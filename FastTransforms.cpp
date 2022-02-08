@@ -41,8 +41,8 @@ namespace alglib_impl {
 //     A   -   DFT of a input array, array[0..N-1]
 //             A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
 // ALGLIB: Copyright 29.05.2009 by Sergey Bochkanov
-// API: void fftc1d(complex_1d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
-// API: void fftc1d(complex_1d_array &a, const xparams _xparams = NonTH);
+// API: void fftc1d(complex_1d_array &a, const ae_int_t n);
+// API: void fftc1d(complex_1d_array &a);
 void fftc1d(CVector *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -93,8 +93,8 @@ void fftc1d(CVector *a, ae_int_t n, ae_state *_state) {
 //     A   -   inverse DFT of a input array, array[0..N-1]
 //             A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
 // ALGLIB: Copyright 29.05.2009 by Sergey Bochkanov
-// API: void fftc1dinv(complex_1d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
-// API: void fftc1dinv(complex_1d_array &a, const xparams _xparams = NonTH);
+// API: void fftc1dinv(complex_1d_array &a, const ae_int_t n);
+// API: void fftc1dinv(complex_1d_array &a);
 void fftc1dinv(CVector *a, ae_int_t n, ae_state *_state) {
    ae_int_t i;
    ae_assert(n > 0, "FFTC1DInv: incorrect N!", _state);
@@ -132,8 +132,8 @@ void fftc1dinv(CVector *a, ae_int_t n, ae_state *_state) {
 // complex array (with frequencies above N/2), so its result may be  used  by
 // other FFT-related subroutines.
 // ALGLIB: Copyright 01.06.2009 by Sergey Bochkanov
-// API: void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f, const xparams _xparams = NonTH);
-// API: void fftr1d(const real_1d_array &a, complex_1d_array &f, const xparams _xparams = NonTH);
+// API: void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f);
+// API: void fftr1d(const real_1d_array &a, complex_1d_array &f);
 void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -230,8 +230,8 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
 // - you must pass FULL array with N elements (although higher  N/2 are still
 // not used) because array size is used to automatically determine FFT length
 // ALGLIB: Copyright 01.06.2009 by Sergey Bochkanov
-// API: void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a, const xparams _xparams = NonTH);
-// API: void fftr1dinv(const complex_1d_array &f, real_1d_array &a, const xparams _xparams = NonTH);
+// API: void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a);
+// API: void fftr1dinv(const complex_1d_array &f, real_1d_array &a);
 void fftr1dinv(CVector *f, ae_int_t n, RVector *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -372,81 +372,65 @@ void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformpl
 } // end of namespace alglib_impl
 
 namespace alglib {
-void fftc1d(complex_1d_array &a, const ae_int_t n, const xparams _xparams) {
+void fftc1d(complex_1d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::fftc1d(ConstT(ae_vector, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void fftc1d(complex_1d_array &a, const xparams _xparams) {
+void fftc1d(complex_1d_array &a) {
    ae_int_t n = a.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::fftc1d(ConstT(ae_vector, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void fftc1dinv(complex_1d_array &a, const ae_int_t n, const xparams _xparams) {
+void fftc1dinv(complex_1d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::fftc1dinv(ConstT(ae_vector, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void fftc1dinv(complex_1d_array &a, const xparams _xparams) {
+void fftc1dinv(complex_1d_array &a) {
    ae_int_t n = a.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::fftc1dinv(ConstT(ae_vector, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f, const xparams _xparams) {
+void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::fftr1d(ConstT(ae_vector, a), n, ConstT(ae_vector, f), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void fftr1d(const real_1d_array &a, complex_1d_array &f, const xparams _xparams) {
+void fftr1d(const real_1d_array &a, complex_1d_array &f) {
    ae_int_t n = a.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::fftr1d(ConstT(ae_vector, a), n, ConstT(ae_vector, f), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a, const xparams _xparams) {
+void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::fftr1dinv(ConstT(ae_vector, f), n, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void fftr1dinv(const complex_1d_array &f, real_1d_array &a, const xparams _xparams) {
+void fftr1dinv(const complex_1d_array &f, real_1d_array &a) {
    ae_int_t n = f.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::fftr1dinv(ConstT(ae_vector, f), n, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -468,7 +452,7 @@ namespace alglib_impl {
 //     A   -   FHT of a input array, array[0..N-1],
 //             A_out[k] = sum(A_in[j]*(cos(2*pi*j*k/N)+sin(2*pi*j*k/N)), j=0..N-1)
 // ALGLIB: Copyright 04.06.2009 by Sergey Bochkanov
-// API: void fhtr1d(real_1d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
+// API: void fhtr1d(real_1d_array &a, const ae_int_t n);
 void fhtr1d(RVector *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -500,7 +484,7 @@ void fhtr1d(RVector *a, ae_int_t n, ae_state *_state) {
 // Outputs:
 //     A   -   inverse FHT of a input array, array[0..N-1]
 // ALGLIB: Copyright 29.05.2009 by Sergey Bochkanov
-// API: void fhtr1dinv(real_1d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
+// API: void fhtr1dinv(real_1d_array &a, const ae_int_t n);
 void fhtr1dinv(RVector *a, ae_int_t n, ae_state *_state) {
    ae_int_t i;
    ae_assert(n > 0, "FHTR1DInv: incorrect N!", _state);
@@ -520,20 +504,16 @@ void fhtr1dinv(RVector *a, ae_int_t n, ae_state *_state) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-void fhtr1d(real_1d_array &a, const ae_int_t n, const xparams _xparams) {
+void fhtr1d(real_1d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::fhtr1d(ConstT(ae_vector, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void fhtr1dinv(real_1d_array &a, const ae_int_t n, const xparams _xparams) {
+void fhtr1dinv(real_1d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::fhtr1dinv(ConstT(ae_vector, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -901,7 +881,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams = NonTH);
+// API: void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
 void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_state *_state) {
    SetVector(r);
    ae_assert(n > 0 && m > 0, "ConvC1D: incorrect N or M!", _state);
@@ -936,7 +916,7 @@ void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_stat
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams = NonTH);
+// API: void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
 void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -1013,7 +993,7 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_s
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c, const xparams _xparams = NonTH);
+// API: void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c);
 void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i1;
@@ -1067,7 +1047,7 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c,
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams = NonTH);
+// API: void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
 void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -1464,7 +1444,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams = NonTH);
+// API: void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
 void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_state *_state) {
    SetVector(r);
    ae_assert(n > 0 && m > 0, "ConvR1D: incorrect N or M!", _state);
@@ -1499,7 +1479,7 @@ void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_stat
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams = NonTH);
+// API: void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
 void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -1562,7 +1542,7 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_s
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c, const xparams _xparams = NonTH);
+// API: void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c);
 void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i1;
@@ -1617,7 +1597,7 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c,
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams = NonTH);
+// API: void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
 void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -1700,74 +1680,58 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
 } // end of namespace alglib_impl
 
 namespace alglib {
-void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams) {
+void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::convc1d(ConstT(ae_vector, a), m, ConstT(ae_vector, b), n, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams) {
+void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::convc1dinv(ConstT(ae_vector, a), m, ConstT(ae_vector, b), n, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c, const xparams _xparams) {
+void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::convc1dcircular(ConstT(ae_vector, s), m, ConstT(ae_vector, r), n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams) {
+void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::convc1dcircularinv(ConstT(ae_vector, a), m, ConstT(ae_vector, b), n, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams) {
+void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::convr1d(ConstT(ae_vector, a), m, ConstT(ae_vector, b), n, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams) {
+void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::convr1dinv(ConstT(ae_vector, a), m, ConstT(ae_vector, b), n, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c, const xparams _xparams) {
+void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::convr1dcircular(ConstT(ae_vector, s), m, ConstT(ae_vector, r), n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams) {
+void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::convr1dcircularinv(ConstT(ae_vector, a), m, ConstT(ae_vector, b), n, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1808,7 +1772,7 @@ namespace alglib_impl {
 //     It is assumed that pattern domain is [0..M-1].  If Pattern is non-zero
 // on [-K..M-1],  you can still use this subroutine, just shift result by K.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_array &pattern, const ae_int_t m, complex_1d_array &r, const xparams _xparams = NonTH);
+// API: void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_array &pattern, const ae_int_t m, complex_1d_array &r);
 void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector *r, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -1852,7 +1816,7 @@ void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector 
 // Outputs:
 //     R   -   convolution: A*B. array[0..M-1].
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const complex_1d_array &pattern, const ae_int_t n, complex_1d_array &c, const xparams _xparams = NonTH);
+// API: void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const complex_1d_array &pattern, const ae_int_t n, complex_1d_array &c);
 void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, CVector *c, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i1;
@@ -1928,7 +1892,7 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
 //     It is assumed that pattern domain is [0..M-1].  If Pattern is non-zero
 // on [-K..M-1],  you can still use this subroutine, just shift result by K.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array &pattern, const ae_int_t m, real_1d_array &r, const xparams _xparams = NonTH);
+// API: void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array &pattern, const ae_int_t m, real_1d_array &r);
 void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector *r, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -1972,7 +1936,7 @@ void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector 
 // Outputs:
 //     R   -   convolution: A*B. array[0..M-1].
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
-// API: void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1d_array &pattern, const ae_int_t n, real_1d_array &c, const xparams _xparams = NonTH);
+// API: void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1d_array &pattern, const ae_int_t n, real_1d_array &c);
 void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, RVector *c, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i1;
@@ -2018,38 +1982,30 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
 } // end of namespace alglib_impl
 
 namespace alglib {
-void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_array &pattern, const ae_int_t m, complex_1d_array &r, const xparams _xparams) {
+void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_array &pattern, const ae_int_t m, complex_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::corrc1d(ConstT(ae_vector, signal), n, ConstT(ae_vector, pattern), m, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const complex_1d_array &pattern, const ae_int_t n, complex_1d_array &c, const xparams _xparams) {
+void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const complex_1d_array &pattern, const ae_int_t n, complex_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::corrc1dcircular(ConstT(ae_vector, signal), m, ConstT(ae_vector, pattern), n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array &pattern, const ae_int_t m, real_1d_array &r, const xparams _xparams) {
+void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array &pattern, const ae_int_t m, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::corrr1d(ConstT(ae_vector, signal), n, ConstT(ae_vector, pattern), m, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1d_array &pattern, const ae_int_t n, real_1d_array &c, const xparams _xparams) {
+void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1d_array &pattern, const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::corrr1dcircular(ConstT(ae_vector, signal), m, ConstT(ae_vector, pattern), n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }

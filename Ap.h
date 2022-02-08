@@ -98,6 +98,16 @@ typedef enum { NonTH, SerTH, ParTH } xparams;
 #   define AE_COMPILER AE_OTHERC
 #endif
 
+// Solaris Studio C/C++, IBM XL C/C++, GNU C, CLang, IntelC++ Compiler (Linux): _thread static
+// Visual C++, Intel C/C++ (Windows), C++ Builder, Digital Mars C++: __declspec(thread) static
+// C++ Builder: __thread static or _declspec(thread) static
+// On Windows before Vista and Server 2008 _declspec(thread) won't work in DLL's except those bound to executables.
+// In C++11 (and in C++ if <threads.h> is supported): thread_local static; requires #include <threads.h>
+// In C11 (in general): Thread_local static
+// The keywords "auto" and "Thread_local"/"thread_local" in C/C++ have mutually exclusive uses
+// and can therefore be considered as different cases of the same concept!
+#define AutoS static // "auto static": static thread-local variables in block or file scope.
+
 // Now we are ready to include the remaining headers.
 // #include <ctype.h>
 #include <stdarg.h>
@@ -237,33 +247,17 @@ typedef struct ae_dyn_block ae_frame;
 
 // ALGLIB environment state
 struct ae_state {
-// The byte order type: AE_LITTLE_ENDIAN or AE_BIG_ENDIAN
-   ae_int_t endianness;
-// double values for NAN, +INFINITY and -INFINITY.
-   const double v_nan = NAN, v_posinf = +INFINITY, v_neginf = -INFINITY;
 // pointer to the top block in a stack of frames which hold dynamically allocated objects
    ae_frame *volatile p_top_block;
-   ae_frame last_block;
 // jmp_buf pointer for internal C-style exception handling
    jmp_buf *volatile break_jump;
 // ae_error_type of the last error (filled when exception is thrown)
    ae_error_type volatile last_error;
 // human-readable message (filled when exception is thrown)
    const char *volatile error_msg;
-// Flags: call-local settings for ALGLIB
-   ae_uint64_t flags;
-// threading information:
-// a) current thread pool
-// b) current worker thread
-// c) parent task (one we are solving right now)
-// d) thread exception handler (function which must be called by ae_assert before raising exception).
-// NOTE: we use void* to store pointers in order to avoid explicit dependency on smp.h
-   void *worker_thread;
-   void *parent_task;
-   void (*thread_exception_handler)(void *);
 };
 void ae_state_set_break_jump(ae_state *state, jmp_buf *buf);
-void ae_state_set_flags(ae_state *state, ae_uint64_t flags);
+void ae_state_set_flags(ae_uint64_t flags);
 
 void ae_frame_make(ae_state *state, ae_frame *tmp);
 void ae_frame_leave(ae_state *state);

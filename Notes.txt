@@ -448,6 +448,30 @@ A6.2. Test Stages
 	―	Replaced the threading flag names "xdefault, "serial" and "parallel" respectively by NonTH, SerTH and ParTH.
 	―	Changed xparams into enum { NonTH = 0, SerTH = 1, ParTH = 2 }.
 0-39	Consolidated {get,set}nworkers(), _ae_cores_count(), _ae_{get,set}_global_threading(), setglobalthreading().
+0-39	Ap.{cpp,h}:
+∙	Part of the ae_state structure has been removed:
+	―	Remove flags from ae_state and make it "AutoS" as CurFlags.
+		Remove the ae_state parameter from ae_set_state_flags().
+	―	Ap.*: thread_exception_handler, parent_task and worker_thread are unused.
+		Remake them "AutoS" as ErrorOp(), SupTask, CurThread, respectively.
+	―	These are all remnants from the Commercial Version of ALGLIB and not actually needed or used anywhere.
+	―	Remove v_nan, v_posinf, v_neginf from ae_state and replace then, respectively, by NAN, +INFINITY and -INFINITY.
+	―	Remove endianness from ae_state: already localized as ByteOrder in Ap.cpp.
+	―	Remove last_block from ae_state: replace it with a single shared object BotFr inside ae_state_init().
+		The frame base, last_block, is block-level static and compile-time fixed and does not need to be made thread-safe.
+	To regain thread-safety will require making CurFlags thread-local
+	(but multi-threadedness was not officially part of the Free Edition of ALGLIB).
+∙	Remove the extra xparams: they are only relevant for the Commercial Version.
+	―	In *.h files:
+		│(..., const xparam _xparams = NonTH);│	⇒	│(...)│
+	―	In *.cpp files:
+		│(..., const xparams _xparams);│	⇒	│(...);│
+		│(..., xparams)│	⇒	│(...)│
+	―	In *.htm files:
+		│(..., <b>const</b> xparams params = xdefault);│ → │(...)│
+	―	Remove the conditional if (_xparams != NonTH) ae_set_state_flags(_xparams),
+		and put it in the caller BEFORE the routine, wherever it is set to a value ≠ NonTH,
+		with a call to ae_set_state_flags(NonTH) to follow.
 
 A6.3. Test Results
 ──────────────────
@@ -482,6 +506,7 @@ A6.3. Test Results
 39	7937 1.0x 12501 1.0x 10873 0.9x 9172 1.1x 1643757812 (61f9c0f4) 80 // Recode random*() and *pythag2().
 39	7692 1.0x 12347 0.9x 11240 1.0x 9492 1.0x 1643828901 (61fad6a5) 78 // Recode "eternal" locks in Ap.{cpp,h}.
 39	7874 1.0x 12501 1.0x 12199 1.0x 9018 1.0x 1644128862 (61ff6a5e) 79 // Recode ByteOrder, _lock routines & xparams.
+39	8000 1.0x 12347 1.0x 12052 1.0x 8761 1.0x 1644295249 (6201f451) 81 // Reduce ae_state and xparams.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -538,19 +563,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7874
+* RGEMM-SEQ-16   (MFLOPS)   8000
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12501
+* RGEMM-SEQ-32   (MFLOPS)  12347
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12199
+* RGEMM-SEQ-64   (MFLOPS)  12052
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9018
+* RGEMM-SEQ-1024 (MFLOPS)   8761
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1644128862
+SEED: 1644295249
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -650,4 +675,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 79 seconds
+Done in 81 seconds

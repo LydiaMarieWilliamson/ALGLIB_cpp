@@ -24,7 +24,7 @@ static const ae_int_t hqrnd_hqrndmagic = 1634357784;
 
 // HQRNDState initialization with seed values
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state, const xparams _xparams = NonTH);
+// API: void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state);
 void hqrndseed(ae_int_t s1, ae_int_t s2, hqrndstate *state, ae_state *_state) {
    SetObj(hqrndstate, state);
 // Protection against negative seeds:
@@ -49,7 +49,7 @@ void hqrndseed(ae_int_t s1, ae_int_t s2, hqrndstate *state, ae_state *_state) {
 // HQRNDState  initialization  with  random  values  which come from standard
 // RNG.
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: void hqrndrandomize(hqrndstate &state, const xparams _xparams = NonTH);
+// API: void hqrndrandomize(hqrndstate &state);
 void hqrndrandomize(hqrndstate *state, ae_state *_state) {
    ae_int_t s0;
    ae_int_t s1;
@@ -93,7 +93,7 @@ static ae_int_t hqrnd_hqrndintegerbase(hqrndstate *state, ae_state *_state) {
 //    * close to 2^62 on 64-bit systems
 //    An exception will be generated if N is too large.
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n, const xparams _xparams = NonTH);
+// API: ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n);
 ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n, ae_state *_state) {
    ae_int_t maxcnt;
    ae_int_t mx;
@@ -175,7 +175,7 @@ ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n, ae_state *_state) {
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: double hqrnduniformr(const hqrndstate &state, const xparams _xparams = NonTH);
+// API: double hqrnduniformr(const hqrndstate &state);
 double hqrnduniformr(hqrndstate *state, ae_state *_state) {
    double result;
    result = (double)(hqrnd_hqrndintegerbase(state, _state) + 1) / (hqrnd_hqrndmax + 2);
@@ -189,7 +189,7 @@ double hqrnduniformr(hqrndstate *state, ae_state *_state) {
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: void hqrndnormal2(const hqrndstate &state, double &x1, double &x2, const xparams _xparams = NonTH);
+// API: void hqrndnormal2(const hqrndstate &state, double &x1, double &x2);
 void hqrndnormal2(hqrndstate *state, double *x1, double *x2, ae_state *_state) {
    double u;
    double v;
@@ -218,7 +218,7 @@ void hqrndnormal2(hqrndstate *state, double *x1, double *x2, ae_state *_state) {
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: double hqrndnormal(const hqrndstate &state, const xparams _xparams = NonTH);
+// API: double hqrndnormal(const hqrndstate &state);
 double hqrndnormal(hqrndstate *state, ae_state *_state) {
    double v1;
    double v2;
@@ -234,7 +234,7 @@ double hqrndnormal(hqrndstate *state, ae_state *_state) {
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x, const xparams _xparams = NonTH);
+// API: void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x);
 void hqrndnormalv(hqrndstate *state, ae_int_t n, RVector *x, ae_state *_state) {
    ae_int_t i;
    ae_int_t n2;
@@ -260,7 +260,7 @@ void hqrndnormalv(hqrndstate *state, ae_int_t n, RVector *x, ae_state *_state) {
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x, const xparams _xparams = NonTH);
+// API: void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x);
 void hqrndnormalm(hqrndstate *state, ae_int_t m, ae_int_t n, RMatrix *x, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -287,7 +287,7 @@ void hqrndnormalm(hqrndstate *state, ae_int_t m, ae_int_t n, RMatrix *x, ae_stat
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: void hqrndunit2(const hqrndstate &state, double &x, double &y, const xparams _xparams = NonTH);
+// API: void hqrndunit2(const hqrndstate &state, double &x, double &y);
 void hqrndunit2(hqrndstate *state, double *x, double *y, ae_state *_state) {
    double v;
    double mx;
@@ -308,7 +308,7 @@ void hqrndunit2(hqrndstate *state, double *x, double *y, ae_state *_state) {
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
 // ALGLIB: Copyright 11.08.2007 by Sergey Bochkanov
-// API: double hqrndexponential(const hqrndstate &state, const double lambdav, const xparams _xparams = NonTH);
+// API: double hqrndexponential(const hqrndstate &state, const double lambdav);
 double hqrndexponential(hqrndstate *state, double lambdav, ae_state *_state) {
    double result;
    ae_assert(lambdav > 0.0, "HQRNDExponential: LambdaV <= 0!", _state);
@@ -328,7 +328,7 @@ double hqrndexponential(hqrndstate *state, double lambdav, ae_state *_state) {
 // RESULT
 //     this function returns one of the X[i] for random i=0..N-1
 // ALGLIB: Copyright 08.11.2011 by Sergey Bochkanov
-// API: double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n, const xparams _xparams = NonTH);
+// API: double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n);
 double hqrnddiscrete(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_state) {
    double result;
    ae_assert(n > 0, "HQRNDDiscrete: N <= 0", _state);
@@ -352,7 +352,7 @@ double hqrnddiscrete(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_state
 //     this function returns random number from continuous distribution which
 //     tries to approximate X as mush as possible. min(X) <= Result <= max(X).
 // ALGLIB: Copyright 08.11.2011 by Sergey Bochkanov
-// API: double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n, const xparams _xparams = NonTH);
+// API: double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n);
 double hqrndcontinuous(hqrndstate *state, RVector *x, ae_int_t n, ae_state *_state) {
    double mx;
    double mn;
@@ -402,115 +402,91 @@ namespace alglib {
 //                     was correctly initialized.
 DefClass(hqrndstate, )
 
-void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state, const xparams _xparams) {
+void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hqrndseed(s1, s2, ConstT(hqrndstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void hqrndrandomize(hqrndstate &state, const xparams _xparams) {
+void hqrndrandomize(hqrndstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hqrndrandomize(ConstT(hqrndstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n, const xparams _xparams) {
+ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::hqrnduniformi(ConstT(hqrndstate, state), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 
-double hqrnduniformr(const hqrndstate &state, const xparams _xparams) {
+double hqrnduniformr(const hqrndstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::hqrnduniformr(ConstT(hqrndstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-void hqrndnormal2(const hqrndstate &state, double &x1, double &x2, const xparams _xparams) {
+void hqrndnormal2(const hqrndstate &state, double &x1, double &x2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hqrndnormal2(ConstT(hqrndstate, state), &x1, &x2, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-double hqrndnormal(const hqrndstate &state, const xparams _xparams) {
+double hqrndnormal(const hqrndstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::hqrndnormal(ConstT(hqrndstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x, const xparams _xparams) {
+void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hqrndnormalv(ConstT(hqrndstate, state), n, ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x, const xparams _xparams) {
+void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hqrndnormalm(ConstT(hqrndstate, state), m, n, ConstT(ae_matrix, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void hqrndunit2(const hqrndstate &state, double &x, double &y, const xparams _xparams) {
+void hqrndunit2(const hqrndstate &state, double &x, double &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hqrndunit2(ConstT(hqrndstate, state), &x, &y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-double hqrndexponential(const hqrndstate &state, const double lambdav, const xparams _xparams) {
+double hqrndexponential(const hqrndstate &state, const double lambdav) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::hqrndexponential(ConstT(hqrndstate, state), lambdav, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n, const xparams _xparams) {
+double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::hqrnddiscrete(ConstT(hqrndstate, state), ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n, const xparams _xparams) {
+double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::hqrndcontinuous(ConstT(hqrndstate, state), ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -526,7 +502,7 @@ namespace alglib_impl {
 // * integer and complex fields of Rec1 are set to 1 and 1+i correspondingly
 // * array field of Rec1 is set to [2,3]
 // ALGLIB: Copyright 27.05.2014 by Sergey Bochkanov
-// API: void xdebuginitrecord1(xdebugrecord1 &rec1, const xparams _xparams = NonTH);
+// API: void xdebuginitrecord1(xdebugrecord1 &rec1);
 void xdebuginitrecord1(xdebugrecord1 *rec1, ae_state *_state) {
    SetObj(xdebugrecord1, rec1);
    rec1->i = 1;
@@ -541,7 +517,7 @@ void xdebuginitrecord1(xdebugrecord1 *rec1, ae_state *_state) {
 //
 // Counts number of True values in the boolean 1D array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: ae_int_t xdebugb1count(const boolean_1d_array &a, const xparams _xparams = NonTH);
+// API: ae_int_t xdebugb1count(const boolean_1d_array &a);
 ae_int_t xdebugb1count(BVector *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t result;
@@ -560,7 +536,7 @@ ae_int_t xdebugb1count(BVector *a, ae_state *_state) {
 // Replace all values in array by NOT(a[i]).
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugb1not(const boolean_1d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugb1not(const boolean_1d_array &a);
 void xdebugb1not(BVector *a, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < a->cnt; i++) {
@@ -574,7 +550,7 @@ void xdebugb1not(BVector *a, ae_state *_state) {
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugb1appendcopy(boolean_1d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugb1appendcopy(boolean_1d_array &a);
 void xdebugb1appendcopy(BVector *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -597,7 +573,7 @@ void xdebugb1appendcopy(BVector *a, ae_state *_state) {
 // Generate N-element array with even-numbered elements set to True.
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a);
 void xdebugb1outeven(ae_int_t n, BVector *a, ae_state *_state) {
    ae_int_t i;
    SetVector(a);
@@ -612,7 +588,7 @@ void xdebugb1outeven(ae_int_t n, BVector *a, ae_state *_state) {
 //
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: ae_int_t xdebugi1sum(const integer_1d_array &a, const xparams _xparams = NonTH);
+// API: ae_int_t xdebugi1sum(const integer_1d_array &a);
 ae_int_t xdebugi1sum(ZVector *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t result;
@@ -629,7 +605,7 @@ ae_int_t xdebugi1sum(ZVector *a, ae_state *_state) {
 // Replace all values in array by -A[I]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugi1neg(const integer_1d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugi1neg(const integer_1d_array &a);
 void xdebugi1neg(ZVector *a, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < a->cnt; i++) {
@@ -643,7 +619,7 @@ void xdebugi1neg(ZVector *a, ae_state *_state) {
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugi1appendcopy(integer_1d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugi1appendcopy(integer_1d_array &a);
 void xdebugi1appendcopy(ZVector *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -668,7 +644,7 @@ void xdebugi1appendcopy(ZVector *a, ae_state *_state) {
 //
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugi1outeven(const ae_int_t n, integer_1d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugi1outeven(const ae_int_t n, integer_1d_array &a);
 void xdebugi1outeven(ae_int_t n, ZVector *a, ae_state *_state) {
    ae_int_t i;
    SetVector(a);
@@ -687,7 +663,7 @@ void xdebugi1outeven(ae_int_t n, ZVector *a, ae_state *_state) {
 //
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: double xdebugr1sum(const real_1d_array &a, const xparams _xparams = NonTH);
+// API: double xdebugr1sum(const real_1d_array &a);
 double xdebugr1sum(RVector *a, ae_state *_state) {
    ae_int_t i;
    double result;
@@ -704,7 +680,7 @@ double xdebugr1sum(RVector *a, ae_state *_state) {
 // Replace all values in array by -A[I]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugr1neg(const real_1d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugr1neg(const real_1d_array &a);
 void xdebugr1neg(RVector *a, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < a->cnt; i++) {
@@ -718,7 +694,7 @@ void xdebugr1neg(RVector *a, ae_state *_state) {
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugr1appendcopy(real_1d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugr1appendcopy(real_1d_array &a);
 void xdebugr1appendcopy(RVector *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -743,7 +719,7 @@ void xdebugr1appendcopy(RVector *a, ae_state *_state) {
 //
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugr1outeven(const ae_int_t n, real_1d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugr1outeven(const ae_int_t n, real_1d_array &a);
 void xdebugr1outeven(ae_int_t n, RVector *a, ae_state *_state) {
    ae_int_t i;
    SetVector(a);
@@ -762,7 +738,7 @@ void xdebugr1outeven(ae_int_t n, RVector *a, ae_state *_state) {
 //
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: complex xdebugc1sum(const complex_1d_array &a, const xparams _xparams = NonTH);
+// API: complex xdebugc1sum(const complex_1d_array &a);
 complex xdebugc1sum(CVector *a, ae_state *_state) {
    ae_int_t i;
    complex result;
@@ -779,7 +755,7 @@ complex xdebugc1sum(CVector *a, ae_state *_state) {
 // Replace all values in array by -A[I]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugc1neg(const complex_1d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugc1neg(const complex_1d_array &a);
 void xdebugc1neg(CVector *a, ae_state *_state) {
    ae_int_t i;
    for (i = 0; i < a->cnt; i++) {
@@ -793,7 +769,7 @@ void xdebugc1neg(CVector *a, ae_state *_state) {
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugc1appendcopy(complex_1d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugc1appendcopy(complex_1d_array &a);
 void xdebugc1appendcopy(CVector *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -818,7 +794,7 @@ void xdebugc1appendcopy(CVector *a, ae_state *_state) {
 //
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugc1outeven(const ae_int_t n, complex_1d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugc1outeven(const ae_int_t n, complex_1d_array &a);
 void xdebugc1outeven(ae_int_t n, CVector *a, ae_state *_state) {
    ae_int_t i;
    SetVector(a);
@@ -837,7 +813,7 @@ void xdebugc1outeven(ae_int_t n, CVector *a, ae_state *_state) {
 //
 // Counts number of True values in the boolean 2D array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: ae_int_t xdebugb2count(const boolean_2d_array &a, const xparams _xparams = NonTH);
+// API: ae_int_t xdebugb2count(const boolean_2d_array &a);
 ae_int_t xdebugb2count(BMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -859,7 +835,7 @@ ae_int_t xdebugb2count(BMatrix *a, ae_state *_state) {
 // Replace all values in array by NOT(a[i]).
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugb2not(const boolean_2d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugb2not(const boolean_2d_array &a);
 void xdebugb2not(BMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -876,7 +852,7 @@ void xdebugb2not(BMatrix *a, ae_state *_state) {
 // Transposes array.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugb2transpose(boolean_2d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugb2transpose(boolean_2d_array &a);
 void xdebugb2transpose(BMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -904,7 +880,7 @@ void xdebugb2transpose(BMatrix *a, ae_state *_state) {
 // Generate MxN matrix with elements set to "Sin(3*I+5*J)>0"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a);
 void xdebugb2outsin(ae_int_t m, ae_int_t n, BMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -922,7 +898,7 @@ void xdebugb2outsin(ae_int_t m, ae_int_t n, BMatrix *a, ae_state *_state) {
 //
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: ae_int_t xdebugi2sum(const integer_2d_array &a, const xparams _xparams = NonTH);
+// API: ae_int_t xdebugi2sum(const integer_2d_array &a);
 ae_int_t xdebugi2sum(ZMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -942,7 +918,7 @@ ae_int_t xdebugi2sum(ZMatrix *a, ae_state *_state) {
 // Replace all values in array by -a[i,j]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugi2neg(const integer_2d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugi2neg(const integer_2d_array &a);
 void xdebugi2neg(ZMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -959,7 +935,7 @@ void xdebugi2neg(ZMatrix *a, ae_state *_state) {
 // Transposes array.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugi2transpose(integer_2d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugi2transpose(integer_2d_array &a);
 void xdebugi2transpose(ZMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -987,7 +963,7 @@ void xdebugi2transpose(ZMatrix *a, ae_state *_state) {
 // Generate MxN matrix with elements set to "Sign(Sin(3*I+5*J))"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a);
 void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -1005,7 +981,7 @@ void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix *a, ae_state *_state) {
 //
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: double xdebugr2sum(const real_2d_array &a, const xparams _xparams = NonTH);
+// API: double xdebugr2sum(const real_2d_array &a);
 double xdebugr2sum(RMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -1025,7 +1001,7 @@ double xdebugr2sum(RMatrix *a, ae_state *_state) {
 // Replace all values in array by -a[i,j]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugr2neg(const real_2d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugr2neg(const real_2d_array &a);
 void xdebugr2neg(RMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -1042,7 +1018,7 @@ void xdebugr2neg(RMatrix *a, ae_state *_state) {
 // Transposes array.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugr2transpose(real_2d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugr2transpose(real_2d_array &a);
 void xdebugr2transpose(RMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -1070,7 +1046,7 @@ void xdebugr2transpose(RMatrix *a, ae_state *_state) {
 // Generate MxN matrix with elements set to "Sin(3*I+5*J)"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a);
 void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -1088,7 +1064,7 @@ void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a, ae_state *_state) {
 //
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: complex xdebugc2sum(const complex_2d_array &a, const xparams _xparams = NonTH);
+// API: complex xdebugc2sum(const complex_2d_array &a);
 complex xdebugc2sum(CMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -1108,7 +1084,7 @@ complex xdebugc2sum(CMatrix *a, ae_state *_state) {
 // Replace all values in array by -a[i,j]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugc2neg(const complex_2d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugc2neg(const complex_2d_array &a);
 void xdebugc2neg(CMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -1125,7 +1101,7 @@ void xdebugc2neg(CMatrix *a, ae_state *_state) {
 // Transposes array.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugc2transpose(complex_2d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugc2transpose(complex_2d_array &a);
 void xdebugc2transpose(CMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -1153,7 +1129,7 @@ void xdebugc2transpose(CMatrix *a, ae_state *_state) {
 // Generate MxN matrix with elements set to "Sin(3*I+5*J),Cos(3*I+5*J)"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const xparams _xparams = NonTH);
+// API: void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a);
 void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -1171,7 +1147,7 @@ void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a, ae_state *_state) {
 //
 // Returns sum of a[i,j]*(1+b[i,j]) such that c[i,j] is True
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c, const xparams _xparams = NonTH);
+// API: double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c);
 double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix *a, RMatrix *b, BMatrix *c, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -1218,316 +1194,248 @@ namespace alglib {
 // ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
 DefClass(xdebugrecord1, DecVal(i) DecComplex(c) DecVar(a))
 
-void xdebuginitrecord1(xdebugrecord1 &rec1, const xparams _xparams) {
+void xdebuginitrecord1(xdebugrecord1 &rec1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebuginitrecord1(ConstT(xdebugrecord1, rec1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-ae_int_t xdebugb1count(const boolean_1d_array &a, const xparams _xparams) {
+ae_int_t xdebugb1count(const boolean_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::xdebugb1count(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 
-void xdebugb1not(const boolean_1d_array &a, const xparams _xparams) {
+void xdebugb1not(const boolean_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugb1not(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugb1appendcopy(boolean_1d_array &a, const xparams _xparams) {
+void xdebugb1appendcopy(boolean_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugb1appendcopy(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a, const xparams _xparams) {
+void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugb1outeven(n, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-ae_int_t xdebugi1sum(const integer_1d_array &a, const xparams _xparams) {
+ae_int_t xdebugi1sum(const integer_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::xdebugi1sum(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 
-void xdebugi1neg(const integer_1d_array &a, const xparams _xparams) {
+void xdebugi1neg(const integer_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugi1neg(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugi1appendcopy(integer_1d_array &a, const xparams _xparams) {
+void xdebugi1appendcopy(integer_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugi1appendcopy(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugi1outeven(const ae_int_t n, integer_1d_array &a, const xparams _xparams) {
+void xdebugi1outeven(const ae_int_t n, integer_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugi1outeven(n, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-double xdebugr1sum(const real_1d_array &a, const xparams _xparams) {
+double xdebugr1sum(const real_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::xdebugr1sum(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-void xdebugr1neg(const real_1d_array &a, const xparams _xparams) {
+void xdebugr1neg(const real_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugr1neg(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugr1appendcopy(real_1d_array &a, const xparams _xparams) {
+void xdebugr1appendcopy(real_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugr1appendcopy(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugr1outeven(const ae_int_t n, real_1d_array &a, const xparams _xparams) {
+void xdebugr1outeven(const ae_int_t n, real_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugr1outeven(n, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-complex xdebugc1sum(const complex_1d_array &a, const xparams _xparams) {
+complex xdebugc1sum(const complex_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, complex(0.0))
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::complex C = alglib_impl::xdebugc1sum(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return ComplexOf(C);
 }
 
-void xdebugc1neg(const complex_1d_array &a, const xparams _xparams) {
+void xdebugc1neg(const complex_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugc1neg(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugc1appendcopy(complex_1d_array &a, const xparams _xparams) {
+void xdebugc1appendcopy(complex_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugc1appendcopy(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugc1outeven(const ae_int_t n, complex_1d_array &a, const xparams _xparams) {
+void xdebugc1outeven(const ae_int_t n, complex_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugc1outeven(n, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-ae_int_t xdebugb2count(const boolean_2d_array &a, const xparams _xparams) {
+ae_int_t xdebugb2count(const boolean_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::xdebugb2count(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 
-void xdebugb2not(const boolean_2d_array &a, const xparams _xparams) {
+void xdebugb2not(const boolean_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugb2not(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugb2transpose(boolean_2d_array &a, const xparams _xparams) {
+void xdebugb2transpose(boolean_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugb2transpose(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a, const xparams _xparams) {
+void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugb2outsin(m, n, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-ae_int_t xdebugi2sum(const integer_2d_array &a, const xparams _xparams) {
+ae_int_t xdebugi2sum(const integer_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::xdebugi2sum(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 
-void xdebugi2neg(const integer_2d_array &a, const xparams _xparams) {
+void xdebugi2neg(const integer_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugi2neg(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugi2transpose(integer_2d_array &a, const xparams _xparams) {
+void xdebugi2transpose(integer_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugi2transpose(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a, const xparams _xparams) {
+void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugi2outsin(m, n, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-double xdebugr2sum(const real_2d_array &a, const xparams _xparams) {
+double xdebugr2sum(const real_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::xdebugr2sum(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-void xdebugr2neg(const real_2d_array &a, const xparams _xparams) {
+void xdebugr2neg(const real_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugr2neg(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugr2transpose(real_2d_array &a, const xparams _xparams) {
+void xdebugr2transpose(real_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugr2transpose(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a, const xparams _xparams) {
+void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugr2outsin(m, n, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-complex xdebugc2sum(const complex_2d_array &a, const xparams _xparams) {
+complex xdebugc2sum(const complex_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, complex(0.0))
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::complex C = alglib_impl::xdebugc2sum(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return ComplexOf(C);
 }
 
-void xdebugc2neg(const complex_2d_array &a, const xparams _xparams) {
+void xdebugc2neg(const complex_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugc2neg(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugc2transpose(complex_2d_array &a, const xparams _xparams) {
+void xdebugc2transpose(complex_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugc2transpose(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const xparams _xparams) {
+void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdebugc2outsincos(m, n, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c, const xparams _xparams) {
+double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::xdebugmaskedbiasedproductsum(m, n, ConstT(ae_matrix, a), ConstT(ae_matrix, b), ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1810,7 +1718,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
-// API: void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf, const xparams _xparams = NonTH);
+// API: void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf);
 void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf, ae_state *_state) {
    SetObj(kdtreerequestbuffer, buf);
    ae_vector_set_length(&buf->x, kdt->nx, _state);
@@ -1857,8 +1765,8 @@ void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf, ae_state *
 //    inefficient case, because  simple  binary  search  (without  additional
 //    structures) is much more efficient in such tasks than KD-trees.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = NonTH);
-// API: void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = NonTH);
+// API: void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
+// API: void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
 void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -1942,8 +1850,8 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
 //    inefficient case, because  simple  binary  search  (without  additional
 //    structures) is much more efficient in such tasks than KD-trees.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = NonTH);
-// API: void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams = NonTH);
+// API: void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
+// API: void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
 void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -2257,8 +2165,8 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
-// API: ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps, const xparams _xparams = NonTH);
-// API: ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const double eps, const xparams _xparams = NonTH);
+// API: ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps);
+// API: ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const double eps);
 ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_int_t k, bool selfmatch, double eps, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -2340,8 +2248,8 @@ ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae
 // * KDTreeQueryResultsTags() to get tag values
 // * KDTreeQueryResultsDistances() to get distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps, const xparams _xparams = NonTH);
-// API: ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const double eps, const xparams _xparams = NonTH);
+// API: ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps);
+// API: ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const double eps);
 ae_int_t kdtreequeryaknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch, double eps, ae_state *_state) {
    ae_int_t result;
    result = kdtreetsqueryaknn(kdt, &kdt->innerbuf, x, k, selfmatch, eps, _state);
@@ -2385,8 +2293,8 @@ ae_int_t kdtreequeryaknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch, do
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
-// API: ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const xparams _xparams = NonTH);
-// API: ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const xparams _xparams = NonTH);
+// API: ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch);
+// API: ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k);
 ae_int_t kdtreetsqueryknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_int_t k, bool selfmatch, ae_state *_state) {
    ae_int_t result;
    ae_assert(k >= 1, "KDTreeTsQueryKNN: K<1!", _state);
@@ -2426,8 +2334,8 @@ ae_int_t kdtreetsqueryknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_
 // * KDTreeQueryResultsTags() to get tag values
 // * KDTreeQueryResultsDistances() to get distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const xparams _xparams = NonTH);
-// API: ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const xparams _xparams = NonTH);
+// API: ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch);
+// API: ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k);
 ae_int_t kdtreequeryknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch, ae_state *_state) {
    ae_int_t result;
    ae_assert(k >= 1, "KDTreeQueryKNN: K<1!", _state);
@@ -2562,8 +2470,8 @@ static ae_int_t nearestneighbor_tsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
-// API: ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams = NonTH);
-// API: ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const xparams _xparams = NonTH);
+// API: ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch);
+// API: ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r);
 ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch, ae_state *_state) {
    ae_int_t result;
    ae_assert(isfinite(r) && r > 0.0, "KDTreeTsQueryRNN: incorrect R!", _state);
@@ -2608,8 +2516,8 @@ ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, dou
 // * KDTreeQueryResultsTags() to get tag values
 // * KDTreeQueryResultsDistances() to get distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams = NonTH);
-// API: ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const xparams _xparams = NonTH);
+// API: ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch);
+// API: ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r);
 ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch, ae_state *_state) {
    ae_int_t result;
    ae_assert(r > 0.0, "KDTreeQueryRNN: incorrect R!", _state);
@@ -2660,8 +2568,8 @@ ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch, ae_st
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
-// API: ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams = NonTH);
-// API: ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const xparams _xparams = NonTH);
+// API: ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch);
+// API: ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r);
 ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch, ae_state *_state) {
    ae_int_t result;
    ae_assert(isfinite(r) && r > 0.0, "KDTreeTsQueryRNNU: incorrect R!", _state);
@@ -2705,8 +2613,8 @@ ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, do
 //
 // As indicated by "U" suffix, this function returns unordered results.
 // ALGLIB: Copyright 01.11.2018 by Sergey Bochkanov
-// API: ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams);
-// API: ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const xparams _xparams);
+// API: ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch);
+// API: ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r);
 ae_int_t kdtreequeryrnnu(kdtree *kdt, RVector *x, double r, bool selfmatch, ae_state *_state) {
    ae_int_t result;
    ae_assert(r > 0.0, "KDTreeQueryRNNU: incorrect R!", _state);
@@ -2825,7 +2733,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree *kdt, kdtreerequestbuffer *
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
 // ALGLIB: Copyright 14.05.2016 by Sergey Bochkanov
-// API: ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &boxmin, const real_1d_array &boxmax, const xparams _xparams = NonTH);
+// API: ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &boxmin, const real_1d_array &boxmax);
 ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector *boxmin, RVector *boxmax, ae_state *_state) {
    ae_int_t j;
    ae_int_t result;
@@ -2887,7 +2795,7 @@ ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector *boxmin
 //       associated with points - it is either INSIDE  or OUTSIDE (so request
 //       for distances will return zeros).
 // ALGLIB: Copyright 14.05.2016 by Sergey Bochkanov
-// API: ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const real_1d_array &boxmax, const xparams _xparams = NonTH);
+// API: ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const real_1d_array &boxmax);
 ae_int_t kdtreequerybox(kdtree *kdt, RVector *boxmin, RVector *boxmax, ae_state *_state) {
    ae_int_t result;
    result = kdtreetsquerybox(kdt, &kdt->innerbuf, boxmin, boxmax, _state);
@@ -2921,7 +2829,7 @@ ae_int_t kdtreequerybox(kdtree *kdt, RVector *boxmin, RVector *boxmax, ae_state 
 // * KDTreeQueryResultsTags()          tag values
 // * KDTreeQueryResultsDistances()     distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreetsqueryresultsx(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &x, const xparams _xparams = NonTH);
+// API: void kdtreetsqueryresultsx(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &x);
 void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *x, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
@@ -2967,7 +2875,7 @@ void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *x, ae
 // * KDTreeQueryResultsTags()          tag values
 // * KDTreeQueryResultsDistances()     distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreequeryresultsx(const kdtree &kdt, real_2d_array &x, const xparams _xparams = NonTH);
+// API: void kdtreequeryresultsx(const kdtree &kdt, real_2d_array &x);
 void kdtreequeryresultsx(kdtree *kdt, RMatrix *x, ae_state *_state) {
    kdtreetsqueryresultsx(kdt, &kdt->innerbuf, x, _state);
 }
@@ -3000,7 +2908,7 @@ void kdtreequeryresultsx(kdtree *kdt, RMatrix *x, ae_state *_state) {
 // * KDTreeQueryResultsTags()          tag values
 // * KDTreeQueryResultsDistances()     distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreetsqueryresultsxy(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &xy, const xparams _xparams = NonTH);
+// API: void kdtreetsqueryresultsxy(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &xy);
 void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *xy, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
@@ -3047,7 +2955,7 @@ void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *xy, 
 // * KDTreeQueryResultsTags()          tag values
 // * KDTreeQueryResultsDistances()     distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreequeryresultsxy(const kdtree &kdt, real_2d_array &xy, const xparams _xparams = NonTH);
+// API: void kdtreequeryresultsxy(const kdtree &kdt, real_2d_array &xy);
 void kdtreequeryresultsxy(kdtree *kdt, RMatrix *xy, ae_state *_state) {
    kdtreetsqueryresultsxy(kdt, &kdt->innerbuf, xy, _state);
 }
@@ -3085,7 +2993,7 @@ void kdtreequeryresultsxy(kdtree *kdt, RMatrix *xy, ae_state *_state) {
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsDistances()     distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreetsqueryresultstags(const kdtree &kdt, const kdtreerequestbuffer &buf, integer_1d_array &tags, const xparams _xparams = NonTH);
+// API: void kdtreetsqueryresultstags(const kdtree &kdt, const kdtreerequestbuffer &buf, integer_1d_array &tags);
 void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector *tags, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
@@ -3132,7 +3040,7 @@ void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector *ta
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsDistances()     distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreequeryresultstags(const kdtree &kdt, integer_1d_array &tags, const xparams _xparams = NonTH);
+// API: void kdtreequeryresultstags(const kdtree &kdt, integer_1d_array &tags);
 void kdtreequeryresultstags(kdtree *kdt, ZVector *tags, ae_state *_state) {
    kdtreetsqueryresultstags(kdt, &kdt->innerbuf, tags, _state);
 }
@@ -3169,7 +3077,7 @@ void kdtreequeryresultstags(kdtree *kdt, ZVector *tags, ae_state *_state) {
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsTags()          tag values
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreetsqueryresultsdistances(const kdtree &kdt, const kdtreerequestbuffer &buf, real_1d_array &r, const xparams _xparams = NonTH);
+// API: void kdtreetsqueryresultsdistances(const kdtree &kdt, const kdtreerequestbuffer &buf, real_1d_array &r);
 void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVector *r, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
@@ -3231,7 +3139,7 @@ void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVecto
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsTags()          tag values
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreequeryresultsdistances(const kdtree &kdt, real_1d_array &r, const xparams _xparams = NonTH);
+// API: void kdtreequeryresultsdistances(const kdtree &kdt, real_1d_array &r);
 void kdtreequeryresultsdistances(kdtree *kdt, RVector *r, ae_state *_state) {
    kdtreetsqueryresultsdistances(kdt, &kdt->innerbuf, r, _state);
 }
@@ -3244,7 +3152,7 @@ void kdtreequeryresultsdistances(kdtree *kdt, RVector *r, ae_state *_state) {
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x, const xparams _xparams = NonTH);
+// API: void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x);
 void kdtreequeryresultsxi(kdtree *kdt, RMatrix *x, ae_state *_state) {
    SetMatrix(x);
    kdtreequeryresultsx(kdt, x, _state);
@@ -3258,7 +3166,7 @@ void kdtreequeryresultsxi(kdtree *kdt, RMatrix *x, ae_state *_state) {
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy, const xparams _xparams = NonTH);
+// API: void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy);
 void kdtreequeryresultsxyi(kdtree *kdt, RMatrix *xy, ae_state *_state) {
    SetMatrix(xy);
    kdtreequeryresultsxy(kdt, xy, _state);
@@ -3272,7 +3180,7 @@ void kdtreequeryresultsxyi(kdtree *kdt, RMatrix *xy, ae_state *_state) {
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags, const xparams _xparams = NonTH);
+// API: void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags);
 void kdtreequeryresultstagsi(kdtree *kdt, ZVector *tags, ae_state *_state) {
    SetVector(tags);
    kdtreequeryresultstags(kdt, tags, _state);
@@ -3286,7 +3194,7 @@ void kdtreequeryresultstagsi(kdtree *kdt, ZVector *tags, ae_state *_state) {
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-// API: void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r, const xparams _xparams = NonTH);
+// API: void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r);
 void kdtreequeryresultsdistancesi(kdtree *kdt, RVector *r, ae_state *_state) {
    SetVector(r);
    kdtreequeryresultsdistances(kdt, r, _state);
@@ -3637,356 +3545,286 @@ void kdtreeunserialize(const std::istream &s_in, kdtree &obj) {
    alglib_impl::ae_state_clear(&state);
 }
 
-void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf, const xparams _xparams) {
+void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreecreaterequestbuffer(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams) {
+void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreebuildtagged(ConstT(ae_matrix, xy), ConstT(ae_vector, tags), n, nx, ny, normtype, ConstT(kdtree, kdt), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams) {
+void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt) {
    if (xy.rows() != tags.length()) ThrowError("Error while calling 'kdtreebuildtagged': looks like one of arguments has wrong size");
    ae_int_t n = xy.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreebuildtagged(ConstT(ae_matrix, xy), ConstT(ae_vector, tags), n, nx, ny, normtype, ConstT(kdtree, kdt), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams) {
+void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreebuild(ConstT(ae_matrix, xy), n, nx, ny, normtype, ConstT(kdtree, kdt), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams) {
+void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt) {
    ae_int_t n = xy.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreebuild(ConstT(ae_matrix, xy), n, nx, ny, normtype, ConstT(kdtree, kdt), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps, const xparams _xparams) {
+ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryaknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch, eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #if !defined AE_NO_EXCEPTIONS
-ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const double eps, const xparams _xparams) {
+ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const double eps) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryaknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch, eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #endif
 
-ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps, const xparams _xparams) {
+ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryaknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch, eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #if !defined AE_NO_EXCEPTIONS
-ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const double eps, const xparams _xparams) {
+ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const double eps) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryaknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch, eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #endif
 
-ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const xparams _xparams) {
+ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #if !defined AE_NO_EXCEPTIONS
-ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const xparams _xparams) {
+ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #endif
 
-ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const xparams _xparams) {
+ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #if !defined AE_NO_EXCEPTIONS
-ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const xparams _xparams) {
+ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #endif
 
-ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams) {
+ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryrnn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #if !defined AE_NO_EXCEPTIONS
-ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const xparams _xparams) {
+ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryrnn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #endif
 
-ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams) {
+ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryrnn(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #if !defined AE_NO_EXCEPTIONS
-ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const xparams _xparams) {
+ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryrnn(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #endif
 
-ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams) {
+ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryrnnu(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #if !defined AE_NO_EXCEPTIONS
-ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const xparams _xparams) {
+ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryrnnu(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #endif
 
-ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch, const xparams _xparams) {
+ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryrnnu(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #if !defined AE_NO_EXCEPTIONS
-ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const xparams _xparams) {
+ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryrnnu(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 #endif
 
-ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &boxmin, const real_1d_array &boxmax, const xparams _xparams) {
+ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &boxmin, const real_1d_array &boxmax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsquerybox(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, boxmin), ConstT(ae_vector, boxmax), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 
-ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const real_1d_array &boxmax, const xparams _xparams) {
+ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const real_1d_array &boxmax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequerybox(ConstT(kdtree, kdt), ConstT(ae_vector, boxmin), ConstT(ae_vector, boxmax), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 
-void kdtreetsqueryresultsx(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &x, const xparams _xparams) {
+void kdtreetsqueryresultsx(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreetsqueryresultsx(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_matrix, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void kdtreequeryresultsx(const kdtree &kdt, real_2d_array &x, const xparams _xparams) {
+void kdtreequeryresultsx(const kdtree &kdt, real_2d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreequeryresultsx(ConstT(kdtree, kdt), ConstT(ae_matrix, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void kdtreetsqueryresultsxy(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &xy, const xparams _xparams) {
+void kdtreetsqueryresultsxy(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &xy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreetsqueryresultsxy(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_matrix, xy), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void kdtreequeryresultsxy(const kdtree &kdt, real_2d_array &xy, const xparams _xparams) {
+void kdtreequeryresultsxy(const kdtree &kdt, real_2d_array &xy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreequeryresultsxy(ConstT(kdtree, kdt), ConstT(ae_matrix, xy), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void kdtreetsqueryresultstags(const kdtree &kdt, const kdtreerequestbuffer &buf, integer_1d_array &tags, const xparams _xparams) {
+void kdtreetsqueryresultstags(const kdtree &kdt, const kdtreerequestbuffer &buf, integer_1d_array &tags) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreetsqueryresultstags(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, tags), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void kdtreequeryresultstags(const kdtree &kdt, integer_1d_array &tags, const xparams _xparams) {
+void kdtreequeryresultstags(const kdtree &kdt, integer_1d_array &tags) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreequeryresultstags(ConstT(kdtree, kdt), ConstT(ae_vector, tags), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void kdtreetsqueryresultsdistances(const kdtree &kdt, const kdtreerequestbuffer &buf, real_1d_array &r, const xparams _xparams) {
+void kdtreetsqueryresultsdistances(const kdtree &kdt, const kdtreerequestbuffer &buf, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreetsqueryresultsdistances(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void kdtreequeryresultsdistances(const kdtree &kdt, real_1d_array &r, const xparams _xparams) {
+void kdtreequeryresultsdistances(const kdtree &kdt, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreequeryresultsdistances(ConstT(kdtree, kdt), ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x, const xparams _xparams) {
+void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreequeryresultsxi(ConstT(kdtree, kdt), ConstT(ae_matrix, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy, const xparams _xparams) {
+void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreequeryresultsxyi(ConstT(kdtree, kdt), ConstT(ae_matrix, xy), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags, const xparams _xparams) {
+void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreequeryresultstagsi(ConstT(kdtree, kdt), ConstT(ae_vector, tags), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r, const xparams _xparams) {
+void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::kdtreequeryresultsdistancesi(ConstT(kdtree, kdt), ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }

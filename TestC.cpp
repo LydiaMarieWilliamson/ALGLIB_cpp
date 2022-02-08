@@ -25479,7 +25479,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err, ae_state *_state) {
                if ((pkind == 0 && j > i) || (pkind == 1 && j < i)) {
                   a.xyR[i][j] = 0.05 * randommid();
                } else {
-                  a.xyR[i][j] = _state->v_nan;
+                  a.xyR[i][j] = NAN;
                }
             }
          }
@@ -25883,7 +25883,7 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
             vm = 1.0E+20;
          }
          if (mkind == 2) {
-            vm = _state->v_posinf;
+            vm = +INFINITY;
          }
       // Create optimizer, solve optimization problem
          epsg = 1.0E-6 * vc;
@@ -25923,18 +25923,18 @@ static void testminlbfgsunit_testother(bool *err, ae_state *_state) {
       // Gradient can be spoiled by +INF, -INF, NAN
          spoilvar = hqrnduniformi(&rs, n, _state);
          i = hqrnduniformi(&rs, 3, _state);
-         spoilval = _state->v_nan;
+         spoilval = NAN;
          if (i == 0) {
-            spoilval = _state->v_neginf;
+            spoilval = -INFINITY;
          }
          if (i == 1) {
-            spoilval = _state->v_posinf;
+            spoilval = +INFINITY;
          }
       } else {
       // Function value can be spoiled only by NAN
       // (+INF can be recognized as legitimate value during optimization)
          spoilvar = -1;
-         spoilval = _state->v_nan;
+         spoilval = NAN;
       }
       spdmatrixrndcond(n, 1.0E5, &fulla, _state);
       ae_vector_set_length(&b, n, _state);
@@ -29100,7 +29100,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
    for (i = 0; i < n; i++) {
       x.xR[i] = 0.5;
       bl.xR[i] = 0.0;
-      bu.xR[i] = _state->v_posinf;
+      bu.xR[i] = +INFINITY;
       ct.xZ[i] = 1;
       for (j = 0; j <= n; j++) {
          c.xyR[i][j] = 0.0;
@@ -29158,7 +29158,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       for (i = 0; i < n; i++) {
          x.xR[i] = 10.0;
          bl.xR[i] = randommid();
-         bu.xR[i] = _state->v_posinf;
+         bu.xR[i] = +INFINITY;
       }
       minbleiccreate(n, &x, &state, _state);
       minbleicsetbc(&state, &bl, &bu, _state);
@@ -29265,7 +29265,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       ae_vector_set_length(&bu, n, _state);
       x.xR[0] = 100.0;
       bl.xR[0] = randommid();
-      bu.xR[0] = _state->v_posinf;
+      bu.xR[0] = +INFINITY;
       stpmax = 0.05 + 0.05 * randomreal();
       minbleiccreate(n, &x, &state, _state);
       minbleicsetbc(&state, &bl, &bu, _state);
@@ -29421,7 +29421,7 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
                vm = 1.0E+20;
             }
             if (mkind == 2) {
-               vm = _state->v_posinf;
+               vm = +INFINITY;
             }
          // Create optimizer, solve optimization problem
             epsg = 1.0E-6 * vc;
@@ -29482,9 +29482,9 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       x.xR[0] = 10 * machineepsilon;
       x.xR[1] = 1.0;
       bl.xR[0] = 0.0;
-      bu.xR[0] = _state->v_posinf;
+      bu.xR[0] = +INFINITY;
       bl.xR[1] = 0.0;
-      bu.xR[1] = _state->v_posinf;
+      bu.xR[1] = +INFINITY;
       for (ckind = 0; ckind <= 2; ckind++) {
          minbleiccreate(2, &x, &state, _state);
          minbleicsetbc(&state, &bl, &bu, _state);
@@ -29539,9 +29539,9 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       x.xR[0] = 10 * machineepsilon;
       x.xR[1] = 1.0;
       bl.xR[0] = 0.0;
-      bu.xR[0] = _state->v_posinf;
+      bu.xR[0] = +INFINITY;
       bl.xR[1] = 0.0;
-      bu.xR[1] = _state->v_posinf;
+      bu.xR[1] = +INFINITY;
       for (ckind = 0; ckind <= 2; ckind++) {
          minbleiccreate(2, &x, &state, _state);
          minbleicsetbc(&state, &bl, &bu, _state);
@@ -29585,18 +29585,18 @@ static void testminbleicunit_testother(bool *err, ae_state *_state) {
       // Gradient can be spoiled by +INF, -INF, NAN
          spoilvar = hqrnduniformi(&rs, n, _state);
          i = hqrnduniformi(&rs, 3, _state);
-         spoilval = _state->v_nan;
+         spoilval = NAN;
          if (i == 0) {
-            spoilval = _state->v_neginf;
+            spoilval = -INFINITY;
          }
          if (i == 1) {
-            spoilval = _state->v_posinf;
+            spoilval = +INFINITY;
          }
       } else {
       // Function value can be spoiled only by NAN
       // (+INF can be recognized as legitimate value during optimization)
          spoilvar = -1;
-         spoilval = _state->v_nan;
+         spoilval = NAN;
       }
       spdmatrixrndcond(n, 1.0E5, &fulla, _state);
       ae_vector_set_length(&b, n, _state);
@@ -31680,16 +31680,16 @@ static bool simpletest(ae_state *_state) {
          for (j = 0; j < sn; j++) {
             infd = randominteger(5);
             if (infd == 0) {
-               db.xR[j] = _state->v_neginf;
-               ub.xR[j] = _state->v_posinf;
+               db.xR[j] = -INFINITY;
+               ub.xR[j] = +INFINITY;
             } else {
                if (infd == 1) {
-                  db.xR[j] = _state->v_neginf;
+                  db.xR[j] = -INFINITY;
                   ub.xR[j] = (maxnb - minnb) * randomreal() + minnb;
                } else {
                   if (infd == 2) {
                      db.xR[j] = (maxnb - minnb) * randomreal() + minnb;
-                     ub.xR[j] = _state->v_posinf;
+                     ub.xR[j] = +INFINITY;
                   } else {
                      if (infd == 3) {
                         db.xR[j] = (maxnb - minnb) * randomreal() + minnb;
@@ -31919,16 +31919,16 @@ static bool functest2(ae_state *_state) {
          for (j = 0; j < sn; j++) {
             infd = randominteger(4);
             if (infd == 0) {
-               db.xR[j] = _state->v_neginf;
-               ub.xR[j] = _state->v_posinf;
+               db.xR[j] = -INFINITY;
+               ub.xR[j] = +INFINITY;
             } else {
                if (infd == 1) {
-                  db.xR[j] = _state->v_neginf;
+                  db.xR[j] = -INFINITY;
                   ub.xR[j] = (maxnb - minnb) * randomreal() + minnb;
                } else {
                   if (infd == 2) {
                      db.xR[j] = (maxnb - minnb) * randomreal() + minnb;
-                     ub.xR[j] = _state->v_posinf;
+                     ub.xR[j] = +INFINITY;
                   } else {
                      db.xR[j] = (maxnb - minnb) * randomreal() + minnb;
                      ub.xR[j] = db.xR[j] + maxstb * randomreal() + 0.01;
@@ -32326,8 +32326,8 @@ static bool quickqptests(ae_state *_state) {
          ae_vector_set_length(&s, n, _state);
          for (i = 0; i < n; i++) {
             b.xR[i] = hqrndnormal(&rs, _state);
-            bndl.xR[i] = _state->v_neginf;
-            bndu.xR[i] = _state->v_posinf;
+            bndl.xR[i] = -INFINITY;
+            bndu.xR[i] = +INFINITY;
             x0.xR[i] = hqrndnormal(&rs, _state);
             if (origintype == 0) {
                xori.xR[i] = 0.0;
@@ -32682,8 +32682,8 @@ static bool quickqptests(ae_state *_state) {
          b.xR[i] = hqrndnormal(&rs, _state);
          x0.xR[i] = hqrndnormal(&rs, _state);
          if (hqrndnormal(&rs, _state) > 0.0) {
-            bndl.xR[i] = _state->v_neginf;
-            bndu.xR[i] = _state->v_posinf;
+            bndl.xR[i] = -INFINITY;
+            bndu.xR[i] = +INFINITY;
          } else {
             bndl.xR[i] = hqrndnormal(&rs, _state);
             bndu.xR[i] = bndl.xR[i];
@@ -32769,8 +32769,8 @@ static bool quickqptests(ae_state *_state) {
       for (i = 0; i < n; i++) {
          xz.xR[i] = hqrnduniformr(&rs, _state) - 0.5;
          x0.xR[i] = 100.0;
-         bndl.xR[i] = _state->v_neginf;
-         bndu.xR[i] = _state->v_posinf;
+         bndl.xR[i] = -INFINITY;
+         bndu.xR[i] = +INFINITY;
       }
       k = hqrnduniformi(&rs, n, _state);
       x0.xR[k] = 5.00001;
@@ -33293,8 +33293,8 @@ static bool bleictests(ae_state *_state) {
       }
    }
    i = randominteger(n);
-   bndl.xR[i] = _state->v_neginf;
-   bndu.xR[i] = _state->v_posinf;
+   bndl.xR[i] = -INFINITY;
+   bndu.xR[i] = +INFINITY;
    minqpsetbc(&state, &bndl, &bndu, _state);
    minqpoptimize(&state, _state);
    minqpresults(&state, &xend0, &rep, _state);
@@ -33688,8 +33688,8 @@ static void testminqpunit_bcqptest(bool *wereerrors, ae_state *_state) {
          ae_vector_set_length(&s, n, _state);
          for (i = 0; i < n; i++) {
             b.xR[i] = hqrndnormal(&rs, _state);
-            bndl.xR[i] = _state->v_neginf;
-            bndu.xR[i] = _state->v_posinf;
+            bndl.xR[i] = -INFINITY;
+            bndu.xR[i] = +INFINITY;
             x0.xR[i] = hqrndnormal(&rs, _state);
             if (origintype == 0) {
                xori.xR[i] = 0.0;
@@ -33841,8 +33841,8 @@ static void testminqpunit_bcqptest(bool *wereerrors, ae_state *_state) {
                s.xR[i] = exp(0.5 * hqrndnormal(&rs, _state));
             }
          }
-         vl = _state->v_neginf;
-         vu = _state->v_posinf;
+         vl = -INFINITY;
+         vu = +INFINITY;
          j = hqrnduniformi(&rs, 5, _state);
          if (j == 0) {
             vl = 0.0;
@@ -33938,7 +33938,7 @@ static void testminqpunit_bcqptest(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             b.xR[i] = hqrndnormal(&rs, _state);
             bndl.xR[i] = 0.0;
-            bndu.xR[i] = _state->v_posinf;
+            bndu.xR[i] = +INFINITY;
             x0.xR[i] = (double)hqrnduniformi(&rs, 2, _state);
          }
       // Solve problem
@@ -35328,7 +35328,7 @@ static void testminqpunit_icqptest(bool *err, ae_state *_state) {
       ae_vector_set_length(&bndu, n, _state);
       for (i = 0; i < n; i++) {
          bndl.xR[i] = 0.0;
-         bndu.xR[i] = _state->v_posinf;
+         bndu.xR[i] = +INFINITY;
       }
       minqpcreate(n, &state2, _state);
       testminqpunit_setrandomalgoconvexlc(&state, _state);
@@ -36249,13 +36249,13 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
                      bndl.xR[i] = xs.xR[i];
                      activeset.xyR[i][nactive] = -1.0;
                      if (hqrnduniformr(&rs, _state) > 0.50) {
-                        bndu.xR[i] = _state->v_posinf;
+                        bndu.xR[i] = +INFINITY;
                      }
                   } else {
                      bndu.xR[i] = xs.xR[i];
                      activeset.xyR[i][nactive] = 1.0;
                      if (hqrnduniformr(&rs, _state) > 0.50) {
-                        bndl.xR[i] = _state->v_neginf;
+                        bndl.xR[i] = -INFINITY;
                      }
                   }
                   activeeq.xB[nactive] = false;
@@ -37248,7 +37248,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
          ae_vector_set_length(&bndu, n, _state);
          for (i = 0; i < n; i++) {
             bndl.xR[i] = 0.0;
-            bndu.xR[i] = _state->v_posinf;
+            bndu.xR[i] = +INFINITY;
          }
          minqpcreate(n, &state2, _state);
          minqpsetalgoquickqp(&state2, 0.0, 0.0, 1.0E-9, 0, true, _state);
@@ -37605,8 +37605,8 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
          // * 1e9
          // * 1e11
             i = hqrnduniformi(&rs, 3, _state);
-            minushuge = _state->v_neginf;
-            plushuge = _state->v_posinf;
+            minushuge = -INFINITY;
+            plushuge = +INFINITY;
             if (i == 1) {
                minushuge = -1.0E9;
                plushuge = 1.0E9;
@@ -38054,7 +38054,7 @@ static void testminqpunit_generallcqptest(bool *errorflag, ae_state *_state) {
       ae_vector_set_length(&bndu, rawccnt, _state);
       for (i = 0; i < rawccnt; i++) {
          bndl.xR[i] = 0.0;
-         bndu.xR[i] = _state->v_posinf;
+         bndu.xR[i] = +INFINITY;
       }
       minqpcreate(rawccnt, &state2, _state);
       minqpsetalgoquickqp(&state2, 0.0, 0.0, 1.0E-9, 0, true, _state);
@@ -39056,8 +39056,8 @@ static void testminqpunit_ipmtests(bool *errorflag, ae_state *_state) {
             ae_vector_set_length(&bndl, n, _state);
             ae_vector_set_length(&bndu, n, _state);
             for (j = 0; j < n; j++) {
-               bndl.xR[j] = _state->v_neginf;
-               bndu.xR[j] = _state->v_posinf;
+               bndl.xR[j] = -INFINITY;
+               bndu.xR[j] = +INFINITY;
                if ((hqrndnormal(&rs, _state) > 0.0 || issemidefinite) || j >= nmain) {
                   bndl.xR[j] = xf.xR[j] - pow(2.0, hqrndnormal(&rs, _state));
                }
@@ -39085,8 +39085,8 @@ static void testminqpunit_ipmtests(bool *errorflag, ae_state *_state) {
                for (j = 0; j < n; j++) {
                   v += rawc.xyR[i][j] * xf.xR[j];
                }
-               rawcl.xR[i] = _state->v_neginf;
-               rawcu.xR[i] = _state->v_posinf;
+               rawcl.xR[i] = -INFINITY;
+               rawcu.xR[i] = +INFINITY;
                if (hqrndnormal(&rs, _state) > 0.0) {
                   rawcl.xR[i] = v - pow(2.0, hqrndnormal(&rs, _state));
                }
@@ -40079,7 +40079,7 @@ static void testminlmunit_testbc(bool *errorflag, ae_state *_state) {
          ae_vector_set_length(&x0, n, _state);
          for (i = 0; i < n; i++) {
             bl.xR[i] = 0.0;
-            bu.xR[i] = _state->v_posinf;
+            bu.xR[i] = +INFINITY;
             x0.xR[i] = 1 + hqrnduniformr(&rs, _state);
          }
          ae_matrix_set_length(&c, m, n + 1, _state);
@@ -40847,12 +40847,12 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
          }
          if (mx < 1.0E-2) {
             i = randominteger(3);
-            v = _state->v_nan;
+            v = NAN;
             if (i == 1) {
-               v = _state->v_posinf;
+               v = +INFINITY;
             }
             if (i == 2) {
-               v = _state->v_neginf;
+               v = -INFINITY;
             }
             if (randombool()) {
                state.fi.xR[randominteger(m)] = v;
@@ -40874,12 +40874,12 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
          }
          if (mx < 1.0E-2) {
             i = randominteger(3);
-            v = _state->v_nan;
+            v = NAN;
             if (i == 1) {
-               v = _state->v_posinf;
+               v = +INFINITY;
             }
             if (i == 2) {
-               v = _state->v_neginf;
+               v = -INFINITY;
             }
             state.fi.xR[randominteger(m)] = v;
             spoilcnt++;
@@ -41545,7 +41545,7 @@ static void testother(bool *err, ae_state *_state) {
                vm = 1.0E+20;
             }
             if (mkind == 2) {
-               vm = _state->v_posinf;
+               vm = +INFINITY;
             }
          // Create optimizer, solve optimization problem
             epsg = 1.0E-6 * vc;
@@ -41587,18 +41587,18 @@ static void testother(bool *err, ae_state *_state) {
       // Gradient can be spoiled by +INF, -INF, NAN
          spoilvar = hqrnduniformi(&rs, n, _state);
          i = hqrnduniformi(&rs, 3, _state);
-         spoilval = _state->v_nan;
+         spoilval = NAN;
          if (i == 0) {
-            spoilval = _state->v_neginf;
+            spoilval = -INFINITY;
          }
          if (i == 1) {
-            spoilval = _state->v_posinf;
+            spoilval = +INFINITY;
          }
       } else {
       // Function value can be spoiled only by NAN
       // (+INF can be recognized as legitimate value during optimization)
          spoilvar = -1;
-         spoilval = _state->v_nan;
+         spoilval = NAN;
       }
       spdmatrixrndcond(n, 1.0E5, &fulla, _state);
       ae_vector_set_length(&b, n, _state);
@@ -43227,10 +43227,10 @@ static void testminlpunit_basictests(bool *err, ae_state *_state) {
             bndl.xR[i] = rmin2(v0, v1, _state);
             bndu.xR[i] = rmax2(v0, v1, _state);
             if (c.xR[i] > 0.0) {
-               bndu.xR[i] = _state->v_posinf;
+               bndu.xR[i] = +INFINITY;
             }
             if (c.xR[i] < 0.0) {
-               bndl.xR[i] = _state->v_neginf;
+               bndl.xR[i] = -INFINITY;
             }
          }
          testminlpunit_shiftfromzero(&c, n, 0.01, _state);
@@ -43261,8 +43261,8 @@ static void testminlpunit_basictests(bool *err, ae_state *_state) {
          testminlpunit_shiftfromzero(&c, n, 0.01, _state);
          k = hqrnduniformi(&rs, n, _state);
          c.xR[k] = 0.0;
-         bndl.xR[k] = _state->v_neginf;
-         bndu.xR[k] = _state->v_posinf;
+         bndl.xR[k] = -INFINITY;
+         bndu.xR[k] = +INFINITY;
          minlpcreate(n, &state, _state);
          testminlpunit_selectsolver(&state, solvertype, _state);
          minlpsetcost(&state, &c, _state);
@@ -43283,7 +43283,7 @@ static void testminlpunit_basictests(bool *err, ae_state *_state) {
          }
          set_error_flag(err, x.xR[k] != 0.0, __FILE__, __LINE__, "testminlpunit.ap:210");
          bndl.xR[k] = hqrndnormal(&rs, _state);
-         bndu.xR[k] = _state->v_posinf;
+         bndu.xR[k] = +INFINITY;
          minlpsetbc(&state, &bndl, &bndu, _state);
          minlpoptimize(&state, _state);
          minlpresults(&state, &x, &rep, _state);
@@ -43301,7 +43301,7 @@ static void testminlpunit_basictests(bool *err, ae_state *_state) {
          }
          set_error_flag(err, x.xR[k] < bndl.xR[k], __FILE__, __LINE__, "testminlpunit.ap:228");
          set_error_flag(err, solvertype == 0 && x.xR[k] != bndl.xR[k], __FILE__, __LINE__, "testminlpunit.ap:229");
-         bndl.xR[k] = _state->v_neginf;
+         bndl.xR[k] = -INFINITY;
          bndu.xR[k] = hqrndnormal(&rs, _state);
          minlpsetbc(&state, &bndl, &bndu, _state);
          minlpoptimize(&state, _state);
@@ -43355,9 +43355,9 @@ static void testminlpunit_basictests(bool *err, ae_state *_state) {
             }
             k = hqrnduniformi(&rs, n, _state);
             if (c.xR[k] > 0.0) {
-               bndl.xR[k] = _state->v_neginf;
+               bndl.xR[k] = -INFINITY;
             } else {
-               bndu.xR[k] = _state->v_posinf;
+               bndu.xR[k] = +INFINITY;
             }
             minlpcreate(n, &state, _state);
             testminlpunit_selectsolver(&state, solvertype, _state);
@@ -43591,10 +43591,10 @@ static void testminlpunit_generatebounds(hqrndstate *rs, ae_int_t n, ae_int_t m,
       v0 = xx->xR[i] - pow(q, hqrndnormal(rs, _state));
       v1 = xx->xR[i] + pow(q, hqrndnormal(rs, _state));
       if (hqrndnormal(rs, _state) > 0.0) {
-         v0 = _state->v_neginf;
+         v0 = -INFINITY;
       }
       if (hqrndnormal(rs, _state) > 0.0) {
-         v1 = _state->v_posinf;
+         v1 = +INFINITY;
       }
       if (kk >= m) {
          if (d->xR[i] >= 0.0) {
@@ -43724,28 +43724,28 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
          if (i < n) {
             kt = hqrnduniformi(rs, 3, _state);
             if (kt == 0) {
-               bndl->xR[i] = _state->v_neginf;
+               bndl->xR[i] = -INFINITY;
                c->xR[i] = -big * (1 + hqrnduniformr(rs, _state));
             }
             if (kt == 1) {
-               bndu->xR[i] = _state->v_posinf;
+               bndu->xR[i] = +INFINITY;
                c->xR[i] = big * (1 + hqrnduniformr(rs, _state));
             }
             if (kt == 2) {
-               bndl->xR[i] = _state->v_neginf;
-               bndu->xR[i] = _state->v_posinf;
+               bndl->xR[i] = -INFINITY;
+               bndu->xR[i] = +INFINITY;
             }
          } else {
             kt = hqrnduniformi(rs, 3, _state);
             if (kt == 0) {
-               au->xR[i - n] = _state->v_posinf;
+               au->xR[i - n] = +INFINITY;
             }
             if (kt == 1) {
-               al->xR[i - n] = _state->v_neginf;
+               al->xR[i - n] = -INFINITY;
             }
             if (kt == 2) {
-               al->xR[i - n] = _state->v_neginf;
-               au->xR[i - n] = _state->v_posinf;
+               al->xR[i - n] = -INFINITY;
+               au->xR[i - n] = +INFINITY;
             }
          }
       }
@@ -43836,9 +43836,9 @@ static void testminlpunit_generateunboundedlpproblem(hqrndstate *rs, ae_int_t n,
          v = pow(q, hqrndnormal(rs, _state)) - pow(q, hqrndnormal(rs, _state));
          if (c->xR[i] > 0.0) {
             bndl->xR[i] = v;
-            bndu->xR[i] = _state->v_posinf;
+            bndu->xR[i] = +INFINITY;
          } else {
-            bndl->xR[i] = _state->v_neginf;
+            bndl->xR[i] = -INFINITY;
             bndu->xR[i] = v;
          }
       }
@@ -43850,9 +43850,9 @@ static void testminlpunit_generateunboundedlpproblem(hqrndstate *rs, ae_int_t n,
       v = pow(q, hqrndnormal(rs, _state)) - pow(q, hqrndnormal(rs, _state));
       if (c->xR[i] < 0.0) {
          bndl->xR[i] = v;
-         bndu->xR[i] = _state->v_posinf;
+         bndu->xR[i] = +INFINITY;
       } else {
-         bndl->xR[i] = _state->v_neginf;
+         bndl->xR[i] = -INFINITY;
          bndu->xR[i] = v;
       }
       ae_frame_leave(_state);
@@ -43870,11 +43870,11 @@ static void testminlpunit_generateunboundedlpproblem(hqrndstate *rs, ae_int_t n,
          c->xR[i] = hqrndnormal(rs, _state);
          x0.xR[i] = hqrndnormal(rs, _state);
          if (c->xR[i] >= 0.0) {
-            bndl->xR[i] = _state->v_neginf;
+            bndl->xR[i] = -INFINITY;
             bndu->xR[i] = x0.xR[i];
          } else {
             bndl->xR[i] = x0.xR[i];
-            bndu->xR[i] = _state->v_posinf;
+            bndu->xR[i] = +INFINITY;
          }
       }
       for (i = 0; i < *m; i++) {
@@ -43886,11 +43886,11 @@ static void testminlpunit_generateunboundedlpproblem(hqrndstate *rs, ae_int_t n,
             vv += a->xyR[i][j] * c->xR[j];
          }
          if (vv >= 0.0) {
-            al->xR[i] = _state->v_neginf;
+            al->xR[i] = -INFINITY;
             au->xR[i] = v;
          } else {
             al->xR[i] = v;
-            au->xR[i] = _state->v_posinf;
+            au->xR[i] = +INFINITY;
          }
       }
       ae_frame_leave(_state);
@@ -44645,8 +44645,8 @@ static void testminnlcunit_testbc(bool *wereerrors, ae_state *_state) {
                ae_vector_set_length(&x0, n, _state);
                for (i = 0; i < n; i++) {
                   b.xR[i] = hqrndnormal(&rs, _state);
-                  bndl.xR[i] = _state->v_neginf;
-                  bndu.xR[i] = _state->v_posinf;
+                  bndl.xR[i] = -INFINITY;
+                  bndu.xR[i] = +INFINITY;
                   x0.xR[i] = hqrndnormal(&rs, _state);
                   j = hqrnduniformi(&rs, 5, _state);
                   if (j == 0) {
@@ -46520,8 +46520,8 @@ static void testminnlcunit_testnlc(bool *wereerrors, ae_state *_state) {
             cntnlec = 0;
             cntnlic = 0;
             for (i = 0; i < n; i++) {
-               bndl.xR[i] = _state->v_neginf;
-               bndu.xR[i] = _state->v_posinf;
+               bndl.xR[i] = -INFINITY;
+               bndu.xR[i] = +INFINITY;
                x0.xR[i] = hqrndnormal(&rs, _state);
                b.xR[i] = 10 * hqrndnormal(&rs, _state);
             }
@@ -47082,18 +47082,18 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
          // Gradient can be spoiled by +INF, -INF, NAN
             spoilvar = hqrnduniformi(&rs, n, _state);
             i = hqrnduniformi(&rs, 3, _state);
-            spoilval = _state->v_nan;
+            spoilval = NAN;
             if (i == 0) {
-               spoilval = _state->v_neginf;
+               spoilval = -INFINITY;
             }
             if (i == 1) {
-               spoilval = _state->v_posinf;
+               spoilval = +INFINITY;
             }
          } else {
          // Function value can be spoiled only by NAN
          // (+INF can be recognized as legitimate value during optimization)
             spoilvar = -1;
-            spoilval = _state->v_nan;
+            spoilval = NAN;
          }
          spdmatrixrndcond(n, 1.0E5, &fulla, _state);
          ae_vector_set_length(&b, n, _state);
@@ -47169,9 +47169,9 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
             x0.xR[i] = hqrndnormal(&rs, _state);
             if (hqrndnormal(&rs, _state) > 0.0) {
                bndl.xR[i] = 0.0;
-               bndu.xR[i] = _state->v_posinf;
+               bndu.xR[i] = +INFINITY;
             } else {
-               bndl.xR[i] = _state->v_neginf;
+               bndl.xR[i] = -INFINITY;
                bndu.xR[i] = 0.0;
             }
          }
@@ -47678,7 +47678,7 @@ static void testminnlcunit_testother(bool *wereerrors, ae_state *_state) {
          for (i = 0; i < n; i++) {
             if (hqrndnormal(&rs, _state) > 0.0) {
                bndl.xR[i] = 0.0;
-               bndu.xR[i] = _state->v_posinf;
+               bndu.xR[i] = +INFINITY;
                x0.xR[i] = hqrnduniformr(&rs, _state);
             } else {
                bndl.xR[i] = 0.0;
@@ -47920,7 +47920,7 @@ static void testminnlcunit_testbugs(bool *wereerrors, ae_state *_state) {
    ae_vector_set_length(&bndl, n, _state);
    ae_vector_set_length(&bndu, n, _state);
    bndl.xR[0] = 0.0;
-   bndu.xR[0] = _state->v_posinf;
+   bndu.xR[0] = +INFINITY;
    ae_matrix_set_length(&c, 1, 2, _state);
    ae_vector_set_length(&ct, 1, _state);
    c.xyR[0][0] = 1.0;
@@ -48696,7 +48696,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
       for (i = 0; i < n; i++) {
          b.xR[i] = hqrndnormal(&rs, _state);
          bndl.xR[i] = 0.0;
-         bndu.xR[i] = _state->v_posinf;
+         bndu.xR[i] = +INFINITY;
          x0.xR[i] = pow(2.0, hqrndnormal(&rs, _state));
       }
       minnlccreate(n, &x0, &state, _state);
@@ -48797,7 +48797,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors, ae_state *_state) {
                xlast.xR[i] = 0.0;
                x0.xR[i] = 2 * xu.xR[i] + 0.1 * hqrnduniformr(&rs, _state);
                bndl.xR[i] = 0.0;
-               bndu.xR[i] = _state->v_posinf;
+               bndu.xR[i] = +INFINITY;
                s.xR[i] = pow(2.0, 0.1 * hqrndnormal(&rs, _state));
             }
             if (defecttype == 0) {
@@ -49580,8 +49580,8 @@ static void testminnsunit_basictest1bc(bool *errors, ae_state *_state) {
    ae_vector_set_length(&bndu, n, _state);
    x0.xR[0] = 0.0;
    x0.xR[1] = 0.0;
-   bndl.xR[0] = _state->v_neginf;
-   bndl.xR[1] = _state->v_neginf;
+   bndl.xR[0] = -INFINITY;
+   bndl.xR[1] = -INFINITY;
    bndu.xR[0] = 1 / sqrt(2.0);
    bndu.xR[1] = 1.0 / 2.0;
    minnscreate(n, &x0, &s, _state);
@@ -50131,8 +50131,8 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
             xc.xR[i] = randommid();
             d.xR[i] = pow(10.0, 2 * randommid());
             s.xR[i] = pow(10.0, 2 * randommid());
-            bndl.xR[i] = _state->v_neginf;
-            bndu.xR[i] = _state->v_posinf;
+            bndl.xR[i] = -INFINITY;
+            bndu.xR[i] = +INFINITY;
             k = randominteger(5);
             if (k == 1) {
                bndl.xR[i] = randommid();
@@ -50231,7 +50231,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
          x0.xR[i] = 1.0;
          b.xR[i] = randomreal() - 0.5;
          bndl.xR[i] = 0.0;
-         bndu.xR[i] = _state->v_posinf;
+         bndu.xR[i] = +INFINITY;
       }
       spdmatrixrndcond(n, conda, &a, _state);
       minnscreate(n, &x0, &state, _state);
@@ -50347,8 +50347,8 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
             xc.xR[i] = randommid();
             d.xR[i] = pow(10.0, 2 * randommid());
             s.xR[i] = pow(10.0, 2 * randommid());
-            bndl.xR[i] = _state->v_neginf;
-            bndu.xR[i] = _state->v_posinf;
+            bndl.xR[i] = -INFINITY;
+            bndu.xR[i] = +INFINITY;
             k = randominteger(5);
             if (k == 1) {
                bndl.xR[i] = randommid();
@@ -50442,8 +50442,8 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors, ae_stat
             x0.xR[i] = randommid();
             xc.xR[i] = randommid();
             x0s.xR[i] = x0.xR[i] * s.xR[i];
-            bndl.xR[i] = _state->v_neginf;
-            bndu.xR[i] = _state->v_posinf;
+            bndl.xR[i] = -INFINITY;
+            bndu.xR[i] = +INFINITY;
             k = randominteger(5);
             if (k == 1) {
                bndl.xR[i] = randommid();
@@ -50597,7 +50597,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
          minnssetxrep(&state, true, _state);
          minnssetlc(&state, &c, &ct, nc, _state);
          repferr = 0.0;
-         flast0 = _state->v_nan;
+         flast0 = NAN;
          while (minnsiteration(&state, _state)) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
@@ -50629,7 +50629,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors, ae_stat
          minnsrestartfrom(&state, &x0, _state);
          rho = 10000.0;
          repferr = 0.0;
-         flast1 = _state->v_nan;
+         flast1 = NAN;
          while (minnsiteration(&state, _state)) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
@@ -51641,7 +51641,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
    for (i = 0; i < n; i++) {
       x.xR[i] = 0.5;
       bl.xR[i] = 0.0;
-      bu.xR[i] = _state->v_posinf;
+      bu.xR[i] = +INFINITY;
    }
    x.xR[0] = 1.0E-100;
    minbccreate(n, &x, &state, _state);
@@ -51675,7 +51675,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
       for (i = 0; i < n; i++) {
          x.xR[i] = 10.0;
          bl.xR[i] = randommid();
-         bu.xR[i] = _state->v_posinf;
+         bu.xR[i] = +INFINITY;
       }
       minbccreate(n, &x, &state, _state);
       minbcsetbc(&state, &bl, &bu, _state);
@@ -51782,7 +51782,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
       ae_vector_set_length(&bu, n, _state);
       x.xR[0] = 100.0;
       bl.xR[0] = randommid();
-      bu.xR[0] = _state->v_posinf;
+      bu.xR[0] = +INFINITY;
       stpmax = 0.05 + 0.05 * randomreal();
       minbccreate(n, &x, &state, _state);
       minbcsetbc(&state, &bl, &bu, _state);
@@ -51928,7 +51928,7 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
                vm = 1.0E+20;
             }
             if (mkind == 2) {
-               vm = _state->v_posinf;
+               vm = +INFINITY;
             }
          // Create optimizer, solve optimization problem
             epsg = 1.0E-6 * vc;
@@ -51989,9 +51989,9 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
       x.xR[0] = 10 * machineepsilon;
       x.xR[1] = 1.0;
       bl.xR[0] = 0.0;
-      bu.xR[0] = _state->v_posinf;
+      bu.xR[0] = +INFINITY;
       bl.xR[1] = 0.0;
-      bu.xR[1] = _state->v_posinf;
+      bu.xR[1] = +INFINITY;
       for (ckind = 0; ckind <= 2; ckind++) {
          minbccreate(2, &x, &state, _state);
          minbcsetbc(&state, &bl, &bu, _state);
@@ -52046,9 +52046,9 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
       x.xR[0] = 10 * machineepsilon;
       x.xR[1] = 1.0;
       bl.xR[0] = 0.0;
-      bu.xR[0] = _state->v_posinf;
+      bu.xR[0] = +INFINITY;
       bl.xR[1] = 0.0;
-      bu.xR[1] = _state->v_posinf;
+      bu.xR[1] = +INFINITY;
       for (ckind = 0; ckind <= 2; ckind++) {
          minbccreate(2, &x, &state, _state);
          minbcsetbc(&state, &bl, &bu, _state);
@@ -52092,18 +52092,18 @@ static void testminbcunit_testother(bool *err, ae_state *_state) {
       // Gradient can be spoiled by +INF, -INF, NAN
          spoilvar = hqrnduniformi(&rs, n, _state);
          i = hqrnduniformi(&rs, 3, _state);
-         spoilval = _state->v_nan;
+         spoilval = NAN;
          if (i == 0) {
-            spoilval = _state->v_neginf;
+            spoilval = -INFINITY;
          }
          if (i == 1) {
-            spoilval = _state->v_posinf;
+            spoilval = +INFINITY;
          }
       } else {
       // Function value can be spoiled only by NAN
       // (+INF can be recognized as legitimate value during optimization)
          spoilvar = -1;
-         spoilval = _state->v_nan;
+         spoilval = NAN;
       }
       spdmatrixrndcond(n, 1.0E5, &fulla, _state);
       ae_vector_set_length(&b, n, _state);
@@ -53405,13 +53405,13 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
             return;
          }
          for (i = 0; i < nx; i++) {
-            qx.xyR[1][i] = _state->v_nan;
+            qx.xyR[1][i] = NAN;
          }
          for (i = 0; i < nx + ny; i++) {
-            qxy.xyR[1][i] = _state->v_nan;
+            qxy.xyR[1][i] = NAN;
          }
          qtags.xZ[1] = 999;
-         qr.xR[1] = _state->v_nan;
+         qr.xR[1] = NAN;
          kdtreequeryresultsx(&treex, &qx, _state);
          kdtreequeryresultsxy(&treexy, &qxy, _state);
          kdtreequeryresultstags(&treext, &qtags, _state);
@@ -61617,7 +61617,7 @@ static void testlsfitunit_testbcnls(bool *errorflag, ae_state *_state) {
          ae_vector_set_length(&x, nx, _state);
          for (i = 0; i < nc; i++) {
             bl.xR[i] = 0.0;
-            bu.xR[i] = _state->v_posinf;
+            bu.xR[i] = +INFINITY;
             c0.xR[i] = 1 + hqrnduniformr(&rs, _state);
          }
          ae_matrix_set_length(&xx, m, nx, _state);
@@ -63656,7 +63656,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors, ae_state *_state)
          for (k1 = 0; k1 <= 1; k1++) {
          // Choose constraints.
             if (k0 == 0) {
-               v0 = _state->v_nan;
+               v0 = NAN;
             } else {
                if (be >= 0.0) {
                   v0 = ae;
@@ -63665,7 +63665,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors, ae_state *_state)
                }
             }
             if (k1 == 0) {
-               v1 = _state->v_nan;
+               v1 = NAN;
             } else {
                if (be >= 0.0) {
                   v1 = de;
@@ -63776,7 +63776,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors, ae_state *_state)
          for (k1 = 0; k1 <= 1; k1++) {
          // Choose constraints.
             if (k0 == 0) {
-               v0 = _state->v_nan;
+               v0 = NAN;
             } else {
                if (be >= 0.0) {
                   v0 = ae;
@@ -63785,7 +63785,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors, ae_state *_state)
                }
             }
             if (k1 == 0) {
-               v1 = _state->v_nan;
+               v1 = NAN;
             } else {
                if (be >= 0.0) {
                   v1 = de;
@@ -64096,11 +64096,11 @@ static void testlsfitunit_testgradientcheck(bool *testg, ae_state *_state) {
       }
       infcomp = randominteger(k + 1);
       if (infcomp < k) {
-         bl.xR[infcomp] = _state->v_neginf;
+         bl.xR[infcomp] = -INFINITY;
       }
       infcomp = randominteger(k + 1);
       if (infcomp < k) {
-         bu.xR[infcomp] = _state->v_posinf;
+         bu.xR[infcomp] = +INFINITY;
       }
       lsfitcreatefg(&x, &y, &c, n, m, k, true, &state, _state);
       lsfitsetgradientcheck(&state, teststep, _state);
@@ -85521,7 +85521,7 @@ static void testmcpdunit_testec(bool *err, ae_state *_state) {
             ae_matrix_set_length(&ec, n, n, _state);
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  ec.xyR[i][j] = _state->v_nan;
+                  ec.xyR[i][j] = NAN;
                }
             }
             for (j = 1; j < n - 1; j++) {
@@ -85610,12 +85610,12 @@ static void testmcpdunit_testbc(bool *err, ae_state *_state) {
             if (randombool()) {
                vl = 0.3 * randomreal();
             } else {
-               vl = _state->v_neginf;
+               vl = -INFINITY;
             }
             if (randombool()) {
                vu = 0.5 + 0.3 * randomreal();
             } else {
-               vu = _state->v_posinf;
+               vu = +INFINITY;
             }
             testmcpdunit_createee(n, entrystate, exitstate, &s, _state);
             mcpdaddtrack(&s, &xy, xy.rows, _state);
@@ -85705,8 +85705,8 @@ static void testmcpdunit_testbc(bool *err, ae_state *_state) {
             ae_matrix_set_length(&bndu, n, n, _state);
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  bndl.xyR[i][j] = _state->v_neginf;
-                  bndu.xyR[i][j] = _state->v_posinf;
+                  bndl.xyR[i][j] = -INFINITY;
+                  bndu.xyR[i][j] = +INFINITY;
                }
             }
             for (j = 1; j < n - 1; j++) {
@@ -89400,8 +89400,8 @@ static bool testalglibbasicsunit_testieeespecial(bool silent, ae_state *_state) 
    okinf = true;
    okother = true;
 // Test classification functions
-   okother = okother && !isinf(_state->v_nan);
-   okother = okother && isinf(_state->v_posinf);
+   okother = okother && !isinf(NAN);
+   okother = okother && isinf(+INFINITY);
    okother = okother && !isinf(maxrealnumber);
    okother = okother && !isinf(1.0);
    okother = okother && !isinf(minrealnumber);
@@ -89409,9 +89409,9 @@ static bool testalglibbasicsunit_testieeespecial(bool silent, ae_state *_state) 
    okother = okother && !isinf(-minrealnumber);
    okother = okother && !isinf(-1.0);
    okother = okother && !isinf(-maxrealnumber);
-   okother = okother && isinf(_state->v_neginf);
-   okother = okother && !isposinf(_state->v_nan);
-   okother = okother && isposinf(_state->v_posinf);
+   okother = okother && isinf(-INFINITY);
+   okother = okother && !isposinf(NAN);
+   okother = okother && isposinf(+INFINITY);
    okother = okother && !isposinf(maxrealnumber);
    okother = okother && !isposinf(1.0);
    okother = okother && !isposinf(minrealnumber);
@@ -89419,9 +89419,9 @@ static bool testalglibbasicsunit_testieeespecial(bool silent, ae_state *_state) 
    okother = okother && !isposinf(-minrealnumber);
    okother = okother && !isposinf(-1.0);
    okother = okother && !isposinf(-maxrealnumber);
-   okother = okother && !isposinf(_state->v_neginf);
-   okother = okother && !isneginf(_state->v_nan);
-   okother = okother && !isneginf(_state->v_posinf);
+   okother = okother && !isposinf(-INFINITY);
+   okother = okother && !isneginf(NAN);
+   okother = okother && !isneginf(+INFINITY);
    okother = okother && !isneginf(maxrealnumber);
    okother = okother && !isneginf(1.0);
    okother = okother && !isneginf(minrealnumber);
@@ -89429,9 +89429,9 @@ static bool testalglibbasicsunit_testieeespecial(bool silent, ae_state *_state) 
    okother = okother && !isneginf(-minrealnumber);
    okother = okother && !isneginf(-1.0);
    okother = okother && !isneginf(-maxrealnumber);
-   okother = okother && isneginf(_state->v_neginf);
-   okother = okother && isnan(_state->v_nan);
-   okother = okother && !isnan(_state->v_posinf);
+   okother = okother && isneginf(-INFINITY);
+   okother = okother && isnan(NAN);
+   okother = okother && !isnan(+INFINITY);
    okother = okother && !isnan(maxrealnumber);
    okother = okother && !isnan(1.0);
    okother = okother && !isnan(minrealnumber);
@@ -89439,9 +89439,9 @@ static bool testalglibbasicsunit_testieeespecial(bool silent, ae_state *_state) 
    okother = okother && !isnan(-minrealnumber);
    okother = okother && !isnan(-1.0);
    okother = okother && !isnan(-maxrealnumber);
-   okother = okother && !isnan(_state->v_neginf);
-   okother = okother && !isfinite(_state->v_nan);
-   okother = okother && !isfinite(_state->v_posinf);
+   okother = okother && !isnan(-INFINITY);
+   okother = okother && !isfinite(NAN);
+   okother = okother && !isfinite(+INFINITY);
    okother = okother && isfinite(maxrealnumber);
    okother = okother && isfinite(1.0);
    okother = okother && isfinite(minrealnumber);
@@ -89449,10 +89449,10 @@ static bool testalglibbasicsunit_testieeespecial(bool silent, ae_state *_state) 
    okother = okother && isfinite(-minrealnumber);
    okother = okother && isfinite(-1.0);
    okother = okother && isfinite(-maxrealnumber);
-   okother = okother && !isfinite(_state->v_neginf);
+   okother = okother && !isfinite(-INFINITY);
 // Test NAN
-   v1 = _state->v_nan;
-   v2 = _state->v_nan;
+   v1 = NAN;
+   v2 = NAN;
    oknan = oknan && isnan(v1);
    oknan = oknan && v1 != v2;
    oknan = oknan && !(v1 == v2);
@@ -89460,176 +89460,176 @@ static bool testalglibbasicsunit_testieeespecial(bool silent, ae_state *_state) 
 // * basic properties
 // * comparisons involving PosINF on one of the sides
 // * comparisons involving NegINF on one of the sides
-   v1 = _state->v_posinf;
-   v2 = _state->v_neginf;
-   okinf = okinf && isinf(_state->v_posinf);
+   v1 = +INFINITY;
+   v2 = -INFINITY;
+   okinf = okinf && isinf(+INFINITY);
    okinf = okinf && isinf(v1);
-   okinf = okinf && isinf(_state->v_neginf);
+   okinf = okinf && isinf(-INFINITY);
    okinf = okinf && isinf(v2);
-   okinf = okinf && isposinf(_state->v_posinf);
+   okinf = okinf && isposinf(+INFINITY);
    okinf = okinf && isposinf(v1);
-   okinf = okinf && !isposinf(_state->v_neginf);
+   okinf = okinf && !isposinf(-INFINITY);
    okinf = okinf && !isposinf(v2);
-   okinf = okinf && !isneginf(_state->v_posinf);
+   okinf = okinf && !isneginf(+INFINITY);
    okinf = okinf && !isneginf(v1);
-   okinf = okinf && isneginf(_state->v_neginf);
+   okinf = okinf && isneginf(-INFINITY);
    okinf = okinf && isneginf(v2);
-   okinf = okinf && _state->v_posinf == _state->v_posinf;
-   okinf = okinf && _state->v_posinf == v1;
-   okinf = okinf && !(_state->v_posinf == _state->v_neginf);
-   okinf = okinf && !(_state->v_posinf == v2);
-   okinf = okinf && !(_state->v_posinf == 0.0);
-   okinf = okinf && !(_state->v_posinf == 1.2);
-   okinf = okinf && !(_state->v_posinf == -1.2);
-   okinf = okinf && v1 == _state->v_posinf;
-   okinf = okinf && !(_state->v_neginf == _state->v_posinf);
-   okinf = okinf && !(v2 == _state->v_posinf);
-   okinf = okinf && !(0.0 == _state->v_posinf);
-   okinf = okinf && !(1.2 == _state->v_posinf);
-   okinf = okinf && !(-1.2 == _state->v_posinf);
-   okinf = okinf && !(_state->v_posinf != _state->v_posinf);
-   okinf = okinf && !(_state->v_posinf != v1);
-   okinf = okinf && _state->v_posinf != _state->v_neginf;
-   okinf = okinf && _state->v_posinf != v2;
-   okinf = okinf && _state->v_posinf != 0.0;
-   okinf = okinf && _state->v_posinf != 1.2;
-   okinf = okinf && _state->v_posinf != -1.2;
-   okinf = okinf && !(v1 != _state->v_posinf);
-   okinf = okinf && _state->v_neginf != _state->v_posinf;
-   okinf = okinf && v2 != _state->v_posinf;
-   okinf = okinf && 0.0 != _state->v_posinf;
-   okinf = okinf && 1.2 != _state->v_posinf;
-   okinf = okinf && -1.2 != _state->v_posinf;
-   okinf = okinf && !(_state->v_posinf < _state->v_posinf);
-   okinf = okinf && !(_state->v_posinf < v1);
-   okinf = okinf && !(_state->v_posinf < _state->v_neginf);
-   okinf = okinf && !(_state->v_posinf < v2);
-   okinf = okinf && !(_state->v_posinf < 0.0);
-   okinf = okinf && !(_state->v_posinf < 1.2);
-   okinf = okinf && !(_state->v_posinf < -1.2);
-   okinf = okinf && !(v1 < _state->v_posinf);
-   okinf = okinf && _state->v_neginf < _state->v_posinf;
-   okinf = okinf && v2 < _state->v_posinf;
-   okinf = okinf && 0.0 < _state->v_posinf;
-   okinf = okinf && 1.2 < _state->v_posinf;
-   okinf = okinf && -1.2 < _state->v_posinf;
-   okinf = okinf && _state->v_posinf <= _state->v_posinf;
-   okinf = okinf && _state->v_posinf <= v1;
-   okinf = okinf && !(_state->v_posinf <= _state->v_neginf);
-   okinf = okinf && !(_state->v_posinf <= v2);
-   okinf = okinf && !(_state->v_posinf <= 0.0);
-   okinf = okinf && !(_state->v_posinf <= 1.2);
-   okinf = okinf && !(_state->v_posinf <= -1.2);
-   okinf = okinf && v1 <= _state->v_posinf;
-   okinf = okinf && _state->v_neginf <= _state->v_posinf;
-   okinf = okinf && v2 <= _state->v_posinf;
-   okinf = okinf && 0.0 <= _state->v_posinf;
-   okinf = okinf && 1.2 <= _state->v_posinf;
-   okinf = okinf && -1.2 <= _state->v_posinf;
-   okinf = okinf && !(_state->v_posinf > _state->v_posinf);
-   okinf = okinf && !(_state->v_posinf > v1);
-   okinf = okinf && _state->v_posinf > _state->v_neginf;
-   okinf = okinf && _state->v_posinf > v2;
-   okinf = okinf && _state->v_posinf > 0.0;
-   okinf = okinf && _state->v_posinf > 1.2;
-   okinf = okinf && _state->v_posinf > -1.2;
-   okinf = okinf && !(v1 > _state->v_posinf);
-   okinf = okinf && !(_state->v_neginf > _state->v_posinf);
-   okinf = okinf && !(v2 > _state->v_posinf);
-   okinf = okinf && !(0.0 > _state->v_posinf);
-   okinf = okinf && !(1.2 > _state->v_posinf);
-   okinf = okinf && !(-1.2 > _state->v_posinf);
-   okinf = okinf && _state->v_posinf >= _state->v_posinf;
-   okinf = okinf && _state->v_posinf >= v1;
-   okinf = okinf && _state->v_posinf >= _state->v_neginf;
-   okinf = okinf && _state->v_posinf >= v2;
-   okinf = okinf && _state->v_posinf >= 0.0;
-   okinf = okinf && _state->v_posinf >= 1.2;
-   okinf = okinf && _state->v_posinf >= -1.2;
-   okinf = okinf && v1 >= _state->v_posinf;
-   okinf = okinf && !(_state->v_neginf >= _state->v_posinf);
-   okinf = okinf && !(v2 >= _state->v_posinf);
-   okinf = okinf && !(0.0 >= _state->v_posinf);
-   okinf = okinf && !(1.2 >= _state->v_posinf);
-   okinf = okinf && !(-1.2 >= _state->v_posinf);
-   okinf = okinf && !(_state->v_neginf == _state->v_posinf);
-   okinf = okinf && !(_state->v_neginf == v1);
-   okinf = okinf && _state->v_neginf == _state->v_neginf;
-   okinf = okinf && _state->v_neginf == v2;
-   okinf = okinf && !(_state->v_neginf == 0.0);
-   okinf = okinf && !(_state->v_neginf == 1.2);
-   okinf = okinf && !(_state->v_neginf == -1.2);
-   okinf = okinf && !(v1 == _state->v_neginf);
-   okinf = okinf && _state->v_neginf == _state->v_neginf;
-   okinf = okinf && v2 == _state->v_neginf;
-   okinf = okinf && !(0.0 == _state->v_neginf);
-   okinf = okinf && !(1.2 == _state->v_neginf);
-   okinf = okinf && !(-1.2 == _state->v_neginf);
-   okinf = okinf && _state->v_neginf != _state->v_posinf;
-   okinf = okinf && _state->v_neginf != v1;
-   okinf = okinf && !(_state->v_neginf != _state->v_neginf);
-   okinf = okinf && !(_state->v_neginf != v2);
-   okinf = okinf && _state->v_neginf != 0.0;
-   okinf = okinf && _state->v_neginf != 1.2;
-   okinf = okinf && _state->v_neginf != -1.2;
-   okinf = okinf && v1 != _state->v_neginf;
-   okinf = okinf && !(_state->v_neginf != _state->v_neginf);
-   okinf = okinf && !(v2 != _state->v_neginf);
-   okinf = okinf && 0.0 != _state->v_neginf;
-   okinf = okinf && 1.2 != _state->v_neginf;
-   okinf = okinf && -1.2 != _state->v_neginf;
-   okinf = okinf && _state->v_neginf < _state->v_posinf;
-   okinf = okinf && _state->v_neginf < v1;
-   okinf = okinf && !(_state->v_neginf < _state->v_neginf);
-   okinf = okinf && !(_state->v_neginf < v2);
-   okinf = okinf && _state->v_neginf < 0.0;
-   okinf = okinf && _state->v_neginf < 1.2;
-   okinf = okinf && _state->v_neginf < -1.2;
-   okinf = okinf && !(v1 < _state->v_neginf);
-   okinf = okinf && !(_state->v_neginf < _state->v_neginf);
-   okinf = okinf && !(v2 < _state->v_neginf);
-   okinf = okinf && !(0.0 < _state->v_neginf);
-   okinf = okinf && !(1.2 < _state->v_neginf);
-   okinf = okinf && !(-1.2 < _state->v_neginf);
-   okinf = okinf && _state->v_neginf <= _state->v_posinf;
-   okinf = okinf && _state->v_neginf <= v1;
-   okinf = okinf && _state->v_neginf <= _state->v_neginf;
-   okinf = okinf && _state->v_neginf <= v2;
-   okinf = okinf && _state->v_neginf <= 0.0;
-   okinf = okinf && _state->v_neginf <= 1.2;
-   okinf = okinf && _state->v_neginf <= -1.2;
-   okinf = okinf && !(v1 <= _state->v_neginf);
-   okinf = okinf && _state->v_neginf <= _state->v_neginf;
-   okinf = okinf && v2 <= _state->v_neginf;
-   okinf = okinf && !(0.0 <= _state->v_neginf);
-   okinf = okinf && !(1.2 <= _state->v_neginf);
-   okinf = okinf && !(-1.2 <= _state->v_neginf);
-   okinf = okinf && !(_state->v_neginf > _state->v_posinf);
-   okinf = okinf && !(_state->v_neginf > v1);
-   okinf = okinf && !(_state->v_neginf > _state->v_neginf);
-   okinf = okinf && !(_state->v_neginf > v2);
-   okinf = okinf && !(_state->v_neginf > 0.0);
-   okinf = okinf && !(_state->v_neginf > 1.2);
-   okinf = okinf && !(_state->v_neginf > -1.2);
-   okinf = okinf && v1 > _state->v_neginf;
-   okinf = okinf && !(_state->v_neginf > _state->v_neginf);
-   okinf = okinf && !(v2 > _state->v_neginf);
-   okinf = okinf && 0.0 > _state->v_neginf;
-   okinf = okinf && 1.2 > _state->v_neginf;
-   okinf = okinf && -1.2 > _state->v_neginf;
-   okinf = okinf && !(_state->v_neginf >= _state->v_posinf);
-   okinf = okinf && !(_state->v_neginf >= v1);
-   okinf = okinf && _state->v_neginf >= _state->v_neginf;
-   okinf = okinf && _state->v_neginf >= v2;
-   okinf = okinf && !(_state->v_neginf >= 0.0);
-   okinf = okinf && !(_state->v_neginf >= 1.2);
-   okinf = okinf && !(_state->v_neginf >= -1.2);
-   okinf = okinf && v1 >= _state->v_neginf;
-   okinf = okinf && _state->v_neginf >= _state->v_neginf;
-   okinf = okinf && v2 >= _state->v_neginf;
-   okinf = okinf && 0.0 >= _state->v_neginf;
-   okinf = okinf && 1.2 >= _state->v_neginf;
-   okinf = okinf && -1.2 >= _state->v_neginf;
+   okinf = okinf && +INFINITY == +INFINITY;
+   okinf = okinf && +INFINITY == v1;
+   okinf = okinf && !(+INFINITY == -INFINITY);
+   okinf = okinf && !(+INFINITY == v2);
+   okinf = okinf && !(+INFINITY == 0.0);
+   okinf = okinf && !(+INFINITY == 1.2);
+   okinf = okinf && !(+INFINITY == -1.2);
+   okinf = okinf && v1 == +INFINITY;
+   okinf = okinf && !(-INFINITY == +INFINITY);
+   okinf = okinf && !(v2 == +INFINITY);
+   okinf = okinf && !(0.0 == +INFINITY);
+   okinf = okinf && !(1.2 == +INFINITY);
+   okinf = okinf && !(-1.2 == +INFINITY);
+   okinf = okinf && !(+INFINITY != +INFINITY);
+   okinf = okinf && !(+INFINITY != v1);
+   okinf = okinf && +INFINITY != -INFINITY;
+   okinf = okinf && +INFINITY != v2;
+   okinf = okinf && +INFINITY != 0.0;
+   okinf = okinf && +INFINITY != 1.2;
+   okinf = okinf && +INFINITY != -1.2;
+   okinf = okinf && !(v1 != +INFINITY);
+   okinf = okinf && -INFINITY != +INFINITY;
+   okinf = okinf && v2 != +INFINITY;
+   okinf = okinf && 0.0 != +INFINITY;
+   okinf = okinf && 1.2 != +INFINITY;
+   okinf = okinf && -1.2 != +INFINITY;
+   okinf = okinf && !(+INFINITY < +INFINITY);
+   okinf = okinf && !(+INFINITY < v1);
+   okinf = okinf && !(+INFINITY < -INFINITY);
+   okinf = okinf && !(+INFINITY < v2);
+   okinf = okinf && !(+INFINITY < 0.0);
+   okinf = okinf && !(+INFINITY < 1.2);
+   okinf = okinf && !(+INFINITY < -1.2);
+   okinf = okinf && !(v1 < +INFINITY);
+   okinf = okinf && -INFINITY < +INFINITY;
+   okinf = okinf && v2 < +INFINITY;
+   okinf = okinf && 0.0 < +INFINITY;
+   okinf = okinf && 1.2 < +INFINITY;
+   okinf = okinf && -1.2 < +INFINITY;
+   okinf = okinf && +INFINITY <= +INFINITY;
+   okinf = okinf && +INFINITY <= v1;
+   okinf = okinf && !(+INFINITY <= -INFINITY);
+   okinf = okinf && !(+INFINITY <= v2);
+   okinf = okinf && !(+INFINITY <= 0.0);
+   okinf = okinf && !(+INFINITY <= 1.2);
+   okinf = okinf && !(+INFINITY <= -1.2);
+   okinf = okinf && v1 <= +INFINITY;
+   okinf = okinf && -INFINITY <= +INFINITY;
+   okinf = okinf && v2 <= +INFINITY;
+   okinf = okinf && 0.0 <= +INFINITY;
+   okinf = okinf && 1.2 <= +INFINITY;
+   okinf = okinf && -1.2 <= +INFINITY;
+   okinf = okinf && !(+INFINITY > +INFINITY);
+   okinf = okinf && !(+INFINITY > v1);
+   okinf = okinf && +INFINITY > -INFINITY;
+   okinf = okinf && +INFINITY > v2;
+   okinf = okinf && +INFINITY > 0.0;
+   okinf = okinf && +INFINITY > 1.2;
+   okinf = okinf && +INFINITY > -1.2;
+   okinf = okinf && !(v1 > +INFINITY);
+   okinf = okinf && !(-INFINITY > +INFINITY);
+   okinf = okinf && !(v2 > +INFINITY);
+   okinf = okinf && !(0.0 > +INFINITY);
+   okinf = okinf && !(1.2 > +INFINITY);
+   okinf = okinf && !(-1.2 > +INFINITY);
+   okinf = okinf && +INFINITY >= +INFINITY;
+   okinf = okinf && +INFINITY >= v1;
+   okinf = okinf && +INFINITY >= -INFINITY;
+   okinf = okinf && +INFINITY >= v2;
+   okinf = okinf && +INFINITY >= 0.0;
+   okinf = okinf && +INFINITY >= 1.2;
+   okinf = okinf && +INFINITY >= -1.2;
+   okinf = okinf && v1 >= +INFINITY;
+   okinf = okinf && !(-INFINITY >= +INFINITY);
+   okinf = okinf && !(v2 >= +INFINITY);
+   okinf = okinf && !(0.0 >= +INFINITY);
+   okinf = okinf && !(1.2 >= +INFINITY);
+   okinf = okinf && !(-1.2 >= +INFINITY);
+   okinf = okinf && !(-INFINITY == +INFINITY);
+   okinf = okinf && !(-INFINITY == v1);
+   okinf = okinf && -INFINITY == -INFINITY;
+   okinf = okinf && -INFINITY == v2;
+   okinf = okinf && !(-INFINITY == 0.0);
+   okinf = okinf && !(-INFINITY == 1.2);
+   okinf = okinf && !(-INFINITY == -1.2);
+   okinf = okinf && !(v1 == -INFINITY);
+   okinf = okinf && -INFINITY == -INFINITY;
+   okinf = okinf && v2 == -INFINITY;
+   okinf = okinf && !(0.0 == -INFINITY);
+   okinf = okinf && !(1.2 == -INFINITY);
+   okinf = okinf && !(-1.2 == -INFINITY);
+   okinf = okinf && -INFINITY != +INFINITY;
+   okinf = okinf && -INFINITY != v1;
+   okinf = okinf && !(-INFINITY != -INFINITY);
+   okinf = okinf && !(-INFINITY != v2);
+   okinf = okinf && -INFINITY != 0.0;
+   okinf = okinf && -INFINITY != 1.2;
+   okinf = okinf && -INFINITY != -1.2;
+   okinf = okinf && v1 != -INFINITY;
+   okinf = okinf && !(-INFINITY != -INFINITY);
+   okinf = okinf && !(v2 != -INFINITY);
+   okinf = okinf && 0.0 != -INFINITY;
+   okinf = okinf && 1.2 != -INFINITY;
+   okinf = okinf && -1.2 != -INFINITY;
+   okinf = okinf && -INFINITY < +INFINITY;
+   okinf = okinf && -INFINITY < v1;
+   okinf = okinf && !(-INFINITY < -INFINITY);
+   okinf = okinf && !(-INFINITY < v2);
+   okinf = okinf && -INFINITY < 0.0;
+   okinf = okinf && -INFINITY < 1.2;
+   okinf = okinf && -INFINITY < -1.2;
+   okinf = okinf && !(v1 < -INFINITY);
+   okinf = okinf && !(-INFINITY < -INFINITY);
+   okinf = okinf && !(v2 < -INFINITY);
+   okinf = okinf && !(0.0 < -INFINITY);
+   okinf = okinf && !(1.2 < -INFINITY);
+   okinf = okinf && !(-1.2 < -INFINITY);
+   okinf = okinf && -INFINITY <= +INFINITY;
+   okinf = okinf && -INFINITY <= v1;
+   okinf = okinf && -INFINITY <= -INFINITY;
+   okinf = okinf && -INFINITY <= v2;
+   okinf = okinf && -INFINITY <= 0.0;
+   okinf = okinf && -INFINITY <= 1.2;
+   okinf = okinf && -INFINITY <= -1.2;
+   okinf = okinf && !(v1 <= -INFINITY);
+   okinf = okinf && -INFINITY <= -INFINITY;
+   okinf = okinf && v2 <= -INFINITY;
+   okinf = okinf && !(0.0 <= -INFINITY);
+   okinf = okinf && !(1.2 <= -INFINITY);
+   okinf = okinf && !(-1.2 <= -INFINITY);
+   okinf = okinf && !(-INFINITY > +INFINITY);
+   okinf = okinf && !(-INFINITY > v1);
+   okinf = okinf && !(-INFINITY > -INFINITY);
+   okinf = okinf && !(-INFINITY > v2);
+   okinf = okinf && !(-INFINITY > 0.0);
+   okinf = okinf && !(-INFINITY > 1.2);
+   okinf = okinf && !(-INFINITY > -1.2);
+   okinf = okinf && v1 > -INFINITY;
+   okinf = okinf && !(-INFINITY > -INFINITY);
+   okinf = okinf && !(v2 > -INFINITY);
+   okinf = okinf && 0.0 > -INFINITY;
+   okinf = okinf && 1.2 > -INFINITY;
+   okinf = okinf && -1.2 > -INFINITY;
+   okinf = okinf && !(-INFINITY >= +INFINITY);
+   okinf = okinf && !(-INFINITY >= v1);
+   okinf = okinf && -INFINITY >= -INFINITY;
+   okinf = okinf && -INFINITY >= v2;
+   okinf = okinf && !(-INFINITY >= 0.0);
+   okinf = okinf && !(-INFINITY >= 1.2);
+   okinf = okinf && !(-INFINITY >= -1.2);
+   okinf = okinf && v1 >= -INFINITY;
+   okinf = okinf && -INFINITY >= -INFINITY;
+   okinf = okinf && v2 >= -INFINITY;
+   okinf = okinf && 0.0 >= -INFINITY;
+   okinf = okinf && 1.2 >= -INFINITY;
+   okinf = okinf && -1.2 >= -INFINITY;
 // summary
    result = result && oknan;
    result = result && okinf;
@@ -90237,7 +90237,7 @@ bool call_unittest(bool (*testfunc)(bool, ae_state *), int *psticky) {
       return false;
    }
    if (use_smp)
-      ae_state_set_flags(&_alglib_env_state, ParTH);
+      ae_state_set_flags(ParTH);
    ae_frame_make(&_alglib_env_state, &_frame_block);
    result = testfunc(true, &_alglib_env_state);
    ae_state_clear(&_alglib_env_state);
@@ -90251,7 +90251,7 @@ bool call_unittest(bool (*testfunc)(bool, ae_state *), int *psticky) {
       ae_state _alglib_env_state; ae_state_init(&_alglib_env_state);
       ae_frame_make(&_alglib_env_state, &_frame_block);
       if (use_smp)
-         ae_state_set_flags(&_alglib_env_state, ParTH);
+         ae_state_set_flags(ParTH);
       result = testfunc(true, &_alglib_env_state);
       ae_state_clear(&_alglib_env_state);
       if (!result)
@@ -90346,7 +90346,7 @@ int main(int argc, char **argv) {
       printf("HARDWARE: 64-bit\n");
    else
       printf("HARDWARE: strange (non-32, non-64)\n");
-// determine endianness of hardware.
+// Determine the native byte ordering of the hardware.
 // 1983 is a good number - non-periodic double representation allow us to
 // easily distinguish between upper and lower halfs and to detect mixed endian hardware.
    u.a = 1.0 / 1983.0;

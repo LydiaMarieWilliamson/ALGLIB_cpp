@@ -108,12 +108,26 @@ void ae_state_set_break_jump(ae_state *state, jmp_buf *buf) {
    state->break_jump = buf;
 }
 
-// This function sets flags member of the ae_state structure
-//
-// buf may be NULL.
-void ae_state_set_flags(ae_state *state, ae_uint64_t flags) {
-   state->flags = flags;
+// Flags: call-local settings for ALGLIB++.
+AutoS ae_uint64_t CurFlags;
+
+// Set CurFlags.
+void ae_state_set_flags(ae_uint64_t flags) {
+   CurFlags = flags;
 }
+
+// Threading information.
+// NOTES:
+// *	These are remnants from the Commercial Version, which worked with the (Commercial-only) file smp.h.
+// *	They were declared as generic pointers of type (void *) in order to avoid explicit dependency on smp.h.
+// *	The current thread pool.
+// AutoS void *CurPool = NULL; //(@) Was never included in the Free Version.
+// *	The current worker thread.
+AutoS void *CurThread = NULL;
+// *	The parent task: the one we are solving right now.
+AutoS void *CurTask = NULL;
+// *	The thread exception handler: the function which must be called by ae_assert() before raising an exception.
+AutoS void (*ErrorOp)(void *) = NULL;
 
 // The stack and frame boundary special blocks.
 static unsigned char DynBottom = 1, DynFrame = 2;
@@ -143,23 +157,6 @@ void ae_frame_leave(ae_state *state) {
    state->p_top_block = state->p_top_block->p_next;
 }
 
-// Determine the byte order.
-// Only big-endian and little-endian are supported for ByteOrder, not mixed-endian hardware.
-static ae_int_t GetByteOrder() {
-// 1983 is used as the magic number because its non-periodic double representation
-// allow us to easily distinguish between upper and lower halfs and to detect mixed endian hardware.
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-   u.a = 1.0 / 1983.0;
-   return
-      u.p[1] == (ae_int32_t)0x3f408642 ? AE_LITTLE_ENDIAN :
-      u.p[0] == (ae_int32_t)0x3f408642 ? AE_BIG_ENDIAN :
-      AE_MIXED_ENDIAN; //(@) Originally, this prompted an abort().
-}
-static const ae_int_t ByteOrder = GetByteOrder();
-
 // This function initializes ALGLIB environment state.
 //
 // NOTES:
@@ -167,27 +164,17 @@ static const ae_int_t ByteOrder = GetByteOrder();
 //   attaching dynamic blocks. Without it ae_leave_frame() will cycle
 //   forever (which is intended behavior).
 void ae_state_init(ae_state *state) {
-   ae_int32_t *vp;
-// Set flags
-   state->flags = 0x0;
-// p_next points to itself because:
-// * correct program should be able to detect end of the list
-//   by looking at the ptr field.
-// * NULL p_next may be used to distinguish automatic blocks
-//   (in the list) from non-automatic (not in the list)
-   state->last_block.p_next = &(state->last_block);
-   state->last_block.deallocator = NULL;
-   state->last_block.ptr = &DynBottom;
-   state->p_top_block = &(state->last_block);
+// The base of the current stack of frames.
+// p_next points to itself because a correct program should be able to detect end of the list by looking at the ptr field.
+// p_next == NULL may be used to distinguish automatic blocks (in the list) from non-automatic (not in the list).
+   static ae_frame BotFr = { &BotFr, NULL, &DynBottom };
+// Set the flags.
+   CurFlags = NonTH;
+   state->p_top_block = &BotFr;
    state->break_jump = NULL;
    state->error_msg = "";
-// Determine the byte order and initialize the precomputed IEEE special quantities.
-   state->endianness = ByteOrder;
-// state->v_nan = NAN, state->v_posinf = +INFINITY, state->v_neginf = -INFINITY; //(@) Already in-line initialized.
-// set threading information
-   state->worker_thread = NULL;
-   state->parent_task = NULL;
-   state->thread_exception_handler = NULL;
+// Set the threading information.
+   CurThread = NULL, CurTask = NULL, ErrorOp = NULL;
 }
 
 // This function clears ALGLIB environment state.
@@ -434,12 +421,11 @@ void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val) {
 // This function cleans up automatically managed memory before caller terminates
 // ALGLIB executing by ae_break() or by simply stopping calling callback.
 //
-// For state != NULL it calls thread_exception_handler() and the ae_state_clear().
+// For state != NULL it calls ErrorOp() and the ae_state_clear().
 // For state == NULL it does nothing.
 void ae_clean_up_before_breaking(ae_state *state) {
    if (state != NULL) {
-      if (state->thread_exception_handler != NULL)
-         state->thread_exception_handler(state);
+      if (ErrorOp != NULL) ErrorOp(state);
       ae_state_clear(state);
    }
 }
@@ -453,8 +439,7 @@ void ae_clean_up_before_breaking(ae_state *state) {
 // In   all  cases,  for  state != NULL  function  sets  state->last_error  and
 // state->error_msg fields. It also clears state with ae_state_clear().
 //
-// If state is not NULL and state->thread_exception_handler  is  set,  it  is
-// called prior to handling error and clearing state.
+// If state != NULL and Error() != NULL, it is called prior to handling error and clearing state.
 static void ae_break(ae_state *state, ae_error_type error_type, const char *msg) {
    if (state != NULL) {
       ae_clean_up_before_breaking(state);
@@ -800,8 +785,8 @@ void aligned_free(void *block) {
 // Returns NULL when zero size is specified.
 //
 // Error handling:
-// * if state is NULL, returns NULL on allocation error
-// * if state is not NULL, calls ae_break() on allocation error
+// * if state == NULL, returns NULL on allocation error
+// * if state != NULL, calls ae_break() on allocation error
 void *ae_malloc(size_t size, ae_state *state) {
    void *result;
    if (size == 0)
@@ -1220,8 +1205,8 @@ void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, bool make_a
 // state               ALGLIB environment state
 //
 // Error handling:
-// * if state is NULL, returns false on allocation error
-// * if state is not NULL, calls ae_break() on allocation error
+// * if state == NULL, returns false on allocation error
+// * if state != NULL, calls ae_break() on allocation error
 // * returns true on success
 //
 // NOTES:
@@ -2882,6 +2867,23 @@ ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer) {
    return result;
 }
 
+// Determine the byte order.
+// Only big-endian and little-endian are supported for ByteOrder, not mixed-endian hardware.
+static ae_int_t GetByteOrder() {
+// 1983 is used as the magic number because its non-periodic double representation
+// allow us to easily distinguish between upper and lower halfs and to detect mixed endian hardware.
+   union {
+      double a;
+      ae_int32_t p[2];
+   } u;
+   u.a = 1.0 / 1983.0;
+   return
+      u.p[1] == (ae_int32_t)0x3f408642 ? AE_LITTLE_ENDIAN :
+      u.p[0] == (ae_int32_t)0x3f408642 ? AE_BIG_ENDIAN :
+      AE_MIXED_ENDIAN; //(@) Originally, this prompted an abort().
+}
+static const ae_int_t ByteOrder = GetByteOrder();
+
 #ifdef AE_USE_CPP_SERIALIZATION
 void ae_serializer_sstart_str(ae_serializer *serializer, std::string *buf) {
    serializer->mode = AE_SM_TO_CPPSTRING;
@@ -3383,15 +3385,15 @@ static double ae_str2double(const char *buf, ae_state *state, const char **pastt
       const char *s_neginf = ".neginf____";
       if (strncmp(buf, s_nan, strlen(s_nan)) == 0) {
          *pasttheend = buf + strlen(s_nan);
-         return state->v_nan;
+         return NAN;
       }
       if (strncmp(buf, s_posinf, strlen(s_posinf)) == 0) {
          *pasttheend = buf + strlen(s_posinf);
-         return state->v_posinf;
+         return +INFINITY;
       }
       if (strncmp(buf, s_neginf, strlen(s_neginf)) == 0) {
          *pasttheend = buf + strlen(s_neginf);
-         return state->v_neginf;
+         return -INFINITY;
       }
       ae_break(state, ERR_ASSERTION_FAILED, emsg);
    }

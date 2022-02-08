@@ -770,13 +770,13 @@ ae_int_t saferdiv(double x, double y, double *r, ae_state *_state) {
    if (y == 0.0) {
       result = 1;
       if (x == 0.0) {
-         *r = _state->v_nan;
+         *r = NAN;
       }
       if (x > 0.0) {
-         *r = _state->v_posinf;
+         *r = +INFINITY;
       }
       if (x < 0.0) {
-         *r = _state->v_neginf;
+         *r = -INFINITY;
       }
       return result;
    }
@@ -802,9 +802,9 @@ ae_int_t saferdiv(double x, double y, double *r, ae_state *_state) {
    } else {
       if (fabs(x) >= maxrealnumber * y) {
          if (x > 0.0) {
-            *r = _state->v_posinf;
+            *r = +INFINITY;
          } else {
-            *r = _state->v_neginf;
+            *r = -INFINITY;
          }
          result = 1;
       } else {

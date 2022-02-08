@@ -241,7 +241,7 @@ void generatereflection(RVector *x, ae_int_t n, double *tau, ae_state *_state) {
 //     V   -   vector #2
 //     IV  -   subvector offset
 // ALGLIB Routine: Copyright 16.10.2017 by Sergey Bochkanov
-// API: void rmatrixger(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double alpha, const real_1d_array &u, const ae_int_t iu, const real_1d_array &v, const ae_int_t iv, const xparams _xparams = NonTH);
+// API: void rmatrixger(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double alpha, const real_1d_array &u, const ae_int_t iu, const real_1d_array &v, const ae_int_t iv);
 void rmatrixger(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state) {
    ae_int_t i;
    double s;
@@ -268,7 +268,7 @@ void rmatrixger(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, do
    }
 }
 
-// API: void rmatrixgemv(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy, const xparams _xparams = NonTH);
+// API: void rmatrixgemv(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy);
 void rmatrixgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state) {
 // Quick exit for M=0, N=0 or Alpha=0.
 //
@@ -379,7 +379,7 @@ void applyreflectionfromtheright(RMatrix *c, double tau, RVector *v, ae_int_t m1
 //     B   -   destination matrix, must be large enough to store result
 //     IB  -   submatrix offset (row index)
 //     JB  -   submatrix offset (column index)
-// API: void rmatrixtranspose(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams = NonTH);
+// API: void rmatrixtranspose(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb);
 void rmatrixtranspose(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_state *_state) {
    ae_int_t i;
    ae_int_t s1;
@@ -414,7 +414,7 @@ void rmatrixtranspose(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t 
 //     B   -   destination matrix, must be large enough to store result
 //     IB  -   submatrix offset (row index)
 //     JB  -   submatrix offset (column index)
-// API: void cmatrixtranspose(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams = NonTH);
+// API: void cmatrixtranspose(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb);
 void cmatrixtranspose(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_state *_state) {
    ae_int_t i;
    ae_int_t s1;
@@ -446,7 +446,7 @@ void cmatrixtranspose(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t 
 //     N   -   number of rows/columns
 //     IsUpper - whether we want to copy upper triangle to lower one (True)
 //             or vice versa (False).
-// API: void rmatrixenforcesymmetricity(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams = NonTH);
+// API: void rmatrixenforcesymmetricity(const real_2d_array &a, const ae_int_t n, const bool isupper);
 void rmatrixenforcesymmetricity(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -473,7 +473,7 @@ void rmatrixenforcesymmetricity(RMatrix *a, ae_int_t n, bool isupper, ae_state *
 //     IA  -   source offset (first element index)
 //     B   -   destination vector, must be large enough to store result
 //     IB  -   destination offset (first element index)
-// API: void rvectorcopy(const ae_int_t n, const real_1d_array &a, const ae_int_t ia, const real_1d_array &b, const ae_int_t ib, const xparams _xparams = NonTH);
+// API: void rvectorcopy(const ae_int_t n, const real_1d_array &a, const ae_int_t ia, const real_1d_array &b, const ae_int_t ib);
 void rvectorcopy(ae_int_t n, RVector *a, ae_int_t ia, RVector *b, ae_int_t ib, ae_state *_state) {
    if (n == 0) {
       return;
@@ -496,7 +496,7 @@ void rvectorcopy(ae_int_t n, RVector *a, ae_int_t ia, RVector *b, ae_int_t ib, a
 //     B   -   destination matrix, must be large enough to store result
 //     IB  -   submatrix offset (row index)
 //     JB  -   submatrix offset (column index)
-// API: void rmatrixcopy(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams = NonTH);
+// API: void rmatrixcopy(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb);
 void rmatrixcopy(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_state *_state) {
    ae_int_t i;
    if (m == 0 || n == 0) {
@@ -518,7 +518,7 @@ void rmatrixcopy(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, R
 //     B   -   destination matrix, must be large enough to store result
 //     IB  -   submatrix offset (row index)
 //     JB  -   submatrix offset (column index)
-// API: void cmatrixcopy(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams = NonTH);
+// API: void cmatrixcopy(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb);
 void cmatrixcopy(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_state *_state) {
    ae_int_t i;
    if (m == 0 || n == 0) {
@@ -546,7 +546,7 @@ void cmatrixcopy(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, C
 //     B   -   destination matrix, must be large enough to store result
 //     IB  -   submatrix offset (row index)
 //     JB  -   submatrix offset (column index)
-// API: void rmatrixgencopy(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double beta, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams = NonTH);
+// API: void rmatrixgencopy(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double beta, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb);
 void rmatrixgencopy(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, double beta, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -603,7 +603,7 @@ void rmatrixgencopy(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t i
 //     IU  -   subvector offset
 //     V   -   vector #2
 //     IV  -   subvector offset
-// API: void rmatrixrank1(const ae_int_t m, const ae_int_t n, real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_1d_array &u, const ae_int_t iu, real_1d_array &v, const ae_int_t iv, const xparams _xparams = NonTH);
+// API: void rmatrixrank1(const ae_int_t m, const ae_int_t n, real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_1d_array &u, const ae_int_t iu, real_1d_array &v, const ae_int_t iv);
 void rmatrixrank1(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv, ae_state *_state) {
    ae_int_t i;
    double s;
@@ -642,7 +642,7 @@ void rmatrixrank1(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, 
 //     IU  -   subvector offset
 //     V   -   vector #2
 //     IV  -   subvector offset
-// API: void cmatrixrank1(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_1d_array &u, const ae_int_t iu, complex_1d_array &v, const ae_int_t iv, const xparams _xparams = NonTH);
+// API: void cmatrixrank1(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_1d_array &u, const ae_int_t iu, complex_1d_array &v, const ae_int_t iv);
 void cmatrixrank1(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv, ae_state *_state) {
    ae_int_t i;
    complex s;
@@ -694,7 +694,7 @@ void cmatrixrank1(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, 
 // if M=0, then subroutine does nothing.
 // if N=0, Y is filled by zeros.
 // ALGLIB Routine: Copyright 28.01.2010 by Sergey Bochkanov
-// API: void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const real_1d_array &y, const ae_int_t iy, const xparams _xparams = NonTH);
+// API: void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const real_1d_array &y, const ae_int_t iy);
 void rmatrixmv(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, RVector *y, ae_int_t iy, ae_state *_state) {
    ae_int_t i;
    double v;
@@ -762,7 +762,7 @@ void rmatrixmv(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_
 // if M=0, then subroutine does nothing.
 // if N=0, Y is filled by zeros.
 // ALGLIB Routine: Copyright 28.01.2010 by Sergey Bochkanov
-// API: void cmatrixmv(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const complex_1d_array &x, const ae_int_t ix, complex_1d_array &y, const ae_int_t iy, const xparams _xparams = NonTH);
+// API: void cmatrixmv(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const complex_1d_array &x, const ae_int_t ix, complex_1d_array &y, const ae_int_t iy);
 void cmatrixmv(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CVector *x, ae_int_t ix, CVector *y, ae_int_t iy, ae_state *_state) {
    ae_int_t i;
    complex v;
@@ -816,7 +816,7 @@ void cmatrixmv(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_
    }
 }
 
-// API: void rmatrixsymv(const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy, const xparams _xparams = NonTH);
+// API: void rmatrixsymv(const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy);
 void rmatrixsymv(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -893,7 +893,7 @@ void rmatrixsymv(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja,
    }
 }
 
-// API: double rmatrixsyvmv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const real_1d_array &tmp, const xparams _xparams = NonTH);
+// API: double rmatrixsyvmv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const real_1d_array &tmp);
 double rmatrixsyvmv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, RVector *tmp, ae_state *_state) {
    ae_int_t i;
    double result;
@@ -942,7 +942,7 @@ double rmatrixsyvmv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupp
 //      (c) 2016 Reference BLAS level1 routine (LAPACK version 3.7.0)
 //      Reference BLAS is a software package provided by Univ. of Tennessee,
 //      Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd.
-// API: void rmatrixtrsv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, const ae_int_t ix, const xparams _xparams = NonTH);
+// API: void rmatrixtrsv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, const ae_int_t ix);
 void rmatrixtrsv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -1209,7 +1209,7 @@ static void ablas_cmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, complex alp
 //     IC      -   submatrix offset
 //     JC      -   submatrix offset
 // ALGLIB Routine: Copyright 2009-2019 by Sergey Bochkanov
-// API: void rmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc, const xparams _xparams = NonTH);
+// API: void rmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc);
 void rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
    ae_int_t ts;
    ts = matrixtilesizeb(_state);
@@ -1267,7 +1267,7 @@ void rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, a
 //     IC      -   submatrix offset
 //     JC      -   submatrix offset
 // ALGLIB Routine: Copyright 2009-2019 by Sergey Bochkanov
-// API: void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const complex alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const complex beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const xparams _xparams = NonTH);
+// API: void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const complex alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const complex beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc);
 void cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
    ae_int_t ts;
    ts = matrixtilesizeb(_state);
@@ -1522,7 +1522,7 @@ static void ablas_cmatrixrighttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t
 //     I2  -   submatrix offset
 //     J2  -   submatrix offset
 // ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
-// API: void rmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams = NonTH);
+// API: void rmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2);
 void rmatrixrighttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
    ae_int_t s1;
    ae_int_t s2;
@@ -1629,7 +1629,7 @@ void rmatrixrighttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t 
 //     I2  -   submatrix offset
 //     J2  -   submatrix offset
 // ALGLIB Routine: Copyright 20.01.2018 by Sergey Bochkanov
-// API: void cmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams = NonTH);
+// API: void cmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2);
 void cmatrixrighttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
    ae_int_t s1;
    ae_int_t s2;
@@ -1935,7 +1935,7 @@ static void ablas_cmatrixlefttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t 
 //     I2  -   submatrix offset
 //     J2  -   submatrix offset
 // ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
-// API: void rmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams = NonTH);
+// API: void rmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2);
 void rmatrixlefttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
    ae_int_t s1;
    ae_int_t s2;
@@ -2035,7 +2035,7 @@ void rmatrixlefttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j
 //     I2  -   submatrix offset
 //     J2  -   submatrix offset
 // ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
-// API: void cmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams = NonTH);
+// API: void cmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2);
 void cmatrixlefttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2, ae_state *_state) {
    ae_int_t s1;
    ae_int_t s2;
@@ -2294,7 +2294,7 @@ static void ablas_cmatrixherk2(ae_int_t n, ae_int_t k, double alpha, CMatrix *a,
 //     JC      -   submatrix offset (column index)
 //     IsUpper -   whether C is upper triangular or lower triangular
 // ALGLIB Routine: Copyright 16.12.2009-22.01.2018 by Sergey Bochkanov
-// API: void rmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper, const xparams _xparams = NonTH);
+// API: void rmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper);
 void rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state) {
    ae_int_t s1;
    ae_int_t s2;
@@ -2386,7 +2386,7 @@ void rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, 
 //                 this function updates only one half of C, leaving
 //                 other half unchanged (not referenced at all).
 // ALGLIB Routine: Copyright 16.12.2009-22.01.2018 by Sergey Bochkanov
-// API: void cmatrixherk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper, const xparams _xparams = NonTH);
+// API: void cmatrixherk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper);
 void cmatrixherk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state) {
    ae_int_t s1;
    ae_int_t s2;
@@ -2453,7 +2453,7 @@ void cmatrixherk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, 
 // (it is HErmitian update, not SYmmetric). It  is  left  here  for  backward
 // compatibility.
 // ALGLIB Routine: Copyright 16.12.2009 by Sergey Bochkanov
-// API: void cmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper, const xparams _xparams = NonTH);
+// API: void cmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper);
 void cmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper, ae_state *_state) {
    cmatrixherk(n, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper, _state);
 }
@@ -2490,228 +2490,178 @@ void rowwisegramschmidt(RMatrix *q, ae_int_t m, ae_int_t n, RVector *x, RVector 
 } // end of namespace alglib_impl
 
 namespace alglib {
-void rmatrixger(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double alpha, const real_1d_array &u, const ae_int_t iu, const real_1d_array &v, const ae_int_t iv, const xparams _xparams) {
+void rmatrixger(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double alpha, const real_1d_array &u, const ae_int_t iu, const real_1d_array &v, const ae_int_t iv) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixger(m, n, ConstT(ae_matrix, a), ia, ja, alpha, ConstT(ae_vector, u), iu, ConstT(ae_vector, v), iv, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixgemv(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy, const xparams _xparams) {
+void rmatrixgemv(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixgemv(m, n, alpha, ConstT(ae_matrix, a), ia, ja, opa, ConstT(ae_vector, x), ix, beta, ConstT(ae_vector, y), iy, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixtranspose(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
+void rmatrixtranspose(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixtranspose(m, n, ConstT(ae_matrix, a), ia, ja, ConstT(ae_matrix, b), ib, jb, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixtranspose(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
+void cmatrixtranspose(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixtranspose(m, n, ConstT(ae_matrix, a), ia, ja, ConstT(ae_matrix, b), ib, jb, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixenforcesymmetricity(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+void rmatrixenforcesymmetricity(const real_2d_array &a, const ae_int_t n, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixenforcesymmetricity(ConstT(ae_matrix, a), n, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rvectorcopy(const ae_int_t n, const real_1d_array &a, const ae_int_t ia, const real_1d_array &b, const ae_int_t ib, const xparams _xparams) {
+void rvectorcopy(const ae_int_t n, const real_1d_array &a, const ae_int_t ia, const real_1d_array &b, const ae_int_t ib) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rvectorcopy(n, ConstT(ae_vector, a), ia, ConstT(ae_vector, b), ib, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixcopy(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
+void rmatrixcopy(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixcopy(m, n, ConstT(ae_matrix, a), ia, ja, ConstT(ae_matrix, b), ib, jb, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixcopy(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
+void cmatrixcopy(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_2d_array &b, const ae_int_t ib, const ae_int_t jb) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixcopy(m, n, ConstT(ae_matrix, a), ia, ja, ConstT(ae_matrix, b), ib, jb, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixgencopy(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double beta, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const xparams _xparams) {
+void rmatrixgencopy(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double beta, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixgencopy(m, n, alpha, ConstT(ae_matrix, a), ia, ja, beta, ConstT(ae_matrix, b), ib, jb, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixrank1(const ae_int_t m, const ae_int_t n, real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_1d_array &u, const ae_int_t iu, real_1d_array &v, const ae_int_t iv, const xparams _xparams) {
+void rmatrixrank1(const ae_int_t m, const ae_int_t n, real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_1d_array &u, const ae_int_t iu, real_1d_array &v, const ae_int_t iv) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixrank1(m, n, ConstT(ae_matrix, a), ia, ja, ConstT(ae_vector, u), iu, ConstT(ae_vector, v), iv, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixrank1(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_1d_array &u, const ae_int_t iu, complex_1d_array &v, const ae_int_t iv, const xparams _xparams) {
+void cmatrixrank1(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, complex_1d_array &u, const ae_int_t iu, complex_1d_array &v, const ae_int_t iv) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixrank1(m, n, ConstT(ae_matrix, a), ia, ja, ConstT(ae_vector, u), iu, ConstT(ae_vector, v), iv, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const real_1d_array &y, const ae_int_t iy, const xparams _xparams) {
+void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const real_1d_array &y, const ae_int_t iy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixmv(m, n, ConstT(ae_matrix, a), ia, ja, opa, ConstT(ae_vector, x), ix, ConstT(ae_vector, y), iy, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixmv(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const complex_1d_array &x, const ae_int_t ix, complex_1d_array &y, const ae_int_t iy, const xparams _xparams) {
+void cmatrixmv(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const complex_1d_array &x, const ae_int_t ix, complex_1d_array &y, const ae_int_t iy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixmv(m, n, ConstT(ae_matrix, a), ia, ja, opa, ConstT(ae_vector, x), ix, ConstT(ae_vector, y), iy, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixsymv(const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy, const xparams _xparams) {
+void rmatrixsymv(const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixsymv(n, alpha, ConstT(ae_matrix, a), ia, ja, isupper, ConstT(ae_vector, x), ix, beta, ConstT(ae_vector, y), iy, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-double rmatrixsyvmv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const real_1d_array &tmp, const xparams _xparams) {
+double rmatrixsyvmv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const real_1d_array &tmp) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::rmatrixsyvmv(n, ConstT(ae_matrix, a), ia, ja, isupper, ConstT(ae_vector, x), ix, ConstT(ae_vector, tmp), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-void rmatrixtrsv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, const ae_int_t ix, const xparams _xparams) {
+void rmatrixtrsv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, const ae_int_t ix) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixtrsv(n, ConstT(ae_matrix, a), ia, ja, isupper, isunit, optype, ConstT(ae_vector, x), ix, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc, const xparams _xparams) {
+void rmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixgemm(m, n, k, alpha, ConstT(ae_matrix, a), ia, ja, optypea, ConstT(ae_matrix, b), ib, jb, optypeb, beta, ConstT(ae_matrix, c), ic, jc, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const complex alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const complex beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const xparams _xparams) {
+void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const complex alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const complex beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixgemm(m, n, k, *alpha.c_ptr(), ConstT(ae_matrix, a), ia, ja, optypea, ConstT(ae_matrix, b), ib, jb, optypeb, *beta.c_ptr(), ConstT(ae_matrix, c), ic, jc, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams) {
+void rmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixrighttrsm(m, n, ConstT(ae_matrix, a), i1, j1, isupper, isunit, optype, ConstT(ae_matrix, x), i2, j2, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams) {
+void cmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixrighttrsm(m, n, ConstT(ae_matrix, a), i1, j1, isupper, isunit, optype, ConstT(ae_matrix, x), i2, j2, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams) {
+void rmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixlefttrsm(m, n, ConstT(ae_matrix, a), i1, j1, isupper, isunit, optype, ConstT(ae_matrix, x), i2, j2, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2, const xparams _xparams) {
+void cmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixlefttrsm(m, n, ConstT(ae_matrix, a), i1, j1, isupper, isunit, optype, ConstT(ae_matrix, x), i2, j2, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper, const xparams _xparams) {
+void rmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixsyrk(n, k, alpha, ConstT(ae_matrix, a), ia, ja, optypea, beta, ConstT(ae_matrix, c), ic, jc, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixherk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper, const xparams _xparams) {
+void cmatrixherk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixherk(n, k, alpha, ConstT(ae_matrix, a), ia, ja, optypea, beta, ConstT(ae_matrix, c), ic, jc, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper, const xparams _xparams) {
+void cmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixsyrk(n, k, alpha, ConstT(ae_matrix, a), ia, ja, optypea, beta, ConstT(ae_matrix, c), ic, jc, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -2998,7 +2948,7 @@ static void ortfac_cmatrixlqbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector
 // where tau is a scalar stored in Tau[I]; v - real vector,
 // so that v(0:i-1) = 0, v(i) = 1, v(i+1:m-1) stored in A(i+1:m-1,i).
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
-// API: void rmatrixqr(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau, const xparams _xparams = NonTH);
+// API: void rmatrixqr(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau);
 void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t minmn;
@@ -3095,7 +3045,7 @@ void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_state *_stat
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
-// API: void cmatrixqr(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau, const xparams _xparams = NonTH);
+// API: void cmatrixqr(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau);
 void cmatrixqr(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t minmn;
@@ -3203,7 +3153,7 @@ void cmatrixqr(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_state *_stat
 // where tau is a scalar stored in Tau[I]; v - real vector, so that v(0:i-1)=0,
 // v(i) = 1, v(i+1:n-1) stored in A(i,i+1:n-1).
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
-// API: void rmatrixlq(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau, const xparams _xparams = NonTH);
+// API: void rmatrixlq(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau);
 void rmatrixlq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t minmn;
@@ -3299,7 +3249,7 @@ void rmatrixlq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_state *_stat
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
-// API: void cmatrixlq(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau, const xparams _xparams = NonTH);
+// API: void cmatrixlq(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau);
 void cmatrixlq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t minmn;
@@ -3392,7 +3342,7 @@ void cmatrixlq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_state *_stat
 //                 Array whose indexes range within [0..M-1, 0..QColumns-1].
 //                 If QColumns=0, the array remains unchanged.
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
-// API: void rmatrixqrunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qcolumns, real_2d_array &q, const xparams _xparams = NonTH);
+// API: void rmatrixqrunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qcolumns, real_2d_array &q);
 void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t qcolumns, RMatrix *q, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t minmn;
@@ -3491,7 +3441,7 @@ void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
 //                     Array whose index ranges within [0..M-1, 0..QColumns-1].
 //                     If QColumns=0, array isn't changed.
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
-// API: void cmatrixqrunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qcolumns, complex_2d_array &q, const xparams _xparams = NonTH);
+// API: void cmatrixqrunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qcolumns, complex_2d_array &q);
 void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t qcolumns, CMatrix *q, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t minmn;
@@ -3588,7 +3538,7 @@ void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
 // Outputs:
 //     R       -   matrix R, array[0..M-1, 0..N-1].
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
-// API: void rmatrixqrunpackr(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &r, const xparams _xparams = NonTH);
+// API: void rmatrixqrunpackr(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &r);
 void rmatrixqrunpackr(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *r, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
@@ -3620,7 +3570,7 @@ void rmatrixqrunpackr(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *r, ae_state *
 // Outputs:
 //     R       -   matrix R, array[0..M-1, 0..N-1].
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
-// API: void cmatrixqrunpackr(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &r, const xparams _xparams = NonTH);
+// API: void cmatrixqrunpackr(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &r);
 void cmatrixqrunpackr(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *r, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
@@ -3657,7 +3607,7 @@ void cmatrixqrunpackr(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *r, ae_state *
 //                 within [0..QRows-1, 0..N-1]. If QRows=0, the array remains
 //                 unchanged.
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
-// API: void rmatrixlqunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qrows, real_2d_array &q, const xparams _xparams = NonTH);
+// API: void rmatrixlqunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qrows, real_2d_array &q);
 void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t qrows, RMatrix *q, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t minmn;
@@ -3756,7 +3706,7 @@ void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
 //                     Array whose index ranges within [0..QRows-1, 0..N-1].
 //                     If QRows=0, array isn't changed.
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
-// API: void cmatrixlqunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qrows, complex_2d_array &q, const xparams _xparams = NonTH);
+// API: void cmatrixlqunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qrows, complex_2d_array &q);
 void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t qrows, CMatrix *q, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t minmn;
@@ -3852,7 +3802,7 @@ void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
 // Outputs:
 //     L       -   matrix L, array[0..M-1, 0..N-1].
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
-// API: void rmatrixlqunpackl(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &l, const xparams _xparams = NonTH);
+// API: void rmatrixlqunpackl(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &l);
 void rmatrixlqunpackl(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *l, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
@@ -3884,7 +3834,7 @@ void rmatrixlqunpackl(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *l, ae_state *
 // Outputs:
 //     L       -   matrix L, array[0..M-1, 0..N-1].
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
-// API: void cmatrixlqunpackl(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &l, const xparams _xparams = NonTH);
+// API: void cmatrixlqunpackl(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &l);
 void cmatrixlqunpackl(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *l, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
@@ -3960,7 +3910,7 @@ void cmatrixlqunpackl(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *l, ae_state *
 //      September 30, 1994.
 //      Sergey Bochkanov, ALGLIB project, translation from FORTRAN to
 //      pseudocode, 2007-2010.
-// API: void rmatrixbd(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tauq, real_1d_array &taup, const xparams _xparams = NonTH);
+// API: void rmatrixbd(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tauq, real_1d_array &taup);
 void rmatrixbd(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tauq, RVector *taup, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t maxmn;
@@ -4082,7 +4032,7 @@ void rmatrixbd(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tauq, RVector *taup,
 //                     Array[0..ZRows-1,0..ZColumns-1]
 //                     If ZRows=0 or ZColumns=0, the array is not modified.
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
-// API: void rmatrixbdmultiplybyq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose, const xparams _xparams = NonTH);
+// API: void rmatrixbdmultiplybyq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose);
 void rmatrixbdmultiplybyq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, RMatrix *z, ae_int_t zrows, ae_int_t zcolumns, bool fromtheright, bool dotranspose, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -4191,7 +4141,7 @@ void rmatrixbdmultiplybyq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, RM
 //                     Array[0..M-1, 0..QColumns-1]
 //                     If QColumns=0, the array is not modified.
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
-// API: void rmatrixbdunpackq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, const ae_int_t qcolumns, real_2d_array &q, const xparams _xparams = NonTH);
+// API: void rmatrixbdunpackq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, const ae_int_t qcolumns, real_2d_array &q);
 void rmatrixbdunpackq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, ae_int_t qcolumns, RMatrix *q, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -4241,7 +4191,7 @@ void rmatrixbdunpackq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, ae_int
 //                 Array whose indexes range within [0..ZRows-1,0..ZColumns-1].
 //                 If ZRows=0 or ZColumns=0, the array is not modified.
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
-// API: void rmatrixbdmultiplybyp(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose, const xparams _xparams = NonTH);
+// API: void rmatrixbdmultiplybyp(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose);
 void rmatrixbdmultiplybyp(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, RMatrix *z, ae_int_t zrows, ae_int_t zcolumns, bool fromtheright, bool dotranspose, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -4345,7 +4295,7 @@ void rmatrixbdmultiplybyp(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, RM
 //                 Array[0..PTRows-1, 0..N-1]
 //                 If PTRows=0, the array is not modified.
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
-// API: void rmatrixbdunpackpt(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, const ae_int_t ptrows, real_2d_array &pt, const xparams _xparams = NonTH);
+// API: void rmatrixbdunpackpt(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, const ae_int_t ptrows, real_2d_array &pt);
 void rmatrixbdunpackpt(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, ae_int_t ptrows, RMatrix *pt, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -4388,7 +4338,7 @@ void rmatrixbdunpackpt(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, ae_in
 //                 Array index ranges within [0..Min(M,N)-1], the last
 //                 element is not used.
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
-// API: void rmatrixbdunpackdiagonals(const real_2d_array &b, const ae_int_t m, const ae_int_t n, bool &isupper, real_1d_array &d, real_1d_array &e, const xparams _xparams = NonTH);
+// API: void rmatrixbdunpackdiagonals(const real_2d_array &b, const ae_int_t m, const ae_int_t n, bool &isupper, real_1d_array &d, real_1d_array &e);
 void rmatrixbdunpackdiagonals(RMatrix *b, ae_int_t m, ae_int_t n, bool *isupper, RVector *d, RVector *e, ae_state *_state) {
    ae_int_t i;
    *isupper = false;
@@ -4449,7 +4399,7 @@ void rmatrixbdunpackdiagonals(RMatrix *b, ae_int_t m, ae_int_t n, bool *isupper,
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      October 31, 1992
-// API: void rmatrixhessenberg(real_2d_array &a, const ae_int_t n, real_1d_array &tau, const xparams _xparams = NonTH);
+// API: void rmatrixhessenberg(real_2d_array &a, const ae_int_t n, real_1d_array &tau);
 void rmatrixhessenberg(RMatrix *a, ae_int_t n, RVector *tau, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -4501,7 +4451,7 @@ void rmatrixhessenberg(RMatrix *a, ae_int_t n, RVector *tau, ae_state *_state) {
 //     Q   -   matrix Q.
 //             Array whose indexes range within [0..N-1, 0..N-1].
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
-// API: void rmatrixhessenbergunpackq(const real_2d_array &a, const ae_int_t n, const real_1d_array &tau, real_2d_array &q, const xparams _xparams = NonTH);
+// API: void rmatrixhessenbergunpackq(const real_2d_array &a, const ae_int_t n, const real_1d_array &tau, real_2d_array &q);
 void rmatrixhessenbergunpackq(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -4551,7 +4501,7 @@ void rmatrixhessenbergunpackq(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q, 
 // Outputs:
 //     H   -   matrix H. Array whose indexes range within [0..N-1, 0..N-1].
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
-// API: void rmatrixhessenbergunpackh(const real_2d_array &a, const ae_int_t n, real_2d_array &h, const xparams _xparams = NonTH);
+// API: void rmatrixhessenbergunpackh(const real_2d_array &a, const ae_int_t n, real_2d_array &h);
 void rmatrixhessenbergunpackh(RMatrix *a, ae_int_t n, RMatrix *h, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -4642,7 +4592,7 @@ void rmatrixhessenbergunpackh(RMatrix *a, ae_int_t n, RMatrix *h, ae_state *_sta
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      October 31, 1992
-// API: void smatrixtd(real_2d_array &a, const ae_int_t n, const bool isupper, real_1d_array &tau, real_1d_array &d, real_1d_array &e, const xparams _xparams = NonTH);
+// API: void smatrixtd(real_2d_array &a, const ae_int_t n, const bool isupper, real_1d_array &tau, real_1d_array &d, real_1d_array &e);
 void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, RVector *e, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -4814,7 +4764,7 @@ void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, R
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      October 31, 1992
-// API: void hmatrixtd(complex_2d_array &a, const ae_int_t n, const bool isupper, complex_1d_array &tau, real_1d_array &d, real_1d_array &e, const xparams _xparams = NonTH);
+// API: void hmatrixtd(complex_2d_array &a, const ae_int_t n, const bool isupper, complex_1d_array &tau, real_1d_array &d, real_1d_array &e);
 void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, RVector *e, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -4940,7 +4890,7 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
 //     Q       -   transformation matrix.
 //                 array with elements [0..N-1, 0..N-1].
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
-// API: void smatrixtdunpackq(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &tau, real_2d_array &q, const xparams _xparams = NonTH);
+// API: void smatrixtdunpackq(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &tau, real_2d_array &q);
 void smatrixtdunpackq(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatrix *q, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -5003,7 +4953,7 @@ void smatrixtdunpackq(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatri
 //     Q       -   transformation matrix.
 //                 array with elements [0..N-1, 0..N-1].
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
-// API: void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &tau, complex_2d_array &q, const xparams _xparams = NonTH);
+// API: void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &tau, complex_2d_array &q);
 void hmatrixtdunpackq(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatrix *q, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -5055,227 +5005,177 @@ void hmatrixtdunpackq(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatri
 } // end of namespace alglib_impl
 
 namespace alglib {
-void rmatrixqr(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau, const xparams _xparams) {
+void rmatrixqr(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixqr(ConstT(ae_matrix, a), m, n, ConstT(ae_vector, tau), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixqr(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau, const xparams _xparams) {
+void cmatrixqr(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixqr(ConstT(ae_matrix, a), m, n, ConstT(ae_vector, tau), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixlq(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau, const xparams _xparams) {
+void rmatrixlq(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixlq(ConstT(ae_matrix, a), m, n, ConstT(ae_vector, tau), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixlq(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau, const xparams _xparams) {
+void cmatrixlq(complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_1d_array &tau) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixlq(ConstT(ae_matrix, a), m, n, ConstT(ae_vector, tau), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixqrunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qcolumns, real_2d_array &q, const xparams _xparams) {
+void rmatrixqrunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qcolumns, real_2d_array &q) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixqrunpackq(ConstT(ae_matrix, a), m, n, ConstT(ae_vector, tau), qcolumns, ConstT(ae_matrix, q), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixqrunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qcolumns, complex_2d_array &q, const xparams _xparams) {
+void cmatrixqrunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qcolumns, complex_2d_array &q) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixqrunpackq(ConstT(ae_matrix, a), m, n, ConstT(ae_vector, tau), qcolumns, ConstT(ae_matrix, q), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixqrunpackr(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &r, const xparams _xparams) {
+void rmatrixqrunpackr(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixqrunpackr(ConstT(ae_matrix, a), m, n, ConstT(ae_matrix, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixqrunpackr(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &r, const xparams _xparams) {
+void cmatrixqrunpackr(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixqrunpackr(ConstT(ae_matrix, a), m, n, ConstT(ae_matrix, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixlqunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qrows, real_2d_array &q, const xparams _xparams) {
+void rmatrixlqunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qrows, real_2d_array &q) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixlqunpackq(ConstT(ae_matrix, a), m, n, ConstT(ae_vector, tau), qrows, ConstT(ae_matrix, q), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixlqunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qrows, complex_2d_array &q, const xparams _xparams) {
+void cmatrixlqunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qrows, complex_2d_array &q) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixlqunpackq(ConstT(ae_matrix, a), m, n, ConstT(ae_vector, tau), qrows, ConstT(ae_matrix, q), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixlqunpackl(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &l, const xparams _xparams) {
+void rmatrixlqunpackl(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &l) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixlqunpackl(ConstT(ae_matrix, a), m, n, ConstT(ae_matrix, l), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixlqunpackl(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &l, const xparams _xparams) {
+void cmatrixlqunpackl(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &l) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixlqunpackl(ConstT(ae_matrix, a), m, n, ConstT(ae_matrix, l), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixbd(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tauq, real_1d_array &taup, const xparams _xparams) {
+void rmatrixbd(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tauq, real_1d_array &taup) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixbd(ConstT(ae_matrix, a), m, n, ConstT(ae_vector, tauq), ConstT(ae_vector, taup), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixbdmultiplybyq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose, const xparams _xparams) {
+void rmatrixbdmultiplybyq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixbdmultiplybyq(ConstT(ae_matrix, qp), m, n, ConstT(ae_vector, tauq), ConstT(ae_matrix, z), zrows, zcolumns, fromtheright, dotranspose, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixbdunpackq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, const ae_int_t qcolumns, real_2d_array &q, const xparams _xparams) {
+void rmatrixbdunpackq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, const ae_int_t qcolumns, real_2d_array &q) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixbdunpackq(ConstT(ae_matrix, qp), m, n, ConstT(ae_vector, tauq), qcolumns, ConstT(ae_matrix, q), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixbdmultiplybyp(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose, const xparams _xparams) {
+void rmatrixbdmultiplybyp(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixbdmultiplybyp(ConstT(ae_matrix, qp), m, n, ConstT(ae_vector, taup), ConstT(ae_matrix, z), zrows, zcolumns, fromtheright, dotranspose, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixbdunpackpt(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, const ae_int_t ptrows, real_2d_array &pt, const xparams _xparams) {
+void rmatrixbdunpackpt(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, const ae_int_t ptrows, real_2d_array &pt) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixbdunpackpt(ConstT(ae_matrix, qp), m, n, ConstT(ae_vector, taup), ptrows, ConstT(ae_matrix, pt), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixbdunpackdiagonals(const real_2d_array &b, const ae_int_t m, const ae_int_t n, bool &isupper, real_1d_array &d, real_1d_array &e, const xparams _xparams) {
+void rmatrixbdunpackdiagonals(const real_2d_array &b, const ae_int_t m, const ae_int_t n, bool &isupper, real_1d_array &d, real_1d_array &e) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixbdunpackdiagonals(ConstT(ae_matrix, b), m, n, &isupper, ConstT(ae_vector, d), ConstT(ae_vector, e), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixhessenberg(real_2d_array &a, const ae_int_t n, real_1d_array &tau, const xparams _xparams) {
+void rmatrixhessenberg(real_2d_array &a, const ae_int_t n, real_1d_array &tau) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixhessenberg(ConstT(ae_matrix, a), n, ConstT(ae_vector, tau), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixhessenbergunpackq(const real_2d_array &a, const ae_int_t n, const real_1d_array &tau, real_2d_array &q, const xparams _xparams) {
+void rmatrixhessenbergunpackq(const real_2d_array &a, const ae_int_t n, const real_1d_array &tau, real_2d_array &q) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixhessenbergunpackq(ConstT(ae_matrix, a), n, ConstT(ae_vector, tau), ConstT(ae_matrix, q), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixhessenbergunpackh(const real_2d_array &a, const ae_int_t n, real_2d_array &h, const xparams _xparams) {
+void rmatrixhessenbergunpackh(const real_2d_array &a, const ae_int_t n, real_2d_array &h) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixhessenbergunpackh(ConstT(ae_matrix, a), n, ConstT(ae_matrix, h), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void smatrixtd(real_2d_array &a, const ae_int_t n, const bool isupper, real_1d_array &tau, real_1d_array &d, real_1d_array &e, const xparams _xparams) {
+void smatrixtd(real_2d_array &a, const ae_int_t n, const bool isupper, real_1d_array &tau, real_1d_array &d, real_1d_array &e) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::smatrixtd(ConstT(ae_matrix, a), n, isupper, ConstT(ae_vector, tau), ConstT(ae_vector, d), ConstT(ae_vector, e), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void hmatrixtd(complex_2d_array &a, const ae_int_t n, const bool isupper, complex_1d_array &tau, real_1d_array &d, real_1d_array &e, const xparams _xparams) {
+void hmatrixtd(complex_2d_array &a, const ae_int_t n, const bool isupper, complex_1d_array &tau, real_1d_array &d, real_1d_array &e) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hmatrixtd(ConstT(ae_matrix, a), n, isupper, ConstT(ae_vector, tau), ConstT(ae_vector, d), ConstT(ae_vector, e), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void smatrixtdunpackq(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &tau, real_2d_array &q, const xparams _xparams) {
+void smatrixtdunpackq(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &tau, real_2d_array &q) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::smatrixtdunpackq(ConstT(ae_matrix, a), n, isupper, ConstT(ae_vector, tau), ConstT(ae_matrix, q), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &tau, complex_2d_array &q, const xparams _xparams) {
+void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &tau, complex_2d_array &q) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hmatrixtdunpackq(ConstT(ae_matrix, a), n, isupper, ConstT(ae_vector, tau), ConstT(ae_matrix, q), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -5295,7 +5195,7 @@ namespace alglib_impl {
 // Outputs:
 //     A   -   A*Q, where Q is random NxN orthogonal matrix
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void rmatrixrndorthogonalfromtheright(real_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams = NonTH);
+// API: void rmatrixrndorthogonalfromtheright(real_2d_array &a, const ae_int_t m, const ae_int_t n);
 void rmatrixrndorthogonalfromtheright(RMatrix *a, ae_int_t m, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    double tau;
@@ -5360,7 +5260,7 @@ void rmatrixrndorthogonalfromtheright(RMatrix *a, ae_int_t m, ae_int_t n, ae_sta
 // Outputs:
 //     A   -   A*Q, where Q is random NxN orthogonal matrix
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void cmatrixrndorthogonalfromtheright(complex_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams = NonTH);
+// API: void cmatrixrndorthogonalfromtheright(complex_2d_array &a, const ae_int_t m, const ae_int_t n);
 void cmatrixrndorthogonalfromtheright(CMatrix *a, ae_int_t m, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    complex lambdav;
@@ -5418,7 +5318,7 @@ void cmatrixrndorthogonalfromtheright(CMatrix *a, ae_int_t m, ae_int_t n, ae_sta
 // Outputs:
 //     A   -   Q*A, where Q is random MxM orthogonal matrix
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void rmatrixrndorthogonalfromtheleft(real_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams = NonTH);
+// API: void rmatrixrndorthogonalfromtheleft(real_2d_array &a, const ae_int_t m, const ae_int_t n);
 void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    double tau;
@@ -5484,7 +5384,7 @@ void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n, ae_stat
 // Outputs:
 //     A   -   Q*A, where Q is random MxM orthogonal matrix
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void cmatrixrndorthogonalfromtheleft(complex_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams = NonTH);
+// API: void cmatrixrndorthogonalfromtheleft(complex_2d_array &a, const ae_int_t m, const ae_int_t n);
 void cmatrixrndorthogonalfromtheleft(CMatrix *a, ae_int_t m, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    complex tau;
@@ -5553,7 +5453,7 @@ void cmatrixrndorthogonalfromtheleft(CMatrix *a, ae_int_t m, ae_int_t n, ae_stat
 //         it to the smaller matrix (embedded in the larger size with a 1 at
 //         the bottom right corner).
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void rmatrixrndorthogonal(const ae_int_t n, real_2d_array &a, const xparams _xparams = NonTH);
+// API: void rmatrixrndorthogonal(const ae_int_t n, real_2d_array &a);
 void rmatrixrndorthogonal(ae_int_t n, RMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -5591,7 +5491,7 @@ void rmatrixrndorthogonal(ae_int_t n, RMatrix *a, ae_state *_state) {
 //         it to the smaller matrix (embedded in the larger size with a 1 at
 //         the bottom right corner).
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void cmatrixrndorthogonal(const ae_int_t n, complex_2d_array &a, const xparams _xparams = NonTH);
+// API: void cmatrixrndorthogonal(const ae_int_t n, complex_2d_array &a);
 void cmatrixrndorthogonal(ae_int_t n, CMatrix *a, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -5619,7 +5519,7 @@ void cmatrixrndorthogonal(ae_int_t n, CMatrix *a, ae_state *_state) {
 // Outputs:
 //     A   -   random matrix with norm2(A)=1 and cond(A)=C
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void rmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a, const xparams _xparams = NonTH);
+// API: void rmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
 void rmatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -5665,7 +5565,7 @@ void rmatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
 // Outputs:
 //     A   -   random matrix with norm2(A)=1 and cond(A)=C
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void cmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a, const xparams _xparams = NonTH);
+// API: void cmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void cmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -5714,7 +5614,7 @@ void cmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
 // Outputs:
 //     A   -   Q'*A*Q, where Q is random NxN orthogonal matrix
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void smatrixrndmultiply(real_2d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
+// API: void smatrixrndmultiply(real_2d_array &a, const ae_int_t n);
 void smatrixrndmultiply(RMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    double tau;
@@ -5774,7 +5674,7 @@ void smatrixrndmultiply(RMatrix *a, ae_int_t n, ae_state *_state) {
 // Outputs:
 //     A   -   Q^H*A*Q, where Q is random NxN orthogonal matrix
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
+// API: void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n);
 void hmatrixrndmultiply(CMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    complex tau;
@@ -5834,7 +5734,7 @@ void hmatrixrndmultiply(CMatrix *a, ae_int_t n, ae_state *_state) {
 // Outputs:
 //     A   -   random matrix with norm2(A)=1 and cond(A)=C
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void smatrixrndcond(const ae_int_t n, const double c, real_2d_array &a, const xparams _xparams = NonTH);
+// API: void smatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
 void smatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -5881,7 +5781,7 @@ void smatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
 // Outputs:
 //     A   -   random matrix with norm2(A)=1 and cond(A)=C
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void hmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a, const xparams _xparams = NonTH);
+// API: void hmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void hmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -5932,7 +5832,7 @@ void hmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
 // Outputs:
 //     A   -   random SPD matrix with norm2(A)=1 and cond(A)=C
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void spdmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a, const xparams _xparams = NonTH);
+// API: void spdmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
 void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -5982,7 +5882,7 @@ void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a, ae_state *_state) {
 // Outputs:
 //     A   -   random HPD matrix with norm2(A)=1 and cond(A)=C
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
-// API: void hpdmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a, const xparams _xparams = NonTH);
+// API: void hpdmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -6028,128 +5928,100 @@ void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a, ae_state *_state) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-void rmatrixrndorthogonalfromtheright(real_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams) {
+void rmatrixrndorthogonalfromtheright(real_2d_array &a, const ae_int_t m, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixrndorthogonalfromtheright(ConstT(ae_matrix, a), m, n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixrndorthogonalfromtheright(complex_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams) {
+void cmatrixrndorthogonalfromtheright(complex_2d_array &a, const ae_int_t m, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixrndorthogonalfromtheright(ConstT(ae_matrix, a), m, n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixrndorthogonalfromtheleft(real_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams) {
+void rmatrixrndorthogonalfromtheleft(real_2d_array &a, const ae_int_t m, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixrndorthogonalfromtheleft(ConstT(ae_matrix, a), m, n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixrndorthogonalfromtheleft(complex_2d_array &a, const ae_int_t m, const ae_int_t n, const xparams _xparams) {
+void cmatrixrndorthogonalfromtheleft(complex_2d_array &a, const ae_int_t m, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixrndorthogonalfromtheleft(ConstT(ae_matrix, a), m, n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixrndorthogonal(const ae_int_t n, real_2d_array &a, const xparams _xparams) {
+void rmatrixrndorthogonal(const ae_int_t n, real_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixrndorthogonal(n, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixrndorthogonal(const ae_int_t n, complex_2d_array &a, const xparams _xparams) {
+void cmatrixrndorthogonal(const ae_int_t n, complex_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixrndorthogonal(n, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a, const xparams _xparams) {
+void rmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixrndcond(n, c, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a, const xparams _xparams) {
+void cmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixrndcond(n, c, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void smatrixrndmultiply(real_2d_array &a, const ae_int_t n, const xparams _xparams) {
+void smatrixrndmultiply(real_2d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::smatrixrndmultiply(ConstT(ae_matrix, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n, const xparams _xparams) {
+void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hmatrixrndmultiply(ConstT(ae_matrix, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void smatrixrndcond(const ae_int_t n, const double c, real_2d_array &a, const xparams _xparams) {
+void smatrixrndcond(const ae_int_t n, const double c, real_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::smatrixrndcond(n, c, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void hmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a, const xparams _xparams) {
+void hmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hmatrixrndcond(n, c, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void spdmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a, const xparams _xparams) {
+void spdmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::spdmatrixrndcond(n, c, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void hpdmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a, const xparams _xparams) {
+void hpdmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hpdmatrixrndcond(n, c, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -6224,8 +6096,8 @@ void sparseinitduidx(sparsematrix *s, ae_state *_state) {
 //                     Previously allocated storage is reused, if  its  size
 //                     is compatible with expected number of non-zeros K.
 // ALGLIB Project: Copyright 14.01.2014 by Sergey Bochkanov
-// API: void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const ae_int_t k, const sparsematrix &s, const xparams _xparams = NonTH);
-// API: void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const ae_int_t k, const sparsematrix &s);
+// API: void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const sparsematrix &s);
 void sparsecreatebuf(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s, ae_state *_state) {
    ae_int_t i;
    ae_assert(m > 0, "SparseCreateBuf: M <= 0", _state);
@@ -6307,8 +6179,8 @@ void sparsecreatebuf(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s, ae_sta
 // allocated storage is NOT reused. If you  want  to reuse already allocated
 // memory, call SparseCreateBuf function.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsecreate(const ae_int_t m, const ae_int_t n, const ae_int_t k, sparsematrix &s, const xparams _xparams = NonTH);
-// API: void sparsecreate(const ae_int_t m, const ae_int_t n, sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparsecreate(const ae_int_t m, const ae_int_t n, const ae_int_t k, sparsematrix &s);
+// API: void sparsecreate(const ae_int_t m, const ae_int_t n, sparsematrix &s);
 void sparsecreate(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s, ae_state *_state) {
    SetObj(sparsematrix, s);
    sparsecreatebuf(m, n, k, s, _state);
@@ -6343,7 +6215,7 @@ void sparsecreate(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s, ae_state 
 //                     You have to fill ALL non-zero elements by calling
 //                     SparseSet() BEFORE you try to use this matrix.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsecreatecrsbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, const sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparsecreatecrsbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, const sparsematrix &s);
 void sparsecreatecrsbuf(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s, ae_state *_state) {
    ae_int_t i;
    ae_int_t noe;
@@ -6399,7 +6271,7 @@ void sparsecreatecrsbuf(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s, a
 //       Previously allocated storage is NOT reused. If you  want  to  reuse
 //       already allocated memory, call SparseCreateCRSBuf function.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsecreatecrs(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparsecreatecrs(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, sparsematrix &s);
 void sparsecreatecrs(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s, ae_state *_state) {
    ae_int_t i;
    SetObj(sparsematrix, s);
@@ -6436,7 +6308,7 @@ void sparsecreatecrs(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s, ae_s
 //                     All elements are filled by zeros.
 //                     You may use sparseset() to change their values.
 // ALGLIB Project: Copyright 13.01.2014 by Sergey Bochkanov
-// API: void sparsecreatesksbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, const sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparsecreatesksbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, const sparsematrix &s);
 void sparsecreatesksbuf(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematrix *s, ae_state *_state) {
    ae_int_t i;
    ae_int_t minmn;
@@ -6513,7 +6385,7 @@ void sparsecreatesksbuf(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsema
 //       Previously allocated storage is NOT reused. If you  want  to  reuse
 //       already allocated memory, call SparseCreateSKSBuf function.
 // ALGLIB Project: Copyright 13.01.2014 by Sergey Bochkanov
-// API: void sparsecreatesks(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparsecreatesks(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, sparsematrix &s);
 void sparsecreatesks(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematrix *s, ae_state *_state) {
    ae_int_t i;
    SetObj(sparsematrix, s);
@@ -6552,7 +6424,7 @@ void sparsecreatesks(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematri
 //                     All elements are filled by zeros.
 //                     You may use sparseset() to change their values.
 // ALGLIB Project: Copyright 13.01.2014 by Sergey Bochkanov
-// API: void sparsecreatesksbandbuf(const ae_int_t m, const ae_int_t n, const ae_int_t bw, const sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparsecreatesksbandbuf(const ae_int_t m, const ae_int_t n, const ae_int_t bw, const sparsematrix &s);
 void sparsecreatesksbandbuf(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s, ae_state *_state) {
    ae_int_t i;
    ae_int_t minmn;
@@ -6623,7 +6495,7 @@ void sparsecreatesksbandbuf(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s
 //       Previously allocated storage is NOT reused. If you  want  to  reuse
 //       already allocated memory, call sparsecreatesksbandbuf function.
 // ALGLIB Project: Copyright 25.12.2017 by Sergey Bochkanov
-// API: void sparsecreatesksband(const ae_int_t m, const ae_int_t n, const ae_int_t bw, sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparsecreatesksband(const ae_int_t m, const ae_int_t n, const ae_int_t bw, sparsematrix &s);
 void sparsecreatesksband(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s, ae_state *_state) {
    SetObj(sparsematrix, s);
    ae_assert(m > 0, "SparseCreateSKSBand: M <= 0", _state);
@@ -6639,7 +6511,7 @@ void sparsecreatesksband(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s, a
 // NOTE:  this  function  does  not verify its arguments, it just copies all
 // fields of the structure.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsecopybuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams = NonTH);
+// API: void sparsecopybuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparsecopybuf(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    ae_int_t l;
    ae_int_t i;
@@ -6685,7 +6557,7 @@ void sparsecopybuf(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 // NOTE:  this  function  does  not verify its arguments, it just copies all
 // fields of the structure.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsecopy(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams = NonTH);
+// API: void sparsecopy(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopy(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    SetObj(sparsematrix, s1);
    sparsecopybuf(s0, s1, _state);
@@ -6693,7 +6565,7 @@ void sparsecopy(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 
 // This function efficiently swaps contents of S0 and S1.
 // ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
-// API: void sparseswap(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams = NonTH);
+// API: void sparseswap(const sparsematrix &s0, const sparsematrix &s1);
 void sparseswap(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    swapi(&s1->matrixtype, &s0->matrixtype, _state);
    swapi(&s1->m, &s0->m, _state);
@@ -6745,7 +6617,7 @@ static ae_int_t sparse_hash(ae_int_t i, ae_int_t j, ae_int_t tabsize, ae_state *
 //     True in case when element exists
 //     False in case when element doesn't exist or it is zero
 // ALGLIB Project: Copyright 14.03.2012 by Sergey Bochkanov
-// API: bool sparserewriteexisting(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v, const xparams _xparams = NonTH);
+// API: bool sparserewriteexisting(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
 bool sparserewriteexisting(sparsematrix *s, ae_int_t i, ae_int_t j, double v, ae_state *_state) {
    ae_int_t hashcode;
    ae_int_t k;
@@ -6829,7 +6701,7 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v, ae_state *_sta
 // deleted too many elements from the matrix, and you want to  free unneeded
 // memory.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparseresizematrix(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparseresizematrix(const sparsematrix &s);
 void sparseresizematrix(sparsematrix *s, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t k;
@@ -6900,7 +6772,7 @@ void sparseresizematrix(sparsematrix *s, ae_state *_state) {
 // Outputs:
 //     S           -   modified matrix
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparseset(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v, const xparams _xparams = NonTH);
+// API: void sparseset(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
 void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v, ae_state *_state) {
    ae_int_t hashcode;
    ae_int_t tcode;
@@ -6995,7 +6867,7 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v, ae_state *_sta
 // NOTE 1:  when  S[i,j]  is exactly zero after modification, it is  deleted
 // from the table.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparseadd(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v, const xparams _xparams = NonTH);
+// API: void sparseadd(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
 void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v, ae_state *_state) {
    ae_int_t hashcode;
    ae_int_t tcode;
@@ -7060,7 +6932,7 @@ void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v, ae_state *_sta
 // Result:
 //     value of S[I,J] or zero (in case no element with such index is found)
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: double sparseget(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const xparams _xparams = NonTH);
+// API: double sparseget(const sparsematrix &s, const ae_int_t i, const ae_int_t j);
 double sparseget(sparsematrix *s, ae_int_t i, ae_int_t j, ae_state *_state) {
    ae_int_t hashcode;
    ae_int_t k;
@@ -7154,7 +7026,7 @@ double sparseget(sparsematrix *s, ae_int_t i, ae_int_t j, ae_state *_state) {
 // Result:
 //     whether S[I,J] is present in the data structure or not
 // ALGLIB Project: Copyright 14.10.2020 by Sergey Bochkanov
-// API: bool sparseexists(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const xparams _xparams = NonTH);
+// API: bool sparseexists(const sparsematrix &s, const ae_int_t i, const ae_int_t j);
 bool sparseexists(sparsematrix *s, ae_int_t i, ae_int_t j, ae_state *_state) {
    ae_int_t hashcode;
    ae_int_t k;
@@ -7241,7 +7113,7 @@ bool sparseexists(sparsematrix *s, ae_int_t i, ae_int_t j, ae_state *_state) {
 // Result:
 //     value of S[I,I] or zero (in case no element with such index is found)
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: double sparsegetdiagonal(const sparsematrix &s, const ae_int_t i, const xparams _xparams = NonTH);
+// API: double sparsegetdiagonal(const sparsematrix &s, const ae_int_t i);
 double sparsegetdiagonal(sparsematrix *s, ae_int_t i, ae_state *_state) {
    double result;
    ae_assert(i >= 0, "SparseGetDiagonal: I<0", _state);
@@ -7286,7 +7158,7 @@ double sparsegetdiagonal(sparsematrix *s, ae_int_t i, ae_state *_state) {
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsemv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
+// API: void sparsemv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y);
 void sparsemv(sparsematrix *s, RVector *x, RVector *y, ae_state *_state) {
    double tval;
    double v;
@@ -7378,7 +7250,7 @@ void sparsemv(sparsematrix *s, RVector *x, RVector *y, ae_state *_state) {
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsemtv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
+// API: void sparsemtv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y);
 void sparsemtv(sparsematrix *s, RVector *x, RVector *y, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -7499,7 +7371,7 @@ void sparsemtv(sparsematrix *s, RVector *x, RVector *y, ae_state *_state) {
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
 // ALGLIB Project: Copyright 10.12.2019 by Sergey Bochkanov
-// API: void sparsegemv(const sparsematrix &s, const double alpha, const ae_int_t ops, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy, const xparams _xparams = NonTH);
+// API: void sparsegemv(const sparsematrix &s, const double alpha, const ae_int_t ops, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy);
 void sparsegemv(sparsematrix *s, double alpha, ae_int_t ops, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state) {
    ae_int_t opm;
    ae_int_t opn;
@@ -7682,7 +7554,7 @@ void sparsegemv(sparsematrix *s, double alpha, ae_int_t ops, RVector *x, ae_int_
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsemv2(const sparsematrix &s, const real_1d_array &x, real_1d_array &y0, real_1d_array &y1, const xparams _xparams = NonTH);
+// API: void sparsemv2(const sparsematrix &s, const real_1d_array &x, real_1d_array &y0, real_1d_array &y1);
 void sparsemv2(sparsematrix *s, RVector *x, RVector *y0, RVector *y1, ae_state *_state) {
    ae_int_t l;
    double tval;
@@ -7797,7 +7669,7 @@ void sparsemv2(sparsematrix *s, RVector *x, RVector *y0, RVector *y1, ae_state *
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsesmv(const sparsematrix &s, const bool isupper, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
+// API: void sparsesmv(const sparsematrix &s, const bool isupper, const real_1d_array &x, real_1d_array &y);
 void sparsesmv(sparsematrix *s, bool isupper, RVector *x, RVector *y, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
@@ -7916,7 +7788,7 @@ void sparsesmv(sparsematrix *s, bool isupper, RVector *x, RVector *y, ae_state *
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
 // ALGLIB Project: Copyright 27.01.2014 by Sergey Bochkanov
-// API: double sparsevsmv(const sparsematrix &s, const bool isupper, const real_1d_array &x, const xparams _xparams = NonTH);
+// API: double sparsevsmv(const sparsematrix &s, const bool isupper, const real_1d_array &x);
 double sparsevsmv(sparsematrix *s, bool isupper, RVector *x, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
@@ -8023,7 +7895,7 @@ double sparsevsmv(sparsematrix *s, bool isupper, RVector *x, ae_state *_state) {
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsemm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b, const xparams _xparams = NonTH);
+// API: void sparsemm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b);
 void sparsemm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b, ae_state *_state) {
    double tval;
    double v;
@@ -8154,7 +8026,7 @@ void sparsemm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b, ae_state *_st
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsemtm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b, const xparams _xparams = NonTH);
+// API: void sparsemtm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b);
 void sparsemtm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -8289,7 +8161,7 @@ void sparsemtm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b, ae_state *_s
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsemm2(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b0, real_2d_array &b1, const xparams _xparams = NonTH);
+// API: void sparsemm2(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b0, real_2d_array &b1);
 void sparsemm2(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b0, RMatrix *b1, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -8436,7 +8308,7 @@ void sparsemm2(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b0, RMatrix *b1
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparsesmm(const sparsematrix &s, const bool isupper, const real_2d_array &a, const ae_int_t k, real_2d_array &b, const xparams _xparams = NonTH);
+// API: void sparsesmm(const sparsematrix &s, const bool isupper, const real_2d_array &a, const ae_int_t k, real_2d_array &b);
 void sparsesmm(sparsematrix *s, bool isupper, RMatrix *a, ae_int_t k, RMatrix *b, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -8623,7 +8495,7 @@ void sparsesmm(sparsematrix *s, bool isupper, RMatrix *a, ae_int_t k, RMatrix *b
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
 // ALGLIB Project: Copyright 20.01.2014 by Sergey Bochkanov
-// API: void sparsetrmv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
+// API: void sparsetrmv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, real_1d_array &y);
 void sparsetrmv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVector *x, RVector *y, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
@@ -8774,7 +8646,7 @@ void sparsetrmv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
 // NOTE: no assertion or tests are done during algorithm  operation.   It  is
 //       your responsibility to provide invertible matrix to algorithm.
 // ALGLIB Project: Copyright 20.01.2014 by Sergey Bochkanov
-// API: void sparsetrsv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, const xparams _xparams = NonTH);
+// API: void sparsetrsv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x);
 void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_state *_state) {
    ae_int_t n;
    ae_int_t fst;
@@ -9024,7 +8896,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
 //       must convert your matrix with SparseConvertToCRS() before using this
 //       function.
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-// API: void sparsesymmpermtblbuf(const sparsematrix &a, const bool isupper, const integer_1d_array &p, const sparsematrix &b, const xparams _xparams = NonTH);
+// API: void sparsesymmpermtblbuf(const sparsematrix &a, const bool isupper, const integer_1d_array &p, const sparsematrix &b);
 void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematrix *b, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -9169,7 +9041,7 @@ void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematri
 //       must convert your matrix with SparseConvertToCRS() before using this
 //       function.
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
-// API: void sparsesymmpermtbl(const sparsematrix &a, const bool isupper, const integer_1d_array &p, sparsematrix &b, const xparams _xparams = NonTH);
+// API: void sparsesymmpermtbl(const sparsematrix &a, const bool isupper, const integer_1d_array &p, sparsematrix &b);
 void sparsesymmpermtbl(sparsematrix *a, bool isupper, ZVector *p, sparsematrix *b, ae_state *_state) {
    SetObj(sparsematrix, b);
    sparsesymmpermtblbuf(a, isupper, p, b, _state);
@@ -9253,7 +9125,7 @@ double sparsegetaveragelengthofchain(sparsematrix *s, ae_state *_state) {
 //       THE  ONLY  matrix  modification  function  you  can  call!!!  Other
 //       matrix modification functions should not be called during enumeration!
 // ALGLIB Project: Copyright 14.03.2012 by Sergey Bochkanov
-// API: bool sparseenumerate(const sparsematrix &s, ae_int_t &t0, ae_int_t &t1, ae_int_t &i, ae_int_t &j, double &v, const xparams _xparams = NonTH);
+// API: bool sparseenumerate(const sparsematrix &s, ae_int_t &t0, ae_int_t &t1, ae_int_t &i, ae_int_t &j, double &v);
 bool sparseenumerate(sparsematrix *s, ae_int_t *t0, ae_int_t *t1, ae_int_t *i, ae_int_t *j, double *v, ae_state *_state) {
    ae_int_t sz;
    ae_int_t i0;
@@ -9363,7 +9235,7 @@ bool sparseenumerate(sparsematrix *s, ae_int_t *t0, ae_int_t *t1, ae_int_t *i, a
 // NOTE: when  incorrect  I  (outside  of  [0,M-1]) or  matrix (non  CRS/SKS)
 //       is passed, this function throws exception.
 // ALGLIB Project: Copyright 10.12.2014 by Sergey Bochkanov
-// API: void sparsegetrow(const sparsematrix &s, const ae_int_t i, real_1d_array &irow, const xparams _xparams = NonTH);
+// API: void sparsegetrow(const sparsematrix &s, const ae_int_t i, real_1d_array &irow);
 void sparsegetrow(sparsematrix *s, ae_int_t i, RVector *irow, ae_state *_state) {
    ae_int_t i0;
    ae_int_t j0;
@@ -9440,7 +9312,7 @@ void sparsegetrow(sparsematrix *s, ae_int_t i, RVector *irow, ae_state *_state) 
 //       time to calculate exact space required for data, second  time  -  to
 //       store data itself.
 // ALGLIB Project: Copyright 10.12.2014 by Sergey Bochkanov
-// API: void sparsegetcompressedrow(const sparsematrix &s, const ae_int_t i, integer_1d_array &colidx, real_1d_array &vals, ae_int_t &nzcnt, const xparams _xparams = NonTH);
+// API: void sparsegetcompressedrow(const sparsematrix &s, const ae_int_t i, integer_1d_array &colidx, real_1d_array &vals, ae_int_t &nzcnt);
 void sparsegetcompressedrow(sparsematrix *s, ae_int_t i, ZVector *colidx, RVector *vals, ae_int_t *nzcnt, ae_state *_state) {
    ae_int_t k;
    ae_int_t k0;
@@ -9506,7 +9378,7 @@ void sparsegetcompressedrow(sparsematrix *s, ae_int_t i, ZVector *colidx, RVecto
 // Outputs:
 //     S           -   sparse matrix, transposed.
 // ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
-// API: void sparsetransposesks(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparsetransposesks(const sparsematrix &s);
 void sparsetransposesks(sparsematrix *s, ae_state *_state) {
    ae_int_t n;
    ae_int_t d;
@@ -9646,7 +9518,7 @@ void sparsetransposesks(sparsematrix *s, ae_state *_state) {
 // NOTE: internal  temporary  copy  is  allocated   for   the   purposes   of
 //       transposition. It is deallocated after transposition.
 // ALGLIB Project: Copyright 30.01.2018 by Sergey Bochkanov
-// API: void sparsetransposecrs(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparsetransposecrs(const sparsematrix &s);
 void sparsetransposecrs(sparsematrix *s, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t oldn;
@@ -9727,7 +9599,7 @@ void sparsetransposecrs(sparsematrix *s, ae_state *_state) {
 //     S1      -   sparse matrix, transposed; previously allocated memory  is
 //                 reused if possible.
 // ALGLIB Project: Copyright 23.07.2018 by Sergey Bochkanov
-// API: void sparsecopytransposecrsbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams = NonTH);
+// API: void sparsecopytransposecrsbuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparsecopytransposecrsbuf(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    ae_int_t oldn;
    ae_int_t oldm;
@@ -9796,7 +9668,7 @@ void sparsecopytransposecrsbuf(sparsematrix *s0, sparsematrix *s1, ae_state *_st
 // Outputs:
 //     S1      -   sparse matrix, transposed
 // ALGLIB Project: Copyright 23.07.2018 by Sergey Bochkanov
-// API: void sparsecopytransposecrs(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams = NonTH);
+// API: void sparsecopytransposecrs(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopytransposecrs(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    SetObj(sparsematrix, s1);
    sparsecopytransposecrsbuf(s0, s1, _state);
@@ -9818,7 +9690,7 @@ void sparsecopytransposecrs(sparsematrix *s0, sparsematrix *s1, ae_state *_state
 //       memory fragmentation. Consider using out-of-place SparseCopyToHashBuf()
 //       function in this case.
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
-// API: void sparseconverttohash(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparseconverttohash(const sparsematrix &s);
 void sparseconverttohash(sparsematrix *s, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -9906,7 +9778,7 @@ void sparseconverttohash(sparsematrix *s, ae_state *_state) {
 //       you  to  use  SparseCopyToCRSBuf()  function,   which   can   reuse
 //       previously allocated memory.
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-// API: void sparseconverttocrs(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparseconverttocrs(const sparsematrix &s);
 void sparseconverttocrs(sparsematrix *s, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t m;
@@ -10065,7 +9937,7 @@ void sparseconverttocrs(sparsematrix *s, ae_state *_state) {
 //       memory fragmentation. Consider using out-of-place SparseCopyToSKSBuf()
 //       function in this case.
 // ALGLIB Project: Copyright 15.01.2014 by Sergey Bochkanov
-// API: void sparseconverttosks(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparseconverttosks(const sparsematrix &s);
 void sparseconverttosks(sparsematrix *s, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -10158,7 +10030,7 @@ void sparseconverttosks(sparsematrix *s, ae_state *_state) {
 //       recommend to use out-of-place buffered  conversion  functions,  like
 //       SparseCopyToBuf(), which can reuse already allocated memory.
 // ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
-// API: void sparseconvertto(const sparsematrix &s0, const ae_int_t fmt, const xparams _xparams = NonTH);
+// API: void sparseconvertto(const sparsematrix &s0, const ae_int_t fmt);
 void sparseconvertto(sparsematrix *s0, ae_int_t fmt, ae_state *_state) {
    ae_assert((fmt == 0 || fmt == 1) || fmt == 2, "SparseConvertTo: invalid fmt parameter", _state);
    if (fmt == 0) {
@@ -10188,7 +10060,7 @@ void sparseconvertto(sparsematrix *s0, ae_int_t fmt, ae_state *_state) {
 //
 // NOTE: if S0 is stored as Hash-table, it is just copied without conversion.
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
-// API: void sparsecopytohashbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams = NonTH);
+// API: void sparsecopytohashbuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparsecopytohashbuf(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    double val;
    ae_int_t t0;
@@ -10241,7 +10113,7 @@ void sparsecopytohashbuf(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 //       SparseCopyToHashBuf() function which re-uses memory in S1 as much as
 //       possible.
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
-// API: void sparsecopytohash(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams = NonTH);
+// API: void sparsecopytohash(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopytohash(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    SetObj(sparsematrix, s1);
    ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToHash: invalid matrix type", _state);
@@ -10262,7 +10134,7 @@ void sparsecopytohash(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 //
 // NOTE: if S0 is stored as CRS, it is just copied without conversion.
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
-// API: void sparsecopytocrsbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams = NonTH);
+// API: void sparsecopytocrsbuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t nonne;
@@ -10414,7 +10286,7 @@ void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 //       SparseCopyToCRSBuf() function which re-uses memory in S1 as much  as
 //       possible.
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
-// API: void sparsecopytocrs(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams = NonTH);
+// API: void sparsecopytocrs(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopytocrs(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    SetObj(sparsematrix, s1);
    ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToCRS: invalid matrix type", _state);
@@ -10433,7 +10305,7 @@ void sparsecopytocrs(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 //
 // NOTE: if S0 is stored as SKS, it is just copied without conversion.
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
-// API: void sparsecopytosksbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams = NonTH);
+// API: void sparsecopytosksbuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparsecopytosksbuf(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    double v;
    ae_int_t n;
@@ -10513,7 +10385,7 @@ void sparsecopytosksbuf(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 //       SparseCopyToSKSBuf() function which re-uses memory in S1 as much  as
 //       possible.
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
-// API: void sparsecopytosks(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams = NonTH);
+// API: void sparsecopytosks(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopytosks(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
    SetObj(sparsematrix, s1);
    ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToSKS: invalid matrix type", _state);
@@ -10535,7 +10407,7 @@ void sparsecopytosks(sparsematrix *s0, sparsematrix *s1, ae_state *_state) {
 // Outputs:
 //     S1          -   sparse matrix in requested format.
 // ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
-// API: void sparsecopytobuf(const sparsematrix &s0, const ae_int_t fmt, const sparsematrix &s1, const xparams _xparams = NonTH);
+// API: void sparsecopytobuf(const sparsematrix &s0, const ae_int_t fmt, const sparsematrix &s1);
 void sparsecopytobuf(sparsematrix *s0, ae_int_t fmt, sparsematrix *s1, ae_state *_state) {
    ae_assert((fmt == 0 || fmt == 1) || fmt == 2, "SparseCopyToBuf: invalid fmt parameter", _state);
    if (fmt == 0) {
@@ -10640,7 +10512,7 @@ void sparsecreatecrsinplace(sparsematrix *s, ae_state *_state) {
 // NOTE: future  versions  of  ALGLIB  may  include additional sparse storage
 //       formats.
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
-// API: ae_int_t sparsegetmatrixtype(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: ae_int_t sparsegetmatrixtype(const sparsematrix &s);
 ae_int_t sparsegetmatrixtype(sparsematrix *s, ae_state *_state) {
    ae_int_t result;
    ae_assert((((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2) || s->matrixtype == -10081) || s->matrixtype == -10082, "SparseGetMatrixType: invalid matrix type", _state);
@@ -10658,7 +10530,7 @@ ae_int_t sparsegetmatrixtype(sparsematrix *s, ae_state *_state) {
 //     True if matrix type is Hash table
 //     False if matrix type is not Hash table
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
-// API: bool sparseishash(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: bool sparseishash(const sparsematrix &s);
 bool sparseishash(sparsematrix *s, ae_state *_state) {
    bool result;
    ae_assert((((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2) || s->matrixtype == -10081) || s->matrixtype == -10082, "SparseIsHash: invalid matrix type", _state);
@@ -10676,7 +10548,7 @@ bool sparseishash(sparsematrix *s, ae_state *_state) {
 //     True if matrix type is CRS
 //     False if matrix type is not CRS
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
-// API: bool sparseiscrs(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: bool sparseiscrs(const sparsematrix &s);
 bool sparseiscrs(sparsematrix *s, ae_state *_state) {
    bool result;
    ae_assert((((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2) || s->matrixtype == -10081) || s->matrixtype == -10082, "SparseIsCRS: invalid matrix type", _state);
@@ -10694,7 +10566,7 @@ bool sparseiscrs(sparsematrix *s, ae_state *_state) {
 //     True if matrix type is SKS
 //     False if matrix type is not SKS
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
-// API: bool sparseissks(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: bool sparseissks(const sparsematrix &s);
 bool sparseissks(sparsematrix *s, ae_state *_state) {
    bool result;
    ae_assert((((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2) || s->matrixtype == -10081) || s->matrixtype == -10082, "SparseIsSKS: invalid matrix type", _state);
@@ -10708,7 +10580,7 @@ bool sparseissks(sparsematrix *s, ae_state *_state) {
 // Outputs:
 //     S   -   sparse matrix to delete
 // ALGLIB Project: Copyright 24.07.2012 by Sergey Bochkanov
-// API: void sparsefree(sparsematrix &s, const xparams _xparams = NonTH);
+// API: void sparsefree(sparsematrix &s);
 void sparsefree(sparsematrix *s, ae_state *_state) {
    SetObj(sparsematrix, s);
    s->matrixtype = -1;
@@ -10723,7 +10595,7 @@ void sparsefree(sparsematrix *s, ae_state *_state) {
 //
 // Result: number of columns of a sparse matrix.
 // ALGLIB Project: Copyright 23.08.2012 by Sergey Bochkanov
-// API: ae_int_t sparsegetncols(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: ae_int_t sparsegetncols(const sparsematrix &s);
 ae_int_t sparsegetncols(sparsematrix *s, ae_state *_state) {
    ae_int_t result;
    result = s->n;
@@ -10734,7 +10606,7 @@ ae_int_t sparsegetncols(sparsematrix *s, ae_state *_state) {
 //
 // Result: number of rows of a sparse matrix.
 // ALGLIB Project: Copyright 23.08.2012 by Sergey Bochkanov
-// API: ae_int_t sparsegetnrows(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: ae_int_t sparsegetnrows(const sparsematrix &s);
 ae_int_t sparsegetnrows(sparsematrix *s, ae_state *_state) {
    ae_int_t result;
    result = s->m;
@@ -10753,7 +10625,7 @@ ae_int_t sparsegetnrows(sparsematrix *s, ae_state *_state) {
 //
 // Result: number of non-zero elements strictly above main diagonal
 // ALGLIB Project: Copyright 12.02.2014 by Sergey Bochkanov
-// API: ae_int_t sparsegetuppercount(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: ae_int_t sparsegetuppercount(const sparsematrix &s);
 ae_int_t sparsegetuppercount(sparsematrix *s, ae_state *_state) {
    ae_int_t sz;
    ae_int_t i0;
@@ -10808,7 +10680,7 @@ ae_int_t sparsegetuppercount(sparsematrix *s, ae_state *_state) {
 //
 // Result: number of non-zero elements strictly below main diagonal
 // ALGLIB Project: Copyright 12.02.2014 by Sergey Bochkanov
-// API: ae_int_t sparsegetlowercount(const sparsematrix &s, const xparams _xparams = NonTH);
+// API: ae_int_t sparsegetlowercount(const sparsematrix &s);
 ae_int_t sparsegetlowercount(sparsematrix *s, ae_state *_state) {
    ae_int_t sz;
    ae_int_t i0;
@@ -11186,568 +11058,446 @@ void sparseunserialize(const std::istream &s_in, sparsematrix &obj) {
    alglib_impl::ae_state_clear(&state);
 }
 
-void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const ae_int_t k, const sparsematrix &s, const xparams _xparams) {
+void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const ae_int_t k, const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecreatebuf(m, n, k, ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const sparsematrix &s, const xparams _xparams) {
+void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const sparsematrix &s) {
    ae_int_t k = 0;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecreatebuf(m, n, k, ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void sparsecreate(const ae_int_t m, const ae_int_t n, const ae_int_t k, sparsematrix &s, const xparams _xparams) {
+void sparsecreate(const ae_int_t m, const ae_int_t n, const ae_int_t k, sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecreate(m, n, k, ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void sparsecreate(const ae_int_t m, const ae_int_t n, sparsematrix &s, const xparams _xparams) {
+void sparsecreate(const ae_int_t m, const ae_int_t n, sparsematrix &s) {
    ae_int_t k = 0;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecreate(m, n, k, ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void sparsecreatecrsbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, const sparsematrix &s, const xparams _xparams) {
+void sparsecreatecrsbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecreatecrsbuf(m, n, ConstT(ae_vector, ner), ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecreatecrs(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, sparsematrix &s, const xparams _xparams) {
+void sparsecreatecrs(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecreatecrs(m, n, ConstT(ae_vector, ner), ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecreatesksbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, const sparsematrix &s, const xparams _xparams) {
+void sparsecreatesksbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecreatesksbuf(m, n, ConstT(ae_vector, d), ConstT(ae_vector, u), ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecreatesks(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, sparsematrix &s, const xparams _xparams) {
+void sparsecreatesks(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecreatesks(m, n, ConstT(ae_vector, d), ConstT(ae_vector, u), ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecreatesksbandbuf(const ae_int_t m, const ae_int_t n, const ae_int_t bw, const sparsematrix &s, const xparams _xparams) {
+void sparsecreatesksbandbuf(const ae_int_t m, const ae_int_t n, const ae_int_t bw, const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecreatesksbandbuf(m, n, bw, ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecreatesksband(const ae_int_t m, const ae_int_t n, const ae_int_t bw, sparsematrix &s, const xparams _xparams) {
+void sparsecreatesksband(const ae_int_t m, const ae_int_t n, const ae_int_t bw, sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecreatesksband(m, n, bw, ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecopybuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
+void sparsecopybuf(const sparsematrix &s0, const sparsematrix &s1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecopybuf(ConstT(sparsematrix, s0), ConstT(sparsematrix, s1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecopy(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
+void sparsecopy(const sparsematrix &s0, sparsematrix &s1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecopy(ConstT(sparsematrix, s0), ConstT(sparsematrix, s1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparseswap(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
+void sparseswap(const sparsematrix &s0, const sparsematrix &s1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparseswap(ConstT(sparsematrix, s0), ConstT(sparsematrix, s1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-bool sparserewriteexisting(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v, const xparams _xparams) {
+bool sparserewriteexisting(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::sparserewriteexisting(ConstT(sparsematrix, s), i, j, v, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-void sparseresizematrix(const sparsematrix &s, const xparams _xparams) {
+void sparseresizematrix(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparseresizematrix(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparseset(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v, const xparams _xparams) {
+void sparseset(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparseset(ConstT(sparsematrix, s), i, j, v, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparseadd(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v, const xparams _xparams) {
+void sparseadd(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparseadd(ConstT(sparsematrix, s), i, j, v, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-double sparseget(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const xparams _xparams) {
+double sparseget(const sparsematrix &s, const ae_int_t i, const ae_int_t j) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::sparseget(ConstT(sparsematrix, s), i, j, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-bool sparseexists(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const xparams _xparams) {
+bool sparseexists(const sparsematrix &s, const ae_int_t i, const ae_int_t j) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::sparseexists(ConstT(sparsematrix, s), i, j, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-double sparsegetdiagonal(const sparsematrix &s, const ae_int_t i, const xparams _xparams) {
+double sparsegetdiagonal(const sparsematrix &s, const ae_int_t i) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::sparsegetdiagonal(ConstT(sparsematrix, s), i, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-void sparsemv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
+void sparsemv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsemv(ConstT(sparsematrix, s), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsemtv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
+void sparsemtv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsemtv(ConstT(sparsematrix, s), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsegemv(const sparsematrix &s, const double alpha, const ae_int_t ops, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy, const xparams _xparams) {
+void sparsegemv(const sparsematrix &s, const double alpha, const ae_int_t ops, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsegemv(ConstT(sparsematrix, s), alpha, ops, ConstT(ae_vector, x), ix, beta, ConstT(ae_vector, y), iy, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsemv2(const sparsematrix &s, const real_1d_array &x, real_1d_array &y0, real_1d_array &y1, const xparams _xparams) {
+void sparsemv2(const sparsematrix &s, const real_1d_array &x, real_1d_array &y0, real_1d_array &y1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsemv2(ConstT(sparsematrix, s), ConstT(ae_vector, x), ConstT(ae_vector, y0), ConstT(ae_vector, y1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsesmv(const sparsematrix &s, const bool isupper, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
+void sparsesmv(const sparsematrix &s, const bool isupper, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsesmv(ConstT(sparsematrix, s), isupper, ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-double sparsevsmv(const sparsematrix &s, const bool isupper, const real_1d_array &x, const xparams _xparams) {
+double sparsevsmv(const sparsematrix &s, const bool isupper, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::sparsevsmv(ConstT(sparsematrix, s), isupper, ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-void sparsemm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b, const xparams _xparams) {
+void sparsemm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsemm(ConstT(sparsematrix, s), ConstT(ae_matrix, a), k, ConstT(ae_matrix, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsemtm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b, const xparams _xparams) {
+void sparsemtm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsemtm(ConstT(sparsematrix, s), ConstT(ae_matrix, a), k, ConstT(ae_matrix, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsemm2(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b0, real_2d_array &b1, const xparams _xparams) {
+void sparsemm2(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b0, real_2d_array &b1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsemm2(ConstT(sparsematrix, s), ConstT(ae_matrix, a), k, ConstT(ae_matrix, b0), ConstT(ae_matrix, b1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsesmm(const sparsematrix &s, const bool isupper, const real_2d_array &a, const ae_int_t k, real_2d_array &b, const xparams _xparams) {
+void sparsesmm(const sparsematrix &s, const bool isupper, const real_2d_array &a, const ae_int_t k, real_2d_array &b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsesmm(ConstT(sparsematrix, s), isupper, ConstT(ae_matrix, a), k, ConstT(ae_matrix, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsetrmv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, real_1d_array &y, const xparams _xparams) {
+void sparsetrmv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsetrmv(ConstT(sparsematrix, s), isupper, isunit, optype, ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsetrsv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, const xparams _xparams) {
+void sparsetrsv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsetrsv(ConstT(sparsematrix, s), isupper, isunit, optype, ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsesymmpermtblbuf(const sparsematrix &a, const bool isupper, const integer_1d_array &p, const sparsematrix &b, const xparams _xparams) {
+void sparsesymmpermtblbuf(const sparsematrix &a, const bool isupper, const integer_1d_array &p, const sparsematrix &b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsesymmpermtblbuf(ConstT(sparsematrix, a), isupper, ConstT(ae_vector, p), ConstT(sparsematrix, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsesymmpermtbl(const sparsematrix &a, const bool isupper, const integer_1d_array &p, sparsematrix &b, const xparams _xparams) {
+void sparsesymmpermtbl(const sparsematrix &a, const bool isupper, const integer_1d_array &p, sparsematrix &b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsesymmpermtbl(ConstT(sparsematrix, a), isupper, ConstT(ae_vector, p), ConstT(sparsematrix, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-bool sparseenumerate(const sparsematrix &s, ae_int_t &t0, ae_int_t &t1, ae_int_t &i, ae_int_t &j, double &v, const xparams _xparams) {
+bool sparseenumerate(const sparsematrix &s, ae_int_t &t0, ae_int_t &t1, ae_int_t &i, ae_int_t &j, double &v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::sparseenumerate(ConstT(sparsematrix, s), &t0, &t1, &i, &j, &v, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-void sparsegetrow(const sparsematrix &s, const ae_int_t i, real_1d_array &irow, const xparams _xparams) {
+void sparsegetrow(const sparsematrix &s, const ae_int_t i, real_1d_array &irow) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsegetrow(ConstT(sparsematrix, s), i, ConstT(ae_vector, irow), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsegetcompressedrow(const sparsematrix &s, const ae_int_t i, integer_1d_array &colidx, real_1d_array &vals, ae_int_t &nzcnt, const xparams _xparams) {
+void sparsegetcompressedrow(const sparsematrix &s, const ae_int_t i, integer_1d_array &colidx, real_1d_array &vals, ae_int_t &nzcnt) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsegetcompressedrow(ConstT(sparsematrix, s), i, ConstT(ae_vector, colidx), ConstT(ae_vector, vals), &nzcnt, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsetransposesks(const sparsematrix &s, const xparams _xparams) {
+void sparsetransposesks(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsetransposesks(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsetransposecrs(const sparsematrix &s, const xparams _xparams) {
+void sparsetransposecrs(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsetransposecrs(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecopytransposecrsbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
+void sparsecopytransposecrsbuf(const sparsematrix &s0, const sparsematrix &s1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecopytransposecrsbuf(ConstT(sparsematrix, s0), ConstT(sparsematrix, s1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecopytransposecrs(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
+void sparsecopytransposecrs(const sparsematrix &s0, sparsematrix &s1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecopytransposecrs(ConstT(sparsematrix, s0), ConstT(sparsematrix, s1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparseconverttohash(const sparsematrix &s, const xparams _xparams) {
+void sparseconverttohash(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparseconverttohash(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparseconverttocrs(const sparsematrix &s, const xparams _xparams) {
+void sparseconverttocrs(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparseconverttocrs(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparseconverttosks(const sparsematrix &s, const xparams _xparams) {
+void sparseconverttosks(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparseconverttosks(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparseconvertto(const sparsematrix &s0, const ae_int_t fmt, const xparams _xparams) {
+void sparseconvertto(const sparsematrix &s0, const ae_int_t fmt) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparseconvertto(ConstT(sparsematrix, s0), fmt, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecopytohashbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
+void sparsecopytohashbuf(const sparsematrix &s0, const sparsematrix &s1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecopytohashbuf(ConstT(sparsematrix, s0), ConstT(sparsematrix, s1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecopytohash(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
+void sparsecopytohash(const sparsematrix &s0, sparsematrix &s1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecopytohash(ConstT(sparsematrix, s0), ConstT(sparsematrix, s1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecopytocrsbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
+void sparsecopytocrsbuf(const sparsematrix &s0, const sparsematrix &s1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecopytocrsbuf(ConstT(sparsematrix, s0), ConstT(sparsematrix, s1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecopytocrs(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
+void sparsecopytocrs(const sparsematrix &s0, sparsematrix &s1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecopytocrs(ConstT(sparsematrix, s0), ConstT(sparsematrix, s1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecopytosksbuf(const sparsematrix &s0, const sparsematrix &s1, const xparams _xparams) {
+void sparsecopytosksbuf(const sparsematrix &s0, const sparsematrix &s1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecopytosksbuf(ConstT(sparsematrix, s0), ConstT(sparsematrix, s1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecopytosks(const sparsematrix &s0, sparsematrix &s1, const xparams _xparams) {
+void sparsecopytosks(const sparsematrix &s0, sparsematrix &s1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecopytosks(ConstT(sparsematrix, s0), ConstT(sparsematrix, s1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void sparsecopytobuf(const sparsematrix &s0, const ae_int_t fmt, const sparsematrix &s1, const xparams _xparams) {
+void sparsecopytobuf(const sparsematrix &s0, const ae_int_t fmt, const sparsematrix &s1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecopytobuf(ConstT(sparsematrix, s0), fmt, ConstT(sparsematrix, s1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-ae_int_t sparsegetmatrixtype(const sparsematrix &s, const xparams _xparams) {
+ae_int_t sparsegetmatrixtype(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::sparsegetmatrixtype(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 
-bool sparseishash(const sparsematrix &s, const xparams _xparams) {
+bool sparseishash(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::sparseishash(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool sparseiscrs(const sparsematrix &s, const xparams _xparams) {
+bool sparseiscrs(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::sparseiscrs(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool sparseissks(const sparsematrix &s, const xparams _xparams) {
+bool sparseissks(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::sparseissks(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-void sparsefree(sparsematrix &s, const xparams _xparams) {
+void sparsefree(sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsefree(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-ae_int_t sparsegetncols(const sparsematrix &s, const xparams _xparams) {
+ae_int_t sparsegetncols(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::sparsegetncols(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 
-ae_int_t sparsegetnrows(const sparsematrix &s, const xparams _xparams) {
+ae_int_t sparsegetnrows(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::sparsegetnrows(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 
-ae_int_t sparsegetuppercount(const sparsematrix &s, const xparams _xparams) {
+ae_int_t sparsegetuppercount(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::sparsegetuppercount(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
 }
 
-ae_int_t sparsegetlowercount(const sparsematrix &s, const xparams _xparams) {
+ae_int_t sparsegetlowercount(const sparsematrix &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_int_t Z = alglib_impl::sparsegetlowercount(ConstT(sparsematrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -15972,7 +15722,7 @@ static void evd_clearrfields(eigsubspacestate *state, ae_state *_state) {
 // See also the InternalTREVC subroutine.
 //
 // The algorithm is based on the LAPACK 3.0 library.
-// API: bool rmatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t vneeded, real_1d_array &wr, real_1d_array &wi, real_2d_array &vl, real_2d_array &vr, const xparams _xparams = NonTH);
+// API: bool rmatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t vneeded, real_1d_array &wr, real_1d_array &wi, real_2d_array &vl, real_2d_array &vr);
 bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *wi, RMatrix *vl, RMatrix *vr, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -16078,7 +15828,7 @@ bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
-// API: bool smatrixtdevd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, real_2d_array &z, const xparams _xparams = NonTH);
+// API: bool smatrixtdevd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, real_2d_array &z);
 bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -16217,7 +15967,7 @@ bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix 
 //     wasn't able to find all the corresponding eigenvectors. In that case,
 //     the eigenvalues and eigenvectors are not returned, M is equal to 0.
 // ALGLIB: Copyright 31.03.2008 by Sergey Bochkanov
-// API: bool smatrixtdevdr(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const double a, const double b, ae_int_t &m, real_2d_array &z, const xparams _xparams = NonTH);
+// API: bool smatrixtdevdr(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const double a, const double b, ae_int_t &m, real_2d_array &z);
 bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double a, double b, ae_int_t *m, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t errorcode;
@@ -16427,7 +16177,7 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
 //     to find all the corresponding eigenvectors. In that case, the eigenvalues
 //     and eigenvectors are not returned.
 // ALGLIB: Copyright 25.12.2005 by Sergey Bochkanov
-// API: bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const ae_int_t i1, const ae_int_t i2, real_2d_array &z, const xparams _xparams = NonTH);
+// API: bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const ae_int_t i1, const ae_int_t i2, real_2d_array &z);
 bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_t i1, ae_int_t i2, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t errorcode;
@@ -16617,7 +16367,7 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
 //     True, if the algorithm has converged.
 //     False, if the algorithm hasn't converged (rare case).
 // ALGLIB: Copyright 2005-2008 by Sergey Bochkanov
-// API: bool smatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, real_2d_array &z, const xparams _xparams = NonTH);
+// API: bool smatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, real_2d_array &z);
 bool smatrixevd(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector *d, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
    bool result;
@@ -16670,7 +16420,7 @@ bool smatrixevd(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector 
 //     eigenvectors of Hermitian matrix are defined up to  multiplication  by
 //     a complex number L, such that |L|=1.
 // ALGLIB: Copyright 2005, 23 March 2007 by Sergey Bochkanov
-// API: bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, complex_2d_array &z, const xparams _xparams = NonTH);
+// API: bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, complex_2d_array &z);
 bool hmatrixevd(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector *d, CMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -16764,7 +16514,7 @@ bool hmatrixevd(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector 
 //     In that case, the eigenvalues and eigenvectors are not returned,
 //     M is equal to 0.
 // ALGLIB: Copyright 07.01.2006 by Sergey Bochkanov
-// API: bool smatrixevdr(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, real_2d_array &z, const xparams _xparams = NonTH);
+// API: bool smatrixevdr(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, real_2d_array &z);
 bool smatrixevdr(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double b1, double b2, ae_int_t *m, RVector *w, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
    bool result;
@@ -16826,7 +16576,7 @@ bool smatrixevdr(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double 
 //     eigen vectors of Hermitian matrix are defined up to multiplication  by
 //     a complex number L, such as |L|=1.
 // ALGLIB: Copyright 07.01.2006, 24.03.2007 by Sergey Bochkanov
-// API: bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, complex_2d_array &z, const xparams _xparams = NonTH);
+// API: bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, complex_2d_array &z);
 bool hmatrixevdr(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double b1, double b2, ae_int_t *m, RVector *w, CMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -16919,7 +16669,7 @@ bool hmatrixevdr(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double 
 //     wasn't able to find all the corresponding eigenvectors.
 //     In that case, the eigenvalues and eigenvectors are not returned.
 // ALGLIB: Copyright 07.01.2006 by Sergey Bochkanov
-// API: bool smatrixevdi(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, real_2d_array &z, const xparams _xparams = NonTH);
+// API: bool smatrixevdi(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, real_2d_array &z);
 bool smatrixevdi(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_t i1, ae_int_t i2, RVector *w, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
    bool result;
@@ -16978,7 +16728,7 @@ bool smatrixevdi(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_
 //     eigen vectors of Hermitian matrix are defined up to multiplication  by
 //     a complex number L, such as |L|=1.
 // ALGLIB: Copyright 07.01.2006, 24.03.2007 by Sergey Bochkanov
-// API: bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, complex_2d_array &z, const xparams _xparams = NonTH);
+// API: bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, complex_2d_array &z);
 bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_t i1, ae_int_t i2, RVector *w, CMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -17076,7 +16826,7 @@ bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_
 //       If you set eps to exactly zero,  Rayleigh-Ritz  phase  is completely
 //       turned off.
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
-// API: void eigsubspacesetcond(const eigsubspacestate &state, const double eps, const ae_int_t maxits, const xparams _xparams = NonTH);
+// API: void eigsubspacesetcond(const eigsubspacestate &state, const double eps, const ae_int_t maxits);
 void eigsubspacesetcond(eigsubspacestate *state, double eps, ae_int_t maxits, ae_state *_state) {
    ae_assert(!state->running, "EigSubspaceSetCond: solver is already running", _state);
    ae_assert(isfinite(eps) && eps >= 0.0, "EigSubspaceSetCond: Eps<0 or NAN/INF", _state);
@@ -17091,7 +16841,7 @@ void eigsubspacesetcond(eigsubspacestate *state, double eps, ae_int_t maxits, ae
 // Buffered version of constructor which aims to reuse  previously  allocated
 // memory as much as possible.
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
-// API: void eigsubspacecreatebuf(const ae_int_t n, const ae_int_t k, const eigsubspacestate &state, const xparams _xparams = NonTH);
+// API: void eigsubspacecreatebuf(const ae_int_t n, const ae_int_t k, const eigsubspacestate &state);
 void eigsubspacecreatebuf(ae_int_t n, ae_int_t k, eigsubspacestate *state, ae_state *_state) {
    ae_assert(n > 0, "EigSubspaceCreate: N <= 0", _state);
    ae_assert(k > 0, "EigSubspaceCreate: K <= 0", _state);
@@ -17154,7 +16904,7 @@ void eigsubspacecreatebuf(ae_int_t n, ae_int_t k, eigsubspacestate *state, ae_st
 //       reuse previous subspace as warm-start point for new EVD problem.  It
 //       can be done with eigsubspacesetwarmstart() function.
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
-// API: void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state, const xparams _xparams = NonTH);
+// API: void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state);
 void eigsubspacecreate(ae_int_t n, ae_int_t k, eigsubspacestate *state, ae_state *_state) {
    SetObj(eigsubspacestate, state);
    ae_assert(n > 0, "EigSubspaceCreate: N <= 0", _state);
@@ -17171,7 +16921,7 @@ void eigsubspacecreate(ae_int_t n, ae_int_t k, eigsubspacestate *state, ae_state
 //     State       -   solver structure
 //     UseWarmStart-   either True or False
 // ALGLIB: Copyright 12.11.2017 by Sergey Bochkanov
-// API: void eigsubspacesetwarmstart(const eigsubspacestate &state, const bool usewarmstart, const xparams _xparams = NonTH);
+// API: void eigsubspacesetwarmstart(const eigsubspacestate &state, const bool usewarmstart);
 void eigsubspacesetwarmstart(eigsubspacestate *state, bool usewarmstart, ae_state *_state) {
    ae_assert(!state->running, "EigSubspaceSetWarmStart: solver is already running", _state);
    state->usewarmstart = usewarmstart;
@@ -17200,7 +16950,7 @@ void eigsubspacesetwarmstart(eigsubspacestate *state, bool usewarmstart, ae_stat
 //                     other  matrix   types;   for   now,   only   symmetric
 //                     eigenproblems are supported.
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
-// API: void eigsubspaceoocstart(const eigsubspacestate &state, const ae_int_t mtype, const xparams _xparams = NonTH);
+// API: void eigsubspaceoocstart(const eigsubspacestate &state, const ae_int_t mtype);
 void eigsubspaceoocstart(eigsubspacestate *state, ae_int_t mtype, ae_state *_state) {
    ae_assert(!state->running, "EigSubspaceStart: solver is already running", _state);
    ae_assert(mtype == 0, "EigSubspaceStart: incorrect mtype parameter", _state);
@@ -17425,7 +17175,7 @@ lbl_rcomm:
 // >     alglib.eigsubspaceoocsendresult(state, in Y)
 // > alglib.eigsubspaceoocstop(state, out W, out Z, out Report)
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
-// API: bool eigsubspaceooccontinue(const eigsubspacestate &state, const xparams _xparams = NonTH);
+// API: bool eigsubspaceooccontinue(const eigsubspacestate &state);
 bool eigsubspaceooccontinue(eigsubspacestate *state, ae_state *_state) {
    bool result;
    ae_assert(state->running, "EigSubspaceContinue: solver is not running", _state);
@@ -17466,7 +17216,7 @@ bool eigsubspaceooccontinue(eigsubspacestate *state, ae_state *_state) {
 //                         it is several times larger than number of  vectors
 //                         K requested by user.
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
-// API: void eigsubspaceoocgetrequestinfo(const eigsubspacestate &state, ae_int_t &requesttype, ae_int_t &requestsize, const xparams _xparams = NonTH);
+// API: void eigsubspaceoocgetrequestinfo(const eigsubspacestate &state, ae_int_t &requesttype, ae_int_t &requestsize);
 void eigsubspaceoocgetrequestinfo(eigsubspacestate *state, ae_int_t *requesttype, ae_int_t *requestsize, ae_state *_state) {
    *requesttype = 0;
    *requestsize = 0;
@@ -17503,7 +17253,7 @@ void eigsubspaceoocgetrequestinfo(eigsubspacestate *state, ae_int_t *requesttype
 //     X               -   array[N,RequestSize] or larger, leading  rectangle
 //                         is filled with dense matrix X.
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
-// API: void eigsubspaceoocgetrequestdata(const eigsubspacestate &state, real_2d_array &x, const xparams _xparams = NonTH);
+// API: void eigsubspaceoocgetrequestdata(const eigsubspacestate &state, real_2d_array &x);
 void eigsubspaceoocgetrequestdata(eigsubspacestate *state, RMatrix *x, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -17535,7 +17285,7 @@ void eigsubspaceoocgetrequestdata(eigsubspacestate *state, RMatrix *x, ae_state 
 //     AX              -   array[N,RequestSize] or larger, leading  rectangle
 //                         is filled with product A*X.
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
-// API: void eigsubspaceoocsendresult(const eigsubspacestate &state, const real_2d_array &ax, const xparams _xparams = NonTH);
+// API: void eigsubspaceoocsendresult(const eigsubspacestate &state, const real_2d_array &ax);
 void eigsubspaceoocsendresult(eigsubspacestate *state, RMatrix *ax, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -17572,7 +17322,7 @@ void eigsubspaceoocsendresult(eigsubspacestate *state, RMatrix *ax, ae_state *_s
 //                     * orthogonal basis of K-dimensional invariant subspace
 //     Rep         -   report with additional parameters
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
-// API: void eigsubspaceoocstop(const eigsubspacestate &state, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep, const xparams _xparams = NonTH);
+// API: void eigsubspaceoocstop(const eigsubspacestate &state, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep);
 void eigsubspaceoocstop(eigsubspacestate *state, RVector *w, RMatrix *z, eigsubspacereport *rep, ae_state *_state) {
    ae_int_t n;
    ae_int_t k;
@@ -17619,7 +17369,7 @@ void eigsubspaceoocstop(eigsubspacestate *state, RVector *w, RMatrix *z, eigsubs
 //       take it into account when working with very large matrices occupying
 //       almost all RAM.
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
-// API: void eigsubspacesolvedenses(const eigsubspacestate &state, const real_2d_array &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep, const xparams _xparams = NonTH);
+// API: void eigsubspacesolvedenses(const eigsubspacestate &state, const real_2d_array &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep);
 void eigsubspacesolvedenses(eigsubspacestate *state, RMatrix *a, bool isupper, RVector *w, RMatrix *z, eigsubspacereport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -17693,7 +17443,7 @@ void eigsubspacesolvedenses(eigsubspacestate *state, RMatrix *a, bool isupper, R
 //     Z           -   array[N,K], matrix of eigenvectors found
 //     Rep         -   report with additional parameters
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
-// API: void eigsubspacesolvesparses(const eigsubspacestate &state, const sparsematrix &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep, const xparams _xparams = NonTH);
+// API: void eigsubspacesolvesparses(const eigsubspacestate &state, const sparsematrix &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep);
 void eigsubspacesolvesparses(eigsubspacestate *state, sparsematrix *a, bool isupper, RVector *w, RMatrix *z, eigsubspacereport *rep, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
@@ -17838,211 +17588,167 @@ DefClass(eigsubspacestate, )
 // You should use ALGLIB functions to work with this object.
 DefClass(eigsubspacereport, DecVal(iterationscount))
 
-bool rmatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t vneeded, real_1d_array &wr, real_1d_array &wi, real_2d_array &vl, real_2d_array &vr, const xparams _xparams) {
+bool rmatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t vneeded, real_1d_array &wr, real_1d_array &wi, real_2d_array &vl, real_2d_array &vr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::rmatrixevd(ConstT(ae_matrix, a), n, vneeded, ConstT(ae_vector, wr), ConstT(ae_vector, wi), ConstT(ae_matrix, vl), ConstT(ae_matrix, vr), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool smatrixtdevd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, real_2d_array &z, const xparams _xparams) {
+bool smatrixtdevd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, real_2d_array &z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::smatrixtdevd(ConstT(ae_vector, d), ConstT(ae_vector, e), n, zneeded, ConstT(ae_matrix, z), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool smatrixtdevdr(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const double a, const double b, ae_int_t &m, real_2d_array &z, const xparams _xparams) {
+bool smatrixtdevdr(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const double a, const double b, ae_int_t &m, real_2d_array &z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::smatrixtdevdr(ConstT(ae_vector, d), ConstT(ae_vector, e), n, zneeded, a, b, &m, ConstT(ae_matrix, z), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const ae_int_t i1, const ae_int_t i2, real_2d_array &z, const xparams _xparams) {
+bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const ae_int_t i1, const ae_int_t i2, real_2d_array &z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::smatrixtdevdi(ConstT(ae_vector, d), ConstT(ae_vector, e), n, zneeded, i1, i2, ConstT(ae_matrix, z), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool smatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, real_2d_array &z, const xparams _xparams) {
+bool smatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, real_2d_array &z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::smatrixevd(ConstT(ae_matrix, a), n, zneeded, isupper, ConstT(ae_vector, d), ConstT(ae_matrix, z), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, complex_2d_array &z, const xparams _xparams) {
+bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, complex_2d_array &z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::hmatrixevd(ConstT(ae_matrix, a), n, zneeded, isupper, ConstT(ae_vector, d), ConstT(ae_matrix, z), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool smatrixevdr(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, real_2d_array &z, const xparams _xparams) {
+bool smatrixevdr(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, real_2d_array &z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::smatrixevdr(ConstT(ae_matrix, a), n, zneeded, isupper, b1, b2, &m, ConstT(ae_vector, w), ConstT(ae_matrix, z), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, complex_2d_array &z, const xparams _xparams) {
+bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, complex_2d_array &z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::hmatrixevdr(ConstT(ae_matrix, a), n, zneeded, isupper, b1, b2, &m, ConstT(ae_vector, w), ConstT(ae_matrix, z), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool smatrixevdi(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, real_2d_array &z, const xparams _xparams) {
+bool smatrixevdi(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, real_2d_array &z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::smatrixevdi(ConstT(ae_matrix, a), n, zneeded, isupper, i1, i2, ConstT(ae_vector, w), ConstT(ae_matrix, z), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, complex_2d_array &z, const xparams _xparams) {
+bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, complex_2d_array &z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::hmatrixevdi(ConstT(ae_matrix, a), n, zneeded, isupper, i1, i2, ConstT(ae_vector, w), ConstT(ae_matrix, z), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-void eigsubspacesetcond(const eigsubspacestate &state, const double eps, const ae_int_t maxits, const xparams _xparams) {
+void eigsubspacesetcond(const eigsubspacestate &state, const double eps, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::eigsubspacesetcond(ConstT(eigsubspacestate, state), eps, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void eigsubspacecreatebuf(const ae_int_t n, const ae_int_t k, const eigsubspacestate &state, const xparams _xparams) {
+void eigsubspacecreatebuf(const ae_int_t n, const ae_int_t k, const eigsubspacestate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::eigsubspacecreatebuf(n, k, ConstT(eigsubspacestate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state, const xparams _xparams) {
+void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::eigsubspacecreate(n, k, ConstT(eigsubspacestate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void eigsubspacesetwarmstart(const eigsubspacestate &state, const bool usewarmstart, const xparams _xparams) {
+void eigsubspacesetwarmstart(const eigsubspacestate &state, const bool usewarmstart) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::eigsubspacesetwarmstart(ConstT(eigsubspacestate, state), usewarmstart, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void eigsubspaceoocstart(const eigsubspacestate &state, const ae_int_t mtype, const xparams _xparams) {
+void eigsubspaceoocstart(const eigsubspacestate &state, const ae_int_t mtype) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::eigsubspaceoocstart(ConstT(eigsubspacestate, state), mtype, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-bool eigsubspaceooccontinue(const eigsubspacestate &state, const xparams _xparams) {
+bool eigsubspaceooccontinue(const eigsubspacestate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::eigsubspaceooccontinue(ConstT(eigsubspacestate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-void eigsubspaceoocgetrequestinfo(const eigsubspacestate &state, ae_int_t &requesttype, ae_int_t &requestsize, const xparams _xparams) {
+void eigsubspaceoocgetrequestinfo(const eigsubspacestate &state, ae_int_t &requesttype, ae_int_t &requestsize) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::eigsubspaceoocgetrequestinfo(ConstT(eigsubspacestate, state), &requesttype, &requestsize, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void eigsubspaceoocgetrequestdata(const eigsubspacestate &state, real_2d_array &x, const xparams _xparams) {
+void eigsubspaceoocgetrequestdata(const eigsubspacestate &state, real_2d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::eigsubspaceoocgetrequestdata(ConstT(eigsubspacestate, state), ConstT(ae_matrix, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void eigsubspaceoocsendresult(const eigsubspacestate &state, const real_2d_array &ax, const xparams _xparams) {
+void eigsubspaceoocsendresult(const eigsubspacestate &state, const real_2d_array &ax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::eigsubspaceoocsendresult(ConstT(eigsubspacestate, state), ConstT(ae_matrix, ax), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void eigsubspaceoocstop(const eigsubspacestate &state, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep, const xparams _xparams) {
+void eigsubspaceoocstop(const eigsubspacestate &state, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::eigsubspaceoocstop(ConstT(eigsubspacestate, state), ConstT(ae_vector, w), ConstT(ae_matrix, z), ConstT(eigsubspacereport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void eigsubspacesolvedenses(const eigsubspacestate &state, const real_2d_array &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep, const xparams _xparams) {
+void eigsubspacesolvedenses(const eigsubspacestate &state, const real_2d_array &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::eigsubspacesolvedenses(ConstT(eigsubspacestate, state), ConstT(ae_matrix, a), isupper, ConstT(ae_vector, w), ConstT(ae_matrix, z), ConstT(eigsubspacereport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void eigsubspacesolvesparses(const eigsubspacestate &state, const sparsematrix &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep, const xparams _xparams) {
+void eigsubspacesolvesparses(const eigsubspacestate &state, const sparsematrix &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::eigsubspacesolvesparses(ConstT(eigsubspacestate, state), ConstT(sparsematrix, a), isupper, ConstT(ae_vector, w), ConstT(ae_matrix, z), ConstT(eigsubspacereport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -24702,7 +24408,7 @@ void cmatrixplu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_
 //     Pivots  -   permutation matrix in compact form.
 //                 array[0..Min(M-1,N-1)].
 // ALGLIB Routine: Copyright 10.01.2010 by Sergey Bochkanov
-// API: void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots, const xparams _xparams = NonTH);
+// API: void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots);
 void rmatrixlu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_state) {
    SetVector(pivots);
    ae_assert(m > 0, "RMatrixLU: incorrect M!", _state);
@@ -24731,7 +24437,7 @@ void rmatrixlu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_s
 //     Pivots  -   permutation matrix in compact form.
 //                 array[0..Min(M-1,N-1)].
 // ALGLIB Routine: Copyright 10.01.2010 by Sergey Bochkanov
-// API: void cmatrixlu(complex_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots, const xparams _xparams = NonTH);
+// API: void cmatrixlu(complex_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots);
 void cmatrixlu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots, ae_state *_state) {
    SetVector(pivots);
    ae_assert(m > 0, "CMatrixLU: incorrect M!", _state);
@@ -25067,7 +24773,7 @@ static bool trfac_hpdmatrixcholeskyrec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
 //     Otherwise, the function returns False. Contents of A is not determined
 //     in such case.
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
-// API: bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams = NonTH);
+// API: bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper);
 bool spdmatrixcholesky(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    ae_frame _frame_block;
    bool result;
@@ -25107,7 +24813,7 @@ bool spdmatrixcholesky(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
 //     Otherwise, the function returns False. Contents of A is not determined
 //     in such case.
 // ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
-// API: bool hpdmatrixcholesky(complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams = NonTH);
+// API: bool hpdmatrixcholesky(complex_2d_array &a, const ae_int_t n, const bool isupper);
 bool hpdmatrixcholesky(CMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    ae_frame _frame_block;
    bool result;
@@ -25147,7 +24853,7 @@ bool hpdmatrixcholesky(CMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
 //                 triangle contains matrix U, and the elements below the main
 //                 diagonal are not modified. Similarly, if IsUpper = False.
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
-// API: void spdmatrixcholeskyupdateadd1buf(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, real_1d_array &bufr, const xparams _xparams = NonTH);
+// API: void spdmatrixcholeskyupdateadd1buf(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, real_1d_array &bufr);
 void spdmatrixcholeskyupdateadd1buf(RMatrix *a, ae_int_t n, bool isupper, RVector *u, RVector *bufr, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -25253,7 +24959,7 @@ void spdmatrixcholeskyupdateadd1buf(RMatrix *a, ae_int_t n, bool isupper, RVecto
 // NOTE: this function checks sizes of input arrays, but it does  NOT  checks
 //       for presence of infinities or NAN's.
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
-// API: void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, const xparams _xparams = NonTH);
+// API: void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u);
 void spdmatrixcholeskyupdateadd1(RMatrix *a, ae_int_t n, bool isupper, RVector *u, ae_state *_state) {
    ae_frame _frame_block;
    ae_frame_make(_state, &_frame_block);
@@ -25290,7 +24996,7 @@ void spdmatrixcholeskyupdateadd1(RMatrix *a, ae_int_t n, bool isupper, RVector *
 //                 triangle contains matrix U, and the elements below the main
 //                 diagonal are not modified. Similarly, if IsUpper = False.
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
-// API: void spdmatrixcholeskyupdatefixbuf(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, real_1d_array &bufr, const xparams _xparams = NonTH);
+// API: void spdmatrixcholeskyupdatefixbuf(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, real_1d_array &bufr);
 void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector *fix, RVector *bufr, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -25504,7 +25210,7 @@ void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector
 //       will  still  work,  but  you  may  get   better   performance   with
 //       straightforward Cholesky.
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
-// API: void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, const xparams _xparams = NonTH);
+// API: void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix);
 void spdmatrixcholeskyupdatefix(RMatrix *a, ae_int_t n, bool isupper, BVector *fix, ae_state *_state) {
    ae_frame _frame_block;
    ae_frame_make(_state, &_frame_block);
@@ -25555,7 +25261,7 @@ void spdmatrixcholeskyupdatefix(RMatrix *a, ae_int_t n, bool isupper, BVector *f
 // * function returns FALSE, if the matrix was factorized but U has strictly
 //   zero elements at the diagonal (the factorization is returned anyway).
 // ALGLIB Routine: Copyright 03.09.2018 by Sergey Bochkanov
-// API: bool sparselu(const sparsematrix &a, const ae_int_t pivottype, integer_1d_array &p, integer_1d_array &q, const xparams _xparams = NonTH);
+// API: bool sparselu(const sparsematrix &a, const ae_int_t pivottype, integer_1d_array &p, integer_1d_array &q);
 bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q, ae_state *_state) {
    ae_frame _frame_block;
    bool result;
@@ -25609,7 +25315,7 @@ bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q, ae_st
 //       matrix  includes  only  finite  values. It is your responsibility to
 //       make sure that there are no infinite or NAN values in the matrix.
 // ALGLIB Routine: Copyright 16.01.2014 by Sergey Bochkanov
-// API: bool sparsecholeskyskyline(const sparsematrix &a, const ae_int_t n, const bool isupper, const xparams _xparams = NonTH);
+// API: bool sparsecholeskyskyline(const sparsematrix &a, const ae_int_t n, const bool isupper);
 bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -25784,7 +25490,7 @@ bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper, ae_state *
 //       matrix  includes  only  finite  values. It is your responsibility to
 //       make sure that there are no infinite or NAN values in the matrix.
 // ALGLIB Routine: Copyright 16.09.2020 by Sergey Bochkanov
-// API: bool sparsecholesky(const sparsematrix &a, const bool isupper, const xparams _xparams = NonTH);
+// API: bool sparsecholesky(const sparsematrix &a, const bool isupper);
 bool sparsecholesky(sparsematrix *a, bool isupper, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t facttype;
@@ -25892,7 +25598,7 @@ bool sparsecholesky(sparsematrix *a, bool isupper, ae_state *_state) {
 //       matrix  includes  only  finite  values. It is your responsibility to
 //       make sure that there are no infinite or NAN values in the matrix.
 // ALGLIB Routine: Copyright 16.09.2020 by Sergey Bochkanov
-// API: bool sparsecholeskyp(const sparsematrix &a, const bool isupper, integer_1d_array &p, const xparams _xparams = NonTH);
+// API: bool sparsecholeskyp(const sparsematrix &a, const bool isupper, integer_1d_array &p);
 bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t facttype;
@@ -26016,7 +25722,7 @@ bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p, ae_state *_state
 // i.e. has diagonal element which is exactly zero. In  such  case  False  is
 // returned, contents of Analysis object is undefined.
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
-// API: bool sparsecholeskyanalyze(const sparsematrix &a, const bool isupper, const ae_int_t facttype, const ae_int_t permtype, sparsedecompositionanalysis &analysis, const xparams _xparams = NonTH);
+// API: bool sparsecholeskyanalyze(const sparsematrix &a, const bool isupper, const ae_int_t facttype, const ae_int_t permtype, sparsedecompositionanalysis &analysis);
 bool sparsecholeskyanalyze(sparsematrix *a, bool isupper, ae_int_t facttype, ae_int_t permtype, sparsedecompositionanalysis *analysis, ae_state *_state) {
    bool result;
    SetObj(sparsedecompositionanalysis, analysis);
@@ -26151,7 +25857,7 @@ void sparsecholeskysetmodtype(sparsedecompositionanalysis *analysis, ae_int_t mo
 // calls to SparseCholeskyFactorize() will result in same factorization being
 // performed one more time.
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
-// API: bool sparsecholeskyfactorize(const sparsedecompositionanalysis &analysis, const bool needupper, sparsematrix &a, real_1d_array &d, integer_1d_array &p, const xparams _xparams = NonTH);
+// API: bool sparsecholeskyfactorize(const sparsedecompositionanalysis &analysis, const bool needupper, sparsematrix &a, real_1d_array &d, integer_1d_array &p);
 bool sparsecholeskyfactorize(sparsedecompositionanalysis *analysis, bool needupper, sparsematrix *a, RVector *d, ZVector *p, ae_state *_state) {
    bool result;
    SetObj(sparsematrix, a);
@@ -26218,7 +25924,7 @@ bool sparsecholeskyfactorize(sparsedecompositionanalysis *analysis, bool needupp
 //                     * specific numeric values loaded into internal  memory
 //                       waiting for the factorization to be performed
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
-// API: void sparsecholeskyreload(const sparsedecompositionanalysis &analysis, const sparsematrix &a, const bool isupper, const xparams _xparams = NonTH);
+// API: void sparsecholeskyreload(const sparsedecompositionanalysis &analysis, const sparsematrix &a, const bool isupper);
 void sparsecholeskyreload(sparsedecompositionanalysis *analysis, sparsematrix *a, bool isupper, ae_state *_state) {
    ae_assert(sparsegetnrows(a, _state) == sparsegetncols(a, _state), "SparseCholeskyReload: A is not square", _state);
    ae_assert(sparsegetnrows(a, _state) == analysis->n, "SparseCholeskyReload: size of A does not match that stored in Analysis", _state);
@@ -26284,145 +25990,115 @@ namespace alglib {
 // object - use appropriate ALGLIB functions to work with this object.
 DefClass(sparsedecompositionanalysis, )
 
-void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots, const xparams _xparams) {
+void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixlu(ConstT(ae_matrix, a), m, n, ConstT(ae_vector, pivots), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void cmatrixlu(complex_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots, const xparams _xparams) {
+void cmatrixlu(complex_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixlu(ConstT(ae_matrix, a), m, n, ConstT(ae_vector, pivots), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::spdmatrixcholesky(ConstT(ae_matrix, a), n, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool hpdmatrixcholesky(complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+bool hpdmatrixcholesky(complex_2d_array &a, const ae_int_t n, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::hpdmatrixcholesky(ConstT(ae_matrix, a), n, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-void spdmatrixcholeskyupdateadd1buf(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, real_1d_array &bufr, const xparams _xparams) {
+void spdmatrixcholeskyupdateadd1buf(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, real_1d_array &bufr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::spdmatrixcholeskyupdateadd1buf(ConstT(ae_matrix, a), n, isupper, ConstT(ae_vector, u), ConstT(ae_vector, bufr), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, const xparams _xparams) {
+void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::spdmatrixcholeskyupdateadd1(ConstT(ae_matrix, a), n, isupper, ConstT(ae_vector, u), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void spdmatrixcholeskyupdatefixbuf(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, real_1d_array &bufr, const xparams _xparams) {
+void spdmatrixcholeskyupdatefixbuf(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, real_1d_array &bufr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::spdmatrixcholeskyupdatefixbuf(ConstT(ae_matrix, a), n, isupper, ConstT(ae_vector, fix), ConstT(ae_vector, bufr), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, const xparams _xparams) {
+void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::spdmatrixcholeskyupdatefix(ConstT(ae_matrix, a), n, isupper, ConstT(ae_vector, fix), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-bool sparselu(const sparsematrix &a, const ae_int_t pivottype, integer_1d_array &p, integer_1d_array &q, const xparams _xparams) {
+bool sparselu(const sparsematrix &a, const ae_int_t pivottype, integer_1d_array &p, integer_1d_array &q) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::sparselu(ConstT(sparsematrix, a), pivottype, ConstT(ae_vector, p), ConstT(ae_vector, q), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool sparsecholeskyskyline(const sparsematrix &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+bool sparsecholeskyskyline(const sparsematrix &a, const ae_int_t n, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::sparsecholeskyskyline(ConstT(sparsematrix, a), n, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool sparsecholesky(const sparsematrix &a, const bool isupper, const xparams _xparams) {
+bool sparsecholesky(const sparsematrix &a, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::sparsecholesky(ConstT(sparsematrix, a), isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool sparsecholeskyp(const sparsematrix &a, const bool isupper, integer_1d_array &p, const xparams _xparams) {
+bool sparsecholeskyp(const sparsematrix &a, const bool isupper, integer_1d_array &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::sparsecholeskyp(ConstT(sparsematrix, a), isupper, ConstT(ae_vector, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool sparsecholeskyanalyze(const sparsematrix &a, const bool isupper, const ae_int_t facttype, const ae_int_t permtype, sparsedecompositionanalysis &analysis, const xparams _xparams) {
+bool sparsecholeskyanalyze(const sparsematrix &a, const bool isupper, const ae_int_t facttype, const ae_int_t permtype, sparsedecompositionanalysis &analysis) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::sparsecholeskyanalyze(ConstT(sparsematrix, a), isupper, facttype, permtype, ConstT(sparsedecompositionanalysis, analysis), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool sparsecholeskyfactorize(const sparsedecompositionanalysis &analysis, const bool needupper, sparsematrix &a, real_1d_array &d, integer_1d_array &p, const xparams _xparams) {
+bool sparsecholeskyfactorize(const sparsedecompositionanalysis &analysis, const bool needupper, sparsematrix &a, real_1d_array &d, integer_1d_array &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::sparsecholeskyfactorize(ConstT(sparsedecompositionanalysis, analysis), needupper, ConstT(sparsematrix, a), ConstT(ae_vector, d), ConstT(ae_vector, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-void sparsecholeskyreload(const sparsedecompositionanalysis &analysis, const sparsematrix &a, const bool isupper, const xparams _xparams) {
+void sparsecholeskyreload(const sparsedecompositionanalysis &analysis, const sparsematrix &a, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::sparsecholeskyreload(ConstT(sparsedecompositionanalysis, analysis), ConstT(sparsematrix, a), isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -27307,7 +26983,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      October 31, 1999.
-// API: bool rmatrixbdsvd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const bool isupper, const bool isfractionalaccuracyrequired, real_2d_array &u, const ae_int_t nru, real_2d_array &c, const ae_int_t ncc, real_2d_array &vt, const ae_int_t ncvt, const xparams _xparams = NonTH);
+// API: bool rmatrixbdsvd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const bool isupper, const bool isfractionalaccuracyrequired, real_2d_array &u, const ae_int_t nru, real_2d_array &c, const ae_int_t ncc, real_2d_array &vt, const ae_int_t ncvt);
 bool rmatrixbdsvd(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfractionalaccuracyrequired, RMatrix *u, ae_int_t nru, RMatrix *c, ae_int_t ncc, RMatrix *vt, ae_int_t ncvt, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -27353,11 +27029,9 @@ bool bidiagonalsvddecomposition(RVector *d, RVector *e, ae_int_t n, bool isupper
 } // end of namespace alglib_impl
 
 namespace alglib {
-bool rmatrixbdsvd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const bool isupper, const bool isfractionalaccuracyrequired, real_2d_array &u, const ae_int_t nru, real_2d_array &c, const ae_int_t ncc, real_2d_array &vt, const ae_int_t ncvt, const xparams _xparams) {
+bool rmatrixbdsvd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const bool isupper, const bool isfractionalaccuracyrequired, real_2d_array &u, const ae_int_t nru, real_2d_array &c, const ae_int_t ncc, real_2d_array &vt, const ae_int_t ncvt) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::rmatrixbdsvd(ConstT(ae_vector, d), ConstT(ae_vector, e), n, isupper, isfractionalaccuracyrequired, ConstT(ae_matrix, u), nru, ConstT(ae_matrix, c), ncc, ConstT(ae_matrix, vt), ncvt, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -27416,7 +27090,7 @@ namespace alglib_impl {
 //                     if VTNeeded=2, VT contains matrix V^T wholly. Array whose
 //                     indexes range within [0..N-1, 0..N-1].
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
-// API: bool rmatrixsvd(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const ae_int_t uneeded, const ae_int_t vtneeded, const ae_int_t additionalmemory, real_1d_array &w, real_2d_array &u, real_2d_array &vt, const xparams _xparams = NonTH);
+// API: bool rmatrixsvd(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const ae_int_t uneeded, const ae_int_t vtneeded, const ae_int_t additionalmemory, real_1d_array &w, real_2d_array &u, real_2d_array &vt);
 bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t vtneeded, ae_int_t additionalmemory, RVector *w, RMatrix *u, RMatrix *vt, ae_state *_state) {
    ae_frame _frame_block;
    bool isupper;
@@ -27605,11 +27279,9 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
 } // end of namespace alglib_impl
 
 namespace alglib {
-bool rmatrixsvd(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const ae_int_t uneeded, const ae_int_t vtneeded, const ae_int_t additionalmemory, real_1d_array &w, real_2d_array &u, real_2d_array &vt, const xparams _xparams) {
+bool rmatrixsvd(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const ae_int_t uneeded, const ae_int_t vtneeded, const ae_int_t additionalmemory, real_1d_array &w, real_2d_array &u, real_2d_array &vt) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::rmatrixsvd(ConstT(ae_matrix, a), m, n, uneeded, vtneeded, additionalmemory, ConstT(ae_vector, w), ConstT(ae_matrix, u), ConstT(ae_matrix, vt), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -28874,7 +28546,7 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double rmatrixrcond1(const real_2d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
+// API: double rmatrixrcond1(const real_2d_array &a, const ae_int_t n);
 double rmatrixrcond1(RMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -28922,7 +28594,7 @@ double rmatrixrcond1(RMatrix *a, ae_int_t n, ae_state *_state) {
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double cmatrixrcond1(const complex_2d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
+// API: double cmatrixrcond1(const complex_2d_array &a, const ae_int_t n);
 double cmatrixrcond1(CMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -28970,7 +28642,7 @@ double cmatrixrcond1(CMatrix *a, ae_int_t n, ae_state *_state) {
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double rmatrixrcondinf(const real_2d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
+// API: double rmatrixrcondinf(const real_2d_array &a, const ae_int_t n);
 double rmatrixrcondinf(RMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -29012,7 +28684,7 @@ double rmatrixrcondinf(RMatrix *a, ae_int_t n, ae_state *_state) {
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double cmatrixrcondinf(const complex_2d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
+// API: double cmatrixrcondinf(const complex_2d_array &a, const ae_int_t n);
 double cmatrixrcondinf(CMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -29064,7 +28736,7 @@ double cmatrixrcondinf(CMatrix *a, ae_int_t n, ae_state *_state) {
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double spdmatrixrcond(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams = NonTH);
+// API: double spdmatrixrcond(const real_2d_array &a, const ae_int_t n, const bool isupper);
 double spdmatrixrcond(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -29137,7 +28809,7 @@ double spdmatrixrcond(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double hpdmatrixrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams = NonTH);
+// API: double hpdmatrixrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper);
 double hpdmatrixrcond(CMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -29202,7 +28874,7 @@ double hpdmatrixrcond(CMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double rmatrixtrrcond1(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams = NonTH);
+// API: double rmatrixtrrcond1(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit);
 double rmatrixtrrcond1(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -29264,7 +28936,7 @@ double rmatrixtrrcond1(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_sta
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double cmatrixtrrcond1(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams = NonTH);
+// API: double cmatrixtrrcond1(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit);
 double cmatrixtrrcond1(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -29326,7 +28998,7 @@ double cmatrixtrrcond1(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_sta
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double rmatrixtrrcondinf(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams = NonTH);
+// API: double rmatrixtrrcondinf(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit);
 double rmatrixtrrcondinf(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -29382,7 +29054,7 @@ double rmatrixtrrcondinf(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_s
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double cmatrixtrrcondinf(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams = NonTH);
+// API: double cmatrixtrrcondinf(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit);
 double cmatrixtrrcondinf(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -29437,7 +29109,7 @@ double cmatrixtrrcondinf(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_s
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double rmatrixlurcond1(const real_2d_array &lua, const ae_int_t n, const xparams _xparams = NonTH);
+// API: double rmatrixlurcond1(const real_2d_array &lua, const ae_int_t n);
 double rmatrixlurcond1(RMatrix *lua, ae_int_t n, ae_state *_state) {
    double v;
    double result;
@@ -29462,7 +29134,7 @@ double rmatrixlurcond1(RMatrix *lua, ae_int_t n, ae_state *_state) {
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double cmatrixlurcond1(const complex_2d_array &lua, const ae_int_t n, const xparams _xparams = NonTH);
+// API: double cmatrixlurcond1(const complex_2d_array &lua, const ae_int_t n);
 double cmatrixlurcond1(CMatrix *lua, ae_int_t n, ae_state *_state) {
    double v;
    double result;
@@ -29489,7 +29161,7 @@ double cmatrixlurcond1(CMatrix *lua, ae_int_t n, ae_state *_state) {
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double rmatrixlurcondinf(const real_2d_array &lua, const ae_int_t n, const xparams _xparams = NonTH);
+// API: double rmatrixlurcondinf(const real_2d_array &lua, const ae_int_t n);
 double rmatrixlurcondinf(RMatrix *lua, ae_int_t n, ae_state *_state) {
    double v;
    double result;
@@ -29515,7 +29187,7 @@ double rmatrixlurcondinf(RMatrix *lua, ae_int_t n, ae_state *_state) {
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double cmatrixlurcondinf(const complex_2d_array &lua, const ae_int_t n, const xparams _xparams = NonTH);
+// API: double cmatrixlurcondinf(const complex_2d_array &lua, const ae_int_t n);
 double cmatrixlurcondinf(CMatrix *lua, ae_int_t n, ae_state *_state) {
    double v;
    double result;
@@ -29546,7 +29218,7 @@ double cmatrixlurcondinf(CMatrix *lua, ae_int_t n, ae_state *_state) {
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double spdmatrixcholeskyrcond(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams = NonTH);
+// API: double spdmatrixcholeskyrcond(const real_2d_array &a, const ae_int_t n, const bool isupper);
 double spdmatrixcholeskyrcond(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    double v;
    double result;
@@ -29576,7 +29248,7 @@ double spdmatrixcholeskyrcond(RMatrix *a, ae_int_t n, bool isupper, ae_state *_s
 // NOTE:
 //     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
 //     0.0 is returned in such cases.
-// API: double hpdmatrixcholeskyrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams = NonTH);
+// API: double hpdmatrixcholeskyrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper);
 double hpdmatrixcholeskyrcond(CMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    double v;
    double result;
@@ -29587,161 +29259,129 @@ double hpdmatrixcholeskyrcond(CMatrix *a, ae_int_t n, bool isupper, ae_state *_s
 } // end of namespace alglib_impl
 
 namespace alglib {
-double rmatrixrcond1(const real_2d_array &a, const ae_int_t n, const xparams _xparams) {
+double rmatrixrcond1(const real_2d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::rmatrixrcond1(ConstT(ae_matrix, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double cmatrixrcond1(const complex_2d_array &a, const ae_int_t n, const xparams _xparams) {
+double cmatrixrcond1(const complex_2d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::cmatrixrcond1(ConstT(ae_matrix, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double rmatrixrcondinf(const real_2d_array &a, const ae_int_t n, const xparams _xparams) {
+double rmatrixrcondinf(const real_2d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::rmatrixrcondinf(ConstT(ae_matrix, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double cmatrixrcondinf(const complex_2d_array &a, const ae_int_t n, const xparams _xparams) {
+double cmatrixrcondinf(const complex_2d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::cmatrixrcondinf(ConstT(ae_matrix, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double spdmatrixrcond(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+double spdmatrixrcond(const real_2d_array &a, const ae_int_t n, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::spdmatrixrcond(ConstT(ae_matrix, a), n, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double hpdmatrixrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+double hpdmatrixrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::hpdmatrixrcond(ConstT(ae_matrix, a), n, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double rmatrixtrrcond1(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams) {
+double rmatrixtrrcond1(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::rmatrixtrrcond1(ConstT(ae_matrix, a), n, isupper, isunit, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double cmatrixtrrcond1(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams) {
+double cmatrixtrrcond1(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::cmatrixtrrcond1(ConstT(ae_matrix, a), n, isupper, isunit, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double rmatrixtrrcondinf(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams) {
+double rmatrixtrrcondinf(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::rmatrixtrrcondinf(ConstT(ae_matrix, a), n, isupper, isunit, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double cmatrixtrrcondinf(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, const xparams _xparams) {
+double cmatrixtrrcondinf(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::cmatrixtrrcondinf(ConstT(ae_matrix, a), n, isupper, isunit, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double rmatrixlurcond1(const real_2d_array &lua, const ae_int_t n, const xparams _xparams) {
+double rmatrixlurcond1(const real_2d_array &lua, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::rmatrixlurcond1(ConstT(ae_matrix, lua), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double cmatrixlurcond1(const complex_2d_array &lua, const ae_int_t n, const xparams _xparams) {
+double cmatrixlurcond1(const complex_2d_array &lua, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::cmatrixlurcond1(ConstT(ae_matrix, lua), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double rmatrixlurcondinf(const real_2d_array &lua, const ae_int_t n, const xparams _xparams) {
+double rmatrixlurcondinf(const real_2d_array &lua, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::rmatrixlurcondinf(ConstT(ae_matrix, lua), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double cmatrixlurcondinf(const complex_2d_array &lua, const ae_int_t n, const xparams _xparams) {
+double cmatrixlurcondinf(const complex_2d_array &lua, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::cmatrixlurcondinf(ConstT(ae_matrix, lua), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double spdmatrixcholeskyrcond(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+double spdmatrixcholeskyrcond(const real_2d_array &a, const ae_int_t n, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::spdmatrixcholeskyrcond(ConstT(ae_matrix, a), n, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 
-double hpdmatrixcholeskyrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+double hpdmatrixcholeskyrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::hpdmatrixcholeskyrcond(ConstT(ae_matrix, a), n, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -30622,7 +30262,7 @@ namespace alglib_impl {
 //
 // Algorithm can be made non-deterministic with NormEstimatorSetSeed(0) call.
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
-// API: void normestimatorcreate(const ae_int_t m, const ae_int_t n, const ae_int_t nstart, const ae_int_t nits, normestimatorstate &state, const xparams _xparams = NonTH);
+// API: void normestimatorcreate(const ae_int_t m, const ae_int_t n, const ae_int_t nstart, const ae_int_t nits, normestimatorstate &state);
 void normestimatorcreate(ae_int_t m, ae_int_t n, ae_int_t nstart, ae_int_t nits, normestimatorstate *state, ae_state *_state) {
    SetObj(normestimatorstate, state);
    ae_assert(m > 0, "NormEstimatorCreate: M <= 0", _state);
@@ -30660,7 +30300,7 @@ void normestimatorcreate(ae_int_t m, ae_int_t n, ae_int_t nstart, ae_int_t nits,
 //                     to NormEstimatorCreate()
 //     SeedVal     -   seed value, >= 0. Zero value = non-deterministic algo.
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
-// API: void normestimatorsetseed(const normestimatorstate &state, const ae_int_t seedval, const xparams _xparams = NonTH);
+// API: void normestimatorsetseed(const normestimatorstate &state, const ae_int_t seedval);
 void normestimatorsetseed(normestimatorstate *state, ae_int_t seedval, ae_state *_state) {
    ae_assert(seedval >= 0, "NormEstimatorSetSeed: SeedVal<0", _state);
    state->seedval = seedval;
@@ -30833,7 +30473,7 @@ void normestimatorrestart(normestimatorstate *state, ae_state *_state) {
 // After this function  is  over  you can call NormEstimatorResults() to get
 // estimate of the norm(A).
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
-// API: void normestimatorestimatesparse(const normestimatorstate &state, const sparsematrix &a, const xparams _xparams = NonTH);
+// API: void normestimatorestimatesparse(const normestimatorstate &state, const sparsematrix &a);
 void normestimatorestimatesparse(normestimatorstate *state, sparsematrix *a, ae_state *_state) {
    normestimatorrestart(state, _state);
    while (normestimatoriteration(state, _state)) {
@@ -30856,7 +30496,7 @@ void normestimatorestimatesparse(normestimatorstate *state, sparsematrix *a, ae_
 // Outputs:
 //     Nrm     -   estimate of the matrix norm, Nrm >= 0
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
-// API: void normestimatorresults(const normestimatorstate &state, double &nrm, const xparams _xparams = NonTH);
+// API: void normestimatorresults(const normestimatorstate &state, double &nrm);
 void normestimatorresults(normestimatorstate *state, double *nrm, ae_state *_state) {
    *nrm = 0;
    *nrm = state->repnorm;
@@ -30917,38 +30557,30 @@ namespace alglib {
 // You should use ALGLIB functions to work with this object.
 DefClass(normestimatorstate, )
 
-void normestimatorcreate(const ae_int_t m, const ae_int_t n, const ae_int_t nstart, const ae_int_t nits, normestimatorstate &state, const xparams _xparams) {
+void normestimatorcreate(const ae_int_t m, const ae_int_t n, const ae_int_t nstart, const ae_int_t nits, normestimatorstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::normestimatorcreate(m, n, nstart, nits, ConstT(normestimatorstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void normestimatorsetseed(const normestimatorstate &state, const ae_int_t seedval, const xparams _xparams) {
+void normestimatorsetseed(const normestimatorstate &state, const ae_int_t seedval) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::normestimatorsetseed(ConstT(normestimatorstate, state), seedval, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void normestimatorestimatesparse(const normestimatorstate &state, const sparsematrix &a, const xparams _xparams) {
+void normestimatorestimatesparse(const normestimatorstate &state, const sparsematrix &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::normestimatorestimatesparse(ConstT(normestimatorstate, state), ConstT(sparsematrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void normestimatorresults(const normestimatorstate &state, double &nrm, const xparams _xparams) {
+void normestimatorresults(const normestimatorstate &state, double &nrm) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::normestimatorresults(ConstT(normestimatorstate, state), &nrm, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -31680,8 +31312,8 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
 // * R1        reciprocal of condition number: 1/cond(A), 1-norm.
 // * RInf      reciprocal of condition number: 1/cond(A), inf-norm.
 // ALGLIB Routine: Copyright 05.02.2010 by Sergey Bochkanov
-// API: void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
-// API: void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
+// API: void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep);
+// API: void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep);
 void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -31753,8 +31385,8 @@ void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
 //     Rep     -   solver report, same as in RMatrixLUInverse
 //     A       -   inverse of matrix A, same as in RMatrixLUInverse
 // ALGLIB Routine: Copyright 05.02.2010 by Sergey Bochkanov
-// API: void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
-// API: void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
+// API: void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep);
+// API: void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep);
 void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -31827,8 +31459,8 @@ void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
 //     True, if the matrix is not singular.
 //     False, if the matrix is singular.
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
-// API: void rmatrixinverse(real_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
-// API: void rmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
+// API: void rmatrixinverse(real_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep);
+// API: void rmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep);
 void rmatrixinverse(RMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_frame_make(_state, &_frame_block);
@@ -31859,8 +31491,8 @@ void rmatrixinverse(RMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep, a
 //     Rep     -   solver report, same as in RMatrixLUInverse
 //     A       -   inverse of matrix A, same as in RMatrixLUInverse
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
-// API: void cmatrixinverse(complex_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
-// API: void cmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
+// API: void cmatrixinverse(complex_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep);
+// API: void cmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep);
 void cmatrixinverse(CMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_frame_make(_state, &_frame_block);
@@ -31902,8 +31534,8 @@ void cmatrixinverse(CMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep, a
 //     Rep     -   solver report, same as in RMatrixLUInverse
 //     A       -   inverse of matrix A, same as in RMatrixLUInverse
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
-// API: void spdmatrixcholeskyinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
-// API: void spdmatrixcholeskyinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
+// API: void spdmatrixcholeskyinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep);
+// API: void spdmatrixcholeskyinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep);
 void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -31978,8 +31610,8 @@ void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
 //     Rep     -   solver report, same as in RMatrixLUInverse
 //     A       -   inverse of matrix A, same as in RMatrixLUInverse
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
-// API: void hpdmatrixcholeskyinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
-// API: void hpdmatrixcholeskyinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
+// API: void hpdmatrixcholeskyinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep);
+// API: void hpdmatrixcholeskyinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep);
 void hpdmatrixcholeskyinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -32057,8 +31689,8 @@ void hpdmatrixcholeskyinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
 //     Rep     -   solver report, same as in RMatrixLUInverse
 //     A       -   inverse of matrix A, same as in RMatrixLUInverse
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
-// API: void spdmatrixinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
-// API: void spdmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
+// API: void spdmatrixinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep);
+// API: void spdmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep);
 void spdmatrixinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    *info = 0;
    SetObj(matinvreport, rep);
@@ -32103,8 +31735,8 @@ void spdmatrixinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, mati
 //     Rep     -   solver report, same as in RMatrixLUInverse
 //     A       -   inverse of matrix A, same as in RMatrixLUInverse
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
-// API: void hpdmatrixinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
-// API: void hpdmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
+// API: void hpdmatrixinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep);
+// API: void hpdmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep);
 void hpdmatrixinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    *info = 0;
    SetObj(matinvreport, rep);
@@ -32154,8 +31786,8 @@ void hpdmatrixinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, mati
 //     Rep     -   same as for RMatrixLUInverse
 //     A       -   same as for RMatrixLUInverse.
 // ALGLIB: Copyright 05.02.2010 by Sergey Bochkanov
-// API: void rmatrixtrinverse(real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
-// API: void rmatrixtrinverse(real_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
+// API: void rmatrixtrinverse(real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep);
+// API: void rmatrixtrinverse(real_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep);
 void rmatrixtrinverse(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -32224,8 +31856,8 @@ void rmatrixtrinverse(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
 //     Rep     -   same as for RMatrixLUInverse
 //     A       -   same as for RMatrixLUInverse.
 // ALGLIB: Copyright 05.02.2010 by Sergey Bochkanov
-// API: void cmatrixtrinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
-// API: void cmatrixtrinverse(complex_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams = NonTH);
+// API: void cmatrixtrinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep);
+// API: void cmatrixtrinverse(complex_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep);
 void cmatrixtrinverse(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_t *info, matinvreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -32280,221 +31912,181 @@ namespace alglib {
 // * RInf  reciprocal of condition number in inf-norm
 DefClass(matinvreport, DecVal(r1) DecVal(rinf))
 
-void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixluinverse(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows() || a.cols() != pivots.length()) ThrowError("Error while calling 'rmatrixluinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixluinverse(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixluinverse(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows() || a.cols() != pivots.length()) ThrowError("Error while calling 'cmatrixluinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixluinverse(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void rmatrixinverse(real_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void rmatrixinverse(real_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixinverse(ConstT(ae_matrix, a), n, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void rmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void rmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'rmatrixinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixinverse(ConstT(ae_matrix, a), n, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void cmatrixinverse(complex_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void cmatrixinverse(complex_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixinverse(ConstT(ae_matrix, a), n, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void cmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void cmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'cmatrixinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixinverse(ConstT(ae_matrix, a), n, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void spdmatrixcholeskyinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void spdmatrixcholeskyinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::spdmatrixcholeskyinverse(ConstT(ae_matrix, a), n, isupper, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void spdmatrixcholeskyinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void spdmatrixcholeskyinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'spdmatrixcholeskyinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
    bool isupper = false;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::spdmatrixcholeskyinverse(ConstT(ae_matrix, a), n, isupper, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void hpdmatrixcholeskyinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void hpdmatrixcholeskyinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hpdmatrixcholeskyinverse(ConstT(ae_matrix, a), n, isupper, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void hpdmatrixcholeskyinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void hpdmatrixcholeskyinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'hpdmatrixcholeskyinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
    bool isupper = false;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hpdmatrixcholeskyinverse(ConstT(ae_matrix, a), n, isupper, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void spdmatrixinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void spdmatrixinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::spdmatrixinverse(ConstT(ae_matrix, a), n, isupper, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void spdmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void spdmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'spdmatrixinverse': looks like one of arguments has wrong size");
    if (!alglib_impl::ae_is_symmetric(ConstT(ae_matrix, a))) ThrowError("'a' parameter is not symmetric matrix");
    ae_int_t n = a.cols();
    bool isupper = false;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::spdmatrixinverse(ConstT(ae_matrix, a), n, isupper, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    if (!alglib_impl::ae_force_symmetric(ConstT(ae_matrix, a))) ThrowError("Internal error while forcing symmetricity of 'a' parameter");
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void hpdmatrixinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void hpdmatrixinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hpdmatrixinverse(ConstT(ae_matrix, a), n, isupper, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void hpdmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void hpdmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'hpdmatrixinverse': looks like one of arguments has wrong size");
    if (!alglib_impl::ae_is_hermitian(ConstT(ae_matrix, a))) ThrowError("'a' parameter is not Hermitian matrix");
    ae_int_t n = a.cols();
    bool isupper = false;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::hpdmatrixinverse(ConstT(ae_matrix, a), n, isupper, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    if (!alglib_impl::ae_force_hermitian(ConstT(ae_matrix, a))) ThrowError("Internal error while forcing Hermitian properties of 'a' parameter");
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void rmatrixtrinverse(real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void rmatrixtrinverse(real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixtrinverse(ConstT(ae_matrix, a), n, isupper, isunit, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void rmatrixtrinverse(real_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void rmatrixtrinverse(real_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'rmatrixtrinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
    bool isunit = false;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixtrinverse(ConstT(ae_matrix, a), n, isupper, isunit, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void cmatrixtrinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void cmatrixtrinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixtrinverse(ConstT(ae_matrix, a), n, isupper, isunit, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void cmatrixtrinverse(complex_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep, const xparams _xparams) {
+void cmatrixtrinverse(complex_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'cmatrixtrinverse': looks like one of arguments has wrong size");
    ae_int_t n = a.cols();
    bool isunit = false;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::cmatrixtrinverse(ConstT(ae_matrix, a), n, isupper, isunit, &info, ConstT(matinvreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -32520,7 +32112,7 @@ namespace alglib_impl {
 // Outputs:
 //     InvA    -   inverse of modified matrix A.
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
-// API: void rmatrixinvupdatesimple(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const ae_int_t updcolumn, const double updval, const xparams _xparams = NonTH);
+// API: void rmatrixinvupdatesimple(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const ae_int_t updcolumn, const double updval);
 void rmatrixinvupdatesimple(RMatrix *inva, ae_int_t n, ae_int_t updrow, ae_int_t updcolumn, double updval, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -32565,7 +32157,7 @@ void rmatrixinvupdatesimple(RMatrix *inva, ae_int_t n, ae_int_t updrow, ae_int_t
 // Outputs:
 //     InvA    -   inverse of modified matrix A.
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
-// API: void rmatrixinvupdaterow(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const real_1d_array &v, const xparams _xparams = NonTH);
+// API: void rmatrixinvupdaterow(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const real_1d_array &v);
 void rmatrixinvupdaterow(RMatrix *inva, ae_int_t n, ae_int_t updrow, RVector *v, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -32611,7 +32203,7 @@ void rmatrixinvupdaterow(RMatrix *inva, ae_int_t n, ae_int_t updrow, RVector *v,
 // Outputs:
 //     InvA        -   inverse of modified matrix A.
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
-// API: void rmatrixinvupdatecolumn(real_2d_array &inva, const ae_int_t n, const ae_int_t updcolumn, const real_1d_array &u, const xparams _xparams = NonTH);
+// API: void rmatrixinvupdatecolumn(real_2d_array &inva, const ae_int_t n, const ae_int_t updcolumn, const real_1d_array &u);
 void rmatrixinvupdatecolumn(RMatrix *inva, ae_int_t n, ae_int_t updcolumn, RVector *u, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -32656,7 +32248,7 @@ void rmatrixinvupdatecolumn(RMatrix *inva, ae_int_t n, ae_int_t updcolumn, RVect
 // Outputs:
 //     InvA - inverse of matrix A + u*v'.
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
-// API: void rmatrixinvupdateuv(real_2d_array &inva, const ae_int_t n, const real_1d_array &u, const real_1d_array &v, const xparams _xparams = NonTH);
+// API: void rmatrixinvupdateuv(real_2d_array &inva, const ae_int_t n, const real_1d_array &u, const real_1d_array &v);
 void rmatrixinvupdateuv(RMatrix *inva, ae_int_t n, RVector *u, RVector *v, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -32690,38 +32282,30 @@ void rmatrixinvupdateuv(RMatrix *inva, ae_int_t n, RVector *u, RVector *v, ae_st
 } // end of namespace alglib_impl
 
 namespace alglib {
-void rmatrixinvupdatesimple(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const ae_int_t updcolumn, const double updval, const xparams _xparams) {
+void rmatrixinvupdatesimple(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const ae_int_t updcolumn, const double updval) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixinvupdatesimple(ConstT(ae_matrix, inva), n, updrow, updcolumn, updval, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixinvupdaterow(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const real_1d_array &v, const xparams _xparams) {
+void rmatrixinvupdaterow(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const real_1d_array &v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixinvupdaterow(ConstT(ae_matrix, inva), n, updrow, ConstT(ae_vector, v), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixinvupdatecolumn(real_2d_array &inva, const ae_int_t n, const ae_int_t updcolumn, const real_1d_array &u, const xparams _xparams) {
+void rmatrixinvupdatecolumn(real_2d_array &inva, const ae_int_t n, const ae_int_t updcolumn, const real_1d_array &u) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixinvupdatecolumn(ConstT(ae_matrix, inva), n, updcolumn, ConstT(ae_vector, u), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void rmatrixinvupdateuv(real_2d_array &inva, const ae_int_t n, const real_1d_array &u, const real_1d_array &v, const xparams _xparams) {
+void rmatrixinvupdateuv(real_2d_array &inva, const ae_int_t n, const real_1d_array &u, const real_1d_array &v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::rmatrixinvupdateuv(ConstT(ae_matrix, inva), n, ConstT(ae_vector, u), ConstT(ae_vector, v), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -32768,7 +32352,7 @@ namespace alglib_impl {
 //         if the algorithm has not converged.
 //
 // Algorithm implemented on the basis of the DHSEQR subroutine (LAPACK 3.0 library).
-// API: bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s, const xparams _xparams = NonTH);
+// API: bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s);
 bool rmatrixschur(RMatrix *a, ae_int_t n, RMatrix *s, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t info;
@@ -32790,11 +32374,9 @@ bool rmatrixschur(RMatrix *a, ae_int_t n, RMatrix *s, ae_state *_state) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s, const xparams _xparams) {
+bool rmatrixschur(real_2d_array &a, const ae_int_t n, real_2d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::rmatrixschur(ConstT(ae_matrix, a), n, ConstT(ae_matrix, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -32852,7 +32434,7 @@ namespace alglib_impl {
 //     False, if the error occurred during the Cholesky decomposition of
 //         matrix B (the matrix is not positive-definite).
 // ALGLIB: Copyright 1.28.2006 by Sergey Bochkanov
-// API: bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t problemtype, real_2d_array &r, bool &isupperr, const xparams _xparams = NonTH);
+// API: bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t problemtype, real_2d_array &r, bool &isupperr);
 bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t problemtype, RMatrix *r, bool *isupperr, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -33069,7 +32651,7 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
 //
 // See also the GeneralizedSymmetricDefiniteEVDReduce subroutine.
 // ALGLIB: Copyright 1.28.2006 by Sergey Bochkanov
-// API: bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t zneeded, const ae_int_t problemtype, real_1d_array &d, real_2d_array &z, const xparams _xparams = NonTH);
+// API: bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t zneeded, const ae_int_t problemtype, real_1d_array &d, real_2d_array &z);
 bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t zneeded, ae_int_t problemtype, RVector *d, RMatrix *z, ae_state *_state) {
    ae_frame _frame_block;
    bool isupperr;
@@ -33136,21 +32718,17 @@ bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupper
 } // end of namespace alglib_impl
 
 namespace alglib {
-bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t problemtype, real_2d_array &r, bool &isupperr, const xparams _xparams) {
+bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t problemtype, real_2d_array &r, bool &isupperr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::smatrixgevdreduce(ConstT(ae_matrix, a), n, isuppera, ConstT(ae_matrix, b), isupperb, problemtype, ConstT(ae_matrix, r), &isupperr, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
 }
 
-bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t zneeded, const ae_int_t problemtype, real_1d_array &d, real_2d_array &z, const xparams _xparams) {
+bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t zneeded, const ae_int_t problemtype, real_1d_array &d, real_2d_array &z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::smatrixgevd(ConstT(ae_matrix, a), n, isuppera, ConstT(ae_matrix, b), isupperb, zneeded, problemtype, ConstT(ae_vector, d), ConstT(ae_matrix, z), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -33176,8 +32754,8 @@ namespace alglib_impl {
 //
 // Result: matrix determinant.
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
-// API: double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, const xparams _xparams = NonTH);
-// API: double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, const xparams _xparams = NonTH);
+// API: double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n);
+// API: double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots);
 double rmatrixludet(RMatrix *a, ZVector *pivots, ae_int_t n, ae_state *_state) {
    ae_int_t i;
    ae_int_t s;
@@ -33215,8 +32793,8 @@ double rmatrixludet(RMatrix *a, ZVector *pivots, ae_int_t n, ae_state *_state) {
 //
 // Result: matrix determinant.
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
-// API: complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, const xparams _xparams = NonTH);
-// API: complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, const xparams _xparams = NonTH);
+// API: complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n);
+// API: complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots);
 complex cmatrixludet(CMatrix *a, ZVector *pivots, ae_int_t n, ae_state *_state) {
    ae_int_t i;
    ae_int_t s;
@@ -33250,8 +32828,8 @@ complex cmatrixludet(CMatrix *a, ZVector *pivots, ae_int_t n, ae_state *_state) 
 //
 // Result: determinant of matrix A.
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
-// API: double rmatrixdet(const real_2d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
-// API: double rmatrixdet(const real_2d_array &a, const xparams _xparams = NonTH);
+// API: double rmatrixdet(const real_2d_array &a, const ae_int_t n);
+// API: double rmatrixdet(const real_2d_array &a);
 double rmatrixdet(RMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    double result;
@@ -33280,8 +32858,8 @@ double rmatrixdet(RMatrix *a, ae_int_t n, ae_state *_state) {
 //
 // Result: determinant of matrix A.
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
-// API: complex cmatrixdet(const complex_2d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
-// API: complex cmatrixdet(const complex_2d_array &a, const xparams _xparams = NonTH);
+// API: complex cmatrixdet(const complex_2d_array &a, const ae_int_t n);
+// API: complex cmatrixdet(const complex_2d_array &a);
 complex cmatrixdet(CMatrix *a, ae_int_t n, ae_state *_state) {
    ae_frame _frame_block;
    complex result;
@@ -33316,8 +32894,8 @@ complex cmatrixdet(CMatrix *a, ae_int_t n, ae_state *_state) {
 // Result:
 //     matrix determinant.
 // ALGLIB: Copyright 2005-2008 by Sergey Bochkanov
-// API: double spdmatrixcholeskydet(const real_2d_array &a, const ae_int_t n, const xparams _xparams = NonTH);
-// API: double spdmatrixcholeskydet(const real_2d_array &a, const xparams _xparams = NonTH);
+// API: double spdmatrixcholeskydet(const real_2d_array &a, const ae_int_t n);
+// API: double spdmatrixcholeskydet(const real_2d_array &a);
 double spdmatrixcholeskydet(RMatrix *a, ae_int_t n, ae_state *_state) {
    ae_int_t i;
    bool f;
@@ -33360,8 +32938,8 @@ double spdmatrixcholeskydet(RMatrix *a, ae_int_t n, ae_state *_state) {
 //     determinant of matrix A.
 //     If matrix A is not positive definite, exception is thrown.
 // ALGLIB: Copyright 2005-2008 by Sergey Bochkanov
-// API: double spdmatrixdet(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams = NonTH);
-// API: double spdmatrixdet(const real_2d_array &a, const xparams _xparams = NonTH);
+// API: double spdmatrixdet(const real_2d_array &a, const ae_int_t n, const bool isupper);
+// API: double spdmatrixdet(const real_2d_array &a);
 double spdmatrixdet(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
    ae_frame _frame_block;
    bool b;
@@ -33381,140 +32959,116 @@ double spdmatrixdet(RMatrix *a, ae_int_t n, bool isupper, ae_state *_state) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, const xparams _xparams) {
+double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::rmatrixludet(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 #if !defined AE_NO_EXCEPTIONS
-double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, const xparams _xparams) {
+double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots) {
    if (a.rows() != a.cols() || a.rows() != pivots.length()) ThrowError("Error while calling 'rmatrixludet': looks like one of arguments has wrong size");
    ae_int_t n = a.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::rmatrixludet(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 #endif
 
-complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, const xparams _xparams) {
+complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, complex(0.0))
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::complex C = alglib_impl::cmatrixludet(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return ComplexOf(C);
 }
 #if !defined AE_NO_EXCEPTIONS
-complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, const xparams _xparams) {
+complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots) {
    if (a.rows() != a.cols() || a.rows() != pivots.length()) ThrowError("Error while calling 'cmatrixludet': looks like one of arguments has wrong size");
    ae_int_t n = a.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, complex(0.0))
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::complex C = alglib_impl::cmatrixludet(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return ComplexOf(C);
 }
 #endif
 
-double rmatrixdet(const real_2d_array &a, const ae_int_t n, const xparams _xparams) {
+double rmatrixdet(const real_2d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::rmatrixdet(ConstT(ae_matrix, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 #if !defined AE_NO_EXCEPTIONS
-double rmatrixdet(const real_2d_array &a, const xparams _xparams) {
+double rmatrixdet(const real_2d_array &a) {
    if (a.rows() != a.cols()) ThrowError("Error while calling 'rmatrixdet': looks like one of arguments has wrong size");
    ae_int_t n = a.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::rmatrixdet(ConstT(ae_matrix, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 #endif
 
-complex cmatrixdet(const complex_2d_array &a, const ae_int_t n, const xparams _xparams) {
+complex cmatrixdet(const complex_2d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, complex(0.0))
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::complex C = alglib_impl::cmatrixdet(ConstT(ae_matrix, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return ComplexOf(C);
 }
 #if !defined AE_NO_EXCEPTIONS
-complex cmatrixdet(const complex_2d_array &a, const xparams _xparams) {
+complex cmatrixdet(const complex_2d_array &a) {
    if (a.rows() != a.cols()) ThrowError("Error while calling 'cmatrixdet': looks like one of arguments has wrong size");
    ae_int_t n = a.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, complex(0.0))
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::complex C = alglib_impl::cmatrixdet(ConstT(ae_matrix, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return ComplexOf(C);
 }
 #endif
 
-double spdmatrixcholeskydet(const real_2d_array &a, const ae_int_t n, const xparams _xparams) {
+double spdmatrixcholeskydet(const real_2d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::spdmatrixcholeskydet(ConstT(ae_matrix, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 #if !defined AE_NO_EXCEPTIONS
-double spdmatrixcholeskydet(const real_2d_array &a, const xparams _xparams) {
+double spdmatrixcholeskydet(const real_2d_array &a) {
    if (a.rows() != a.cols()) ThrowError("Error while calling 'spdmatrixcholeskydet': looks like one of arguments has wrong size");
    ae_int_t n = a.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::spdmatrixcholeskydet(ConstT(ae_matrix, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 #endif
 
-double spdmatrixdet(const real_2d_array &a, const ae_int_t n, const bool isupper, const xparams _xparams) {
+double spdmatrixdet(const real_2d_array &a, const ae_int_t n, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::spdmatrixdet(ConstT(ae_matrix, a), n, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
 }
 #if !defined AE_NO_EXCEPTIONS
-double spdmatrixdet(const real_2d_array &a, const xparams _xparams) {
+double spdmatrixdet(const real_2d_array &a) {
    if (a.rows() != a.cols()) ThrowError("Error while calling 'spdmatrixdet': looks like one of arguments has wrong size");
    if (!alglib_impl::ae_is_symmetric(ConstT(ae_matrix, a))) ThrowError("'a' parameter is not symmetric matrix");
    ae_int_t n = a.rows();
    bool isupper = false;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, 0.0)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    double D = alglib_impl::spdmatrixdet(ConstT(ae_matrix, a), n, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;

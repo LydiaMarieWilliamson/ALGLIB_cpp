@@ -135,8 +135,8 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
 // SEE ALSO
 //     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
-// API: void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams = NonTH);
-// API: void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams = NonTH);
+// API: void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state);
+// API: void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state);
 void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state) {
    SetObj(odesolverstate, state);
    ae_assert(n >= 1, "ODESolverRKCK: N<1!", _state);
@@ -154,8 +154,8 @@ void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, d
 // This function provides a reverse communication interface, which is not documented or recommended for use.
 // Instead, it is recommended that you use the better-documented API function odesolversolve() listed below.
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
-// API: bool odesolveriteration(const odesolverstate &state, const xparams _xparams = NonTH);
-// API: void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL, const xparams _xparams = NonTH);
+// API: bool odesolveriteration(const odesolverstate &state);
+// API: void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL);
 bool odesolveriteration(odesolverstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
@@ -435,7 +435,7 @@ lbl_rcomm:
 //                     *  1    task has been solved
 //                 * Rep.NFEV contains number of function calculations
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
-// API: void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams = NonTH);
+// API: void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep);
 void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix *ytbl, odesolverreport *rep, ae_state *_state) {
    double v;
    ae_int_t i;
@@ -543,32 +543,26 @@ namespace alglib {
 DefClass(odesolverstate, DecVal(needdy) DecVar(y) DecVar(dy) DecVal(x))
 DefClass(odesolverreport, DecVal(nfev) DecVal(terminationtype))
 
-void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams) {
+void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::odesolverrkck(ConstT(ae_vector, y), n, ConstT(ae_vector, x), m, eps, h, ConstT(odesolverstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams) {
+void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state) {
    ae_int_t n = y.length();
    ae_int_t m = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::odesolverrkck(ConstT(ae_vector, y), n, ConstT(ae_vector, x), m, eps, h, ConstT(odesolverstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-bool odesolveriteration(const odesolverstate &state, const xparams _xparams) {
+bool odesolveriteration(const odesolverstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::odesolveriteration(ConstT(odesolverstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -580,11 +574,9 @@ bool odesolveriteration(const odesolverstate &state, const xparams _xparams) {
 //     diff    -   callback which calculates dy/dx for given y and x
 //     ptr     -   optional pointer which is passed to diff; can be NULL
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
-void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr, const xparams _xparams) {
+void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(diff != NULL, "ALGLIB: error in 'odesolversolve()' (diff is NULL)", &_alglib_env_state);
    while (alglib_impl::odesolveriteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -594,11 +586,9 @@ void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, 
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams) {
+void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::odesolverresults(ConstT(odesolverstate, state), &m, ConstT(ae_vector, xtbl), ConstT(ae_matrix, ytbl), ConstT(odesolverreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }

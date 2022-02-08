@@ -3534,7 +3534,7 @@ static const double minlbfgs_gtol = 0.4;
 // Passing EpsG=0, EpsF=0, EpsX=0 and MaxIts=0 (simultaneously) will lead to
 // automatic stopping criterion selection (small EpsX).
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minlbfgssetcond(const minlbfgsstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams);
+// API: void minlbfgssetcond(const minlbfgsstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
 void minlbfgssetcond(minlbfgsstate *state, double epsg, double epsf, double epsx, ae_int_t maxits, ae_state *_state) {
    ae_assert(isfinite(epsg), "MinLBFGSSetCond: EpsG is not finite number!", _state);
    ae_assert(epsg >= 0.0, "MinLBFGSSetCond: negative EpsG!", _state);
@@ -3561,7 +3561,7 @@ void minlbfgssetcond(minlbfgsstate *state, double epsg, double epsf, double epsx
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to MinLBFGSOptimize().
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minlbfgssetxrep(const minlbfgsstate &state, const bool needxrep, const xparams _xparams);
+// API: void minlbfgssetxrep(const minlbfgsstate &state, const bool needxrep);
 void minlbfgssetxrep(minlbfgsstate *state, bool needxrep, ae_state *_state) {
    state->xrep = needxrep;
 }
@@ -3579,7 +3579,7 @@ void minlbfgssetxrep(minlbfgsstate *state, bool needxrep, ae_state *_state) {
 // steps  that  are  too  large  (and  therefore  expose  us  to the possible
 // overflow) without actually calculating function value at the x+stp*d.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minlbfgssetstpmax(const minlbfgsstate &state, const double stpmax, const xparams _xparams);
+// API: void minlbfgssetstpmax(const minlbfgsstate &state, const double stpmax);
 void minlbfgssetstpmax(minlbfgsstate *state, double stpmax, ae_state *_state) {
    ae_assert(isfinite(stpmax), "MinLBFGSSetStpMax: StpMax is not finite!", _state);
    ae_assert(stpmax >= 0.0, "MinLBFGSSetStpMax: StpMax<0!", _state);
@@ -3613,7 +3613,7 @@ void minlbfgssetstpmax(minlbfgsstate *state, double stpmax, ae_state *_state) {
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
-// API: void minlbfgssetscale(const minlbfgsstate &state, const real_1d_array &s, const xparams _xparams);
+// API: void minlbfgssetscale(const minlbfgsstate &state, const real_1d_array &s);
 void minlbfgssetscale(minlbfgsstate *state, RVector *s, ae_state *_state) {
    ae_int_t i;
    ae_assert(s->cnt >= state->n, "MinLBFGSSetScale: Length(S)<N", _state);
@@ -3641,7 +3641,7 @@ static void minlbfgs_clearrequestfields(minlbfgsstate *state, ae_state *_state) 
 //     State   -   structure used to store algorithm state
 //     X       -   new starting point.
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
-// API: void minlbfgsrestartfrom(const minlbfgsstate &state, const real_1d_array &x, const xparams _xparams);
+// API: void minlbfgsrestartfrom(const minlbfgsstate &state, const real_1d_array &x);
 void minlbfgsrestartfrom(minlbfgsstate *state, RVector *x, ae_state *_state) {
    ae_assert(x->cnt >= state->n, "MinLBFGSRestartFrom: Length(X)<N!", _state);
    ae_assert(isfinitevector(x, state->n, _state), "MinLBFGSRestartFrom: X contains infinite or NaN values!", _state);
@@ -3757,8 +3757,8 @@ void minlbfgscreatex(ae_int_t n, ae_int_t m, RVector *x, ae_int_t flags, double 
 //    use MinLBFGSSetStpMax() function to bound algorithm's  steps.  However,
 //    L-BFGS rarely needs such a tuning.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minlbfgscreate(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams);
-// API: void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams);
+// API: void minlbfgscreate(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlbfgsstate &state);
+// API: void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state);
 void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state, ae_state *_state) {
    SetObj(minlbfgsstate, state);
    ae_assert(n >= 1, "MinLBFGSCreate: N<1!", _state);
@@ -3812,8 +3812,8 @@ void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state, ae
 //    dimensional problems only, and to implement analytical gradient as soon
 //    as possible.
 // ALGLIB: Copyright 16.05.2011 by Sergey Bochkanov
-// API: void minlbfgscreatef(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams);
-// API: void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams);
+// API: void minlbfgscreatef(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state);
+// API: void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state);
 void minlbfgscreatef(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlbfgsstate *state, ae_state *_state) {
    SetObj(minlbfgsstate, state);
    ae_assert(n >= 1, "MinLBFGSCreateF: N too small!", _state);
@@ -3835,7 +3835,7 @@ void minlbfgscreatef(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlbf
 // NOTE:  you  can  change  preconditioner  "on  the  fly",  during algorithm
 // iterations.
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void minlbfgssetprecdefault(const minlbfgsstate &state, const xparams _xparams);
+// API: void minlbfgssetprecdefault(const minlbfgsstate &state);
 void minlbfgssetprecdefault(minlbfgsstate *state, ae_state *_state) {
    state->prectype = 0;
 }
@@ -3859,7 +3859,7 @@ void minlbfgssetprecdefault(minlbfgsstate *state, ae_state *_state) {
 //
 // NOTE 2:  P  should  be nonsingular. Exception will be thrown otherwise.
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void minlbfgssetpreccholesky(const minlbfgsstate &state, const real_2d_array &p, const bool isupper, const xparams _xparams);
+// API: void minlbfgssetpreccholesky(const minlbfgsstate &state, const real_2d_array &p, const bool isupper);
 void minlbfgssetpreccholesky(minlbfgsstate *state, RMatrix *p, bool isupper, ae_state *_state) {
    ae_int_t i;
    double mx;
@@ -3895,7 +3895,7 @@ void minlbfgssetpreccholesky(minlbfgsstate *state, RMatrix *p, bool isupper, ae_
 //
 // NOTE 3: you should pass diagonal of approximate Hessian - NOT ITS INVERSE.
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void minlbfgssetprecdiag(const minlbfgsstate &state, const real_1d_array &d, const xparams _xparams);
+// API: void minlbfgssetprecdiag(const minlbfgsstate &state, const real_1d_array &d);
 void minlbfgssetprecdiag(minlbfgsstate *state, RVector *d, ae_state *_state) {
    ae_int_t i;
    ae_assert(d->cnt >= state->n, "MinLBFGSSetPrecDiag: D is too short", _state);
@@ -3928,7 +3928,7 @@ void minlbfgssetprecdiag(minlbfgsstate *state, RVector *d, ae_state *_state) {
 // Inputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void minlbfgssetprecscale(const minlbfgsstate &state, const xparams _xparams);
+// API: void minlbfgssetprecscale(const minlbfgsstate &state);
 void minlbfgssetprecscale(minlbfgsstate *state, ae_state *_state) {
    state->prectype = 3;
 }
@@ -3998,9 +3998,9 @@ void minlbfgssetpreclowrankexact(minlbfgsstate *state, RVector *d, RVector *c, R
 // This function provides a reverse communication interface, which is not documented or recommended for use.
 // Instead, it is recommended that you use the better-documented API functions minlbfgsoptimize() listed below.
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-// API: bool minlbfgsiteration(const minlbfgsstate &state, const xparams _xparams = NonTH);
-// API: void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
-// API: void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
+// API: bool minlbfgsiteration(const minlbfgsstate &state);
+// API: void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
+// API: void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool minlbfgsiteration(minlbfgsstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
@@ -4547,7 +4547,7 @@ lbl_rcomm:
 //     points and we compare its prediction with actual value in  the  middle
 //     point
 // ALGLIB: Copyright 15.06.2014 by Sergey Bochkanov
-// API: void minlbfgsoptguardgradient(const minlbfgsstate &state, const double teststep, const xparams _xparams);
+// API: void minlbfgsoptguardgradient(const minlbfgsstate &state, const double teststep);
 void minlbfgsoptguardgradient(minlbfgsstate *state, double teststep, ae_state *_state) {
    ae_assert(isfinite(teststep), "MinLBFGSOptGuardGradient: TestStep contains NaN or INF", _state);
    ae_assert(teststep >= 0.0, "MinLBFGSOptGuardGradient: invalid argument TestStep(TestStep<0)", _state);
@@ -4613,8 +4613,8 @@ void minlbfgsoptguardgradient(minlbfgsstate *state, double teststep, ae_state *_
 // flag (and allows you to continue optimization). When optimization is done,
 // you can study OptGuard result.
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const ae_int_t level, const xparams _xparams);
-// API: void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const xparams _xparams);
+// API: void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const ae_int_t level);
+// API: void minlbfgsoptguardsmoothness(const minlbfgsstate &state);
 void minlbfgsoptguardsmoothness(minlbfgsstate *state, ae_int_t level, ae_state *_state) {
    ae_assert(level == 0 || level == 1, "MinLBFGSOptGuardSmoothness: unexpected value of level parameter", _state);
    state->smoothnessguardlevel = level;
@@ -4686,7 +4686,7 @@ void minlbfgsoptguardsmoothness(minlbfgsstate *state, ae_int_t level, ae_state *
 //       our test examples  (measured  with  multiple  restarts  from  random
 //       points), and to have exactly 0% false positives.
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minlbfgsoptguardresults(const minlbfgsstate &state, optguardreport &rep, const xparams _xparams);
+// API: void minlbfgsoptguardresults(const minlbfgsstate &state, optguardreport &rep);
 void minlbfgsoptguardresults(minlbfgsstate *state, optguardreport *rep, ae_state *_state) {
    SetObj(optguardreport, rep);
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
@@ -4731,7 +4731,7 @@ void minlbfgsoptguardresults(minlbfgsstate *state, optguardreport *rep, ae_state
 //     strrep  -   C1 test #0 "strong" report
 //     lngrep  -   C1 test #0 "long" report
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
+// API: void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep);
 void minlbfgsoptguardnonc1test0results(minlbfgsstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
    SetObj(optguardnonc1test0report, strrep);
    SetObj(optguardnonc1test0report, lngrep);
@@ -4785,7 +4785,7 @@ void minlbfgsoptguardnonc1test0results(minlbfgsstate *state, optguardnonc1test0r
 //     strrep  -   C1 test #1 "strong" report
 //     lngrep  -   C1 test #1 "long" report
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
+// API: void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep);
 void minlbfgsoptguardnonc1test1results(minlbfgsstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
    SetObj(optguardnonc1test1report, strrep);
    SetObj(optguardnonc1test1report, lngrep);
@@ -4800,7 +4800,7 @@ void minlbfgsoptguardnonc1test1results(minlbfgsstate *state, optguardnonc1test1r
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
 // ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
-// API: void minlbfgsresultsbuf(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams);
+// API: void minlbfgsresultsbuf(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep);
 void minlbfgsresultsbuf(minlbfgsstate *state, RVector *x, minlbfgsreport *rep, ae_state *_state) {
    if (x->cnt < state->n) {
       ae_vector_set_length(x, state->n, _state);
@@ -4839,7 +4839,7 @@ void minlbfgsresultsbuf(minlbfgsstate *state, RVector *x, minlbfgsreport *rep, a
 //                 * Rep.IterationsCount contains iterations count
 //                 * NFEV countains number of function calculations
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams);
+// API: void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep);
 void minlbfgsresults(minlbfgsstate *state, RVector *x, minlbfgsreport *rep, ae_state *_state) {
    SetVector(x);
    SetObj(minlbfgsreport, rep);
@@ -4866,7 +4866,7 @@ void minlbfgsresults(minlbfgsstate *state, RVector *x, minlbfgsreport *rep, ae_s
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
-// API: void minlbfgsrequesttermination(const minlbfgsstate &state, const xparams _xparams);
+// API: void minlbfgsrequesttermination(const minlbfgsstate &state);
 void minlbfgsrequesttermination(minlbfgsstate *state, ae_state *_state) {
    state->userterminationneeded = true;
 }
@@ -5033,132 +5033,104 @@ DefClass(minlbfgsstate, DecVal(needf) DecVal(needfg) DecVal(xupdated) DecVal(f) 
 // Other fields of this structure are not documented and should not be used!
 DefClass(minlbfgsreport, DecVal(iterationscount) DecVal(nfev) DecVal(terminationtype))
 
-void minlbfgssetcond(const minlbfgsstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+void minlbfgssetcond(const minlbfgsstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgssetcond(ConstT(minlbfgsstate, state), epsg, epsf, epsx, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgssetxrep(const minlbfgsstate &state, const bool needxrep, const xparams _xparams) {
+void minlbfgssetxrep(const minlbfgsstate &state, const bool needxrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgssetxrep(ConstT(minlbfgsstate, state), needxrep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgssetstpmax(const minlbfgsstate &state, const double stpmax, const xparams _xparams) {
+void minlbfgssetstpmax(const minlbfgsstate &state, const double stpmax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgssetstpmax(ConstT(minlbfgsstate, state), stpmax, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgssetscale(const minlbfgsstate &state, const real_1d_array &s, const xparams _xparams) {
+void minlbfgssetscale(const minlbfgsstate &state, const real_1d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgssetscale(ConstT(minlbfgsstate, state), ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgsrestartfrom(const minlbfgsstate &state, const real_1d_array &x, const xparams _xparams) {
+void minlbfgsrestartfrom(const minlbfgsstate &state, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgsrestartfrom(ConstT(minlbfgsstate, state), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgscreate(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams) {
+void minlbfgscreate(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlbfgsstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgscreate(n, m, ConstT(ae_vector, x), ConstT(minlbfgsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state, const xparams _xparams) {
+void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgscreate(n, m, ConstT(ae_vector, x), ConstT(minlbfgsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minlbfgscreatef(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams) {
+void minlbfgscreatef(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgscreatef(n, m, ConstT(ae_vector, x), diffstep, ConstT(minlbfgsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state, const xparams _xparams) {
+void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgscreatef(n, m, ConstT(ae_vector, x), diffstep, ConstT(minlbfgsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minlbfgssetprecdefault(const minlbfgsstate &state, const xparams _xparams) {
+void minlbfgssetprecdefault(const minlbfgsstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgssetprecdefault(ConstT(minlbfgsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgssetpreccholesky(const minlbfgsstate &state, const real_2d_array &p, const bool isupper, const xparams _xparams) {
+void minlbfgssetpreccholesky(const minlbfgsstate &state, const real_2d_array &p, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgssetpreccholesky(ConstT(minlbfgsstate, state), ConstT(ae_matrix, p), isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgssetprecdiag(const minlbfgsstate &state, const real_1d_array &d, const xparams _xparams) {
+void minlbfgssetprecdiag(const minlbfgsstate &state, const real_1d_array &d) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgssetprecdiag(ConstT(minlbfgsstate, state), ConstT(ae_vector, d), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgssetprecscale(const minlbfgsstate &state, const xparams _xparams) {
+void minlbfgssetprecscale(const minlbfgsstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgssetprecscale(ConstT(minlbfgsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-bool minlbfgsiteration(const minlbfgsstate &state, const xparams _xparams) {
+bool minlbfgsiteration(const minlbfgsstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::minlbfgsiteration(ConstT(minlbfgsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -5209,11 +5181,9 @@ bool minlbfgsiteration(const minlbfgsstate &state, const xparams _xparams) {
 //    being thrown. Either  you  did  not pass gradient when it WAS needed or
 //    you passed gradient when it was NOT needed.
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlbfgsoptimize()' (func is NULL)", &_alglib_env_state);
    while (alglib_impl::minlbfgsiteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -5223,11 +5193,9 @@ void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x,
    EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
-void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minlbfgsoptimize()' (grad is NULL)", &_alglib_env_state);
    while (alglib_impl::minlbfgsiteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -5238,85 +5206,67 @@ void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x,
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgsoptguardgradient(const minlbfgsstate &state, const double teststep, const xparams _xparams) {
+void minlbfgsoptguardgradient(const minlbfgsstate &state, const double teststep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgsoptguardgradient(ConstT(minlbfgsstate, state), teststep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const ae_int_t level, const xparams _xparams) {
+void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const ae_int_t level) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgsoptguardsmoothness(ConstT(minlbfgsstate, state), level, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const xparams _xparams) {
+void minlbfgsoptguardsmoothness(const minlbfgsstate &state) {
    ae_int_t level = 1;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgsoptguardsmoothness(ConstT(minlbfgsstate, state), level, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minlbfgsoptguardresults(const minlbfgsstate &state, optguardreport &rep, const xparams _xparams) {
+void minlbfgsoptguardresults(const minlbfgsstate &state, optguardreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgsoptguardresults(ConstT(minlbfgsstate, state), ConstT(optguardreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
+void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgsoptguardnonc1test0results(ConstT(minlbfgsstate, state), ConstT(optguardnonc1test0report, strrep), ConstT(optguardnonc1test0report, lngrep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
+void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgsoptguardnonc1test1results(ConstT(minlbfgsstate, state), ConstT(optguardnonc1test1report, strrep), ConstT(optguardnonc1test1report, lngrep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgsresultsbuf(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams) {
+void minlbfgsresultsbuf(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgsresultsbuf(ConstT(minlbfgsstate, state), ConstT(ae_vector, x), ConstT(minlbfgsreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep, const xparams _xparams) {
+void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgsresults(ConstT(minlbfgsstate, state), ConstT(ae_vector, x), ConstT(minlbfgsreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgsrequesttermination(const minlbfgsstate &state, const xparams _xparams) {
+void minlbfgsrequesttermination(const minlbfgsstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgsrequesttermination(ConstT(minlbfgsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -6360,7 +6310,7 @@ double cqmdebugconstrainedevalt(convexquadraticmodel *s, RVector *x, ae_state *_
    n = s->n;
    ae_assert(isfinitevector(x, n, _state), "CQMDebugConstrainedEvalT: X is not finite vector", _state);
    if (!cqmodels_cqmrebuild(s, _state)) {
-      result = _state->v_nan;
+      result = NAN;
       return result;
    }
    result = 0.0;
@@ -6441,7 +6391,7 @@ double cqmdebugconstrainedevale(convexquadraticmodel *s, RVector *x, ae_state *_
    n = s->n;
    ae_assert(isfinitevector(x, n, _state), "CQMDebugConstrainedEvalE: X is not finite vector", _state);
    if (!cqmodels_cqmrebuild(s, _state)) {
-      result = _state->v_nan;
+      result = NAN;
       return result;
    }
    result = 0.0;
@@ -7961,8 +7911,8 @@ void sasinit(ae_int_t n, sactiveset *s, ae_state *_state) {
    vectorsetlengthatleast(&s->bndu, n, _state);
    vectorsetlengthatleast(&s->hasbndu, n, _state);
    for (i = 0; i < n; i++) {
-      s->bndl.xR[i] = _state->v_neginf;
-      s->bndu.xR[i] = _state->v_posinf;
+      s->bndl.xR[i] = -INFINITY;
+      s->bndu.xR[i] = +INFINITY;
       s->hasbndl.xB[i] = false;
       s->hasbndu.xB[i] = false;
    }
@@ -10935,14 +10885,14 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
          sstate->bndl.xR[i] = (bndlc->xR[i] - xoriginc->xR[i]) / sc->xR[i];
       } else {
          ae_assert(isneginf(bndlc->xR[i]), "QQPOptimize: incorrect lower bound", _state);
-         sstate->bndl.xR[i] = _state->v_neginf;
+         sstate->bndl.xR[i] = -INFINITY;
       }
       sstate->havebndu.xB[i] = isfinite(bnduc->xR[i]);
       if (sstate->havebndu.xB[i]) {
          sstate->bndu.xR[i] = (bnduc->xR[i] - xoriginc->xR[i]) / sc->xR[i];
       } else {
          ae_assert(isposinf(bnduc->xR[i]), "QQPOptimize: incorrect upper bound", _state);
-         sstate->bndu.xR[i] = _state->v_posinf;
+         sstate->bndu.xR[i] = +INFINITY;
       }
    }
 // Process initial point:
@@ -11567,17 +11517,17 @@ static void qpdenseaulsolver_generateexmodel(RMatrix *sclsfta, RVector *sclsftb,
       if (sclsfthasbndl->xB[i]) {
          exbndl->xR[i] = sclsftbndl->xR[i];
       } else {
-         exbndl->xR[i] = _state->v_neginf;
+         exbndl->xR[i] = -INFINITY;
       }
       if (sclsfthasbndu->xB[i]) {
          exbndu->xR[i] = sclsftbndu->xR[i];
       } else {
-         exbndu->xR[i] = _state->v_posinf;
+         exbndu->xR[i] = +INFINITY;
       }
    }
    for (i = nmain; i < ntotal; i++) {
       exbndl->xR[i] = 0.0;
-      exbndu->xR[i] = _state->v_posinf;
+      exbndu->xR[i] = +INFINITY;
    }
 // Handle equality constraints:
 // * modify quadratic term
@@ -12761,7 +12711,7 @@ static const double minbleic_penaltyfactor = 100.0;
 //   even  when  numerical  differentiation is used (algorithm adjusts  nodes
 //   according to boundary constraints)
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbleicsetbc(const minbleicstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams);
+// API: void minbleicsetbc(const minbleicstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 void minbleicsetbc(minbleicstate *state, RVector *bndl, RVector *bndu, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
@@ -12811,8 +12761,8 @@ void minbleicsetbc(minbleicstate *state, RVector *bndl, RVector *bndu, ae_state 
 // (this kind of constraints is always satisfied exactly, both in  the  final
 // solution and in all intermediate points).
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams);
-// API: void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams);
+// API: void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
+// API: void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct);
 void minbleicsetlc(minbleicstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
@@ -12906,7 +12856,7 @@ void minbleicsetlc(minbleicstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae
 //       slightly more than MaxIts iterations. I.e., MaxIts  sets  non-strict
 //       limit on iterations count.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbleicsetcond(const minbleicstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams);
+// API: void minbleicsetcond(const minbleicstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
 void minbleicsetcond(minbleicstate *state, double epsg, double epsf, double epsx, ae_int_t maxits, ae_state *_state) {
    ae_assert(isfinite(epsg), "MinBLEICSetCond: EpsG is not finite number", _state);
    ae_assert(epsg >= 0.0, "MinBLEICSetCond: negative EpsG", _state);
@@ -12951,7 +12901,7 @@ void minbleicsetcond(minbleicstate *state, double epsg, double epsf, double epsx
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
-// API: void minbleicsetscale(const minbleicstate &state, const real_1d_array &s, const xparams _xparams);
+// API: void minbleicsetscale(const minbleicstate &state, const real_1d_array &s);
 void minbleicsetscale(minbleicstate *state, RVector *s, ae_state *_state) {
    ae_int_t i;
    ae_assert(s->cnt >= state->nmain, "MinBLEICSetScale: Length(S)<N", _state);
@@ -12968,7 +12918,7 @@ void minbleicsetscale(minbleicstate *state, RVector *s, ae_state *_state) {
 // Inputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void minbleicsetprecdefault(const minbleicstate &state, const xparams _xparams);
+// API: void minbleicsetprecdefault(const minbleicstate &state);
 void minbleicsetprecdefault(minbleicstate *state, ae_state *_state) {
    state->prectype = 0;
 }
@@ -12985,7 +12935,7 @@ void minbleicsetprecdefault(minbleicstate *state, ae_state *_state) {
 //
 // NOTE 2: you should pass diagonal of approximate Hessian - NOT ITS INVERSE.
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void minbleicsetprecdiag(const minbleicstate &state, const real_1d_array &d, const xparams _xparams);
+// API: void minbleicsetprecdiag(const minbleicstate &state, const real_1d_array &d);
 void minbleicsetprecdiag(minbleicstate *state, RVector *d, ae_state *_state) {
    ae_int_t i;
    ae_assert(d->cnt >= state->nmain, "MinBLEICSetPrecDiag: D is too short", _state);
@@ -13018,7 +12968,7 @@ void minbleicsetprecdiag(minbleicstate *state, RVector *d, ae_state *_state) {
 // Inputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void minbleicsetprecscale(const minbleicstate &state, const xparams _xparams);
+// API: void minbleicsetprecscale(const minbleicstate &state);
 void minbleicsetprecscale(minbleicstate *state, ae_state *_state) {
    state->prectype = 3;
 }
@@ -13032,7 +12982,7 @@ void minbleicsetprecscale(minbleicstate *state, ae_state *_state) {
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to MinBLEICOptimize().
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbleicsetxrep(const minbleicstate &state, const bool needxrep, const xparams _xparams);
+// API: void minbleicsetxrep(const minbleicstate &state, const bool needxrep);
 void minbleicsetxrep(minbleicstate *state, bool needxrep, ae_state *_state) {
    state->xrep = needxrep;
 }
@@ -13073,7 +13023,7 @@ void minbleicsetdrep(minbleicstate *state, bool needdrep, ae_state *_state) {
 // steps  that  are  too  large  (and  therefore  expose  us  to the possible
 // overflow) without actually calculating function value at the x+stp*d.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minbleicsetstpmax(const minbleicstate &state, const double stpmax, const xparams _xparams);
+// API: void minbleicsetstpmax(const minbleicstate &state, const double stpmax);
 void minbleicsetstpmax(minbleicstate *state, double stpmax, ae_state *_state) {
    ae_assert(isfinite(stpmax), "MinBLEICSetStpMax: StpMax is not finite!", _state);
    ae_assert(stpmax >= 0.0, "MinBLEICSetStpMax: StpMax<0!", _state);
@@ -13098,7 +13048,7 @@ static void minbleic_clearrequestfields(minbleicstate *state, ae_state *_state) 
 //     State   -   structure previously allocated with MinBLEICCreate call.
 //     X       -   new starting point.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbleicrestartfrom(const minbleicstate &state, const real_1d_array &x, const xparams _xparams);
+// API: void minbleicrestartfrom(const minbleicstate &state, const real_1d_array &x);
 void minbleicrestartfrom(minbleicstate *state, RVector *x, ae_state *_state) {
    ae_int_t n;
    n = state->nmain;
@@ -13149,9 +13099,9 @@ static void minbleic_minbleicinitinternal(ae_int_t n, RVector *x, double diffste
    ae_vector_set_length(&state->g, n, _state);
    ae_vector_set_length(&state->work, n, _state);
    for (i = 0; i < n; i++) {
-      state->bndl.xR[i] = _state->v_neginf;
+      state->bndl.xR[i] = -INFINITY;
       state->hasbndl.xB[i] = false;
-      state->bndu.xR[i] = _state->v_posinf;
+      state->bndu.xR[i] = +INFINITY;
       state->hasbndu.xB[i] = false;
       state->s.xR[i] = 1.0;
       state->invs.xR[i] = 1.0;
@@ -13230,8 +13180,8 @@ static void minbleic_minbleicinitinternal(ae_int_t n, RVector *x, double diffste
 // Outputs:
 //     State   -   structure stores algorithm state
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &state, const xparams _xparams);
-// API: void minbleiccreate(const real_1d_array &x, minbleicstate &state, const xparams _xparams);
+// API: void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &state);
+// API: void minbleiccreate(const real_1d_array &x, minbleicstate &state);
 void minbleiccreate(ae_int_t n, RVector *x, minbleicstate *state, ae_state *_state) {
    ae_frame _frame_block;
    ae_frame_make(_state, &_frame_block);
@@ -13283,8 +13233,8 @@ void minbleiccreate(ae_int_t n, RVector *x, minbleicstate *state, ae_state *_sta
 //    dimensional problems only, and to implement analytical gradient as soon
 //    as possible.
 // ALGLIB: Copyright 16.05.2011 by Sergey Bochkanov
-// API: void minbleiccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams);
-// API: void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams);
+// API: void minbleiccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbleicstate &state);
+// API: void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstate &state);
 void minbleiccreatef(ae_int_t n, RVector *x, double diffstep, minbleicstate *state, ae_state *_state) {
    ae_frame _frame_block;
    ae_frame_make(_state, &_frame_block);
@@ -13329,9 +13279,9 @@ static void minbleic_updateestimateofgoodstep(double *estimate, double newstep, 
 // This function provides a reverse communication interface, which is not documented or recommended for use.
 // Instead, it is recommended that you use the better-documented API functions minbleicoptimize() listed below.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: bool minbleiciteration(const minbleicstate &state, const xparams _xparams = NonTH);
-// API: void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
-// API: void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
+// API: bool minbleiciteration(const minbleicstate &state);
+// API: void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
+// API: void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool minbleiciteration(minbleicstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
@@ -13472,9 +13422,9 @@ bool minbleiciteration(minbleicstate *state, ae_state *_state) {
    state->repnfev = 0;
    state->repvaridx = -1;
    state->repdebugeqerr = 0.0;
-   state->repdebugfs = _state->v_nan;
-   state->repdebugff = _state->v_nan;
-   state->repdebugdx = _state->v_nan;
+   state->repdebugfs = NAN;
+   state->repdebugff = NAN;
+   state->repdebugdx = NAN;
    if (state->stpmax != 0.0 && state->prectype != 0) {
       state->repterminationtype = -10;
       result = false;
@@ -14248,7 +14198,7 @@ lbl_rcomm:
 //     points and we compare its prediction with actual value in  the  middle
 //     point
 // ALGLIB: Copyright 15.06.2014 by Sergey Bochkanov
-// API: void minbleicoptguardgradient(const minbleicstate &state, const double teststep, const xparams _xparams);
+// API: void minbleicoptguardgradient(const minbleicstate &state, const double teststep);
 void minbleicoptguardgradient(minbleicstate *state, double teststep, ae_state *_state) {
    ae_assert(isfinite(teststep), "MinBLEICOptGuardGradient: TestStep contains NaN or INF", _state);
    ae_assert(teststep >= 0.0, "MinBLEICOptGuardGradient: invalid argument TestStep(TestStep<0)", _state);
@@ -14314,8 +14264,8 @@ void minbleicoptguardgradient(minbleicstate *state, double teststep, ae_state *_
 // flag (and allows you to continue optimization). When optimization is done,
 // you can study OptGuard result.
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minbleicoptguardsmoothness(const minbleicstate &state, const ae_int_t level, const xparams _xparams);
-// API: void minbleicoptguardsmoothness(const minbleicstate &state, const xparams _xparams);
+// API: void minbleicoptguardsmoothness(const minbleicstate &state, const ae_int_t level);
+// API: void minbleicoptguardsmoothness(const minbleicstate &state);
 void minbleicoptguardsmoothness(minbleicstate *state, ae_int_t level, ae_state *_state) {
    ae_assert(level == 0 || level == 1, "MinBLEICOptGuardSmoothness: unexpected value of level parameter", _state);
    state->smoothnessguardlevel = level;
@@ -14387,7 +14337,7 @@ void minbleicoptguardsmoothness(minbleicstate *state, ae_int_t level, ae_state *
 //       our test examples  (measured  with  multiple  restarts  from  random
 //       points), and to have exactly 0% false positives.
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minbleicoptguardresults(const minbleicstate &state, optguardreport &rep, const xparams _xparams);
+// API: void minbleicoptguardresults(const minbleicstate &state, optguardreport &rep);
 void minbleicoptguardresults(minbleicstate *state, optguardreport *rep, ae_state *_state) {
    SetObj(optguardreport, rep);
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
@@ -14432,7 +14382,7 @@ void minbleicoptguardresults(minbleicstate *state, optguardreport *rep, ae_state
 //     strrep  -   C1 test #0 "strong" report
 //     lngrep  -   C1 test #0 "long" report
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
+// API: void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep);
 void minbleicoptguardnonc1test0results(minbleicstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
    SetObj(optguardnonc1test0report, strrep);
    SetObj(optguardnonc1test0report, lngrep);
@@ -14486,7 +14436,7 @@ void minbleicoptguardnonc1test0results(minbleicstate *state, optguardnonc1test0r
 //     strrep  -   C1 test #1 "strong" report
 //     lngrep  -   C1 test #1 "long" report
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
+// API: void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep);
 void minbleicoptguardnonc1test1results(minbleicstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
    SetObj(optguardnonc1test1report, strrep);
    SetObj(optguardnonc1test1report, lngrep);
@@ -14501,7 +14451,7 @@ void minbleicoptguardnonc1test1results(minbleicstate *state, optguardnonc1test1r
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbleicresultsbuf(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams);
+// API: void minbleicresultsbuf(const minbleicstate &state, real_1d_array &x, minbleicreport &rep);
 void minbleicresultsbuf(minbleicstate *state, RVector *x, minbleicreport *rep, ae_state *_state) {
    ae_int_t i;
    if (x->cnt < state->nmain) {
@@ -14517,7 +14467,7 @@ void minbleicresultsbuf(minbleicstate *state, RVector *x, minbleicreport *rep, a
       ae_v_move(x->xR, 1, state->sas.xc.xR, 1, state->nmain);
    } else {
       for (i = 0; i < state->nmain; i++) {
-         x->xR[i] = _state->v_nan;
+         x->xR[i] = NAN;
       }
    }
    rep->debugeqerr = state->repdebugeqerr;
@@ -14554,7 +14504,7 @@ void minbleicresultsbuf(minbleicstate *state, RVector *x, minbleicreport *rep, a
 //                 More information about fields of this  structure  can  be
 //                 found in the comments on MinBLEICReport datatype.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams);
+// API: void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicreport &rep);
 void minbleicresults(minbleicstate *state, RVector *x, minbleicreport *rep, ae_state *_state) {
    SetVector(x);
    SetObj(minbleicreport, rep);
@@ -14581,7 +14531,7 @@ void minbleicresults(minbleicstate *state, RVector *x, minbleicreport *rep, ae_s
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
-// API: void minbleicrequesttermination(const minbleicstate &state, const xparams _xparams);
+// API: void minbleicrequesttermination(const minbleicstate &state);
 void minbleicrequesttermination(minbleicstate *state, ae_state *_state) {
    state->userterminationneeded = true;
 }
@@ -14825,153 +14775,121 @@ DefClass(minbleicstate, DecVal(needf) DecVal(needfg) DecVal(xupdated) DecVal(f) 
 // * DebugDX                   |X_start-X_final|
 DefClass(minbleicreport, DecVal(iterationscount) DecVal(nfev) DecVal(varidx) DecVal(terminationtype) DecVal(debugeqerr) DecVal(debugfs) DecVal(debugff) DecVal(debugdx) DecVal(debugfeasqpits) DecVal(debugfeasgpaits) DecVal(inneriterationscount) DecVal(outeriterationscount))
 
-void minbleicsetbc(const minbleicstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+void minbleicsetbc(const minbleicstate &state, const real_1d_array &bndl, const real_1d_array &bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicsetbc(ConstT(minbleicstate, state), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicsetlc(ConstT(minbleicstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
+void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct) {
    if (c.rows() != ct.length()) ThrowError("Error while calling 'minbleicsetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicsetlc(ConstT(minbleicstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minbleicsetcond(const minbleicstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+void minbleicsetcond(const minbleicstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicsetcond(ConstT(minbleicstate, state), epsg, epsf, epsx, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicsetscale(const minbleicstate &state, const real_1d_array &s, const xparams _xparams) {
+void minbleicsetscale(const minbleicstate &state, const real_1d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicsetscale(ConstT(minbleicstate, state), ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicsetprecdefault(const minbleicstate &state, const xparams _xparams) {
+void minbleicsetprecdefault(const minbleicstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicsetprecdefault(ConstT(minbleicstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicsetprecdiag(const minbleicstate &state, const real_1d_array &d, const xparams _xparams) {
+void minbleicsetprecdiag(const minbleicstate &state, const real_1d_array &d) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicsetprecdiag(ConstT(minbleicstate, state), ConstT(ae_vector, d), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicsetprecscale(const minbleicstate &state, const xparams _xparams) {
+void minbleicsetprecscale(const minbleicstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicsetprecscale(ConstT(minbleicstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicsetxrep(const minbleicstate &state, const bool needxrep, const xparams _xparams) {
+void minbleicsetxrep(const minbleicstate &state, const bool needxrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicsetxrep(ConstT(minbleicstate, state), needxrep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicsetstpmax(const minbleicstate &state, const double stpmax, const xparams _xparams) {
+void minbleicsetstpmax(const minbleicstate &state, const double stpmax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicsetstpmax(ConstT(minbleicstate, state), stpmax, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicrestartfrom(const minbleicstate &state, const real_1d_array &x, const xparams _xparams) {
+void minbleicrestartfrom(const minbleicstate &state, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicrestartfrom(ConstT(minbleicstate, state), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &state, const xparams _xparams) {
+void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleiccreate(n, ConstT(ae_vector, x), ConstT(minbleicstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minbleiccreate(const real_1d_array &x, minbleicstate &state, const xparams _xparams) {
+void minbleiccreate(const real_1d_array &x, minbleicstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleiccreate(n, ConstT(ae_vector, x), ConstT(minbleicstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minbleiccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams) {
+void minbleiccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbleicstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleiccreatef(n, ConstT(ae_vector, x), diffstep, ConstT(minbleicstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstate &state, const xparams _xparams) {
+void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleiccreatef(n, ConstT(ae_vector, x), diffstep, ConstT(minbleicstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-bool minbleiciteration(const minbleicstate &state, const xparams _xparams) {
+bool minbleiciteration(const minbleicstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::minbleiciteration(ConstT(minbleicstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -15022,11 +14940,9 @@ bool minbleiciteration(const minbleicstate &state, const xparams _xparams) {
 //    exception being thrown. Either  you  did  not pass gradient when it WAS
 //    needed or you passed gradient when it was NOT needed.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minbleicoptimize()' (func is NULL)", &_alglib_env_state);
    while (alglib_impl::minbleiciteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -15036,11 +14952,9 @@ void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x,
    EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
-void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minbleicoptimize()' (grad is NULL)", &_alglib_env_state);
    while (alglib_impl::minbleiciteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -15051,85 +14965,67 @@ void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x,
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicoptguardgradient(const minbleicstate &state, const double teststep, const xparams _xparams) {
+void minbleicoptguardgradient(const minbleicstate &state, const double teststep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicoptguardgradient(ConstT(minbleicstate, state), teststep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicoptguardsmoothness(const minbleicstate &state, const ae_int_t level, const xparams _xparams) {
+void minbleicoptguardsmoothness(const minbleicstate &state, const ae_int_t level) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicoptguardsmoothness(ConstT(minbleicstate, state), level, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minbleicoptguardsmoothness(const minbleicstate &state, const xparams _xparams) {
+void minbleicoptguardsmoothness(const minbleicstate &state) {
    ae_int_t level = 1;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicoptguardsmoothness(ConstT(minbleicstate, state), level, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minbleicoptguardresults(const minbleicstate &state, optguardreport &rep, const xparams _xparams) {
+void minbleicoptguardresults(const minbleicstate &state, optguardreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicoptguardresults(ConstT(minbleicstate, state), ConstT(optguardreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
+void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicoptguardnonc1test0results(ConstT(minbleicstate, state), ConstT(optguardnonc1test0report, strrep), ConstT(optguardnonc1test0report, lngrep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
+void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicoptguardnonc1test1results(ConstT(minbleicstate, state), ConstT(optguardnonc1test1report, strrep), ConstT(optguardnonc1test1report, lngrep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicresultsbuf(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams) {
+void minbleicresultsbuf(const minbleicstate &state, real_1d_array &x, minbleicreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicresultsbuf(ConstT(minbleicstate, state), ConstT(ae_vector, x), ConstT(minbleicreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicreport &rep, const xparams _xparams) {
+void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicresults(ConstT(minbleicstate, state), ConstT(ae_vector, x), ConstT(minbleicreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicrequesttermination(const minbleicstate &state, const xparams _xparams) {
+void minbleicrequesttermination(const minbleicstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicrequesttermination(ConstT(minbleicstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -15872,7 +15768,7 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
             //
             // One pair of slack variables added.
                state->b.xR[i] = cl->xR[i];
-               state->r.xR[i] = _state->v_posinf;
+               state->r.xR[i] = +INFINITY;
                state->hasr.xB[i] = false;
                state->aflips.xB[i] = false;
                vs = 1.0;
@@ -15882,7 +15778,7 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
          //
          // One pair of slack variables added.
             state->b.xR[i] = -cu->xR[i];
-            state->r.xR[i] = _state->v_posinf;
+            state->r.xR[i] = +INFINITY;
             state->hasr.xB[i] = false;
             state->aflips.xB[i] = true;
             vs = -1.0;
@@ -16112,8 +16008,8 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
    for (i = 0; i < n; i++) {
       state->hasbndl.xB[i] = false;
       state->hasbndu.xB[i] = false;
-      state->bndl.xR[i] = _state->v_neginf;
-      state->bndu.xR[i] = _state->v_posinf;
+      state->bndl.xR[i] = -INFINITY;
+      state->bndu.xR[i] = +INFINITY;
    }
 // Linear constraints - empty
    state->mdense = 0;
@@ -18848,7 +18744,7 @@ namespace alglib_impl {
 // to automatic stopping criterion selection (presently it is  small    step
 // length, but it may change in the future versions of ALGLIB).
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minqpsetalgobleic(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams);
+// API: void minqpsetalgobleic(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
 void minqpsetalgobleic(minqpstate *state, double epsg, double epsf, double epsx, ae_int_t maxits, ae_state *_state) {
    ae_assert(isfinite(epsg), "MinQPSetAlgoBLEIC: EpsG is not finite number", _state);
    ae_assert(epsg >= 0.0, "MinQPSetAlgoBLEIC: negative EpsG", _state);
@@ -18942,7 +18838,7 @@ void minqpsetalgobleic(minqpstate *state, double epsg, double epsf, double epsx,
 //       (specific step length chosen may change in the future  versions  of
 //       ALGLIB, so it is better to specify step length explicitly).
 // ALGLIB: Copyright 20.08.2016 by Sergey Bochkanov
-// API: void minqpsetalgodenseaul(const minqpstate &state, const double epsx, const double rho, const ae_int_t itscnt, const xparams _xparams);
+// API: void minqpsetalgodenseaul(const minqpstate &state, const double epsx, const double rho, const ae_int_t itscnt);
 void minqpsetalgodenseaul(minqpstate *state, double epsx, double rho, ae_int_t itscnt, ae_state *_state) {
    ae_assert(isfinite(epsx), "MinQPSetAlgoDenseAUL: EpsX is not finite number", _state);
    ae_assert(epsx >= 0.0, "MinQPSetAlgoDenseAUL: negative EpsX", _state);
@@ -19014,7 +18910,7 @@ void minqpsetalgodenseaul(minqpstate *state, double epsx, double rho, ae_int_t i
 //
 // NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
-// API: void minqpsetalgodenseipm(const minqpstate &state, const double eps, const xparams _xparams);
+// API: void minqpsetalgodenseipm(const minqpstate &state, const double eps);
 void minqpsetalgodenseipm(minqpstate *state, double eps, ae_state *_state) {
    ae_assert(isfinite(eps), "MinQPSetAlgoDenseIPM: Eps is not finite number", _state);
    ae_assert(eps >= 0.0, "MinQPSetAlgoDenseIPM: negative Eps", _state);
@@ -19083,7 +18979,7 @@ void minqpsetalgodenseipm(minqpstate *state, double eps, ae_state *_state) {
 //
 // NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
-// API: void minqpsetalgosparseipm(const minqpstate &state, const double eps, const xparams _xparams);
+// API: void minqpsetalgosparseipm(const minqpstate &state, const double eps);
 void minqpsetalgosparseipm(minqpstate *state, double eps, ae_state *_state) {
    ae_assert(isfinite(eps), "MinQPSetAlgoSparseIPM: Eps is not finite number", _state);
    ae_assert(eps >= 0.0, "MinQPSetAlgoSparseIPM: negative Eps", _state);
@@ -19187,7 +19083,7 @@ void minqpsetalgosparseipm(minqpstate *state, double eps, ae_state *_state) {
 // to automatic stopping criterion selection (presently it is  small    step
 // length, but it may change in the future versions of ALGLIB).
 // ALGLIB: Copyright 22.05.2014 by Sergey Bochkanov
-// API: void minqpsetalgoquickqp(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxouterits, const bool usenewton, const xparams _xparams);
+// API: void minqpsetalgoquickqp(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxouterits, const bool usenewton);
 void minqpsetalgoquickqp(minqpstate *state, double epsg, double epsf, double epsx, ae_int_t maxouterits, bool usenewton, ae_state *_state) {
    ae_assert(isfinite(epsg), "MinQPSetAlgoQuickQP: EpsG is not finite number", _state);
    ae_assert(epsg >= 0.0, "MinQPSetAlgoQuickQP: negative EpsG", _state);
@@ -19261,7 +19157,7 @@ void minqpsetalgoquickqp(minqpstate *state, double epsg, double epsf, double eps
 //     State   -   optimizer with zero quadratic/linear terms
 //                 and no constraints
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minqpcreate(const ae_int_t n, minqpstate &state, const xparams _xparams);
+// API: void minqpcreate(const ae_int_t n, minqpstate &state);
 void minqpcreate(ae_int_t n, minqpstate *state, ae_state *_state) {
    ae_int_t i;
    SetObj(minqpstate, state);
@@ -19288,8 +19184,8 @@ void minqpcreate(ae_int_t n, minqpstate *state, ae_state *_state) {
    ae_vector_set_length(&state->xs, n, _state);
    vectorsetlengthatleast(&state->replagbc, n, _state);
    for (i = 0; i < n; i++) {
-      state->bndl.xR[i] = _state->v_neginf;
-      state->bndu.xR[i] = _state->v_posinf;
+      state->bndl.xR[i] = -INFINITY;
+      state->bndu.xR[i] = +INFINITY;
       state->havebndl.xB[i] = false;
       state->havebndu.xB[i] = false;
       state->b.xR[i] = 0.0;
@@ -19324,7 +19220,7 @@ void minqpsetlineartermfast(minqpstate *state, RVector *b, ae_state *_state) {
 //     State   -   structure which stores algorithm state
 //     B       -   linear term, array[N].
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minqpsetlinearterm(const minqpstate &state, const real_1d_array &b, const xparams _xparams);
+// API: void minqpsetlinearterm(const minqpstate &state, const real_1d_array &b);
 void minqpsetlinearterm(minqpstate *state, RVector *b, ae_state *_state) {
    ae_int_t n;
    n = state->n;
@@ -19403,8 +19299,8 @@ void minqpsetquadratictermfast(minqpstate *state, RMatrix *a, bool isupper, doub
 //                 * if not given, both lower and upper  triangles  must  be
 //                   filled.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const bool isupper, const xparams _xparams);
-// API: void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const xparams _xparams);
+// API: void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const bool isupper);
+// API: void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a);
 void minqpsetquadraticterm(minqpstate *state, RMatrix *a, bool isupper, ae_state *_state) {
    ae_int_t n;
    n = state->n;
@@ -19442,7 +19338,7 @@ void minqpsetquadraticterm(minqpstate *state, RMatrix *a, bool isupper, ae_state
 //                 * if not given, both lower and upper  triangles  must  be
 //                   filled.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minqpsetquadratictermsparse(const minqpstate &state, const sparsematrix &a, const bool isupper, const xparams _xparams);
+// API: void minqpsetquadratictermsparse(const minqpstate &state, const sparsematrix &a, const bool isupper);
 void minqpsetquadratictermsparse(minqpstate *state, sparsematrix *a, bool isupper, ae_state *_state) {
    ae_int_t n;
    ae_int_t t0;
@@ -19499,7 +19395,7 @@ void minqpsetstartingpointfast(minqpstate *state, RVector *x, ae_state *_state) 
 //     State   -   structure which stores algorithm state
 //     X       -   starting point, array[N].
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minqpsetstartingpoint(const minqpstate &state, const real_1d_array &x, const xparams _xparams);
+// API: void minqpsetstartingpoint(const minqpstate &state, const real_1d_array &x);
 void minqpsetstartingpoint(minqpstate *state, RVector *x, ae_state *_state) {
    ae_int_t n;
    n = state->n;
@@ -19534,7 +19430,7 @@ void minqpsetoriginfast(minqpstate *state, RVector *xorigin, ae_state *_state) {
 //     State   -   structure which stores algorithm state
 //     XOrigin -   origin, array[N].
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minqpsetorigin(const minqpstate &state, const real_1d_array &xorigin, const xparams _xparams);
+// API: void minqpsetorigin(const minqpstate &state, const real_1d_array &xorigin);
 void minqpsetorigin(minqpstate *state, RVector *xorigin, ae_state *_state) {
    ae_int_t n;
    n = state->n;
@@ -19565,7 +19461,7 @@ void minqpsetorigin(minqpstate *state, RVector *xorigin, ae_state *_state) {
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
-// API: void minqpsetscale(const minqpstate &state, const real_1d_array &s, const xparams _xparams);
+// API: void minqpsetscale(const minqpstate &state, const real_1d_array &s);
 void minqpsetscale(minqpstate *state, RVector *s, ae_state *_state) {
    ae_int_t i;
    ae_assert(s->cnt >= state->n, "MinQPSetScale: Length(S)<N", _state);
@@ -19603,7 +19499,7 @@ void minqpsetscale(minqpstate *state, RVector *s, ae_state *_state) {
 // Inputs:
 //     State   -   structure stores algorithm state
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
-// API: void minqpsetscaleautodiag(const minqpstate &state, const xparams _xparams);
+// API: void minqpsetscaleautodiag(const minqpstate &state);
 void minqpsetscaleautodiag(minqpstate *state, ae_state *_state) {
    state->stype = 1;
 }
@@ -19648,7 +19544,7 @@ void minqpsetscaleautodiag(minqpstate *state, ae_state *_state) {
 //
 // NOTE: BndL>BndU will result in QP problem being recognized as infeasible.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams);
+// API: void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 void minqpsetbc(minqpstate *state, RVector *bndl, RVector *bndu, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
@@ -19697,7 +19593,7 @@ void minqpsetbc(minqpstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 //
 // NOTE: BndL>BndU will result in QP problem being recognized as infeasible.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu, const xparams _xparams);
+// API: void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu);
 void minqpsetbcall(minqpstate *state, double bndl, double bndu, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
@@ -19739,7 +19635,7 @@ void minqpsetbcall(minqpstate *state, double bndl, double bndu, ae_state *_state
 //
 // NOTE: BndL>BndU will result in QP problem being recognized as infeasible.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, const double bndu, const xparams _xparams);
+// API: void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, const double bndu);
 void minqpsetbci(minqpstate *state, ae_int_t i, double bndl, double bndu, ae_state *_state) {
    ae_assert(i >= 0 && i < state->n, "MinQPSetBCi: I is outside of [0,N)", _state);
    ae_assert(isfinite(bndl) || isneginf(bndl), "MinQPSetBCi: BndL is NAN or +INF", _state);
@@ -19781,7 +19677,7 @@ void minqpsetbci(minqpstate *state, ae_int_t i, double bndl, double bndu, ae_sta
 //         algorithmic limitations (BLEIC-QP solver is most  precise,  AUL-QP
 //         solver is less precise).
 // ALGLIB: Copyright 22.08.2016 by Sergey Bochkanov
-// API: void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams);
+// API: void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k);
 void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t k, ae_state *_state) {
    ae_frame _frame_block;
    ae_frame_make(_state, &_frame_block);
@@ -19839,7 +19735,7 @@ void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t 
 //         requirements on the input size, so we recommend you to pass sparse
 //         term whose size exactly matches algorithm expectations.
 // ALGLIB: Copyright 22.08.2016 by Sergey Bochkanov
-// API: void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const xparams _xparams);
+// API: void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek);
 void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect, ae_int_t sparsek, RMatrix *densec, ZVector *densect, ae_int_t densek, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -19939,10 +19835,10 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
       sparsecreatecrsinplace(&state->sparsec, _state);
       for (i = 0; i < sparsek; i++) {
          if (sparsect->xZ[i] > 0) {
-            state->cu.xR[i] = _state->v_posinf;
+            state->cu.xR[i] = +INFINITY;
          }
          if (sparsect->xZ[i] < 0) {
-            state->cl.xR[i] = _state->v_neginf;
+            state->cl.xR[i] = -INFINITY;
          }
       }
    }
@@ -19955,11 +19851,11 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
          }
          if (densect->xZ[i] > 0) {
             state->cl.xR[sparsek + i] = densec->xyR[i][n];
-            state->cu.xR[sparsek + i] = _state->v_posinf;
+            state->cu.xR[sparsek + i] = +INFINITY;
             continue;
          }
          if (densect->xZ[i] < 0) {
-            state->cl.xR[sparsek + i] = _state->v_neginf;
+            state->cl.xR[sparsek + i] = -INFINITY;
             state->cu.xR[sparsek + i] = densec->xyR[i][n];
             continue;
          }
@@ -19983,7 +19879,7 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
 // simply accepts constraints in one order (old) and passes them to new  API,
 // now in correct order.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
-// API: void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const xparams _xparams);
+// API: void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek);
 void minqpsetlcmixedlegacy(minqpstate *state, RMatrix *densec, ZVector *densect, ae_int_t densek, sparsematrix *sparsec, ZVector *sparsect, ae_int_t sparsek, ae_state *_state) {
    minqpsetlcmixed(state, sparsec, sparsect, sparsek, densec, densect, densek, _state);
 }
@@ -20019,8 +19915,8 @@ void minqpsetlcmixedlegacy(minqpstate *state, RMatrix *densec, ZVector *densect,
 //         algorithmic limitations (BLEIC-QP solver is most  precise,  AUL-QP
 //         solver is less precise).
 // ALGLIB: Copyright 19.06.2012 by Sergey Bochkanov
-// API: void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams);
-// API: void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams);
+// API: void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
+// API: void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct);
 void minqpsetlc(minqpstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state) {
    ae_frame _frame_block;
    ae_frame_make(_state, &_frame_block);
@@ -20063,7 +19959,7 @@ void minqpsetlc(minqpstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 //     K       -   number  of equality/inequality constraints, K >= 0.  If  K=0
 //                 is specified, A, AL, AU are ignored.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
-// API: void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, const ae_int_t ksparse, const real_2d_array &densea, const ae_int_t kdense, const real_1d_array &al, const real_1d_array &au, const xparams _xparams);
+// API: void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, const ae_int_t ksparse, const real_2d_array &densea, const ae_int_t kdense, const real_1d_array &al, const real_1d_array &au);
 void minqpsetlc2mixed(minqpstate *state, sparsematrix *sparsea, ae_int_t ksparse, RMatrix *densea, ae_int_t kdense, RVector *al, RVector *au, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
@@ -20139,8 +20035,8 @@ void minqpsetlc2mixed(minqpstate *state, sparsematrix *sparsea, ae_int_t ksparse
 //     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A, AL, AU.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
-// API: void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams);
-// API: void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const xparams _xparams);
+// API: void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k);
+// API: void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au);
 void minqpsetlc2dense(minqpstate *state, RMatrix *a, RVector *al, RVector *au, ae_int_t k, ae_state *_state) {
    minqpsetlc2mixed(state, &state->dummysparse, 0, a, k, al, au, _state);
 }
@@ -20165,7 +20061,7 @@ void minqpsetlc2dense(minqpstate *state, RMatrix *a, RVector *al, RVector *au, a
 //     K       -   number  of equality/inequality constraints, K >= 0.  If  K=0
 //                 is specified, A, AL, AU are ignored.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
-// API: void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams);
+// API: void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k);
 void minqpsetlc2(minqpstate *state, sparsematrix *a, RVector *al, RVector *au, ae_int_t k, ae_state *_state) {
    minqpsetlc2mixed(state, a, k, &state->dummyr2, 0, al, au, _state);
 }
@@ -20184,7 +20080,7 @@ void minqpsetlc2(minqpstate *state, sparsematrix *a, RVector *al, RVector *au, a
 //                 * AU=+INF  => one-sided constraint AL <= Ai*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams);
+// API: void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const double al, const double au);
 void minqpaddlc2dense(minqpstate *state, RVector *a, double al, double au, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
@@ -20228,7 +20124,7 @@ void minqpaddlc2dense(minqpstate *state, RVector *a, double al, double au, ae_st
 //                 * AU=+INF  => one-sided constraint AL <= A*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au, const xparams _xparams);
+// API: void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au);
 void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, double al, double au, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -20357,7 +20253,7 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
 //                 * AU=+INF  => one-sided constraint AL <= A*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da, const double al, const double au, const xparams _xparams);
+// API: void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da, const double al, const double au);
 void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, double au, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -20487,7 +20383,7 @@ void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, doubl
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 //      Special thanks to Elvira Illarionova  for  important  suggestions  on
 //      the linearly constrained QP algorithm.
-// API: void minqpoptimize(const minqpstate &state, const xparams _xparams);
+// API: void minqpoptimize(const minqpstate &state);
 void minqpoptimize(minqpstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
@@ -20765,7 +20661,7 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minqpresultsbuf(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams);
+// API: void minqpresultsbuf(const minqpstate &state, real_1d_array &x, minqpreport &rep);
 void minqpresultsbuf(minqpstate *state, RVector *x, minqpreport *rep, ae_state *_state) {
    ae_int_t i;
    ae_assert(state->xs.cnt >= state->n, "MinQPResultsBuf: integrity check failed", _state);
@@ -20822,7 +20718,7 @@ void minqpresultsbuf(minqpstate *state, RVector *x, minqpreport *rep, ae_state *
 //         further improvement is impossible,
 //         X contains best point found so far.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams);
+// API: void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep);
 void minqpresults(minqpstate *state, RVector *x, minqpreport *rep, ae_state *_state) {
    SetVector(x);
    SetObj(minqpreport, rep);
@@ -21099,299 +20995,235 @@ DefClass(minqpstate, )
 //       unboundedness  detected).
 DefClass(minqpreport, DecVal(inneriterationscount) DecVal(outeriterationscount) DecVal(nmv) DecVal(ncholesky) DecVal(terminationtype) DecVar(lagbc) DecVar(laglc))
 
-void minqpsetalgobleic(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+void minqpsetalgobleic(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetalgobleic(ConstT(minqpstate, state), epsg, epsf, epsx, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetalgodenseaul(const minqpstate &state, const double epsx, const double rho, const ae_int_t itscnt, const xparams _xparams) {
+void minqpsetalgodenseaul(const minqpstate &state, const double epsx, const double rho, const ae_int_t itscnt) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetalgodenseaul(ConstT(minqpstate, state), epsx, rho, itscnt, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetalgodenseipm(const minqpstate &state, const double eps, const xparams _xparams) {
+void minqpsetalgodenseipm(const minqpstate &state, const double eps) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetalgodenseipm(ConstT(minqpstate, state), eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetalgosparseipm(const minqpstate &state, const double eps, const xparams _xparams) {
+void minqpsetalgosparseipm(const minqpstate &state, const double eps) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetalgosparseipm(ConstT(minqpstate, state), eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetalgoquickqp(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxouterits, const bool usenewton, const xparams _xparams) {
+void minqpsetalgoquickqp(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxouterits, const bool usenewton) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetalgoquickqp(ConstT(minqpstate, state), epsg, epsf, epsx, maxouterits, usenewton, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpcreate(const ae_int_t n, minqpstate &state, const xparams _xparams) {
+void minqpcreate(const ae_int_t n, minqpstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpcreate(n, ConstT(minqpstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetlinearterm(const minqpstate &state, const real_1d_array &b, const xparams _xparams) {
+void minqpsetlinearterm(const minqpstate &state, const real_1d_array &b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetlinearterm(ConstT(minqpstate, state), ConstT(ae_vector, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const bool isupper, const xparams _xparams) {
+void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetquadraticterm(ConstT(minqpstate, state), ConstT(ae_matrix, a), isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const xparams _xparams) {
+void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a) {
    if (!alglib_impl::ae_is_symmetric(ConstT(ae_matrix, a))) ThrowError("'a' parameter is not symmetric matrix");
    bool isupper = false;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetquadraticterm(ConstT(minqpstate, state), ConstT(ae_matrix, a), isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minqpsetquadratictermsparse(const minqpstate &state, const sparsematrix &a, const bool isupper, const xparams _xparams) {
+void minqpsetquadratictermsparse(const minqpstate &state, const sparsematrix &a, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetquadratictermsparse(ConstT(minqpstate, state), ConstT(sparsematrix, a), isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetstartingpoint(const minqpstate &state, const real_1d_array &x, const xparams _xparams) {
+void minqpsetstartingpoint(const minqpstate &state, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetstartingpoint(ConstT(minqpstate, state), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetorigin(const minqpstate &state, const real_1d_array &xorigin, const xparams _xparams) {
+void minqpsetorigin(const minqpstate &state, const real_1d_array &xorigin) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetorigin(ConstT(minqpstate, state), ConstT(ae_vector, xorigin), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetscale(const minqpstate &state, const real_1d_array &s, const xparams _xparams) {
+void minqpsetscale(const minqpstate &state, const real_1d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetscale(ConstT(minqpstate, state), ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetscaleautodiag(const minqpstate &state, const xparams _xparams) {
+void minqpsetscaleautodiag(const minqpstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetscaleautodiag(ConstT(minqpstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1d_array &bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetbc(ConstT(minqpstate, state), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu, const xparams _xparams) {
+void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetbcall(ConstT(minqpstate, state), bndl, bndu, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, const double bndu, const xparams _xparams) {
+void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, const double bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetbci(ConstT(minqpstate, state), i, bndl, bndu, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetlcsparse(ConstT(minqpstate, state), ConstT(sparsematrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const xparams _xparams) {
+void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetlcmixed(ConstT(minqpstate, state), ConstT(sparsematrix, sparsec), ConstT(ae_vector, sparsect), sparsek, ConstT(ae_matrix, densec), ConstT(ae_vector, densect), densek, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const xparams _xparams) {
+void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetlcmixedlegacy(ConstT(minqpstate, state), ConstT(ae_matrix, densec), ConstT(ae_vector, densect), densek, ConstT(sparsematrix, sparsec), ConstT(ae_vector, sparsect), sparsek, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetlc(ConstT(minqpstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
+void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct) {
    if (c.rows() != ct.length()) ThrowError("Error while calling 'minqpsetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetlc(ConstT(minqpstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, const ae_int_t ksparse, const real_2d_array &densea, const ae_int_t kdense, const real_1d_array &al, const real_1d_array &au, const xparams _xparams) {
+void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, const ae_int_t ksparse, const real_2d_array &densea, const ae_int_t kdense, const real_1d_array &al, const real_1d_array &au) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetlc2mixed(ConstT(minqpstate, state), ConstT(sparsematrix, sparsea), ksparse, ConstT(ae_matrix, densea), kdense, ConstT(ae_vector, al), ConstT(ae_vector, au), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams) {
+void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetlc2dense(ConstT(minqpstate, state), ConstT(ae_matrix, a), ConstT(ae_vector, al), ConstT(ae_vector, au), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const xparams _xparams) {
+void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au) {
    if (a.rows() != al.length() || a.rows() != au.length()) ThrowError("Error while calling 'minqpsetlc2dense': looks like one of arguments has wrong size");
    ae_int_t k = a.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetlc2dense(ConstT(minqpstate, state), ConstT(ae_matrix, a), ConstT(ae_vector, al), ConstT(ae_vector, au), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams) {
+void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpsetlc2(ConstT(minqpstate, state), ConstT(sparsematrix, a), ConstT(ae_vector, al), ConstT(ae_vector, au), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams) {
+void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const double al, const double au) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpaddlc2dense(ConstT(minqpstate, state), ConstT(ae_vector, a), al, au, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au, const xparams _xparams) {
+void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpaddlc2(ConstT(minqpstate, state), ConstT(ae_vector, idxa), ConstT(ae_vector, vala), nnz, al, au, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da, const double al, const double au, const xparams _xparams) {
+void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da, const double al, const double au) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpaddlc2sparsefromdense(ConstT(minqpstate, state), ConstT(ae_vector, da), al, au, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpoptimize(const minqpstate &state, const xparams _xparams) {
+void minqpoptimize(const minqpstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpoptimize(ConstT(minqpstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpresultsbuf(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams) {
+void minqpresultsbuf(const minqpstate &state, real_1d_array &x, minqpreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpresultsbuf(ConstT(minqpstate, state), ConstT(ae_vector, x), ConstT(minqpreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep, const xparams _xparams) {
+void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minqpresults(ConstT(minqpstate, state), ConstT(ae_vector, x), ConstT(minqpreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -21431,7 +21263,7 @@ static const ae_int_t minlm_additers = 5;
 // NOTE: it is not recommended to set large EpsX (say, 0.001). Because LM  is
 //       a second-order method, it performs very precise steps anyway.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minlmsetcond(const minlmstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams);
+// API: void minlmsetcond(const minlmstate &state, const double epsx, const ae_int_t maxits);
 void minlmsetcond(minlmstate *state, double epsx, ae_int_t maxits, ae_state *_state) {
    ae_assert(isfinite(epsx), "MinLMSetCond: EpsX is not finite number!", _state);
    ae_assert(epsx >= 0.0, "MinLMSetCond: negative EpsX!", _state);
@@ -21453,7 +21285,7 @@ void minlmsetcond(minlmstate *state, double epsx, ae_int_t maxits, ae_state *_st
 // provided to MinLMOptimize(). Both Levenberg-Marquardt and internal  L-BFGS
 // iterations are reported.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minlmsetxrep(const minlmstate &state, const bool needxrep, const xparams _xparams);
+// API: void minlmsetxrep(const minlmstate &state, const bool needxrep);
 void minlmsetxrep(minlmstate *state, bool needxrep, ae_state *_state) {
    state->xrep = needxrep;
 }
@@ -21475,7 +21307,7 @@ void minlmsetxrep(minlmstate *state, bool needxrep, ae_state *_state) {
 // intermediate  step  of  preconditioned L-BFGS optimization is incompatible
 // with limits on step size.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minlmsetstpmax(const minlmstate &state, const double stpmax, const xparams _xparams);
+// API: void minlmsetstpmax(const minlmstate &state, const double stpmax);
 void minlmsetstpmax(minlmstate *state, double stpmax, ae_state *_state) {
    ae_assert(isfinite(stpmax), "MinLMSetStpMax: StpMax is not finite!", _state);
    ae_assert(stpmax >= 0.0, "MinLMSetStpMax: StpMax<0!", _state);
@@ -21505,7 +21337,7 @@ void minlmsetstpmax(minlmstate *state, double stpmax, ae_state *_state) {
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
-// API: void minlmsetscale(const minlmstate &state, const real_1d_array &s, const xparams _xparams);
+// API: void minlmsetscale(const minlmstate &state, const real_1d_array &s);
 void minlmsetscale(minlmstate *state, RVector *s, ae_state *_state) {
    ae_int_t i;
    ae_assert(s->cnt >= state->n, "MinLMSetScale: Length(S)<N", _state);
@@ -21540,7 +21372,7 @@ void minlmsetscale(minlmstate *state, RVector *s, ae_state *_state) {
 // * function is evaluated only INSIDE area specified by bound constraints
 //   or at its boundary
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
-// API: void minlmsetbc(const minlmstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams);
+// API: void minlmsetbc(const minlmstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 void minlmsetbc(minlmstate *state, RVector *bndl, RVector *bndu, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
@@ -21598,8 +21430,8 @@ void minlmsetbc(minlmstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 //       Thus, if you can reformulate your problem in such way  this  it  has
 //       only box constraints, it may be beneficial to do so.
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
-// API: void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams);
-// API: void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams);
+// API: void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
+// API: void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct);
 void minlmsetlc(minlmstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
@@ -21683,7 +21515,7 @@ void minlmsetlc(minlmstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 // NOTE: attempt to call this function with unsupported protocol/acceleration
 // combination will result in exception being thrown.
 // ALGLIB: Copyright 14.10.2010 by Sergey Bochkanov
-// API: void minlmsetacctype(const minlmstate &state, const ae_int_t acctype, const xparams _xparams);
+// API: void minlmsetacctype(const minlmstate &state, const ae_int_t acctype);
 void minlmsetacctype(minlmstate *state, ae_int_t acctype, ae_state *_state) {
    ae_assert((acctype == 0 || acctype == 1) || acctype == 2, "MinLMSetAccType: incorrect AccType!", _state);
    if (acctype == 2) {
@@ -21727,7 +21559,7 @@ static void minlm_clearrequestfields(minlmstate *state, ae_state *_state) {
 //                 allocated with MinLMCreateXXX call.
 //     X       -   new starting point.
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
-// API: void minlmrestartfrom(const minlmstate &state, const real_1d_array &x, const xparams _xparams);
+// API: void minlmrestartfrom(const minlmstate &state, const real_1d_array &x);
 void minlmrestartfrom(minlmstate *state, RVector *x, ae_state *_state) {
    ae_assert(x->cnt >= state->n, "MinLMRestartFrom: Length(X)<N!", _state);
    ae_assert(isfinitevector(x, state->n, _state), "MinLMRestartFrom: X contains infinite or NaN values!", _state);
@@ -21787,9 +21619,9 @@ static void minlm_lmprepare(ae_int_t n, ae_int_t m, bool havegrad, minlmstate *s
    ae_vector_set_length(&state->havebndl, n, _state);
    ae_vector_set_length(&state->havebndu, n, _state);
    for (i = 0; i < n; i++) {
-      state->bndl.xR[i] = _state->v_neginf;
+      state->bndl.xR[i] = -INFINITY;
       state->havebndl.xB[i] = false;
-      state->bndu.xR[i] = _state->v_posinf;
+      state->bndu.xR[i] = +INFINITY;
       state->havebndu.xB[i] = false;
    }
 // Prepare scaling matrix
@@ -21861,8 +21693,8 @@ static void minlm_lmprepare(ae_int_t n, ae_int_t m, bool havegrad, minlmstate *s
 //    optimization algorithm makes too large steps which leads  to  overflow,
 //    use MinLMSetStpMax() function to bound algorithm's steps.
 // ALGLIB: Copyright 30.03.2009 by Sergey Bochkanov
-// API: void minlmcreatevj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
-// API: void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
+// API: void minlmcreatevj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state);
+// API: void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state);
 void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state) {
    SetObj(minlmstate, state);
    ae_assert(n >= 1, "MinLMCreateVJ: N<1!", _state);
@@ -21943,8 +21775,8 @@ void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_sta
 //    optimization algorithm makes too large steps which leads  to  overflow,
 //    use MinLMSetStpMax() function to bound algorithm's steps.
 // ALGLIB: Copyright 30.03.2009 by Sergey Bochkanov
-// API: void minlmcreatev(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams);
-// API: void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams);
+// API: void minlmcreatev(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state);
+// API: void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state);
 void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstate *state, ae_state *_state) {
    SetObj(minlmstate, state);
    ae_assert(isfinite(diffstep), "MinLMCreateV: DiffStep is not finite!", _state);
@@ -22029,8 +21861,8 @@ void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstat
 //    optimization algorithm makes too large steps which leads  to  overflow,
 //    use MinLMSetStpMax() function to bound algorithm's steps.
 // ALGLIB: Copyright 30.03.2009 by Sergey Bochkanov
-// API: void minlmcreatefgh(const ae_int_t n, const real_1d_array &x, minlmstate &state, const xparams _xparams);
-// API: void minlmcreatefgh(const real_1d_array &x, minlmstate &state, const xparams _xparams);
+// API: void minlmcreatefgh(const ae_int_t n, const real_1d_array &x, minlmstate &state);
+// API: void minlmcreatefgh(const real_1d_array &x, minlmstate &state);
 void minlmcreatefgh(ae_int_t n, RVector *x, minlmstate *state, ae_state *_state) {
    SetObj(minlmstate, state);
    ae_assert(n >= 1, "MinLMCreateFGH: N<1!", _state);
@@ -22057,8 +21889,8 @@ void minlmcreatefgh(ae_int_t n, RVector *x, minlmstate *state, ae_state *_state)
 //
 // Since ALGLIB 3.3 it is equivalent to MinLMCreateVJ().
 // ALGLIB: Copyright 30.03.2009 by Sergey Bochkanov
-// API: void minlmcreatevgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
-// API: void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
+// API: void minlmcreatevgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state);
+// API: void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state);
 void minlmcreatevgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state) {
    SetObj(minlmstate, state);
    minlmcreatevj(n, m, x, state, _state);
@@ -22068,8 +21900,8 @@ void minlmcreatevgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_st
 // backward  compatibility  only.  We  recommend  to use MinLMCreateVJ, which
 // provides similar, but more consistent and feature-rich interface.
 // ALGLIB: Copyright 30.03.2009 by Sergey Bochkanov
-// API: void minlmcreatefj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
-// API: void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
+// API: void minlmcreatefj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state);
+// API: void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state);
 void minlmcreatefj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state) {
    SetObj(minlmstate, state);
    ae_assert(n >= 1, "MinLMCreateFJ: N<1!", _state);
@@ -22097,8 +21929,8 @@ void minlmcreatefj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_sta
 //
 // Since ALGLIB 3.3 it is equivalent to MinLMCreateFJ().
 // ALGLIB: Copyright 30.03.2009 by Sergey Bochkanov
-// API: void minlmcreatefgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
-// API: void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams);
+// API: void minlmcreatefgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state);
+// API: void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state);
 void minlmcreatefgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_state *_state) {
    SetObj(minlmstate, state);
    minlmcreatefj(n, m, x, state, _state);
@@ -22537,12 +22369,12 @@ lbl_rcomm:
 // This function provides a reverse communication interface, which is not documented or recommended for use.
 // Instead, it is recommended that you use the better-documented API functions minlmoptimize() listed below.
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
-// API: bool minlmiteration(const minlmstate &state, const xparams _xparams = NonTH);
-// API: void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
-// API: void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
-// API: void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
-// API: void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
-// API: void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
+// API: bool minlmiteration(const minlmstate &state);
+// API: void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
+// API: void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
+// API: void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
+// API: void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
+// API: void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool minlmiteration(minlmstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
@@ -23765,7 +23597,7 @@ lbl_rcomm:
 //     points and we compare its prediction with actual value in  the  middle
 //     point
 // ALGLIB: Copyright 15.06.2014 by Sergey Bochkanov
-// API: void minlmoptguardgradient(const minlmstate &state, const double teststep, const xparams _xparams);
+// API: void minlmoptguardgradient(const minlmstate &state, const double teststep);
 void minlmoptguardgradient(minlmstate *state, double teststep, ae_state *_state) {
    ae_assert(isfinite(teststep), "MinLMOptGuardGradient: TestStep contains NaN or INF", _state);
    ae_assert(teststep >= 0.0, "MinLMOptGuardGradient: invalid argument TestStep(TestStep<0)", _state);
@@ -23803,7 +23635,7 @@ void minlmoptguardgradient(minlmstate *state, double teststep, ae_state *_state)
 // Outputs:
 //     rep     -   OptGuard report
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minlmoptguardresults(const minlmstate &state, optguardreport &rep, const xparams _xparams);
+// API: void minlmoptguardresults(const minlmstate &state, optguardreport &rep);
 void minlmoptguardresults(minlmstate *state, optguardreport *rep, ae_state *_state) {
    SetObj(optguardreport, rep);
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
@@ -23816,7 +23648,7 @@ void minlmoptguardresults(minlmstate *state, optguardreport *rep, ae_state *_sta
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
-// API: void minlmresultsbuf(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams);
+// API: void minlmresultsbuf(const minlmstate &state, real_1d_array &x, minlmreport &rep);
 void minlmresultsbuf(minlmstate *state, RVector *x, minlmreport *rep, ae_state *_state) {
    if (x->cnt < state->n) {
       ae_vector_set_length(x, state->n, _state);
@@ -23857,7 +23689,7 @@ void minlmresultsbuf(minlmstate *state, RVector *x, minlmreport *rep, ae_state *
 //                         X contains point which was "current accepted" when
 //                         termination request was submitted.
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
-// API: void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams);
+// API: void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep);
 void minlmresults(minlmstate *state, RVector *x, minlmreport *rep, ae_state *_state) {
    SetVector(x);
    SetObj(minlmreport, rep);
@@ -23884,7 +23716,7 @@ void minlmresults(minlmstate *state, RVector *x, minlmreport *rep, ae_state *_st
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
-// API: void minlmrequesttermination(const minlmstate &state, const xparams _xparams);
+// API: void minlmrequesttermination(const minlmstate &state);
 void minlmrequesttermination(minlmstate *state, ae_state *_state) {
    state->userterminationneeded = true;
 }
@@ -24180,215 +24012,171 @@ DefClass(minlmstate, DecVal(needf) DecVal(needfg) DecVal(needfgh) DecVal(needfi)
 // * NCholesky, number of Cholesky decomposition calculations
 DefClass(minlmreport, DecVal(iterationscount) DecVal(terminationtype) DecVal(nfunc) DecVal(njac) DecVal(ngrad) DecVal(nhess) DecVal(ncholesky))
 
-void minlmsetcond(const minlmstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+void minlmsetcond(const minlmstate &state, const double epsx, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmsetcond(ConstT(minlmstate, state), epsx, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmsetxrep(const minlmstate &state, const bool needxrep, const xparams _xparams) {
+void minlmsetxrep(const minlmstate &state, const bool needxrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmsetxrep(ConstT(minlmstate, state), needxrep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmsetstpmax(const minlmstate &state, const double stpmax, const xparams _xparams) {
+void minlmsetstpmax(const minlmstate &state, const double stpmax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmsetstpmax(ConstT(minlmstate, state), stpmax, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmsetscale(const minlmstate &state, const real_1d_array &s, const xparams _xparams) {
+void minlmsetscale(const minlmstate &state, const real_1d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmsetscale(ConstT(minlmstate, state), ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmsetbc(const minlmstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+void minlmsetbc(const minlmstate &state, const real_1d_array &bndl, const real_1d_array &bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmsetbc(ConstT(minlmstate, state), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmsetlc(ConstT(minlmstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
+void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct) {
    if (c.rows() != ct.length()) ThrowError("Error while calling 'minlmsetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmsetlc(ConstT(minlmstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minlmsetacctype(const minlmstate &state, const ae_int_t acctype, const xparams _xparams) {
+void minlmsetacctype(const minlmstate &state, const ae_int_t acctype) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmsetacctype(ConstT(minlmstate, state), acctype, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmrestartfrom(const minlmstate &state, const real_1d_array &x, const xparams _xparams) {
+void minlmrestartfrom(const minlmstate &state, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmrestartfrom(ConstT(minlmstate, state), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmcreatevj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+void minlmcreatevj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmcreatevj(n, m, ConstT(ae_vector, x), ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmcreatevj(n, m, ConstT(ae_vector, x), ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minlmcreatev(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams) {
+void minlmcreatev(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmcreatev(n, m, ConstT(ae_vector, x), diffstep, ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state, const xparams _xparams) {
+void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmcreatev(n, m, ConstT(ae_vector, x), diffstep, ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minlmcreatefgh(const ae_int_t n, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+void minlmcreatefgh(const ae_int_t n, const real_1d_array &x, minlmstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmcreatefgh(n, ConstT(ae_vector, x), ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlmcreatefgh(const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+void minlmcreatefgh(const real_1d_array &x, minlmstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmcreatefgh(n, ConstT(ae_vector, x), ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minlmcreatevgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+void minlmcreatevgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmcreatevgj(n, m, ConstT(ae_vector, x), ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmcreatevgj(n, m, ConstT(ae_vector, x), ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minlmcreatefj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+void minlmcreatefj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmcreatefj(n, m, ConstT(ae_vector, x), ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmcreatefj(n, m, ConstT(ae_vector, x), ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minlmcreatefgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+void minlmcreatefgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmcreatefgj(n, m, ConstT(ae_vector, x), ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state, const xparams _xparams) {
+void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmcreatefgj(n, m, ConstT(ae_vector, x), ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-bool minlmiteration(const minlmstate &state, const xparams _xparams) {
+bool minlmiteration(const minlmstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::minlmiteration(ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -24428,11 +24216,9 @@ bool minlmiteration(const minlmstate &state, const xparams _xparams) {
 //    Be careful to avoid such errors because there is no way to find them at
 //    compile time - you can see them at runtime only.
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
-void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minlmoptimize()' (fvec is NULL)", &_alglib_env_state);
    while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -24442,11 +24228,9 @@ void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_
    EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
-void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minlmoptimize()' (fvec is NULL)", &_alglib_env_state);
    alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minlmoptimize()' (jac is NULL)", &_alglib_env_state);
    while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state))
@@ -24458,11 +24242,9 @@ void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_
    EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
-void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlmoptimize()' (func is NULL)", &_alglib_env_state);
    alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minlmoptimize()' (grad is NULL)", &_alglib_env_state);
    alglib_impl::ae_assert(hess != NULL, "ALGLIB: error in 'minlmoptimize()' (hess is NULL)", &_alglib_env_state);
@@ -24476,11 +24258,9 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
    EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
-void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlmoptimize()' (func is NULL)", &_alglib_env_state);
    alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minlmoptimize()' (jac is NULL)", &_alglib_env_state);
    while (alglib_impl::minlmiteration(state.c_ptr(), &_alglib_env_state))
@@ -24492,11 +24272,9 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
    EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
-void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlmoptimize()' (func is NULL)", &_alglib_env_state);
    alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minlmoptimize()' (grad is NULL)", &_alglib_env_state);
    alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minlmoptimize()' (jac is NULL)", &_alglib_env_state);
@@ -24511,47 +24289,37 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmoptguardgradient(const minlmstate &state, const double teststep, const xparams _xparams) {
+void minlmoptguardgradient(const minlmstate &state, const double teststep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmoptguardgradient(ConstT(minlmstate, state), teststep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmoptguardresults(const minlmstate &state, optguardreport &rep, const xparams _xparams) {
+void minlmoptguardresults(const minlmstate &state, optguardreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmoptguardresults(ConstT(minlmstate, state), ConstT(optguardreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmresultsbuf(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams) {
+void minlmresultsbuf(const minlmstate &state, real_1d_array &x, minlmreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmresultsbuf(ConstT(minlmstate, state), ConstT(ae_vector, x), ConstT(minlmreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep, const xparams _xparams) {
+void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmresults(ConstT(minlmstate, state), ConstT(ae_vector, x), ConstT(minlmreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmrequesttermination(const minlmstate &state, const xparams _xparams) {
+void minlmrequesttermination(const minlmstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlmrequesttermination(ConstT(minlmstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -24592,7 +24360,7 @@ static const double mincg_gtol = 0.3;
 // Passing EpsG=0, EpsF=0, EpsX=0 and MaxIts=0 (simultaneously) will lead to
 // automatic stopping criterion selection (small EpsX).
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void mincgsetcond(const mincgstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams);
+// API: void mincgsetcond(const mincgstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
 void mincgsetcond(mincgstate *state, double epsg, double epsf, double epsx, ae_int_t maxits, ae_state *_state) {
    ae_assert(isfinite(epsg), "MinCGSetCond: EpsG is not finite number!", _state);
    ae_assert(epsg >= 0.0, "MinCGSetCond: negative EpsG!", _state);
@@ -24636,7 +24404,7 @@ void mincgsetcond(mincgstate *state, double epsg, double epsf, double epsx, ae_i
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
-// API: void mincgsetscale(const mincgstate &state, const real_1d_array &s, const xparams _xparams);
+// API: void mincgsetscale(const mincgstate &state, const real_1d_array &s);
 void mincgsetscale(mincgstate *state, RVector *s, ae_state *_state) {
    ae_int_t i;
    ae_assert(s->cnt >= state->n, "MinCGSetScale: Length(S)<N", _state);
@@ -24656,7 +24424,7 @@ void mincgsetscale(mincgstate *state, RVector *s, ae_state *_state) {
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to MinCGOptimize().
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void mincgsetxrep(const mincgstate &state, const bool needxrep, const xparams _xparams);
+// API: void mincgsetxrep(const mincgstate &state, const bool needxrep);
 void mincgsetxrep(mincgstate *state, bool needxrep, ae_state *_state) {
    state->xrep = needxrep;
 }
@@ -24685,7 +24453,7 @@ void mincgsetdrep(mincgstate *state, bool needdrep, ae_state *_state) {
 //                 * 0     DY (Dai and Yuan) algorithm
 //                 * 1     Hybrid DY-HS algorithm
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void mincgsetcgtype(const mincgstate &state, const ae_int_t cgtype, const xparams _xparams);
+// API: void mincgsetcgtype(const mincgstate &state, const ae_int_t cgtype);
 void mincgsetcgtype(mincgstate *state, ae_int_t cgtype, ae_state *_state) {
    ae_assert(cgtype >= -1 && cgtype <= 1, "MinCGSetCGType: incorrect CGType!", _state);
    if (cgtype == -1) {
@@ -24707,7 +24475,7 @@ void mincgsetcgtype(mincgstate *state, ae_int_t cgtype, ae_state *_state) {
 // steps  that  are  too  large  (and  therefore  expose  us  to the possible
 // overflow) without actually calculating function value at the x+stp*d.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void mincgsetstpmax(const mincgstate &state, const double stpmax, const xparams _xparams);
+// API: void mincgsetstpmax(const mincgstate &state, const double stpmax);
 void mincgsetstpmax(mincgstate *state, double stpmax, ae_state *_state) {
    ae_assert(isfinite(stpmax), "MinCGSetStpMax: StpMax is not finite!", _state);
    ae_assert(stpmax >= 0.0, "MinCGSetStpMax: StpMax<0!", _state);
@@ -24722,7 +24490,7 @@ void mincgsetstpmax(mincgstate *state, double stpmax, ae_state *_state) {
 // NOTE:  you  can  change  preconditioner  "on  the  fly",  during algorithm
 // iterations.
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void mincgsetprecdefault(const mincgstate &state, const xparams _xparams);
+// API: void mincgsetprecdefault(const mincgstate &state);
 void mincgsetprecdefault(mincgstate *state, ae_state *_state) {
    state->prectype = 0;
    state->innerresetneeded = true;
@@ -24759,7 +24527,7 @@ void mincgsetprecdiagfast(mincgstate *state, RVector *d, ae_state *_state) {
 //
 // NOTE 3: you should pass diagonal of approximate Hessian - NOT ITS INVERSE.
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void mincgsetprecdiag(const mincgstate &state, const real_1d_array &d, const xparams _xparams);
+// API: void mincgsetprecdiag(const mincgstate &state, const real_1d_array &d);
 void mincgsetprecdiag(mincgstate *state, RVector *d, ae_state *_state) {
    ae_int_t i;
    ae_assert(d->cnt >= state->n, "MinCGSetPrecDiag: D is too short", _state);
@@ -24790,7 +24558,7 @@ void mincgsetprecdiag(mincgstate *state, RVector *d, ae_state *_state) {
 // NOTE:  you  can  change  preconditioner  "on  the  fly",  during algorithm
 // iterations.
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void mincgsetprecscale(const mincgstate &state, const xparams _xparams);
+// API: void mincgsetprecscale(const mincgstate &state);
 void mincgsetprecscale(mincgstate *state, ae_state *_state) {
    state->prectype = 3;
    state->innerresetneeded = true;
@@ -24921,7 +24689,7 @@ void mincgsetprecvarpart(mincgstate *state, RVector *d2, ae_state *_state) {
 //     Stp     -   initial estimate of the step length.
 //                 Can be zero (no estimate).
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
-// API: void mincgsuggeststep(const mincgstate &state, const double stp, const xparams _xparams);
+// API: void mincgsuggeststep(const mincgstate &state, const double stp);
 void mincgsuggeststep(mincgstate *state, double stp, ae_state *_state) {
    ae_assert(isfinite(stp), "MinCGSuggestStep: Stp is infinite or NAN", _state);
    ae_assert(stp >= 0.0, "MinCGSuggestStep: Stp<0", _state);
@@ -24971,7 +24739,7 @@ static void mincg_clearrequestfields(mincgstate *state, ae_state *_state) {
 //     State   -   structure used to store algorithm state.
 //     X       -   new starting point.
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
-// API: void mincgrestartfrom(const mincgstate &state, const real_1d_array &x, const xparams _xparams);
+// API: void mincgrestartfrom(const mincgstate &state, const real_1d_array &x);
 void mincgrestartfrom(mincgstate *state, RVector *x, ae_state *_state) {
    ae_assert(x->cnt >= state->n, "MinCGRestartFrom: Length(X)<N!", _state);
    ae_assert(isfinitevector(x, state->n, _state), "MinCGCreate: X contains infinite or NaN values!", _state);
@@ -25058,8 +24826,8 @@ static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *sta
 // Outputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 25.03.2010 by Sergey Bochkanov
-// API: void mincgcreate(const ae_int_t n, const real_1d_array &x, mincgstate &state, const xparams _xparams);
-// API: void mincgcreate(const real_1d_array &x, mincgstate &state, const xparams _xparams);
+// API: void mincgcreate(const ae_int_t n, const real_1d_array &x, mincgstate &state);
+// API: void mincgcreate(const real_1d_array &x, mincgstate &state);
 void mincgcreate(ae_int_t n, RVector *x, mincgstate *state, ae_state *_state) {
    SetObj(mincgstate, state);
    ae_assert(n >= 1, "MinCGCreate: N too small!", _state);
@@ -25107,8 +24875,8 @@ void mincgcreate(ae_int_t n, RVector *x, mincgstate *state, ae_state *_state) {
 //    dimensional problems only, and to implement analytical gradient as soon
 //    as possible.
 // ALGLIB: Copyright 16.05.2011 by Sergey Bochkanov
-// API: void mincgcreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams);
-// API: void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams);
+// API: void mincgcreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, mincgstate &state);
+// API: void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &state);
 void mincgcreatef(ae_int_t n, RVector *x, double diffstep, mincgstate *state, ae_state *_state) {
    SetObj(mincgstate, state);
    ae_assert(n >= 1, "MinCGCreateF: N too small!", _state);
@@ -25213,9 +24981,9 @@ static double mincg_preconditionedmultiply2(mincgstate *state, RVector *x, RVect
 // This function provides a reverse communication interface, which is not documented or recommended for use.
 // Instead, it is recommended that you use the better-documented API functions mincgoptimize() listed below.
 // ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
-// API: bool mincgiteration(const mincgstate &state, const xparams _xparams = NonTH);
-// API: void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
-// API: void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
+// API: bool mincgiteration(const mincgstate &state);
+// API: void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
+// API: void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool mincgiteration(mincgstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
@@ -25799,7 +25567,7 @@ lbl_rcomm:
 //     points and we compare its prediction with actual value in  the  middle
 //     point
 // ALGLIB: Copyright 15.06.2014 by Sergey Bochkanov
-// API: void mincgoptguardgradient(const mincgstate &state, const double teststep, const xparams _xparams);
+// API: void mincgoptguardgradient(const mincgstate &state, const double teststep);
 void mincgoptguardgradient(mincgstate *state, double teststep, ae_state *_state) {
    ae_assert(isfinite(teststep), "MinCGOptGuardGradient: TestStep contains NaN or INF", _state);
    ae_assert(teststep >= 0.0, "MinCGOptGuardGradient: invalid argument TestStep(TestStep<0)", _state);
@@ -25865,8 +25633,8 @@ void mincgoptguardgradient(mincgstate *state, double teststep, ae_state *_state)
 // flag (and allows you to continue optimization). When optimization is done,
 // you can study OptGuard result.
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void mincgoptguardsmoothness(const mincgstate &state, const ae_int_t level, const xparams _xparams);
-// API: void mincgoptguardsmoothness(const mincgstate &state, const xparams _xparams);
+// API: void mincgoptguardsmoothness(const mincgstate &state, const ae_int_t level);
+// API: void mincgoptguardsmoothness(const mincgstate &state);
 void mincgoptguardsmoothness(mincgstate *state, ae_int_t level, ae_state *_state) {
    ae_assert(level == 0 || level == 1, "MinCGOptGuardSmoothness: unexpected value of level parameter", _state);
    state->smoothnessguardlevel = level;
@@ -25938,7 +25706,7 @@ void mincgoptguardsmoothness(mincgstate *state, ae_int_t level, ae_state *_state
 //       our test examples  (measured  with  multiple  restarts  from  random
 //       points), and to have exactly 0% false positives.
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void mincgoptguardresults(const mincgstate &state, optguardreport &rep, const xparams _xparams);
+// API: void mincgoptguardresults(const mincgstate &state, optguardreport &rep);
 void mincgoptguardresults(mincgstate *state, optguardreport *rep, ae_state *_state) {
    SetObj(optguardreport, rep);
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
@@ -25983,7 +25751,7 @@ void mincgoptguardresults(mincgstate *state, optguardreport *rep, ae_state *_sta
 //     strrep  -   C1 test #0 "strong" report
 //     lngrep  -   C1 test #0 "long" report
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
+// API: void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep);
 void mincgoptguardnonc1test0results(mincgstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
    SetObj(optguardnonc1test0report, strrep);
    SetObj(optguardnonc1test0report, lngrep);
@@ -26037,7 +25805,7 @@ void mincgoptguardnonc1test0results(mincgstate *state, optguardnonc1test0report 
 //     strrep  -   C1 test #1 "strong" report
 //     lngrep  -   C1 test #1 "long" report
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
+// API: void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep);
 void mincgoptguardnonc1test1results(mincgstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
    SetObj(optguardnonc1test1report, strrep);
    SetObj(optguardnonc1test1report, lngrep);
@@ -26052,7 +25820,7 @@ void mincgoptguardnonc1test1results(mincgstate *state, optguardnonc1test1report 
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
 // ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
-// API: void mincgresultsbuf(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams);
+// API: void mincgresultsbuf(const mincgstate &state, real_1d_array &x, mincgreport &rep);
 void mincgresultsbuf(mincgstate *state, RVector *x, mincgreport *rep, ae_state *_state) {
    if (x->cnt < state->n) {
       ae_vector_set_length(x, state->n, _state);
@@ -26089,7 +25857,7 @@ void mincgresultsbuf(mincgstate *state, RVector *x, mincgreport *rep, ae_state *
 //                 * Rep.IterationsCount contains iterations count
 //                 * NFEV countains number of function calculations
 // ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
-// API: void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams);
+// API: void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep);
 void mincgresults(mincgstate *state, RVector *x, mincgreport *rep, ae_state *_state) {
    SetVector(x);
    SetObj(mincgreport, rep);
@@ -26116,7 +25884,7 @@ void mincgresults(mincgstate *state, RVector *x, mincgreport *rep, ae_state *_st
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
-// API: void mincgrequesttermination(const mincgstate &state, const xparams _xparams);
+// API: void mincgrequesttermination(const mincgstate &state);
 void mincgrequesttermination(mincgstate *state, ae_state *_state) {
    state->userterminationneeded = true;
 }
@@ -26286,141 +26054,111 @@ DefClass(mincgstate, DecVal(needf) DecVal(needfg) DecVal(xupdated) DecVal(f) Dec
 // Other fields of this structure are not documented and should not be used!
 DefClass(mincgreport, DecVal(iterationscount) DecVal(nfev) DecVal(terminationtype))
 
-void mincgsetcond(const mincgstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+void mincgsetcond(const mincgstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgsetcond(ConstT(mincgstate, state), epsg, epsf, epsx, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgsetscale(const mincgstate &state, const real_1d_array &s, const xparams _xparams) {
+void mincgsetscale(const mincgstate &state, const real_1d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgsetscale(ConstT(mincgstate, state), ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgsetxrep(const mincgstate &state, const bool needxrep, const xparams _xparams) {
+void mincgsetxrep(const mincgstate &state, const bool needxrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgsetxrep(ConstT(mincgstate, state), needxrep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgsetcgtype(const mincgstate &state, const ae_int_t cgtype, const xparams _xparams) {
+void mincgsetcgtype(const mincgstate &state, const ae_int_t cgtype) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgsetcgtype(ConstT(mincgstate, state), cgtype, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgsetstpmax(const mincgstate &state, const double stpmax, const xparams _xparams) {
+void mincgsetstpmax(const mincgstate &state, const double stpmax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgsetstpmax(ConstT(mincgstate, state), stpmax, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgsetprecdefault(const mincgstate &state, const xparams _xparams) {
+void mincgsetprecdefault(const mincgstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgsetprecdefault(ConstT(mincgstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgsetprecdiag(const mincgstate &state, const real_1d_array &d, const xparams _xparams) {
+void mincgsetprecdiag(const mincgstate &state, const real_1d_array &d) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgsetprecdiag(ConstT(mincgstate, state), ConstT(ae_vector, d), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgsetprecscale(const mincgstate &state, const xparams _xparams) {
+void mincgsetprecscale(const mincgstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgsetprecscale(ConstT(mincgstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgsuggeststep(const mincgstate &state, const double stp, const xparams _xparams) {
+void mincgsuggeststep(const mincgstate &state, const double stp) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgsuggeststep(ConstT(mincgstate, state), stp, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgrestartfrom(const mincgstate &state, const real_1d_array &x, const xparams _xparams) {
+void mincgrestartfrom(const mincgstate &state, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgrestartfrom(ConstT(mincgstate, state), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgcreate(const ae_int_t n, const real_1d_array &x, mincgstate &state, const xparams _xparams) {
+void mincgcreate(const ae_int_t n, const real_1d_array &x, mincgstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgcreate(n, ConstT(ae_vector, x), ConstT(mincgstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void mincgcreate(const real_1d_array &x, mincgstate &state, const xparams _xparams) {
+void mincgcreate(const real_1d_array &x, mincgstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgcreate(n, ConstT(ae_vector, x), ConstT(mincgstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void mincgcreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams) {
+void mincgcreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, mincgstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgcreatef(n, ConstT(ae_vector, x), diffstep, ConstT(mincgstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &state, const xparams _xparams) {
+void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgcreatef(n, ConstT(ae_vector, x), diffstep, ConstT(mincgstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-bool mincgiteration(const mincgstate &state, const xparams _xparams) {
+bool mincgiteration(const mincgstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::mincgiteration(ConstT(mincgstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -26471,11 +26209,9 @@ bool mincgiteration(const mincgstate &state, const xparams _xparams) {
 //    thrown. Either  you  did  not  pass  gradient when it WAS needed or you
 //    passed gradient when it was NOT needed.
 // ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
-void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'mincgoptimize()' (func is NULL)", &_alglib_env_state);
    while (alglib_impl::mincgiteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -26485,11 +26221,9 @@ void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, doubl
    EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
-void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'mincgoptimize()' (grad is NULL)", &_alglib_env_state);
    while (alglib_impl::mincgiteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -26500,85 +26234,67 @@ void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, doubl
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgoptguardgradient(const mincgstate &state, const double teststep, const xparams _xparams) {
+void mincgoptguardgradient(const mincgstate &state, const double teststep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgoptguardgradient(ConstT(mincgstate, state), teststep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgoptguardsmoothness(const mincgstate &state, const ae_int_t level, const xparams _xparams) {
+void mincgoptguardsmoothness(const mincgstate &state, const ae_int_t level) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgoptguardsmoothness(ConstT(mincgstate, state), level, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void mincgoptguardsmoothness(const mincgstate &state, const xparams _xparams) {
+void mincgoptguardsmoothness(const mincgstate &state) {
    ae_int_t level = 1;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgoptguardsmoothness(ConstT(mincgstate, state), level, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void mincgoptguardresults(const mincgstate &state, optguardreport &rep, const xparams _xparams) {
+void mincgoptguardresults(const mincgstate &state, optguardreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgoptguardresults(ConstT(mincgstate, state), ConstT(optguardreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
+void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgoptguardnonc1test0results(ConstT(mincgstate, state), ConstT(optguardnonc1test0report, strrep), ConstT(optguardnonc1test0report, lngrep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
+void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgoptguardnonc1test1results(ConstT(mincgstate, state), ConstT(optguardnonc1test1report, strrep), ConstT(optguardnonc1test1report, lngrep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgresultsbuf(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams) {
+void mincgresultsbuf(const mincgstate &state, real_1d_array &x, mincgreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgresultsbuf(ConstT(mincgstate, state), ConstT(ae_vector, x), ConstT(mincgreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep, const xparams _xparams) {
+void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgresults(ConstT(mincgstate, state), ConstT(ae_vector, x), ConstT(mincgreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void mincgrequesttermination(const mincgstate &state, const xparams _xparams) {
+void mincgrequesttermination(const mincgstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::mincgrequesttermination(ConstT(mincgstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -27069,7 +26785,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
             subsolver->d0.xR[offsslackec + 2 * i + 1] = fabs(v);
          }
       } else {
-         subsolver->cural.xR[i] = _state->v_neginf;
+         subsolver->cural.xR[i] = -INFINITY;
          subsolver->curau.xR[i] = -v;
          subsolver->curbndl.xR[offsslackic + (i - nec)] = 0.0;
          subsolver->curbndu.xR[offsslackic + (i - nec)] = rmax2(v, 0.0, _state);
@@ -27128,7 +26844,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          }
       } else {
       // Inequality constraint
-         subsolver->cural.xR[subsolver->sparseefflc.m + i] = _state->v_neginf;
+         subsolver->cural.xR[subsolver->sparseefflc.m + i] = -INFINITY;
          subsolver->curau.xR[subsolver->sparseefflc.m + i] = -v;
          subsolver->curbndl.xR[offsslacknlic + (i - nlec)] = 0.0;
          subsolver->curbndu.xR[offsslacknlic + (i - nlec)] = rmax2(v, 0.0, _state);
@@ -32761,7 +32477,7 @@ static const ae_int_t minlp_alllogicalsbasis = 0;
 //                 * default value is zero
 //                 Algorithm stops when relative error is less than Eps.
 // ALGLIB: Copyright 08.11.2020 by Sergey Bochkanov
-// API: void minlpsetalgodss(const minlpstate &state, const double eps, const xparams _xparams);
+// API: void minlpsetalgodss(const minlpstate &state, const double eps);
 void minlpsetalgodss(minlpstate *state, double eps, ae_state *_state) {
    ae_assert(isfinite(eps), "MinLPSetAlgoDSS: Eps is not finite number", _state);
    ae_assert(eps >= 0.0, "MinLPSetAlgoDSS: Eps<0", _state);
@@ -32793,8 +32509,8 @@ void minlpsetalgodss(minlpstate *state, double eps, ae_state *_state) {
 //                 Algorithm  stops  when  primal  error  AND  dual error AND
 //                 duality gap are less than Eps.
 // ALGLIB: Copyright 08.11.2020 by Sergey Bochkanov
-// API: void minlpsetalgoipm(const minlpstate &state, const double eps, const xparams _xparams);
-// API: void minlpsetalgoipm(const minlpstate &state, const xparams _xparams);
+// API: void minlpsetalgoipm(const minlpstate &state, const double eps);
+// API: void minlpsetalgoipm(const minlpstate &state);
 void minlpsetalgoipm(minlpstate *state, double eps, ae_state *_state) {
    ae_assert(isfinite(eps), "MinLPSetAlgoIPM: Eps is not finite number", _state);
    ae_assert(eps >= 0.0, "MinLPSetAlgoIPM: Eps<0", _state);
@@ -32811,7 +32527,7 @@ void minlpsetalgoipm(minlpstate *state, double eps, ae_state *_state) {
 //     State   -   structure which stores algorithm state
 //     C       -   cost term, array[N].
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minlpsetcost(const minlpstate &state, const real_1d_array &c, const xparams _xparams);
+// API: void minlpsetcost(const minlpstate &state, const real_1d_array &c);
 void minlpsetcost(minlpstate *state, RVector *c, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
@@ -32838,7 +32554,7 @@ void minlpsetcost(minlpstate *state, RVector *c, ae_state *_state) {
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minlpsetscale(const minlpstate &state, const real_1d_array &s, const xparams _xparams);
+// API: void minlpsetscale(const minlpstate &state, const real_1d_array &s);
 void minlpsetscale(minlpstate *state, RVector *s, ae_state *_state) {
    ae_int_t i;
    ae_assert(s->cnt >= state->n, "MinLPSetScale: Length(S)<N", _state);
@@ -32887,7 +32603,7 @@ void minlpsetscale(minlpstate *state, RVector *s, ae_state *_state) {
 //
 // NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams);
+// API: void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 void minlpsetbc(minlpstate *state, RVector *bndl, RVector *bndu, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
@@ -32937,7 +32653,7 @@ void minlpsetbc(minlpstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 //
 // NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu, const xparams _xparams);
+// API: void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu);
 void minlpsetbcall(minlpstate *state, double bndl, double bndu, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
@@ -32984,7 +32700,7 @@ void minlpsetbcall(minlpstate *state, double bndl, double bndu, ae_state *_state
 //
 // NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, const double bndu, const xparams _xparams);
+// API: void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, const double bndu);
 void minlpsetbci(minlpstate *state, ae_int_t i, double bndl, double bndu, ae_state *_state) {
    ae_int_t n;
    n = state->n;
@@ -33027,8 +32743,8 @@ void minlpsetbci(minlpstate *state, ae_int_t i, double bndl, double bndu, ae_sta
 //     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A, AL, AU.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams);
-// API: void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const xparams _xparams);
+// API: void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k);
+// API: void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au);
 void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, ae_int_t k, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -33099,7 +32815,7 @@ void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, a
 //     K       -   number  of equality/inequality constraints, K >= 0.  If  K=0
 //                 is specified, A, AL, AU are ignored.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams);
+// API: void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k);
 void minlpsetlc2(minlpstate *state, sparsematrix *a, RVector *al, RVector *au, ae_int_t k, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
@@ -33154,8 +32870,8 @@ void minlpsetlc2(minlpstate *state, sparsematrix *a, RVector *al, RVector *au, a
 //     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A and CT.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams);
-// API: void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const xparams _xparams);
+// API: void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const ae_int_t k);
+// API: void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct);
 void minlpsetlc(minlpstate *state, RMatrix *a, ZVector *ct, ae_int_t k, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -33181,11 +32897,11 @@ void minlpsetlc(minlpstate *state, RMatrix *a, ZVector *ct, ae_int_t k, ae_state
    for (i = 0; i < k; i++) {
       if (ct->xZ[i] > 0) {
          al.xR[i] = a->xyR[i][n];
-         au.xR[i] = _state->v_posinf;
+         au.xR[i] = +INFINITY;
          continue;
       }
       if (ct->xZ[i] < 0) {
-         al.xR[i] = _state->v_neginf;
+         al.xR[i] = -INFINITY;
          au.xR[i] = a->xyR[i][n];
          continue;
       }
@@ -33243,7 +32959,7 @@ static void minlp_clearreportfields(minlpstate *state, ae_state *_state) {
 // Outputs:
 //     State   -   optimizer in the default state
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minlpcreate(const ae_int_t n, minlpstate &state, const xparams _xparams);
+// API: void minlpcreate(const ae_int_t n, minlpstate &state);
 void minlpcreate(ae_int_t n, minlpstate *state, ae_state *_state) {
    ae_int_t i;
    SetObj(minlpstate, state);
@@ -33290,7 +33006,7 @@ void minlpcreate(ae_int_t n, minlpstate *state, ae_state *_state) {
 //                 * AU=+INF  => one-sided constraint AL <= A*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minlpaddlc2(const minlpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au, const xparams _xparams);
+// API: void minlpaddlc2(const minlpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au);
 void minlpaddlc2(minlpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, double al, double au, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -33418,7 +33134,7 @@ void minlpaddlc2(minlpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
 //                 * AU=+INF  => one-sided constraint AL <= Ai*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams);
+// API: void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const double al, const double au);
 void minlpaddlc2dense(minlpstate *state, RVector *a, double al, double au, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
@@ -33449,7 +33165,7 @@ void minlpaddlc2dense(minlpstate *state, RVector *a, double al, double au, ae_st
 // You should use minlpresults() function to access results  after  calls  to
 // this function.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
-// API: void minlpoptimize(const minlpstate &state, const xparams _xparams);
+// API: void minlpoptimize(const minlpstate &state);
 void minlpoptimize(minlpstate *state, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -33612,7 +33328,7 @@ void minlpoptimize(minlpstate *state, ae_state *_state) {
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minlpresultsbuf(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams);
+// API: void minlpresultsbuf(const minlpstate &state, real_1d_array &x, minlpreport &rep);
 void minlpresultsbuf(minlpstate *state, RVector *x, minlpreport *rep, ae_state *_state) {
    ae_int_t i;
    ae_int_t repn;
@@ -33665,7 +33381,7 @@ void minlpresultsbuf(minlpstate *state, RVector *x, minlpreport *rep, ae_state *
 //                 *  1..4 successful completion
 //                 *  5    MaxIts steps was taken
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams);
+// API: void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep);
 void minlpresults(minlpstate *state, RVector *x, minlpreport *rep, ae_state *_state) {
    SetVector(x);
    SetObj(minlpreport, rep);
@@ -33846,181 +33562,143 @@ DefClass(minlpstate, )
 // * Ai is an I-th row of linear constraint matrix
 DefClass(minlpreport, DecVal(f) DecVar(lagbc) DecVar(laglc) DecVar(y) DecVar(stats) DecVal(primalerror) DecVal(dualerror) DecVal(slackerror) DecVal(iterationscount) DecVal(terminationtype))
 
-void minlpsetalgodss(const minlpstate &state, const double eps, const xparams _xparams) {
+void minlpsetalgodss(const minlpstate &state, const double eps) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetalgodss(ConstT(minlpstate, state), eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlpsetalgoipm(const minlpstate &state, const double eps, const xparams _xparams) {
+void minlpsetalgoipm(const minlpstate &state, const double eps) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetalgoipm(ConstT(minlpstate, state), eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlpsetalgoipm(const minlpstate &state, const xparams _xparams) {
+void minlpsetalgoipm(const minlpstate &state) {
    double eps = 0.0;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetalgoipm(ConstT(minlpstate, state), eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minlpsetcost(const minlpstate &state, const real_1d_array &c, const xparams _xparams) {
+void minlpsetcost(const minlpstate &state, const real_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetcost(ConstT(minlpstate, state), ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlpsetscale(const minlpstate &state, const real_1d_array &s, const xparams _xparams) {
+void minlpsetscale(const minlpstate &state, const real_1d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetscale(ConstT(minlpstate, state), ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1d_array &bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetbc(ConstT(minlpstate, state), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu, const xparams _xparams) {
+void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetbcall(ConstT(minlpstate, state), bndl, bndu, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, const double bndu, const xparams _xparams) {
+void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, const double bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetbci(ConstT(minlpstate, state), i, bndl, bndu, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams) {
+void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetlc2dense(ConstT(minlpstate, state), ConstT(ae_matrix, a), ConstT(ae_vector, al), ConstT(ae_vector, au), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const xparams _xparams) {
+void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au) {
    if (a.rows() != al.length() || a.rows() != au.length()) ThrowError("Error while calling 'minlpsetlc2dense': looks like one of arguments has wrong size");
    ae_int_t k = a.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetlc2dense(ConstT(minlpstate, state), ConstT(ae_matrix, a), ConstT(ae_vector, al), ConstT(ae_vector, au), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k, const xparams _xparams) {
+void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetlc2(ConstT(minlpstate, state), ConstT(sparsematrix, a), ConstT(ae_vector, al), ConstT(ae_vector, au), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetlc(ConstT(minlpstate, state), ConstT(ae_matrix, a), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const xparams _xparams) {
+void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct) {
    if (a.rows() != ct.length()) ThrowError("Error while calling 'minlpsetlc': looks like one of arguments has wrong size");
    ae_int_t k = a.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpsetlc(ConstT(minlpstate, state), ConstT(ae_matrix, a), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minlpcreate(const ae_int_t n, minlpstate &state, const xparams _xparams) {
+void minlpcreate(const ae_int_t n, minlpstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpcreate(n, ConstT(minlpstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlpaddlc2(const minlpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au, const xparams _xparams) {
+void minlpaddlc2(const minlpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpaddlc2(ConstT(minlpstate, state), ConstT(ae_vector, idxa), ConstT(ae_vector, vala), nnz, al, au, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const double al, const double au, const xparams _xparams) {
+void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const double al, const double au) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpaddlc2dense(ConstT(minlpstate, state), ConstT(ae_vector, a), al, au, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlpoptimize(const minlpstate &state, const xparams _xparams) {
+void minlpoptimize(const minlpstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpoptimize(ConstT(minlpstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlpresultsbuf(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams) {
+void minlpresultsbuf(const minlpstate &state, real_1d_array &x, minlpreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpresultsbuf(ConstT(minlpstate, state), ConstT(ae_vector, x), ConstT(minlpreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep, const xparams _xparams) {
+void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlpresults(ConstT(minlpstate, state), ConstT(ae_vector, x), ConstT(minlpreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -34398,7 +34076,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          subsolver->curbndu.xR[offsslackec + 2 * i + 0] = fabs(v);
          subsolver->curbndu.xR[offsslackec + 2 * i + 1] = fabs(v);
       } else {
-         subsolver->cural.xR[i] = _state->v_neginf;
+         subsolver->cural.xR[i] = -INFINITY;
          subsolver->curau.xR[i] = -v;
          subsolver->curbndl.xR[offsslackic + (i - nec)] = 0.0;
          subsolver->curbndu.xR[offsslackic + (i - nec)] = rmax2(v, 0.0, _state);
@@ -34449,7 +34127,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          subsolver->curbndu.xR[offsslacknlec + 2 * i + 1] = fabs(v);
       } else {
       // Inequality constraint
-         subsolver->cural.xR[subsolver->sparseefflc.m + i] = _state->v_neginf;
+         subsolver->cural.xR[subsolver->sparseefflc.m + i] = -INFINITY;
          subsolver->curau.xR[subsolver->sparseefflc.m + i] = -v;
          subsolver->curbndl.xR[offsslacknlic + (i - nlec)] = 0.0;
          subsolver->curbndu.xR[offsslacknlic + (i - nlec)] = rmax2(v, 0.0, _state);
@@ -36561,7 +36239,7 @@ static const double minnlc_regprec = 1.0E-6;
 //          possible   that  algorithm  will  evaluate  function  outside  of
 //          feasible area!
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-// API: void minnlcsetbc(const minnlcstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams);
+// API: void minnlcsetbc(const minnlcstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 void minnlcsetbc(minnlcstate *state, RVector *bndl, RVector *bndu, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
@@ -36609,8 +36287,8 @@ void minnlcsetbc(minnlcstate *state, RVector *bndl, RVector *bndu, ae_state *_st
 //         possible   that  algorithm  will  evaluate  function  outside   of
 //         feasible area!
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-// API: void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams);
-// API: void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams);
+// API: void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
+// API: void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct);
 void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
@@ -36701,7 +36379,7 @@ void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_sta
 //         with unit scale)  or  has  magnitude approximately equal to 1/S[i]
 //         (where S is a scale set by MinNLCSetScale() function).
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-// API: void minnlcsetnlc(const minnlcstate &state, const ae_int_t nlec, const ae_int_t nlic, const xparams _xparams);
+// API: void minnlcsetnlc(const minnlcstate &state, const ae_int_t nlec, const ae_int_t nlic);
 void minnlcsetnlc(minnlcstate *state, ae_int_t nlec, ae_int_t nlic, ae_state *_state) {
    ae_assert(nlec >= 0, "MinNLCSetNLC: NLEC<0", _state);
    ae_assert(nlic >= 0, "MinNLCSetNLC: NLIC<0", _state);
@@ -36728,7 +36406,7 @@ void minnlcsetnlc(minnlcstate *state, ae_int_t nlec, ae_int_t nlic, ae_state *_s
 // Passing EpsX=0 and MaxIts=0 (simultaneously) will lead to automatic
 // selection of the stopping condition.
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-// API: void minnlcsetcond(const minnlcstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams);
+// API: void minnlcsetcond(const minnlcstate &state, const double epsx, const ae_int_t maxits);
 void minnlcsetcond(minnlcstate *state, double epsx, ae_int_t maxits, ae_state *_state) {
    ae_assert(isfinite(epsx), "MinNLCSetCond: EpsX is not finite number", _state);
    ae_assert(epsx >= 0.0, "MinNLCSetCond: negative EpsX", _state);
@@ -36756,7 +36434,7 @@ void minnlcsetcond(minnlcstate *state, double epsx, ae_int_t maxits, ae_state *_
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-// API: void minnlcsetscale(const minnlcstate &state, const real_1d_array &s, const xparams _xparams);
+// API: void minnlcsetscale(const minnlcstate &state, const real_1d_array &s);
 void minnlcsetscale(minnlcstate *state, RVector *s, ae_state *_state) {
    ae_int_t i;
    ae_assert(s->cnt >= state->n, "MinNLCSetScale: Length(S)<N", _state);
@@ -36795,7 +36473,7 @@ void minnlcsetscale(minnlcstate *state, RVector *s, ae_state *_state) {
 // Inputs:
 //     State   -   structure stores algorithm state
 // ALGLIB: Copyright 26.09.2014 by Sergey Bochkanov
-// API: void minnlcsetprecinexact(const minnlcstate &state, const xparams _xparams);
+// API: void minnlcsetprecinexact(const minnlcstate &state);
 void minnlcsetprecinexact(minnlcstate *state, ae_state *_state) {
    state->updatefreq = 0;
    state->prectype = 1;
@@ -36842,7 +36520,7 @@ void minnlcsetprecinexact(minnlcstate *state, ae_state *_state) {
 //                 UpdateFreq iterations. Recommended value: 10 or higher.
 //                 Zero value means that good default value will be used.
 // ALGLIB: Copyright 26.09.2014 by Sergey Bochkanov
-// API: void minnlcsetprecexactlowrank(const minnlcstate &state, const ae_int_t updatefreq, const xparams _xparams);
+// API: void minnlcsetprecexactlowrank(const minnlcstate &state, const ae_int_t updatefreq);
 void minnlcsetprecexactlowrank(minnlcstate *state, ae_int_t updatefreq, ae_state *_state) {
    ae_assert(updatefreq >= 0, "MinNLCSetPrecExactLowRank: UpdateFreq<0", _state);
    if (updatefreq == 0) {
@@ -36898,7 +36576,7 @@ void minnlcsetprecexactlowrank(minnlcstate *state, ae_int_t updatefreq, ae_state
 //                 UpdateFreq iterations. Recommended value: 10 or higher.
 //                 Zero value means that good default value will be used.
 // ALGLIB: Copyright 26.09.2014 by Sergey Bochkanov
-// API: void minnlcsetprecexactrobust(const minnlcstate &state, const ae_int_t updatefreq, const xparams _xparams);
+// API: void minnlcsetprecexactrobust(const minnlcstate &state, const ae_int_t updatefreq);
 void minnlcsetprecexactrobust(minnlcstate *state, ae_int_t updatefreq, ae_state *_state) {
    ae_assert(updatefreq >= 0, "MinNLCSetPrecExactLowRank: UpdateFreq<0", _state);
    if (updatefreq == 0) {
@@ -36926,7 +36604,7 @@ void minnlcsetprecexactrobust(minnlcstate *state, ae_int_t updatefreq, ae_state 
 // Inputs:
 //     State   -   structure stores algorithm state
 // ALGLIB: Copyright 26.09.2014 by Sergey Bochkanov
-// API: void minnlcsetprecnone(const minnlcstate &state, const xparams _xparams);
+// API: void minnlcsetprecnone(const minnlcstate &state);
 void minnlcsetprecnone(minnlcstate *state, ae_state *_state) {
    state->updatefreq = 0;
    state->prectype = 0;
@@ -36949,7 +36627,7 @@ void minnlcsetprecnone(minnlcstate *state, ae_state *_state) {
 // NOTE: different solvers employed by MinNLC optimizer use  different  norms
 //       for step; AUL solver uses 2-norm, whilst SLP solver uses INF-norm.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minnlcsetstpmax(const minnlcstate &state, const double stpmax, const xparams _xparams);
+// API: void minnlcsetstpmax(const minnlcstate &state, const double stpmax);
 void minnlcsetstpmax(minnlcstate *state, double stpmax, ae_state *_state) {
    ae_assert(isfinite(stpmax), "MinNLCSetStpMax: StpMax is not finite!", _state);
    ae_assert(stpmax >= 0.0, "MinNLCSetStpMax: StpMax<0!", _state);
@@ -37148,7 +36826,7 @@ void minnlcsetstpmax(minnlcstate *state, double stpmax, ae_state *_state) {
 // noise (more robust than, say, active set methods),  but  large  noise  may
 // destabilize algorithm.
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-// API: void minnlcsetalgoaul(const minnlcstate &state, const double rho, const ae_int_t itscnt, const xparams _xparams);
+// API: void minnlcsetalgoaul(const minnlcstate &state, const double rho, const ae_int_t itscnt);
 void minnlcsetalgoaul(minnlcstate *state, double rho, ae_int_t itscnt, ae_state *_state) {
    ae_assert(itscnt >= 0, "MinNLCSetAlgoAUL: negative ItsCnt", _state);
    ae_assert(isfinite(rho), "MinNLCSetAlgoAUL: Rho is not finite", _state);
@@ -37204,7 +36882,7 @@ void minnlcsetalgoaul(minnlcstate *state, double rho, ae_int_t itscnt, ae_state 
 // Inputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 02.04.2018 by Sergey Bochkanov
-// API: void minnlcsetalgoslp(const minnlcstate &state, const xparams _xparams);
+// API: void minnlcsetalgoslp(const minnlcstate &state);
 void minnlcsetalgoslp(minnlcstate *state, ae_state *_state) {
    state->solvertype = 1;
 }
@@ -37257,7 +36935,7 @@ void minnlcsetalgoslp(minnlcstate *state, ae_state *_state) {
 // confirm or deny it, we recommend you to use AUL or SLP solvers,  which can
 // detect nonsmoothness of the problem.
 // ALGLIB: Copyright 02.12.2019 by Sergey Bochkanov
-// API: void minnlcsetalgosqp(const minnlcstate &state, const xparams _xparams);
+// API: void minnlcsetalgosqp(const minnlcstate &state);
 void minnlcsetalgosqp(minnlcstate *state, ae_state *_state) {
    state->solvertype = 2;
 }
@@ -37276,7 +36954,7 @@ void minnlcsetalgosqp(minnlcstate *state, ae_state *_state) {
 //       value which is returned is NOT function being minimized. It  is  sum
 //       of the value of the function being minimized - and penalty term.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minnlcsetxrep(const minnlcstate &state, const bool needxrep, const xparams _xparams);
+// API: void minnlcsetxrep(const minnlcstate &state, const bool needxrep);
 void minnlcsetxrep(minnlcstate *state, bool needxrep, ae_state *_state) {
    state->xrep = needxrep;
 }
@@ -37298,7 +36976,7 @@ static void minnlc_clearrequestfields(minnlcstate *state, ae_state *_state) {
 //     State   -   structure previously allocated with MinNLCCreate call.
 //     X       -   new starting point.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minnlcrestartfrom(const minnlcstate &state, const real_1d_array &x, const xparams _xparams);
+// API: void minnlcrestartfrom(const minnlcstate &state, const real_1d_array &x);
 void minnlcrestartfrom(minnlcstate *state, RVector *x, ae_state *_state) {
    ae_int_t n;
    n = state->n;
@@ -37344,9 +37022,9 @@ static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, m
    ae_vector_set_length(&state->xc, n, _state);
    ae_vector_set_length(&state->x, n, _state);
    for (i = 0; i < n; i++) {
-      state->bndl.xR[i] = _state->v_neginf;
+      state->bndl.xR[i] = -INFINITY;
       state->hasbndl.xB[i] = false;
-      state->bndu.xR[i] = _state->v_posinf;
+      state->bndu.xR[i] = +INFINITY;
       state->hasbndu.xB[i] = false;
       state->s.xR[i] = 1.0;
       state->lastscaleused.xR[i] = 1.0;
@@ -37479,8 +37157,8 @@ static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, m
 // Outputs:
 //     State   -   structure stores algorithm state
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-// API: void minnlccreate(const ae_int_t n, const real_1d_array &x, minnlcstate &state, const xparams _xparams);
-// API: void minnlccreate(const real_1d_array &x, minnlcstate &state, const xparams _xparams);
+// API: void minnlccreate(const ae_int_t n, const real_1d_array &x, minnlcstate &state);
+// API: void minnlccreate(const real_1d_array &x, minnlcstate &state);
 void minnlccreate(ae_int_t n, RVector *x, minnlcstate *state, ae_state *_state) {
    SetObj(minnlcstate, state);
    ae_assert(n >= 1, "MinNLCCreate: N<1", _state);
@@ -37530,8 +37208,8 @@ void minnlccreate(ae_int_t n, RVector *x, minnlcstate *state, ae_state *_state) 
 //    dimensional problems only, and to implement analytical gradient as soon
 //    as possible.
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-// API: void minnlccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams);
-// API: void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams);
+// API: void minnlccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnlcstate &state);
+// API: void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state);
 void minnlccreatef(ae_int_t n, RVector *x, double diffstep, minnlcstate *state, ae_state *_state) {
    SetObj(minnlcstate, state);
    ae_assert(n >= 1, "MinNLCCreateF: N<1", _state);
@@ -38419,9 +38097,9 @@ static void minnlc_unscale(minnlcstate *state, RVector *xs, RVector *scaledbndl,
 // This function provides a reverse communication interface, which is not documented or recommended for use.
 // Instead, it is recommended that you use the better-documented API functions minnlcoptimize() listed below.
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-// API: bool minnlciteration(const minnlcstate &state, const xparams _xparams = NonTH);
-// API: void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
-// API: void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
+// API: bool minnlciteration(const minnlcstate &state);
+// API: void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
+// API: void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool minnlciteration(minnlcstate *state, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
@@ -39079,7 +38757,7 @@ lbl_rcomm:
 //     points and we compare its prediction with actual value in  the  middle
 //     point
 // ALGLIB: Copyright 15.06.2014 by Sergey Bochkanov
-// API: void minnlcoptguardgradient(const minnlcstate &state, const double teststep, const xparams _xparams);
+// API: void minnlcoptguardgradient(const minnlcstate &state, const double teststep);
 void minnlcoptguardgradient(minnlcstate *state, double teststep, ae_state *_state) {
    ae_assert(isfinite(teststep), "MinNLCOptGuardGradient: TestStep contains NaN or INF", _state);
    ae_assert(teststep >= 0.0, "MinNLCOptGuardGradient: invalid argument TestStep(TestStep<0)", _state);
@@ -39149,8 +38827,8 @@ void minnlcoptguardgradient(minnlcstate *state, double teststep, ae_state *_stat
 // flag (and allows you to continue optimization). When optimization is done,
 // you can study OptGuard result.
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minnlcoptguardsmoothness(const minnlcstate &state, const ae_int_t level, const xparams _xparams);
-// API: void minnlcoptguardsmoothness(const minnlcstate &state, const xparams _xparams);
+// API: void minnlcoptguardsmoothness(const minnlcstate &state, const ae_int_t level);
+// API: void minnlcoptguardsmoothness(const minnlcstate &state);
 void minnlcoptguardsmoothness(minnlcstate *state, ae_int_t level, ae_state *_state) {
    ae_assert(level == 0 || level == 1, "MinNLCOptGuardSmoothness: unexpected value of level parameter", _state);
    state->smoothnessguardlevel = level;
@@ -39223,7 +38901,7 @@ void minnlcoptguardsmoothness(minnlcstate *state, ae_int_t level, ae_state *_sta
 //       our test examples  (measured  with  multiple  restarts  from  random
 //       points), and to have exactly 0% false positives.
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minnlcoptguardresults(const minnlcstate &state, optguardreport &rep, const xparams _xparams);
+// API: void minnlcoptguardresults(const minnlcstate &state, optguardreport &rep);
 void minnlcoptguardresults(minnlcstate *state, optguardreport *rep, ae_state *_state) {
    SetObj(optguardreport, rep);
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
@@ -39270,7 +38948,7 @@ void minnlcoptguardresults(minnlcstate *state, optguardreport *rep, ae_state *_s
 //     strrep  -   C1 test #0 "strong" report
 //     lngrep  -   C1 test #0 "long" report
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
+// API: void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep);
 void minnlcoptguardnonc1test0results(minnlcstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
    SetObj(optguardnonc1test0report, strrep);
    SetObj(optguardnonc1test0report, lngrep);
@@ -39326,7 +39004,7 @@ void minnlcoptguardnonc1test0results(minnlcstate *state, optguardnonc1test0repor
 //     strrep  -   C1 test #1 "strong" report
 //     lngrep  -   C1 test #1 "long" report
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
+// API: void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep);
 void minnlcoptguardnonc1test1results(minnlcstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
    SetObj(optguardnonc1test1report, strrep);
    SetObj(optguardnonc1test1report, lngrep);
@@ -39341,7 +39019,7 @@ void minnlcoptguardnonc1test1results(minnlcstate *state, optguardnonc1test1repor
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minnlcresultsbuf(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams);
+// API: void minnlcresultsbuf(const minnlcstate &state, real_1d_array &x, minnlcreport &rep);
 void minnlcresultsbuf(minnlcstate *state, RVector *x, minnlcreport *rep, ae_state *_state) {
    ae_int_t i;
    if (x->cnt < state->n) {
@@ -39361,7 +39039,7 @@ void minnlcresultsbuf(minnlcstate *state, RVector *x, minnlcreport *rep, ae_stat
       ae_v_move(x->xR, 1, state->xc.xR, 1, state->n);
    } else {
       for (i = 0; i < state->n; i++) {
-         x->xR[i] = _state->v_nan;
+         x->xR[i] = NAN;
       }
    }
 }
@@ -39409,7 +39087,7 @@ void minnlcresultsbuf(minnlcstate *state, RVector *x, minnlcreport *rep, ae_stat
 //                 More information about fields of this  structure  can  be
 //                 found in the comments on minnlcreport datatype.
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-// API: void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams);
+// API: void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep);
 void minnlcresults(minnlcstate *state, RVector *x, minnlcreport *rep, ae_state *_state) {
    SetVector(x);
    SetObj(minnlcreport, rep);
@@ -39436,7 +39114,7 @@ void minnlcresults(minnlcstate *state, RVector *x, minnlcreport *rep, ae_state *
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
-// API: void minnlcrequesttermination(const minnlcstate &state, const xparams _xparams);
+// API: void minnlcrequesttermination(const minnlcstate &state);
 void minnlcrequesttermination(minnlcstate *state, ae_state *_state) {
    state->userterminationneeded = true;
 }
@@ -39704,198 +39382,156 @@ DefClass(minnlcstate, DecVal(needfi) DecVal(needfij) DecVal(xupdated) DecVal(f) 
 // Other fields of this structure are not documented and should not be used!
 DefClass(minnlcreport, DecVal(iterationscount) DecVal(nfev) DecVal(terminationtype) DecVal(bcerr) DecVal(bcidx) DecVal(lcerr) DecVal(lcidx) DecVal(nlcerr) DecVal(nlcidx) DecVal(dbgphase0its))
 
-void minnlcsetbc(const minnlcstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+void minnlcsetbc(const minnlcstate &state, const real_1d_array &bndl, const real_1d_array &bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetbc(ConstT(minnlcstate, state), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetlc(ConstT(minnlcstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
+void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct) {
    if (c.rows() != ct.length()) ThrowError("Error while calling 'minnlcsetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetlc(ConstT(minnlcstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minnlcsetnlc(const minnlcstate &state, const ae_int_t nlec, const ae_int_t nlic, const xparams _xparams) {
+void minnlcsetnlc(const minnlcstate &state, const ae_int_t nlec, const ae_int_t nlic) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetnlc(ConstT(minnlcstate, state), nlec, nlic, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcsetcond(const minnlcstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+void minnlcsetcond(const minnlcstate &state, const double epsx, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetcond(ConstT(minnlcstate, state), epsx, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcsetscale(const minnlcstate &state, const real_1d_array &s, const xparams _xparams) {
+void minnlcsetscale(const minnlcstate &state, const real_1d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetscale(ConstT(minnlcstate, state), ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcsetprecinexact(const minnlcstate &state, const xparams _xparams) {
+void minnlcsetprecinexact(const minnlcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetprecinexact(ConstT(minnlcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcsetprecexactlowrank(const minnlcstate &state, const ae_int_t updatefreq, const xparams _xparams) {
+void minnlcsetprecexactlowrank(const minnlcstate &state, const ae_int_t updatefreq) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetprecexactlowrank(ConstT(minnlcstate, state), updatefreq, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcsetprecexactrobust(const minnlcstate &state, const ae_int_t updatefreq, const xparams _xparams) {
+void minnlcsetprecexactrobust(const minnlcstate &state, const ae_int_t updatefreq) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetprecexactrobust(ConstT(minnlcstate, state), updatefreq, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcsetprecnone(const minnlcstate &state, const xparams _xparams) {
+void minnlcsetprecnone(const minnlcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetprecnone(ConstT(minnlcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcsetstpmax(const minnlcstate &state, const double stpmax, const xparams _xparams) {
+void minnlcsetstpmax(const minnlcstate &state, const double stpmax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetstpmax(ConstT(minnlcstate, state), stpmax, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcsetalgoaul(const minnlcstate &state, const double rho, const ae_int_t itscnt, const xparams _xparams) {
+void minnlcsetalgoaul(const minnlcstate &state, const double rho, const ae_int_t itscnt) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetalgoaul(ConstT(minnlcstate, state), rho, itscnt, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcsetalgoslp(const minnlcstate &state, const xparams _xparams) {
+void minnlcsetalgoslp(const minnlcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetalgoslp(ConstT(minnlcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcsetalgosqp(const minnlcstate &state, const xparams _xparams) {
+void minnlcsetalgosqp(const minnlcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetalgosqp(ConstT(minnlcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcsetxrep(const minnlcstate &state, const bool needxrep, const xparams _xparams) {
+void minnlcsetxrep(const minnlcstate &state, const bool needxrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcsetxrep(ConstT(minnlcstate, state), needxrep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcrestartfrom(const minnlcstate &state, const real_1d_array &x, const xparams _xparams) {
+void minnlcrestartfrom(const minnlcstate &state, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcrestartfrom(ConstT(minnlcstate, state), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlccreate(const ae_int_t n, const real_1d_array &x, minnlcstate &state, const xparams _xparams) {
+void minnlccreate(const ae_int_t n, const real_1d_array &x, minnlcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlccreate(n, ConstT(ae_vector, x), ConstT(minnlcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minnlccreate(const real_1d_array &x, minnlcstate &state, const xparams _xparams) {
+void minnlccreate(const real_1d_array &x, minnlcstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlccreate(n, ConstT(ae_vector, x), ConstT(minnlcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minnlccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams) {
+void minnlccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnlcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlccreatef(n, ConstT(ae_vector, x), diffstep, ConstT(minnlcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state, const xparams _xparams) {
+void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlccreatef(n, ConstT(ae_vector, x), diffstep, ConstT(minnlcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-bool minnlciteration(const minnlcstate &state, const xparams _xparams) {
+bool minnlciteration(const minnlcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::minnlciteration(ConstT(minnlcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -39943,11 +39579,9 @@ bool minnlciteration(const minnlcstate &state, const xparams _xparams) {
 //    combination will lead to exception. Either  you  did  not pass gradient
 //    when it WAS needed or you passed gradient when it was NOT needed.
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minnlcoptimize()' (fvec is NULL)", &_alglib_env_state);
    while (alglib_impl::minnlciteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -39957,11 +39591,9 @@ void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, rea
    EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
-void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minnlcoptimize()' (jac is NULL)", &_alglib_env_state);
    while (alglib_impl::minnlciteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -39972,85 +39604,67 @@ void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcoptguardgradient(const minnlcstate &state, const double teststep, const xparams _xparams) {
+void minnlcoptguardgradient(const minnlcstate &state, const double teststep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcoptguardgradient(ConstT(minnlcstate, state), teststep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcoptguardsmoothness(const minnlcstate &state, const ae_int_t level, const xparams _xparams) {
+void minnlcoptguardsmoothness(const minnlcstate &state, const ae_int_t level) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcoptguardsmoothness(ConstT(minnlcstate, state), level, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minnlcoptguardsmoothness(const minnlcstate &state, const xparams _xparams) {
+void minnlcoptguardsmoothness(const minnlcstate &state) {
    ae_int_t level = 1;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcoptguardsmoothness(ConstT(minnlcstate, state), level, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minnlcoptguardresults(const minnlcstate &state, optguardreport &rep, const xparams _xparams) {
+void minnlcoptguardresults(const minnlcstate &state, optguardreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcoptguardresults(ConstT(minnlcstate, state), ConstT(optguardreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
+void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcoptguardnonc1test0results(ConstT(minnlcstate, state), ConstT(optguardnonc1test0report, strrep), ConstT(optguardnonc1test0report, lngrep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
+void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcoptguardnonc1test1results(ConstT(minnlcstate, state), ConstT(optguardnonc1test1report, strrep), ConstT(optguardnonc1test1report, lngrep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcresultsbuf(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams) {
+void minnlcresultsbuf(const minnlcstate &state, real_1d_array &x, minnlcreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcresultsbuf(ConstT(minnlcstate, state), ConstT(ae_vector, x), ConstT(minnlcreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep, const xparams _xparams) {
+void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcresults(ConstT(minnlcstate, state), ConstT(ae_vector, x), ConstT(minnlcreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnlcrequesttermination(const minnlcstate &state, const xparams _xparams) {
+void minnlcrequesttermination(const minnlcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnlcrequesttermination(ConstT(minnlcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -40082,7 +39696,7 @@ namespace alglib_impl {
 //   even  when  numerical  differentiation is used (algorithm adjusts  nodes
 //   according to boundary constraints)
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: void minnssetbc(const minnsstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams);
+// API: void minnssetbc(const minnsstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 void minnssetbc(minnsstate *state, RVector *bndl, RVector *bndu, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
@@ -40134,8 +39748,8 @@ void minnssetbc(minnsstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 // (this kind of constraints is always satisfied exactly, both in  the  final
 // solution and in all intermediate points).
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams);
-// API: void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams);
+// API: void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
+// API: void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct);
 void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
@@ -40234,7 +39848,7 @@ void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
 //         Rho parameter of minnssetalgoags(), because too  large  value  may
 //         slow down convergence.
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: void minnssetnlc(const minnsstate &state, const ae_int_t nlec, const ae_int_t nlic, const xparams _xparams);
+// API: void minnssetnlc(const minnsstate &state, const ae_int_t nlec, const ae_int_t nlic);
 void minnssetnlc(minnsstate *state, ae_int_t nlec, ae_int_t nlic, ae_state *_state) {
    ae_assert(nlec >= 0, "MinNSSetNLC: NLEC<0", _state);
    ae_assert(nlic >= 0, "MinNSSetNLC: NLIC<0", _state);
@@ -40258,7 +39872,7 @@ void minnssetnlc(minnsstate *state, ae_int_t nlec, ae_int_t nlic, ae_state *_sta
 // stopping criterion selection. We do not recommend you to rely  on  default
 // choice in production code.
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: void minnssetcond(const minnsstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams);
+// API: void minnssetcond(const minnsstate &state, const double epsx, const ae_int_t maxits);
 void minnssetcond(minnsstate *state, double epsx, ae_int_t maxits, ae_state *_state) {
    ae_assert(isfinite(epsx), "MinNSSetCond: EpsX is not finite number", _state);
    ae_assert(epsx >= 0.0, "MinNSSetCond: negative EpsX", _state);
@@ -40286,7 +39900,7 @@ void minnssetcond(minnsstate *state, double epsx, ae_int_t maxits, ae_state *_st
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: void minnssetscale(const minnsstate &state, const real_1d_array &s, const xparams _xparams);
+// API: void minnssetscale(const minnsstate &state, const real_1d_array &s);
 void minnssetscale(minnsstate *state, RVector *s, ae_state *_state) {
    ae_int_t i;
    ae_assert(s->cnt >= state->n, "MinNSSetScale: Length(S)<N", _state);
@@ -40386,7 +40000,7 @@ void minnssetscale(minnsstate *state, RVector *s, ae_state *_state) {
 //   however, penalty coefficient for nonlinear constraints must be specified
 //   by user.
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: void minnssetalgoags(const minnsstate &state, const double radius, const double penalty, const xparams _xparams);
+// API: void minnssetalgoags(const minnsstate &state, const double radius, const double penalty);
 void minnssetalgoags(minnsstate *state, double radius, double penalty, ae_state *_state) {
    ae_assert(isfinite(radius), "MinNSSetAlgoAGS: Radius is not finite", _state);
    ae_assert(radius > 0.0, "MinNSSetAlgoAGS: Radius <= 0", _state);
@@ -40406,7 +40020,7 @@ void minnssetalgoags(minnsstate *state, double radius, double penalty, ae_state 
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to minnsoptimize().
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minnssetxrep(const minnsstate &state, const bool needxrep, const xparams _xparams);
+// API: void minnssetxrep(const minnsstate &state, const bool needxrep);
 void minnssetxrep(minnsstate *state, bool needxrep, ae_state *_state) {
    state->xrep = needxrep;
 }
@@ -40428,7 +40042,7 @@ static void minns_clearrequestfields(minnsstate *state, ae_state *_state) {
 //     State   -   structure previously allocated with minnscreate() call.
 //     X       -   new starting point.
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: void minnsrestartfrom(const minnsstate &state, const real_1d_array &x, const xparams _xparams);
+// API: void minnsrestartfrom(const minnsstate &state, const real_1d_array &x);
 void minnsrestartfrom(minnsstate *state, RVector *x, ae_state *_state) {
    ae_int_t n;
    n = state->n;
@@ -40483,9 +40097,9 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
    ae_vector_set_length(&state->d, n, _state);
    ae_vector_set_length(&state->x, n, _state);
    for (i = 0; i < n; i++) {
-      state->bndl.xR[i] = _state->v_neginf;
+      state->bndl.xR[i] = -INFINITY;
       state->hasbndl.xB[i] = false;
-      state->bndu.xR[i] = _state->v_posinf;
+      state->bndu.xR[i] = +INFINITY;
       state->hasbndu.xB[i] = false;
       state->s.xR[i] = 1.0;
       state->xstart.xR[i] = x->xR[i];
@@ -40602,8 +40216,8 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
 //       gradient.   This   function  creates  solver  which  uses  numerical
 //       differentiation with user-specified step.
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: void minnscreate(const ae_int_t n, const real_1d_array &x, minnsstate &state, const xparams _xparams);
-// API: void minnscreate(const real_1d_array &x, minnsstate &state, const xparams _xparams);
+// API: void minnscreate(const ae_int_t n, const real_1d_array &x, minnsstate &state);
+// API: void minnscreate(const real_1d_array &x, minnsstate &state);
 void minnscreate(ae_int_t n, RVector *x, minnsstate *state, ae_state *_state) {
    SetObj(minnsstate, state);
    ae_assert(n >= 1, "MinNSCreate: N<1", _state);
@@ -40638,8 +40252,8 @@ void minnscreate(ae_int_t n, RVector *x, minnsstate *state, ae_state *_state) {
 // Outputs:
 //     State   -   structure stores algorithm state
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: void minnscreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams);
-// API: void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams);
+// API: void minnscreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnsstate &state);
+// API: void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state);
 void minnscreatef(ae_int_t n, RVector *x, double diffstep, minnsstate *state, ae_state *_state) {
    SetObj(minnsstate, state);
    ae_assert(n >= 1, "MinNSCreateF: N<1", _state);
@@ -40670,7 +40284,7 @@ void minnscreatef(ae_int_t n, RVector *x, double diffstep, minnsstate *state, ae
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: void minnsrequesttermination(const minnsstate &state, const xparams _xparams);
+// API: void minnsrequesttermination(const minnsstate &state);
 void minnsrequesttermination(minnsstate *state, ae_state *_state) {
    state->userterminationneeded = true;
 }
@@ -41290,7 +40904,7 @@ static bool minns_agsiteration(minnsstate *state, ae_state *_state) {
    matrixsetlengthatleast(&state->tmp2, 1, maxsamplesize + 1, _state);
    for (i = 0; i < maxsamplesize; i++) {
       state->tmp0.xR[i] = 0.0;
-      state->tmp1.xR[i] = _state->v_posinf;
+      state->tmp1.xR[i] = +INFINITY;
    }
 // Prepare RNG, seed it with fixed values so
 // that each run on same problem yeilds same results
@@ -41309,12 +40923,12 @@ static bool minns_agsiteration(minnsstate *state, ae_state *_state) {
       if (state->hasbndl.xB[i]) {
          state->scaledbndl.xR[i] = state->bndl.xR[i] / state->s.xR[i];
       } else {
-         state->scaledbndl.xR[i] = _state->v_neginf;
+         state->scaledbndl.xR[i] = -INFINITY;
       }
       if (state->hasbndu.xB[i]) {
          state->scaledbndu.xR[i] = state->bndu.xR[i] / state->s.xR[i];
       } else {
-         state->scaledbndu.xR[i] = _state->v_posinf;
+         state->scaledbndu.xR[i] = +INFINITY;
       }
       if (state->hasbndl.xB[i] && state->hasbndu.xB[i]) {
          ae_assert(state->scaledbndl.xR[i] <= state->scaledbndu.xR[i], "MinNS: integrity check failed (dfdf)", _state);
@@ -41795,9 +41409,9 @@ lbl_rcomm:
 // This function provides a reverse communication interface, which is not documented or recommended for use.
 // Instead, it is recommended that you use the better-documented API functions minnsoptimize() listed below.
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: bool minnsiteration(const minnsstate &state, const xparams _xparams = NonTH);
-// API: void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
-// API: void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
+// API: bool minnsiteration(const minnsstate &state);
+// API: void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
+// API: void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool minnsiteration(minnsstate *state, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
@@ -42025,7 +41639,7 @@ lbl_rcomm:
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: void minnsresultsbuf(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams);
+// API: void minnsresultsbuf(const minnsstate &state, real_1d_array &x, minnsreport &rep);
 void minnsresultsbuf(minnsstate *state, RVector *x, minnsreport *rep, ae_state *_state) {
    ae_int_t i;
    if (x->cnt < state->n) {
@@ -42043,7 +41657,7 @@ void minnsresultsbuf(minnsstate *state, RVector *x, minnsreport *rep, ae_state *
       ae_v_move(x->xR, 1, state->xc.xR, 1, state->n);
    } else {
       for (i = 0; i < state->n; i++) {
-         x->xR[i] = _state->v_nan;
+         x->xR[i] = NAN;
       }
    }
 }
@@ -42071,7 +41685,7 @@ void minnsresultsbuf(minnsstate *state, RVector *x, minnsreport *rep, ae_state *
 //                         X contains best point found so far.
 //                 *  8    User requested termination via minnsrequesttermination()
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-// API: void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams);
+// API: void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep);
 void minnsresults(minnsstate *state, RVector *x, minnsreport *rep, ae_state *_state) {
    SetVector(x);
    SetObj(minnsreport, rep);
@@ -42372,144 +41986,114 @@ DefClass(minnsstate, DecVal(needfi) DecVal(needfij) DecVal(xupdated) DecVal(f) D
 // Other fields of this structure are not documented and should not be used!
 DefClass(minnsreport, DecVal(iterationscount) DecVal(nfev) DecVal(cerr) DecVal(lcerr) DecVal(nlcerr) DecVal(terminationtype) DecVal(varidx) DecVal(funcidx))
 
-void minnssetbc(const minnsstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+void minnssetbc(const minnsstate &state, const real_1d_array &bndl, const real_1d_array &bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnssetbc(ConstT(minnsstate, state), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams) {
+void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnssetlc(ConstT(minnsstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams) {
+void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct) {
    if (c.rows() != ct.length()) ThrowError("Error while calling 'minnssetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnssetlc(ConstT(minnsstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minnssetnlc(const minnsstate &state, const ae_int_t nlec, const ae_int_t nlic, const xparams _xparams) {
+void minnssetnlc(const minnsstate &state, const ae_int_t nlec, const ae_int_t nlic) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnssetnlc(ConstT(minnsstate, state), nlec, nlic, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnssetcond(const minnsstate &state, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+void minnssetcond(const minnsstate &state, const double epsx, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnssetcond(ConstT(minnsstate, state), epsx, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnssetscale(const minnsstate &state, const real_1d_array &s, const xparams _xparams) {
+void minnssetscale(const minnsstate &state, const real_1d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnssetscale(ConstT(minnsstate, state), ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnssetalgoags(const minnsstate &state, const double radius, const double penalty, const xparams _xparams) {
+void minnssetalgoags(const minnsstate &state, const double radius, const double penalty) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnssetalgoags(ConstT(minnsstate, state), radius, penalty, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnssetxrep(const minnsstate &state, const bool needxrep, const xparams _xparams) {
+void minnssetxrep(const minnsstate &state, const bool needxrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnssetxrep(ConstT(minnsstate, state), needxrep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnsrestartfrom(const minnsstate &state, const real_1d_array &x, const xparams _xparams) {
+void minnsrestartfrom(const minnsstate &state, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnsrestartfrom(ConstT(minnsstate, state), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnscreate(const ae_int_t n, const real_1d_array &x, minnsstate &state, const xparams _xparams) {
+void minnscreate(const ae_int_t n, const real_1d_array &x, minnsstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnscreate(n, ConstT(ae_vector, x), ConstT(minnsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minnscreate(const real_1d_array &x, minnsstate &state, const xparams _xparams) {
+void minnscreate(const real_1d_array &x, minnsstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnscreate(n, ConstT(ae_vector, x), ConstT(minnsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minnscreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams) {
+void minnscreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnsstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnscreatef(n, ConstT(ae_vector, x), diffstep, ConstT(minnsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state, const xparams _xparams) {
+void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnscreatef(n, ConstT(ae_vector, x), diffstep, ConstT(minnsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minnsrequesttermination(const minnsstate &state, const xparams _xparams) {
+void minnsrequesttermination(const minnsstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnsrequesttermination(ConstT(minnsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-bool minnsiteration(const minnsstate &state, const xparams _xparams) {
+bool minnsiteration(const minnsstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::minnsiteration(ConstT(minnsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -42557,11 +42141,9 @@ bool minnsiteration(const minnsstate &state, const xparams _xparams) {
 //    combination will lead to exception. Either  you  did  not pass gradient
 //    when it WAS needed or you passed gradient when it was NOT needed.
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minnsoptimize()' (fvec is NULL)", &_alglib_env_state);
    while (alglib_impl::minnsiteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -42571,11 +42153,9 @@ void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_
    EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
-void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minnsoptimize()' (jac is NULL)", &_alglib_env_state);
    while (alglib_impl::minnsiteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -42586,20 +42166,16 @@ void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnsresultsbuf(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams) {
+void minnsresultsbuf(const minnsstate &state, real_1d_array &x, minnsreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnsresultsbuf(ConstT(minnsstate, state), ConstT(ae_vector, x), ConstT(minnsreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep, const xparams _xparams) {
+void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minnsresults(ConstT(minnsstate, state), ConstT(ae_vector, x), ConstT(minnsreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -42618,14 +42194,14 @@ static const double mincomp_asarho = 0.5;
 
 // Obsolete function, use MinLBFGSSetPrecDefault() instead.
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void minlbfgssetdefaultpreconditioner(const minlbfgsstate &state, const xparams _xparams);
+// API: void minlbfgssetdefaultpreconditioner(const minlbfgsstate &state);
 void minlbfgssetdefaultpreconditioner(minlbfgsstate *state, ae_state *_state) {
    minlbfgssetprecdefault(state, _state);
 }
 
 // Obsolete function, use MinLBFGSSetCholeskyPreconditioner() instead.
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void minlbfgssetcholeskypreconditioner(const minlbfgsstate &state, const real_2d_array &p, const bool isupper, const xparams _xparams);
+// API: void minlbfgssetcholeskypreconditioner(const minlbfgsstate &state, const real_2d_array &p, const bool isupper);
 void minlbfgssetcholeskypreconditioner(minlbfgsstate *state, RMatrix *p, bool isupper, ae_state *_state) {
    minlbfgssetpreccholesky(state, p, isupper, _state);
 }
@@ -42633,21 +42209,21 @@ void minlbfgssetcholeskypreconditioner(minlbfgsstate *state, RMatrix *p, bool is
 // This is obsolete function which was used by previous version of the  BLEIC
 // optimizer. It does nothing in the current version of BLEIC.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbleicsetbarrierwidth(const minbleicstate &state, const double mu, const xparams _xparams);
+// API: void minbleicsetbarrierwidth(const minbleicstate &state, const double mu);
 void minbleicsetbarrierwidth(minbleicstate *state, double mu, ae_state *_state) {
 }
 
 // This is obsolete function which was used by previous version of the  BLEIC
 // optimizer. It does nothing in the current version of BLEIC.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbleicsetbarrierdecay(const minbleicstate &state, const double mudecay, const xparams _xparams);
+// API: void minbleicsetbarrierdecay(const minbleicstate &state, const double mudecay);
 void minbleicsetbarrierdecay(minbleicstate *state, double mudecay, ae_state *_state) {
 }
 
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minasasetcond(const minasastate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams);
+// API: void minasasetcond(const minasastate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
 void minasasetcond(minasastate *state, double epsg, double epsf, double epsx, ae_int_t maxits, ae_state *_state) {
    ae_assert(isfinite(epsg), "MinASASetCond: EpsG is not finite number!", _state);
    ae_assert(epsg >= 0.0, "MinASASetCond: negative EpsG!", _state);
@@ -42668,7 +42244,7 @@ void minasasetcond(minasastate *state, double epsg, double epsf, double epsx, ae
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minasasetxrep(const minasastate &state, const bool needxrep, const xparams _xparams);
+// API: void minasasetxrep(const minasastate &state, const bool needxrep);
 void minasasetxrep(minasastate *state, bool needxrep, ae_state *_state) {
    state->xrep = needxrep;
 }
@@ -42676,7 +42252,7 @@ void minasasetxrep(minasastate *state, bool needxrep, ae_state *_state) {
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minasasetalgorithm(const minasastate &state, const ae_int_t algotype, const xparams _xparams);
+// API: void minasasetalgorithm(const minasastate &state, const ae_int_t algotype);
 void minasasetalgorithm(minasastate *state, ae_int_t algotype, ae_state *_state) {
    ae_assert(algotype >= -1 && algotype <= 1, "MinASASetAlgorithm: incorrect AlgoType!", _state);
    if (algotype == -1) {
@@ -42688,7 +42264,7 @@ void minasasetalgorithm(minasastate *state, ae_int_t algotype, ae_state *_state)
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minasasetstpmax(const minasastate &state, const double stpmax, const xparams _xparams);
+// API: void minasasetstpmax(const minasastate &state, const double stpmax);
 void minasasetstpmax(minasastate *state, double stpmax, ae_state *_state) {
    ae_assert(isfinite(stpmax), "MinASASetStpMax: StpMax is not finite!", _state);
    ae_assert(stpmax >= 0.0, "MinASASetStpMax: StpMax<0!", _state);
@@ -42704,7 +42280,7 @@ static void mincomp_clearrequestfields(minasastate *state, ae_state *_state) {
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
-// API: void minasarestartfrom(const minasastate &state, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams);
+// API: void minasarestartfrom(const minasastate &state, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu);
 void minasarestartfrom(minasastate *state, RVector *x, RVector *bndl, RVector *bndu, ae_state *_state) {
    ae_assert(x->cnt >= state->n, "MinASARestartFrom: Length(X)<N!", _state);
    ae_assert(isfinitevector(x, state->n, _state), "MinASARestartFrom: X contains infinite or NaN values!", _state);
@@ -42726,8 +42302,8 @@ void minasarestartfrom(minasastate *state, RVector *x, RVector *bndl, RVector *b
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
 // ALGLIB: Copyright 25.03.2010 by Sergey Bochkanov
-// API: void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams);
-// API: void minasacreate(const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams);
+// API: void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state);
+// API: void minasacreate(const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state);
 void minasacreate(ae_int_t n, RVector *x, RVector *bndl, RVector *bndu, minasastate *state, ae_state *_state) {
    ae_int_t i;
    SetObj(minasastate, state);
@@ -42865,8 +42441,8 @@ static bool mincomp_asauisempty(minasastate *state, ae_state *_state) {
 // This function provides a reverse communication interface, which is not documented or recommended for use.
 // Instead, it is recommended that you use the better-documented API function minasaoptimize() listed below.
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-// API: bool minasaiteration(const minasastate &state, const xparams _xparams = NonTH);
-// API: void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
+// API: bool minasaiteration(const minasastate &state);
+// API: void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool minasaiteration(minasastate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
@@ -43497,7 +43073,7 @@ lbl_rcomm:
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-// API: void minasaresultsbuf(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams);
+// API: void minasaresultsbuf(const minasastate &state, real_1d_array &x, minasareport &rep);
 void minasaresultsbuf(minasastate *state, RVector *x, minasareport *rep, ae_state *_state) {
    ae_int_t i;
    if (x->cnt < state->n) {
@@ -43518,7 +43094,7 @@ void minasaresultsbuf(minasastate *state, RVector *x, minasareport *rep, ae_stat
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-// API: void minasaresults(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams);
+// API: void minasaresults(const minasastate &state, real_1d_array &x, minasareport &rep);
 void minasaresults(minasastate *state, RVector *x, minasareport *rep, ae_state *_state) {
    SetVector(x);
    SetObj(minasareport, rep);
@@ -43634,113 +43210,89 @@ namespace alglib {
 DefClass(minasastate, DecVal(needfg) DecVal(xupdated) DecVal(f) DecVar(g) DecVar(x))
 DefClass(minasareport, DecVal(iterationscount) DecVal(nfev) DecVal(terminationtype) DecVal(activeconstraints))
 
-void minlbfgssetdefaultpreconditioner(const minlbfgsstate &state, const xparams _xparams) {
+void minlbfgssetdefaultpreconditioner(const minlbfgsstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgssetdefaultpreconditioner(ConstT(minlbfgsstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlbfgssetcholeskypreconditioner(const minlbfgsstate &state, const real_2d_array &p, const bool isupper, const xparams _xparams) {
+void minlbfgssetcholeskypreconditioner(const minlbfgsstate &state, const real_2d_array &p, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minlbfgssetcholeskypreconditioner(ConstT(minlbfgsstate, state), ConstT(ae_matrix, p), isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicsetbarrierwidth(const minbleicstate &state, const double mu, const xparams _xparams) {
+void minbleicsetbarrierwidth(const minbleicstate &state, const double mu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicsetbarrierwidth(ConstT(minbleicstate, state), mu, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbleicsetbarrierdecay(const minbleicstate &state, const double mudecay, const xparams _xparams) {
+void minbleicsetbarrierdecay(const minbleicstate &state, const double mudecay) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbleicsetbarrierdecay(ConstT(minbleicstate, state), mudecay, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minasasetcond(const minasastate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+void minasasetcond(const minasastate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minasasetcond(ConstT(minasastate, state), epsg, epsf, epsx, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minasasetxrep(const minasastate &state, const bool needxrep, const xparams _xparams) {
+void minasasetxrep(const minasastate &state, const bool needxrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minasasetxrep(ConstT(minasastate, state), needxrep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minasasetalgorithm(const minasastate &state, const ae_int_t algotype, const xparams _xparams) {
+void minasasetalgorithm(const minasastate &state, const ae_int_t algotype) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minasasetalgorithm(ConstT(minasastate, state), algotype, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minasasetstpmax(const minasastate &state, const double stpmax, const xparams _xparams) {
+void minasasetstpmax(const minasastate &state, const double stpmax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minasasetstpmax(ConstT(minasastate, state), stpmax, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minasarestartfrom(const minasastate &state, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+void minasarestartfrom(const minasastate &state, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minasarestartfrom(ConstT(minasastate, state), ConstT(ae_vector, x), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams) {
+void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minasacreate(n, ConstT(ae_vector, x), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), ConstT(minasastate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minasacreate(const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state, const xparams _xparams) {
+void minasacreate(const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state) {
    if (x.length() != bndl.length() || x.length() != bndu.length()) ThrowError("Error while calling 'minasacreate': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minasacreate(n, ConstT(ae_vector, x), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), ConstT(minasastate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-bool minasaiteration(const minasastate &state, const xparams _xparams) {
+bool minasaiteration(const minasastate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::minasaiteration(ConstT(minasastate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -43757,11 +43309,9 @@ bool minasaiteration(const minasastate &state, const xparams _xparams) {
 //     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
 //                 can be NULL
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minasaoptimize()' (grad is NULL)", &_alglib_env_state);
    while (alglib_impl::minasaiteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -43772,20 +43322,16 @@ void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, dou
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minasaresultsbuf(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams) {
+void minasaresultsbuf(const minasastate &state, real_1d_array &x, minasareport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minasaresultsbuf(ConstT(minasastate, state), ConstT(ae_vector, x), ConstT(minasareport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minasaresults(const minasastate &state, real_1d_array &x, minasareport &rep, const xparams _xparams) {
+void minasaresults(const minasastate &state, real_1d_array &x, minasareport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minasaresults(ConstT(minasastate, state), ConstT(ae_vector, x), ConstT(minasareport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -43824,7 +43370,7 @@ static const double minbc_decaycorrection = 0.8;
 //   even  when  numerical  differentiation is used (algorithm adjusts  nodes
 //   according to boundary constraints)
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbcsetbc(const minbcstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams);
+// API: void minbcsetbc(const minbcstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 void minbcsetbc(minbcstate *state, RVector *bndl, RVector *bndu, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
@@ -43873,7 +43419,7 @@ void minbcsetbc(minbcstate *state, RVector *bndl, RVector *bndu, ae_state *_stat
 //       slightly more than MaxIts iterations. I.e., MaxIts  sets  non-strict
 //       limit on iterations count.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbcsetcond(const minbcstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams);
+// API: void minbcsetcond(const minbcstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
 void minbcsetcond(minbcstate *state, double epsg, double epsf, double epsx, ae_int_t maxits, ae_state *_state) {
    ae_assert(isfinite(epsg), "MinBCSetCond: EpsG is not finite number", _state);
    ae_assert(epsg >= 0.0, "MinBCSetCond: negative EpsG", _state);
@@ -43918,7 +43464,7 @@ void minbcsetcond(minbcstate *state, double epsg, double epsf, double epsx, ae_i
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
-// API: void minbcsetscale(const minbcstate &state, const real_1d_array &s, const xparams _xparams);
+// API: void minbcsetscale(const minbcstate &state, const real_1d_array &s);
 void minbcsetscale(minbcstate *state, RVector *s, ae_state *_state) {
    ae_int_t i;
    ae_assert(s->cnt >= state->nmain, "MinBCSetScale: Length(S)<N", _state);
@@ -43934,7 +43480,7 @@ void minbcsetscale(minbcstate *state, RVector *s, ae_state *_state) {
 // Inputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void minbcsetprecdefault(const minbcstate &state, const xparams _xparams);
+// API: void minbcsetprecdefault(const minbcstate &state);
 void minbcsetprecdefault(minbcstate *state, ae_state *_state) {
    state->prectype = 0;
 }
@@ -43951,7 +43497,7 @@ void minbcsetprecdefault(minbcstate *state, ae_state *_state) {
 //
 // NOTE 2: you should pass diagonal of approximate Hessian - NOT ITS INVERSE.
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void minbcsetprecdiag(const minbcstate &state, const real_1d_array &d, const xparams _xparams);
+// API: void minbcsetprecdiag(const minbcstate &state, const real_1d_array &d);
 void minbcsetprecdiag(minbcstate *state, RVector *d, ae_state *_state) {
    ae_int_t i;
    ae_assert(d->cnt >= state->nmain, "MinBCSetPrecDiag: D is too short", _state);
@@ -43984,7 +43530,7 @@ void minbcsetprecdiag(minbcstate *state, RVector *d, ae_state *_state) {
 // Inputs:
 //     State   -   structure which stores algorithm state
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
-// API: void minbcsetprecscale(const minbcstate &state, const xparams _xparams);
+// API: void minbcsetprecscale(const minbcstate &state);
 void minbcsetprecscale(minbcstate *state, ae_state *_state) {
    state->prectype = 3;
 }
@@ -43998,7 +43544,7 @@ void minbcsetprecscale(minbcstate *state, ae_state *_state) {
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to MinBCOptimize().
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbcsetxrep(const minbcstate &state, const bool needxrep, const xparams _xparams);
+// API: void minbcsetxrep(const minbcstate &state, const bool needxrep);
 void minbcsetxrep(minbcstate *state, bool needxrep, ae_state *_state) {
    state->xrep = needxrep;
 }
@@ -44016,7 +43562,7 @@ void minbcsetxrep(minbcstate *state, bool needxrep, ae_state *_state) {
 // steps  that  are  too  large  (and  therefore  expose  us  to the possible
 // overflow) without actually calculating function value at the x+stp*d.
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
-// API: void minbcsetstpmax(const minbcstate &state, const double stpmax, const xparams _xparams);
+// API: void minbcsetstpmax(const minbcstate &state, const double stpmax);
 void minbcsetstpmax(minbcstate *state, double stpmax, ae_state *_state) {
    ae_assert(isfinite(stpmax), "MinBCSetStpMax: StpMax is not finite!", _state);
    ae_assert(stpmax >= 0.0, "MinBCSetStpMax: StpMax<0!", _state);
@@ -44040,7 +43586,7 @@ static void minbc_clearrequestfields(minbcstate *state, ae_state *_state) {
 //     State   -   structure previously allocated with MinBCCreate call.
 //     X       -   new starting point.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbcrestartfrom(const minbcstate &state, const real_1d_array &x, const xparams _xparams);
+// API: void minbcrestartfrom(const minbcstate &state, const real_1d_array &x);
 void minbcrestartfrom(minbcstate *state, RVector *x, ae_state *_state) {
    ae_int_t n;
    n = state->nmain;
@@ -44090,9 +43636,9 @@ static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, min
    vectorsetlengthatleast(&state->g, n, _state);
    vectorsetlengthatleast(&state->work, n, _state);
    for (i = 0; i < n; i++) {
-      state->bndl.xR[i] = _state->v_neginf;
+      state->bndl.xR[i] = -INFINITY;
       state->hasbndl.xB[i] = false;
-      state->bndu.xR[i] = _state->v_posinf;
+      state->bndu.xR[i] = +INFINITY;
       state->hasbndu.xB[i] = false;
       state->s.xR[i] = 1.0;
       state->invs.xR[i] = 1.0;
@@ -44163,8 +43709,8 @@ static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, min
 // Outputs:
 //     State   -   structure stores algorithm state
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state, const xparams _xparams);
-// API: void minbccreate(const real_1d_array &x, minbcstate &state, const xparams _xparams);
+// API: void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state);
+// API: void minbccreate(const real_1d_array &x, minbcstate &state);
 void minbccreate(ae_int_t n, RVector *x, minbcstate *state, ae_state *_state) {
    ae_frame _frame_block;
    ae_frame_make(_state, &_frame_block);
@@ -44216,8 +43762,8 @@ void minbccreate(ae_int_t n, RVector *x, minbcstate *state, ae_state *_state) {
 //    dimensional problems only, and to implement analytical gradient as soon
 //    as possible.
 // ALGLIB: Copyright 16.05.2011 by Sergey Bochkanov
-// API: void minbccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams);
-// API: void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams);
+// API: void minbccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbcstate &state);
+// API: void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &state);
 void minbccreatef(ae_int_t n, RVector *x, double diffstep, minbcstate *state, ae_state *_state) {
    ae_frame _frame_block;
    ae_frame_make(_state, &_frame_block);
@@ -44262,9 +43808,9 @@ static void minbc_updateestimateofgoodstep(double *estimate, double newstep, ae_
 // This function provides a reverse communication interface, which is not documented or recommended for use.
 // Instead, it is recommended that you use the better-documented API functions minbcoptimize() listed below.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: bool minbciteration(const minbcstate &state, const xparams _xparams = NonTH);
-// API: void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
-// API: void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = NonTH);
+// API: bool minbciteration(const minbcstate &state);
+// API: void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
+// API: void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool minbciteration(minbcstate *state, ae_state *_state) {
    ae_int_t freezeidx;
    double freezeval;
@@ -45339,7 +44885,7 @@ lbl_rcomm:
 //     points and we compare its prediction with actual value in  the  middle
 //     point
 // ALGLIB: Copyright 15.06.2014 by Sergey Bochkanov
-// API: void minbcoptguardgradient(const minbcstate &state, const double teststep, const xparams _xparams);
+// API: void minbcoptguardgradient(const minbcstate &state, const double teststep);
 void minbcoptguardgradient(minbcstate *state, double teststep, ae_state *_state) {
    ae_assert(isfinite(teststep), "MinBCOptGuardGradient: TestStep contains NaN or INF", _state);
    ae_assert(teststep >= 0.0, "MinBCOptGuardGradient: invalid argument TestStep(TestStep<0)", _state);
@@ -45405,8 +44951,8 @@ void minbcoptguardgradient(minbcstate *state, double teststep, ae_state *_state)
 // flag (and allows you to continue optimization). When optimization is done,
 // you can study OptGuard result.
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minbcoptguardsmoothness(const minbcstate &state, const ae_int_t level, const xparams _xparams);
-// API: void minbcoptguardsmoothness(const minbcstate &state, const xparams _xparams);
+// API: void minbcoptguardsmoothness(const minbcstate &state, const ae_int_t level);
+// API: void minbcoptguardsmoothness(const minbcstate &state);
 void minbcoptguardsmoothness(minbcstate *state, ae_int_t level, ae_state *_state) {
    ae_assert(level == 0 || level == 1, "MinBCOptGuardSmoothness: unexpected value of level parameter", _state);
    state->smoothnessguardlevel = level;
@@ -45478,7 +45024,7 @@ void minbcoptguardsmoothness(minbcstate *state, ae_int_t level, ae_state *_state
 //       our test examples  (measured  with  multiple  restarts  from  random
 //       points), and to have exactly 0% false positives.
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minbcoptguardresults(const minbcstate &state, optguardreport &rep, const xparams _xparams);
+// API: void minbcoptguardresults(const minbcstate &state, optguardreport &rep);
 void minbcoptguardresults(minbcstate *state, optguardreport *rep, ae_state *_state) {
    SetObj(optguardreport, rep);
    smoothnessmonitorexportreport(&state->smonitor, rep, _state);
@@ -45523,7 +45069,7 @@ void minbcoptguardresults(minbcstate *state, optguardreport *rep, ae_state *_sta
 //     strrep  -   C1 test #0 "strong" report
 //     lngrep  -   C1 test #0 "long" report
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams);
+// API: void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep);
 void minbcoptguardnonc1test0results(minbcstate *state, optguardnonc1test0report *strrep, optguardnonc1test0report *lngrep, ae_state *_state) {
    SetObj(optguardnonc1test0report, strrep);
    SetObj(optguardnonc1test0report, lngrep);
@@ -45577,7 +45123,7 @@ void minbcoptguardnonc1test0results(minbcstate *state, optguardnonc1test0report 
 //     strrep  -   C1 test #1 "strong" report
 //     lngrep  -   C1 test #1 "long" report
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
-// API: void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams);
+// API: void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep);
 void minbcoptguardnonc1test1results(minbcstate *state, optguardnonc1test1report *strrep, optguardnonc1test1report *lngrep, ae_state *_state) {
    SetObj(optguardnonc1test1report, strrep);
    SetObj(optguardnonc1test1report, lngrep);
@@ -45592,7 +45138,7 @@ void minbcoptguardnonc1test1results(minbcstate *state, optguardnonc1test1report 
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbcresultsbuf(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams);
+// API: void minbcresultsbuf(const minbcstate &state, real_1d_array &x, minbcreport &rep);
 void minbcresultsbuf(minbcstate *state, RVector *x, minbcreport *rep, ae_state *_state) {
    ae_int_t i;
    if (x->cnt < state->nmain) {
@@ -45606,7 +45152,7 @@ void minbcresultsbuf(minbcstate *state, RVector *x, minbcreport *rep, ae_state *
       ae_v_move(x->xR, 1, state->xc.xR, 1, state->nmain);
    } else {
       for (i = 0; i < state->nmain; i++) {
-         x->xR[i] = _state->v_nan;
+         x->xR[i] = NAN;
       }
    }
 }
@@ -45635,7 +45181,7 @@ void minbcresultsbuf(minbcstate *state, RVector *x, minbcreport *rep, ae_state *
 //                 More information about fields of this  structure  can  be
 //                 found in the comments on MinBCReport datatype.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-// API: void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams);
+// API: void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep);
 void minbcresults(minbcstate *state, RVector *x, minbcreport *rep, ae_state *_state) {
    SetVector(x);
    SetObj(minbcreport, rep);
@@ -45662,7 +45208,7 @@ void minbcresults(minbcstate *state, RVector *x, minbcreport *rep, ae_state *_st
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
-// API: void minbcrequesttermination(const minbcstate &state, const xparams _xparams);
+// API: void minbcrequesttermination(const minbcstate &state);
 void minbcrequesttermination(minbcstate *state, ae_state *_state) {
    state->userterminationneeded = true;
 }
@@ -45852,132 +45398,104 @@ DefClass(minbcstate, DecVal(needf) DecVal(needfg) DecVal(xupdated) DecVal(f) Dec
 //         submitted.
 DefClass(minbcreport, DecVal(iterationscount) DecVal(nfev) DecVal(varidx) DecVal(terminationtype))
 
-void minbcsetbc(const minbcstate &state, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+void minbcsetbc(const minbcstate &state, const real_1d_array &bndl, const real_1d_array &bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcsetbc(ConstT(minbcstate, state), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcsetcond(const minbcstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits, const xparams _xparams) {
+void minbcsetcond(const minbcstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcsetcond(ConstT(minbcstate, state), epsg, epsf, epsx, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcsetscale(const minbcstate &state, const real_1d_array &s, const xparams _xparams) {
+void minbcsetscale(const minbcstate &state, const real_1d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcsetscale(ConstT(minbcstate, state), ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcsetprecdefault(const minbcstate &state, const xparams _xparams) {
+void minbcsetprecdefault(const minbcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcsetprecdefault(ConstT(minbcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcsetprecdiag(const minbcstate &state, const real_1d_array &d, const xparams _xparams) {
+void minbcsetprecdiag(const minbcstate &state, const real_1d_array &d) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcsetprecdiag(ConstT(minbcstate, state), ConstT(ae_vector, d), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcsetprecscale(const minbcstate &state, const xparams _xparams) {
+void minbcsetprecscale(const minbcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcsetprecscale(ConstT(minbcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcsetxrep(const minbcstate &state, const bool needxrep, const xparams _xparams) {
+void minbcsetxrep(const minbcstate &state, const bool needxrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcsetxrep(ConstT(minbcstate, state), needxrep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcsetstpmax(const minbcstate &state, const double stpmax, const xparams _xparams) {
+void minbcsetstpmax(const minbcstate &state, const double stpmax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcsetstpmax(ConstT(minbcstate, state), stpmax, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcrestartfrom(const minbcstate &state, const real_1d_array &x, const xparams _xparams) {
+void minbcrestartfrom(const minbcstate &state, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcrestartfrom(ConstT(minbcstate, state), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state, const xparams _xparams) {
+void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbccreate(n, ConstT(ae_vector, x), ConstT(minbcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minbccreate(const real_1d_array &x, minbcstate &state, const xparams _xparams) {
+void minbccreate(const real_1d_array &x, minbcstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbccreate(n, ConstT(ae_vector, x), ConstT(minbcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minbccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams) {
+void minbccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbccreatef(n, ConstT(ae_vector, x), diffstep, ConstT(minbcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &state, const xparams _xparams) {
+void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &state) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbccreatef(n, ConstT(ae_vector, x), diffstep, ConstT(minbcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-bool minbciteration(const minbcstate &state, const xparams _xparams) {
+bool minbciteration(const minbcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, false)
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    bool Ok = alglib_impl::minbciteration(ConstT(minbcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -46028,11 +45546,9 @@ bool minbciteration(const minbcstate &state, const xparams _xparams) {
 //    exception being thrown. Either  you  did  not pass gradient when it WAS
 //    needed or you passed gradient when it was NOT needed.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minbcoptimize()' (func is NULL)", &_alglib_env_state);
    while (alglib_impl::minbciteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -46042,11 +45558,9 @@ void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, doubl
    EndPoll(_alglib_env_state)
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
-void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
+void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minbcoptimize()' (grad is NULL)", &_alglib_env_state);
    while (alglib_impl::minbciteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -46057,85 +45571,67 @@ void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, doubl
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcoptguardgradient(const minbcstate &state, const double teststep, const xparams _xparams) {
+void minbcoptguardgradient(const minbcstate &state, const double teststep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcoptguardgradient(ConstT(minbcstate, state), teststep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcoptguardsmoothness(const minbcstate &state, const ae_int_t level, const xparams _xparams) {
+void minbcoptguardsmoothness(const minbcstate &state, const ae_int_t level) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcoptguardsmoothness(ConstT(minbcstate, state), level, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #if !defined AE_NO_EXCEPTIONS
-void minbcoptguardsmoothness(const minbcstate &state, const xparams _xparams) {
+void minbcoptguardsmoothness(const minbcstate &state) {
    ae_int_t level = 1;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcoptguardsmoothness(ConstT(minbcstate, state), level, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 #endif
 
-void minbcoptguardresults(const minbcstate &state, optguardreport &rep, const xparams _xparams) {
+void minbcoptguardresults(const minbcstate &state, optguardreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcoptguardresults(ConstT(minbcstate, state), ConstT(optguardreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep, const xparams _xparams) {
+void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcoptguardnonc1test0results(ConstT(minbcstate, state), ConstT(optguardnonc1test0report, strrep), ConstT(optguardnonc1test0report, lngrep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep, const xparams _xparams) {
+void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcoptguardnonc1test1results(ConstT(minbcstate, state), ConstT(optguardnonc1test1report, strrep), ConstT(optguardnonc1test1report, lngrep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcresultsbuf(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams) {
+void minbcresultsbuf(const minbcstate &state, real_1d_array &x, minbcreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcresultsbuf(ConstT(minbcstate, state), ConstT(ae_vector, x), ConstT(minbcreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep, const xparams _xparams) {
+void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcresults(ConstT(minbcstate, state), ConstT(ae_vector, x), ConstT(minbcreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minbcrequesttermination(const minbcstate &state, const xparams _xparams) {
+void minbcrequesttermination(const minbcstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::minbcrequesttermination(ConstT(minbcstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -46148,7 +45644,7 @@ namespace alglib_impl {
 //
 // This function is intended for internal use by ALGLIB.
 // ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
-// API: void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p, const xparams _xparams);
+// API: void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p);
 void lptestproblemcreate(ae_int_t n, bool hasknowntarget, double targetf, lptestproblem *p, ae_state *_state) {
    SetObj(lptestproblem, p);
    ae_assert(n >= 1, "LPTestProblemCreate: N<1", _state);
@@ -46157,7 +45653,7 @@ void lptestproblemcreate(ae_int_t n, bool hasknowntarget, double targetf, lptest
    if (hasknowntarget) {
       p->targetf = targetf;
    } else {
-      p->targetf = _state->v_nan;
+      p->targetf = NAN;
    }
    ae_vector_set_length(&p->s, n, _state);
    rsetv(n, 1.0, &p->s, _state);
@@ -46176,7 +45672,7 @@ void lptestproblemcreate(ae_int_t n, bool hasknowntarget, double targetf, lptest
 //
 // This function is intended for internal use by ALGLIB.
 // ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
-// API: void lptestproblemsetscale(const lptestproblem &p, const real_1d_array &s, const xparams _xparams);
+// API: void lptestproblemsetscale(const lptestproblem &p, const real_1d_array &s);
 void lptestproblemsetscale(lptestproblem *p, RVector *s, ae_state *_state) {
    rcopyv(p->n, s, &p->s, _state);
 }
@@ -46185,7 +45681,7 @@ void lptestproblemsetscale(lptestproblem *p, RVector *s, ae_state *_state) {
 //
 // This function is intended for internal use by ALGLIB.
 // ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
-// API: void lptestproblemsetcost(const lptestproblem &p, const real_1d_array &c, const xparams _xparams);
+// API: void lptestproblemsetcost(const lptestproblem &p, const real_1d_array &c);
 void lptestproblemsetcost(lptestproblem *p, RVector *c, ae_state *_state) {
    rcopyv(p->n, c, &p->c, _state);
 }
@@ -46194,7 +45690,7 @@ void lptestproblemsetcost(lptestproblem *p, RVector *c, ae_state *_state) {
 //
 // This function is intended for internal use by ALGLIB.
 // ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
-// API: void lptestproblemsetbc(const lptestproblem &p, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams);
+// API: void lptestproblemsetbc(const lptestproblem &p, const real_1d_array &bndl, const real_1d_array &bndu);
 void lptestproblemsetbc(lptestproblem *p, RVector *bndl, RVector *bndu, ae_state *_state) {
    rcopyv(p->n, bndl, &p->bndl, _state);
    rcopyv(p->n, bndu, &p->bndu, _state);
@@ -46204,7 +45700,7 @@ void lptestproblemsetbc(lptestproblem *p, RVector *bndl, RVector *bndu, ae_state
 //
 // This function is intended for internal use by ALGLIB.
 // ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
-// API: void lptestproblemsetlc2(const lptestproblem &p, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t m, const xparams _xparams);
+// API: void lptestproblemsetlc2(const lptestproblem &p, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t m);
 void lptestproblemsetlc2(lptestproblem *p, sparsematrix *a, RVector *al, RVector *au, ae_int_t m, ae_state *_state) {
    if (m <= 0) {
       p->m = 0;
@@ -46223,7 +45719,7 @@ void lptestproblemsetlc2(lptestproblem *p, sparsematrix *a, RVector *al, RVector
 // Although for technical reasons it is made publicly available (and has  its
 // own manual entry), you should never call it.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-// API: void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state, const xparams _xparams);
+// API: void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state);
 void xdbgminlpcreatefromtestproblem(lptestproblem *p, minlpstate *state, ae_state *_state) {
    SetObj(minlpstate, state);
    minlpcreate(p->n, state, _state);
@@ -46410,56 +45906,44 @@ void lptestproblemunserialize(const std::istream &s_in, lptestproblem &obj) {
    alglib_impl::ae_state_clear(&state);
 }
 
-void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p, const xparams _xparams) {
+void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::lptestproblemcreate(n, hasknowntarget, targetf, ConstT(lptestproblem, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void lptestproblemsetscale(const lptestproblem &p, const real_1d_array &s, const xparams _xparams) {
+void lptestproblemsetscale(const lptestproblem &p, const real_1d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::lptestproblemsetscale(ConstT(lptestproblem, p), ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void lptestproblemsetcost(const lptestproblem &p, const real_1d_array &c, const xparams _xparams) {
+void lptestproblemsetcost(const lptestproblem &p, const real_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::lptestproblemsetcost(ConstT(lptestproblem, p), ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void lptestproblemsetbc(const lptestproblem &p, const real_1d_array &bndl, const real_1d_array &bndu, const xparams _xparams) {
+void lptestproblemsetbc(const lptestproblem &p, const real_1d_array &bndl, const real_1d_array &bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::lptestproblemsetbc(ConstT(lptestproblem, p), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void lptestproblemsetlc2(const lptestproblem &p, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t m, const xparams _xparams) {
+void lptestproblemsetlc2(const lptestproblem &p, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t m) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::lptestproblemsetlc2(ConstT(lptestproblem, p), ConstT(sparsematrix, a), ConstT(ae_vector, al), ConstT(ae_vector, au), m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state, const xparams _xparams) {
+void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
    TryCatch(_alglib_env_state, )
-   if (_xparams != NonTH)
-      ae_state_set_flags(&_alglib_env_state, _xparams);
    alglib_impl::xdbgminlpcreatefromtestproblem(ConstT(lptestproblem, p), ConstT(minlpstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }

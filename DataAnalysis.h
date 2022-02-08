@@ -27,9 +27,9 @@ void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvar
 } // end of namespace alglib_impl
 
 namespace alglib {
-void pcabuildbasis(const real_2d_array &x, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, real_1d_array &s2, real_2d_array &v, const xparams _xparams = NonTH);
-void pcatruncatedsubspace(const real_2d_array &x, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nneeded, const double eps, const ae_int_t maxits, real_1d_array &s2, real_2d_array &v, const xparams _xparams = NonTH);
-void pcatruncatedsubspacesparse(const sparsematrix &x, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nneeded, const double eps, const ae_int_t maxits, real_1d_array &s2, real_2d_array &v, const xparams _xparams = NonTH);
+void pcabuildbasis(const real_2d_array &x, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, real_1d_array &s2, real_2d_array &v);
+void pcatruncatedsubspace(const real_2d_array &x, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nneeded, const double eps, const ae_int_t maxits, real_1d_array &s2, real_2d_array &v);
+void pcatruncatedsubspacesparse(const sparsematrix &x, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nneeded, const double eps, const ae_int_t maxits, real_1d_array &s2, real_2d_array &v);
 } // end of namespace alglib
 
 // === BDSS Package ===
@@ -61,8 +61,8 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
 } // end of namespace alglib_impl
 
 namespace alglib {
-void dsoptimalsplit2(const real_1d_array &a, const integer_1d_array &c, const ae_int_t n, ae_int_t &info, double &threshold, double &pal, double &pbl, double &par, double &pbr, double &cve, const xparams _xparams = NonTH);
-void dsoptimalsplit2fast(real_1d_array &a, integer_1d_array &c, integer_1d_array &tiesbuf, integer_1d_array &cntbuf, real_1d_array &bufr, integer_1d_array &bufi, const ae_int_t n, const ae_int_t nc, const double alpha, ae_int_t &info, double &threshold, double &rms, double &cvrms, const xparams _xparams = NonTH);
+void dsoptimalsplit2(const real_1d_array &a, const integer_1d_array &c, const ae_int_t n, ae_int_t &info, double &threshold, double &pal, double &pbl, double &par, double &pbr, double &cve);
+void dsoptimalsplit2fast(real_1d_array &a, integer_1d_array &c, integer_1d_array &tiesbuf, integer_1d_array &cntbuf, real_1d_array &bufr, integer_1d_array &bufi, const ae_int_t n, const ae_int_t nc, const double alpha, ae_int_t &info, double &threshold, double &rms, double &cvrms);
 } // end of namespace alglib
 
 // === MLPBASE Package ===
@@ -211,68 +211,68 @@ void mlpserialize(multilayerperceptron &obj, std::ostream &s_out);
 void mlpunserialize(const std::string &s_in, multilayerperceptron &obj);
 void mlpunserialize(const std::istream &s_in, multilayerperceptron &obj);
 
-void mlpproperties(const multilayerperceptron &network, ae_int_t &nin, ae_int_t &nout, ae_int_t &wcount, const xparams _xparams = NonTH);
-bool mlpissoftmax(const multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlprandomize(const multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlprandomizefull(const multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpcreate0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpcreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpcreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpcreateb0(const ae_int_t nin, const ae_int_t nout, const double b, const double d, multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpcreateb1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double b, const double d, multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpcreateb2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double b, const double d, multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpcreater0(const ae_int_t nin, const ae_int_t nout, const double a, const double b, multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpcreater1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double a, const double b, multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpcreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double a, const double b, multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpcreatec0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpcreatec1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpcreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpactivationfunction(const double net, const ae_int_t k, double &f, double &df, double &d2f, const xparams _xparams = NonTH);
-void mlpprocess(const multilayerperceptron &network, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
-void mlpprocessi(const multilayerperceptron &network, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
-void mlpgrad(const multilayerperceptron &network, const real_1d_array &x, const real_1d_array &desiredy, double &e, real_1d_array &grad, const xparams _xparams = NonTH);
-void mlpgradn(const multilayerperceptron &network, const real_1d_array &x, const real_1d_array &desiredy, double &e, real_1d_array &grad, const xparams _xparams = NonTH);
-void mlpgradbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, const xparams _xparams = NonTH);
-void mlpgradbatchsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t ssize, double &e, real_1d_array &grad, const xparams _xparams = NonTH);
-void mlpgradbatchsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad, const xparams _xparams = NonTH);
-void mlpgradbatchsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad, const xparams _xparams = NonTH);
-void mlpgradnbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, const xparams _xparams = NonTH);
-void mlphessiannbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, real_2d_array &h, const xparams _xparams = NonTH);
-void mlphessianbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, real_2d_array &h, const xparams _xparams = NonTH);
-ae_int_t mlpgetinputscount(const multilayerperceptron &network, const xparams _xparams = NonTH);
-ae_int_t mlpgetoutputscount(const multilayerperceptron &network, const xparams _xparams = NonTH);
-ae_int_t mlpgetweightscount(const multilayerperceptron &network, const xparams _xparams = NonTH);
-ae_int_t mlpgetlayerscount(const multilayerperceptron &network, const xparams _xparams = NonTH);
-ae_int_t mlpgetlayersize(const multilayerperceptron &network, const ae_int_t k, const xparams _xparams = NonTH);
-void mlpgetinputscaling(const multilayerperceptron &network, const ae_int_t i, double &mean, double &sigma, const xparams _xparams = NonTH);
-void mlpgetoutputscaling(const multilayerperceptron &network, const ae_int_t i, double &mean, double &sigma, const xparams _xparams = NonTH);
-void mlpgetneuroninfo(const multilayerperceptron &network, const ae_int_t k, const ae_int_t i, ae_int_t &fkind, double &threshold, const xparams _xparams = NonTH);
-double mlpgetweight(const multilayerperceptron &network, const ae_int_t k0, const ae_int_t i0, const ae_int_t k1, const ae_int_t i1, const xparams _xparams = NonTH);
-void mlpsetinputscaling(const multilayerperceptron &network, const ae_int_t i, const double mean, const double sigma, const xparams _xparams = NonTH);
-void mlpsetoutputscaling(const multilayerperceptron &network, const ae_int_t i, const double mean, const double sigma, const xparams _xparams = NonTH);
-void mlpsetneuroninfo(const multilayerperceptron &network, const ae_int_t k, const ae_int_t i, const ae_int_t fkind, const double threshold, const xparams _xparams = NonTH);
-void mlpsetweight(const multilayerperceptron &network, const ae_int_t k0, const ae_int_t i0, const ae_int_t k1, const ae_int_t i1, const double w, const xparams _xparams = NonTH);
-void mlpcopy(const multilayerperceptron &network1, multilayerperceptron &network2, const xparams _xparams = NonTH);
-void mlpcopytunableparameters(const multilayerperceptron &network1, const multilayerperceptron &network2, const xparams _xparams = NonTH);
-void mlpinitpreprocessor(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, const xparams _xparams = NonTH);
-double mlperror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlperrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlperrorn(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, const xparams _xparams = NonTH);
-ae_int_t mlpclserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlprelclserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlprelclserrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlpavgce(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlpavgcesparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlprmserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlprmserrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlpavgerror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlpavgerrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlpavgrelerror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlpavgrelerrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-void mlpallerrorssubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, modelerrors &rep, const xparams _xparams = NonTH);
-void mlpallerrorssparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, modelerrors &rep, const xparams _xparams = NonTH);
-double mlperrorsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, const xparams _xparams = NonTH);
-double mlperrorsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, const xparams _xparams = NonTH);
+void mlpproperties(const multilayerperceptron &network, ae_int_t &nin, ae_int_t &nout, ae_int_t &wcount);
+bool mlpissoftmax(const multilayerperceptron &network);
+void mlprandomize(const multilayerperceptron &network);
+void mlprandomizefull(const multilayerperceptron &network);
+void mlpcreate0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network);
+void mlpcreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network);
+void mlpcreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network);
+void mlpcreateb0(const ae_int_t nin, const ae_int_t nout, const double b, const double d, multilayerperceptron &network);
+void mlpcreateb1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double b, const double d, multilayerperceptron &network);
+void mlpcreateb2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double b, const double d, multilayerperceptron &network);
+void mlpcreater0(const ae_int_t nin, const ae_int_t nout, const double a, const double b, multilayerperceptron &network);
+void mlpcreater1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double a, const double b, multilayerperceptron &network);
+void mlpcreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double a, const double b, multilayerperceptron &network);
+void mlpcreatec0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network);
+void mlpcreatec1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network);
+void mlpcreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network);
+void mlpactivationfunction(const double net, const ae_int_t k, double &f, double &df, double &d2f);
+void mlpprocess(const multilayerperceptron &network, const real_1d_array &x, real_1d_array &y);
+void mlpprocessi(const multilayerperceptron &network, const real_1d_array &x, real_1d_array &y);
+void mlpgrad(const multilayerperceptron &network, const real_1d_array &x, const real_1d_array &desiredy, double &e, real_1d_array &grad);
+void mlpgradn(const multilayerperceptron &network, const real_1d_array &x, const real_1d_array &desiredy, double &e, real_1d_array &grad);
+void mlpgradbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
+void mlpgradbatchsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
+void mlpgradbatchsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad);
+void mlpgradbatchsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad);
+void mlpgradnbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
+void mlphessiannbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, real_2d_array &h);
+void mlphessianbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, real_2d_array &h);
+ae_int_t mlpgetinputscount(const multilayerperceptron &network);
+ae_int_t mlpgetoutputscount(const multilayerperceptron &network);
+ae_int_t mlpgetweightscount(const multilayerperceptron &network);
+ae_int_t mlpgetlayerscount(const multilayerperceptron &network);
+ae_int_t mlpgetlayersize(const multilayerperceptron &network, const ae_int_t k);
+void mlpgetinputscaling(const multilayerperceptron &network, const ae_int_t i, double &mean, double &sigma);
+void mlpgetoutputscaling(const multilayerperceptron &network, const ae_int_t i, double &mean, double &sigma);
+void mlpgetneuroninfo(const multilayerperceptron &network, const ae_int_t k, const ae_int_t i, ae_int_t &fkind, double &threshold);
+double mlpgetweight(const multilayerperceptron &network, const ae_int_t k0, const ae_int_t i0, const ae_int_t k1, const ae_int_t i1);
+void mlpsetinputscaling(const multilayerperceptron &network, const ae_int_t i, const double mean, const double sigma);
+void mlpsetoutputscaling(const multilayerperceptron &network, const ae_int_t i, const double mean, const double sigma);
+void mlpsetneuroninfo(const multilayerperceptron &network, const ae_int_t k, const ae_int_t i, const ae_int_t fkind, const double threshold);
+void mlpsetweight(const multilayerperceptron &network, const ae_int_t k0, const ae_int_t i0, const ae_int_t k1, const ae_int_t i1, const double w);
+void mlpcopy(const multilayerperceptron &network1, multilayerperceptron &network2);
+void mlpcopytunableparameters(const multilayerperceptron &network1, const multilayerperceptron &network2);
+void mlpinitpreprocessor(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize);
+double mlperror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
+double mlperrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
+double mlperrorn(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize);
+ae_int_t mlpclserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
+double mlprelclserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
+double mlprelclserrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
+double mlpavgce(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
+double mlpavgcesparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
+double mlprmserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
+double mlprmserrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
+double mlpavgerror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
+double mlpavgerrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
+double mlpavgrelerror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
+double mlpavgrelerrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
+void mlpallerrorssubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, modelerrors &rep);
+void mlpallerrorssparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, modelerrors &rep);
+double mlperrorsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize);
+double mlperrorsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize);
 } // end of namespace alglib
 
 // === MLPE Package ===
@@ -328,29 +328,29 @@ void mlpeserialize(mlpensemble &obj, std::ostream &s_out);
 void mlpeunserialize(const std::string &s_in, mlpensemble &obj);
 void mlpeunserialize(const std::istream &s_in, mlpensemble &obj);
 
-void mlpecreatefromnetwork(const multilayerperceptron &network, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpecreate0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpecreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpecreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpecreateb0(const ae_int_t nin, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpecreateb1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpecreateb2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpecreater0(const ae_int_t nin, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpecreater1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpecreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpecreatec0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpecreatec1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpecreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlperandomize(const mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpeproperties(const mlpensemble &ensemble, ae_int_t &nin, ae_int_t &nout, const xparams _xparams = NonTH);
-bool mlpeissoftmax(const mlpensemble &ensemble, const xparams _xparams = NonTH);
-void mlpeprocess(const mlpensemble &ensemble, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
-void mlpeprocessi(const mlpensemble &ensemble, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
-double mlperelclserror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlpeavgce(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlpermserror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlpeavgerror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mlpeavgrelerror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
+void mlpecreatefromnetwork(const multilayerperceptron &network, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlpecreate0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlpecreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlpecreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlpecreateb0(const ae_int_t nin, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlpecreateb1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlpecreateb2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlpecreater0(const ae_int_t nin, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlpecreater1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlpecreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlpecreatec0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlpecreatec1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlpecreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
+void mlperandomize(const mlpensemble &ensemble);
+void mlpeproperties(const mlpensemble &ensemble, ae_int_t &nin, ae_int_t &nout);
+bool mlpeissoftmax(const mlpensemble &ensemble);
+void mlpeprocess(const mlpensemble &ensemble, const real_1d_array &x, real_1d_array &y);
+void mlpeprocessi(const mlpensemble &ensemble, const real_1d_array &x, real_1d_array &y);
+double mlperelclserror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
+double mlpeavgce(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
+double mlpermserror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
+double mlpeavgerror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
+double mlpeavgrelerror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 } // end of namespace alglib
 
 // === CLUSTERING Package ===
@@ -443,21 +443,21 @@ DecClass(clusterizerstate, );
 DecClass(ahcreport, ae_int_t &terminationtype; ae_int_t &npoints; integer_1d_array p; integer_2d_array z; integer_2d_array pz; integer_2d_array pm; real_1d_array mergedist;);
 DecClass(kmeansreport, ae_int_t &npoints; ae_int_t &nfeatures; ae_int_t &terminationtype; ae_int_t &iterationscount; double &energy; ae_int_t &k; real_2d_array c; integer_1d_array cidx;);
 
-void clusterizercreate(clusterizerstate &s, const xparams _xparams = NonTH);
-void clusterizersetpoints(const clusterizerstate &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const ae_int_t disttype, const xparams _xparams = NonTH);
-void clusterizersetpoints(const clusterizerstate &s, const real_2d_array &xy, const ae_int_t disttype, const xparams _xparams = NonTH);
-void clusterizersetdistances(const clusterizerstate &s, const real_2d_array &d, const ae_int_t npoints, const bool isupper, const xparams _xparams = NonTH);
-void clusterizersetdistances(const clusterizerstate &s, const real_2d_array &d, const bool isupper, const xparams _xparams = NonTH);
-void clusterizersetahcalgo(const clusterizerstate &s, const ae_int_t algo, const xparams _xparams = NonTH);
-void clusterizersetkmeanslimits(const clusterizerstate &s, const ae_int_t restarts, const ae_int_t maxits, const xparams _xparams = NonTH);
-void clusterizersetkmeansinit(const clusterizerstate &s, const ae_int_t initalgo, const xparams _xparams = NonTH);
-void clusterizersetseed(const clusterizerstate &s, const ae_int_t seed, const xparams _xparams = NonTH);
-void clusterizergetdistances(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const ae_int_t disttype, real_2d_array &d, const xparams _xparams = NonTH);
-void clusterizerrunahc(const clusterizerstate &s, ahcreport &rep, const xparams _xparams = NonTH);
-void clusterizerrunkmeans(const clusterizerstate &s, const ae_int_t k, kmeansreport &rep, const xparams _xparams = NonTH);
-void clusterizergetkclusters(const ahcreport &rep, const ae_int_t k, integer_1d_array &cidx, integer_1d_array &cz, const xparams _xparams = NonTH);
-void clusterizerseparatedbydist(const ahcreport &rep, const double r, ae_int_t &k, integer_1d_array &cidx, integer_1d_array &cz, const xparams _xparams = NonTH);
-void clusterizerseparatedbycorr(const ahcreport &rep, const double r, ae_int_t &k, integer_1d_array &cidx, integer_1d_array &cz, const xparams _xparams = NonTH);
+void clusterizercreate(clusterizerstate &s);
+void clusterizersetpoints(const clusterizerstate &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const ae_int_t disttype);
+void clusterizersetpoints(const clusterizerstate &s, const real_2d_array &xy, const ae_int_t disttype);
+void clusterizersetdistances(const clusterizerstate &s, const real_2d_array &d, const ae_int_t npoints, const bool isupper);
+void clusterizersetdistances(const clusterizerstate &s, const real_2d_array &d, const bool isupper);
+void clusterizersetahcalgo(const clusterizerstate &s, const ae_int_t algo);
+void clusterizersetkmeanslimits(const clusterizerstate &s, const ae_int_t restarts, const ae_int_t maxits);
+void clusterizersetkmeansinit(const clusterizerstate &s, const ae_int_t initalgo);
+void clusterizersetseed(const clusterizerstate &s, const ae_int_t seed);
+void clusterizergetdistances(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const ae_int_t disttype, real_2d_array &d);
+void clusterizerrunahc(const clusterizerstate &s, ahcreport &rep);
+void clusterizerrunkmeans(const clusterizerstate &s, const ae_int_t k, kmeansreport &rep);
+void clusterizergetkclusters(const ahcreport &rep, const ae_int_t k, integer_1d_array &cidx, integer_1d_array &cz);
+void clusterizerseparatedbydist(const ahcreport &rep, const double r, ae_int_t &k, integer_1d_array &cidx, integer_1d_array &cz);
+void clusterizerseparatedbycorr(const ahcreport &rep, const double r, ae_int_t &k, integer_1d_array &cidx, integer_1d_array &cz);
 } // end of namespace alglib
 
 // === DFOREST Package ===
@@ -668,36 +668,36 @@ void dfserialize(decisionforest &obj, std::ostream &s_out);
 void dfunserialize(const std::string &s_in, decisionforest &obj);
 void dfunserialize(const std::istream &s_in, decisionforest &obj);
 
-void dfcreatebuffer(const decisionforest &model, decisionforestbuffer &buf, const xparams _xparams = NonTH);
-void dfbuildercreate(decisionforestbuilder &s, const xparams _xparams = NonTH);
-void dfbuildersetdataset(const decisionforestbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const xparams _xparams = NonTH);
-void dfbuildersetrndvars(const decisionforestbuilder &s, const ae_int_t rndvars, const xparams _xparams = NonTH);
-void dfbuildersetrndvarsratio(const decisionforestbuilder &s, const double f, const xparams _xparams = NonTH);
-void dfbuildersetrndvarsauto(const decisionforestbuilder &s, const xparams _xparams = NonTH);
-void dfbuildersetsubsampleratio(const decisionforestbuilder &s, const double f, const xparams _xparams = NonTH);
-void dfbuildersetseed(const decisionforestbuilder &s, const ae_int_t seedval, const xparams _xparams = NonTH);
-void dfbuildersetrdfalgo(const decisionforestbuilder &s, const ae_int_t algotype, const xparams _xparams = NonTH);
-void dfbuildersetrdfsplitstrength(const decisionforestbuilder &s, const ae_int_t splitstrength, const xparams _xparams = NonTH);
-void dfbuildersetimportancetrngini(const decisionforestbuilder &s, const xparams _xparams = NonTH);
-void dfbuildersetimportanceoobgini(const decisionforestbuilder &s, const xparams _xparams = NonTH);
-void dfbuildersetimportancepermutation(const decisionforestbuilder &s, const xparams _xparams = NonTH);
-void dfbuildersetimportancenone(const decisionforestbuilder &s, const xparams _xparams = NonTH);
-double dfbuilderpeekprogress(const decisionforestbuilder &s, const xparams _xparams = NonTH);
-double dfbuildergetprogress(const decisionforestbuilder &s, const xparams _xparams = NonTH);
-void dfbuilderbuildrandomforest(const decisionforestbuilder &s, const ae_int_t ntrees, decisionforest &df, dfreport &rep, const xparams _xparams = NonTH);
-double dfbinarycompression(const decisionforest &df, const xparams _xparams = NonTH);
-void dfprocess(const decisionforest &df, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
-void dfprocessi(const decisionforest &df, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
-double dfprocess0(const decisionforest &model, const real_1d_array &x, const xparams _xparams = NonTH);
-ae_int_t dfclassify(const decisionforest &model, const real_1d_array &x, const xparams _xparams = NonTH);
-void dftsprocess(const decisionforest &df, const decisionforestbuffer &buf, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
-double dfrelclserror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double dfavgce(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double dfrmserror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double dfavgerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double dfavgrelerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-void dfbuildrandomdecisionforest(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const ae_int_t ntrees, const double r, ae_int_t &info, decisionforest &df, dfreport &rep, const xparams _xparams = NonTH);
-void dfbuildrandomdecisionforestx1(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const ae_int_t ntrees, const ae_int_t nrndvars, const double r, ae_int_t &info, decisionforest &df, dfreport &rep, const xparams _xparams = NonTH);
+void dfcreatebuffer(const decisionforest &model, decisionforestbuffer &buf);
+void dfbuildercreate(decisionforestbuilder &s);
+void dfbuildersetdataset(const decisionforestbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses);
+void dfbuildersetrndvars(const decisionforestbuilder &s, const ae_int_t rndvars);
+void dfbuildersetrndvarsratio(const decisionforestbuilder &s, const double f);
+void dfbuildersetrndvarsauto(const decisionforestbuilder &s);
+void dfbuildersetsubsampleratio(const decisionforestbuilder &s, const double f);
+void dfbuildersetseed(const decisionforestbuilder &s, const ae_int_t seedval);
+void dfbuildersetrdfalgo(const decisionforestbuilder &s, const ae_int_t algotype);
+void dfbuildersetrdfsplitstrength(const decisionforestbuilder &s, const ae_int_t splitstrength);
+void dfbuildersetimportancetrngini(const decisionforestbuilder &s);
+void dfbuildersetimportanceoobgini(const decisionforestbuilder &s);
+void dfbuildersetimportancepermutation(const decisionforestbuilder &s);
+void dfbuildersetimportancenone(const decisionforestbuilder &s);
+double dfbuilderpeekprogress(const decisionforestbuilder &s);
+double dfbuildergetprogress(const decisionforestbuilder &s);
+void dfbuilderbuildrandomforest(const decisionforestbuilder &s, const ae_int_t ntrees, decisionforest &df, dfreport &rep);
+double dfbinarycompression(const decisionforest &df);
+void dfprocess(const decisionforest &df, const real_1d_array &x, real_1d_array &y);
+void dfprocessi(const decisionforest &df, const real_1d_array &x, real_1d_array &y);
+double dfprocess0(const decisionforest &model, const real_1d_array &x);
+ae_int_t dfclassify(const decisionforest &model, const real_1d_array &x);
+void dftsprocess(const decisionforest &df, const decisionforestbuffer &buf, const real_1d_array &x, real_1d_array &y);
+double dfrelclserror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
+double dfavgce(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
+double dfrmserror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
+double dfavgerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
+double dfavgrelerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
+void dfbuildrandomdecisionforest(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const ae_int_t ntrees, const double r, ae_int_t &info, decisionforest &df, dfreport &rep);
+void dfbuildrandomdecisionforestx1(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const ae_int_t ntrees, const ae_int_t nrndvars, const double r, ae_int_t &info, decisionforest &df, dfreport &rep);
 } // end of namespace alglib
 
 // === LINREG Package ===
@@ -746,16 +746,16 @@ namespace alglib {
 DecClass(linearmodel, );
 DecClass(lrreport, real_2d_array c; double &rmserror; double &avgerror; double &avgrelerror; double &cvrmserror; double &cvavgerror; double &cvavgrelerror; ae_int_t &ncvdefects; integer_1d_array cvdefects;);
 
-double lrrmserror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double lravgerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double lravgrelerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-void lrbuilds(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar, const xparams _xparams = NonTH);
-void lrbuild(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar, const xparams _xparams = NonTH);
-void lrbuildzs(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar, const xparams _xparams = NonTH);
-void lrbuildz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar, const xparams _xparams = NonTH);
-void lrunpack(const linearmodel &lm, real_1d_array &v, ae_int_t &nvars, const xparams _xparams = NonTH);
-void lrpack(const real_1d_array &v, const ae_int_t nvars, linearmodel &lm, const xparams _xparams = NonTH);
-double lrprocess(const linearmodel &lm, const real_1d_array &x, const xparams _xparams = NonTH);
+double lrrmserror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double lravgerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double lravgrelerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+void lrbuilds(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
+void lrbuild(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
+void lrbuildzs(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
+void lrbuildz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
+void lrunpack(const linearmodel &lm, real_1d_array &v, ae_int_t &nvars);
+void lrpack(const real_1d_array &v, const ae_int_t nvars, linearmodel &lm);
+double lrprocess(const linearmodel &lm, const real_1d_array &x);
 } // end of namespace alglib
 
 // === FILTERS Package ===
@@ -767,12 +767,12 @@ void filterlrma(RVector *x, ae_int_t n, ae_int_t k, ae_state *_state);
 } // end of namespace alglib_impl
 
 namespace alglib {
-void filtersma(real_1d_array &x, const ae_int_t n, const ae_int_t k, const xparams _xparams = NonTH);
-void filtersma(real_1d_array &x, const ae_int_t k, const xparams _xparams = NonTH);
-void filterema(real_1d_array &x, const ae_int_t n, const double alpha, const xparams _xparams = NonTH);
-void filterema(real_1d_array &x, const double alpha, const xparams _xparams = NonTH);
-void filterlrma(real_1d_array &x, const ae_int_t n, const ae_int_t k, const xparams _xparams = NonTH);
-void filterlrma(real_1d_array &x, const ae_int_t k, const xparams _xparams = NonTH);
+void filtersma(real_1d_array &x, const ae_int_t n, const ae_int_t k);
+void filtersma(real_1d_array &x, const ae_int_t k);
+void filterema(real_1d_array &x, const ae_int_t n, const double alpha);
+void filterema(real_1d_array &x, const double alpha);
+void filterlrma(real_1d_array &x, const ae_int_t n, const ae_int_t k);
+void filterlrma(real_1d_array &x, const ae_int_t k);
 } // end of namespace alglib
 
 // === SSA Package ===
@@ -851,33 +851,33 @@ void ssaforecastavgsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int
 namespace alglib {
 DecClass(ssamodel, );
 
-void ssacreate(ssamodel &s, const xparams _xparams = NonTH);
-void ssasetwindow(const ssamodel &s, const ae_int_t windowwidth, const xparams _xparams = NonTH);
-void ssasetseed(const ssamodel &s, const ae_int_t seed, const xparams _xparams = NonTH);
-void ssasetpoweruplength(const ssamodel &s, const ae_int_t pwlen, const xparams _xparams = NonTH);
-void ssasetmemorylimit(const ssamodel &s, const ae_int_t memlimit, const xparams _xparams = NonTH);
-void ssaaddsequence(const ssamodel &s, const real_1d_array &x, const ae_int_t n, const xparams _xparams = NonTH);
-void ssaaddsequence(const ssamodel &s, const real_1d_array &x, const xparams _xparams = NonTH);
-void ssaappendpointandupdate(const ssamodel &s, const double x, const double updateits, const xparams _xparams = NonTH);
-void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const ae_int_t nticks, const double updateits, const xparams _xparams = NonTH);
-void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const double updateits, const xparams _xparams = NonTH);
-void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a, const ae_int_t windowwidth, const ae_int_t nbasis, const xparams _xparams = NonTH);
-void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a, const xparams _xparams = NonTH);
-void ssasetalgotopkdirect(const ssamodel &s, const ae_int_t topk, const xparams _xparams = NonTH);
-void ssasetalgotopkrealtime(const ssamodel &s, const ae_int_t topk, const xparams _xparams = NonTH);
-void ssacleardata(const ssamodel &s, const xparams _xparams = NonTH);
-void ssagetbasis(const ssamodel &s, real_2d_array &a, real_1d_array &sv, ae_int_t &windowwidth, ae_int_t &nbasis, const xparams _xparams = NonTH);
-void ssagetlrr(const ssamodel &s, real_1d_array &a, ae_int_t &windowwidth, const xparams _xparams = NonTH);
-void ssaanalyzelastwindow(const ssamodel &s, real_1d_array &trend, real_1d_array &noise, ae_int_t &nticks, const xparams _xparams = NonTH);
-void ssaanalyzelast(const ssamodel &s, const ae_int_t nticks, real_1d_array &trend, real_1d_array &noise, const xparams _xparams = NonTH);
-void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, const ae_int_t nticks, real_1d_array &trend, real_1d_array &noise, const xparams _xparams = NonTH);
-void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, real_1d_array &trend, real_1d_array &noise, const xparams _xparams = NonTH);
-void ssaforecastlast(const ssamodel &s, const ae_int_t nticks, real_1d_array &trend, const xparams _xparams = NonTH);
-void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t datalen, const ae_int_t forecastlen, const bool applysmoothing, real_1d_array &trend, const xparams _xparams = NonTH);
-void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t forecastlen, real_1d_array &trend, const xparams _xparams = NonTH);
-void ssaforecastavglast(const ssamodel &s, const ae_int_t m, const ae_int_t nticks, real_1d_array &trend, const xparams _xparams = NonTH);
-void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t datalen, const ae_int_t m, const ae_int_t forecastlen, const bool applysmoothing, real_1d_array &trend, const xparams _xparams = NonTH);
-void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t m, const ae_int_t forecastlen, real_1d_array &trend, const xparams _xparams = NonTH);
+void ssacreate(ssamodel &s);
+void ssasetwindow(const ssamodel &s, const ae_int_t windowwidth);
+void ssasetseed(const ssamodel &s, const ae_int_t seed);
+void ssasetpoweruplength(const ssamodel &s, const ae_int_t pwlen);
+void ssasetmemorylimit(const ssamodel &s, const ae_int_t memlimit);
+void ssaaddsequence(const ssamodel &s, const real_1d_array &x, const ae_int_t n);
+void ssaaddsequence(const ssamodel &s, const real_1d_array &x);
+void ssaappendpointandupdate(const ssamodel &s, const double x, const double updateits);
+void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const ae_int_t nticks, const double updateits);
+void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const double updateits);
+void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a, const ae_int_t windowwidth, const ae_int_t nbasis);
+void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a);
+void ssasetalgotopkdirect(const ssamodel &s, const ae_int_t topk);
+void ssasetalgotopkrealtime(const ssamodel &s, const ae_int_t topk);
+void ssacleardata(const ssamodel &s);
+void ssagetbasis(const ssamodel &s, real_2d_array &a, real_1d_array &sv, ae_int_t &windowwidth, ae_int_t &nbasis);
+void ssagetlrr(const ssamodel &s, real_1d_array &a, ae_int_t &windowwidth);
+void ssaanalyzelastwindow(const ssamodel &s, real_1d_array &trend, real_1d_array &noise, ae_int_t &nticks);
+void ssaanalyzelast(const ssamodel &s, const ae_int_t nticks, real_1d_array &trend, real_1d_array &noise);
+void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, const ae_int_t nticks, real_1d_array &trend, real_1d_array &noise);
+void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, real_1d_array &trend, real_1d_array &noise);
+void ssaforecastlast(const ssamodel &s, const ae_int_t nticks, real_1d_array &trend);
+void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t datalen, const ae_int_t forecastlen, const bool applysmoothing, real_1d_array &trend);
+void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t forecastlen, real_1d_array &trend);
+void ssaforecastavglast(const ssamodel &s, const ae_int_t m, const ae_int_t nticks, real_1d_array &trend);
+void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t datalen, const ae_int_t m, const ae_int_t forecastlen, const bool applysmoothing, real_1d_array &trend);
+void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t m, const ae_int_t forecastlen, real_1d_array &trend);
 } // end of namespace alglib
 
 // === LDA Package ===
@@ -888,8 +888,8 @@ void fisherlda(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
 } // end of namespace alglib_impl
 
 namespace alglib {
-void fisherldan(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_2d_array &w, const xparams _xparams = NonTH);
-void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_1d_array &w, const xparams _xparams = NonTH);
+void fisherldan(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_2d_array &w);
+void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_1d_array &w);
 } // end of namespace alglib
 
 // === MCPD Package ===
@@ -959,23 +959,23 @@ namespace alglib {
 DecClass(mcpdstate, );
 DecClass(mcpdreport, ae_int_t &inneriterationscount; ae_int_t &outeriterationscount; ae_int_t &nfev; ae_int_t &terminationtype;);
 
-void mcpdcreate(const ae_int_t n, mcpdstate &s, const xparams _xparams = NonTH);
-void mcpdcreateentry(const ae_int_t n, const ae_int_t entrystate, mcpdstate &s, const xparams _xparams = NonTH);
-void mcpdcreateexit(const ae_int_t n, const ae_int_t exitstate, mcpdstate &s, const xparams _xparams = NonTH);
-void mcpdcreateentryexit(const ae_int_t n, const ae_int_t entrystate, const ae_int_t exitstate, mcpdstate &s, const xparams _xparams = NonTH);
-void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy, const ae_int_t k, const xparams _xparams = NonTH);
-void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy, const xparams _xparams = NonTH);
-void mcpdsetec(const mcpdstate &s, const real_2d_array &ec, const xparams _xparams = NonTH);
-void mcpdaddec(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double c, const xparams _xparams = NonTH);
-void mcpdsetbc(const mcpdstate &s, const real_2d_array &bndl, const real_2d_array &bndu, const xparams _xparams = NonTH);
-void mcpdaddbc(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double bndl, const double bndu, const xparams _xparams = NonTH);
-void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k, const xparams _xparams = NonTH);
-void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_array &ct, const xparams _xparams = NonTH);
-void mcpdsettikhonovregularizer(const mcpdstate &s, const double v, const xparams _xparams = NonTH);
-void mcpdsetprior(const mcpdstate &s, const real_2d_array &pp, const xparams _xparams = NonTH);
-void mcpdsetpredictionweights(const mcpdstate &s, const real_1d_array &pw, const xparams _xparams = NonTH);
-void mcpdsolve(const mcpdstate &s, const xparams _xparams = NonTH);
-void mcpdresults(const mcpdstate &s, real_2d_array &p, mcpdreport &rep, const xparams _xparams = NonTH);
+void mcpdcreate(const ae_int_t n, mcpdstate &s);
+void mcpdcreateentry(const ae_int_t n, const ae_int_t entrystate, mcpdstate &s);
+void mcpdcreateexit(const ae_int_t n, const ae_int_t exitstate, mcpdstate &s);
+void mcpdcreateentryexit(const ae_int_t n, const ae_int_t entrystate, const ae_int_t exitstate, mcpdstate &s);
+void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy, const ae_int_t k);
+void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy);
+void mcpdsetec(const mcpdstate &s, const real_2d_array &ec);
+void mcpdaddec(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double c);
+void mcpdsetbc(const mcpdstate &s, const real_2d_array &bndl, const real_2d_array &bndu);
+void mcpdaddbc(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double bndl, const double bndu);
+void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
+void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_array &ct);
+void mcpdsettikhonovregularizer(const mcpdstate &s, const double v);
+void mcpdsetprior(const mcpdstate &s, const real_2d_array &pp);
+void mcpdsetpredictionweights(const mcpdstate &s, const real_1d_array &pw);
+void mcpdsolve(const mcpdstate &s);
+void mcpdresults(const mcpdstate &s, real_2d_array &p, mcpdreport &rep);
 } // end of namespace alglib
 
 // === LOGIT Package ===
@@ -1046,17 +1046,17 @@ namespace alglib {
 DecClass(logitmodel, );
 DecClass(mnlreport, ae_int_t &ngrad; ae_int_t &nhess;);
 
-void mnlprocess(const logitmodel &lm, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
-void mnlprocessi(const logitmodel &lm, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
-void mnltrainh(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, logitmodel &lm, mnlreport &rep, const xparams _xparams = NonTH);
-void mnlunpack(const logitmodel &lm, real_2d_array &a, ae_int_t &nvars, ae_int_t &nclasses, const xparams _xparams = NonTH);
-void mnlpack(const real_2d_array &a, const ae_int_t nvars, const ae_int_t nclasses, logitmodel &lm, const xparams _xparams = NonTH);
-double mnlavgce(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mnlrelclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mnlrmserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mnlavgerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double mnlavgrelerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t ssize, const xparams _xparams = NonTH);
+void mnlprocess(const logitmodel &lm, const real_1d_array &x, real_1d_array &y);
+void mnlprocessi(const logitmodel &lm, const real_1d_array &x, real_1d_array &y);
+void mnltrainh(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, logitmodel &lm, mnlreport &rep);
+void mnlunpack(const logitmodel &lm, real_2d_array &a, ae_int_t &nvars, ae_int_t &nclasses);
+void mnlpack(const real_2d_array &a, const ae_int_t nvars, const ae_int_t nclasses, logitmodel &lm);
+double mnlavgce(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double mnlrelclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double mnlrmserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double mnlavgerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double mnlavgrelerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t ssize);
 } // end of namespace alglib
 
 // === KNN Package ===
@@ -1147,24 +1147,24 @@ void knnserialize(knnmodel &obj, std::ostream &s_out);
 void knnunserialize(const std::string &s_in, knnmodel &obj);
 void knnunserialize(const std::istream &s_in, knnmodel &obj);
 
-void knncreatebuffer(const knnmodel &model, knnbuffer &buf, const xparams _xparams = NonTH);
-void knnbuildercreate(knnbuilder &s, const xparams _xparams = NonTH);
-void knnbuildersetdatasetreg(const knnbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nout, const xparams _xparams = NonTH);
-void knnbuildersetdatasetcls(const knnbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const xparams _xparams = NonTH);
-void knnbuildersetnorm(const knnbuilder &s, const ae_int_t nrmtype, const xparams _xparams = NonTH);
-void knnallerrors(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, knnreport &rep, const xparams _xparams = NonTH);
-void knnbuilderbuildknnmodel(const knnbuilder &s, const ae_int_t k, const double eps, knnmodel &model, knnreport &rep, const xparams _xparams = NonTH);
-void knnrewritekeps(const knnmodel &model, const ae_int_t k, const double eps, const xparams _xparams = NonTH);
-void knntsprocess(const knnmodel &model, const knnbuffer &buf, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
-void knnprocess(const knnmodel &model, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
-double knnprocess0(const knnmodel &model, const real_1d_array &x, const xparams _xparams = NonTH);
-ae_int_t knnclassify(const knnmodel &model, const real_1d_array &x, const xparams _xparams = NonTH);
-void knnprocessi(const knnmodel &model, const real_1d_array &x, real_1d_array &y, const xparams _xparams = NonTH);
-double knnrelclserror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double knnavgce(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double knnrmserror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double knnavgerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-double knnavgrelerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
+void knncreatebuffer(const knnmodel &model, knnbuffer &buf);
+void knnbuildercreate(knnbuilder &s);
+void knnbuildersetdatasetreg(const knnbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nout);
+void knnbuildersetdatasetcls(const knnbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses);
+void knnbuildersetnorm(const knnbuilder &s, const ae_int_t nrmtype);
+void knnallerrors(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, knnreport &rep);
+void knnbuilderbuildknnmodel(const knnbuilder &s, const ae_int_t k, const double eps, knnmodel &model, knnreport &rep);
+void knnrewritekeps(const knnmodel &model, const ae_int_t k, const double eps);
+void knntsprocess(const knnmodel &model, const knnbuffer &buf, const real_1d_array &x, real_1d_array &y);
+void knnprocess(const knnmodel &model, const real_1d_array &x, real_1d_array &y);
+double knnprocess0(const knnmodel &model, const real_1d_array &x);
+ae_int_t knnclassify(const knnmodel &model, const real_1d_array &x);
+void knnprocessi(const knnmodel &model, const real_1d_array &x, real_1d_array &y);
+double knnrelclserror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
+double knnavgce(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
+double knnrmserror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
+double knnavgerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
+double knnavgrelerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 } // end of namespace alglib
 
 // === MLPTRAIN Package ===
@@ -1294,26 +1294,26 @@ DecClass(mlpreport, double &relclserror; double &avgce; double &rmserror; double
 DecClass(mlpcvreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror;);
 DecClass(mlptrainer, );
 
-void mlptrainlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep, const xparams _xparams = NonTH);
-void mlptrainlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep, const xparams _xparams = NonTH);
-void mlptraines(const multilayerperceptron &network, const real_2d_array &trnxy, const ae_int_t trnsize, const real_2d_array &valxy, const ae_int_t valsize, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep, const xparams _xparams = NonTH);
-void mlpkfoldcvlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep, const xparams _xparams = NonTH);
-void mlpkfoldcvlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep, const xparams _xparams = NonTH);
-void mlpkfoldcv(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, const ae_int_t foldscount, mlpreport &rep, const xparams _xparams = NonTH);
-void mlpsetdataset(const mlptrainer &s, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-void mlpsetsparsedataset(const mlptrainer &s, const sparsematrix &xy, const ae_int_t npoints, const xparams _xparams = NonTH);
-void mlpsetdecay(const mlptrainer &s, const double decay, const xparams _xparams = NonTH);
-void mlpsetcond(const mlptrainer &s, const double wstep, const ae_int_t maxits, const xparams _xparams = NonTH);
-void mlpsetalgobatch(const mlptrainer &s, const xparams _xparams = NonTH);
-void mlpcreatetrainer(const ae_int_t nin, const ae_int_t nout, mlptrainer &s, const xparams _xparams = NonTH);
-void mlpcreatetrainercls(const ae_int_t nin, const ae_int_t nclasses, mlptrainer &s, const xparams _xparams = NonTH);
-void mlptrainnetwork(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, mlpreport &rep, const xparams _xparams = NonTH);
-void mlpstarttraining(const mlptrainer &s, const multilayerperceptron &network, const bool randomstart, const xparams _xparams = NonTH);
-bool mlpcontinuetraining(const mlptrainer &s, const multilayerperceptron &network, const xparams _xparams = NonTH);
-void mlpebagginglm(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep, mlpcvreport &ooberrors, const xparams _xparams = NonTH);
-void mlpebagginglbfgs(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep, mlpcvreport &ooberrors, const xparams _xparams = NonTH);
-void mlpetraines(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep, const xparams _xparams = NonTH);
-void mlptrainensemblees(const mlptrainer &s, const mlpensemble &ensemble, const ae_int_t nrestarts, mlpreport &rep, const xparams _xparams = NonTH);
+void mlptrainlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
+void mlptrainlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep);
+void mlptraines(const multilayerperceptron &network, const real_2d_array &trnxy, const ae_int_t trnsize, const real_2d_array &valxy, const ae_int_t valsize, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
+void mlpkfoldcvlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep);
+void mlpkfoldcvlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep);
+void mlpkfoldcv(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, const ae_int_t foldscount, mlpreport &rep);
+void mlpsetdataset(const mlptrainer &s, const real_2d_array &xy, const ae_int_t npoints);
+void mlpsetsparsedataset(const mlptrainer &s, const sparsematrix &xy, const ae_int_t npoints);
+void mlpsetdecay(const mlptrainer &s, const double decay);
+void mlpsetcond(const mlptrainer &s, const double wstep, const ae_int_t maxits);
+void mlpsetalgobatch(const mlptrainer &s);
+void mlpcreatetrainer(const ae_int_t nin, const ae_int_t nout, mlptrainer &s);
+void mlpcreatetrainercls(const ae_int_t nin, const ae_int_t nclasses, mlptrainer &s);
+void mlptrainnetwork(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, mlpreport &rep);
+void mlpstarttraining(const mlptrainer &s, const multilayerperceptron &network, const bool randomstart);
+bool mlpcontinuetraining(const mlptrainer &s, const multilayerperceptron &network);
+void mlpebagginglm(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep, mlpcvreport &ooberrors);
+void mlpebagginglbfgs(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep, mlpcvreport &ooberrors);
+void mlpetraines(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
+void mlptrainensemblees(const mlptrainer &s, const mlpensemble &ensemble, const ae_int_t nrestarts, mlpreport &rep);
 } // end of namespace alglib
 
 // === DATACOMP Package ===
@@ -1323,7 +1323,7 @@ void kmeansgenerate(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t k, a
 } // end of namespace alglib_impl
 
 namespace alglib {
-void kmeansgenerate(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t k, const ae_int_t restarts, ae_int_t &info, real_2d_array &c, integer_1d_array &xyc, const xparams _xparams = NonTH);
+void kmeansgenerate(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t k, const ae_int_t restarts, ae_int_t &info, real_2d_array &c, integer_1d_array &xyc);
 } // end of namespace alglib
 
 #endif // OnceOnly
