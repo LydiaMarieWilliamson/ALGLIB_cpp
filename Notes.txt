@@ -472,6 +472,10 @@ A6.2. Test Stages
 	―	Remove the conditional if (_xparams != NonTH) ae_set_state_flags(_xparams),
 		and put it in the caller BEFORE the routine, wherever it is set to a value ≠ NonTH,
 		with a call to ae_set_state_flags(NonTH) to follow.
+0-39	AE_{{,PARALLEL_}SINGLECORE,{SEQUENTIAL_,PARALLEL_}MULTICORE} remade into an enum; AE_NOENV = 0 added.
+	AE_TEST renamed into a constant TestMode as declared as the enum type.
+	Multi-branch #if conditionals for the enum made into switch statements.
+39	TestC.cpp: setting the values of global_failure_flag and return the values of main() to EXIT_{SUCCESS,FAILURE}.
 
 A6.3. Test Results
 ──────────────────

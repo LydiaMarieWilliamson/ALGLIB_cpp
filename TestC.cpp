@@ -90081,13 +90081,12 @@ bool testalglibbasics(bool silent, ae_state *_state) {
 #   include <windows.h>
 #endif
 
-#define AE_SINGLECORE           1
-#define AE_SEQUENTIAL_MULTICORE 2
-#define AE_PARALLEL_SINGLECORE 3
-#define AE_PARALLEL_MULTICORE 4
-#define AE_SKIP_TEST 5
-
 unsigned seed;
+
+static const enum {
+   AE_NOENV, AE_SINGLECORE, AE_SEQUENTIAL_MULTICORE, AE_PARALLEL_SINGLECORE, AE_PARALLEL_MULTICORE, AE_SKIP_TEST
+} TestMode = AE_SINGLECORE;
+
 int global_failure_flag = 0;
 bool use_smp = false;
 
@@ -90321,11 +90320,7 @@ int main(int argc, char **argv) {
    InitializeCriticalSection(&print_lock);
 #endif
 // SMP settings
-#if AE_TEST == AE_PARALLEL_MULTICORE || AE_TEST == AE_SEQUENTIAL_MULTICORE
-   use_smp = true;
-#else
-   use_smp = false;
-#endif
+   use_smp = TestMode == AE_PARALLEL_MULTICORE || TestMode == AE_SEQUENTIAL_MULTICORE;
 // Seed
    printf("SEED: %u\n", (unsigned int)seed);
    srand(seed);
@@ -90387,76 +90382,57 @@ int main(int argc, char **argv) {
    printf("OS: unknown\n");
 #endif
 // Testing mode
-#if AE_TEST == 0 || AE_TEST == AE_SINGLECORE
-   printf("TESTING MODE: single core\n");
-#elif AE_TEST == AE_PARALLEL_SINGLECORE
-   printf("TESTING MODE: single core, parallel\n");
-#elif AE_TEST == AE_SEQUENTIAL_MULTICORE
-   printf("TESTING MODE: milti-core, sequential\n");
-#elif AE_TEST == AE_PARALLEL_MULTICORE
-   printf("TESTING MODE: milti-core, parallel\n");
-#elif AE_TEST == AE_SKIP_TEST
-   printf("TESTING MODE: just compiling\n");
-   printf("Done in 0 seconds\n");
-   return 0;
-#else
-#   error Unknown AE_TEST being passed
-#endif
+   switch (TestMode) {
+      case AE_NOENV: case AE_SINGLECORE: printf("Testing Mode: single core\n"); break;
+      case AE_PARALLEL_SINGLECORE: printf("Testing Mode: single core, parallel\n"); break;
+      case AE_SEQUENTIAL_MULTICORE: printf("Testing Mode: multi-core, sequential\n"); break;
+      case AE_PARALLEL_MULTICORE: printf("Testing Mode: multi-core, parallel\n"); break;
+      case AE_SKIP_TEST: printf("Testing Mode: just compiling\nDone in 0 seconds\n"); return EXIT_SUCCESS;
+      default: printf("Testing Mode: unknown\n"); return EXIT_FAILURE;
+   }
 // now we are ready to test!
    time(&time_0);
 #ifdef _ALGLIB_HAS_WORKSTEALING
-   if (ae_smpselftests())
-      printf("%-32s OK\n", "SMP self tests");
-   else {
-      printf("%-32s FAILED\n", "SMP self tests");
-      return 1;
-   }
+   bool smpOk = ae_smpselftests();
+   printf("%-32s %s\n", "SMP self tests", smpOk ? "Ok" : "Failed");
+   if (!smpOk) return EXIT_FAILURE;
 #endif
    fflush(stdout);
-#if AE_TEST == 0 || AE_TEST == AE_SINGLECORE || AE_TEST == AE_SEQUENTIAL_MULTICORE || AE_TEST == AE_SKIP_TEST
-   tester_function(NULL);
-#elif AE_TEST == AE_PARALLEL_MULTICORE || AE_TEST == AE_PARALLEL_SINGLECORE
-#   ifdef _ALGLIB_HAS_WORKSTEALING
-   setnworkers(0);
-#   endif
-#   if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-   {
-      long cpu_cnt;
-      pthread_t *threads = NULL;
-      int idx;
-      cpu_cnt = sysconf(_SC_NPROCESSORS_ONLN);
-      ae_assert(cpu_cnt >= 1, "processors count is less than 1", NULL);
-      threads = (pthread_t *)malloc(cpu_cnt * sizeof(pthread_t));
-      ae_assert(threads != NULL, "malloc failure", NULL);
-      for (idx = 0; idx < cpu_cnt; idx++) {
-         int status = pthread_create(&threads[idx], NULL, tester_function, NULL);
-         if (status != 0) {
-            printf("Failed to create thread\n");
-            abort();
-         }
-      }
-      for (idx = 0; idx < cpu_cnt; idx++)
-         pthread_join(threads[idx], NULL);
-   }
-#   elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-   {
-      SYSTEM_INFO sysInfo;
-      HANDLE *hThreads = NULL;
-      int idx;
-      GetSystemInfo(&sysInfo);
-      ae_assert(sysInfo.dwNumberOfProcessors >= 1, "processors count is less than 1", NULL);
-      hThreads = (HANDLE *)malloc(sysInfo.dwNumberOfProcessors * sizeof(HANDLE));
-      ae_assert(hThreads != NULL, "malloc failure", NULL);
-      for (idx = 0; idx < sysInfo.dwNumberOfProcessors; idx++)
-         hThreads[idx] = CreateThread(NULL, 0, tester_function, NULL, 0, NULL);
-      WaitForMultipleObjects(sysInfo.dwNumberOfProcessors, hThreads, TRUE, INFINITE);
-   }
-#   else
-#      error Unable to determine OS (define AE_OS, AE_DEBUG4POSIX or AE_DEBUG4WINDOWS)
-#   endif
-#else
-#   error Unexpected test mode
+   switch (TestMode) {
+      case AE_NOENV: case AE_SINGLECORE: case AE_SEQUENTIAL_MULTICORE: case AE_SKIP_TEST:
+         tester_function(NULL);
+      break;
+      case AE_PARALLEL_MULTICORE: case AE_PARALLEL_SINGLECORE: {
+#ifdef _ALGLIB_HAS_WORKSTEALING
+         setnworkers(0);
 #endif
+#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
+         long cpu_cnt = sysconf(_SC_NPROCESSORS_ONLN);
+         ae_assert(cpu_cnt >= 1, "processors count is less than 1", NULL);
+         pthread_t *Bundle = (pthread_t *)malloc(cpu_cnt * sizeof *Bundle);
+         ae_assert(Bundle != NULL, "malloc failure", NULL);
+         for (int cpu = 0; cpu < cpu_cnt; cpu++) {
+            int status = pthread_create(&Bundle[cpu], NULL, tester_function, NULL);
+            if (status != 0) {
+               printf("Failed to create thread\n");
+               abort();
+            }
+         }
+         for (int cpu = 0; cpu < cpu_cnt; cpu++) pthread_join(Bundle[cpu], NULL);
+#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
+         SYSTEM_INFO sysInfo; GetSystemInfo(&sysInfo); long cpu_cnt = sysInfo.dwNumberOfProcessors;
+         ae_assert(cpu_cnt >= 1, "processors count is less than 1", NULL);
+         HANDLE *Bundle = (HANDLE *)malloc(cpu_cnt * sizeof *Bundle);
+         ae_assert(Bundle != NULL, "malloc failure", NULL);
+         for (int cpu = 0; cpu < cpu_cnt; cpu++)
+            Bundle[cpu] = CreateThread(NULL, 0, tester_function, NULL, 0, NULL);
+         WaitForMultipleObjects(cpu_cnt, Bundle, TRUE, INFINITE);
+#else
+#   error Unable to determine OS (define AE_OS, AE_DEBUG4POSIX or AE_DEBUG4WINDOWS)
+#endif
+      }
+      default: printf("Unexpected test mode\n"); return EXIT_FAILURE;
+   }
    time(&time_1);
    printf("Done in %ld seconds\n", (long)difftime(time_1, time_0));
    if (global_failure_flag)
