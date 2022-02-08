@@ -374,7 +374,7 @@ void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformpl
 namespace alglib {
 void fftc1d(complex_1d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fftc1d(ConstT(ae_vector, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -382,7 +382,7 @@ void fftc1d(complex_1d_array &a, const ae_int_t n) {
 void fftc1d(complex_1d_array &a) {
    ae_int_t n = a.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fftc1d(ConstT(ae_vector, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -390,7 +390,7 @@ void fftc1d(complex_1d_array &a) {
 
 void fftc1dinv(complex_1d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fftc1dinv(ConstT(ae_vector, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -398,7 +398,7 @@ void fftc1dinv(complex_1d_array &a, const ae_int_t n) {
 void fftc1dinv(complex_1d_array &a) {
    ae_int_t n = a.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fftc1dinv(ConstT(ae_vector, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -406,7 +406,7 @@ void fftc1dinv(complex_1d_array &a) {
 
 void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fftr1d(ConstT(ae_vector, a), n, ConstT(ae_vector, f), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -414,7 +414,7 @@ void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f) {
 void fftr1d(const real_1d_array &a, complex_1d_array &f) {
    ae_int_t n = a.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fftr1d(ConstT(ae_vector, a), n, ConstT(ae_vector, f), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -422,7 +422,7 @@ void fftr1d(const real_1d_array &a, complex_1d_array &f) {
 
 void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fftr1dinv(ConstT(ae_vector, f), n, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -430,7 +430,7 @@ void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a) {
 void fftr1dinv(const complex_1d_array &f, real_1d_array &a) {
    ae_int_t n = f.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fftr1dinv(ConstT(ae_vector, f), n, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -506,14 +506,14 @@ void fhtr1dinv(RVector *a, ae_int_t n, ae_state *_state) {
 namespace alglib {
 void fhtr1d(real_1d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fhtr1d(ConstT(ae_vector, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void fhtr1dinv(real_1d_array &a, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fhtr1dinv(ConstT(ae_vector, a), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1682,56 +1682,56 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
 namespace alglib {
 void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::convc1d(ConstT(ae_vector, a), m, ConstT(ae_vector, b), n, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::convc1dinv(ConstT(ae_vector, a), m, ConstT(ae_vector, b), n, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::convc1dcircular(ConstT(ae_vector, s), m, ConstT(ae_vector, r), n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::convc1dcircularinv(ConstT(ae_vector, a), m, ConstT(ae_vector, b), n, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::convr1d(ConstT(ae_vector, a), m, ConstT(ae_vector, b), n, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::convr1dinv(ConstT(ae_vector, a), m, ConstT(ae_vector, b), n, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::convr1dcircular(ConstT(ae_vector, s), m, ConstT(ae_vector, r), n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::convr1dcircularinv(ConstT(ae_vector, a), m, ConstT(ae_vector, b), n, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1984,28 +1984,28 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
 namespace alglib {
 void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_array &pattern, const ae_int_t m, complex_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::corrc1d(ConstT(ae_vector, signal), n, ConstT(ae_vector, pattern), m, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const complex_1d_array &pattern, const ae_int_t n, complex_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::corrc1dcircular(ConstT(ae_vector, signal), m, ConstT(ae_vector, pattern), n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array &pattern, const ae_int_t m, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::corrr1d(ConstT(ae_vector, signal), n, ConstT(ae_vector, pattern), m, ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1d_array &pattern, const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::corrr1dcircular(ConstT(ae_vector, signal), m, ConstT(ae_vector, pattern), n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }

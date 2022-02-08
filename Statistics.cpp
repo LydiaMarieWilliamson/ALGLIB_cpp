@@ -1472,7 +1472,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
 namespace alglib {
 void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, double &variance, double &skewness, double &kurtosis) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::samplemoments(ConstT(ae_vector, x), n, &mean, &variance, &skewness, &kurtosis, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1480,7 +1480,7 @@ void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, doubl
 void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::samplemoments(ConstT(ae_vector, x), n, &mean, &variance, &skewness, &kurtosis, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1488,7 +1488,7 @@ void samplemoments(const real_1d_array &x, double &mean, double &variance, doubl
 
 double samplemean(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::samplemean(ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1497,7 +1497,7 @@ double samplemean(const real_1d_array &x, const ae_int_t n) {
 double samplemean(const real_1d_array &x) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::samplemean(ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1506,7 +1506,7 @@ double samplemean(const real_1d_array &x) {
 
 double samplevariance(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::samplevariance(ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1515,7 +1515,7 @@ double samplevariance(const real_1d_array &x, const ae_int_t n) {
 double samplevariance(const real_1d_array &x) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::samplevariance(ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1524,7 +1524,7 @@ double samplevariance(const real_1d_array &x) {
 
 double sampleskewness(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::sampleskewness(ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1533,7 +1533,7 @@ double sampleskewness(const real_1d_array &x, const ae_int_t n) {
 double sampleskewness(const real_1d_array &x) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::sampleskewness(ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1542,7 +1542,7 @@ double sampleskewness(const real_1d_array &x) {
 
 double samplekurtosis(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::samplekurtosis(ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1551,7 +1551,7 @@ double samplekurtosis(const real_1d_array &x, const ae_int_t n) {
 double samplekurtosis(const real_1d_array &x) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::samplekurtosis(ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1560,7 +1560,7 @@ double samplekurtosis(const real_1d_array &x) {
 
 void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::sampleadev(ConstT(ae_vector, x), n, &adev, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1568,7 +1568,7 @@ void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev) {
 void sampleadev(const real_1d_array &x, double &adev) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::sampleadev(ConstT(ae_vector, x), n, &adev, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1576,7 +1576,7 @@ void sampleadev(const real_1d_array &x, double &adev) {
 
 void samplemedian(const real_1d_array &x, const ae_int_t n, double &median) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::samplemedian(ConstT(ae_vector, x), n, &median, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1584,7 +1584,7 @@ void samplemedian(const real_1d_array &x, const ae_int_t n, double &median) {
 void samplemedian(const real_1d_array &x, double &median) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::samplemedian(ConstT(ae_vector, x), n, &median, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1592,7 +1592,7 @@ void samplemedian(const real_1d_array &x, double &median) {
 
 void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::samplepercentile(ConstT(ae_vector, x), n, p, &v, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1600,7 +1600,7 @@ void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, 
 void samplepercentile(const real_1d_array &x, const double p, double &v) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::samplepercentile(ConstT(ae_vector, x), n, p, &v, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1608,7 +1608,7 @@ void samplepercentile(const real_1d_array &x, const double p, double &v) {
 
 void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1617,7 +1617,7 @@ void rankdata(real_2d_array &xy) {
    ae_int_t npoints = xy.rows();
    ae_int_t nfeatures = xy.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1625,7 +1625,7 @@ void rankdata(real_2d_array &xy) {
 
 void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1634,7 +1634,7 @@ void rankdatacentered(real_2d_array &xy) {
    ae_int_t npoints = xy.rows();
    ae_int_t nfeatures = xy.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1642,7 +1642,7 @@ void rankdatacentered(real_2d_array &xy) {
 
 double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::cov2(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1652,7 +1652,7 @@ double cov2(const real_1d_array &x, const real_1d_array &y) {
    if (x.length() != y.length()) ThrowError("Error while calling 'cov2': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::cov2(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1661,7 +1661,7 @@ double cov2(const real_1d_array &x, const real_1d_array &y) {
 
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::pearsoncorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1671,7 +1671,7 @@ double pearsoncorr2(const real_1d_array &x, const real_1d_array &y) {
    if (x.length() != y.length()) ThrowError("Error while calling 'pearsoncorr2': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::pearsoncorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1680,7 +1680,7 @@ double pearsoncorr2(const real_1d_array &x, const real_1d_array &y) {
 
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::spearmancorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1690,7 +1690,7 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y) {
    if (x.length() != y.length()) ThrowError("Error while calling 'spearmancorr2': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::spearmancorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1699,7 +1699,7 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y) {
 
 double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::pearsoncorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1707,7 +1707,7 @@ double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const 
 
 double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::spearmanrankcorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1715,7 +1715,7 @@ double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, c
 
 void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::covm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1724,7 +1724,7 @@ void covm(const real_2d_array &x, real_2d_array &c) {
    ae_int_t n = x.rows();
    ae_int_t m = x.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::covm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1732,7 +1732,7 @@ void covm(const real_2d_array &x, real_2d_array &c) {
 
 void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pearsoncorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1741,7 +1741,7 @@ void pearsoncorrm(const real_2d_array &x, real_2d_array &c) {
    ae_int_t n = x.rows();
    ae_int_t m = x.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pearsoncorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1749,7 +1749,7 @@ void pearsoncorrm(const real_2d_array &x, real_2d_array &c) {
 
 void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spearmancorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1758,7 +1758,7 @@ void spearmancorrm(const real_2d_array &x, real_2d_array &c) {
    ae_int_t n = x.rows();
    ae_int_t m = x.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spearmancorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1766,7 +1766,7 @@ void spearmancorrm(const real_2d_array &x, real_2d_array &c) {
 
 void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::covm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1777,7 +1777,7 @@ void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
    ae_int_t m1 = x.cols();
    ae_int_t m2 = y.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::covm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1785,7 +1785,7 @@ void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
 
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pearsoncorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1796,7 +1796,7 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array
    ae_int_t m1 = x.cols();
    ae_int_t m2 = y.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pearsoncorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1804,7 +1804,7 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array
 
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spearmancorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1815,7 +1815,7 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_arra
    ae_int_t m1 = x.cols();
    ae_int_t m2 = y.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spearmancorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -2356,14 +2356,14 @@ void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails
 namespace alglib {
 void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pearsoncorrelationsignificance(r, n, &bothtails, &lefttail, &righttail, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spearmanrankcorrelationsignificance(r, n, &bothtails, &lefttail, &righttail, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -4260,7 +4260,7 @@ void jarqueberatest(RVector *x, ae_int_t n, double *p, ae_state *_state) {
 namespace alglib {
 void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::jarqueberatest(ConstT(ae_vector, x), n, &p, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -4433,14 +4433,14 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
 namespace alglib {
 void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ftest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::onesamplevariancetest(ConstT(ae_vector, x), n, variance, &bothtails, &lefttail, &righttail, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -9149,7 +9149,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
 namespace alglib {
 void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::wilcoxonsignedranktest(ConstT(ae_vector, x), n, e, &bothtails, &lefttail, &righttail, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -12773,7 +12773,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
 namespace alglib {
 void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mannwhitneyutest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -12862,7 +12862,7 @@ void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails,
 namespace alglib {
 void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::onesamplesigntest(ConstT(ae_vector, x), n, median, &bothtails, &lefttail, &righttail, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13270,21 +13270,21 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
 namespace alglib {
 void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::studentttest1(ConstT(ae_vector, x), n, mean, &bothtails, &lefttail, &righttail, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::studentttest2(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::unequalvariancettest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }

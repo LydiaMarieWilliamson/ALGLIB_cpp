@@ -279,7 +279,7 @@ double lngamma(double x, double *sgngam, ae_state *_state) {
 namespace alglib {
 double gammafunction(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::gammafunction(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -287,7 +287,7 @@ double gammafunction(const double x) {
 
 double lngamma(const double x, double &sgngam) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::lngamma(x, &sgngam, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -827,7 +827,7 @@ double bivariatenormalcdf(double x, double y, double rho, ae_state *_state) {
 namespace alglib {
 double errorfunction(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::errorfunction(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -835,7 +835,7 @@ double errorfunction(const double x) {
 
 double errorfunctionc(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::errorfunctionc(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -843,7 +843,7 @@ double errorfunctionc(const double x) {
 
 double normaldistribution(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::normaldistribution(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -851,7 +851,7 @@ double normaldistribution(const double x) {
 
 double normalpdf(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::normalpdf(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -859,7 +859,7 @@ double normalpdf(const double x) {
 
 double normalcdf(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::normalcdf(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -867,7 +867,7 @@ double normalcdf(const double x) {
 
 double invnormalcdf(const double y0) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::invnormalcdf(y0, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -875,7 +875,7 @@ double invnormalcdf(const double y0) {
 
 double invnormaldistribution(const double y0) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::invnormaldistribution(y0, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -883,7 +883,7 @@ double invnormaldistribution(const double y0) {
 
 double inverf(const double e) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::inverf(e, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -891,7 +891,7 @@ double inverf(const double e) {
 
 double bivariatenormalpdf(const double x, const double y, const double rho) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::bivariatenormalpdf(x, y, rho, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -899,7 +899,7 @@ double bivariatenormalpdf(const double x, const double y, const double rho) {
 
 double bivariatenormalcdf(const double x, const double y, const double rho) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::bivariatenormalcdf(x, y, rho, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1645,7 +1645,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
 namespace alglib {
 double incompletebeta(const double a, const double b, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::incompletebeta(a, b, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1653,7 +1653,7 @@ double incompletebeta(const double a, const double b, const double x) {
 
 double invincompletebeta(const double a, const double b, const double y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::invincompletebeta(a, b, y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1821,7 +1821,7 @@ double invstudenttdistribution(ae_int_t k, double p, ae_state *_state) {
 namespace alglib {
 double studenttdistribution(const ae_int_t k, const double t) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::studenttdistribution(k, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1829,7 +1829,7 @@ double studenttdistribution(const ae_int_t k, const double t) {
 
 double invstudenttdistribution(const ae_int_t k, const double p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::invstudenttdistribution(k, p, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1980,7 +1980,7 @@ double invfdistribution(ae_int_t a, ae_int_t b, double y, ae_state *_state) {
 namespace alglib {
 double fdistribution(const ae_int_t a, const ae_int_t b, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::fdistribution(a, b, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1988,7 +1988,7 @@ double fdistribution(const ae_int_t a, const ae_int_t b, const double x) {
 
 double fcdistribution(const ae_int_t a, const ae_int_t b, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::fcdistribution(a, b, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1996,7 +1996,7 @@ double fcdistribution(const ae_int_t a, const ae_int_t b, const double x) {
 
 double invfdistribution(const ae_int_t a, const ae_int_t b, const double y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::invfdistribution(a, b, y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2345,7 +2345,7 @@ double invincompletegammac(double a, double y0, ae_state *_state) {
 namespace alglib {
 double incompletegamma(const double a, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::incompletegamma(a, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2353,7 +2353,7 @@ double incompletegamma(const double a, const double x) {
 
 double incompletegammac(const double a, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::incompletegammac(a, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2361,7 +2361,7 @@ double incompletegammac(const double a, const double x) {
 
 double invincompletegammac(const double a, const double y0) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::invincompletegammac(a, y0, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2477,7 +2477,7 @@ double invchisquaredistribution(double v, double y, ae_state *_state) {
 namespace alglib {
 double chisquaredistribution(const double v, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::chisquaredistribution(v, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2485,7 +2485,7 @@ double chisquaredistribution(const double v, const double x) {
 
 double chisquarecdistribution(const double v, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::chisquarecdistribution(v, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2493,7 +2493,7 @@ double chisquarecdistribution(const double v, const double x) {
 
 double invchisquaredistribution(const double v, const double y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::invchisquaredistribution(v, y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2677,7 +2677,7 @@ double invbinomialdistribution(ae_int_t k, ae_int_t n, double y, ae_state *_stat
 namespace alglib {
 double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::binomialdistribution(k, n, p, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2685,7 +2685,7 @@ double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p) 
 
 double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::binomialcdistribution(k, n, p, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2693,7 +2693,7 @@ double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p)
 
 double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::invbinomialdistribution(k, n, y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3043,7 +3043,7 @@ double exponentialintegralen(double x, ae_int_t n, ae_state *_state) {
 namespace alglib {
 double exponentialintegralei(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::exponentialintegralei(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3051,7 +3051,7 @@ double exponentialintegralei(const double x) {
 
 double exponentialintegralen(const double x, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::exponentialintegralen(x, n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3179,7 +3179,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
 namespace alglib {
 void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::jacobianellipticfunctions(u, m, &sn, &cn, &dn, &ph, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3591,14 +3591,14 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi, ae_state 
 namespace alglib {
 void sinecosineintegrals(const double x, double &si, double &ci) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::sinecosineintegrals(x, &si, &ci, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::hyperbolicsinecosineintegrals(x, &shi, &chi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3768,7 +3768,7 @@ void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state) {
 namespace alglib {
 double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::chebyshevcalculate(r, n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3776,7 +3776,7 @@ double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x) {
 
 double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::chebyshevsum(ConstT(ae_vector, c), r, n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3784,14 +3784,14 @@ double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, 
 
 void chebyshevcoefficients(const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::chebyshevcoefficients(n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fromchebyshev(ConstT(ae_vector, a), n, ConstT(ae_vector, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3892,7 +3892,7 @@ double invpoissondistribution(ae_int_t k, double y, ae_state *_state) {
 namespace alglib {
 double poissondistribution(const ae_int_t k, const double m) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::poissondistribution(k, m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3900,7 +3900,7 @@ double poissondistribution(const ae_int_t k, const double m) {
 
 double poissoncdistribution(const ae_int_t k, const double m) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::poissoncdistribution(k, m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3908,7 +3908,7 @@ double poissoncdistribution(const ae_int_t k, const double m) {
 
 double invpoissondistribution(const ae_int_t k, const double y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::invpoissondistribution(k, y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3976,7 +3976,7 @@ double beta(double a, double b, ae_state *_state) {
 namespace alglib {
 double beta(const double a, const double b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::beta(a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4151,7 +4151,7 @@ void fresnelintegral(double x, double *c, double *s, ae_state *_state) {
 namespace alglib {
 void fresnelintegral(const double x, double &c, double &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fresnelintegral(x, &c, &s, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -4274,7 +4274,7 @@ double psi(double x, ae_state *_state) {
 namespace alglib {
 double psi(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::psi(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4606,7 +4606,7 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip, ae_state *
 namespace alglib {
 void airy(const double x, double &ai, double &aip, double &bi, double &bip) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::airy(x, &ai, &aip, &bi, &bip, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -4733,7 +4733,7 @@ double dawsonintegral(double x, ae_state *_state) {
 namespace alglib {
 double dawsonintegral(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::dawsonintegral(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4831,7 +4831,7 @@ void hermitecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
 namespace alglib {
 double hermitecalculate(const ae_int_t n, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::hermitecalculate(n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4839,7 +4839,7 @@ double hermitecalculate(const ae_int_t n, const double x) {
 
 double hermitesum(const real_1d_array &c, const ae_int_t n, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::hermitesum(ConstT(ae_vector, c), n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4847,7 +4847,7 @@ double hermitesum(const real_1d_array &c, const ae_int_t n, const double x) {
 
 void hermitecoefficients(const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::hermitecoefficients(n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -4944,7 +4944,7 @@ void legendrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
 namespace alglib {
 double legendrecalculate(const ae_int_t n, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::legendrecalculate(n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4952,7 +4952,7 @@ double legendrecalculate(const ae_int_t n, const double x) {
 
 double legendresum(const real_1d_array &c, const ae_int_t n, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::legendresum(ConstT(ae_vector, c), n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -4960,7 +4960,7 @@ double legendresum(const real_1d_array &c, const ae_int_t n, const double x) {
 
 void legendrecoefficients(const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::legendrecoefficients(n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -6000,7 +6000,7 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
 namespace alglib {
 double besselj0(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::besselj0(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6008,7 +6008,7 @@ double besselj0(const double x) {
 
 double besselj1(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::besselj1(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6016,7 +6016,7 @@ double besselj1(const double x) {
 
 double besseljn(const ae_int_t n, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::besseljn(n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6024,7 +6024,7 @@ double besseljn(const ae_int_t n, const double x) {
 
 double bessely0(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::bessely0(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6032,7 +6032,7 @@ double bessely0(const double x) {
 
 double bessely1(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::bessely1(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6040,7 +6040,7 @@ double bessely1(const double x) {
 
 double besselyn(const ae_int_t n, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::besselyn(n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6048,7 +6048,7 @@ double besselyn(const ae_int_t n, const double x) {
 
 double besseli0(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::besseli0(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6056,7 +6056,7 @@ double besseli0(const double x) {
 
 double besseli1(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::besseli1(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6064,7 +6064,7 @@ double besseli1(const double x) {
 
 double besselk0(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::besselk0(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6072,7 +6072,7 @@ double besselk0(const double x) {
 
 double besselk1(const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::besselk1(x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6080,7 +6080,7 @@ double besselk1(const double x) {
 
 double besselkn(const ae_int_t nn, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::besselkn(nn, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6168,7 +6168,7 @@ void laguerrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
 namespace alglib {
 double laguerrecalculate(const ae_int_t n, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::laguerrecalculate(n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6176,7 +6176,7 @@ double laguerrecalculate(const ae_int_t n, const double x) {
 
 double laguerresum(const real_1d_array &c, const ae_int_t n, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::laguerresum(ConstT(ae_vector, c), n, x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6184,7 +6184,7 @@ double laguerresum(const real_1d_array &c, const ae_int_t n, const double x) {
 
 void laguerrecoefficients(const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::laguerrecoefficients(n, ConstT(ae_vector, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -6590,7 +6590,7 @@ double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
 namespace alglib {
 double ellipticintegralkhighprecision(const double m1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::ellipticintegralkhighprecision(m1, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6598,7 +6598,7 @@ double ellipticintegralkhighprecision(const double m1) {
 
 double ellipticintegralk(const double m) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::ellipticintegralk(m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6606,7 +6606,7 @@ double ellipticintegralk(const double m) {
 
 double incompleteellipticintegralk(const double phi, const double m) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::incompleteellipticintegralk(phi, m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6614,7 +6614,7 @@ double incompleteellipticintegralk(const double phi, const double m) {
 
 double ellipticintegrale(const double m) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::ellipticintegrale(m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -6622,7 +6622,7 @@ double ellipticintegrale(const double m) {
 
 double incompleteellipticintegrale(const double phi, const double m) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::incompleteellipticintegrale(phi, m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;

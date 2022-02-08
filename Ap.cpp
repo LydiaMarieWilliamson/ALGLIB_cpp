@@ -101,12 +101,19 @@ bool _use_alloc_counter = false;
 bool _force_malloc_failure = false;
 ae_int_t _malloc_failure_after = 0;
 
-// This function sets jump buffer for error handling.
-//
-// buf may be NULL.
-void ae_state_set_break_jump(ae_state *state, jmp_buf *buf) {
-   state->break_jump = buf;
+//(@) Originally a part of the global environment structure, these should al; be made thread-local.
+// A pointer to the jmp_buf for cases when C-style exception handling is used.
+// It may be NULL.
+AutoS jmp_buf *volatile CurBreakAt;
+
+// Set the jump buffer for error handling.
+void ae_state_set_break_jump(jmp_buf *buf) {
+   CurBreakAt = buf;
 }
+
+// The ae_error_type of the last error and a legible message for it; filled when an exception is thrown.
+AutoS ae_error_type volatile CurStatus;
+AutoS const char *volatile CurMsg;
 
 // Flags: call-local settings for ALGLIB++.
 AutoS ae_uint64_t CurFlags;
@@ -171,8 +178,8 @@ void ae_state_init(ae_state *state) {
 // Set the flags.
    CurFlags = NonTH;
    state->p_top_block = &BotFr;
-   state->break_jump = NULL;
-   state->error_msg = "";
+   CurBreakAt = NULL;
+   CurMsg = "";
 // Set the threading information.
    CurThread = NULL, CurTask = NULL, ErrorOp = NULL;
 }
@@ -432,21 +439,21 @@ void ae_clean_up_before_breaking(ae_state *state) {
 
 // This function abnormally aborts program, using one of several ways:
 //
-// * for state != NULL and state->break_jump being initialized with  call  to
+// * for state != NULL and CurBreakAt being initialized with  call  to
 //   ae_state_set_break_jump() - it performs longjmp() to return site.
 // * otherwise, abort() is called
 //
-// In   all  cases,  for  state != NULL  function  sets  state->last_error  and
-// state->error_msg fields. It also clears state with ae_state_clear().
+// In   all  cases,  for  state != NULL  function  sets  CurStatus  and
+// CurMsg fields. It also clears state with ae_state_clear().
 //
 // If state != NULL and Error() != NULL, it is called prior to handling error and clearing state.
 static void ae_break(ae_state *state, ae_error_type error_type, const char *msg) {
    if (state != NULL) {
       ae_clean_up_before_breaking(state);
-      state->last_error = error_type;
-      state->error_msg = msg;
-      if (state->break_jump != NULL)
-         longjmp(*(state->break_jump), 1);
+      CurStatus = error_type;
+      CurMsg = msg;
+      if (CurBreakAt != NULL)
+         longjmp(*CurBreakAt, 1);
       else
          abort();
    } else
@@ -8312,46 +8319,22 @@ namespace alglib {
 
 // Exception handling.
 #if !defined AE_NO_EXCEPTIONS
-ap_error::ap_error() {
-}
-
-ap_error::ap_error(const char *Msg) {
-   msg = Msg;
-}
-
-void ap_error::make_assertion(bool Cond) {
-   if (!Cond)
-      ThrowError("");
-}
-
-void ap_error::make_assertion(bool Cond, const char *Msg) {
-   if (!Cond)
-      ThrowError(Msg);
-}
+ap_error::ap_error() { msg = alglib_impl::CurMsg; }
+ap_error::ap_error(const char *Msg) { msg = Msg; }
+void ap_error::make_assertion(bool Cond) { if (!Cond) ThrowError(""); }
+void ap_error::make_assertion(bool Cond, const char *Msg) { if (!Cond) ThrowError(Msg); }
 #else
 static const char *_alglib_last_error = NULL;
-
-static void set_error_flag(const char *Msg) {
-   if (Msg == NULL)
-      Msg = "ALGLIB: unknown error";
-   _alglib_last_error = Msg;
-}
-
-void set_error_msg(alglib_impl::ae_state Q) {
-   _alglib_last_error = Q.error_msg;
-}
+static void set_error_flag(const char *Msg) { _alglib_last_error = Msg == NULL ? "set_error_flag: unknown error" : Msg; }
+void set_error_msg() { _alglib_last_error = alglib_impl::CurMsg; }
 
 bool get_error_flag(const char **MsgP) {
-   if (_alglib_last_error == NULL)
-      return false;
-   if (MsgP != NULL)
-      *MsgP = _alglib_last_error;
+   if (_alglib_last_error == NULL) return false;
+   if (MsgP != NULL) *MsgP = _alglib_last_error;
    return true;
 }
 
-void clear_error_flag() {
-   _alglib_last_error = NULL;
-}
+void clear_error_flag() { _alglib_last_error = NULL; }
 #endif
 
 // Global and local constants/variables.
@@ -9705,13 +9688,11 @@ std::string arraytostring(const complex *ptr, ae_int_t n, int dps) {
 
 ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
    alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryX(_state) {
+   TryX {
 #if !defined AE_NO_EXCEPTIONS
-      ThrowErrorMsg(_state, );
+      ThrowErrorMsg();
 #else
-      owner = true, This = NULL;
-      set_error_msg(_state);
-      return;
+      owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
    owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, 0, datatype, &_state, false);
@@ -9724,9 +9705,7 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl:
 #if !defined AE_NO_EXCEPTIONS
       ThrowError(msg);
 #else
-      owner = true, This = NULL;
-      set_error_flag(msg);
-      return;
+      owner = true, This = NULL, set_error_flag(msg); return;
 #endif
    }
    owner = false, This = e_ptr;
@@ -9734,13 +9713,11 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl:
 
 ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::ae_datatype datatype) {
    alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryX(_state) {
+   TryX {
 #if !defined AE_NO_EXCEPTIONS
-      ThrowErrorMsg(_state, );
+      ThrowErrorMsg();
 #else
-      owner = true, This = NULL;
-      set_error_msg(_state);
-      return;
+      owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
    alglib_impl::ae_assert(rhs.This != NULL, "ALGLIB: ae_vector_wrapper source is not initialized", &_state);
@@ -9756,7 +9733,7 @@ ae_vector_wrapper::~ae_vector_wrapper() {
 
 void ae_vector_wrapper::setlength(ae_int_t iLen) {
    alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryCatch(_state, )
+   TryCatch()
    alglib_impl::ae_assert(This != NULL, "ALGLIB: setlength() error, This == NULL (array was not correctly initialized)", &_state);
    alglib_impl::ae_assert(owner, "ALGLIB: setlength() error, This is frozen proxy array", &_state);
    alglib_impl::ae_vector_set_length(This, iLen, &_state);
@@ -9777,7 +9754,7 @@ const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs)
    if (this == &rhs)
       return *this;
    alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryCatch(_state, *this)
+   TryCatch(*this)
    ae_assert(This != NULL, "ALGLIB: incorrect assignment (uninitialized destination)", &_state);
    ae_assert(rhs.This != NULL, "ALGLIB: incorrect assignment (uninitialized source)", &_state);
    ae_assert(rhs.This->datatype == This->datatype, "ALGLIB: incorrect assignment to array (types do not match)", &_state);
@@ -9801,7 +9778,7 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
       str_vector_create(p, true, &svec);
       {
          alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-         TryCatch(_state, )
+         TryCatch()
          owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, (ae_int_t)svec.size(), datatype, &_state, false);
          ae_state_clear(&_state);
       }
@@ -10010,13 +9987,11 @@ double *real_1d_array::getcontent() {
 void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
    alglib_impl::x_vector x;
    alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryX(_state) {
+   TryX {
 #if !defined AE_NO_EXCEPTIONS
-      ThrowErrorMsg(_state, );
+      ThrowErrorMsg();
 #else
-      owner = true, This = NULL;
-      set_error_msg(_state);
-      return;
+      owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
    alglib_impl::ae_assert(owner, "ALGLIB: unable to attach proxy object to something else", &_state);
@@ -10094,13 +10069,11 @@ complex *complex_1d_array::getcontent() {
 
 ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
    alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryX(_state) {
+   TryX {
 #if !defined AE_NO_EXCEPTIONS
-      ThrowErrorMsg(_state, );
+      ThrowErrorMsg();
 #else
-      owner = true, This = NULL;
-      set_error_msg(_state);
-      return;
+      owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
    owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_matrix_init(This, 0, 0, datatype, &_state, false);
@@ -10113,9 +10086,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl:
 #if !defined AE_NO_EXCEPTIONS
       ThrowError(msg);
 #else
-      owner = true, This = NULL;
-      set_error_flag(msg);
-      return;
+      owner = true, This = NULL, set_error_flag(msg); return;
 #endif
    }
    owner = false, This = e_ptr;
@@ -10123,13 +10094,11 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl:
 
 ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::ae_datatype datatype) {
    alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryX(_state) {
+   TryX {
 #if !defined AE_NO_EXCEPTIONS
-      ThrowErrorMsg(_state, );
+      ThrowErrorMsg();
 #else
-      owner = true, This = NULL;
-      set_error_msg(_state);
-      return;
+      owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
    owner = true, This = NULL;
@@ -10148,7 +10117,7 @@ ae_matrix_wrapper::~ae_matrix_wrapper() {
 // TODO: automatic allocation of NULL pointer!!!!!
 void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
    alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryCatch(_state, )
+   TryCatch()
    alglib_impl::ae_assert(This != NULL, "ALGLIB: setlength() error, p_mat == NULL (array was not correctly initialized)", &_state);
    alglib_impl::ae_assert(owner, "ALGLIB: setlength() error, attempt to resize proxy array", &_state);
    alglib_impl::ae_matrix_set_length(This, rows, cols, &_state);
@@ -10182,7 +10151,7 @@ const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs)
    if (this == &rhs)
       return *this;
    alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryCatch(_state, *this)
+   TryCatch(*this)
    ae_assert(This != NULL, "ALGLIB: incorrect assignment to matrix (uninitialized destination)", &_state);
    ae_assert(rhs.This != NULL, "ALGLIB: incorrect assignment to array (uninitialized source)", &_state);
    ae_assert(rhs.This->datatype == This->datatype, "ALGLIB: incorrect assignment to array (types dont match)", &_state);
@@ -10209,7 +10178,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
       str_matrix_create(p, &smat);
       {
          alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-         TryCatch(_state, )
+         TryCatch()
          owner = true, This = &Obj, memset(This, 0, sizeof *This);
          if (smat.size() != 0)
             ae_matrix_init(This, (ae_int_t)smat.size(), (ae_int_t)smat[0].size(), datatype, &_state, false);
@@ -10427,13 +10396,11 @@ void real_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const double *pCo
 void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pContent) {
    alglib_impl::x_matrix x;
    alglib_impl::ae_state _state; alglib_impl::ae_state_init(&_state);
-   TryX(_state) {
+   TryX {
 #if !defined AE_NO_EXCEPTIONS
-      ThrowErrorMsg(_state, );
+      ThrowErrorMsg();
 #else
-      owner = true, This = NULL;
-      set_error_flag(_state.error_msg);
-      return;
+      owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
    alglib_impl::ae_assert(owner, "ALGLIB: unable to attach proxy object to something else", &_state);

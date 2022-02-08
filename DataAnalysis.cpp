@@ -398,21 +398,21 @@ void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvar
 namespace alglib {
 void pcabuildbasis(const real_2d_array &x, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, real_1d_array &s2, real_2d_array &v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pcabuildbasis(ConstT(ae_matrix, x), npoints, nvars, &info, ConstT(ae_vector, s2), ConstT(ae_matrix, v), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pcatruncatedsubspace(const real_2d_array &x, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nneeded, const double eps, const ae_int_t maxits, real_1d_array &s2, real_2d_array &v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pcatruncatedsubspace(ConstT(ae_matrix, x), npoints, nvars, nneeded, eps, maxits, ConstT(ae_vector, s2), ConstT(ae_matrix, v), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pcatruncatedsubspacesparse(const sparsematrix &x, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nneeded, const double eps, const ae_int_t maxits, real_1d_array &s2, real_2d_array &v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pcatruncatedsubspacesparse(ConstT(sparsematrix, x), npoints, nvars, nneeded, eps, maxits, ConstT(ae_vector, s2), ConstT(ae_matrix, v), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1414,14 +1414,14 @@ void cvreport_free(void *_p, bool make_automatic) {
 namespace alglib {
 void dsoptimalsplit2(const real_1d_array &a, const integer_1d_array &c, const ae_int_t n, ae_int_t &info, double &threshold, double &pal, double &pbl, double &par, double &pbr, double &cve) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dsoptimalsplit2(ConstT(ae_vector, a), ConstT(ae_vector, c), n, &info, &threshold, &pal, &pbl, &par, &pbr, &cve, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dsoptimalsplit2fast(real_1d_array &a, integer_1d_array &c, integer_1d_array &tiesbuf, integer_1d_array &cntbuf, real_1d_array &bufr, integer_1d_array &bufi, const ae_int_t n, const ae_int_t nc, const double alpha, ae_int_t &info, double &threshold, double &rms, double &cvrms) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dsoptimalsplit2fast(ConstT(ae_vector, a), ConstT(ae_vector, c), ConstT(ae_vector, tiesbuf), ConstT(ae_vector, cntbuf), ConstT(ae_vector, bufr), ConstT(ae_vector, bufi), n, nc, alpha, &info, &threshold, &rms, &cvrms, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -6957,7 +6957,7 @@ DefClass(multilayerperceptron, )
 void mlpserialize(multilayerperceptron &obj, std::string &s_out) {
    alglib_impl::ae_int_t ssize;
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::mlpalloc(&serializer, obj.c_ptr(), &state);
@@ -6972,7 +6972,7 @@ void mlpserialize(multilayerperceptron &obj, std::string &s_out) {
 }
 void mlpserialize(multilayerperceptron &obj, std::ostream &s_out) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::mlpalloc(&serializer, obj.c_ptr(), &state);
@@ -6985,7 +6985,7 @@ void mlpserialize(multilayerperceptron &obj, std::ostream &s_out) {
 
 void mlpunserialize(const std::string &s_in, multilayerperceptron &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::mlpunserialize(&serializer, obj.c_ptr(), &state);
@@ -6994,7 +6994,7 @@ void mlpunserialize(const std::string &s_in, multilayerperceptron &obj) {
 }
 void mlpunserialize(const std::istream &s_in, multilayerperceptron &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::mlpunserialize(&serializer, obj.c_ptr(), &state);
@@ -7004,14 +7004,14 @@ void mlpunserialize(const std::istream &s_in, multilayerperceptron &obj) {
 
 void mlpproperties(const multilayerperceptron &network, ae_int_t &nin, ae_int_t &nout, ae_int_t &wcount) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpproperties(ConstT(multilayerperceptron, network), &nin, &nout, &wcount, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 bool mlpissoftmax(const multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, false)
+   TryCatch(false)
    bool Ok = alglib_impl::mlpissoftmax(ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -7019,189 +7019,189 @@ bool mlpissoftmax(const multilayerperceptron &network) {
 
 void mlprandomize(const multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlprandomize(ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlprandomizefull(const multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlprandomizefull(ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreate0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreate0(nin, nout, ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreate1(nin, nhid, nout, ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreate2(nin, nhid1, nhid2, nout, ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreateb0(const ae_int_t nin, const ae_int_t nout, const double b, const double d, multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreateb0(nin, nout, b, d, ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreateb1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double b, const double d, multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreateb1(nin, nhid, nout, b, d, ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreateb2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double b, const double d, multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreateb2(nin, nhid1, nhid2, nout, b, d, ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreater0(const ae_int_t nin, const ae_int_t nout, const double a, const double b, multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreater0(nin, nout, a, b, ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreater1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double a, const double b, multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreater1(nin, nhid, nout, a, b, ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double a, const double b, multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreater2(nin, nhid1, nhid2, nout, a, b, ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreatec0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreatec0(nin, nout, ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreatec1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreatec1(nin, nhid, nout, ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreatec2(nin, nhid1, nhid2, nout, ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpactivationfunction(const double net, const ae_int_t k, double &f, double &df, double &d2f) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpactivationfunction(net, k, &f, &df, &d2f, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpprocess(const multilayerperceptron &network, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpprocess(ConstT(multilayerperceptron, network), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpprocessi(const multilayerperceptron &network, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpprocessi(ConstT(multilayerperceptron, network), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpgrad(const multilayerperceptron &network, const real_1d_array &x, const real_1d_array &desiredy, double &e, real_1d_array &grad) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpgrad(ConstT(multilayerperceptron, network), ConstT(ae_vector, x), ConstT(ae_vector, desiredy), &e, ConstT(ae_vector, grad), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpgradn(const multilayerperceptron &network, const real_1d_array &x, const real_1d_array &desiredy, double &e, real_1d_array &grad) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpgradn(ConstT(multilayerperceptron, network), ConstT(ae_vector, x), ConstT(ae_vector, desiredy), &e, ConstT(ae_vector, grad), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpgradbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpgradbatch(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), ssize, &e, ConstT(ae_vector, grad), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpgradbatchsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t ssize, double &e, real_1d_array &grad) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpgradbatchsparse(ConstT(multilayerperceptron, network), ConstT(sparsematrix, xy), ssize, &e, ConstT(ae_vector, grad), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpgradbatchsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpgradbatchsubset(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), setsize, ConstT(ae_vector, idx), subsetsize, &e, ConstT(ae_vector, grad), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpgradbatchsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpgradbatchsparsesubset(ConstT(multilayerperceptron, network), ConstT(sparsematrix, xy), setsize, ConstT(ae_vector, idx), subsetsize, &e, ConstT(ae_vector, grad), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpgradnbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpgradnbatch(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), ssize, &e, ConstT(ae_vector, grad), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlphessiannbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, real_2d_array &h) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlphessiannbatch(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), ssize, &e, ConstT(ae_vector, grad), ConstT(ae_matrix, h), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlphessianbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, real_2d_array &h) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlphessianbatch(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), ssize, &e, ConstT(ae_vector, grad), ConstT(ae_matrix, h), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 ae_int_t mlpgetinputscount(const multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::mlpgetinputscount(ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -7209,7 +7209,7 @@ ae_int_t mlpgetinputscount(const multilayerperceptron &network) {
 
 ae_int_t mlpgetoutputscount(const multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::mlpgetoutputscount(ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -7217,7 +7217,7 @@ ae_int_t mlpgetoutputscount(const multilayerperceptron &network) {
 
 ae_int_t mlpgetweightscount(const multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::mlpgetweightscount(ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -7225,7 +7225,7 @@ ae_int_t mlpgetweightscount(const multilayerperceptron &network) {
 
 ae_int_t mlpgetlayerscount(const multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::mlpgetlayerscount(ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -7233,7 +7233,7 @@ ae_int_t mlpgetlayerscount(const multilayerperceptron &network) {
 
 ae_int_t mlpgetlayersize(const multilayerperceptron &network, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::mlpgetlayersize(ConstT(multilayerperceptron, network), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -7241,28 +7241,28 @@ ae_int_t mlpgetlayersize(const multilayerperceptron &network, const ae_int_t k) 
 
 void mlpgetinputscaling(const multilayerperceptron &network, const ae_int_t i, double &mean, double &sigma) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpgetinputscaling(ConstT(multilayerperceptron, network), i, &mean, &sigma, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpgetoutputscaling(const multilayerperceptron &network, const ae_int_t i, double &mean, double &sigma) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpgetoutputscaling(ConstT(multilayerperceptron, network), i, &mean, &sigma, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpgetneuroninfo(const multilayerperceptron &network, const ae_int_t k, const ae_int_t i, ae_int_t &fkind, double &threshold) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpgetneuroninfo(ConstT(multilayerperceptron, network), k, i, &fkind, &threshold, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double mlpgetweight(const multilayerperceptron &network, const ae_int_t k0, const ae_int_t i0, const ae_int_t k1, const ae_int_t i1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlpgetweight(ConstT(multilayerperceptron, network), k0, i0, k1, i1, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7270,56 +7270,56 @@ double mlpgetweight(const multilayerperceptron &network, const ae_int_t k0, cons
 
 void mlpsetinputscaling(const multilayerperceptron &network, const ae_int_t i, const double mean, const double sigma) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpsetinputscaling(ConstT(multilayerperceptron, network), i, mean, sigma, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpsetoutputscaling(const multilayerperceptron &network, const ae_int_t i, const double mean, const double sigma) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpsetoutputscaling(ConstT(multilayerperceptron, network), i, mean, sigma, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpsetneuroninfo(const multilayerperceptron &network, const ae_int_t k, const ae_int_t i, const ae_int_t fkind, const double threshold) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpsetneuroninfo(ConstT(multilayerperceptron, network), k, i, fkind, threshold, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpsetweight(const multilayerperceptron &network, const ae_int_t k0, const ae_int_t i0, const ae_int_t k1, const ae_int_t i1, const double w) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpsetweight(ConstT(multilayerperceptron, network), k0, i0, k1, i1, w, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcopy(const multilayerperceptron &network1, multilayerperceptron &network2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcopy(ConstT(multilayerperceptron, network1), ConstT(multilayerperceptron, network2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcopytunableparameters(const multilayerperceptron &network1, const multilayerperceptron &network2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcopytunableparameters(ConstT(multilayerperceptron, network1), ConstT(multilayerperceptron, network2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpinitpreprocessor(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpinitpreprocessor(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), ssize, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double mlperror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlperror(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7327,7 +7327,7 @@ double mlperror(const multilayerperceptron &network, const real_2d_array &xy, co
 
 double mlperrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlperrorsparse(ConstT(multilayerperceptron, network), ConstT(sparsematrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7335,7 +7335,7 @@ double mlperrorsparse(const multilayerperceptron &network, const sparsematrix &x
 
 double mlperrorn(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlperrorn(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), ssize, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7343,7 +7343,7 @@ double mlperrorn(const multilayerperceptron &network, const real_2d_array &xy, c
 
 ae_int_t mlpclserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::mlpclserror(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -7351,7 +7351,7 @@ ae_int_t mlpclserror(const multilayerperceptron &network, const real_2d_array &x
 
 double mlprelclserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlprelclserror(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7359,7 +7359,7 @@ double mlprelclserror(const multilayerperceptron &network, const real_2d_array &
 
 double mlprelclserrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlprelclserrorsparse(ConstT(multilayerperceptron, network), ConstT(sparsematrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7367,7 +7367,7 @@ double mlprelclserrorsparse(const multilayerperceptron &network, const sparsemat
 
 double mlpavgce(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlpavgce(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7375,7 +7375,7 @@ double mlpavgce(const multilayerperceptron &network, const real_2d_array &xy, co
 
 double mlpavgcesparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlpavgcesparse(ConstT(multilayerperceptron, network), ConstT(sparsematrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7383,7 +7383,7 @@ double mlpavgcesparse(const multilayerperceptron &network, const sparsematrix &x
 
 double mlprmserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlprmserror(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7391,7 +7391,7 @@ double mlprmserror(const multilayerperceptron &network, const real_2d_array &xy,
 
 double mlprmserrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlprmserrorsparse(ConstT(multilayerperceptron, network), ConstT(sparsematrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7399,7 +7399,7 @@ double mlprmserrorsparse(const multilayerperceptron &network, const sparsematrix
 
 double mlpavgerror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlpavgerror(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7407,7 +7407,7 @@ double mlpavgerror(const multilayerperceptron &network, const real_2d_array &xy,
 
 double mlpavgerrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlpavgerrorsparse(ConstT(multilayerperceptron, network), ConstT(sparsematrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7415,7 +7415,7 @@ double mlpavgerrorsparse(const multilayerperceptron &network, const sparsematrix
 
 double mlpavgrelerror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlpavgrelerror(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7423,7 +7423,7 @@ double mlpavgrelerror(const multilayerperceptron &network, const real_2d_array &
 
 double mlpavgrelerrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlpavgrelerrorsparse(ConstT(multilayerperceptron, network), ConstT(sparsematrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7431,21 +7431,21 @@ double mlpavgrelerrorsparse(const multilayerperceptron &network, const sparsemat
 
 void mlpallerrorssubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, modelerrors &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpallerrorssubset(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), setsize, ConstT(ae_vector, subset), subsetsize, ConstT(modelerrors, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpallerrorssparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, modelerrors &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpallerrorssparsesubset(ConstT(multilayerperceptron, network), ConstT(sparsematrix, xy), setsize, ConstT(ae_vector, subset), subsetsize, ConstT(modelerrors, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double mlperrorsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlperrorsubset(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), setsize, ConstT(ae_vector, subset), subsetsize, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7453,7 +7453,7 @@ double mlperrorsubset(const multilayerperceptron &network, const real_2d_array &
 
 double mlperrorsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlperrorsparsesubset(ConstT(multilayerperceptron, network), ConstT(sparsematrix, xy), setsize, ConstT(ae_vector, subset), subsetsize, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -8116,7 +8116,7 @@ DefClass(mlpensemble, )
 void mlpeserialize(mlpensemble &obj, std::string &s_out) {
    alglib_impl::ae_int_t ssize;
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::mlpealloc(&serializer, obj.c_ptr(), &state);
@@ -8131,7 +8131,7 @@ void mlpeserialize(mlpensemble &obj, std::string &s_out) {
 }
 void mlpeserialize(mlpensemble &obj, std::ostream &s_out) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::mlpealloc(&serializer, obj.c_ptr(), &state);
@@ -8144,7 +8144,7 @@ void mlpeserialize(mlpensemble &obj, std::ostream &s_out) {
 
 void mlpeunserialize(const std::string &s_in, mlpensemble &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::mlpeunserialize(&serializer, obj.c_ptr(), &state);
@@ -8153,7 +8153,7 @@ void mlpeunserialize(const std::string &s_in, mlpensemble &obj) {
 }
 void mlpeunserialize(const std::istream &s_in, mlpensemble &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::mlpeunserialize(&serializer, obj.c_ptr(), &state);
@@ -8163,112 +8163,112 @@ void mlpeunserialize(const std::istream &s_in, mlpensemble &obj) {
 
 void mlpecreatefromnetwork(const multilayerperceptron &network, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreatefromnetwork(ConstT(multilayerperceptron, network), ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpecreate0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreate0(nin, nout, ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpecreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreate1(nin, nhid, nout, ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpecreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreate2(nin, nhid1, nhid2, nout, ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpecreateb0(const ae_int_t nin, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreateb0(nin, nout, b, d, ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpecreateb1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreateb1(nin, nhid, nout, b, d, ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpecreateb2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreateb2(nin, nhid1, nhid2, nout, b, d, ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpecreater0(const ae_int_t nin, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreater0(nin, nout, a, b, ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpecreater1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreater1(nin, nhid, nout, a, b, ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpecreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreater2(nin, nhid1, nhid2, nout, a, b, ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpecreatec0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreatec0(nin, nout, ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpecreatec1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreatec1(nin, nhid, nout, ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpecreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpecreatec2(nin, nhid1, nhid2, nout, ensemblesize, ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlperandomize(const mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlperandomize(ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpeproperties(const mlpensemble &ensemble, ae_int_t &nin, ae_int_t &nout) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpeproperties(ConstT(mlpensemble, ensemble), &nin, &nout, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 bool mlpeissoftmax(const mlpensemble &ensemble) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, false)
+   TryCatch(false)
    bool Ok = alglib_impl::mlpeissoftmax(ConstT(mlpensemble, ensemble), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -8276,21 +8276,21 @@ bool mlpeissoftmax(const mlpensemble &ensemble) {
 
 void mlpeprocess(const mlpensemble &ensemble, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpeprocess(ConstT(mlpensemble, ensemble), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpeprocessi(const mlpensemble &ensemble, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpeprocessi(ConstT(mlpensemble, ensemble), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double mlperelclserror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlperelclserror(ConstT(mlpensemble, ensemble), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -8298,7 +8298,7 @@ double mlperelclserror(const mlpensemble &ensemble, const real_2d_array &xy, con
 
 double mlpeavgce(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlpeavgce(ConstT(mlpensemble, ensemble), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -8306,7 +8306,7 @@ double mlpeavgce(const mlpensemble &ensemble, const real_2d_array &xy, const ae_
 
 double mlpermserror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlpermserror(ConstT(mlpensemble, ensemble), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -8314,7 +8314,7 @@ double mlpermserror(const mlpensemble &ensemble, const real_2d_array &xy, const 
 
 double mlpeavgerror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlpeavgerror(ConstT(mlpensemble, ensemble), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -8322,7 +8322,7 @@ double mlpeavgerror(const mlpensemble &ensemble, const real_2d_array &xy, const 
 
 double mlpeavgrelerror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mlpeavgrelerror(ConstT(mlpensemble, ensemble), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -10675,14 +10675,14 @@ DefClass(kmeansreport, DecVal(npoints) DecVal(nfeatures) DecVal(terminationtype)
 
 void clusterizercreate(clusterizerstate &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizercreate(ConstT(clusterizerstate, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void clusterizersetpoints(const clusterizerstate &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const ae_int_t disttype) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizersetpoints(ConstT(clusterizerstate, s), ConstT(ae_matrix, xy), npoints, nfeatures, disttype, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -10691,7 +10691,7 @@ void clusterizersetpoints(const clusterizerstate &s, const real_2d_array &xy, co
    ae_int_t npoints = xy.rows();
    ae_int_t nfeatures = xy.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizersetpoints(ConstT(clusterizerstate, s), ConstT(ae_matrix, xy), npoints, nfeatures, disttype, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -10699,7 +10699,7 @@ void clusterizersetpoints(const clusterizerstate &s, const real_2d_array &xy, co
 
 void clusterizersetdistances(const clusterizerstate &s, const real_2d_array &d, const ae_int_t npoints, const bool isupper) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizersetdistances(ConstT(clusterizerstate, s), ConstT(ae_matrix, d), npoints, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -10708,7 +10708,7 @@ void clusterizersetdistances(const clusterizerstate &s, const real_2d_array &d, 
    if (d.rows() != d.cols()) ThrowError("Error while calling 'clusterizersetdistances': looks like one of arguments has wrong size");
    ae_int_t npoints = d.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizersetdistances(ConstT(clusterizerstate, s), ConstT(ae_matrix, d), npoints, isupper, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -10716,70 +10716,70 @@ void clusterizersetdistances(const clusterizerstate &s, const real_2d_array &d, 
 
 void clusterizersetahcalgo(const clusterizerstate &s, const ae_int_t algo) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizersetahcalgo(ConstT(clusterizerstate, s), algo, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void clusterizersetkmeanslimits(const clusterizerstate &s, const ae_int_t restarts, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizersetkmeanslimits(ConstT(clusterizerstate, s), restarts, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void clusterizersetkmeansinit(const clusterizerstate &s, const ae_int_t initalgo) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizersetkmeansinit(ConstT(clusterizerstate, s), initalgo, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void clusterizersetseed(const clusterizerstate &s, const ae_int_t seed) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizersetseed(ConstT(clusterizerstate, s), seed, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void clusterizergetdistances(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const ae_int_t disttype, real_2d_array &d) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizergetdistances(ConstT(ae_matrix, xy), npoints, nfeatures, disttype, ConstT(ae_matrix, d), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void clusterizerrunahc(const clusterizerstate &s, ahcreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizerrunahc(ConstT(clusterizerstate, s), ConstT(ahcreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void clusterizerrunkmeans(const clusterizerstate &s, const ae_int_t k, kmeansreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizerrunkmeans(ConstT(clusterizerstate, s), k, ConstT(kmeansreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void clusterizergetkclusters(const ahcreport &rep, const ae_int_t k, integer_1d_array &cidx, integer_1d_array &cz) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizergetkclusters(ConstT(ahcreport, rep), k, ConstT(ae_vector, cidx), ConstT(ae_vector, cz), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void clusterizerseparatedbydist(const ahcreport &rep, const double r, ae_int_t &k, integer_1d_array &cidx, integer_1d_array &cz) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizerseparatedbydist(ConstT(ahcreport, rep), r, &k, ConstT(ae_vector, cidx), ConstT(ae_vector, cz), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void clusterizerseparatedbycorr(const ahcreport &rep, const double r, ae_int_t &k, integer_1d_array &cidx, integer_1d_array &cz) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::clusterizerseparatedbycorr(ConstT(ahcreport, rep), r, &k, ConstT(ae_vector, cidx), ConstT(ae_vector, cz), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -14753,7 +14753,7 @@ DefClass(dfreport, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(avg
 void dfserialize(decisionforest &obj, std::string &s_out) {
    alglib_impl::ae_int_t ssize;
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::dfalloc(&serializer, obj.c_ptr(), &state);
@@ -14768,7 +14768,7 @@ void dfserialize(decisionforest &obj, std::string &s_out) {
 }
 void dfserialize(decisionforest &obj, std::ostream &s_out) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::dfalloc(&serializer, obj.c_ptr(), &state);
@@ -14781,7 +14781,7 @@ void dfserialize(decisionforest &obj, std::ostream &s_out) {
 
 void dfunserialize(const std::string &s_in, decisionforest &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::dfunserialize(&serializer, obj.c_ptr(), &state);
@@ -14790,7 +14790,7 @@ void dfunserialize(const std::string &s_in, decisionforest &obj) {
 }
 void dfunserialize(const std::istream &s_in, decisionforest &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::dfunserialize(&serializer, obj.c_ptr(), &state);
@@ -14800,105 +14800,105 @@ void dfunserialize(const std::istream &s_in, decisionforest &obj) {
 
 void dfcreatebuffer(const decisionforest &model, decisionforestbuffer &buf) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfcreatebuffer(ConstT(decisionforest, model), ConstT(decisionforestbuffer, buf), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildercreate(decisionforestbuilder &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildercreate(ConstT(decisionforestbuilder, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildersetdataset(const decisionforestbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildersetdataset(ConstT(decisionforestbuilder, s), ConstT(ae_matrix, xy), npoints, nvars, nclasses, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildersetrndvars(const decisionforestbuilder &s, const ae_int_t rndvars) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildersetrndvars(ConstT(decisionforestbuilder, s), rndvars, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildersetrndvarsratio(const decisionforestbuilder &s, const double f) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildersetrndvarsratio(ConstT(decisionforestbuilder, s), f, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildersetrndvarsauto(const decisionforestbuilder &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildersetrndvarsauto(ConstT(decisionforestbuilder, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildersetsubsampleratio(const decisionforestbuilder &s, const double f) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildersetsubsampleratio(ConstT(decisionforestbuilder, s), f, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildersetseed(const decisionforestbuilder &s, const ae_int_t seedval) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildersetseed(ConstT(decisionforestbuilder, s), seedval, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildersetrdfalgo(const decisionforestbuilder &s, const ae_int_t algotype) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildersetrdfalgo(ConstT(decisionforestbuilder, s), algotype, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildersetrdfsplitstrength(const decisionforestbuilder &s, const ae_int_t splitstrength) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildersetrdfsplitstrength(ConstT(decisionforestbuilder, s), splitstrength, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildersetimportancetrngini(const decisionforestbuilder &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildersetimportancetrngini(ConstT(decisionforestbuilder, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildersetimportanceoobgini(const decisionforestbuilder &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildersetimportanceoobgini(ConstT(decisionforestbuilder, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildersetimportancepermutation(const decisionforestbuilder &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildersetimportancepermutation(ConstT(decisionforestbuilder, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildersetimportancenone(const decisionforestbuilder &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildersetimportancenone(ConstT(decisionforestbuilder, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double dfbuilderpeekprogress(const decisionforestbuilder &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::dfbuilderpeekprogress(ConstT(decisionforestbuilder, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -14906,7 +14906,7 @@ double dfbuilderpeekprogress(const decisionforestbuilder &s) {
 
 double dfbuildergetprogress(const decisionforestbuilder &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::dfbuildergetprogress(ConstT(decisionforestbuilder, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -14914,14 +14914,14 @@ double dfbuildergetprogress(const decisionforestbuilder &s) {
 
 void dfbuilderbuildrandomforest(const decisionforestbuilder &s, const ae_int_t ntrees, decisionforest &df, dfreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuilderbuildrandomforest(ConstT(decisionforestbuilder, s), ntrees, ConstT(decisionforest, df), ConstT(dfreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double dfbinarycompression(const decisionforest &df) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::dfbinarycompression(ConstT(decisionforest, df), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -14929,21 +14929,21 @@ double dfbinarycompression(const decisionforest &df) {
 
 void dfprocess(const decisionforest &df, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfprocess(ConstT(decisionforest, df), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfprocessi(const decisionforest &df, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfprocessi(ConstT(decisionforest, df), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double dfprocess0(const decisionforest &model, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::dfprocess0(ConstT(decisionforest, model), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -14951,7 +14951,7 @@ double dfprocess0(const decisionforest &model, const real_1d_array &x) {
 
 ae_int_t dfclassify(const decisionforest &model, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::dfclassify(ConstT(decisionforest, model), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -14959,14 +14959,14 @@ ae_int_t dfclassify(const decisionforest &model, const real_1d_array &x) {
 
 void dftsprocess(const decisionforest &df, const decisionforestbuffer &buf, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dftsprocess(ConstT(decisionforest, df), ConstT(decisionforestbuffer, buf), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double dfrelclserror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::dfrelclserror(ConstT(decisionforest, df), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -14974,7 +14974,7 @@ double dfrelclserror(const decisionforest &df, const real_2d_array &xy, const ae
 
 double dfavgce(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::dfavgce(ConstT(decisionforest, df), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -14982,7 +14982,7 @@ double dfavgce(const decisionforest &df, const real_2d_array &xy, const ae_int_t
 
 double dfrmserror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::dfrmserror(ConstT(decisionforest, df), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -14990,7 +14990,7 @@ double dfrmserror(const decisionforest &df, const real_2d_array &xy, const ae_in
 
 double dfavgerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::dfavgerror(ConstT(decisionforest, df), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -14998,7 +14998,7 @@ double dfavgerror(const decisionforest &df, const real_2d_array &xy, const ae_in
 
 double dfavgrelerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::dfavgrelerror(ConstT(decisionforest, df), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -15006,14 +15006,14 @@ double dfavgrelerror(const decisionforest &df, const real_2d_array &xy, const ae
 
 void dfbuildrandomdecisionforest(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const ae_int_t ntrees, const double r, ae_int_t &info, decisionforest &df, dfreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildrandomdecisionforest(ConstT(ae_matrix, xy), npoints, nvars, nclasses, ntrees, r, &info, ConstT(decisionforest, df), ConstT(dfreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void dfbuildrandomdecisionforestx1(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const ae_int_t ntrees, const ae_int_t nrndvars, const double r, ae_int_t &info, decisionforest &df, dfreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::dfbuildrandomdecisionforestx1(ConstT(ae_matrix, xy), npoints, nvars, nclasses, ntrees, nrndvars, r, &info, ConstT(decisionforest, df), ConstT(dfreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -15940,7 +15940,7 @@ DefClass(lrreport, DecVar(c) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerro
 
 double lrrmserror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::lrrmserror(ConstT(linearmodel, lm), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -15948,7 +15948,7 @@ double lrrmserror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t
 
 double lravgerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::lravgerror(ConstT(linearmodel, lm), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -15956,7 +15956,7 @@ double lravgerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t
 
 double lravgrelerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::lravgrelerror(ConstT(linearmodel, lm), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -15964,49 +15964,49 @@ double lravgrelerror(const linearmodel &lm, const real_2d_array &xy, const ae_in
 
 void lrbuilds(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lrbuilds(ConstT(ae_matrix, xy), ConstT(ae_vector, s), npoints, nvars, &info, ConstT(linearmodel, lm), ConstT(lrreport, ar), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lrbuild(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lrbuild(ConstT(ae_matrix, xy), npoints, nvars, &info, ConstT(linearmodel, lm), ConstT(lrreport, ar), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lrbuildzs(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lrbuildzs(ConstT(ae_matrix, xy), ConstT(ae_vector, s), npoints, nvars, &info, ConstT(linearmodel, lm), ConstT(lrreport, ar), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lrbuildz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lrbuildz(ConstT(ae_matrix, xy), npoints, nvars, &info, ConstT(linearmodel, lm), ConstT(lrreport, ar), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lrunpack(const linearmodel &lm, real_1d_array &v, ae_int_t &nvars) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lrunpack(ConstT(linearmodel, lm), ConstT(ae_vector, v), &nvars, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lrpack(const real_1d_array &v, const ae_int_t nvars, linearmodel &lm) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lrpack(ConstT(ae_vector, v), nvars, ConstT(linearmodel, lm), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double lrprocess(const linearmodel &lm, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::lrprocess(ConstT(linearmodel, lm), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -16252,7 +16252,7 @@ void filterlrma(RVector *x, ae_int_t n, ae_int_t k, ae_state *_state) {
 namespace alglib {
 void filtersma(real_1d_array &x, const ae_int_t n, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::filtersma(ConstT(ae_vector, x), n, k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -16260,7 +16260,7 @@ void filtersma(real_1d_array &x, const ae_int_t n, const ae_int_t k) {
 void filtersma(real_1d_array &x, const ae_int_t k) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::filtersma(ConstT(ae_vector, x), n, k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -16268,7 +16268,7 @@ void filtersma(real_1d_array &x, const ae_int_t k) {
 
 void filterema(real_1d_array &x, const ae_int_t n, const double alpha) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::filterema(ConstT(ae_vector, x), n, alpha, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -16276,7 +16276,7 @@ void filterema(real_1d_array &x, const ae_int_t n, const double alpha) {
 void filterema(real_1d_array &x, const double alpha) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::filterema(ConstT(ae_vector, x), n, alpha, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -16284,7 +16284,7 @@ void filterema(real_1d_array &x, const double alpha) {
 
 void filterlrma(real_1d_array &x, const ae_int_t n, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::filterlrma(ConstT(ae_vector, x), n, k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -16292,7 +16292,7 @@ void filterlrma(real_1d_array &x, const ae_int_t n, const ae_int_t k) {
 void filterlrma(real_1d_array &x, const ae_int_t k) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::filterlrma(ConstT(ae_vector, x), n, k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -18636,42 +18636,42 @@ DefClass(ssamodel, )
 
 void ssacreate(ssamodel &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssacreate(ConstT(ssamodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssasetwindow(const ssamodel &s, const ae_int_t windowwidth) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssasetwindow(ConstT(ssamodel, s), windowwidth, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssasetseed(const ssamodel &s, const ae_int_t seed) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssasetseed(ConstT(ssamodel, s), seed, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssasetpoweruplength(const ssamodel &s, const ae_int_t pwlen) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssasetpoweruplength(ConstT(ssamodel, s), pwlen, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssasetmemorylimit(const ssamodel &s, const ae_int_t memlimit) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssasetmemorylimit(ConstT(ssamodel, s), memlimit, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssaaddsequence(const ssamodel &s, const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaaddsequence(ConstT(ssamodel, s), ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -18679,7 +18679,7 @@ void ssaaddsequence(const ssamodel &s, const real_1d_array &x, const ae_int_t n)
 void ssaaddsequence(const ssamodel &s, const real_1d_array &x) {
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaaddsequence(ConstT(ssamodel, s), ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -18687,14 +18687,14 @@ void ssaaddsequence(const ssamodel &s, const real_1d_array &x) {
 
 void ssaappendpointandupdate(const ssamodel &s, const double x, const double updateits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaappendpointandupdate(ConstT(ssamodel, s), x, updateits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const ae_int_t nticks, const double updateits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaappendsequenceandupdate(ConstT(ssamodel, s), ConstT(ae_vector, x), nticks, updateits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -18702,7 +18702,7 @@ void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const
 void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const double updateits) {
    ae_int_t nticks = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaappendsequenceandupdate(ConstT(ssamodel, s), ConstT(ae_vector, x), nticks, updateits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -18710,7 +18710,7 @@ void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const
 
 void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a, const ae_int_t windowwidth, const ae_int_t nbasis) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssasetalgoprecomputed(ConstT(ssamodel, s), ConstT(ae_matrix, a), windowwidth, nbasis, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -18719,7 +18719,7 @@ void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a) {
    ae_int_t windowwidth = a.rows();
    ae_int_t nbasis = a.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssasetalgoprecomputed(ConstT(ssamodel, s), ConstT(ae_matrix, a), windowwidth, nbasis, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -18727,56 +18727,56 @@ void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a) {
 
 void ssasetalgotopkdirect(const ssamodel &s, const ae_int_t topk) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssasetalgotopkdirect(ConstT(ssamodel, s), topk, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssasetalgotopkrealtime(const ssamodel &s, const ae_int_t topk) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssasetalgotopkrealtime(ConstT(ssamodel, s), topk, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssacleardata(const ssamodel &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssacleardata(ConstT(ssamodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssagetbasis(const ssamodel &s, real_2d_array &a, real_1d_array &sv, ae_int_t &windowwidth, ae_int_t &nbasis) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssagetbasis(ConstT(ssamodel, s), ConstT(ae_matrix, a), ConstT(ae_vector, sv), &windowwidth, &nbasis, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssagetlrr(const ssamodel &s, real_1d_array &a, ae_int_t &windowwidth) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssagetlrr(ConstT(ssamodel, s), ConstT(ae_vector, a), &windowwidth, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssaanalyzelastwindow(const ssamodel &s, real_1d_array &trend, real_1d_array &noise, ae_int_t &nticks) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaanalyzelastwindow(ConstT(ssamodel, s), ConstT(ae_vector, trend), ConstT(ae_vector, noise), &nticks, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssaanalyzelast(const ssamodel &s, const ae_int_t nticks, real_1d_array &trend, real_1d_array &noise) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaanalyzelast(ConstT(ssamodel, s), nticks, ConstT(ae_vector, trend), ConstT(ae_vector, noise), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, const ae_int_t nticks, real_1d_array &trend, real_1d_array &noise) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaanalyzesequence(ConstT(ssamodel, s), ConstT(ae_vector, data), nticks, ConstT(ae_vector, trend), ConstT(ae_vector, noise), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -18784,7 +18784,7 @@ void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, const ae_i
 void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, real_1d_array &trend, real_1d_array &noise) {
    ae_int_t nticks = data.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaanalyzesequence(ConstT(ssamodel, s), ConstT(ae_vector, data), nticks, ConstT(ae_vector, trend), ConstT(ae_vector, noise), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -18792,14 +18792,14 @@ void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, real_1d_ar
 
 void ssaforecastlast(const ssamodel &s, const ae_int_t nticks, real_1d_array &trend) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaforecastlast(ConstT(ssamodel, s), nticks, ConstT(ae_vector, trend), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t datalen, const ae_int_t forecastlen, const bool applysmoothing, real_1d_array &trend) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaforecastsequence(ConstT(ssamodel, s), ConstT(ae_vector, data), datalen, forecastlen, applysmoothing, ConstT(ae_vector, trend), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -18808,7 +18808,7 @@ void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_
    ae_int_t datalen = data.length();
    bool applysmoothing = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaforecastsequence(ConstT(ssamodel, s), ConstT(ae_vector, data), datalen, forecastlen, applysmoothing, ConstT(ae_vector, trend), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -18816,14 +18816,14 @@ void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_
 
 void ssaforecastavglast(const ssamodel &s, const ae_int_t m, const ae_int_t nticks, real_1d_array &trend) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaforecastavglast(ConstT(ssamodel, s), m, nticks, ConstT(ae_vector, trend), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t datalen, const ae_int_t m, const ae_int_t forecastlen, const bool applysmoothing, real_1d_array &trend) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaforecastavgsequence(ConstT(ssamodel, s), ConstT(ae_vector, data), datalen, m, forecastlen, applysmoothing, ConstT(ae_vector, trend), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -18832,7 +18832,7 @@ void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const 
    ae_int_t datalen = data.length();
    bool applysmoothing = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ssaforecastavgsequence(ConstT(ssamodel, s), ConstT(ae_vector, data), datalen, m, forecastlen, applysmoothing, ConstT(ae_vector, trend), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -19148,14 +19148,14 @@ void fisherlda(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
 namespace alglib {
 void fisherldan(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_2d_array &w) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fisherldan(ConstT(ae_matrix, xy), npoints, nvars, nclasses, &info, ConstT(ae_matrix, w), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_1d_array &w) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fisherlda(ConstT(ae_matrix, xy), npoints, nvars, nclasses, &info, ConstT(ae_vector, w), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -20253,35 +20253,35 @@ DefClass(mcpdreport, DecVal(inneriterationscount) DecVal(outeriterationscount) D
 
 void mcpdcreate(const ae_int_t n, mcpdstate &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdcreate(n, ConstT(mcpdstate, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mcpdcreateentry(const ae_int_t n, const ae_int_t entrystate, mcpdstate &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdcreateentry(n, entrystate, ConstT(mcpdstate, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mcpdcreateexit(const ae_int_t n, const ae_int_t exitstate, mcpdstate &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdcreateexit(n, exitstate, ConstT(mcpdstate, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mcpdcreateentryexit(const ae_int_t n, const ae_int_t entrystate, const ae_int_t exitstate, mcpdstate &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdcreateentryexit(n, entrystate, exitstate, ConstT(mcpdstate, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdaddtrack(ConstT(mcpdstate, s), ConstT(ae_matrix, xy), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -20289,7 +20289,7 @@ void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy, const ae_int_t k)
 void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy) {
    ae_int_t k = xy.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdaddtrack(ConstT(mcpdstate, s), ConstT(ae_matrix, xy), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -20297,35 +20297,35 @@ void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy) {
 
 void mcpdsetec(const mcpdstate &s, const real_2d_array &ec) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdsetec(ConstT(mcpdstate, s), ConstT(ae_matrix, ec), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mcpdaddec(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdaddec(ConstT(mcpdstate, s), i, j, c, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mcpdsetbc(const mcpdstate &s, const real_2d_array &bndl, const real_2d_array &bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdsetbc(ConstT(mcpdstate, s), ConstT(ae_matrix, bndl), ConstT(ae_matrix, bndu), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mcpdaddbc(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double bndl, const double bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdaddbc(ConstT(mcpdstate, s), i, j, bndl, bndu, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdsetlc(ConstT(mcpdstate, s), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -20334,7 +20334,7 @@ void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_arra
    if (c.rows() != ct.length()) ThrowError("Error while calling 'mcpdsetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdsetlc(ConstT(mcpdstate, s), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -20342,35 +20342,35 @@ void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_arra
 
 void mcpdsettikhonovregularizer(const mcpdstate &s, const double v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdsettikhonovregularizer(ConstT(mcpdstate, s), v, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mcpdsetprior(const mcpdstate &s, const real_2d_array &pp) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdsetprior(ConstT(mcpdstate, s), ConstT(ae_matrix, pp), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mcpdsetpredictionweights(const mcpdstate &s, const real_1d_array &pw) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdsetpredictionweights(ConstT(mcpdstate, s), ConstT(ae_vector, pw), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mcpdsolve(const mcpdstate &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdsolve(ConstT(mcpdstate, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mcpdresults(const mcpdstate &s, real_2d_array &p, mcpdreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mcpdresults(ConstT(mcpdstate, s), ConstT(ae_matrix, p), ConstT(mcpdreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -21484,42 +21484,42 @@ DefClass(mnlreport, DecVal(ngrad) DecVal(nhess))
 
 void mnlprocess(const logitmodel &lm, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mnlprocess(ConstT(logitmodel, lm), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mnlprocessi(const logitmodel &lm, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mnlprocessi(ConstT(logitmodel, lm), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mnltrainh(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, logitmodel &lm, mnlreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mnltrainh(ConstT(ae_matrix, xy), npoints, nvars, nclasses, &info, ConstT(logitmodel, lm), ConstT(mnlreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mnlunpack(const logitmodel &lm, real_2d_array &a, ae_int_t &nvars, ae_int_t &nclasses) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mnlunpack(ConstT(logitmodel, lm), ConstT(ae_matrix, a), &nvars, &nclasses, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mnlpack(const real_2d_array &a, const ae_int_t nvars, const ae_int_t nclasses, logitmodel &lm) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mnlpack(ConstT(ae_matrix, a), nvars, nclasses, ConstT(logitmodel, lm), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double mnlavgce(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mnlavgce(ConstT(logitmodel, lm), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -21527,7 +21527,7 @@ double mnlavgce(const logitmodel &lm, const real_2d_array &xy, const ae_int_t np
 
 ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::mnlclserror(ConstT(logitmodel, lm), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -21535,7 +21535,7 @@ ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int
 
 double mnlrelclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mnlrelclserror(ConstT(logitmodel, lm), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -21543,7 +21543,7 @@ double mnlrelclserror(const logitmodel &lm, const real_2d_array &xy, const ae_in
 
 double mnlrmserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mnlrmserror(ConstT(logitmodel, lm), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -21551,7 +21551,7 @@ double mnlrmserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t
 
 double mnlavgerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mnlavgerror(ConstT(logitmodel, lm), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -21559,7 +21559,7 @@ double mnlavgerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t
 
 double mnlavgrelerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t ssize) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::mnlavgrelerror(ConstT(logitmodel, lm), ConstT(ae_matrix, xy), ssize, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -22574,7 +22574,7 @@ DefClass(knnreport, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(av
 void knnserialize(knnmodel &obj, std::string &s_out) {
    alglib_impl::ae_int_t ssize;
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::knnalloc(&serializer, obj.c_ptr(), &state);
@@ -22589,7 +22589,7 @@ void knnserialize(knnmodel &obj, std::string &s_out) {
 }
 void knnserialize(knnmodel &obj, std::ostream &s_out) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::knnalloc(&serializer, obj.c_ptr(), &state);
@@ -22602,7 +22602,7 @@ void knnserialize(knnmodel &obj, std::ostream &s_out) {
 
 void knnunserialize(const std::string &s_in, knnmodel &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::knnunserialize(&serializer, obj.c_ptr(), &state);
@@ -22611,7 +22611,7 @@ void knnunserialize(const std::string &s_in, knnmodel &obj) {
 }
 void knnunserialize(const std::istream &s_in, knnmodel &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::knnunserialize(&serializer, obj.c_ptr(), &state);
@@ -22621,77 +22621,77 @@ void knnunserialize(const std::istream &s_in, knnmodel &obj) {
 
 void knncreatebuffer(const knnmodel &model, knnbuffer &buf) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::knncreatebuffer(ConstT(knnmodel, model), ConstT(knnbuffer, buf), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void knnbuildercreate(knnbuilder &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::knnbuildercreate(ConstT(knnbuilder, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void knnbuildersetdatasetreg(const knnbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nout) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::knnbuildersetdatasetreg(ConstT(knnbuilder, s), ConstT(ae_matrix, xy), npoints, nvars, nout, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void knnbuildersetdatasetcls(const knnbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::knnbuildersetdatasetcls(ConstT(knnbuilder, s), ConstT(ae_matrix, xy), npoints, nvars, nclasses, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void knnbuildersetnorm(const knnbuilder &s, const ae_int_t nrmtype) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::knnbuildersetnorm(ConstT(knnbuilder, s), nrmtype, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void knnallerrors(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, knnreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::knnallerrors(ConstT(knnmodel, model), ConstT(ae_matrix, xy), npoints, ConstT(knnreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void knnbuilderbuildknnmodel(const knnbuilder &s, const ae_int_t k, const double eps, knnmodel &model, knnreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::knnbuilderbuildknnmodel(ConstT(knnbuilder, s), k, eps, ConstT(knnmodel, model), ConstT(knnreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void knnrewritekeps(const knnmodel &model, const ae_int_t k, const double eps) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::knnrewritekeps(ConstT(knnmodel, model), k, eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void knntsprocess(const knnmodel &model, const knnbuffer &buf, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::knntsprocess(ConstT(knnmodel, model), ConstT(knnbuffer, buf), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void knnprocess(const knnmodel &model, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::knnprocess(ConstT(knnmodel, model), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double knnprocess0(const knnmodel &model, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::knnprocess0(ConstT(knnmodel, model), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -22699,7 +22699,7 @@ double knnprocess0(const knnmodel &model, const real_1d_array &x) {
 
 ae_int_t knnclassify(const knnmodel &model, const real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::knnclassify(ConstT(knnmodel, model), ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -22707,14 +22707,14 @@ ae_int_t knnclassify(const knnmodel &model, const real_1d_array &x) {
 
 void knnprocessi(const knnmodel &model, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::knnprocessi(ConstT(knnmodel, model), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double knnrelclserror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::knnrelclserror(ConstT(knnmodel, model), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -22722,7 +22722,7 @@ double knnrelclserror(const knnmodel &model, const real_2d_array &xy, const ae_i
 
 double knnavgce(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::knnavgce(ConstT(knnmodel, model), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -22730,7 +22730,7 @@ double knnavgce(const knnmodel &model, const real_2d_array &xy, const ae_int_t n
 
 double knnrmserror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::knnrmserror(ConstT(knnmodel, model), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -22738,7 +22738,7 @@ double knnrmserror(const knnmodel &model, const real_2d_array &xy, const ae_int_
 
 double knnavgerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::knnavgerror(ConstT(knnmodel, model), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -22746,7 +22746,7 @@ double knnavgerror(const knnmodel &model, const real_2d_array &xy, const ae_int_
 
 double knnavgrelerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::knnavgrelerror(ConstT(knnmodel, model), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -25523,112 +25523,112 @@ DefClass(mlptrainer, )
 
 void mlptrainlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlptrainlm(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints, decay, restarts, &info, ConstT(mlpreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlptrainlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlptrainlbfgs(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints, decay, restarts, wstep, maxits, &info, ConstT(mlpreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlptraines(const multilayerperceptron &network, const real_2d_array &trnxy, const ae_int_t trnsize, const real_2d_array &valxy, const ae_int_t valsize, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlptraines(ConstT(multilayerperceptron, network), ConstT(ae_matrix, trnxy), trnsize, ConstT(ae_matrix, valxy), valsize, decay, restarts, &info, ConstT(mlpreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpkfoldcvlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpkfoldcvlbfgs(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints, decay, restarts, wstep, maxits, foldscount, &info, ConstT(mlpreport, rep), ConstT(mlpcvreport, cvrep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpkfoldcvlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpkfoldcvlm(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints, decay, restarts, foldscount, &info, ConstT(mlpreport, rep), ConstT(mlpcvreport, cvrep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpkfoldcv(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, const ae_int_t foldscount, mlpreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpkfoldcv(ConstT(mlptrainer, s), ConstT(multilayerperceptron, network), nrestarts, foldscount, ConstT(mlpreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpsetdataset(const mlptrainer &s, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpsetdataset(ConstT(mlptrainer, s), ConstT(ae_matrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpsetsparsedataset(const mlptrainer &s, const sparsematrix &xy, const ae_int_t npoints) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpsetsparsedataset(ConstT(mlptrainer, s), ConstT(sparsematrix, xy), npoints, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpsetdecay(const mlptrainer &s, const double decay) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpsetdecay(ConstT(mlptrainer, s), decay, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpsetcond(const mlptrainer &s, const double wstep, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpsetcond(ConstT(mlptrainer, s), wstep, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpsetalgobatch(const mlptrainer &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpsetalgobatch(ConstT(mlptrainer, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreatetrainer(const ae_int_t nin, const ae_int_t nout, mlptrainer &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreatetrainer(nin, nout, ConstT(mlptrainer, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpcreatetrainercls(const ae_int_t nin, const ae_int_t nclasses, mlptrainer &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpcreatetrainercls(nin, nclasses, ConstT(mlptrainer, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlptrainnetwork(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, mlpreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlptrainnetwork(ConstT(mlptrainer, s), ConstT(multilayerperceptron, network), nrestarts, ConstT(mlpreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpstarttraining(const mlptrainer &s, const multilayerperceptron &network, const bool randomstart) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpstarttraining(ConstT(mlptrainer, s), ConstT(multilayerperceptron, network), randomstart, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 bool mlpcontinuetraining(const mlptrainer &s, const multilayerperceptron &network) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, false)
+   TryCatch(false)
    bool Ok = alglib_impl::mlpcontinuetraining(ConstT(mlptrainer, s), ConstT(multilayerperceptron, network), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -25636,28 +25636,28 @@ bool mlpcontinuetraining(const mlptrainer &s, const multilayerperceptron &networ
 
 void mlpebagginglm(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep, mlpcvreport &ooberrors) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpebagginglm(ConstT(mlpensemble, ensemble), ConstT(ae_matrix, xy), npoints, decay, restarts, &info, ConstT(mlpreport, rep), ConstT(mlpcvreport, ooberrors), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpebagginglbfgs(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep, mlpcvreport &ooberrors) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpebagginglbfgs(ConstT(mlpensemble, ensemble), ConstT(ae_matrix, xy), npoints, decay, restarts, wstep, maxits, &info, ConstT(mlpreport, rep), ConstT(mlpcvreport, ooberrors), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlpetraines(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlpetraines(ConstT(mlpensemble, ensemble), ConstT(ae_matrix, xy), npoints, decay, restarts, &info, ConstT(mlpreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void mlptrainensemblees(const mlptrainer &s, const mlpensemble &ensemble, const ae_int_t nrestarts, mlpreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::mlptrainensemblees(ConstT(mlptrainer, s), ConstT(mlpensemble, ensemble), nrestarts, ConstT(mlpreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -25690,7 +25690,7 @@ void kmeansgenerate(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t k, a
 namespace alglib {
 void kmeansgenerate(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t k, const ae_int_t restarts, ae_int_t &info, real_2d_array &c, integer_1d_array &xyc) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kmeansgenerate(ConstT(ae_matrix, xy), npoints, nvars, k, restarts, &info, ConstT(ae_matrix, c), ConstT(ae_vector, xyc), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }

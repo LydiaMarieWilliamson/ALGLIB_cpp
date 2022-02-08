@@ -629,7 +629,7 @@ DefClass(barycentricinterpolant, )
 
 double barycentriccalc(const barycentricinterpolant &b, const double t) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::barycentriccalc(ConstT(barycentricinterpolant, b), t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -637,49 +637,49 @@ double barycentriccalc(const barycentricinterpolant &b, const double t) {
 
 void barycentricdiff1(const barycentricinterpolant &b, const double t, double &f, double &df) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::barycentricdiff1(ConstT(barycentricinterpolant, b), t, &f, &df, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void barycentricdiff2(const barycentricinterpolant &b, const double t, double &f, double &df, double &d2f) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::barycentricdiff2(ConstT(barycentricinterpolant, b), t, &f, &df, &d2f, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void barycentriclintransx(const barycentricinterpolant &b, const double ca, const double cb) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::barycentriclintransx(ConstT(barycentricinterpolant, b), ca, cb, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void barycentriclintransy(const barycentricinterpolant &b, const double ca, const double cb) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::barycentriclintransy(ConstT(barycentricinterpolant, b), ca, cb, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void barycentricunpack(const barycentricinterpolant &b, ae_int_t &n, real_1d_array &x, real_1d_array &y, real_1d_array &w) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::barycentricunpack(ConstT(barycentricinterpolant, b), &n, ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void barycentricbuildxyw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, barycentricinterpolant &b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::barycentricbuildxyw(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(barycentricinterpolant, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void barycentricbuildfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t d, barycentricinterpolant &b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::barycentricbuildfloaterhormann(ConstT(ae_vector, x), ConstT(ae_vector, y), n, d, ConstT(barycentricinterpolant, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -2006,7 +2006,7 @@ DefClass(idwreport, DecVal(rmserror) DecVal(avgerror) DecVal(maxerror) DecVal(r2
 void idwserialize(idwmodel &obj, std::string &s_out) {
    alglib_impl::ae_int_t ssize;
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::idwalloc(&serializer, obj.c_ptr(), &state);
@@ -2021,7 +2021,7 @@ void idwserialize(idwmodel &obj, std::string &s_out) {
 }
 void idwserialize(idwmodel &obj, std::ostream &s_out) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::idwalloc(&serializer, obj.c_ptr(), &state);
@@ -2034,7 +2034,7 @@ void idwserialize(idwmodel &obj, std::ostream &s_out) {
 
 void idwunserialize(const std::string &s_in, idwmodel &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::idwunserialize(&serializer, obj.c_ptr(), &state);
@@ -2043,7 +2043,7 @@ void idwunserialize(const std::string &s_in, idwmodel &obj) {
 }
 void idwunserialize(const std::istream &s_in, idwmodel &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::idwunserialize(&serializer, obj.c_ptr(), &state);
@@ -2053,28 +2053,28 @@ void idwunserialize(const std::istream &s_in, idwmodel &obj) {
 
 void idwcreatecalcbuffer(const idwmodel &s, idwcalcbuffer &buf) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwcreatecalcbuffer(ConstT(idwmodel, s), ConstT(idwcalcbuffer, buf), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void idwbuildercreate(const ae_int_t nx, const ae_int_t ny, idwbuilder &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwbuildercreate(nx, ny, ConstT(idwbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void idwbuildersetnlayers(const idwbuilder &state, const ae_int_t nlayers) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwbuildersetnlayers(ConstT(idwbuilder, state), nlayers, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwbuildersetpoints(ConstT(idwbuilder, state), ConstT(ae_matrix, xy), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -2082,7 +2082,7 @@ void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const
 void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy) {
    ae_int_t n = xy.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwbuildersetpoints(ConstT(idwbuilder, state), ConstT(ae_matrix, xy), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -2090,70 +2090,70 @@ void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy) {
 
 void idwbuildersetalgomstab(const idwbuilder &state, const double srad) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwbuildersetalgomstab(ConstT(idwbuilder, state), srad, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void idwbuildersetalgotextbookshepard(const idwbuilder &state, const double p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwbuildersetalgotextbookshepard(ConstT(idwbuilder, state), p, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void idwbuildersetalgotextbookmodshepard(const idwbuilder &state, const double r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwbuildersetalgotextbookmodshepard(ConstT(idwbuilder, state), r, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void idwbuildersetuserterm(const idwbuilder &state, const double v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwbuildersetuserterm(ConstT(idwbuilder, state), v, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void idwbuildersetconstterm(const idwbuilder &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwbuildersetconstterm(ConstT(idwbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void idwbuildersetzeroterm(const idwbuilder &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwbuildersetzeroterm(ConstT(idwbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void idwtscalcbuf(const idwmodel &s, const idwcalcbuffer &buf, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwtscalcbuf(ConstT(idwmodel, s), ConstT(idwcalcbuffer, buf), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void idwcalc(const idwmodel &s, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwcalc(ConstT(idwmodel, s), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void idwcalcbuf(const idwmodel &s, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwcalcbuf(ConstT(idwmodel, s), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double idwcalc1(const idwmodel &s, const double x0) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::idwcalc1(ConstT(idwmodel, s), x0, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2161,7 +2161,7 @@ double idwcalc1(const idwmodel &s, const double x0) {
 
 double idwcalc2(const idwmodel &s, const double x0, const double x1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::idwcalc2(ConstT(idwmodel, s), x0, x1, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2169,7 +2169,7 @@ double idwcalc2(const idwmodel &s, const double x0, const double x1) {
 
 double idwcalc3(const idwmodel &s, const double x0, const double x1, const double x2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::idwcalc3(ConstT(idwmodel, s), x0, x1, x2, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -2177,7 +2177,7 @@ double idwcalc3(const idwmodel &s, const double x0, const double x1, const doubl
 
 void idwfit(const idwbuilder &state, idwmodel &model, idwreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::idwfit(ConstT(idwbuilder, state), ConstT(idwmodel, model), ConstT(idwreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3660,7 +3660,7 @@ double polynomialcalccheb2(double a, double b, RVector *f, ae_int_t n, double t,
 namespace alglib {
 void polynomialbuild(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialbuild(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3669,7 +3669,7 @@ void polynomialbuild(const real_1d_array &x, const real_1d_array &y, barycentric
    if (x.length() != y.length()) ThrowError("Error while calling 'polynomialbuild': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialbuild(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3677,7 +3677,7 @@ void polynomialbuild(const real_1d_array &x, const real_1d_array &y, barycentric
 
 void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialbuildeqdist(a, b, ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3685,7 +3685,7 @@ void polynomialbuildeqdist(const double a, const double b, const real_1d_array &
 void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p) {
    ae_int_t n = y.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialbuildeqdist(a, b, ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3693,7 +3693,7 @@ void polynomialbuildeqdist(const double a, const double b, const real_1d_array &
 
 void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialbuildcheb1(a, b, ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3701,7 +3701,7 @@ void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y
 void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p) {
    ae_int_t n = y.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialbuildcheb1(a, b, ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3709,7 +3709,7 @@ void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y
 
 void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialbuildcheb2(a, b, ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3717,7 +3717,7 @@ void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y
 void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p) {
    ae_int_t n = y.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialbuildcheb2(a, b, ConstT(ae_vector, y), n, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3725,14 +3725,14 @@ void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y
 
 void polynomialbar2cheb(const barycentricinterpolant &p, const double a, const double b, real_1d_array &t) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialbar2cheb(ConstT(barycentricinterpolant, p), a, b, ConstT(ae_vector, t), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void polynomialcheb2bar(const real_1d_array &t, const ae_int_t n, const double a, const double b, barycentricinterpolant &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialcheb2bar(ConstT(ae_vector, t), n, a, b, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3740,7 +3740,7 @@ void polynomialcheb2bar(const real_1d_array &t, const ae_int_t n, const double a
 void polynomialcheb2bar(const real_1d_array &t, const double a, const double b, barycentricinterpolant &p) {
    ae_int_t n = t.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialcheb2bar(ConstT(ae_vector, t), n, a, b, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3748,7 +3748,7 @@ void polynomialcheb2bar(const real_1d_array &t, const double a, const double b, 
 
 void polynomialbar2pow(const barycentricinterpolant &p, const double c, const double s, real_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialbar2pow(ConstT(barycentricinterpolant, p), c, s, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3757,7 +3757,7 @@ void polynomialbar2pow(const barycentricinterpolant &p, real_1d_array &a) {
    double c = 0.0;
    double s = 1.0;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialbar2pow(ConstT(barycentricinterpolant, p), c, s, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3765,7 +3765,7 @@ void polynomialbar2pow(const barycentricinterpolant &p, real_1d_array &a) {
 
 void polynomialpow2bar(const real_1d_array &a, const ae_int_t n, const double c, const double s, barycentricinterpolant &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialpow2bar(ConstT(ae_vector, a), n, c, s, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3775,7 +3775,7 @@ void polynomialpow2bar(const real_1d_array &a, barycentricinterpolant &p) {
    double c = 0.0;
    double s = 1.0;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialpow2bar(ConstT(ae_vector, a), n, c, s, ConstT(barycentricinterpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3783,7 +3783,7 @@ void polynomialpow2bar(const real_1d_array &a, barycentricinterpolant &p) {
 
 double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::polynomialcalceqdist(a, b, ConstT(ae_vector, f), n, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3792,7 +3792,7 @@ double polynomialcalceqdist(const double a, const double b, const real_1d_array 
 double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const double t) {
    ae_int_t n = f.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::polynomialcalceqdist(a, b, ConstT(ae_vector, f), n, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3801,7 +3801,7 @@ double polynomialcalceqdist(const double a, const double b, const real_1d_array 
 
 double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::polynomialcalccheb1(a, b, ConstT(ae_vector, f), n, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3810,7 +3810,7 @@ double polynomialcalccheb1(const double a, const double b, const real_1d_array &
 double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const double t) {
    ae_int_t n = f.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::polynomialcalccheb1(a, b, ConstT(ae_vector, f), n, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3819,7 +3819,7 @@ double polynomialcalccheb1(const double a, const double b, const real_1d_array &
 
 double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::polynomialcalccheb2(a, b, ConstT(ae_vector, f), n, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3828,7 +3828,7 @@ double polynomialcalccheb2(const double a, const double b, const real_1d_array &
 double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const double t) {
    ae_int_t n = f.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::polynomialcalccheb2(a, b, ConstT(ae_vector, f), n, t, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7131,7 +7131,7 @@ DefClass(spline1dfitreport, DecVal(taskrcond) DecVal(rmserror) DecVal(avgerror) 
 
 void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dbuildlinear(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7140,7 +7140,7 @@ void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, spline1
    if (x.length() != y.length()) ThrowError("Error while calling 'spline1dbuildlinear': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dbuildlinear(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7148,7 +7148,7 @@ void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, spline1
 
 void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const real_1d_array &d, const ae_int_t n, spline1dinterpolant &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dbuildhermite(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, d), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7157,7 +7157,7 @@ void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const 
    if (x.length() != y.length() || x.length() != d.length()) ThrowError("Error while calling 'spline1dbuildhermite': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dbuildhermite(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, d), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7165,7 +7165,7 @@ void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const 
 
 void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, spline1dinterpolant &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dbuildcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7178,7 +7178,7 @@ void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, spline1d
    ae_int_t boundrtype = 0;
    double boundr = 0.0;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dbuildcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7186,7 +7186,7 @@ void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, spline1d
 
 void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundtype, const double tension, spline1dinterpolant &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dbuildcatmullrom(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundtype, tension, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7197,7 +7197,7 @@ void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, spl
    ae_int_t boundtype = 0;
    double tension = 0.0;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dbuildcatmullrom(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundtype, tension, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7205,7 +7205,7 @@ void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, spl
 
 void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dbuildakima(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7214,7 +7214,7 @@ void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, spline1d
    if (x.length() != y.length()) ThrowError("Error while calling 'spline1dbuildakima': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dbuildakima(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7222,7 +7222,7 @@ void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, spline1d
 
 void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dbuildmonotone(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7231,7 +7231,7 @@ void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, splin
    if (x.length() != y.length()) ThrowError("Error while calling 'spline1dbuildmonotone': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dbuildmonotone(ConstT(ae_vector, x), ConstT(ae_vector, y), n, ConstT(spline1dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7239,7 +7239,7 @@ void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, splin
 
 void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, real_1d_array &d) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dgriddiffcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, d), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7252,7 +7252,7 @@ void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, real_
    ae_int_t boundrtype = 0;
    double boundr = 0.0;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dgriddiffcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, d), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7260,7 +7260,7 @@ void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, real_
 
 void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, real_1d_array &d1, real_1d_array &d2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dgriddiff2cubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, d1), ConstT(ae_vector, d2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7273,7 +7273,7 @@ void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, real
    ae_int_t boundrtype = 0;
    double boundr = 0.0;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dgriddiff2cubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, d1), ConstT(ae_vector, d2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7281,7 +7281,7 @@ void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, real
 
 void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dconvcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7295,7 +7295,7 @@ void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const rea
    double boundr = 0.0;
    ae_int_t n2 = x2.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dconvcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7303,7 +7303,7 @@ void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const rea
 
 void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, real_1d_array &d2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dconvdiffcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y2), ConstT(ae_vector, d2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7317,7 +7317,7 @@ void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const
    double boundr = 0.0;
    ae_int_t n2 = x2.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dconvdiffcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y2), ConstT(ae_vector, d2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7325,7 +7325,7 @@ void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const
 
 void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, real_1d_array &d2, real_1d_array &dd2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dconvdiff2cubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y2), ConstT(ae_vector, d2), ConstT(ae_vector, dd2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7339,7 +7339,7 @@ void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, cons
    double boundr = 0.0;
    ae_int_t n2 = x2.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dconvdiff2cubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, boundltype, boundl, boundrtype, boundr, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y2), ConstT(ae_vector, d2), ConstT(ae_vector, dd2), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7347,7 +7347,7 @@ void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, cons
 
 double spline1dcalc(const spline1dinterpolant &c, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::spline1dcalc(ConstT(spline1dinterpolant, c), x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7355,35 +7355,35 @@ double spline1dcalc(const spline1dinterpolant &c, const double x) {
 
 void spline1ddiff(const spline1dinterpolant &c, const double x, double &s, double &ds, double &d2s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1ddiff(ConstT(spline1dinterpolant, c), x, &s, &ds, &d2s, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline1dunpack(const spline1dinterpolant &c, ae_int_t &n, real_2d_array &tbl) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dunpack(ConstT(spline1dinterpolant, c), &n, ConstT(ae_matrix, tbl), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline1dlintransx(const spline1dinterpolant &c, const double a, const double b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dlintransx(ConstT(spline1dinterpolant, c), a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline1dlintransy(const spline1dinterpolant &c, const double a, const double b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dlintransy(ConstT(spline1dinterpolant, c), a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double spline1dintegrate(const spline1dinterpolant &c, const double x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::spline1dintegrate(ConstT(spline1dinterpolant, c), x, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -7391,7 +7391,7 @@ double spline1dintegrate(const spline1dinterpolant &c, const double x) {
 
 void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfit(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, lambdans, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7400,7 +7400,7 @@ void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t 
    if (x.length() != y.length()) ThrowError("Error while calling 'spline1dfit': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfit(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, lambdans, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13119,21 +13119,21 @@ DefClass(lsfitstate, DecVal(needf) DecVal(needfg) DecVal(needfgh) DecVal(xupdate
 
 void lstfitpiecewiselinearrdpfixed(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lstfitpiecewiselinearrdpfixed(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, ConstT(ae_vector, x2), ConstT(ae_vector, y2), &nsections, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lstfitpiecewiselinearrdp(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double eps, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lstfitpiecewiselinearrdp(ConstT(ae_vector, x), ConstT(ae_vector, y), n, eps, ConstT(ae_vector, x2), ConstT(ae_vector, y2), &nsections, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const ae_int_t n, const ae_int_t m, ae_int_t &info, real_1d_array &c, lsfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitlinearw(ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_matrix, fmatrix), n, m, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13143,7 +13143,7 @@ void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_
    ae_int_t n = y.length();
    ae_int_t m = fmatrix.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitlinearw(ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_matrix, fmatrix), n, m, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13151,7 +13151,7 @@ void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_
 
 void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const real_2d_array &cmatrix, const ae_int_t n, const ae_int_t m, const ae_int_t k, ae_int_t &info, real_1d_array &c, lsfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitlinearwc(ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_matrix, fmatrix), ConstT(ae_matrix, cmatrix), n, m, k, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13163,7 +13163,7 @@ void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d
    ae_int_t m = fmatrix.cols();
    ae_int_t k = cmatrix.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitlinearwc(ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_matrix, fmatrix), ConstT(ae_matrix, cmatrix), n, m, k, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13171,7 +13171,7 @@ void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d
 
 void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, const ae_int_t n, const ae_int_t m, ae_int_t &info, real_1d_array &c, lsfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitlinear(ConstT(ae_vector, y), ConstT(ae_matrix, fmatrix), n, m, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13181,7 +13181,7 @@ void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, ae_int_t 
    ae_int_t n = y.length();
    ae_int_t m = fmatrix.cols();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitlinear(ConstT(ae_vector, y), ConstT(ae_matrix, fmatrix), n, m, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13189,7 +13189,7 @@ void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, ae_int_t 
 
 void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const real_2d_array &cmatrix, const ae_int_t n, const ae_int_t m, const ae_int_t k, ae_int_t &info, real_1d_array &c, lsfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitlinearc(ConstT(ae_vector, y), ConstT(ae_matrix, fmatrix), ConstT(ae_matrix, cmatrix), n, m, k, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13201,7 +13201,7 @@ void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const re
    ae_int_t m = fmatrix.cols();
    ae_int_t k = cmatrix.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitlinearc(ConstT(ae_vector, y), ConstT(ae_matrix, fmatrix), ConstT(ae_matrix, cmatrix), n, m, k, &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13209,7 +13209,7 @@ void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const re
 
 void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialfitwc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(barycentricinterpolant, p), ConstT(polynomialfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13220,7 +13220,7 @@ void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_
    ae_int_t n = x.length();
    ae_int_t k = xc.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialfitwc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(barycentricinterpolant, p), ConstT(polynomialfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13228,7 +13228,7 @@ void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_
 
 void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialfit(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(barycentricinterpolant, p), ConstT(polynomialfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13237,7 +13237,7 @@ void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_
    if (x.length() != y.length()) ThrowError("Error while calling 'polynomialfit': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::polynomialfit(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(barycentricinterpolant, p), ConstT(polynomialfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13245,7 +13245,7 @@ void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_
 
 double logisticcalc4(const double x, const double a, const double b, const double c, const double d) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::logisticcalc4(x, a, b, c, d, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -13253,7 +13253,7 @@ double logisticcalc4(const double x, const double a, const double b, const doubl
 
 double logisticcalc5(const double x, const double a, const double b, const double c, const double d, const double g) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::logisticcalc5(x, a, b, c, d, g, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -13261,56 +13261,56 @@ double logisticcalc5(const double x, const double a, const double b, const doubl
 
 void logisticfit45x(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, const bool is4pl, const double lambdav, const double epsx, const ae_int_t rscnt, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::logisticfit45x(ConstT(ae_vector, x), ConstT(ae_vector, y), n, cnstrleft, cnstrright, is4pl, lambdav, epsx, rscnt, &a, &b, &c, &d, &g, ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void logisticfit4(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, double &a, double &b, double &c, double &d, lsfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::logisticfit4(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &a, &b, &c, &d, ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void logisticfit4ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, lsfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::logisticfit4ec(ConstT(ae_vector, x), ConstT(ae_vector, y), n, cnstrleft, cnstrright, &a, &b, &c, &d, ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void logisticfit5(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::logisticfit5(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &a, &b, &c, &d, &g, ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void logisticfit5ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::logisticfit5ec(ConstT(ae_vector, x), ConstT(ae_vector, y), n, cnstrleft, cnstrright, &a, &b, &c, &d, &g, ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void barycentricfitfloaterhormannwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, barycentricinterpolant &b, barycentricfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::barycentricfitfloaterhormannwc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(barycentricinterpolant, b), ConstT(barycentricfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void barycentricfitfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, barycentricinterpolant &b, barycentricfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::barycentricfitfloaterhormann(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(barycentricinterpolant, b), ConstT(barycentricfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfitcubicwc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13321,7 +13321,7 @@ void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const re
    ae_int_t n = x.length();
    ae_int_t k = xc.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfitcubicwc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13329,7 +13329,7 @@ void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const re
 
 void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfitcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13338,7 +13338,7 @@ void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_i
    if (x.length() != y.length()) ThrowError("Error while calling 'spline1dfitcubic': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfitcubic(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13346,7 +13346,7 @@ void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_i
 
 void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfithermitewc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13357,7 +13357,7 @@ void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const 
    ae_int_t n = x.length();
    ae_int_t k = xc.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfithermitewc(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, ConstT(ae_vector, xc), ConstT(ae_vector, yc), ConstT(ae_vector, dc), k, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13365,7 +13365,7 @@ void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const 
 
 void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfithermite(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13374,7 +13374,7 @@ void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae
    if (x.length() != y.length()) ThrowError("Error while calling 'spline1dfithermite': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfithermite(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13382,42 +13382,42 @@ void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae
 
 void lsfitsetcond(const lsfitstate &state, const double epsx, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitsetcond(ConstT(lsfitstate, state), epsx, maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lsfitsetstpmax(const lsfitstate &state, const double stpmax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitsetstpmax(ConstT(lsfitstate, state), stpmax, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lsfitsetxrep(const lsfitstate &state, const bool needxrep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitsetxrep(ConstT(lsfitstate, state), needxrep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lsfitsetscale(const lsfitstate &state, const real_1d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitsetscale(ConstT(lsfitstate, state), ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lsfitsetbc(const lsfitstate &state, const real_1d_array &bndl, const real_1d_array &bndu) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitsetbc(ConstT(lsfitstate, state), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitsetlc(ConstT(lsfitstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13426,7 +13426,7 @@ void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1
    if (c.rows() != ct.length()) ThrowError("Error while calling 'lsfitsetlc': looks like one of arguments has wrong size");
    ae_int_t k = c.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitsetlc(ConstT(lsfitstate, state), ConstT(ae_matrix, c), ConstT(ae_vector, ct), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13434,14 +13434,14 @@ void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1
 
 void lsfitsetgradientcheck(const lsfitstate &state, const double teststep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitsetgradientcheck(ConstT(lsfitstate, state), teststep, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const double diffstep, lsfitstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitcreatewf(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_vector, c), n, m, k, diffstep, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13452,7 +13452,7 @@ void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d
    ae_int_t m = x.cols();
    ae_int_t k = c.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitcreatewf(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_vector, c), n, m, k, diffstep, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13460,7 +13460,7 @@ void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d
 
 void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const double diffstep, lsfitstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitcreatef(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, c), n, m, k, diffstep, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13471,7 +13471,7 @@ void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_
    ae_int_t m = x.cols();
    ae_int_t k = c.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitcreatef(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, c), n, m, k, diffstep, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13479,7 +13479,7 @@ void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_
 
 void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const bool cheapfg, lsfitstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitcreatewfg(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_vector, c), n, m, k, cheapfg, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13490,7 +13490,7 @@ void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1
    ae_int_t m = x.cols();
    ae_int_t k = c.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitcreatewfg(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_vector, c), n, m, k, cheapfg, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13498,7 +13498,7 @@ void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1
 
 void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const bool cheapfg, lsfitstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitcreatefg(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, c), n, m, k, cheapfg, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13509,7 +13509,7 @@ void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d
    ae_int_t m = x.cols();
    ae_int_t k = c.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitcreatefg(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, c), n, m, k, cheapfg, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13517,7 +13517,7 @@ void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d
 
 void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, lsfitstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitcreatewfgh(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_vector, c), n, m, k, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13528,7 +13528,7 @@ void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_
    ae_int_t m = x.cols();
    ae_int_t k = c.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitcreatewfgh(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, w), ConstT(ae_vector, c), n, m, k, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13536,7 +13536,7 @@ void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_
 
 void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, lsfitstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitcreatefgh(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, c), n, m, k, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13547,7 +13547,7 @@ void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1
    ae_int_t m = x.cols();
    ae_int_t k = c.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitcreatefgh(ConstT(ae_matrix, x), ConstT(ae_vector, y), ConstT(ae_vector, c), n, m, k, ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13555,7 +13555,7 @@ void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1
 
 bool lsfititeration(const lsfitstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, false)
+   TryCatch(false)
    bool Ok = alglib_impl::lsfititeration(ConstT(lsfitstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -13612,7 +13612,7 @@ bool lsfititeration(const lsfitstate &state) {
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'lsfitfit()' (func is NULL)", &_alglib_env_state);
    while (alglib_impl::lsfititeration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -13624,7 +13624,7 @@ void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real
 }
 void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'lsfitfit()' (func is NULL)", &_alglib_env_state);
    alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'lsfitfit()' (grad is NULL)", &_alglib_env_state);
    while (alglib_impl::lsfititeration(state.c_ptr(), &_alglib_env_state))
@@ -13638,7 +13638,7 @@ void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real
 }
 void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'lsfitfit()' (func is NULL)", &_alglib_env_state);
    alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'lsfitfit()' (grad is NULL)", &_alglib_env_state);
    alglib_impl::ae_assert(hess != NULL, "ALGLIB: error in 'lsfitfit()' (hess is NULL)", &_alglib_env_state);
@@ -13655,7 +13655,7 @@ void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real
 
 void lsfitresults(const lsfitstate &state, ae_int_t &info, real_1d_array &c, lsfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::lsfitresults(ConstT(lsfitstate, state), &info, ConstT(ae_vector, c), ConstT(lsfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -14439,35 +14439,35 @@ void fitsphereinternalreport_free(void *_p, bool make_automatic) {
 namespace alglib {
 void fitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fitspherex(ConstT(ae_matrix, xy), npoints, nx, problemtype, epsx, aulits, penalty, ConstT(ae_vector, cx), &rlo, &rhi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void fitspherels(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fitspherels(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &r, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void fitspheremc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fitspheremc(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rhi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void fitspheremi(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fitspheremi(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rlo, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void fitspheremz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::fitspheremz(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rlo, &rhi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -15523,105 +15523,105 @@ DefClass(pspline3interpolant, )
 
 void pspline2build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline2build(ConstT(ae_matrix, xy), n, st, pt, ConstT(pspline2interpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline3build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline3build(ConstT(ae_matrix, xy), n, st, pt, ConstT(pspline3interpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline2buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline2buildperiodic(ConstT(ae_matrix, xy), n, st, pt, ConstT(pspline2interpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline3buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline3buildperiodic(ConstT(ae_matrix, xy), n, st, pt, ConstT(pspline3interpolant, p), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline2parametervalues(const pspline2interpolant &p, ae_int_t &n, real_1d_array &t) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline2parametervalues(ConstT(pspline2interpolant, p), &n, ConstT(ae_vector, t), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline3parametervalues(const pspline3interpolant &p, ae_int_t &n, real_1d_array &t) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline3parametervalues(ConstT(pspline3interpolant, p), &n, ConstT(ae_vector, t), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline2calc(const pspline2interpolant &p, const double t, double &x, double &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline2calc(ConstT(pspline2interpolant, p), t, &x, &y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline3calc(const pspline3interpolant &p, const double t, double &x, double &y, double &z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline3calc(ConstT(pspline3interpolant, p), t, &x, &y, &z, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline2diff(const pspline2interpolant &p, const double t, double &x, double &dx, double &y, double &dy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline2diff(ConstT(pspline2interpolant, p), t, &x, &dx, &y, &dy, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline3diff(const pspline3interpolant &p, const double t, double &x, double &dx, double &y, double &dy, double &z, double &dz) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline3diff(ConstT(pspline3interpolant, p), t, &x, &dx, &y, &dy, &z, &dz, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline2tangent(const pspline2interpolant &p, const double t, double &x, double &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline2tangent(ConstT(pspline2interpolant, p), t, &x, &y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline3tangent(const pspline3interpolant &p, const double t, double &x, double &y, double &z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline3tangent(ConstT(pspline3interpolant, p), t, &x, &y, &z, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline2diff2(const pspline2interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline2diff2(ConstT(pspline2interpolant, p), t, &x, &dx, &d2x, &y, &dy, &d2y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void pspline3diff2(const pspline3interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y, double &z, double &dz, double &d2z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::pspline3diff2(ConstT(pspline3interpolant, p), t, &x, &dx, &d2x, &y, &dy, &d2y, &z, &dz, &d2z, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double pspline2arclength(const pspline2interpolant &p, const double a, const double b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::pspline2arclength(ConstT(pspline2interpolant, p), a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -15629,7 +15629,7 @@ double pspline2arclength(const pspline2interpolant &p, const double a, const dou
 
 double pspline3arclength(const pspline3interpolant &p, const double a, const double b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::pspline3arclength(ConstT(pspline3interpolant, p), a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -15637,7 +15637,7 @@ double pspline3arclength(const pspline3interpolant &p, const double a, const dou
 
 void parametricrdpfixed(const real_2d_array &x, const ae_int_t n, const ae_int_t d, const ae_int_t stopm, const double stopeps, real_2d_array &x2, integer_1d_array &idx2, ae_int_t &nsections) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::parametricrdpfixed(ConstT(ae_matrix, x), n, d, stopm, stopeps, ConstT(ae_matrix, x2), ConstT(ae_vector, idx2), &nsections, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -22090,7 +22090,7 @@ DefClass(spline2dfitreport, DecVal(rmserror) DecVal(avgerror) DecVal(maxerror) D
 void spline2dserialize(spline2dinterpolant &obj, std::string &s_out) {
    alglib_impl::ae_int_t ssize;
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::spline2dalloc(&serializer, obj.c_ptr(), &state);
@@ -22105,7 +22105,7 @@ void spline2dserialize(spline2dinterpolant &obj, std::string &s_out) {
 }
 void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::spline2dalloc(&serializer, obj.c_ptr(), &state);
@@ -22118,7 +22118,7 @@ void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out) {
 
 void spline2dunserialize(const std::string &s_in, spline2dinterpolant &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::spline2dunserialize(&serializer, obj.c_ptr(), &state);
@@ -22127,7 +22127,7 @@ void spline2dunserialize(const std::string &s_in, spline2dinterpolant &obj) {
 }
 void spline2dunserialize(const std::istream &s_in, spline2dinterpolant &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::spline2dunserialize(&serializer, obj.c_ptr(), &state);
@@ -22137,7 +22137,7 @@ void spline2dunserialize(const std::istream &s_in, spline2dinterpolant &obj) {
 
 double spline2dcalc(const spline2dinterpolant &c, const double x, const double y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::spline2dcalc(ConstT(spline2dinterpolant, c), x, y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -22145,21 +22145,21 @@ double spline2dcalc(const spline2dinterpolant &c, const double x, const double y
 
 void spline2dcalcvbuf(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dcalcvbuf(ConstT(spline2dinterpolant, c), x, y, ConstT(ae_vector, f), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dcalcv(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dcalcv(ConstT(spline2dinterpolant, c), x, y, ConstT(ae_vector, f), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double spline2dcalcvi(const spline2dinterpolant &c, const double x, const double y, const ae_int_t i) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::spline2dcalcvi(ConstT(spline2dinterpolant, c), x, y, i, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -22167,182 +22167,182 @@ double spline2dcalcvi(const spline2dinterpolant &c, const double x, const double
 
 void spline2ddiff(const spline2dinterpolant &c, const double x, const double y, double &f, double &fx, double &fy, double &fxy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2ddiff(ConstT(spline2dinterpolant, c), x, y, &f, &fx, &fy, &fxy, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2ddiffvi(const spline2dinterpolant &c, const double x, const double y, const ae_int_t i, double &f, double &fx, double &fy, double &fxy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2ddiffvi(ConstT(spline2dinterpolant, c), x, y, i, &f, &fx, &fy, &fxy, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dcopy(const spline2dinterpolant &c, spline2dinterpolant &cc) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dcopy(ConstT(spline2dinterpolant, c), ConstT(spline2dinterpolant, cc), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dresamplebicubic(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dresamplebicubic(ConstT(ae_matrix, a), oldheight, oldwidth, ConstT(ae_matrix, b), newheight, newwidth, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dresamplebilinear(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dresamplebilinear(ConstT(ae_matrix, a), oldheight, oldwidth, ConstT(ae_matrix, b), newheight, newwidth, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildbilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildbilinearv(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, ConstT(ae_vector, f), d, ConstT(spline2dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildbicubicv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildbicubicv(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, ConstT(ae_vector, f), d, ConstT(spline2dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildbilinear(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildbilinear(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_matrix, f), m, n, ConstT(spline2dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildbicubic(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildbicubic(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_matrix, f), m, n, ConstT(spline2dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dlintransxy(const spline2dinterpolant &c, const double ax, const double bx, const double ay, const double by) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dlintransxy(ConstT(spline2dinterpolant, c), ax, bx, ay, by, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dlintransf(const spline2dinterpolant &c, const double a, const double b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dlintransf(ConstT(spline2dinterpolant, c), a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dunpackv(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, ae_int_t &d, real_2d_array &tbl) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dunpackv(ConstT(spline2dinterpolant, c), &m, &n, &d, ConstT(ae_matrix, tbl), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dunpack(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, real_2d_array &tbl) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dunpack(ConstT(spline2dinterpolant, c), &m, &n, ConstT(ae_matrix, tbl), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildercreate(const ae_int_t d, spline2dbuilder &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildercreate(d, ConstT(spline2dbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildersetuserterm(const spline2dbuilder &state, const double v) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildersetuserterm(ConstT(spline2dbuilder, state), v, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildersetlinterm(const spline2dbuilder &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildersetlinterm(ConstT(spline2dbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildersetconstterm(const spline2dbuilder &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildersetconstterm(ConstT(spline2dbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildersetzeroterm(const spline2dbuilder &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildersetzeroterm(ConstT(spline2dbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildersetpoints(const spline2dbuilder &state, const real_2d_array &xy, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildersetpoints(ConstT(spline2dbuilder, state), ConstT(ae_matrix, xy), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildersetareaauto(const spline2dbuilder &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildersetareaauto(ConstT(spline2dbuilder, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildersetarea(const spline2dbuilder &state, const double xa, const double xb, const double ya, const double yb) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildersetarea(ConstT(spline2dbuilder, state), xa, xb, ya, yb, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildersetgrid(const spline2dbuilder &state, const ae_int_t kx, const ae_int_t ky) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildersetgrid(ConstT(spline2dbuilder, state), kx, ky, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildersetalgofastddm(const spline2dbuilder &state, const ae_int_t nlayers, const double lambdav) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildersetalgofastddm(ConstT(spline2dbuilder, state), nlayers, lambdav, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildersetalgoblocklls(const spline2dbuilder &state, const double lambdans) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildersetalgoblocklls(ConstT(spline2dbuilder, state), lambdans, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dbuildersetalgonaivells(const spline2dbuilder &state, const double lambdans) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dbuildersetalgonaivells(ConstT(spline2dbuilder, state), lambdans, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline2dfit(const spline2dbuilder &state, spline2dinterpolant &s, spline2dfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline2dfit(ConstT(spline2dbuilder, state), ConstT(spline2dinterpolant, s), ConstT(spline2dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -25868,21 +25868,21 @@ DefClass(spline3dinterpolant, )
 
 void spline3dcalcvbuf(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline3dcalcvbuf(ConstT(spline3dinterpolant, c), x, y, z, ConstT(ae_vector, f), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline3dcalcv(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline3dcalcv(ConstT(spline3dinterpolant, c), x, y, z, ConstT(ae_vector, f), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double spline3dcalc(const spline3dinterpolant &c, const double x, const double y, const double z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::spline3dcalc(ConstT(spline3dinterpolant, c), x, y, z, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -25890,35 +25890,35 @@ double spline3dcalc(const spline3dinterpolant &c, const double x, const double y
 
 void spline3dresampletrilinear(const real_1d_array &a, const ae_int_t oldzcount, const ae_int_t oldycount, const ae_int_t oldxcount, const ae_int_t newzcount, const ae_int_t newycount, const ae_int_t newxcount, real_1d_array &b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline3dresampletrilinear(ConstT(ae_vector, a), oldzcount, oldycount, oldxcount, newzcount, newycount, newxcount, ConstT(ae_vector, b), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline3dbuildtrilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &z, const ae_int_t l, const real_1d_array &f, const ae_int_t d, spline3dinterpolant &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline3dbuildtrilinearv(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, ConstT(ae_vector, z), l, ConstT(ae_vector, f), d, ConstT(spline3dinterpolant, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline3dlintransxyz(const spline3dinterpolant &c, const double ax, const double bx, const double ay, const double by, const double az, const double bz) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline3dlintransxyz(ConstT(spline3dinterpolant, c), ax, bx, ay, by, az, bz, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline3dlintransf(const spline3dinterpolant &c, const double a, const double b) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline3dlintransf(ConstT(spline3dinterpolant, c), a, b, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline3dunpackv(const spline3dinterpolant &c, ae_int_t &n, ae_int_t &m, ae_int_t &l, ae_int_t &d, ae_int_t &stype, real_2d_array &tbl) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline3dunpackv(ConstT(spline3dinterpolant, c), &n, &m, &l, &d, &stype, ConstT(ae_matrix, tbl), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -26231,35 +26231,35 @@ void spline1dfitpenalized(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double
 namespace alglib {
 void nsfitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::nsfitspherex(ConstT(ae_matrix, xy), npoints, nx, problemtype, epsx, aulits, penalty, ConstT(ae_vector, cx), &rlo, &rhi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void nsfitspheremcc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::nsfitspheremcc(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rhi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void nsfitspheremic(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::nsfitspheremic(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rlo, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::nsfitspheremzc(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rlo, &rhi, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfitpenalizedw(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -26268,7 +26268,7 @@ void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const
    if (x.length() != y.length() || x.length() != w.length()) ThrowError("Error while calling 'spline1dfitpenalizedw': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfitpenalizedw(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -26276,7 +26276,7 @@ void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const
 
 void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfitpenalized(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -26285,7 +26285,7 @@ void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const 
    if (x.length() != y.length()) ThrowError("Error while calling 'spline1dfitpenalized': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::spline1dfitpenalized(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -28362,7 +28362,7 @@ DefClass(rbfreport, DecVal(rmserror) DecVal(maxerror) DecVal(arows) DecVal(acols
 void rbfserialize(rbfmodel &obj, std::string &s_out) {
    alglib_impl::ae_int_t ssize;
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::rbfalloc(&serializer, obj.c_ptr(), &state);
@@ -28377,7 +28377,7 @@ void rbfserialize(rbfmodel &obj, std::string &s_out) {
 }
 void rbfserialize(rbfmodel &obj, std::ostream &s_out) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::rbfalloc(&serializer, obj.c_ptr(), &state);
@@ -28390,7 +28390,7 @@ void rbfserialize(rbfmodel &obj, std::ostream &s_out) {
 
 void rbfunserialize(const std::string &s_in, rbfmodel &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::rbfunserialize(&serializer, obj.c_ptr(), &state);
@@ -28399,7 +28399,7 @@ void rbfunserialize(const std::string &s_in, rbfmodel &obj) {
 }
 void rbfunserialize(const std::istream &s_in, rbfmodel &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::rbfunserialize(&serializer, obj.c_ptr(), &state);
@@ -28409,21 +28409,21 @@ void rbfunserialize(const std::istream &s_in, rbfmodel &obj) {
 
 void rbfcreate(const ae_int_t nx, const ae_int_t ny, rbfmodel &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfcreate(nx, ny, ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfcreatecalcbuffer(const rbfmodel &s, rbfcalcbuffer &buf) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfcreatecalcbuffer(ConstT(rbfmodel, s), ConstT(rbfcalcbuffer, buf), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetpoints(ConstT(rbfmodel, s), ConstT(ae_matrix, xy), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -28431,7 +28431,7 @@ void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const ae_int_t n) 
 void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy) {
    ae_int_t n = xy.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetpoints(ConstT(rbfmodel, s), ConstT(ae_matrix, xy), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -28439,7 +28439,7 @@ void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy) {
 
 void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const ae_int_t n, const real_1d_array &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetpointsandscales(ConstT(rbfmodel, r), ConstT(ae_matrix, xy), n, ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -28447,7 +28447,7 @@ void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const ae_
 void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const real_1d_array &s) {
    ae_int_t n = xy.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetpointsandscales(ConstT(rbfmodel, r), ConstT(ae_matrix, xy), n, ConstT(ae_vector, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -28455,7 +28455,7 @@ void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const rea
 
 void rbfsetalgoqnn(const rbfmodel &s, const double q, const double z) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetalgoqnn(ConstT(rbfmodel, s), q, z, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -28464,7 +28464,7 @@ void rbfsetalgoqnn(const rbfmodel &s) {
    double q = 1.0;
    double z = 5.0;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetalgoqnn(ConstT(rbfmodel, s), q, z, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -28472,7 +28472,7 @@ void rbfsetalgoqnn(const rbfmodel &s) {
 
 void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const double lambdav) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetalgomultilayer(ConstT(rbfmodel, s), rbase, nlayers, lambdav, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -28480,7 +28480,7 @@ void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t 
 void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers) {
    double lambdav = 0.01;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetalgomultilayer(ConstT(rbfmodel, s), rbase, nlayers, lambdav, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -28488,63 +28488,63 @@ void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t 
 
 void rbfsetalgohierarchical(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const double lambdans) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetalgohierarchical(ConstT(rbfmodel, s), rbase, nlayers, lambdans, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfsetlinterm(const rbfmodel &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetlinterm(ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfsetconstterm(const rbfmodel &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetconstterm(ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfsetzeroterm(const rbfmodel &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetzeroterm(ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfsetv2bf(const rbfmodel &s, const ae_int_t bf) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetv2bf(ConstT(rbfmodel, s), bf, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfsetv2its(const rbfmodel &s, const ae_int_t maxits) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetv2its(ConstT(rbfmodel, s), maxits, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfsetv2supportr(const rbfmodel &s, const double r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfsetv2supportr(ConstT(rbfmodel, s), r, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfbuildmodel(const rbfmodel &s, rbfreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfbuildmodel(ConstT(rbfmodel, s), ConstT(rbfreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double rbfcalc1(const rbfmodel &s, const double x0) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::rbfcalc1(ConstT(rbfmodel, s), x0, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -28552,7 +28552,7 @@ double rbfcalc1(const rbfmodel &s, const double x0) {
 
 double rbfcalc2(const rbfmodel &s, const double x0, const double x1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::rbfcalc2(ConstT(rbfmodel, s), x0, x1, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -28560,7 +28560,7 @@ double rbfcalc2(const rbfmodel &s, const double x0, const double x1) {
 
 double rbfcalc3(const rbfmodel &s, const double x0, const double x1, const double x2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::rbfcalc3(ConstT(rbfmodel, s), x0, x1, x2, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -28568,70 +28568,70 @@ double rbfcalc3(const rbfmodel &s, const double x0, const double x1, const doubl
 
 void rbftscalcbuf(const rbfmodel &s, const rbfcalcbuffer &buf, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbftscalcbuf(ConstT(rbfmodel, s), ConstT(rbfcalcbuffer, buf), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfcalcbuf(const rbfmodel &s, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfcalcbuf(ConstT(rbfmodel, s), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfcalc(ConstT(rbfmodel, s), ConstT(ae_vector, x), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfgridcalc2(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_2d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfgridcalc2(ConstT(rbfmodel, s), ConstT(ae_vector, x0), n0, ConstT(ae_vector, x1), n1, ConstT(ae_matrix, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfgridcalc2v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfgridcalc2v(ConstT(rbfmodel, s), ConstT(ae_vector, x0), n0, ConstT(ae_vector, x1), n1, ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfgridcalc2vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const boolean_1d_array &flagy, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfgridcalc2vsubset(ConstT(rbfmodel, s), ConstT(ae_vector, x0), n0, ConstT(ae_vector, x1), n1, ConstT(ae_vector, flagy), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfgridcalc3v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfgridcalc3v(ConstT(rbfmodel, s), ConstT(ae_vector, x0), n0, ConstT(ae_vector, x1), n1, ConstT(ae_vector, x2), n2, ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfgridcalc3vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const real_1d_array &x2, const ae_int_t n2, const boolean_1d_array &flagy, real_1d_array &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfgridcalc3vsubset(ConstT(rbfmodel, s), ConstT(ae_vector, x0), n0, ConstT(ae_vector, x1), n1, ConstT(ae_vector, x2), n2, ConstT(ae_vector, flagy), ConstT(ae_vector, y), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void rbfunpack(const rbfmodel &s, ae_int_t &nx, ae_int_t &ny, real_2d_array &xwr, ae_int_t &nc, real_2d_array &v, ae_int_t &modelversion) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfunpack(ConstT(rbfmodel, s), &nx, &ny, ConstT(ae_matrix, xwr), &nc, ConstT(ae_matrix, v), &modelversion, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 ae_int_t rbfgetmodelversion(const rbfmodel &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::rbfgetmodelversion(ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -28639,7 +28639,7 @@ ae_int_t rbfgetmodelversion(const rbfmodel &s) {
 
 double rbfpeekprogress(const rbfmodel &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::rbfpeekprogress(ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -28647,7 +28647,7 @@ double rbfpeekprogress(const rbfmodel &s) {
 
 void rbfrequesttermination(const rbfmodel &s) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::rbfrequesttermination(ConstT(rbfmodel, s), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }

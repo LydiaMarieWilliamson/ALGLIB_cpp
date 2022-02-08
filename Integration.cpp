@@ -595,49 +595,49 @@ void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, 
 namespace alglib {
 void gqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::gqgeneraterec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const double b, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::gqgenerategausslobattorec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, a, b, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void gqgenerategaussradaurec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::gqgenerategaussradaurec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, a, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void gqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::gqgenerategausslegendre(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void gqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::gqgenerategaussjacobi(n, alpha, beta, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void gqgenerategausslaguerre(const ae_int_t n, const double alpha, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::gqgenerategausslaguerre(n, alpha, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::gqgenerategausshermite(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1407,35 +1407,35 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
 namespace alglib {
 void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::gkqgeneraterec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void gkqlegendrecalc(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::gkqlegendrecalc(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, double &eps) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::gkqlegendretbl(n, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::gkqgenerategausslegendre(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::gkqgenerategaussjacobi(n, alpha, beta, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -2328,28 +2328,28 @@ DefClass(autogkstate, DecVal(needf) DecVal(x) DecVal(xminusa) DecVal(bminusx) De
 
 void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::autogksmoothw(a, b, xwidth, ConstT(autogkstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void autogksmooth(const double a, const double b, autogkstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::autogksmooth(a, b, ConstT(autogkstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void autogksingular(const double a, const double b, const double alpha, const double beta, autogkstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::autogksingular(a, b, alpha, beta, ConstT(autogkstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 bool autogkiteration(const autogkstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, false)
+   TryCatch(false)
    bool Ok = alglib_impl::autogkiteration(ConstT(autogkstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Ok;
@@ -2363,7 +2363,7 @@ bool autogkiteration(const autogkstate &state) {
 // ALGLIB: Copyright 07.05.2009 by Sergey Bochkanov
 void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'autogkintegrate()' (func is NULL)", &_alglib_env_state);
    while (alglib_impl::autogkiteration(state.c_ptr(), &_alglib_env_state))
    BegPoll
@@ -2375,7 +2375,7 @@ void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, 
 
 void autogkresults(const autogkstate &state, double &v, autogkreport &rep) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::autogkresults(ConstT(autogkstate, state), &v, ConstT(autogkreport, rep), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }

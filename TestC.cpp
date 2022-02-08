@@ -90231,7 +90231,7 @@ bool call_unittest(bool (*testfunc)(bool, ae_state *), int *psticky) {
    ae_frame _frame_block;
    bool result;
    ae_state _alglib_env_state; ae_state_init(&_alglib_env_state);
-   TryX(_alglib_env_state) {
+   TryX {
       *psticky = 1;
       return false;
    }

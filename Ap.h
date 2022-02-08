@@ -249,14 +249,8 @@ typedef struct ae_dyn_block ae_frame;
 struct ae_state {
 // pointer to the top block in a stack of frames which hold dynamically allocated objects
    ae_frame *volatile p_top_block;
-// jmp_buf pointer for internal C-style exception handling
-   jmp_buf *volatile break_jump;
-// ae_error_type of the last error (filled when exception is thrown)
-   ae_error_type volatile last_error;
-// human-readable message (filled when exception is thrown)
-   const char *volatile error_msg;
 };
-void ae_state_set_break_jump(ae_state *state, jmp_buf *buf);
+void ae_state_set_break_jump(jmp_buf *buf);
 void ae_state_set_flags(ae_uint64_t flags);
 
 void ae_frame_make(ae_state *state, ae_frame *tmp);
@@ -962,12 +956,12 @@ struct ap_error {
    static void make_assertion(bool Cond, const char *MsgP);
 };
 #   define ThrowError(Msg)	throw ap_error(Msg)
-#   define ThrowErrorMsg(Q, X)	throw ap_error((Q).error_msg)
+#   define ThrowErrorMsg(X)	throw ap_error()
 #   define BegPoll		{ try {
 #   define EndPoll(Q)		} catch(...) { ae_clean_up_before_breaking(&Q); throw; } }
 #else
 // Exception-free code.
-#   define ThrowErrorMsg(Q, X)	set_error_msg(Q); return X
+#   define ThrowErrorMsg(X)	set_error_msg(); return X
 //(@) The following restriction is unnecessary.
 // #   if AE_OS != AE_OTHER_OS
 // #      error Exception-free mode can not be combined with AE_OS definition
@@ -978,15 +972,15 @@ struct ap_error {
 #   define BegPoll	{
 #   define EndPoll(Q)	}
 // Set the error flag and the pending error message.
-void set_error_msg(alglib_impl::ae_state Q);
+void set_error_msg();
 // Get the error flag and (optionally) the error message (as *MsgP);
 // If the error flag is not set (or MsgP == NULL) *MsgP is not changed.
 bool get_error_flag(const char **MsgP = NULL);
 // Clear the error flag (it is not cleared until explicit call to this function).
 void clear_error_flag();
 #endif
-#define TryX(Q)		jmp_buf BreakAt; if (!setjmp(BreakAt)) alglib_impl::ae_state_set_break_jump(&(Q), &BreakAt); else
-#define TryCatch(Q, X)	TryX(Q) { ThrowErrorMsg(Q, X); }
+#define TryX		jmp_buf BreakAt; if (!setjmp(BreakAt)) alglib_impl::ae_state_set_break_jump(&BreakAt); else
+#define TryCatch(X)	TryX { ThrowErrorMsg(X); }
 
 // Class declaration/definition macros.
 #define DecVal(X)	, X(Obj->X)
@@ -1017,9 +1011,9 @@ struct Type: public Type##I { \
 #define DefClass(Type, Vars) \
 Type##I::Type##I() { \
    alglib_impl::ae_state Q; alglib_impl::ae_state_init(&Q); \
-   TryX(Q) { \
+   TryX { \
       if (Obj != NULL) alglib_impl::Type##_free(Obj, false), alglib_impl::ae_free(Obj), Obj = NULL; \
-      ThrowErrorMsg(Q, ); \
+      ThrowErrorMsg(); \
    } \
    Obj = NULL, Obj = (alglib_impl::Type *)alglib_impl::ae_malloc(sizeof *Obj, &Q); \
    memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_init(Obj, &Q, false); \
@@ -1027,9 +1021,9 @@ Type##I::Type##I() { \
 } \
 Type##I::Type##I(const Type##I &A) { \
    alglib_impl::ae_state Q; alglib_impl::ae_state_init(&Q); \
-   TryX(Q) { \
+   TryX { \
       if (Obj != NULL) alglib_impl::Type##_free(Obj, false), alglib_impl::ae_free(Obj), Obj = NULL; \
-      ThrowErrorMsg(Q, ); \
+      ThrowErrorMsg(); \
    } \
    Obj = NULL; \
    alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " copy constructor failure (source is not initialized)", &Q); \
@@ -1040,7 +1034,7 @@ Type##I::Type##I(const Type##I &A) { \
 Type##I &Type##I::operator=(const Type##I &A) { \
    if (this == &A) return *this; \
    alglib_impl::ae_state Q; alglib_impl::ae_state_init(&Q); \
-   TryCatch(Q, *this); \
+   TryCatch(*this); \
    alglib_impl::ae_assert(Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (destination is not initialized)", &Q); \
    alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (source is not initialized)", &Q); \
    alglib_impl::Type##_free(Obj, false); \

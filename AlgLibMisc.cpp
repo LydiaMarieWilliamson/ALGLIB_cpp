@@ -404,21 +404,21 @@ DefClass(hqrndstate, )
 
 void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::hqrndseed(s1, s2, ConstT(hqrndstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void hqrndrandomize(hqrndstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::hqrndrandomize(ConstT(hqrndstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::hqrnduniformi(ConstT(hqrndstate, state), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -426,7 +426,7 @@ ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n) {
 
 double hqrnduniformr(const hqrndstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::hqrnduniformr(ConstT(hqrndstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -434,14 +434,14 @@ double hqrnduniformr(const hqrndstate &state) {
 
 void hqrndnormal2(const hqrndstate &state, double &x1, double &x2) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::hqrndnormal2(ConstT(hqrndstate, state), &x1, &x2, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double hqrndnormal(const hqrndstate &state) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::hqrndnormal(ConstT(hqrndstate, state), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -449,28 +449,28 @@ double hqrndnormal(const hqrndstate &state) {
 
 void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::hqrndnormalv(ConstT(hqrndstate, state), n, ConstT(ae_vector, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::hqrndnormalm(ConstT(hqrndstate, state), m, n, ConstT(ae_matrix, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void hqrndunit2(const hqrndstate &state, double &x, double &y) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::hqrndunit2(ConstT(hqrndstate, state), &x, &y, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double hqrndexponential(const hqrndstate &state, const double lambdav) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::hqrndexponential(ConstT(hqrndstate, state), lambdav, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -478,7 +478,7 @@ double hqrndexponential(const hqrndstate &state, const double lambdav) {
 
 double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::hqrnddiscrete(ConstT(hqrndstate, state), ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -486,7 +486,7 @@ double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_i
 
 double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::hqrndcontinuous(ConstT(hqrndstate, state), ConstT(ae_vector, x), n, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1196,14 +1196,14 @@ DefClass(xdebugrecord1, DecVal(i) DecComplex(c) DecVar(a))
 
 void xdebuginitrecord1(xdebugrecord1 &rec1) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebuginitrecord1(ConstT(xdebugrecord1, rec1), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 ae_int_t xdebugb1count(const boolean_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::xdebugb1count(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -1211,28 +1211,28 @@ ae_int_t xdebugb1count(const boolean_1d_array &a) {
 
 void xdebugb1not(const boolean_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugb1not(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugb1appendcopy(boolean_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugb1appendcopy(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugb1outeven(n, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 ae_int_t xdebugi1sum(const integer_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::xdebugi1sum(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -1240,28 +1240,28 @@ ae_int_t xdebugi1sum(const integer_1d_array &a) {
 
 void xdebugi1neg(const integer_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugi1neg(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugi1appendcopy(integer_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugi1appendcopy(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugi1outeven(const ae_int_t n, integer_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugi1outeven(n, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double xdebugr1sum(const real_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::xdebugr1sum(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1269,28 +1269,28 @@ double xdebugr1sum(const real_1d_array &a) {
 
 void xdebugr1neg(const real_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugr1neg(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugr1appendcopy(real_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugr1appendcopy(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugr1outeven(const ae_int_t n, real_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugr1outeven(n, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 complex xdebugc1sum(const complex_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, complex(0.0))
+   TryCatch(complex(0.0))
    alglib_impl::complex C = alglib_impl::xdebugc1sum(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return ComplexOf(C);
@@ -1298,28 +1298,28 @@ complex xdebugc1sum(const complex_1d_array &a) {
 
 void xdebugc1neg(const complex_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugc1neg(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugc1appendcopy(complex_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugc1appendcopy(ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugc1outeven(const ae_int_t n, complex_1d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugc1outeven(n, ConstT(ae_vector, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 ae_int_t xdebugb2count(const boolean_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::xdebugb2count(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -1327,28 +1327,28 @@ ae_int_t xdebugb2count(const boolean_2d_array &a) {
 
 void xdebugb2not(const boolean_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugb2not(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugb2transpose(boolean_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugb2transpose(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugb2outsin(m, n, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 ae_int_t xdebugi2sum(const integer_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::xdebugi2sum(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -1356,28 +1356,28 @@ ae_int_t xdebugi2sum(const integer_2d_array &a) {
 
 void xdebugi2neg(const integer_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugi2neg(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugi2transpose(integer_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugi2transpose(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugi2outsin(m, n, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double xdebugr2sum(const real_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::xdebugr2sum(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -1385,28 +1385,28 @@ double xdebugr2sum(const real_2d_array &a) {
 
 void xdebugr2neg(const real_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugr2neg(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugr2transpose(real_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugr2transpose(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugr2outsin(m, n, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 complex xdebugc2sum(const complex_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, complex(0.0))
+   TryCatch(complex(0.0))
    alglib_impl::complex C = alglib_impl::xdebugc2sum(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return ComplexOf(C);
@@ -1414,28 +1414,28 @@ complex xdebugc2sum(const complex_2d_array &a) {
 
 void xdebugc2neg(const complex_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugc2neg(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugc2transpose(complex_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugc2transpose(ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::xdebugc2outsincos(m, n, ConstT(ae_matrix, a), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0.0)
+   TryCatch(0.0)
    double D = alglib_impl::xdebugmaskedbiasedproductsum(m, n, ConstT(ae_matrix, a), ConstT(ae_matrix, b), ConstT(ae_matrix, c), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return D;
@@ -3500,7 +3500,7 @@ DefClass(kdtree, )
 void kdtreeserialize(kdtree &obj, std::string &s_out) {
    alglib_impl::ae_int_t ssize;
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::kdtreealloc(&serializer, obj.c_ptr(), &state);
@@ -3515,7 +3515,7 @@ void kdtreeserialize(kdtree &obj, std::string &s_out) {
 }
 void kdtreeserialize(kdtree &obj, std::ostream &s_out) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::kdtreealloc(&serializer, obj.c_ptr(), &state);
@@ -3528,7 +3528,7 @@ void kdtreeserialize(kdtree &obj, std::ostream &s_out) {
 
 void kdtreeunserialize(const std::string &s_in, kdtree &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::kdtreeunserialize(&serializer, obj.c_ptr(), &state);
@@ -3537,7 +3537,7 @@ void kdtreeunserialize(const std::string &s_in, kdtree &obj) {
 }
 void kdtreeunserialize(const std::istream &s_in, kdtree &obj) {
    alglib_impl::ae_state state; alglib_impl::ae_state_init(&state);
-   TryCatch(state, )
+   TryCatch()
    NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::kdtreeunserialize(&serializer, obj.c_ptr(), &state);
@@ -3547,14 +3547,14 @@ void kdtreeunserialize(const std::istream &s_in, kdtree &obj) {
 
 void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreecreaterequestbuffer(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreebuildtagged(ConstT(ae_matrix, xy), ConstT(ae_vector, tags), n, nx, ny, normtype, ConstT(kdtree, kdt), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3563,7 +3563,7 @@ void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, co
    if (xy.rows() != tags.length()) ThrowError("Error while calling 'kdtreebuildtagged': looks like one of arguments has wrong size");
    ae_int_t n = xy.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreebuildtagged(ConstT(ae_matrix, xy), ConstT(ae_vector, tags), n, nx, ny, normtype, ConstT(kdtree, kdt), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3571,7 +3571,7 @@ void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, co
 
 void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreebuild(ConstT(ae_matrix, xy), n, nx, ny, normtype, ConstT(kdtree, kdt), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3579,7 +3579,7 @@ void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, c
 void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt) {
    ae_int_t n = xy.rows();
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreebuild(ConstT(ae_matrix, xy), n, nx, ny, normtype, ConstT(kdtree, kdt), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3587,7 +3587,7 @@ void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, 
 
 ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryaknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch, eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3596,7 +3596,7 @@ ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, co
 ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const double eps) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryaknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch, eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3605,7 +3605,7 @@ ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, co
 
 ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryaknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch, eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3614,7 +3614,7 @@ ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int
 ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const double eps) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryaknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch, eps, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3623,7 +3623,7 @@ ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int
 
 ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3632,7 +3632,7 @@ ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, con
 ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3641,7 +3641,7 @@ ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, con
 
 ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3650,7 +3650,7 @@ ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_
 ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3659,7 +3659,7 @@ ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_
 
 ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryrnn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3668,7 +3668,7 @@ ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, con
 ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryrnn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3677,7 +3677,7 @@ ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, con
 
 ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryrnn(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3686,7 +3686,7 @@ ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double 
 ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryrnn(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3695,7 +3695,7 @@ ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double 
 
 ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryrnnu(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3704,7 +3704,7 @@ ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, co
 ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryrnnu(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3713,7 +3713,7 @@ ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, co
 
 ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryrnnu(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3722,7 +3722,7 @@ ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double
 ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r) {
    bool selfmatch = true;
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryrnnu(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3731,7 +3731,7 @@ ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double
 
 ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &boxmin, const real_1d_array &boxmax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreetsquerybox(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, boxmin), ConstT(ae_vector, boxmax), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3739,7 +3739,7 @@ ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, con
 
 ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const real_1d_array &boxmax) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, 0)
+   TryCatch(0)
    alglib_impl::ae_int_t Z = alglib_impl::kdtreequerybox(ConstT(kdtree, kdt), ConstT(ae_vector, boxmin), ConstT(ae_vector, boxmax), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return Z;
@@ -3747,84 +3747,84 @@ ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const re
 
 void kdtreetsqueryresultsx(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreetsqueryresultsx(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_matrix, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void kdtreequeryresultsx(const kdtree &kdt, real_2d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreequeryresultsx(ConstT(kdtree, kdt), ConstT(ae_matrix, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void kdtreetsqueryresultsxy(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &xy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreetsqueryresultsxy(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_matrix, xy), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void kdtreequeryresultsxy(const kdtree &kdt, real_2d_array &xy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreequeryresultsxy(ConstT(kdtree, kdt), ConstT(ae_matrix, xy), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void kdtreetsqueryresultstags(const kdtree &kdt, const kdtreerequestbuffer &buf, integer_1d_array &tags) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreetsqueryresultstags(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, tags), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void kdtreequeryresultstags(const kdtree &kdt, integer_1d_array &tags) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreequeryresultstags(ConstT(kdtree, kdt), ConstT(ae_vector, tags), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void kdtreetsqueryresultsdistances(const kdtree &kdt, const kdtreerequestbuffer &buf, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreetsqueryresultsdistances(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void kdtreequeryresultsdistances(const kdtree &kdt, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreequeryresultsdistances(ConstT(kdtree, kdt), ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreequeryresultsxi(ConstT(kdtree, kdt), ConstT(ae_matrix, x), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreequeryresultsxyi(ConstT(kdtree, kdt), ConstT(ae_matrix, xy), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreequeryresultstagsi(ConstT(kdtree, kdt), ConstT(ae_vector, tags), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
 void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r) {
    alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
-   TryCatch(_alglib_env_state, )
+   TryCatch()
    alglib_impl::kdtreequeryresultsdistancesi(ConstT(kdtree, kdt), ConstT(ae_vector, r), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }

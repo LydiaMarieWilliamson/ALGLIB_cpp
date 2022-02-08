@@ -476,6 +476,17 @@ A6.2. Test Stages
 	AE_TEST renamed into a constant TestMode as declared as the enum type.
 	Multi-branch #if conditionals for the enum made into switch statements.
 39	TestC.cpp: setting the values of global_failure_flag and return the values of main() to EXIT_{SUCCESS,FAILURE}.
+9-39	The state structure removed, except the frame pointers --
+	―	Remove break_jump, last_error, error_msg from ae_state
+		in favor of Ap.cpp-internal globals CurBreakAt, CurStatus, CurMsg, respectively.
+	―	Remove the ae_state parameter from ae_state_set_break_jump() and the TryX() macro, remaking TryX as a name-macro.
+	―	Redefine ap_error() as the equivalent of ap_error(CurMsg).
+	―	CurMsg made file-scope local with suitable redefinitions of set_error_flag() and ap_error().
+	―	Remove the ae_state parameter from set_error_msg() and the ThrowErrorMsg() and TryCatch() macros.
+	―	To regain thread-safety will require making TopFr, CurBreakAt, CurStatus, CurMsg thread-local;
+		(but multi-threadedness was not officially part of the Free Edition of ALGLIB).
+	―	As an alternative/intermediate solution, the globals might later be restored as frame-local,
+		pushed on the frame to make way for new copies in ae_state_init() and popped off with ae_state_clear().
 
 A6.3. Test Results
 ──────────────────
@@ -511,6 +522,7 @@ A6.3. Test Results
 39	7692 1.0x 12347 0.9x 11240 1.0x 9492 1.0x 1643828901 (61fad6a5) 78 // Recode "eternal" locks in Ap.{cpp,h}.
 39	7874 1.0x 12501 1.0x 12199 1.0x 9018 1.0x 1644128862 (61ff6a5e) 79 // Recode ByteOrder, _lock routines & xparams.
 39	8000 1.0x 12347 1.0x 12052 1.0x 8761 1.0x 1644295249 (6201f451) 81 // Reduce ae_state and xparams.
+39	8065 1.0x 12501 1.0x 12199 1.0x 9614 1.0x 1644352844 (6202d54c) 77 // Further reduce ae_state; synthesize TestMode.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -567,19 +579,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   8000
+* RGEMM-SEQ-16   (MFLOPS)   8065
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12347
+* RGEMM-SEQ-32   (MFLOPS)  12501
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12052
+* RGEMM-SEQ-64   (MFLOPS)  12199
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   8761
+* RGEMM-SEQ-1024 (MFLOPS)   9614
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1644295249
+SEED: 1644352844
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -588,7 +600,7 @@ CORES: 1 (serial version)
 LIBS:  
 CPUID: sse2 avx2 fma
 OS: POSIX
-TESTING MODE: single core
+Testing Mode: single core
 ablasf                           OK
 hqrnd                            OK
 ablas                            OK
@@ -679,4 +691,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 81 seconds
+Done in 77 seconds
