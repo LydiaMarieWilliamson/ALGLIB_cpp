@@ -123,6 +123,10 @@ void ae_state_set_flags(ae_uint64_t flags) {
    CurFlags = flags;
 }
 
+// A pointer to the top block in a stack of frames which hold dynamically allocated objects.
+//(@) To be later replaced by AutoS ae_frame *volatile TopFr;
+#define TopFr (state->p_top_block)
+
 // Threading information.
 // NOTES:
 // *	These are remnants from the Commercial Version, which worked with the (Commercial-only) file smp.h.
@@ -139,56 +143,43 @@ AutoS void (*ErrorOp)(void *) = NULL;
 // The stack and frame boundary special blocks.
 static unsigned char DynBottom = 1, DynFrame = 2;
 
-// This function makes new stack frame.
-//
-// This function takes two parameters: environment state and pointer to  the
-// dynamic block which will be used as indicator  of  the  frame  beginning.
-// This dynamic block must be initialized by caller and mustn't  be changed/
-// deallocated/reused till ae_leave_frame called. It may be global or  local
-// variable (local is even better).
-void ae_frame_make(ae_state *state, ae_frame *tmp) {
-   tmp->p_next = state->p_top_block;
-   tmp->deallocator = NULL;
-   tmp->ptr = &DynFrame;
-   state->p_top_block = tmp;
+// Make a new stack frame for the environment.
+// Fr points to the place in the dynamic block that marks where the frame begins.
+// The dynamic block is assumed to be initialized by the caller and must be left alone
+// (no changes, deallocations or reuse) until ae_leave_frame() is called.
+// It may be a global or (preferrably) a local variable.
+void ae_frame_make(ae_state *state, ae_frame *Fr) {
+   Fr->p_next = TopFr, Fr->deallocator = NULL, Fr->ptr = &DynFrame, TopFr = Fr;
 }
 
-// This function leaves current stack frame and deallocates all automatic
-// dynamic blocks which were attached to this frame.
+// Leave the current stack frame and deallocate all automatic dynamic blocks which were attached to this frame.
 void ae_frame_leave(ae_state *state) {
-   while (state->p_top_block->ptr != &DynFrame && state->p_top_block->ptr != &DynBottom) {
-      if (state->p_top_block->ptr != NULL && state->p_top_block->deallocator != NULL)
-         state->p_top_block->deallocator(state->p_top_block->ptr);
-      state->p_top_block = state->p_top_block->p_next;
-   }
-   state->p_top_block = state->p_top_block->p_next;
+   for (; TopFr->ptr != &DynFrame && TopFr->ptr != &DynBottom; TopFr = TopFr->p_next)
+      if (TopFr->ptr != NULL && TopFr->deallocator != NULL) TopFr->deallocator(TopFr->ptr);
+   if (TopFr->ptr == &DynFrame) TopFr = TopFr->p_next;
 }
 
-// This function initializes ALGLIB environment state.
-//
-// NOTES:
-// * stacks contain no frames, so ae_make_frame() must be called before
-//   attaching dynamic blocks. Without it ae_leave_frame() will cycle
-//   forever (which is intended behavior).
+// Initialize the ALGLIB frame stack environment.
+// NOTE:
+// *	Stacks contain no frames, so ae_make_frame() must be called before attaching dynamic blocks.
+//	Without it ae_leave_frame() will cycle forever -- as intended.
 void ae_state_init(ae_state *state) {
 // The base of the current stack of frames.
 // p_next points to itself because a correct program should be able to detect end of the list by looking at the ptr field.
 // p_next == NULL may be used to distinguish automatic blocks (in the list) from non-automatic (not in the list).
    static ae_frame BotFr = { &BotFr, NULL, &DynBottom };
-// Set the flags.
-   CurFlags = NonTH;
-   state->p_top_block = &BotFr;
-   CurBreakAt = NULL;
-   CurMsg = "";
+// Set the status indicators and clear the frame.
+   CurBreakAt = NULL, CurMsg = "", CurFlags = NonTH, TopFr = &BotFr;
 // Set the threading information.
    CurThread = NULL, CurTask = NULL, ErrorOp = NULL;
 }
 
-// This function clears ALGLIB environment state.
-// All dynamic data controlled by state are freed.
+// Clear the ALGLIB frame stack environment, freeing all dynamic data in it that it controls.
 void ae_state_clear(ae_state *state) {
-   while (state->p_top_block->ptr != &DynBottom)
-      ae_frame_leave(state);
+   if (state == NULL || TopFr == NULL) return;
+   for (; TopFr->ptr != &DynBottom; TopFr = TopFr->p_next)
+      if (TopFr->ptr != NULL && TopFr->deallocator != NULL) TopFr->deallocator(TopFr->ptr);
+   TopFr = NULL;
 }
 
 #define AE_CRITICAL_ASSERT(x) if (!(x)) abort()
@@ -431,10 +422,9 @@ void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val) {
 // For state != NULL it calls ErrorOp() and the ae_state_clear().
 // For state == NULL it does nothing.
 void ae_clean_up_before_breaking(ae_state *state) {
-   if (state != NULL) {
-      if (ErrorOp != NULL) ErrorOp(state);
-      ae_state_clear(state);
-   }
+   if (state == NULL) return;
+   if (ErrorOp != NULL) ErrorOp(state);
+   ae_state_clear(state);
 }
 
 // This function abnormally aborts program, using one of several ways:
@@ -446,18 +436,13 @@ void ae_clean_up_before_breaking(ae_state *state) {
 // In   all  cases,  for  state != NULL  function  sets  CurStatus  and
 // CurMsg fields. It also clears state with ae_state_clear().
 //
-// If state != NULL and Error() != NULL, it is called prior to handling error and clearing state.
+// If state != NULL and ErrorOp() != NULL, it is called prior to handling error and clearing state.
 static void ae_break(ae_state *state, ae_error_type error_type, const char *msg) {
-   if (state != NULL) {
-      ae_clean_up_before_breaking(state);
-      CurStatus = error_type;
-      CurMsg = msg;
-      if (CurBreakAt != NULL)
-         longjmp(*CurBreakAt, 1);
-      else
-         abort();
-   } else
-      abort();
+   if (state == NULL) abort();
+   if (ErrorOp != NULL) ErrorOp(state);
+   ae_state_clear(state);
+   CurStatus = error_type, CurMsg = msg;
+   if (CurBreakAt != NULL) longjmp(*CurBreakAt, 1); else abort();
 }
 
 // Assertion
@@ -847,8 +832,8 @@ bool ae_check_zeros(const void *ptr, ae_int_t n) {
 // NOTES:
 // * never call it for special blocks which marks frame boundaries!
 static void ae_db_attach(ae_dyn_block *block, ae_state *state) {
-   block->p_next = state->p_top_block;
-   state->p_top_block = block;
+   block->p_next = TopFr;
+   TopFr = block;
 }
 
 // This function initializes dynamic block:
@@ -2621,7 +2606,7 @@ void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *
    ae_assert(pool->seed_object != NULL, "ALGLIB: shared pool is not seeded, PoolRecycle() failed", state);
 // assert that pointer non-null and owns the object
    ae_assert(pptr->is_owner, "ALGLIB: pptr in ae_shared_pool_recycle() does not own its pointer", state);
-   ae_assert(pptr->ptr != NULL, "ALGLIB: pptr in ae_shared_pool_recycle() is NULL", state);
+   ae_assert(pptr->ptr != NULL, "ALGLIB: pptr in ae_shared_pool_recycle() == NULL", state);
 // acquire lock
    ae_acquire_lock(&pool->pool_lock);
 // acquire shared pool entry (reuse one from recycled_entries or allocate new one)
@@ -3045,7 +3030,7 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, bool v, ae_state *s
    char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
    const char *emsg = "ALGLIB: serialization integrity error";
    ae_int_t bytes_appended;
-// prepare serialization, check consistency
+// Prepare the serialization, check consistency.
    ae_bool2str(v, buf, state);
    serializer->entries_saved++;
    if (serializer->entries_saved % AE_SER_ENTRIES_PER_ROW)

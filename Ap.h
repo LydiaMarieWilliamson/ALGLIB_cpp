@@ -253,7 +253,7 @@ struct ae_state {
 void ae_state_set_break_jump(jmp_buf *buf);
 void ae_state_set_flags(ae_uint64_t flags);
 
-void ae_frame_make(ae_state *state, ae_frame *tmp);
+void ae_frame_make(ae_state *state, ae_frame *Fr);
 void ae_frame_leave(ae_state *state);
 
 void ae_state_init(ae_state *state);

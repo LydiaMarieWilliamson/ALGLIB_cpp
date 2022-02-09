@@ -523,6 +523,7 @@ A6.3. Test Results
 39	7874 1.0x 12501 1.0x 12199 1.0x 9018 1.0x 1644128862 (61ff6a5e) 79 // Recode ByteOrder, _lock routines & xparams.
 39	8000 1.0x 12347 1.0x 12052 1.0x 8761 1.0x 1644295249 (6201f451) 81 // Reduce ae_state and xparams.
 39	8065 1.0x 12501 1.0x 12199 1.0x 9614 1.0x 1644352844 (6202d54c) 77 // Further reduce ae_state; synthesize TestMode.
+39	7937 1.0x 12501 1.0x 11909 1.0x 9296 1.0x 1644431780 (620409a4) 79 // Recoding state and frame routines in Ap.{cpp,h}.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -579,19 +580,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   8065
+* RGEMM-SEQ-16   (MFLOPS)   7937
 * RGEMM-MTN-16              1.0x
 * RGEMM-SEQ-32   (MFLOPS)  12501
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12199
+* RGEMM-SEQ-64   (MFLOPS)  11909
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9614
+* RGEMM-SEQ-1024 (MFLOPS)   9296
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1644352844
+SEED: 1644431780
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -691,4 +692,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 77 seconds
+Done in 79 seconds
