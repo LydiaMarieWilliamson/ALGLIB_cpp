@@ -462,16 +462,12 @@ A6.2. Test Stages
 	To regain thread-safety will require making CurFlags thread-local
 	(but multi-threadedness was not officially part of the Free Edition of ALGLIB).
 ∙	Remove the extra xparams: they are only relevant for the Commercial Version.
-	―	In *.h files:
-		│(..., const xparam _xparams = NonTH);│	⇒	│(...)│
-	―	In *.cpp files:
-		│(..., const xparams _xparams);│	⇒	│(...);│
-		│(..., xparams)│	⇒	│(...)│
-	―	In *.htm files:
-		│(..., <b>const</b> xparams params = xdefault);│ → │(...)│
+	―	xparam parameters from declarations in: *.h, in comments in *.cpp and in Manual.htm.
+	―	xparam arguments from function calls in *.cpp.
 	―	Remove the conditional if (_xparams != NonTH) ae_set_state_flags(_xparams),
 		and put it in the caller BEFORE the routine, wherever it is set to a value ≠ NonTH,
 		with a call to ae_set_state_flags(NonTH) to follow.
+	―	Update TestZ to reflect the change to xparams.
 0-39	AE_{{,PARALLEL_}SINGLECORE,{SEQUENTIAL_,PARALLEL_}MULTICORE} remade into an enum; AE_NOENV = 0 added.
 	AE_TEST renamed into a constant TestMode as declared as the enum type.
 	Multi-branch #if conditionals for the enum made into switch statements.
@@ -487,6 +483,17 @@ A6.2. Test Stages
 		(but multi-threadedness was not officially part of the Free Edition of ALGLIB).
 	―	As an alternative/intermediate solution, the globals might later be restored as frame-local,
 		pushed on the frame to make way for new copies in ae_state_init() and popped off with ae_state_clear().
+0-39	Empty and remove the global ae_state structure.
+	―	Recode the core routines for the types:
+		ae_dyn_block, ae_vector, ae_matrix, ae_smart_ptr, x_vector, x_matrix, ae_lock, _lock, ae_shared_pool
+		in Ap.cpp to accommodate this change, grafting the revisions already made to them in ALGLIB++.
+	―	Remove all ae_state parameters from function declarations, there and elsewhere.
+	―	Remove all ae_state parameters from function calls, there and elsewhere.
+	―	Split ae_clean_up_before_breaking() into ae_clean_up() and ae_state_clear().
+	―	Remove ae_check_zeros(); placing, instead, the responsibility for zero-initialization into the constructor wrappers.
+	―	Reduce multi-threaded support in TestX, for now, until the former ae_state variables are made thread-local,
+		and synthesize approximate comparisons NearR(), SmallR() in TestX.cpp,
+		grafting these changes and most of TestX from ALGLIB++.
 
 A6.3. Test Results
 ──────────────────
@@ -524,6 +531,7 @@ A6.3. Test Results
 39	8000 1.0x 12347 1.0x 12052 1.0x 8761 1.0x 1644295249 (6201f451) 81 // Reduce ae_state and xparams.
 39	8065 1.0x 12501 1.0x 12199 1.0x 9614 1.0x 1644352844 (6202d54c) 77 // Further reduce ae_state; synthesize TestMode.
 39	7937 1.0x 12501 1.0x 11909 1.0x 9296 1.0x 1644431780 (620409a4) 79 // Recoding state and frame routines in Ap.{cpp,h}.
+39	7353 1.0x 12501 1.0x 12199 1.0x 9534 1.0x 1644465141 (62048bf5) 79 // Elimination of ae_state, temporary reduction of TestX.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -561,38 +569,38 @@ System:
 * cores count                  1
 Allocation counter activated...
 Basic functions:
-* 1D arrays                   OK
-* 2D arrays                   OK
-* CSV support                 OK
-* Serialization (kd-tree)     OK
-* Serialization (RBF)         OK
-* Progress/termination (RBF)  OK
-* Exceptions in constructors  OK
+* 1D arrays                   Ok
+* 2D arrays                   Ok
+* CSV support                 Ok
+* Serialization (kd-tree)     Ok
+* Serialization (RBF)         Ok
+* Progress/termination (RBF)  Ok
+* Exceptions in constructors  Ok
 SMP settings vs GEMM speedup:
 * test skipped (no SMP)       ??
 Issues:
-* issue 505                   OK
-* issue 478                   OK
-* issue 528                   OK
-* issue 591                   OK
-* issue 594                   OK
-* issue 764                   OK
-* issue 813                   OK
-* issue 824                   OK
+* Issue 505                   Ok
+* Issue 478                   Ok
+* Issue 528                   Ok
+* Issue 591                   Ok
+* Issue 594                   Ok
+* Issue 764                   Ok
+* Issue 813                   Ok
+* Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7937
+* RGEMM-SEQ-16   (MFLOPS)   7353
 * RGEMM-MTN-16              1.0x
 * RGEMM-SEQ-32   (MFLOPS)  12501
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  11909
+* RGEMM-SEQ-64   (MFLOPS)  12199
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9296
+* RGEMM-SEQ-1024 (MFLOPS)   9534
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1644431780
+SEED: 1644465141
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian

@@ -125,7 +125,7 @@ typedef enum { NonTH, SerTH, ParTH } xparams;
 // -	an x86 architecture definition AE_CPU == AE_INTEL,
 // -	a compiler which supports intrinsics.
 // The presence of _ALGLIB_HAS_???_INTRINSICS does NOT mean that our CPU actually supports these intrinsics -
-// such things should be determined at runtime with ae_cpuid().
+// such things should be determined by CurCPU, which is initialized on start-up.
 // It means that we are working under Intel and our compiler can issue SIMD-capable code.
 #if defined AE_CPU && AE_CPU == AE_INTEL // Intel definitions.
 // Other than Sun studio, we only assume that the compiler supports all instruction sets if something is not explicitly turned off.
@@ -245,19 +245,14 @@ struct ae_dyn_block {
 // Frame marker.
 typedef struct ae_dyn_block ae_frame;
 
-// ALGLIB environment state
-struct ae_state {
-// pointer to the top block in a stack of frames which hold dynamically allocated objects
-   ae_frame *volatile p_top_block;
-};
 void ae_state_set_break_jump(jmp_buf *buf);
 void ae_state_set_flags(ae_uint64_t flags);
 
-void ae_frame_make(ae_state *state, ae_frame *Fr);
-void ae_frame_leave(ae_state *state);
+void ae_frame_make(ae_frame *Fr);
+void ae_frame_leave();
 
-void ae_state_init(ae_state *state);
-void ae_state_clear(ae_state *state);
+void ae_state_init();
+void ae_state_clear();
 
 // The threading model type.
 void ae_set_global_threading(ae_uint64_t flg_value);
@@ -301,8 +296,8 @@ typedef enum {
 ae_int64_t ae_get_dbg_value(debug_flag_t id);
 void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val);
 
-void ae_clean_up_before_breaking(ae_state *state);
-void ae_assert(bool cond, const char *msg, ae_state *state);
+void ae_clean_up();
+void ae_assert(bool cond, const char *msg);
 
 int tickcount();
 
@@ -315,14 +310,14 @@ void memory_pool_stats(ae_int_t *bytes_used, ae_int_t *bytes_free);
 void *aligned_malloc(size_t size, size_t alignment);
 void aligned_free(void *block);
 
-void *ae_malloc(size_t size, ae_state *state);
+void *ae_malloc(size_t size);
 void ae_free(void *p);
 
-void ae_db_init(ae_dyn_block *block, ae_int_t size, ae_state *state, bool make_automatic);
-void ae_db_realloc(ae_dyn_block *block, ae_int_t size, ae_state *state);
+void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic);
+void ae_db_realloc(ae_dyn_block *block, ae_int_t size);
 void ae_db_free(ae_dyn_block *block);
 void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2);
-#define NewBlock(B, N, Q)		ae_dyn_block B; memset(&B, 0, sizeof B); ae_db_init(&B, N, Q, true)
+#define NewBlock(B, N)		ae_dyn_block B; memset(&B, 0, sizeof B); ae_db_init(&B, N, true)
 
 ae_int_t ae_sizeof(ae_datatype datatype);
 
@@ -346,15 +341,15 @@ struct ae_vector {
       complex *xC;
    };
 };
-void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_state *state, bool make_automatic);
-void ae_vector_copy(ae_vector *dst, ae_vector *src, ae_state *state, bool make_automatic);
-void ae_vector_set_length(ae_vector *dst, ae_int_t newsize, ae_state *state);
-void ae_vector_resize(ae_vector *dst, ae_int_t newsize, ae_state *state);
+void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, bool make_automatic);
+void ae_vector_copy(ae_vector *dst, ae_vector *src, bool make_automatic);
+void ae_vector_set_length(ae_vector *dst, ae_int_t newsize);
+void ae_vector_resize(ae_vector *dst, ae_int_t newsize);
 void ae_vector_free(ae_vector *dst, bool make_automatic);
 void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2);
-#define NewVector(V, N, Type, Q)	ae_vector V; memset(&V, 0, sizeof V), ae_vector_init(&V, N, Type, Q, true)
-#define DupVector(V, Q)			ae_vector _##V; memset(&_##V, 0, sizeof _##V), ae_vector_copy(&_##V, V, Q, true); V = &_##V
-#define SetVector(P)			ae_vector_free(P, true)
+#define NewVector(V, N, Type)	ae_vector V; memset(&V, 0, sizeof V), ae_vector_init(&V, N, Type, true)
+#define DupVector(V)		ae_vector _##V; memset(&_##V, 0, sizeof _##V), ae_vector_copy(&_##V, V, true); V = &_##V
+#define SetVector(P)		ae_vector_free(P, true)
 
 struct ae_matrix {
    ae_int_t cols;
@@ -373,13 +368,13 @@ struct ae_matrix {
       complex **xyC;
    };
 };
-void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, ae_state *state, bool make_automatic);
-void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, bool make_automatic);
-void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_state *state);
+void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, bool make_automatic);
+void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, bool make_automatic);
+void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols);
 void ae_matrix_free(ae_matrix *dst, bool make_automatic);
 void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2);
-#define NewMatrix(M, Ys, Xs, Type, Q)	ae_matrix M; memset(&M, 0, sizeof M), ae_matrix_init(&M, Ys, Xs, Type, Q, true)
-#define DupMatrix(M, Q)			ae_matrix _##M; memset(&_##M, 0, sizeof _##M), ae_matrix_copy(&_##M, M, Q, true), M = &_##M
+#define NewMatrix(M, Ys, Xs, Type)	ae_matrix M; memset(&M, 0, sizeof M), ae_matrix_init(&M, Ys, Xs, Type, true)
+#define DupMatrix(M)			ae_matrix _##M; memset(&_##M, 0, sizeof _##M), ae_matrix_copy(&_##M, M, true), M = &_##M
 #define SetMatrix(P)			ae_matrix_free(P, true)
 
 // Used for better documenting function parameters.
@@ -398,13 +393,13 @@ struct ae_smart_ptr {
 // The frame entry; used to ensure automatic deallocation of the smart pointer in case of an exception/exit.
    ae_dyn_block frame_entry;
 };
-void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, ae_state *state, bool make_automatic);
+void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic);
 void ae_smart_ptr_free(void *_dst); // Accepts ae_smart_ptr *.
 void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*free)(void *, bool make_automatic));
 void ae_smart_ptr_release(ae_smart_ptr *dst);
-#define NewObj(Type, P, Q)	Type P; memset(&P, 0, sizeof P), Type##_init(&P, Q, true)
-#define RefObj(Type, P, Q)	Type *P; alglib_impl::ae_smart_ptr _##P; memset(&_##P, 0, sizeof _##P), alglib_impl::ae_smart_ptr_init(&_##P, (void **)&P, Q, true)
-#define SetObj(Type, P)		Type##_free(P, true)
+#define NewObj(Type, P)	Type P; memset(&P, 0, sizeof P), Type##_init(&P, true)
+#define RefObj(Type, P)	Type *P; alglib_impl::ae_smart_ptr _##P; memset(&_##P, 0, sizeof _##P), alglib_impl::ae_smart_ptr_init(&_##P, (void **)&P, true)
+#define SetObj(Type, P)	Type##_free(P, true)
 
 // The X-interface.
 // The effective type for the last_action field.
@@ -458,9 +453,9 @@ struct x_vector {
       ae_int64_t portable_alignment_enforcer;
    };
 };
-void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic);
-void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic);
-void ae_x_set_vector(x_vector *dst, ae_vector *src, ae_state *state);
+void ae_vector_init_from_x(ae_vector *dst, x_vector *src, bool make_automatic);
+void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, bool make_automatic);
+void ae_x_set_vector(x_vector *dst, ae_vector *src);
 void ae_x_attach_to_vector(x_vector *dst, ae_vector *src);
 void x_vector_free(x_vector *dst, bool make_automatic);
 
@@ -489,9 +484,9 @@ struct x_matrix {
       ae_int64_t portable_alignment_enforcer;
    };
 };
-void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool make_automatic);
-void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool make_automatic);
-void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state);
+void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, bool make_automatic);
+void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, bool make_automatic);
+void ae_x_set_matrix(x_matrix *dst, ae_matrix *src);
 void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src);
 
 bool ae_is_symmetric(ae_matrix *a);
@@ -519,7 +514,7 @@ struct ae_lock {
 // Static locks are allocated without using the frame and cannot de deallocated.
    bool is_static;
 };
-void ae_init_lock(ae_lock *lock, ae_state *state, bool is_static, bool make_automatic);
+void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic);
 void ae_acquire_lock(ae_lock *lock);
 void ae_release_lock(ae_lock *lock);
 void ae_free_lock(ae_lock *lock);
@@ -548,25 +543,25 @@ struct ae_shared_pool {
 // The size of the object; used when we call malloc() for new objects.
    ae_int_t size_of_object;
 // The initializer function; accepts a pointer to malloc'ed object, initializes its fields.
-   void (*init)(void *dst, ae_state *state, bool make_automatic);
+   void (*init)(void *dst, bool make_automatic);
 // The copy constructor; accepts a pointer to malloc'ed, but not not to the initialized object.
-   void (*copy)(void *dst, void *src, ae_state *state, bool make_automatic);
+   void (*copy)(void *dst, void *src, bool make_automatic);
 // The destructor function.
    void (*free)(void *ptr, bool make_automatic);
 // The frame entry; points to the pool object itself.
    ae_frame frame_entry;
 };
-void ae_shared_pool_init(void *_dst, ae_state *state, bool make_automatic);
-void ae_shared_pool_copy(void *_dst, void *_src, ae_state *state, bool make_automatic);
+void ae_shared_pool_init(void *_dst, bool make_automatic);
+void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic);
 void ae_shared_pool_free(void *dst, bool make_automatic);
 bool ae_shared_pool_is_initialized(ae_shared_pool *dst);
-void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, ae_state *state, bool make_automatic), void (*copy)(void *dst, void *src, ae_state *state, bool make_automatic), void (*free)(void *ptr, bool make_automatic), ae_state *state);
-void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state);
-void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state);
-void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic, ae_state *state);
-void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state);
-void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state);
-void ae_shared_pool_reset(ae_shared_pool *pool, ae_state *state);
+void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, bool make_automatic), void (*copy)(void *dst, void *src, bool make_automatic), void (*free)(void *ptr, bool make_automatic));
+void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr);
+void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr);
+void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic);
+void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
+void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
+void ae_shared_pool_reset(ae_shared_pool *pool);
 
 // Serializer:
 // *	ae_stream_writer is the type expected for pointers to serializer stream-writing functions,
@@ -631,20 +626,20 @@ void ae_serializer_ustart_str(ae_serializer *serializer, const char *buf);
 void ae_serializer_sstart_stream(ae_serializer *serializer, ae_stream_writer writer, ae_int_t aux);
 void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader reader, ae_int_t aux);
 
-bool ae_serializer_unserialize_bool(ae_serializer *serializer, ae_state *state);
-void ae_serializer_serialize_bool(ae_serializer *serializer, bool v, ae_state *state);
-ae_int_t ae_serializer_unserialize_int(ae_serializer *serializer, ae_state *state);
-void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v, ae_state *state);
-ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer, ae_state *state);
-void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v, ae_state *state);
-double ae_serializer_unserialize_double(ae_serializer *serializer, ae_state *state);
-void ae_serializer_serialize_double(ae_serializer *serializer, double v, ae_state *state);
+bool ae_serializer_unserialize_bool(ae_serializer *serializer);
+void ae_serializer_serialize_bool(ae_serializer *serializer, bool v);
+ae_int_t ae_serializer_unserialize_int(ae_serializer *serializer);
+void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v);
+ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer);
+void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v);
+double ae_serializer_unserialize_double(ae_serializer *serializer);
+void ae_serializer_serialize_double(ae_serializer *serializer, double v);
 
-void ae_serializer_stop(ae_serializer *serializer, ae_state *state);
+void ae_serializer_stop(ae_serializer *serializer);
 
 void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes);
-void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *bytes, ae_state *state);
-void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes, ae_state *state);
+void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
+void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
 
 // Real math functions: IEEE-compliant floating point comparisons and standard functions.
 // * IEEE-compliant floating point comparisons
@@ -652,25 +647,25 @@ bool isposinf(double x);
 bool isneginf(double x);
 
 // * standard functions
-ae_int_t imin2(ae_int_t m1, ae_int_t m2, ae_state *state);
-ae_int_t imin3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state);
-ae_int_t imax2(ae_int_t m1, ae_int_t m2, ae_state *state);
-ae_int_t imax3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state);
-ae_int_t ae_iabs(ae_int_t x, ae_state *state);
-ae_int_t sign(double x, ae_state *state);
-ae_int_t iround(double x, ae_state *state);
-ae_int_t itrunc(double x, ae_state *state);
-ae_int_t ifloor(double x, ae_state *state);
-ae_int_t iceil(double x, ae_state *state);
+ae_int_t imin2(ae_int_t m1, ae_int_t m2);
+ae_int_t imin3(ae_int_t i0, ae_int_t i1, ae_int_t i2);
+ae_int_t imax2(ae_int_t m1, ae_int_t m2);
+ae_int_t imax3(ae_int_t i0, ae_int_t i1, ae_int_t i2);
+ae_int_t ae_iabs(ae_int_t x);
+ae_int_t sign(double x);
+ae_int_t iround(double x);
+ae_int_t itrunc(double x);
+ae_int_t ifloor(double x);
+ae_int_t iceil(double x);
 
-double rmin2(double m1, double m2, ae_state *state);
-double rmax2(double m1, double m2, ae_state *state);
-double rmax3(double r0, double r1, double r2, ae_state *_state);
-double rmaxabs3(double r0, double r1, double r2, ae_state *_state);
-double sqr(double x, ae_state *state);
+double rmin2(double m1, double m2);
+double rmax2(double m1, double m2);
+double rmax3(double r0, double r1, double r2);
+double rmaxabs3(double r0, double r1, double r2);
+double sqr(double x);
 
-ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2, ae_state *_state);
-double rboundval(double x, double b1, double b2, ae_state *_state);
+ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2);
+double rboundval(double x, double b1, double b2);
 
 // Debug-support.
 #if 0 //(@) Not used anywhere, and not useful for debugging.
@@ -695,9 +690,9 @@ inline complex complex_from_i(ae_int_t x, ae_int_t y = 0) { complex r; r.x = (do
 inline complex complex_from_d(double x, double y = 0.0) { complex r; r.x = x, r.y = y; return r; }
 
 complex ae_c_neg(complex lhs);
-complex conj(complex lhs, ae_state *state);
-complex csqr(complex lhs, ae_state *state);
-double abscomplex(complex z, ae_state *state);
+complex conj(complex lhs);
+complex csqr(complex lhs);
+double abscomplex(complex z);
 
 bool ae_c_eq(complex lhs, complex rhs);
 bool ae_c_neq(complex lhs, complex rhs);
@@ -753,9 +748,6 @@ extern const double pi;
 #   define pi 3.1415926535897932384626433832795
 #endif
 
-// Debugging and tracing functions
-bool ae_check_zeros(const void *ptr, ae_int_t n);
-
 // debug functions (must be turned on by preprocessor definitions):
 // * flushconsole(), fluches console
 // * ae_debugrng(), returns random number generated with high-quality random numbers generator
@@ -773,8 +765,8 @@ struct rcommstate {
    ae_vector ra;
    ae_vector ca;
 };
-void rcommstate_init(rcommstate *p, ae_state *_state, bool make_automatic);
-void rcommstate_copy(rcommstate *dst, rcommstate *src, ae_state *_state, bool make_automatic);
+void rcommstate_init(rcommstate *p, bool make_automatic);
+void rcommstate_copy(rcommstate *dst, rcommstate *src, bool make_automatic);
 void rcommstate_free(rcommstate *p, bool make_automatic);
 
 // Internal macros, defined only when _ALGLIB_IMPL_DEFINES is defined before
@@ -888,57 +880,57 @@ void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const doub
 #      endif
 #   endif
 // ABLASF kernels
-double rdotv(ae_int_t n, RVector *x, RVector *y, ae_state *_state);
-double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state);
-double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib, ae_state *_state);
-double rdotv2(ae_int_t n, RVector *x, ae_state *_state);
-void rcopyv(ae_int_t n, RVector *x, RVector *y, ae_state *_state);
-void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i, ae_state *_state);
-void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x, ae_state *_state);
-void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k, ae_state *_state);
-void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y, ae_state *_state);
-void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx, ae_state *_state);
-void icopyv(ae_int_t n, ZVector *x, ZVector *y, ae_state *_state);
-void bcopyv(ae_int_t n, BVector *x, BVector *y, ae_state *_state);
-void rsetv(ae_int_t n, double v, RVector *x, ae_state *_state);
-void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state);
-void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state);
-void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state);
-void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state);
-void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state);
-void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state);
-void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state);
-void raddv(ae_int_t n, double alpha, RVector *y, RVector *x, ae_state *_state);
-void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x, ae_state *_state);
-void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst, ae_state *_state);
-void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx, ae_state *_state);
-void rmergemulv(ae_int_t n, RVector *y, RVector *x, ae_state *_state);
-void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *_state);
-void rmergemaxv(ae_int_t n, RVector *y, RVector *x, ae_state *_state);
-void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-void rmergemaxrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *_state);
-void rmergeminv(ae_int_t n, RVector *y, RVector *x, ae_state *_state);
-void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-void rmergeminrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x, ae_state *_state);
-double rmaxv(ae_int_t n, RVector *x, ae_state *_state);
-double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-double rmaxabsv(ae_int_t n, RVector *x, ae_state *_state);
-double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx, ae_state *_state);
-void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy, ae_state *_state);
-void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy, ae_state *_state);
-void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVector *x, double beta, RVector *y, ae_state *_state);
-void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state);
-void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix *a, ae_state *_state);
-void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state);
-bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
+double rdotv(ae_int_t n, RVector *x, RVector *y);
+double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i);
+double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib);
+double rdotv2(ae_int_t n, RVector *x);
+void rcopyv(ae_int_t n, RVector *x, RVector *y);
+void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i);
+void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x);
+void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k);
+void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y);
+void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx);
+void icopyv(ae_int_t n, ZVector *x, ZVector *y);
+void bcopyv(ae_int_t n, BVector *x, BVector *y);
+void rsetv(ae_int_t n, double v, RVector *x);
+void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i);
+void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx);
+void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a);
+void isetv(ae_int_t n, ae_int_t v, ZVector *x);
+void bsetv(ae_int_t n, bool v, BVector *x);
+void rmulv(ae_int_t n, double v, RVector *x);
+void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx);
+void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx);
+void raddv(ae_int_t n, double alpha, RVector *y, RVector *x);
+void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx);
+void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x);
+void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst);
+void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx);
+void rmergemulv(ae_int_t n, RVector *y, RVector *x);
+void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx);
+void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x);
+void rmergemaxv(ae_int_t n, RVector *y, RVector *x);
+void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx);
+void rmergemaxrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x);
+void rmergeminv(ae_int_t n, RVector *y, RVector *x);
+void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx);
+void rmergeminrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x);
+double rmaxv(ae_int_t n, RVector *x);
+double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx);
+double rmaxabsv(ae_int_t n, RVector *x);
+double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx);
+void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy);
+void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy);
+void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVector *x, double beta, RVector *y);
+void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy);
+void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix *a);
+void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix);
+bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
 // Sparse supernodal Cholesky kernels
-ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state);
-void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state);
-bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
-bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
+ae_int_t spchol_spsymmgetmaxsimd();
+void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth);
+bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase);
+bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase);
 #endif // ALGLIB_NO_FAST_KERNELS
 } // end of namespace alglib_impl
 
@@ -958,7 +950,7 @@ struct ap_error {
 #   define ThrowError(Msg)	throw ap_error(Msg)
 #   define ThrowErrorMsg(X)	throw ap_error()
 #   define BegPoll		{ try {
-#   define EndPoll(Q)		} catch(...) { ae_clean_up_before_breaking(&Q); throw; } }
+#   define EndPoll		} catch(...) { alglib_impl::ae_clean_up(), alglib_impl::ae_state_clear(); throw; } }
 #else
 // Exception-free code.
 #   define ThrowErrorMsg(X)	set_error_msg(); return X
@@ -970,7 +962,7 @@ struct ap_error {
 #      error Exception-free mode is thread-unsafe; define AE_THREADING = NonTH to prove that you know it.
 #   endif
 #   define BegPoll	{
-#   define EndPoll(Q)	}
+#   define EndPoll	}
 // Set the error flag and the pending error message.
 void set_error_msg();
 // Get the error flag and (optionally) the error message (as *MsgP);
@@ -1010,36 +1002,36 @@ struct Type: public Type##I { \
 
 #define DefClass(Type, Vars) \
 Type##I::Type##I() { \
-   alglib_impl::ae_state Q; alglib_impl::ae_state_init(&Q); \
+   alglib_impl::ae_state_init(); \
    TryX { \
       if (Obj != NULL) alglib_impl::Type##_free(Obj, false), alglib_impl::ae_free(Obj), Obj = NULL; \
       ThrowErrorMsg(); \
    } \
-   Obj = NULL, Obj = (alglib_impl::Type *)alglib_impl::ae_malloc(sizeof *Obj, &Q); \
-   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_init(Obj, &Q, false); \
-   ae_state_clear(&Q); \
+   Obj = NULL, Obj = (alglib_impl::Type *)alglib_impl::ae_malloc(sizeof *Obj); \
+   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_init(Obj, false); \
+   alglib_impl::ae_state_clear(); \
 } \
 Type##I::Type##I(const Type##I &A) { \
-   alglib_impl::ae_state Q; alglib_impl::ae_state_init(&Q); \
+   alglib_impl::ae_state_init(); \
    TryX { \
       if (Obj != NULL) alglib_impl::Type##_free(Obj, false), alglib_impl::ae_free(Obj), Obj = NULL; \
       ThrowErrorMsg(); \
    } \
    Obj = NULL; \
-   alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " copy constructor failure (source is not initialized)", &Q); \
-   Obj = (alglib_impl::Type *)alglib_impl::ae_malloc(sizeof *Obj, &Q); \
-   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_copy(Obj, const_cast<alglib_impl::Type *>(A.Obj), &Q, false); \
-   ae_state_clear(&Q); \
+   alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " copy constructor failure (source is not initialized)"); \
+   Obj = (alglib_impl::Type *)alglib_impl::ae_malloc(sizeof *Obj); \
+   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_copy(Obj, const_cast<alglib_impl::Type *>(A.Obj), false); \
+   alglib_impl::ae_state_clear(); \
 } \
 Type##I &Type##I::operator=(const Type##I &A) { \
    if (this == &A) return *this; \
-   alglib_impl::ae_state Q; alglib_impl::ae_state_init(&Q); \
+   alglib_impl::ae_state_init(); \
    TryCatch(*this); \
-   alglib_impl::ae_assert(Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (destination is not initialized)", &Q); \
-   alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (source is not initialized)", &Q); \
+   alglib_impl::ae_assert(Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (destination is not initialized)"); \
+   alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (source is not initialized)"); \
    alglib_impl::Type##_free(Obj, false); \
-   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_copy(Obj, const_cast<alglib_impl::Type *>(A.Obj), &Q, false); \
-   ae_state_clear(&Q); \
+   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_copy(Obj, const_cast<alglib_impl::Type *>(A.Obj), false); \
+   alglib_impl::ae_state_clear(); \
    return *this; \
 } \
 Type##I::~Type##I() { \
@@ -1236,7 +1228,7 @@ protected:
 //	after we fetch pointer to memory and its size, this X-object is ignored and not referenced anymore.
 //	So, you can pass pointers to temporary x-structures which are deallocated immediately after you call attach_to().
 // *	The state structure is used for error reporting purposes (longjmp on errors).
-   void attach_to(alglib_impl::x_vector *new_ptr, alglib_impl::ae_state *_state);
+   void attach_to(alglib_impl::x_vector *new_ptr);
 // Assigns rhs to the current object and return *this.
 // It has several branches depending on the target object's status:
 // *	For proxy objects, copy the data to the proxy.
@@ -1383,13 +1375,13 @@ protected:
 //	So, you can pass pointers to temporary x-structures which are deallocated immediately after you call attach_to().
 // *	The state structure is used for error-handling purposes (longjmp on errors).
 //	All previously allocated memory is correctly freed on error.
-   void attach_to(alglib_impl::x_matrix *new_ptr, alglib_impl::ae_state *_state);
+   void attach_to(alglib_impl::x_matrix *new_ptr);
 #if 0 //(@) Not implemented.
 // This function initializes matrix and allocates own memory storage.
 // NOTE:
 // *	initial state of wrapper object is assumed to be uninitialized;
 //	if This != NULL on entry, it is considered critical error (abort is called).
-   void init(ae_int_t rows, ae_int_t cols, alglib_impl::ae_datatype datatype, alglib_impl::ae_state *_state);
+   void init(ae_int_t rows, ae_int_t cols, alglib_impl::ae_datatype datatype);
 #endif
 // Assign rhs to the current object and return *this.
 // It has several branches depending on the target object's status:

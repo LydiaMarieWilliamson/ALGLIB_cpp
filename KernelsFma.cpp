@@ -7,7 +7,7 @@
 #include "KernelsFma.h"
 namespace alglib_impl {
 #if !defined ALGLIB_NO_FAST_KERNELS && defined _ALGLIB_HAS_FMA_INTRINSICS
-double rdotv_fma(const ae_int_t n, const Real *__restrict x, const Real *__restrict y, const ae_state *__restrict _state) {
+double rdotv_fma(const ae_int_t n, const Real *__restrict x, const Real *__restrict y) {
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
    const ae_int_t fmaLen = (avx2len >> 2) << 2;
@@ -70,7 +70,7 @@ double rdotv_fma(const ae_int_t n, const Real *__restrict x, const Real *__restr
    return dot;
 }
 
-double rdotv2_fma(const ae_int_t n, const Real *__restrict x, const ae_state *__restrict _state) {
+double rdotv2_fma(const ae_int_t n, const Real *__restrict x) {
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
    const ae_int_t fmaLen = (avx2len >> 2) << 2;
@@ -133,7 +133,7 @@ double rdotv2_fma(const ae_int_t n, const Real *__restrict x, const ae_state *__
    return dot;
 }
 
-void raddv_fma(const ae_int_t n, const double alpha, const Real *__restrict y, Real *__restrict x, const ae_state *__restrict _state) {
+void raddv_fma(const ae_int_t n, const double alpha, const Real *__restrict y, Real *__restrict x) {
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
    const __m256d *__restrict pSrc = (const __m256d *)(y);
@@ -157,7 +157,7 @@ void raddv_fma(const ae_int_t n, const double alpha, const Real *__restrict y, R
    }
 }
 
-void raddvx_fma3avx_xaligned(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x, ae_state *_state) {
+void raddvx_fma3avx_xaligned(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x) {
    ae_int_t i;
    const ae_int_t vecLen = (n >> 2) << 2;
    const __m256d avx2alpha = _mm256_set1_pd(alpha);
@@ -185,7 +185,7 @@ void raddvx_fma3avx_xaligned(const ae_int_t n, const double alpha, const double 
    }
 }
 
-void raddvx_fma(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x, ae_state *_state) {
+void raddvx_fma(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x) {
    const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
    if (n <= 4) {
       ae_int_t i;
@@ -195,7 +195,7 @@ void raddvx_fma(const ae_int_t n, const double alpha, const double *__restrict y
    }
    switch (unal) {
       case 0:
-         raddvx_fma3avx_xaligned(n, alpha, y, x, _state);
+         raddvx_fma3avx_xaligned(n, alpha, y, x);
          return;
       case 8:
          x[2] += alpha * y[2];
@@ -204,13 +204,13 @@ void raddvx_fma(const ae_int_t n, const double alpha, const double *__restrict y
       case 24:{
          x[0] += alpha * y[0];
          const ptrdiff_t nDone = 4 - (unal >> 3);
-         raddvx_fma3avx_xaligned(n - nDone, alpha, y + nDone, x + nDone, _state);
+         raddvx_fma3avx_xaligned(n - nDone, alpha, y + nDone, x + nDone);
          return;
       }
    }
 }
 
-void rgemv_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const double *__restrict x, double *__restrict y, ae_state *_state) {
+void rgemv_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const double *__restrict x, double *__restrict y) {
    ae_int_t i;
    ae_int_t j;
    const __m256d *__restrict pX = (const __m256d *)x;
@@ -296,7 +296,7 @@ void rgemv_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha, 
    }
 }
 
-void rgemv_transposed_fma(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const double *__restrict x, double *__restrict y, ae_state *_state) {
+void rgemv_transposed_fma(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const double *__restrict x, double *__restrict y) {
    ae_int_t i;
    ae_int_t j;
    __m256d *__restrict pY = (__m256d *)y;
@@ -315,7 +315,7 @@ void rgemv_transposed_fma(const ae_int_t m, const ae_int_t n, const double alpha
    }
 }
 
-void rgemvx_straight_fma_xaligned(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y, ae_state *_state) {
+void rgemvx_straight_fma_xaligned(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y) {
    ae_int_t i;
    ae_int_t j;
    const __m256d *__restrict pX = (const __m256d *)x;
@@ -401,7 +401,7 @@ void rgemvx_straight_fma_xaligned(const ae_int_t m, const ae_int_t n, const doub
    }
 }
 
-void rgemvx_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y, ae_state *_state) {
+void rgemvx_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y) {
    ae_int_t i;
    ae_int_t j;
    if (n <= 3) {
@@ -417,7 +417,7 @@ void rgemvx_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha,
    }
    const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
    if (unal == 0) {
-      rgemvx_straight_fma_xaligned(m, n, alpha, a, ia, ja, x, y, _state);
+      rgemvx_straight_fma_xaligned(m, n, alpha, a, ia, ja, x, y);
       return;
    }
    const ptrdiff_t shift = 4 - (unal >> 3);
@@ -429,10 +429,10 @@ void rgemvx_straight_fma(const ae_int_t m, const ae_int_t n, const double alpha,
       }
       y[i] += alpha * v;
    }
-   rgemvx_straight_fma_xaligned(m, n - shift, alpha, a, ia, ja + shift, x + shift, y, _state);
+   rgemvx_straight_fma_xaligned(m, n - shift, alpha, a, ia, ja + shift, x + shift, y);
 }
 
-void rgemvx_transposed_fma_yaligned(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y, ae_state *_state) {
+void rgemvx_transposed_fma_yaligned(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y) {
    ae_int_t i;
    ae_int_t j;
    __m256d *__restrict pY = (__m256d *)y;
@@ -451,7 +451,7 @@ void rgemvx_transposed_fma_yaligned(const ae_int_t m, const ae_int_t n, const do
    }
 }
 
-void rgemvx_transposed_fma(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y, ae_state *_state) {
+void rgemvx_transposed_fma(const ae_int_t m, const ae_int_t n, const double alpha, ae_matrix *__restrict a, const ae_int_t ia, const ae_int_t ja, const double *__restrict x, double *__restrict y) {
    ae_int_t i;
    ae_int_t j;
    if (m <= 3) {
@@ -466,7 +466,7 @@ void rgemvx_transposed_fma(const ae_int_t m, const ae_int_t n, const double alph
    }
    const ptrdiff_t unal = ((ptrdiff_t)y) & 31;
    if (unal == 0) {
-      rgemvx_transposed_fma_yaligned(m, n, alpha, a, ia, ja, x, y, _state);
+      rgemvx_transposed_fma_yaligned(m, n, alpha, a, ia, ja, x, y);
       return;
    }
    const ptrdiff_t shift = 4 - (unal >> 3);
@@ -477,7 +477,7 @@ void rgemvx_transposed_fma(const ae_int_t m, const ae_int_t n, const double alph
          y[j] += v * p_a[j];
       }
    }
-   rgemvx_transposed_fma_yaligned(m - shift, n, alpha, a, ia, ja + shift, x, y + shift, _state);
+   rgemvx_transposed_fma_yaligned(m - shift, n, alpha, a, ia, ja + shift, x, y + shift);
 }
 
 // Computes  product   A*transpose(B)  of two MICRO_SIZE*ROUND_LENGTH rowwise
@@ -539,9 +539,9 @@ void ablasf_dotblkh_fma(const double *src_a, const double *src_b, ae_int_t round
 //
 // Outputs:
 // ALGLIB Routine: Copyright 08.09.2021 by Sergey Bochkanov
-void spchol_propagatefwd_fma(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state) {
+void spchol_propagatefwd_fma(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth) {
    ae_int_t k;
-   ae_assert(simdwidth == 4, "SPCHOL: unexpected stride in propagatefwd()", _state);
+   ae_assert(simdwidth == 4, "SPCHOL: unexpected stride in propagatefwd()");
    if (sstride == 4) {
    // blocksize is either 3 or 4
       if (CurCPU & CPU_FMA) {
@@ -581,10 +581,10 @@ void spchol_propagatefwd_fma(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVe
          return;
       }
    }
-   ae_assert(false, "spchol_propagatefwd_fma: unsupported input", _state);
+   ae_assert(false, "spchol_propagatefwd_fma: unsupported input");
 }
 
-bool spchol_updatekernelabc4_fma(double *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, double *diagd, ae_int_t offsd, ae_int_t *raw2smap, ae_int_t *superrowidx, ae_int_t urbase, ae_state *_state) {
+bool spchol_updatekernelabc4_fma(double *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, double *diagd, ae_int_t offsd, ae_int_t *raw2smap, ae_int_t *superrowidx, ae_int_t urbase) {
    ae_int_t k;
    ae_int_t targetrow;
    ae_int_t targetcol;
@@ -664,7 +664,7 @@ bool spchol_updatekernelabc4_fma(double *rowstorage, ae_int_t offss, ae_int_t tw
    return true;
 }
 
-bool spchol_updatekernel4444_fma(double *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, double *diagd, ae_int_t offsd, ae_int_t *raw2smap, ae_int_t *superrowidx, ae_int_t urbase, ae_state *_state) {
+bool spchol_updatekernel4444_fma(double *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, double *diagd, ae_int_t offsd, ae_int_t *raw2smap, ae_int_t *superrowidx, ae_int_t urbase) {
    ae_int_t k;
    ae_int_t targetrow;
    ae_int_t offsk;

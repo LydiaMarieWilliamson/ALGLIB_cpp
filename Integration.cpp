@@ -51,49 +51,49 @@ namespace alglib_impl {
 //     W       -   array[0..N-1] - array of quadrature weights.
 // ALGLIB: Copyright 2005-2009 by Sergey Bochkanov
 // API: void gqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
-void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
+void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *w) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(d, 0, DT_REAL, _state);
-   NewVector(e, 0, DT_REAL, _state);
-   NewMatrix(z, 0, 0, DT_REAL, _state);
+   NewVector(d, 0, DT_REAL);
+   NewVector(e, 0, DT_REAL);
+   NewMatrix(z, 0, 0, DT_REAL);
    if (n < 1) {
       *info = -1;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    *info = 1;
 // Initialize
-   ae_vector_set_length(&d, n, _state);
-   ae_vector_set_length(&e, n, _state);
+   ae_vector_set_length(&d, n);
+   ae_vector_set_length(&e, n);
    for (i = 1; i < n; i++) {
       d.xR[i - 1] = alpha->xR[i - 1];
       if (beta->xR[i] <= 0.0) {
          *info = -2;
-         ae_frame_leave(_state);
+         ae_frame_leave();
          return;
       }
       e.xR[i - 1] = sqrt(beta->xR[i]);
    }
    d.xR[n - 1] = alpha->xR[n - 1];
 // EVD
-   if (!smatrixtdevd(&d, &e, n, 3, &z, _state)) {
+   if (!smatrixtdevd(&d, &e, n, 3, &z)) {
       *info = -3;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
 // Generate
-   ae_vector_set_length(x, n, _state);
-   ae_vector_set_length(w, n, _state);
+   ae_vector_set_length(x, n);
+   ae_vector_set_length(w, n);
    for (i = 1; i <= n; i++) {
       x->xR[i - 1] = d.xR[i - 1];
-      w->xR[i - 1] = mu0 * sqr(z.xyR[0][i - 1], _state);
+      w->xR[i - 1] = mu0 * sqr(z.xyR[0][i - 1]);
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Computation of nodes and weights for a Gauss-Lobatto quadrature formula
@@ -132,7 +132,7 @@ void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int
 //     W       -   array[0..N-1] - array of quadrature weights.
 // ALGLIB: Copyright 2005-2009 by Sergey Bochkanov
 // API: void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const double b, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
-void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double a, double b, ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
+void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double a, double b, ae_int_t n, ae_int_t *info, RVector *x, RVector *w) {
    ae_frame _frame_block;
    ae_int_t i;
    double pim1a;
@@ -148,32 +148,32 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
    double b2;
    double alph;
    double bet;
-   ae_frame_make(_state, &_frame_block);
-   DupVector(alpha, _state);
-   DupVector(beta, _state);
+   ae_frame_make(&_frame_block);
+   DupVector(alpha);
+   DupVector(beta);
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(d, 0, DT_REAL, _state);
-   NewVector(e, 0, DT_REAL, _state);
-   NewMatrix(z, 0, 0, DT_REAL, _state);
+   NewVector(d, 0, DT_REAL);
+   NewVector(e, 0, DT_REAL);
+   NewMatrix(z, 0, 0, DT_REAL);
    if (n <= 2) {
       *info = -1;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    *info = 1;
 // Initialize, D[1:N+1], E[1:N]
    n -= 2;
-   ae_vector_set_length(&d, n + 2, _state);
-   ae_vector_set_length(&e, n + 1, _state);
+   ae_vector_set_length(&d, n + 2);
+   ae_vector_set_length(&e, n + 1);
    for (i = 1; i <= n + 1; i++) {
       d.xR[i - 1] = alpha->xR[i - 1];
    }
    for (i = 1; i <= n; i++) {
       if (beta->xR[i] <= 0.0) {
          *info = -2;
-         ae_frame_leave(_state);
+         ae_frame_leave();
          return;
       }
       e.xR[i - 1] = sqrt(beta->xR[i]);
@@ -214,25 +214,25 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
    }
    if (bet < 0.0) {
       *info = -3;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    d.xR[n + 1] = alph;
    e.xR[n] = sqrt(bet);
 // EVD
-   if (!smatrixtdevd(&d, &e, n + 2, 3, &z, _state)) {
+   if (!smatrixtdevd(&d, &e, n + 2, 3, &z)) {
       *info = -3;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
 // Generate
-   ae_vector_set_length(x, n + 2, _state);
-   ae_vector_set_length(w, n + 2, _state);
+   ae_vector_set_length(x, n + 2);
+   ae_vector_set_length(w, n + 2);
    for (i = 1; i <= n + 2; i++) {
       x->xR[i - 1] = d.xR[i - 1];
-      w->xR[i - 1] = mu0 * sqr(z.xyR[0][i - 1], _state);
+      w->xR[i - 1] = mu0 * sqr(z.xyR[0][i - 1]);
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Computation of nodes and weights for a Gauss-Radau quadrature formula
@@ -270,36 +270,36 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
 //     W       -   array[0..N-1] - array of quadrature weights.
 // ALGLIB: Copyright 2005-2009 by Sergey Bochkanov
 // API: void gqgenerategaussradaurec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
-void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a, ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
+void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a, ae_int_t n, ae_int_t *info, RVector *x, RVector *w) {
    ae_frame _frame_block;
    ae_int_t i;
    double polim1;
    double poli;
    double t;
-   ae_frame_make(_state, &_frame_block);
-   DupVector(alpha, _state);
-   DupVector(beta, _state);
+   ae_frame_make(&_frame_block);
+   DupVector(alpha);
+   DupVector(beta);
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(d, 0, DT_REAL, _state);
-   NewVector(e, 0, DT_REAL, _state);
-   NewMatrix(z, 0, 0, DT_REAL, _state);
+   NewVector(d, 0, DT_REAL);
+   NewVector(e, 0, DT_REAL);
+   NewMatrix(z, 0, 0, DT_REAL);
    if (n < 2) {
       *info = -1;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    *info = 1;
 // Initialize, D[1:N], E[1:N]
    n--;
-   ae_vector_set_length(&d, n + 1, _state);
-   ae_vector_set_length(&e, n, _state);
+   ae_vector_set_length(&d, n + 1);
+   ae_vector_set_length(&e, n);
    for (i = 1; i <= n; i++) {
       d.xR[i - 1] = alpha->xR[i - 1];
       if (beta->xR[i] <= 0.0) {
          *info = -2;
-         ae_frame_leave(_state);
+         ae_frame_leave();
          return;
       }
       e.xR[i - 1] = sqrt(beta->xR[i]);
@@ -315,19 +315,19 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
    }
    d.xR[n] = a - beta->xR[n] * polim1 / poli;
 // EVD
-   if (!smatrixtdevd(&d, &e, n + 1, 3, &z, _state)) {
+   if (!smatrixtdevd(&d, &e, n + 1, 3, &z)) {
       *info = -3;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
 // Generate
-   ae_vector_set_length(x, n + 1, _state);
-   ae_vector_set_length(w, n + 1, _state);
+   ae_vector_set_length(x, n + 1);
+   ae_vector_set_length(w, n + 1);
    for (i = 1; i <= n + 1; i++) {
       x->xR[i - 1] = d.xR[i - 1];
-      w->xR[i - 1] = mu0 * sqr(z.xyR[0][i - 1], _state);
+      w->xR[i - 1] = mu0 * sqr(z.xyR[0][i - 1]);
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Returns nodes/weights for Gauss-Legendre quadrature on [-1,1] with N
@@ -350,30 +350,30 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
 //     W           -   array[0..N-1] - array of quadrature weights.
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
-void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
+void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(alpha, 0, DT_REAL, _state);
-   NewVector(beta, 0, DT_REAL, _state);
+   NewVector(alpha, 0, DT_REAL);
+   NewVector(beta, 0, DT_REAL);
    if (n < 1) {
       *info = -1;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
-   ae_vector_set_length(&alpha, n, _state);
-   ae_vector_set_length(&beta, n, _state);
+   ae_vector_set_length(&alpha, n);
+   ae_vector_set_length(&beta, n);
    for (i = 0; i < n; i++) {
       alpha.xR[i] = 0.0;
    }
    beta.xR[0] = 2.0;
    for (i = 1; i < n; i++) {
-      beta.xR[i] = 1 / (4 - 1 / sqr((double)i, _state));
+      beta.xR[i] = 1 / (4 - 1 / sqr((double)i));
    }
-   gqgeneraterec(&alpha, &beta, beta.xR[0], n, info, x, w, _state);
+   gqgeneraterec(&alpha, &beta, beta.xR[0], n, info, x, w);
 // test basic properties to detect errors
    if (*info > 0) {
       if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
@@ -385,7 +385,7 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w,
          }
       }
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Returns  nodes/weights  for  Gauss-Jacobi quadrature on [-1,1] with weight
@@ -411,7 +411,7 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w,
 //     W           -   array[0..N-1] - array of quadrature weights.
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &w);
-void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
+void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *w) {
    ae_frame _frame_block;
    double alpha2;
    double beta2;
@@ -419,39 +419,39 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
    double t;
    ae_int_t i;
    double s;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(a, 0, DT_REAL, _state);
-   NewVector(b, 0, DT_REAL, _state);
+   NewVector(a, 0, DT_REAL);
+   NewVector(b, 0, DT_REAL);
    if ((n < 1 || alpha <= -1.0) || beta <= -1.0) {
       *info = -1;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
-   ae_vector_set_length(&a, n, _state);
-   ae_vector_set_length(&b, n, _state);
+   ae_vector_set_length(&a, n);
+   ae_vector_set_length(&b, n);
    apb = alpha + beta;
    a.xR[0] = (beta - alpha) / (apb + 2);
-   t = (apb + 1) * log(2.0) + lngamma(alpha + 1, &s, _state) + lngamma(beta + 1, &s, _state) - lngamma(apb + 2, &s, _state);
+   t = (apb + 1) * log(2.0) + lngamma(alpha + 1, &s) + lngamma(beta + 1, &s) - lngamma(apb + 2, &s);
    if (t > log(maxrealnumber)) {
       *info = -4;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    b.xR[0] = exp(t);
    if (n > 1) {
-      alpha2 = sqr(alpha, _state);
-      beta2 = sqr(beta, _state);
+      alpha2 = sqr(alpha);
+      beta2 = sqr(beta);
       a.xR[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
-      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * sqr(apb + 2, _state));
+      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * sqr(apb + 2));
       for (i = 2; i < n; i++) {
          a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
-         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * sqr(1 + 0.5 * apb / i, _state));
+         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * sqr(1 + 0.5 * apb / i));
       }
    }
-   gqgeneraterec(&a, &b, b.xR[0], n, info, x, w, _state);
+   gqgeneraterec(&a, &b, b.xR[0], n, info, x, w);
 // test basic properties to detect errors
    if (*info > 0) {
       if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
@@ -463,7 +463,7 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
          }
       }
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Returns  nodes/weights  for  Gauss-Laguerre  quadrature  on  [0,+inf) with
@@ -488,29 +488,29 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
 //     W           -   array[0..N-1] - array of quadrature weights.
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gqgenerategausslaguerre(const ae_int_t n, const double alpha, ae_int_t &info, real_1d_array &x, real_1d_array &w);
-void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
+void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *x, RVector *w) {
    ae_frame _frame_block;
    double t;
    ae_int_t i;
    double s;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(a, 0, DT_REAL, _state);
-   NewVector(b, 0, DT_REAL, _state);
+   NewVector(a, 0, DT_REAL);
+   NewVector(b, 0, DT_REAL);
    if (n < 1 || alpha <= -1.0) {
       *info = -1;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
-   ae_vector_set_length(&a, n, _state);
-   ae_vector_set_length(&b, n, _state);
+   ae_vector_set_length(&a, n);
+   ae_vector_set_length(&b, n);
    a.xR[0] = alpha + 1;
-   t = lngamma(alpha + 1, &s, _state);
+   t = lngamma(alpha + 1, &s);
    if (t >= log(maxrealnumber)) {
       *info = -4;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    b.xR[0] = exp(t);
@@ -520,7 +520,7 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
          b.xR[i] = i * (i + alpha);
       }
    }
-   gqgeneraterec(&a, &b, b.xR[0], n, info, x, w, _state);
+   gqgeneraterec(&a, &b, b.xR[0], n, info, x, w);
 // test basic properties to detect errors
    if (*info > 0) {
       if (x->xR[0] < 0.0) {
@@ -532,7 +532,7 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
          }
       }
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Returns  nodes/weights  for  Gauss-Hermite  quadrature on (-inf,+inf) with
@@ -554,22 +554,22 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
 //     W           -   array[0..N-1] - array of quadrature weights.
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
-void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state) {
+void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
    SetVector(w);
-   NewVector(a, 0, DT_REAL, _state);
-   NewVector(b, 0, DT_REAL, _state);
+   NewVector(a, 0, DT_REAL);
+   NewVector(b, 0, DT_REAL);
    if (n < 1) {
       *info = -1;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
-   ae_vector_set_length(&a, n, _state);
-   ae_vector_set_length(&b, n, _state);
+   ae_vector_set_length(&a, n);
+   ae_vector_set_length(&b, n);
    for (i = 0; i < n; i++) {
       a.xR[i] = 0.0;
    }
@@ -579,7 +579,7 @@ void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, 
          b.xR[i] = 0.5 * i;
       }
    }
-   gqgeneraterec(&a, &b, b.xR[0], n, info, x, w, _state);
+   gqgeneraterec(&a, &b, b.xR[0], n, info, x, w);
 // test basic properties to detect errors
    if (*info > 0) {
       for (i = 0; i < n - 1; i++) {
@@ -588,58 +588,58 @@ void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, 
          }
       }
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
 void gqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::gqgeneraterec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::gqgeneraterec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w));
+   alglib_impl::ae_state_clear();
 }
 
 void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const double b, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::gqgenerategausslobattorec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, a, b, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::gqgenerategausslobattorec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, a, b, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w));
+   alglib_impl::ae_state_clear();
 }
 
 void gqgenerategaussradaurec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::gqgenerategaussradaurec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, a, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::gqgenerategaussradaurec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, a, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w));
+   alglib_impl::ae_state_clear();
 }
 
 void gqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::gqgenerategausslegendre(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::gqgenerategausslegendre(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w));
+   alglib_impl::ae_state_clear();
 }
 
 void gqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::gqgenerategaussjacobi(n, alpha, beta, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::gqgenerategaussjacobi(n, alpha, beta, &info, ConstT(ae_vector, x), ConstT(ae_vector, w));
+   alglib_impl::ae_state_clear();
 }
 
 void gqgenerategausslaguerre(const ae_int_t n, const double alpha, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::gqgenerategausslaguerre(n, alpha, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::gqgenerategausslaguerre(n, alpha, &info, ConstT(ae_vector, x), ConstT(ae_vector, w));
+   alglib_impl::ae_state_clear();
 }
 
 void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::gqgenerategausshermite(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::gqgenerategausshermite(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, w));
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -689,7 +689,7 @@ namespace alglib_impl {
 //                     corresponding to extended Kronrod nodes).
 // ALGLIB: Copyright 08.05.2009 by Sergey Bochkanov
 // API: void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
-void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state) {
+void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -699,27 +699,27 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    ae_int_t m;
    ae_int_t l;
    ae_int_t k;
-   ae_frame_make(_state, &_frame_block);
-   DupVector(alpha, _state);
-   DupVector(beta, _state);
+   ae_frame_make(&_frame_block);
+   DupVector(alpha);
+   DupVector(beta);
    *info = 0;
    SetVector(x);
    SetVector(wkronrod);
    SetVector(wgauss);
-   NewVector(ta, 0, DT_REAL, _state);
-   NewVector(t, 0, DT_REAL, _state);
-   NewVector(s, 0, DT_REAL, _state);
-   NewVector(xgtmp, 0, DT_REAL, _state);
-   NewVector(wgtmp, 0, DT_REAL, _state);
+   NewVector(ta, 0, DT_REAL);
+   NewVector(t, 0, DT_REAL);
+   NewVector(s, 0, DT_REAL);
+   NewVector(xgtmp, 0, DT_REAL);
+   NewVector(wgtmp, 0, DT_REAL);
    if (!(n % 2) || n < 3) {
       *info = -1;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
-   for (i = 0; i <= iceil((double)(3 * (n / 2)) / 2.0, _state); i++) {
+   for (i = 0; i <= iceil((double)(3 * (n / 2)) / 2.0); i++) {
       if (beta->xR[i] <= 0.0) {
          *info = -2;
-         ae_frame_leave(_state);
+         ae_frame_leave();
          return;
       }
    }
@@ -728,34 +728,34 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    n /= 2;
    beta->xR[0] = mu0;
 // Calculate Gauss nodes/weights, save them for later processing
-   gqgeneraterec(alpha, beta, mu0, n, info, &xgtmp, &wgtmp, _state);
+   gqgeneraterec(alpha, beta, mu0, n, info, &xgtmp, &wgtmp);
    if (*info < 0) {
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
 // Resize:
 // * A from 0..floor(3*n/2) to 0..2*n
 // * B from 0..ceil(3*n/2)  to 0..2*n
    ae_int_t alen = 3 * n / 2 + 1, blen = (3 * n + 1) / 2 + 1;
-   ae_vector_set_length(&ta, alen, _state);
+   ae_vector_set_length(&ta, alen);
    ae_v_move(ta.xR, 1, alpha->xR, 1, alen);
-   ae_vector_set_length(alpha, 2 * n + 1, _state);
+   ae_vector_set_length(alpha, 2 * n + 1);
    ae_v_move(alpha->xR, 1, ta.xR, 1, alen);
    for (i = alen; i <= 2 * n; i++) {
       alpha->xR[i] = 0.0;
    }
-   ae_vector_set_length(&ta, blen, _state);
+   ae_vector_set_length(&ta, blen);
    ae_v_move(ta.xR, 1, beta->xR, 1, blen);
-   ae_vector_set_length(beta, 2 * n + 1, _state);
+   ae_vector_set_length(beta, 2 * n + 1);
    ae_v_move(beta->xR, 1, ta.xR, 1, blen);
    for (i = blen; i <= 2 * n; i++) {
       beta->xR[i] = 0.0;
    }
 // Initialize T, S
    wlen = 2 + n / 2;
-   ae_vector_set_length(&t, wlen, _state);
-   ae_vector_set_length(&s, wlen, _state);
-   ae_vector_set_length(&ta, wlen, _state);
+   ae_vector_set_length(&t, wlen);
+   ae_vector_set_length(&s, wlen);
+   ae_vector_set_length(&ta, wlen);
    woffs = 1;
    for (i = 0; i < wlen; i++) {
       t.xR[i] = 0.0;
@@ -798,12 +798,12 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    }
    alpha->xR[2 * n] = alpha->xR[n - 1] - beta->xR[2 * n] * s.xR[woffs + 0] / t.xR[woffs + 0];
 // calculation of Kronrod nodes and weights, unpacking of Gauss weights
-   gqgeneraterec(alpha, beta, mu0, 2 * n + 1, info, x, wkronrod, _state);
+   gqgeneraterec(alpha, beta, mu0, 2 * n + 1, info, x, wkronrod);
    if (*info == -2) {
       *info = -5;
    }
    if (*info < 0) {
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    for (i = 0; i < 2 * n; i++) {
@@ -812,17 +812,17 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
       }
    }
    if (*info < 0) {
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
-   ae_vector_set_length(wgauss, 2 * n + 1, _state);
+   ae_vector_set_length(wgauss, 2 * n + 1);
    for (i = 0; i <= 2 * n; i++) {
       wgauss->xR[i] = 0.0;
    }
    for (i = 0; i < n; i++) {
       wgauss->xR[2 * i + 1] = wgtmp.xR[i];
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Returns Gauss and Gauss-Kronrod nodes for quadrature with N points.
@@ -848,38 +848,38 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
 //                     corresponding to extended Kronrod nodes).
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gkqlegendrecalc(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
-void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state) {
+void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss) {
    ae_frame _frame_block;
    ae_int_t alen;
    ae_int_t blen;
    double mu0;
    ae_int_t k;
    ae_int_t i;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
    SetVector(wkronrod);
    SetVector(wgauss);
-   NewVector(alpha, 0, DT_REAL, _state);
-   NewVector(beta, 0, DT_REAL, _state);
+   NewVector(alpha, 0, DT_REAL);
+   NewVector(beta, 0, DT_REAL);
    if (!(n % 2) || n < 3) {
       *info = -1;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    mu0 = 2.0;
    alen = 3 * n / 2 + 1;
    blen = (3 * n + 1) / 2 + 1;
-   ae_vector_set_length(&alpha, alen, _state);
-   ae_vector_set_length(&beta, blen, _state);
+   ae_vector_set_length(&alpha, alen);
+   ae_vector_set_length(&beta, blen);
    for (k = 0; k < alen; k++) {
       alpha.xR[k] = 0.0;
    }
    beta.xR[0] = 2.0;
    for (k = 1; k < blen; k++) {
-      beta.xR[k] = 1 / (4 - 1 / sqr((double)k, _state));
+      beta.xR[k] = 1 / (4 - 1 / sqr((double)k));
    }
-   gkqgeneraterec(&alpha, &beta, mu0, n, info, x, wkronrod, wgauss, _state);
+   gkqgeneraterec(&alpha, &beta, mu0, n, info, x, wkronrod, wgauss);
 // test basic properties to detect errors
    if (*info > 0) {
       if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
@@ -891,7 +891,7 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
          }
       }
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Returns Gauss and Gauss-Kronrod nodes for quadrature with N  points  using
@@ -912,32 +912,32 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
 //                     corresponding to extended Kronrod nodes).
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, double &eps);
-void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, double *eps, ae_state *_state) {
+void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, double *eps) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t ng;
    double tmp;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    SetVector(x);
    SetVector(wkronrod);
    SetVector(wgauss);
    *eps = 0;
-   NewVector(p1, 0, DT_INT, _state);
-   NewVector(p2, 0, DT_INT, _state);
+   NewVector(p1, 0, DT_INT);
+   NewVector(p2, 0, DT_INT);
 // these initializers are not really necessary,
 // but without them compiler complains about uninitialized locals
    ng = 0;
 // Process
-   ae_assert(((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61, "GKQNodesTbl: incorrect N!", _state);
-   ae_vector_set_length(x, n, _state);
-   ae_vector_set_length(wkronrod, n, _state);
-   ae_vector_set_length(wgauss, n, _state);
+   ae_assert(((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61, "GKQNodesTbl: incorrect N!");
+   ae_vector_set_length(x, n);
+   ae_vector_set_length(wkronrod, n);
+   ae_vector_set_length(wgauss, n);
    for (i = 0; i < n; i++) {
       x->xR[i] = 0.0;
       wkronrod->xR[i] = 0.0;
       wgauss->xR[i] = 0.0;
    }
-   *eps = rmax2(machineepsilon, 1.0E-32, _state);
+   *eps = rmax2(machineepsilon, 1.0E-32);
    if (n == 15) {
       ng = 4;
       wgauss->xR[0] = 0.129484966168869693270611432679082;
@@ -1254,7 +1254,7 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
       wgauss->xR[2 * i] = 0.0;
    }
 // reorder
-   tagsort(x, n, &p1, &p2, _state);
+   tagsort(x, n, &p1, &p2);
    for (i = 0; i < n; i++) {
       tmp = wkronrod->xR[i];
       wkronrod->xR[i] = wkronrod->xR[p2.xZ[i]];
@@ -1263,7 +1263,7 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
       wgauss->xR[i] = wgauss->xR[p2.xZ[i]];
       wgauss->xR[p2.xZ[i]] = tmp;
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
@@ -1291,7 +1291,7 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
 //                     corresponding to extended Kronrod nodes).
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
-void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state) {
+void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss) {
    double eps;
    *info = 0;
    SetVector(x);
@@ -1299,9 +1299,9 @@ void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w
    SetVector(wgauss);
    if (machineepsilon > 1.0E-32 && (((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61)) {
       *info = 1;
-      gkqlegendretbl(n, x, wkronrod, wgauss, &eps, _state);
+      gkqlegendretbl(n, x, wkronrod, wgauss, &eps);
    } else {
-      gkqlegendrecalc(n, info, x, wkronrod, wgauss, _state);
+      gkqlegendrecalc(n, info, x, wkronrod, wgauss);
    }
 }
 
@@ -1337,7 +1337,7 @@ void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w
 //                     corresponding to extended Kronrod nodes).
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 // API: void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
-void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state) {
+void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss) {
    ae_frame _frame_block;
    ae_int_t clen;
    double alpha2;
@@ -1346,49 +1346,49 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
    double t;
    ae_int_t i;
    double s;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
    SetVector(wkronrod);
    SetVector(wgauss);
-   NewVector(a, 0, DT_REAL, _state);
-   NewVector(b, 0, DT_REAL, _state);
+   NewVector(a, 0, DT_REAL);
+   NewVector(b, 0, DT_REAL);
    if (n % 2 != 1 || n < 3) {
       *info = -1;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    if (alpha <= -1.0 || beta <= -1.0) {
       *info = -1;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
-   clen = iceil((double)(3 * (n / 2)) / 2.0, _state) + 1;
-   ae_vector_set_length(&a, clen, _state);
-   ae_vector_set_length(&b, clen, _state);
+   clen = iceil((double)(3 * (n / 2)) / 2.0) + 1;
+   ae_vector_set_length(&a, clen);
+   ae_vector_set_length(&b, clen);
    for (i = 0; i < clen; i++) {
       a.xR[i] = 0.0;
    }
    apb = alpha + beta;
    a.xR[0] = (beta - alpha) / (apb + 2);
-   t = (apb + 1) * log(2.0) + lngamma(alpha + 1, &s, _state) + lngamma(beta + 1, &s, _state) - lngamma(apb + 2, &s, _state);
+   t = (apb + 1) * log(2.0) + lngamma(alpha + 1, &s) + lngamma(beta + 1, &s) - lngamma(apb + 2, &s);
    if (t > log(maxrealnumber)) {
       *info = -4;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    b.xR[0] = exp(t);
    if (clen > 1) {
-      alpha2 = sqr(alpha, _state);
-      beta2 = sqr(beta, _state);
+      alpha2 = sqr(alpha);
+      beta2 = sqr(beta);
       a.xR[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
-      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * sqr(apb + 2, _state));
+      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * sqr(apb + 2));
       for (i = 2; i < clen; i++) {
          a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
-         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * sqr(1 + 0.5 * apb / i, _state));
+         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * sqr(1 + 0.5 * apb / i));
       }
    }
-   gkqgeneraterec(&a, &b, b.xR[0], n, info, x, wkronrod, wgauss, _state);
+   gkqgeneraterec(&a, &b, b.xR[0], n, info, x, wkronrod, wgauss);
 // test basic properties to detect errors
    if (*info > 0) {
       if (x->xR[0] < -1.0 || x->xR[n - 1] > 1.0) {
@@ -1400,44 +1400,44 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
          }
       }
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
 void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::gkqgeneraterec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::gkqgeneraterec(ConstT(ae_vector, alpha), ConstT(ae_vector, beta), mu0, n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss));
+   alglib_impl::ae_state_clear();
 }
 
 void gkqlegendrecalc(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::gkqlegendrecalc(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::gkqlegendrecalc(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss));
+   alglib_impl::ae_state_clear();
 }
 
 void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, double &eps) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::gkqlegendretbl(n, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &eps, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::gkqlegendretbl(n, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &eps);
+   alglib_impl::ae_state_clear();
 }
 
 void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::gkqgenerategausslegendre(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::gkqgenerategausslegendre(n, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss));
+   alglib_impl::ae_state_clear();
 }
 
 void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::gkqgenerategaussjacobi(n, alpha, beta, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::gkqgenerategaussjacobi(n, alpha, beta, &info, ConstT(ae_vector, x), ConstT(ae_vector, wkronrod), ConstT(ae_vector, wgauss));
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -1465,17 +1465,17 @@ static const ae_int_t autogk_maxsubintervals = 10000;
 //     AutoGKSmooth, AutoGKSingular, AutoGKResults.
 // ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
 // API: void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state);
-void autogksmoothw(double a, double b, double xwidth, autogkstate *state, ae_state *_state) {
+void autogksmoothw(double a, double b, double xwidth, autogkstate *state) {
    SetObj(autogkstate, state);
-   ae_assert(isfinite(a), "AutoGKSmoothW: A is not finite!", _state);
-   ae_assert(isfinite(b), "AutoGKSmoothW: B is not finite!", _state);
-   ae_assert(isfinite(xwidth), "AutoGKSmoothW: XWidth is not finite!", _state);
+   ae_assert(isfinite(a), "AutoGKSmoothW: A is not finite!");
+   ae_assert(isfinite(b), "AutoGKSmoothW: B is not finite!");
+   ae_assert(isfinite(xwidth), "AutoGKSmoothW: XWidth is not finite!");
    state->wrappermode = 0;
    state->a = a;
    state->b = b;
    state->xwidth = xwidth;
    state->needf = false;
-   ae_vector_set_length(&state->rstate.ra, 10 + 1, _state);
+   ae_vector_set_length(&state->rstate.ra, 10 + 1);
    state->rstate.stage = -1;
 }
 
@@ -1501,11 +1501,11 @@ void autogksmoothw(double a, double b, double xwidth, autogkstate *state, ae_sta
 //     AutoGKSmoothW, AutoGKSingular, AutoGKResults.
 // ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
 // API: void autogksmooth(const double a, const double b, autogkstate &state);
-void autogksmooth(double a, double b, autogkstate *state, ae_state *_state) {
+void autogksmooth(double a, double b, autogkstate *state) {
    SetObj(autogkstate, state);
-   ae_assert(isfinite(a), "AutoGKSmooth: A is not finite!", _state);
-   ae_assert(isfinite(b), "AutoGKSmooth: B is not finite!", _state);
-   autogksmoothw(a, b, 0.0, state, _state);
+   ae_assert(isfinite(a), "AutoGKSmooth: A is not finite!");
+   ae_assert(isfinite(b), "AutoGKSmooth: B is not finite!");
+   autogksmoothw(a, b, 0.0, state);
 }
 
 // Integration on a finite interval [A,B].
@@ -1536,12 +1536,12 @@ void autogksmooth(double a, double b, autogkstate *state, ae_state *_state) {
 //     AutoGKSmooth, AutoGKSmoothW, AutoGKResults.
 // ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
 // API: void autogksingular(const double a, const double b, const double alpha, const double beta, autogkstate &state);
-void autogksingular(double a, double b, double alpha, double beta, autogkstate *state, ae_state *_state) {
+void autogksingular(double a, double b, double alpha, double beta, autogkstate *state) {
    SetObj(autogkstate, state);
-   ae_assert(isfinite(a), "AutoGKSingular: A is not finite!", _state);
-   ae_assert(isfinite(b), "AutoGKSingular: B is not finite!", _state);
-   ae_assert(isfinite(alpha), "AutoGKSingular: Alpha is not finite!", _state);
-   ae_assert(isfinite(beta), "AutoGKSingular: Beta is not finite!", _state);
+   ae_assert(isfinite(a), "AutoGKSingular: A is not finite!");
+   ae_assert(isfinite(b), "AutoGKSingular: B is not finite!");
+   ae_assert(isfinite(alpha), "AutoGKSingular: Alpha is not finite!");
+   ae_assert(isfinite(beta), "AutoGKSingular: Beta is not finite!");
    state->wrappermode = 1;
    state->a = a;
    state->b = b;
@@ -1549,7 +1549,7 @@ void autogksingular(double a, double b, double alpha, double beta, autogkstate *
    state->beta = beta;
    state->xwidth = 0.0;
    state->needf = false;
-   ae_vector_set_length(&state->rstate.ra, 10 + 1, _state);
+   ae_vector_set_length(&state->rstate.ra, 10 + 1);
    state->rstate.stage = -1;
 }
 
@@ -1559,19 +1559,19 @@ void autogksingular(double a, double b, double alpha, double beta, autogkstate *
 //
 // width<0 -   error
 // width=0 -   no width requirements
-static void autogk_autogkinternalprepare(double a, double b, double eps, double xwidth, autogkinternalstate *state, ae_state *_state) {
+static void autogk_autogkinternalprepare(double a, double b, double eps, double xwidth, autogkinternalstate *state) {
 // Save settings
    state->a = a;
    state->b = b;
    state->eps = eps;
    state->xwidth = xwidth;
 // Prepare RComm structure
-   ae_vector_set_length(&state->rstate.ia, 3 + 1, _state);
-   ae_vector_set_length(&state->rstate.ra, 8 + 1, _state);
+   ae_vector_set_length(&state->rstate.ia, 3 + 1);
+   ae_vector_set_length(&state->rstate.ra, 8 + 1);
    state->rstate.stage = -1;
 }
 
-static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth, ae_state *_state) {
+static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth) {
    ae_int_t i;
    ae_int_t p;
    double t;
@@ -1605,7 +1605,7 @@ static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth
    }
 }
 
-static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth, ae_state *_state) {
+static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth) {
    ae_int_t i;
    ae_int_t p;
    double t;
@@ -1629,25 +1629,25 @@ static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidt
    }
 }
 
-static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newheapsize, ae_int_t heapwidth, ae_state *_state) {
+static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newheapsize, ae_int_t heapwidth) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_frame_make(_state, &_frame_block);
-   NewMatrix(tmp, 0, 0, DT_REAL, _state);
-   ae_matrix_set_length(&tmp, *heapsize, heapwidth, _state);
+   ae_frame_make(&_frame_block);
+   NewMatrix(tmp, 0, 0, DT_REAL);
+   ae_matrix_set_length(&tmp, *heapsize, heapwidth);
    for (i = 0; i < *heapsize; i++) {
       ae_v_move(tmp.xyR[i], 1, heap->xyR[i], 1, heapwidth);
    }
-   ae_matrix_set_length(heap, newheapsize, heapwidth, _state);
+   ae_matrix_set_length(heap, newheapsize, heapwidth);
    for (i = 0; i < *heapsize; i++) {
       ae_v_move(heap->xyR[i], 1, tmp.xyR[i], 1, heapwidth);
    }
    *heapsize = newheapsize;
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Internal AutoGK subroutine
-static bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state *_state) {
+static bool autogk_autogkinternaliteration(autogkinternalstate *state) {
    double c1;
    double c2;
    ae_int_t i;
@@ -1712,14 +1712,14 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state 
 // initialize quadratures.
 // use 15-point Gauss-Kronrod formula.
    state->n = 15;
-   gkqgenerategausslegendre(state->n, &info, &state->qn, &state->wk, &state->wg, _state);
+   gkqgenerategausslegendre(state->n, &info, &state->qn, &state->wk, &state->wg);
    if (info < 0) {
       state->info = -5;
       state->r = 0.0;
       result = false;
       return result;
    }
-   ae_vector_set_length(&state->wr, state->n, _state);
+   ae_vector_set_length(&state->wr, state->n);
    for (i = 0; i < state->n; i++) {
       if (i == 0) {
          state->wr.xR[i] = 0.5 * fabs(state->qn.xR[1] - state->qn.xR[0]);
@@ -1763,7 +1763,7 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state 
    state->heapwidth = 5;
    state->heapsize = 1;
    state->heapused = 1;
-   ae_matrix_set_length(&state->heap, state->heapsize, state->heapwidth, _state);
+   ae_matrix_set_length(&state->heap, state->heapsize, state->heapwidth);
    c1 = 0.5 * (state->b - state->a);
    c2 = 0.5 * (state->b + state->a);
    intg = 0.0;
@@ -1805,11 +1805,11 @@ lbl_7:
 lbl_3:
 // maximum subinterval should be no more than XWidth.
 // so we create Ceil((B-A)/XWidth)+1 small subintervals
-   ns = iceil(fabs(state->b - state->a) / state->xwidth, _state) + 1;
+   ns = iceil(fabs(state->b - state->a) / state->xwidth) + 1;
    state->heapsize = ns;
    state->heapused = ns;
    state->heapwidth = 5;
-   ae_matrix_set_length(&state->heap, state->heapsize, state->heapwidth, _state);
+   ae_matrix_set_length(&state->heap, state->heapsize, state->heapwidth);
    state->sumerr = 0.0;
    state->sumabs = 0.0;
    j = 0;
@@ -1867,7 +1867,7 @@ lbl_14:
    }
 // additional memory if needed
    if (state->heapused == state->heapsize) {
-      autogk_mheapresize(&state->heap, &state->heapsize, 4 * state->heapsize, state->heapwidth, _state);
+      autogk_mheapresize(&state->heap, &state->heapsize, 4 * state->heapsize, state->heapwidth);
    }
 // TODO: every 20 iterations recalculate errors/sums
    if (state->sumerr <= state->eps * state->sumabs || state->heapused >= autogk_maxsubintervals) {
@@ -1879,7 +1879,7 @@ lbl_14:
       return result;
    }
 // Exclude interval with maximum absolute error
-   autogk_mheappop(&state->heap, state->heapused, state->heapwidth, _state);
+   autogk_mheappop(&state->heap, state->heapused, state->heapwidth);
    state->sumerr -= state->heap.xyR[state->heapused - 1][0];
    state->sumabs -= state->heap.xyR[state->heapused - 1][2];
 // Divide interval, create subintervals
@@ -1932,8 +1932,8 @@ lbl_21:
    j++;
    goto lbl_16;
 lbl_18:
-   autogk_mheappush(&state->heap, state->heapused - 1, state->heapwidth, _state);
-   autogk_mheappush(&state->heap, state->heapused, state->heapwidth, _state);
+   autogk_mheappush(&state->heap, state->heapused - 1, state->heapwidth);
+   autogk_mheappush(&state->heap, state->heapused, state->heapwidth);
    state->heapused++;
    goto lbl_14;
 lbl_15:
@@ -1963,7 +1963,7 @@ lbl_rcomm:
 // ALGLIB: Copyright 07.05.2009 by Sergey Bochkanov
 // API: bool autogkiteration(const autogkstate &state);
 // API: void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr = NULL);
-bool autogkiteration(autogkstate *state, ae_state *_state) {
+bool autogkiteration(autogkstate *state) {
    double s;
    double tmp;
    double eps;
@@ -2039,9 +2039,9 @@ bool autogkiteration(autogkstate *state, ae_state *_state) {
       return result;
    }
 // general case
-   autogk_autogkinternalprepare(a, b, eps, state->xwidth, &state->internalstate, _state);
+   autogk_autogkinternalprepare(a, b, eps, state->xwidth, &state->internalstate);
 lbl_5:
-   if (!autogk_autogkinternaliteration(&state->internalstate, _state)) {
+   if (!autogk_autogkinternaliteration(&state->internalstate)) {
       goto lbl_6;
    }
    x = state->internalstate.x;
@@ -2093,14 +2093,14 @@ lbl_3:
       alpha = beta;
       beta = tmp;
    }
-   alpha = rmin2(alpha, 0.0, _state);
-   beta = rmin2(beta, 0.0, _state);
+   alpha = rmin2(alpha, 0.0);
+   beta = rmin2(beta, 0.0);
 // first, integrate left half of [a,b]:
 //     integral(f(x)dx, a, (b+a)/2) =
 //     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
-   autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + alpha), eps, state->xwidth, &state->internalstate, _state);
+   autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + alpha), eps, state->xwidth, &state->internalstate);
 lbl_9:
-   if (!autogk_autogkinternaliteration(&state->internalstate, _state)) {
+   if (!autogk_autogkinternaliteration(&state->internalstate)) {
       goto lbl_10;
    }
 // Fill State.X, State.XMinusA, State.BMinusX.
@@ -2133,9 +2133,9 @@ lbl_10:
 // then, integrate right half of [a,b]:
 //     integral(f(x)dx, (b+a)/2, b) =
 //     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
-   autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + beta), eps, state->xwidth, &state->internalstate, _state);
+   autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + beta), eps, state->xwidth, &state->internalstate);
 lbl_11:
-   if (!autogk_autogkinternaliteration(&state->internalstate, _state)) {
+   if (!autogk_autogkinternaliteration(&state->internalstate)) {
       goto lbl_12;
    }
 // Fill State.X, State.XMinusA, State.BMinusX.
@@ -2202,7 +2202,7 @@ lbl_rcomm:
 //     Rep     -   optimization report (see AutoGKReport description)
 // ALGLIB: Copyright 14.11.2007 by Sergey Bochkanov
 // API: void autogkresults(const autogkstate &state, double &v, autogkreport &rep);
-void autogkresults(autogkstate *state, double *v, autogkreport *rep, ae_state *_state) {
+void autogkresults(autogkstate *state, double *v, autogkreport *rep) {
    *v = 0;
    SetObj(autogkreport, rep);
    *v = state->v;
@@ -2211,10 +2211,10 @@ void autogkresults(autogkstate *state, double *v, autogkreport *rep, ae_state *_
    rep->nintervals = state->nintervals;
 }
 
-void autogkreport_init(void *_p, ae_state *_state, bool make_automatic) {
+void autogkreport_init(void *_p, bool make_automatic) {
 }
 
-void autogkreport_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void autogkreport_copy(void *_dst, void *_src, bool make_automatic) {
    autogkreport *dst = (autogkreport *)_dst;
    autogkreport *src = (autogkreport *)_src;
    dst->terminationtype = src->terminationtype;
@@ -2225,17 +2225,17 @@ void autogkreport_copy(void *_dst, void *_src, ae_state *_state, bool make_autom
 void autogkreport_free(void *_p, bool make_automatic) {
 }
 
-void autogkinternalstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void autogkinternalstate_init(void *_p, bool make_automatic) {
    autogkinternalstate *p = (autogkinternalstate *)_p;
-   ae_matrix_init(&p->heap, 0, 0, DT_REAL, _state, make_automatic);
-   ae_vector_init(&p->qn, 0, DT_REAL, _state, make_automatic);
-   ae_vector_init(&p->wg, 0, DT_REAL, _state, make_automatic);
-   ae_vector_init(&p->wk, 0, DT_REAL, _state, make_automatic);
-   ae_vector_init(&p->wr, 0, DT_REAL, _state, make_automatic);
-   rcommstate_init(&p->rstate, _state, make_automatic);
+   ae_matrix_init(&p->heap, 0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->qn, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->wg, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->wk, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->wr, 0, DT_REAL, make_automatic);
+   rcommstate_init(&p->rstate, make_automatic);
 }
 
-void autogkinternalstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void autogkinternalstate_copy(void *_dst, void *_src, bool make_automatic) {
    autogkinternalstate *dst = (autogkinternalstate *)_dst;
    autogkinternalstate *src = (autogkinternalstate *)_src;
    dst->a = src->a;
@@ -2246,18 +2246,18 @@ void autogkinternalstate_copy(void *_dst, void *_src, ae_state *_state, bool mak
    dst->f = src->f;
    dst->info = src->info;
    dst->r = src->r;
-   ae_matrix_copy(&dst->heap, &src->heap, _state, make_automatic);
+   ae_matrix_copy(&dst->heap, &src->heap, make_automatic);
    dst->heapsize = src->heapsize;
    dst->heapwidth = src->heapwidth;
    dst->heapused = src->heapused;
    dst->sumerr = src->sumerr;
    dst->sumabs = src->sumabs;
-   ae_vector_copy(&dst->qn, &src->qn, _state, make_automatic);
-   ae_vector_copy(&dst->wg, &src->wg, _state, make_automatic);
-   ae_vector_copy(&dst->wk, &src->wk, _state, make_automatic);
-   ae_vector_copy(&dst->wr, &src->wr, _state, make_automatic);
+   ae_vector_copy(&dst->qn, &src->qn, make_automatic);
+   ae_vector_copy(&dst->wg, &src->wg, make_automatic);
+   ae_vector_copy(&dst->wk, &src->wk, make_automatic);
+   ae_vector_copy(&dst->wr, &src->wr, make_automatic);
    dst->n = src->n;
-   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
 }
 
 void autogkinternalstate_free(void *_p, bool make_automatic) {
@@ -2270,13 +2270,13 @@ void autogkinternalstate_free(void *_p, bool make_automatic) {
    rcommstate_free(&p->rstate, make_automatic);
 }
 
-void autogkstate_init(void *_p, ae_state *_state, bool make_automatic) {
+void autogkstate_init(void *_p, bool make_automatic) {
    autogkstate *p = (autogkstate *)_p;
-   autogkinternalstate_init(&p->internalstate, _state, make_automatic);
-   rcommstate_init(&p->rstate, _state, make_automatic);
+   autogkinternalstate_init(&p->internalstate, make_automatic);
+   rcommstate_init(&p->rstate, make_automatic);
 }
 
-void autogkstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
+void autogkstate_copy(void *_dst, void *_src, bool make_automatic) {
    autogkstate *dst = (autogkstate *)_dst;
    autogkstate *src = (autogkstate *)_src;
    dst->a = src->a;
@@ -2290,8 +2290,8 @@ void autogkstate_copy(void *_dst, void *_src, ae_state *_state, bool make_automa
    dst->needf = src->needf;
    dst->f = src->f;
    dst->wrappermode = src->wrappermode;
-   autogkinternalstate_copy(&dst->internalstate, &src->internalstate, _state, make_automatic);
-   rcommstate_copy(&dst->rstate, &src->rstate, _state, make_automatic);
+   autogkinternalstate_copy(&dst->internalstate, &src->internalstate, make_automatic);
+   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
    dst->v = src->v;
    dst->terminationtype = src->terminationtype;
    dst->nfev = src->nfev;
@@ -2327,31 +2327,31 @@ DefClass(autogkreport, DecVal(terminationtype) DecVal(nfev) DecVal(nintervals))
 DefClass(autogkstate, DecVal(needf) DecVal(x) DecVal(xminusa) DecVal(bminusx) DecVal(f))
 
 void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::autogksmoothw(a, b, xwidth, ConstT(autogkstate, state), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::autogksmoothw(a, b, xwidth, ConstT(autogkstate, state));
+   alglib_impl::ae_state_clear();
 }
 
 void autogksmooth(const double a, const double b, autogkstate &state) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::autogksmooth(a, b, ConstT(autogkstate, state), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::autogksmooth(a, b, ConstT(autogkstate, state));
+   alglib_impl::ae_state_clear();
 }
 
 void autogksingular(const double a, const double b, const double alpha, const double beta, autogkstate &state) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::autogksingular(a, b, alpha, beta, ConstT(autogkstate, state), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::autogksingular(a, b, alpha, beta, ConstT(autogkstate, state));
+   alglib_impl::ae_state_clear();
 }
 
 bool autogkiteration(const autogkstate &state) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(false)
-   bool Ok = alglib_impl::autogkiteration(ConstT(autogkstate, state), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   bool Ok = alglib_impl::autogkiteration(ConstT(autogkstate, state));
+   alglib_impl::ae_state_clear();
    return Ok;
 }
 
@@ -2362,21 +2362,21 @@ bool autogkiteration(const autogkstate &state) {
 //     ptr     -   optional pointer which is passed to func; can be NULL
 // ALGLIB: Copyright 07.05.2009 by Sergey Bochkanov
 void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'autogkintegrate()' (func is NULL)", &_alglib_env_state);
-   while (alglib_impl::autogkiteration(state.c_ptr(), &_alglib_env_state))
+   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'autogkintegrate()' (func is NULL)");
+   while (alglib_impl::autogkiteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.xminusa, state.bminusx, state.f, ptr);
-      else alglib_impl::ae_assert(false, "ALGLIB: unexpected error in 'autogkintegrate()'", &_alglib_env_state);
-   EndPoll(_alglib_env_state)
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+      else alglib_impl::ae_assert(false, "ALGLIB: unexpected error in 'autogkintegrate()'");
+   EndPoll
+   alglib_impl::ae_state_clear();
 }
 
 void autogkresults(const autogkstate &state, double &v, autogkreport &rep) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::autogkresults(ConstT(autogkstate, state), &v, ConstT(autogkreport, rep), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::autogkresults(ConstT(autogkstate, state), &v, ConstT(autogkreport, rep));
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib

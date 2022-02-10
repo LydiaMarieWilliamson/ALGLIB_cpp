@@ -36,7 +36,7 @@ namespace alglib_impl {
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 // API: void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, double &variance, double &skewness, double &kurtosis);
 // API: void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis);
-void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, double *skewness, double *kurtosis, ae_state *_state) {
+void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, double *skewness, double *kurtosis) {
    ae_int_t i;
    double v;
    double v1;
@@ -46,9 +46,9 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
    *variance = 0;
    *skewness = 0;
    *kurtosis = 0;
-   ae_assert(n >= 0, "SampleMoments: N<0", _state);
-   ae_assert(x->cnt >= n, "SampleMoments: Length(X)<N!", _state);
-   ae_assert(isfinitevector(x, n, _state), "SampleMoments: X is not finite vector", _state);
+   ae_assert(n >= 0, "SampleMoments: N<0");
+   ae_assert(x->cnt >= n, "SampleMoments: Length(X)<N!");
+   ae_assert(isfinitevector(x, n), "SampleMoments: X is not finite vector");
 // Init, special case 'N=0'
    *mean = 0.0;
    *variance = 0.0;
@@ -67,13 +67,13 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 += sqr(x->xR[i] - (*mean), _state);
+         v1 += sqr(x->xR[i] - (*mean));
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
          v2 += (x->xR[i] - (*mean));
       }
-      v2 = sqr(v2, _state) / n;
+      v2 = sqr(v2) / n;
       *variance = (v1 - v2) / (n - 1);
       if (*variance < 0.0) {
          *variance = 0.0;
@@ -84,9 +84,9 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
    if (stddev != 0.0) {
       for (i = 0; i < n; i++) {
          v = (x->xR[i] - (*mean)) / stddev;
-         v2 = sqr(v, _state);
+         v2 = sqr(v);
          *skewness += v2 * v;
-         *kurtosis += sqr(v2, _state);
+         *kurtosis += sqr(v2);
       }
       *skewness /= n;
       *kurtosis = *kurtosis / n - 3;
@@ -108,13 +108,13 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 // API: double samplemean(const real_1d_array &x, const ae_int_t n);
 // API: double samplemean(const real_1d_array &x);
-double samplemean(RVector *x, ae_int_t n, ae_state *_state) {
+double samplemean(RVector *x, ae_int_t n) {
    double mean;
    double tmp0;
    double tmp1;
    double tmp2;
    double result;
-   samplemoments(x, n, &mean, &tmp0, &tmp1, &tmp2, _state);
+   samplemoments(x, n, &mean, &tmp0, &tmp1, &tmp2);
    result = mean;
    return result;
 }
@@ -134,13 +134,13 @@ double samplemean(RVector *x, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 // API: double samplevariance(const real_1d_array &x, const ae_int_t n);
 // API: double samplevariance(const real_1d_array &x);
-double samplevariance(RVector *x, ae_int_t n, ae_state *_state) {
+double samplevariance(RVector *x, ae_int_t n) {
    double variance;
    double tmp0;
    double tmp1;
    double tmp2;
    double result;
-   samplemoments(x, n, &tmp0, &variance, &tmp1, &tmp2, _state);
+   samplemoments(x, n, &tmp0, &variance, &tmp1, &tmp2);
    result = variance;
    return result;
 }
@@ -160,13 +160,13 @@ double samplevariance(RVector *x, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 // API: double sampleskewness(const real_1d_array &x, const ae_int_t n);
 // API: double sampleskewness(const real_1d_array &x);
-double sampleskewness(RVector *x, ae_int_t n, ae_state *_state) {
+double sampleskewness(RVector *x, ae_int_t n) {
    double skewness;
    double tmp0;
    double tmp1;
    double tmp2;
    double result;
-   samplemoments(x, n, &tmp0, &tmp1, &skewness, &tmp2, _state);
+   samplemoments(x, n, &tmp0, &tmp1, &skewness, &tmp2);
    result = skewness;
    return result;
 }
@@ -186,13 +186,13 @@ double sampleskewness(RVector *x, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 // API: double samplekurtosis(const real_1d_array &x, const ae_int_t n);
 // API: double samplekurtosis(const real_1d_array &x);
-double samplekurtosis(RVector *x, ae_int_t n, ae_state *_state) {
+double samplekurtosis(RVector *x, ae_int_t n) {
    double kurtosis;
    double tmp0;
    double tmp1;
    double tmp2;
    double result;
-   samplemoments(x, n, &tmp0, &tmp1, &tmp2, &kurtosis, _state);
+   samplemoments(x, n, &tmp0, &tmp1, &tmp2, &kurtosis);
    result = kurtosis;
    return result;
 }
@@ -210,13 +210,13 @@ double samplekurtosis(RVector *x, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 // API: void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev);
 // API: void sampleadev(const real_1d_array &x, double &adev);
-void sampleadev(RVector *x, ae_int_t n, double *adev, ae_state *_state) {
+void sampleadev(RVector *x, ae_int_t n, double *adev) {
    ae_int_t i;
    double mean;
    *adev = 0;
-   ae_assert(n >= 0, "SampleADev: N<0", _state);
-   ae_assert(x->cnt >= n, "SampleADev: Length(X)<N!", _state);
-   ae_assert(isfinitevector(x, n, _state), "SampleADev: X is not finite vector", _state);
+   ae_assert(n >= 0, "SampleADev: N<0");
+   ae_assert(x->cnt >= n, "SampleADev: Length(X)<N!");
+   ae_assert(isfinitevector(x, n), "SampleADev: X is not finite vector");
 // Init, handle N=0
    mean = 0.0;
    *adev = 0.0;
@@ -248,7 +248,7 @@ void sampleadev(RVector *x, ae_int_t n, double *adev, ae_state *_state) {
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 // API: void samplemedian(const real_1d_array &x, const ae_int_t n, double &median);
 // API: void samplemedian(const real_1d_array &x, double &median);
-void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
+void samplemedian(RVector *x, ae_int_t n, double *median) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t ir;
@@ -258,26 +258,26 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
    ae_int_t k;
    double a;
    double tval;
-   ae_frame_make(_state, &_frame_block);
-   DupVector(x, _state);
+   ae_frame_make(&_frame_block);
+   DupVector(x);
    *median = 0;
-   ae_assert(n >= 0, "SampleMedian: N<0", _state);
-   ae_assert(x->cnt >= n, "SampleMedian: Length(X)<N!", _state);
-   ae_assert(isfinitevector(x, n, _state), "SampleMedian: X is not finite vector", _state);
+   ae_assert(n >= 0, "SampleMedian: N<0");
+   ae_assert(x->cnt >= n, "SampleMedian: Length(X)<N!");
+   ae_assert(isfinitevector(x, n), "SampleMedian: X is not finite vector");
 // Some degenerate cases
    *median = 0.0;
    if (n <= 0) {
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    if (n == 1) {
       *median = x->xR[0];
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    if (n == 2) {
       *median = 0.5 * (x->xR[0] + x->xR[1]);
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
 // Common case, N >= 3.
@@ -344,7 +344,7 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
 // If N is odd, return result
    if (n % 2 == 1) {
       *median = x->xR[k];
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    a = x->xR[n - 1];
@@ -354,7 +354,7 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
       }
    }
    *median = 0.5 * (x->xR[k] + a);
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Percentile calculation.
@@ -371,35 +371,35 @@ void samplemedian(RVector *x, ae_int_t n, double *median, ae_state *_state) {
 // ALGLIB: Copyright 01.03.2008 by Sergey Bochkanov
 // API: void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v);
 // API: void samplepercentile(const real_1d_array &x, const double p, double &v);
-void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_state) {
+void samplepercentile(RVector *x, ae_int_t n, double p, double *v) {
    ae_frame _frame_block;
    ae_int_t i1;
    double t;
-   ae_frame_make(_state, &_frame_block);
-   DupVector(x, _state);
+   ae_frame_make(&_frame_block);
+   DupVector(x);
    *v = 0;
-   NewVector(rbuf, 0, DT_REAL, _state);
-   ae_assert(n >= 0, "SamplePercentile: N<0", _state);
-   ae_assert(x->cnt >= n, "SamplePercentile: Length(X)<N!", _state);
-   ae_assert(isfinitevector(x, n, _state), "SamplePercentile: X is not finite vector", _state);
-   ae_assert(isfinite(p), "SamplePercentile: incorrect P!", _state);
-   ae_assert(p >= 0.0 && p <= 1.0, "SamplePercentile: incorrect P!", _state);
-   tagsortfast(x, &rbuf, n, _state);
+   NewVector(rbuf, 0, DT_REAL);
+   ae_assert(n >= 0, "SamplePercentile: N<0");
+   ae_assert(x->cnt >= n, "SamplePercentile: Length(X)<N!");
+   ae_assert(isfinitevector(x, n), "SamplePercentile: X is not finite vector");
+   ae_assert(isfinite(p), "SamplePercentile: incorrect P!");
+   ae_assert(p >= 0.0 && p <= 1.0, "SamplePercentile: incorrect P!");
+   tagsortfast(x, &rbuf, n);
    if (p == 0.0) {
       *v = x->xR[0];
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    if (p == 1.0) {
       *v = x->xR[n - 1];
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    t = p * (n - 1);
-   i1 = ifloor(t, _state);
-   t -= ifloor(t, _state);
+   i1 = ifloor(t);
+   t -= ifloor(t);
    *v = x->xR[i1] * (1 - t) + x->xR[i1 + 1] * t;
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Basecase code for RankData(), performs actual work on subset of data using
@@ -424,15 +424,15 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v, ae_state *_st
 //     XY      -   data in [I0,I1) are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
-static void basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1, ae_state *_state) {
+static void basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1) {
    ae_int_t i;
-   ae_assert(i1 >= i0, "RankDataBasecase: internal error", _state);
+   ae_assert(i1 >= i0, "RankDataBasecase: internal error");
    if (buf1->ra0.cnt < nfeatures) {
-      ae_vector_set_length(&buf1->ra0, nfeatures, _state);
+      ae_vector_set_length(&buf1->ra0, nfeatures);
    }
    for (i = i0; i < i1; i++) {
       ae_v_move(buf1->ra0.xR, 1, xy->xyR[i], 1, nfeatures);
-      rankx(&buf1->ra0, nfeatures, iscentered, buf0, _state);
+      rankx(&buf1->ra0, nfeatures, iscentered, buf0);
       ae_v_move(xy->xyR[i], 1, buf1->ra0.xR, 1, nfeatures);
    }
 }
@@ -458,32 +458,32 @@ static void basestat_rankdatabasecase(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_
 //     XY      -   data in [I0,I1) are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
-static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost, ae_state *_state) {
+static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost) {
    ae_frame _frame_block;
    double problemcost;
    ae_int_t im;
-   ae_frame_make(_state, &_frame_block);
-   RefObj(apbuffers, buf0, _state);
-   RefObj(apbuffers, buf1, _state);
-   ae_assert(i1 >= i0, "RankDataRec: internal error", _state);
+   ae_frame_make(&_frame_block);
+   RefObj(apbuffers, buf0);
+   RefObj(apbuffers, buf1);
+   ae_assert(i1 >= i0, "RankDataRec: internal error");
 // Try to activate parallelism
-// Parallelism was tried if: i1 - i0 >= 4 && (double)(i1 - i0) * nfeatures * logbase2((double)nfeatures, _state) >= smpactivationlevel(_state)
+// Parallelism was tried if: i1 - i0 >= 4 && (double)(i1 - i0) * nfeatures * logbase2((double)nfeatures) >= smpactivationlevel()
 // Recursively split problem, if it is too large
-   problemcost = (double)(i1 - i0) * nfeatures * logbase2((double)nfeatures, _state);
-   if (i1 - i0 >= 2 && problemcost > spawnlevel(_state)) {
+   problemcost = (double)(i1 - i0) * nfeatures * logbase2((double)nfeatures);
+   if (i1 - i0 >= 2 && problemcost > spawnlevel()) {
       im = (i1 + i0) / 2;
-      basestat_rankdatarec(xy, i0, im, nfeatures, iscentered, pool, basecasecost, _state);
-      basestat_rankdatarec(xy, im, i1, nfeatures, iscentered, pool, basecasecost, _state);
-      ae_frame_leave(_state);
+      basestat_rankdatarec(xy, i0, im, nfeatures, iscentered, pool, basecasecost);
+      basestat_rankdatarec(xy, im, i1, nfeatures, iscentered, pool, basecasecost);
+      ae_frame_leave();
       return;
    }
 // Retrieve buffers from pool, call serial code, return buffers to pool
-   ae_shared_pool_retrieve(pool, &_buf0, _state);
-   ae_shared_pool_retrieve(pool, &_buf1, _state);
-   basestat_rankdatabasecase(xy, i0, i1, nfeatures, iscentered, buf0, buf1, _state);
-   ae_shared_pool_recycle(pool, &_buf0, _state);
-   ae_shared_pool_recycle(pool, &_buf1, _state);
-   ae_frame_leave(_state);
+   ae_shared_pool_retrieve(pool, &_buf0);
+   ae_shared_pool_retrieve(pool, &_buf1);
+   basestat_rankdatabasecase(xy, i0, i1, nfeatures, iscentered, buf0, buf1);
+   ae_shared_pool_recycle(pool, &_buf0);
+   ae_shared_pool_recycle(pool, &_buf1);
+   ae_frame_leave();
 }
 
 // This function replaces data in XY by their ranks:
@@ -504,18 +504,18 @@ static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 // API: void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
 // API: void rankdata(real_2d_array &xy);
-void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state) {
+void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    ae_frame _frame_block;
    ae_int_t basecasecost;
-   ae_frame_make(_state, &_frame_block);
-   NewObj(apbuffers, buf0, _state);
-   NewObj(apbuffers, buf1, _state);
-   NewObj(ae_shared_pool, pool, _state);
-   ae_assert(npoints >= 0, "RankData: NPoints<0", _state);
-   ae_assert(nfeatures >= 1, "RankData: NFeatures<1", _state);
-   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints", _state);
-   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures", _state);
-   ae_assert(apservisfinitematrix(xy, npoints, nfeatures, _state), "RankData: XY contains infinite/NAN elements", _state);
+   ae_frame_make(&_frame_block);
+   NewObj(apbuffers, buf0);
+   NewObj(apbuffers, buf1);
+   NewObj(ae_shared_pool, pool);
+   ae_assert(npoints >= 0, "RankData: NPoints<0");
+   ae_assert(nfeatures >= 1, "RankData: NFeatures<1");
+   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints");
+   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures");
+   ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "RankData: XY contains infinite/NAN elements");
 // Basecase cost is a maximum cost of basecase problems.
 // Problems harded than that cost will be split.
 //
@@ -525,15 +525,15 @@ void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_stat
 //
 // Try to use serial code for basecase problems, no SMP functionality, no shared pools.
    basecasecost = 10000;
-   if ((double)npoints * nfeatures * logbase2((double)nfeatures, _state) < (double)basecasecost) {
-      basestat_rankdatabasecase(xy, 0, npoints, nfeatures, false, &buf0, &buf1, _state);
-      ae_frame_leave(_state);
+   if ((double)npoints * nfeatures * logbase2((double)nfeatures) < (double)basecasecost) {
+      basestat_rankdatabasecase(xy, 0, npoints, nfeatures, false, &buf0, &buf1);
+      ae_frame_leave();
       return;
    }
 // Parallel code
-   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free, _state);
-   basestat_rankdatarec(xy, 0, npoints, nfeatures, false, &pool, basecasecost, _state);
-   ae_frame_leave(_state);
+   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free);
+   basestat_rankdatarec(xy, 0, npoints, nfeatures, false, &pool, basecasecost);
+   ae_frame_leave();
 }
 
 // This function replaces data in XY by their CENTERED ranks:
@@ -556,18 +556,18 @@ void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_stat
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 // API: void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
 // API: void rankdatacentered(real_2d_array &xy);
-void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state) {
+void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    ae_frame _frame_block;
    ae_int_t basecasecost;
-   ae_frame_make(_state, &_frame_block);
-   NewObj(apbuffers, buf0, _state);
-   NewObj(apbuffers, buf1, _state);
-   NewObj(ae_shared_pool, pool, _state);
-   ae_assert(npoints >= 0, "RankData: NPoints<0", _state);
-   ae_assert(nfeatures >= 1, "RankData: NFeatures<1", _state);
-   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints", _state);
-   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures", _state);
-   ae_assert(apservisfinitematrix(xy, npoints, nfeatures, _state), "RankData: XY contains infinite/NAN elements", _state);
+   ae_frame_make(&_frame_block);
+   NewObj(apbuffers, buf0);
+   NewObj(apbuffers, buf1);
+   NewObj(ae_shared_pool, pool);
+   ae_assert(npoints >= 0, "RankData: NPoints<0");
+   ae_assert(nfeatures >= 1, "RankData: NFeatures<1");
+   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints");
+   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures");
+   ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "RankData: XY contains infinite/NAN elements");
 // Basecase cost is a maximum cost of basecase problems.
 // Problems harded than that cost will be split.
 //
@@ -577,15 +577,15 @@ void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_stat
 //
 // Try to use serial code, no SMP functionality, no shared pools.
    basecasecost = 10000;
-   if ((double)npoints * nfeatures * logbase2((double)nfeatures, _state) < (double)basecasecost) {
-      basestat_rankdatabasecase(xy, 0, npoints, nfeatures, true, &buf0, &buf1, _state);
-      ae_frame_leave(_state);
+   if ((double)npoints * nfeatures * logbase2((double)nfeatures) < (double)basecasecost) {
+      basestat_rankdatabasecase(xy, 0, npoints, nfeatures, true, &buf0, &buf1);
+      ae_frame_leave();
       return;
    }
 // Parallel code
-   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free, _state);
-   basestat_rankdatarec(xy, 0, npoints, nfeatures, true, &pool, basecasecost, _state);
-   ae_frame_leave(_state);
+   ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), apbuffers_init, apbuffers_copy, apbuffers_free);
+   basestat_rankdatarec(xy, 0, npoints, nfeatures, true, &pool, basecasecost);
+   ae_frame_leave();
 }
 
 // 2-sample covariance
@@ -602,7 +602,7 @@ void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_stat
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 // API: double cov2(const real_1d_array &x, const real_1d_array &y);
-double cov2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
+double cov2(RVector *x, RVector *y, ae_int_t n) {
    ae_int_t i;
    double xmean;
    double ymean;
@@ -613,11 +613,11 @@ double cov2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    bool samex;
    bool samey;
    double result;
-   ae_assert(n >= 0, "Cov2: N<0", _state);
-   ae_assert(x->cnt >= n, "Cov2: Length(X)<N!", _state);
-   ae_assert(y->cnt >= n, "Cov2: Length(Y)<N!", _state);
-   ae_assert(isfinitevector(x, n, _state), "Cov2: X is not finite vector", _state);
-   ae_assert(isfinitevector(y, n, _state), "Cov2: Y is not finite vector", _state);
+   ae_assert(n >= 0, "Cov2: N<0");
+   ae_assert(x->cnt >= n, "Cov2: Length(X)<N!");
+   ae_assert(y->cnt >= n, "Cov2: Length(Y)<N!");
+   ae_assert(isfinitevector(x, n), "Cov2: X is not finite vector");
+   ae_assert(isfinitevector(y, n), "Cov2: Y is not finite vector");
 // Special case
    if (n <= 1) {
       result = 0.0;
@@ -676,7 +676,7 @@ double cov2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 // API: double pearsoncorr2(const real_1d_array &x, const real_1d_array &y);
-double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
+double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
    ae_int_t i;
    double xmean;
    double ymean;
@@ -691,11 +691,11 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    double t1;
    double t2;
    double result;
-   ae_assert(n >= 0, "PearsonCorr2: N<0", _state);
-   ae_assert(x->cnt >= n, "PearsonCorr2: Length(X)<N!", _state);
-   ae_assert(y->cnt >= n, "PearsonCorr2: Length(Y)<N!", _state);
-   ae_assert(isfinitevector(x, n, _state), "PearsonCorr2: X is not finite vector", _state);
-   ae_assert(isfinitevector(y, n, _state), "PearsonCorr2: Y is not finite vector", _state);
+   ae_assert(n >= 0, "PearsonCorr2: N<0");
+   ae_assert(x->cnt >= n, "PearsonCorr2: Length(X)<N!");
+   ae_assert(y->cnt >= n, "PearsonCorr2: Length(Y)<N!");
+   ae_assert(isfinitevector(x, n), "PearsonCorr2: X is not finite vector");
+   ae_assert(isfinitevector(y, n), "PearsonCorr2: Y is not finite vector");
 // Special case
    if (n <= 1) {
       result = 0.0;
@@ -737,8 +737,8 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    for (i = 0; i < n; i++) {
       t1 = x->xR[i] - xmean;
       t2 = y->xR[i] - ymean;
-      xv += sqr(t1, _state);
-      yv += sqr(t2, _state);
+      xv += sqr(t1);
+      yv += sqr(t2);
       s += t1 * t2;
    }
    if (xv == 0.0 || yv == 0.0) {
@@ -764,46 +764,46 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 // API: double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 // API: double spearmancorr2(const real_1d_array &x, const real_1d_array &y);
-double spearmancorr2(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
+double spearmancorr2(RVector *x, RVector *y, ae_int_t n) {
    ae_frame _frame_block;
    double result;
-   ae_frame_make(_state, &_frame_block);
-   DupVector(x, _state);
-   DupVector(y, _state);
-   NewObj(apbuffers, buf, _state);
-   ae_assert(n >= 0, "SpearmanCorr2: N<0", _state);
-   ae_assert(x->cnt >= n, "SpearmanCorr2: Length(X)<N!", _state);
-   ae_assert(y->cnt >= n, "SpearmanCorr2: Length(Y)<N!", _state);
-   ae_assert(isfinitevector(x, n, _state), "SpearmanCorr2: X is not finite vector", _state);
-   ae_assert(isfinitevector(y, n, _state), "SpearmanCorr2: Y is not finite vector", _state);
+   ae_frame_make(&_frame_block);
+   DupVector(x);
+   DupVector(y);
+   NewObj(apbuffers, buf);
+   ae_assert(n >= 0, "SpearmanCorr2: N<0");
+   ae_assert(x->cnt >= n, "SpearmanCorr2: Length(X)<N!");
+   ae_assert(y->cnt >= n, "SpearmanCorr2: Length(Y)<N!");
+   ae_assert(isfinitevector(x, n), "SpearmanCorr2: X is not finite vector");
+   ae_assert(isfinitevector(y, n), "SpearmanCorr2: Y is not finite vector");
 // Special case
    if (n <= 1) {
       result = 0.0;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return result;
    }
-   rankx(x, n, false, &buf, _state);
-   rankx(y, n, false, &buf, _state);
-   result = pearsoncorr2(x, y, n, _state);
-   ae_frame_leave(_state);
+   rankx(x, n, false, &buf);
+   rankx(y, n, false, &buf);
+   result = pearsoncorr2(x, y, n);
+   ae_frame_leave();
    return result;
 }
 
 // Obsolete function, we recommend to use PearsonCorr2().
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 // API: double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
-double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
+double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n) {
    double result;
-   result = pearsoncorr2(x, y, n, _state);
+   result = pearsoncorr2(x, y, n);
    return result;
 }
 
 // Obsolete function, we recommend to use SpearmanCorr2().
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 // API: double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
-double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
+double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n) {
    double result;
-   result = spearmancorr2(x, y, n, _state);
+   result = spearmancorr2(x, y, n);
    return result;
 }
 
@@ -825,39 +825,39 @@ double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_st
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
 // API: void covm(const real_2d_array &x, real_2d_array &c);
-void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
+void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_frame_make(_state, &_frame_block);
-   DupMatrix(x, _state);
+   ae_frame_make(&_frame_block);
+   DupMatrix(x);
    SetMatrix(c);
-   NewVector(t, 0, DT_REAL, _state);
-   NewVector(x0, 0, DT_REAL, _state);
-   NewVector(same, 0, DT_BOOL, _state);
-   ae_assert(n >= 0, "CovM: N<0", _state);
-   ae_assert(m >= 1, "CovM: M<1", _state);
-   ae_assert(x->rows >= n, "CovM: Rows(X)<N!", _state);
-   ae_assert(x->cols >= m || n == 0, "CovM: Cols(X)<M!", _state);
-   ae_assert(apservisfinitematrix(x, n, m, _state), "CovM: X contains infinite/NAN elements", _state);
+   NewVector(t, 0, DT_REAL);
+   NewVector(x0, 0, DT_REAL);
+   NewVector(same, 0, DT_BOOL);
+   ae_assert(n >= 0, "CovM: N<0");
+   ae_assert(m >= 1, "CovM: M<1");
+   ae_assert(x->rows >= n, "CovM: Rows(X)<N!");
+   ae_assert(x->cols >= m || n == 0, "CovM: Cols(X)<M!");
+   ae_assert(apservisfinitematrix(x, n, m), "CovM: X contains infinite/NAN elements");
 // N <= 1, return zero
    if (n <= 1) {
-      ae_matrix_set_length(c, m, m, _state);
+      ae_matrix_set_length(c, m, m);
       for (i = 0; i < m; i++) {
          for (j = 0; j < m; j++) {
             c->xyR[i][j] = 0.0;
          }
       }
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
 // Calculate means,
 // check for constant columns
-   ae_vector_set_length(&t, m, _state);
-   ae_vector_set_length(&x0, m, _state);
-   ae_vector_set_length(&same, m, _state);
-   ae_matrix_set_length(c, m, m, _state);
+   ae_vector_set_length(&t, m);
+   ae_vector_set_length(&x0, m);
+   ae_vector_set_length(&same, m);
+   ae_matrix_set_length(c, m, m);
    for (i = 0; i < m; i++) {
       t.xR[i] = 0.0;
       same.xB[i] = true;
@@ -883,9 +883,9 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
          }
       }
    }
-   rmatrixsyrk(m, n, 1.0 / (n - 1), x, 0, 0, 1, 0.0, c, 0, 0, true, _state);
-   rmatrixenforcesymmetricity(c, m, true, _state);
-   ae_frame_leave(_state);
+   rmatrixsyrk(m, n, 1.0 / (n - 1), x, 0, 0, 1, 0.0, c, 0, 0, true);
+   rmatrixenforcesymmetricity(c, m, true);
+   ae_frame_leave();
 }
 
 // Pearson product-moment correlation matrix
@@ -906,21 +906,21 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
 // API: void pearsoncorrm(const real_2d_array &x, real_2d_array &c);
-void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
+void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    SetMatrix(c);
-   NewVector(t, 0, DT_REAL, _state);
-   ae_assert(n >= 0, "PearsonCorrM: N<0", _state);
-   ae_assert(m >= 1, "PearsonCorrM: M<1", _state);
-   ae_assert(x->rows >= n, "PearsonCorrM: Rows(X)<N!", _state);
-   ae_assert(x->cols >= m || n == 0, "PearsonCorrM: Cols(X)<M!", _state);
-   ae_assert(apservisfinitematrix(x, n, m, _state), "PearsonCorrM: X contains infinite/NAN elements", _state);
-   ae_vector_set_length(&t, m, _state);
-   covm(x, n, m, c, _state);
+   NewVector(t, 0, DT_REAL);
+   ae_assert(n >= 0, "PearsonCorrM: N<0");
+   ae_assert(m >= 1, "PearsonCorrM: M<1");
+   ae_assert(x->rows >= n, "PearsonCorrM: Rows(X)<N!");
+   ae_assert(x->cols >= m || n == 0, "PearsonCorrM: Cols(X)<M!");
+   ae_assert(apservisfinitematrix(x, n, m), "PearsonCorrM: X contains infinite/NAN elements");
+   ae_vector_set_length(&t, m);
+   covm(x, n, m, c);
    for (i = 0; i < m; i++) {
       if (c->xyR[i][i] > 0.0) {
          t.xR[i] = 1 / sqrt(c->xyR[i][i]);
@@ -934,7 +934,7 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_sta
          c->xyR[i][j] *= v * t.xR[j];
       }
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Spearman's rank correlation matrix
@@ -955,7 +955,7 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_sta
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
 // API: void spearmancorrm(const real_2d_array &x, real_2d_array &c);
-void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_state) {
+void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -963,34 +963,34 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
    double vv;
    double x0;
    bool b;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    SetMatrix(c);
-   NewObj(apbuffers, buf, _state);
-   NewMatrix(xc, 0, 0, DT_REAL, _state);
-   NewVector(t, 0, DT_REAL, _state);
-   ae_assert(n >= 0, "SpearmanCorrM: N<0", _state);
-   ae_assert(m >= 1, "SpearmanCorrM: M<1", _state);
-   ae_assert(x->rows >= n, "SpearmanCorrM: Rows(X)<N!", _state);
-   ae_assert(x->cols >= m || n == 0, "SpearmanCorrM: Cols(X)<M!", _state);
-   ae_assert(apservisfinitematrix(x, n, m, _state), "SpearmanCorrM: X contains infinite/NAN elements", _state);
+   NewObj(apbuffers, buf);
+   NewMatrix(xc, 0, 0, DT_REAL);
+   NewVector(t, 0, DT_REAL);
+   ae_assert(n >= 0, "SpearmanCorrM: N<0");
+   ae_assert(m >= 1, "SpearmanCorrM: M<1");
+   ae_assert(x->rows >= n, "SpearmanCorrM: Rows(X)<N!");
+   ae_assert(x->cols >= m || n == 0, "SpearmanCorrM: Cols(X)<M!");
+   ae_assert(apservisfinitematrix(x, n, m), "SpearmanCorrM: X contains infinite/NAN elements");
 // N <= 1, return zero
    if (n <= 1) {
-      ae_matrix_set_length(c, m, m, _state);
+      ae_matrix_set_length(c, m, m);
       for (i = 0; i < m; i++) {
          for (j = 0; j < m; j++) {
             c->xyR[i][j] = 0.0;
          }
       }
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
 // Allocate
-   ae_vector_set_length(&t, imax2(n, m, _state), _state);
-   ae_matrix_set_length(c, m, m, _state);
+   ae_vector_set_length(&t, imax2(n, m));
+   ae_matrix_set_length(c, m, m);
 // Replace data with ranks
-   ae_matrix_set_length(&xc, m, n, _state);
-   rmatrixtranspose(n, m, x, 0, 0, &xc, 0, 0, _state);
-   rankdata(&xc, m, n, _state);
+   ae_matrix_set_length(&xc, m, n);
+   rmatrixtranspose(n, m, x, 0, 0, &xc, 0, 0);
+   rankdata(&xc, m, n);
 // 1. Calculate means, check for constant columns
 // 2. Center variables, constant  columns are
 //   artificialy zeroed (they must be zero in exact arithmetics,
@@ -1022,7 +1022,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
       }
    }
 // Calculate upper half of symmetric covariance matrix
-   rmatrixsyrk(m, n, 1.0 / (n - 1), &xc, 0, 0, 0, 0.0, c, 0, 0, true, _state);
+   rmatrixsyrk(m, n, 1.0 / (n - 1), &xc, 0, 0, 0, 0.0, c, 0, 0, true);
 // Calculate Pearson coefficients (upper triangle)
    for (i = 0; i < m; i++) {
       if (c->xyR[i][i] > 0.0) {
@@ -1038,8 +1038,8 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
       }
    }
 // force symmetricity
-   rmatrixenforcesymmetricity(c, m, true, _state);
-   ae_frame_leave(_state);
+   rmatrixenforcesymmetricity(c, m, true);
+   ae_frame_leave();
 }
 
 // Cross-covariance matrix
@@ -1066,47 +1066,47 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c, ae_state *_st
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
 // API: void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
-void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state) {
+void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_frame_make(_state, &_frame_block);
-   DupMatrix(x, _state);
-   DupMatrix(y, _state);
+   ae_frame_make(&_frame_block);
+   DupMatrix(x);
+   DupMatrix(y);
    SetMatrix(c);
-   NewVector(t, 0, DT_REAL, _state);
-   NewVector(x0, 0, DT_REAL, _state);
-   NewVector(y0, 0, DT_REAL, _state);
-   NewVector(samex, 0, DT_BOOL, _state);
-   NewVector(samey, 0, DT_BOOL, _state);
-   ae_assert(n >= 0, "CovM2: N<0", _state);
-   ae_assert(m1 >= 1, "CovM2: M1<1", _state);
-   ae_assert(m2 >= 1, "CovM2: M2<1", _state);
-   ae_assert(x->rows >= n, "CovM2: Rows(X)<N!", _state);
-   ae_assert(x->cols >= m1 || n == 0, "CovM2: Cols(X)<M1!", _state);
-   ae_assert(apservisfinitematrix(x, n, m1, _state), "CovM2: X contains infinite/NAN elements", _state);
-   ae_assert(y->rows >= n, "CovM2: Rows(Y)<N!", _state);
-   ae_assert(y->cols >= m2 || n == 0, "CovM2: Cols(Y)<M2!", _state);
-   ae_assert(apservisfinitematrix(y, n, m2, _state), "CovM2: X contains infinite/NAN elements", _state);
+   NewVector(t, 0, DT_REAL);
+   NewVector(x0, 0, DT_REAL);
+   NewVector(y0, 0, DT_REAL);
+   NewVector(samex, 0, DT_BOOL);
+   NewVector(samey, 0, DT_BOOL);
+   ae_assert(n >= 0, "CovM2: N<0");
+   ae_assert(m1 >= 1, "CovM2: M1<1");
+   ae_assert(m2 >= 1, "CovM2: M2<1");
+   ae_assert(x->rows >= n, "CovM2: Rows(X)<N!");
+   ae_assert(x->cols >= m1 || n == 0, "CovM2: Cols(X)<M1!");
+   ae_assert(apservisfinitematrix(x, n, m1), "CovM2: X contains infinite/NAN elements");
+   ae_assert(y->rows >= n, "CovM2: Rows(Y)<N!");
+   ae_assert(y->cols >= m2 || n == 0, "CovM2: Cols(Y)<M2!");
+   ae_assert(apservisfinitematrix(y, n, m2), "CovM2: X contains infinite/NAN elements");
 // N <= 1, return zero
    if (n <= 1) {
-      ae_matrix_set_length(c, m1, m2, _state);
+      ae_matrix_set_length(c, m1, m2);
       for (i = 0; i < m1; i++) {
          for (j = 0; j < m2; j++) {
             c->xyR[i][j] = 0.0;
          }
       }
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
 // Allocate
-   ae_vector_set_length(&t, imax2(m1, m2, _state), _state);
-   ae_vector_set_length(&x0, m1, _state);
-   ae_vector_set_length(&y0, m2, _state);
-   ae_vector_set_length(&samex, m1, _state);
-   ae_vector_set_length(&samey, m2, _state);
-   ae_matrix_set_length(c, m1, m2, _state);
+   ae_vector_set_length(&t, imax2(m1, m2));
+   ae_vector_set_length(&x0, m1);
+   ae_vector_set_length(&y0, m2);
+   ae_vector_set_length(&samex, m1);
+   ae_vector_set_length(&samey, m2);
+   ae_matrix_set_length(c, m1, m2);
 // * calculate means of X
 // * center X
 // * if we have constant columns, these columns are
@@ -1154,8 +1154,8 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
       }
    }
 // calculate cross-covariance matrix
-   rmatrixgemm(m1, m2, n, 1.0 / (n - 1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0, _state);
-   ae_frame_leave(_state);
+   rmatrixgemm(m1, m2, n, 1.0 / (n - 1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0);
+   ae_frame_leave();
 }
 
 // Pearson product-moment cross-correlation matrix
@@ -1182,51 +1182,51 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
 // API: void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
-void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state) {
+void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_frame_make(_state, &_frame_block);
-   DupMatrix(x, _state);
-   DupMatrix(y, _state);
+   ae_frame_make(&_frame_block);
+   DupMatrix(x);
+   DupMatrix(y);
    SetMatrix(c);
-   NewVector(t, 0, DT_REAL, _state);
-   NewVector(x0, 0, DT_REAL, _state);
-   NewVector(y0, 0, DT_REAL, _state);
-   NewVector(sx, 0, DT_REAL, _state);
-   NewVector(sy, 0, DT_REAL, _state);
-   NewVector(samex, 0, DT_BOOL, _state);
-   NewVector(samey, 0, DT_BOOL, _state);
-   ae_assert(n >= 0, "PearsonCorrM2: N<0", _state);
-   ae_assert(m1 >= 1, "PearsonCorrM2: M1<1", _state);
-   ae_assert(m2 >= 1, "PearsonCorrM2: M2<1", _state);
-   ae_assert(x->rows >= n, "PearsonCorrM2: Rows(X)<N!", _state);
-   ae_assert(x->cols >= m1 || n == 0, "PearsonCorrM2: Cols(X)<M1!", _state);
-   ae_assert(apservisfinitematrix(x, n, m1, _state), "PearsonCorrM2: X contains infinite/NAN elements", _state);
-   ae_assert(y->rows >= n, "PearsonCorrM2: Rows(Y)<N!", _state);
-   ae_assert(y->cols >= m2 || n == 0, "PearsonCorrM2: Cols(Y)<M2!", _state);
-   ae_assert(apservisfinitematrix(y, n, m2, _state), "PearsonCorrM2: X contains infinite/NAN elements", _state);
+   NewVector(t, 0, DT_REAL);
+   NewVector(x0, 0, DT_REAL);
+   NewVector(y0, 0, DT_REAL);
+   NewVector(sx, 0, DT_REAL);
+   NewVector(sy, 0, DT_REAL);
+   NewVector(samex, 0, DT_BOOL);
+   NewVector(samey, 0, DT_BOOL);
+   ae_assert(n >= 0, "PearsonCorrM2: N<0");
+   ae_assert(m1 >= 1, "PearsonCorrM2: M1<1");
+   ae_assert(m2 >= 1, "PearsonCorrM2: M2<1");
+   ae_assert(x->rows >= n, "PearsonCorrM2: Rows(X)<N!");
+   ae_assert(x->cols >= m1 || n == 0, "PearsonCorrM2: Cols(X)<M1!");
+   ae_assert(apservisfinitematrix(x, n, m1), "PearsonCorrM2: X contains infinite/NAN elements");
+   ae_assert(y->rows >= n, "PearsonCorrM2: Rows(Y)<N!");
+   ae_assert(y->cols >= m2 || n == 0, "PearsonCorrM2: Cols(Y)<M2!");
+   ae_assert(apservisfinitematrix(y, n, m2), "PearsonCorrM2: X contains infinite/NAN elements");
 // N <= 1, return zero
    if (n <= 1) {
-      ae_matrix_set_length(c, m1, m2, _state);
+      ae_matrix_set_length(c, m1, m2);
       for (i = 0; i < m1; i++) {
          for (j = 0; j < m2; j++) {
             c->xyR[i][j] = 0.0;
          }
       }
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
 // Allocate
-   ae_vector_set_length(&t, imax2(m1, m2, _state), _state);
-   ae_vector_set_length(&x0, m1, _state);
-   ae_vector_set_length(&y0, m2, _state);
-   ae_vector_set_length(&sx, m1, _state);
-   ae_vector_set_length(&sy, m2, _state);
-   ae_vector_set_length(&samex, m1, _state);
-   ae_vector_set_length(&samey, m2, _state);
-   ae_matrix_set_length(c, m1, m2, _state);
+   ae_vector_set_length(&t, imax2(m1, m2));
+   ae_vector_set_length(&x0, m1);
+   ae_vector_set_length(&y0, m2);
+   ae_vector_set_length(&sx, m1);
+   ae_vector_set_length(&sy, m2);
+   ae_vector_set_length(&samex, m1);
+   ae_vector_set_length(&samey, m2);
+   ae_matrix_set_length(c, m1, m2);
 // * calculate means of X
 // * center X
 // * if we have constant columns, these columns are
@@ -1285,7 +1285,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
       sy.xR[j] = sqrt(sy.xR[j] / (n - 1));
    }
 // calculate cross-covariance matrix
-   rmatrixgemm(m1, m2, n, 1.0 / (n - 1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0, _state);
+   rmatrixgemm(m1, m2, n, 1.0 / (n - 1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0);
 // Divide by standard deviations
    for (i = 0; i < m1; i++) {
       if (sx.xR[i] != 0.0) {
@@ -1307,7 +1307,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
          c->xyR[i][j] *= v * sy.xR[j];
       }
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 
 // Spearman's rank cross-correlation matrix
@@ -1334,7 +1334,7 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
 // API: void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
-void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state) {
+void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -1344,46 +1344,46 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
    bool b;
    double x0;
    double y0;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    SetMatrix(c);
-   NewVector(t, 0, DT_REAL, _state);
-   NewVector(sx, 0, DT_REAL, _state);
-   NewVector(sy, 0, DT_REAL, _state);
-   NewMatrix(xc, 0, 0, DT_REAL, _state);
-   NewMatrix(yc, 0, 0, DT_REAL, _state);
-   NewObj(apbuffers, buf, _state);
-   ae_assert(n >= 0, "SpearmanCorrM2: N<0", _state);
-   ae_assert(m1 >= 1, "SpearmanCorrM2: M1<1", _state);
-   ae_assert(m2 >= 1, "SpearmanCorrM2: M2<1", _state);
-   ae_assert(x->rows >= n, "SpearmanCorrM2: Rows(X)<N!", _state);
-   ae_assert(x->cols >= m1 || n == 0, "SpearmanCorrM2: Cols(X)<M1!", _state);
-   ae_assert(apservisfinitematrix(x, n, m1, _state), "SpearmanCorrM2: X contains infinite/NAN elements", _state);
-   ae_assert(y->rows >= n, "SpearmanCorrM2: Rows(Y)<N!", _state);
-   ae_assert(y->cols >= m2 || n == 0, "SpearmanCorrM2: Cols(Y)<M2!", _state);
-   ae_assert(apservisfinitematrix(y, n, m2, _state), "SpearmanCorrM2: X contains infinite/NAN elements", _state);
+   NewVector(t, 0, DT_REAL);
+   NewVector(sx, 0, DT_REAL);
+   NewVector(sy, 0, DT_REAL);
+   NewMatrix(xc, 0, 0, DT_REAL);
+   NewMatrix(yc, 0, 0, DT_REAL);
+   NewObj(apbuffers, buf);
+   ae_assert(n >= 0, "SpearmanCorrM2: N<0");
+   ae_assert(m1 >= 1, "SpearmanCorrM2: M1<1");
+   ae_assert(m2 >= 1, "SpearmanCorrM2: M2<1");
+   ae_assert(x->rows >= n, "SpearmanCorrM2: Rows(X)<N!");
+   ae_assert(x->cols >= m1 || n == 0, "SpearmanCorrM2: Cols(X)<M1!");
+   ae_assert(apservisfinitematrix(x, n, m1), "SpearmanCorrM2: X contains infinite/NAN elements");
+   ae_assert(y->rows >= n, "SpearmanCorrM2: Rows(Y)<N!");
+   ae_assert(y->cols >= m2 || n == 0, "SpearmanCorrM2: Cols(Y)<M2!");
+   ae_assert(apservisfinitematrix(y, n, m2), "SpearmanCorrM2: X contains infinite/NAN elements");
 // N <= 1, return zero
    if (n <= 1) {
-      ae_matrix_set_length(c, m1, m2, _state);
+      ae_matrix_set_length(c, m1, m2);
       for (i = 0; i < m1; i++) {
          for (j = 0; j < m2; j++) {
             c->xyR[i][j] = 0.0;
          }
       }
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
 // Allocate
-   ae_vector_set_length(&t, imax2(imax2(m1, m2, _state), n, _state), _state);
-   ae_vector_set_length(&sx, m1, _state);
-   ae_vector_set_length(&sy, m2, _state);
-   ae_matrix_set_length(c, m1, m2, _state);
+   ae_vector_set_length(&t, imax2(imax2(m1, m2), n));
+   ae_vector_set_length(&sx, m1);
+   ae_vector_set_length(&sy, m2);
+   ae_matrix_set_length(c, m1, m2);
 // Replace data with ranks
-   ae_matrix_set_length(&xc, m1, n, _state);
-   ae_matrix_set_length(&yc, m2, n, _state);
-   rmatrixtranspose(n, m1, x, 0, 0, &xc, 0, 0, _state);
-   rmatrixtranspose(n, m2, y, 0, 0, &yc, 0, 0, _state);
-   rankdata(&xc, m1, n, _state);
-   rankdata(&yc, m2, n, _state);
+   ae_matrix_set_length(&xc, m1, n);
+   ae_matrix_set_length(&yc, m2, n);
+   rmatrixtranspose(n, m1, x, 0, 0, &xc, 0, 0);
+   rmatrixtranspose(n, m2, y, 0, 0, &yc, 0, 0);
+   rankdata(&xc, m1, n);
+   rankdata(&yc, m2, n);
 // 1. Calculate means, variances, check for constant columns
 // 2. Center variables, constant  columns are
 //   artificialy zeroed (they must be zero in exact arithmetics,
@@ -1443,7 +1443,7 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
       sy.xR[i] = sqrt(v2 / (n - 1));
    }
 // calculate cross-covariance matrix
-   rmatrixgemm(m1, m2, n, 1.0 / (n - 1), &xc, 0, 0, 0, &yc, 0, 0, 1, 0.0, c, 0, 0, _state);
+   rmatrixgemm(m1, m2, n, 1.0 / (n - 1), &xc, 0, 0, 0, &yc, 0, 0, 1, 0.0, c, 0, 0);
 // Divide by standard deviations
    for (i = 0; i < m1; i++) {
       if (sx.xR[i] != 0.0) {
@@ -1465,310 +1465,310 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
          c->xyR[i][j] *= v * sy.xR[j];
       }
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
 void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, double &variance, double &skewness, double &kurtosis) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::samplemoments(ConstT(ae_vector, x), n, &mean, &variance, &skewness, &kurtosis, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::samplemoments(ConstT(ae_vector, x), n, &mean, &variance, &skewness, &kurtosis);
+   alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
 void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis) {
    ae_int_t n = x.length();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::samplemoments(ConstT(ae_vector, x), n, &mean, &variance, &skewness, &kurtosis, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::samplemoments(ConstT(ae_vector, x), n, &mean, &variance, &skewness, &kurtosis);
+   alglib_impl::ae_state_clear();
 }
 #endif
 
 double samplemean(const real_1d_array &x, const ae_int_t n) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::samplemean(ConstT(ae_vector, x), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::samplemean(ConstT(ae_vector, x), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #if !defined AE_NO_EXCEPTIONS
 double samplemean(const real_1d_array &x) {
    ae_int_t n = x.length();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::samplemean(ConstT(ae_vector, x), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::samplemean(ConstT(ae_vector, x), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #endif
 
 double samplevariance(const real_1d_array &x, const ae_int_t n) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::samplevariance(ConstT(ae_vector, x), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::samplevariance(ConstT(ae_vector, x), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #if !defined AE_NO_EXCEPTIONS
 double samplevariance(const real_1d_array &x) {
    ae_int_t n = x.length();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::samplevariance(ConstT(ae_vector, x), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::samplevariance(ConstT(ae_vector, x), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #endif
 
 double sampleskewness(const real_1d_array &x, const ae_int_t n) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::sampleskewness(ConstT(ae_vector, x), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::sampleskewness(ConstT(ae_vector, x), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #if !defined AE_NO_EXCEPTIONS
 double sampleskewness(const real_1d_array &x) {
    ae_int_t n = x.length();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::sampleskewness(ConstT(ae_vector, x), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::sampleskewness(ConstT(ae_vector, x), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #endif
 
 double samplekurtosis(const real_1d_array &x, const ae_int_t n) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::samplekurtosis(ConstT(ae_vector, x), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::samplekurtosis(ConstT(ae_vector, x), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #if !defined AE_NO_EXCEPTIONS
 double samplekurtosis(const real_1d_array &x) {
    ae_int_t n = x.length();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::samplekurtosis(ConstT(ae_vector, x), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::samplekurtosis(ConstT(ae_vector, x), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #endif
 
 void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::sampleadev(ConstT(ae_vector, x), n, &adev, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::sampleadev(ConstT(ae_vector, x), n, &adev);
+   alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
 void sampleadev(const real_1d_array &x, double &adev) {
    ae_int_t n = x.length();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::sampleadev(ConstT(ae_vector, x), n, &adev, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::sampleadev(ConstT(ae_vector, x), n, &adev);
+   alglib_impl::ae_state_clear();
 }
 #endif
 
 void samplemedian(const real_1d_array &x, const ae_int_t n, double &median) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::samplemedian(ConstT(ae_vector, x), n, &median, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::samplemedian(ConstT(ae_vector, x), n, &median);
+   alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
 void samplemedian(const real_1d_array &x, double &median) {
    ae_int_t n = x.length();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::samplemedian(ConstT(ae_vector, x), n, &median, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::samplemedian(ConstT(ae_vector, x), n, &median);
+   alglib_impl::ae_state_clear();
 }
 #endif
 
 void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::samplepercentile(ConstT(ae_vector, x), n, p, &v, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::samplepercentile(ConstT(ae_vector, x), n, p, &v);
+   alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
 void samplepercentile(const real_1d_array &x, const double p, double &v) {
    ae_int_t n = x.length();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::samplepercentile(ConstT(ae_vector, x), n, p, &v, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::samplepercentile(ConstT(ae_vector, x), n, p, &v);
+   alglib_impl::ae_state_clear();
 }
 #endif
 
 void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures);
+   alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
 void rankdata(real_2d_array &xy) {
    ae_int_t npoints = xy.rows();
    ae_int_t nfeatures = xy.cols();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures);
+   alglib_impl::ae_state_clear();
 }
 #endif
 
 void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures);
+   alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
 void rankdatacentered(real_2d_array &xy) {
    ae_int_t npoints = xy.rows();
    ae_int_t nfeatures = xy.cols();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures);
+   alglib_impl::ae_state_clear();
 }
 #endif
 
 double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::cov2(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::cov2(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #if !defined AE_NO_EXCEPTIONS
 double cov2(const real_1d_array &x, const real_1d_array &y) {
    if (x.length() != y.length()) ThrowError("Error while calling 'cov2': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::cov2(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::cov2(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #endif
 
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::pearsoncorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::pearsoncorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #if !defined AE_NO_EXCEPTIONS
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y) {
    if (x.length() != y.length()) ThrowError("Error while calling 'pearsoncorr2': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::pearsoncorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::pearsoncorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #endif
 
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::spearmancorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::spearmancorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #if !defined AE_NO_EXCEPTIONS
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y) {
    if (x.length() != y.length()) ThrowError("Error while calling 'spearmancorr2': looks like one of arguments has wrong size");
    ae_int_t n = x.length();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::spearmancorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::spearmancorr2(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 #endif
 
 double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::pearsoncorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::pearsoncorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::spearmanrankcorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::spearmanrankcorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::covm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::covm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
 void covm(const real_2d_array &x, real_2d_array &c) {
    ae_int_t n = x.rows();
    ae_int_t m = x.cols();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::covm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::covm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
 }
 #endif
 
 void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::pearsoncorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::pearsoncorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
 void pearsoncorrm(const real_2d_array &x, real_2d_array &c) {
    ae_int_t n = x.rows();
    ae_int_t m = x.cols();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::pearsoncorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::pearsoncorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
 }
 #endif
 
 void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::spearmancorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::spearmancorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
 void spearmancorrm(const real_2d_array &x, real_2d_array &c) {
    ae_int_t n = x.rows();
    ae_int_t m = x.cols();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::spearmancorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::spearmancorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
 }
 #endif
 
 void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::covm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::covm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
 void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
@@ -1776,18 +1776,18 @@ void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
    ae_int_t n = x.rows();
    ae_int_t m1 = x.cols();
    ae_int_t m2 = y.cols();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::covm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::covm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
 }
 #endif
 
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::pearsoncorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::pearsoncorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
@@ -1795,18 +1795,18 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array
    ae_int_t n = x.rows();
    ae_int_t m1 = x.cols();
    ae_int_t m2 = y.cols();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::pearsoncorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::pearsoncorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
 }
 #endif
 
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::spearmancorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::spearmancorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
@@ -1814,10 +1814,10 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_arra
    ae_int_t n = x.rows();
    ae_int_t m1 = x.cols();
    ae_int_t m2 = y.cols();
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::spearmancorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::spearmancorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
 }
 #endif
 } // end of namespace alglib
@@ -1859,7 +1859,7 @@ namespace alglib_impl {
 //                     the null hypothesis is rejected.
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 // API: void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail);
-void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
    double t;
    double p;
    *bothtails = 0;
@@ -1885,18 +1885,18 @@ void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, dou
       return;
    }
 // General case
-   t = r * sqrt((n - 2) / (1 - sqr(r, _state)));
-   p = studenttdistribution(n - 2, t, _state);
-   *bothtails = 2 * rmin2(p, 1 - p, _state);
+   t = r * sqrt((n - 2) / (1 - sqr(r)));
+   p = studenttdistribution(n - 2, t);
+   *bothtails = 2 * rmin2(p, 1 - p);
    *lefttail = p;
    *righttail = 1 - p;
 }
 
 // Tail(S, 5)
-static double correlationtests_spearmantail5(double s, ae_state *_state) {
+static double correlationtests_spearmantail5(double s) {
    double result;
    if (s < 0.000e+00) {
-      result = studenttdistribution(3, -s, _state);
+      result = studenttdistribution(3, -s);
       return result;
    }
    if (s >= 3.580e+00) {
@@ -1948,10 +1948,10 @@ static double correlationtests_spearmantail5(double s, ae_state *_state) {
 }
 
 // Tail(S, 6)
-static double correlationtests_spearmantail6(double s, ae_state *_state) {
+static double correlationtests_spearmantail6(double s) {
    double result;
    if (s < 1.001e+00) {
-      result = studenttdistribution(4, -s, _state);
+      result = studenttdistribution(4, -s);
       return result;
    }
    if (s >= 5.663e+00) {
@@ -1999,10 +1999,10 @@ static double correlationtests_spearmantail6(double s, ae_state *_state) {
 }
 
 // Tail(S, 7)
-static double correlationtests_spearmantail7(double s, ae_state *_state) {
+static double correlationtests_spearmantail7(double s) {
    double result;
    if (s < 1.001e+00) {
-      result = studenttdistribution(5, -s, _state);
+      result = studenttdistribution(5, -s);
       return result;
    }
    if (s >= 8.159e+00) {
@@ -2078,10 +2078,10 @@ static double correlationtests_spearmantail7(double s, ae_state *_state) {
 }
 
 // Tail(S, 8)
-static double correlationtests_spearmantail8(double s, ae_state *_state) {
+static double correlationtests_spearmantail8(double s) {
    double result;
    if (s < 2.001e+00) {
-      result = studenttdistribution(6, -s, _state);
+      result = studenttdistribution(6, -s);
       return result;
    }
    if (s >= 1.103e+01) {
@@ -2153,10 +2153,10 @@ static double correlationtests_spearmantail8(double s, ae_state *_state) {
 }
 
 // Tail(S, 9)
-static double correlationtests_spearmantail9(double s, ae_state *_state) {
+static double correlationtests_spearmantail9(double s) {
    double result;
    if (s < 2.001e+00) {
-      result = studenttdistribution(7, -s, _state);
+      result = studenttdistribution(7, -s);
       return result;
    }
    if (s >= 9.989e+00) {
@@ -2256,29 +2256,29 @@ static double correlationtests_spearmantail9(double s, ae_state *_state) {
 }
 
 // Tail(T,N), accepts T<0
-static double correlationtests_spearmantail(double t, ae_int_t n, ae_state *_state) {
+static double correlationtests_spearmantail(double t, ae_int_t n) {
    double result;
    if (n == 5) {
-      result = correlationtests_spearmantail5(-t, _state);
+      result = correlationtests_spearmantail5(-t);
       return result;
    }
    if (n == 6) {
-      result = correlationtests_spearmantail6(-t, _state);
+      result = correlationtests_spearmantail6(-t);
       return result;
    }
    if (n == 7) {
-      result = correlationtests_spearmantail7(-t, _state);
+      result = correlationtests_spearmantail7(-t);
       return result;
    }
    if (n == 8) {
-      result = correlationtests_spearmantail8(-t, _state);
+      result = correlationtests_spearmantail8(-t);
       return result;
    }
    if (n == 9) {
-      result = correlationtests_spearmantail9(-t, _state);
+      result = correlationtests_spearmantail9(-t);
       return result;
    }
-   result = studenttdistribution(n - 2, t, _state);
+   result = studenttdistribution(n - 2, t);
    return result;
 }
 // Spearman's rank correlation coefficient significance test
@@ -2316,7 +2316,7 @@ static double correlationtests_spearmantail(double t, ae_int_t n, ae_state *_sta
 //                     the null hypothesis is rejected.
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 // API: void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail);
-void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
    double t;
    double p;
    *bothtails = 0;
@@ -2336,16 +2336,16 @@ void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails
       if (r <= -1.0) {
          t = -1.0E10;
       } else {
-         t = r * sqrt((n - 2) / (1 - sqr(r, _state)));
+         t = r * sqrt((n - 2) / (1 - sqr(r)));
       }
    }
    if (t < 0.0) {
-      p = correlationtests_spearmantail(t, n, _state);
+      p = correlationtests_spearmantail(t, n);
       *bothtails = 2 * p;
       *lefttail = p;
       *righttail = 1 - p;
    } else {
-      p = correlationtests_spearmantail(-t, n, _state);
+      p = correlationtests_spearmantail(-t, n);
       *bothtails = 2 * p;
       *lefttail = 1 - p;
       *righttail = p;
@@ -2355,23 +2355,23 @@ void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails
 
 namespace alglib {
 void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::pearsoncorrelationsignificance(r, n, &bothtails, &lefttail, &righttail, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::pearsoncorrelationsignificance(r, n, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
 }
 
 void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::spearmanrankcorrelationsignificance(r, n, &bothtails, &lefttail, &righttail, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::spearmanrankcorrelationsignificance(r, n, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
 // === JARQUEBERA Package ===
 namespace alglib_impl {
-static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state) {
+static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r) {
    double t;
    *r += c * (*tj);
    t = 2 * x * (*tj1) - (*tj);
@@ -2379,7 +2379,7 @@ static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, doubl
    *tj1 = t;
 }
 
-static double jarquebera_jbtbl5(double s, ae_state *_state) {
+static double jarquebera_jbtbl5(double s) {
    double x;
    double tj;
    double tj1;
@@ -2389,9 +2389,9 @@ static double jarquebera_jbtbl5(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 0.400000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.097885e-20, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.854501e-20, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.756616e-20, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.097885e-20, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.854501e-20, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.756616e-20, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2401,22 +2401,22 @@ static double jarquebera_jbtbl5(double s, ae_state *_state) {
       x = 2 * (s - 0.400000) / 0.700000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.324545e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.075941e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -9.772272e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.175686e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.576162e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.126861e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.434425e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.790359e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.809178e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.479704e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.717040e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.294170e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.880632e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.023344e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.601531e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.920403e-02, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.324545e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.075941e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.772272e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.175686e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.576162e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.126861e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.434425e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.790359e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.809178e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.479704e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.717040e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.294170e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.880632e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.023344e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.601531e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.920403e-02, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2426,7 +2426,7 @@ static double jarquebera_jbtbl5(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl6(double s, ae_state *_state) {
+static double jarquebera_jbtbl6(double s) {
    double x;
    double tj;
    double tj1;
@@ -2436,9 +2436,9 @@ static double jarquebera_jbtbl6(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 0.250000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -2.274707e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.700471e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.425764e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -2.274707e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.700471e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.425764e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2448,19 +2448,19 @@ static double jarquebera_jbtbl6(double s, ae_state *_state) {
       x = 2 * (s - 0.250000) / 1.050000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.339000e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.011104e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.168177e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.085666e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.738606e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.022876e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.462402e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.908270e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.230772e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.006996e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.410222e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.893768e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 8.114564e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.339000e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.011104e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.168177e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.085666e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.738606e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.022876e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.462402e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.908270e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.230772e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.006996e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.410222e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.893768e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 8.114564e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2470,17 +2470,17 @@ static double jarquebera_jbtbl6(double s, ae_state *_state) {
       x = 2 * (s - 1.300000) / 0.550000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.794311e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.578700e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.394664e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.928290e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.813273e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.076063e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.835380e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.013013e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.058903e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.856915e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.710887e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.794311e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.578700e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.394664e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.928290e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.813273e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.076063e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.835380e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.013013e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.058903e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.856915e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.710887e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2490,7 +2490,7 @@ static double jarquebera_jbtbl6(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl7(double s, ae_state *_state) {
+static double jarquebera_jbtbl7(double s) {
    double x;
    double tj;
    double tj1;
@@ -2500,17 +2500,17 @@ static double jarquebera_jbtbl7(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 1.400000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.093681e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.695911e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.473192e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.203236e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.590379e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.291876e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.132007e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 9.411147e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.180067e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.487610e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.436561e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.093681e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.695911e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.473192e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.203236e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.590379e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.291876e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.132007e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 9.411147e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.180067e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.487610e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.436561e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2520,19 +2520,19 @@ static double jarquebera_jbtbl7(double s, ae_state *_state) {
       x = 2 * (s - 1.400000) / 1.600000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -5.947854e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.772675e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.707912e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.691171e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.132795e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.481310e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.867536e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 8.772327e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.033387e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.378277e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.497964e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.636814e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -9.581640e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -5.947854e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.772675e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.707912e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.691171e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.132795e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.481310e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.867536e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 8.772327e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.033387e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.378277e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.497964e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.636814e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.581640e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2542,17 +2542,17 @@ static double jarquebera_jbtbl7(double s, ae_state *_state) {
       x = 2 * (s - 3.000000) / 0.200000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -7.511008e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.140472e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.682053e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.568561e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.933930e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.140472e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.895025e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.140472e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.933930e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.568561e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.682053e+00, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -7.511008e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.140472e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.682053e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.568561e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.933930e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.140472e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.895025e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.140472e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.933930e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.568561e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.682053e+00, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2562,7 +2562,7 @@ static double jarquebera_jbtbl7(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl8(double s, ae_state *_state) {
+static double jarquebera_jbtbl8(double s) {
    double x;
    double tj;
    double tj1;
@@ -2572,15 +2572,15 @@ static double jarquebera_jbtbl8(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 1.300000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -7.199015e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.095921e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.736828e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.047438e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.484320e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.937923e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.810470e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.139780e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.708443e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -7.199015e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.095921e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.736828e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.047438e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.484320e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.937923e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.810470e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.139780e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.708443e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2590,15 +2590,15 @@ static double jarquebera_jbtbl8(double s, ae_state *_state) {
       x = 2 * (s - 1.300000) / 0.700000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -3.378966e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.802461e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.547593e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.241042e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.203274e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.201990e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.125597e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.584426e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.546069e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -3.378966e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.802461e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.547593e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.241042e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.203274e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.201990e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.125597e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.584426e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.546069e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2608,17 +2608,17 @@ static double jarquebera_jbtbl8(double s, ae_state *_state) {
       x = 2 * (s - 2.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.828366e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.137533e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.016671e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.745637e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.189801e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.621610e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.741122e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.516368e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.552085e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.787029e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.359774e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.828366e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.137533e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.016671e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.745637e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.189801e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.621610e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.741122e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.516368e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.552085e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.787029e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.359774e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2628,7 +2628,7 @@ static double jarquebera_jbtbl8(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl9(double s, ae_state *_state) {
+static double jarquebera_jbtbl9(double s) {
    double x;
    double tj;
    double tj1;
@@ -2638,15 +2638,15 @@ static double jarquebera_jbtbl9(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 1.300000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.279320e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -9.277151e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.669339e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.086149e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.333816e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.871249e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.007048e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.482245e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.355615e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.279320e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.277151e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.669339e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.086149e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.333816e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.871249e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.007048e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.482245e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.355615e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2656,15 +2656,15 @@ static double jarquebera_jbtbl9(double s, ae_state *_state) {
       x = 2 * (s - 1.300000) / 0.700000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -2.981430e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.972248e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.747737e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.808530e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.888305e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 9.001302e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.378767e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.108510e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.915372e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -2.981430e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.972248e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.747737e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.808530e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.888305e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 9.001302e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.378767e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.108510e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.915372e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2674,17 +2674,17 @@ static double jarquebera_jbtbl9(double s, ae_state *_state) {
       x = 2 * (s - 2.000000) / 5.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.387463e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.845231e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.809956e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.543461e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.880397e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.160074e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.356527e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.394428e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 9.619892e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.758763e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.790977e-05, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.387463e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.845231e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.809956e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.543461e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.880397e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.160074e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.356527e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.394428e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 9.619892e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.758763e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.790977e-05, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2694,7 +2694,7 @@ static double jarquebera_jbtbl9(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl10(double s, ae_state *_state) {
+static double jarquebera_jbtbl10(double s) {
    double x;
    double tj;
    double tj1;
@@ -2704,15 +2704,15 @@ static double jarquebera_jbtbl10(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 1.200000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -4.590993e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.562730e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.353934e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.069933e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.849151e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 8.931406e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.636295e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.178340e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.917749e-05, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -4.590993e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.562730e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.353934e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.069933e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.849151e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 8.931406e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.636295e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.178340e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.917749e-05, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2722,15 +2722,15 @@ static double jarquebera_jbtbl10(double s, ae_state *_state) {
       x = 2 * (s - 1.200000) / 0.800000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -2.537658e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -9.962401e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.838715e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.055792e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.580316e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.781701e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.770362e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.838983e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.999052e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -2.537658e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.962401e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.838715e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.055792e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.580316e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.781701e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.770362e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.838983e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.999052e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2740,12 +2740,12 @@ static double jarquebera_jbtbl10(double s, ae_state *_state) {
       x = 2 * (s - 2.000000) / 5.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -5.337524e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.877029e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.734650e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.249254e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.320250e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.432266e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -5.337524e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.877029e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.734650e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.249254e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.320250e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.432266e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2755,7 +2755,7 @@ static double jarquebera_jbtbl10(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl11(double s, ae_state *_state) {
+static double jarquebera_jbtbl11(double s) {
    double x;
    double tj;
    double tj1;
@@ -2765,15 +2765,15 @@ static double jarquebera_jbtbl11(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 1.200000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -4.339517e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.051558e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.000992e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.022547e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -9.808401e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.592870e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.575081e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.086173e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.089011e-05, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -4.339517e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.051558e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.000992e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.022547e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.808401e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.592870e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.575081e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.086173e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.089011e-05, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2783,15 +2783,15 @@ static double jarquebera_jbtbl11(double s, ae_state *_state) {
       x = 2 * (s - 1.200000) / 1.050000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -2.523221e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.068388e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.179661e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.555524e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.238964e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.364320e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.895771e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.762774e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.201340e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -2.523221e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.068388e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.179661e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.555524e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.238964e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.364320e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.895771e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.762774e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.201340e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2801,12 +2801,12 @@ static double jarquebera_jbtbl11(double s, ae_state *_state) {
       x = 2 * (s - 2.250000) / 5.750000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -5.212179e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.684579e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 8.299519e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.606261e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.310869e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.320115e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -5.212179e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.684579e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 8.299519e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.606261e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.310869e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.320115e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2816,7 +2816,7 @@ static double jarquebera_jbtbl11(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl12(double s, ae_state *_state) {
+static double jarquebera_jbtbl12(double s) {
    double x;
    double tj;
    double tj1;
@@ -2826,15 +2826,15 @@ static double jarquebera_jbtbl12(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 1.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -2.736742e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.657836e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.047209e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.319599e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.545631e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 9.280445e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.815679e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.213519e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.256838e-05, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -2.736742e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.657836e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.047209e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.319599e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.545631e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 9.280445e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.815679e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.213519e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.256838e-05, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2844,17 +2844,17 @@ static double jarquebera_jbtbl12(double s, ae_state *_state) {
       x = 2 * (s - 1.000000) / 2.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -2.573947e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.515287e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.611880e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.271311e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.495815e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.141186e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.180886e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.388211e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.890761e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.233175e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.946156e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -2.573947e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.515287e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.611880e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.271311e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.495815e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.141186e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.180886e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.388211e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.890761e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.233175e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.946156e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2864,17 +2864,17 @@ static double jarquebera_jbtbl12(double s, ae_state *_state) {
       x = 2 * (s - 3.000000) / 9.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -5.947819e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.034157e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.878986e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.078603e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.990977e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.866215e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.897866e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.512252e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.073743e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.022621e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.501343e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -5.947819e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.034157e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.878986e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.078603e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.990977e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.866215e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.897866e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.512252e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.073743e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.022621e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.501343e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2884,7 +2884,7 @@ static double jarquebera_jbtbl12(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl13(double s, ae_state *_state) {
+static double jarquebera_jbtbl13(double s) {
    double x;
    double tj;
    double tj1;
@@ -2894,15 +2894,15 @@ static double jarquebera_jbtbl13(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 1.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -2.713276e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.557541e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -9.459092e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.044145e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.546132e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.002374e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.349456e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.025669e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.590242e-05, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -2.713276e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.557541e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.459092e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.044145e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.546132e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.002374e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.349456e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.025669e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.590242e-05, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2912,17 +2912,17 @@ static double jarquebera_jbtbl13(double s, ae_state *_state) {
       x = 2 * (s - 1.000000) / 2.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -2.454383e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.467539e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.270774e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.075763e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.611647e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.990785e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 8.109212e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.135031e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.915919e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.522390e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.144701e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -2.454383e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.467539e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.270774e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.075763e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.611647e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.990785e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 8.109212e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.135031e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.915919e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.522390e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.144701e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2932,17 +2932,17 @@ static double jarquebera_jbtbl13(double s, ae_state *_state) {
       x = 2 * (s - 3.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -5.736127e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.920809e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.175858e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.002049e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.158966e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.157781e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.762172e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.780347e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.193310e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.442421e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.547756e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -5.736127e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.920809e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.175858e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.002049e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.158966e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.157781e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.762172e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.780347e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.193310e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.442421e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.547756e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2952,7 +2952,7 @@ static double jarquebera_jbtbl13(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl14(double s, ae_state *_state) {
+static double jarquebera_jbtbl14(double s) {
    double x;
    double tj;
    double tj1;
@@ -2962,15 +2962,15 @@ static double jarquebera_jbtbl14(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 1.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -2.698527e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.479081e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.640733e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.466899e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.469485e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.150009e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.965975e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.710210e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.327808e-05, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -2.698527e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.479081e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.640733e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.466899e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.469485e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.150009e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.965975e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.710210e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.327808e-05, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -2980,17 +2980,17 @@ static double jarquebera_jbtbl14(double s, ae_state *_state) {
       x = 2 * (s - 1.000000) / 2.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -2.350359e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.421365e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.960468e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.149167e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.361109e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.976022e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.082700e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.563328e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.453123e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.917559e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.151067e-05, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -2.350359e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.421365e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.960468e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.149167e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.361109e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.976022e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.082700e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.563328e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.453123e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.917559e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.151067e-05, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3000,17 +3000,17 @@ static double jarquebera_jbtbl14(double s, ae_state *_state) {
       x = 2 * (s - 3.000000) / 12.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -5.746892e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.010441e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.566146e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.129690e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.929724e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.524227e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.192933e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.254730e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.620685e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.289618e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.112350e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -5.746892e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.010441e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.566146e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.129690e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.929724e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.524227e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.192933e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.254730e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.620685e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.289618e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.112350e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3020,7 +3020,7 @@ static double jarquebera_jbtbl14(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl15(double s, ae_state *_state) {
+static double jarquebera_jbtbl15(double s) {
    double x;
    double tj;
    double tj1;
@@ -3030,13 +3030,13 @@ static double jarquebera_jbtbl15(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 2.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.043660e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.361653e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.009497e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.951784e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.377903e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.003253e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.271309e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.043660e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.361653e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.009497e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.951784e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.377903e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.003253e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.271309e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3046,13 +3046,13 @@ static double jarquebera_jbtbl15(double s, ae_state *_state) {
       x = 2 * (s - 2.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -3.582778e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.349578e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 9.476514e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.717385e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.222591e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.635124e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.815993e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -3.582778e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.349578e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 9.476514e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.717385e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.222591e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.635124e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.815993e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3062,17 +3062,17 @@ static double jarquebera_jbtbl15(double s, ae_state *_state) {
       x = 2 * (s - 5.000000) / 12.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.115476e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.655936e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 8.404310e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.663794e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 8.868618e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.381447e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 9.444801e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.581503e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -9.468696e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.728509e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.206470e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.115476e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.655936e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 8.404310e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.663794e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 8.868618e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.381447e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 9.444801e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.581503e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.468696e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.728509e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.206470e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3082,7 +3082,7 @@ static double jarquebera_jbtbl15(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl16(double s, ae_state *_state) {
+static double jarquebera_jbtbl16(double s) {
    double x;
    double tj;
    double tj1;
@@ -3092,13 +3092,13 @@ static double jarquebera_jbtbl16(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 2.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.002570e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.298141e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.832803e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.877026e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.539436e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 8.439658e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.756911e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.002570e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.298141e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.832803e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.877026e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.539436e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 8.439658e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.756911e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3108,13 +3108,13 @@ static double jarquebera_jbtbl16(double s, ae_state *_state) {
       x = 2 * (s - 2.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -3.486198e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.242944e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.020002e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.130531e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.512373e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.054876e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.556839e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -3.486198e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.242944e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.020002e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.130531e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.512373e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.054876e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.556839e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3124,17 +3124,17 @@ static double jarquebera_jbtbl16(double s, ae_state *_state) {
       x = 2 * (s - 5.000000) / 15.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.241608e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.832655e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.340545e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.361143e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.283219e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.484549e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.805968e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.057243e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.454439e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.177513e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.819209e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.241608e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.832655e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.340545e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.361143e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.283219e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.484549e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.805968e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.057243e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.454439e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.177513e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.819209e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3144,7 +3144,7 @@ static double jarquebera_jbtbl16(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl17(double s, ae_state *_state) {
+static double jarquebera_jbtbl17(double s) {
    double x;
    double tj;
    double tj1;
@@ -3154,15 +3154,15 @@ static double jarquebera_jbtbl17(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.566973e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.810330e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.840039e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.337294e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.383549e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.556515e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.656965e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.404569e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.447867e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.566973e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.810330e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.840039e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.337294e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.383549e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.556515e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.656965e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.404569e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.447867e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3172,15 +3172,15 @@ static double jarquebera_jbtbl17(double s, ae_state *_state) {
       x = 2 * (s - 3.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -3.905684e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.222920e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.146667e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.809176e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.057028e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.211838e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.099683e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.161105e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.225465e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -3.905684e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.222920e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.146667e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.809176e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.057028e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.211838e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.099683e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.161105e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.225465e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3190,17 +3190,17 @@ static double jarquebera_jbtbl17(double s, ae_state *_state) {
       x = 2 * (s - 6.000000) / 18.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.594282e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.917838e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.455980e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.999589e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.604263e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.484445e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.819937e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.930390e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.771761e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.232581e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.029083e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.594282e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.917838e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.455980e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.999589e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.604263e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.484445e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.819937e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.930390e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.771761e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.232581e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.029083e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3210,7 +3210,7 @@ static double jarquebera_jbtbl17(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl18(double s, ae_state *_state) {
+static double jarquebera_jbtbl18(double s) {
    double x;
    double tj;
    double tj1;
@@ -3220,15 +3220,15 @@ static double jarquebera_jbtbl18(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.526802e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.762373e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.598890e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.189437e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.971721e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.823067e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.064501e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.014932e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.953513e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.526802e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.762373e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.598890e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.189437e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.971721e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.823067e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.064501e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.014932e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.953513e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3238,15 +3238,15 @@ static double jarquebera_jbtbl18(double s, ae_state *_state) {
       x = 2 * (s - 3.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -3.818669e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.070918e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.277196e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.879817e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.887357e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.638451e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.502800e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.165796e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.034960e-05, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -3.818669e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.070918e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.277196e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.879817e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.887357e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.638451e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.502800e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.165796e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.034960e-05, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3256,17 +3256,17 @@ static double jarquebera_jbtbl18(double s, ae_state *_state) {
       x = 2 * (s - 6.000000) / 14.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.010656e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.496296e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.002227e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.338250e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.137036e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.586202e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -9.736384e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.332251e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.877982e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.160963e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.547247e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.010656e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.496296e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.002227e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.338250e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.137036e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.586202e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.736384e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.332251e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.877982e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.160963e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.547247e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3276,7 +3276,7 @@ static double jarquebera_jbtbl18(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl19(double s, ae_state *_state) {
+static double jarquebera_jbtbl19(double s) {
    double x;
    double tj;
    double tj1;
@@ -3286,15 +3286,15 @@ static double jarquebera_jbtbl19(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.490213e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.719633e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.459123e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.034878e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.113868e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.030922e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.054022e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.525623e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.277360e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.490213e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.719633e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.459123e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.034878e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.113868e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.030922e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.054022e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.525623e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.277360e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3304,15 +3304,15 @@ static double jarquebera_jbtbl19(double s, ae_state *_state) {
       x = 2 * (s - 3.000000) / 3.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -3.744750e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.977749e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.223716e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.363889e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.711774e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.557257e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.254794e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 9.034207e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.498107e-05, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -3.744750e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.977749e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.223716e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.363889e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.711774e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.557257e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.254794e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 9.034207e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.498107e-05, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3322,17 +3322,17 @@ static double jarquebera_jbtbl19(double s, ae_state *_state) {
       x = 2 * (s - 6.000000) / 14.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -5.872768e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.430689e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.136575e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.726627e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.421110e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.581510e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.559520e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.838208e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 8.428839e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.170682e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.006647e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -5.872768e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.430689e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.136575e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.726627e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.421110e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.581510e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.559520e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.838208e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 8.428839e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.170682e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.006647e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3342,7 +3342,7 @@ static double jarquebera_jbtbl19(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl20(double s, ae_state *_state) {
+static double jarquebera_jbtbl20(double s) {
    double x;
    double tj;
    double tj1;
@@ -3352,22 +3352,22 @@ static double jarquebera_jbtbl20(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.854794e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.948947e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.632184e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.139397e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.006237e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.810031e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.573620e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 9.951242e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.274092e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.464196e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.882139e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.575144e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.822804e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.061348e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.908404e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.978353e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.854794e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.948947e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.632184e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.139397e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.006237e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.810031e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.573620e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 9.951242e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.274092e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.464196e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.882139e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.575144e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.822804e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.061348e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.908404e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.978353e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3377,22 +3377,22 @@ static double jarquebera_jbtbl20(double s, ae_state *_state) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -5.030989e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.327151e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.346404e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.840051e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.578551e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -9.813886e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.905973e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.358489e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.450795e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.941157e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.432418e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.070537e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 9.375654e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.367378e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 9.890859e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.679782e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -5.030989e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.327151e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.346404e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.840051e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.578551e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.813886e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.905973e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.358489e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.450795e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.941157e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.432418e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.070537e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 9.375654e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.367378e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 9.890859e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.679782e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3402,9 +3402,9 @@ static double jarquebera_jbtbl20(double s, ae_state *_state) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -7.015854e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.487737e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.244254e-02, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -7.015854e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.487737e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.244254e-02, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3414,7 +3414,7 @@ static double jarquebera_jbtbl20(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl30(double s, ae_state *_state) {
+static double jarquebera_jbtbl30(double s) {
    double x;
    double tj;
    double tj1;
@@ -3424,22 +3424,22 @@ static double jarquebera_jbtbl30(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.630822e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.724298e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.872756e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.658268e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.573597e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.994157e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.994825e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.394303e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.785029e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.990264e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.037838e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.755546e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.774473e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.821395e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.392603e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.353313e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.630822e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.724298e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.872756e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.658268e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.573597e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.994157e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.994825e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.394303e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.785029e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.990264e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.037838e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.755546e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.774473e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.821395e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.392603e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.353313e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3449,17 +3449,17 @@ static double jarquebera_jbtbl30(double s, ae_state *_state) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -4.539322e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.197018e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.396848e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.804293e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.867928e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.768758e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.211792e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.925799e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.046235e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -9.536469e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.489642e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -4.539322e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.197018e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.396848e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.804293e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.867928e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.768758e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.211792e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.925799e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.046235e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.536469e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.489642e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3469,9 +3469,9 @@ static double jarquebera_jbtbl30(double s, ae_state *_state) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.263462e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.177316e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.590637e-02, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.263462e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.177316e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.590637e-02, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3481,7 +3481,7 @@ static double jarquebera_jbtbl30(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl50(double s, ae_state *_state) {
+static double jarquebera_jbtbl50(double s) {
    double x;
    double tj;
    double tj1;
@@ -3491,17 +3491,17 @@ static double jarquebera_jbtbl50(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.436279e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.519711e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.148699e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.001204e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.207620e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.034778e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.220322e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.033260e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.588280e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.851653e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.287733e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.436279e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.519711e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.148699e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.001204e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.207620e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.034778e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.220322e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.033260e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.588280e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.851653e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.287733e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3511,17 +3511,17 @@ static double jarquebera_jbtbl50(double s, ae_state *_state) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -4.234645e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.189127e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.429738e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.058822e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 9.086776e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.445783e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.311671e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.261298e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.496987e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.605249e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 8.162282e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -4.234645e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.189127e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.429738e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.058822e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 9.086776e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.445783e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.311671e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.261298e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.496987e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.605249e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 8.162282e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3531,9 +3531,9 @@ static double jarquebera_jbtbl50(double s, ae_state *_state) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -5.921095e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.888603e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.080113e-02, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -5.921095e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.888603e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.080113e-02, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3543,7 +3543,7 @@ static double jarquebera_jbtbl50(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl65(double s, ae_state *_state) {
+static double jarquebera_jbtbl65(double s) {
    double x;
    double tj;
    double tj1;
@@ -3553,13 +3553,13 @@ static double jarquebera_jbtbl65(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.360024e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.434631e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.514580e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 7.332038e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.158197e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.121233e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.051056e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.360024e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.434631e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.514580e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 7.332038e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.158197e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.121233e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.051056e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3569,17 +3569,17 @@ static double jarquebera_jbtbl65(double s, ae_state *_state) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -4.148601e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.214233e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.487977e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.424720e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.116715e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.043152e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.718149e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.313701e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.097305e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.181031e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.256975e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -4.148601e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.214233e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.487977e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.424720e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.116715e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.043152e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.718149e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.313701e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.097305e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.181031e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.256975e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3589,9 +3589,9 @@ static double jarquebera_jbtbl65(double s, ae_state *_state) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -5.858951e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.895179e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.933237e-02, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -5.858951e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.895179e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.933237e-02, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3601,7 +3601,7 @@ static double jarquebera_jbtbl65(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl100(double s, ae_state *_state) {
+static double jarquebera_jbtbl100(double s) {
    double x;
    double tj;
    double tj1;
@@ -3611,13 +3611,13 @@ static double jarquebera_jbtbl100(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.257021e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.313418e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.628931e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.264287e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.518487e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.499826e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.836044e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.257021e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.313418e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.628931e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.264287e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.518487e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.499826e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.836044e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3627,13 +3627,13 @@ static double jarquebera_jbtbl100(double s, ae_state *_state) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -4.056508e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.279690e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.665746e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.290012e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.487632e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.704465e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.211669e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -4.056508e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.279690e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.665746e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.290012e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.487632e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.704465e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.211669e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3643,9 +3643,9 @@ static double jarquebera_jbtbl100(double s, ae_state *_state) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -5.866099e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.399767e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.498208e-02, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -5.866099e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.399767e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.498208e-02, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3655,7 +3655,7 @@ static double jarquebera_jbtbl100(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl130(double s, ae_state *_state) {
+static double jarquebera_jbtbl130(double s) {
    double x;
    double tj;
    double tj1;
@@ -3665,13 +3665,13 @@ static double jarquebera_jbtbl130(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.207999e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.253864e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.618032e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.112729e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.210546e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.732602e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.410527e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.207999e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.253864e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.618032e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.112729e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.210546e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.732602e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.410527e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3681,13 +3681,13 @@ static double jarquebera_jbtbl130(double s, ae_state *_state) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -4.026324e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.331990e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.779129e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.674749e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.669077e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.679136e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 8.833221e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -4.026324e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.331990e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.779129e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.674749e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.669077e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.679136e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 8.833221e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3697,9 +3697,9 @@ static double jarquebera_jbtbl130(double s, ae_state *_state) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -5.893951e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.475304e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.116734e-02, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -5.893951e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.475304e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.116734e-02, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3709,7 +3709,7 @@ static double jarquebera_jbtbl130(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl200(double s, ae_state *_state) {
+static double jarquebera_jbtbl200(double s) {
    double x;
    double tj;
    double tj1;
@@ -3719,13 +3719,13 @@ static double jarquebera_jbtbl200(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.146155e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.177398e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.297970e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.869745e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.717288e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.982108e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.427636e-05, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.146155e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.177398e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.297970e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.869745e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.717288e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.982108e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.427636e-05, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3735,13 +3735,13 @@ static double jarquebera_jbtbl200(double s, ae_state *_state) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -4.034235e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.455006e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.942996e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.973795e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.418812e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.156778e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.896705e-05, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -4.034235e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.455006e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.942996e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.973795e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.418812e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.156778e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.896705e-05, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3751,9 +3751,9 @@ static double jarquebera_jbtbl200(double s, ae_state *_state) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.086071e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.152176e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.725393e-02, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.086071e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.152176e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.725393e-02, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3763,7 +3763,7 @@ static double jarquebera_jbtbl200(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl301(double s, ae_state *_state) {
+static double jarquebera_jbtbl301(double s) {
    double x;
    double tj;
    double tj1;
@@ -3773,13 +3773,13 @@ static double jarquebera_jbtbl301(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.104290e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.125800e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -9.595847e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.219666e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.502210e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.414543e-05, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.754115e-05, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.104290e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.125800e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.595847e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.219666e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.502210e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.414543e-05, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.754115e-05, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3789,13 +3789,13 @@ static double jarquebera_jbtbl301(double s, ae_state *_state) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -4.065955e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.582060e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.004472e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -4.709092e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.105779e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.197391e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.386780e-04, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -4.065955e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.582060e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.004472e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -4.709092e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.105779e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.197391e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.386780e-04, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3805,9 +3805,9 @@ static double jarquebera_jbtbl301(double s, ae_state *_state) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.311384e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.918763e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.626584e-02, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.311384e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.918763e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.626584e-02, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3817,7 +3817,7 @@ static double jarquebera_jbtbl301(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl501(double s, ae_state *_state) {
+static double jarquebera_jbtbl501(double s) {
    double x;
    double tj;
    double tj1;
@@ -3827,10 +3827,10 @@ static double jarquebera_jbtbl501(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.067426e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.079765e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -5.463005e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 6.875659e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.067426e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.079765e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.463005e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 6.875659e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3840,12 +3840,12 @@ static double jarquebera_jbtbl501(double s, ae_state *_state) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -4.127574e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.740694e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.044502e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.746714e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 3.810594e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.197111e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -4.127574e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.740694e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.044502e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.746714e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.810594e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.197111e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3855,9 +3855,9 @@ static double jarquebera_jbtbl501(double s, ae_state *_state) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.628194e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -8.846221e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.386405e-02, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.628194e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -8.846221e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.386405e-02, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3867,7 +3867,7 @@ static double jarquebera_jbtbl501(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl701(double s, ae_state *_state) {
+static double jarquebera_jbtbl701(double s) {
    double x;
    double tj;
    double tj1;
@@ -3877,10 +3877,10 @@ static double jarquebera_jbtbl701(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.050999e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.059769e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -3.922680e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 4.847054e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.050999e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.059769e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.922680e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 4.847054e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3890,12 +3890,12 @@ static double jarquebera_jbtbl701(double s, ae_state *_state) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -4.192182e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.860007e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.963942e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.838711e-02, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.893112e-04, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.159788e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -4.192182e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.860007e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.963942e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.838711e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.893112e-04, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.159788e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3905,9 +3905,9 @@ static double jarquebera_jbtbl701(double s, ae_state *_state) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -6.917851e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -9.817020e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.383727e-02, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -6.917851e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.817020e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.383727e-02, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3917,7 +3917,7 @@ static double jarquebera_jbtbl701(double s, ae_state *_state) {
    return result;
 }
 
-static double jarquebera_jbtbl1401(double s, ae_state *_state) {
+static double jarquebera_jbtbl1401(double s) {
    double x;
    double tj;
    double tj1;
@@ -3927,10 +3927,10 @@ static double jarquebera_jbtbl1401(double s, ae_state *_state) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -1.026266e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.030061e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.259222e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 2.536254e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -1.026266e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.030061e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.259222e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.536254e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3940,12 +3940,12 @@ static double jarquebera_jbtbl1401(double s, ae_state *_state) {
       x = 2 * (s - 4.000000) / 11.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -4.329849e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -2.095443e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 1.759363e-01, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -7.751359e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -6.124368e-03, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.793114e-03, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -4.329849e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.095443e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.759363e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.751359e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -6.124368e-03, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.793114e-03, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3955,9 +3955,9 @@ static double jarquebera_jbtbl1401(double s, ae_state *_state) {
       x = 2 * (s - 15.000000) / 10.000000 - 1;
       tj = 1.0;
       tj1 = x;
-      jarquebera_jbcheb(x, -7.544330e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, -1.225382e+00, &tj, &tj1, &result, _state);
-      jarquebera_jbcheb(x, 5.392349e-02, &tj, &tj1, &result, _state);
+      jarquebera_jbcheb(x, -7.544330e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.225382e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 5.392349e-02, &tj, &tj1, &result);
       if (result > 0.0) {
          result = 0.0;
       }
@@ -3967,7 +3967,7 @@ static double jarquebera_jbtbl1401(double s, ae_state *_state) {
    return result;
 }
 
-static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s, ae_state *_state) {
+static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s) {
    ae_int_t i;
    double v;
    double v1;
@@ -3983,7 +3983,7 @@ static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s, ae
    skewness = 0.0;
    kurtosis = 0.0;
    stddev = 0.0;
-   ae_assert(n > 1, "Assertion failed", _state);
+   ae_assert(n > 1, "Assertion failed");
 // Mean
    for (i = 0; i < n; i++) {
       mean += x->xR[i];
@@ -3993,13 +3993,13 @@ static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s, ae
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 += sqr(x->xR[i] - mean, _state);
+         v1 += sqr(x->xR[i] - mean);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
          v2 += (x->xR[i] - mean);
       }
-      v2 = sqr(v2, _state) / n;
+      v2 = sqr(v2) / n;
       variance = (v1 - v2) / (n - 1);
       if (variance < 0.0) {
          variance = 0.0;
@@ -4010,18 +4010,18 @@ static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s, ae
    if (stddev != 0.0) {
       for (i = 0; i < n; i++) {
          v = (x->xR[i] - mean) / stddev;
-         v2 = sqr(v, _state);
+         v2 = sqr(v);
          skewness += v2 * v;
-         kurtosis += sqr(v2, _state);
+         kurtosis += sqr(v2);
       }
       skewness /= n;
       kurtosis = kurtosis / n - 3;
    }
 // Statistic
-   *s = (double)n / 6.0 *(sqr(skewness, _state) + sqr(kurtosis, _state) / 4);
+   *s = (double)n / 6.0 *(sqr(skewness) + sqr(kurtosis) / 4);
 }
 
-static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state) {
+static double jarquebera_jarqueberaapprox(ae_int_t n, double s) {
    ae_frame _frame_block;
    double t1;
    double t2;
@@ -4034,67 +4034,67 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
    double f23;
    double x;
    double result;
-   ae_frame_make(_state, &_frame_block);
-   NewVector(vx, 0, DT_REAL, _state);
-   NewVector(vy, 0, DT_REAL, _state);
-   NewMatrix(ctbl, 0, 0, DT_REAL, _state);
+   ae_frame_make(&_frame_block);
+   NewVector(vx, 0, DT_REAL);
+   NewVector(vy, 0, DT_REAL);
+   NewMatrix(ctbl, 0, 0, DT_REAL);
    result = 1.0;
    x = s;
    if (n < 5) {
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return result;
    }
 // N = 5..20 are tabulated
    if (n >= 5 && n <= 20) {
       if (n == 5) {
-         result = exp(jarquebera_jbtbl5(x, _state));
+         result = exp(jarquebera_jbtbl5(x));
       }
       if (n == 6) {
-         result = exp(jarquebera_jbtbl6(x, _state));
+         result = exp(jarquebera_jbtbl6(x));
       }
       if (n == 7) {
-         result = exp(jarquebera_jbtbl7(x, _state));
+         result = exp(jarquebera_jbtbl7(x));
       }
       if (n == 8) {
-         result = exp(jarquebera_jbtbl8(x, _state));
+         result = exp(jarquebera_jbtbl8(x));
       }
       if (n == 9) {
-         result = exp(jarquebera_jbtbl9(x, _state));
+         result = exp(jarquebera_jbtbl9(x));
       }
       if (n == 10) {
-         result = exp(jarquebera_jbtbl10(x, _state));
+         result = exp(jarquebera_jbtbl10(x));
       }
       if (n == 11) {
-         result = exp(jarquebera_jbtbl11(x, _state));
+         result = exp(jarquebera_jbtbl11(x));
       }
       if (n == 12) {
-         result = exp(jarquebera_jbtbl12(x, _state));
+         result = exp(jarquebera_jbtbl12(x));
       }
       if (n == 13) {
-         result = exp(jarquebera_jbtbl13(x, _state));
+         result = exp(jarquebera_jbtbl13(x));
       }
       if (n == 14) {
-         result = exp(jarquebera_jbtbl14(x, _state));
+         result = exp(jarquebera_jbtbl14(x));
       }
       if (n == 15) {
-         result = exp(jarquebera_jbtbl15(x, _state));
+         result = exp(jarquebera_jbtbl15(x));
       }
       if (n == 16) {
-         result = exp(jarquebera_jbtbl16(x, _state));
+         result = exp(jarquebera_jbtbl16(x));
       }
       if (n == 17) {
-         result = exp(jarquebera_jbtbl17(x, _state));
+         result = exp(jarquebera_jbtbl17(x));
       }
       if (n == 18) {
-         result = exp(jarquebera_jbtbl18(x, _state));
+         result = exp(jarquebera_jbtbl18(x));
       }
       if (n == 19) {
-         result = exp(jarquebera_jbtbl19(x, _state));
+         result = exp(jarquebera_jbtbl19(x));
       }
       if (n == 20) {
-         result = exp(jarquebera_jbtbl20(x, _state));
+         result = exp(jarquebera_jbtbl20(x));
       }
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return result;
    }
 // N = 20, 30, 50 are tabulated.
@@ -4105,9 +4105,9 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       t2 = -1.0 / 30.0;
       t3 = -1.0 / 50.0;
       t = -1.0 / n;
-      f1 = jarquebera_jbtbl20(x, _state);
-      f2 = jarquebera_jbtbl30(x, _state);
-      f3 = jarquebera_jbtbl50(x, _state);
+      f1 = jarquebera_jbtbl20(x);
+      f2 = jarquebera_jbtbl30(x);
+      f3 = jarquebera_jbtbl50(x);
       f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
       f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
@@ -4115,7 +4115,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
          result = 0.0;
       }
       result = exp(result);
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return result;
    }
 // N = 50, 65, 100 are tabulated.
@@ -4126,9 +4126,9 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       t2 = -1.0 / 65.0;
       t3 = -1.0 / 100.0;
       t = -1.0 / n;
-      f1 = jarquebera_jbtbl50(x, _state);
-      f2 = jarquebera_jbtbl65(x, _state);
-      f3 = jarquebera_jbtbl100(x, _state);
+      f1 = jarquebera_jbtbl50(x);
+      f2 = jarquebera_jbtbl65(x);
+      f3 = jarquebera_jbtbl100(x);
       f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
       f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
@@ -4136,7 +4136,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
          result = 0.0;
       }
       result = exp(result);
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return result;
    }
 // N = 100, 130, 200 are tabulated.
@@ -4147,9 +4147,9 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       t2 = -1.0 / 130.0;
       t3 = -1.0 / 200.0;
       t = -1.0 / n;
-      f1 = jarquebera_jbtbl100(x, _state);
-      f2 = jarquebera_jbtbl130(x, _state);
-      f3 = jarquebera_jbtbl200(x, _state);
+      f1 = jarquebera_jbtbl100(x);
+      f2 = jarquebera_jbtbl130(x);
+      f3 = jarquebera_jbtbl200(x);
       f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
       f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
@@ -4157,7 +4157,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
          result = 0.0;
       }
       result = exp(result);
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return result;
    }
 // N = 200, 301, 501 are tabulated.
@@ -4168,9 +4168,9 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       t2 = -1.0 / 301.0;
       t3 = -1.0 / 501.0;
       t = -1.0 / n;
-      f1 = jarquebera_jbtbl200(x, _state);
-      f2 = jarquebera_jbtbl301(x, _state);
-      f3 = jarquebera_jbtbl501(x, _state);
+      f1 = jarquebera_jbtbl200(x);
+      f2 = jarquebera_jbtbl301(x);
+      f3 = jarquebera_jbtbl501(x);
       f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
       f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
@@ -4178,7 +4178,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
          result = 0.0;
       }
       result = exp(result);
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return result;
    }
 // N = 501, 701, 1401 are tabulated.
@@ -4189,9 +4189,9 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
       t2 = -1.0 / 701.0;
       t3 = -1.0 / 1401.0;
       t = -1.0 / n;
-      f1 = jarquebera_jbtbl501(x, _state);
-      f2 = jarquebera_jbtbl701(x, _state);
-      f3 = jarquebera_jbtbl1401(x, _state);
+      f1 = jarquebera_jbtbl501(x);
+      f2 = jarquebera_jbtbl701(x);
+      f3 = jarquebera_jbtbl1401(x);
       f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
       f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
@@ -4199,20 +4199,20 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
          result = 0.0;
       }
       result = exp(result);
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return result;
    }
 // Asymptotic expansion
    if (n > 1401) {
-      result = -0.5 * x + (jarquebera_jbtbl1401(x, _state) + 0.5 * x) * sqrt(1401.0 / n);
+      result = -0.5 * x + (jarquebera_jbtbl1401(x) + 0.5 * x) * sqrt(1401.0 / n);
       if (result > 0.0) {
          result = 0.0;
       }
       result = exp(result);
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return result;
    }
-   ae_frame_leave(_state);
+   ae_frame_leave();
    return result;
 }
 
@@ -4243,7 +4243,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s, ae_state *_state
 // from table values.
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 // API: void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p);
-void jarqueberatest(RVector *x, ae_int_t n, double *p, ae_state *_state) {
+void jarqueberatest(RVector *x, ae_int_t n, double *p) {
    double s;
    *p = 0;
 // N is too small
@@ -4252,17 +4252,17 @@ void jarqueberatest(RVector *x, ae_int_t n, double *p, ae_state *_state) {
       return;
    }
 // N is large enough
-   jarquebera_jarqueberastatistic(x, n, &s, _state);
-   *p = jarquebera_jarqueberaapprox(n, s, _state);
+   jarquebera_jarqueberastatistic(x, n, &s);
+   *p = jarquebera_jarqueberaapprox(n, s);
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
 void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::jarqueberatest(ConstT(ae_vector, x), n, &p, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::jarqueberatest(ConstT(ae_vector, x), n, &p);
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -4302,7 +4302,7 @@ namespace alglib_impl {
 //                     the null hypothesis is rejected.
 // ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
 // API: void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
-void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
    double xmean;
    double ymean;
@@ -4334,12 +4334,12 @@ void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, do
 // Variance (using corrected two-pass algorithm)
    xvar = 0.0;
    for (i = 0; i < n; i++) {
-      xvar += sqr(x->xR[i] - xmean, _state);
+      xvar += sqr(x->xR[i] - xmean);
    }
    xvar /= n - 1;
    yvar = 0.0;
    for (i = 0; i < m; i++) {
-      yvar += sqr(y->xR[i] - ymean, _state);
+      yvar += sqr(y->xR[i] - ymean);
    }
    yvar /= m - 1;
    if (xvar == 0.0 || yvar == 0.0) {
@@ -4351,9 +4351,9 @@ void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, do
 // Statistic
    df1 = n - 1;
    df2 = m - 1;
-   stat = rmin2(xvar / yvar, yvar / xvar, _state);
-   *bothtails = 1 - (fdistribution(df1, df2, 1 / stat, _state) - fdistribution(df1, df2, stat, _state));
-   *lefttail = fdistribution(df1, df2, xvar / yvar, _state);
+   stat = rmin2(xvar / yvar, yvar / xvar);
+   *bothtails = 1 - (fdistribution(df1, df2, 1 / stat) - fdistribution(df1, df2, stat));
+   *lefttail = fdistribution(df1, df2, xvar / yvar);
    *righttail = 1 - (*lefttail);
 }
 
@@ -4388,7 +4388,7 @@ void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, do
 //                     the null hypothesis is rejected.
 // ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
 // API: void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail);
-void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
    double xmean;
    double xvar;
@@ -4412,7 +4412,7 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
 // Variance
    xvar = 0.0;
    for (i = 0; i < n; i++) {
-      xvar += sqr(x->xR[i] - xmean, _state);
+      xvar += sqr(x->xR[i] - xmean);
    }
    xvar /= n - 1;
    if (xvar == 0.0) {
@@ -4423,8 +4423,8 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
    }
 // Statistic
    stat = (n - 1) * xvar / variance;
-   s = chisquaredistribution((double)(n - 1), stat, _state);
-   *bothtails = 2 * rmin2(s, 1 - s, _state);
+   s = chisquaredistribution((double)(n - 1), stat);
+   *bothtails = 2 * rmin2(s, 1 - s);
    *lefttail = s;
    *righttail = 1 - (*lefttail);
 }
@@ -4432,17 +4432,17 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
 
 namespace alglib {
 void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ftest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::ftest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
 }
 
 void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::onesamplevariancetest(ConstT(ae_vector, x), n, variance, &bothtails, &lefttail, &righttail, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::onesamplevariancetest(ConstT(ae_vector, x), n, variance, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -4450,7 +4450,7 @@ void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const doubl
 // Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
 // Sequential Chebyshev interpolation.
-static void wsr_wcheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state) {
+static void wsr_wcheb(double x, double c, double *tj, double *tj1, double *r) {
    double t;
    *r += c * (*tj);
    t = 2 * x * (*tj1) - (*tj);
@@ -4459,12 +4459,12 @@ static void wsr_wcheb(double x, double c, double *tj, double *tj1, double *r, ae
 }
 
 // Tail(S, 5)
-static double wsr_w5(double s, ae_state *_state) {
+static double wsr_w5(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-3.708099e+00 * s + 7.500000e+00, _state);
+   w = iround(-3.708099e+00 * s + 7.500000e+00);
    if (w >= 7) {
       r = -6.931e-01;
    }
@@ -4494,12 +4494,12 @@ static double wsr_w5(double s, ae_state *_state) {
 }
 
 // Tail(S, 6)
-static double wsr_w6(double s, ae_state *_state) {
+static double wsr_w6(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-4.769696e+00 * s + 1.050000e+01, _state);
+   w = iround(-4.769696e+00 * s + 1.050000e+01);
    if (w >= 10) {
       r = -6.931e-01;
    }
@@ -4538,12 +4538,12 @@ static double wsr_w6(double s, ae_state *_state) {
 }
 
 // Tail(S, 7)
-static double wsr_w7(double s, ae_state *_state) {
+static double wsr_w7(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-5.916080e+00 * s + 1.400000e+01, _state);
+   w = iround(-5.916080e+00 * s + 1.400000e+01);
    if (w >= 14) {
       r = -6.325e-01;
    }
@@ -4594,12 +4594,12 @@ static double wsr_w7(double s, ae_state *_state) {
 }
 
 // Tail(S, 8)
-static double wsr_w8(double s, ae_state *_state) {
+static double wsr_w8(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-7.141428e+00 * s + 1.800000e+01, _state);
+   w = iround(-7.141428e+00 * s + 1.800000e+01);
    if (w >= 18) {
       r = -6.399e-01;
    }
@@ -4662,12 +4662,12 @@ static double wsr_w8(double s, ae_state *_state) {
 }
 
 // Tail(S, 9)
-static double wsr_w9(double s, ae_state *_state) {
+static double wsr_w9(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-8.440972e+00 * s + 2.250000e+01, _state);
+   w = iround(-8.440972e+00 * s + 2.250000e+01);
    if (w >= 22) {
       r = -6.931e-01;
    }
@@ -4742,12 +4742,12 @@ static double wsr_w9(double s, ae_state *_state) {
 }
 
 // Tail(S, 10)
-static double wsr_w10(double s, ae_state *_state) {
+static double wsr_w10(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-9.810708e+00 * s + 2.750000e+01, _state);
+   w = iround(-9.810708e+00 * s + 2.750000e+01);
    if (w >= 27) {
       r = -6.931e-01;
    }
@@ -4837,12 +4837,12 @@ static double wsr_w10(double s, ae_state *_state) {
 }
 
 // Tail(S, 11)
-static double wsr_w11(double s, ae_state *_state) {
+static double wsr_w11(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-1.124722e+01 * s + 3.300000e+01, _state);
+   w = iround(-1.124722e+01 * s + 3.300000e+01);
    if (w >= 33) {
       r = -6.595e-01;
    }
@@ -4950,12 +4950,12 @@ static double wsr_w11(double s, ae_state *_state) {
 }
 
 // Tail(S, 12)
-static double wsr_w12(double s, ae_state *_state) {
+static double wsr_w12(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-1.274755e+01 * s + 3.900000e+01, _state);
+   w = iround(-1.274755e+01 * s + 3.900000e+01);
    if (w >= 39) {
       r = -6.633e-01;
    }
@@ -5081,12 +5081,12 @@ static double wsr_w12(double s, ae_state *_state) {
 }
 
 // Tail(S, 13)
-static double wsr_w13(double s, ae_state *_state) {
+static double wsr_w13(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-1.430909e+01 * s + 4.550000e+01, _state);
+   w = iround(-1.430909e+01 * s + 4.550000e+01);
    if (w >= 45) {
       r = -6.931e-01;
    }
@@ -5230,12 +5230,12 @@ static double wsr_w13(double s, ae_state *_state) {
 }
 
 // Tail(S, 14)
-static double wsr_w14(double s, ae_state *_state) {
+static double wsr_w14(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-1.592953e+01 * s + 5.250000e+01, _state);
+   w = iround(-1.592953e+01 * s + 5.250000e+01);
    if (w >= 52) {
       r = -6.931e-01;
    }
@@ -5400,12 +5400,12 @@ static double wsr_w14(double s, ae_state *_state) {
 }
 
 // Tail(S, 15)
-static double wsr_w15(double s, ae_state *_state) {
+static double wsr_w15(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-1.760682e+01 * s + 6.000000e+01, _state);
+   w = iround(-1.760682e+01 * s + 6.000000e+01);
    if (w >= 60) {
       r = -6.714e-01;
    }
@@ -5594,12 +5594,12 @@ static double wsr_w15(double s, ae_state *_state) {
 }
 
 // Tail(S, 16)
-static double wsr_w16(double s, ae_state *_state) {
+static double wsr_w16(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-1.933908e+01 * s + 6.800000e+01, _state);
+   w = iround(-1.933908e+01 * s + 6.800000e+01);
    if (w >= 68) {
       r = -6.733e-01;
    }
@@ -5812,12 +5812,12 @@ static double wsr_w16(double s, ae_state *_state) {
 }
 
 // Tail(S, 17)
-static double wsr_w17(double s, ae_state *_state) {
+static double wsr_w17(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-2.112463e+01 * s + 7.650000e+01, _state);
+   w = iround(-2.112463e+01 * s + 7.650000e+01);
    if (w >= 76) {
       r = -6.931e-01;
    }
@@ -6054,12 +6054,12 @@ static double wsr_w17(double s, ae_state *_state) {
 }
 
 // Tail(S, 18)
-static double wsr_w18(double s, ae_state *_state) {
+static double wsr_w18(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-2.296193e+01 * s + 8.550000e+01, _state);
+   w = iround(-2.296193e+01 * s + 8.550000e+01);
    if (w >= 85) {
       r = -6.931e-01;
    }
@@ -6323,12 +6323,12 @@ static double wsr_w18(double s, ae_state *_state) {
 }
 
 // Tail(S, 19)
-static double wsr_w19(double s, ae_state *_state) {
+static double wsr_w19(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-2.484955e+01 * s + 9.500000e+01, _state);
+   w = iround(-2.484955e+01 * s + 9.500000e+01);
    if (w >= 95) {
       r = -6.776e-01;
    }
@@ -6622,12 +6622,12 @@ static double wsr_w19(double s, ae_state *_state) {
 }
 
 // Tail(S, 20)
-static double wsr_w20(double s, ae_state *_state) {
+static double wsr_w20(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-2.678619e+01 * s + 1.050000e+02, _state);
+   w = iround(-2.678619e+01 * s + 1.050000e+02);
    if (w >= 105) {
       r = -6.787e-01;
    }
@@ -6951,12 +6951,12 @@ static double wsr_w20(double s, ae_state *_state) {
 }
 
 // Tail(S, 21)
-static double wsr_w21(double s, ae_state *_state) {
+static double wsr_w21(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-2.877064e+01 * s + 1.155000e+02, _state);
+   w = iround(-2.877064e+01 * s + 1.155000e+02);
    if (w >= 115) {
       r = -6.931e-01;
    }
@@ -7310,12 +7310,12 @@ static double wsr_w21(double s, ae_state *_state) {
 }
 
 // Tail(S, 22)
-static double wsr_w22(double s, ae_state *_state) {
+static double wsr_w22(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-3.080179e+01 * s + 1.265000e+02, _state);
+   w = iround(-3.080179e+01 * s + 1.265000e+02);
    if (w >= 126) {
       r = -6.931e-01;
    }
@@ -7702,12 +7702,12 @@ static double wsr_w22(double s, ae_state *_state) {
 }
 
 // Tail(S, 23)
-static double wsr_w23(double s, ae_state *_state) {
+static double wsr_w23(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-3.287856e+01 * s + 1.380000e+02, _state);
+   w = iround(-3.287856e+01 * s + 1.380000e+02);
    if (w >= 138) {
       r = -6.813e-01;
    }
@@ -8130,12 +8130,12 @@ static double wsr_w23(double s, ae_state *_state) {
 }
 
 // Tail(S, 24)
-static double wsr_w24(double s, ae_state *_state) {
+static double wsr_w24(double s) {
    ae_int_t w;
    double r;
    double result;
    r = 0.0;
-   w = iround(-3.500000e+01 * s + 1.500000e+02, _state);
+   w = iround(-3.500000e+01 * s + 1.500000e+02);
    if (w >= 150) {
       r = -6.820e-01;
    }
@@ -8594,247 +8594,247 @@ static double wsr_w24(double s, ae_state *_state) {
 }
 
 // Tail(S, 25)
-static double wsr_w25(double s, ae_state *_state) {
+static double wsr_w25(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   wsr_wcheb(x, -5.150509e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.695528e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.437637e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -2.611906e-01, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -7.625722e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -2.579892e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.086876e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -2.906543e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -2.354881e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 1.007195e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -8.437327e-04, &tj, &tj1, &result, _state);
+   wsr_wcheb(x, -5.150509e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.695528e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.437637e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -2.611906e-01, &tj, &tj1, &result);
+   wsr_wcheb(x, -7.625722e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -2.579892e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.086876e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -2.906543e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, -2.354881e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, 1.007195e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -8.437327e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 26)
-static double wsr_w26(double s, ae_state *_state) {
+static double wsr_w26(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   wsr_wcheb(x, -5.117622e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.635159e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.395167e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -2.382823e-01, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -6.531987e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -2.060112e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -8.203697e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.516523e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.431364e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 6.384553e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -3.238369e-04, &tj, &tj1, &result, _state);
+   wsr_wcheb(x, -5.117622e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.635159e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.395167e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -2.382823e-01, &tj, &tj1, &result);
+   wsr_wcheb(x, -6.531987e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -2.060112e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -8.203697e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.516523e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.431364e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, 6.384553e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -3.238369e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 27)
-static double wsr_w27(double s, ae_state *_state) {
+static double wsr_w27(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   wsr_wcheb(x, -5.089731e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.584248e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.359966e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -2.203696e-01, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.753344e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.761891e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -7.096897e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.419108e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.581214e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 3.033766e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.901441e-04, &tj, &tj1, &result, _state);
+   wsr_wcheb(x, -5.089731e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.584248e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.359966e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -2.203696e-01, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.753344e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.761891e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -7.096897e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.419108e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.581214e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, 3.033766e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.901441e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 28)
-static double wsr_w28(double s, ae_state *_state) {
+static double wsr_w28(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   wsr_wcheb(x, -5.065046e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.539163e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.328939e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -2.046376e-01, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.061515e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.469271e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.711578e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -8.389153e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.250575e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 4.047245e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.128555e-04, &tj, &tj1, &result, _state);
+   wsr_wcheb(x, -5.065046e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.539163e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.328939e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -2.046376e-01, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.061515e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.469271e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.711578e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, -8.389153e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.250575e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, 4.047245e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.128555e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 29)
-static double wsr_w29(double s, ae_state *_state) {
+static double wsr_w29(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   wsr_wcheb(x, -5.043413e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.499756e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.302137e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.915129e-01, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -4.516329e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.260064e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -4.817269e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.478130e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.111668e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 4.093451e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.135860e-04, &tj, &tj1, &result, _state);
+   wsr_wcheb(x, -5.043413e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.499756e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.302137e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.915129e-01, &tj, &tj1, &result);
+   wsr_wcheb(x, -4.516329e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.260064e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -4.817269e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.478130e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.111668e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, 4.093451e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.135860e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 30)
-static double wsr_w30(double s, ae_state *_state) {
+static double wsr_w30(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   wsr_wcheb(x, -5.024071e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.464515e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.278342e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.800030e-01, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -4.046294e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.076162e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -3.968677e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.911679e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -8.619185e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 5.125362e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -3.984370e-04, &tj, &tj1, &result, _state);
+   wsr_wcheb(x, -5.024071e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.464515e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.278342e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.800030e-01, &tj, &tj1, &result);
+   wsr_wcheb(x, -4.046294e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.076162e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -3.968677e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.911679e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -8.619185e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, 5.125362e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -3.984370e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 40)
-static double wsr_w40(double s, ae_state *_state) {
+static double wsr_w40(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   wsr_wcheb(x, -4.904809e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.248327e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.136698e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.170982e-01, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.824427e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -3.888648e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.344929e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 2.790407e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -4.619858e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 3.359121e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -2.883026e-04, &tj, &tj1, &result, _state);
+   wsr_wcheb(x, -4.904809e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.248327e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.136698e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.170982e-01, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.824427e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -3.888648e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.344929e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, 2.790407e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -4.619858e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, 3.359121e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -2.883026e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 60)
-static double wsr_w60(double s, ae_state *_state) {
+static double wsr_w60(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   wsr_wcheb(x, -4.809656e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.077191e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.029402e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -7.507931e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -6.506226e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.391278e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -4.263635e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 2.302271e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -2.384348e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 1.865587e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.622355e-04, &tj, &tj1, &result, _state);
+   wsr_wcheb(x, -4.809656e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.077191e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.029402e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -7.507931e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, -6.506226e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.391278e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, -4.263635e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, 2.302271e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -2.384348e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, 1.865587e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.622355e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 120)
-static double wsr_w120(double s, ae_state *_state) {
+static double wsr_w120(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   wsr_wcheb(x, -4.729426e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -4.934426e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -9.433231e-01, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -4.492504e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 1.673948e-05, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -6.077014e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -7.215768e-05, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 9.086734e-05, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -8.447980e-05, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 6.705028e-05, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.828507e-05, &tj, &tj1, &result, _state);
+   wsr_wcheb(x, -4.729426e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -4.934426e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -9.433231e-01, &tj, &tj1, &result);
+   wsr_wcheb(x, -4.492504e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, 1.673948e-05, &tj, &tj1, &result);
+   wsr_wcheb(x, -6.077014e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -7.215768e-05, &tj, &tj1, &result);
+   wsr_wcheb(x, 9.086734e-05, &tj, &tj1, &result);
+   wsr_wcheb(x, -8.447980e-05, &tj, &tj1, &result);
+   wsr_wcheb(x, 6.705028e-05, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.828507e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 200)
-static double wsr_w200(double s, ae_state *_state) {
+static double wsr_w200(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   wsr_wcheb(x, -4.700240e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -4.883080e+00, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -9.132168e-01, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -3.512684e-02, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 1.726342e-03, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -5.189796e-04, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -1.628659e-06, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 4.261786e-05, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -4.002498e-05, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, 3.146287e-05, &tj, &tj1, &result, _state);
-   wsr_wcheb(x, -2.727576e-05, &tj, &tj1, &result, _state);
+   wsr_wcheb(x, -4.700240e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -4.883080e+00, &tj, &tj1, &result);
+   wsr_wcheb(x, -9.132168e-01, &tj, &tj1, &result);
+   wsr_wcheb(x, -3.512684e-02, &tj, &tj1, &result);
+   wsr_wcheb(x, 1.726342e-03, &tj, &tj1, &result);
+   wsr_wcheb(x, -5.189796e-04, &tj, &tj1, &result);
+   wsr_wcheb(x, -1.628659e-06, &tj, &tj1, &result);
+   wsr_wcheb(x, 4.261786e-05, &tj, &tj1, &result);
+   wsr_wcheb(x, -4.002498e-05, &tj, &tj1, &result);
+   wsr_wcheb(x, 3.146287e-05, &tj, &tj1, &result);
+   wsr_wcheb(x, -2.727576e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S,N), S >= 0
-static double wsr_wsigma(double s, ae_int_t n, ae_state *_state) {
+static double wsr_wsigma(double s, ae_int_t n) {
    double f0;
    double f1;
    double f2;
@@ -8849,95 +8849,95 @@ static double wsr_wsigma(double s, ae_int_t n, ae_state *_state) {
    double result;
    result = 0.0;
    if (n == 5) {
-      result = wsr_w5(s, _state);
+      result = wsr_w5(s);
    }
    if (n == 6) {
-      result = wsr_w6(s, _state);
+      result = wsr_w6(s);
    }
    if (n == 7) {
-      result = wsr_w7(s, _state);
+      result = wsr_w7(s);
    }
    if (n == 8) {
-      result = wsr_w8(s, _state);
+      result = wsr_w8(s);
    }
    if (n == 9) {
-      result = wsr_w9(s, _state);
+      result = wsr_w9(s);
    }
    if (n == 10) {
-      result = wsr_w10(s, _state);
+      result = wsr_w10(s);
    }
    if (n == 11) {
-      result = wsr_w11(s, _state);
+      result = wsr_w11(s);
    }
    if (n == 12) {
-      result = wsr_w12(s, _state);
+      result = wsr_w12(s);
    }
    if (n == 13) {
-      result = wsr_w13(s, _state);
+      result = wsr_w13(s);
    }
    if (n == 14) {
-      result = wsr_w14(s, _state);
+      result = wsr_w14(s);
    }
    if (n == 15) {
-      result = wsr_w15(s, _state);
+      result = wsr_w15(s);
    }
    if (n == 16) {
-      result = wsr_w16(s, _state);
+      result = wsr_w16(s);
    }
    if (n == 17) {
-      result = wsr_w17(s, _state);
+      result = wsr_w17(s);
    }
    if (n == 18) {
-      result = wsr_w18(s, _state);
+      result = wsr_w18(s);
    }
    if (n == 19) {
-      result = wsr_w19(s, _state);
+      result = wsr_w19(s);
    }
    if (n == 20) {
-      result = wsr_w20(s, _state);
+      result = wsr_w20(s);
    }
    if (n == 21) {
-      result = wsr_w21(s, _state);
+      result = wsr_w21(s);
    }
    if (n == 22) {
-      result = wsr_w22(s, _state);
+      result = wsr_w22(s);
    }
    if (n == 23) {
-      result = wsr_w23(s, _state);
+      result = wsr_w23(s);
    }
    if (n == 24) {
-      result = wsr_w24(s, _state);
+      result = wsr_w24(s);
    }
    if (n == 25) {
-      result = wsr_w25(s, _state);
+      result = wsr_w25(s);
    }
    if (n == 26) {
-      result = wsr_w26(s, _state);
+      result = wsr_w26(s);
    }
    if (n == 27) {
-      result = wsr_w27(s, _state);
+      result = wsr_w27(s);
    }
    if (n == 28) {
-      result = wsr_w28(s, _state);
+      result = wsr_w28(s);
    }
    if (n == 29) {
-      result = wsr_w29(s, _state);
+      result = wsr_w29(s);
    }
    if (n == 30) {
-      result = wsr_w30(s, _state);
+      result = wsr_w30(s);
    }
    if (n > 30) {
       x = 1.0 / n;
       x0 = 1.0 / 30;
-      f0 = wsr_w30(s, _state);
+      f0 = wsr_w30(s);
       x1 = 1.0 / 40;
-      f1 = wsr_w40(s, _state);
+      f1 = wsr_w40(s);
       x2 = 1.0 / 60;
-      f2 = wsr_w60(s, _state);
+      f2 = wsr_w60(s);
       x3 = 1.0 / 120;
-      f3 = wsr_w120(s, _state);
+      f3 = wsr_w120(s);
       x4 = 1.0 / 200;
-      f4 = wsr_w200(s, _state);
+      f4 = wsr_w200(s);
       f1 = ((x - x0) * f1 - (x - x1) * f0) / (x1 - x0);
       f2 = ((x - x0) * f2 - (x - x2) * f0) / (x2 - x0);
       f3 = ((x - x0) * f3 - (x - x3) * f0) / (x3 - x0);
@@ -8999,7 +8999,7 @@ static double wsr_wsigma(double s, ae_int_t n, ae_state *_state) {
 // the significance level outlies this interval, the test returns 0.0001.
 // ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
 // API: void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail);
-void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -9014,19 +9014,19 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    double s;
    double sigma;
    double mu;
-   ae_frame_make(_state, &_frame_block);
-   DupVector(x, _state);
+   ae_frame_make(&_frame_block);
+   DupVector(x);
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
-   NewVector(r, 0, DT_REAL, _state);
-   NewVector(c, 0, DT_INT, _state);
+   NewVector(r, 0, DT_REAL);
+   NewVector(c, 0, DT_INT);
 // Prepare
    if (n < 5) {
       *bothtails = 1.0;
       *lefttail = 1.0;
       *righttail = 1.0;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    ns = 0;
@@ -9041,11 +9041,11 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
       *bothtails = 1.0;
       *lefttail = 1.0;
       *righttail = 1.0;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
-   ae_vector_set_length(&r, ns - 1 + 1, _state);
-   ae_vector_set_length(&c, ns - 1 + 1, _state);
+   ae_vector_set_length(&r, ns - 1 + 1);
+   ae_vector_set_length(&c, ns - 1 + 1);
    for (i = 0; i < ns; i++) {
       r.xR[i] = fabs(x->xR[i] - e);
       c.xZ[i] = i;
@@ -9133,25 +9133,25 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    sigma = sqrt(mu * (2 * ns + 1) / 6);
    s = (w - mu) / sigma;
    if (s <= 0.0) {
-      p = exp(wsr_wsigma(-(w - mu) / sigma, ns, _state));
-      mp = 1 - exp(wsr_wsigma(-(w - 1 - mu) / sigma, ns, _state));
+      p = exp(wsr_wsigma(-(w - mu) / sigma, ns));
+      mp = 1 - exp(wsr_wsigma(-(w - 1 - mu) / sigma, ns));
    } else {
-      mp = exp(wsr_wsigma((w - mu) / sigma, ns, _state));
-      p = 1 - exp(wsr_wsigma((w + 1 - mu) / sigma, ns, _state));
+      mp = exp(wsr_wsigma((w - mu) / sigma, ns));
+      p = 1 - exp(wsr_wsigma((w + 1 - mu) / sigma, ns));
    }
-   *lefttail = rmax2(p, 1.0E-4, _state);
-   *righttail = rmax2(mp, 1.0E-4, _state);
-   *bothtails = 2 * rmin2(*lefttail, *righttail, _state);
-   ae_frame_leave(_state);
+   *lefttail = rmax2(p, 1.0E-4);
+   *righttail = rmax2(mp, 1.0E-4);
+   *bothtails = 2 * rmin2(*lefttail, *righttail);
+   ae_frame_leave();
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
 void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::wilcoxonsignedranktest(ConstT(ae_vector, x), n, e, &bothtails, &lefttail, &righttail, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::wilcoxonsignedranktest(ConstT(ae_vector, x), n, e, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -9159,7 +9159,7 @@ void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const doub
 // Depends on: (AlgLibMisc) HQRND
 namespace alglib_impl {
 // Sequential Chebyshev interpolation.
-static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, double *r, ae_state *_state) {
+static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, double *r) {
    double t;
    *r += c * (*tj);
    t = 2 * x * (*tj1) - (*tj);
@@ -9168,2878 +9168,2878 @@ static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, doub
 }
 
 // Tail(S, 5, 5)
-static double mannwhitneyu_utbln5n5(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n5(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 2.611165e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 2.611165e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -2.596264e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.412086e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.858542e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.614282e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.372686e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.524731e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.435331e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.284665e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.184141e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.298360e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 7.447272e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.938769e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.276205e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.138481e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.684625e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.558104e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -2.596264e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.412086e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.858542e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.614282e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.372686e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.524731e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.435331e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.284665e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.184141e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.298360e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 7.447272e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.938769e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.276205e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.138481e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.684625e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.558104e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 6)
-static double mannwhitneyu_utbln5n6(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n6(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 2.738613e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 2.738613e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -2.810459e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.684429e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.712858e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.009324e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.644391e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 6.034173e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.953498e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.279293e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.563485e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.971952e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.506309e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.541406e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.283205e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.016347e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.221626e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.286752e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -2.810459e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.684429e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.712858e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.009324e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.644391e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 6.034173e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.953498e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.279293e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.563485e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.971952e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.506309e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.541406e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.283205e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.016347e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.221626e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.286752e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 7)
-static double mannwhitneyu_utbln5n7(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n7(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 2.841993e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 2.841993e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -2.994677e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.923264e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.506190e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.054280e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.794587e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.726290e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.534180e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.517845e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.904428e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.882443e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.482988e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.114875e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.515082e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.996056e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.293581e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.349444e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -2.994677e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.923264e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.506190e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.054280e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.794587e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.726290e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.534180e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.517845e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.904428e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.882443e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.482988e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.114875e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.515082e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.996056e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.293581e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.349444e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 8)
-static double mannwhitneyu_utbln5n8(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n8(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 2.927700e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 2.927700e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.155727e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.135078e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.247203e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.309697e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.993725e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.567219e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.383704e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.002188e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.487322e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.443899e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.688270e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.600339e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.874948e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.811593e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.072353e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.659457e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.155727e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.135078e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.247203e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.309697e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.993725e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.567219e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.383704e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.002188e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.487322e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.443899e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.688270e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.600339e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.874948e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.811593e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.072353e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.659457e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 9)
-static double mannwhitneyu_utbln5n9(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n9(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.000000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.000000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.298162e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.325016e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.939852e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.563029e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.222652e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.195200e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.445665e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.204792e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.775217e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.527781e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.221948e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.242968e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.607959e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.771285e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 6.694026e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.481190e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.298162e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.325016e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.939852e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.563029e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.222652e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.195200e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.445665e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.204792e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.775217e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.527781e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.221948e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.242968e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.607959e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.771285e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 6.694026e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.481190e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 10)
-static double mannwhitneyu_utbln5n10(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n10(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.061862e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.061862e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.425360e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.496710e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.587658e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.812005e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.427637e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.515702e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.406867e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.796295e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.237591e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.654249e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.181165e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.011665e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.417927e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.534880e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.791255e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.871512e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.425360e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.496710e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.587658e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.812005e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.427637e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.515702e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.406867e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.796295e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.237591e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.654249e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.181165e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.011665e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.417927e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.534880e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.791255e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.871512e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 11)
-static double mannwhitneyu_utbln5n11(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n11(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.115427e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.115427e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.539959e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.652998e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.196503e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.054363e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.618848e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.109411e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.786668e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.215648e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.484220e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.935991e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.396191e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.894177e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.206979e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.519055e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.210326e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.189679e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.539959e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.652998e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.196503e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.054363e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.618848e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.109411e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.786668e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.215648e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.484220e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.935991e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.396191e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.894177e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.206979e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.519055e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.210326e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.189679e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 12)
-static double mannwhitneyu_utbln5n12(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n12(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.162278e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.162278e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.644007e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.796173e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.771177e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.290043e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.794686e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.702110e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.185959e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.416259e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.592056e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.201530e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.754365e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.978945e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.012032e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.304579e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.100378e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.728269e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.644007e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.796173e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.771177e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.290043e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.794686e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.702110e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.185959e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.416259e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.592056e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.201530e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.754365e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.978945e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.012032e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.304579e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.100378e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.728269e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 13)
-static double mannwhitneyu_utbln5n13(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n13(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.203616e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.203616e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.739120e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.928117e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.031605e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.519403e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.962648e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.292183e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.809293e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.465156e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.456278e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.446055e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.109490e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.218256e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.941479e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.058603e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.824402e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.830947e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.739120e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.928117e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.031605e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.519403e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.962648e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.292183e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.809293e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.465156e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.456278e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.446055e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.109490e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.218256e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.941479e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.058603e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.824402e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.830947e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 14)
-static double mannwhitneyu_utbln5n14(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n14(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.240370e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.240370e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.826559e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.050370e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.083408e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.743164e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.012030e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.884686e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.059656e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.327521e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.134026e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.584201e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.440618e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.524133e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.990007e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.887334e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.534977e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.705395e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.826559e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.050370e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.083408e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.743164e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.012030e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.884686e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.059656e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.327521e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.134026e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.584201e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.440618e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.524133e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.990007e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.887334e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.534977e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.705395e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 15)
-static double mannwhitneyu_utbln5n15(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n15(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.851572e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.082033e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.095983e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.814595e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.073148e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.420213e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.517175e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.344180e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.371393e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.711443e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.228569e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.683483e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.267112e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.156044e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 9.131316e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.301023e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.851572e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.082033e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.095983e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.814595e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.073148e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.420213e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.517175e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.344180e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.371393e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.711443e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.228569e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.683483e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.267112e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.156044e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 9.131316e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.301023e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 16)
-static double mannwhitneyu_utbln5n16(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n16(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.852210e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.077482e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.091186e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.797282e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.084994e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.667054e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.843909e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.456732e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.039830e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.723508e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.940608e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.478285e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.649144e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.237703e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.707410e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.874293e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.852210e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.077482e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.091186e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.797282e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.084994e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.667054e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.843909e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.456732e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.039830e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.723508e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.940608e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.478285e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.649144e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.237703e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.707410e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.874293e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 17)
-static double mannwhitneyu_utbln5n17(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n17(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.851752e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.071259e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.084700e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.758898e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.073846e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.684838e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.964936e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.782442e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.956362e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.984727e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.196936e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.558262e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.690746e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.364855e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.401006e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.546748e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.851752e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.071259e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.084700e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.758898e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.073846e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.684838e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.964936e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.782442e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.956362e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.984727e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.196936e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.558262e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.690746e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.364855e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.401006e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.546748e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 18)
-static double mannwhitneyu_utbln5n18(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n18(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.850840e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.064799e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.077651e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.712659e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.049217e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.571333e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.929809e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.752044e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.949464e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.896101e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.614460e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.384357e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.489113e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.445725e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.945636e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.424653e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.850840e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.064799e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.077651e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.712659e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.049217e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.571333e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.929809e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.752044e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.949464e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.896101e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.614460e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.384357e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.489113e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.445725e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.945636e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.424653e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 19)
-static double mannwhitneyu_utbln5n19(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n19(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.850027e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.059159e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.071106e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.669960e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.022780e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.442555e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.851335e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.433865e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.514465e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.332989e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.606099e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.341945e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.402164e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.039761e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.512831e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.284427e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.850027e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.059159e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.071106e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.669960e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.022780e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.442555e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.851335e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.433865e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.514465e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.332989e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.606099e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.341945e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.402164e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.039761e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.512831e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.284427e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 20)
-static double mannwhitneyu_utbln5n20(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n20(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.849651e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.054729e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.065747e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.636243e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.003234e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.372789e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.831551e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.763090e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.830626e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.122384e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.108328e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.557983e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.945666e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.965696e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.493236e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.162591e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.849651e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.054729e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.065747e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.636243e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.003234e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.372789e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.831551e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.763090e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.830626e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.122384e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.108328e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.557983e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.945666e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.965696e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.493236e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.162591e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 21)
-static double mannwhitneyu_utbln5n21(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n21(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.849649e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.051155e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.061430e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.608869e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.902788e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.346562e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.874709e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.682887e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.026206e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.534551e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.990575e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.713334e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 9.737011e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.304571e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.133110e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.123457e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.849649e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.051155e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.061430e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.608869e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.902788e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.346562e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.874709e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.682887e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.026206e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.534551e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.990575e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.713334e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 9.737011e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.304571e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.133110e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.123457e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 22)
-static double mannwhitneyu_utbln5n22(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n22(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.849598e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.047605e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.057264e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.579513e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.749602e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.275137e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.881768e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.177374e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.981056e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.696290e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.886803e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.085378e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.675242e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.426367e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.039613e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.662378e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.849598e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.047605e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.057264e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.579513e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.749602e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.275137e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.881768e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.177374e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.981056e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.696290e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.886803e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.085378e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.675242e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.426367e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.039613e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.662378e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 23)
-static double mannwhitneyu_utbln5n23(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n23(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.849269e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.043761e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.052735e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.544683e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.517503e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.112082e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.782070e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.549483e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.747329e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.694263e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.147141e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.526209e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.039173e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.235615e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.656546e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.014423e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.849269e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.043761e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.052735e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.544683e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.517503e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.112082e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.782070e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.549483e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.747329e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.694263e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.147141e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.526209e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.039173e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.235615e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.656546e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.014423e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 24)
-static double mannwhitneyu_utbln5n24(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n24(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.848925e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.040178e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.048355e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.510198e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.261134e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.915864e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.627423e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.307345e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.732992e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.869652e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.494176e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.047533e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.178439e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.424171e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.829195e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.840810e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.848925e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.040178e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.048355e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.510198e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.261134e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.915864e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.627423e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.307345e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.732992e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.869652e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.494176e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.047533e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.178439e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.424171e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.829195e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.840810e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 25)
-static double mannwhitneyu_utbln5n25(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n25(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.848937e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.037512e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.044866e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.483269e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.063682e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.767778e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.508540e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.332756e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.881511e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.124041e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.368456e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.930499e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.779630e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.029528e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.658678e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.289695e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.848937e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.037512e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.044866e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.483269e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.063682e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.767778e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.508540e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.332756e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.881511e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.124041e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.368456e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.930499e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.779630e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.029528e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.658678e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.289695e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 26)
-static double mannwhitneyu_utbln5n26(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n26(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.849416e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.035915e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.042493e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.466021e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.956432e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.698914e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.465689e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.035254e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.674614e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.492734e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.014021e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.944953e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.255750e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.075841e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.989330e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.134862e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.849416e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.035915e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.042493e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.466021e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.956432e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.698914e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.465689e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.035254e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.674614e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.492734e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.014021e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.944953e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.255750e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.075841e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.989330e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.134862e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 27)
-static double mannwhitneyu_utbln5n27(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n27(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.850070e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.034815e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.040650e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.453117e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.886426e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.661702e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.452346e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.002476e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.720126e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.001400e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.729826e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.740640e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.206333e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.366093e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.193471e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.804091e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.850070e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.034815e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.040650e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.453117e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.886426e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.661702e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.452346e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.002476e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.720126e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.001400e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.729826e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.740640e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.206333e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.366093e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.193471e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.804091e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 28)
-static double mannwhitneyu_utbln5n28(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n28(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.850668e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.033786e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.038853e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.440281e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.806020e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.612883e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.420436e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.787982e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.535230e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.263121e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.849609e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.863967e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.391610e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.720294e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.952273e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.901413e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.850668e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.033786e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.038853e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.440281e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.806020e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.612883e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.420436e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.787982e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.535230e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.263121e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.849609e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.863967e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.391610e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.720294e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.952273e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.901413e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 29)
-static double mannwhitneyu_utbln5n29(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n29(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.851217e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.032834e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.037113e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.427762e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.719146e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.557172e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.375498e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.452033e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.187516e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.916936e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.065533e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.067301e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.615824e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.432244e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.417795e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.710038e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.851217e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.032834e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.037113e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.427762e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.719146e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.557172e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.375498e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.452033e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.187516e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.916936e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.065533e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.067301e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.615824e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.432244e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.417795e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.710038e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 30)
-static double mannwhitneyu_utbln5n30(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n30(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.851845e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.032148e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.035679e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.417758e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.655330e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.522132e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.352106e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.326911e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.064969e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.813321e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.683881e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.813346e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.627085e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.832107e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.519336e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.888530e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.851845e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.032148e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.035679e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.417758e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.655330e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.522132e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.352106e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.326911e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.064969e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.813321e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.683881e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.813346e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.627085e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.832107e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.519336e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.888530e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 5, 100)
-static double mannwhitneyu_utbln5n100(double s, ae_state *_state) {
+static double mannwhitneyu_utbln5n100(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.877940e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.039324e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.022243e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.305825e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.960119e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.112000e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.138868e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.418164e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.174520e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.489617e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.878301e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.302233e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.054113e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.458862e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.186591e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.623412e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.877940e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.039324e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.022243e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.305825e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.960119e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.112000e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.138868e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.418164e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.174520e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.489617e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.878301e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.302233e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.054113e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.458862e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.186591e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.623412e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 6, 6)
-static double mannwhitneyu_utbln6n6(double s, ae_state *_state) {
+static double mannwhitneyu_utbln6n6(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 2.882307e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 2.882307e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.054075e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.998804e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.681518e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.067578e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.709435e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 9.952661e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.641700e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.304572e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.336275e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.770385e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.401891e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.246148e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.442663e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.502866e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.105855e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.739371e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.054075e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.998804e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.681518e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.067578e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.709435e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 9.952661e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.641700e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.304572e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.336275e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.770385e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.401891e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.246148e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.442663e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.502866e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.105855e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.739371e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 6, 7)
-static double mannwhitneyu_utbln6n7(double s, ae_state *_state) {
+static double mannwhitneyu_utbln6n7(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.000000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.000000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.265287e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.274613e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.582352e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.334293e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.915502e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.108091e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.546701e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.298827e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.891501e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.313717e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.989501e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.914594e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.062372e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.158841e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.596443e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.185662e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.265287e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.274613e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.582352e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.334293e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.915502e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.108091e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.546701e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.298827e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.891501e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.313717e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.989501e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.914594e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.062372e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.158841e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.596443e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.185662e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 6, 8)
-static double mannwhitneyu_utbln6n8(double s, ae_state *_state) {
+static double mannwhitneyu_utbln6n8(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.098387e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.098387e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.450954e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.520462e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.420299e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.604853e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.165840e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.008756e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.723402e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.843521e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.883405e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.720980e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.301709e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.948034e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.776243e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.623736e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.742068e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.796927e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.450954e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.520462e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.420299e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.604853e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.165840e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.008756e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.723402e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.843521e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.883405e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.720980e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.301709e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.948034e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.776243e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.623736e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.742068e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.796927e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 6, 9)
-static double mannwhitneyu_utbln6n9(double s, ae_state *_state) {
+static double mannwhitneyu_utbln6n9(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.181981e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.181981e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.616113e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.741650e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.204487e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.873068e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.446794e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.632286e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.266481e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.280067e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.780687e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.480242e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.592200e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.581019e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.264231e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.347174e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.167535e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.092185e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.616113e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.741650e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.204487e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.873068e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.446794e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.632286e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.266481e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.280067e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.780687e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.480242e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.592200e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.581019e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.264231e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.347174e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.167535e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.092185e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 6, 10)
-static double mannwhitneyu_utbln6n10(double s, ae_state *_state) {
+static double mannwhitneyu_utbln6n10(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.253957e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.253957e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.764382e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.942366e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.939896e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.137812e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.720270e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.281070e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.901060e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.824937e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.802812e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.258132e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.233536e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.085530e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.212151e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.001329e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.226048e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.035298e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.764382e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.942366e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.939896e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.137812e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.720270e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.281070e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.901060e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.824937e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.802812e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.258132e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.233536e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.085530e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.212151e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.001329e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.226048e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.035298e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 6, 11)
-static double mannwhitneyu_utbln6n11(double s, ae_state *_state) {
+static double mannwhitneyu_utbln6n11(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.316625e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.316625e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.898597e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.125710e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.063297e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.396852e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.990126e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.927977e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.726500e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.858745e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.654590e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.217736e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.989770e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.768493e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.924364e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.140215e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.647914e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.924802e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.898597e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.125710e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.063297e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.396852e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.990126e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.927977e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.726500e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.858745e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.654590e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.217736e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.989770e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.768493e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.924364e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.140215e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.647914e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.924802e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 6, 12)
-static double mannwhitneyu_utbln6n12(double s, ae_state *_state) {
+static double mannwhitneyu_utbln6n12(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.371709e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.371709e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.020941e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.294250e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.128842e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.650389e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.248611e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.578510e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.162852e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.746982e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.454209e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.128042e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.936650e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.530794e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.665192e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.994144e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.662249e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.368541e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.020941e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.294250e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.128842e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.650389e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.248611e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.578510e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.162852e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.746982e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.454209e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.128042e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.936650e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.530794e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.665192e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.994144e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.662249e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.368541e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 6, 13)
-static double mannwhitneyu_utbln6n13(double s, ae_state *_state) {
+static double mannwhitneyu_utbln6n13(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.420526e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.420526e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.133167e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.450016e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.191088e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.898220e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.050249e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.226901e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.471113e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.007470e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.049420e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.059074e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.881249e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.452780e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.441805e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.787493e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.483957e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.481590e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.133167e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.450016e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.191088e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.898220e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.050249e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.226901e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.471113e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.007470e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.049420e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.059074e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.881249e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.452780e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.441805e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.787493e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.483957e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.481590e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 6, 14)
-static double mannwhitneyu_utbln6n14(double s, ae_state *_state) {
+static double mannwhitneyu_utbln6n14(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.450000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.450000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.201268e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.542568e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.226965e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.046029e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.136657e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.786757e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.843748e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.588022e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.253029e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.667188e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.788330e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.474545e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.540494e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.951188e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.863323e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.220904e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.201268e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.542568e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.226965e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.046029e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.136657e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.786757e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.843748e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.588022e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.253029e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.667188e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.788330e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.474545e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.540494e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.951188e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.863323e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.220904e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 6, 15)
-static double mannwhitneyu_utbln6n15(double s, ae_state *_state) {
+static double mannwhitneyu_utbln6n15(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.450000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.450000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.195689e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.526567e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.213617e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.975035e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.118480e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.859142e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.083312e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.298720e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.766708e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.026356e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.093113e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.135168e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.136376e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.190870e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.435972e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.413129e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.195689e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.526567e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.213617e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.975035e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.118480e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.859142e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.083312e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.298720e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.766708e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.026356e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.093113e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.135168e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.136376e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.190870e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.435972e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.413129e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 6, 30)
-static double mannwhitneyu_utbln6n30(double s, ae_state *_state) {
+static double mannwhitneyu_utbln6n30(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.450000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.450000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.166269e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.427399e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.118239e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.360847e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.745885e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.025041e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.187179e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.432089e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.408451e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.388774e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.795560e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.304136e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.258516e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.180236e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.388679e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.836027e-06, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.166269e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.427399e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.118239e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.360847e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.745885e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.025041e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.187179e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.432089e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.408451e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.388774e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.795560e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.304136e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.258516e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.180236e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.388679e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.836027e-06, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 6, 100)
-static double mannwhitneyu_utbln6n100(double s, ae_state *_state) {
+static double mannwhitneyu_utbln6n100(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.450000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.450000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.181350e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.417919e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.094201e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.195883e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.818937e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.514202e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.125047e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.022148e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.284181e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.157766e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.023752e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.127985e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.221690e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.516179e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 9.501398e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 9.380220e-06, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.181350e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.417919e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.094201e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.195883e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.818937e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.514202e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.125047e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.022148e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.284181e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.157766e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.023752e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.127985e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.221690e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.516179e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 9.501398e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 9.380220e-06, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 7, 7)
-static double mannwhitneyu_utbln7n7(double s, ae_state *_state) {
+static double mannwhitneyu_utbln7n7(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.130495e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.130495e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.501264e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.584790e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.577311e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.617002e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.145186e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.023462e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.408251e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.626515e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.072492e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.722926e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.095445e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.842602e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.751427e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.008927e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.892431e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.772386e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.501264e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.584790e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.577311e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.617002e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.145186e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.023462e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.408251e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.626515e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.072492e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.722926e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.095445e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.842602e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.751427e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.008927e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.892431e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.772386e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 7, 8)
-static double mannwhitneyu_utbln7n8(double s, ae_state *_state) {
+static double mannwhitneyu_utbln7n8(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.240370e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.240370e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.709965e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.862154e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.504541e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.900195e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.439995e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.678028e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.485540e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.437047e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.440092e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.114227e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.516569e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.829457e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.787550e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.761866e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.991911e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.533481e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.709965e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.862154e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.504541e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.900195e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.439995e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.678028e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.485540e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.437047e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.440092e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.114227e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.516569e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.829457e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.787550e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.761866e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.991911e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.533481e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 7, 9)
-static double mannwhitneyu_utbln7n9(double s, ae_state *_state) {
+static double mannwhitneyu_utbln7n9(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.334314e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.334314e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.896550e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.112671e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.037277e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.181695e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.765190e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.360116e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.695960e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.780578e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.963843e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.616148e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.852104e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.390744e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.014041e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.888101e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.467474e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.004611e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.896550e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.112671e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.037277e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.181695e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.765190e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.360116e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.695960e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.780578e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.963843e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.616148e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.852104e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.390744e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.014041e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.888101e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.467474e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.004611e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 7, 10)
-static double mannwhitneyu_utbln7n10(double s, ae_state *_state) {
+static double mannwhitneyu_utbln7n10(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.415650e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.415650e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.064844e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.340749e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.118888e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.459730e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.097781e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.057688e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.097406e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.209262e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.065641e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.196677e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.313994e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.827157e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.822284e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.389090e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.340850e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.395172e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.064844e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.340749e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.118888e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.459730e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.097781e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.057688e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.097406e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.209262e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.065641e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.196677e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.313994e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.827157e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.822284e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.389090e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.340850e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.395172e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 7, 11)
-static double mannwhitneyu_utbln7n11(double s, ae_state *_state) {
+static double mannwhitneyu_utbln7n11(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.486817e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.486817e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.217795e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.549783e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.195905e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.733093e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.428447e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.760093e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.431676e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.717152e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.032199e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.832423e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.905979e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.302799e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.464371e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.456211e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.736244e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.140712e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.217795e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.549783e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.195905e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.733093e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.428447e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.760093e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.431676e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.717152e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.032199e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.832423e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.905979e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.302799e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.464371e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.456211e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.736244e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.140712e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 7, 12)
-static double mannwhitneyu_utbln7n12(double s, ae_state *_state) {
+static double mannwhitneyu_utbln7n12(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.235822e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.564100e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.190813e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.686546e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.395083e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.967359e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.747096e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.304144e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.903198e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.134906e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.175035e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.266224e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.892931e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.604706e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 9.070459e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.427010e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.235822e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.564100e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.190813e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.686546e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.395083e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.967359e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.747096e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.304144e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.903198e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.134906e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.175035e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.266224e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.892931e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.604706e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 9.070459e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.427010e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 7, 13)
-static double mannwhitneyu_utbln7n13(double s, ae_state *_state) {
+static double mannwhitneyu_utbln7n13(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.222204e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.532300e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.164642e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.523768e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.531984e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.467857e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.483804e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.524136e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.077740e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.745218e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.602085e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.828831e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.994070e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.873879e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.341937e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.706444e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.222204e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.532300e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.164642e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.523768e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.531984e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.467857e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.483804e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.524136e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.077740e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.745218e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.602085e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.828831e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.994070e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.873879e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.341937e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.706444e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 7, 14)
-static double mannwhitneyu_utbln7n14(double s, ae_state *_state) {
+static double mannwhitneyu_utbln7n14(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.211763e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.507542e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.143640e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.395755e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.808020e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.044259e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.182308e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.057325e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.724255e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.303900e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.113148e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.102514e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.559442e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.634986e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.776476e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.054489e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.211763e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.507542e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.143640e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.395755e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.808020e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.044259e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.182308e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.057325e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.724255e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.303900e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.113148e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.102514e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.559442e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.634986e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.776476e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.054489e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 7, 15)
-static double mannwhitneyu_utbln7n15(double s, ae_state *_state) {
+static double mannwhitneyu_utbln7n15(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.204898e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.489960e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.129172e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.316741e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.506107e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.983676e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.258013e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.262515e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.984156e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.912108e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.974023e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 6.056195e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.090842e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.232620e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.816339e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.020421e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.204898e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.489960e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.129172e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.316741e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.506107e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.983676e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.258013e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.262515e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.984156e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.912108e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.974023e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 6.056195e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.090842e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.232620e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.816339e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.020421e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 7, 30)
-static double mannwhitneyu_utbln7n30(double s, ae_state *_state) {
+static double mannwhitneyu_utbln7n30(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.176536e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.398705e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.045481e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.821982e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.962304e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.698132e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.062667e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.282353e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.014836e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.035683e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.004137e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.801453e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.920705e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.518735e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.821501e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.801008e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.176536e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.398705e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.045481e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.821982e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.962304e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.698132e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.062667e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.282353e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.014836e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.035683e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.004137e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.801453e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.920705e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.518735e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.821501e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.801008e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 7, 100)
-static double mannwhitneyu_utbln7n100(double s, ae_state *_state) {
+static double mannwhitneyu_utbln7n100(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.188337e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.386949e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.022834e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.686517e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.323516e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.399392e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.644333e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.617044e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.031396e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.792066e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.675457e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.673416e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.258552e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.174214e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.073644e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.349958e-06, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.188337e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.386949e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.022834e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.686517e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.323516e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.399392e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.644333e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.617044e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.031396e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.792066e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.675457e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.673416e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.258552e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.174214e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.073644e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.349958e-06, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 8, 8)
-static double mannwhitneyu_utbln8n8(double s, ae_state *_state) {
+static double mannwhitneyu_utbln8n8(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.360672e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.360672e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -3.940217e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.168913e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.051485e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.195325e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.775196e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.385506e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.244902e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.525632e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.771275e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.332874e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.079599e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.882551e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.407944e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.769844e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.062433e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.872535e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -3.940217e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.168913e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.051485e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.195325e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.775196e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.385506e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.244902e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.525632e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.771275e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.332874e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.079599e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.882551e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.407944e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.769844e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.062433e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.872535e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 8, 9)
-static double mannwhitneyu_utbln8n9(double s, ae_state *_state) {
+static double mannwhitneyu_utbln8n9(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.464102e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.464102e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.147004e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.446939e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.146155e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.488561e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.144561e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.116917e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.205667e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.515661e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.618616e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.599011e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.457324e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.482917e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.488267e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.469823e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.957591e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.058326e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.147004e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.446939e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.146155e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.488561e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.144561e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.116917e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.205667e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.515661e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.618616e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.599011e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.457324e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.482917e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.488267e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.469823e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.957591e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.058326e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 8, 10)
-static double mannwhitneyu_utbln8n10(double s, ae_state *_state) {
+static double mannwhitneyu_utbln8n10(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.554093e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.554093e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.334282e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.700860e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.235253e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.778489e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.527324e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.862885e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.589781e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.507355e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.717526e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 9.215726e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.848696e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.918854e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.219614e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.753761e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.573688e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.602177e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.334282e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.700860e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.235253e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.778489e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.527324e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.862885e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.589781e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.507355e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.717526e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 9.215726e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.848696e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.918854e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.219614e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.753761e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.573688e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.602177e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 8, 11)
-static double mannwhitneyu_utbln8n11(double s, ae_state *_state) {
+static double mannwhitneyu_utbln8n11(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.421882e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.812457e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.266153e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.849344e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.971527e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.258944e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.944820e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.894685e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.031836e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.514330e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.351660e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 6.206748e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.492600e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.005338e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.780099e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.673599e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.421882e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.812457e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.266153e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.849344e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.971527e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.258944e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.944820e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.894685e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.031836e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.514330e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.351660e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 6.206748e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.492600e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.005338e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.780099e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.673599e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 8, 12)
-static double mannwhitneyu_utbln8n12(double s, ae_state *_state) {
+static double mannwhitneyu_utbln8n12(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.398211e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.762214e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.226296e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.603837e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.643223e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.502438e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.544574e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.647734e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.442259e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.011484e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.384758e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.998259e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.659985e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.331046e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.638478e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.056785e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.398211e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.762214e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.226296e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.603837e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.643223e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.502438e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.544574e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.647734e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.442259e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.011484e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.384758e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.998259e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.659985e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.331046e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.638478e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.056785e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 8, 13)
-static double mannwhitneyu_utbln8n13(double s, ae_state *_state) {
+static double mannwhitneyu_utbln8n13(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.380670e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.724511e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.195851e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.420511e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.609928e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.893999e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.115919e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.291410e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.339664e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.801548e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.534710e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.793250e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.806718e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.384624e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.120582e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.936453e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.380670e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.724511e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.195851e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.420511e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.609928e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.893999e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.115919e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.291410e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.339664e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.801548e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.534710e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.793250e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.806718e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.384624e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.120582e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.936453e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 8, 14)
-static double mannwhitneyu_utbln8n14(double s, ae_state *_state) {
+static double mannwhitneyu_utbln8n14(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.368494e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.697171e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.174440e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.300621e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.087393e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.685826e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.085254e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.525658e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.966647e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.453388e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.826066e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.501958e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.336297e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.251972e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.118456e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.415959e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.368494e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.697171e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.174440e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.300621e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.087393e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.685826e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.085254e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.525658e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.966647e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.453388e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.826066e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.501958e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.336297e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.251972e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.118456e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.415959e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 8, 15)
-static double mannwhitneyu_utbln8n15(double s, ae_state *_state) {
+static double mannwhitneyu_utbln8n15(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.358397e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.674485e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.155941e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.195780e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.544830e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.426183e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.309902e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.650956e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.068874e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.538544e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.192525e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.073905e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.079673e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 9.423572e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 6.579647e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.765904e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.358397e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.674485e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.155941e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.195780e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.544830e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.426183e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.309902e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.650956e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.068874e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.538544e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.192525e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.073905e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.079673e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 9.423572e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 6.579647e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.765904e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 8, 30)
-static double mannwhitneyu_utbln8n30(double s, ae_state *_state) {
+static double mannwhitneyu_utbln8n30(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.318823e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.567159e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.064864e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.688413e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.153712e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.309389e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.226861e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.523815e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.780987e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.166866e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.922431e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.466397e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.690036e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.008185e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.271903e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.534751e-06, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.318823e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.567159e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.064864e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.688413e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.153712e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.309389e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.226861e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.523815e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.780987e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.166866e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.922431e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.466397e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.690036e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.008185e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.271903e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.534751e-06, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 8, 100)
-static double mannwhitneyu_utbln8n100(double s, ae_state *_state) {
+static double mannwhitneyu_utbln8n100(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.324531e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.547071e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.038129e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.541549e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.525605e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.044992e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.085713e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.017871e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.459226e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.092064e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.024349e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 7.366347e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 6.385637e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.321722e-08, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.439286e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.058079e-07, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.324531e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.547071e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.038129e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.541549e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.525605e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.044992e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.085713e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.017871e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.459226e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.092064e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.024349e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 7.366347e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 6.385637e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.321722e-08, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.439286e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.058079e-07, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 9, 9)
-static double mannwhitneyu_utbln9n9(double s, ae_state *_state) {
+static double mannwhitneyu_utbln9n9(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.576237e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.576237e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.372857e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.750859e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.248233e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.792868e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.559372e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.894941e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.643256e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.091370e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.285034e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 6.112997e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.806229e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.150741e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.509825e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.891051e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.485013e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.343653e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.372857e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.750859e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.248233e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.792868e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.559372e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.894941e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.643256e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.091370e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.285034e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 6.112997e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.806229e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.150741e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.509825e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.891051e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.485013e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.343653e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 9, 10)
-static double mannwhitneyu_utbln9n10(double s, ae_state *_state) {
+static double mannwhitneyu_utbln9n10(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.516726e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.939333e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.305046e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.935326e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.029141e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.420592e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.053140e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.065930e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.523581e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.544888e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.813741e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.510631e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.536057e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.833815e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.189692e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.615050e-03, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.516726e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.939333e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.305046e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.935326e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.029141e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.420592e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.053140e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.065930e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.523581e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.544888e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.813741e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.510631e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.536057e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.833815e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.189692e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.615050e-03, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 9, 11)
-static double mannwhitneyu_utbln9n11(double s, ae_state *_state) {
+static double mannwhitneyu_utbln9n11(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.481308e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.867483e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.249072e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.591790e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.400128e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.341992e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.463680e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.487211e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.671196e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.343472e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.544146e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.802335e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.117084e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.217443e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.858766e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.193687e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.481308e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.867483e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.249072e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.591790e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.400128e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.341992e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.463680e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.487211e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.671196e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.343472e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.544146e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.802335e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.117084e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.217443e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.858766e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.193687e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 9, 12)
-static double mannwhitneyu_utbln9n12(double s, ae_state *_state) {
+static double mannwhitneyu_utbln9n12(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.456776e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.817037e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.209788e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.362108e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.171356e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.661557e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.026141e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.361908e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.093885e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.298389e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.663603e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.768522e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.579015e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.868677e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.440652e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.523037e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.456776e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.817037e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.209788e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.362108e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.171356e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.661557e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.026141e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.361908e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.093885e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.298389e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.663603e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.768522e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.579015e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.868677e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.440652e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.523037e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 9, 13)
-static double mannwhitneyu_utbln9n13(double s, ae_state *_state) {
+static double mannwhitneyu_utbln9n13(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.438840e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.779308e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.180614e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.196489e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.346621e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.234857e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.796211e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.575715e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.525647e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.964651e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.275235e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.299124e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.397416e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.295781e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.237619e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 7.269692e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.438840e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.779308e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.180614e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.196489e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.346621e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.234857e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.796211e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.575715e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.525647e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.964651e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.275235e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.299124e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.397416e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.295781e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.237619e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 7.269692e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 9, 14)
-static double mannwhitneyu_utbln9n14(double s, ae_state *_state) {
+static double mannwhitneyu_utbln9n14(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.425981e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.751545e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.159543e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.086570e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.917446e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.120112e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.175519e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.515473e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.727772e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.070629e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.677569e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.876953e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.233502e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.508182e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.120389e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.847212e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.425981e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.751545e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.159543e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.086570e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.917446e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.120112e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.175519e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.515473e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.727772e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.070629e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.677569e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.876953e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.233502e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.508182e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.120389e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.847212e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 9, 15)
-static double mannwhitneyu_utbln9n15(double s, ae_state *_state) {
+static double mannwhitneyu_utbln9n15(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.414952e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.727612e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.140634e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.981231e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.382635e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.853575e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.571051e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.567625e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.214197e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.448700e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.712669e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.015050e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.438610e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 6.301363e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.309386e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.164772e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.414952e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.727612e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.140634e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.981231e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.382635e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.853575e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.571051e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.567625e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.214197e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.448700e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.712669e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.015050e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.438610e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 6.301363e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.309386e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.164772e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 9, 30)
-static double mannwhitneyu_utbln9n30(double s, ae_state *_state) {
+static double mannwhitneyu_utbln9n30(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.370720e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.615712e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.050023e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.504775e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.318265e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.646826e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.741492e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.735360e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.966911e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.100738e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.348991e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.527687e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.917286e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.397466e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.360175e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.892252e-07, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.370720e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.615712e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.050023e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.504775e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.318265e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.646826e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.741492e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.735360e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.966911e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.100738e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.348991e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.527687e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.917286e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.397466e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.360175e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.892252e-07, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 9, 100)
-static double mannwhitneyu_utbln9n100(double s, ae_state *_state) {
+static double mannwhitneyu_utbln9n100(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.372506e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.590966e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.021758e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.359849e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.755519e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.533166e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.936659e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.634913e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.730053e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.791845e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.030682e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.228663e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.631175e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.636749e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.404599e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.789872e-07, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.372506e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.590966e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.021758e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.359849e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.755519e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.533166e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.936659e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.634913e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.730053e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.791845e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.030682e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.228663e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.631175e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.636749e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.404599e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.789872e-07, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 10, 10)
-static double mannwhitneyu_utbln10n10(double s, ae_state *_state) {
+static double mannwhitneyu_utbln10n10(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.468831e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.844398e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.231728e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.486073e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.781321e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.971425e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.215371e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.828451e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.419872e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.430165e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.740363e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.049211e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.269371e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.211393e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.232314e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.016081e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.468831e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.844398e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.231728e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.486073e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.781321e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.971425e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.215371e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.828451e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.419872e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.430165e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.740363e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.049211e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.269371e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.211393e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.232314e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.016081e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 10, 11)
-static double mannwhitneyu_utbln10n11(double s, ae_state *_state) {
+static double mannwhitneyu_utbln10n11(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.437998e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.782296e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.184732e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.219585e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.457012e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.296008e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.481501e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.527940e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.953426e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.563840e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.574403e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.535775e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.338037e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.002654e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.852676e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.318132e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.437998e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.782296e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.184732e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.219585e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.457012e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.296008e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.481501e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.527940e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.953426e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.563840e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.574403e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.535775e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.338037e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.002654e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.852676e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.318132e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 10, 12)
-static double mannwhitneyu_utbln10n12(double s, ae_state *_state) {
+static double mannwhitneyu_utbln10n12(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.416082e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.737458e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.150952e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.036884e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.609030e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.908684e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.439666e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.162647e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.451601e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.148757e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.803981e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.731621e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.346903e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.013151e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.956148e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.438381e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.416082e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.737458e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.150952e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.036884e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.609030e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.908684e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.439666e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.162647e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.451601e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.148757e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.803981e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.731621e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.346903e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.013151e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.956148e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.438381e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 10, 13)
-static double mannwhitneyu_utbln10n13(double s, ae_state *_state) {
+static double mannwhitneyu_utbln10n13(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.399480e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.702863e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.124829e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.897428e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.979802e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.634368e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.180461e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.484926e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.864376e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.186576e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.886925e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.836828e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.074756e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.209547e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.883266e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.380143e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.399480e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.702863e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.124829e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.897428e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.979802e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.634368e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.180461e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.484926e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.864376e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.186576e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.886925e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.836828e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.074756e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.209547e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.883266e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.380143e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 10, 14)
-static double mannwhitneyu_utbln10n14(double s, ae_state *_state) {
+static double mannwhitneyu_utbln10n14(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.386924e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.676124e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.104740e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.793826e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.558886e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.492462e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.052903e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.917782e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.878696e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.576046e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.764551e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.288778e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.757658e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.299101e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.265197e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.384503e-07, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.386924e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.676124e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.104740e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.793826e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.558886e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.492462e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.052903e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.917782e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.878696e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.576046e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.764551e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.288778e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.757658e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.299101e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.265197e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.384503e-07, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 10, 15)
-static double mannwhitneyu_utbln10n15(double s, ae_state *_state) {
+static double mannwhitneyu_utbln10n15(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.376846e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.654247e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.088083e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.705945e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.169677e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.317213e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.264836e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.548024e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.633910e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.505621e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.658588e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.320254e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.175277e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.122317e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.675688e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.661363e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.376846e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.654247e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.088083e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.705945e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.169677e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.317213e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.264836e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.548024e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.633910e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.505621e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.658588e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.320254e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.175277e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.122317e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.675688e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.661363e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 10, 30)
-static double mannwhitneyu_utbln10n30(double s, ae_state *_state) {
+static double mannwhitneyu_utbln10n30(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.333977e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.548099e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.004444e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.291014e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.523674e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.828211e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.716917e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.894256e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.433371e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.522675e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.764192e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.140235e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.629230e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.541895e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.944946e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.726360e-06, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.333977e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.548099e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.004444e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.291014e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.523674e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.828211e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.716917e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.894256e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.433371e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.522675e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.764192e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.140235e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.629230e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.541895e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.944946e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.726360e-06, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 10, 100)
-static double mannwhitneyu_utbln10n100(double s, ae_state *_state) {
+static double mannwhitneyu_utbln10n100(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.334008e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.522316e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.769627e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.158110e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.053650e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.242235e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.173571e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.033661e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.824732e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.084420e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.610036e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.728155e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.217130e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.340966e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.001235e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.694052e-07, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.334008e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.522316e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.769627e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.158110e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.053650e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.242235e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.173571e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.033661e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.824732e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.084420e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.610036e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.728155e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.217130e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.340966e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.001235e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.694052e-07, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 11, 11)
-static double mannwhitneyu_utbln11n11(double s, ae_state *_state) {
+static double mannwhitneyu_utbln11n11(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.519760e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.880694e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.200698e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.174092e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.072304e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.054773e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.506613e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.813942e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.223644e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.417416e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.499166e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.194332e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 7.369096e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.968590e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.630532e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.061000e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.519760e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.880694e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.200698e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.174092e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.072304e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.054773e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.506613e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.813942e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.223644e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.417416e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.499166e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.194332e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 7.369096e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.968590e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.630532e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.061000e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 11, 12)
-static double mannwhitneyu_utbln11n12(double s, ae_state *_state) {
+static double mannwhitneyu_utbln11n12(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.495790e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.832622e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.165420e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.987306e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.265621e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.723537e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.347406e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.353464e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 6.613369e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.102522e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.237709e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.665652e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.626903e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.167518e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.564455e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.047320e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.495790e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.832622e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.165420e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.987306e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.265621e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.723537e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.347406e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.353464e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 6.613369e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.102522e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.237709e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.665652e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.626903e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.167518e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.564455e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.047320e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 11, 13)
-static double mannwhitneyu_utbln11n13(double s, ae_state *_state) {
+static double mannwhitneyu_utbln11n13(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.477880e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.796242e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.138769e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.851739e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.722104e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.548304e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.176683e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.817895e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.842451e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.935870e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.421777e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.238831e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.867026e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.458255e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.306259e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.961487e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.477880e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.796242e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.138769e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.851739e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.722104e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.548304e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.176683e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.817895e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.842451e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.935870e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.421777e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.238831e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.867026e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.458255e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.306259e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.961487e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 11, 14)
-static double mannwhitneyu_utbln11n14(double s, ae_state *_state) {
+static double mannwhitneyu_utbln11n14(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.463683e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.766969e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.117082e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.739574e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.238865e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.350306e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.425871e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.640172e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.660633e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.879883e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.349658e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.271795e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.304544e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.024201e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.816867e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.596787e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.463683e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.766969e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.117082e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.739574e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.238865e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.350306e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.425871e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.640172e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.660633e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.879883e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.349658e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.271795e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.304544e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.024201e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.816867e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.596787e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 11, 15)
-static double mannwhitneyu_utbln11n15(double s, ae_state *_state) {
+static double mannwhitneyu_utbln11n15(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.452526e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.743570e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.099705e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.650612e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.858285e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.187036e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.689241e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.294360e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.072623e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.278008e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.322382e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.131558e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.305669e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.825627e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.332689e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.120973e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.452526e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.743570e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.099705e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.650612e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.858285e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.187036e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.689241e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.294360e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.072623e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.278008e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.322382e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.131558e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.305669e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.825627e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.332689e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.120973e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 11, 30)
-static double mannwhitneyu_utbln11n30(double s, ae_state *_state) {
+static double mannwhitneyu_utbln11n30(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.402621e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.627440e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.011333e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.224126e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.232856e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.859347e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.377381e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.756709e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.033230e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.875472e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.608399e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.102943e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.740693e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.343139e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.196878e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.658062e-07, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.402621e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.627440e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.011333e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.224126e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.232856e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.859347e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.377381e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.756709e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.033230e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.875472e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.608399e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.102943e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.740693e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.343139e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.196878e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.658062e-07, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 11, 100)
-static double mannwhitneyu_utbln11n100(double s, ae_state *_state) {
+static double mannwhitneyu_utbln11n100(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.398795e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.596486e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.814761e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.085187e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.766529e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.379425e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.986351e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.214705e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.360075e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.260869e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.033307e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.727087e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.393883e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.242989e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.111928e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.898823e-09, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.398795e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.596486e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.814761e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.085187e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.766529e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.379425e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.986351e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.214705e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.360075e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.260869e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.033307e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.727087e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.393883e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.242989e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.111928e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.898823e-09, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 12, 12)
-static double mannwhitneyu_utbln12n12(double s, ae_state *_state) {
+static double mannwhitneyu_utbln12n12(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.472616e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.786627e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.132099e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.817523e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.570179e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.479511e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.799492e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.565350e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.530139e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.380132e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.242761e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.576269e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.018771e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.933911e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 9.002799e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.022048e-06, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.472616e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.786627e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.132099e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.817523e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.570179e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.479511e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.799492e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.565350e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.530139e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.380132e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.242761e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.576269e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.018771e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.933911e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 9.002799e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.022048e-06, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 12, 13)
-static double mannwhitneyu_utbln12n13(double s, ae_state *_state) {
+static double mannwhitneyu_utbln12n13(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.454800e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.750794e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.105988e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.684754e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.011826e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.262579e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.044492e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.478741e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.322165e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.621104e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.068753e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.468396e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.056235e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.327375e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.914877e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.784191e-04, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.454800e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.750794e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.105988e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.684754e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.011826e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.262579e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.044492e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.478741e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.322165e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.621104e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.068753e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.468396e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.056235e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.327375e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.914877e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.784191e-04, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 12, 14)
-static double mannwhitneyu_utbln12n14(double s, ae_state *_state) {
+static double mannwhitneyu_utbln12n14(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.440910e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.722404e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.085254e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.579439e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.563738e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.066730e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.129346e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.014531e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.129679e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.000909e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.996174e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 6.377924e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.936304e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.051098e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 9.025820e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 8.730585e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.440910e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.722404e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.085254e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.579439e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.563738e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.066730e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.129346e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.014531e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.129679e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.000909e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.996174e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 6.377924e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.936304e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.051098e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 9.025820e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 8.730585e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 12, 15)
-static double mannwhitneyu_utbln12n15(double s, ae_state *_state) {
+static double mannwhitneyu_utbln12n15(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.430123e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.700008e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.068971e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.499725e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.250897e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.473145e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.680008e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.483350e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.766992e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.891081e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.015140e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.977756e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.707414e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.114786e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 6.238865e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.381445e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.430123e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.700008e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.068971e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.499725e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.250897e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.473145e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.680008e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.483350e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.766992e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.891081e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.015140e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.977756e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.707414e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.114786e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 6.238865e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.381445e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 12, 30)
-static double mannwhitneyu_utbln12n30(double s, ae_state *_state) {
+static double mannwhitneyu_utbln12n30(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.380023e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.585782e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.838583e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.103394e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.834015e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.635212e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.948212e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.574169e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.747980e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.833672e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.722433e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.181038e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.206473e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.716003e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.476434e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.217700e-07, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.380023e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.585782e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.838583e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.103394e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.834015e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.635212e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.948212e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.574169e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.747980e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.833672e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.722433e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.181038e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.206473e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.716003e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.476434e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.217700e-07, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 12, 100)
-static double mannwhitneyu_utbln12n100(double s, ae_state *_state) {
+static double mannwhitneyu_utbln12n100(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.374567e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.553481e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.541334e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.701907e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.414757e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.404103e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.234388e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.453762e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.311060e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.317501e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.713888e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.309583e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.019804e-08, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.224829e-09, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.349019e-08, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.893302e-08, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.374567e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.553481e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.541334e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.701907e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.414757e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.404103e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.234388e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.453762e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.311060e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.317501e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.713888e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.309583e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.019804e-08, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.224829e-09, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.349019e-08, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.893302e-08, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 13, 13)
-static double mannwhitneyu_utbln13n13(double s, ae_state *_state) {
+static double mannwhitneyu_utbln13n13(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.541046e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.859047e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.130164e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.689719e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.950693e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.231455e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.976550e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.538455e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.245603e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.142647e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.831434e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.032483e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.488405e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.156927e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.949279e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.532700e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.541046e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.859047e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.130164e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.689719e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.950693e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.231455e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.976550e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.538455e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.245603e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.142647e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.831434e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.032483e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.488405e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.156927e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.949279e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.532700e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 13, 14)
-static double mannwhitneyu_utbln13n14(double s, ae_state *_state) {
+static double mannwhitneyu_utbln13n14(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.525655e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.828341e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.108110e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.579552e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.488307e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.032328e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.988741e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.766394e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.388950e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.338179e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.133440e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.023518e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.110570e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.202332e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.056132e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.536323e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.525655e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.828341e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.108110e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.579552e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.488307e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.032328e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.988741e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.766394e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.388950e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.338179e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.133440e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.023518e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.110570e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.202332e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.056132e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.536323e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 13, 15)
-static double mannwhitneyu_utbln13n15(double s, ae_state *_state) {
+static double mannwhitneyu_utbln13n15(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.513585e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.803952e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.090686e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.495310e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.160314e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.073124e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.480313e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.478239e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.140914e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.311541e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.677105e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.115464e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.578563e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.044604e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.888939e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 2.395644e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.513585e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.803952e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.090686e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.495310e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.160314e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.073124e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.480313e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.478239e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.140914e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.311541e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.677105e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.115464e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.578563e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.044604e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.888939e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 2.395644e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 13, 30)
-static double mannwhitneyu_utbln13n30(double s, ae_state *_state) {
+static double mannwhitneyu_utbln13n30(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.455999e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.678434e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.995491e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.078100e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.705220e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.258739e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.671526e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.185458e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.507764e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.411446e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.044355e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.285765e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.345282e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.066940e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.962037e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.723644e-07, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.455999e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.678434e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.995491e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.078100e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.705220e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.258739e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.671526e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.185458e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.507764e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.411446e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.044355e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.285765e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.345282e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.066940e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.962037e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.723644e-07, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 13, 100)
-static double mannwhitneyu_utbln13n100(double s, ae_state *_state) {
+static double mannwhitneyu_utbln13n100(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.446787e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.640804e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.671552e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.364990e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.274444e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.047440e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.161439e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.171729e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.562171e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.359762e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.275494e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.747635e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.700292e-08, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.565559e-09, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 5.005396e-09, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 3.335794e-09, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.446787e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.640804e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.671552e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.364990e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.274444e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.047440e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.161439e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.171729e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.562171e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.359762e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.275494e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.747635e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.700292e-08, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.565559e-09, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 5.005396e-09, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 3.335794e-09, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 14, 14)
-static double mannwhitneyu_utbln14n14(double s, ae_state *_state) {
+static double mannwhitneyu_utbln14n14(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.510624e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.798584e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.087107e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.478532e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.098050e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.855986e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.409083e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.299536e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.176177e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.479417e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.812761e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -5.225872e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 4.516521e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 6.730551e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 9.237563e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.611820e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.510624e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.798584e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.087107e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.478532e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.098050e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.855986e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.409083e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.299536e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.176177e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.479417e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.812761e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -5.225872e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 4.516521e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 6.730551e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 9.237563e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.611820e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 14, 15)
-static double mannwhitneyu_utbln14n15(double s, ae_state *_state) {
+static double mannwhitneyu_utbln14n15(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.498681e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.774668e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.070267e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.399348e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.807239e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.845763e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.071773e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.261698e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.011695e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.305946e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.879295e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.999439e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.904438e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.944986e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.373908e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.140794e-05, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.498681e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.774668e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.070267e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.399348e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.807239e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.845763e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.071773e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.261698e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.011695e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.305946e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.879295e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.999439e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.904438e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.944986e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.373908e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.140794e-05, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 14, 30)
-static double mannwhitneyu_utbln14n30(double s, ae_state *_state) {
+static double mannwhitneyu_utbln14n30(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.440378e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.649587e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.807829e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.989753e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.463646e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.586580e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -6.745917e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.635398e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.923172e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.446699e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.613892e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.214073e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.651683e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.272777e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.464988e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.109803e-07, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.440378e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.649587e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.807829e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.989753e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.463646e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.586580e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -6.745917e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.635398e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.923172e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.446699e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.613892e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.214073e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.651683e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.272777e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.464988e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.109803e-07, &tj, &tj1, &result);
    return result;
 }
 
 // Tail(S, 14, 100)
-static double mannwhitneyu_utbln14n100(double s, ae_state *_state) {
+static double mannwhitneyu_utbln14n100(double s) {
    double x;
    double tj;
    double tj1;
    double result;
    result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0, _state);
+   x = rmin2(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
    tj1 = x;
-   mannwhitneyu_ucheb(x, -4.429701e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -4.610577e+00, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -9.482675e-01, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.605550e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.062151e-02, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.525154e-03, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.835983e-04, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -8.411440e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.744901e-05, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.318850e-06, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.692100e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -1.536270e-07, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -3.705888e-08, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -7.999599e-09, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, -2.908395e-09, &tj, &tj1, &result, _state);
-   mannwhitneyu_ucheb(x, 1.546923e-09, &tj, &tj1, &result, _state);
+   mannwhitneyu_ucheb(x, -4.429701e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -4.610577e+00, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -9.482675e-01, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.605550e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.062151e-02, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.525154e-03, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.835983e-04, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -8.411440e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.744901e-05, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.318850e-06, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.692100e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -1.536270e-07, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -3.705888e-08, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -7.999599e-09, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, -2.908395e-09, &tj, &tj1, &result);
+   mannwhitneyu_ucheb(x, 1.546923e-09, &tj, &tj1, &result);
    return result;
 }
 
 // Three-point polynomial interpolation.
-static double mannwhitneyu_uninterpolate(double p1, double p2, double p3, ae_int_t n, ae_state *_state) {
+static double mannwhitneyu_uninterpolate(double p1, double p2, double p3, ae_int_t n) {
    double t1;
    double t2;
    double t3;
@@ -12058,111 +12058,111 @@ static double mannwhitneyu_uninterpolate(double p1, double p2, double p3, ae_int
 }
 
 // Tail(0, N1, N2)
-static double mannwhitneyu_usigma000(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+static double mannwhitneyu_usigma000(ae_int_t n1, ae_int_t n2) {
    double p1;
    double p2;
    double p3;
    double result;
-   p1 = mannwhitneyu_uninterpolate(-6.76984e-01, -6.83700e-01, -6.89873e-01, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-6.83700e-01, -6.87311e-01, -6.90957e-01, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-6.89873e-01, -6.90957e-01, -6.92175e-01, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   p1 = mannwhitneyu_uninterpolate(-6.76984e-01, -6.83700e-01, -6.89873e-01, n2);
+   p2 = mannwhitneyu_uninterpolate(-6.83700e-01, -6.87311e-01, -6.90957e-01, n2);
+   p3 = mannwhitneyu_uninterpolate(-6.89873e-01, -6.90957e-01, -6.92175e-01, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
    return result;
 }
 
 // Tail(0.75, N1, N2)
-static double mannwhitneyu_usigma075(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+static double mannwhitneyu_usigma075(ae_int_t n1, ae_int_t n2) {
    double p1;
    double p2;
    double p3;
    double result;
-   p1 = mannwhitneyu_uninterpolate(-1.44500e+00, -1.45906e+00, -1.47063e+00, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-1.45906e+00, -1.46856e+00, -1.47644e+00, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-1.47063e+00, -1.47644e+00, -1.48100e+00, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   p1 = mannwhitneyu_uninterpolate(-1.44500e+00, -1.45906e+00, -1.47063e+00, n2);
+   p2 = mannwhitneyu_uninterpolate(-1.45906e+00, -1.46856e+00, -1.47644e+00, n2);
+   p3 = mannwhitneyu_uninterpolate(-1.47063e+00, -1.47644e+00, -1.48100e+00, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
    return result;
 }
 
 // Tail(1.5, N1, N2)
-static double mannwhitneyu_usigma150(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+static double mannwhitneyu_usigma150(ae_int_t n1, ae_int_t n2) {
    double p1;
    double p2;
    double p3;
    double result;
-   p1 = mannwhitneyu_uninterpolate(-2.65380e+00, -2.67352e+00, -2.69011e+00, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-2.67352e+00, -2.68591e+00, -2.69659e+00, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-2.69011e+00, -2.69659e+00, -2.70192e+00, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   p1 = mannwhitneyu_uninterpolate(-2.65380e+00, -2.67352e+00, -2.69011e+00, n2);
+   p2 = mannwhitneyu_uninterpolate(-2.67352e+00, -2.68591e+00, -2.69659e+00, n2);
+   p3 = mannwhitneyu_uninterpolate(-2.69011e+00, -2.69659e+00, -2.70192e+00, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
    return result;
 }
 
 // Tail(2.25, N1, N2)
-static double mannwhitneyu_usigma225(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+static double mannwhitneyu_usigma225(ae_int_t n1, ae_int_t n2) {
    double p1;
    double p2;
    double p3;
    double result;
-   p1 = mannwhitneyu_uninterpolate(-4.41465e+00, -4.42260e+00, -4.43702e+00, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-4.42260e+00, -4.41639e+00, -4.41928e+00, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-4.43702e+00, -4.41928e+00, -4.41030e+00, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   p1 = mannwhitneyu_uninterpolate(-4.41465e+00, -4.42260e+00, -4.43702e+00, n2);
+   p2 = mannwhitneyu_uninterpolate(-4.42260e+00, -4.41639e+00, -4.41928e+00, n2);
+   p3 = mannwhitneyu_uninterpolate(-4.43702e+00, -4.41928e+00, -4.41030e+00, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
    return result;
 }
 
 // Tail(3.0, N1, N2)
-static double mannwhitneyu_usigma300(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+static double mannwhitneyu_usigma300(ae_int_t n1, ae_int_t n2) {
    double p1;
    double p2;
    double p3;
    double result;
-   p1 = mannwhitneyu_uninterpolate(-6.89839e+00, -6.83477e+00, -6.82340e+00, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-6.83477e+00, -6.74559e+00, -6.71117e+00, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-6.82340e+00, -6.71117e+00, -6.64929e+00, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   p1 = mannwhitneyu_uninterpolate(-6.89839e+00, -6.83477e+00, -6.82340e+00, n2);
+   p2 = mannwhitneyu_uninterpolate(-6.83477e+00, -6.74559e+00, -6.71117e+00, n2);
+   p3 = mannwhitneyu_uninterpolate(-6.82340e+00, -6.71117e+00, -6.64929e+00, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
    return result;
 }
 
 // Tail(3.33, N1, N2)
-static double mannwhitneyu_usigma333(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+static double mannwhitneyu_usigma333(ae_int_t n1, ae_int_t n2) {
    double p1;
    double p2;
    double p3;
    double result;
-   p1 = mannwhitneyu_uninterpolate(-8.31272e+00, -8.17096e+00, -8.13125e+00, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-8.17096e+00, -8.00156e+00, -7.93245e+00, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-8.13125e+00, -7.93245e+00, -7.82502e+00, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   p1 = mannwhitneyu_uninterpolate(-8.31272e+00, -8.17096e+00, -8.13125e+00, n2);
+   p2 = mannwhitneyu_uninterpolate(-8.17096e+00, -8.00156e+00, -7.93245e+00, n2);
+   p3 = mannwhitneyu_uninterpolate(-8.13125e+00, -7.93245e+00, -7.82502e+00, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
    return result;
 }
 
 // Tail(3.66, N1, N2)
-static double mannwhitneyu_usigma367(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+static double mannwhitneyu_usigma367(ae_int_t n1, ae_int_t n2) {
    double p1;
    double p2;
    double p3;
    double result;
-   p1 = mannwhitneyu_uninterpolate(-9.98837e+00, -9.70844e+00, -9.62087e+00, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-9.70844e+00, -9.41156e+00, -9.28998e+00, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-9.62087e+00, -9.28998e+00, -9.11686e+00, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   p1 = mannwhitneyu_uninterpolate(-9.98837e+00, -9.70844e+00, -9.62087e+00, n2);
+   p2 = mannwhitneyu_uninterpolate(-9.70844e+00, -9.41156e+00, -9.28998e+00, n2);
+   p3 = mannwhitneyu_uninterpolate(-9.62087e+00, -9.28998e+00, -9.11686e+00, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
    return result;
 }
 
 // Tail(4.0, N1, N2)
-static double mannwhitneyu_usigma400(ae_int_t n1, ae_int_t n2, ae_state *_state) {
+static double mannwhitneyu_usigma400(ae_int_t n1, ae_int_t n2) {
    double p1;
    double p2;
    double p3;
    double result;
-   p1 = mannwhitneyu_uninterpolate(-1.20250e+01, -1.14911e+01, -1.13231e+01, n2, _state);
-   p2 = mannwhitneyu_uninterpolate(-1.14911e+01, -1.09927e+01, -1.07937e+01, n2, _state);
-   p3 = mannwhitneyu_uninterpolate(-1.13231e+01, -1.07937e+01, -1.05285e+01, n2, _state);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1, _state);
+   p1 = mannwhitneyu_uninterpolate(-1.20250e+01, -1.14911e+01, -1.13231e+01, n2);
+   p2 = mannwhitneyu_uninterpolate(-1.14911e+01, -1.09927e+01, -1.07937e+01, n2);
+   p3 = mannwhitneyu_uninterpolate(-1.13231e+01, -1.07937e+01, -1.05285e+01, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
    return result;
 }
 
 // Tail(S, N1, N2)
-static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *_state) {
+static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
    double f0;
    double f1;
    double f2;
@@ -12176,339 +12176,339 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *
    double result;
    result = 0.0;
 // N1=5, N2 = 5, 6, 7, ...
-   if (imin2(n1, n2, _state) == 5) {
-      if (imax2(n1, n2, _state) == 5) {
-         result = mannwhitneyu_utbln5n5(s, _state);
+   if (imin2(n1, n2) == 5) {
+      if (imax2(n1, n2) == 5) {
+         result = mannwhitneyu_utbln5n5(s);
       }
-      if (imax2(n1, n2, _state) == 6) {
-         result = mannwhitneyu_utbln5n6(s, _state);
+      if (imax2(n1, n2) == 6) {
+         result = mannwhitneyu_utbln5n6(s);
       }
-      if (imax2(n1, n2, _state) == 7) {
-         result = mannwhitneyu_utbln5n7(s, _state);
+      if (imax2(n1, n2) == 7) {
+         result = mannwhitneyu_utbln5n7(s);
       }
-      if (imax2(n1, n2, _state) == 8) {
-         result = mannwhitneyu_utbln5n8(s, _state);
+      if (imax2(n1, n2) == 8) {
+         result = mannwhitneyu_utbln5n8(s);
       }
-      if (imax2(n1, n2, _state) == 9) {
-         result = mannwhitneyu_utbln5n9(s, _state);
+      if (imax2(n1, n2) == 9) {
+         result = mannwhitneyu_utbln5n9(s);
       }
-      if (imax2(n1, n2, _state) == 10) {
-         result = mannwhitneyu_utbln5n10(s, _state);
+      if (imax2(n1, n2) == 10) {
+         result = mannwhitneyu_utbln5n10(s);
       }
-      if (imax2(n1, n2, _state) == 11) {
-         result = mannwhitneyu_utbln5n11(s, _state);
+      if (imax2(n1, n2) == 11) {
+         result = mannwhitneyu_utbln5n11(s);
       }
-      if (imax2(n1, n2, _state) == 12) {
-         result = mannwhitneyu_utbln5n12(s, _state);
+      if (imax2(n1, n2) == 12) {
+         result = mannwhitneyu_utbln5n12(s);
       }
-      if (imax2(n1, n2, _state) == 13) {
-         result = mannwhitneyu_utbln5n13(s, _state);
+      if (imax2(n1, n2) == 13) {
+         result = mannwhitneyu_utbln5n13(s);
       }
-      if (imax2(n1, n2, _state) == 14) {
-         result = mannwhitneyu_utbln5n14(s, _state);
+      if (imax2(n1, n2) == 14) {
+         result = mannwhitneyu_utbln5n14(s);
       }
-      if (imax2(n1, n2, _state) == 15) {
-         result = mannwhitneyu_utbln5n15(s, _state);
+      if (imax2(n1, n2) == 15) {
+         result = mannwhitneyu_utbln5n15(s);
       }
-      if (imax2(n1, n2, _state) == 16) {
-         result = mannwhitneyu_utbln5n16(s, _state);
+      if (imax2(n1, n2) == 16) {
+         result = mannwhitneyu_utbln5n16(s);
       }
-      if (imax2(n1, n2, _state) == 17) {
-         result = mannwhitneyu_utbln5n17(s, _state);
+      if (imax2(n1, n2) == 17) {
+         result = mannwhitneyu_utbln5n17(s);
       }
-      if (imax2(n1, n2, _state) == 18) {
-         result = mannwhitneyu_utbln5n18(s, _state);
+      if (imax2(n1, n2) == 18) {
+         result = mannwhitneyu_utbln5n18(s);
       }
-      if (imax2(n1, n2, _state) == 19) {
-         result = mannwhitneyu_utbln5n19(s, _state);
+      if (imax2(n1, n2) == 19) {
+         result = mannwhitneyu_utbln5n19(s);
       }
-      if (imax2(n1, n2, _state) == 20) {
-         result = mannwhitneyu_utbln5n20(s, _state);
+      if (imax2(n1, n2) == 20) {
+         result = mannwhitneyu_utbln5n20(s);
       }
-      if (imax2(n1, n2, _state) == 21) {
-         result = mannwhitneyu_utbln5n21(s, _state);
+      if (imax2(n1, n2) == 21) {
+         result = mannwhitneyu_utbln5n21(s);
       }
-      if (imax2(n1, n2, _state) == 22) {
-         result = mannwhitneyu_utbln5n22(s, _state);
+      if (imax2(n1, n2) == 22) {
+         result = mannwhitneyu_utbln5n22(s);
       }
-      if (imax2(n1, n2, _state) == 23) {
-         result = mannwhitneyu_utbln5n23(s, _state);
+      if (imax2(n1, n2) == 23) {
+         result = mannwhitneyu_utbln5n23(s);
       }
-      if (imax2(n1, n2, _state) == 24) {
-         result = mannwhitneyu_utbln5n24(s, _state);
+      if (imax2(n1, n2) == 24) {
+         result = mannwhitneyu_utbln5n24(s);
       }
-      if (imax2(n1, n2, _state) == 25) {
-         result = mannwhitneyu_utbln5n25(s, _state);
+      if (imax2(n1, n2) == 25) {
+         result = mannwhitneyu_utbln5n25(s);
       }
-      if (imax2(n1, n2, _state) == 26) {
-         result = mannwhitneyu_utbln5n26(s, _state);
+      if (imax2(n1, n2) == 26) {
+         result = mannwhitneyu_utbln5n26(s);
       }
-      if (imax2(n1, n2, _state) == 27) {
-         result = mannwhitneyu_utbln5n27(s, _state);
+      if (imax2(n1, n2) == 27) {
+         result = mannwhitneyu_utbln5n27(s);
       }
-      if (imax2(n1, n2, _state) == 28) {
-         result = mannwhitneyu_utbln5n28(s, _state);
+      if (imax2(n1, n2) == 28) {
+         result = mannwhitneyu_utbln5n28(s);
       }
-      if (imax2(n1, n2, _state) == 29) {
-         result = mannwhitneyu_utbln5n29(s, _state);
+      if (imax2(n1, n2) == 29) {
+         result = mannwhitneyu_utbln5n29(s);
       }
-      if (imax2(n1, n2, _state) > 29) {
-         f0 = mannwhitneyu_utbln5n15(s, _state);
-         f1 = mannwhitneyu_utbln5n30(s, _state);
-         f2 = mannwhitneyu_utbln5n100(s, _state);
-         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2, _state), _state);
+      if (imax2(n1, n2) > 29) {
+         f0 = mannwhitneyu_utbln5n15(s);
+         f1 = mannwhitneyu_utbln5n30(s);
+         f2 = mannwhitneyu_utbln5n100(s);
+         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2));
       }
       return result;
    }
 // N1=6, N2 = 6, 7, 8, ...
-   if (imin2(n1, n2, _state) == 6) {
-      if (imax2(n1, n2, _state) == 6) {
-         result = mannwhitneyu_utbln6n6(s, _state);
+   if (imin2(n1, n2) == 6) {
+      if (imax2(n1, n2) == 6) {
+         result = mannwhitneyu_utbln6n6(s);
       }
-      if (imax2(n1, n2, _state) == 7) {
-         result = mannwhitneyu_utbln6n7(s, _state);
+      if (imax2(n1, n2) == 7) {
+         result = mannwhitneyu_utbln6n7(s);
       }
-      if (imax2(n1, n2, _state) == 8) {
-         result = mannwhitneyu_utbln6n8(s, _state);
+      if (imax2(n1, n2) == 8) {
+         result = mannwhitneyu_utbln6n8(s);
       }
-      if (imax2(n1, n2, _state) == 9) {
-         result = mannwhitneyu_utbln6n9(s, _state);
+      if (imax2(n1, n2) == 9) {
+         result = mannwhitneyu_utbln6n9(s);
       }
-      if (imax2(n1, n2, _state) == 10) {
-         result = mannwhitneyu_utbln6n10(s, _state);
+      if (imax2(n1, n2) == 10) {
+         result = mannwhitneyu_utbln6n10(s);
       }
-      if (imax2(n1, n2, _state) == 11) {
-         result = mannwhitneyu_utbln6n11(s, _state);
+      if (imax2(n1, n2) == 11) {
+         result = mannwhitneyu_utbln6n11(s);
       }
-      if (imax2(n1, n2, _state) == 12) {
-         result = mannwhitneyu_utbln6n12(s, _state);
+      if (imax2(n1, n2) == 12) {
+         result = mannwhitneyu_utbln6n12(s);
       }
-      if (imax2(n1, n2, _state) == 13) {
-         result = mannwhitneyu_utbln6n13(s, _state);
+      if (imax2(n1, n2) == 13) {
+         result = mannwhitneyu_utbln6n13(s);
       }
-      if (imax2(n1, n2, _state) == 14) {
-         result = mannwhitneyu_utbln6n14(s, _state);
+      if (imax2(n1, n2) == 14) {
+         result = mannwhitneyu_utbln6n14(s);
       }
-      if (imax2(n1, n2, _state) == 15) {
-         result = mannwhitneyu_utbln6n15(s, _state);
+      if (imax2(n1, n2) == 15) {
+         result = mannwhitneyu_utbln6n15(s);
       }
-      if (imax2(n1, n2, _state) > 15) {
-         f0 = mannwhitneyu_utbln6n15(s, _state);
-         f1 = mannwhitneyu_utbln6n30(s, _state);
-         f2 = mannwhitneyu_utbln6n100(s, _state);
-         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2, _state), _state);
+      if (imax2(n1, n2) > 15) {
+         f0 = mannwhitneyu_utbln6n15(s);
+         f1 = mannwhitneyu_utbln6n30(s);
+         f2 = mannwhitneyu_utbln6n100(s);
+         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2));
       }
       return result;
    }
 // N1=7, N2 = 7, 8, ...
-   if (imin2(n1, n2, _state) == 7) {
-      if (imax2(n1, n2, _state) == 7) {
-         result = mannwhitneyu_utbln7n7(s, _state);
+   if (imin2(n1, n2) == 7) {
+      if (imax2(n1, n2) == 7) {
+         result = mannwhitneyu_utbln7n7(s);
       }
-      if (imax2(n1, n2, _state) == 8) {
-         result = mannwhitneyu_utbln7n8(s, _state);
+      if (imax2(n1, n2) == 8) {
+         result = mannwhitneyu_utbln7n8(s);
       }
-      if (imax2(n1, n2, _state) == 9) {
-         result = mannwhitneyu_utbln7n9(s, _state);
+      if (imax2(n1, n2) == 9) {
+         result = mannwhitneyu_utbln7n9(s);
       }
-      if (imax2(n1, n2, _state) == 10) {
-         result = mannwhitneyu_utbln7n10(s, _state);
+      if (imax2(n1, n2) == 10) {
+         result = mannwhitneyu_utbln7n10(s);
       }
-      if (imax2(n1, n2, _state) == 11) {
-         result = mannwhitneyu_utbln7n11(s, _state);
+      if (imax2(n1, n2) == 11) {
+         result = mannwhitneyu_utbln7n11(s);
       }
-      if (imax2(n1, n2, _state) == 12) {
-         result = mannwhitneyu_utbln7n12(s, _state);
+      if (imax2(n1, n2) == 12) {
+         result = mannwhitneyu_utbln7n12(s);
       }
-      if (imax2(n1, n2, _state) == 13) {
-         result = mannwhitneyu_utbln7n13(s, _state);
+      if (imax2(n1, n2) == 13) {
+         result = mannwhitneyu_utbln7n13(s);
       }
-      if (imax2(n1, n2, _state) == 14) {
-         result = mannwhitneyu_utbln7n14(s, _state);
+      if (imax2(n1, n2) == 14) {
+         result = mannwhitneyu_utbln7n14(s);
       }
-      if (imax2(n1, n2, _state) == 15) {
-         result = mannwhitneyu_utbln7n15(s, _state);
+      if (imax2(n1, n2) == 15) {
+         result = mannwhitneyu_utbln7n15(s);
       }
-      if (imax2(n1, n2, _state) > 15) {
-         f0 = mannwhitneyu_utbln7n15(s, _state);
-         f1 = mannwhitneyu_utbln7n30(s, _state);
-         f2 = mannwhitneyu_utbln7n100(s, _state);
-         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2, _state), _state);
+      if (imax2(n1, n2) > 15) {
+         f0 = mannwhitneyu_utbln7n15(s);
+         f1 = mannwhitneyu_utbln7n30(s);
+         f2 = mannwhitneyu_utbln7n100(s);
+         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2));
       }
       return result;
    }
 // N1=8, N2 = 8, 9, 10, ...
-   if (imin2(n1, n2, _state) == 8) {
-      if (imax2(n1, n2, _state) == 8) {
-         result = mannwhitneyu_utbln8n8(s, _state);
+   if (imin2(n1, n2) == 8) {
+      if (imax2(n1, n2) == 8) {
+         result = mannwhitneyu_utbln8n8(s);
       }
-      if (imax2(n1, n2, _state) == 9) {
-         result = mannwhitneyu_utbln8n9(s, _state);
+      if (imax2(n1, n2) == 9) {
+         result = mannwhitneyu_utbln8n9(s);
       }
-      if (imax2(n1, n2, _state) == 10) {
-         result = mannwhitneyu_utbln8n10(s, _state);
+      if (imax2(n1, n2) == 10) {
+         result = mannwhitneyu_utbln8n10(s);
       }
-      if (imax2(n1, n2, _state) == 11) {
-         result = mannwhitneyu_utbln8n11(s, _state);
+      if (imax2(n1, n2) == 11) {
+         result = mannwhitneyu_utbln8n11(s);
       }
-      if (imax2(n1, n2, _state) == 12) {
-         result = mannwhitneyu_utbln8n12(s, _state);
+      if (imax2(n1, n2) == 12) {
+         result = mannwhitneyu_utbln8n12(s);
       }
-      if (imax2(n1, n2, _state) == 13) {
-         result = mannwhitneyu_utbln8n13(s, _state);
+      if (imax2(n1, n2) == 13) {
+         result = mannwhitneyu_utbln8n13(s);
       }
-      if (imax2(n1, n2, _state) == 14) {
-         result = mannwhitneyu_utbln8n14(s, _state);
+      if (imax2(n1, n2) == 14) {
+         result = mannwhitneyu_utbln8n14(s);
       }
-      if (imax2(n1, n2, _state) == 15) {
-         result = mannwhitneyu_utbln8n15(s, _state);
+      if (imax2(n1, n2) == 15) {
+         result = mannwhitneyu_utbln8n15(s);
       }
-      if (imax2(n1, n2, _state) > 15) {
-         f0 = mannwhitneyu_utbln8n15(s, _state);
-         f1 = mannwhitneyu_utbln8n30(s, _state);
-         f2 = mannwhitneyu_utbln8n100(s, _state);
-         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2, _state), _state);
+      if (imax2(n1, n2) > 15) {
+         f0 = mannwhitneyu_utbln8n15(s);
+         f1 = mannwhitneyu_utbln8n30(s);
+         f2 = mannwhitneyu_utbln8n100(s);
+         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2));
       }
       return result;
    }
 // N1=9, N2 = 9, 10, ...
-   if (imin2(n1, n2, _state) == 9) {
-      if (imax2(n1, n2, _state) == 9) {
-         result = mannwhitneyu_utbln9n9(s, _state);
+   if (imin2(n1, n2) == 9) {
+      if (imax2(n1, n2) == 9) {
+         result = mannwhitneyu_utbln9n9(s);
       }
-      if (imax2(n1, n2, _state) == 10) {
-         result = mannwhitneyu_utbln9n10(s, _state);
+      if (imax2(n1, n2) == 10) {
+         result = mannwhitneyu_utbln9n10(s);
       }
-      if (imax2(n1, n2, _state) == 11) {
-         result = mannwhitneyu_utbln9n11(s, _state);
+      if (imax2(n1, n2) == 11) {
+         result = mannwhitneyu_utbln9n11(s);
       }
-      if (imax2(n1, n2, _state) == 12) {
-         result = mannwhitneyu_utbln9n12(s, _state);
+      if (imax2(n1, n2) == 12) {
+         result = mannwhitneyu_utbln9n12(s);
       }
-      if (imax2(n1, n2, _state) == 13) {
-         result = mannwhitneyu_utbln9n13(s, _state);
+      if (imax2(n1, n2) == 13) {
+         result = mannwhitneyu_utbln9n13(s);
       }
-      if (imax2(n1, n2, _state) == 14) {
-         result = mannwhitneyu_utbln9n14(s, _state);
+      if (imax2(n1, n2) == 14) {
+         result = mannwhitneyu_utbln9n14(s);
       }
-      if (imax2(n1, n2, _state) == 15) {
-         result = mannwhitneyu_utbln9n15(s, _state);
+      if (imax2(n1, n2) == 15) {
+         result = mannwhitneyu_utbln9n15(s);
       }
-      if (imax2(n1, n2, _state) > 15) {
-         f0 = mannwhitneyu_utbln9n15(s, _state);
-         f1 = mannwhitneyu_utbln9n30(s, _state);
-         f2 = mannwhitneyu_utbln9n100(s, _state);
-         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2, _state), _state);
+      if (imax2(n1, n2) > 15) {
+         f0 = mannwhitneyu_utbln9n15(s);
+         f1 = mannwhitneyu_utbln9n30(s);
+         f2 = mannwhitneyu_utbln9n100(s);
+         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2));
       }
       return result;
    }
 // N1=10, N2 = 10, 11, ...
-   if (imin2(n1, n2, _state) == 10) {
-      if (imax2(n1, n2, _state) == 10) {
-         result = mannwhitneyu_utbln10n10(s, _state);
+   if (imin2(n1, n2) == 10) {
+      if (imax2(n1, n2) == 10) {
+         result = mannwhitneyu_utbln10n10(s);
       }
-      if (imax2(n1, n2, _state) == 11) {
-         result = mannwhitneyu_utbln10n11(s, _state);
+      if (imax2(n1, n2) == 11) {
+         result = mannwhitneyu_utbln10n11(s);
       }
-      if (imax2(n1, n2, _state) == 12) {
-         result = mannwhitneyu_utbln10n12(s, _state);
+      if (imax2(n1, n2) == 12) {
+         result = mannwhitneyu_utbln10n12(s);
       }
-      if (imax2(n1, n2, _state) == 13) {
-         result = mannwhitneyu_utbln10n13(s, _state);
+      if (imax2(n1, n2) == 13) {
+         result = mannwhitneyu_utbln10n13(s);
       }
-      if (imax2(n1, n2, _state) == 14) {
-         result = mannwhitneyu_utbln10n14(s, _state);
+      if (imax2(n1, n2) == 14) {
+         result = mannwhitneyu_utbln10n14(s);
       }
-      if (imax2(n1, n2, _state) == 15) {
-         result = mannwhitneyu_utbln10n15(s, _state);
+      if (imax2(n1, n2) == 15) {
+         result = mannwhitneyu_utbln10n15(s);
       }
-      if (imax2(n1, n2, _state) > 15) {
-         f0 = mannwhitneyu_utbln10n15(s, _state);
-         f1 = mannwhitneyu_utbln10n30(s, _state);
-         f2 = mannwhitneyu_utbln10n100(s, _state);
-         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2, _state), _state);
+      if (imax2(n1, n2) > 15) {
+         f0 = mannwhitneyu_utbln10n15(s);
+         f1 = mannwhitneyu_utbln10n30(s);
+         f2 = mannwhitneyu_utbln10n100(s);
+         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2));
       }
       return result;
    }
 // N1=11, N2 = 11, 12, ...
-   if (imin2(n1, n2, _state) == 11) {
-      if (imax2(n1, n2, _state) == 11) {
-         result = mannwhitneyu_utbln11n11(s, _state);
+   if (imin2(n1, n2) == 11) {
+      if (imax2(n1, n2) == 11) {
+         result = mannwhitneyu_utbln11n11(s);
       }
-      if (imax2(n1, n2, _state) == 12) {
-         result = mannwhitneyu_utbln11n12(s, _state);
+      if (imax2(n1, n2) == 12) {
+         result = mannwhitneyu_utbln11n12(s);
       }
-      if (imax2(n1, n2, _state) == 13) {
-         result = mannwhitneyu_utbln11n13(s, _state);
+      if (imax2(n1, n2) == 13) {
+         result = mannwhitneyu_utbln11n13(s);
       }
-      if (imax2(n1, n2, _state) == 14) {
-         result = mannwhitneyu_utbln11n14(s, _state);
+      if (imax2(n1, n2) == 14) {
+         result = mannwhitneyu_utbln11n14(s);
       }
-      if (imax2(n1, n2, _state) == 15) {
-         result = mannwhitneyu_utbln11n15(s, _state);
+      if (imax2(n1, n2) == 15) {
+         result = mannwhitneyu_utbln11n15(s);
       }
-      if (imax2(n1, n2, _state) > 15) {
-         f0 = mannwhitneyu_utbln11n15(s, _state);
-         f1 = mannwhitneyu_utbln11n30(s, _state);
-         f2 = mannwhitneyu_utbln11n100(s, _state);
-         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2, _state), _state);
+      if (imax2(n1, n2) > 15) {
+         f0 = mannwhitneyu_utbln11n15(s);
+         f1 = mannwhitneyu_utbln11n30(s);
+         f2 = mannwhitneyu_utbln11n100(s);
+         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2));
       }
       return result;
    }
 // N1=12, N2 = 12, 13, ...
-   if (imin2(n1, n2, _state) == 12) {
-      if (imax2(n1, n2, _state) == 12) {
-         result = mannwhitneyu_utbln12n12(s, _state);
+   if (imin2(n1, n2) == 12) {
+      if (imax2(n1, n2) == 12) {
+         result = mannwhitneyu_utbln12n12(s);
       }
-      if (imax2(n1, n2, _state) == 13) {
-         result = mannwhitneyu_utbln12n13(s, _state);
+      if (imax2(n1, n2) == 13) {
+         result = mannwhitneyu_utbln12n13(s);
       }
-      if (imax2(n1, n2, _state) == 14) {
-         result = mannwhitneyu_utbln12n14(s, _state);
+      if (imax2(n1, n2) == 14) {
+         result = mannwhitneyu_utbln12n14(s);
       }
-      if (imax2(n1, n2, _state) == 15) {
-         result = mannwhitneyu_utbln12n15(s, _state);
+      if (imax2(n1, n2) == 15) {
+         result = mannwhitneyu_utbln12n15(s);
       }
-      if (imax2(n1, n2, _state) > 15) {
-         f0 = mannwhitneyu_utbln12n15(s, _state);
-         f1 = mannwhitneyu_utbln12n30(s, _state);
-         f2 = mannwhitneyu_utbln12n100(s, _state);
-         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2, _state), _state);
+      if (imax2(n1, n2) > 15) {
+         f0 = mannwhitneyu_utbln12n15(s);
+         f1 = mannwhitneyu_utbln12n30(s);
+         f2 = mannwhitneyu_utbln12n100(s);
+         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2));
       }
       return result;
    }
 // N1=13, N2 = 13, 14, ...
-   if (imin2(n1, n2, _state) == 13) {
-      if (imax2(n1, n2, _state) == 13) {
-         result = mannwhitneyu_utbln13n13(s, _state);
+   if (imin2(n1, n2) == 13) {
+      if (imax2(n1, n2) == 13) {
+         result = mannwhitneyu_utbln13n13(s);
       }
-      if (imax2(n1, n2, _state) == 14) {
-         result = mannwhitneyu_utbln13n14(s, _state);
+      if (imax2(n1, n2) == 14) {
+         result = mannwhitneyu_utbln13n14(s);
       }
-      if (imax2(n1, n2, _state) == 15) {
-         result = mannwhitneyu_utbln13n15(s, _state);
+      if (imax2(n1, n2) == 15) {
+         result = mannwhitneyu_utbln13n15(s);
       }
-      if (imax2(n1, n2, _state) > 15) {
-         f0 = mannwhitneyu_utbln13n15(s, _state);
-         f1 = mannwhitneyu_utbln13n30(s, _state);
-         f2 = mannwhitneyu_utbln13n100(s, _state);
-         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2, _state), _state);
+      if (imax2(n1, n2) > 15) {
+         f0 = mannwhitneyu_utbln13n15(s);
+         f1 = mannwhitneyu_utbln13n30(s);
+         f2 = mannwhitneyu_utbln13n100(s);
+         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2));
       }
       return result;
    }
 // N1=14, N2 = 14, 15, ...
-   if (imin2(n1, n2, _state) == 14) {
-      if (imax2(n1, n2, _state) == 14) {
-         result = mannwhitneyu_utbln14n14(s, _state);
+   if (imin2(n1, n2) == 14) {
+      if (imax2(n1, n2) == 14) {
+         result = mannwhitneyu_utbln14n14(s);
       }
-      if (imax2(n1, n2, _state) == 15) {
-         result = mannwhitneyu_utbln14n15(s, _state);
+      if (imax2(n1, n2) == 15) {
+         result = mannwhitneyu_utbln14n15(s);
       }
-      if (imax2(n1, n2, _state) > 15) {
-         f0 = mannwhitneyu_utbln14n15(s, _state);
-         f1 = mannwhitneyu_utbln14n30(s, _state);
-         f2 = mannwhitneyu_utbln14n100(s, _state);
-         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2, _state), _state);
+      if (imax2(n1, n2) > 15) {
+         f0 = mannwhitneyu_utbln14n15(s);
+         f1 = mannwhitneyu_utbln14n30(s);
+         f2 = mannwhitneyu_utbln14n100(s);
+         result = mannwhitneyu_uninterpolate(f0, f1, f2, imax2(n1, n2));
       }
       return result;
    }
@@ -12518,15 +12518,15 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *
    }
    if (s < 3.0) {
       s0 = 0.000000e+00;
-      f0 = mannwhitneyu_usigma000(n1, n2, _state);
+      f0 = mannwhitneyu_usigma000(n1, n2);
       s1 = 7.500000e-01;
-      f1 = mannwhitneyu_usigma075(n1, n2, _state);
+      f1 = mannwhitneyu_usigma075(n1, n2);
       s2 = 1.500000e+00;
-      f2 = mannwhitneyu_usigma150(n1, n2, _state);
+      f2 = mannwhitneyu_usigma150(n1, n2);
       s3 = 2.250000e+00;
-      f3 = mannwhitneyu_usigma225(n1, n2, _state);
+      f3 = mannwhitneyu_usigma225(n1, n2);
       s4 = 3.000000e+00;
-      f4 = mannwhitneyu_usigma300(n1, n2, _state);
+      f4 = mannwhitneyu_usigma300(n1, n2);
       f1 = ((s - s0) * f1 - (s - s1) * f0) / (s1 - s0);
       f2 = ((s - s0) * f2 - (s - s2) * f0) / (s2 - s0);
       f3 = ((s - s0) * f3 - (s - s3) * f0) / (s3 - s0);
@@ -12540,13 +12540,13 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *
       result = f4;
    } else {
       s0 = 3.000000e+00;
-      f0 = mannwhitneyu_usigma300(n1, n2, _state);
+      f0 = mannwhitneyu_usigma300(n1, n2);
       s1 = 3.333333e+00;
-      f1 = mannwhitneyu_usigma333(n1, n2, _state);
+      f1 = mannwhitneyu_usigma333(n1, n2);
       s2 = 3.666667e+00;
-      f2 = mannwhitneyu_usigma367(n1, n2, _state);
+      f2 = mannwhitneyu_usigma367(n1, n2);
       s3 = 4.000000e+00;
-      f3 = mannwhitneyu_usigma400(n1, n2, _state);
+      f3 = mannwhitneyu_usigma400(n1, n2);
       f1 = ((s - s0) * f1 - (s - s1) * f0) / (s1 - s0);
       f2 = ((s - s0) * f2 - (s - s2) * f0) / (s2 - s0);
       f3 = ((s - s0) * f3 - (s - s3) * f0) / (s3 - s0);
@@ -12623,7 +12623,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2, ae_state *
 //       may quite often get P equal to exactly 0.25 or 0.0001.
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 // API: void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
-void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -12639,24 +12639,24 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    double sigma;
    double mu;
    ae_int_t tiecount;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
-   NewVector(r, 0, DT_REAL, _state);
-   NewVector(c, 0, DT_INT, _state);
-   NewVector(tiesize, 0, DT_INT, _state);
+   NewVector(r, 0, DT_REAL);
+   NewVector(c, 0, DT_INT);
+   NewVector(tiesize, 0, DT_INT);
 // Prepare
    if (n <= 4 || m <= 4) {
       *bothtails = 1.0;
       *lefttail = 1.0;
       *righttail = 1.0;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    ns = n + m;
-   ae_vector_set_length(&r, ns - 1 + 1, _state);
-   ae_vector_set_length(&c, ns - 1 + 1, _state);
+   ae_vector_set_length(&r, ns - 1 + 1);
+   ae_vector_set_length(&c, ns - 1 + 1);
    for (i = 0; i < n; i++) {
       r.xR[i] = x->xR[i];
       c.xZ[i] = 0;
@@ -12724,7 +12724,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
 // compute tied ranks
    i = 0;
    tiecount = 0;
-   ae_vector_set_length(&tiesize, ns - 1 + 1, _state);
+   ae_vector_set_length(&tiesize, ns - 1 + 1);
    while (i < ns) {
       j = i + 1;
       while (j < ns) {
@@ -12750,32 +12750,32 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    u = (double)n * m + 0.5 * n * (n + 1) - u;
 // Result
    mu = (double)n * m / 2;
-   tmp = ns * (sqr((double)ns, _state) - 1) / 12;
+   tmp = ns * (sqr((double)ns) - 1) / 12;
    for (i = 0; i < tiecount; i++) {
-      tmp -= tiesize.xZ[i] * (sqr((double)tiesize.xZ[i], _state) - 1) / 12;
+      tmp -= tiesize.xZ[i] * (sqr((double)tiesize.xZ[i]) - 1) / 12;
    }
    sigma = sqrt((double)n * m / ns / (ns - 1) * tmp);
    s = (u - mu) / sigma;
    if (s <= 0.0) {
-      p = exp(mannwhitneyu_usigma(-(u - mu) / sigma, n, m, _state));
-      mp = 1 - exp(mannwhitneyu_usigma(-(u - 1 - mu) / sigma, n, m, _state));
+      p = exp(mannwhitneyu_usigma(-(u - mu) / sigma, n, m));
+      mp = 1 - exp(mannwhitneyu_usigma(-(u - 1 - mu) / sigma, n, m));
    } else {
-      mp = exp(mannwhitneyu_usigma((u - mu) / sigma, n, m, _state));
-      p = 1 - exp(mannwhitneyu_usigma((u + 1 - mu) / sigma, n, m, _state));
+      mp = exp(mannwhitneyu_usigma((u - mu) / sigma, n, m));
+      p = 1 - exp(mannwhitneyu_usigma((u + 1 - mu) / sigma, n, m));
    }
-   *lefttail = rboundval(rmax2(mp, 1.0E-4, _state), 0.0001, 0.2500, _state);
-   *righttail = rboundval(rmax2(p, 1.0E-4, _state), 0.0001, 0.2500, _state);
-   *bothtails = 2 * rmin2(*lefttail, *righttail, _state);
-   ae_frame_leave(_state);
+   *lefttail = rboundval(rmax2(mp, 1.0E-4), 0.0001, 0.2500);
+   *righttail = rboundval(rmax2(p, 1.0E-4), 0.0001, 0.2500);
+   *bothtails = 2 * rmin2(*lefttail, *righttail);
+   ae_frame_leave();
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
 void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::mannwhitneyutest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::mannwhitneyutest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -12819,7 +12819,7 @@ namespace alglib_impl {
 // approximation is used, so significance levels have about 15 exact digits.
 // ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
 // API: void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail);
-void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
    ae_int_t gtcnt;
    ae_int_t necnt;
@@ -12853,18 +12853,18 @@ void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails,
       *righttail = 1.0;
       return;
    }
-   *bothtails = rmin2(2 * binomialdistribution(imin2(gtcnt, necnt - gtcnt, _state), necnt, 0.5, _state), 1.0, _state);
-   *lefttail = binomialdistribution(gtcnt, necnt, 0.5, _state);
-   *righttail = binomialcdistribution(gtcnt - 1, necnt, 0.5, _state);
+   *bothtails = rmin2(2 * binomialdistribution(imin2(gtcnt, necnt - gtcnt), necnt, 0.5), 1.0);
+   *lefttail = binomialdistribution(gtcnt, necnt, 0.5);
+   *righttail = binomialcdistribution(gtcnt - 1, necnt, 0.5);
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
 void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::onesamplesigntest(ConstT(ae_vector, x), n, median, &bothtails, &lefttail, &righttail, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::onesamplesigntest(ConstT(ae_vector, x), n, median, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -12909,7 +12909,7 @@ namespace alglib_impl {
 //         value of mean being tested.
 // ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
 // API: void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail);
-void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
    double xmean;
    double x0;
@@ -12950,13 +12950,13 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
    if (n != 1 && !samex) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 += sqr(x->xR[i] - xmean, _state);
+         v1 += sqr(x->xR[i] - xmean);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
          v2 += (x->xR[i] - xmean);
       }
-      v2 = sqr(v2, _state) / n;
+      v2 = sqr(v2) / n;
       xvariance = (v1 - v2) / (n - 1);
       if (xvariance < 0.0) {
          xvariance = 0.0;
@@ -12983,8 +12983,8 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
    }
 // Statistic
    stat = (xmean - mean) / (xstddev / sqrt((double)n));
-   s = studenttdistribution(n - 1, stat, _state);
-   *bothtails = 2 * rmin2(s, 1 - s, _state);
+   s = studenttdistribution(n - 1, stat);
+   *bothtails = 2 * rmin2(s, 1 - s);
    *lefttail = s;
    *righttail = 1 - s;
 }
@@ -13027,7 +13027,7 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
 //         to 1.0 or 0.0, depending on difference between means.
 // ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
 // API: void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
-void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
    bool samex;
    bool samey;
@@ -13079,10 +13079,10 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
    s = 0.0;
    if (n + m > 2) {
       for (i = 0; i < n; i++) {
-         s += sqr(x->xR[i] - xmean, _state);
+         s += sqr(x->xR[i] - xmean);
       }
       for (i = 0; i < m; i++) {
-         s += sqr(y->xR[i] - ymean, _state);
+         s += sqr(y->xR[i] - ymean);
       }
       s = sqrt(s * (1.0 / n + 1.0 / m) / (n + m - 2));
    }
@@ -13106,8 +13106,8 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
    }
 // Statistic
    stat = (xmean - ymean) / s;
-   p = studenttdistribution(n + m - 2, stat, _state);
-   *bothtails = 2 * rmin2(p, 1 - p, _state);
+   p = studenttdistribution(n + m - 2, stat);
+   *bothtails = 2 * rmin2(p, 1 - p);
    *lefttail = p;
    *righttail = 1 - p;
 }
@@ -13152,7 +13152,7 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
 //         version.
 // ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
 // API: void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
-void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail, ae_state *_state) {
+void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
    bool samex;
    bool samey;
@@ -13207,14 +13207,14 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
    xvar = 0.0;
    if (n >= 2 && !samex) {
       for (i = 0; i < n; i++) {
-         xvar += sqr(x->xR[i] - xmean, _state);
+         xvar += sqr(x->xR[i] - xmean);
       }
       xvar /= n - 1;
    }
    yvar = 0.0;
    if (m >= 2 && !samey) {
       for (i = 0; i < m; i++) {
-         yvar += sqr(y->xR[i] - ymean, _state);
+         yvar += sqr(y->xR[i] - ymean);
       }
       yvar /= m - 1;
    }
@@ -13244,24 +13244,24 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
    // NOTE: right-tail and left-tail must be passed to 1-sample
    //       t-test in reverse order because we reverse order of
    //       of samples.
-      studentttest1(y, m, xmean, bothtails, righttail, lefttail, _state);
+      studentttest1(y, m, xmean, bothtails, righttail, lefttail);
       return;
    }
    if (yvar == 0.0) {
    // Y is constant, unpooled 2-sample test reduces to 1-sample test.
-      studentttest1(x, n, ymean, bothtails, lefttail, righttail, _state);
+      studentttest1(x, n, ymean, bothtails, lefttail, righttail);
       return;
    }
 // Statistic
    stat = (xmean - ymean) / sqrt(xvar / n + yvar / m);
    c = xvar / n / (xvar / n + yvar / m);
-   df = (double)(n - 1) * (m - 1) / ((m - 1) * sqr(c, _state) + (n - 1) * sqr(1 - c, _state));
+   df = (double)(n - 1) * (m - 1) / ((m - 1) * sqr(c) + (n - 1) * sqr(1 - c));
    if (stat > 0.0) {
-      p = 1 - 0.5 * incompletebeta(df / 2, 0.5, df / (df + sqr(stat, _state)), _state);
+      p = 1 - 0.5 * incompletebeta(df / 2, 0.5, df / (df + sqr(stat)));
    } else {
-      p = 0.5 * incompletebeta(df / 2, 0.5, df / (df + sqr(stat, _state)), _state);
+      p = 0.5 * incompletebeta(df / 2, 0.5, df / (df + sqr(stat)));
    }
-   *bothtails = 2 * rmin2(p, 1 - p, _state);
+   *bothtails = 2 * rmin2(p, 1 - p);
    *lefttail = p;
    *righttail = 1 - p;
 }
@@ -13269,23 +13269,23 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
 
 namespace alglib {
 void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::studentttest1(ConstT(ae_vector, x), n, mean, &bothtails, &lefttail, &righttail, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::studentttest1(ConstT(ae_vector, x), n, mean, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
 }
 
 void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::studentttest2(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::studentttest2(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
 }
 
 void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::unequalvariancettest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::unequalvariancettest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib

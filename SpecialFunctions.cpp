@@ -16,7 +16,7 @@
 
 // === GAMMAFUNC Package ===
 namespace alglib_impl {
-static double gammafunc_gammastirf(double x, ae_state *_state) {
+static double gammafunc_gammastirf(double x) {
    double y;
    double w;
    double v;
@@ -59,7 +59,7 @@ static double gammafunc_gammastirf(double x, ae_state *_state) {
 // Original copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
 // Translated to AlgoPascal by Sergey Bochkanov (2005, 2006, 2007).
 // API: double gammafunction(const double x);
-double gammafunction(double x, ae_state *_state) {
+double gammafunction(double x) {
 #ifndef ALGLIB_INTERCEPTS_SPECFUNCS
    double p;
    double pp;
@@ -74,7 +74,7 @@ double gammafunction(double x, ae_state *_state) {
    if (q > 33.0) {
       if (x < 0.0) {
          p = floor(q);
-         i = iround(p, _state);
+         i = iround(p);
          if (i % 2 == 0) {
             sgngam = -1.0;
          }
@@ -85,9 +85,9 @@ double gammafunction(double x, ae_state *_state) {
          }
          z = q * sin(pi * z);
          z = fabs(z);
-         z = pi / (z * gammafunc_gammastirf(q, _state));
+         z = pi / (z * gammafunc_gammastirf(q));
       } else {
-         z = gammafunc_gammastirf(x, _state);
+         z = gammafunc_gammastirf(x);
       }
       result = sgngam * z;
       return result;
@@ -171,7 +171,7 @@ double gammafunction(double x, ae_state *_state) {
 // Copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
 // Translated to AlgoPascal by Sergey Bochkanov (2005, 2006, 2007).
 // API: double lngamma(const double x, double &sgngam);
-double lngamma(double x, double *sgngam, ae_state *_state) {
+double lngamma(double x, double *sgngam) {
 #ifndef ALGLIB_INTERCEPTS_SPECFUNCS
    double a;
    double b;
@@ -192,9 +192,9 @@ double lngamma(double x, double *sgngam, ae_state *_state) {
    ls2pi = 0.91893853320467274178;
    if (x < -34.0) {
       q = -x;
-      w = lngamma(q, &tmp, _state);
+      w = lngamma(q, &tmp);
       p = floor(q);
-      i = iround(p, _state);
+      i = iround(p);
       if (i % 2 == 0) {
          *sgngam = -1.0;
       } else {
@@ -278,18 +278,18 @@ double lngamma(double x, double *sgngam, ae_state *_state) {
 
 namespace alglib {
 double gammafunction(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::gammafunction(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::gammafunction(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double lngamma(const double x, double &sgngam) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::lngamma(x, &sgngam, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::lngamma(x, &sgngam);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -299,7 +299,7 @@ double lngamma(const double x, double &sgngam) {
 namespace alglib_impl {
 #if 0
 // Forward reference to an indirect recursive call. //(@) Already declared externally.
-double errorfunctionc(double x, ae_state *_state);
+double errorfunctionc(double x);
 #endif
 
 // Error function
@@ -327,13 +327,13 @@ double errorfunctionc(double x, ae_state *_state);
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 // API: double errorfunction(const double x);
-double errorfunction(double x, ae_state *_state) {
+double errorfunction(double x) {
    double xsq;
    double s;
    double p;
    double q;
    double result;
-   s = (double)sign(x, _state);
+   s = (double)sign(x);
    x = fabs(x);
    if (x < 0.5) {
       xsq = x * x;
@@ -358,7 +358,7 @@ double errorfunction(double x, ae_state *_state) {
       result = s;
       return result;
    }
-   result = s * (1 - errorfunctionc(x, _state));
+   result = s * (1 - errorfunctionc(x));
    return result;
 }
 
@@ -388,16 +388,16 @@ double errorfunction(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 // API: double errorfunctionc(const double x);
-double errorfunctionc(double x, ae_state *_state) {
+double errorfunctionc(double x) {
    double p;
    double q;
    double result;
    if (x < 0.0) {
-      result = 2 - errorfunctionc(-x, _state);
+      result = 2 - errorfunctionc(-x);
       return result;
    }
    if (x < 0.5) {
-      result = 1.0 - errorfunction(x, _state);
+      result = 1.0 - errorfunction(x);
       return result;
    }
    if (x >= 10.0) {
@@ -422,15 +422,15 @@ double errorfunctionc(double x, ae_state *_state) {
    q = 6089.5424232724435504633068 + x * q;
    q = 4958.82756472114071495438422 + x * q;
    q = 1826.3348842295112595576438 + x * q;
-   result = exp(-sqr(x, _state)) * p / q;
+   result = exp(-sqr(x)) * p / q;
    return result;
 }
 
 // Same as normalcdf(), obsolete name.
 // API: double normaldistribution(const double x);
-double normaldistribution(double x, ae_state *_state) {
+double normaldistribution(double x) {
    double result;
-   result = 0.5 * (errorfunction(x / 1.41421356237309504880, _state) + 1);
+   result = 0.5 * (errorfunction(x / 1.41421356237309504880) + 1);
    return result;
 }
 
@@ -445,9 +445,9 @@ double normaldistribution(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 // API: double normalpdf(const double x);
-double normalpdf(double x, ae_state *_state) {
+double normalpdf(double x) {
    double result;
-   ae_assert(isfinite(x), "NormalPDF: X is infinite", _state);
+   ae_assert(isfinite(x), "NormalPDF: X is infinite");
    result = exp(-x * x / 2) / sqrt(2 * pi);
    return result;
 }
@@ -481,9 +481,9 @@ double normalpdf(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 // API: double normalcdf(const double x);
-double normalcdf(double x, ae_state *_state) {
+double normalcdf(double x) {
    double result;
-   result = 0.5 * (errorfunction(x / 1.41421356237309504880, _state) + 1);
+   result = 0.5 * (errorfunction(x / 1.41421356237309504880) + 1);
    return result;
 }
 
@@ -511,7 +511,7 @@ double normalcdf(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 // API: double invnormalcdf(const double y0);
-double invnormalcdf(double y0, ae_state *_state) {
+double invnormalcdf(double y0) {
    double expm2;
    double s2pi;
    double x;
@@ -620,9 +620,9 @@ double invnormalcdf(double y0, ae_state *_state) {
 
 // Same as invnormalcdf(), deprecated name
 // API: double invnormaldistribution(const double y0);
-double invnormaldistribution(double y0, ae_state *_state) {
+double invnormaldistribution(double y0) {
    double result;
-   result = invnormalcdf(y0, _state);
+   result = invnormalcdf(y0);
    return result;
 }
 
@@ -631,9 +631,9 @@ double invnormaldistribution(double y0, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 // API: double inverf(const double e);
-double inverf(double e, ae_state *_state) {
+double inverf(double e) {
    double result;
-   result = invnormaldistribution(0.5 * (e + 1), _state) / sqrt(2.0);
+   result = invnormaldistribution(0.5 * (e + 1)) / sqrt(2.0);
    return result;
 }
 
@@ -652,13 +652,13 @@ double inverf(double e, ae_state *_state) {
 // This function won't fail as long as Rho is in (-1,+1) range.
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
 // API: double bivariatenormalpdf(const double x, const double y, const double rho);
-double bivariatenormalpdf(double x, double y, double rho, ae_state *_state) {
+double bivariatenormalpdf(double x, double y, double rho) {
    double onerho2;
    double result;
-   ae_assert(isfinite(x), "BivariateNormalCDF: X is infinite", _state);
-   ae_assert(isfinite(y), "BivariateNormalCDF: Y is infinite", _state);
-   ae_assert(isfinite(rho), "BivariateNormalCDF: Rho is infinite", _state);
-   ae_assert(-1.0 < rho && rho < 1.0, "BivariateNormalCDF: Rho is not in (-1,+1) range", _state);
+   ae_assert(isfinite(x), "BivariateNormalCDF: X is infinite");
+   ae_assert(isfinite(y), "BivariateNormalCDF: Y is infinite");
+   ae_assert(isfinite(rho), "BivariateNormalCDF: Rho is infinite");
+   ae_assert(-1.0 < rho && rho < 1.0, "BivariateNormalCDF: Rho is not in (-1,+1) range");
    onerho2 = (1 - rho) * (1 + rho);
    result = exp(-(x * x + y * y - 2 * rho * x * y) / (2 * onerho2)) / (2 * pi * sqrt(onerho2));
    return result;
@@ -667,7 +667,7 @@ double bivariatenormalpdf(double x, double y, double rho, ae_state *_state) {
 // Internal function which computes integrand of  formula  (3)  by  Alan
 // Genz times Gaussian weights (passed by user).
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
-static double normaldistr_bvnintegrate3(double rangea, double rangeb, double x, double y, double gw, double gx, ae_state *_state) {
+static double normaldistr_bvnintegrate3(double rangea, double rangeb, double x, double y, double gw, double gx) {
    double r;
    double t2;
    double dd;
@@ -686,7 +686,7 @@ static double normaldistr_bvnintegrate3(double rangea, double rangeb, double x, 
 // Internal function which computes integrand of  formula  (6)  by  Alan
 // Genz times Gaussian weights (passed by user).
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
-static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, double y, double s, double gw, double gx, ae_state *_state) {
+static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, double y, double s, double gw, double gx) {
    double r;
    double exphsk22x2;
    double exphsk2;
@@ -734,7 +734,7 @@ static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, 
 // This function won't fail as long as Rho is in (-1,+1) range.
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
 // API: double bivariatenormalcdf(const double x, const double y, const double rho);
-double bivariatenormalcdf(double x, double y, double rho, ae_state *_state) {
+double bivariatenormalcdf(double x, double y, double rho) {
    double rangea;
    double rangeb;
    double s;
@@ -746,12 +746,12 @@ double bivariatenormalcdf(double x, double y, double rho, ae_state *_state) {
    double tb;
    double tc;
    double result;
-   ae_assert(isfinite(x), "BivariateNormalCDF: X is infinite", _state);
-   ae_assert(isfinite(y), "BivariateNormalCDF: Y is infinite", _state);
-   ae_assert(isfinite(rho), "BivariateNormalCDF: Rho is infinite", _state);
-   ae_assert(-1.0 < rho && rho < 1.0, "BivariateNormalCDF: Rho is not in (-1,+1) range", _state);
+   ae_assert(isfinite(x), "BivariateNormalCDF: X is infinite");
+   ae_assert(isfinite(y), "BivariateNormalCDF: Y is infinite");
+   ae_assert(isfinite(rho), "BivariateNormalCDF: Rho is infinite");
+   ae_assert(-1.0 < rho && rho < 1.0, "BivariateNormalCDF: Rho is not in (-1,+1) range");
    if (rho == 0.0) {
-      result = normalcdf(x, _state) * normalcdf(y, _state);
+      result = normalcdf(x) * normalcdf(y);
       return result;
    }
    if (fabs(rho) <= 0.8) {
@@ -760,30 +760,30 @@ double bivariatenormalcdf(double x, double y, double rho, ae_state *_state) {
       rangea = 0.0;
       rangeb = asin(rho);
       v = 0.0;
-      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2491470458134028, -0.1252334085114689, _state);
-      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2491470458134028, 0.1252334085114689, _state);
-      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2334925365383548, -0.3678314989981802, _state);
-      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2334925365383548, 0.3678314989981802, _state);
-      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2031674267230659, -0.5873179542866175, _state);
-      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2031674267230659, 0.5873179542866175, _state);
-      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1600783285433462, -0.7699026741943047, _state);
-      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1600783285433462, 0.7699026741943047, _state);
-      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1069393259953184, -0.9041172563704749, _state);
-      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1069393259953184, 0.9041172563704749, _state);
-      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, -0.9815606342467192, _state);
-      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, 0.9815606342467192, _state);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2491470458134028, -0.1252334085114689);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2491470458134028, 0.1252334085114689);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2334925365383548, -0.3678314989981802);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2334925365383548, 0.3678314989981802);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2031674267230659, -0.5873179542866175);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2031674267230659, 0.5873179542866175);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1600783285433462, -0.7699026741943047);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1600783285433462, 0.7699026741943047);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1069393259953184, -0.9041172563704749);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1069393259953184, 0.9041172563704749);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, -0.9815606342467192);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, 0.9815606342467192);
       v = v * 0.5 * (rangeb - rangea) / (2 * pi);
-      result = normalcdf(x, _state) * normalcdf(y, _state) + v;
+      result = normalcdf(x) * normalcdf(y) + v;
    } else {
    // Rho is large, compute integral using using formula (6) by Alan Genz, integrated
    // by means of 20-point Gauss-Legendre quadrature.
       x = -x;
       y = -y;
-      s = (double)sign(rho, _state);
+      s = (double)sign(rho);
       if (s > 0.0) {
-         fxys = normalcdf(-rmax2(x, y, _state), _state);
+         fxys = normalcdf(-rmax2(x, y));
       } else {
-         fxys = rmax2(0.0, normalcdf(-x, _state) - normalcdf(y, _state), _state);
+         fxys = rmax2(0.0, normalcdf(-x) - normalcdf(y));
       }
       rangea = 0.0;
       rangeb = sqrt((1 - rho) * (1 + rho));
@@ -791,117 +791,117 @@ double bivariatenormalcdf(double x, double y, double rho, ae_state *_state) {
       ta = rangeb;
       tb = fabs(x - s * y);
       tc = (4 - s * x * y) / 8;
-      v0 = ta * (1 - tc * (tb * tb - ta * ta) / 3) * exp(-tb * tb / (2 * ta * ta)) - tb * (1 - tc * tb * tb / 3) * sqrt(2 * pi) * normalcdf(-tb / ta, _state);
+      v0 = ta * (1 - tc * (tb * tb - ta * ta) / 3) * exp(-tb * tb / (2 * ta * ta)) - tb * (1 - tc * tb * tb / 3) * sqrt(2 * pi) * normalcdf(-tb / ta);
       v0 = v0 * exp(-s * x * y / 2) / (2 * pi);
    // Compute second term (numerical integral, 20-point Gauss-Legendre rule) from formula (6)
       v1 = 0.0;
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1527533871307258, -0.0765265211334973, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1527533871307258, 0.0765265211334973, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1491729864726037, -0.2277858511416451, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1491729864726037, 0.2277858511416451, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1420961093183820, -0.3737060887154195, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1420961093183820, 0.3737060887154195, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1316886384491766, -0.5108670019508271, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1316886384491766, 0.5108670019508271, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1181945319615184, -0.6360536807265150, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1181945319615184, 0.6360536807265150, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1019301198172404, -0.7463319064601508, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1019301198172404, 0.7463319064601508, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0832767415767048, -0.8391169718222188, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0832767415767048, 0.8391169718222188, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0626720483341091, -0.9122344282513259, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0626720483341091, 0.9122344282513259, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0406014298003869, -0.9639719272779138, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0406014298003869, 0.9639719272779138, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, -0.9931285991850949, _state);
-      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, 0.9931285991850949, _state);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1527533871307258, -0.0765265211334973);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1527533871307258, 0.0765265211334973);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1491729864726037, -0.2277858511416451);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1491729864726037, 0.2277858511416451);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1420961093183820, -0.3737060887154195);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1420961093183820, 0.3737060887154195);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1316886384491766, -0.5108670019508271);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1316886384491766, 0.5108670019508271);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1181945319615184, -0.6360536807265150);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1181945319615184, 0.6360536807265150);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1019301198172404, -0.7463319064601508);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1019301198172404, 0.7463319064601508);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0832767415767048, -0.8391169718222188);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0832767415767048, 0.8391169718222188);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0626720483341091, -0.9122344282513259);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0626720483341091, 0.9122344282513259);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0406014298003869, -0.9639719272779138);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0406014298003869, 0.9639719272779138);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, -0.9931285991850949);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, 0.9931285991850949);
       v1 = v1 * 0.5 * (rangeb - rangea) / (2 * pi);
       result = fxys - s * (v0 + v1);
    }
-   result = rmax2(result, 0.0, _state);
-   result = rmin2(result, 1.0, _state);
+   result = rmax2(result, 0.0);
+   result = rmin2(result, 1.0);
    return result;
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
 double errorfunction(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::errorfunction(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::errorfunction(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double errorfunctionc(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::errorfunctionc(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::errorfunctionc(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double normaldistribution(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::normaldistribution(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::normaldistribution(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double normalpdf(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::normalpdf(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::normalpdf(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double normalcdf(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::normalcdf(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::normalcdf(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double invnormalcdf(const double y0) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::invnormalcdf(y0, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::invnormalcdf(y0);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double invnormaldistribution(const double y0) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::invnormaldistribution(y0, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::invnormaldistribution(y0);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double inverf(const double e) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::inverf(e, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::inverf(e);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double bivariatenormalpdf(const double x, const double y, const double rho) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::bivariatenormalpdf(x, y, rho, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::bivariatenormalpdf(x, y, rho);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double bivariatenormalcdf(const double x, const double y, const double rho) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::bivariatenormalcdf(x, y, rho, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::bivariatenormalcdf(x, y, rho);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -913,7 +913,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library, Release 2.8:  June, 2000
 // Copyright 1984, 1995, 2000 by Stephen L. Moshier
-static double ibetaf_incompletebetafe(double a, double b, double x, double big, double biginv, ae_state *_state) {
+static double ibetaf_incompletebetafe(double a, double b, double x, double big, double biginv) {
    double xk;
    double pk;
    double pkm1;
@@ -1009,7 +1009,7 @@ static double ibetaf_incompletebetafe(double a, double b, double x, double big, 
 //
 // Cephes Math Library, Release 2.8:  June, 2000
 // Copyright 1984, 1995, 2000 by Stephen L. Moshier
-static double ibetaf_incompletebetafe2(double a, double b, double x, double big, double biginv, ae_state *_state) {
+static double ibetaf_incompletebetafe2(double a, double b, double x, double big, double biginv) {
    double xk;
    double pk;
    double pkm1;
@@ -1107,7 +1107,7 @@ static double ibetaf_incompletebetafe2(double a, double b, double x, double big,
 //
 // Cephes Math Library, Release 2.8:  June, 2000
 // Copyright 1984, 1995, 2000 by Stephen L. Moshier
-static double ibetaf_incompletebetaps(double a, double b, double x, double maxgam, ae_state *_state) {
+static double ibetaf_incompletebetaps(double a, double b, double x, double maxgam) {
    double s;
    double t;
    double u;
@@ -1137,10 +1137,10 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
    s += ai;
    u = a * log(x);
    if (a + b < maxgam && fabs(u) < log(maxrealnumber)) {
-      t = gammafunction(a + b, _state) / (gammafunction(a, _state) * gammafunction(b, _state));
+      t = gammafunction(a + b) / (gammafunction(a) * gammafunction(b));
       s *= t * pow(x, a);
    } else {
-      t = lngamma(a + b, &sg, _state) - lngamma(a, &sg, _state) - lngamma(b, &sg, _state) + u + log(s);
+      t = lngamma(a + b, &sg) - lngamma(a, &sg) - lngamma(b, &sg) + u + log(s);
       if (t < log(minrealnumber)) {
          s = 0.0;
       } else {
@@ -1191,7 +1191,7 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
 // Cephes Math Library, Release 2.8:  June, 2000
 // Copyright 1984, 1995, 2000 by Stephen L. Moshier
 // API: double incompletebeta(const double a, const double b, const double x);
-double incompletebeta(double a, double b, double x, ae_state *_state) {
+double incompletebeta(double a, double b, double x) {
    double t;
    double xc;
    double w;
@@ -1209,8 +1209,8 @@ double incompletebeta(double a, double b, double x, ae_state *_state) {
    maxgam = 171.624376956302725;
    minlog = log(minrealnumber);
    maxlog = log(maxrealnumber);
-   ae_assert(a > 0.0 && b > 0.0, "Domain error in IncompleteBeta", _state);
-   ae_assert(x >= 0.0 && x <= 1.0, "Domain error in IncompleteBeta", _state);
+   ae_assert(a > 0.0 && b > 0.0, "Domain error in IncompleteBeta");
+   ae_assert(x >= 0.0 && x <= 1.0, "Domain error in IncompleteBeta");
    if (x == 0.0) {
       result = 0.0;
       return result;
@@ -1221,7 +1221,7 @@ double incompletebeta(double a, double b, double x, ae_state *_state) {
    }
    flag = 0;
    if (b * x <= 1.0 && x <= 0.95) {
-      result = ibetaf_incompletebetaps(a, b, x, maxgam, _state);
+      result = ibetaf_incompletebetaps(a, b, x, maxgam);
       return result;
    }
    w = 1.0 - x;
@@ -1236,7 +1236,7 @@ double incompletebeta(double a, double b, double x, ae_state *_state) {
       xc = w;
    }
    if ((flag == 1 && b * x <= 1.0) && x <= 0.95) {
-      t = ibetaf_incompletebetaps(a, b, x, maxgam, _state);
+      t = ibetaf_incompletebetaps(a, b, x, maxgam);
       if (t <= machineepsilon) {
          result = 1.0 - machineepsilon;
       } else {
@@ -1246,9 +1246,9 @@ double incompletebeta(double a, double b, double x, ae_state *_state) {
    }
    y = x * (a + b - 2.0) - (a - 1.0);
    if (y < 0.0) {
-      w = ibetaf_incompletebetafe(a, b, x, big, biginv, _state);
+      w = ibetaf_incompletebetafe(a, b, x, big, biginv);
    } else {
-      w = ibetaf_incompletebetafe2(a, b, x, big, biginv, _state) / xc;
+      w = ibetaf_incompletebetafe2(a, b, x, big, biginv) / xc;
    }
    y = a * log(x);
    t = b * log(xc);
@@ -1257,7 +1257,7 @@ double incompletebeta(double a, double b, double x, ae_state *_state) {
       t *= pow(x, a);
       t /= a;
       t *= w;
-      t *= gammafunction(a + b, _state) / (gammafunction(a, _state) * gammafunction(b, _state));
+      t *= gammafunction(a + b) / (gammafunction(a) * gammafunction(b));
       if (flag == 1) {
          if (t <= machineepsilon) {
             result = 1.0 - machineepsilon;
@@ -1269,7 +1269,7 @@ double incompletebeta(double a, double b, double x, ae_state *_state) {
       }
       return result;
    }
-   y += t + lngamma(a + b, &sg, _state) - lngamma(a, &sg, _state) - lngamma(b, &sg, _state);
+   y += t + lngamma(a + b, &sg) - lngamma(a, &sg) - lngamma(b, &sg);
    y += log(w / a);
    if (y < minlog) {
       t = 0.0;
@@ -1314,7 +1314,7 @@ double incompletebeta(double a, double b, double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1996, 2000 by Stephen L. Moshier
 // API: double invincompletebeta(const double a, const double b, const double y);
-double invincompletebeta(double a, double b, double y, ae_state *_state) {
+double invincompletebeta(double a, double b, double y) {
    double aaa;
    double bbb;
    double y0;
@@ -1344,7 +1344,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
    ae_int_t breakihalvecycle;
    double result;
    i = 0;
-   ae_assert(y >= 0.0 && y <= 1.0, "Domain error in InvIncompleteBeta", _state);
+   ae_assert(y >= 0.0 && y <= 1.0, "Domain error in InvIncompleteBeta");
 // special cases
    if (y == 0.0) {
       result = 0.0;
@@ -1390,13 +1390,13 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
             bbb = b;
             y0 = y;
             x = aaa / (aaa + bbb);
-            yyy = incompletebeta(aaa, bbb, x, _state);
+            yyy = incompletebeta(aaa, bbb, x);
             mainlooppos = ihalve;
             continue;
          } else {
             dithresh = 1.0e-4;
          }
-         yp = -invnormaldistribution(y, _state);
+         yp = -invnormaldistribution(y);
          if (y > 0.5) {
             rflg = 1;
             aaa = b;
@@ -1418,7 +1418,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
             break;
          }
          x = aaa / (aaa + bbb * exp(d));
-         yyy = incompletebeta(aaa, bbb, x, _state);
+         yyy = incompletebeta(aaa, bbb, x);
          yp = (yyy - y0) / y0;
          if (fabs(yp) < 0.2) {
             mainlooppos = newt;
@@ -1450,7 +1450,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
                      break;
                   }
                }
-               yyy = incompletebeta(aaa, bbb, x, _state);
+               yyy = incompletebeta(aaa, bbb, x);
                yp = (x1 - x0) / (x1 + x0);
                if (fabs(yp) < dithresh) {
                   mainlooppos = newt;
@@ -1493,7 +1493,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
                      y0 = 1.0 - y;
                   }
                   x = 1.0 - x;
-                  yyy = incompletebeta(aaa, bbb, x, _state);
+                  yyy = incompletebeta(aaa, bbb, x);
                   x0 = 0.0;
                   yl = 0.0;
                   x1 = 1.0;
@@ -1551,7 +1551,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
             break;
          }
          nflg = 1;
-         lgm = lngamma(aaa + bbb, &s, _state) - lngamma(aaa, &s, _state) - lngamma(bbb, &s, _state);
+         lgm = lngamma(aaa + bbb, &s) - lngamma(aaa, &s) - lngamma(bbb, &s);
          i = 0;
          mainlooppos = newtcycle;
          continue;
@@ -1560,7 +1560,7 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
       if (mainlooppos == newtcycle) {
          if (i <= 7) {
             if (i != 0) {
-               yyy = incompletebeta(aaa, bbb, x, _state);
+               yyy = incompletebeta(aaa, bbb, x);
             }
             if (yyy < yl) {
                x = x0;
@@ -1644,18 +1644,18 @@ double invincompletebeta(double a, double b, double y, ae_state *_state) {
 
 namespace alglib {
 double incompletebeta(const double a, const double b, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::incompletebeta(a, b, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::incompletebeta(a, b, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double invincompletebeta(const double a, const double b, const double y) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::invincompletebeta(a, b, y, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::invincompletebeta(a, b, y);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -1703,7 +1703,7 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 // API: double studenttdistribution(const ae_int_t k, const double t);
-double studenttdistribution(ae_int_t k, double t, ae_state *_state) {
+double studenttdistribution(ae_int_t k, double t) {
    double x;
    double rk;
    double z;
@@ -1713,7 +1713,7 @@ double studenttdistribution(ae_int_t k, double t, ae_state *_state) {
    double xsqk;
    ae_int_t j;
    double result;
-   ae_assert(k > 0, "Domain error in StudentTDistribution", _state);
+   ae_assert(k > 0, "Domain error in StudentTDistribution");
    if (t == 0.0) {
       result = 0.5;
       return result;
@@ -1721,7 +1721,7 @@ double studenttdistribution(ae_int_t k, double t, ae_state *_state) {
    if (t < -2.0) {
       rk = (double)k;
       z = rk / (rk + t * t);
-      result = 0.5 * incompletebeta(0.5 * rk, 0.5, z, _state);
+      result = 0.5 * incompletebeta(0.5 * rk, 0.5, z);
       return result;
    }
    if (t < 0.0) {
@@ -1780,13 +1780,13 @@ double studenttdistribution(ae_int_t k, double t, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 // API: double invstudenttdistribution(const ae_int_t k, const double p);
-double invstudenttdistribution(ae_int_t k, double p, ae_state *_state) {
+double invstudenttdistribution(ae_int_t k, double p) {
    double t;
    double rk;
    double z;
    ae_int_t rflg;
    double result;
-   ae_assert((k > 0 && p > 0.0) && p < 1.0, "Domain error in InvStudentTDistribution", _state);
+   ae_assert((k > 0 && p > 0.0) && p < 1.0, "Domain error in InvStudentTDistribution");
    rk = (double)k;
    if (p > 0.25 && p < 0.75) {
       if (p == 0.5) {
@@ -1794,7 +1794,7 @@ double invstudenttdistribution(ae_int_t k, double p, ae_state *_state) {
          return result;
       }
       z = 1.0 - 2.0 * p;
-      z = invincompletebeta(0.5, 0.5 * rk, fabs(z), _state);
+      z = invincompletebeta(0.5, 0.5 * rk, fabs(z));
       t = sqrt(rk * z / (1.0 - z));
       if (p < 0.5) {
          t = -t;
@@ -1807,7 +1807,7 @@ double invstudenttdistribution(ae_int_t k, double p, ae_state *_state) {
       p = 1.0 - p;
       rflg = 1;
    }
-   z = invincompletebeta(0.5 * rk, 0.5, 2.0 * p, _state);
+   z = invincompletebeta(0.5 * rk, 0.5, 2.0 * p);
    if (maxrealnumber * z < rk) {
       result = rflg * maxrealnumber;
       return result;
@@ -1820,18 +1820,18 @@ double invstudenttdistribution(ae_int_t k, double p, ae_state *_state) {
 
 namespace alglib {
 double studenttdistribution(const ae_int_t k, const double t) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::studenttdistribution(k, t, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::studenttdistribution(k, t);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double invstudenttdistribution(const ae_int_t k, const double p) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::invstudenttdistribution(k, p, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::invstudenttdistribution(k, p);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -1870,13 +1870,13 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 // API: double fdistribution(const ae_int_t a, const ae_int_t b, const double x);
-double fdistribution(ae_int_t a, ae_int_t b, double x, ae_state *_state) {
+double fdistribution(ae_int_t a, ae_int_t b, double x) {
    double w;
    double result;
-   ae_assert((a >= 1 && b >= 1) && x >= 0.0, "Domain error in FDistribution", _state);
+   ae_assert((a >= 1 && b >= 1) && x >= 0.0, "Domain error in FDistribution");
    w = a * x;
    w /= b + w;
-   result = incompletebeta(0.5 * a, 0.5 * b, w, _state);
+   result = incompletebeta(0.5 * a, 0.5 * b, w);
    return result;
 }
 
@@ -1915,12 +1915,12 @@ double fdistribution(ae_int_t a, ae_int_t b, double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 // API: double fcdistribution(const ae_int_t a, const ae_int_t b, const double x);
-double fcdistribution(ae_int_t a, ae_int_t b, double x, ae_state *_state) {
+double fcdistribution(ae_int_t a, ae_int_t b, double x) {
    double w;
    double result;
-   ae_assert((a >= 1 && b >= 1) && x >= 0.0, "Domain error in FCDistribution", _state);
+   ae_assert((a >= 1 && b >= 1) && x >= 0.0, "Domain error in FCDistribution");
    w = b / (b + a * x);
-   result = incompletebeta(0.5 * b, 0.5 * a, w, _state);
+   result = incompletebeta(0.5 * b, 0.5 * a, w);
    return result;
 }
 
@@ -1958,19 +1958,19 @@ double fcdistribution(ae_int_t a, ae_int_t b, double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 // API: double invfdistribution(const ae_int_t a, const ae_int_t b, const double y);
-double invfdistribution(ae_int_t a, ae_int_t b, double y, ae_state *_state) {
+double invfdistribution(ae_int_t a, ae_int_t b, double y) {
    double w;
    double result;
-   ae_assert(((a >= 1 && b >= 1) && y > 0.0) && y <= 1.0, "Domain error in InvFDistribution", _state);
+   ae_assert(((a >= 1 && b >= 1) && y > 0.0) && y <= 1.0, "Domain error in InvFDistribution");
 // Compute probability for x = 0.5
-   w = incompletebeta(0.5 * b, 0.5 * a, 0.5, _state);
+   w = incompletebeta(0.5 * b, 0.5 * a, 0.5);
 // If that is greater than y, then the solution w < .5
 // Otherwise, solve at 1-y to remove cancellation in (b - b*w)
    if (w > y || y < 0.001) {
-      w = invincompletebeta(0.5 * b, 0.5 * a, y, _state);
+      w = invincompletebeta(0.5 * b, 0.5 * a, y);
       result = (b - b * w) / (a * w);
    } else {
-      w = invincompletebeta(0.5 * a, 0.5 * b, 1.0 - y, _state);
+      w = invincompletebeta(0.5 * a, 0.5 * b, 1.0 - y);
       result = b * w / (a * (1.0 - w));
    }
    return result;
@@ -1979,26 +1979,26 @@ double invfdistribution(ae_int_t a, ae_int_t b, double y, ae_state *_state) {
 
 namespace alglib {
 double fdistribution(const ae_int_t a, const ae_int_t b, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::fdistribution(a, b, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::fdistribution(a, b, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double fcdistribution(const ae_int_t a, const ae_int_t b, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::fcdistribution(a, b, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::fcdistribution(a, b, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double invfdistribution(const ae_int_t a, const ae_int_t b, const double y) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::invfdistribution(a, b, y, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::invfdistribution(a, b, y);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -2008,7 +2008,7 @@ double invfdistribution(const ae_int_t a, const ae_int_t b, const double y) {
 namespace alglib_impl {
 #if 0
 // Forward reference to an indirect recursive call. //(@) Already declared externally.
-double incompletegammac(double a, double x, ae_state *_state);
+double incompletegammac(double a, double x);
 #endif
 
 // Incomplete gamma integral
@@ -2039,7 +2039,7 @@ double incompletegammac(double a, double x, ae_state *_state);
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 1987, 2000 by Stephen L. Moshier
 // API: double incompletegamma(const double a, const double x);
-double incompletegamma(double a, double x, ae_state *_state) {
+double incompletegamma(double a, double x) {
    double igammaepsilon;
    double ans;
    double ax;
@@ -2053,10 +2053,10 @@ double incompletegamma(double a, double x, ae_state *_state) {
       return result;
    }
    if (x > 1.0 && x > a) {
-      result = 1 - incompletegammac(a, x, _state);
+      result = 1 - incompletegammac(a, x);
       return result;
    }
-   ax = a * log(x) - x - lngamma(a, &tmp, _state);
+   ax = a * log(x) - x - lngamma(a, &tmp);
    if (ax < -709.78271289338399) {
       result = 0.0;
       return result;
@@ -2106,7 +2106,7 @@ double incompletegamma(double a, double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 1987, 2000 by Stephen L. Moshier
 // API: double incompletegammac(const double a, const double x);
-double incompletegammac(double a, double x, ae_state *_state) {
+double incompletegammac(double a, double x) {
    double igammaepsilon;
    double igammabignumber;
    double igammabignumberinv;
@@ -2134,10 +2134,10 @@ double incompletegammac(double a, double x, ae_state *_state) {
       return result;
    }
    if (x < 1.0 || x < a) {
-      result = 1 - incompletegamma(a, x, _state);
+      result = 1 - incompletegamma(a, x);
       return result;
    }
-   ax = a * log(x) - x - lngamma(a, &tmp, _state);
+   ax = a * log(x) - x - lngamma(a, &tmp);
    if (ax < -709.78271289338399) {
       result = 0.0;
       return result;
@@ -2215,7 +2215,7 @@ double incompletegammac(double a, double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 // API: double invincompletegammac(const double a, const double y0);
-double invincompletegammac(double a, double y0, ae_state *_state) {
+double invincompletegammac(double a, double y0) {
    double igammaepsilon;
    double iinvgammabignumber;
    double x0;
@@ -2239,16 +2239,16 @@ double invincompletegammac(double a, double y0, ae_state *_state) {
    yh = 1.0;
    dithresh = 5 * igammaepsilon;
    d = 1 / (9 * a);
-   y = 1 - d - invnormaldistribution(y0, _state) * sqrt(d);
+   y = 1 - d - invnormaldistribution(y0) * sqrt(d);
    x = a * y * y * y;
-   lgm = lngamma(a, &tmp, _state);
+   lgm = lngamma(a, &tmp);
    i = 0;
    while (i < 10) {
       if (x > x0 || x < x1) {
          d = 0.0625;
          break;
       }
-      y = incompletegammac(a, x, _state);
+      y = incompletegammac(a, x);
       if (y < yl || y > yh) {
          d = 0.0625;
          break;
@@ -2280,7 +2280,7 @@ double invincompletegammac(double a, double y0, ae_state *_state) {
       }
       while (x0 == iinvgammabignumber) {
          x *= (1 + d);
-         y = incompletegammac(a, x, _state);
+         y = incompletegammac(a, x);
          if (y < y0) {
             x0 = x;
             yl = y;
@@ -2294,7 +2294,7 @@ double invincompletegammac(double a, double y0, ae_state *_state) {
    i = 0;
    while (i < 400) {
       x = x1 + d * (x0 - x1);
-      y = incompletegammac(a, x, _state);
+      y = incompletegammac(a, x);
       lgm = (x0 - x1) / (x1 + x0);
       if (fabs(lgm) < dithresh) {
          break;
@@ -2344,26 +2344,26 @@ double invincompletegammac(double a, double y0, ae_state *_state) {
 
 namespace alglib {
 double incompletegamma(const double a, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::incompletegamma(a, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::incompletegamma(a, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double incompletegammac(const double a, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::incompletegammac(a, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::incompletegammac(a, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double invincompletegammac(const double a, const double y0) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::invincompletegammac(a, y0, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::invincompletegammac(a, y0);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -2403,10 +2403,10 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: double chisquaredistribution(const double v, const double x);
-double chisquaredistribution(double v, double x, ae_state *_state) {
+double chisquaredistribution(double v, double x) {
    double result;
-   ae_assert(x >= 0.0 && v >= 1.0, "Domain error in ChiSquareDistribution", _state);
-   result = incompletegamma(v / 2.0, x / 2.0, _state);
+   ae_assert(x >= 0.0 && v >= 1.0, "Domain error in ChiSquareDistribution");
+   result = incompletegamma(v / 2.0, x / 2.0);
    return result;
 }
 
@@ -2440,10 +2440,10 @@ double chisquaredistribution(double v, double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: double chisquarecdistribution(const double v, const double x);
-double chisquarecdistribution(double v, double x, ae_state *_state) {
+double chisquarecdistribution(double v, double x) {
    double result;
-   ae_assert(x >= 0.0 && v >= 1.0, "Domain error in ChiSquareDistributionC", _state);
-   result = incompletegammac(v / 2.0, x / 2.0, _state);
+   ae_assert(x >= 0.0 && v >= 1.0, "Domain error in ChiSquareDistributionC");
+   result = incompletegammac(v / 2.0, x / 2.0);
    return result;
 }
 
@@ -2466,36 +2466,36 @@ double chisquarecdistribution(double v, double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: double invchisquaredistribution(const double v, const double y);
-double invchisquaredistribution(double v, double y, ae_state *_state) {
+double invchisquaredistribution(double v, double y) {
    double result;
-   ae_assert((y >= 0.0 && y <= 1.0) && v >= 1.0, "Domain error in InvChiSquareDistribution", _state);
-   result = 2 * invincompletegammac(0.5 * v, y, _state);
+   ae_assert((y >= 0.0 && y <= 1.0) && v >= 1.0, "Domain error in InvChiSquareDistribution");
+   result = 2 * invincompletegammac(0.5 * v, y);
    return result;
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
 double chisquaredistribution(const double v, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::chisquaredistribution(v, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::chisquaredistribution(v, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double chisquarecdistribution(const double v, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::chisquarecdistribution(v, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::chisquarecdistribution(v, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double invchisquaredistribution(const double v, const double y) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::invchisquaredistribution(v, y, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::invchisquaredistribution(v, y);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -2534,12 +2534,12 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 // API: double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p);
-double binomialdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state) {
+double binomialdistribution(ae_int_t k, ae_int_t n, double p) {
    double dk;
    double dn;
    double result;
-   ae_assert(p >= 0.0 && p <= 1.0, "Domain error in BinomialDistribution", _state);
-   ae_assert(k >= -1 && k <= n, "Domain error in BinomialDistribution", _state);
+   ae_assert(p >= 0.0 && p <= 1.0, "Domain error in BinomialDistribution");
+   ae_assert(k >= -1 && k <= n, "Domain error in BinomialDistribution");
    if (k == -1) {
       result = 0.0;
       return result;
@@ -2553,7 +2553,7 @@ double binomialdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state) 
       dk = pow(1.0 - p, dn);
    } else {
       dk = (double)(k + 1);
-      dk = incompletebeta(dn, dk, 1.0 - p, _state);
+      dk = incompletebeta(dn, dk, 1.0 - p);
    }
    result = dk;
    return result;
@@ -2591,12 +2591,12 @@ double binomialdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state) 
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 // API: double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p);
-double binomialcdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state) {
+double binomialcdistribution(ae_int_t k, ae_int_t n, double p) {
    double dk;
    double dn;
    double result;
-   ae_assert(p >= 0.0 && p <= 1.0, "Domain error in BinomialDistributionC", _state);
-   ae_assert(k >= -1 && k <= n, "Domain error in BinomialDistributionC", _state);
+   ae_assert(p >= 0.0 && p <= 1.0, "Domain error in BinomialDistributionC");
+   ae_assert(k >= -1 && k <= n, "Domain error in BinomialDistributionC");
    if (k == -1) {
       result = 1.0;
       return result;
@@ -2608,13 +2608,13 @@ double binomialcdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state)
    dn = (double)(n - k);
    if (k == 0) {
       if (p < 0.01) {
-         dk = -nuexpm1(dn * nulog1p(-p, _state), _state);
+         dk = -nuexpm1(dn * nulog1p(-p));
       } else {
          dk = 1.0 - pow(1.0 - p, dn);
       }
    } else {
       dk = (double)(k + 1);
-      dk = incompletebeta(dk, dn, p, _state);
+      dk = incompletebeta(dk, dn, p);
    }
    result = dk;
    return result;
@@ -2647,26 +2647,26 @@ double binomialcdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state)
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 // API: double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y);
-double invbinomialdistribution(ae_int_t k, ae_int_t n, double y, ae_state *_state) {
+double invbinomialdistribution(ae_int_t k, ae_int_t n, double y) {
    double dk;
    double dn;
    double p;
    double result;
-   ae_assert(k >= 0 && k < n, "Domain error in InvBinomialDistribution", _state);
+   ae_assert(k >= 0 && k < n, "Domain error in InvBinomialDistribution");
    dn = (double)(n - k);
    if (k == 0) {
       if (y > 0.8) {
-         p = -nuexpm1(nulog1p(y - 1.0, _state) / dn, _state);
+         p = -nuexpm1(nulog1p(y - 1.0) / dn);
       } else {
          p = 1.0 - pow(y, 1.0 / dn);
       }
    } else {
       dk = (double)(k + 1);
-      p = incompletebeta(dn, dk, 0.5, _state);
+      p = incompletebeta(dn, dk, 0.5);
       if (p > 0.5) {
-         p = invincompletebeta(dk, dn, 1.0 - y, _state);
+         p = invincompletebeta(dk, dn, 1.0 - y);
       } else {
-         p = 1.0 - invincompletebeta(dn, dk, y, _state);
+         p = 1.0 - invincompletebeta(dn, dk, y);
       }
    }
    result = p;
@@ -2676,26 +2676,26 @@ double invbinomialdistribution(ae_int_t k, ae_int_t n, double y, ae_state *_stat
 
 namespace alglib {
 double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::binomialdistribution(k, n, p, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::binomialdistribution(k, n, p);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::binomialcdistribution(k, n, p, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::binomialcdistribution(k, n, p);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::invbinomialdistribution(k, n, y, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::invbinomialdistribution(k, n, y);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -2726,7 +2726,7 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.8:  May, 1999
 // Copyright 1999 by Stephen L. Moshier
 // API: double exponentialintegralei(const double x);
-double exponentialintegralei(double x, ae_state *_state) {
+double exponentialintegralei(double x) {
    double eul;
    double f;
    double f1;
@@ -2923,7 +2923,7 @@ double exponentialintegralei(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 2000 by Stephen L. Moshier
 // API: double exponentialintegralen(const double x, const ae_int_t n);
-double exponentialintegralen(double x, ae_int_t n, ae_state *_state) {
+double exponentialintegralen(double x, ae_int_t n) {
    double r;
    double t;
    double yk;
@@ -3042,18 +3042,18 @@ double exponentialintegralen(double x, ae_int_t n, ae_state *_state) {
 
 namespace alglib {
 double exponentialintegralei(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::exponentialintegralei(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::exponentialintegralei(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double exponentialintegralen(const double x, const ae_int_t n) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::exponentialintegralen(x, n, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::exponentialintegralen(x, n);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -3099,7 +3099,7 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph);
-void jacobianellipticfunctions(double u, double m, double *sn, double *cn, double *dn, double *ph, ae_state *_state) {
+void jacobianellipticfunctions(double u, double m, double *sn, double *cn, double *dn, double *ph) {
    ae_frame _frame_block;
    double ai;
    double b;
@@ -3107,16 +3107,16 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    double t;
    double twon;
    ae_int_t i;
-   ae_frame_make(_state, &_frame_block);
+   ae_frame_make(&_frame_block);
    *sn = 0;
    *cn = 0;
    *dn = 0;
    *ph = 0;
-   NewVector(a, 0, DT_REAL, _state);
-   NewVector(c, 0, DT_REAL, _state);
-   ae_assert(m >= 0.0 && m <= 1.0, "Domain error in JacobianEllipticFunctions: m<0 or m>1", _state);
-   ae_vector_set_length(&a, 8 + 1, _state);
-   ae_vector_set_length(&c, 8 + 1, _state);
+   NewVector(a, 0, DT_REAL);
+   NewVector(c, 0, DT_REAL);
+   ae_assert(m >= 0.0 && m <= 1.0, "Domain error in JacobianEllipticFunctions: m<0 or m>1");
+   ae_vector_set_length(&a, 8 + 1);
+   ae_vector_set_length(&c, 8 + 1);
    if (m < 1.0e-9) {
       t = sin(u);
       b = cos(u);
@@ -3125,7 +3125,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
       *cn = b + ai * t;
       *ph = u - ai;
       *dn = 1.0 - 0.5 * m * t * t;
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    if (m >= 0.9999999999) {
@@ -3139,7 +3139,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
       ai *= t * phi;
       *cn = phi - ai * (twon - u);
       *dn = phi + ai * (twon + u);
-      ae_frame_leave(_state);
+      ae_frame_leave();
       return;
    }
    a.xR[0] = 1.0;
@@ -3149,7 +3149,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    i = 0;
    while (fabs(c.xR[i] / a.xR[i]) > machineepsilon) {
       if (i > 7) {
-         ae_assert(false, "Overflow in JacobianEllipticFunctions", _state);
+         ae_assert(false, "Overflow in JacobianEllipticFunctions");
          break;
       }
       ai = a.xR[i];
@@ -3172,16 +3172,16 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    *cn = t;
    *dn = t / cos(phi - b);
    *ph = phi;
-   ae_frame_leave(_state);
+   ae_frame_leave();
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
 void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::jacobianellipticfunctions(u, m, &sn, &cn, &dn, &ph, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::jacobianellipticfunctions(u, m, &sn, &cn, &dn, &ph);
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -3225,7 +3225,7 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.1:  January, 1989
 // Copyright 1984, 1987, 1989 by Stephen L. Moshier
 // API: void sinecosineintegrals(const double x, double &si, double &ci);
-void sinecosineintegrals(double x, double *si, double *ci, ae_state *_state) {
+void sinecosineintegrals(double x, double *si, double *ci) {
    double z;
    double c;
    double s;
@@ -3378,7 +3378,7 @@ void sinecosineintegrals(double x, double *si, double *ci, ae_state *_state) {
    *ci = f * s - g * c;
 }
 
-static void trigintegrals_chebiterationshichi(double x, double c, double *b0, double *b1, double *b2, ae_state *_state) {
+static void trigintegrals_chebiterationshichi(double x, double c, double *b0, double *b1, double *b2) {
    *b2 = *b1;
    *b1 = *b0;
    *b0 = x * (*b1) - (*b2) + c;
@@ -3423,7 +3423,7 @@ static void trigintegrals_chebiterationshichi(double x, double c, double *b0, do
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi);
-void hyperbolicsinecosineintegrals(double x, double *shi, double *chi, ae_state *_state) {
+void hyperbolicsinecosineintegrals(double x, double *shi, double *chi) {
    double k;
    double z;
    double c;
@@ -3467,52 +3467,52 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi, ae_state 
          k = exp(x) / x;
          b0 = 1.83889230173399459482E-17;
          b1 = 0.0;
-         trigintegrals_chebiterationshichi(a, -9.55485532279655569575E-17, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 2.04326105980879882648E-16, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 1.09896949074905343022E-15, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -1.31313534344092599234E-14, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 5.93976226264314278932E-14, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -3.47197010497749154755E-14, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -1.40059764613117131000E-12, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 9.49044626224223543299E-12, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -1.61596181145435454033E-11, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -1.77899784436430310321E-10, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 1.35455469767246947469E-9, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -1.03257121792819495123E-9, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -3.56699611114982536845E-8, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 1.44818877384267342057E-7, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 7.82018215184051295296E-7, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -5.39919118403805073710E-6, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -3.12458202168959833422E-5, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 8.90136741950727517826E-5, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 2.02558474743846862168E-3, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 2.96064440855633256972E-2, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 1.11847751047257036625E0, &b0, &b1, &b2, _state);
+         trigintegrals_chebiterationshichi(a, -9.55485532279655569575E-17, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 2.04326105980879882648E-16, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 1.09896949074905343022E-15, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -1.31313534344092599234E-14, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 5.93976226264314278932E-14, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -3.47197010497749154755E-14, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -1.40059764613117131000E-12, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 9.49044626224223543299E-12, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -1.61596181145435454033E-11, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -1.77899784436430310321E-10, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 1.35455469767246947469E-9, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -1.03257121792819495123E-9, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -3.56699611114982536845E-8, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 1.44818877384267342057E-7, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 7.82018215184051295296E-7, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -5.39919118403805073710E-6, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -3.12458202168959833422E-5, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 8.90136741950727517826E-5, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 2.02558474743846862168E-3, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 2.96064440855633256972E-2, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 1.11847751047257036625E0, &b0, &b1, &b2);
          s = k * 0.5 * (b0 - b2);
          b0 = -8.12435385225864036372E-18;
          b1 = 0.0;
-         trigintegrals_chebiterationshichi(a, 2.17586413290339214377E-17, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 5.22624394924072204667E-17, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -9.48812110591690559363E-16, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 5.35546311647465209166E-15, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -1.21009970113732918701E-14, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -6.00865178553447437951E-14, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 7.16339649156028587775E-13, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -2.93496072607599856104E-12, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -1.40359438136491256904E-12, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 8.76302288609054966081E-11, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -4.40092476213282340617E-10, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -1.87992075640569295479E-10, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 1.31458150989474594064E-8, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -4.75513930924765465590E-8, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -2.21775018801848880741E-7, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 1.94635531373272490962E-6, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 4.33505889257316408893E-6, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -6.13387001076494349496E-5, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, -3.13085477492997465138E-4, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 4.97164789823116062801E-4, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 2.64347496031374526641E-2, &b0, &b1, &b2, _state);
-         trigintegrals_chebiterationshichi(a, 1.11446150876699213025E0, &b0, &b1, &b2, _state);
+         trigintegrals_chebiterationshichi(a, 2.17586413290339214377E-17, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 5.22624394924072204667E-17, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -9.48812110591690559363E-16, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 5.35546311647465209166E-15, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -1.21009970113732918701E-14, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -6.00865178553447437951E-14, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 7.16339649156028587775E-13, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -2.93496072607599856104E-12, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -1.40359438136491256904E-12, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 8.76302288609054966081E-11, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -4.40092476213282340617E-10, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -1.87992075640569295479E-10, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 1.31458150989474594064E-8, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -4.75513930924765465590E-8, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -2.21775018801848880741E-7, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 1.94635531373272490962E-6, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 4.33505889257316408893E-6, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -6.13387001076494349496E-5, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, -3.13085477492997465138E-4, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 4.97164789823116062801E-4, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 2.64347496031374526641E-2, &b0, &b1, &b2);
+         trigintegrals_chebiterationshichi(a, 1.11446150876699213025E0, &b0, &b1, &b2);
          c = k * 0.5 * (b0 - b2);
       } else {
          if (x <= 88.0) {
@@ -3520,54 +3520,54 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi, ae_state 
             k = exp(x) / x;
             b0 = -1.05311574154850938805E-17;
             b1 = 0.0;
-            trigintegrals_chebiterationshichi(a, 2.62446095596355225821E-17, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 8.82090135625368160657E-17, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -3.38459811878103047136E-16, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -8.30608026366935789136E-16, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 3.93397875437050071776E-15, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.01765565969729044505E-14, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -4.21128170307640802703E-14, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -1.60818204519802480035E-13, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 3.34714954175994481761E-13, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 2.72600352129153073807E-12, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.66894954752839083608E-12, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -3.49278141024730899554E-11, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -1.58580661666482709598E-10, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -1.79289437183355633342E-10, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.76281629144264523277E-9, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.69050228879421288846E-8, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.25391771228487041649E-7, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.16229947068677338732E-6, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.61038260117376323993E-5, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 3.49810375601053973070E-4, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.28478065259647610779E-2, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.03665722588798326712E0, &b0, &b1, &b2, _state);
+            trigintegrals_chebiterationshichi(a, 2.62446095596355225821E-17, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 8.82090135625368160657E-17, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -3.38459811878103047136E-16, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -8.30608026366935789136E-16, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 3.93397875437050071776E-15, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.01765565969729044505E-14, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -4.21128170307640802703E-14, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -1.60818204519802480035E-13, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 3.34714954175994481761E-13, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 2.72600352129153073807E-12, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.66894954752839083608E-12, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -3.49278141024730899554E-11, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -1.58580661666482709598E-10, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -1.79289437183355633342E-10, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.76281629144264523277E-9, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.69050228879421288846E-8, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.25391771228487041649E-7, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.16229947068677338732E-6, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.61038260117376323993E-5, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 3.49810375601053973070E-4, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.28478065259647610779E-2, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.03665722588798326712E0, &b0, &b1, &b2);
             s = k * 0.5 * (b0 - b2);
             b0 = 8.06913408255155572081E-18;
             b1 = 0.0;
-            trigintegrals_chebiterationshichi(a, -2.08074168180148170312E-17, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -5.98111329658272336816E-17, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 2.68533951085945765591E-16, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 4.52313941698904694774E-16, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -3.10734917335299464535E-15, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -4.42823207332531972288E-15, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 3.49639695410806959872E-14, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 6.63406731718911586609E-14, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -3.71902448093119218395E-13, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -1.27135418132338309016E-12, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 2.74851141935315395333E-12, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 2.33781843985453438400E-11, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 2.71436006377612442764E-11, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -2.56600180000355990529E-10, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -1.61021375163803438552E-9, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -4.72543064876271773512E-9, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, -3.00095178028681682282E-9, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 7.79387474390914922337E-8, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.06942765566401507066E-6, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.59503164802313196374E-5, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 3.49592575153777996871E-4, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.28475387530065247392E-2, &b0, &b1, &b2, _state);
-            trigintegrals_chebiterationshichi(a, 1.03665693917934275131E0, &b0, &b1, &b2, _state);
+            trigintegrals_chebiterationshichi(a, -2.08074168180148170312E-17, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -5.98111329658272336816E-17, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 2.68533951085945765591E-16, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 4.52313941698904694774E-16, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -3.10734917335299464535E-15, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -4.42823207332531972288E-15, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 3.49639695410806959872E-14, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 6.63406731718911586609E-14, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -3.71902448093119218395E-13, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -1.27135418132338309016E-12, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 2.74851141935315395333E-12, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 2.33781843985453438400E-11, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 2.71436006377612442764E-11, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -2.56600180000355990529E-10, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -1.61021375163803438552E-9, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -4.72543064876271773512E-9, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, -3.00095178028681682282E-9, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 7.79387474390914922337E-8, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.06942765566401507066E-6, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.59503164802313196374E-5, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 3.49592575153777996871E-4, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.28475387530065247392E-2, &b0, &b1, &b2);
+            trigintegrals_chebiterationshichi(a, 1.03665693917934275131E0, &b0, &b1, &b2);
             c = k * 0.5 * (b0 - b2);
          } else {
             if (sg != 0) {
@@ -3590,17 +3590,17 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi, ae_state 
 
 namespace alglib {
 void sinecosineintegrals(const double x, double &si, double &ci) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::sinecosineintegrals(x, &si, &ci, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::sinecosineintegrals(x, &si, &ci);
+   alglib_impl::ae_state_clear();
 }
 
 void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::hyperbolicsinecosineintegrals(x, &shi, &chi, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::hyperbolicsinecosineintegrals(x, &shi, &chi);
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -3617,7 +3617,7 @@ namespace alglib_impl {
 // Result:
 //     the value of the Chebyshev polynomial at x
 // API: double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x);
-double chebyshevcalculate(ae_int_t r, ae_int_t n, double x, ae_state *_state) {
+double chebyshevcalculate(ae_int_t r, ae_int_t n, double x) {
    ae_int_t i;
    double a;
    double b;
@@ -3665,7 +3665,7 @@ double chebyshevcalculate(ae_int_t r, ae_int_t n, double x, ae_state *_state) {
 // Result:
 //     the value of the Chebyshev polynomial at x
 // API: double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x);
-double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x, ae_state *_state) {
+double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x) {
    double b1;
    double b2;
    ae_int_t i;
@@ -3693,10 +3693,10 @@ double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x, ae_state *_sta
 // Outputs:
 //     C   -   coefficients
 // API: void chebyshevcoefficients(const ae_int_t n, real_1d_array &c);
-void chebyshevcoefficients(ae_int_t n, RVector *c, ae_state *_state) {
+void chebyshevcoefficients(ae_int_t n, RVector *c) {
    ae_int_t i;
    SetVector(c);
-   ae_vector_set_length(c, n + 1, _state);
+   ae_vector_set_length(c, n + 1);
    for (i = 0; i <= n; i++) {
       c->xR[i] = 0.0;
    }
@@ -3722,13 +3722,13 @@ void chebyshevcoefficients(ae_int_t n, RVector *c, ae_state *_state) {
 // Outputs:
 //     B   -   power series coefficients
 // API: void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b);
-void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state) {
+void fromchebyshev(RVector *a, ae_int_t n, RVector *b) {
    ae_int_t i;
    ae_int_t k;
    double e;
    double d;
    SetVector(b);
-   ae_vector_set_length(b, n + 1, _state);
+   ae_vector_set_length(b, n + 1);
    for (i = 0; i <= n; i++) {
       b->xR[i] = 0.0;
    }
@@ -3767,33 +3767,33 @@ void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state) {
 
 namespace alglib {
 double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::chebyshevcalculate(r, n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::chebyshevcalculate(r, n, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::chebyshevsum(ConstT(ae_vector, c), r, n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::chebyshevsum(ConstT(ae_vector, c), r, n, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 void chebyshevcoefficients(const ae_int_t n, real_1d_array &c) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::chebyshevcoefficients(n, ConstT(ae_vector, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::chebyshevcoefficients(n, ConstT(ae_vector, c));
+   alglib_impl::ae_state_clear();
 }
 
 void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::fromchebyshev(ConstT(ae_vector, a), n, ConstT(ae_vector, b), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::fromchebyshev(ConstT(ae_vector, a), n, ConstT(ae_vector, b));
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -3824,10 +3824,10 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 // API: double poissondistribution(const ae_int_t k, const double m);
-double poissondistribution(ae_int_t k, double m, ae_state *_state) {
+double poissondistribution(ae_int_t k, double m) {
    double result;
-   ae_assert(k >= 0 && m > 0.0, "Domain error in PoissonDistribution", _state);
-   result = incompletegammac((double)(k + 1), m, _state);
+   ae_assert(k >= 0 && m > 0.0, "Domain error in PoissonDistribution");
+   result = incompletegammac((double)(k + 1), m);
    return result;
 }
 
@@ -3856,10 +3856,10 @@ double poissondistribution(ae_int_t k, double m, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 // API: double poissoncdistribution(const ae_int_t k, const double m);
-double poissoncdistribution(ae_int_t k, double m, ae_state *_state) {
+double poissoncdistribution(ae_int_t k, double m) {
    double result;
-   ae_assert(k >= 0 && m > 0.0, "Domain error in PoissonDistributionC", _state);
-   result = incompletegamma((double)(k + 1), m, _state);
+   ae_assert(k >= 0 && m > 0.0, "Domain error in PoissonDistributionC");
+   result = incompletegamma((double)(k + 1), m);
    return result;
 }
 
@@ -3881,36 +3881,36 @@ double poissoncdistribution(ae_int_t k, double m, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 // API: double invpoissondistribution(const ae_int_t k, const double y);
-double invpoissondistribution(ae_int_t k, double y, ae_state *_state) {
+double invpoissondistribution(ae_int_t k, double y) {
    double result;
-   ae_assert((k >= 0 && y >= 0.0) && y < 1.0, "Domain error in InvPoissonDistribution", _state);
-   result = invincompletegammac((double)(k + 1), y, _state);
+   ae_assert((k >= 0 && y >= 0.0) && y < 1.0, "Domain error in InvPoissonDistribution");
+   result = invincompletegammac((double)(k + 1), y);
    return result;
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
 double poissondistribution(const ae_int_t k, const double m) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::poissondistribution(k, m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::poissondistribution(k, m);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double poissoncdistribution(const ae_int_t k, const double m) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::poissoncdistribution(k, m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::poissoncdistribution(k, m);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double invpoissondistribution(const ae_int_t k, const double y) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::invpoissondistribution(k, y, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::invpoissondistribution(k, y);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -3939,34 +3939,34 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.0:  April, 1987
 // Copyright 1984, 1987 by Stephen L. Moshier
 // API: double beta(const double a, const double b);
-double beta(double a, double b, ae_state *_state) {
+double beta(double a, double b) {
    double y;
    double sg;
    double s;
    double result;
    sg = 1.0;
-   ae_assert(a > 0.0 || a != floor(a), "Overflow in Beta", _state);
-   ae_assert(b > 0.0 || b != floor(b), "Overflow in Beta", _state);
+   ae_assert(a > 0.0 || a != floor(a), "Overflow in Beta");
+   ae_assert(b > 0.0 || b != floor(b), "Overflow in Beta");
    y = a + b;
    if (fabs(y) > 171.624376956302725) {
-      y = lngamma(y, &s, _state);
+      y = lngamma(y, &s);
       sg *= s;
-      y = lngamma(b, &s, _state) - y;
+      y = lngamma(b, &s) - y;
       sg *= s;
-      y += lngamma(a, &s, _state);
+      y += lngamma(a, &s);
       sg *= s;
-      ae_assert(y <= log(maxrealnumber), "Overflow in Beta", _state);
+      ae_assert(y <= log(maxrealnumber), "Overflow in Beta");
       result = sg * exp(y);
       return result;
    }
-   y = gammafunction(y, _state);
-   ae_assert(y != 0.0, "Overflow in Beta", _state);
+   y = gammafunction(y);
+   ae_assert(y != 0.0, "Overflow in Beta");
    if (a > b) {
-      y = gammafunction(a, _state) / y;
-      y *= gammafunction(b, _state);
+      y = gammafunction(a) / y;
+      y *= gammafunction(b);
    } else {
-      y = gammafunction(b, _state) / y;
-      y *= gammafunction(a, _state);
+      y = gammafunction(b) / y;
+      y *= gammafunction(a);
    }
    result = y;
    return result;
@@ -3975,10 +3975,10 @@ double beta(double a, double b, ae_state *_state) {
 
 namespace alglib {
 double beta(const double a, const double b) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::beta(a, b, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::beta(a, b);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -4026,7 +4026,7 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 // API: void fresnelintegral(const double x, double &c, double &s);
-void fresnelintegral(double x, double *c, double *s, ae_state *_state) {
+void fresnelintegral(double x, double *c, double *s) {
    double xxa;
    double f;
    double g;
@@ -4078,13 +4078,13 @@ void fresnelintegral(double x, double *c, double *s, ae_state *_state) {
       cd = cd * t + 8.68029542941784300606E-4;
       cd = cd * t + 4.12142090722199792936E-2;
       cd = cd * t + 1.00000000000000000118E0;
-      *s = sign(xxa, _state) * x * x2 * sn / sd;
-      *c = sign(xxa, _state) * x * cn / cd;
+      *s = sign(xxa) * x * x2 * sn / sd;
+      *c = sign(xxa) * x * cn / cd;
       return;
    }
    if (x > 36974.0) {
-      *c = sign(xxa, _state) * 0.5;
-      *s = sign(xxa, _state) * 0.5;
+      *c = sign(xxa) * 0.5;
+      *s = sign(xxa) * 0.5;
       return;
    }
    x2 = x * x;
@@ -4143,17 +4143,17 @@ void fresnelintegral(double x, double *c, double *s, ae_state *_state) {
    t = mpi * x;
    *c = 0.5 + (f * ss - g * cc) / t;
    *s = 0.5 - (f * cc + g * ss) / t;
-   *c *= sign(xxa, _state);
-   *s *= sign(xxa, _state);
+   *c *= sign(xxa);
+   *s *= sign(xxa);
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
 void fresnelintegral(const double x, double &c, double &s) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::fresnelintegral(x, &c, &s, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::fresnelintegral(x, &c, &s);
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -4197,7 +4197,7 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1992, 2000 by Stephen L. Moshier
 // API: double psi(const double x);
-double psi(double x, ae_state *_state) {
+double psi(double x) {
    double p;
    double q;
    double nz;
@@ -4217,7 +4217,7 @@ double psi(double x, ae_state *_state) {
       q = x;
       p = floor(q);
       if (p == q) {
-         ae_assert(false, "Singularity in Psi(x)", _state);
+         ae_assert(false, "Singularity in Psi(x)");
          result = maxrealnumber;
          return result;
       }
@@ -4235,7 +4235,7 @@ double psi(double x, ae_state *_state) {
    }
    if (x <= 10.0 && x == floor(x)) {
       y = 0.0;
-      n = ifloor(x, _state);
+      n = ifloor(x);
       for (i = 1; i < n; i++) {
          w = (double)i;
          y += 1.0 / w;
@@ -4273,10 +4273,10 @@ double psi(double x, ae_state *_state) {
 
 namespace alglib {
 double psi(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::psi(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::psi(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -4314,7 +4314,7 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 // API: void airy(const double x, double &ai, double &aip, double &bi, double &bip);
-void airy(double x, double *ai, double *aip, double *bi, double *bip, ae_state *_state) {
+void airy(double x, double *ai, double *aip, double *bi, double *bip) {
    double z;
    double zz;
    double t;
@@ -4605,10 +4605,10 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip, ae_state *
 
 namespace alglib {
 void airy(const double x, double &ai, double &aip, double &bi, double &bip) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::airy(x, &ai, &aip, &bi, &bip, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::airy(x, &ai, &aip, &bi, &bip);
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -4638,7 +4638,7 @@ namespace alglib_impl {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 // API: double dawsonintegral(const double x);
-double dawsonintegral(double x, ae_state *_state) {
+double dawsonintegral(double x) {
    double x2;
    double y;
    ae_int_t sg;
@@ -4732,10 +4732,10 @@ double dawsonintegral(double x, ae_state *_state) {
 
 namespace alglib {
 double dawsonintegral(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::dawsonintegral(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::dawsonintegral(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -4751,7 +4751,7 @@ namespace alglib_impl {
 // Result:
 //     the value of the Hermite polynomial Hn at x
 // API: double hermitecalculate(const ae_int_t n, const double x);
-double hermitecalculate(ae_int_t n, double x, ae_state *_state) {
+double hermitecalculate(ae_int_t n, double x) {
    ae_int_t i;
    double a;
    double b;
@@ -4790,7 +4790,7 @@ double hermitecalculate(ae_int_t n, double x, ae_state *_state) {
 // Result:
 //     the value of the Hermite polynomial at x
 // API: double hermitesum(const real_1d_array &c, const ae_int_t n, const double x);
-double hermitesum(RVector *c, ae_int_t n, double x, ae_state *_state) {
+double hermitesum(RVector *c, ae_int_t n, double x) {
    double b1;
    double b2;
    ae_int_t i;
@@ -4814,10 +4814,10 @@ double hermitesum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 // Outputs:
 //     C   -   coefficients
 // API: void hermitecoefficients(const ae_int_t n, real_1d_array &c);
-void hermitecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
+void hermitecoefficients(ae_int_t n, RVector *c) {
    ae_int_t i;
    SetVector(c);
-   ae_vector_set_length(c, n + 1, _state);
+   ae_vector_set_length(c, n + 1);
    for (i = 0; i <= n; i++) {
       c->xR[i] = 0.0;
    }
@@ -4830,26 +4830,26 @@ void hermitecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
 
 namespace alglib {
 double hermitecalculate(const ae_int_t n, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::hermitecalculate(n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::hermitecalculate(n, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double hermitesum(const real_1d_array &c, const ae_int_t n, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::hermitesum(ConstT(ae_vector, c), n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::hermitesum(ConstT(ae_vector, c), n, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 void hermitecoefficients(const ae_int_t n, real_1d_array &c) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::hermitecoefficients(n, ConstT(ae_vector, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::hermitecoefficients(n, ConstT(ae_vector, c));
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -4864,7 +4864,7 @@ namespace alglib_impl {
 // Result:
 //     the value of the Legendre polynomial Pn at x
 // API: double legendrecalculate(const ae_int_t n, const double x);
-double legendrecalculate(ae_int_t n, double x, ae_state *_state) {
+double legendrecalculate(ae_int_t n, double x) {
    double a;
    double b;
    ae_int_t i;
@@ -4900,7 +4900,7 @@ double legendrecalculate(ae_int_t n, double x, ae_state *_state) {
 // Result:
 //     the value of the Legendre polynomial at x
 // API: double legendresum(const real_1d_array &c, const ae_int_t n, const double x);
-double legendresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
+double legendresum(RVector *c, ae_int_t n, double x) {
    double b1;
    double b2;
    ae_int_t i;
@@ -4924,10 +4924,10 @@ double legendresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 // Outputs:
 //     C   -   coefficients
 // API: void legendrecoefficients(const ae_int_t n, real_1d_array &c);
-void legendrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
+void legendrecoefficients(ae_int_t n, RVector *c) {
    ae_int_t i;
    SetVector(c);
-   ae_vector_set_length(c, n + 1, _state);
+   ae_vector_set_length(c, n + 1);
    for (i = 0; i <= n; i++) {
       c->xR[i] = 0.0;
    }
@@ -4943,26 +4943,26 @@ void legendrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
 
 namespace alglib {
 double legendrecalculate(const ae_int_t n, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::legendrecalculate(n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::legendrecalculate(n, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double legendresum(const real_1d_array &c, const ae_int_t n, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::legendresum(ConstT(ae_vector, c), n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::legendresum(ConstT(ae_vector, c), n, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 void legendrecoefficients(const ae_int_t n, real_1d_array &c) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::legendrecoefficients(n, ConstT(ae_vector, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::legendrecoefficients(n, ConstT(ae_vector, c));
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -4972,7 +4972,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-static void bessel_besselmfirstcheb(double c, double *b0, double *b1, double *b2, ae_state *_state) {
+static void bessel_besselmfirstcheb(double c, double *b0, double *b1, double *b2) {
    *b0 = c;
    *b1 = 0.0;
    *b2 = 0.0;
@@ -4982,7 +4982,7 @@ static void bessel_besselmfirstcheb(double c, double *b0, double *b1, double *b2
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-static void bessel_besselmnextcheb(double x, double c, double *b0, double *b1, double *b2, ae_state *_state) {
+static void bessel_besselmnextcheb(double x, double c, double *b0, double *b1, double *b2) {
    *b2 = *b1;
    *b1 = *b0;
    *b0 = x * (*b1) - (*b2) + c;
@@ -4992,7 +4992,7 @@ static void bessel_besselmnextcheb(double x, double c, double *b0, double *b1, d
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-static void bessel_besselm1firstcheb(double c, double *b0, double *b1, double *b2, ae_state *_state) {
+static void bessel_besselm1firstcheb(double c, double *b0, double *b1, double *b2) {
    *b0 = c;
    *b1 = 0.0;
    *b2 = 0.0;
@@ -5002,13 +5002,13 @@ static void bessel_besselm1firstcheb(double c, double *b0, double *b1, double *b
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
-static void bessel_besselm1nextcheb(double x, double c, double *b0, double *b1, double *b2, ae_state *_state) {
+static void bessel_besselm1nextcheb(double x, double c, double *b0, double *b1, double *b2) {
    *b2 = *b1;
    *b1 = *b0;
    *b0 = x * (*b1) - (*b2) + c;
 }
 
-static void bessel_besselasympt0(double x, double *pzero, double *qzero, ae_state *_state) {
+static void bessel_besselasympt0(double x, double *pzero, double *qzero) {
    double xsq;
    double p2;
    double q2;
@@ -5049,7 +5049,7 @@ static void bessel_besselasympt0(double x, double *pzero, double *qzero, ae_stat
    *qzero = 8 * p3 / q3 / x;
 }
 
-static void bessel_besselasympt1(double x, double *pzero, double *qzero, ae_state *_state) {
+static void bessel_besselasympt1(double x, double *pzero, double *qzero) {
    double xsq;
    double p2;
    double q2;
@@ -5117,7 +5117,7 @@ static void bessel_besselasympt1(double x, double *pzero, double *qzero, ae_stat
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 // API: double besselj0(const double x);
-double besselj0(double x, ae_state *_state) {
+double besselj0(double x) {
    double xsq;
    double nn;
    double pzero;
@@ -5129,12 +5129,12 @@ double besselj0(double x, ae_state *_state) {
       x = -x;
    }
    if (x > 8.0) {
-      bessel_besselasympt0(x, &pzero, &qzero, _state);
+      bessel_besselasympt0(x, &pzero, &qzero);
       nn = x - pi / 4;
       result = sqrt(2 / pi / x) * (pzero * cos(nn) - qzero * sin(nn));
       return result;
    }
-   xsq = sqr(x, _state);
+   xsq = sqr(x);
    p1 = 26857.86856980014981415848441;
    p1 = -40504123.71833132706360663322 + xsq * p1;
    p1 = 25071582855.36881945555156435 + xsq * p1;
@@ -5176,7 +5176,7 @@ double besselj0(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 // API: double besselj1(const double x);
-double besselj1(double x, ae_state *_state) {
+double besselj1(double x) {
    double s;
    double xsq;
    double nn;
@@ -5185,12 +5185,12 @@ double besselj1(double x, ae_state *_state) {
    double p1;
    double q1;
    double result;
-   s = (double)sign(x, _state);
+   s = (double)sign(x);
    if (x < 0.0) {
       x = -x;
    }
    if (x > 8.0) {
-      bessel_besselasympt1(x, &pzero, &qzero, _state);
+      bessel_besselasympt1(x, &pzero, &qzero);
       nn = x - 3 * pi / 4;
       result = sqrt(2 / pi / x) * (pzero * cos(nn) - qzero * sin(nn));
       if (s < 0.0) {
@@ -5198,7 +5198,7 @@ double besselj1(double x, ae_state *_state) {
       }
       return result;
    }
-   xsq = sqr(x, _state);
+   xsq = sqr(x);
    p1 = 2701.122710892323414856790990;
    p1 = -4695753.530642995859767162166 + xsq * p1;
    p1 = 3413234182.301700539091292655 + xsq * p1;
@@ -5247,7 +5247,7 @@ double besselj1(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: double besseljn(const ae_int_t n, const double x);
-double besseljn(ae_int_t n, double x, ae_state *_state) {
+double besseljn(ae_int_t n, double x) {
    double pkm2;
    double pkm1;
    double pk;
@@ -5274,18 +5274,18 @@ double besseljn(ae_int_t n, double x, ae_state *_state) {
       x = -x;
    }
    if (n == 0) {
-      result = sg * besselj0(x, _state);
+      result = sg * besselj0(x);
       return result;
    }
    if (n == 1) {
-      result = sg * besselj1(x, _state);
+      result = sg * besselj1(x);
       return result;
    }
    if (n == 2) {
       if (x == 0.0) {
          result = 0.0;
       } else {
-         result = sg * (2.0 * besselj1(x, _state) / x - besselj0(x, _state));
+         result = sg * (2.0 * besselj1(x) / x - besselj0(x));
       }
       return result;
    }
@@ -5315,9 +5315,9 @@ double besseljn(ae_int_t n, double x, ae_state *_state) {
       k--;
    } while (k != 0);
    if (fabs(pk) > fabs(pkm1)) {
-      ans = besselj1(x, _state) / pk;
+      ans = besselj1(x) / pk;
    } else {
-      ans = besselj0(x, _state) / pkm1;
+      ans = besselj0(x) / pkm1;
    }
    result = sg * ans;
    return result;
@@ -5350,7 +5350,7 @@ double besseljn(ae_int_t n, double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 // API: double bessely0(const double x);
-double bessely0(double x, ae_state *_state) {
+double bessely0(double x) {
    double nn;
    double xsq;
    double pzero;
@@ -5359,12 +5359,12 @@ double bessely0(double x, ae_state *_state) {
    double q4;
    double result;
    if (x > 8.0) {
-      bessel_besselasympt0(x, &pzero, &qzero, _state);
+      bessel_besselasympt0(x, &pzero, &qzero);
       nn = x - pi / 4;
       result = sqrt(2 / pi / x) * (pzero * sin(nn) + qzero * cos(nn));
       return result;
    }
-   xsq = sqr(x, _state);
+   xsq = sqr(x);
    p4 = -41370.35497933148554125235152;
    p4 = 59152134.65686889654273830069 + xsq * p4;
    p4 = -34363712229.79040378171030138 + xsq * p4;
@@ -5383,7 +5383,7 @@ double bessely0(double x, ae_state *_state) {
    q4 = 23928830434997818.57439356652 + xsq * q4;
    q4 = 4192417043410839973.904769661 + xsq * q4;
    q4 = 372645883898616588198.9980 + xsq * q4;
-   result = p4 / q4 + 2 / pi * besselj0(x, _state) * log(x);
+   result = p4 / q4 + 2 / pi * besselj0(x) * log(x);
    return result;
 }
 
@@ -5407,7 +5407,7 @@ double bessely0(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 // API: double bessely1(const double x);
-double bessely1(double x, ae_state *_state) {
+double bessely1(double x) {
    double nn;
    double xsq;
    double pzero;
@@ -5416,12 +5416,12 @@ double bessely1(double x, ae_state *_state) {
    double q4;
    double result;
    if (x > 8.0) {
-      bessel_besselasympt1(x, &pzero, &qzero, _state);
+      bessel_besselasympt1(x, &pzero, &qzero);
       nn = x - 3 * pi / 4;
       result = sqrt(2 / pi / x) * (pzero * sin(nn) + qzero * cos(nn));
       return result;
    }
-   xsq = sqr(x, _state);
+   xsq = sqr(x);
    p4 = -2108847.540133123652824139923;
    p4 = 3639488548.124002058278999428 + xsq * p4;
    p4 = -2580681702194.450950541426399 + xsq * p4;
@@ -5441,7 +5441,7 @@ double bessely1(double x, ae_state *_state) {
    q4 = 29549879358971486742.90758119 + xsq * q4;
    q4 = 5435310377188854170800.653097 + xsq * q4;
    q4 = 508206736694124324531442.4152 + xsq * q4;
-   result = x * p4 / q4 + 2 / pi * (besselj1(x, _state) * log(x) - 1 / x);
+   result = x * p4 / q4 + 2 / pi * (besselj1(x) * log(x) - 1 / x);
    return result;
 }
 
@@ -5466,7 +5466,7 @@ double bessely1(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: double besselyn(const ae_int_t n, const double x);
-double besselyn(ae_int_t n, double x, ae_state *_state) {
+double besselyn(ae_int_t n, double x) {
    ae_int_t i;
    double a;
    double b;
@@ -5481,15 +5481,15 @@ double besselyn(ae_int_t n, double x, ae_state *_state) {
       }
    }
    if (n == 0) {
-      result = bessely0(x, _state);
+      result = bessely0(x);
       return result;
    }
    if (n == 1) {
-      result = s * bessely1(x, _state);
+      result = s * bessely1(x);
       return result;
    }
-   a = bessely0(x, _state);
-   b = bessely1(x, _state);
+   a = bessely0(x);
+   b = bessely1(x);
    for (i = 1; i < n; i++) {
       tmp = b;
       b = 2 * i / x * b - a;
@@ -5519,7 +5519,7 @@ double besselyn(ae_int_t n, double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: double besseli0(const double x);
-double besseli0(double x, ae_state *_state) {
+double besseli0(double x) {
    double y;
    double v;
    double z;
@@ -5532,66 +5532,66 @@ double besseli0(double x, ae_state *_state) {
    }
    if (x <= 8.0) {
       y = x / 2.0 - 2.0;
-      bessel_besselmfirstcheb(-4.41534164647933937950E-18, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 3.33079451882223809783E-17, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -2.43127984654795469359E-16, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 1.71539128555513303061E-15, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -1.16853328779934516808E-14, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 7.67618549860493561688E-14, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -4.85644678311192946090E-13, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 2.95505266312963983461E-12, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -1.72682629144155570723E-11, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 9.67580903537323691224E-11, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -5.18979560163526290666E-10, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 2.65982372468238665035E-9, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -1.30002500998624804212E-8, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 6.04699502254191894932E-8, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -2.67079385394061173391E-7, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 1.11738753912010371815E-6, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -4.41673835845875056359E-6, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 1.64484480707288970893E-5, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -5.75419501008210370398E-5, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 1.88502885095841655729E-4, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -5.76375574538582365885E-4, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 1.63947561694133579842E-3, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -4.32430999505057594430E-3, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 1.05464603945949983183E-2, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -2.37374148058994688156E-2, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 4.93052842396707084878E-2, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -9.49010970480476444210E-2, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 1.71620901522208775349E-1, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -3.04682672343198398683E-1, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 6.76795274409476084995E-1, &b0, &b1, &b2, _state);
+      bessel_besselmfirstcheb(-4.41534164647933937950E-18, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 3.33079451882223809783E-17, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -2.43127984654795469359E-16, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 1.71539128555513303061E-15, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -1.16853328779934516808E-14, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 7.67618549860493561688E-14, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -4.85644678311192946090E-13, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 2.95505266312963983461E-12, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -1.72682629144155570723E-11, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 9.67580903537323691224E-11, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -5.18979560163526290666E-10, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 2.65982372468238665035E-9, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -1.30002500998624804212E-8, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 6.04699502254191894932E-8, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -2.67079385394061173391E-7, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 1.11738753912010371815E-6, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -4.41673835845875056359E-6, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 1.64484480707288970893E-5, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -5.75419501008210370398E-5, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 1.88502885095841655729E-4, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -5.76375574538582365885E-4, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 1.63947561694133579842E-3, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -4.32430999505057594430E-3, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 1.05464603945949983183E-2, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -2.37374148058994688156E-2, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 4.93052842396707084878E-2, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -9.49010970480476444210E-2, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 1.71620901522208775349E-1, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -3.04682672343198398683E-1, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 6.76795274409476084995E-1, &b0, &b1, &b2);
       v = 0.5 * (b0 - b2);
       result = exp(x) * v;
       return result;
    }
    z = 32.0 / x - 2.0;
-   bessel_besselmfirstcheb(-7.23318048787475395456E-18, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, -4.83050448594418207126E-18, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 4.46562142029675999901E-17, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 3.46122286769746109310E-17, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, -2.82762398051658348494E-16, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, -3.42548561967721913462E-16, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 1.77256013305652638360E-15, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 3.81168066935262242075E-15, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, -9.55484669882830764870E-15, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, -4.15056934728722208663E-14, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 1.54008621752140982691E-14, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 3.85277838274214270114E-13, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 7.18012445138366623367E-13, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, -1.79417853150680611778E-12, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, -1.32158118404477131188E-11, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, -3.14991652796324136454E-11, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 1.18891471078464383424E-11, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 4.94060238822496958910E-10, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 3.39623202570838634515E-9, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 2.26666899049817806459E-8, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 2.04891858946906374183E-7, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 2.89137052083475648297E-6, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 6.88975834691682398426E-5, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 3.36911647825569408990E-3, &b0, &b1, &b2, _state);
-   bessel_besselmnextcheb(z, 8.04490411014108831608E-1, &b0, &b1, &b2, _state);
+   bessel_besselmfirstcheb(-7.23318048787475395456E-18, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, -4.83050448594418207126E-18, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 4.46562142029675999901E-17, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 3.46122286769746109310E-17, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, -2.82762398051658348494E-16, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, -3.42548561967721913462E-16, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 1.77256013305652638360E-15, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 3.81168066935262242075E-15, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, -9.55484669882830764870E-15, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, -4.15056934728722208663E-14, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 1.54008621752140982691E-14, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 3.85277838274214270114E-13, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 7.18012445138366623367E-13, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, -1.79417853150680611778E-12, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, -1.32158118404477131188E-11, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, -3.14991652796324136454E-11, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 1.18891471078464383424E-11, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 4.94060238822496958910E-10, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 3.39623202570838634515E-9, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 2.26666899049817806459E-8, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 2.04891858946906374183E-7, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 2.89137052083475648297E-6, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 6.88975834691682398426E-5, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 3.36911647825569408990E-3, &b0, &b1, &b2);
+   bessel_besselmnextcheb(z, 8.04490411014108831608E-1, &b0, &b1, &b2);
    v = 0.5 * (b0 - b2);
    result = exp(x) * v / sqrt(x);
    return result;
@@ -5617,7 +5617,7 @@ double besseli0(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 1987, 2000 by Stephen L. Moshier
 // API: double besseli1(const double x);
-double besseli1(double x, ae_state *_state) {
+double besseli1(double x) {
    double y;
    double z;
    double v;
@@ -5628,64 +5628,64 @@ double besseli1(double x, ae_state *_state) {
    z = fabs(x);
    if (z <= 8.0) {
       y = z / 2.0 - 2.0;
-      bessel_besselm1firstcheb(2.77791411276104639959E-18, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -2.11142121435816608115E-17, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 1.55363195773620046921E-16, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.10559694773538630805E-15, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 7.60068429473540693410E-15, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -5.04218550472791168711E-14, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 3.22379336594557470981E-13, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.98397439776494371520E-12, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 1.17361862988909016308E-11, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -6.66348972350202774223E-11, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 3.62559028155211703701E-10, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.88724975172282928790E-9, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 9.38153738649577178388E-9, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -4.44505912879632808065E-8, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 2.00329475355213526229E-7, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -8.56872026469545474066E-7, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 3.47025130813767847674E-6, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.32731636560394358279E-5, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 4.78156510755005422638E-5, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.61760815825896745588E-4, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 5.12285956168575772895E-4, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.51357245063125314899E-3, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 4.15642294431288815669E-3, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.05640848946261981558E-2, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 2.47264490306265168283E-2, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -5.29459812080949914269E-2, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 1.02643658689847095384E-1, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.76416518357834055153E-1, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 2.52587186443633654823E-1, &b0, &b1, &b2, _state);
+      bessel_besselm1firstcheb(2.77791411276104639959E-18, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -2.11142121435816608115E-17, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 1.55363195773620046921E-16, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.10559694773538630805E-15, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 7.60068429473540693410E-15, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -5.04218550472791168711E-14, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 3.22379336594557470981E-13, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.98397439776494371520E-12, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 1.17361862988909016308E-11, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -6.66348972350202774223E-11, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 3.62559028155211703701E-10, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.88724975172282928790E-9, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 9.38153738649577178388E-9, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -4.44505912879632808065E-8, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 2.00329475355213526229E-7, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -8.56872026469545474066E-7, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 3.47025130813767847674E-6, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.32731636560394358279E-5, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 4.78156510755005422638E-5, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.61760815825896745588E-4, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 5.12285956168575772895E-4, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.51357245063125314899E-3, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 4.15642294431288815669E-3, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.05640848946261981558E-2, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 2.47264490306265168283E-2, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -5.29459812080949914269E-2, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 1.02643658689847095384E-1, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.76416518357834055153E-1, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 2.52587186443633654823E-1, &b0, &b1, &b2);
       v = 0.5 * (b0 - b2);
       z *= v * exp(z);
    } else {
       y = 32.0 / z - 2.0;
-      bessel_besselm1firstcheb(7.51729631084210481353E-18, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 4.41434832307170791151E-18, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -4.65030536848935832153E-17, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -3.20952592199342395980E-17, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 2.96262899764595013876E-16, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 3.30820231092092828324E-16, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.88035477551078244854E-15, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -3.81440307243700780478E-15, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 1.04202769841288027642E-14, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 4.27244001671195135429E-14, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -2.10154184277266431302E-14, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -4.08355111109219731823E-13, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -7.19855177624590851209E-13, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 2.03562854414708950722E-12, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 1.41258074366137813316E-11, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 3.25260358301548823856E-11, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.89749581235054123450E-11, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -5.58974346219658380687E-10, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -3.83538038596423702205E-9, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -2.63146884688951950684E-8, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -2.51223623787020892529E-7, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -3.88256480887769039346E-6, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.10588938762623716291E-4, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -9.76109749136146840777E-3, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 7.78576235018280120474E-1, &b0, &b1, &b2, _state);
+      bessel_besselm1firstcheb(7.51729631084210481353E-18, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 4.41434832307170791151E-18, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -4.65030536848935832153E-17, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -3.20952592199342395980E-17, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 2.96262899764595013876E-16, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 3.30820231092092828324E-16, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.88035477551078244854E-15, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -3.81440307243700780478E-15, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 1.04202769841288027642E-14, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 4.27244001671195135429E-14, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -2.10154184277266431302E-14, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -4.08355111109219731823E-13, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -7.19855177624590851209E-13, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 2.03562854414708950722E-12, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 1.41258074366137813316E-11, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 3.25260358301548823856E-11, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.89749581235054123450E-11, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -5.58974346219658380687E-10, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -3.83538038596423702205E-9, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -2.63146884688951950684E-8, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -2.51223623787020892529E-7, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -3.88256480887769039346E-6, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.10588938762623716291E-4, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -9.76109749136146840777E-3, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 7.78576235018280120474E-1, &b0, &b1, &b2);
       v = 0.5 * (b0 - b2);
       z = v * exp(z) / sqrt(z);
    }
@@ -5716,7 +5716,7 @@ double besseli1(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: double besselk0(const double x);
-double besselk0(double x, ae_state *_state) {
+double besselk0(double x) {
    double y;
    double z;
    double v;
@@ -5724,48 +5724,48 @@ double besselk0(double x, ae_state *_state) {
    double b1;
    double b2;
    double result;
-   ae_assert(x > 0.0, "Domain error in BesselK0: x <= 0", _state);
+   ae_assert(x > 0.0, "Domain error in BesselK0: x <= 0");
    if (x <= 2.0) {
       y = x * x - 2.0;
-      bessel_besselmfirstcheb(1.37446543561352307156E-16, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 4.25981614279661018399E-14, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 1.03496952576338420167E-11, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 1.90451637722020886025E-9, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 2.53479107902614945675E-7, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 2.28621210311945178607E-5, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 1.26461541144692592338E-3, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 3.59799365153615016266E-2, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, 3.44289899924628486886E-1, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(y, -5.35327393233902768720E-1, &b0, &b1, &b2, _state);
+      bessel_besselmfirstcheb(1.37446543561352307156E-16, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 4.25981614279661018399E-14, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 1.03496952576338420167E-11, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 1.90451637722020886025E-9, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 2.53479107902614945675E-7, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 2.28621210311945178607E-5, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 1.26461541144692592338E-3, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 3.59799365153615016266E-2, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, 3.44289899924628486886E-1, &b0, &b1, &b2);
+      bessel_besselmnextcheb(y, -5.35327393233902768720E-1, &b0, &b1, &b2);
       v = 0.5 * (b0 - b2);
-      v -= log(0.5 * x) * besseli0(x, _state);
+      v -= log(0.5 * x) * besseli0(x);
    } else {
       z = 8.0 / x - 2.0;
-      bessel_besselmfirstcheb(5.30043377268626276149E-18, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, -1.64758043015242134646E-17, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, 5.21039150503902756861E-17, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, -1.67823109680541210385E-16, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, 5.51205597852431940784E-16, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, -1.84859337734377901440E-15, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, 6.34007647740507060557E-15, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, -2.22751332699166985548E-14, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, 8.03289077536357521100E-14, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, -2.98009692317273043925E-13, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, 1.14034058820847496303E-12, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, -4.51459788337394416547E-12, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, 1.85594911495471785253E-11, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, -7.95748924447710747776E-11, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, 3.57739728140030116597E-10, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, -1.69753450938905987466E-9, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, 8.57403401741422608519E-9, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, -4.66048989768794782956E-8, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, 2.76681363944501510342E-7, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, -1.83175552271911948767E-6, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, 1.39498137188764993662E-5, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, -1.28495495816278026384E-4, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, 1.56988388573005337491E-3, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, -3.14481013119645005427E-2, &b0, &b1, &b2, _state);
-      bessel_besselmnextcheb(z, 2.44030308206595545468E0, &b0, &b1, &b2, _state);
+      bessel_besselmfirstcheb(5.30043377268626276149E-18, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, -1.64758043015242134646E-17, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, 5.21039150503902756861E-17, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, -1.67823109680541210385E-16, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, 5.51205597852431940784E-16, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, -1.84859337734377901440E-15, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, 6.34007647740507060557E-15, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, -2.22751332699166985548E-14, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, 8.03289077536357521100E-14, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, -2.98009692317273043925E-13, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, 1.14034058820847496303E-12, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, -4.51459788337394416547E-12, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, 1.85594911495471785253E-11, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, -7.95748924447710747776E-11, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, 3.57739728140030116597E-10, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, -1.69753450938905987466E-9, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, 8.57403401741422608519E-9, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, -4.66048989768794782956E-8, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, 2.76681363944501510342E-7, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, -1.83175552271911948767E-6, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, 1.39498137188764993662E-5, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, -1.28495495816278026384E-4, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, 1.56988388573005337491E-3, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, -3.14481013119645005427E-2, &b0, &b1, &b2);
+      bessel_besselmnextcheb(z, 2.44030308206595545468E0, &b0, &b1, &b2);
       v = 0.5 * (b0 - b2);
       v = v * exp(-x) / sqrt(x);
    }
@@ -5791,7 +5791,7 @@ double besselk0(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: double besselk1(const double x);
-double besselk1(double x, ae_state *_state) {
+double besselk1(double x) {
    double y;
    double z;
    double v;
@@ -5800,49 +5800,49 @@ double besselk1(double x, ae_state *_state) {
    double b2;
    double result;
    z = 0.5 * x;
-   ae_assert(z > 0.0, "Domain error in K1", _state);
+   ae_assert(z > 0.0, "Domain error in K1");
    if (x <= 2.0) {
       y = x * x - 2.0;
-      bessel_besselm1firstcheb(-7.02386347938628759343E-18, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -2.42744985051936593393E-15, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -6.66690169419932900609E-13, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.41148839263352776110E-10, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -2.21338763073472585583E-8, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -2.43340614156596823496E-6, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.73028895751305206302E-4, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -6.97572385963986435018E-3, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.22611180822657148235E-1, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -3.53155960776544875667E-1, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 1.52530022733894777053E0, &b0, &b1, &b2, _state);
+      bessel_besselm1firstcheb(-7.02386347938628759343E-18, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -2.42744985051936593393E-15, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -6.66690169419932900609E-13, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.41148839263352776110E-10, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -2.21338763073472585583E-8, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -2.43340614156596823496E-6, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.73028895751305206302E-4, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -6.97572385963986435018E-3, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.22611180822657148235E-1, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -3.53155960776544875667E-1, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 1.52530022733894777053E0, &b0, &b1, &b2);
       v = 0.5 * (b0 - b2);
-      result = log(z) * besseli1(x, _state) + v / x;
+      result = log(z) * besseli1(x) + v / x;
    } else {
       y = 8.0 / x - 2.0;
-      bessel_besselm1firstcheb(-5.75674448366501715755E-18, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 1.79405087314755922667E-17, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -5.68946255844285935196E-17, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 1.83809354436663880070E-16, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -6.05704724837331885336E-16, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 2.03870316562433424052E-15, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -7.01983709041831346144E-15, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 2.47715442448130437068E-14, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -8.97670518232499435011E-14, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 3.34841966607842919884E-13, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.28917396095102890680E-12, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 5.13963967348173025100E-12, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -2.12996783842756842877E-11, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 9.21831518760500529508E-11, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -4.19035475934189648750E-10, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 2.01504975519703286596E-9, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.03457624656780970260E-8, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 5.74108412545004946722E-8, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -3.50196060308781257119E-7, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 2.40648494783721712015E-6, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -1.93619797416608296024E-5, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 1.95215518471351631108E-4, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, -2.85781685962277938680E-3, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 1.03923736576817238437E-1, &b0, &b1, &b2, _state);
-      bessel_besselm1nextcheb(y, 2.72062619048444266945E0, &b0, &b1, &b2, _state);
+      bessel_besselm1firstcheb(-5.75674448366501715755E-18, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 1.79405087314755922667E-17, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -5.68946255844285935196E-17, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 1.83809354436663880070E-16, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -6.05704724837331885336E-16, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 2.03870316562433424052E-15, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -7.01983709041831346144E-15, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 2.47715442448130437068E-14, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -8.97670518232499435011E-14, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 3.34841966607842919884E-13, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.28917396095102890680E-12, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 5.13963967348173025100E-12, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -2.12996783842756842877E-11, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 9.21831518760500529508E-11, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -4.19035475934189648750E-10, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 2.01504975519703286596E-9, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.03457624656780970260E-8, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 5.74108412545004946722E-8, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -3.50196060308781257119E-7, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 2.40648494783721712015E-6, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -1.93619797416608296024E-5, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 1.95215518471351631108E-4, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, -2.85781685962277938680E-3, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 1.03923736576817238437E-1, &b0, &b1, &b2);
+      bessel_besselm1nextcheb(y, 2.72062619048444266945E0, &b0, &b1, &b2);
       v = 0.5 * (b0 - b2);
       result = exp(-x) * v / sqrt(x);
    }
@@ -5870,7 +5870,7 @@ double besselk1(double x, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 2000 by Stephen L. Moshier
 // API: double besselkn(const ae_int_t nn, const double x);
-double besselkn(ae_int_t nn, double x, ae_state *_state) {
+double besselkn(ae_int_t nn, double x) {
    double k;
    double kf;
    double nk1f;
@@ -5897,8 +5897,8 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
    } else {
       n = nn;
    }
-   ae_assert(n <= 31, "Overflow in BesselKN", _state);
-   ae_assert(x > 0.0, "Domain error in BesselKN", _state);
+   ae_assert(n <= 31, "Overflow in BesselKN");
+   ae_assert(x > 0.0, "Domain error in BesselKN");
    if (x <= 9.55) {
       ans = 0.0;
       z0 = 0.25 * x * x;
@@ -5929,14 +5929,14 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
                zn *= z;
                t = nk1f * zn / kf;
                s += t;
-               ae_assert(maxrealnumber - fabs(t) > fabs(s), "Overflow in BesselKN", _state);
-               ae_assert(!(tox > 1.0 && maxrealnumber / tox < zmn), "Overflow in BesselKN", _state);
+               ae_assert(maxrealnumber - fabs(t) > fabs(s), "Overflow in BesselKN");
+               ae_assert(!(tox > 1.0 && maxrealnumber / tox < zmn), "Overflow in BesselKN");
                zmn *= tox;
             }
             s *= 0.5;
             t = fabs(s);
-            ae_assert(!(zmn > 1.0 && maxrealnumber / zmn < t), "Overflow in BesselKN", _state);
-            ae_assert(!(t > 1.0 && maxrealnumber / t < zmn), "Overflow in BesselKN", _state);
+            ae_assert(!(zmn > 1.0 && maxrealnumber / zmn < t), "Overflow in BesselKN");
+            ae_assert(!(t > 1.0 && maxrealnumber / t < zmn), "Overflow in BesselKN");
             ans = s * zmn;
          }
       }
@@ -5999,90 +5999,90 @@ double besselkn(ae_int_t nn, double x, ae_state *_state) {
 
 namespace alglib {
 double besselj0(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::besselj0(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::besselj0(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double besselj1(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::besselj1(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::besselj1(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double besseljn(const ae_int_t n, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::besseljn(n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::besseljn(n, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double bessely0(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::bessely0(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::bessely0(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double bessely1(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::bessely1(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::bessely1(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double besselyn(const ae_int_t n, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::besselyn(n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::besselyn(n, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double besseli0(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::besseli0(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::besseli0(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double besseli1(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::besseli1(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::besseli1(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double besselk0(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::besselk0(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::besselk0(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double besselk1(const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::besselk1(x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::besselk1(x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double besselkn(const ae_int_t nn, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::besselkn(nn, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::besselkn(nn, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
@@ -6098,7 +6098,7 @@ namespace alglib_impl {
 // Result:
 //     the value of the Laguerre polynomial Ln at x
 // API: double laguerrecalculate(const ae_int_t n, const double x);
-double laguerrecalculate(ae_int_t n, double x, ae_state *_state) {
+double laguerrecalculate(ae_int_t n, double x) {
    double a;
    double b;
    double i;
@@ -6130,7 +6130,7 @@ double laguerrecalculate(ae_int_t n, double x, ae_state *_state) {
 // Result:
 //     the value of the Laguerre polynomial at x
 // API: double laguerresum(const real_1d_array &c, const ae_int_t n, const double x);
-double laguerresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
+double laguerresum(RVector *c, ae_int_t n, double x) {
    double b1;
    double b2;
    ae_int_t i;
@@ -6154,10 +6154,10 @@ double laguerresum(RVector *c, ae_int_t n, double x, ae_state *_state) {
 // Outputs:
 //     C   -   coefficients
 // API: void laguerrecoefficients(const ae_int_t n, real_1d_array &c);
-void laguerrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
+void laguerrecoefficients(ae_int_t n, RVector *c) {
    ae_int_t i;
    SetVector(c);
-   ae_vector_set_length(c, n + 1, _state);
+   ae_vector_set_length(c, n + 1);
    c->xR[0] = 1.0;
    for (i = 0; i < n; i++) {
       c->xR[i + 1] = -c->xR[i] * (n - i) / (i + 1) / (i + 1);
@@ -6167,26 +6167,26 @@ void laguerrecoefficients(ae_int_t n, RVector *c, ae_state *_state) {
 
 namespace alglib {
 double laguerrecalculate(const ae_int_t n, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::laguerrecalculate(n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::laguerrecalculate(n, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double laguerresum(const real_1d_array &c, const ae_int_t n, const double x) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::laguerresum(ConstT(ae_vector, c), n, x, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::laguerresum(ConstT(ae_vector, c), n, x);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 void laguerrecoefficients(const ae_int_t n, real_1d_array &c) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::laguerrecoefficients(n, ConstT(ae_vector, c), &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   alglib_impl::laguerrecoefficients(n, ConstT(ae_vector, c));
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -6227,7 +6227,7 @@ namespace alglib_impl {
 // Cephes Math Library, Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: double ellipticintegralkhighprecision(const double m1);
-double ellipticintegralkhighprecision(double m1, ae_state *_state) {
+double ellipticintegralkhighprecision(double m1) {
    double p;
    double q;
    double result;
@@ -6290,9 +6290,9 @@ double ellipticintegralkhighprecision(double m1, ae_state *_state) {
 // Cephes Math Library, Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: double ellipticintegralk(const double m);
-double ellipticintegralk(double m, ae_state *_state) {
+double ellipticintegralk(double m) {
    double result;
-   result = ellipticintegralkhighprecision(1.0 - m, _state);
+   result = ellipticintegralkhighprecision(1.0 - m);
    return result;
 }
 
@@ -6329,7 +6329,7 @@ double ellipticintegralk(double m, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 // API: double incompleteellipticintegralk(const double phi, const double m);
-double incompleteellipticintegralk(double phi, double m, ae_state *_state) {
+double incompleteellipticintegralk(double phi, double m) {
    double a;
    double b;
    double c;
@@ -6353,12 +6353,12 @@ double incompleteellipticintegralk(double phi, double m, ae_state *_state) {
       result = log(tan(0.5 * (pio2 + phi)));
       return result;
    }
-   npio2 = ifloor(phi / pio2, _state);
+   npio2 = ifloor(phi / pio2);
    if (npio2 % 2 != 0) {
       npio2++;
    }
    if (npio2 != 0) {
-      k = ellipticintegralk(1 - a, _state);
+      k = ellipticintegralk(1 - a);
       phi -= npio2 * pio2;
    } else {
       k = 0.0;
@@ -6376,9 +6376,9 @@ double incompleteellipticintegralk(double phi, double m, ae_state *_state) {
       if (fabs(e) < 10.0) {
          e = atan(e);
          if (npio2 == 0) {
-            k = ellipticintegralk(1 - a, _state);
+            k = ellipticintegralk(1 - a);
          }
-         temp = k - incompleteellipticintegralk(e, m, _state);
+         temp = k - incompleteellipticintegralk(e, m);
          if (s < 0) {
             temp = -temp;
          }
@@ -6393,7 +6393,7 @@ double incompleteellipticintegralk(double phi, double m, ae_state *_state) {
    while (fabs(c / a) > machineepsilon) {
       temp = b / a;
       phi += atan(t * temp) + md * pi;
-      md = itrunc((phi + pio2) / pi, _state);
+      md = itrunc((phi + pio2) / pi);
       t = t * (1.0 + temp) / (1.0 - temp * t * t);
       c = 0.5 * (a - b);
       temp = sqrt(a * b);
@@ -6435,11 +6435,11 @@ double incompleteellipticintegralk(double phi, double m, ae_state *_state) {
 // Cephes Math Library, Release 2.8: June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 // API: double ellipticintegrale(const double m);
-double ellipticintegrale(double m, ae_state *_state) {
+double ellipticintegrale(double m) {
    double p;
    double q;
    double result;
-   ae_assert(m >= 0.0 && m <= 1.0, "Domain error in EllipticIntegralE: m<0 or m>1", _state);
+   ae_assert(m >= 0.0 && m <= 1.0, "Domain error in EllipticIntegralE: m<0 or m>1");
    m = 1 - m;
    if (m == 0.0) {
       result = 1.0;
@@ -6499,7 +6499,7 @@ double ellipticintegrale(double m, ae_state *_state) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1993, 2000 by Stephen L. Moshier
 // API: double incompleteellipticintegrale(const double phi, const double m);
-double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
+double incompleteellipticintegrale(double phi, double m) {
    double pio2;
    double a;
    double b;
@@ -6520,7 +6520,7 @@ double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
       return result;
    }
    lphi = phi;
-   npio2 = ifloor(lphi / pio2, _state);
+   npio2 = ifloor(lphi / pio2);
    if (npio2 % 2 != 0) {
       npio2++;
    }
@@ -6532,7 +6532,7 @@ double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
       s = 1;
    }
    a = 1.0 - m;
-   ebig = ellipticintegrale(m, _state);
+   ebig = ellipticintegrale(m);
    if (a == 0.0) {
       temp = sin(lphi);
       if (s < 0) {
@@ -6551,7 +6551,7 @@ double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
    // ... but avoid multiple recursions.
       if (fabs(e) < 10.0) {
          e = atan(e);
-         temp = ebig + m * sin(lphi) * sin(e) - incompleteellipticintegrale(e, m, _state);
+         temp = ebig + m * sin(lphi) * sin(e) - incompleteellipticintegrale(e, m);
          if (s < 0) {
             temp = -temp;
          }
@@ -6567,7 +6567,7 @@ double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
    while (fabs(c / a) > machineepsilon) {
       temp = b / a;
       lphi += atan(t * temp) + md * pi;
-      md = itrunc((lphi + pio2) / pi, _state);
+      md = itrunc((lphi + pio2) / pi);
       t = t * (1.0 + temp) / (1.0 - temp * t * t);
       c = 0.5 * (a - b);
       temp = sqrt(a * b);
@@ -6576,7 +6576,7 @@ double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
       d += d;
       e += c * sin(lphi);
    }
-   temp = ebig / ellipticintegralk(m, _state);
+   temp = ebig / ellipticintegralk(m);
    temp *= (atan(t) + md * pi) / (d * a);
    temp += e;
    if (s < 0) {
@@ -6589,42 +6589,42 @@ double incompleteellipticintegrale(double phi, double m, ae_state *_state) {
 
 namespace alglib {
 double ellipticintegralkhighprecision(const double m1) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::ellipticintegralkhighprecision(m1, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::ellipticintegralkhighprecision(m1);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double ellipticintegralk(const double m) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::ellipticintegralk(m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::ellipticintegralk(m);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double incompleteellipticintegralk(const double phi, const double m) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::incompleteellipticintegralk(phi, m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::incompleteellipticintegralk(phi, m);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double ellipticintegrale(const double m) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::ellipticintegrale(m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::ellipticintegrale(m);
+   alglib_impl::ae_state_clear();
    return D;
 }
 
 double incompleteellipticintegrale(const double phi, const double m) {
-   alglib_impl::ae_state _alglib_env_state; alglib_impl::ae_state_init(&_alglib_env_state);
+   alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::incompleteellipticintegrale(phi, m, &_alglib_env_state);
-   alglib_impl::ae_state_clear(&_alglib_env_state);
+   double D = alglib_impl::incompleteellipticintegrale(phi, m);
+   alglib_impl::ae_state_clear();
    return D;
 }
 } // end of namespace alglib
