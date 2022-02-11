@@ -12244,92 +12244,51 @@ bool lsfititeration(lsfitstate *state) {
    ae_int_t j;
    ae_int_t j1;
    ae_int_t info;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      m = state->rstate.ia.xZ[1];
-      k = state->rstate.ia.xZ[2];
-      i = state->rstate.ia.xZ[3];
-      j = state->rstate.ia.xZ[4];
-      j1 = state->rstate.ia.xZ[5];
-      info = state->rstate.ia.xZ[6];
-      lx = state->rstate.ra.xR[0];
-      lf = state->rstate.ra.xR[1];
-      ld = state->rstate.ra.xR[2];
-      rx = state->rstate.ra.xR[3];
-      rf = state->rstate.ra.xR[4];
-      rd = state->rstate.ra.xR[5];
-      v = state->rstate.ra.xR[6];
-      vv = state->rstate.ra.xR[7];
-      relcnt = state->rstate.ra.xR[8];
-   } else {
-      n = 359;
-      m = -58;
-      k = -919;
-      i = -909;
-      j = 81;
-      j1 = 255;
-      info = 74;
-      lx = -788;
-      lf = 809;
-      ld = 205;
-      rx = -838;
-      rf = 939;
-      rd = -526;
-      v = 763;
-      vv = -541;
-      relcnt = -698;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   m = state->rstate.ia.xZ[1];
+   k = state->rstate.ia.xZ[2];
+   i = state->rstate.ia.xZ[3];
+   j = state->rstate.ia.xZ[4];
+   j1 = state->rstate.ia.xZ[5];
+   info = state->rstate.ia.xZ[6];
+   lx = state->rstate.ra.xR[0];
+   lf = state->rstate.ra.xR[1];
+   ld = state->rstate.ra.xR[2];
+   rx = state->rstate.ra.xR[3];
+   rf = state->rstate.ra.xR[4];
+   rd = state->rstate.ra.xR[5];
+   v = state->rstate.ra.xR[6];
+   vv = state->rstate.ra.xR[7];
+   relcnt = state->rstate.ra.xR[8];
+   switch (state->rstate.stage) {
+      case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
+      case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
+      case 8: goto Resume08; case 9: goto Resume09; case 10: goto Resume10;
+      case 11: goto Resume11; case 12: goto Resume12; case 13: goto Resume13;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
-   if (state->rstate.stage == 5) {
-      goto lbl_5;
-   }
-   if (state->rstate.stage == 6) {
-      goto lbl_6;
-   }
-   if (state->rstate.stage == 7) {
-      goto lbl_7;
-   }
-   if (state->rstate.stage == 8) {
-      goto lbl_8;
-   }
-   if (state->rstate.stage == 9) {
-      goto lbl_9;
-   }
-   if (state->rstate.stage == 10) {
-      goto lbl_10;
-   }
-   if (state->rstate.stage == 11) {
-      goto lbl_11;
-   }
-   if (state->rstate.stage == 12) {
-      goto lbl_12;
-   }
-   if (state->rstate.stage == 13) {
-      goto lbl_13;
-   }
+Spawn:
+   n = 359;
+   m = -58;
+   k = -919;
+   i = -909;
+   j = 81;
+   j1 = 255;
+   info = 74;
+   lx = -788;
+   lf = 809;
+   ld = 205;
+   rx = -838;
+   rf = 939;
+   rd = -526;
+   v = 763;
+   vv = -541;
+   relcnt = -698;
 // Routine body
 // Init
    if (state->wkind == 1) {
@@ -12354,77 +12313,56 @@ bool lsfititeration(lsfitstate *state) {
    minlmsetlc(&state->optstate, &state->cleic, &state->tmpct, state->nec + state->nic);
 //  Check that user-supplied gradient is correct
    lsfit_lsfitclearrequestfields(state);
-   if (!(state->teststep > 0.0 && state->optalgo == 1)) {
-      goto lbl_14;
-   }
-   for (i = 0; i < k; i++) {
-      state->c.xR[i] = state->c0.xR[i];
-      if (isfinite(state->bndl.xR[i])) {
-         state->c.xR[i] = rmax2(state->c.xR[i], state->bndl.xR[i]);
+   if (state->teststep > 0.0 && state->optalgo == 1) {
+      for (i = 0; i < k; i++) {
+         state->c.xR[i] = state->c0.xR[i];
+         if (isfinite(state->bndl.xR[i])) {
+            state->c.xR[i] = rmax2(state->c.xR[i], state->bndl.xR[i]);
+         }
+         if (isfinite(state->bndu.xR[i])) {
+            state->c.xR[i] = rmin2(state->c.xR[i], state->bndu.xR[i]);
+         }
       }
-      if (isfinite(state->bndu.xR[i])) {
-         state->c.xR[i] = rmin2(state->c.xR[i], state->bndu.xR[i]);
+      state->needfg = true;
+      for (i = 0; i < k; i++) {
+         ae_assert(state->bndl.xR[i] <= state->c.xR[i] && state->c.xR[i] <= state->bndu.xR[i], "LSFitIteration: internal error(State.C is out of bounds)");
+         v = state->c.xR[i];
+         for (j = 0; j < n; j++) {
+            ae_v_move(state->x.xR, 1, state->taskx.xyR[j], 1, m);
+            state->c.xR[i] = v - state->teststep * state->s.xR[i];
+            if (isfinite(state->bndl.xR[i])) {
+               state->c.xR[i] = rmax2(state->c.xR[i], state->bndl.xR[i]);
+            }
+            lx = state->c.xR[i];
+            state->rstate.stage = 0; goto Pause; Resume00:
+            lf = state->f;
+            ld = state->g.xR[i];
+            state->c.xR[i] = v + state->teststep * state->s.xR[i];
+            if (isfinite(state->bndu.xR[i])) {
+               state->c.xR[i] = rmin2(state->c.xR[i], state->bndu.xR[i]);
+            }
+            rx = state->c.xR[i];
+            state->rstate.stage = 1; goto Pause; Resume01:
+            rf = state->f;
+            rd = state->g.xR[i];
+            state->c.xR[i] = (lx + rx) / 2;
+            if (isfinite(state->bndl.xR[i])) {
+               state->c.xR[i] = rmax2(state->c.xR[i], state->bndl.xR[i]);
+            }
+            if (isfinite(state->bndu.xR[i])) {
+               state->c.xR[i] = rmin2(state->c.xR[i], state->bndu.xR[i]);
+            }
+            state->rstate.stage = 2; goto Pause; Resume02:
+            state->c.xR[i] = v;
+            if (!derivativecheck(lf, ld, rf, rd, state->f, state->g.xR[i], rx - lx)) {
+               state->repvaridx = i;
+               state->repterminationtype = -7;
+               goto Exit;
+            }
+         }
       }
+      state->needfg = false;
    }
-   state->needfg = true;
-   i = 0;
-lbl_16:
-   if (i > k - 1) {
-      goto lbl_18;
-   }
-   ae_assert(state->bndl.xR[i] <= state->c.xR[i] && state->c.xR[i] <= state->bndu.xR[i], "LSFitIteration: internal error(State.C is out of bounds)");
-   v = state->c.xR[i];
-   j = 0;
-lbl_19:
-   if (j > n - 1) {
-      goto lbl_21;
-   }
-   ae_v_move(state->x.xR, 1, state->taskx.xyR[j], 1, m);
-   state->c.xR[i] = v - state->teststep * state->s.xR[i];
-   if (isfinite(state->bndl.xR[i])) {
-      state->c.xR[i] = rmax2(state->c.xR[i], state->bndl.xR[i]);
-   }
-   lx = state->c.xR[i];
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   lf = state->f;
-   ld = state->g.xR[i];
-   state->c.xR[i] = v + state->teststep * state->s.xR[i];
-   if (isfinite(state->bndu.xR[i])) {
-      state->c.xR[i] = rmin2(state->c.xR[i], state->bndu.xR[i]);
-   }
-   rx = state->c.xR[i];
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   rf = state->f;
-   rd = state->g.xR[i];
-   state->c.xR[i] = (lx + rx) / 2;
-   if (isfinite(state->bndl.xR[i])) {
-      state->c.xR[i] = rmax2(state->c.xR[i], state->bndl.xR[i]);
-   }
-   if (isfinite(state->bndu.xR[i])) {
-      state->c.xR[i] = rmin2(state->c.xR[i], state->bndu.xR[i]);
-   }
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->c.xR[i] = v;
-   if (!derivativecheck(lf, ld, rf, rd, state->f, state->g.xR[i], rx - lx)) {
-      state->repvaridx = i;
-      state->repterminationtype = -7;
-      result = false;
-      return result;
-   }
-   j++;
-   goto lbl_19;
-lbl_21:
-   i++;
-   goto lbl_16;
-lbl_18:
-   state->needfg = false;
-lbl_14:
 // Fill WCur by weights:
 // * for WKind=0 unit weights are chosen
 // * for WKind=1 we use user-supplied weights stored in State.TaskW
@@ -12436,176 +12374,107 @@ lbl_14:
       }
    }
 // Optimize
-lbl_22:
-   if (!minlmiteration(&state->optstate)) {
-      goto lbl_23;
-   }
-   if (!state->optstate.needfi) {
-      goto lbl_24;
-   }
-// calculate f[] = wi*(f(xi,c)-yi)
-   i = 0;
-lbl_26:
-   if (i > n - 1) {
-      goto lbl_28;
-   }
-   ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
-   ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
-   state->pointindex = i;
-   lsfit_lsfitclearrequestfields(state);
-   state->needf = true;
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->needf = false;
-   vv = state->wcur.xR[i];
-   state->optstate.fi.xR[i] = vv * (state->f - state->tasky.xR[i]);
-   i++;
-   goto lbl_26;
-lbl_28:
-   goto lbl_22;
-lbl_24:
-   if (!state->optstate.needf) {
-      goto lbl_29;
-   }
-// calculate F = sum (wi*(f(xi,c)-yi))^2
-   state->optstate.f = 0.0;
-   i = 0;
-lbl_31:
-   if (i > n - 1) {
-      goto lbl_33;
-   }
-   ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
-   ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
-   state->pointindex = i;
-   lsfit_lsfitclearrequestfields(state);
-   state->needf = true;
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   state->needf = false;
-   vv = state->wcur.xR[i];
-   state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
-   i++;
-   goto lbl_31;
-lbl_33:
-   goto lbl_22;
-lbl_29:
-   if (!state->optstate.needfg) {
-      goto lbl_34;
-   }
-// calculate F/gradF
-   state->optstate.f = 0.0;
-   for (i = 0; i < k; i++) {
-      state->optstate.g.xR[i] = 0.0;
-   }
-   i = 0;
-lbl_36:
-   if (i > n - 1) {
-      goto lbl_38;
-   }
-   ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
-   ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
-   state->pointindex = i;
-   lsfit_lsfitclearrequestfields(state);
-   state->needfg = true;
-   state->rstate.stage = 5;
-   goto lbl_rcomm;
-lbl_5:
-   state->needfg = false;
-   vv = state->wcur.xR[i];
-   state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
-   v = sqr(vv) * 2 * (state->f - state->tasky.xR[i]);
-   ae_v_addd(state->optstate.g.xR, 1, state->g.xR, 1, k, v);
-   i++;
-   goto lbl_36;
-lbl_38:
-   goto lbl_22;
-lbl_34:
-   if (!state->optstate.needfij) {
-      goto lbl_39;
-   }
-// calculate Fi/jac(Fi)
-   i = 0;
-lbl_41:
-   if (i > n - 1) {
-      goto lbl_43;
-   }
-   ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
-   ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
-   state->pointindex = i;
-   lsfit_lsfitclearrequestfields(state);
-   state->needfg = true;
-   state->rstate.stage = 6;
-   goto lbl_rcomm;
-lbl_6:
-   state->needfg = false;
-   vv = state->wcur.xR[i];
-   state->optstate.fi.xR[i] = vv * (state->f - state->tasky.xR[i]);
-   ae_v_moved(state->optstate.j.xyR[i], 1, state->g.xR, 1, k, vv);
-   i++;
-   goto lbl_41;
-lbl_43:
-   goto lbl_22;
-lbl_39:
-   if (!state->optstate.needfgh) {
-      goto lbl_44;
-   }
-// calculate F/grad(F)/hess(F)
-   state->optstate.f = 0.0;
-   for (i = 0; i < k; i++) {
-      state->optstate.g.xR[i] = 0.0;
-   }
-   for (i = 0; i < k; i++) {
-      for (j = 0; j < k; j++) {
-         state->optstate.h.xyR[i][j] = 0.0;
+   while (minlmiteration(&state->optstate)) {
+      if (state->optstate.needfi) {
+      // calculate f[] = wi*(f(xi,c)-yi)
+         for (i = 0; i < n; i++) {
+            ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
+            ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
+            state->pointindex = i;
+            lsfit_lsfitclearrequestfields(state);
+            state->needf = true;
+            state->rstate.stage = 3; goto Pause; Resume03:
+            state->needf = false;
+            vv = state->wcur.xR[i];
+            state->optstate.fi.xR[i] = vv * (state->f - state->tasky.xR[i]);
+         }
+      } else if (state->optstate.needf) {
+      // calculate F = sum (wi*(f(xi,c)-yi))^2
+         state->optstate.f = 0.0;
+         for (i = 0; i < n; i++) {
+            ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
+            ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
+            state->pointindex = i;
+            lsfit_lsfitclearrequestfields(state);
+            state->needf = true;
+            state->rstate.stage = 4; goto Pause; Resume04:
+            state->needf = false;
+            vv = state->wcur.xR[i];
+            state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
+         }
+      } else if (state->optstate.needfg) {
+      // calculate F/gradF
+         state->optstate.f = 0.0;
+         for (i = 0; i < k; i++) {
+            state->optstate.g.xR[i] = 0.0;
+         }
+         for (i = 0; i < n; i++) {
+            ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
+            ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
+            state->pointindex = i;
+            lsfit_lsfitclearrequestfields(state);
+            state->needfg = true;
+            state->rstate.stage = 5; goto Pause; Resume05:
+            state->needfg = false;
+            vv = state->wcur.xR[i];
+            state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
+            v = sqr(vv) * 2 * (state->f - state->tasky.xR[i]);
+            ae_v_addd(state->optstate.g.xR, 1, state->g.xR, 1, k, v);
+         }
+      } else if (state->optstate.needfij) {
+      // calculate Fi/jac(Fi)
+         for (i = 0; i < n; i++) {
+            ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
+            ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
+            state->pointindex = i;
+            lsfit_lsfitclearrequestfields(state);
+            state->needfg = true;
+            state->rstate.stage = 6; goto Pause; Resume06:
+            state->needfg = false;
+            vv = state->wcur.xR[i];
+            state->optstate.fi.xR[i] = vv * (state->f - state->tasky.xR[i]);
+            ae_v_moved(state->optstate.j.xyR[i], 1, state->g.xR, 1, k, vv);
+         }
+      } else if (state->optstate.needfgh) {
+      // calculate F/grad(F)/hess(F)
+         state->optstate.f = 0.0;
+         for (i = 0; i < k; i++) {
+            state->optstate.g.xR[i] = 0.0;
+         }
+         for (i = 0; i < k; i++) {
+            for (j = 0; j < k; j++) {
+               state->optstate.h.xyR[i][j] = 0.0;
+            }
+         }
+         for (i = 0; i < n; i++) {
+            ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
+            ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
+            state->pointindex = i;
+            lsfit_lsfitclearrequestfields(state);
+            state->needfgh = true;
+            state->rstate.stage = 7; goto Pause; Resume07:
+            state->needfgh = false;
+            vv = state->wcur.xR[i];
+            state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
+            v = sqr(vv) * 2 * (state->f - state->tasky.xR[i]);
+            ae_v_addd(state->optstate.g.xR, 1, state->g.xR, 1, k, v);
+            for (j = 0; j < k; j++) {
+               v = 2 * sqr(vv) * state->g.xR[j];
+               ae_v_addd(state->optstate.h.xyR[j], 1, state->g.xR, 1, k, v);
+               v = 2 * sqr(vv) * (state->f - state->tasky.xR[i]);
+               ae_v_addd(state->optstate.h.xyR[j], 1, state->h.xyR[j], 1, k, v);
+            }
+         }
+      } else if (state->optstate.xupdated) {
+      // Report new iteration
+         ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
+         state->f = state->optstate.f;
+         lsfit_lsfitclearrequestfields(state);
+         state->xupdated = true;
+         state->rstate.stage = 8; goto Pause; Resume08:
+         state->xupdated = false;
       }
    }
-   i = 0;
-lbl_46:
-   if (i > n - 1) {
-      goto lbl_48;
-   }
-   ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
-   ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
-   state->pointindex = i;
-   lsfit_lsfitclearrequestfields(state);
-   state->needfgh = true;
-   state->rstate.stage = 7;
-   goto lbl_rcomm;
-lbl_7:
-   state->needfgh = false;
-   vv = state->wcur.xR[i];
-   state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
-   v = sqr(vv) * 2 * (state->f - state->tasky.xR[i]);
-   ae_v_addd(state->optstate.g.xR, 1, state->g.xR, 1, k, v);
-   for (j = 0; j < k; j++) {
-      v = 2 * sqr(vv) * state->g.xR[j];
-      ae_v_addd(state->optstate.h.xyR[j], 1, state->g.xR, 1, k, v);
-      v = 2 * sqr(vv) * (state->f - state->tasky.xR[i]);
-      ae_v_addd(state->optstate.h.xyR[j], 1, state->h.xyR[j], 1, k, v);
-   }
-   i++;
-   goto lbl_46;
-lbl_48:
-   goto lbl_22;
-lbl_44:
-   if (!state->optstate.xupdated) {
-      goto lbl_49;
-   }
-// Report new iteration
-   ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
-   state->f = state->optstate.f;
-   lsfit_lsfitclearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 8;
-   goto lbl_rcomm;
-lbl_8:
-   state->xupdated = false;
-   goto lbl_22;
-lbl_49:
-   goto lbl_22;
-lbl_23:
 // Extract results
 //
 // NOTE: reverse communication protocol used by this unit does NOT
@@ -12616,141 +12485,102 @@ lbl_23:
    state->repterminationtype = state->optrep.terminationtype;
    state->repiterationscount = state->optrep.iterationscount;
 // calculate errors
-   if (state->repterminationtype <= 0) {
-      goto lbl_51;
+   if (state->repterminationtype > 0) {
+   // Calculate RMS/Avg/Max/... errors
+      state->reprmserror = 0.0;
+      state->repwrmserror = 0.0;
+      state->repavgerror = 0.0;
+      state->repavgrelerror = 0.0;
+      state->repmaxerror = 0.0;
+      relcnt = 0.0;
+      for (i = 0; i < n; i++) {
+         ae_v_move(state->c.xR, 1, state->c1.xR, 1, k);
+         ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
+         state->pointindex = i;
+         lsfit_lsfitclearrequestfields(state);
+         state->needf = true;
+         state->rstate.stage = 9; goto Pause; Resume09:
+         state->needf = false;
+         v = state->f;
+         vv = state->wcur.xR[i];
+         state->reprmserror += sqr(v - state->tasky.xR[i]);
+         state->repwrmserror += sqr(vv * (v - state->tasky.xR[i]));
+         state->repavgerror += fabs(v - state->tasky.xR[i]);
+         if (state->tasky.xR[i] != 0.0) {
+            state->repavgrelerror += fabs(v - state->tasky.xR[i]) / fabs(state->tasky.xR[i]);
+            relcnt++;
+         }
+         state->repmaxerror = rmax2(state->repmaxerror, fabs(v - state->tasky.xR[i]));
+      }
+      state->reprmserror = sqrt(state->reprmserror / n);
+      state->repwrmserror = sqrt(state->repwrmserror / n);
+      state->repavgerror /= n;
+      if (relcnt != 0.0) {
+         state->repavgrelerror /= relcnt;
+      }
+   // Calculate covariance matrix
+      matrixsetlengthatleast(&state->tmpjac, n, k);
+      vectorsetlengthatleast(&state->tmpf, n);
+      vectorsetlengthatleast(&state->tmp, k);
+      if (state->diffstep > 0.0) {
+      // Compute Jacobian by means of numerical differentiation
+         lsfit_lsfitclearrequestfields(state);
+         state->needf = true;
+         for (i = 0; i < n; i++) {
+            ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
+            state->pointindex = i;
+            state->rstate.stage = 10; goto Pause; Resume10:
+            state->tmpf.xR[i] = state->f;
+            for (j = 0; j < k; j++) {
+               v = state->c.xR[j];
+               lx = v - state->diffstep * state->s.xR[j];
+               state->c.xR[j] = lx;
+               if (isfinite(state->bndl.xR[j])) {
+                  state->c.xR[j] = rmax2(state->c.xR[j], state->bndl.xR[j]);
+               }
+               state->rstate.stage = 11; goto Pause; Resume11:
+               lf = state->f;
+               rx = v + state->diffstep * state->s.xR[j];
+               state->c.xR[j] = rx;
+               if (isfinite(state->bndu.xR[j])) {
+                  state->c.xR[j] = rmin2(state->c.xR[j], state->bndu.xR[j]);
+               }
+               state->rstate.stage = 12; goto Pause; Resume12:
+               rf = state->f;
+               state->c.xR[j] = v;
+               if (rx != lx) {
+                  state->tmpjac.xyR[i][j] = (rf - lf) / (rx - lx);
+               } else {
+                  state->tmpjac.xyR[i][j] = 0.0;
+               }
+            }
+         }
+         state->needf = false;
+      } else {
+      // Jacobian is calculated with user-provided analytic gradient
+         lsfit_lsfitclearrequestfields(state);
+         state->needfg = true;
+         for (i = 0; i < n; i++) {
+            ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
+            state->pointindex = i;
+            state->rstate.stage = 13; goto Pause; Resume13:
+            state->tmpf.xR[i] = state->f;
+            for (j = 0; j < k; j++) {
+               state->tmpjac.xyR[i][j] = state->g.xR[j];
+            }
+         }
+         state->needfg = false;
+      }
+      for (i = 0; i < k; i++) {
+         state->tmp.xR[i] = 0.0;
+      }
+      lsfit_estimateerrors(&state->tmpjac, &state->tmpf, &state->tasky, &state->wcur, &state->tmp, &state->s, n, k, &state->rep, &state->tmpjacw, 0);
    }
-// Calculate RMS/Avg/Max/... errors
-   state->reprmserror = 0.0;
-   state->repwrmserror = 0.0;
-   state->repavgerror = 0.0;
-   state->repavgrelerror = 0.0;
-   state->repmaxerror = 0.0;
-   relcnt = 0.0;
-   i = 0;
-lbl_53:
-   if (i > n - 1) {
-      goto lbl_55;
-   }
-   ae_v_move(state->c.xR, 1, state->c1.xR, 1, k);
-   ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
-   state->pointindex = i;
-   lsfit_lsfitclearrequestfields(state);
-   state->needf = true;
-   state->rstate.stage = 9;
-   goto lbl_rcomm;
-lbl_9:
-   state->needf = false;
-   v = state->f;
-   vv = state->wcur.xR[i];
-   state->reprmserror += sqr(v - state->tasky.xR[i]);
-   state->repwrmserror += sqr(vv * (v - state->tasky.xR[i]));
-   state->repavgerror += fabs(v - state->tasky.xR[i]);
-   if (state->tasky.xR[i] != 0.0) {
-      state->repavgrelerror += fabs(v - state->tasky.xR[i]) / fabs(state->tasky.xR[i]);
-      relcnt++;
-   }
-   state->repmaxerror = rmax2(state->repmaxerror, fabs(v - state->tasky.xR[i]));
-   i++;
-   goto lbl_53;
-lbl_55:
-   state->reprmserror = sqrt(state->reprmserror / n);
-   state->repwrmserror = sqrt(state->repwrmserror / n);
-   state->repavgerror /= n;
-   if (relcnt != 0.0) {
-      state->repavgrelerror /= relcnt;
-   }
-// Calculate covariance matrix
-   matrixsetlengthatleast(&state->tmpjac, n, k);
-   vectorsetlengthatleast(&state->tmpf, n);
-   vectorsetlengthatleast(&state->tmp, k);
-   if (state->diffstep <= 0.0) {
-      goto lbl_56;
-   }
-// Compute Jacobian by means of numerical differentiation
-   lsfit_lsfitclearrequestfields(state);
-   state->needf = true;
-   i = 0;
-lbl_58:
-   if (i > n - 1) {
-      goto lbl_60;
-   }
-   ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
-   state->pointindex = i;
-   state->rstate.stage = 10;
-   goto lbl_rcomm;
-lbl_10:
-   state->tmpf.xR[i] = state->f;
-   j = 0;
-lbl_61:
-   if (j > k - 1) {
-      goto lbl_63;
-   }
-   v = state->c.xR[j];
-   lx = v - state->diffstep * state->s.xR[j];
-   state->c.xR[j] = lx;
-   if (isfinite(state->bndl.xR[j])) {
-      state->c.xR[j] = rmax2(state->c.xR[j], state->bndl.xR[j]);
-   }
-   state->rstate.stage = 11;
-   goto lbl_rcomm;
-lbl_11:
-   lf = state->f;
-   rx = v + state->diffstep * state->s.xR[j];
-   state->c.xR[j] = rx;
-   if (isfinite(state->bndu.xR[j])) {
-      state->c.xR[j] = rmin2(state->c.xR[j], state->bndu.xR[j]);
-   }
-   state->rstate.stage = 12;
-   goto lbl_rcomm;
-lbl_12:
-   rf = state->f;
-   state->c.xR[j] = v;
-   if (rx != lx) {
-      state->tmpjac.xyR[i][j] = (rf - lf) / (rx - lx);
-   } else {
-      state->tmpjac.xyR[i][j] = 0.0;
-   }
-   j++;
-   goto lbl_61;
-lbl_63:
-   i++;
-   goto lbl_58;
-lbl_60:
-   state->needf = false;
-   goto lbl_57;
-lbl_56:
-// Jacobian is calculated with user-provided analytic gradient
-   lsfit_lsfitclearrequestfields(state);
-   state->needfg = true;
-   i = 0;
-lbl_64:
-   if (i > n - 1) {
-      goto lbl_66;
-   }
-   ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
-   state->pointindex = i;
-   state->rstate.stage = 13;
-   goto lbl_rcomm;
-lbl_13:
-   state->tmpf.xR[i] = state->f;
-   for (j = 0; j < k; j++) {
-      state->tmpjac.xyR[i][j] = state->g.xR[j];
-   }
-   i++;
-   goto lbl_64;
-lbl_66:
-   state->needfg = false;
-lbl_57:
-   for (i = 0; i < k; i++) {
-      state->tmp.xR[i] = 0.0;
-   }
-   lsfit_estimateerrors(&state->tmpjac, &state->tmpf, &state->tasky, &state->wcur, &state->tmp, &state->s, n, k, &state->rep, &state->tmpjacw, 0);
-lbl_51:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = m;
    state->rstate.ia.xZ[2] = k;
@@ -12767,7 +12597,7 @@ lbl_rcomm:
    state->rstate.ra.xR[6] = v;
    state->rstate.ra.xR[7] = vv;
    state->rstate.ra.xR[8] = relcnt;
-   return result;
+   return true;
 }
 
 // Nonlinear least squares fitting results.

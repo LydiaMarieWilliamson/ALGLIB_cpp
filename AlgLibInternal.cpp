@@ -8680,44 +8680,29 @@ void armijocreate(ae_int_t n, RVector *x, double f, RVector *s, double stp, doub
 bool armijoiteration(armijostate *state) {
    double v;
    ae_int_t n;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      v = state->rstate.ra.xR[0];
-   } else {
-      n = 359;
-      v = -58;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   v = state->rstate.ra.xR[0];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
+Spawn:
+   n = 359;
+   v = -58;
 // Routine body
    if ((state->stplen <= 0.0 || state->stpmax < 0.0) || state->fmax < 2) {
       state->info = 0;
-      result = false;
-      return result;
+      goto Exit;
    }
    if (state->stplen <= linmin_stpmin) {
       state->info = 4;
-      result = false;
-      return result;
+      goto Exit;
    }
    n = state->n;
    state->nfev = 0;
@@ -8734,111 +8719,85 @@ bool armijoiteration(armijostate *state) {
    }
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
+   state->rstate.stage = 0; goto Pause; Resume0:
    state->nfev++;
-   if (state->f >= state->fcur) {
-      goto lbl_4;
-   }
-   state->stplen = v;
-   state->fcur = state->f;
-lbl_6:
-   if (false) {
-      goto lbl_7;
-   }
-// test stopping conditions
-   if (state->nfev >= state->fmax) {
-      state->info = 3;
-      result = false;
-      return result;
-   }
-   if (state->stplen >= state->stpmax) {
-      state->info = 5;
-      result = false;
-      return result;
-   }
-// evaluate F
-   v = state->stplen * linmin_armijofactor;
-   if (v > state->stpmax && state->stpmax != 0.0) {
-      v = state->stpmax;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->nfev++;
-// make decision
    if (state->f < state->fcur) {
       state->stplen = v;
       state->fcur = state->f;
-   } else {
-      state->info = 1;
-      result = false;
-      return result;
+      while (true) {
+      // test stopping conditions
+         if (state->nfev >= state->fmax) {
+            state->info = 3;
+            goto Exit;
+         }
+         if (state->stplen >= state->stpmax) {
+            state->info = 5;
+            goto Exit;
+         }
+      // evaluate F
+         v = state->stplen * linmin_armijofactor;
+         if (v > state->stpmax && state->stpmax != 0.0) {
+            v = state->stpmax;
+         }
+         ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+         ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
+         state->rstate.stage = 1; goto Pause; Resume1:
+         state->nfev++;
+      // make decision
+         if (state->f < state->fcur) {
+            state->stplen = v;
+            state->fcur = state->f;
+         } else {
+            state->info = 1;
+            goto Exit;
+         }
+      }
    }
-   goto lbl_6;
-lbl_7:
-lbl_4:
 // Decrease length
    v = state->stplen / linmin_armijofactor;
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
+   state->rstate.stage = 2; goto Pause; Resume2:
    state->nfev++;
-   if (state->f >= state->fcur) {
-      goto lbl_8;
-   }
-   state->stplen /= linmin_armijofactor;
-   state->fcur = state->f;
-lbl_10:
-   if (false) {
-      goto lbl_11;
-   }
-// test stopping conditions
-   if (state->nfev >= state->fmax) {
-      state->info = 3;
-      result = false;
-      return result;
-   }
-   if (state->stplen <= linmin_stpmin) {
-      state->info = 4;
-      result = false;
-      return result;
-   }
-// evaluate F
-   v = state->stplen / linmin_armijofactor;
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->nfev++;
-// make decision
    if (state->f < state->fcur) {
       state->stplen /= linmin_armijofactor;
       state->fcur = state->f;
-   } else {
-      state->info = 1;
-      result = false;
-      return result;
+      while (true) {
+      // test stopping conditions
+         if (state->nfev >= state->fmax) {
+            state->info = 3;
+            goto Exit;
+         }
+         if (state->stplen <= linmin_stpmin) {
+            state->info = 4;
+            goto Exit;
+         }
+      // evaluate F
+         v = state->stplen / linmin_armijofactor;
+         ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+         ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
+         state->rstate.stage = 3; goto Pause; Resume3:
+         state->nfev++;
+      // make decision
+         if (state->f < state->fcur) {
+            state->stplen /= linmin_armijofactor;
+            state->fcur = state->f;
+         } else {
+            state->info = 1;
+            goto Exit;
+         }
+      }
    }
-   goto lbl_10;
-lbl_11:
-lbl_8:
 // Nothing to be done
    state->info = 1;
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ra.xR[0] = v;
-   return result;
+   return true;
 }
 
 // Results of Armijo search

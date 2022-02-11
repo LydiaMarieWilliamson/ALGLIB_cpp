@@ -532,6 +532,9 @@ A6.3. Test Results
 39	8065 1.0x 12501 1.0x 12199 1.0x 9614 1.0x 1644352844 (6202d54c) 77 // Further reduce ae_state; synthesize TestMode.
 39	7937 1.0x 12501 1.0x 11909 1.0x 9296 1.0x 1644431780 (620409a4) 79 // Recoding state and frame routines in Ap.{cpp,h}.
 39	7353 1.0x 12501 1.0x 12199 1.0x 9534 1.0x 1644465141 (62048bf5) 79 // Elimination of ae_state, temporary reduction of TestX.
+39	7692 1.0x 11629 1.1x 12199 1.0x 9367 1.0x 1644613148 (6206ce1c) 76 // Re-synthesis of RCOMM routines. Failed TestC (iterativesparse, minnlc).
+39	8065 0.9x 11629 0.9x 11368 1.1x 9172 1.0x 1644615571 (6206d793) 78 // Error in TestC (iterativesparse) corrected.
+39	8130 1.0x 12501 1.0x 12052 1.0x 9307 1.0x 1644616814 (6206dc6e) 75 // Error in TestC (minnlc) corrected.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -588,19 +591,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7353
+* RGEMM-SEQ-16   (MFLOPS)   8130
 * RGEMM-MTN-16              1.0x
 * RGEMM-SEQ-32   (MFLOPS)  12501
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12199
+* RGEMM-SEQ-64   (MFLOPS)  12052
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9534
+* RGEMM-SEQ-1024 (MFLOPS)   9307
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1644465141
+SEED: 1644616814
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -700,4 +703,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 79 seconds
+Done in 75 seconds

@@ -23632,57 +23632,53 @@ static bool mlptrain_mlpcontinuetrainingx(mlptrainer *s, ZVector *subset, ae_int
    ae_int_t cursize;
    ae_int_t idx0;
    ae_int_t idx1;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (session->rstate.stage >= 0) {
-      nin = session->rstate.ia.xZ[0];
-      nout = session->rstate.ia.xZ[1];
-      wcount = session->rstate.ia.xZ[2];
-      twcount = session->rstate.ia.xZ[3];
-      ntype = session->rstate.ia.xZ[4];
-      ttype = session->rstate.ia.xZ[5];
-      i = session->rstate.ia.xZ[6];
-      j = session->rstate.ia.xZ[7];
-      k = session->rstate.ia.xZ[8];
-      trnsetsize = session->rstate.ia.xZ[9];
-      epoch = session->rstate.ia.xZ[10];
-      minibatchcount = session->rstate.ia.xZ[11];
-      minibatchidx = session->rstate.ia.xZ[12];
-      cursize = session->rstate.ia.xZ[13];
-      idx0 = session->rstate.ia.xZ[14];
-      idx1 = session->rstate.ia.xZ[15];
-      decay = session->rstate.ra.xR[0];
-      v = session->rstate.ra.xR[1];
-   } else {
-      nin = 359;
-      nout = -58;
-      wcount = -919;
-      twcount = -909;
-      ntype = 81;
-      ttype = 255;
-      i = 74;
-      j = -788;
-      k = 809;
-      trnsetsize = 205;
-      epoch = -838;
-      minibatchcount = 939;
-      minibatchidx = -526;
-      cursize = 763;
-      idx0 = -541;
-      idx1 = -698;
-      decay = -900;
-      v = -318;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (session->rstate.stage < 0) goto Spawn;
+   nin = session->rstate.ia.xZ[0];
+   nout = session->rstate.ia.xZ[1];
+   wcount = session->rstate.ia.xZ[2];
+   twcount = session->rstate.ia.xZ[3];
+   ntype = session->rstate.ia.xZ[4];
+   ttype = session->rstate.ia.xZ[5];
+   i = session->rstate.ia.xZ[6];
+   j = session->rstate.ia.xZ[7];
+   k = session->rstate.ia.xZ[8];
+   trnsetsize = session->rstate.ia.xZ[9];
+   epoch = session->rstate.ia.xZ[10];
+   minibatchcount = session->rstate.ia.xZ[11];
+   minibatchidx = session->rstate.ia.xZ[12];
+   cursize = session->rstate.ia.xZ[13];
+   idx0 = session->rstate.ia.xZ[14];
+   idx1 = session->rstate.ia.xZ[15];
+   decay = session->rstate.ra.xR[0];
+   v = session->rstate.ra.xR[1];
+   switch (session->rstate.stage) {
+      case 0: goto Resume0;
+      default: goto Exit;
    }
-   if (session->rstate.stage == 0) {
-      goto lbl_0;
-   }
+Spawn:
+   nin = 359;
+   nout = -58;
+   wcount = -919;
+   twcount = -909;
+   ntype = 81;
+   ttype = 255;
+   i = 74;
+   j = -788;
+   k = 809;
+   trnsetsize = 205;
+   epoch = -838;
+   minibatchcount = 939;
+   minibatchidx = -526;
+   cursize = 763;
+   idx0 = -541;
+   idx1 = -698;
+   decay = -900;
+   v = -318;
 // Routine body
 // Check correctness of inputs
    ae_assert(s->npoints >= 0, "MLPContinueTrainingX: internal error - parameter S is not initialized or is spoiled(S.NPoints<0).");
@@ -23706,8 +23702,7 @@ static bool mlptrain_mlpcontinuetrainingx(mlptrainer *s, ZVector *subset, ae_int
    }
 // Quick exit on empty training set
    if (s->npoints == 0 || subsetsize == 0) {
-      result = false;
-      return result;
+      goto Exit;
    }
 // Minibatch training
    if (session->algoused == 1) {
@@ -23715,38 +23710,30 @@ static bool mlptrain_mlpcontinuetrainingx(mlptrainer *s, ZVector *subset, ae_int
    }
 // Last option: full batch training
    decay = s->decay;
-lbl_1:
-   if (!minlbfgsiteration(&session->optimizer)) {
-      goto lbl_2;
+   while (minlbfgsiteration(&session->optimizer)) {
+      if (session->optimizer.xupdated) {
+         ae_v_move(session->network.weights.xR, 1, session->optimizer.x.xR, 1, wcount);
+         session->rstate.stage = 0; goto Pause; Resume0: ;
+      }
+      ae_v_move(session->network.weights.xR, 1, session->optimizer.x.xR, 1, wcount);
+      if (s->datatype == 0) {
+         mlpgradbatchsubset(&session->network, &s->densexy, s->npoints, subset, subsetsize, &session->optimizer.f, &session->optimizer.g);
+      }
+      if (s->datatype == 1) {
+         mlpgradbatchsparsesubset(&session->network, &s->sparsexy, s->npoints, subset, subsetsize, &session->optimizer.f, &session->optimizer.g);
+      }
+   // Increment number of operations performed on batch gradient
+      ++*ngradbatch;
+      v = ae_v_dotproduct(session->network.weights.xR, 1, session->network.weights.xR, 1, wcount);
+      session->optimizer.f += 0.5 * decay * v;
+      ae_v_addd(session->optimizer.g.xR, 1, session->network.weights.xR, 1, wcount, decay);
    }
-   if (!session->optimizer.xupdated) {
-      goto lbl_3;
-   }
-   ae_v_move(session->network.weights.xR, 1, session->optimizer.x.xR, 1, wcount);
-   session->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-lbl_3:
-   ae_v_move(session->network.weights.xR, 1, session->optimizer.x.xR, 1, wcount);
-   if (s->datatype == 0) {
-      mlpgradbatchsubset(&session->network, &s->densexy, s->npoints, subset, subsetsize, &session->optimizer.f, &session->optimizer.g);
-   }
-   if (s->datatype == 1) {
-      mlpgradbatchsparsesubset(&session->network, &s->sparsexy, s->npoints, subset, subsetsize, &session->optimizer.f, &session->optimizer.g);
-   }
-// Increment number of operations performed on batch gradient
-   ++*ngradbatch;
-   v = ae_v_dotproduct(session->network.weights.xR, 1, session->network.weights.xR, 1, wcount);
-   session->optimizer.f += 0.5 * decay * v;
-   ae_v_addd(session->optimizer.g.xR, 1, session->network.weights.xR, 1, wcount, decay);
-   goto lbl_1;
-lbl_2:
    minlbfgsresultsbuf(&session->optimizer, &session->network.weights, &session->optimizerrep);
-   result = false;
-   return result;
+Exit:
+   session->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    session->rstate.ia.xZ[0] = nin;
    session->rstate.ia.xZ[1] = nout;
    session->rstate.ia.xZ[2] = wcount;
@@ -23765,7 +23752,7 @@ lbl_rcomm:
    session->rstate.ia.xZ[15] = idx1;
    session->rstate.ra.xR[0] = decay;
    session->rstate.ra.xR[1] = v;
-   return result;
+   return true;
 }
 
 // This function trains neural network passed to this function, using current

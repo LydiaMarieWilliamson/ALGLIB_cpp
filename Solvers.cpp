@@ -4090,182 +4090,132 @@ static bool iterativesparse_sparsesolveriteration(sparsesolverstate *state) {
    double res;
    double prevres;
    double res0;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      outeridx = state->rstate.ia.xZ[0];
-      res = state->rstate.ra.xR[0];
-      prevres = state->rstate.ra.xR[1];
-      res0 = state->rstate.ra.xR[2];
-   } else {
-      outeridx = 359;
-      res = -58;
-      prevres = -919;
-      res0 = -909;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   outeridx = state->rstate.ia.xZ[0];
+   res = state->rstate.ra.xR[0];
+   prevres = state->rstate.ra.xR[1];
+   res0 = state->rstate.ra.xR[2];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
+      case 3: goto Resume3; case 4: goto Resume4;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
+Spawn:
+   outeridx = 359;
+   res = -58;
+   prevres = -919;
+   res0 = -909;
 // Routine body
    state->running = true;
    iterativesparse_clearrequestfields(state);
    iterativesparse_clearreportfields(state);
 // GMRES?
-   if (state->algotype != 0) {
-      goto lbl_5;
-   }
-   if (rdotv2(state->n, &state->x0) != 0.0) {
-      goto lbl_7;
-   }
-// Starting point is default one (zero), quick initialization
-   rsetv(state->n, 0.0, &state->xf);
-   rcopyv(state->n, &state->b, &state->wrkb);
-   goto lbl_8;
-lbl_7:
-// Non-zero starting point is provided,
-   rcopyv(state->n, &state->x0, &state->xf);
-   state->requesttype = 0;
-   rcopyv(state->n, &state->x0, &state->x);
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->requesttype = -999;
-   state->repnmv++;
-   rcopyv(state->n, &state->b, &state->wrkb);
-   raddv(state->n, -1.0, &state->ax, &state->wrkb);
-lbl_8:
-   outeridx = 0;
-   state->repterminationtype = 5;
-   state->repr2 = rdotv2(state->n, &state->wrkb);
-   res0 = sqrt(rdotv2(state->n, &state->b));
-   res = sqrt(state->repr2);
-   if (!state->xrep) {
-      goto lbl_9;
-   }
-// Report initial point
-   state->requesttype = -1;
-   state->reply1 = res * res;
-   rcopyv(state->n, &state->xf, &state->x);
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->requesttype = -999;
-lbl_9:
-lbl_11:
-   if (!(res > 0.0 && (state->maxits == 0 || state->repiterationscount < state->maxits))) {
-      goto lbl_12;
-   }
-// Solve with GMRES(k) for current residual.
-//
-// We set EpsF-based stopping condition for GMRES(k). It allows us
-// to quickly detect sufficient decrease in the residual. We still
-// have to recompute residual after the GMRES round because residuals
-// computed by GMRES are different from the true one (due to restarts).
-//
-// However, checking residual decrease within GMRES still gives us
-// an opportunity to stop early without waiting for GMRES round to
-// complete.
-   fblsgmrescreate(&state->wrkb, state->n, state->gmresk, &state->gmressolver);
-   state->gmressolver.epsres = state->epsf * res0 / res;
-lbl_13:
-   if (!fblsgmresiteration(&state->gmressolver)) {
-      goto lbl_14;
-   }
-   state->requesttype = 0;
-   rcopyv(state->n, &state->gmressolver.x, &state->x);
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->requesttype = -999;
-   rcopyv(state->n, &state->ax, &state->gmressolver.ax);
-   state->repnmv++;
-   if (state->userterminationneeded) {
-   // User requested termination
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-   goto lbl_13;
-lbl_14:
-   state->repiterationscount += state->gmressolver.itsperformed;
-   raddv(state->n, 1.0, &state->gmressolver.xs, &state->xf);
-// Update residual, evaluate residual decrease, terminate if needed
-   state->requesttype = 0;
-   rcopyv(state->n, &state->xf, &state->x);
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->requesttype = -999;
-   state->repnmv++;
-   rcopyv(state->n, &state->b, &state->wrkb);
-   raddv(state->n, -1.0, &state->ax, &state->wrkb);
-   state->repr2 = rdotv2(state->n, &state->wrkb);
-   prevres = res;
-   res = sqrt(state->repr2);
-   if (!state->xrep) {
-      goto lbl_15;
-   }
-// Report initial point
-   state->requesttype = -1;
-   state->reply1 = res * res;
-   rcopyv(state->n, &state->xf, &state->x);
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   state->requesttype = -999;
-lbl_15:
-   if (res <= state->epsf * res0) {
-   // Residual decrease condition met, stopping
-      state->repterminationtype = 1;
-      goto lbl_12;
-   }
-   if (res >= prevres * (1 - sqrt(machineepsilon))) {
-   // The algorithm stagnated
-      state->repterminationtype = 7;
-      goto lbl_12;
-   }
-   if (state->userterminationneeded) {
-   // User requested termination
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-   outeridx++;
-   goto lbl_11;
-lbl_12:
-   result = false;
-   return result;
-lbl_5:
-   ae_assert(false, "SparseSolverIteration: integrity check failed (unexpected algo)");
-   result = false;
-   return result;
+   if (state->algotype == 0) {
+      if (rdotv2(state->n, &state->x0) == 0.0) {
+      // Starting point is default one (zero), quick initialization
+         rsetv(state->n, 0.0, &state->xf);
+         rcopyv(state->n, &state->b, &state->wrkb);
+      } else {
+      // Non-zero starting point is provided,
+         rcopyv(state->n, &state->x0, &state->xf);
+         state->requesttype = 0;
+         rcopyv(state->n, &state->x0, &state->x);
+         state->rstate.stage = 0; goto Pause; Resume0:
+         state->requesttype = -999;
+         state->repnmv++;
+         rcopyv(state->n, &state->b, &state->wrkb);
+         raddv(state->n, -1.0, &state->ax, &state->wrkb);
+      }
+      outeridx = 0;
+      state->repterminationtype = 5;
+      state->repr2 = rdotv2(state->n, &state->wrkb);
+      res0 = sqrt(rdotv2(state->n, &state->b));
+      res = sqrt(state->repr2);
+      if (state->xrep) {
+      // Report initial point
+         state->requesttype = -1;
+         state->reply1 = res * res;
+         rcopyv(state->n, &state->xf, &state->x);
+         state->rstate.stage = 1; goto Pause; Resume1:
+         state->requesttype = -999;
+      }
+      for (; res > 0.0 && (state->maxits == 0 || state->repiterationscount < state->maxits); outeridx++) {
+      // Solve with GMRES(k) for current residual.
+      //
+      // We set EpsF-based stopping condition for GMRES(k). It allows us
+      // to quickly detect sufficient decrease in the residual. We still
+      // have to recompute residual after the GMRES round because residuals
+      // computed by GMRES are different from the true one (due to restarts).
+      //
+      // However, checking residual decrease within GMRES still gives us
+      // an opportunity to stop early without waiting for GMRES round to
+      // complete.
+         fblsgmrescreate(&state->wrkb, state->n, state->gmresk, &state->gmressolver);
+         state->gmressolver.epsres = state->epsf * res0 / res;
+         while (fblsgmresiteration(&state->gmressolver)) {
+            state->requesttype = 0;
+            rcopyv(state->n, &state->gmressolver.x, &state->x);
+            state->rstate.stage = 2; goto Pause; Resume2:
+            state->requesttype = -999;
+            rcopyv(state->n, &state->ax, &state->gmressolver.ax);
+            state->repnmv++;
+            if (state->userterminationneeded) {
+            // User requested termination
+               state->repterminationtype = 8;
+               goto Exit;
+            }
+         }
+         state->repiterationscount += state->gmressolver.itsperformed;
+         raddv(state->n, 1.0, &state->gmressolver.xs, &state->xf);
+      // Update residual, evaluate residual decrease, terminate if needed
+         state->requesttype = 0;
+         rcopyv(state->n, &state->xf, &state->x);
+         state->rstate.stage = 3; goto Pause; Resume3:
+         state->requesttype = -999;
+         state->repnmv++;
+         rcopyv(state->n, &state->b, &state->wrkb);
+         raddv(state->n, -1.0, &state->ax, &state->wrkb);
+         state->repr2 = rdotv2(state->n, &state->wrkb);
+         prevres = res;
+         res = sqrt(state->repr2);
+         if (state->xrep) {
+         // Report initial point
+            state->requesttype = -1;
+            state->reply1 = res * res;
+            rcopyv(state->n, &state->xf, &state->x);
+            state->rstate.stage = 4; goto Pause; Resume4:
+            state->requesttype = -999;
+         }
+         if (res <= state->epsf * res0) {
+         // Residual decrease condition met, stopping
+            state->repterminationtype = 1;
+            break;
+         } else if (res >= prevres * (1 - sqrt(machineepsilon))) {
+         // The algorithm stagnated
+            state->repterminationtype = 7;
+            break;
+         } else if (state->userterminationneeded) {
+         // User requested termination
+            state->repterminationtype = 8;
+            goto Exit;
+         }
+      }
+   } else ae_assert(false, "SparseSolverIteration: integrity check failed (unexpected algo)");
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = outeridx;
    state->rstate.ra.xR[0] = res;
    state->rstate.ra.xR[1] = prevres;
    state->rstate.ra.xR[2] = res0;
-   return result;
+   return true;
 }
 
 // This function initiates out-of-core mode of the sparse solver.  It  should
@@ -5197,50 +5147,26 @@ bool lincgiteration(lincgstate *state) {
    double uvar;
    double bnorm;
    double v;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      i = state->rstate.ia.xZ[0];
-      uvar = state->rstate.ra.xR[0];
-      bnorm = state->rstate.ra.xR[1];
-      v = state->rstate.ra.xR[2];
-   } else {
-      i = 359;
-      uvar = -58;
-      bnorm = -919;
-      v = -909;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   i = state->rstate.ia.xZ[0];
+   uvar = state->rstate.ra.xR[0];
+   bnorm = state->rstate.ra.xR[1];
+   v = state->rstate.ra.xR[2];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
+      case 4: goto Resume4; case 5: goto Resume5; case 6: goto Resume6; case 7: goto Resume7;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
-   if (state->rstate.stage == 5) {
-      goto lbl_5;
-   }
-   if (state->rstate.stage == 6) {
-      goto lbl_6;
-   }
-   if (state->rstate.stage == 7) {
-      goto lbl_7;
-   }
+Spawn:
+   i = 359;
+   uvar = -58;
+   bnorm = -919;
+   v = -909;
 // Routine body
    ae_assert(state->b.cnt > 0, "LinCGIteration: B is not initialized (you must initialize B by LinCGSetB() call");
    state->running = true;
@@ -5253,9 +5179,7 @@ bool lincgiteration(lincgstate *state) {
    state->repnmv++;
    lincg_clearrfields(state);
    state->needvmv = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
+   state->rstate.stage = 0; goto Pause; Resume0:
    state->needvmv = false;
    bnorm = 0.0;
    state->r2 = 0.0;
@@ -5268,17 +5192,13 @@ lbl_0:
    }
    bnorm = sqrt(bnorm);
 // Output first report
-   if (!state->xrep) {
-      goto lbl_8;
+   if (state->xrep) {
+      ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
+      lincg_clearrfields(state);
+      state->xupdated = true;
+      state->rstate.stage = 1; goto Pause; Resume1:
+      state->xupdated = false;
    }
-   ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-   lincg_clearrfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->xupdated = false;
-lbl_8:
 // Is x0 a solution?
    if (!isfinite(state->r2) || sqrt(state->r2) <= state->epsf * bnorm) {
       state->running = false;
@@ -5287,17 +5207,14 @@ lbl_8:
       } else {
          state->repterminationtype = -4;
       }
-      result = false;
-      return result;
+      goto Exit;
    }
 // Calculate Z and P
    ae_v_move(state->x.xR, 1, state->r.xR, 1, state->n);
    state->repnmv++;
    lincg_clearrfields(state);
    state->needprec = true;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
+   state->rstate.stage = 2; goto Pause; Resume2:
    state->needprec = false;
    for (i = 0; i < state->n; i++) {
       state->z.xR[i] = state->pv.xR[i];
@@ -5305,215 +5222,183 @@ lbl_2:
    }
 // Other iterations(1..N)
    state->repiterationscount = 0;
-lbl_10:
-   if (false) {
-      goto lbl_11;
-   }
-   state->repiterationscount++;
-// Calculate Alpha
-   ae_v_move(state->x.xR, 1, state->p.xR, 1, state->n);
-   state->repnmv++;
-   lincg_clearrfields(state);
-   state->needvmv = true;
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->needvmv = false;
-   if (!isfinite(state->vmv) || state->vmv <= 0.0) {
-   // a) Overflow when calculating VMV
-   // b) non-positive VMV (non-SPD matrix)
-      state->running = false;
-      if (isfinite(state->vmv)) {
-         state->repterminationtype = -5;
-      } else {
-         state->repterminationtype = -4;
+   while (true) {
+      state->repiterationscount++;
+   // Calculate Alpha
+      ae_v_move(state->x.xR, 1, state->p.xR, 1, state->n);
+      state->repnmv++;
+      lincg_clearrfields(state);
+      state->needvmv = true;
+      state->rstate.stage = 3; goto Pause; Resume3:
+      state->needvmv = false;
+      if (!isfinite(state->vmv) || state->vmv <= 0.0) {
+      // a) Overflow when calculating VMV
+      // b) non-positive VMV (non-SPD matrix)
+         state->running = false;
+         if (isfinite(state->vmv)) {
+            state->repterminationtype = -5;
+         } else {
+            state->repterminationtype = -4;
+         }
+         goto Exit;
       }
-      result = false;
-      return result;
-   }
-   state->alpha = 0.0;
-   for (i = 0; i < state->n; i++) {
-      state->alpha += state->r.xR[i] * state->z.xR[i];
-   }
-   state->alpha /= state->vmv;
-   if (!isfinite(state->alpha)) {
-   // Overflow when calculating Alpha
-      state->running = false;
-      state->repterminationtype = -4;
-      result = false;
-      return result;
-   }
-// Next step toward solution
-   for (i = 0; i < state->n; i++) {
-      state->cx.xR[i] = state->rx.xR[i] + state->alpha * state->p.xR[i];
-   }
-// Calculate R:
-// * use recurrent relation to update R
-// * at every ItsBeforeRUpdate-th iteration recalculate it from scratch, using matrix-vector product
-//   in case R grows instead of decreasing, algorithm is terminated with positive completion code
-   if (!(state->itsbeforerupdate == 0 || state->repiterationscount % state->itsbeforerupdate != 0)) {
-      goto lbl_12;
-   }
-// Calculate R using recurrent formula
-   for (i = 0; i < state->n; i++) {
-      state->cr.xR[i] = state->r.xR[i] - state->alpha * state->mv.xR[i];
-      state->x.xR[i] = state->cr.xR[i];
-   }
-   goto lbl_13;
-lbl_12:
-// Calculate R using matrix-vector multiplication
-   ae_v_move(state->x.xR, 1, state->cx.xR, 1, state->n);
-   state->repnmv++;
-   lincg_clearrfields(state);
-   state->needmv = true;
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   state->needmv = false;
-   for (i = 0; i < state->n; i++) {
-      state->cr.xR[i] = state->b.xR[i] - state->mv.xR[i];
-      state->x.xR[i] = state->cr.xR[i];
-   }
-// Calculating merit function
-// Check emergency stopping criterion
-   v = 0.0;
-   for (i = 0; i < state->n; i++) {
-      v += state->mv.xR[i] * state->cx.xR[i] - 2 * state->b.xR[i] * state->cx.xR[i];
-   }
-   if (v < state->meritfunction) {
-      goto lbl_14;
-   }
-   for (i = 0; i < state->n; i++) {
-      if (!isfinite(state->rx.xR[i])) {
+      state->alpha = 0.0;
+      for (i = 0; i < state->n; i++) {
+         state->alpha += state->r.xR[i] * state->z.xR[i];
+      }
+      state->alpha /= state->vmv;
+      if (!isfinite(state->alpha)) {
+      // Overflow when calculating Alpha
          state->running = false;
          state->repterminationtype = -4;
-         result = false;
-         return result;
+         goto Exit;
       }
-   }
-// output last report
-   if (!state->xrep) {
-      goto lbl_16;
-   }
-   ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-   lincg_clearrfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 5;
-   goto lbl_rcomm;
-lbl_5:
-   state->xupdated = false;
-lbl_16:
-   state->running = false;
-   state->repterminationtype = 7;
-   result = false;
-   return result;
-lbl_14:
-   state->meritfunction = v;
-lbl_13:
-   ae_v_move(state->rx.xR, 1, state->cx.xR, 1, state->n);
-// calculating RNorm
-//
-// NOTE: monotonic decrease of R2 is not guaranteed by algorithm.
-   state->r2 = 0.0;
-   for (i = 0; i < state->n; i++) {
-      state->r2 += state->cr.xR[i] * state->cr.xR[i];
-   }
-// output report
-   if (!state->xrep) {
-      goto lbl_18;
-   }
-   ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-   lincg_clearrfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 6;
-   goto lbl_rcomm;
-lbl_6:
-   state->xupdated = false;
-lbl_18:
-// stopping criterion
-// achieved the required precision
-   if (!isfinite(state->r2) || sqrt(state->r2) <= state->epsf * bnorm) {
-      state->running = false;
-      if (isfinite(state->r2)) {
-         state->repterminationtype = 1;
-      } else {
-         state->repterminationtype = -4;
-      }
-      result = false;
-      return result;
-   }
-   if (state->repiterationscount >= state->maxits && state->maxits > 0) {
+   // Next step toward solution
       for (i = 0; i < state->n; i++) {
-         if (!isfinite(state->rx.xR[i])) {
+         state->cx.xR[i] = state->rx.xR[i] + state->alpha * state->p.xR[i];
+      }
+   // Calculate R:
+   // * use recurrent relation to update R
+   // * at every ItsBeforeRUpdate-th iteration recalculate it from scratch, using matrix-vector product
+   //   in case R grows instead of decreasing, algorithm is terminated with positive completion code
+      if (state->itsbeforerupdate == 0 || state->repiterationscount % state->itsbeforerupdate != 0) {
+      // Calculate R using recurrent formula
+         for (i = 0; i < state->n; i++) {
+            state->cr.xR[i] = state->r.xR[i] - state->alpha * state->mv.xR[i];
+            state->x.xR[i] = state->cr.xR[i];
+         }
+      } else {
+      // Calculate R using matrix-vector multiplication
+         ae_v_move(state->x.xR, 1, state->cx.xR, 1, state->n);
+         state->repnmv++;
+         lincg_clearrfields(state);
+         state->needmv = true;
+         state->rstate.stage = 4; goto Pause; Resume4:
+         state->needmv = false;
+         for (i = 0; i < state->n; i++) {
+            state->cr.xR[i] = state->b.xR[i] - state->mv.xR[i];
+            state->x.xR[i] = state->cr.xR[i];
+         }
+      // Calculating merit function
+      // Check emergency stopping criterion
+         v = 0.0;
+         for (i = 0; i < state->n; i++) {
+            v += state->mv.xR[i] * state->cx.xR[i] - 2 * state->b.xR[i] * state->cx.xR[i];
+         }
+         if (v >= state->meritfunction) {
+            for (i = 0; i < state->n; i++) {
+               if (!isfinite(state->rx.xR[i])) {
+                  state->running = false;
+                  state->repterminationtype = -4;
+                  goto Exit;
+               }
+            }
+         // output last report
+            if (state->xrep) {
+               ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
+               lincg_clearrfields(state);
+               state->xupdated = true;
+               state->rstate.stage = 5; goto Pause; Resume5:
+               state->xupdated = false;
+            }
+            state->running = false;
+            state->repterminationtype = 7;
+            goto Exit;
+         }
+         state->meritfunction = v;
+      }
+      ae_v_move(state->rx.xR, 1, state->cx.xR, 1, state->n);
+   // calculating RNorm
+   //
+   // NOTE: monotonic decrease of R2 is not guaranteed by algorithm.
+      state->r2 = 0.0;
+      for (i = 0; i < state->n; i++) {
+         state->r2 += state->cr.xR[i] * state->cr.xR[i];
+      }
+   // output report
+      if (state->xrep) {
+         ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
+         lincg_clearrfields(state);
+         state->xupdated = true;
+         state->rstate.stage = 6; goto Pause; Resume6:
+         state->xupdated = false;
+      }
+   // stopping criterion
+   // achieved the required precision
+      if (!isfinite(state->r2) || sqrt(state->r2) <= state->epsf * bnorm) {
+         state->running = false;
+         if (isfinite(state->r2)) {
+            state->repterminationtype = 1;
+         } else {
+            state->repterminationtype = -4;
+         }
+         goto Exit;
+      }
+      if (state->repiterationscount >= state->maxits && state->maxits > 0) {
+         for (i = 0; i < state->n; i++) {
+            if (!isfinite(state->rx.xR[i])) {
+               state->running = false;
+               state->repterminationtype = -4;
+               goto Exit;
+            }
+         }
+      // if X is finite number
+         state->running = false;
+         state->repterminationtype = 5;
+         goto Exit;
+      }
+      ae_v_move(state->x.xR, 1, state->cr.xR, 1, state->n);
+   // prepere of parameters for next iteration
+      state->repnmv++;
+      lincg_clearrfields(state);
+      state->needprec = true;
+      state->rstate.stage = 7; goto Pause; Resume7:
+      state->needprec = false;
+      ae_v_move(state->cz.xR, 1, state->pv.xR, 1, state->n);
+      if (state->repiterationscount % state->itsbeforerestart != 0) {
+         state->beta = 0.0;
+         uvar = 0.0;
+         for (i = 0; i < state->n; i++) {
+            state->beta += state->cz.xR[i] * state->cr.xR[i];
+            uvar += state->z.xR[i] * state->r.xR[i];
+         }
+      // check that UVar is't INF or is't zero
+         if (!isfinite(uvar) || uvar == 0.0) {
             state->running = false;
             state->repterminationtype = -4;
-            result = false;
-            return result;
+            goto Exit;
          }
+      // calculate .BETA
+         state->beta /= uvar;
+      // check that .BETA neither INF nor NaN
+         if (!isfinite(state->beta)) {
+            state->running = false;
+            state->repterminationtype = -1;
+            goto Exit;
+         }
+         for (i = 0; i < state->n; i++) {
+            state->p.xR[i] = state->cz.xR[i] + state->beta * state->p.xR[i];
+         }
+      } else {
+         ae_v_move(state->p.xR, 1, state->cz.xR, 1, state->n);
       }
-   // if X is finite number
-      state->running = false;
-      state->repterminationtype = 5;
-      result = false;
-      return result;
-   }
-   ae_v_move(state->x.xR, 1, state->cr.xR, 1, state->n);
-// prepere of parameters for next iteration
-   state->repnmv++;
-   lincg_clearrfields(state);
-   state->needprec = true;
-   state->rstate.stage = 7;
-   goto lbl_rcomm;
-lbl_7:
-   state->needprec = false;
-   ae_v_move(state->cz.xR, 1, state->pv.xR, 1, state->n);
-   if (state->repiterationscount % state->itsbeforerestart != 0) {
-      state->beta = 0.0;
-      uvar = 0.0;
+   // prepere data for next iteration
       for (i = 0; i < state->n; i++) {
-         state->beta += state->cz.xR[i] * state->cr.xR[i];
-         uvar += state->z.xR[i] * state->r.xR[i];
+      // write (k+1)th iteration to (k )th iteration
+         state->r.xR[i] = state->cr.xR[i];
+         state->z.xR[i] = state->cz.xR[i];
       }
-   // check that UVar is't INF or is't zero
-      if (!isfinite(uvar) || uvar == 0.0) {
-         state->running = false;
-         state->repterminationtype = -4;
-         result = false;
-         return result;
-      }
-   // calculate .BETA
-      state->beta /= uvar;
-   // check that .BETA neither INF nor NaN
-      if (!isfinite(state->beta)) {
-         state->running = false;
-         state->repterminationtype = -1;
-         result = false;
-         return result;
-      }
-      for (i = 0; i < state->n; i++) {
-         state->p.xR[i] = state->cz.xR[i] + state->beta * state->p.xR[i];
-      }
-   } else {
-      ae_v_move(state->p.xR, 1, state->cz.xR, 1, state->n);
    }
-// prepere data for next iteration
-   for (i = 0; i < state->n; i++) {
-   // write (k+1)th iteration to (k )th iteration
-      state->r.xR[i] = state->cr.xR[i];
-      state->z.xR[i] = state->cz.xR[i];
-   }
-   goto lbl_10;
-lbl_11:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = i;
    state->rstate.ra.xR[0] = uvar;
    state->rstate.ra.xR[1] = bnorm;
    state->rstate.ra.xR[2] = v;
-   return result;
+   return true;
 }
 
 // Procedure for restart function LinCGIteration
@@ -6022,45 +5907,24 @@ bool linlsqriteration(linlsqrstate *state) {
    ae_int_t summn;
    double bnorm;
    ae_int_t i;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      summn = state->rstate.ia.xZ[0];
-      i = state->rstate.ia.xZ[1];
-      bnorm = state->rstate.ra.xR[0];
-   } else {
-      summn = 359;
-      i = -58;
-      bnorm = -919;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   summn = state->rstate.ia.xZ[0];
+   i = state->rstate.ia.xZ[1];
+   bnorm = state->rstate.ra.xR[0];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
+      case 4: goto Resume4; case 5: goto Resume5; case 6: goto Resume6;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
-   if (state->rstate.stage == 5) {
-      goto lbl_5;
-   }
-   if (state->rstate.stage == 6) {
-      goto lbl_6;
-   }
+Spawn:
+   summn = 359;
+   i = -58;
+   bnorm = -919;
 // Routine body
    ae_assert(state->b.cnt > 0, "LinLSQRIteration: using non-allocated array B");
    summn = state->m + state->n;
@@ -6073,58 +5937,39 @@ bool linlsqriteration(linlsqrstate *state) {
    linlsqr_clearrfields(state);
 // estimate for ANorm
    normestimatorrestart(&state->nes);
-lbl_7:
-   if (!normestimatoriteration(&state->nes)) {
-      goto lbl_8;
+   while (normestimatoriteration(&state->nes)) {
+      if (state->nes.needmv) {
+         ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->n);
+         state->repnmv++;
+         linlsqr_clearrfields(state);
+         state->needmv = true;
+         state->rstate.stage = 0; goto Pause; Resume0:
+         state->needmv = false;
+         ae_v_move(state->nes.mv.xR, 1, state->mv.xR, 1, state->m);
+      } else if (state->nes.needmtv) {
+         ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->m);
+      // matrix-vector multiplication
+         state->repnmv++;
+         linlsqr_clearrfields(state);
+         state->needmtv = true;
+         state->rstate.stage = 1; goto Pause; Resume1:
+         state->needmtv = false;
+         ae_v_move(state->nes.mtv.xR, 1, state->mtv.xR, 1, state->n);
+      }
    }
-   if (!state->nes.needmv) {
-      goto lbl_9;
-   }
-   ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->n);
-   state->repnmv++;
-   linlsqr_clearrfields(state);
-   state->needmv = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needmv = false;
-   ae_v_move(state->nes.mv.xR, 1, state->mv.xR, 1, state->m);
-   goto lbl_7;
-lbl_9:
-   if (!state->nes.needmtv) {
-      goto lbl_11;
-   }
-   ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->m);
-// matrix-vector multiplication
-   state->repnmv++;
-   linlsqr_clearrfields(state);
-   state->needmtv = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->needmtv = false;
-   ae_v_move(state->nes.mtv.xR, 1, state->mtv.xR, 1, state->n);
-   goto lbl_7;
-lbl_11:
-   goto lbl_7;
-lbl_8:
    normestimatorresults(&state->nes, &state->anorm);
 // initialize .RX by zeros
    for (i = 0; i < state->n; i++) {
       state->rx.xR[i] = 0.0;
    }
 // output first report
-   if (!state->xrep) {
-      goto lbl_13;
+   if (state->xrep) {
+      ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
+      linlsqr_clearrfields(state);
+      state->xupdated = true;
+      state->rstate.stage = 2; goto Pause; Resume2:
+      state->xupdated = false;
    }
-   ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-   linlsqr_clearrfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->xupdated = false;
-lbl_13:
 // LSQR, Step 0.
 //
 // Algorithm outline corresponds to one which was described at p.50 of
@@ -6157,8 +6002,7 @@ lbl_13:
    // Zero right part
       state->running = false;
       state->repterminationtype = 1;
-      result = false;
-      return result;
+      goto Exit;
    }
    for (i = 0; i < summn; i++) {
       if (i < state->m) {
@@ -6171,9 +6015,7 @@ lbl_13:
    state->repnmv++;
    linlsqr_clearrfields(state);
    state->needmtv = true;
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
+   state->rstate.stage = 3; goto Pause; Resume3:
    state->needmtv = false;
    for (i = 0; i < state->n; i++) {
       state->mtv.xR[i] += state->lambdai * state->ui.xR[state->m + i];
@@ -6187,8 +6029,7 @@ lbl_3:
    // Orthogonality stopping criterion is met
       state->running = false;
       state->repterminationtype = 4;
-      result = false;
-      return result;
+      goto Exit;
    }
    for (i = 0; i < state->n; i++) {
       state->vi.xR[i] = state->mtv.xR[i] / state->alphai;
@@ -6201,169 +6042,152 @@ lbl_3:
    }
    state->dnorm = 0.0;
 // Steps I=1, 2, ...
-lbl_15:
-   if (false) {
-      goto lbl_16;
-   }
-// At I-th step State.RepIterationsCount=I.
-   state->repiterationscount++;
-// Bidiagonalization part:
-//     beta[i+1]*u[i+1]  = A_mod*v[i]-alpha[i]*u[i]
-//     alpha[i+1]*v[i+1] = A_mod'*u[i+1] - beta[i+1]*v[i]
-//
-// NOTE:  beta[i+1]=0 or alpha[i+1]=0 will lead to successful termination
-//        in the end of the current iteration. In this case u/v are zero.
-// NOTE2: algorithm won't fail on zero alpha or beta (there will be no
-//        division by zero because it will be stopped BEFORE division
-//        occurs). However, near-zero alpha and beta won't stop algorithm
-//        and, although no division by zero will happen, orthogonality
-//        in U and V will be lost.
-   ae_v_move(state->x.xR, 1, state->vi.xR, 1, state->n);
-   state->repnmv++;
-   linlsqr_clearrfields(state);
-   state->needmv = true;
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   state->needmv = false;
-   for (i = 0; i < state->n; i++) {
-      state->mv.xR[state->m + i] = state->lambdai * state->vi.xR[i];
-   }
-   state->betaip1 = 0.0;
-   for (i = 0; i < summn; i++) {
-      state->uip1.xR[i] = state->mv.xR[i] - state->alphai * state->ui.xR[i];
-      state->betaip1 += state->uip1.xR[i] * state->uip1.xR[i];
-   }
-   if (state->betaip1 != 0.0) {
-      state->betaip1 = sqrt(state->betaip1);
-      for (i = 0; i < summn; i++) {
-         state->uip1.xR[i] /= state->betaip1;
-      }
-   }
-   ae_v_move(state->x.xR, 1, state->uip1.xR, 1, state->m);
-   state->repnmv++;
-   linlsqr_clearrfields(state);
-   state->needmtv = true;
-   state->rstate.stage = 5;
-   goto lbl_rcomm;
-lbl_5:
-   state->needmtv = false;
-   for (i = 0; i < state->n; i++) {
-      state->mtv.xR[i] += state->lambdai * state->uip1.xR[state->m + i];
-   }
-   state->alphaip1 = 0.0;
-   for (i = 0; i < state->n; i++) {
-      state->vip1.xR[i] = state->mtv.xR[i] - state->betaip1 * state->vi.xR[i];
-      state->alphaip1 += state->vip1.xR[i] * state->vip1.xR[i];
-   }
-   if (state->alphaip1 != 0.0) {
-      state->alphaip1 = sqrt(state->alphaip1);
+   while (true) {
+   // At I-th step State.RepIterationsCount=I.
+      state->repiterationscount++;
+   // Bidiagonalization part:
+   //     beta[i+1]*u[i+1]  = A_mod*v[i]-alpha[i]*u[i]
+   //     alpha[i+1]*v[i+1] = A_mod'*u[i+1] - beta[i+1]*v[i]
+   //
+   // NOTE:  beta[i+1]=0 or alpha[i+1]=0 will lead to successful termination
+   //        in the end of the current iteration. In this case u/v are zero.
+   // NOTE2: algorithm won't fail on zero alpha or beta (there will be no
+   //        division by zero because it will be stopped BEFORE division
+   //        occurs). However, near-zero alpha and beta won't stop algorithm
+   //        and, although no division by zero will happen, orthogonality
+   //        in U and V will be lost.
+      ae_v_move(state->x.xR, 1, state->vi.xR, 1, state->n);
+      state->repnmv++;
+      linlsqr_clearrfields(state);
+      state->needmv = true;
+      state->rstate.stage = 4; goto Pause; Resume4:
+      state->needmv = false;
       for (i = 0; i < state->n; i++) {
-         state->vip1.xR[i] /= state->alphaip1;
+         state->mv.xR[state->m + i] = state->lambdai * state->vi.xR[i];
       }
+      state->betaip1 = 0.0;
+      for (i = 0; i < summn; i++) {
+         state->uip1.xR[i] = state->mv.xR[i] - state->alphai * state->ui.xR[i];
+         state->betaip1 += state->uip1.xR[i] * state->uip1.xR[i];
+      }
+      if (state->betaip1 != 0.0) {
+         state->betaip1 = sqrt(state->betaip1);
+         for (i = 0; i < summn; i++) {
+            state->uip1.xR[i] /= state->betaip1;
+         }
+      }
+      ae_v_move(state->x.xR, 1, state->uip1.xR, 1, state->m);
+      state->repnmv++;
+      linlsqr_clearrfields(state);
+      state->needmtv = true;
+      state->rstate.stage = 5; goto Pause; Resume5:
+      state->needmtv = false;
+      for (i = 0; i < state->n; i++) {
+         state->mtv.xR[i] += state->lambdai * state->uip1.xR[state->m + i];
+      }
+      state->alphaip1 = 0.0;
+      for (i = 0; i < state->n; i++) {
+         state->vip1.xR[i] = state->mtv.xR[i] - state->betaip1 * state->vi.xR[i];
+         state->alphaip1 += state->vip1.xR[i] * state->vip1.xR[i];
+      }
+      if (state->alphaip1 != 0.0) {
+         state->alphaip1 = sqrt(state->alphaip1);
+         for (i = 0; i < state->n; i++) {
+            state->vip1.xR[i] /= state->alphaip1;
+         }
+      }
+   // Build next orthogonal transformation
+      state->rhoi = safepythag2(state->rhobari, state->betaip1);
+      state->ci = state->rhobari / state->rhoi;
+      state->si = state->betaip1 / state->rhoi;
+      state->theta = state->si * state->alphaip1;
+      state->rhobarip1 = -state->ci * state->alphaip1;
+      state->phii = state->ci * state->phibari;
+      state->phibarip1 = state->si * state->phibari;
+   // Update .RNorm
+   //
+   // This tricky  formula  is  necessary  because  simply  writing
+   // State.R2:=State.PhiBarIP1*State.PhiBarIP1 does NOT guarantees
+   // monotonic decrease of R2. Roundoff error combined with 80-bit
+   // precision used internally by Intel chips allows R2 to increase
+   // slightly in some rare, but possible cases. This property is
+   // undesirable, so we prefer to guard against R increase.
+      state->r2 = rmin2(state->r2, state->phibarip1 * state->phibarip1);
+   // Update d and DNorm, check condition-related stopping criteria
+      for (i = 0; i < state->n; i++) {
+         state->d.xR[i] = 1 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
+         state->dnorm += state->d.xR[i] * state->d.xR[i];
+      }
+      if (sqrt(state->dnorm) * state->anorm >= state->epsc) {
+         state->running = false;
+         state->repterminationtype = 7;
+         goto Exit;
+      }
+   // Update x, output report
+      for (i = 0; i < state->n; i++) {
+         state->rx.xR[i] += state->phii / state->rhoi * state->omegai.xR[i];
+      }
+      if (state->xrep) {
+         ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
+         linlsqr_clearrfields(state);
+         state->xupdated = true;
+         state->rstate.stage = 6; goto Pause; Resume6:
+         state->xupdated = false;
+      }
+   // Check stopping criteria
+   // 1. achieved required number of iterations;
+   // 2. ||Rk|| <= EpsB*||B||;
+   // 3. ||A^T*Rk||/(||A||*||Rk||) <= EpsA;
+      if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
+      // Achieved required number of iterations
+         state->running = false;
+         state->repterminationtype = 5;
+         goto Exit;
+      }
+      if (state->phibarip1 <= state->epsb * bnorm) {
+      // ||Rk|| <= EpsB*||B||, here ||Rk||=PhiBar
+         state->running = false;
+         state->repterminationtype = 1;
+         goto Exit;
+      }
+      if (state->alphaip1 * fabs(state->ci) / state->anorm <= state->epsa) {
+      // ||A^T*Rk||/(||A||*||Rk||) <= EpsA, here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
+         state->running = false;
+         state->repterminationtype = 4;
+         goto Exit;
+      }
+      if (state->userterminationneeded) {
+      // User requested termination
+         state->running = false;
+         state->repterminationtype = 8;
+         goto Exit;
+      }
+   // Update omega
+      for (i = 0; i < state->n; i++) {
+         state->omegaip1.xR[i] = state->vip1.xR[i] - state->theta / state->rhoi * state->omegai.xR[i];
+      }
+   // Prepare for the next iteration - rename variables:
+   // u[i]   := u[i+1]
+   // v[i]   := v[i+1]
+   // rho[i] := rho[i+1]
+   // ...
+      ae_v_move(state->ui.xR, 1, state->uip1.xR, 1, summn);
+      ae_v_move(state->vi.xR, 1, state->vip1.xR, 1, state->n);
+      ae_v_move(state->omegai.xR, 1, state->omegaip1.xR, 1, state->n);
+      state->alphai = state->alphaip1;
+      state->betai = state->betaip1;
+      state->phibari = state->phibarip1;
+      state->rhobari = state->rhobarip1;
    }
-// Build next orthogonal transformation
-   state->rhoi = safepythag2(state->rhobari, state->betaip1);
-   state->ci = state->rhobari / state->rhoi;
-   state->si = state->betaip1 / state->rhoi;
-   state->theta = state->si * state->alphaip1;
-   state->rhobarip1 = -state->ci * state->alphaip1;
-   state->phii = state->ci * state->phibari;
-   state->phibarip1 = state->si * state->phibari;
-// Update .RNorm
-//
-// This tricky  formula  is  necessary  because  simply  writing
-// State.R2:=State.PhiBarIP1*State.PhiBarIP1 does NOT guarantees
-// monotonic decrease of R2. Roundoff error combined with 80-bit
-// precision used internally by Intel chips allows R2 to increase
-// slightly in some rare, but possible cases. This property is
-// undesirable, so we prefer to guard against R increase.
-   state->r2 = rmin2(state->r2, state->phibarip1 * state->phibarip1);
-// Update d and DNorm, check condition-related stopping criteria
-   for (i = 0; i < state->n; i++) {
-      state->d.xR[i] = 1 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
-      state->dnorm += state->d.xR[i] * state->d.xR[i];
-   }
-   if (sqrt(state->dnorm) * state->anorm >= state->epsc) {
-      state->running = false;
-      state->repterminationtype = 7;
-      result = false;
-      return result;
-   }
-// Update x, output report
-   for (i = 0; i < state->n; i++) {
-      state->rx.xR[i] += state->phii / state->rhoi * state->omegai.xR[i];
-   }
-   if (!state->xrep) {
-      goto lbl_17;
-   }
-   ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-   linlsqr_clearrfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 6;
-   goto lbl_rcomm;
-lbl_6:
-   state->xupdated = false;
-lbl_17:
-// Check stopping criteria
-// 1. achieved required number of iterations;
-// 2. ||Rk|| <= EpsB*||B||;
-// 3. ||A^T*Rk||/(||A||*||Rk||) <= EpsA;
-   if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
-   // Achieved required number of iterations
-      state->running = false;
-      state->repterminationtype = 5;
-      result = false;
-      return result;
-   }
-   if (state->phibarip1 <= state->epsb * bnorm) {
-   // ||Rk|| <= EpsB*||B||, here ||Rk||=PhiBar
-      state->running = false;
-      state->repterminationtype = 1;
-      result = false;
-      return result;
-   }
-   if (state->alphaip1 * fabs(state->ci) / state->anorm <= state->epsa) {
-   // ||A^T*Rk||/(||A||*||Rk||) <= EpsA, here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
-      state->running = false;
-      state->repterminationtype = 4;
-      result = false;
-      return result;
-   }
-   if (state->userterminationneeded) {
-   // User requested termination
-      state->running = false;
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-// Update omega
-   for (i = 0; i < state->n; i++) {
-      state->omegaip1.xR[i] = state->vip1.xR[i] - state->theta / state->rhoi * state->omegai.xR[i];
-   }
-// Prepare for the next iteration - rename variables:
-// u[i]   := u[i+1]
-// v[i]   := v[i+1]
-// rho[i] := rho[i+1]
-// ...
-   ae_v_move(state->ui.xR, 1, state->uip1.xR, 1, summn);
-   ae_v_move(state->vi.xR, 1, state->vip1.xR, 1, state->n);
-   ae_v_move(state->omegai.xR, 1, state->omegaip1.xR, 1, state->n);
-   state->alphai = state->alphaip1;
-   state->betai = state->betaip1;
-   state->phibari = state->phibarip1;
-   state->rhobari = state->rhobarip1;
-   goto lbl_15;
-lbl_16:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = summn;
    state->rstate.ia.xZ[1] = i;
    state->rstate.ra.xR[0] = bnorm;
-   return result;
+   return true;
 }
 
 // This function restarts LinLSQRIteration
@@ -7020,53 +6844,38 @@ bool nleqiteration(nleqstate *state) {
    double mu;
    double stepnorm;
    bool b;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      m = state->rstate.ia.xZ[1];
-      i = state->rstate.ia.xZ[2];
-      b = state->rstate.ba.xB[0];
-      lambdaup = state->rstate.ra.xR[0];
-      lambdadown = state->rstate.ra.xR[1];
-      lambdav = state->rstate.ra.xR[2];
-      rho = state->rstate.ra.xR[3];
-      mu = state->rstate.ra.xR[4];
-      stepnorm = state->rstate.ra.xR[5];
-   } else {
-      n = 359;
-      m = -58;
-      i = -919;
-      b = true;
-      lambdaup = 81;
-      lambdadown = 255;
-      lambdav = 74;
-      rho = -788;
-      mu = 809;
-      stepnorm = 205;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   m = state->rstate.ia.xZ[1];
+   i = state->rstate.ia.xZ[2];
+   b = state->rstate.ba.xB[0];
+   lambdaup = state->rstate.ra.xR[0];
+   lambdadown = state->rstate.ra.xR[1];
+   lambdav = state->rstate.ra.xR[2];
+   rho = state->rstate.ra.xR[3];
+   mu = state->rstate.ra.xR[4];
+   stepnorm = state->rstate.ra.xR[5];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
+      case 3: goto Resume3; case 4: goto Resume4;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
+Spawn:
+   n = 359;
+   m = -58;
+   i = -919;
+   b = true;
+   lambdaup = 81;
+   lambdadown = 255;
+   lambdav = 74;
+   rho = -788;
+   mu = 809;
+   stepnorm = 205;
 // Routine body
 // Prepare
    n = state->n;
@@ -7078,165 +6887,142 @@ bool nleqiteration(nleqstate *state) {
 // Calculate F/G, initialize algorithm
    nleq_clearrequestfields(state);
    state->needf = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
+   state->rstate.stage = 0; goto Pause; Resume0:
    state->needf = false;
    state->repnfunc++;
    ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
    state->fbase = state->f;
    state->fprev = maxrealnumber;
-   if (!state->xrep) {
-      goto lbl_5;
+   if (state->xrep) {
+   // progress report
+      nleq_clearrequestfields(state);
+      state->xupdated = true;
+      state->rstate.stage = 1; goto Pause; Resume1:
+      state->xupdated = false;
    }
-// progress report
-   nleq_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->xupdated = false;
-lbl_5:
    if (state->f <= sqr(state->epsf)) {
       state->repterminationtype = 1;
-      result = false;
-      return result;
+      goto Exit;
    }
 // Main cycle
    lambdaup = 10.0;
    lambdadown = 0.3;
    lambdav = 0.001;
    rho = 1.0;
-lbl_7:
-   if (false) {
-      goto lbl_8;
-   }
-// Get Jacobian;
-// before we get to this point we already have State.XBase filled
-// with current point and State.FBase filled with function value
-// at XBase
-   nleq_clearrequestfields(state);
-   state->needfij = true;
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->needfij = false;
-   state->repnfunc++;
-   state->repnjac++;
-   rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->rightpart, 0);
-   ae_v_muld(state->rightpart.xR, 1, n, -1);
-// Inner cycle: find good lambda
-lbl_9:
-   if (false) {
-      goto lbl_10;
-   }
-// Solve (J^T*J + (Lambda+Mu)*I)*y = J^T*F
-// to get step d=-y where:
-// * Mu=||F|| - is damping parameter for nonlinear system
-// * Lambda   - is additional Levenberg-Marquardt parameter
-//              for better convergence when far away from minimum
-   for (i = 0; i < n; i++) {
-      state->candstep.xR[i] = 0.0;
-   }
-   fblssolvecgx(&state->j, m, n, lambdav, &state->rightpart, &state->candstep, &state->cgbuf);
-// Normalize step (it must be no more than StpMax)
-   stepnorm = 0.0;
-   for (i = 0; i < n; i++) {
-      if (state->candstep.xR[i] != 0.0) {
-         stepnorm = 1.0;
+   while (true) {
+   // Get Jacobian;
+   // before we get to this point we already have State.XBase filled
+   // with current point and State.FBase filled with function value
+   // at XBase
+      nleq_clearrequestfields(state);
+      state->needfij = true;
+      ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+      state->rstate.stage = 2; goto Pause; Resume2:
+      state->needfij = false;
+      state->repnfunc++;
+      state->repnjac++;
+      rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->rightpart, 0);
+      ae_v_muld(state->rightpart.xR, 1, n, -1);
+   // Inner cycle: find good lambda
+      while (true) {
+      // Solve (J^T*J + (Lambda+Mu)*I)*y = J^T*F
+      // to get step d=-y where:
+      // * Mu=||F|| - is damping parameter for nonlinear system
+      // * Lambda   - is additional Levenberg-Marquardt parameter
+      //              for better convergence when far away from minimum
+         for (i = 0; i < n; i++) {
+            state->candstep.xR[i] = 0.0;
+         }
+         fblssolvecgx(&state->j, m, n, lambdav, &state->rightpart, &state->candstep, &state->cgbuf);
+      // Normalize step (it must be no more than StpMax)
+         stepnorm = 0.0;
+         for (i = 0; i < n; i++) {
+            if (state->candstep.xR[i] != 0.0) {
+               stepnorm = 1.0;
+               break;
+            }
+         }
+         linminnormalized(&state->candstep, &stepnorm, n);
+         if (state->stpmax != 0.0) {
+            stepnorm = rmin2(stepnorm, state->stpmax);
+         }
+      // Test new step - is it good enough?
+      // * if not, Lambda is increased and we try again.
+      // * if step is good, we decrease Lambda and move on.
+      //
+      // We can break this cycle on two occasions:
+      // * step is so small that x+step == x (in floating point arithmetics)
+      // * lambda is so large
+         ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+         ae_v_addd(state->x.xR, 1, state->candstep.xR, 1, n, stepnorm);
+         b = true;
+         for (i = 0; i < n; i++) {
+            if (state->x.xR[i] != state->xbase.xR[i]) {
+               b = false;
+               break;
+            }
+         }
+         if (b) {
+         // Step is too small, force zero step and break
+            stepnorm = 0.0;
+            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+            state->f = state->fbase;
+            break;
+         }
+         nleq_clearrequestfields(state);
+         state->needf = true;
+         state->rstate.stage = 3; goto Pause; Resume3:
+         state->needf = false;
+         state->repnfunc++;
+         if (state->f < state->fbase) {
+         // function value decreased, move on
+            nleq_decreaselambda(&lambdav, &rho, lambdadown);
+            break;
+         }
+         if (!nleq_increaselambda(&lambdav, &rho, lambdaup)) {
+         // Lambda is too large (near overflow), force zero step and break
+            stepnorm = 0.0;
+            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+            state->f = state->fbase;
+            break;
+         }
+      }
+   // Accept step:
+   // * new position
+   // * new function value
+      state->fbase = state->f;
+      ae_v_addd(state->xbase.xR, 1, state->candstep.xR, 1, n, stepnorm);
+      state->repiterationscount++;
+   // Report new iteration
+      if (state->xrep) {
+         nleq_clearrequestfields(state);
+         state->xupdated = true;
+         state->f = state->fbase;
+         ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+         state->rstate.stage = 4; goto Pause; Resume4:
+         state->xupdated = false;
+      }
+   // Test stopping conditions on F, step (zero/non-zero) and MaxIts;
+   // If one of the conditions is met, RepTerminationType is changed.
+      if (sqrt(state->f) <= state->epsf) {
+         state->repterminationtype = 1;
+      }
+      if (stepnorm == 0.0 && state->repterminationtype == 0) {
+         state->repterminationtype = -4;
+      }
+      if (state->repiterationscount >= state->maxits && state->maxits > 0) {
+         state->repterminationtype = 5;
+      }
+      if (state->repterminationtype != 0) {
          break;
       }
+   // Now, iteration is finally over
    }
-   linminnormalized(&state->candstep, &stepnorm, n);
-   if (state->stpmax != 0.0) {
-      stepnorm = rmin2(stepnorm, state->stpmax);
-   }
-// Test new step - is it good enough?
-// * if not, Lambda is increased and we try again.
-// * if step is good, we decrease Lambda and move on.
-//
-// We can break this cycle on two occasions:
-// * step is so small that x+step == x (in floating point arithmetics)
-// * lambda is so large
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   ae_v_addd(state->x.xR, 1, state->candstep.xR, 1, n, stepnorm);
-   b = true;
-   for (i = 0; i < n; i++) {
-      if (state->x.xR[i] != state->xbase.xR[i]) {
-         b = false;
-         break;
-      }
-   }
-   if (b) {
-   // Step is too small, force zero step and break
-      stepnorm = 0.0;
-      ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-      state->f = state->fbase;
-      goto lbl_10;
-   }
-   nleq_clearrequestfields(state);
-   state->needf = true;
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->needf = false;
-   state->repnfunc++;
-   if (state->f < state->fbase) {
-   // function value decreased, move on
-      nleq_decreaselambda(&lambdav, &rho, lambdadown);
-      goto lbl_10;
-   }
-   if (!nleq_increaselambda(&lambdav, &rho, lambdaup)) {
-   // Lambda is too large (near overflow), force zero step and break
-      stepnorm = 0.0;
-      ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-      state->f = state->fbase;
-      goto lbl_10;
-   }
-   goto lbl_9;
-lbl_10:
-// Accept step:
-// * new position
-// * new function value
-   state->fbase = state->f;
-   ae_v_addd(state->xbase.xR, 1, state->candstep.xR, 1, n, stepnorm);
-   state->repiterationscount++;
-// Report new iteration
-   if (!state->xrep) {
-      goto lbl_11;
-   }
-   nleq_clearrequestfields(state);
-   state->xupdated = true;
-   state->f = state->fbase;
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   state->xupdated = false;
-lbl_11:
-// Test stopping conditions on F, step (zero/non-zero) and MaxIts;
-// If one of the conditions is met, RepTerminationType is changed.
-   if (sqrt(state->f) <= state->epsf) {
-      state->repterminationtype = 1;
-   }
-   if (stepnorm == 0.0 && state->repterminationtype == 0) {
-      state->repterminationtype = -4;
-   }
-   if (state->repiterationscount >= state->maxits && state->maxits > 0) {
-      state->repterminationtype = 5;
-   }
-   if (state->repterminationtype != 0) {
-      goto lbl_8;
-   }
-// Now, iteration is finally over
-   goto lbl_7;
-lbl_8:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = m;
    state->rstate.ia.xZ[2] = i;
@@ -7247,7 +7033,7 @@ lbl_rcomm:
    state->rstate.ra.xR[3] = rho;
    state->rstate.ra.xR[4] = mu;
    state->rstate.ra.xR[5] = stepnorm;
-   return result;
+   return true;
 }
 
 // NLEQ solver results

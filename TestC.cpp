@@ -7826,42 +7826,35 @@ static bool testsparseunit_generatenext(sparsegenerator *g, RMatrix *da, sparsem
    ae_int_t i;
    ae_int_t j;
    double v;
-   bool result;
    SetMatrix(da);
    SetObj(sparsematrix, sa);
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (g->rcs.stage >= 0) {
-      n = g->rcs.ia.xZ[0];
-      m = g->rcs.ia.xZ[1];
-      nz = g->rcs.ia.xZ[2];
-      nzd = g->rcs.ia.xZ[3];
-      i = g->rcs.ia.xZ[4];
-      j = g->rcs.ia.xZ[5];
-      pnz = g->rcs.ra.xR[0];
-      v = g->rcs.ra.xR[1];
-   } else {
-      n = 359;
-      m = -58;
-      nz = -919;
-      nzd = -909;
-      i = 81;
-      j = 255;
-      pnz = 74;
-      v = -788;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (g->rcs.stage < 0) goto Spawn;
+   n = g->rcs.ia.xZ[0];
+   m = g->rcs.ia.xZ[1];
+   nz = g->rcs.ia.xZ[2];
+   nzd = g->rcs.ia.xZ[3];
+   i = g->rcs.ia.xZ[4];
+   j = g->rcs.ia.xZ[5];
+   pnz = g->rcs.ra.xR[0];
+   v = g->rcs.ra.xR[1];
+   switch (g->rcs.stage) {
+      case 0: goto Resume0; case 1: goto Resume1;
+      default: goto Exit;
    }
-   if (g->rcs.stage == 0) {
-      goto lbl_0;
-   }
-   if (g->rcs.stage == 1) {
-      goto lbl_1;
-   }
+Spawn:
+   n = 359;
+   m = -58;
+   nz = -919;
+   nzd = -909;
+   i = 81;
+   j = 255;
+   pnz = 74;
+   v = -788;
 // Routine body
    n = g->n;
    if (g->m == 0) {
@@ -7870,122 +7863,94 @@ static bool testsparseunit_generatenext(sparsegenerator *g, RMatrix *da, sparsem
       m = g->m;
    }
    ae_assert(m > 0 && n > 0, "GenerateNext: incorrect N/M");
-// Generate general sparse matrix
-   if (g->matkind != 0) {
-      goto lbl_2;
-   }
-   nz = n * m;
-lbl_4:
-   if (false) {
-      goto lbl_5;
-   }
-// Generate dense N*N matrix where probability of element
-// being non-zero is PNZ.
-   pnz = (double)nz / (n * m);
-   ae_matrix_set_length(&g->bufa, m, n);
-   for (i = 0; i < m; i++) {
-      for (j = 0; j < n; j++) {
-         if (hqrnduniformr(&g->rs) <= pnz) {
-            g->bufa.xyR[i][j] = hqrnduniformr(&g->rs) - 0.5;
-         } else {
-            g->bufa.xyR[i][j] = 0.0;
+   if (g->matkind == 0) { // Generate general sparse matrix
+      for (nz = n * m; ; nz /= 2) {
+      // Generate dense N*N matrix where probability of element
+      // being non-zero is PNZ.
+         pnz = (double)nz / (n * m);
+         ae_matrix_set_length(&g->bufa, m, n);
+         for (i = 0; i < m; i++) {
+            for (j = 0; j < n; j++) {
+               if (hqrnduniformr(&g->rs) <= pnz) {
+                  g->bufa.xyR[i][j] = hqrnduniformr(&g->rs) - 0.5;
+               } else {
+                  g->bufa.xyR[i][j] = 0.0;
+               }
+            }
+         }
+      // Output matrix and RComm
+         ae_matrix_set_length(da, m, n);
+         sparsecreate(m, n, iround(pnz * m * n), sa);
+         for (i = 0; i < m; i++) {
+            for (j = 0; j < n; j++) {
+               if ((j <= i && g->triangle <= 0) || (j >= i && g->triangle >= 0)) {
+                  da->xyR[i][j] = g->bufa.xyR[i][j];
+                  sparseset(sa, i, j, g->bufa.xyR[i][j]);
+               } else {
+                  da->xyR[i][j] = 0.0;
+               }
+            }
+         }
+         g->rcs.stage = 0; goto Pause; Resume0:
+      // Increase problem sparsity and try one more time.
+      // Stop after testing NZ=0.
+         if (nz == 0) {
+            break;
          }
       }
-   }
-// Output matrix and RComm
-   ae_matrix_set_length(da, m, n);
-   sparsecreate(m, n, iround(pnz * m * n), sa);
-   for (i = 0; i < m; i++) {
-      for (j = 0; j < n; j++) {
-         if ((j <= i && g->triangle <= 0) || (j >= i && g->triangle >= 0)) {
-            da->xyR[i][j] = g->bufa.xyR[i][j];
-            sparseset(sa, i, j, g->bufa.xyR[i][j]);
+   } else if (g->matkind == 1) { // Generate general sparse matrix with non-zero diagonal
+      ae_assert(n == m, "GenerateNext: non-square matrix for MatKind=1");
+      for (nz = n * n - n; ; nz /= 2) {
+      // Generate dense N*N matrix where probability of non-diagonal element
+      // being non-zero is PNZ.
+         if (n > 1) {
+            pnz = (double)nz / (n * n - n);
          } else {
-            da->xyR[i][j] = 0.0;
+            pnz = 1.0;
+         }
+         ae_matrix_set_length(&g->bufa, n, n);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               if (i == j) {
+                  do {
+                     g->bufa.xyR[i][i] = hqrnduniformr(&g->rs) - 0.5;
+                  } while (g->bufa.xyR[i][i] == 0.0);
+                  g->bufa.xyR[i][i] += 1.5 * sign(g->bufa.xyR[i][i]);
+                  continue;
+               }
+               if (hqrnduniformr(&g->rs) <= pnz) {
+                  g->bufa.xyR[i][j] = hqrnduniformr(&g->rs) - 0.5;
+               } else {
+                  g->bufa.xyR[i][j] = 0.0;
+               }
+            }
+         }
+      // Output matrix and RComm
+         ae_matrix_set_length(da, n, n);
+         sparsecreate(n, n, iround(pnz * (n * n - n) + n), sa);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               if ((j <= i && g->triangle <= 0) || (j >= i && g->triangle >= 0)) {
+                  da->xyR[i][j] = g->bufa.xyR[i][j];
+                  sparseset(sa, i, j, g->bufa.xyR[i][j]);
+               } else {
+                  da->xyR[i][j] = 0.0;
+               }
+            }
+         }
+         g->rcs.stage = 1; goto Pause; Resume1:
+      // Increase problem sparsity and try one more time.
+      // Stop after testing NZ=0.
+         if (nz == 0) {
+            break;
          }
       }
-   }
-   g->rcs.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-// Increase problem sparsity and try one more time.
-// Stop after testing NZ=0.
-   if (nz == 0) {
-      goto lbl_5;
-   }
-   nz /= 2;
-   goto lbl_4;
-lbl_5:
-   result = false;
-   return result;
-lbl_2:
-// Generate general sparse matrix with non-zero diagonal
-   if (g->matkind != 1) {
-      goto lbl_6;
-   }
-   ae_assert(n == m, "GenerateNext: non-square matrix for MatKind=1");
-   nz = n * n - n;
-lbl_8:
-   if (false) {
-      goto lbl_9;
-   }
-// Generate dense N*N matrix where probability of non-diagonal element
-// being non-zero is PNZ.
-   if (n > 1) {
-      pnz = (double)nz / (n * n - n);
-   } else {
-      pnz = 1.0;
-   }
-   ae_matrix_set_length(&g->bufa, n, n);
-   for (i = 0; i < n; i++) {
-      for (j = 0; j < n; j++) {
-         if (i == j) {
-            do {
-               g->bufa.xyR[i][i] = hqrnduniformr(&g->rs) - 0.5;
-            } while (g->bufa.xyR[i][i] == 0.0);
-            g->bufa.xyR[i][i] += 1.5 * sign(g->bufa.xyR[i][i]);
-            continue;
-         }
-         if (hqrnduniformr(&g->rs) <= pnz) {
-            g->bufa.xyR[i][j] = hqrnduniformr(&g->rs) - 0.5;
-         } else {
-            g->bufa.xyR[i][j] = 0.0;
-         }
-      }
-   }
-// Output matrix and RComm
-   ae_matrix_set_length(da, n, n);
-   sparsecreate(n, n, iround(pnz * (n * n - n) + n), sa);
-   for (i = 0; i < n; i++) {
-      for (j = 0; j < n; j++) {
-         if ((j <= i && g->triangle <= 0) || (j >= i && g->triangle >= 0)) {
-            da->xyR[i][j] = g->bufa.xyR[i][j];
-            sparseset(sa, i, j, g->bufa.xyR[i][j]);
-         } else {
-            da->xyR[i][j] = 0.0;
-         }
-      }
-   }
-   g->rcs.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-// Increase problem sparsity and try one more time.
-// Stop after testing NZ=0.
-   if (nz == 0) {
-      goto lbl_9;
-   }
-   nz /= 2;
-   goto lbl_8;
-lbl_9:
-   result = false;
-   return result;
-lbl_6:
-   ae_assert(false, "Assertion failed");
-   result = false;
-   return result;
+   } else ae_assert(false, "Assertion failed");
+Exit:
+   g->rcs.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    g->rcs.ia.xZ[0] = n;
    g->rcs.ia.xZ[1] = m;
    g->rcs.ia.xZ[2] = nz;
@@ -7994,7 +7959,7 @@ lbl_rcomm:
    g->rcs.ia.xZ[5] = j;
    g->rcs.ra.xR[0] = pnz;
    g->rcs.ra.xR[1] = v;
-   return result;
+   return true;
 }
 
 // Function for testing Level 2 unsymmetric linear algebra functions.

@@ -1661,53 +1661,43 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state) {
    ae_int_t ns;
    double qeps;
    ae_int_t info;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      i = state->rstate.ia.xZ[0];
-      j = state->rstate.ia.xZ[1];
-      ns = state->rstate.ia.xZ[2];
-      info = state->rstate.ia.xZ[3];
-      c1 = state->rstate.ra.xR[0];
-      c2 = state->rstate.ra.xR[1];
-      intg = state->rstate.ra.xR[2];
-      intk = state->rstate.ra.xR[3];
-      inta = state->rstate.ra.xR[4];
-      v = state->rstate.ra.xR[5];
-      ta = state->rstate.ra.xR[6];
-      tb = state->rstate.ra.xR[7];
-      qeps = state->rstate.ra.xR[8];
-   } else {
-      i = 939;
-      j = -526;
-      ns = 763;
-      info = -541;
-      c1 = -698;
-      c2 = -900;
-      intg = -318;
-      intk = -940;
-      inta = 1016;
-      v = -229;
-      ta = -536;
-      tb = 487;
-      qeps = -115;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   i = state->rstate.ia.xZ[0];
+   j = state->rstate.ia.xZ[1];
+   ns = state->rstate.ia.xZ[2];
+   info = state->rstate.ia.xZ[3];
+   c1 = state->rstate.ra.xR[0];
+   c2 = state->rstate.ra.xR[1];
+   intg = state->rstate.ra.xR[2];
+   intk = state->rstate.ra.xR[3];
+   inta = state->rstate.ra.xR[4];
+   v = state->rstate.ra.xR[5];
+   ta = state->rstate.ra.xR[6];
+   tb = state->rstate.ra.xR[7];
+   qeps = state->rstate.ra.xR[8];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
+Spawn:
+   i = 939;
+   j = -526;
+   ns = 763;
+   info = -541;
+   c1 = -698;
+   c2 = -900;
+   intg = -318;
+   intk = -940;
+   inta = 1016;
+   v = -229;
+   ta = -536;
+   tb = 487;
+   qeps = -115;
 // Routine body
 // initialize quadratures.
 // use 15-point Gauss-Kronrod formula.
@@ -1716,8 +1706,7 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state) {
    if (info < 0) {
       state->info = -5;
       state->r = 0.0;
-      result = false;
-      return result;
+      goto Exit;
    }
    ae_vector_set_length(&state->wr, state->n);
    for (i = 0; i < state->n; i++) {
@@ -1735,15 +1724,13 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state) {
    if (state->a == state->b) {
       state->info = 1;
       state->r = 0.0;
-      result = false;
-      return result;
+      goto Exit;
    }
 // test parameters
    if (state->eps < 0.0 || state->xwidth < 0.0) {
       state->info = -1;
       state->r = 0.0;
-      result = false;
-      return result;
+      goto Exit;
    }
    state->info = 1;
    if (state->eps == 0.0) {
@@ -1755,193 +1742,149 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state) {
 // * column 2   -   integral of a |F(x)| (calculated using modified rect. method)
 // * column 3   -   left boundary of a subinterval
 // * column 4   -   right boundary of a subinterval
-   if (state->xwidth != 0.0) {
-      goto lbl_3;
-   }
-// no maximum width requirements
-// start from one big subinterval
-   state->heapwidth = 5;
-   state->heapsize = 1;
-   state->heapused = 1;
-   ae_matrix_set_length(&state->heap, state->heapsize, state->heapwidth);
-   c1 = 0.5 * (state->b - state->a);
-   c2 = 0.5 * (state->b + state->a);
-   intg = 0.0;
-   intk = 0.0;
-   inta = 0.0;
-   i = 0;
-lbl_5:
-   if (i > state->n - 1) {
-      goto lbl_7;
-   }
-// obtain F
-   state->x = c1 * state->qn.xR[i] + c2;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   v = state->f;
-// Gauss-Kronrod formula
-   intk += v * state->wk.xR[i];
-   if (i % 2 == 1) {
-      intg += v * state->wg.xR[i];
-   }
-// Integral |F(x)|
-// Use rectangles method
-   inta += fabs(v) * state->wr.xR[i];
-   i++;
-   goto lbl_5;
-lbl_7:
-   intk *= (state->b - state->a) * 0.5;
-   intg *= (state->b - state->a) * 0.5;
-   inta *= (state->b - state->a) * 0.5;
-   state->heap.xyR[0][0] = fabs(intg - intk);
-   state->heap.xyR[0][1] = intk;
-   state->heap.xyR[0][2] = inta;
-   state->heap.xyR[0][3] = state->a;
-   state->heap.xyR[0][4] = state->b;
-   state->sumerr = state->heap.xyR[0][0];
-   state->sumabs = fabs(inta);
-   goto lbl_4;
-lbl_3:
-// maximum subinterval should be no more than XWidth.
-// so we create Ceil((B-A)/XWidth)+1 small subintervals
-   ns = iceil(fabs(state->b - state->a) / state->xwidth) + 1;
-   state->heapsize = ns;
-   state->heapused = ns;
-   state->heapwidth = 5;
-   ae_matrix_set_length(&state->heap, state->heapsize, state->heapwidth);
-   state->sumerr = 0.0;
-   state->sumabs = 0.0;
-   j = 0;
-lbl_8:
-   if (j > ns - 1) {
-      goto lbl_10;
-   }
-   ta = state->a + j * (state->b - state->a) / ns;
-   tb = state->a + (j + 1) * (state->b - state->a) / ns;
-   c1 = 0.5 * (tb - ta);
-   c2 = 0.5 * (tb + ta);
-   intg = 0.0;
-   intk = 0.0;
-   inta = 0.0;
-   i = 0;
-lbl_11:
-   if (i > state->n - 1) {
-      goto lbl_13;
-   }
-// obtain F
-   state->x = c1 * state->qn.xR[i] + c2;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   v = state->f;
-// Gauss-Kronrod formula
-   intk += v * state->wk.xR[i];
-   if (i % 2 == 1) {
-      intg += v * state->wg.xR[i];
-   }
-// Integral |F(x)|
-// Use rectangles method
-   inta += fabs(v) * state->wr.xR[i];
-   i++;
-   goto lbl_11;
-lbl_13:
-   intk *= (tb - ta) * 0.5;
-   intg *= (tb - ta) * 0.5;
-   inta *= (tb - ta) * 0.5;
-   state->heap.xyR[j][0] = fabs(intg - intk);
-   state->heap.xyR[j][1] = intk;
-   state->heap.xyR[j][2] = inta;
-   state->heap.xyR[j][3] = ta;
-   state->heap.xyR[j][4] = tb;
-   state->sumerr += state->heap.xyR[j][0];
-   state->sumabs += fabs(inta);
-   j++;
-   goto lbl_8;
-lbl_10:
-lbl_4:
-// method iterations
-lbl_14:
-   if (false) {
-      goto lbl_15;
-   }
-// additional memory if needed
-   if (state->heapused == state->heapsize) {
-      autogk_mheapresize(&state->heap, &state->heapsize, 4 * state->heapsize, state->heapwidth);
-   }
-// TODO: every 20 iterations recalculate errors/sums
-   if (state->sumerr <= state->eps * state->sumabs || state->heapused >= autogk_maxsubintervals) {
-      state->r = 0.0;
-      for (j = 0; j < state->heapused; j++) {
-         state->r += state->heap.xyR[j][1];
+   if (state->xwidth == 0.0) {
+   // no maximum width requirements
+   // start from one big subinterval
+      state->heapwidth = 5;
+      state->heapsize = 1;
+      state->heapused = 1;
+      ae_matrix_set_length(&state->heap, state->heapsize, state->heapwidth);
+      c1 = 0.5 * (state->b - state->a);
+      c2 = 0.5 * (state->b + state->a);
+      intg = 0.0;
+      intk = 0.0;
+      inta = 0.0;
+      for (i = 0; i < state->n; i++) {
+      // obtain F
+         state->x = c1 * state->qn.xR[i] + c2;
+         state->rstate.stage = 0; goto Pause; Resume0:
+         v = state->f;
+      // Gauss-Kronrod formula
+         intk += v * state->wk.xR[i];
+         if (i % 2 == 1) {
+            intg += v * state->wg.xR[i];
+         }
+      // Integral |F(x)|
+      // Use rectangles method
+         inta += fabs(v) * state->wr.xR[i];
       }
-      result = false;
-      return result;
+      intk *= (state->b - state->a) * 0.5;
+      intg *= (state->b - state->a) * 0.5;
+      inta *= (state->b - state->a) * 0.5;
+      state->heap.xyR[0][0] = fabs(intg - intk);
+      state->heap.xyR[0][1] = intk;
+      state->heap.xyR[0][2] = inta;
+      state->heap.xyR[0][3] = state->a;
+      state->heap.xyR[0][4] = state->b;
+      state->sumerr = state->heap.xyR[0][0];
+      state->sumabs = fabs(inta);
+   } else {
+   // maximum subinterval should be no more than XWidth.
+   // so we create Ceil((B-A)/XWidth)+1 small subintervals
+      ns = iceil(fabs(state->b - state->a) / state->xwidth) + 1;
+      state->heapsize = ns;
+      state->heapused = ns;
+      state->heapwidth = 5;
+      ae_matrix_set_length(&state->heap, state->heapsize, state->heapwidth);
+      state->sumerr = 0.0;
+      state->sumabs = 0.0;
+      for (j = 0; j < ns; j++) {
+         ta = state->a + j * (state->b - state->a) / ns;
+         tb = state->a + (j + 1) * (state->b - state->a) / ns;
+         c1 = 0.5 * (tb - ta);
+         c2 = 0.5 * (tb + ta);
+         intg = 0.0;
+         intk = 0.0;
+         inta = 0.0;
+         for (i = 0; i < state->n; i++) {
+         // obtain F
+            state->x = c1 * state->qn.xR[i] + c2;
+            state->rstate.stage = 1; goto Pause; Resume1:
+            v = state->f;
+         // Gauss-Kronrod formula
+            intk += v * state->wk.xR[i];
+            if (i % 2 == 1) {
+               intg += v * state->wg.xR[i];
+            }
+         // Integral |F(x)|
+         // Use rectangles method
+            inta += fabs(v) * state->wr.xR[i];
+         }
+         intk *= (tb - ta) * 0.5;
+         intg *= (tb - ta) * 0.5;
+         inta *= (tb - ta) * 0.5;
+         state->heap.xyR[j][0] = fabs(intg - intk);
+         state->heap.xyR[j][1] = intk;
+         state->heap.xyR[j][2] = inta;
+         state->heap.xyR[j][3] = ta;
+         state->heap.xyR[j][4] = tb;
+         state->sumerr += state->heap.xyR[j][0];
+         state->sumabs += fabs(inta);
+      }
    }
-// Exclude interval with maximum absolute error
-   autogk_mheappop(&state->heap, state->heapused, state->heapwidth);
-   state->sumerr -= state->heap.xyR[state->heapused - 1][0];
-   state->sumabs -= state->heap.xyR[state->heapused - 1][2];
-// Divide interval, create subintervals
-   ta = state->heap.xyR[state->heapused - 1][3];
-   tb = state->heap.xyR[state->heapused - 1][4];
-   state->heap.xyR[state->heapused - 1][3] = ta;
-   state->heap.xyR[state->heapused - 1][4] = 0.5 * (ta + tb);
-   state->heap.xyR[state->heapused][3] = 0.5 * (ta + tb);
-   state->heap.xyR[state->heapused][4] = tb;
-   j = state->heapused - 1;
-lbl_16:
-   if (j > state->heapused) {
-      goto lbl_18;
+// method iterations
+   while (true) {
+   // additional memory if needed
+      if (state->heapused == state->heapsize) {
+         autogk_mheapresize(&state->heap, &state->heapsize, 4 * state->heapsize, state->heapwidth);
+      }
+   // TODO: every 20 iterations recalculate errors/sums
+      if (state->sumerr <= state->eps * state->sumabs || state->heapused >= autogk_maxsubintervals) {
+         state->r = 0.0;
+         for (j = 0; j < state->heapused; j++) {
+            state->r += state->heap.xyR[j][1];
+         }
+         goto Exit;
+      }
+   // Exclude interval with maximum absolute error
+      autogk_mheappop(&state->heap, state->heapused, state->heapwidth);
+      state->sumerr -= state->heap.xyR[state->heapused - 1][0];
+      state->sumabs -= state->heap.xyR[state->heapused - 1][2];
+   // Divide interval, create subintervals
+      ta = state->heap.xyR[state->heapused - 1][3];
+      tb = state->heap.xyR[state->heapused - 1][4];
+      state->heap.xyR[state->heapused - 1][3] = ta;
+      state->heap.xyR[state->heapused - 1][4] = 0.5 * (ta + tb);
+      state->heap.xyR[state->heapused][3] = 0.5 * (ta + tb);
+      state->heap.xyR[state->heapused][4] = tb;
+      for (j = state->heapused - 1; j <= state->heapused; j++) {
+         c1 = 0.5 * (state->heap.xyR[j][4] - state->heap.xyR[j][3]);
+         c2 = 0.5 * (state->heap.xyR[j][4] + state->heap.xyR[j][3]);
+         intg = 0.0;
+         intk = 0.0;
+         inta = 0.0;
+         for (i = 0; i < state->n; i++) {
+         // F(x)
+            state->x = c1 * state->qn.xR[i] + c2;
+            state->rstate.stage = 2; goto Pause; Resume2:
+            v = state->f;
+         // Gauss-Kronrod formula
+            intk += v * state->wk.xR[i];
+            if (i % 2 == 1) {
+               intg += v * state->wg.xR[i];
+            }
+         // Integral |F(x)|
+         // Use rectangles method
+            inta += fabs(v) * state->wr.xR[i];
+         }
+         intk *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
+         intg *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
+         inta *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
+         state->heap.xyR[j][0] = fabs(intg - intk);
+         state->heap.xyR[j][1] = intk;
+         state->heap.xyR[j][2] = inta;
+         state->sumerr += state->heap.xyR[j][0];
+         state->sumabs += state->heap.xyR[j][2];
+      }
+      autogk_mheappush(&state->heap, state->heapused - 1, state->heapwidth);
+      autogk_mheappush(&state->heap, state->heapused, state->heapwidth);
+      state->heapused++;
    }
-   c1 = 0.5 * (state->heap.xyR[j][4] - state->heap.xyR[j][3]);
-   c2 = 0.5 * (state->heap.xyR[j][4] + state->heap.xyR[j][3]);
-   intg = 0.0;
-   intk = 0.0;
-   inta = 0.0;
-   i = 0;
-lbl_19:
-   if (i > state->n - 1) {
-      goto lbl_21;
-   }
-// F(x)
-   state->x = c1 * state->qn.xR[i] + c2;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   v = state->f;
-// Gauss-Kronrod formula
-   intk += v * state->wk.xR[i];
-   if (i % 2 == 1) {
-      intg += v * state->wg.xR[i];
-   }
-// Integral |F(x)|
-// Use rectangles method
-   inta += fabs(v) * state->wr.xR[i];
-   i++;
-   goto lbl_19;
-lbl_21:
-   intk *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
-   intg *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
-   inta *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
-   state->heap.xyR[j][0] = fabs(intg - intk);
-   state->heap.xyR[j][1] = intk;
-   state->heap.xyR[j][2] = inta;
-   state->sumerr += state->heap.xyR[j][0];
-   state->sumabs += state->heap.xyR[j][2];
-   j++;
-   goto lbl_16;
-lbl_18:
-   autogk_mheappush(&state->heap, state->heapused - 1, state->heapwidth);
-   autogk_mheappush(&state->heap, state->heapused, state->heapwidth);
-   state->heapused++;
-   goto lbl_14;
-lbl_15:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = i;
    state->rstate.ia.xZ[1] = j;
    state->rstate.ia.xZ[2] = ns;
@@ -1955,7 +1898,7 @@ lbl_rcomm:
    state->rstate.ra.xR[6] = ta;
    state->rstate.ra.xR[7] = tb;
    state->rstate.ra.xR[8] = qeps;
-   return result;
+   return true;
 }
 
 // This function provides a reverse communication interface, which is not documented or recommended for use.
@@ -1975,49 +1918,39 @@ bool autogkiteration(autogkstate *state) {
    double beta;
    double v1;
    double v2;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      s = state->rstate.ra.xR[0];
-      tmp = state->rstate.ra.xR[1];
-      eps = state->rstate.ra.xR[2];
-      a = state->rstate.ra.xR[3];
-      b = state->rstate.ra.xR[4];
-      x = state->rstate.ra.xR[5];
-      t = state->rstate.ra.xR[6];
-      alpha = state->rstate.ra.xR[7];
-      beta = state->rstate.ra.xR[8];
-      v1 = state->rstate.ra.xR[9];
-      v2 = state->rstate.ra.xR[10];
-   } else {
-      s = 359;
-      tmp = -58;
-      eps = -919;
-      a = -909;
-      b = 81;
-      x = 255;
-      t = 74;
-      alpha = -788;
-      beta = 809;
-      v1 = 205;
-      v2 = -838;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   s = state->rstate.ra.xR[0];
+   tmp = state->rstate.ra.xR[1];
+   eps = state->rstate.ra.xR[2];
+   a = state->rstate.ra.xR[3];
+   b = state->rstate.ra.xR[4];
+   x = state->rstate.ra.xR[5];
+   t = state->rstate.ra.xR[6];
+   alpha = state->rstate.ra.xR[7];
+   beta = state->rstate.ra.xR[8];
+   v1 = state->rstate.ra.xR[9];
+   v2 = state->rstate.ra.xR[10];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
+Spawn:
+   s = 359;
+   tmp = -58;
+   eps = -919;
+   a = -909;
+   b = 81;
+   x = 255;
+   t = 74;
+   alpha = -788;
+   beta = 809;
+   v1 = 205;
+   v2 = -838;
 // Routine body
    eps = 0.0;
    a = state->a;
@@ -2027,155 +1960,123 @@ bool autogkiteration(autogkstate *state) {
    state->terminationtype = -1;
    state->nfev = 0;
    state->nintervals = 0;
-// smooth function  at a finite interval
-   if (state->wrappermode != 0) {
-      goto lbl_3;
-   }
-// special case
-   if (a == b) {
+   if (state->wrappermode == 0) { // smooth function  at a finite interval
+   // special case
+      if (a == b) {
+         state->terminationtype = 1;
+         state->v = 0.0;
+         goto Exit;
+      }
+   // general case
+      autogk_autogkinternalprepare(a, b, eps, state->xwidth, &state->internalstate);
+      while (autogk_autogkinternaliteration(&state->internalstate)) {
+         x = state->internalstate.x;
+         state->x = x;
+         state->xminusa = x - a;
+         state->bminusx = b - x;
+         state->needf = true;
+         state->rstate.stage = 0; goto Pause; Resume0:
+         state->needf = false;
+         state->nfev++;
+         state->internalstate.f = state->f;
+      }
+      state->v = state->internalstate.r;
+      state->terminationtype = state->internalstate.info;
+      state->nintervals = state->internalstate.heapused;
+   } else if (state->wrappermode == 1) { // function with power-law singularities at the ends of a finite interval
+   // test coefficients
+      if (alpha <= -1.0 || beta <= -1.0) {
+         state->terminationtype = -1;
+         state->v = 0.0;
+         goto Exit;
+      }
+   // special cases
+      if (a == b) {
+         state->terminationtype = 1;
+         state->v = 0.0;
+         goto Exit;
+      }
+   // reduction to general form
+      if (a < b) {
+         s = 1.0;
+      } else {
+         s = -1.0;
+         tmp = a;
+         a = b;
+         b = tmp;
+         tmp = alpha;
+         alpha = beta;
+         beta = tmp;
+      }
+      alpha = rmin2(alpha, 0.0);
+      beta = rmin2(beta, 0.0);
+   // first, integrate left half of [a,b]:
+   //     integral(f(x)dx, a, (b+a)/2) =
+   //     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
+      autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + alpha), eps, state->xwidth, &state->internalstate);
+      while (autogk_autogkinternaliteration(&state->internalstate)) {
+      // Fill State.X, State.XMinusA, State.BMinusX.
+      // Latter two are filled correctly even if B<A.
+         x = state->internalstate.x;
+         t = pow(x, 1 / (1 + alpha));
+         state->x = a + t;
+         if (s > 0.0) {
+            state->xminusa = t;
+            state->bminusx = b - (a + t);
+         } else {
+            state->xminusa = a + t - b;
+            state->bminusx = -t;
+         }
+         state->needf = true;
+         state->rstate.stage = 1; goto Pause; Resume1:
+         state->needf = false;
+         if (alpha != 0.0) {
+            state->internalstate.f = state->f * pow(x, -alpha / (1 + alpha)) / (1 + alpha);
+         } else {
+            state->internalstate.f = state->f;
+         }
+         state->nfev++;
+      }
+      v1 = state->internalstate.r;
+      state->nintervals += state->internalstate.heapused;
+   // then, integrate right half of [a,b]:
+   //     integral(f(x)dx, (b+a)/2, b) =
+   //     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
+      autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + beta), eps, state->xwidth, &state->internalstate);
+      while (autogk_autogkinternaliteration(&state->internalstate)) {
+      // Fill State.X, State.XMinusA, State.BMinusX.
+      // Latter two are filled correctly (X-A, B-X) even if B<A.
+         x = state->internalstate.x;
+         t = pow(x, 1 / (1 + beta));
+         state->x = b - t;
+         if (s > 0.0) {
+            state->xminusa = b - t - a;
+            state->bminusx = t;
+         } else {
+            state->xminusa = -t;
+            state->bminusx = a - (b - t);
+         }
+         state->needf = true;
+         state->rstate.stage = 2; goto Pause; Resume2:
+         state->needf = false;
+         if (beta != 0.0) {
+            state->internalstate.f = state->f * pow(x, -beta / (1 + beta)) / (1 + beta);
+         } else {
+            state->internalstate.f = state->f;
+         }
+         state->nfev++;
+      }
+      v2 = state->internalstate.r;
+      state->nintervals += state->internalstate.heapused;
+   // final result
+      state->v = s * (v1 + v2);
       state->terminationtype = 1;
-      state->v = 0.0;
-      result = false;
-      return result;
    }
-// general case
-   autogk_autogkinternalprepare(a, b, eps, state->xwidth, &state->internalstate);
-lbl_5:
-   if (!autogk_autogkinternaliteration(&state->internalstate)) {
-      goto lbl_6;
-   }
-   x = state->internalstate.x;
-   state->x = x;
-   state->xminusa = x - a;
-   state->bminusx = b - x;
-   state->needf = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needf = false;
-   state->nfev++;
-   state->internalstate.f = state->f;
-   goto lbl_5;
-lbl_6:
-   state->v = state->internalstate.r;
-   state->terminationtype = state->internalstate.info;
-   state->nintervals = state->internalstate.heapused;
-   result = false;
-   return result;
-lbl_3:
-// function with power-law singularities at the ends of a finite interval
-   if (state->wrappermode != 1) {
-      goto lbl_7;
-   }
-// test coefficients
-   if (alpha <= -1.0 || beta <= -1.0) {
-      state->terminationtype = -1;
-      state->v = 0.0;
-      result = false;
-      return result;
-   }
-// special cases
-   if (a == b) {
-      state->terminationtype = 1;
-      state->v = 0.0;
-      result = false;
-      return result;
-   }
-// reduction to general form
-   if (a < b) {
-      s = 1.0;
-   } else {
-      s = -1.0;
-      tmp = a;
-      a = b;
-      b = tmp;
-      tmp = alpha;
-      alpha = beta;
-      beta = tmp;
-   }
-   alpha = rmin2(alpha, 0.0);
-   beta = rmin2(beta, 0.0);
-// first, integrate left half of [a,b]:
-//     integral(f(x)dx, a, (b+a)/2) =
-//     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
-   autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + alpha), eps, state->xwidth, &state->internalstate);
-lbl_9:
-   if (!autogk_autogkinternaliteration(&state->internalstate)) {
-      goto lbl_10;
-   }
-// Fill State.X, State.XMinusA, State.BMinusX.
-// Latter two are filled correctly even if B<A.
-   x = state->internalstate.x;
-   t = pow(x, 1 / (1 + alpha));
-   state->x = a + t;
-   if (s > 0.0) {
-      state->xminusa = t;
-      state->bminusx = b - (a + t);
-   } else {
-      state->xminusa = a + t - b;
-      state->bminusx = -t;
-   }
-   state->needf = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->needf = false;
-   if (alpha != 0.0) {
-      state->internalstate.f = state->f * pow(x, -alpha / (1 + alpha)) / (1 + alpha);
-   } else {
-      state->internalstate.f = state->f;
-   }
-   state->nfev++;
-   goto lbl_9;
-lbl_10:
-   v1 = state->internalstate.r;
-   state->nintervals += state->internalstate.heapused;
-// then, integrate right half of [a,b]:
-//     integral(f(x)dx, (b+a)/2, b) =
-//     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
-   autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + beta), eps, state->xwidth, &state->internalstate);
-lbl_11:
-   if (!autogk_autogkinternaliteration(&state->internalstate)) {
-      goto lbl_12;
-   }
-// Fill State.X, State.XMinusA, State.BMinusX.
-// Latter two are filled correctly (X-A, B-X) even if B<A.
-   x = state->internalstate.x;
-   t = pow(x, 1 / (1 + beta));
-   state->x = b - t;
-   if (s > 0.0) {
-      state->xminusa = b - t - a;
-      state->bminusx = t;
-   } else {
-      state->xminusa = -t;
-      state->bminusx = a - (b - t);
-   }
-   state->needf = true;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->needf = false;
-   if (beta != 0.0) {
-      state->internalstate.f = state->f * pow(x, -beta / (1 + beta)) / (1 + beta);
-   } else {
-      state->internalstate.f = state->f;
-   }
-   state->nfev++;
-   goto lbl_11;
-lbl_12:
-   v2 = state->internalstate.r;
-   state->nintervals += state->internalstate.heapused;
-// final result
-   state->v = s * (v1 + v2);
-   state->terminationtype = 1;
-   result = false;
-   return result;
-lbl_7:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ra.xR[0] = s;
    state->rstate.ra.xR[1] = tmp;
    state->rstate.ra.xR[2] = eps;
@@ -2187,7 +2088,7 @@ lbl_rcomm:
    state->rstate.ra.xR[8] = beta;
    state->rstate.ra.xR[9] = v1;
    state->rstate.ra.xR[10] = v2;
-   return result;
+   return true;
 }
 
 // Adaptive integration results

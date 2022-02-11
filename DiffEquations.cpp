@@ -170,52 +170,47 @@ bool odesolveriteration(odesolverstate *state) {
    double err;
    double maxgrowpow;
    ae_int_t klimit;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      m = state->rstate.ia.xZ[1];
-      i = state->rstate.ia.xZ[2];
-      j = state->rstate.ia.xZ[3];
-      k = state->rstate.ia.xZ[4];
-      klimit = state->rstate.ia.xZ[5];
-      gridpoint = state->rstate.ba.xB[0];
-      xc = state->rstate.ra.xR[0];
-      v = state->rstate.ra.xR[1];
-      h = state->rstate.ra.xR[2];
-      h2 = state->rstate.ra.xR[3];
-      err = state->rstate.ra.xR[4];
-      maxgrowpow = state->rstate.ra.xR[5];
-   } else {
-      n = 359;
-      m = -58;
-      i = -919;
-      j = -909;
-      k = 81;
-      klimit = 255;
-      gridpoint = false;
-      xc = -788;
-      v = 809;
-      h = 205;
-      h2 = -838;
-      err = 939;
-      maxgrowpow = -526;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   m = state->rstate.ia.xZ[1];
+   i = state->rstate.ia.xZ[2];
+   j = state->rstate.ia.xZ[3];
+   k = state->rstate.ia.xZ[4];
+   klimit = state->rstate.ia.xZ[5];
+   gridpoint = state->rstate.ba.xB[0];
+   xc = state->rstate.ra.xR[0];
+   v = state->rstate.ra.xR[1];
+   h = state->rstate.ra.xR[2];
+   h2 = state->rstate.ra.xR[3];
+   err = state->rstate.ra.xR[4];
+   maxgrowpow = state->rstate.ra.xR[5];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
+Spawn:
+   n = 359;
+   m = -58;
+   i = -919;
+   j = -909;
+   k = 81;
+   klimit = 255;
+   gridpoint = false;
+   xc = -788;
+   v = 809;
+   h = 205;
+   h2 = -838;
+   err = 939;
+   maxgrowpow = -526;
 // Routine body
 // prepare
    if (state->repterminationtype != 0) {
-      result = false;
-      return result;
+      goto Exit;
    }
    n = state->n;
    m = state->m;
@@ -227,179 +222,157 @@ bool odesolveriteration(odesolverstate *state) {
    ae_assert(state->h > 0.0, "ODESolver: internal error");
    ae_assert(m > 1, "ODESolverIteration: internal error");
 // choose solver
-   if (state->solvertype != 0) {
-      goto lbl_1;
-   }
-// Cask-Karp solver
-// Prepare coefficients table.
-// Check it for errors
-   ae_vector_set_length(&state->rka, 6);
-   state->rka.xR[0] = 0.0;
-   state->rka.xR[1] = 1.0 / 5.0;
-   state->rka.xR[2] = 3.0 / 10.0;
-   state->rka.xR[3] = 3.0 / 5.0;
-   state->rka.xR[4] = 1.0;
-   state->rka.xR[5] = 7.0 / 8.0;
-   ae_matrix_set_length(&state->rkb, 6, 5);
-   state->rkb.xyR[1][0] = 1.0 / 5.0;
-   state->rkb.xyR[2][0] = 3.0 / 40.0;
-   state->rkb.xyR[2][1] = 9.0 / 40.0;
-   state->rkb.xyR[3][0] = 3.0 / 10.0;
-   state->rkb.xyR[3][1] = -9.0 / 10.0;
-   state->rkb.xyR[3][2] = 6.0 / 5.0;
-   state->rkb.xyR[4][0] = -11.0 / 54.0;
-   state->rkb.xyR[4][1] = 5.0 / 2.0;
-   state->rkb.xyR[4][2] = -70.0 / 27.0;
-   state->rkb.xyR[4][3] = 35.0 / 27.0;
-   state->rkb.xyR[5][0] = 1631.0 / 55296.0;
-   state->rkb.xyR[5][1] = 175.0 / 512.0;
-   state->rkb.xyR[5][2] = 575.0 / 13824.0;
-   state->rkb.xyR[5][3] = 44275.0 / 110592.0;
-   state->rkb.xyR[5][4] = 253.0 / 4096.0;
-   ae_vector_set_length(&state->rkc, 6);
-   state->rkc.xR[0] = 37.0 / 378.0;
-   state->rkc.xR[1] = 0.0;
-   state->rkc.xR[2] = 250.0 / 621.0;
-   state->rkc.xR[3] = 125.0 / 594.0;
-   state->rkc.xR[4] = 0.0;
-   state->rkc.xR[5] = 512.0 / 1771.0;
-   ae_vector_set_length(&state->rkcs, 6);
-   state->rkcs.xR[0] = 2825.0 / 27648.0;
-   state->rkcs.xR[1] = 0.0;
-   state->rkcs.xR[2] = 18575.0 / 48384.0;
-   state->rkcs.xR[3] = 13525.0 / 55296.0;
-   state->rkcs.xR[4] = 277.0 / 14336.0;
-   state->rkcs.xR[5] = 1.0 / 4.0;
-   ae_matrix_set_length(&state->rkk, 6, n);
-// Main cycle consists of two iterations:
-// * outer where we travel from X[i-1] to X[i]
-// * inner where we travel inside [X[i-1],X[i]]
-   ae_matrix_set_length(&state->ytbl, m, n);
-   ae_vector_set_length(&state->escale, n);
-   ae_vector_set_length(&state->yn, n);
-   ae_vector_set_length(&state->yns, n);
-   xc = state->xg.xR[0];
-   ae_v_move(state->ytbl.xyR[0], 1, state->yc.xR, 1, n);
-   for (j = 0; j < n; j++) {
-      state->escale.xR[j] = 0.0;
-   }
-   i = 1;
-lbl_3:
-   if (i > m - 1) {
-      goto lbl_5;
-   }
-// begin inner iteration
-lbl_6:
-   if (false) {
-      goto lbl_7;
-   }
-// truncate step if needed (beyond right boundary).
-// determine should we store X or not
-   if (xc + h >= state->xg.xR[i]) {
-      h = state->xg.xR[i] - xc;
-      gridpoint = true;
-   } else {
-      gridpoint = false;
-   }
-// Update error scale maximums
-//
-// These maximums are initialized by zeros,
-// then updated every iterations.
-   for (j = 0; j < n; j++) {
-      state->escale.xR[j] = rmax2(state->escale.xR[j], fabs(state->yc.xR[j]));
-   }
-// make one step:
-// 1. calculate all info needed to do step
-// 2. update errors scale maximums using values/derivatives
-//    obtained during (1)
-//
-// Take into account that we use scaling of X to reduce task
-// to the form where x[0] < x[1] < ... < x[n-1]. So X is
-// replaced by x=xscale*t, and dy/dx=f(y,x) is replaced
-// by dy/dt=xscale*f(y,xscale*t).
-   ae_v_move(state->yn.xR, 1, state->yc.xR, 1, n);
-   ae_v_move(state->yns.xR, 1, state->yc.xR, 1, n);
-   k = 0;
-lbl_8:
-   if (k > 5) {
-      goto lbl_10;
-   }
-// prepare data for the next update of YN/YNS
-   state->x = state->xscale * (xc + state->rka.xR[k] * h);
-   ae_v_move(state->y.xR, 1, state->yc.xR, 1, n);
-   for (j = 0; j < k; j++) {
-      v = state->rkb.xyR[k][j];
-      ae_v_addd(state->y.xR, 1, state->rkk.xyR[j], 1, n, v);
-   }
-   state->needdy = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needdy = false;
-   state->repnfev++;
-   v = h * state->xscale;
-   ae_v_moved(state->rkk.xyR[k], 1, state->dy.xR, 1, n, v);
-// update YN/YNS
-   v = state->rkc.xR[k];
-   ae_v_addd(state->yn.xR, 1, state->rkk.xyR[k], 1, n, v);
-   v = state->rkcs.xR[k];
-   ae_v_addd(state->yns.xR, 1, state->rkk.xyR[k], 1, n, v);
-   k++;
-   goto lbl_8;
-lbl_10:
-// estimate error
-   err = 0.0;
-   for (j = 0; j < n; j++) {
-      if (!state->fraceps) {
-      // absolute error is estimated
-         err = rmax2(err, fabs(state->yn.xR[j] - state->yns.xR[j]));
-      } else {
-      // Relative error is estimated
-         v = state->escale.xR[j];
-         if (v == 0.0) {
-            v = 1.0;
-         }
-         err = rmax2(err, fabs(state->yn.xR[j] - state->yns.xR[j]) / v);
+   if (state->solvertype == 0) {
+   // Cask-Karp solver
+   // Prepare coefficients table.
+   // Check it for errors
+      ae_vector_set_length(&state->rka, 6);
+      state->rka.xR[0] = 0.0;
+      state->rka.xR[1] = 1.0 / 5.0;
+      state->rka.xR[2] = 3.0 / 10.0;
+      state->rka.xR[3] = 3.0 / 5.0;
+      state->rka.xR[4] = 1.0;
+      state->rka.xR[5] = 7.0 / 8.0;
+      ae_matrix_set_length(&state->rkb, 6, 5);
+      state->rkb.xyR[1][0] = 1.0 / 5.0;
+      state->rkb.xyR[2][0] = 3.0 / 40.0;
+      state->rkb.xyR[2][1] = 9.0 / 40.0;
+      state->rkb.xyR[3][0] = 3.0 / 10.0;
+      state->rkb.xyR[3][1] = -9.0 / 10.0;
+      state->rkb.xyR[3][2] = 6.0 / 5.0;
+      state->rkb.xyR[4][0] = -11.0 / 54.0;
+      state->rkb.xyR[4][1] = 5.0 / 2.0;
+      state->rkb.xyR[4][2] = -70.0 / 27.0;
+      state->rkb.xyR[4][3] = 35.0 / 27.0;
+      state->rkb.xyR[5][0] = 1631.0 / 55296.0;
+      state->rkb.xyR[5][1] = 175.0 / 512.0;
+      state->rkb.xyR[5][2] = 575.0 / 13824.0;
+      state->rkb.xyR[5][3] = 44275.0 / 110592.0;
+      state->rkb.xyR[5][4] = 253.0 / 4096.0;
+      ae_vector_set_length(&state->rkc, 6);
+      state->rkc.xR[0] = 37.0 / 378.0;
+      state->rkc.xR[1] = 0.0;
+      state->rkc.xR[2] = 250.0 / 621.0;
+      state->rkc.xR[3] = 125.0 / 594.0;
+      state->rkc.xR[4] = 0.0;
+      state->rkc.xR[5] = 512.0 / 1771.0;
+      ae_vector_set_length(&state->rkcs, 6);
+      state->rkcs.xR[0] = 2825.0 / 27648.0;
+      state->rkcs.xR[1] = 0.0;
+      state->rkcs.xR[2] = 18575.0 / 48384.0;
+      state->rkcs.xR[3] = 13525.0 / 55296.0;
+      state->rkcs.xR[4] = 277.0 / 14336.0;
+      state->rkcs.xR[5] = 1.0 / 4.0;
+      ae_matrix_set_length(&state->rkk, 6, n);
+   // Main cycle consists of two iterations:
+   // * outer where we travel from X[i-1] to X[i]
+   // * inner where we travel inside [X[i-1],X[i]]
+      ae_matrix_set_length(&state->ytbl, m, n);
+      ae_vector_set_length(&state->escale, n);
+      ae_vector_set_length(&state->yn, n);
+      ae_vector_set_length(&state->yns, n);
+      xc = state->xg.xR[0];
+      ae_v_move(state->ytbl.xyR[0], 1, state->yc.xR, 1, n);
+      for (j = 0; j < n; j++) {
+         state->escale.xR[j] = 0.0;
       }
+      for (i = 1; i < m; i++) {
+      // begin inner iteration
+         while (true) {
+         // truncate step if needed (beyond right boundary).
+         // determine should we store X or not
+            if (xc + h >= state->xg.xR[i]) {
+               h = state->xg.xR[i] - xc;
+               gridpoint = true;
+            } else {
+               gridpoint = false;
+            }
+         // Update error scale maximums
+         //
+         // These maximums are initialized by zeros,
+         // then updated every iterations.
+            for (j = 0; j < n; j++) {
+               state->escale.xR[j] = rmax2(state->escale.xR[j], fabs(state->yc.xR[j]));
+            }
+         // make one step:
+         // 1. calculate all info needed to do step
+         // 2. update errors scale maximums using values/derivatives
+         //    obtained during (1)
+         //
+         // Take into account that we use scaling of X to reduce task
+         // to the form where x[0] < x[1] < ... < x[n-1]. So X is
+         // replaced by x=xscale*t, and dy/dx=f(y,x) is replaced
+         // by dy/dt=xscale*f(y,xscale*t).
+            ae_v_move(state->yn.xR, 1, state->yc.xR, 1, n);
+            ae_v_move(state->yns.xR, 1, state->yc.xR, 1, n);
+            for (k = 0; k < 6; k++) {
+            // prepare data for the next update of YN/YNS
+               state->x = state->xscale * (xc + state->rka.xR[k] * h);
+               ae_v_move(state->y.xR, 1, state->yc.xR, 1, n);
+               for (j = 0; j < k; j++) {
+                  v = state->rkb.xyR[k][j];
+                  ae_v_addd(state->y.xR, 1, state->rkk.xyR[j], 1, n, v);
+               }
+               state->needdy = true;
+               state->rstate.stage = 0; goto Pause; Resume0:
+               state->needdy = false;
+               state->repnfev++;
+               v = h * state->xscale;
+               ae_v_moved(state->rkk.xyR[k], 1, state->dy.xR, 1, n, v);
+            // update YN/YNS
+               v = state->rkc.xR[k];
+               ae_v_addd(state->yn.xR, 1, state->rkk.xyR[k], 1, n, v);
+               v = state->rkcs.xR[k];
+               ae_v_addd(state->yns.xR, 1, state->rkk.xyR[k], 1, n, v);
+            }
+         // estimate error
+            err = 0.0;
+            for (j = 0; j < n; j++) {
+               if (!state->fraceps) {
+               // absolute error is estimated
+                  err = rmax2(err, fabs(state->yn.xR[j] - state->yns.xR[j]));
+               } else {
+               // Relative error is estimated
+                  v = state->escale.xR[j];
+                  if (v == 0.0) {
+                     v = 1.0;
+                  }
+                  err = rmax2(err, fabs(state->yn.xR[j] - state->yns.xR[j]) / v);
+               }
+            }
+         // calculate new step, restart if necessary
+            if (maxgrowpow * err <= state->eps) {
+               h2 = odesolver_odesolvermaxgrow * h;
+            } else {
+               h2 = h * pow(state->eps / err, 0.2);
+            }
+            if (h2 < h / odesolver_odesolvermaxshrink) {
+               h2 = h / odesolver_odesolvermaxshrink;
+            }
+            if (err > state->eps) {
+               h = rmin2(h2, odesolver_odesolverguaranteeddecay * h);
+               continue;
+            }
+         // advance position
+            xc += h;
+            ae_v_move(state->yc.xR, 1, state->yn.xR, 1, n);
+         // update H
+            h = h2;
+         // break on grid point
+            if (gridpoint) {
+               break;
+            }
+         }
+      // save result
+         ae_v_move(state->ytbl.xyR[i], 1, state->yc.xR, 1, n);
+      }
+      state->repterminationtype = 1;
    }
-// calculate new step, restart if necessary
-   if (maxgrowpow * err <= state->eps) {
-      h2 = odesolver_odesolvermaxgrow * h;
-   } else {
-      h2 = h * pow(state->eps / err, 0.2);
-   }
-   if (h2 < h / odesolver_odesolvermaxshrink) {
-      h2 = h / odesolver_odesolvermaxshrink;
-   }
-   if (err > state->eps) {
-      h = rmin2(h2, odesolver_odesolverguaranteeddecay * h);
-      goto lbl_6;
-   }
-// advance position
-   xc += h;
-   ae_v_move(state->yc.xR, 1, state->yn.xR, 1, n);
-// update H
-   h = h2;
-// break on grid point
-   if (gridpoint) {
-      goto lbl_7;
-   }
-   goto lbl_6;
-lbl_7:
-// save result
-   ae_v_move(state->ytbl.xyR[i], 1, state->yc.xR, 1, n);
-   i++;
-   goto lbl_3;
-lbl_5:
-   state->repterminationtype = 1;
-   result = false;
-   return result;
-lbl_1:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = m;
    state->rstate.ia.xZ[2] = i;
@@ -413,7 +386,7 @@ lbl_rcomm:
    state->rstate.ra.xR[3] = h2;
    state->rstate.ra.xR[4] = err;
    state->rstate.ra.xR[5] = maxgrowpow;
-   return result;
+   return true;
 }
 
 // ODE solver results

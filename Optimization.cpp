@@ -2920,113 +2920,101 @@ bool smoothnessmonitorprobe(smoothnessmonitor *monitor) {
    double v;
    double v0;
    double v1;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (monitor->probingrcomm.stage >= 0) {
-      i = monitor->probingrcomm.ia.xZ[0];
-      j = monitor->probingrcomm.ia.xZ[1];
-      idx = monitor->probingrcomm.ia.xZ[2];
-      vlargest = monitor->probingrcomm.ra.xR[0];
-      v = monitor->probingrcomm.ra.xR[1];
-      v0 = monitor->probingrcomm.ra.xR[2];
-      v1 = monitor->probingrcomm.ra.xR[3];
-   } else {
-      i = 359;
-      j = -58;
-      idx = -919;
-      vlargest = -909;
-      v = 81;
-      v0 = 255;
-      v1 = 74;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (monitor->probingrcomm.stage < 0) goto Spawn;
+   i = monitor->probingrcomm.ia.xZ[0];
+   j = monitor->probingrcomm.ia.xZ[1];
+   idx = monitor->probingrcomm.ia.xZ[2];
+   vlargest = monitor->probingrcomm.ra.xR[0];
+   v = monitor->probingrcomm.ra.xR[1];
+   v0 = monitor->probingrcomm.ra.xR[2];
+   v1 = monitor->probingrcomm.ra.xR[3];
+   switch (monitor->probingrcomm.stage) {
+      case 0: goto Resume0;
+      default: goto Exit;
    }
-   if (monitor->probingrcomm.stage == 0) {
-      goto lbl_0;
-   }
+Spawn:
+   i = 359;
+   j = -58;
+   idx = -919;
+   vlargest = -909;
+   v = 81;
+   v0 = 255;
+   v1 = 74;
 // Routine body
-   i = 0;
-lbl_1:
-   if (i > 40) {
-      goto lbl_3;
-   }
-// Increase storage size
-   rvectorgrowto(&monitor->probingsteps, monitor->probingnstepsstored + 1);
-   rmatrixgrowrowsto(&monitor->probingvalues, monitor->probingnstepsstored + 1, monitor->probingnvalues);
-   rmatrixgrowrowsto(&monitor->probingslopes, monitor->probingnstepsstored + 1, monitor->probingnvalues);
-// Determine probing step length, save step to the end of the storage
-   if (i <= 10) {
-   // First 11 steps are performed over equidistant grid
-      monitor->probingstp = (double)i / 10.0 *monitor->probingstepmax;
-   } else {
-   // Subsequent steps target either points with maximum change in F[0]
-   // (search for discontinuity) or maximum change in slope of F[0] (search
-   // for nonsmoothness)
-      ae_assert(monitor->probingnstepsstored >= 3, "SMonitor: critical integrity check failed");
-      if (i % 2 == 0) {
-      // Target interval with maximum change in F[0]
-         idx = -1;
-         vlargest = 0.0;
-         for (j = 0; j < monitor->probingnstepsstored - 1; j++) {
-            v = fabs(monitor->probingvalues.xyR[j + 1][0] - monitor->probingvalues.xyR[j][0]);
-            if (idx < 0 || v > vlargest) {
-               idx = j;
-               vlargest = v;
-            }
-         }
-         monitor->probingstp = 0.5 * (monitor->probingsteps.xR[idx] + monitor->probingsteps.xR[idx + 1]);
+   for (i = 0; i < 40; i++) {
+   // Increase storage size
+      rvectorgrowto(&monitor->probingsteps, monitor->probingnstepsstored + 1);
+      rmatrixgrowrowsto(&monitor->probingvalues, monitor->probingnstepsstored + 1, monitor->probingnvalues);
+      rmatrixgrowrowsto(&monitor->probingslopes, monitor->probingnstepsstored + 1, monitor->probingnvalues);
+   // Determine probing step length, save step to the end of the storage
+      if (i <= 10) {
+      // First 11 steps are performed over equidistant grid
+         monitor->probingstp = (double)i / 10.0 *monitor->probingstepmax;
       } else {
-      // Target interval [J,J+2] with maximum change in slope of F[0], select
-      // subinterval [J,J+1] or [J+1,J+2] with maximum length.
-         idx = -1;
-         vlargest = 0.0;
-         for (j = 0; j < monitor->probingnstepsstored - 2; j++) {
-            v0 = (monitor->probingvalues.xyR[j + 1][0] - monitor->probingvalues.xyR[j + 0][0]) / (monitor->probingsteps.xR[j + 1] - monitor->probingsteps.xR[j + 0] + machineepsilon);
-            v1 = (monitor->probingvalues.xyR[j + 2][0] - monitor->probingvalues.xyR[j + 1][0]) / (monitor->probingsteps.xR[j + 2] - monitor->probingsteps.xR[j + 1] + machineepsilon);
-            v = fabs(v0 - v1);
-            if (idx < 0 || v > vlargest) {
-               idx = j;
-               vlargest = v;
+      // Subsequent steps target either points with maximum change in F[0]
+      // (search for discontinuity) or maximum change in slope of F[0] (search
+      // for nonsmoothness)
+         ae_assert(monitor->probingnstepsstored >= 3, "SMonitor: critical integrity check failed");
+         if (i % 2 == 0) {
+         // Target interval with maximum change in F[0]
+            idx = -1;
+            vlargest = 0.0;
+            for (j = 0; j < monitor->probingnstepsstored - 1; j++) {
+               v = fabs(monitor->probingvalues.xyR[j + 1][0] - monitor->probingvalues.xyR[j][0]);
+               if (idx < 0 || v > vlargest) {
+                  idx = j;
+                  vlargest = v;
+               }
+            }
+            monitor->probingstp = 0.5 * (monitor->probingsteps.xR[idx] + monitor->probingsteps.xR[idx + 1]);
+         } else {
+         // Target interval [J,J+2] with maximum change in slope of F[0], select
+         // subinterval [J,J+1] or [J+1,J+2] with maximum length.
+            idx = -1;
+            vlargest = 0.0;
+            for (j = 0; j < monitor->probingnstepsstored - 2; j++) {
+               v0 = (monitor->probingvalues.xyR[j + 1][0] - monitor->probingvalues.xyR[j + 0][0]) / (monitor->probingsteps.xR[j + 1] - monitor->probingsteps.xR[j + 0] + machineepsilon);
+               v1 = (monitor->probingvalues.xyR[j + 2][0] - monitor->probingvalues.xyR[j + 1][0]) / (monitor->probingsteps.xR[j + 2] - monitor->probingsteps.xR[j + 1] + machineepsilon);
+               v = fabs(v0 - v1);
+               if (idx < 0 || v > vlargest) {
+                  idx = j;
+                  vlargest = v;
+               }
+            }
+            if (monitor->probingsteps.xR[idx + 2] - monitor->probingsteps.xR[idx + 1] > monitor->probingsteps.xR[idx + 1] - monitor->probingsteps.xR[idx + 0]) {
+               monitor->probingstp = 0.5 * (monitor->probingsteps.xR[idx + 2] + monitor->probingsteps.xR[idx + 1]);
+            } else {
+               monitor->probingstp = 0.5 * (monitor->probingsteps.xR[idx + 1] + monitor->probingsteps.xR[idx + 0]);
             }
          }
-         if (monitor->probingsteps.xR[idx + 2] - monitor->probingsteps.xR[idx + 1] > monitor->probingsteps.xR[idx + 1] - monitor->probingsteps.xR[idx + 0]) {
-            monitor->probingstp = 0.5 * (monitor->probingsteps.xR[idx + 2] + monitor->probingsteps.xR[idx + 1]);
-         } else {
-            monitor->probingstp = 0.5 * (monitor->probingsteps.xR[idx + 1] + monitor->probingsteps.xR[idx + 0]);
+      }
+      monitor->probingsteps.xR[monitor->probingnstepsstored] = monitor->probingstp;
+   // Retrieve user values
+      monitor->probingrcomm.stage = 0; goto Pause; Resume0:
+      for (j = 0; j < monitor->probingnvalues; j++) {
+         monitor->probingvalues.xyR[monitor->probingnstepsstored][j] = monitor->probingf.xR[j];
+         monitor->probingslopes.xyR[monitor->probingnstepsstored][j] = 0.0;
+      }
+      monitor->probingnstepsstored++;
+   // Resort
+      for (j = monitor->probingnstepsstored - 1; j >= 1; j--) {
+         if (monitor->probingsteps.xR[j - 1] <= monitor->probingsteps.xR[j]) {
+            break;
          }
+         swapelements(&monitor->probingsteps, j - 1, j);
+         swaprows(&monitor->probingvalues, j - 1, j, monitor->probingnvalues);
       }
    }
-   monitor->probingsteps.xR[monitor->probingnstepsstored] = monitor->probingstp;
-// Retrieve user values
-   monitor->probingrcomm.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   for (j = 0; j < monitor->probingnvalues; j++) {
-      monitor->probingvalues.xyR[monitor->probingnstepsstored][j] = monitor->probingf.xR[j];
-      monitor->probingslopes.xyR[monitor->probingnstepsstored][j] = 0.0;
-   }
-   monitor->probingnstepsstored++;
-// Resort
-   for (j = monitor->probingnstepsstored - 1; j >= 1; j--) {
-      if (monitor->probingsteps.xR[j - 1] <= monitor->probingsteps.xR[j]) {
-         break;
-      }
-      swapelements(&monitor->probingsteps, j - 1, j);
-      swaprows(&monitor->probingvalues, j - 1, j, monitor->probingnvalues);
-   }
-   i++;
-   goto lbl_1;
-lbl_3:
-   result = false;
-   return result;
+Exit:
+   monitor->probingrcomm.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    monitor->probingrcomm.ia.xZ[0] = i;
    monitor->probingrcomm.ia.xZ[1] = j;
    monitor->probingrcomm.ia.xZ[2] = idx;
@@ -3034,7 +3022,7 @@ lbl_rcomm:
    monitor->probingrcomm.ra.xR[1] = v;
    monitor->probingrcomm.ra.xR[2] = v0;
    monitor->probingrcomm.ra.xR[3] = v1;
-   return result;
+   return true;
 }
 
 // This subroutine exports report to user-readable representation (all arrays
@@ -3071,56 +3059,42 @@ bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *uns
    double vp;
    double vm;
    double vc;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (monitor->rstateg0.stage >= 0) {
-      n = monitor->rstateg0.ia.xZ[0];
-      k = monitor->rstateg0.ia.xZ[1];
-      i = monitor->rstateg0.ia.xZ[2];
-      j = monitor->rstateg0.ia.xZ[3];
-      varidx = monitor->rstateg0.ia.xZ[4];
-      v = monitor->rstateg0.ra.xR[0];
-      vp = monitor->rstateg0.ra.xR[1];
-      vm = monitor->rstateg0.ra.xR[2];
-      vc = monitor->rstateg0.ra.xR[3];
-   } else {
-      n = -788;
-      k = 809;
-      i = 205;
-      j = -838;
-      varidx = 939;
-      v = -526;
-      vp = 763;
-      vm = -541;
-      vc = -698;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (monitor->rstateg0.stage < 0) goto Spawn;
+   n = monitor->rstateg0.ia.xZ[0];
+   k = monitor->rstateg0.ia.xZ[1];
+   i = monitor->rstateg0.ia.xZ[2];
+   j = monitor->rstateg0.ia.xZ[3];
+   varidx = monitor->rstateg0.ia.xZ[4];
+   v = monitor->rstateg0.ra.xR[0];
+   vp = monitor->rstateg0.ra.xR[1];
+   vm = monitor->rstateg0.ra.xR[2];
+   vc = monitor->rstateg0.ra.xR[3];
+   switch (monitor->rstateg0.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
+      default: goto Exit;
    }
-   if (monitor->rstateg0.stage == 0) {
-      goto lbl_0;
-   }
-   if (monitor->rstateg0.stage == 1) {
-      goto lbl_1;
-   }
-   if (monitor->rstateg0.stage == 2) {
-      goto lbl_2;
-   }
-   if (monitor->rstateg0.stage == 3) {
-      goto lbl_3;
-   }
+Spawn:
+   n = -788;
+   k = 809;
+   i = 205;
+   j = -838;
+   varidx = 939;
+   v = -526;
+   vp = 763;
+   vm = -541;
+   vc = -698;
 // Routine body
    n = monitor->n;
    k = monitor->k;
    monitor->needfij = false;
 // Quick exit
    if (((n <= 0 || k <= 0) || !isfinite(teststep)) || teststep == 0.0) {
-      result = false;
-      return result;
+      goto Exit;
    }
    teststep = fabs(teststep);
 // Allocate storage
@@ -3156,9 +3130,7 @@ bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *uns
       monitor->x.xR[i] = v;
    }
    monitor->needfij = true;
-   monitor->rstateg0.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
+   monitor->rstateg0.stage = 0; goto Pause; Resume0:
    monitor->needfij = false;
    for (i = 0; i < k; i++) {
       monitor->fbase.xR[i] = monitor->fi.xR[i];
@@ -3168,87 +3140,74 @@ lbl_0:
       }
    }
 // Check Jacobian column by column
-   varidx = 0;
-lbl_4:
-   if (varidx > n - 1) {
-      goto lbl_6;
-   }
-// Determine test location.
-   v = monitor->xbase.xR[varidx];
-   vm = v - s->xR[varidx] * teststep;
-   vp = v + s->xR[varidx] * teststep;
-   if ((hasboxconstraints && isfinite(bndl->xR[varidx])) && vm < bndl->xR[varidx]) {
-      vm = bndl->xR[varidx];
-   }
-   if ((hasboxconstraints && isfinite(bndu->xR[varidx])) && vp > bndu->xR[varidx]) {
-      vp = bndu->xR[varidx];
-   }
-   vc = vm + (vp - vm) / 2;
-// Quickly skip fixed variables
-   if ((vm == vp || vc == vm) || vc == vp) {
-      for (i = 0; i < k; i++) {
-         monitor->rep.badgradnum.xyR[i][varidx] = 0.0;
+   for (varidx = 0; varidx < n; varidx++) {
+   // Determine test location.
+      v = monitor->xbase.xR[varidx];
+      vm = v - s->xR[varidx] * teststep;
+      vp = v + s->xR[varidx] * teststep;
+      if ((hasboxconstraints && isfinite(bndl->xR[varidx])) && vm < bndl->xR[varidx]) {
+         vm = bndl->xR[varidx];
       }
-      goto lbl_5;
-   }
-// Compute F/J at three trial points
-   for (i = 0; i < n; i++) {
-      monitor->x.xR[i] = monitor->xbase.xR[i];
-   }
-   monitor->x.xR[varidx] = vm;
-   monitor->needfij = true;
-   monitor->rstateg0.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   monitor->needfij = false;
-   for (i = 0; i < k; i++) {
-      monitor->fm.xR[i] = monitor->fi.xR[i];
-      monitor->jm.xR[i] = monitor->j.xyR[i][varidx];
-   }
-   for (i = 0; i < n; i++) {
-      monitor->x.xR[i] = monitor->xbase.xR[i];
-   }
-   monitor->x.xR[varidx] = vc;
-   monitor->needfij = true;
-   monitor->rstateg0.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   monitor->needfij = false;
-   for (i = 0; i < k; i++) {
-      monitor->fc.xR[i] = monitor->fi.xR[i];
-      monitor->jc.xR[i] = monitor->j.xyR[i][varidx];
-   }
-   for (i = 0; i < n; i++) {
-      monitor->x.xR[i] = monitor->xbase.xR[i];
-   }
-   monitor->x.xR[varidx] = vp;
-   monitor->needfij = true;
-   monitor->rstateg0.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   monitor->needfij = false;
-   for (i = 0; i < k; i++) {
-      monitor->fp.xR[i] = monitor->fi.xR[i];
-      monitor->jp.xR[i] = monitor->j.xyR[i][varidx];
-   }
-// Check derivative
-   for (i = 0; i < k; i++) {
-      monitor->rep.badgradnum.xyR[i][varidx] = (monitor->fp.xR[i] - monitor->fm.xR[i]) / (vp - vm);
-      if (!derivativecheck(monitor->fm.xR[i], monitor->jm.xR[i] * s->xR[varidx], monitor->fp.xR[i], monitor->jp.xR[i] * s->xR[varidx], monitor->fc.xR[i], monitor->jc.xR[i] * s->xR[varidx], (vp - vm) / s->xR[varidx])) {
-         monitor->rep.badgradsuspected = true;
-         monitor->rep.badgradfidx = i;
-         monitor->rep.badgradvidx = varidx;
+      if ((hasboxconstraints && isfinite(bndu->xR[varidx])) && vp > bndu->xR[varidx]) {
+         vp = bndu->xR[varidx];
+      }
+      vc = vm + (vp - vm) / 2;
+   // Quickly skip fixed variables
+      if ((vm == vp || vc == vm) || vc == vp) {
+         for (i = 0; i < k; i++) {
+            monitor->rep.badgradnum.xyR[i][varidx] = 0.0;
+         }
+      } else {
+      // Compute F/J at three trial points
+         for (i = 0; i < n; i++) {
+            monitor->x.xR[i] = monitor->xbase.xR[i];
+         }
+         monitor->x.xR[varidx] = vm;
+         monitor->needfij = true;
+         monitor->rstateg0.stage = 1; goto Pause; Resume1:
+         monitor->needfij = false;
+         for (i = 0; i < k; i++) {
+            monitor->fm.xR[i] = monitor->fi.xR[i];
+            monitor->jm.xR[i] = monitor->j.xyR[i][varidx];
+         }
+         for (i = 0; i < n; i++) {
+            monitor->x.xR[i] = monitor->xbase.xR[i];
+         }
+         monitor->x.xR[varidx] = vc;
+         monitor->needfij = true;
+         monitor->rstateg0.stage = 2; goto Pause; Resume2:
+         monitor->needfij = false;
+         for (i = 0; i < k; i++) {
+            monitor->fc.xR[i] = monitor->fi.xR[i];
+            monitor->jc.xR[i] = monitor->j.xyR[i][varidx];
+         }
+         for (i = 0; i < n; i++) {
+            monitor->x.xR[i] = monitor->xbase.xR[i];
+         }
+         monitor->x.xR[varidx] = vp;
+         monitor->needfij = true;
+         monitor->rstateg0.stage = 3; goto Pause; Resume3:
+         monitor->needfij = false;
+         for (i = 0; i < k; i++) {
+            monitor->fp.xR[i] = monitor->fi.xR[i];
+            monitor->jp.xR[i] = monitor->j.xyR[i][varidx];
+         }
+      // Check derivative
+         for (i = 0; i < k; i++) {
+            monitor->rep.badgradnum.xyR[i][varidx] = (monitor->fp.xR[i] - monitor->fm.xR[i]) / (vp - vm);
+            if (!derivativecheck(monitor->fm.xR[i], monitor->jm.xR[i] * s->xR[varidx], monitor->fp.xR[i], monitor->jp.xR[i] * s->xR[varidx], monitor->fc.xR[i], monitor->jc.xR[i] * s->xR[varidx], (vp - vm) / s->xR[varidx])) {
+               monitor->rep.badgradsuspected = true;
+               monitor->rep.badgradfidx = i;
+               monitor->rep.badgradvidx = varidx;
+            }
+         }
       }
    }
-lbl_5:
-   varidx++;
-   goto lbl_4;
-lbl_6:
-   result = false;
-   return result;
+Exit:
+   monitor->rstateg0.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    monitor->rstateg0.ia.xZ[0] = n;
    monitor->rstateg0.ia.xZ[1] = k;
    monitor->rstateg0.ia.xZ[2] = i;
@@ -3258,7 +3217,7 @@ lbl_rcomm:
    monitor->rstateg0.ra.xR[1] = vp;
    monitor->rstateg0.ra.xR[2] = vm;
    monitor->rstateg0.ra.xR[3] = vc;
-   return result;
+   return true;
 }
 
 void precbuflbfgs_init(void *_p, bool make_automatic) {
@@ -4010,79 +3969,36 @@ bool minlbfgsiteration(minlbfgsstate *state) {
    ae_int_t mcinfo;
    double v;
    double vv;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      m = state->rstate.ia.xZ[1];
-      i = state->rstate.ia.xZ[2];
-      j = state->rstate.ia.xZ[3];
-      ic = state->rstate.ia.xZ[4];
-      mcinfo = state->rstate.ia.xZ[5];
-      v = state->rstate.ra.xR[0];
-      vv = state->rstate.ra.xR[1];
-   } else {
-      n = 359;
-      m = -58;
-      i = -919;
-      j = -909;
-      ic = 81;
-      mcinfo = 255;
-      v = 74;
-      vv = -788;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   m = state->rstate.ia.xZ[1];
+   i = state->rstate.ia.xZ[2];
+   j = state->rstate.ia.xZ[3];
+   ic = state->rstate.ia.xZ[4];
+   mcinfo = state->rstate.ia.xZ[5];
+   v = state->rstate.ra.xR[0];
+   vv = state->rstate.ra.xR[1];
+   switch (state->rstate.stage) {
+      case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
+      case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
+      case 8: goto Resume08; case 9: goto Resume09; case 10: goto Resume10; case 11: goto Resume11;
+      case 12: goto Resume12; case 13: goto Resume13; case 14: goto Resume14;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
-   if (state->rstate.stage == 5) {
-      goto lbl_5;
-   }
-   if (state->rstate.stage == 6) {
-      goto lbl_6;
-   }
-   if (state->rstate.stage == 7) {
-      goto lbl_7;
-   }
-   if (state->rstate.stage == 8) {
-      goto lbl_8;
-   }
-   if (state->rstate.stage == 9) {
-      goto lbl_9;
-   }
-   if (state->rstate.stage == 10) {
-      goto lbl_10;
-   }
-   if (state->rstate.stage == 11) {
-      goto lbl_11;
-   }
-   if (state->rstate.stage == 12) {
-      goto lbl_12;
-   }
-   if (state->rstate.stage == 13) {
-      goto lbl_13;
-   }
-   if (state->rstate.stage == 14) {
-      goto lbl_14;
-   }
+Spawn:
+   n = 359;
+   m = -58;
+   i = -919;
+   j = -909;
+   ic = 81;
+   mcinfo = 255;
+   v = 74;
+   vv = -788;
 // Routine body
 // Unload frequently used variables from State structure
 // (just for typing convinience)
@@ -4102,99 +4018,65 @@ bool minlbfgsiteration(minlbfgsstate *state) {
 //  Check, that transferred derivative value is right
    state->stp = 0.0;
    minlbfgs_clearrequestfields(state);
-   if (!(state->diffstep == 0.0 && state->teststep > 0.0)) {
-      goto lbl_15;
+   if (state->diffstep == 0.0 && state->teststep > 0.0) {
+      while (smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->s, &state->s, false, state->teststep)) {
+         for (i = 0; i < n; i++) {
+            state->x.xR[i] = state->smonitor.x.xR[i];
+         }
+         state->needfg = true;
+         state->rstate.stage = 0; goto Pause; Resume00:
+         state->needfg = false;
+         state->smonitor.fi.xR[0] = state->f;
+         for (i = 0; i < n; i++) {
+            state->smonitor.j.xyR[0][i] = state->g.xR[i];
+         }
+      }
    }
-lbl_17:
-   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->s, &state->s, false, state->teststep)) {
-      goto lbl_18;
-   }
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = state->smonitor.x.xR[i];
-   }
-   state->needfg = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needfg = false;
-   state->smonitor.fi.xR[0] = state->f;
-   for (i = 0; i < n; i++) {
-      state->smonitor.j.xyR[0][i] = state->g.xR[i];
-   }
-   goto lbl_17;
-lbl_18:
-lbl_15:
 // Calculate F/G at the initial point
    for (i = 0; i < n; i++) {
       state->x.xR[i] = state->xbase.xR[i];
    }
    state->stp = 0.0;
    minlbfgs_clearrequestfields(state);
-   if (state->diffstep != 0.0) {
-      goto lbl_19;
+   if (state->diffstep == 0.0) {
+      state->needfg = true;
+      state->rstate.stage = 1; goto Pause; Resume01:
+      state->needfg = false;
+   } else {
+      state->needf = true;
+      state->rstate.stage = 2; goto Pause; Resume02:
+      state->fbase = state->f;
+      for (i = 0; i < n; i++) {
+         v = state->x.xR[i];
+         state->x.xR[i] = v - state->diffstep * state->s.xR[i];
+         state->rstate.stage = 3; goto Pause; Resume03:
+         state->fm2 = state->f;
+         state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
+         state->rstate.stage = 4; goto Pause; Resume04:
+         state->fm1 = state->f;
+         state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
+         state->rstate.stage = 5; goto Pause; Resume05:
+         state->fp1 = state->f;
+         state->x.xR[i] = v + state->diffstep * state->s.xR[i];
+         state->rstate.stage = 6; goto Pause; Resume06:
+         state->fp2 = state->f;
+         state->x.xR[i] = v;
+         state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
+      }
+      state->f = state->fbase;
+      state->needf = false;
    }
-   state->needfg = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->needfg = false;
-   goto lbl_20;
-lbl_19:
-   state->needf = true;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->fbase = state->f;
-   i = 0;
-lbl_21:
-   if (i > n - 1) {
-      goto lbl_23;
-   }
-   v = state->x.xR[i];
-   state->x.xR[i] = v - state->diffstep * state->s.xR[i];
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->fm2 = state->f;
-   state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   state->fm1 = state->f;
-   state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 5;
-   goto lbl_rcomm;
-lbl_5:
-   state->fp1 = state->f;
-   state->x.xR[i] = v + state->diffstep * state->s.xR[i];
-   state->rstate.stage = 6;
-   goto lbl_rcomm;
-lbl_6:
-   state->fp2 = state->f;
-   state->x.xR[i] = v;
-   state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   i++;
-   goto lbl_21;
-lbl_23:
-   state->f = state->fbase;
-   state->needf = false;
-lbl_20:
    trimprepare(state->f, &state->trimthreshold);
-   if (!state->xrep) {
-      goto lbl_24;
+   if (state->xrep) {
+      minlbfgs_clearrequestfields(state);
+      state->xupdated = true;
+      state->rstate.stage = 7; goto Pause; Resume07:
+      state->xupdated = false;
    }
-   minlbfgs_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 7;
-   goto lbl_rcomm;
-lbl_7:
-   state->xupdated = false;
-lbl_24:
    if (state->userterminationneeded) {
    // User requested termination
       state->repterminationtype = 8;
-      result = false;
-      return result;
+      goto Exit;
    }
    state->repnfev = 1;
    state->fold = state->f;
@@ -4204,8 +4086,7 @@ lbl_24:
    }
    if (sqrt(v) <= state->epsg) {
       state->repterminationtype = 4;
-      result = false;
-      return result;
+      goto Exit;
    }
 // Choose initial step and direction.
 // Apply preconditioner, if we have something other than default.
@@ -4251,240 +4132,200 @@ lbl_24:
    }
 // Main cycle
    state->k = 0;
-lbl_26:
-   if (false) {
-      goto lbl_27;
-   }
-// Main cycle: prepare to 1-D line search
-   state->p = state->k % m;
-   state->q = imin2(state->k, m - 1);
-// Store X[k], G[k]
-   ae_v_move(state->xp.xR, 1, state->x.xR, 1, n);
-   ae_v_moveneg(state->sk.xyR[state->p], 1, state->x.xR, 1, n);
-   ae_v_moveneg(state->yk.xyR[state->p], 1, state->g.xR, 1, n);
-// Minimize F(x+alpha*d)
-// Calculate S[k], Y[k]
-   state->mcstage = 0;
-   if (state->k != 0) {
-      state->stp = 1.0;
-   }
-   linminnormalized(&state->d, &state->stp, n);
-   smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->x, state->f, &state->g);
-   mcsrch(n, &state->x, &state->f, &state->g, &state->d, &state->stp, state->stpmax, minlbfgs_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
-lbl_28:
-   if (state->mcstage == 0) {
-      goto lbl_29;
-   }
-   minlbfgs_clearrequestfields(state);
-   if (state->diffstep != 0.0) {
-      goto lbl_30;
-   }
-   state->needfg = true;
-   state->rstate.stage = 8;
-   goto lbl_rcomm;
-lbl_8:
-   state->needfg = false;
-   goto lbl_31;
-lbl_30:
-   state->needf = true;
-   state->rstate.stage = 9;
-   goto lbl_rcomm;
-lbl_9:
-   state->fbase = state->f;
-   i = 0;
-lbl_32:
-   if (i > n - 1) {
-      goto lbl_34;
-   }
-   v = state->x.xR[i];
-   state->x.xR[i] = v - state->diffstep * state->s.xR[i];
-   state->rstate.stage = 10;
-   goto lbl_rcomm;
-lbl_10:
-   state->fm2 = state->f;
-   state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 11;
-   goto lbl_rcomm;
-lbl_11:
-   state->fm1 = state->f;
-   state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 12;
-   goto lbl_rcomm;
-lbl_12:
-   state->fp1 = state->f;
-   state->x.xR[i] = v + state->diffstep * state->s.xR[i];
-   state->rstate.stage = 13;
-   goto lbl_rcomm;
-lbl_13:
-   state->fp2 = state->f;
-   state->x.xR[i] = v;
-   state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   i++;
-   goto lbl_32;
-lbl_34:
-   state->f = state->fbase;
-   state->needf = false;
-lbl_31:
-   smoothnessmonitorenqueuepoint1u(&state->smonitor, &state->s, &state->invs, &state->d, state->stp, &state->x, state->f, &state->g);
-   trimfunction(&state->f, &state->g, n, state->trimthreshold);
-   mcsrch(n, &state->x, &state->f, &state->g, &state->d, &state->stp, state->stpmax, minlbfgs_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
-   goto lbl_28;
-lbl_29:
-   smoothnessmonitorfinalizelinesearch(&state->smonitor);
-   if (state->userterminationneeded) {
-   // User requested termination.
-   // Restore previous point and return.
-      ae_v_move(state->x.xR, 1, state->xp.xR, 1, n);
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-   if (!state->xrep) {
-      goto lbl_35;
-   }
-// report
-   minlbfgs_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 14;
-   goto lbl_rcomm;
-lbl_14:
-   state->xupdated = false;
-lbl_35:
-   state->repnfev += state->nfev;
-   state->repiterationscount++;
-   ae_v_add(state->sk.xyR[state->p], 1, state->x.xR, 1, n);
-   ae_v_add(state->yk.xyR[state->p], 1, state->g.xR, 1, n);
-// Stopping conditions
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(state->g.xR[i] * state->s.xR[i]);
-   }
-   if (!isfinite(v) || !isfinite(state->f)) {
-   // Abnormal termination - infinities in function/gradient
-      state->repterminationtype = -8;
-      result = false;
-      return result;
-   }
-   if (state->repiterationscount >= state->maxits && state->maxits > 0) {
-   // Too many iterations
-      state->repterminationtype = 5;
-      result = false;
-      return result;
-   }
-   if (sqrt(v) <= state->epsg) {
-   // Gradient is small enough
-      state->repterminationtype = 4;
-      result = false;
-      return result;
-   }
-   if (state->fold - state->f <= state->epsf * rmax2(fabs(state->fold), rmax2(fabs(state->f), 1.0))) {
-   // F(k+1)-F(k) is small enough
-      state->repterminationtype = 1;
-      result = false;
-      return result;
-   }
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(state->sk.xyR[state->p][i] / state->s.xR[i]);
-   }
-   if (sqrt(v) <= state->epsx) {
-   // X(k+1)-X(k) is small enough
-      state->repterminationtype = 2;
-      result = false;
-      return result;
-   }
-// If Wolfe conditions are satisfied, we can update
-// limited memory model.
-//
-// However, if conditions are not satisfied (NFEV limit is met,
-// function is too wild, ...), we'll skip L-BFGS update
-   if (mcinfo != 1) {
-   // Skip update.
-   //
-   // In such cases we'll initialize search direction by
-   // antigradient vector, because it  leads to more
-   // transparent code with less number of special cases
-      state->fold = state->f;
-      ae_v_moveneg(state->d.xR, 1, state->g.xR, 1, n);
-   } else {
-   // Calculate Rho[k], GammaK
-      v = ae_v_dotproduct(state->yk.xyR[state->p], 1, state->sk.xyR[state->p], 1, n);
-      vv = ae_v_dotproduct(state->yk.xyR[state->p], 1, state->yk.xyR[state->p], 1, n);
-      if (v == 0.0 || vv == 0.0) {
-      // Rounding errors make further iterations impossible.
-         state->repterminationtype = -2;
-         result = false;
-         return result;
+   while (true) {
+   // Main cycle: prepare to 1-D line search
+      state->p = state->k % m;
+      state->q = imin2(state->k, m - 1);
+   // Store X[k], G[k]
+      ae_v_move(state->xp.xR, 1, state->x.xR, 1, n);
+      ae_v_moveneg(state->sk.xyR[state->p], 1, state->x.xR, 1, n);
+      ae_v_moveneg(state->yk.xyR[state->p], 1, state->g.xR, 1, n);
+   // Minimize F(x+alpha*d)
+   // Calculate S[k], Y[k]
+      state->mcstage = 0;
+      if (state->k != 0) {
+         state->stp = 1.0;
       }
-      state->rho.xR[state->p] = 1 / v;
-      state->gammak = v / vv;
-   //  Calculate d(k+1) = -H(k+1)*g(k+1)
-   //
-   //  for I:=K downto K-Q do
-   //      V = s(i)^T * work(iteration:I)
-   //      theta(i) = V
-   //      work(iteration:I+1) = work(iteration:I) - V*Rho(i)*y(i)
-   //  work(last iteration) = H0*work(last iteration) - preconditioner
-   //  for I:=K-Q to K do
-   //      V = y(i)^T*work(iteration:I)
-   //      work(iteration:I+1) = work(iteration:I) +(-V+theta(i))*Rho(i)*s(i)
-   //
-   //  NOW WORK CONTAINS d(k+1)
-      ae_v_move(state->work.xR, 1, state->g.xR, 1, n);
-      for (i = state->k; i >= state->k - state->q; i--) {
-         ic = i % m;
-         v = ae_v_dotproduct(state->sk.xyR[ic], 1, state->work.xR, 1, n);
-         state->theta.xR[ic] = v;
-         vv = v * state->rho.xR[ic];
-         ae_v_subd(state->work.xR, 1, state->yk.xyR[ic], 1, n, vv);
-      }
-      if (state->prectype == 0) {
-      // Simple preconditioner is used
-         v = state->gammak;
-         ae_v_muld(state->work.xR, 1, n, v);
-      }
-      if (state->prectype == 1) {
-      // Cholesky preconditioner is used
-         fblscholeskysolve(&state->denseh, 1.0, n, true, &state->work, &state->autobuf);
-      }
-      if (state->prectype == 2) {
-      // diagonal approximation is used
-         for (i = 0; i < n; i++) {
-            state->work.xR[i] /= state->diagh.xR[i];
+      linminnormalized(&state->d, &state->stp, n);
+      smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->x, state->f, &state->g);
+      mcsrch(n, &state->x, &state->f, &state->g, &state->d, &state->stp, state->stpmax, minlbfgs_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
+      while (state->mcstage != 0) {
+         minlbfgs_clearrequestfields(state);
+         if (state->diffstep == 0.0) {
+            state->needfg = true;
+            state->rstate.stage = 8; goto Pause; Resume08:
+            state->needfg = false;
+         } else {
+            state->needf = true;
+            state->rstate.stage = 9; goto Pause; Resume09:
+            state->fbase = state->f;
+            for (i = 0; i < n; i++) {
+               v = state->x.xR[i];
+               state->x.xR[i] = v - state->diffstep * state->s.xR[i];
+               state->rstate.stage = 10; goto Pause; Resume10:
+               state->fm2 = state->f;
+               state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
+               state->rstate.stage = 11; goto Pause; Resume11:
+               state->fm1 = state->f;
+               state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
+               state->rstate.stage = 12; goto Pause; Resume12:
+               state->fp1 = state->f;
+               state->x.xR[i] = v + state->diffstep * state->s.xR[i];
+               state->rstate.stage = 13; goto Pause; Resume13:
+               state->fp2 = state->f;
+               state->x.xR[i] = v;
+               state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
+            }
+            state->f = state->fbase;
+            state->needf = false;
          }
+         smoothnessmonitorenqueuepoint1u(&state->smonitor, &state->s, &state->invs, &state->d, state->stp, &state->x, state->f, &state->g);
+         trimfunction(&state->f, &state->g, n, state->trimthreshold);
+         mcsrch(n, &state->x, &state->f, &state->g, &state->d, &state->stp, state->stpmax, minlbfgs_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
       }
-      if (state->prectype == 3) {
-      // scale-based preconditioner is used
-         for (i = 0; i < n; i++) {
-            state->work.xR[i] *= state->s.xR[i] * state->s.xR[i];
+      smoothnessmonitorfinalizelinesearch(&state->smonitor);
+      if (state->userterminationneeded) {
+      // User requested termination.
+      // Restore previous point and return.
+         ae_v_move(state->x.xR, 1, state->xp.xR, 1, n);
+         state->repterminationtype = 8;
+         goto Exit;
+      }
+      if (state->xrep) {
+      // report
+         minlbfgs_clearrequestfields(state);
+         state->xupdated = true;
+         state->rstate.stage = 14; goto Pause; Resume14:
+         state->xupdated = false;
+      }
+      state->repnfev += state->nfev;
+      state->repiterationscount++;
+      ae_v_add(state->sk.xyR[state->p], 1, state->x.xR, 1, n);
+      ae_v_add(state->yk.xyR[state->p], 1, state->g.xR, 1, n);
+   // Stopping conditions
+      v = 0.0;
+      for (i = 0; i < n; i++) {
+         v += sqr(state->g.xR[i] * state->s.xR[i]);
+      }
+      if (!isfinite(v) || !isfinite(state->f)) {
+      // Abnormal termination - infinities in function/gradient
+         state->repterminationtype = -8;
+         goto Exit;
+      }
+      if (state->repiterationscount >= state->maxits && state->maxits > 0) {
+      // Too many iterations
+         state->repterminationtype = 5;
+         goto Exit;
+      }
+      if (sqrt(v) <= state->epsg) {
+      // Gradient is small enough
+         state->repterminationtype = 4;
+         goto Exit;
+      }
+      if (state->fold - state->f <= state->epsf * rmax2(fabs(state->fold), rmax2(fabs(state->f), 1.0))) {
+      // F(k+1)-F(k) is small enough
+         state->repterminationtype = 1;
+         goto Exit;
+      }
+      v = 0.0;
+      for (i = 0; i < n; i++) {
+         v += sqr(state->sk.xyR[state->p][i] / state->s.xR[i]);
+      }
+      if (sqrt(v) <= state->epsx) {
+      // X(k+1)-X(k) is small enough
+         state->repterminationtype = 2;
+         goto Exit;
+      }
+   // If Wolfe conditions are satisfied, we can update
+   // limited memory model.
+   //
+   // However, if conditions are not satisfied (NFEV limit is met,
+   // function is too wild, ...), we'll skip L-BFGS update
+      if (mcinfo != 1) {
+      // Skip update.
+      //
+      // In such cases we'll initialize search direction by
+      // antigradient vector, because it  leads to more
+      // transparent code with less number of special cases
+         state->fold = state->f;
+         ae_v_moveneg(state->d.xR, 1, state->g.xR, 1, n);
+      } else {
+      // Calculate Rho[k], GammaK
+         v = ae_v_dotproduct(state->yk.xyR[state->p], 1, state->sk.xyR[state->p], 1, n);
+         vv = ae_v_dotproduct(state->yk.xyR[state->p], 1, state->yk.xyR[state->p], 1, n);
+         if (v == 0.0 || vv == 0.0) {
+         // Rounding errors make further iterations impossible.
+            state->repterminationtype = -2;
+            goto Exit;
          }
+         state->rho.xR[state->p] = 1 / v;
+         state->gammak = v / vv;
+      //  Calculate d(k+1) = -H(k+1)*g(k+1)
+      //
+      //  for I:=K downto K-Q do
+      //      V = s(i)^T * work(iteration:I)
+      //      theta(i) = V
+      //      work(iteration:I+1) = work(iteration:I) - V*Rho(i)*y(i)
+      //  work(last iteration) = H0*work(last iteration) - preconditioner
+      //  for I:=K-Q to K do
+      //      V = y(i)^T*work(iteration:I)
+      //      work(iteration:I+1) = work(iteration:I) +(-V+theta(i))*Rho(i)*s(i)
+      //
+      //  NOW WORK CONTAINS d(k+1)
+         ae_v_move(state->work.xR, 1, state->g.xR, 1, n);
+         for (i = state->k; i >= state->k - state->q; i--) {
+            ic = i % m;
+            v = ae_v_dotproduct(state->sk.xyR[ic], 1, state->work.xR, 1, n);
+            state->theta.xR[ic] = v;
+            vv = v * state->rho.xR[ic];
+            ae_v_subd(state->work.xR, 1, state->yk.xyR[ic], 1, n, vv);
+         }
+         if (state->prectype == 0) {
+         // Simple preconditioner is used
+            v = state->gammak;
+            ae_v_muld(state->work.xR, 1, n, v);
+         }
+         if (state->prectype == 1) {
+         // Cholesky preconditioner is used
+            fblscholeskysolve(&state->denseh, 1.0, n, true, &state->work, &state->autobuf);
+         }
+         if (state->prectype == 2) {
+         // diagonal approximation is used
+            for (i = 0; i < n; i++) {
+               state->work.xR[i] /= state->diagh.xR[i];
+            }
+         }
+         if (state->prectype == 3) {
+         // scale-based preconditioner is used
+            for (i = 0; i < n; i++) {
+               state->work.xR[i] *= state->s.xR[i] * state->s.xR[i];
+            }
+         }
+         if (state->prectype == 4) {
+         // Rank-K BFGS-based preconditioner is used
+            inexactlbfgspreconditioner(&state->work, n, &state->precd, &state->precc, &state->precw, state->preck, &state->precbuf);
+         }
+         if (state->prectype == 5) {
+         // Exact low-rank preconditioner is used
+            applylowrankpreconditioner(&state->work, &state->lowrankbuf);
+         }
+         for (i = state->k - state->q; i <= state->k; i++) {
+            ic = i % m;
+            v = ae_v_dotproduct(state->yk.xyR[ic], 1, state->work.xR, 1, n);
+            vv = state->rho.xR[ic] * (-v + state->theta.xR[ic]);
+            ae_v_addd(state->work.xR, 1, state->sk.xyR[ic], 1, n, vv);
+         }
+         ae_v_moveneg(state->d.xR, 1, state->work.xR, 1, n);
+      // Next step
+         state->fold = state->f;
+         state->k++;
       }
-      if (state->prectype == 4) {
-      // Rank-K BFGS-based preconditioner is used
-         inexactlbfgspreconditioner(&state->work, n, &state->precd, &state->precc, &state->precw, state->preck, &state->precbuf);
-      }
-      if (state->prectype == 5) {
-      // Exact low-rank preconditioner is used
-         applylowrankpreconditioner(&state->work, &state->lowrankbuf);
-      }
-      for (i = state->k - state->q; i <= state->k; i++) {
-         ic = i % m;
-         v = ae_v_dotproduct(state->yk.xyR[ic], 1, state->work.xR, 1, n);
-         vv = state->rho.xR[ic] * (-v + state->theta.xR[ic]);
-         ae_v_addd(state->work.xR, 1, state->sk.xyR[ic], 1, n, vv);
-      }
-      ae_v_moveneg(state->d.xR, 1, state->work.xR, 1, n);
-   // Next step
-      state->fold = state->f;
-      state->k++;
    }
-   goto lbl_26;
-lbl_27:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = m;
    state->rstate.ia.xZ[2] = i;
@@ -4493,7 +4334,7 @@ lbl_rcomm:
    state->rstate.ia.xZ[5] = mcinfo;
    state->rstate.ra.xR[0] = v;
    state->rstate.ra.xR[1] = vv;
-   return result;
+   return true;
 }
 
 // This  function  activates/deactivates verification  of  the  user-supplied
@@ -13297,112 +13138,50 @@ bool minbleiciteration(minbleicstate *state) {
    double penalty;
    double ginit;
    double gdecay;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      m = state->rstate.ia.xZ[1];
-      i = state->rstate.ia.xZ[2];
-      j = state->rstate.ia.xZ[3];
-      mcinfo = state->rstate.ia.xZ[4];
-      actstatus = state->rstate.ia.xZ[5];
-      itidx = state->rstate.ia.xZ[6];
-      b = state->rstate.ba.xB[0];
-      v = state->rstate.ra.xR[0];
-      vv = state->rstate.ra.xR[1];
-      v0 = state->rstate.ra.xR[2];
-      penalty = state->rstate.ra.xR[3];
-      ginit = state->rstate.ra.xR[4];
-      gdecay = state->rstate.ra.xR[5];
-   } else {
-      n = 359;
-      m = -58;
-      i = -919;
-      j = -909;
-      mcinfo = 81;
-      actstatus = 255;
-      itidx = 74;
-      b = false;
-      v = 809;
-      vv = 205;
-      v0 = -838;
-      penalty = 939;
-      ginit = -526;
-      gdecay = 763;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   m = state->rstate.ia.xZ[1];
+   i = state->rstate.ia.xZ[2];
+   j = state->rstate.ia.xZ[3];
+   mcinfo = state->rstate.ia.xZ[4];
+   actstatus = state->rstate.ia.xZ[5];
+   itidx = state->rstate.ia.xZ[6];
+   b = state->rstate.ba.xB[0];
+   v = state->rstate.ra.xR[0];
+   vv = state->rstate.ra.xR[1];
+   v0 = state->rstate.ra.xR[2];
+   penalty = state->rstate.ra.xR[3];
+   ginit = state->rstate.ra.xR[4];
+   gdecay = state->rstate.ra.xR[5];
+   switch (state->rstate.stage) {
+      case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
+      case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
+      case 8: goto Resume08; case 9: goto Resume09; case 10: goto Resume10; case 11: goto Resume11;
+      case 12: goto Resume12; case 13: goto Resume13; case 14: goto Resume14; case 15: goto Resume15;
+      case 16: goto Resume16; case 17: goto Resume17; case 18: goto Resume18;
+      case 19: goto Resume19; case 20: goto Resume20; case 21: goto Resume21;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
-   if (state->rstate.stage == 5) {
-      goto lbl_5;
-   }
-   if (state->rstate.stage == 6) {
-      goto lbl_6;
-   }
-   if (state->rstate.stage == 7) {
-      goto lbl_7;
-   }
-   if (state->rstate.stage == 8) {
-      goto lbl_8;
-   }
-   if (state->rstate.stage == 9) {
-      goto lbl_9;
-   }
-   if (state->rstate.stage == 10) {
-      goto lbl_10;
-   }
-   if (state->rstate.stage == 11) {
-      goto lbl_11;
-   }
-   if (state->rstate.stage == 12) {
-      goto lbl_12;
-   }
-   if (state->rstate.stage == 13) {
-      goto lbl_13;
-   }
-   if (state->rstate.stage == 14) {
-      goto lbl_14;
-   }
-   if (state->rstate.stage == 15) {
-      goto lbl_15;
-   }
-   if (state->rstate.stage == 16) {
-      goto lbl_16;
-   }
-   if (state->rstate.stage == 17) {
-      goto lbl_17;
-   }
-   if (state->rstate.stage == 18) {
-      goto lbl_18;
-   }
-   if (state->rstate.stage == 19) {
-      goto lbl_19;
-   }
-   if (state->rstate.stage == 20) {
-      goto lbl_20;
-   }
-   if (state->rstate.stage == 21) {
-      goto lbl_21;
-   }
+Spawn:
+   n = 359;
+   m = -58;
+   i = -919;
+   j = -909;
+   mcinfo = 81;
+   actstatus = 255;
+   itidx = 74;
+   b = false;
+   v = 809;
+   vv = 205;
+   v0 = -838;
+   penalty = 939;
+   ginit = -526;
+   gdecay = 763;
 // Routine body
 // Algorithm parameters:
 // * M          number of L-BFGS corrections.
@@ -13427,8 +13206,7 @@ bool minbleiciteration(minbleicstate *state) {
    state->repdebugdx = NAN;
    if (state->stpmax != 0.0 && state->prectype != 0) {
       state->repterminationtype = -10;
-      result = false;
-      return result;
+      goto Exit;
    }
    matrixsetlengthatleast(&state->bufyk, m + 1, n);
    matrixsetlengthatleast(&state->bufsk, m + 1, n);
@@ -13442,28 +13220,20 @@ bool minbleiciteration(minbleicstate *state) {
    }
 //  Check analytic derivative
    minbleic_clearrequestfields(state);
-   if (!(state->diffstep == 0.0 && state->teststep > 0.0)) {
-      goto lbl_22;
+   if (state->diffstep == 0.0 && state->teststep > 0.0) {
+      while (smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xstart, &state->s, &state->bndl, &state->bndu, true, state->teststep)) {
+         for (i = 0; i < n; i++) {
+            state->x.xR[i] = state->smonitor.x.xR[i];
+         }
+         state->needfg = true;
+         state->rstate.stage = 0; goto Pause; Resume00:
+         state->needfg = false;
+         state->smonitor.fi.xR[0] = state->f;
+         for (i = 0; i < n; i++) {
+            state->smonitor.j.xyR[0][i] = state->g.xR[i];
+         }
+      }
    }
-lbl_24:
-   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xstart, &state->s, &state->bndl, &state->bndu, true, state->teststep)) {
-      goto lbl_25;
-   }
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = state->smonitor.x.xR[i];
-   }
-   state->needfg = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needfg = false;
-   state->smonitor.fi.xR[0] = state->f;
-   for (i = 0; i < n; i++) {
-      state->smonitor.j.xyR[0][i] = state->g.xR[i];
-   }
-   goto lbl_24;
-lbl_25:
-lbl_22:
 // Fill TmpPrec with current preconditioner
    vectorsetlengthatleast(&state->tmpprec, n);
    for (i = 0; i < n; i++) {
@@ -13481,8 +13251,7 @@ lbl_22:
 // Start optimization
    if (!sasstartoptimization(&state->sas, &state->xstart)) {
       state->repterminationtype = -3;
-      result = false;
-      return result;
+      goto Exit;
    }
 // Main cycle of BLEIC-PG algorithm
    state->repterminationtype = 0;
@@ -13492,644 +13261,553 @@ lbl_22:
    state->nonmonotoniccnt = iround(1.5 * (n + state->nic)) + 5;
    ae_v_move(state->x.xR, 1, state->sas.xc.xR, 1, n);
    minbleic_clearrequestfields(state);
-   if (state->diffstep != 0.0) {
-      goto lbl_26;
+   if (state->diffstep == 0.0) {
+      state->needfg = true;
+      state->rstate.stage = 1; goto Pause; Resume01:
+      state->needfg = false;
+   } else {
+      state->needf = true;
+      state->rstate.stage = 2; goto Pause; Resume02:
+      state->needf = false;
    }
-   state->needfg = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->needfg = false;
-   goto lbl_27;
-lbl_26:
-   state->needf = true;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->needf = false;
-lbl_27:
    state->fc = state->f;
    trimprepare(state->f, &state->trimthreshold);
    state->repnfev++;
-   if (!state->xrep) {
-      goto lbl_28;
-   }
-// Report current point
-   ae_v_move(state->x.xR, 1, state->sas.xc.xR, 1, n);
-   state->f = state->fc;
-   state->xupdated = true;
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->xupdated = false;
-lbl_28:
-   if (state->userterminationneeded) {
-   // User requested termination
-      sasstopoptimization(&state->sas);
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-lbl_30:
-   if (false) {
-      goto lbl_31;
-   }
-// Preparations
-//
-// (a) calculate unconstrained gradient
-// (b) determine initial active set
-// (c) update MaxScaledGrad
-// (d) check F/G for NAN/INF, abnormally terminate algorithm if needed
-   ae_v_move(state->x.xR, 1, state->sas.xc.xR, 1, n);
-   minbleic_clearrequestfields(state);
-   if (state->diffstep != 0.0) {
-      goto lbl_32;
-   }
-// Analytic gradient
-   state->needfg = true;
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   state->needfg = false;
-   goto lbl_33;
-lbl_32:
-// Numerical differentiation
-   state->needf = true;
-   state->rstate.stage = 5;
-   goto lbl_rcomm;
-lbl_5:
-   state->fbase = state->f;
-   i = 0;
-lbl_34:
-   if (i > n - 1) {
-      goto lbl_36;
-   }
-   v = state->x.xR[i];
-   b = false;
-   if (state->hasbndl.xB[i]) {
-      b = b || v - state->diffstep * state->s.xR[i] < state->bndl.xR[i];
-   }
-   if (state->hasbndu.xB[i]) {
-      b = b || v + state->diffstep * state->s.xR[i] > state->bndu.xR[i];
-   }
-   if (b) {
-      goto lbl_37;
-   }
-   state->x.xR[i] = v - state->diffstep * state->s.xR[i];
-   state->rstate.stage = 6;
-   goto lbl_rcomm;
-lbl_6:
-   state->fm2 = state->f;
-   state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 7;
-   goto lbl_rcomm;
-lbl_7:
-   state->fm1 = state->f;
-   state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 8;
-   goto lbl_rcomm;
-lbl_8:
-   state->fp1 = state->f;
-   state->x.xR[i] = v + state->diffstep * state->s.xR[i];
-   state->rstate.stage = 9;
-   goto lbl_rcomm;
-lbl_9:
-   state->fp2 = state->f;
-   state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   goto lbl_38;
-lbl_37:
-   state->xm1 = v - state->diffstep * state->s.xR[i];
-   state->xp1 = v + state->diffstep * state->s.xR[i];
-   if (state->hasbndl.xB[i] && state->xm1 < state->bndl.xR[i]) {
-      state->xm1 = state->bndl.xR[i];
-   }
-   if (state->hasbndu.xB[i] && state->xp1 > state->bndu.xR[i]) {
-      state->xp1 = state->bndu.xR[i];
-   }
-   state->x.xR[i] = state->xm1;
-   state->rstate.stage = 10;
-   goto lbl_rcomm;
-lbl_10:
-   state->fm1 = state->f;
-   state->x.xR[i] = state->xp1;
-   state->rstate.stage = 11;
-   goto lbl_rcomm;
-lbl_11:
-   state->fp1 = state->f;
-   if (state->xm1 != state->xp1) {
-      state->g.xR[i] = (state->fp1 - state->fm1) / (state->xp1 - state->xm1);
-   } else {
-      state->g.xR[i] = 0.0;
-   }
-lbl_38:
-   state->x.xR[i] = v;
-   i++;
-   goto lbl_34;
-lbl_36:
-   state->f = state->fbase;
-   state->needf = false;
-lbl_33:
-   state->fc = state->f;
-   ae_v_move(state->ugc.xR, 1, state->g.xR, 1, n);
-   ae_v_move(state->cgc.xR, 1, state->g.xR, 1, n);
-   sasreactivateconstraintsprec(&state->sas, &state->ugc);
-   sasconstraineddirection(&state->sas, &state->cgc);
-   ginit = 0.0;
-   for (i = 0; i < n; i++) {
-      ginit += sqr(state->cgc.xR[i] * state->s.xR[i]);
-   }
-   ginit = sqrt(ginit);
-   state->maxscaledgrad = rmax2(state->maxscaledgrad, ginit);
-   if (!isfinite(ginit) || !isfinite(state->fc)) {
-   // Abnormal termination - infinities in function/gradient
-      sasstopoptimization(&state->sas);
-      state->repterminationtype = -8;
-      result = false;
-      return result;
+   if (state->xrep) {
+   // Report current point
+      ae_v_move(state->x.xR, 1, state->sas.xc.xR, 1, n);
+      state->f = state->fc;
+      state->xupdated = true;
+      state->rstate.stage = 3; goto Pause; Resume03:
+      state->xupdated = false;
    }
    if (state->userterminationneeded) {
    // User requested termination
       sasstopoptimization(&state->sas);
       state->repterminationtype = 8;
-      result = false;
-      return result;
+      goto Exit;
    }
-// LBFGS stage:
-// * during LBFGS iterations we activate new constraints, but never
-//   deactivate already active ones.
-// * we perform at most N iterations of LBFGS before re-evaluating
-//   active set and restarting LBFGS.
-// * first iteration of LBFGS is a special - it is performed with
-//   minimum set of active constraints, algorithm termination can
-//   be performed only at this state. We call this iteration
-//  "steepest descent step".
-//
-// About termination:
-// * LBFGS iterations can be terminated because of two reasons:
-//   * "termination" - non-zero termination code in RepTerminationType,
-//     which means that optimization is done
-//   * "restart" - zero RepTerminationType, which means that we
-//     have to re-evaluate active set and resume LBFGS stage.
-// * one more option is "refresh" - to continue LBFGS iterations,
-//   but with all BFGS updates (Sk/Yk pairs) being dropped;
-//   it happens after changes in active set
-   state->bufsize = 0;
-   state->steepestdescentstep = true;
-   itidx = -1;
-lbl_39:
-   if (itidx >= n - 1) {
-      goto lbl_40;
-   }
-// Increment iterations counter
-//
-// NOTE: we have strong reasons to use such complex scheme
-//       instead of just for() loop - this counter may be
-//       decreased at some occasions to perform "restart"
-//       of an iteration.
-   itidx++;
-// At the beginning of each iteration:
-// * SAS.XC stores current point
-// * FC stores current function value
-// * UGC stores current unconstrained gradient
-// * CGC stores current constrained gradient
-// * D stores constrained step direction (calculated at this block)
-//
-//
-// Check gradient-based stopping criteria
-//
-// This stopping condition is tested only for step which is the
-// first step of LBFGS (subsequent steps may accumulate active
-// constraints thus they should NOT be used for stopping - gradient
-// may be small when constrained, but these constraints may be
-// deactivated by the subsequent steps)
-   if (state->steepestdescentstep && sasscaledconstrainednorm(&state->sas, &state->ugc) <= state->epsg) {
-   // Gradient is small enough.
-   // Optimization is terminated
-      state->repterminationtype = 4;
-      goto lbl_40;
-   }
-// 1. Calculate search direction D according to L-BFGS algorithm
-//    using constrained preconditioner to perform inner multiplication.
-// 2. Evaluate scaled length of direction D; restart LBFGS if D is zero
-//    (it may be possible that we found minimum, but it is also possible
-//    that some constraints need deactivation)
-// 3. If D is non-zero, try to use previous scaled step length as initial estimate for new step.
-   ae_v_move(state->work.xR, 1, state->cgc.xR, 1, n);
-   for (i = state->bufsize - 1; i >= 0; i--) {
-      v = ae_v_dotproduct(state->bufsk.xyR[i], 1, state->work.xR, 1, n);
-      state->buftheta.xR[i] = v;
-      vv = v * state->bufrho.xR[i];
-      ae_v_subd(state->work.xR, 1, state->bufyk.xyR[i], 1, n, vv);
-   }
-   sasconstraineddirectionprec(&state->sas, &state->work);
-   for (i = 0; i < state->bufsize; i++) {
-      v = ae_v_dotproduct(state->bufyk.xyR[i], 1, state->work.xR, 1, n);
-      vv = state->bufrho.xR[i] * (-v + state->buftheta.xR[i]);
-      ae_v_addd(state->work.xR, 1, state->bufsk.xyR[i], 1, n, vv);
-   }
-   sasconstraineddirection(&state->sas, &state->work);
-   ae_v_moveneg(state->d.xR, 1, state->work.xR, 1, n);
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(state->d.xR[i] / state->s.xR[i]);
-   }
-   v = sqrt(v);
-   if (v == 0.0) {
-   // Search direction is zero.
-   // If we perform "steepest descent step", algorithm is terminated.
-   // Otherwise we just restart LBFGS.
-      if (state->steepestdescentstep) {
-         state->repterminationtype = 4;
-      }
-      goto lbl_40;
-   }
-   ae_assert(v > 0.0, "MinBLEIC: internal error");
-   if (state->lastscaledgoodstep > 0.0 && v > 0.0) {
-      state->stp = state->lastscaledgoodstep / v;
-   } else {
-      state->stp = 1.0 / v;
-   }
-// Calculate bound on step length.
-// Step direction is stored
-   sasexploredirection(&state->sas, &state->d, &state->curstpmax, &state->cidx, &state->cval);
-   state->activationstep = state->curstpmax;
-   if (state->cidx >= 0 && state->activationstep == 0.0) {
-   // We are exactly at the boundary, immediate activation
-   // of constraint is required. LBFGS stage is continued
-   // with "refreshed" model.
+   while (true) {
+   // Preparations
    //
-   // ! IMPORTANT: we do not clear SteepestDescent flag here,
-   // !            it is very important for correct stopping
-   // !            of algorithm.
-   //
-   // ! IMPORTANT: we decrease iteration counter in order to
-   //              preserve computational budget for iterations.
-      sasimmediateactivation(&state->sas, state->cidx, state->cval);
-      state->bufsize = 0;
-      itidx--;
-      goto lbl_39;
-   }
-   if (state->stpmax > 0.0) {
-      v = ae_v_dotproduct(state->d.xR, 1, state->d.xR, 1, n);
-      v = sqrt(v);
-      if (v > 0.0) {
-         state->curstpmax = rmin2(state->curstpmax, state->stpmax / v);
-      }
-   }
-// Report beginning of line search (if requested by caller).
-// See description of the MinBLEICState for more information
-// about fields accessible to caller.
-//
-// Caller may do following:
-// * change State.Stp and load better initial estimate of
-//   the step length.
-// Caller may not terminate algorithm.
-   if (!state->drep) {
-      goto lbl_41;
-   }
-   minbleic_clearrequestfields(state);
-   state->lsstart = true;
-   state->boundedstep = state->cidx >= 0;
-   ae_v_move(state->x.xR, 1, state->sas.xc.xR, 1, n);
-   state->rstate.stage = 12;
-   goto lbl_rcomm;
-lbl_12:
-   state->lsstart = false;
-lbl_41:
-// Minimize F(x+alpha*d)
-   ae_v_move(state->xn.xR, 1, state->sas.xc.xR, 1, n);
-   ae_v_move(state->cgn.xR, 1, state->cgc.xR, 1, n);
-   ae_v_move(state->ugn.xR, 1, state->ugc.xR, 1, n);
-   state->fn = state->fc;
-   state->mcstage = 0;
-   smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->xn, state->fn, &state->ugn);
-   mcsrch(n, &state->xn, &state->fn, &state->ugn, &state->d, &state->stp, state->curstpmax, minbleic_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
-lbl_43:
-   if (state->mcstage == 0) {
-      goto lbl_44;
-   }
-// Perform correction (constraints are enforced)
-// Copy XN to X
-   sascorrection(&state->sas, &state->xn, &penalty);
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = state->xn.xR[i];
-   }
-// Gradient, either user-provided or numerical differentiation
-   minbleic_clearrequestfields(state);
-   if (state->diffstep != 0.0) {
-      goto lbl_45;
-   }
-// Analytic gradient
-   state->needfg = true;
-   state->rstate.stage = 13;
-   goto lbl_rcomm;
-lbl_13:
-   state->needfg = false;
-   state->repnfev++;
-   goto lbl_46;
-lbl_45:
-// Numerical differentiation
-   state->needf = true;
-   state->rstate.stage = 14;
-   goto lbl_rcomm;
-lbl_14:
-   state->fbase = state->f;
-   i = 0;
-lbl_47:
-   if (i > n - 1) {
-      goto lbl_49;
-   }
-   v = state->x.xR[i];
-   b = false;
-   if (state->hasbndl.xB[i]) {
-      b = b || v - state->diffstep * state->s.xR[i] < state->bndl.xR[i];
-   }
-   if (state->hasbndu.xB[i]) {
-      b = b || v + state->diffstep * state->s.xR[i] > state->bndu.xR[i];
-   }
-   if (b) {
-      goto lbl_50;
-   }
-   state->x.xR[i] = v - state->diffstep * state->s.xR[i];
-   state->rstate.stage = 15;
-   goto lbl_rcomm;
-lbl_15:
-   state->fm2 = state->f;
-   state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 16;
-   goto lbl_rcomm;
-lbl_16:
-   state->fm1 = state->f;
-   state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 17;
-   goto lbl_rcomm;
-lbl_17:
-   state->fp1 = state->f;
-   state->x.xR[i] = v + state->diffstep * state->s.xR[i];
-   state->rstate.stage = 18;
-   goto lbl_rcomm;
-lbl_18:
-   state->fp2 = state->f;
-   state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   state->repnfev += 4;
-   goto lbl_51;
-lbl_50:
-   state->xm1 = v - state->diffstep * state->s.xR[i];
-   state->xp1 = v + state->diffstep * state->s.xR[i];
-   if (state->hasbndl.xB[i] && state->xm1 < state->bndl.xR[i]) {
-      state->xm1 = state->bndl.xR[i];
-   }
-   if (state->hasbndu.xB[i] && state->xp1 > state->bndu.xR[i]) {
-      state->xp1 = state->bndu.xR[i];
-   }
-   state->x.xR[i] = state->xm1;
-   state->rstate.stage = 19;
-   goto lbl_rcomm;
-lbl_19:
-   state->fm1 = state->f;
-   state->x.xR[i] = state->xp1;
-   state->rstate.stage = 20;
-   goto lbl_rcomm;
-lbl_20:
-   state->fp1 = state->f;
-   if (state->xm1 != state->xp1) {
-      state->g.xR[i] = (state->fp1 - state->fm1) / (state->xp1 - state->xm1);
-   } else {
-      state->g.xR[i] = 0.0;
-   }
-   state->repnfev += 2;
-lbl_51:
-   state->x.xR[i] = v;
-   i++;
-   goto lbl_47;
-lbl_49:
-   state->f = state->fbase;
-   state->needf = false;
-lbl_46:
-// Back to MCSRCH
-//
-// NOTE: penalty term from correction is added to FN in order
-//       to penalize increase in infeasibility.
-   smoothnessmonitorenqueuepoint1u(&state->smonitor, &state->s, &state->invs, &state->d, state->stp, &state->x, state->f, &state->g);
-   state->fn = state->f + minbleic_penaltyfactor * state->maxscaledgrad * penalty;
-   ae_v_move(state->cgn.xR, 1, state->g.xR, 1, n);
-   ae_v_move(state->ugn.xR, 1, state->g.xR, 1, n);
-   sasconstraineddirection(&state->sas, &state->cgn);
-   trimfunction(&state->fn, &state->cgn, n, state->trimthreshold);
-   mcsrch(n, &state->xn, &state->fn, &state->ugn, &state->d, &state->stp, state->curstpmax, minbleic_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
-   goto lbl_43;
-lbl_44:
-   ae_v_moveneg(state->bufsk.xyR[state->bufsize], 1, state->sas.xc.xR, 1, n);
-   ae_v_moveneg(state->bufyk.xyR[state->bufsize], 1, state->cgc.xR, 1, n);
-   ae_v_add(state->bufsk.xyR[state->bufsize], 1, state->xn.xR, 1, n);
-   ae_v_add(state->bufyk.xyR[state->bufsize], 1, state->cgn.xR, 1, n);
-   smoothnessmonitorfinalizelinesearch(&state->smonitor);
-// Check for presence of NAN/INF in function/gradient
-   v = state->fn;
-   for (i = 0; i < n; i++) {
-      v = 0.1 * v + state->ugn.xR[i];
-   }
-   if (!isfinite(v)) {
-   // Abnormal termination - infinities in function/gradient
-      state->repterminationtype = -8;
-      goto lbl_40;
-   }
-// Handle possible failure of the line search or request for termination
-   if (mcinfo != 1 && mcinfo != 5) {
-   // We can not find step which decreases function value. We have
-   // two possibilities:
-   // (a) numerical properties of the function do not allow us to
-   //     find good step.
-   // (b) we are close to activation of some constraint, and it is
-   //     so close that step which activates it leads to change in
-   //     target function which is smaller than numerical noise.
-   //
-   // Optimization algorithm must be able to handle case (b), because
-   // inability to handle it will cause failure when algorithm
-   // started very close to boundary of the feasible area.
-   //
-   // In order to correctly handle such cases we allow limited amount
-   // of small steps which increase function value.
-      v = 0.0;
-      for (i = 0; i < n; i++) {
-         v += sqr(state->d.xR[i] * state->curstpmax / state->s.xR[i]);
-      }
-      v = sqrt(v);
-      b = false;
-      if ((state->cidx >= 0 && v <= minbleic_maxnonmonotoniclen) && state->nonmonotoniccnt > 0) {
-      // We try to enforce non-monotonic step:
-      // * Stp    := CurStpMax
-      // * MCINFO := 5
-      // * XN     := XC+CurStpMax*D
-      // * non-monotonic counter is decreased
-      //
-      // NOTE: UGN/CGN are not updated because step is so short that we assume that
-      //       GN is approximately equal to GC.
-      //
-      // NOTE: prior to enforcing such step we check that it does not increase infeasibility
-      //       of constraints beyond tolerable level
-         v = state->curstpmax;
-         ae_v_move(state->tmp0.xR, 1, state->sas.xc.xR, 1, n);
-         ae_v_addd(state->tmp0.xR, 1, state->d.xR, 1, n, v);
-         state->stp = state->curstpmax;
-         mcinfo = 5;
-         ae_v_move(state->xn.xR, 1, state->tmp0.xR, 1, n);
-         state->nonmonotoniccnt--;
-         b = true;
-      }
-      if (!b) {
-      // Numerical properties of the function do not allow
-      // us to solve problem. Here we have two possibilities:
-      // * if it is "steepest descent" step, we can terminate
-      //   algorithm because we are close to minimum
-      // * if it is NOT "steepest descent" step, we should restart
-      //   LBFGS iterations.
-         if (state->steepestdescentstep) {
-         // Algorithm is terminated
-            state->repterminationtype = 7;
-            goto lbl_40;
-         } else {
-         // Re-evaluate active set and restart LBFGS
-            goto lbl_40;
-         }
-      }
-   }
-   if (state->userterminationneeded) {
-      goto lbl_40;
-   }
-// Current point is updated:
-// * move XC/FC/GC to XP/FP/GP
-// * change current point remembered by SAS structure
-// * move XN/FN/GN to XC/FC/GC
-// * report current point and update iterations counter
-// * if MCINFO=1, push new pair SK/YK to LBFGS buffer
-   state->fp = state->fc;
-   ae_v_move(state->xp.xR, 1, state->sas.xc.xR, 1, n);
-   state->fc = state->fn;
-   ae_v_move(state->cgc.xR, 1, state->cgn.xR, 1, n);
-   ae_v_move(state->ugc.xR, 1, state->ugn.xR, 1, n);
-   actstatus = sasmoveto(&state->sas, &state->xn, state->cidx >= 0 && state->stp >= state->activationstep, state->cidx, state->cval);
-   if (!state->xrep) {
-      goto lbl_52;
-   }
-   ae_v_move(state->x.xR, 1, state->sas.xc.xR, 1, n);
-   minbleic_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 21;
-   goto lbl_rcomm;
-lbl_21:
-   state->xupdated = false;
-lbl_52:
-   state->repinneriterationscount++;
-   if (mcinfo == 1) {
-   // Accept new LBFGS update given by Sk,Yk
-      if (state->bufsize == m) {
-      // Buffer is full, shift contents by one row
-         for (i = 0; i < state->bufsize; i++) {
-            ae_v_move(state->bufsk.xyR[i], 1, state->bufsk.xyR[i + 1], 1, n);
-            ae_v_move(state->bufyk.xyR[i], 1, state->bufyk.xyR[i + 1], 1, n);
-         }
-         for (i = 0; i < state->bufsize - 1; i++) {
-            state->bufrho.xR[i] = state->bufrho.xR[i + 1];
-            state->buftheta.xR[i] = state->buftheta.xR[i + 1];
-         }
+   // (a) calculate unconstrained gradient
+   // (b) determine initial active set
+   // (c) update MaxScaledGrad
+   // (d) check F/G for NAN/INF, abnormally terminate algorithm if needed
+      ae_v_move(state->x.xR, 1, state->sas.xc.xR, 1, n);
+      minbleic_clearrequestfields(state);
+      if (state->diffstep == 0.0) {
+      // Analytic gradient
+         state->needfg = true;
+         state->rstate.stage = 4; goto Pause; Resume04:
+         state->needfg = false;
       } else {
-      // Buffer is not full, increase buffer size by 1
-         state->bufsize++;
+      // Numerical differentiation
+         state->needf = true;
+         state->rstate.stage = 5; goto Pause; Resume05:
+         state->fbase = state->f;
+         for (i = 0; i < n; i++) {
+            v = state->x.xR[i];
+            b = false;
+            if (state->hasbndl.xB[i]) {
+               b = b || v - state->diffstep * state->s.xR[i] < state->bndl.xR[i];
+            }
+            if (state->hasbndu.xB[i]) {
+               b = b || v + state->diffstep * state->s.xR[i] > state->bndu.xR[i];
+            }
+            if (!b) {
+               state->x.xR[i] = v - state->diffstep * state->s.xR[i];
+               state->rstate.stage = 6; goto Pause; Resume06:
+               state->fm2 = state->f;
+               state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
+               state->rstate.stage = 7; goto Pause; Resume07:
+               state->fm1 = state->f;
+               state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
+               state->rstate.stage = 8; goto Pause; Resume08:
+               state->fp1 = state->f;
+               state->x.xR[i] = v + state->diffstep * state->s.xR[i];
+               state->rstate.stage = 9; goto Pause; Resume09:
+               state->fp2 = state->f;
+               state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
+            } else {
+               state->xm1 = v - state->diffstep * state->s.xR[i];
+               state->xp1 = v + state->diffstep * state->s.xR[i];
+               if (state->hasbndl.xB[i] && state->xm1 < state->bndl.xR[i]) {
+                  state->xm1 = state->bndl.xR[i];
+               }
+               if (state->hasbndu.xB[i] && state->xp1 > state->bndu.xR[i]) {
+                  state->xp1 = state->bndu.xR[i];
+               }
+               state->x.xR[i] = state->xm1;
+               state->rstate.stage = 10; goto Pause; Resume10:
+               state->fm1 = state->f;
+               state->x.xR[i] = state->xp1;
+               state->rstate.stage = 11; goto Pause; Resume11:
+               state->fp1 = state->f;
+               if (state->xm1 != state->xp1) {
+                  state->g.xR[i] = (state->fp1 - state->fm1) / (state->xp1 - state->xm1);
+               } else {
+                  state->g.xR[i] = 0.0;
+               }
+            }
+            state->x.xR[i] = v;
+         }
+         state->f = state->fbase;
+         state->needf = false;
       }
-      v = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufsk.xyR[state->bufsize - 1], 1, n);
-      vv = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufyk.xyR[state->bufsize - 1], 1, n);
-      if (v == 0.0 || vv == 0.0) {
-      // Strange internal error in LBFGS - either YK=0
-      // (which should not have been) or (SK,YK)=0 (again,
-      // unexpected). It should not take place because
-      // MCINFO=1, which signals "good" step. But just
-      // to be sure we have special branch of code which
-      // restarts LBFGS
-         goto lbl_40;
-      }
-      state->bufrho.xR[state->bufsize - 1] = 1 / v;
-      ae_assert(state->bufsize <= m, "MinBLEIC: internal error");
-   // Update length of the good step
-      v = 0.0;
-      vv = 0.0;
+      state->fc = state->f;
+      ae_v_move(state->ugc.xR, 1, state->g.xR, 1, n);
+      ae_v_move(state->cgc.xR, 1, state->g.xR, 1, n);
+      sasreactivateconstraintsprec(&state->sas, &state->ugc);
+      sasconstraineddirection(&state->sas, &state->cgc);
+      ginit = 0.0;
       for (i = 0; i < n; i++) {
-         v += sqr((state->sas.xc.xR[i] - state->xp.xR[i]) / state->s.xR[i]);
-         vv += sqr(state->sas.xc.xR[i] - state->xp.xR[i]);
+         ginit += sqr(state->cgc.xR[i] * state->s.xR[i]);
       }
-      state->lastgoodstep = sqrt(vv);
-      minbleic_updateestimateofgoodstep(&state->lastscaledgoodstep, sqrt(v));
-   }
-// Check stopping criteria
-//
-// Step size and function-based stopping criteria are tested only
-// for step which satisfies Wolfe conditions and is the first step of
-// LBFGS (subsequent steps may accumulate active constraints thus
-// they should NOT be used for stopping; step size or function change
-// may be small when constrained, but these constraints may be
-// deactivated by the subsequent steps).
-//
-// MaxIts-based stopping condition is checked for all kinds of steps.
-   if (mcinfo == 1 && state->steepestdescentstep) {
-   // Step is small enough
-      v = 0.0;
-      for (i = 0; i < n; i++) {
-         v += sqr((state->sas.xc.xR[i] - state->xp.xR[i]) / state->s.xR[i]);
+      ginit = sqrt(ginit);
+      state->maxscaledgrad = rmax2(state->maxscaledgrad, ginit);
+      if (!isfinite(ginit) || !isfinite(state->fc)) {
+      // Abnormal termination - infinities in function/gradient
+         sasstopoptimization(&state->sas);
+         state->repterminationtype = -8;
+         goto Exit;
       }
-      v = sqrt(v);
-      if (v <= state->epsx) {
-         state->repterminationtype = 2;
-         goto lbl_40;
+      if (state->userterminationneeded) {
+      // User requested termination
+         sasstopoptimization(&state->sas);
+         state->repterminationtype = 8;
+         goto Exit;
       }
-   // Function change is small enough
-      if (fabs(state->fp - state->fc) <= state->epsf * rmax2(fabs(state->fc), rmax2(fabs(state->fp), 1.0))) {
-         state->repterminationtype = 1;
-         goto lbl_40;
-      }
-   }
-   if (state->maxits > 0 && state->repinneriterationscount >= state->maxits) {
-      state->repterminationtype = 5;
-      goto lbl_40;
-   }
-// Clear "steepest descent" flag.
-   state->steepestdescentstep = false;
-// Smooth reset (LBFGS memory model is refreshed) or hard restart:
-// * LBFGS model is refreshed, if line search was performed with activation of constraints
-// * algorithm is restarted if scaled gradient decreased below GDecay
-   if (actstatus >= 0) {
+   // LBFGS stage:
+   // * during LBFGS iterations we activate new constraints, but never
+   //   deactivate already active ones.
+   // * we perform at most N iterations of LBFGS before re-evaluating
+   //   active set and restarting LBFGS.
+   // * first iteration of LBFGS is a special - it is performed with
+   //   minimum set of active constraints, algorithm termination can
+   //   be performed only at this state. We call this iteration
+   //  "steepest descent step".
+   //
+   // About termination:
+   // * LBFGS iterations can be terminated because of two reasons:
+   //   * "termination" - non-zero termination code in RepTerminationType,
+   //     which means that optimization is done
+   //   * "restart" - zero RepTerminationType, which means that we
+   //     have to re-evaluate active set and resume LBFGS stage.
+   // * one more option is "refresh" - to continue LBFGS iterations,
+   //   but with all BFGS updates (Sk/Yk pairs) being dropped;
+   //   it happens after changes in active set
       state->bufsize = 0;
-      goto lbl_39;
+      state->steepestdescentstep = true;
+      for (itidx = -1; itidx < n - 1; ) {
+      // Increment iterations counter
+      //
+      // NOTE: we have strong reasons to use such complex scheme
+      //       instead of just for() loop - this counter may be
+      //       decreased at some occasions to perform "restart"
+      //       of an iteration.
+         itidx++;
+      // At the beginning of each iteration:
+      // * SAS.XC stores current point
+      // * FC stores current function value
+      // * UGC stores current unconstrained gradient
+      // * CGC stores current constrained gradient
+      // * D stores constrained step direction (calculated at this block)
+      //
+      //
+      // Check gradient-based stopping criteria
+      //
+      // This stopping condition is tested only for step which is the
+      // first step of LBFGS (subsequent steps may accumulate active
+      // constraints thus they should NOT be used for stopping - gradient
+      // may be small when constrained, but these constraints may be
+      // deactivated by the subsequent steps)
+         if (state->steepestdescentstep && sasscaledconstrainednorm(&state->sas, &state->ugc) <= state->epsg) {
+         // Gradient is small enough.
+         // Optimization is terminated
+            state->repterminationtype = 4;
+            break;
+         }
+      // 1. Calculate search direction D according to L-BFGS algorithm
+      //    using constrained preconditioner to perform inner multiplication.
+      // 2. Evaluate scaled length of direction D; restart LBFGS if D is zero
+      //    (it may be possible that we found minimum, but it is also possible
+      //    that some constraints need deactivation)
+      // 3. If D is non-zero, try to use previous scaled step length as initial estimate for new step.
+         ae_v_move(state->work.xR, 1, state->cgc.xR, 1, n);
+         for (i = state->bufsize - 1; i >= 0; i--) {
+            v = ae_v_dotproduct(state->bufsk.xyR[i], 1, state->work.xR, 1, n);
+            state->buftheta.xR[i] = v;
+            vv = v * state->bufrho.xR[i];
+            ae_v_subd(state->work.xR, 1, state->bufyk.xyR[i], 1, n, vv);
+         }
+         sasconstraineddirectionprec(&state->sas, &state->work);
+         for (i = 0; i < state->bufsize; i++) {
+            v = ae_v_dotproduct(state->bufyk.xyR[i], 1, state->work.xR, 1, n);
+            vv = state->bufrho.xR[i] * (-v + state->buftheta.xR[i]);
+            ae_v_addd(state->work.xR, 1, state->bufsk.xyR[i], 1, n, vv);
+         }
+         sasconstraineddirection(&state->sas, &state->work);
+         ae_v_moveneg(state->d.xR, 1, state->work.xR, 1, n);
+         v = 0.0;
+         for (i = 0; i < n; i++) {
+            v += sqr(state->d.xR[i] / state->s.xR[i]);
+         }
+         v = sqrt(v);
+         if (v == 0.0) {
+         // Search direction is zero.
+         // If we perform "steepest descent step", algorithm is terminated.
+         // Otherwise we just restart LBFGS.
+            if (state->steepestdescentstep) {
+               state->repterminationtype = 4;
+            }
+            break;
+         }
+         ae_assert(v > 0.0, "MinBLEIC: internal error");
+         if (state->lastscaledgoodstep > 0.0 && v > 0.0) {
+            state->stp = state->lastscaledgoodstep / v;
+         } else {
+            state->stp = 1.0 / v;
+         }
+      // Calculate bound on step length.
+      // Step direction is stored
+         sasexploredirection(&state->sas, &state->d, &state->curstpmax, &state->cidx, &state->cval);
+         state->activationstep = state->curstpmax;
+         if (state->cidx >= 0 && state->activationstep == 0.0) {
+         // We are exactly at the boundary, immediate activation
+         // of constraint is required. LBFGS stage is continued
+         // with "refreshed" model.
+         //
+         // ! IMPORTANT: we do not clear SteepestDescent flag here,
+         // !            it is very important for correct stopping
+         // !            of algorithm.
+         //
+         // ! IMPORTANT: we decrease iteration counter in order to
+         //              preserve computational budget for iterations.
+            sasimmediateactivation(&state->sas, state->cidx, state->cval);
+            state->bufsize = 0;
+            itidx--;
+            continue;
+         }
+         if (state->stpmax > 0.0) {
+            v = ae_v_dotproduct(state->d.xR, 1, state->d.xR, 1, n);
+            v = sqrt(v);
+            if (v > 0.0) {
+               state->curstpmax = rmin2(state->curstpmax, state->stpmax / v);
+            }
+         }
+      // Report beginning of line search (if requested by caller).
+      // See description of the MinBLEICState for more information
+      // about fields accessible to caller.
+      //
+      // Caller may do following:
+      // * change State.Stp and load better initial estimate of
+      //   the step length.
+      // Caller may not terminate algorithm.
+         if (state->drep) {
+            minbleic_clearrequestfields(state);
+            state->lsstart = true;
+            state->boundedstep = state->cidx >= 0;
+            ae_v_move(state->x.xR, 1, state->sas.xc.xR, 1, n);
+            state->rstate.stage = 12; goto Pause; Resume12:
+            state->lsstart = false;
+         }
+      // Minimize F(x+alpha*d)
+         ae_v_move(state->xn.xR, 1, state->sas.xc.xR, 1, n);
+         ae_v_move(state->cgn.xR, 1, state->cgc.xR, 1, n);
+         ae_v_move(state->ugn.xR, 1, state->ugc.xR, 1, n);
+         state->fn = state->fc;
+         state->mcstage = 0;
+         smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->xn, state->fn, &state->ugn);
+         mcsrch(n, &state->xn, &state->fn, &state->ugn, &state->d, &state->stp, state->curstpmax, minbleic_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
+         while (state->mcstage != 0) {
+         // Perform correction (constraints are enforced)
+         // Copy XN to X
+            sascorrection(&state->sas, &state->xn, &penalty);
+            for (i = 0; i < n; i++) {
+               state->x.xR[i] = state->xn.xR[i];
+            }
+         // Gradient, either user-provided or numerical differentiation
+            minbleic_clearrequestfields(state);
+            if (state->diffstep == 0.0) {
+            // Analytic gradient
+               state->needfg = true;
+               state->rstate.stage = 13; goto Pause; Resume13:
+               state->needfg = false;
+               state->repnfev++;
+            } else {
+            // Numerical differentiation
+               state->needf = true;
+               state->rstate.stage = 14; goto Pause; Resume14:
+               state->fbase = state->f;
+               for (i = 0; i < n; i++) {
+                  v = state->x.xR[i];
+                  b = false;
+                  if (state->hasbndl.xB[i]) {
+                     b = b || v - state->diffstep * state->s.xR[i] < state->bndl.xR[i];
+                  }
+                  if (state->hasbndu.xB[i]) {
+                     b = b || v + state->diffstep * state->s.xR[i] > state->bndu.xR[i];
+                  }
+                  if (!b) {
+                     state->x.xR[i] = v - state->diffstep * state->s.xR[i];
+                     state->rstate.stage = 15; goto Pause; Resume15:
+                     state->fm2 = state->f;
+                     state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
+                     state->rstate.stage = 16; goto Pause; Resume16:
+                     state->fm1 = state->f;
+                     state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
+                     state->rstate.stage = 17; goto Pause; Resume17:
+                     state->fp1 = state->f;
+                     state->x.xR[i] = v + state->diffstep * state->s.xR[i];
+                     state->rstate.stage = 18; goto Pause; Resume18:
+                     state->fp2 = state->f;
+                     state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
+                     state->repnfev += 4;
+                  } else {
+                     state->xm1 = v - state->diffstep * state->s.xR[i];
+                     state->xp1 = v + state->diffstep * state->s.xR[i];
+                     if (state->hasbndl.xB[i] && state->xm1 < state->bndl.xR[i]) {
+                        state->xm1 = state->bndl.xR[i];
+                     }
+                     if (state->hasbndu.xB[i] && state->xp1 > state->bndu.xR[i]) {
+                        state->xp1 = state->bndu.xR[i];
+                     }
+                     state->x.xR[i] = state->xm1;
+                     state->rstate.stage = 19; goto Pause; Resume19:
+                     state->fm1 = state->f;
+                     state->x.xR[i] = state->xp1;
+                     state->rstate.stage = 20; goto Pause; Resume20:
+                     state->fp1 = state->f;
+                     if (state->xm1 != state->xp1) {
+                        state->g.xR[i] = (state->fp1 - state->fm1) / (state->xp1 - state->xm1);
+                     } else {
+                        state->g.xR[i] = 0.0;
+                     }
+                     state->repnfev += 2;
+                  }
+                  state->x.xR[i] = v;
+               }
+               state->f = state->fbase;
+               state->needf = false;
+            }
+         // Back to MCSRCH
+         //
+         // NOTE: penalty term from correction is added to FN in order
+         //       to penalize increase in infeasibility.
+            smoothnessmonitorenqueuepoint1u(&state->smonitor, &state->s, &state->invs, &state->d, state->stp, &state->x, state->f, &state->g);
+            state->fn = state->f + minbleic_penaltyfactor * state->maxscaledgrad * penalty;
+            ae_v_move(state->cgn.xR, 1, state->g.xR, 1, n);
+            ae_v_move(state->ugn.xR, 1, state->g.xR, 1, n);
+            sasconstraineddirection(&state->sas, &state->cgn);
+            trimfunction(&state->fn, &state->cgn, n, state->trimthreshold);
+            mcsrch(n, &state->xn, &state->fn, &state->ugn, &state->d, &state->stp, state->curstpmax, minbleic_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
+         }
+         ae_v_moveneg(state->bufsk.xyR[state->bufsize], 1, state->sas.xc.xR, 1, n);
+         ae_v_moveneg(state->bufyk.xyR[state->bufsize], 1, state->cgc.xR, 1, n);
+         ae_v_add(state->bufsk.xyR[state->bufsize], 1, state->xn.xR, 1, n);
+         ae_v_add(state->bufyk.xyR[state->bufsize], 1, state->cgn.xR, 1, n);
+         smoothnessmonitorfinalizelinesearch(&state->smonitor);
+      // Check for presence of NAN/INF in function/gradient
+         v = state->fn;
+         for (i = 0; i < n; i++) {
+            v = 0.1 * v + state->ugn.xR[i];
+         }
+         if (!isfinite(v)) {
+         // Abnormal termination - infinities in function/gradient
+            state->repterminationtype = -8;
+            break;
+         }
+      // Handle possible failure of the line search or request for termination
+         if (mcinfo != 1 && mcinfo != 5) {
+         // We can not find step which decreases function value. We have
+         // two possibilities:
+         // (a) numerical properties of the function do not allow us to
+         //     find good step.
+         // (b) we are close to activation of some constraint, and it is
+         //     so close that step which activates it leads to change in
+         //     target function which is smaller than numerical noise.
+         //
+         // Optimization algorithm must be able to handle case (b), because
+         // inability to handle it will cause failure when algorithm
+         // started very close to boundary of the feasible area.
+         //
+         // In order to correctly handle such cases we allow limited amount
+         // of small steps which increase function value.
+            v = 0.0;
+            for (i = 0; i < n; i++) {
+               v += sqr(state->d.xR[i] * state->curstpmax / state->s.xR[i]);
+            }
+            v = sqrt(v);
+            b = false;
+            if ((state->cidx >= 0 && v <= minbleic_maxnonmonotoniclen) && state->nonmonotoniccnt > 0) {
+            // We try to enforce non-monotonic step:
+            // * Stp    := CurStpMax
+            // * MCINFO := 5
+            // * XN     := XC+CurStpMax*D
+            // * non-monotonic counter is decreased
+            //
+            // NOTE: UGN/CGN are not updated because step is so short that we assume that
+            //       GN is approximately equal to GC.
+            //
+            // NOTE: prior to enforcing such step we check that it does not increase infeasibility
+            //       of constraints beyond tolerable level
+               v = state->curstpmax;
+               ae_v_move(state->tmp0.xR, 1, state->sas.xc.xR, 1, n);
+               ae_v_addd(state->tmp0.xR, 1, state->d.xR, 1, n, v);
+               state->stp = state->curstpmax;
+               mcinfo = 5;
+               ae_v_move(state->xn.xR, 1, state->tmp0.xR, 1, n);
+               state->nonmonotoniccnt--;
+               b = true;
+            }
+            if (!b) {
+            // Numerical properties of the function do not allow
+            // us to solve problem. Here we have two possibilities:
+            // * if it is "steepest descent" step, we can terminate
+            //   algorithm because we are close to minimum
+            // * if it is NOT "steepest descent" step, we should restart
+            //   LBFGS iterations.
+               if (state->steepestdescentstep) {
+               // Algorithm is terminated
+                  state->repterminationtype = 7;
+                  break;
+               } else {
+               // Re-evaluate active set and restart LBFGS
+                  break;
+               }
+            }
+         }
+         if (state->userterminationneeded) {
+            break;
+         }
+      // Current point is updated:
+      // * move XC/FC/GC to XP/FP/GP
+      // * change current point remembered by SAS structure
+      // * move XN/FN/GN to XC/FC/GC
+      // * report current point and update iterations counter
+      // * if MCINFO=1, push new pair SK/YK to LBFGS buffer
+         state->fp = state->fc;
+         ae_v_move(state->xp.xR, 1, state->sas.xc.xR, 1, n);
+         state->fc = state->fn;
+         ae_v_move(state->cgc.xR, 1, state->cgn.xR, 1, n);
+         ae_v_move(state->ugc.xR, 1, state->ugn.xR, 1, n);
+         actstatus = sasmoveto(&state->sas, &state->xn, state->cidx >= 0 && state->stp >= state->activationstep, state->cidx, state->cval);
+         if (state->xrep) {
+            ae_v_move(state->x.xR, 1, state->sas.xc.xR, 1, n);
+            minbleic_clearrequestfields(state);
+            state->xupdated = true;
+            state->rstate.stage = 21; goto Pause; Resume21:
+            state->xupdated = false;
+         }
+         state->repinneriterationscount++;
+         if (mcinfo == 1) {
+         // Accept new LBFGS update given by Sk,Yk
+            if (state->bufsize == m) {
+            // Buffer is full, shift contents by one row
+               for (i = 0; i < state->bufsize; i++) {
+                  ae_v_move(state->bufsk.xyR[i], 1, state->bufsk.xyR[i + 1], 1, n);
+                  ae_v_move(state->bufyk.xyR[i], 1, state->bufyk.xyR[i + 1], 1, n);
+               }
+               for (i = 0; i < state->bufsize - 1; i++) {
+                  state->bufrho.xR[i] = state->bufrho.xR[i + 1];
+                  state->buftheta.xR[i] = state->buftheta.xR[i + 1];
+               }
+            } else {
+            // Buffer is not full, increase buffer size by 1
+               state->bufsize++;
+            }
+            v = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufsk.xyR[state->bufsize - 1], 1, n);
+            vv = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufyk.xyR[state->bufsize - 1], 1, n);
+            if (v == 0.0 || vv == 0.0) {
+            // Strange internal error in LBFGS - either YK=0
+            // (which should not have been) or (SK,YK)=0 (again,
+            // unexpected). It should not take place because
+            // MCINFO=1, which signals "good" step. But just
+            // to be sure we have special branch of code which
+            // restarts LBFGS
+               break;
+            }
+            state->bufrho.xR[state->bufsize - 1] = 1 / v;
+            ae_assert(state->bufsize <= m, "MinBLEIC: internal error");
+         // Update length of the good step
+            v = 0.0;
+            vv = 0.0;
+            for (i = 0; i < n; i++) {
+               v += sqr((state->sas.xc.xR[i] - state->xp.xR[i]) / state->s.xR[i]);
+               vv += sqr(state->sas.xc.xR[i] - state->xp.xR[i]);
+            }
+            state->lastgoodstep = sqrt(vv);
+            minbleic_updateestimateofgoodstep(&state->lastscaledgoodstep, sqrt(v));
+         }
+      // Check stopping criteria
+      //
+      // Step size and function-based stopping criteria are tested only
+      // for step which satisfies Wolfe conditions and is the first step of
+      // LBFGS (subsequent steps may accumulate active constraints thus
+      // they should NOT be used for stopping; step size or function change
+      // may be small when constrained, but these constraints may be
+      // deactivated by the subsequent steps).
+      //
+      // MaxIts-based stopping condition is checked for all kinds of steps.
+         if (mcinfo == 1 && state->steepestdescentstep) {
+         // Step is small enough
+            v = 0.0;
+            for (i = 0; i < n; i++) {
+               v += sqr((state->sas.xc.xR[i] - state->xp.xR[i]) / state->s.xR[i]);
+            }
+            v = sqrt(v);
+            if (v <= state->epsx) {
+               state->repterminationtype = 2;
+               break;
+            }
+         // Function change is small enough
+            if (fabs(state->fp - state->fc) <= state->epsf * rmax2(fabs(state->fc), rmax2(fabs(state->fp), 1.0))) {
+               state->repterminationtype = 1;
+               break;
+            }
+         }
+         if (state->maxits > 0 && state->repinneriterationscount >= state->maxits) {
+            state->repterminationtype = 5;
+            break;
+         }
+      // Clear "steepest descent" flag.
+         state->steepestdescentstep = false;
+      // Smooth reset (LBFGS memory model is refreshed) or hard restart:
+      // * LBFGS model is refreshed, if line search was performed with activation of constraints
+      // * algorithm is restarted if scaled gradient decreased below GDecay
+         if (actstatus >= 0) {
+            state->bufsize = 0;
+            continue;
+         }
+         v = 0.0;
+         for (i = 0; i < n; i++) {
+            v += sqr(state->cgc.xR[i] * state->s.xR[i]);
+         }
+         if (sqrt(v) < gdecay * ginit) {
+            break;
+         }
+      }
+      if (state->userterminationneeded) {
+      // User requested termination
+         state->repterminationtype = 8;
+         break;
+      }
+      if (state->repterminationtype != 0) {
+      // Algorithm terminated
+         break;
+      }
+   // Decrease decay coefficient. Subsequent L-BFGS stages will
+   // have more stringent stopping criteria.
+      gdecay = rmax2(gdecay * minbleic_decaycorrection, minbleic_mindecay);
    }
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(state->cgc.xR[i] * state->s.xR[i]);
-   }
-   if (sqrt(v) < gdecay * ginit) {
-      goto lbl_40;
-   }
-   goto lbl_39;
-lbl_40:
-   if (state->userterminationneeded) {
-   // User requested termination
-      state->repterminationtype = 8;
-      goto lbl_31;
-   }
-   if (state->repterminationtype != 0) {
-   // Algorithm terminated
-      goto lbl_31;
-   }
-// Decrease decay coefficient. Subsequent L-BFGS stages will
-// have more stringent stopping criteria.
-   gdecay = rmax2(gdecay * minbleic_decaycorrection, minbleic_mindecay);
-   goto lbl_30;
-lbl_31:
    sasstopoptimization(&state->sas);
    state->repouteriterationscount = 1;
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = m;
    state->rstate.ia.xZ[2] = i;
@@ -14144,7 +13822,7 @@ lbl_rcomm:
    state->rstate.ra.xR[3] = penalty;
    state->rstate.ra.xR[4] = ginit;
    state->rstate.ra.xR[5] = gdecay;
-   return result;
+   return true;
 }
 
 // This  function  activates/deactivates verification  of  the  user-supplied
@@ -22171,199 +21849,181 @@ static bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambd
    double v;
    ae_int_t n;
    ae_int_t m;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      i = state->rstate.ia.xZ[0];
-      n = state->rstate.ia.xZ[1];
-      m = state->rstate.ia.xZ[2];
-      bflag = state->rstate.ba.xB[0];
-      v = state->rstate.ra.xR[0];
-   } else {
-      i = -838;
-      n = 939;
-      m = -526;
-      bflag = true;
-      v = -541;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   i = state->rstate.ia.xZ[0];
+   n = state->rstate.ia.xZ[1];
+   m = state->rstate.ia.xZ[2];
+   bflag = state->rstate.ba.xB[0];
+   v = state->rstate.ra.xR[0];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
+Spawn:
+   i = -838;
+   n = 939;
+   m = -526;
+   bflag = true;
+   v = -541;
 // Routine body
    *iflag = -99;
    n = state->n;
    m = state->m;
-lbl_2:
-   if (false) {
-      goto lbl_3;
-   }
-   *deltaxready = false;
-   *deltafready = false;
-// Do we need model update?
-   if (state->modelage > 0 && *nu >= minlm_suspiciousnu) {
-      *iflag = -2;
-      goto lbl_3;
-   }
-// Setup quadratic solver and solve quadratic programming problem.
-// After problem is solved we'll try to bound step by StpMax
-// (Lambda will be increased if step size is too large).
-//
-// We use BFlag variable to indicate that we have to increase Lambda.
-// If it is False, we will try to increase Lambda and move to new iteration.
-   bflag = true;
-   for (i = 0; i < n; i++) {
-      state->tmp0.xR[i] = state->modeldiag.xR[i] + *lambdav / sqr(state->s.xR[i]);
-   }
-   minqprewritediagonal(&state->qpstate, &state->tmp0);
-   minqpoptimize(&state->qpstate);
-   minqpresultsbuf(&state->qpstate, xnew, &state->qprep);
-   *ncholesky += state->qprep.ncholesky;
-   if (state->qprep.terminationtype == -3) {
-   // Infeasible constraints
-      *iflag = -3;
-      goto lbl_3;
-   }
-   if (state->qprep.terminationtype == -4 || state->qprep.terminationtype == -5) {
-   // Unconstrained direction of negative curvature was detected
-      if (!minlm_increaselambda(lambdav, nu)) {
-         *iflag = -1;
-         goto lbl_3;
+   while (true) {
+      *deltaxready = false;
+      *deltafready = false;
+   // Do we need model update?
+      if (state->modelage > 0 && *nu >= minlm_suspiciousnu) {
+         *iflag = -2;
+         break;
       }
-      goto lbl_2;
-   }
-   ae_assert(state->qprep.terminationtype > 0, "MinLM: unexpected completion code from QP solver");
-   ae_v_move(state->xdir.xR, 1, xnew->xR, 1, n);
-   ae_v_sub(state->xdir.xR, 1, state->xbase.xR, 1, n);
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(state->xdir.xR[i] / state->s.xR[i]);
-   }
-   if (isfinite(v)) {
-      v = sqrt(v);
-      if (state->stpmax > 0.0 && v > state->stpmax) {
+   // Setup quadratic solver and solve quadratic programming problem.
+   // After problem is solved we'll try to bound step by StpMax
+   // (Lambda will be increased if step size is too large).
+   //
+   // We use BFlag variable to indicate that we have to increase Lambda.
+   // If it is False, we will try to increase Lambda and move to new iteration.
+      bflag = true;
+      for (i = 0; i < n; i++) {
+         state->tmp0.xR[i] = state->modeldiag.xR[i] + *lambdav / sqr(state->s.xR[i]);
+      }
+      minqprewritediagonal(&state->qpstate, &state->tmp0);
+      minqpoptimize(&state->qpstate);
+      minqpresultsbuf(&state->qpstate, xnew, &state->qprep);
+      *ncholesky += state->qprep.ncholesky;
+      if (state->qprep.terminationtype == -3) {
+      // Infeasible constraints
+         *iflag = -3;
+         break;
+      }
+      if (state->qprep.terminationtype == -4 || state->qprep.terminationtype == -5) {
+      // Unconstrained direction of negative curvature was detected
+         if (!minlm_increaselambda(lambdav, nu)) {
+            *iflag = -1;
+            break;
+         }
+         continue;
+      }
+      ae_assert(state->qprep.terminationtype > 0, "MinLM: unexpected completion code from QP solver");
+      ae_v_move(state->xdir.xR, 1, xnew->xR, 1, n);
+      ae_v_sub(state->xdir.xR, 1, state->xbase.xR, 1, n);
+      v = 0.0;
+      for (i = 0; i < n; i++) {
+         v += sqr(state->xdir.xR[i] / state->s.xR[i]);
+      }
+      if (isfinite(v)) {
+         v = sqrt(v);
+         if (state->stpmax > 0.0 && v > state->stpmax) {
+            bflag = false;
+         }
+      } else {
          bflag = false;
       }
-   } else {
-      bflag = false;
-   }
-   if (!bflag) {
-   // Solution failed:
-   // try to increase lambda to make matrix positive definite and continue.
-      if (!minlm_increaselambda(lambdav, nu)) {
-         *iflag = -1;
-         goto lbl_3;
+      if (!bflag) {
+      // Solution failed:
+      // try to increase lambda to make matrix positive definite and continue.
+         if (!minlm_increaselambda(lambdav, nu)) {
+            *iflag = -1;
+            break;
+         }
+         continue;
       }
-      goto lbl_2;
-   }
-// Step in State.XDir and it is bounded by StpMax.
-//
-// We should check stopping conditions on step size here.
-// DeltaX, which is used for secant updates, is initialized here.
-//
-// This code is a bit tricky because sometimes XDir != 0, but
-// it is so small that XDir+XBase == XBase (in finite precision
-// arithmetics). So we set DeltaX to XBase, then
-// add XDir, and then subtract XBase to get exact value of
-// DeltaX.
-//
-// Step length is estimated using DeltaX.
-//
-// NOTE: stopping conditions are tested
-// for fresh models only (ModelAge=0)
-   ae_v_move(deltax->xR, 1, xnew->xR, 1, n);
-   ae_v_sub(deltax->xR, 1, state->xbase.xR, 1, n);
-   *deltaxready = true;
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(deltax->xR[i] / state->s.xR[i]);
-   }
-   v = sqrt(v);
-   if (v <= state->epsx) {
-      if (state->modelage == 0) {
-      // Step is too short, model is fresh and we can rely on it.
-      // Terminating.
-         *iflag = 2;
-         goto lbl_3;
+   // Step in State.XDir and it is bounded by StpMax.
+   //
+   // We should check stopping conditions on step size here.
+   // DeltaX, which is used for secant updates, is initialized here.
+   //
+   // This code is a bit tricky because sometimes XDir != 0, but
+   // it is so small that XDir+XBase == XBase (in finite precision
+   // arithmetics). So we set DeltaX to XBase, then
+   // add XDir, and then subtract XBase to get exact value of
+   // DeltaX.
+   //
+   // Step length is estimated using DeltaX.
+   //
+   // NOTE: stopping conditions are tested
+   // for fresh models only (ModelAge=0)
+      ae_v_move(deltax->xR, 1, xnew->xR, 1, n);
+      ae_v_sub(deltax->xR, 1, state->xbase.xR, 1, n);
+      *deltaxready = true;
+      v = 0.0;
+      for (i = 0; i < n; i++) {
+         v += sqr(deltax->xR[i] / state->s.xR[i]);
+      }
+      v = sqrt(v);
+      if (v <= state->epsx) {
+         if (state->modelage == 0) {
+         // Step is too short, model is fresh and we can rely on it.
+         // Terminating.
+            *iflag = 2;
+            break;
+         } else {
+         // Step is suspiciously short, but model is not fresh
+         // and we can't rely on it.
+            *iflag = -2;
+            break;
+         }
+      }
+   // Let's evaluate new step:
+   // a) if we have Fi vector, we evaluate it using rcomm, and
+   //    then we manually calculate State.F as sum of squares of Fi[]
+   // b) if we have F value, we just evaluate it through rcomm interface
+   //
+   // We prefer (a) because we may need Fi vector for additional
+   // iterations
+      ae_v_move(state->x.xR, 1, xnew->xR, 1, n);
+      state->needf = false;
+      state->needfi = false;
+      if (state->hasfi) {
+         state->needfi = true;
+         state->rstate.stage = 0; goto Pause; Resume0:
+         state->needfi = false;
+         v = ae_v_dotproduct(state->fi.xR, 1, state->fi.xR, 1, m);
+         *fnew = v;
+         ae_v_move(deltaf->xR, 1, state->fi.xR, 1, m);
+         ae_v_sub(deltaf->xR, 1, state->fibase.xR, 1, m);
+         *deltafready = true;
       } else {
-      // Step is suspiciously short, but model is not fresh
-      // and we can't rely on it.
-         *iflag = -2;
-         goto lbl_3;
+         state->needf = true;
+         state->rstate.stage = 1; goto Pause; Resume1:
+         state->needf = false;
+         *fnew = state->f;
       }
-   }
-// Let's evaluate new step:
-// a) if we have Fi vector, we evaluate it using rcomm, and
-//    then we manually calculate State.F as sum of squares of Fi[]
-// b) if we have F value, we just evaluate it through rcomm interface
-//
-// We prefer (a) because we may need Fi vector for additional
-// iterations
-   ae_v_move(state->x.xR, 1, xnew->xR, 1, n);
-   state->needf = false;
-   state->needfi = false;
-   if (!state->hasfi) {
-      goto lbl_4;
-   }
-   state->needfi = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needfi = false;
-   v = ae_v_dotproduct(state->fi.xR, 1, state->fi.xR, 1, m);
-   *fnew = v;
-   ae_v_move(deltaf->xR, 1, state->fi.xR, 1, m);
-   ae_v_sub(deltaf->xR, 1, state->fibase.xR, 1, m);
-   *deltafready = true;
-   goto lbl_5;
-lbl_4:
-   state->needf = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->needf = false;
-   *fnew = state->f;
-lbl_5:
-   if (!isfinite(*fnew)) {
-   // Integrity check failed, break!
-      *iflag = -8;
-      goto lbl_3;
-   }
-   if (*fnew >= state->fbase) {
-   // Increase lambda and continue
-      if (!minlm_increaselambda(lambdav, nu)) {
-         *iflag = -1;
-         goto lbl_3;
+      if (!isfinite(*fnew)) {
+      // Integrity check failed, break!
+         *iflag = -8;
+         break;
       }
-      goto lbl_2;
+      if (*fnew >= state->fbase) {
+      // Increase lambda and continue
+         if (!minlm_increaselambda(lambdav, nu)) {
+            *iflag = -1;
+            break;
+         }
+         continue;
+      }
+   // We've found our step!
+      *iflag = 0;
+      break;
    }
-// We've found our step!
-   *iflag = 0;
-   goto lbl_3;
-   goto lbl_2;
-lbl_3:
    *nu = 1.0;
    ae_assert(((*iflag >= -3 && *iflag <= 0) || *iflag == -8) || *iflag > 0, "MinLM: internal integrity check failed!");
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = i;
    state->rstate.ia.xZ[1] = n;
    state->rstate.ia.xZ[2] = m;
    state->rstate.ba.xB[0] = bflag;
    state->rstate.ra.xR[0] = v;
-   return result;
+   return true;
 }
 
 // This function provides a reverse communication interface, which is not documented or recommended for use.
@@ -22386,122 +22046,43 @@ bool minlmiteration(minlmstate *state) {
    double fnew;
    ae_int_t i;
    ae_int_t k;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      m = state->rstate.ia.xZ[1];
-      iflag = state->rstate.ia.xZ[2];
-      i = state->rstate.ia.xZ[3];
-      k = state->rstate.ia.xZ[4];
-      bflag = state->rstate.ba.xB[0];
-      v = state->rstate.ra.xR[0];
-      s = state->rstate.ra.xR[1];
-      t = state->rstate.ra.xR[2];
-      fnew = state->rstate.ra.xR[3];
-   } else {
-      n = 359;
-      m = -58;
-      iflag = -919;
-      i = -909;
-      k = 81;
-      bflag = true;
-      v = 74;
-      s = -788;
-      t = 809;
-      fnew = 205;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   m = state->rstate.ia.xZ[1];
+   iflag = state->rstate.ia.xZ[2];
+   i = state->rstate.ia.xZ[3];
+   k = state->rstate.ia.xZ[4];
+   bflag = state->rstate.ba.xB[0];
+   v = state->rstate.ra.xR[0];
+   s = state->rstate.ra.xR[1];
+   t = state->rstate.ra.xR[2];
+   fnew = state->rstate.ra.xR[3];
+   switch (state->rstate.stage) {
+      case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
+      case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
+      case 8: goto Resume08; case 9: goto Resume09; case 10: goto Resume10; case 11: goto Resume11;
+      case 12: goto Resume12; case 13: goto Resume13; case 14: goto Resume14; case 15: goto Resume15;
+      case 16: goto Resume16; case 17: goto Resume17; case 18: goto Resume18; case 19: goto Resume19;
+      case 20: goto Resume20; case 21: goto Resume21; case 22: goto Resume22; case 23: goto Resume23;
+      case 24: goto Resume24; case 25: goto Resume25; case 26: goto Resume26; case 27: goto Resume27;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
-   if (state->rstate.stage == 5) {
-      goto lbl_5;
-   }
-   if (state->rstate.stage == 6) {
-      goto lbl_6;
-   }
-   if (state->rstate.stage == 7) {
-      goto lbl_7;
-   }
-   if (state->rstate.stage == 8) {
-      goto lbl_8;
-   }
-   if (state->rstate.stage == 9) {
-      goto lbl_9;
-   }
-   if (state->rstate.stage == 10) {
-      goto lbl_10;
-   }
-   if (state->rstate.stage == 11) {
-      goto lbl_11;
-   }
-   if (state->rstate.stage == 12) {
-      goto lbl_12;
-   }
-   if (state->rstate.stage == 13) {
-      goto lbl_13;
-   }
-   if (state->rstate.stage == 14) {
-      goto lbl_14;
-   }
-   if (state->rstate.stage == 15) {
-      goto lbl_15;
-   }
-   if (state->rstate.stage == 16) {
-      goto lbl_16;
-   }
-   if (state->rstate.stage == 17) {
-      goto lbl_17;
-   }
-   if (state->rstate.stage == 18) {
-      goto lbl_18;
-   }
-   if (state->rstate.stage == 19) {
-      goto lbl_19;
-   }
-   if (state->rstate.stage == 20) {
-      goto lbl_20;
-   }
-   if (state->rstate.stage == 21) {
-      goto lbl_21;
-   }
-   if (state->rstate.stage == 22) {
-      goto lbl_22;
-   }
-   if (state->rstate.stage == 23) {
-      goto lbl_23;
-   }
-   if (state->rstate.stage == 24) {
-      goto lbl_24;
-   }
-   if (state->rstate.stage == 25) {
-      goto lbl_25;
-   }
-   if (state->rstate.stage == 26) {
-      goto lbl_26;
-   }
-   if (state->rstate.stage == 27) {
-      goto lbl_27;
-   }
+Spawn:
+   n = 359;
+   m = -58;
+   iflag = -919;
+   i = -909;
+   k = 81;
+   bflag = true;
+   v = 74;
+   s = -788;
+   t = 809;
+   fnew = 205;
 // Routine body
 // prepare
    n = state->n;
@@ -22523,38 +22104,29 @@ bool minlmiteration(minlmstate *state) {
 // Prepare LM step finder and enforce/check feasibility of constraints
    if (!minlm_minlmstepfinderinit(&state->finderstate, n, m, state->maxmodelage, state->hasfi, &state->xbase, &state->bndl, &state->bndu, &state->cleic, state->nec, state->nic, &state->s, state->stpmax, state->epsx)) {
       state->repterminationtype = -3;
-      result = false;
-      return result;
+      goto Exit;
    }
 // set constraints for obsolete QP solver
    minqpsetbc(&state->qpstate, &state->bndl, &state->bndu);
 //  Check correctness of the analytic Jacobian
    minlm_clearrequestfields(state);
-   if (!(state->algomode == 1 && state->teststep > 0.0)) {
-      goto lbl_28;
-   }
-   ae_assert(m > 0, "MinLM: integrity check failed");
-lbl_30:
-   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->bndl, &state->bndu, true, state->teststep)) {
-      goto lbl_31;
-   }
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = state->smonitor.x.xR[i];
-   }
-   state->needfij = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needfij = false;
-   for (i = 0; i < m; i++) {
-      state->smonitor.fi.xR[i] = state->fi.xR[i];
-      for (k = 0; k < n; k++) {
-         state->smonitor.j.xyR[i][k] = state->j.xyR[i][k];
+   if (state->algomode == 1 && state->teststep > 0.0) {
+      ae_assert(m > 0, "MinLM: integrity check failed");
+      while (smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->bndl, &state->bndu, true, state->teststep)) {
+         for (i = 0; i < n; i++) {
+            state->x.xR[i] = state->smonitor.x.xR[i];
+         }
+         state->needfij = true;
+         state->rstate.stage = 0; goto Pause; Resume00:
+         state->needfij = false;
+         for (i = 0; i < m; i++) {
+            state->smonitor.fi.xR[i] = state->fi.xR[i];
+            for (k = 0; k < n; k++) {
+               state->smonitor.j.xyR[i][k] = state->j.xyR[i][k];
+            }
+         }
       }
    }
-   goto lbl_30;
-lbl_31:
-lbl_28:
 // Initial report of current point
 //
 // Note 1: we rewrite State.X twice because
@@ -22562,45 +22134,33 @@ lbl_28:
 //
 // Note 2: we set NeedF or NeedFI depending on what
 // information about function we have.
-   if (!state->xrep) {
-      goto lbl_32;
+   if (state->xrep) {
+      ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+      minlm_clearrequestfields(state);
+      if (state->hasf) {
+         state->needf = true;
+         state->rstate.stage = 1; goto Pause; Resume01:
+         state->needf = false;
+      } else {
+         ae_assert(state->hasfi, "MinLM: internal error 2!");
+         state->needfi = true;
+         state->rstate.stage = 2; goto Pause; Resume02:
+         state->needfi = false;
+         v = ae_v_dotproduct(state->fi.xR, 1, state->fi.xR, 1, m);
+         state->f = v;
+      }
+      state->repnfunc++;
+      ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+      minlm_clearrequestfields(state);
+      state->xupdated = true;
+      state->rstate.stage = 3; goto Pause; Resume03:
+      state->xupdated = false;
    }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   minlm_clearrequestfields(state);
-   if (!state->hasf) {
-      goto lbl_34;
-   }
-   state->needf = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->needf = false;
-   goto lbl_35;
-lbl_34:
-   ae_assert(state->hasfi, "MinLM: internal error 2!");
-   state->needfi = true;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->needfi = false;
-   v = ae_v_dotproduct(state->fi.xR, 1, state->fi.xR, 1, m);
-   state->f = v;
-lbl_35:
-   state->repnfunc++;
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   minlm_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->xupdated = false;
-lbl_32:
    if (state->userterminationneeded) {
    // User requested termination
       ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
       state->repterminationtype = 8;
-      result = false;
-      return result;
+      goto Exit;
    }
 // Prepare control variables
    state->nu = 1.0;
@@ -22608,931 +22168,764 @@ lbl_32:
    state->modelage = state->maxmodelage + 1;
    state->deltaxready = false;
    state->deltafready = false;
-   if (state->algomode == 2) {
-      goto lbl_36;
-   }
-// Jacobian-based optimization mode
-//
-// Main cycle.
-//
-// We move through it until either:
-// * one of the stopping conditions is met
-// * we decide that stopping conditions are too stringent
-//   and break from cycle
-lbl_38:
-   if (false) {
-      goto lbl_39;
-   }
-// First, we have to prepare quadratic model for our function.
-// We use BFlag to ensure that model is prepared;
-// if it is false at the end of this block, something went wrong.
-//
-// We may either calculate brand new model or update old one.
-//
-// Before this block we have:
-// * State.XBase            - current position.
-// * State.DeltaX           - if DeltaXReady is True
-// * State.DeltaF           - if DeltaFReady is True
-//
-// After this block is over, we will have:
-// * State.XBase            - base point (unchanged)
-// * State.FBase            - F(XBase)
-// * State.GBase            - linear term
-// * State.QuadraticModel   - quadratic term
-// * State.LambdaV          - current estimate for lambda
-//
-// We also clear DeltaXReady/DeltaFReady flags
-// after initialization is done.
-   ae_assert(state->algomode == 0 || state->algomode == 1, "MinLM: integrity check failed");
-   if (!(state->modelage > state->maxmodelage || !(state->deltaxready && state->deltafready))) {
-      goto lbl_40;
-   }
-// Refresh model (using either finite differences or analytic Jacobian)
-   if (state->algomode != 0) {
-      goto lbl_42;
-   }
-// Optimization using F values only.
-// Use finite differences to estimate Jacobian.
-   ae_assert(state->hasfi, "MinLMIteration: internal error when estimating Jacobian (no f[])");
-   k = 0;
-lbl_44:
-   if (k > n - 1) {
-      goto lbl_46;
-   }
-// We guard X[k] from leaving [BndL,BndU].
-// In case BndL=BndU, we assume that derivative in this direction is zero.
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] -= state->s.xR[k] * state->diffstep;
-   if (state->havebndl.xB[k]) {
-      state->x.xR[k] = rmax2(state->x.xR[k], state->bndl.xR[k]);
-   }
-   if (state->havebndu.xB[k]) {
-      state->x.xR[k] = rmin2(state->x.xR[k], state->bndu.xR[k]);
-   }
-   state->xm1 = state->x.xR[k];
-   minlm_clearrequestfields(state);
-   state->needfi = true;
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   state->repnfunc++;
-   ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, m);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] += state->s.xR[k] * state->diffstep;
-   if (state->havebndl.xB[k]) {
-      state->x.xR[k] = rmax2(state->x.xR[k], state->bndl.xR[k]);
-   }
-   if (state->havebndu.xB[k]) {
-      state->x.xR[k] = rmin2(state->x.xR[k], state->bndu.xR[k]);
-   }
-   state->xp1 = state->x.xR[k];
-   minlm_clearrequestfields(state);
-   state->needfi = true;
-   state->rstate.stage = 5;
-   goto lbl_rcomm;
-lbl_5:
-   state->repnfunc++;
-   ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, m);
-   v = state->xp1 - state->xm1;
-   if (v != 0.0) {
-      v = 1 / v;
-      ae_v_moved(&state->j.xyR[0][k], state->j.stride, state->fp1.xR, 1, m, v);
-      ae_v_subd(&state->j.xyR[0][k], state->j.stride, state->fm1.xR, 1, m, v);
-   } else {
-      for (i = 0; i < m; i++) {
-         state->j.xyR[i][k] = 0.0;
-      }
-   }
-   k++;
-   goto lbl_44;
-lbl_46:
-// Calculate F(XBase)
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   minlm_clearrequestfields(state);
-   state->needfi = true;
-   state->rstate.stage = 6;
-   goto lbl_rcomm;
-lbl_6:
-   state->needfi = false;
-   state->repnfunc++;
-   state->repnjac++;
-// New model
-   state->modelage = 0;
-   goto lbl_43;
-lbl_42:
-// Obtain f[] and Jacobian
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   minlm_clearrequestfields(state);
-   state->needfij = true;
-   state->rstate.stage = 7;
-   goto lbl_rcomm;
-lbl_7:
-   state->needfij = false;
-   state->repnfunc++;
-   state->repnjac++;
-// New model
-   state->modelage = 0;
-lbl_43:
-   goto lbl_41;
-lbl_40:
-// State.J contains Jacobian or its current approximation;
-// refresh it using secant updates:
-//
-// f(x0+dx) = f(x0) + J*dx,
-// J_new = J_old + u*h'
-// h = x_new-x_old
-// u = (f_new - f_old - J_old*h)/(h'h)
-//
-// We can explicitly generate h and u, but it is
-// preferential to do in-place calculations. Only
-// I-th row of J_old is needed to calculate u[I],
-// so we can update J row by row in one pass.
-//
-// NOTE: we expect that State.XBase contains new point,
-// State.FBase contains old point, State.DeltaX and
-// State.DeltaY contain updates from last step.
-   ae_assert(state->deltaxready && state->deltafready, "MinLMIteration: uninitialized DeltaX/DeltaF");
-   t = ae_v_dotproduct(state->deltax.xR, 1, state->deltax.xR, 1, n);
-   ae_assert(t != 0.0, "MinLM: internal error (T=0)");
-   for (i = 0; i < m; i++) {
-      v = ae_v_dotproduct(state->j.xyR[i], 1, state->deltax.xR, 1, n);
-      v = (state->deltaf.xR[i] - v) / t;
-      ae_v_addd(state->j.xyR[i], 1, state->deltax.xR, 1, n, v);
-   }
-   ae_v_move(state->fi.xR, 1, state->fibase.xR, 1, m);
-   ae_v_add(state->fi.xR, 1, state->deltaf.xR, 1, m);
-// Increase model age
-   state->modelage++;
-lbl_41:
-   rmatrixgemm(n, n, m, 2.0, &state->j, 0, 0, 1, &state->j, 0, 0, 0, 0.0, &state->quadraticmodel, 0, 0);
-   rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->gbase, 0);
-   ae_v_muld(state->gbase.xR, 1, n, 2);
-   v = ae_v_dotproduct(state->fi.xR, 1, state->fi.xR, 1, m);
-   state->fbase = v;
-   ae_v_move(state->fibase.xR, 1, state->fi.xR, 1, m);
-   state->deltaxready = false;
-   state->deltafready = false;
-// Perform integrity check (presense of NAN/INF)
-   v = state->fbase;
-   for (i = 0; i < n; i++) {
-      v = 0.1 * v + state->gbase.xR[i];
-   }
-   if (!isfinite(v)) {
-   // Break!
-      state->repterminationtype = -8;
-      result = false;
-      return result;
-   }
-// If Lambda is not initialized, initialize it using quadratic model
-   if (state->lambdav < 0.0) {
-      state->lambdav = 0.0;
-      for (i = 0; i < n; i++) {
-         state->lambdav = rmax2(state->lambdav, fabs(state->quadraticmodel.xyR[i][i]) * sqr(state->s.xR[i]));
-      }
-      state->lambdav *= 0.001;
-      if (state->lambdav == 0.0) {
-         state->lambdav = 1.0;
-      }
-   }
-// Find value of Levenberg-Marquardt damping parameter which:
-// * leads to positive definite damped model
-// * within bounds specified by StpMax
-// * generates step which decreases function value
-//
-// After this block IFlag is set to:
-// * -8, if internal integrity control detected NAN/INF in function values
-// * -3, if constraints are infeasible
-// * -2, if model update is needed (either Lambda growth is too large
-//       or step is too short, but we can't rely on model and stop iterations)
-// * -1, if model is fresh, Lambda have grown too large, termination is needed
-// *  0, if everything is OK, continue iterations
-// * >0, successful termination, step is less than EpsX
-//
-// State.Nu can have any value on enter, but after exit it is set to 1.0
-   iflag = -99;
-   minlm_minlmstepfinderstart(&state->finderstate, &state->quadraticmodel, &state->gbase, state->fbase, &state->xbase, &state->fibase, state->modelage);
-lbl_47:
-   if (!minlm_minlmstepfinderiteration(&state->finderstate, &state->lambdav, &state->nu, &state->xnew, &state->deltax, &state->deltaxready, &state->deltaf, &state->deltafready, &iflag, &fnew, &state->repncholesky)) {
-      goto lbl_48;
-   }
-   ae_assert(state->hasfi || state->hasf, "MinLM: internal error 2!");
-   state->repnfunc++;
-   minlm_clearrequestfields(state);
-   if (!state->finderstate.needfi) {
-      goto lbl_49;
-   }
-   ae_assert(state->hasfi, "MinLM: internal error 2!");
-   ae_v_move(state->x.xR, 1, state->finderstate.x.xR, 1, n);
-   state->needfi = true;
-   state->rstate.stage = 8;
-   goto lbl_rcomm;
-lbl_8:
-   state->needfi = false;
-   ae_v_move(state->finderstate.fi.xR, 1, state->fi.xR, 1, m);
-   goto lbl_47;
-lbl_49:
-   if (!state->finderstate.needf) {
-      goto lbl_51;
-   }
-   ae_assert(state->hasf, "MinLM: internal error 2!");
-   ae_v_move(state->x.xR, 1, state->finderstate.x.xR, 1, n);
-   state->needf = true;
-   state->rstate.stage = 9;
-   goto lbl_rcomm;
-lbl_9:
-   state->needf = false;
-   state->finderstate.f = state->f;
-   goto lbl_47;
-lbl_51:
-   ae_assert(false, "MinLM: internal error 2!");
-   goto lbl_47;
-lbl_48:
-   if (state->userterminationneeded) {
-   // User requested termination
-      ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-   state->nu = 1.0;
-   ae_assert(((iflag >= -3 && iflag <= 0) || iflag == -8) || iflag > 0, "MinLM: internal integrity check failed!");
-   if (iflag == -3) {
-      state->repterminationtype = -3;
-      result = false;
-      return result;
-   }
-   if (iflag == -2) {
-      state->modelage = state->maxmodelage + 1;
-      goto lbl_38;
-   }
-   if (iflag != -1) {
-      goto lbl_53;
-   }
-// Stopping conditions are too stringent
-   state->repterminationtype = 7;
-   if (!state->xrep) {
-      goto lbl_55;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->f = state->fbase;
-   minlm_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 10;
-   goto lbl_rcomm;
-lbl_10:
-   state->xupdated = false;
-lbl_55:
-   result = false;
-   return result;
-lbl_53:
-   if (!(iflag == -8 || iflag > 0)) {
-      goto lbl_57;
-   }
-// Either:
-// * Integrity check failed - infinities or NANs
-// * successful termination (step size is small enough)
-   state->repterminationtype = iflag;
-   if (!state->xrep) {
-      goto lbl_59;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->f = state->fbase;
-   minlm_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 11;
-   goto lbl_rcomm;
-lbl_11:
-   state->xupdated = false;
-lbl_59:
-   result = false;
-   return result;
-lbl_57:
-   state->f = fnew;
-// Levenberg-Marquardt step is ready.
-// Compare predicted vs. actual decrease and decide what to do with lambda.
-//
-// NOTE: we expect that State.DeltaX contains direction of step,
-// State.F contains function value at new point.
-   ae_assert(state->deltaxready, "MinLM: deltaX is not ready");
-   iflag = minlm_checkdecrease(&state->quadraticmodel, &state->gbase, state->fbase, n, &state->deltax, state->f, &state->lambdav, &state->nu);
-   if (iflag == 0) {
-      goto lbl_61;
-   }
-   state->repterminationtype = iflag;
-   if (!state->xrep) {
-      goto lbl_63;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->f = state->fbase;
-   minlm_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 12;
-   goto lbl_rcomm;
-lbl_12:
-   state->xupdated = false;
-lbl_63:
-   result = false;
-   return result;
-lbl_61:
-// Accept step, report it and
-// test stopping conditions on iterations count and function decrease.
-//
-// NOTE: we expect that State.DeltaX contains direction of step,
-// State.F contains function value at new point.
-//
-// NOTE2: we should update XBase ONLY. In the beginning of the next
-// iteration we expect that State.FIBase is NOT updated and
-// contains old value of a function vector.
-   ae_v_move(state->xbase.xR, 1, state->xnew.xR, 1, n);
-   if (!state->xrep) {
-      goto lbl_65;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   minlm_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 13;
-   goto lbl_rcomm;
-lbl_13:
-   state->xupdated = false;
-lbl_65:
-   state->repiterationscount++;
-   if (state->repiterationscount >= state->maxits && state->maxits > 0) {
-      state->repterminationtype = 5;
-   }
-   if (state->repterminationtype <= 0) {
-      goto lbl_67;
-   }
-   if (!state->xrep) {
-      goto lbl_69;
-   }
-// Report: XBase contains new point, F contains function value at new point
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   minlm_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 14;
-   goto lbl_rcomm;
-lbl_14:
-   state->xupdated = false;
-lbl_69:
-   result = false;
-   return result;
-lbl_67:
-   state->modelage++;
-   goto lbl_38;
-lbl_39:
-// Lambda is too large, we have to break iterations.
-   state->repterminationtype = 7;
-   if (!state->xrep) {
-      goto lbl_71;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->f = state->fbase;
-   minlm_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 15;
-   goto lbl_rcomm;
-lbl_15:
-   state->xupdated = false;
-lbl_71:
-   goto lbl_37;
-lbl_36:
-// Legacy Hessian-based mode
-//
-// Main cycle.
-//
-// We move through it until either:
-// * one of the stopping conditions is met
-// * we decide that stopping conditions are too stringent
-//   and break from cycle
-//
-   if (state->nec + state->nic > 0) {
-   // FGH solver does not support general linear constraints
-      state->repterminationtype = -5;
-      result = false;
-      return result;
-   }
-lbl_73:
-   if (false) {
-      goto lbl_74;
-   }
-// First, we have to prepare quadratic model for our function.
-// We use BFlag to ensure that model is prepared;
-// if it is false at the end of this block, something went wrong.
-//
-// We may either calculate brand new model or update old one.
-//
-// Before this block we have:
-// * State.XBase            - current position.
-// * State.DeltaX           - if DeltaXReady is True
-// * State.DeltaF           - if DeltaFReady is True
-//
-// After this block is over, we will have:
-// * State.XBase            - base point (unchanged)
-// * State.FBase            - F(XBase)
-// * State.GBase            - linear term
-// * State.QuadraticModel   - quadratic term
-// * State.LambdaV          - current estimate for lambda
-//
-// We also clear DeltaXReady/DeltaFReady flags
-// after initialization is done.
-   bflag = false;
-   if (!(state->algomode == 0 || state->algomode == 1)) {
-      goto lbl_75;
-   }
-// Calculate f[] and Jacobian
-   if (!(state->modelage > state->maxmodelage || !(state->deltaxready && state->deltafready))) {
-      goto lbl_77;
-   }
-// Refresh model (using either finite differences or analytic Jacobian)
-   if (state->algomode != 0) {
-      goto lbl_79;
-   }
-// Optimization using F values only.
-// Use finite differences to estimate Jacobian.
-   ae_assert(state->hasfi, "MinLMIteration: internal error when estimating Jacobian (no f[])");
-   k = 0;
-lbl_81:
-   if (k > n - 1) {
-      goto lbl_83;
-   }
-// We guard X[k] from leaving [BndL,BndU].
-// In case BndL=BndU, we assume that derivative in this direction is zero.
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] -= state->s.xR[k] * state->diffstep;
-   if (state->havebndl.xB[k]) {
-      state->x.xR[k] = rmax2(state->x.xR[k], state->bndl.xR[k]);
-   }
-   if (state->havebndu.xB[k]) {
-      state->x.xR[k] = rmin2(state->x.xR[k], state->bndu.xR[k]);
-   }
-   state->xm1 = state->x.xR[k];
-   minlm_clearrequestfields(state);
-   state->needfi = true;
-   state->rstate.stage = 16;
-   goto lbl_rcomm;
-lbl_16:
-   state->repnfunc++;
-   ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, m);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] += state->s.xR[k] * state->diffstep;
-   if (state->havebndl.xB[k]) {
-      state->x.xR[k] = rmax2(state->x.xR[k], state->bndl.xR[k]);
-   }
-   if (state->havebndu.xB[k]) {
-      state->x.xR[k] = rmin2(state->x.xR[k], state->bndu.xR[k]);
-   }
-   state->xp1 = state->x.xR[k];
-   minlm_clearrequestfields(state);
-   state->needfi = true;
-   state->rstate.stage = 17;
-   goto lbl_rcomm;
-lbl_17:
-   state->repnfunc++;
-   ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, m);
-   v = state->xp1 - state->xm1;
-   if (v != 0.0) {
-      v = 1 / v;
-      ae_v_moved(&state->j.xyR[0][k], state->j.stride, state->fp1.xR, 1, m, v);
-      ae_v_subd(&state->j.xyR[0][k], state->j.stride, state->fm1.xR, 1, m, v);
-   } else {
-      for (i = 0; i < m; i++) {
-         state->j.xyR[i][k] = 0.0;
-      }
-   }
-   k++;
-   goto lbl_81;
-lbl_83:
-// Calculate F(XBase)
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   minlm_clearrequestfields(state);
-   state->needfi = true;
-   state->rstate.stage = 18;
-   goto lbl_rcomm;
-lbl_18:
-   state->needfi = false;
-   state->repnfunc++;
-   state->repnjac++;
-// New model
-   state->modelage = 0;
-   goto lbl_80;
-lbl_79:
-// Obtain f[] and Jacobian
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   minlm_clearrequestfields(state);
-   state->needfij = true;
-   state->rstate.stage = 19;
-   goto lbl_rcomm;
-lbl_19:
-   state->needfij = false;
-   state->repnfunc++;
-   state->repnjac++;
-// New model
-   state->modelage = 0;
-lbl_80:
-   goto lbl_78;
-lbl_77:
-// State.J contains Jacobian or its current approximation;
-// refresh it using secant updates:
-//
-// f(x0+dx) = f(x0) + J*dx,
-// J_new = J_old + u*h'
-// h = x_new-x_old
-// u = (f_new - f_old - J_old*h)/(h'h)
-//
-// We can explicitly generate h and u, but it is
-// preferential to do in-place calculations. Only
-// I-th row of J_old is needed to calculate u[I],
-// so we can update J row by row in one pass.
-//
-// NOTE: we expect that State.XBase contains new point,
-// State.FBase contains old point, State.DeltaX and
-// State.DeltaY contain updates from last step.
-   ae_assert(state->deltaxready && state->deltafready, "MinLMIteration: uninitialized DeltaX/DeltaF");
-   t = ae_v_dotproduct(state->deltax.xR, 1, state->deltax.xR, 1, n);
-   ae_assert(t != 0.0, "MinLM: internal error (T=0)");
-   for (i = 0; i < m; i++) {
-      v = ae_v_dotproduct(state->j.xyR[i], 1, state->deltax.xR, 1, n);
-      v = (state->deltaf.xR[i] - v) / t;
-      ae_v_addd(state->j.xyR[i], 1, state->deltax.xR, 1, n, v);
-   }
-   ae_v_move(state->fi.xR, 1, state->fibase.xR, 1, m);
-   ae_v_add(state->fi.xR, 1, state->deltaf.xR, 1, m);
-// Increase model age
-   state->modelage++;
-lbl_78:
-// Generate quadratic model:
-//     f(xbase+dx) =
-//       = (f0 + J*dx)'(f0 + J*dx)
-//       = f0^2 + dx'J'f0 + f0*J*dx + dx'J'J*dx
-//       = f0^2 + 2*f0*J*dx + dx'J'J*dx
-//
-// Note that we calculate 2*(J'J) instead of J'J because
-// our quadratic model is based on Tailor decomposition,
-// i.e. it has 0.5 before quadratic term.
-   rmatrixgemm(n, n, m, 2.0, &state->j, 0, 0, 1, &state->j, 0, 0, 0, 0.0, &state->quadraticmodel, 0, 0);
-   rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->gbase, 0);
-   ae_v_muld(state->gbase.xR, 1, n, 2);
-   v = ae_v_dotproduct(state->fi.xR, 1, state->fi.xR, 1, m);
-   state->fbase = v;
-   ae_v_move(state->fibase.xR, 1, state->fi.xR, 1, m);
-// set control variables
-   bflag = true;
-lbl_75:
    if (state->algomode != 2) {
-      goto lbl_84;
-   }
-   ae_assert(!state->hasfi, "MinLMIteration: internal error (HasFI is True in Hessian-based mode)");
-// Obtain F, G, H
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   minlm_clearrequestfields(state);
-   state->needfgh = true;
-   state->rstate.stage = 20;
-   goto lbl_rcomm;
-lbl_20:
-   state->needfgh = false;
-   state->repnfunc++;
-   state->repngrad++;
-   state->repnhess++;
-   rmatrixcopy(n, n, &state->h, 0, 0, &state->quadraticmodel, 0, 0);
-   ae_v_move(state->gbase.xR, 1, state->g.xR, 1, n);
-   state->fbase = state->f;
-// set control variables
-   bflag = true;
-   state->modelage = 0;
-lbl_84:
-   ae_assert(bflag, "MinLM: internal integrity check failed!");
-   state->deltaxready = false;
-   state->deltafready = false;
-// Perform integrity check (presense of NAN/INF)
-   v = state->fbase;
-   for (i = 0; i < n; i++) {
-      v = 0.1 * v + state->gbase.xR[i];
-   }
-   if (!isfinite(v)) {
-   // Break!
-      state->repterminationtype = -8;
-      result = false;
-      return result;
-   }
-// If Lambda is not initialized, initialize it using quadratic model
-   if (state->lambdav < 0.0) {
-      state->lambdav = 0.0;
-      for (i = 0; i < n; i++) {
-         state->lambdav = rmax2(state->lambdav, fabs(state->quadraticmodel.xyR[i][i]) * sqr(state->s.xR[i]));
-      }
-      state->lambdav *= 0.001;
-      if (state->lambdav == 0.0) {
-         state->lambdav = 1.0;
-      }
-   }
-// Find value of Levenberg-Marquardt damping parameter which:
-// * leads to positive definite damped model
-// * within bounds specified by StpMax
-// * generates step which decreases function value
-//
-// After this block IFlag is set to:
-// * -3, if constraints are infeasible
-// * -2, if model update is needed (either Lambda growth is too large
-//       or step is too short, but we can't rely on model and stop iterations)
-// * -1, if model is fresh, Lambda have grown too large, termination is needed
-// *  0, if everything is OK, continue iterations
-//
-// State.Nu can have any value on enter, but after exit it is set to 1.0
-   iflag = -99;
-lbl_86:
-   if (false) {
-      goto lbl_87;
-   }
-// Do we need model update?
-   if (state->modelage > 0 && state->nu >= minlm_suspiciousnu) {
-      iflag = -2;
-      goto lbl_87;
-   }
-// Setup quadratic solver and solve quadratic programming problem.
-// After problem is solved we'll try to bound step by StpMax
-// (Lambda will be increased if step size is too large).
-//
-// We use BFlag variable to indicate that we have to increase Lambda.
-// If it is False, we will try to increase Lambda and move to new iteration.
-   bflag = true;
-   minqpsetstartingpointfast(&state->qpstate, &state->xbase);
-   minqpsetoriginfast(&state->qpstate, &state->xbase);
-   minqpsetlineartermfast(&state->qpstate, &state->gbase);
-   minqpsetquadratictermfast(&state->qpstate, &state->quadraticmodel, true, 0.0);
-   for (i = 0; i < n; i++) {
-      state->tmp0.xR[i] = state->quadraticmodel.xyR[i][i] + state->lambdav / sqr(state->s.xR[i]);
-   }
-   minqprewritediagonal(&state->qpstate, &state->tmp0);
-   minqpoptimize(&state->qpstate);
-   minqpresultsbuf(&state->qpstate, &state->xdir, &state->qprep);
-   if (state->qprep.terminationtype > 0) {
-   // successful solution of QP problem
-      ae_v_sub(state->xdir.xR, 1, state->xbase.xR, 1, n);
-      v = ae_v_dotproduct(state->xdir.xR, 1, state->xdir.xR, 1, n);
-      if (isfinite(v)) {
-         v = sqrt(v);
-         if (state->stpmax > 0.0 && v > state->stpmax) {
-            bflag = false;
+   // Jacobian-based optimization mode
+   //
+   // Main cycle.
+   //
+   // We move through it until either:
+   // * one of the stopping conditions is met
+   // * we decide that stopping conditions are too stringent
+   //   and break from cycle
+      while (true) {
+      // First, we have to prepare quadratic model for our function.
+      // We use BFlag to ensure that model is prepared;
+      // if it is false at the end of this block, something went wrong.
+      //
+      // We may either calculate brand new model or update old one.
+      //
+      // Before this block we have:
+      // * State.XBase            - current position.
+      // * State.DeltaX           - if DeltaXReady is True
+      // * State.DeltaF           - if DeltaFReady is True
+      //
+      // After this block is over, we will have:
+      // * State.XBase            - base point (unchanged)
+      // * State.FBase            - F(XBase)
+      // * State.GBase            - linear term
+      // * State.QuadraticModel   - quadratic term
+      // * State.LambdaV          - current estimate for lambda
+      //
+      // We also clear DeltaXReady/DeltaFReady flags
+      // after initialization is done.
+         ae_assert(state->algomode == 0 || state->algomode == 1, "MinLM: integrity check failed");
+         if (state->modelage > state->maxmodelage || !(state->deltaxready && state->deltafready)) {
+         // Refresh model (using either finite differences or analytic Jacobian)
+            if (state->algomode == 0) {
+            // Optimization using F values only.
+            // Use finite differences to estimate Jacobian.
+               ae_assert(state->hasfi, "MinLMIteration: internal error when estimating Jacobian (no f[])");
+               for (k = 0; k < n; k++) {
+               // We guard X[k] from leaving [BndL,BndU].
+               // In case BndL=BndU, we assume that derivative in this direction is zero.
+                  ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                  state->x.xR[k] -= state->s.xR[k] * state->diffstep;
+                  if (state->havebndl.xB[k]) {
+                     state->x.xR[k] = rmax2(state->x.xR[k], state->bndl.xR[k]);
+                  }
+                  if (state->havebndu.xB[k]) {
+                     state->x.xR[k] = rmin2(state->x.xR[k], state->bndu.xR[k]);
+                  }
+                  state->xm1 = state->x.xR[k];
+                  minlm_clearrequestfields(state);
+                  state->needfi = true;
+                  state->rstate.stage = 4; goto Pause; Resume04:
+                  state->repnfunc++;
+                  ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, m);
+                  ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                  state->x.xR[k] += state->s.xR[k] * state->diffstep;
+                  if (state->havebndl.xB[k]) {
+                     state->x.xR[k] = rmax2(state->x.xR[k], state->bndl.xR[k]);
+                  }
+                  if (state->havebndu.xB[k]) {
+                     state->x.xR[k] = rmin2(state->x.xR[k], state->bndu.xR[k]);
+                  }
+                  state->xp1 = state->x.xR[k];
+                  minlm_clearrequestfields(state);
+                  state->needfi = true;
+                  state->rstate.stage = 5; goto Pause; Resume05:
+                  state->repnfunc++;
+                  ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, m);
+                  v = state->xp1 - state->xm1;
+                  if (v != 0.0) {
+                     v = 1 / v;
+                     ae_v_moved(&state->j.xyR[0][k], state->j.stride, state->fp1.xR, 1, m, v);
+                     ae_v_subd(&state->j.xyR[0][k], state->j.stride, state->fm1.xR, 1, m, v);
+                  } else {
+                     for (i = 0; i < m; i++) {
+                        state->j.xyR[i][k] = 0.0;
+                     }
+                  }
+               }
+            // Calculate F(XBase)
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               minlm_clearrequestfields(state);
+               state->needfi = true;
+               state->rstate.stage = 6; goto Pause; Resume06:
+               state->needfi = false;
+               state->repnfunc++;
+               state->repnjac++;
+            // New model
+               state->modelage = 0;
+            } else {
+            // Obtain f[] and Jacobian
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               minlm_clearrequestfields(state);
+               state->needfij = true;
+               state->rstate.stage = 7; goto Pause; Resume07:
+               state->needfij = false;
+               state->repnfunc++;
+               state->repnjac++;
+            // New model
+               state->modelage = 0;
+            }
+         } else {
+         // State.J contains Jacobian or its current approximation;
+         // refresh it using secant updates:
+         //
+         // f(x0+dx) = f(x0) + J*dx,
+         // J_new = J_old + u*h'
+         // h = x_new-x_old
+         // u = (f_new - f_old - J_old*h)/(h'h)
+         //
+         // We can explicitly generate h and u, but it is
+         // preferential to do in-place calculations. Only
+         // I-th row of J_old is needed to calculate u[I],
+         // so we can update J row by row in one pass.
+         //
+         // NOTE: we expect that State.XBase contains new point,
+         // State.FBase contains old point, State.DeltaX and
+         // State.DeltaY contain updates from last step.
+            ae_assert(state->deltaxready && state->deltafready, "MinLMIteration: uninitialized DeltaX/DeltaF");
+            t = ae_v_dotproduct(state->deltax.xR, 1, state->deltax.xR, 1, n);
+            ae_assert(t != 0.0, "MinLM: internal error (T=0)");
+            for (i = 0; i < m; i++) {
+               v = ae_v_dotproduct(state->j.xyR[i], 1, state->deltax.xR, 1, n);
+               v = (state->deltaf.xR[i] - v) / t;
+               ae_v_addd(state->j.xyR[i], 1, state->deltax.xR, 1, n, v);
+            }
+            ae_v_move(state->fi.xR, 1, state->fibase.xR, 1, m);
+            ae_v_add(state->fi.xR, 1, state->deltaf.xR, 1, m);
+         // Increase model age
+            state->modelage++;
          }
-      } else {
-         bflag = false;
+         rmatrixgemm(n, n, m, 2.0, &state->j, 0, 0, 1, &state->j, 0, 0, 0, 0.0, &state->quadraticmodel, 0, 0);
+         rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->gbase, 0);
+         ae_v_muld(state->gbase.xR, 1, n, 2);
+         v = ae_v_dotproduct(state->fi.xR, 1, state->fi.xR, 1, m);
+         state->fbase = v;
+         ae_v_move(state->fibase.xR, 1, state->fi.xR, 1, m);
+         state->deltaxready = false;
+         state->deltafready = false;
+      // Perform integrity check (presense of NAN/INF)
+         v = state->fbase;
+         for (i = 0; i < n; i++) {
+            v = 0.1 * v + state->gbase.xR[i];
+         }
+         if (!isfinite(v)) {
+         // Break!
+            state->repterminationtype = -8;
+            goto Exit;
+         }
+      // If Lambda is not initialized, initialize it using quadratic model
+         if (state->lambdav < 0.0) {
+            state->lambdav = 0.0;
+            for (i = 0; i < n; i++) {
+               state->lambdav = rmax2(state->lambdav, fabs(state->quadraticmodel.xyR[i][i]) * sqr(state->s.xR[i]));
+            }
+            state->lambdav *= 0.001;
+            if (state->lambdav == 0.0) {
+               state->lambdav = 1.0;
+            }
+         }
+      // Find value of Levenberg-Marquardt damping parameter which:
+      // * leads to positive definite damped model
+      // * within bounds specified by StpMax
+      // * generates step which decreases function value
+      //
+      // After this block IFlag is set to:
+      // * -8, if internal integrity control detected NAN/INF in function values
+      // * -3, if constraints are infeasible
+      // * -2, if model update is needed (either Lambda growth is too large
+      //       or step is too short, but we can't rely on model and stop iterations)
+      // * -1, if model is fresh, Lambda have grown too large, termination is needed
+      // *  0, if everything is OK, continue iterations
+      // * >0, successful termination, step is less than EpsX
+      //
+      // State.Nu can have any value on enter, but after exit it is set to 1.0
+         iflag = -99;
+         minlm_minlmstepfinderstart(&state->finderstate, &state->quadraticmodel, &state->gbase, state->fbase, &state->xbase, &state->fibase, state->modelage);
+         while (minlm_minlmstepfinderiteration(&state->finderstate, &state->lambdav, &state->nu, &state->xnew, &state->deltax, &state->deltaxready, &state->deltaf, &state->deltafready, &iflag, &fnew, &state->repncholesky)) {
+            ae_assert(state->hasfi || state->hasf, "MinLM: internal error 2!");
+            state->repnfunc++;
+            minlm_clearrequestfields(state);
+            if (state->finderstate.needfi) {
+               ae_assert(state->hasfi, "MinLM: internal error 2!");
+               ae_v_move(state->x.xR, 1, state->finderstate.x.xR, 1, n);
+               state->needfi = true;
+               state->rstate.stage = 8; goto Pause; Resume08:
+               state->needfi = false;
+               ae_v_move(state->finderstate.fi.xR, 1, state->fi.xR, 1, m);
+            } else if (state->finderstate.needf) {
+               ae_assert(state->hasf, "MinLM: internal error 2!");
+               ae_v_move(state->x.xR, 1, state->finderstate.x.xR, 1, n);
+               state->needf = true;
+               state->rstate.stage = 9; goto Pause; Resume09:
+               state->needf = false;
+               state->finderstate.f = state->f;
+            } else ae_assert(false, "MinLM: internal error 2!");
+         }
+         if (state->userterminationneeded) {
+         // User requested termination
+            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+            state->repterminationtype = 8;
+            goto Exit;
+         }
+         state->nu = 1.0;
+         ae_assert(((iflag >= -3 && iflag <= 0) || iflag == -8) || iflag > 0, "MinLM: internal integrity check failed!");
+         if (iflag == -3) {
+            state->repterminationtype = -3;
+            goto Exit;
+         } else if (iflag == -2) {
+            state->modelage = state->maxmodelage + 1;
+            continue;
+         } else if (iflag == -1) {
+         // Stopping conditions are too stringent
+            state->repterminationtype = 7;
+            if (state->xrep) {
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               state->f = state->fbase;
+               minlm_clearrequestfields(state);
+               state->xupdated = true;
+               state->rstate.stage = 10; goto Pause; Resume10:
+               state->xupdated = false;
+            }
+            goto Exit;
+         } else if (iflag == -8 || iflag > 0) {
+         // Either:
+         // * Integrity check failed - infinities or NANs
+         // * successful termination (step size is small enough)
+            state->repterminationtype = iflag;
+            if (state->xrep) {
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               state->f = state->fbase;
+               minlm_clearrequestfields(state);
+               state->xupdated = true;
+               state->rstate.stage = 11; goto Pause; Resume11:
+               state->xupdated = false;
+            }
+            goto Exit;
+         }
+         state->f = fnew;
+      // Levenberg-Marquardt step is ready.
+      // Compare predicted vs. actual decrease and decide what to do with lambda.
+      //
+      // NOTE: we expect that State.DeltaX contains direction of step,
+      // State.F contains function value at new point.
+         ae_assert(state->deltaxready, "MinLM: deltaX is not ready");
+         iflag = minlm_checkdecrease(&state->quadraticmodel, &state->gbase, state->fbase, n, &state->deltax, state->f, &state->lambdav, &state->nu);
+         if (iflag != 0) {
+            state->repterminationtype = iflag;
+            if (state->xrep) {
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               state->f = state->fbase;
+               minlm_clearrequestfields(state);
+               state->xupdated = true;
+               state->rstate.stage = 12; goto Pause; Resume12:
+               state->xupdated = false;
+            }
+            goto Exit;
+         }
+      // Accept step, report it and
+      // test stopping conditions on iterations count and function decrease.
+      //
+      // NOTE: we expect that State.DeltaX contains direction of step,
+      // State.F contains function value at new point.
+      //
+      // NOTE2: we should update XBase ONLY. In the beginning of the next
+      // iteration we expect that State.FIBase is NOT updated and
+      // contains old value of a function vector.
+         ae_v_move(state->xbase.xR, 1, state->xnew.xR, 1, n);
+         if (state->xrep) {
+            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+            minlm_clearrequestfields(state);
+            state->xupdated = true;
+            state->rstate.stage = 13; goto Pause; Resume13:
+            state->xupdated = false;
+         }
+         state->repiterationscount++;
+         if (state->repiterationscount >= state->maxits && state->maxits > 0) {
+            state->repterminationtype = 5;
+         }
+         if (state->repterminationtype > 0) {
+            if (state->xrep) {
+            // Report: XBase contains new point, F contains function value at new point
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               minlm_clearrequestfields(state);
+               state->xupdated = true;
+               state->rstate.stage = 14; goto Pause; Resume14:
+               state->xupdated = false;
+            }
+            goto Exit;
+         }
+         state->modelage++;
+      }
+   // Lambda is too large, we have to break iterations.
+      state->repterminationtype = 7;
+      if (state->xrep) {
+         ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+         state->f = state->fbase;
+         minlm_clearrequestfields(state);
+         state->xupdated = true;
+         state->rstate.stage = 15; goto Pause; Resume15:
+         state->xupdated = false;
       }
    } else {
-   // Either problem is non-convex (increase LambdaV) or constraints are inconsistent
-      ae_assert((state->qprep.terminationtype == -3 || state->qprep.terminationtype == -4) || state->qprep.terminationtype == -5, "MinLM: unexpected completion code from QP solver");
-      if (state->qprep.terminationtype == -3) {
-         iflag = -3;
-         goto lbl_87;
+   // Legacy Hessian-based mode
+   //
+   // Main cycle.
+   //
+   // We move through it until either:
+   // * one of the stopping conditions is met
+   // * we decide that stopping conditions are too stringent
+   //   and break from cycle
+   //
+      if (state->nec + state->nic > 0) {
+      // FGH solver does not support general linear constraints
+         state->repterminationtype = -5;
+         goto Exit;
       }
-      bflag = false;
-   }
-   if (!bflag) {
-   // Solution failed:
-   // try to increase lambda to make matrix positive definite and continue.
-      if (!minlm_increaselambda(&state->lambdav, &state->nu)) {
-         iflag = -1;
-         goto lbl_87;
+      while (true) {
+      // First, we have to prepare quadratic model for our function.
+      // We use BFlag to ensure that model is prepared;
+      // if it is false at the end of this block, something went wrong.
+      //
+      // We may either calculate brand new model or update old one.
+      //
+      // Before this block we have:
+      // * State.XBase            - current position.
+      // * State.DeltaX           - if DeltaXReady is True
+      // * State.DeltaF           - if DeltaFReady is True
+      //
+      // After this block is over, we will have:
+      // * State.XBase            - base point (unchanged)
+      // * State.FBase            - F(XBase)
+      // * State.GBase            - linear term
+      // * State.QuadraticModel   - quadratic term
+      // * State.LambdaV          - current estimate for lambda
+      //
+      // We also clear DeltaXReady/DeltaFReady flags
+      // after initialization is done.
+         bflag = false;
+         if (state->algomode == 0 || state->algomode == 1) {
+         // Calculate f[] and Jacobian
+            if (state->modelage > state->maxmodelage || !(state->deltaxready && state->deltafready)) {
+            // Refresh model (using either finite differences or analytic Jacobian)
+               if (state->algomode == 0) {
+               // Optimization using F values only.
+               // Use finite differences to estimate Jacobian.
+                  ae_assert(state->hasfi, "MinLMIteration: internal error when estimating Jacobian (no f[])");
+                  for (k = 0; k < n; k++) {
+                  // We guard X[k] from leaving [BndL,BndU].
+                  // In case BndL=BndU, we assume that derivative in this direction is zero.
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] -= state->s.xR[k] * state->diffstep;
+                     if (state->havebndl.xB[k]) {
+                        state->x.xR[k] = rmax2(state->x.xR[k], state->bndl.xR[k]);
+                     }
+                     if (state->havebndu.xB[k]) {
+                        state->x.xR[k] = rmin2(state->x.xR[k], state->bndu.xR[k]);
+                     }
+                     state->xm1 = state->x.xR[k];
+                     minlm_clearrequestfields(state);
+                     state->needfi = true;
+                     state->rstate.stage = 16; goto Pause; Resume16:
+                     state->repnfunc++;
+                     ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, m);
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] += state->s.xR[k] * state->diffstep;
+                     if (state->havebndl.xB[k]) {
+                        state->x.xR[k] = rmax2(state->x.xR[k], state->bndl.xR[k]);
+                     }
+                     if (state->havebndu.xB[k]) {
+                        state->x.xR[k] = rmin2(state->x.xR[k], state->bndu.xR[k]);
+                     }
+                     state->xp1 = state->x.xR[k];
+                     minlm_clearrequestfields(state);
+                     state->needfi = true;
+                     state->rstate.stage = 17; goto Pause; Resume17:
+                     state->repnfunc++;
+                     ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, m);
+                     v = state->xp1 - state->xm1;
+                     if (v != 0.0) {
+                        v = 1 / v;
+                        ae_v_moved(&state->j.xyR[0][k], state->j.stride, state->fp1.xR, 1, m, v);
+                        ae_v_subd(&state->j.xyR[0][k], state->j.stride, state->fm1.xR, 1, m, v);
+                     } else {
+                        for (i = 0; i < m; i++) {
+                           state->j.xyR[i][k] = 0.0;
+                        }
+                     }
+                  }
+               // Calculate F(XBase)
+                  ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                  minlm_clearrequestfields(state);
+                  state->needfi = true;
+                  state->rstate.stage = 18; goto Pause; Resume18:
+                  state->needfi = false;
+                  state->repnfunc++;
+                  state->repnjac++;
+               // New model
+                  state->modelage = 0;
+               } else {
+               // Obtain f[] and Jacobian
+                  ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                  minlm_clearrequestfields(state);
+                  state->needfij = true;
+                  state->rstate.stage = 19; goto Pause; Resume19:
+                  state->needfij = false;
+                  state->repnfunc++;
+                  state->repnjac++;
+               // New model
+                  state->modelage = 0;
+               }
+            } else {
+            // State.J contains Jacobian or its current approximation;
+            // refresh it using secant updates:
+            //
+            // f(x0+dx) = f(x0) + J*dx,
+            // J_new = J_old + u*h'
+            // h = x_new-x_old
+            // u = (f_new - f_old - J_old*h)/(h'h)
+            //
+            // We can explicitly generate h and u, but it is
+            // preferential to do in-place calculations. Only
+            // I-th row of J_old is needed to calculate u[I],
+            // so we can update J row by row in one pass.
+            //
+            // NOTE: we expect that State.XBase contains new point,
+            // State.FBase contains old point, State.DeltaX and
+            // State.DeltaY contain updates from last step.
+               ae_assert(state->deltaxready && state->deltafready, "MinLMIteration: uninitialized DeltaX/DeltaF");
+               t = ae_v_dotproduct(state->deltax.xR, 1, state->deltax.xR, 1, n);
+               ae_assert(t != 0.0, "MinLM: internal error (T=0)");
+               for (i = 0; i < m; i++) {
+                  v = ae_v_dotproduct(state->j.xyR[i], 1, state->deltax.xR, 1, n);
+                  v = (state->deltaf.xR[i] - v) / t;
+                  ae_v_addd(state->j.xyR[i], 1, state->deltax.xR, 1, n, v);
+               }
+               ae_v_move(state->fi.xR, 1, state->fibase.xR, 1, m);
+               ae_v_add(state->fi.xR, 1, state->deltaf.xR, 1, m);
+            // Increase model age
+               state->modelage++;
+            }
+         // Generate quadratic model:
+         //     f(xbase+dx) =
+         //       = (f0 + J*dx)'(f0 + J*dx)
+         //       = f0^2 + dx'J'f0 + f0*J*dx + dx'J'J*dx
+         //       = f0^2 + 2*f0*J*dx + dx'J'J*dx
+         //
+         // Note that we calculate 2*(J'J) instead of J'J because
+         // our quadratic model is based on Tailor decomposition,
+         // i.e. it has 0.5 before quadratic term.
+            rmatrixgemm(n, n, m, 2.0, &state->j, 0, 0, 1, &state->j, 0, 0, 0, 0.0, &state->quadraticmodel, 0, 0);
+            rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->gbase, 0);
+            ae_v_muld(state->gbase.xR, 1, n, 2);
+            v = ae_v_dotproduct(state->fi.xR, 1, state->fi.xR, 1, m);
+            state->fbase = v;
+            ae_v_move(state->fibase.xR, 1, state->fi.xR, 1, m);
+         // set control variables
+            bflag = true;
+         }
+         if (state->algomode == 2) {
+            ae_assert(!state->hasfi, "MinLMIteration: internal error (HasFI is True in Hessian-based mode)");
+         // Obtain F, G, H
+            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+            minlm_clearrequestfields(state);
+            state->needfgh = true;
+            state->rstate.stage = 20; goto Pause; Resume20:
+            state->needfgh = false;
+            state->repnfunc++;
+            state->repngrad++;
+            state->repnhess++;
+            rmatrixcopy(n, n, &state->h, 0, 0, &state->quadraticmodel, 0, 0);
+            ae_v_move(state->gbase.xR, 1, state->g.xR, 1, n);
+            state->fbase = state->f;
+         // set control variables
+            bflag = true;
+            state->modelage = 0;
+         }
+         ae_assert(bflag, "MinLM: internal integrity check failed!");
+         state->deltaxready = false;
+         state->deltafready = false;
+      // Perform integrity check (presense of NAN/INF)
+         v = state->fbase;
+         for (i = 0; i < n; i++) {
+            v = 0.1 * v + state->gbase.xR[i];
+         }
+         if (!isfinite(v)) {
+         // Break!
+            state->repterminationtype = -8;
+            goto Exit;
+         }
+      // If Lambda is not initialized, initialize it using quadratic model
+         if (state->lambdav < 0.0) {
+            state->lambdav = 0.0;
+            for (i = 0; i < n; i++) {
+               state->lambdav = rmax2(state->lambdav, fabs(state->quadraticmodel.xyR[i][i]) * sqr(state->s.xR[i]));
+            }
+            state->lambdav *= 0.001;
+            if (state->lambdav == 0.0) {
+               state->lambdav = 1.0;
+            }
+         }
+      // Find value of Levenberg-Marquardt damping parameter which:
+      // * leads to positive definite damped model
+      // * within bounds specified by StpMax
+      // * generates step which decreases function value
+      //
+      // After this block IFlag is set to:
+      // * -3, if constraints are infeasible
+      // * -2, if model update is needed (either Lambda growth is too large
+      //       or step is too short, but we can't rely on model and stop iterations)
+      // * -1, if model is fresh, Lambda have grown too large, termination is needed
+      // *  0, if everything is OK, continue iterations
+      //
+      // State.Nu can have any value on enter, but after exit it is set to 1.0
+         iflag = -99;
+         while (true) {
+         // Do we need model update?
+            if (state->modelage > 0 && state->nu >= minlm_suspiciousnu) {
+               iflag = -2;
+               break;
+            }
+         // Setup quadratic solver and solve quadratic programming problem.
+         // After problem is solved we'll try to bound step by StpMax
+         // (Lambda will be increased if step size is too large).
+         //
+         // We use BFlag variable to indicate that we have to increase Lambda.
+         // If it is False, we will try to increase Lambda and move to new iteration.
+            bflag = true;
+            minqpsetstartingpointfast(&state->qpstate, &state->xbase);
+            minqpsetoriginfast(&state->qpstate, &state->xbase);
+            minqpsetlineartermfast(&state->qpstate, &state->gbase);
+            minqpsetquadratictermfast(&state->qpstate, &state->quadraticmodel, true, 0.0);
+            for (i = 0; i < n; i++) {
+               state->tmp0.xR[i] = state->quadraticmodel.xyR[i][i] + state->lambdav / sqr(state->s.xR[i]);
+            }
+            minqprewritediagonal(&state->qpstate, &state->tmp0);
+            minqpoptimize(&state->qpstate);
+            minqpresultsbuf(&state->qpstate, &state->xdir, &state->qprep);
+            if (state->qprep.terminationtype > 0) {
+            // successful solution of QP problem
+               ae_v_sub(state->xdir.xR, 1, state->xbase.xR, 1, n);
+               v = ae_v_dotproduct(state->xdir.xR, 1, state->xdir.xR, 1, n);
+               if (isfinite(v)) {
+                  v = sqrt(v);
+                  if (state->stpmax > 0.0 && v > state->stpmax) {
+                     bflag = false;
+                  }
+               } else {
+                  bflag = false;
+               }
+            } else {
+            // Either problem is non-convex (increase LambdaV) or constraints are inconsistent
+               ae_assert((state->qprep.terminationtype == -3 || state->qprep.terminationtype == -4) || state->qprep.terminationtype == -5, "MinLM: unexpected completion code from QP solver");
+               if (state->qprep.terminationtype == -3) {
+                  iflag = -3;
+                  break;
+               }
+               bflag = false;
+            }
+            if (!bflag) {
+            // Solution failed:
+            // try to increase lambda to make matrix positive definite and continue.
+               if (!minlm_increaselambda(&state->lambdav, &state->nu)) {
+                  iflag = -1;
+                  break;
+               }
+               continue;
+            }
+         // Step in State.XDir and it is bounded by StpMax.
+         //
+         // We should check stopping conditions on step size here.
+         // DeltaX, which is used for secant updates, is initialized here.
+         //
+         // This code is a bit tricky because sometimes XDir != 0, but
+         // it is so small that XDir+XBase == XBase (in finite precision
+         // arithmetics). So we set DeltaX to XBase, then
+         // add XDir, and then subtract XBase to get exact value of
+         // DeltaX.
+         //
+         // Step length is estimated using DeltaX.
+         //
+         // NOTE: stopping conditions are tested
+         // for fresh models only (ModelAge=0)
+            ae_v_move(state->deltax.xR, 1, state->xbase.xR, 1, n);
+            ae_v_add(state->deltax.xR, 1, state->xdir.xR, 1, n);
+            ae_v_sub(state->deltax.xR, 1, state->xbase.xR, 1, n);
+            state->deltaxready = true;
+            v = 0.0;
+            for (i = 0; i < n; i++) {
+               v += sqr(state->deltax.xR[i] / state->s.xR[i]);
+            }
+            v = sqrt(v);
+            if (v <= state->epsx) {
+               if (state->modelage == 0) {
+               // Step is too short, model is fresh and we can rely on it.
+               // Terminating.
+                  state->repterminationtype = 2;
+                  if (state->xrep) {
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->f = state->fbase;
+                     minlm_clearrequestfields(state);
+                     state->xupdated = true;
+                     state->rstate.stage = 21; goto Pause; Resume21:
+                     state->xupdated = false;
+                  }
+                  goto Exit;
+               } else {
+               // Step is suspiciously short, but model is not fresh
+               // and we can't rely on it.
+                  iflag = -2;
+                  break;
+               }
+            }
+         // Let's evaluate new step:
+         // a) if we have Fi vector, we evaluate it using rcomm, and
+         //    then we manually calculate State.F as sum of squares of Fi[]
+         // b) if we have F value, we just evaluate it through rcomm interface
+         //
+         // We prefer (a) because we may need Fi vector for additional
+         // iterations
+            ae_assert(state->hasfi || state->hasf, "MinLM: internal error 2!");
+            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+            ae_v_add(state->x.xR, 1, state->xdir.xR, 1, n);
+            minlm_clearrequestfields(state);
+            if (state->hasfi) {
+               state->needfi = true;
+               state->rstate.stage = 22; goto Pause; Resume22:
+               state->needfi = false;
+               v = ae_v_dotproduct(state->fi.xR, 1, state->fi.xR, 1, m);
+               state->f = v;
+               ae_v_move(state->deltaf.xR, 1, state->fi.xR, 1, m);
+               ae_v_sub(state->deltaf.xR, 1, state->fibase.xR, 1, m);
+               state->deltafready = true;
+            } else {
+               state->needf = true;
+               state->rstate.stage = 23; goto Pause; Resume23:
+               state->needf = false;
+            }
+            state->repnfunc++;
+            if (!isfinite(state->f)) {
+            // Integrity check failed, break!
+               state->repterminationtype = -8;
+               goto Exit;
+            }
+            if (state->f >= state->fbase) {
+            // Increase lambda and continue
+               if (!minlm_increaselambda(&state->lambdav, &state->nu)) {
+                  iflag = -1;
+                  break;
+               }
+               continue;
+            }
+         // We've found our step!
+            iflag = 0;
+            break;
+         }
+         if (state->userterminationneeded) {
+         // User requested termination
+            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+            state->repterminationtype = 8;
+            goto Exit;
+         }
+         state->nu = 1.0;
+         ae_assert(iflag >= -3 && iflag <= 0, "MinLM: internal integrity check failed!");
+         if (iflag == -3) {
+            state->repterminationtype = -3;
+            goto Exit;
+         } else if (iflag == -2) {
+            state->modelage = state->maxmodelage + 1;
+            continue;
+         } else if (iflag == -1) {
+            break;
+         }
+      // Levenberg-Marquardt step is ready.
+      // Compare predicted vs. actual decrease and decide what to do with lambda.
+      //
+      // NOTE: we expect that State.DeltaX contains direction of step,
+      // State.F contains function value at new point.
+         ae_assert(state->deltaxready, "MinLM: deltaX is not ready");
+         t = 0.0;
+         for (i = 0; i < n; i++) {
+            v = ae_v_dotproduct(state->quadraticmodel.xyR[i], 1, state->deltax.xR, 1, n);
+            t += state->deltax.xR[i] * state->gbase.xR[i] + 0.5 * state->deltax.xR[i] * v;
+         }
+         state->predicteddecrease = -t;
+         state->actualdecrease = -(state->f - state->fbase);
+         if (state->predicteddecrease <= 0.0) {
+            break;
+         }
+         v = state->actualdecrease / state->predicteddecrease;
+         if (v < 0.1) {
+            if (!minlm_increaselambda(&state->lambdav, &state->nu)) {
+            // Lambda is too large, we have to break iterations.
+               state->repterminationtype = 7;
+               if (state->xrep) {
+                  ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                  state->f = state->fbase;
+                  minlm_clearrequestfields(state);
+                  state->xupdated = true;
+                  state->rstate.stage = 24; goto Pause; Resume24:
+                  state->xupdated = false;
+               }
+               goto Exit;
+            }
+         }
+         if (v > 0.5) {
+            minlm_decreaselambda(&state->lambdav, &state->nu);
+         }
+      // Accept step, report it and
+      // test stopping conditions on iterations count and function decrease.
+      //
+      // NOTE: we expect that State.DeltaX contains direction of step,
+      // State.F contains function value at new point.
+      //
+      // NOTE2: we should update XBase ONLY. In the beginning of the next
+      // iteration we expect that State.FIBase is NOT updated and
+      // contains old value of a function vector.
+         ae_v_add(state->xbase.xR, 1, state->deltax.xR, 1, n);
+         if (state->xrep) {
+            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+            minlm_clearrequestfields(state);
+            state->xupdated = true;
+            state->rstate.stage = 25; goto Pause; Resume25:
+            state->xupdated = false;
+         }
+         state->repiterationscount++;
+         if (state->repiterationscount >= state->maxits && state->maxits > 0) {
+            state->repterminationtype = 5;
+         }
+         if (state->repterminationtype > 0) {
+            if (state->xrep) {
+            // Report: XBase contains new point, F contains function value at new point
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               minlm_clearrequestfields(state);
+               state->xupdated = true;
+               state->rstate.stage = 26; goto Pause; Resume26:
+               state->xupdated = false;
+            }
+            goto Exit;
+         }
+         state->modelage++;
       }
-      goto lbl_86;
-   }
-// Step in State.XDir and it is bounded by StpMax.
-//
-// We should check stopping conditions on step size here.
-// DeltaX, which is used for secant updates, is initialized here.
-//
-// This code is a bit tricky because sometimes XDir != 0, but
-// it is so small that XDir+XBase == XBase (in finite precision
-// arithmetics). So we set DeltaX to XBase, then
-// add XDir, and then subtract XBase to get exact value of
-// DeltaX.
-//
-// Step length is estimated using DeltaX.
-//
-// NOTE: stopping conditions are tested
-// for fresh models only (ModelAge=0)
-   ae_v_move(state->deltax.xR, 1, state->xbase.xR, 1, n);
-   ae_v_add(state->deltax.xR, 1, state->xdir.xR, 1, n);
-   ae_v_sub(state->deltax.xR, 1, state->xbase.xR, 1, n);
-   state->deltaxready = true;
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(state->deltax.xR[i] / state->s.xR[i]);
-   }
-   v = sqrt(v);
-   if (v > state->epsx) {
-      goto lbl_88;
-   }
-   if (state->modelage != 0) {
-      goto lbl_90;
-   }
-// Step is too short, model is fresh and we can rely on it.
-// Terminating.
-   state->repterminationtype = 2;
-   if (!state->xrep) {
-      goto lbl_92;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->f = state->fbase;
-   minlm_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 21;
-   goto lbl_rcomm;
-lbl_21:
-   state->xupdated = false;
-lbl_92:
-   result = false;
-   return result;
-   goto lbl_91;
-lbl_90:
-// Step is suspiciously short, but model is not fresh
-// and we can't rely on it.
-   iflag = -2;
-   goto lbl_87;
-lbl_91:
-lbl_88:
-// Let's evaluate new step:
-// a) if we have Fi vector, we evaluate it using rcomm, and
-//    then we manually calculate State.F as sum of squares of Fi[]
-// b) if we have F value, we just evaluate it through rcomm interface
-//
-// We prefer (a) because we may need Fi vector for additional
-// iterations
-   ae_assert(state->hasfi || state->hasf, "MinLM: internal error 2!");
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   ae_v_add(state->x.xR, 1, state->xdir.xR, 1, n);
-   minlm_clearrequestfields(state);
-   if (!state->hasfi) {
-      goto lbl_94;
-   }
-   state->needfi = true;
-   state->rstate.stage = 22;
-   goto lbl_rcomm;
-lbl_22:
-   state->needfi = false;
-   v = ae_v_dotproduct(state->fi.xR, 1, state->fi.xR, 1, m);
-   state->f = v;
-   ae_v_move(state->deltaf.xR, 1, state->fi.xR, 1, m);
-   ae_v_sub(state->deltaf.xR, 1, state->fibase.xR, 1, m);
-   state->deltafready = true;
-   goto lbl_95;
-lbl_94:
-   state->needf = true;
-   state->rstate.stage = 23;
-   goto lbl_rcomm;
-lbl_23:
-   state->needf = false;
-lbl_95:
-   state->repnfunc++;
-   if (!isfinite(state->f)) {
-   // Integrity check failed, break!
-      state->repterminationtype = -8;
-      result = false;
-      return result;
-   }
-   if (state->f >= state->fbase) {
-   // Increase lambda and continue
-      if (!minlm_increaselambda(&state->lambdav, &state->nu)) {
-         iflag = -1;
-         goto lbl_87;
+   // Lambda is too large, we have to break iterations.
+      state->repterminationtype = 7;
+      if (state->xrep) {
+         ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+         state->f = state->fbase;
+         minlm_clearrequestfields(state);
+         state->xupdated = true;
+         state->rstate.stage = 27; goto Pause; Resume27:
+         state->xupdated = false;
       }
-      goto lbl_86;
    }
-// We've found our step!
-   iflag = 0;
-   goto lbl_87;
-   goto lbl_86;
-lbl_87:
-   if (state->userterminationneeded) {
-   // User requested termination
-      ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-   state->nu = 1.0;
-   ae_assert(iflag >= -3 && iflag <= 0, "MinLM: internal integrity check failed!");
-   if (iflag == -3) {
-      state->repterminationtype = -3;
-      result = false;
-      return result;
-   }
-   if (iflag == -2) {
-      state->modelage = state->maxmodelage + 1;
-      goto lbl_73;
-   }
-   if (iflag == -1) {
-      goto lbl_74;
-   }
-// Levenberg-Marquardt step is ready.
-// Compare predicted vs. actual decrease and decide what to do with lambda.
-//
-// NOTE: we expect that State.DeltaX contains direction of step,
-// State.F contains function value at new point.
-   ae_assert(state->deltaxready, "MinLM: deltaX is not ready");
-   t = 0.0;
-   for (i = 0; i < n; i++) {
-      v = ae_v_dotproduct(state->quadraticmodel.xyR[i], 1, state->deltax.xR, 1, n);
-      t += state->deltax.xR[i] * state->gbase.xR[i] + 0.5 * state->deltax.xR[i] * v;
-   }
-   state->predicteddecrease = -t;
-   state->actualdecrease = -(state->f - state->fbase);
-   if (state->predicteddecrease <= 0.0) {
-      goto lbl_74;
-   }
-   v = state->actualdecrease / state->predicteddecrease;
-   if (v >= 0.1) {
-      goto lbl_96;
-   }
-   if (minlm_increaselambda(&state->lambdav, &state->nu)) {
-      goto lbl_98;
-   }
-// Lambda is too large, we have to break iterations.
-   state->repterminationtype = 7;
-   if (!state->xrep) {
-      goto lbl_100;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->f = state->fbase;
-   minlm_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 24;
-   goto lbl_rcomm;
-lbl_24:
-   state->xupdated = false;
-lbl_100:
-   result = false;
-   return result;
-lbl_98:
-lbl_96:
-   if (v > 0.5) {
-      minlm_decreaselambda(&state->lambdav, &state->nu);
-   }
-// Accept step, report it and
-// test stopping conditions on iterations count and function decrease.
-//
-// NOTE: we expect that State.DeltaX contains direction of step,
-// State.F contains function value at new point.
-//
-// NOTE2: we should update XBase ONLY. In the beginning of the next
-// iteration we expect that State.FIBase is NOT updated and
-// contains old value of a function vector.
-   ae_v_add(state->xbase.xR, 1, state->deltax.xR, 1, n);
-   if (!state->xrep) {
-      goto lbl_102;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   minlm_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 25;
-   goto lbl_rcomm;
-lbl_25:
-   state->xupdated = false;
-lbl_102:
-   state->repiterationscount++;
-   if (state->repiterationscount >= state->maxits && state->maxits > 0) {
-      state->repterminationtype = 5;
-   }
-   if (state->repterminationtype <= 0) {
-      goto lbl_104;
-   }
-   if (!state->xrep) {
-      goto lbl_106;
-   }
-// Report: XBase contains new point, F contains function value at new point
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   minlm_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 26;
-   goto lbl_rcomm;
-lbl_26:
-   state->xupdated = false;
-lbl_106:
-   result = false;
-   return result;
-lbl_104:
-   state->modelage++;
-   goto lbl_73;
-lbl_74:
-// Lambda is too large, we have to break iterations.
-   state->repterminationtype = 7;
-   if (!state->xrep) {
-      goto lbl_108;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->f = state->fbase;
-   minlm_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 27;
-   goto lbl_rcomm;
-lbl_27:
-   state->xupdated = false;
-lbl_108:
-lbl_37:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = m;
    state->rstate.ia.xZ[2] = iflag;
@@ -23543,7 +22936,7 @@ lbl_rcomm:
    state->rstate.ra.xR[1] = s;
    state->rstate.ra.xR[2] = t;
    state->rstate.ra.xR[3] = fnew;
-   return result;
+   return true;
 }
 
 // This  function  activates/deactivates verification  of  the  user-supplied
@@ -24990,82 +24383,31 @@ bool mincgiteration(mincgstate *state) {
    double betak;
    double v;
    double vv;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      i = state->rstate.ia.xZ[1];
-      betak = state->rstate.ra.xR[0];
-      v = state->rstate.ra.xR[1];
-      vv = state->rstate.ra.xR[2];
-   } else {
-      n = 359;
-      i = -58;
-      betak = -919;
-      v = -909;
-      vv = 81;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   i = state->rstate.ia.xZ[1];
+   betak = state->rstate.ra.xR[0];
+   v = state->rstate.ra.xR[1];
+   vv = state->rstate.ra.xR[2];
+   switch (state->rstate.stage) {
+      case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
+      case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
+      case 8: goto Resume08; case 9: goto Resume09; case 10: goto Resume10; case 11: goto Resume11;
+      case 12: goto Resume12; case 13: goto Resume13; case 14: goto Resume14;
+      case 15: goto Resume15; case 16: goto Resume16; case 17: goto Resume17;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
-   if (state->rstate.stage == 5) {
-      goto lbl_5;
-   }
-   if (state->rstate.stage == 6) {
-      goto lbl_6;
-   }
-   if (state->rstate.stage == 7) {
-      goto lbl_7;
-   }
-   if (state->rstate.stage == 8) {
-      goto lbl_8;
-   }
-   if (state->rstate.stage == 9) {
-      goto lbl_9;
-   }
-   if (state->rstate.stage == 10) {
-      goto lbl_10;
-   }
-   if (state->rstate.stage == 11) {
-      goto lbl_11;
-   }
-   if (state->rstate.stage == 12) {
-      goto lbl_12;
-   }
-   if (state->rstate.stage == 13) {
-      goto lbl_13;
-   }
-   if (state->rstate.stage == 14) {
-      goto lbl_14;
-   }
-   if (state->rstate.stage == 15) {
-      goto lbl_15;
-   }
-   if (state->rstate.stage == 16) {
-      goto lbl_16;
-   }
-   if (state->rstate.stage == 17) {
-      goto lbl_17;
-   }
+Spawn:
+   n = 359;
+   i = -58;
+   betak = -919;
+   v = -909;
+   vv = 81;
 // Routine body
 // Prepare
    n = state->n;
@@ -25083,28 +24425,20 @@ bool mincgiteration(mincgstate *state) {
    }
 //  Check, that transferred derivative value is right
    mincg_clearrequestfields(state);
-   if (!(state->diffstep == 0.0 && state->teststep > 0.0)) {
-      goto lbl_18;
+   if (state->diffstep == 0.0 && state->teststep > 0.0) {
+      while (smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->s, &state->s, false, state->teststep)) {
+         for (i = 0; i < n; i++) {
+            state->x.xR[i] = state->smonitor.x.xR[i];
+         }
+         state->needfg = true;
+         state->rstate.stage = 0; goto Pause; Resume00:
+         state->needfg = false;
+         state->smonitor.fi.xR[0] = state->f;
+         for (i = 0; i < n; i++) {
+            state->smonitor.j.xyR[0][i] = state->g.xR[i];
+         }
+      }
    }
-lbl_20:
-   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->s, &state->s, false, state->teststep)) {
-      goto lbl_21;
-   }
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = state->smonitor.x.xR[i];
-   }
-   state->needfg = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needfg = false;
-   state->smonitor.fi.xR[0] = state->f;
-   for (i = 0; i < n; i++) {
-      state->smonitor.j.xyR[0][i] = state->g.xR[i];
-   }
-   goto lbl_20;
-lbl_21:
-lbl_18:
 // Preparations continue:
 // * set XK
 // * calculate F/G
@@ -25118,87 +24452,57 @@ lbl_18:
    }
    ae_v_move(state->xk.xR, 1, state->x.xR, 1, n);
    mincg_clearrequestfields(state);
-   if (state->diffstep != 0.0) {
-      goto lbl_22;
+   if (state->diffstep == 0.0) {
+      state->needfg = true;
+      state->rstate.stage = 1; goto Pause; Resume01:
+      state->needfg = false;
+   } else {
+      state->needf = true;
+      state->rstate.stage = 2; goto Pause; Resume02:
+      state->fbase = state->f;
+      for (i = 0; i < n; i++) {
+         v = state->x.xR[i];
+         state->x.xR[i] = v - state->diffstep * state->s.xR[i];
+         state->rstate.stage = 3; goto Pause; Resume03:
+         state->fm2 = state->f;
+         state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
+         state->rstate.stage = 4; goto Pause; Resume04:
+         state->fm1 = state->f;
+         state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
+         state->rstate.stage = 5; goto Pause; Resume05:
+         state->fp1 = state->f;
+         state->x.xR[i] = v + state->diffstep * state->s.xR[i];
+         state->rstate.stage = 6; goto Pause; Resume06:
+         state->fp2 = state->f;
+         state->x.xR[i] = v;
+         state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
+      }
+      state->f = state->fbase;
+      state->needf = false;
    }
-   state->needfg = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->needfg = false;
-   goto lbl_23;
-lbl_22:
-   state->needf = true;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->fbase = state->f;
-   i = 0;
-lbl_24:
-   if (i > n - 1) {
-      goto lbl_26;
+   if (state->drep) {
+   // Report algorithm powerup (if needed)
+      mincg_clearrequestfields(state);
+      state->algpowerup = true;
+      state->rstate.stage = 7; goto Pause; Resume07:
+      state->algpowerup = false;
    }
-   v = state->x.xR[i];
-   state->x.xR[i] = v - state->diffstep * state->s.xR[i];
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->fm2 = state->f;
-   state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   state->fm1 = state->f;
-   state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 5;
-   goto lbl_rcomm;
-lbl_5:
-   state->fp1 = state->f;
-   state->x.xR[i] = v + state->diffstep * state->s.xR[i];
-   state->rstate.stage = 6;
-   goto lbl_rcomm;
-lbl_6:
-   state->fp2 = state->f;
-   state->x.xR[i] = v;
-   state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   i++;
-   goto lbl_24;
-lbl_26:
-   state->f = state->fbase;
-   state->needf = false;
-lbl_23:
-   if (!state->drep) {
-      goto lbl_27;
-   }
-// Report algorithm powerup (if needed)
-   mincg_clearrequestfields(state);
-   state->algpowerup = true;
-   state->rstate.stage = 7;
-   goto lbl_rcomm;
-lbl_7:
-   state->algpowerup = false;
-lbl_27:
    trimprepare(state->f, &state->trimthreshold);
    ae_v_moveneg(state->dk.xR, 1, state->g.xR, 1, n);
    mincg_preconditionedmultiply(state, &state->dk, &state->work0, &state->work1);
-   if (!state->xrep) {
-      goto lbl_29;
+   if (state->xrep) {
+      mincg_clearrequestfields(state);
+      state->xupdated = true;
+      state->rstate.stage = 8; goto Pause; Resume08:
+      state->xupdated = false;
    }
-   mincg_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 8;
-   goto lbl_rcomm;
-lbl_8:
-   state->xupdated = false;
-lbl_29:
    if (state->terminationneeded || state->userterminationneeded) {
    // Combined termination point for "internal" termination by TerminationNeeded flag
    // and for "user" termination by MinCGRequestTermination() (UserTerminationNeeded flag).
    // In this location rules for both of methods are same, thus only one exit point is needed.
       ae_v_move(state->xn.xR, 1, state->xk.xR, 1, n);
       state->repterminationtype = 8;
-      result = false;
-      return result;
+      goto Exit;
    }
    v = 0.0;
    for (i = 0; i < n; i++) {
@@ -25207,8 +24511,7 @@ lbl_29:
    if (sqrt(v) <= state->epsg) {
       ae_v_move(state->xn.xR, 1, state->xk.xR, 1, n);
       state->repterminationtype = 4;
-      result = false;
-      return result;
+      goto Exit;
    }
    state->repnfev = 1;
    state->k = 0;
@@ -25230,290 +24533,240 @@ lbl_29:
    }
 // Main cycle
    state->rstimer = mincg_rscountdownlen;
-lbl_31:
-   if (false) {
-      goto lbl_32;
-   }
-// * clear reset flag
-// * clear termination flag
-// * store G[k] for later calculation of Y[k]
-// * prepare starting point and direction and step length for line search
-   state->innerresetneeded = false;
-   state->terminationneeded = false;
-   ae_v_moveneg(state->yk.xR, 1, state->g.xR, 1, n);
-   ae_v_move(state->d.xR, 1, state->dk.xR, 1, n);
-   ae_v_move(state->x.xR, 1, state->xk.xR, 1, n);
-   state->mcstage = 0;
-   state->stp = 1.0;
-   linminnormalized(&state->d, &state->stp, n);
-   if (state->lastgoodstep != 0.0) {
-      state->stp = state->lastgoodstep;
-   }
-   state->curstpmax = state->stpmax;
-// Report beginning of line search (if needed)
-// Terminate algorithm, if user request was detected
-   if (!state->drep) {
-      goto lbl_33;
-   }
-   mincg_clearrequestfields(state);
-   state->lsstart = true;
-   state->rstate.stage = 9;
-   goto lbl_rcomm;
-lbl_9:
-   state->lsstart = false;
-lbl_33:
-   if (state->terminationneeded) {
-      ae_v_move(state->xn.xR, 1, state->x.xR, 1, n);
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-// Minimization along D
-   smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->x, state->f, &state->g);
-   mcsrch(n, &state->x, &state->f, &state->g, &state->d, &state->stp, state->curstpmax, mincg_gtol, &state->mcinfo, &state->nfev, &state->work0, &state->lstate, &state->mcstage);
-lbl_35:
-   if (state->mcstage == 0) {
-      goto lbl_36;
-   }
-// Calculate function/gradient using either
-// analytical gradient supplied by user
-// or finite difference approximation.
-//
-// "Trim" function in order to handle near-singularity points.
-   mincg_clearrequestfields(state);
-   if (state->diffstep != 0.0) {
-      goto lbl_37;
-   }
-   state->needfg = true;
-   state->rstate.stage = 10;
-   goto lbl_rcomm;
-lbl_10:
-   state->needfg = false;
-   goto lbl_38;
-lbl_37:
-   state->needf = true;
-   state->rstate.stage = 11;
-   goto lbl_rcomm;
-lbl_11:
-   state->fbase = state->f;
-   i = 0;
-lbl_39:
-   if (i > n - 1) {
-      goto lbl_41;
-   }
-   v = state->x.xR[i];
-   state->x.xR[i] = v - state->diffstep * state->s.xR[i];
-   state->rstate.stage = 12;
-   goto lbl_rcomm;
-lbl_12:
-   state->fm2 = state->f;
-   state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 13;
-   goto lbl_rcomm;
-lbl_13:
-   state->fm1 = state->f;
-   state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 14;
-   goto lbl_rcomm;
-lbl_14:
-   state->fp1 = state->f;
-   state->x.xR[i] = v + state->diffstep * state->s.xR[i];
-   state->rstate.stage = 15;
-   goto lbl_rcomm;
-lbl_15:
-   state->fp2 = state->f;
-   state->x.xR[i] = v;
-   state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   i++;
-   goto lbl_39;
-lbl_41:
-   state->f = state->fbase;
-   state->needf = false;
-lbl_38:
-   smoothnessmonitorenqueuepoint1u(&state->smonitor, &state->s, &state->invs, &state->d, state->stp, &state->x, state->f, &state->g);
-   trimfunction(&state->f, &state->g, n, state->trimthreshold);
-// Call MCSRCH again
-   mcsrch(n, &state->x, &state->f, &state->g, &state->d, &state->stp, state->curstpmax, mincg_gtol, &state->mcinfo, &state->nfev, &state->work0, &state->lstate, &state->mcstage);
-   goto lbl_35;
-lbl_36:
-   smoothnessmonitorfinalizelinesearch(&state->smonitor);
-// * terminate algorithm if "user" request for detected
-// * report end of line search
-// * store current point to XN
-// * report iteration
-// * terminate algorithm if "internal" request was detected
-   if (state->userterminationneeded) {
-      ae_v_move(state->xn.xR, 1, state->xk.xR, 1, n);
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-   if (!state->drep) {
-      goto lbl_42;
-   }
-// Report end of line search (if needed)
-   mincg_clearrequestfields(state);
-   state->lsend = true;
-   state->rstate.stage = 16;
-   goto lbl_rcomm;
-lbl_16:
-   state->lsend = false;
-lbl_42:
-   ae_v_move(state->xn.xR, 1, state->x.xR, 1, n);
-   if (!state->xrep) {
-      goto lbl_44;
-   }
-   mincg_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 17;
-   goto lbl_rcomm;
-lbl_17:
-   state->xupdated = false;
-lbl_44:
-   if (state->terminationneeded) {
-      ae_v_move(state->xn.xR, 1, state->x.xR, 1, n);
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-// Line search is finished.
-// * calculate BetaK
-// * calculate DN
-// * update timers
-// * calculate step length:
-//   * LastScaledStep is ALWAYS calculated because it is used in the stopping criteria
-//   * LastGoodStep is updated only when MCINFO is equal to 1 (Wolfe conditions hold).
-//     See below for more explanation.
-   if (state->mcinfo == 1 && !state->innerresetneeded) {
-   // Standard Wolfe conditions hold
-   // Calculate Y[K] and D[K]'*Y[K]
-      ae_v_add(state->yk.xR, 1, state->g.xR, 1, n);
-      vv = ae_v_dotproduct(state->yk.xR, 1, state->dk.xR, 1, n);
-   // Calculate BetaK according to DY formula
-      v = mincg_preconditionedmultiply2(state, &state->g, &state->g, &state->work0, &state->work1);
-      state->betady = v / vv;
-   // Calculate BetaK according to HS formula
-      v = mincg_preconditionedmultiply2(state, &state->g, &state->yk, &state->work0, &state->work1);
-      state->betahs = v / vv;
-   // Choose BetaK
-      if (state->cgtype == 0) {
-         betak = state->betady;
+   while (true) {
+   // * clear reset flag
+   // * clear termination flag
+   // * store G[k] for later calculation of Y[k]
+   // * prepare starting point and direction and step length for line search
+      state->innerresetneeded = false;
+      state->terminationneeded = false;
+      ae_v_moveneg(state->yk.xR, 1, state->g.xR, 1, n);
+      ae_v_move(state->d.xR, 1, state->dk.xR, 1, n);
+      ae_v_move(state->x.xR, 1, state->xk.xR, 1, n);
+      state->mcstage = 0;
+      state->stp = 1.0;
+      linminnormalized(&state->d, &state->stp, n);
+      if (state->lastgoodstep != 0.0) {
+         state->stp = state->lastgoodstep;
       }
-      if (state->cgtype == 1) {
-         betak = rmax2(0.0, rmin2(state->betady, state->betahs));
+      state->curstpmax = state->stpmax;
+   // Report beginning of line search (if needed)
+   // Terminate algorithm, if user request was detected
+      if (state->drep) {
+         mincg_clearrequestfields(state);
+         state->lsstart = true;
+         state->rstate.stage = 9; goto Pause; Resume09:
+         state->lsstart = false;
       }
-   } else {
-   // Something is wrong (may be function is too wild or too flat)
-   // or we just have to restart algo.
-   //
-   // We'll set BetaK=0, which will restart CG algorithm.
-   // We can stop later (during normal checks) if stopping conditions are met.
-      betak = 0.0;
-      state->debugrestartscount++;
-   }
-   if (state->repiterationscount > 0 && state->repiterationscount % (3 + n) == 0) {
-   // clear Beta every N iterations
-      betak = 0.0;
-   }
-   if (state->mcinfo == 1 || state->mcinfo == 5) {
-      state->rstimer = mincg_rscountdownlen;
-   } else {
-      state->rstimer--;
-   }
-   ae_v_moveneg(state->dn.xR, 1, state->g.xR, 1, n);
-   mincg_preconditionedmultiply(state, &state->dn, &state->work0, &state->work1);
-   ae_v_addd(state->dn.xR, 1, state->dk.xR, 1, n, betak);
-   state->lastscaledstep = 0.0;
-   for (i = 0; i < n; i++) {
-      state->lastscaledstep += sqr(state->d.xR[i] / state->s.xR[i]);
-   }
-   state->lastscaledstep = state->stp * sqrt(state->lastscaledstep);
-   if (state->mcinfo == 1) {
-   // Step is good (Wolfe conditions hold), update LastGoodStep.
-   //
-   // This check for MCINFO=1 is essential because sometimes in the
-   // constrained optimization setting we may take very short steps
-   // (like 1E-15) because we were very close to boundary of the
-   // feasible area. Such short step does not mean that we've converged
-   // to the solution - it was so short because we were close to the
-   // boundary and there was a limit on step length.
-   //
-   // So having such short step is quite normal situation. However, we
-   // should NOT start next iteration from step whose initial length is
-   // estimated as 1E-15 because it may lead to the failure of the
-   // linear minimizer (step is too short, function does not changes,
-   // line search stagnates).
-      state->lastgoodstep = 0.0;
+      if (state->terminationneeded) {
+         ae_v_move(state->xn.xR, 1, state->x.xR, 1, n);
+         state->repterminationtype = 8;
+         goto Exit;
+      }
+   // Minimization along D
+      smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->x, state->f, &state->g);
+      mcsrch(n, &state->x, &state->f, &state->g, &state->d, &state->stp, state->curstpmax, mincg_gtol, &state->mcinfo, &state->nfev, &state->work0, &state->lstate, &state->mcstage);
+      while (state->mcstage != 0) {
+      // Calculate function/gradient using either
+      // analytical gradient supplied by user
+      // or finite difference approximation.
+      //
+      // "Trim" function in order to handle near-singularity points.
+         mincg_clearrequestfields(state);
+         if (state->diffstep == 0.0) {
+            state->needfg = true;
+            state->rstate.stage = 10; goto Pause; Resume10:
+            state->needfg = false;
+         } else {
+            state->needf = true;
+            state->rstate.stage = 11; goto Pause; Resume11:
+            state->fbase = state->f;
+            for (i = 0; i < n; i++) {
+               v = state->x.xR[i];
+               state->x.xR[i] = v - state->diffstep * state->s.xR[i];
+               state->rstate.stage = 12; goto Pause; Resume12:
+               state->fm2 = state->f;
+               state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
+               state->rstate.stage = 13; goto Pause; Resume13:
+               state->fm1 = state->f;
+               state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
+               state->rstate.stage = 14; goto Pause; Resume14:
+               state->fp1 = state->f;
+               state->x.xR[i] = v + state->diffstep * state->s.xR[i];
+               state->rstate.stage = 15; goto Pause; Resume15:
+               state->fp2 = state->f;
+               state->x.xR[i] = v;
+               state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
+            }
+            state->f = state->fbase;
+            state->needf = false;
+         }
+         smoothnessmonitorenqueuepoint1u(&state->smonitor, &state->s, &state->invs, &state->d, state->stp, &state->x, state->f, &state->g);
+         trimfunction(&state->f, &state->g, n, state->trimthreshold);
+      // Call MCSRCH again
+         mcsrch(n, &state->x, &state->f, &state->g, &state->d, &state->stp, state->curstpmax, mincg_gtol, &state->mcinfo, &state->nfev, &state->work0, &state->lstate, &state->mcstage);
+      }
+      smoothnessmonitorfinalizelinesearch(&state->smonitor);
+   // * terminate algorithm if "user" request for detected
+   // * report end of line search
+   // * store current point to XN
+   // * report iteration
+   // * terminate algorithm if "internal" request was detected
+      if (state->userterminationneeded) {
+         ae_v_move(state->xn.xR, 1, state->xk.xR, 1, n);
+         state->repterminationtype = 8;
+         goto Exit;
+      }
+      if (state->drep) {
+      // Report end of line search (if needed)
+         mincg_clearrequestfields(state);
+         state->lsend = true;
+         state->rstate.stage = 16; goto Pause; Resume16:
+         state->lsend = false;
+      }
+      ae_v_move(state->xn.xR, 1, state->x.xR, 1, n);
+      if (state->xrep) {
+         mincg_clearrequestfields(state);
+         state->xupdated = true;
+         state->rstate.stage = 17; goto Pause; Resume17:
+         state->xupdated = false;
+      }
+      if (state->terminationneeded) {
+         ae_v_move(state->xn.xR, 1, state->x.xR, 1, n);
+         state->repterminationtype = 8;
+         goto Exit;
+      }
+   // Line search is finished.
+   // * calculate BetaK
+   // * calculate DN
+   // * update timers
+   // * calculate step length:
+   //   * LastScaledStep is ALWAYS calculated because it is used in the stopping criteria
+   //   * LastGoodStep is updated only when MCINFO is equal to 1 (Wolfe conditions hold).
+   //     See below for more explanation.
+      if (state->mcinfo == 1 && !state->innerresetneeded) {
+      // Standard Wolfe conditions hold
+      // Calculate Y[K] and D[K]'*Y[K]
+         ae_v_add(state->yk.xR, 1, state->g.xR, 1, n);
+         vv = ae_v_dotproduct(state->yk.xR, 1, state->dk.xR, 1, n);
+      // Calculate BetaK according to DY formula
+         v = mincg_preconditionedmultiply2(state, &state->g, &state->g, &state->work0, &state->work1);
+         state->betady = v / vv;
+      // Calculate BetaK according to HS formula
+         v = mincg_preconditionedmultiply2(state, &state->g, &state->yk, &state->work0, &state->work1);
+         state->betahs = v / vv;
+      // Choose BetaK
+         if (state->cgtype == 0) {
+            betak = state->betady;
+         }
+         if (state->cgtype == 1) {
+            betak = rmax2(0.0, rmin2(state->betady, state->betahs));
+         }
+      } else {
+      // Something is wrong (may be function is too wild or too flat)
+      // or we just have to restart algo.
+      //
+      // We'll set BetaK=0, which will restart CG algorithm.
+      // We can stop later (during normal checks) if stopping conditions are met.
+         betak = 0.0;
+         state->debugrestartscount++;
+      }
+      if (state->repiterationscount > 0 && state->repiterationscount % (3 + n) == 0) {
+      // clear Beta every N iterations
+         betak = 0.0;
+      }
+      if (state->mcinfo == 1 || state->mcinfo == 5) {
+         state->rstimer = mincg_rscountdownlen;
+      } else {
+         state->rstimer--;
+      }
+      ae_v_moveneg(state->dn.xR, 1, state->g.xR, 1, n);
+      mincg_preconditionedmultiply(state, &state->dn, &state->work0, &state->work1);
+      ae_v_addd(state->dn.xR, 1, state->dk.xR, 1, n, betak);
+      state->lastscaledstep = 0.0;
       for (i = 0; i < n; i++) {
-         state->lastgoodstep += sqr(state->d.xR[i]);
+         state->lastscaledstep += sqr(state->d.xR[i] / state->s.xR[i]);
       }
-      state->lastgoodstep = state->stp * sqrt(state->lastgoodstep);
-   }
-// Update information.
-// Check stopping conditions.
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(state->g.xR[i] * state->s.xR[i]);
-   }
-   if (!isfinite(v) || !isfinite(state->f)) {
-   // Abnormal termination - infinities in function/gradient
-      state->repterminationtype = -8;
-      result = false;
-      return result;
-   }
-   state->repnfev += state->nfev;
-   state->repiterationscount++;
-   if (state->repiterationscount >= state->maxits && state->maxits > 0) {
-   // Too many iterations
-      state->repterminationtype = 5;
-      result = false;
-      return result;
-   }
-   if (sqrt(v) <= state->epsg) {
-   // Gradient is small enough
-      state->repterminationtype = 4;
-      result = false;
-      return result;
-   }
-   if (!state->innerresetneeded) {
-   // These conditions are checked only when no inner reset was requested by user
-      if (state->fold - state->f <= state->epsf * rmax2(fabs(state->fold), rmax2(fabs(state->f), 1.0))) {
-      // F(k+1)-F(k) is small enough
-         state->repterminationtype = 1;
-         result = false;
-         return result;
+      state->lastscaledstep = state->stp * sqrt(state->lastscaledstep);
+      if (state->mcinfo == 1) {
+      // Step is good (Wolfe conditions hold), update LastGoodStep.
+      //
+      // This check for MCINFO=1 is essential because sometimes in the
+      // constrained optimization setting we may take very short steps
+      // (like 1E-15) because we were very close to boundary of the
+      // feasible area. Such short step does not mean that we've converged
+      // to the solution - it was so short because we were close to the
+      // boundary and there was a limit on step length.
+      //
+      // So having such short step is quite normal situation. However, we
+      // should NOT start next iteration from step whose initial length is
+      // estimated as 1E-15 because it may lead to the failure of the
+      // linear minimizer (step is too short, function does not changes,
+      // line search stagnates).
+         state->lastgoodstep = 0.0;
+         for (i = 0; i < n; i++) {
+            state->lastgoodstep += sqr(state->d.xR[i]);
+         }
+         state->lastgoodstep = state->stp * sqrt(state->lastgoodstep);
       }
-      if (state->lastscaledstep <= state->epsx) {
-      // X(k+1)-X(k) is small enough
-         state->repterminationtype = 2;
-         result = false;
-         return result;
+   // Update information.
+   // Check stopping conditions.
+      v = 0.0;
+      for (i = 0; i < n; i++) {
+         v += sqr(state->g.xR[i] * state->s.xR[i]);
       }
+      if (!isfinite(v) || !isfinite(state->f)) {
+      // Abnormal termination - infinities in function/gradient
+         state->repterminationtype = -8;
+         goto Exit;
+      }
+      state->repnfev += state->nfev;
+      state->repiterationscount++;
+      if (state->repiterationscount >= state->maxits && state->maxits > 0) {
+      // Too many iterations
+         state->repterminationtype = 5;
+         goto Exit;
+      }
+      if (sqrt(v) <= state->epsg) {
+      // Gradient is small enough
+         state->repterminationtype = 4;
+         goto Exit;
+      }
+      if (!state->innerresetneeded) {
+      // These conditions are checked only when no inner reset was requested by user
+         if (state->fold - state->f <= state->epsf * rmax2(fabs(state->fold), rmax2(fabs(state->f), 1.0))) {
+         // F(k+1)-F(k) is small enough
+            state->repterminationtype = 1;
+            goto Exit;
+         }
+         if (state->lastscaledstep <= state->epsx) {
+         // X(k+1)-X(k) is small enough
+            state->repterminationtype = 2;
+            goto Exit;
+         }
+      }
+      if (state->rstimer <= 0) {
+      // Too many subsequent restarts
+         state->repterminationtype = 7;
+         goto Exit;
+      }
+   // Shift Xk/Dk, update other information
+      ae_v_move(state->xk.xR, 1, state->xn.xR, 1, n);
+      ae_v_move(state->dk.xR, 1, state->dn.xR, 1, n);
+      state->fold = state->f;
+      state->k++;
    }
-   if (state->rstimer <= 0) {
-   // Too many subsequent restarts
-      state->repterminationtype = 7;
-      result = false;
-      return result;
-   }
-// Shift Xk/Dk, update other information
-   ae_v_move(state->xk.xR, 1, state->xn.xR, 1, n);
-   ae_v_move(state->dk.xR, 1, state->dn.xR, 1, n);
-   state->fold = state->f;
-   state->k++;
-   goto lbl_31;
-lbl_32:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = i;
    state->rstate.ra.xR[0] = betak;
    state->rstate.ra.xR[1] = v;
    state->rstate.ra.xR[2] = vv;
-   return result;
+   return true;
 }
 
 // This  function  activates/deactivates verification  of  the  user-supplied
@@ -27233,68 +26486,55 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
    double stepknlagval;
    bool hessianupdateperformed;
    double stp;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (meritstate->rmeritphasestate.stage >= 0) {
-      n = meritstate->rmeritphasestate.ia.xZ[0];
-      nslack = meritstate->rmeritphasestate.ia.xZ[1];
-      nec = meritstate->rmeritphasestate.ia.xZ[2];
-      nic = meritstate->rmeritphasestate.ia.xZ[3];
-      nlec = meritstate->rmeritphasestate.ia.xZ[4];
-      nlic = meritstate->rmeritphasestate.ia.xZ[5];
-      i = meritstate->rmeritphasestate.ia.xZ[6];
-      j = meritstate->rmeritphasestate.ia.xZ[7];
-      hessianupdateperformed = meritstate->rmeritphasestate.ba.xB[0];
-      v = meritstate->rmeritphasestate.ra.xR[0];
-      vv = meritstate->rmeritphasestate.ra.xR[1];
-      mx = meritstate->rmeritphasestate.ra.xR[2];
-      f0 = meritstate->rmeritphasestate.ra.xR[3];
-      f1 = meritstate->rmeritphasestate.ra.xR[4];
-      nu = meritstate->rmeritphasestate.ra.xR[5];
-      localstp = meritstate->rmeritphasestate.ra.xR[6];
-      stepklagval = meritstate->rmeritphasestate.ra.xR[7];
-      stepknlagval = meritstate->rmeritphasestate.ra.xR[8];
-      stp = meritstate->rmeritphasestate.ra.xR[9];
-   } else {
-      n = -536;
-      nslack = 487;
-      nec = -115;
-      nic = 886;
-      nlec = 346;
-      nlic = -722;
-      i = -413;
-      j = -461;
-      hessianupdateperformed = true;
-      v = 306;
-      vv = -1011;
-      mx = 951;
-      f0 = -463;
-      f1 = 88;
-      nu = -861;
-      localstp = -678;
-      stepklagval = -731;
-      stepknlagval = -675;
-      stp = -763;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (meritstate->rmeritphasestate.stage < 0) goto Spawn;
+   n = meritstate->rmeritphasestate.ia.xZ[0];
+   nslack = meritstate->rmeritphasestate.ia.xZ[1];
+   nec = meritstate->rmeritphasestate.ia.xZ[2];
+   nic = meritstate->rmeritphasestate.ia.xZ[3];
+   nlec = meritstate->rmeritphasestate.ia.xZ[4];
+   nlic = meritstate->rmeritphasestate.ia.xZ[5];
+   i = meritstate->rmeritphasestate.ia.xZ[6];
+   j = meritstate->rmeritphasestate.ia.xZ[7];
+   hessianupdateperformed = meritstate->rmeritphasestate.ba.xB[0];
+   v = meritstate->rmeritphasestate.ra.xR[0];
+   vv = meritstate->rmeritphasestate.ra.xR[1];
+   mx = meritstate->rmeritphasestate.ra.xR[2];
+   f0 = meritstate->rmeritphasestate.ra.xR[3];
+   f1 = meritstate->rmeritphasestate.ra.xR[4];
+   nu = meritstate->rmeritphasestate.ra.xR[5];
+   localstp = meritstate->rmeritphasestate.ra.xR[6];
+   stepklagval = meritstate->rmeritphasestate.ra.xR[7];
+   stepknlagval = meritstate->rmeritphasestate.ra.xR[8];
+   stp = meritstate->rmeritphasestate.ra.xR[9];
+   switch (meritstate->rmeritphasestate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1;/* case 2: goto Resume2;*/ case 3: goto Resume3;
+      default: goto Exit;
    }
-   if (meritstate->rmeritphasestate.stage == 0) {
-      goto lbl_0;
-   }
-   if (meritstate->rmeritphasestate.stage == 1) {
-      goto lbl_1;
-   }
-   if (meritstate->rmeritphasestate.stage == 2) {
-      goto lbl_2;
-   }
-   if (meritstate->rmeritphasestate.stage == 3) {
-      goto lbl_3;
-   }
+Spawn:
+   n = -536;
+   nslack = 487;
+   nec = -115;
+   nic = 886;
+   nlec = 346;
+   nlic = -722;
+   i = -413;
+   j = -461;
+   hessianupdateperformed = true;
+   v = 306;
+   vv = -1011;
+   mx = 951;
+   f0 = -463;
+   f1 = 88;
+   nu = -861;
+   localstp = -678;
+   stepklagval = -731;
+   stepknlagval = -675;
+   stp = -763;
 // Routine body
    n = state->n;
    nec = state->nec;
@@ -27310,8 +26550,7 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
 // Determine step direction using initial quadratic model.
 // Update penalties vector with current Lagrange multipliers.
    if (!nlcsqp_qpsubproblemsolve(state, &state->subsolver, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj, &meritstate->d, &meritstate->lagmult, &j)) {
-      result = false;
-      return result;
+      goto Exit;
    }
    for (i = 0; i < nec + nic + nlec + nlic; i++) {
       meritstate->penalties.xR[i] = rmax2(meritstate->penalties.xR[i], fabs(meritstate->lagmult.xR[i]));
@@ -27327,89 +26566,76 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
    }
    nlcsqp_sqpsendx(state, &meritstate->stepkxn);
    state->needfij = true;
-   meritstate->rmeritphasestate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
+   meritstate->rmeritphasestate.stage = 0; goto Pause; Resume0:
    state->needfij = false;
    if (!nlcsqp_sqpretrievefij(state, &meritstate->stepkfin, &meritstate->stepkjn)) {
    // Failed to retrieve func/Jac, infinities detected
       state->repterminationtype = -8;
       meritstate->status = 0;
-      result = false;
-      return result;
+      goto Exit;
    }
    f1 = nlcsqp_meritfunction(state, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->lagmult, &meritstate->penalties, &meritstate->tmpmerit);
-   if (f1 < f0) {
-      goto lbl_4;
-   }
-// Full step increases merit function. Let's compute second order
-// correction to the constraint model and recompute trial step D:
-// * use original model of the target
-// * extrapolate model of nonlinear constraints at StepKX+D back to origin
-//
-   meritstate->stepkfic.xR[0] = meritstate->stepkfi.xR[0];
-   for (j = 0; j < n; j++) {
-      meritstate->stepkjc.xyR[0][j] = meritstate->stepkj.xyR[0][j];
-   }
-   for (i = 1; i <= nlec + nlic; i++) {
-      v = 0.0;
+   if (f1 >= f0) {
+   // Full step increases merit function. Let's compute second order
+   // correction to the constraint model and recompute trial step D:
+   // * use original model of the target
+   // * extrapolate model of nonlinear constraints at StepKX+D back to origin
+   //
+      meritstate->stepkfic.xR[0] = meritstate->stepkfi.xR[0];
       for (j = 0; j < n; j++) {
-         v += meritstate->d.xR[j] * meritstate->stepkj.xyR[i][j];
-         meritstate->stepkjc.xyR[i][j] = meritstate->stepkj.xyR[i][j];
+         meritstate->stepkjc.xyR[0][j] = meritstate->stepkj.xyR[0][j];
       }
-      meritstate->stepkfic.xR[i] = meritstate->stepkfin.xR[i] - v;
+      for (i = 1; i <= nlec + nlic; i++) {
+         v = 0.0;
+         for (j = 0; j < n; j++) {
+            v += meritstate->d.xR[j] * meritstate->stepkj.xyR[i][j];
+            meritstate->stepkjc.xyR[i][j] = meritstate->stepkj.xyR[i][j];
+         }
+         meritstate->stepkfic.xR[i] = meritstate->stepkfin.xR[i] - v;
+      }
+      if (!nlcsqp_qpsubproblemsolve(state, &state->subsolver, &meritstate->stepkx, &meritstate->stepkfic, &meritstate->stepkjc, &meritstate->dx, &meritstate->dummylagmult, &j)) {
+         goto Exit;
+      }
+      for (i = 0; i < n; i++) {
+         meritstate->d.xR[i] = meritstate->dx.xR[i];
+      }
+   // Perform line search, we again try full step (maybe it will work after SOC)
+      localstp = 1.0;
+      nu = 0.5;
+      f1 = f0;
+      smoothnessmonitorstartlinesearch(smonitor, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj);
+      while (true) {
+         for (i = 0; i < n; i++) {
+            meritstate->stepkxn.xR[i] = meritstate->stepkx.xR[i] + localstp * meritstate->d.xR[i];
+         }
+         nlcsqp_sqpsendx(state, &meritstate->stepkxn);
+         state->needfij = true;
+         meritstate->rmeritphasestate.stage = 1; goto Pause; Resume1:
+         state->needfij = false;
+         if (!nlcsqp_sqpretrievefij(state, &meritstate->stepkfin, &meritstate->stepkjn)) {
+         // Failed to retrieve func/Jac, infinities detected
+            state->repterminationtype = -8;
+            meritstate->status = 0;
+            goto Exit;
+         }
+         smoothnessmonitorenqueuepoint(smonitor, &meritstate->d, localstp, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->stepkjn);
+         f1 = nlcsqp_meritfunction(state, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->lagmult, &meritstate->penalties, &meritstate->tmpmerit);
+         if (f1 < f0) {
+         // Step is found!
+            break;
+         }
+         if (localstp < 0.001) {
+         // Step is shorter than 0.001 times current search direction,
+         // it means that no good step can be found.
+            localstp = 0.0;
+            nlcsqp_sqpcopystate(state, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->stepkjn);
+            break;
+         }
+         localstp *= nu;
+         nu = rmax2(0.1, 0.5 * nu);
+      }
+      smoothnessmonitorfinalizelinesearch(smonitor);
    }
-   if (!nlcsqp_qpsubproblemsolve(state, &state->subsolver, &meritstate->stepkx, &meritstate->stepkfic, &meritstate->stepkjc, &meritstate->dx, &meritstate->dummylagmult, &j)) {
-      result = false;
-      return result;
-   }
-   for (i = 0; i < n; i++) {
-      meritstate->d.xR[i] = meritstate->dx.xR[i];
-   }
-// Perform line search, we again try full step (maybe it will work after SOC)
-   localstp = 1.0;
-   nu = 0.5;
-   f1 = f0;
-   smoothnessmonitorstartlinesearch(smonitor, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj);
-lbl_6:
-   if (false) {
-      goto lbl_7;
-   }
-   for (i = 0; i < n; i++) {
-      meritstate->stepkxn.xR[i] = meritstate->stepkx.xR[i] + localstp * meritstate->d.xR[i];
-   }
-   nlcsqp_sqpsendx(state, &meritstate->stepkxn);
-   state->needfij = true;
-   meritstate->rmeritphasestate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->needfij = false;
-   if (!nlcsqp_sqpretrievefij(state, &meritstate->stepkfin, &meritstate->stepkjn)) {
-   // Failed to retrieve func/Jac, infinities detected
-      state->repterminationtype = -8;
-      meritstate->status = 0;
-      result = false;
-      return result;
-   }
-   smoothnessmonitorenqueuepoint(smonitor, &meritstate->d, localstp, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->stepkjn);
-   f1 = nlcsqp_meritfunction(state, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->lagmult, &meritstate->penalties, &meritstate->tmpmerit);
-   if (f1 < f0) {
-   // Step is found!
-      goto lbl_7;
-   }
-   if (localstp < 0.001) {
-   // Step is shorter than 0.001 times current search direction,
-   // it means that no good step can be found.
-      localstp = 0.0;
-      nlcsqp_sqpcopystate(state, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->stepkjn);
-      goto lbl_7;
-   }
-   localstp *= nu;
-   nu = rmax2(0.1, 0.5 * nu);
-   goto lbl_6;
-lbl_7:
-   smoothnessmonitorfinalizelinesearch(smonitor);
-lbl_4:
    for (i = 0; i < n; i++) {
       if (state->hasbndl.xB[i]) {
          meritstate->stepkxn.xR[i] = rmax2(meritstate->stepkxn.xR[i], state->scaledbndl.xR[i]);
@@ -27422,8 +26648,7 @@ lbl_4:
    // User requested termination, break before we move to new point
       state->repterminationtype = 8;
       meritstate->status = 0;
-      result = false;
-      return result;
+      goto Exit;
    }
    nlcsqp_lagrangianfg(state, &meritstate->stepkx, state->trustrad, &meritstate->stepkfi, &meritstate->stepkj, &meritstate->lagmult, &meritstate->tmplagrangianfg, &stepklagval, &meritstate->stepklaggrad);
    nlcsqp_lagrangianfg(state, &meritstate->stepkxn, state->trustrad, &meritstate->stepkfin, &meritstate->stepkjn, &meritstate->lagmult, &meritstate->tmplagrangianfg, &stepknlagval, &meritstate->stepknlaggrad);
@@ -27462,41 +26687,33 @@ lbl_4:
          meritstate->increasebigc = meritstate->increasebigc || fabs(v) > vv;
       }
    }
-   goto lbl_8;
+#if 0 //(@) Not used.
 // Perform agressive probing of the search direction - additional function evaluations
 // which help us to determine possible discontinuity and nonsmoothness of the problem
-   goto lbl_10;
    smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad);
    smoothnessmonitorstartlinesearch(smonitor, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj);
-lbl_12:
-   if (!smoothnessmonitorprobe(smonitor)) {
-      goto lbl_13;
-   }
-   for (j = 0; j < n; j++) {
-      meritstate->stepkxc.xR[j] = meritstate->stepkx.xR[j] + smonitor->probingstp * meritstate->d.xR[j];
-      if (state->hasbndl.xB[j]) {
-         meritstate->stepkxc.xR[j] = rmax2(meritstate->stepkxc.xR[j], state->scaledbndl.xR[j]);
+   while (smoothnessmonitorprobe(smonitor)) {
+      for (j = 0; j < n; j++) {
+         meritstate->stepkxc.xR[j] = meritstate->stepkx.xR[j] + smonitor->probingstp * meritstate->d.xR[j];
+         if (state->hasbndl.xB[j]) {
+            meritstate->stepkxc.xR[j] = rmax2(meritstate->stepkxc.xR[j], state->scaledbndl.xR[j]);
+         }
+         if (state->hasbndu.xB[j]) {
+            meritstate->stepkxc.xR[j] = rmin2(meritstate->stepkxc.xR[j], state->scaledbndu.xR[j]);
+         }
       }
-      if (state->hasbndu.xB[j]) {
-         meritstate->stepkxc.xR[j] = rmin2(meritstate->stepkxc.xR[j], state->scaledbndu.xR[j]);
+      nlcsqp_sqpsendx(state, &meritstate->stepkxc);
+      state->needfij = true;
+      meritstate->rmeritphasestate.stage = 2; goto Pause; Resume2:
+      state->needfij = false;
+      if (!nlcsqp_sqpretrievefij(state, &meritstate->stepkfic, &meritstate->stepkjc)) {
+         break;
       }
+      smonitor->probingf.xR[0] = nlcsqp_rawlagrangian(state, &meritstate->stepkxc, &meritstate->stepkfic, &meritstate->lagmult, &meritstate->penalties, &meritstate->tmpmerit);
+      smonitor->probingf.xR[1] = meritstate->stepkfic.xR[0];
+      smoothnessmonitorenqueuepoint(smonitor, &meritstate->d, smonitor->probingstp, &meritstate->stepkxc, &meritstate->stepkfic, &meritstate->stepkjc);
    }
-   nlcsqp_sqpsendx(state, &meritstate->stepkxc);
-   state->needfij = true;
-   meritstate->rmeritphasestate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->needfij = false;
-   if (!nlcsqp_sqpretrievefij(state, &meritstate->stepkfic, &meritstate->stepkjc)) {
-      goto lbl_13;
-   }
-   smonitor->probingf.xR[0] = nlcsqp_rawlagrangian(state, &meritstate->stepkxc, &meritstate->stepkfic, &meritstate->lagmult, &meritstate->penalties, &meritstate->tmpmerit);
-   smonitor->probingf.xR[1] = meritstate->stepkfic.xR[0];
-   smoothnessmonitorenqueuepoint(smonitor, &meritstate->d, smonitor->probingstp, &meritstate->stepkxc, &meritstate->stepkfic, &meritstate->stepkjc);
-   goto lbl_12;
-lbl_13:
    smoothnessmonitorfinalizelinesearch(smonitor);
-lbl_10:
 // Update debug curvature information - TraceGamma[]
    v = 0.0;
    mx = 0.0;
@@ -27546,7 +26763,7 @@ lbl_10:
    for (i = 0; i < n; i++) {
       v = rmax2(v, state->subsolver.h.xyR[i][i]);
    }
-lbl_8:
+#endif
 // Perform Hessian update
    hessianupdateperformed = false;
    if (localstp > 0.0) {
@@ -27555,26 +26772,22 @@ lbl_8:
 // Move to new point
    stp = localstp;
    nlcsqp_sqpcopystate(state, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->stepkjn, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj);
-   if (localstp <= 0.0) {
-      goto lbl_14;
+   if (localstp > 0.0) {
+   // Report one more inner iteration
+      nlcsqp_sqpsendx(state, &meritstate->stepkx);
+      state->f = meritstate->stepkfi.xR[0] * state->fscales.xR[0];
+      state->xupdated = true;
+      meritstate->rmeritphasestate.stage = 3; goto Pause; Resume3:
+      state->xupdated = false;
+   // Update constraint violations
+      checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &meritstate->stepkx, n, &state->replcerr, &state->replcidx);
+      unscaleandchecknlcviolation(&meritstate->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx);
    }
-// Report one more inner iteration
-   nlcsqp_sqpsendx(state, &meritstate->stepkx);
-   state->f = meritstate->stepkfi.xR[0] * state->fscales.xR[0];
-   state->xupdated = true;
-   meritstate->rmeritphasestate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->xupdated = false;
-// Update constraint violations
-   checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &meritstate->stepkx, n, &state->replcerr, &state->replcidx);
-   unscaleandchecknlcviolation(&meritstate->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx);
-lbl_14:
-   result = false;
-   return result;
+Exit:
+   meritstate->rmeritphasestate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    meritstate->rmeritphasestate.ia.xZ[0] = n;
    meritstate->rmeritphasestate.ia.xZ[1] = nslack;
    meritstate->rmeritphasestate.ia.xZ[2] = nec;
@@ -27594,7 +26807,7 @@ lbl_rcomm:
    meritstate->rmeritphasestate.ra.xR[7] = stepklagval;
    meritstate->rmeritphasestate.ra.xR[8] = stepknlagval;
    meritstate->rmeritphasestate.ra.xR[9] = stp;
-   return result;
+   return true;
 }
 
 // This function initializes MeritPhase temporaries. It should be called before
@@ -27774,65 +26987,55 @@ bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool usert
    ae_int_t subiterationidx;
    bool trustradstagnated;
    bool increasebigc;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      nslack = state->rstate.ia.xZ[1];
-      nec = state->rstate.ia.xZ[2];
-      nic = state->rstate.ia.xZ[3];
-      nlec = state->rstate.ia.xZ[4];
-      nlic = state->rstate.ia.xZ[5];
-      i = state->rstate.ia.xZ[6];
-      j = state->rstate.ia.xZ[7];
-      status = state->rstate.ia.xZ[8];
-      subiterationidx = state->rstate.ia.xZ[9];
-      trustradstagnated = state->rstate.ba.xB[0];
-      increasebigc = state->rstate.ba.xB[3];
-      v = state->rstate.ra.xR[0];
-      vv = state->rstate.ra.xR[1];
-      mx = state->rstate.ra.xR[2];
-      deltamax = state->rstate.ra.xR[3];
-      multiplyby = state->rstate.ra.xR[4];
-      setscaleto = state->rstate.ra.xR[5];
-      prevtrustrad = state->rstate.ra.xR[6];
-   } else {
-      n = 359;
-      nslack = -58;
-      nec = -919;
-      nic = -909;
-      nlec = 81;
-      nlic = 255;
-      i = 74;
-      j = -788;
-      status = 809;
-      subiterationidx = 205;
-      trustradstagnated = false;
-      increasebigc = true;
-      v = -541;
-      vv = -698;
-      mx = -900;
-      deltamax = -318;
-      multiplyby = -940;
-      setscaleto = 1016;
-      prevtrustrad = -229;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   nslack = state->rstate.ia.xZ[1];
+   nec = state->rstate.ia.xZ[2];
+   nic = state->rstate.ia.xZ[3];
+   nlec = state->rstate.ia.xZ[4];
+   nlic = state->rstate.ia.xZ[5];
+   i = state->rstate.ia.xZ[6];
+   j = state->rstate.ia.xZ[7];
+   status = state->rstate.ia.xZ[8];
+   subiterationidx = state->rstate.ia.xZ[9];
+   trustradstagnated = state->rstate.ba.xB[0];
+   increasebigc = state->rstate.ba.xB[3];
+   v = state->rstate.ra.xR[0];
+   vv = state->rstate.ra.xR[1];
+   mx = state->rstate.ra.xR[2];
+   deltamax = state->rstate.ra.xR[3];
+   multiplyby = state->rstate.ra.xR[4];
+   setscaleto = state->rstate.ra.xR[5];
+   prevtrustrad = state->rstate.ra.xR[6];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
+Spawn:
+   n = 359;
+   nslack = -58;
+   nec = -919;
+   nic = -909;
+   nlec = 81;
+   nlic = 255;
+   i = 74;
+   j = -788;
+   status = 809;
+   subiterationidx = 205;
+   trustradstagnated = false;
+   increasebigc = true;
+   v = -541;
+   vv = -698;
+   mx = -900;
+   deltamax = -318;
+   multiplyby = -940;
+   setscaleto = 1016;
+   prevtrustrad = -229;
 // Routine body
    n = state->n;
    nec = state->nec;
@@ -27863,9 +27066,7 @@ bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool usert
 // Compute initial violation of constraints.
    nlcsqp_sqpsendx(state, &state->step0x);
    state->needfij = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
+   state->rstate.stage = 0; goto Pause; Resume0:
    state->needfij = false;
    if (!nlcsqp_sqpretrievefij(state, &state->step0fi, &state->step0j)) {
    // Failed to retrieve function/Jaconian, infinities detected!
@@ -27873,157 +27074,142 @@ lbl_0:
          state->stepkx.xR[i] = state->step0x.xR[i];
       }
       state->repterminationtype = -8;
-      result = false;
-      return result;
+      goto Exit;
    }
    nlcsqp_sqpcopystate(state, &state->step0x, &state->step0fi, &state->step0j, &state->stepkx, &state->stepkfi, &state->stepkj);
    nlcsqp_sqpsendx(state, &state->stepkx);
    state->f = state->stepkfi.xR[0] * state->fscales.xR[0];
    state->xupdated = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
+   state->rstate.stage = 1; goto Pause; Resume1:
    state->xupdated = false;
    checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->stepkx, n, &state->replcerr, &state->replcidx);
    unscaleandchecknlcviolation(&state->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx);
 // Perform outer (NLC) iterations
    state->bigc = 500.0;
    nlcsqp_initqpsubsolver(state, &state->subsolver);
-lbl_3:
-   if (false) {
-      goto lbl_4;
-   }
-// Before beginning new outer iteration:
-// * renormalize target function and/or constraints, if some of them have too large magnitudes
-// * save initial point for the outer iteration
-   for (i = 0; i <= nlec + nlic; i++) {
-   // Determine (a) multiplicative coefficient applied to function value
-   // and Jacobian row, and (b) new value of the function scale.
-      mx = 0.0;
-      for (j = 0; j < n; j++) {
-         mx = rmax2(mx, fabs(state->stepkj.xyR[i][j]));
-      }
-      multiplyby = 1.0;
-      setscaleto = state->fscales.xR[i];
-      if (mx >= nlcsqp_sqpbigscale) {
-         multiplyby = 1 / mx;
-         setscaleto = state->fscales.xR[i] * mx;
-      }
-      if (mx <= nlcsqp_sqpsmallscale && state->fscales.xR[i] > 1.0) {
-         if (state->fscales.xR[i] * mx > 1.0) {
+   while (true) {
+   // Before beginning new outer iteration:
+   // * renormalize target function and/or constraints, if some of them have too large magnitudes
+   // * save initial point for the outer iteration
+      for (i = 0; i <= nlec + nlic; i++) {
+      // Determine (a) multiplicative coefficient applied to function value
+      // and Jacobian row, and (b) new value of the function scale.
+         mx = 0.0;
+         for (j = 0; j < n; j++) {
+            mx = rmax2(mx, fabs(state->stepkj.xyR[i][j]));
+         }
+         multiplyby = 1.0;
+         setscaleto = state->fscales.xR[i];
+         if (mx >= nlcsqp_sqpbigscale) {
             multiplyby = 1 / mx;
             setscaleto = state->fscales.xR[i] * mx;
-         } else {
-            multiplyby = state->fscales.xR[i];
-            setscaleto = 1.0;
+         }
+         if (mx <= nlcsqp_sqpsmallscale && state->fscales.xR[i] > 1.0) {
+            if (state->fscales.xR[i] * mx > 1.0) {
+               multiplyby = 1 / mx;
+               setscaleto = state->fscales.xR[i] * mx;
+            } else {
+               multiplyby = state->fscales.xR[i];
+               setscaleto = 1.0;
+            }
+         }
+         if (multiplyby != 1.0) {
+         // Function #I needs renormalization:
+         // * update function vector element and Jacobian matrix row
+         // * update FScales[] and TraceGamma[] arrays
+            state->stepkfi.xR[i] *= multiplyby;
+            for (j = 0; j < n; j++) {
+               state->stepkj.xyR[i][j] *= multiplyby;
+            }
+            state->fscales.xR[i] = setscaleto;
          }
       }
-      if (multiplyby != 1.0) {
-      // Function #I needs renormalization:
-      // * update function vector element and Jacobian matrix row
-      // * update FScales[] and TraceGamma[] arrays
-         state->stepkfi.xR[i] *= multiplyby;
-         for (j = 0; j < n; j++) {
-            state->stepkj.xyR[i][j] *= multiplyby;
-         }
-         state->fscales.xR[i] = setscaleto;
+   // PHASE 2
+   //
+   // This phase is a primary part of the algorithm which is responsible for its
+   // convergence properties.
+   //
+   // It solves QP subproblem with possible activation and deactivation of constraints
+   // and then starts backtracking (step length is bounded by 1.0) merit function search
+   // (with second-order correction to deal with Maratos effect) on the direction produced
+   // by QP subproblem.
+   //
+   // This phase is everything we need to in order to have convergence; however,
+   // it has one performance-related issue: using "general" interior point QP solver
+   // results in slow solution times. Fast equality-constrained phase is essential for
+   // the quick convergence.
+      nlcsqp_qpsubsolversetalgoipm(&state->subsolver);
+      nlcsqp_sqpcopystate(state, &state->stepkx, &state->stepkfi, &state->stepkj, &state->step0x, &state->step0fi, &state->step0j);
+      nlcsqp_meritphaseinit(&state->meritstate, &state->stepkx, &state->stepkfi, &state->stepkj, n, nec, nic, nlec, nlic, &state->abslagmemory, nlcsqp_penaltymemlen);
+      while (nlcsqp_meritphaseiteration(state, &state->meritstate, smonitor, userterminationneeded)) {
+         state->rstate.stage = 2; goto Pause; Resume2: ;
+      }
+      nlcsqp_meritphaseresults(&state->meritstate, &state->stepkx, &state->stepkfi, &state->stepkj, &state->meritlagmult, &increasebigc, &status);
+      if (status == 0) {
+         break;
+      }
+      ae_assert(status > 0, "MinSQPIteration: integrity check failed");
+      state->haslagmult = true;
+      for (i = nlcsqp_penaltymemlen - 1; i >= 1; i--) {
+         rcopyrr(nec + nic + nlec + nlic, &state->abslagmemory, i - 1, &state->abslagmemory, i);
+      }
+      for (i = 0; i < nec + nic + nlec + nlic; i++) {
+         state->abslagmemory.xyR[0][i] = fabs(state->meritlagmult.xR[i]);
+      }
+   // Caller requested to update BigC - L1 penalty coefficient for linearized constraint violation
+      if (increasebigc) {
+         state->bigc = rmin2(10 * state->bigc, nlcsqp_maxbigc);
+      }
+   // Update trust region.
+   //
+   // NOTE: when trust region radius remains fixed for a long time it may mean that we
+   //       stagnated in eternal loop. In such cases we decrease it slightly in order
+   //       to break possible loop. If such decrease was unnecessary, it may be easily
+   //       fixed within few iterations.
+      deltamax = 0.0;
+      for (i = 0; i < n; i++) {
+         deltamax = rmax2(deltamax, fabs(state->step0x.xR[i] - state->stepkx.xR[i]) / state->trustrad);
+      }
+      trustradstagnated = false;
+      state->trustradstagnationcnt++;
+      prevtrustrad = state->trustrad;
+      if (deltamax <= nlcsqp_sqpdeltadecrease) {
+         state->trustrad *= rmax2(deltamax / nlcsqp_sqpdeltadecrease, nlcsqp_maxtrustraddecay);
+      }
+      if (deltamax >= nlcsqp_sqpdeltaincrease) {
+         state->trustrad *= rmin2(deltamax / nlcsqp_sqpdeltaincrease, nlcsqp_maxtrustradgrowth);
+      }
+      if (state->trustrad < 0.99 * prevtrustrad || state->trustrad > 1.01 * prevtrustrad) {
+         state->trustradstagnationcnt = 0;
+      }
+      if (state->trustradstagnationcnt >= nlcsqp_trustradstagnationlimit) {
+         state->trustrad *= 0.5;
+         state->trustradstagnationcnt = 0;
+         trustradstagnated = true;
+      }
+   // Advance outer iteration counter, test stopping criteria
+      state->repiterationscount++;
+      if (fabs(state->stepkfi.xR[0] - state->step0fi.xR[0]) <= nlcsqp_stagnationepsf * fabs(state->step0fi.xR[0])) {
+         state->fstagnationcnt++;
+      } else {
+         state->fstagnationcnt = 0;
+      }
+      if (state->trustrad <= state->epsx) {
+         state->repterminationtype = 2;
+         break;
+      } else if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
+         state->repterminationtype = 5;
+         break;
+      } else if (state->fstagnationcnt >= nlcsqp_fstagnationlimit) {
+         state->repterminationtype = 7;
+         break;
       }
    }
-// PHASE 2
-//
-// This phase is a primary part of the algorithm which is responsible for its
-// convergence properties.
-//
-// It solves QP subproblem with possible activation and deactivation of constraints
-// and then starts backtracking (step length is bounded by 1.0) merit function search
-// (with second-order correction to deal with Maratos effect) on the direction produced
-// by QP subproblem.
-//
-// This phase is everything we need to in order to have convergence; however,
-// it has one performance-related issue: using "general" interior point QP solver
-// results in slow solution times. Fast equality-constrained phase is essential for
-// the quick convergence.
-   nlcsqp_qpsubsolversetalgoipm(&state->subsolver);
-   nlcsqp_sqpcopystate(state, &state->stepkx, &state->stepkfi, &state->stepkj, &state->step0x, &state->step0fi, &state->step0j);
-   nlcsqp_meritphaseinit(&state->meritstate, &state->stepkx, &state->stepkfi, &state->stepkj, n, nec, nic, nlec, nlic, &state->abslagmemory, nlcsqp_penaltymemlen);
-lbl_5:
-   if (!nlcsqp_meritphaseiteration(state, &state->meritstate, smonitor, userterminationneeded)) {
-      goto lbl_6;
-   }
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   goto lbl_5;
-lbl_6:
-   nlcsqp_meritphaseresults(&state->meritstate, &state->stepkx, &state->stepkfi, &state->stepkj, &state->meritlagmult, &increasebigc, &status);
-   if (status == 0) {
-      goto lbl_4;
-   }
-   ae_assert(status > 0, "MinSQPIteration: integrity check failed");
-   state->haslagmult = true;
-   for (i = nlcsqp_penaltymemlen - 1; i >= 1; i--) {
-      rcopyrr(nec + nic + nlec + nlic, &state->abslagmemory, i - 1, &state->abslagmemory, i);
-   }
-   for (i = 0; i < nec + nic + nlec + nlic; i++) {
-      state->abslagmemory.xyR[0][i] = fabs(state->meritlagmult.xR[i]);
-   }
-// Caller requested to update BigC - L1 penalty coefficient for linearized constraint violation
-   if (increasebigc) {
-      state->bigc = rmin2(10 * state->bigc, nlcsqp_maxbigc);
-   }
-// Update trust region.
-//
-// NOTE: when trust region radius remains fixed for a long time it may mean that we
-//       stagnated in eternal loop. In such cases we decrease it slightly in order
-//       to break possible loop. If such decrease was unnecessary, it may be easily
-//       fixed within few iterations.
-   deltamax = 0.0;
-   for (i = 0; i < n; i++) {
-      deltamax = rmax2(deltamax, fabs(state->step0x.xR[i] - state->stepkx.xR[i]) / state->trustrad);
-   }
-   trustradstagnated = false;
-   state->trustradstagnationcnt++;
-   prevtrustrad = state->trustrad;
-   if (deltamax <= nlcsqp_sqpdeltadecrease) {
-      state->trustrad *= rmax2(deltamax / nlcsqp_sqpdeltadecrease, nlcsqp_maxtrustraddecay);
-   }
-   if (deltamax >= nlcsqp_sqpdeltaincrease) {
-      state->trustrad *= rmin2(deltamax / nlcsqp_sqpdeltaincrease, nlcsqp_maxtrustradgrowth);
-   }
-   if (state->trustrad < 0.99 * prevtrustrad || state->trustrad > 1.01 * prevtrustrad) {
-      state->trustradstagnationcnt = 0;
-   }
-   if (state->trustradstagnationcnt >= nlcsqp_trustradstagnationlimit) {
-      state->trustrad *= 0.5;
-      state->trustradstagnationcnt = 0;
-      trustradstagnated = true;
-   }
-// Advance outer iteration counter, test stopping criteria
-   state->repiterationscount++;
-   if (fabs(state->stepkfi.xR[0] - state->step0fi.xR[0]) <= nlcsqp_stagnationepsf * fabs(state->step0fi.xR[0])) {
-      state->fstagnationcnt++;
-   } else {
-      state->fstagnationcnt = 0;
-   }
-   if (state->trustrad <= state->epsx) {
-      state->repterminationtype = 2;
-      goto lbl_4;
-   }
-   if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
-      state->repterminationtype = 5;
-      goto lbl_4;
-   }
-   if (state->fstagnationcnt >= nlcsqp_fstagnationlimit) {
-      state->repterminationtype = 7;
-      goto lbl_4;
-   }
-   goto lbl_3;
-lbl_4:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = nslack;
    state->rstate.ia.xZ[2] = nec;
@@ -28043,7 +27229,7 @@ lbl_rcomm:
    state->rstate.ra.xR[4] = multiplyby;
    state->rstate.ra.xR[5] = setscaleto;
    state->rstate.ra.xR[6] = prevtrustrad;
-   return result;
+   return true;
 }
 
 void minsqpsubsolver_init(void *_p, bool make_automatic) {
@@ -34597,62 +33783,49 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
    double nu;
    double localstp;
    double mu;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state13->rphase13state.stage >= 0) {
-      n = state13->rphase13state.ia.xZ[0];
-      nslack = state13->rphase13state.ia.xZ[1];
-      nec = state13->rphase13state.ia.xZ[2];
-      nic = state13->rphase13state.ia.xZ[3];
-      nlec = state13->rphase13state.ia.xZ[4];
-      nlic = state13->rphase13state.ia.xZ[5];
-      innerk = state13->rphase13state.ia.xZ[6];
-      i = state13->rphase13state.ia.xZ[7];
-      j = state13->rphase13state.ia.xZ[8];
-      v = state13->rphase13state.ra.xR[0];
-      mx = state13->rphase13state.ra.xR[1];
-      f0 = state13->rphase13state.ra.xR[2];
-      f1 = state13->rphase13state.ra.xR[3];
-      nu = state13->rphase13state.ra.xR[4];
-      localstp = state13->rphase13state.ra.xR[5];
-      mu = state13->rphase13state.ra.xR[6];
-   } else {
-      n = 346;
-      nslack = -722;
-      nec = -413;
-      nic = -461;
-      nlec = 927;
-      nlic = 201;
-      innerk = 922;
-      i = -154;
-      j = 306;
-      v = 88;
-      mx = -861;
-      f0 = -678;
-      f1 = -731;
-      nu = -675;
-      localstp = -763;
-      mu = -233;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state13->rphase13state.stage < 0) goto Spawn;
+   n = state13->rphase13state.ia.xZ[0];
+   nslack = state13->rphase13state.ia.xZ[1];
+   nec = state13->rphase13state.ia.xZ[2];
+   nic = state13->rphase13state.ia.xZ[3];
+   nlec = state13->rphase13state.ia.xZ[4];
+   nlic = state13->rphase13state.ia.xZ[5];
+   innerk = state13->rphase13state.ia.xZ[6];
+   i = state13->rphase13state.ia.xZ[7];
+   j = state13->rphase13state.ia.xZ[8];
+   v = state13->rphase13state.ra.xR[0];
+   mx = state13->rphase13state.ra.xR[1];
+   f0 = state13->rphase13state.ra.xR[2];
+   f1 = state13->rphase13state.ra.xR[3];
+   nu = state13->rphase13state.ra.xR[4];
+   localstp = state13->rphase13state.ra.xR[5];
+   mu = state13->rphase13state.ra.xR[6];
+   switch (state13->rphase13state.stage) {
+      case 0: goto Resume0; case 1: goto Resume1;/* case 2: goto Resume2;*/ case 3: goto Resume3;
+      default: goto Exit;
    }
-   if (state13->rphase13state.stage == 0) {
-      goto lbl_0;
-   }
-   if (state13->rphase13state.stage == 1) {
-      goto lbl_1;
-   }
-   if (state13->rphase13state.stage == 2) {
-      goto lbl_2;
-   }
-   if (state13->rphase13state.stage == 3) {
-      goto lbl_3;
-   }
+Spawn:
+   n = 346;
+   nslack = -722;
+   nec = -413;
+   nic = -461;
+   nlec = 927;
+   nlic = 201;
+   innerk = 922;
+   i = -154;
+   j = 306;
+   v = 88;
+   mx = -861;
+   f0 = -678;
+   f1 = -731;
+   nu = -675;
+   localstp = -763;
+   mu = -233;
 // Routine body
    n = state->n;
    nec = state->nec;
@@ -34674,8 +33847,7 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
       if (state->lpfailurecnt >= nlcslp_lpfailureslimit) {
          state->repterminationtype = 7;
          *status = 0;
-         result = false;
-         return result;
+         goto Exit;
       }
    // Can not solve LP subproblem, decrease trust radius
       state->trustrad *= 0.5;
@@ -34685,8 +33857,7 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
       } else {
          *status = -1;
       }
-      result = false;
-      return result;
+      goto Exit;
    }
    nlcslp_lpsubproblemappendconjugacyconstraint(state, &state->subsolver, &state13->d);
    mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory), rmaxabsv(nec + nic + nlec + nlic, lagmult));
@@ -34697,57 +33868,52 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
 // The idea is that we perform trial step (stp=1) using simple linearized model,
 // compute constraint vector at the new trial point - and use these updated
 // constraint linearizations back at the initial point.
-   if (!state13->usecorrection) {
-      goto lbl_4;
-   }
-// Perform trial step using vector D to StepKXC
-   for (i = 0; i < n; i++) {
-      state13->stepkxc.xR[i] = curx->xR[i] + state13->d.xR[i];
-   }
-   nlcslp_slpsendx(state, &state13->stepkxc);
-   state->needfij = true;
-   state13->rphase13state.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needfij = false;
-   if (!nlcslp_slpretrievefij(state, &state13->stepkfic, &state13->stepkjc)) {
-   // Failed to retrieve func/Jac, infinities detected
-      state->repterminationtype = -8;
-      *status = 0;
-      result = false;
-      return result;
-   }
-// Move back to point CurX[], restore original linearization of the target
-   state13->stepkfic.xR[0] = curfi->xR[0];
-   for (j = 0; j < n; j++) {
-      state13->stepkxc.xR[j] = curx->xR[j];
-      state13->stepkjc.xyR[0][j] = curj->xyR[0][j];
-   }
-// Extrapolate linearization of nonlinear constraints back to origin
-   for (i = 1; i <= nlec + nlic; i++) {
-      v = 0.0;
-      for (j = 0; j < n; j++) {
-         v += state13->d.xR[j] * state13->stepkjc.xyR[i][j];
-      }
-      state13->stepkfic.xR[i] -= v;
-   }
-// Solve linearized problem one more time, now with new linearization of constraints
-// (but still old linearization of the target), obtain DX
-//
-// NOTE: because lpsubproblemrestart() call resets set of conjugate constraints, we
-//       have to re-add it after solve.
-   nlcslp_lpsubproblemrestart(state, &state->subsolver);
-   if (!nlcslp_lpsubproblemsolve(state, &state->subsolver, &state13->stepkxc, &state13->stepkfic, &state13->stepkjc, innerk, &state13->dx, &state13->dummylagmult)) {
-   // Second LP subproblem failed.
-   // Noncritical failure, can be ignored,
-   } else {
-   // Set D to new direction
+   if (state13->usecorrection) {
+   // Perform trial step using vector D to StepKXC
       for (i = 0; i < n; i++) {
-         state13->d.xR[i] = state13->dx.xR[i];
+         state13->stepkxc.xR[i] = curx->xR[i] + state13->d.xR[i];
       }
+      nlcslp_slpsendx(state, &state13->stepkxc);
+      state->needfij = true;
+      state13->rphase13state.stage = 0; goto Pause; Resume0:
+      state->needfij = false;
+      if (!nlcslp_slpretrievefij(state, &state13->stepkfic, &state13->stepkjc)) {
+      // Failed to retrieve func/Jac, infinities detected
+         state->repterminationtype = -8;
+         *status = 0;
+         goto Exit;
+      }
+   // Move back to point CurX[], restore original linearization of the target
+      state13->stepkfic.xR[0] = curfi->xR[0];
+      for (j = 0; j < n; j++) {
+         state13->stepkxc.xR[j] = curx->xR[j];
+         state13->stepkjc.xyR[0][j] = curj->xyR[0][j];
+      }
+   // Extrapolate linearization of nonlinear constraints back to origin
+      for (i = 1; i <= nlec + nlic; i++) {
+         v = 0.0;
+         for (j = 0; j < n; j++) {
+            v += state13->d.xR[j] * state13->stepkjc.xyR[i][j];
+         }
+         state13->stepkfic.xR[i] -= v;
+      }
+   // Solve linearized problem one more time, now with new linearization of constraints
+   // (but still old linearization of the target), obtain DX
+   //
+   // NOTE: because lpsubproblemrestart() call resets set of conjugate constraints, we
+   //       have to re-add it after solve.
+      nlcslp_lpsubproblemrestart(state, &state->subsolver);
+      if (!nlcslp_lpsubproblemsolve(state, &state->subsolver, &state13->stepkxc, &state13->stepkfic, &state13->stepkjc, innerk, &state13->dx, &state13->dummylagmult)) {
+      // Second LP subproblem failed.
+      // Noncritical failure, can be ignored,
+      } else {
+      // Set D to new direction
+         for (i = 0; i < n; i++) {
+            state13->d.xR[i] = state13->dx.xR[i];
+         }
+      }
+      nlcslp_lpsubproblemappendconjugacyconstraint(state, &state->subsolver, &state13->d);
    }
-   nlcslp_lpsubproblemappendconjugacyconstraint(state, &state->subsolver, &state13->d);
-lbl_4:
 // Perform merit function backtracking line search, with trial point being
 // computed as XN = XK + Stp*D, with Stp in [0,1]
 //
@@ -34759,43 +33925,36 @@ lbl_4:
    f0 = nlcslp_meritfunction(state, curx, curfi, lagmult, mu, &state13->tmpmerit);
    f1 = f0;
    smoothnessmonitorstartlinesearch(smonitor, curx, curfi, curj);
-lbl_6:
-   if (false) {
-      goto lbl_7;
+   while (true) {
+      for (i = 0; i < n; i++) {
+         state13->stepkxn.xR[i] = curx->xR[i] + localstp * state13->d.xR[i];
+      }
+      nlcslp_slpsendx(state, &state13->stepkxn);
+      state->needfij = true;
+      state13->rphase13state.stage = 1; goto Pause; Resume1:
+      state->needfij = false;
+      if (!nlcslp_slpretrievefij(state, &state13->stepkfin, &state13->stepkjn)) {
+      // Failed to retrieve func/Jac, infinities detected
+         state->repterminationtype = -8;
+         *status = 0;
+         goto Exit;
+      }
+      smoothnessmonitorenqueuepoint(smonitor, &state13->d, localstp, &state13->stepkxn, &state13->stepkfin, &state13->stepkjn);
+      f1 = nlcslp_meritfunction(state, &state13->stepkxn, &state13->stepkfin, lagmult, mu, &state13->tmpmerit);
+      if (f1 < f0) {
+      // Step is found!
+         break;
+      }
+      if (localstp < 0.001) {
+      // Step is shorter than 0.001 times current search direction,
+      // it means that no good step can be found.
+         localstp = 0.0;
+         nlcslp_slpcopystate(state, curx, curfi, curj, &state13->stepkxn, &state13->stepkfin, &state13->stepkjn);
+         break;
+      }
+      localstp *= nu;
+      nu = rmax2(0.1, 0.5 * nu);
    }
-   for (i = 0; i < n; i++) {
-      state13->stepkxn.xR[i] = curx->xR[i] + localstp * state13->d.xR[i];
-   }
-   nlcslp_slpsendx(state, &state13->stepkxn);
-   state->needfij = true;
-   state13->rphase13state.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->needfij = false;
-   if (!nlcslp_slpretrievefij(state, &state13->stepkfin, &state13->stepkjn)) {
-   // Failed to retrieve func/Jac, infinities detected
-      state->repterminationtype = -8;
-      *status = 0;
-      result = false;
-      return result;
-   }
-   smoothnessmonitorenqueuepoint(smonitor, &state13->d, localstp, &state13->stepkxn, &state13->stepkfin, &state13->stepkjn);
-   f1 = nlcslp_meritfunction(state, &state13->stepkxn, &state13->stepkfin, lagmult, mu, &state13->tmpmerit);
-   if (f1 < f0) {
-   // Step is found!
-      goto lbl_7;
-   }
-   if (localstp < 0.001) {
-   // Step is shorter than 0.001 times current search direction,
-   // it means that no good step can be found.
-      localstp = 0.0;
-      nlcslp_slpcopystate(state, curx, curfi, curj, &state13->stepkxn, &state13->stepkfin, &state13->stepkjn);
-      goto lbl_7;
-   }
-   localstp *= nu;
-   nu = rmax2(0.1, 0.5 * nu);
-   goto lbl_6;
-lbl_7:
    smoothnessmonitorfinalizelinesearch(smonitor);
    for (i = 0; i < n; i++) {
       if (state->hasbndl.xB[i]) {
@@ -34809,68 +33968,55 @@ lbl_7:
    // User requested termination, break before we move to new point
       state->repterminationtype = 8;
       *status = 0;
-      result = false;
-      return result;
+      goto Exit;
    }
-   goto lbl_8;
-   goto lbl_10;
+#if 0 //(@) Not used.
    smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad);
-lbl_12:
-   if (!smoothnessmonitorprobe(smonitor)) {
-      goto lbl_13;
-   }
-   for (j = 0; j < n; j++) {
-      state13->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state13->d.xR[j];
-      if (state->hasbndl.xB[j]) {
-         state13->stepkxc.xR[j] = rmax2(state13->stepkxc.xR[j], state->scaledbndl.xR[j]);
+   while (smoothnessmonitorprobe(smonitor)) {
+      for (j = 0; j < n; j++) {
+         state13->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state13->d.xR[j];
+         if (state->hasbndl.xB[j]) {
+            state13->stepkxc.xR[j] = rmax2(state13->stepkxc.xR[j], state->scaledbndl.xR[j]);
+         }
+         if (state->hasbndu.xB[j]) {
+            state13->stepkxc.xR[j] = rmin2(state13->stepkxc.xR[j], state->scaledbndu.xR[j]);
+         }
       }
-      if (state->hasbndu.xB[j]) {
-         state13->stepkxc.xR[j] = rmin2(state13->stepkxc.xR[j], state->scaledbndu.xR[j]);
+      nlcslp_slpsendx(state, &state13->stepkxc);
+      state->needfij = true;
+      state13->rphase13state.stage = 2; goto Pause; Resume2:
+      state->needfij = false;
+      if (!nlcslp_slpretrievefij(state, &state13->stepkfic, &state13->stepkjc)) {
+         break;
       }
+      smonitor->probingf.xR[0] = nlcslp_rawlagrangian(state, &state13->stepkxc, &state13->stepkfic, lagmult, &state13->tmpmerit);
+      smonitor->probingf.xR[1] = state13->stepkfic.xR[0];
    }
-   nlcslp_slpsendx(state, &state13->stepkxc);
-   state->needfij = true;
-   state13->rphase13state.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->needfij = false;
-   if (!nlcslp_slpretrievefij(state, &state13->stepkfic, &state13->stepkjc)) {
-      goto lbl_13;
-   }
-   smonitor->probingf.xR[0] = nlcslp_rawlagrangian(state, &state13->stepkxc, &state13->stepkfic, lagmult, &state13->tmpmerit);
-   smonitor->probingf.xR[1] = state13->stepkfic.xR[0];
-   goto lbl_12;
-lbl_13:
-lbl_10:
    mx = 0.0;
    for (i = 0; i < n; i++) {
       mx = rmax2(mx, fabs(state13->d.xR[i]) / state->trustrad);
    }
-lbl_8:
+#endif
 // Move to new point
    *stp = localstp;
    nlcslp_slpcopystate(state, &state13->stepkxn, &state13->stepkfin, &state13->stepkjn, curx, curfi, curj);
-   if (localstp <= 0.0) {
-      goto lbl_14;
+   if (localstp > 0.0) {
+   // Report one more inner iteration
+      state->repinneriterationscount++;
+      nlcslp_slpsendx(state, curx);
+      state->f = curfi->xR[0] * state->fscales.xR[0];
+      state->xupdated = true;
+      state13->rphase13state.stage = 3; goto Pause; Resume3:
+      state->xupdated = false;
+   // Update constraint violations
+      checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, curx, n, &state->replcerr, &state->replcidx);
+      unscaleandchecknlcviolation(curfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx);
    }
-// Report one more inner iteration
-   state->repinneriterationscount++;
-   nlcslp_slpsendx(state, curx);
-   state->f = curfi->xR[0] * state->fscales.xR[0];
-   state->xupdated = true;
-   state13->rphase13state.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->xupdated = false;
-// Update constraint violations
-   checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, curx, n, &state->replcerr, &state->replcidx);
-   unscaleandchecknlcviolation(curfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx);
-lbl_14:
-   result = false;
-   return result;
+Exit:
+   state13->rphase13state.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state13->rphase13state.ia.xZ[0] = n;
    state13->rphase13state.ia.xZ[1] = nslack;
    state13->rphase13state.ia.xZ[2] = nec;
@@ -34887,7 +34033,7 @@ lbl_rcomm:
    state13->rphase13state.ra.xR[4] = nu;
    state13->rphase13state.ra.xR[5] = localstp;
    state13->rphase13state.ra.xR[6] = mu;
-   return result;
+   return true;
 }
 
 // This function initializes Phase2   temporaries. It should be called before
@@ -34988,73 +34134,63 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
    double f0;
    double f1;
    double mu;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state2->rphase2state.stage >= 0) {
-      n = state2->rphase2state.ia.xZ[0];
-      nslack = state2->rphase2state.ia.xZ[1];
-      nec = state2->rphase2state.ia.xZ[2];
-      nic = state2->rphase2state.ia.xZ[3];
-      nlec = state2->rphase2state.ia.xZ[4];
-      nlic = state2->rphase2state.ia.xZ[5];
-      mcinfo = state2->rphase2state.ia.xZ[6];
-      mcnfev = state2->rphase2state.ia.xZ[7];
-      mcstage = state2->rphase2state.ia.xZ[8];
-      i = state2->rphase2state.ia.xZ[9];
-      j = state2->rphase2state.ia.xZ[10];
-      innerk = state2->rphase2state.ia.xZ[11];
-      nondescentcnt = state2->rphase2state.ia.xZ[12];
-      stp = state2->rphase2state.ra.xR[0];
-      v = state2->rphase2state.ra.xR[1];
-      vv = state2->rphase2state.ra.xR[2];
-      mx = state2->rphase2state.ra.xR[3];
-      stepklagval = state2->rphase2state.ra.xR[4];
-      stepknlagval = state2->rphase2state.ra.xR[5];
-      gammaprev = state2->rphase2state.ra.xR[6];
-      f0 = state2->rphase2state.ra.xR[7];
-      f1 = state2->rphase2state.ra.xR[8];
-      mu = state2->rphase2state.ra.xR[9];
-   } else {
-      n = -936;
-      nslack = -279;
-      nec = 94;
-      nic = -812;
-      nlec = 427;
-      nlic = 178;
-      mcinfo = -819;
-      mcnfev = -826;
-      mcstage = 667;
-      i = 692;
-      j = 84;
-      innerk = 529;
-      nondescentcnt = 14;
-      stp = 289;
-      v = 317;
-      vv = 476;
-      mx = -889;
-      stepklagval = -400;
-      stepknlagval = 489;
-      gammaprev = -962;
-      f0 = 161;
-      f1 = -447;
-      mu = -799;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state2->rphase2state.stage < 0) goto Spawn;
+   n = state2->rphase2state.ia.xZ[0];
+   nslack = state2->rphase2state.ia.xZ[1];
+   nec = state2->rphase2state.ia.xZ[2];
+   nic = state2->rphase2state.ia.xZ[3];
+   nlec = state2->rphase2state.ia.xZ[4];
+   nlic = state2->rphase2state.ia.xZ[5];
+   mcinfo = state2->rphase2state.ia.xZ[6];
+   mcnfev = state2->rphase2state.ia.xZ[7];
+   mcstage = state2->rphase2state.ia.xZ[8];
+   i = state2->rphase2state.ia.xZ[9];
+   j = state2->rphase2state.ia.xZ[10];
+   innerk = state2->rphase2state.ia.xZ[11];
+   nondescentcnt = state2->rphase2state.ia.xZ[12];
+   stp = state2->rphase2state.ra.xR[0];
+   v = state2->rphase2state.ra.xR[1];
+   vv = state2->rphase2state.ra.xR[2];
+   mx = state2->rphase2state.ra.xR[3];
+   stepklagval = state2->rphase2state.ra.xR[4];
+   stepknlagval = state2->rphase2state.ra.xR[5];
+   gammaprev = state2->rphase2state.ra.xR[6];
+   f0 = state2->rphase2state.ra.xR[7];
+   f1 = state2->rphase2state.ra.xR[8];
+   mu = state2->rphase2state.ra.xR[9];
+   switch (state2->rphase2state.stage) {
+      case 0: goto Resume0;/* case 1: goto Resume1;*/ case 2: goto Resume2;
+      default: goto Exit;
    }
-   if (state2->rphase2state.stage == 0) {
-      goto lbl_0;
-   }
-   if (state2->rphase2state.stage == 1) {
-      goto lbl_1;
-   }
-   if (state2->rphase2state.stage == 2) {
-      goto lbl_2;
-   }
+Spawn:
+   n = -936;
+   nslack = -279;
+   nec = 94;
+   nic = -812;
+   nlec = 427;
+   nlic = 178;
+   mcinfo = -819;
+   mcnfev = -826;
+   mcstage = 667;
+   i = 692;
+   j = 84;
+   innerk = 529;
+   nondescentcnt = 14;
+   stp = 289;
+   v = 317;
+   vv = 476;
+   mx = -889;
+   stepklagval = -400;
+   stepknlagval = 489;
+   gammaprev = -962;
+   f0 = 161;
+   f1 = -447;
+   mu = -799;
 // Routine body
    n = state->n;
    nec = state->nec;
@@ -35079,238 +34215,206 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
    mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory), rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult));
    nondescentcnt = 0;
    nlcslp_lpsubproblemrestart(state, &state->subsolver);
-   innerk = 1;
-lbl_3:
-   if (innerk > n) {
-      goto lbl_5;
-   }
-// Formulate LP subproblem and solve it
-   if (!nlcslp_lpsubproblemsolve(state, &state->subsolver, curx, curfi, curj, innerk, &state2->d, lagmult)) {
-   // LP solver failed due to numerical errors; exit.
-   // It may happen when we solve problem with LOTS of conjugacy constraints.
-      if (innerk == 1) {
-      // The very first iteration failed, really strange.
-      } else {
-      // Quite a normal, the problem is overconstrained by conjugacy constraints now
-      }
-      result = false;
-      return result;
-   }
-   mx = 0.0;
-   for (i = 0; i < n; i++) {
-      mx = rmax2(mx, fabs(state2->d.xR[i]) / state->trustrad);
-   }
-   if (mx == 0.0) {
-   // Nearly-zero direction is suggested (maybe we arrived exactly to the solution), stop iterations
-      *status = 1;
-      nlcslp_slpcopystate(state, curx, curfi, curj, &state2->stepkxn, &state2->stepkfin, &state2->stepkjn);
-      result = false;
-      return result;
-   }
-   nlcslp_lpsubproblemappendconjugacyconstraint(state, &state->subsolver, &state2->d);
-// Perform line search to minimize Lagrangian along D.
-// Post-normalize StepKXN with respect to box constraints.
-//
-// MCSRCH can fail in the following cases:
-// * rounding errors prevent optimization
-// * non-descent direction is specified (MCINFO=0 is returned)
-// In the latter case we proceed to minimization of merit function.
-//
-// NOTE: constraint violation reports are updated during Lagrangian computation
-   state2->lastlcerr = 0.0;
-   state2->lastlcidx = -1;
-   state2->lastnlcerr = 0.0;
-   state2->lastnlcidx = -1;
-   vectorsetlengthatleast(&state2->tmp0, n);
-   nlcslp_lagrangianfg(state, curx, state->trustrad, curfi, curj, lagmult, &state2->tmplagrangianfg, &stepklagval, &state2->stepklaggrad, &state2->lastlcerr, &state2->lastlcidx, &state2->lastnlcerr, &state2->lastnlcidx);
-   nlcslp_slpcopystate(state, curx, curfi, curj, &state2->stepkxn, &state2->stepkfin, &state2->stepkjn);
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      state2->stepknlaggrad.xR[i] = state2->stepklaggrad.xR[i];
-      v += state2->d.xR[i] * state2->stepklaggrad.xR[i];
-   }
-   if (v >= 0.0) {
-   // Non-descent direction D was specified; it may happen because LP subproblem favors
-   // directions which decrease L1 penalty and default augmentation of Lagrangian involves
-   // only L2 term.
-   //
-   // Append direction to the conjugacy constraints and retry direction generation.
-   //
-   // We make several retries with conjugate directions before giving up.
-      nondescentcnt++;
-      if (nlcslp_nondescentlimit > 0 && nondescentcnt > nlcslp_nondescentlimit) {
-         *status = 1;
-         result = false;
-         return result;
-      }
-      goto lbl_4;
-   }
-   smoothnessmonitorstartlinesearch(smonitor, curx, curfi, curj);
-   stepknlagval = stepklagval;
-   mcnfev = 0;
-   mcstage = 0;
-   stp = 1.0;
-   mcsrch(n, &state2->stepkxn, &stepknlagval, &state2->stepknlaggrad, &state2->d, &stp, 1.0, nlcslp_slpgtol, &mcinfo, &mcnfev, &state2->tmp0, &state2->mcstate, &mcstage);
-lbl_6:
-   if (mcstage == 0) {
-      goto lbl_7;
-   }
-   nlcslp_slpsendx(state, &state2->stepkxn);
-   state->needfij = true;
-   state2->rphase2state.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needfij = false;
-   if (!nlcslp_slpretrievefij(state, &state2->stepkfin, &state2->stepkjn)) {
-   // Failed to retrieve func/Jac, infinities detected
-      *status = 0;
-      state->repterminationtype = -8;
-      result = false;
-      return result;
-   }
-   smoothnessmonitorenqueuepoint(smonitor, &state2->d, stp, &state2->stepkxn, &state2->stepkfin, &state2->stepkjn);
-   nlcslp_lagrangianfg(state, &state2->stepkxn, state->trustrad, &state2->stepkfin, &state2->stepkjn, lagmult, &state2->tmplagrangianfg, &stepknlagval, &state2->stepknlaggrad, &state2->lastlcerr, &state2->lastlcidx, &state2->lastnlcerr, &state2->lastnlcidx);
-   mcsrch(n, &state2->stepkxn, &stepknlagval, &state2->stepknlaggrad, &state2->d, &stp, 1.0, nlcslp_slpgtol, &mcinfo, &mcnfev, &state2->tmp0, &state2->mcstate, &mcstage);
-   goto lbl_6;
-lbl_7:
-   smoothnessmonitorfinalizelinesearch(smonitor);
-   for (i = 0; i < n; i++) {
-      if (state->hasbndl.xB[i]) {
-         state2->stepkxn.xR[i] = rmax2(state2->stepkxn.xR[i], state->scaledbndl.xR[i]);
-      }
-      if (state->hasbndu.xB[i]) {
-         state2->stepkxn.xR[i] = rmin2(state2->stepkxn.xR[i], state->scaledbndu.xR[i]);
-      }
-   }
-   if (mcinfo <= 0) {
-   // Line search failed miserably, terminate
-      *status = 1;
-      if (innerk == 1) {
-      // The very first iteration failed, really strange.
-      // Let's decrease trust radius and try one more time.
-         state->trustrad *= 0.5;
-         if (state->trustrad < state->epsx) {
-            state->repterminationtype = 2;
-            *status = 0;
+   for (innerk = 1; innerk <= n; innerk++) {
+   // Formulate LP subproblem and solve it
+      if (!nlcslp_lpsubproblemsolve(state, &state->subsolver, curx, curfi, curj, innerk, &state2->d, lagmult)) {
+      // LP solver failed due to numerical errors; exit.
+      // It may happen when we solve problem with LOTS of conjugacy constraints.
+         if (innerk == 1) {
+         // The very first iteration failed, really strange.
+         } else {
+         // Quite a normal, the problem is overconstrained by conjugacy constraints now
          }
-      } else {
-      // Well, it can be normal
+         goto Exit;
       }
-      result = false;
-      return result;
-   }
-   if (mcinfo == 1) {
-      nlcslp_lpsubproblemupdatehessian(state, &state->subsolver, curx, &state2->stepklaggrad, &state2->stepkxn, &state2->stepknlaggrad);
-   }
-// Update GammaMax - estimate of the function Hessian norm
-   v = 0.0;
-   vv = 0.0;
-   mx = 0.0;
-   for (i = 0; i < n; i++) {
-      mx = rmax2(mx, fabs(state2->stepkxn.xR[i] - curx->xR[i]));
-      v += sqr(state2->stepkxn.xR[i] - curx->xR[i]);
-      vv += (state2->stepkjn.xyR[0][i] - curj->xyR[0][i]) * (state2->stepkxn.xR[i] - curx->xR[i]);
-   }
-   gammaprev = *gammamax;
-   if (mx > nlcslp_bfgstol) {
-      *gammamax = rmax2(*gammamax, fabs(vv / v));
-   }
-   goto lbl_8;
-   goto lbl_10;
-   smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad);
-lbl_12:
-   if (!smoothnessmonitorprobe(smonitor)) {
-      goto lbl_13;
-   }
-   for (j = 0; j < n; j++) {
-      state2->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state2->d.xR[j];
-      if (state->hasbndl.xB[j]) {
-         state2->stepkxc.xR[j] = rmax2(state2->stepkxc.xR[j], state->scaledbndl.xR[j]);
+      mx = 0.0;
+      for (i = 0; i < n; i++) {
+         mx = rmax2(mx, fabs(state2->d.xR[i]) / state->trustrad);
       }
-      if (state->hasbndu.xB[j]) {
-         state2->stepkxc.xR[j] = rmin2(state2->stepkxc.xR[j], state->scaledbndu.xR[j]);
+      if (mx == 0.0) {
+      // Nearly-zero direction is suggested (maybe we arrived exactly to the solution), stop iterations
+         *status = 1;
+         nlcslp_slpcopystate(state, curx, curfi, curj, &state2->stepkxn, &state2->stepkfin, &state2->stepkjn);
+         goto Exit;
       }
-   }
-   nlcslp_slpsendx(state, &state2->stepkxc);
-   state->needfij = true;
-   state2->rphase2state.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->needfij = false;
-   if (!nlcslp_slpretrievefij(state, &state2->stepkfic, &state2->stepkjc)) {
-      goto lbl_13;
-   }
-   smonitor->probingf.xR[0] = nlcslp_rawlagrangian(state, &state2->stepkxc, &state2->stepkfic, lagmult, &state2->tmpmerit);
-   smonitor->probingf.xR[1] = state2->stepkfic.xR[0];
-   goto lbl_12;
-lbl_13:
-lbl_10:
-   mx = 0.0;
-   for (i = 0; i < n; i++) {
-      mx = rmax2(mx, fabs(state2->d.xR[i]) / state->trustrad);
-   }
-   f0 = nlcslp_meritfunction(state, curx, curfi, &state2->meritlagmult, mu, &state2->tmpmerit);
-   f1 = nlcslp_meritfunction(state, &state2->stepkxn, &state2->stepkfin, &state2->meritlagmult, mu, &state2->tmpmerit);
-lbl_8:
-// Check status of the termination request
-// Update current point
-// Update constraint status.
-// Report iteration.
-   if (userterminationneeded) {
-   // User requested termination, break before we move to new point
-      *status = 0;
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-   nlcslp_slpcopystate(state, &state2->stepkxn, &state2->stepkfin, &state2->stepkjn, curx, curfi, curj);
-   state->replcerr = state2->lastlcerr;
-   state->replcidx = state2->lastlcidx;
-   state->repnlcerr = state2->lastnlcerr;
-   state->repnlcidx = state2->lastnlcidx;
-   state->repinneriterationscount++;
-   nlcslp_slpsendx(state, curx);
-   state->f = curfi->xR[0] * state->fscales.xR[0];
-   state->xupdated = true;
-   state2->rphase2state.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->xupdated = false;
-// Terminate inner LP subiterations
-   if (state->maxits > 0 && state->repinneriterationscount >= state->maxits) {
-   // Iteration limit exhausted
-      *status = 1;
-      result = false;
-      return result;
-   }
-   if (stp >= nlcslp_slpstpclosetoone) {
-   // Step is close to 1.0, either of two is likely:
-   // * we move through nearly linear region of F()
-   // * we try to enforce some strongly violated constraint
+      nlcslp_lpsubproblemappendconjugacyconstraint(state, &state->subsolver, &state2->d);
+   // Perform line search to minimize Lagrangian along D.
+   // Post-normalize StepKXN with respect to box constraints.
    //
-   // In any case, authors of the original algorithm recommend to break inner LP
-   // iteration and proceed to test of sufficient decrease of merit function.
-      *status = 1;
-      result = false;
-      return result;
+   // MCSRCH can fail in the following cases:
+   // * rounding errors prevent optimization
+   // * non-descent direction is specified (MCINFO=0 is returned)
+   // In the latter case we proceed to minimization of merit function.
+   //
+   // NOTE: constraint violation reports are updated during Lagrangian computation
+      state2->lastlcerr = 0.0;
+      state2->lastlcidx = -1;
+      state2->lastnlcerr = 0.0;
+      state2->lastnlcidx = -1;
+      vectorsetlengthatleast(&state2->tmp0, n);
+      nlcslp_lagrangianfg(state, curx, state->trustrad, curfi, curj, lagmult, &state2->tmplagrangianfg, &stepklagval, &state2->stepklaggrad, &state2->lastlcerr, &state2->lastlcidx, &state2->lastnlcerr, &state2->lastnlcidx);
+      nlcslp_slpcopystate(state, curx, curfi, curj, &state2->stepkxn, &state2->stepkfin, &state2->stepkjn);
+      v = 0.0;
+      for (i = 0; i < n; i++) {
+         state2->stepknlaggrad.xR[i] = state2->stepklaggrad.xR[i];
+         v += state2->d.xR[i] * state2->stepklaggrad.xR[i];
+      }
+      if (v >= 0.0) {
+      // Non-descent direction D was specified; it may happen because LP subproblem favors
+      // directions which decrease L1 penalty and default augmentation of Lagrangian involves
+      // only L2 term.
+      //
+      // Append direction to the conjugacy constraints and retry direction generation.
+      //
+      // We make several retries with conjugate directions before giving up.
+         nondescentcnt++;
+         if (nlcslp_nondescentlimit > 0 && nondescentcnt > nlcslp_nondescentlimit) {
+            *status = 1;
+            goto Exit;
+         }
+         continue;
+      }
+      smoothnessmonitorstartlinesearch(smonitor, curx, curfi, curj);
+      stepknlagval = stepklagval;
+      mcnfev = 0;
+      mcstage = 0;
+      stp = 1.0;
+      mcsrch(n, &state2->stepkxn, &stepknlagval, &state2->stepknlaggrad, &state2->d, &stp, 1.0, nlcslp_slpgtol, &mcinfo, &mcnfev, &state2->tmp0, &state2->mcstate, &mcstage);
+      while (mcstage != 0) {
+         nlcslp_slpsendx(state, &state2->stepkxn);
+         state->needfij = true;
+         state2->rphase2state.stage = 0; goto Pause; Resume0:
+         state->needfij = false;
+         if (!nlcslp_slpretrievefij(state, &state2->stepkfin, &state2->stepkjn)) {
+         // Failed to retrieve func/Jac, infinities detected
+            *status = 0;
+            state->repterminationtype = -8;
+            goto Exit;
+         }
+         smoothnessmonitorenqueuepoint(smonitor, &state2->d, stp, &state2->stepkxn, &state2->stepkfin, &state2->stepkjn);
+         nlcslp_lagrangianfg(state, &state2->stepkxn, state->trustrad, &state2->stepkfin, &state2->stepkjn, lagmult, &state2->tmplagrangianfg, &stepknlagval, &state2->stepknlaggrad, &state2->lastlcerr, &state2->lastlcidx, &state2->lastnlcerr, &state2->lastnlcidx);
+         mcsrch(n, &state2->stepkxn, &stepknlagval, &state2->stepknlaggrad, &state2->d, &stp, 1.0, nlcslp_slpgtol, &mcinfo, &mcnfev, &state2->tmp0, &state2->mcstate, &mcstage);
+      }
+      smoothnessmonitorfinalizelinesearch(smonitor);
+      for (i = 0; i < n; i++) {
+         if (state->hasbndl.xB[i]) {
+            state2->stepkxn.xR[i] = rmax2(state2->stepkxn.xR[i], state->scaledbndl.xR[i]);
+         }
+         if (state->hasbndu.xB[i]) {
+            state2->stepkxn.xR[i] = rmin2(state2->stepkxn.xR[i], state->scaledbndu.xR[i]);
+         }
+      }
+      if (mcinfo <= 0) {
+      // Line search failed miserably, terminate
+         *status = 1;
+         if (innerk == 1) {
+         // The very first iteration failed, really strange.
+         // Let's decrease trust radius and try one more time.
+            state->trustrad *= 0.5;
+            if (state->trustrad < state->epsx) {
+               state->repterminationtype = 2;
+               *status = 0;
+            }
+         } else {
+         // Well, it can be normal
+         }
+         goto Exit;
+      }
+      if (mcinfo == 1) {
+         nlcslp_lpsubproblemupdatehessian(state, &state->subsolver, curx, &state2->stepklaggrad, &state2->stepkxn, &state2->stepknlaggrad);
+      }
+   // Update GammaMax - estimate of the function Hessian norm
+      v = 0.0;
+      vv = 0.0;
+      mx = 0.0;
+      for (i = 0; i < n; i++) {
+         mx = rmax2(mx, fabs(state2->stepkxn.xR[i] - curx->xR[i]));
+         v += sqr(state2->stepkxn.xR[i] - curx->xR[i]);
+         vv += (state2->stepkjn.xyR[0][i] - curj->xyR[0][i]) * (state2->stepkxn.xR[i] - curx->xR[i]);
+      }
+      gammaprev = *gammamax;
+      if (mx > nlcslp_bfgstol) {
+         *gammamax = rmax2(*gammamax, fabs(vv / v));
+      }
+   #if 0 //(@) Not used.
+      smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad);
+      while (smoothnessmonitorprobe(smonitor)) {
+         for (j = 0; j < n; j++) {
+            state2->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state2->d.xR[j];
+            if (state->hasbndl.xB[j]) {
+               state2->stepkxc.xR[j] = rmax2(state2->stepkxc.xR[j], state->scaledbndl.xR[j]);
+            }
+            if (state->hasbndu.xB[j]) {
+               state2->stepkxc.xR[j] = rmin2(state2->stepkxc.xR[j], state->scaledbndu.xR[j]);
+            }
+         }
+         nlcslp_slpsendx(state, &state2->stepkxc);
+         state->needfij = true;
+         state2->rphase2state.stage = 1; goto Pause; Resume1:
+         state->needfij = false;
+         if (!nlcslp_slpretrievefij(state, &state2->stepkfic, &state2->stepkjc)) {
+            break;
+         }
+         smonitor->probingf.xR[0] = nlcslp_rawlagrangian(state, &state2->stepkxc, &state2->stepkfic, lagmult, &state2->tmpmerit);
+         smonitor->probingf.xR[1] = state2->stepkfic.xR[0];
+      }
+      mx = 0.0;
+      for (i = 0; i < n; i++) {
+         mx = rmax2(mx, fabs(state2->d.xR[i]) / state->trustrad);
+      }
+      f0 = nlcslp_meritfunction(state, curx, curfi, &state2->meritlagmult, mu, &state2->tmpmerit);
+      f1 = nlcslp_meritfunction(state, &state2->stepkxn, &state2->stepkfin, &state2->meritlagmult, mu, &state2->tmpmerit);
+   #endif
+   // Check status of the termination request
+   // Update current point
+   // Update constraint status.
+   // Report iteration.
+      if (userterminationneeded) {
+      // User requested termination, break before we move to new point
+         *status = 0;
+         state->repterminationtype = 8;
+         goto Exit;
+      }
+      nlcslp_slpcopystate(state, &state2->stepkxn, &state2->stepkfin, &state2->stepkjn, curx, curfi, curj);
+      state->replcerr = state2->lastlcerr;
+      state->replcidx = state2->lastlcidx;
+      state->repnlcerr = state2->lastnlcerr;
+      state->repnlcidx = state2->lastnlcidx;
+      state->repinneriterationscount++;
+      nlcslp_slpsendx(state, curx);
+      state->f = curfi->xR[0] * state->fscales.xR[0];
+      state->xupdated = true;
+      state2->rphase2state.stage = 2; goto Pause; Resume2:
+      state->xupdated = false;
+   // Terminate inner LP subiterations
+      if (state->maxits > 0 && state->repinneriterationscount >= state->maxits) {
+      // Iteration limit exhausted
+         *status = 1;
+         goto Exit;
+      }
+      if (stp >= nlcslp_slpstpclosetoone) {
+      // Step is close to 1.0, either of two is likely:
+      // * we move through nearly linear region of F()
+      // * we try to enforce some strongly violated constraint
+      //
+      // In any case, authors of the original algorithm recommend to break inner LP
+      // iteration and proceed to test of sufficient decrease of merit function.
+         *status = 1;
+         goto Exit;
+      }
+      if ((mcinfo != 1 && mcinfo != 3) && mcinfo != 5) {
+      // Line search ended with "bad" MCINFO
+      // (neither sufficient decrease, neither maximum step);
+      // terminate.
+         *status = 1;
+         goto Exit;
+      }
    }
-   if ((mcinfo != 1 && mcinfo != 3) && mcinfo != 5) {
-   // Line search ended with "bad" MCINFO
-   // (neither sufficient decrease, neither maximum step);
-   // terminate.
-      *status = 1;
-      result = false;
-      return result;
-   }
-lbl_4:
-   innerk++;
-   goto lbl_3;
-lbl_5:
-   result = false;
-   return result;
+Exit:
+   state2->rphase2state.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state2->rphase2state.ia.xZ[0] = n;
    state2->rphase2state.ia.xZ[1] = nslack;
    state2->rphase2state.ia.xZ[2] = nec;
@@ -35334,7 +34438,7 @@ lbl_rcomm:
    state2->rphase2state.ra.xR[7] = f0;
    state2->rphase2state.ra.xR[8] = f1;
    state2->rphase2state.ra.xR[9] = mu;
-   return result;
+   return true;
 }
 
 void minslpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int_t n, RMatrix *cleic, ZVector *lcsrcidx, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, double epsx, ae_int_t maxits, minslpstate *state) {
@@ -35492,79 +34596,64 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
    double setscaleto;
    double prevtrustrad;
    double mu;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      nslack = state->rstate.ia.xZ[1];
-      nec = state->rstate.ia.xZ[2];
-      nic = state->rstate.ia.xZ[3];
-      nlec = state->rstate.ia.xZ[4];
-      nlic = state->rstate.ia.xZ[5];
-      i = state->rstate.ia.xZ[6];
-      j = state->rstate.ia.xZ[7];
-      innerk = state->rstate.ia.xZ[8];
-      status = state->rstate.ia.xZ[9];
-      lpstagesuccess = state->rstate.ba.xB[0];
-      v = state->rstate.ra.xR[0];
-      vv = state->rstate.ra.xR[1];
-      mx = state->rstate.ra.xR[2];
-      gammamax = state->rstate.ra.xR[3];
-      f1 = state->rstate.ra.xR[4];
-      f2 = state->rstate.ra.xR[5];
-      stp = state->rstate.ra.xR[6];
-      deltamax = state->rstate.ra.xR[7];
-      multiplyby = state->rstate.ra.xR[8];
-      setscaleto = state->rstate.ra.xR[9];
-      prevtrustrad = state->rstate.ra.xR[10];
-      mu = state->rstate.ra.xR[11];
-   } else {
-      n = 359;
-      nslack = -58;
-      nec = -919;
-      nic = -909;
-      nlec = 81;
-      nlic = 255;
-      i = 74;
-      j = -788;
-      innerk = 809;
-      status = 205;
-      lpstagesuccess = false;
-      v = 763;
-      vv = -541;
-      mx = -698;
-      gammamax = -900;
-      f1 = -318;
-      f2 = -940;
-      stp = 1016;
-      deltamax = -229;
-      multiplyby = -536;
-      setscaleto = 487;
-      prevtrustrad = -115;
-      mu = 886;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   nslack = state->rstate.ia.xZ[1];
+   nec = state->rstate.ia.xZ[2];
+   nic = state->rstate.ia.xZ[3];
+   nlec = state->rstate.ia.xZ[4];
+   nlic = state->rstate.ia.xZ[5];
+   i = state->rstate.ia.xZ[6];
+   j = state->rstate.ia.xZ[7];
+   innerk = state->rstate.ia.xZ[8];
+   status = state->rstate.ia.xZ[9];
+   lpstagesuccess = state->rstate.ba.xB[0];
+   v = state->rstate.ra.xR[0];
+   vv = state->rstate.ra.xR[1];
+   mx = state->rstate.ra.xR[2];
+   gammamax = state->rstate.ra.xR[3];
+   f1 = state->rstate.ra.xR[4];
+   f2 = state->rstate.ra.xR[5];
+   stp = state->rstate.ra.xR[6];
+   deltamax = state->rstate.ra.xR[7];
+   multiplyby = state->rstate.ra.xR[8];
+   setscaleto = state->rstate.ra.xR[9];
+   prevtrustrad = state->rstate.ra.xR[10];
+   mu = state->rstate.ra.xR[11];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
+      case 3: goto Resume3; case 4: goto Resume4;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
+Spawn:
+   n = 359;
+   nslack = -58;
+   nec = -919;
+   nic = -909;
+   nlec = 81;
+   nlic = 255;
+   i = 74;
+   j = -788;
+   innerk = 809;
+   status = 205;
+   lpstagesuccess = false;
+   v = 763;
+   vv = -541;
+   mx = -698;
+   gammamax = -900;
+   f1 = -318;
+   f2 = -940;
+   stp = 1016;
+   deltamax = -229;
+   multiplyby = -536;
+   setscaleto = 487;
+   prevtrustrad = -115;
+   mu = 886;
 // Routine body
    n = state->n;
    nec = state->nec;
@@ -35601,9 +34690,7 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
 // Compute initial violation of constraints.
    nlcslp_slpsendx(state, &state->step0x);
    state->needfij = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
+   state->rstate.stage = 0; goto Pause; Resume0:
    state->needfij = false;
    if (!nlcslp_slpretrievefij(state, &state->step0fi, &state->step0j)) {
    // Failed to retrieve function/Jaconian, infinities detected!
@@ -35611,207 +34698,177 @@ lbl_0:
          state->stepkx.xR[i] = state->step0x.xR[i];
       }
       state->repterminationtype = -8;
-      result = false;
-      return result;
+      goto Exit;
    }
    nlcslp_slpcopystate(state, &state->step0x, &state->step0fi, &state->step0j, &state->stepkx, &state->stepkfi, &state->stepkj);
    nlcslp_slpsendx(state, &state->stepkx);
    state->f = state->stepkfi.xR[0] * state->fscales.xR[0];
    state->xupdated = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
+   state->rstate.stage = 1; goto Pause; Resume1:
    state->xupdated = false;
    checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->stepkx, n, &state->replcerr, &state->replcidx);
    unscaleandchecknlcviolation(&state->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx);
 // Perform outer (NLC) iterations
    nlcslp_initlpsubsolver(state, &state->subsolver, state->hessiantype);
-lbl_5:
-   if (false) {
-      goto lbl_6;
-   }
-// Before beginning new outer iteration:
-// * renormalize target function and/or constraints, if some of them have too large magnitudes
-// * save initial point for the outer iteration
-   for (i = 0; i <= nlec + nlic; i++) {
-   // Determine (a) multiplicative coefficient applied to function value
-   // and Jacobian row, and (b) new value of the function scale.
-      mx = 0.0;
-      for (j = 0; j < n; j++) {
-         mx = rmax2(mx, fabs(state->stepkj.xyR[i][j]));
-      }
-      multiplyby = 1.0;
-      setscaleto = state->fscales.xR[i];
-      if (mx >= nlcslp_slpbigscale) {
-         multiplyby = 1 / mx;
-         setscaleto = state->fscales.xR[i] * mx;
-      }
-      if (mx <= nlcslp_slpsmallscale && state->fscales.xR[i] > 1.0) {
-         if (state->fscales.xR[i] * mx > 1.0) {
+   while (true) {
+   // Before beginning new outer iteration:
+   // * renormalize target function and/or constraints, if some of them have too large magnitudes
+   // * save initial point for the outer iteration
+      for (i = 0; i <= nlec + nlic; i++) {
+      // Determine (a) multiplicative coefficient applied to function value
+      // and Jacobian row, and (b) new value of the function scale.
+         mx = 0.0;
+         for (j = 0; j < n; j++) {
+            mx = rmax2(mx, fabs(state->stepkj.xyR[i][j]));
+         }
+         multiplyby = 1.0;
+         setscaleto = state->fscales.xR[i];
+         if (mx >= nlcslp_slpbigscale) {
             multiplyby = 1 / mx;
             setscaleto = state->fscales.xR[i] * mx;
+         }
+         if (mx <= nlcslp_slpsmallscale && state->fscales.xR[i] > 1.0) {
+            if (state->fscales.xR[i] * mx > 1.0) {
+               multiplyby = 1 / mx;
+               setscaleto = state->fscales.xR[i] * mx;
+            } else {
+               multiplyby = state->fscales.xR[i];
+               setscaleto = 1.0;
+            }
+         }
+         if (multiplyby != 1.0) {
+         // Function #I needs renormalization:
+         // * update function vector element and Jacobian matrix row
+         // * update FScales[] array
+            state->stepkfi.xR[i] *= multiplyby;
+            for (j = 0; j < n; j++) {
+               state->stepkj.xyR[i][j] *= multiplyby;
+            }
+            state->fscales.xR[i] = setscaleto;
+         }
+      }
+   // Save initial point for the outer iteration
+      nlcslp_slpcopystate(state, &state->stepkx, &state->stepkfi, &state->stepkj, &state->step0x, &state->step0fi, &state->step0j);
+   // PHASE 1:
+   //
+   // * perform step using linear model with second order correction
+   // * compute "reference" Lagrange multipliers
+   // * compute merit function at the end of the phase 1 and push it to the history queue
+   //
+   // NOTE: a second order correction helps to overcome Maratos effect - a tendency
+   //       of L1 penalized merit function to reject nonzero steps along steepest
+   //       descent direction.
+   //
+   //       The idea (explained in more details in the Phase13Iteration() body)
+   //       is to perform one look-ahead step and use updated constraint values
+   //       back at the initial point.
+      nlcslp_phase13init(&state->state13, n, nec, nic, nlec, nlic, true);
+      while (!nlcslp_phase13iteration(state, &state->state13, smonitor, userterminationneeded, &state->stepkx, &state->stepkfi, &state->stepkj, &state->meritlagmult, &status, &stp)) {
+         state->rstate.stage = 2; goto Pause; Resume2: ;
+      }
+      if (status < 0) {
+         continue;
+      } else if (status == 0) {
+         break;
+      }
+      mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory), rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult));
+      for (i = state->historylen; i >= 1; i--) {
+         state->meritfunctionhistory.xR[i] = state->meritfunctionhistory.xR[i - 1];
+         state->maxlaghistory.xR[i] = state->maxlaghistory.xR[i - 1];
+      }
+      state->meritfunctionhistory.xR[0] = nlcslp_meritfunction(state, &state->stepkx, &state->stepkfi, &state->meritlagmult, mu, &state->tmpmerit);
+      state->maxlaghistory.xR[0] = rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult);
+      state->historylen = imin2(state->historylen + 1, nlcslp_nonmonotonicphase2limit);
+   // PHASE 2: conjugate subiterations
+   //
+   // If step with second order correction is shorter than 1.0, it means
+   // that target is sufficiently nonlinear to use advanced iterations.
+   // * perform inner LP subiterations with additional conjugacy constraints
+   // * check changes in merit function, discard iteration results if merit function increased
+      if (stp < nlcslp_slpstpclosetoone) {
+         nlcslp_slpcopystate(state, &state->stepkx, &state->stepkfi, &state->stepkj, &state->backupx, &state->backupfi, &state->backupj);
+      // LP subiterations
+         nlcslp_phase2init(&state->state2, n, nec, nic, nlec, nlic, &state->meritlagmult);
+         while (nlcslp_phase2iteration(state, &state->state2, smonitor, userterminationneeded, &state->stepkx, &state->stepkfi, &state->stepkj, &state->dummylagmult, &gammamax, &status)) {
+            state->rstate.stage = 3; goto Pause; Resume3: ;
+         }
+         if (status == 0) {
+         // Save progress so far and stop
+            break;
+         }
+      // Evaluating step
+      //
+      // This step is essential because previous step (which minimizes Lagrangian) may fail
+      // to produce descent direction for L1-penalized merit function and will increase it
+      // instead of decreasing.
+      //
+      // During evaluation we compare merit function at new location with maximum computed
+      // over last NonmonotonicPhase2Limit+1 previous ones (as suggested in 'A Sequential
+      // Quadratic Programming Algorithm with Non-Monotone Line Search' by Yu-Hong Dai).
+      //
+      // Settings NonmonotonicPhase2Limit to 0 will result in strictly monotonic line search,
+      // whilst having nonzero limits means that we perform more robust nonmonotonic search.
+         f1 = state->meritfunctionhistory.xR[0];
+         for (i = 1; i <= state->historylen; i++) {
+            f1 = rmax2(f1, state->meritfunctionhistory.xR[i]);
+         }
+         f2 = nlcslp_meritfunction(state, &state->stepkx, &state->stepkfi, &state->meritlagmult, mu, &state->tmpmerit);
+         if (f2 >= f1) {
+         // Merit function does not decrease, discard phase results and report is as one
+         // more "fake" inner iteration.
+         //
+         // NOTE: it is important that F2=F1 is considered as "does not decrease"
+            nlcslp_slpcopystate(state, &state->backupx, &state->backupfi, &state->backupj, &state->stepkx, &state->stepkfi, &state->stepkj);
+            state->repinneriterationscount++;
+            nlcslp_slpsendx(state, &state->stepkx);
+            state->f = state->stepkfi.xR[0] * state->fscales.xR[0];
+            state->xupdated = true;
+            state->rstate.stage = 4; goto Pause; Resume4:
+            state->xupdated = false;
+            checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->stepkx, n, &state->replcerr, &state->replcidx);
+            unscaleandchecknlcviolation(&state->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx);
          } else {
-            multiplyby = state->fscales.xR[i];
-            setscaleto = 1.0;
+         // Merit function decreased, accept phase
+            state->meritfunctionhistory.xR[0] = f2;
          }
+      } else {
+      // No phase #2
       }
-      if (multiplyby != 1.0) {
-      // Function #I needs renormalization:
-      // * update function vector element and Jacobian matrix row
-      // * update FScales[] array
-         state->stepkfi.xR[i] *= multiplyby;
-         for (j = 0; j < n; j++) {
-            state->stepkj.xyR[i][j] *= multiplyby;
-         }
-         state->fscales.xR[i] = setscaleto;
+   // Update trust region
+      prevtrustrad = state->trustrad;
+      deltamax = 0.0;
+      for (i = 0; i < n; i++) {
+         deltamax = rmax2(deltamax, fabs(state->step0x.xR[i] - state->stepkx.xR[i]) / state->trustrad);
+      }
+      if (deltamax <= nlcslp_slpdeltadecrease) {
+         state->trustrad *= rmax2(deltamax / nlcslp_slpdeltadecrease, nlcslp_maxtrustraddecay);
+      }
+      if (deltamax >= nlcslp_slpdeltaincrease) {
+         state->trustrad *= rmin2(deltamax / nlcslp_slpdeltaincrease, nlcslp_maxtrustradgrowth);
+      }
+   // Advance outer iteration counter, test stopping criteria
+      state->repouteriterationscount++;
+      if (fabs(state->stepkfi.xR[0] - state->step0fi.xR[0]) <= nlcslp_stagnationepsf * fabs(state->step0fi.xR[0])) {
+         state->fstagnationcnt++;
+      } else {
+         state->fstagnationcnt = 0;
+      }
+      if (state->trustrad <= state->epsx) {
+         state->repterminationtype = 2;
+         break;
+      } else if (state->maxits > 0 && state->repinneriterationscount >= state->maxits) {
+         state->repterminationtype = 5;
+         break;
+      } else if (state->fstagnationcnt >= nlcslp_fstagnationlimit) {
+         state->repterminationtype = 7;
+         break;
       }
    }
-// Save initial point for the outer iteration
-   nlcslp_slpcopystate(state, &state->stepkx, &state->stepkfi, &state->stepkj, &state->step0x, &state->step0fi, &state->step0j);
-// PHASE 1:
-//
-// * perform step using linear model with second order correction
-// * compute "reference" Lagrange multipliers
-// * compute merit function at the end of the phase 1 and push it to the history queue
-//
-// NOTE: a second order correction helps to overcome Maratos effect - a tendency
-//       of L1 penalized merit function to reject nonzero steps along steepest
-//       descent direction.
-//
-//       The idea (explained in more details in the Phase13Iteration() body)
-//       is to perform one look-ahead step and use updated constraint values
-//       back at the initial point.
-   nlcslp_phase13init(&state->state13, n, nec, nic, nlec, nlic, true);
-lbl_7:
-   if (!nlcslp_phase13iteration(state, &state->state13, smonitor, userterminationneeded, &state->stepkx, &state->stepkfi, &state->stepkj, &state->meritlagmult, &status, &stp)) {
-      goto lbl_8;
-   }
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   goto lbl_7;
-lbl_8:
-   if (status < 0) {
-      goto lbl_5;
-   }
-   if (status == 0) {
-      goto lbl_6;
-   }
-   mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory), rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult));
-   for (i = state->historylen; i >= 1; i--) {
-      state->meritfunctionhistory.xR[i] = state->meritfunctionhistory.xR[i - 1];
-      state->maxlaghistory.xR[i] = state->maxlaghistory.xR[i - 1];
-   }
-   state->meritfunctionhistory.xR[0] = nlcslp_meritfunction(state, &state->stepkx, &state->stepkfi, &state->meritlagmult, mu, &state->tmpmerit);
-   state->maxlaghistory.xR[0] = rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult);
-   state->historylen = imin2(state->historylen + 1, nlcslp_nonmonotonicphase2limit);
-// PHASE 2: conjugate subiterations
-//
-// If step with second order correction is shorter than 1.0, it means
-// that target is sufficiently nonlinear to use advanced iterations.
-// * perform inner LP subiterations with additional conjugacy constraints
-// * check changes in merit function, discard iteration results if merit function increased
-   if (stp >= nlcslp_slpstpclosetoone) {
-      goto lbl_9;
-   }
-   nlcslp_slpcopystate(state, &state->stepkx, &state->stepkfi, &state->stepkj, &state->backupx, &state->backupfi, &state->backupj);
-// LP subiterations
-   nlcslp_phase2init(&state->state2, n, nec, nic, nlec, nlic, &state->meritlagmult);
-lbl_11:
-   if (!nlcslp_phase2iteration(state, &state->state2, smonitor, userterminationneeded, &state->stepkx, &state->stepkfi, &state->stepkj, &state->dummylagmult, &gammamax, &status)) {
-      goto lbl_12;
-   }
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   goto lbl_11;
-lbl_12:
-   if (status == 0) {
-   // Save progress so far and stop
-      goto lbl_6;
-   }
-// Evaluating step
-//
-// This step is essential because previous step (which minimizes Lagrangian) may fail
-// to produce descent direction for L1-penalized merit function and will increase it
-// instead of decreasing.
-//
-// During evaluation we compare merit function at new location with maximum computed
-// over last NonmonotonicPhase2Limit+1 previous ones (as suggested in 'A Sequential
-// Quadratic Programming Algorithm with Non-Monotone Line Search' by Yu-Hong Dai).
-//
-// Settings NonmonotonicPhase2Limit to 0 will result in strictly monotonic line search,
-// whilst having nonzero limits means that we perform more robust nonmonotonic search.
-   f1 = state->meritfunctionhistory.xR[0];
-   for (i = 1; i <= state->historylen; i++) {
-      f1 = rmax2(f1, state->meritfunctionhistory.xR[i]);
-   }
-   f2 = nlcslp_meritfunction(state, &state->stepkx, &state->stepkfi, &state->meritlagmult, mu, &state->tmpmerit);
-   if (f2 < f1) {
-      goto lbl_13;
-   }
-// Merit function does not decrease, discard phase results and report is as one
-// more "fake" inner iteration.
-//
-// NOTE: it is important that F2=F1 is considered as "does not decrease"
-   nlcslp_slpcopystate(state, &state->backupx, &state->backupfi, &state->backupj, &state->stepkx, &state->stepkfi, &state->stepkj);
-   state->repinneriterationscount++;
-   nlcslp_slpsendx(state, &state->stepkx);
-   state->f = state->stepkfi.xR[0] * state->fscales.xR[0];
-   state->xupdated = true;
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   state->xupdated = false;
-   checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->stepkx, n, &state->replcerr, &state->replcidx);
-   unscaleandchecknlcviolation(&state->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx);
-   goto lbl_14;
-lbl_13:
-// Merit function decreased, accept phase
-   state->meritfunctionhistory.xR[0] = f2;
-lbl_14:
-   goto lbl_10;
-lbl_9:
-// No phase #2
-lbl_10:
-// Update trust region
-   prevtrustrad = state->trustrad;
-   deltamax = 0.0;
-   for (i = 0; i < n; i++) {
-      deltamax = rmax2(deltamax, fabs(state->step0x.xR[i] - state->stepkx.xR[i]) / state->trustrad);
-   }
-   if (deltamax <= nlcslp_slpdeltadecrease) {
-      state->trustrad *= rmax2(deltamax / nlcslp_slpdeltadecrease, nlcslp_maxtrustraddecay);
-   }
-   if (deltamax >= nlcslp_slpdeltaincrease) {
-      state->trustrad *= rmin2(deltamax / nlcslp_slpdeltaincrease, nlcslp_maxtrustradgrowth);
-   }
-// Advance outer iteration counter, test stopping criteria
-   state->repouteriterationscount++;
-   if (fabs(state->stepkfi.xR[0] - state->step0fi.xR[0]) <= nlcslp_stagnationepsf * fabs(state->step0fi.xR[0])) {
-      state->fstagnationcnt++;
-   } else {
-      state->fstagnationcnt = 0;
-   }
-   if (state->trustrad <= state->epsx) {
-      state->repterminationtype = 2;
-      goto lbl_6;
-   }
-   if (state->maxits > 0 && state->repinneriterationscount >= state->maxits) {
-      state->repterminationtype = 5;
-      goto lbl_6;
-   }
-   if (state->fstagnationcnt >= nlcslp_fstagnationlimit) {
-      state->repterminationtype = 7;
-      goto lbl_6;
-   }
-   goto lbl_5;
-lbl_6:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = nslack;
    state->rstate.ia.xZ[2] = nec;
@@ -35835,7 +34892,7 @@ lbl_rcomm:
    state->rstate.ra.xR[9] = setscaleto;
    state->rstate.ra.xR[10] = prevtrustrad;
    state->rstate.ra.xR[11] = mu;
-   return result;
+   return true;
 }
 
 void minslpsubsolver_init(void *_p, bool make_automatic) {
@@ -37672,61 +36729,51 @@ static bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor)
    double v0;
    double v1;
    double v2;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstateaul.stage >= 0) {
-      n = state->rstateaul.ia.xZ[0];
-      nec = state->rstateaul.ia.xZ[1];
-      nic = state->rstateaul.ia.xZ[2];
-      ng = state->rstateaul.ia.xZ[3];
-      nh = state->rstateaul.ia.xZ[4];
-      i = state->rstateaul.ia.xZ[5];
-      j = state->rstateaul.ia.xZ[6];
-      outerit = state->rstateaul.ia.xZ[7];
-      preccounter = state->rstateaul.ia.xZ[8];
-      v = state->rstateaul.ra.xR[0];
-      vv = state->rstateaul.ra.xR[1];
-      p = state->rstateaul.ra.xR[2];
-      dp = state->rstateaul.ra.xR[3];
-      d2p = state->rstateaul.ra.xR[4];
-      v0 = state->rstateaul.ra.xR[5];
-      v1 = state->rstateaul.ra.xR[6];
-      v2 = state->rstateaul.ra.xR[7];
-   } else {
-      n = 809;
-      nec = 205;
-      nic = -838;
-      ng = 939;
-      nh = -526;
-      i = 763;
-      j = -541;
-      outerit = -698;
-      preccounter = -900;
-      v = -318;
-      vv = -940;
-      p = 1016;
-      dp = -229;
-      d2p = -536;
-      v0 = 487;
-      v1 = -115;
-      v2 = 886;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstateaul.stage < 0) goto Spawn;
+   n = state->rstateaul.ia.xZ[0];
+   nec = state->rstateaul.ia.xZ[1];
+   nic = state->rstateaul.ia.xZ[2];
+   ng = state->rstateaul.ia.xZ[3];
+   nh = state->rstateaul.ia.xZ[4];
+   i = state->rstateaul.ia.xZ[5];
+   j = state->rstateaul.ia.xZ[6];
+   outerit = state->rstateaul.ia.xZ[7];
+   preccounter = state->rstateaul.ia.xZ[8];
+   v = state->rstateaul.ra.xR[0];
+   vv = state->rstateaul.ra.xR[1];
+   p = state->rstateaul.ra.xR[2];
+   dp = state->rstateaul.ra.xR[3];
+   d2p = state->rstateaul.ra.xR[4];
+   v0 = state->rstateaul.ra.xR[5];
+   v1 = state->rstateaul.ra.xR[6];
+   v2 = state->rstateaul.ra.xR[7];
+   switch (state->rstateaul.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
+      default: goto Exit;
    }
-   if (state->rstateaul.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstateaul.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstateaul.stage == 2) {
-      goto lbl_2;
-   }
+Spawn:
+   n = 809;
+   nec = 205;
+   nic = -838;
+   ng = 939;
+   nh = -526;
+   i = 763;
+   j = -541;
+   outerit = -698;
+   preccounter = -900;
+   v = -318;
+   vv = -940;
+   p = 1016;
+   dp = -229;
+   d2p = -536;
+   v0 = 487;
+   v1 = -115;
+   v2 = 886;
 // Routine body
    ae_assert(state->solvertype == 0, "MinNLC: internal error");
    n = state->n;
@@ -37805,249 +36852,223 @@ static bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor)
    state->xkpresent = false;
    ae_assert(state->aulitscnt > 0, "MinNLC: integrity check failed");
    minnlc_clearpreconditioner(&state->auloptimizer);
-   outerit = 0;
-lbl_3:
-   if (outerit > state->aulitscnt - 1) {
-      goto lbl_5;
-   }
-// Optimize with current Lagrange multipliers
-//
-// NOTE: this code expects and checks that line search ends in the
-//       point which is used as beginning for the next search. Such
-//       guarantee is given by MCSRCH function.  L-BFGS  optimizer
-//       does not formally guarantee it, but it follows same rule.
-//       Below we a) rely on such property of the optimizer, and b)
-//       assert that it is true, in order to fail loudly if it is
-//       not true.
-//
-// NOTE: security check for NAN/INF in F/G is responsibility of
-//       LBFGS optimizer. AUL optimizer checks for NAN/INF only
-//       when we update Lagrange multipliers.
-   preccounter = 0;
-   minlbfgssetxrep(&state->auloptimizer, true);
-   minlbfgsrestartfrom(&state->auloptimizer, &state->xc);
-lbl_6:
-   if (!minlbfgsiteration(&state->auloptimizer)) {
-      goto lbl_7;
-   }
-   if (!state->auloptimizer.needfg) {
-      goto lbl_8;
-   }
-// Un-scale X, evaluate F/G/H, re-scale Jacobian
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = state->auloptimizer.x.xR[i] * state->s.xR[i];
-   }
-   state->needfij = true;
-   state->rstateaul.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needfij = false;
-   for (i = 0; i <= ng + nh; i++) {
-      for (j = 0; j < n; j++) {
-         state->j.xyR[i][j] *= state->s.xR[j];
-      }
-   }
-// Store data for estimation of Hessian norm:
-// * current point (re-scaled)
-// * gradient of the target function (re-scaled, unmodified)
-   ae_v_move(state->xk1.xR, 1, state->auloptimizer.x.xR, 1, n);
-   ae_v_move(state->gk1.xR, 1, state->j.xyR[0], 1, n);
-// Function being optimized
-   state->auloptimizer.f = state->fi.xR[0];
-   for (i = 0; i < n; i++) {
-      state->auloptimizer.g.xR[i] = state->j.xyR[0][i];
-   }
-// Send information to OptGuard monitor
-   smoothnessmonitorenqueuepoint(smonitor, &state->auloptimizer.d, state->auloptimizer.stp, &state->auloptimizer.x, &state->fi, &state->j);
-// Penalty for violation of boundary/linear/nonlinear constraints
-   minnlc_penaltybc(&state->auloptimizer.x, &state->scaledbndl, &state->hasbndl, &state->scaledbndu, &state->hasbndu, &state->nubc, n, state->rho, state->stabilizingpoint, &state->auloptimizer.f, &state->auloptimizer.g);
-   minnlc_penaltylc(&state->auloptimizer.x, &state->scaledcleic, &state->nulc, n, nec, nic, state->rho, state->stabilizingpoint, &state->auloptimizer.f, &state->auloptimizer.g);
-   minnlc_penaltynlc(&state->fi, &state->j, &state->nunlc, n, ng, nh, state->rho, state->stabilizingpoint, &state->auloptimizer.f, &state->auloptimizer.g);
-// Forward termination request if needed
-   if (state->userterminationneeded) {
-      minlbfgsrequesttermination(&state->auloptimizer);
-   }
-// To optimizer
-   goto lbl_6;
-lbl_8:
-   if (!state->auloptimizer.xupdated) {
-      goto lbl_10;
-   }
-// Report current point (if needed)
-   if (!state->xrep) {
-      goto lbl_12;
-   }
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = state->auloptimizer.x.xR[i] * state->s.xR[i];
-   }
-   state->f = state->auloptimizer.f;
-   state->xupdated = true;
-   state->rstateaul.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->xupdated = false;
-lbl_12:
-// Send information to OptGuard monitor
-   smoothnessmonitorfinalizelinesearch(smonitor);
-   smoothnessmonitorstartlinesearch(smonitor, &state->auloptimizer.x, &state->fi, &state->j);
-// Forward termination request if needed
-   if (state->userterminationneeded) {
-      minlbfgsrequesttermination(&state->auloptimizer);
-   }
-// Update constraints violation
-   checkbcviolation(&state->hasbndl, &state->scaledbndl, &state->hasbndu, &state->scaledbndu, &state->auloptimizer.x, n, &state->s, false, &state->repbcerr, &state->repbcidx);
-   checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->auloptimizer.x, n, &state->replcerr, &state->replcidx);
-   checknlcviolation(&state->fi, ng, nh, &state->repnlcerr, &state->repnlcidx);
-// Update GammaK
-   if (state->xkpresent) {
-   // XK/GK store beginning of current line search, and XK1/GK1
-   // store data for the end of the line search:
-   // * first, we Assert() that XK1 (last point where function
-   //   was evaluated) is same as AULOptimizer.X (what is
-   //   reported by RComm interface
-   // * calculate step length V2.
+   for (outerit = 0; outerit < state->aulitscnt; outerit++) {
+   // Optimize with current Lagrange multipliers
    //
-   // If V2>HessEstTol, then:
-   // * calculate V0 - directional derivative at XK,
-   //   and V1 - directional derivative at XK1
-   // * set GammaK to Max(GammaK, |V1-V0|/V2)
-      for (i = 0; i < n; i++) {
-         ae_assert(fabs(state->auloptimizer.x.xR[i] - state->xk1.xR[i]) <= 100 * machineepsilon || !(isfinite(state->auloptimizer.x.xR[i]) && isfinite(state->xk1.xR[i])), "MinNLC: integrity check failed, unexpected behavior of LBFGS optimizer");
+   // NOTE: this code expects and checks that line search ends in the
+   //       point which is used as beginning for the next search. Such
+   //       guarantee is given by MCSRCH function.  L-BFGS  optimizer
+   //       does not formally guarantee it, but it follows same rule.
+   //       Below we a) rely on such property of the optimizer, and b)
+   //       assert that it is true, in order to fail loudly if it is
+   //       not true.
+   //
+   // NOTE: security check for NAN/INF in F/G is responsibility of
+   //       LBFGS optimizer. AUL optimizer checks for NAN/INF only
+   //       when we update Lagrange multipliers.
+      preccounter = 0;
+      minlbfgssetxrep(&state->auloptimizer, true);
+      minlbfgsrestartfrom(&state->auloptimizer, &state->xc);
+      while (minlbfgsiteration(&state->auloptimizer)) {
+         if (state->auloptimizer.needfg) {
+         // Un-scale X, evaluate F/G/H, re-scale Jacobian
+            for (i = 0; i < n; i++) {
+               state->x.xR[i] = state->auloptimizer.x.xR[i] * state->s.xR[i];
+            }
+            state->needfij = true;
+            state->rstateaul.stage = 0; goto Pause; Resume0:
+            state->needfij = false;
+            for (i = 0; i <= ng + nh; i++) {
+               for (j = 0; j < n; j++) {
+                  state->j.xyR[i][j] *= state->s.xR[j];
+               }
+            }
+         // Store data for estimation of Hessian norm:
+         // * current point (re-scaled)
+         // * gradient of the target function (re-scaled, unmodified)
+            ae_v_move(state->xk1.xR, 1, state->auloptimizer.x.xR, 1, n);
+            ae_v_move(state->gk1.xR, 1, state->j.xyR[0], 1, n);
+         // Function being optimized
+            state->auloptimizer.f = state->fi.xR[0];
+            for (i = 0; i < n; i++) {
+               state->auloptimizer.g.xR[i] = state->j.xyR[0][i];
+            }
+         // Send information to OptGuard monitor
+            smoothnessmonitorenqueuepoint(smonitor, &state->auloptimizer.d, state->auloptimizer.stp, &state->auloptimizer.x, &state->fi, &state->j);
+         // Penalty for violation of boundary/linear/nonlinear constraints
+            minnlc_penaltybc(&state->auloptimizer.x, &state->scaledbndl, &state->hasbndl, &state->scaledbndu, &state->hasbndu, &state->nubc, n, state->rho, state->stabilizingpoint, &state->auloptimizer.f, &state->auloptimizer.g);
+            minnlc_penaltylc(&state->auloptimizer.x, &state->scaledcleic, &state->nulc, n, nec, nic, state->rho, state->stabilizingpoint, &state->auloptimizer.f, &state->auloptimizer.g);
+            minnlc_penaltynlc(&state->fi, &state->j, &state->nunlc, n, ng, nh, state->rho, state->stabilizingpoint, &state->auloptimizer.f, &state->auloptimizer.g);
+         // Forward termination request if needed
+            if (state->userterminationneeded) {
+               minlbfgsrequesttermination(&state->auloptimizer);
+            }
+         // To optimizer
+         // continue;
+         } else if (state->auloptimizer.xupdated) {
+         // Report current point (if needed)
+            if (state->xrep) {
+               for (i = 0; i < n; i++) {
+                  state->x.xR[i] = state->auloptimizer.x.xR[i] * state->s.xR[i];
+               }
+               state->f = state->auloptimizer.f;
+               state->xupdated = true;
+               state->rstateaul.stage = 1; goto Pause; Resume1:
+               state->xupdated = false;
+            }
+         // Send information to OptGuard monitor
+            smoothnessmonitorfinalizelinesearch(smonitor);
+            smoothnessmonitorstartlinesearch(smonitor, &state->auloptimizer.x, &state->fi, &state->j);
+         // Forward termination request if needed
+            if (state->userterminationneeded) {
+               minlbfgsrequesttermination(&state->auloptimizer);
+            }
+         // Update constraints violation
+            checkbcviolation(&state->hasbndl, &state->scaledbndl, &state->hasbndu, &state->scaledbndu, &state->auloptimizer.x, n, &state->s, false, &state->repbcerr, &state->repbcidx);
+            checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->auloptimizer.x, n, &state->replcerr, &state->replcidx);
+            checknlcviolation(&state->fi, ng, nh, &state->repnlcerr, &state->repnlcidx);
+         // Update GammaK
+            if (state->xkpresent) {
+            // XK/GK store beginning of current line search, and XK1/GK1
+            // store data for the end of the line search:
+            // * first, we Assert() that XK1 (last point where function
+            //   was evaluated) is same as AULOptimizer.X (what is
+            //   reported by RComm interface
+            // * calculate step length V2.
+            //
+            // If V2>HessEstTol, then:
+            // * calculate V0 - directional derivative at XK,
+            //   and V1 - directional derivative at XK1
+            // * set GammaK to Max(GammaK, |V1-V0|/V2)
+               for (i = 0; i < n; i++) {
+                  ae_assert(fabs(state->auloptimizer.x.xR[i] - state->xk1.xR[i]) <= 100 * machineepsilon || !(isfinite(state->auloptimizer.x.xR[i]) && isfinite(state->xk1.xR[i])), "MinNLC: integrity check failed, unexpected behavior of LBFGS optimizer");
+               }
+               v2 = 0.0;
+               for (i = 0; i < n; i++) {
+                  v2 += sqr(state->xk.xR[i] - state->xk1.xR[i]);
+               }
+               v2 = sqrt(v2);
+               if (v2 > minnlc_hessesttol) {
+                  v0 = 0.0;
+                  v1 = 0.0;
+                  for (i = 0; i < n; i++) {
+                     v = (state->xk.xR[i] - state->xk1.xR[i]) / v2;
+                     v0 += state->gk.xR[i] * v;
+                     v1 += state->gk1.xR[i] * v;
+                  }
+                  state->gammak = rmax2(state->gammak, fabs(v1 - v0) / v2);
+               }
+            } else {
+            // Beginning of the first line search, XK is not yet initialized.
+               ae_v_move(state->xk.xR, 1, state->xk1.xR, 1, n);
+               ae_v_move(state->gk.xR, 1, state->gk1.xR, 1, n);
+               state->xkpresent = true;
+            }
+         // Update preconsitioner using current GammaK
+            minnlc_updatepreconditioner(state->prectype, state->updatefreq, &preccounter, &state->auloptimizer, &state->auloptimizer.x, state->rho, state->gammak, &state->scaledbndl, &state->hasbndl, &state->scaledbndu, &state->hasbndu, &state->nubc, &state->scaledcleic, &state->nulc, &state->fi, &state->j, &state->nunlc, &state->bufd, &state->bufc, &state->bufw, &state->bufz, &state->tmp0, n, nec, nic, ng, nh);
+         } else ae_assert(false, "MinNLC: integrity check failed");
       }
-      v2 = 0.0;
-      for (i = 0; i < n; i++) {
-         v2 += sqr(state->xk.xR[i] - state->xk1.xR[i]);
+      minlbfgsresultsbuf(&state->auloptimizer, &state->xc, &state->aulreport);
+      state->repinneriterationscount += state->aulreport.iterationscount;
+      state->repnfev += state->aulreport.nfev;
+      state->repterminationtype = state->aulreport.terminationtype;
+      state->repouteriterationscount++;
+      if (state->repterminationtype <= 0 || state->repterminationtype == 8) {
+         break;
       }
-      v2 = sqrt(v2);
-      if (v2 > minnlc_hessesttol) {
-         v0 = 0.0;
-         v1 = 0.0;
-         for (i = 0; i < n; i++) {
-            v = (state->xk.xR[i] - state->xk1.xR[i]) / v2;
-            v0 += state->gk.xR[i] * v;
-            v1 += state->gk1.xR[i] * v;
+   // 1. Evaluate F/J
+   // 2. Check for NAN/INF in F/J: we just calculate sum of their
+   //    components, it should be enough to reduce vector/matrix to
+   //    just one value which either "normal" (all summands were "normal")
+   //    or NAN/INF (at least one summand was NAN/INF).
+   // 3. Update Lagrange multipliers
+      for (i = 0; i < n; i++) {
+         state->x.xR[i] = state->xc.xR[i] * state->s.xR[i];
+      }
+      state->needfij = true;
+      state->rstateaul.stage = 2; goto Pause; Resume2:
+      state->needfij = false;
+      v = 0.0;
+      for (i = 0; i <= ng + nh; i++) {
+         v = 0.1 * v + state->fi.xR[i];
+         for (j = 0; j < n; j++) {
+            v = 0.1 * v + state->j.xyR[i][j];
          }
-         state->gammak = rmax2(state->gammak, fabs(v1 - v0) / v2);
       }
-   } else {
-   // Beginning of the first line search, XK is not yet initialized.
-      ae_v_move(state->xk.xR, 1, state->xk1.xR, 1, n);
-      ae_v_move(state->gk.xR, 1, state->gk1.xR, 1, n);
-      state->xkpresent = true;
-   }
-// Update preconsitioner using current GammaK
-   minnlc_updatepreconditioner(state->prectype, state->updatefreq, &preccounter, &state->auloptimizer, &state->auloptimizer.x, state->rho, state->gammak, &state->scaledbndl, &state->hasbndl, &state->scaledbndu, &state->hasbndu, &state->nubc, &state->scaledcleic, &state->nulc, &state->fi, &state->j, &state->nunlc, &state->bufd, &state->bufc, &state->bufw, &state->bufz, &state->tmp0, n, nec, nic, ng, nh);
-   goto lbl_6;
-lbl_10:
-   ae_assert(false, "MinNLC: integrity check failed");
-   goto lbl_6;
-lbl_7:
-   minlbfgsresultsbuf(&state->auloptimizer, &state->xc, &state->aulreport);
-   state->repinneriterationscount += state->aulreport.iterationscount;
-   state->repnfev += state->aulreport.nfev;
-   state->repterminationtype = state->aulreport.terminationtype;
-   state->repouteriterationscount++;
-   if (state->repterminationtype <= 0 || state->repterminationtype == 8) {
-      goto lbl_5;
-   }
-// 1. Evaluate F/J
-// 2. Check for NAN/INF in F/J: we just calculate sum of their
-//    components, it should be enough to reduce vector/matrix to
-//    just one value which either "normal" (all summands were "normal")
-//    or NAN/INF (at least one summand was NAN/INF).
-// 3. Update Lagrange multipliers
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = state->xc.xR[i] * state->s.xR[i];
-   }
-   state->needfij = true;
-   state->rstateaul.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->needfij = false;
-   v = 0.0;
-   for (i = 0; i <= ng + nh; i++) {
-      v = 0.1 * v + state->fi.xR[i];
-      for (j = 0; j < n; j++) {
-         v = 0.1 * v + state->j.xyR[i][j];
+      if (!isfinite(v)) {
+      // Abnormal termination - infinities in function/gradient
+         state->repterminationtype = -8;
+         goto Exit;
       }
-   }
-   if (!isfinite(v)) {
-   // Abnormal termination - infinities in function/gradient
-      state->repterminationtype = -8;
-      result = false;
-      return result;
-   }
-   for (i = 0; i <= ng + nh; i++) {
-      for (j = 0; j < n; j++) {
-         state->j.xyR[i][j] *= state->s.xR[j];
+      for (i = 0; i <= ng + nh; i++) {
+         for (j = 0; j < n; j++) {
+            state->j.xyR[i][j] *= state->s.xR[j];
+         }
       }
-   }
-   for (i = 0; i < n; i++) {
-   // Process coefficients corresponding to equality-type
-   // constraints.
-      if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
-         minnlcequalitypenaltyfunction((state->xc.xR[i] - state->scaledbndl.xR[i]) * state->rho, &p, &dp, &d2p);
-         state->nubc.xR[2 * i + 0] = rboundval(state->nubc.xR[2 * i + 0] - dp, -minnlc_maxlagmult, minnlc_maxlagmult);
-         continue;
+      for (i = 0; i < n; i++) {
+      // Process coefficients corresponding to equality-type
+      // constraints.
+         if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
+            minnlcequalitypenaltyfunction((state->xc.xR[i] - state->scaledbndl.xR[i]) * state->rho, &p, &dp, &d2p);
+            state->nubc.xR[2 * i + 0] = rboundval(state->nubc.xR[2 * i + 0] - dp, -minnlc_maxlagmult, minnlc_maxlagmult);
+            continue;
+         }
+      // Process coefficients corresponding to inequality-type
+      // constraints. These coefficients have limited growth/decay
+      // per iteration which helps to stabilize algorithm.
+         ae_assert(minnlc_aulmaxgrowth > 1.0, "MinNLC: integrity error");
+         if (state->hasbndl.xB[i]) {
+            minnlcinequalityshiftfunction((state->xc.xR[i] - state->scaledbndl.xR[i]) * state->rho + 1, &p, &dp, &d2p);
+            v = fabs(dp);
+            v = rmin2(v, minnlc_aulmaxgrowth);
+            v = rmax2(v, 1 / minnlc_aulmaxgrowth);
+            state->nubc.xR[2 * i + 0] = rboundval(state->nubc.xR[2 * i + 0] * v, -minnlc_maxlagmult, minnlc_maxlagmult);
+         }
+         if (state->hasbndu.xB[i]) {
+            minnlcinequalityshiftfunction((state->scaledbndu.xR[i] - state->xc.xR[i]) * state->rho + 1, &p, &dp, &d2p);
+            v = fabs(dp);
+            v = rmin2(v, minnlc_aulmaxgrowth);
+            v = rmax2(v, 1 / minnlc_aulmaxgrowth);
+            state->nubc.xR[2 * i + 1] = rboundval(state->nubc.xR[2 * i + 1] * v, -minnlc_maxlagmult, minnlc_maxlagmult);
+         }
       }
-   // Process coefficients corresponding to inequality-type
-   // constraints. These coefficients have limited growth/decay
-   // per iteration which helps to stabilize algorithm.
-      ae_assert(minnlc_aulmaxgrowth > 1.0, "MinNLC: integrity error");
-      if (state->hasbndl.xB[i]) {
-         minnlcinequalityshiftfunction((state->xc.xR[i] - state->scaledbndl.xR[i]) * state->rho + 1, &p, &dp, &d2p);
-         v = fabs(dp);
-         v = rmin2(v, minnlc_aulmaxgrowth);
-         v = rmax2(v, 1 / minnlc_aulmaxgrowth);
-         state->nubc.xR[2 * i + 0] = rboundval(state->nubc.xR[2 * i + 0] * v, -minnlc_maxlagmult, minnlc_maxlagmult);
+      for (i = 0; i < nec + nic; i++) {
+         v = ae_v_dotproduct(state->scaledcleic.xyR[i], 1, state->xc.xR, 1, n);
+         v -= state->scaledcleic.xyR[i][n];
+         if (i < nec) {
+            minnlcequalitypenaltyfunction(v * state->rho, &p, &dp, &d2p);
+            state->nulc.xR[i] = rboundval(state->nulc.xR[i] - dp, -minnlc_maxlagmult, minnlc_maxlagmult);
+         } else {
+            minnlcinequalityshiftfunction(-v * state->rho + 1, &p, &dp, &d2p);
+            v = fabs(dp);
+            v = rmin2(v, minnlc_aulmaxgrowth);
+            v = rmax2(v, 1 / minnlc_aulmaxgrowth);
+            state->nulc.xR[i] = rboundval(state->nulc.xR[i] * v, -minnlc_maxlagmult, minnlc_maxlagmult);
+         }
       }
-      if (state->hasbndu.xB[i]) {
-         minnlcinequalityshiftfunction((state->scaledbndu.xR[i] - state->xc.xR[i]) * state->rho + 1, &p, &dp, &d2p);
-         v = fabs(dp);
-         v = rmin2(v, minnlc_aulmaxgrowth);
-         v = rmax2(v, 1 / minnlc_aulmaxgrowth);
-         state->nubc.xR[2 * i + 1] = rboundval(state->nubc.xR[2 * i + 1] * v, -minnlc_maxlagmult, minnlc_maxlagmult);
+      for (i = 1; i <= ng + nh; i++) {
+      // NOTE: loop index must start from 1, not zero!
+         v = state->fi.xR[i];
+         if (i <= ng) {
+            minnlcequalitypenaltyfunction(v * state->rho, &p, &dp, &d2p);
+            state->nunlc.xR[i - 1] = rboundval(state->nunlc.xR[i - 1] - dp, -minnlc_maxlagmult, minnlc_maxlagmult);
+         } else {
+            minnlcinequalityshiftfunction(-v * state->rho + 1, &p, &dp, &d2p);
+            v = fabs(dp);
+            v = rmin2(v, minnlc_aulmaxgrowth);
+            v = rmax2(v, 1 / minnlc_aulmaxgrowth);
+            state->nunlc.xR[i - 1] = rboundval(state->nunlc.xR[i - 1] * v, -minnlc_maxlagmult, minnlc_maxlagmult);
+         }
       }
    }
-   for (i = 0; i < nec + nic; i++) {
-      v = ae_v_dotproduct(state->scaledcleic.xyR[i], 1, state->xc.xR, 1, n);
-      v -= state->scaledcleic.xyR[i][n];
-      if (i < nec) {
-         minnlcequalitypenaltyfunction(v * state->rho, &p, &dp, &d2p);
-         state->nulc.xR[i] = rboundval(state->nulc.xR[i] - dp, -minnlc_maxlagmult, minnlc_maxlagmult);
-      } else {
-         minnlcinequalityshiftfunction(-v * state->rho + 1, &p, &dp, &d2p);
-         v = fabs(dp);
-         v = rmin2(v, minnlc_aulmaxgrowth);
-         v = rmax2(v, 1 / minnlc_aulmaxgrowth);
-         state->nulc.xR[i] = rboundval(state->nulc.xR[i] * v, -minnlc_maxlagmult, minnlc_maxlagmult);
-      }
-   }
-   for (i = 1; i <= ng + nh; i++) {
-   // NOTE: loop index must start from 1, not zero!
-      v = state->fi.xR[i];
-      if (i <= ng) {
-         minnlcequalitypenaltyfunction(v * state->rho, &p, &dp, &d2p);
-         state->nunlc.xR[i - 1] = rboundval(state->nunlc.xR[i - 1] - dp, -minnlc_maxlagmult, minnlc_maxlagmult);
-      } else {
-         minnlcinequalityshiftfunction(-v * state->rho + 1, &p, &dp, &d2p);
-         v = fabs(dp);
-         v = rmin2(v, minnlc_aulmaxgrowth);
-         v = rmax2(v, 1 / minnlc_aulmaxgrowth);
-         state->nunlc.xR[i - 1] = rboundval(state->nunlc.xR[i - 1] * v, -minnlc_maxlagmult, minnlc_maxlagmult);
-      }
-   }
-   outerit++;
-   goto lbl_3;
-lbl_5:
    for (i = 0; i < n; i++) {
       state->xc.xR[i] *= state->s.xR[i];
    }
-   result = false;
-   return result;
+Exit:
+   state->rstateaul.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstateaul.ia.xZ[0] = n;
    state->rstateaul.ia.xZ[1] = nec;
    state->rstateaul.ia.xZ[2] = nic;
@@ -38065,7 +37086,7 @@ lbl_rcomm:
    state->rstateaul.ra.xR[5] = v0;
    state->rstateaul.ra.xR[6] = v1;
    state->rstateaul.ra.xR[7] = v2;
-   return result;
+   return true;
 }
 
 // Unscales X (converts from scaled variables to original ones), paying special
@@ -38109,109 +37130,39 @@ bool minnlciteration(minnlcstate *state) {
    double vleft;
    double vright;
    bool b;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      i = state->rstate.ia.xZ[0];
-      k = state->rstate.ia.xZ[1];
-      n = state->rstate.ia.xZ[2];
-      ng = state->rstate.ia.xZ[3];
-      nh = state->rstate.ia.xZ[4];
-      b = state->rstate.ba.xB[0];
-      vleft = state->rstate.ra.xR[0];
-      vright = state->rstate.ra.xR[1];
-   } else {
-      i = 359;
-      k = -58;
-      n = -919;
-      ng = -909;
-      nh = 81;
-      b = true;
-      vleft = 74;
-      vright = -788;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   i = state->rstate.ia.xZ[0];
+   k = state->rstate.ia.xZ[1];
+   n = state->rstate.ia.xZ[2];
+   ng = state->rstate.ia.xZ[3];
+   nh = state->rstate.ia.xZ[4];
+   b = state->rstate.ba.xB[0];
+   vleft = state->rstate.ra.xR[0];
+   vright = state->rstate.ra.xR[1];
+   switch (state->rstate.stage) {
+      case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
+      case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
+      case 8: goto Resume08; case 9: goto Resume09; case 10: goto Resume10; case 11: goto Resume11;
+      case 12: goto Resume12; case 13: goto Resume13; case 14: goto Resume14; case 15: goto Resume15;
+      case 16: goto Resume16; case 17: goto Resume17; case 18: goto Resume18; case 19: goto Resume19;
+      case 20: goto Resume20; case 21: goto Resume21; case 22: goto Resume22;
+      case 23: goto Resume23; case 24: goto Resume24;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
-   if (state->rstate.stage == 5) {
-      goto lbl_5;
-   }
-   if (state->rstate.stage == 6) {
-      goto lbl_6;
-   }
-   if (state->rstate.stage == 7) {
-      goto lbl_7;
-   }
-   if (state->rstate.stage == 8) {
-      goto lbl_8;
-   }
-   if (state->rstate.stage == 9) {
-      goto lbl_9;
-   }
-   if (state->rstate.stage == 10) {
-      goto lbl_10;
-   }
-   if (state->rstate.stage == 11) {
-      goto lbl_11;
-   }
-   if (state->rstate.stage == 12) {
-      goto lbl_12;
-   }
-   if (state->rstate.stage == 13) {
-      goto lbl_13;
-   }
-   if (state->rstate.stage == 14) {
-      goto lbl_14;
-   }
-   if (state->rstate.stage == 15) {
-      goto lbl_15;
-   }
-   if (state->rstate.stage == 16) {
-      goto lbl_16;
-   }
-   if (state->rstate.stage == 17) {
-      goto lbl_17;
-   }
-   if (state->rstate.stage == 18) {
-      goto lbl_18;
-   }
-   if (state->rstate.stage == 19) {
-      goto lbl_19;
-   }
-   if (state->rstate.stage == 20) {
-      goto lbl_20;
-   }
-   if (state->rstate.stage == 21) {
-      goto lbl_21;
-   }
-   if (state->rstate.stage == 22) {
-      goto lbl_22;
-   }
-   if (state->rstate.stage == 23) {
-      goto lbl_23;
-   }
-   if (state->rstate.stage == 24) {
-      goto lbl_24;
-   }
+Spawn:
+   i = 359;
+   k = -58;
+   n = -919;
+   ng = -909;
+   nh = 81;
+   b = true;
+   vleft = 74;
+   vright = -788;
 // Routine body
 // Init
    state->userterminationneeded = false;
@@ -38243,457 +37194,317 @@ bool minnlciteration(minnlcstate *state) {
             state->repterminationtype = -3;
             state->repbcerr = state->bndl.xR[i] - state->bndu.xR[i];
             state->repbcidx = i;
-            result = false;
-            return result;
+            goto Exit;
          }
       }
    }
 // Test gradient
-   if (!(state->diffstep == 0.0 && state->teststep > 0.0)) {
-      goto lbl_25;
-   }
-lbl_27:
-   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xstart, &state->s, &state->bndl, &state->bndu, true, state->teststep)) {
-      goto lbl_28;
-   }
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = state->smonitor.x.xR[i];
-   }
-   state->needfij = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needfij = false;
-   for (i = 0; i <= ng + nh; i++) {
-      state->smonitor.fi.xR[i] = state->fi.xR[i];
-      for (k = 0; k < n; k++) {
-         state->smonitor.j.xyR[i][k] = state->j.xyR[i][k];
+   if (state->diffstep == 0.0 && state->teststep > 0.0) {
+      while (smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xstart, &state->s, &state->bndl, &state->bndu, true, state->teststep)) {
+         for (i = 0; i < n; i++) {
+            state->x.xR[i] = state->smonitor.x.xR[i];
+         }
+         state->needfij = true;
+         state->rstate.stage = 0; goto Pause; Resume00:
+         state->needfij = false;
+         for (i = 0; i <= ng + nh; i++) {
+            state->smonitor.fi.xR[i] = state->fi.xR[i];
+            for (k = 0; k < n; k++) {
+               state->smonitor.j.xyR[i][k] = state->j.xyR[i][k];
+            }
+         }
       }
    }
-   goto lbl_27;
-lbl_28:
-lbl_25:
-// AUL solver
-   if (state->solvertype != 0) {
-      goto lbl_29;
-   }
-   if (state->diffstep != 0.0) {
-      vectorsetlengthatleast(&state->xbase, n);
-      vectorsetlengthatleast(&state->fbase, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fm2, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fm1, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fp1, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fp2, 1 + ng + nh);
-   }
-   ae_vector_set_length(&state->rstateaul.ia, 8 + 1);
-   ae_vector_set_length(&state->rstateaul.ra, 7 + 1);
-   state->rstateaul.stage = -1;
-lbl_31:
-   if (!minnlc_auliteration(state, &state->smonitor)) {
-      goto lbl_32;
-   }
-// Numerical differentiation (if needed) - intercept NeedFiJ
-// request and replace it by sequence of NeedFi requests
-   if (!(state->diffstep != 0.0 && state->needfij)) {
-      goto lbl_33;
-   }
-   state->needfij = false;
-   state->needfi = true;
-   ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
-   k = 0;
-lbl_35:
-   if (k > n - 1) {
-      goto lbl_37;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] -= state->s.xR[k] * state->diffstep;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   ae_v_move(state->fm2.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] -= 0.5 * state->s.xR[k] * state->diffstep;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] += 0.5 * state->s.xR[k] * state->diffstep;
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] += state->s.xR[k] * state->diffstep;
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   ae_v_move(state->fp2.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   for (i = 0; i <= ng + nh; i++) {
-      state->j.xyR[i][k] = (8 * (state->fp1.xR[i] - state->fm1.xR[i]) - (state->fp2.xR[i] - state->fm2.xR[i])) / (6 * state->diffstep * state->s.xR[i]);
-   }
-   k++;
-   goto lbl_35;
-lbl_37:
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->rstate.stage = 5;
-   goto lbl_rcomm;
-lbl_5:
-// Restore previous values of fields and continue
-   state->needfi = false;
-   state->needfij = true;
-   goto lbl_31;
-lbl_33:
-// Forward request to caller
-   state->rstate.stage = 6;
-   goto lbl_rcomm;
-lbl_6:
-   goto lbl_31;
-lbl_32:
-   result = false;
-   return result;
-lbl_29:
-// SLP solver
-   if (state->solvertype != 1) {
-      goto lbl_38;
-   }
-   if (state->diffstep != 0.0) {
-      vectorsetlengthatleast(&state->xbase, n);
-      vectorsetlengthatleast(&state->fbase, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fm2, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fm1, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fp1, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fp2, 1 + ng + nh);
-   }
-   minslpinitbuf(&state->bndl, &state->bndu, &state->s, &state->xstart, n, &state->cleic, &state->lcsrcidx, state->nec, state->nic, state->ng, state->nh, state->epsx, state->maxits, &state->slpsolverstate);
-lbl_40:
-   if (!minslpiteration(&state->slpsolverstate, &state->smonitor, state->userterminationneeded)) {
-      goto lbl_41;
-   }
-// Forward request to caller
-   if (!state->slpsolverstate.needfij) {
-      goto lbl_42;
-   }
-// Evaluate target function/Jacobian
-   if (state->diffstep != 0.0) {
-      goto lbl_44;
-   }
-// Analytic Jacobian is provided
-   minnlc_unscale(state, &state->slpsolverstate.x, &state->slpsolverstate.scaledbndl, &state->slpsolverstate.scaledbndu, &state->x);
-   state->needfij = true;
-   state->rstate.stage = 7;
-   goto lbl_rcomm;
-lbl_7:
-   state->needfij = false;
-   for (i = 0; i <= ng + nh; i++) {
-      state->slpsolverstate.fi.xR[i] = state->fi.xR[i];
-      for (k = 0; k < n; k++) {
-         state->slpsolverstate.j.xyR[i][k] = state->j.xyR[i][k] * state->s.xR[k];
+   if (state->solvertype == 0) { // AUL solver
+      if (state->diffstep != 0.0) {
+         vectorsetlengthatleast(&state->xbase, n);
+         vectorsetlengthatleast(&state->fbase, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fm2, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fm1, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fp1, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fp2, 1 + ng + nh);
       }
-   }
-   goto lbl_45;
-lbl_44:
-// Numerical differentiation
-   state->needfij = false;
-   state->needfi = true;
-   minnlc_unscale(state, &state->slpsolverstate.x, &state->slpsolverstate.scaledbndl, &state->slpsolverstate.scaledbndu, &state->xbase);
-   k = 0;
-lbl_46:
-   if (k > n - 1) {
-      goto lbl_48;
-   }
-   vleft = state->xbase.xR[k] - state->s.xR[k] * state->diffstep;
-   vright = state->xbase.xR[k] + state->s.xR[k] * state->diffstep;
-   if (!((state->hasbndl.xB[k] && vleft < state->bndl.xR[k]) || (state->hasbndu.xB[k] && vright > state->bndu.xR[k]))) {
-      goto lbl_49;
-   }
-// Box constraint is violated by 4-point centered formula, use 2-point uncentered one
-   if (state->hasbndl.xB[k] && vleft < state->bndl.xR[k]) {
-      vleft = state->bndl.xR[k];
-   }
-   if (state->hasbndu.xB[k] && vright > state->bndu.xR[k]) {
-      vright = state->bndu.xR[k];
-   }
-   ae_assert(vleft <= vright, "MinNLC: integrity check failed");
-   if (vleft == vright) {
-   // Fixed variable
-      for (i = 0; i <= ng + nh; i++) {
-         state->j.xyR[i][k] = 0.0;
+      ae_vector_set_length(&state->rstateaul.ia, 8 + 1);
+      ae_vector_set_length(&state->rstateaul.ra, 7 + 1);
+      state->rstateaul.stage = -1;
+      while (minnlc_auliteration(state, &state->smonitor)) {
+      // Numerical differentiation (if needed) - intercept NeedFiJ
+      // request and replace it by sequence of NeedFi requests
+         if (state->diffstep != 0.0 && state->needfij) {
+            state->needfij = false;
+            state->needfi = true;
+            ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
+            for (k = 0; k < n; k++) {
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               state->x.xR[k] -= state->s.xR[k] * state->diffstep;
+               state->rstate.stage = 1; goto Pause; Resume01:
+               ae_v_move(state->fm2.xR, 1, state->fi.xR, 1, ng + nh + 1);
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               state->x.xR[k] -= 0.5 * state->s.xR[k] * state->diffstep;
+               state->rstate.stage = 2; goto Pause; Resume02:
+               ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, ng + nh + 1);
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               state->x.xR[k] += 0.5 * state->s.xR[k] * state->diffstep;
+               state->rstate.stage = 3; goto Pause; Resume03:
+               ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, ng + nh + 1);
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               state->x.xR[k] += state->s.xR[k] * state->diffstep;
+               state->rstate.stage = 4; goto Pause; Resume04:
+               ae_v_move(state->fp2.xR, 1, state->fi.xR, 1, ng + nh + 1);
+               for (i = 0; i <= ng + nh; i++) {
+                  state->j.xyR[i][k] = (8 * (state->fp1.xR[i] - state->fm1.xR[i]) - (state->fp2.xR[i] - state->fm2.xR[i])) / (6 * state->diffstep * state->s.xR[i]);
+               }
+            }
+            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+            state->rstate.stage = 5; goto Pause; Resume05:
+         // Restore previous values of fields and continue
+            state->needfi = false;
+            state->needfij = true;
+         } else {
+         // Forward request to caller
+            state->rstate.stage = 6; goto Pause; Resume06: ;
+         }
       }
-      goto lbl_47;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] = vleft;
-   state->rstate.stage = 8;
-   goto lbl_rcomm;
-lbl_8:
-   ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] = vright;
-   state->rstate.stage = 9;
-   goto lbl_rcomm;
-lbl_9:
-   ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   for (i = 0; i <= ng + nh; i++) {
-      state->j.xyR[i][k] = (state->fp1.xR[i] - state->fm1.xR[i]) / (vright - vleft);
-   }
-   goto lbl_50;
-lbl_49:
-// 4-point centered formula does not violate box constraints
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] -= state->s.xR[k] * state->diffstep;
-   state->rstate.stage = 10;
-   goto lbl_rcomm;
-lbl_10:
-   ae_v_move(state->fm2.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] -= 0.5 * state->s.xR[k] * state->diffstep;
-   state->rstate.stage = 11;
-   goto lbl_rcomm;
-lbl_11:
-   ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] += 0.5 * state->s.xR[k] * state->diffstep;
-   state->rstate.stage = 12;
-   goto lbl_rcomm;
-lbl_12:
-   ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] += state->s.xR[k] * state->diffstep;
-   state->rstate.stage = 13;
-   goto lbl_rcomm;
-lbl_13:
-   ae_v_move(state->fp2.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   for (i = 0; i <= ng + nh; i++) {
-      state->j.xyR[i][k] = (8 * (state->fp1.xR[i] - state->fm1.xR[i]) - (state->fp2.xR[i] - state->fm2.xR[i])) / (6 * state->diffstep * state->s.xR[k]);
-   }
-lbl_50:
-lbl_47:
-   k++;
-   goto lbl_46;
-lbl_48:
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->rstate.stage = 14;
-   goto lbl_rcomm;
-lbl_14:
-   state->needfi = false;
-   state->needfij = true;
-   for (i = 0; i <= ng + nh; i++) {
-      state->slpsolverstate.fi.xR[i] = state->fi.xR[i];
-      for (k = 0; k < n; k++) {
-         state->slpsolverstate.j.xyR[i][k] = state->j.xyR[i][k] * state->s.xR[k];
+   } else if (state->solvertype == 1) { // SLP solver
+      if (state->diffstep != 0.0) {
+         vectorsetlengthatleast(&state->xbase, n);
+         vectorsetlengthatleast(&state->fbase, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fm2, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fm1, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fp1, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fp2, 1 + ng + nh);
       }
-   }
-lbl_45:
-   state->repnfev++;
-   goto lbl_40;
-lbl_42:
-   if (!state->slpsolverstate.xupdated) {
-      goto lbl_51;
-   }
-// Report current point
-   if (!state->xrep) {
-      goto lbl_53;
-   }
-   minnlc_unscale(state, &state->slpsolverstate.x, &state->slpsolverstate.scaledbndl, &state->slpsolverstate.scaledbndu, &state->x);
-   state->f = state->slpsolverstate.f;
-   state->xupdated = true;
-   state->rstate.stage = 15;
-   goto lbl_rcomm;
-lbl_15:
-   state->xupdated = false;
-lbl_53:
-   goto lbl_40;
-lbl_51:
-   ae_assert(state->slpsolverstate.needfij, "NLC:SLP:request");
-   goto lbl_40;
-lbl_41:
-   state->repterminationtype = state->slpsolverstate.repterminationtype;
-   state->repouteriterationscount = state->slpsolverstate.repouteriterationscount;
-   state->repinneriterationscount = state->slpsolverstate.repinneriterationscount;
-   state->repbcerr = state->slpsolverstate.repbcerr;
-   state->repbcidx = state->slpsolverstate.repbcidx;
-   state->replcerr = state->slpsolverstate.replcerr;
-   state->replcidx = state->slpsolverstate.replcidx;
-   state->repnlcerr = state->slpsolverstate.repnlcerr;
-   state->repnlcidx = state->slpsolverstate.repnlcidx;
-   minnlc_unscale(state, &state->slpsolverstate.stepkx, &state->slpsolverstate.scaledbndl, &state->slpsolverstate.scaledbndu, &state->xc);
-   result = false;
-   return result;
-lbl_38:
-// SQP solver
-   if (state->solvertype != 2) {
-      goto lbl_55;
-   }
-   if (state->diffstep != 0.0) {
-      vectorsetlengthatleast(&state->xbase, n);
-      vectorsetlengthatleast(&state->fbase, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fm2, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fm1, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fp1, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fp2, 1 + ng + nh);
-   }
-   minsqpinitbuf(&state->bndl, &state->bndu, &state->s, &state->xstart, n, &state->cleic, &state->lcsrcidx, state->nec, state->nic, state->ng, state->nh, state->epsx, state->maxits, &state->sqpsolverstate);
-lbl_57:
-   if (!minsqpiteration(&state->sqpsolverstate, &state->smonitor, state->userterminationneeded)) {
-      goto lbl_58;
-   }
-// Forward request to caller
-   if (!state->sqpsolverstate.needfij) {
-      goto lbl_59;
-   }
-// Evaluate target function/Jacobian
-   if (state->diffstep != 0.0) {
-      goto lbl_61;
-   }
-// Analytic Jacobian is provided
-   minnlc_unscale(state, &state->sqpsolverstate.x, &state->sqpsolverstate.scaledbndl, &state->sqpsolverstate.scaledbndu, &state->x);
-   state->needfij = true;
-   state->rstate.stage = 16;
-   goto lbl_rcomm;
-lbl_16:
-   state->needfij = false;
-   for (i = 0; i <= ng + nh; i++) {
-      state->sqpsolverstate.fi.xR[i] = state->fi.xR[i];
-      for (k = 0; k < n; k++) {
-         state->sqpsolverstate.j.xyR[i][k] = state->j.xyR[i][k] * state->s.xR[k];
+      minslpinitbuf(&state->bndl, &state->bndu, &state->s, &state->xstart, n, &state->cleic, &state->lcsrcidx, state->nec, state->nic, state->ng, state->nh, state->epsx, state->maxits, &state->slpsolverstate);
+      while (minslpiteration(&state->slpsolverstate, &state->smonitor, state->userterminationneeded)) {
+      // Forward request to caller
+         if (state->slpsolverstate.needfij) {
+         // Evaluate target function/Jacobian
+            if (state->diffstep == 0.0) {
+            // Analytic Jacobian is provided
+               minnlc_unscale(state, &state->slpsolverstate.x, &state->slpsolverstate.scaledbndl, &state->slpsolverstate.scaledbndu, &state->x);
+               state->needfij = true;
+               state->rstate.stage = 7; goto Pause; Resume07:
+               state->needfij = false;
+               for (i = 0; i <= ng + nh; i++) {
+                  state->slpsolverstate.fi.xR[i] = state->fi.xR[i];
+                  for (k = 0; k < n; k++) {
+                     state->slpsolverstate.j.xyR[i][k] = state->j.xyR[i][k] * state->s.xR[k];
+                  }
+               }
+            } else {
+            // Numerical differentiation
+               state->needfij = false;
+               state->needfi = true;
+               minnlc_unscale(state, &state->slpsolverstate.x, &state->slpsolverstate.scaledbndl, &state->slpsolverstate.scaledbndu, &state->xbase);
+               for (k = 0; k < n; k++) {
+                  vleft = state->xbase.xR[k] - state->s.xR[k] * state->diffstep;
+                  vright = state->xbase.xR[k] + state->s.xR[k] * state->diffstep;
+                  if ((state->hasbndl.xB[k] && vleft < state->bndl.xR[k]) || (state->hasbndu.xB[k] && vright > state->bndu.xR[k])) {
+                  // Box constraint is violated by 4-point centered formula, use 2-point uncentered one
+                     if (state->hasbndl.xB[k] && vleft < state->bndl.xR[k]) {
+                        vleft = state->bndl.xR[k];
+                     }
+                     if (state->hasbndu.xB[k] && vright > state->bndu.xR[k]) {
+                        vright = state->bndu.xR[k];
+                     }
+                     ae_assert(vleft <= vright, "MinNLC: integrity check failed");
+                     if (vleft == vright) {
+                     // Fixed variable
+                        for (i = 0; i <= ng + nh; i++) {
+                           state->j.xyR[i][k] = 0.0;
+                        }
+                        continue;
+                     }
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] = vleft;
+                     state->rstate.stage = 8; goto Pause; Resume08:
+                     ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, ng + nh + 1);
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] = vright;
+                     state->rstate.stage = 9; goto Pause; Resume09:
+                     ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, ng + nh + 1);
+                     for (i = 0; i <= ng + nh; i++) {
+                        state->j.xyR[i][k] = (state->fp1.xR[i] - state->fm1.xR[i]) / (vright - vleft);
+                     }
+                  } else {
+                  // 4-point centered formula does not violate box constraints
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] -= state->s.xR[k] * state->diffstep;
+                     state->rstate.stage = 10; goto Pause; Resume10:
+                     ae_v_move(state->fm2.xR, 1, state->fi.xR, 1, ng + nh + 1);
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] -= 0.5 * state->s.xR[k] * state->diffstep;
+                     state->rstate.stage = 11; goto Pause; Resume11:
+                     ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, ng + nh + 1);
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] += 0.5 * state->s.xR[k] * state->diffstep;
+                     state->rstate.stage = 12; goto Pause; Resume12:
+                     ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, ng + nh + 1);
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] += state->s.xR[k] * state->diffstep;
+                     state->rstate.stage = 13; goto Pause; Resume13:
+                     ae_v_move(state->fp2.xR, 1, state->fi.xR, 1, ng + nh + 1);
+                     for (i = 0; i <= ng + nh; i++) {
+                        state->j.xyR[i][k] = (8 * (state->fp1.xR[i] - state->fm1.xR[i]) - (state->fp2.xR[i] - state->fm2.xR[i])) / (6 * state->diffstep * state->s.xR[k]);
+                     }
+                  }
+               }
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               state->rstate.stage = 14; goto Pause; Resume14:
+               state->needfi = false;
+               state->needfij = true;
+               for (i = 0; i <= ng + nh; i++) {
+                  state->slpsolverstate.fi.xR[i] = state->fi.xR[i];
+                  for (k = 0; k < n; k++) {
+                     state->slpsolverstate.j.xyR[i][k] = state->j.xyR[i][k] * state->s.xR[k];
+                  }
+               }
+            }
+            state->repnfev++;
+         } else if (state->slpsolverstate.xupdated) {
+         // Report current point
+            if (state->xrep) {
+               minnlc_unscale(state, &state->slpsolverstate.x, &state->slpsolverstate.scaledbndl, &state->slpsolverstate.scaledbndu, &state->x);
+               state->f = state->slpsolverstate.f;
+               state->xupdated = true;
+               state->rstate.stage = 15; goto Pause; Resume15:
+               state->xupdated = false;
+            }
+         } else ae_assert(state->slpsolverstate.needfij, "NLC:SLP:request");
       }
-   }
-   goto lbl_62;
-lbl_61:
-// Numerical differentiation
-   state->needfij = false;
-   state->needfi = true;
-   minnlc_unscale(state, &state->sqpsolverstate.x, &state->sqpsolverstate.scaledbndl, &state->sqpsolverstate.scaledbndu, &state->xbase);
-   k = 0;
-lbl_63:
-   if (k > n - 1) {
-      goto lbl_65;
-   }
-   vleft = state->xbase.xR[k] - state->s.xR[k] * state->diffstep;
-   vright = state->xbase.xR[k] + state->s.xR[k] * state->diffstep;
-   if (!((state->hasbndl.xB[k] && vleft < state->bndl.xR[k]) || (state->hasbndu.xB[k] && vright > state->bndu.xR[k]))) {
-      goto lbl_66;
-   }
-// Box constraint is violated by 4-point centered formula, use 2-point uncentered one
-   if (state->hasbndl.xB[k] && vleft < state->bndl.xR[k]) {
-      vleft = state->bndl.xR[k];
-   }
-   if (state->hasbndu.xB[k] && vright > state->bndu.xR[k]) {
-      vright = state->bndu.xR[k];
-   }
-   ae_assert(vleft <= vright, "MinNLC: integrity check failed");
-   if (vleft == vright) {
-   // Fixed variable
-      for (i = 0; i <= ng + nh; i++) {
-         state->j.xyR[i][k] = 0.0;
+      state->repterminationtype = state->slpsolverstate.repterminationtype;
+      state->repouteriterationscount = state->slpsolverstate.repouteriterationscount;
+      state->repinneriterationscount = state->slpsolverstate.repinneriterationscount;
+      state->repbcerr = state->slpsolverstate.repbcerr;
+      state->repbcidx = state->slpsolverstate.repbcidx;
+      state->replcerr = state->slpsolverstate.replcerr;
+      state->replcidx = state->slpsolverstate.replcidx;
+      state->repnlcerr = state->slpsolverstate.repnlcerr;
+      state->repnlcidx = state->slpsolverstate.repnlcidx;
+      minnlc_unscale(state, &state->slpsolverstate.stepkx, &state->slpsolverstate.scaledbndl, &state->slpsolverstate.scaledbndu, &state->xc);
+   } else if (state->solvertype == 2) { // SQP solver
+      if (state->diffstep != 0.0) {
+         vectorsetlengthatleast(&state->xbase, n);
+         vectorsetlengthatleast(&state->fbase, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fm2, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fm1, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fp1, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fp2, 1 + ng + nh);
       }
-      goto lbl_64;
-   }
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] = vleft;
-   state->rstate.stage = 17;
-   goto lbl_rcomm;
-lbl_17:
-   ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] = vright;
-   state->rstate.stage = 18;
-   goto lbl_rcomm;
-lbl_18:
-   ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   for (i = 0; i <= ng + nh; i++) {
-      state->j.xyR[i][k] = (state->fp1.xR[i] - state->fm1.xR[i]) / (vright - vleft);
-   }
-   goto lbl_67;
-lbl_66:
-// 4-point centered formula does not violate box constraints
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] -= state->s.xR[k] * state->diffstep;
-   state->rstate.stage = 19;
-   goto lbl_rcomm;
-lbl_19:
-   ae_v_move(state->fm2.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] -= 0.5 * state->s.xR[k] * state->diffstep;
-   state->rstate.stage = 20;
-   goto lbl_rcomm;
-lbl_20:
-   ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] += 0.5 * state->s.xR[k] * state->diffstep;
-   state->rstate.stage = 21;
-   goto lbl_rcomm;
-lbl_21:
-   ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->x.xR[k] += state->s.xR[k] * state->diffstep;
-   state->rstate.stage = 22;
-   goto lbl_rcomm;
-lbl_22:
-   ae_v_move(state->fp2.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   for (i = 0; i <= ng + nh; i++) {
-      state->j.xyR[i][k] = (8 * (state->fp1.xR[i] - state->fm1.xR[i]) - (state->fp2.xR[i] - state->fm2.xR[i])) / (6 * state->diffstep * state->s.xR[k]);
-   }
-lbl_67:
-lbl_64:
-   k++;
-   goto lbl_63;
-lbl_65:
-   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-   state->rstate.stage = 23;
-   goto lbl_rcomm;
-lbl_23:
-   state->needfi = false;
-   state->needfij = true;
-   for (i = 0; i <= ng + nh; i++) {
-      state->sqpsolverstate.fi.xR[i] = state->fi.xR[i];
-      for (k = 0; k < n; k++) {
-         state->sqpsolverstate.j.xyR[i][k] = state->j.xyR[i][k] * state->s.xR[k];
+      minsqpinitbuf(&state->bndl, &state->bndu, &state->s, &state->xstart, n, &state->cleic, &state->lcsrcidx, state->nec, state->nic, state->ng, state->nh, state->epsx, state->maxits, &state->sqpsolverstate);
+      while (minsqpiteration(&state->sqpsolverstate, &state->smonitor, state->userterminationneeded)) {
+      // Forward request to caller
+         if (state->sqpsolverstate.needfij) {
+         // Evaluate target function/Jacobian
+            if (state->diffstep == 0.0) {
+            // Analytic Jacobian is provided
+               minnlc_unscale(state, &state->sqpsolverstate.x, &state->sqpsolverstate.scaledbndl, &state->sqpsolverstate.scaledbndu, &state->x);
+               state->needfij = true;
+               state->rstate.stage = 16; goto Pause; Resume16:
+               state->needfij = false;
+               for (i = 0; i <= ng + nh; i++) {
+                  state->sqpsolverstate.fi.xR[i] = state->fi.xR[i];
+                  for (k = 0; k < n; k++) {
+                     state->sqpsolverstate.j.xyR[i][k] = state->j.xyR[i][k] * state->s.xR[k];
+                  }
+               }
+            } else {
+            // Numerical differentiation
+               state->needfij = false;
+               state->needfi = true;
+               minnlc_unscale(state, &state->sqpsolverstate.x, &state->sqpsolverstate.scaledbndl, &state->sqpsolverstate.scaledbndu, &state->xbase);
+               for (k = 0; k < n; k++) {
+                  vleft = state->xbase.xR[k] - state->s.xR[k] * state->diffstep;
+                  vright = state->xbase.xR[k] + state->s.xR[k] * state->diffstep;
+                  if ((state->hasbndl.xB[k] && vleft < state->bndl.xR[k]) || (state->hasbndu.xB[k] && vright > state->bndu.xR[k])) {
+                  // Box constraint is violated by 4-point centered formula, use 2-point uncentered one
+                     if (state->hasbndl.xB[k] && vleft < state->bndl.xR[k]) {
+                        vleft = state->bndl.xR[k];
+                     }
+                     if (state->hasbndu.xB[k] && vright > state->bndu.xR[k]) {
+                        vright = state->bndu.xR[k];
+                     }
+                     ae_assert(vleft <= vright, "MinNLC: integrity check failed");
+                     if (vleft == vright) {
+                     // Fixed variable
+                        for (i = 0; i <= ng + nh; i++) {
+                           state->j.xyR[i][k] = 0.0;
+                        }
+                        continue;
+                     }
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] = vleft;
+                     state->rstate.stage = 17; goto Pause; Resume17:
+                     ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, ng + nh + 1);
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] = vright;
+                     state->rstate.stage = 18; goto Pause; Resume18:
+                     ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, ng + nh + 1);
+                     for (i = 0; i <= ng + nh; i++) {
+                        state->j.xyR[i][k] = (state->fp1.xR[i] - state->fm1.xR[i]) / (vright - vleft);
+                     }
+                  } else {
+                  // 4-point centered formula does not violate box constraints
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] -= state->s.xR[k] * state->diffstep;
+                     state->rstate.stage = 19; goto Pause; Resume19:
+                     ae_v_move(state->fm2.xR, 1, state->fi.xR, 1, ng + nh + 1);
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] -= 0.5 * state->s.xR[k] * state->diffstep;
+                     state->rstate.stage = 20; goto Pause; Resume20:
+                     ae_v_move(state->fm1.xR, 1, state->fi.xR, 1, ng + nh + 1);
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] += 0.5 * state->s.xR[k] * state->diffstep;
+                     state->rstate.stage = 21; goto Pause; Resume21:
+                     ae_v_move(state->fp1.xR, 1, state->fi.xR, 1, ng + nh + 1);
+                     ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+                     state->x.xR[k] += state->s.xR[k] * state->diffstep;
+                     state->rstate.stage = 22; goto Pause; Resume22:
+                     ae_v_move(state->fp2.xR, 1, state->fi.xR, 1, ng + nh + 1);
+                     for (i = 0; i <= ng + nh; i++) {
+                        state->j.xyR[i][k] = (8 * (state->fp1.xR[i] - state->fm1.xR[i]) - (state->fp2.xR[i] - state->fm2.xR[i])) / (6 * state->diffstep * state->s.xR[k]);
+                     }
+                  }
+               }
+               ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               state->rstate.stage = 23; goto Pause; Resume23:
+               state->needfi = false;
+               state->needfij = true;
+               for (i = 0; i <= ng + nh; i++) {
+                  state->sqpsolverstate.fi.xR[i] = state->fi.xR[i];
+                  for (k = 0; k < n; k++) {
+                     state->sqpsolverstate.j.xyR[i][k] = state->j.xyR[i][k] * state->s.xR[k];
+                  }
+               }
+            }
+            state->repnfev++;
+         } else if (state->sqpsolverstate.xupdated) {
+         // Report current point
+            if (state->xrep) {
+               minnlc_unscale(state, &state->sqpsolverstate.x, &state->sqpsolverstate.scaledbndl, &state->sqpsolverstate.scaledbndu, &state->x);
+               state->f = state->sqpsolverstate.f;
+               state->xupdated = true;
+               state->rstate.stage = 24; goto Pause; Resume24:
+               state->xupdated = false;
+            }
+         } else ae_assert(state->sqpsolverstate.needfij, "NLC:SQP:request");
       }
+      state->repterminationtype = state->sqpsolverstate.repterminationtype;
+      state->repouteriterationscount = state->sqpsolverstate.repiterationscount;
+      state->repinneriterationscount = state->sqpsolverstate.repiterationscount;
+      state->repbcerr = state->sqpsolverstate.repbcerr;
+      state->repbcidx = state->sqpsolverstate.repbcidx;
+      state->replcerr = state->sqpsolverstate.replcerr;
+      state->replcidx = state->sqpsolverstate.replcidx;
+      state->repnlcerr = state->sqpsolverstate.repnlcerr;
+      state->repnlcidx = state->sqpsolverstate.repnlcidx;
+      minnlc_unscale(state, &state->sqpsolverstate.stepkx, &state->sqpsolverstate.scaledbndl, &state->sqpsolverstate.scaledbndu, &state->xc);
    }
-lbl_62:
-   state->repnfev++;
-   goto lbl_57;
-lbl_59:
-   if (!state->sqpsolverstate.xupdated) {
-      goto lbl_68;
-   }
-// Report current point
-   if (!state->xrep) {
-      goto lbl_70;
-   }
-   minnlc_unscale(state, &state->sqpsolverstate.x, &state->sqpsolverstate.scaledbndl, &state->sqpsolverstate.scaledbndu, &state->x);
-   state->f = state->sqpsolverstate.f;
-   state->xupdated = true;
-   state->rstate.stage = 24;
-   goto lbl_rcomm;
-lbl_24:
-   state->xupdated = false;
-lbl_70:
-   goto lbl_57;
-lbl_68:
-   ae_assert(state->sqpsolverstate.needfij, "NLC:SQP:request");
-   goto lbl_57;
-lbl_58:
-   state->repterminationtype = state->sqpsolverstate.repterminationtype;
-   state->repouteriterationscount = state->sqpsolverstate.repiterationscount;
-   state->repinneriterationscount = state->sqpsolverstate.repiterationscount;
-   state->repbcerr = state->sqpsolverstate.repbcerr;
-   state->repbcidx = state->sqpsolverstate.repbcidx;
-   state->replcerr = state->sqpsolverstate.replcerr;
-   state->replcidx = state->sqpsolverstate.replcidx;
-   state->repnlcerr = state->sqpsolverstate.repnlcerr;
-   state->repnlcidx = state->sqpsolverstate.repnlcidx;
-   minnlc_unscale(state, &state->sqpsolverstate.stepkx, &state->sqpsolverstate.scaledbndl, &state->sqpsolverstate.scaledbndu, &state->xc);
-   result = false;
-   return result;
-lbl_55:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = i;
    state->rstate.ia.xZ[1] = k;
    state->rstate.ia.xZ[2] = n;
@@ -38702,7 +37513,7 @@ lbl_rcomm:
    state->rstate.ba.xB[0] = b;
    state->rstate.ra.xR[0] = vleft;
    state->rstate.ra.xR[1] = vright;
-   return result;
+   return true;
 }
 
 // This  function  activates/deactivates verification  of  the  user-supplied
@@ -40794,86 +39605,73 @@ static bool minns_agsiteration(minnsstate *state) {
    ae_int_t maxbacktrackits;
    bool fullsample;
    double currentf0;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstateags.stage >= 0) {
-      n = state->rstateags.ia.xZ[0];
-      nec = state->rstateags.ia.xZ[1];
-      nic = state->rstateags.ia.xZ[2];
-      ng = state->rstateags.ia.xZ[3];
-      nh = state->rstateags.ia.xZ[4];
-      i = state->rstateags.ia.xZ[5];
-      j = state->rstateags.ia.xZ[6];
-      k = state->rstateags.ia.xZ[7];
-      radiusdecays = state->rstateags.ia.xZ[8];
-      maxsamplesize = state->rstateags.ia.xZ[9];
-      cursamplesize = state->rstateags.ia.xZ[10];
-      shortstepscnt = state->rstateags.ia.xZ[11];
-      backtrackits = state->rstateags.ia.xZ[12];
-      maxbacktrackits = state->rstateags.ia.xZ[13];
-      b = state->rstateags.ba.xB[0];
-      alphadecreased = state->rstateags.ba.xB[1];
-      fullsample = state->rstateags.ba.xB[2];
-      radius0 = state->rstateags.ra.xR[0];
-      radius = state->rstateags.ra.xR[1];
-      alpha = state->rstateags.ra.xR[2];
-      recommendedstep = state->rstateags.ra.xR[3];
-      dhd = state->rstateags.ra.xR[4];
-      dnrminf = state->rstateags.ra.xR[5];
-      v = state->rstateags.ra.xR[6];
-      vv = state->rstateags.ra.xR[7];
-      v0 = state->rstateags.ra.xR[8];
-      v1 = state->rstateags.ra.xR[9];
-      currentf0 = state->rstateags.ra.xR[10];
-   } else {
-      n = 939;
-      nec = -526;
-      nic = 763;
-      ng = -541;
-      nh = -698;
-      i = -900;
-      j = -318;
-      k = -940;
-      radiusdecays = 1016;
-      maxsamplesize = -229;
-      cursamplesize = -536;
-      shortstepscnt = 487;
-      backtrackits = -115;
-      maxbacktrackits = 886;
-      b = false;
-      alphadecreased = false;
-      fullsample = true;
-      radius0 = 922;
-      radius = -154;
-      alpha = 306;
-      recommendedstep = -1011;
-      dhd = 951;
-      dnrminf = -463;
-      v = 88;
-      vv = -861;
-      v0 = -678;
-      v1 = -731;
-      currentf0 = -675;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstateags.stage < 0) goto Spawn;
+   n = state->rstateags.ia.xZ[0];
+   nec = state->rstateags.ia.xZ[1];
+   nic = state->rstateags.ia.xZ[2];
+   ng = state->rstateags.ia.xZ[3];
+   nh = state->rstateags.ia.xZ[4];
+   i = state->rstateags.ia.xZ[5];
+   j = state->rstateags.ia.xZ[6];
+   k = state->rstateags.ia.xZ[7];
+   radiusdecays = state->rstateags.ia.xZ[8];
+   maxsamplesize = state->rstateags.ia.xZ[9];
+   cursamplesize = state->rstateags.ia.xZ[10];
+   shortstepscnt = state->rstateags.ia.xZ[11];
+   backtrackits = state->rstateags.ia.xZ[12];
+   maxbacktrackits = state->rstateags.ia.xZ[13];
+   b = state->rstateags.ba.xB[0];
+   alphadecreased = state->rstateags.ba.xB[1];
+   fullsample = state->rstateags.ba.xB[2];
+   radius0 = state->rstateags.ra.xR[0];
+   radius = state->rstateags.ra.xR[1];
+   alpha = state->rstateags.ra.xR[2];
+   recommendedstep = state->rstateags.ra.xR[3];
+   dhd = state->rstateags.ra.xR[4];
+   dnrminf = state->rstateags.ra.xR[5];
+   v = state->rstateags.ra.xR[6];
+   vv = state->rstateags.ra.xR[7];
+   v0 = state->rstateags.ra.xR[8];
+   v1 = state->rstateags.ra.xR[9];
+   currentf0 = state->rstateags.ra.xR[10];
+   switch (state->rstateags.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
+      default: goto Exit;
    }
-   if (state->rstateags.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstateags.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstateags.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstateags.stage == 3) {
-      goto lbl_3;
-   }
+Spawn:
+   n = 939;
+   nec = -526;
+   nic = 763;
+   ng = -541;
+   nh = -698;
+   i = -900;
+   j = -318;
+   k = -940;
+   radiusdecays = 1016;
+   maxsamplesize = -229;
+   cursamplesize = -536;
+   shortstepscnt = 487;
+   backtrackits = -115;
+   maxbacktrackits = 886;
+   b = false;
+   alphadecreased = false;
+   fullsample = true;
+   radius0 = 922;
+   radius = -154;
+   alpha = 306;
+   recommendedstep = -1011;
+   dhd = 951;
+   dnrminf = -463;
+   v = 88;
+   vv = -861;
+   v0 = -678;
+   v1 = -731;
+   currentf0 = -675;
 // Routine body
    ae_assert(state->solvertype == 0, "MinNS: internal error");
    n = state->n;
@@ -40884,8 +39682,7 @@ static bool minns_agsiteration(minnsstate *state) {
 // Check consistency of parameters
    if (ng + nh > 0 && state->agsrhononlinear == 0.0) {
       state->repterminationtype = -1;
-      result = false;
-      return result;
+      goto Exit;
    }
 // Allocate arrays.
    vectorsetlengthatleast(&state->colmax, n);
@@ -40917,8 +39714,7 @@ static bool minns_agsiteration(minnsstate *state) {
    // Check and scale constraints
       if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndu.xR[i] < state->bndl.xR[i]) {
          state->repterminationtype = -3;
-         result = false;
-         return result;
+         goto Exit;
       }
       if (state->hasbndl.xB[i]) {
          state->scaledbndl.xR[i] = state->bndl.xR[i] / state->s.xR[i];
@@ -40988,393 +39784,365 @@ static bool minns_agsiteration(minnsstate *state) {
    shortstepscnt = 0;
    fullsample = false;
    state->rholinear = 0.0;
-lbl_4:
-   if (false) {
-      goto lbl_5;
-   }
-// First phase of iteration - central point:
-//
-// 1. evaluate function at central point - first entry in sample.
-//    Its status is ignored, it is always recalculated.
-// 2. report point and check gradient/function value for NAN/INF
-// 3. check penalty coefficients for linear terms; increase them
-//    if directional derivative of function being optimized (not
-//    merit function!) is larger than derivative of penalty.
-// 4. update report on constraint violation
-   cursamplesize = imax2(cursamplesize, 1);
-   ae_v_move(state->samplex.xyR[0], 1, state->xc.xR, 1, n);
-   ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
-   minns_clearrequestfields(state);
-   state->needfij = true;
-   state->rstateags.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needfij = false;
-   currentf0 = state->rawf;
-   state->replcerr = 0.0;
-   for (i = 0; i < nec + nic; i++) {
-      v = -state->scaledcleic.xyR[i][n];
-      for (j = 0; j < n; j++) {
-         v += state->scaledcleic.xyR[i][j] * state->xc.xR[j];
-      }
-      if (i >= nec && v <= 0.0) {
-         continue;
-      }
-      state->replcerr = rmax2(state->replcerr, fabs(v));
-   }
-   state->repnlcerr = 0.0;
-   for (i = 1; i <= ng + nh; i++) {
-      v = state->fi.xR[i];
-      if (i > ng && v <= 0.0) {
-         continue;
-      }
-      state->repnlcerr = rmax2(state->repnlcerr, fabs(v));
-   }
-   state->samplef.xR[0] = state->meritf;
-   rcopyvr(n, &state->meritg, &state->samplegm, 0);
-   if (!state->xrep) {
-      goto lbl_6;
-   }
-   ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
-   state->f = currentf0;
-   minns_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstateags.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->xupdated = false;
-lbl_6:
-   if (state->userterminationneeded) {
-   // User requested termination
-      state->repterminationtype = 8;
-      goto lbl_5;
-   }
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(state->samplegm.xyR[0][i]);
-   }
-   if (!isfinite(v) || !isfinite(state->samplef.xR[0])) {
-   // Abnormal termination - infinities in function/gradient
-      state->repterminationtype = -8;
-      goto lbl_5;
-   }
-   ae_assert(state->agspenaltylevel > 1.0, "MinNS: integrity error");
-   ae_assert(state->agspenaltyincrease > state->agspenaltylevel, "MinNS: integrity error");
-   if (sqrt(rdotv2(n, &state->rawg)) * state->agspenaltylevel > state->rholinear) {
-      state->rholinear = sqrt(rdotv2(n, &state->rawg)) * state->agspenaltyincrease;
-      cursamplesize = 0;
-      goto lbl_4;
-   }
-// Check stopping conditions.
-   if (radiusdecays >= state->agsmaxraddecays) {
-   // Too many attempts to decrease radius
-      state->repterminationtype = 7;
-      goto lbl_5;
-   }
-   if (state->repinneriterationscount >= state->maxits && state->maxits > 0) {
-   // Too many iterations
-      state->repterminationtype = 5;
-      goto lbl_5;
-   }
-   if (radius <= state->epsx * state->agsraddecay) {
-   // Radius is smaller than required step tolerance multiplied by radius decay.
+   while (true) {
+   // First phase of iteration - central point:
    //
-   // Additional decay is required in order to make sure that optimization session
-   // with radius equal to EpsX was successfully done.
-      state->repterminationtype = 2;
-      goto lbl_5;
-   }
-// Update sample:
-//
-// 1. invalidate entries which are too far away from XC
-//    and move all valid entries to beginning of the sample.
-// 2. add new entries until we have AGSSampleSize
-//    items in our sample. We remove oldest entries from
-//    sample until we have enough place to add at least
-//    AGSMinUpdate items.
-// 3. prepare "modified" gradient sample with respect to
-//    boundary constraints.
-   ae_assert(cursamplesize >= 1, "MinNS: integrity check failed (2367)");
-   k = 1;
-   for (i = 1; i < cursamplesize; i++) {
-   // If entry is outside of Radius-ball around XC, discard it.
+   // 1. evaluate function at central point - first entry in sample.
+   //    Its status is ignored, it is always recalculated.
+   // 2. report point and check gradient/function value for NAN/INF
+   // 3. check penalty coefficients for linear terms; increase them
+   //    if directional derivative of function being optimized (not
+   //    merit function!) is larger than derivative of penalty.
+   // 4. update report on constraint violation
+      cursamplesize = imax2(cursamplesize, 1);
+      ae_v_move(state->samplex.xyR[0], 1, state->xc.xR, 1, n);
+      ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
+      minns_clearrequestfields(state);
+      state->needfij = true;
+      state->rstateags.stage = 0; goto Pause; Resume0:
+      state->needfij = false;
+      currentf0 = state->rawf;
+      state->replcerr = 0.0;
+      for (i = 0; i < nec + nic; i++) {
+         v = -state->scaledcleic.xyR[i][n];
+         for (j = 0; j < n; j++) {
+            v += state->scaledcleic.xyR[i][j] * state->xc.xR[j];
+         }
+         if (i >= nec && v <= 0.0) {
+            continue;
+         }
+         state->replcerr = rmax2(state->replcerr, fabs(v));
+      }
+      state->repnlcerr = 0.0;
+      for (i = 1; i <= ng + nh; i++) {
+         v = state->fi.xR[i];
+         if (i > ng && v <= 0.0) {
+            continue;
+         }
+         state->repnlcerr = rmax2(state->repnlcerr, fabs(v));
+      }
+      state->samplef.xR[0] = state->meritf;
+      rcopyvr(n, &state->meritg, &state->samplegm, 0);
+      if (state->xrep) {
+         ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
+         state->f = currentf0;
+         minns_clearrequestfields(state);
+         state->xupdated = true;
+         state->rstateags.stage = 1; goto Pause; Resume1:
+         state->xupdated = false;
+      }
+      if (state->userterminationneeded) {
+      // User requested termination
+         state->repterminationtype = 8;
+         break;
+      }
+      v = 0.0;
+      for (i = 0; i < n; i++) {
+         v += sqr(state->samplegm.xyR[0][i]);
+      }
+      if (!isfinite(v) || !isfinite(state->samplef.xR[0])) {
+      // Abnormal termination - infinities in function/gradient
+         state->repterminationtype = -8;
+         break;
+      }
+      ae_assert(state->agspenaltylevel > 1.0, "MinNS: integrity error");
+      ae_assert(state->agspenaltyincrease > state->agspenaltylevel, "MinNS: integrity error");
+      if (sqrt(rdotv2(n, &state->rawg)) * state->agspenaltylevel > state->rholinear) {
+         state->rholinear = sqrt(rdotv2(n, &state->rawg)) * state->agspenaltyincrease;
+         cursamplesize = 0;
+         continue;
+      }
+   // Check stopping conditions.
+      if (radiusdecays >= state->agsmaxraddecays) {
+      // Too many attempts to decrease radius
+         state->repterminationtype = 7;
+         break;
+      } else if (state->repinneriterationscount >= state->maxits && state->maxits > 0) {
+      // Too many iterations
+         state->repterminationtype = 5;
+         break;
+      } else if (radius <= state->epsx * state->agsraddecay) {
+      // Radius is smaller than required step tolerance multiplied by radius decay.
+      //
+      // Additional decay is required in order to make sure that optimization session
+      // with radius equal to EpsX was successfully done.
+         state->repterminationtype = 2;
+         break;
+      }
+   // Update sample:
+   //
+   // 1. invalidate entries which are too far away from XC
+   //    and move all valid entries to beginning of the sample.
+   // 2. add new entries until we have AGSSampleSize
+   //    items in our sample. We remove oldest entries from
+   //    sample until we have enough place to add at least
+   //    AGSMinUpdate items.
+   // 3. prepare "modified" gradient sample with respect to
+   //    boundary constraints.
+      ae_assert(cursamplesize >= 1, "MinNS: integrity check failed (2367)");
+      k = 1;
+      for (i = 1; i < cursamplesize; i++) {
+      // If entry is outside of Radius-ball around XC, discard it.
+         v = 0.0;
+         for (j = 0; j < n; j++) {
+            v = rmax2(v, fabs(state->samplex.xyR[i][j] - state->xc.xR[j]));
+         }
+         if (v > radius) {
+            continue;
+         }
+      // Move to the beginning
+         rcopyrr(n, &state->samplex, i, &state->samplex, k);
+         rcopyrr(n, &state->samplegm, i, &state->samplegm, k);
+         state->samplef.xR[k] = state->samplef.xR[i];
+         k++;
+      }
+      cursamplesize = k;
+      if (state->agssamplesize - cursamplesize < state->agsminupdate) {
+      // Remove oldest entries
+         k = state->agsminupdate - (state->agssamplesize - cursamplesize);
+         ae_assert(k <= cursamplesize - 1, "MinNS: integrity check failed (2662)");
+         for (i = 1; i < cursamplesize - k; i++) {
+            rcopyrr(n, &state->samplex, i + k, &state->samplex, i);
+            rcopyrr(n, &state->samplegm, i + k, &state->samplegm, i);
+            state->samplef.xR[i] = state->samplef.xR[i + k];
+         }
+         cursamplesize -= k;
+      }
+      for (k = 0, i = cursamplesize; i < imin2(cursamplesize + state->agsminupdate, state->agssamplesize); k++, i++) {
+         for (j = 0; j < n; j++) {
+         // Undistorted position
+            state->samplex.xyR[i][j] = state->xc.xR[j];
+         // Do not apply distortion if the variable is fixed
+            if ((state->hasbndl.xB[j] && state->hasbndu.xB[j]) && state->scaledbndl.xR[j] == state->scaledbndu.xR[j]) {
+               continue;
+            }
+         // Apply distortion
+            if (hqrnduniformr(&state->agsrs) >= 0.5) {
+            // Sample at the left side with 50% probability
+               v0 = state->samplex.xyR[i][j] - radius;
+               v1 = state->samplex.xyR[i][j];
+               if (state->hasbndl.xB[j]) {
+                  v0 = rmax2(state->scaledbndl.xR[j], v0);
+               }
+            } else {
+            // Sample at the right side with 50% probability
+               v0 = state->samplex.xyR[i][j];
+               v1 = state->samplex.xyR[i][j] + radius;
+               if (state->hasbndu.xB[j]) {
+                  v1 = rmin2(state->scaledbndu.xR[j], v1);
+               }
+            }
+            ae_assert(v1 >= v0, "MinNS: integrity check failed (9743)");
+            state->samplex.xyR[i][j] = rboundval(v0 + (v1 - v0) * hqrnduniformr(&state->agsrs), v0, v1);
+         }
+         ae_v_move(state->x.xR, 1, state->samplex.xyR[i], 1, n);
+         minns_clearrequestfields(state);
+         state->needfij = true;
+         state->rstateags.stage = 2; goto Pause; Resume2:
+         state->needfij = false;
+         state->samplef.xR[i] = state->meritf;
+         rcopyvr(n, &state->meritg, &state->samplegm, i);
+      }
+      cursamplesize += k;
+      fullsample = cursamplesize == state->agssamplesize;
+      for (j = 0; j < cursamplesize; j++) {
+      // For J-th element in gradient sample, process all of its components
+      // and modify them according to status of box constraints
+         for (i = 0; i < n; i++) {
+            ae_assert(!state->hasbndl.xB[i] || state->xc.xR[i] >= state->scaledbndl.xR[i], "MinNS: integrity error");
+            ae_assert(!state->hasbndu.xB[i] || state->xc.xR[i] <= state->scaledbndu.xR[i], "MinNS: integrity error");
+            state->samplegmbc.xyR[j][i] = state->samplegm.xyR[j][i];
+            if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->scaledbndl.xR[i] == state->scaledbndu.xR[i]) {
+            // I-th box constraint is of equality type (lower bound matches upper one).
+            // Simplest case, always active.
+               state->samplegmbc.xyR[j][i] = 0.0;
+               continue;
+            }
+            if (state->hasbndl.xB[i] && state->xc.xR[i] == state->scaledbndl.xR[i]) {
+            // We are at lower bound: activate/deactivate constraint depending on gradient at XC
+               if (state->samplegm.xyR[0][i] >= 0.0) {
+                  state->samplegmbc.xyR[j][i] = 0.0;
+               }
+               continue;
+            }
+            if (state->hasbndu.xB[i] && state->xc.xR[i] == state->scaledbndu.xR[i]) {
+            // We are at upper bound: activate/deactivate constraint depending on gradient at XC
+               if (state->samplegm.xyR[0][i] <= 0.0) {
+                  state->samplegmbc.xyR[j][i] = 0.0;
+               }
+               continue;
+            }
+         }
+      }
+   // Calculate diagonal Hessian.
+   //
+   // This Hessian serves two purposes:
+   // * first, it improves performance of gradient descent step
+   // * second, it improves condition number of QP subproblem
+   //   solved to determine step
+   //
+   // The idea is that for each variable we check whether sample
+   // includes entries with alternating sign of gradient:
+   // * if gradients with different signs are present, Hessian
+   //   component is set to M/R, where M is a maximum magnitude
+   //   of corresponding gradient component, R is a sampling radius.
+   //   Note that sign=0 and sign=1 are treated as different ones
+   // * if all gradients have same sign, Hessian component is
+   //   set to M/R0, where R0 is initial sampling radius.
+      for (j = 0; j < n; j++) {
+         state->colmax.xR[j] = 0.0;
+         state->signmin.xR[j] = 1.0;
+         state->signmax.xR[j] = -1.0;
+      }
+      for (i = 0; i < cursamplesize; i++) {
+         for (j = 0; j < n; j++) {
+            v = state->samplegmbc.xyR[i][j];
+            state->colmax.xR[j] = rmax2(state->colmax.xR[j], fabs(v));
+            state->signmin.xR[j] = rmin2(state->signmin.xR[j], (double)sign(v));
+            state->signmax.xR[j] = rmax2(state->signmax.xR[j], (double)sign(v));
+         }
+      }
+      for (j = 0; j < n; j++) {
+         if (state->signmin.xR[j] != state->signmax.xR[j]) {
+         // Alternating signs of gradient - step is proportional to current sampling radius
+            ae_assert(state->colmax.xR[j] != 0.0, "MinNS: integrity check failed (2975)");
+            ae_assert(radius != 0.0, "MinNS: integrity check failed (8473)");
+            state->diagh.xR[j] = state->colmax.xR[j] / radius;
+            continue;
+         }
+         if (state->colmax.xR[j] != 0.0) {
+         // Non-alternating sign of gradient, but non-zero.
+         // Step is proportional to recommended step
+            ae_assert(recommendedstep != 0.0, "MinNS: integrity check failed (3274)");
+            state->diagh.xR[j] = state->colmax.xR[j] / recommendedstep;
+            continue;
+         }
+         state->diagh.xR[j] = 1.0;
+      }
+   // PROJECTION PHASE
+   //
+   // We project zero vector on convex hull of gradient sample.
+   // If projection is small enough, we decrease radius and restart.
+   // Otherwise, this phase returns search direction in State.D.
+   //
+   // NOTE: because we use iterative solver, it may have trouble
+   //       dealing with ill-conditioned problems. So we also employ
+   //       second, backup test for stationarity - when too many
+   //       subsequent backtracking searches resulted in short steps.
+      minns_solveqp(&state->samplegmbc, &state->diagh, cursamplesize, n, &state->tmp0, &state->dbgncholesky, &state->nsqp);
+      for (j = 0; j < n; j++) {
+         state->d.xR[j] = 0.0;
+      }
+      for (i = 0; i < cursamplesize; i++) {
+         v = state->tmp0.xR[i];
+         ae_v_addd(state->d.xR, 1, state->samplegmbc.xyR[i], 1, n, v);
+      }
       v = 0.0;
       for (j = 0; j < n; j++) {
-         v = rmax2(v, fabs(state->samplex.xyR[i][j] - state->xc.xR[j]));
+         v = rmax2(v, fabs(state->d.xR[j] / coalesce(state->colmax.xR[j], 1.0)));
       }
-      if (v > radius) {
+      if (v <= state->agsstattold) {
+      // Stationarity test succeeded.
+      // Decrease radius and restart.
+      //
+      // NOTE: we also clear ShortStepsCnt on restart
+         radius *= state->agsraddecay;
+         shortstepscnt = 0;
+         radiusdecays++;
+         state->repinneriterationscount++;
          continue;
       }
-   // Move to the beginning
-      rcopyrr(n, &state->samplex, i, &state->samplex, k);
-      rcopyrr(n, &state->samplegm, i, &state->samplegm, k);
-      state->samplef.xR[k] = state->samplef.xR[i];
-      k++;
-   }
-   cursamplesize = k;
-   if (state->agssamplesize - cursamplesize < state->agsminupdate) {
-   // Remove oldest entries
-      k = state->agsminupdate - (state->agssamplesize - cursamplesize);
-      ae_assert(k <= cursamplesize - 1, "MinNS: integrity check failed (2662)");
-      for (i = 1; i < cursamplesize - k; i++) {
-         rcopyrr(n, &state->samplex, i + k, &state->samplex, i);
-         rcopyrr(n, &state->samplegm, i + k, &state->samplegm, i);
-         state->samplef.xR[i] = state->samplef.xR[i + k];
-      }
-      cursamplesize -= k;
-   }
-   k = 0;
-   i = cursamplesize;
-lbl_8:
-   if (i > imin2(cursamplesize + state->agsminupdate, state->agssamplesize) - 1) {
-      goto lbl_10;
-   }
-   for (j = 0; j < n; j++) {
-   // Undistorted position
-      state->samplex.xyR[i][j] = state->xc.xR[j];
-   // Do not apply distortion if the variable is fixed
-      if ((state->hasbndl.xB[j] && state->hasbndu.xB[j]) && state->scaledbndl.xR[j] == state->scaledbndu.xR[j]) {
-         continue;
-      }
-   // Apply distortion
-      if (hqrnduniformr(&state->agsrs) >= 0.5) {
-      // Sample at the left side with 50% probability
-         v0 = state->samplex.xyR[i][j] - radius;
-         v1 = state->samplex.xyR[i][j];
-         if (state->hasbndl.xB[j]) {
-            v0 = rmax2(state->scaledbndl.xR[j], v0);
-         }
-      } else {
-      // Sample at the right side with 50% probability
-         v0 = state->samplex.xyR[i][j];
-         v1 = state->samplex.xyR[i][j] + radius;
-         if (state->hasbndu.xB[j]) {
-            v1 = rmin2(state->scaledbndu.xR[j], v1);
-         }
-      }
-      ae_assert(v1 >= v0, "MinNS: integrity check failed (9743)");
-      state->samplex.xyR[i][j] = rboundval(v0 + (v1 - v0) * hqrnduniformr(&state->agsrs), v0, v1);
-   }
-   ae_v_move(state->x.xR, 1, state->samplex.xyR[i], 1, n);
-   minns_clearrequestfields(state);
-   state->needfij = true;
-   state->rstateags.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->needfij = false;
-   state->samplef.xR[i] = state->meritf;
-   rcopyvr(n, &state->meritg, &state->samplegm, i);
-   k++;
-   i++;
-   goto lbl_8;
-lbl_10:
-   cursamplesize += k;
-   fullsample = cursamplesize == state->agssamplesize;
-   for (j = 0; j < cursamplesize; j++) {
-   // For J-th element in gradient sample, process all of its components
-   // and modify them according to status of box constraints
       for (i = 0; i < n; i++) {
-         ae_assert(!state->hasbndl.xB[i] || state->xc.xR[i] >= state->scaledbndl.xR[i], "MinNS: integrity error");
-         ae_assert(!state->hasbndu.xB[i] || state->xc.xR[i] <= state->scaledbndu.xR[i], "MinNS: integrity error");
-         state->samplegmbc.xyR[j][i] = state->samplegm.xyR[j][i];
-         if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->scaledbndl.xR[i] == state->scaledbndu.xR[i]) {
-         // I-th box constraint is of equality type (lower bound matches upper one).
-         // Simplest case, always active.
-            state->samplegmbc.xyR[j][i] = 0.0;
-            continue;
+         state->d.xR[i] /= -state->diagh.xR[i];
+      }
+   // Perform backtracking line search.
+   // Update initial step length depending on search results.
+   // Here we assume that D is non-zero.
+   //
+   // NOTE: if AGSShortLimit subsequent line searches resulted
+   //       in steps shorter than AGSStatTolStp, we decrease radius.
+      dhd = 0.0;
+      for (i = 0; i < n; i++) {
+         dhd += state->d.xR[i] * state->diagh.xR[i] * state->d.xR[i];
+      }
+      dnrminf = rmaxabsv(n, &state->d);
+      ae_assert(dnrminf > 0.0, "MinNS: integrity error (2752)");
+      alpha = recommendedstep / dnrminf;
+      alphadecreased = false;
+      backtrackits = 0;
+      if (fullsample) {
+         maxbacktrackits = state->agsmaxbacktrack;
+      } else {
+         maxbacktrackits = state->agsmaxbacktracknonfull;
+      }
+      while (true) {
+      // Prepare XN and evaluate merit function at XN
+         ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
+         ae_v_addd(state->xn.xR, 1, state->d.xR, 1, n, alpha);
+         enforceboundaryconstraints(&state->xn, &state->scaledbndl, &state->hasbndl, &state->scaledbndu, &state->hasbndu, n, 0);
+         ae_v_move(state->samplex.xyR[maxsamplesize], 1, state->xn.xR, 1, n);
+         ae_v_move(state->x.xR, 1, state->xn.xR, 1, n);
+         minns_clearrequestfields(state);
+         state->needfij = true;
+         state->rstateags.stage = 3; goto Pause; Resume3:
+         state->needfij = false;
+         state->samplef.xR[maxsamplesize] = state->meritf;
+         rcopyvr(n, &state->meritg, &state->samplegm, maxsamplesize);
+      // Check sufficient decrease condition
+         ae_assert(dnrminf > 0.0, "MinNS: integrity error (9642)");
+         if (state->samplef.xR[maxsamplesize] <= state->samplef.xR[0] - alpha * state->agsdecrease * dhd) {
+            break;
          }
-         if (state->hasbndl.xB[i] && state->xc.xR[i] == state->scaledbndl.xR[i]) {
-         // We are at lower bound: activate/deactivate constraint depending on gradient at XC
-            if (state->samplegm.xyR[0][i] >= 0.0) {
-               state->samplegmbc.xyR[j][i] = 0.0;
-            }
-            continue;
-         }
-         if (state->hasbndu.xB[i] && state->xc.xR[i] == state->scaledbndu.xR[i]) {
-         // We are at upper bound: activate/deactivate constraint depending on gradient at XC
-            if (state->samplegm.xyR[0][i] <= 0.0) {
-               state->samplegmbc.xyR[j][i] = 0.0;
-            }
-            continue;
+      // Decrease Alpha
+         alpha *= state->agsalphadecay;
+         alphadecreased = true;
+      // Update and check iterations counter.
+         backtrackits++;
+         if (backtrackits >= maxbacktrackits) {
+         // Too many backtracking searches performed without success.
+         // Terminate iterations.
+            alpha = 0.0;
+            alphadecreased = true;
+            ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
+            break;
          }
       }
-   }
-// Calculate diagonal Hessian.
-//
-// This Hessian serves two purposes:
-// * first, it improves performance of gradient descent step
-// * second, it improves condition number of QP subproblem
-//   solved to determine step
-//
-// The idea is that for each variable we check whether sample
-// includes entries with alternating sign of gradient:
-// * if gradients with different signs are present, Hessian
-//   component is set to M/R, where M is a maximum magnitude
-//   of corresponding gradient component, R is a sampling radius.
-//   Note that sign=0 and sign=1 are treated as different ones
-// * if all gradients have same sign, Hessian component is
-//   set to M/R0, where R0 is initial sampling radius.
-   for (j = 0; j < n; j++) {
-      state->colmax.xR[j] = 0.0;
-      state->signmin.xR[j] = 1.0;
-      state->signmax.xR[j] = -1.0;
-   }
-   for (i = 0; i < cursamplesize; i++) {
-      for (j = 0; j < n; j++) {
-         v = state->samplegmbc.xyR[i][j];
-         state->colmax.xR[j] = rmax2(state->colmax.xR[j], fabs(v));
-         state->signmin.xR[j] = rmin2(state->signmin.xR[j], (double)sign(v));
-         state->signmax.xR[j] = rmax2(state->signmax.xR[j], (double)sign(v));
+      if ((alpha * dnrminf <= state->agsshortstpabs || alpha * dnrminf <= state->agsshortstprel * radius) || fabs(state->samplef.xR[0] - state->samplef.xR[maxsamplesize]) <= state->agsshortf) {
+         shortstepscnt++;
+      } else {
+         shortstepscnt = 0;
       }
-   }
-   for (j = 0; j < n; j++) {
-      if (state->signmin.xR[j] != state->signmax.xR[j]) {
-      // Alternating signs of gradient - step is proportional to current sampling radius
-         ae_assert(state->colmax.xR[j] != 0.0, "MinNS: integrity check failed (2975)");
-         ae_assert(radius != 0.0, "MinNS: integrity check failed (8473)");
-         state->diagh.xR[j] = state->colmax.xR[j] / radius;
+      if (shortstepscnt >= state->agsshortlimit) {
+      // Too many subsequent short steps.
+      //
+      // It may be possible that optimizer is unable to find out
+      // that we have to decrease radius because of ill-conditioned
+      // gradients.
+      //
+      // Decrease radius and restart.
+         radius *= state->agsraddecay;
+         shortstepscnt = 0;
+         radiusdecays++;
+         state->repinneriterationscount++;
          continue;
       }
-      if (state->colmax.xR[j] != 0.0) {
-      // Non-alternating sign of gradient, but non-zero.
-      // Step is proportional to recommended step
-         ae_assert(recommendedstep != 0.0, "MinNS: integrity check failed (3274)");
-         state->diagh.xR[j] = state->colmax.xR[j] / recommendedstep;
-         continue;
+      if (!alphadecreased) {
+         recommendedstep *= 2.0;
       }
-      state->diagh.xR[j] = 1.0;
-   }
-// PROJECTION PHASE
-//
-// We project zero vector on convex hull of gradient sample.
-// If projection is small enough, we decrease radius and restart.
-// Otherwise, this phase returns search direction in State.D.
-//
-// NOTE: because we use iterative solver, it may have trouble
-//       dealing with ill-conditioned problems. So we also employ
-//       second, backup test for stationarity - when too many
-//       subsequent backtracking searches resulted in short steps.
-   minns_solveqp(&state->samplegmbc, &state->diagh, cursamplesize, n, &state->tmp0, &state->dbgncholesky, &state->nsqp);
-   for (j = 0; j < n; j++) {
-      state->d.xR[j] = 0.0;
-   }
-   for (i = 0; i < cursamplesize; i++) {
-      v = state->tmp0.xR[i];
-      ae_v_addd(state->d.xR, 1, state->samplegmbc.xyR[i], 1, n, v);
-   }
-   v = 0.0;
-   for (j = 0; j < n; j++) {
-      v = rmax2(v, fabs(state->d.xR[j] / coalesce(state->colmax.xR[j], 1.0)));
-   }
-   if (v <= state->agsstattold) {
-   // Stationarity test succeeded.
-   // Decrease radius and restart.
-   //
-   // NOTE: we also clear ShortStepsCnt on restart
-      radius *= state->agsraddecay;
-      shortstepscnt = 0;
-      radiusdecays++;
+      if (alphadecreased && fullsample) {
+         recommendedstep *= 0.5;
+      }
+   // Next iteration
+      ae_v_move(state->xc.xR, 1, state->xn.xR, 1, n);
       state->repinneriterationscount++;
-      goto lbl_4;
    }
-   for (i = 0; i < n; i++) {
-      state->d.xR[i] /= -state->diagh.xR[i];
-   }
-// Perform backtracking line search.
-// Update initial step length depending on search results.
-// Here we assume that D is non-zero.
-//
-// NOTE: if AGSShortLimit subsequent line searches resulted
-//       in steps shorter than AGSStatTolStp, we decrease radius.
-   dhd = 0.0;
-   for (i = 0; i < n; i++) {
-      dhd += state->d.xR[i] * state->diagh.xR[i] * state->d.xR[i];
-   }
-   dnrminf = rmaxabsv(n, &state->d);
-   ae_assert(dnrminf > 0.0, "MinNS: integrity error (2752)");
-   alpha = recommendedstep / dnrminf;
-   alphadecreased = false;
-   backtrackits = 0;
-   if (fullsample) {
-      maxbacktrackits = state->agsmaxbacktrack;
-   } else {
-      maxbacktrackits = state->agsmaxbacktracknonfull;
-   }
-lbl_11:
-   if (false) {
-      goto lbl_12;
-   }
-// Prepare XN and evaluate merit function at XN
-   ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
-   ae_v_addd(state->xn.xR, 1, state->d.xR, 1, n, alpha);
-   enforceboundaryconstraints(&state->xn, &state->scaledbndl, &state->hasbndl, &state->scaledbndu, &state->hasbndu, n, 0);
-   ae_v_move(state->samplex.xyR[maxsamplesize], 1, state->xn.xR, 1, n);
-   ae_v_move(state->x.xR, 1, state->xn.xR, 1, n);
-   minns_clearrequestfields(state);
-   state->needfij = true;
-   state->rstateags.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->needfij = false;
-   state->samplef.xR[maxsamplesize] = state->meritf;
-   rcopyvr(n, &state->meritg, &state->samplegm, maxsamplesize);
-// Check sufficient decrease condition
-   ae_assert(dnrminf > 0.0, "MinNS: integrity error (9642)");
-   if (state->samplef.xR[maxsamplesize] <= state->samplef.xR[0] - alpha * state->agsdecrease * dhd) {
-      goto lbl_12;
-   }
-// Decrease Alpha
-   alpha *= state->agsalphadecay;
-   alphadecreased = true;
-// Update and check iterations counter.
-   backtrackits++;
-   if (backtrackits >= maxbacktrackits) {
-   // Too many backtracking searches performed without success.
-   // Terminate iterations.
-      alpha = 0.0;
-      alphadecreased = true;
-      ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
-      goto lbl_12;
-   }
-   goto lbl_11;
-lbl_12:
-   if ((alpha * dnrminf <= state->agsshortstpabs || alpha * dnrminf <= state->agsshortstprel * radius) || fabs(state->samplef.xR[0] - state->samplef.xR[maxsamplesize]) <= state->agsshortf) {
-      shortstepscnt++;
-   } else {
-      shortstepscnt = 0;
-   }
-   if (shortstepscnt >= state->agsshortlimit) {
-   // Too many subsequent short steps.
-   //
-   // It may be possible that optimizer is unable to find out
-   // that we have to decrease radius because of ill-conditioned
-   // gradients.
-   //
-   // Decrease radius and restart.
-      radius *= state->agsraddecay;
-      shortstepscnt = 0;
-      radiusdecays++;
-      state->repinneriterationscount++;
-      goto lbl_4;
-   }
-   if (!alphadecreased) {
-      recommendedstep *= 2.0;
-   }
-   if (alphadecreased && fullsample) {
-      recommendedstep *= 0.5;
-   }
-// Next iteration
-   ae_v_move(state->xc.xR, 1, state->xn.xR, 1, n);
-   state->repinneriterationscount++;
-   goto lbl_4;
-lbl_5:
 // Convert back from scaled to unscaled representation
    minns_unscalepointbc(state, &state->xc);
-   result = false;
-   return result;
+Exit:
+   state->rstateags.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstateags.ia.xZ[0] = n;
    state->rstateags.ia.xZ[1] = nec;
    state->rstateags.ia.xZ[2] = nic;
@@ -41403,7 +40171,7 @@ lbl_rcomm:
    state->rstateags.ra.xR[8] = v0;
    state->rstateags.ra.xR[9] = v1;
    state->rstateags.ra.xR[10] = currentf0;
-   return result;
+   return true;
 }
 
 // This function provides a reverse communication interface, which is not documented or recommended for use.
@@ -41424,52 +40192,39 @@ bool minnsiteration(minnsstate *state) {
    double v;
    double xp;
    double xm;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      i = state->rstate.ia.xZ[0];
-      j = state->rstate.ia.xZ[1];
-      k = state->rstate.ia.xZ[2];
-      n = state->rstate.ia.xZ[3];
-      nec = state->rstate.ia.xZ[4];
-      nic = state->rstate.ia.xZ[5];
-      ng = state->rstate.ia.xZ[6];
-      nh = state->rstate.ia.xZ[7];
-      v = state->rstate.ra.xR[0];
-      xp = state->rstate.ra.xR[1];
-      xm = state->rstate.ra.xR[2];
-   } else {
-      i = 359;
-      j = -58;
-      k = -919;
-      n = -909;
-      nec = 81;
-      nic = 255;
-      ng = 74;
-      nh = -788;
-      v = 809;
-      xp = 205;
-      xm = -838;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   i = state->rstate.ia.xZ[0];
+   j = state->rstate.ia.xZ[1];
+   k = state->rstate.ia.xZ[2];
+   n = state->rstate.ia.xZ[3];
+   nec = state->rstate.ia.xZ[4];
+   nic = state->rstate.ia.xZ[5];
+   ng = state->rstate.ia.xZ[6];
+   nh = state->rstate.ia.xZ[7];
+   v = state->rstate.ra.xR[0];
+   xp = state->rstate.ra.xR[1];
+   xm = state->rstate.ra.xR[2];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
+Spawn:
+   i = 359;
+   j = -58;
+   k = -919;
+   n = -909;
+   nec = 81;
+   nic = 255;
+   ng = 74;
+   nh = -788;
+   v = 809;
+   xp = 205;
+   xm = -838;
 // Routine body
 // Init
    state->replcerr = 0.0;
@@ -41489,136 +40244,107 @@ bool minnsiteration(minnsstate *state) {
    nh = state->nh;
    minns_clearrequestfields(state);
 // AGS solver
-   if (state->solvertype != 0) {
-      goto lbl_4;
-   }
-   if (state->diffstep != 0.0) {
-      vectorsetlengthatleast(&state->xbase, n);
-      vectorsetlengthatleast(&state->fbase, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fm, 1 + ng + nh);
-      vectorsetlengthatleast(&state->fp, 1 + ng + nh);
-   }
-   vectorsetlengthatleast(&state->xscaled, n);
-   vectorsetlengthatleast(&state->rawg, n);
-   vectorsetlengthatleast(&state->meritg, n);
-   ae_vector_set_length(&state->rstateags.ia, 13 + 1);
-   ae_vector_set_length(&state->rstateags.ba, 5 + 1);
-   ae_vector_set_length(&state->rstateags.ra, 10 + 1);
-   state->rstateags.stage = -1;
-lbl_6:
-   if (!minns_agsiteration(state)) {
-      goto lbl_7;
-   }
-   rcopyv(n, &state->x, &state->xscaled);
-   minns_unscalepointbc(state, &state->x);
-// Numerical differentiation (if needed) - intercept NeedFiJ
-// request and replace it by sequence of NeedFi requests
-   if (!(state->diffstep != 0.0 && state->needfij)) {
-      goto lbl_8;
-   }
-   state->needfij = false;
-   state->needfi = true;
-   ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   ae_v_move(state->fbase.xR, 1, state->fi.xR, 1, ng + nh + 1);
-   state->repnfev++;
-   k = 0;
-lbl_10:
-   if (k > n - 1) {
-      goto lbl_12;
-   }
-   v = state->xbase.xR[k];
-   xm = v - state->diffstep * state->s.xR[k];
-   xp = v + state->diffstep * state->s.xR[k];
-   if (state->hasbndl.xB[k] && xm < state->bndl.xR[k]) {
-      xm = state->bndl.xR[k];
-   }
-   if (state->hasbndu.xB[k] && xp > state->bndu.xR[k]) {
-      xp = state->bndu.xR[k];
-   }
-   ae_assert(xm <= xp, "MinNS: integrity check failed (3y634)");
-   if (xm == xp) {
-      goto lbl_13;
-   }
-// Compute F(XM) and F(XP)
-   rcopyv(n, &state->xbase, &state->x);
-   state->x.xR[k] = xm;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   rcopyv(1 + ng + nh, &state->fi, &state->fm);
-   rcopyv(n, &state->xbase, &state->x);
-   state->x.xR[k] = xp;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   rcopyv(1 + ng + nh, &state->fi, &state->fp);
-// Compute subgradient at XBase
-   rcopymulvc(1 + ng + nh, 1 / (xp - xm), &state->fp, &state->j, k);
-   raddvc(1 + ng + nh, -1 / (xp - xm), &state->fm, &state->j, k);
-   state->repnfev += 2;
-   goto lbl_14;
-lbl_13:
-   rsetc(1 + ng + nh, 0.0, &state->j, k);
-lbl_14:
-   k++;
-   goto lbl_10;
-lbl_12:
-// Restore previous values of fields and continue
-   rcopyv(n, &state->xscaled, &state->x);
-   rcopyv(1 + ng + nh, &state->fbase, &state->fi);
-   state->needfi = false;
-   state->needfij = true;
-   goto lbl_9;
-lbl_8:
-// Forward request to caller
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->repnfev++;
-   rcopyv(n, &state->xscaled, &state->x);
-lbl_9:
-// Postprocess Jacobian: scale and produce 'raw' and 'merit' functions
-   for (i = 0; i <= ng + nh; i++) {
-      rmergemulvr(n, &state->s, &state->j, i);
-   }
-   state->rawf = state->fi.xR[0];
-   state->meritf = state->fi.xR[0];
-   rcopyrv(n, &state->j, 0, &state->rawg);
-   rcopyrv(n, &state->j, 0, &state->meritg);
-   for (i = 0; i < nec + nic; i++) {
-      v = rdotvr(n, &state->x, &state->scaledcleic, i) - state->scaledcleic.xyR[i][n];
-      if (i >= nec && v < 0.0) {
-         continue;
+   if (state->solvertype == 0) {
+      if (state->diffstep != 0.0) {
+         vectorsetlengthatleast(&state->xbase, n);
+         vectorsetlengthatleast(&state->fbase, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fm, 1 + ng + nh);
+         vectorsetlengthatleast(&state->fp, 1 + ng + nh);
       }
-      state->meritf += state->rholinear * fabs(v);
-      raddrv(n, state->rholinear * sign(v), &state->scaledcleic, i, &state->meritg);
-   }
-   for (i = 1; i <= ng + nh; i++) {
-      v = state->fi.xR[i];
-      if (i <= ng && v == 0.0) {
-         continue;
+      vectorsetlengthatleast(&state->xscaled, n);
+      vectorsetlengthatleast(&state->rawg, n);
+      vectorsetlengthatleast(&state->meritg, n);
+      ae_vector_set_length(&state->rstateags.ia, 13 + 1);
+      ae_vector_set_length(&state->rstateags.ba, 5 + 1);
+      ae_vector_set_length(&state->rstateags.ra, 10 + 1);
+      state->rstateags.stage = -1;
+      while (minns_agsiteration(state)) {
+         rcopyv(n, &state->x, &state->xscaled);
+         minns_unscalepointbc(state, &state->x);
+      // Numerical differentiation (if needed) - intercept NeedFiJ
+      // request and replace it by sequence of NeedFi requests
+         if (state->diffstep != 0.0 && state->needfij) {
+            state->needfij = false;
+            state->needfi = true;
+            ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
+            state->rstate.stage = 0; goto Pause; Resume0:
+            ae_v_move(state->fbase.xR, 1, state->fi.xR, 1, ng + nh + 1);
+            state->repnfev++;
+            for (k = 0; k < n; k++) {
+               v = state->xbase.xR[k];
+               xm = v - state->diffstep * state->s.xR[k];
+               xp = v + state->diffstep * state->s.xR[k];
+               if (state->hasbndl.xB[k] && xm < state->bndl.xR[k]) {
+                  xm = state->bndl.xR[k];
+               }
+               if (state->hasbndu.xB[k] && xp > state->bndu.xR[k]) {
+                  xp = state->bndu.xR[k];
+               }
+               ae_assert(xm <= xp, "MinNS: integrity check failed (3y634)");
+               if (xm != xp) {
+               // Compute F(XM) and F(XP)
+                  rcopyv(n, &state->xbase, &state->x);
+                  state->x.xR[k] = xm;
+                  state->rstate.stage = 1; goto Pause; Resume1:
+                  rcopyv(1 + ng + nh, &state->fi, &state->fm);
+                  rcopyv(n, &state->xbase, &state->x);
+                  state->x.xR[k] = xp;
+                  state->rstate.stage = 2; goto Pause; Resume2:
+                  rcopyv(1 + ng + nh, &state->fi, &state->fp);
+               // Compute subgradient at XBase
+                  rcopymulvc(1 + ng + nh, 1 / (xp - xm), &state->fp, &state->j, k);
+                  raddvc(1 + ng + nh, -1 / (xp - xm), &state->fm, &state->j, k);
+                  state->repnfev += 2;
+               } else {
+                  rsetc(1 + ng + nh, 0.0, &state->j, k);
+               }
+            }
+         // Restore previous values of fields and continue
+            rcopyv(n, &state->xscaled, &state->x);
+            rcopyv(1 + ng + nh, &state->fbase, &state->fi);
+            state->needfi = false;
+            state->needfij = true;
+         } else {
+         // Forward request to caller
+            state->rstate.stage = 3; goto Pause; Resume3:
+            state->repnfev++;
+            rcopyv(n, &state->xscaled, &state->x);
+         }
+      // Postprocess Jacobian: scale and produce 'raw' and 'merit' functions
+         for (i = 0; i <= ng + nh; i++) {
+            rmergemulvr(n, &state->s, &state->j, i);
+         }
+         state->rawf = state->fi.xR[0];
+         state->meritf = state->fi.xR[0];
+         rcopyrv(n, &state->j, 0, &state->rawg);
+         rcopyrv(n, &state->j, 0, &state->meritg);
+         for (i = 0; i < nec + nic; i++) {
+            v = rdotvr(n, &state->x, &state->scaledcleic, i) - state->scaledcleic.xyR[i][n];
+            if (i >= nec && v < 0.0) {
+               continue;
+            }
+            state->meritf += state->rholinear * fabs(v);
+            raddrv(n, state->rholinear * sign(v), &state->scaledcleic, i, &state->meritg);
+         }
+         for (i = 1; i <= ng + nh; i++) {
+            v = state->fi.xR[i];
+            if (i <= ng && v == 0.0) {
+               continue;
+            } else if (i > ng && v <= 0.0) {
+               continue;
+            }
+            state->meritf += state->agsrhononlinear * fabs(v);
+            raddrv(n, state->agsrhononlinear * sign(v), &state->j, i, &state->meritg);
+         }
+      // Done
+      // continue;
       }
-      if (i > ng && v <= 0.0) {
-         continue;
-      }
-      state->meritf += state->agsrhononlinear * fabs(v);
-      raddrv(n, state->agsrhononlinear * sign(v), &state->j, i, &state->meritg);
    }
-// Done
-   goto lbl_6;
-   goto lbl_6;
-lbl_7:
-   result = false;
-   return result;
-lbl_4:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = i;
    state->rstate.ia.xZ[1] = j;
    state->rstate.ia.xZ[2] = k;
@@ -41630,7 +40356,7 @@ lbl_rcomm:
    state->rstate.ra.xR[0] = v;
    state->rstate.ra.xR[1] = xp;
    state->rstate.ra.xR[2] = xm;
-   return result;
+   return true;
 }
 
 //
@@ -42453,81 +41179,38 @@ bool minasaiteration(minasastate *state) {
    bool b;
    bool stepfound;
    ae_int_t diffcnt;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      i = state->rstate.ia.xZ[1];
-      mcinfo = state->rstate.ia.xZ[2];
-      diffcnt = state->rstate.ia.xZ[3];
-      b = state->rstate.ba.xB[0];
-      stepfound = state->rstate.ba.xB[1];
-      betak = state->rstate.ra.xR[0];
-      v = state->rstate.ra.xR[1];
-      vv = state->rstate.ra.xR[2];
-   } else {
-      n = 359;
-      i = -58;
-      mcinfo = -919;
-      diffcnt = -909;
-      b = true;
-      stepfound = true;
-      betak = 74;
-      v = -788;
-      vv = 809;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   i = state->rstate.ia.xZ[1];
+   mcinfo = state->rstate.ia.xZ[2];
+   diffcnt = state->rstate.ia.xZ[3];
+   b = state->rstate.ba.xB[0];
+   stepfound = state->rstate.ba.xB[1];
+   betak = state->rstate.ra.xR[0];
+   v = state->rstate.ra.xR[1];
+   vv = state->rstate.ra.xR[2];
+   switch (state->rstate.stage) {
+      case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
+      case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
+      case 8: goto Resume08; case 9: goto Resume09; case 10: goto Resume10; case 11: goto Resume11;
+      case 12: goto Resume12; case 13: goto Resume13; case 14: goto Resume14;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
-   if (state->rstate.stage == 5) {
-      goto lbl_5;
-   }
-   if (state->rstate.stage == 6) {
-      goto lbl_6;
-   }
-   if (state->rstate.stage == 7) {
-      goto lbl_7;
-   }
-   if (state->rstate.stage == 8) {
-      goto lbl_8;
-   }
-   if (state->rstate.stage == 9) {
-      goto lbl_9;
-   }
-   if (state->rstate.stage == 10) {
-      goto lbl_10;
-   }
-   if (state->rstate.stage == 11) {
-      goto lbl_11;
-   }
-   if (state->rstate.stage == 12) {
-      goto lbl_12;
-   }
-   if (state->rstate.stage == 13) {
-      goto lbl_13;
-   }
-   if (state->rstate.stage == 14) {
-      goto lbl_14;
-   }
+Spawn:
+   n = 359;
+   i = -58;
+   mcinfo = -919;
+   diffcnt = -909;
+   b = true;
+   stepfound = true;
+   betak = 74;
+   v = -788;
+   vv = 809;
 // Routine body
 // Prepare
    n = state->n;
@@ -42549,25 +41232,18 @@ bool minasaiteration(minasastate *state) {
 // Calculate F/G, initialize algorithm
    mincomp_clearrequestfields(state);
    state->needfg = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
+   state->rstate.stage = 0; goto Pause; Resume00:
    state->needfg = false;
-   if (!state->xrep) {
-      goto lbl_15;
+   if (state->xrep) {
+   // progress report
+      mincomp_clearrequestfields(state);
+      state->xupdated = true;
+      state->rstate.stage = 1; goto Pause; Resume01:
+      state->xupdated = false;
    }
-// progress report
-   mincomp_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->xupdated = false;
-lbl_15:
    if (mincomp_asaboundedantigradnorm(state) <= state->epsg) {
       state->repterminationtype = 4;
-      result = false;
-      return result;
+      goto Exit;
    }
    state->repnfev++;
 // Main cycle
@@ -42576,488 +41252,380 @@ lbl_15:
 // * CurAlgo stores current algorithm selector
 // * State.XK, State.F and State.G store current X/F/G
 // * State.AK stores current set of active constraints
-lbl_17:
-   if (false) {
-      goto lbl_18;
-   }
-// GPA algorithm
-   if (state->curalgo != 0) {
-      goto lbl_19;
-   }
-   state->k = 0;
-   state->acount = 0;
-lbl_21:
-   if (false) {
-      goto lbl_22;
-   }
-// Determine Dk = proj(xk - gk)-xk
-   for (i = 0; i < n; i++) {
-      state->d.xR[i] = rboundval(state->xk.xR[i] - state->g.xR[i], state->bndl.xR[i], state->bndu.xR[i]) - state->xk.xR[i];
-   }
-// Armijo line search.
-// * exact search with alpha=1 is tried first,
-//   'exact' means that we evaluate f() EXACTLY at
-//   bound(x-g,bndl,bndu), without intermediate floating
-//   point operations.
-// * alpha<1 are tried if explicit search wasn't successful
-// Result is placed into XN.
-//
-// Two types of search are needed because we can't
-// just use second type with alpha=1 because in finite
-// precision arithmetics (x1-x0)+x0 may differ from x1.
-// So while x1 is correctly bounded (it lie EXACTLY on
-// boundary, if it is active), (x1-x0)+x0 may be
-// not bounded.
-   v = ae_v_dotproduct(state->d.xR, 1, state->g.xR, 1, n);
-   state->dginit = v;
-   state->finit = state->f;
-   if (!(mincomp_asad1norm(state) <= state->stpmax || state->stpmax == 0.0)) {
-      goto lbl_23;
-   }
-// Try alpha=1 step first
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = rboundval(state->xk.xR[i] - state->g.xR[i], state->bndl.xR[i], state->bndu.xR[i]);
-   }
-   mincomp_clearrequestfields(state);
-   state->needfg = true;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->needfg = false;
-   state->repnfev++;
-   stepfound = state->f <= state->finit + mincomp_gpaftol * state->dginit;
-   goto lbl_24;
-lbl_23:
-   stepfound = false;
-lbl_24:
-   if (!stepfound) {
-      goto lbl_25;
-   }
-// we are at the boundary(ies)
-   ae_v_move(state->xn.xR, 1, state->x.xR, 1, n);
-   state->stp = 1.0;
-   goto lbl_26;
-lbl_25:
-// alpha=1 is too large, try smaller values
-   state->stp = 1.0;
-   linminnormalized(&state->d, &state->stp, n);
-   state->dginit /= state->stp;
-   state->stp *= mincomp_gpadecay;
-   if (state->stpmax > 0.0) {
-      state->stp = rmin2(state->stp, state->stpmax);
-   }
-lbl_27:
-   if (false) {
-      goto lbl_28;
-   }
-   v = state->stp;
-   ae_v_move(state->x.xR, 1, state->xk.xR, 1, n);
-   ae_v_addd(state->x.xR, 1, state->d.xR, 1, n, v);
-   mincomp_clearrequestfields(state);
-   state->needfg = true;
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->needfg = false;
-   state->repnfev++;
-   if (state->stp <= mincomp_stpmin) {
-      goto lbl_28;
-   }
-   if (state->f <= state->finit + state->stp * mincomp_gpaftol * state->dginit) {
-      goto lbl_28;
-   }
-   state->stp *= mincomp_gpadecay;
-   goto lbl_27;
-lbl_28:
-   ae_v_move(state->xn.xR, 1, state->x.xR, 1, n);
-lbl_26:
-   state->repiterationscount++;
-   if (!state->xrep) {
-      goto lbl_29;
-   }
-// progress report
-   mincomp_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   state->xupdated = false;
-lbl_29:
-// Calculate new set of active constraints.
-// Reset counter if active set was changed.
-// Prepare for the new iteration
-   for (i = 0; i < n; i++) {
-      if (state->xn.xR[i] == state->bndl.xR[i] || state->xn.xR[i] == state->bndu.xR[i]) {
-         state->an.xR[i] = 0.0;
-      } else {
-         state->an.xR[i] = 1.0;
+   while (true) {
+   // GPA algorithm
+      if (state->curalgo == 0) {
+         state->k = 0;
+         state->acount = 0;
+         while (true) {
+         // Determine Dk = proj(xk - gk)-xk
+            for (i = 0; i < n; i++) {
+               state->d.xR[i] = rboundval(state->xk.xR[i] - state->g.xR[i], state->bndl.xR[i], state->bndu.xR[i]) - state->xk.xR[i];
+            }
+         // Armijo line search.
+         // * exact search with alpha=1 is tried first,
+         //   'exact' means that we evaluate f() EXACTLY at
+         //   bound(x-g,bndl,bndu), without intermediate floating
+         //   point operations.
+         // * alpha<1 are tried if explicit search wasn't successful
+         // Result is placed into XN.
+         //
+         // Two types of search are needed because we can't
+         // just use second type with alpha=1 because in finite
+         // precision arithmetics (x1-x0)+x0 may differ from x1.
+         // So while x1 is correctly bounded (it lie EXACTLY on
+         // boundary, if it is active), (x1-x0)+x0 may be
+         // not bounded.
+            v = ae_v_dotproduct(state->d.xR, 1, state->g.xR, 1, n);
+            state->dginit = v;
+            state->finit = state->f;
+            if (mincomp_asad1norm(state) <= state->stpmax || state->stpmax == 0.0) {
+            // Try alpha=1 step first
+               for (i = 0; i < n; i++) {
+                  state->x.xR[i] = rboundval(state->xk.xR[i] - state->g.xR[i], state->bndl.xR[i], state->bndu.xR[i]);
+               }
+               mincomp_clearrequestfields(state);
+               state->needfg = true;
+               state->rstate.stage = 2; goto Pause; Resume02:
+               state->needfg = false;
+               state->repnfev++;
+               stepfound = state->f <= state->finit + mincomp_gpaftol * state->dginit;
+            } else {
+               stepfound = false;
+            }
+            if (stepfound) {
+            // we are at the boundary(ies)
+               ae_v_move(state->xn.xR, 1, state->x.xR, 1, n);
+               state->stp = 1.0;
+            } else {
+            // alpha=1 is too large, try smaller values
+               state->stp = 1.0;
+               linminnormalized(&state->d, &state->stp, n);
+               state->dginit /= state->stp;
+               state->stp *= mincomp_gpadecay;
+               if (state->stpmax > 0.0) {
+                  state->stp = rmin2(state->stp, state->stpmax);
+               }
+               while (true) {
+                  v = state->stp;
+                  ae_v_move(state->x.xR, 1, state->xk.xR, 1, n);
+                  ae_v_addd(state->x.xR, 1, state->d.xR, 1, n, v);
+                  mincomp_clearrequestfields(state);
+                  state->needfg = true;
+                  state->rstate.stage = 3; goto Pause; Resume03:
+                  state->needfg = false;
+                  state->repnfev++;
+                  if (state->stp <= mincomp_stpmin) {
+                     break;
+                  } else if (state->f <= state->finit + state->stp * mincomp_gpaftol * state->dginit) {
+                     break;
+                  }
+                  state->stp *= mincomp_gpadecay;
+               }
+               ae_v_move(state->xn.xR, 1, state->x.xR, 1, n);
+            }
+            state->repiterationscount++;
+            if (state->xrep) {
+            // progress report
+               mincomp_clearrequestfields(state);
+               state->xupdated = true;
+               state->rstate.stage = 4; goto Pause; Resume04:
+               state->xupdated = false;
+            }
+         // Calculate new set of active constraints.
+         // Reset counter if active set was changed.
+         // Prepare for the new iteration
+            for (i = 0; i < n; i++) {
+               if (state->xn.xR[i] == state->bndl.xR[i] || state->xn.xR[i] == state->bndu.xR[i]) {
+                  state->an.xR[i] = 0.0;
+               } else {
+                  state->an.xR[i] = 1.0;
+               }
+            }
+            for (i = 0; i < n; i++) {
+               if (state->ak.xR[i] != state->an.xR[i]) {
+                  state->acount = -1;
+                  break;
+               }
+            }
+            state->acount++;
+            ae_v_move(state->xk.xR, 1, state->xn.xR, 1, n);
+            ae_v_move(state->ak.xR, 1, state->an.xR, 1, n);
+         // Stopping conditions
+            if (state->repiterationscount >= state->maxits && state->maxits > 0) {
+            // Too many iterations
+               state->repterminationtype = 5;
+               if (state->xrep) {
+                  mincomp_clearrequestfields(state);
+                  state->xupdated = true;
+                  state->rstate.stage = 5; goto Pause; Resume05:
+                  state->xupdated = false;
+               }
+               goto Exit;
+            } else if (mincomp_asaboundedantigradnorm(state) <= state->epsg) {
+            // Gradient is small enough
+               state->repterminationtype = 4;
+               if (state->xrep) {
+                  mincomp_clearrequestfields(state);
+                  state->xupdated = true;
+                  state->rstate.stage = 6; goto Pause; Resume06:
+                  state->xupdated = false;
+               }
+               goto Exit;
+            }
+            v = ae_v_dotproduct(state->d.xR, 1, state->d.xR, 1, n);
+            if (sqrt(v) * state->stp <= state->epsx) {
+            // Step size is too small, no further improvement is
+            // possible
+               state->repterminationtype = 2;
+               if (state->xrep) {
+                  mincomp_clearrequestfields(state);
+                  state->xupdated = true;
+                  state->rstate.stage = 7; goto Pause; Resume07:
+                  state->xupdated = false;
+               }
+               goto Exit;
+            } else if (state->finit - state->f <= state->epsf * rmax2(fabs(state->finit), rmax2(fabs(state->f), 1.0))) {
+            // F(k+1)-F(k) is small enough
+               state->repterminationtype = 1;
+               if (state->xrep) {
+                  mincomp_clearrequestfields(state);
+                  state->xupdated = true;
+                  state->rstate.stage = 8; goto Pause; Resume08:
+                  state->xupdated = false;
+               }
+               goto Exit;
+            }
+         // Decide - should we switch algorithm or not
+            if (mincomp_asauisempty(state)) {
+               if (mincomp_asaginorm(state) >= state->mu * mincomp_asad1norm(state)) {
+                  state->curalgo = 1;
+                  break;
+               } else {
+                  state->mu *= mincomp_asarho;
+               }
+            } else {
+               if (state->acount == mincomp_n1) {
+                  if (mincomp_asaginorm(state) >= state->mu * mincomp_asad1norm(state)) {
+                     state->curalgo = 1;
+                     break;
+                  }
+               }
+            }
+         // Next iteration
+            state->k++;
+         }
       }
-   }
-   for (i = 0; i < n; i++) {
-      if (state->ak.xR[i] != state->an.xR[i]) {
-         state->acount = -1;
-         break;
-      }
-   }
-   state->acount++;
-   ae_v_move(state->xk.xR, 1, state->xn.xR, 1, n);
-   ae_v_move(state->ak.xR, 1, state->an.xR, 1, n);
-// Stopping conditions
-   if (!(state->repiterationscount >= state->maxits && state->maxits > 0)) {
-      goto lbl_31;
-   }
-// Too many iterations
-   state->repterminationtype = 5;
-   if (!state->xrep) {
-      goto lbl_33;
-   }
-   mincomp_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 5;
-   goto lbl_rcomm;
-lbl_5:
-   state->xupdated = false;
-lbl_33:
-   result = false;
-   return result;
-lbl_31:
-   if (mincomp_asaboundedantigradnorm(state) > state->epsg) {
-      goto lbl_35;
-   }
-// Gradient is small enough
-   state->repterminationtype = 4;
-   if (!state->xrep) {
-      goto lbl_37;
-   }
-   mincomp_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 6;
-   goto lbl_rcomm;
-lbl_6:
-   state->xupdated = false;
-lbl_37:
-   result = false;
-   return result;
-lbl_35:
-   v = ae_v_dotproduct(state->d.xR, 1, state->d.xR, 1, n);
-   if (sqrt(v) * state->stp > state->epsx) {
-      goto lbl_39;
-   }
-// Step size is too small, no further improvement is
-// possible
-   state->repterminationtype = 2;
-   if (!state->xrep) {
-      goto lbl_41;
-   }
-   mincomp_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 7;
-   goto lbl_rcomm;
-lbl_7:
-   state->xupdated = false;
-lbl_41:
-   result = false;
-   return result;
-lbl_39:
-   if (state->finit - state->f > state->epsf * rmax2(fabs(state->finit), rmax2(fabs(state->f), 1.0))) {
-      goto lbl_43;
-   }
-// F(k+1)-F(k) is small enough
-   state->repterminationtype = 1;
-   if (!state->xrep) {
-      goto lbl_45;
-   }
-   mincomp_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 8;
-   goto lbl_rcomm;
-lbl_8:
-   state->xupdated = false;
-lbl_45:
-   result = false;
-   return result;
-lbl_43:
-// Decide - should we switch algorithm or not
-   if (mincomp_asauisempty(state)) {
-      if (mincomp_asaginorm(state) >= state->mu * mincomp_asad1norm(state)) {
-         state->curalgo = 1;
-         goto lbl_22;
-      } else {
-         state->mu *= mincomp_asarho;
-      }
-   } else {
-      if (state->acount == mincomp_n1) {
-         if (mincomp_asaginorm(state) >= state->mu * mincomp_asad1norm(state)) {
-            state->curalgo = 1;
-            goto lbl_22;
+   // CG algorithm
+      if (state->curalgo == 1) {
+      // first, check that there are non-active constraints.
+      // move to GPA algorithm, if all constraints are active
+         b = true;
+         for (i = 0; i < n; i++) {
+            if (state->ak.xR[i] != 0.0) {
+               b = false;
+               break;
+            }
+         }
+         if (b) {
+            state->curalgo = 0;
+            continue;
+         }
+      // CG iterations
+         state->fold = state->f;
+         ae_v_move(state->xk.xR, 1, state->x.xR, 1, n);
+         for (i = 0; i < n; i++) {
+            state->dk.xR[i] = -state->g.xR[i] * state->ak.xR[i];
+            state->gc.xR[i] = state->g.xR[i] * state->ak.xR[i];
+         }
+         while (true) {
+         // Store G[k] for later calculation of Y[k]
+            for (i = 0; i < n; i++) {
+               state->yk.xR[i] = -state->gc.xR[i];
+            }
+         // Make a CG step in direction given by DK[]:
+         // * calculate step. Step projection into feasible set
+         //   is used. It has several benefits: a) step may be
+         //   found with usual line search, b) multiple constraints
+         //   may be activated with one step, c) activated constraints
+         //   are detected in a natural way - just compare x[i] with
+         //   bounds
+         // * update active set, set B to True, if there
+         //   were changes in the set.
+            ae_v_move(state->d.xR, 1, state->dk.xR, 1, n);
+            ae_v_move(state->xn.xR, 1, state->xk.xR, 1, n);
+            state->mcstage = 0;
+            state->stp = 1.0;
+            linminnormalized(&state->d, &state->stp, n);
+            if (state->laststep != 0.0) {
+               state->stp = state->laststep;
+            }
+            mcsrch(n, &state->xn, &state->f, &state->gc, &state->d, &state->stp, state->stpmax, mincomp_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
+            while (state->mcstage != 0) {
+            // preprocess data: bound State.XN so it belongs to the
+            // feasible set and store it in the State.X
+               for (i = 0; i < n; i++) {
+                  state->x.xR[i] = rboundval(state->xn.xR[i], state->bndl.xR[i], state->bndu.xR[i]);
+               }
+            // RComm
+               mincomp_clearrequestfields(state);
+               state->needfg = true;
+               state->rstate.stage = 9; goto Pause; Resume09:
+               state->needfg = false;
+            // postprocess data: zero components of G corresponding to
+            // the active constraints
+               for (i = 0; i < n; i++) {
+                  if (state->x.xR[i] == state->bndl.xR[i] || state->x.xR[i] == state->bndu.xR[i]) {
+                     state->gc.xR[i] = 0.0;
+                  } else {
+                     state->gc.xR[i] = state->g.xR[i];
+                  }
+               }
+               mcsrch(n, &state->xn, &state->f, &state->gc, &state->d, &state->stp, state->stpmax, mincomp_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
+            }
+            diffcnt = 0;
+            for (i = 0; i < n; i++) {
+            // XN contains unprojected result, project it,
+            // save copy to X (will be used for progress reporting)
+               state->xn.xR[i] = rboundval(state->xn.xR[i], state->bndl.xR[i], state->bndu.xR[i]);
+            // update active set
+               if (state->xn.xR[i] == state->bndl.xR[i] || state->xn.xR[i] == state->bndu.xR[i]) {
+                  state->an.xR[i] = 0.0;
+               } else {
+                  state->an.xR[i] = 1.0;
+               }
+               if (state->an.xR[i] != state->ak.xR[i]) {
+                  diffcnt++;
+               }
+               state->ak.xR[i] = state->an.xR[i];
+            }
+            ae_v_move(state->xk.xR, 1, state->xn.xR, 1, n);
+            state->repnfev += state->nfev;
+            state->repiterationscount++;
+            if (state->xrep) {
+            // progress report
+               mincomp_clearrequestfields(state);
+               state->xupdated = true;
+               state->rstate.stage = 10; goto Pause; Resume10:
+               state->xupdated = false;
+            }
+         // Update info about step length
+            v = ae_v_dotproduct(state->d.xR, 1, state->d.xR, 1, n);
+            state->laststep = sqrt(v) * state->stp;
+         // Check stopping conditions.
+            if (mincomp_asaboundedantigradnorm(state) <= state->epsg) {
+            // Gradient is small enough
+               state->repterminationtype = 4;
+               if (state->xrep) {
+                  mincomp_clearrequestfields(state);
+                  state->xupdated = true;
+                  state->rstate.stage = 11; goto Pause; Resume11:
+                  state->xupdated = false;
+               }
+               goto Exit;
+            } else if (state->repiterationscount >= state->maxits && state->maxits > 0) {
+            // Too many iterations
+               state->repterminationtype = 5;
+               if (state->xrep) {
+                  mincomp_clearrequestfields(state);
+                  state->xupdated = true;
+                  state->rstate.stage = 12; goto Pause; Resume12:
+                  state->xupdated = false;
+               }
+               goto Exit;
+            }
+            if (mincomp_asaginorm(state) >= state->mu * mincomp_asad1norm(state) && diffcnt == 0) {
+            // These conditions (EpsF/EpsX) are explicitly or implicitly
+            // related to the current step size and influenced
+            // by changes in the active constraints.
+            //
+            // For these reasons they are checked only when we don't
+            // want to 'unstick' at the end of the iteration and there
+            // were no changes in the active set.
+            //
+            // NOTE: consition |G| >= Mu*|D1| must be exactly opposite
+            // to the condition used to switch back to GPA. At least
+            // one inequality must be strict, otherwise infinite cycle
+            // may occur when |G|=Mu*|D1| (we DON'T test stopping
+            // conditions and we DON'T switch to GPA, so we cycle
+            // indefinitely).
+               if (state->fold - state->f <= state->epsf * rmax2(fabs(state->fold), rmax2(fabs(state->f), 1.0))) {
+               // F(k+1)-F(k) is small enough
+                  state->repterminationtype = 1;
+                  if (state->xrep) {
+                     mincomp_clearrequestfields(state);
+                     state->xupdated = true;
+                     state->rstate.stage = 13; goto Pause; Resume13:
+                     state->xupdated = false;
+                  }
+                  goto Exit;
+               } else if (state->laststep <= state->epsx) {
+               // X(k+1)-X(k) is small enough
+                  state->repterminationtype = 2;
+                  if (state->xrep) {
+                     mincomp_clearrequestfields(state);
+                     state->xupdated = true;
+                     state->rstate.stage = 14; goto Pause; Resume14:
+                     state->xupdated = false;
+                  }
+                  goto Exit;
+               }
+            }
+         // Check conditions for switching
+            if (mincomp_asaginorm(state) < state->mu * mincomp_asad1norm(state)) {
+               state->curalgo = 0;
+               break;
+            } else if (diffcnt > 0) {
+               if (mincomp_asauisempty(state) || diffcnt >= mincomp_n2) {
+                  state->curalgo = 1;
+               } else {
+                  state->curalgo = 0;
+               }
+               break;
+            }
+         // Calculate D(k+1)
+         //
+         // Line search may result in:
+         // * maximum feasible step being taken (already processed)
+         // * point satisfying Wolfe conditions
+         // * some kind of error (CG is restarted by assigning 0.0 to Beta)
+            if (mcinfo == 1) {
+            // Standard Wolfe conditions are satisfied:
+            // * calculate Y[K] and BetaK
+               ae_v_add(state->yk.xR, 1, state->gc.xR, 1, n);
+               vv = ae_v_dotproduct(state->yk.xR, 1, state->dk.xR, 1, n);
+               v = ae_v_dotproduct(state->gc.xR, 1, state->gc.xR, 1, n);
+               state->betady = v / vv;
+               v = ae_v_dotproduct(state->gc.xR, 1, state->yk.xR, 1, n);
+               state->betahs = v / vv;
+               if (state->cgtype == 0) {
+                  betak = state->betady;
+               }
+               if (state->cgtype == 1) {
+                  betak = rmax2(0.0, rmin2(state->betady, state->betahs));
+               }
+            } else {
+            // Something is wrong (may be function is too wild or too flat).
+            //
+            // We'll set BetaK=0, which will restart CG algorithm.
+            // We can stop later (during normal checks) if stopping conditions are met.
+               betak = 0.0;
+               state->debugrestartscount++;
+            }
+            ae_v_moveneg(state->dn.xR, 1, state->gc.xR, 1, n);
+            ae_v_addd(state->dn.xR, 1, state->dk.xR, 1, n, betak);
+            ae_v_move(state->dk.xR, 1, state->dn.xR, 1, n);
+         // update other information
+            state->fold = state->f;
+            state->k++;
          }
       }
    }
-// Next iteration
-   state->k++;
-   goto lbl_21;
-lbl_22:
-lbl_19:
-// CG algorithm
-   if (state->curalgo != 1) {
-      goto lbl_47;
-   }
-// first, check that there are non-active constraints.
-// move to GPA algorithm, if all constraints are active
-   b = true;
-   for (i = 0; i < n; i++) {
-      if (state->ak.xR[i] != 0.0) {
-         b = false;
-         break;
-      }
-   }
-   if (b) {
-      state->curalgo = 0;
-      goto lbl_17;
-   }
-// CG iterations
-   state->fold = state->f;
-   ae_v_move(state->xk.xR, 1, state->x.xR, 1, n);
-   for (i = 0; i < n; i++) {
-      state->dk.xR[i] = -state->g.xR[i] * state->ak.xR[i];
-      state->gc.xR[i] = state->g.xR[i] * state->ak.xR[i];
-   }
-lbl_49:
-   if (false) {
-      goto lbl_50;
-   }
-// Store G[k] for later calculation of Y[k]
-   for (i = 0; i < n; i++) {
-      state->yk.xR[i] = -state->gc.xR[i];
-   }
-// Make a CG step in direction given by DK[]:
-// * calculate step. Step projection into feasible set
-//   is used. It has several benefits: a) step may be
-//   found with usual line search, b) multiple constraints
-//   may be activated with one step, c) activated constraints
-//   are detected in a natural way - just compare x[i] with
-//   bounds
-// * update active set, set B to True, if there
-//   were changes in the set.
-   ae_v_move(state->d.xR, 1, state->dk.xR, 1, n);
-   ae_v_move(state->xn.xR, 1, state->xk.xR, 1, n);
-   state->mcstage = 0;
-   state->stp = 1.0;
-   linminnormalized(&state->d, &state->stp, n);
-   if (state->laststep != 0.0) {
-      state->stp = state->laststep;
-   }
-   mcsrch(n, &state->xn, &state->f, &state->gc, &state->d, &state->stp, state->stpmax, mincomp_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
-lbl_51:
-   if (state->mcstage == 0) {
-      goto lbl_52;
-   }
-// preprocess data: bound State.XN so it belongs to the
-// feasible set and store it in the State.X
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = rboundval(state->xn.xR[i], state->bndl.xR[i], state->bndu.xR[i]);
-   }
-// RComm
-   mincomp_clearrequestfields(state);
-   state->needfg = true;
-   state->rstate.stage = 9;
-   goto lbl_rcomm;
-lbl_9:
-   state->needfg = false;
-// postprocess data: zero components of G corresponding to
-// the active constraints
-   for (i = 0; i < n; i++) {
-      if (state->x.xR[i] == state->bndl.xR[i] || state->x.xR[i] == state->bndu.xR[i]) {
-         state->gc.xR[i] = 0.0;
-      } else {
-         state->gc.xR[i] = state->g.xR[i];
-      }
-   }
-   mcsrch(n, &state->xn, &state->f, &state->gc, &state->d, &state->stp, state->stpmax, mincomp_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
-   goto lbl_51;
-lbl_52:
-   diffcnt = 0;
-   for (i = 0; i < n; i++) {
-   // XN contains unprojected result, project it,
-   // save copy to X (will be used for progress reporting)
-      state->xn.xR[i] = rboundval(state->xn.xR[i], state->bndl.xR[i], state->bndu.xR[i]);
-   // update active set
-      if (state->xn.xR[i] == state->bndl.xR[i] || state->xn.xR[i] == state->bndu.xR[i]) {
-         state->an.xR[i] = 0.0;
-      } else {
-         state->an.xR[i] = 1.0;
-      }
-      if (state->an.xR[i] != state->ak.xR[i]) {
-         diffcnt++;
-      }
-      state->ak.xR[i] = state->an.xR[i];
-   }
-   ae_v_move(state->xk.xR, 1, state->xn.xR, 1, n);
-   state->repnfev += state->nfev;
-   state->repiterationscount++;
-   if (!state->xrep) {
-      goto lbl_53;
-   }
-// progress report
-   mincomp_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 10;
-   goto lbl_rcomm;
-lbl_10:
-   state->xupdated = false;
-lbl_53:
-// Update info about step length
-   v = ae_v_dotproduct(state->d.xR, 1, state->d.xR, 1, n);
-   state->laststep = sqrt(v) * state->stp;
-// Check stopping conditions.
-   if (mincomp_asaboundedantigradnorm(state) > state->epsg) {
-      goto lbl_55;
-   }
-// Gradient is small enough
-   state->repterminationtype = 4;
-   if (!state->xrep) {
-      goto lbl_57;
-   }
-   mincomp_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 11;
-   goto lbl_rcomm;
-lbl_11:
-   state->xupdated = false;
-lbl_57:
-   result = false;
-   return result;
-lbl_55:
-   if (!(state->repiterationscount >= state->maxits && state->maxits > 0)) {
-      goto lbl_59;
-   }
-// Too many iterations
-   state->repterminationtype = 5;
-   if (!state->xrep) {
-      goto lbl_61;
-   }
-   mincomp_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 12;
-   goto lbl_rcomm;
-lbl_12:
-   state->xupdated = false;
-lbl_61:
-   result = false;
-   return result;
-lbl_59:
-   if (!(mincomp_asaginorm(state) >= state->mu * mincomp_asad1norm(state) && diffcnt == 0)) {
-      goto lbl_63;
-   }
-// These conditions (EpsF/EpsX) are explicitly or implicitly
-// related to the current step size and influenced
-// by changes in the active constraints.
-//
-// For these reasons they are checked only when we don't
-// want to 'unstick' at the end of the iteration and there
-// were no changes in the active set.
-//
-// NOTE: consition |G| >= Mu*|D1| must be exactly opposite
-// to the condition used to switch back to GPA. At least
-// one inequality must be strict, otherwise infinite cycle
-// may occur when |G|=Mu*|D1| (we DON'T test stopping
-// conditions and we DON'T switch to GPA, so we cycle
-// indefinitely).
-   if (state->fold - state->f > state->epsf * rmax2(fabs(state->fold), rmax2(fabs(state->f), 1.0))) {
-      goto lbl_65;
-   }
-// F(k+1)-F(k) is small enough
-   state->repterminationtype = 1;
-   if (!state->xrep) {
-      goto lbl_67;
-   }
-   mincomp_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 13;
-   goto lbl_rcomm;
-lbl_13:
-   state->xupdated = false;
-lbl_67:
-   result = false;
-   return result;
-lbl_65:
-   if (state->laststep > state->epsx) {
-      goto lbl_69;
-   }
-// X(k+1)-X(k) is small enough
-   state->repterminationtype = 2;
-   if (!state->xrep) {
-      goto lbl_71;
-   }
-   mincomp_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 14;
-   goto lbl_rcomm;
-lbl_14:
-   state->xupdated = false;
-lbl_71:
-   result = false;
-   return result;
-lbl_69:
-lbl_63:
-// Check conditions for switching
-   if (mincomp_asaginorm(state) < state->mu * mincomp_asad1norm(state)) {
-      state->curalgo = 0;
-      goto lbl_50;
-   }
-   if (diffcnt > 0) {
-      if (mincomp_asauisempty(state) || diffcnt >= mincomp_n2) {
-         state->curalgo = 1;
-      } else {
-         state->curalgo = 0;
-      }
-      goto lbl_50;
-   }
-// Calculate D(k+1)
-//
-// Line search may result in:
-// * maximum feasible step being taken (already processed)
-// * point satisfying Wolfe conditions
-// * some kind of error (CG is restarted by assigning 0.0 to Beta)
-   if (mcinfo == 1) {
-   // Standard Wolfe conditions are satisfied:
-   // * calculate Y[K] and BetaK
-      ae_v_add(state->yk.xR, 1, state->gc.xR, 1, n);
-      vv = ae_v_dotproduct(state->yk.xR, 1, state->dk.xR, 1, n);
-      v = ae_v_dotproduct(state->gc.xR, 1, state->gc.xR, 1, n);
-      state->betady = v / vv;
-      v = ae_v_dotproduct(state->gc.xR, 1, state->yk.xR, 1, n);
-      state->betahs = v / vv;
-      if (state->cgtype == 0) {
-         betak = state->betady;
-      }
-      if (state->cgtype == 1) {
-         betak = rmax2(0.0, rmin2(state->betady, state->betahs));
-      }
-   } else {
-   // Something is wrong (may be function is too wild or too flat).
-   //
-   // We'll set BetaK=0, which will restart CG algorithm.
-   // We can stop later (during normal checks) if stopping conditions are met.
-      betak = 0.0;
-      state->debugrestartscount++;
-   }
-   ae_v_moveneg(state->dn.xR, 1, state->gc.xR, 1, n);
-   ae_v_addd(state->dn.xR, 1, state->dk.xR, 1, n, betak);
-   ae_v_move(state->dk.xR, 1, state->dn.xR, 1, n);
-// update other information
-   state->fold = state->f;
-   state->k++;
-   goto lbl_49;
-lbl_50:
-lbl_47:
-   goto lbl_17;
-lbl_18:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = i;
    state->rstate.ia.xZ[2] = mcinfo;
@@ -43067,7 +41635,7 @@ lbl_rcomm:
    state->rstate.ra.xR[0] = betak;
    state->rstate.ra.xR[1] = v;
    state->rstate.ra.xR[2] = vv;
-   return result;
+   return true;
 }
 
 // Obsolete optimization algorithm.
@@ -43829,142 +42397,58 @@ bool minbciteration(minbcstate *state) {
    double gdecay;
    bool activationstatus;
    double activationstep;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      freezeidx = state->rstate.ia.xZ[0];
-      n = state->rstate.ia.xZ[1];
-      m = state->rstate.ia.xZ[2];
-      i = state->rstate.ia.xZ[3];
-      j = state->rstate.ia.xZ[4];
-      mcinfo = state->rstate.ia.xZ[5];
-      itidx = state->rstate.ia.xZ[6];
-      b = state->rstate.ba.xB[0];
-      activationstatus = state->rstate.ba.xB[1];
-      freezeval = state->rstate.ra.xR[0];
-      scaleddnorm = state->rstate.ra.xR[1];
-      v = state->rstate.ra.xR[2];
-      vv = state->rstate.ra.xR[3];
-      v0 = state->rstate.ra.xR[4];
-      ginit = state->rstate.ra.xR[5];
-      gdecay = state->rstate.ra.xR[6];
-      activationstep = state->rstate.ra.xR[7];
-   } else {
-      freezeidx = 359;
-      n = -58;
-      m = -919;
-      i = -909;
-      j = 81;
-      mcinfo = 255;
-      itidx = 74;
-      b = false;
-      activationstatus = true;
-      freezeval = 205;
-      scaleddnorm = -838;
-      v = 939;
-      vv = -526;
-      v0 = 763;
-      ginit = -541;
-      gdecay = -698;
-      activationstep = -900;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   freezeidx = state->rstate.ia.xZ[0];
+   n = state->rstate.ia.xZ[1];
+   m = state->rstate.ia.xZ[2];
+   i = state->rstate.ia.xZ[3];
+   j = state->rstate.ia.xZ[4];
+   mcinfo = state->rstate.ia.xZ[5];
+   itidx = state->rstate.ia.xZ[6];
+   b = state->rstate.ba.xB[0];
+   activationstatus = state->rstate.ba.xB[1];
+   freezeval = state->rstate.ra.xR[0];
+   scaleddnorm = state->rstate.ra.xR[1];
+   v = state->rstate.ra.xR[2];
+   vv = state->rstate.ra.xR[3];
+   v0 = state->rstate.ra.xR[4];
+   ginit = state->rstate.ra.xR[5];
+   gdecay = state->rstate.ra.xR[6];
+   activationstep = state->rstate.ra.xR[7];
+   switch (state->rstate.stage) {
+      case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
+      case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
+      case 8: goto Resume08; case 9: goto Resume09; case 10: goto Resume10; case 11: goto Resume11;
+      case 12: goto Resume12; case 13: goto Resume13; case 14: goto Resume14; case 15: goto Resume15;
+      case 16: goto Resume16; case 17: goto Resume17; case 18: goto Resume18; case 19: goto Resume19;
+      case 20: goto Resume20; case 21: goto Resume21; case 22: goto Resume22; case 23: goto Resume23;
+      case 24: goto Resume24; case 25: goto Resume25; case 26: goto Resume26;
+      case 27: goto Resume27; case 28: goto Resume28; case 29: goto Resume29;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
-   if (state->rstate.stage == 4) {
-      goto lbl_4;
-   }
-   if (state->rstate.stage == 5) {
-      goto lbl_5;
-   }
-   if (state->rstate.stage == 6) {
-      goto lbl_6;
-   }
-   if (state->rstate.stage == 7) {
-      goto lbl_7;
-   }
-   if (state->rstate.stage == 8) {
-      goto lbl_8;
-   }
-   if (state->rstate.stage == 9) {
-      goto lbl_9;
-   }
-   if (state->rstate.stage == 10) {
-      goto lbl_10;
-   }
-   if (state->rstate.stage == 11) {
-      goto lbl_11;
-   }
-   if (state->rstate.stage == 12) {
-      goto lbl_12;
-   }
-   if (state->rstate.stage == 13) {
-      goto lbl_13;
-   }
-   if (state->rstate.stage == 14) {
-      goto lbl_14;
-   }
-   if (state->rstate.stage == 15) {
-      goto lbl_15;
-   }
-   if (state->rstate.stage == 16) {
-      goto lbl_16;
-   }
-   if (state->rstate.stage == 17) {
-      goto lbl_17;
-   }
-   if (state->rstate.stage == 18) {
-      goto lbl_18;
-   }
-   if (state->rstate.stage == 19) {
-      goto lbl_19;
-   }
-   if (state->rstate.stage == 20) {
-      goto lbl_20;
-   }
-   if (state->rstate.stage == 21) {
-      goto lbl_21;
-   }
-   if (state->rstate.stage == 22) {
-      goto lbl_22;
-   }
-   if (state->rstate.stage == 23) {
-      goto lbl_23;
-   }
-   if (state->rstate.stage == 24) {
-      goto lbl_24;
-   }
-   if (state->rstate.stage == 25) {
-      goto lbl_25;
-   }
-   if (state->rstate.stage == 26) {
-      goto lbl_26;
-   }
-   if (state->rstate.stage == 27) {
-      goto lbl_27;
-   }
-   if (state->rstate.stage == 28) {
-      goto lbl_28;
-   }
-   if (state->rstate.stage == 29) {
-      goto lbl_29;
-   }
+Spawn:
+   freezeidx = 359;
+   n = -58;
+   m = -919;
+   i = -909;
+   j = 81;
+   mcinfo = 255;
+   itidx = 74;
+   b = false;
+   activationstatus = true;
+   freezeval = 205;
+   scaleddnorm = -838;
+   v = 939;
+   vv = -526;
+   v0 = 763;
+   ginit = -541;
+   gdecay = -698;
+   activationstep = -900;
 // Routine body
 // Algorithm parameters:
 // * M          number of L-BFGS corrections.
@@ -43982,8 +42466,7 @@ bool minbciteration(minbcstate *state) {
    if (!enforceboundaryconstraints(&state->xc, &state->bndl, &state->hasbndl, &state->bndu, &state->hasbndu, n, 0)) {
    // Inconsistent constraints
       state->repterminationtype = -3;
-      result = false;
-      return result;
+      goto Exit;
    }
    state->userterminationneeded = false;
    state->repterminationtype = 0;
@@ -44015,805 +42498,662 @@ bool minbciteration(minbcstate *state) {
    }
 //  Check correctness of user-supplied gradient
    minbc_clearrequestfields(state);
-   if (!(state->diffstep == 0.0 && state->teststep > 0.0)) {
-      goto lbl_30;
+   if (state->diffstep == 0.0 && state->teststep > 0.0) {
+      while (smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xc, &state->s, &state->bndl, &state->bndu, true, state->teststep)) {
+         for (i = 0; i < n; i++) {
+            state->x.xR[i] = state->smonitor.x.xR[i];
+         }
+         state->needfg = true;
+         state->rstate.stage = 0; goto Pause; Resume00:
+         state->needfg = false;
+         state->smonitor.fi.xR[0] = state->f;
+         for (i = 0; i < n; i++) {
+            state->smonitor.j.xyR[0][i] = state->g.xR[i];
+         }
+      }
    }
-lbl_32:
-   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xc, &state->s, &state->bndl, &state->bndu, true, state->teststep)) {
-      goto lbl_33;
-   }
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = state->smonitor.x.xR[i];
-   }
-   state->needfg = true;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   state->needfg = false;
-   state->smonitor.fi.xR[0] = state->f;
-   for (i = 0; i < n; i++) {
-      state->smonitor.j.xyR[0][i] = state->g.xR[i];
-   }
-   goto lbl_32;
-lbl_33:
-lbl_30:
 // Main cycle of BC-PG algorithm
    state->repterminationtype = 0;
    state->lastscaledgoodstep = 0.0;
    state->nonmonotoniccnt = iround(1.5 * n) + 5;
    ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
    minbc_clearrequestfields(state);
-   if (state->diffstep != 0.0) {
-      goto lbl_34;
+   if (state->diffstep == 0.0) {
+      state->needfg = true;
+      state->rstate.stage = 1; goto Pause; Resume01:
+      state->needfg = false;
+   } else {
+      state->needf = true;
+      state->rstate.stage = 2; goto Pause; Resume02:
+      state->needf = false;
    }
-   state->needfg = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   state->needfg = false;
-   goto lbl_35;
-lbl_34:
-   state->needf = true;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   state->needf = false;
-lbl_35:
    state->fc = state->f;
    trimprepare(state->f, &state->trimthreshold);
    state->repnfev++;
-   if (!state->xrep) {
-      goto lbl_36;
-   }
-// Report current point
-   ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
-   state->f = state->fc;
-   state->xupdated = true;
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   state->xupdated = false;
-lbl_36:
-   if (state->userterminationneeded) {
-   // User requested termination
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-lbl_38:
-   if (false) {
-      goto lbl_39;
-   }
-// Steepest descent phase
-//
-// (a) calculate unconstrained gradient
-// (b) check F/G for NAN/INF, abnormally terminate algorithm if needed
-// (c) perform one steepest descent step, activating only those constraints
-//     which prevent us from moving outside of box-constrained area
-   ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
-   minbc_clearrequestfields(state);
-   if (state->diffstep != 0.0) {
-      goto lbl_40;
-   }
-// Analytic gradient
-   state->needfg = true;
-   state->rstate.stage = 4;
-   goto lbl_rcomm;
-lbl_4:
-   state->needfg = false;
-   goto lbl_41;
-lbl_40:
-// Numerical differentiation
-   state->needf = true;
-   state->rstate.stage = 5;
-   goto lbl_rcomm;
-lbl_5:
-   state->fbase = state->f;
-   i = 0;
-lbl_42:
-   if (i > n - 1) {
-      goto lbl_44;
-   }
-   v = state->x.xR[i];
-   b = false;
-   if (state->hasbndl.xB[i]) {
-      b = b || v - state->diffstep * state->s.xR[i] < state->bndl.xR[i];
-   }
-   if (state->hasbndu.xB[i]) {
-      b = b || v + state->diffstep * state->s.xR[i] > state->bndu.xR[i];
-   }
-   if (b) {
-      goto lbl_45;
-   }
-   state->x.xR[i] = v - state->diffstep * state->s.xR[i];
-   state->rstate.stage = 6;
-   goto lbl_rcomm;
-lbl_6:
-   state->fm2 = state->f;
-   state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 7;
-   goto lbl_rcomm;
-lbl_7:
-   state->fm1 = state->f;
-   state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 8;
-   goto lbl_rcomm;
-lbl_8:
-   state->fp1 = state->f;
-   state->x.xR[i] = v + state->diffstep * state->s.xR[i];
-   state->rstate.stage = 9;
-   goto lbl_rcomm;
-lbl_9:
-   state->fp2 = state->f;
-   state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   goto lbl_46;
-lbl_45:
-   state->xm1 = v - state->diffstep * state->s.xR[i];
-   state->xp1 = v + state->diffstep * state->s.xR[i];
-   if (state->hasbndl.xB[i] && state->xm1 < state->bndl.xR[i]) {
-      state->xm1 = state->bndl.xR[i];
-   }
-   if (state->hasbndu.xB[i] && state->xp1 > state->bndu.xR[i]) {
-      state->xp1 = state->bndu.xR[i];
-   }
-   state->x.xR[i] = state->xm1;
-   state->rstate.stage = 10;
-   goto lbl_rcomm;
-lbl_10:
-   state->fm1 = state->f;
-   state->x.xR[i] = state->xp1;
-   state->rstate.stage = 11;
-   goto lbl_rcomm;
-lbl_11:
-   state->fp1 = state->f;
-   if (state->xm1 != state->xp1) {
-      state->g.xR[i] = (state->fp1 - state->fm1) / (state->xp1 - state->xm1);
-   } else {
-      state->g.xR[i] = 0.0;
-   }
-lbl_46:
-   state->x.xR[i] = v;
-   i++;
-   goto lbl_42;
-lbl_44:
-   state->f = state->fbase;
-   state->needf = false;
-lbl_41:
-   state->fc = state->f;
-   ae_v_move(state->ugc.xR, 1, state->g.xR, 1, n);
-   ae_v_move(state->cgc.xR, 1, state->g.xR, 1, n);
-   projectgradientintobc(&state->xc, &state->cgc, &state->bndl, &state->hasbndl, &state->bndu, &state->hasbndu, n, 0);
-   ginit = 0.0;
-   for (i = 0; i < n; i++) {
-      ginit += sqr(state->cgc.xR[i] * state->s.xR[i]);
-   }
-   ginit = sqrt(ginit);
-   if (!isfinite(ginit) || !isfinite(state->fc)) {
-   // Abnormal termination - infinities in function/gradient
-      state->repterminationtype = -8;
-      result = false;
-      return result;
+   if (state->xrep) {
+   // Report current point
+      ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
+      state->f = state->fc;
+      state->xupdated = true;
+      state->rstate.stage = 3; goto Pause; Resume03:
+      state->xupdated = false;
    }
    if (state->userterminationneeded) {
    // User requested termination
       state->repterminationtype = 8;
-      result = false;
-      return result;
+      goto Exit;
    }
-   if (ginit <= state->epsg) {
-   // Gradient is small enough.
-   // Optimization is terminated
-      state->repterminationtype = 4;
-      result = false;
-      return result;
-   }
-   for (i = 0; i < n; i++) {
-      state->d.xR[i] = -state->tmpprec.xR[i] * state->cgc.xR[i];
-   }
-   scaleddnorm = 0.0;
-   for (i = 0; i < n; i++) {
-      scaleddnorm += sqr(state->d.xR[i] / state->s.xR[i]);
-   }
-   scaleddnorm = sqrt(scaleddnorm);
-   ae_assert(scaleddnorm > 0.0, "MinBC: integrity check failed");
-   if (state->lastscaledgoodstep > 0.0) {
-      state->stp = state->lastscaledgoodstep / scaleddnorm;
-   } else {
-      state->stp = 1.0 / scaleddnorm;
-   }
-   calculatestepbound(&state->xc, &state->d, 1.0, &state->bndl, &state->hasbndl, &state->bndu, &state->hasbndu, n, 0, &freezeidx, &freezeval, &state->curstpmax);
-   activationstep = state->curstpmax;
-   if (freezeidx < 0 || state->curstpmax > 1.0E50) {
-      state->curstpmax = 1.0E50;
-   }
-   if (state->stpmax > 0.0) {
-      state->curstpmax = rmin2(state->curstpmax, state->stpmax / scaleddnorm);
-   }
-   ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
-   ae_v_move(state->cgn.xR, 1, state->cgc.xR, 1, n);
-   ae_v_move(state->ugn.xR, 1, state->ugc.xR, 1, n);
-   state->fn = state->fc;
-   state->mcstage = 0;
-   smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->xn, state->fn, &state->ugn);
-   mcsrch(n, &state->xn, &state->fn, &state->cgn, &state->d, &state->stp, state->curstpmax, minbc_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
-lbl_47:
-   if (state->mcstage == 0) {
-      goto lbl_48;
-   }
-// Copy XN to X, perform on-the-fly correction w.r.t box
-// constraints (projection onto feasible set).
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = state->xn.xR[i];
-      if (state->hasbndl.xB[i] && state->xn.xR[i] < state->bndl.xR[i]) {
-         state->x.xR[i] = state->bndl.xR[i];
-      }
-      if (state->hasbndu.xB[i] && state->xn.xR[i] > state->bndu.xR[i]) {
-         state->x.xR[i] = state->bndu.xR[i];
-      }
-   }
-// Gradient, either user-provided or numerical differentiation
-   minbc_clearrequestfields(state);
-   if (state->diffstep != 0.0) {
-      goto lbl_49;
-   }
-// Analytic gradient
-   state->needfg = true;
-   state->rstate.stage = 12;
-   goto lbl_rcomm;
-lbl_12:
-   state->needfg = false;
-   state->repnfev++;
-   goto lbl_50;
-lbl_49:
-// Numerical differentiation
-   state->needf = true;
-   state->rstate.stage = 13;
-   goto lbl_rcomm;
-lbl_13:
-   state->fbase = state->f;
-   i = 0;
-lbl_51:
-   if (i > n - 1) {
-      goto lbl_53;
-   }
-   v = state->x.xR[i];
-   b = false;
-   if (state->hasbndl.xB[i]) {
-      b = b || v - state->diffstep * state->s.xR[i] < state->bndl.xR[i];
-   }
-   if (state->hasbndu.xB[i]) {
-      b = b || v + state->diffstep * state->s.xR[i] > state->bndu.xR[i];
-   }
-   if (b) {
-      goto lbl_54;
-   }
-   state->x.xR[i] = v - state->diffstep * state->s.xR[i];
-   state->rstate.stage = 14;
-   goto lbl_rcomm;
-lbl_14:
-   state->fm2 = state->f;
-   state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 15;
-   goto lbl_rcomm;
-lbl_15:
-   state->fm1 = state->f;
-   state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 16;
-   goto lbl_rcomm;
-lbl_16:
-   state->fp1 = state->f;
-   state->x.xR[i] = v + state->diffstep * state->s.xR[i];
-   state->rstate.stage = 17;
-   goto lbl_rcomm;
-lbl_17:
-   state->fp2 = state->f;
-   state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   state->repnfev += 4;
-   goto lbl_55;
-lbl_54:
-   state->xm1 = v - state->diffstep * state->s.xR[i];
-   state->xp1 = v + state->diffstep * state->s.xR[i];
-   if (state->hasbndl.xB[i] && state->xm1 < state->bndl.xR[i]) {
-      state->xm1 = state->bndl.xR[i];
-   }
-   if (state->hasbndu.xB[i] && state->xp1 > state->bndu.xR[i]) {
-      state->xp1 = state->bndu.xR[i];
-   }
-   state->x.xR[i] = state->xm1;
-   state->rstate.stage = 18;
-   goto lbl_rcomm;
-lbl_18:
-   state->fm1 = state->f;
-   state->x.xR[i] = state->xp1;
-   state->rstate.stage = 19;
-   goto lbl_rcomm;
-lbl_19:
-   state->fp1 = state->f;
-   if (state->xm1 != state->xp1) {
-      state->g.xR[i] = (state->fp1 - state->fm1) / (state->xp1 - state->xm1);
-   } else {
-      state->g.xR[i] = 0.0;
-   }
-   state->repnfev += 2;
-lbl_55:
-   state->x.xR[i] = v;
-   i++;
-   goto lbl_51;
-lbl_53:
-   state->f = state->fbase;
-   state->needf = false;
-lbl_50:
-// Back to MCSRCH
-   smoothnessmonitorenqueuepoint1u(&state->smonitor, &state->s, &state->invs, &state->d, state->stp, &state->x, state->f, &state->g);
-   trimfunction(&state->f, &state->g, n, state->trimthreshold);
-   state->fn = state->f;
-   ae_v_move(state->cgn.xR, 1, state->g.xR, 1, n);
-   ae_v_move(state->ugn.xR, 1, state->g.xR, 1, n);
-   for (i = 0; i < n; i++) {
-      if (state->d.xR[i] == 0.0) {
-         state->cgn.xR[i] = 0.0;
-      }
-   }
-   mcsrch(n, &state->xn, &state->fn, &state->cgn, &state->d, &state->stp, state->curstpmax, minbc_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
-   goto lbl_47;
-lbl_48:
-   smoothnessmonitorfinalizelinesearch(&state->smonitor);
-   v = state->fn;
-   for (i = 0; i < n; i++) {
-      v = 0.1 * v + state->ugn.xR[i];
-   }
-   if (!isfinite(v)) {
-   // Abnormal termination - infinities in function/gradient
-      state->repterminationtype = -8;
-      result = false;
-      return result;
-   }
-   if (mcinfo != 1 && mcinfo != 5) {
-   // We can not find step which decreases function value. We have
-   // two possibilities:
-   // (a) numerical properties of the function do not allow us to
-   //     find good step.
-   // (b) we are close to activation of some constraint, and it is
-   //     so close that step which activates it leads to change in
-   //     target function which is smaller than numerical noise.
+   while (true) {
+   // Steepest descent phase
    //
-   // Optimization algorithm must be able to handle case (b), because
-   // inability to handle it will cause failure when algorithm
-   // started very close to boundary of the feasible area.
-   //
-   // In order to correctly handle such cases we allow limited amount
-   // of small steps which increase function value.
-      if ((freezeidx >= 0 && scaleddnorm * state->curstpmax <= minbc_maxnonmonotoniclen) && state->nonmonotoniccnt > 0) {
-      // We enforce non-monotonic step:
-      // * Stp    := CurStpMax
-      // * MCINFO := 5
-      // * XN     := XC+CurStpMax*D
-      // * non-monotonic counter is decreased
-      //
-      // NOTE: UGN/CGN are not updated because step is so short that we assume that
-      //       GN is approximately equal to GC.
-         state->stp = state->curstpmax;
-         mcinfo = 5;
-         v = state->curstpmax;
-         ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
-         ae_v_addd(state->xn.xR, 1, state->d.xR, 1, n, v);
-         state->nonmonotoniccnt--;
+   // (a) calculate unconstrained gradient
+   // (b) check F/G for NAN/INF, abnormally terminate algorithm if needed
+   // (c) perform one steepest descent step, activating only those constraints
+   //     which prevent us from moving outside of box-constrained area
+      ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
+      minbc_clearrequestfields(state);
+      if (state->diffstep == 0.0) {
+      // Analytic gradient
+         state->needfg = true;
+         state->rstate.stage = 4; goto Pause; Resume04:
+         state->needfg = false;
       } else {
-      // Numerical properties of the function does not allow
-      // us to solve problem. Algorithm is terminated
-         state->repterminationtype = 7;
-         result = false;
-         return result;
+      // Numerical differentiation
+         state->needf = true;
+         state->rstate.stage = 5; goto Pause; Resume05:
+         state->fbase = state->f;
+         for (i = 0; i < n; i++) {
+            v = state->x.xR[i];
+            b = false;
+            if (state->hasbndl.xB[i]) {
+               b = b || v - state->diffstep * state->s.xR[i] < state->bndl.xR[i];
+            }
+            if (state->hasbndu.xB[i]) {
+               b = b || v + state->diffstep * state->s.xR[i] > state->bndu.xR[i];
+            }
+            if (!b) {
+               state->x.xR[i] = v - state->diffstep * state->s.xR[i];
+               state->rstate.stage = 6; goto Pause; Resume06:
+               state->fm2 = state->f;
+               state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
+               state->rstate.stage = 7; goto Pause; Resume07:
+               state->fm1 = state->f;
+               state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
+               state->rstate.stage = 8; goto Pause; Resume08:
+               state->fp1 = state->f;
+               state->x.xR[i] = v + state->diffstep * state->s.xR[i];
+               state->rstate.stage = 9; goto Pause; Resume09:
+               state->fp2 = state->f;
+               state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
+            } else {
+               state->xm1 = v - state->diffstep * state->s.xR[i];
+               state->xp1 = v + state->diffstep * state->s.xR[i];
+               if (state->hasbndl.xB[i] && state->xm1 < state->bndl.xR[i]) {
+                  state->xm1 = state->bndl.xR[i];
+               }
+               if (state->hasbndu.xB[i] && state->xp1 > state->bndu.xR[i]) {
+                  state->xp1 = state->bndu.xR[i];
+               }
+               state->x.xR[i] = state->xm1;
+               state->rstate.stage = 10; goto Pause; Resume10:
+               state->fm1 = state->f;
+               state->x.xR[i] = state->xp1;
+               state->rstate.stage = 11; goto Pause; Resume11:
+               state->fp1 = state->f;
+               if (state->xm1 != state->xp1) {
+                  state->g.xR[i] = (state->fp1 - state->fm1) / (state->xp1 - state->xm1);
+               } else {
+                  state->g.xR[i] = 0.0;
+               }
+            }
+            state->x.xR[i] = v;
+         }
+         state->f = state->fbase;
+         state->needf = false;
       }
-   }
-   if (state->userterminationneeded) {
-   // User requested termination
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-   ae_assert(mcinfo != 5 || state->stp == state->curstpmax, "MinBC: integrity check failed");
-   postprocessboundedstep(&state->xn, &state->xc, &state->bndl, &state->hasbndl, &state->bndu, &state->hasbndu, n, 0, freezeidx, freezeval, state->stp, activationstep);
-   state->fp = state->fc;
-   state->fc = state->fn;
-   ae_v_move(state->xp.xR, 1, state->xc.xR, 1, n);
-   ae_v_move(state->xc.xR, 1, state->xn.xR, 1, n);
-   ae_v_move(state->cgc.xR, 1, state->cgn.xR, 1, n);
-   ae_v_move(state->ugc.xR, 1, state->ugn.xR, 1, n);
-   if (!state->xrep) {
-      goto lbl_56;
-   }
-   ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
-   minbc_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 20;
-   goto lbl_rcomm;
-lbl_20:
-   state->xupdated = false;
-lbl_56:
-   state->repiterationscount++;
-   if (mcinfo == 1) {
-      v = 0.0;
+      state->fc = state->f;
+      ae_v_move(state->ugc.xR, 1, state->g.xR, 1, n);
+      ae_v_move(state->cgc.xR, 1, state->g.xR, 1, n);
+      projectgradientintobc(&state->xc, &state->cgc, &state->bndl, &state->hasbndl, &state->bndu, &state->hasbndu, n, 0);
+      ginit = 0.0;
       for (i = 0; i < n; i++) {
-         v += sqr((state->xc.xR[i] - state->xp.xR[i]) / state->s.xR[i]);
+         ginit += sqr(state->cgc.xR[i] * state->s.xR[i]);
       }
-      v = sqrt(v);
-      if (v <= state->epsx) {
-      // Step is small enough
-         state->repterminationtype = 2;
-         result = false;
-         return result;
+      ginit = sqrt(ginit);
+      if (!isfinite(ginit) || !isfinite(state->fc)) {
+      // Abnormal termination - infinities in function/gradient
+         state->repterminationtype = -8;
+         goto Exit;
       }
-      if (fabs(state->fp - state->fc) <= state->epsf * rmax2(fabs(state->fc), rmax2(fabs(state->fp), 1.0))) {
-      // Function change is small enough
-         state->repterminationtype = 1;
-         result = false;
-         return result;
+      if (state->userterminationneeded) {
+      // User requested termination
+         state->repterminationtype = 8;
+         goto Exit;
       }
-   }
-   if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
-   // Iteration counter exceeded limit
-      state->repterminationtype = 5;
-      result = false;
-      return result;
-   }
-// LBFGS stage:
-// * during LBFGS iterations we activate new constraints, but never
-//   deactivate already active ones.
-// * we perform at most N iterations of LBFGS before re-evaluating
-//   active set and restarting LBFGS.
-//
-// About termination:
-// * LBFGS iterations can be terminated because of two reasons:
-//   * "termination" - non-zero termination code in RepTerminationType,
-//     which means that optimization is done
-//   * "restart" - zero RepTerminationType, which means that we
-//     have to re-evaluate active set and resume LBFGS stage.
-// * one more option is "refresh" - to continue LBFGS iterations,
-//   but with all BFGS updates (Sk/Yk pairs) being dropped;
-//   it happens after changes in active set
-   ginit = 0.0;
-   for (i = 0; i < n; i++) {
-      state->cgc.xR[i] = state->ugc.xR[i];
-      if (state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i]) {
-         state->cgc.xR[i] = 0.0;
+      if (ginit <= state->epsg) {
+      // Gradient is small enough.
+      // Optimization is terminated
+         state->repterminationtype = 4;
+         goto Exit;
       }
-      if (state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i]) {
-         state->cgc.xR[i] = 0.0;
+      for (i = 0; i < n; i++) {
+         state->d.xR[i] = -state->tmpprec.xR[i] * state->cgc.xR[i];
       }
-      ginit += sqr(state->cgc.xR[i] * state->s.xR[i]);
-   }
-   ginit = sqrt(ginit);
-   state->bufsize = 0;
-   itidx = 0;
-lbl_58:
-   if (itidx > n - 1) {
-      goto lbl_60;
-   }
-// At the beginning of each iteration:
-// * XC stores current point
-// * FC stores current function value
-// * UGC stores current unconstrained gradient
-// * CGC stores current constrained gradient
-// * D stores constrained step direction (calculated at this block)
-//
-// 1. Calculate search direction D according to L-BFGS algorithm
-//    using constrained preconditioner to perform inner multiplication.
-// 2. Evaluate scaled length of direction D; restart LBFGS if D is zero
-//    (it may be possible that we found minimum, but it is also possible
-//    that some constraints need deactivation)
-// 3. If D is non-zero, try to use previous scaled step length as initial estimate for new step.
-// 4. Calculate bound on step length.
-   ae_v_move(state->work.xR, 1, state->cgc.xR, 1, n);
-   for (i = state->bufsize - 1; i >= 0; i--) {
-      v = ae_v_dotproduct(state->bufsk.xyR[i], 1, state->work.xR, 1, n);
-      state->buftheta.xR[i] = v;
-      vv = v * state->bufrho.xR[i];
-      ae_v_subd(state->work.xR, 1, state->bufyk.xyR[i], 1, n, vv);
-   }
-   for (i = 0; i < n; i++) {
-      state->work.xR[i] *= state->tmpprec.xR[i];
-   }
-   for (i = 0; i < state->bufsize; i++) {
-      v = ae_v_dotproduct(state->bufyk.xyR[i], 1, state->work.xR, 1, n);
-      vv = state->bufrho.xR[i] * (-v + state->buftheta.xR[i]);
-      ae_v_addd(state->work.xR, 1, state->bufsk.xyR[i], 1, n, vv);
-   }
-   ae_v_moveneg(state->d.xR, 1, state->work.xR, 1, n);
-   b = false;
-   for (i = 0; i < n; i++) {
-      b = b || ((state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i]) && state->d.xR[i] != 0.0);
-      b = b || ((state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i]) && state->d.xR[i] != 0.0);
-   }
-   ae_assert(!b, "MinBC: integrity check failed (q)");
-   scaleddnorm = 0.0;
-   for (i = 0; i < n; i++) {
-      scaleddnorm += sqr(state->d.xR[i] / state->s.xR[i]);
-   }
-   scaleddnorm = sqrt(scaleddnorm);
-   if (scaleddnorm == 0.0) {
-   // Search direction is zero.
-   // Skip back to steepest descent phase.
-      goto lbl_60;
-   }
-   if (state->lastscaledgoodstep > 0.0) {
-      state->stp = state->lastscaledgoodstep / scaleddnorm;
-   } else {
-      state->stp = 1.0 / scaleddnorm;
-   }
-   state->curstpmax = 1.0E50;
-   if (state->stpmax > 0.0) {
-      state->curstpmax = rmin2(state->curstpmax, state->stpmax / scaleddnorm);
-   }
-// Minimize G(t) = F(CONSTRAIN(XC + t*D)), with t being scalar, XC and D being vectors.
-   ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
-   ae_v_move(state->cgn.xR, 1, state->cgc.xR, 1, n);
-   ae_v_move(state->ugn.xR, 1, state->ugc.xR, 1, n);
-   state->fn = state->fc;
-   state->mcstage = 0;
-   smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->xn, state->fn, &state->ugn);
-   mcsrch(n, &state->xn, &state->fn, &state->cgn, &state->d, &state->stp, state->curstpmax, minbc_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
-lbl_61:
-   if (state->mcstage == 0) {
-      goto lbl_62;
-   }
-// Copy XN to X, perform on-the-fly correction w.r.t box
-// constraints (projection onto feasible set).
-   for (i = 0; i < n; i++) {
-      state->x.xR[i] = state->xn.xR[i];
-      if (state->hasbndl.xB[i] && state->xn.xR[i] <= state->bndl.xR[i]) {
-         state->x.xR[i] = state->bndl.xR[i];
+      scaleddnorm = 0.0;
+      for (i = 0; i < n; i++) {
+         scaleddnorm += sqr(state->d.xR[i] / state->s.xR[i]);
       }
-      if (state->hasbndu.xB[i] && state->xn.xR[i] >= state->bndu.xR[i]) {
-         state->x.xR[i] = state->bndu.xR[i];
+      scaleddnorm = sqrt(scaleddnorm);
+      ae_assert(scaleddnorm > 0.0, "MinBC: integrity check failed");
+      if (state->lastscaledgoodstep > 0.0) {
+         state->stp = state->lastscaledgoodstep / scaleddnorm;
+      } else {
+         state->stp = 1.0 / scaleddnorm;
       }
-   }
-// Gradient, either user-provided or numerical differentiation
-   minbc_clearrequestfields(state);
-   if (state->diffstep != 0.0) {
-      goto lbl_63;
-   }
-// Analytic gradient
-   state->needfg = true;
-   state->rstate.stage = 21;
-   goto lbl_rcomm;
-lbl_21:
-   state->needfg = false;
-   state->repnfev++;
-   goto lbl_64;
-lbl_63:
-// Numerical differentiation
-   state->needf = true;
-   state->rstate.stage = 22;
-   goto lbl_rcomm;
-lbl_22:
-   state->fbase = state->f;
-   i = 0;
-lbl_65:
-   if (i > n - 1) {
-      goto lbl_67;
-   }
-   v = state->x.xR[i];
-   b = false;
-   if (state->hasbndl.xB[i]) {
-      b = b || v - state->diffstep * state->s.xR[i] < state->bndl.xR[i];
-   }
-   if (state->hasbndu.xB[i]) {
-      b = b || v + state->diffstep * state->s.xR[i] > state->bndu.xR[i];
-   }
-   if (b) {
-      goto lbl_68;
-   }
-   state->x.xR[i] = v - state->diffstep * state->s.xR[i];
-   state->rstate.stage = 23;
-   goto lbl_rcomm;
-lbl_23:
-   state->fm2 = state->f;
-   state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 24;
-   goto lbl_rcomm;
-lbl_24:
-   state->fm1 = state->f;
-   state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
-   state->rstate.stage = 25;
-   goto lbl_rcomm;
-lbl_25:
-   state->fp1 = state->f;
-   state->x.xR[i] = v + state->diffstep * state->s.xR[i];
-   state->rstate.stage = 26;
-   goto lbl_rcomm;
-lbl_26:
-   state->fp2 = state->f;
-   state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
-   state->repnfev += 4;
-   goto lbl_69;
-lbl_68:
-   state->xm1 = v - state->diffstep * state->s.xR[i];
-   state->xp1 = v + state->diffstep * state->s.xR[i];
-   if (state->hasbndl.xB[i] && state->xm1 < state->bndl.xR[i]) {
-      state->xm1 = state->bndl.xR[i];
-   }
-   if (state->hasbndu.xB[i] && state->xp1 > state->bndu.xR[i]) {
-      state->xp1 = state->bndu.xR[i];
-   }
-   state->x.xR[i] = state->xm1;
-   state->rstate.stage = 27;
-   goto lbl_rcomm;
-lbl_27:
-   state->fm1 = state->f;
-   state->x.xR[i] = state->xp1;
-   state->rstate.stage = 28;
-   goto lbl_rcomm;
-lbl_28:
-   state->fp1 = state->f;
-   if (state->xm1 != state->xp1) {
-      state->g.xR[i] = (state->fp1 - state->fm1) / (state->xp1 - state->xm1);
-   } else {
-      state->g.xR[i] = 0.0;
-   }
-   state->repnfev += 2;
-lbl_69:
-   state->x.xR[i] = v;
-   i++;
-   goto lbl_65;
-lbl_67:
-   state->f = state->fbase;
-   state->needf = false;
-lbl_64:
-// Back to MCSRCH
-   smoothnessmonitorenqueuepoint1u(&state->smonitor, &state->s, &state->invs, &state->d, state->stp, &state->x, state->f, &state->g);
-   trimfunction(&state->f, &state->g, n, state->trimthreshold);
-   state->fn = state->f;
-   for (i = 0; i < n; i++) {
-      state->ugn.xR[i] = state->g.xR[i];
-      state->cgn.xR[i] = state->g.xR[i];
-      if (state->hasbndl.xB[i] && state->xn.xR[i] <= state->bndl.xR[i]) {
-         state->cgn.xR[i] = 0.0;
+      calculatestepbound(&state->xc, &state->d, 1.0, &state->bndl, &state->hasbndl, &state->bndu, &state->hasbndu, n, 0, &freezeidx, &freezeval, &state->curstpmax);
+      activationstep = state->curstpmax;
+      if (freezeidx < 0 || state->curstpmax > 1.0E50) {
+         state->curstpmax = 1.0E50;
       }
-      if (state->hasbndu.xB[i] && state->xn.xR[i] >= state->bndu.xR[i]) {
-         state->cgn.xR[i] = 0.0;
+      if (state->stpmax > 0.0) {
+         state->curstpmax = rmin2(state->curstpmax, state->stpmax / scaleddnorm);
       }
-   }
-   mcsrch(n, &state->xn, &state->fn, &state->cgn, &state->d, &state->stp, state->curstpmax, minbc_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
-   goto lbl_61;
-lbl_62:
-   smoothnessmonitorfinalizelinesearch(&state->smonitor);
-   for (i = 0; i < n; i++) {
-      if (state->hasbndl.xB[i] && state->xn.xR[i] <= state->bndl.xR[i]) {
-         state->xn.xR[i] = state->bndl.xR[i];
+      ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
+      ae_v_move(state->cgn.xR, 1, state->cgc.xR, 1, n);
+      ae_v_move(state->ugn.xR, 1, state->ugc.xR, 1, n);
+      state->fn = state->fc;
+      state->mcstage = 0;
+      smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->xn, state->fn, &state->ugn);
+      mcsrch(n, &state->xn, &state->fn, &state->cgn, &state->d, &state->stp, state->curstpmax, minbc_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
+      while (state->mcstage != 0) {
+      // Copy XN to X, perform on-the-fly correction w.r.t box
+      // constraints (projection onto feasible set).
+         for (i = 0; i < n; i++) {
+            state->x.xR[i] = state->xn.xR[i];
+            if (state->hasbndl.xB[i] && state->xn.xR[i] < state->bndl.xR[i]) {
+               state->x.xR[i] = state->bndl.xR[i];
+            }
+            if (state->hasbndu.xB[i] && state->xn.xR[i] > state->bndu.xR[i]) {
+               state->x.xR[i] = state->bndu.xR[i];
+            }
+         }
+      // Gradient, either user-provided or numerical differentiation
+         minbc_clearrequestfields(state);
+         if (state->diffstep == 0.0) {
+         // Analytic gradient
+            state->needfg = true;
+            state->rstate.stage = 12; goto Pause; Resume12:
+            state->needfg = false;
+            state->repnfev++;
+         } else {
+         // Numerical differentiation
+            state->needf = true;
+            state->rstate.stage = 13; goto Pause; Resume13:
+            state->fbase = state->f;
+            for (i = 0; i < n; i++) {
+               v = state->x.xR[i];
+               b = false;
+               if (state->hasbndl.xB[i]) {
+                  b = b || v - state->diffstep * state->s.xR[i] < state->bndl.xR[i];
+               }
+               if (state->hasbndu.xB[i]) {
+                  b = b || v + state->diffstep * state->s.xR[i] > state->bndu.xR[i];
+               }
+               if (!b) {
+                  state->x.xR[i] = v - state->diffstep * state->s.xR[i];
+                  state->rstate.stage = 14; goto Pause; Resume14:
+                  state->fm2 = state->f;
+                  state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
+                  state->rstate.stage = 15; goto Pause; Resume15:
+                  state->fm1 = state->f;
+                  state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
+                  state->rstate.stage = 16; goto Pause; Resume16:
+                  state->fp1 = state->f;
+                  state->x.xR[i] = v + state->diffstep * state->s.xR[i];
+                  state->rstate.stage = 17; goto Pause; Resume17:
+                  state->fp2 = state->f;
+                  state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
+                  state->repnfev += 4;
+               } else {
+                  state->xm1 = v - state->diffstep * state->s.xR[i];
+                  state->xp1 = v + state->diffstep * state->s.xR[i];
+                  if (state->hasbndl.xB[i] && state->xm1 < state->bndl.xR[i]) {
+                     state->xm1 = state->bndl.xR[i];
+                  }
+                  if (state->hasbndu.xB[i] && state->xp1 > state->bndu.xR[i]) {
+                     state->xp1 = state->bndu.xR[i];
+                  }
+                  state->x.xR[i] = state->xm1;
+                  state->rstate.stage = 18; goto Pause; Resume18:
+                  state->fm1 = state->f;
+                  state->x.xR[i] = state->xp1;
+                  state->rstate.stage = 19; goto Pause; Resume19:
+                  state->fp1 = state->f;
+                  if (state->xm1 != state->xp1) {
+                     state->g.xR[i] = (state->fp1 - state->fm1) / (state->xp1 - state->xm1);
+                  } else {
+                     state->g.xR[i] = 0.0;
+                  }
+                  state->repnfev += 2;
+               }
+               state->x.xR[i] = v;
+            }
+            state->f = state->fbase;
+            state->needf = false;
+         }
+      // Back to MCSRCH
+         smoothnessmonitorenqueuepoint1u(&state->smonitor, &state->s, &state->invs, &state->d, state->stp, &state->x, state->f, &state->g);
+         trimfunction(&state->f, &state->g, n, state->trimthreshold);
+         state->fn = state->f;
+         ae_v_move(state->cgn.xR, 1, state->g.xR, 1, n);
+         ae_v_move(state->ugn.xR, 1, state->g.xR, 1, n);
+         for (i = 0; i < n; i++) {
+            if (state->d.xR[i] == 0.0) {
+               state->cgn.xR[i] = 0.0;
+            }
+         }
+         mcsrch(n, &state->xn, &state->fn, &state->cgn, &state->d, &state->stp, state->curstpmax, minbc_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
       }
-      if (state->hasbndu.xB[i] && state->xn.xR[i] >= state->bndu.xR[i]) {
-         state->xn.xR[i] = state->bndu.xR[i];
+      smoothnessmonitorfinalizelinesearch(&state->smonitor);
+      v = state->fn;
+      for (i = 0; i < n; i++) {
+         v = 0.1 * v + state->ugn.xR[i];
       }
-   }
-   ae_v_moveneg(state->bufsk.xyR[state->bufsize], 1, state->xc.xR, 1, n);
-   ae_v_moveneg(state->bufyk.xyR[state->bufsize], 1, state->cgc.xR, 1, n);
-   ae_v_add(state->bufsk.xyR[state->bufsize], 1, state->xn.xR, 1, n);
-   ae_v_add(state->bufyk.xyR[state->bufsize], 1, state->cgn.xR, 1, n);
-// Handle special situations:
-// * check for presence of NAN/INF in function/gradient
-// * handle failure of line search
-   v = state->fn;
-   for (i = 0; i < n; i++) {
-      v = 0.1 * v + state->ugn.xR[i];
-   }
-   if (!isfinite(v)) {
-   // Abnormal termination - infinities in function/gradient
-      state->repterminationtype = -8;
-      result = false;
-      return result;
-   }
-   if (state->userterminationneeded) {
-   // User requested termination
-      state->repterminationtype = 8;
-      result = false;
-      return result;
-   }
-   if (mcinfo != 1) {
-   // Terminate LBFGS phase
-      goto lbl_60;
-   }
-// Current point is updated:
-// * move XC/FC/GC to XP/FP/GP
-// * move XN/FN/GN to XC/FC/GC
-// * report current point and update iterations counter
-// * push new pair SK/YK to LBFGS buffer
-// * update length of the good step
-   activationstatus = false;
-   for (i = 0; i < n; i++) {
-      if ((state->hasbndl.xB[i] && state->xn.xR[i] == state->bndl.xR[i]) && state->xn.xR[i] != state->xc.xR[i]) {
-         activationstatus = true;
+      if (!isfinite(v)) {
+      // Abnormal termination - infinities in function/gradient
+         state->repterminationtype = -8;
+         goto Exit;
       }
-      if ((state->hasbndu.xB[i] && state->xn.xR[i] == state->bndu.xR[i]) && state->xn.xR[i] != state->xc.xR[i]) {
-         activationstatus = true;
+      if (mcinfo != 1 && mcinfo != 5) {
+      // We can not find step which decreases function value. We have
+      // two possibilities:
+      // (a) numerical properties of the function do not allow us to
+      //     find good step.
+      // (b) we are close to activation of some constraint, and it is
+      //     so close that step which activates it leads to change in
+      //     target function which is smaller than numerical noise.
+      //
+      // Optimization algorithm must be able to handle case (b), because
+      // inability to handle it will cause failure when algorithm
+      // started very close to boundary of the feasible area.
+      //
+      // In order to correctly handle such cases we allow limited amount
+      // of small steps which increase function value.
+         if ((freezeidx >= 0 && scaleddnorm * state->curstpmax <= minbc_maxnonmonotoniclen) && state->nonmonotoniccnt > 0) {
+         // We enforce non-monotonic step:
+         // * Stp    := CurStpMax
+         // * MCINFO := 5
+         // * XN     := XC+CurStpMax*D
+         // * non-monotonic counter is decreased
+         //
+         // NOTE: UGN/CGN are not updated because step is so short that we assume that
+         //       GN is approximately equal to GC.
+            state->stp = state->curstpmax;
+            mcinfo = 5;
+            v = state->curstpmax;
+            ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
+            ae_v_addd(state->xn.xR, 1, state->d.xR, 1, n, v);
+            state->nonmonotoniccnt--;
+         } else {
+         // Numerical properties of the function does not allow
+         // us to solve problem. Algorithm is terminated
+            state->repterminationtype = 7;
+            goto Exit;
+         }
       }
-   }
-   state->fp = state->fc;
-   state->fc = state->fn;
-   ae_v_move(state->xp.xR, 1, state->xc.xR, 1, n);
-   ae_v_move(state->xc.xR, 1, state->xn.xR, 1, n);
-   ae_v_move(state->cgc.xR, 1, state->cgn.xR, 1, n);
-   ae_v_move(state->ugc.xR, 1, state->ugn.xR, 1, n);
-   if (!state->xrep) {
-      goto lbl_70;
-   }
-   ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
-   minbc_clearrequestfields(state);
-   state->xupdated = true;
-   state->rstate.stage = 29;
-   goto lbl_rcomm;
-lbl_29:
-   state->xupdated = false;
-lbl_70:
-   state->repiterationscount++;
-   if (state->bufsize == m) {
-   // Buffer is full, shift contents by one row
-      for (i = 0; i < state->bufsize; i++) {
-         ae_v_move(state->bufsk.xyR[i], 1, state->bufsk.xyR[i + 1], 1, n);
-         ae_v_move(state->bufyk.xyR[i], 1, state->bufyk.xyR[i + 1], 1, n);
+      if (state->userterminationneeded) {
+      // User requested termination
+         state->repterminationtype = 8;
+         goto Exit;
       }
-      for (i = 0; i < state->bufsize - 1; i++) {
-         state->bufrho.xR[i] = state->bufrho.xR[i + 1];
-         state->buftheta.xR[i] = state->buftheta.xR[i + 1];
+      ae_assert(mcinfo != 5 || state->stp == state->curstpmax, "MinBC: integrity check failed");
+      postprocessboundedstep(&state->xn, &state->xc, &state->bndl, &state->hasbndl, &state->bndu, &state->hasbndu, n, 0, freezeidx, freezeval, state->stp, activationstep);
+      state->fp = state->fc;
+      state->fc = state->fn;
+      ae_v_move(state->xp.xR, 1, state->xc.xR, 1, n);
+      ae_v_move(state->xc.xR, 1, state->xn.xR, 1, n);
+      ae_v_move(state->cgc.xR, 1, state->cgn.xR, 1, n);
+      ae_v_move(state->ugc.xR, 1, state->ugn.xR, 1, n);
+      if (state->xrep) {
+         ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
+         minbc_clearrequestfields(state);
+         state->xupdated = true;
+         state->rstate.stage = 20; goto Pause; Resume20:
+         state->xupdated = false;
       }
-   } else {
-   // Buffer is not full, increase buffer size by 1
-      state->bufsize++;
-   }
-   v = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufsk.xyR[state->bufsize - 1], 1, n);
-   vv = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufyk.xyR[state->bufsize - 1], 1, n);
-   if (v == 0.0 || vv == 0.0) {
-   // Strange internal error in LBFGS - either YK=0
-   // (which should not have been) or (SK,YK)=0 (again,
-   // unexpected). It should not take place because
-   // MCINFO=1, which signals "good" step. But just
-   // to be sure we have special branch of code which
-   // restarts LBFGS
-      goto lbl_60;
-   }
-   state->bufrho.xR[state->bufsize - 1] = 1 / v;
-   ae_assert(state->bufsize <= m, "MinBC: internal error");
-   v = 0.0;
-   vv = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr((state->xc.xR[i] - state->xp.xR[i]) / state->s.xR[i]);
-      vv += sqr(state->xc.xR[i] - state->xp.xR[i]);
-   }
-   minbc_updateestimateofgoodstep(&state->lastscaledgoodstep, sqrt(v));
-// Check MaxIts-based stopping condition.
-   if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
-      state->repterminationtype = 5;
-      result = false;
-      return result;
-   }
-// Smooth reset (LBFGS memory model is refreshed) or hard restart:
-// * LBFGS model is refreshed, if line search was performed with activation of constraints
-// * algorithm is restarted if scaled gradient decreased below GDecay
-   if (activationstatus) {
+      state->repiterationscount++;
+      if (mcinfo == 1) {
+         v = 0.0;
+         for (i = 0; i < n; i++) {
+            v += sqr((state->xc.xR[i] - state->xp.xR[i]) / state->s.xR[i]);
+         }
+         v = sqrt(v);
+         if (v <= state->epsx) {
+         // Step is small enough
+            state->repterminationtype = 2;
+            goto Exit;
+         }
+         if (fabs(state->fp - state->fc) <= state->epsf * rmax2(fabs(state->fc), rmax2(fabs(state->fp), 1.0))) {
+         // Function change is small enough
+            state->repterminationtype = 1;
+            goto Exit;
+         }
+      }
+      if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
+      // Iteration counter exceeded limit
+         state->repterminationtype = 5;
+         goto Exit;
+      }
+   // LBFGS stage:
+   // * during LBFGS iterations we activate new constraints, but never
+   //   deactivate already active ones.
+   // * we perform at most N iterations of LBFGS before re-evaluating
+   //   active set and restarting LBFGS.
+   //
+   // About termination:
+   // * LBFGS iterations can be terminated because of two reasons:
+   //   * "termination" - non-zero termination code in RepTerminationType,
+   //     which means that optimization is done
+   //   * "restart" - zero RepTerminationType, which means that we
+   //     have to re-evaluate active set and resume LBFGS stage.
+   // * one more option is "refresh" - to continue LBFGS iterations,
+   //   but with all BFGS updates (Sk/Yk pairs) being dropped;
+   //   it happens after changes in active set
+      ginit = 0.0;
+      for (i = 0; i < n; i++) {
+         state->cgc.xR[i] = state->ugc.xR[i];
+         if (state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i]) {
+            state->cgc.xR[i] = 0.0;
+         }
+         if (state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i]) {
+            state->cgc.xR[i] = 0.0;
+         }
+         ginit += sqr(state->cgc.xR[i] * state->s.xR[i]);
+      }
+      ginit = sqrt(ginit);
       state->bufsize = 0;
-      goto lbl_59;
+      for (itidx = 0; itidx < n; itidx++) {
+      // At the beginning of each iteration:
+      // * XC stores current point
+      // * FC stores current function value
+      // * UGC stores current unconstrained gradient
+      // * CGC stores current constrained gradient
+      // * D stores constrained step direction (calculated at this block)
+      //
+      // 1. Calculate search direction D according to L-BFGS algorithm
+      //    using constrained preconditioner to perform inner multiplication.
+      // 2. Evaluate scaled length of direction D; restart LBFGS if D is zero
+      //    (it may be possible that we found minimum, but it is also possible
+      //    that some constraints need deactivation)
+      // 3. If D is non-zero, try to use previous scaled step length as initial estimate for new step.
+      // 4. Calculate bound on step length.
+         ae_v_move(state->work.xR, 1, state->cgc.xR, 1, n);
+         for (i = state->bufsize - 1; i >= 0; i--) {
+            v = ae_v_dotproduct(state->bufsk.xyR[i], 1, state->work.xR, 1, n);
+            state->buftheta.xR[i] = v;
+            vv = v * state->bufrho.xR[i];
+            ae_v_subd(state->work.xR, 1, state->bufyk.xyR[i], 1, n, vv);
+         }
+         for (i = 0; i < n; i++) {
+            state->work.xR[i] *= state->tmpprec.xR[i];
+         }
+         for (i = 0; i < state->bufsize; i++) {
+            v = ae_v_dotproduct(state->bufyk.xyR[i], 1, state->work.xR, 1, n);
+            vv = state->bufrho.xR[i] * (-v + state->buftheta.xR[i]);
+            ae_v_addd(state->work.xR, 1, state->bufsk.xyR[i], 1, n, vv);
+         }
+         ae_v_moveneg(state->d.xR, 1, state->work.xR, 1, n);
+         b = false;
+         for (i = 0; i < n; i++) {
+            b = b || ((state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i]) && state->d.xR[i] != 0.0);
+            b = b || ((state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i]) && state->d.xR[i] != 0.0);
+         }
+         ae_assert(!b, "MinBC: integrity check failed (q)");
+         scaleddnorm = 0.0;
+         for (i = 0; i < n; i++) {
+            scaleddnorm += sqr(state->d.xR[i] / state->s.xR[i]);
+         }
+         scaleddnorm = sqrt(scaleddnorm);
+         if (scaleddnorm == 0.0) {
+         // Search direction is zero.
+         // Skip back to steepest descent phase.
+            break;
+         }
+         if (state->lastscaledgoodstep > 0.0) {
+            state->stp = state->lastscaledgoodstep / scaleddnorm;
+         } else {
+            state->stp = 1.0 / scaleddnorm;
+         }
+         state->curstpmax = 1.0E50;
+         if (state->stpmax > 0.0) {
+            state->curstpmax = rmin2(state->curstpmax, state->stpmax / scaleddnorm);
+         }
+      // Minimize G(t) = F(CONSTRAIN(XC + t*D)), with t being scalar, XC and D being vectors.
+         ae_v_move(state->xn.xR, 1, state->xc.xR, 1, n);
+         ae_v_move(state->cgn.xR, 1, state->cgc.xR, 1, n);
+         ae_v_move(state->ugn.xR, 1, state->ugc.xR, 1, n);
+         state->fn = state->fc;
+         state->mcstage = 0;
+         smoothnessmonitorstartlinesearch1u(&state->smonitor, &state->s, &state->invs, &state->xn, state->fn, &state->ugn);
+         mcsrch(n, &state->xn, &state->fn, &state->cgn, &state->d, &state->stp, state->curstpmax, minbc_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
+         while (state->mcstage != 0) {
+         // Copy XN to X, perform on-the-fly correction w.r.t box
+         // constraints (projection onto feasible set).
+            for (i = 0; i < n; i++) {
+               state->x.xR[i] = state->xn.xR[i];
+               if (state->hasbndl.xB[i] && state->xn.xR[i] <= state->bndl.xR[i]) {
+                  state->x.xR[i] = state->bndl.xR[i];
+               }
+               if (state->hasbndu.xB[i] && state->xn.xR[i] >= state->bndu.xR[i]) {
+                  state->x.xR[i] = state->bndu.xR[i];
+               }
+            }
+         // Gradient, either user-provided or numerical differentiation
+            minbc_clearrequestfields(state);
+            if (state->diffstep == 0.0) {
+            // Analytic gradient
+               state->needfg = true;
+               state->rstate.stage = 21; goto Pause; Resume21:
+               state->needfg = false;
+               state->repnfev++;
+            } else {
+            // Numerical differentiation
+               state->needf = true;
+               state->rstate.stage = 22; goto Pause; Resume22:
+               state->fbase = state->f;
+               for (i = 0; i < n; i++) {
+                  v = state->x.xR[i];
+                  b = false;
+                  if (state->hasbndl.xB[i]) {
+                     b = b || v - state->diffstep * state->s.xR[i] < state->bndl.xR[i];
+                  }
+                  if (state->hasbndu.xB[i]) {
+                     b = b || v + state->diffstep * state->s.xR[i] > state->bndu.xR[i];
+                  }
+                  if (!b) {
+                     state->x.xR[i] = v - state->diffstep * state->s.xR[i];
+                     state->rstate.stage = 23; goto Pause; Resume23:
+                     state->fm2 = state->f;
+                     state->x.xR[i] = v - 0.5 * state->diffstep * state->s.xR[i];
+                     state->rstate.stage = 24; goto Pause; Resume24:
+                     state->fm1 = state->f;
+                     state->x.xR[i] = v + 0.5 * state->diffstep * state->s.xR[i];
+                     state->rstate.stage = 25; goto Pause; Resume25:
+                     state->fp1 = state->f;
+                     state->x.xR[i] = v + state->diffstep * state->s.xR[i];
+                     state->rstate.stage = 26; goto Pause; Resume26:
+                     state->fp2 = state->f;
+                     state->g.xR[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.xR[i]);
+                     state->repnfev += 4;
+                  } else {
+                     state->xm1 = v - state->diffstep * state->s.xR[i];
+                     state->xp1 = v + state->diffstep * state->s.xR[i];
+                     if (state->hasbndl.xB[i] && state->xm1 < state->bndl.xR[i]) {
+                        state->xm1 = state->bndl.xR[i];
+                     }
+                     if (state->hasbndu.xB[i] && state->xp1 > state->bndu.xR[i]) {
+                        state->xp1 = state->bndu.xR[i];
+                     }
+                     state->x.xR[i] = state->xm1;
+                     state->rstate.stage = 27; goto Pause; Resume27:
+                     state->fm1 = state->f;
+                     state->x.xR[i] = state->xp1;
+                     state->rstate.stage = 28; goto Pause; Resume28:
+                     state->fp1 = state->f;
+                     if (state->xm1 != state->xp1) {
+                        state->g.xR[i] = (state->fp1 - state->fm1) / (state->xp1 - state->xm1);
+                     } else {
+                        state->g.xR[i] = 0.0;
+                     }
+                     state->repnfev += 2;
+                  }
+                  state->x.xR[i] = v;
+               }
+               state->f = state->fbase;
+               state->needf = false;
+            }
+         // Back to MCSRCH
+            smoothnessmonitorenqueuepoint1u(&state->smonitor, &state->s, &state->invs, &state->d, state->stp, &state->x, state->f, &state->g);
+            trimfunction(&state->f, &state->g, n, state->trimthreshold);
+            state->fn = state->f;
+            for (i = 0; i < n; i++) {
+               state->ugn.xR[i] = state->g.xR[i];
+               state->cgn.xR[i] = state->g.xR[i];
+               if (state->hasbndl.xB[i] && state->xn.xR[i] <= state->bndl.xR[i]) {
+                  state->cgn.xR[i] = 0.0;
+               }
+               if (state->hasbndu.xB[i] && state->xn.xR[i] >= state->bndu.xR[i]) {
+                  state->cgn.xR[i] = 0.0;
+               }
+            }
+            mcsrch(n, &state->xn, &state->fn, &state->cgn, &state->d, &state->stp, state->curstpmax, minbc_gtol, &mcinfo, &state->nfev, &state->work, &state->lstate, &state->mcstage);
+         }
+         smoothnessmonitorfinalizelinesearch(&state->smonitor);
+         for (i = 0; i < n; i++) {
+            if (state->hasbndl.xB[i] && state->xn.xR[i] <= state->bndl.xR[i]) {
+               state->xn.xR[i] = state->bndl.xR[i];
+            }
+            if (state->hasbndu.xB[i] && state->xn.xR[i] >= state->bndu.xR[i]) {
+               state->xn.xR[i] = state->bndu.xR[i];
+            }
+         }
+         ae_v_moveneg(state->bufsk.xyR[state->bufsize], 1, state->xc.xR, 1, n);
+         ae_v_moveneg(state->bufyk.xyR[state->bufsize], 1, state->cgc.xR, 1, n);
+         ae_v_add(state->bufsk.xyR[state->bufsize], 1, state->xn.xR, 1, n);
+         ae_v_add(state->bufyk.xyR[state->bufsize], 1, state->cgn.xR, 1, n);
+      // Handle special situations:
+      // * check for presence of NAN/INF in function/gradient
+      // * handle failure of line search
+         v = state->fn;
+         for (i = 0; i < n; i++) {
+            v = 0.1 * v + state->ugn.xR[i];
+         }
+         if (!isfinite(v)) {
+         // Abnormal termination - infinities in function/gradient
+            state->repterminationtype = -8;
+            goto Exit;
+         }
+         if (state->userterminationneeded) {
+         // User requested termination
+            state->repterminationtype = 8;
+            goto Exit;
+         }
+         if (mcinfo != 1) {
+         // Terminate LBFGS phase
+            break;
+         }
+      // Current point is updated:
+      // * move XC/FC/GC to XP/FP/GP
+      // * move XN/FN/GN to XC/FC/GC
+      // * report current point and update iterations counter
+      // * push new pair SK/YK to LBFGS buffer
+      // * update length of the good step
+         activationstatus = false;
+         for (i = 0; i < n; i++) {
+            if ((state->hasbndl.xB[i] && state->xn.xR[i] == state->bndl.xR[i]) && state->xn.xR[i] != state->xc.xR[i]) {
+               activationstatus = true;
+            }
+            if ((state->hasbndu.xB[i] && state->xn.xR[i] == state->bndu.xR[i]) && state->xn.xR[i] != state->xc.xR[i]) {
+               activationstatus = true;
+            }
+         }
+         state->fp = state->fc;
+         state->fc = state->fn;
+         ae_v_move(state->xp.xR, 1, state->xc.xR, 1, n);
+         ae_v_move(state->xc.xR, 1, state->xn.xR, 1, n);
+         ae_v_move(state->cgc.xR, 1, state->cgn.xR, 1, n);
+         ae_v_move(state->ugc.xR, 1, state->ugn.xR, 1, n);
+         if (state->xrep) {
+            ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
+            minbc_clearrequestfields(state);
+            state->xupdated = true;
+            state->rstate.stage = 29; goto Pause; Resume29:
+            state->xupdated = false;
+         }
+         state->repiterationscount++;
+         if (state->bufsize == m) {
+         // Buffer is full, shift contents by one row
+            for (i = 0; i < state->bufsize; i++) {
+               ae_v_move(state->bufsk.xyR[i], 1, state->bufsk.xyR[i + 1], 1, n);
+               ae_v_move(state->bufyk.xyR[i], 1, state->bufyk.xyR[i + 1], 1, n);
+            }
+            for (i = 0; i < state->bufsize - 1; i++) {
+               state->bufrho.xR[i] = state->bufrho.xR[i + 1];
+               state->buftheta.xR[i] = state->buftheta.xR[i + 1];
+            }
+         } else {
+         // Buffer is not full, increase buffer size by 1
+            state->bufsize++;
+         }
+         v = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufsk.xyR[state->bufsize - 1], 1, n);
+         vv = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufyk.xyR[state->bufsize - 1], 1, n);
+         if (v == 0.0 || vv == 0.0) {
+         // Strange internal error in LBFGS - either YK=0
+         // (which should not have been) or (SK,YK)=0 (again,
+         // unexpected). It should not take place because
+         // MCINFO=1, which signals "good" step. But just
+         // to be sure we have special branch of code which
+         // restarts LBFGS
+            break;
+         }
+         state->bufrho.xR[state->bufsize - 1] = 1 / v;
+         ae_assert(state->bufsize <= m, "MinBC: internal error");
+         v = 0.0;
+         vv = 0.0;
+         for (i = 0; i < n; i++) {
+            v += sqr((state->xc.xR[i] - state->xp.xR[i]) / state->s.xR[i]);
+            vv += sqr(state->xc.xR[i] - state->xp.xR[i]);
+         }
+         minbc_updateestimateofgoodstep(&state->lastscaledgoodstep, sqrt(v));
+      // Check MaxIts-based stopping condition.
+         if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
+            state->repterminationtype = 5;
+            goto Exit;
+         }
+      // Smooth reset (LBFGS memory model is refreshed) or hard restart:
+      // * LBFGS model is refreshed, if line search was performed with activation of constraints
+      // * algorithm is restarted if scaled gradient decreased below GDecay
+         if (activationstatus) {
+            state->bufsize = 0;
+            continue;
+         }
+         v = 0.0;
+         for (i = 0; i < n; i++) {
+            v += sqr(state->cgc.xR[i] * state->s.xR[i]);
+         }
+         if (sqrt(v) < gdecay * ginit) {
+            break;
+         }
+      }
+   // Decrease decay coefficient. Subsequent L-BFGS stages will
+   // have more stringent stopping criteria.
+      gdecay = rmax2(gdecay * minbc_decaycorrection, minbc_mindecay);
    }
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(state->cgc.xR[i] * state->s.xR[i]);
-   }
-   if (sqrt(v) < gdecay * ginit) {
-      goto lbl_60;
-   }
-lbl_59:
-   itidx++;
-   goto lbl_58;
-lbl_60:
-// Decrease decay coefficient. Subsequent L-BFGS stages will
-// have more stringent stopping criteria.
-   gdecay = rmax2(gdecay * minbc_decaycorrection, minbc_mindecay);
-   goto lbl_38;
-lbl_39:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = freezeidx;
    state->rstate.ia.xZ[1] = n;
    state->rstate.ia.xZ[2] = m;
@@ -44831,7 +43171,7 @@ lbl_rcomm:
    state->rstate.ra.xR[5] = ginit;
    state->rstate.ra.xR[6] = gdecay;
    state->rstate.ra.xR[7] = activationstep;
-   return result;
+   return true;
 }
 
 // This  function  activates/deactivates verification  of  the  user-supplied

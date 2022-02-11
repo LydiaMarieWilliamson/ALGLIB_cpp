@@ -16975,41 +16975,37 @@ bool eigsubspaceiteration(eigsubspacestate *state) {
    double vv;
    double v;
    ae_int_t convcnt;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      nwork = state->rstate.ia.xZ[1];
-      k = state->rstate.ia.xZ[2];
-      cnt = state->rstate.ia.xZ[3];
-      i = state->rstate.ia.xZ[4];
-      i1 = state->rstate.ia.xZ[5];
-      j = state->rstate.ia.xZ[6];
-      convcnt = state->rstate.ia.xZ[7];
-      vv = state->rstate.ra.xR[0];
-      v = state->rstate.ra.xR[1];
-   } else {
-      n = 359;
-      nwork = -58;
-      k = -919;
-      cnt = -909;
-      i = 81;
-      i1 = 255;
-      j = 74;
-      convcnt = -788;
-      vv = 809;
-      v = 205;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   nwork = state->rstate.ia.xZ[1];
+   k = state->rstate.ia.xZ[2];
+   cnt = state->rstate.ia.xZ[3];
+   i = state->rstate.ia.xZ[4];
+   i1 = state->rstate.ia.xZ[5];
+   j = state->rstate.ia.xZ[6];
+   convcnt = state->rstate.ia.xZ[7];
+   vv = state->rstate.ra.xR[0];
+   v = state->rstate.ra.xR[1];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
+Spawn:
+   n = 359;
+   nwork = -58;
+   k = -919;
+   cnt = -909;
+   i = 81;
+   i1 = 255;
+   j = 74;
+   convcnt = -788;
+   vv = 809;
+   v = 205;
 // Routine body
    n = state->n;
    k = state->k;
@@ -17052,65 +17048,59 @@ bool eigsubspaceiteration(eigsubspacestate *state) {
          state->firstcall = false;
       }
       rmatrixcopy(nwork, n, &state->q0, 0, 0, &state->qnew, 0, 0);
-   }
-// Start iteration
-   state->repiterationscount = 0;
-   convcnt = 0;
-lbl_1:
-   if (!((state->maxits == 0 || state->repiterationscount < state->maxits) && convcnt < evd_stepswithintol)) {
-      goto lbl_2;
-   }
-// Update QCur := QNew
-//
-// Calculate A*Q'
-   rmatrixcopy(nwork, n, &state->qnew, 0, 0, &state->qcur, 0, 0);
-   rmatrixtranspose(nwork, n, &state->qcur, 0, 0, &state->x, 0, 0);
-   evd_clearrfields(state);
-   state->requesttype = 0;
-   state->requestsize = nwork;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-// Perform Rayleigh-Ritz step to estimate convergence of diagonal eigenvalues
-   if (state->eps > 0.0) {
-      ae_assert(state->matrixtype == 0, "integrity check failed");
-      matrixsetlengthatleast(&state->r, nwork, nwork);
-      rmatrixgemm(nwork, nwork, n, 1.0, &state->qcur, 0, 0, 0, &state->ax, 0, 0, 0, 0.0, &state->r, 0, 0);
-      if (!smatrixevd(&state->r, nwork, 0, true, &state->wcur, &state->dummy)) {
-         ae_assert(false, "EigSubspace: direct eigensolver failed to converge");
       }
-      for (j = 0; j < nwork; j++) {
-         state->wrank.xR[j] = fabs(state->wcur.xR[j]);
-      }
-      rankxuntied(&state->wrank, nwork, &state->buf);
-      v = 0.0;
-      vv = 0.0;
-      for (j = 0; j < nwork; j++) {
-         if (state->wrank.xR[j] >= (double)(nwork - k)) {
-            v = rmax2(v, fabs(state->wcur.xR[j] - state->wprev.xR[j]));
-            vv = rmax2(vv, fabs(state->wcur.xR[j]));
+   // Start iteration
+      state->repiterationscount = 0;
+      convcnt = 0;
+      while ((state->maxits == 0 || state->repiterationscount < state->maxits) && convcnt < evd_stepswithintol) {
+   // Update QCur := QNew
+   //
+   // Calculate A*Q'
+      rmatrixcopy(nwork, n, &state->qnew, 0, 0, &state->qcur, 0, 0);
+      rmatrixtranspose(nwork, n, &state->qcur, 0, 0, &state->x, 0, 0);
+      evd_clearrfields(state);
+      state->requesttype = 0;
+      state->requestsize = nwork;
+      state->rstate.stage = 0; goto Pause; Resume0:
+   // Perform Rayleigh-Ritz step to estimate convergence of diagonal eigenvalues
+      if (state->eps > 0.0) {
+         ae_assert(state->matrixtype == 0, "integrity check failed");
+         matrixsetlengthatleast(&state->r, nwork, nwork);
+         rmatrixgemm(nwork, nwork, n, 1.0, &state->qcur, 0, 0, 0, &state->ax, 0, 0, 0, 0.0, &state->r, 0, 0);
+         if (!smatrixevd(&state->r, nwork, 0, true, &state->wcur, &state->dummy)) {
+            ae_assert(false, "EigSubspace: direct eigensolver failed to converge");
+         }
+         for (j = 0; j < nwork; j++) {
+            state->wrank.xR[j] = fabs(state->wcur.xR[j]);
+         }
+         rankxuntied(&state->wrank, nwork, &state->buf);
+         v = 0.0;
+         vv = 0.0;
+         for (j = 0; j < nwork; j++) {
+            if (state->wrank.xR[j] >= (double)(nwork - k)) {
+               v = rmax2(v, fabs(state->wcur.xR[j] - state->wprev.xR[j]));
+               vv = rmax2(vv, fabs(state->wcur.xR[j]));
+            }
+         }
+         if (vv == 0.0) {
+            vv = 1.0;
+         }
+         if (v <= state->eps * vv) {
+            convcnt++;
+         } else {
+            convcnt = 0;
+         }
+         for (j = 0; j < nwork; j++) {
+            state->wprev.xR[j] = state->wcur.xR[j];
          }
       }
-      if (vv == 0.0) {
-         vv = 1.0;
-      }
-      if (v <= state->eps * vv) {
-         convcnt++;
-      } else {
-         convcnt = 0;
-      }
-      for (j = 0; j < nwork; j++) {
-         state->wprev.xR[j] = state->wcur.xR[j];
-      }
+   // QR renormalization and update of QNew
+      rmatrixtranspose(n, nwork, &state->ax, 0, 0, &state->znew, 0, 0);
+      rmatrixlq(&state->znew, nwork, n, &state->tau);
+      rmatrixlqunpackq(&state->znew, nwork, n, &state->tau, nwork, &state->qnew);
+   // Update iteration index
+      state->repiterationscount++;
    }
-// QR renormalization and update of QNew
-   rmatrixtranspose(n, nwork, &state->ax, 0, 0, &state->znew, 0, 0);
-   rmatrixlq(&state->znew, nwork, n, &state->tau);
-   rmatrixlqunpackq(&state->znew, nwork, n, &state->tau, nwork, &state->qnew);
-// Update iteration index
-   state->repiterationscount++;
-   goto lbl_1;
-lbl_2:
 // Perform Rayleigh-Ritz step: find true eigenpairs in NWork-dimensional
 // subspace.
    ae_assert(state->matrixtype == 0, "integrity check failed");
@@ -17145,11 +17135,11 @@ lbl_2:
    }
    ae_assert(cnt == k, "EigSubspace: integrity check failed");
    rmatrixgemm(n, k, nwork, 1.0, &state->qcur, 0, 0, 1, &state->rz, 0, 0, 0, 0.0, &state->rq, 0, 0);
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = nwork;
    state->rstate.ia.xZ[2] = k;
@@ -17160,7 +17150,7 @@ lbl_rcomm:
    state->rstate.ia.xZ[7] = convcnt;
    state->rstate.ra.xR[0] = vv;
    state->rstate.ra.xR[1] = v;
-   return result;
+   return true;
 }
 
 // This function performs subspace iteration  in  the  out-of-core  mode.  It
@@ -29660,45 +29650,35 @@ bool fblscgiteration(fblslincgstate *state) {
    double betak;
    double v1;
    double v2;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      k = state->rstate.ia.xZ[1];
-      rk2 = state->rstate.ra.xR[0];
-      rk12 = state->rstate.ra.xR[1];
-      pap = state->rstate.ra.xR[2];
-      s = state->rstate.ra.xR[3];
-      betak = state->rstate.ra.xR[4];
-      v1 = state->rstate.ra.xR[5];
-      v2 = state->rstate.ra.xR[6];
-   } else {
-      n = 359;
-      k = -58;
-      rk2 = -919;
-      rk12 = -909;
-      pap = 81;
-      s = 255;
-      betak = 74;
-      v1 = -788;
-      v2 = 809;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   k = state->rstate.ia.xZ[1];
+   rk2 = state->rstate.ra.xR[0];
+   rk12 = state->rstate.ra.xR[1];
+   pap = state->rstate.ra.xR[2];
+   s = state->rstate.ra.xR[3];
+   betak = state->rstate.ra.xR[4];
+   v1 = state->rstate.ra.xR[5];
+   v2 = state->rstate.ra.xR[6];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
+Spawn:
+   n = 359;
+   k = -58;
+   rk2 = -919;
+   rk12 = -909;
+   pap = 81;
+   s = 255;
+   betak = 74;
+   v1 = -788;
+   v2 = 809;
 // Routine body
 // prepare locals
    n = state->n;
@@ -29708,92 +29688,79 @@ bool fblscgiteration(fblslincgstate *state) {
       for (k = 0; k < n; k++) {
          state->xk.xR[k] = 0.0;
       }
-      result = false;
-      return result;
+      goto Exit;
    }
 // r(0) = b-A*x(0)
 // RK2 = r(0)'*r(0)
    ae_v_move(state->x.xR, 1, state->xk.xR, 1, n);
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
+   state->rstate.stage = 0; goto Pause; Resume0:
    ae_v_move(state->rk.xR, 1, state->b.xR, 1, n);
    ae_v_sub(state->rk.xR, 1, state->ax.xR, 1, n);
    rk2 = ae_v_dotproduct(state->rk.xR, 1, state->rk.xR, 1, n);
    ae_v_move(state->pk.xR, 1, state->rk.xR, 1, n);
    state->e1 = sqrt(rk2);
 // Cycle
-   k = 0;
-lbl_3:
-   if (k > n - 1) {
-      goto lbl_5;
-   }
-// Calculate A*p(k) - store in State.Tmp2
-// and p(k)'*A*p(k)  - store in PAP
-//
-// If PAP=0, break (iteration is over)
-   ae_v_move(state->x.xR, 1, state->pk.xR, 1, n);
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   ae_v_move(state->tmp2.xR, 1, state->ax.xR, 1, n);
-   pap = state->xax;
-   if (!isfinite(pap)) {
-      goto lbl_5;
-   }
-   if (pap <= 0.0) {
-      goto lbl_5;
-   }
-// S = (r(k)'*r(k))/(p(k)'*A*p(k))
-   s = rk2 / pap;
-// x(k+1) = x(k) + S*p(k)
-   ae_v_move(state->xk1.xR, 1, state->xk.xR, 1, n);
-   ae_v_addd(state->xk1.xR, 1, state->pk.xR, 1, n, s);
-// r(k+1) = r(k) - S*A*p(k)
-// RK12 = r(k+1)'*r(k+1)
-//
-// Break if r(k+1) small enough (when compared to r(k))
-   ae_v_move(state->rk1.xR, 1, state->rk.xR, 1, n);
-   ae_v_subd(state->rk1.xR, 1, state->tmp2.xR, 1, n, s);
-   rk12 = ae_v_dotproduct(state->rk1.xR, 1, state->rk1.xR, 1, n);
-   if (sqrt(rk12) <= 100 * machineepsilon * state->e1) {
-   // X(k) = x(k+1) before exit -
-   // - because we expect to find solution at x(k)
+   for (k = 0; k < n; k++) {
+   // Calculate A*p(k) - store in State.Tmp2
+   // and p(k)'*A*p(k)  - store in PAP
+   //
+   // If PAP=0, break (iteration is over)
+      ae_v_move(state->x.xR, 1, state->pk.xR, 1, n);
+      state->rstate.stage = 1; goto Pause; Resume1:
+      ae_v_move(state->tmp2.xR, 1, state->ax.xR, 1, n);
+      pap = state->xax;
+      if (!isfinite(pap)) {
+         break;
+      }
+      if (pap <= 0.0) {
+         break;
+      }
+   // S = (r(k)'*r(k))/(p(k)'*A*p(k))
+      s = rk2 / pap;
+   // x(k+1) = x(k) + S*p(k)
+      ae_v_move(state->xk1.xR, 1, state->xk.xR, 1, n);
+      ae_v_addd(state->xk1.xR, 1, state->pk.xR, 1, n, s);
+   // r(k+1) = r(k) - S*A*p(k)
+   // RK12 = r(k+1)'*r(k+1)
+   //
+   // Break if r(k+1) small enough (when compared to r(k))
+      ae_v_move(state->rk1.xR, 1, state->rk.xR, 1, n);
+      ae_v_subd(state->rk1.xR, 1, state->tmp2.xR, 1, n, s);
+      rk12 = ae_v_dotproduct(state->rk1.xR, 1, state->rk1.xR, 1, n);
+      if (sqrt(rk12) <= 100 * machineepsilon * state->e1) {
+      // X(k) = x(k+1) before exit -
+      // - because we expect to find solution at x(k)
+         ae_v_move(state->xk.xR, 1, state->xk1.xR, 1, n);
+         break;
+      }
+   // BetaK = RK12/RK2
+   // p(k+1) = r(k+1)+betak*p(k)
+   //
+   // NOTE: we expect that BetaK won't overflow because of
+   // "Sqrt(RK12) <= 100*MachineEpsilon*E1" test above.
+      betak = rk12 / rk2;
+      ae_v_move(state->pk1.xR, 1, state->rk1.xR, 1, n);
+      ae_v_addd(state->pk1.xR, 1, state->pk.xR, 1, n, betak);
+   // r(k) := r(k+1)
+   // x(k) := x(k+1)
+   // p(k) := p(k+1)
+      ae_v_move(state->rk.xR, 1, state->rk1.xR, 1, n);
       ae_v_move(state->xk.xR, 1, state->xk1.xR, 1, n);
-      goto lbl_5;
+      ae_v_move(state->pk.xR, 1, state->pk1.xR, 1, n);
+      rk2 = rk12;
    }
-// BetaK = RK12/RK2
-// p(k+1) = r(k+1)+betak*p(k)
-//
-// NOTE: we expect that BetaK won't overflow because of
-// "Sqrt(RK12) <= 100*MachineEpsilon*E1" test above.
-   betak = rk12 / rk2;
-   ae_v_move(state->pk1.xR, 1, state->rk1.xR, 1, n);
-   ae_v_addd(state->pk1.xR, 1, state->pk.xR, 1, n, betak);
-// r(k) := r(k+1)
-// x(k) := x(k+1)
-// p(k) := p(k+1)
-   ae_v_move(state->rk.xR, 1, state->rk1.xR, 1, n);
-   ae_v_move(state->xk.xR, 1, state->xk1.xR, 1, n);
-   ae_v_move(state->pk.xR, 1, state->pk1.xR, 1, n);
-   rk2 = rk12;
-   k++;
-   goto lbl_3;
-lbl_5:
 // Calculate E2
    ae_v_move(state->x.xR, 1, state->xk.xR, 1, n);
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
+   state->rstate.stage = 2; goto Pause; Resume2:
    ae_v_move(state->rk.xR, 1, state->b.xR, 1, n);
    ae_v_sub(state->rk.xR, 1, state->ax.xR, 1, n);
    v1 = ae_v_dotproduct(state->rk.xR, 1, state->rk.xR, 1, n);
    state->e2 = sqrt(v1);
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = k;
    state->rstate.ra.xR[0] = rk2;
@@ -29803,7 +29770,7 @@ lbl_rcomm:
    state->rstate.ra.xR[4] = betak;
    state->rstate.ra.xR[5] = v1;
    state->rstate.ra.xR[6] = v2;
-   return result;
+   return true;
 }
 
 // Construction of GMRES(k) solver.
@@ -29871,53 +29838,49 @@ bool fblsgmresiteration(fblsgmresstate *state) {
    double prevresnrm;
    ae_int_t i;
    ae_int_t j;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      itidx = state->rstate.ia.xZ[1];
-      kdim = state->rstate.ia.xZ[2];
-      i = state->rstate.ia.xZ[3];
-      j = state->rstate.ia.xZ[4];
-      rmax = state->rstate.ra.xR[0];
-      rmindiag = state->rstate.ra.xR[1];
-      cs = state->rstate.ra.xR[2];
-      sn = state->rstate.ra.xR[3];
-      v = state->rstate.ra.xR[4];
-      vv = state->rstate.ra.xR[5];
-      anrm = state->rstate.ra.xR[6];
-      qnrm = state->rstate.ra.xR[7];
-      bnrm = state->rstate.ra.xR[8];
-      resnrm = state->rstate.ra.xR[9];
-      prevresnrm = state->rstate.ra.xR[10];
-   } else {
-      n = 205;
-      itidx = -838;
-      kdim = 939;
-      i = -526;
-      j = 763;
-      rmax = -541;
-      rmindiag = -698;
-      cs = -900;
-      sn = -318;
-      v = -940;
-      vv = 1016;
-      anrm = -229;
-      qnrm = -536;
-      bnrm = 487;
-      resnrm = -115;
-      prevresnrm = 886;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   itidx = state->rstate.ia.xZ[1];
+   kdim = state->rstate.ia.xZ[2];
+   i = state->rstate.ia.xZ[3];
+   j = state->rstate.ia.xZ[4];
+   rmax = state->rstate.ra.xR[0];
+   rmindiag = state->rstate.ra.xR[1];
+   cs = state->rstate.ra.xR[2];
+   sn = state->rstate.ra.xR[3];
+   v = state->rstate.ra.xR[4];
+   vv = state->rstate.ra.xR[5];
+   anrm = state->rstate.ra.xR[6];
+   qnrm = state->rstate.ra.xR[7];
+   bnrm = state->rstate.ra.xR[8];
+   resnrm = state->rstate.ra.xR[9];
+   prevresnrm = state->rstate.ra.xR[10];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
+Spawn:
+   n = 205;
+   itidx = -838;
+   kdim = 939;
+   i = -526;
+   j = 763;
+   rmax = -541;
+   rmindiag = -698;
+   cs = -900;
+   sn = -318;
+   v = -940;
+   vv = 1016;
+   anrm = -229;
+   qnrm = -536;
+   bnrm = 487;
+   resnrm = -115;
+   prevresnrm = 886;
 // Routine body
    n = state->n;
    state->retcode = 1;
@@ -29925,8 +29888,7 @@ bool fblsgmresiteration(fblsgmresstate *state) {
    rsetallocv(n, 0.0, &state->xs);
    bnrm = sqrt(rdotv2(n, &state->b));
    if (bnrm == 0.0) {
-      result = false;
-      return result;
+      goto Exit;
    }
    rallocm(state->itscnt + 1, n, &state->qi);
    rallocm(state->itscnt, n, &state->aqi);
@@ -29947,99 +29909,91 @@ bool fblsgmresiteration(fblsgmresstate *state) {
    rsetallocv(state->itscnt, 0.0, &state->ys);
    rallocv(imax2(n, state->itscnt + 2), &state->tmp0);
    rallocv(imax2(n, state->itscnt + 2), &state->tmp1);
-   itidx = 0;
-lbl_1:
-   if (itidx > state->itscnt - 1) {
-      goto lbl_3;
+   for (itidx = 0; itidx < state->itscnt; itidx++) {
+      prevresnrm = resnrm;
+   // Compute A*Qi[ItIdx], then compute Qi[ItIdx+1]
+      rcopyrv(n, &state->qi, itidx, &state->x);
+      state->rstate.stage = 0; goto Pause; Resume0:
+      rcopyvr(n, &state->ax, &state->aqi, itidx);
+      anrm = sqrt(rdotv2(n, &state->ax));
+      if (anrm == 0.0) {
+         state->retcode = 2;
+         break;
+      }
+      rowwisegramschmidt(&state->qi, itidx + 1, n, &state->ax, &state->tmp0, true);
+      rowwisegramschmidt(&state->qi, itidx + 1, n, &state->ax, &state->tmp1, true);
+      raddvc(itidx + 1, 1.0, &state->tmp0, &state->h, itidx);
+      raddvc(itidx + 1, 1.0, &state->tmp1, &state->h, itidx);
+      qnrm = sqrt(rdotv2(n, &state->ax));
+      state->h.xyR[itidx + 1][itidx] = qnrm;
+      rmulv(n, 1 / coalesce(qnrm, 1.0), &state->ax);
+      rcopyvr(n, &state->ax, &state->qi, itidx + 1);
+   // We have QR decomposition of H from the previous iteration:
+   // * (ItIdx+1)*(ItIdx+1) orthogonal HQ embedded into larger (ItIdx+2)*(ItIdx+2) identity matrix
+   // * (ItIdx+1)*ItIdx     triangular HR embedded into larger (ItIdx+2)*(ItIdx+1) zero matrix
+   //
+   // We just have to update QR decomposition after one more column is added to H:
+   // * multiply this column by HQ to obtain (ItIdx+2)-dimensional vector X
+   // * generate rotation to nullify last element of X to obtain (ItIdx+1)-dimensional vector Y
+   //   that is copied into (ItIdx+1)-th column of HR
+   // * apply same rotation to HQ
+   // * apply same rotation to HQB - current right-hand side
+      rcopycv(itidx + 2, &state->h, itidx, &state->tmp0);
+      rmatrixgemv(itidx + 2, itidx + 2, 1.0, &state->hq, 0, 0, 0, &state->tmp0, 0, 0.0, &state->tmp1, 0);
+      generaterotation(state->tmp1.xR[itidx], state->tmp1.xR[itidx + 1], &cs, &sn, &v);
+      state->tmp1.xR[itidx] = v;
+      state->tmp1.xR[itidx + 1] = 0.0;
+      rmax = rmax2(rmax, rmaxabsv(itidx + 2, &state->tmp1));
+      rmindiag = rmin2(rmindiag, fabs(v));
+      if (rmindiag <= rmax * state->epsdiag) {
+         state->retcode = 3;
+         break;
+      }
+      rcopyvc(itidx + 2, &state->tmp1, &state->hr, itidx);
+      for (j = 0; j <= itidx + 1; j++) {
+         v = state->hq.xyR[itidx + 0][j];
+         vv = state->hq.xyR[itidx + 1][j];
+         state->hq.xyR[itidx + 0][j] = cs * v + sn * vv;
+         state->hq.xyR[itidx + 1][j] = -sn * v + cs * vv;
+      }
+      v = state->hqb.xR[itidx + 0];
+      vv = state->hqb.xR[itidx + 1];
+      state->hqb.xR[itidx + 0] = cs * v + sn * vv;
+      state->hqb.xR[itidx + 1] = -sn * v + cs * vv;
+      resnrm = fabs(state->hqb.xR[itidx + 1]);
+   // Previous attempt to extend R was successful (no small diagonal elements).
+   // Increase Krylov subspace dimensionality.
+      kdim++;
+   // Iteration is over.
+   // Terminate if:
+   // * last Qi was nearly zero after orthogonalization.
+   // * sufficient decrease of residual
+   // * stagnation of residual
+      state->itsperformed++;
+      if (qnrm <= state->epsort * anrm || qnrm == 0.0) {
+         state->retcode = 4;
+         break;
+      }
+      if (resnrm <= state->epsres * bnrm) {
+         state->retcode = 5;
+         break;
+      }
+      if (resnrm / prevresnrm > state->epsred) {
+         state->retcode = 6;
+         break;
+      }
    }
-   prevresnrm = resnrm;
-// Compute A*Qi[ItIdx], then compute Qi[ItIdx+1]
-   rcopyrv(n, &state->qi, itidx, &state->x);
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   rcopyvr(n, &state->ax, &state->aqi, itidx);
-   anrm = sqrt(rdotv2(n, &state->ax));
-   if (anrm == 0.0) {
-      state->retcode = 2;
-      goto lbl_3;
-   }
-   rowwisegramschmidt(&state->qi, itidx + 1, n, &state->ax, &state->tmp0, true);
-   rowwisegramschmidt(&state->qi, itidx + 1, n, &state->ax, &state->tmp1, true);
-   raddvc(itidx + 1, 1.0, &state->tmp0, &state->h, itidx);
-   raddvc(itidx + 1, 1.0, &state->tmp1, &state->h, itidx);
-   qnrm = sqrt(rdotv2(n, &state->ax));
-   state->h.xyR[itidx + 1][itidx] = qnrm;
-   rmulv(n, 1 / coalesce(qnrm, 1.0), &state->ax);
-   rcopyvr(n, &state->ax, &state->qi, itidx + 1);
-// We have QR decomposition of H from the previous iteration:
-// * (ItIdx+1)*(ItIdx+1) orthogonal HQ embedded into larger (ItIdx+2)*(ItIdx+2) identity matrix
-// * (ItIdx+1)*ItIdx     triangular HR embedded into larger (ItIdx+2)*(ItIdx+1) zero matrix
-//
-// We just have to update QR decomposition after one more column is added to H:
-// * multiply this column by HQ to obtain (ItIdx+2)-dimensional vector X
-// * generate rotation to nullify last element of X to obtain (ItIdx+1)-dimensional vector Y
-//   that is copied into (ItIdx+1)-th column of HR
-// * apply same rotation to HQ
-// * apply same rotation to HQB - current right-hand side
-   rcopycv(itidx + 2, &state->h, itidx, &state->tmp0);
-   rmatrixgemv(itidx + 2, itidx + 2, 1.0, &state->hq, 0, 0, 0, &state->tmp0, 0, 0.0, &state->tmp1, 0);
-   generaterotation(state->tmp1.xR[itidx], state->tmp1.xR[itidx + 1], &cs, &sn, &v);
-   state->tmp1.xR[itidx] = v;
-   state->tmp1.xR[itidx + 1] = 0.0;
-   rmax = rmax2(rmax, rmaxabsv(itidx + 2, &state->tmp1));
-   rmindiag = rmin2(rmindiag, fabs(v));
-   if (rmindiag <= rmax * state->epsdiag) {
-      state->retcode = 3;
-      goto lbl_3;
-   }
-   rcopyvc(itidx + 2, &state->tmp1, &state->hr, itidx);
-   for (j = 0; j <= itidx + 1; j++) {
-      v = state->hq.xyR[itidx + 0][j];
-      vv = state->hq.xyR[itidx + 1][j];
-      state->hq.xyR[itidx + 0][j] = cs * v + sn * vv;
-      state->hq.xyR[itidx + 1][j] = -sn * v + cs * vv;
-   }
-   v = state->hqb.xR[itidx + 0];
-   vv = state->hqb.xR[itidx + 1];
-   state->hqb.xR[itidx + 0] = cs * v + sn * vv;
-   state->hqb.xR[itidx + 1] = -sn * v + cs * vv;
-   resnrm = fabs(state->hqb.xR[itidx + 1]);
-// Previous attempt to extend R was successful (no small diagonal elements).
-// Increase Krylov subspace dimensionality.
-   kdim++;
-// Iteration is over.
-// Terminate if:
-// * last Qi was nearly zero after orthogonalization.
-// * sufficient decrease of residual
-// * stagnation of residual
-   state->itsperformed++;
-   if (qnrm <= state->epsort * anrm || qnrm == 0.0) {
-      state->retcode = 4;
-      goto lbl_3;
-   }
-   if (resnrm <= state->epsres * bnrm) {
-      state->retcode = 5;
-      goto lbl_3;
-   }
-   if (resnrm / prevresnrm > state->epsred) {
-      state->retcode = 6;
-      goto lbl_3;
-   }
-   itidx++;
-   goto lbl_1;
-lbl_3:
 // Post-solve
    if (kdim > 0) {
       rcopyv(kdim, &state->hqb, &state->ys);
       rmatrixtrsv(kdim, &state->hr, 0, 0, true, false, 0, &state->ys, 0);
       rmatrixmv(n, kdim, &state->qi, 0, 0, 1, &state->ys, 0, &state->xs, 0);
    }
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = itidx;
    state->rstate.ia.xZ[2] = kdim;
@@ -30056,7 +30010,7 @@ lbl_rcomm:
    state->rstate.ra.xR[8] = bnrm;
    state->rstate.ra.xR[9] = resnrm;
    state->rstate.ra.xR[10] = prevresnrm;
-   return result;
+   return true;
 }
 
 // Fast  least  squares  solver,  solves  well  conditioned  system   without
@@ -30315,44 +30269,31 @@ bool normestimatoriteration(normestimatorstate *state) {
    double v;
    double growth;
    double bestgrowth;
-   bool result;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way
-// anywhere from C++ to Python.
-//
-// This code initializes locals by:
-// * random values determined during code
-//   generation - on first subroutine call
-// * values from previous call - on subsequent calls
-   if (state->rstate.stage >= 0) {
-      n = state->rstate.ia.xZ[0];
-      m = state->rstate.ia.xZ[1];
-      i = state->rstate.ia.xZ[2];
-      itcnt = state->rstate.ia.xZ[3];
-      v = state->rstate.ra.xR[0];
-      growth = state->rstate.ra.xR[1];
-      bestgrowth = state->rstate.ra.xR[2];
-   } else {
-      n = 359;
-      m = -58;
-      i = -919;
-      itcnt = -909;
-      v = 81;
-      growth = 255;
-      bestgrowth = 74;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->rstate.stage < 0) goto Spawn;
+   n = state->rstate.ia.xZ[0];
+   m = state->rstate.ia.xZ[1];
+   i = state->rstate.ia.xZ[2];
+   itcnt = state->rstate.ia.xZ[3];
+   v = state->rstate.ra.xR[0];
+   growth = state->rstate.ra.xR[1];
+   bestgrowth = state->rstate.ra.xR[2];
+   switch (state->rstate.stage) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
+      default: goto Exit;
    }
-   if (state->rstate.stage == 0) {
-      goto lbl_0;
-   }
-   if (state->rstate.stage == 1) {
-      goto lbl_1;
-   }
-   if (state->rstate.stage == 2) {
-      goto lbl_2;
-   }
-   if (state->rstate.stage == 3) {
-      goto lbl_3;
-   }
+Spawn:
+   n = 359;
+   m = -58;
+   i = -919;
+   itcnt = -909;
+   v = 81;
+   growth = 255;
+   bestgrowth = 74;
 // Routine body
    n = state->n;
    m = state->m;
@@ -30364,82 +30305,62 @@ bool normestimatoriteration(normestimatorstate *state) {
    for (i = 1; i < n; i++) {
       state->xbest.xR[i] = 0.0;
    }
-   itcnt = 0;
-lbl_4:
-   if (itcnt > state->nstart - 1) {
-      goto lbl_6;
-   }
-   do {
+   for (itcnt = 0; itcnt < state->nstart; itcnt++) {
+      do {
+         v = 0.0;
+         for (i = 0; i < n; i++) {
+            state->x0.xR[i] = hqrndnormal(&state->r);
+            v += sqr(state->x0.xR[i]);
+         }
+      } while (v == 0.0);
+      v = 1 / sqrt(v);
+      ae_v_muld(state->x0.xR, 1, n, v);
+      ae_v_move(state->x.xR, 1, state->x0.xR, 1, n);
+      state->needmv = true;
+      state->needmtv = false;
+      state->rstate.stage = 0; goto Pause; Resume0:
+      ae_v_move(state->x.xR, 1, state->mv.xR, 1, m);
+      state->needmv = false;
+      state->needmtv = true;
+      state->rstate.stage = 1; goto Pause; Resume1:
+      ae_v_move(state->x1.xR, 1, state->mtv.xR, 1, n);
       v = 0.0;
       for (i = 0; i < n; i++) {
-         state->x0.xR[i] = hqrndnormal(&state->r);
-         v += sqr(state->x0.xR[i]);
+         v += sqr(state->x1.xR[i]);
       }
-   } while (v == 0.0);
-   v = 1 / sqrt(v);
-   ae_v_muld(state->x0.xR, 1, n, v);
-   ae_v_move(state->x.xR, 1, state->x0.xR, 1, n);
-   state->needmv = true;
-   state->needmtv = false;
-   state->rstate.stage = 0;
-   goto lbl_rcomm;
-lbl_0:
-   ae_v_move(state->x.xR, 1, state->mv.xR, 1, m);
-   state->needmv = false;
-   state->needmtv = true;
-   state->rstate.stage = 1;
-   goto lbl_rcomm;
-lbl_1:
-   ae_v_move(state->x1.xR, 1, state->mtv.xR, 1, n);
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(state->x1.xR[i]);
+      growth = sqrt(sqrt(v));
+      if (growth > bestgrowth) {
+         v = 1 / sqrt(v);
+         ae_v_moved(state->xbest.xR, 1, state->x1.xR, 1, n, v);
+         bestgrowth = growth;
+      }
    }
-   growth = sqrt(sqrt(v));
-   if (growth > bestgrowth) {
-      v = 1 / sqrt(v);
-      ae_v_moved(state->xbest.xR, 1, state->x1.xR, 1, n, v);
-      bestgrowth = growth;
-   }
-   itcnt++;
-   goto lbl_4;
-lbl_6:
    ae_v_move(state->x0.xR, 1, state->xbest.xR, 1, n);
-   itcnt = 0;
-lbl_7:
-   if (itcnt > state->nits - 1) {
-      goto lbl_9;
+   for (itcnt = 0; itcnt < state->nits; itcnt++) {
+      ae_v_move(state->x.xR, 1, state->x0.xR, 1, n);
+      state->needmv = true;
+      state->needmtv = false;
+      state->rstate.stage = 2; goto Pause; Resume2:
+      ae_v_move(state->x.xR, 1, state->mv.xR, 1, m);
+      state->needmv = false;
+      state->needmtv = true;
+      state->rstate.stage = 3; goto Pause; Resume3:
+      ae_v_move(state->x1.xR, 1, state->mtv.xR, 1, n);
+      v = 0.0;
+      for (i = 0; i < n; i++) {
+         v += sqr(state->x1.xR[i]);
+      }
+      state->repnorm = sqrt(sqrt(v));
+      if (v != 0.0) {
+         v = 1 / sqrt(v);
+         ae_v_moved(state->x0.xR, 1, state->x1.xR, 1, n, v);
+      }
    }
-   ae_v_move(state->x.xR, 1, state->x0.xR, 1, n);
-   state->needmv = true;
-   state->needmtv = false;
-   state->rstate.stage = 2;
-   goto lbl_rcomm;
-lbl_2:
-   ae_v_move(state->x.xR, 1, state->mv.xR, 1, m);
-   state->needmv = false;
-   state->needmtv = true;
-   state->rstate.stage = 3;
-   goto lbl_rcomm;
-lbl_3:
-   ae_v_move(state->x1.xR, 1, state->mtv.xR, 1, n);
-   v = 0.0;
-   for (i = 0; i < n; i++) {
-      v += sqr(state->x1.xR[i]);
-   }
-   state->repnorm = sqrt(sqrt(v));
-   if (v != 0.0) {
-      v = 1 / sqrt(v);
-      ae_v_moved(state->x0.xR, 1, state->x1.xR, 1, n, v);
-   }
-   itcnt++;
-   goto lbl_7;
-lbl_9:
-   result = false;
-   return result;
+Exit:
+   state->rstate.stage = -1;
+   return false;
 // Saving state
-lbl_rcomm:
-   result = true;
+Pause:
    state->rstate.ia.xZ[0] = n;
    state->rstate.ia.xZ[1] = m;
    state->rstate.ia.xZ[2] = i;
@@ -30447,7 +30368,7 @@ lbl_rcomm:
    state->rstate.ra.xR[0] = v;
    state->rstate.ra.xR[1] = growth;
    state->rstate.ra.xR[2] = bestgrowth;
-   return result;
+   return true;
 }
 
 // This  function  restarts estimator and prepares it for the next estimation
