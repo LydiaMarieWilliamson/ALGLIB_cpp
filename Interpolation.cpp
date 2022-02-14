@@ -6014,7 +6014,7 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
    linlsqrcreatebuf(arows, m, &solver);
    linlsqrsetb(&solver, &targets);
    linlsqrsetcond(&solver, 1.0E-14, 1.0E-14, lsqrcnt);
-   while (linlsqriteration(&solver)) {
+   while (linlsqriteration(&solver))
       if (solver.needmv) {
          for (i = 0; i < m; i++) {
             tmp1.xR[i] = solver.x.xR[i];
@@ -6024,14 +6024,12 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
          sparsetrsv(&ata, true, false, 0, &tmp1);
       // After preconditioning is done, multiply by A
          sparsemv(&av, &tmp1, &solver.mv);
-      }
-      if (solver.needmtv) {
+      } else if (solver.needmtv) {
       // Multiply by design matrix A
          sparsemtv(&av, &solver.x, &solver.mtv);
       // Multiply by preconditioner: solve TRSV(U',A*Solver.X)
          sparsetrsv(&ata, true, false, 1, &solver.mtv);
       }
-   }
    linlsqrresults(&solver, &tmp1, &srep);
    sparsetrsv(&ata, true, false, 0, &tmp1);
 // Generate output spline as a table of spline valued and first
@@ -9335,20 +9333,17 @@ static void lsfit_logisticfitinternal(RVector *x, RVector *y, ae_int_t n, bool i
    double vp0;
    double vp1;
    *flast = 0;
-   minlmrestartfrom(state, p1);
-   while (minlmiteration(state)) {
-      ta = state->x.xR[0];
-      tb = state->x.xR[1];
-      tc = state->x.xR[2];
-      td = state->x.xR[3];
-      tg = state->x.xR[4];
+   for (minlmrestartfrom(state, p1); minlmiteration(state); )
       if (state->xupdated) {
       // Save best function value obtained so far.
          *flast = state->f;
-         continue;
-      }
-      if (state->needfi || state->needfij) {
+      } else if (state->needfi || state->needfij) {
       // Function vector and Jacobian
+         ta = state->x.xR[0];
+         tb = state->x.xR[1];
+         tc = state->x.xR[2];
+         td = state->x.xR[3];
+         tg = state->x.xR[4];
          for (i = 0; i < n; i++) {
             ae_assert(x->xR[i] >= 0.0, "LogisticFitInternal: integrity error");
          // Handle zero X
@@ -9429,10 +9424,7 @@ static void lsfit_logisticfitinternal(RVector *x, RVector *y, ae_int_t n, bool i
             }
          }
       // Done
-         continue;
-      }
-      ae_assert(false, "LogisticFitX: internal error");
-   }
+      } else ae_assert(false, "LogisticFitX: internal error");
    minlmresultsbuf(state, p1, replm);
    ae_assert(replm->terminationtype > 0, "LogisticFitX: internal error");
 }
@@ -11642,14 +11634,6 @@ void lsfitsetgradientcheck(lsfitstate *state, double teststep) {
    state->teststep = teststep;
 }
 
-// Internal subroutine
-static void lsfit_lsfitclearrequestfields(lsfitstate *state) {
-   state->needf = false;
-   state->needfg = false;
-   state->needfgh = false;
-   state->xupdated = false;
-}
-
 // Weighted nonlinear least squares fitting using function values only.
 //
 // Combination of numerical differentiation and secant updates is used to
@@ -11741,10 +11725,7 @@ void lsfitcreatewf(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, a
    state->nec = 0;
    state->nic = 0;
    minlmcreatev(k, n, &state->c0, diffstep, &state->optstate);
-   lsfit_lsfitclearrequestfields(state);
-   ae_vector_set_length(&state->rstate.ia, 6 + 1);
-   ae_vector_set_length(&state->rstate.ra, 8 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // Nonlinear least squares fitting using function values only.
@@ -11835,10 +11816,7 @@ void lsfitcreatef(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, ae
    state->nec = 0;
    state->nic = 0;
    minlmcreatev(k, n, &state->c0, diffstep, &state->optstate);
-   lsfit_lsfitclearrequestfields(state);
-   ae_vector_set_length(&state->rstate.ia, 6 + 1);
-   ae_vector_set_length(&state->rstate.ra, 8 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // Weighted nonlinear least squares fitting using gradient only.
@@ -11942,10 +11920,7 @@ void lsfitcreatewfg(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n, 
    } else {
       minlmcreatevj(k, n, &state->c0, &state->optstate);
    }
-   lsfit_lsfitclearrequestfields(state);
-   ae_vector_set_length(&state->rstate.ia, 6 + 1);
-   ae_vector_set_length(&state->rstate.ra, 8 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // Nonlinear least squares fitting using gradient only, without individual
@@ -12040,10 +12015,7 @@ void lsfitcreatefg(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, a
    } else {
       minlmcreatevj(k, n, &state->c0, &state->optstate);
    }
-   lsfit_lsfitclearrequestfields(state);
-   ae_vector_set_length(&state->rstate.ia, 6 + 1);
-   ae_vector_set_length(&state->rstate.ra, 8 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // Weighted nonlinear least squares fitting using gradient/Hessian.
@@ -12130,10 +12102,7 @@ void lsfitcreatewfgh(RMatrix *x, RVector *y, RVector *w, RVector *c, ae_int_t n,
    state->nec = 0;
    state->nic = 0;
    minlmcreatefgh(k, &state->c0, &state->optstate);
-   lsfit_lsfitclearrequestfields(state);
-   ae_vector_set_length(&state->rstate.ia, 6 + 1);
-   ae_vector_set_length(&state->rstate.ra, 8 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // Nonlinear least squares fitting using gradient/Hessian, without individial
@@ -12214,10 +12183,7 @@ void lsfitcreatefgh(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, 
    state->nec = 0;
    state->nic = 0;
    minlmcreatefgh(k, &state->c0, &state->optstate);
-   lsfit_lsfitclearrequestfields(state);
-   ae_vector_set_length(&state->rstate.ia, 6 + 1);
-   ae_vector_set_length(&state->rstate.ra, 8 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // This function provides a reverse communication interface, which is not documented or recommended for use.
@@ -12228,45 +12194,28 @@ void lsfitcreatefgh(RMatrix *x, RVector *y, RVector *c, ae_int_t n, ae_int_t m, 
 // API: void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr) = NULL, void *ptr = NULL);
 // API: void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr) = NULL, void *ptr = NULL);
 bool lsfititeration(lsfitstate *state) {
-   double lx;
-   double lf;
-   double ld;
-   double rx;
-   double rf;
-   double rd;
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t k;
-   double v;
-   double vv;
-   double relcnt;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t j1;
-   ae_int_t info;
+   AutoS double lx;
+   AutoS double lf;
+   AutoS double ld;
+   AutoS double rx;
+   AutoS double rf;
+   AutoS double rd;
+   AutoS ae_int_t n;
+   AutoS ae_int_t m;
+   AutoS ae_int_t k;
+   AutoS double v;
+   AutoS double vv;
+   AutoS double relcnt;
+   AutoS ae_int_t i;
+   AutoS ae_int_t j;
+   AutoS ae_int_t j1;
+   AutoS ae_int_t info;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   n = state->rstate.ia.xZ[0];
-   m = state->rstate.ia.xZ[1];
-   k = state->rstate.ia.xZ[2];
-   i = state->rstate.ia.xZ[3];
-   j = state->rstate.ia.xZ[4];
-   j1 = state->rstate.ia.xZ[5];
-   info = state->rstate.ia.xZ[6];
-   lx = state->rstate.ra.xR[0];
-   lf = state->rstate.ra.xR[1];
-   ld = state->rstate.ra.xR[2];
-   rx = state->rstate.ra.xR[3];
-   rf = state->rstate.ra.xR[4];
-   rd = state->rstate.ra.xR[5];
-   v = state->rstate.ra.xR[6];
-   vv = state->rstate.ra.xR[7];
-   relcnt = state->rstate.ra.xR[8];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
       case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
       case 8: goto Resume08; case 9: goto Resume09; case 10: goto Resume10;
@@ -12294,6 +12243,7 @@ Spawn:
    if (state->wkind == 1) {
       ae_assert(state->npoints == state->nweights, "LSFitFit: number of points is not equal to the number of weights");
    }
+   state->xupdated = state->needfgh = state->needfg = state->needf = false;
    state->repvaridx = -1;
    n = state->npoints;
    m = state->m;
@@ -12312,7 +12262,6 @@ Spawn:
    minlmsetbc(&state->optstate, &state->bndl, &state->bndu);
    minlmsetlc(&state->optstate, &state->cleic, &state->tmpct, state->nec + state->nic);
 //  Check that user-supplied gradient is correct
-   lsfit_lsfitclearrequestfields(state);
    if (state->teststep > 0.0 && state->optalgo == 1) {
       for (i = 0; i < k; i++) {
          state->c.xR[i] = state->c0.xR[i];
@@ -12334,7 +12283,7 @@ Spawn:
                state->c.xR[i] = rmax2(state->c.xR[i], state->bndl.xR[i]);
             }
             lx = state->c.xR[i];
-            state->rstate.stage = 0; goto Pause; Resume00:
+            state->PQ = 0; goto Pause; Resume00:
             lf = state->f;
             ld = state->g.xR[i];
             state->c.xR[i] = v + state->teststep * state->s.xR[i];
@@ -12342,7 +12291,7 @@ Spawn:
                state->c.xR[i] = rmin2(state->c.xR[i], state->bndu.xR[i]);
             }
             rx = state->c.xR[i];
-            state->rstate.stage = 1; goto Pause; Resume01:
+            state->PQ = 1; goto Pause; Resume01:
             rf = state->f;
             rd = state->g.xR[i];
             state->c.xR[i] = (lx + rx) / 2;
@@ -12352,7 +12301,7 @@ Spawn:
             if (isfinite(state->bndu.xR[i])) {
                state->c.xR[i] = rmin2(state->c.xR[i], state->bndu.xR[i]);
             }
-            state->rstate.stage = 2; goto Pause; Resume02:
+            state->PQ = 2; goto Pause; Resume02:
             state->c.xR[i] = v;
             if (!derivativecheck(lf, ld, rf, rd, state->f, state->g.xR[i], rx - lx)) {
                state->repvaridx = i;
@@ -12374,17 +12323,14 @@ Spawn:
       }
    }
 // Optimize
-   while (minlmiteration(&state->optstate)) {
+   while (minlmiteration(&state->optstate))
       if (state->optstate.needfi) {
       // calculate f[] = wi*(f(xi,c)-yi)
          for (i = 0; i < n; i++) {
             ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
             ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
             state->pointindex = i;
-            lsfit_lsfitclearrequestfields(state);
-            state->needf = true;
-            state->rstate.stage = 3; goto Pause; Resume03:
-            state->needf = false;
+            state->needf = true, state->PQ = 3; goto Pause; Resume03: state->needf = false;
             vv = state->wcur.xR[i];
             state->optstate.fi.xR[i] = vv * (state->f - state->tasky.xR[i]);
          }
@@ -12395,10 +12341,7 @@ Spawn:
             ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
             ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
             state->pointindex = i;
-            lsfit_lsfitclearrequestfields(state);
-            state->needf = true;
-            state->rstate.stage = 4; goto Pause; Resume04:
-            state->needf = false;
+            state->needf = true, state->PQ = 4; goto Pause; Resume04: state->needf = false;
             vv = state->wcur.xR[i];
             state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
          }
@@ -12412,10 +12355,7 @@ Spawn:
             ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
             ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
             state->pointindex = i;
-            lsfit_lsfitclearrequestfields(state);
-            state->needfg = true;
-            state->rstate.stage = 5; goto Pause; Resume05:
-            state->needfg = false;
+            state->needfg = true, state->PQ = 5; goto Pause; Resume05: state->needfg = false;
             vv = state->wcur.xR[i];
             state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
             v = sqr(vv) * 2 * (state->f - state->tasky.xR[i]);
@@ -12427,10 +12367,7 @@ Spawn:
             ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
             ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
             state->pointindex = i;
-            lsfit_lsfitclearrequestfields(state);
-            state->needfg = true;
-            state->rstate.stage = 6; goto Pause; Resume06:
-            state->needfg = false;
+            state->needfg = true, state->PQ = 6; goto Pause; Resume06: state->needfg = false;
             vv = state->wcur.xR[i];
             state->optstate.fi.xR[i] = vv * (state->f - state->tasky.xR[i]);
             ae_v_moved(state->optstate.j.xyR[i], 1, state->g.xR, 1, k, vv);
@@ -12450,10 +12387,7 @@ Spawn:
             ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
             ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
             state->pointindex = i;
-            lsfit_lsfitclearrequestfields(state);
-            state->needfgh = true;
-            state->rstate.stage = 7; goto Pause; Resume07:
-            state->needfgh = false;
+            state->needfgh = true, state->PQ = 7; goto Pause; Resume07: state->needfgh = false;
             vv = state->wcur.xR[i];
             state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
             v = sqr(vv) * 2 * (state->f - state->tasky.xR[i]);
@@ -12469,12 +12403,8 @@ Spawn:
       // Report new iteration
          ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
          state->f = state->optstate.f;
-         lsfit_lsfitclearrequestfields(state);
-         state->xupdated = true;
-         state->rstate.stage = 8; goto Pause; Resume08:
-         state->xupdated = false;
+         state->xupdated = true, state->PQ = 8; goto Pause; Resume08: state->xupdated = false;
       }
-   }
 // Extract results
 //
 // NOTE: reverse communication protocol used by this unit does NOT
@@ -12497,10 +12427,7 @@ Spawn:
          ae_v_move(state->c.xR, 1, state->c1.xR, 1, k);
          ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
          state->pointindex = i;
-         lsfit_lsfitclearrequestfields(state);
-         state->needf = true;
-         state->rstate.stage = 9; goto Pause; Resume09:
-         state->needf = false;
+         state->needf = true, state->PQ = 9; goto Pause; Resume09: state->needf = false;
          v = state->f;
          vv = state->wcur.xR[i];
          state->reprmserror += sqr(v - state->tasky.xR[i]);
@@ -12524,12 +12451,11 @@ Spawn:
       vectorsetlengthatleast(&state->tmp, k);
       if (state->diffstep > 0.0) {
       // Compute Jacobian by means of numerical differentiation
-         lsfit_lsfitclearrequestfields(state);
          state->needf = true;
          for (i = 0; i < n; i++) {
             ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
             state->pointindex = i;
-            state->rstate.stage = 10; goto Pause; Resume10:
+            state->PQ = 10; goto Pause; Resume10:
             state->tmpf.xR[i] = state->f;
             for (j = 0; j < k; j++) {
                v = state->c.xR[j];
@@ -12538,14 +12464,14 @@ Spawn:
                if (isfinite(state->bndl.xR[j])) {
                   state->c.xR[j] = rmax2(state->c.xR[j], state->bndl.xR[j]);
                }
-               state->rstate.stage = 11; goto Pause; Resume11:
+               state->PQ = 11; goto Pause; Resume11:
                lf = state->f;
                rx = v + state->diffstep * state->s.xR[j];
                state->c.xR[j] = rx;
                if (isfinite(state->bndu.xR[j])) {
                   state->c.xR[j] = rmin2(state->c.xR[j], state->bndu.xR[j]);
                }
-               state->rstate.stage = 12; goto Pause; Resume12:
+               state->PQ = 12; goto Pause; Resume12:
                rf = state->f;
                state->c.xR[j] = v;
                if (rx != lx) {
@@ -12558,12 +12484,11 @@ Spawn:
          state->needf = false;
       } else {
       // Jacobian is calculated with user-provided analytic gradient
-         lsfit_lsfitclearrequestfields(state);
          state->needfg = true;
          for (i = 0; i < n; i++) {
             ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
             state->pointindex = i;
-            state->rstate.stage = 13; goto Pause; Resume13:
+            state->PQ = 13; goto Pause; Resume13:
             state->tmpf.xR[i] = state->f;
             for (j = 0; j < k; j++) {
                state->tmpjac.xyR[i][j] = state->g.xR[j];
@@ -12577,26 +12502,9 @@ Spawn:
       lsfit_estimateerrors(&state->tmpjac, &state->tmpf, &state->tasky, &state->wcur, &state->tmp, &state->s, n, k, &state->rep, &state->tmpjacw, 0);
    }
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ia.xZ[0] = n;
-   state->rstate.ia.xZ[1] = m;
-   state->rstate.ia.xZ[2] = k;
-   state->rstate.ia.xZ[3] = i;
-   state->rstate.ia.xZ[4] = j;
-   state->rstate.ia.xZ[5] = j1;
-   state->rstate.ia.xZ[6] = info;
-   state->rstate.ra.xR[0] = lx;
-   state->rstate.ra.xR[1] = lf;
-   state->rstate.ra.xR[2] = ld;
-   state->rstate.ra.xR[3] = rx;
-   state->rstate.ra.xR[4] = rf;
-   state->rstate.ra.xR[5] = rd;
-   state->rstate.ra.xR[6] = v;
-   state->rstate.ra.xR[7] = vv;
-   state->rstate.ra.xR[8] = relcnt;
    return true;
 }
 
@@ -12799,7 +12707,6 @@ void lsfitstate_init(void *_p, bool make_automatic) {
    lsfitreport_init(&p->rep, make_automatic);
    minlmstate_init(&p->optstate, make_automatic);
    minlmreport_init(&p->optrep, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
 }
 
 void lsfitstate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -12860,7 +12767,7 @@ void lsfitstate_copy(void *_dst, void *_src, bool make_automatic) {
    minlmreport_copy(&dst->optrep, &src->optrep, make_automatic);
    dst->prevnpt = src->prevnpt;
    dst->prevalgo = src->prevalgo;
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
 }
 
 void lsfitstate_free(void *_p, bool make_automatic) {
@@ -12888,7 +12795,6 @@ void lsfitstate_free(void *_p, bool make_automatic) {
    lsfitreport_free(&p->rep, make_automatic);
    minlmstate_free(&p->optstate, make_automatic);
    minlmreport_free(&p->optrep, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -13694,7 +13600,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
       minlmsetscale(&lmstate, &scr);
       minlmsetbc(&lmstate, &bl, &bu);
       minlmsetcond(&lmstate, epsx, maxits);
-      while (minlmiteration(&lmstate)) {
+      while (minlmiteration(&lmstate))
          if (lmstate.needfij || lmstate.needfi) {
             rep->nfev++;
             for (i = 0; i < npoints; i++) {
@@ -13710,10 +13616,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                   lmstate.j.xyR[i][nx] = -1.0;
                }
             }
-            continue;
-         }
-         ae_assert(false, "Assertion failed");
-      }
+         } else ae_assert(false, "Assertion failed");
       minlmresults(&lmstate, &pcr, &lmrep);
       ae_assert(lmrep.terminationtype > 0, "FitSphereX: unexpected failure of LM solver");
       rep->iterationscount += lmrep.iterationscount;
@@ -13768,8 +13671,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
          } else {
             minnlcsetalgoslp(&nlcstate);
          }
-         minnlcrestartfrom(&nlcstate, &pcr);
-         while (minnlciteration(&nlcstate)) {
+         for (minnlcrestartfrom(&nlcstate, &pcr); minnlciteration(&nlcstate); )
             if (nlcstate.needfij) {
                rep->nfev++;
                nlcstate.fi.xR[0] = vhi * nlcstate.x.xR[nx + 1] - vlo * nlcstate.x.xR[nx + 0];
@@ -13812,10 +13714,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                   }
                   ae_assert(suboffset == cpr, "Assertion failed");
                }
-               continue;
-            }
-            ae_assert(false, "Assertion failed");
-         }
+            } else ae_assert(false, "Assertion failed");
          minnlcresults(&nlcstate, &pcr, &nlcrep);
          ae_assert(nlcrep.terminationtype > 0, "FitSphereX: unexpected failure of NLC solver");
          rep->iterationscount += nlcrep.iterationscount;
@@ -13912,8 +13811,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                prevc.xR[j] = pcr.xR[j];
             }
             minbleicsetlc(&blcstate, &cmatrix, &ct, cpr * npoints);
-            minbleicrestartfrom(&blcstate, &pcr);
-            while (minbleiciteration(&blcstate)) {
+            for (minbleicrestartfrom(&blcstate, &pcr); minbleiciteration(&blcstate); )
                if (blcstate.needfg) {
                   rep->nfev++;
                   blcstate.f = vhi * blcstate.x.xR[nx + 1] - vlo * blcstate.x.xR[nx + 0];
@@ -13922,9 +13820,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                   }
                   blcstate.g.xR[nx + 0] = -1 * vlo;
                   blcstate.g.xR[nx + 1] = 1 * vhi;
-                  continue;
                }
-            }
             minbleicresults(&blcstate, &pcr, &blcrep);
             ae_assert(blcrep.terminationtype > 0, "FitSphereX: unexpected failure of BLEIC solver");
             rep->iterationscount += blcrep.iterationscount;
@@ -14968,8 +14864,7 @@ double pspline2arclength(pspline2interpolant *p, double a, double b) {
    ae_frame_make(&_frame_block);
    NewObj(autogkstate, state);
    NewObj(autogkreport, rep);
-   autogksmooth(a, b, &state);
-   while (autogkiteration(&state)) {
+   for (autogksmooth(a, b, &state); autogkiteration(&state); ) {
       spline1ddiff(&p->x, state.x, &sx, &dsx, &d2sx);
       spline1ddiff(&p->y, state.x, &sy, &dsy, &d2sy);
       state.f = safepythag2(dsx, dsy);
@@ -15008,8 +14903,7 @@ double pspline3arclength(pspline3interpolant *p, double a, double b) {
    ae_frame_make(&_frame_block);
    NewObj(autogkstate, state);
    NewObj(autogkreport, rep);
-   autogksmooth(a, b, &state);
-   while (autogkiteration(&state)) {
+   for (autogksmooth(a, b, &state); autogkiteration(&state); ) {
       spline1ddiff(&p->x, state.x, &sx, &dsx, &d2sx);
       spline1ddiff(&p->y, state.x, &sy, &dsy, &d2sy);
       spline1ddiff(&p->z, state.x, &sz, &dsz, &d2sz);
@@ -20005,7 +19899,7 @@ static void spline2d_blockllsfit(spline2dxdesignmatrix *xdesign, ae_int_t lsqrcn
       linlsqrrestart(&buf->solver);
       linlsqrsetb(&buf->solver, &buf->tmp0);
       linlsqrsetcond(&buf->solver, 1.0E-14, 1.0E-14, lsqrcnt);
-      while (linlsqriteration(&buf->solver)) {
+      while (linlsqriteration(&buf->solver))
          if (buf->solver.needmv) {
          // Use Cholesky factorization of the system matrix
          // as preconditioner: solve TRSV(U,Solver.X)
@@ -20015,14 +19909,12 @@ static void spline2d_blockllsfit(spline2dxdesignmatrix *xdesign, ae_int_t lsqrcn
             spline2d_blockllstrsv(&buf->blockata, kx, ky, false, &buf->tmp1);
          // After preconditioning is done, multiply by A
             spline2d_xdesignmv(xdesign, &buf->tmp1, &buf->solver.mv);
-         }
-         if (buf->solver.needmtv) {
+         } else if (buf->solver.needmtv) {
          // Multiply by design matrix A
             spline2d_xdesignmtv(xdesign, &buf->solver.x, &buf->solver.mtv);
          // Multiply by preconditioner: solve TRSV(U',A*Solver.X)
             spline2d_blockllstrsv(&buf->blockata, kx, ky, true, &buf->solver.mtv);
          }
-      }
    // Get results and post-multiply by preconditioner to get
    // original variables.
       linlsqrresults(&buf->solver, &buf->tmp1, &buf->solverrep);
@@ -21167,7 +21059,7 @@ static void spline2d_naivellsfit(sparsematrix *av, sparsematrix *ah, ae_int_t ar
          }
          linlsqrsetb(&solver, &tmp0);
          linlsqrsetcond(&solver, 1.0E-14, 1.0E-14, lsqrcnt);
-         while (linlsqriteration(&solver)) {
+         while (linlsqriteration(&solver))
             if (solver.needmv) {
             // Use Cholesky factorization of the system matrix
             // as preconditioner: solve TRSV(U,Solver.X)
@@ -21177,14 +21069,12 @@ static void spline2d_naivellsfit(sparsematrix *av, sparsematrix *ah, ae_int_t ar
                rmatrixtrsv(kx * ky, &ata, 0, 0, true, false, 0, &tmp1, 0);
             // After preconditioning is done, multiply by A
                sparsemv(av, &tmp1, &solver.mv);
-            }
-            if (solver.needmtv) {
+            } else if (solver.needmtv) {
             // Multiply by design matrix A
                sparsemv(ah, &solver.x, &solver.mtv);
             // Multiply by preconditioner: solve TRSV(U',A*Solver.X)
                rmatrixtrsv(kx * ky, &ata, 0, 0, true, false, 1, &solver.mtv, 0);
             }
-         }
          linlsqrresults(&solver, &tmp1, &solverrep);
          rmatrixtrsv(kx * ky, &ata, 0, 0, true, false, 0, &tmp1, 0);
          for (i = 0; i < kx * ky; i++) {
@@ -23804,7 +23694,7 @@ void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scaleve
          linlsqrsetb(&linstate, &denseb1);
          linlsqrrestart(&linstate);
          linlsqrsetxrep(&linstate, true);
-         while (linlsqriteration(&linstate)) {
+         while (linlsqriteration(&linstate))
             if (*terminationrequest) {
             // Request for termination was submitted, terminate immediately
                rbfv2_zerofill(s, nx, ny, bf);
@@ -23812,22 +23702,17 @@ void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scaleve
                *progress10000 = 10000;
                ae_frame_leave();
                return;
-            }
-            if (linstate.needmv) {
+            } else if (linstate.needmv) {
                for (i = 0; i < nbasis; i++) {
                   tmpx.xR[i] = prec.xR[i] * linstate.x.xR[i];
                }
                sparsemv(&sparseacrs, &tmpx, &linstate.mv);
-               continue;
-            }
-            if (linstate.needmtv) {
+            } else if (linstate.needmtv) {
                sparsemtv(&sparseacrs, &linstate.x, &linstate.mtv);
                for (i = 0; i < nbasis; i++) {
                   linstate.mtv.xR[i] *= prec.xR[i];
                }
-               continue;
-            }
-            if (linstate.xupdated) {
+            } else if (linstate.xupdated) {
                rprogress = 0.0;
                for (i = 0; i < levelidx; i++) {
                   rprogress += maxits * ny * avgrowsize.xR[i];
@@ -23839,10 +23724,7 @@ void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scaleve
                rprogress = rmin2(rprogress, 10000.0);
                ae_assert(*progress10000 <= iround(rprogress) + 1, "HRBF: integrity check failed (progress indicator) even after +1 safeguard correction");
                *progress10000 = iround(rprogress);
-               continue;
-            }
-            ae_assert(false, "HRBF: unexpected request from LSQR solver");
-         }
+            } else ae_assert(false, "HRBF: unexpected request from LSQR solver");
          linlsqrresults(&linstate, &densew1, &lsqrrep);
          ae_assert(lsqrrep.terminationtype > 0, "RBFV2BuildHierarchical: integrity check failed");
          for (i = 0; i < nbasis; i++) {

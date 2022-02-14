@@ -1208,7 +1208,7 @@ struct smlptrnsession {
    ae_vector wbuf1;
    ae_vector allminibatches;
    ae_vector currentminibatch;
-   rcommstate rstate;
+   ae_int_t PQ;
    ae_int_t algoused;
    ae_int_t minibatchsize;
    hqrndstate generator;

@@ -197,7 +197,7 @@ struct sparsesolverstate {
    ae_vector wrkb;
    sparsematrix convbuf;
    fblsgmresstate gmressolver;
-   rcommstate rstate;
+   ae_int_t PQ;
 };
 void sparsesolverstate_init(void *_p, bool make_automatic);
 void sparsesolverstate_copy(void *_dst, void *_src, bool make_automatic);
@@ -285,7 +285,7 @@ struct lincgstate {
    ae_int_t repterminationtype;
    bool running;
    ae_vector tmpd;
-   rcommstate rstate;
+   ae_int_t PQ;
 };
 void lincgstate_init(void *_p, bool make_automatic);
 void lincgstate_copy(void *_dst, void *_src, bool make_automatic);
@@ -388,7 +388,7 @@ struct linlsqrstate {
    bool userterminationneeded;
    ae_vector tmpd;
    ae_vector tmpx;
-   rcommstate rstate;
+   ae_int_t PQ;
 };
 void linlsqrstate_init(void *_p, bool make_automatic);
 void linlsqrstate_copy(void *_dst, void *_src, bool make_automatic);
@@ -454,7 +454,7 @@ struct nleqstate {
    bool needf;
    bool needfij;
    bool xupdated;
-   rcommstate rstate;
+   ae_int_t PQ;
    ae_int_t repiterationscount;
    ae_int_t repnfunc;
    ae_int_t repnjac;

@@ -44,7 +44,7 @@ struct odesolverstate {
    ae_vector rkcs;
    ae_matrix rkb;
    ae_matrix rkk;
-   rcommstate rstate;
+   ae_int_t PQ;
 };
 void odesolverstate_init(void *_p, bool make_automatic);
 void odesolverstate_copy(void *_dst, void *_src, bool make_automatic);

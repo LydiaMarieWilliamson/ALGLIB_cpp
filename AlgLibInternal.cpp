@@ -8146,7 +8146,7 @@ void linminnormalized(RVector *d, double *stp, ae_int_t n) {
    *stp /= s;
 }
 
-static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double *dy, double *stp, double fp, double dp, bool *brackt, double stmin, double stmax, ae_int_t *info) {
+void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double *dy, double *stp, double fp, double dp, bool *brackt, double stmin, double stmax, ae_int_t *info) {
    bool bound;
    double gamma;
    double p;
@@ -8159,16 +8159,16 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
    double stpq;
    double theta;
    *info = 0;
-//     CHECK THE INPUT PARAMETERS FOR ERRORS.
+// Check the inputs for errors.
    if (((*brackt && (*stp <= rmin2(*stx, *sty) || *stp >= rmax2(*stx, *sty))) || *dx * (*stp - (*stx)) >= 0.0) || stmax < stmin) {
       return;
    }
-//     DETERMINE IF THE DERIVATIVES HAVE OPPOSITE SIGN.
+// Determine if the derivatives have opposite sign.
    sgnd = dp * (*dx / fabs(*dx));
-//     FIRST CASE. A HIGHER FUNCTION VALUE.
-//     THE MINIMUM IS BRACKETED. IF THE CUBIC STEP IS CLOSER
-//     TO STX THAN THE QUADRATIC STEP, THE CUBIC STEP IS TAKEN,
-//     ELSE THE AVERAGE OF THE CUBIC AND QUADRATIC STEPS IS TAKEN.
+// The first case: a higher function value.
+// The minimum is bracketed.
+// If the cubic step is closer to *stx than the quadratic step, the cubic step is taken,
+// else the average of the cubic and quadratic steps is taken.
    if (fp > *fx) {
       *info = 1;
       bound = true;
@@ -8189,108 +8189,93 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
          stpf = stpc + (stpq - stpc) / 2;
       }
       *brackt = true;
-   } else {
-      if (sgnd < 0.0) {
-      //     SECOND CASE. A LOWER FUNCTION VALUE AND DERIVATIVES OF
-      //     OPPOSITE SIGN. THE MINIMUM IS BRACKETED. IF THE CUBIC
-      //     STEP IS CLOSER TO STX THAN THE QUADRATIC (SECANT) STEP,
-      //     THE CUBIC STEP IS TAKEN, ELSE THE QUADRATIC STEP IS TAKEN.
-         *info = 2;
-         bound = false;
-         theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
-         s = rmax2(fabs(theta), rmax2(fabs(*dx), fabs(dp)));
-         gamma = s * sqrt(sqr(theta / s) - *dx / s * (dp / s));
-         if (*stp > *stx) {
-            gamma = -gamma;
-         }
-         p = gamma - dp + theta;
-         q = gamma - dp + gamma + (*dx);
-         r = p / q;
+   } else if (sgnd < 0.0) {
+   // The second case: a lower function value and derivatives of opposite sign.
+   // The minimum is bracketed.
+   // If the cubic step is closer to *stx than the quadratic (secant) step, the cubic step is taken, else the quadratic step is taken.
+      *info = 2;
+      bound = false;
+      theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
+      s = rmax2(fabs(theta), rmax2(fabs(*dx), fabs(dp)));
+      gamma = s * sqrt(sqr(theta / s) - *dx / s * (dp / s));
+      if (*stp > *stx) {
+         gamma = -gamma;
+      }
+      p = gamma - dp + theta;
+      q = gamma - dp + gamma + (*dx);
+      r = p / q;
+      stpc = *stp + r * (*stx - (*stp));
+      stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
+      if (fabs(stpc - (*stp)) > fabs(stpq - (*stp))) {
+         stpf = stpc;
+      } else {
+         stpf = stpq;
+      }
+      *brackt = true;
+   } else if (fabs(dp) < fabs(*dx)) {
+   // The third case: a lower function value, derivatives of the same sign, and the magnitude of the derivative decreases.
+   // The cubic step is only used if the cubic tends to infinity in the direction of the step or if the minimum of the cubic is beyond *stp.
+   // Otherwise the cubic step is defined to be either stpmin or stpmax.
+   // The quadratic (secant) step is also computed and if the minimum is bracketed
+   // then the step closest to *stx is taken, else the step farthest away is taken.
+      *info = 3;
+      bound = true;
+      theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
+      s = rmax2(fabs(theta), rmax2(fabs(*dx), fabs(dp)));
+   // The case gamma == 0.0 only arises if the cubic does not tend to infinity in the direction of the step.
+      gamma = s * sqrt(rmax2(0.0, sqr(theta / s) - *dx / s * (dp / s)));
+      if (*stp > *stx) {
+         gamma = -gamma;
+      }
+      p = gamma - dp + theta;
+      q = gamma + (*dx - dp) + gamma;
+      r = p / q;
+      if (r < 0.0 && gamma != 0.0) {
          stpc = *stp + r * (*stx - (*stp));
-         stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
-         if (fabs(stpc - (*stp)) > fabs(stpq - (*stp))) {
+      } else if (*stp > *stx) {
+         stpc = stmax;
+      } else {
+         stpc = stmin;
+      }
+      stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
+      if (*brackt) {
+         if (fabs(*stp - stpc) < fabs(*stp - stpq)) {
             stpf = stpc;
          } else {
             stpf = stpq;
          }
-         *brackt = true;
       } else {
-         if (fabs(dp) < fabs(*dx)) {
-         //     THIRD CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
-         //     SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DECREASES.
-         //     THE CUBIC STEP IS ONLY USED IF THE CUBIC TENDS TO INFINITY
-         //     IN THE DIRECTION OF THE STEP OR IF THE MINIMUM OF THE CUBIC
-         //     IS BEYOND STP. OTHERWISE THE CUBIC STEP IS DEFINED TO BE
-         //     EITHER STPMIN OR STPMAX. THE QUADRATIC (SECANT) STEP IS ALSO
-         //     COMPUTED AND IF THE MINIMUM IS BRACKETED THEN THE THE STEP
-         //     CLOSEST TO STX IS TAKEN, ELSE THE STEP FARTHEST AWAY IS TAKEN.
-            *info = 3;
-            bound = true;
-            theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
-            s = rmax2(fabs(theta), rmax2(fabs(*dx), fabs(dp)));
-         //        THE CASE GAMMA = 0 ONLY ARISES IF THE CUBIC DOES NOT TEND
-         //        TO INFINITY IN THE DIRECTION OF THE STEP.
-            gamma = s * sqrt(rmax2(0.0, sqr(theta / s) - *dx / s * (dp / s)));
-            if (*stp > *stx) {
-               gamma = -gamma;
-            }
-            p = gamma - dp + theta;
-            q = gamma + (*dx - dp) + gamma;
-            r = p / q;
-            if (r < 0.0 && gamma != 0.0) {
-               stpc = *stp + r * (*stx - (*stp));
-            } else {
-               if (*stp > *stx) {
-                  stpc = stmax;
-               } else {
-                  stpc = stmin;
-               }
-            }
-            stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
-            if (*brackt) {
-               if (fabs(*stp - stpc) < fabs(*stp - stpq)) {
-                  stpf = stpc;
-               } else {
-                  stpf = stpq;
-               }
-            } else {
-               if (fabs(*stp - stpc) > fabs(*stp - stpq)) {
-                  stpf = stpc;
-               } else {
-                  stpf = stpq;
-               }
-            }
+         if (fabs(*stp - stpc) > fabs(*stp - stpq)) {
+            stpf = stpc;
          } else {
-         //     FOURTH CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
-         //     SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DOES
-         //     NOT DECREASE. IF THE MINIMUM IS NOT BRACKETED, THE STEP
-         //     IS EITHER STPMIN OR STPMAX, ELSE THE CUBIC STEP IS TAKEN.
-            *info = 4;
-            bound = false;
-            if (*brackt) {
-               theta = 3 * (fp - (*fy)) / (*sty - (*stp)) + (*dy) + dp;
-               s = rmax2(fabs(theta), rmax2(fabs(*dy), fabs(dp)));
-               gamma = s * sqrt(sqr(theta / s) - *dy / s * (dp / s));
-               if (*stp > *sty) {
-                  gamma = -gamma;
-               }
-               p = gamma - dp + theta;
-               q = gamma - dp + gamma + (*dy);
-               r = p / q;
-               stpc = *stp + r * (*sty - (*stp));
-               stpf = stpc;
-            } else {
-               if (*stp > *stx) {
-                  stpf = stmax;
-               } else {
-                  stpf = stmin;
-               }
-            }
+            stpf = stpq;
          }
       }
+   } else {
+   // The fourth case: a lower function value, derivatives of the same sign, and the magnitude of the derivative does not decrease.
+   // If the minimum is not bracketed, the step is either stpmin or stpmax, else the cubic step is taken.
+      *info = 4;
+      bound = false;
+      if (*brackt) {
+         theta = 3 * (fp - (*fy)) / (*sty - (*stp)) + (*dy) + dp;
+         s = rmax2(fabs(theta), rmax2(fabs(*dy), fabs(dp)));
+         gamma = s * sqrt(sqr(theta / s) - *dy / s * (dp / s));
+         if (*stp > *sty) {
+            gamma = -gamma;
+         }
+         p = gamma - dp + theta;
+         q = gamma - dp + gamma + (*dy);
+         r = p / q;
+         stpc = *stp + r * (*sty - (*stp));
+         stpf = stpc;
+      } else if (*stp > *stx) {
+         stpf = stmax;
+      } else {
+         stpf = stmin;
+      }
    }
-//     UPDATE THE INTERVAL OF UNCERTAINTY. THIS UPDATE DOES NOT
-//     DEPEND ON THE NEW STEP OR THE CASE ANALYSIS ABOVE.
+// Update the uncertainty interval.
+// This update does not depend on the new step or the case analysis above.
    if (fp > *fx) {
       *sty = *stp;
       *fy = fp;
@@ -8305,7 +8290,7 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
       *fx = fp;
       *dx = dp;
    }
-//     COMPUTE THE NEW STEP AND SAFEGUARD IT.
+// Compute the new step and safeguard it.
    stpf = rmin2(stmax, stpf);
    stpf = rmax2(stmin, stpf);
    *stp = stpf;
@@ -8318,131 +8303,72 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
    }
 }
 
-// THE  PURPOSE  OF  MCSRCH  IS  TO  FIND A STEP WHICH SATISFIES A SUFFICIENT
-// DECREASE CONDITION AND A CURVATURE CONDITION.
+// The purpose of mcsrch() is to find a step which satisfies a sufficient decrease condition and a curvature condition.
+// At each stage the subroutine updates an uncertainty interval with the state members stx and sty as the endpoints.
+// The uncertainty interval is initially chosen so that it contains a minimizer of the modified function
+//	F(x + *stp s) - F(x) - ftol *stp (F'(x)^T s).
+// If a step is obtained for which the modified function has a non-positive function value and non-negative derivative,
+// then the uncertainty interval is chosen so that it contains a minimizer of F(x + *stp s).
 //
-// AT EACH STAGE THE SUBROUTINE  UPDATES  AN  INTERVAL  OF  UNCERTAINTY  WITH
-// ENDPOINTS  STX  AND  STY.  THE INTERVAL OF UNCERTAINTY IS INITIALLY CHOSEN
-// SO THAT IT CONTAINS A MINIMIZER OF THE MODIFIED FUNCTION
+// The algorithm is designed to find a step which satisfies the sufficient decrease condition
+//	F(x + *stp s) <= F(x) + ftol *stp (F'(x)^T s),
+// and the curvature condition
+//	|F'(x + *stp s)^T s| <= gtol |F'(x)^T s|.
+// If ftol < gtol and if, for example, the function is bounded below, then there is always a step which satisfies both conditions.
+// If no step can be found which satisfies both conditions,
+// then the algorithm usually stops when rounding errors prevent further progress.
+// In this case *stp only satisfies the sufficient decrease condition.
 //
-//     F(X+STP*S) - F(X) - FTOL*STP*(GRADF(X)'S).
+// IMPORTANT NOTES:
+// *	This routine guarantees that it will stop at the last point where function value was calculated.
+//	It won't make several additional function evaluations after finding a good point.
+//	So if you store function evaluations requested by this routine,
+//	you can be sure that last one is the point where we've stopped.
+// *	When 0 < stpmax < stpmin, the algorithm will terminate with *info == 5 and *stp == stpmax.
+// *	This algorithm guarantees that, if *info == 1 or *info == 5, then:
+//	*	F(final_point) < F(initial_point) - strict inequality,
+//	*	final_point != initial_point - after rounding to machine precision.
+// *	When a non-descent direction is specified, algorithm stops with *info == 0, *stp == 0 and initial point at X[].
 //
-// IF  A STEP  IS OBTAINED FOR  WHICH THE MODIFIED FUNCTION HAS A NONPOSITIVE
-// FUNCTION  VALUE  AND  NONNEGATIVE  DERIVATIVE,   THEN   THE   INTERVAL  OF
-// UNCERTAINTY IS CHOSEN SO THAT IT CONTAINS A MINIMIZER OF F(X+STP*S).
-//
-// THE  ALGORITHM  IS  DESIGNED TO FIND A STEP WHICH SATISFIES THE SUFFICIENT
-// DECREASE CONDITION
-//
-//     F(X+STP*S) .LE. F(X) + FTOL*STP*(GRADF(X)'S),
-//
-// AND THE CURVATURE CONDITION
-//
-//     ABS(GRADF(X+STP*S)'S)) .LE. GTOL*ABS(GRADF(X)'S).
-//
-// IF  FTOL  IS  LESS  THAN GTOL AND IF, FOR EXAMPLE, THE FUNCTION IS BOUNDED
-// BELOW,  THEN  THERE  IS  ALWAYS  A  STEP  WHICH SATISFIES BOTH CONDITIONS.
-// IF  NO  STEP  CAN BE FOUND  WHICH  SATISFIES  BOTH  CONDITIONS,  THEN  THE
-// ALGORITHM  USUALLY STOPS  WHEN  ROUNDING ERRORS  PREVENT FURTHER PROGRESS.
-// IN THIS CASE STP ONLY SATISFIES THE SUFFICIENT DECREASE CONDITION.
-//
-//
-// :::::::::::::IMPORTANT NOTES:::::::::::::
-//
-// NOTE 1:
-//
-// This routine  guarantees that it will stop at the last point where function
-// value was calculated. It won't make several additional function evaluations
-// after finding good point. So if you store function evaluations requested by
-// this routine, you can be sure that last one is the point where we've stopped.
-//
-// NOTE 2:
-//
-// when 0<StpMax<StpMin, algorithm will terminate with INFO=5 and Stp=StpMax
-//
-// NOTE 3:
-//
-// this algorithm guarantees that, if MCINFO=1 or MCINFO=5, then:
-// * F(final_point)<F(initial_point) - strict inequality
-// * final_point != initial_point - after rounding to machine precision
-//
-// NOTE 4:
-//
-// when non-descent direction is specified, algorithm stops with MCINFO=0,
-// Stp=0 and initial point at X[].
-// :::::::::::::::::::::::::::::::::::::::::
-//
-//
-// PARAMETERS DESCRIPRION
-//
-// STAGE IS ZERO ON FIRST CALL, ZERO ON FINAL EXIT
-//
-// N IS A POSITIVE INTEGER INPUT VARIABLE SET TO THE NUMBER OF VARIABLES.
-//
-// X IS  AN  ARRAY  OF  LENGTH N. ON INPUT IT MUST CONTAIN THE BASE POINT FOR
-// THE LINE SEARCH. ON OUTPUT IT CONTAINS X+STP*S.
-//
-// F IS  A  VARIABLE. ON INPUT IT MUST CONTAIN THE VALUE OF F AT X. ON OUTPUT
-// IT CONTAINS THE VALUE OF F AT X + STP*S.
-//
-// G IS AN ARRAY OF LENGTH N. ON INPUT IT MUST CONTAIN THE GRADIENT OF F AT X.
-// ON OUTPUT IT CONTAINS THE GRADIENT OF F AT X + STP*S.
-//
-// S IS AN INPUT ARRAY OF LENGTH N WHICH SPECIFIES THE SEARCH DIRECTION.
-//
-// STP  IS  A NONNEGATIVE VARIABLE. ON INPUT STP CONTAINS AN INITIAL ESTIMATE
-// OF A SATISFACTORY STEP. ON OUTPUT STP CONTAINS THE FINAL ESTIMATE.
-//
-// FTOL AND GTOL ARE NONNEGATIVE INPUT VARIABLES. TERMINATION OCCURS WHEN THE
-// SUFFICIENT DECREASE CONDITION AND THE DIRECTIONAL DERIVATIVE CONDITION ARE
-// SATISFIED.
-//
-// XTOL IS A NONNEGATIVE INPUT VARIABLE. TERMINATION OCCURS WHEN THE RELATIVE
-// WIDTH OF THE INTERVAL OF UNCERTAINTY IS AT MOST XTOL.
-//
-// STPMIN AND STPMAX ARE NONNEGATIVE INPUT VARIABLES WHICH SPECIFY LOWER  AND
-// UPPER BOUNDS FOR THE STEP.
-//
-// MAXFEV IS A POSITIVE INTEGER INPUT VARIABLE. TERMINATION OCCURS WHEN THE
-// NUMBER OF CALLS TO FCN IS AT LEAST MAXFEV BY THE END OF AN ITERATION.
-//
-// INFO IS AN INTEGER OUTPUT VARIABLE SET AS FOLLOWS:
-//     INFO = 0  IMPROPER INPUT PARAMETERS.
-//
-//     INFO = 1  THE SUFFICIENT DECREASE CONDITION AND THE
-//               DIRECTIONAL DERIVATIVE CONDITION HOLD.
-//
-//     INFO = 2  RELATIVE WIDTH OF THE INTERVAL OF UNCERTAINTY
-//               IS AT MOST XTOL.
-//
-//     INFO = 3  NUMBER OF CALLS TO FCN HAS REACHED MAXFEV.
-//
-//     INFO = 4  THE STEP IS AT THE LOWER BOUND STPMIN.
-//
-//     INFO = 5  THE STEP IS AT THE UPPER BOUND STPMAX.
-//
-//     INFO = 6  ROUNDING ERRORS PREVENT FURTHER PROGRESS.
-//               THERE MAY NOT BE A STEP WHICH SATISFIES THE
-//               SUFFICIENT DECREASE AND CURVATURE CONDITIONS.
-//               TOLERANCES MAY BE TOO SMALL.
-//
-// NFEV IS AN INTEGER OUTPUT VARIABLE SET TO THE NUMBER OF CALLS TO FCN.
-//
-// WA IS A WORK ARRAY OF LENGTH N.
-//
-// ARGONNE NATIONAL LABORATORY. MINPACK PROJECT. JUNE 1983
-// JORGE J. MORE', DAVID J. THUENTE
-void mcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVector *s, double *stp, double stpmax, double gtol, ae_int_t *info, ae_int_t *nfev, RVector *wa, linminstate *state, ae_int_t *stage) {
+// Parameters and Inputs:
+// *	n:	The number of variables; n > 0.
+// *	x:	An n-vector for the base point for the line search, updated to x + *stp s.
+// *	f:	The value, set to F(x) and updated to F(x + *stp s).
+// *	g:	An n-vector, set to F'(x) and updated to F'(x + *stp s).
+// *	s:	An n-vector indicating the search direction.
+// *	*stp:	The step estimate; *stp >= 0; updated on output; accessed via the pointer stp.
+// *	stpmin:	The minimum step size; stpmin >= 0 (represented here as the constant linmin_stpmin).
+// *	stpmax:	The maximum step size; stpmax >= 0.
+// *	xtol:	The tolerance for the relative width of the uncertainty interval; xtol >= 0.
+// *	ftol:	The tolerance for sufficient decrease; ftol >= 0.
+// *	gtol:	The tolerance for the directional derivative curvature condition; gtol >= 0.
+// *	*info:	The return code; accessed via the pointer info:
+//		0:	Improper inputs or parameters.
+//		1:	The sufficient decrease condition and the directional derivative condition hold.
+//		2:	The relative width of the uncertainty interval is at most xtol.
+//		3:	The number of function calls has reached maxfev.
+//		4:	The step is at the lower bound stpmin.
+//		5:	The step is at the upper bound stpmax.
+//		6:	Rounding errors prevent further progress.
+//			There may not be a step which satisfies the sufficient decrease and curvature conditions.
+//			The tolerances may be too small.
+// *	*nfev:	The number of function calls; accessed via the pointer nfev.
+// *	maxfev:	The number of function calls allowed for the algorithm; maxfev > 0.
+// *	wa:	An n-vector for work space.
+// *	state:	The algorithm state.
+// *	*stage:	The algorithm stage; accessed via the pointer stage.
+// Return Value:
+// *	The condition (*stage != 0), indicating that iteration is in progress.
+// Argonne National Laboratory. MINPACK Project. 1983 June.
+// Jorge J. More', David J. Thuente.
+bool mcsrch(ae_int_t n, RVector *x, double f, RVector *g, RVector *s, double *stp, double stpmax, double gtol, ae_int_t *info, ae_int_t *nfev, RVector *wa, linminstate *state, ae_int_t *stage) {
    ae_int_t i;
    double v;
-   double p5;
-   double p66;
-   double zero;
-// init
-   p5 = 0.5;
-   p66 = 0.66;
+// Initialize.
+   const double p5 = 0.5;
+   const double p66 = 0.66;
    state->xtrapf = 4.0;
-   zero = 0.0;
+   const double zero = 0.0;
    if (stpmax == 0.0) {
       stpmax = linmin_defstpmax;
    }
@@ -8452,184 +8378,172 @@ void mcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVector *s, double *s
    if (*stp > stpmax) {
       *stp = stpmax;
    }
-// Main cycle
+// Manually threaded two-way signalling.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (*stage > 0) switch (*stage) {
+   // case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
+      case 4: goto Resume4;
+      default: goto Exit;
+   }
+Spawn:
+// The main cycle.
+#if 0
+// Next.
+   *stage = 2;
+   Resume2:
+#endif
+   state->infoc = 1;
+   *info = 0;
+// Check the inputs and parameters for errors.
+   if (stpmax < linmin_stpmin && stpmax > 0.0) {
+      *info = 5;
+      *stp = stpmax;
+      goto Exit;
+   }
+   if (((((((n <= 0 || *stp <= 0.0) || linmin_ftol < 0.0) || gtol < zero) || linmin_xtol < zero) || linmin_stpmin < zero) || stpmax < linmin_stpmin) || linmin_maxfev <= 0) {
+      goto Exit;
+   }
+// Compute the initial gradient in the search direction and check that s is a descent direction.
+   v = ae_v_dotproduct(g->xR, 1, s->xR, 1, n);
+   state->dginit = v;
+   if (state->dginit >= 0.0) {
+      *stp = 0.0;
+      goto Exit;
+   }
+// Initialize the local variables.
+   state->brackt = false;
+   state->stage1 = true;
+   *nfev = 0;
+   state->finit = f;
+   state->dgtest = linmin_ftol * state->dginit;
+   state->width = stpmax - linmin_stpmin;
+   state->width1 = state->width / p5;
+   ae_v_move(wa->xR, 1, x->xR, 1, n);
+// The members stx, fx, dgx contain the values of the step, function, and directional derivative at the best step.
+// The members sty, fy, dgy contain the values of the step, function, and derivative at the other endpoint of the uncertainty interval.
+// The variables *stp, f and member dg contain the values of the step, function, and derivative at the current step.
+   state->stx = 0.0;
+   state->fx = state->finit;
+   state->dgx = state->dginit;
+   state->sty = 0.0;
+   state->fy = state->finit;
+   state->dgy = state->dginit;
    while (true) {
-      if (*stage == 0) {
-      // NEXT
-         *stage = 2;
-         continue;
-      }
-      if (*stage == 2) {
-         state->infoc = 1;
-         *info = 0;
-      //     CHECK THE INPUT PARAMETERS FOR ERRORS.
-         if (stpmax < linmin_stpmin && stpmax > 0.0) {
-            *info = 5;
-            *stp = stpmax;
-            *stage = 0;
-            return;
-         }
-         if (((((((n <= 0 || *stp <= 0.0) || linmin_ftol < 0.0) || gtol < zero) || linmin_xtol < zero) || linmin_stpmin < zero) || stpmax < linmin_stpmin) || linmin_maxfev <= 0) {
-            *stage = 0;
-            return;
-         }
-      //     COMPUTE THE INITIAL GRADIENT IN THE SEARCH DIRECTION
-      //     AND CHECK THAT S IS A DESCENT DIRECTION.
-         v = ae_v_dotproduct(g->xR, 1, s->xR, 1, n);
-         state->dginit = v;
-         if (state->dginit >= 0.0) {
-            *stage = 0;
-            *stp = 0.0;
-            return;
-         }
-      //     INITIALIZE LOCAL VARIABLES.
-         state->brackt = false;
-         state->stage1 = true;
-         *nfev = 0;
-         state->finit = *f;
-         state->dgtest = linmin_ftol * state->dginit;
-         state->width = stpmax - linmin_stpmin;
-         state->width1 = state->width / p5;
-         ae_v_move(wa->xR, 1, x->xR, 1, n);
-      //     THE VARIABLES STX, FX, DGX CONTAIN THE VALUES OF THE STEP,
-      //     FUNCTION, AND DIRECTIONAL DERIVATIVE AT THE BEST STEP.
-      //     THE VARIABLES STY, FY, DGY CONTAIN THE VALUE OF THE STEP,
-      //     FUNCTION, AND DERIVATIVE AT THE OTHER ENDPOINT OF
-      //     THE INTERVAL OF UNCERTAINTY.
-      //     THE VARIABLES STP, F, DG CONTAIN THE VALUES OF THE STEP,
-      //     FUNCTION, AND DERIVATIVE AT THE CURRENT STEP.
-         state->stx = 0.0;
-         state->fx = state->finit;
-         state->dgx = state->dginit;
-         state->sty = 0.0;
-         state->fy = state->finit;
-         state->dgy = state->dginit;
-      // NEXT
-         *stage = 3;
-         continue;
-      }
-      if (*stage == 3) {
-      //     START OF ITERATION.
-      //
-      //     SET THE MINIMUM AND MAXIMUM STEPS TO CORRESPOND
-      //     TO THE PRESENT INTERVAL OF UNCERTAINTY.
-         if (state->brackt) {
-            if (state->stx < state->sty) {
-               state->stmin = state->stx;
-               state->stmax = state->sty;
-            } else {
-               state->stmin = state->sty;
-               state->stmax = state->stx;
-            }
-         } else {
+#if 0
+   // Next.
+      *stage = 3;
+      Resume3:
+#endif
+   // Start the iteration.
+   // Set the minimum and maximum steps to correspond to the present uncertainty interval.
+      if (state->brackt) {
+         if (state->stx < state->sty) {
             state->stmin = state->stx;
-            state->stmax = *stp + state->xtrapf * (*stp - state->stx);
-         }
-      //        FORCE THE STEP TO BE WITHIN THE BOUNDS STPMAX AND STPMIN.
-         if (*stp > stpmax) {
-            *stp = stpmax;
-         }
-         if (*stp < linmin_stpmin) {
-            *stp = linmin_stpmin;
-         }
-      //        IF AN UNUSUAL TERMINATION IS TO OCCUR THEN LET
-      //        STP BE THE LOWEST POINT OBTAINED SO FAR.
-         if ((((state->brackt && (*stp <= state->stmin || *stp >= state->stmax)) || *nfev >= linmin_maxfev - 1) || state->infoc == 0) || (state->brackt && state->stmax - state->stmin <= linmin_xtol * state->stmax)) {
-            *stp = state->stx;
-         }
-      //        EVALUATE THE FUNCTION AND GRADIENT AT STP
-      //        AND COMPUTE THE DIRECTIONAL DERIVATIVE.
-         ae_v_move(x->xR, 1, wa->xR, 1, n);
-         ae_v_addd(x->xR, 1, s->xR, 1, n, *stp);
-      // NEXT
-         *stage = 4;
-         return;
-      }
-      if (*stage == 4) {
-         *info = 0;
-         ++*nfev;
-         v = ae_v_dotproduct(g->xR, 1, s->xR, 1, n);
-         state->dg = v;
-         state->ftest1 = state->finit + *stp * state->dgtest;
-      //        TEST FOR CONVERGENCE.
-         if ((state->brackt && (*stp <= state->stmin || *stp >= state->stmax)) || state->infoc == 0) {
-            *info = 6;
-         }
-         if (((*stp == stpmax && *f < state->finit) && *f <= state->ftest1) && state->dg <= state->dgtest) {
-            *info = 5;
-         }
-         if (*stp == linmin_stpmin && ((*f >= state->finit || *f > state->ftest1) || state->dg >= state->dgtest)) {
-            *info = 4;
-         }
-         if (*nfev >= linmin_maxfev) {
-            *info = 3;
-         }
-         if (state->brackt && state->stmax - state->stmin <= linmin_xtol * state->stmax) {
-            *info = 2;
-         }
-         if ((*f < state->finit && *f <= state->ftest1) && fabs(state->dg) <= -gtol * state->dginit) {
-            *info = 1;
-         }
-      //        CHECK FOR TERMINATION.
-         if (*info != 0) {
-         // Check guarantees provided by the function for INFO=1 or INFO=5
-            if (*info == 1 || *info == 5) {
-               v = 0.0;
-               for (i = 0; i < n; i++) {
-                  v += (wa->xR[i] - x->xR[i]) * (wa->xR[i] - x->xR[i]);
-               }
-               if (*f >= state->finit || v == 0.0) {
-                  *info = 6;
-               }
-            }
-            *stage = 0;
-            return;
-         }
-      //        IN THE FIRST STAGE WE SEEK A STEP FOR WHICH THE MODIFIED
-      //        FUNCTION HAS A NONPOSITIVE VALUE AND NONNEGATIVE DERIVATIVE.
-         if ((state->stage1 && *f <= state->ftest1) && state->dg >= rmin2(linmin_ftol, gtol) * state->dginit) {
-            state->stage1 = false;
-         }
-      //        A MODIFIED FUNCTION IS USED TO PREDICT THE STEP ONLY IF
-      //        WE HAVE NOT OBTAINED A STEP FOR WHICH THE MODIFIED
-      //        FUNCTION HAS A NONPOSITIVE FUNCTION VALUE AND NONNEGATIVE
-      //        DERIVATIVE, AND IF A LOWER FUNCTION VALUE HAS BEEN
-      //        OBTAINED BUT THE DECREASE IS NOT SUFFICIENT.
-         if ((state->stage1 && *f <= state->fx) && *f > state->ftest1) {
-         //           DEFINE THE MODIFIED FUNCTION AND DERIVATIVE VALUES.
-            state->fm = *f - *stp * state->dgtest;
-            state->fxm = state->fx - state->stx * state->dgtest;
-            state->fym = state->fy - state->sty * state->dgtest;
-            state->dgm = state->dg - state->dgtest;
-            state->dgxm = state->dgx - state->dgtest;
-            state->dgym = state->dgy - state->dgtest;
-         //           CALL CSTEP TO UPDATE THE INTERVAL OF UNCERTAINTY
-         //           AND TO COMPUTE THE NEW STEP.
-            linmin_mcstep(&state->stx, &state->fxm, &state->dgxm, &state->sty, &state->fym, &state->dgym, stp, state->fm, state->dgm, &state->brackt, state->stmin, state->stmax, &state->infoc);
-         //           RESET THE FUNCTION AND GRADIENT VALUES FOR F.
-            state->fx = state->fxm + state->stx * state->dgtest;
-            state->fy = state->fym + state->sty * state->dgtest;
-            state->dgx = state->dgxm + state->dgtest;
-            state->dgy = state->dgym + state->dgtest;
+            state->stmax = state->sty;
          } else {
-         //           CALL MCSTEP TO UPDATE THE INTERVAL OF UNCERTAINTY
-         //           AND TO COMPUTE THE NEW STEP.
-            linmin_mcstep(&state->stx, &state->fx, &state->dgx, &state->sty, &state->fy, &state->dgy, stp, *f, state->dg, &state->brackt, state->stmin, state->stmax, &state->infoc);
+            state->stmin = state->sty;
+            state->stmax = state->stx;
          }
-      //        FORCE A SUFFICIENT DECREASE IN THE SIZE OF THE
-      //        INTERVAL OF UNCERTAINTY.
-         if (state->brackt) {
-            if (fabs(state->sty - state->stx) >= p66 * state->width1) {
-               *stp = state->stx + p5 * (state->sty - state->stx);
+      } else {
+         state->stmin = state->stx;
+         state->stmax = *stp + state->xtrapf * (*stp - state->stx);
+      }
+   // Force the step to be within the bounds stpmax and stpmin.
+      if (*stp > stpmax) {
+         *stp = stpmax;
+      }
+      if (*stp < linmin_stpmin) {
+         *stp = linmin_stpmin;
+      }
+   // If an unusual termination is to occur then let *stp be the lowest point obtained so far.
+      if ((((state->brackt && (*stp <= state->stmin || *stp >= state->stmax)) || *nfev >= linmin_maxfev - 1) || state->infoc == 0) || (state->brackt && state->stmax - state->stmin <= linmin_xtol * state->stmax)) {
+         *stp = state->stx;
+      }
+   // Evaluate the function and gradient at *stp and compute the directional derivative.
+      ae_v_move(x->xR, 1, wa->xR, 1, n);
+      ae_v_addd(x->xR, 1, s->xR, 1, n, *stp);
+   // Next.
+      *stage = 4; goto Pause; Resume4:
+      *info = 0;
+      ++*nfev;
+      v = ae_v_dotproduct(g->xR, 1, s->xR, 1, n);
+      state->dg = v;
+      state->ftest1 = state->finit + *stp * state->dgtest;
+   // Test for convergence.
+      if ((state->brackt && (*stp <= state->stmin || *stp >= state->stmax)) || state->infoc == 0) {
+         *info = 6;
+      }
+      if (((*stp == stpmax && f < state->finit) && f <= state->ftest1) && state->dg <= state->dgtest) {
+         *info = 5;
+      }
+      if (*stp == linmin_stpmin && ((f >= state->finit || f > state->ftest1) || state->dg >= state->dgtest)) {
+         *info = 4;
+      }
+      if (*nfev >= linmin_maxfev) {
+         *info = 3;
+      }
+      if (state->brackt && state->stmax - state->stmin <= linmin_xtol * state->stmax) {
+         *info = 2;
+      }
+      if ((f < state->finit && f <= state->ftest1) && fabs(state->dg) <= -gtol * state->dginit) {
+         *info = 1;
+      }
+   // Check for termination.
+      if (*info != 0) {
+      // Check the guarantees provided by the function for *info == 1 or *info == 5.
+         if (*info == 1 || *info == 5) {
+            v = 0.0;
+            for (i = 0; i < n; i++) {
+               v += (wa->xR[i] - x->xR[i]) * (wa->xR[i] - x->xR[i]);
             }
-            state->width1 = state->width;
-            state->width = fabs(state->sty - state->stx);
+            if (f >= state->finit || v == 0.0) {
+               *info = 6;
+            }
          }
-      //  NEXT.
-         *stage = 3;
-         continue;
+         goto Exit;
+      }
+   // In the first stage we seek a step for which the modified function has a non-positive value and non-negative derivative.
+      if ((state->stage1 && f <= state->ftest1) && state->dg >= rmin2(linmin_ftol, gtol) * state->dginit) {
+         state->stage1 = false;
+      }
+   // A modified function is used to predict the step only if we have not obtained a step
+   // for which the modified function has a non-positive function value and non-negative derivative,
+   // and if a lower function value has been obtained but the decrease is not sufficient.
+      if ((state->stage1 && f <= state->fx) && f > state->ftest1) {
+      // Define the modified function and derivative values.
+         state->fm = f - *stp * state->dgtest;
+         state->fxm = state->fx - state->stx * state->dgtest;
+         state->fym = state->fy - state->sty * state->dgtest;
+         state->dgm = state->dg - state->dgtest;
+         state->dgxm = state->dgx - state->dgtest;
+         state->dgym = state->dgy - state->dgtest;
+      // Update the uncertainty interval and compute the new step.
+         mcstep(&state->stx, &state->fxm, &state->dgxm, &state->sty, &state->fym, &state->dgym, stp, state->fm, state->dgm, &state->brackt, state->stmin, state->stmax, &state->infoc);
+      // Reset the function and gradient values for f.
+         state->fx = state->fxm + state->stx * state->dgtest;
+         state->fy = state->fym + state->sty * state->dgtest;
+         state->dgx = state->dgxm + state->dgtest;
+         state->dgy = state->dgym + state->dgtest;
+      } else {
+      // Update the uncertainty interval and compute the new step.
+         mcstep(&state->stx, &state->fx, &state->dgx, &state->sty, &state->fy, &state->dgy, stp, f, state->dg, &state->brackt, state->stmin, state->stmax, &state->infoc);
+      }
+   // Force a sufficient decrease in the size of the uncertainty interval.
+      if (state->brackt) {
+         if (fabs(state->sty - state->stx) >= p66 * state->width1) {
+            *stp = state->stx + p5 * (state->sty - state->stx);
+         }
+         state->width1 = state->width;
+         state->width = fabs(state->sty - state->stx);
       }
    }
+Exit:
+   *stage = 0;
+   return false;
+Pause:
+   return true;
 }
 
 // These functions perform Armijo line search using  at  most  FMAX  function
@@ -8670,25 +8584,20 @@ void armijocreate(ae_int_t n, RVector *x, double f, RVector *s, double stp, doub
    state->n = n;
    ae_v_move(state->xbase.xR, 1, x->xR, 1, n);
    ae_v_move(state->s.xR, 1, s->xR, 1, n);
-   ae_vector_set_length(&state->rstate.ia, 0 + 1);
-   ae_vector_set_length(&state->rstate.ra, 0 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // This is rcomm-based search function
 // ALGLIB: Copyright 05.10.2010 by Sergey Bochkanov
 bool armijoiteration(armijostate *state) {
-   double v;
-   ae_int_t n;
+   AutoS double v;
+   AutoS ae_int_t n;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   n = state->rstate.ia.xZ[0];
-   v = state->rstate.ra.xR[0];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       default: goto Exit;
    }
@@ -8719,7 +8628,7 @@ Spawn:
    }
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
-   state->rstate.stage = 0; goto Pause; Resume0:
+   state->PQ = 0; goto Pause; Resume0:
    state->nfev++;
    if (state->f < state->fcur) {
       state->stplen = v;
@@ -8741,7 +8650,7 @@ Spawn:
          }
          ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
          ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
-         state->rstate.stage = 1; goto Pause; Resume1:
+         state->PQ = 1; goto Pause; Resume1:
          state->nfev++;
       // make decision
          if (state->f < state->fcur) {
@@ -8757,7 +8666,7 @@ Spawn:
    v = state->stplen / linmin_armijofactor;
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
-   state->rstate.stage = 2; goto Pause; Resume2:
+   state->PQ = 2; goto Pause; Resume2:
    state->nfev++;
    if (state->f < state->fcur) {
       state->stplen /= linmin_armijofactor;
@@ -8776,7 +8685,7 @@ Spawn:
          v = state->stplen / linmin_armijofactor;
          ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
          ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
-         state->rstate.stage = 3; goto Pause; Resume3:
+         state->PQ = 3; goto Pause; Resume3:
          state->nfev++;
       // make decision
          if (state->f < state->fcur) {
@@ -8791,12 +8700,9 @@ Spawn:
 // Nothing to be done
    state->info = 1;
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ia.xZ[0] = n;
-   state->rstate.ra.xR[0] = v;
    return true;
 }
 
@@ -8860,7 +8766,6 @@ void armijostate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->xbase, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->s, 0, DT_REAL, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
 }
 
 void armijostate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -8878,7 +8783,7 @@ void armijostate_copy(void *_dst, void *_src, bool make_automatic) {
    dst->fmax = src->fmax;
    dst->nfev = src->nfev;
    dst->info = src->info;
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
 }
 
 void armijostate_free(void *_p, bool make_automatic) {
@@ -8886,7 +8791,6 @@ void armijostate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->x, make_automatic);
    ae_vector_free(&p->xbase, make_automatic);
    ae_vector_free(&p->s, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
 }
 } // end of namespace alglib_impl
 

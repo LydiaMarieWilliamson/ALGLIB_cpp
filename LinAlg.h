@@ -398,7 +398,7 @@ struct eigsubspacestate {
    ae_int_t requesttype;
    ae_int_t requestsize;
    ae_int_t repiterationscount;
-   rcommstate rstate;
+   ae_int_t PQ;
 };
 void eigsubspacestate_init(void *_p, bool make_automatic);
 void eigsubspacestate_copy(void *_dst, void *_src, bool make_automatic);
@@ -858,7 +858,7 @@ struct fblslincgstate {
    ae_vector pk;
    ae_vector pk1;
    ae_vector b;
-   rcommstate rstate;
+   ae_int_t PQ;
    ae_vector tmp2;
 };
 void fblslincgstate_init(void *_p, bool make_automatic);
@@ -887,7 +887,7 @@ struct fblsgmresstate {
    double epsdiag;
    ae_int_t itsperformed;
    ae_int_t retcode;
-   rcommstate rstate;
+   ae_int_t PQ;
 };
 void fblsgmresstate_init(void *_p, bool make_automatic);
 void fblsgmresstate_copy(void *_dst, void *_src, bool make_automatic);
@@ -922,7 +922,7 @@ struct normestimatorstate {
    bool needmv;
    bool needmtv;
    double repnorm;
-   rcommstate rstate;
+   ae_int_t PQ;
 };
 void normestimatorstate_init(void *_p, bool make_automatic);
 void normestimatorstate_copy(void *_dst, void *_src, bool make_automatic);

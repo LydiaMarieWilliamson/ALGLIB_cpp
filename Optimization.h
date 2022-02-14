@@ -157,7 +157,7 @@ struct smoothnessmonitor {
    ae_vector probingsteps;
    ae_matrix probingvalues;
    ae_matrix probingslopes;
-   rcommstate probingrcomm;
+   ae_int_t ProbePQ;
    bool linesearchspoiled;
    bool linesearchstarted;
    double nonc0currentrating;
@@ -180,7 +180,7 @@ struct smoothnessmonitor {
    ae_vector x;
    ae_vector fi;
    ae_matrix j;
-   rcommstate rstateg0;
+   ae_int_t PQ;
    ae_vector xbase;
    ae_vector fbase;
    ae_vector fm;
@@ -294,7 +294,7 @@ struct minlbfgsstate {
    bool xupdated;
    bool userterminationneeded;
    double teststep;
-   rcommstate rstate;
+   ae_int_t PQ;
    ae_int_t repiterationscount;
    ae_int_t repnfev;
    ae_int_t repterminationtype;
@@ -750,7 +750,7 @@ struct minbleicstate {
    bool steepestdescentstep;
    bool boundedstep;
    bool userterminationneeded;
-   rcommstate rstate;
+   ae_int_t PQ;
    ae_vector ugc;
    ae_vector cgc;
    ae_vector xn;
@@ -1254,7 +1254,7 @@ struct minlmstepfinder {
    ae_vector havebndl;
    ae_vector havebndu;
    ae_vector s;
-   rcommstate rstate;
+   ae_int_t PQ;
    ae_vector xdir;
    ae_vector choleskybuf;
    ae_vector tmp0;
@@ -1328,7 +1328,7 @@ struct minlmstate {
    ae_int_t repngrad;
    ae_int_t repnhess;
    ae_int_t repncholesky;
-   rcommstate rstate;
+   ae_int_t PQ;
    ae_vector choleskybuf;
    ae_vector tmp0;
    double actualdecrease;
@@ -1476,7 +1476,7 @@ struct mincgstate {
    bool lsstart;
    bool lsend;
    bool userterminationneeded;
-   rcommstate rstate;
+   ae_int_t PQ;
    ae_int_t repiterationscount;
    ae_int_t repnfev;
    ae_int_t repterminationtype;
@@ -1646,7 +1646,7 @@ struct minsqpmeritphasestate {
    ae_vector stepknlaggrad;
    ae_int_t status;
    bool increasebigc;
-   rcommstate rmeritphasestate;
+   ae_int_t PQ;
 };
 void minsqpmeritphasestate_init(void *_p, bool make_automatic);
 void minsqpmeritphasestate_copy(void *_dst, void *_src, bool make_automatic);
@@ -1705,7 +1705,7 @@ struct minsqpstate {
    ae_int_t replcidx;
    double repnlcerr;
    ae_int_t repnlcidx;
-   rcommstate rstate;
+   ae_int_t PQ;
 };
 void minsqpstate_init(void *_p, bool make_automatic);
 void minsqpstate_copy(void *_dst, void *_src, bool make_automatic);
@@ -2069,7 +2069,7 @@ struct minslpphase13state {
    ae_matrix stepkjn;
    ae_vector dummylagmult;
    minslptmpmerit tmpmerit;
-   rcommstate rphase13state;
+   ae_int_t Ph13PQ;
 };
 void minslpphase13state_init(void *_p, bool make_automatic);
 void minslpphase13state_copy(void *_dst, void *_src, bool make_automatic);
@@ -2095,7 +2095,7 @@ struct minslpphase2state {
    ae_vector d;
    linminstate mcstate;
    minslptmpmerit tmpmerit;
-   rcommstate rphase2state;
+   ae_int_t Ph2PQ;
 };
 void minslpphase2state_init(void *_p, bool make_automatic);
 void minslpphase2state_copy(void *_dst, void *_src, bool make_automatic);
@@ -2158,7 +2158,7 @@ struct minslpstate {
    ae_int_t replcidx;
    double repnlcerr;
    ae_int_t repnlcidx;
-   rcommstate rstate;
+   ae_int_t PQ;
 };
 void minslpstate_init(void *_p, bool make_automatic);
 void minslpstate_copy(void *_dst, void *_src, bool make_automatic);
@@ -2204,9 +2204,8 @@ struct minnlcstate {
    bool needfij;
    bool needfi;
    bool xupdated;
-   rcommstate rstate;
-   rcommstate rstateaul;
-   rcommstate rstateslp;
+   ae_int_t PQ;
+   ae_int_t AulPQ;
    ae_vector scaledbndl;
    ae_vector scaledbndu;
    ae_matrix scaledcleic;
@@ -2396,8 +2395,8 @@ struct minnsstate {
    bool needfij;
    bool needfi;
    bool xupdated;
-   rcommstate rstate;
-   rcommstate rstateags;
+   ae_int_t PQ;
+   ae_int_t AgsPQ;
    hqrndstate agsrs;
    double agsradius;
    ae_int_t agssamplesize;
@@ -2557,7 +2556,7 @@ struct minasastate {
    ae_vector g;
    bool needfg;
    bool xupdated;
-   rcommstate rstate;
+   ae_int_t PQ;
    ae_int_t repiterationscount;
    ae_int_t repnfev;
    ae_int_t repterminationtype;
@@ -2639,7 +2638,7 @@ struct minbcstate {
    bool needfg;
    bool xupdated;
    bool userterminationneeded;
-   rcommstate rstate;
+   ae_int_t PQ;
    ae_vector xc;
    ae_vector ugc;
    ae_vector cgc;

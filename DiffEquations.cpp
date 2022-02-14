@@ -27,11 +27,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
    double v;
    SetObj(odesolverstate, state);
 // Prepare RComm
-   ae_vector_set_length(&state->rstate.ia, 5 + 1);
-   ae_vector_set_length(&state->rstate.ba, 0 + 1);
-   ae_vector_set_length(&state->rstate.ra, 5 + 1);
-   state->rstate.stage = -1;
-   state->needdy = false;
+   state->PQ = -1;
 // check parameters.
    if ((n <= 0 || m < 1) || eps == 0.0) {
       state->repterminationtype = -1;
@@ -157,39 +153,25 @@ void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, d
 // API: bool odesolveriteration(const odesolverstate &state);
 // API: void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL);
 bool odesolveriteration(odesolverstate *state) {
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   double xc;
-   double v;
-   double h;
-   double h2;
-   bool gridpoint;
-   double err;
-   double maxgrowpow;
-   ae_int_t klimit;
+   AutoS ae_int_t n;
+   AutoS ae_int_t m;
+   AutoS ae_int_t i;
+   AutoS ae_int_t j;
+   AutoS ae_int_t k;
+   AutoS double xc;
+   AutoS double v;
+   AutoS double h;
+   AutoS double h2;
+   AutoS bool gridpoint;
+   AutoS double err;
+   AutoS double maxgrowpow;
+   AutoS ae_int_t klimit;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   n = state->rstate.ia.xZ[0];
-   m = state->rstate.ia.xZ[1];
-   i = state->rstate.ia.xZ[2];
-   j = state->rstate.ia.xZ[3];
-   k = state->rstate.ia.xZ[4];
-   klimit = state->rstate.ia.xZ[5];
-   gridpoint = state->rstate.ba.xB[0];
-   xc = state->rstate.ra.xR[0];
-   v = state->rstate.ra.xR[1];
-   h = state->rstate.ra.xR[2];
-   h2 = state->rstate.ra.xR[3];
-   err = state->rstate.ra.xR[4];
-   maxgrowpow = state->rstate.ra.xR[5];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0;
       default: goto Exit;
    }
@@ -216,6 +198,7 @@ Spawn:
    m = state->m;
    h = state->h;
    maxgrowpow = pow(odesolver_odesolvermaxgrow, 5.0);
+   state->needdy = false;
    state->repnfev = 0;
 // some preliminary checks for internal errors
 // after this we assume that H>0 and M>1
@@ -313,9 +296,7 @@ Spawn:
                   v = state->rkb.xyR[k][j];
                   ae_v_addd(state->y.xR, 1, state->rkk.xyR[j], 1, n, v);
                }
-               state->needdy = true;
-               state->rstate.stage = 0; goto Pause; Resume0:
-               state->needdy = false;
+               state->needdy = true, state->PQ = 0; goto Pause; Resume0: state->needdy = false;
                state->repnfev++;
                v = h * state->xscale;
                ae_v_moved(state->rkk.xyR[k], 1, state->dy.xR, 1, n, v);
@@ -369,23 +350,9 @@ Spawn:
       state->repterminationtype = 1;
    }
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ia.xZ[0] = n;
-   state->rstate.ia.xZ[1] = m;
-   state->rstate.ia.xZ[2] = i;
-   state->rstate.ia.xZ[3] = j;
-   state->rstate.ia.xZ[4] = k;
-   state->rstate.ia.xZ[5] = klimit;
-   state->rstate.ba.xB[0] = gridpoint;
-   state->rstate.ra.xR[0] = xc;
-   state->rstate.ra.xR[1] = v;
-   state->rstate.ra.xR[2] = h;
-   state->rstate.ra.xR[3] = h2;
-   state->rstate.ra.xR[4] = err;
-   state->rstate.ra.xR[5] = maxgrowpow;
    return true;
 }
 
@@ -447,7 +414,6 @@ void odesolverstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->rkcs, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->rkb, 0, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->rkk, 0, 0, DT_REAL, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
 }
 
 void odesolverstate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -477,7 +443,7 @@ void odesolverstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->rkcs, &src->rkcs, make_automatic);
    ae_matrix_copy(&dst->rkb, &src->rkb, make_automatic);
    ae_matrix_copy(&dst->rkk, &src->rkk, make_automatic);
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
 }
 
 void odesolverstate_free(void *_p, bool make_automatic) {
@@ -495,7 +461,6 @@ void odesolverstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->rkcs, make_automatic);
    ae_matrix_free(&p->rkb, make_automatic);
    ae_matrix_free(&p->rkk, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
 }
 
 void odesolverreport_init(void *_p, bool make_automatic) {

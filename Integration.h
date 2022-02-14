@@ -90,7 +90,7 @@ struct autogkinternalstate {
    ae_vector wk;
    ae_vector wr;
    ae_int_t n;
-   rcommstate rstate;
+   ae_int_t PQ;
 };
 void autogkinternalstate_init(void *_p, bool make_automatic);
 void autogkinternalstate_copy(void *_dst, void *_src, bool make_automatic);
@@ -109,7 +109,7 @@ struct autogkstate {
    double f;
    ae_int_t wrappermode;
    autogkinternalstate internalstate;
-   rcommstate rstate;
+   ae_int_t PQ;
    double v;
    ae_int_t terminationtype;
    ae_int_t nfev;

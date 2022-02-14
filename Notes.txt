@@ -174,23 +174,23 @@ There are 6 groups of routines (labeled A, B, C, D, E and F), based on which par
 A5.1. ALGLIB Commercial and Free Notifications
 ──────────────────────────────────────────────
 ABCDEF	│ COMMERCIAL EDITION OF ALGLIB:
-ABCDEF	│ 
+ABCDEF	│
 AB――――	│ Commercial version of ALGLIB includes one important improvement of this function, which can be used from C++ and C#:
 ――CDEF	│ Commercial Edition of ALGLIB includes following important improvements of this function:
 AB――――	│ ∙ Intel MKL support (lightweight Intel MKL is shipped with ALGLIB)
 ――CDEF	│ ∙ high-performance native backend with same C# interface (C# version)
 ―――DEF	│ ∙ multithreading support (C++ and C# versions)
 ――C―EF	│ ∙ hardware vendor (Intel) implementations of linear algebra primitives (C++ and C# versions, x86/x64 platform)
-ABCDEF	│ 
+ABCDEF	│
 AB――――	│ Intel MKL gives approximately constant (with respect to number of worker threads)
 AB――――	│ acceleration factor which depends on CPU being used,
 AB────	│ problem size and "baseline" ALGLIB edition which is used for comparison.
-AB――――	│ 
+AB――――	│
 A―――――	│ Generally, commercial ALGLIB is several times faster than open-source generic C edition,
 A―――――	│ and many times faster than open-source C# edition.
-A―――――	│ 
+A―――――	│
 AB――――	│ Multithreaded acceleration is NOT supported for this function.
-ABCDEF	│ 
+ABCDEF	│
 ABCDEF	│ We recommend you to read 'Working with commercial version' section of ALGLIB Reference Manual
 ABCDEF	│ in order to find out how to use performance-related features provided by commercial edition of ALGLIB.
 
@@ -535,6 +535,7 @@ A6.3. Test Results
 39	7692 1.0x 11629 1.1x 12199 1.0x 9367 1.0x 1644613148 (6206ce1c) 76 // Re-synthesis of RCOMM routines. Failed TestC (iterativesparse, minnlc).
 39	8065 0.9x 11629 0.9x 11368 1.1x 9172 1.0x 1644615571 (6206d793) 78 // Error in TestC (iterativesparse) corrected.
 39	8130 1.0x 12501 1.0x 12052 1.0x 9307 1.0x 1644616814 (6206dc6e) 75 // Error in TestC (minnlc) corrected.
+39	7576 1.1x 12347 1.0x 12350 0.9x 8957 1.0x 1644799817 (6209a749) 77 // Normalization of the RCOMM routines and those similar to it.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -591,19 +592,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   8130
-* RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12501
+* RGEMM-SEQ-16   (MFLOPS)   7576
+* RGEMM-MTN-16              1.1x
+* RGEMM-SEQ-32   (MFLOPS)  12347
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12052
-* RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9307
+* RGEMM-SEQ-64   (MFLOPS)  12350
+* RGEMM-MTN-64              0.9x
+* RGEMM-SEQ-1024 (MFLOPS)   8957
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1644616814
+SEED: 1644799817
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -703,4 +704,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 75 seconds
+Done in 77 seconds

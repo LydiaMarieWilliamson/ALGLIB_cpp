@@ -4086,21 +4086,16 @@ void sparsesolvercreate(ae_int_t n, sparsesolverstate *state) {
 // Reverse communication sparse iteration subroutine
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool iterativesparse_sparsesolveriteration(sparsesolverstate *state) {
-   ae_int_t outeridx;
-   double res;
-   double prevres;
-   double res0;
+   AutoS ae_int_t outeridx;
+   AutoS double res;
+   AutoS double prevres;
+   AutoS double res0;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   outeridx = state->rstate.ia.xZ[0];
-   res = state->rstate.ra.xR[0];
-   prevres = state->rstate.ra.xR[1];
-   res0 = state->rstate.ra.xR[2];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
       case 3: goto Resume3; case 4: goto Resume4;
       default: goto Exit;
@@ -4123,10 +4118,8 @@ Spawn:
       } else {
       // Non-zero starting point is provided,
          rcopyv(state->n, &state->x0, &state->xf);
-         state->requesttype = 0;
          rcopyv(state->n, &state->x0, &state->x);
-         state->rstate.stage = 0; goto Pause; Resume0:
-         state->requesttype = -999;
+         state->requesttype = 0, state->PQ = 0; goto Pause; Resume0: state->requesttype = -999;
          state->repnmv++;
          rcopyv(state->n, &state->b, &state->wrkb);
          raddv(state->n, -1.0, &state->ax, &state->wrkb);
@@ -4138,11 +4131,9 @@ Spawn:
       res = sqrt(state->repr2);
       if (state->xrep) {
       // Report initial point
-         state->requesttype = -1;
          state->reply1 = res * res;
          rcopyv(state->n, &state->xf, &state->x);
-         state->rstate.stage = 1; goto Pause; Resume1:
-         state->requesttype = -999;
+         state->requesttype = -1, state->PQ = 1; goto Pause; Resume1: state->requesttype = -999;
       }
       for (; res > 0.0 && (state->maxits == 0 || state->repiterationscount < state->maxits); outeridx++) {
       // Solve with GMRES(k) for current residual.
@@ -4158,10 +4149,8 @@ Spawn:
          fblsgmrescreate(&state->wrkb, state->n, state->gmresk, &state->gmressolver);
          state->gmressolver.epsres = state->epsf * res0 / res;
          while (fblsgmresiteration(&state->gmressolver)) {
-            state->requesttype = 0;
             rcopyv(state->n, &state->gmressolver.x, &state->x);
-            state->rstate.stage = 2; goto Pause; Resume2:
-            state->requesttype = -999;
+            state->requesttype = 0, state->PQ = 2; goto Pause; Resume2: state->requesttype = -999;
             rcopyv(state->n, &state->ax, &state->gmressolver.ax);
             state->repnmv++;
             if (state->userterminationneeded) {
@@ -4173,10 +4162,8 @@ Spawn:
          state->repiterationscount += state->gmressolver.itsperformed;
          raddv(state->n, 1.0, &state->gmressolver.xs, &state->xf);
       // Update residual, evaluate residual decrease, terminate if needed
-         state->requesttype = 0;
          rcopyv(state->n, &state->xf, &state->x);
-         state->rstate.stage = 3; goto Pause; Resume3:
-         state->requesttype = -999;
+         state->requesttype = 0, state->PQ = 3; goto Pause; Resume3: state->requesttype = -999;
          state->repnmv++;
          rcopyv(state->n, &state->b, &state->wrkb);
          raddv(state->n, -1.0, &state->ax, &state->wrkb);
@@ -4185,11 +4172,9 @@ Spawn:
          res = sqrt(state->repr2);
          if (state->xrep) {
          // Report initial point
-            state->requesttype = -1;
             state->reply1 = res * res;
             rcopyv(state->n, &state->xf, &state->x);
-            state->rstate.stage = 4; goto Pause; Resume4:
-            state->requesttype = -999;
+            state->requesttype = -1, state->PQ = 4; goto Pause; Resume4: state->requesttype = -999;
          }
          if (res <= state->epsf * res0) {
          // Residual decrease condition met, stopping
@@ -4207,14 +4192,9 @@ Spawn:
       }
    } else ae_assert(false, "SparseSolverIteration: integrity check failed (unexpected algo)");
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ia.xZ[0] = outeridx;
-   state->rstate.ra.xR[0] = res;
-   state->rstate.ra.xR[1] = prevres;
-   state->rstate.ra.xR[2] = res0;
    return true;
 }
 
@@ -4236,9 +4216,7 @@ Pause:
 // ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
 // API: void sparsesolveroocstart(const sparsesolverstate &state, const real_1d_array &b);
 void sparsesolveroocstart(sparsesolverstate *state, RVector *b) {
-   ae_vector_set_length(&state->rstate.ia, 0 + 1);
-   ae_vector_set_length(&state->rstate.ra, 2 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
    iterativesparse_clearrequestfields(state);
    iterativesparse_clearreportfields(state);
    state->running = true;
@@ -4515,15 +4493,12 @@ void sparsesolversolvesymmetric(sparsesolverstate *state, sparsematrix *a, bool 
       return;
    }
 // Solve using out-of-core API
-   sparsesolveroocstart(state, b);
-   while (sparsesolverooccontinue(state)) {
-      if (state->requesttype == -1) {
-      // Skip location reports
-         continue;
+   for (sparsesolveroocstart(state, b); sparsesolverooccontinue(state); )
+      if (state->requesttype == -1) ; // Skip location reports
+      else {
+         ae_assert(state->requesttype == 0, "SparseSolverSolveSymmetric: integrity check 7372 failed");
+         sparsesmv(a, isupper, &state->x, &state->ax);
       }
-      ae_assert(state->requesttype == 0, "SparseSolverSolveSymmetric: integrity check 7372 failed");
-      sparsesmv(a, isupper, &state->x, &state->ax);
-   }
 }
 
 // Solving sparse symmetric linear system A*x=b using GMRES(k) method. Sparse
@@ -4655,15 +4630,12 @@ void sparsesolversolve(sparsesolverstate *state, sparsematrix *a, RVector *b) {
       return;
    }
 // Solve using out-of-core API
-   sparsesolveroocstart(state, b);
-   while (sparsesolverooccontinue(state)) {
-      if (state->requesttype == -1) {
-      // Skip location reports
-         continue;
+   for (sparsesolveroocstart(state, b); sparsesolverooccontinue(state); )
+      if (state->requesttype == -1) ; // Skip location reports
+      else {
+         ae_assert(state->requesttype == 0, "SparseSolverSolve: integrity check 7372 failed");
+         sparsemv(a, &state->x, &state->ax);
       }
-      ae_assert(state->requesttype == 0, "SparseSolverSolve: integrity check 7372 failed");
-      sparsemv(a, &state->x, &state->ax);
-   }
 }
 
 // Solving sparse linear system A*x=b using GMRES(k) method.
@@ -4785,7 +4757,6 @@ void sparsesolverstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->wrkb, 0, DT_REAL, make_automatic);
    sparsematrix_init(&p->convbuf, make_automatic);
    fblsgmresstate_init(&p->gmressolver, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
 }
 
 void sparsesolverstate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -4813,7 +4784,7 @@ void sparsesolverstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->wrkb, &src->wrkb, make_automatic);
    sparsematrix_copy(&dst->convbuf, &src->convbuf, make_automatic);
    fblsgmresstate_copy(&dst->gmressolver, &src->gmressolver, make_automatic);
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
 }
 
 void sparsesolverstate_free(void *_p, bool make_automatic) {
@@ -4826,7 +4797,6 @@ void sparsesolverstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->wrkb, make_automatic);
    sparsematrix_free(&p->convbuf, make_automatic);
    fblsgmresstate_free(&p->gmressolver, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -5037,9 +5007,7 @@ void lincgcreate(ae_int_t n, lincgstate *state) {
    ae_vector_set_length(&state->mv, state->n);
    ae_vector_set_length(&state->pv, state->n);
    lincg_updateitersdata(state);
-   ae_vector_set_length(&state->rstate.ia, 0 + 1);
-   ae_vector_set_length(&state->rstate.ra, 2 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // This function sets starting point.
@@ -5130,34 +5098,19 @@ void lincgsetcond(lincgstate *state, double epsf, ae_int_t maxits) {
    }
 }
 
-// Clears request fileds (to be sure that we don't forgot to clear something)
-static void lincg_clearrfields(lincgstate *state) {
-   state->xupdated = false;
-   state->needmv = false;
-   state->needmtv = false;
-   state->needmv2 = false;
-   state->needvmv = false;
-   state->needprec = false;
-}
-
 // Reverse communication version of linear CG.
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 bool lincgiteration(lincgstate *state) {
-   ae_int_t i;
-   double uvar;
-   double bnorm;
-   double v;
+   AutoS ae_int_t i;
+   AutoS double uvar;
+   AutoS double bnorm;
+   AutoS double v;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   i = state->rstate.ia.xZ[0];
-   uvar = state->rstate.ra.xR[0];
-   bnorm = state->rstate.ra.xR[1];
-   v = state->rstate.ra.xR[2];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       case 4: goto Resume4; case 5: goto Resume5; case 6: goto Resume6; case 7: goto Resume7;
       default: goto Exit;
@@ -5169,18 +5122,15 @@ Spawn:
    v = -909;
 // Routine body
    ae_assert(state->b.cnt > 0, "LinCGIteration: B is not initialized (you must initialize B by LinCGSetB() call");
+   state->needprec = state->needvmv = state->needmv2 = state->needmtv = state->needmv = state->xupdated = false;
    state->running = true;
    state->repnmv = 0;
-   lincg_clearrfields(state);
    lincg_updateitersdata(state);
 // Start 0-th iteration
    ae_v_move(state->rx.xR, 1, state->startx.xR, 1, state->n);
    ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
    state->repnmv++;
-   lincg_clearrfields(state);
-   state->needvmv = true;
-   state->rstate.stage = 0; goto Pause; Resume0:
-   state->needvmv = false;
+   state->needvmv = true, state->PQ = 0; goto Pause; Resume0: state->needvmv = false;
    bnorm = 0.0;
    state->r2 = 0.0;
    state->meritfunction = 0.0;
@@ -5194,10 +5144,7 @@ Spawn:
 // Output first report
    if (state->xrep) {
       ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-      lincg_clearrfields(state);
-      state->xupdated = true;
-      state->rstate.stage = 1; goto Pause; Resume1:
-      state->xupdated = false;
+      state->xupdated = true, state->PQ = 1; goto Pause; Resume1: state->xupdated = false;
    }
 // Is x0 a solution?
    if (!isfinite(state->r2) || sqrt(state->r2) <= state->epsf * bnorm) {
@@ -5212,10 +5159,7 @@ Spawn:
 // Calculate Z and P
    ae_v_move(state->x.xR, 1, state->r.xR, 1, state->n);
    state->repnmv++;
-   lincg_clearrfields(state);
-   state->needprec = true;
-   state->rstate.stage = 2; goto Pause; Resume2:
-   state->needprec = false;
+   state->needprec = true, state->PQ = 2; goto Pause; Resume2: state->needprec = false;
    for (i = 0; i < state->n; i++) {
       state->z.xR[i] = state->pv.xR[i];
       state->p.xR[i] = state->z.xR[i];
@@ -5227,10 +5171,7 @@ Spawn:
    // Calculate Alpha
       ae_v_move(state->x.xR, 1, state->p.xR, 1, state->n);
       state->repnmv++;
-      lincg_clearrfields(state);
-      state->needvmv = true;
-      state->rstate.stage = 3; goto Pause; Resume3:
-      state->needvmv = false;
+      state->needvmv = true, state->PQ = 3; goto Pause; Resume3: state->needvmv = false;
       if (!isfinite(state->vmv) || state->vmv <= 0.0) {
       // a) Overflow when calculating VMV
       // b) non-positive VMV (non-SPD matrix)
@@ -5271,10 +5212,7 @@ Spawn:
       // Calculate R using matrix-vector multiplication
          ae_v_move(state->x.xR, 1, state->cx.xR, 1, state->n);
          state->repnmv++;
-         lincg_clearrfields(state);
-         state->needmv = true;
-         state->rstate.stage = 4; goto Pause; Resume4:
-         state->needmv = false;
+         state->needmv = true, state->PQ = 4; goto Pause; Resume4: state->needmv = false;
          for (i = 0; i < state->n; i++) {
             state->cr.xR[i] = state->b.xR[i] - state->mv.xR[i];
             state->x.xR[i] = state->cr.xR[i];
@@ -5296,10 +5234,7 @@ Spawn:
          // output last report
             if (state->xrep) {
                ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-               lincg_clearrfields(state);
-               state->xupdated = true;
-               state->rstate.stage = 5; goto Pause; Resume5:
-               state->xupdated = false;
+               state->xupdated = true, state->PQ = 5; goto Pause; Resume5: state->xupdated = false;
             }
             state->running = false;
             state->repterminationtype = 7;
@@ -5318,10 +5253,7 @@ Spawn:
    // output report
       if (state->xrep) {
          ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-         lincg_clearrfields(state);
-         state->xupdated = true;
-         state->rstate.stage = 6; goto Pause; Resume6:
-         state->xupdated = false;
+         state->xupdated = true, state->PQ = 6; goto Pause; Resume6: state->xupdated = false;
       }
    // stopping criterion
    // achieved the required precision
@@ -5350,10 +5282,7 @@ Spawn:
       ae_v_move(state->x.xR, 1, state->cr.xR, 1, state->n);
    // prepere of parameters for next iteration
       state->repnmv++;
-      lincg_clearrfields(state);
-      state->needprec = true;
-      state->rstate.stage = 7; goto Pause; Resume7:
-      state->needprec = false;
+      state->needprec = true, state->PQ = 7; goto Pause; Resume7: state->needprec = false;
       ae_v_move(state->cz.xR, 1, state->pv.xR, 1, state->n);
       if (state->repiterationscount % state->itsbeforerestart != 0) {
          state->beta = 0.0;
@@ -5390,24 +5319,16 @@ Spawn:
       }
    }
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ia.xZ[0] = i;
-   state->rstate.ra.xR[0] = uvar;
-   state->rstate.ra.xR[1] = bnorm;
-   state->rstate.ra.xR[2] = v;
    return true;
 }
 
 // Procedure for restart function LinCGIteration
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 void lincgrestart(lincgstate *state) {
-   ae_vector_set_length(&state->rstate.ia, 0 + 1);
-   ae_vector_set_length(&state->rstate.ra, 2 + 1);
-   state->rstate.stage = -1;
-   lincg_clearrfields(state);
+   state->PQ = -1;
 }
 
 // Procedure for solution of A*x=b with sparse A.
@@ -5464,22 +5385,19 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
 // Solve
    lincgrestart(state);
    lincgsetb(state, b);
-   while (lincgiteration(state)) {
+   while (lincgiteration(state))
    // Process different requests from optimizer
       if (state->needmv) {
          sparsesmv(a, isupper, &state->x, &state->mv);
-      }
-      if (state->needvmv) {
+      } else if (state->needvmv) {
          sparsesmv(a, isupper, &state->x, &state->mv);
          vmv = ae_v_dotproduct(state->x.xR, 1, state->mv.xR, 1, state->n);
          state->vmv = vmv;
-      }
-      if (state->needprec) {
+      } else if (state->needprec) {
          for (i = 0; i < n; i++) {
             state->pv.xR[i] = state->x.xR[i] * sqr(state->tmpd.xR[i]);
          }
       }
-   }
 }
 
 // CG-solver: results.
@@ -5579,7 +5497,6 @@ void lincgstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->pv, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->startx, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->tmpd, 0, DT_REAL, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
 }
 
 void lincgstate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -5620,7 +5537,7 @@ void lincgstate_copy(void *_dst, void *_src, bool make_automatic) {
    dst->repterminationtype = src->repterminationtype;
    dst->running = src->running;
    ae_vector_copy(&dst->tmpd, &src->tmpd, make_automatic);
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
 }
 
 void lincgstate_free(void *_p, bool make_automatic) {
@@ -5638,7 +5555,6 @@ void lincgstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->pv, make_automatic);
    ae_vector_free(&p->startx, make_automatic);
    ae_vector_free(&p->tmpd, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
 }
 
 void lincgreport_init(void *_p, bool make_automatic) {
@@ -5792,9 +5708,7 @@ void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state) {
    for (i = 0; i < m; i++) {
       state->b.xR[i] = 0.0;
    }
-   ae_vector_set_length(&state->rstate.ia, 1 + 1);
-   ae_vector_set_length(&state->rstate.ra, 0 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // This function initializes linear LSQR Solver. This solver is used to solve
@@ -5892,31 +5806,17 @@ void linlsqrsetlambdai(linlsqrstate *state, double lambdai) {
    state->lambdai = lambdai;
 }
 
-// Clears request fileds (to be sure that we don't forgot to clear something)
-static void linlsqr_clearrfields(linlsqrstate *state) {
-   state->xupdated = false;
-   state->needmv = false;
-   state->needmtv = false;
-   state->needmv2 = false;
-   state->needvmv = false;
-   state->needprec = false;
-}
-
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 bool linlsqriteration(linlsqrstate *state) {
-   ae_int_t summn;
-   double bnorm;
-   ae_int_t i;
+   AutoS ae_int_t summn;
+   AutoS double bnorm;
+   AutoS ae_int_t i;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   summn = state->rstate.ia.xZ[0];
-   i = state->rstate.ia.xZ[1];
-   bnorm = state->rstate.ra.xR[0];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       case 4: goto Resume4; case 5: goto Resume5; case 6: goto Resume6;
       default: goto Exit;
@@ -5929,34 +5829,26 @@ Spawn:
    ae_assert(state->b.cnt > 0, "LinLSQRIteration: using non-allocated array B");
    summn = state->m + state->n;
    bnorm = sqrt(state->bnorm2);
+   state->needprec = state->needvmv = state->needmv2 = state->needmtv = state->needmv = state->xupdated = false;
    state->userterminationneeded = false;
    state->running = true;
    state->repnmv = 0;
    state->repiterationscount = 0;
    state->r2 = state->bnorm2;
-   linlsqr_clearrfields(state);
 // estimate for ANorm
-   normestimatorrestart(&state->nes);
-   while (normestimatoriteration(&state->nes)) {
+   for (normestimatorrestart(&state->nes); normestimatoriteration(&state->nes); )
       if (state->nes.needmv) {
          ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->n);
          state->repnmv++;
-         linlsqr_clearrfields(state);
-         state->needmv = true;
-         state->rstate.stage = 0; goto Pause; Resume0:
-         state->needmv = false;
+         state->needmv = true, state->PQ = 0; goto Pause; Resume0: state->needmv = false;
          ae_v_move(state->nes.mv.xR, 1, state->mv.xR, 1, state->m);
       } else if (state->nes.needmtv) {
          ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->m);
       // matrix-vector multiplication
          state->repnmv++;
-         linlsqr_clearrfields(state);
-         state->needmtv = true;
-         state->rstate.stage = 1; goto Pause; Resume1:
-         state->needmtv = false;
+         state->needmtv = true, state->PQ = 1; goto Pause; Resume1: state->needmtv = false;
          ae_v_move(state->nes.mtv.xR, 1, state->mtv.xR, 1, state->n);
       }
-   }
    normestimatorresults(&state->nes, &state->anorm);
 // initialize .RX by zeros
    for (i = 0; i < state->n; i++) {
@@ -5965,10 +5857,7 @@ Spawn:
 // output first report
    if (state->xrep) {
       ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-      linlsqr_clearrfields(state);
-      state->xupdated = true;
-      state->rstate.stage = 2; goto Pause; Resume2:
-      state->xupdated = false;
+      state->xupdated = true, state->PQ = 2; goto Pause; Resume2: state->xupdated = false;
    }
 // LSQR, Step 0.
 //
@@ -6013,10 +5902,7 @@ Spawn:
       state->x.xR[i] = state->ui.xR[i];
    }
    state->repnmv++;
-   linlsqr_clearrfields(state);
-   state->needmtv = true;
-   state->rstate.stage = 3; goto Pause; Resume3:
-   state->needmtv = false;
+   state->needmtv = true, state->PQ = 3; goto Pause; Resume3: state->needmtv = false;
    for (i = 0; i < state->n; i++) {
       state->mtv.xR[i] += state->lambdai * state->ui.xR[state->m + i];
    }
@@ -6058,10 +5944,7 @@ Spawn:
    //        in U and V will be lost.
       ae_v_move(state->x.xR, 1, state->vi.xR, 1, state->n);
       state->repnmv++;
-      linlsqr_clearrfields(state);
-      state->needmv = true;
-      state->rstate.stage = 4; goto Pause; Resume4:
-      state->needmv = false;
+      state->needmv = true, state->PQ = 4; goto Pause; Resume4: state->needmv = false;
       for (i = 0; i < state->n; i++) {
          state->mv.xR[state->m + i] = state->lambdai * state->vi.xR[i];
       }
@@ -6078,10 +5961,7 @@ Spawn:
       }
       ae_v_move(state->x.xR, 1, state->uip1.xR, 1, state->m);
       state->repnmv++;
-      linlsqr_clearrfields(state);
-      state->needmtv = true;
-      state->rstate.stage = 5; goto Pause; Resume5:
-      state->needmtv = false;
+      state->needmtv = true, state->PQ = 5; goto Pause; Resume5: state->needmtv = false;
       for (i = 0; i < state->n; i++) {
          state->mtv.xR[i] += state->lambdai * state->uip1.xR[state->m + i];
       }
@@ -6129,10 +6009,7 @@ Spawn:
       }
       if (state->xrep) {
          ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-         linlsqr_clearrfields(state);
-         state->xupdated = true;
-         state->rstate.stage = 6; goto Pause; Resume6:
-         state->xupdated = false;
+         state->xupdated = true, state->PQ = 6; goto Pause; Resume6: state->xupdated = false;
       }
    // Check stopping criteria
    // 1. achieved required number of iterations;
@@ -6180,23 +6057,16 @@ Spawn:
       state->rhobari = state->rhobarip1;
    }
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ia.xZ[0] = summn;
-   state->rstate.ia.xZ[1] = i;
-   state->rstate.ra.xR[0] = bnorm;
    return true;
 }
 
 // This function restarts LinLSQRIteration
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 void linlsqrrestart(linlsqrstate *state) {
-   ae_vector_set_length(&state->rstate.ia, 1 + 1);
-   ae_vector_set_length(&state->rstate.ra, 0 + 1);
-   state->rstate.stage = -1;
-   linlsqr_clearrfields(state);
+   state->PQ = -1;
    state->repiterationscount = 0;
 }
 
@@ -6265,21 +6135,18 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b) {
 // by A or A'. After solution we modify State.RX so it will store untransformed
 // variables
    linlsqrsetb(state, b);
-   linlsqrrestart(state);
-   while (linlsqriteration(state)) {
+   for (linlsqrrestart(state); linlsqriteration(state); )
       if (state->needmv) {
          for (i = 0; i < n; i++) {
             state->tmpx.xR[i] = state->tmpd.xR[i] * state->x.xR[i];
          }
          sparsemv(a, &state->tmpx, &state->mv);
-      }
-      if (state->needmtv) {
+      } else if (state->needmtv) {
          sparsemtv(a, &state->x, &state->mtv);
          for (i = 0; i < n; i++) {
             state->mtv.xR[i] *= state->tmpd.xR[i];
          }
       }
-   }
    for (i = 0; i < n; i++) {
       state->rx.xR[i] *= state->tmpd.xR[i];
    }
@@ -6427,7 +6294,6 @@ void linlsqrstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->mtv, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->tmpd, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->tmpx, 0, DT_REAL, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
 }
 
 void linlsqrstate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -6485,7 +6351,7 @@ void linlsqrstate_copy(void *_dst, void *_src, bool make_automatic) {
    dst->userterminationneeded = src->userterminationneeded;
    ae_vector_copy(&dst->tmpd, &src->tmpd, make_automatic);
    ae_vector_copy(&dst->tmpx, &src->tmpx, make_automatic);
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
 }
 
 void linlsqrstate_free(void *_p, bool make_automatic) {
@@ -6505,7 +6371,6 @@ void linlsqrstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->mtv, make_automatic);
    ae_vector_free(&p->tmpd, make_automatic);
    ae_vector_free(&p->tmpx, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
 }
 
 void linlsqrreport_init(void *_p, bool make_automatic) {
@@ -6674,13 +6539,6 @@ void nleqsetstpmax(nleqstate *state, double stpmax) {
    state->stpmax = stpmax;
 }
 
-// Clears request fileds (to be sure that we don't forgot to clear something)
-static void nleq_clearrequestfields(nleqstate *state) {
-   state->needf = false;
-   state->needfij = false;
-   state->xupdated = false;
-}
-
 // This  subroutine  restarts  CG  algorithm from new point. All optimization
 // parameters are left unchanged.
 //
@@ -6699,11 +6557,7 @@ void nleqrestartfrom(nleqstate *state, RVector *x) {
    ae_assert(x->cnt >= state->n, "NLEQRestartFrom: Length(X)<N!");
    ae_assert(isfinitevector(x, state->n), "NLEQRestartFrom: X contains infinite or NaN values!");
    ae_v_move(state->x.xR, 1, x->xR, 1, state->n);
-   ae_vector_set_length(&state->rstate.ia, 2 + 1);
-   ae_vector_set_length(&state->rstate.ba, 0 + 1);
-   ae_vector_set_length(&state->rstate.ra, 5 + 1);
-   state->rstate.stage = -1;
-   nleq_clearrequestfields(state);
+   state->PQ = -1;
 }
 
 //                 LEVENBERG-MARQUARDT-LIKE NONLINEAR SOLVER
@@ -6834,33 +6688,22 @@ static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown) 
 // API: bool nleqiteration(const nleqstate &state);
 // API: void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool nleqiteration(nleqstate *state) {
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t i;
-   double lambdaup;
-   double lambdadown;
-   double lambdav;
-   double rho;
-   double mu;
-   double stepnorm;
-   bool b;
+   AutoS ae_int_t n;
+   AutoS ae_int_t m;
+   AutoS ae_int_t i;
+   AutoS double lambdaup;
+   AutoS double lambdadown;
+   AutoS double lambdav;
+   AutoS double rho;
+   AutoS double mu;
+   AutoS double stepnorm;
+   AutoS bool b;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   n = state->rstate.ia.xZ[0];
-   m = state->rstate.ia.xZ[1];
-   i = state->rstate.ia.xZ[2];
-   b = state->rstate.ba.xB[0];
-   lambdaup = state->rstate.ra.xR[0];
-   lambdadown = state->rstate.ra.xR[1];
-   lambdav = state->rstate.ra.xR[2];
-   rho = state->rstate.ra.xR[3];
-   mu = state->rstate.ra.xR[4];
-   stepnorm = state->rstate.ra.xR[5];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
       case 3: goto Resume3; case 4: goto Resume4;
       default: goto Exit;
@@ -6880,25 +6723,20 @@ Spawn:
 // Prepare
    n = state->n;
    m = state->m;
+   state->xupdated = state->needfij = state->needf = false;
    state->repterminationtype = 0;
    state->repiterationscount = 0;
    state->repnfunc = 0;
    state->repnjac = 0;
 // Calculate F/G, initialize algorithm
-   nleq_clearrequestfields(state);
-   state->needf = true;
-   state->rstate.stage = 0; goto Pause; Resume0:
-   state->needf = false;
+   state->needf = true, state->PQ = 0; goto Pause; Resume0: state->needf = false;
    state->repnfunc++;
    ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
    state->fbase = state->f;
    state->fprev = maxrealnumber;
    if (state->xrep) {
    // progress report
-      nleq_clearrequestfields(state);
-      state->xupdated = true;
-      state->rstate.stage = 1; goto Pause; Resume1:
-      state->xupdated = false;
+      state->xupdated = true, state->PQ = 1; goto Pause; Resume1: state->xupdated = false;
    }
    if (state->f <= sqr(state->epsf)) {
       state->repterminationtype = 1;
@@ -6914,11 +6752,8 @@ Spawn:
    // before we get to this point we already have State.XBase filled
    // with current point and State.FBase filled with function value
    // at XBase
-      nleq_clearrequestfields(state);
-      state->needfij = true;
       ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-      state->rstate.stage = 2; goto Pause; Resume2:
-      state->needfij = false;
+      state->needfij = true, state->PQ = 2; goto Pause; Resume2: state->needfij = false;
       state->repnfunc++;
       state->repnjac++;
       rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->rightpart, 0);
@@ -6969,10 +6804,7 @@ Spawn:
             state->f = state->fbase;
             break;
          }
-         nleq_clearrequestfields(state);
-         state->needf = true;
-         state->rstate.stage = 3; goto Pause; Resume3:
-         state->needf = false;
+         state->needf = true, state->PQ = 3; goto Pause; Resume3: state->needf = false;
          state->repnfunc++;
          if (state->f < state->fbase) {
          // function value decreased, move on
@@ -6995,12 +6827,9 @@ Spawn:
       state->repiterationscount++;
    // Report new iteration
       if (state->xrep) {
-         nleq_clearrequestfields(state);
-         state->xupdated = true;
          state->f = state->fbase;
          ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-         state->rstate.stage = 4; goto Pause; Resume4:
-         state->xupdated = false;
+         state->xupdated = true, state->PQ = 4; goto Pause; Resume4: state->xupdated = false;
       }
    // Test stopping conditions on F, step (zero/non-zero) and MaxIts;
    // If one of the conditions is met, RepTerminationType is changed.
@@ -7019,20 +6848,9 @@ Spawn:
    // Now, iteration is finally over
    }
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ia.xZ[0] = n;
-   state->rstate.ia.xZ[1] = m;
-   state->rstate.ia.xZ[2] = i;
-   state->rstate.ba.xB[0] = b;
-   state->rstate.ra.xR[0] = lambdaup;
-   state->rstate.ra.xR[1] = lambdadown;
-   state->rstate.ra.xR[2] = lambdav;
-   state->rstate.ra.xR[3] = rho;
-   state->rstate.ra.xR[4] = mu;
-   state->rstate.ra.xR[5] = stepnorm;
    return true;
 }
 
@@ -7088,7 +6906,6 @@ void nleqstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->fi, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->j, 0, 0, DT_REAL, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
    ae_vector_init(&p->xbase, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->candstep, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->rightpart, 0, DT_REAL, make_automatic);
@@ -7111,7 +6928,7 @@ void nleqstate_copy(void *_dst, void *_src, bool make_automatic) {
    dst->needf = src->needf;
    dst->needfij = src->needfij;
    dst->xupdated = src->xupdated;
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
    dst->repiterationscount = src->repiterationscount;
    dst->repnfunc = src->repnfunc;
    dst->repnjac = src->repnjac;
@@ -7129,7 +6946,6 @@ void nleqstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->x, make_automatic);
    ae_vector_free(&p->fi, make_automatic);
    ae_matrix_free(&p->j, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
    ae_vector_free(&p->xbase, make_automatic);
    ae_vector_free(&p->candstep, make_automatic);
    ae_vector_free(&p->rightpart, make_automatic);

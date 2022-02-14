@@ -425,7 +425,7 @@ struct lsfitstate {
    minlmreport optrep;
    ae_int_t prevnpt;
    ae_int_t prevalgo;
-   rcommstate rstate;
+   ae_int_t PQ;
 };
 void lsfitstate_init(void *_p, bool make_automatic);
 void lsfitstate_copy(void *_dst, void *_src, bool make_automatic);

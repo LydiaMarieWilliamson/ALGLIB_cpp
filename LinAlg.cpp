@@ -16954,9 +16954,7 @@ void eigsubspacesetwarmstart(eigsubspacestate *state, bool usewarmstart) {
 void eigsubspaceoocstart(eigsubspacestate *state, ae_int_t mtype) {
    ae_assert(!state->running, "EigSubspaceStart: solver is already running");
    ae_assert(mtype == 0, "EigSubspaceStart: incorrect mtype parameter");
-   ae_vector_set_length(&state->rstate.ia, 7 + 1);
-   ae_vector_set_length(&state->rstate.ra, 1 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
    evd_clearrfields(state);
    state->running = true;
    state->matrixtype = mtype;
@@ -16965,33 +16963,22 @@ void eigsubspaceoocstart(eigsubspacestate *state, ae_int_t mtype) {
 // Internal r-comm function.
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 bool eigsubspaceiteration(eigsubspacestate *state) {
-   ae_int_t n;
-   ae_int_t nwork;
-   ae_int_t k;
-   ae_int_t cnt;
-   ae_int_t i;
-   ae_int_t i1;
-   ae_int_t j;
-   double vv;
-   double v;
-   ae_int_t convcnt;
+   AutoS ae_int_t n;
+   AutoS ae_int_t nwork;
+   AutoS ae_int_t k;
+   AutoS ae_int_t cnt;
+   AutoS ae_int_t i;
+   AutoS ae_int_t i1;
+   AutoS ae_int_t j;
+   AutoS double vv;
+   AutoS double v;
+   AutoS ae_int_t convcnt;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   n = state->rstate.ia.xZ[0];
-   nwork = state->rstate.ia.xZ[1];
-   k = state->rstate.ia.xZ[2];
-   cnt = state->rstate.ia.xZ[3];
-   i = state->rstate.ia.xZ[4];
-   i1 = state->rstate.ia.xZ[5];
-   j = state->rstate.ia.xZ[6];
-   convcnt = state->rstate.ia.xZ[7];
-   vv = state->rstate.ra.xR[0];
-   v = state->rstate.ra.xR[1];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0;
       default: goto Exit;
    }
@@ -17048,11 +17035,11 @@ Spawn:
          state->firstcall = false;
       }
       rmatrixcopy(nwork, n, &state->q0, 0, 0, &state->qnew, 0, 0);
-      }
-   // Start iteration
-      state->repiterationscount = 0;
-      convcnt = 0;
-      while ((state->maxits == 0 || state->repiterationscount < state->maxits) && convcnt < evd_stepswithintol) {
+   }
+// Start iteration
+   state->repiterationscount = 0;
+   convcnt = 0;
+   while ((state->maxits == 0 || state->repiterationscount < state->maxits) && convcnt < evd_stepswithintol) {
    // Update QCur := QNew
    //
    // Calculate A*Q'
@@ -17061,7 +17048,7 @@ Spawn:
       evd_clearrfields(state);
       state->requesttype = 0;
       state->requestsize = nwork;
-      state->rstate.stage = 0; goto Pause; Resume0:
+      state->PQ = 0; goto Pause; Resume0:
    // Perform Rayleigh-Ritz step to estimate convergence of diagonal eigenvalues
       if (state->eps > 0.0) {
          ae_assert(state->matrixtype == 0, "integrity check failed");
@@ -17136,20 +17123,9 @@ Spawn:
    ae_assert(cnt == k, "EigSubspace: integrity check failed");
    rmatrixgemm(n, k, nwork, 1.0, &state->qcur, 0, 0, 1, &state->rz, 0, 0, 0, 0.0, &state->rq, 0, 0);
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ia.xZ[0] = n;
-   state->rstate.ia.xZ[1] = nwork;
-   state->rstate.ia.xZ[2] = k;
-   state->rstate.ia.xZ[3] = cnt;
-   state->rstate.ia.xZ[4] = i;
-   state->rstate.ia.xZ[5] = i1;
-   state->rstate.ia.xZ[6] = j;
-   state->rstate.ia.xZ[7] = convcnt;
-   state->rstate.ra.xR[0] = vv;
-   state->rstate.ra.xR[1] = v;
    return true;
 }
 
@@ -17390,9 +17366,7 @@ void eigsubspacesolvedenses(eigsubspacestate *state, RMatrix *a, bool isupper, R
    }
 // Start iterations
    state->matrixtype = 0;
-   ae_vector_set_length(&state->rstate.ia, 7 + 1);
-   ae_vector_set_length(&state->rstate.ra, 1 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
    evd_clearrfields(state);
    while (eigsubspaceiteration(state)) {
    // Calculate A*X with RMatrixGEMM
@@ -17445,9 +17419,7 @@ void eigsubspacesolvesparses(eigsubspacestate *state, sparsematrix *a, bool isup
    ae_assert(!state->running, "EigSubspaceSolveSparseS: solver is still running");
    n = state->n;
    state->matrixtype = 0;
-   ae_vector_set_length(&state->rstate.ia, 7 + 1);
-   ae_vector_set_length(&state->rstate.ra, 1 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
    evd_clearrfields(state);
    while (eigsubspaceiteration(state)) {
       ae_assert(state->requesttype == 0, "EigSubspaceSolveDense: integrity check failed");
@@ -17489,7 +17461,6 @@ void eigsubspacestate_init(void *_p, bool make_automatic) {
    apbuffers_init(&p->buf, make_automatic);
    ae_matrix_init(&p->x, 0, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->ax, 0, 0, DT_REAL, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
 }
 
 void eigsubspacestate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -17527,7 +17498,7 @@ void eigsubspacestate_copy(void *_dst, void *_src, bool make_automatic) {
    dst->requesttype = src->requesttype;
    dst->requestsize = src->requestsize;
    dst->repiterationscount = src->repiterationscount;
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
 }
 
 void eigsubspacestate_free(void *_p, bool make_automatic) {
@@ -17551,7 +17522,6 @@ void eigsubspacestate_free(void *_p, bool make_automatic) {
    apbuffers_free(&p->buf, make_automatic);
    ae_matrix_free(&p->x, make_automatic);
    ae_matrix_free(&p->ax, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
 }
 
 void eigsubspacereport_init(void *_p, bool make_automatic) {
@@ -27318,117 +27288,78 @@ static ae_int_t rcond_internalcomplexrcondicmax1(CVector *x, ae_int_t n) {
    return result;
 }
 
-static void rcond_internalcomplexrcondsaveall(ZVector *isave, RVector *rsave, ae_int_t *i, ae_int_t *iter, ae_int_t *j, ae_int_t *jlast, ae_int_t *jump, double *absxi, double *altsgn, double *estold, double *temp) {
-   isave->xZ[0] = *i;
-   isave->xZ[1] = *iter;
-   isave->xZ[2] = *j;
-   isave->xZ[3] = *jlast;
-   isave->xZ[4] = *jump;
-   rsave->xR[0] = *absxi;
-   rsave->xR[1] = *altsgn;
-   rsave->xR[2] = *estold;
-   rsave->xR[3] = *temp;
-}
-
-static void rcond_internalcomplexrcondloadall(ZVector *isave, RVector *rsave, ae_int_t *i, ae_int_t *iter, ae_int_t *j, ae_int_t *jlast, ae_int_t *jump, double *absxi, double *altsgn, double *estold, double *temp) {
-   *i = isave->xZ[0];
-   *iter = isave->xZ[1];
-   *j = isave->xZ[2];
-   *jlast = isave->xZ[3];
-   *jump = isave->xZ[4];
-   *absxi = rsave->xR[0];
-   *altsgn = rsave->xR[1];
-   *estold = rsave->xR[2];
-   *temp = rsave->xR[3];
-}
-
 // Internal subroutine for matrix norm estimation
+// Return Value:
+// *	The condition (*kase != 0), indicating that iteration is in progress.
 //
 //   -- LAPACK auxiliary routine (version 3.0) --
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      February 29, 1992
-static void rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVector *isgn, double *est, ae_int_t *kase) {
-   ae_int_t itmax;
+static bool rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVector *isgn, double *est, ae_int_t *kase) {
    ae_int_t i;
    double t;
    bool flg;
-   ae_int_t positer;
-   ae_int_t posj;
-   ae_int_t posjlast;
-   ae_int_t posjump;
-   ae_int_t posaltsgn;
-   ae_int_t posestold;
-   ae_int_t postemp;
-   itmax = 5;
-   posaltsgn = n + 1;
-   posestold = n + 2;
-   postemp = n + 3;
-   positer = n + 1;
-   posj = n + 2;
-   posjlast = n + 3;
-   posjump = n + 4;
-   if (*kase == 0) {
-      ae_vector_set_length(v, n + 4);
-      ae_vector_set_length(x, n + 1);
-      ae_vector_set_length(isgn, n + 5);
-      t = 1.0 / n;
-      for (i = 1; i <= n; i++) {
-         x->xR[i] = t;
-      }
-      *kase = 1;
-      isgn->xZ[posjump] = 1;
-      return;
+   AutoS ae_int_t iter;
+   AutoS ae_int_t j;
+   AutoS ae_int_t jlast;
+   AutoS ae_int_t jump;
+   AutoS double altsgn;
+   AutoS double estold;
+   AutoS double temp;
+   const ae_int_t itmax = 5;
+// Manually threaded two-way signalling.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (*kase != 0) switch (jump) {
+      case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
+      case 4: goto Resume4; case 5: goto Resume5;
+      default: goto Exit;
    }
-//     ................ ENTRY   (JUMP = 1)
-//     FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X.
-   if (isgn->xZ[posjump] == 1) {
-      if (n == 1) {
-         v->xR[1] = x->xR[1];
-         *est = fabs(v->xR[1]);
-         *kase = 0;
-         return;
-      }
-      *est = 0.0;
-      for (i = 1; i <= n; i++) {
-         *est += fabs(x->xR[i]);
-      }
-      for (i = 1; i <= n; i++) {
-         if (x->xR[i] >= 0.0) {
-            x->xR[i] = 1.0;
-         } else {
-            x->xR[i] = -1.0;
-         }
-         isgn->xZ[i] = sign(x->xR[i]);
-      }
-      *kase = 2;
-      isgn->xZ[posjump] = 2;
-      return;
+Spawn:
+   ae_vector_set_length(v, n + 1);
+   ae_vector_set_length(x, n + 1);
+   ae_vector_set_length(isgn, n + 1);
+   t = 1.0 / n;
+   for (i = 1; i <= n; i++) {
+      x->xR[i] = t;
    }
-//     ................ ENTRY   (JUMP = 2)
-//     FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY TRANDPOSE(A)*X.
-   if (isgn->xZ[posjump] == 2) {
-      isgn->xZ[posj] = 1;
-      for (i = 2; i <= n; i++) {
-         if (fabs(x->xR[i]) > fabs(x->xR[isgn->xZ[posj]])) {
-            isgn->xZ[posj] = i;
-         }
+   *kase = 1; jump = 1; goto Pause; Resume1: // The first iteration: x was updated to A x.
+   if (n == 1) {
+      v->xR[1] = x->xR[1];
+      *est = fabs(v->xR[1]);
+      goto Exit;
+   }
+   *est = 0.0;
+   for (i = 1; i <= n; i++) {
+      *est += fabs(x->xR[i]);
+   }
+   for (i = 1; i <= n; i++) {
+      if (x->xR[i] >= 0.0) {
+         x->xR[i] = 1.0;
+      } else {
+         x->xR[i] = -1.0;
       }
-      isgn->xZ[positer] = 2;
-   // MAIN LOOP - ITERATIONS 2,3,...,ITMAX.
+      isgn->xZ[i] = sign(x->xR[i]);
+   }
+   *kase = 2; jump = 2; goto Pause; Resume2: // The first iteration: x was updated to A^T x.
+   j = 1;
+   for (i = 2; i <= n; i++) {
+      if (fabs(x->xR[i]) > fabs(x->xR[j])) {
+         j = i;
+      }
+   }
+// The main loop: iterations 2, 3, ..., itmax.
+   iter = 2;
+   do {
       for (i = 1; i <= n; i++) {
          x->xR[i] = 0.0;
       }
-      x->xR[isgn->xZ[posj]] = 1.0;
-      *kase = 1;
-      isgn->xZ[posjump] = 3;
-      return;
-   }
-//     ................ ENTRY   (JUMP = 3)
-//     X HAS BEEN OVERWRITTEN BY A*X.
-   if (isgn->xZ[posjump] == 3) {
+      x->xR[j] = 1.0;
+      *kase = 1; jump = 3; goto Pause; Resume3: // x was updated to A x.
       ae_v_move(&v->xR[1], 1, &x->xR[1], 1, n);
-      v->xR[posestold] = *est;
+      estold = *est;
       *est = 0.0;
       for (i = 1; i <= n; i++) {
          *est += fabs(v->xR[i]);
@@ -27439,18 +27370,8 @@ static void rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVecto
             flg = true;
          }
       }
-   // REPEATED SIGN VECTOR DETECTED, HENCE ALGORITHM HAS CONVERGED.
-   // OR MAY BE CYCLING.
-      if (!flg || *est <= v->xR[posestold]) {
-         v->xR[posaltsgn] = 1.0;
-         for (i = 1; i <= n; i++) {
-            x->xR[i] = v->xR[posaltsgn] * (1 + (double)(i - 1) / (n - 1));
-            v->xR[posaltsgn] = -v->xR[posaltsgn];
-         }
-         *kase = 1;
-         isgn->xZ[posjump] = 5;
-         return;
-      }
+   // A repeated sign vector was detected, hence the algorithm has converged; or it may be cycling.
+      if (!flg || *est <= estold) break;
       for (i = 1; i <= n; i++) {
          if (x->xR[i] >= 0.0) {
             x->xR[i] = 1.0;
@@ -27460,144 +27381,96 @@ static void rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVecto
             isgn->xZ[i] = -1;
          }
       }
-      *kase = 2;
-      isgn->xZ[posjump] = 4;
-      return;
-   }
-//     ................ ENTRY   (JUMP = 4)
-//     X HAS BEEN OVERWRITTEN BY TRANDPOSE(A)*X.
-   if (isgn->xZ[posjump] == 4) {
-      isgn->xZ[posjlast] = isgn->xZ[posj];
-      isgn->xZ[posj] = 1;
+      *kase = 2; jump = 4; goto Pause; Resume4: // x was updated to A^T x.
+      jlast = j;
+      j = 1;
       for (i = 2; i <= n; i++) {
-         if (fabs(x->xR[i]) > fabs(x->xR[isgn->xZ[posj]])) {
-            isgn->xZ[posj] = i;
+         if (fabs(x->xR[i]) > fabs(x->xR[j])) {
+            j = i;
          }
       }
-      if (x->xR[isgn->xZ[posjlast]] != fabs(x->xR[isgn->xZ[posj]]) && isgn->xZ[positer] < itmax) {
-         isgn->xZ[positer]++;
-         for (i = 1; i <= n; i++) {
-            x->xR[i] = 0.0;
-         }
-         x->xR[isgn->xZ[posj]] = 1.0;
-         *kase = 1;
-         isgn->xZ[posjump] = 3;
-         return;
-      }
-   // ITERATION COMPLETE.  FINAL STAGE.
-      v->xR[posaltsgn] = 1.0;
-      for (i = 1; i <= n; i++) {
-         x->xR[i] = v->xR[posaltsgn] * (1 + (double)(i - 1) / (n - 1));
-         v->xR[posaltsgn] = -v->xR[posaltsgn];
-      }
-      *kase = 1;
-      isgn->xZ[posjump] = 5;
-      return;
+   } while (x->xR[jlast] != fabs(x->xR[j]) && iter++ < itmax);
+// The iteration is complete: final stage.
+   altsgn = 1.0;
+   for (i = 1; i <= n; i++) {
+      x->xR[i] = altsgn * (1 + (double)(i - 1) / (n - 1));
+      altsgn = -altsgn;
    }
-//     ................ ENTRY   (JUMP = 5)
-//     X HAS BEEN OVERWRITTEN BY A*X.
-   if (isgn->xZ[posjump] == 5) {
-      v->xR[postemp] = 0.0;
-      for (i = 1; i <= n; i++) {
-         v->xR[postemp] += fabs(x->xR[i]);
-      }
-      v->xR[postemp] = 2 * v->xR[postemp] / (3 * n);
-      if (v->xR[postemp] > *est) {
-         ae_v_move(&v->xR[1], 1, &x->xR[1], 1, n);
-         *est = v->xR[postemp];
-      }
-      *kase = 0;
-      return;
+   *kase = 1; jump = 5; goto Pause; Resume5: // x was updated to A x.
+   temp = 0.0;
+   for (i = 1; i <= n; i++) {
+      temp += fabs(x->xR[i]);
    }
+   temp = 2 * temp / (3 * n);
+   if (temp > *est) {
+      ae_v_move(&v->xR[1], 1, &x->xR[1], 1, n);
+      *est = temp;
+   }
+Exit:
+   *kase = 0;
+   return false;
+Pause:
+   return true;
 }
 
-static void rcond_cmatrixestimatenorm(ae_int_t n, CVector *v, CVector *x, double *est, ae_int_t *kase, ZVector *isave, RVector *rsave) {
-   ae_int_t itmax;
+static bool rcond_cmatrixestimatenorm(ae_int_t n, CVector *v, CVector *x, double *est, ae_int_t *kase) {
    ae_int_t i;
-   ae_int_t iter;
-   ae_int_t j;
-   ae_int_t jlast;
-   ae_int_t jump;
-   double absxi;
-   double altsgn;
-   double estold;
-   double safmin;
-   double temp;
+   AutoS ae_int_t iter;
+   AutoS ae_int_t j;
+   AutoS ae_int_t jlast;
+   AutoS ae_int_t jump;
+   AutoS double absxi;
+   AutoS double altsgn;
+   AutoS double estold;
+   AutoS double temp;
 // Executable Statements ..
-   itmax = 5;
-   safmin = minrealnumber;
-   if (*kase == 0) {
-      ae_vector_set_length(v, n + 1);
-      ae_vector_set_length(x, n + 1);
-      ae_vector_set_length(isave, 5);
-      ae_vector_set_length(rsave, 4);
-      for (i = 1; i <= n; i++) {
-         x->xC[i] = complex_from_d(1.0 / n);
-      }
-      *kase = 1;
-      jump = 1;
-      rcond_internalcomplexrcondsaveall(isave, rsave, &i, &iter, &j, &jlast, &jump, &absxi, &altsgn, &estold, &temp);
-      return;
+   const ae_int_t itmax = 5;
+   const double safmin = minrealnumber;
+// Manually threaded two-way signalling.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (*kase != 0) switch (jump) {
+      case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
+      case 4: goto Resume4; case 5: goto Resume5;
+      default: goto Exit;
    }
-   rcond_internalcomplexrcondloadall(isave, rsave, &i, &iter, &j, &jlast, &jump, &absxi, &altsgn, &estold, &temp);
-// ENTRY   (JUMP = 1)
-// FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X.
-   if (jump == 1) {
-      if (n == 1) {
-         v->xC[1] = x->xC[1];
-         *est = abscomplex(v->xC[1]);
-         *kase = 0;
-         rcond_internalcomplexrcondsaveall(isave, rsave, &i, &iter, &j, &jlast, &jump, &absxi, &altsgn, &estold, &temp);
-         return;
-      }
-      *est = rcond_internalcomplexrcondscsum1(x, n);
-      for (i = 1; i <= n; i++) {
-         absxi = abscomplex(x->xC[i]);
-         if (absxi > safmin) {
-            x->xC[i] = ae_c_div_d(x->xC[i], absxi);
-         } else {
-            x->xC[i] = complex_from_i(1);
-         }
-      }
-      *kase = 2;
-      jump = 2;
-      rcond_internalcomplexrcondsaveall(isave, rsave, &i, &iter, &j, &jlast, &jump, &absxi, &altsgn, &estold, &temp);
-      return;
+Spawn:
+   ae_vector_set_length(v, n + 1);
+   ae_vector_set_length(x, n + 1);
+   for (i = 1; i <= n; i++) {
+      x->xC[i] = complex_from_d(1.0 / n);
    }
-// ENTRY   (JUMP = 2)
-// FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY CTRANS(A)*X.
-   if (jump == 2) {
-      j = rcond_internalcomplexrcondicmax1(x, n);
-      iter = 2;
-   // MAIN LOOP - ITERATIONS 2,3,...,ITMAX.
+   *kase = 1; jump = 1; goto Pause; Resume1: // The first iteration: x was updated to A x.
+   if (n == 1) {
+      v->xC[1] = x->xC[1];
+      *est = abscomplex(v->xC[1]);
+      goto Exit;
+   }
+   *est = rcond_internalcomplexrcondscsum1(x, n);
+   for (i = 1; i <= n; i++) {
+      absxi = abscomplex(x->xC[i]);
+      if (absxi > safmin) {
+         x->xC[i] = ae_c_div_d(x->xC[i], absxi);
+      } else {
+         x->xC[i] = complex_from_i(1);
+      }
+   }
+   *kase = 2; jump = 2; goto Pause; Resume2: // The first iteration: x was updated to A^T x.
+   j = rcond_internalcomplexrcondicmax1(x, n);
+// The main loop: iterations 2, 3, ..., itmax.
+   iter = 2;
+   do {
       for (i = 1; i <= n; i++) {
          x->xC[i] = complex_from_i(0);
       }
       x->xC[j] = complex_from_i(1);
-      *kase = 1;
-      jump = 3;
-      rcond_internalcomplexrcondsaveall(isave, rsave, &i, &iter, &j, &jlast, &jump, &absxi, &altsgn, &estold, &temp);
-      return;
-   }
-// ENTRY   (JUMP = 3)
-// X HAS BEEN OVERWRITTEN BY A*X.
-   if (jump == 3) {
+      *kase = 1; jump = 3; goto Pause; Resume3: // x was updated to A x.
       ae_v_cmove(&v->xC[1], 1, &x->xC[1], 1, "N", n);
       estold = *est;
       *est = rcond_internalcomplexrcondscsum1(v, n);
-   // TEST FOR CYCLING.
-      if (*est <= estold) {
-      // ITERATION COMPLETE.  FINAL STAGE.
-         altsgn = 1.0;
-         for (i = 1; i <= n; i++) {
-            x->xC[i] = complex_from_d(altsgn * (1 + (double)(i - 1) / (n - 1)));
-            altsgn = -altsgn;
-         }
-         *kase = 1;
-         jump = 5;
-         rcond_internalcomplexrcondsaveall(isave, rsave, &i, &iter, &j, &jlast, &jump, &absxi, &altsgn, &estold, &temp);
-         return;
-      }
+   // Test for cycling.
+      if (*est <= estold) break;
       for (i = 1; i <= n; i++) {
          absxi = abscomplex(x->xC[i]);
          if (absxi > safmin) {
@@ -27606,51 +27479,27 @@ static void rcond_cmatrixestimatenorm(ae_int_t n, CVector *v, CVector *x, double
             x->xC[i] = complex_from_i(1);
          }
       }
-      *kase = 2;
-      jump = 4;
-      rcond_internalcomplexrcondsaveall(isave, rsave, &i, &iter, &j, &jlast, &jump, &absxi, &altsgn, &estold, &temp);
-      return;
-   }
-// ENTRY   (JUMP = 4)
-// X HAS BEEN OVERWRITTEN BY CTRANS(A)*X.
-   if (jump == 4) {
+      *kase = 2; jump = 4; goto Pause; Resume4: // x was updated to A^T x.
       jlast = j;
       j = rcond_internalcomplexrcondicmax1(x, n);
-      if (abscomplex(x->xC[jlast]) != abscomplex(x->xC[j]) && iter < itmax) {
-         iter++;
-      // MAIN LOOP - ITERATIONS 2,3,...,ITMAX.
-         for (i = 1; i <= n; i++) {
-            x->xC[i] = complex_from_i(0);
-         }
-         x->xC[j] = complex_from_i(1);
-         *kase = 1;
-         jump = 3;
-         rcond_internalcomplexrcondsaveall(isave, rsave, &i, &iter, &j, &jlast, &jump, &absxi, &altsgn, &estold, &temp);
-         return;
-      }
-   // ITERATION COMPLETE.  FINAL STAGE.
-      altsgn = 1.0;
-      for (i = 1; i <= n; i++) {
-         x->xC[i] = complex_from_d(altsgn * (1 + (double)(i - 1) / (n - 1)));
-         altsgn = -altsgn;
-      }
-      *kase = 1;
-      jump = 5;
-      rcond_internalcomplexrcondsaveall(isave, rsave, &i, &iter, &j, &jlast, &jump, &absxi, &altsgn, &estold, &temp);
-      return;
+   } while (abscomplex(x->xC[jlast]) != abscomplex(x->xC[j]) && iter++ < itmax);
+// The iteration is complete: final stage.
+   altsgn = 1.0;
+   for (i = 1; i <= n; i++) {
+      x->xC[i] = complex_from_d(altsgn * (1 + (double)(i - 1) / (n - 1)));
+      altsgn = -altsgn;
    }
-// ENTRY   (JUMP = 5)
-// X HAS BEEN OVERWRITTEN BY A*X.
-   if (jump == 5) {
-      temp = 2 * (rcond_internalcomplexrcondscsum1(x, n) / (3 * n));
-      if (temp > *est) {
-         ae_v_cmove(&v->xC[1], 1, &x->xC[1], 1, "N", n);
-         *est = temp;
-      }
-      *kase = 0;
-      rcond_internalcomplexrcondsaveall(isave, rsave, &i, &iter, &j, &jlast, &jump, &absxi, &altsgn, &estold, &temp);
-      return;
+   *kase = 1; jump = 5; goto Pause; Resume5: // x was updated to A x.
+   temp = 2 * (rcond_internalcomplexrcondscsum1(x, n) / (3 * n));
+   if (temp > *est) {
+      ae_v_cmove(&v->xC[1], 1, &x->xC[1], 1, "N", n);
+      *est = temp;
    }
+Exit:
+   *kase = 0;
+   return false;
+Pause:
+   return true;
 }
 
 // Internal subroutine for condition number estimation
@@ -27725,12 +27574,7 @@ static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, b
    }
 // Estimate the norm of inv(A).
    ainvnm = 0.0;
-   kase = 0;
-   while (true) {
-      rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase);
-      if (kase == 0) {
-         break;
-      }
+   for (kase = 0; rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase); ) {
    // from 1-based array to 0-based
       for (i = 0; i < n; i++) {
          ex.xR[i] = ex.xR[i + 1];
@@ -27788,8 +27632,6 @@ static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, b
    NewVector(cwork2, 0, DT_COMPLEX);
    NewVector(cwork3, 0, DT_COMPLEX);
    NewVector(cwork4, 0, DT_COMPLEX);
-   NewVector(isave, 0, DT_INT);
-   NewVector(rsave, 0, DT_REAL);
 // RC=0 if something happens
    *rc = 0.0;
 // init
@@ -27841,12 +27683,7 @@ static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, b
    } else {
       kase1 = 2;
    }
-   kase = 0;
-   while (true) {
-      rcond_cmatrixestimatenorm(n, &cwork4, &ex, &ainvnm, &kase, &isave, &rsave);
-      if (kase == 0) {
-         break;
-      }
+   for (kase = 0; rcond_cmatrixestimatenorm(n, &cwork4, &ex, &ainvnm, &kase); ) {
    // From 1-based to 0-based
       for (i = 0; i < n; i++) {
          ex.xC[i] = ex.xC[i + 1];
@@ -27928,13 +27765,8 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
    sa = 1 / sa;
 // Estimate the norm of A.
    if (!isnormprovided) {
-      kase = 0;
       anorm = 0.0;
-      while (true) {
-         rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &anorm, &kase);
-         if (kase == 0) {
-            break;
-         }
+      for (kase = 0; rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &anorm, &kase); )
          if (isupper) {
          // Multiply by U
             for (i = 1; i <= n; i++) {
@@ -27970,7 +27802,6 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
             }
             ae_v_muld(&ex.xR[1], 1, n, sa);
          }
-      }
    }
 // Quick return if possible
    if (anorm == 0.0) {
@@ -27983,12 +27814,7 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
       return;
    }
 // Estimate the 1-norm of inv(A).
-   kase = 0;
-   while (true) {
-      rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase);
-      if (kase == 0) {
-         break;
-      }
+   for (kase = 0; rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase); ) {
       for (i = 0; i < n; i++) {
          ex.xR[i] = ex.xR[i + 1];
       }
@@ -28047,8 +27873,6 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
    double maxgrowth;
    ae_frame_make(&_frame_block);
    *rc = 0;
-   NewVector(isave, 0, DT_INT);
-   NewVector(rsave, 0, DT_REAL);
    NewVector(ex, 0, DT_COMPLEX);
    NewVector(ev, 0, DT_COMPLEX);
    NewVector(tmp, 0, DT_COMPLEX);
@@ -28079,12 +27903,7 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
 // Estimate the norm of A
    if (!isnormprovided) {
       anorm = 0.0;
-      kase = 0;
-      while (true) {
-         rcond_cmatrixestimatenorm(n, &ev, &ex, &anorm, &kase, &isave, &rsave);
-         if (kase == 0) {
-            break;
-         }
+      for (kase = 0; rcond_cmatrixestimatenorm(n, &ev, &ex, &anorm, &kase); )
          if (isupper) {
          // Multiply by U
             for (i = 1; i <= n; i++) {
@@ -28120,7 +27939,6 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
             }
             ae_v_cmuld(&ex.xC[1], 1, n, sa);
          }
-      }
    }
 // Quick return if possible
 // After this block we assume that ANORM != 0
@@ -28135,12 +27953,7 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
    }
 // Estimate the norm of inv(A).
    ainvnm = 0.0;
-   kase = 0;
-   while (true) {
-      rcond_cmatrixestimatenorm(n, &ev, &ex, &ainvnm, &kase, &isave, &rsave);
-      if (kase == 0) {
-         break;
-      }
+   for (kase = 0; rcond_cmatrixestimatenorm(n, &ev, &ex, &ainvnm, &kase); ) {
       for (i = 0; i < n; i++) {
          ex.xC[i] = ex.xC[i + 1];
       }
@@ -28238,13 +28051,8 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
    sl = 1 / sl;
 // Estimate the norm of A.
    if (!isanormprovided) {
-      kase = 0;
       anorm = 0.0;
-      while (true) {
-         rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &anorm, &kase);
-         if (kase == 0) {
-            break;
-         }
+      for (kase = 0; rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &anorm, &kase); )
          if (kase == kase1) {
          // Multiply by U
             for (i = 1; i <= n; i++) {
@@ -28283,7 +28091,6 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
             }
             ae_v_move(&ex.xR[1], 1, tmp.xR, 1, n);
          }
-      }
    }
 // Scale according to SU/SL
    anorm *= su * sl;
@@ -28300,12 +28107,7 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
    }
 // Estimate the norm of inv(A).
    ainvnm = 0.0;
-   kase = 0;
-   while (true) {
-      rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase);
-      if (kase == 0) {
-         break;
-      }
+   for (kase = 0; rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase); ) {
    // from 1-based array to 0-based
       for (i = 0; i < n; i++) {
          ex.xR[i] = ex.xR[i + 1];
@@ -28373,8 +28175,6 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
    NewVector(cwork2, 0, DT_COMPLEX);
    NewVector(cwork3, 0, DT_COMPLEX);
    NewVector(cwork4, 0, DT_COMPLEX);
-   NewVector(isave, 0, DT_INT);
-   NewVector(rsave, 0, DT_REAL);
    if (n <= 0) {
       ae_frame_leave();
       return;
@@ -28411,47 +28211,42 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
       } else {
          kase1 = 2;
       }
-      kase = 0;
-      do {
-         rcond_cmatrixestimatenorm(n, &cwork4, &ex, &anorm, &kase, &isave, &rsave);
-         if (kase != 0) {
-            if (kase == kase1) {
-            // Multiply by U
-               for (i = 1; i <= n; i++) {
-                  v = ae_v_cdotproduct(&lua->xyC[i - 1][i - 1], 1, "N", &ex.xC[i], 1, "N", n - i + 1);
-                  ex.xC[i] = v;
+      for (kase = 0; rcond_cmatrixestimatenorm(n, &cwork4, &ex, &anorm, &kase); )
+         if (kase == kase1) {
+         // Multiply by U
+            for (i = 1; i <= n; i++) {
+               v = ae_v_cdotproduct(&lua->xyC[i - 1][i - 1], 1, "N", &ex.xC[i], 1, "N", n - i + 1);
+               ex.xC[i] = v;
+            }
+         // Multiply by L
+            for (i = n; i >= 1; i--) {
+               v = complex_from_i(0);
+               if (i > 1) {
+                  v = ae_v_cdotproduct(lua->xyC[i - 1], 1, "N", &ex.xC[1], 1, "N", i - 1);
                }
-            // Multiply by L
-               for (i = n; i >= 1; i--) {
-                  v = complex_from_i(0);
-                  if (i > 1) {
-                     v = ae_v_cdotproduct(lua->xyC[i - 1], 1, "N", &ex.xC[1], 1, "N", i - 1);
-                  }
-                  ex.xC[i] = ae_c_add(v, ex.xC[i]);
+               ex.xC[i] = ae_c_add(v, ex.xC[i]);
+            }
+         } else {
+         // Multiply by L'
+            for (i = 1; i <= n; i++) {
+               cwork2.xC[i] = complex_from_i(0);
+            }
+            for (i = 1; i <= n; i++) {
+               v = ex.xC[i];
+               if (i > 1) {
+                  ae_v_caddc(&cwork2.xC[1], 1, lua->xyC[i - 1], 1, "Conj", i - 1, v);
                }
-            } else {
-            // Multiply by L'
-               for (i = 1; i <= n; i++) {
-                  cwork2.xC[i] = complex_from_i(0);
-               }
-               for (i = 1; i <= n; i++) {
-                  v = ex.xC[i];
-                  if (i > 1) {
-                     ae_v_caddc(&cwork2.xC[1], 1, lua->xyC[i - 1], 1, "Conj", i - 1, v);
-                  }
-                  cwork2.xC[i] = ae_c_add(cwork2.xC[i], v);
-               }
-            // Multiply by U'
-               for (i = 1; i <= n; i++) {
-                  ex.xC[i] = complex_from_i(0);
-               }
-               for (i = 1; i <= n; i++) {
-                  v = cwork2.xC[i];
-                  ae_v_caddc(&ex.xC[i], 1, &lua->xyC[i - 1][i - 1], 1, "Conj", n - i + 1, v);
-               }
+               cwork2.xC[i] = ae_c_add(cwork2.xC[i], v);
+            }
+         // Multiply by U'
+            for (i = 1; i <= n; i++) {
+               ex.xC[i] = complex_from_i(0);
+            }
+            for (i = 1; i <= n; i++) {
+               v = cwork2.xC[i];
+               ae_v_caddc(&ex.xC[i], 1, &lua->xyC[i - 1][i - 1], 1, "Conj", n - i + 1, v);
             }
          }
-      } while (kase != 0);
    }
 // Scale according to SU/SL
    anorm *= su * sl;
@@ -28467,12 +28262,7 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
    } else {
       kase1 = 2;
    }
-   kase = 0;
-   while (true) {
-      rcond_cmatrixestimatenorm(n, &cwork4, &ex, &ainvnm, &kase, &isave, &rsave);
-      if (kase == 0) {
-         break;
-      }
+   for (kase = 0; rcond_cmatrixestimatenorm(n, &cwork4, &ex, &ainvnm, &kase); ) {
    // From 1-based to 0-based
       for (i = 0; i < n; i++) {
          ex.xC[i] = ex.xC[i + 1];
@@ -29630,9 +29420,7 @@ void fblscgcreate(RVector *x, RVector *b, ae_int_t n, fblslincgstate *state) {
    state->n = n;
    ae_v_move(state->xk.xR, 1, x->xR, 1, n);
    ae_v_move(state->b.xR, 1, b->xR, 1, n);
-   ae_vector_set_length(&state->rstate.ia, 1 + 1);
-   ae_vector_set_length(&state->rstate.ra, 6 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // Linear CG solver, function relying on reverse communication to calculate
@@ -29641,31 +29429,21 @@ void fblscgcreate(RVector *x, RVector *b, ae_int_t n, fblslincgstate *state) {
 // See comments for FBLSLinCGState structure for more info.
 // ALGLIB: Copyright 22.10.2009 by Sergey Bochkanov
 bool fblscgiteration(fblslincgstate *state) {
-   ae_int_t n;
-   ae_int_t k;
-   double rk2;
-   double rk12;
-   double pap;
-   double s;
-   double betak;
-   double v1;
-   double v2;
+   AutoS ae_int_t n;
+   AutoS ae_int_t k;
+   AutoS double rk2;
+   AutoS double rk12;
+   AutoS double pap;
+   AutoS double s;
+   AutoS double betak;
+   AutoS double v1;
+   AutoS double v2;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   n = state->rstate.ia.xZ[0];
-   k = state->rstate.ia.xZ[1];
-   rk2 = state->rstate.ra.xR[0];
-   rk12 = state->rstate.ra.xR[1];
-   pap = state->rstate.ra.xR[2];
-   s = state->rstate.ra.xR[3];
-   betak = state->rstate.ra.xR[4];
-   v1 = state->rstate.ra.xR[5];
-   v2 = state->rstate.ra.xR[6];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
       default: goto Exit;
    }
@@ -29693,7 +29471,7 @@ Spawn:
 // r(0) = b-A*x(0)
 // RK2 = r(0)'*r(0)
    ae_v_move(state->x.xR, 1, state->xk.xR, 1, n);
-   state->rstate.stage = 0; goto Pause; Resume0:
+   state->PQ = 0; goto Pause; Resume0:
    ae_v_move(state->rk.xR, 1, state->b.xR, 1, n);
    ae_v_sub(state->rk.xR, 1, state->ax.xR, 1, n);
    rk2 = ae_v_dotproduct(state->rk.xR, 1, state->rk.xR, 1, n);
@@ -29706,7 +29484,7 @@ Spawn:
    //
    // If PAP=0, break (iteration is over)
       ae_v_move(state->x.xR, 1, state->pk.xR, 1, n);
-      state->rstate.stage = 1; goto Pause; Resume1:
+      state->PQ = 1; goto Pause; Resume1:
       ae_v_move(state->tmp2.xR, 1, state->ax.xR, 1, n);
       pap = state->xax;
       if (!isfinite(pap)) {
@@ -29751,25 +29529,15 @@ Spawn:
    }
 // Calculate E2
    ae_v_move(state->x.xR, 1, state->xk.xR, 1, n);
-   state->rstate.stage = 2; goto Pause; Resume2:
+   state->PQ = 2; goto Pause; Resume2:
    ae_v_move(state->rk.xR, 1, state->b.xR, 1, n);
    ae_v_sub(state->rk.xR, 1, state->ax.xR, 1, n);
    v1 = ae_v_dotproduct(state->rk.xR, 1, state->rk.xR, 1, n);
    state->e2 = sqrt(v1);
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ia.xZ[0] = n;
-   state->rstate.ia.xZ[1] = k;
-   state->rstate.ra.xR[0] = rk2;
-   state->rstate.ra.xR[1] = rk12;
-   state->rstate.ra.xR[2] = pap;
-   state->rstate.ra.xR[3] = s;
-   state->rstate.ra.xR[4] = betak;
-   state->rstate.ra.xR[5] = v1;
-   state->rstate.ra.xR[6] = v2;
    return true;
 }
 
@@ -29811,9 +29579,7 @@ void fblsgmrescreate(RVector *b, ae_int_t n, ae_int_t k, fblsgmresstate *state) 
    rcopyallocv(n, b, &state->b);
    rallocv(n, &state->x);
    rallocv(n, &state->ax);
-   ae_vector_set_length(&state->rstate.ia, 4 + 1);
-   ae_vector_set_length(&state->rstate.ra, 10 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // Linear CG solver, function relying on reverse communication to calculate
@@ -29822,45 +29588,28 @@ void fblsgmrescreate(RVector *b, ae_int_t n, ae_int_t k, fblsgmresstate *state) 
 // See comments for FBLSLinCGState structure for more info.
 // ALGLIB: Copyright 22.10.2009 by Sergey Bochkanov
 bool fblsgmresiteration(fblsgmresstate *state) {
-   ae_int_t n;
-   ae_int_t itidx;
-   ae_int_t kdim;
-   double rmax;
-   double rmindiag;
-   double cs;
-   double sn;
-   double v;
-   double vv;
-   double anrm;
-   double qnrm;
-   double bnrm;
-   double resnrm;
-   double prevresnrm;
-   ae_int_t i;
-   ae_int_t j;
+   AutoS ae_int_t n;
+   AutoS ae_int_t itidx;
+   AutoS ae_int_t kdim;
+   AutoS double rmax;
+   AutoS double rmindiag;
+   AutoS double cs;
+   AutoS double sn;
+   AutoS double v;
+   AutoS double vv;
+   AutoS double anrm;
+   AutoS double qnrm;
+   AutoS double bnrm;
+   AutoS double resnrm;
+   AutoS double prevresnrm;
+   AutoS ae_int_t i;
+   AutoS ae_int_t j;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   n = state->rstate.ia.xZ[0];
-   itidx = state->rstate.ia.xZ[1];
-   kdim = state->rstate.ia.xZ[2];
-   i = state->rstate.ia.xZ[3];
-   j = state->rstate.ia.xZ[4];
-   rmax = state->rstate.ra.xR[0];
-   rmindiag = state->rstate.ra.xR[1];
-   cs = state->rstate.ra.xR[2];
-   sn = state->rstate.ra.xR[3];
-   v = state->rstate.ra.xR[4];
-   vv = state->rstate.ra.xR[5];
-   anrm = state->rstate.ra.xR[6];
-   qnrm = state->rstate.ra.xR[7];
-   bnrm = state->rstate.ra.xR[8];
-   resnrm = state->rstate.ra.xR[9];
-   prevresnrm = state->rstate.ra.xR[10];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0;
       default: goto Exit;
    }
@@ -29913,7 +29662,7 @@ Spawn:
       prevresnrm = resnrm;
    // Compute A*Qi[ItIdx], then compute Qi[ItIdx+1]
       rcopyrv(n, &state->qi, itidx, &state->x);
-      state->rstate.stage = 0; goto Pause; Resume0:
+      state->PQ = 0; goto Pause; Resume0:
       rcopyvr(n, &state->ax, &state->aqi, itidx);
       anrm = sqrt(rdotv2(n, &state->ax));
       if (anrm == 0.0) {
@@ -29990,26 +29739,9 @@ Spawn:
       rmatrixmv(n, kdim, &state->qi, 0, 0, 1, &state->ys, 0, &state->xs, 0);
    }
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ia.xZ[0] = n;
-   state->rstate.ia.xZ[1] = itidx;
-   state->rstate.ia.xZ[2] = kdim;
-   state->rstate.ia.xZ[3] = i;
-   state->rstate.ia.xZ[4] = j;
-   state->rstate.ra.xR[0] = rmax;
-   state->rstate.ra.xR[1] = rmindiag;
-   state->rstate.ra.xR[2] = cs;
-   state->rstate.ra.xR[3] = sn;
-   state->rstate.ra.xR[4] = v;
-   state->rstate.ra.xR[5] = vv;
-   state->rstate.ra.xR[6] = anrm;
-   state->rstate.ra.xR[7] = qnrm;
-   state->rstate.ra.xR[8] = bnrm;
-   state->rstate.ra.xR[9] = resnrm;
-   state->rstate.ra.xR[10] = prevresnrm;
    return true;
 }
 
@@ -30083,7 +29815,6 @@ void fblslincgstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->pk, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->pk1, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->b, 0, DT_REAL, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
    ae_vector_init(&p->tmp2, 0, DT_REAL, make_automatic);
 }
 
@@ -30103,7 +29834,7 @@ void fblslincgstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->pk, &src->pk, make_automatic);
    ae_vector_copy(&dst->pk1, &src->pk1, make_automatic);
    ae_vector_copy(&dst->b, &src->b, make_automatic);
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
    ae_vector_copy(&dst->tmp2, &src->tmp2, make_automatic);
 }
 
@@ -30118,7 +29849,6 @@ void fblslincgstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->pk, make_automatic);
    ae_vector_free(&p->pk1, make_automatic);
    ae_vector_free(&p->b, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
    ae_vector_free(&p->tmp2, make_automatic);
 }
 
@@ -30137,7 +29867,6 @@ void fblsgmresstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->ys, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->tmp1, 0, DT_REAL, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
 }
 
 void fblsgmresstate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -30164,7 +29893,7 @@ void fblsgmresstate_copy(void *_dst, void *_src, bool make_automatic) {
    dst->epsdiag = src->epsdiag;
    dst->itsperformed = src->itsperformed;
    dst->retcode = src->retcode;
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
 }
 
 void fblsgmresstate_free(void *_p, bool make_automatic) {
@@ -30182,7 +29911,6 @@ void fblsgmresstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->ys, make_automatic);
    ae_vector_free(&p->tmp0, make_automatic);
    ae_vector_free(&p->tmp1, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -30236,9 +29964,7 @@ void normestimatorcreate(ae_int_t m, ae_int_t n, ae_int_t nstart, ae_int_t nits,
    ae_vector_set_length(&state->x, imax2(state->n, state->m));
    ae_vector_set_length(&state->mv, state->m);
    ae_vector_set_length(&state->mtv, state->n);
-   ae_vector_set_length(&state->rstate.ia, 3 + 1);
-   ae_vector_set_length(&state->rstate.ra, 2 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // This function changes seed value used by algorithm. In some cases we  need
@@ -30262,27 +29988,19 @@ void normestimatorsetseed(normestimatorstate *state, ae_int_t seedval) {
 
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
 bool normestimatoriteration(normestimatorstate *state) {
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t i;
-   ae_int_t itcnt;
-   double v;
-   double growth;
-   double bestgrowth;
+   AutoS ae_int_t n;
+   AutoS ae_int_t m;
+   AutoS ae_int_t i;
+   AutoS ae_int_t itcnt;
+   AutoS double v;
+   AutoS double growth;
+   AutoS double bestgrowth;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   n = state->rstate.ia.xZ[0];
-   m = state->rstate.ia.xZ[1];
-   i = state->rstate.ia.xZ[2];
-   itcnt = state->rstate.ia.xZ[3];
-   v = state->rstate.ra.xR[0];
-   growth = state->rstate.ra.xR[1];
-   bestgrowth = state->rstate.ra.xR[2];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       default: goto Exit;
    }
@@ -30301,6 +30019,7 @@ Spawn:
       hqrndseed(state->seedval, state->seedval + 2, &state->r);
    }
    bestgrowth = 0.0;
+   state->needmtv = state->needmv = false;
    state->xbest.xR[0] = 1.0;
    for (i = 1; i < n; i++) {
       state->xbest.xR[i] = 0.0;
@@ -30316,13 +30035,9 @@ Spawn:
       v = 1 / sqrt(v);
       ae_v_muld(state->x0.xR, 1, n, v);
       ae_v_move(state->x.xR, 1, state->x0.xR, 1, n);
-      state->needmv = true;
-      state->needmtv = false;
-      state->rstate.stage = 0; goto Pause; Resume0:
+      state->needmv = true, state->PQ = 0; goto Pause; Resume0: state->needmv = false;
       ae_v_move(state->x.xR, 1, state->mv.xR, 1, m);
-      state->needmv = false;
-      state->needmtv = true;
-      state->rstate.stage = 1; goto Pause; Resume1:
+      state->needmtv = true, state->PQ = 1; goto Pause; Resume1: state->needmtv = false;
       ae_v_move(state->x1.xR, 1, state->mtv.xR, 1, n);
       v = 0.0;
       for (i = 0; i < n; i++) {
@@ -30338,13 +30053,9 @@ Spawn:
    ae_v_move(state->x0.xR, 1, state->xbest.xR, 1, n);
    for (itcnt = 0; itcnt < state->nits; itcnt++) {
       ae_v_move(state->x.xR, 1, state->x0.xR, 1, n);
-      state->needmv = true;
-      state->needmtv = false;
-      state->rstate.stage = 2; goto Pause; Resume2:
+      state->needmv = true, state->PQ = 2; goto Pause; Resume2: state->needmv = false;
       ae_v_move(state->x.xR, 1, state->mv.xR, 1, m);
-      state->needmv = false;
-      state->needmtv = true;
-      state->rstate.stage = 3; goto Pause; Resume3:
+      state->needmtv = true, state->PQ = 3; goto Pause; Resume3: state->needmtv = false;
       ae_v_move(state->x1.xR, 1, state->mtv.xR, 1, n);
       v = 0.0;
       for (i = 0; i < n; i++) {
@@ -30357,17 +30068,9 @@ Spawn:
       }
    }
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ia.xZ[0] = n;
-   state->rstate.ia.xZ[1] = m;
-   state->rstate.ia.xZ[2] = i;
-   state->rstate.ia.xZ[3] = itcnt;
-   state->rstate.ra.xR[0] = v;
-   state->rstate.ra.xR[1] = growth;
-   state->rstate.ra.xR[2] = bestgrowth;
    return true;
 }
 
@@ -30378,9 +30081,7 @@ Pause:
 //     State   -   algorithm state
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
 void normestimatorrestart(normestimatorstate *state) {
-   ae_vector_set_length(&state->rstate.ia, 3 + 1);
-   ae_vector_set_length(&state->rstate.ra, 2 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // This function estimates norm of the sparse M*N matrix A.
@@ -30396,17 +30097,9 @@ void normestimatorrestart(normestimatorstate *state) {
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
 // API: void normestimatorestimatesparse(const normestimatorstate &state, const sparsematrix &a);
 void normestimatorestimatesparse(normestimatorstate *state, sparsematrix *a) {
-   normestimatorrestart(state);
-   while (normestimatoriteration(state)) {
-      if (state->needmv) {
-         sparsemv(a, &state->x, &state->mv);
-         continue;
-      }
-      if (state->needmtv) {
-         sparsemtv(a, &state->x, &state->mtv);
-         continue;
-      }
-   }
+   for (normestimatorrestart(state); normestimatoriteration(state); )
+      if (state->needmv) sparsemv(a, &state->x, &state->mv);
+      else if (state->needmtv) sparsemtv(a, &state->x, &state->mtv);
 }
 
 // Matrix norm estimation results
@@ -30433,7 +30126,6 @@ void normestimatorstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->mv, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->mtv, 0, DT_REAL, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
 }
 
 void normestimatorstate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -30455,7 +30147,7 @@ void normestimatorstate_copy(void *_dst, void *_src, bool make_automatic) {
    dst->needmv = src->needmv;
    dst->needmtv = src->needmtv;
    dst->repnorm = src->repnorm;
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
 }
 
 void normestimatorstate_free(void *_p, bool make_automatic) {
@@ -30468,7 +30160,6 @@ void normestimatorstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->x, make_automatic);
    ae_vector_free(&p->mv, make_automatic);
    ae_vector_free(&p->mtv, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
 }
 } // end of namespace alglib_impl
 

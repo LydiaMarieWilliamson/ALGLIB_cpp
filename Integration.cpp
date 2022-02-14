@@ -1474,9 +1474,7 @@ void autogksmoothw(double a, double b, double xwidth, autogkstate *state) {
    state->a = a;
    state->b = b;
    state->xwidth = xwidth;
-   state->needf = false;
-   ae_vector_set_length(&state->rstate.ra, 10 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // Integration of a smooth function F(x) on a finite interval [a,b].
@@ -1548,9 +1546,7 @@ void autogksingular(double a, double b, double alpha, double beta, autogkstate *
    state->alpha = alpha;
    state->beta = beta;
    state->xwidth = 0.0;
-   state->needf = false;
-   ae_vector_set_length(&state->rstate.ra, 10 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 // Internal AutoGK subroutine
@@ -1566,9 +1562,7 @@ static void autogk_autogkinternalprepare(double a, double b, double eps, double 
    state->eps = eps;
    state->xwidth = xwidth;
 // Prepare RComm structure
-   ae_vector_set_length(&state->rstate.ia, 3 + 1);
-   ae_vector_set_length(&state->rstate.ra, 8 + 1);
-   state->rstate.stage = -1;
+   state->PQ = -1;
 }
 
 static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth) {
@@ -1648,39 +1642,25 @@ static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newhe
 
 // Internal AutoGK subroutine
 static bool autogk_autogkinternaliteration(autogkinternalstate *state) {
-   double c1;
-   double c2;
-   ae_int_t i;
-   ae_int_t j;
-   double intg;
-   double intk;
-   double inta;
-   double v;
-   double ta;
-   double tb;
-   ae_int_t ns;
-   double qeps;
-   ae_int_t info;
+   AutoS double c1;
+   AutoS double c2;
+   AutoS ae_int_t i;
+   AutoS ae_int_t j;
+   AutoS double intg;
+   AutoS double intk;
+   AutoS double inta;
+   AutoS double v;
+   AutoS double ta;
+   AutoS double tb;
+   AutoS ae_int_t ns;
+   AutoS double qeps;
+   AutoS ae_int_t info;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   i = state->rstate.ia.xZ[0];
-   j = state->rstate.ia.xZ[1];
-   ns = state->rstate.ia.xZ[2];
-   info = state->rstate.ia.xZ[3];
-   c1 = state->rstate.ra.xR[0];
-   c2 = state->rstate.ra.xR[1];
-   intg = state->rstate.ra.xR[2];
-   intk = state->rstate.ra.xR[3];
-   inta = state->rstate.ra.xR[4];
-   v = state->rstate.ra.xR[5];
-   ta = state->rstate.ra.xR[6];
-   tb = state->rstate.ra.xR[7];
-   qeps = state->rstate.ra.xR[8];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
       default: goto Exit;
    }
@@ -1757,7 +1737,7 @@ Spawn:
       for (i = 0; i < state->n; i++) {
       // obtain F
          state->x = c1 * state->qn.xR[i] + c2;
-         state->rstate.stage = 0; goto Pause; Resume0:
+         state->PQ = 0; goto Pause; Resume0:
          v = state->f;
       // Gauss-Kronrod formula
          intk += v * state->wk.xR[i];
@@ -1799,7 +1779,7 @@ Spawn:
          for (i = 0; i < state->n; i++) {
          // obtain F
             state->x = c1 * state->qn.xR[i] + c2;
-            state->rstate.stage = 1; goto Pause; Resume1:
+            state->PQ = 1; goto Pause; Resume1:
             v = state->f;
          // Gauss-Kronrod formula
             intk += v * state->wk.xR[i];
@@ -1856,7 +1836,7 @@ Spawn:
          for (i = 0; i < state->n; i++) {
          // F(x)
             state->x = c1 * state->qn.xR[i] + c2;
-            state->rstate.stage = 2; goto Pause; Resume2:
+            state->PQ = 2; goto Pause; Resume2:
             v = state->f;
          // Gauss-Kronrod formula
             intk += v * state->wk.xR[i];
@@ -1881,23 +1861,9 @@ Spawn:
       state->heapused++;
    }
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ia.xZ[0] = i;
-   state->rstate.ia.xZ[1] = j;
-   state->rstate.ia.xZ[2] = ns;
-   state->rstate.ia.xZ[3] = info;
-   state->rstate.ra.xR[0] = c1;
-   state->rstate.ra.xR[1] = c2;
-   state->rstate.ra.xR[2] = intg;
-   state->rstate.ra.xR[3] = intk;
-   state->rstate.ra.xR[4] = inta;
-   state->rstate.ra.xR[5] = v;
-   state->rstate.ra.xR[6] = ta;
-   state->rstate.ra.xR[7] = tb;
-   state->rstate.ra.xR[8] = qeps;
    return true;
 }
 
@@ -1907,35 +1873,23 @@ Pause:
 // API: bool autogkiteration(const autogkstate &state);
 // API: void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr = NULL);
 bool autogkiteration(autogkstate *state) {
-   double s;
-   double tmp;
-   double eps;
-   double a;
-   double b;
-   double x;
-   double t;
-   double alpha;
-   double beta;
-   double v1;
-   double v2;
+   AutoS double s;
+   AutoS double tmp;
+   AutoS double eps;
+   AutoS double a;
+   AutoS double b;
+   AutoS double x;
+   AutoS double t;
+   AutoS double alpha;
+   AutoS double beta;
+   AutoS double v1;
+   AutoS double v2;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
-   if (state->rstate.stage < 0) goto Spawn;
-   s = state->rstate.ra.xR[0];
-   tmp = state->rstate.ra.xR[1];
-   eps = state->rstate.ra.xR[2];
-   a = state->rstate.ra.xR[3];
-   b = state->rstate.ra.xR[4];
-   x = state->rstate.ra.xR[5];
-   t = state->rstate.ra.xR[6];
-   alpha = state->rstate.ra.xR[7];
-   beta = state->rstate.ra.xR[8];
-   v1 = state->rstate.ra.xR[9];
-   v2 = state->rstate.ra.xR[10];
-   switch (state->rstate.stage) {
+   if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
       default: goto Exit;
    }
@@ -1957,6 +1911,7 @@ Spawn:
    b = state->b;
    alpha = state->alpha;
    beta = state->beta;
+   state->needf = false;
    state->terminationtype = -1;
    state->nfev = 0;
    state->nintervals = 0;
@@ -1974,9 +1929,7 @@ Spawn:
          state->x = x;
          state->xminusa = x - a;
          state->bminusx = b - x;
-         state->needf = true;
-         state->rstate.stage = 0; goto Pause; Resume0:
-         state->needf = false;
+         state->needf = true, state->PQ = 0; goto Pause; Resume0: state->needf = false;
          state->nfev++;
          state->internalstate.f = state->f;
       }
@@ -2027,9 +1980,7 @@ Spawn:
             state->xminusa = a + t - b;
             state->bminusx = -t;
          }
-         state->needf = true;
-         state->rstate.stage = 1; goto Pause; Resume1:
-         state->needf = false;
+         state->needf = true, state->PQ = 1; goto Pause; Resume1: state->needf = false;
          if (alpha != 0.0) {
             state->internalstate.f = state->f * pow(x, -alpha / (1 + alpha)) / (1 + alpha);
          } else {
@@ -2056,9 +2007,7 @@ Spawn:
             state->xminusa = -t;
             state->bminusx = a - (b - t);
          }
-         state->needf = true;
-         state->rstate.stage = 2; goto Pause; Resume2:
-         state->needf = false;
+         state->needf = true, state->PQ = 2; goto Pause; Resume2: state->needf = false;
          if (beta != 0.0) {
             state->internalstate.f = state->f * pow(x, -beta / (1 + beta)) / (1 + beta);
          } else {
@@ -2073,21 +2022,9 @@ Spawn:
       state->terminationtype = 1;
    }
 Exit:
-   state->rstate.stage = -1;
+   state->PQ = -1;
    return false;
-// Saving state
 Pause:
-   state->rstate.ra.xR[0] = s;
-   state->rstate.ra.xR[1] = tmp;
-   state->rstate.ra.xR[2] = eps;
-   state->rstate.ra.xR[3] = a;
-   state->rstate.ra.xR[4] = b;
-   state->rstate.ra.xR[5] = x;
-   state->rstate.ra.xR[6] = t;
-   state->rstate.ra.xR[7] = alpha;
-   state->rstate.ra.xR[8] = beta;
-   state->rstate.ra.xR[9] = v1;
-   state->rstate.ra.xR[10] = v2;
    return true;
 }
 
@@ -2133,7 +2070,6 @@ void autogkinternalstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->wg, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->wk, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->wr, 0, DT_REAL, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
 }
 
 void autogkinternalstate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -2158,7 +2094,7 @@ void autogkinternalstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->wk, &src->wk, make_automatic);
    ae_vector_copy(&dst->wr, &src->wr, make_automatic);
    dst->n = src->n;
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
 }
 
 void autogkinternalstate_free(void *_p, bool make_automatic) {
@@ -2168,13 +2104,11 @@ void autogkinternalstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->wg, make_automatic);
    ae_vector_free(&p->wk, make_automatic);
    ae_vector_free(&p->wr, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
 }
 
 void autogkstate_init(void *_p, bool make_automatic) {
    autogkstate *p = (autogkstate *)_p;
    autogkinternalstate_init(&p->internalstate, make_automatic);
-   rcommstate_init(&p->rstate, make_automatic);
 }
 
 void autogkstate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -2192,7 +2126,7 @@ void autogkstate_copy(void *_dst, void *_src, bool make_automatic) {
    dst->f = src->f;
    dst->wrappermode = src->wrappermode;
    autogkinternalstate_copy(&dst->internalstate, &src->internalstate, make_automatic);
-   rcommstate_copy(&dst->rstate, &src->rstate, make_automatic);
+   dst->PQ = src->PQ;
    dst->v = src->v;
    dst->terminationtype = src->terminationtype;
    dst->nfev = src->nfev;
@@ -2202,7 +2136,6 @@ void autogkstate_copy(void *_dst, void *_src, bool make_automatic) {
 void autogkstate_free(void *_p, bool make_automatic) {
    autogkstate *p = (autogkstate *)_p;
    autogkinternalstate_free(&p->internalstate, make_automatic);
-   rcommstate_free(&p->rstate, make_automatic);
 }
 } // end of namespace alglib_impl
 
