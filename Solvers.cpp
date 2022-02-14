@@ -4276,7 +4276,7 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
 // Solve
    lincgrestart(state);
    lincgsetb(state, b);
-   while (lincgiteration(state)) {
+   while (lincgiteration(state))
    // Process different requests from optimizer
       if (state->needmv) {
          sparsesmv(a, isupper, &state->x, &state->mv);
@@ -4289,7 +4289,6 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
             state->pv.xR[i] = state->x.xR[i] * sqr(state->tmpd.xR[i]);
          }
       }
-   }
 }
 
 // CG-solver: results.
@@ -4729,7 +4728,7 @@ Spawn:
    state->repiterationscount = 0;
    state->r2 = state->bnorm2;
 // estimate for ANorm
-   for (normestimatorrestart(&state->nes); normestimatoriteration(&state->nes); ) {
+   for (normestimatorrestart(&state->nes); normestimatoriteration(&state->nes); )
       if (state->nes.needmv) {
          ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->n);
          state->repnmv++, state->needmv = true, state->PQ = 0; goto Pause; Resume0: state->needmv = false;
@@ -4740,7 +4739,6 @@ Spawn:
          state->repnmv++, state->needmtv = true, state->PQ = 1; goto Pause; Resume1: state->needmtv = false;
          ae_v_move(state->nes.mtv.xR, 1, state->mtv.xR, 1, state->n);
       }
-   }
    normestimatorresults(&state->nes, &state->anorm);
 // initialize .RX by zeros
    for (i = 0; i < state->n; i++) {
@@ -5024,8 +5022,7 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b) {
 // by A or A'. After solution we modify State.RX so it will store untransformed
 // variables
    linlsqrsetb(state, b);
-   linlsqrrestart(state);
-   while (linlsqriteration(state)) {
+   for (linlsqrrestart(state); linlsqriteration(state); )
       if (state->needmv) {
          for (i = 0; i < n; i++) {
             state->tmpx.xR[i] = state->tmpd.xR[i] * state->x.xR[i];
@@ -5037,7 +5034,6 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b) {
             state->mtv.xR[i] *= state->tmpd.xR[i];
          }
       }
-   }
    for (i = 0; i < n; i++) {
       state->rx.xR[i] *= state->tmpd.xR[i];
    }

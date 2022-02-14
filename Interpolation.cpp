@@ -6219,7 +6219,7 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
    linlsqrcreatebuf(arows, m, &solver);
    linlsqrsetb(&solver, &targets);
    linlsqrsetcond(&solver, 1.0E-14, 1.0E-14, lsqrcnt);
-   while (linlsqriteration(&solver)) {
+   while (linlsqriteration(&solver))
       if (solver.needmv) {
          for (i = 0; i < m; i++) {
             tmp1.xR[i] = solver.x.xR[i];
@@ -6235,7 +6235,6 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
       // Multiply by preconditioner: solve TRSV(U',A*Solver.X)
          sparsetrsv(&ata, true, false, 1, &solver.mtv);
       }
-   }
    linlsqrresults(&solver, &tmp1, &srep);
    sparsetrsv(&ata, true, false, 0, &tmp1);
 // Generate output spline as a table of spline valued and first
@@ -9562,18 +9561,17 @@ static void lsfit_logisticfitinternal(RVector *x, RVector *y, ae_int_t n, bool i
    double vp0;
    double vp1;
    *flast = 0;
-   minlmrestartfrom(state, p1);
-   while (minlmiteration(state)) {
-      ta = state->x.xR[0];
-      tb = state->x.xR[1];
-      tc = state->x.xR[2];
-      td = state->x.xR[3];
-      tg = state->x.xR[4];
+   for (minlmrestartfrom(state, p1); minlmiteration(state); )
       if (state->xupdated) {
       // Save best function value obtained so far.
          *flast = state->f;
       } else if (state->needfi || state->needfij) {
       // Function vector and Jacobian
+         ta = state->x.xR[0];
+         tb = state->x.xR[1];
+         tc = state->x.xR[2];
+         td = state->x.xR[3];
+         tg = state->x.xR[4];
          for (i = 0; i < n; i++) {
             ae_assert(x->xR[i] >= 0.0, "LogisticFitInternal: integrity error");
          // Handle zero X
@@ -9654,7 +9652,6 @@ static void lsfit_logisticfitinternal(RVector *x, RVector *y, ae_int_t n, bool i
             }
          }
       } else ae_assert(false, "LogisticFitX: internal error");
-   }
    minlmresultsbuf(state, p1, replm);
    ae_assert(replm->terminationtype > 0, "LogisticFitX: internal error");
 }
@@ -12547,7 +12544,7 @@ Spawn:
       }
    }
 // Optimize
-   while (minlmiteration(&state->optstate)) {
+   while (minlmiteration(&state->optstate))
       if (state->optstate.needfi) {
       // calculate f[] = wi*(f(xi,c)-yi)
          for (i = 0; i < n; i++) {
@@ -12631,7 +12628,6 @@ Spawn:
          state->f = state->optstate.f;
          state->xupdated = true, state->PQ = 8; goto Pause; Resume8: state->xupdated = false;
       }
-   }
 // Extract results
 //
 // NOTE: reverse communication protocol used by this unit does NOT
@@ -13827,7 +13823,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
       minlmsetscale(&lmstate, &scr);
       minlmsetbc(&lmstate, &bl, &bu);
       minlmsetcond(&lmstate, epsx, maxits);
-      while (minlmiteration(&lmstate)) {
+      while (minlmiteration(&lmstate))
          if (lmstate.needfij || lmstate.needfi) {
             rep->nfev++;
             for (i = 0; i < npoints; i++) {
@@ -13844,7 +13840,6 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                }
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minlmresults(&lmstate, &pcr, &lmrep);
       ae_assert(lmrep.terminationtype > 0, "FitSphereX: unexpected failure of LM solver");
       rep->iterationscount += lmrep.iterationscount;
@@ -13899,7 +13894,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
          } else {
             minnlcsetalgoslp(&nlcstate);
          }
-         for (minnlcrestartfrom(&nlcstate, &pcr); minnlciteration(&nlcstate); ) {
+         for (minnlcrestartfrom(&nlcstate, &pcr); minnlciteration(&nlcstate); )
             if (nlcstate.needfij) {
                rep->nfev++;
                nlcstate.fi.xR[0] = vhi * nlcstate.x.xR[nx + 1] - vlo * nlcstate.x.xR[nx];
@@ -13943,7 +13938,6 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                   ae_assert(suboffset == cpr, "Assertion failed");
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&nlcstate, &pcr, &nlcrep);
          ae_assert(nlcrep.terminationtype > 0, "FitSphereX: unexpected failure of NLC solver");
          rep->iterationscount += nlcrep.iterationscount;
@@ -14040,7 +14034,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                prevc.xR[j] = pcr.xR[j];
             }
             minbleicsetlc(&blcstate, &cmatrix, &ct, cpr * npoints);
-            for (minbleicrestartfrom(&blcstate, &pcr); minbleiciteration(&blcstate); ) {
+            for (minbleicrestartfrom(&blcstate, &pcr); minbleiciteration(&blcstate); )
                if (blcstate.needfg) {
                   rep->nfev++;
                   blcstate.f = vhi * blcstate.x.xR[nx + 1] - vlo * blcstate.x.xR[nx];
@@ -14050,7 +14044,6 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                   blcstate.g.xR[nx] = -1 * vlo;
                   blcstate.g.xR[nx + 1] = 1 * vhi;
                }
-            }
             minbleicresults(&blcstate, &pcr, &blcrep);
             ae_assert(blcrep.terminationtype > 0, "FitSphereX: unexpected failure of BLEIC solver");
             rep->iterationscount += blcrep.iterationscount;
@@ -20081,7 +20074,7 @@ static void spline2d_blockllsfit(spline2dxdesignmatrix *xdesign, ae_int_t lsqrcn
       linlsqrrestart(&buf->solver);
       linlsqrsetb(&buf->solver, &buf->tmp0);
       linlsqrsetcond(&buf->solver, 1.0E-14, 1.0E-14, lsqrcnt);
-      while (linlsqriteration(&buf->solver)) {
+      while (linlsqriteration(&buf->solver))
          if (buf->solver.needmv) {
          // Use Cholesky factorization of the system matrix
          // as preconditioner: solve TRSV(U,Solver.X)
@@ -20097,7 +20090,6 @@ static void spline2d_blockllsfit(spline2dxdesignmatrix *xdesign, ae_int_t lsqrcn
          // Multiply by preconditioner: solve TRSV(U',A*Solver.X)
             spline2d_blockllstrsv(&buf->blockata, kx, ky, true, &buf->solver.mtv);
          }
-      }
    // Get results and post-multiply by preconditioner to get
    // original variables.
       linlsqrresults(&buf->solver, &buf->tmp1, &buf->solverrep);
@@ -21238,7 +21230,7 @@ static void spline2d_naivellsfit(sparsematrix *av, sparsematrix *ah, ae_int_t ar
          }
          linlsqrsetb(&solver, &tmp0);
          linlsqrsetcond(&solver, 1.0E-14, 1.0E-14, lsqrcnt);
-         while (linlsqriteration(&solver)) {
+         while (linlsqriteration(&solver))
             if (solver.needmv) {
             // Use Cholesky factorization of the system matrix
             // as preconditioner: solve TRSV(U,Solver.X)
@@ -21254,7 +21246,6 @@ static void spline2d_naivellsfit(sparsematrix *av, sparsematrix *ah, ae_int_t ar
             // Multiply by preconditioner: solve TRSV(U',A*Solver.X)
                rmatrixtrsv(kx * ky, &ata, 0, 0, true, false, 1, &solver.mtv, 0);
             }
-         }
          linlsqrresults(&solver, &tmp1, &solverrep);
          rmatrixtrsv(kx * ky, &ata, 0, 0, true, false, 0, &tmp1, 0);
          for (i = 0; i < kx * ky; i++) {
@@ -23871,7 +23862,7 @@ void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scaleve
          linlsqrsetb(&linstate, &denseb1);
          linlsqrrestart(&linstate);
          linlsqrsetxrep(&linstate, true);
-         while (linlsqriteration(&linstate)) {
+         while (linlsqriteration(&linstate))
             if (*terminationrequest) {
             // Request for termination was submitted, terminate immediately
                rbfv2_zerofill(s, nx, ny, bf);
@@ -23879,8 +23870,7 @@ void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scaleve
                *progress10000 = 10000;
                ae_frame_leave();
                return;
-            }
-            if (linstate.needmv) {
+            } else if (linstate.needmv) {
                for (i = 0; i < nbasis; i++) {
                   tmpx.xR[i] = prec.xR[i] * linstate.x.xR[i];
                }
@@ -23903,7 +23893,6 @@ void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scaleve
                ae_assert(*progress10000 <= iround(rprogress) + 1, "HRBF: integrity check failed (progress indicator) even after +1 safeguard correction");
                *progress10000 = iround(rprogress);
             } else ae_assert(false, "HRBF: unexpected request from LSQR solver");
-         }
          linlsqrresults(&linstate, &densew1, &lsqrrep);
          ae_assert(lsqrrep.terminationtype > 0, "RBFV2BuildHierarchical: integrity check failed");
          for (i = 0; i < nbasis; i++) {

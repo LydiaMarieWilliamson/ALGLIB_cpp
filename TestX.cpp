@@ -126,23 +126,19 @@ void func505_grad(const real_1d_array &x, double &func, real_1d_array &grad, voi
    try {
       grad = "[0,1]";
       issue505Ok = false;
-   } catch(...) {
-   }
+   } catch(...) { }
    try {
       grad = z;
       issue505Ok = false;
-   } catch(...) {
-   }
+   } catch(...) { }
    try {
       grad.setlength(10);
       issue505Ok = false;
-   } catch(...) {
-   }
+   } catch(...) { }
    try {
       grad.setlength(1);
       issue505Ok = false;
-   } catch(...) {
-   }
+   } catch(...) { }
 //
 // This block actually calculates function/gradient
 //
@@ -180,29 +176,24 @@ void func505_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
    try {
       jac = "[[0]]";
       issue505Ok = false;
-   } catch(...) {
-   }
+   } catch(...) { }
    try {
       jac = "[[0,0],[1,1]]";
       issue505Ok = false;
-   } catch(...) {
-   }
+   } catch(...) { }
    try {
       z = "[[0,1]]";
       jac = z;
       issue505Ok = false;
-   } catch(...) {
-   }
+   } catch(...) { }
    try {
       jac.setlength(10, 6);
       issue505Ok = false;
-   } catch(...) {
-   }
+   } catch(...) { }
    try {
       jac.setlength(2, 1);
       issue505Ok = false;
-   } catch(...) {
-   }
+   } catch(...) { }
 //
 // This block actually calculates function/gradient
 //
@@ -234,8 +225,8 @@ void file_put_contents(const char *filename, const char *contents) {
 }
 
 struct async_rbf_record {
-   rbfmodel * p_model;
-   rbfreport * p_report;
+   rbfmodel *p_model;
+   rbfreport *p_report;
    bool thread_finished;
 };
 
@@ -330,7 +321,7 @@ int main() {
          a0[0] = a0_orig;
       // operations on constant arrays
          {
-            const boolean_1d_array & ac = arr_6;
+            const boolean_1d_array &ac = arr_6;
             Ok = Ok && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
             Ok = Ok && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
             const bool *p = ac.getcontent();
@@ -438,8 +429,7 @@ int main() {
          arr_5.setlength(99);
          Ok = Ok && arr_5.length() == 99;
       // setcontent/getcontent
-         ae_int_t a0[] = {
-         2, 3, 1, 9, 2};
+         ae_int_t a0[] = { 2, 3, 1, 9, 2 };
          ae_int_t a0_mod = 7;
          ae_int_t a0_orig = 2;
          ae_int_t *p6;
@@ -454,7 +444,7 @@ int main() {
          a0[0] = a0_orig;
       // operations on constant arrays
          {
-            const integer_1d_array & ac = arr_6;
+            const integer_1d_array &ac = arr_6;
             Ok = Ok && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
             Ok = Ok && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
             const ae_int_t *p = ac.getcontent();
@@ -580,7 +570,7 @@ int main() {
          a0[0] = a0_orig;
       // operations on constant arrays
          {
-            const real_1d_array & ac = arr_6;
+            const real_1d_array &ac = arr_6;
             Ok = Ok && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
             Ok = Ok && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
             const double *p = ac.getcontent();
@@ -753,8 +743,7 @@ int main() {
          arr_5.setlength(99);
          Ok = Ok && arr_5.length() == 99;
       // setcontent/getcontent
-         complex a0[] = {
-         2, 3.5, 1, 9.125, 2};
+         complex a0[] = { 2, 3.5, 1, 9.125, 2 };
          complex a0_mod = 7;
          complex a0_orig = 2;
          complex *p6;
@@ -769,7 +758,7 @@ int main() {
          a0[0] = a0_orig;
       // operations on constant arrays
          {
-            const complex_1d_array & ac = arr_6;
+            const complex_1d_array &ac = arr_6;
             Ok = Ok && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
             Ok = Ok && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
             const complex *p = ac.getcontent();
@@ -926,7 +915,7 @@ int main() {
                a0[0] = r;
             // operations on constant arrays
                {
-                  const real_2d_array & ac = arr_6;
+                  const real_2d_array &ac = arr_6;
                   for (i = 0; i < m; i++)
                      for (j = 0; j < n; j++) {
                         Ok = Ok && ac[i][j] == a0[i * n + j];
@@ -943,7 +932,7 @@ int main() {
       // * attempts to call setlength() must fail even when new size match original size
       //   of the array
       //
-         {      // test attach_to(ae_matrix*)
+         { // test attach_to(ae_matrix*)
          // subtest 0
             real_2d_array targt, acopy, acopy2;
             targt = s3;
@@ -1031,7 +1020,7 @@ int main() {
                Ok = false;
             }
          }
-         {      // test attach_to(double*)
+         { // test attach_to(double*)
          // subtest 0
             real_2d_array proxy, acopy, acopy2;
             double targt[] = { v30, v31, v32, v33, v34, v35 };
@@ -1530,17 +1519,31 @@ int main() {
          fflush(stdout);
          return 1;
       }
-//(@) Drop down to alglib_impl here, because the state and frame accesses are no longer thread-safe.
+//(@) Drop down to alglib_impl here, for now, because the state and frame accesses are no longer thread-safe.
+#   define FullMultiThreaded 0
       for (double last_progress = 0.0; last_progress < 0.001; ) {
+#   if FullMultiThreaded
+         double new_progress = rbfpeekprogress(rbf);
+#   else
          double new_progress = alglib_impl::rbfpeekprogress(rbf.c_ptr());
+#   endif
          Ok = Ok && new_progress >= last_progress && new_progress <= 0.1; // We expect to terminate well before reaching 10%.
          last_progress = new_progress;
       }
+#   if FullMultiThreaded
+      rbfrequesttermination(rbf);
+#   else
       alglib_impl::rbfrequesttermination(rbf.c_ptr());
+#   endif
       while (!async_rec.thread_finished) {
+#   if FullMultiThreaded
+         double new_progress = rbfpeekprogress(rbf);
+#   else
          double new_progress = alglib_impl::rbfpeekprogress(rbf.c_ptr());
+#   endif
          Ok = Ok && (new_progress <= 0.1 || new_progress == 1.0); // We expect to terminate well before reaching 10%.
       }
+#   undef FullMultiThreaded
       Ok = Ok && rbfpeekprogress(rbf) == 1;
       Ok = Ok && rep.terminationtype == 8;
       Ok = Ok && rbfcalc2(rbf, hqrndnormal(rs), hqrndnormal(rs)) == 0.0;
@@ -1562,7 +1565,7 @@ int main() {
 #ifdef AE_USE_ALLOC_COUNTER
       bool Ok = true;
       bool were_exceptions = false;
-      for (int eidx = 0;; eidx++)       // loop is terminated when we survive through all the tests
+      for (int eidx = 0;; eidx++) // loop is terminated when we survive through all the tests
       {
       //
       // Select moment when we generate exception in the constructor
@@ -1667,7 +1670,7 @@ int main() {
             were_exceptions = true;
          }
       }
-      alglib_impl::_malloc_failure_after = 0;   // turn off artificial malloc failures
+      alglib_impl::_malloc_failure_after = 0; // turn off artificial malloc failures
       printf(fmt_str, "* Exceptions in constructors", were_exceptions ? (Ok ? "Ok" : "Failed") : "..");
       fflush(stdout);
       if (!Ok)
@@ -1711,47 +1714,47 @@ int main() {
                t0 = alglib_impl::tickcount();
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_default += alglib_impl::tickcount() - t0;
-               _ae_set_global_threading(default_global_threading);      // restore
+               _ae_set_global_threading(default_global_threading); // restore
             // global serial
                t0 = alglib_impl::tickcount();
                setglobalthreading(SerTH);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_ser += alglib_impl::tickcount() - t0;
-               _ae_set_global_threading(default_global_threading);      // restore
+               _ae_set_global_threading(default_global_threading); // restore
             // global parallel
                t0 = alglib_impl::tickcount();
                setglobalthreading(ParTH);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp += alglib_impl::tickcount() - t0;
-               _ae_set_global_threading(default_global_threading);      // restore
+               _ae_set_global_threading(default_global_threading); // restore
             // global serial, local serial
                t0 = alglib_impl::tickcount();
                setglobalthreading(SerTH);
                alglib_impl::ae_state_set_flags(SerTH);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_ser_loc_ser += alglib_impl::tickcount() - t0;
-               _ae_set_global_threading(default_global_threading);      // restore
+               _ae_set_global_threading(default_global_threading); // restore
             // global serial, local parallel
                t0 = alglib_impl::tickcount();
                setglobalthreading(SerTH);
                alglib_impl::ae_state_set_flags(ParTH);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_ser_loc_smp += alglib_impl::tickcount() - t0;
-               _ae_set_global_threading(default_global_threading);      // restore
+               _ae_set_global_threading(default_global_threading); // restore
             // global parallel, local serial
                t0 = alglib_impl::tickcount();
                setglobalthreading(ParTH);
                alglib_impl::ae_state_set_flags(SerTH);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp_loc_ser += alglib_impl::tickcount() - t0;
-               _ae_set_global_threading(default_global_threading);      // restore
+               _ae_set_global_threading(default_global_threading); // restore
             // global parallel, local parallel
                t0 = alglib_impl::tickcount();
                setglobalthreading(ParTH);
                alglib_impl::ae_state_set_flags(ParTH);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp_loc_smp += alglib_impl::tickcount() - t0;
-               _ae_set_global_threading(default_global_threading);      // restore
+               _ae_set_global_threading(default_global_threading); // restore
             // global parallel, nworkers=1
                t0 = alglib_impl::tickcount();
                setglobalthreading(ParTH);
@@ -1759,7 +1762,7 @@ int main() {
                setnworkers(1);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp_nw1 += alglib_impl::tickcount() - t0;
-               _ae_set_global_threading(default_global_threading);      // restore
+               _ae_set_global_threading(default_global_threading); // restore
                setnworkers(default_nworkers);
             }
          } catch(ap_error) {

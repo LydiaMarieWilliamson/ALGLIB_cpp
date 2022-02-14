@@ -19959,7 +19959,7 @@ void mcpdsolve(mcpdstate *s) {
    minbleicsetcond(&s->bs, 0.0, 0.0, mcpd_xtol, 0);
    minbleicsetprecdiag(&s->bs, &s->h);
 // solve problem
-   for (minbleicrestartfrom(&s->bs, &s->tmpp); minbleiciteration(&s->bs); ) {
+   for (minbleicrestartfrom(&s->bs, &s->tmpp); minbleiciteration(&s->bs); )
       if (s->bs.needfg) {
       // Calculate regularization term
          s->bs.f = 0.0;
@@ -19982,7 +19982,6 @@ void mcpdsolve(mcpdstate *s) {
             }
          }
       } else ae_assert(false, "MCPDSolve: internal error");
-   }
    minbleicresultsbuf(&s->bs, &s->tmpp, &s->br);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
@@ -20356,7 +20355,7 @@ void mnlprocessi(logitmodel *lm, RVector *x, RVector *y) {
 }
 
 // The purpose of logit_mnlmcsrch() is to find a step which satisfies a sufficient decrease condition and a curvature condition.
-// At each stage the subroutine updates an uncertainty interval with endpoints state->stx and state->sty.
+// At each stage the subroutine updates an uncertainty interval with the state members stx and sty as the endpoints.
 // The uncertainty interval is initially chosen so that it contains a minimizer of the modified function
 //	F(x + *stp s) - F(x) - ftol *stp (F'(x)^T s).
 // If a step is obtained for which the modified function has a non-positive function value and non-negative derivative,
@@ -20365,7 +20364,7 @@ void mnlprocessi(logitmodel *lm, RVector *x, RVector *y) {
 // The algorithm is designed to find a step which satisfies the sufficient decrease condition
 //	F(x + *stp s) <= F(x) + ftol *stp (F'(x)^T s),
 // and the curvature condition
-//	|F'(x + *stp s)^T s| <= gtol |F'(x)' s|.
+//	|F'(x + *stp s)^T s| <= gtol |F'(x)^T s|.
 // If ftol < gtol and if, for example, the function is bounded below, then there is always a step which satisfies both conditions.
 // If no step can be found which satisfies both conditions,
 // then the algorithm usually stops when rounding errors prevent further progress.
@@ -20395,7 +20394,7 @@ void mnlprocessi(logitmodel *lm, RVector *x, RVector *y) {
 //			The tolerances may be too small.
 // *	*nfev:	The number of function calls; accessed via the pointer nfev.
 // *	maxfev:	The number of function calls allowed for the algorithm; maxfev > 0.
-// *	wa:	A n-vector for work space.
+// *	wa:	An n-vector for work space.
 // *	state:	The algorithm state.
 // *	*stage:	The algorithm stage; accessed via the pointer stage.
 // Argonne National Laboratory. MINPACK Project. 1983 June.
@@ -20405,7 +20404,7 @@ static bool logit_mnlmcsrch(ae_int_t n, RVector *x, double f, RVector *g, RVecto
    const ae_int_t maxfev = 20;
    const double stpmin = 0.01, stpmax = 100000.0;
    double v;
-// init
+// Initialize.
    const double p5 = 0.5;
    const double p66 = 0.66;
    state->xtrapf = 4.0;
@@ -20420,7 +20419,7 @@ static bool logit_mnlmcsrch(ae_int_t n, RVector *x, double f, RVector *g, RVecto
       default: goto Exit;
    }
 Spawn:
-// Main cycle
+// The main cycle.
 #if 0
 // Next.
    *stage = 2;
@@ -20702,8 +20701,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
       wstep = sqrt(v);
       v = 1 / sqrt(v);
       ae_v_muld(wdir.xR, 1, wcount, v);
-      mcstage = 0;
-      while (logit_mnlmcsrch(wcount, &network.weights, e, &g, &wdir, &wstep, &mcinfo, &mcnfev, &work, &mcstate, &mcstage)) {
+      for (mcstage = 0; logit_mnlmcsrch(wcount, &network.weights, e, &g, &wdir, &wstep, &mcinfo, &mcnfev, &work, &mcstate, &mcstage); ) {
          mlpgradnbatch(&network, xy, npoints, &e, &g);
          v = ae_v_dotproduct(network.weights.xR, 1, network.weights.xR, 1, wcount);
          e += 0.5 * decay * v;
@@ -20744,8 +20742,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
       wstep = sqrt(v);
       v = 1 / sqrt(v);
       ae_v_muld(wdir.xR, 1, wcount, v);
-      mcstage = 0;
-      while (logit_mnlmcsrch(wcount, &network.weights, e, &g, &wdir, &wstep, &mcinfo, &mcnfev, &work, &mcstate, &mcstage)) {
+      for (mcstage = 0; logit_mnlmcsrch(wcount, &network.weights, e, &g, &wdir, &wstep, &mcinfo, &mcnfev, &work, &mcstate, &mcstage); ) {
          mlpgradnbatch(&network, xy, npoints, &e, &g);
          v = ae_v_dotproduct(network.weights.xR, 1, network.weights.xR, 1, wcount);
          e += 0.5 * decay * v;
@@ -22905,7 +22902,7 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
       minlbfgscreate(wcount, imin2(wcount, 10), &w, &state);
       minlbfgssetcond(&state, 0.0, 0.0, wstep, 0);
       minlbfgssetxrep(&state, true);
-      while (minlbfgsiteration(&state)) {
+      while (minlbfgsiteration(&state))
          if (state.needfg) { // Calculate gradient
             ae_v_move(network->weights.xR, 1, state.x.xR, 1, wcount);
             mlpgradnbatch(network, trnxy, trnsize, &state.f, &state.g);
@@ -22927,7 +22924,6 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
             }
             itcnt++;
          }
-      }
       minlbfgsresults(&state, &w, &internalrep);
    // Compare with final answer
       if (ebest < efinal) {

@@ -25772,7 +25772,8 @@ static ae_int_t rcond_internalcomplexrcondicmax1(CVector *x, ae_int_t n) {
 }
 
 // Internal subroutine for matrix norm estimation
-//
+// Return Value:
+// *	The condition (*kase != 0), indicating that iteration is in progress.
 //   -- LAPACK auxiliary routine (version 3.0) --
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
@@ -25806,7 +25807,7 @@ Spawn:
    for (i = 1; i <= n; i++) {
       x->xR[i] = t;
    }
-   *kase = 1; jump = 1; goto Pause; Resume1: // FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X.
+   *kase = 1; jump = 1; goto Pause; Resume1: // The first iteration: x was updated to A x.
    if (n == 1) {
       v->xR[1] = x->xR[1];
       *est = fabs(v->xR[1]);
@@ -25824,21 +25825,21 @@ Spawn:
       }
       isgn->xZ[i] = sign(x->xR[i]);
    }
-   *kase = 2; jump = 2; goto Pause; Resume2: // FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY TRANDPOSE(A)*X.
+   *kase = 2; jump = 2; goto Pause; Resume2: // The first iteration: x was updated to A^T x.
    j = 1;
    for (i = 2; i <= n; i++) {
       if (fabs(x->xR[i]) > fabs(x->xR[j])) {
          j = i;
       }
    }
+// The main loop: iterations 2, 3, ..., itmax.
    iter = 2;
-// MAIN LOOP - ITERATIONS 2,3,...,ITMAX.
    do {
       for (i = 1; i <= n; i++) {
          x->xR[i] = 0.0;
       }
       x->xR[j] = 1.0;
-      *kase = 1; jump = 3; goto Pause; Resume3: // X HAS BEEN OVERWRITTEN BY A*X.
+      *kase = 1; jump = 3; goto Pause; Resume3: // x was updated to A x.
       ae_v_move(&v->xR[1], 1, &x->xR[1], 1, n);
       estold = *est;
       *est = 0.0;
@@ -25851,8 +25852,7 @@ Spawn:
             flg = true;
          }
       }
-   // REPEATED SIGN VECTOR DETECTED, HENCE ALGORITHM HAS CONVERGED.
-   // OR MAY BE CYCLING.
+   // A repeated sign vector was detected, hence the algorithm has converged; or it may be cycling.
       if (!flg || *est <= estold) break;
       for (i = 1; i <= n; i++) {
          if (x->xR[i] >= 0.0) {
@@ -25863,7 +25863,7 @@ Spawn:
             isgn->xZ[i] = -1;
          }
       }
-      *kase = 2; jump = 4; goto Pause; Resume4: // X HAS BEEN OVERWRITTEN BY TRANDPOSE(A)*X.
+      *kase = 2; jump = 4; goto Pause; Resume4: // x was updated to A^T x.
       jlast = j;
       j = 1;
       for (i = 2; i <= n; i++) {
@@ -25872,13 +25872,13 @@ Spawn:
          }
       }
    } while (x->xR[jlast] != fabs(x->xR[j]) && iter++ < itmax);
-// ITERATION COMPLETE.  FINAL STAGE.
+// The iteration is complete: final stage.
    altsgn = 1.0;
    for (i = 1; i <= n; i++) {
       x->xR[i] = altsgn * (1 + (double)(i - 1) / (n - 1));
       altsgn = -altsgn;
    }
-   *kase = 1; jump = 5; goto Pause; Resume5: // X HAS BEEN OVERWRITTEN BY A*X.
+   *kase = 1; jump = 5; goto Pause; Resume5: // x was updated to A x.
    temp = 0.0;
    for (i = 1; i <= n; i++) {
       temp += fabs(x->xR[i]);
@@ -25896,7 +25896,7 @@ Pause:
 }
 
 static bool rcond_cmatrixestimatenorm(ae_int_t n, CVector *v, CVector *x, double *est, ae_int_t *kase) {
-   AutoS ae_int_t i;
+   ae_int_t i;
    AutoS ae_int_t iter;
    AutoS ae_int_t j;
    AutoS ae_int_t jlast;
@@ -25923,7 +25923,7 @@ Spawn:
    for (i = 1; i <= n; i++) {
       x->xC[i] = complex_from_d(1.0 / n);
    }
-   *kase = 1; jump = 1; goto Pause; Resume1: // FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY A*X.
+   *kase = 1; jump = 1; goto Pause; Resume1: // The first iteration: x was updated to A x.
    if (n == 1) {
       v->xC[1] = x->xC[1];
       *est = abscomplex(v->xC[1]);
@@ -25938,23 +25938,21 @@ Spawn:
          x->xC[i] = complex_from_i(1);
       }
    }
-   *kase = 2; jump = 2; goto Pause; Resume2: // FIRST ITERATION.  X HAS BEEN OVERWRITTEN BY CTRANS(A)*X.
+   *kase = 2; jump = 2; goto Pause; Resume2: // The first iteration: x was updated to A^T x.
    j = rcond_internalcomplexrcondicmax1(x, n);
+// The main loop: iterations 2, 3, ..., itmax.
    iter = 2;
    do {
-   // MAIN LOOP - ITERATIONS 2,3,...,ITMAX.
       for (i = 1; i <= n; i++) {
          x->xC[i] = complex_from_i(0);
       }
       x->xC[j] = complex_from_i(1);
-      *kase = 1; jump = 3; goto Pause; Resume3: // X HAS BEEN OVERWRITTEN BY A*X.
+      *kase = 1; jump = 3; goto Pause; Resume3: // x was updated to A x.
       ae_v_cmove(&v->xC[1], 1, &x->xC[1], 1, "N", n);
       estold = *est;
       *est = rcond_internalcomplexrcondscsum1(v, n);
-   // TEST FOR CYCLING.
-      if (*est <= estold) {
-         break;
-      }
+   // Test for cycling.
+      if (*est <= estold) break;
       for (i = 1; i <= n; i++) {
          absxi = abscomplex(x->xC[i]);
          if (absxi > safmin) {
@@ -25963,17 +25961,17 @@ Spawn:
             x->xC[i] = complex_from_i(1);
          }
       }
-      *kase = 2; jump = 4; goto Pause; Resume4: // X HAS BEEN OVERWRITTEN BY CTRANS(A)*X.
+      *kase = 2; jump = 4; goto Pause; Resume4: // x was updated to A^T x.
       jlast = j;
       j = rcond_internalcomplexrcondicmax1(x, n);
    } while (abscomplex(x->xC[jlast]) != abscomplex(x->xC[j]) && iter++ < itmax);
-// ITERATION COMPLETE.  FINAL STAGE.
+// The iteration is complete: final stage.
    altsgn = 1.0;
    for (i = 1; i <= n; i++) {
       x->xC[i] = complex_from_d(altsgn * (1 + (double)(i - 1) / (n - 1)));
       altsgn = -altsgn;
    }
-   *kase = 1; jump = 5; goto Pause; Resume5: // X HAS BEEN OVERWRITTEN BY A*X.
+   *kase = 1; jump = 5; goto Pause; Resume5: // x was updated to A x.
    temp = 2 * (rcond_internalcomplexrcondscsum1(x, n) / (3 * n));
    if (temp > *est) {
       ae_v_cmove(&v->xC[1], 1, &x->xC[1], 1, "N", n);
@@ -26058,8 +26056,7 @@ static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, b
    }
 // Estimate the norm of inv(A).
    ainvnm = 0.0;
-   kase = 0;
-   while (rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase)) {
+   for (kase = 0; rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase); ) {
    // from 1-based array to 0-based
       for (i = 0; i < n; i++) {
          ex.xR[i] = ex.xR[i + 1];
@@ -26168,8 +26165,7 @@ static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, b
    } else {
       kase1 = 2;
    }
-   kase = 0;
-   while (rcond_cmatrixestimatenorm(n, &cwork4, &ex, &ainvnm, &kase)) {
+   for (kase = 0; rcond_cmatrixestimatenorm(n, &cwork4, &ex, &ainvnm, &kase); ) {
    // From 1-based to 0-based
       for (i = 0; i < n; i++) {
          ex.xC[i] = ex.xC[i + 1];
@@ -26251,9 +26247,8 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
    sa = 1 / sa;
 // Estimate the norm of A.
    if (!isnormprovided) {
-      kase = 0;
       anorm = 0.0;
-      while (rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &anorm, &kase)) {
+      for (kase = 0; rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &anorm, &kase); )
          if (isupper) {
          // Multiply by U
             for (i = 1; i <= n; i++) {
@@ -26289,7 +26284,6 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
             }
             ae_v_muld(&ex.xR[1], 1, n, sa);
          }
-      }
    }
 // Quick return if possible
    if (anorm == 0.0) {
@@ -26302,8 +26296,7 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
       return;
    }
 // Estimate the 1-norm of inv(A).
-   kase = 0;
-   while (rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase)) {
+   for (kase = 0; rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase); ) {
       for (i = 0; i < n; i++) {
          ex.xR[i] = ex.xR[i + 1];
       }
@@ -26392,8 +26385,7 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
 // Estimate the norm of A
    if (!isnormprovided) {
       anorm = 0.0;
-      kase = 0;
-      while (rcond_cmatrixestimatenorm(n, &ev, &ex, &anorm, &kase)) {
+      for (kase = 0; rcond_cmatrixestimatenorm(n, &ev, &ex, &anorm, &kase); )
          if (isupper) {
          // Multiply by U
             for (i = 1; i <= n; i++) {
@@ -26429,7 +26421,6 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
             }
             ae_v_cmuld(&ex.xC[1], 1, n, sa);
          }
-      }
    }
 // Quick return if possible
 // After this block we assume that ANORM != 0
@@ -26444,8 +26435,7 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
    }
 // Estimate the norm of inv(A).
    ainvnm = 0.0;
-   kase = 0;
-   while (rcond_cmatrixestimatenorm(n, &ev, &ex, &ainvnm, &kase)) {
+   for (kase = 0; rcond_cmatrixestimatenorm(n, &ev, &ex, &ainvnm, &kase); ) {
       for (i = 0; i < n; i++) {
          ex.xC[i] = ex.xC[i + 1];
       }
@@ -26543,9 +26533,8 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
    sl = 1 / sl;
 // Estimate the norm of A.
    if (!isanormprovided) {
-      kase = 0;
       anorm = 0.0;
-      while (rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &anorm, &kase)) {
+      for (kase = 0; rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &anorm, &kase); )
          if (kase == kase1) {
          // Multiply by U
             for (i = 1; i <= n; i++) {
@@ -26584,7 +26573,6 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
             }
             ae_v_move(&ex.xR[1], 1, tmp.xR, 1, n);
          }
-      }
    }
 // Scale according to SU/SL
    anorm *= su * sl;
@@ -26601,8 +26589,7 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
    }
 // Estimate the norm of inv(A).
    ainvnm = 0.0;
-   kase = 0;
-   while (rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase)) {
+   for (kase = 0; rcond_rmatrixestimatenorm(n, &ev, &ex, &iwork, &ainvnm, &kase); ) {
    // from 1-based array to 0-based
       for (i = 0; i < n; i++) {
          ex.xR[i] = ex.xR[i + 1];
@@ -26706,46 +26693,42 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
       } else {
          kase1 = 2;
       }
-      kase = 0;
-      do {
-         if (rcond_cmatrixestimatenorm(n, &cwork4, &ex, &anorm, &kase)) {
-            if (kase == kase1) {
-            // Multiply by U
-               for (i = 1; i <= n; i++) {
-                  v = ae_v_cdotproduct(&lua->xyC[i - 1][i - 1], 1, "N", &ex.xC[i], 1, "N", n - i + 1);
-                  ex.xC[i] = v;
+      for (kase = 0; rcond_cmatrixestimatenorm(n, &cwork4, &ex, &anorm, &kase); )
+         if (kase == kase1) {
+         // Multiply by U
+            for (i = 1; i <= n; i++) {
+               v = ae_v_cdotproduct(&lua->xyC[i - 1][i - 1], 1, "N", &ex.xC[i], 1, "N", n - i + 1);
+               ex.xC[i] = v;
+            }
+         // Multiply by L
+            for (i = n; i >= 1; i--) {
+               v = complex_from_i(0);
+               if (i > 1) {
+                  v = ae_v_cdotproduct(lua->xyC[i - 1], 1, "N", &ex.xC[1], 1, "N", i - 1);
                }
-            // Multiply by L
-               for (i = n; i >= 1; i--) {
-                  v = complex_from_i(0);
-                  if (i > 1) {
-                     v = ae_v_cdotproduct(lua->xyC[i - 1], 1, "N", &ex.xC[1], 1, "N", i - 1);
-                  }
-                  ex.xC[i] = ae_c_add(v, ex.xC[i]);
+               ex.xC[i] = ae_c_add(v, ex.xC[i]);
+            }
+         } else {
+         // Multiply by L'
+            for (i = 1; i <= n; i++) {
+               cwork2.xC[i] = complex_from_i(0);
+            }
+            for (i = 1; i <= n; i++) {
+               v = ex.xC[i];
+               if (i > 1) {
+                  ae_v_caddc(&cwork2.xC[1], 1, lua->xyC[i - 1], 1, "Conj", i - 1, v);
                }
-            } else {
-            // Multiply by L'
-               for (i = 1; i <= n; i++) {
-                  cwork2.xC[i] = complex_from_i(0);
-               }
-               for (i = 1; i <= n; i++) {
-                  v = ex.xC[i];
-                  if (i > 1) {
-                     ae_v_caddc(&cwork2.xC[1], 1, lua->xyC[i - 1], 1, "Conj", i - 1, v);
-                  }
-                  cwork2.xC[i] = ae_c_add(cwork2.xC[i], v);
-               }
-            // Multiply by U'
-               for (i = 1; i <= n; i++) {
-                  ex.xC[i] = complex_from_i(0);
-               }
-               for (i = 1; i <= n; i++) {
-                  v = cwork2.xC[i];
-                  ae_v_caddc(&ex.xC[i], 1, &lua->xyC[i - 1][i - 1], 1, "Conj", n - i + 1, v);
-               }
+               cwork2.xC[i] = ae_c_add(cwork2.xC[i], v);
+            }
+         // Multiply by U'
+            for (i = 1; i <= n; i++) {
+               ex.xC[i] = complex_from_i(0);
+            }
+            for (i = 1; i <= n; i++) {
+               v = cwork2.xC[i];
+               ae_v_caddc(&ex.xC[i], 1, &lua->xyC[i - 1][i - 1], 1, "Conj", n - i + 1, v);
             }
          }
-      } while (kase != 0);
    }
 // Scale according to SU/SL
    anorm *= su * sl;
@@ -26761,8 +26744,7 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
    } else {
       kase1 = 2;
    }
-   kase = 0;
-   while (rcond_cmatrixestimatenorm(n, &cwork4, &ex, &ainvnm, &kase)) {
+   for (kase = 0; rcond_cmatrixestimatenorm(n, &cwork4, &ex, &ainvnm, &kase); ) {
    // From 1-based to 0-based
       for (i = 0; i < n; i++) {
          ex.xC[i] = ex.xC[i + 1];
@@ -28578,10 +28560,9 @@ void normestimatorrestart(normestimatorstate *state) {
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
 // API: void normestimatorestimatesparse(const normestimatorstate &state, const sparsematrix &a);
 void normestimatorestimatesparse(normestimatorstate *state, sparsematrix *a) {
-   for (normestimatorrestart(state); normestimatoriteration(state); ) {
+   for (normestimatorrestart(state); normestimatoriteration(state); )
       if (state->needmv) sparsemv(a, &state->x, &state->mv);
       else if (state->needmtv) sparsemtv(a, &state->x, &state->mtv);
-   }
 }
 
 // Matrix norm estimation results

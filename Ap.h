@@ -210,7 +210,7 @@ typedef struct ae_dyn_block ae_frame;
 void ae_state_set_break_jump(jmp_buf *buf);
 void ae_state_set_flags(ae_uint64_t flags);
 
-void ae_frame_make(ae_frame *tmp);
+void ae_frame_make(ae_frame *Fr);
 void ae_frame_leave();
 
 void ae_state_init();

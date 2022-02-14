@@ -6924,7 +6924,7 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
       bracktbound = *brackt;
       double theta = 3 * (*fx - fp) / (*stp - *stx) + *dx + dp;
       double s = rmax2(fabs(theta), rmax2(fabs(*dx), fabs(dp)));
-   // The case gamma == 0 only arises if the cubic does not tend to infinity in the direction of the step.
+   // The case gamma == 0.0 only arises if the cubic does not tend to infinity in the direction of the step.
       double gamma = s * sqrt(rmax2(0.0, sqr(theta / s) - *dx / s * (dp / s)));
       if (*stp > *stx) gamma = -gamma;
       double r = (gamma - dp + theta) / (gamma - dp + gamma + *dx);
@@ -6967,7 +6967,7 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
 }
 
 // The purpose of mcsrch() is to find a step which satisfies a sufficient decrease condition and a curvature condition.
-// At each stage the subroutine updates an uncertainty interval with endpoints state->stx and state->sty.
+// At each stage the subroutine updates an uncertainty interval with the state members stx and sty as the endpoints.
 // The uncertainty interval is initially chosen so that it contains a minimizer of the modified function
 //	F(x + *stp s) - F(x) - ftol *stp (F'(x)^T s).
 // If a step is obtained for which the modified function has a non-positive function value and non-negative derivative,
@@ -6976,7 +6976,7 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
 // The algorithm is designed to find a step which satisfies the sufficient decrease condition
 //	F(x + *stp s) <= F(x) + ftol *stp (F'(x)^T s),
 // and the curvature condition
-//	|F'(x + *stp s)^T s| <= gtol |F'(x)' s|.
+//	|F'(x + *stp s)^T s| <= gtol |F'(x)^T s|.
 // If ftol < gtol and if, for example, the function is bounded below, then there is always a step which satisfies both conditions.
 // If no step can be found which satisfies both conditions,
 // then the algorithm usually stops when rounding errors prevent further progress.
@@ -6984,13 +6984,14 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
 //
 // IMPORTANT NOTES:
 // *	This routine guarantees that it will stop at the last point where function value was calculated.
-//	It won't make several additional function evaluations after finding good point.
-//	So if you store function evaluations requested by this routine, you can be sure that last one is the point where we've stopped.
-// *	When 0 < StpMax < StpMin, algorithm will terminate with INFO == 5 and Stp == StpMax
-// *	This algorithm guarantees that, if MCINFO == 1 or MCINFO == 5, then:
-//	*	F(final_point)< F(initial_point) - strict inequality
-//	*	final_point != initial_point - after rounding to machine precision
-// *	When non-descent direction is specified, algorithm stops with MCINFO == 0, Stp == 0 and initial point at X[].
+//	It won't make several additional function evaluations after finding a good point.
+//	So if you store function evaluations requested by this routine,
+//	you can be sure that last one is the point where we've stopped.
+// *	When 0 < stpmax < stpmin, the algorithm will terminate with *info == 5 and *stp == stpmax.
+// *	This algorithm guarantees that, if *info == 1 or *info == 5, then:
+//	*	F(final_point) < F(initial_point) - strict inequality,
+//	*	final_point != initial_point - after rounding to machine precision.
+// *	When a non-descent direction is specified, algorithm stops with *info == 0, *stp == 0 and initial point at X[].
 //
 // Parameters and Inputs:
 // *	n:	The number of variables; n > 0.
@@ -6999,7 +7000,7 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
 // *	g:	An n-vector, set to F'(x) and updated to F'(x + *stp s).
 // *	s:	An n-vector indicating the search direction.
 // *	*stp:	The step estimate; *stp >= 0; updated on output; accessed via the pointer stp.
-// *	stpmin:	The minimum step size; stpmin >= 0.
+// *	stpmin:	The minimum step size; stpmin >= 0 (represented here as the constant linmin_stpmin).
 // *	stpmax:	The maximum step size; stpmax >= 0.
 // *	xtol:	The tolerance for the relative width of the uncertainty interval; xtol >= 0.
 // *	ftol:	The tolerance for sufficient decrease; ftol >= 0.
@@ -7016,9 +7017,11 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
 //			The tolerances may be too small.
 // *	*nfev:	The number of function calls; accessed via the pointer nfev.
 // *	maxfev:	The number of function calls allowed for the algorithm; maxfev > 0.
-// *	wa:	A n-vector for work space.
+// *	wa:	An n-vector for work space.
 // *	state:	The algorithm state.
 // *	*stage:	The algorithm stage; accessed via the pointer stage.
+// Return Value:
+// *	The condition (*stage != 0), indicating that iteration is in progress.
 // Argonne National Laboratory. MINPACK Project. 1983 June.
 // Jorge J. More', David J. Thuente.
 bool mcsrch(ae_int_t n, RVector *x, double f, RVector *g, RVector *s, double *stp, double stpmax, double gtol, ae_int_t *info, ae_int_t *nfev, RVector *wa, linminstate *state, ae_int_t *stage) {
@@ -7027,7 +7030,7 @@ bool mcsrch(ae_int_t n, RVector *x, double f, RVector *g, RVector *s, double *st
    const double defstpmax = 1.0E+50;
    ae_int_t i;
    double v;
-// init
+// Initialize.
    const double p5 = 0.5;
    const double p66 = 0.66;
    state->xtrapf = 4.0;
@@ -7051,7 +7054,7 @@ bool mcsrch(ae_int_t n, RVector *x, double f, RVector *g, RVector *s, double *st
       default: goto Exit;
    }
 Spawn:
-// Main cycle
+// The main cycle.
 #if 0
 // Next.
    *stage = 2;
@@ -7154,7 +7157,7 @@ Spawn:
       }
    // Check for termination.
       if (*info != 0) {
-      // Check the guarantees provided by the function for *info == 1 or *info == 5
+      // Check the guarantees provided by the function for *info == 1 or *info == 5.
          if (*info == 1 || *info == 5) {
             v = 0.0;
             for (i = 0; i < n; i++) {

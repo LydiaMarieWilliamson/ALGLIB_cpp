@@ -1890,8 +1890,7 @@ Spawn:
    state->terminationtype = -1;
    state->nfev = 0;
    state->nintervals = 0;
-// smooth function  at a finite interval
-   if (state->wrappermode == 0) {
+   if (state->wrappermode == 0) { // smooth function  at a finite interval
    // special case
       if (a == b) {
          state->terminationtype = 1;
@@ -1899,8 +1898,7 @@ Spawn:
          goto Exit;
       }
    // general case
-      autogk_autogkinternalprepare(a, b, eps, state->xwidth, &state->internalstate);
-      while (autogk_autogkinternaliteration(&state->internalstate)) {
+      for (autogk_autogkinternalprepare(a, b, eps, state->xwidth, &state->internalstate); autogk_autogkinternaliteration(&state->internalstate); ) {
          x = state->internalstate.x;
          state->x = x;
          state->xminusa = x - a;
@@ -1911,10 +1909,7 @@ Spawn:
       state->v = state->internalstate.r;
       state->terminationtype = state->internalstate.info;
       state->nintervals = state->internalstate.heapused;
-      goto Exit;
-   }
-// function with Power-law singularities at the ends of a finite interval
-   if (state->wrappermode == 1) {
+   } else if (state->wrappermode == 1) { // function with Power-law singularities at the ends of a finite interval
    // test coefficients
       if (alpha <= -1.0 || beta <= -1.0) {
          state->terminationtype = -1;
@@ -1940,8 +1935,7 @@ Spawn:
    // first, integrate left half of [a,b]:
    //     integral(f(x)dx, a, (b+a)/2) =
    //     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
-      autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + alpha), eps, state->xwidth, &state->internalstate);
-      while (autogk_autogkinternaliteration(&state->internalstate)) {
+      for (autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + alpha), eps, state->xwidth, &state->internalstate); autogk_autogkinternaliteration(&state->internalstate); ) {
       // Fill State.X, State.XMinusA, State.BMinusX.
       // Latter two are filled correctly even if B < A.
          x = state->internalstate.x;
@@ -1966,8 +1960,7 @@ Spawn:
    // then, integrate right half of [a,b]:
    //     integral(f(x)dx, (b+a)/2, b) =
    //     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
-      autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + beta), eps, state->xwidth, &state->internalstate);
-      while (autogk_autogkinternaliteration(&state->internalstate)) {
+      for (autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + beta), eps, state->xwidth, &state->internalstate); autogk_autogkinternaliteration(&state->internalstate); ) {
       // Fill State.X, State.XMinusA, State.BMinusX.
       // Latter two are filled correctly (X-A, B-X) even if B < A.
          x = state->internalstate.x;
@@ -1992,7 +1985,6 @@ Spawn:
    // final result
       state->v = s * (v1 + v2);
       state->terminationtype = 1;
-      goto Exit;
    }
 Exit:
    state->PQ = -1;

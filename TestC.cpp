@@ -17344,8 +17344,7 @@ static bool testfblsunit_testgmres() {
       eprev = maxrealnumber;
       for (itscnt = 1; itscnt <= n; itscnt++) {
       // Solve
-         fblsgmrescreate(&b, n, itscnt, &state);
-         while (fblsgmresiteration(&state)) {
+         for (fblsgmrescreate(&b, n, itscnt, &state); fblsgmresiteration(&state); ) {
             rmatrixmv(n, n, &a, 0, 0, 0, &state.x, 0, &state.ax, 0);
          }
       // Check orthonormality of Qi
@@ -17394,8 +17393,7 @@ static bool testfblsunit_testgmres() {
       // Try various iteration counts
          for (itscnt = rk; itscnt <= n; itscnt++) {
          // Solve
-            fblsgmrescreate(&b, n, itscnt, &state);
-            while (fblsgmresiteration(&state)) {
+            for (fblsgmrescreate(&b, n, itscnt, &state); fblsgmresiteration(&state); ) {
                rmatrixmv(n, n, &a, 0, 0, 0, &state.x, 0, &state.ax, 0);
             }
          // Compute residual
@@ -17420,8 +17418,7 @@ static bool testfblsunit_testgmres() {
          }
          hqrndnormalv(&rs, n, &b);
       // Try to solve
-         fblsgmrescreate(&b, n, itscnt, &state);
-         while (fblsgmresiteration(&state)) {
+         for (fblsgmrescreate(&b, n, itscnt, &state); fblsgmresiteration(&state); ) {
             rmatrixmv(n, n, &a, 0, 0, 0, &state.x, 0, &state.ax, 0);
          }
       // Test solution
@@ -17528,8 +17525,7 @@ bool testfbls() {
          ae_v_sub(tmp2.xR, 1, b.xR, 1, n);
          v = ae_v_dotproduct(tmp2.xR, 1, tmp2.xR, 1, n);
          e1 = sqrt(v);
-         fblscgcreate(&x, &b, n, &cgstate);
-         while (fblscgiteration(&cgstate)) {
+         for (fblscgcreate(&x, &b, n, &cgstate); fblscgiteration(&cgstate); ) {
             rmatrixmv(m, n, &a, 0, 0, 0, &cgstate.x, 0, &tmp1, 0);
             rmatrixmv(n, m, &a, 0, 0, 1, &tmp1, 0, &cgstate.ax, 0);
             ae_v_addd(cgstate.ax.xR, 1, cgstate.x.xR, 1, n, alpha);
@@ -17727,7 +17723,7 @@ static bool testlincgunit_complextest() {
       lincgsetrupdatefreq(&state, 2);
       numofit = 0;
       getrnorm = maxrealnumber;
-      while (lincgiteration(&state)) {
+      while (lincgiteration(&state))
          if (state.needmv) {
             for (i = 0; i < sz; i++) {
                state.mv.xR[i] = 0.0;
@@ -17761,7 +17757,6 @@ static bool testlincgunit_complextest() {
             getrnorm = state.r2;
             numofit++;
          }
-      }
       lincgresults(&state, &x0, &rep);
       if (getrnorm != rep.r2) {
          if (!silent) {
@@ -18000,7 +17995,7 @@ static bool testlincgunit_complexres() {
             } else {
                lincgsetcond(&s, 0.0, n);
             }
-            while (lincgiteration(&s)) {
+            while (lincgiteration(&s))
                if (s.needmv) {
                   for (i = 0; i < n; i++) {
                      s.mv.xR[i] = 0.0;
@@ -18022,7 +18017,6 @@ static bool testlincgunit_complexres() {
                      s.pv.xR[i] = s.x.xR[i];
                   }
                }
-            }
             lincgresults(&s, &x0, &rep);
          // Check result
             err = 0.0;
@@ -18110,7 +18104,7 @@ static bool testlincgunit_basictestx() {
       lincgsetxrep(&s, true);
       lincgsetcond(&s, 0.0, n);
       iters = 0;
-      while (lincgiteration(&s)) {
+      while (lincgiteration(&s))
          if (s.needmv) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
@@ -18144,7 +18138,6 @@ static bool testlincgunit_basictestx() {
             }
             iters++;
          }
-      }
    // Check first and last points
       for (i = 0; i < n; i++) {
          if (x00.xR[i] != x0.xR[i]) {
@@ -18232,7 +18225,7 @@ static bool testlincgunit_testrcorrectness() {
    lincgsetb(&s, &b);
    lincgsetxrep(&s, true);
    lincgsetcond(&s, 0.0, maxits);
-   while (lincgiteration(&s)) {
+   while (lincgiteration(&s))
       if (s.needmv) {
          for (i = 0; i < n; i++) {
             s.mv.xR[i] = 0.0;
@@ -18269,7 +18262,6 @@ static bool testlincgunit_testrcorrectness() {
             return Ok;
          }
       }
-   }
    lincgresults(&s, &b, &rep);
    if (rep.iterationscount != maxits) {
       Ok = false;
@@ -18321,7 +18313,7 @@ static bool testlincgunit_basictestiters() {
       lincgsetxrep(&s, true);
       lincgsetcond(&s, 0.0, n);
       iters = 0;
-      while (lincgiteration(&s)) {
+      while (lincgiteration(&s))
          if (s.needmv) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
@@ -18345,7 +18337,6 @@ static bool testlincgunit_basictestiters() {
          } else if (s.xupdated) {
             iters++;
          }
-      }
       lincgresults(&s, &x0, &rep);
    // Check
       if (iters != rep.iterationscount + 1 || iters > n + 1) {
@@ -18370,7 +18361,7 @@ static bool testlincgunit_basictestiters() {
       lincgrestart(&s);
       lincgsetb(&s, &b);
       iters = 0;
-      while (lincgiteration(&s)) {
+      while (lincgiteration(&s))
          if (s.needmv) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
@@ -18394,7 +18385,6 @@ static bool testlincgunit_basictestiters() {
          } else if (s.xupdated) {
             iters++;
          }
-      }
       lincgresults(&s, &x0, &rep);
    // check
       if (iters != rep.iterationscount + 1 || iters > n + 1) {
@@ -18617,7 +18607,7 @@ static bool testlincgunit_krylovsubspacetest() {
       lincgsetcond(&s, 0.0, n);
       lincgsetrupdatefreq(&s, 2);
       numofit = 0;
-      while (lincgiteration(&s)) {
+      while (lincgiteration(&s))
          if (s.needmv) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
@@ -18644,7 +18634,6 @@ static bool testlincgunit_krylovsubspacetest() {
             }
             numofit++;
          }
-      }
    // Check that I-th step S_i=X[I+1]-X[i] belongs to I-th Krylov subspace.
    // Checks are done for first K2 steps, with K2 small enough to avoid
    // numerical errors.
@@ -18864,7 +18853,7 @@ static bool testlincgunit_precondtest() {
       lincgsetxrep(&s, true);
       lincgsetcond(&s, 0.0, n);
       numofit = 0;
-      while (lincgiteration(&s)) {
+      while (lincgiteration(&s))
          if (s.needmv) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
@@ -18896,12 +18885,11 @@ static bool testlincgunit_precondtest() {
             }
             numofit++;
          }
-      }
       lincgsetstartingpoint(&s, &tx0);
       lincgsetb(&s, &tb);
       lincgrestart(&s);
       numofit = 0;
-      while (lincgiteration(&s)) {
+      while (lincgiteration(&s))
          if (s.needmv) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
@@ -18933,7 +18921,6 @@ static bool testlincgunit_precondtest() {
             }
             numofit++;
          }
-      }
    // Compare results - sequence of points generated when solving original problem with
    // points generated by modified problem.
       for (i = 0; i < numofit; i++) {
@@ -19443,7 +19430,7 @@ static bool testlinlsqrunit_svdtest() {
          linlsqrsetb(&s, &b);
          linlsqrsetlambdai(&s, lambdai);
          linlsqrsetprecunit(&s);
-         while (linlsqriteration(&s)) {
+         while (linlsqriteration(&s))
             if (s.needmv) {
                for (i = 0; i < m; i++) {
                   s.mv.xR[i] = 0.0;
@@ -19459,7 +19446,6 @@ static bool testlinlsqrunit_svdtest() {
                   }
                }
             }
-         }
          linlsqrresults(&s, &x0, &rep);
          if (!testlinlsqrunit_isitgoodsolution(&a, &b, m, n, lambdai, &x0, testlinlsqrunit_e0, testlinlsqrunit_tolort)) {
             Ok = false;
@@ -19564,7 +19550,7 @@ static bool testlinlsqrunit_mwcranksvdtest() {
                   linlsqrsetb(&s, &b);
                   linlsqrsetcond(&s, 0.0, 0.0, n);
                   linlsqrsetlambdai(&s, lambdai);
-                  while (linlsqriteration(&s)) {
+                  while (linlsqriteration(&s))
                      if (s.needmv) {
                         for (i = 0; i < m; i++) {
                            s.mv.xR[i] = 0.0;
@@ -19580,7 +19566,6 @@ static bool testlinlsqrunit_mwcranksvdtest() {
                            }
                         }
                      }
-                  }
                   linlsqrresults(&s, &x0, &rep);
                   if (!testlinlsqrunit_isitgoodsolution(&a, &b, m, n, lambdai, &x0, testlinlsqrunit_e0, testlinlsqrunit_tolort)) {
                      Ok = false;
@@ -19677,7 +19662,7 @@ static bool testlinlsqrunit_mwicranksvdtest() {
                      linlsqrsetb(&s, &b);
                      linlsqrsetcond(&s, testlinlsqrunit_emergencye0, testlinlsqrunit_emergencye0, n);
                      linlsqrsetlambdai(&s, lambdai);
-                     while (linlsqriteration(&s)) {
+                     while (linlsqriteration(&s))
                         if (s.needmv) {
                            for (i = 0; i < m; i++) {
                               s.mv.xR[i] = 0.0;
@@ -19693,7 +19678,6 @@ static bool testlinlsqrunit_mwicranksvdtest() {
                               }
                            }
                         }
-                     }
                      linlsqrresults(&s, &x0, &rep);
                   // Check
                      if (!testlinlsqrunit_isitgoodsolution(&a, &b, m, n, lambdai, &x0, testlinlsqrunit_e0, testlinlsqrunit_tolort)) {
@@ -19807,7 +19791,7 @@ static bool testlinlsqrunit_bidiagonaltest() {
                      linlsqrcreate(m, n, &s);
                      linlsqrsetb(&s, &b);
                      linlsqrsetcond(&s, testlinlsqrunit_e0, testlinlsqrunit_e0, 0);
-                     while (linlsqriteration(&s)) {
+                     while (linlsqriteration(&s))
                         if (s.needmv) {
                            for (i = 0; i < m; i++) {
                               s.mv.xR[i] = 0.0;
@@ -19823,7 +19807,6 @@ static bool testlinlsqrunit_bidiagonaltest() {
                               }
                            }
                         }
-                     }
                      linlsqrresults(&s, &x0, &rep);
                   // Check
                      if (!testlinlsqrunit_isitgoodsolution(&a, &b, m, n, 0.0, &x0, testlinlsqrunit_e0, testlinlsqrunit_tolort)) {
@@ -19897,7 +19880,7 @@ static bool testlinlsqrunit_zeromatrixtest() {
             linlsqrcreate(m, n, &s);
             linlsqrsetb(&s, &b);
             linlsqrsetcond(&s, 0.0, 0.0, n);
-            while (linlsqriteration(&s)) {
+            while (linlsqriteration(&s))
                if (s.needmv) {
                   for (i = 0; i < m; i++) {
                      s.mv.xR[i] = 0.0;
@@ -19913,7 +19896,6 @@ static bool testlinlsqrunit_zeromatrixtest() {
                      }
                   }
                }
-            }
             linlsqrresults(&s, &x0, &rep);
          // Check
             if (!testlinlsqrunit_isitgoodsolution(&a, &b, m, n, 0.0, &x0, testlinlsqrunit_e0, testlinlsqrunit_tolort)) {
@@ -20000,7 +19982,7 @@ static bool testlinlsqrunit_reportcorrectnesstest() {
             linlsqrsetlambdai(&s, (double)lambdai);
             linlsqrsetxrep(&s, true);
             Ok = Ok && linlsqrpeekiterationscount(&s) == 0;
-            while (linlsqriteration(&s)) {
+            while (linlsqriteration(&s))
                if (s.needmv) {
                   for (i = 0; i < m; i++) {
                      s.mv.xR[i] = 0.0;
@@ -20055,7 +20037,6 @@ static bool testlinlsqrunit_reportcorrectnesstest() {
                // check iterations counter
                   Ok = Ok && linlsqrpeekiterationscount(&s) == its;
                }
-            }
             linlsqrresults(&s, &x0, &rep);
             Ok = Ok && linlsqrpeekiterationscount(&s) == n;
          // check, that FirstX is equal to zero and LastX
@@ -20147,7 +20128,7 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
       linlsqrcreate(n, n, &s);
       linlsqrsetb(&s, &b);
       linlsqrsetcond(&s, 0.0, 0.0, maxits);
-      while (linlsqriteration(&s)) {
+      while (linlsqriteration(&s))
          if (s.needmv) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
@@ -20163,7 +20144,6 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
                }
             }
          }
-      }
       linlsqrresults(&s, &x0, &rep);
       if (rep.iterationscount > maxits || rep.terminationtype <= 0) {
          if (!silent) {
@@ -20187,7 +20167,7 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
       linlsqrcreate(n, n, &s);
       linlsqrsetb(&s, &b);
       linlsqrsetcond(&s, 0.0, eps, 0);
-      while (linlsqriteration(&s)) {
+      while (linlsqriteration(&s))
          if (s.needmv) {
             for (i = 0; i < n; i++) {
                s.mv.xR[i] = 0.0;
@@ -20203,7 +20183,6 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
                }
             }
          }
-      }
       linlsqrresults(&s, &x0, &rep);
       rknorm = 0.0;
       for (i = 0; i < n; i++) {
@@ -20268,7 +20247,7 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
             linlsqrcreate(n, n - 1, &s);
             linlsqrsetb(&s, &b);
             linlsqrsetcond(&s, eps, 0.0, 0);
-            while (linlsqriteration(&s)) {
+            while (linlsqriteration(&s))
                if (s.needmv) {
                   for (i = 0; i < n; i++) {
                      s.mv.xR[i] = 0.0;
@@ -20284,7 +20263,6 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
                      }
                   }
                }
-            }
             linlsqrresults(&s, &x0, &rep);
          // Check condition
             ae_vector_set_length(&rk, n);
@@ -20387,7 +20365,7 @@ static bool testlinlsqrunit_analytictest() {
          linlsqrsetcond(&s, 0.0, 0.0, smallk);
          linlsqrsetxrep(&s, true);
          pointsstored = 0;
-         while (linlsqriteration(&s)) {
+         while (linlsqriteration(&s))
             if (s.needmv) {
                for (i = 0; i < m; i++) {
                   s.mv.xR[i] = 0.0;
@@ -20407,7 +20385,6 @@ static bool testlinlsqrunit_analytictest() {
                ae_v_move(xk.xyR[pointsstored], 1, s.x.xR, 1, n);
                pointsstored++;
             }
-         }
          if (pointsstored < 3) {
          // At least two iterations should be performed
          // (our task is not that easy to solve)
@@ -20511,7 +20488,7 @@ static bool testlinlsqrunit_testterminationrequests() {
       linlsqrsetxrep(&s, true);
       firstpointreported = false;
       reportsafterrequest = 0;
-      while (linlsqriteration(&s)) {
+      while (linlsqriteration(&s))
          if (s.needmv) {
             for (i = 0; i < m; i++) {
                s.mv.xR[i] = 0.0;
@@ -20544,7 +20521,6 @@ static bool testlinlsqrunit_testterminationrequests() {
                reportsafterrequest++;
             }
          }
-      }
       linlsqrresults(&s, &x1, &rep);
       Ok = Ok && rep.terminationtype == 8;
       Ok = Ok && isfinitevector(&x1, n);
@@ -20839,9 +20815,7 @@ bool testnleq() {
       nleqcreatelm(2, 2, &x, &state);
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0);
-      while (nleqiteration(&state)) {
-         testnlequnit_testfunchbm(&state);
-      }
+      while (nleqiteration(&state)) testnlequnit_testfunchbm(&state);
       nleqresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
          basicsOk = basicsOk && sqr(x.xR[0] * x.xR[0] + x.xR[1] - 11) + sqr(x.xR[0] + x.xR[1] * x.xR[1] - 7) <= sqr(epsf);
@@ -20855,16 +20829,12 @@ bool testnleq() {
       nleqcreatelm(2, 2, &x, &state);
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0);
-      while (nleqiteration(&state)) {
-         testnlequnit_testfunchbm(&state);
-      }
+      while (nleqiteration(&state)) testnlequnit_testfunchbm(&state);
       nleqresults(&state, &x, &rep);
       ae_vector_set_length(&x, 2);
       x.xR[0] = 10.0 * randommid();
       x.xR[1] = 10.0 * randommid();
-      for (nleqrestartfrom(&state, &x); nleqiteration(&state); ) {
-         testnlequnit_testfunchbm(&state);
-      }
+      for (nleqrestartfrom(&state, &x); nleqiteration(&state); ) testnlequnit_testfunchbm(&state);
       nleqresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
          basicsOk = basicsOk && sqr(x.xR[0] * x.xR[0] + x.xR[1] - 11) + sqr(x.xR[0] + x.xR[1] * x.xR[1] - 7) <= sqr(epsf);
@@ -20885,15 +20855,11 @@ bool testnleq() {
       nleqsetcond(&state, epsf, 0);
       nleqsetstpmax(&state, 0.01);
       k = 1 + randominteger(100);
-      for (i = 0; i < k && nleqiteration(&state); i++) {
-         testnlequnit_testfunchbm(&state);
-      }
+      for (i = 0; i < k && nleqiteration(&state); i++) testnlequnit_testfunchbm(&state);
       ae_vector_set_length(&x, 2);
       x.xR[0] = 10.0 * randommid();
       x.xR[1] = 10.0 * randommid();
-      for (nleqrestartfrom(&state, &x); nleqiteration(&state); ) {
-         testnlequnit_testfunchbm(&state);
-      }
+      for (nleqrestartfrom(&state, &x); nleqiteration(&state); ) testnlequnit_testfunchbm(&state);
       nleqresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
          basicsOk = basicsOk && sqr(x.xR[0] * x.xR[0] + x.xR[1] - 11) + sqr(x.xR[0] + x.xR[1] * x.xR[1] - 7) <= sqr(epsf);
@@ -20914,9 +20880,7 @@ bool testnleq() {
       nleqcreatelm(2, 1, &x, &state);
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0);
-      while (nleqiteration(&state)) {
-         testnlequnit_testfunchb1(&state);
-      }
+      while (nleqiteration(&state)) testnlequnit_testfunchb1(&state);
       nleqresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
          basicsOk = basicsOk && sqr(x.xR[0] * x.xR[0] + x.xR[1] - 11) + sqr(x.xR[0] + x.xR[1] * x.xR[1] - 7) <= epsf;
@@ -20935,9 +20899,7 @@ bool testnleq() {
       nleqcreatelm(2, 3, &x, &state);
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0);
-      while (nleqiteration(&state)) {
-         testnlequnit_testfuncshbm(&state);
-      }
+      while (nleqiteration(&state)) testnlequnit_testfuncshbm(&state);
       nleqresults(&state, &x, &rep);
       basicsOk = basicsOk && rep.terminationtype == -4;
    }
@@ -20963,7 +20925,7 @@ bool testnleq() {
    nfunc = 0;
    njac = 0;
    itcnt = 0;
-   while (nleqiteration(&state)) {
+   while (nleqiteration(&state))
       if (state.xupdated) {
       // first report must be starting point
          if (firstrep) {
@@ -20983,12 +20945,9 @@ bool testnleq() {
          itcnt++;
       } else if (state.needf || state.needfij) {
          nfunc++;
-         if (state.needfij) {
-            njac++;
-         }
+         if (state.needfij) njac++;
          testnlequnit_testfunchbm(&state);
       }
-   }
    nleqresults(&state, &x, &rep);
    if (rep.terminationtype > 0) {
       otherOk = otherOk && xlast.xR[0] == x.xR[0] && xlast.xR[1] == x.xR[1];
@@ -22429,9 +22388,7 @@ static bool testminlbfgsunit_testpreconditioning() {
          for (i = 0; i < n; i++) {
             x.xR[i] = randommid();
          }
-         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) {
-            testminlbfgsunit_calciip2(&state, n);
-         }
+         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) testminlbfgsunit_calciip2(&state, n);
          minlbfgsresults(&state, &x, &rep);
          cntb1 += rep.iterationscount;
          Ok = Ok && rep.terminationtype > 0;
@@ -22453,9 +22410,7 @@ static bool testminlbfgsunit_testpreconditioning() {
          for (i = 0; i < n; i++) {
             x.xR[i] = randommid();
          }
-         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) {
-            testminlbfgsunit_calciip2(&state, n);
-         }
+         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) testminlbfgsunit_calciip2(&state, n);
          minlbfgsresults(&state, &x, &rep);
          cntb2 += rep.iterationscount;
          Ok = Ok && rep.terminationtype > 0;
@@ -22481,9 +22436,7 @@ static bool testminlbfgsunit_testpreconditioning() {
          for (i = 0; i < n; i++) {
             x.xR[i] = randommid();
          }
-         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) {
-            testminlbfgsunit_calciip2(&state, n);
-         }
+         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) testminlbfgsunit_calciip2(&state, n);
          minlbfgsresults(&state, &x, &rep);
          cntg1 += rep.iterationscount;
          Ok = Ok && rep.terminationtype > 0;
@@ -22499,9 +22452,7 @@ static bool testminlbfgsunit_testpreconditioning() {
          for (i = 0; i < n; i++) {
             x.xR[i] = randommid();
          }
-         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) {
-            testminlbfgsunit_calciip2(&state, n);
-         }
+         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) testminlbfgsunit_calciip2(&state, n);
          minlbfgsresults(&state, &x, &rep);
          cntg2 += rep.iterationscount;
          Ok = Ok && rep.terminationtype > 0;
@@ -22536,9 +22487,7 @@ static bool testminlbfgsunit_testpreconditioning() {
          for (i = 0; i < n; i++) {
             x.xR[i] = randommid();
          }
-         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) {
-            testminlbfgsunit_calciip2(&state, n);
-         }
+         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) testminlbfgsunit_calciip2(&state, n);
          minlbfgsresults(&state, &x, &rep);
          cntb2 += rep.iterationscount;
          Ok = Ok && rep.terminationtype > 0;
@@ -22550,9 +22499,7 @@ static bool testminlbfgsunit_testpreconditioning() {
          for (i = 0; i < n; i++) {
             x.xR[i] = randommid();
          }
-         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) {
-            testminlbfgsunit_calciip2(&state, n);
-         }
+         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) testminlbfgsunit_calciip2(&state, n);
          minlbfgsresults(&state, &x, &rep);
          cntg2 += rep.iterationscount;
          Ok = Ok && rep.terminationtype > 0;
@@ -22626,7 +22573,7 @@ static bool testminlbfgsunit_testother() {
    minlbfgssetcond(&state, 0.0, 0.0, 0.0, 100);
    minlbfgssetxrep(&state, true);
    fprev = maxrealnumber;
-   while (minlbfgsiteration(&state)) {
+   while (minlbfgsiteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -22643,7 +22590,6 @@ static bool testminlbfgsunit_testother() {
          fprev = state.f;
          ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
       }
-   }
    minlbfgsresults(&state, &x, &rep);
    for (i = 0; i < n; i++) {
       Ok = Ok && x.xR[i] == xlast.xR[i];
@@ -22668,7 +22614,7 @@ static bool testminlbfgsunit_testother() {
       minlbfgssetcond(&state, 0.0, 0.0, 0.0, n / 2);
       wasf = false;
       wasfg = false;
-      while (minlbfgsiteration(&state)) {
+      while (minlbfgsiteration(&state))
          if (state.needf || state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -22680,7 +22626,6 @@ static bool testminlbfgsunit_testother() {
             wasf = wasf || state.needf;
             wasfg = wasfg || state.needfg;
          }
-      }
       minlbfgsresults(&state, &x, &rep);
       if (dkind == 0) {
          Ok = Ok && !wasf && wasfg;
@@ -22723,7 +22668,7 @@ static bool testminlbfgsunit_testother() {
    minlbfgssetstpmax(&state, stpmax);
    minlbfgssetxrep(&state, true);
    xprev = x.xR[0];
-   while (minlbfgsiteration(&state)) {
+   while (minlbfgsiteration(&state))
       if (state.needfg) {
          state.f = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
          state.g.xR[0] = exp(state.x.xR[0]) - exp(-state.x.xR[0]);
@@ -22732,7 +22677,6 @@ static bool testminlbfgsunit_testother() {
          Ok = Ok && NearAtR(state.x.xR[0], xprev, (1 + sqrt(machineepsilon)) * stpmax);
          xprev = state.x.xR[0];
       }
-   }
 // Test correctness of the scaling:
 // * initial point is random point from [+1,+2]^N
 // * f(x) = SUM(A[i]*x[i]^4), C[i] is random from [0.01,100]
@@ -22773,7 +22717,7 @@ static bool testminlbfgsunit_testother() {
             x.xR[i] = randomreal() + 1;
          }
          minlbfgssetcond(&state, tmpeps, 0.0, 0.0, 0);
-         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) {
+         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); )
             if (state.needfg) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
@@ -22781,7 +22725,6 @@ static bool testminlbfgsunit_testother() {
                   state.g.xR[i] = 4 * a.xR[i] * pow(state.x.xR[i], 3.0);
                }
             }
-         }
          minlbfgsresults(&state, &x, &rep);
          if (rep.terminationtype <= 0) {
             Ok = false;
@@ -22801,7 +22744,7 @@ static bool testminlbfgsunit_testother() {
          hasxlast = false;
          lastscaledstep = maxrealnumber;
          minlbfgssetcond(&state, 0.0, 0.0, tmpeps, 0);
-         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) {
+         for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); )
             if (state.needfg) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
@@ -22821,7 +22764,6 @@ static bool testminlbfgsunit_testother() {
                ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
                hasxlast = true;
             }
-         }
          minlbfgsresults(&state, &x, &rep);
          if (rep.terminationtype <= 0) {
             Ok = false;
@@ -22871,7 +22813,7 @@ static bool testminlbfgsunit_testother() {
          x.xR[0] = 0.0;
          minlbfgscreate(1, 1, &x, &state);
          minlbfgssetcond(&state, epsg, 0.0, 0.0, 0);
-         while (minlbfgsiteration(&state)) {
+         while (minlbfgsiteration(&state))
             if (state.needfg) {
                if (-0.999999 < state.x.xR[0] && state.x.xR[0] < 0.999999) {
                   state.f = 1 / (1 - state.x.xR[0]) + 1 / (1 + state.x.xR[0]) + vc * state.x.xR[0];
@@ -22880,7 +22822,6 @@ static bool testminlbfgsunit_testother() {
                   state.f = vm;
                }
             }
-         }
          minlbfgsresults(&state, &x, &rep);
          if (rep.terminationtype <= 0) {
             Ok = false;
@@ -22927,7 +22868,7 @@ static bool testminlbfgsunit_testother() {
       minlbfgssetcond(&state, 0.0, 0.0, 0.0, stopiteration);
       minlbfgssetxrep(&state, true);
       k = -1;
-      while (minlbfgsiteration(&state)) {
+      while (minlbfgsiteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -22948,7 +22889,6 @@ static bool testminlbfgsunit_testother() {
          } else if (state.xupdated) {
             k++;
          } else ae_assert(false, "Assertion failed");
-      }
       minlbfgsresults(&state, &x1, &rep);
       Ok = Ok && rep.terminationtype == -8;
    }
@@ -22971,7 +22911,7 @@ static bool testminlbfgsunit_testother() {
       callidx = 0;
       terminationrequested = false;
       ae_v_move(xlast.xR, 1, x.xR, 1, n);
-      while (minlbfgsiteration(&state)) {
+      while (minlbfgsiteration(&state))
          if (state.needfg) {
             state.f = ss * sqr(exp(state.x.xR[0]) - 2) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
             state.g.xR[0] = 2 * ss * (exp(state.x.xR[0]) - 2) * exp(state.x.xR[0]) + 2 * (state.x.xR[2] - state.x.xR[0]) * (-1);
@@ -22987,7 +22927,6 @@ static bool testminlbfgsunit_testother() {
                ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minlbfgsresults(&state, &x, &rep);
       Ok = Ok && rep.terminationtype == 8;
       for (i = 0; i < n; i++) {
@@ -23209,7 +23148,7 @@ static bool testminlbfgsunit_testoptguard() {
    spdmatrixrndcond(n, 1.0E3, &a1);
    minlbfgscreate(n, 3, &x0, &state);
    minlbfgssetcond(&state, 0.0, 0.0, 1.0E-9, 10);
-   while (minlbfgsiteration(&state)) {
+   while (minlbfgsiteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -23223,7 +23162,6 @@ static bool testminlbfgsunit_testoptguard() {
             state.g.xR[i] = 0.0;
          }
       } else ae_assert(false, "Assertion failed");
-   }
    minlbfgsresults(&state, &x1, &rep);
    minlbfgsoptguardresults(&state, &ogrep);
    Ok = Ok && rep.terminationtype > 0;
@@ -23260,7 +23198,7 @@ static bool testminlbfgsunit_testoptguard() {
    }
    minlbfgscreate(n, 2, &x0, &state);
    minlbfgssetcond(&state, 0.0, 0.0, 1.0E-9, 50);
-   while (minlbfgsiteration(&state)) {
+   while (minlbfgsiteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -23278,7 +23216,6 @@ static bool testminlbfgsunit_testoptguard() {
             }
          }
       } else ae_assert(false, "Assertion failed");
-   }
    minlbfgsresults(&state, &x1, &rep);
    minlbfgsoptguardresults(&state, &ogrep);
    Ok = Ok && isfinitevector(&x1, n);
@@ -23318,7 +23255,7 @@ static bool testminlbfgsunit_testoptguard() {
          minlbfgsoptguardgradient(&state, diffstep);
          minlbfgssetcond(&state, 0.0, 0.0, 1.0E-9, 10);
          minlbfgssetscale(&state, &s);
-         while (minlbfgsiteration(&state)) {
+         while (minlbfgsiteration(&state))
             if (state.needfg) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
@@ -23342,7 +23279,6 @@ static bool testminlbfgsunit_testoptguard() {
                   state.g.xR[i] /= s.xR[i];
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minlbfgsresults(&state, &x1, &rep);
          minlbfgsoptguardresults(&state, &ogrep);
       // Check that something is returned
@@ -23449,7 +23385,7 @@ static bool testminlbfgsunit_testoptguard() {
       minlbfgssetcond(&state, 0.0, 0.0, 1.0E-9, 50);
       minlbfgssetscale(&state, &s);
       minlbfgsoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminlbfgsunit_maxoptguardlevel));
-      while (minlbfgsiteration(&state)) {
+      while (minlbfgsiteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -23467,7 +23403,6 @@ static bool testminlbfgsunit_testoptguard() {
                }
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minlbfgsresults(&state, &x1, &rep);
       minlbfgsoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
@@ -23570,7 +23505,7 @@ static bool testminlbfgsunit_testoptguard() {
       minlbfgscreatef(n, m, &x0, diffstep, &state);
       minlbfgssetcond(&state, 0.0, 0.0, 1.0E-9, 50);
       minlbfgsoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminlbfgsunit_maxoptguardlevel));
-      while (minlbfgsiteration(&state)) {
+      while (minlbfgsiteration(&state))
          if (state.needf) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -23581,7 +23516,6 @@ static bool testminlbfgsunit_testoptguard() {
                state.f += fabs(v);
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minlbfgsresults(&state, &x1, &rep);
       minlbfgsoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
@@ -23625,7 +23559,7 @@ static bool testminlbfgsunit_testoptguard() {
    minlbfgscreate(n, m, &x0, &state);
    minlbfgsoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminlbfgsunit_maxoptguardlevel));
    minlbfgssetcond(&state, 0.0, 0.0, 1.0E-9, 25);
-   while (minlbfgsiteration(&state)) {
+   while (minlbfgsiteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -23637,7 +23571,6 @@ static bool testminlbfgsunit_testoptguard() {
             }
          }
       } else ae_assert(false, "Assertion failed");
-   }
    minlbfgsresults(&state, &x1, &rep);
    Ok = Ok && isfinitevector(&x1, n);
    Ok = Ok && rep.terminationtype > 0;
@@ -23707,7 +23640,7 @@ bool testminlbfgs() {
          minlbfgscreatef(n, m, &x, diffstep, &state);
       }
       minlbfgssetcond(&state, 0.0, 0.0, 0.0, 0);
-      while (minlbfgsiteration(&state)) {
+      while (minlbfgsiteration(&state))
          if (state.needf || state.needfg) {
             state.f = sqr(state.x.xR[0] - 2) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
             if (state.needfg) {
@@ -23716,7 +23649,6 @@ bool testminlbfgs() {
                state.g.xR[2] = 2 * (state.x.xR[2] - state.x.xR[0]);
             }
          }
-      }
       minlbfgsresults(&state, &x, &rep);
       refOk = refOk && rep.terminationtype > 0 && NearAtR(x.xR[0], 2, 0.001) && SmallAtR(x.xR[1], 0.001) && NearAtR(x.xR[2], 2, 0.001);
    }
@@ -23738,14 +23670,13 @@ bool testminlbfgs() {
             minlbfgscreatef(n, m, &x, diffstep, &state);
          }
          minlbfgssetcond(&state, 1.0E-9, 0.0, 0.0, 0);
-         while (minlbfgsiteration(&state)) {
+         while (minlbfgsiteration(&state))
             if (state.needf || state.needfg) {
                state.f = sqr(state.x.xR[0]) / (1 + sqr(state.x.xR[0]));
                if (state.needfg) {
                   state.g.xR[0] = (2 * state.x.xR[0] * (1 + sqr(state.x.xR[0])) - sqr(state.x.xR[0]) * 2 * state.x.xR[0]) / sqr(1 + sqr(state.x.xR[0]));
                }
             }
-         }
          minlbfgsresults(&state, &x, &rep);
          nonconvOk = nonconvOk && rep.terminationtype > 0 && SmallAtR(x.xR[0], 0.001);
          v += 0.1;
@@ -23772,23 +23703,17 @@ bool testminlbfgs() {
       }
       minlbfgssetstpmax(&state, 0.1);
       minlbfgssetcond(&state, 0.0000001, 0.0, 0.0, 0);
-      for (i = 0; i <= 10 && minlbfgsiteration(&state); i++) {
-         testminlbfgsunit_testfunc2(&state);
-      }
+      for (i = 0; i <= 10 && minlbfgsiteration(&state); i++) testminlbfgsunit_testfunc2(&state);
       x.xR[0] = 10 + 10.0 * randomreal();
       x.xR[1] = 10 + 10.0 * randomreal();
       x.xR[2] = 10 + 10.0 * randomreal();
-      for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) {
-         testminlbfgsunit_testfunc2(&state);
-      }
+      for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) testminlbfgsunit_testfunc2(&state);
       minlbfgsresults(&state, &x, &rep);
       restartsOk = restartsOk && rep.terminationtype > 0 && NearAtR(x.xR[0], log(2.0), 0.01) && SmallAtR(x.xR[1], 0.01) && NearAtR(x.xR[2], log(2.0), 0.01);
       x.xR[0] = 10 + 10.0 * randomreal();
       x.xR[1] = 10 + 10.0 * randomreal();
       x.xR[2] = 10 + 10.0 * randomreal();
-      for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) {
-         testminlbfgsunit_testfunc2(&state);
-      }
+      for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) testminlbfgsunit_testfunc2(&state);
       minlbfgsresults(&state, &x, &rep);
       restartsOk = restartsOk && rep.terminationtype > 0 && NearAtR(x.xR[0], log(2.0), 0.01) && SmallAtR(x.xR[1], 0.01) && NearAtR(x.xR[2], log(2.0), 0.01);
    }
@@ -23827,7 +23752,7 @@ bool testminlbfgs() {
                minlbfgscreatef(n, m, &x, diffstep, &state);
             }
             minlbfgssetcond(&state, 0.0, 0.0, 0.0, 0);
-            while (minlbfgsiteration(&state)) {
+            while (minlbfgsiteration(&state))
                if (state.needf || state.needfg) {
                   state.f = 0.0;
                   if (state.needfg) {
@@ -23845,7 +23770,6 @@ bool testminlbfgs() {
                      }
                   }
                }
-            }
             minlbfgsresults(&state, &x, &rep);
             eqOk = eqOk && rep.terminationtype > 0;
             for (i = 0; i < n; i++) {
@@ -23870,9 +23794,7 @@ bool testminlbfgs() {
          minlbfgscreatef(n, m, &x, diffstep, &state);
       }
       minlbfgssetcond(&state, 0.001, 0.0, 0.0, 0);
-      while (minlbfgsiteration(&state)) {
-         testminlbfgsunit_testfunc3(&state);
-      }
+      while (minlbfgsiteration(&state)) testminlbfgsunit_testfunc3(&state);
       minlbfgsresults(&state, &x, &rep);
       convOk = convOk && rep.terminationtype == 4;
       for (i = 0; i <= 2; i++) {
@@ -23885,9 +23807,7 @@ bool testminlbfgs() {
          minlbfgscreatef(n, m, &x, diffstep, &state);
       }
       minlbfgssetcond(&state, 0.0, 0.001, 0.0, 0);
-      while (minlbfgsiteration(&state)) {
-         testminlbfgsunit_testfunc3(&state);
-      }
+      while (minlbfgsiteration(&state)) testminlbfgsunit_testfunc3(&state);
       minlbfgsresults(&state, &x, &rep);
       convOk = convOk && rep.terminationtype == 1;
       for (i = 0; i <= 2; i++) {
@@ -23900,9 +23820,7 @@ bool testminlbfgs() {
          minlbfgscreatef(n, m, &x, diffstep, &state);
       }
       minlbfgssetcond(&state, 0.0, 0.0, 0.001, 0);
-      while (minlbfgsiteration(&state)) {
-         testminlbfgsunit_testfunc3(&state);
-      }
+      while (minlbfgsiteration(&state)) testminlbfgsunit_testfunc3(&state);
       minlbfgsresults(&state, &x, &rep);
       convOk = convOk && rep.terminationtype == 2;
       for (i = 0; i <= 2; i++) {
@@ -23915,9 +23833,7 @@ bool testminlbfgs() {
          minlbfgscreatef(n, m, &x, diffstep, &state);
       }
       minlbfgssetcond(&state, 0.0, 0.0, 0.0, 10);
-      while (minlbfgsiteration(&state)) {
-         testminlbfgsunit_testfunc3(&state);
-      }
+      while (minlbfgsiteration(&state)) testminlbfgsunit_testfunc3(&state);
       minlbfgsresults(&state, &x, &rep);
       convOk = convOk && rep.terminationtype == 5 && rep.iterationscount == 10;
    }
@@ -25241,7 +25157,7 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                   minbleicsetlc(&state, &c, &ct, 1);
                   minbleicsetcond(&state, weakepsg, 0.0, 0.0, 0);
                   testminbleicunit_setrandompreconditioner(&state, n, preckind);
-                  while (minbleiciteration(&state)) {
+                  while (minbleiciteration(&state))
                      if (state.needf || state.needfg) {
                         state.f = 0.0;
                         for (i = 0; i < n; i++) {
@@ -25251,7 +25167,6 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                            }
                         }
                      }
-                  }
                   minbleicresults(&state, &x, &rep);
                   if (rep.terminationtype <= 0) {
                      *ConvOkP = false;
@@ -25349,7 +25264,7 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                   minbleicsetlc(&state, &c, &ct, k);
                   minbleicsetcond(&state, weakepsg, 0.0, 0.0, 0);
                   testminbleicunit_setrandompreconditioner(&state, n, preckind);
-                  while (minbleiciteration(&state)) {
+                  while (minbleiciteration(&state))
                      if (state.needf || state.needfg) {
                         state.f = 0.0;
                         for (i = 0; i < n; i++) {
@@ -25359,7 +25274,6 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                            }
                         }
                      }
-                  }
                   minbleicresults(&state, &x, &rep);
                   if (rep.terminationtype <= 0) {
                      *ConvOkP = false;
@@ -25585,7 +25499,7 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                minbleicsetlc(&state, &c, &ct, 2 * n);
                minbleicsetcond(&state, weakepsg, 0.0, 0.0, 0);
                testminbleicunit_setrandompreconditioner(&state, n, preckind);
-               while (minbleiciteration(&state)) {
+               while (minbleiciteration(&state))
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
@@ -25598,7 +25512,6 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                      ae_frame_leave();
                      return Ok;
                   }
-               }
                minbleicresults(&state, &x, &rep);
                if (rep.terminationtype <= 0) {
                   *ConvOkP = false;
@@ -25670,7 +25583,7 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                   minbleicsetlc(&state, &c, &ct, k);
                   minbleicsetcond(&state, weakepsg, 0.0, 0.0, 0);
                   testminbleicunit_setrandompreconditioner(&state, n, preckind);
-                  while (minbleiciteration(&state)) {
+                  while (minbleiciteration(&state))
                      if (state.needfg) {
                         state.f = 0.0;
                         for (i = 0; i < n; i++) {
@@ -25683,7 +25596,6 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                         ae_frame_leave();
                         return Ok;
                      }
-                  }
                   minbleicresults(&state, &x, &rep);
                   if (rep.terminationtype <= 0) {
                      *ConvOkP = false;
@@ -25747,7 +25659,7 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                minbleicsetbc(&state, &bl, &bu);
                minbleicsetcond(&state, weakepsg, 0.0, 0.0, 0);
                testminbleicunit_setrandompreconditioner(&state, n, preckind);
-               while (minbleiciteration(&state)) {
+               while (minbleiciteration(&state))
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
@@ -25760,7 +25672,6 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                      ae_frame_leave();
                      return Ok;
                   }
-               }
                minbleicresults(&state, &x, &rep);
                Ok = Ok && rep.terminationtype == -3;
             }
@@ -25807,7 +25718,7 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                   minbleicsetlc(&state, &c, &ct, k + 1);
                   minbleicsetcond(&state, weakepsg, 0.0, 0.0, 0);
                   testminbleicunit_setrandompreconditioner(&state, n, preckind);
-                  while (minbleiciteration(&state)) {
+                  while (minbleiciteration(&state))
                      if (state.needfg) {
                         state.f = 0.0;
                         for (i = 0; i < n; i++) {
@@ -25820,7 +25731,6 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                         ae_frame_leave();
                         return Ok;
                      }
-                  }
                   minbleicresults(&state, &x, &rep);
                   Ok = Ok && rep.terminationtype == -3;
                }
@@ -25934,7 +25844,7 @@ static bool testminbleicunit_testother() {
    minbleiccreate(n, &x, &state);
    minbleicsetbc(&state, &bl, &bu);
    minbleicsetcond(&state, 0.0, 0.0, 0.0, 2 * n);
-   while (minbleiciteration(&state)) {
+   while (minbleiciteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -25942,7 +25852,6 @@ static bool testminbleicunit_testother() {
             state.g.xR[i] = 1.0;
          }
       }
-   }
    minbleicresults(&state, &xf, &rep);
    Ok = Ok && rep.terminationtype > 0;
    if (rep.terminationtype > 0) {
@@ -25953,7 +25862,7 @@ static bool testminbleicunit_testother() {
    minbleiccreate(n, &x, &state);
    minbleicsetlc(&state, &c, &ct, n);
    minbleicsetcond(&state, 1.0E-64, 0.0, 0.0, 10);
-   while (minbleiciteration(&state)) {
+   while (minbleiciteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -25961,7 +25870,6 @@ static bool testminbleicunit_testother() {
             state.g.xR[i] = 1.0;
          }
       }
-   }
    minbleicresults(&state, &xf, &rep);
    Ok = Ok && rep.terminationtype > 0;
    if (rep.terminationtype > 0) {
@@ -25988,7 +25896,7 @@ static bool testminbleicunit_testother() {
       minbleicsetcond(&state, 1.0E-64, 0.0, 0.0, 10);
       minbleicsetxrep(&state, true);
       fprev = maxrealnumber;
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -26004,7 +25912,6 @@ static bool testminbleicunit_testother() {
             fprev = state.f;
             ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
          }
-      }
       minbleicresults(&state, &x, &rep);
       for (i = 0; i < n; i++) {
          Ok = Ok && x.xR[i] == xlast.xR[i];
@@ -26030,7 +25937,7 @@ static bool testminbleicunit_testother() {
          minbleicsetcond(&state, 1.0E-6, 0.0, epsx, 0);
          wasf = false;
          wasfg = false;
-         while (minbleiciteration(&state)) {
+         while (minbleiciteration(&state))
             if (state.needf || state.needfg) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
@@ -26042,7 +25949,6 @@ static bool testminbleicunit_testother() {
                wasf = wasf || state.needf;
                wasfg = wasfg || state.needfg;
             }
-         }
          minbleicresults(&state, &x, &rep);
          if (dkind == 0) {
             Ok = Ok && !wasf && wasfg;
@@ -26093,7 +25999,7 @@ static bool testminbleicunit_testother() {
       minbleicsetxrep(&state, true);
       minbleicsetstpmax(&state, stpmax);
       xprev = x.xR[0];
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
             state.g.xR[0] = exp(state.x.xR[0]) - exp(-state.x.xR[0]);
@@ -26102,7 +26008,6 @@ static bool testminbleicunit_testother() {
             Ok = Ok && NearAtR(state.x.xR[0], xprev, (1 + sqrt(machineepsilon)) * stpmax);
             xprev = state.x.xR[0];
          }
-      }
    }
 // Ability to solve problems with function which is unbounded from below
    for (pass = 1; pass <= passcount; pass++) {
@@ -26116,12 +26021,11 @@ static bool testminbleicunit_testother() {
       minbleiccreate(n, &x, &state);
       minbleicsetbc(&state, &bl, &bu);
       minbleicsetcond(&state, epsg, 0.0, epsx, 0);
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = -1.0E8 * sqr(state.x.xR[0]);
             state.g.xR[0] = -2.0E8 * state.x.xR[0];
          }
-      }
       minbleicresults(&state, &x, &rep);
       Ok = Ok && NearAtR(x.xR[0], bu.xR[0], epsx);
    }
@@ -26182,7 +26086,7 @@ static bool testminbleicunit_testother() {
                }
                minbleicsetcond(&state, tmpeps, 0.0, 0.0, 0);
                minbleicsetscale(&state, &s);
-               while (minbleiciteration(&state)) {
+               while (minbleiciteration(&state))
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
@@ -26190,7 +26094,6 @@ static bool testminbleicunit_testother() {
                         state.g.xR[i] = 2 * a.xR[i] * state.x.xR[i];
                      }
                   }
-               }
                minbleicresults(&state, &x, &rep);
                if (rep.terminationtype <= 0) {
                   Ok = false;
@@ -26248,7 +26151,7 @@ static bool testminbleicunit_testother() {
             x.xR[0] = 0.0;
             minbleiccreate(1, &x, &state);
             minbleicsetcond(&state, epsg, 0.0, 0.0, 0);
-            while (minbleiciteration(&state)) {
+            while (minbleiciteration(&state))
                if (state.needfg) {
                   if (-0.999999 < state.x.xR[0] && state.x.xR[0] < 0.999999) {
                      state.f = 1 / (1 - state.x.xR[0]) + 1 / (1 + state.x.xR[0]) + vc * state.x.xR[0];
@@ -26258,7 +26161,6 @@ static bool testminbleicunit_testother() {
                      state.g.xR[0] = 0.0;
                   }
                }
-            }
             minbleicresults(&state, &x, &rep);
             if (rep.terminationtype <= 0) {
                Ok = false;
@@ -26316,13 +26218,12 @@ static bool testminbleicunit_testother() {
          if (ckind == 2) {
             minbleicsetcond(&state, 0.0, 0.0, eps, 0);
          }
-         while (minbleiciteration(&state)) {
+         while (minbleiciteration(&state))
             if (state.needfg) {
                state.f = sqr(state.x.xR[0] + 1) + sqr(state.x.xR[1] + 1) + 10000 * machineepsilon * randomreal();
                state.g.xR[0] = 2 * (state.x.xR[0] + 1);
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
             }
-         }
          minbleicresults(&state, &xf, &rep);
          if (rep.terminationtype <= 0 || xf.xR[0] != 0.0 || xf.xR[1] != 0.0) {
             Ok = false;
@@ -26373,7 +26274,7 @@ static bool testminbleicunit_testother() {
          if (ckind == 2) {
             minbleicsetcond(&state, 0.0, 0.0, eps, 0);
          }
-         while (minbleiciteration(&state)) {
+         while (minbleiciteration(&state))
             if (state.needfg) {
                state.f = sqr(state.x.xR[0] + 1) + sqr(state.x.xR[1] + 1);
                if (state.x.xR[0] == x.xR[0] && state.x.xR[1] == x.xR[1]) {
@@ -26382,7 +26283,6 @@ static bool testminbleicunit_testother() {
                state.g.xR[0] = 2 * (state.x.xR[0] + 1);
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
             }
-         }
          minbleicresults(&state, &xf, &rep);
          if (rep.terminationtype <= 0 || xf.xR[0] != 0.0 || xf.xR[1] != 0.0) {
             Ok = false;
@@ -26428,7 +26328,7 @@ static bool testminbleicunit_testother() {
       minbleicsetcond(&state, 0.0, 0.0, 0.0, stopiteration);
       minbleicsetxrep(&state, true);
       k = -1;
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -26449,7 +26349,6 @@ static bool testminbleicunit_testother() {
          } else if (state.xupdated) {
             k++;
          } else ae_assert(false, "Assertion failed");
-      }
       minbleicresults(&state, &x1, &rep);
       Ok = Ok && rep.terminationtype == -8;
    }
@@ -26480,7 +26379,7 @@ static bool testminbleicunit_testother() {
       callidx = 0;
       terminationrequested = false;
       ae_v_move(xlast.xR, 1, x.xR, 1, n);
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = ss * sqr(exp(state.x.xR[0]) - 2) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
             state.g.xR[0] = 2 * ss * (exp(state.x.xR[0]) - 2) * exp(state.x.xR[0]) + 2 * (state.x.xR[2] - state.x.xR[0]) * (-1);
@@ -26496,7 +26395,6 @@ static bool testminbleicunit_testother() {
                ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minbleicresults(&state, &x, &rep);
       Ok = Ok && rep.terminationtype == 8;
       for (i = 0; i < n; i++) {
@@ -26571,7 +26469,7 @@ static bool testminbleicunit_testother() {
       minbleicsetbc(&state, &bl, &bu);
       minbleicsetlc(&state, &c, &ct, nec + nic);
       minbleicsetcond(&state, 0.0, 0.0, 0.0, 1);
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -26579,7 +26477,6 @@ static bool testminbleicunit_testother() {
                state.g.xR[i] = 1.0;
             }
          }
-      }
       minbleicresults(&state, &xf, &rep);
    }
 // Test that SActiveSet object prevents steps which increase infeasibility.
@@ -26621,7 +26518,7 @@ static bool testminbleicunit_testother() {
       minbleiccreate(n, &x0, &state);
       minbleicsetlc(&state, &c, &ct, 1);
       minbleicsetcond(&state, 0.0, 0.0, 1.0E-15, 0);
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -26630,7 +26527,6 @@ static bool testminbleicunit_testother() {
                state.g.xR[i] = v;
             }
          }
-      }
       minbleicresults(&state, &xf, &rep);
       Ok = Ok && rep.terminationtype > 0;
       for (i = 0; i < n; i++) {
@@ -26736,13 +26632,12 @@ static bool testminbleicunit_testconv() {
       minbleicsetbc(&state, &bl, &bu);
       minbleicsetlc(&state, &c, &ct, 4);
       minbleicsetcond(&state, epsg, 0.0, 0.0, 0);
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = state.x.xR[0] + 0.001 * state.x.xR[1];
             state.g.xR[0] = 1.0;
             state.g.xR[1] = 0.001;
          }
-      }
       minbleicresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
          Ok = Ok && NearAtR(x.xR[0], -1.0, tol);
@@ -26757,13 +26652,12 @@ static bool testminbleicunit_testconv() {
       minbleicsetbc(&state, &bl, &bu);
       minbleicsetlc(&state, &c, &ct, 4);
       minbleicsetcond(&state, epsg, 0.0, 0.0, 0);
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = sqr(state.x.xR[0] + 10) + sqr(state.x.xR[1]);
             state.g.xR[0] = 2 * (state.x.xR[0] + 10);
             state.g.xR[1] = 2 * state.x.xR[1];
          }
-      }
       minbleicresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
          Ok = Ok && NearAtR(x.xR[0], -1.0, tol);
@@ -26778,13 +26672,12 @@ static bool testminbleicunit_testconv() {
       minbleicsetbc(&state, &bl, &bu);
       minbleicsetlc(&state, &c, &ct, 4);
       minbleicsetcond(&state, epsg, 0.0, 0.0, 0);
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = sqr(state.x.xR[0] + 10) + sqr(state.x.xR[1] - 0.6);
             state.g.xR[0] = 2 * (state.x.xR[0] + 10);
             state.g.xR[1] = 2 * (state.x.xR[1] - 0.6);
          }
-      }
       minbleicresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
          Ok = Ok && NearAtR(x.xR[0], -1.0, tol);
@@ -27076,7 +26969,7 @@ static bool testminbleicunit_testconv() {
                minbleicsetbc(&state, &bl, &bu);
                minbleicsetlc(&state, &c, &ct, ccnt);
                minbleicsetcond(&state, 1.0E-9, 0.0, 0.0, 0);
-               while (minbleiciteration(&state)) {
+               while (minbleiciteration(&state))
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
@@ -27089,7 +26982,6 @@ static bool testminbleicunit_testconv() {
                         state.g.xR[i] += v;
                      }
                   } else ae_assert(false, "Assertion failed");
-               }
                minbleicresults(&state, &xs0, &rep);
                Ok = Ok && rep.terminationtype > 0;
                if (!Ok) {
@@ -27200,7 +27092,7 @@ static bool testminbleicunit_testconv() {
             minbleicsetbc(&state, &bl, &bu);
             minbleicsetlc(&state, &c, &ct, ccnt);
             minbleicsetcond(&state, 1.0E-9, 0.0, 0.0, 0);
-            while (minbleiciteration(&state)) {
+            while (minbleiciteration(&state))
                if (state.needfg) {
                   state.f = 0.0;
                   for (i = 0; i < n; i++) {
@@ -27213,7 +27105,6 @@ static bool testminbleicunit_testconv() {
                      state.g.xR[i] += v;
                   }
                } else ae_assert(false, "Assertion failed");
-            }
             minbleicresults(&state, &xs0, &rep);
             Ok = Ok && rep.terminationtype > 0;
             if (!Ok) {
@@ -27397,9 +27288,7 @@ static bool testminbleicunit_testpreconditioning() {
             for (i = 0; i < n; i++) {
                x.xR[i] = randommid();
             }
-            for (minbleicrestartfrom(&state, &x); minbleiciteration(&state); ) {
-               testminbleicunit_calciip2(&state, n, fk);
-            }
+            for (minbleicrestartfrom(&state, &x); minbleiciteration(&state); ) testminbleicunit_calciip2(&state, n, fk);
             minbleicresults(&state, &x, &rep);
             cntb1 += rep.inneriterationscount;
             Ok = Ok && rep.terminationtype > 0;
@@ -27415,9 +27304,7 @@ static bool testminbleicunit_testpreconditioning() {
             for (i = 0; i < n; i++) {
                x.xR[i] = randommid();
             }
-            for (minbleicrestartfrom(&state, &x); minbleiciteration(&state); ) {
-               testminbleicunit_calciip2(&state, n, fk);
-            }
+            for (minbleicrestartfrom(&state, &x); minbleiciteration(&state); ) testminbleicunit_calciip2(&state, n, fk);
             minbleicresults(&state, &x, &rep);
             cntg1 += rep.inneriterationscount;
             Ok = Ok && rep.terminationtype > 0;
@@ -27435,9 +27322,7 @@ static bool testminbleicunit_testpreconditioning() {
             for (i = 0; i < n; i++) {
                x.xR[i] = randommid();
             }
-            for (minbleicrestartfrom(&state, &x); minbleiciteration(&state); ) {
-               testminbleicunit_calciip2(&state, n, fk);
-            }
+            for (minbleicrestartfrom(&state, &x); minbleiciteration(&state); ) testminbleicunit_calciip2(&state, n, fk);
             minbleicresults(&state, &x, &rep);
             cntb2 += rep.inneriterationscount;
             Ok = Ok && rep.terminationtype > 0;
@@ -27449,9 +27334,7 @@ static bool testminbleicunit_testpreconditioning() {
             for (i = 0; i < n; i++) {
                x.xR[i] = randommid();
             }
-            for (minbleicrestartfrom(&state, &x); minbleiciteration(&state); ) {
-               testminbleicunit_calciip2(&state, n, fk);
-            }
+            for (minbleicrestartfrom(&state, &x); minbleiciteration(&state); ) testminbleicunit_calciip2(&state, n, fk);
             minbleicresults(&state, &x, &rep);
             cntg2 += rep.inneriterationscount;
             Ok = Ok && rep.terminationtype > 0;
@@ -27527,7 +27410,7 @@ static bool testminbleicunit_testbugs() {
             minbleiccreate(n, &x, &state);
             minbleicsetlc(&state, &c, &ct, 1);
             minbleicsetcond(&state, 0.0, 0.0, 0.0, 99);
-            while (minbleiciteration(&state)) {
+            while (minbleiciteration(&state))
                if (state.needfg) {
                   state.f = 0.0;
                   for (i = 0; i < n; i++) {
@@ -27535,7 +27418,6 @@ static bool testminbleicunit_testbugs() {
                      state.g.xR[i] = 2 * state.x.xR[i] + c.xyR[0][i];
                   }
                } else ae_assert(false, "Assertion failed");
-            }
             minbleicresultsbuf(&state, &x1, &rep);
             Ok = Ok && rep.terminationtype > 0;
             for (i = 0; i < n; i++) {
@@ -27621,7 +27503,7 @@ static bool testminbleicunit_testbugs() {
       minbleicsetlc(&state, &c, &ct, 5);
       minbleicsetcond(&state, 0.0, 0.0, tolx, 0);
       minbleicsetprecdiag(&state, &h);
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needfg) {
          // Calculate regularization term
             state.f = 0.0;
@@ -27640,7 +27522,6 @@ static bool testminbleicunit_testbugs() {
                }
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minbleicresultsbuf(&state, &x, &rep);
    }
    ae_frame_leave();
@@ -27859,7 +27740,7 @@ static bool testminbleicunit_testoptguard() {
    spdmatrixrndcond(n, 1.0E3, &a1);
    minbleiccreate(n, &x0, &state);
    minbleicsetcond(&state, 0.0, 0.0, 1.0E-9, 10);
-   while (minbleiciteration(&state)) {
+   while (minbleiciteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -27873,7 +27754,6 @@ static bool testminbleicunit_testoptguard() {
             state.g.xR[i] = 0.0;
          }
       } else ae_assert(false, "Assertion failed");
-   }
    minbleicresults(&state, &x1, &rep);
    minbleicoptguardresults(&state, &ogrep);
    Ok = Ok && rep.terminationtype > 0;
@@ -27910,7 +27790,7 @@ static bool testminbleicunit_testoptguard() {
    }
    minbleiccreate(n, &x0, &state);
    minbleicsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
-   while (minbleiciteration(&state)) {
+   while (minbleiciteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -27928,7 +27808,6 @@ static bool testminbleicunit_testoptguard() {
             }
          }
       } else ae_assert(false, "Assertion failed");
-   }
    minbleicresults(&state, &x1, &rep);
    minbleicoptguardresults(&state, &ogrep);
    Ok = Ok && isfinitevector(&x1, n);
@@ -27979,7 +27858,7 @@ static bool testminbleicunit_testoptguard() {
          minbleicsetcond(&state, 0.0, 0.0, 1.0E-9, 10);
          minbleicsetscale(&state, &s);
          minbleicsetbc(&state, &bndl, &bndu);
-         while (minbleiciteration(&state)) {
+         while (minbleiciteration(&state))
             if (state.needfg) {
                for (i = 0; i < n; i++) {
                   Ok = Ok && state.x.xR[i] >= bndl.xR[i];
@@ -28007,7 +27886,6 @@ static bool testminbleicunit_testoptguard() {
                   state.g.xR[i] /= s.xR[i];
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minbleicresults(&state, &x1, &rep);
          minbleicoptguardresults(&state, &ogrep);
       // Check that something is returned
@@ -28113,7 +27991,7 @@ static bool testminbleicunit_testoptguard() {
       minbleicsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
       minbleicsetscale(&state, &s);
       minbleicoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminbleicunit_maxoptguardlevel));
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -28131,7 +28009,6 @@ static bool testminbleicunit_testoptguard() {
                }
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minbleicresults(&state, &x1, &rep);
       minbleicoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
@@ -28233,7 +28110,7 @@ static bool testminbleicunit_testoptguard() {
       minbleiccreatef(n, &x0, diffstep, &state);
       minbleicsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
       minbleicoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminbleicunit_maxoptguardlevel));
-      while (minbleiciteration(&state)) {
+      while (minbleiciteration(&state))
          if (state.needf) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -28244,7 +28121,6 @@ static bool testminbleicunit_testoptguard() {
                state.f += fabs(v);
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minbleicresults(&state, &x1, &rep);
       minbleicoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
@@ -28287,7 +28163,7 @@ static bool testminbleicunit_testoptguard() {
    minbleiccreate(n, &x0, &state);
    minbleicoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminbleicunit_maxoptguardlevel));
    minbleicsetcond(&state, 0.0, 0.0, 1.0E-9, 25);
-   while (minbleiciteration(&state)) {
+   while (minbleiciteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -28299,7 +28175,6 @@ static bool testminbleicunit_testoptguard() {
             }
          }
       } else ae_assert(false, "Assertion failed");
-   }
    minbleicresults(&state, &x1, &rep);
    Ok = Ok && isfinitevector(&x1, n);
    Ok = Ok && rep.terminationtype > 0;
@@ -37106,13 +36981,12 @@ static bool testminlmunit_testlc() {
       }
       minlmsetcond(&state, epsx, 0);
       minlmsetlc(&state, &rawc, &rawct, rawccnt);
-      while (minlmiteration(&state)) {
+      while (minlmiteration(&state))
          if (state.needfi) {
             testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, false);
          } else if (state.needfij) {
             testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, true);
          } else ae_assert(false, "minlm test: integrity check failed");
-      }
       minlmresults(&state, &x, &rep);
       Ok = Ok && rep.terminationtype > 0;
       if (!Ok) {
@@ -37219,13 +37093,12 @@ static bool testminlmunit_testlc() {
    // Solve N-dimensional "combined" problem, store result to X1
       minlmcreatevj(n, m1 + m2, &x0, &state);
       minlmsetcond(&state, epsx, 0);
-      while (minlmiteration(&state)) {
+      while (minlmiteration(&state))
          if (state.needfi) {
             testminlmunit_testfunc1(n, m1 + m2, &c, &state.x, &v, false, &state.fi, true, &state.j, false);
          } else if (state.needfij) {
             testminlmunit_testfunc1(n, m1 + m2, &c, &state.x, &v, false, &state.fi, true, &state.j, true);
          } else ae_assert(false, "minlm test: integrity check failed");
-      }
       minlmresults(&state, &x, &rep);
       Ok = Ok && rep.terminationtype > 0;
       if (!Ok) {
@@ -37236,13 +37109,12 @@ static bool testminlmunit_testlc() {
       minlmcreatevj(2 * n, m1 + m2, &x12, &state);
       minlmsetcond(&state, epsx, 0);
       minlmsetlc(&state, &rawc, &rawct, rawccnt);
-      while (minlmiteration(&state)) {
+      while (minlmiteration(&state))
          if (state.needfi) {
             testminlmunit_testfunc1(2 * n, m1 + m2, &c12, &state.x, &v, false, &state.fi, true, &state.j, false);
          } else if (state.needfij) {
             testminlmunit_testfunc1(2 * n, m1 + m2, &c12, &state.x, &v, false, &state.fi, true, &state.j, true);
          } else ae_assert(false, "minlm test: integrity check failed");
-      }
       minlmresults(&state, &x12, &rep);
       Ok = Ok && rep.terminationtype > 0;
       if (!Ok) {
@@ -37428,7 +37300,7 @@ static bool testminlmunit_testother(bool *StateFieldConsistencyOkP) {
       callidx = 0;
       terminationrequested = false;
       ae_v_move(xlast.xR, 1, x.xR, 1, n);
-      while (minlmiteration(&state)) {
+      while (minlmiteration(&state))
          if (state.needfi || state.needfij) {
             state.fi.xR[0] = sqrt(s) * (exp(state.x.xR[0]) - 2);
             state.fi.xR[1] = state.x.xR[1];
@@ -37454,7 +37326,6 @@ static bool testminlmunit_testother(bool *StateFieldConsistencyOkP) {
                ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minlmresults(&state, &x, &rep);
       Ok = Ok && rep.terminationtype == 8;
       for (i = 0; i < n; i++) {
@@ -37476,7 +37347,7 @@ static bool testminlmunit_testother(bool *StateFieldConsistencyOkP) {
    minlmcreatevj(n, m, &x, &state);
    minlmsetcond(&state, 1.0E-12, 0);
    spoilcnt = 0;
-   while (minlmiteration(&state)) {
+   while (minlmiteration(&state))
       if (state.needfij) {
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
@@ -37532,7 +37403,6 @@ static bool testminlmunit_testother(bool *StateFieldConsistencyOkP) {
             spoilcnt++;
          }
       } else ae_assert(false, "Assertion failed");
-   }
    minlmresults(&state, &x, &rep);
    Ok = Ok && rep.terminationtype == -8;
    Ok = Ok && spoilcnt == 1;
@@ -37579,7 +37449,7 @@ static bool testminlmunit_testoptguard() {
    spdmatrixrndcond(n, 1.0E3, &a1);
    minlmcreatevj(n, 1, &x0, &state);
    minlmsetcond(&state, 1.0E-9, 10);
-   while (minlmiteration(&state)) {
+   while (minlmiteration(&state))
       if (state.needfij) {
          state.fi.xR[0] = 0.0;
          for (i = 0; i < n; i++) {
@@ -37593,7 +37463,6 @@ static bool testminlmunit_testoptguard() {
             state.j.xyR[0][i] = 0.0;
          }
       } else ae_assert(false, "Assertion failed");
-   }
    minlmresults(&state, &x1, &rep);
    minlmoptguardresults(&state, &ogrep);
    Ok = Ok && rep.terminationtype > 0;
@@ -37650,7 +37519,7 @@ static bool testminlmunit_testoptguard() {
             minlmsetcond(&state, 1.0E-9, 10);
             minlmsetscale(&state, &s);
             minlmsetbc(&state, &bndl, &bndu);
-            while (minlmiteration(&state)) {
+            while (minlmiteration(&state))
                if (state.needfi || state.needfij) {
                   for (i = 0; i < n; i++) {
                      Ok = Ok && state.x.xR[i] >= bndl.xR[i];
@@ -37696,7 +37565,6 @@ static bool testminlmunit_testoptguard() {
                      }
                   }
                } else ae_assert(false, "Assertion failed");
-            }
             minlmresults(&state, &x1, &rep);
             minlmoptguardresults(&state, &ogrep);
          // Check that something is returned
@@ -37798,12 +37666,11 @@ static bool testminlmunit_tryreproducefixedbugs() {
    bu.xR[1] = 1.0;
    minlmcreatev(2, 2, &x, 0.001, &s);
    minlmsetbc(&s, &bl, &bu);
-   while (minlmiteration(&s)) {
+   while (minlmiteration(&s))
       if (s.needfi) {
          s.fi.xR[0] = sqr(s.x.xR[0]);
          s.fi.xR[1] = sqr(s.x.xR[1]);
       }
-   }
    minlmresults(&s, &x, &rep);
    Ok = Ok && x.xR[0] >= bl.xR[0] && x.xR[0] <= bu.xR[0] && x.xR[1] >= bl.xR[1] && x.xR[1] <= bu.xR[1];
    ae_frame_leave();
@@ -37917,7 +37784,7 @@ static bool testother() {
       mincgsetcond(&state, 0.0, 0.0, 0.0, 100);
       mincgsetxrep(&state, true);
       fprev = maxrealnumber;
-      while (mincgiteration(&state)) {
+      while (mincgiteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -37934,7 +37801,6 @@ static bool testother() {
             fprev = state.f;
             ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
          }
-      }
       mincgresults(&state, &x, &rep);
       for (i = 0; i < n; i++) {
          Ok = Ok && x.xR[i] == xlast.xR[i];
@@ -37958,7 +37824,7 @@ static bool testother() {
          mincgsetcond(&state, 0.0, 0.0, 0.0, n / 2);
          wasf = false;
          wasfg = false;
-         while (mincgiteration(&state)) {
+         while (mincgiteration(&state))
             if (state.needf || state.needfg) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
@@ -37970,7 +37836,6 @@ static bool testother() {
                wasf = wasf || state.needf;
                wasfg = wasfg || state.needfg;
             }
-         }
          mincgresults(&state, &x, &rep);
          if (dkind == 0) {
             Ok = Ok && !wasf && wasfg;
@@ -38012,7 +37877,7 @@ static bool testother() {
       mincgsetstpmax(&state, stpmax);
       mincgsetxrep(&state, true);
       xprev = x.xR[0];
-      while (mincgiteration(&state)) {
+      while (mincgiteration(&state))
          if (state.needfg) {
             state.f = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
             state.g.xR[0] = exp(state.x.xR[0]) - exp(-state.x.xR[0]);
@@ -38021,7 +37886,6 @@ static bool testother() {
             Ok = Ok && NearAtR(state.x.xR[0], xprev, (1 + sqrt(machineepsilon)) * stpmax);
             xprev = state.x.xR[0];
          }
-      }
    // Test correctness of the scaling:
    // * initial point is random point from [+1,+2]^N
    // * f(x) = SUM(A[i]*x[i]^4), C[i] is random from [0.01,100]
@@ -38061,7 +37925,7 @@ static bool testother() {
                x.xR[i] = randomreal() + 1;
             }
             mincgsetcond(&state, tmpeps, 0.0, 0.0, 0);
-            for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) {
+            for (mincgrestartfrom(&state, &x); mincgiteration(&state); )
                if (state.needfg) {
                   state.f = 0.0;
                   for (i = 0; i < n; i++) {
@@ -38069,7 +37933,6 @@ static bool testother() {
                      state.g.xR[i] = 4 * a.xR[i] * pow(state.x.xR[i], 3.0);
                   }
                }
-            }
             mincgresults(&state, &x, &rep);
             if (rep.terminationtype <= 0) {
                Ok = false;
@@ -38089,7 +37952,7 @@ static bool testother() {
             hasxlast = false;
             mincgsetcond(&state, 0.0, 0.0, tmpeps, 0);
             lastscaledstep = 0.0;
-            for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) {
+            for (mincgrestartfrom(&state, &x); mincgiteration(&state); )
                if (state.needfg) {
                   state.f = 0.0;
                   for (i = 0; i < n; i++) {
@@ -38109,7 +37972,6 @@ static bool testother() {
                   ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
                   hasxlast = true;
                }
-            }
             mincgresults(&state, &x, &rep);
             if (rep.terminationtype <= 0) {
                Ok = false;
@@ -38154,7 +38016,7 @@ static bool testother() {
             mincgcreate(1, &x, &state);
             mincgsetcond(&state, epsg, 0.0, 0.0, 0);
             mincgsetcgtype(&state, cgtype);
-            while (mincgiteration(&state)) {
+            while (mincgiteration(&state))
                if (state.needfg) {
                   if (-0.999999 < state.x.xR[0] && state.x.xR[0] < 0.999999) {
                      state.f = 1 / (1 - state.x.xR[0]) + 1 / (1 + state.x.xR[0]) + vc * state.x.xR[0];
@@ -38163,7 +38025,6 @@ static bool testother() {
                      state.f = vm;
                   }
                }
-            }
             mincgresults(&state, &x, &rep);
             if (rep.terminationtype <= 0) {
                Ok = false;
@@ -38211,7 +38072,7 @@ static bool testother() {
       mincgsetcond(&state, 0.0, 0.0, 0.0, stopiteration);
       mincgsetxrep(&state, true);
       k = -1;
-      while (mincgiteration(&state)) {
+      while (mincgiteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -38232,7 +38093,6 @@ static bool testother() {
          } else if (state.xupdated) {
             k++;
          } else ae_assert(false, "Assertion failed");
-      }
       mincgresults(&state, &x1, &rep);
       Ok = Ok && rep.terminationtype == -8;
    }
@@ -38255,7 +38115,7 @@ static bool testother() {
       callidx = 0;
       terminationrequested = false;
       ae_v_move(xlast.xR, 1, x.xR, 1, n);
-      while (mincgiteration(&state)) {
+      while (mincgiteration(&state))
          if (state.needfg) {
             state.f = ss * sqr(exp(state.x.xR[0]) - 2) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
             state.g.xR[0] = 2 * ss * (exp(state.x.xR[0]) - 2) * exp(state.x.xR[0]) + 2 * (state.x.xR[2] - state.x.xR[0]) * (-1);
@@ -38271,7 +38131,6 @@ static bool testother() {
                ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
             }
          } else ae_assert(false, "Assertion failed");
-      }
       mincgresults(&state, &x, &rep);
       Ok = Ok && rep.terminationtype == 8;
       for (i = 0; i < n; i++) {
@@ -38441,9 +38300,7 @@ static bool testmincgunit_testpreconditioning() {
             for (i = 0; i < n; i++) {
                x.xR[i] = randommid();
             }
-            for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) {
-               testmincgunit_calciip2(&state, n);
-            }
+            for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) testmincgunit_calciip2(&state, n);
             mincgresults(&state, &x, &rep);
             cntb1 += rep.iterationscount;
             Ok = Ok && rep.terminationtype > 0;
@@ -38459,9 +38316,7 @@ static bool testmincgunit_testpreconditioning() {
             for (i = 0; i < n; i++) {
                x.xR[i] = randommid();
             }
-            for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) {
-               testmincgunit_calciip2(&state, n);
-            }
+            for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) testmincgunit_calciip2(&state, n);
             mincgresults(&state, &x, &rep);
             cntg1 += rep.iterationscount;
             Ok = Ok && rep.terminationtype > 0;
@@ -38510,9 +38365,7 @@ static bool testmincgunit_testpreconditioning() {
                for (i = 0; i < n; i++) {
                   x.xR[i] = randommid();
                }
-               for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) {
-                  testmincgunit_calclowrank(&state, n, vs, &d, &v, &vd, &x0);
-               }
+               for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) testmincgunit_calclowrank(&state, n, vs, &d, &v, &vd, &x0);
                mincgresults(&state, &x, &rep);
                cntb1 += rep.iterationscount;
                Ok = Ok && rep.terminationtype > 0;
@@ -38524,9 +38377,7 @@ static bool testmincgunit_testpreconditioning() {
                for (i = 0; i < n; i++) {
                   x.xR[i] = randommid();
                }
-               for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) {
-                  testmincgunit_calclowrank(&state, n, vs, &d, &v, &vd, &x0);
-               }
+               for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) testmincgunit_calclowrank(&state, n, vs, &d, &v, &vd, &x0);
                mincgresults(&state, &x, &rep);
                cntg1 += rep.iterationscount;
                Ok = Ok && rep.terminationtype > 0;
@@ -38559,9 +38410,7 @@ static bool testmincgunit_testpreconditioning() {
             for (i = 0; i < n; i++) {
                x.xR[i] = randommid();
             }
-            for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) {
-               testmincgunit_calciip2(&state, n);
-            }
+            for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) testmincgunit_calciip2(&state, n);
             mincgresults(&state, &x, &rep);
             cntb2 += rep.iterationscount;
             Ok = Ok && rep.terminationtype > 0;
@@ -38573,9 +38422,7 @@ static bool testmincgunit_testpreconditioning() {
             for (i = 0; i < n; i++) {
                x.xR[i] = randommid();
             }
-            for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) {
-               testmincgunit_calciip2(&state, n);
-            }
+            for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) testmincgunit_calciip2(&state, n);
             mincgresults(&state, &x, &rep);
             cntg2 += rep.iterationscount;
             Ok = Ok && rep.terminationtype > 0;
@@ -38797,7 +38644,7 @@ static bool testmincgunit_testoptguard() {
    spdmatrixrndcond(n, 1.0E3, &a1);
    mincgcreate(n, &x0, &state);
    mincgsetcond(&state, 0.0, 0.0, 1.0E-9, 10);
-   while (mincgiteration(&state)) {
+   while (mincgiteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -38811,7 +38658,6 @@ static bool testmincgunit_testoptguard() {
             state.g.xR[i] = 0.0;
          }
       } else ae_assert(false, "Assertion failed");
-   }
    mincgresults(&state, &x1, &rep);
    mincgoptguardresults(&state, &ogrep);
    Ok = Ok && rep.terminationtype > 0;
@@ -38848,7 +38694,7 @@ static bool testmincgunit_testoptguard() {
    }
    mincgcreate(n, &x0, &state);
    mincgsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
-   while (mincgiteration(&state)) {
+   while (mincgiteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -38866,7 +38712,6 @@ static bool testmincgunit_testoptguard() {
             }
          }
       } else ae_assert(false, "Assertion failed");
-   }
    mincgresults(&state, &x1, &rep);
    mincgoptguardresults(&state, &ogrep);
    Ok = Ok && isfinitevector(&x1, n);
@@ -38905,7 +38750,7 @@ static bool testmincgunit_testoptguard() {
          mincgoptguardgradient(&state, diffstep);
          mincgsetcond(&state, 0.0, 0.0, 1.0E-9, 10);
          mincgsetscale(&state, &s);
-         while (mincgiteration(&state)) {
+         while (mincgiteration(&state))
             if (state.needfg) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
@@ -38929,7 +38774,6 @@ static bool testmincgunit_testoptguard() {
                   state.g.xR[i] /= s.xR[i];
                }
             } else ae_assert(false, "Assertion failed");
-         }
          mincgresults(&state, &x1, &rep);
          mincgoptguardresults(&state, &ogrep);
       // Check that something is returned
@@ -39035,7 +38879,7 @@ static bool testmincgunit_testoptguard() {
       mincgsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
       mincgsetscale(&state, &s);
       mincgoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testmincgunit_maxoptguardlevel));
-      while (mincgiteration(&state)) {
+      while (mincgiteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -39053,7 +38897,6 @@ static bool testmincgunit_testoptguard() {
                }
             }
          } else ae_assert(false, "Assertion failed");
-      }
       mincgresults(&state, &x1, &rep);
       mincgoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
@@ -39155,7 +38998,7 @@ static bool testmincgunit_testoptguard() {
       mincgcreatef(n, &x0, diffstep, &state);
       mincgsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
       mincgoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testmincgunit_maxoptguardlevel));
-      while (mincgiteration(&state)) {
+      while (mincgiteration(&state))
          if (state.needf) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -39166,7 +39009,6 @@ static bool testmincgunit_testoptguard() {
                state.f += fabs(v);
             }
          } else ae_assert(false, "Assertion failed");
-      }
       mincgresults(&state, &x1, &rep);
       mincgoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
@@ -39209,7 +39051,7 @@ static bool testmincgunit_testoptguard() {
    mincgcreate(n, &x0, &state);
    mincgoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testmincgunit_maxoptguardlevel));
    mincgsetcond(&state, 0.0, 0.0, 1.0E-9, 25);
-   while (mincgiteration(&state)) {
+   while (mincgiteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -39221,7 +39063,6 @@ static bool testmincgunit_testoptguard() {
             }
          }
       } else ae_assert(false, "Assertion failed");
-   }
    mincgresults(&state, &x1, &rep);
    Ok = Ok && isfinitevector(&x1, n);
    Ok = Ok && rep.terminationtype > 0;
@@ -39322,23 +39163,17 @@ bool testmincg() {
          mincgsetcgtype(&state, cgtype);
          mincgsetstpmax(&state, 0.1);
          mincgsetcond(&state, 0.0000001, 0.0, 0.0, 0);
-         for (i = 0; i <= 10 && mincgiteration(&state); i++) {
-            testmincgunit_testfunc2(&state);
-         }
+         for (i = 0; i <= 10 && mincgiteration(&state); i++) testmincgunit_testfunc2(&state);
          x.xR[0] = 10 + 10.0 * randomreal();
          x.xR[1] = 10 + 10.0 * randomreal();
          x.xR[2] = 10 + 10.0 * randomreal();
-         for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) {
-            testmincgunit_testfunc2(&state);
-         }
+         for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) testmincgunit_testfunc2(&state);
          mincgresults(&state, &x, &rep);
          restartsOk = restartsOk && rep.terminationtype > 0 && NearAtR(x.xR[0], log(2.0), 0.01) && SmallAtR(x.xR[1], 0.01) && NearAtR(x.xR[2], log(2.0), 0.01);
          x.xR[0] = 10 + 10.0 * randomreal();
          x.xR[1] = 10 + 10.0 * randomreal();
          x.xR[2] = 10 + 10.0 * randomreal();
-         for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) {
-            testmincgunit_testfunc2(&state);
-         }
+         for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) testmincgunit_testfunc2(&state);
          mincgresults(&state, &x, &rep);
          restartsOk = restartsOk && rep.terminationtype > 0 && NearAtR(x.xR[0], log(2.0), 0.01) && SmallAtR(x.xR[1], 0.01) && NearAtR(x.xR[2], log(2.0), 0.01);
       // 1D problem #1
@@ -39459,9 +39294,7 @@ bool testmincg() {
          }
          mincgsetcond(&state, 0.001, 0.0, 0.0, 0);
          mincgsetcgtype(&state, cgtype);
-         while (mincgiteration(&state)) {
-            testmincgunit_testfunc3(&state);
-         }
+         while (mincgiteration(&state)) testmincgunit_testfunc3(&state);
          mincgresults(&state, &x, &rep);
          convOk = convOk && rep.terminationtype == 4;
          for (i = 0; i < n; i++) {
@@ -39475,9 +39308,7 @@ bool testmincg() {
          }
          mincgsetcond(&state, 0.0, 0.001, 0.0, 0);
          mincgsetcgtype(&state, cgtype);
-         while (mincgiteration(&state)) {
-            testmincgunit_testfunc3(&state);
-         }
+         while (mincgiteration(&state)) testmincgunit_testfunc3(&state);
          mincgresults(&state, &x, &rep);
          convOk = convOk && rep.terminationtype == 1;
          for (i = 0; i < n; i++) {
@@ -39491,9 +39322,7 @@ bool testmincg() {
          }
          mincgsetcond(&state, 0.0, 0.0, 0.001, 0);
          mincgsetcgtype(&state, cgtype);
-         while (mincgiteration(&state)) {
-            testmincgunit_testfunc3(&state);
-         }
+         while (mincgiteration(&state)) testmincgunit_testfunc3(&state);
          mincgresults(&state, &x, &rep);
          convOk = convOk && rep.terminationtype == 2;
          for (i = 0; i < n; i++) {
@@ -39507,9 +39336,7 @@ bool testmincg() {
          }
          mincgsetcond(&state, 0.0, 0.0, 0.0, 10);
          mincgsetcgtype(&state, cgtype);
-         while (mincgiteration(&state)) {
-            testmincgunit_testfunc3(&state);
-         }
+         while (mincgiteration(&state)) testmincgunit_testfunc3(&state);
          mincgresults(&state, &x, &rep);
          convOk = convOk && (rep.terminationtype == 5 && rep.iterationscount == 10 || rep.terminationtype == 7);
       }
@@ -41205,7 +41032,7 @@ static bool testminnlcunit_testbc() {
                }
                minnlcsetbc(&state, &bndl, &bndu);
                minnlcsetcond(&state, 1.0E-7, 0);
-               while (minnlciteration(&state)) {
+               while (minnlciteration(&state))
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
@@ -41217,7 +41044,6 @@ static bool testminnlcunit_testbc() {
                         }
                      }
                   } else ae_assert(false, "Assertion failed");
-               }
                minnlcresults(&state, &x1, &rep);
                Ok = Ok && isfinitevector(&x1, n);
                Ok = Ok && rep.terminationtype > 0;
@@ -41329,7 +41155,7 @@ static bool testminnlcunit_testbc() {
                }
                minnlcsetbc(&state, &bndl, &bndu);
                minnlcsetcond(&state, 1.0E-7, 0);
-               while (minnlciteration(&state)) {
+               while (minnlciteration(&state))
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
@@ -41341,7 +41167,6 @@ static bool testminnlcunit_testbc() {
                         }
                      }
                   } else ae_assert(false, "Assertion failed");
-               }
                minnlcresults(&state, &x1, &rep);
                Ok = Ok && isfinitevector(&x1, n);
                Ok = Ok && rep.terminationtype > 0;
@@ -41534,7 +41359,7 @@ static bool testminnlcunit_testlc() {
                if (hqrndnormal(&rs) > 0.0) {
                   minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
                }
-               while (minnlciteration(&state)) {
+               while (minnlciteration(&state))
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
@@ -41542,7 +41367,6 @@ static bool testminnlcunit_testlc() {
                         state.j.xyR[0][i] = b.xR[i] + state.x.xR[i] / sqr(s.xR[i]);
                      }
                   } else ae_assert(false, "Assertion failed");
-               }
                minnlcresults(&state, &x1, &rep);
                Ok = Ok && isfinitevector(&x1, n);
                Ok = Ok && rep.terminationtype > 0;
@@ -41658,7 +41482,7 @@ static bool testminnlcunit_testlc() {
             if (hqrndnormal(&rs) > 0.0) {
                minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
             }
-            while (minnlciteration(&state)) {
+            while (minnlciteration(&state))
                if (state.needfij) {
                   state.fi.xR[0] = 0.0;
                   for (i = 0; i < n; i++) {
@@ -41670,7 +41494,6 @@ static bool testminnlcunit_testlc() {
                      }
                   }
                } else ae_assert(false, "Assertion failed");
-            }
             minnlcresults(&state, &x1, &rep);
             Ok = Ok && isfinitevector(&x1, n);
             Ok = Ok && rep.terminationtype > 0;
@@ -41775,7 +41598,7 @@ static bool testminnlcunit_testlc() {
             if (hqrndnormal(&rs) > 0.0) {
                minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
             }
-            while (minnlciteration(&state)) {
+            while (minnlciteration(&state))
                if (state.needfij) {
                   state.fi.xR[0] = 0.0;
                   for (i = 0; i < n; i++) {
@@ -41787,7 +41610,6 @@ static bool testminnlcunit_testlc() {
                      }
                   }
                } else ae_assert(false, "Assertion failed");
-            }
             minnlcresults(&state, &x1, &rep);
             Ok = Ok && isfinitevector(&x1, n);
             Ok = Ok && rep.terminationtype > 0;
@@ -41889,7 +41711,7 @@ static bool testminnlcunit_testlc() {
          if (hqrndnormal(&rs) > 0.0) {
             minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
          }
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -41901,7 +41723,6 @@ static bool testminnlcunit_testlc() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && isfinitevector(&x1, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -41929,7 +41750,7 @@ static bool testminnlcunit_testlc() {
             }
          }
          minnlcsetbc(&state, &bndl, &bndu);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -41941,7 +41762,6 @@ static bool testminnlcunit_testlc() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x2, &rep);
          Ok = Ok && isfinitevector(&x2, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -42026,7 +41846,7 @@ static bool testminnlcunit_testlc() {
          if (hqrndnormal(&rs) > 0.0) {
             minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
          }
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -42038,7 +41858,6 @@ static bool testminnlcunit_testlc() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && isfinitevector(&x1, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -42138,7 +41957,7 @@ static bool testminnlcunit_testlc() {
          if (hqrndnormal(&rs) > 0.0) {
             minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
          }
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -42150,7 +41969,6 @@ static bool testminnlcunit_testlc() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && isfinitevector(&x1, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -42247,7 +42065,7 @@ static bool testminnlcunit_testlc() {
          if (hqrndnormal(&rs) > 0.0) {
             minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
          }
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -42259,7 +42077,6 @@ static bool testminnlcunit_testlc() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x0, &rep);
          Ok = Ok && isfinitevector(&x0, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -42275,7 +42092,7 @@ static bool testminnlcunit_testlc() {
          for (i = 0; i < n; i++) {
             xstart.xR[i] = 2.0 * randommid();
          }
-         for (minnlcrestartfrom(&state, &xstart); minnlciteration(&state); ) {
+         for (minnlcrestartfrom(&state, &xstart); minnlciteration(&state); )
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -42287,7 +42104,6 @@ static bool testminnlcunit_testlc() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && isfinitevector(&x1, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -42420,7 +42236,7 @@ static bool testminnlcunit_testlc() {
             if (hqrndnormal(&rs) > 0.0) {
                minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
             }
-            while (minnlciteration(&state)) {
+            while (minnlciteration(&state))
                if (state.needfij) {
                   state.fi.xR[0] = 0.0;
                   for (i = 0; i < n; i++) {
@@ -42433,7 +42249,6 @@ static bool testminnlcunit_testlc() {
                      state.j.xyR[0][i] += v;
                   }
                } else ae_assert(false, "Assertion failed");
-            }
             minnlcresults(&state, &xs0, &rep);
             Ok = Ok && rep.terminationtype > 0;
             if (hqrndnormal(&rs) > 0.0) {
@@ -42569,7 +42384,7 @@ static bool testminnlcunit_testlc() {
                if (hqrndnormal(&rs) > 0.0) {
                   minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
                }
-               while (minnlciteration(&state)) {
+               while (minnlciteration(&state))
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
@@ -42582,7 +42397,6 @@ static bool testminnlcunit_testlc() {
                         state.j.xyR[0][i] += v;
                      }
                   } else ae_assert(false, "Assertion failed");
-               }
                minnlcresults(&state, &xs0, &rep);
                Ok = Ok && rep.terminationtype > 0;
                if (hqrndnormal(&rs) > 0.0) {
@@ -42759,7 +42573,7 @@ static bool testminnlcunit_testnlc() {
       }
       minnlcsetcond(&state, 1.0E-7, 0);
       minnlcsetnlc(&state, 0, 1);
-      while (minnlciteration(&state)) {
+      while (minnlciteration(&state))
          if (state.needfij) {
             state.fi.xR[0] = sqr(state.x.xR[0] - 1) + sqr(state.x.xR[1] - 1);
             state.j.xyR[0][0] = 2 * (state.x.xR[0] - 1);
@@ -42768,7 +42582,6 @@ static bool testminnlcunit_testnlc() {
             state.j.xyR[1][0] = 2 * state.x.xR[0];
             state.j.xyR[1][1] = 2 * state.x.xR[1];
          } else ae_assert(false, "Assertion failed");
-      }
       minnlcresults(&state, &x1, &rep);
       Ok = Ok && isfinitevector(&x1, n);
       Ok = Ok && rep.terminationtype > 0;
@@ -42783,7 +42596,7 @@ static bool testminnlcunit_testnlc() {
       if (hqrndnormal(&rs) > 0.0) {
          minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
       }
-      while (minnlciteration(&state)) {
+      while (minnlciteration(&state))
          if (state.needfij) {
             state.fi.xR[0] = sqr(state.x.xR[0] - 1) + sqr(state.x.xR[1] - 1);
             state.j.xyR[0][0] = 2 * (state.x.xR[0] - 1);
@@ -42792,7 +42605,6 @@ static bool testminnlcunit_testnlc() {
             state.j.xyR[1][0] = 2 * state.x.xR[0];
             state.j.xyR[1][1] = 2 * state.x.xR[1];
          } else ae_assert(false, "Assertion failed");
-      }
       minnlcresults(&state, &x1, &rep);
       Ok = Ok && isfinitevector(&x1, n);
       Ok = Ok && rep.terminationtype > 0;
@@ -42876,7 +42688,7 @@ static bool testminnlcunit_testnlc() {
             if (hqrndnormal(&rs) > 0.0) {
                minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
             }
-            while (minnlciteration(&state)) {
+            while (minnlciteration(&state))
                if (state.needfij) {
                   for (i = 0; i <= cntnlec + 2 * cntnlic; i++) {
                      state.fi.xR[i] = 0.0;
@@ -42907,7 +42719,6 @@ static bool testminnlcunit_testnlc() {
                      state.j.xyR[1 + cntnlec + 2 * i + 1][k] = 1 / s.xR[k];
                   }
                } else ae_assert(false, "Assertion failed");
-            }
             minnlcresults(&state, &x1, &rep);
             Ok = Ok && isfinitevector(&x1, n);
             Ok = Ok && rep.terminationtype > 0;
@@ -43090,7 +42901,7 @@ static bool testminnlcunit_testnlc() {
             if (hqrndnormal(&rs) > 0.0) {
                minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
             }
-            while (minnlciteration(&state)) {
+            while (minnlciteration(&state))
                if (state.needfij) {
                // Evaluate target function
                   state.fi.xR[0] = 0.0;
@@ -43132,7 +42943,6 @@ static bool testminnlcunit_testnlc() {
                   ae_assert(knlec == 1 + cntnlec, "Assertion failed");
                   ae_assert(knlic == 1 + cntnlec + cntnlic, "Assertion failed");
                } else ae_assert(false, "Assertion failed");
-            }
             minnlcresults(&state, &x1, &rep);
             Ok = Ok && isfinitevector(&x1, n);
             Ok = Ok && rep.terminationtype > 0;
@@ -43457,7 +43267,7 @@ static bool testminnlcunit_testother() {
       minnlcsetcond(&state, 1.0E-7, 0);
       minnlcsetnlc(&state, 0, 1);
       minnlcsetxrep(&state, true);
-      while (minnlciteration(&state)) {
+      while (minnlciteration(&state))
          if (state.needfij) {
             state.fi.xR[0] = sqr(state.x.xR[0] - 1) + sqr(state.x.xR[1] - 1);
             state.j.xyR[0][0] = 2 * (state.x.xR[0] - 1);
@@ -43476,7 +43286,6 @@ static bool testminnlcunit_testother() {
             xlast.xR[0] = state.x.xR[0];
             xlast.xR[1] = state.x.xR[1];
          } else ae_assert(false, "Assertion failed");
-      }
       minnlcresults(&state, &x1, &rep);
       Ok = Ok && isfinitevector(&x1, n);
       Ok = Ok && rep.terminationtype > 0;
@@ -43511,12 +43320,11 @@ static bool testminnlcunit_testother() {
       }
       minnlcsetcond(&state, 1.0E-7, 0);
       minnlcsetnlc(&state, 0, 1);
-      while (minnlciteration(&state)) {
+      while (minnlciteration(&state))
          if (state.needfi) {
             state.fi.xR[0] = sqr(state.x.xR[0] - 1) + sqr(state.x.xR[1] - 1);
             state.fi.xR[1] = sqr(state.x.xR[0]) + sqr(state.x.xR[1]) - 1;
          } else ae_assert(false, "Assertion failed");
-      }
       minnlcresults(&state, &x1, &rep);
       Ok = Ok && isfinitevector(&x1, n);
       Ok = Ok && rep.terminationtype > 0;
@@ -43595,7 +43403,7 @@ static bool testminnlcunit_testother() {
             }
          }
          minnlcsetlc(&state, &c, &ct, k);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -43603,7 +43411,6 @@ static bool testminnlcunit_testother() {
                   state.j.xyR[0][i] = 2 * state.x.xR[i];
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && isfinitevector(&x1, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -43638,7 +43445,7 @@ static bool testminnlcunit_testother() {
          }
          minnlcsetcond(&state, 0.0, maxits);
          minnlcsetnlc(&state, k, 0);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -43651,7 +43458,6 @@ static bool testminnlcunit_testother() {
                   ae_v_move(state.j.xyR[1 + i], 1, c.xyR[i], 1, n);
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x2, &rep);
          Ok = Ok && isfinitevector(&x2, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -43715,7 +43521,7 @@ static bool testminnlcunit_testother() {
          minnlcsetcond(&state, 0.0, stopiteration);
          minnlcsetxrep(&state, true);
          k = -1;
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -43736,7 +43542,6 @@ static bool testminnlcunit_testother() {
             } else if (state.xupdated) {
                k++;
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype == -8;
       }
@@ -43778,7 +43583,7 @@ static bool testminnlcunit_testother() {
          }
          minnlcsetbc(&state, &bndl, &bndu);
          minnlcsetcond(&state, 1.0E-8, 0);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -43792,7 +43597,6 @@ static bool testminnlcunit_testother() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
       // Check numerical Jacobian
@@ -43808,7 +43612,7 @@ static bool testminnlcunit_testother() {
          }
          minnlcsetbc(&state, &bndl, &bndu);
          minnlcsetcond(&state, 1.0E-8, 0);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfi) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -43820,7 +43624,6 @@ static bool testminnlcunit_testother() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
       }
@@ -43848,7 +43651,7 @@ static bool testminnlcunit_testother() {
             }
          }
          minnlcsetcond(&state, 1.0E-7, 200);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -43856,7 +43659,6 @@ static bool testminnlcunit_testother() {
                   state.j.xyR[0][i] = 4 * pow(state.x.xR[i], 3.0);
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
       // Check solution itself
          Ok = Ok && isfinitevector(&x1, n);
@@ -43920,7 +43722,7 @@ static bool testminnlcunit_testother() {
          minnlcsetbc(&state, &bndl, &bndu);
          minnlcsetlc(&state, &c, &ct, k);
          minnlcsetcond(&state, 1.0E-7, 0);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -43928,7 +43730,6 @@ static bool testminnlcunit_testother() {
                   state.j.xyR[0][i] = 2 * (state.x.xR[i] - xu.xR[i]);
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
       // Check solution itself, calculate reference violation values
          Ok = Ok && isfinitevector(&x1, n);
@@ -44014,7 +43815,7 @@ static bool testminnlcunit_testother() {
          minnlcsetlc(&state, &c, &ct, k);
          minnlcsetscale(&state, &s);
          minnlcsetcond(&state, 1.0E-7, 0);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -44022,7 +43823,6 @@ static bool testminnlcunit_testother() {
                   state.j.xyR[0][i] = 2 * (state.x.xR[i] - xu.xR[i]);
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
       // Check solution itself, calculate reference violation values
          Ok = Ok && isfinitevector(&x1, n);
@@ -44115,7 +43915,7 @@ static bool testminnlcunit_testother() {
          minnlcsetnlc(&state, nlec, nlic);
          minnlcsetscale(&state, &s);
          minnlcsetcond(&state, 1.0E-7, 0);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -44130,7 +43930,6 @@ static bool testminnlcunit_testother() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
       // Check solution itself, calculate reference violation values
          Ok = Ok && isfinitevector(&x1, n);
@@ -44189,7 +43988,7 @@ static bool testminnlcunit_testother() {
          callidx = 0;
          terminationrequested = false;
          ae_v_move(xlast.xR, 1, x0.xR, 1, n);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = ss * sqr(exp(state.x.xR[0]) - 2) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
                state.j.xyR[0][0] = 2 * ss * (exp(state.x.xR[0]) - 2) * exp(state.x.xR[0]) + 2 * (state.x.xR[2] - state.x.xR[0]) * (-1);
@@ -44205,7 +44004,6 @@ static bool testminnlcunit_testother() {
                   ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype == 8;
          for (i = 0; i < n; i++) {
@@ -44291,7 +44089,7 @@ static bool testminnlcunit_testother() {
             minnlcsetnlc(&state, blocksize * blockcnt, 0);
          }
          minnlcsetprecnone(&state);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -44306,7 +44104,6 @@ static bool testminnlcunit_testother() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && isfinitevector(&x1, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -44325,7 +44122,7 @@ static bool testminnlcunit_testother() {
             minnlcsetnlc(&state, blocksize * blockcnt, 0);
          }
          minnlcsetprecinexact(&state);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -44340,7 +44137,6 @@ static bool testminnlcunit_testother() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && isfinitevector(&x1, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -44359,7 +44155,7 @@ static bool testminnlcunit_testother() {
             minnlcsetnlc(&state, blocksize * blockcnt, 0);
          }
          minnlcsetprecexactlowrank(&state, 3);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -44374,7 +44170,6 @@ static bool testminnlcunit_testother() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && isfinitevector(&x1, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -44393,7 +44188,7 @@ static bool testminnlcunit_testother() {
             minnlcsetnlc(&state, blocksize * blockcnt, 0);
          }
          minnlcsetprecexactrobust(&state, 3);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -44408,7 +44203,6 @@ static bool testminnlcunit_testother() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && isfinitevector(&x1, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -44507,7 +44301,7 @@ static bool testminnlcunit_testbugs() {
       if (ckind == 2) {
          minnlcsetnlc(&state, 0, 1);
       }
-      while (minnlciteration(&state)) {
+      while (minnlciteration(&state))
          if (state.needfij) {
             state.fi.xR[0] = state.x.xR[0] - sqr(state.x.xR[0]);
             state.j.xyR[0][0] = 1 - 2 * state.x.xR[0];
@@ -44516,7 +44310,6 @@ static bool testminnlcunit_testbugs() {
                state.j.xyR[1][0] = -1.0;
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minnlcresults(&state, &x1, &rep);
       Ok = Ok && rep.terminationtype > 0;
       if (!Ok) {
@@ -44538,7 +44331,7 @@ static bool testminnlcunit_testbugs() {
       if (ckind == 2) {
          minnlcsetnlc(&state, 0, 1);
       }
-      while (minnlciteration(&state)) {
+      while (minnlciteration(&state))
          if (state.needfij) {
             state.fi.xR[0] = state.x.xR[0] - sqr(state.x.xR[0]);
             state.j.xyR[0][0] = 1 - 2 * state.x.xR[0];
@@ -44547,7 +44340,6 @@ static bool testminnlcunit_testbugs() {
                state.j.xyR[1][0] = -1.0;
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minnlcresults(&state, &x1, &rep);
       Ok = Ok && rep.terminationtype > 0;
       if (!Ok) {
@@ -44567,7 +44359,7 @@ static bool testminnlcunit_testbugs() {
       if (ckind == 2) {
          minnlcsetnlc(&state, 0, 1);
       }
-      while (minnlciteration(&state)) {
+      while (minnlciteration(&state))
          if (state.needfij) {
             state.fi.xR[0] = state.x.xR[0] - sqr(state.x.xR[0]);
             state.j.xyR[0][0] = 1 - 2 * state.x.xR[0];
@@ -44576,7 +44368,6 @@ static bool testminnlcunit_testbugs() {
                state.j.xyR[1][0] = -1.0;
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minnlcresults(&state, &x1, &rep);
       Ok = Ok && rep.terminationtype > 0;
       if (!Ok) {
@@ -44640,7 +44431,7 @@ static bool testminnlcunit_testbugs() {
          }
          minnlcsetcond(&state, 1.0E-7, 20);
          minnlcsetnlc(&state, k, k);
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (j = 0; j < n; j++) {
@@ -44655,7 +44446,6 @@ static bool testminnlcunit_testbugs() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          Ok = Ok && isfinitevector(&x1, n);
          Ok = Ok && rep.terminationtype > 0;
@@ -44961,7 +44751,7 @@ static bool testminnlcunit_testoptguard() {
       }
       minnlcsetcond(&state, 1.0E-7, 10);
       minnlcsetnlc(&state, 0, 1);
-      while (minnlciteration(&state)) {
+      while (minnlciteration(&state))
          if (state.needfij) {
             state.fi.xR[0] = 0.0;
             for (i = 0; i < n; i++) {
@@ -44984,7 +44774,6 @@ static bool testminnlcunit_testoptguard() {
                state.j.xyR[1][i] = 0.0;
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minnlcresults(&state, &x1, &rep);
       minnlcoptguardresults(&state, &ogrep);
       Ok = Ok && rep.terminationtype > 0;
@@ -45034,7 +44823,7 @@ static bool testminnlcunit_testoptguard() {
          }
       }
       minnlcsetcond(&state, 1.0E-9, 50);
-      while (minnlciteration(&state)) {
+      while (minnlciteration(&state))
          if (state.needfij) {
             state.fi.xR[0] = 0.0;
             for (i = 0; i < n; i++) {
@@ -45052,7 +44841,6 @@ static bool testminnlcunit_testoptguard() {
                }
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minnlcresults(&state, &x1, &rep);
       minnlcoptguardresults(&state, &ogrep);
       Ok = Ok && isfinitevector(&x1, n);
@@ -45118,7 +44906,7 @@ static bool testminnlcunit_testoptguard() {
                minnlcsetscale(&state, &s);
                minnlcsetbc(&state, &bndl, &bndu);
                minnlcsetnlc(&state, 0, 1);
-               while (minnlciteration(&state)) {
+               while (minnlciteration(&state))
                   if (state.needfij) {
                      if (solvertype != 0) {
                         for (i = 0; i < n; i++) {
@@ -45158,7 +44946,6 @@ static bool testminnlcunit_testoptguard() {
                         state.j.xyR[1][i] /= s.xR[i];
                      }
                   } else ae_assert(false, "Assertion failed");
-               }
                minnlcresults(&state, &x1, &rep);
                minnlcoptguardresults(&state, &ogrep);
             // Check that something is returned
@@ -45268,7 +45055,7 @@ static bool testminnlcunit_testoptguard() {
       minnlcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel));
       minnlcsetbc(&state, &bndl, &bndu);
       minnlcsetcond(&state, 1.0E-7, 25);
-      while (minnlciteration(&state)) {
+      while (minnlciteration(&state))
          if (state.needfij) {
             state.fi.xR[0] = 0.0;
             for (i = 0; i < n; i++) {
@@ -45280,7 +45067,6 @@ static bool testminnlcunit_testoptguard() {
                }
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minnlcresults(&state, &x1, &rep);
       Ok = Ok && isfinitevector(&x1, n);
       Ok = Ok && rep.terminationtype > 0;
@@ -45381,7 +45167,7 @@ static bool testminnlcunit_testoptguard() {
             minnlcsetcond(&state, 1.0E-7, 1000);
             minnlcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel));
             minnlcsetxrep(&state, true);
-            while (minnlciteration(&state)) {
+            while (minnlciteration(&state))
                if (state.needfij) {
                   state.fi.xR[0] = 0.0;
                   for (i = 0; i < n; i++) {
@@ -45433,7 +45219,6 @@ static bool testminnlcunit_testoptguard() {
                      cntabove++;
                   }
                } else ae_assert(false, "Assertion failed");
-            }
             minnlcresults(&state, &x1, &rep);
             minnlcoptguardresults(&state, &ogrep);
          // Check basic properties of the solution
@@ -45530,7 +45315,7 @@ static bool testminnlcunit_testoptguard() {
          minnlcsetcond(&state, 1.0E-7, 50);
          minnlcsetscale(&state, &s);
          minnlcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel));
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -45548,7 +45333,6 @@ static bool testminnlcunit_testoptguard() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          minnlcoptguardresults(&state, &ogrep);
       // Check basic properties of the solution
@@ -45665,7 +45449,7 @@ static bool testminnlcunit_testoptguard() {
          }
          minnlcsetcond(&state, 1.0E-7, 50);
          minnlcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel));
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfi) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -45676,7 +45460,6 @@ static bool testminnlcunit_testoptguard() {
                   state.fi.xR[0] += fabs(v);
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          minnlcoptguardresults(&state, &ogrep);
       // Check basic properties of the solution
@@ -45756,7 +45539,7 @@ static bool testminnlcunit_testoptguard() {
          minnlcsetnlc(&state, 0, n);
          minnlcsetscale(&state, &s);
          minnlcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel));
-         while (minnlciteration(&state)) {
+         while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -45777,7 +45560,6 @@ static bool testminnlcunit_testoptguard() {
                   }
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnlcresults(&state, &x1, &rep);
          minnlcoptguardresults(&state, &ogrep);
       // Check basic properties of the solution
@@ -45912,7 +45694,7 @@ static bool testminnsunit_basictest0uc() {
       }
       minnscreate(n, &x0, &s);
       minnssetalgoags(&s, 0.1, 0.0);
-      while (minnsiteration(&s)) {
+      while (minnsiteration(&s))
          if (s.needfij) {
             s.fi.xR[0] = 0.0;
             for (i = 0; i < n; i++) {
@@ -45920,7 +45702,6 @@ static bool testminnsunit_basictest0uc() {
                s.j.xyR[0][i] = d.xR[i] * sign(s.x.xR[i]);
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minnsresults(&s, &x1, &rep);
       Ok = Ok && rep.terminationtype > 0;
       if (!Ok) {
@@ -45961,7 +45742,7 @@ static bool testminnsunit_basictest1uc() {
    x0.xR[1] = 0.0;
    minnscreate(n, &x0, &s);
    minnssetalgoags(&s, 0.1, 0.0);
-   while (minnsiteration(&s)) {
+   while (minnsiteration(&s))
       if (s.needfij) {
          v0 = s.x.xR[0];
          v1 = s.x.xR[1];
@@ -45977,7 +45758,6 @@ static bool testminnsunit_basictest1uc() {
             s.j.xyR[0][1] += 100 * 2;
          }
       } else ae_assert(false, "Assertion failed");
-   }
    minnsresults(&s, &x1, &rep);
    Ok = Ok && rep.terminationtype > 0;
    if (!Ok) {
@@ -46030,7 +45810,7 @@ static bool testminnsunit_basictest0bc() {
       minnscreate(n, &x0, &s);
       minnssetalgoags(&s, 0.1, 0.0);
       minnssetbc(&s, &bl, &bu);
-      while (minnsiteration(&s)) {
+      while (minnsiteration(&s))
          if (s.needfij) {
             s.fi.xR[0] = 0.0;
             for (i = 0; i < n; i++) {
@@ -46038,7 +45818,6 @@ static bool testminnsunit_basictest0bc() {
                s.j.xyR[0][i] = d.xR[i] * sign(s.x.xR[i]);
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minnsresults(&s, &x1, &rep);
       Ok = Ok && rep.terminationtype > 0;
       if (!Ok) {
@@ -46090,7 +45869,7 @@ static bool testminnsunit_basictest1bc() {
    minnscreate(n, &x0, &s);
    minnssetbc(&s, &bndl, &bndu);
    minnssetalgoags(&s, 0.1, 0.0);
-   while (minnsiteration(&s)) {
+   while (minnsiteration(&s))
       if (s.needfij) {
          v0 = s.x.xR[0];
          v1 = s.x.xR[1];
@@ -46098,7 +45877,6 @@ static bool testminnsunit_basictest1bc() {
          s.j.xyR[0][0] = 10 * sign(sqr(v0) - v1) * 2 * v0 + 2 * (v0 - 1);
          s.j.xyR[0][1] = (double)(10 * sign(sqr(v0) - v1) * (-1));
       } else ae_assert(false, "Assertion failed");
-   }
    minnsresults(&s, &x1, &rep);
    Ok = Ok && rep.terminationtype > 0;
    if (!Ok) {
@@ -46165,7 +45943,7 @@ static bool testminnsunit_basictest0lc() {
       minnscreate(n, &x0, &s);
       minnssetalgoags(&s, 0.1, 0.0);
       minnssetlc(&s, &c, &ct, nc);
-      while (minnsiteration(&s)) {
+      while (minnsiteration(&s))
          if (s.needfij) {
             s.fi.xR[0] = 0.0;
             for (i = 0; i < n; i++) {
@@ -46173,7 +45951,6 @@ static bool testminnsunit_basictest0lc() {
                s.j.xyR[0][i] = d * 2 * s.x.xR[i];
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minnsresults(&s, &x1, &rep);
       Ok = Ok && rep.terminationtype > 0;
       if (!Ok) {
@@ -46229,7 +46006,7 @@ static bool testminnsunit_basictest1lc() {
    minnscreate(n, &x0, &s);
    minnssetlc(&s, &c, &ct, 2);
    minnssetalgoags(&s, 0.1, 0.0);
-   while (minnsiteration(&s)) {
+   while (minnsiteration(&s))
       if (s.needfij) {
          v0 = s.x.xR[0];
          v1 = s.x.xR[1];
@@ -46237,7 +46014,6 @@ static bool testminnsunit_basictest1lc() {
          s.j.xyR[0][0] = 10 * sign(sqr(v0) - v1) * 2 * v0 + 2 * (v0 - 1);
          s.j.xyR[0][1] = (double)(10 * sign(sqr(v0) - v1) * (-1));
       } else ae_assert(false, "Assertion failed");
-   }
    minnsresults(&s, &x1, &rep);
    Ok = Ok && rep.terminationtype > 0;
    if (!Ok) {
@@ -46303,7 +46079,7 @@ static bool testminnsunit_basictest0nlc() {
       minnscreate(n, &x0, &s);
       minnssetalgoags(&s, 0.1, 100.0);
       minnssetnlc(&s, nec, nic);
-      while (minnsiteration(&s)) {
+      while (minnsiteration(&s))
          if (s.needfij) {
             s.fi.xR[0] = 0.0;
             for (j = 0; j < n; j++) {
@@ -46325,7 +46101,6 @@ static bool testminnsunit_basictest0nlc() {
                }
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minnsresults(&s, &x1, &rep);
       Ok = Ok && rep.terminationtype > 0;
       if (!Ok) {
@@ -46401,7 +46176,7 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
          }
          werexreports = false;
          repferr = 0.0;
-         while (minnsiteration(&state)) {
+         while (minnsiteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -46420,7 +46195,6 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
                }
                repferr = rmax2(repferr, fabs(v - state.f));
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          *OtherOkP = *OtherOkP && werexreports == requirexrep;
@@ -46458,7 +46232,7 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
          minnssetscale(&state, &s);
          minnssetxrep(&state, true);
          repferr = 0.0;
-         while (minnsiteration(&state)) {
+         while (minnsiteration(&state))
             if (state.needfi) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -46471,7 +46245,6 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
                }
                repferr = rmax2(repferr, fabs(v - state.f));
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          *OtherOkP = *OtherOkP && repferr <= 10000 * machineepsilon;
@@ -46513,7 +46286,7 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
          minnssetalgoags(&state, 0.1, 0.0);
          minnssetcond(&state, 0.0, testminnsunit_scalingtestcnt);
          minnssetxrep(&state, false);
-         while (minnsiteration(&state)) {
+         while (minnsiteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -46521,7 +46294,6 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] - xc.xR[i]);
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          if (!Ok || !*OtherOkP) {
@@ -46531,7 +46303,7 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
          minnssetscale(&state, &s);
          minnssetxrep(&state, true);
          werexreports = false;
-         for (minnsrestartfrom(&state, &x0s); minnsiteration(&state); ) {
+         for (minnsrestartfrom(&state, &x0s); minnsiteration(&state); )
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -46542,7 +46314,6 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
                ae_v_move(xrlast.xR, 1, state.x.xR, 1, n);
                werexreports = true;
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1s, &rep);
          Ok = Ok && rep.terminationtype > 0;
          if (!Ok || !*OtherOkP) {
@@ -46653,7 +46424,7 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
          }
          werexreports = false;
          repferr = 0.0;
-         while (minnsiteration(&state)) {
+         while (minnsiteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -46676,7 +46447,6 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
                   Ok = Ok && state.x.xR[i] <= bndu.xR[i];
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          *OtherOkP = *OtherOkP && werexreports == requirexrep;
@@ -46722,7 +46492,7 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
       minnssetalgoags(&state, 0.1, 0.0);
       minnssetcond(&state, epsrad, 0);
       minnssetbc(&state, &bndl, &bndu);
-      while (minnsiteration(&state)) {
+      while (minnsiteration(&state))
          if (state.needfij) {
             state.fi.xR[0] = 0.0;
             for (i = 0; i < n; i++) {
@@ -46741,7 +46511,6 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
                }
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minnsresults(&state, &x1, &rep);
       Ok = Ok && rep.terminationtype > 0;
       if (!Ok || !*OtherOkP) {
@@ -46789,7 +46558,7 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
          minnssetcond(&state, epsrad, 0);
          minnssetbc(&state, &bndl, &bndu);
          v = -1000.0;
-         while (minnsiteration(&state)) {
+         while (minnsiteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -46799,7 +46568,6 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
                   state.j.xyR[0][i] = v * (v1 + 2 * v0 * v1);
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          for (i = 0; i < n; i++) {
@@ -46856,7 +46624,7 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
          minnssetbc(&state, &bndl, &bndu);
          minnssetxrep(&state, true);
          repferr = 0.0;
-         while (minnsiteration(&state)) {
+         while (minnsiteration(&state))
             if (state.needfi) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -46873,7 +46641,6 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
                }
                repferr = rmax2(repferr, fabs(v - state.f));
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          *OtherOkP = *OtherOkP && repferr <= 10000 * machineepsilon;
@@ -46945,7 +46712,7 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
          minnssetcond(&state, 0.0, testminnsunit_scalingtestcnt);
          minnssetbc(&state, &bndl, &bndu);
          minnssetxrep(&state, false);
-         while (minnsiteration(&state)) {
+         while (minnsiteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -46953,7 +46720,6 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] - xc.xR[i]);
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          if (!Ok || !*OtherOkP) {
@@ -46962,7 +46728,7 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
          }
          minnssetscale(&state, &s);
          minnssetbc(&state, &scaledbndl, &scaledbndu);
-         for (minnsrestartfrom(&state, &x0s); minnsiteration(&state); ) {
+         for (minnsrestartfrom(&state, &x0s); minnsiteration(&state); )
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -46970,7 +46736,6 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] / s.xR[i] - xc.xR[i]) / s.xR[i];
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1s, &rep);
          Ok = Ok && rep.terminationtype > 0;
          if (!Ok || !*OtherOkP) {
@@ -47071,7 +46836,7 @@ static bool testminnsunit_testlc(bool *OtherOkP) {
          minnssetlc(&state, &c, &ct, nc);
          repferr = 0.0;
          flast0 = NAN;
-         while (minnsiteration(&state)) {
+         while (minnsiteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -47085,7 +46850,6 @@ static bool testminnsunit_testlc(bool *OtherOkP) {
                }
                repferr = rmax2(repferr, fabs(flast0 - state.f));
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          Ok = Ok && isfinite(flast0);
@@ -47098,7 +46862,7 @@ static bool testminnsunit_testlc(bool *OtherOkP) {
          rho = 1000.0;
          repferr = 0.0;
          flast1 = NAN;
-         for (minnsrestartfrom(&state, &x0); minnsiteration(&state); ) {
+         for (minnsrestartfrom(&state, &x0); minnsiteration(&state); )
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -47132,7 +46896,6 @@ static bool testminnsunit_testlc(bool *OtherOkP) {
                   flast1 += d.xR[i] * sqr(state.x.xR[i] - xc.xR[i]);
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x2, &rep);
          Ok = Ok && rep.terminationtype > 0;
          Ok = Ok && isfinite(flast1);
@@ -47166,7 +46929,7 @@ static bool testminnsunit_testlc(bool *OtherOkP) {
          minnssetcond(&state, epsrad, 0);
          minnssetlc(&state, &c, &ct, 2 * n);
          v = -1000.0;
-         while (minnsiteration(&state)) {
+         while (minnsiteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -47176,7 +46939,6 @@ static bool testminnsunit_testlc(bool *OtherOkP) {
                   state.j.xyR[0][i] = v * (v1 + 2 * v0 * v1);
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          for (i = 0; i < n; i++) {
@@ -47256,7 +47018,7 @@ static bool testminnsunit_testlc(bool *OtherOkP) {
          minnssetcond(&state, 0.0, testminnsunit_scalingtestcnt);
          minnssetlc(&state, &c, &ct, 2 * n);
          minnssetxrep(&state, false);
-         while (minnsiteration(&state)) {
+         while (minnsiteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -47264,7 +47026,6 @@ static bool testminnsunit_testlc(bool *OtherOkP) {
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] - xc.xR[i]);
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          if (!Ok || !*OtherOkP) {
@@ -47273,7 +47034,7 @@ static bool testminnsunit_testlc(bool *OtherOkP) {
          }
          minnssetscale(&state, &s);
          minnssetlc(&state, &scaledc, &ct, 2 * n);
-         for (minnsrestartfrom(&state, &x0s); minnsiteration(&state); ) {
+         for (minnsrestartfrom(&state, &x0s); minnsiteration(&state); )
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
@@ -47281,7 +47042,6 @@ static bool testminnsunit_testlc(bool *OtherOkP) {
                   state.j.xyR[0][i] = d.xR[i] * sign(state.x.xR[i] / s.xR[i] - xc.xR[i]) / s.xR[i];
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minnsresults(&state, &x1s, &rep);
          Ok = Ok && rep.terminationtype > 0;
          if (!Ok || !*OtherOkP) {
@@ -47371,7 +47131,7 @@ static bool testminnsunit_testnlc(bool *OtherOkP) {
                minnssetcond(&state, epsrad, 0);
                minnssetscale(&state, &s);
                minnssetnlc(&state, nec, nc - nec);
-               while (minnsiteration(&state)) {
+               while (minnsiteration(&state))
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
@@ -47386,7 +47146,6 @@ static bool testminnsunit_testnlc(bool *OtherOkP) {
                         state.j.xyR[i][i - 1] = r.xR[i - 1];
                      }
                   } else ae_assert(false, "Assertion failed");
-               }
                minnsresults(&state, &x1, &rep);
                Ok = Ok && rep.terminationtype > 0;
                if (!Ok || !*OtherOkP) {
@@ -47438,7 +47197,7 @@ static bool testminnsunit_testnlc(bool *OtherOkP) {
                minnssetcond(&state, epsrad, 0);
                minnssetscale(&state, &s);
                minnssetnlc(&state, nec, nc - nec);
-               while (minnsiteration(&state)) {
+               while (minnsiteration(&state))
                   if (state.needfi) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
@@ -47448,7 +47207,6 @@ static bool testminnsunit_testnlc(bool *OtherOkP) {
                         state.fi.xR[i] = state.x.xR[i - 1] * r.xR[i - 1];
                      }
                   } else ae_assert(false, "Assertion failed");
-               }
                minnsresults(&state, &x1, &rep);
                Ok = Ok && rep.terminationtype > 0;
                if (!Ok || !*OtherOkP) {
@@ -47515,7 +47273,7 @@ static bool testminnsunit_testnlc(bool *OtherOkP) {
                minnssetalgoags(&state, 0.1, 1.0);
                minnssetcond(&state, 0.0, testminnsunit_scalingtestcnt);
                minnssetnlc(&state, nec, nc - nec);
-               while (minnsiteration(&state)) {
+               while (minnsiteration(&state))
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
@@ -47530,7 +47288,6 @@ static bool testminnsunit_testnlc(bool *OtherOkP) {
                         state.j.xyR[i][i - 1] = r.xR[i - 1];
                      }
                   } else ae_assert(false, "Assertion failed");
-               }
                minnsresults(&state, &x1, &rep);
                Ok = Ok && rep.terminationtype > 0;
                if (!Ok || !*OtherOkP) {
@@ -47538,7 +47295,7 @@ static bool testminnsunit_testnlc(bool *OtherOkP) {
                   return Ok;
                }
                minnssetscale(&state, &s);
-               for (minnsrestartfrom(&state, &x0s); minnsiteration(&state); ) {
+               for (minnsrestartfrom(&state, &x0s); minnsiteration(&state); )
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
                      for (i = 0; i < n; i++) {
@@ -47553,7 +47310,6 @@ static bool testminnsunit_testnlc(bool *OtherOkP) {
                         state.j.xyR[i][i - 1] = r.xR[i - 1] / s.xR[i - 1];
                      }
                   } else ae_assert(false, "Assertion failed");
-               }
                minnsresults(&state, &x1s, &rep);
                for (i = 0; i < n; i++) {
                   Ok = Ok && isfinite(x1.xR[i]) && isfinite(x1s.xR[i]) && NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], testminnsunit_scalingtesttol);
@@ -47605,7 +47361,7 @@ static bool testminnsunit_testother() {
       minnssetcond(&state, epsrad, 0);
       minnssetnlc(&state, 1, 1);
       v = 1000.0;
-      while (minnsiteration(&state)) {
+      while (minnsiteration(&state))
          if (state.needfij) {
             v0 = state.x.xR[0];
             v1 = state.x.xR[1];
@@ -47619,7 +47375,6 @@ static bool testminnsunit_testother() {
             state.j.xyR[2][0] = rho;
             state.j.xyR[2][1] = 0.0;
          } else ae_assert(false, "Assertion failed");
-      }
       minnsresults(&state, &x1, &rep);
       Ok = Ok && rep.terminationtype > 0;
       Ok = Ok && isfinite(x1.xR[0]);
@@ -47948,7 +47703,7 @@ static bool testminbcunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                minbcsetbc(&state, &bl, &bu);
                minbcsetcond(&state, weakepsg, 0.0, 0.0, 0);
                testminbcunit_setrandompreconditioner(&state, n, preckind);
-               while (minbciteration(&state)) {
+               while (minbciteration(&state))
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
@@ -47961,7 +47716,6 @@ static bool testminbcunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                      ae_frame_leave();
                      return Ok;
                   }
-               }
                minbcresults(&state, &x, &rep);
                Ok = Ok && rep.terminationtype == -3;
             }
@@ -48062,7 +47816,7 @@ static bool testminbcunit_testother() {
    minbccreate(n, &x, &state);
    minbcsetbc(&state, &bl, &bu);
    minbcsetcond(&state, 0.0, 0.0, 0.0, 2 * n);
-   while (minbciteration(&state)) {
+   while (minbciteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -48070,7 +47824,6 @@ static bool testminbcunit_testother() {
             state.g.xR[i] = 1.0;
          }
       }
-   }
    minbcresults(&state, &xf, &rep);
    Ok = Ok && rep.terminationtype > 0;
    if (rep.terminationtype > 0) {
@@ -48097,7 +47850,7 @@ static bool testminbcunit_testother() {
       minbcsetcond(&state, 1.0E-64, 0.0, 0.0, 10);
       minbcsetxrep(&state, true);
       fprev = maxrealnumber;
-      while (minbciteration(&state)) {
+      while (minbciteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -48113,7 +47866,6 @@ static bool testminbcunit_testother() {
             fprev = state.f;
             ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
          }
-      }
       minbcresults(&state, &x, &rep);
       for (i = 0; i < n; i++) {
          Ok = Ok && x.xR[i] == xlast.xR[i];
@@ -48139,7 +47891,7 @@ static bool testminbcunit_testother() {
          minbcsetcond(&state, 1.0E-6, 0.0, epsx, 0);
          wasf = false;
          wasfg = false;
-         while (minbciteration(&state)) {
+         while (minbciteration(&state))
             if (state.needf || state.needfg) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
@@ -48151,7 +47903,6 @@ static bool testminbcunit_testother() {
                wasf = wasf || state.needf;
                wasfg = wasfg || state.needfg;
             }
-         }
          minbcresults(&state, &x, &rep);
          if (dkind == 0) {
             Ok = Ok && !wasf && wasfg;
@@ -48202,7 +47953,7 @@ static bool testminbcunit_testother() {
       minbcsetxrep(&state, true);
       minbcsetstpmax(&state, stpmax);
       xprev = x.xR[0];
-      while (minbciteration(&state)) {
+      while (minbciteration(&state))
          if (state.needfg) {
             state.f = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
             state.g.xR[0] = exp(state.x.xR[0]) - exp(-state.x.xR[0]);
@@ -48211,7 +47962,6 @@ static bool testminbcunit_testother() {
             Ok = Ok && NearAtR(state.x.xR[0], xprev, (1 + sqrt(machineepsilon)) * stpmax);
             xprev = state.x.xR[0];
          }
-      }
    }
 // Ability to solve problems with function which is unbounded from below
    for (pass = 1; pass <= passcount; pass++) {
@@ -48225,12 +47975,11 @@ static bool testminbcunit_testother() {
       minbccreate(n, &x, &state);
       minbcsetbc(&state, &bl, &bu);
       minbcsetcond(&state, epsg, 0.0, epsx, 0);
-      while (minbciteration(&state)) {
+      while (minbciteration(&state))
          if (state.needfg) {
             state.f = -1.0E8 * sqr(state.x.xR[0]);
             state.g.xR[0] = -2.0E8 * state.x.xR[0];
          }
-      }
       minbcresults(&state, &x, &rep);
       Ok = Ok && NearAtR(x.xR[0], bu.xR[0], epsx);
    }
@@ -48281,7 +48030,7 @@ static bool testminbcunit_testother() {
                }
                minbcsetcond(&state, tmpeps, 0.0, 0.0, 0);
                minbcsetscale(&state, &s);
-               while (minbciteration(&state)) {
+               while (minbciteration(&state))
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
@@ -48289,7 +48038,6 @@ static bool testminbcunit_testother() {
                         state.g.xR[i] = 2 * a.xR[i] * state.x.xR[i];
                      }
                   }
-               }
                minbcresults(&state, &x, &rep);
                if (rep.terminationtype <= 0) {
                   Ok = false;
@@ -48347,7 +48095,7 @@ static bool testminbcunit_testother() {
             x.xR[0] = 0.0;
             minbccreate(1, &x, &state);
             minbcsetcond(&state, epsg, 0.0, 0.0, 0);
-            while (minbciteration(&state)) {
+            while (minbciteration(&state))
                if (state.needfg) {
                   if (-0.999999 < state.x.xR[0] && state.x.xR[0] < 0.999999) {
                      state.f = 1 / (1 - state.x.xR[0]) + 1 / (1 + state.x.xR[0]) + vc * state.x.xR[0];
@@ -48357,7 +48105,6 @@ static bool testminbcunit_testother() {
                      state.g.xR[0] = 0.0;
                   }
                }
-            }
             minbcresults(&state, &x, &rep);
             if (rep.terminationtype <= 0) {
                Ok = false;
@@ -48415,13 +48162,12 @@ static bool testminbcunit_testother() {
          if (ckind == 2) {
             minbcsetcond(&state, 0.0, 0.0, eps, 0);
          }
-         while (minbciteration(&state)) {
+         while (minbciteration(&state))
             if (state.needfg) {
                state.f = sqr(state.x.xR[0] + 1) + sqr(state.x.xR[1] + 1) + 10000 * machineepsilon * randomreal();
                state.g.xR[0] = 2 * (state.x.xR[0] + 1);
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
             }
-         }
          minbcresults(&state, &xf, &rep);
          if (rep.terminationtype <= 0 || xf.xR[0] != 0.0 || xf.xR[1] != 0.0) {
             Ok = false;
@@ -48472,7 +48218,7 @@ static bool testminbcunit_testother() {
          if (ckind == 2) {
             minbcsetcond(&state, 0.0, 0.0, eps, 0);
          }
-         while (minbciteration(&state)) {
+         while (minbciteration(&state))
             if (state.needfg) {
                state.f = sqr(state.x.xR[0] + 1) + sqr(state.x.xR[1] + 1);
                if (state.x.xR[0] == x.xR[0] && state.x.xR[1] == x.xR[1]) {
@@ -48481,7 +48227,6 @@ static bool testminbcunit_testother() {
                state.g.xR[0] = 2 * (state.x.xR[0] + 1);
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
             }
-         }
          minbcresults(&state, &xf, &rep);
          if (rep.terminationtype <= 0 || xf.xR[0] != 0.0 || xf.xR[1] != 0.0) {
             Ok = false;
@@ -48527,7 +48272,7 @@ static bool testminbcunit_testother() {
       minbcsetcond(&state, 0.0, 0.0, 0.0, stopiteration);
       minbcsetxrep(&state, true);
       k = -1;
-      while (minbciteration(&state)) {
+      while (minbciteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -48548,7 +48293,6 @@ static bool testminbcunit_testother() {
          } else if (state.xupdated) {
             k++;
          } else ae_assert(false, "Assertion failed");
-      }
       minbcresults(&state, &x1, &rep);
       Ok = Ok && rep.terminationtype == -8;
    }
@@ -48579,7 +48323,7 @@ static bool testminbcunit_testother() {
       callidx = 0;
       terminationrequested = false;
       ae_v_move(xlast.xR, 1, x.xR, 1, n);
-      while (minbciteration(&state)) {
+      while (minbciteration(&state))
          if (state.needfg) {
             state.f = ss * sqr(exp(state.x.xR[0]) - 2) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
             state.g.xR[0] = 2 * ss * (exp(state.x.xR[0]) - 2) * exp(state.x.xR[0]) + 2 * (state.x.xR[2] - state.x.xR[0]) * (-1);
@@ -48595,7 +48339,6 @@ static bool testminbcunit_testother() {
                ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minbcresults(&state, &x, &rep);
       Ok = Ok && rep.terminationtype == 8;
       for (i = 0; i < n; i++) {
@@ -48682,9 +48425,7 @@ static bool testminbcunit_testpreconditioning() {
             for (i = 0; i < n; i++) {
                x.xR[i] = randommid();
             }
-            for (minbcrestartfrom(&state, &x); minbciteration(&state); ) {
-               testminbcunit_calciip2(&state, n, fk);
-            }
+            for (minbcrestartfrom(&state, &x); minbciteration(&state); ) testminbcunit_calciip2(&state, n, fk);
             minbcresults(&state, &x, &rep);
             cntb1 += rep.iterationscount;
             Ok = Ok && rep.terminationtype > 0;
@@ -48700,9 +48441,7 @@ static bool testminbcunit_testpreconditioning() {
             for (i = 0; i < n; i++) {
                x.xR[i] = randommid();
             }
-            for (minbcrestartfrom(&state, &x); minbciteration(&state); ) {
-               testminbcunit_calciip2(&state, n, fk);
-            }
+            for (minbcrestartfrom(&state, &x); minbciteration(&state); ) testminbcunit_calciip2(&state, n, fk);
             minbcresults(&state, &x, &rep);
             cntg1 += rep.iterationscount;
             Ok = Ok && rep.terminationtype > 0;
@@ -48720,9 +48459,7 @@ static bool testminbcunit_testpreconditioning() {
             for (i = 0; i < n; i++) {
                x.xR[i] = randommid();
             }
-            for (minbcrestartfrom(&state, &x); minbciteration(&state); ) {
-               testminbcunit_calciip2(&state, n, fk);
-            }
+            for (minbcrestartfrom(&state, &x); minbciteration(&state); ) testminbcunit_calciip2(&state, n, fk);
             minbcresults(&state, &x, &rep);
             cntb2 += rep.iterationscount;
             Ok = Ok && rep.terminationtype > 0;
@@ -48734,9 +48471,7 @@ static bool testminbcunit_testpreconditioning() {
             for (i = 0; i < n; i++) {
                x.xR[i] = randommid();
             }
-            for (minbcrestartfrom(&state, &x); minbciteration(&state); ) {
-               testminbcunit_calciip2(&state, n, fk);
-            }
+            for (minbcrestartfrom(&state, &x); minbciteration(&state); ) testminbcunit_calciip2(&state, n, fk);
             minbcresults(&state, &x, &rep);
             cntg2 += rep.iterationscount;
             Ok = Ok && rep.terminationtype > 0;
@@ -48960,7 +48695,7 @@ static bool testminbcunit_testoptguard() {
    spdmatrixrndcond(n, 1.0E3, &a1);
    minbccreate(n, &x0, &state);
    minbcsetcond(&state, 0.0, 0.0, 1.0E-9, 10);
-   while (minbciteration(&state)) {
+   while (minbciteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -48974,7 +48709,6 @@ static bool testminbcunit_testoptguard() {
             state.g.xR[i] = 0.0;
          }
       } else ae_assert(false, "Assertion failed");
-   }
    minbcresults(&state, &x1, &rep);
    minbcoptguardresults(&state, &ogrep);
    Ok = Ok && rep.terminationtype > 0;
@@ -49011,7 +48745,7 @@ static bool testminbcunit_testoptguard() {
    }
    minbccreate(n, &x0, &state);
    minbcsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
-   while (minbciteration(&state)) {
+   while (minbciteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -49029,7 +48763,6 @@ static bool testminbcunit_testoptguard() {
             }
          }
       } else ae_assert(false, "Assertion failed");
-   }
    minbcresults(&state, &x1, &rep);
    minbcoptguardresults(&state, &ogrep);
    Ok = Ok && isfinitevector(&x1, n);
@@ -49080,7 +48813,7 @@ static bool testminbcunit_testoptguard() {
          minbcsetcond(&state, 0.0, 0.0, 1.0E-9, 10);
          minbcsetscale(&state, &s);
          minbcsetbc(&state, &bndl, &bndu);
-         while (minbciteration(&state)) {
+         while (minbciteration(&state))
             if (state.needfg) {
                for (i = 0; i < n; i++) {
                   Ok = Ok && state.x.xR[i] >= bndl.xR[i];
@@ -49108,7 +48841,6 @@ static bool testminbcunit_testoptguard() {
                   state.g.xR[i] /= s.xR[i];
                }
             } else ae_assert(false, "Assertion failed");
-         }
          minbcresults(&state, &x1, &rep);
          minbcoptguardresults(&state, &ogrep);
       // Check that something is returned
@@ -49214,7 +48946,7 @@ static bool testminbcunit_testoptguard() {
       minbcsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
       minbcsetscale(&state, &s);
       minbcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminbcunit_maxoptguardlevel));
-      while (minbciteration(&state)) {
+      while (minbciteration(&state))
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -49232,7 +48964,6 @@ static bool testminbcunit_testoptguard() {
                }
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minbcresults(&state, &x1, &rep);
       minbcoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
@@ -49334,7 +49065,7 @@ static bool testminbcunit_testoptguard() {
       minbccreatef(n, &x0, diffstep, &state);
       minbcsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
       minbcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminbcunit_maxoptguardlevel));
-      while (minbciteration(&state)) {
+      while (minbciteration(&state))
          if (state.needf) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -49345,7 +49076,6 @@ static bool testminbcunit_testoptguard() {
                state.f += fabs(v);
             }
          } else ae_assert(false, "Assertion failed");
-      }
       minbcresults(&state, &x1, &rep);
       minbcoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
@@ -49388,7 +49118,7 @@ static bool testminbcunit_testoptguard() {
    minbccreate(n, &x0, &state);
    minbcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminbcunit_maxoptguardlevel));
    minbcsetcond(&state, 0.0, 0.0, 1.0E-9, 25);
-   while (minbciteration(&state)) {
+   while (minbciteration(&state))
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
@@ -49400,7 +49130,6 @@ static bool testminbcunit_testoptguard() {
             }
          }
       } else ae_assert(false, "Assertion failed");
-   }
    minbcresults(&state, &x1, &rep);
    Ok = Ok && isfinitevector(&x1, n);
    Ok = Ok && rep.terminationtype > 0;
@@ -58144,13 +57873,12 @@ static bool testlsfitunit_testlcnls() {
       }
       lsfitsetcond(&state, epsx, 0);
       lsfitsetlc(&state, &rawc, &rawct, rawccnt);
-      while (lsfititeration(&state)) {
+      while (lsfititeration(&state))
          if (state.needf) {
             testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, false);
          } else if (state.needfg) {
             testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
          } else ae_assert(false, "lsfit test: integrity check failed");
-      }
       lsfitresults(&state, &terminationtype, &c1, &rep);
       Ok = Ok && terminationtype > 0;
       if (!Ok) {
@@ -58240,13 +57968,12 @@ static bool testlsfitunit_testlcnls() {
          }
          lsfitsetcond(&state, epsx, 0);
          lsfitsetlc(&state, &rawc, &rawct, rawccnt);
-         while (lsfititeration(&state)) {
+         while (lsfititeration(&state))
             if (state.needf) {
                testlsfitunit_testfunc2(&state.x, nx, &state.c, nc, &state.f, true, &state.g, false);
             } else if (state.needfg) {
                testlsfitunit_testfunc2(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
             } else ae_assert(false, "minlm test: integrity check failed");
-         }
          lsfitresults(&state, &terminationtype, &c1, &rep);
          Ok = Ok && terminationtype > 0;
          if (!Ok) {
@@ -58299,13 +58026,12 @@ static bool testlsfitunit_testlcnls() {
          }
          lsfitsetcond(&state, epsx, 0);
          lsfitsetlc(&state, &rawc, &rawct, rawccnt);
-         while (lsfititeration(&state)) {
+         while (lsfititeration(&state))
             if (state.needf) {
                testlsfitunit_testfunc3(&state.x, nx, &state.c, nc, &state.f, true, &state.g, false);
             } else if (state.needfg) {
                testlsfitunit_testfunc3(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
             } else ae_assert(false, "minlm test: integrity check failed");
-         }
          lsfitresults(&state, &terminationtype, &c1, &rep);
          Ok = Ok && terminationtype > 0;
          if (!Ok) {
@@ -58800,14 +58526,13 @@ static void testlsfitunit_testgeneralfitting(bool *LlsOkP, bool *NlsOkP) {
    }
    lsfitcreatefg(&a, &y, &c, n, 1, 1, true, &state);
    lsfitsetcond(&state, nlthreshold, 0);
-   while (lsfititeration(&state)) {
+   while (lsfititeration(&state))
       if (state.needf) {
          state.f = 1 / (1 + state.c.xR[0] * sqr(state.x.xR[0]));
       } else if (state.needfg) {
          state.f = 1 / (1 + state.c.xR[0] * sqr(state.x.xR[0]));
          state.g.xR[0] = -sqr(state.x.xR[0]) / sqr(1 + state.c.xR[0] * sqr(state.x.xR[0]));
       }
-   }
    lsfitresults(&state, &info, &c, &rep);
    if (info <= 0) {
       *NlsOkP = false;
@@ -58852,14 +58577,13 @@ static void testlsfitunit_testgeneralfitting(bool *LlsOkP, bool *NlsOkP) {
    // Test NLS
       lsfitcreatefg(&a, &y, &c, 4, 1, 1, true, &state);
       lsfitsetcond(&state, nlthreshold, 0);
-      while (lsfititeration(&state)) {
+      while (lsfititeration(&state))
          if (state.needf) {
             state.f = state.c.xR[0];
          } else if (state.needfg) {
             state.f = state.c.xR[0];
             state.g.xR[0] = 1.0;
          }
-      }
       lsfitresults(&state, &info, &c, &rep);
       if (info <= 0) {
          *NlsOkP = false;
@@ -58955,7 +58679,7 @@ static void testlsfitunit_testgeneralfitting(bool *LlsOkP, bool *NlsOkP) {
                   lsfitcreatef(&a, &y, &cstart, a.rows, n, n, 0.001 * cscale, &state);
                }
                lsfitsetcond(&state, 0.0, 10);
-               while (lsfititeration(&state)) {
+               while (lsfititeration(&state))
                   if (state.needf) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
@@ -58968,7 +58692,6 @@ static void testlsfitunit_testgeneralfitting(bool *LlsOkP, bool *NlsOkP) {
                         state.g.xR[i] = state.x.xR[i];
                      }
                   }
-               }
                lsfitresults(&state, &info, &cend, &rep);
             }
             if (skind == 1) {
@@ -59072,7 +58795,7 @@ static void testlsfitunit_testgeneralfitting(bool *LlsOkP, bool *NlsOkP) {
          lsfitcreatewf(&a, &y, &w, &cstart, a.rows, n, n, 0.001 * cscale, &state);
       }
       lsfitsetcond(&state, 0.0, 10);
-      while (lsfititeration(&state)) {
+      while (lsfititeration(&state))
          if (state.needf) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -59085,7 +58808,6 @@ static void testlsfitunit_testgeneralfitting(bool *LlsOkP, bool *NlsOkP) {
                state.g.xR[i] = state.x.xR[i];
             }
          }
-      }
       lsfitresults(&state, &info, &c2, &rep);
    // Solve problem #2 (only points with non-zero weights).
    // We randomly choose between analytic gradient and numerical differentiation.
@@ -59095,7 +58817,7 @@ static void testlsfitunit_testgeneralfitting(bool *LlsOkP, bool *NlsOkP) {
          lsfitcreatewf(&a, &y, &w, &cstart, a.rows / 2, n, n, 0.001 * cscale, &state);
       }
       lsfitsetcond(&state, 0.0, 10);
-      while (lsfititeration(&state)) {
+      while (lsfititeration(&state))
          if (state.needf) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
@@ -59108,7 +58830,6 @@ static void testlsfitunit_testgeneralfitting(bool *LlsOkP, bool *NlsOkP) {
                state.g.xR[i] = state.x.xR[i];
             }
          }
-      }
       lsfitresults(&state, &info, &c2, &rep2);
    // Compare covariance matrices, it should be enough to test algorithm
       for (i = 0; i < n; i++) {
@@ -59981,11 +59702,10 @@ static bool testlsfitunit_testgradientcheck() {
       lsfitsetcond(&state, 0.0, 100);
       lsfitsetbc(&state, &bl, &bu);
    // Check that the criterion passes a derivative if it is correct
-      while (lsfititeration(&state)) {
+      while (lsfititeration(&state))
          if (state.needfg) {
             testlsfitunit_funcderiv(&state.c, &state.x, &x0, k, m, func, &state.f, &state.g);
          }
-      }
       lsfitresults(&state, &info, &cres, &rep);
    // Check that error code does not equal to -7 and parameter .VarIdx
    // equal to -1.
@@ -60001,12 +59721,11 @@ static bool testlsfitunit_testgradientcheck() {
       lsfitsetbc(&state, &bl, &bu);
    // Check that the criterion does not miss a derivative if
    // it is incorrect
-      while (lsfititeration(&state)) {
+      while (lsfititeration(&state))
          if (state.needfg) {
             testlsfitunit_funcderiv(&state.c, &state.x, &x0, k, m, func, &state.f, &state.g);
             state.g.xR[nbrcomp] += noise;
          }
-      }
       lsfitresults(&state, &info, &cres, &rep);
    // Check that error code equal to -7 and parameter .VarIdx
    // equal to number of incorrect component.
@@ -82502,12 +82221,10 @@ static bool testmlptrainunit_testmlpzeroweights() {
       }
       mlpsetdecay(&trainer, vdecay);
       mlpsetcond(&trainer, traineps, trainits);
-      c = randominteger(2);
-      if (c == 0) {
-         for (mlpstarttraining(&trainer, &net, true); mlpcontinuetraining(&trainer, &net); ) { }
-      }
-      if (c == 1) {
+      if (randombool()) {
          mlptrainnetwork(&trainer, &net, nneedrest, &rep);
+      } else {
+         for (mlpstarttraining(&trainer, &net, true); mlpcontinuetraining(&trainer, &net); ) { }
       }
    // Check weights
       mlpproperties(&net, &nin, &nout, &wcount);
@@ -84908,7 +84625,7 @@ static const enum {
    AE_NOENV, AE_SINGLECORE, AE_SEQUENTIAL_MULTICORE, AE_PARALLEL_SINGLECORE, AE_PARALLEL_MULTICORE, AE_SKIP_TEST
 } TestMode = AE_SINGLECORE;
 
-int global_failure_flag = 0;
+int global_failure_flag = EXIT_SUCCESS;
 bool use_smp = false;
 
 MutEx_t tests_mutex;
@@ -85047,7 +84764,7 @@ ThRet_t tester_function(ThArg_t T) {
       if (test >= tests) break;
    // Call the unit test.
       bool Ok = call_unittest(unittests[test].testfunc);
-      if (!Ok) global_failure_flag = 1;
+      if (!Ok) global_failure_flag = EXIT_FAILURE;
    // Display the test results.
       acquire_mutex(&print_mutex);
       printf("%2d/%d: %-32s %s\n", test + 1, tests, unittests[test].name, Ok? "Ok": "Failed");
@@ -85141,15 +84858,15 @@ int main(int argc, char **argv) {
       case AE_PARALLEL_SINGLECORE: printf("Testing Mode: single core, parallel\n"); break;
       case AE_SEQUENTIAL_MULTICORE: printf("Testing Mode: milti-core, sequential\n"); break;
       case AE_PARALLEL_MULTICORE: printf("Testing Mode: milti-core, parallel\n"); break;
-      case AE_SKIP_TEST: printf("Testing Mode: just compiling\nDone in 0 seconds\n"); return 0;
-      default: printf("Testing Mode: unknown\n"); return 1;
+      case AE_SKIP_TEST: printf("Testing Mode: just compiling\nDone in 0 seconds\n"); return EXIT_SUCCESS;
+      default: printf("Testing Mode: unknown\n"); return EXIT_FAILURE;
    }
 // now we are ready to test!
    time(&time_0);
 #ifdef _ALGLIB_HAS_WORKSTEALING
    bool smpOk = ae_smpselftests();
-   printf("%-32s %s\n", "SMP self tests", smpOk? "Ok": "Failed");
-   if (!smpOk) return 1;
+   printf("%-32s %s\n", "SMP self tests", smpOk ? "Ok" : "Failed");
+   if (!smpOk) return EXIT_FAILURE;
 #endif
    fflush(stdout);
    switch (TestMode) {
@@ -85173,7 +84890,7 @@ int main(int argc, char **argv) {
          }
          join_threads(cpu_cnt, Bundle);
       }
-      default: printf("Unexpected test mode\n"); return 1;
+      default: printf("Unexpected test mode\n"); return EXIT_FAILURE;
    }
    time(&time_1);
    printf("Done in %ld seconds\n", (long)difftime(time_1, time_0));

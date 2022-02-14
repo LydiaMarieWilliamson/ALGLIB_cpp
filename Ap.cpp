@@ -110,11 +110,11 @@ AutoS ae_frame *volatile TopFr;
 static unsigned char DynBottom = 1, DynFrame = 2;
 
 // Make a new stack frame for the environment.
-// tmp points to the place in the dynamic block that marks where the frame begins.
-// The dynamic block is assumed to be initialized by thecaller and must be left alone
+// Fr points to the place in the dynamic block that marks where the frame begins.
+// The dynamic block is assumed to be initialized by the caller and must be left alone
 // (no changes, deallocations, or reuse) until ae_leave_frame() is called.
-// tmp may be a global or (preferrably) local variable.
-void ae_frame_make(ae_frame *tmp) { tmp->p_next = TopFr, tmp->deallocator = NULL, tmp->ptr = &DynFrame, TopFr = tmp; }
+// It may be a global or (preferrably) a local variable.
+void ae_frame_make(ae_frame *Fr) { Fr->p_next = TopFr, Fr->deallocator = NULL, Fr->ptr = &DynFrame, TopFr = Fr; }
 
 // Leave the current stack frame and deallocate all automatic dynamic blocks which were attached to this frame.
 void ae_frame_leave() {
@@ -123,17 +123,17 @@ void ae_frame_leave() {
    if (TopFr->ptr == &DynFrame) TopFr = TopFr->p_next;
 }
 
-// Initializes the ALGLIB++ frame stack environment.
+// Initialize the ALGLIB++ frame stack environment.
 // NOTE:
 // *	Stacks contain no frames, so ae_make_frame() must be called before attaching dynamic blocks.
 //	Without it ae_leave_frame() will cycle forever -- as intended.
 void ae_state_init() {
 // The base of the current stack of frames.
-// p_next points to itself because a correct program should be able to detect end of the list by looking at the ptr field.
-// NULL p_next may be used to distinguish automatic blocks (in the list) from non-automatic (not in the list).
+// p_next points to itself because a correct program should be able to detect the end of the list by looking at the ptr field.
+// p_next == NULL may be used to distinguish automatic blocks (in the list) from non-automatic (not in the list).
    static ae_frame BotFr = { &BotFr, NULL, &DynBottom };
 // Set the status indicators and clear the frame.
-   CurFlags = 0x0, CurBreakAt = NULL, CurMsg = "", TopFr = &BotFr;
+   CurBreakAt = NULL, CurMsg = "", CurFlags = NonTH, TopFr = &BotFr;
 }
 
 // Clear the ALGLIB++ frame stack environment, freeing all the dynamic data in it that it controls.
@@ -152,8 +152,7 @@ void ae_state_clear() {
 static void ae_break(ae_error_type error_type, const char *msg) {
    if (TopFr == NULL) abort();
    ae_state_clear();
-   CurStatus = error_type;
-   CurMsg = msg;
+   CurStatus = error_type, CurMsg = msg;
    if (CurBreakAt != NULL) longjmp(*CurBreakAt, 1); else abort();
 }
 
@@ -648,7 +647,7 @@ static void ae_db_attach(ae_dyn_block *block) { block->p_next = TopFr, TopFr = b
 // Upon allocation failure with TopFr != NULL, call ae_break(), leaving block in a valid (but empty) state.
 // NOTES:
 // *	Avoid calling it for blocks which are already in the list.
-//	Use ae_db_realloc() for already allocated blocks.
+//	Use ae_db_realloc() for already-allocated blocks.
 // *	No memory allocation is performed for initialization with size == 0.
 void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic) {
 //(@) Zero-check removed.
@@ -710,7 +709,7 @@ ae_int_t ae_sizeof(ae_datatype datatype) {
 }
 
 // Make dst into a new datatype ae_vector of size >= 0.
-// Its contents are assumed to be uninitialized. and its fields are ignored.
+// Its contents are assumed to be uninitialized, and its fields are ignored.
 // make_automatic indicates whether or not the vector is to be added to the dynamic block list.
 // Upon allocation failure or size < 0, call ae_break().
 // NOTE:
@@ -847,10 +846,10 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
 // dst is assumed to be uninitialized, its fields are ignored.
 // make_automatic indicates whether or not dst is to be added to the dynamic block list,
 // as opposed to being a global object or field of some other object.
-// Upon allocation failure, called ae_break().
+// Upon allocation failure, call ae_break().
 void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, bool make_automatic) {
    ae_matrix_init(dst, src->rows, src->cols, src->datatype, make_automatic);
-   if (src->cols != 0 && src->rows != 0)
+   if (src->cols > 0 && src->rows > 0)
       if (dst->stride == src->stride)
          memmove(dst->xyX[0], src->xyX[0], (size_t)(src->rows * src->stride * ae_sizeof(src->datatype)));
       else for (ae_int_t i = 0; i < dst->rows; i++)
@@ -866,8 +865,7 @@ void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols) {
    ae_assert(cols >= 0 && rows >= 0, "ae_matrix_set_length: negative length");
    if (dst->cols == cols && dst->rows == rows) return;
 // Prepare the stride.
-   dst->stride = cols;
-   while (dst->stride * ae_sizeof(dst->datatype) % AE_DATA_ALIGN != 0) dst->stride++;
+   for (dst->stride = cols; dst->stride * ae_sizeof(dst->datatype) % AE_DATA_ALIGN != 0; dst->stride++);
 // Prepare for possible errors during reallocation.
    dst->rows = dst->cols = 0;
    dst->xyX = NULL;
@@ -879,8 +877,7 @@ void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols) {
 }
 
 // The "FREE" functionality for ae_matrix dst.
-// Clear the contents of matrix dst,
-// Clear the contents of matrix dst, eleasing all dynamically allocated memory, but leaving the structure intact in a valid state.
+// Clear the contents of matrix dst, releasing all dynamically allocated memory, but leaving the structure intact in a valid state.
 // dst may be on the frame - in which case it will NOT be removed from the list.
 // IMPORTANT:
 // *	This function does NOT invalidate dst; it just releases all dynamically allocated storage,
@@ -915,7 +912,7 @@ void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2) {
    mat2->xX = p_ptr;
 }
 
-// Make dst into a new smart Pointer dst.
+// Make dst into a new smart pointer dst.
 // dst is assumed to be uninitialized, but pre-allocated, by aliasing subscriber (which may be NULL) with dst->ptr.
 // After initialization, dst stores the NULL pointer.
 // make_automatic indicates whether or not dst is to be added to the dynamic block list.
@@ -924,7 +921,7 @@ void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic
 //(@) Zero-check removed.
    dst->subscriber = subscriber;
    dst->ptr = NULL;
-   if (dst->subscriber != NULL) *(dst->subscriber) = dst->ptr;
+   if (dst->subscriber != NULL) *dst->subscriber = dst->ptr;
    dst->is_owner = false;
    dst->is_dynamic = false;
    dst->frame_entry.deallocator = ae_smart_ptr_free;
@@ -932,8 +929,8 @@ void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic
    if (make_automatic) ae_db_attach(&dst->frame_entry);
 }
 
-// Free the smart pointer _dst so that it contains the NULL reference,
-// The change is propagated to its subscriber, if the _dst was created with a non-NULL subscriber.
+// Free the smart pointer _dst so that it contains the NULL reference.
+// The change is propagated to its subscriber, if _dst was created with a non-NULL subscriber.
 void ae_smart_ptr_free(void *_dst) {
    ae_smart_ptr *dst = (ae_smart_ptr *)_dst;
    if (dst->is_owner && dst->ptr != NULL) {
@@ -944,7 +941,7 @@ void ae_smart_ptr_free(void *_dst) {
    dst->is_dynamic = false;
    dst->ptr = NULL;
    dst->free = NULL;
-   if (dst->subscriber != NULL) *(dst->subscriber) = NULL;
+   if (dst->subscriber != NULL) *dst->subscriber = NULL;
 }
 
 // Assign pointer new_ptr to smart pointer dst.
@@ -965,10 +962,10 @@ void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool i
    dst->is_owner = not_null && is_owner;
    dst->is_dynamic = not_null && is_dynamic;
    dst->free = not_null ? free : NULL;
-   if (dst->subscriber != NULL) *(dst->subscriber) = dst->ptr;
+   if (dst->subscriber != NULL) *dst->subscriber = dst->ptr;
 }
 
-// Release the pointer owned by the smart Pointer dst by NULLing all internal fields
+// Release the pointer owned by the smart pointer dst by NULLing all internal fields
 // and passing any ownership it has to the caller, instead of applying the destructor function to the internal pointer.
 // The change is propagated to its subscriber, if the smart pointer was created with subscriber != NULL.
 void ae_smart_ptr_release(ae_smart_ptr *dst) {
@@ -976,8 +973,7 @@ void ae_smart_ptr_release(ae_smart_ptr *dst) {
    dst->is_dynamic = false;
    dst->ptr = NULL;
    dst->free = NULL;
-   if (dst->subscriber != NULL)
-      *(dst->subscriber) = NULL;
+   if (dst->subscriber != NULL) *dst->subscriber = NULL;
 }
 
 // Copy x_vector src into ae_vector dst.
@@ -990,13 +986,13 @@ void ae_vector_init_from_x(ae_vector *dst, x_vector *src, bool make_automatic) {
    if (src->cnt > 0) memmove(dst->xX, src->x_ptr, (size_t)(((ae_int_t)src->cnt) * ae_sizeof((ae_datatype) src->datatype)));
 }
 
-// Copy x_vector src into ae_vector dst.
+// Copy x_vector src into ae_vector dst by attaching dst to src.
 // dst is assumed to be uninitialized, its fields are ignored.
-// make_automatic indicates whether or not the vector will be registered in the ALGLIB++ environment.
+// make_automatic indicates whether or not the vector will be registered in the ALGLIB++ environment
 // The new vector is attached to the source:
 // ∙	dst shares memory with src: a write to one changes both.
 // ∙	dst can be reallocated with ae_vector_set_length(), but src remains untouched.
-// ∙	src, however, can NOT be reallocated as long as dst exists
+// ∙	src, however, can NOT be reallocated as long as dst exists.
 // ∙	dst->is_attached is set to true to indicate that dst does not own its memory.
 // Upon allocation failure, call ae_break().
 void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, bool make_automatic) {
@@ -1028,7 +1024,7 @@ void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, bool make_automat
 //	dst->last_action is set to ACT_SAME_LOCATION (unless it was ACT_NEW_LOCATION), dst->owner is unmodified.
 // NOTE:
 // *	dst is assumed to be initialized.
-//	Its contents is freed before copying data from src (if the size/type are different)
+//	Its contents are freed before copying data from src (if the size/type are different)
 //	or overwritten (if possible, given the destination size).
 void ae_x_set_vector(x_vector *dst, ae_vector *src) {
    if (src->xX == dst->x_ptr) {
@@ -1049,15 +1045,15 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src) {
       else if (dst->last_action == ACT_NEW_LOCATION) dst->last_action = ACT_NEW_LOCATION;
       else ae_assert(false, "ae_x_set_vector: internal error");
    }
-   if (src->cnt) memmove(dst->x_ptr, src->xX, (size_t)(src->cnt * ae_sizeof(src->datatype)));
+   if (src->cnt != 0) memmove(dst->x_ptr, src->xX, (size_t)(src->cnt * ae_sizeof(src->datatype)));
 }
 
 // Attach the x_vector dst to the contents of the ae_vector src.
 // Ownership of memory allocated is not changed (it is still managed the ae_vector).
 // NOTES:
 // *	dst is assumed to be initialized.
-//	Its contents is freed before attaching to src.
-// *	assuming correctly initialized src, this function can't fail, and so doesn't need TopFr.
+//	Its contents are freed before attaching to src.
+// *	Assuming correctly initialized src, this function can't fail, and so doesn't need the global stack frame.
 void ae_x_attach_to_vector(x_vector *dst, ae_vector *src) {
    if (dst->owner) ae_free(dst->x_ptr);
    dst->x_ptr = src->xX;
@@ -1082,7 +1078,7 @@ void x_vector_free(x_vector *dst, bool make_automatic) {
 // make_automatic indicates whether or not the matrix will be registered in the ALGLIB++ environment.
 void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, bool make_automatic) {
    ae_matrix_init(dst, (ae_int_t)src->rows, (ae_int_t)src->cols, (ae_datatype) src->datatype, make_automatic);
-   if (src->cols != 0 && src->rows != 0) {
+   if (src->cols > 0 && src->rows > 0) {
       char *p_src_row = (char *)src->x_ptr;
       char *p_dst_row = (char *)(dst->xyX[0]);
       ae_int_t row_size = ae_sizeof((ae_datatype) src->datatype) * (ae_int_t)src->cols;
@@ -1091,13 +1087,13 @@ void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, bool make_automatic) {
    }
 }
 
-// Copy x_matrix src into ae_matrix dst.
+// Copy x_matrix src into ae_matrix dst by attaching dst to src.
 // dst is assumed to be uninitialized, its fields are ignored.
 // make_automatic indicates whether or not the matrix will be registered in the ALGLIB++ environment.
 // The new matrix is attached to the source:
 // ∙	dst shares memory with src: a write to one changes both.
 // ∙	dst can be reallocated with ae_matrix_set_length(), but src remains untouched.
-// ∙	src, however, can NOT be reallocated as long as dst exists
+// ∙	src, however, can NOT be reallocated as long as dst exists.
 // ∙	dst->is_attached is set to true to indicate that dst does not own its memory.
 // Upon allocation failure, call ae_break().
 void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, bool make_automatic) {
@@ -1135,24 +1131,24 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, bool make_automat
 // Not meant for use when dst is attached to src, though it may be used when src is attached to dst.
 // One of the following is then applied:
 // *	if src is attached to dst, no action is required or done,
-// *	for independent vectors of different sizes: allocate storage in dst and copy src to dst.
+// *	for independent matrices of different sizes: allocate storage in dst and copy src to dst.
 //	dst->last_action is set to ACT_NEW_LOCATION, and dst->owner is set to true.
-// *	for independent vectors of the same sizes: no (re)allocation is required or done.
+// *	for independent matrices of the same sizes: no (re)allocation is required or done.
 //	Just copy src to the already-existing place.
 //	dst->last_action is set to ACT_SAME_LOCATION (unless it was ACT_NEW_LOCATION), dst->owner is unmodified.
 // NOTE:
 // *	dst is assumed to be initialized.
-//	Its contents is freed before copying data from src (if the size/type are different)
+//	Its contents are freed before copying data from src (if the size/type are different)
 //	or overwritten (if possible, given the destination size).
 void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
    if (src->xyX != NULL && src->xyX[0] == dst->x_ptr) {
    // src->ptr points to the beginning of dst, attached matrices, no need to copy.
       return;
    }
-   if (dst->rows != src->rows || dst->cols != src->cols || dst->datatype != src->datatype) {
+   if (dst->cols != src->cols || dst->rows != src->rows || dst->datatype != src->datatype) {
       if (dst->owner) ae_free(dst->x_ptr);
-      dst->rows = src->rows;
       dst->cols = src->cols;
+      dst->rows = src->rows;
       dst->stride = src->cols;
       dst->datatype = src->datatype;
       dst->x_ptr = ae_malloc((size_t)(dst->rows * ((ae_int_t)dst->stride) * ae_sizeof(src->datatype)));
@@ -1165,7 +1161,7 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
       else if (dst->last_action == ACT_NEW_LOCATION) dst->last_action = ACT_NEW_LOCATION;
       else ae_assert(false, "ae_x_set_matrix: internal error");
    }
-   if (src->rows != 0 && src->cols != 0) {
+   if (src->cols != 0 && src->rows != 0) {
       char *p_src_row = (char *)(src->xyX[0]);
       char *p_dst_row = (char *)dst->x_ptr;
       ae_int_t row_size = ae_sizeof(src->datatype) * src->cols;
@@ -1178,8 +1174,8 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
 // Ownership of memory allocated is not changed (it is still managed the ae_matrix).
 // NOTES:
 // *	dst is assumed to be initialized.
-//	Its contents is freed before attaching to src.
-// *	assuming correctly initialized src, this function can't fail, and so doesn't need TopFr.
+//	Its contents are freed before attaching to src.
+// *	Assuming correctly initialized src, this function can't fail, and so doesn't need the global stack frame.
 void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src) {
    if (dst->owner) ae_free(dst->x_ptr);
    dst->cols = src->cols;
@@ -1657,7 +1653,7 @@ static inline void _ae_free_lock(_lock *p) { }
 // *	As a special exception, this function allows you to specify TopFr == NULL.
 //	In this case, exceptions arising during construction are handled as critical failures, resulting in abort().
 //	make_automatic must be false on such calls.
-// *	is_static indicates that lock is to be made "eternal" (i.e. static),
+// *	is_static indicates that the lock is to be made "eternal" (i.e. static),
 //	which is expected to persist until the end of the execution of the program.
 // *	Eternal locks can not be deallocated (cleared) and do not increase debug allocation counters.
 //	Errors during allocation of such locks are considered critical exceptions and are handled by calling abort().
@@ -1704,8 +1700,8 @@ static void ae_shared_pool_destroy(void *_dst) { ae_shared_pool_free(_dst, false
 // as opposed to being the field of some other object.
 // Upon allocation failure, call ae_break().
 void ae_shared_pool_init(void *_dst, bool make_automatic) {
-   ae_shared_pool *dst = (ae_shared_pool *)_dst;
 //(@) Zero-check removed.
+   ae_shared_pool *dst = (ae_shared_pool *)_dst;
 // Initialize.
    dst->seed_object = NULL;
    dst->recycled_objects = NULL;
@@ -1822,7 +1818,7 @@ bool ae_shared_pool_is_initialized(ae_shared_pool *dst) {
    return dst->seed_object != NULL;
 }
 
-// Seed the already-initialized ae_shared_pool dst by setting its internal seed object to seed_object:size_of_object,
+// Seed the already-initialized ae_shared_pool dst by setting its internal seed object to seed_object::size_of_object,
 // freeing everything owned by dst (the current seed object and recycled objects).
 // The make, copy and free functions are set respectively to init(), copy() and free().
 // NOTE:
@@ -1889,7 +1885,7 @@ void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 // Require pool to be seeded and pptr to be non-NULL and to own the object.
    ae_assert(pool->seed_object != NULL, "ae_shared_pool_recycle: shared pool is not seeded");
    ae_assert(pptr->is_owner, "ae_shared_pool_recycle: pptr does not own its pointer");
-   ae_assert(pptr->ptr != NULL, "ae_shared_pool_recycle: pptr is NULL");
+   ae_assert(pptr->ptr != NULL, "ae_shared_pool_recycle: pptr == NULL");
 // Acquire the lock and the shared pool entry (reusing an entry from recycled_entries, if there are any).
    ae_acquire_lock(&pool->pool_lock);
    ae_shared_pool_entry *new_entry;
@@ -1932,7 +1928,7 @@ void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic) {
 // The pointer to the first recycled object is stored in the smart pointer pptr.
 // IMPORTANT:
 // *	The recycled object is KEPT in pool and ownership is NOT passed to pptr.
-// *	If there are no recycled objects left in pool or pool is not seeded, NULL is stored into pptr.
+// *	If there are no recycled objects left in pool or pool is not seeded, the NULL is stored into pptr.
 // *	Any non-NULL pointer owned by pptr is deallocated before storing the value retrieved from pool.
 // *	This function IS NOT thread-safe
 // *	You should NOT modify pool during enumeration (although you can modify the state of the objects retrieved from pool).
