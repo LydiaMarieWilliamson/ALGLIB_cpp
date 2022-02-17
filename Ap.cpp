@@ -9038,7 +9038,7 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
 
 ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl::ae_datatype datatype) {
    if (e_ptr == NULL || e_ptr->datatype != datatype) {
-      const char *msg = "ALGLIB: ae_vector_wrapper datatype check failed";
+      const char *msg = "ae_vector_wrapper::ae_vector_wrapper: datatype check failed";
 #if !defined AE_NO_EXCEPTIONS
       ThrowError(msg);
 #else
@@ -9064,10 +9064,7 @@ ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::
    alglib_impl::ae_state_clear();
 }
 
-ae_vector_wrapper::~ae_vector_wrapper() {
-   if (This == &Obj)
-      ae_vector_free(This, false);
-}
+ae_vector_wrapper::~ae_vector_wrapper() { if (This == &Obj) ae_vector_free(This, false); }
 
 void ae_vector_wrapper::setlength(ae_int_t iLen) {
    alglib_impl::ae_state_init();
@@ -9078,29 +9075,23 @@ void ae_vector_wrapper::setlength(ae_int_t iLen) {
    alglib_impl::ae_state_clear();
 }
 
-ae_int_t ae_vector_wrapper::length() const {
-   return This == NULL ? 0 : This->cnt;
-}
+ae_int_t ae_vector_wrapper::length() const { return This == NULL ? 0 : This->cnt; }
 
 void ae_vector_wrapper::attach_to(alglib_impl::x_vector *new_ptr) {
-   if (This == &Obj)
-      ae_vector_free(This, false);
+   if (This == &Obj) ae_vector_free(This, false);
    owner = false, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init_attach_to_x(This, new_ptr, false);
 }
 
 const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs) {
-   if (this == &rhs)
-      return *this;
+   if (this == &rhs) return *this;
    alglib_impl::ae_state_init();
    TryCatch(*this)
    alglib_impl::ae_assert(This != NULL, "ae_vector_wrapper::assign: incorrect assignment (uninitialized destination)");
 // Assignment to proxy object.
    alglib_impl::ae_assert(rhs.This != NULL, "ae_vector_wrapper::assign: incorrect assignment (uninitialized source)");
    alglib_impl::ae_assert(rhs.This->datatype == This->datatype, "ae_vector_wrapper::assign: incorrect assignment to array (types do not match)");
-   if (!owner)
-      alglib_impl::ae_assert(rhs.This->cnt == This->cnt, "ae_vector_wrapper::assign: incorrect assignment to proxy array (sizes do not match)");
-   if (rhs.This->cnt != This->cnt)
-      ae_vector_set_length(This, rhs.This->cnt);
+   if (!owner) alglib_impl::ae_assert(rhs.This->cnt == This->cnt, "ae_vector_wrapper::assign: incorrect assignment to proxy array (sizes do not match)");
+   if (rhs.This->cnt != This->cnt) ae_vector_set_length(This, rhs.This->cnt);
    memcpy(This->xX, rhs.This->xX, This->cnt * alglib_impl::ae_sizeof(This->datatype));
    alglib_impl::ae_state_clear();
    return *this;
@@ -9108,20 +9099,16 @@ const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs)
 
 #if !defined AE_NO_EXCEPTIONS
 ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype datatype) {
-   std::vector < const char *>svec;
-   size_t i;
-   char *p = filter_spaces(s);
-   if (p == NULL)
-      ThrowError("ae_vector_wrapper::ae_vector_wrapper: allocation error");
+   char *p = filter_spaces(s); if (p == NULL) ThrowError("ae_vector_wrapper::ae_vector_wrapper: allocation error");
    try {
-      str_vector_create(p, true, &svec);
-      {
-         alglib_impl::ae_state_init();
-         TryCatch()
-         owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, (ae_int_t)svec.size(), datatype, false);
-         alglib_impl::ae_state_clear();
-      }
-      for (i = 0; i < svec.size(); i++) switch (datatype) {
+      std::vector<const char *> svec; str_vector_create(p, true, &svec);
+   {
+      alglib_impl::ae_state_init();
+      TryCatch()
+      owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, (ae_int_t)svec.size(), datatype, false);
+      alglib_impl::ae_state_clear();
+   }
+      for (size_t i = 0; i < svec.size(); i++) switch (datatype) {
       // case alglib_impl::DT_BYTE: // The same as alglib_impl::DT_BOOL.
          case alglib_impl::DT_BOOL: This->xB[i] = parse_bool_delim(svec[i], ",]"); break;
          case alglib_impl::DT_INT: This->xZ[i] = parse_int_delim(svec[i], ",]"); break;
@@ -9136,195 +9123,86 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
 }
 #endif
 
-boolean_1d_array::boolean_1d_array():ae_vector_wrapper(alglib_impl::DT_BOOL) {
-}
-
-boolean_1d_array::boolean_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_BOOL) {
-}
-
-boolean_1d_array::boolean_1d_array(const boolean_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_BOOL) {
-}
-
+boolean_1d_array::boolean_1d_array(): ae_vector_wrapper(alglib_impl::DT_BOOL) { }
+boolean_1d_array::boolean_1d_array(alglib_impl::ae_vector *p): ae_vector_wrapper(p, alglib_impl::DT_BOOL) { }
+boolean_1d_array::boolean_1d_array(const boolean_1d_array &rhs): ae_vector_wrapper(rhs, alglib_impl::DT_BOOL) { }
 #if !defined AE_NO_EXCEPTIONS
-boolean_1d_array::boolean_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_BOOL) {
-}
-
-std::string boolean_1d_array::tostring() const {
-   if (length() == 0)
-      return "[]";
-   return arraytostring(&(operator()(0)), length());
-}
+boolean_1d_array::boolean_1d_array(const char *s): ae_vector_wrapper(s, alglib_impl::DT_BOOL) { }
+std::string boolean_1d_array::tostring() const { return length() == 0 ? "[]" : arraytostring(&(operator()(0)), length()); }
 #endif
+boolean_1d_array::~boolean_1d_array() { }
 
-boolean_1d_array::~boolean_1d_array() {
-}
-
-const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs) {
-   return static_cast < const boolean_1d_array &>(assign(rhs));
-}
-
-const bool &boolean_1d_array::operator()(ae_int_t i) const {
-   return This->xB[i];
-}
-
-bool &boolean_1d_array::operator()(ae_int_t i) {
-   return This->xB[i];
-}
-
-const bool &boolean_1d_array::operator[](ae_int_t i) const {
-   return This->xB[i];
-}
-
-bool &boolean_1d_array::operator[](ae_int_t i) {
-   return This->xB[i];
-}
+const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs) { return static_cast<const boolean_1d_array &>(assign(rhs)); }
+const bool &boolean_1d_array::operator()(ae_int_t i) const { return This->xB[i]; }
+bool &boolean_1d_array::operator()(ae_int_t i) { return This->xB[i]; }
+const bool &boolean_1d_array::operator[](ae_int_t i) const { return This->xB[i]; }
+bool &boolean_1d_array::operator[](ae_int_t i) { return This->xB[i]; }
 
 void boolean_1d_array::setcontent(ae_int_t iLen, const bool *pContent) {
-   ae_int_t i;
 // Handle possible exception-free errors.
    setlength(iLen);
-   if (This == NULL || This->cnt != iLen)
-      return;
-// Copy.
-   for (i = 0; i < iLen; i++)
-      This->xB[i] = pContent[i];
+// Copy, if its size matches.
+   if (This != NULL && This->cnt == iLen)
+      for (ae_int_t i = 0; i < iLen; i++) This->xB[i] = pContent[i];
 }
 
-const bool *boolean_1d_array::getcontent() const {
-   return This->xB;
-}
+const bool *boolean_1d_array::getcontent() const { return This->xB; }
+bool *boolean_1d_array::getcontent() { return This->xB; }
 
-bool *boolean_1d_array::getcontent() {
-   return This->xB;
-}
-
-integer_1d_array::integer_1d_array():ae_vector_wrapper(alglib_impl::DT_INT) {
-}
-
-integer_1d_array::integer_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_INT) {
-}
-
-integer_1d_array::integer_1d_array(const integer_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_INT) {
-}
-
+integer_1d_array::integer_1d_array(): ae_vector_wrapper(alglib_impl::DT_INT) { }
+integer_1d_array::integer_1d_array(alglib_impl::ae_vector *p): ae_vector_wrapper(p, alglib_impl::DT_INT) { }
+integer_1d_array::integer_1d_array(const integer_1d_array &rhs): ae_vector_wrapper(rhs, alglib_impl::DT_INT) { }
 #if !defined AE_NO_EXCEPTIONS
-integer_1d_array::integer_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_INT) {
-}
-
-std::string integer_1d_array::tostring() const {
-   if (length() == 0)
-      return "[]";
-   return arraytostring(&operator()(0), length());
-}
+integer_1d_array::integer_1d_array(const char *s): ae_vector_wrapper(s, alglib_impl::DT_INT) { }
+std::string integer_1d_array::tostring() const { return length() == 0 ? "[]" : arraytostring(&operator()(0), length()); }
 #endif
+integer_1d_array::~integer_1d_array() { }
 
-integer_1d_array::~integer_1d_array() {
-}
-
-const integer_1d_array &integer_1d_array::operator=(const integer_1d_array &rhs) {
-   return static_cast < const integer_1d_array &>(assign(rhs));
-}
-
-const ae_int_t &integer_1d_array::operator()(ae_int_t i) const {
-   return This->xZ[i];
-}
-
-ae_int_t &integer_1d_array::operator()(ae_int_t i) {
-   return This->xZ[i];
-}
-
-const ae_int_t &integer_1d_array::operator[](ae_int_t i) const {
-   return This->xZ[i];
-}
-
-ae_int_t &integer_1d_array::operator[](ae_int_t i) {
-   return This->xZ[i];
-}
+const integer_1d_array &integer_1d_array::operator=(const integer_1d_array &rhs) { return static_cast<const integer_1d_array &>(assign(rhs)); }
+const ae_int_t &integer_1d_array::operator()(ae_int_t i) const { return This->xZ[i]; }
+ae_int_t &integer_1d_array::operator()(ae_int_t i) { return This->xZ[i]; }
+const ae_int_t &integer_1d_array::operator[](ae_int_t i) const { return This->xZ[i]; }
+ae_int_t &integer_1d_array::operator[](ae_int_t i) { return This->xZ[i]; }
 
 void integer_1d_array::setcontent(ae_int_t iLen, const ae_int_t *pContent) {
-   ae_int_t i;
 // Handle possible exception-free errors.
    setlength(iLen);
-   if (This == NULL || This->cnt != iLen)
-      return;
-// Copy.
-   for (i = 0; i < iLen; i++)
-      This->xZ[i] = pContent[i];
+// Copy, if its size matches.
+   if (This != NULL && This->cnt == iLen)
+      for (ae_int_t i = 0; i < iLen; i++) This->xZ[i] = pContent[i];
 }
 
-const ae_int_t *integer_1d_array::getcontent() const {
-   return This->xZ;
-}
+const ae_int_t *integer_1d_array::getcontent() const { return This->xZ; }
+ae_int_t *integer_1d_array::getcontent() { return This->xZ; }
 
-ae_int_t *integer_1d_array::getcontent() {
-   return This->xZ;
-}
-
-real_1d_array::real_1d_array():ae_vector_wrapper(alglib_impl::DT_REAL) {
-}
-
-real_1d_array::real_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_REAL) {
-}
-
-real_1d_array::real_1d_array(const real_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_REAL) {
-}
-
+real_1d_array::real_1d_array(): ae_vector_wrapper(alglib_impl::DT_REAL) { }
+real_1d_array::real_1d_array(alglib_impl::ae_vector *p): ae_vector_wrapper(p, alglib_impl::DT_REAL) { }
+real_1d_array::real_1d_array(const real_1d_array &rhs): ae_vector_wrapper(rhs, alglib_impl::DT_REAL) { }
 #if !defined AE_NO_EXCEPTIONS
-real_1d_array::real_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_REAL) {
-}
-
-std::string real_1d_array::tostring(int dps) const {
-   if (length() == 0)
-      return "[]";
-   return arraytostring(&operator()(0), length(), dps);
-}
+real_1d_array::real_1d_array(const char *s): ae_vector_wrapper(s, alglib_impl::DT_REAL) { }
+std::string real_1d_array::tostring(int dps) const { return length() == 0 ? "[]" : arraytostring(&operator()(0), length(), dps); }
 #endif
+real_1d_array::~real_1d_array() { }
 
-real_1d_array::~real_1d_array() {
-}
-
-const real_1d_array &real_1d_array::operator=(const real_1d_array &rhs) {
-   return static_cast < const real_1d_array &>(assign(rhs));
-}
-
-const double &real_1d_array::operator()(ae_int_t i) const {
-   return This->xR[i];
-}
-
-double &real_1d_array::operator()(ae_int_t i) {
-   return This->xR[i];
-}
-
-const double &real_1d_array::operator[](ae_int_t i) const {
-   return This->xR[i];
-}
-
-double &real_1d_array::operator[](ae_int_t i) {
-   return This->xR[i];
-}
+const real_1d_array &real_1d_array::operator=(const real_1d_array &rhs) { return static_cast<const real_1d_array &>(assign(rhs)); }
+const double &real_1d_array::operator()(ae_int_t i) const { return This->xR[i]; }
+double &real_1d_array::operator()(ae_int_t i) { return This->xR[i]; }
+const double &real_1d_array::operator[](ae_int_t i) const { return This->xR[i]; }
+double &real_1d_array::operator[](ae_int_t i) { return This->xR[i]; }
 
 void real_1d_array::setcontent(ae_int_t iLen, const double *pContent) {
-   ae_int_t i;
 // Handle possible exception-free errors.
    setlength(iLen);
-   if (This == NULL || This->cnt != iLen)
-      return;
-// Copy.
-   for (i = 0; i < iLen; i++)
-      This->xR[i] = pContent[i];
+// Copy, if its size matches.
+   if (This != NULL && This->cnt == iLen)
+      for (ae_int_t i = 0; i < iLen; i++) This->xR[i] = pContent[i];
 }
 
-const double *real_1d_array::getcontent() const {
-   return This->xR;
-}
-
-double *real_1d_array::getcontent() {
-   return This->xR;
-}
+const double *real_1d_array::getcontent() const { return This->xR; }
+double *real_1d_array::getcontent() { return This->xR; }
 
 // TODO: Convert to a constructor!
 void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
-   alglib_impl::x_vector x;
    alglib_impl::ae_state_init();
    TryX {
 #if !defined AE_NO_EXCEPTIONS
@@ -9335,6 +9213,7 @@ void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
    }
    alglib_impl::ae_assert(owner, "real_1d_array::attach_to_ptr: unable to attach proxy object to something else");
    alglib_impl::ae_assert(iLen > 0, "real_1d_array::attach_to_ptr: non-positive length");
+   alglib_impl::x_vector x;
    x.cnt = iLen;
    x.datatype = alglib_impl::DT_REAL;
    x.owner = false;
@@ -9344,67 +9223,31 @@ void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
    alglib_impl::ae_state_clear();
 }
 
-complex_1d_array::complex_1d_array():ae_vector_wrapper(alglib_impl::DT_COMPLEX) {
-}
-
-complex_1d_array::complex_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_COMPLEX) {
-}
-
-complex_1d_array::complex_1d_array(const complex_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_COMPLEX) {
-}
-
+complex_1d_array::complex_1d_array(): ae_vector_wrapper(alglib_impl::DT_COMPLEX) { }
+complex_1d_array::complex_1d_array(alglib_impl::ae_vector *p): ae_vector_wrapper(p, alglib_impl::DT_COMPLEX) { }
+complex_1d_array::complex_1d_array(const complex_1d_array &rhs): ae_vector_wrapper(rhs, alglib_impl::DT_COMPLEX) { }
 #if !defined AE_NO_EXCEPTIONS
-complex_1d_array::complex_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_COMPLEX) {
-}
-
-std::string complex_1d_array::tostring(int dps) const {
-   if (length() == 0)
-      return "[]";
-   return arraytostring(&operator()(0), length(), dps);
-}
+complex_1d_array::complex_1d_array(const char *s): ae_vector_wrapper(s, alglib_impl::DT_COMPLEX) { }
+std::string complex_1d_array::tostring(int dps) const { return length() == 0 ? "[]" : arraytostring(&operator()(0), length(), dps); }
 #endif
+complex_1d_array::~complex_1d_array() { }
 
-complex_1d_array::~complex_1d_array() {
-}
-
-const complex_1d_array &complex_1d_array::operator=(const complex_1d_array &rhs) {
-   return static_cast < const complex_1d_array &>(assign(rhs));
-}
-
-const complex &complex_1d_array::operator()(ae_int_t i) const {
-   return *((const complex *)(This->xC + i));
-}
-
-complex &complex_1d_array::operator()(ae_int_t i) {
-   return *((complex *)(This->xC + i));
-}
-
-const complex &complex_1d_array::operator[](ae_int_t i) const {
-   return *((const complex *)(This->xC + i));
-}
-
-complex &complex_1d_array::operator[](ae_int_t i) {
-   return *((complex *)(This->xC + i));
-}
+const complex_1d_array &complex_1d_array::operator=(const complex_1d_array &rhs) { return static_cast<const complex_1d_array &>(assign(rhs)); }
+const complex &complex_1d_array::operator()(ae_int_t i) const { return *(const complex *)(This->xC + i); }
+complex &complex_1d_array::operator()(ae_int_t i) { return *(complex *)(This->xC + i); }
+const complex &complex_1d_array::operator[](ae_int_t i) const { return *(const complex *)(This->xC + i); }
+complex &complex_1d_array::operator[](ae_int_t i) { return *(complex *)(This->xC + i); }
 
 void complex_1d_array::setcontent(ae_int_t iLen, const complex *pContent) {
-   ae_int_t i;
 // Handle possible exception-free errors.
    setlength(iLen);
-   if (This == NULL || This->cnt != iLen)
-      return;
-// Copy.
-   for (i = 0; i < iLen; i++)
-      This->xC[i] = complex_from_c(pContent[i]);
+// Copy, if its size matches.
+   if (This != NULL && This->cnt == iLen)
+      for (ae_int_t i = 0; i < iLen; i++) This->xC[i] = complex_from_c(pContent[i]);
 }
 
-const complex *complex_1d_array::getcontent() const {
-   return (const complex *)This->xC;
-}
-
-complex *complex_1d_array::getcontent() {
-   return (complex *)This->xC;
-}
+const complex *complex_1d_array::getcontent() const { return (const complex *)This->xC; }
+complex *complex_1d_array::getcontent() { return (complex *)This->xC; }
 
 ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
    alglib_impl::ae_state_init();
@@ -9421,7 +9264,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
 
 ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl::ae_datatype datatype) {
    if (e_ptr->datatype != datatype) {
-      const char *msg = "ALGLIB: ae_vector_wrapper datatype check failed";
+      const char *msg = "ae_matrix_wrapper::ae_matrix_wrapper: datatype check failed";
 #if !defined AE_NO_EXCEPTIONS
       ThrowError(msg);
 #else
@@ -9440,16 +9283,14 @@ ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::
       owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
-   alglib_impl::ae_assert(rhs.This->datatype == datatype, "ae_matrix_wrapper::ae_matrix_wrapper: datatype check failed");
+   if (rhs.This != NULL)
+      alglib_impl::ae_assert(rhs.This->datatype == datatype, "ae_matrix_wrapper::ae_matrix_wrapper: datatype check failed");
    owner = true, This = &Obj, memset(This, 0, sizeof *This);
    rhs.This == NULL ? ae_matrix_init(This, 0, 0, datatype, false) : ae_matrix_copy(This, rhs.This, false);
    alglib_impl::ae_state_clear();
 }
 
-ae_matrix_wrapper::~ae_matrix_wrapper() {
-   if (This == &Obj)
-      ae_matrix_free(This, false);
-}
+ae_matrix_wrapper::~ae_matrix_wrapper() { if (This == &Obj) ae_matrix_free(This, false); }
 
 // TODO: Automatic allocation of NULL pointer!
 void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
@@ -9461,32 +9302,18 @@ void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
    alglib_impl::ae_state_clear();
 }
 
-ae_int_t ae_matrix_wrapper::cols() const {
-   return This == NULL ? 0 : This->cols;
-}
-
-ae_int_t ae_matrix_wrapper::rows() const {
-   return This == NULL ? 0 : This->rows;
-}
-
-ae_int_t ae_matrix_wrapper::getstride() const {
-   return This == NULL ? 0 : This->stride;
-}
-
-bool ae_matrix_wrapper::isempty() const {
-   return rows() == 0 || cols() == 0;
-}
+ae_int_t ae_matrix_wrapper::cols() const { return This == NULL ? 0 : This->cols; }
+ae_int_t ae_matrix_wrapper::rows() const { return This == NULL ? 0 : This->rows; }
+ae_int_t ae_matrix_wrapper::getstride() const { return This == NULL ? 0 : This->stride; }
+bool ae_matrix_wrapper::isempty() const { return rows() == 0 || cols() == 0; }
 
 void ae_matrix_wrapper::attach_to(alglib_impl::x_matrix *new_ptr) {
-   if (This == &Obj)
-      ae_matrix_free(This, false);
+   if (This == &Obj) ae_matrix_free(This, false);
    owner = false, This = &Obj, memset(This, 0, sizeof *This), ae_matrix_init_attach_to_x(This, new_ptr, false);
 }
 
 const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs) {
-   ae_int_t i;
-   if (this == &rhs)
-      return *this;
+   if (this == &rhs) return *this;
    alglib_impl::ae_state_init();
    TryCatch(*this)
    alglib_impl::ae_assert(This != NULL, "ae_matrix_wrapper::assign: incorrect assignment to matrix (uninitialized destination)");
@@ -9497,34 +9324,25 @@ const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs)
       alglib_impl::ae_assert(rhs.This->cols == This->cols, "ae_matrix_wrapper::assign: incorrect assignment to proxy array (sizes dont match)");
       alglib_impl::ae_assert(rhs.This->rows == This->rows, "ae_matrix_wrapper::assign: incorrect assignment to proxy array (sizes dont match)");
    }
-   if ((rhs.This->rows != This->rows) || (rhs.This->cols != This->cols))
-      ae_matrix_set_length(This, rhs.This->rows, rhs.This->cols);
-   for (i = 0; i < This->rows; i++)
-      memcpy(This->xyX[i], rhs.This->xyX[i], This->cols * alglib_impl::ae_sizeof(This->datatype));
+   if (rhs.This->cols != This->cols || rhs.This->rows != This->rows) ae_matrix_set_length(This, rhs.This->rows, rhs.This->cols);
+   for (ae_int_t i = 0; i < This->rows; i++) memcpy(This->xyX[i], rhs.This->xyX[i], This->cols * alglib_impl::ae_sizeof(This->datatype));
    alglib_impl::ae_state_clear();
    return *this;
 }
 
 #if !defined AE_NO_EXCEPTIONS
 ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype datatype) {
-   std::vector< std::vector<const char *> > smat;
-   size_t i, j;
-   char *p = filter_spaces(s);
-   if (p == NULL)
-      ThrowError("ae_matrix_wrapper::ae_matrix_wrapper: allocation error");
+   char *p = filter_spaces(s); if (p == NULL) ThrowError("ae_matrix_wrapper::ae_matrix_wrapper: allocation error");
    try {
-      str_matrix_create(p, &smat);
-      {
-         alglib_impl::ae_state_init();
-         TryCatch()
-         owner = true, This = &Obj, memset(This, 0, sizeof *This);
-         if (smat.size() != 0)
-            ae_matrix_init(This, (ae_int_t)smat.size(), (ae_int_t)smat[0].size(), datatype, false);
-         else
-            ae_matrix_init(This, 0, 0, datatype, false);
-         alglib_impl::ae_state_clear();
-      }
-      for (i = 0; i < smat.size(); i++) for (j = 0; j < smat[0].size(); j++) switch (datatype) {
+      std::vector< std::vector<const char *> > smat; str_matrix_create(p, &smat);
+   {
+      alglib_impl::ae_state_init();
+      TryCatch()
+      ae_int_t rows = smat.size(), cols = rows == 0 ? 0 : smat[0].size();
+      owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_matrix_init(This, rows, cols, datatype, false);
+      alglib_impl::ae_state_clear();
+   }
+      for (size_t i = 0; i < smat.size(); i++) for (size_t j = 0; j < smat[0].size(); j++) switch (datatype) {
       // case alglib_impl::DT_BYTE: // The same as alglib_impl::DT_BOOL.
          case alglib_impl::DT_BOOL: This->xyB[i][j] = parse_bool_delim(smat[i][j], ",]"); break;
          case alglib_impl::DT_INT: This->xyZ[i][j] = parse_int_delim(smat[i][j], ",]"); break;
@@ -9539,200 +9357,100 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
 }
 #endif
 
-boolean_2d_array::boolean_2d_array():ae_matrix_wrapper(alglib_impl::DT_BOOL) {
-}
-
-boolean_2d_array::boolean_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_BOOL) {
-}
-
-boolean_2d_array::boolean_2d_array(const boolean_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_BOOL) {
-}
-
+boolean_2d_array::boolean_2d_array(): ae_matrix_wrapper(alglib_impl::DT_BOOL) { }
+boolean_2d_array::boolean_2d_array(alglib_impl::ae_matrix *p): ae_matrix_wrapper(p, alglib_impl::DT_BOOL) { }
+boolean_2d_array::boolean_2d_array(const boolean_2d_array &rhs): ae_matrix_wrapper(rhs, alglib_impl::DT_BOOL) { }
 #if !defined AE_NO_EXCEPTIONS
-boolean_2d_array::boolean_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_BOOL) {
-}
-
+boolean_2d_array::boolean_2d_array(const char *s): ae_matrix_wrapper(s, alglib_impl::DT_BOOL) { }
 std::string boolean_2d_array::tostring() const {
-   std::string result;
-   ae_int_t i;
-   if (isempty())
-      return "[[]]";
-   result = "[";
-   for (i = 0; i < rows(); i++) {
-      if (i != 0)
-         result += ",";
+   if (isempty()) return "[[]]";
+   std::string result = "[";
+   for (ae_int_t i = 0; i < rows(); i++) {
+      if (i != 0) result += ",";
       result += arraytostring(&operator()(i, 0), cols());
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 #endif
+boolean_2d_array::~boolean_2d_array() { }
 
-boolean_2d_array::~boolean_2d_array() {
-}
-
-const boolean_2d_array &boolean_2d_array::operator=(const boolean_2d_array &rhs) {
-   return static_cast < const boolean_2d_array &>(assign(rhs));
-}
-
-const bool &boolean_2d_array::operator()(ae_int_t i, ae_int_t j) const {
-   return This->xyB[i][j];
-}
-
-bool &boolean_2d_array::operator()(ae_int_t i, ae_int_t j) {
-   return This->xyB[i][j];
-}
-
-const bool *boolean_2d_array::operator[](ae_int_t i) const {
-   return This->xyB[i];
-}
-
-bool *boolean_2d_array::operator[](ae_int_t i) {
-   return This->xyB[i];
-}
+const boolean_2d_array &boolean_2d_array::operator=(const boolean_2d_array &rhs) { return static_cast<const boolean_2d_array &>(assign(rhs)); }
+const bool &boolean_2d_array::operator()(ae_int_t i, ae_int_t j) const { return This->xyB[i][j]; }
+bool &boolean_2d_array::operator()(ae_int_t i, ae_int_t j) { return This->xyB[i][j]; }
+const bool *boolean_2d_array::operator[](ae_int_t i) const { return This->xyB[i]; }
+bool *boolean_2d_array::operator[](ae_int_t i) { return This->xyB[i]; }
 
 void boolean_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const bool *pContent) {
-   ae_int_t i, j;
 // Handle possible exception-free errors.
    setlength(irows, icols);
-   if (This == NULL || This->rows != irows || This->cols != icols)
-      return;
-// Copy.
-   for (i = 0; i < irows; i++)
-      for (j = 0; j < icols; j++)
-         This->xyB[i][j] = pContent[i * icols + j];
+// Copy, if its size matches.
+   if (This != NULL && This->cols == icols && This->rows == irows)
+      for (ae_int_t i = 0; i < irows; i++) for (ae_int_t j = 0; j < icols; j++) This->xyB[i][j] = pContent[i * icols + j];
 }
 
-integer_2d_array::integer_2d_array():ae_matrix_wrapper(alglib_impl::DT_INT) {
-}
-
-integer_2d_array::integer_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_INT) {
-}
-
-integer_2d_array::integer_2d_array(const integer_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_INT) {
-}
-
+integer_2d_array::integer_2d_array(): ae_matrix_wrapper(alglib_impl::DT_INT) { }
+integer_2d_array::integer_2d_array(alglib_impl::ae_matrix *p): ae_matrix_wrapper(p, alglib_impl::DT_INT) { }
+integer_2d_array::integer_2d_array(const integer_2d_array &rhs): ae_matrix_wrapper(rhs, alglib_impl::DT_INT) { }
 #if !defined AE_NO_EXCEPTIONS
-integer_2d_array::integer_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_INT) {
-}
-
+integer_2d_array::integer_2d_array(const char *s): ae_matrix_wrapper(s, alglib_impl::DT_INT) { }
 std::string integer_2d_array::tostring() const {
-   std::string result;
-   ae_int_t i;
-   if (isempty())
-      return "[[]]";
-   result = "[";
-   for (i = 0; i < rows(); i++) {
-      if (i != 0)
-         result += ",";
+   if (isempty()) return "[[]]";
+   std::string result = "[";
+   for (ae_int_t i = 0; i < rows(); i++) {
+      if (i != 0) result += ",";
       result += arraytostring(&operator()(i, 0), cols());
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 #endif
+integer_2d_array::~integer_2d_array() { }
 
-integer_2d_array::~integer_2d_array() {
-}
-
-const integer_2d_array &integer_2d_array::operator=(const integer_2d_array &rhs) {
-   return static_cast < const integer_2d_array &>(assign(rhs));
-}
-
-const ae_int_t &integer_2d_array::operator()(ae_int_t i, ae_int_t j) const {
-   return This->xyZ[i][j];
-}
-
-ae_int_t &integer_2d_array::operator()(ae_int_t i, ae_int_t j) {
-   return This->xyZ[i][j];
-}
-
-const ae_int_t *integer_2d_array::operator[](ae_int_t i) const {
-   return This->xyZ[i];
-}
-
-ae_int_t *integer_2d_array::operator[](ae_int_t i) {
-   return This->xyZ[i];
-}
+const integer_2d_array &integer_2d_array::operator=(const integer_2d_array &rhs) { return static_cast<const integer_2d_array &>(assign(rhs)); }
+const ae_int_t &integer_2d_array::operator()(ae_int_t i, ae_int_t j) const { return This->xyZ[i][j]; }
+ae_int_t &integer_2d_array::operator()(ae_int_t i, ae_int_t j) { return This->xyZ[i][j]; }
+const ae_int_t *integer_2d_array::operator[](ae_int_t i) const { return This->xyZ[i]; }
+ae_int_t *integer_2d_array::operator[](ae_int_t i) { return This->xyZ[i]; }
 
 void integer_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t *pContent) {
-   ae_int_t i, j;
 // Handle possible exception-free errors.
    setlength(irows, icols);
-   if (This == NULL || This->rows != irows || This->cols != icols)
-      return;
-// Copy.
-   for (i = 0; i < irows; i++)
-      for (j = 0; j < icols; j++)
-         This->xyZ[i][j] = pContent[i * icols + j];
+// Copy, if its size matches.
+   if (This != NULL && This->cols == icols && This->rows == irows)
+      for (ae_int_t i = 0; i < irows; i++) for (ae_int_t j = 0; j < icols; j++) This->xyZ[i][j] = pContent[i * icols + j];
 }
 
-real_2d_array::real_2d_array():ae_matrix_wrapper(alglib_impl::DT_REAL) {
-}
-
-real_2d_array::real_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_REAL) {
-}
-
-real_2d_array::real_2d_array(const real_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_REAL) {
-}
-
+real_2d_array::real_2d_array(): ae_matrix_wrapper(alglib_impl::DT_REAL) { }
+real_2d_array::real_2d_array(alglib_impl::ae_matrix *p): ae_matrix_wrapper(p, alglib_impl::DT_REAL) { }
+real_2d_array::real_2d_array(const real_2d_array &rhs): ae_matrix_wrapper(rhs, alglib_impl::DT_REAL) { }
 #if !defined AE_NO_EXCEPTIONS
-real_2d_array::real_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_REAL) {
-}
-
+real_2d_array::real_2d_array(const char *s): ae_matrix_wrapper(s, alglib_impl::DT_REAL) { }
 std::string real_2d_array::tostring(int dps) const {
-   std::string result;
-   ae_int_t i;
-   if (isempty())
-      return "[[]]";
-   result = "[";
-   for (i = 0; i < rows(); i++) {
-      if (i != 0)
-         result += ",";
+   if (isempty()) return "[[]]";
+   std::string result = "[";
+   for (ae_int_t i = 0; i < rows(); i++) {
+      if (i != 0) result += ",";
       result += arraytostring(&operator()(i, 0), cols(), dps);
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 #endif
+real_2d_array::~real_2d_array() { }
 
-real_2d_array::~real_2d_array() {
-}
-
-const real_2d_array &real_2d_array::operator=(const real_2d_array &rhs) {
-   return static_cast < const real_2d_array &>(assign(rhs));
-}
-
-const double &real_2d_array::operator()(ae_int_t i, ae_int_t j) const {
-   return This->xyR[i][j];
-}
-
-double &real_2d_array::operator()(ae_int_t i, ae_int_t j) {
-   return This->xyR[i][j];
-}
-
-const double *real_2d_array::operator[](ae_int_t i) const {
-   return This->xyR[i];
-}
-
-double *real_2d_array::operator[](ae_int_t i) {
-   return This->xyR[i];
-}
+const real_2d_array &real_2d_array::operator=(const real_2d_array &rhs) { return static_cast<const real_2d_array &>(assign(rhs)); }
+const double &real_2d_array::operator()(ae_int_t i, ae_int_t j) const { return This->xyR[i][j]; }
+double &real_2d_array::operator()(ae_int_t i, ae_int_t j) { return This->xyR[i][j]; }
+const double *real_2d_array::operator[](ae_int_t i) const { return This->xyR[i]; }
+double *real_2d_array::operator[](ae_int_t i) { return This->xyR[i]; }
 
 void real_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const double *pContent) {
-   ae_int_t i, j;
 // Handle possible exception-free errors.
    setlength(irows, icols);
-   if (This == NULL || This->rows != irows || This->cols != icols)
-      return;
-// Copy.
-   for (i = 0; i < irows; i++)
-      for (j = 0; j < icols; j++)
-         This->xyR[i][j] = pContent[i * icols + j];
+// Copy, if its size matches.
+   if (This != NULL && This->cols == icols && This->rows == irows)
+      for (ae_int_t i = 0; i < irows; i++) for (ae_int_t j = 0; j < icols; j++) This->xyR[i][j] = pContent[i * icols + j];
 }
 
 void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pContent) {
-   alglib_impl::x_matrix x;
    alglib_impl::ae_state_init();
    TryX {
 #if !defined AE_NO_EXCEPTIONS
@@ -9743,8 +9461,9 @@ void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pConte
    }
    alglib_impl::ae_assert(owner, "real_2d_array::attach_to_ptr: unable to attach proxy object to something else");
    alglib_impl::ae_assert(icols > 0 && irows > 0, "real_2d_array::attach_to_ptr: non-positive length");
-   x.rows = irows;
+   alglib_impl::x_matrix x;
    x.cols = icols;
+   x.rows = irows;
    x.stride = icols;
    x.datatype = alglib_impl::DT_REAL;
    x.owner = false;
@@ -9754,67 +9473,35 @@ void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pConte
    alglib_impl::ae_state_clear();
 }
 
-complex_2d_array::complex_2d_array():ae_matrix_wrapper(alglib_impl::DT_COMPLEX) {
-}
-
-complex_2d_array::complex_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_COMPLEX) {
-}
-
-complex_2d_array::complex_2d_array(const complex_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_COMPLEX) {
-}
-
+complex_2d_array::complex_2d_array(): ae_matrix_wrapper(alglib_impl::DT_COMPLEX) { }
+complex_2d_array::complex_2d_array(alglib_impl::ae_matrix *p): ae_matrix_wrapper(p, alglib_impl::DT_COMPLEX) { }
+complex_2d_array::complex_2d_array(const complex_2d_array &rhs): ae_matrix_wrapper(rhs, alglib_impl::DT_COMPLEX) { }
 #if !defined AE_NO_EXCEPTIONS
-complex_2d_array::complex_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_COMPLEX) {
-}
-
+complex_2d_array::complex_2d_array(const char *s): ae_matrix_wrapper(s, alglib_impl::DT_COMPLEX) { }
 std::string complex_2d_array::tostring(int dps) const {
-   std::string result;
-   ae_int_t i;
-   if (isempty())
-      return "[[]]";
-   result = "[";
-   for (i = 0; i < rows(); i++) {
-      if (i != 0)
-         result += ",";
+   if (isempty()) return "[[]]";
+   std::string result = "[";
+   for (ae_int_t i = 0; i < rows(); i++) {
+      if (i != 0) result += ",";
       result += arraytostring(&operator()(i, 0), cols(), dps);
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 #endif
+complex_2d_array::~complex_2d_array() { }
 
-complex_2d_array::~complex_2d_array() {
-}
-
-const complex_2d_array &complex_2d_array::operator=(const complex_2d_array &rhs) {
-   return static_cast < const complex_2d_array &>(assign(rhs));
-}
-
-const complex &complex_2d_array::operator()(ae_int_t i, ae_int_t j) const {
-   return *((const complex *)(This->xyC[i] + j));
-}
-
-complex &complex_2d_array::operator()(ae_int_t i, ae_int_t j) {
-   return *((complex *)(This->xyC[i] + j));
-}
-
-const complex *complex_2d_array::operator[](ae_int_t i) const {
-   return (const complex *)(This->xyC[i]);
-}
-
-complex *complex_2d_array::operator[](ae_int_t i) {
-   return (complex *)(This->xyC[i]);
-}
+const complex_2d_array &complex_2d_array::operator=(const complex_2d_array &rhs) { return static_cast<const complex_2d_array &>(assign(rhs)); }
+const complex &complex_2d_array::operator()(ae_int_t i, ae_int_t j) const { return *(const complex *)(This->xyC[i] + j); }
+complex &complex_2d_array::operator()(ae_int_t i, ae_int_t j) { return *(complex *)(This->xyC[i] + j); }
+const complex *complex_2d_array::operator[](ae_int_t i) const { return (const complex *)This->xyC[i]; }
+complex *complex_2d_array::operator[](ae_int_t i) { return (complex *)This->xyC[i]; }
 
 void complex_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const complex *pContent) {
-   ae_int_t i, j;
 // Handle possible exception-free errors.
    setlength(irows, icols);
-   if (This == NULL || This->rows != irows || This->cols != icols)
-      return;
-// Copy.
-   for (i = 0; i < irows; i++)
-      for (j = 0; j < icols; j++)
+// Copy, if its size matches.
+   if (This != NULL && This->cols == icols && This->rows == irows)
+      for (ae_int_t i = 0; i < irows; i++) for (ae_int_t j = 0; j < icols; j++)
          This->xyC[i][j] = complex_from_c(pContent[i * icols + j]);
 }
 
