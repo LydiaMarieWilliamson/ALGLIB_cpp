@@ -8813,10 +8813,6 @@ void vmul(complex *vdst, ae_int_t N, complex alpha) {
    vmul(vdst, 1, N, alpha);
 }
 
-ae_int_t vlen(ae_int_t n1, ae_int_t n2) {
-   return n2 - n1 + 1;
-}
-
 // Matrices and vectors: I/O.
 
 static bool strimatch(const char *s1, const char *s2) {
