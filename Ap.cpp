@@ -3946,31 +3946,6 @@ const double machineepsilon = 5.0E-16, maxrealnumber = 1.0E300, minrealnumber = 
 const double pi = 3.1415926535897932384626433832795;
 #endif
 
-// RComm functions
-void rcommstate_init(rcommstate *p, bool make_automatic) {
-// zero-filled initialization
-   memset(&p->ba, 0, sizeof p->ba), ae_vector_init(&p->ba, 0, DT_BOOL, make_automatic);
-   memset(&p->ia, 0, sizeof p->ia), ae_vector_init(&p->ia, 0, DT_INT, make_automatic);
-   memset(&p->ra, 0, sizeof p->ra), ae_vector_init(&p->ra, 0, DT_REAL, make_automatic);
-   memset(&p->ca, 0, sizeof p->ca), ae_vector_init(&p->ca, 0, DT_COMPLEX, make_automatic);
-}
-
-void rcommstate_copy(rcommstate *dst, rcommstate *src, bool make_automatic) {
-// zero-filled initialization
-   memset(&dst->ba, 0, sizeof dst->ba), ae_vector_copy(&dst->ba, &src->ba, make_automatic);
-   memset(&dst->ia, 0, sizeof dst->ia), ae_vector_copy(&dst->ia, &src->ia, make_automatic);
-   memset(&dst->ra, 0, sizeof dst->ra), ae_vector_copy(&dst->ra, &src->ra, make_automatic);
-   memset(&dst->ca, 0, sizeof dst->ca), ae_vector_copy(&dst->ca, &src->ca, make_automatic);
-   dst->stage = src->stage;
-}
-
-void rcommstate_free(rcommstate *p, bool make_automatic) {
-   ae_vector_free(&p->ba, make_automatic);
-   ae_vector_free(&p->ia, make_automatic);
-   ae_vector_free(&p->ra, make_automatic);
-   ae_vector_free(&p->ca, make_automatic);
-}
-
 // Optimized shared C/C++ linear algebra code.
 static const ae_int_t alglib_simd_alignment = 0x10;
 static const ae_int_t alglib_r_block = 0x20, alglib_half_r_block = alglib_r_block / 2, alglib_twice_r_block = 2 * alglib_r_block;

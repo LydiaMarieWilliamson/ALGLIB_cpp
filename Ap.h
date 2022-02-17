@@ -757,18 +757,6 @@ extern const double pi;
 #   define flushconsole(s) fflush(stdout)
 #endif
 
-// RComm functions
-struct rcommstate {
-   int stage;
-   ae_vector ia;
-   ae_vector ba;
-   ae_vector ra;
-   ae_vector ca;
-};
-void rcommstate_init(rcommstate *p, bool make_automatic);
-void rcommstate_copy(rcommstate *dst, rcommstate *src, bool make_automatic);
-void rcommstate_free(rcommstate *p, bool make_automatic);
-
 // Internal macros, defined only when _ALGLIB_IMPL_DEFINES is defined before
 // inclusion of this header file
 #if defined _ALGLIB_IMPL_DEFINES
