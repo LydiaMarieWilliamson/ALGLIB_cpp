@@ -37,7 +37,6 @@
 #   include <vector>
 #endif
 
-// #define AE_USE_CPP
 // The CPU type.
 #define AE_OTHER_CPU	0
 #define AE_INTEL	1
@@ -110,7 +109,7 @@ typedef enum { NonTH, SerTH, ParTH } xparams;
 
 // Now we are ready to include the remaining headers.
 // #include <ctype.h>
-#include <stdarg.h>
+// #include <stdarg.h>
 #include <string.h>
 #include <setjmp.h>
 #if defined AE_HAVE_STDINT
@@ -318,7 +317,7 @@ void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic);
 void ae_db_realloc(ae_dyn_block *block, ae_int_t size);
 void ae_db_free(ae_dyn_block *block);
 void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2);
-#define NewBlock(B, N)		ae_dyn_block B; memset(&B, 0, sizeof B); ae_db_init(&B, N, true)
+#define NewBlock(B, N)			ae_dyn_block B; memset(&B, 0, sizeof B), ae_db_init(&B, N, true)
 
 ae_int_t ae_sizeof(ae_datatype datatype);
 
@@ -348,9 +347,9 @@ void ae_vector_set_length(ae_vector *dst, ae_int_t newsize);
 void ae_vector_resize(ae_vector *dst, ae_int_t newsize);
 void ae_vector_free(ae_vector *dst, bool make_automatic);
 void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2);
-#define NewVector(V, N, Type)	ae_vector V; memset(&V, 0, sizeof V), ae_vector_init(&V, N, Type, true)
-#define DupVector(V)		ae_vector _##V; memset(&_##V, 0, sizeof _##V), ae_vector_copy(&_##V, V, true); V = &_##V
-#define SetVector(P)		ae_vector_free(P, true)
+#define NewVector(V, N, Type)		ae_vector V; memset(&V, 0, sizeof V), ae_vector_init(&V, N, Type, true)
+#define DupVector(V)			ae_vector _##V; memset(&_##V, 0, sizeof _##V), ae_vector_copy(&_##V, V, true), V = &_##V
+#define SetVector(P)			ae_vector_free(P, true)
 
 struct ae_matrix {
    ae_int_t cols;
@@ -743,19 +742,10 @@ void ae_v_muld(double *A, ae_int_t dA, ae_int_t N, double Alpha);
 extern const double machineepsilon, maxrealnumber, minrealnumber;
 extern const double pi;
 #else
-#   define machineepsilon 5E-16
-#   define maxrealnumber  1E300
-#   define minrealnumber  1E-300
-#   define pi 3.1415926535897932384626433832795
-#endif
-
-// debug functions (must be turned on by preprocessor definitions):
-// * flushconsole(), fluches console
-// * ae_debugrng(), returns random number generated with high-quality random numbers generator
-// * ae_set_seed(), sets seed of the debug RNG (NON-THREAD-SAFE!!!)
-// * ae_get_seed(), returns two seed values of the debug RNG (NON-THREAD-SAFE!!!)
-#if defined AE_DEBUG4POSIX || defined AE_DEBUG4WINDOWS
-#   define flushconsole(s) fflush(stdout)
+#   define machineepsilon	5.0E-16
+#   define maxrealnumber	1.0E300
+#   define minrealnumber	1.0E-300
+#   define pi			3.1415926535897932384626433832795
 #endif
 
 // Internal macros, defined only when _ALGLIB_IMPL_DEFINES is defined before
@@ -950,8 +940,8 @@ struct ap_error {
 #   if AE_THREADING != NonTH
 #      error Exception-free mode is thread-unsafe; define AE_THREADING = NonTH to prove that you know it.
 #   endif
-#   define BegPoll	{
-#   define EndPoll	}
+#   define BegPoll		{
+#   define EndPoll		}
 // Set the error flag and the pending error message.
 void set_error_msg();
 // Get the error flag and (optionally) the error message (as *MsgP);

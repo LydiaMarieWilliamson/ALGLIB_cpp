@@ -40,7 +40,9 @@
 #include <locale.h>
 #include <ctype.h>
 #if defined AE_CPU && AE_CPU == AE_INTEL
-#   if AE_COMPILER == AE_MSVC
+#   if AE_COMPILER == AE_GNUC && 0
+#      include <fpu_control.h> //(@) For _FPU_GETCW and _FPU_SETCW, for a fix that's apparently no longer needed.
+#   elif AE_COMPILER == AE_MSVC
 #      include <intrin.h>
 #   endif
 #endif
@@ -84,7 +86,7 @@ namespace alglib_impl {
 //      static char DummyArray[1 -  2 * (ConstA - ConstB) * (ConstA - ConstB)];
 // that would lead to a syntax error if the constraint failed (by declaring a negative array size).
 // You can remove them, if you want, since they are not used anywhere else.
-#define EquateConst(Arr, A, B)  static char Arr[1 - 2*((A) - (B)) * ((A) - (B))];
+#define EquateConst(Arr, A, B)	static char Arr[1 - 2 * ((A) - (B)) * ((A) - (B))];
 EquateConst(_ae_bool_must_be_8_bits_wide, (int)sizeof(bool), 1);
 EquateConst(_ae_int32_t_must_be_32_bits_wide, (int)sizeof(ae_int32_t), 4);
 EquateConst(_ae_int64_t_must_be_64_bits_wide, (int)sizeof(ae_int64_t), 8);
@@ -185,8 +187,8 @@ void ae_state_clear() {
 
 // Global flags, split into several char-sized variables in order to avoid problem with non-atomic reads/writes
 // (single-byte ops are atomic on all modern architectures);
-#define _ALGLIB_FLG_THREADING_MASK          0x7
-#define _ALGLIB_FLG_THREADING_SHIFT         0
+#define _ALGLIB_FLG_THREADING_MASK	0x7
+#define _ALGLIB_FLG_THREADING_SHIFT	0
 //
 // Following variables are included:
 // * threading-related settings
@@ -504,7 +506,11 @@ void *ae_align(void *ptr, size_t alignment) {
 //       so use it only when necessary.
 static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
    AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
-#if AE_OS == AE_WINDOWS
+#if AE_COMPILER == AE_GNUC && AE_CPU == AE_INTEL && 100 * __GNUC__ + __GNUC__ >= 470
+   __atomic_add_fetch(p, v, __ATOMIC_RELAXED);
+#elif defined __clang__ && AE_CPU == AE_INTEL
+   __atomic_fetch_add(p, v, __ATOMIC_RELAXED);
+#elif AE_OS == AE_WINDOWS
    while (true) {
    // perform conversion between ae_int_t* and void**
    // without compiler warnings about indirection levels
@@ -519,10 +525,6 @@ static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
       if (InterlockedCompareExchangePointer(u.ptr, (PVOID)((char *)v0 + v), v0) == v0)
          break;
    }
-#elif defined __clang__ && (AE_CPU == AE_INTEL)
-   __atomic_fetch_add(p, v, __ATOMIC_RELAXED);
-#elif (AE_COMPILER == AE_GNUC) && (AE_CPU == AE_INTEL) && (__GNUC__*100+__GNUC__ >= 470)
-   __atomic_add_fetch(p, v, __ATOMIC_RELAXED);
 #else
    *p += v; // At least do something for older compilers!
 #endif
@@ -542,7 +544,11 @@ static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
 //       so use it only when necessary.
 static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
    AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
-#if AE_OS == AE_WINDOWS
+#if AE_COMPILER == AE_GNUC && AE_CPU == AE_INTEL && 100 * __GNUC__ + __GNUC__ >= 470
+   __atomic_sub_fetch(p, v, __ATOMIC_RELAXED);
+#elif defined __clang__ && AE_CPU == AE_INTEL
+   __atomic_fetch_sub(p, v, __ATOMIC_RELAXED);
+#elif AE_OS == AE_WINDOWS
    while (true) {
    // perform conversion between ae_int_t* and void**
    // without compiler warnings about indirection levels
@@ -557,10 +563,6 @@ static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
       if (InterlockedCompareExchangePointer(u.ptr, (PVOID)((char *)v0 - v), v0) == v0)
          break;
    }
-#elif defined __clang__ && (AE_CPU == AE_INTEL)
-   __atomic_fetch_sub(p, v, __ATOMIC_RELAXED);
-#elif (AE_COMPILER == AE_GNUC) && (AE_CPU == AE_INTEL) && (__GNUC__*100+__GNUC__ >= 470)
-   __atomic_sub_fetch(p, v, __ATOMIC_RELAXED);
 #else
    *p -= v; // At least do something for older compilers!
 #endif
@@ -568,8 +570,8 @@ static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
 
 // Fields for memory allocation over static array
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
-#   if AE_THREADING != AE_SERIAL_UNSAFE
-#      error Basis static malloc is thread-unsafe; define AE_THREADING=AE_SERIAL_UNSAFE to prove that you know it
+#   if AE_THREADING != NonTH
+#      error Basic static malloc is thread-unsafe; define AE_THREADING = NonTH to prove that you know it.
 #   endif
 
 static ae_int_t sm_page_size = 0;
