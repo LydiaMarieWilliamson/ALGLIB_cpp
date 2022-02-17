@@ -494,6 +494,9 @@ A6.2. Test Stages
 	―	Reduce multi-threaded support in TestX, for now, until the former ae_state variables are made thread-local,
 		and synthesize approximate comparisons NearR(), SmallR() in TestX.cpp,
 		grafting these changes and most of TestX from ALGLIB++.
+0-39	Recoded the core-counting routines.
+	―	Synthesis of alglib_impl::ae_count_cores().
+	―	Renamed alglib::_ae_cores_count() as ae_cores_count().
 
 A6.3. Test Results
 ──────────────────

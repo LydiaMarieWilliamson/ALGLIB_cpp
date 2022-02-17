@@ -261,6 +261,7 @@ ae_uint64_t ae_get_global_threading();
 // Service functions.
 typedef enum { CPU_SSE2 = 0x1, CPU_AVX2 = 0x2, CPU_FMA = 0x4 } ae_cpuid_t;
 extern const ae_cpuid_t CurCPU;
+ae_int_t ae_cores_count();
 ae_int_t ae_get_effective_workers(ae_int_t nworkers);
 
 // IDs for ae_[sg]et_dbg_value().
@@ -1108,12 +1109,12 @@ complex csqr(const complex &z);
 // Multi-threading and multi-core functions.
 // These are mostly stubs from the commercial version of ALGLIB.
 
-// Get/Set the number of cores: can be 1, 2, ... ; or 0 for auto; or -1/-2/... for all except for one/two/...
+// Get/Set the number of cores; can be 1, 2, ...; or 0 for auto; or -1/-2/... for all except for one/two/...
 ae_int_t getnworkers();
 void setnworkers(ae_int_t nworkers);
 
-// Internal functions used by TestX.cpp, interfaces for functions present in commercial ALGLIB but lacking in free edition.
-ae_int_t _ae_cores_count();
+// Internal functions used by TestX.cpp, interfaces for functions present only in the commercial version of ALGLIB.
+ae_int_t ae_cores_count();
 void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value);
 alglib_impl::ae_uint64_t _ae_get_global_threading();
 
