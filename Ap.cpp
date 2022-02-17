@@ -559,12 +559,12 @@ void set_memory_pool(void *ptr, size_t size) {
    AE_CRITICAL_ASSERT(sm_mem == NULL);
    AE_CRITICAL_ASSERT(size > 0);
 // Align the pointer.
-   size -= ae_misalignment(ptr, sizeof(ae_int_t));
-   ptr = ae_align(ptr, sizeof(ae_int_t));
+   size -= ae_misalignment(ptr, sizeof *sm_page_tbl);
+   ptr = ae_align(ptr, sizeof *sm_page_tbl);
 // Calculate the page size and page count, prepare pointers to the page table and memory.
-   sm_page_size = 256;
+   sm_page_size = 0x100;
 // We expect to have memory for at least one page + table entry + alignment.
-   AE_CRITICAL_ASSERT(size >= (sm_page_size + sizeof(ae_int_t)) + sm_page_size);
+   AE_CRITICAL_ASSERT(size >= (sm_page_size + sizeof *sm_page_tbl) + sm_page_size);
    sm_page_cnt = (size - sm_page_size) / (sm_page_size + sizeof *sm_page_tbl);
    AE_CRITICAL_ASSERT(sm_page_cnt > 0);
    sm_page_tbl = (ae_int_t *)ptr;
@@ -574,28 +574,22 @@ void set_memory_pool(void *ptr, size_t size) {
 }
 
 static void *ae_static_malloc(size_t size, size_t alignment) {
-   int rq_pages, i, j, cur_len;
    AE_CRITICAL_ASSERT(size >= 0);
    AE_CRITICAL_ASSERT(sm_page_size > 0);
    AE_CRITICAL_ASSERT(sm_page_cnt > 0);
    AE_CRITICAL_ASSERT(sm_page_tbl != NULL);
    AE_CRITICAL_ASSERT(sm_mem != NULL);
-   if (size == 0)
-      return NULL;
-   if (_force_malloc_failure)
-      return NULL;
+   if (size == 0 || _force_malloc_failure) return NULL;
 // Check that the page alignment and requested alignment match each other.
    AE_CRITICAL_ASSERT(alignment <= sm_page_size);
    AE_CRITICAL_ASSERT((sm_page_size % alignment) == 0);
 // Search a long enough sequence of pages.
-   rq_pages = size / sm_page_size;
-   if (size % sm_page_size)
-      rq_pages++;
-   cur_len = 0;
-   for (i = 0; i < sm_page_cnt;) {
+   int rq_pages = size / sm_page_size;
+   if (size % sm_page_size) rq_pages++;
+   int cur_len = 0;
+   for (int i = 0; i < sm_page_cnt; ) {
    // Determine the length of the free page sequence.
-      if (sm_page_tbl[i] == 0)
-         cur_len++;
+      if (sm_page_tbl[i] == 0) cur_len++;
       else {
          AE_CRITICAL_ASSERT(sm_page_tbl[i] > 0);
          cur_len = 0;
@@ -609,11 +603,9 @@ static void *ae_static_malloc(size_t size, size_t alignment) {
             ae_optional_atomic_add_i(&_alloc_counter, 1);
             ae_optional_atomic_add_i(&_alloc_counter_total, 1);
          }
-         if (_use_dbg_counters)
-            ae_optional_atomic_add_i(&_dbg_alloc_total, size);
+         if (_use_dbg_counters) ae_optional_atomic_add_i(&_dbg_alloc_total, size);
       // Mark pages and return.
-         for (j = 0; j < rq_pages; j++)
-            sm_page_tbl[i - j] = -1;
+         for (int j = 0; j < rq_pages; j++) sm_page_tbl[i - j] = -1;
          sm_page_tbl[i - (rq_pages - 1)] = rq_pages;
          return sm_mem + (i - (rq_pages - 1)) * sm_page_size;
       }
@@ -624,35 +616,29 @@ static void *ae_static_malloc(size_t size, size_t alignment) {
 }
 
 static void ae_static_free(void *block) {
-   ae_int_t page_idx, page_cnt, i;
-   if (block == NULL)
-      return;
-   page_idx = (unsigned char *)block - sm_mem;
+   if (block == NULL) return;
+   ae_int_t page_idx = (unsigned char *)block - sm_mem;
    AE_CRITICAL_ASSERT(page_idx >= 0);
    AE_CRITICAL_ASSERT((page_idx % sm_page_size) == 0);
    page_idx /= sm_page_size;
    AE_CRITICAL_ASSERT(page_idx < sm_page_cnt);
-   page_cnt = sm_page_tbl[page_idx];
+   ae_int_t page_cnt = sm_page_tbl[page_idx];
    AE_CRITICAL_ASSERT(page_cnt >= 1);
-   for (i = 0; i < page_cnt; i++)
-      sm_page_tbl[page_idx + i] = 0;
+   for (ae_int_t i = 0; i < page_cnt; i++) sm_page_tbl[page_idx + i] = 0;
 // Update the counters (if the use-flag is set).
-   if (_use_alloc_counter)
-      ae_optional_atomic_sub_i(&_alloc_counter, 1);
+   if (_use_alloc_counter) ae_optional_atomic_sub_i(&_alloc_counter, 1);
 }
 
 void memory_pool_stats(ae_int_t *bytes_used, ae_int_t *bytes_free) {
-   int i;
    AE_CRITICAL_ASSERT(sm_page_size > 0);
    AE_CRITICAL_ASSERT(sm_page_cnt > 0);
    AE_CRITICAL_ASSERT(sm_page_tbl != NULL);
    AE_CRITICAL_ASSERT(sm_mem != NULL);
 // Scan the page table.
-   *bytes_used = 0;
-   *bytes_free = 0;
-   for (i = 0; i < sm_page_cnt;) {
+   *bytes_free = *bytes_used = 0;
+   for (int i = 0; i < sm_page_cnt; ) {
       if (sm_page_tbl[i] == 0) {
-         (*bytes_free)++;
+         ++*bytes_free;
          i++;
       } else {
          AE_CRITICAL_ASSERT(sm_page_tbl[i] > 0);
@@ -670,44 +656,31 @@ void *aligned_malloc(size_t size, size_t alignment) {
    return ae_static_malloc(size, alignment);
 #else
    char *result = NULL;
-   if (size == 0)
-      return NULL;
-   if (_force_malloc_failure)
-      return NULL;
-   if (_malloc_failure_after > 0 && _alloc_counter_total >= _malloc_failure_after)
-      return NULL;
+   if (size == 0 || _force_malloc_failure || _malloc_failure_after > 0 && _alloc_counter_total >= _malloc_failure_after) return NULL;
 // Allocate.
    if (alignment <= 1) {
    // No alignment, just call malloc().
-      void *block;
-      void **p;;
-      block = malloc(sizeof(void *) + size);
-      if (block == NULL)
-         return NULL;
-      p = (void **)block;
-      *p = block;
-      result = (char *)((char *)block + sizeof(void *));
+      void *block = malloc(sizeof block + size);
+      if (block == NULL) return NULL;
+      *(void **)block = block;
+      result = (char *)((char *)block + sizeof block);
    } else {
    // Align.
-      void *block;
-      block = malloc(alignment - 1 + sizeof(void *) + size);
-      if (block == NULL)
-         return NULL;
-      result = (char *)block + sizeof(void *);
+      void *block = malloc(alignment - 1 + sizeof block + size);
+      if (block == NULL) return NULL;
+      result = (char *)block + sizeof block;
 #   if 0
-      if ((result - (char *)0) % alignment != 0)
-         result += alignment - (result - (char *)0) % alignment;
+      if ((result - (char *)NULL) % alignment != 0) result += alignment - (result - (char *)NULL) % alignment;
 #   endif
       result = (char *)ae_align(result, alignment);
-      *((void **)(result - sizeof(void *))) = block;
+      *(void **)(result - sizeof block) = block;
    }
 // Update whichever counters the use-flags are set for.
    if (_use_alloc_counter) {
       ae_optional_atomic_add_i(&_alloc_counter, 1);
       ae_optional_atomic_add_i(&_alloc_counter_total, 1);
    }
-   if (_use_dbg_counters)
-      ae_optional_atomic_add_i(&_dbg_alloc_total, (ae_int64_t)size);
+   if (_use_dbg_counters) ae_optional_atomic_add_i(&_dbg_alloc_total, (ae_int64_t)size);
    return (void *)result;
 #endif
 }
@@ -716,7 +689,7 @@ static void *aligned_extract_ptr(void *block) {
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    return NULL;
 #else
-   return block == NULL ? NULL : *(void **)((char *)block - sizeof(void *));
+   return block == NULL ? NULL : *(void **)((char *)block - sizeof block);
 #endif
 }
 
@@ -724,13 +697,10 @@ void aligned_free(void *block) {
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    ae_static_free(block);
 #else
-   void *p;
-   if (block == NULL)
-      return;
-   p = aligned_extract_ptr(block);
+   if (block == NULL) return;
+   void *p = aligned_extract_ptr(block);
    free(p);
-   if (_use_alloc_counter)
-      ae_optional_atomic_sub_i(&_alloc_counter, 1);
+   if (_use_alloc_counter) ae_optional_atomic_sub_i(&_alloc_counter, 1);
 #endif
 }
 
@@ -738,28 +708,21 @@ void aligned_free(void *block) {
 // Return NULL when size == 0 is specified.
 // Upon failure with TopFr != NULL, call ae_break(), otherwise return NULL.
 void *ae_malloc(size_t size) {
-   void *result;
-   if (size == 0)
-      return NULL;
-   result = aligned_malloc(size, AE_DATA_ALIGN);
-   if (result == NULL && TopFr != NULL)
-      ae_break(ERR_OUT_OF_MEMORY, "ae_malloc: out of memory");
+   if (size == 0) return NULL;
+   void *result = aligned_malloc(size, AE_DATA_ALIGN);
+   if (result == NULL && TopFr != NULL) ae_break(ERR_OUT_OF_MEMORY, "ae_malloc: out of memory");
    return result;
 }
 
 void ae_free(void *p) {
-   if (p != NULL)
-      aligned_free(p);
+   if (p != NULL) aligned_free(p);
 }
 
 // Attach block to the dynamic block list for the ALGLIB++ environment.
 // This function does NOT generate exceptions.
 // NOTE:
 // *	Avoid calling it for the special blocks which mark frame boundaries!
-static void ae_db_attach(ae_dyn_block *block) {
-   block->p_next = TopFr;
-   TopFr = block;
-}
+static void ae_db_attach(ae_dyn_block *block) { block->p_next = TopFr, TopFr = block; }
 
 // Allocate and initialize a dynamic block of size >= 0 bytes for the ALGLIB++ environment.
 // It is assumed to be uninitialized, its fields are ignored.
@@ -777,10 +740,7 @@ void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic) {
    block->ptr = NULL;
    block->valgrind_hint = NULL;
    if (make_automatic) ae_db_attach(block); else block->p_next = NULL;
-   if (size != 0) {
-      block->ptr = ae_malloc((size_t)size);
-      block->valgrind_hint = aligned_extract_ptr(block->ptr);
-   }
+   if (size != 0) block->ptr = ae_malloc((size_t)size), block->valgrind_hint = aligned_extract_ptr(block->ptr);
    block->deallocator = ae_free;
 }
 
@@ -891,11 +851,9 @@ void ae_vector_set_length(ae_vector *dst, ae_int_t newsize) {
 // The values of elements added during vector growth are undefined.
 // Upon allocation failure, call ae_break().
 void ae_vector_resize(ae_vector *dst, ae_int_t newsize) {
-   ae_int_t bytes_total;
    ae_vector tmp; memset(&tmp, 0, sizeof tmp), ae_vector_init(&tmp, newsize, dst->datatype, false);
-   bytes_total = (dst->cnt < newsize ? dst->cnt : newsize) * ae_sizeof(dst->datatype);
-   if (bytes_total > 0)
-      memmove(tmp.xX, dst->xX, bytes_total);
+   ae_int_t bytes_total = (dst->cnt < newsize ? dst->cnt : newsize) * ae_sizeof(dst->datatype);
+   if (bytes_total > 0) memmove(tmp.xX, dst->xX, bytes_total);
    ae_swap_vectors(dst, &tmp);
    ae_vector_free(&tmp, true);
 }
@@ -1895,9 +1853,7 @@ void ae_free_lock(ae_lock *lock) {
 }
 
 // A reduced form ae_shared_pool_free() suitable for use as the deallocation function on a frame.
-static void ae_shared_pool_destroy(void *_dst) {
-   ae_shared_pool_free(_dst, false);
-}
+static void ae_shared_pool_destroy(void *_dst) { ae_shared_pool_free(_dst, false); }
 
 // A new ae_shared_pool structure for _dst.
 // _dst is assumed to be pre-allocated, and uninitialized, its fields are ignored.
@@ -2057,9 +2013,8 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 // Acquire a lock.
    ae_acquire_lock(&pool->pool_lock);
    if (pool->recycled_objects != NULL) { // Try to reuse recycled objects.
-      ae_shared_pool_entry *result;
    // Retrieve an entry/object from the list of recycled objects.
-      result = pool->recycled_objects;
+      ae_shared_pool_entry *result = pool->recycled_objects;
       pool->recycled_objects = (ae_shared_pool_entry *)pool->recycled_objects->next_entry;
       void *new_obj = result->obj;
       result->obj = NULL;
@@ -2070,7 +2025,6 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr) {
       ae_release_lock(&pool->pool_lock);
    // Assign the object to the smart pointer.
       ae_smart_ptr_assign(pptr, new_obj, true, true, pool->free);
-      return;
    } else {
    // Release the lock; we do not need it anymore because the copy constructor does not modify the source variable.
       ae_release_lock(&pool->pool_lock);
@@ -2110,7 +2064,7 @@ void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr) {
    // *	Unlock the pool first
    //	so as to prevent the pool from being left in a locked state in case ae_malloc() raises an exception.
       ae_release_lock(&pool->pool_lock);
-      new_entry = (ae_shared_pool_entry *)ae_malloc(sizeof(ae_shared_pool_entry));
+      new_entry = (ae_shared_pool_entry *)ae_malloc(sizeof *new_entry);
       ae_acquire_lock(&pool->pool_lock);
    }
 // Recycle the object, the lock object and the source pointer.
@@ -2127,7 +2081,7 @@ void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 //	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic) {
 // Clear the recycled objects.
-   for (ae_shared_pool_entry *ptr = pool->recycled_objects; ptr != NULL;) {
+   for (ae_shared_pool_entry *ptr = pool->recycled_objects; ptr != NULL; ) {
       ae_shared_pool_entry *tmp = (ae_shared_pool_entry *)ptr->next_entry;
       pool->free(ptr->obj, make_automatic);
       ae_free(ptr->obj);

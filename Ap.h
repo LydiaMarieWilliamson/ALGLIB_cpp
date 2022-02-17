@@ -224,22 +224,6 @@ extern bool _force_malloc_failure;
 // Otherwise, this value has no effect.
 extern ae_int_t _malloc_failure_after;
 
-// Dynamic block which may be automatically deallocated during stack unwinding.
-typedef void (*ae_deallocator)(void *);
-struct ae_dyn_block {
-// The next block in the stack unwinding list; or NULL if this block is not in the list.
-   struct ae_dyn_block *volatile p_next;
-// The block deallocation function; or NULL for the stack frame/boundary "special" blocks.
-   ae_deallocator deallocator; // Was: void *deallocator;
-// The argument for deallocator(); or NULL for 0-size blocks, or the DYN_BOTTOM or DYN_FRAME stack frame/boundary "special" blocks.
-   void *volatile ptr;
-// A "hint" pointer for Valgrind and other similar memory checking tools,
-// that saves what malloc() actually returned, or NULL if the feature is disabled or lost.
-// It is always set at run-time to to (ptr == NULL? NULL: aligned_extract_ptr(ptr)).
-// Memory testing tools may sometimes report "(possibly) lost" memory for the pointers that ALGLIB++ assigns,
-// since it aligns pointers in such a way that X usually points beyond the actual allocated memory's start.
-   void *valgrind_hint; // It is always set to (ptr == NULL? NULL: aliged_extract_ptr(ptr)).
-};
 // Frame marker.
 typedef struct ae_dyn_block ae_frame;
 
@@ -312,6 +296,22 @@ void aligned_free(void *block);
 void *ae_malloc(size_t size);
 void ae_free(void *p);
 
+// Dynamic block which may be automatically deallocated during stack unwinding.
+typedef void (*ae_deallocator)(void *);
+struct ae_dyn_block {
+// The next block in the stack unwinding list; or NULL if this block is not in the list.
+   struct ae_dyn_block *volatile p_next;
+// The block deallocation function; or NULL for the stack frame/boundary "special" blocks.
+   ae_deallocator deallocator; // Was: void *deallocator;
+// The argument for deallocator(); or NULL for 0-size blocks, or the DYN_BOTTOM or DYN_FRAME stack frame/boundary "special" blocks.
+   void *volatile ptr;
+// A "hint" pointer for Valgrind and other similar memory checking tools,
+// that saves what malloc() actually returned, or NULL if the feature is disabled or lost.
+// It is always set at run-time to to (ptr == NULL? NULL: aligned_extract_ptr(ptr)).
+// Memory testing tools may sometimes report "(possibly) lost" memory for the pointers that ALGLIB++ assigns,
+// since it aligns pointers in such a way that X usually points beyond the actual allocated memory's start.
+   void *valgrind_hint; // It is always set to (ptr == NULL? NULL: aliged_extract_ptr(ptr)).
+};
 void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic);
 void ae_db_realloc(ae_dyn_block *block, ae_int_t size);
 void ae_db_free(ae_dyn_block *block);
@@ -553,7 +553,7 @@ struct ae_shared_pool {
 };
 void ae_shared_pool_init(void *_dst, bool make_automatic);
 void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic);
-void ae_shared_pool_free(void *dst, bool make_automatic);
+void ae_shared_pool_free(void *_dst, bool make_automatic);
 bool ae_shared_pool_is_initialized(ae_shared_pool *dst);
 void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, bool make_automatic), void (*copy)(void *dst, void *src, bool make_automatic), void (*free)(void *ptr, bool make_automatic));
 void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr);
