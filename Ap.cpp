@@ -2151,17 +2151,14 @@ void ae_shared_pool_reset(ae_shared_pool *pool) {
 // Convert the six-bit value v in the range [0,0100) to digits, letters, minuses and underscores.
 // Any v outside the range [0,0100) is convereted to   '?'.
 static char ae_sixbits2char(ae_int_t v) {
-   static char _sixbits2char_tbl[100] = {
-      '0', '1', '2', '3', '4', '5', '6', '7',
-      '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
-      'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-      'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-      'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
-      'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-      'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-      'u', 'v', 'w', 'x', 'y', 'z', '-', '_'
+   static char _sixbits2char_tbl[0100] = {
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+      'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+      'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+      'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '-', '_'
    };
-   return v >= 0 && v < 100 ? _sixbits2char_tbl[v] : '?';
+   const size_t CharN = sizeof _sixbits2char_tbl/sizeof _sixbits2char_tbl[0];
+   return v >= 0 && v < CharN ? _sixbits2char_tbl[v] : '?';
 #if 0
 // v is correct, process it.
    return
@@ -2176,25 +2173,18 @@ static char ae_sixbits2char(ae_int_t v) {
 // Convert any character c in the range of ae_sixbits2char() to a six-bit value in the range [0, 0100).
 // Convert any other character c to -1.
 static ae_int_t ae_char2sixbits(char c) {
-   static ae_int_t _ae_char2sixbits_tbl[] = {
-      -1, -1, -1, -1, -1, -1, -1, -1,
-      -1, -1, -1, -1, -1, -1, -1, -1,
-      -1, -1, -1, -1, -1, -1, -1, -1,
-      -1, -1, -1, -1, -1, -1, -1, -1,
-      -1, -1, -1, -1, -1, -1, -1, -1,
-      -1, -1, -1, -1, -1, 62, -1, -1,
-      0, 1, 2, 3, 4, 5, 6, 7,
-      8, 9, -1, -1, -1, -1, -1, -1,
-      -1, 10, 11, 12, 13, 14, 15, 16,
-      17, 18, 19, 20, 21, 22, 23, 24,
-      25, 26, 27, 28, 29, 30, 31, 32,
-      33, 34, 35, -1, -1, -1, -1, 63,
-      -1, 36, 37, 38, 39, 40, 41, 42,
-      43, 44, 45, 46, 47, 48, 49, 50,
-      51, 52, 53, 54, 55, 56, 57, 58,
-      59, 60, 61, -1, -1, -1, -1, -1
+   static ae_int_t _ae_char2sixbits_tbl[0x80] = {
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1,
+       0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1,
+      -1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+      25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, 63,
+      -1, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
+      51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1
    };
-   return (c >= 0 && c < 127) ? _ae_char2sixbits_tbl[(int)c] : -1;
+   const size_t Bit6N = sizeof _ae_char2sixbits_tbl/sizeof _ae_char2sixbits_tbl[0];
+   return c >= 0 && c < Bit6N ? _ae_char2sixbits_tbl[(int)c] : -1;
 }
 
 // Convert the 3 x 8-bit array src into the 4 x 6-bit array dst.
@@ -2215,14 +2205,12 @@ static void ae_foursixbits2threebytes(const ae_int_t *src, unsigned char *dst) {
 // Initialize the serializer.
 void ae_serializer_init(ae_serializer *serializer) {
    serializer->mode = AE_SM_DEFAULT;
-   serializer->entries_needed = 0;
-   serializer->bytes_asked = 0;
+   serializer->bytes_asked = serializer->entries_needed = 0;
 }
 
 void ae_serializer_alloc_start(ae_serializer *serializer) {
    serializer->mode = AE_SM_ALLOC;
-   serializer->entries_needed = 0;
-   serializer->bytes_asked = 0;
+   serializer->bytes_asked = serializer->entries_needed = 0;
 }
 
 void ae_serializer_alloc_entry(ae_serializer *serializer) {
@@ -2232,28 +2220,19 @@ void ae_serializer_alloc_entry(ae_serializer *serializer) {
 // After the allocation is done, return the required size of the output string buffer (including trailing '\0').
 // The actual size of the data being stored can be a few characters smaller than requested.
 ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer) {
-   ae_int_t rows, lastrowsize, result;
    serializer->mode = AE_SM_READY2S;
 // If no entries are needed (the degenerate case).
-   if (serializer->entries_needed == 0) {
-      serializer->bytes_asked = 4; // A pair of chars for "\r\n", one for '.', one for the trailing '\0'.
-      return serializer->bytes_asked;
-   }
+   if (serializer->entries_needed == 0)
+      return serializer->bytes_asked = 4; // A pair of chars for "\r\n", one for '.', one for the trailing '\0'.
 // The non-degenerate case.
-   rows = serializer->entries_needed / AE_SER_ENTRIES_PER_ROW;
-   lastrowsize = AE_SER_ENTRIES_PER_ROW;
+   ae_int_t rows = serializer->entries_needed / AE_SER_ENTRIES_PER_ROW;
+   ae_int_t lastrowsize = AE_SER_ENTRIES_PER_ROW;
    if (serializer->entries_needed % AE_SER_ENTRIES_PER_ROW) {
       lastrowsize = serializer->entries_needed % AE_SER_ENTRIES_PER_ROW;
       rows++;
    }
 // The result size: data size + ' ' & '\n' symbols + trailing '.' & '\0'.
-   result = ((rows - 1) * AE_SER_ENTRIES_PER_ROW + lastrowsize) * AE_SER_ENTRY_LENGTH; // data size
-   result += (rows - 1) * (AE_SER_ENTRIES_PER_ROW - 1) + (lastrowsize - 1); // space symbols
-   result += rows * 2; // newline symbols
-   result += 1; // trailing dot
-   result += 1; // trailing zero
-   serializer->bytes_asked = result;
-   return result;
+   return serializer->bytes_asked = ((rows - 1) * AE_SER_ENTRIES_PER_ROW + lastrowsize) * (AE_SER_ENTRY_LENGTH + 1) + rows + 2;
 }
 
 // Determine the byte order.
@@ -2261,11 +2240,7 @@ ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer) {
 static ae_int_t GetByteOrder() {
 // 1983 is used as the magic number because its non-periodic double representation
 // allows us to easily distinguish between the upper and lower halves and to detect mixed endian hardware.
-   union {
-      double a;
-      ae_int32_t p[2];
-   } u;
-   u.a = 1.0 / 1983.0;
+   union { double a; ae_int32_t p[2]; } u; u.a = 1.0 / 1983.0;
    return
       u.p[1] == (ae_int32_t)0x3f408642 ? AE_LITTLE_ENDIAN :
       u.p[0] == (ae_int32_t)0x3f408642 ? AE_BIG_ENDIAN :
@@ -2277,8 +2252,7 @@ static const ae_int_t ByteOrder = GetByteOrder();
 void ae_serializer_sstart_str(ae_serializer *serializer, std::string *buf) {
    serializer->mode = AE_SM_TO_CPPSTRING;
    serializer->out_cppstr = buf;
-   serializer->entries_saved = 0;
-   serializer->bytes_written = 0;
+   serializer->bytes_written = serializer->entries_saved = 0;
 }
 
 void ae_serializer_ustart_str(ae_serializer *serializer, const std::string *buf) {
@@ -2286,46 +2260,41 @@ void ae_serializer_ustart_str(ae_serializer *serializer, const std::string *buf)
    serializer->in_str = buf->c_str();
 }
 
-static bool cpp_writer(const char *p_string, ae_int_t aux) {
-   std::ostream * stream = reinterpret_cast < std::ostream * >(aux);
-   stream->write(p_string, strlen(p_string));
-   return !stream->bad();
-}
-
 static bool cpp_reader(ae_int_t aux, ae_int_t cnt, char *p_buf) {
-   std::istream * stream = reinterpret_cast < std::istream * >(aux);
-   int c;
-   if (cnt <= 0)
-      return false; // Unexpected cnt.
+   std::istream *stream = reinterpret_cast<std::istream *>(aux);
+   if (cnt <= 0) return false; // Unexpected cnt.
    while (true) {
-      c = stream->get();
-      if (c < 0 || c > 255)
-         return false; // Failure!
-      if (c != ' ' && c != '\t' && c != '\n' && c != '\r') break;
+      int c = stream->get();
+      if (c < 0 || c > 0xff) return false; // Failure!
+      else if (c != ' ' && c != '\t' && c != '\n' && c != '\r') break;
    }
    p_buf[0] = (char)c;
    for (int k = 1; k < cnt; k++) {
-      c = stream->get();
-      if (c < 0 || c > 255 || c == ' ' || c == '\t' || c == '\n' || c == '\r')
-         return false; // Failure!
+      int c = stream->get();
+      if (c < 0 || c > 0xff || c == ' ' || c == '\t' || c == '\n' || c == '\r') return false; // Failure!
       p_buf[k] = (char)c;
    }
    p_buf[cnt] = 0;
    return true; // Success.
 }
 
+static bool cpp_writer(const char *p_string, ae_int_t aux) {
+   std::ostream *stream = reinterpret_cast<std::ostream *>(aux);
+   stream->write(p_string, strlen(p_string));
+   return !stream->bad();
+}
+
 void ae_serializer_sstart_stream(ae_serializer *serializer, std::ostream *stream) {
    serializer->mode = AE_SM_TO_STREAM;
    serializer->stream_writer = cpp_writer;
-   serializer->stream_aux = reinterpret_cast < ae_int_t > (stream);
-   serializer->entries_saved = 0;
-   serializer->bytes_written = 0;
+   serializer->stream_aux = reinterpret_cast<ae_int_t>(stream);
+   serializer->bytes_written = serializer->entries_saved = 0;
 }
 
 void ae_serializer_ustart_stream(ae_serializer *serializer, const std::istream *stream) {
    serializer->mode = AE_SM_FROM_STREAM;
    serializer->stream_reader = cpp_reader;
-   serializer->stream_aux = reinterpret_cast < ae_int_t > (stream);
+   serializer->stream_aux = reinterpret_cast<ae_int_t>(stream);
 }
 #endif
 
@@ -2333,8 +2302,7 @@ void ae_serializer_sstart_str(ae_serializer *serializer, char *buf) {
    serializer->mode = AE_SM_TO_STRING;
    serializer->out_str = buf;
    serializer->out_str[0] = 0;
-   serializer->entries_saved = 0;
-   serializer->bytes_written = 0;
+   serializer->bytes_written = serializer->entries_saved = 0;
 }
 
 void ae_serializer_ustart_str(ae_serializer *serializer, const char *buf) {
@@ -2346,8 +2314,7 @@ void ae_serializer_sstart_stream(ae_serializer *serializer, ae_stream_writer wri
    serializer->mode = AE_SM_TO_STREAM;
    serializer->stream_writer = writer;
    serializer->stream_aux = aux;
-   serializer->entries_saved = 0;
-   serializer->bytes_written = 0;
+   serializer->bytes_written = serializer->entries_saved = 0;
 }
 
 void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader reader, ae_int_t aux) {
@@ -2359,31 +2326,17 @@ void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader rea
 // Unserialize a boolean value from the string buf, up to *pasttheend.
 // Raise an error in case an unexpected symbol is found.
 static bool ae_str2bool(const char *buf, const char **pasttheend) {
-   bool was0, was1;
-   const char *emsg = "ALGLIB: unable to read boolean value from stream";
-   was0 = false;
-   was1 = false;
-   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
-      buf++;
-   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
-      if (*buf == '0') {
-         was0 = true;
-         buf++;
-         continue;
-      }
-      if (*buf == '1') {
-         was1 = true;
-         buf++;
-         continue;
-      }
-      ae_break(ERR_ASSERTION_FAILED, emsg);
-   }
+   const char *emsg = "ae_str2bool: unable to read boolean value from stream";
+   bool was0 = false;
+   bool was1 = false;
+   for (; *buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r'; buf++);
+   for (; *buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != '\0'; buf++)
+      if (*buf == '0') was0 = true;
+      else if (*buf == '1') was1 = true;
+      else ae_break(ERR_ASSERTION_FAILED, emsg);
    *pasttheend = buf;
-   if ((!was0) && (!was1))
-      ae_break(ERR_ASSERTION_FAILED, emsg);
-   if (was0 && was1)
-      ae_break(ERR_ASSERTION_FAILED, emsg);
-   return was1 ? true : false;
+   if (was0 == was1) ae_break(ERR_ASSERTION_FAILED, emsg);
+   return was1;
 }
 
 // Unserialize a boolean value from serializer.
@@ -2391,17 +2344,14 @@ static bool ae_str2bool(const char *buf, const char **pasttheend) {
 // Raise an error in case an unexpected symbol is found.
 bool ae_serializer_unserialize_bool(ae_serializer *serializer) {
    switch (serializer->mode) {
-      case AE_SM_FROM_STRING:
-         return ae_str2bool(serializer->in_str, &serializer->in_str);
-      break;
+      case AE_SM_FROM_STRING: return ae_str2bool(serializer->in_str, &serializer->in_str);
       case AE_SM_FROM_STREAM: {
-         char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
+         char buf[AE_SER_ENTRY_LENGTH + 3];
          const char *p = buf;
          ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_bool: error reading from stream");
          return ae_str2bool(buf, &p);
       }
-      break;
-      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
+      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_unserialize_bool: unable to read boolean value from stream");
    }
    return false;
 }
@@ -2409,18 +2359,15 @@ bool ae_serializer_unserialize_bool(ae_serializer *serializer) {
 // Serialize the boolean value v into the string buf.
 static void ae_bool2str(bool v, char *buf) {
    char c = v ? '1' : '0';
-   ae_int_t i;
-   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
-      buf[i] = c;
-   buf[AE_SER_ENTRY_LENGTH] = 0;
+   for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++) buf[i] = c;
+   buf[AE_SER_ENTRY_LENGTH] = '\0';
 }
 
 // Serialize the boolean value v to serializer.
 void ae_serializer_serialize_bool(ae_serializer *serializer, bool v) {
+   const char *emsg = "ae_serializer_serialize_bool: serialization integrity error";
 // At least 11 characters for the value, plus 1 for the trailing '\0'.
-   char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
-   const char *emsg = "ALGLIB: serialization integrity error";
-   ae_int_t bytes_appended;
+   char buf[AE_SER_ENTRY_LENGTH + 3];
 // Prepare the serialization and check consistency.
    ae_bool2str(v, buf);
    serializer->entries_saved++;
@@ -2428,7 +2375,7 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, bool v) {
       strcat(buf, " ");
    else
       strcat(buf, "\r\n");
-   bytes_appended = (ae_int_t)strlen(buf);
+   ae_int_t bytes_appended = (ae_int_t)strlen(buf);
    ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // Strict "<", to make room for the trailing '\0'.
    serializer->bytes_written += bytes_appended;
 // Append to the buffer.
@@ -2452,46 +2399,33 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, bool v) {
 // Unserialize an integer value from the string buf, up to *pasttheend.
 // Raise an error in case an unexpected symbol is found.
 static ae_int_t ae_str2int(const char *buf, const char **pasttheend) {
-   const char *emsg = "ALGLIB: unable to read integer value from stream";
+   const char *emsg = "ae_str2int: unable to read integer value from stream";
 // *	Skip leading spaces.
 // *	Read and decode six-bit digits.
 // *	Set trailing digits to zeros.
 // *	Convert to little endian 64-bit integer representation.
 // *	Convert to big endian representation, if needed.
+   for (; *buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r'; buf++);
    ae_int_t sixbits[12];
-   ae_int_t sixbitsread, i;
-   union {
-      ae_int_t ival;
-      unsigned char bytes[9];
-   } u;
-   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
-      buf++;
-   sixbitsread = 0;
-   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
-      ae_int_t d;
-      d = ae_char2sixbits(*buf);
-      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
-         ae_break(ERR_ASSERTION_FAILED, emsg);
-      sixbits[sixbitsread] = d;
-      sixbitsread++;
-      buf++;
+   ae_int_t sixbitsread = 0;
+   for (; *buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != '\0'; buf++) {
+      ae_int_t d = ae_char2sixbits(*buf);
+      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH) ae_break(ERR_ASSERTION_FAILED, emsg);
+      sixbits[sixbitsread++] = d;
    }
    *pasttheend = buf;
-   if (sixbitsread == 0)
-      ae_break(ERR_ASSERTION_FAILED, emsg);
-   for (i = sixbitsread; i < 12; i++)
-      sixbits[i] = 0;
+   if (sixbitsread == 0) ae_break(ERR_ASSERTION_FAILED, emsg);
+   for (ae_int_t i = sixbitsread; i < 12; i++) sixbits[i] = 0;
+   union { ae_int_t ival; unsigned char bytes[9]; } u;
    ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
    ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
-   if (ByteOrder == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
-         unsigned char tc;
-         tc = u.bytes[i];
-         u.bytes[i] = u.bytes[sizeof(ae_int_t) - 1 - i];
-         u.bytes[sizeof(ae_int_t) - 1 - i] = tc;
+   if (ByteOrder == AE_BIG_ENDIAN)
+      for (ae_int_t i0 = 0, i1 = sizeof u.ival - 1; i0 < i1; i0++, i1--) {
+         unsigned char tc = u.bytes[i0];
+         u.bytes[i0] = u.bytes[i1];
+         u.bytes[i1] = tc;
       }
-   }
    return u.ival;
 }
 
@@ -2500,66 +2434,56 @@ static ae_int_t ae_str2int(const char *buf, const char **pasttheend) {
 // Raise an error in case an unexpected symbol is found.
 ae_int_t ae_serializer_unserialize_int(ae_serializer *serializer) {
    switch (serializer->mode) {
-      case AE_SM_FROM_STRING:
-         return ae_str2int(serializer->in_str, &serializer->in_str);
-      break;
+      case AE_SM_FROM_STRING: return ae_str2int(serializer->in_str, &serializer->in_str);
       case AE_SM_FROM_STREAM: {
-         char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
+         char buf[AE_SER_ENTRY_LENGTH + 3];
          const char *p = buf;
          ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_int: error reading from stream");
          return ae_str2int(buf, &p);
       }
-      break;
-      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
+      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_unserialize_int: integrity check failed");
    }
    return 0;
 }
 
 // Serialize the integer value v into the string buf.
 static void ae_int2str(ae_int_t v, char *buf) {
-   union {
-      ae_int_t ival;
-      unsigned char bytes[9];
-   } u;
-   ae_int_t i;
-   ae_int_t sixbits[12];
-   unsigned char c;
 // Copy v to array of chars, sign extending it and converting it to little endian order.
 // In order to avoid explicit mention of the size of the ae_int_t type, we:
 // *	fill u.bytes by zeros or ones (depending on the sign of v),
 // *	copy v to u.ival,
 // *	reorder u.bytes (for big endian architectures), to obtain a signed 64-bit representation of v stored in u.bytes,
 // *	additionally, zero the last byte of u.bytes to simplify conversion to six-bit form.
-   c = v < 0 ? (unsigned char)0xFF : (unsigned char)0x00;
+   unsigned char c = v < 0 ? (unsigned char)0xFF : (unsigned char)0x00;
+   union { ae_int_t ival; unsigned char bytes[9]; } u;
    u.ival = v;
-   for (i = sizeof(ae_int_t); i <= 8; i++) // i <= 8 is preferred because it avoids unnecessary compiler warnings
+   const size_t un = sizeof u.ival, us = sizeof u.bytes;
+   for (ae_int_t i = un; i < us; i++) // i < us is preferred because it avoids unnecessary compiler warnings.
       u.bytes[i] = c;
-   u.bytes[8] = 0;
-   if (ByteOrder == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
-         unsigned char tc;
-         tc = u.bytes[i];
-         u.bytes[i] = u.bytes[sizeof(ae_int_t) - 1 - i];
-         u.bytes[sizeof(ae_int_t) - 1 - i] = tc;
+   u.bytes[us - 1] = '\0';
+   if (ByteOrder == AE_BIG_ENDIAN)
+      for (ae_int_t i0 = 0, i1 = un - 1; i0 < i1; i0++, i1--) {
+         unsigned char tc = u.bytes[i0];
+         u.bytes[i0] = u.bytes[i1];
+         u.bytes[i1] = tc;
       }
-   }
 // Convert to six-bit representation, output.
 // NOTE:
 // *	The last element of sixbits is always zero, and is not output.
+   ae_int_t sixbits[12];
    ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
    ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
    ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
-   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
+   for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
       buf[i] = ae_sixbits2char(sixbits[i]);
    buf[AE_SER_ENTRY_LENGTH] = 0x00;
 }
 
 // Serialize the integer value v to serializer.
 void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v) {
+   const char *emsg = "ae_serializer_serialize_int: serialization integrity error";
 // At least 11 characters for the value, plus 1 for the trailing '\0'.
-   char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
-   const char *emsg = "ALGLIB: serialization integrity error";
-   ae_int_t bytes_appended;
+   char buf[AE_SER_ENTRY_LENGTH + 3];
 // Prepare the serialization and check consistency.
    ae_int2str(v, buf);
    serializer->entries_saved++;
@@ -2567,7 +2491,7 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v) {
       strcat(buf, " ");
    else
       strcat(buf, "\r\n");
-   bytes_appended = (ae_int_t)strlen(buf);
+   ae_int_t bytes_appended = (ae_int_t)strlen(buf);
    ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // Strict "<", to make room for the trailing '\0'.
    serializer->bytes_written += bytes_appended;
 // Append to the buffer.
@@ -2591,45 +2515,35 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v) {
 // Unserialize a 64-bit integer value from the string buf, up to *pasttheend.
 // Raise an error in case an unexpected symbol is found.
 static ae_int64_t ae_str2int64(const char *buf, const char **pasttheend) {
-   const char *emsg = "ALGLIB: unable to read integer value from stream";
+   const char *emsg = "ae_str2int64: unable to read integer value from stream";
 // *	Skip leading spaces.
 // *	Read and decode six-bit digits.
 // *	Set trailing digits to zeros.
 // *	Convert to little endian 64-bit integer representation.
 // *	Convert to big endian representation, if needed.
+   for (; *buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r'; buf++);
    ae_int_t sixbits[12];
-   ae_int_t sixbitsread, i;
-   unsigned char bytes[9];
-   ae_int64_t result;
-   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
-      buf++;
-   sixbitsread = 0;
-   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
-      ae_int_t d;
-      d = ae_char2sixbits(*buf);
-      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
-         ae_break(ERR_ASSERTION_FAILED, emsg);
-      sixbits[sixbitsread] = d;
-      sixbitsread++;
-      buf++;
+   ae_int_t sixbitsread = 0;
+   for (; *buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != '\0'; buf++) {
+      ae_int_t d = ae_char2sixbits(*buf);
+      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH) ae_break(ERR_ASSERTION_FAILED, emsg);
+      sixbits[sixbitsread++] = d;
    }
    *pasttheend = buf;
-   if (sixbitsread == 0)
-      ae_break(ERR_ASSERTION_FAILED, emsg);
-   for (i = sixbitsread; i < 12; i++)
-      sixbits[i] = 0;
+   if (sixbitsread == 0) ae_break(ERR_ASSERTION_FAILED, emsg);
+   for (ae_int_t i = sixbitsread; i < 12; i++) sixbits[i] = 0;
+   unsigned char bytes[9];
    ae_foursixbits2threebytes(sixbits + 0, bytes + 0);
    ae_foursixbits2threebytes(sixbits + 4, bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, bytes + 6);
-   if (ByteOrder == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
-         unsigned char tc;
-         tc = bytes[i];
-         bytes[i] = bytes[sizeof(ae_int_t) - 1 - i];
-         bytes[sizeof(ae_int_t) - 1 - i] = tc;
+   if (ByteOrder == AE_BIG_ENDIAN)
+      for (ae_int_t i0 = 0, i1 = sizeof(ae_int_t) - 1; i0 < i1; i0++, i1--) {
+         unsigned char tc = bytes[i0];
+         bytes[i0] = bytes[i1];
+         bytes[i1] = tc;
       }
-   }
-   memmove(&result, bytes, sizeof(result));
+   ae_int64_t result;
+   memmove(&result, bytes, sizeof result);
    return result;
 }
 
@@ -2638,17 +2552,14 @@ static ae_int64_t ae_str2int64(const char *buf, const char **pasttheend) {
 // Raise an error in case an unexpected symbol is found.
 ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer) {
    switch (serializer->mode) {
-      case AE_SM_FROM_STRING:
-         return ae_str2int64(serializer->in_str, &serializer->in_str);
-      break;
+      case AE_SM_FROM_STRING: return ae_str2int64(serializer->in_str, &serializer->in_str);
       case AE_SM_FROM_STREAM: {
-         char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
+         char buf[AE_SER_ENTRY_LENGTH + 3];
          const char *p = buf;
          ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_int64: error reading from stream");
          return ae_str2int64(buf, &p);
       }
-      break;
-      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
+      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_unserialize_int64: integrity check failed");
    }
    return 0L;
 }
@@ -2662,36 +2573,32 @@ static void ae_int642str(ae_int64_t v, char *buf) {
 // *	reorder bytes (for big endian architectures), to obtain a signed 64-bit representation of v stored in bytes,
 // *	additionally, zero the last byte of bytes to simplify conversion to six-bit form.
    unsigned char bytes[9];
-   ae_int_t i;
-   ae_int_t sixbits[12];
    memset(bytes, v < 0 ? 0xFF : 0x00, 8);
    memmove(bytes, &v, 8);
    bytes[8] = 0;
-   if (ByteOrder == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
-         unsigned char tc;
-         tc = bytes[i];
-         bytes[i] = bytes[sizeof(ae_int_t) - 1 - i];
-         bytes[sizeof(ae_int_t) - 1 - i] = tc;
+   if (ByteOrder == AE_BIG_ENDIAN)
+      for (ae_int_t i0 = 0, i1 = sizeof(ae_int_t) - 1; i0 < i1; i0++, i1--) {
+         unsigned char tc = bytes[i0];
+         bytes[i0] = bytes[i1];
+         bytes[i1] = tc;
       }
-   }
 // Convert to six-bit representation, output.
 // NOTE:
 // *	The last element of sixbits is always zero, we do not output it.
+   ae_int_t sixbits[12];
    ae_threebytes2foursixbits(bytes + 0, sixbits + 0);
    ae_threebytes2foursixbits(bytes + 3, sixbits + 4);
    ae_threebytes2foursixbits(bytes + 6, sixbits + 8);
-   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
+   for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
       buf[i] = ae_sixbits2char(sixbits[i]);
    buf[AE_SER_ENTRY_LENGTH] = 0x00;
 }
 
 // Serialize the 64-bit integer value v to serializer.
 void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v) {
+   const char *emsg = "ae_serializer_serialize_int64: serialization integrity error";
 // At least 11 characters for the value, plus 1 for the trailing '\0'.
-   char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
-   const char *emsg = "ALGLIB: serialization integrity error";
-   ae_int_t bytes_appended;
+   char buf[AE_SER_ENTRY_LENGTH + 3];
 // Prepare the serialization and check consistency.
    ae_int642str(v, buf);
    serializer->entries_saved++;
@@ -2699,7 +2606,7 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v) {
       strcat(buf, " ");
    else
       strcat(buf, "\r\n");
-   bytes_appended = (ae_int_t)strlen(buf);
+   ae_int_t bytes_appended = (ae_int_t)strlen(buf);
    ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // Strict "<", to make room for the trailing '\0'.
    serializer->bytes_written += bytes_appended;
 // Append to the buffer.
@@ -2723,33 +2630,17 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v) {
 // Unserialize a double value from the string buf, up to *pasttheend.
 // Raise an error in case an unexpected symbol is found.
 static double ae_str2double(const char *buf, const char **pasttheend) {
-   const char *emsg = "ALGLIB: unable to read double value from stream";
-   ae_int_t sixbits[12];
-   ae_int_t sixbitsread, i;
-   union {
-      double dval;
-      unsigned char bytes[9];
-   } u;
+   const char *emsg = "ae_str2double: unable to read double value from stream";
 // Skip leading spaces.
-   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
-      buf++;
+   for (; *buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r'; buf++);
 // Handle special cases.
    if (*buf == '.') {
       const char *s_nan = ".nan_______";
       const char *s_posinf = ".posinf____";
       const char *s_neginf = ".neginf____";
-      if (strncmp(buf, s_nan, strlen(s_nan)) == 0) {
-         *pasttheend = buf + strlen(s_nan);
-         return NAN;
-      }
-      if (strncmp(buf, s_posinf, strlen(s_posinf)) == 0) {
-         *pasttheend = buf + strlen(s_posinf);
-         return +INFINITY;
-      }
-      if (strncmp(buf, s_neginf, strlen(s_neginf)) == 0) {
-         *pasttheend = buf + strlen(s_neginf);
-         return -INFINITY;
-      }
+      if (strncmp(buf, s_nan, strlen(s_nan)) == 0) { *pasttheend = buf + strlen(s_nan); return NAN; }
+      if (strncmp(buf, s_posinf, strlen(s_posinf)) == 0) { *pasttheend = buf + strlen(s_posinf); return +INFINITY; }
+      if (strncmp(buf, s_neginf, strlen(s_neginf)) == 0) { *pasttheend = buf + strlen(s_neginf); return -INFINITY; }
       ae_break(ERR_ASSERTION_FAILED, emsg);
    }
 // The general case:
@@ -2758,31 +2649,26 @@ static double ae_str2double(const char *buf, const char **pasttheend) {
 // *	Set the last digit to zero (needed to simplify the conversion).
 // *	Convert to 8 bytes.
 // *	Convert to big endian representation, if needed.
-   sixbitsread = 0;
-   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
-      ae_int_t d;
-      d = ae_char2sixbits(*buf);
-      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
-         ae_break(ERR_ASSERTION_FAILED, emsg);
-      sixbits[sixbitsread] = d;
-      sixbitsread++;
-      buf++;
+   ae_int_t sixbits[12];
+   ae_int_t sixbitsread = 0;
+   for (; *buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != '\0'; buf++) {
+      ae_int_t d = ae_char2sixbits(*buf);
+      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH) ae_break(ERR_ASSERTION_FAILED, emsg);
+      sixbits[sixbitsread++] = d;
    }
    *pasttheend = buf;
-   if (sixbitsread != AE_SER_ENTRY_LENGTH)
-      ae_break(ERR_ASSERTION_FAILED, emsg);
+   if (sixbitsread != AE_SER_ENTRY_LENGTH) ae_break(ERR_ASSERTION_FAILED, emsg);
    sixbits[AE_SER_ENTRY_LENGTH] = 0;
+   union { double dval; unsigned char bytes[9]; } u;
    ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
    ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
-   if (ByteOrder == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t)(sizeof(double) / 2); i++) {
-         unsigned char tc;
-         tc = u.bytes[i];
-         u.bytes[i] = u.bytes[sizeof(double) - 1 - i];
-         u.bytes[sizeof(double) - 1 - i] = tc;
+   if (ByteOrder == AE_BIG_ENDIAN)
+      for (ae_int_t i0 = 0, i1 = sizeof u.dval - 1; i0 < i1; i0++, i1--) {
+         unsigned char tc = u.bytes[i0];
+         u.bytes[i0] = u.bytes[i1];
+         u.bytes[i1] = tc;
       }
-   }
    return u.dval;
 }
 
@@ -2791,41 +2677,30 @@ static double ae_str2double(const char *buf, const char **pasttheend) {
 // Raise an error in case an unexpected symbol is found.
 double ae_serializer_unserialize_double(ae_serializer *serializer) {
    switch (serializer->mode) {
-      case AE_SM_FROM_STRING:
-         return ae_str2double(serializer->in_str, &serializer->in_str);
-      break;
+      case AE_SM_FROM_STRING: return ae_str2double(serializer->in_str, &serializer->in_str);
       case AE_SM_FROM_STREAM: {
-         char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
+         char buf[AE_SER_ENTRY_LENGTH + 3];
          const char *p = buf;
          ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_double: error reading from stream");
          return ae_str2double(buf, &p);
       }
-      break;
-      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
+      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_unserialize_double: unable to read double value from stream");
    }
    return 0.0;
 }
 
 // Serialize the double value v into the string buf.
 static void ae_double2str(double v, char *buf) {
-   union {
-      double dval;
-      unsigned char bytes[9];
-   } u;
-   ae_int_t i;
-   ae_int_t sixbits[12];
 // Handle the special cases, first.
    if (isnan(v)) {
       const char *s = ".nan_______";
       memmove(buf, s, strlen(s) + 1);
       return;
-   }
-   if (isposinf(v)) {
+   } else if (isposinf(v)) {
       const char *s = ".posinf____";
       memmove(buf, s, strlen(s) + 1);
       return;
-   }
-   if (isneginf(v)) {
+   } else if (isneginf(v)) {
       const char *s = ".neginf____";
       memmove(buf, s, strlen(s) + 1);
       return;
@@ -2835,29 +2710,28 @@ static void ae_double2str(double v, char *buf) {
 // *	set the last byte of u.bytes to zero in order to simplify conversion to six-bit representation,
 // *	convert to little endian (if needed),
 // *	convert to six-bit representation (the last element of sixbits is always zero, and is not output).
+   union { double dval; unsigned char bytes[9]; } u;
    u.dval = v;
-   u.bytes[8] = 0;
-   if (ByteOrder == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t)(sizeof(double) / 2); i++) {
-         unsigned char tc;
-         tc = u.bytes[i];
-         u.bytes[i] = u.bytes[sizeof(double) - 1 - i];
-         u.bytes[sizeof(double) - 1 - i] = tc;
+   u.bytes[8] = '\0';
+   if (ByteOrder == AE_BIG_ENDIAN)
+      for (ae_int_t i0 = 0, i1 = sizeof u.dval - 1; i0 < i1; i0++, i1--) {
+         unsigned char tc = u.bytes[i0];
+         u.bytes[i0] = u.bytes[i1];
+         u.bytes[i1] = tc;
       }
-   }
+   ae_int_t sixbits[12];
    ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
    ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
    ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
-   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
+   for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
       buf[i] = ae_sixbits2char(sixbits[i]);
    buf[AE_SER_ENTRY_LENGTH] = 0x00;
 }
 
 void ae_serializer_serialize_double(ae_serializer *serializer, double v) {
+   const char *emsg = "ae_serializer_serialize_double: serialization integrity error";
 // At least 11 characters for the value, plus 1 for the trailing '\0'.
-   char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
-   const char *emsg = "ALGLIB: serialization integrity error";
-   ae_int_t bytes_appended;
+   char buf[AE_SER_ENTRY_LENGTH + 3];
 // Prepare the serialization and check consistency.
    ae_double2str(v, buf);
    serializer->entries_saved++;
@@ -2865,7 +2739,7 @@ void ae_serializer_serialize_double(ae_serializer *serializer, double v) {
       strcat(buf, " ");
    else
       strcat(buf, "\r\n");
-   bytes_appended = (ae_int_t)strlen(buf);
+   ae_int_t bytes_appended = (ae_int_t)strlen(buf);
    ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // Strict "<", to make room for the trailing '\0'.
    serializer->bytes_written += bytes_appended;
 // Append to the buffer.
@@ -2899,7 +2773,7 @@ void ae_serializer_stop(ae_serializer *serializer) {
          ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer_stop: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
          serializer->bytes_written++;
          strcat(serializer->out_str, ".");
-         serializer->out_str += 1;
+         serializer->out_str++;
       break;
       case AE_SM_TO_STREAM:
          ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer_stop: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
@@ -2908,8 +2782,7 @@ void ae_serializer_stop(ae_serializer *serializer) {
       break;
    // For compatibility with the pre-3.11 serializer, which does not require a trailing '.', we do not test for a trailing '.'.
    // Anyway, because the string is not a stream, we do not have to read ALL trailing symbols.
-      case AE_SM_FROM_STRING:
-      break;
+      case AE_SM_FROM_STRING: break;
       case AE_SM_FROM_STREAM: {
       // Read a trailing '.', perform an integrity check.
          char buf[2];
@@ -2917,49 +2790,37 @@ void ae_serializer_stop(ae_serializer *serializer) {
          ae_assert(buf[0] == '.', "ae_serializer_stop: trailing . is not found in the stream");
       }
       break;
-      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
+      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_stop: integrity check failed");
    }
 }
 
 void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes) {
-   ae_int_t n;
-   n = bytes->cnt;
-   n = n / 8 + (n % 8 > 0 ? 1 : 0);
-   serializer->entries_needed += 1 + n;
+   ae_int_t n = bytes->cnt;
+   serializer->entries_needed += 1 + n / 8 + (n % 8 > 0 ? 1 : 0);
 }
 
 void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *bytes) {
-   ae_int_t chunk_size, n, entries_count;
-   chunk_size = 8;
+   ae_int_t chunk_size = 8;
 // Read the array length, allocate output.
-   n = ae_serializer_unserialize_int(serializer);
+   ae_int_t n = ae_serializer_unserialize_int(serializer);
    ae_vector_set_length(bytes, n);
 // Count and read the entries.
-   entries_count = n / chunk_size + (n % chunk_size > 0 ? 1 : 0);
+   ae_int_t entries_count = n / chunk_size + (n % chunk_size > 0 ? 1 : 0);
    for (ae_int_t eidx = 0; eidx < entries_count; eidx++) {
-      ae_int_t elen;
-      ae_int64_t tmp64;
-      elen = n - eidx * chunk_size;
-      elen = elen > chunk_size ? chunk_size : elen;
-      tmp64 = ae_serializer_unserialize_int64(serializer);
-      memmove(bytes->xU + eidx * chunk_size, &tmp64, elen);
+      ae_int64_t tmp64 = ae_serializer_unserialize_int64(serializer);
+      memmove(bytes->xU + eidx * chunk_size, &tmp64, imin2(n - eidx * chunk_size, chunk_size));
    }
 }
 
 void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes) {
-   ae_int_t chunk_size, entries_count;
-   chunk_size = 8;
+   ae_int_t chunk_size = 8;
 // Save the array length.
    ae_serializer_serialize_int(serializer, bytes->cnt);
 // Count the entries.
-   entries_count = bytes->cnt / chunk_size + (bytes->cnt % chunk_size > 0 ? 1 : 0);
+   ae_int_t entries_count = bytes->cnt / chunk_size + (bytes->cnt % chunk_size > 0 ? 1 : 0);
    for (ae_int_t eidx = 0; eidx < entries_count; eidx++) {
-      ae_int64_t tmpi;
-      ae_int_t elen;
-      elen = bytes->cnt - eidx * chunk_size;
-      elen = elen > chunk_size ? chunk_size : elen;
-      memset(&tmpi, 0, sizeof tmpi);
-      memmove(&tmpi, bytes->xU + eidx * chunk_size, elen);
+      ae_int64_t tmpi; memset(&tmpi, 0, sizeof tmpi);
+      memmove(&tmpi, bytes->xU + eidx * chunk_size, imin2(bytes->cnt - eidx * chunk_size, chunk_size));
       ae_serializer_serialize_int64(serializer, tmpi);
    }
 }
@@ -7660,7 +7521,7 @@ void clear_error_flag() { _alglib_last_error = NULL; }
 #if 0
 // Global and local constants and variables.
 const double machineepsilon = 5E-16, maxrealnumber = 1E300, minrealnumber = 1E-300;
-const ae_int_t ByteOrder = alglib_impl::ByteOrder;
+static const ae_int_t ByteOrder = alglib_impl::ByteOrder;
 #endif
 
 // Standard functions.
@@ -7811,36 +7672,37 @@ static inline alglib_impl::complex complex_from_c(complex z) {
 
 #if !defined AE_NO_EXCEPTIONS
 std::string complex::tostring(int _dps) const {
-   char mask[32];
-   char buf_x[32];
-   char buf_y[32];
-   char buf_zero[32];
    int dps = _dps >= 0 ? _dps : -_dps;
    if (dps <= 0 || dps >= 20)
       ThrowError("complex::tostring: incorrect dps");
 // Handle IEEE special quantities.
    if (isnan(x) || isnan(y))
       return "NAN";
-   if (isinf(x) || isinf(y))
+   else if (isinf(x) || isinf(y))
       return "INF";
 // Generate the mask.
-   if (sprintf(mask, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof(mask))
+   char mask[0x20];
+   if (sprintf(mask, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof mask)
       ThrowError("complex::tostring: buffer overflow");
 // Print |x|, |y| and zero with the same mask and compare.
-   if (sprintf(buf_x, mask, fabs(x)) >= (int)sizeof(buf_x))
+   char buf_x[0x20];
+   if (sprintf(buf_x, mask, fabs(x)) >= (int)sizeof buf_x)
       ThrowError("complex::tostring: buffer overflow");
-   if (sprintf(buf_y, mask, fabs(y)) >= (int)sizeof(buf_y))
+   char buf_y[0x20];
+   if (sprintf(buf_y, mask, fabs(y)) >= (int)sizeof buf_y)
       ThrowError("complex::tostring: buffer overflow");
-   if (sprintf(buf_zero, mask, 0.0) >= (int)sizeof(buf_zero))
+   char buf_zero[0x20];
+   if (sprintf(buf_zero, mask, 0.0) >= (int)sizeof buf_zero)
       ThrowError("complex::tostring: buffer overflow");
 // Different zero/non-zero patterns.
    if (strcmp(buf_x, buf_zero) != 0 && strcmp(buf_y, buf_zero) != 0)
       return std::string(x > 0 ? "" : "-") + buf_x + (y > 0 ? "+" : "-") + buf_y + "i";
-   if (strcmp(buf_x, buf_zero) != 0 && strcmp(buf_y, buf_zero) == 0)
+   else if (strcmp(buf_x, buf_zero) != 0 && strcmp(buf_y, buf_zero) == 0)
       return std::string(x > 0 ? "" : "-") + buf_x;
-   if (strcmp(buf_x, buf_zero) == 0 && strcmp(buf_y, buf_zero) != 0)
+   else if (strcmp(buf_x, buf_zero) == 0 && strcmp(buf_y, buf_zero) != 0)
       return std::string(y > 0 ? "" : "-") + buf_y + "i";
-   return std::string("0");
+   else
+      return std::string("0");
 }
 #endif
 
