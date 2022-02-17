@@ -1239,10 +1239,10 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
    // src->ptr points to the beginning of dst, attached matrices, no need to copy.
       return;
    }
-   if (dst->rows != src->rows || dst->cols != src->cols || dst->datatype != src->datatype) {
+   if (dst->cols != src->cols || dst->rows != src->rows || dst->datatype != src->datatype) {
       if (dst->owner) ae_free(dst->x_ptr);
-      dst->rows = src->rows;
       dst->cols = src->cols;
+      dst->rows = src->rows;
       dst->stride = src->cols;
       dst->datatype = src->datatype;
       dst->x_ptr = ae_malloc((size_t)(dst->rows * (ae_int_t)dst->stride * ae_sizeof(src->datatype)));
@@ -1285,41 +1285,30 @@ static const ae_int_t x_nb = 16; // A cut-off for recursion in the divide-and-co
 
 // Symmetric/Hermitian properties: check and force
 static void x_split_length(ae_int_t n, ae_int_t nb, ae_int_t *n1, ae_int_t *n2) {
-   ae_int_t r;
    if (n <= nb) {
       *n1 = n;
       *n2 = 0;
+   } else if (n % nb != 0) {
+      *n2 = n % nb;
+      *n1 = n - *n2;
    } else {
-      if (n % nb != 0) {
-         *n2 = n % nb;
-         *n1 = n - (*n2);
-      } else {
-         *n2 = n / 2;
-         *n1 = n - (*n2);
-         if (*n1 % nb == 0) {
-            return;
-         }
-         r = nb - *n1 % nb;
-         *n1 += r;
-         *n2 -= r;
-      }
+      *n2 = n / 2;
+      *n1 = n - *n2;
+      if (*n1 % nb == 0) return;
+      ae_int_t r = nb - *n1 % nb;
+      *n1 += r;
+      *n2 -= r;
    }
 }
 
 static double x_safepythag2(double x, double y) {
-   double w;
-   double xabs;
-   double yabs;
-   double z;
-   xabs = fabs(x);
-   yabs = fabs(y);
-   w = xabs > yabs ? xabs : yabs;
-   z = xabs < yabs ? xabs : yabs;
-   if (z == 0)
-      return w;
+   double xabs = fabs(x);
+   double yabs = fabs(y);
+   double w = xabs > yabs ? xabs : yabs;
+   double z = xabs < yabs ? xabs : yabs;
+   if (z == 0.0) return w;
    else {
-      double t;
-      t = z / w;
+      double t = z / w;
       return w * sqrt(1 + t * t);
    }
 }
@@ -1329,91 +1318,73 @@ static double x_safepythag2(double x, double y) {
 // *	*mx:	the componentwise maximum of a,
 // *	*err:	the maximum componentwise difference between the lower block and the transpose of its upper counterpart.
 static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, bool *nonfinite, double *mx, double *err) {
-// Reduce to smaller cases.
-   if (len0 > x_nb || len1 > x_nb) {
-      ae_int_t n1, n2;
-      if (len0 > len1) {
-         x_split_length(len0, x_nb, &n1, &n2);
-         is_symmetric_rec_off_stat(a, offset0, offset1, n1, len1, nonfinite, mx, err);
-         is_symmetric_rec_off_stat(a, offset0 + n1, offset1, n2, len1, nonfinite, mx, err);
-      } else {
-         x_split_length(len1, x_nb, &n1, &n2);
-         is_symmetric_rec_off_stat(a, offset0, offset1, len0, n1, nonfinite, mx, err);
-         is_symmetric_rec_off_stat(a, offset0, offset1 + n1, len0, n2, nonfinite, mx, err);
-      }
-      return;
-   } else {
-   // The base case.
-      double *p1, *p2, *prow, *pcol;
-      double v;
-      ae_int_t i, j;
-      p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
-      p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
-      for (i = 0; i < len0; i++) {
-         pcol = p2 + i;
-         prow = p1 + i * a->stride;
-         for (j = 0; j < len1; j++) {
+   if (len0 <= x_nb && len1 <= x_nb) { // The base case.
+      double *p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
+      double *p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
+      for (ae_int_t i = 0; i < len0; i++) {
+         double *pcol = p2 + i;
+         double *prow = p1 + i * a->stride;
+         for (ae_int_t j = 0; j < len1; j++) {
             if (!isfinite(*pcol) || !isfinite(*prow)) {
                *nonfinite = true;
             } else {
-               v = fabs(*pcol);
-               *mx = *mx > v ? *mx : v;
-               v = fabs(*prow);
-               *mx = *mx > v ? *mx : v;
-               v = fabs(*pcol - *prow);
-               *err = *err > v ? *err : v;
+               double xa = fabs(*pcol);
+               *mx = *mx > xa ? *mx : xa;
+               double ya = fabs(*prow);
+               *mx = *mx > ya ? *mx : ya;
+               double xya = fabs(*pcol - *prow);
+               *err = *err > xya ? *err : xya;
             }
             pcol += a->stride;
             prow++;
          }
       }
+   } else { // Reduce to smaller cases.
+      if (len0 > len1) {
+         ae_int_t n1, n2;
+         x_split_length(len0, x_nb, &n1, &n2);
+         is_symmetric_rec_off_stat(a, offset0, offset1, n1, len1, nonfinite, mx, err);
+         is_symmetric_rec_off_stat(a, offset0 + n1, offset1, n2, len1, nonfinite, mx, err);
+      } else {
+         ae_int_t n1, n2;
+         x_split_length(len1, x_nb, &n1, &n2);
+         is_symmetric_rec_off_stat(a, offset0, offset1, len0, n1, nonfinite, mx, err);
+         is_symmetric_rec_off_stat(a, offset0, offset1 + n1, len0, n2, nonfinite, mx, err);
+      }
    }
 }
 
-// this function checks that diagonal block A0 is symmetric.
-// Block A0 is specified by its offset and size.
-//
-//     [ .          ]
-//     [   A0       ]
-// A = [       .    ]
-//     [          . ]
-//
-//  this subroutine updates current values of:
-//  a) mx       maximum value of A[i,j] found so far
-//  b) err      componentwise difference between A0 and A0^T
-//
+// Verify that the diagonal len x len block at (offset, offset) is symmetric.
+// Also, accumulate updates on:
+// *	*mx:	the componentwise maximum of a,
+// *	*err:	the maximum componentwise difference between the block and its transpose.
 static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len, bool *nonfinite, double *mx, double *err) {
-   double *p, *prow, *pcol;
-   double v;
-   ae_int_t i, j;
-// Reduce to smaller cases.
-   if (len > x_nb) {
+   if (len <= x_nb) { // The base case.
+      double *p = (double *)(a->x_ptr) + offset * a->stride + offset;
+      for (ae_int_t i = 0; i < len; i++) {
+         double *pcol = p + i;
+         double *prow = p + i * a->stride;
+         for (ae_int_t j = 0; j < i; j++, pcol += a->stride, prow++) {
+            if (!isfinite(*pcol) || !isfinite(*prow)) {
+               *nonfinite = true;
+            } else {
+               double xa = fabs(*pcol);
+               *mx = *mx > xa ? *mx : xa;
+               double ya = fabs(*prow);
+               *mx = *mx > ya ? *mx : ya;
+               double xya = fabs(*pcol - *prow);
+               *err = *err > xya ? *err : xya;
+            }
+         }
+         double norm = fabs(p[i + i * a->stride]);
+         *mx = *mx > norm ? *mx : norm;
+      }
+   } else { // Reduce to smaller cases.
       ae_int_t n1, n2;
       x_split_length(len, x_nb, &n1, &n2);
       is_symmetric_rec_diag_stat(a, offset, n1, nonfinite, mx, err);
       is_symmetric_rec_diag_stat(a, offset + n1, n2, nonfinite, mx, err);
       is_symmetric_rec_off_stat(a, offset + n1, offset, n2, n1, nonfinite, mx, err);
-      return;
-   }
-// The base case.
-   p = (double *)(a->x_ptr) + offset * a->stride + offset;
-   for (i = 0; i < len; i++) {
-      pcol = p + i;
-      prow = p + i * a->stride;
-      for (j = 0; j < i; j++, pcol += a->stride, prow++) {
-         if (!isfinite(*pcol) || !isfinite(*prow)) {
-            *nonfinite = true;
-         } else {
-            v = fabs(*pcol);
-            *mx = *mx > v ? *mx : v;
-            v = fabs(*prow);
-            *mx = *mx > v ? *mx : v;
-            v = fabs(*pcol - *prow);
-            *err = *err > v ? *err : v;
-         }
-      }
-      v = fabs(p[i + i * a->stride]);
-      *mx = *mx > v ? *mx : v;
    }
 }
 
@@ -1433,97 +1404,79 @@ static bool x_is_symmetric(x_matrix *a) {
 // *	*mx:	the componentwise maximum of a
 // *	*err:	the maximum componentwise difference between the lower block and the Hermitian conjugate of its upper counterpart.
 static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, bool *nonfinite, double *mx, double *err) {
-// Reduce to smaller cases.
-   if (len0 > x_nb || len1 > x_nb) {
-      ae_int_t n1, n2;
-      if (len0 > len1) {
-         x_split_length(len0, x_nb, &n1, &n2);
-         is_hermitian_rec_off_stat(a, offset0, offset1, n1, len1, nonfinite, mx, err);
-         is_hermitian_rec_off_stat(a, offset0 + n1, offset1, n2, len1, nonfinite, mx, err);
-      } else {
-         x_split_length(len1, x_nb, &n1, &n2);
-         is_hermitian_rec_off_stat(a, offset0, offset1, len0, n1, nonfinite, mx, err);
-         is_hermitian_rec_off_stat(a, offset0, offset1 + n1, len0, n2, nonfinite, mx, err);
-      }
-      return;
-   } else {
-   // The base case.
-      complex *p1, *p2, *prow, *pcol;
-      double v;
-      ae_int_t i, j;
-      p1 = (complex *)a->x_ptr + offset0 * a->stride + offset1;
-      p2 = (complex *)a->x_ptr + offset1 * a->stride + offset0;
-      for (i = 0; i < len0; i++) {
-         pcol = p2 + i;
-         prow = p1 + i * a->stride;
-         for (j = 0; j < len1; j++) {
+   if (len0 <= x_nb && len1 <= x_nb) { // The base case.
+      complex *p1 = (complex *)a->x_ptr + offset0 * a->stride + offset1;
+      complex *p2 = (complex *)a->x_ptr + offset1 * a->stride + offset0;
+      for (ae_int_t i = 0; i < len0; i++) {
+         complex *pcol = p2 + i;
+         complex *prow = p1 + i * a->stride;
+         for (ae_int_t j = 0; j < len1; j++) {
             if (!isfinite(pcol->x) || !isfinite(pcol->y) || !isfinite(prow->x) || !isfinite(prow->y)) {
                *nonfinite = true;
             } else {
-               v = x_safepythag2(pcol->x, pcol->y);
-               *mx = *mx > v ? *mx : v;
-               v = x_safepythag2(prow->x, prow->y);
-               *mx = *mx > v ? *mx : v;
-               v = x_safepythag2(pcol->x - prow->x, pcol->y + prow->y);
-               *err = *err > v ? *err : v;
+               double xa = x_safepythag2(pcol->x, pcol->y);
+               *mx = *mx > xa ? *mx : xa;
+               double ya = x_safepythag2(prow->x, prow->y);
+               *mx = *mx > ya ? *mx : ya;
+               double xya = x_safepythag2(pcol->x - prow->x, pcol->y + prow->y);
+               *err = *err > xya ? *err : xya;
             }
             pcol += a->stride;
             prow++;
          }
       }
+   } else { // Reduce to smaller cases.
+      if (len0 > len1) {
+         ae_int_t n1, n2;
+         x_split_length(len0, x_nb, &n1, &n2);
+         is_hermitian_rec_off_stat(a, offset0, offset1, n1, len1, nonfinite, mx, err);
+         is_hermitian_rec_off_stat(a, offset0 + n1, offset1, n2, len1, nonfinite, mx, err);
+      } else {
+         ae_int_t n1, n2;
+         x_split_length(len1, x_nb, &n1, &n2);
+         is_hermitian_rec_off_stat(a, offset0, offset1, len0, n1, nonfinite, mx, err);
+         is_hermitian_rec_off_stat(a, offset0, offset1 + n1, len0, n2, nonfinite, mx, err);
+      }
    }
 }
 
-// this function checks that diagonal block A0 is Hermitian.
-// Block A0 is specified by its offset and size.
-//
-//     [ .          ]
-//     [   A0       ]
-// A = [       .    ]
-//     [          . ]
-//
-//  this subroutine updates current values of:
-//  a) mx       maximum value of A[i,j] found so far
-//  b) err      componentwise difference between A0 and A0^H
-//
+// Verify that the len x len diagonal block at (offset, offset) is Hermitian.
+// Also, accumulate updates on:
+// *	*mx:	the componentwise maximum of a
+// *	*err:	the maximum componentwise difference between the block and its Hermitian conjugate.
 static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len, bool *nonfinite, double *mx, double *err) {
-   complex *p, *prow, *pcol;
-   double v;
-   ae_int_t i, j;
-// Reduce to smaller cases.
-   if (len > x_nb) {
+   if (len <= x_nb) { // The base case.
+      complex *p = (complex *)a->x_ptr + offset * a->stride + offset;
+      for (ae_int_t i = 0; i < len; i++) {
+         complex *pcol = p + i;
+         complex *prow = p + i * a->stride;
+         for (ae_int_t j = 0; j < i; j++, pcol += a->stride, prow++) {
+            if (!isfinite(pcol->x) || !isfinite(pcol->y) || !isfinite(prow->x) || !isfinite(prow->y)) {
+               *nonfinite = true;
+            } else {
+               double xa = x_safepythag2(pcol->x, pcol->y);
+               *mx = *mx > xa ? *mx : xa;
+               double ya = x_safepythag2(prow->x, prow->y);
+               *mx = *mx > ya ? *mx : ya;
+               double xya = x_safepythag2(pcol->x - prow->x, pcol->y + prow->y);
+               *err = *err > xya ? *err : xya;
+            }
+         }
+         if (!isfinite(p[i + i * a->stride].x) || !isfinite(p[i + i * a->stride].y)) {
+            *nonfinite = true;
+         } else {
+            double xa = fabs(p[i + i * a->stride].x);
+            *mx = *mx > xa ? *mx : xa;
+            double ya = fabs(p[i + i * a->stride].y);
+            *err = *err > ya ? *err : ya;
+         }
+      }
+   } else { // Reduce to smaller cases.
       ae_int_t n1, n2;
       x_split_length(len, x_nb, &n1, &n2);
       is_hermitian_rec_diag_stat(a, offset, n1, nonfinite, mx, err);
       is_hermitian_rec_diag_stat(a, offset + n1, n2, nonfinite, mx, err);
       is_hermitian_rec_off_stat(a, offset + n1, offset, n2, n1, nonfinite, mx, err);
-      return;
-   }
-// The base case.
-   p = (complex *)a->x_ptr + offset * a->stride + offset;
-   for (i = 0; i < len; i++) {
-      pcol = p + i;
-      prow = p + i * a->stride;
-      for (j = 0; j < i; j++, pcol += a->stride, prow++) {
-         if (!isfinite(pcol->x) || !isfinite(pcol->y) || !isfinite(prow->x) || !isfinite(prow->y)) {
-            *nonfinite = true;
-         } else {
-            v = x_safepythag2(pcol->x, pcol->y);
-            *mx = *mx > v ? *mx : v;
-            v = x_safepythag2(prow->x, prow->y);
-            *mx = *mx > v ? *mx : v;
-            v = x_safepythag2(pcol->x - prow->x, pcol->y + prow->y);
-            *err = *err > v ? *err : v;
-         }
-      }
-      if (!isfinite(p[i + i * a->stride].x) || !isfinite(p[i + i * a->stride].y)) {
-         *nonfinite = true;
-      } else {
-         v = fabs(p[i + i * a->stride].x);
-         *mx = *mx > v ? *mx : v;
-         v = fabs(p[i + i * a->stride].y);
-         *err = *err > v ? *err : v;
-      }
    }
 }
 
@@ -1540,135 +1493,109 @@ static bool x_is_hermitian(x_matrix *a) {
 
 // Copy the transpose of the len0 x len1 off-diagonal block at (offset0, offset1) to its symmetric counterpart.
 static void force_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1) {
-// Reduce to smaller cases.
-   if (len0 > x_nb || len1 > x_nb) {
-      ae_int_t n1, n2;
-      if (len0 > len1) {
-         x_split_length(len0, x_nb, &n1, &n2);
-         force_symmetric_rec_off_stat(a, offset0, offset1, n1, len1);
-         force_symmetric_rec_off_stat(a, offset0 + n1, offset1, n2, len1);
-      } else {
-         x_split_length(len1, x_nb, &n1, &n2);
-         force_symmetric_rec_off_stat(a, offset0, offset1, len0, n1);
-         force_symmetric_rec_off_stat(a, offset0, offset1 + n1, len0, n2);
-      }
-      return;
-   } else {
-   // The base case.
-      double *p1, *p2, *prow, *pcol;
-      ae_int_t i, j;
-      p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
-      p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
-      for (i = 0; i < len0; i++) {
-         pcol = p2 + i;
-         prow = p1 + i * a->stride;
-         for (j = 0; j < len1; j++) {
+   if (len0 <= x_nb && len1 <= x_nb) { // The base case.
+      double *p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
+      double *p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
+      for (ae_int_t i = 0; i < len0; i++) {
+         double *pcol = p2 + i;
+         double *prow = p1 + i * a->stride;
+         for (ae_int_t j = 0; j < len1; j++) {
             *pcol = *prow;
             pcol += a->stride;
             prow++;
          }
+      }
+   } else { // Reduce to smaller cases.
+      if (len0 > len1) {
+         ae_int_t n1, n2;
+         x_split_length(len0, x_nb, &n1, &n2);
+         force_symmetric_rec_off_stat(a, offset0, offset1, n1, len1);
+         force_symmetric_rec_off_stat(a, offset0 + n1, offset1, n2, len1);
+      } else {
+         ae_int_t n1, n2;
+         x_split_length(len1, x_nb, &n1, &n2);
+         force_symmetric_rec_off_stat(a, offset0, offset1, len0, n1);
+         force_symmetric_rec_off_stat(a, offset0, offset1 + n1, len0, n2);
       }
    }
 }
 
 // Copy the transpose of the lower part of the len x len diagonal block at (offset, offset) to its upper part.
 static void force_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len) {
-   double *p, *prow, *pcol;
-   ae_int_t i, j;
-// Reduce to smaller cases.
-   if (len > x_nb) {
+   if (len <= x_nb) { // The base case.
+      double *p = (double *)(a->x_ptr) + offset * a->stride + offset;
+      for (ae_int_t i = 0; i < len; i++) {
+         double *pcol = p + i;
+         double *prow = p + i * a->stride;
+         for (ae_int_t j = 0; j < i; j++, pcol += a->stride, prow++)
+            *pcol = *prow;
+      }
+   } else { // Reduce to smaller cases.
       ae_int_t n1, n2;
       x_split_length(len, x_nb, &n1, &n2);
       force_symmetric_rec_diag_stat(a, offset, n1);
       force_symmetric_rec_diag_stat(a, offset + n1, n2);
       force_symmetric_rec_off_stat(a, offset + n1, offset, n2, n1);
-      return;
-   }
-// The base case.
-   p = (double *)(a->x_ptr) + offset * a->stride + offset;
-   for (i = 0; i < len; i++) {
-      pcol = p + i;
-      prow = p + i * a->stride;
-      for (j = 0; j < i; j++, pcol += a->stride, prow++)
-         *pcol = *prow;
    }
 }
 
 static bool x_force_symmetric(x_matrix *a) {
-   if (a->datatype != DT_REAL)
-      return false;
-   if (a->cols != a->rows)
-      return false;
-   if (a->cols == 0 || a->rows == 0)
-      return true;
-   force_symmetric_rec_diag_stat(a, 0, (ae_int_t)a->rows);
+   if (a->datatype != DT_REAL || a->cols != a->rows) return false;
+   if (a->cols > 0 && a->rows > 0) force_symmetric_rec_diag_stat(a, 0, (ae_int_t)a->rows);
    return true;
 }
 
 // Copy the Hermitian conjugate of the len0 x len1 off-diagonal block at (offset0, offset1) to its symmetric counterpart.
 static void force_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1) {
-// Reduce to smaller cases.
-   if (len0 > x_nb || len1 > x_nb) {
-      ae_int_t n1, n2;
-      if (len0 > len1) {
-         x_split_length(len0, x_nb, &n1, &n2);
-         force_hermitian_rec_off_stat(a, offset0, offset1, n1, len1);
-         force_hermitian_rec_off_stat(a, offset0 + n1, offset1, n2, len1);
-      } else {
-         x_split_length(len1, x_nb, &n1, &n2);
-         force_hermitian_rec_off_stat(a, offset0, offset1, len0, n1);
-         force_hermitian_rec_off_stat(a, offset0, offset1 + n1, len0, n2);
-      }
-      return;
-   } else {
-   // The base case.
-      complex *p1, *p2, *prow, *pcol;
-      ae_int_t i, j;
-      p1 = (complex *)a->x_ptr + offset0 * a->stride + offset1;
-      p2 = (complex *)a->x_ptr + offset1 * a->stride + offset0;
-      for (i = 0; i < len0; i++) {
-         pcol = p2 + i;
-         prow = p1 + i * a->stride;
-         for (j = 0; j < len1; j++) {
+   if (len0 <= x_nb && len1 <= x_nb) { // The base case.
+      complex *p1 = (complex *)a->x_ptr + offset0 * a->stride + offset1;
+      complex *p2 = (complex *)a->x_ptr + offset1 * a->stride + offset0;
+      for (ae_int_t i = 0; i < len0; i++) {
+         complex *pcol = p2 + i;
+         complex *prow = p1 + i * a->stride;
+         for (ae_int_t j = 0; j < len1; j++) {
             *pcol = *prow;
             pcol += a->stride;
             prow++;
          }
+      }
+   } else { // Reduce to smaller cases.
+      if (len0 > len1) {
+         ae_int_t n1, n2;
+         x_split_length(len0, x_nb, &n1, &n2);
+         force_hermitian_rec_off_stat(a, offset0, offset1, n1, len1);
+         force_hermitian_rec_off_stat(a, offset0 + n1, offset1, n2, len1);
+      } else {
+         ae_int_t n1, n2;
+         x_split_length(len1, x_nb, &n1, &n2);
+         force_hermitian_rec_off_stat(a, offset0, offset1, len0, n1);
+         force_hermitian_rec_off_stat(a, offset0, offset1 + n1, len0, n2);
       }
    }
 }
 
 // Copy the Hermitian conjugate of the lower part of the len x len diagonal block at (offset, offset) to the upper part.
 static void force_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len) {
-   complex *p, *prow, *pcol;
-   ae_int_t i, j;
-// Reduce to smaller cases.
-   if (len > x_nb) {
+   if (len <= x_nb) { // The base case.
+      complex *p = (complex *)a->x_ptr + offset * a->stride + offset;
+      for (ae_int_t i = 0; i < len; i++) {
+         complex *pcol = p + i;
+         complex *prow = p + i * a->stride;
+         for (ae_int_t j = 0; j < i; j++, pcol += a->stride, prow++)
+            *pcol = *prow;
+      }
+   } else { // Reduce to smaller cases.
       ae_int_t n1, n2;
       x_split_length(len, x_nb, &n1, &n2);
       force_hermitian_rec_diag_stat(a, offset, n1);
       force_hermitian_rec_diag_stat(a, offset + n1, n2);
       force_hermitian_rec_off_stat(a, offset + n1, offset, n2, n1);
-      return;
-   }
-// The base case.
-   p = (complex *)a->x_ptr + offset * a->stride + offset;
-   for (i = 0; i < len; i++) {
-      pcol = p + i;
-      prow = p + i * a->stride;
-      for (j = 0; j < i; j++, pcol += a->stride, prow++)
-         *pcol = *prow;
    }
 }
 
 static bool x_force_hermitian(x_matrix *a) {
-   if (a->datatype != DT_COMPLEX)
-      return false;
-   if (a->cols != a->rows)
-      return false;
-   if (a->cols == 0 || a->rows == 0)
-      return true;
-   force_hermitian_rec_diag_stat(a, 0, (ae_int_t)a->rows);
+   if (a->datatype != DT_COMPLEX || a->cols != a->rows) return false;
+   if (a->cols > 0 && a->rows > 0) force_hermitian_rec_diag_stat(a, 0, (ae_int_t)a->rows);
    return true;
 }
 
