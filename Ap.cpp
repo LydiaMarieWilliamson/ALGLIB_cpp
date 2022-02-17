@@ -14,16 +14,12 @@
 #define InAlgLib
 
 // if AE_OS == AE_LINUX (will be redefined to AE_POSIX in Ap.h),
-// set _GNU_SOURCE flag BEFORE any #includes to get affinity
-// management functions
-//
+// set _GNU_SOURCE flag BEFORE any #includes to get affinity management functions.
 #if AE_OS == AE_LINUX && !defined _GNU_SOURCE
 #   define _GNU_SOURCE
 #endif
 
-//
-// Must be defined before we include Ap.h
-//
+// Must be defined before we include Ap.h.
 #define _ALGLIB_IMPL_DEFINES
 #define _ALGLIB_INTEGRITY_CHECKS_ONCE
 #include "Ap.h"
@@ -62,7 +58,7 @@
 #   include <process.h>
 #endif
 
-// Debugging helpers for Windows
+// Debugging helpers for Windows.
 #ifdef AE_DEBUG4WINDOWS
 #   include <windows.h>
 #endif
@@ -81,9 +77,9 @@ namespace alglib_impl {
 #define AE_SER_ENTRIES_PER_ROW	5
 
 // These declarations are used to ensure, at compile-time, that
-//      sizeof(bool) == 1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_int_t) == sizeof(void *).
+//	sizeof(bool) == 1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_int_t) == sizeof(void *).
 // They are implemented by the following general method to verify ConstA == ConstB:
-//      static char DummyArray[1 -  2 * (ConstA - ConstB) * (ConstA - ConstB)];
+//	static char DummyArray[1 -  2 * (ConstA - ConstB) * (ConstA - ConstB)];
 // that would lead to a syntax error if the constraint failed (by declaring a negative array size).
 // You can remove them, if you want, since they are not used anywhere else.
 #define EquateConst(Arr, A, B)	static char Arr[1 - 2 * ((A) - (B)) * ((A) - (B))];
@@ -147,7 +143,7 @@ static unsigned char DynBottom = 1, DynFrame = 2;
 // Make a new stack frame for the environment.
 // Fr points to the place in the dynamic block that marks where the frame begins.
 // The dynamic block is assumed to be initialized by the caller and must be left alone
-// (no changes, deallocations or reuse) until ae_leave_frame() is called.
+// (no changes, deallocations, or reuse) until ae_leave_frame() is called.
 // It may be a global or (preferrably) a local variable.
 void ae_frame_make(ae_frame *Fr) {
    Fr->p_next = TopFr, Fr->deallocator = NULL, Fr->ptr = &DynFrame, TopFr = Fr;
@@ -160,13 +156,13 @@ void ae_frame_leave() {
    if (TopFr->ptr == &DynFrame) TopFr = TopFr->p_next;
 }
 
-// Initialize the ALGLIB frame stack environment.
+// Initialize the ALGLIB++ frame stack environment.
 // NOTE:
 // *	Stacks contain no frames, so ae_make_frame() must be called before attaching dynamic blocks.
 //	Without it ae_leave_frame() will cycle forever -- as intended.
 void ae_state_init() {
 // The base of the current stack of frames.
-// p_next points to itself because a correct program should be able to detect end of the list by looking at the ptr field.
+// p_next points to itself because a correct program should be able to detect the end of the list by looking at the ptr field.
 // p_next == NULL may be used to distinguish automatic blocks (in the list) from non-automatic (not in the list).
    static ae_frame BotFr = { &BotFr, NULL, &DynBottom };
 // Set the status indicators and clear the frame.
@@ -175,7 +171,7 @@ void ae_state_init() {
    CurThread = NULL, CurTask = NULL, ErrorOp = NULL;
 }
 
-// Clear the ALGLIB frame stack environment, freeing all dynamic data in it that it controls.
+// Clear the ALGLIB++ frame stack environment, freeing all the dynamic data in it that it controls.
 void ae_state_clear() {
    if (TopFr == NULL) return;
    for (; TopFr->ptr != &DynBottom; TopFr = TopFr->p_next)
@@ -185,16 +181,16 @@ void ae_state_clear() {
 
 #define AE_CRITICAL_ASSERT(x) if (!(x)) abort()
 
-// Global flags, split into several char-sized variables in order to avoid problem with non-atomic reads/writes
-// (single-byte ops are atomic on all modern architectures);
+// Make flags variables into one or more char-sized variables in order to avoid problems with non-atomic reads/writes
+// (single-byte ops are atomic on all contemporary CPUs).
 #define _ALGLIB_FLG_THREADING_MASK	0x7
 #define _ALGLIB_FLG_THREADING_SHIFT	0
-//
-// Following variables are included:
-// * threading-related settings
+
+// The following variables are included:
+// *	threading-related settings
 static unsigned char _alglib_global_threading_flags = SerTH >> _ALGLIB_FLG_THREADING_SHIFT;
 
-// Get/set the default (global) threading model:
+// Get/Set the default (global) threading model:
 // *	serial execution,
 // *	multithreading, if cores_to_use allows it.
 ae_uint64_t ae_get_global_threading() {
@@ -222,11 +218,11 @@ void ae_set_global_threading(ae_uint64_t flg_value) {
 static ae_int_t _alglib_cores_to_use = 0;
 
 // CPUID
-// Information about features the CPU and compiler support.
-// You must tell ALGLIB++ what CPU family is used by defining AE_CPU symbol (without this hint zero will be returned).
+// Information about the features the CPU and compiler support.
+// You must tell ALGLIB++ what CPU family is used by defining AE_CPU (without this hint zero will be returned).
 // NOTE:
 // *	The results of this function depend on both the CPU and compiler;
-//	if compiler doesn't support SSE intrinsics, then the function won't set the corresponding flag.
+//	if the compiler doesn't support SSE intrinsics, then the function won't set the corresponding flag.
 static ae_cpuid_t ae_cpuid() {
 // Determine the CPU characteristics and perform CPU-specific initializations.
 // Previous calls are cached to speed things up.
@@ -234,7 +230,7 @@ static ae_cpuid_t ae_cpuid() {
 // provided that simultaneous writes by different cores to the same location will be executed in serial manner,
 // which is true of contemporary architectures.
    static volatile bool _ae_cpuid_initialized = false, _ae_cpuid_has_sse2 = false, _ae_cpuid_has_avx2 = false, _ae_cpuid_has_fma = false;
-// If not initialized, the determine the system properties.
+// If not initialized, then determine the system properties.
    if (!_ae_cpuid_initialized) {
 #if defined AE_CPU && AE_CPU == AE_INTEL
    { // SSE2
@@ -326,14 +322,12 @@ ae_int_t ae_cores_count() {
 #endif
 }
 
-// This function maps nworkers  number  (which  can  be  positive,  zero  or
-// negative with 0 meaning "all cores", -1 meaning "all cores -1" and so on)
+// Map the nworkers number (which can be positive, zero for "all cores" or negative, e.g. -1 meaning "all cores -1")
 // to an "effective", strictly positive workers count.
 //
-// This  function  is  intended  to  be used by debugging/testing code which
-// tests different number of worker threads. It is NOT aligned  in  any  way
-// with ALGLIB multithreading framework (i.e. it can return  non-zero worker
-// count even for single-threaded GPLed ALGLIB).
+// This is meant for use by debugging/testing code which tests different number of worker threads.
+// It is NOT aligned in any way with the ALGLIB++ multithreading framework
+// (i.e. it can return a non-zero worker count even for single-threaded GPLed ALGLIB++).
 ae_int_t ae_get_effective_workers(ae_int_t nworkers) {
 // Count the cores.
 #if defined AE_NWORKERS
@@ -350,7 +344,7 @@ ae_int_t ae_get_effective_workers(ae_int_t nworkers) {
 static ae_int_t _dbg_alloc_total = 0;
 static bool _use_dbg_counters = false;
 static bool _use_vendor_kernels = true;
-static bool debug_workstealing = false; // debug workstealing environment? False by default
+static bool debug_workstealing = false; // Debug work-stealing environment? false by default.
 static ae_int_t dbgws_pushroot_ok = 0;
 static ae_int_t dbgws_pushroot_failed = 0;
 
@@ -421,16 +415,12 @@ void ae_clean_up() {
    if (TopFr != NULL && ErrorOp != NULL) ErrorOp(TopFr);
 }
 
-// This function abnormally aborts program, using one of several ways:
-//
-// * for TopFr != NULL and CurBreakAt being initialized with  call  to
-//   ae_state_set_break_jump() - it performs longjmp() to return site.
-// * otherwise, abort() is called
-//
-// In   all  cases,  for  TopFr != NULL  function  sets  CurStatus  and
-// CurMsg fields. It also clears TopFr with ae_state_clear().
-//
-// If TopFr != NULL and ErrorOp() != NULL, it is called prior to handling error and clearing TopFr.
+// Abnormally abort the program, using one of several ways:
+// *	if TopFr != NULL and CurBreakAt points to a jmp_buf - longjmp() to the return site,
+// *	else abort().
+// In all cases, for TopFr != NULL, set the CurStatus and CurMsg fields.
+// Clear the frame stack, if any, with ae_state_clear().
+// If TopFr != NULL and ErrorOp() != NULL, call ErrorOp() before handling errors and clearing TopFr.
 static void ae_break(ae_error_type error_type, const char *msg) {
    if (TopFr == NULL) abort();
    if (ErrorOp != NULL) ErrorOp(TopFr);
@@ -439,18 +429,17 @@ static void ae_break(ae_error_type error_type, const char *msg) {
    if (CurBreakAt != NULL) longjmp(*CurBreakAt, 1); else abort();
 }
 
-// Assertion
-//
-// For TopFr != NULL it allows to gracefully leave ALGLIB session,
-// removing all frames and deallocating registered dynamic data structure.
-// For TopFr == NULL it just abort()'s program.
-// IMPORTANT: this function ALWAYS evaluates its argument.  It  can  not  be
-//            replaced by macro which does nothing. So, you may place actual
-//            function calls at cond, and these will always be performed.
+// Assertion.
+// Upon failure with TopFr != NULL, gracefully exit ALGLIB++, removing all frames and deallocating registered dynamic data structures.
+// Otherwise, just abort().
+// IMPORTANT:
+// *	This function ALWAYS evaluates cond, and cannot be replaced by macros which do nothing.
+//	In particular, when invoked, a function call may be used as the cond argument, and it will be carried out.
 void ae_assert(bool cond, const char *msg) {
    if (!cond) ae_break(ERR_ASSERTION_FAILED, msg);
 }
 
+// A wrapper around OS-dependent clock routines.
 #if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
 int tickcount() {
    struct timeval now;
@@ -492,18 +481,14 @@ void *ae_align(void *ptr, size_t alignment) {
    return result;
 }
 
-// This function belongs to the family of  "optional  atomics",  i.e.  atomic
-// functions which either perform atomic changes - or do nothing at  all,  if
-// current compiler settings do not allow us to generate atomic code.
-//
-// All "optional atomics" are synchronized, i.e. either all of them work - or
-// no one of the works.
+// The "optional atomics" functions:
+// functions which either perform atomic changes - or fall back to an ordinary operation,
+// if the current compiler settings cannot generate atomic code.
+// They are all synchronized, i.e. either all of them work - or none of them do.
 
-// This particular function performs atomic addition on pointer-sized  value,
-// which must be pointer-size aligned.
-//
-// NOTE: this function is not intended to be extremely high performance  one,
-//       so use it only when necessary.
+// Perform atomic addition on a pointer-sized and pointer-size aligned value.
+// NOTE:
+// *	This function is not keyed in for high performance, so use it only when necessary.
 static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
    AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
 #if AE_COMPILER == AE_GNUC && AE_CPU == AE_INTEL && 100 * __GNUC__ + __GNUC__ >= 470
@@ -512,16 +497,14 @@ static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
    __atomic_fetch_add(p, v, __ATOMIC_RELAXED);
 #elif AE_OS == AE_WINDOWS
    while (true) {
-   // perform conversion between ae_int_t* and void**
-   // without compiler warnings about indirection levels
+   // Convert between ae_int_t * and void ** without compiler warnings about indirection levels.
       union {
          PVOID volatile *volatile ptr;
          volatile ae_int_t *volatile iptr;
       } u;
       u.iptr = p;
-   // atomic read for initial value
+   // Atomic read the initial value, convert it to a 1-byte pointer, then increment and store it.
       PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
-   // increment cached value and store
       if (InterlockedCompareExchangePointer(u.ptr, (PVOID)((char *)v0 + v), v0) == v0)
          break;
    }
@@ -530,18 +513,9 @@ static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
 #endif
 }
 
-// This function belongs to the family of  "optional  atomics",  i.e.  atomic
-// functions which either perform atomic changes - or do nothing at  all,  if
-// current compiler settings do not allow us to generate atomic code.
-//
-// All "optional atomics" are synchronized, i.e. either all of them work - or
-// no one of the works.
-//
-// This  particular  function  performs  atomic  subtraction on pointer-sized
-// value, which must be pointer-size aligned.
-//
-// NOTE: this function is not intended to be extremely high performance  one,
-//       so use it only when necessary.
+// Perform atomic subtraction on a pointer-sized and pointer-size aligned value.
+// NOTE:
+// *	This function is not keyed in for high performance, so use it only when necessary.
 static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
    AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
 #if AE_COMPILER == AE_GNUC && AE_CPU == AE_INTEL && 100 * __GNUC__ + __GNUC__ >= 470
@@ -550,16 +524,14 @@ static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
    __atomic_fetch_sub(p, v, __ATOMIC_RELAXED);
 #elif AE_OS == AE_WINDOWS
    while (true) {
-   // perform conversion between ae_int_t* and void**
-   // without compiler warnings about indirection levels
+   // Convert between ae_int_t * and void ** without compiler warnings about indirection levels.
       union {
          PVOID volatile *volatile ptr;
          volatile ae_int_t *volatile iptr;
       } u;
       u.iptr = p;
-   // atomic read for initial value, convert it to 1-byte pointer
+   // Atomic read the initial value, convert it to a 1-byte pointer, then decrement and store it.
       PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
-   // increment cached value and store
       if (InterlockedCompareExchangePointer(u.ptr, (PVOID)((char *)v0 - v), v0) == v0)
          break;
    }
@@ -568,8 +540,8 @@ static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
 #endif
 }
 
-// Fields for memory allocation over static array
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
+// Fields for memory allocation over static array.
 #   if AE_THREADING != NonTH
 #      error Basic static malloc is thread-unsafe; define AE_THREADING = NonTH to prove that you know it.
 #   endif
@@ -580,24 +552,24 @@ static ae_int_t *sm_page_tbl = NULL;
 static unsigned char *sm_mem = NULL;
 
 void set_memory_pool(void *ptr, size_t size) {
-// Integrity checks
+// Integrity checks.
    AE_CRITICAL_ASSERT(sm_page_size == 0);
    AE_CRITICAL_ASSERT(sm_page_cnt == 0);
    AE_CRITICAL_ASSERT(sm_page_tbl == NULL);
    AE_CRITICAL_ASSERT(sm_mem == NULL);
    AE_CRITICAL_ASSERT(size > 0);
-// Align pointer
+// Align the pointer.
    size -= ae_misalignment(ptr, sizeof(ae_int_t));
    ptr = ae_align(ptr, sizeof(ae_int_t));
-// Calculate page size and page count, prepare pointers to page table and memory
+// Calculate the page size and page count, prepare pointers to the page table and memory.
    sm_page_size = 256;
-// we expect to have memory for at least one page + table entry + alignment
+// We expect to have memory for at least one page + table entry + alignment.
    AE_CRITICAL_ASSERT(size >= (sm_page_size + sizeof(ae_int_t)) + sm_page_size);
    sm_page_cnt = (size - sm_page_size) / (sm_page_size + sizeof *sm_page_tbl);
    AE_CRITICAL_ASSERT(sm_page_cnt > 0);
    sm_page_tbl = (ae_int_t *)ptr;
    sm_mem = (unsigned char *)ae_align(sm_page_tbl + sm_page_cnt, sm_page_size);
-// Mark all pages as free
+// Mark all pages as free.
    memset(sm_page_tbl, 0, sm_page_cnt * sizeof *sm_page_tbl);
 }
 
@@ -612,16 +584,16 @@ static void *ae_static_malloc(size_t size, size_t alignment) {
       return NULL;
    if (_force_malloc_failure)
       return NULL;
-// check that page alignment and requested alignment match each other
+// Check that the page alignment and requested alignment match each other.
    AE_CRITICAL_ASSERT(alignment <= sm_page_size);
    AE_CRITICAL_ASSERT((sm_page_size % alignment) == 0);
-// search long enough sequence of pages
+// Search a long enough sequence of pages.
    rq_pages = size / sm_page_size;
    if (size % sm_page_size)
       rq_pages++;
    cur_len = 0;
    for (i = 0; i < sm_page_cnt;) {
-   // determine length of the sequence of free pages
+   // Determine the length of the free page sequence.
       if (sm_page_tbl[i] == 0)
          cur_len++;
       else {
@@ -630,22 +602,22 @@ static void *ae_static_malloc(size_t size, size_t alignment) {
          i += sm_page_tbl[i];
          continue;
       }
-   // found it?
+   // Found it?
       if (cur_len >= rq_pages) {
-      // update counters (if flag is set)
+      // Update whichever counters the use-flags are set for.
          if (_use_alloc_counter) {
             ae_optional_atomic_add_i(&_alloc_counter, 1);
             ae_optional_atomic_add_i(&_alloc_counter_total, 1);
          }
          if (_use_dbg_counters)
             ae_optional_atomic_add_i(&_dbg_alloc_total, size);
-      // mark pages and return
+      // Mark pages and return.
          for (j = 0; j < rq_pages; j++)
             sm_page_tbl[i - j] = -1;
          sm_page_tbl[i - (rq_pages - 1)] = rq_pages;
          return sm_mem + (i - (rq_pages - 1)) * sm_page_size;
       }
-   // next element
+   // The next page.
       i++;
    }
    return NULL;
@@ -664,7 +636,7 @@ static void ae_static_free(void *block) {
    AE_CRITICAL_ASSERT(page_cnt >= 1);
    for (i = 0; i < page_cnt; i++)
       sm_page_tbl[page_idx + i] = 0;
-// update counters (if flag is set)
+// Update the counters (if the use-flag is set).
    if (_use_alloc_counter)
       ae_optional_atomic_sub_i(&_alloc_counter, 1);
 }
@@ -675,7 +647,7 @@ void memory_pool_stats(ae_int_t *bytes_used, ae_int_t *bytes_free) {
    AE_CRITICAL_ASSERT(sm_page_cnt > 0);
    AE_CRITICAL_ASSERT(sm_page_tbl != NULL);
    AE_CRITICAL_ASSERT(sm_mem != NULL);
-// scan page table
+// Scan the page table.
    *bytes_used = 0;
    *bytes_free = 0;
    for (i = 0; i < sm_page_cnt;) {
@@ -704,9 +676,9 @@ void *aligned_malloc(size_t size, size_t alignment) {
       return NULL;
    if (_malloc_failure_after > 0 && _alloc_counter_total >= _malloc_failure_after)
       return NULL;
-// allocate
+// Allocate.
    if (alignment <= 1) {
-   // no alignment, just call alloc
+   // No alignment, just call malloc().
       void *block;
       void **p;;
       block = malloc(sizeof(void *) + size);
@@ -716,7 +688,7 @@ void *aligned_malloc(size_t size, size_t alignment) {
       *p = block;
       result = (char *)((char *)block + sizeof(void *));
    } else {
-   // align
+   // Align.
       void *block;
       block = malloc(alignment - 1 + sizeof(void *) + size);
       if (block == NULL)
@@ -729,14 +701,13 @@ void *aligned_malloc(size_t size, size_t alignment) {
       result = (char *)ae_align(result, alignment);
       *((void **)(result - sizeof(void *))) = block;
    }
-// update counters (if flag is set)
+// Update whichever counters the use-flags are set for.
    if (_use_alloc_counter) {
       ae_optional_atomic_add_i(&_alloc_counter, 1);
       ae_optional_atomic_add_i(&_alloc_counter_total, 1);
    }
    if (_use_dbg_counters)
       ae_optional_atomic_add_i(&_dbg_alloc_total, (ae_int64_t)size);
-// return
    return (void *)result;
 #endif
 }
@@ -764,12 +735,8 @@ void aligned_free(void *block) {
 }
 
 // Allocate memory with automatic alignment.
-//
-// Returns NULL when zero size is specified.
-//
-// Error handling:
-// * if TopFr == NULL, returns NULL on allocation error
-// * if TopFr != NULL, calls ae_break() on allocation error
+// Return NULL when size == 0 is specified.
+// Upon failure with TopFr != NULL, call ae_break(), otherwise return NULL.
 void *ae_malloc(size_t size) {
    void *result;
    if (size == 0)
@@ -785,11 +752,10 @@ void ae_free(void *p) {
       aligned_free(p);
 }
 
-// This function attaches block to the dynamic block list
-// block               block
+// Attach block to the dynamic block list for the ALGLIB++ environment.
 // This function does NOT generate exceptions.
-// NOTES:
-// * never call it for special blocks which marks frame boundaries!
+// NOTE:
+// *	Avoid calling it for the special blocks which mark frame boundaries!
 static void ae_db_attach(ae_dyn_block *block) {
    block->p_next = TopFr;
    TopFr = block;
@@ -800,7 +766,7 @@ static void ae_db_attach(ae_dyn_block *block) {
 // make_automatic indicates that the block is to be added to the dynamic block list.
 // Upon allocation failure with TopFr != NULL, call ae_break(), leaving block in a valid (but empty) state.
 // NOTES:
-// *	Avoid calling it for blocks which are already in the list;
+// *	Avoid calling it for blocks which are already in the list.
 //	Use ae_db_realloc() for already-allocated blocks.
 // *	No memory allocation is performed for initialization with size == 0.
 void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic) {
@@ -821,8 +787,7 @@ void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic) {
 // Reallocate the dynamic block (assumed to be initialized) to size bytes for the ALGLIB++ environment.
 // Delete the old contents but preserve the automatic state.
 // Upon allocation failure with TopFr != NULL, call ae_break(), leaving block in a valid (but empty) state.
-// size                new size (in bytes)
-// NOTES:
+// NOTE:
 // *	Avoid calling it for the special blocks which mark frame boundaries!
 void ae_db_realloc(ae_dyn_block *block, ae_int_t size) {
 //(@) TopFr != NULL check removed.
@@ -836,7 +801,7 @@ void ae_db_realloc(ae_dyn_block *block, ae_int_t size) {
 }
 
 // Clear the dynamic block (assumed to be initialized), releasing all dynamically allocated memory.
-// The dynamic block may be in the automatic management list - in this case it will NOT be removed from list.
+// The dynamic block may be in the automatic management list - in this case it will NOT be removed from the list.
 // NOTE:
 // *	Avoid calling it for the special blocks which mark frame boundaries!
 void ae_db_free(ae_dyn_block *block) {
@@ -861,8 +826,7 @@ void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2) {
    block2->deallocator = deallocator;
 }
 
-// Returns size of datatype.
-// Zero for dynamic types like strings or multiple precision types.
+// The size of datatype or zero for dynamic types like strings or multiple precision types.
 ae_int_t ae_sizeof(ae_datatype datatype) {
    switch (datatype) {
    // case DT_BYTE: // The same as DT_BOOL.
@@ -882,7 +846,7 @@ ae_int_t ae_sizeof(ae_datatype datatype) {
 // *	No memory allocation is performed for initialization with size == 0.
 void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, bool make_automatic) {
 // Integrity checks.
-// TopFr != NULL and zero-check removed.
+//(@) TopFr != NULL check and zero-check removed.
    ae_assert(size >= 0, "ae_vector_init: negative size");
 // Prepare for possible errors during allocation.
    dst->cnt = 0;
@@ -914,7 +878,7 @@ void ae_vector_set_length(ae_vector *dst, ae_int_t newsize) {
 //(@) TopFr != NULL check removed.
    ae_assert(newsize >= 0, "ae_vector_set_length(): negative size");
    if (dst->cnt == newsize) return;
-// Reallociate, preparing first for possible errors.
+// Reallocate, preparing first for possible errors.
    dst->cnt = 0;
    dst->xX = NULL;
    ae_db_realloc(&dst->data, newsize * ae_sizeof(dst->datatype));
@@ -925,7 +889,7 @@ void ae_vector_set_length(ae_vector *dst, ae_int_t newsize) {
 // Resize the ae_vector dst to size newsize >= 0, preserving previously existing elements.
 // dst must be initialized.
 // The values of elements added during vector growth are undefined.
-// Upon allocation failure call ae_break().
+// Upon allocation failure, call ae_break().
 void ae_vector_resize(ae_vector *dst, ae_int_t newsize) {
    ae_int_t bytes_total;
    ae_vector tmp; memset(&tmp, 0, sizeof tmp), ae_vector_init(&tmp, newsize, dst->datatype, false);
@@ -969,7 +933,7 @@ void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2) {
 // *	dst must be a correctly initialized matrix.
 // *	dst->data.ptr points to the beginning of memory block allocated for row pointers.
 // *	dst->ptr - undefined (initialized during algorithm processing).
-// *	storage points to the beginning of actual storage
+// *	storage points to the beginning of actual storage.
 static void ae_matrix_update_row_pointers(ae_matrix *dst, void *storage) {
    if (dst->cols > 0 && dst->rows > 0) {
       char *p_base = (char *)storage;
@@ -991,7 +955,7 @@ static void ae_matrix_update_row_pointers(ae_matrix *dst, void *storage) {
 void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, bool make_automatic) {
 //(@) TopFr != NULL check and zero-check removed.
    ae_assert(cols >= 0 && rows >= 0, "ae_matrix_init: negative length");
-// If either cols or rows is zero, then they must both be made so.
+// If either cols or rows is 0, then they both must be made so.
    if (cols == 0) rows = 0; else if (rows == 0) cols = 0;
 // Initialize.
    dst->datatype = datatype;
@@ -1031,7 +995,7 @@ void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, bool make_automatic) {
 // Its contents are freed after setlength().
 // Upon allocation failure with TopFr != NULL, call ae_break(), otherwise return an indication of success or failure.
 void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols) {
-// TopFr != NULL check removed.
+//(@) TopFr != NULL check removed.
    ae_assert(cols >= 0 && rows >= 0, "ae_matrix_set_length: negative length");
    if (dst->cols == cols && dst->rows == rows) return;
 // Prepare the stride.
@@ -1060,8 +1024,7 @@ void ae_matrix_free(ae_matrix *dst, bool/* make_automatic*/) {
    dst->is_attached = false;
 }
 
-// This function efficiently swaps contents of two vectors, leaving other
-// pararemeters (automatic management, etc.) unchanged.
+// Efficiently swap ae_matrix mat1 with ae_matrix mat2, leaving other pararemeters (automatic management, etc.) intact.
 void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2) {
    ae_assert(!mat1->is_attached, "ae_swap_matrices: internal error, attempt to swap matrices attached to X-object");
    ae_assert(!mat2->is_attached, "ae_swap_matrices: internal error, attempt to swap matrices attached to X-object");
@@ -1089,7 +1052,7 @@ void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2) {
 // make_automatic indicates whether or not dst is to be added to the dynamic block list.
 // Upon allocation failure, call ae_break().
 void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic) {
-// TopFr != NULL and zero-check removed.
+//(@) TopFr != NULL check and zero-check removed.
    dst->subscriber = subscriber;
    dst->ptr = NULL;
    if (dst->subscriber != NULL) *dst->subscriber = dst->ptr;
@@ -1153,7 +1116,7 @@ void ae_smart_ptr_release(ae_smart_ptr *dst) {
 // Both src and dst remain completely independent afterwards.
 // make_automatic indicates whether or not the vector will be registered in the ALGLIB++ environment.
 void ae_vector_init_from_x(ae_vector *dst, x_vector *src, bool make_automatic) {
-// TopFr != NULL check removed.
+//(@) TopFr != NULL check removed.
    ae_vector_init(dst, (ae_int_t)src->cnt, (ae_datatype)src->datatype, make_automatic);
    if (src->cnt > 0) memmove(dst->xX, src->x_ptr, (size_t)((ae_int_t)src->cnt * ae_sizeof((ae_datatype)src->datatype)));
 }
@@ -1165,10 +1128,10 @@ void ae_vector_init_from_x(ae_vector *dst, x_vector *src, bool make_automatic) {
 // *	dst shares memory with src: a write to one changes both.
 // *	dst can be reallocated with ae_vector_set_length(), but src remains untouched.
 // *	src, however, can NOT be reallocated as long as dst exists.
-// *	dst->is_attached is set to true to indicte that dst does not own its memory.
+// *	dst->is_attached is set to true to indicate that dst does not own its memory.
 // Upon allocation failure, call ae_break().
 void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, bool make_automatic) {
-// TopFr != NULL and zero-check removed.
+//(@) TopFr != NULL check and zero-check removed.
    volatile ae_int_t cnt = (ae_int_t)src->cnt;
 // Ensure the correct size.
    ae_assert(cnt == src->cnt, "ae_vector_init_attach_to_x(): 32/64 overflow");
@@ -1189,18 +1152,18 @@ void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, bool make_automat
 // Not meant for use when dst is attached to src, though it may be used when src is attached to dst.
 // One of the following is then applied:
 // *	if src is attached to dst, no action is required or done,
-// *	for independent vectors of different sizes: allocate storage in dst and copy src to dst.
+// *	for independent vectors of different size: allocate storage in dst and copy src to dst.
 //	dst->last_action is set to ACT_NEW_LOCATION, and dst->owner is set to true.
 // *	for independent vectors of the same size: no (re)allocation is required or done.
 //	Just copy src to the already-existing place.
 //	dst->last_action is set to ACT_SAME_LOCATION (unless it was ACT_NEW_LOCATION), dst->owner is unmodified.
 // NOTE:
 // *	dst is assumed to be initialized.
-//	Its contents are freed before copying data from src (if size/type are different)
+//	Its contents are freed before copying data from src (if the size/type are different)
 //	or overwritten (if possible, given the destination size).
 void ae_x_set_vector(x_vector *dst, ae_vector *src) {
    if (src->xX == dst->x_ptr) {
-   // src->ptr points to the beginning of dst, attached matrices, no need to copy
+   // src->ptr points to the beginning of dst, attached matrices, no need to copy.
       return;
    }
    if (dst->cnt != src->cnt || dst->datatype != src->datatype) {
@@ -1243,13 +1206,13 @@ void x_vector_free(x_vector *dst, bool/* make_automatic*/) {
    dst->cnt = 0;
 }
 
-// copy x_matrix src into ae_matrix dst.
+// Copy x_matrix src into ae_matrix dst.
 // dst is assumed to be uninitialized, its fields are ignored.
 // The newly-created copy of src is to be owned/managed by dst.
 // Both src and dst remain completely independent afterwards.
 // make_automatic indicates whether or not the matrix will be registered in the ALGLIB++ environment.
 void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, bool make_automatic) {
-// TopFr != NULL check removed.
+//(@) TopFr != NULL check removed.
    ae_matrix_init(dst, (ae_int_t)src->rows, (ae_int_t)src->cols, (ae_datatype)src->datatype, make_automatic);
    if (src->cols > 0 && src->rows > 0) {
       char *p_src_row = (char *)src->x_ptr;
@@ -1260,7 +1223,7 @@ void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, bool make_automatic) {
    }
 }
 
-// Copy x_matrix src to ae_matrix dst by attaching dst to src.
+// Copy x_matrix src into ae_matrix dst by attaching dst to src.
 // dst is assumed to be uninitialized, its fields are ignored.
 // make_automatic indicates whether or not the matrix will be registered in the ALGLIB++ environment.
 // The new matrix is attached to the source:
@@ -1270,7 +1233,7 @@ void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, bool make_automatic) {
 // *	dst->is_attached is set to true to indicate that dst does not own its memory.
 // Upon allocation failure, call ae_break().
 void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, bool make_automatic) {
-// TopFr != NULL and zero-check removed.
+//(@) TopFr != NULL check and zero-check removed.
    ae_int_t cols = (ae_int_t)src->cols;
    ae_int_t rows = (ae_int_t)src->rows;
 // Check that the X-source is densely packed.
@@ -1303,15 +1266,15 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, bool make_automat
 // Copy ae_matrix src to x_matrix dst.
 // Not meant for use when dst is attached to src, though it may be used when src is attached to dst.
 // One of the following is then applied:
-// *	for src attached to dst, no action is required or done.
-// *	for independent matrices of different sizes: allocate storage in dst and copy src to dst.
-//	dst->last_action field is set to ACT_NEW_LOCATION, and dst->owner is set to true.
-// *	for independent matrices of the same size: no (re)allocation is required or done.
-//	Just copy src to already-existing place.
+// *	If src is attached to dst, no action is required or done.
+// *	For independent matrices of different size: allocate storage in dst and copy src to dst.
+//	dst->last_action is set to ACT_NEW_LOCATION, and dst->owner is set to true.
+// *	For independent matrices of the same size: no (re)allocation is required or done.
+//	Just copy src to the already-existing place.
 //	dst->last_action is set to ACT_SAME_LOCATION (unless it was ACT_NEW_LOCATION), dst->owner is unmodified.
 // NOTE:
 // *	dst is assumed to be initialized.
-//	Its contents are freed before copying data from src (if size/type are different)
+//	Its contents are freed before copying data from src (if the size/type are different)
 //	or overwritten (if possible, given the destination size).
 void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
    if (src->xyX != NULL && src->xyX[0] == dst->x_ptr) {
@@ -1360,7 +1323,7 @@ void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src) {
    dst->owner = false;
 }
 
-static const ae_int_t x_nb = 16; // A cut-off for recursion in the divide-and-conquer x-matrix routines.
+static const ae_int_t x_nb = 16; // A cut-off for recursion in the divide-and-conquer x_matrix routines.
 
 // Symmetric/Hermitian properties: check and force
 static void x_split_length(ae_int_t n, ae_int_t nb, ae_int_t *n1, ae_int_t *n2) {
@@ -1403,21 +1366,12 @@ static double x_safepythag2(double x, double y) {
    }
 }
 
-// this function checks difference between offdiagonal blocks BL and BU
-// (see below). Block BL is specified by offsets (offset0,offset1)  and
-// sizes (len0,len1).
-//
-//     [ .          ]
-//     [   A0  BU   ]
-// A = [   BL  A1   ]
-//     [          . ]
-//
-//  this subroutine updates current values of:
-//  a) mx       maximum value of A[i,j] found so far
-//  b) err      componentwise difference between elements of BL and BU^T
-//
+// Verify the symmetry of the len0 x len1 off-diagonal block at (offset0, offset1) with its symmetric counterpart.
+// Also, accumulate updates on:
+// *	*mx:	the componentwise maximum of a,
+// *	*err:	the maximum componentwise difference between the lower block and the transpose of its upper counterpart.
 static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, bool *nonfinite, double *mx, double *err) {
-// try to split problem into two smaller ones
+// Reduce to smaller cases.
    if (len0 > x_nb || len1 > x_nb) {
       ae_int_t n1, n2;
       if (len0 > len1) {
@@ -1431,7 +1385,7 @@ static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
       }
       return;
    } else {
-   // base case
+   // The base case.
       double *p1, *p2, *prow, *pcol;
       double v;
       ae_int_t i, j;
@@ -1474,7 +1428,7 @@ static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
    double *p, *prow, *pcol;
    double v;
    ae_int_t i, j;
-// try to split problem into two smaller ones
+// Reduce to smaller cases.
    if (len > x_nb) {
       ae_int_t n1, n2;
       x_split_length(len, x_nb, &n1, &n2);
@@ -1483,7 +1437,7 @@ static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
       is_symmetric_rec_off_stat(a, offset + n1, offset, n2, n1, nonfinite, mx, err);
       return;
    }
-// base case
+// The base case.
    p = (double *)(a->x_ptr) + offset * a->stride + offset;
    for (i = 0; i < len; i++) {
       pcol = p + i;
@@ -1516,21 +1470,12 @@ static bool x_is_symmetric(x_matrix *a) {
    return !nonfinite && (mx == 0.0 || err / mx <= 1.0E-14);
 }
 
-// this function checks difference between offdiagonal blocks BL and BU
-// (see below). Block BL is specified by offsets (offset0,offset1)  and
-// sizes (len0,len1).
-//
-//     [ .          ]
-//     [   A0  BU   ]
-// A = [   BL  A1   ]
-//     [          . ]
-//
-//  this subroutine updates current values of:
-//  a) mx       maximum value of A[i,j] found so far
-//  b) err      componentwise difference between elements of BL and BU^H
-//
+// Verify the Hermitian conjugacy of the len0 x len1 off-diagonal block at (offset0, offset1) with its symmetric counterpart.
+// Also, accumulate updates on:
+// *	*mx:	the componentwise maximum of a
+// *	*err:	the maximum componentwise difference between the lower block and the Hermitian conjugate of its upper counterpart.
 static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, bool *nonfinite, double *mx, double *err) {
-// try to split problem into two smaller ones
+// Reduce to smaller cases.
    if (len0 > x_nb || len1 > x_nb) {
       ae_int_t n1, n2;
       if (len0 > len1) {
@@ -1544,7 +1489,7 @@ static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
       }
       return;
    } else {
-   // base case
+   // The base case.
       complex *p1, *p2, *prow, *pcol;
       double v;
       ae_int_t i, j;
@@ -1587,7 +1532,7 @@ static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
    complex *p, *prow, *pcol;
    double v;
    ae_int_t i, j;
-// try to split problem into two smaller ones
+// Reduce to smaller cases.
    if (len > x_nb) {
       ae_int_t n1, n2;
       x_split_length(len, x_nb, &n1, &n2);
@@ -1596,7 +1541,7 @@ static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
       is_hermitian_rec_off_stat(a, offset + n1, offset, n2, n1, nonfinite, mx, err);
       return;
    }
-// base case
+// The base case.
    p = (complex *)a->x_ptr + offset * a->stride + offset;
    for (i = 0; i < len; i++) {
       pcol = p + i;
@@ -1635,17 +1580,9 @@ static bool x_is_hermitian(x_matrix *a) {
    return !nonfinite && (mx == 0.0 || err / mx <= 1.0E-14);
 }
 
-// this function copies offdiagonal block BL to its symmetric counterpart
-// BU (see below). Block BL is specified by offsets (offset0,offset1)
-// and sizes (len0,len1).
-//
-//     [ .          ]
-//     [   A0  BU   ]
-// A = [   BL  A1   ]
-//     [          . ]
-//
+// Copy the transpose of the len0 x len1 off-diagonal block at (offset0, offset1) to its symmetric counterpart.
 static void force_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1) {
-// try to split problem into two smaller ones
+// Reduce to smaller cases.
    if (len0 > x_nb || len1 > x_nb) {
       ae_int_t n1, n2;
       if (len0 > len1) {
@@ -1659,7 +1596,7 @@ static void force_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
       }
       return;
    } else {
-   // base case
+   // The base case.
       double *p1, *p2, *prow, *pcol;
       ae_int_t i, j;
       p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
@@ -1676,18 +1613,11 @@ static void force_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
    }
 }
 
-// this function copies lower part of diagonal block A0 to its upper part
-// Block is specified by offset and size.
-//
-//     [ .          ]
-//     [   A0       ]
-// A = [       .    ]
-//     [          . ]
-//
+// Copy the transpose of the lower part of the len x len diagonal block at (offset, offset) to its upper part.
 static void force_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len) {
    double *p, *prow, *pcol;
    ae_int_t i, j;
-// try to split problem into two smaller ones
+// Reduce to smaller cases.
    if (len > x_nb) {
       ae_int_t n1, n2;
       x_split_length(len, x_nb, &n1, &n2);
@@ -1696,7 +1626,7 @@ static void force_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
       force_symmetric_rec_off_stat(a, offset + n1, offset, n2, n1);
       return;
    }
-// base case
+// The base case.
    p = (double *)(a->x_ptr) + offset * a->stride + offset;
    for (i = 0; i < len; i++) {
       pcol = p + i;
@@ -1717,16 +1647,9 @@ static bool x_force_symmetric(x_matrix *a) {
    return true;
 }
 
-// this function copies Hermitian transpose of offdiagonal block BL to
-// its symmetric counterpart BU (see below). Block BL is specified by
-// offsets (offset0,offset1) and sizes (len0,len1).
-//
-//     [ .          ]
-//     [   A0  BU   ]
-// A = [   BL  A1   ]
-//     [          . ]
+// Copy the Hermitian conjugate of the len0 x len1 off-diagonal block at (offset0, offset1) to its symmetric counterpart.
 static void force_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1) {
-// try to split problem into two smaller ones
+// Reduce to smaller cases.
    if (len0 > x_nb || len1 > x_nb) {
       ae_int_t n1, n2;
       if (len0 > len1) {
@@ -1740,7 +1663,7 @@ static void force_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
       }
       return;
    } else {
-   // base case
+   // The base case.
       complex *p1, *p2, *prow, *pcol;
       ae_int_t i, j;
       p1 = (complex *)a->x_ptr + offset0 * a->stride + offset1;
@@ -1757,18 +1680,11 @@ static void force_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
    }
 }
 
-// this function copies Hermitian transpose of lower part of
-// diagonal block A0 to its upper part Block is specified by offset and size.
-//
-//     [ .          ]
-//     [   A0       ]
-// A = [       .    ]
-//     [          . ]
-//
+// Copy the Hermitian conjugate of the lower part of the len x len diagonal block at (offset, offset) to the upper part.
 static void force_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len) {
    complex *p, *prow, *pcol;
    ae_int_t i, j;
-// try to split problem into two smaller ones
+// Reduce to smaller cases.
    if (len > x_nb) {
       ae_int_t n1, n2;
       x_split_length(len, x_nb, &n1, &n2);
@@ -1777,7 +1693,7 @@ static void force_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
       force_hermitian_rec_off_stat(a, offset + n1, offset, n2, n1);
       return;
    }
-// base case
+// The base case.
    p = (complex *)a->x_ptr + offset * a->stride + offset;
    for (i = 0; i < len; i++) {
       pcol = p + i;
@@ -1826,11 +1742,11 @@ bool ae_force_hermitian(ae_matrix *a) {
    return x_force_hermitian(&x);
 }
 
-// This function causes the calling thread to relinquish the CPU. The thread
-// is moved to the end of the queue and some other thread gets to run.
-//
-// NOTE: this function should NOT be called when AE_OS is AE_OTHER_OS -  the
-//       whole program will be abnormally terminated.
+//(@) ae_yield(), originally had external linkage, but isn't documented in the API or used elsewhere.
+// Make the calling thread relinquish the CPU.
+// The thread is moved to the end of the queue and some other thread gets to run.
+// NOTE:
+// *	this function should NOT be called when AE_OS is AE_OTHER_OS - the whole program will be abnormally terminated.
 static void ae_yield() {
 #if AE_OS == AE_POSIX
    sched_yield();
@@ -1842,18 +1758,17 @@ static void ae_yield() {
 #endif
 }
 
-// This function performs given number of spin-wait iterations.
+// Perform a given number of spin-wait iterations.
 void ae_spin_wait(ae_int_t cnt) {
-// It is touched once in the ae_init_pool() function from smp.c in order to prevent optimizations.
+// This variable is used to prevent some tricky optimizations which may degrade multi-threaded performance.
+// It was used by the SMP version to prevent optimizations that would remove objects that can nowadays be declared "volatile".
    static volatile ae_int_t ae_never_change_it = 1;
-// This variable is used to prevent some tricky optimizations which may degrade multithreaded performance.
-// these strange operations with ae_never_change_it are necessary to
-// prevent compiler optimization of the loop.
+// These strange operations with ae_never_change_it are necessary to prevent compiler optimization of the loop.
    volatile ae_int_t i;
-// very unlikely because no one will wait for such amount of cycles
+// Very unlikely because no one will wait for such amount of cycles.
    if (cnt > 0x12345678)
       ae_never_change_it = cnt % 10;
-// spin wait, test condition which will never be true
+// Spin wait, test a condition which will never be true.
    for (i = 0; i < cnt; i++)
       if (ae_never_change_it > 0)
          ae_never_change_it--;
@@ -1990,7 +1905,7 @@ static void ae_shared_pool_destroy(void *_dst) {
 // as opposed to being the field of some other object.
 // Upon allocation failure, call ae_break().
 void ae_shared_pool_init(void *_dst, bool make_automatic) {
-//(@) TopFr != NULL and zero-check removed.
+//(@) TopFr != NULL check and zero-check removed.
    ae_shared_pool *dst = (ae_shared_pool *)_dst;
 // Initialize.
    dst->seed_object = NULL;
@@ -2007,11 +1922,10 @@ void ae_shared_pool_init(void *_dst, bool make_automatic) {
    ae_init_lock(&dst->pool_lock, false, false);
 }
 
-// Clear all dynamically allocated fields of the ae_shared_pool except for the lock.
-//
+// Clear all dynamically allocated fields of the ae_shared_pool dst except for the lock.
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does NOT try to acquire a pool_lock and should NOT be used simultaneously from other threads.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 static void ae_shared_pool_internalclear(ae_shared_pool *dst, bool make_automatic) {
 // Free the seed.
    if (dst->seed_object != NULL) {
@@ -2039,13 +1953,13 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst, bool make_automati
 
 // Copy the ae_shared_pool _src into the previously-allocated ae_shared_pool _dst.
 // _dst is assumed to be uninitialized and its fields are ignored.
-// make_automatic indicates whether or not _dst is to be removed after leaving the current frame
+// make_automatic indicates whether or not _dst is to be removed after leaving the current frame.
 // as opposed to being the field of some other object.
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does not try to acquire a pool lock and should NOT be used simultaneously from another thread.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic) {
-// TopFr != NULL check removed (for TopFr != NULL: allocation errors result in an exception from ae_malloc()).
+//(@) TopFr != NULL check removed (for TopFr != NULL: allocation errors result in an exception from ae_malloc()).
    ae_shared_pool *dst = (ae_shared_pool *)_dst;
    ae_shared_pool *src = (ae_shared_pool *)_src;
    ae_shared_pool_init(dst, make_automatic);
@@ -2063,12 +1977,12 @@ void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic) {
 // Copy the recycled objects.
    dst->recycled_objects = NULL;
    for (ae_shared_pool_entry *ptr = src->recycled_objects; ptr != NULL; ptr = (ae_shared_pool_entry *)ptr->next_entry) {
-   // Allocate an entry, immediately add to the recycled list (we do not want to lose it in case of future malloc failures).
+   // Allocate an entry, immediately add it to the recycled list (we do not want to lose it in case of future malloc failures).
       ae_shared_pool_entry *tmp = (ae_shared_pool_entry *)ae_malloc(sizeof *tmp);
       memset(tmp, 0, sizeof *tmp);
       tmp->next_entry = dst->recycled_objects;
       dst->recycled_objects = tmp;
-   // Prepare a place for the object and copy() it
+   // Prepare a place for the object and copy() it.
       tmp->obj = ae_malloc(dst->size_of_object);
       memset(tmp->obj, 0, dst->size_of_object);
       dst->copy(tmp->obj, ptr->obj, false);
@@ -2085,7 +1999,7 @@ void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic) {
 // Free the ae_shared_pool _dst.
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does not try to acquire pool lock and should NOT be used from other threads.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_free(void *_dst, bool make_automatic) {
    ae_shared_pool *dst = (ae_shared_pool *)_dst;
 // Clear the seed and lists.
@@ -2105,19 +2019,19 @@ void ae_shared_pool_free(void *_dst, bool make_automatic) {
 // True if and only if the already-initialized ae_shared_pool dst is seeded; i.e. if its internal seed object is set.
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does NOT try acquire a pool lock and should NOT be used simultaneously from other threads.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 bool ae_shared_pool_is_initialized(ae_shared_pool *dst) {
    return dst->seed_object != NULL;
 }
 
-// Seed the already-initialized ae_shared_pool dst by setting its seed object to seed_object::size_of_object,
+// Seed the already-initialized ae_shared_pool dst by setting its internal seed object to seed_object::size_of_object,
 // freeing everything owned by dst (the current seed object and recycled objects).
 // The make, copy and free functions are set respectively to init(), copy() and free().
 // NOTE:
 // *	This function is NOT thread-safe.
 //	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, bool make_automatic), void (*copy)(void *dst, void *src, bool make_automatic), void (*free)(void *ptr, bool make_automatic)) {
-// TopFr != NULL check removed (for TopFr != NULL: allocation errors result in an exception from ae_malloc()).
+//(@) TopFr != NULL check removed (for TopFr != NULL: allocation errors result in an exception from ae_malloc()).
 // Free the internal objects.
    ae_shared_pool_internalclear(dst, false);
 // Set the non-pointer fields.
@@ -2137,7 +2051,7 @@ void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t si
 // *	This function IS thread-safe.
 //	It acquires a pool lock during its operation and can be used simultaneously from several threads.
 void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr) {
-// TopFr != NULL check removed (for TopFr != NULL: allocation errors result in an exception from ae_malloc()).
+//(@) TopFr != NULL check removed (for TopFr != NULL: allocation errors result in an exception from ae_malloc()).
 // Require pool to be seeded.
    ae_assert(pool->seed_object != NULL, "ae_shared_pool_retrieve: shared pool is not seeded");
 // Acquire a lock.
@@ -2158,7 +2072,7 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr) {
       ae_smart_ptr_assign(pptr, new_obj, true, true, pool->free);
       return;
    } else {
-   // Release the lock; we do not need it anymore because the copy constructor does not modify source variable.
+   // Release the lock; we do not need it anymore because the copy constructor does not modify the source variable.
       ae_release_lock(&pool->pool_lock);
    // Create a new object from the seed.
       void *new_obj = ae_malloc(pool->size_of_object);
@@ -2172,26 +2086,26 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 }
 
 // Recycle the object owned by the smart pointer pptr by moving it into the ae_shared_pool pool.
-// pptr must not own the object.
+// pptr must own the object.
 // Afterwards, it owns the NULL pointer.
 // NOTE:
 // *	This function IS thread-safe.
 //	It acquires a pool lock during its operation and can be used simultaneously from several threads.
 void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr) {
-// TopFr != NULL check removed (for TopFr != NULL: allocation errors result in exception).
-// Require pool to be seeded and pptr to be non-NULL and to own the object.
+//(@) TopFr != NULL check removed (for TopFr != NULL: allocation errors result in an exception from ae_malloc()).
+// Require pool to be seeded and pptr != NULL and to own the object.
    ae_assert(pool->seed_object != NULL, "ae_shared_pool_recycle: shared pool is not seeded");
    ae_assert(pptr->is_owner, "ae_shared_pool_recycle: pptr does not own its pointer");
    ae_assert(pptr->ptr != NULL, "ae_shared_pool_recycle: pptr == NULL");
-// Acquire the lock and the shared pool entry (reusing an entry from recycled_entries, if there are any)
+// Acquire the lock and the shared pool entry (reusing an entry from recycled_entries, if there are any).
    ae_acquire_lock(&pool->pool_lock);
    ae_shared_pool_entry *new_entry;
    if (pool->recycled_entries != NULL) {
-   // reuse previously allocated entry
+   // Reuse a previously allocated entry.
       new_entry = pool->recycled_entries;
       pool->recycled_entries = (ae_shared_pool_entry *)new_entry->next_entry;
    } else {
-   // Allocate memory for new entry.
+   // Allocate a new entry.
    // NOTE:
    // *	Unlock the pool first
    //	so as to prevent the pool from being left in a locked state in case ae_malloc() raises an exception.
@@ -2210,7 +2124,7 @@ void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 // Clear the internal list of recycled objects, keeping intact the seed object managed by the ae_shared_pool pool.
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does not acquire a pool lock and should NOT be used simultaneously from other threads.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic) {
 // Clear the recycled objects.
    for (ae_shared_pool_entry *ptr = pool->recycled_objects; ptr != NULL;) {
@@ -2223,14 +2137,14 @@ void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic) {
    pool->recycled_objects = NULL;
 }
 
-// Allow the recycled elements of the ae_shared_pool to be enumerated.
-// The pointer to the first recycled object is stored in the smart pointer ptr.
+// Allow the recycled elements of the ae_shared_pool pool to be enumerated.
+// The pointer to the first recycled object is stored in the smart pointer pptr.
 // IMPORTANT:
 // *	The recycled object is KEPT in pool and ownership is NOT passed to pptr.
-// *	If there are no recycled objects left in pool or pool is not seeded, then NULL is stored to pptr.
+// *	If there are no recycled objects left in pool or pool is not seeded, then NULL is stored into pptr.
 // *	Any non-NULL pointer owned by pptr is deallocated before storing the value retrieved from pool.
 // *	This function IS NOT thread-safe
-// *	You should NOT modify pool during enumeration (although you can modify the state of the objects retrieved from pool)
+// *	You should NOT modify pool during enumeration (although you can modify the state of the objects retrieved from pool).
 void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 // Modify the internal enumeration counter.
    pool->enumeration_counter = pool->recycled_objects;
@@ -2253,7 +2167,7 @@ void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr) {
    }
 // Modify the internal enumeration counter.
    pool->enumeration_counter = (ae_shared_pool_entry *)pool->enumeration_counter->next_entry;
-// Exit on an empty list
+// Exit on an empty list.
    if (pool->enumeration_counter == NULL)
       ae_smart_ptr_assign(pptr, NULL, false, false, NULL);
 // Assign the object to a smart pointer.
@@ -2265,7 +2179,7 @@ void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 // while leaving pool intact for reseeding and subsequent reuse.
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does not try to acquire pool lock and should NOT be used simultaneously from other threads.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_reset(ae_shared_pool *pool) {
 // Clear the seed and lists.
    ae_shared_pool_internalclear(pool, false);
@@ -2280,10 +2194,8 @@ void ae_shared_pool_reset(ae_shared_pool *pool) {
    pool->free = NULL;
 }
 
-// This function converts six-bit value (from 0 to 63)  to  character  (only
-// digits, lowercase and uppercase letters, minus and underscore are used).
-//
-// If v is negative or greater than 63, this function returns '?'.
+// Convert the six-bit value v in the range [0,0100) to digits, letters, minuses and underscores.
+// Any v outside the range [0,0100) is convereted to   '?'.
 static char ae_sixbits2char(ae_int_t v) {
    static char _sixbits2char_tbl[100] = {
       '0', '1', '2', '3', '4', '5', '6', '7',
@@ -2296,8 +2208,8 @@ static char ae_sixbits2char(ae_int_t v) {
       'u', 'v', 'w', 'x', 'y', 'z', '-', '_'
    };
    return v >= 0 && v < 100 ? _sixbits2char_tbl[v] : '?';
-// v is correct, process it
 #if 0
+// v is correct, process it.
    return
       v < 10 ? '0' + v :
       (v -= 10) < 26 ? 'A' + v :
@@ -2306,10 +2218,9 @@ static char ae_sixbits2char(ae_int_t v) {
 #endif
 }
 
-// This function converts character to six-bit value (from 0 to 63).
-//
-// This function is inverse of ae_sixbits2char()
-// If c is not correct character, this function returns -1.
+// The inverse of ae_sixbits2char().
+// Convert any character c in the range of ae_sixbits2char() to a six-bit value in the range [0, 0100).
+// Convert any other character c to -1.
 static ae_int_t ae_char2sixbits(char c) {
    static ae_int_t _ae_char2sixbits_tbl[] = {
       -1, -1, -1, -1, -1, -1, -1, -1,
@@ -2332,11 +2243,7 @@ static ae_int_t ae_char2sixbits(char c) {
    return (c >= 0 && c < 127) ? _ae_char2sixbits_tbl[(int)c] : -1;
 }
 
-// This function converts three bytes (24 bits) to four six-bit values
-// (24 bits again).
-//
-// src     pointer to three bytes
-// dst     pointer to four ints
+// Convert the 3 x 8-bit array src into the 4 x 6-bit array dst.
 static void ae_threebytes2foursixbits(const unsigned char *src, ae_int_t *dst) {
    dst[0] = src[0] & 0x3F;
    dst[1] = (src[0] >> 6) | ((src[1] & 0x0F) << 2);
@@ -2344,18 +2251,14 @@ static void ae_threebytes2foursixbits(const unsigned char *src, ae_int_t *dst) {
    dst[3] = src[2] >> 2;
 }
 
-// This function converts four six-bit values (24 bits) to three bytes
-// (24 bits again).
-//
-// src     pointer to four ints
-// dst     pointer to three bytes
+// Convert the 4 x 6-bit array src into the 3 x 8-bit array dst.
 static void ae_foursixbits2threebytes(const ae_int_t *src, unsigned char *dst) {
    dst[0] = (unsigned char)(src[0] | ((src[1] & 0x03) << 6));
    dst[1] = (unsigned char)((src[1] >> 2) | ((src[2] & 0x0F) << 4));
    dst[2] = (unsigned char)((src[2] >> 4) | (src[3] << 2));
 }
 
-// This function initializes serializer
+// Initialize the serializer.
 void ae_serializer_init(ae_serializer *serializer) {
    serializer->mode = AE_SM_DEFAULT;
    serializer->entries_needed = 0;
@@ -2372,25 +2275,24 @@ void ae_serializer_alloc_entry(ae_serializer *serializer) {
    serializer->entries_needed++;
 }
 
-// After allocation phase is done, this function returns  required  size  of
-// the output string buffer (including trailing zero symbol). Actual size of
-// the data being stored can be a few characters smaller than requested.
+// After the allocation is done, return the required size of the output string buffer (including trailing '\0').
+// The actual size of the data being stored can be a few characters smaller than requested.
 ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer) {
    ae_int_t rows, lastrowsize, result;
    serializer->mode = AE_SM_READY2S;
-// if no entries needes (degenerate case)
+// If no entries are needed (the degenerate case).
    if (serializer->entries_needed == 0) {
-      serializer->bytes_asked = 4; // a pair of chars for \r\n, one for dot, one for trailing zero
+      serializer->bytes_asked = 4; // A pair of chars for "\r\n", one for '.', one for the trailing '\0'.
       return serializer->bytes_asked;
    }
-// non-degenerate case
+// The non-degenerate case.
    rows = serializer->entries_needed / AE_SER_ENTRIES_PER_ROW;
    lastrowsize = AE_SER_ENTRIES_PER_ROW;
    if (serializer->entries_needed % AE_SER_ENTRIES_PER_ROW) {
       lastrowsize = serializer->entries_needed % AE_SER_ENTRIES_PER_ROW;
       rows++;
    }
-// calculate result size
+// The result size: data size + ' ' & '\n' symbols + trailing '.' & '\0'.
    result = ((rows - 1) * AE_SER_ENTRIES_PER_ROW + lastrowsize) * AE_SER_ENTRY_LENGTH; // data size
    result += (rows - 1) * (AE_SER_ENTRIES_PER_ROW - 1) + (lastrowsize - 1); // space symbols
    result += rows * 2; // newline symbols
@@ -2404,7 +2306,7 @@ ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer) {
 // Only big-endian and little-endian are supported for ByteOrder, not mixed-endian hardware.
 static ae_int_t GetByteOrder() {
 // 1983 is used as the magic number because its non-periodic double representation
-// allow us to easily distinguish between upper and lower halfs and to detect mixed endian hardware.
+// allows us to easily distinguish between the upper and lower halves and to detect mixed endian hardware.
    union {
       double a;
       ae_int32_t p[2];
@@ -2500,11 +2402,8 @@ void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader rea
    serializer->stream_aux = aux;
 }
 
-// This function unserializes boolean value from buffer
-// buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, traling spaces/tabs/newlines are treated as  end  of
-//             the boolean value.
-// This function raises an error in case unexpected symbol is found
+// Unserialize a boolean value from the string buf, up to *pasttheend.
+// Raise an error in case an unexpected symbol is found.
 static bool ae_str2bool(const char *buf, const char **pasttheend) {
    bool was0, was1;
    const char *emsg = "ALGLIB: unable to read boolean value from stream";
@@ -2533,6 +2432,9 @@ static bool ae_str2bool(const char *buf, const char **pasttheend) {
    return was1 ? true : false;
 }
 
+// Unserialize a boolean value from serializer.
+// Leading whitespaces are ignored, a trailing whitespace terminates the string.
+// Raise an error in case an unexpected symbol is found.
 bool ae_serializer_unserialize_bool(ae_serializer *serializer) {
    switch (serializer->mode) {
       case AE_SM_FROM_STRING:
@@ -2550,10 +2452,7 @@ bool ae_serializer_unserialize_bool(ae_serializer *serializer) {
    return false;
 }
 
-// This function serializes boolean value into buffer
-// v           boolean value to be serialized
-// buf         buffer, at least 12 characters wide
-//             (11 chars for value, one for trailing zero)
+// Serialize the boolean value v into the string buf.
 static void ae_bool2str(bool v, char *buf) {
    char c = v ? '1' : '0';
    ae_int_t i;
@@ -2562,11 +2461,13 @@ static void ae_bool2str(bool v, char *buf) {
    buf[AE_SER_ENTRY_LENGTH] = 0;
 }
 
+// Serialize the boolean value v to serializer.
 void ae_serializer_serialize_bool(ae_serializer *serializer, bool v) {
+// At least 11 characters for the value, plus 1 for the trailing '\0'.
    char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
    const char *emsg = "ALGLIB: serialization integrity error";
    ae_int_t bytes_appended;
-// Prepare the serialization, check consistency.
+// Prepare the serialization and check consistency.
    ae_bool2str(v, buf);
    serializer->entries_saved++;
    if (serializer->entries_saved % AE_SER_ENTRIES_PER_ROW)
@@ -2574,7 +2475,7 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, bool v) {
    else
       strcat(buf, "\r\n");
    bytes_appended = (ae_int_t)strlen(buf);
-   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // strict "less" because we need space for trailing zero
+   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // Strict "<", to make room for the trailing '\0'.
    serializer->bytes_written += bytes_appended;
 // Append to the buffer.
    switch (serializer->mode) {
@@ -2594,24 +2495,21 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, bool v) {
    }
 }
 
-// This function unserializes integer value from string
-// buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, traling spaces/tabs/newlines are treated as  end  of
-//             the boolean value.
-// This function raises an error in case unexpected symbol is found
+// Unserialize an integer value from the string buf, up to *pasttheend.
+// Raise an error in case an unexpected symbol is found.
 static ae_int_t ae_str2int(const char *buf, const char **pasttheend) {
    const char *emsg = "ALGLIB: unable to read integer value from stream";
+// *	Skip leading spaces.
+// *	Read and decode six-bit digits.
+// *	Set trailing digits to zeros.
+// *	Convert to little endian 64-bit integer representation.
+// *	Convert to big endian representation, if needed.
    ae_int_t sixbits[12];
    ae_int_t sixbitsread, i;
    union {
       ae_int_t ival;
       unsigned char bytes[9];
    } u;
-// 1. skip leading spaces
-// 2. read and decode six-bit digits
-// 3. set trailing digits to zeros
-// 4. convert to little endian 64-bit integer representation
-// 5. convert to big endian representation, if needed
    while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
       buf++;
    sixbitsread = 0;
@@ -2643,6 +2541,9 @@ static ae_int_t ae_str2int(const char *buf, const char **pasttheend) {
    return u.ival;
 }
 
+// Unserialize an integer value from serializer.
+// Leading whitespaces are ignored, a trailing whitespace terminates the string.
+// Raise an error in case an unexpected symbol is found.
 ae_int_t ae_serializer_unserialize_int(ae_serializer *serializer) {
    switch (serializer->mode) {
       case AE_SM_FROM_STRING:
@@ -2660,10 +2561,7 @@ ae_int_t ae_serializer_unserialize_int(ae_serializer *serializer) {
    return 0;
 }
 
-// This function serializes integer value into buffer
-// v           integer value to be serialized
-// buf         buffer, at least 12 characters wide
-//             (11 chars for value, one for trailing zero)
+// Serialize the integer value v into the string buf.
 static void ae_int2str(ae_int_t v, char *buf) {
    union {
       ae_int_t ival;
@@ -2672,17 +2570,12 @@ static void ae_int2str(ae_int_t v, char *buf) {
    ae_int_t i;
    ae_int_t sixbits[12];
    unsigned char c;
-// copy v to array of chars, sign extending it and
-// converting to little endian order
-//
-// because we don't want to mention size of ae_int_t explicitly,
-// we do it as follows:
-// 1. we fill u.bytes by zeros or ones (depending on sign of v)
-// 2. we copy v to u.ival
-// 3. if we run on big endian architecture, we reorder u.bytes
-// 4. now we have signed 64-bit representation of v stored in u.bytes
-// 5. additionally, we set 9th byte of u.bytes to zero in order to
-//    simplify conversion to six-bit representation
+// Copy v to array of chars, sign extending it and converting it to little endian order.
+// In order to avoid explicit mention of the size of the ae_int_t type, we:
+// *	fill u.bytes by zeros or ones (depending on the sign of v),
+// *	copy v to u.ival,
+// *	reorder u.bytes (for big endian architectures), to obtain a signed 64-bit representation of v stored in u.bytes,
+// *	additionally, zero the last byte of u.bytes to simplify conversion to six-bit form.
    c = v < 0 ? (unsigned char)0xFF : (unsigned char)0x00;
    u.ival = v;
    for (i = sizeof(ae_int_t); i <= 8; i++) // i <= 8 is preferred because it avoids unnecessary compiler warnings
@@ -2696,9 +2589,9 @@ static void ae_int2str(ae_int_t v, char *buf) {
          u.bytes[sizeof(ae_int_t) - 1 - i] = tc;
       }
    }
-// convert to six-bit representation, output
-//
-// NOTE: last 12th element of sixbits is always zero, we do not output it
+// Convert to six-bit representation, output.
+// NOTE:
+// *	The last element of sixbits is always zero, and is not output.
    ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
    ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
    ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
@@ -2707,11 +2600,13 @@ static void ae_int2str(ae_int_t v, char *buf) {
    buf[AE_SER_ENTRY_LENGTH] = 0x00;
 }
 
+// Serialize the integer value v to serializer.
 void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v) {
+// At least 11 characters for the value, plus 1 for the trailing '\0'.
    char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
    const char *emsg = "ALGLIB: serialization integrity error";
    ae_int_t bytes_appended;
-// prepare serialization, check consistency
+// Prepare the serialization and check consistency.
    ae_int2str(v, buf);
    serializer->entries_saved++;
    if (serializer->entries_saved % AE_SER_ENTRIES_PER_ROW)
@@ -2719,7 +2614,7 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v) {
    else
       strcat(buf, "\r\n");
    bytes_appended = (ae_int_t)strlen(buf);
-   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // strict "less" because we need space for trailing zero
+   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // Strict "<", to make room for the trailing '\0'.
    serializer->bytes_written += bytes_appended;
 // Append to the buffer.
    switch (serializer->mode) {
@@ -2739,22 +2634,19 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v) {
    }
 }
 
-// This function unserializes 64-bit integer value from string
-// buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, traling spaces/tabs/newlines are treated as  end  of
-//             the boolean value.
-// This function raises an error in case unexpected symbol is found
+// Unserialize a 64-bit integer value from the string buf, up to *pasttheend.
+// Raise an error in case an unexpected symbol is found.
 static ae_int64_t ae_str2int64(const char *buf, const char **pasttheend) {
    const char *emsg = "ALGLIB: unable to read integer value from stream";
+// *	Skip leading spaces.
+// *	Read and decode six-bit digits.
+// *	Set trailing digits to zeros.
+// *	Convert to little endian 64-bit integer representation.
+// *	Convert to big endian representation, if needed.
    ae_int_t sixbits[12];
    ae_int_t sixbitsread, i;
    unsigned char bytes[9];
    ae_int64_t result;
-// 1. skip leading spaces
-// 2. read and decode six-bit digits
-// 3. set trailing digits to zeros
-// 4. convert to little endian 64-bit integer representation
-// 5. convert to big endian representation, if needed
    while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
       buf++;
    sixbitsread = 0;
@@ -2787,6 +2679,9 @@ static ae_int64_t ae_str2int64(const char *buf, const char **pasttheend) {
    return result;
 }
 
+// Unserialize a 64-bit integer value from serializer.
+// Leading whitespaces are ignored, a trailing whitespace terminates the string.
+// Raise an error in case an unexpected symbol is found.
 ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer) {
    switch (serializer->mode) {
       case AE_SM_FROM_STRING:
@@ -2804,25 +2699,17 @@ ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer) {
    return 0L;
 }
 
-// This function serializes 64-bit integer value into buffer
-// v           integer value to be serialized
-// buf         buffer, at least 12 characters wide
-//             (11 chars for value, one for trailing zero)
+// Serialize the 64-bit integer value v into the string buf.
 static void ae_int642str(ae_int64_t v, char *buf) {
+// Copy v to an array of chars, sign extending it and converting it to little endian order.
+// In order to avoid explicit mention of the size of the ae_int64_t type, we:
+// *	fill bytes by zeros or ones (depending on the sign of v),
+// *	copy v to bytes,
+// *	reorder bytes (for big endian architectures), to obtain a signed 64-bit representation of v stored in bytes,
+// *	additionally, zero the last byte of bytes to simplify conversion to six-bit form.
    unsigned char bytes[9];
    ae_int_t i;
    ae_int_t sixbits[12];
-// copy v to array of chars, sign extending it and
-// converting to little endian order
-//
-// because we don't want to mention size of ae_int_t explicitly,
-// we do it as follows:
-// 1. we fill bytes by zeros or ones (depending on sign of v)
-// 2. we memmove v to bytes
-// 3. if we run on big endian architecture, we reorder bytes
-// 4. now we have signed 64-bit representation of v stored in bytes
-// 5. additionally, we set 9th byte of bytes to zero in order to
-//    simplify conversion to six-bit representation
    memset(bytes, v < 0 ? 0xFF : 0x00, 8);
    memmove(bytes, &v, 8);
    bytes[8] = 0;
@@ -2834,9 +2721,9 @@ static void ae_int642str(ae_int64_t v, char *buf) {
          bytes[sizeof(ae_int_t) - 1 - i] = tc;
       }
    }
-// convert to six-bit representation, output
-//
-// NOTE: last 12th element of sixbits is always zero, we do not output it
+// Convert to six-bit representation, output.
+// NOTE:
+// *	The last element of sixbits is always zero, we do not output it.
    ae_threebytes2foursixbits(bytes + 0, sixbits + 0);
    ae_threebytes2foursixbits(bytes + 3, sixbits + 4);
    ae_threebytes2foursixbits(bytes + 6, sixbits + 8);
@@ -2845,11 +2732,13 @@ static void ae_int642str(ae_int64_t v, char *buf) {
    buf[AE_SER_ENTRY_LENGTH] = 0x00;
 }
 
+// Serialize the 64-bit integer value v to serializer.
 void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v) {
+// At least 11 characters for the value, plus 1 for the trailing '\0'.
    char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
    const char *emsg = "ALGLIB: serialization integrity error";
    ae_int_t bytes_appended;
-// prepare serialization, check consistency
+// Prepare the serialization and check consistency.
    ae_int642str(v, buf);
    serializer->entries_saved++;
    if (serializer->entries_saved % AE_SER_ENTRIES_PER_ROW)
@@ -2857,7 +2746,7 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v) {
    else
       strcat(buf, "\r\n");
    bytes_appended = (ae_int_t)strlen(buf);
-   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // strict "less" because we need space for trailing zero
+   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // Strict "<", to make room for the trailing '\0'.
    serializer->bytes_written += bytes_appended;
 // Append to the buffer.
    switch (serializer->mode) {
@@ -2877,11 +2766,8 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v) {
    }
 }
 
-// This function unserializes double value from string
-// buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, traling spaces/tabs/newlines are treated as  end  of
-//             the boolean value.
-// This function raises an error in case unexpected symbol is found
+// Unserialize a double value from the string buf, up to *pasttheend.
+// Raise an error in case an unexpected symbol is found.
 static double ae_str2double(const char *buf, const char **pasttheend) {
    const char *emsg = "ALGLIB: unable to read double value from stream";
    ae_int_t sixbits[12];
@@ -2890,10 +2776,10 @@ static double ae_str2double(const char *buf, const char **pasttheend) {
       double dval;
       unsigned char bytes[9];
    } u;
-// skip leading spaces
+// Skip leading spaces.
    while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
       buf++;
-// Handle special cases
+// Handle special cases.
    if (*buf == '.') {
       const char *s_nan = ".nan_______";
       const char *s_posinf = ".posinf____";
@@ -2912,12 +2798,12 @@ static double ae_str2double(const char *buf, const char **pasttheend) {
       }
       ae_break(ERR_ASSERTION_FAILED, emsg);
    }
-// General case:
-// 1. read and decode six-bit digits
-// 2. check that all 11 digits were read
-// 3. set last 12th digit to zero (needed for simplicity of conversion)
-// 4. convert to 8 bytes
-// 5. convert to big endian representation, if needed
+// The general case:
+// *	Read and decode six-bit digits.
+// *	Check that all 11 digits were read.
+// *	Set the last digit to zero (needed to simplify the conversion).
+// *	Convert to 8 bytes.
+// *	Convert to big endian representation, if needed.
    sixbitsread = 0;
    while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
       ae_int_t d;
@@ -2946,6 +2832,9 @@ static double ae_str2double(const char *buf, const char **pasttheend) {
    return u.dval;
 }
 
+// Unserialize a double value from serializer.
+// Leading whitespaces are ignored, a trailing whitespace terminates the string.
+// Raise an error in case an unexpected symbol is found.
 double ae_serializer_unserialize_double(ae_serializer *serializer) {
    switch (serializer->mode) {
       case AE_SM_FROM_STRING:
@@ -2963,10 +2852,7 @@ double ae_serializer_unserialize_double(ae_serializer *serializer) {
    return 0.0;
 }
 
-// This function serializes double value into buffer
-// v           double value to be serialized
-// buf         buffer, at least 12 characters wide
-//             (11 chars for value, one for trailing zero)
+// Serialize the double value v into the string buf.
 static void ae_double2str(double v, char *buf) {
    union {
       double dval;
@@ -2974,7 +2860,7 @@ static void ae_double2str(double v, char *buf) {
    } u;
    ae_int_t i;
    ae_int_t sixbits[12];
-// handle special quantities
+// Handle the special cases, first.
    if (isnan(v)) {
       const char *s = ".nan_______";
       memmove(buf, s, strlen(s) + 1);
@@ -2990,13 +2876,11 @@ static void ae_double2str(double v, char *buf) {
       memmove(buf, s, strlen(s) + 1);
       return;
    }
-// process general case:
-// 1. copy v to array of chars
-// 2. set 9th byte of u.bytes to zero in order to
-//    simplify conversion to six-bit representation
-// 3. convert to little endian (if needed)
-// 4. convert to six-bit representation
-//    (last 12th element of sixbits is always zero, we do not output it)
+// Handle the general case:
+// *	copy v to array of chars,
+// *	set the last byte of u.bytes to zero in order to simplify conversion to six-bit representation,
+// *	convert to little endian (if needed),
+// *	convert to six-bit representation (the last element of sixbits is always zero, and is not output).
    u.dval = v;
    u.bytes[8] = 0;
    if (ByteOrder == AE_BIG_ENDIAN) {
@@ -3016,10 +2900,11 @@ static void ae_double2str(double v, char *buf) {
 }
 
 void ae_serializer_serialize_double(ae_serializer *serializer, double v) {
+// At least 11 characters for the value, plus 1 for the trailing '\0'.
    char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
    const char *emsg = "ALGLIB: serialization integrity error";
    ae_int_t bytes_appended;
-// prepare serialization, check consistency
+// Prepare the serialization and check consistency.
    ae_double2str(v, buf);
    serializer->entries_saved++;
    if (serializer->entries_saved % AE_SER_ENTRIES_PER_ROW)
@@ -3027,7 +2912,7 @@ void ae_serializer_serialize_double(ae_serializer *serializer, double v) {
    else
       strcat(buf, "\r\n");
    bytes_appended = (ae_int_t)strlen(buf);
-   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // strict "less" because we need space for trailing zero
+   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // Strict "<", to make room for the trailing '\0'.
    serializer->bytes_written += bytes_appended;
 // Append to the buffer.
    switch (serializer->mode) {
@@ -3051,19 +2936,19 @@ void ae_serializer_stop(ae_serializer *serializer) {
    switch (serializer->mode) {
 #ifdef AE_USE_CPP_SERIALIZATION
       case AE_SM_TO_CPPSTRING:
-         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed"); // strict "less" because we need space for trailing zero
+         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
          serializer->bytes_written++;
          *serializer->out_cppstr += ".";
       break;
 #endif
       case AE_SM_TO_STRING:
-         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed"); // strict "less" because we need space for trailing zero
+         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
          serializer->bytes_written++;
          strcat(serializer->out_str, ".");
          serializer->out_str += 1;
       break;
       case AE_SM_TO_STREAM:
-         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed"); // strict "less" because we need space for trailing zero
+         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
          serializer->bytes_written++;
          ae_assert(serializer->stream_writer(".", serializer->stream_aux), "ae_serializer: error writing to stream");
       break;
@@ -3092,10 +2977,10 @@ void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes)
 void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *bytes) {
    ae_int_t chunk_size, n, entries_count;
    chunk_size = 8;
-// read array length, allocate output
+// Read the array length, allocate output.
    n = ae_serializer_unserialize_int(serializer);
    ae_vector_set_length(bytes, n);
-// determine entries count, read entries
+// Count and read the entries.
    entries_count = n / chunk_size + (n % chunk_size > 0 ? 1 : 0);
    for (ae_int_t eidx = 0; eidx < entries_count; eidx++) {
       ae_int_t elen;
@@ -3110,9 +2995,9 @@ void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *
 void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes) {
    ae_int_t chunk_size, entries_count;
    chunk_size = 8;
-// save array length
+// Save the array length.
    ae_serializer_serialize_int(serializer, bytes->cnt);
-// determine entries count
+// Count the entries.
    entries_count = bytes->cnt / chunk_size + (bytes->cnt % chunk_size > 0 ? 1 : 0);
    for (ae_int_t eidx = 0; eidx < entries_count; eidx++) {
       ae_int64_t tmpi;
@@ -3125,7 +3010,7 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
    }
 }
 
-// Real math functions
+// Integer and real math functions.
 bool isposinf(double x) {
    return isinf(x) && !signbit(x);
 }
@@ -3286,7 +3171,7 @@ bool randombool(double p/* = 0.5*/) {
    return rand() + rand()/mx <= p * mx;
 }
 
-// Complex math functions
+// Complex math functions.
 complex ae_c_neg(complex lhs) {
    complex result;
    result = complex_from_d(-lhs.x, -lhs.y);
@@ -3794,7 +3679,7 @@ void ae_v_cmulc(complex *vdst, ae_int_t stride_dst, ae_int_t n, complex alpha) {
    }
 }
 
-// Real BLAS operations
+// Level 1 Real BLAS operations
 double ae_v_dotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n) {
    double result = 0.0;
    ae_int_t i;
@@ -7818,13 +7703,13 @@ bool get_error_flag(const char **MsgP) {
 void clear_error_flag() { _alglib_last_error = NULL; }
 #endif
 
-// Global and local constants/variables.
 #if 0
+// Global and local constants and variables.
 const double machineepsilon = 5E-16, maxrealnumber = 1E300, minrealnumber = 1E-300;
 const ae_int_t ByteOrder = alglib_impl::ByteOrder;
 #endif
 
-// standard functions
+// Standard functions.
 int sign(double x) {
    if (x > 0) return 1;
    if (x < 0) return -1;
@@ -7979,22 +7864,22 @@ std::string complex::tostring(int _dps) const {
    int dps = _dps >= 0 ? _dps : -_dps;
    if (dps <= 0 || dps >= 20)
       ThrowError("complex::tostring(): incorrect dps");
-// handle IEEE special quantities
+// Handle IEEE special quantities.
    if (isnan(x) || isnan(y))
       return "NAN";
    if (isinf(x) || isinf(y))
       return "INF";
-// generate mask
+// Generate the mask.
    if (sprintf(mask, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof(mask))
       ThrowError("complex::tostring(): buffer overflow");
-// print |x|, |y| and zero with same mask and compare
+// Print |x|, |y| and zero with the same mask and compare.
    if (sprintf(buf_x, mask, fabs(x)) >= (int)sizeof(buf_x))
       ThrowError("complex::tostring(): buffer overflow");
    if (sprintf(buf_y, mask, fabs(y)) >= (int)sizeof(buf_y))
       ThrowError("complex::tostring(): buffer overflow");
    if (sprintf(buf_zero, mask, 0.0) >= (int)sizeof(buf_zero))
       ThrowError("complex::tostring(): buffer overflow");
-// different zero/nonzero patterns
+// Different zero/non-zero patterns.
    if (strcmp(buf_x, buf_zero) != 0 && strcmp(buf_y, buf_zero) != 0)
       return std::string(x > 0 ? "" : "-") + buf_x + (y > 0 ? "+" : "-") + buf_y + "i";
    if (strcmp(buf_x, buf_zero) != 0 && strcmp(buf_y, buf_zero) == 0)
@@ -8150,7 +8035,7 @@ void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) { }
 void setglobalthreading(const xparams settings) { }
 #endif
 
-// Level 1 BLAS functions
+// Level 1 Real BLAS functions.
 
 double vdotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n) {
    double result = 0.0;
@@ -8812,7 +8697,7 @@ void vmul(complex *vdst, ae_int_t N, complex alpha) {
    vmul(vdst, 1, N, alpha);
 }
 
-// Matrices and vectors: I/O.
+// Matrices and Vectors: I/O.
 
 static bool strimatch(const char *s1, const char *s2) {
 // Handle the special cases.
@@ -8826,11 +8711,9 @@ static bool strimatch(const char *s1, const char *s2) {
 }
 
 #if !defined AE_NO_EXCEPTIONS
-//
-// This function filters out all spaces from the string.
-// It returns string allocated with ae_malloc().
-// On allocaction failure returns NULL.
-//
+// Filter out all of the spaces from the string s.
+// Return a string allocated with ae_malloc().
+// On allocation failure, return NULL.
 static char *filter_spaces(const char *s) {
    size_t i, n;
    char *r;
@@ -8848,10 +8731,8 @@ static char *filter_spaces(const char *s) {
 }
 
 static void str_vector_create(const char *src, bool match_head_only, std::vector < const char *>*p_vec) {
-//
-// parse beginning of the string.
-// try to handle "[]" string
-//
+// Parse the beginning of the string.
+// Try to handle "[]".
    p_vec->clear();
    if (*src != '[')
       ThrowError("Incorrect initializer for vector");
@@ -8878,14 +8759,10 @@ static void str_vector_create(const char *src, bool match_head_only, std::vector
 
 static void str_matrix_create(const char *src, std::vector < std::vector < const char *> >*p_mat) {
    p_mat->clear();
-//
-// Try to handle "[[]]" string
-//
+// Try to handle "[[]]".
    if (strcmp(src, "[[]]") == 0)
       return;
-//
-// Parse non-empty string
-//
+// Parse a non-empty string.
    if (*src != '[')
       ThrowError("Incorrect initializer for matrix");
    src++;
@@ -8912,9 +8789,9 @@ static void str_matrix_create(const char *src, std::vector < std::vector < const
 }
 
 static bool parse_bool_delim(const char *s, const char *delim) {
+// Try to parse "false", "true", or otherwise fail.
    const char *p;
    char buf[8];
-// try to parse false
    p = "false";
    memset(buf, 0, sizeof buf);
    strncpy(buf, s, strlen(p));
@@ -8923,7 +8800,6 @@ static bool parse_bool_delim(const char *s, const char *delim) {
          ThrowError("Cannot parse value");
       return false;
    }
-// try to parse true
    p = "true";
    memset(buf, 0, sizeof buf);
    strncpy(buf, s, strlen(p));
@@ -8932,7 +8808,6 @@ static bool parse_bool_delim(const char *s, const char *delim) {
          ThrowError("Cannot parse value");
       return true;
    }
-// error
    ThrowError("Cannot parse value");
 }
 
@@ -8941,12 +8816,7 @@ static ae_int_t parse_int_delim(const char *s, const char *delim) {
    long long_val;
    volatile ae_int_t ae_val;
    p = s;
-//
-// check string structure:
-// * leading sign
-// * at least one digit
-// * delimiter
-//
+// Check the string structure for a leading sign, at least one digit and a delimiter.
    if (*s == '-' || *s == '+')
       s++;
    if (*s == 0 || strchr("1234567890", *s) == NULL)
@@ -8955,7 +8825,7 @@ static ae_int_t parse_int_delim(const char *s, const char *delim) {
       s++;
    if (*s == 0 || strchr(delim, *s) == NULL)
       ThrowError("Cannot parse value");
-// convert and ensure that value fits into ae_int_t
+// Convert and ensure that the value fits into ae_int_t.
    s = p;
    long_val = atol(s);
    ae_val = long_val;
@@ -8972,9 +8842,7 @@ static bool _parse_real_delim(const char *s, const char *delim, double *result, 
    int isign;
    lconv *loc;
    p = s;
-//
-// check string structure and decide what to do
-//
+// Check the string structure and decide what to do.
    isign = 1;
    if (*s == '-' || *s == '+') {
       isign = *s == '-' ? -1 : +1;
@@ -8983,9 +8851,7 @@ static bool _parse_real_delim(const char *s, const char *delim, double *result, 
    memset(buf, 0, sizeof buf);
    strncpy(buf, s, 3);
    if (!strimatch(buf, "nan") && !strimatch(buf, "inf")) {
-   //
-   // [sign] [ddd] [.] [ddd] [e|E[sign]ddd]
-   //
+   // [Sign] [Digits] [.] [Digits] [e|E [Sign] Digits].
       has_digits = false;
       if (*s != 0 && strchr("1234567890", *s) != NULL) {
          has_digits = true;
@@ -9013,9 +8879,7 @@ static bool _parse_real_delim(const char *s, const char *delim, double *result, 
       if (*s == 0 || strchr(delim, *s) == NULL)
          return false;
       *new_s = s;
-   //
-   // finite value conversion
-   //
+   // Finite value conversion.
       if (*new_s - p >= (int)sizeof(buf))
          return false;
       strncpy(buf, p, (size_t)(*new_s - p));
@@ -9027,16 +8891,12 @@ static bool _parse_real_delim(const char *s, const char *delim, double *result, 
       *result = atof(buf);
       return true;
    } else {
-   //
-   // check delimiter and update *new_s
-   //
+   // Check the delimiter and update *new_s.
       s += 3;
       if (*s == 0 || strchr(delim, *s) == NULL)
          return false;
       *new_s = s;
-   //
-   // NAN, INF conversion
-   //
+   // NAN, INF conversion.
       if (strimatch(buf, "nan"))
          *result = NAN;
       if (strimatch(buf, "inf"))
@@ -9054,13 +8914,13 @@ static double parse_real_delim(const char *s, const char *delim) {
 }
 
 static complex parse_complex_delim(const char *s, const char *delim) {
+// Parse as a real value.
    double d_result;
    const char *new_s;
    complex c_result;
-// parse as real value
    if (_parse_real_delim(s, delim, &d_result, &new_s))
       return d_result;
-// parse as "a+bi" or "a-bi"
+// Parse as "x + yi" or "x - yi".
    if (_parse_real_delim(s, "+-", &c_result.x, &new_s)) {
       s = new_s;
       if (!_parse_real_delim(s, "i", &c_result.y, &new_s))
@@ -9070,7 +8930,7 @@ static complex parse_complex_delim(const char *s, const char *delim) {
          ThrowError("Cannot parse value");
       return c_result;
    }
-// parse as complex value "bi+a" or "bi-a"
+// Parse as a complex value "yi + x" or "yi - x".
    if (_parse_real_delim(s, "i", &c_result.y, &new_s)) {
       s = new_s + 1;
       if (*s == 0)
@@ -9086,7 +8946,7 @@ static complex parse_complex_delim(const char *s, const char *delim) {
       }
       ThrowError("Cannot parse value");
    }
-// error
+// Error.
    ThrowError("Cannot parse value");
 }
 
@@ -9233,6 +9093,7 @@ const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs)
    alglib_impl::ae_state_init();
    TryCatch(*this)
    alglib_impl::ae_assert(This != NULL, "ALGLIB: incorrect assignment (uninitialized destination)");
+// Assignment to proxy object.
    alglib_impl::ae_assert(rhs.This != NULL, "ALGLIB: incorrect assignment (uninitialized source)");
    alglib_impl::ae_assert(rhs.This->datatype == This->datatype, "ALGLIB: incorrect assignment to array (types do not match)");
    if (!owner)
@@ -9319,11 +9180,11 @@ bool &boolean_1d_array::operator[](ae_int_t i) {
 
 void boolean_1d_array::setcontent(ae_int_t iLen, const bool *pContent) {
    ae_int_t i;
-// setlength, with exception-free error handling fallback code
+// Handle possible exception-free errors.
    setlength(iLen);
    if (This == NULL || This->cnt != iLen)
       return;
-// copy
+// Copy.
    for (i = 0; i < iLen; i++)
       This->xB[i] = pContent[i];
 }
@@ -9381,11 +9242,11 @@ ae_int_t &integer_1d_array::operator[](ae_int_t i) {
 
 void integer_1d_array::setcontent(ae_int_t iLen, const ae_int_t *pContent) {
    ae_int_t i;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(iLen);
    if (This == NULL || This->cnt != iLen)
       return;
-// copy
+// Copy.
    for (i = 0; i < iLen; i++)
       This->xZ[i] = pContent[i];
 }
@@ -9443,11 +9304,11 @@ double &real_1d_array::operator[](ae_int_t i) {
 
 void real_1d_array::setcontent(ae_int_t iLen, const double *pContent) {
    ae_int_t i;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(iLen);
    if (This == NULL || This->cnt != iLen)
       return;
-// copy
+// Copy.
    for (i = 0; i < iLen; i++)
       This->xR[i] = pContent[i];
 }
@@ -9460,7 +9321,7 @@ double *real_1d_array::getcontent() {
    return This->xR;
 }
 
-// TODO: convert to constructor!!!!!!!
+// TODO: Convert to a constructor!
 void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
    alglib_impl::x_vector x;
    alglib_impl::ae_state_init();
@@ -9527,11 +9388,11 @@ complex &complex_1d_array::operator[](ae_int_t i) {
 
 void complex_1d_array::setcontent(ae_int_t iLen, const complex *pContent) {
    ae_int_t i;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(iLen);
    if (This == NULL || This->cnt != iLen)
       return;
-// copy
+// Copy.
    for (i = 0; i < iLen; i++)
       This->xC[i] = complex_from_c(pContent[i]);
 }
@@ -9591,7 +9452,7 @@ ae_matrix_wrapper::~ae_matrix_wrapper() {
       ae_matrix_free(This, false);
 }
 
-// TODO: automatic allocation of NULL pointer!!!!!
+// TODO: Automatic allocation of NULL pointer!
 void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -9630,6 +9491,7 @@ const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs)
    alglib_impl::ae_state_init();
    TryCatch(*this)
    alglib_impl::ae_assert(This != NULL, "ALGLIB: incorrect assignment to matrix (uninitialized destination)");
+// Assignment to proxy object.
    alglib_impl::ae_assert(rhs.This != NULL, "ALGLIB: incorrect assignment to array (uninitialized source)");
    alglib_impl::ae_assert(rhs.This->datatype == This->datatype, "ALGLIB: incorrect assignment to array (types dont match)");
    if (!owner) {
@@ -9732,11 +9594,11 @@ bool *boolean_2d_array::operator[](ae_int_t i) {
 
 void boolean_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const bool *pContent) {
    ae_int_t i, j;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(irows, icols);
    if (This == NULL || This->rows != irows || This->cols != icols)
       return;
-// copy
+// Copy.
    for (i = 0; i < irows; i++)
       for (j = 0; j < icols; j++)
          This->xyB[i][j] = pContent[i * icols + j];
@@ -9796,11 +9658,11 @@ ae_int_t *integer_2d_array::operator[](ae_int_t i) {
 
 void integer_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t *pContent) {
    ae_int_t i, j;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(irows, icols);
    if (This == NULL || This->rows != irows || This->cols != icols)
       return;
-// copy
+// Copy.
    for (i = 0; i < irows; i++)
       for (j = 0; j < icols; j++)
          This->xyZ[i][j] = pContent[i * icols + j];
@@ -9860,11 +9722,11 @@ double *real_2d_array::operator[](ae_int_t i) {
 
 void real_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const double *pContent) {
    ae_int_t i, j;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(irows, icols);
    if (This == NULL || This->rows != irows || This->cols != icols)
       return;
-// copy
+// Copy.
    for (i = 0; i < irows; i++)
       for (j = 0; j < icols; j++)
          This->xyR[i][j] = pContent[i * icols + j];
@@ -9947,11 +9809,11 @@ complex *complex_2d_array::operator[](ae_int_t i) {
 
 void complex_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const complex *pContent) {
    ae_int_t i, j;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(irows, icols);
    if (This == NULL || This->rows != irows || This->cols != icols)
       return;
-// copy
+// Copy.
    for (i = 0; i < irows; i++)
       for (j = 0; j < icols; j++)
          This->xyC[i][j] = complex_from_c(pContent[i * icols + j]);
@@ -9963,17 +9825,11 @@ const int CSV_DEFAULT = 0x0, CSV_SKIP_HEADERS = 0x1;
 // CSV function.
 void read_csv(const char *filename, char separator, int flags, real_2d_array &out) {
    int flag;
-//
-// Parameters
-//
+// Parameters.
    bool skip_first_row = (flags & CSV_SKIP_HEADERS) != 0;
-//
-// Prepare empty output array
-//
+// Prepare an empty output array.
    out.setlength(0, 0);
-//
-// Open file, determine size, read contents
-//
+// Open the file, determine its size and read its contents.
    FILE *f_in = fopen(filename, "rb");
    if (f_in == NULL)
       ThrowError("read_csv: unable to open input file");
@@ -9981,27 +9837,24 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
    AE_CRITICAL_ASSERT(flag == 0);
    long int _filesize = ftell(f_in);
    AE_CRITICAL_ASSERT(_filesize >= 0);
-   if (_filesize == 0) {
-   // empty file, return empty array, success
+   if (_filesize == 0) { // An empty file: return an empty array, success.
       fclose(f_in);
       return;
    }
    size_t filesize = _filesize;
    std::vector < char >v_buf;
    v_buf.resize(filesize + 2, 0);
-   char *p_buf = &v_buf[0];
+   char *p_buf = &v_buf[0]; //(@) This is NOT equivalent to char *p_buf = v_buf!
    flag = fseek(f_in, 0, SEEK_SET);
    AE_CRITICAL_ASSERT(flag == 0);
    size_t bytes_read = fread((void *)p_buf, 1, filesize, f_in);
    AE_CRITICAL_ASSERT(bytes_read == filesize);
    fclose(f_in);
-//
-// Normalize file contents:
-// * replace 0x0 by spaces
-// * remove trailing spaces and newlines
-// * append trailing '\n' and '\0' characters
-// Return if file contains only spaces/newlines.
-//
+// Normalize the file contents:
+// *	replace '\0' by ' ',
+// *	remove the trailing ' ' and '\n' characters,
+// *	append trailing '\n' and '\0' characters.
+// Return if the file contains only ' ' and '\n' characters.
    for (size_t i = 0; i < filesize; i++)
       if (p_buf[i] == 0)
          p_buf[i] = ' ';
@@ -10018,16 +9871,14 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
    p_buf[filesize + 0] = '\n';
    p_buf[filesize + 1] = '\0';
    filesize += 2;
-//
-// Scan dataset.
-//
+// Scan the dataset.
    size_t rows_count = 0, cols_count = 0, max_length = 0;
    std::vector < size_t >offsets, lengths;
    for (size_t row_start = 0; p_buf[row_start] != 0x0;) {
-   // determine row length
+   // The size of the row.
       size_t row_length;
       for (row_length = 0; p_buf[row_start + row_length] != '\n'; row_length++);
-   // determine cols count, perform integrity check
+   // Count the columns and perform an integrity check.
       size_t cur_cols_cnt = 1;
       for (size_t idx = 0; idx < row_length; idx++)
          if (p_buf[row_start + idx] == separator)
@@ -10035,7 +9886,7 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
       if (cols_count > 0 && cols_count != cur_cols_cnt)
          ThrowError("read_csv: non-rectangular contents, rows have different sizes");
       cols_count = cur_cols_cnt;
-   // store offsets and lengths of the fields
+   // Store the offsets and lengths of the fields.
       size_t cur_offs = 0;
       for (size_t idx = 0; idx < row_length + 1; idx++)
          if (p_buf[row_start + idx] == separator || p_buf[row_start + idx] == '\n') {
@@ -10044,7 +9895,7 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
             max_length = idx - cur_offs > max_length ? idx - cur_offs : max_length;
             cur_offs = idx + 1;
          }
-   // advance row start
+   // Advance row_start.
       rows_count++;
       row_start += row_length + 1;
    }
@@ -10052,11 +9903,10 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
    AE_CRITICAL_ASSERT(cols_count >= 1);
    AE_CRITICAL_ASSERT(cols_count * rows_count == offsets.size());
    AE_CRITICAL_ASSERT(cols_count * rows_count == lengths.size());
+// Return on empty output.
    if (rows_count == 1 && skip_first_row) // empty output, return
       return;
-//
-// Convert
-//
+// Convert.
    size_t row0 = skip_first_row ? 1 : 0;
    size_t row1 = rows_count;
    lconv *loc = localeconv();

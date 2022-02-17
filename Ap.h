@@ -208,7 +208,7 @@ struct complex { double x, y; };
 typedef enum { ERR_OK = 0, ERR_OUT_OF_MEMORY = 1, ERR_XARRAY_TOO_LARGE = 2, ERR_ASSERTION_FAILED = 3 } ae_error_type;
 typedef enum { DT_BOOL = 1, DT_BYTE = 1, DT_INT = 2, DT_REAL = 3, DT_COMPLEX = 4 } ae_datatype;
 
-// Allocation counters, inactive by default.
+// Allocation-tracking: inactive by default.
 // Turned on when needed for debugging purposes.
 // _alloc_counter is incremented by 1 on malloc(), decremented on free().
 // _alloc_counter_total is only incremented by 1.
@@ -240,7 +240,6 @@ struct ae_dyn_block {
 // since it aligns pointers in such a way that X usually points beyond the actual allocated memory's start.
    void *valgrind_hint; // It is always set to (ptr == NULL? NULL: aliged_extract_ptr(ptr)).
 };
-
 // Frame marker.
 typedef struct ae_dyn_block ae_frame;
 
@@ -253,7 +252,8 @@ void ae_frame_leave();
 void ae_state_init();
 void ae_state_clear();
 
-// The threading model type.
+
+// Get/set the threading model type.
 void ae_set_global_threading(ae_uint64_t flg_value);
 ae_uint64_t ae_get_global_threading();
 
@@ -263,7 +263,7 @@ extern const ae_cpuid_t CurCPU;
 ae_int_t ae_cores_count();
 ae_int_t ae_get_effective_workers(ae_int_t nworkers);
 
-// IDs for ae_[sg]et_dbg_value().
+// Id values for ae_[sg]et_dbg_value().
 typedef enum {
 // get set
    _ALGLIB_ALLOC_COUNTER = 0, _ALGLIB_TOTAL_ALLOC_SIZE = 1,
@@ -322,7 +322,7 @@ void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2);
 ae_int_t ae_sizeof(ae_datatype datatype);
 
 struct ae_vector {
-// The number of elements in the vector, cnt >= 0.
+// The number of elements in the vector; cnt >= 0.
    ae_int_t cnt;
 // Either DT_BOOL/DT_BYTE, DT_INT, DT_REAL or DT_COMPLEX.
    ae_datatype datatype;
@@ -359,6 +359,7 @@ struct ae_matrix {
 // True if and only if the ae_matrix was attached to an x_matrix by ae_matrix_init_attach_to_x().
    bool is_attached;
    ae_dyn_block data;
+// A generic pointer, raster pointer or pointer to the data with the matching datatype.
    union {
       void *xX;
       void **xyX;
@@ -378,6 +379,7 @@ void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2);
 #define SetMatrix(P)			ae_matrix_free(P, true)
 
 // Used for better documenting function parameters.
+// TODO: Remake ae_vector and ae_matrix as template types.
 typedef ae_vector BVector, ZVector, RVector, CVector;
 typedef ae_matrix BMatrix, ZMatrix, RMatrix, CMatrix;
 
@@ -406,7 +408,7 @@ void ae_smart_ptr_release(ae_smart_ptr *dst);
 enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION = 2, ACT_NEW_LOCATION = 3 };
 
 #if 0 //(@) Not used anywhere.
-// x-strings (zero-terminated): members are ae_int64_t to avoid alignment problems.
+// x-strings (zero-terminated): members are ae_int64_t aligned to avoid alignment problems.
 // Compiler-specific alignment definitions.
 #   if AE_COMPILER == AE_GNUC
 #      define ALIGNED __attribute__((aligned(8)))
@@ -423,15 +425,15 @@ struct x_string {
 // Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
 //	ACT_UNCHANGED:		unchanged,
 //	ACT_SAME_LOCATION:	stored at the same location, or
-//	ACT_NEW_LOCATION:	stored at the new location.
+//	ACT_NEW_LOCATION:	stored at a new location.
 // ACT_{UNCHANGED,SAME_LOCATION} mean no reallocation or copying is required.
    ALIGNED ae_int64_t last_action;	// enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION, ACT_NEW_LOCATION } last_action;
 // A pointer to the actual data.
-   ALIGNED char *ptr;
+   ALIGNED char *ptr;			// union { void *ptr; ae_int64_t portable_alignment_enforcer; };
 };
 #endif
 
-// x-vectors: members are ae_int64_t to avoid alignment problems.
+// x-vectors: members are ae_int64_t aligned to avoid alignment problems.
 struct x_vector {
 // The vector size; i.e., the number of elements.
    ae_int64_t cnt;		// ae_int_t cnt;
@@ -444,7 +446,7 @@ struct x_vector {
 // Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
 //	ACT_UNCHANGED:		unchanged,
 //	ACT_SAME_LOCATION:	stored at the same location, or
-//	ACT_NEW_LOCATION:	stored at the new location.
+//	ACT_NEW_LOCATION:	stored at a new location.
 // ACT_{UNCHANGED,SAME_LOCATION} mean no reallocation or copying is required.
    ae_int64_t last_action;	// enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION, ACT_NEW_LOCATION } last_action;
 // A pointer to the actual data - with enforced alignment.
@@ -459,12 +461,12 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src);
 void ae_x_attach_to_vector(x_vector *dst, ae_vector *src);
 void x_vector_free(x_vector *dst, bool make_automatic);
 
-// x-matrices: members are ae_int64_t to avoid alignment problems.
+// x-matrices: members are ae_int64_t aligned to avoid alignment problems.
 struct x_matrix {
 // The matrix size.
 // If either dimension is 0, then both must be.
    ae_int64_t cols, rows;	// ae_int_t cols, rows;
-// The stride, i.e. the byte-distsance between the first elements of adjacent matrix rows.
+// The stride, i.e. the byte-distance between the first elements of adjacent matrix rows.
    ae_int64_t stride;		// ae_int_t stride;
 // One of the DT_* values.
    ae_int64_t datatype;		// ae_datatype datatype;
@@ -475,10 +477,10 @@ struct x_matrix {
 // Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
 //	ACT_UNCHANGED:		unchanged,
 //	ACT_SAME_LOCATION:	stored at the same location, or
-//	ACT_NEW_LOCATION:	stored at the new location.
+//	ACT_NEW_LOCATION:	stored at a new location.
 // ACT_{UNCHANGED,SAME_LOCATION} mean no reallocation or copying is required.
    ae_int64_t last_action;	// enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION, ACT_NEW_LOCATION } last_action;
-// A pointer to the actual data, stored rowwise - with enforced alignment.
+// A pointer to the actual matrix data, stored rowwise - with enforced alignment.
    union {
       void *x_ptr;
       ae_int64_t portable_alignment_enforcer;
@@ -497,9 +499,9 @@ bool ae_force_hermitian(ae_matrix *a);
 // An OS-independent non-reentrant lock:
 // *	under Posix and Windows systems it uses the system-provided locks,
 // *	under Boost it uses the OS-independent lock provided by the Boost package,
-// *	when no OS is defined, it uses a "fake lock" (just a stub which is not thread-safe):
+// *	when no OS is defined, it uses a "fake lock" (just a stub, which is not thread-safe):
 //	a)	the "fake lock" can be in locked or free mode,
-//	b)	the "fake lock" can be used only from the thread created it,
+//	b)	the "fake lock" can be used only from the thread which created it,
 //	c)	when the thread acquires a free lock, it immediately returns,
 //	d)	when the thread acquires a busy lock, the program is terminated
 //		(because the lock is already acquired and no one else can free it).
@@ -507,11 +509,11 @@ struct ae_lock {
 // Pointer to _lock structure.
 // This pointer has type void * in order to make the header file OS-independent (the lock declaration depends on the OS).
    void *lock_ptr;
-// For is_static == false this field manages pointer to the _lock structure.
-// The frame that is is responsible for deallocation the lock's frame is freed.
+// For is_static == false this field manages the pointer to the _lock structure.
+// The frame that is responsible for deallocation when the lock's frame is freed.
    ae_frame db;
-// True if we have a static lock (used by thread pool) or transient lock.
-// Static locks are allocated without using the frame and cannot de deallocated.
+// True if we have a static lock (used by a thread pool) or transient lock.
+// Static locks are allocated without using the frame and cannot be deallocated.
    bool is_static;
 };
 void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic);
@@ -529,9 +531,8 @@ struct ae_shared_pool {
 // The seed object: used to create new instances of temporaries.
    void *volatile seed_object;
 // The list of recycled Objects:
-// *	entries in this list store pointers to recycled objects
+// *	entries in this list store pointers to recycled objects,
 // *	move from this list the first entry of each object retrieved to recycled_entries, and return the caller its obj field.
-// *	get an entry for each object recycled from this list before allocating any with malloc().
    ae_shared_pool_entry *volatile recycled_objects;
 // The list of recycled Entries:
 // *	entries which are not used to store recycled objects;
@@ -542,9 +543,9 @@ struct ae_shared_pool {
    ae_shared_pool_entry *volatile enumeration_counter;
 // The size of the object; used when we call malloc() for new objects.
    ae_int_t size_of_object;
-// The initializer function; accepts a pointer to malloc'ed object, initializes its fields.
+// The initializer function; accepts a pointer to the malloc'ed object, initializes its fields.
    void (*init)(void *dst, bool make_automatic);
-// The copy constructor; accepts a pointer to malloc'ed, but not not to the initialized object.
+// The copy constructor; accepts a pointer to the malloc'ed object, but not to the initialized object.
    void (*copy)(void *dst, void *src, bool make_automatic);
 // The destructor function.
    void (*free)(void *ptr, bool make_automatic);
@@ -642,11 +643,11 @@ void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *
 void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
 
 // Real math functions: IEEE-compliant floating point comparisons and standard functions.
-// * IEEE-compliant floating point comparisons
+// * IEEE-compliant floating point comparisons.
 bool isposinf(double x);
 bool isneginf(double x);
 
-// * standard functions
+// * Standard functions.
 ae_int_t imin2(ae_int_t m1, ae_int_t m2);
 ae_int_t imin3(ae_int_t i0, ae_int_t i1, ae_int_t i2);
 ae_int_t imax2(ae_int_t m1, ae_int_t m2);
@@ -675,9 +676,9 @@ double rboundval(double x, double b1, double b2);
 
 // Debug-enabled random number functions:
 // TODO:
-// ∙  ae_set_seed():          set the seed of the debug random number generator (NOT thread-safe!!!).
-// ∙  ae_get_seed():          the seed value of the debug random number generator (NOT thread-safe!!!).
-// ∙  ae_debugrng():          a random number generated with a high-quality random number generator.
+// *	ae_set_seed():	set the seed of the debug random number generator (NOT thread-safe!!!).
+// *	ae_get_seed():	the seed value of the debug random number generator (NOT thread-safe!!!).
+// *	ae_debugrng():	a random number generated with a high-quality random number generator.
 double randomreal();
 double randommid();
 ae_int_t randominteger(ae_int_t maxv);
@@ -947,7 +948,7 @@ void set_error_msg();
 // Get the error flag and (optionally) the error message (as *MsgP);
 // If the error flag is not set (or MsgP == NULL) *MsgP is not changed.
 bool get_error_flag(const char **MsgP = NULL);
-// Clear the error flag (it is not cleared until explicit call to this function).
+// Clear the error flag (it is not cleared until an explicit call to this function).
 void clear_error_flag();
 #endif
 #define TryX		jmp_buf BreakAt; if (!setjmp(BreakAt)) alglib_impl::ae_state_set_break_jump(&BreakAt); else
@@ -1016,8 +1017,8 @@ Type &Type::operator=(const Type &A) { \
 
 typedef alglib_impl::ae_int_t ae_int_t;
 
-// Constants and functions introduced for compatibility with AlgoPascal
 #if 0
+// Constants and functions introduced for compatibility with AlgoPascal.
 extern const double machineepsilon, maxrealnumber, minrealnumber;
 #endif
 
@@ -1173,8 +1174,8 @@ struct ae_vector_wrapper {
    ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::ae_datatype datatype);
 // The destructor.
    virtual ~ae_vector_wrapper();
-// If the vector was allocated with its own object, function changes length, completely dropping the previous contents.
-// It does not work (throws exception) for frozen proxy objects.
+// If the vector was allocated with its own object, this function changes length, completely dropping the previous contents.
+// It does not work (and throws an exception) for frozen proxy objects.
    void setlength(ae_int_t iLen);
 // The element count.
    ae_int_t length() const;
@@ -1190,15 +1191,15 @@ private:
 #endif
 protected:
 // Attach a wrapper object externally to the X-object new_ptr;
-// "frozen proxy" mode is activated (you can read/write, but can not reallocate and do not own memory of the vector).
+// "frozen proxy" mode is activated (you can read/write, but can not reallocate and do not own the vector's memory).
 // NOTES:
 // *	The wrapper object is assumed to start out already initialized; all previously allocated memory is properly deallocated.
-// *	The X-object pointed to by new_ptr is used only once;
-//	after we fetch pointer to memory and its size, this X-object is ignored and not referenced anymore.
+// *	The X-object at new_ptr is used only once;
+//	after we fetch the pointer to memory and its size, this X-object is ignored and not referenced anymore.
 //	So, you can pass pointers to temporary x-structures which are deallocated immediately after you call attach_to().
 // *	The state structure is used for error reporting purposes (longjmp on errors).
    void attach_to(alglib_impl::x_vector *new_ptr);
-// Assigns rhs to the current object and return *this.
+// Assign rhs to the current object and return *this.
 // It has several branches depending on the target object's status:
 // *	For proxy objects, copy the data to the proxy.
 //	Throw an exception if the source and target are not the same size.
@@ -1207,9 +1208,8 @@ protected:
 // *	This function correctly handles assignments of the object to itself.
    const ae_vector_wrapper &assign(const ae_vector_wrapper &rhs);
 #if !defined AE_NO_EXCEPTIONS
-// Copy the vector of the indicated datatype into the current object.
-// NOTE:
-// *	this function is not supported in exception-free mode.
+// Copy the vector of the indicated datatype from the string s into the current object.
+// The current object is considered empty (this function should be called from the copy constructor).
    ae_vector_wrapper(const char *s, alglib_impl::ae_datatype datatype);
 #endif
 // The indicated C-structure used by the C-core and the inner ae_vector:
@@ -1217,8 +1217,8 @@ protected:
 // *	This != &Obj:	someone else owns the ae_vector and is to handle its deallocation;
 //			while Obj is assumed to be uninitialized and is ignored.
    alglib_impl::ae_vector *This, Obj;
-// True if and only if the vector was not internally allocated and owned.
-// *	ae_vector's, directly owned or not, can be read or modified.
+// True if and only if the vector's object was internally allocated and is owned.
+// *	ae_vector's, directly owned or not, can be read and modified.
 // *	Only internally allocated and owned ae_vector's can be freed and resized.
 // *	If owner == false:
 //	―	This == &Obj:	the ae_vector contains the object, but it points to externally allocated memory.
@@ -1241,7 +1241,6 @@ struct boolean_1d_array: public ae_vector_wrapper {
    const bool &operator()(ae_int_t i) const; bool &operator()(ae_int_t i);
    const bool &operator[](ae_int_t i) const; bool &operator[](ae_int_t i);
 // Allocate an iLen-vector, giving it a completely independent copy of the data at pContent.
-// Completely independent copy of data is created.
    void setcontent(ae_int_t iLen, const bool *pContent);
 // A pointer to internal memory.
    const bool *getcontent() const; bool *getcontent();
@@ -1285,7 +1284,7 @@ struct real_1d_array: public ae_vector_wrapper {
 // *	No own memory is allocated, no data is copied.
 // *	The pContent pointer should be valid as long as we work with the vector.
 // After attaching the vector to external memory, it is "frozen":
-// it is possible to read/write array elements, but not to resize it (no setlength() calls).
+// it is possible to read/write the vector elements, but not to resize it (no setlength() calls).
    void attach_to_ptr(ae_int_t iLen, double *pContent);
 };
 
@@ -1303,23 +1302,25 @@ struct complex_1d_array: public ae_vector_wrapper {
    const complex &operator[](ae_int_t i) const; complex &operator[](ae_int_t i);
 // Allocate an iLen-vector, giving it a completely independent copy of the data at pContent.
    void setcontent(ae_int_t iLen, const complex *pContent);
+// A pointer to internal memory.
    const complex *getcontent() const; complex *getcontent();
 };
 
 struct ae_matrix_wrapper {
-// A new zero-sized matrix of the given datatype, with run-time type-checking.
+// A new zero-sized matrix of the given datatype.
    ae_matrix_wrapper(alglib_impl::ae_datatype datatype);
 // A new object externally attached to e_ptr, with run-time type-checking.
 // NOTE:
 // *	An exception is thrown if datatype != e_ptr->datatype.
    ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl::ae_datatype datatype);
-// A copy of rhs (rhs.datatype == datatype is required), with run-time type-checking.
+// A copy of the object rhs (can be a reference to one of the derived classes), with run-time type-checking.
 // NOTE:
 // *	An exception is thrown if datatype != rhs.datatype.
    ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::ae_datatype datatype);
 // The destructor.
    virtual ~ae_matrix_wrapper();
    void setlength(ae_int_t rows, ae_int_t cols);
+// The column and row count and stride.
    ae_int_t cols() const;
    ae_int_t rows() const;
    ae_int_t getstride() const;
@@ -1336,7 +1337,7 @@ private:
 #endif
 protected:
 // Attach a wrapper object externally to the X-object new_ptr;
-// "frozen proxy" mode is activated (you can read/write, but can not reallocate and do not own memory of the vector).
+// "frozen proxy" mode is activated (you can read/write, but can not reallocate and do not own the matrix's memory).
 // NOTES:
 // *	The wrapper object is assumed to start out already initialized; all previously allocated memory is properly deallocated.
 // *	The X-object at new_ptr is used only once;
@@ -1362,15 +1363,15 @@ protected:
    const ae_matrix_wrapper &assign(const ae_matrix_wrapper &rhs);
 #if !defined AE_NO_EXCEPTIONS
 // Copy the matrix of the indicated datatype from the string s into the current object.
-// The current object is considered empty (this function should be called from copy constructor).
+// The current object is considered empty (this function should be called from the copy constructor).
    ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype datatype);
 #endif
 // The internal C-structure used by the C-core and the inner ae_matrix.
 // *	This == &Obj:	the matrix owns the ae_matrix and is to handle its deallocation.
 // *	This != &Obj:	someone else owns the ae_matrix and is to handle its deallocation;
-//			while Obj is assumed to be uninitialized and is ignored.
+//			while Obj is assumed to be uninitialized and to be ignored.
    alglib_impl::ae_matrix *This, Obj;
-// True if and only if the matrix's object was not internally allocated and owned.
+// True if and only if the matrix's object was internally allocated and is owned.
 // *	ae_matrix's, directly owned or not, can be read and modified.
 // *	Only internally allocated and owned matrix objects can be freed and resized.
 // *	If owner == false:
@@ -1428,9 +1429,9 @@ struct real_2d_array: public ae_matrix_wrapper {
 // A new irows x icols matrix filled with a completely independent copy of the data at pContent.
    void setcontent(ae_int_t irows, ae_int_t icols, const double *pContent);
 // Attach an array to the matrix at pContent.
-// *    Very little own memory is allocated - O(irows) bytes for the precomputed pointers;
-//      rather than the O(icols irows) copying of data.
-// *    The pContent pointer should be valid as long as we work with the matrix.
+// *	Very little own memory is allocated - O(irows) bytes for the precomputed pointers;
+//	rather than the O(icols irows) copying of data.
+// *	The pContent pointer should be valid as long as we work with the matrix.
 // After attaching the matrix to external memory, it is "frozen":
 // it is possible to read/write the matrix elements, but not to resize it (no setlength() calls).
    void attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pContent);
