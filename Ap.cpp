@@ -179,6 +179,37 @@ void ae_state_clear() {
    TopFr = NULL;
 }
 
+// Clean up automatically managed memory before the caller terminates ALGLIB++.
+// For TopFr != NULL call ErrorOp(), if defined.
+// For TopFr == NULL do nothing.
+void ae_clean_up() {
+   if (TopFr != NULL && ErrorOp != NULL) ErrorOp(TopFr);
+}
+
+// Abnormally abort the program, using one of several ways:
+// *	if TopFr != NULL and CurBreakAt points to a jmp_buf - longjmp() to the return site,
+// *	else abort().
+// In all cases, for TopFr != NULL, set the CurStatus and CurMsg fields.
+// Clear the frame stack, if any, with ae_state_clear().
+// If TopFr != NULL and ErrorOp() != NULL, call ErrorOp() before handling errors and clearing TopFr.
+static void ae_break(ae_error_type error_type, const char *msg) {
+   if (TopFr == NULL) abort();
+   if (ErrorOp != NULL) ErrorOp(TopFr);
+   ae_state_clear();
+   CurStatus = error_type, CurMsg = msg;
+   if (CurBreakAt != NULL) longjmp(*CurBreakAt, 1); else abort();
+}
+
+// Assertion.
+// Upon failure with TopFr != NULL, gracefully exit ALGLIB++, removing all frames and deallocating registered dynamic data structures.
+// Otherwise, just abort().
+// IMPORTANT:
+// *	This function ALWAYS evaluates cond, and cannot be replaced by macros which do nothing.
+//	In particular, when invoked, a function call may be used as the cond argument, and it will be carried out.
+void ae_assert(bool cond, const char *msg) {
+   if (!cond) ae_break(ERR_ASSERTION_FAILED, msg);
+}
+
 #define AE_CRITICAL_ASSERT(x) if (!(x)) abort()
 
 // Make flags variables into one or more char-sized variables in order to avoid problems with non-atomic reads/writes
@@ -406,37 +437,6 @@ void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val) {
       case _ALGLIB_GLOBAL_THREADING: ae_set_global_threading((ae_uint64_t)flag_val); break;
       case _ALGLIB_NWORKERS: _alglib_cores_to_use = (ae_int_t)flag_val; break;
    }
-}
-
-// Clean up automatically managed memory before the caller terminates ALGLIB++.
-// For TopFr != NULL call ErrorOp(), if defined.
-// For TopFr == NULL do nothing.
-void ae_clean_up() {
-   if (TopFr != NULL && ErrorOp != NULL) ErrorOp(TopFr);
-}
-
-// Abnormally abort the program, using one of several ways:
-// *	if TopFr != NULL and CurBreakAt points to a jmp_buf - longjmp() to the return site,
-// *	else abort().
-// In all cases, for TopFr != NULL, set the CurStatus and CurMsg fields.
-// Clear the frame stack, if any, with ae_state_clear().
-// If TopFr != NULL and ErrorOp() != NULL, call ErrorOp() before handling errors and clearing TopFr.
-static void ae_break(ae_error_type error_type, const char *msg) {
-   if (TopFr == NULL) abort();
-   if (ErrorOp != NULL) ErrorOp(TopFr);
-   ae_state_clear();
-   CurStatus = error_type, CurMsg = msg;
-   if (CurBreakAt != NULL) longjmp(*CurBreakAt, 1); else abort();
-}
-
-// Assertion.
-// Upon failure with TopFr != NULL, gracefully exit ALGLIB++, removing all frames and deallocating registered dynamic data structures.
-// Otherwise, just abort().
-// IMPORTANT:
-// *	This function ALWAYS evaluates cond, and cannot be replaced by macros which do nothing.
-//	In particular, when invoked, a function call may be used as the cond argument, and it will be carried out.
-void ae_assert(bool cond, const char *msg) {
-   if (!cond) ae_break(ERR_ASSERTION_FAILED, msg);
 }
 
 // A wrapper around OS-dependent clock routines.
@@ -793,7 +793,7 @@ void ae_db_realloc(ae_dyn_block *block, ae_int_t size) {
 //(@) TopFr != NULL check removed.
 // NOTE:
 // *	These strange dances around block->ptr are necessary in order to correctly handle possible exceptions during memory allocation.
-   ae_assert(size >= 0, "ae_db_realloc(): negative size");
+   ae_assert(size >= 0, "ae_db_realloc: negative size");
    if (block->ptr != NULL) block->deallocator(block->ptr), block->ptr = NULL, block->valgrind_hint = NULL;
    block->ptr = ae_malloc((size_t)size);
    block->valgrind_hint = aligned_extract_ptr(block->ptr);
@@ -876,7 +876,7 @@ void ae_vector_copy(ae_vector *dst, ae_vector *src, bool make_automatic) {
 // Upon allocation failure with TopFr != NULL, call ae_break(), otherwise return an indication of success or failure.
 void ae_vector_set_length(ae_vector *dst, ae_int_t newsize) {
 //(@) TopFr != NULL check removed.
-   ae_assert(newsize >= 0, "ae_vector_set_length(): negative size");
+   ae_assert(newsize >= 0, "ae_vector_set_length: negative size");
    if (dst->cnt == newsize) return;
 // Reallocate, preparing first for possible errors.
    dst->cnt = 0;
@@ -1134,8 +1134,8 @@ void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, bool make_automat
 //(@) TopFr != NULL check and zero-check removed.
    volatile ae_int_t cnt = (ae_int_t)src->cnt;
 // Ensure the correct size.
-   ae_assert(cnt == src->cnt, "ae_vector_init_attach_to_x(): 32/64 overflow");
-   ae_assert(cnt >= 0, "ae_vector_init_attach_to_x(): negative length");
+   ae_assert(cnt == src->cnt, "ae_vector_init_attach_to_x: 32/64 overflow");
+   ae_assert(cnt >= 0, "ae_vector_init_attach_to_x: negative length");
 // Prepare for possible errors during allocation.
    dst->cnt = 0;
    dst->xX = NULL;
@@ -1178,7 +1178,7 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src) {
       if (dst->last_action == ACT_UNCHANGED) dst->last_action = ACT_SAME_LOCATION;
       else if (dst->last_action == ACT_SAME_LOCATION) dst->last_action = ACT_SAME_LOCATION;
       else if (dst->last_action == ACT_NEW_LOCATION) dst->last_action = ACT_NEW_LOCATION;
-      else ae_assert(false, "ae_x_set_vector: internal error in ae_x_set_vector()");
+      else ae_assert(false, "ae_x_set_vector: internal error");
    }
    if (src->cnt != 0) memmove(dst->x_ptr, src->xX, (size_t)(src->cnt * ae_sizeof(src->datatype)));
 }
@@ -1237,11 +1237,11 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, bool make_automat
    ae_int_t cols = (ae_int_t)src->cols;
    ae_int_t rows = (ae_int_t)src->rows;
 // Check that the X-source is densely packed.
-   ae_assert(src->cols == src->stride, "ae_matrix_init_attach_to_x(): unsupported stride");
+   ae_assert(src->cols == src->stride, "ae_matrix_init_attach_to_x: unsupported stride");
 // Ensure the correct size.
-   ae_assert(cols == src->cols, "ae_matrix_init_attach_to_x(): 32/64 overflow");
-   ae_assert(rows == src->rows, "ae_matrix_init_attach_to_x(): 32/64 overflow");
-   ae_assert(cols >= 0 && rows >= 0, "ae_matrix_init_attach_to_x(): negative length");
+   ae_assert(cols == src->cols, "ae_matrix_init_attach_to_x: 32/64 overflow");
+   ae_assert(rows == src->rows, "ae_matrix_init_attach_to_x: 32/64 overflow");
+   ae_assert(cols >= 0 && rows >= 0, "ae_matrix_init_attach_to_x: negative length");
 // If either cols or rows is 0, then they both must be made so.
    if (cols == 0) rows = 0; else if (rows == 0) cols = 0;
 // Initialize.
@@ -1295,7 +1295,7 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
       if (dst->last_action == ACT_UNCHANGED) dst->last_action = ACT_SAME_LOCATION;
       else if (dst->last_action == ACT_SAME_LOCATION) dst->last_action = ACT_SAME_LOCATION;
       else if (dst->last_action == ACT_NEW_LOCATION) dst->last_action = ACT_NEW_LOCATION;
-      else ae_assert(false, "ae_x_set_matrix: internal error in ae_x_set_vector()");
+      else ae_assert(false, "ae_x_set_matrix: internal error");
    }
    if (src->cols != 0 && src->rows != 0) {
       char *p_src_row = (char *)(src->xyX[0]);
@@ -2443,7 +2443,7 @@ bool ae_serializer_unserialize_bool(ae_serializer *serializer) {
       case AE_SM_FROM_STREAM: {
          char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
          const char *p = buf;
-         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "serializer: error reading from stream");
+         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_bool: error reading from stream");
          return ae_str2bool(buf, &p);
       }
       break;
@@ -2489,7 +2489,7 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, bool v) {
          serializer->out_str += bytes_appended;
       break;
       case AE_SM_TO_STREAM:
-         ae_assert(serializer->stream_writer(buf, serializer->stream_aux), "serializer: error writing to stream");
+         ae_assert(serializer->stream_writer(buf, serializer->stream_aux), "ae_serializer_serialize_bool: error writing to stream");
       break;
       default: ae_break(ERR_ASSERTION_FAILED, emsg);
    }
@@ -2552,7 +2552,7 @@ ae_int_t ae_serializer_unserialize_int(ae_serializer *serializer) {
       case AE_SM_FROM_STREAM: {
          char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
          const char *p = buf;
-         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "serializer: error reading from stream");
+         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_int: error reading from stream");
          return ae_str2int(buf, &p);
       }
       break;
@@ -2628,7 +2628,7 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v) {
          serializer->out_str += bytes_appended;
       break;
       case AE_SM_TO_STREAM:
-         ae_assert(serializer->stream_writer(buf, serializer->stream_aux), "serializer: error writing to stream");
+         ae_assert(serializer->stream_writer(buf, serializer->stream_aux), "ae_serializer_serialize_int: error writing to stream");
       break;
       default: ae_break(ERR_ASSERTION_FAILED, emsg);
    }
@@ -2690,7 +2690,7 @@ ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer) {
       case AE_SM_FROM_STREAM: {
          char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
          const char *p = buf;
-         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "serializer: error reading from stream");
+         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_int64: error reading from stream");
          return ae_str2int64(buf, &p);
       }
       break;
@@ -2760,7 +2760,7 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v) {
          serializer->out_str += bytes_appended;
       break;
       case AE_SM_TO_STREAM:
-         ae_assert(serializer->stream_writer(buf, serializer->stream_aux), "serializer: error writing to stream");
+         ae_assert(serializer->stream_writer(buf, serializer->stream_aux), "ae_serializer_serialize_int64: error writing to stream");
       break;
       default: ae_break(ERR_ASSERTION_FAILED, emsg);
    }
@@ -2843,7 +2843,7 @@ double ae_serializer_unserialize_double(ae_serializer *serializer) {
       case AE_SM_FROM_STREAM: {
          char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
          const char *p = buf;
-         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "serializer: error reading from stream");
+         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_double: error reading from stream");
          return ae_str2double(buf, &p);
       }
       break;
@@ -2926,7 +2926,7 @@ void ae_serializer_serialize_double(ae_serializer *serializer, double v) {
          serializer->out_str += bytes_appended;
       break;
       case AE_SM_TO_STREAM:
-         ae_assert(serializer->stream_writer(buf, serializer->stream_aux), "serializer: error writing to stream");
+         ae_assert(serializer->stream_writer(buf, serializer->stream_aux), "ae_serializer_serialize_double: error writing to stream");
       break;
       default: ae_break(ERR_ASSERTION_FAILED, emsg);
    }
@@ -2936,21 +2936,21 @@ void ae_serializer_stop(ae_serializer *serializer) {
    switch (serializer->mode) {
 #ifdef AE_USE_CPP_SERIALIZATION
       case AE_SM_TO_CPPSTRING:
-         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
+         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer_stop: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
          serializer->bytes_written++;
          *serializer->out_cppstr += ".";
       break;
 #endif
       case AE_SM_TO_STRING:
-         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
+         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer_stop: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
          serializer->bytes_written++;
          strcat(serializer->out_str, ".");
          serializer->out_str += 1;
       break;
       case AE_SM_TO_STREAM:
-         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
+         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer_stop: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
          serializer->bytes_written++;
-         ae_assert(serializer->stream_writer(".", serializer->stream_aux), "ae_serializer: error writing to stream");
+         ae_assert(serializer->stream_writer(".", serializer->stream_aux), "ae_serializer_stop: error writing to stream");
       break;
    // For compatibility with the pre-3.11 serializer, which does not require a trailing '.', we do not test for a trailing '.'.
    // Anyway, because the string is not a stream, we do not have to read ALL trailing symbols.
@@ -2959,8 +2959,8 @@ void ae_serializer_stop(ae_serializer *serializer) {
       case AE_SM_FROM_STREAM: {
       // Read a trailing '.', perform an integrity check.
          char buf[2];
-         ae_assert(serializer->stream_reader(serializer->stream_aux, 1, buf), "ae_serializer: error reading from stream");
-         ae_assert(buf[0] == '.', "ae_serializer: trailing . is not found in the stream");
+         ae_assert(serializer->stream_reader(serializer->stream_aux, 1, buf), "ae_serializer_stop: error reading from stream");
+         ae_assert(buf[0] == '.', "ae_serializer_stop: trailing . is not found in the stream");
       }
       break;
       default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer: integrity check failed");
@@ -7863,7 +7863,7 @@ std::string complex::tostring(int _dps) const {
    char buf_zero[32];
    int dps = _dps >= 0 ? _dps : -_dps;
    if (dps <= 0 || dps >= 20)
-      ThrowError("complex::tostring(): incorrect dps");
+      ThrowError("complex::tostring: incorrect dps");
 // Handle IEEE special quantities.
    if (isnan(x) || isnan(y))
       return "NAN";
@@ -7871,14 +7871,14 @@ std::string complex::tostring(int _dps) const {
       return "INF";
 // Generate the mask.
    if (sprintf(mask, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof(mask))
-      ThrowError("complex::tostring(): buffer overflow");
+      ThrowError("complex::tostring: buffer overflow");
 // Print |x|, |y| and zero with the same mask and compare.
    if (sprintf(buf_x, mask, fabs(x)) >= (int)sizeof(buf_x))
-      ThrowError("complex::tostring(): buffer overflow");
+      ThrowError("complex::tostring: buffer overflow");
    if (sprintf(buf_y, mask, fabs(y)) >= (int)sizeof(buf_y))
-      ThrowError("complex::tostring(): buffer overflow");
+      ThrowError("complex::tostring: buffer overflow");
    if (sprintf(buf_zero, mask, 0.0) >= (int)sizeof(buf_zero))
-      ThrowError("complex::tostring(): buffer overflow");
+      ThrowError("complex::tostring: buffer overflow");
 // Different zero/non-zero patterns.
    if (strcmp(buf_x, buf_zero) != 0 && strcmp(buf_y, buf_zero) != 0)
       return std::string(x > 0 ? "" : "-") + buf_x + (y > 0 ? "+" : "-") + buf_y + "i";
@@ -8970,7 +8970,7 @@ std::string arraytostring(const ae_int_t *ptr, ae_int_t n) {
    result = "[";
    for (i = 0; i < n; i++) {
       if (sprintf(buf, i == 0 ? "%ld" : ",%ld", long (ptr[i])) >= (int)sizeof(buf))
-         ThrowError("arraytostring(): buffer overflow");
+         ThrowError("arraytostring: buffer overflow");
       result += buf;
    }
    result += "]";
@@ -8987,14 +8987,14 @@ std::string arraytostring(const double *ptr, ae_int_t n, int _dps) {
    dps = dps <= 50 ? dps : 50;
    result = "[";
    if (sprintf(mask1, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof(mask1))
-      ThrowError("arraytostring(): buffer overflow");
+      ThrowError("arraytostring: buffer overflow");
    if (sprintf(mask2, ",%s", mask1) >= (int)sizeof(mask2))
-      ThrowError("arraytostring(): buffer overflow");
+      ThrowError("arraytostring: buffer overflow");
    for (i = 0; i < n; i++) {
       buf[0] = 0;
       if (isfinite(ptr[i])) {
          if (sprintf(buf, i == 0 ? mask1 : mask2, double(ptr[i])) >= (int)sizeof(buf))
-            ThrowError("arraytostring(): buffer overflow");
+            ThrowError("arraytostring: buffer overflow");
       } else if (isnan(ptr[i]))
          strcpy(buf, i == 0 ? "NAN" : ",NAN");
       else if (isposinf(ptr[i]))
@@ -9057,9 +9057,10 @@ ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::
       owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
-   alglib_impl::ae_assert(rhs.This != NULL, "ALGLIB: ae_vector_wrapper source is not initialized");
-   alglib_impl::ae_assert(rhs.This->datatype == datatype, "ALGLIB: ae_vector_wrapper datatype check failed");
-   owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_copy(This, rhs.This, false);
+   if (rhs.This != NULL)
+      alglib_impl::ae_assert(rhs.This->datatype == datatype, "ae_vector_wrapper::ae_vector_wrapper: datatype check failed");
+   owner = true, This = &Obj, memset(This, 0, sizeof *This);
+   rhs.This == NULL ? ae_vector_init(This, 0, datatype, false) : ae_vector_copy(This, rhs.This, false);
    alglib_impl::ae_state_clear();
 }
 
@@ -9071,8 +9072,8 @@ ae_vector_wrapper::~ae_vector_wrapper() {
 void ae_vector_wrapper::setlength(ae_int_t iLen) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(This != NULL, "ALGLIB: setlength() error, This == NULL (array was not correctly initialized)");
-   alglib_impl::ae_assert(owner, "ALGLIB: setlength() error, This is frozen proxy array");
+   alglib_impl::ae_assert(This != NULL, "ae_vector_wrapper::setlength: This == NULL (array was not correctly initialized)");
+   alglib_impl::ae_assert(owner, "ae_vector_wrapper::setlength: This is frozen proxy array");
    alglib_impl::ae_vector_set_length(This, iLen);
    alglib_impl::ae_state_clear();
 }
@@ -9092,12 +9093,12 @@ const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs)
       return *this;
    alglib_impl::ae_state_init();
    TryCatch(*this)
-   alglib_impl::ae_assert(This != NULL, "ALGLIB: incorrect assignment (uninitialized destination)");
+   alglib_impl::ae_assert(This != NULL, "ae_vector_wrapper::assign: incorrect assignment (uninitialized destination)");
 // Assignment to proxy object.
-   alglib_impl::ae_assert(rhs.This != NULL, "ALGLIB: incorrect assignment (uninitialized source)");
-   alglib_impl::ae_assert(rhs.This->datatype == This->datatype, "ALGLIB: incorrect assignment to array (types do not match)");
+   alglib_impl::ae_assert(rhs.This != NULL, "ae_vector_wrapper::assign: incorrect assignment (uninitialized source)");
+   alglib_impl::ae_assert(rhs.This->datatype == This->datatype, "ae_vector_wrapper::assign: incorrect assignment to array (types do not match)");
    if (!owner)
-      alglib_impl::ae_assert(rhs.This->cnt == This->cnt, "ALGLIB: incorrect assignment to proxy array (sizes do not match)");
+      alglib_impl::ae_assert(rhs.This->cnt == This->cnt, "ae_vector_wrapper::assign: incorrect assignment to proxy array (sizes do not match)");
    if (rhs.This->cnt != This->cnt)
       ae_vector_set_length(This, rhs.This->cnt);
    memcpy(This->xX, rhs.This->xX, This->cnt * alglib_impl::ae_sizeof(This->datatype));
@@ -9111,7 +9112,7 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
    size_t i;
    char *p = filter_spaces(s);
    if (p == NULL)
-      ThrowError("ALGLIB: allocation error");
+      ThrowError("ae_vector_wrapper::ae_vector_wrapper: allocation error");
    try {
       str_vector_create(p, true, &svec);
       {
@@ -9332,8 +9333,8 @@ void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
       owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
-   alglib_impl::ae_assert(owner, "ALGLIB: unable to attach proxy object to something else");
-   alglib_impl::ae_assert(iLen > 0, "ALGLIB: non-positive length for attach_to_ptr()");
+   alglib_impl::ae_assert(owner, "real_1d_array::attach_to_ptr: unable to attach proxy object to something else");
+   alglib_impl::ae_assert(iLen > 0, "real_1d_array::attach_to_ptr: non-positive length");
    x.cnt = iLen;
    x.datatype = alglib_impl::DT_REAL;
    x.owner = false;
@@ -9439,11 +9440,9 @@ ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::
       owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
-   owner = true, This = NULL;
-   alglib_impl::ae_assert(rhs.This->datatype == datatype, "ALGLIB: ae_matrix_wrapper datatype check failed");
-   if (rhs.This != NULL) {
-      This = &Obj, memset(This, 0, sizeof *This), ae_matrix_copy(This, rhs.This, false);
-   }
+   alglib_impl::ae_assert(rhs.This->datatype == datatype, "ae_matrix_wrapper::ae_matrix_wrapper: datatype check failed");
+   owner = true, This = &Obj, memset(This, 0, sizeof *This);
+   rhs.This == NULL ? ae_matrix_init(This, 0, 0, datatype, false) : ae_matrix_copy(This, rhs.This, false);
    alglib_impl::ae_state_clear();
 }
 
@@ -9456,8 +9455,8 @@ ae_matrix_wrapper::~ae_matrix_wrapper() {
 void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(This != NULL, "ALGLIB: setlength() error, p_mat == NULL (array was not correctly initialized)");
-   alglib_impl::ae_assert(owner, "ALGLIB: setlength() error, attempt to resize proxy array");
+   alglib_impl::ae_assert(This != NULL, "ae_matrix_wrapper::setlength: p_mat == NULL (array was not correctly initialized)");
+   alglib_impl::ae_assert(owner, "ae_matrix_wrapper::setlength: attempt to resize proxy array");
    alglib_impl::ae_matrix_set_length(This, rows, cols);
    alglib_impl::ae_state_clear();
 }
@@ -9490,13 +9489,13 @@ const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs)
       return *this;
    alglib_impl::ae_state_init();
    TryCatch(*this)
-   alglib_impl::ae_assert(This != NULL, "ALGLIB: incorrect assignment to matrix (uninitialized destination)");
+   alglib_impl::ae_assert(This != NULL, "ae_matrix_wrapper::assign: incorrect assignment to matrix (uninitialized destination)");
 // Assignment to proxy object.
-   alglib_impl::ae_assert(rhs.This != NULL, "ALGLIB: incorrect assignment to array (uninitialized source)");
-   alglib_impl::ae_assert(rhs.This->datatype == This->datatype, "ALGLIB: incorrect assignment to array (types dont match)");
+   alglib_impl::ae_assert(rhs.This != NULL, "ae_matrix_wrapper::assign: incorrect assignment to array (uninitialized source)");
+   alglib_impl::ae_assert(rhs.This->datatype == This->datatype, "ae_matrix_wrapper::assign: incorrect assignment to array (types dont match)");
    if (!owner) {
-      alglib_impl::ae_assert(rhs.This->rows == This->rows, "ALGLIB: incorrect assignment to proxy array (sizes dont match)");
-      alglib_impl::ae_assert(rhs.This->cols == This->cols, "ALGLIB: incorrect assignment to proxy array (sizes dont match)");
+      alglib_impl::ae_assert(rhs.This->cols == This->cols, "ae_matrix_wrapper::assign: incorrect assignment to proxy array (sizes dont match)");
+      alglib_impl::ae_assert(rhs.This->rows == This->rows, "ae_matrix_wrapper::assign: incorrect assignment to proxy array (sizes dont match)");
    }
    if ((rhs.This->rows != This->rows) || (rhs.This->cols != This->cols))
       ae_matrix_set_length(This, rhs.This->rows, rhs.This->cols);
@@ -9512,7 +9511,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
    size_t i, j;
    char *p = filter_spaces(s);
    if (p == NULL)
-      ThrowError("ALGLIB: allocation error");
+      ThrowError("ae_matrix_wrapper::ae_matrix_wrapper: allocation error");
    try {
       str_matrix_create(p, &smat);
       {
@@ -9742,8 +9741,8 @@ void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pConte
       owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
-   alglib_impl::ae_assert(owner, "ALGLIB: unable to attach proxy object to something else");
-   alglib_impl::ae_assert(irows > 0 && icols > 0, "ALGLIB: non-positive length for attach_to_ptr()");
+   alglib_impl::ae_assert(owner, "real_2d_array::attach_to_ptr: unable to attach proxy object to something else");
+   alglib_impl::ae_assert(icols > 0 && irows > 0, "real_2d_array::attach_to_ptr: non-positive length");
    x.rows = irows;
    x.cols = icols;
    x.stride = icols;

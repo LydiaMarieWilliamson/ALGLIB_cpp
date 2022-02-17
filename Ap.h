@@ -252,6 +252,8 @@ void ae_frame_leave();
 void ae_state_init();
 void ae_state_clear();
 
+void ae_clean_up();
+void ae_assert(bool cond, const char *msg);
 
 // Get/set the threading model type.
 void ae_set_global_threading(ae_uint64_t flg_value);
@@ -295,9 +297,6 @@ typedef enum {
 } debug_flag_t;
 ae_int64_t ae_get_dbg_value(debug_flag_t id);
 void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val);
-
-void ae_clean_up();
-void ae_assert(bool cond, const char *msg);
 
 int tickcount();
 
