@@ -9823,16 +9823,14 @@ const int CSV_DEFAULT = 0x0, CSV_SKIP_HEADERS = 0x1;
 
 // CSV function.
 void read_csv(const char *filename, char separator, int flags, real_2d_array &out) {
-   int flag;
 // Parameters.
    bool skip_first_row = (flags & CSV_SKIP_HEADERS) != 0;
 // Prepare an empty output array.
    out.setlength(0, 0);
 // Open the file, determine its size and read its contents.
    FILE *f_in = fopen(filename, "rb");
-   if (f_in == NULL)
-      ThrowError("read_csv: unable to open input file");
-   flag = fseek(f_in, 0, SEEK_END);
+   if (f_in == NULL) ThrowError("read_csv: unable to open input file");
+   int flag = fseek(f_in, 0, SEEK_END);
    AE_CRITICAL_ASSERT(flag == 0);
    long int _filesize = ftell(f_in);
    AE_CRITICAL_ASSERT(_filesize >= 0);
@@ -9841,7 +9839,7 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
       return;
    }
    size_t filesize = _filesize;
-   std::vector < char >v_buf;
+   std::vector<char> v_buf;
    v_buf.resize(filesize + 2, 0);
    char *p_buf = &v_buf[0]; //(@) This is NOT equivalent to char *p_buf = v_buf!
    flag = fseek(f_in, 0, SEEK_SET);
@@ -9854,29 +9852,21 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
 // *	remove the trailing ' ' and '\n' characters,
 // *	append trailing '\n' and '\0' characters.
 // Return if the file contains only ' ' and '\n' characters.
-   for (size_t i = 0; i < filesize; i++)
-      if (p_buf[i] == 0)
-         p_buf[i] = ' ';
-   for (; filesize > 0;) {
+   for (size_t i = 0; i < filesize; i++) if (p_buf[i] == 0) p_buf[i] = ' ';
+   for (; filesize > 0; filesize--) {
       char c = p_buf[filesize - 1];
-      if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
-         filesize--;
-         continue;
-      }
-      break;
+      if (c != ' ' && c != '\t' && c != '\n' && c != '\r') break;
    }
-   if (filesize == 0)
-      return;
-   p_buf[filesize + 0] = '\n';
-   p_buf[filesize + 1] = '\0';
-   filesize += 2;
+   if (filesize == 0) return;
+   p_buf[filesize++] = '\n';
+   p_buf[filesize++] = '\0';
 // Scan the dataset.
-   size_t rows_count = 0, cols_count = 0, max_length = 0;
-   std::vector < size_t >offsets, lengths;
-   for (size_t row_start = 0; p_buf[row_start] != 0x0;) {
+   size_t cols_count = 0, rows_count = 0, max_length = 0;
+   std::vector<size_t> offsets, lengths;
+   for (size_t row_start = 0; p_buf[row_start] != 0x0; rows_count++) {
    // The size of the row.
-      size_t row_length;
-      for (row_length = 0; p_buf[row_start + row_length] != '\n'; row_length++);
+      size_t row_length = 0;
+      for (; p_buf[row_start + row_length] != '\n'; row_length++);
    // Count the columns and perform an integrity check.
       size_t cur_cols_cnt = 1;
       for (size_t idx = 0; idx < row_length; idx++)
@@ -9895,7 +9885,6 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
             cur_offs = idx + 1;
          }
    // Advance row_start.
-      rows_count++;
       row_start += row_length + 1;
    }
    AE_CRITICAL_ASSERT(rows_count >= 1);
@@ -9903,8 +9892,7 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
    AE_CRITICAL_ASSERT(cols_count * rows_count == offsets.size());
    AE_CRITICAL_ASSERT(cols_count * rows_count == lengths.size());
 // Return on empty output.
-   if (rows_count == 1 && skip_first_row) // empty output, return
-      return;
+   if (rows_count == 1 && skip_first_row) return;
 // Convert.
    size_t row0 = skip_first_row ? 1 : 0;
    size_t row1 = rows_count;
