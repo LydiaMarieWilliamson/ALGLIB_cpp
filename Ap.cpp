@@ -8715,88 +8715,68 @@ static bool strimatch(const char *s1, const char *s2) {
 // Return a string allocated with ae_malloc().
 // On allocation failure, return NULL.
 static char *filter_spaces(const char *s) {
-   size_t i, n;
-   char *r;
-   char *r0;
-   n = strlen(s);
-   r = (char *)alglib_impl::ae_malloc(n + 1);
-   if (r == NULL)
-      return r;
-   for (i = 0, r0 = r; i <= n; i++, s++)
-      if (!isspace(*s)) {
-         *r0 = *s;
-         r0++;
-      }
+   size_t n = strlen(s);
+   char *r = (char *)alglib_impl::ae_malloc(n + 1);
+   if (r == NULL) return r;
+   char *r0 = r;
+   for (size_t i = 0; i <= n; i++, s++)
+      if (!isspace(*s)) *r0++ = *s;
    return r;
 }
 
-static void str_vector_create(const char *src, bool match_head_only, std::vector < const char *>*p_vec) {
+static void str_vector_create(const char *src, bool match_head_only, std::vector<const char *> *p_vec) {
 // Parse the beginning of the string.
 // Try to handle "[]".
    p_vec->clear();
-   if (*src != '[')
-      ThrowError("Incorrect initializer for vector");
-   src++;
-   if (*src == ']')
-      return;
+   if (*src != '[') ThrowError("Incorrect initializer for vector");
+   else if (*++src == ']') return;
    p_vec->push_back(src);
-   while (true) {
-      if (*src == 0)
+   while (true)
+      if (*src == '\0')
          ThrowError("Incorrect initializer for vector");
-      if (*src == ']') {
-         if (src[1] == 0 || !match_head_only)
+      else if (*src == ']')
+         if (src[1] == '\0' || !match_head_only)
             return;
-         ThrowError("Incorrect initializer for vector");
-      }
-      if (*src == ',') {
-         p_vec->push_back(src + 1);
-         src++;
-         continue;
-      }
-      src++;
-   }
+         else
+            ThrowError("Incorrect initializer for vector");
+      else if (*src++ == ',')
+         p_vec->push_back(src);
 }
 
-static void str_matrix_create(const char *src, std::vector < std::vector < const char *> >*p_mat) {
+static void str_matrix_create(const char *src, std::vector< std::vector<const char *> > *p_mat) {
    p_mat->clear();
 // Try to handle "[[]]".
-   if (strcmp(src, "[[]]") == 0)
-      return;
+   if (strcmp(src, "[[]]") == 0) return;
 // Parse a non-empty string.
-   if (*src != '[')
-      ThrowError("Incorrect initializer for matrix");
+   if (*src != '[') ThrowError("Incorrect initializer for matrix");
    src++;
    while (true) {
-      p_mat->push_back(std::vector < const char *>());
+      p_mat->push_back(std::vector<const char *>());
       str_vector_create(src, false, &p_mat->back());
       if (p_mat->back().size() == 0 || p_mat->back().size() != (*p_mat)[0].size())
          ThrowError("Incorrect initializer for matrix");
       src = strchr(src, ']');
       if (src == NULL)
          ThrowError("Incorrect initializer for matrix");
-      src++;
-      if (*src == ',') {
+      else if (*++src == ',')
          src++;
-         continue;
-      }
-      if (*src == ']')
+      else if (*src == ']')
          break;
-      ThrowError("Incorrect initializer for matrix");
+      else
+         ThrowError("Incorrect initializer for matrix");
    }
-   src++;
-   if (*src != 0)
+   if (*++src != '\0')
       ThrowError("Incorrect initializer for matrix");
 }
 
 static bool parse_bool_delim(const char *s, const char *delim) {
 // Try to parse "false", "true", or otherwise fail.
-   const char *p;
+   const char *p = "false";
    char buf[8];
-   p = "false";
    memset(buf, 0, sizeof buf);
    strncpy(buf, s, strlen(p));
    if (strimatch(buf, p)) {
-      if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
+      if (s[strlen(p)] == '\0' || strchr(delim, s[strlen(p)]) == NULL)
          ThrowError("Cannot parse value");
       return false;
    }
@@ -8804,7 +8784,7 @@ static bool parse_bool_delim(const char *s, const char *delim) {
    memset(buf, 0, sizeof buf);
    strncpy(buf, s, strlen(p));
    if (strimatch(buf, p)) {
-      if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
+      if (s[strlen(p)] == '\0' || strchr(delim, s[strlen(p)]) == NULL)
          ThrowError("Cannot parse value");
       return true;
    }
@@ -8812,57 +8792,49 @@ static bool parse_bool_delim(const char *s, const char *delim) {
 }
 
 static ae_int_t parse_int_delim(const char *s, const char *delim) {
-   const char *p;
-   long long_val;
-   volatile ae_int_t ae_val;
-   p = s;
+   const char *p = s;
 // Check the string structure for a leading sign, at least one digit and a delimiter.
    if (*s == '-' || *s == '+')
       s++;
-   if (*s == 0 || strchr("1234567890", *s) == NULL)
+   if (*s == '\0' || strchr("1234567890", *s) == NULL)
       ThrowError("Cannot parse value");
-   while (*s != 0 && strchr("1234567890", *s) != NULL)
+   while (*s != '\0' && strchr("1234567890", *s) != NULL)
       s++;
-   if (*s == 0 || strchr(delim, *s) == NULL)
+   if (*s == '\0' || strchr(delim, *s) == NULL)
       ThrowError("Cannot parse value");
 // Convert and ensure that the value fits into ae_int_t.
    s = p;
-   long_val = atol(s);
-   ae_val = long_val;
+   long long_val = atol(s);
+   volatile ae_int_t ae_val = long_val;
    if (ae_val != long_val)
       ThrowError("Cannot parse value");
    return ae_val;
 }
 
 static bool _parse_real_delim(const char *s, const char *delim, double *result, const char **new_s) {
-   const char *p;
-   char *t;
-   bool has_digits;
-   char buf[64];
-   int isign;
-   lconv *loc;
-   p = s;
+   const char *p = s;
 // Check the string structure and decide what to do.
-   isign = 1;
+   int isign = 1;
    if (*s == '-' || *s == '+') {
       isign = *s == '-' ? -1 : +1;
       s++;
    }
+   char buf[0x40];
    memset(buf, 0, sizeof buf);
    strncpy(buf, s, 3);
    if (!strimatch(buf, "nan") && !strimatch(buf, "inf")) {
    // [Sign] [Digits] [.] [Digits] [e|E [Sign] Digits].
-      has_digits = false;
-      if (*s != 0 && strchr("1234567890", *s) != NULL) {
+      bool has_digits = false;
+      if (*s != '\0' && strchr("1234567890", *s) != NULL) {
          has_digits = true;
-         while (*s != 0 && strchr("1234567890", *s) != NULL)
+         while (*s != '\0' && strchr("1234567890", *s) != NULL)
             s++;
       }
       if (*s == '.')
          s++;
-      if (*s != 0 && strchr("1234567890", *s) != NULL) {
+      if (*s != '\0' && strchr("1234567890", *s) != NULL) {
          has_digits = true;
-         while (*s != 0 && strchr("1234567890", *s) != NULL)
+         while (*s != '\0' && strchr("1234567890", *s) != NULL)
             s++;
       }
       if (!has_digits)
@@ -8871,21 +8843,21 @@ static bool _parse_real_delim(const char *s, const char *delim, double *result, 
          s++;
          if (*s == '-' || *s == '+')
             s++;
-         if (*s == 0 || strchr("1234567890", *s) == NULL)
+         if (*s == '\0' || strchr("1234567890", *s) == NULL)
             return false;
-         while (*s != 0 && strchr("1234567890", *s) != NULL)
+         while (*s != '\0' && strchr("1234567890", *s) != NULL)
             s++;
       }
-      if (*s == 0 || strchr(delim, *s) == NULL)
+      if (*s == '\0' || strchr(delim, *s) == NULL)
          return false;
       *new_s = s;
    // Finite value conversion.
-      if (*new_s - p >= (int)sizeof(buf))
+      if (*new_s - p >= (int)sizeof buf)
          return false;
       strncpy(buf, p, (size_t)(*new_s - p));
-      buf[*new_s - p] = 0;
-      loc = localeconv();
-      t = strchr(buf, '.');
+      buf[*new_s - p] = '\0';
+      lconv *loc = localeconv();
+      char *t = strchr(buf, '.');
       if (t != NULL)
          *t = *loc->decimal_point;
       *result = atof(buf);
@@ -8893,7 +8865,7 @@ static bool _parse_real_delim(const char *s, const char *delim, double *result, 
    } else {
    // Check the delimiter and update *new_s.
       s += 3;
-      if (*s == 0 || strchr(delim, *s) == NULL)
+      if (*s == '\0' || strchr(delim, *s) == NULL)
          return false;
       *new_s = s;
    // NAN, INF conversion.
@@ -8917,10 +8889,10 @@ static complex parse_complex_delim(const char *s, const char *delim) {
 // Parse as a real value.
    double d_result;
    const char *new_s;
-   complex c_result;
    if (_parse_real_delim(s, delim, &d_result, &new_s))
       return d_result;
 // Parse as "x + yi" or "x - yi".
+   complex c_result;
    if (_parse_real_delim(s, "+-", &c_result.x, &new_s)) {
       s = new_s;
       if (!_parse_real_delim(s, "i", &c_result.y, &new_s))
@@ -8933,10 +8905,10 @@ static complex parse_complex_delim(const char *s, const char *delim) {
 // Parse as a complex value "yi + x" or "yi - x".
    if (_parse_real_delim(s, "i", &c_result.y, &new_s)) {
       s = new_s + 1;
-      if (*s == 0)
+      if (*s == '\0')
          ThrowError("Cannot parse value");
       if (strchr(delim, *s) != NULL) {
-         c_result.x = 0;
+         c_result.x = 0.0;
          return c_result;
       }
       if (strchr("+-", *s) != NULL) {
@@ -8950,50 +8922,41 @@ static complex parse_complex_delim(const char *s, const char *delim) {
    ThrowError("Cannot parse value");
 }
 
-std::string arraytostring(const bool *ptr, ae_int_t n) {
-   std::string result;
-   ae_int_t i;
-   result = "[";
-   for (i = 0; i < n; i++) {
-      if (i != 0)
-         result += ",";
+static std::string arraytostring(const bool *ptr, ae_int_t n) {
+   std::string result = "[";
+   for (ae_int_t i = 0; i < n; i++) {
+      if (i != 0) result += ",";
       result += ptr[i] ? "true" : "false";
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 
-std::string arraytostring(const ae_int_t *ptr, ae_int_t n) {
-   std::string result;
-   ae_int_t i;
-   char buf[64];
-   result = "[";
-   for (i = 0; i < n; i++) {
-      if (sprintf(buf, i == 0 ? "%ld" : ",%ld", long (ptr[i])) >= (int)sizeof(buf))
+static std::string arraytostring(const ae_int_t *ptr, ae_int_t n) {
+   std::string result = "[";
+   for (ae_int_t i = 0; i < n; i++) {
+      char buf[0x40];
+      if (sprintf(buf, i == 0 ? "%ld" : ",%ld", long (ptr[i])) >= (int)sizeof buf)
          ThrowError("arraytostring: buffer overflow");
       result += buf;
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 
-std::string arraytostring(const double *ptr, ae_int_t n, int _dps) {
-   std::string result;
-   ae_int_t i;
-   char buf[64];
-   char mask1[64];
-   char mask2[80];
+static std::string arraytostring(const double *ptr, ae_int_t n, int _dps) {
    int dps = _dps >= 0 ? _dps : -_dps;
    dps = dps <= 50 ? dps : 50;
-   result = "[";
-   if (sprintf(mask1, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof(mask1))
+   std::string result = "[";
+   char mask1[0x40];
+   if (sprintf(mask1, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof mask1)
       ThrowError("arraytostring: buffer overflow");
-   if (sprintf(mask2, ",%s", mask1) >= (int)sizeof(mask2))
+   char mask2[0x50];
+   if (sprintf(mask2, ",%s", mask1) >= (int)sizeof mask2)
       ThrowError("arraytostring: buffer overflow");
-   for (i = 0; i < n; i++) {
-      buf[0] = 0;
+   for (ae_int_t i = 0; i < n; i++) {
+      char buf[0x40];
+      buf[0] = '\0';
       if (isfinite(ptr[i])) {
-         if (sprintf(buf, i == 0 ? mask1 : mask2, double(ptr[i])) >= (int)sizeof(buf))
+         if (sprintf(buf, i == 0 ? mask1 : mask2, double(ptr[i])) >= (int)sizeof buf)
             ThrowError("arraytostring: buffer overflow");
       } else if (isnan(ptr[i]))
          strcpy(buf, i == 0 ? "NAN" : ",NAN");
@@ -9003,21 +8966,16 @@ std::string arraytostring(const double *ptr, ae_int_t n, int _dps) {
          strcpy(buf, i == 0 ? "-INF" : ",-INF");
       result += buf;
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 
-std::string arraytostring(const complex *ptr, ae_int_t n, int dps) {
-   std::string result;
-   ae_int_t i;
-   result = "[";
-   for (i = 0; i < n; i++) {
-      if (i != 0)
-         result += ",";
+static std::string arraytostring(const complex *ptr, ae_int_t n, int dps) {
+   std::string result = "[";
+   for (ae_int_t i = 0; i < n; i++) {
+      if (i != 0) result += ",";
       result += ptr[i].tostring(dps);
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 #endif
 
