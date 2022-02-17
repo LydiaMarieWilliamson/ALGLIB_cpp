@@ -964,75 +964,65 @@ void clear_error_flag();
 #define TryCatch(X)	TryX { ThrowErrorMsg(X); }
 
 // Class declaration/definition macros.
-#define DecVal(X)	, X(Obj->X)
-#define DecVar(X)	, X(&Obj->X)
-#define DecComplex(X)	, X(*(complex *)&Obj->X)
+#define DecVal(X)	, X(Obj.X)
+#define DecVar(X)	, X(&Obj.X)
+#define DecComplex(X)	, X(*(complex *)&Obj.X)
 #define ConstT(T, Val)	(const_cast<alglib_impl::T *>((Val).c_ptr()))
 #define ComplexOf(Val)	(*reinterpret_cast<complex *>(&(Val)))
 
+// Pseudo-templates for ALGLIB++ "Class" types:
+// The triple-layering -- also present in the distribution version of ALGLIB --
+// is the cost of trying to make a C++ type into a C structure, and to then turn around and wrap it back into a C++ type.
+// It's better to just lose the C code (which is, effectively, what the alglib_impl namespace is and encapsulates)
+// and write it all in C++, instead.
+// I compromised by re-wrapping the C++ wrapper code into the DefClass() and DecClass() pseudo-templates
+// and then removing the need for and calls to malloc()/free() that were originally in the member functions comprising DefClass().
+// This CAN be quashed down to 1 layer ...
+// by just writing the member functions directly in the corresponding types currently contained in the alglib_impl namespace,
+// and using this, instead.
+// However, it requires rewriting all the code involving smart pointers and shared pools as templates
+// or by using C++'s native facilities for shared pools.
 #define DecClass(Type, Pars) \
 struct Type##I { \
    Type##I(); \
    Type##I(const Type##I &A); \
-   Type##I &operator=(const Type##I &A); \
-   virtual ~Type##I(); \
-   alglib_impl::Type *c_ptr() { return Obj; } \
-   alglib_impl::Type *c_ptr() const { return const_cast<alglib_impl::Type *>(Obj); } \
 protected: \
-   alglib_impl::Type *Obj; \
+   alglib_impl::Type Obj; \
 }; \
 struct Type: public Type##I { \
    Type(); \
    Type(const Type &A); \
    Type &operator=(const Type &A); \
-   virtual ~Type(); \
+   ~Type() { alglib_impl::Type##_free(&Obj, false); } \
+   alglib_impl::Type *c_ptr() { return &Obj; } \
+   alglib_impl::Type *c_ptr() const { return const_cast<alglib_impl::Type *>(&Obj); } \
    Pars \
 }
 
 #define DefClass(Type, Vars) \
 Type##I::Type##I() { \
    alglib_impl::ae_state_init(); \
-   TryX { \
-      if (Obj != NULL) alglib_impl::Type##_free(Obj, false), alglib_impl::ae_free(Obj), Obj = NULL; \
-      ThrowErrorMsg(); \
-   } \
-   Obj = NULL, Obj = (alglib_impl::Type *)alglib_impl::ae_malloc(sizeof *Obj); \
-   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_init(Obj, false); \
+   TryX { alglib_impl::Type##_free(&Obj, false); ThrowErrorMsg(); } \
+   memset(&Obj, 0, sizeof Obj), alglib_impl::Type##_init(&Obj, false); \
    alglib_impl::ae_state_clear(); \
 } \
 Type##I::Type##I(const Type##I &A) { \
    alglib_impl::ae_state_init(); \
-   TryX { \
-      if (Obj != NULL) alglib_impl::Type##_free(Obj, false), alglib_impl::ae_free(Obj), Obj = NULL; \
-      ThrowErrorMsg(); \
-   } \
-   Obj = NULL; \
-   alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " copy constructor failure (source is not initialized)"); \
-   Obj = (alglib_impl::Type *)alglib_impl::ae_malloc(sizeof *Obj); \
-   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_copy(Obj, const_cast<alglib_impl::Type *>(A.Obj), false); \
+   TryX { alglib_impl::Type##_free(&Obj, false); ThrowErrorMsg(); } \
+   memset(&Obj, 0, sizeof Obj), alglib_impl::Type##_copy(&Obj, const_cast<alglib_impl::Type *>(&A.Obj), false); \
    alglib_impl::ae_state_clear(); \
 } \
-Type##I &Type##I::operator=(const Type##I &A) { \
+Type::Type(): Type##I() Vars { } \
+Type::Type(const Type &A): Type##I(A) Vars { } \
+Type &Type::operator=(const Type &A) { \
    if (this == &A) return *this; \
    alglib_impl::ae_state_init(); \
-   TryCatch(*this); \
-   alglib_impl::ae_assert(Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (destination is not initialized)"); \
-   alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (source is not initialized)"); \
-   alglib_impl::Type##_free(Obj, false); \
-   memset(Obj, 0, sizeof *Obj), alglib_impl::Type##_copy(Obj, const_cast<alglib_impl::Type *>(A.Obj), false); \
+   TryCatch(*this) \
+   alglib_impl::Type##_free(&Obj, false); \
+   memset(&Obj, 0, sizeof Obj), alglib_impl::Type##_copy(&Obj, const_cast<alglib_impl::Type *>(&A.Obj), false); \
    alglib_impl::ae_state_clear(); \
    return *this; \
-} \
-Type##I::~Type##I() { \
-   if (Obj != NULL) alglib_impl::Type##_free(Obj, false), ae_free(Obj); \
-} \
-Type::Type():Type##I() Vars { } \
-Type::Type(const Type &A):Type##I(A) Vars { } \
-Type &Type::operator=(const Type &A) { \
-   if (this != &A) Type##I::operator=(A); \
-   return *this; \
-} \
-Type::~Type() { }
+}
 
 typedef alglib_impl::ae_int_t ae_int_t;
 
