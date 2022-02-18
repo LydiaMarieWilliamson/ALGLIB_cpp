@@ -924,7 +924,7 @@ struct ap_error {
    ap_error();
    ap_error(const char *Msg);
    static void make_assertion(bool Cond);
-   static void make_assertion(bool Cond, const char *MsgP);
+   static void make_assertion(bool Cond, const char *Msg);
 };
 #   define ThrowError(Msg)	throw ap_error(Msg)
 #   define ThrowErrorMsg(X)	throw ap_error()
