@@ -105,9 +105,7 @@ ae_int_t _malloc_failure_after = 0;
 AutoS jmp_buf *volatile CurBreakAt;
 
 // Set the jump buffer for error handling.
-void ae_state_set_break_jump(jmp_buf *buf) {
-   CurBreakAt = buf;
-}
+void ae_state_set_break_jump(jmp_buf *buf) { CurBreakAt = buf; }
 
 // The ae_error_type of the last error and a legible message for it; filled when an exception is thrown.
 AutoS ae_error_type volatile CurStatus;
@@ -117,9 +115,7 @@ AutoS const char *volatile CurMsg;
 AutoS ae_uint64_t CurFlags;
 
 // Set CurFlags.
-void ae_state_set_flags(ae_uint64_t flags) {
-   CurFlags = flags;
-}
+void ae_state_set_flags(ae_uint64_t flags) { CurFlags = flags; }
 
 // A pointer to the top block in a stack of frames which hold dynamically allocated objects.
 AutoS ae_frame *volatile TopFr;
@@ -145,9 +141,7 @@ static unsigned char DynBottom = 1, DynFrame = 2;
 // The dynamic block is assumed to be initialized by the caller and must be left alone
 // (no changes, deallocations, or reuse) until ae_leave_frame() is called.
 // It may be a global or (preferrably) a local variable.
-void ae_frame_make(ae_frame *Fr) {
-   Fr->p_next = TopFr, Fr->deallocator = NULL, Fr->ptr = &DynFrame, TopFr = Fr;
-}
+void ae_frame_make(ae_frame *Fr) { Fr->p_next = TopFr, Fr->deallocator = NULL, Fr->ptr = &DynFrame, TopFr = Fr; }
 
 // Leave the current stack frame and deallocate all automatic dynamic blocks which were attached to this frame.
 void ae_frame_leave() {
@@ -476,8 +470,8 @@ ae_int_t ae_misalignment(const void *ptr, size_t alignment) {
 
 void *ae_align(void *ptr, size_t alignment) {
    char *result = (char *)ptr;
-   if ((result - (char *)0) % alignment != 0)
-      result += alignment - (result - (char *)0) % alignment;
+   if ((result - (char *)NULL) % alignment != 0)
+      result += alignment - (result - (char *)NULL) % alignment;
    return result;
 }
 
@@ -505,8 +499,7 @@ static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
       u.iptr = p;
    // Atomic read the initial value, convert it to a 1-byte pointer, then increment and store it.
       PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
-      if (InterlockedCompareExchangePointer(u.ptr, (PVOID)((char *)v0 + v), v0) == v0)
-         break;
+      if (InterlockedCompareExchangePointer(u.ptr, (PVOID)((char *)v0 + v), v0) == v0) break;
    }
 #else
    *p += v; // At least do something for older compilers!
@@ -532,8 +525,7 @@ static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
       u.iptr = p;
    // Atomic read the initial value, convert it to a 1-byte pointer, then decrement and store it.
       PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
-      if (InterlockedCompareExchangePointer(u.ptr, (PVOID)((char *)v0 - v), v0) == v0)
-         break;
+      if (InterlockedCompareExchangePointer(u.ptr, (PVOID)((char *)v0 - v), v0) == v0) break;
    }
 #else
    *p -= v; // At least do something for older compilers!
@@ -1636,25 +1628,23 @@ static void ae_yield() {
 #if AE_OS == AE_POSIX
    sched_yield();
 #elif AE_OS == AE_WINDOWS
-   if (!SwitchToThread())
-      Sleep(0);
+   if (!SwitchToThread()) Sleep(0);
 #else
    abort();
 #endif
 }
 
 // Perform a given number of spin-wait iterations.
-void ae_spin_wait(ae_int_t cnt) {
+static void ae_spin_wait(ae_int_t cnt) {
 // This variable is used to prevent some tricky optimizations which may degrade multi-threaded performance.
 // It was used by the SMP version to prevent optimizations that would remove objects that can nowadays be declared "volatile".
    static volatile ae_int_t ae_never_change_it = 1;
 // These strange operations with ae_never_change_it are necessary to prevent compiler optimization of the loop.
-   volatile ae_int_t i;
 // Very unlikely because no one will wait for such amount of cycles.
    if (cnt > 0x12345678)
       ae_never_change_it = cnt % 10;
 // Spin wait, test a condition which will never be true.
-   for (i = 0; i < cnt; i++)
+   for (volatile ae_int_t i = 0; i < cnt; i++)
       if (ae_never_change_it > 0)
          ae_never_change_it--;
 }
@@ -1762,14 +1752,10 @@ void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic) {
 
 // Acquire an ae_lock.
 // If the lock is busy and ae_yield() is supported, we ae_yield() after retrying several times, with tight spin waits in between.
-void ae_acquire_lock(ae_lock *lock) {
-   _ae_acquire_lock((_lock *)lock->lock_ptr);
-}
+void ae_acquire_lock(ae_lock *lock) { _ae_acquire_lock((_lock *)lock->lock_ptr); }
 
 // Release an ae_lock.
-void ae_release_lock(ae_lock *lock) {
-   _ae_release_lock((_lock *)lock->lock_ptr);
-}
+void ae_release_lock(ae_lock *lock) { _ae_release_lock((_lock *)lock->lock_ptr); }
 
 // Free an ae_lock.
 void ae_free_lock(ae_lock *lock) {

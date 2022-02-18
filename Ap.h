@@ -240,8 +240,8 @@ void ae_clean_up();
 void ae_assert(bool cond, const char *msg);
 
 // Get/set the threading model type.
-void ae_set_global_threading(ae_uint64_t flg_value);
 ae_uint64_t ae_get_global_threading();
+void ae_set_global_threading(ae_uint64_t flg_value);
 
 // Service functions.
 typedef enum { CPU_SSE2 = 0x1, CPU_AVX2 = 0x2, CPU_FMA = 0x4 } ae_cpuid_t;
@@ -1095,8 +1095,8 @@ void setnworkers(ae_int_t nworkers);
 
 // Internal functions used by TestX.cpp, interfaces for functions present only in the commercial version of ALGLIB.
 ae_int_t ae_cores_count();
-void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value);
 alglib_impl::ae_uint64_t _ae_get_global_threading();
+void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value);
 
 // Set the global threading mode.
 void setglobalthreading(const xparams settings);
