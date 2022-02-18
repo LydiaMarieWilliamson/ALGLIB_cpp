@@ -2868,509 +2868,373 @@ complex ae_c_d_div(double A, complex B) {
    }
 }
 
-// Complex BLAS operations
-complex ae_v_cdotproduct(const complex *v0, ae_int_t stride0, const char *conj0, const complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n) {
-   double rx = 0.0, ry = 0.0;
-   ae_int_t i;
-   bool bconj0 = !((conj0[0] == 'N') || (conj0[0] == 'n'));
-   bool bconj1 = !((conj1[0] == 'N') || (conj1[0] == 'n'));
-   complex result;
-   if (bconj0 && bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = -v0->y;
-         v1x = v1->x;
-         v1y = -v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   if (!bconj0 && bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = v0->y;
-         v1x = v1->x;
-         v1y = -v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   if (bconj0 && !bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = -v0->y;
-         v1x = v1->x;
-         v1y = v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   if (!bconj0 && !bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = v0->y;
-         v1x = v1->x;
-         v1y = v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   result = complex_from_d(rx, ry);
-   return result;
+// Level 1 Complex BLAS operations.
+// Handle the case of unit stride specially and separately with optimization.
+
+complex ae_v_cdotproduct(const complex *A, ae_int_t dA, const char *CjA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   double Cx = 0.0, Cy = 0.0;
+   bool ConjA = CjA[0] != 'N' && CjA[0] != 'n';
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (ConjA)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = -A->y;
+            double Bx = B->x, By = -B->y;
+            Cx += Ax * Bx - Ay * By, Cy += Ax * By + Ay * Bx;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = -A->y;
+            double Bx = B->x, By = B->y;
+            Cx += Ax * Bx - Ay * By, Cy += Ax * By + Ay * Bx;
+         }
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = A->y;
+            double Bx = B->x, By = -B->y;
+            Cx += Ax * Bx - Ay * By, Cy += Ax * By + Ay * Bx;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = A->y;
+            double Bx = B->x, By = B->y;
+            Cx += Ax * Bx - Ay * By, Cy += Ax * By + Ay * Bx;
+         }
+   return complex_from_d(Cx, Cy);
 }
 
-void ae_v_cmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = vsrc->x;
-            vdst->y = -vsrc->y;
+void ae_v_cmove(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = B->x;
+            A->y = -B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-            *vdst = *vsrc;
-      }
-   } else {
-   // optimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = vsrc->x;
-            vdst->y = -vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++)
+            *A = *B;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = B->x;
+            A->y = -B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++)
-            *vdst = *vsrc;
-      }
-   }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+            *A = *B;
 }
 
-void ae_v_cmoveneg(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = -vsrc->x;
-            vdst->y = vsrc->y;
+void ae_v_cmoveneg(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = -B->x;
+            A->y = B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = -vsrc->x;
-            vdst->y = -vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = -B->x;
+            A->y = -B->y;
          }
-      }
-   } else {
-   // optimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = -vsrc->x;
-            vdst->y = vsrc->y;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = -B->x;
+            A->y = B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = -vsrc->x;
-            vdst->y = -vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = -B->x;
+            A->y = -B->y;
          }
-      }
-   }
 }
 
-void ae_v_cmoved(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = -alpha * vsrc->y;
+void ae_v_cmoved(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = Alpha * B->x;
+            A->y = -Alpha * B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = alpha * vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = Alpha * B->x;
+            A->y = Alpha * B->y;
          }
-      }
-   } else {
-   // optimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = -alpha * vsrc->y;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = Alpha * B->x;
+            A->y = -Alpha * B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = alpha * vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = Alpha * B->x;
+            A->y = Alpha * B->y;
          }
-      }
-   }
 }
 
-void ae_v_cmovec(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = ax * vsrc->x + ay * vsrc->y;
-            vdst->y = -ax * vsrc->y + ay * vsrc->x;
+void ae_v_cmovec(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   double ax = Alpha.x, ay = Alpha.y;
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = ax * B->x + ay * B->y;
+            A->y = -ax * B->y + ay * B->x;
          }
-      } else {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = ax * vsrc->x - ay * vsrc->y;
-            vdst->y = ax * vsrc->y + ay * vsrc->x;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = ax * B->x - ay * B->y;
+            A->y = ax * B->y + ay * B->x;
          }
-      }
-   } else {
-   // highly optimized case
-      if (bconj) {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = ax * vsrc->x + ay * vsrc->y;
-            vdst->y = -ax * vsrc->y + ay * vsrc->x;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = ax * B->x + ay * B->y;
+            A->y = -ax * B->y + ay * B->x;
          }
-      } else {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = ax * vsrc->x - ay * vsrc->y;
-            vdst->y = ax * vsrc->y + ay * vsrc->x;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = ax * B->x - ay * B->y;
+            A->y = ax * B->y + ay * B->x;
          }
-      }
-   }
 }
 
-void ae_v_cadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += vsrc->x;
-            vdst->y -= vsrc->y;
+void ae_v_cadd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += B->x;
+            A->y -= B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += vsrc->x;
-            vdst->y += vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += B->x;
+            A->y += B->y;
          }
-      }
-   } else {
-   // optimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += vsrc->x;
-            vdst->y -= vsrc->y;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += B->x;
+            A->y -= B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += vsrc->x;
-            vdst->y += vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += B->x;
+            A->y += B->y;
          }
-      }
-   }
 }
 
-void ae_v_caddd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y -= alpha * vsrc->y;
+void ae_v_caddd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += Alpha * B->x;
+            A->y -= Alpha * B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y += alpha * vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += Alpha * B->x;
+            A->y += Alpha * B->y;
          }
-      }
-   } else {
-   // optimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y -= alpha * vsrc->y;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += Alpha * B->x;
+            A->y -= Alpha * B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y += alpha * vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += Alpha * B->x;
+            A->y += Alpha * B->y;
          }
-      }
-   }
 }
 
-void ae_v_caddc(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      double ax = alpha.x, ay = alpha.y;
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += ax * vsrc->x + ay * vsrc->y;
-            vdst->y -= ax * vsrc->y - ay * vsrc->x;
+void ae_v_caddc(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   double ax = Alpha.x, ay = Alpha.y;
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += ax * B->x + ay * B->y;
+            A->y -= ax * B->y - ay * B->x;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += ax * vsrc->x - ay * vsrc->y;
-            vdst->y += ax * vsrc->y + ay * vsrc->x;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += ax * B->x - ay * B->y;
+            A->y += ax * B->y + ay * B->x;
          }
-      }
-   } else {
-   // highly optimized case
-      double ax = alpha.x, ay = alpha.y;
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += ax * vsrc->x + ay * vsrc->y;
-            vdst->y -= ax * vsrc->y - ay * vsrc->x;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += ax * B->x + ay * B->y;
+            A->y -= ax * B->y - ay * B->x;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += ax * vsrc->x - ay * vsrc->y;
-            vdst->y += ax * vsrc->y + ay * vsrc->x;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += ax * B->x - ay * B->y;
+            A->y += ax * B->y + ay * B->x;
          }
-      }
-   }
 }
 
-void ae_v_csub(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x -= vsrc->x;
-            vdst->y += vsrc->y;
+void ae_v_csub(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x -= B->x;
+            A->y += B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x -= vsrc->x;
-            vdst->y -= vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x -= B->x;
+            A->y -= B->y;
          }
-      }
-   } else {
-   // highly optimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x -= vsrc->x;
-            vdst->y += vsrc->y;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x -= B->x;
+            A->y += B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x -= vsrc->x;
-            vdst->y -= vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x -= B->x;
+            A->y -= B->y;
          }
-      }
-   }
 }
 
-void ae_v_csubd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   ae_v_caddd(vdst, stride_dst, vsrc, stride_src, conj_src, n, -alpha);
+void ae_v_csubd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha) {
+   ae_v_caddd(A, dA, B, dB, CjB, N, -Alpha);
 }
 
-void ae_v_csubc(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
-   alpha = complex_from_d(-alpha.x, -alpha.y);
-   ae_v_caddc(vdst, stride_dst, vsrc, stride_src, conj_src, n, alpha);
+void ae_v_csubc(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha) {
+   ae_v_caddc(A, dA, B, dB, CjB, N, complex_from_d(-Alpha.x, -Alpha.y));
 }
 
-void ae_v_cmuld(complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst) {
-         vdst->x *= alpha;
-         vdst->y *= alpha;
+void ae_v_cmuld(complex *A, ae_int_t dA, ae_int_t N, double Alpha) {
+   if (dA == 1)
+      for (ae_int_t n = 0; n < N; n++, A++) {
+         A->x *= Alpha;
+         A->y *= Alpha;
       }
-   } else {
-   // optimized case
-      for (i = 0; i < n; i++, vdst++) {
-         vdst->x *= alpha;
-         vdst->y *= alpha;
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA) {
+         A->x *= Alpha;
+         A->y *= Alpha;
       }
-   }
 }
 
-void ae_v_cmulc(complex *vdst, ae_int_t stride_dst, ae_int_t n, complex alpha) {
-   ae_int_t i;
-   if (stride_dst != 1) {
-   // general unoptimized case
-      double ax = alpha.x, ay = alpha.y;
-      for (i = 0; i < n; i++, vdst += stride_dst) {
-         double dstx = vdst->x, dsty = vdst->y;
-         vdst->x = ax * dstx - ay * dsty;
-         vdst->y = ax * dsty + ay * dstx;
+void ae_v_cmulc(complex *A, ae_int_t dA, ae_int_t N, complex Alpha) {
+   double Ax = Alpha.x, Ay = Alpha.y;
+   if (dA == 1)
+      for (ae_int_t n = 0; n < N; n++, A++) {
+         double Bx = A->x, By = A->y;
+         A->x = Ax * Bx - Ay * By;
+         A->y = Ax * By + Ay * Bx;
       }
-   } else {
-   // highly optimized case
-      double ax = alpha.x, ay = alpha.y;
-      for (i = 0; i < n; i++, vdst++) {
-         double dstx = vdst->x, dsty = vdst->y;
-         vdst->x = ax * dstx - ay * dsty;
-         vdst->y = ax * dsty + ay * dstx;
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA) {
+         double Bx = A->x, By = A->y;
+         A->x = Ax * Bx - Ay * By;
+         A->y = Ax * By + Ay * Bx;
       }
-   }
 }
 
 // Level 1 Real BLAS operations
-double ae_v_dotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n) {
-   double result = 0.0;
-   ae_int_t i;
-   if (stride0 != 1 || stride1 != 1) {
-   // slow general code
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1)
-         result += (*v0) * (*v1);
-   } else {
-   // optimized code for stride=1
-      ae_int_t n4 = n / 4;
-      ae_int_t nleft = n % 4;
-      for (i = 0; i < n4; i++, v0 += 4, v1 += 4)
-         result += v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2] + v0[3] * v1[3];
-      for (i = 0; i < nleft; i++, v0++, v1++)
-         result += v0[0] * v1[0];
-   }
-   return result;
+// Handle the case of unit stride specially and separately with optimization.
+//(@) In ae_v_{dotproduct,move,moveneg,moved,add,addd,sub,subd}(), _ialglib_vcopy()
+//(@) this case originally cut the loop counter in half (or quarter) and did two (or four) steps per loop.
+//(@) This was removed, the need for it was not clearly explained and it appears to have no visible effect on performance.
+
+double ae_v_dotproduct(const double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   double C = 0.0;
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         C += A[0] * B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         C += *A * *B;
+   return C;
 }
 
-void ae_v_move(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst = *vsrc;
-   } else {
-   // optimized case
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] = vsrc[0];
-         vdst[1] = vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] = vsrc[0];
-   }
+void ae_v_move(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] = B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A = *B;
 }
 
-void ae_v_moveneg(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst = -*vsrc;
-   } else {
-   // optimized case
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] = -vsrc[0];
-         vdst[1] = -vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] = -vsrc[0];
-   }
+void ae_v_moveneg(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] = -B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A = -*B;
 }
 
-void ae_v_moved(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst = alpha * (*vsrc);
-   } else {
-   // optimized case
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] = alpha * vsrc[0];
-         vdst[1] = alpha * vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] = alpha * vsrc[0];
-   }
+void ae_v_moved(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha) {
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] = Alpha * B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A = Alpha * *B;
 }
 
-void ae_v_add(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst += *vsrc;
-   } else {
-   // optimized case
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] += vsrc[0];
-         vdst[1] += vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] += vsrc[0];
-   }
+void ae_v_add(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] += B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A += *B;
 }
 
-void ae_v_addd(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst += alpha * (*vsrc);
-   } else {
-   // optimized case
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] += alpha * vsrc[0];
-         vdst[1] += alpha * vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] += alpha * vsrc[0];
-   }
+void ae_v_addd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha) {
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] += Alpha * B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A += Alpha * *B;
 }
 
-void ae_v_sub(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst -= *vsrc;
-   } else {
-   // highly optimized case
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] -= vsrc[0];
-         vdst[1] -= vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] -= vsrc[0];
-   }
+void ae_v_sub(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] -= B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A -= *B;
 }
 
-void ae_v_subd(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha) {
-   ae_v_addd(vdst, stride_dst, vsrc, stride_src, n, -alpha);
+void ae_v_subd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha) {
+// Equivalent to ae_v_addd(A, dA, B, dB, N, -Alpha);
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] -= Alpha * B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A -= Alpha * *B;
 }
 
-void ae_v_muld(double *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst)
-         *vdst *= alpha;
-   } else {
-   // highly optimized case
-      for (i = 0; i < n; i++, vdst++)
-         *vdst *= alpha;
-   }
+void ae_v_muld(double *A, ae_int_t dA, ae_int_t N, double Alpha) {
+   if (dA == 1)
+      for (ae_int_t n = 0; n < N; n++, A++)
+         *A *= Alpha;
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA)
+         *A *= Alpha;
 }
 
 #if 0
@@ -7425,665 +7289,451 @@ void setglobalthreading(const xparams settings) { }
 #endif
 
 // Level 1 Real BLAS functions.
+// Handle the case of unit stride specially and separately with optimization.
+//(@) In the double v{dotproduct,move,moveneg,add}()
+//(@) this case originally cut the loop counter in half (or quarter) and did two (or four) steps per loop.
+//(@) This was removed, the need for it was not clearly explained and it appears to have no visible effect on performance.
 
-double vdotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n) {
-   double result = 0.0;
-   ae_int_t i;
-   if (stride0 != 1 || stride1 != 1) {
-   //
-   // slow general code
-   //
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1)
-         result += (*v0) * (*v1);
-   } else {
-   //
-   // optimized code for stride=1
-   //
-      ae_int_t n4 = n / 4;
-      ae_int_t nleft = n % 4;
-      for (i = 0; i < n4; i++, v0 += 4, v1 += 4)
-         result += v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2] + v0[3] * v1[3];
-      for (i = 0; i < nleft; i++, v0++, v1++)
-         result += v0[0] * v1[0];
-   }
-   return result;
+double vdotproduct(const double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   double C = 0.0;
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         C += *A * *B;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         C += *A * *B;
+   return C;
 }
 
-double vdotproduct(const double *v1, const double *v2, ae_int_t N) {
-   return vdotproduct(v1, 1, v2, 1, N);
+double vdotproduct(const double *A, const double *B, ae_int_t N) {
+   return vdotproduct(A, 1, B, 1, N);
 }
 
-complex vdotproduct(const complex *v0, ae_int_t stride0, const char *conj0, const complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n) {
-   double rx = 0.0, ry = 0.0;
-   ae_int_t i;
-   bool bconj0 = !((conj0[0] == 'N') || (conj0[0] == 'n'));
-   bool bconj1 = !((conj1[0] == 'N') || (conj1[0] == 'n'));
-   if (bconj0 && bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = -v0->y;
-         v1x = v1->x;
-         v1y = -v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   if (!bconj0 && bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = v0->y;
-         v1x = v1->x;
-         v1y = -v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   if (bconj0 && !bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = -v0->y;
-         v1x = v1->x;
-         v1y = v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   if (!bconj0 && !bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = v0->y;
-         v1x = v1->x;
-         v1y = v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   return complex (rx, ry);
-}
-
-complex vdotproduct(const complex *v1, const complex *v2, ae_int_t N) {
-   return vdotproduct(v1, 1, "N", v2, 1, "N", N);
-}
-
-void vmove(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst = *vsrc;
-   } else {
-   //
-   // optimized case
-   //
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] = vsrc[0];
-         vdst[1] = vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] = vsrc[0];
-   }
-}
-
-void vmove(double *vdst, const double *vsrc, ae_int_t N) {
-   vmove(vdst, 1, vsrc, 1, N);
-}
-
-void vmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = vsrc->x;
-            vdst->y = -vsrc->y;
+complex vdotproduct(const complex *A, ae_int_t dA, const char *CjA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   double Cx = 0.0, Cy = 0.0;
+   bool ConjA = CjA[0] != 'N' && CjA[0] != 'n';
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (ConjA)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = -A->y;
+            double Bx = B->x, By = -B->y;
+            Cx += Ax * Bx - Ay * By, Cy += Ax * By + Ay * Bx;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-            *vdst = *vsrc;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = -A->y;
+            double Bx = B->x, By = B->y;
+            Cx += Ax * Bx - Ay * By, Cy += Ax * By + Ay * Bx;
+         }
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = A->y;
+            double Bx = B->x, By = -B->y;
+            Cx += Ax * Bx - Ay * By, Cy += Ax * By + Ay * Bx;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = A->y;
+            double Bx = B->x, By = B->y;
+            Cx += Ax * Bx - Ay * By, Cy += Ax * By + Ay * Bx;
+         }
+   return complex(Cx, Cy);
+}
+
+complex vdotproduct(const complex *A, const complex *B, ae_int_t N) {
+   return vdotproduct(A, 1, "N", B, 1, "N", N);
+}
+
+void vmove(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         *A = *B;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A = *B;
+}
+
+void vmove(double *A, const double *B, ae_int_t N) {
+   vmove(A, 1, B, 1, N);
+}
+
+void vmove(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = B->x;
+            A->y = -B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++)
+            *A = *B;
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = B->x;
+            A->y = -B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+            *A = *B;
+}
+
+void vmove(complex *A, const complex *B, ae_int_t N) {
+   vmove(A, 1, B, 1, "N", N);
+}
+
+void vmoveneg(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         *A = -*B;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A = -*B;
+}
+
+void vmoveneg(double *A, const double *B, ae_int_t N) {
+   vmoveneg(A, 1, B, 1, N);
+}
+
+void vmoveneg(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = -B->x;
+            A->y = B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = -B->x;
+            A->y = -B->y;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = -B->x;
+            A->y = B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = -B->x;
+            A->y = -B->y;
+         }
+}
+
+void vmoveneg(complex *A, const complex *B, ae_int_t N) {
+   vmoveneg(A, 1, B, 1, "N", N);
+}
+
+void vmove(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha) {
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         *A = Alpha * *B;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A = Alpha * *B;
+}
+
+void vmove(double *A, const double *B, ae_int_t N, double Alpha) {
+   vmove(A, 1, B, 1, N, Alpha);
+}
+
+void vmove(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = Alpha * B->x;
+            A->y = -Alpha * B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = Alpha * B->x;
+            A->y = Alpha * B->y;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = Alpha * B->x;
+            A->y = -Alpha * B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = Alpha * B->x;
+            A->y = Alpha * B->y;
+         }
+}
+
+void vmove(complex *A, const complex *B, ae_int_t N, double Alpha) {
+   vmove(A, 1, B, 1, "N", N, Alpha);
+}
+
+void vmove(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   double Ax = Alpha.x, Ay = Alpha.y;
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = Ax * B->x + Ay * B->y;
+            A->y = -Ax * B->y + Ay * B->x;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = Ax * B->x - Ay * B->y;
+            A->y = Ax * B->y + Ay * B->x;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = Ax * B->x + Ay * B->y;
+            A->y = -Ax * B->y + Ay * B->x;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = Ax * B->x - Ay * B->y;
+            A->y = Ax * B->y + Ay * B->x;
+         }
+}
+
+void vmove(complex *A, const complex *B, ae_int_t N, complex Alpha) {
+   vmove(A, 1, B, 1, "N", N, Alpha);
+}
+
+void vadd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         *A += *B;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A += *B;
+}
+
+void vadd(double *A, const double *B, ae_int_t N) {
+   vadd(A, 1, B, 1, N);
+}
+
+void vadd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += B->x;
+            A->y -= B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += B->x;
+            A->y += B->y;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += B->x;
+            A->y -= B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += B->x;
+            A->y += B->y;
+         }
+}
+
+void vadd(complex *A, const complex *B, ae_int_t N) {
+   vadd(A, 1, B, 1, "N", N);
+}
+
+void vadd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha) {
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         *A += Alpha * *B;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A += Alpha * *B;
+}
+
+void vadd(double *A, const double *B, ae_int_t N, double Alpha) {
+   vadd(A, 1, B, 1, N, Alpha);
+}
+
+void vadd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += Alpha * B->x;
+            A->y -= Alpha * B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += Alpha * B->x;
+            A->y += Alpha * B->y;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += Alpha * B->x;
+            A->y -= Alpha * B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += Alpha * B->x;
+            A->y += Alpha * B->y;
+         }
+}
+
+void vadd(complex *A, const complex *B, ae_int_t N, double Alpha) {
+   vadd(A, 1, B, 1, "N", N, Alpha);
+}
+
+void vadd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   double Ax = Alpha.x, Ay = Alpha.y;
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += Ax * B->x + Ay * B->y;
+            A->y -= Ax * B->y - Ay * B->x;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += Ax * B->x - Ay * B->y;
+            A->y += Ax * B->y + Ay * B->x;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += Ax * B->x + Ay * B->y;
+            A->y -= Ax * B->y - Ay * B->x;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += Ax * B->x - Ay * B->y;
+            A->y += Ax * B->y + Ay * B->x;
+         }
+}
+
+void vadd(complex *A, const complex *B, ae_int_t N, complex Alpha) {
+   vadd(A, 1, B, 1, "N", N, Alpha);
+}
+
+void vsub(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         *A -= *B;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A -= *B;
+}
+
+void vsub(double *A, const double *B, ae_int_t N) {
+   vsub(A, 1, B, 1, N);
+}
+
+void vsub(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x -= B->x;
+            A->y += B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x -= B->x;
+            A->y -= B->y;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x -= B->x;
+            A->y += B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x -= B->x;
+            A->y -= B->y;
+         }
+}
+
+void vsub(complex *A, const complex *B, ae_int_t N) {
+   vsub(A, 1, B, 1, "N", N);
+}
+
+void vsub(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha) {
+   vadd(A, dA, B, dB, N, -Alpha);
+}
+
+void vsub(double *A, const double *B, ae_int_t N, double Alpha) {
+   vadd(A, 1, B, 1, N, -Alpha);
+}
+
+void vsub(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha) {
+   vadd(A, dA, B, dB, CjB, N, -Alpha);
+}
+
+void vsub(complex *A, const complex *B, ae_int_t N, double Alpha) {
+   vadd(A, 1, B, 1, "N", N, -Alpha);
+}
+
+void vsub(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha) {
+   vadd(A, dA, B, dB, CjB, N, -Alpha);
+}
+
+void vsub(complex *A, const complex *B, ae_int_t N, complex Alpha) {
+   vadd(A, 1, B, 1, "N", N, -Alpha);
+}
+
+void vmul(double *A, ae_int_t dA, ae_int_t N, double Alpha) {
+   if (dA == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++)
+         *A *= Alpha;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA)
+         *A *= Alpha;
+}
+
+void vmul(double *A, ae_int_t N, double Alpha) {
+   vmul(A, 1, N, Alpha);
+}
+
+void vmul(complex *A, ae_int_t dA, ae_int_t N, double Alpha) {
+   if (dA == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++) {
+         A->x *= Alpha;
+         A->y *= Alpha;
       }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = vsrc->x;
-            vdst->y = -vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++)
-            *vdst = *vsrc;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA) {
+         A->x *= Alpha;
+         A->y *= Alpha;
       }
-   }
 }
 
-void vmove(complex *vdst, const complex *vsrc, ae_int_t N) {
-   vmove(vdst, 1, vsrc, 1, "N", N);
+void vmul(complex *A, ae_int_t N, double Alpha) {
+   vmul(A, 1, N, Alpha);
 }
 
-void vmoveneg(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst = -*vsrc;
-   } else {
-   //
-   // optimized case
-   //
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] = -vsrc[0];
-         vdst[1] = -vsrc[1];
+void vmul(complex *A, ae_int_t dA, ae_int_t N, complex Alpha) {
+   double Ax = Alpha.x, Ay = Alpha.y;
+   if (dA == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++) {
+         double Bx = A->x, By = A->y;
+         A->x = Ax * Bx - Ay * By;
+         A->y = Ax * By + Ay * Bx;
       }
-      if (n % 2 != 0)
-         vdst[0] = -vsrc[0];
-   }
-}
-
-void vmoveneg(double *vdst, const double *vsrc, ae_int_t N) {
-   vmoveneg(vdst, 1, vsrc, 1, N);
-}
-
-void vmoveneg(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = -vsrc->x;
-            vdst->y = vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = -vsrc->x;
-            vdst->y = -vsrc->y;
-         }
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA) {
+         double Bx = A->x, By = A->y;
+         A->x = Ax * Bx - Ay * By;
+         A->y = Ax * By + Ay * Bx;
       }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = -vsrc->x;
-            vdst->y = vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = -vsrc->x;
-            vdst->y = -vsrc->y;
-         }
-      }
-   }
 }
 
-void vmoveneg(complex *vdst, const complex *vsrc, ae_int_t N) {
-   vmoveneg(vdst, 1, vsrc, 1, "N", N);
-}
-
-void vmove(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst = alpha * (*vsrc);
-   } else {
-   //
-   // optimized case
-   //
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] = alpha * vsrc[0];
-         vdst[1] = alpha * vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] = alpha * vsrc[0];
-   }
-}
-
-void vmove(double *vdst, const double *vsrc, ae_int_t N, double alpha) {
-   vmove(vdst, 1, vsrc, 1, N, alpha);
-}
-
-void vmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = -alpha * vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = alpha * vsrc->y;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = -alpha * vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = alpha * vsrc->y;
-         }
-      }
-   }
-}
-
-void vmove(complex *vdst, const complex *vsrc, ae_int_t N, double alpha) {
-   vmove(vdst, 1, vsrc, 1, "N", N, alpha);
-}
-
-void vmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = ax * vsrc->x + ay * vsrc->y;
-            vdst->y = -ax * vsrc->y + ay * vsrc->x;
-         }
-      } else {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = ax * vsrc->x - ay * vsrc->y;
-            vdst->y = ax * vsrc->y + ay * vsrc->x;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = ax * vsrc->x + ay * vsrc->y;
-            vdst->y = -ax * vsrc->y + ay * vsrc->x;
-         }
-      } else {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = ax * vsrc->x - ay * vsrc->y;
-            vdst->y = ax * vsrc->y + ay * vsrc->x;
-         }
-      }
-   }
-}
-
-void vmove(complex *vdst, const complex *vsrc, ae_int_t N, complex alpha) {
-   vmove(vdst, 1, vsrc, 1, "N", N, alpha);
-}
-
-void vadd(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst += *vsrc;
-   } else {
-   //
-   // optimized case
-   //
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] += vsrc[0];
-         vdst[1] += vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] += vsrc[0];
-   }
-}
-
-void vadd(double *vdst, const double *vsrc, ae_int_t N) {
-   vadd(vdst, 1, vsrc, 1, N);
-}
-
-void vadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += vsrc->x;
-            vdst->y -= vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += vsrc->x;
-            vdst->y += vsrc->y;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += vsrc->x;
-            vdst->y -= vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += vsrc->x;
-            vdst->y += vsrc->y;
-         }
-      }
-   }
-}
-
-void vadd(complex *vdst, const complex *vsrc, ae_int_t N) {
-   vadd(vdst, 1, vsrc, 1, "N", N);
-}
-
-void vadd(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst += alpha * (*vsrc);
-   } else {
-   //
-   // optimized case
-   //
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] += alpha * vsrc[0];
-         vdst[1] += alpha * vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] += alpha * vsrc[0];
-   }
-}
-
-void vadd(double *vdst, const double *vsrc, ae_int_t N, double alpha) {
-   vadd(vdst, 1, vsrc, 1, N, alpha);
-}
-
-void vadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y -= alpha * vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y += alpha * vsrc->y;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y -= alpha * vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y += alpha * vsrc->y;
-         }
-      }
-   }
-}
-
-void vadd(complex *vdst, const complex *vsrc, ae_int_t N, double alpha) {
-   vadd(vdst, 1, vsrc, 1, "N", N, alpha);
-}
-
-void vadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      double ax = alpha.x, ay = alpha.y;
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += ax * vsrc->x + ay * vsrc->y;
-            vdst->y -= ax * vsrc->y - ay * vsrc->x;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += ax * vsrc->x - ay * vsrc->y;
-            vdst->y += ax * vsrc->y + ay * vsrc->x;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      double ax = alpha.x, ay = alpha.y;
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += ax * vsrc->x + ay * vsrc->y;
-            vdst->y -= ax * vsrc->y - ay * vsrc->x;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += ax * vsrc->x - ay * vsrc->y;
-            vdst->y += ax * vsrc->y + ay * vsrc->x;
-         }
-      }
-   }
-}
-
-void vadd(complex *vdst, const complex *vsrc, ae_int_t N, complex alpha) {
-   vadd(vdst, 1, vsrc, 1, "N", N, alpha);
-}
-
-void vsub(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst -= *vsrc;
-   } else {
-   //
-   // optimized case
-   //
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] -= vsrc[0];
-         vdst[1] -= vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] -= vsrc[0];
-   }
-}
-
-void vsub(double *vdst, const double *vsrc, ae_int_t N) {
-   vsub(vdst, 1, vsrc, 1, N);
-}
-
-void vsub(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x -= vsrc->x;
-            vdst->y += vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x -= vsrc->x;
-            vdst->y -= vsrc->y;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x -= vsrc->x;
-            vdst->y += vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x -= vsrc->x;
-            vdst->y -= vsrc->y;
-         }
-      }
-   }
-}
-
-void vsub(complex *vdst, const complex *vsrc, ae_int_t N) {
-   vsub(vdst, 1, vsrc, 1, "N", N);
-}
-
-void vsub(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha) {
-   vadd(vdst, stride_dst, vsrc, stride_src, n, -alpha);
-}
-
-void vsub(double *vdst, const double *vsrc, ae_int_t N, double alpha) {
-   vadd(vdst, 1, vsrc, 1, N, -alpha);
-}
-
-void vsub(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   vadd(vdst, stride_dst, vsrc, stride_src, conj_src, n, -alpha);
-}
-
-void vsub(complex *vdst, const complex *vsrc, ae_int_t n, double alpha) {
-   vadd(vdst, 1, vsrc, 1, "N", n, -alpha);
-}
-
-void vsub(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
-   vadd(vdst, stride_dst, vsrc, stride_src, conj_src, n, -alpha);
-}
-
-void vsub(complex *vdst, const complex *vsrc, ae_int_t n, complex alpha) {
-   vadd(vdst, 1, vsrc, 1, "N", n, -alpha);
-}
-
-void vmul(double *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst)
-         *vdst *= alpha;
-   } else {
-   //
-   // optimized case
-   //
-      for (i = 0; i < n; i++, vdst++)
-         *vdst *= alpha;
-   }
-}
-
-void vmul(double *vdst, ae_int_t N, double alpha) {
-   vmul(vdst, 1, N, alpha);
-}
-
-void vmul(complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst) {
-         vdst->x *= alpha;
-         vdst->y *= alpha;
-      }
-   } else {
-   //
-   // optimized case
-   //
-      for (i = 0; i < n; i++, vdst++) {
-         vdst->x *= alpha;
-         vdst->y *= alpha;
-      }
-   }
-}
-
-void vmul(complex *vdst, ae_int_t N, double alpha) {
-   vmul(vdst, 1, N, alpha);
-}
-
-void vmul(complex *vdst, ae_int_t stride_dst, ae_int_t n, complex alpha) {
-   ae_int_t i;
-   if (stride_dst != 1) {
-   //
-   // general unoptimized case
-   //
-      double ax = alpha.x, ay = alpha.y;
-      for (i = 0; i < n; i++, vdst += stride_dst) {
-         double dstx = vdst->x, dsty = vdst->y;
-         vdst->x = ax * dstx - ay * dsty;
-         vdst->y = ax * dsty + ay * dstx;
-      }
-   } else {
-   //
-   // optimized case
-   //
-      double ax = alpha.x, ay = alpha.y;
-      for (i = 0; i < n; i++, vdst++) {
-         double dstx = vdst->x, dsty = vdst->y;
-         vdst->x = ax * dstx - ay * dsty;
-         vdst->y = ax * dsty + ay * dstx;
-      }
-   }
-}
-
-void vmul(complex *vdst, ae_int_t N, complex alpha) {
-   vmul(vdst, 1, N, alpha);
+void vmul(complex *A, ae_int_t N, complex Alpha) {
+   vmul(A, 1, N, Alpha);
 }
 
 // Matrices and Vectors: I/O.
