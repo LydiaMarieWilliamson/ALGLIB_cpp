@@ -108,6 +108,7 @@ typedef enum { NonTH, SerTH, ParTH } xparams;
 
 // Now we are ready to include the remaining headers.
 // #include <ctype.h>
+// #include <stdarg.h>
 #include <string.h>
 #include <setjmp.h>
 #if defined AE_HAVE_STDINT
@@ -205,8 +206,6 @@ extern ae_int_t _malloc_failure_after;
 // Frame marker.
 typedef struct ae_dyn_block ae_frame;
 
-// A legible message associated with the last error; filled when an exception is thrown.
-//(@) Originally part of the global state structure, this should be made thread-local.
 void ae_state_set_break_jump(jmp_buf *buf);
 void ae_state_set_flags(ae_uint64_t flags);
 
@@ -228,7 +227,7 @@ extern const ae_cpuid_t CurCPU;
 ae_int_t ae_cores_count();
 ae_int_t ae_get_effective_workers(ae_int_t nworkers);
 
-// Id values for ae_[sg]et_debug_value().
+// Id values for ae_[sg]et_dbg_value().
 typedef enum {
 // get set
    _ALGLIB_ALLOC_COUNTER = 0, _ALGLIB_TOTAL_ALLOC_SIZE = 1,
@@ -386,7 +385,7 @@ void ae_smart_ptr_release(ae_smart_ptr *dst);
 enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION = 2, ACT_NEW_LOCATION = 3 };
 
 #if 0 //(@) Not used anywhere.
-// x-strings (zero-terminated): members are ae_int64_t to avoid alignment problems.
+// x-strings (zero-terminated): members are ae_int64_t aligned to avoid alignment problems.
 // Compiler-specific alignment definitions.
 #   if AE_COMPILER == AE_GNUC
 #      define ALIGNED __attribute__((aligned(8)))
@@ -439,7 +438,7 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src);
 void ae_x_attach_to_vector(x_vector *dst, ae_vector *src);
 void x_vector_free(x_vector *dst, bool make_automatic);
 
-// x-matrices: members are ae_int64_t to avoid alignment problems.
+// x-matrices: members are ae_int64_t aligned to avoid alignment problems.
 struct x_matrix {
 // The matrix size.
 // If either dimension is 0, then both must be.
@@ -654,9 +653,9 @@ double rboundval(double x, double b1, double b2);
 
 // Debug-enabled random number functions:
 // TODO:
-// ∙	ae_set_seed():	set the seed of the debug random number generator (NOT thread-safe!!!).
-// ∙	ae_get_seed():	the seed value of the debug random number generator (NOT thread-safe!!!).
-// ∙	ae_debugrng():	a random number generated with a high-quality random number generator.
+// *	ae_set_seed():	set the seed of the debug random number generator (NOT thread-safe!!!).
+// *	ae_get_seed():	the seed value of the debug random number generator (NOT thread-safe!!!).
+// *	ae_debugrng():	a random number generated with a high-quality random number generator.
 double randomreal();
 double randommid();
 ae_int_t randominteger(ae_int_t maxv);
@@ -765,6 +764,10 @@ struct ap_error {
 #else
 // Exception-free code.
 #   define ThrowErrorMsg(X)	set_error_msg(); return X
+//(@) The following restriction is unnecessary.
+// #   if AE_OS != AE_OTHER_OS
+// #      error Exception-free mode can not be combined with AE_OS definition
+// #   endif
 #   if AE_THREADING != NonTH
 #      error Exception-free mode is thread-unsafe; define AE_THREADING = NonTH to prove that you know it.
 #   endif
@@ -788,7 +791,7 @@ void clear_error_flag();
 #define ConstT(T, Val)	(const_cast<alglib_impl::T *>((Val).c_ptr()))
 #define ComplexOf(Val)	(*reinterpret_cast<complex *>(&(Val)))
 
-// Pseudo-templates:
+// Pseudo-templates for ALGLIB++ "Class" types:
 // The triple-layering -- also present in the distribution version of ALGLIB --
 // is the cost of trying to make a C++ type into a C structure, and to then turn around and wrap it back into a C++ type.
 // It's better to just lose the C code (which is, effectively, what the alglib_impl namespace is and encapsulates)
@@ -933,7 +936,7 @@ void setglobalthreading(const xparams settings);
 // NOTES:
 // *	Segments A and B should NOT overlap.
 // *	Strides dA, dB must be > 0, but are not assert()'ed within the function.
-// *	CjA, CjB specify whether or not A and B respectively are to be conjugated before processing.
+// *	CjA and CjB specify whether or not A and B respectively are to be conjugated before processing.
 //	Any string which starts with 'N' or 'n' ("No conj", for example) specifies an unmodified parameter.
 //	All other strings specify conjugation of the input, but "Conj" is recommended for use in such cases.
 double vdotproduct(const double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
@@ -1021,7 +1024,7 @@ protected:
 // "frozen proxy" mode is activated (you can read/write, but can not reallocate and do not own the vector's memory).
 // NOTES:
 // *	The wrapper object is assumed to start out already initialized; all previously allocated memory is properly deallocated.
-// *	The X-object pointed to by new_ptr is used only once;
+// *	The X-object at new_ptr is used only once;
 //	after we fetch the pointer to memory and its size, this X-object is ignored and not referenced anymore.
 //	So, you can pass pointers to temporary x-structures which are deallocated immediately after you call attach_to().
 // *	The state structure is used for error reporting purposes (longjmp on errors).
@@ -1041,7 +1044,7 @@ protected:
 #endif
 // The indicated C-structure used by the C-core and the inner ae_vector:
 // *	This == &Obj:	the object owns the ae_vector and is to handle its deallocation.
-// *	This != &Obj:	someone else owns the ae_vector object and is to handle its deallocation;
+// *	This != &Obj:	someone else owns the ae_vector and is to handle its deallocation;
 //			while Obj is assumed to be uninitialized and is ignored.
    alglib_impl::ae_vector *This, Obj;
 // True if and only if the vector's object was internally allocated and is owned.
@@ -1167,12 +1170,19 @@ protected:
 // "frozen proxy" mode is activated (you can read/write, but can not reallocate and do not own the matrix's memory).
 // NOTES:
 // *	The wrapper object is assumed to start out already initialized; all previously allocated memory is properly deallocated.
-// *	The X-object pointed to by new_ptr is used only once;
+// *	The X-object at new_ptr is used only once;
 //	after we fetch the pointer to memory and its size, this X-object is ignored and not referenced anymore.
 //	So, you can pass pointers to temporary x-structures which are deallocated immediately after you call attach_to().
 // *	The state structure is used for error-handling purposes (longjmp on errors).
 //	All previously allocated memory is correctly freed on error.
    void attach_to(alglib_impl::x_matrix *new_ptr);
+#if 0 //(@) Not implemented.
+// This function initializes matrix and allocates own memory storage.
+// NOTE:
+// *	initial state of wrapper object is assumed to be uninitialized;
+//	if This != NULL on entry, it is considered critical error (abort is called).
+   void init(ae_int_t rows, ae_int_t cols, alglib_impl::ae_datatype datatype);
+#endif
 // Assign rhs to the current object and return *this.
 // It has several branches depending on the target object's status:
 // *	For proxy objects, copy the data to the proxy.
@@ -1188,7 +1198,7 @@ protected:
 #endif
 // The internal C-structure used by the C-core and the inner ae_matrix.
 // *	This == &Obj:	the matrix owns the ae_matrix and is to handle its deallocation.
-// *	This != &Obj:	someone else owns the ae_matrix object and is to handle its deallocation;
+// *	This != &Obj:	someone else owns the ae_matrix and is to handle its deallocation;
 //			while Obj is assumed to be uninitialized and to be ignored.
    alglib_impl::ae_matrix *This, Obj;
 // True if and only if the matrix's object was internally allocated and is owned.

@@ -1060,6 +1060,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 39	Continuing stage 33: more conversions related to sinteger ⇒ ae_int_t, sreal ⇒ double, srealarray ⇒ RVector.
 39	Setting the values of values of global_failure_flag and the return values of main() to EXIT_{SUCCESS,FAILURE}.
 39	Possible hidden bug in minbleiciteration() removed (the iteration counter bounds were set wrong).
+39	Renamed _ae_core_count() as ae_cores_count().
 </pre>
 </p>
 <p>
@@ -1205,8 +1206,9 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 39	5465 0.9x 7875 1.0x 8406 0.9x 7258 1.0x 1639362698 (61b6b08a) 82 // Minor fixes in TestX.cpp.
 39	5319 1.0x 7813 1.0x 8133 1.0x 7428 1.0x 1639430716 (61b7ba3c) 79 // Removing the CPU initialization from Ap.{cpp,h}.
 39	5000 1.0x 6494 1.2x 8003 1.0x 6826 1.0x 1641872436 (61dcfc34) 82 // Re-sorting of routines to better match 3.18.0.
-39	4505 0.9x 6994 1.0x 7815 1.0x 7225 1.0x 1644177884 (620029dc) 77 // Retrofitting changes made separately for 3.18.0 into here.
-39	5435 1.0x 8404 1.0x 8267 1.0x 7255 1.0x 1644800572 (6209aa3c) 75 // Retrofitting changes made into the RCOMM interface for 3.18.0 into here.
+39	4505 0.9x 6994 1.0x 7815 1.0x 7225 1.0x 1644177884 (620029dc) 77 // Adding changes made separately for 3.18.0 into here.
+39	5435 1.0x 8404 1.0x 8267 1.0x 7255 1.0x 1644800572 (6209aa3c) 75 // Adding changes made into the RCOMM interface for 3.18.0 into here.
+39	4237 1.0x 6897 1.1x 8406 1.0x 7386 1.0x 1645175143 (620f6167) 77 // Adding changes made separately for 3.18.0 to Ap.* and TestX.cpp.
 </pre>
 </p>
 </div>
