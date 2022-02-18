@@ -542,6 +542,8 @@ A6.3. Test Results
 39	8065 0.9x 11629 0.9x 11368 1.1x 9172 1.0x 1644615571 (6206d793) 78 // Error in TestC (iterativesparse) corrected.
 39	8130 1.0x 12501 1.0x 12052 1.0x 9307 1.0x 1644616814 (6206dc6e) 75 // Error in TestC (minnlc) corrected.
 39	7576 1.1x 12347 1.0x 12350 0.9x 8957 1.0x 1644799817 (6209a749) 77 // Normalization of the RCOMM routines and those similar to it.
+39	6289 1.0x 9710 1.0x 8775 1.1x 8569 1.1x 1645146923 (620ef32b) 79 // Restructuring Ap.{cpp,h} & TestZ.cpp; retrofitting ALGLIB++.
+39	7937 1.0x 11906 1.0x 11769 1.0x 8699 1.1x 1645147397 (620ef505) 79 // Re-testing, with other processes off.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -566,12 +568,12 @@ TestZ: Exception-Free Wrapper Test
 ./TestZ
 Test exception-free error handling:
 Allocation counter activated...
-* default flag value          OK
-* 1D arrays                   OK
-* 2D arrays                   OK
-* ALGLIB objects              OK
-* ALGLIB functions            OK
-Allocation counter checked... OK
+* default flag value          Ok
+* 1D arrays                   Ok
+* 2D arrays                   Ok
+* ALGLIB objects              Ok
+* ALGLIB functions            Ok
+Allocation counter checked... Ok
 echo "TestX: Speed and Consistency"
 TestX: Speed and Consistency
 ./TestX
@@ -598,19 +600,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7576
-* RGEMM-MTN-16              1.1x
-* RGEMM-SEQ-32   (MFLOPS)  12347
+* RGEMM-SEQ-16   (MFLOPS)   7937
+* RGEMM-MTN-16              1.0x
+* RGEMM-SEQ-32   (MFLOPS)   11906
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12350
-* RGEMM-MTN-64              0.9x
-* RGEMM-SEQ-1024 (MFLOPS)   8957
-* RGEMM-MTN-1024            1.0x
+* RGEMM-SEQ-64   (MFLOPS)   11769
+* RGEMM-MTN-64              1.0x
+* RGEMM-SEQ-1024 (MFLOPS)   8699
+* RGEMM-MTN-1024            1.1x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1644799817
+SEED: 1645147397
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -710,4 +712,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 77 seconds
+Done in 79 seconds

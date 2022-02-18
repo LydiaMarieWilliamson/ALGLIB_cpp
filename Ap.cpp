@@ -1725,7 +1725,7 @@ static inline void _ae_release_lock(_lock *p) { p->is_locked = false; }
 static inline void _ae_free_lock(_lock *p) { }
 #endif
 
-// Initialize an ae_lock.
+// Initialize a free ae_lock.
 // NOTES:
 // *	make_automatic indicates whether or not the lock is to be added to the automatic memory management list.
 // *	As a special exception, this function allows you to specify TopFr == NULL.
@@ -1737,14 +1737,14 @@ static inline void _ae_free_lock(_lock *p) { }
 //	Errors during allocation of such locks are considered critical exceptions and are handled by calling abort().
 void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic) {
 //(@) Zero-check removed.
-   bool is_auto = is_static || TopFr != NULL;
+   bool is_auto = !is_static && TopFr != NULL;
    if (!is_auto) {
       AE_CRITICAL_ASSERT(!make_automatic);
       ae_state_init();
    }
    lock->is_static = is_static;
    size_t size = sizeof(_lock);
-   if (!is_static) ae_db_init(&lock->db, size, make_automatic);
+   ae_db_init(&lock->db, size, make_automatic);
    lock->lock_ptr = !is_static ? lock->db.ptr : size == 0 || _force_malloc_failure ? NULL : malloc(size);
    _ae_init_lock((_lock *)lock->lock_ptr);
    if (!is_auto) ae_state_clear();
@@ -2179,9 +2179,8 @@ static bool cpp_reader(ae_int_t aux, ae_int_t cnt, char *p_buf) {
    while (true) {
       int c = stream->get();
       if (c < 0 || c > 0xff) return false; // Failure!
-      else if (c != ' ' && c != '\t' && c != '\n' && c != '\r') break;
+      else if (c != ' ' && c != '\t' && c != '\n' && c != '\r') { p_buf[0] = (char)c; break; }
    }
-   p_buf[0] = (char)c;
    for (int k = 1; k < cnt; k++) {
       int c = stream->get();
       if (c < 0 || c > 0xff || c == ' ' || c == '\t' || c == '\n' || c == '\r') return false; // Failure!
