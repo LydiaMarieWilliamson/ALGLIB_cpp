@@ -2739,145 +2739,60 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
 }
 
 // Integer and real math functions.
-bool isposinf(double x) {
-   return isinf(x) && !signbit(x);
+bool isneginf(double x) { return isinf(x) && signbit(x); }
+bool isposinf(double x) { return isinf(x) && !signbit(x); }
+
+ae_int_t imin2(ae_int_t x, ae_int_t y) { return x > y ? y : x; }
+
+// Return min(x,y,z).
+ae_int_t imin3(ae_int_t x, ae_int_t y, ae_int_t z) {
+   ae_int_t xy = x < y ? x : y;
+   return xy < z ? xy : z;
 }
 
-bool isneginf(double x) {
-   return isinf(x) && signbit(x);
+ae_int_t imax2(ae_int_t x, ae_int_t y) { return x > y ? x : y; }
+
+// Return max(x,y,z).
+ae_int_t imax3(ae_int_t x, ae_int_t y, ae_int_t z) {
+   ae_int_t xy = x > y ? x : y;
+   return xy > z ? xy : z;
 }
 
-ae_int_t imin2(ae_int_t m1, ae_int_t m2) {
-   return m1 > m2 ? m2 : m1;
+ae_int_t ae_iabs(ae_int_t x) { return x >= 0 ? x : -x; }
+ae_int_t sign(double x) { return x > 0 ? +1 : x < 0 ? -1 : 0; }
+ae_int_t iround(double x) { return (ae_int_t)round(x); }
+ae_int_t itrunc(double x) { return (ae_int_t)trunc(x); }
+ae_int_t ifloor(double x) { return (ae_int_t)floor(x); }
+ae_int_t iceil(double x) { return (ae_int_t)ceil(x); }
+
+double rmin2(double x, double y) { return x > y ? y : x; }
+double rmax2(double x, double y) { return x > y ? x : y; }
+
+// Return max(x,y,z).
+double rmax3(double x, double y, double z) {
+   double xy = x > y ? x : y;
+   return xy > z ? xy : z;
 }
 
-// This function returns min(i0,i1,i2)
-ae_int_t imin3(ae_int_t i0, ae_int_t i1, ae_int_t i2) {
-   ae_int_t result;
-   result = i0;
-   if (i1 < result) {
-      result = i1;
-   }
-   if (i2 < result) {
-      result = i2;
-   }
-   return result;
+// Return max(|x|,|y|,|z|).
+double rmaxabs3(double x, double y, double z) {
+   x = fabs(x), y = fabs(y), z = fabs(z);
+   double xy = x > y ? x : y;
+   return xy > z ? xy : z;
 }
 
-ae_int_t imax2(ae_int_t m1, ae_int_t m2) {
-   return m1 > m2 ? m1 : m2;
-}
+double sqr(double x) { return x * x; }
 
-// This function returns max(i0,i1,i2)
-ae_int_t imax3(ae_int_t i0, ae_int_t i1, ae_int_t i2) {
-   ae_int_t result;
-   result = i0;
-   if (i1 > result) {
-      result = i1;
-   }
-   if (i2 > result) {
-      result = i2;
-   }
-   return result;
-}
-
-ae_int_t ae_iabs(ae_int_t x) {
-   return x >= 0 ? x : -x;
-}
-
-ae_int_t sign(double x) {
-   if (x > 0) return 1;
-   if (x < 0) return -1;
-   return 0;
-}
-
-ae_int_t iround(double x) {
-   return (ae_int_t)round(x);
-}
-
-ae_int_t itrunc(double x) {
-   return (ae_int_t)trunc(x);
-}
-
-ae_int_t ifloor(double x) {
-   return (ae_int_t)floor(x);
-}
-
-ae_int_t iceil(double x) {
-   return (ae_int_t)ceil(x);
-}
-
-double rmin2(double m1, double m2) {
-   return m1 > m2 ? m2 : m1;
-}
-
-double rmax2(double m1, double m2) {
-   return m1 > m2 ? m1 : m2;
-}
-
-// This function returns max(r0,r1,r2)
-double rmax3(double r0, double r1, double r2) {
-   double result;
-   result = r0;
-   if (r1 > result) {
-      result = r1;
-   }
-   if (r2 > result) {
-      result = r2;
-   }
-   return result;
-}
-
-// This function returns max(|r0|,|r1|,|r2|)
-double rmaxabs3(double r0, double r1, double r2) {
-   double result;
-   r0 = fabs(r0);
-   r1 = fabs(r1);
-   r2 = fabs(r2);
-   result = r0;
-   if (r1 > result) {
-      result = r1;
-   }
-   if (r2 > result) {
-      result = r2;
-   }
-   return result;
-}
-
-double sqr(double x) {
-   return x * x;
-}
-
-// 'bounds' value: maps X to [B1,B2]
+// Clip x to [b1, b2], mapping to the nearest endpoint if outside the interval.
+// This assumes b1 < b2.
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+// Integer version.
 ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2) {
-   ae_int_t result;
-   if (x <= b1) {
-      result = b1;
-      return result;
-   }
-   if (x >= b2) {
-      result = b2;
-      return result;
-   }
-   result = x;
-   return result;
+   return x <= b1 ? b1 : x >= b2 ? b2 : x;
 }
-
-// 'bounds' value: maps X to [B1,B2]
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+// Real version.
 double rboundval(double x, double b1, double b2) {
-   double result;
-   if (x <= b1) {
-      result = b1;
-      return result;
-   }
-   if (x >= b2) {
-      result = b2;
-      return result;
-   }
-   result = x;
-   return result;
+   return x <= b1 ? b1 : x >= b2 ? b2 : x;
 }
 
 double randomreal() {
@@ -2890,9 +2805,7 @@ double randommid() {
    return 2.0 * (rand() + rand() / mx) / mx - 1.0;
 }
 
-ae_int_t randominteger(ae_int_t maxv) {
-   return rand() % maxv;
-}
+ae_int_t randominteger(ae_int_t maxv) { return rand() % maxv; }
 
 bool randombool(double p/* = 0.5*/) {
    const double mx = (double)RAND_MAX + 1.0;
@@ -7433,16 +7346,26 @@ void clear_error_flag() { _alglib_last_error = NULL; }
 
 #if 0
 // Global and local constants and variables.
-const double machineepsilon = 5E-16, maxrealnumber = 1E300, minrealnumber = 1E-300;
+const double machineepsilon = 5.0E-16, maxrealnumber = 1.0E300, minrealnumber = 1.0E-300;
+const double pi = 3.1415926535897932384626433832795;
 static const ae_int_t ByteOrder = alglib_impl::ByteOrder;
 #endif
 
 // Standard functions.
-int sign(double x) {
-   if (x > 0) return 1;
-   if (x < 0) return -1;
-   return 0;
-}
+bool isneginf(double x) { return isinf(x) && signbit(x); }
+bool isposinf(double x) { return isinf(x) && !signbit(x); }
+
+int minint(int x, int y) { return x > y ? y : x; }
+int maxint(int x, int y) { return x > y ? x : y; }
+int sign(double x) { return x > 0 ? +1 : x < 0 ? -1 : 0; }
+int iround(double x) { return int(round(x)); }
+int itrunc(double x) { return int(trunc(x)); }
+int ifloor(double x) { return int(floor(x)); }
+int iceil(double x) { return int(ceil(x)); }
+
+double minreal(double x, double y) { return x > y ? y : x; }
+double maxreal(double x, double y) { return x > y ? x : y; }
+double sqr(double x) { return x * x; }
 
 double randomreal() {
    const double mx = (double)RAND_MAX + 1.0;
@@ -7454,57 +7377,11 @@ double randommid() {
    return 2.0 * (rand() + rand() / mx) / mx - 1.0;
 }
 
-ae_int_t randominteger(ae_int_t maxv) {
-   return (ae_int_t)rand() % maxv;
-}
+ae_int_t randominteger(ae_int_t maxv) { return (ae_int_t)rand() % maxv; }
 
 bool randombool(double p/* = 0.5*/) {
    const double mx = (double)RAND_MAX + 1.0;
    return rand() + rand()/mx <= p * mx;
-}
-
-int round(double x) {
-   return int(round(x));
-}
-
-int trunc(double x) {
-   return int(trunc(x));
-}
-
-int ifloor(double x) {
-   return int(floor(x));
-}
-
-int iceil(double x) {
-   return int(ceil(x));
-}
-
-double sqr(double x) {
-   return x * x;
-}
-
-int maxint(int m1, int m2) {
-   return m1 > m2 ? m1 : m2;
-}
-
-int minint(int m1, int m2) {
-   return m1 > m2 ? m2 : m1;
-}
-
-double maxreal(double m1, double m2) {
-   return m1 > m2 ? m1 : m2;
-}
-
-double minreal(double m1, double m2) {
-   return m1 > m2 ? m2 : m1;
-}
-
-bool isposinf(double x) {
-   return isinf(x) && !signbit(x);
-}
-
-bool isneginf(double x) {
-   return isinf(x) && signbit(x);
 }
 
 // Complex number with double precision.

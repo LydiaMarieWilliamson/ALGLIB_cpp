@@ -643,14 +643,14 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
 
 // Real math functions: IEEE-compliant floating point comparisons and standard functions.
 // * IEEE-compliant floating point comparisons.
-bool isposinf(double x);
 bool isneginf(double x);
+bool isposinf(double x);
 
 // * Standard functions.
-ae_int_t imin2(ae_int_t m1, ae_int_t m2);
-ae_int_t imin3(ae_int_t i0, ae_int_t i1, ae_int_t i2);
-ae_int_t imax2(ae_int_t m1, ae_int_t m2);
-ae_int_t imax3(ae_int_t i0, ae_int_t i1, ae_int_t i2);
+ae_int_t imin2(ae_int_t x, ae_int_t y);
+ae_int_t imin3(ae_int_t x, ae_int_t y, ae_int_t z);
+ae_int_t imax2(ae_int_t x, ae_int_t y);
+ae_int_t imax3(ae_int_t x, ae_int_t y, ae_int_t z);
 ae_int_t ae_iabs(ae_int_t x);
 ae_int_t sign(double x);
 ae_int_t iround(double x);
@@ -658,10 +658,10 @@ ae_int_t itrunc(double x);
 ae_int_t ifloor(double x);
 ae_int_t iceil(double x);
 
-double rmin2(double m1, double m2);
-double rmax2(double m1, double m2);
-double rmax3(double r0, double r1, double r2);
-double rmaxabs3(double r0, double r1, double r2);
+double rmin2(double x, double y);
+double rmax2(double x, double y);
+double rmax3(double x, double y, double z);
+double rmaxabs3(double x, double y, double z);
 double sqr(double x);
 
 ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2);
@@ -1019,28 +1019,28 @@ typedef alglib_impl::ae_int_t ae_int_t;
 #if 0
 // Constants and functions introduced for compatibility with AlgoPascal.
 extern const double machineepsilon, maxrealnumber, minrealnumber;
+extern const double pi;
 #endif
 
+bool isneginf(double x);
+bool isposinf(double x);
+
+int minint(int x, int y);
+int maxint(int x, int y);
 int sign(double x);
+int iround(double x);
+int itrunc(double x);
+int ifloor(double x);
+int iceil(double x);
+
+double minreal(double x, double y);
+double maxreal(double x, double y);
+double sqr(double x);
 
 double randomreal();
 double randommid();
 ae_int_t randominteger(ae_int_t maxv);
 bool randombool(double p = 0.5);
-
-int round(double x);
-int trunc(double x);
-int ifloor(double x);
-int iceil(double x);
-
-double sqr(double x);
-int maxint(int m1, int m2);
-int minint(int m1, int m2);
-double maxreal(double m1, double m2);
-double minreal(double m1, double m2);
-
-bool isposinf(double x);
-bool isneginf(double x);
 
 // Complex number with double precision.
 struct complex {
