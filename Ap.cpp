@@ -192,16 +192,17 @@ void ae_set_global_threading(ae_uint64_t flg_value) {
 }
 
 // The recommended number of active workers:
-// *	The exact number of cores to use if AE_NWORKERS > 0
-// *	ALL available cores, if AE_NWORKERS == 0
-// *	max(_alglib_cores_to_use + AE_NWORKERS, 1), if AE_NWORKERS < 0.
-// *	Default value = 0: either full parallelism if AE_NWORKERS is not defined,
+// *	The exact number of cores to use, if AE_NWORKERS > 0,
+// *	ALL available cores, if AE_NWORKERS == 0,
+// *	max(_alglib_cores_to_use + AE_NWORKERS, 1), if AE_NWORKERS < 0,
+// *	Default value == 0: either full parallelism if AE_NWORKERS is not defined,
 //	or a manually-set number of cores if AE_NWORKERS is defined.
 // PROTECTION:
 // *	not needed; runtime modification is possible, but we do not need exact synchronization.
 #if defined AE_NWORKERS && AE_NWORKERS <= 0
 #   error AE_NWORKERS must be positive number or not defined at all.
 #endif
+
 static ae_int_t _alglib_cores_to_use = 0;
 
 // CPUID
@@ -225,11 +226,11 @@ static ae_cpuid_t ae_cpuid() {
 #      if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
       ae_int_t a, b, c, d;
       __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
-      if (d&0x04000000) _ae_cpuid_has_sse2 = true;
+      if (d & 0x04000000) _ae_cpuid_has_sse2 = true;
 #      elif AE_COMPILER == AE_MSVC
       int CPUInfo[4];
       __cpuid(CPUInfo, 1);
-      if (CPUInfo[3]&0x04000000) _ae_cpuid_has_sse2 = true;
+      if (CPUInfo[3] & 0x04000000) _ae_cpuid_has_sse2 = true;
 #      endif
 #   endif
    } { // Perform one more CPUID call to generate memory fence
@@ -263,12 +264,11 @@ ae_int_t ae_cores_count() {
 #if AE_OS == AE_POSIX
    return sysconf(_SC_NPROCESSORS_ONLN);
 #   if 0 //(@) Was:
-// long Cores = sysconf(_SC_NPROCESSORS_ONLN);
-// return Cores <= 0 ? 1 : Cores;
+   long Cores = sysconf(_SC_NPROCESSORS_ONLN);
+   return Cores <= 0 ? 1 : Cores;
 #   endif
 #elif AE_OS == AE_WINDOWS
-   SYSTEM_INFO sysInfo;
-   GetSystemInfo(&sysInfo);
+   SYSTEM_INFO sysInfo; GetSystemInfo(&sysInfo);
    return (ae_int_t)sysInfo.dwNumberOfProcessors;
 #else
    return 1;
@@ -278,11 +278,11 @@ ae_int_t ae_cores_count() {
 // Map the nworkers number (which can be positive, zero for "all cores" or negative, e.g. -1 meaning "all cores -1")
 // to an "effective", strictly positive workers count.
 //
-// This is meant for use by debugging/testing code which tests different numbers of worker threads.
+// This is meant for use by debugging/testing code which tests different number of worker threads.
 // It is NOT aligned in any way with the ALGLIB++ multithreading framework
 // (i.e. it can return a non-zero worker count even for single-threaded GPLed ALGLIB++).
 ae_int_t ae_get_effective_workers(ae_int_t nworkers) {
-// Determine the cores count.
+// Count the cores.
 #if defined AE_NWORKERS
    ae_int_t ncores = AE_NWORKERS;
 #else
@@ -353,10 +353,10 @@ int tickcount() {
    v = now.tv_usec / 1000;
    r += v;
    return r;
-#if 0
+#   if 0
    struct timespec now;
    return clock_gettime(CLOCK_MONOTONIC, &now) ? 0 : now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;
-#endif
+#   endif
 }
 #elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
 int tickcount() {
@@ -5203,14 +5203,14 @@ complex csqr(const complex &A) { double Ax = A.x, Ay = A.y; return complex(Ax * 
 #ifdef AE_HPC
 ae_int_t getnworkers() { return alglib_impl::getnworkers(); }
 void setnworkers(ae_int_t nworkers) { alglib_impl::setnworkers(nworkers); }
-ae_int_t _ae_cores_count() { return alglib_impl::ae_cores_count(); }
+ae_int_t ae_cores_count() { return alglib_impl::ae_cores_count(); }
 alglib_impl::ae_uint64_t _ae_get_global_threading() { return alglib_impl::ae_get_global_threading(); }
 void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) { alglib_impl::ae_set_global_threading(flg_value); }
 void setglobalthreading(const xparams settings) { alglib_impl::ae_set_global_threading((ae_uint64_t)settings); }
 #else
 ae_int_t getnworkers() { return 1; }
 void setnworkers(ae_int_t nworkers) { }
-ae_int_t _ae_cores_count() { return 1; }
+ae_int_t ae_cores_count() { return 1; }
 alglib_impl::ae_uint64_t _ae_get_global_threading() { return SerTH; }
 void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) { }
 void setglobalthreading(const xparams settings) { }

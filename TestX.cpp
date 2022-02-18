@@ -1688,7 +1688,7 @@ int main() {
    // with different threading settings.
    //
       printf("SMP settings vs GEMM speedup:\n");
-      if (_ae_cores_count() > 1) {
+      if (ae_cores_count() > 1) {
          bool Ok = true;
          alglib_impl::ae_uint64_t default_global_threading = _ae_get_global_threading();
          ae_int_t default_nworkers = getnworkers();

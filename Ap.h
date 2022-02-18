@@ -922,7 +922,7 @@ ae_int_t getnworkers();
 void setnworkers(ae_int_t nworkers);
 
 // Internal functions used by TestX.cpp, interfaces for functions present only in the commercial version of ALGLIB.
-ae_int_t _ae_cores_count();
+ae_int_t ae_cores_count();
 alglib_impl::ae_uint64_t _ae_get_global_threading();
 void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value);
 
