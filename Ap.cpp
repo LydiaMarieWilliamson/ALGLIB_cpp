@@ -3248,27 +3248,20 @@ static const ae_int_t alglib_simd_alignment = 0x10;
 static const ae_int_t alglib_r_block = 0x20, alglib_half_r_block = alglib_r_block / 2, alglib_twice_r_block = 2 * alglib_r_block;
 static const ae_int_t alglib_c_block = 0x10, alglib_half_c_block = alglib_c_block / 2, alglib_twice_c_block = 2 * alglib_c_block;
 
-// This subroutine calculates fast 32x32 real matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using either generic C code or native optimizations (if available)
-//
+// A fast 32 x 32 real matrix-vector product:
+//	y = Beta y + Alpha A x
+// with available native optimizations or else generic C code
 // IMPORTANT:
-// * A must be stored in row-major order,
-//   stride is alglib_r_block,
-//   aligned on alglib_simd_alignment boundary
-// * X must be aligned on alglib_simd_alignment boundary
-// * Y may be non-aligned
-static void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
-   ae_int_t i, k;
-   const double *pa0, *pa1, *pb;
-   pa0 = a;
-   pa1 = a + alglib_r_block;
-   pb = x;
-   for (i = 0; i < 16; i++) {
+// *	a must be stored in row-major order with stride = alglib_r_block, aligned on an alglib_simd_alignment boundary
+// *	x must be aligned on an alglib_simd_alignment boundary
+// *	y may be non-aligned
+static void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride, double Alpha, double Beta) {
+   const double *pa0 = a;
+   const double *pa1 = a + alglib_r_block;
+   const double *pb = x;
+   for (ae_int_t i = 0; i < 16; i++) {
       double v0 = 0.0, v1 = 0.0;
-      for (k = 0; k < 4; k++) {
+      for (ae_int_t k = 0; k < 4; k++) {
          v0 += pa0[0] * pb[0];
          v1 += pa1[0] * pb[0];
          v0 += pa0[1] * pb[1];
@@ -3289,11 +3282,10 @@ static void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t
          pa1 += 8;
          pb += 8;
       }
-      y[0] = beta * y[0] + alpha * v0;
-      y[stride] = beta * y[stride] + alpha * v1;
-   // now we've processed rows I and I+1,
-   // pa0 and pa1 are pointing to rows I+1 and I+2.
-   // move to I+2 and I+3.
+      y[0] = Beta * y[0] + Alpha * v0;
+      y[stride] = Beta * y[stride] + Alpha * v1;
+   // Now we've processed rows I and I + 1,
+   // Move pa0 and pa1 from rows I + 1 and I + 2 to rows I + 2 and I + 3.
       pa0 += alglib_r_block;
       pa1 += alglib_r_block;
       pb = x;
@@ -3302,93 +3294,72 @@ static void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t
 }
 
 #if defined AE_HAS_SSE2_INTRINSICS
-// This function calculates MxN real matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
-// product is calculated (only beta is updated); however, this update  is not
-// efficient  and  this  function  should  NOT  be used for multiplication of
-// vector and scalar.
-//
+// The m x n real matrix-vector product (32 x 32 optimized version):
+//	y = Beta y + Alpha a x
+// using generic C code, optimized with _ialglib_mv_32 if (m, n) == (32, 32).
+// If Beta == 0.0, y is overwritten by Alpha a x and if Alpha == 0.0, y is multiplied by Beta.
+// However, the y = Beta y operation here is not done efficiently as a scalar-vector product, and should NOT be used this way.
 // IMPORTANT:
-// * 0 <= M <= alglib_r_block, 0 <= N <= alglib_r_block
-// * A must be stored in row-major order with stride equal to alglib_r_block
-// * y may be non-aligned
-// * both A and x must have same offset with respect to 16-byte boundary:
-//   either both are aligned, or both are aligned with offset 8. Function
-//   will crash your system if you try to call it with misaligned or
-//   incorrectly aligned data.
-//
+// *	(m, n) is in [0, alglib_r_block] x [0, alglib_r_block].
+// *	a must be in row-major order with stride = alglib_r_block.
+// *	y may be non-aligned
+// *	both a and x must have same offset with respect to a 16-byte boundary:
+//	either both are aligned, or both are aligned with offset 8.
+//	You will crash your system if you try to use this with misaligned or incorrectly aligned data.
 // This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. CurCPU contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will be undefined. If (2) is failed,  call
-// to this function will probably crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
+// *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+//	Otherwise, this function will be undefined.
+// *	CurCPU contains CPU_SSE2 (checked at run-time)
+//	Otherwise, calling this function will probably crash your system.
+// If you want to know whether it is safe to call it, you should check CurCPU.
 // If CPU_SSE2 bit is set, this function is callable and will do its work.
-static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
-   ae_int_t i, k, n2;
-   ae_int_t mb3, mtail, nhead, nb8, nb2, ntail;
-   const double *pa0, *pa1, *pa2, *pb;
-   __m128d v0, v1, v2, va0, va1, va2, vx, vtmp;
-// Handle special cases:
-// - alpha is zero or n is zero
-// - m is zero
+static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double Alpha, double Beta) {
+// Handle the special cases:
+// *	Alpha == 0.0 or m n == 0
    if (m == 0)
       return;
-   if (alpha == 0.0 || n == 0) {
-      if (beta == 0.0) {
-         for (i = 0; i < m; i++) {
+   else if (Alpha == 0.0 || n == 0) {
+      if (Beta == 0.0)
+         for (ae_int_t i = 0; i < m; i++) {
             *y = 0.0;
             y += stride;
          }
-      } else {
-         for (i = 0; i < m; i++) {
-            *y *= beta;
+      else
+         for (ae_int_t i = 0; i < m; i++) {
+            *y *= Beta;
             y += stride;
          }
-      }
       return;
    }
-// Handle general case: nonzero alpha, n and m
-//
-// We divide problem as follows...
-//
+// Handle the general case: m n != 0 and Alpha != 0.0.
+// We divide the problem as follows...
 // Rows M are divided into:
-// - mb3 blocks, each 3xN
-// - mtail blocks, each 1xN
-//
-// Within a row, elements are divided  into:
-// - nhead 1x1 blocks (used to align the rest, either 0 or 1)
-// - nb8 1x8 blocks, aligned to 16-byte boundary
-// - nb2 1x2 blocks, aligned to 16-byte boundary
-// - ntail 1x1 blocks, aligned too (altough we don't rely on it)
-//
-   n2 = n / 2;
-   mb3 = m / 3;
-   mtail = m % 3;
-   nhead = ae_misalignment(a, alglib_simd_alignment) == 0 ? 0 : 1;
-   nb8 = (n - nhead) / 8;
-   nb2 = (n - nhead - 8 * nb8) / 2;
-   ntail = n - nhead - 8 * nb8 - 2 * nb2;
-   for (i = 0; i < mb3; i++) {
-      double row0, row1, row2;
-      row0 = 0;
-      row1 = 0;
-      row2 = 0;
-      pb = x;
-      pa0 = a;
-      pa1 = a + alglib_r_block;
-      pa2 = a + alglib_twice_r_block;
+// -	mb3 3 x n blocks,
+// -	mtail 1 x n blocks.
+// Within each row, the elements are divided into:
+// -	nhead 1 x 1 blocks (used to align the rest, either 0 or 1),
+// -	nb8 1 x 8 blocks, aligned to 16-byte boundary,
+// -	nb2 1 x 2 blocks, aligned to 16-byte boundary,
+// -	ntail 1 x 1 blocks, aligned too (altough we don't rely on it).
+   ae_int_t n2 = n / 2;
+   ae_int_t mb3 = m / 3;
+   ae_int_t mtail = m % 3;
+   ae_int_t nhead = ae_misalignment(a, alglib_simd_alignment) == 0 ? 0 : 1;
+   ae_int_t nb8 = (n - nhead) / 8;
+   ae_int_t nb2 = (n - nhead - 8 * nb8) / 2;
+   ae_int_t ntail = n - nhead - 8 * nb8 - 2 * nb2;
+   for (ae_int_t i = 0; i < mb3; i++) {
+      double row0 = 0.0;
+      double row1 = 0.0;
+      double row2 = 0.0;
+      const double *pb = x;
+      const double *pa0 = a;
+      const double *pa1 = a + alglib_r_block;
+      const double *pa2 = a + alglib_twice_r_block;
       a += 3 * alglib_r_block;
+      __m128d v0, v1, v2;
       if (nhead == 1) {
-         vx = _mm_load_sd(pb);
+         __m128d vx = _mm_load_sd(pb);
          v0 = _mm_load_sd(pa0);
          v1 = _mm_load_sd(pa1);
          v2 = _mm_load_sd(pa2);
@@ -3404,14 +3375,15 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          v1 = _mm_setzero_pd();
          v2 = _mm_setzero_pd();
       }
-      for (k = 0; k < nb8; k++) {
-      // this code is a shuffle of simultaneous dot product.
-      // see below for commented unshuffled original version.
-         vx = _mm_load_pd(pb);
-         va0 = _mm_load_pd(pa0);
-         va1 = _mm_load_pd(pa1);
+      for (ae_int_t k = 0; k < nb8; k++) {
+#   if 1
+      // A shuffle of the code for a simultaneous dot product.
+      // See below for the commented-out unshuffled original version.
+         __m128d vx = _mm_load_pd(pb);
+         __m128d va0 = _mm_load_pd(pa0);
+         __m128d va1 = _mm_load_pd(pa1);
          va0 = _mm_mul_pd(va0, vx);
-         va2 = _mm_load_pd(pa2);
+         __m128d va2 = _mm_load_pd(pa2);
          v0 = _mm_add_pd(va0, v0);
          va1 = _mm_mul_pd(va1, vx);
          va0 = _mm_load_pd(pa0 + 2);
@@ -3451,12 +3423,12 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          pa1 += 8;
          pa2 += 8;
          pb += 8;
-#   if 0
-      // this is unshuffled version of code above
-         vx = _mm_load_pd(pb);
-         va0 = _mm_load_pd(pa0);
-         va1 = _mm_load_pd(pa1);
-         va2 = _mm_load_pd(pa2);
+#   else
+      // The unshuffled version of the code above.
+         __m128d vx = _mm_load_pd(pb);
+         __m128d va0 = _mm_load_pd(pa0);
+         __m128d va1 = _mm_load_pd(pa1);
+         __m128d va2 = _mm_load_pd(pa2);
          va0 = _mm_mul_pd(va0, vx);
          va1 = _mm_mul_pd(va1, vx);
          va2 = _mm_mul_pd(va2, vx);
@@ -3495,11 +3467,11 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          v2 = _mm_add_pd(va2, v2);
 #   endif
       }
-      for (k = 0; k < nb2; k++) {
-         vx = _mm_load_pd(pb);
-         va0 = _mm_load_pd(pa0);
-         va1 = _mm_load_pd(pa1);
-         va2 = _mm_load_pd(pa2);
+      for (ae_int_t k = 0; k < nb2; k++) {
+         __m128d vx = _mm_load_pd(pb);
+         __m128d va0 = _mm_load_pd(pa0);
+         __m128d va1 = _mm_load_pd(pa1);
+         __m128d va2 = _mm_load_pd(pa2);
          va0 = _mm_mul_pd(va0, vx);
          v0 = _mm_add_pd(va0, v0);
          va1 = _mm_mul_pd(va1, vx);
@@ -3511,11 +3483,11 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          pa2 += 2;
          pb += 2;
       }
-      for (k = 0; k < ntail; k++) {
-         vx = _mm_load1_pd(pb);
-         va0 = _mm_load1_pd(pa0);
-         va1 = _mm_load1_pd(pa1);
-         va2 = _mm_load1_pd(pa2);
+      for (ae_int_t k = 0; k < ntail; k++) {
+         __m128d vx = _mm_load1_pd(pb);
+         __m128d va0 = _mm_load1_pd(pa0);
+         __m128d va1 = _mm_load1_pd(pa1);
+         __m128d va2 = _mm_load1_pd(pa2);
          va0 = _mm_mul_sd(va0, vx);
          v0 = _mm_add_sd(v0, va0);
          va1 = _mm_mul_sd(va1, vx);
@@ -3523,103 +3495,87 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          va2 = _mm_mul_sd(va2, vx);
          v2 = _mm_add_sd(v2, va2);
       }
-      vtmp = _mm_add_pd(_mm_unpacklo_pd(v0, v1), _mm_unpackhi_pd(v0, v1));
+      __m128d vtmp = _mm_add_pd(_mm_unpacklo_pd(v0, v1), _mm_unpackhi_pd(v0, v1));
       _mm_storel_pd(&row0, vtmp);
       _mm_storeh_pd(&row1, vtmp);
       v2 = _mm_add_sd(_mm_shuffle_pd(v2, v2, 1), v2);
       _mm_storel_pd(&row2, v2);
-      if (beta != 0) {
-         y[0] = beta * y[0] + alpha * row0;
-         y[stride] = beta * y[stride] + alpha * row1;
-         y[2 * stride] = beta * y[2 * stride] + alpha * row2;
+      if (Beta != 0) {
+         y[0] = Beta * y[0] + Alpha * row0;
+         y[stride] = Beta * y[stride] + Alpha * row1;
+         y[2 * stride] = Beta * y[2 * stride] + Alpha * row2;
       } else {
-         y[0] = alpha * row0;
-         y[stride] = alpha * row1;
-         y[2 * stride] = alpha * row2;
+         y[0] = Alpha * row0;
+         y[stride] = Alpha * row1;
+         y[2 * stride] = Alpha * row2;
       }
       y += 3 * stride;
    }
-   for (i = 0; i < mtail; i++) {
-      double row0;
-      row0 = 0;
-      pb = x;
-      pa0 = a;
+   for (ae_int_t i = 0; i < mtail; i++) {
+      double row0 = 0.0;
+      const double *pb = x;
+      const double *pa0 = a;
       a += alglib_r_block;
-      for (k = 0; k < n2; k++) {
+      for (ae_int_t k = 0; k < n2; k++) {
          row0 += pb[0] * pa0[0] + pb[1] * pa0[1];
          pa0 += 2;
          pb += 2;
       }
       if (n % 2)
          row0 += pb[0] * pa0[0];
-      if (beta != 0)
-         y[0] = beta * y[0] + alpha * row0;
+      if (Beta != 0)
+         y[0] = Beta * y[0] + Alpha * row0;
       else
-         y[0] = alpha * row0;
+         y[0] = Alpha * row0;
       y += stride;
    }
 }
 #endif
 
-// This function calculates MxN real matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
-// product is calculated (only beta is updated); however, this update  is not
-// efficient  and  this  function  should  NOT  be used for multiplication of
-// vector and scalar.
-//
-// IMPORTANT:
-// * 0 <= M <= alglib_r_block, 0 <= N <= alglib_r_block
-// * A must be stored in row-major order with stride equal to alglib_r_block
-static void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
-// Handle special cases:
-// - alpha is zero or n is zero
-// - m is zero
+// The m x n real matrix-vector product:
+//	y = Beta y + Alpha a x
+// with generic C code, optimized with _ialglib_mv_32() if (m, n) == (32, 32).
+// If Beta == 0.0, y is overwritten by Alpha a x and if Alpha == 0.0, y is multiplied by Beta.
+// However, the y = Beta y operation here is not done efficiently as a scalar-vector product, and should NOT be used this way.
+// Important:
+// *	(m, n) is in [0, alglib_r_block] x [0, alglib_r_block].
+// *	a must be in row-major order with stride = alglib_r_block.
+static void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double Alpha, double Beta) {
+// Handle the special cases:
+// *	Alpha == 0.0 or m n == 0
    if (m == 0)
       return;
-   if (alpha == 0.0 || n == 0) {
-      ae_int_t i;
-      if (beta == 0.0) {
-         for (i = 0; i < m; i++) {
+   else if (Alpha == 0.0 || n == 0) {
+      if (Beta == 0.0)
+         for (ae_int_t i = 0; i < m; i++) {
             *y = 0.0;
             y += stride;
          }
-      } else {
-         for (i = 0; i < m; i++) {
-            *y *= beta;
+      else
+         for (ae_int_t i = 0; i < m; i++) {
+            *y *= Beta;
             y += stride;
          }
-      }
       return;
    }
-// Handle general case: nonzero alpha, n and m
-//
-   if (m == 32 && n == 32) {
-   // 32x32, may be we have something better than general implementation
-      _ialglib_mv_32(a, x, y, stride, alpha, beta);
-   } else {
-      ae_int_t i, k, m2, n8, n2, ntrail2;
-      const double *pa0, *pa1, *pb;
-   // First M/2 rows of A are processed in pairs.
-   // optimized code is used.
-      m2 = m / 2;
-      n8 = n / 8;
-      ntrail2 = (n - 8 * n8) / 2;
-      for (i = 0; i < m2; i++) {
+// Handle the general case: mn != 0 and Alpha != 0.0.
+   if (m == 32 && n == 32)
+   // The 32 x 32 case is specially optimized.
+      _ialglib_mv_32(a, x, y, stride, Alpha, Beta);
+   else {
+   // Optimized by doing the first M/2 pairs of rows of a pairwise.
+      ae_int_t m2 = m / 2;
+      ae_int_t n8 = n / 8;
+      ae_int_t ntrail2 = (n - 8 * n8) / 2;
+      for (ae_int_t i = 0; i < m2; i++) {
          double v0 = 0.0, v1 = 0.0;
-      // 'a' points to the part of the matrix which
-      // is not processed yet
-         pb = x;
-         pa0 = a;
-         pa1 = a + alglib_r_block;
+      // 'a' points to the part of the matrix which is not processed yet.
+         const double *pb = x;
+         const double *pa0 = a;
+         const double *pa1 = a + alglib_r_block;
          a += alglib_twice_r_block;
-      // 8 elements per iteration
-         for (k = 0; k < n8; k++) {
+      // 8 elements per iteration.
+         for (ae_int_t k = 0; k < n8; k++) {
             v0 += pa0[0] * pb[0];
             v1 += pa1[0] * pb[0];
             v0 += pa0[1] * pb[1];
@@ -3640,8 +3596,8 @@ static void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *
             pa1 += 8;
             pb += 8;
          }
-      // 2 elements per iteration
-         for (k = 0; k < ntrail2; k++) {
+      // 2 elements per iteration.
+         for (ae_int_t k = 0; k < ntrail2; k++) {
             v0 += pa0[0] * pb[0];
             v1 += pa1[0] * pb[0];
             v0 += pa0[1] * pb[1];
@@ -3650,111 +3606,91 @@ static void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *
             pa1 += 2;
             pb += 2;
          }
-      // last element, if needed
-         if (n % 2 != 0) {
+      // The last element, if needed.
+         if (n % 2) {
             v0 += pa0[0] * pb[0];
             v1 += pa1[0] * pb[0];
          }
-      // final update
-         if (beta != 0) {
-            y[0] = beta * y[0] + alpha * v0;
-            y[stride] = beta * y[stride] + alpha * v1;
+      // The final update.
+         if (Beta != 0.0) {
+            y[0] = Beta * y[0] + Alpha * v0;
+            y[stride] = Beta * y[stride] + Alpha * v1;
          } else {
-            y[0] = alpha * v0;
-            y[stride] = alpha * v1;
+            y[0] = Alpha * v0;
+            y[stride] = Alpha * v1;
          }
-      // move to the next pair of elements
+      // Move to the next pair of elements.
          y += 2 * stride;
       }
-   // Last (odd) row is processed with less optimized code.
-      if (m % 2 != 0) {
+   // For odd m, the last row is done with the less optimized code.
+      if (m % 2) {
          double v0 = 0.0;
-      // 'a' points to the part of the matrix which
-      // is not processed yet
-         pb = x;
-         pa0 = a;
-      // 2 elements per iteration
-         n2 = n / 2;
-         for (k = 0; k < n2; k++) {
+      // 'a' points to the part of the matrix which is not processed yet.
+         const double *pb = x;
+         const double *pa0 = a;
+      // 2 elements per iteration.
+         ae_int_t n2 = n / 2;
+         for (ae_int_t k = 0; k < n2; k++) {
             v0 += pa0[0] * pb[0] + pa0[1] * pb[1];
             pa0 += 2;
             pb += 2;
          }
-      // last element, if needed
-         if (n % 2 != 0)
+      // The last element, if needed.
+         if (n % 2)
             v0 += pa0[0] * pb[0];
-      // final update
-         if (beta != 0)
-            y[0] = beta * y[0] + alpha * v0;
+      // The final update.
+         if (Beta != 0.0)
+            y[0] = Beta * y[0] + Alpha * v0;
          else
-            y[0] = alpha * v0;
+            y[0] = Alpha * v0;
       }
    }
 }
 
 #if defined AE_HAS_SSE2_INTRINSICS
-// This subroutine calculates fast MxN complex matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code, where A, x, y, alpha and beta are complex.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
-// still calculate A*x and  multiply  it  by  alpha  (this distinction can be
-// important when A or x contain infinities/NANs).
-//
-// IMPORTANT:
-// * 0 <= M <= alglib_c_block, 0 <= N <= alglib_c_block
-// * A must be stored in row-major order, as sequence of double precision
-//   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
-//   in doubles).
-// * Y may be referenced by cy (pointer to complex) or
-//   dy (pointer to array of double precision pair) depending on what type of
-//   output you wish. Pass pointer to Y as one of these parameters,
-//   AND SET OTHER PARAMETER TO NULL.
-// * both A and x must be aligned; y may be non-aligned.
-//
+// A fast m x n complex matrix-vector product (SSE2-optimized version)
+//	y = Beta y + Alpha a x
+// with generic C code for complex a, x, y, Alpha and Beta.
+// If Beta == 0.0, y is overwritten by Alpha a x but if Alpha == 0.0, we still do y = Alpha a x (to properly handle infinities/NANs).
+// Important:
+// *	(m, n) is in [0, alglib_c_block] x [0, alglib_c_block].
+// *	a must be in row-major order as (double, double) with stride = alglib_c_block double-pairs.
+// *	y may point to either vector cy (Complex) or dy (double precision pairs).
+// *	Either cy or dy must be NULL, but not both.
+// *	Both a and x must be aligned, but y may be non-aligned.
 // This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. CurCPU contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will be undefined. If (2) is failed,  call
-// to this function will probably crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
+// *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+//	Otherwise, this function will be undefined.
+// *	CurCPU contains CPU_SSE2 (checked at run-time)
+//	Otherwise, calling this function will probably crash your system.
+// If you want to know whether it is safe to call it, you should check CurCPU.
 // If CPU_SSE2 bit is set, this function is callable and will do its work.
-static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, complex *cy, double *dy, ae_int_t stride, complex alpha, complex beta) {
-   ae_int_t i, j, m2;
-   const double *pa0, *pa1, *parow, *pb;
-   __m128d vbeta, vbetax, vbetay;
-   __m128d valpha, valphax, valphay;
-   m2 = m / 2;
-   parow = a;
+static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, complex *cy, double *dy, ae_int_t stride, complex Alpha, complex Beta) {
+   ae_int_t m2 = m / 2;
+   const double *parow = a;
    if (cy != NULL) {
       dy = (double *)cy;
       cy = NULL;
    }
-   vbeta = _mm_loadh_pd(_mm_load_sd(&beta.x), &beta.y);
-   vbetax = _mm_unpacklo_pd(vbeta, vbeta);
-   vbetay = _mm_unpackhi_pd(vbeta, vbeta);
-   valpha = _mm_loadh_pd(_mm_load_sd(&alpha.x), &alpha.y);
-   valphax = _mm_unpacklo_pd(valpha, valpha);
-   valphay = _mm_unpackhi_pd(valpha, valpha);
-   for (i = 0; i < m2; i++) {
-      __m128d vx, vy, vt0, vt1, vt2, vt3, vt4, vt5, vrx, vry, vtx, vty;
-      pa0 = parow;
-      pa1 = parow + 2 * alglib_c_block;
-      pb = x;
-      vx = _mm_setzero_pd();
-      vy = _mm_setzero_pd();
-      for (j = 0; j < n; j++) {
-         vt0 = _mm_load1_pd(pb);
-         vt1 = _mm_load1_pd(pb + 1);
-         vt2 = _mm_load_pd(pa0);
-         vt3 = _mm_load_pd(pa1);
-         vt5 = _mm_unpacklo_pd(vt2, vt3);
-         vt4 = _mm_unpackhi_pd(vt2, vt3);
+   __m128d vbeta = _mm_loadh_pd(_mm_load_sd(&Beta.x), &Beta.y);
+   __m128d vbetax = _mm_unpacklo_pd(vbeta, vbeta);
+   __m128d vbetay = _mm_unpackhi_pd(vbeta, vbeta);
+   __m128d valpha = _mm_loadh_pd(_mm_load_sd(&Alpha.x), &Alpha.y);
+   __m128d valphax = _mm_unpacklo_pd(valpha, valpha);
+   __m128d valphay = _mm_unpackhi_pd(valpha, valpha);
+   for (ae_int_t i = 0; i < m2; i++) {
+      const double *pa0 = parow;
+      const double *pa1 = parow + 2 * alglib_c_block;
+      const double *pb = x;
+      __m128d vx = _mm_setzero_pd();
+      __m128d vy = _mm_setzero_pd();
+      for (ae_int_t j = 0; j < n; j++) {
+         __m128d vt0 = _mm_load1_pd(pb);
+         __m128d vt1 = _mm_load1_pd(pb + 1);
+         __m128d vt2 = _mm_load_pd(pa0);
+         __m128d vt3 = _mm_load_pd(pa1);
+         __m128d vt5 = _mm_unpacklo_pd(vt2, vt3);
+         __m128d vt4 = _mm_unpackhi_pd(vt2, vt3);
          vt2 = vt5;
          vt3 = vt4;
          vt2 = _mm_mul_pd(vt2, vt0);
@@ -3769,17 +3705,18 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          pa1 += 2;
          pb += 2;
       }
-      if (beta.x == 0.0 && beta.y == 0.0) {
+      __m128d vrx, vry;
+      if (Beta.x == 0.0 && Beta.y == 0.0) {
          vrx = _mm_setzero_pd();
          vry = _mm_setzero_pd();
       } else {
-         vtx = _mm_loadh_pd(_mm_load_sd(dy + 0), dy + 2 * stride + 0);
-         vty = _mm_loadh_pd(_mm_load_sd(dy + 1), dy + 2 * stride + 1);
+         __m128d vtx = _mm_loadh_pd(_mm_load_sd(dy + 0), dy + 2 * stride + 0);
+         __m128d vty = _mm_loadh_pd(_mm_load_sd(dy + 1), dy + 2 * stride + 1);
          vrx = _mm_sub_pd(_mm_mul_pd(vbetax, vtx), _mm_mul_pd(vbetay, vty));
          vry = _mm_add_pd(_mm_mul_pd(vbetax, vty), _mm_mul_pd(vbetay, vtx));
       }
-      vtx = _mm_sub_pd(_mm_mul_pd(valphax, vx), _mm_mul_pd(valphay, vy));
-      vty = _mm_add_pd(_mm_mul_pd(valphax, vy), _mm_mul_pd(valphay, vx));
+      __m128d vtx = _mm_sub_pd(_mm_mul_pd(valphax, vx), _mm_mul_pd(valphay, vy));
+      __m128d vty = _mm_add_pd(_mm_mul_pd(valphax, vy), _mm_mul_pd(valphay, vx));
       vrx = _mm_add_pd(vrx, vtx);
       vry = _mm_add_pd(vry, vty);
       _mm_storel_pd(dy + 0, vrx);
@@ -3791,10 +3728,9 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
    }
    if (m % 2) {
       double v0 = 0.0, v1 = 0.0;
-      double tx, ty;
-      pa0 = parow;
-      pb = x;
-      for (j = 0; j < n; j++) {
+      const double *pa0 = parow;
+      const double *pb = x;
+      for (ae_int_t j = 0; j < n; j++) {
          v0 += pa0[0] * pb[0];
          v1 += pa0[0] * pb[1];
          v0 -= pa0[1] * pb[1];
@@ -3802,15 +3738,16 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          pa0 += 2;
          pb += 2;
       }
-      if (beta.x == 0.0 && beta.y == 0.0) {
+      double tx, ty;
+      if (Beta.x == 0.0 && Beta.y == 0.0) {
          tx = 0.0;
          ty = 0.0;
       } else {
-         tx = beta.x * dy[0] - beta.y * dy[1];
-         ty = beta.x * dy[1] + beta.y * dy[0];
+         tx = Beta.x * dy[0] - Beta.y * dy[1];
+         ty = Beta.x * dy[1] + Beta.y * dy[0];
       }
-      tx += alpha.x * v0 - alpha.y * v1;
-      ty += alpha.x * v1 + alpha.y * v0;
+      tx += Alpha.x * v0 - Alpha.y * v1;
+      ty += Alpha.x * v1 + Alpha.y * v0;
       dy[0] = tx;
       dy[1] = ty;
       dy += 2 * stride;
@@ -3819,36 +3756,23 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
 }
 #endif
 
-// This subroutine calculates fast MxN complex matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code, where A, x, y, alpha and beta are complex.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
-// still calculate A*x and  multiply  it  by  alpha  (this distinction can be
-// important when A or x contain infinities/NANs).
-//
-// IMPORTANT:
-// * 0 <= M <= alglib_c_block, 0 <= N <= alglib_c_block
-// * A must be stored in row-major order, as sequence of double precision
-//   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
-//   in doubles).
-// * Y may be referenced by cy (pointer to complex) or
-//   dy (pointer to array of double precision pair) depending on what type of
-//   output you wish. Pass pointer to Y as one of these parameters,
-//   AND SET OTHER PARAMETER TO NULL.
-// * both A and x must be aligned; y may be non-aligned.
-static void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, complex *cy, double *dy, ae_int_t stride, complex alpha, complex beta) {
-   ae_int_t i, j;
-   const double *pa, *parow, *pb;
-   parow = a;
-   for (i = 0; i < m; i++) {
+// A fast m x n complex matrix-vector product
+//	y = Beta y + Alpha a x
+// with generic C code for complex a, x, y, Alpha and Beta.
+// If Beta == 0.0, y is overwritten by Alpha a x but if Alpha == 0.0, we still do y = Alpha a x (to properly handle infinities/NANs).
+// Important:
+// *	(m, n) is in [0, alglib_c_block] x [0, alglib_c_block].
+// *	a must be in row-major order as (double, double) with stride = alglib_c_block double-pairs.
+// *	y may point to either vector cy (Complex) or dy (double precision pairs).
+// *	Either cy or dy must be NULL, but not both.
+// *	Both a and x must be aligned, but y may be non-aligned.
+static void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, complex *cy, double *dy, ae_int_t stride, complex Alpha, complex Beta) {
+   const double *parow = a;
+   for (ae_int_t i = 0; i < m; i++) {
       double v0 = 0.0, v1 = 0.0;
-      pa = parow;
-      pb = x;
-      for (j = 0; j < n; j++) {
+      const double *pa = parow;
+      const double *pb = x;
+      for (ae_int_t j = 0; j < n; j++) {
          v0 += pa[0] * pb[0];
          v1 += pa[0] * pb[1];
          v0 -= pa[1] * pb[1];
@@ -3857,14 +3781,14 @@ static void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *
          pb += 2;
       }
       if (cy != NULL) {
-         double tx = (beta.x * cy->x - beta.y * cy->y) + (alpha.x * v0 - alpha.y * v1);
-         double ty = (beta.x * cy->y + beta.y * cy->x) + (alpha.x * v1 + alpha.y * v0);
+         double tx = (Beta.x * cy->x - Beta.y * cy->y) + (Alpha.x * v0 - Alpha.y * v1);
+         double ty = (Beta.x * cy->y + Beta.y * cy->x) + (Alpha.x * v1 + Alpha.y * v0);
          cy->x = tx;
          cy->y = ty;
          cy += stride;
       } else {
-         double tx = (beta.x * dy[0] - beta.y * dy[1]) + (alpha.x * v0 - alpha.y * v1);
-         double ty = (beta.x * dy[1] + beta.y * dy[0]) + (alpha.x * v1 + alpha.y * v0);
+         double tx = (Beta.x * dy[0] - Beta.y * dy[1]) + (Alpha.x * v0 - Alpha.y * v1);
+         double ty = (Beta.x * dy[1] + Beta.y * dy[0]) + (Alpha.x * v1 + Alpha.y * v0);
          dy[0] = tx;
          dy[1] = ty;
          dy += 2 * stride;
@@ -3873,135 +3797,93 @@ static void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *
    }
 }
 
-// This subroutine sets vector to zero
+// Set the real n-vector p to zero.
 static void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride) {
-   ae_int_t i;
-   if (stride == 1) {
-      for (i = 0; i < n; i++, p++)
+   if (stride == 1)
+      for (ae_int_t i = 0; i < n; i++, p++)
          *p = 0.0;
-   } else {
-      for (i = 0; i < n; i++, p += stride)
+   else
+      for (ae_int_t i = 0; i < n; i++, p += stride)
          *p = 0.0;
-   }
 }
 
-// This subroutine sets vector to zero
+// Set the complex n-vector p to zero.
 static void _ialglib_vzero_complex(ae_int_t n, complex *p, ae_int_t stride) {
-   ae_int_t i;
-   if (stride == 1) {
-      for (i = 0; i < n; i++, p++) {
-         p->x = 0.0;
-         p->y = 0.0;
-      }
-   } else {
-      for (i = 0; i < n; i++, p += stride) {
-         p->x = 0.0;
-         p->y = 0.0;
-      }
-   }
+   if (stride == 1)
+      for (ae_int_t i = 0; i < n; i++, p++)
+         p->y = p->x = 0.0;
+   else
+      for (ae_int_t i = 0; i < n; i++, p += stride)
+         p->y = p->x = 0.0;
 }
 
-// This subroutine copies unaligned real vector
+// Copy the unaligned real vector a to b.
 static void _ialglib_vcopy(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb) {
-   ae_int_t i, n2;
-   if (stridea == 1 && strideb == 1) {
-      n2 = n / 2;
-      for (i = n2; i != 0; i--, a += 2, b += 2) {
-         b[0] = a[0];
-         b[1] = a[1];
-      }
-      if (n % 2 != 0)
-         b[0] = a[0];
-   } else {
-      for (i = 0; i < n; i++, a += stridea, b += strideb)
+   if (stridea == 1 && strideb == 1)
+      for (ae_int_t i = n; i != 0; i--, a++, b++)
          *b = *a;
-   }
+   else
+      for (ae_int_t i = 0; i < n; i++, a += stridea, b += strideb)
+         *b = *a;
 }
 
-// This subroutine copies unaligned complex vector
-// (passed as complex*)
-//
-// 1. strideb is stride measured in complex numbers, not doubles
-// 2. conj may be "N" (no conj.) or "C" (conj.)
+// Copy the unaligned complex vector a to b (passed as complex *).
+// *	The strideb is in complex numbers rather than double-pairs.
+// *	conj may be "N" (no conj.) or "C" (conj.)
 static void _ialglib_vcopy_complex(ae_int_t n, const complex *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
-   ae_int_t i;
-// more general case
-   if (conj[0] == 'N' || conj[0] == 'n') {
-      for (i = 0; i < n; i++, a += stridea, b += 2 * strideb) {
+   strideb *= 2; // Multiply by sizeof(complex)/sizeof(double).
+   if (conj[0] == 'N' || conj[0] == 'n')
+      for (ae_int_t i = 0; i < n; i++, a += stridea, b += strideb) {
          b[0] = a->x;
          b[1] = a->y;
       }
-   } else {
-      for (i = 0; i < n; i++, a += stridea, b += 2 * strideb) {
+   else
+      for (ae_int_t i = 0; i < n; i++, a += stridea, b += strideb) {
          b[0] = a->x;
          b[1] = -a->y;
       }
-   }
 }
 
-// This subroutine copies unaligned complex vector (passed as double *)
-//
-// 1. strideb is stride measured in complex numbers, not doubles
-// 2. conj may be "N" (no conj.) or "C" (conj.)
+// Copy the unaligned complex vector a to b (passed as double *).
+// *	The strideb is in complex numbers rather than double-pairs.
+// *	conj may be "N" (no conj.) or "C" (conj.)
 static void _ialglib_vcopy_dcomplex(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
-   ae_int_t i;
-// more general case
-   if (conj[0] == 'N' || conj[0] == 'n') {
-      for (i = 0; i < n; i++, a += 2 * stridea, b += 2 * strideb) {
+   stridea *= 2, strideb *= 2; // Multiply by sizeof(complex)/sizeof(double).
+   if (conj[0] == 'N' || conj[0] == 'n')
+      for (ae_int_t i = 0; i < n; i++, a += stridea, b += strideb) {
          b[0] = a[0];
          b[1] = a[1];
       }
-   } else {
-      for (i = 0; i < n; i++, a += 2 * stridea, b += 2 * strideb) {
+   else
+      for (ae_int_t i = 0; i < n; i++, a += stridea, b += strideb) {
          b[0] = a[0];
          b[1] = -a[1];
       }
-   }
 }
 
 #if defined AE_HAS_SSE2_INTRINSICS
-// This subroutine copies matrix from  non-aligned non-contigous storage
-// to aligned contigous storage
-//
-// A:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-// * aligned
-// * stride is alglib_r_block
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-//
+// Copy the real non-aligned non-contigous m x n matrix a (SSE2-optimized version)
+// to an m x n or n x m submatrix of the aligned contiguous alglib_r_block x alglib_r_block matrix b.
+// Use transposition if op != 0.
+// The stride is stride for a, alglib_r_block for b.
 // This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. CurCPU contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will be undefined. If (2) is failed,  call
-// to this function will probably crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
+// *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+//	Otherwise, this function will be undefined.
+// *	CurCPU contains CPU_SSE2 (checked at run-time)
+//	Otherwise, calling this function will probably crash your system.
+// If you want to know whether it is safe to call it, you should check CurCPU.
 // If CPU_SSE2 bit is set, this function is callable and will do its work.
 static void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
-   ae_int_t i, j, mb2;
-   const double *psrc0, *psrc1;
-   double *pdst;
    if (op == 0) {
-      ae_int_t nb8, ntail;
-      nb8 = n / 8;
-      ntail = n - 8 * nb8;
-      for (i = 0, psrc0 = a; i < m; i++, a += stride, b += alglib_r_block, psrc0 = a) {
-         pdst = b;
-         for (j = 0; j < nb8; j++) {
-            __m128d v0, v1;
-            v0 = _mm_loadu_pd(psrc0);
+      ae_int_t nb8 = n / 8;
+      ae_int_t ntail = n - 8 * nb8;
+      const double *psrc0 = a;
+      for (ae_int_t i = 0; i < m; i++, a += stride, b += alglib_r_block, psrc0 = a) {
+         double *pdst = b;
+         for (ae_int_t j = 0; j < nb8; j++) {
+            __m128d v0 = _mm_loadu_pd(psrc0);
             _mm_store_pd(pdst, v0);
-            v1 = _mm_loadu_pd(psrc0 + 2);
+            __m128d v1 = _mm_loadu_pd(psrc0 + 2);
             _mm_store_pd(pdst + 2, v1);
             v1 = _mm_loadu_pd(psrc0 + 4);
             _mm_store_pd(pdst + 4, v1);
@@ -4010,32 +3892,28 @@ static void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae
             pdst += 8;
             psrc0 += 8;
          }
-         for (j = 0; j < ntail; j++)
+         for (ae_int_t j = 0; j < ntail; j++)
             pdst[j] = psrc0[j];
       }
    } else {
-      const double *arow0, *arow1;
-      double *bcol0, *bcol1, *pdst0, *pdst1;
-      ae_int_t nb4, ntail, n2;
-      n2 = n / 2;
-      mb2 = m / 2;
-      nb4 = n / 4;
-      ntail = n - 4 * nb4;
-      arow0 = a;
-      arow1 = a + stride;
-      bcol0 = b;
-      bcol1 = b + 1;
-      for (i = 0; i < mb2; i++) {
-         psrc0 = arow0;
-         psrc1 = arow1;
-         pdst0 = bcol0;
-         pdst1 = bcol1;
-         for (j = 0; j < nb4; j++) {
-            __m128d v0, v1, v2, v3;
-            v0 = _mm_loadu_pd(psrc0);
-            v1 = _mm_loadu_pd(psrc1);
-            v2 = _mm_loadu_pd(psrc0 + 2);
-            v3 = _mm_loadu_pd(psrc1 + 2);
+      ae_int_t n2 = n / 2;
+      ae_int_t mb2 = m / 2;
+      ae_int_t nb4 = n / 4;
+      ae_int_t ntail = n - 4 * nb4;
+      const double *arow0 = a;
+      const double *arow1 = a + stride;
+      double *bcol0 = b;
+      double *bcol1 = b + 1;
+      for (ae_int_t i = 0; i < mb2; i++) {
+         const double *psrc0 = arow0;
+         const double *psrc1 = arow1;
+         double *pdst0 = bcol0;
+         double *pdst1 = bcol1;
+         for (ae_int_t j = 0; j < nb4; j++) {
+            __m128d v0 = _mm_loadu_pd(psrc0);
+            __m128d v1 = _mm_loadu_pd(psrc1);
+            __m128d v2 = _mm_loadu_pd(psrc0 + 2);
+            __m128d v3 = _mm_loadu_pd(psrc1 + 2);
             _mm_store_pd(pdst0, _mm_unpacklo_pd(v0, v1));
             _mm_store_pd(pdst0 + alglib_r_block, _mm_unpackhi_pd(v0, v1));
             _mm_store_pd(pdst0 + 2 * alglib_r_block, _mm_unpacklo_pd(v2, v3));
@@ -4045,7 +3923,7 @@ static void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae
             psrc0 += 4;
             psrc1 += 4;
          }
-         for (j = 0; j < ntail; j++) {
+         for (ae_int_t j = 0; j < ntail; j++) {
             pdst0[0] = psrc0[0];
             pdst1[0] = psrc1[0];
             pdst0 += alglib_r_block;
@@ -4059,263 +3937,218 @@ static void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae
          bcol1 += 2;
       }
       if (m % 2) {
-         psrc0 = arow0;
-         pdst0 = bcol0;
-         for (j = 0; j < n2; j++) {
+         const double *psrc0 = arow0;
+         double *pdst0 = bcol0;
+         for (ae_int_t j = 0; j < n2; j++) {
             pdst0[0] = psrc0[0];
             pdst0[alglib_r_block] = psrc0[1];
             pdst0 += alglib_twice_r_block;
             psrc0 += 2;
          }
-         if (n % 2 != 0)
+         if (n % 2)
             pdst0[0] = psrc0[0];
       }
    }
 }
 #endif
 
-// This subroutine copies matrix from  non-aligned non-contigous storage
-// to aligned contigous storage
-//
-// A:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-// * aligned
-// * stride is alglib_r_block
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
+// Copy the real non-aligned non-contigous m x n matrix a
+// to an m x n or n x m submatrix of the aligned contiguous alglib_r_block x alglib_r_block matrix b.
+// Use transposition if op != 0.
+// The stride is stride for a, alglib_r_block for b.
 static void _ialglib_mcopyblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
-   ae_int_t i, j, n2;
-   const double *psrc;
-   double *pdst;
-   if (op == 0) {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_r_block, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += 2) {
+   ae_int_t n2 = n / 2;
+   if (op == 0)
+      for (ae_int_t i = 0; i < m; i++, a += stride, b += alglib_r_block) {
+         const double *psrc = a;
+         double *pdst = b;
+         for (ae_int_t j = 0; j < n2; j++, pdst += 2, psrc += 2) {
             pdst[0] = psrc[0];
             pdst[1] = psrc[1];
          }
-         if (n % 2 != 0)
+         if (n % 2)
             pdst[0] = psrc[0];
       }
-   } else {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += 1, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += alglib_twice_r_block, psrc += 2) {
+   else
+      for (ae_int_t i = 0; i < m; i++, a += stride, b++) {
+         const double *psrc = a;
+         double *pdst = b;
+         for (ae_int_t j = 0; j < n2; j++, pdst += alglib_twice_r_block, psrc += 2) {
             pdst[0] = psrc[0];
             pdst[alglib_r_block] = psrc[1];
          }
-         if (n % 2 != 0)
+         if (n % 2)
             pdst[0] = psrc[0];
       }
-   }
 }
 
-// This subroutine copies matrix from  aligned contigous storage to non-
-// aligned non-contigous storage
-//
-// A:
-// * MxN
-// * aligned
-// * contigous
-// * stride is alglib_r_block
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-// * non-aligned, non-contigous
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
+// Copy an m x n submatrix of the real non-aligned non-contigous stride x stride matrix a to the aligned contigous m x n or n x m matrix b.
+// Use transposition if op != 0.
+// The stride is alglib_r_block for a, stride for b.
 static void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, double *b, ae_int_t stride) {
-   ae_int_t i, j, n2;
-   const double *psrc;
-   double *pdst;
-   if (op == 0) {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a += alglib_r_block, b += stride, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += 2) {
+   ae_int_t n2 = n / 2;
+   if (op == 0)
+      for (ae_int_t i = 0; i < m; i++, a += alglib_r_block, b += stride) {
+         const double *psrc = a;
+         double *pdst = b;
+         for (ae_int_t j = 0; j < n2; j++, pdst += 2, psrc += 2) {
             pdst[0] = psrc[0];
             pdst[1] = psrc[1];
          }
-         if (n % 2 != 0)
+         if (n % 2)
             pdst[0] = psrc[0];
       }
-   } else {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a++, b += stride, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += alglib_twice_r_block) {
+   else
+      for (ae_int_t i = 0; i < m; i++, a++, b += stride) {
+         const double *psrc = a;
+         double *pdst = b;
+         for (ae_int_t j = 0; j < n2; j++, pdst += 2, psrc += alglib_twice_r_block) {
             pdst[0] = psrc[0];
             pdst[1] = psrc[alglib_r_block];
          }
-         if (n % 2 != 0)
+         if (n % 2)
             pdst[0] = psrc[0];
       }
-   }
 }
 
-// This subroutine copies matrix from  non-aligned non-contigous storage
-// to aligned contigous storage
-//
-// A:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * may be transformed during copying (as prescribed by op)
-// * pointer to complex is passed
-//
-// B:
-// * 2*alglib_c_block*alglib_c_block doubles (only MxN/NxM submatrix is used)
-// * aligned
-// * stride is alglib_c_block
-// * pointer to double is passed
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-// * 2 - conjugate transposition
-// * 3 - conjugate, but no  transposition
+// Copy the complex aligned contigous m x n matrix a to an m x n or n x m submatrix of the non-aligned non-contigous 2 x stride x stride matrix b.
+// Copy as is or use transposition, Hermitian conjugate or conjugate, respectively if Op == 0, 1, 2 or 3.
+// The stride is stride for a, alglib_c_block double-pairs for b.
 static void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const complex *a, ae_int_t op, ae_int_t stride, double *b) {
-   ae_int_t i, j;
-   const complex *psrc;
-   double *pdst;
-   if (op == 0) {
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_twice_c_block, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst += 2, psrc++) {
-            pdst[0] = psrc->x;
-            pdst[1] = psrc->y;
+   switch (op) {
+      case 0:
+         for (ae_int_t i = 0; i < m; i++, a += stride, b += alglib_twice_c_block) {
+            const complex *psrc = a;
+            double *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst += 2, psrc++) {
+               pdst[0] = psrc->x;
+               pdst[1] = psrc->y;
+            }
          }
-   }
-   if (op == 1) {
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += 2, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst += alglib_twice_c_block, psrc++) {
-            pdst[0] = psrc->x;
-            pdst[1] = psrc->y;
+      break;
+      case 1:
+         for (ae_int_t i = 0; i < m; i++, a += stride, b += 2) {
+            const complex *psrc = a;
+            double *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst += alglib_twice_c_block, psrc++) {
+               pdst[0] = psrc->x;
+               pdst[1] = psrc->y;
+            }
          }
-   }
-   if (op == 2) {
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += 2, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst += alglib_twice_c_block, psrc++) {
-            pdst[0] = psrc->x;
-            pdst[1] = -psrc->y;
+      break;
+      case 2:
+         for (ae_int_t i = 0; i < m; i++, a += stride, b += 2) {
+            const complex *psrc = a;
+            double *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst += alglib_twice_c_block, psrc++) {
+               pdst[0] = psrc->x;
+               pdst[1] = -psrc->y;
+            }
          }
-   }
-   if (op == 3) {
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_twice_c_block, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst += 2, psrc++) {
-            pdst[0] = psrc->x;
-            pdst[1] = -psrc->y;
+      break;
+      case 3:
+         for (ae_int_t i = 0; i < m; i++, a += stride, b += alglib_twice_c_block) {
+            const complex *psrc = a;
+            double *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst += 2, psrc++) {
+               pdst[0] = psrc->x;
+               pdst[1] = -psrc->y;
+            }
          }
+      break;
    }
 }
 
-// This subroutine copies matrix from aligned contigous storage to
-// non-aligned non-contigous storage
-//
-// A:
-// * 2*alglib_c_block*alglib_c_block doubles (only MxN submatrix is used)
-// * aligned
-// * stride is alglib_c_block
-// * pointer to double is passed
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * pointer to complex is passed
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-// * 2 - conjugate transposition
-// * 3 - conjugate, but no  transposition
+// Copy the complex aligned contigous m x n matrix a to an m x n or n x m submatrix of the non-aligned non-contigous 2 x stride x stride matrix b.
+// Copy as is or use transposition, Hermitian conjugate or conjugate, respectively if op == 0, 1, 2 or 3.
+// The stride is stride for a, alglib_c_block double-pairs for b.
 static void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, complex *b, ae_int_t stride) {
-   ae_int_t i, j;
-   const double *psrc;
-   complex *pdst;
-   if (op == 0) {
-      for (i = 0, psrc = a; i < m; i++, a += alglib_twice_c_block, b += stride, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += 2) {
-            pdst->x = psrc[0];
-            pdst->y = psrc[1];
+   switch (op) {
+      case 0:
+         for (ae_int_t i = 0; i < m; i++, a += alglib_twice_c_block, b += stride) {
+            const double *psrc = a;
+            complex *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst++, psrc += 2) {
+               pdst->x = psrc[0];
+               pdst->y = psrc[1];
+            }
          }
-   }
-   if (op == 1) {
-      for (i = 0, psrc = a; i < m; i++, a += 2, b += stride, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += alglib_twice_c_block) {
-            pdst->x = psrc[0];
-            pdst->y = psrc[1];
+      break;
+      case 1:
+         for (ae_int_t i = 0; i < m; i++, a += 2, b += stride) {
+            const double *psrc = a;
+            complex *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst++, psrc += alglib_twice_c_block) {
+               pdst->x = psrc[0];
+               pdst->y = psrc[1];
+            }
          }
-   }
-   if (op == 2) {
-      for (i = 0, psrc = a; i < m; i++, a += 2, b += stride, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += alglib_twice_c_block) {
-            pdst->x = psrc[0];
-            pdst->y = -psrc[1];
+      break;
+      case 2:
+         for (ae_int_t i = 0; i < m; i++, a += 2, b += stride) {
+            const double *psrc = a;
+            complex *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst++, psrc += alglib_twice_c_block) {
+               pdst->x = psrc[0];
+               pdst->y = -psrc[1];
+            }
          }
-   }
-   if (op == 3) {
-      for (i = 0, psrc = a; i < m; i++, a += alglib_twice_c_block, b += stride, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += 2) {
-            pdst->x = psrc[0];
-            pdst->y = -psrc[1];
+      break;
+      case 3:
+         for (ae_int_t i = 0; i < m; i++, a += alglib_twice_c_block, b += stride) {
+            const double *psrc = a;
+            complex *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst++, psrc += 2) {
+               pdst->x = psrc[0];
+               pdst->y = -psrc[1];
+            }
          }
+      break;
    }
 }
 
 // Real GEMM kernel.
-static bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double *_b, ae_int_t _b_stride, ae_int_t optypeb, double beta, double *_c, ae_int_t _c_stride) {
-   int i;
-   double *crow;
-   double _abuf[alglib_r_block + alglib_simd_alignment];
-   double _bbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_abuf, alglib_simd_alignment);
-   double *const b = (double *)ae_align(_bbuf, alglib_simd_alignment);
+static bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double *_b, ae_int_t _b_stride, ae_int_t optypeb, double Beta, double *_c, ae_int_t _c_stride) {
+   if (m > alglib_r_block || n > alglib_r_block || k > alglib_r_block || m <= 0 || n <= 0 || k <= 0 || Alpha == 0.0)
+      return false;
    void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
    void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
-   if (m > alglib_r_block || n > alglib_r_block || k > alglib_r_block || m <= 0 || n <= 0 || k <= 0 || alpha == 0.0)
-      return false;
-// Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
+// Check for SSE2 support.
    if (CurCPU & CPU_SSE2) {
       rmv = &_ialglib_rmv_sse2;
       mcopyblock = &_ialglib_mcopyblock_sse2;
    }
 #endif
-// copy b
+// Copy or transpose b.
+   double _bbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const b = (double *)ae_align(_bbuf, alglib_simd_alignment);
    if (optypeb == 0)
       mcopyblock(k, n, _b, 1, _b_stride, b);
    else
       mcopyblock(n, k, _b, 0, _b_stride, b);
-// multiply B by A (from the right, by rows)
-// and store result in C
-   crow = _c;
+// Multiply b by a (from the right, by rows) into c.
+   double _abuf[alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_abuf, alglib_simd_alignment);
+   bool BetaIs0 = Beta == 0.0;
+   double *crow = _c;
    if (optypea == 0) {
       const double *arow = _a;
-      for (i = 0; i < m; i++) {
+      for (ae_int_t i = 0; i < m; i++) {
          _ialglib_vcopy(k, arow, 1, abuf, 1);
-         if (beta == 0)
+         if (BetaIs0)
             _ialglib_vzero(n, crow, 1);
-         rmv(n, k, b, abuf, crow, 1, alpha, beta);
+         rmv(n, k, b, abuf, crow, 1, Alpha, Beta);
          crow += _c_stride;
          arow += _a_stride;
       }
    } else {
       const double *acol = _a;
-      for (i = 0; i < m; i++) {
+      for (ae_int_t i = 0; i < m; i++) {
          _ialglib_vcopy(k, acol, _a_stride, abuf, 1);
-         if (beta == 0)
+         if (BetaIs0)
             _ialglib_vzero(n, crow, 1);
-         rmv(n, k, b, abuf, crow, 1, alpha, beta);
+         rmv(n, k, b, abuf, crow, 1, Alpha, Beta);
          crow += _c_stride;
          acol++;
       }
@@ -4324,52 +4157,58 @@ static bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alph
 }
 
 // Complex GEMM kernel.
-static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, complex *_a, ae_int_t _a_stride, ae_int_t optypea, complex *_b, ae_int_t _b_stride, ae_int_t optypeb, complex beta, complex *_c, ae_int_t _c_stride) {
-   const complex *arow;
-   complex *crow;
-   ae_int_t i;
-   double _loc_abuf[2 * alglib_c_block + alglib_simd_alignment];
-   double _loc_b[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const b = (double *)ae_align(_loc_b, alglib_simd_alignment);
-   ae_int_t brows;
-   ae_int_t bcols;
-   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, complex *, double *, ae_int_t, complex, complex) = &_ialglib_cmv;
+static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex Alpha, complex *_a, ae_int_t _a_stride, ae_int_t optypea, complex *_b, ae_int_t _b_stride, ae_int_t optypeb, complex Beta, complex *_c, ae_int_t _c_stride) {
    if (m > alglib_c_block || n > alglib_c_block || k > alglib_c_block)
       return false;
-// Check for SSE2 support
+   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, complex *, double *, ae_int_t, complex, complex) = &_ialglib_cmv;
 #ifdef AE_HAS_SSE2_INTRINSICS
+// Check for SSE2 support.
    if (CurCPU & CPU_SSE2) {
       cmv = &_ialglib_cmv_sse2;
    }
 #endif
-// copy b
-   brows = optypeb == 0 ? k : n;
-   bcols = optypeb == 0 ? n : k;
-   if (optypeb == 0)
-      _ialglib_mcopyblock_complex(brows, bcols, _b, 1, _b_stride, b);
-   if (optypeb == 1)
-      _ialglib_mcopyblock_complex(brows, bcols, _b, 0, _b_stride, b);
-   if (optypeb == 2)
-      _ialglib_mcopyblock_complex(brows, bcols, _b, 3, _b_stride, b);
-// multiply B by A (from the right, by rows)
-// and store result in C
-   arow = _a;
-   crow = _c;
-   for (i = 0; i < m; i++) {
-      if (optypea == 0) {
-         _ialglib_vcopy_complex(k, arow, 1, abuf, 1, "No conj");
-         arow += _a_stride;
-      } else if (optypea == 1) {
-         _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "No conj");
-         arow++;
-      } else {
-         _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "Conj");
-         arow++;
+// Copy, transpose, conjugate or Hermitianize b.
+   double _loc_b[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const b = (double *)ae_align(_loc_b, alglib_simd_alignment);
+   ae_int_t bcols = optypeb == 0 ? n : k;
+   ae_int_t brows = optypeb == 0 ? k : n;
+   switch (optypeb) {
+      default:
+      case 0:
+         _ialglib_mcopyblock_complex(brows, bcols, _b, 1, _b_stride, b);
+      break;
+      case 1:
+         _ialglib_mcopyblock_complex(brows, bcols, _b, 0, _b_stride, b);
+      break;
+      case 2:
+         _ialglib_mcopyblock_complex(brows, bcols, _b, 3, _b_stride, b);
+      break;
+   }
+// Multiply b by a (from the right, by rows) into c.
+   double _loc_abuf[2 * alglib_c_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   bool BetaIs0 = Beta.x == 0.0 && Beta.y == 0.0;
+   const complex *arow = _a;
+   complex *crow = _c;
+   for (ae_int_t i = 0; i < m; i++) {
+      switch (optypea) {
+         case 0:
+            _ialglib_vcopy_complex(k, arow, 1, abuf, 1, "No conj");
+            arow += _a_stride;
+         break;
+         case 1:
+            _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "No conj");
+            arow++;
+         break;
+         default:
+         case 2:
+            _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "Conj");
+            arow++;
+         break;
       }
-      if (beta.x == 0 && beta.y == 0)
+      if (BetaIs0)
          _ialglib_vzero_complex(n, crow, 1);
-      cmv(n, k, b, abuf, crow, NULL, 1, alpha, beta);
+      cmv(n, k, b, abuf, crow, NULL, 1, Alpha, Beta);
       crow += _c_stride;
    }
    return true;
@@ -4377,52 +4216,48 @@ static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alp
 
 // Real Right TRSM kernel.
 static bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
-// local buffers
-   double *pdiag;
-   ae_int_t i;
-   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
-   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
-   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
    if (m > alglib_r_block || n > alglib_r_block)
       return false;
-// Check for SSE2 support
+   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
+   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
 #ifdef AE_HAS_SSE2_INTRINSICS
+// Check for SSE2 support.
    if (CurCPU & CPU_SSE2) {
       rmv = &_ialglib_rmv_sse2;
       mcopyblock = &_ialglib_mcopyblock_sse2;
    }
 #endif
-// Prepare
+// Prepare.
+   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
    mcopyblock(n, n, _a, optype, _a_stride, abuf);
+   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    mcopyblock(m, n, _x, 0, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += alglib_r_block + 1)
+   if (isunit) {
+      double *pdiag = abuf;
+      for (ae_int_t i = 0; i < n; i++, pdiag += alglib_r_block + 1)
          *pdiag = 1.0;
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-// Solve Y*A^-1=X where A is upper or lower triangular
-   if (uppera) {
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += alglib_r_block + 1) {
-         double beta = 1.0 / (*pdiag);
-         double alpha = -beta;
+   }
+// Solve y a^-1 == x, where a is upper or lower triangular.
+   double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   if ((optype == 0) == isupper) {
+      double *pdiag = abuf;
+      for (ae_int_t i = 0; i < n; i++, pdiag += alglib_r_block + 1) {
+         double Beta = 1.0 / *pdiag;
+         double Alpha = -Beta;
          _ialglib_vcopy(i, abuf + i, alglib_r_block, tmpbuf, 1);
-         rmv(m, i, xbuf, tmpbuf, xbuf + i, alglib_r_block, alpha, beta);
+         rmv(m, i, xbuf, tmpbuf, xbuf + i, alglib_r_block, Alpha, Beta);
       }
       _ialglib_mcopyunblock(m, n, xbuf, 0, _x, _x_stride);
    } else {
-      for (i = n - 1, pdiag = abuf + (n - 1) * alglib_r_block + (n - 1); i >= 0; i--, pdiag -= alglib_r_block + 1) {
-         double beta = 1.0 / (*pdiag);
-         double alpha = -beta;
+      double *pdiag = abuf + (n - 1) * alglib_r_block + (n - 1);
+      for (ae_int_t i = n - 1; i >= 0; i--, pdiag -= alglib_r_block + 1) {
+         double Beta = 1.0 / *pdiag;
+         double Alpha = -Beta;
          _ialglib_vcopy(n - 1 - i, pdiag + alglib_r_block, alglib_r_block, tmpbuf + i + 1, 1);
-         rmv(m, n - 1 - i, xbuf + i + 1, tmpbuf + i + 1, xbuf + i, alglib_r_block, alpha, beta);
+         rmv(m, n - 1 - i, xbuf + i + 1, tmpbuf + i + 1, xbuf + i, alglib_r_block, Alpha, Beta);
       }
       _ialglib_mcopyunblock(m, n, xbuf, 0, _x, _x_stride);
    }
@@ -4431,60 +4266,50 @@ static bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int
 
 // Complex Right TRSM kernel.
 static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, complex *_x, ae_int_t _x_stride) {
-// local buffers
-   double *pdiag;
-   ae_int_t i;
-   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
    void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, complex *, double *, ae_int_t, complex, complex) = &_ialglib_cmv;
    if (m > alglib_c_block || n > alglib_c_block)
       return false;
-// Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
+// Check for SSE2 support
    if (CurCPU & CPU_SSE2) {
       cmv = &_ialglib_cmv_sse2;
    }
 #endif
-// Prepare
+// Prepare.
+   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
    _ialglib_mcopyblock_complex(n, n, _a, optype, _a_stride, abuf);
+   double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    _ialglib_mcopyblock_complex(m, n, _x, 0, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
+   if (isunit) {
+      double *pdiag = abuf;
+      for (ae_int_t i = 0; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
          pdiag[0] = 1.0;
          pdiag[1] = 0.0;
       }
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-// Solve Y*A^-1=X where A is upper or lower triangular
-   if (uppera) {
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
-         complex tmp_c;
-         complex beta;
-         complex alpha;
-         tmp_c = complex_from_d(pdiag[0], pdiag[1]);
-         beta = ae_c_d_div(1.0, tmp_c);
-         alpha = complex_from_d(-beta.x, -beta.y);
+   }
+// Solve y a^-1 == x, where a is upper or lower triangular.
+   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   if ((optype == 0) == isupper) {
+      double *pdiag = abuf;
+      for (ae_int_t i = 0; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
+         complex tmp_c = complex_from_d(pdiag[0], pdiag[1]);
+         complex Beta = ae_c_d_div(1.0, tmp_c);
+         complex Alpha = complex_from_d(-Beta.x, -Beta.y);
          _ialglib_vcopy_dcomplex(i, abuf + 2 * i, alglib_c_block, tmpbuf, 1, "No conj");
-         cmv(m, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
+         cmv(m, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, Alpha, Beta);
       }
       _ialglib_mcopyunblock_complex(m, n, xbuf, 0, _x, _x_stride);
    } else {
-      for (i = n - 1, pdiag = abuf + 2 * ((n - 1) * alglib_c_block + (n - 1)); i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
-         complex tmp_c;
-         complex beta;
-         complex alpha;
-         tmp_c = complex_from_d(pdiag[0], pdiag[1]);
-         beta = ae_c_d_div(1.0, tmp_c);
-         alpha = complex_from_d(-beta.x, -beta.y);
+      double *pdiag = abuf + 2 * (n - 1) * (alglib_c_block + 1);
+      for (ae_int_t i = n - 1; i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
+         complex tmp_c = complex_from_d(pdiag[0], pdiag[1]);
+         complex Beta = ae_c_d_div(1.0, tmp_c);
+         complex Alpha = complex_from_d(-Beta.x, -Beta.y);
          _ialglib_vcopy_dcomplex(n - 1 - i, pdiag + 2 * alglib_c_block, alglib_c_block, tmpbuf, 1, "No conj");
-         cmv(m, n - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
+         cmv(m, n - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, Alpha, Beta);
       }
       _ialglib_mcopyunblock_complex(m, n, xbuf, 0, _x, _x_stride);
    }
@@ -4493,53 +4318,49 @@ static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_in
 
 // Real Left TRSM kernel.
 static bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
-// local buffers
-   double *pdiag, *arow;
-   ae_int_t i;
-   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
    double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
-   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
-   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
    if (m > alglib_r_block || n > alglib_r_block)
       return false;
-// Check for SSE2 support
+   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
+   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
 #ifdef AE_HAS_SSE2_INTRINSICS
+// Check for SSE2 support.
    if (CurCPU & CPU_SSE2) {
       rmv = &_ialglib_rmv_sse2;
       mcopyblock = &_ialglib_mcopyblock_sse2;
    }
 #endif
-// Prepare
-// Transpose X (so we may use mv, which calculates A*x, but not x*A)
+// Prepare.
+   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
    mcopyblock(m, m, _a, optype, _a_stride, abuf);
+   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    mcopyblock(m, n, _x, 1, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < m; i++, pdiag += alglib_r_block + 1)
+// Transpose x (so we may use mv, which calculates a x, but not x a).
+   if (isunit) {
+      double *pdiag = abuf;
+      for (ae_int_t i = 0; i < m; i++, pdiag += alglib_r_block + 1)
          *pdiag = 1.0;
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-// Solve A^-1*Y^T=X^T where A is upper or lower triangular
-   if (uppera) {
-      for (i = m - 1, pdiag = abuf + (m - 1) * alglib_r_block + (m - 1); i >= 0; i--, pdiag -= alglib_r_block + 1) {
-         double beta = 1.0 / (*pdiag);
-         double alpha = -beta;
+   }
+// Solve a^-1 y^T == x^T, where a is upper or lower triangular.
+   if ((optype == 0) == isupper) {
+      double *pdiag = abuf + (m - 1) * (alglib_r_block + 1);
+      for (ae_int_t i = m - 1; i >= 0; i--, pdiag -= alglib_r_block + 1) {
+         double Beta = 1.0 / *pdiag;
+         double Alpha = -Beta;
          _ialglib_vcopy(m - 1 - i, pdiag + 1, 1, tmpbuf + i + 1, 1);
-         rmv(n, m - 1 - i, xbuf + i + 1, tmpbuf + i + 1, xbuf + i, alglib_r_block, alpha, beta);
+         rmv(n, m - 1 - i, xbuf + i + 1, tmpbuf + i + 1, xbuf + i, alglib_r_block, Alpha, Beta);
       }
       _ialglib_mcopyunblock(m, n, xbuf, 1, _x, _x_stride);
    } else {
-      for (i = 0, pdiag = abuf, arow = abuf; i < m; i++, pdiag += alglib_r_block + 1, arow += alglib_r_block) {
-         double beta = 1.0 / (*pdiag);
-         double alpha = -beta;
+      double *pdiag = abuf, *arow = abuf;
+      for (ae_int_t i = 0; i < m; i++, pdiag += alglib_r_block + 1, arow += alglib_r_block) {
+         double Beta = 1.0 / *pdiag;
+         double Alpha = -Beta;
          _ialglib_vcopy(i, arow, 1, tmpbuf, 1);
-         rmv(n, i, xbuf, tmpbuf, xbuf + i, alglib_r_block, alpha, beta);
+         rmv(n, i, xbuf, tmpbuf, xbuf + i, alglib_r_block, Alpha, Beta);
       }
       _ialglib_mcopyunblock(m, n, xbuf, 1, _x, _x_stride);
    }
@@ -4548,61 +4369,51 @@ static bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_
 
 // Complex Left TRSM kernel.
 static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, complex *_x, ae_int_t _x_stride) {
-// local buffers
-   double *pdiag, *arow;
-   ae_int_t i;
-   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
-   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, complex *, double *, ae_int_t, complex, complex) = &_ialglib_cmv;
    if (m > alglib_c_block || n > alglib_c_block)
       return false;
-// Check for SSE2 support
+   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, complex *, double *, ae_int_t, complex, complex) = &_ialglib_cmv;
 #ifdef AE_HAS_SSE2_INTRINSICS
+// Check for SSE2 support.
    if (CurCPU & CPU_SSE2) {
       cmv = &_ialglib_cmv_sse2;
    }
 #endif
-// Prepare
-// Transpose X (so we may use mv, which calculates A*x, but not x*A)
+// Prepare.
+   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
    _ialglib_mcopyblock_complex(m, m, _a, optype, _a_stride, abuf);
+   double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    _ialglib_mcopyblock_complex(m, n, _x, 1, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < m; i++, pdiag += 2 * (alglib_c_block + 1)) {
+// Transpose x (so we may use mv, which calculates a x, but not x a).
+   if (isunit) {
+      double *pdiag = abuf;
+      for (ae_int_t i = 0; i < m; i++, pdiag += 2 * (alglib_c_block + 1)) {
          pdiag[0] = 1.0;
          pdiag[1] = 0.0;
       }
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-// Solve A^-1*Y^T=X^T where A is upper or lower triangular
-   if (uppera) {
-      for (i = m - 1, pdiag = abuf + 2 * ((m - 1) * alglib_c_block + (m - 1)); i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
-         complex tmp_c;
-         complex beta;
-         complex alpha;
-         tmp_c = complex_from_d(pdiag[0], pdiag[1]);
-         beta = ae_c_d_div(1.0, tmp_c);
-         alpha = complex_from_d(-beta.x, -beta.y);
+   }
+// Solve a^-1 y^T = x^T, where a is upper or lower triangular.
+   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   if ((optype == 0) == isupper) {
+      double *pdiag = abuf + 2 * (m - 1) * (alglib_c_block + 1);
+      for (ae_int_t i = m - 1; i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
+         complex tmp_c = complex_from_d(pdiag[0], pdiag[1]);
+         complex Beta = ae_c_d_div(1.0, tmp_c);
+         complex Alpha = complex_from_d(-Beta.x, -Beta.y);
          _ialglib_vcopy_dcomplex(m - 1 - i, pdiag + 2, 1, tmpbuf, 1, "No conj");
-         cmv(n, m - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
+         cmv(n, m - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, Alpha, Beta);
       }
       _ialglib_mcopyunblock_complex(m, n, xbuf, 1, _x, _x_stride);
    } else {
-      for (i = 0, pdiag = abuf, arow = abuf; i < m; i++, pdiag += 2 * (alglib_c_block + 1), arow += 2 * alglib_c_block) {
-         complex tmp_c;
-         complex beta;
-         complex alpha;
-         tmp_c = complex_from_d(pdiag[0], pdiag[1]);
-         beta = ae_c_d_div(1.0, tmp_c);
-         alpha = complex_from_d(-beta.x, -beta.y);
+      double *pdiag = abuf, *arow = abuf;
+      for (ae_int_t i = 0; i < m; i++, pdiag += 2 * (alglib_c_block + 1), arow += 2 * alglib_c_block) {
+         complex tmp_c = complex_from_d(pdiag[0], pdiag[1]);
+         complex Beta = ae_c_d_div(1.0, tmp_c);
+         complex Alpha = complex_from_d(-Beta.x, -Beta.y);
          _ialglib_vcopy_dcomplex(i, arow, 1, tmpbuf, 1, "No conj");
-         cmv(n, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
+         cmv(n, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, Alpha, Beta);
       }
       _ialglib_mcopyunblock_complex(m, n, xbuf, 1, _x, _x_stride);
    }
@@ -4610,149 +4421,136 @@ static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int
 }
 
 // Real SYRK/HERK kernel.
-static bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, double *_c, ae_int_t _c_stride, bool isupper) {
-// local buffers
-   double *arow, *crow;
-   ae_int_t i;
-   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_cbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
+static bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double Alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double Beta, double *_c, ae_int_t _c_stride, bool isupper) {
    if (n > alglib_r_block || k > alglib_r_block)
       return false;
-   if (n == 0)
+   else if (n == 0)
       return true;
-// copy A and C, task is transformed to "A*A^T"-form.
-// if beta == 0, then C is filled by zeros (and not referenced)
-//
-// alpha == 0 or k == 0 are correctly processed (A is not referenced)
-   if (alpha == 0)
+// Copy a and c, and transformed the task to "a a^T"-form.
+// If Beta == 0.0, then zero out c and ignore it.
+// If Alpha == 0.0 or k == 0 then ignore a.
+//(@) The SSE2-optimized form of _ialglib_mcopyblock() was not used here in the original ALGLIB version and hasn't yet been incorporated here.
+   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   if (Alpha == 0.0)
       k = 0;
-   if (k > 0) {
+   else if (k > 0)
       if (optypea == 0)
          _ialglib_mcopyblock(n, k, _a, 0, _a_stride, abuf);
       else
          _ialglib_mcopyblock(k, n, _a, 1, _a_stride, abuf);
-   }
+   double _loc_cbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
    _ialglib_mcopyblock(n, n, _c, 0, _c_stride, cbuf);
-   if (beta == 0) {
-      for (i = 0, crow = cbuf; i < n; i++, crow += alglib_r_block)
-         if (isupper)
+   if (Beta == 0.0) {
+      double *crow = cbuf;
+      if (isupper)
+         for (ae_int_t i = 0; i < n; i++, crow += alglib_r_block)
             _ialglib_vzero(n - i, crow + i, 1);
-         else
+      else
+         for (ae_int_t i = 0; i < n; i++, crow += alglib_r_block)
             _ialglib_vzero(i + 1, crow, 1);
    }
-// update C
-   if (isupper) {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += alglib_r_block, crow += alglib_r_block) {
-         _ialglib_rmv(n - i, k, arow, arow, crow + i, 1, alpha, beta);
-      }
-   } else {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += alglib_r_block, crow += alglib_r_block) {
-         _ialglib_rmv(i + 1, k, abuf, arow, crow, 1, alpha, beta);
-      }
-   }
-// copy back
+// Update c.
+//(@) The SSE2-optimized form of _ialglib_rmv() was not used here in the original ALGLIB version and hasn't yet been incorporated here.
+   double *arow = abuf, *crow = cbuf;
+   if (isupper)
+      for (ae_int_t i = 0; i < n; i++, arow += alglib_r_block, crow += alglib_r_block)
+         _ialglib_rmv(n - i, k, arow, arow, crow + i, 1, Alpha, Beta);
+   else
+      for (ae_int_t i = 0; i < n; i++, arow += alglib_r_block, crow += alglib_r_block)
+         _ialglib_rmv(i + 1, k, abuf, arow, crow, 1, Alpha, Beta);
+// Copy back.
    _ialglib_mcopyunblock(n, n, cbuf, 0, _c, _c_stride);
    return true;
 }
 
 // Complex SYRK/HERK kernel.
-static bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, complex *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, complex *_c, ae_int_t _c_stride, bool isupper) {
-// local buffers
-   double *arow, *crow;
-   complex c_alpha, c_beta;
-   ae_int_t i;
-   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_cbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+static bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double Alpha, complex *_a, ae_int_t _a_stride, ae_int_t optypea, double Beta, complex *_c, ae_int_t _c_stride, bool isupper) {
    if (n > alglib_c_block || k > alglib_c_block)
       return false;
-   if (n == 0)
+   else if (n == 0)
       return true;
-// copy A and C, task is transformed to "A*A^H"-form.
-// if beta == 0, then C is filled by zeros (and not referenced)
-//
-// alpha == 0 or k == 0 are correctly processed (A is not referenced)
-   c_alpha = complex_from_d(alpha);
-   c_beta = complex_from_d(beta);
-   if (alpha == 0)
+// Copy a and c, transforming to "a a^H"-form.
+// If Beta == 0.0, then set c to 0 and ignore it.
+// If Alpha == 0.0 or k == 0 then ignore a.
+   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   if (Alpha == 0.0)
       k = 0;
-   if (k > 0) {
+   else if (k > 0)
       if (optypea == 0)
          _ialglib_mcopyblock_complex(n, k, _a, 3, _a_stride, abuf);
       else
          _ialglib_mcopyblock_complex(k, n, _a, 1, _a_stride, abuf);
-   }
+   double _loc_cbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
    _ialglib_mcopyblock_complex(n, n, _c, 0, _c_stride, cbuf);
-   if (beta == 0) {
-      for (i = 0, crow = cbuf; i < n; i++, crow += 2 * alglib_c_block)
+   if (Beta == 0.0) {
+      double *crow = cbuf;
+      for (ae_int_t i = 0; i < n; i++, crow += 2 * alglib_c_block)
          if (isupper)
             _ialglib_vzero(2 * (n - i), crow + 2 * i, 1);
          else
             _ialglib_vzero(2 * (i + 1), crow, 1);
    }
-// update C
-   if (isupper) {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += 2 * alglib_c_block, crow += 2 * alglib_c_block) {
+// Update c.
+//(@) The SSE2-optimized form of _ialglib_cmv() was not used here in the original ALGLIB version and hasn't yet been incorporated here.
+   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   double *arow = abuf, *crow = cbuf;
+   complex c_alpha = complex_from_d(Alpha);
+   complex c_beta = complex_from_d(Beta);
+   if (isupper)
+      for (ae_int_t i = 0; i < n; i++, arow += 2 * alglib_c_block, crow += 2 * alglib_c_block) {
          _ialglib_vcopy_dcomplex(k, arow, 1, tmpbuf, 1, "Conj");
          _ialglib_cmv(n - i, k, arow, tmpbuf, NULL, crow + 2 * i, 1, c_alpha, c_beta);
       }
-   } else {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += 2 * alglib_c_block, crow += 2 * alglib_c_block) {
+   else
+      for (ae_int_t i = 0; i < n; i++, arow += 2 * alglib_c_block, crow += 2 * alglib_c_block) {
          _ialglib_vcopy_dcomplex(k, arow, 1, tmpbuf, 1, "Conj");
          _ialglib_cmv(i + 1, k, abuf, tmpbuf, NULL, crow, 1, c_alpha, c_beta);
       }
-   }
-// copy back
+// Copy back.
    _ialglib_mcopyunblock_complex(n, n, cbuf, 0, _c, _c_stride);
    return true;
 }
 
 // Real rank-1 kernel.
-// deprecated version
+// Deprecated version.
 static bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double *_u, double *_v) {
-// Locals
-   double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
-   ae_int_t m2 = m / 2;
-   ae_int_t n2 = n / 2;
-   ae_int_t stride = _a_stride;
-   ae_int_t stride2 = 2 * _a_stride;
-   ae_int_t i, j;
-// Quick exit
+// Quick exit.
    if (m <= 0 || n <= 0)
       return false;
-// update pairs of rows
-   arow0 = _a;
-   arow1 = arow0 + stride;
-   pu = _u;
-   vtmp = _v;
-   for (i = 0; i < m2; i++, arow0 += stride2, arow1 += stride2, pu += 2) {
-   // update by two
-      for (j = 0, pv = vtmp, dst0 = arow0, dst1 = arow1; j < n2; j++, dst0 += 2, dst1 += 2, pv += 2) {
+// Locals.
+   ae_int_t m2 = m / 2;
+   ae_int_t n2 = n / 2;
+   ae_int_t stride2 = 2 * _a_stride;
+// Update the rows and columns by twos, handling the odd ones separately.
+   double *arow0 = _a;
+   double *arow1 = arow0 + _a_stride;
+   double *pu = _u;
+   double *vtmp = _v;
+   for (ae_int_t i = 0; i < m2; i++, arow0 += stride2, arow1 += stride2, pu += 2) {
+      double *pv = vtmp, *dst0 = arow0, *dst1 = arow1;
+      for (ae_int_t j = 0; j < n2; j++, dst0 += 2, dst1 += 2, pv += 2) {
          dst0[0] += pu[0] * pv[0];
          dst0[1] += pu[0] * pv[1];
          dst1[0] += pu[1] * pv[0];
          dst1[1] += pu[1] * pv[1];
       }
-   // final update
-      if (n % 2 != 0) {
+      if (n % 2) {
          dst0[0] += pu[0] * pv[0];
          dst1[0] += pu[1] * pv[0];
       }
    }
-// update last row
-   if (m % 2 != 0) {
-   // update by two
-      for (j = 0, pv = vtmp, dst0 = arow0; j < n2; j++, dst0 += 2, pv += 2) {
+   if (m % 2) {
+      double *pv = vtmp, *dst0 = arow0;
+      for (ae_int_t j = 0; j < n2; j++, dst0 += 2, pv += 2) {
          dst0[0] += pu[0] * pv[0];
          dst0[1] += pu[0] * pv[1];
       }
-   // final update
-      if (n % 2 != 0)
+      if (n % 2)
          dst0[0] += pu[0] * pv[0];
    }
    return true;
@@ -4760,20 +4558,18 @@ static bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _
 
 // Complex rank-1 kernel.
 static bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, complex *_a, ae_int_t _a_stride, complex *_u, complex *_v) {
-// Locals
-   complex *arow, *pu, *pv, *vtmp, *dst;
-   ae_int_t n2 = n / 2;
-   ae_int_t i, j;
-// Quick exit
+// Quick exit.
    if (m <= 0 || n <= 0)
       return false;
-// update pairs of rows
-   arow = _a;
-   pu = _u;
-   vtmp = _v;
-   for (i = 0; i < m; i++, arow += _a_stride, pu++) {
-   // update by two
-      for (j = 0, pv = vtmp, dst = arow; j < n2; j++, dst += 2, pv += 2) {
+// Locals.
+   ae_int_t n2 = n / 2;
+// Update the rows and columns by twos, handling the one ones separately.
+   complex *arow = _a;
+   complex *pu = _u;
+   complex *vtmp = _v;
+   for (ae_int_t i = 0; i < m; i++, arow += _a_stride, pu++) {
+      complex *pv = vtmp, *dst = arow;
+      for (ae_int_t j = 0; j < n2; j++, dst += 2, pv += 2) {
          double ux = pu[0].x;
          double uy = pu[0].y;
          double v0x = pv[0].x;
@@ -4785,8 +4581,7 @@ static bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, complex *_a, ae_int_t 
          dst[1].x += ux * v1x - uy * v1y;
          dst[1].y += ux * v1y + uy * v1x;
       }
-   // final update
-      if (n % 2 != 0) {
+      if (n % 2) {
          double ux = pu[0].x;
          double uy = pu[0].y;
          double vx = pv[0].x;
@@ -4799,118 +4594,102 @@ static bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, complex *_a, ae_int_t 
 }
 
 // Real rank-1 kernel.
-// deprecated version
-static bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double alpha, double *_u, double *_v) {
-// Locals
-   double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
+// Deprecated version.
+static bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double Alpha, double *_u, double *_v) {
+// Quick exit.
+   if (m <= 0 || n <= 0 || Alpha == 0.0)
+      return false;
+// Locals.
    ae_int_t m2 = m / 2;
    ae_int_t n2 = n / 2;
-   ae_int_t stride = _a_stride;
    ae_int_t stride2 = 2 * _a_stride;
-   ae_int_t i, j;
-// Quick exit
-   if (m <= 0 || n <= 0 || alpha == 0.0)
-      return false;
-// update pairs of rows
-   arow0 = _a;
-   arow1 = arow0 + stride;
-   pu = _u;
-   vtmp = _v;
-   for (i = 0; i < m2; i++, arow0 += stride2, arow1 += stride2, pu += 2) {
-      double au0 = alpha * pu[0];
-      double au1 = alpha * pu[1];
-   // update by two
-      for (j = 0, pv = vtmp, dst0 = arow0, dst1 = arow1; j < n2; j++, dst0 += 2, dst1 += 2, pv += 2) {
+// Update the rows and columns by twos, handling the odd ones separately.
+   double *arow0 = _a;
+   double *arow1 = arow0 + _a_stride;
+   double *pu = _u;
+   double *vtmp = _v;
+   for (ae_int_t i = 0; i < m2; i++, arow0 += stride2, arow1 += stride2, pu += 2) {
+      double au0 = Alpha * pu[0];
+      double au1 = Alpha * pu[1];
+      double *pv = vtmp, *dst0 = arow0, *dst1 = arow1;
+      for (ae_int_t j = 0; j < n2; j++, dst0 += 2, dst1 += 2, pv += 2) {
          dst0[0] += au0 * pv[0];
          dst0[1] += au0 * pv[1];
          dst1[0] += au1 * pv[0];
          dst1[1] += au1 * pv[1];
       }
-   // final update
-      if (n % 2 != 0) {
+      if (n % 2) {
          dst0[0] += au0 * pv[0];
          dst1[0] += au1 * pv[0];
       }
    }
-// update last row
-   if (m % 2 != 0) {
-      double au0 = alpha * pu[0];
-   // update by two
-      for (j = 0, pv = vtmp, dst0 = arow0; j < n2; j++, dst0 += 2, pv += 2) {
+   if (m % 2) {
+      double au0 = Alpha * pu[0];
+      double *pv = vtmp, *dst0 = arow0;
+      for (ae_int_t j = 0; j < n2; j++, dst0 += 2, pv += 2) {
          dst0[0] += au0 * pv[0];
          dst0[1] += au0 * pv[1];
       }
-   // final update
-      if (n % 2 != 0)
+      if (n % 2)
          dst0[0] += au0 * pv[0];
    }
    return true;
 }
 
 // Interface functions for efficient kernels.
+// For KerGemmRF(), KerGemmCF(), KerTrsmRCF(), KerTrsmRRF(), KerTrsmLCF(), KerTrsmLRF(), KerHerkCF(), KerSyrkRF():
+// For:
+//	_ialglib_i_rmatrixgemmf, _ialglib_i_rmatrixrighttrsmf, _ialglib_i_rmatrixlefttrsmf, _ialglib_i_rmatrixsyrkf,
+//	_ialglib_i_cmatrixgemmf, _ialglib_i_cmatrixrighttrsmf, _ialglib_i_cmatrixlefttrsmf, _ialglib_i_cmatrixherkf:
+// *	handle the degenerate cases like zero matrices by ALGLIB++ - greatly simplifies passing data to ALGLIB++ kernel,
+// *	handle the general cases with the optimized ALGLIB++ kernel.
 
-bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (alpha == 0.0 || k == 0 || n == 0 || m == 0)
+bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double Beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
+   if (Alpha == 0.0 || k == 0 || n == 0 || m == 0)
       return false;
-// handle with optimized ALGLIB kernel
-   return _ialglib_rmatrixgemm(m, n, k, alpha, _a->xyR[ia] + ja, _a->stride, optypea, _b->xyR[ib] + jb, _b->stride, optypeb, beta, _c->xyR[ic] + jc, _c->stride);
+   return _ialglib_rmatrixgemm(m, n, k, Alpha, _a->xyR[ia] + ja, _a->stride, optypea, _b->xyR[ib] + jb, _b->stride, optypeb, Beta, _c->xyR[ic] + jc, _c->stride);
 }
 
-bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if ((alpha.x == 0.0 && alpha.y == 0.0) || k == 0 || n == 0 || m == 0)
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex Alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex Beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
+   if (Alpha.x == 0.0 && Alpha.y == 0.0 || k == 0 || n == 0 || m == 0)
       return false;
-// handle with optimized ALGLIB kernel
-   return _ialglib_cmatrixgemm(m, n, k, alpha, _a->xyC[ia] + ja, _a->stride, optypea, _b->xyC[ib] + jb, _b->stride, optypeb, beta, _c->xyC[ic] + jc, _c->stride);
+   return _ialglib_cmatrixgemm(m, n, k, Alpha, _a->xyC[ia] + ja, _a->stride, optypea, _b->xyC[ib] + jb, _b->stride, optypeb, Beta, _c->xyC[ic] + jc, _c->stride);
 }
 
 bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (m == 0 || n == 0)
       return false;
-// handle with optimized ALGLIB kernel
    return _ialglib_rmatrixrighttrsm(m, n, &a->xyR[i1][j1], a->stride, isupper, isunit, optype, &x->xyR[i2][j2], x->stride);
 }
 
 bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (m == 0 || n == 0)
       return false;
-// handle with optimized ALGLIB kernel
    return _ialglib_cmatrixrighttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
 }
 
 bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (m == 0 || n == 0)
       return false;
-// handle with optimized ALGLIB kernel
    return _ialglib_rmatrixlefttrsm(m, n, &a->xyR[i1][j1], a->stride, isupper, isunit, optype, &x->xyR[i2][j2], x->stride);
 }
 
 bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (m == 0 || n == 0)
       return false;
-// handle with optimized ALGLIB kernel
    return _ialglib_cmatrixlefttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
 }
 
-bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (alpha == 0.0 || k == 0 || n == 0)
+bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double Alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double Beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+   if (Alpha == 0.0 || k == 0 || n == 0)
       return false;
-// ALGLIB kernel
-   return _ialglib_rmatrixsyrk(n, k, alpha, &a->xyR[ia][ja], a->stride, optypea, beta, &c->xyR[ic][jc], c->stride, isupper);
+   return _ialglib_rmatrixsyrk(n, k, Alpha, &a->xyR[ia][ja], a->stride, optypea, Beta, &c->xyR[ic][jc], c->stride, isupper);
 }
 
-bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (alpha == 0.0 || k == 0 || n == 0)
+bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double Alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double Beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+   if (Alpha == 0.0 || k == 0 || n == 0)
       return false;
-// ALGLIB kernel
-   return _ialglib_cmatrixherk(n, k, alpha, &a->xyC[ia][ja], a->stride, optypea, beta, &c->xyC[ic][jc], c->stride, isupper);
+   return _ialglib_cmatrixherk(n, k, Alpha, &a->xyC[ia][ja], a->stride, optypea, Beta, &c->xyC[ic][jc], c->stride, isupper);
 }
 
 bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
@@ -4921,48 +4700,35 @@ bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia,
    return _ialglib_cmatrixrank1(m, n, &a->xyC[ia][ja], a->stride, &u->xC[uoffs], &v->xC[voffs]);
 }
 
-bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
-   return _ialglib_rmatrixger(m, n, &a->xyR[ia][ja], a->stride, alpha, &u->xR[uoffs], &v->xR[voffs]);
+bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double Alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
+   return _ialglib_rmatrixger(m, n, &a->xyR[ia][ja], a->stride, Alpha, &u->xR[uoffs], &v->xR[voffs]);
 }
 
 #if defined AE_HAS_SSE2_INTRINSICS
-// This function reads rectangular matrix A given by two column pointers col0
-// and  col1  and  stride src_stride and moves it into  contiguous row-by-row
-// storage given by dst.
-//
+// Pack the matrix (col0, col1) with stride src_stride and length n row-by-row into the contiguous matrix dst (SSE2-optimized version).
 // dst must be aligned, col0 and col1 may be non-aligned.
-//
 // It can handle following special cases:
-// * col1 == NULL        in this case second column of A is filled by zeros
-// * src_stride == 1     efficient SSE-based code is used
-// * col1-col0 == 1      efficient SSE-based code is used
-//
+// *	col1 == NULL:				the second column is treated as 0,
+// *	src_stride == 1 or col1 - col0 == 1:	efficient SSE-based code is used.
 // This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. CurCPU contains CPU_SSE2 (checked at run-time)
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
+// *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// *	CurCPU contains CPU_SSE2 (checked at run-time)
+// If you want to know whether it is safe to call it, you should check CurCPU.
 // If CPU_SSE2 bit is set, this function is callable and will do its work.
 static void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
-   ae_int_t n2, j, stride2;
-// handle special case: col1 == NULL
-   if (col1 == NULL) {
-      for (j = 0; j < n; j++) {
+   if (col1 == NULL) // Handle the special case: col1 == NULL.
+      for (ae_int_t j = 0; j < n; j++) {
          dst[0] = *col0;
          dst[1] = 0.0;
          col0 += src_stride;
          dst += 2;
       }
-      return;
-   }
-// handle unit stride
-   if (src_stride == 1) {
-      __m128d v0, v1;
-      n2 = n / 2;
-      for (j = 0; j < n2; j++) {
-         v0 = _mm_loadu_pd(col0);
+   else if (src_stride == 1) { // Handle the case for unit stride.
+      ae_int_t n2 = n / 2;
+      for (ae_int_t j = 0; j < n2; j++) {
+         __m128d v0 = _mm_loadu_pd(col0);
          col0 += 2;
-         v1 = _mm_loadu_pd(col1);
+         __m128d v1 = _mm_loadu_pd(col1);
          col1 += 2;
          _mm_store_pd(dst, _mm_unpacklo_pd(v0, v1));
          _mm_store_pd(dst + 2, _mm_unpackhi_pd(v0, v1));
@@ -4972,16 +4738,12 @@ static void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int
          dst[0] = *col0;
          dst[1] = *col1;
       }
-      return;
-   }
-// handle col1-col0 == 1
-   if (col1 - col0 == 1) {
-      __m128d v0, v1;
-      n2 = n / 2;
-      stride2 = 2 * src_stride;
-      for (j = 0; j < n2; j++) {
-         v0 = _mm_loadu_pd(col0);
-         v1 = _mm_loadu_pd(col0 + src_stride);
+   } else if (col1 - col0 == 1) { // Handle the case: col1 - col0 == 1.
+      ae_int_t n2 = n / 2;
+      ae_int_t stride2 = 2 * src_stride;
+      for (ae_int_t j = 0; j < n2; j++) {
+         __m128d v0 = _mm_loadu_pd(col0);
+         __m128d v1 = _mm_loadu_pd(col0 + src_stride);
          _mm_store_pd(dst, v0);
          _mm_store_pd(dst + 2, v1);
          col0 += stride2;
@@ -4991,110 +4753,88 @@ static void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int
          dst[0] = col0[0];
          dst[1] = col0[1];
       }
-      return;
-   }
-// handle general case
-   n2 = n / 2;
-   stride2 = src_stride * 2;
-   for (j = 0; j < n2; j++) {
-      dst[0] = *col0;
-      dst[1] = *col1;
-      dst[2] = col0[src_stride];
-      dst[3] = col1[src_stride];
-      col0 += stride2;
-      col1 += stride2;
-      dst += 4;
-   }
-   if (n % 2) {
-      dst[0] = *col0;
-      dst[1] = *col1;
+   } else { // The general case.
+      ae_int_t n2 = n / 2;
+      ae_int_t stride2 = 2 * src_stride;
+      for (ae_int_t j = 0; j < n2; j++) {
+         dst[0] = *col0;
+         dst[1] = *col1;
+         dst[2] = col0[src_stride];
+         dst[3] = col1[src_stride];
+         col0 += stride2;
+         col1 += stride2;
+         dst += 4;
+      }
+      if (n % 2) {
+         dst[0] = *col0;
+         dst[1] = *col1;
+      }
    }
 }
 #endif
 
-// This function reads rectangular matrix A given by two column pointers
-// col0 and col1 and stride src_stride and moves it into contiguous row-
-// by-row storage given by dst.
-//
-// It can handle following special cases:
-// * col1 == NULL    in this case second column of A is filled by zeros
+// Pack the matrix (col0, col1) with stride src_stride and length n row-by-row into the contiguous matrix dst.
+// dst must be aligned, col0 and col1 may be non-aligned.
+// It can handle following special case:
+// *	col1 == NULL:				the second column is treated as 0,
 void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
-   ae_int_t n2, j, stride2;
-// handle special case
-   if (col1 == NULL) {
-      for (j = 0; j < n; j++) {
+   if (col1 == NULL) // Handle the special case: col1 == NULL.
+      for (ae_int_t j = 0; j < n; j++) {
          dst[0] = *col0;
          dst[1] = 0.0;
          col0 += src_stride;
          dst += 2;
       }
-      return;
-   }
-// handle general case
-   n2 = n / 2;
-   stride2 = src_stride * 2;
-   for (j = 0; j < n2; j++) {
-      dst[0] = *col0;
-      dst[1] = *col1;
-      dst[2] = col0[src_stride];
-      dst[3] = col1[src_stride];
-      col0 += stride2;
-      col1 += stride2;
-      dst += 4;
-   }
-   if (n % 2) {
-      dst[0] = *col0;
-      dst[1] = *col1;
+   else { // Handle the general case.
+      ae_int_t n2 = n / 2;
+      ae_int_t stride2 = src_stride * 2;
+      for (ae_int_t j = 0; j < n2; j++) {
+         dst[0] = *col0;
+         dst[1] = *col1;
+         dst[2] = col0[src_stride];
+         dst[3] = col1[src_stride];
+         col0 += stride2;
+         col1 += stride2;
+         dst += 4;
+      }
+      if (n % 2) {
+         dst[0] = *col0;
+         dst[1] = *col1;
+      }
    }
 }
 
 #if defined AE_HAS_SSE2_INTRINSICS
-// This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
-// matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
-// stored in non-contiguous row-by-row storage.
-//
-// A and B must be aligned; R may be non-aligned.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero -
-// just ignored).
-//
-// However, when alpha is zero, we still calculate A'*B, which is
-// multiplied by zero afterwards.
-//
-// Function accepts additional parameter store_mode:
-// * if 0, full R is stored
-// * if 1, only first row of R is stored
-// * if 2, only first column of R is stored
-// * if 3, only top left element of R is stored
-//
+// Calculate (SSE2-optimized)
+//	r = Alpha a' b + Beta r
+// where
+// *	a and b are aligned k x 2 matrices stored in contiguous row-by-row storage,
+// *	r is a 2 x 2 matrix stored in non-contiguous row-by-row storage and may be non-aligned.
+// If Beta == 0.0, then r is ignored, rather than multiplied by zero.
+// but if Alpha == 0.0, we still calculate a' b even though it is multiplied by zero afterwards.
+// The format of the result for r, based on store_mode, is as follows:
+// *	store_mode == 0:	the full r is stored
+// *	store_mode == 1:	only the first row of r is stored
+// *	store_mode == 2:	only the first column of r is stored
+// *	store_mode == 3:	only the top left element of r is stored
 // This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. CurCPU contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will still be defined and callable, but it
-// will do nothing.  If (2)  is  failed , call to this function will probably
-// crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
+// *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+//	Otherwise, this function will be undefined.
+// *	CurCPU contains CPU_SSE2 (checked at run-time)
+//	Otherwise, calling this function will probably crash your system.
+// If you want to know whether it is safe to call it, you should check CurCPU.
 // If CPU_SSE2 bit is set, this function is callable and will do its work.
-static void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
-// We calculate product of two Kx2 matrices (result is 2x2).
-// VA and VB store result as follows:
-//
-//        [ VD[0]  VE[0] ]
-// A'*B = [              ]
-//        [ VE[1]  VD[1] ]
-//
-   __m128d va, vb, vd, ve, vt, r0, r1, valpha, vbeta;
-   ae_int_t t, k2;
-// calculate product
-   k2 = k / 2;
-   vd = _mm_setzero_pd();
-   ve = _mm_setzero_pd();
-   for (t = 0; t < k2; t++) {
-      vb = _mm_load_pd(b);
-      va = _mm_load_pd(a);
-      vt = vb;
+static void _ialglib_mm22_sse2(double Alpha, const double *a, const double *b, ae_int_t k, double Beta, double *r, ae_int_t stride, ae_int_t store_mode) {
+// Calculate the 2 x 2 matrix product the k x 2 matrices va and vb and store the result as follows:
+//	a' b	=	/ vd[0] ve[0] \
+//			\ ve[1] vd[1] /
+   ae_int_t k2 = k / 2;
+   __m128d vd = _mm_setzero_pd();
+   __m128d ve = _mm_setzero_pd();
+   for (ae_int_t t = 0; t < k2; t++) {
+      __m128d vb = _mm_load_pd(b);
+      __m128d va = _mm_load_pd(a);
+      __m128d vt = vb;
       vb = _mm_mul_pd(va, vb);
       vt = _mm_shuffle_pd(vt, vt, 1);
       vd = _mm_add_pd(vb, vd);
@@ -5112,85 +4852,78 @@ static void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, a
       b += 4;
    }
    if (k % 2) {
-      va = _mm_load_pd(a);
-      vb = _mm_load_pd(b);
-      vt = _mm_shuffle_pd(vb, vb, 1);
+      __m128d va = _mm_load_pd(a);
+      __m128d vb = _mm_load_pd(b);
+      __m128d vt = _mm_shuffle_pd(vb, vb, 1);
       vd = _mm_add_pd(_mm_mul_pd(va, vb), vd);
       ve = _mm_add_pd(_mm_mul_pd(va, vt), ve);
    }
-// r0 is first row of alpha*A'*B, r1 is second row
-   valpha = _mm_load1_pd(&alpha);
-   r0 = _mm_mul_pd(_mm_unpacklo_pd(vd, ve), valpha);
-   r1 = _mm_mul_pd(_mm_unpackhi_pd(ve, vd), valpha);
-// store
-   if (store_mode == 0) {
-      if (beta == 0) {
-         _mm_storeu_pd(r, r0);
-         _mm_storeu_pd(r + stride, r1);
-      } else {
-         vbeta = _mm_load1_pd(&beta);
-         _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), vbeta), r0));
-         _mm_storeu_pd(r + stride, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + stride), vbeta), r1));
+// r0 is the first row of Alpha a' b, r1 is the second row.
+   __m128d valpha = _mm_load1_pd(&Alpha);
+   __m128d r0 = _mm_mul_pd(_mm_unpacklo_pd(vd, ve), valpha);
+   __m128d r1 = _mm_mul_pd(_mm_unpackhi_pd(ve, vd), valpha);
+// Format and store the result r.
+   switch (store_mode) {
+      case 0:
+         if (Beta == 0.0) {
+            _mm_storeu_pd(r, r0);
+            _mm_storeu_pd(r + stride, r1);
+         } else {
+            __m128d vbeta = _mm_load1_pd(&Beta);
+            _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), vbeta), r0));
+            _mm_storeu_pd(r + stride, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + stride), vbeta), r1));
+         }
+      break;
+      case 1:
+         if (Beta == 0.0)
+            _mm_storeu_pd(r, r0);
+         else
+            _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), _mm_load1_pd(&Beta)), r0));
+      break;
+      case 2: {
+         double buf[4];
+         _mm_storeu_pd(buf, r0);
+         _mm_storeu_pd(buf + 2, r1);
+         if (Beta == 0.0) {
+            r[0] = buf[0];
+            r[stride] = buf[2];
+         } else {
+            r[0] = Beta * r[0] + buf[0];
+            r[stride] = Beta * r[stride] + buf[2];
+         }
       }
-      return;
-   }
-   if (store_mode == 1) {
-      if (beta == 0)
-         _mm_storeu_pd(r, r0);
-      else
-         _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), _mm_load1_pd(&beta)), r0));
-      return;
-   }
-   if (store_mode == 2) {
-      double buf[4];
-      _mm_storeu_pd(buf, r0);
-      _mm_storeu_pd(buf + 2, r1);
-      if (beta == 0) {
-         r[0] = buf[0];
-         r[stride + 0] = buf[2];
-      } else {
-         r[0] = beta * r[0] + buf[0];
-         r[stride + 0] = beta * r[stride + 0] + buf[2];
+      break;
+      case 3: {
+         double buf[2];
+         _mm_storeu_pd(buf, r0);
+         if (Beta == 0.0)
+            r[0] = buf[0];
+         else
+            r[0] = Beta * r[0] + buf[0];
       }
-      return;
-   }
-   if (store_mode == 3) {
-      double buf[2];
-      _mm_storeu_pd(buf, r0);
-      if (beta == 0)
-         r[0] = buf[0];
-      else
-         r[0] = beta * r[0] + buf[0];
-      return;
+      break;
    }
 }
 #endif
 
-// This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
-// matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
-// stored in non-contiguous row-by-row storage.
-//
-// A and B must be aligned; R may be non-aligned.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero -
-// just ignored).
-//
-// However, when alpha is zero, we still calculate A'*B, which is
-// multiplied by zero afterwards.
-//
-// Function accepts additional parameter store_mode:
-// * if 0, full R is stored
-// * if 1, only first row of R is stored
-// * if 2, only first column of R is stored
-// * if 3, only top left element of R is stored
-void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
-   double v00, v01, v10, v11;
-   ae_int_t t;
-   v00 = 0.0;
-   v01 = 0.0;
-   v10 = 0.0;
-   v11 = 0.0;
-   for (t = 0; t < k; t++) {
+// Calculate
+//	r = Alpha a' b + Beta r
+// where
+// *	a and b are aligned k x 2 matrices stored in contiguous row-by-row storage,
+// *	r is a 2 x 2 matrix stored in non-contiguous row-by-row storage and may be non-aligned.
+// If Beta == 0.0, then r is ignored, rather than multiplied by zero.
+// but if Alpha == 0.0, we still calculate a' b even though it is multiplied by zero afterwards.
+// The format of the result for r, based on store_mode, is as follows:
+// *	store_mode == 0:	the full r is stored
+// *	store_mode == 1:	only the first row of r is stored
+// *	store_mode == 2:	only the first column of r is stored
+// *	store_mode == 3:	only the top left element of r is stored
+void _ialglib_mm22(double Alpha, const double *a, const double *b, ae_int_t k, double Beta, double *r, ae_int_t stride, ae_int_t store_mode) {
+   double v00 = 0.0;
+   double v01 = 0.0;
+   double v10 = 0.0;
+   double v11 = 0.0;
+   for (ae_int_t t = 0; t < k; t++) {
       v00 += a[0] * b[0];
       v01 += a[0] * b[1];
       v10 += a[1] * b[0];
@@ -5198,105 +4931,82 @@ void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, d
       a += 2;
       b += 2;
    }
-   if (store_mode == 0) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-         r[1] = alpha * v01;
-         r[stride + 0] = alpha * v10;
-         r[stride + 1] = alpha * v11;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-         r[1] = beta * r[1] + alpha * v01;
-         r[stride + 0] = beta * r[stride + 0] + alpha * v10;
-         r[stride + 1] = beta * r[stride + 1] + alpha * v11;
-      }
-      return;
-   }
-   if (store_mode == 1) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-         r[1] = alpha * v01;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-         r[1] = beta * r[1] + alpha * v01;
-      }
-      return;
-   }
-   if (store_mode == 2) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-         r[stride + 0] = alpha * v10;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-         r[stride + 0] = beta * r[stride + 0] + alpha * v10;
-      }
-      return;
-   }
-   if (store_mode == 3) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-      }
-      return;
+   switch (store_mode) {
+      case 0:
+         if (Beta == 0.0) {
+            r[0] = Alpha * v00;
+            r[1] = Alpha * v01;
+            r[stride] = Alpha * v10;
+            r[stride + 1] = Alpha * v11;
+         } else {
+            r[0] = Beta * r[0] + Alpha * v00;
+            r[1] = Beta * r[1] + Alpha * v01;
+            r[stride] = Beta * r[stride] + Alpha * v10;
+            r[stride + 1] = Beta * r[stride + 1] + Alpha * v11;
+         }
+      break;
+      case 1:
+         if (Beta == 0.0) {
+            r[0] = Alpha * v00;
+            r[1] = Alpha * v01;
+         } else {
+            r[0] = Beta * r[0] + Alpha * v00;
+            r[1] = Beta * r[1] + Alpha * v01;
+         }
+      break;
+      case 2:
+         if (Beta == 0.0) {
+            r[0] = Alpha * v00;
+            r[stride] = Alpha * v10;
+         } else {
+            r[0] = Beta * r[0] + Alpha * v00;
+            r[stride] = Beta * r[stride] + Alpha * v10;
+         }
+      break;
+      case 3:
+         if (Beta == 0.0) {
+            r[0] = Alpha * v00;
+         } else {
+            r[0] = Beta * r[0] + Alpha * v00;
+         }
+      break;
    }
 }
 
 #if defined AE_HAS_SSE2_INTRINSICS
-// This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
-// are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
-// stored in non-contiguous row-by-row storage.
-//
-// A, B0 and B1 must be aligned; R may be non-aligned.
-//
-// Note  that  B0  and  B1  are  two  separate  matrices  stored in different
-// locations.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero - just
-// ignored).
-//
-// However,  when  alpha  is  zero , we still calculate MM product,  which is
-// multiplied by zero afterwards.
-//
-// Unlike mm22 functions, this function does NOT support partial  output of R
-// - we always store full 2x4 matrix.
-//
+// Calculate
+//	r = Alpha a' (b0|b1) + Beta r
+// where
+// *	a, b0 and b1 are alinged k x 2 matrices stored in contiguous row-by-row storage,
+//	b0 and b1 are two separate matrices stored in different locations,
+// *	r is a 2 x 4 matrix stored in non-contiguous row-by-row storage and may be non-aligned.
+// If Beta == 0.0, then r is ignored, rather than multiplied by zero.
+// but if Alpha == 0.0, we still calculate the MM product even though it is multiplied by zero afterwards.
+// Unlike the mm22 functions, this function does NOT support partial output formats for r - we always store the full 2 x 4 matrix.
 // This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. CurCPU contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will still be defined and callable, but it
-// will do nothing.  If (2)  is  failed , call to this function will probably
-// crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
+// *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+//	Otherwise, this function will be undefined.
+// *	CurCPU contains CPU_SSE2 (checked at run-time)
+//	Otherwise, calling this function will probably crash your system.
+// If you want to know whether it is safe to call it, you should check CurCPU.
 // If CPU_SSE2 bit is set, this function is callable and will do its work.
-static void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
-// We calculate product of two Kx2 matrices (result is 2x2).
-// V0, V1, V2, V3 store result as follows:
-//
-//     [ V0[0]  V1[1] V2[0]  V3[1] ]
-// R = [                           ]
-//     [ V1[0]  V0[1] V3[0]  V2[1] ]
-//
-// VA0 stores current 1x2 block of A, VA1 stores shuffle of VA0,
-// VB0 and VB1 are used to store two copies of 1x2 block of B0 or B1
-// (both vars store same data - either B0 or B1). Results from multiplication
-// by VA0/VA1 are stored in VB0/VB1 too.
-//
-   __m128d v0, v1, v2, v3, va0, va1, vb0, vb1;
-   __m128d r00, r01, r10, r11, valpha, vbeta;
-   ae_int_t t;
-   v0 = _mm_setzero_pd();
-   v1 = _mm_setzero_pd();
-   v2 = _mm_setzero_pd();
-   v3 = _mm_setzero_pd();
-   for (t = 0; t < k; t++) {
-      va0 = _mm_load_pd(a);
-      vb0 = _mm_load_pd(b0);
-      va1 = _mm_load_pd(a);
+static void _ialglib_mm22x2_sse2(double Alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double Beta, double *r, ae_int_t stride) {
+// Calculate the 2 x 2 matrix product of two k x 2 matrices and store the result in v0, v1, v2 and v3 as follows:
+//	r =	/ v0[0] v1[1] v2[0] v3[1] \
+//		\ v1[0] v0[1] v3[0] v2[1] /
+// vA0 is the current 1 x 2 block of a, va1 is the shuffle of va0,
+// vB0 and vB1 are the two copies of the 1 x 2 blocks of b0 or b1 (both are the same copy - either b0 or b1).
+// The results from multiplication by va0/va1 are stored in vb0/vb1 too.
+   __m128d v0 = _mm_setzero_pd();
+   __m128d v1 = _mm_setzero_pd();
+   __m128d v2 = _mm_setzero_pd();
+   __m128d v3 = _mm_setzero_pd();
+   for (ae_int_t t = 0; t < k; t++) {
+      __m128d va0 = _mm_load_pd(a);
+      __m128d vb0 = _mm_load_pd(b0);
+      __m128d va1 = _mm_load_pd(a);
       vb0 = _mm_mul_pd(va0, vb0);
-      vb1 = _mm_load_pd(b0);
+      __m128d vb1 = _mm_load_pd(b0);
       v0 = _mm_add_pd(v0, vb0);
       vb1 = _mm_mul_pd(va1, vb1);
       vb0 = _mm_load_pd(b1);
@@ -5310,32 +5020,27 @@ static void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0
       b0 += 2;
       b1 += 2;
    }
-// shuffle V1 and V3 (conversion to more convenient storage format):
-//
-//     [ V0[0]  V1[0] V2[0]  V3[0] ]
-// R = [                           ]
-//     [ V1[1]  V0[1] V3[1]  V2[1] ]
-//
-// unpack results to
-//
-// [ r00 r01 ]
-// [ r10 r11 ]
-//
-   valpha = _mm_load1_pd(&alpha);
+// Shuffle v1 and v3 (converting to more convenient storage format):
+//	r =	/ v0[0] v1[0] v2[0] v3[0] \
+//		\ v1[1] v0[1] v3[1] v2[1] /
+// and unpack the results to
+//	/ r00 r01 \
+//	\ r10 r11 /
+   __m128d valpha = _mm_load1_pd(&Alpha);
    v1 = _mm_shuffle_pd(v1, v1, 1);
    v3 = _mm_shuffle_pd(v3, v3, 1);
-   r00 = _mm_mul_pd(_mm_unpacklo_pd(v0, v1), valpha);
-   r10 = _mm_mul_pd(_mm_unpackhi_pd(v1, v0), valpha);
-   r01 = _mm_mul_pd(_mm_unpacklo_pd(v2, v3), valpha);
-   r11 = _mm_mul_pd(_mm_unpackhi_pd(v3, v2), valpha);
-// store
-   if (beta == 0) {
+   __m128d r00 = _mm_mul_pd(_mm_unpacklo_pd(v0, v1), valpha);
+   __m128d r10 = _mm_mul_pd(_mm_unpackhi_pd(v1, v0), valpha);
+   __m128d r01 = _mm_mul_pd(_mm_unpacklo_pd(v2, v3), valpha);
+   __m128d r11 = _mm_mul_pd(_mm_unpackhi_pd(v3, v2), valpha);
+// Store the result.
+   if (Beta == 0.0) {
       _mm_storeu_pd(r, r00);
       _mm_storeu_pd(r + 2, r01);
       _mm_storeu_pd(r + stride, r10);
       _mm_storeu_pd(r + stride + 2, r11);
    } else {
-      vbeta = _mm_load1_pd(&beta);
+      __m128d vbeta = _mm_load1_pd(&Beta);
       _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), vbeta), r00));
       _mm_storeu_pd(r + 2, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + 2), vbeta), r01));
       _mm_storeu_pd(r + stride, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + stride), vbeta), r10));
@@ -5344,26 +5049,18 @@ static void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0
 }
 #endif
 
-// This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
-// are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
-// stored in non-contiguous row-by-row storage.
-//
-// A, B0 and B1 must be aligned; R may be non-aligned.
-//
-// Note  that  B0  and  B1  are  two  separate  matrices  stored in different
-// locations.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero - just
-// ignored).
-//
-// However,  when  alpha  is  zero , we still calculate MM product,  which is
-// multiplied by zero afterwards.
-//
-// Unlike mm22 functions, this function does NOT support partial  output of R
-// - we always store full 2x4 matrix.
-void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
-   _ialglib_mm22(alpha, a, b0, k, beta, r, stride, 0);
-   _ialglib_mm22(alpha, a, b1, k, beta, r + 2, stride, 0);
+// Calculate
+//	r = Alpha a' (b0|b1) + Beta r
+// where
+// *	a, b0 and b1 are alinged k x 2 matrices stored in contiguous row-by-row storage,
+//	b0 and b1 are two separate matrices stored in different locations,
+// *	r is a 2 x 4 matrix stored in non-contiguous row-by-row storage and may be non-aligned.
+// If Beta == 0.0, then r is ignored, rather than multiplied by zero.
+// but if Alpha == 0.0, we still calculate the MM product even though it is multiplied by zero afterwards.
+// Unlike the mm22 functions, this function does NOT support partial output formats for r - we always store the full 2 x 4 matrix.
+void _ialglib_mm22x2(double Alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double Beta, double *r, ae_int_t stride) {
+   _ialglib_mm22(Alpha, a, b0, k, Beta, r, stride, 0);
+   _ialglib_mm22(Alpha, a, b1, k, Beta, r + 2, stride, 0);
 }
 
 #if !defined ALGLIB_NO_FAST_KERNELS
@@ -5865,16 +5562,16 @@ void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx) {
 //     X       -   array[N], vector to process
 //
 // Result:
-//     X := X + alpha*Y
+//     X := X + Alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddv(ae_int_t n, double alpha, RVector *y, RVector *x) {
+void raddv(ae_int_t n, double Alpha, RVector *y, RVector *x) {
    ae_int_t i;
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xR, x->xR))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, Alpha, y->xR, x->xR))
    for (i = 0; i < n; i++) {
-      x->xR[i] += alpha * y->xR[i];
+      x->xR[i] += Alpha * y->xR[i];
    }
 }
 
@@ -5887,16 +5584,16 @@ void raddv(ae_int_t n, double alpha, RVector *y, RVector *x) {
 //     X       -   target row RowIdx
 //
 // Result:
-//     X := X + alpha*Y
+//     X := X + Alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx) {
+void raddvr(ae_int_t n, double Alpha, RVector *y, RMatrix *x, ae_int_t rowidx) {
    ae_int_t i;
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xR, x->xyR[rowidx]))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, Alpha, y->xR, x->xyR[rowidx]))
    for (i = 0; i < n; i++) {
-      x->xyR[rowidx][i] += alpha * y->xR[i];
+      x->xyR[rowidx][i] += Alpha * y->xR[i];
    }
 }
 
@@ -5910,16 +5607,16 @@ void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx) {
 //     X       -   array[N], vector to process
 //
 // Result:
-//     X := X + alpha*Y
+//     X := X + Alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x) {
+void raddrv(ae_int_t n, double Alpha, RMatrix *y, ae_int_t ridx, RVector *x) {
    ae_int_t i;
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xyR[ridx], x->xR))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, Alpha, y->xyR[ridx], x->xR))
    for (i = 0; i < n; i++) {
-      x->xR[i] += alpha * y->xyR[ridx][i];
+      x->xR[i] += Alpha * y->xyR[ridx][i];
    }
 }
 
@@ -5934,16 +5631,16 @@ void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x) {
 //     RIdxDst -   destination row index
 //
 // Result:
-//     X := X + alpha*Y
+//     X := X + Alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst) {
+void raddrr(ae_int_t n, double Alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst) {
    ae_int_t i;
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, alpha, y->xyR[ridxsrc], x->xyR[ridxdst]))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv, (n, Alpha, y->xyR[ridxsrc], x->xyR[ridxdst]))
    for (i = 0; i < n; i++) {
-      x->xyR[ridxdst][i] += alpha * y->xyR[ridxsrc][i];
+      x->xyR[ridxdst][i] += Alpha * y->xyR[ridxsrc][i];
    }
 }
 
@@ -5958,16 +5655,16 @@ void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, 
 //     OffsX   -   destination offset
 //
 // Result:
-//     X := X + alpha*Y
+//     X := X + Alpha*Y
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx) {
+void raddvx(ae_int_t n, double Alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx) {
    ae_int_t i;
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    if (n >= _ABLASF_KERNEL_SIZE1)
-      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddvx, (n, alpha, y->xR + offsy, x->xR + offsx))
+      _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddvx, (n, Alpha, y->xR + offsy, x->xR + offsx))
    for (i = 0; i < n; i++) {
-      x->xR[offsx + i] += alpha * y->xR[offsy + i];
+      x->xR[offsx + i] += Alpha * y->xR[offsy + i];
    }
 }
 
@@ -6326,7 +6023,7 @@ void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy)
    }
 }
 
-// Matrix-vector product: y := alpha*op(A)*x + beta*y
+// Matrix-vector product: y := Alpha*op(A)*x + Beta*y
 //
 // NOTE: this  function  expects  Y  to  be  large enough to store result. No
 //       automatic preallocation happens for  smaller  arrays.  No  integrity
@@ -6358,7 +6055,7 @@ void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy)
 //        initial state of Y is ignored (rewritten by  A*x,  without  initial
 //        multiplication by zeros).
 // ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
-void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVector *x, double beta, RVector *y) {
+void rgemv(ae_int_t m, ae_int_t n, double Alpha, RMatrix *a, ae_int_t opa, RVector *x, double Beta, RVector *y) {
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -6369,36 +6066,36 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
    if (m <= 0) {
       return;
    }
-   if (beta != 0.0) {
-      rmulv(m, beta, y);
+   if (Beta != 0.0) {
+      rmulv(m, Beta, y);
    } else {
       rsetv(m, 0.0, y);
    }
-   if (n <= 0 || alpha == 0.0) {
+   if (n <= 0 || Alpha == 0.0) {
       return;
    }
 // Straight or transposed?
    if (opa == 0) {
    // Try SIMD code
       if (n >= _ABLASF_KERNEL_SIZE2)
-         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_straight, (m, n, alpha, a, x->xR, y->xR))
+         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_straight, (m, n, Alpha, a, x->xR, y->xR))
    // Generic C version: y += A*x
       for (i = 0; i < m; i++) {
          v = 0.0;
          for (j = 0; j < n; j++) {
             v += a->xyR[i][j] * x->xR[j];
          }
-         y->xR[i] += alpha * v;
+         y->xR[i] += Alpha * v;
       }
       return;
    }
    if (opa == 1) {
    // Try SIMD code
       if (m >= _ABLASF_KERNEL_SIZE2)
-         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_transposed, (m, n, alpha, a, x->xR, y->xR))
+         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_transposed, (m, n, Alpha, a, x->xR, y->xR))
    // Generic C version: y += A^T*x
       for (i = 0; i < n; i++) {
-         v = alpha * x->xR[i];
+         v = Alpha * x->xR[i];
          for (j = 0; j < m; j++) {
             y->xR[j] += v * a->xyR[i][j];
          }
@@ -6407,7 +6104,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
    }
 }
 
-// Matrix-vector product: y := alpha*op(A)*x + beta*y
+// Matrix-vector product: y := Alpha*op(A)*x + Beta*y
 //
 // Here x, y, A are subvectors/submatrices of larger vectors/matrices.
 //
@@ -6445,7 +6142,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
 //        initial state of Y is ignored (rewritten by  A*x,  without  initial
 //        multiplication by zeros).
 // ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
-void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
+void rgemvx(ae_int_t m, ae_int_t n, double Alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double Beta, RVector *y, ae_int_t iy) {
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -6456,36 +6153,36 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
    if (m <= 0) {
       return;
    }
-   if (beta != 0.0) {
-      rmulvx(m, beta, y, iy);
+   if (Beta != 0.0) {
+      rmulvx(m, Beta, y, iy);
    } else {
       rsetvx(m, 0.0, y, iy);
    }
-   if (n <= 0 || alpha == 0.0) {
+   if (n <= 0 || Alpha == 0.0) {
       return;
    }
 // Straight or transposed?
    if (opa == 0) {
    // Try SIMD code
       if (n >= _ABLASF_KERNEL_SIZE2)
-         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_straight, (m, n, alpha, a, ia, ja, x->xR + ix, y->xR + iy))
+         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_straight, (m, n, Alpha, a, ia, ja, x->xR + ix, y->xR + iy))
    // Generic C code: y += A*x
       for (i = 0; i < m; i++) {
          v = 0.0;
          for (j = 0; j < n; j++) {
             v += a->xyR[ia + i][ja + j] * x->xR[ix + j];
          }
-         y->xR[iy + i] += alpha * v;
+         y->xR[iy + i] += Alpha * v;
       }
       return;
    }
    if (opa == 1) {
    // Try SIMD code
       if (m >= _ABLASF_KERNEL_SIZE2)
-         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_transposed, (m, n, alpha, a, ia, ja, x->xR + ix, y->xR + iy))
+         _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_transposed, (m, n, Alpha, a, ia, ja, x->xR + ix, y->xR + iy))
    // Generic C code: y += A^T*x
       for (i = 0; i < n; i++) {
-         v = alpha * x->xR[ix + i];
+         v = Alpha * x->xR[ix + i];
          for (j = 0; j < m; j++) {
             y->xR[iy + j] += v * a->xyR[ia + i][ja + j];
          }
@@ -6494,7 +6191,7 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
    }
 }
 
-// Rank-1 correction: A := A + alpha*u*v'
+// Rank-1 correction: A := A + Alpha*u*v'
 //
 // NOTE: this  function  expects  A  to  be  large enough to store result. No
 //       automatic preallocation happens for  smaller  arrays.  No  integrity
@@ -6508,15 +6205,15 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
 //     U   -   vector #1
 //     V   -   vector #2
 // ALGLIB Routine: Copyright 07.09.2021 by Sergey Bochkanov
-void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix *a) {
+void rger(ae_int_t m, ae_int_t n, double Alpha, RVector *u, RVector *v, RMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    double s;
-   if ((m <= 0 || n <= 0) || alpha == 0.0) {
+   if ((m <= 0 || n <= 0) || Alpha == 0.0) {
       return;
    }
    for (i = 0; i < m; i++) {
-      s = alpha * u->xR[i];
+      s = Alpha * u->xR[i];
       for (j = 0; j < n; j++) {
          a->xyR[i][j] += s * v->xR[j];
       }
@@ -6620,7 +6317,7 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
 
 // Fast rGEMM kernel with AVX2/FMA support
 // ALGLIB Routine: Copyright 19.09.2021 by Sergey Bochkanov
-bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *_c, ae_int_t ic, ae_int_t jc) {
+bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, RMatrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double Beta, RMatrix *_c, ae_int_t ic, ae_int_t jc) {
 #   if !defined _ALGLIB_HAS_AVX2_INTRINSICS
    return false;
 #   else
@@ -6642,8 +6339,8 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RM
 // Prepare C
    c = _c->xyR[ic] + jc;
    stride_c = _c->stride;
-// Do we have alpha*A*B ?
-   if (alpha != 0 && k > 0) {
+// Do we have Alpha*A*B ?
+   if (Alpha != 0 && k > 0) {
    // Prepare structures
       ae_int_t base0, base1, offs0;
       double *a = _a->xyR[ia] + ja;
@@ -6672,18 +6369,18 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RM
             ablasf_dotblk(blka, storageb_long + base1 * block_size, round_k, block_size, micro_size, blkc + base1, block_size);
       // Output block row of block(A)'*entire(B)
          for (offs0 = 0; offs0 < lim0; offs0++)
-            ablasf_daxpby(n, alpha, blkc + offs0 * block_size, beta, c + (base0 + offs0) * stride_c);
+            ablasf_daxpby(n, Alpha, blkc + offs0 * block_size, Beta, c + (base0 + offs0) * stride_c);
       }
    } else {
-   // No A*B, just beta*C (degenerate case, not optimized)
-      if (beta == 0) {
+   // No A*B, just Beta*C (degenerate case, not optimized)
+      if (Beta == 0) {
          for (out0 = 0; out0 < m; out0++)
             for (out1 = 0; out1 < n; out1++)
                c[out0 * stride_c + out1] = 0.0;
-      } else if (beta != 1) {
+      } else if (Beta != 1) {
          for (out0 = 0; out0 < m; out0++)
             for (out1 = 0; out1 < n; out1++)
-               c[out0 * stride_c + out1] *= beta;
+               c[out0 * stride_c + out1] *= Beta;
       }
    }
    return true;
