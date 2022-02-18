@@ -689,28 +689,28 @@ bool randombool(double p = 0.5);
 inline complex complex_from_i(ae_int_t x, ae_int_t y = 0) { complex r; r.x = (double)x, r.y = (double)y; return r; }
 inline complex complex_from_d(double x, double y = 0.0) { complex r; r.x = x, r.y = y; return r; }
 
-complex ae_c_neg(complex lhs);
-complex conj(complex lhs);
-complex csqr(complex lhs);
-double abscomplex(complex z);
+complex ae_c_neg(complex A);
+complex conj(complex A);
+complex csqr(complex A);
+double abscomplex(complex A);
 
-bool ae_c_eq(complex lhs, complex rhs);
-bool ae_c_neq(complex lhs, complex rhs);
+bool ae_c_eq(complex A, complex B);
+bool ae_c_neq(complex A, complex B);
 
-complex ae_c_add(complex lhs, complex rhs);
-complex ae_c_mul(complex lhs, complex rhs);
-complex ae_c_sub(complex lhs, complex rhs);
-complex ae_c_div(complex lhs, complex rhs);
+complex ae_c_add(complex A, complex B);
+complex ae_c_mul(complex A, complex B);
+complex ae_c_sub(complex A, complex B);
+complex ae_c_div(complex A, complex B);
 
-bool ae_c_eq_d(complex lhs, double rhs);
-bool ae_c_neq_d(complex lhs, double rhs);
+bool ae_c_eq_d(complex A, double B);
+bool ae_c_neq_d(complex A, double B);
 
-complex ae_c_add_d(complex lhs, double rhs);
-complex ae_c_mul_d(complex lhs, double rhs);
-complex ae_c_sub_d(complex lhs, double rhs);
-complex ae_c_d_sub(double lhs, complex rhs);
-complex ae_c_div_d(complex lhs, double rhs);
-complex ae_c_d_div(double lhs, complex rhs);
+complex ae_c_add_d(complex A, double B);
+complex ae_c_mul_d(complex A, double B);
+complex ae_c_sub_d(complex A, double B);
+complex ae_c_d_sub(double A, complex B);
+complex ae_c_div_d(complex A, double B);
+complex ae_c_d_div(double A, complex B);
 
 // Complex BLAS operations.
 complex ae_v_cdotproduct(const complex *A, ae_int_t dA, const char *CjA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
@@ -1061,30 +1061,30 @@ struct complex {
    alglib_impl::complex *c_ptr() { return (alglib_impl::complex *)this; }
    const alglib_impl::complex *c_ptr() const { return (const alglib_impl::complex *)this; }
 #if !defined AE_NO_EXCEPTIONS
-   std::string tostring(int dps) const;
+   std::string tostring(int _dps) const;
 #endif
    double x, y;
 };
 
-bool operator==(const complex &lhs, const complex &rhs);
-bool operator!=(const complex &lhs, const complex &rhs);
-const complex operator+(const complex &lhs);
-const complex operator-(const complex &lhs);
-const complex operator+(const complex &lhs, const complex &rhs);
-const complex operator+(const complex &lhs, const double &rhs);
-const complex operator+(const double &lhs, const complex &rhs);
-const complex operator-(const complex &lhs, const complex &rhs);
-const complex operator-(const complex &lhs, const double &rhs);
-const complex operator-(const double &lhs, const complex &rhs);
-const complex operator*(const complex &lhs, const complex &rhs);
-const complex operator*(const complex &lhs, const double &rhs);
-const complex operator*(const double &lhs, const complex &rhs);
-const complex operator/(const complex &lhs, const complex &rhs);
-const complex operator/(const double &lhs, const complex &rhs);
-const complex operator/(const complex &lhs, const double &rhs);
-double abscomplex(const complex &z);
-complex conj(const complex &z);
-complex csqr(const complex &z);
+bool operator==(const complex &A, const complex &B);
+bool operator!=(const complex &A, const complex &B);
+const complex operator+(const complex &A);
+const complex operator-(const complex &A);
+const complex operator+(const complex &A, const complex &B);
+const complex operator+(const complex &A, const double &B);
+const complex operator+(const double &A, const complex &B);
+const complex operator-(const complex &A, const complex &B);
+const complex operator-(const complex &A, const double &B);
+const complex operator-(const double &A, const complex &B);
+const complex operator*(const complex &A, const complex &B);
+const complex operator*(const complex &A, const double &B);
+const complex operator*(const double &A, const complex &B);
+const complex operator/(const complex &A, const complex &B);
+const complex operator/(const complex &A, const double &B);
+const complex operator/(const double &A, const complex &B);
+double abscomplex(const complex &A);
+complex conj(const complex &A);
+complex csqr(const complex &A);
 
 // Multi-threading and multi-core functions.
 // These are mostly stubs from the commercial version of ALGLIB.

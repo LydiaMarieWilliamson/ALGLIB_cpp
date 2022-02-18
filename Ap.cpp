@@ -2813,151 +2813,59 @@ bool randombool(double p/* = 0.5*/) {
 }
 
 // Complex math functions.
-complex ae_c_neg(complex lhs) {
-   complex result;
-   result = complex_from_d(-lhs.x, -lhs.y);
-   return result;
-}
+complex ae_c_neg(complex A) { return complex_from_d(-A.x, -A.y); }
+complex conj(complex A) { return complex_from_d(+A.x, -A.y); }
+complex csqr(complex A) { double Ax = A.x, Ay = A.y; return complex_from_d(Ax * Ax - Ay * Ay, 2.0 * Ax * Ay); }
 
-complex conj(complex lhs) {
-   complex result;
-   result = complex_from_d(+lhs.x, -lhs.y);
-   return result;
-}
-
-complex csqr(complex lhs) {
-   complex result;
-   result = complex_from_d(lhs.x * lhs.x - lhs.y * lhs.y, 2 * lhs.x * lhs.y);
-   return result;
-}
-
-double abscomplex(complex z) {
-   double w;
-   double xabs;
-   double yabs;
-   double v;
-   xabs = fabs(z.x);
-   yabs = fabs(z.y);
-   w = xabs > yabs ? xabs : yabs;
-   v = xabs < yabs ? xabs : yabs;
-   if (v == 0)
-      return w;
+double abscomplex(complex A) {
+   double Ax = fabs(A.x), Ay = fabs(A.y), Lo = Ax < Ay ? Ax : Ay, Hi = Ax > Ay ? Ax : Ay;
+   if (Lo == 0.0) return Hi;
    else {
-      double t = v / w;
-      return w * sqrt(1 + t * t);
+      double Span = Lo / Hi;
+      return Hi * sqrt(1.0 + Span * Span);
    }
 }
 
-bool ae_c_eq(complex lhs, complex rhs) {
-   volatile double x1 = lhs.x;
-   volatile double x2 = rhs.x;
-   volatile double y1 = lhs.y;
-   volatile double y2 = rhs.y;
-   return x1 == x2 && y1 == y2;
+bool ae_c_eq(complex A, complex B) { return A.x == B.x && A.y == B.y; }
+bool ae_c_neq(complex A, complex B) { return A.x != B.x || A.y != B.y; }
+complex ae_c_add(complex A, complex B) { return complex_from_d(A.x + B.x, A.y + B.y); }
+
+complex ae_c_mul(complex A, complex B) {
+   double Ax = A.x, Ay = A.y, Bx = B.x, By = B.y;
+   return complex_from_d(Ax * Bx - Ay * By, Ax * By + Ay * Bx);
 }
 
-bool ae_c_neq(complex lhs, complex rhs) {
-   volatile double x1 = lhs.x;
-   volatile double x2 = rhs.x;
-   volatile double y1 = lhs.y;
-   volatile double y2 = rhs.y;
-   return x1 != x2 || y1 != y2;
-}
+complex ae_c_sub(complex A, complex B) { return complex_from_d(A.x - B.x, A.y - B.y); }
 
-complex ae_c_add(complex lhs, complex rhs) {
-   complex result;
-   result = complex_from_d(lhs.x + rhs.x, lhs.y + rhs.y);
-   return result;
-}
-
-complex ae_c_mul(complex lhs, complex rhs) {
-   complex result;
-   result = complex_from_d(lhs.x * rhs.x - lhs.y * rhs.y, lhs.x * rhs.y + lhs.y * rhs.x);
-   return result;
-}
-
-complex ae_c_sub(complex lhs, complex rhs) {
-   complex result;
-   result = complex_from_d(lhs.x - rhs.x, lhs.y - rhs.y);
-   return result;
-}
-
-complex ae_c_div(complex lhs, complex rhs) {
-   complex result;
-   double e;
-   double f;
-   if (fabs(rhs.y) < fabs(rhs.x)) {
-      e = rhs.y / rhs.x;
-      f = rhs.x + rhs.y * e;
-      result = complex_from_d((lhs.x + lhs.y * e) / f, (lhs.y - lhs.x * e) / f);
+complex ae_c_div(complex A, complex B) {
+   double Ax = A.x, Ay = A.y, Bx = B.x, By = B.y;
+   if (fabs(By) < fabs(Bx)) {
+      double e = By / Bx, f = Bx + By * e;
+      return complex_from_d((Ax + Ay * e) / f, (Ay - Ax * e) / f);
    } else {
-      e = rhs.x / rhs.y;
-      f = rhs.y + rhs.x * e;
-      result = complex_from_d((lhs.y + lhs.x * e) / f, (-lhs.x + lhs.y * e) / f);
+      double e = Bx / By, f = By + Bx * e;
+      return complex_from_d((Ax * e + Ay) / f, (Ay * e - Ax) / f);
    }
-   return result;
 }
 
-bool ae_c_eq_d(complex lhs, double rhs) {
-   volatile double x1 = lhs.x;
-   volatile double x2 = rhs;
-   volatile double y1 = lhs.y;
-   volatile double y2 = 0.0;
-   return x1 == x2 && y1 == y2;
-}
+bool ae_c_eq_d(complex A, double B) { return A.x == B && A.y == 0.0; }
+bool ae_c_neq_d(complex A, double B) { return A.x != B || A.y != 0.0; }
 
-bool ae_c_neq_d(complex lhs, double rhs) {
-   volatile double x1 = lhs.x;
-   volatile double x2 = rhs;
-   volatile double y1 = lhs.y;
-   volatile double y2 = 0.0;
-   return x1 != x2 || y1 != y2;
-}
+complex ae_c_add_d(complex A, double B) { return complex_from_d(A.x + B, A.y); }
+complex ae_c_mul_d(complex A, double B) { return complex_from_d(A.x * B, A.y * B); }
+complex ae_c_sub_d(complex A, double B) { return complex_from_d(A.x - B, A.y); }
+complex ae_c_d_sub(double A, complex B) { return complex_from_d(A - B.x, -B.y); }
+complex ae_c_div_d(complex A, double B) { return complex_from_d(A.x / B, A.y / B); }
 
-complex ae_c_add_d(complex lhs, double rhs) {
-   complex result;
-   result = complex_from_d(lhs.x + rhs, lhs.y);
-   return result;
-}
-
-complex ae_c_mul_d(complex lhs, double rhs) {
-   complex result;
-   result = complex_from_d(lhs.x * rhs, lhs.y * rhs);
-   return result;
-}
-
-complex ae_c_sub_d(complex lhs, double rhs) {
-   complex result;
-   result = complex_from_d(lhs.x - rhs, lhs.y);
-   return result;
-}
-
-complex ae_c_d_sub(double lhs, complex rhs) {
-   complex result;
-   result = complex_from_d(lhs - rhs.x, -rhs.y);
-   return result;
-}
-
-complex ae_c_div_d(complex lhs, double rhs) {
-   complex result;
-   result = complex_from_d(lhs.x / rhs, lhs.y / rhs);
-   return result;
-}
-
-complex ae_c_d_div(double lhs, complex rhs) {
-   complex result;
-   double e;
-   double f;
-   if (fabs(rhs.y) < fabs(rhs.x)) {
-      e = rhs.y / rhs.x;
-      f = rhs.x + rhs.y * e;
-      result = complex_from_d(lhs / f, -lhs * e / f);
+complex ae_c_d_div(double A, complex B) {
+   double Bx = B.x, By = B.y;
+   if (fabs(By) < fabs(Bx)) {
+      double e = By / Bx, f = Bx + By * e;
+      return complex_from_d(A / f, -A * e / f);
    } else {
-      e = rhs.x / rhs.y;
-      f = rhs.y + rhs.x * e;
-      result = complex_from_d(lhs * e / f, -lhs / f);
+      double e = Bx / By, f = By + Bx * e;
+      return complex_from_d(A * e / f, -A / f);
    }
-   return result;
 }
 
 // Complex BLAS operations
@@ -7385,87 +7293,36 @@ bool randombool(double p/* = 0.5*/) {
 }
 
 // Complex number with double precision.
-complex &complex::operator=(const double &v) {
-   x = v;
-   y = 0.0;
-   return *this;
-}
-
-complex &complex::operator+=(const double &v) {
-   x += v;
-   return *this;
-}
-
-complex &complex::operator-=(const double &v) {
-   x -= v;
-   return *this;
-}
-
-complex &complex::operator*=(const double &v) {
-   x *= v;
-   y *= v;
-   return *this;
-}
-
-complex &complex::operator/=(const double &v) {
-   x /= v;
-   y /= v;
-   return *this;
-}
-
-complex &complex::operator=(const complex &z) {
-   x = z.x;
-   y = z.y;
-   return *this;
-}
-
-complex &complex::operator+=(const complex &z) {
-   x += z.x;
-   y += z.y;
-   return *this;
-}
-
-complex &complex::operator-=(const complex &z) {
-   x -= z.x;
-   y -= z.y;
-   return *this;
-}
-
-complex &complex::operator*=(const complex &z) {
-   double t = x * z.x - y * z.y;
-   y = x * z.y + y * z.x;
-   x = t;
-   return *this;
-}
+complex &complex::operator=(const double &v) { x = v, y = 0.0; return *this; }
+complex &complex::operator=(const complex &z) { x = z.x, y = z.y; return *this; }
+complex &complex::operator+=(const double &v) { x += v; return *this; }
+complex &complex::operator+=(const complex &z) { x += z.x, y += z.y; return *this; }
+complex &complex::operator-=(const double &v) { x -= v; return *this; }
+complex &complex::operator-=(const complex &z) { x -= z.x, y -= z.y; return *this; }
+complex &complex::operator*=(const double &v) { x *= v, y *= v; return *this; }
+complex &complex::operator*=(const complex &z) { double t = x * z.x - y * z.y; y = x * z.y + y * z.x, x = t; return *this; }
+complex &complex::operator/=(const double &v) { x /= v, y /= v; return *this; }
 
 complex &complex::operator/=(const complex &z) {
-   complex result;
-   double e;
-   double f;
-   if (fabs(z.y) < fabs(z.x)) {
-      e = z.y / z.x;
-      f = z.x + z.y * e;
-      result = complex((x + y * e) / f, (y - x * e) / f);
+   double zx = z.x, zy = z.y;
+   if (fabs(zy) < fabs(zx)) {
+      double e = zy / zx, f = zx + zy * e;
+      return *this = complex((x + y * e) / f, (y - x * e) / f);
    } else {
-      e = z.x / z.y;
-      f = z.y + z.x * e;
-      result = complex((y + x * e) / f, (-x + y * e) / f);
+      double e = zx / zy, f = zy + zx * e;
+      return *this = complex((x * e + y) / f, (y * e - x) / f);
    }
-   *this = result;
-   return *this;
 }
 
 // alglib_impl-alglib gateway.
-static inline alglib_impl::complex complex_from_c(complex z) {
-   return alglib_impl::complex_from_d(z.x, z.y);
-}
+static inline alglib_impl::complex complex_from_c(complex z) { return alglib_impl::complex_from_d(z.x, z.y); }
 
 #if !defined AE_NO_EXCEPTIONS
 std::string complex::tostring(int _dps) const {
    int dps = _dps >= 0 ? _dps : -_dps;
    if (dps <= 0 || dps >= 20)
       ThrowError("complex::tostring: incorrect dps");
-// Handle IEEE special quantities.
+// Handle IEEE-special quantities.
    if (isnan(x) || isnan(y))
       return "NAN";
    else if (isinf(x) || isinf(y))
@@ -7496,134 +7353,60 @@ std::string complex::tostring(int _dps) const {
 }
 #endif
 
-bool operator==(const complex &lhs, const complex &rhs) {
-   volatile double x1 = lhs.x;
-   volatile double x2 = rhs.x;
-   volatile double y1 = lhs.y;
-   volatile double y2 = rhs.y;
-   return x1 == x2 && y1 == y2;
-}
+bool operator==(const complex &A, const complex &B) { return A.x == B.x && A.y == B.y; }
+bool operator!=(const complex &A, const complex &B) { return A.x != B.x || A.y != B.y; }
 
-bool operator!=(const complex &lhs, const complex &rhs) {
-   return !(lhs == rhs);
-}
+const complex operator+(const complex &A) { return A; }
+const complex operator-(const complex &A) { return complex(-A.x, -A.y); }
 
-const complex operator+(const complex &lhs) {
-   return lhs;
-}
+const complex operator+(const complex &A, const complex &B) { complex r = A; r += B; return r; }
+const complex operator+(const complex &A, const double &B) { complex r = A; r += B; return r; }
+const complex operator+(const double &A, const complex &B) { complex r = B; r += A; return r; }
 
-const complex operator-(const complex &lhs) {
-   return complex (-lhs.x, -lhs.y);
-}
+const complex operator-(const complex &A, const complex &B) { complex r = A; r -= B; return r; }
+const complex operator-(const complex &A, const double &B) { complex r = A; r -= B; return r; }
+const complex operator-(const double &A, const complex &B) { complex r = A; r -= B; return r; }
 
-const complex operator+(const complex &lhs, const complex &rhs) {
-   complex r = lhs;
-   r += rhs;
-   return r;
-}
+const complex operator*(const complex &A, const complex &B) { return complex(A.x * B.x - A.y * B.y, A.x * B.y + A.y * B.x); }
+const complex operator*(const complex &A, const double &B) { return complex(A.x * B, A.y * B); }
+const complex operator*(const double &A, const complex &B) { return complex(A * B.x, A * B.y); }
 
-const complex operator+(const complex &lhs, const double &rhs) {
-   complex r = lhs;
-   r += rhs;
-   return r;
-}
-
-const complex operator+(const double &lhs, const complex &rhs) {
-   complex r = rhs;
-   r += lhs;
-   return r;
-}
-
-const complex operator-(const complex &lhs, const complex &rhs) {
-   complex r = lhs;
-   r -= rhs;
-   return r;
-}
-
-const complex operator-(const complex &lhs, const double &rhs) {
-   complex r = lhs;
-   r -= rhs;
-   return r;
-}
-
-const complex operator-(const double &lhs, const complex &rhs) {
-   complex r = lhs;
-   r -= rhs;
-   return r;
-}
-
-const complex operator*(const complex &lhs, const complex &rhs) {
-   return complex (lhs.x * rhs.x - lhs.y * rhs.y, lhs.x * rhs.y + lhs.y * rhs.x);
-}
-
-const complex operator*(const complex &lhs, const double &rhs) {
-   return complex (lhs.x * rhs, lhs.y * rhs);
-}
-
-const complex operator*(const double &lhs, const complex &rhs) {
-   return complex (lhs * rhs.x, lhs * rhs.y);
-}
-
-const complex operator/(const complex &lhs, const complex &rhs) {
-   complex result;
-   double e;
-   double f;
-   if (fabs(rhs.y) < fabs(rhs.x)) {
-      e = rhs.y / rhs.x;
-      f = rhs.x + rhs.y * e;
-      result = complex((lhs.x + lhs.y * e) / f, (lhs.y - lhs.x * e) / f);
+const complex operator/(const complex &A, const complex &B) {
+   double Ax = A.x, Ay = A.y;
+   double Bx = B.x, By = B.y;
+   if (fabs(By) < fabs(Bx)) {
+      double e = By / Bx, f = Bx + By * e;
+      return complex((Ax + Ay * e) / f, (Ay - Ax * e) / f);
    } else {
-      e = rhs.x / rhs.y;
-      f = rhs.y + rhs.x * e;
-      result = complex((lhs.y + lhs.x * e) / f, (-lhs.x + lhs.y * e) / f);
+      double e = Bx / By, f = By + Bx * e;
+      return complex((Ax * e + Ay) / f, (Ay * e - Ax) / f);
    }
-   return result;
 }
 
-const complex operator/(const double &lhs, const complex &rhs) {
-   complex result;
-   double e;
-   double f;
-   if (fabs(rhs.y) < fabs(rhs.x)) {
-      e = rhs.y / rhs.x;
-      f = rhs.x + rhs.y * e;
-      result = complex(lhs / f, -lhs * e / f);
+const complex operator/(const double &A, const complex &B) {
+   double Bx = B.x, By = B.y;
+   if (fabs(By) < fabs(Bx)) {
+      double e = By / Bx, f = Bx + By * e;
+      return complex(A / f, -A * e / f);
    } else {
-      e = rhs.x / rhs.y;
-      f = rhs.y + rhs.x * e;
-      result = complex(lhs * e / f, -lhs / f);
+      double e = Bx / By, f = By + Bx * e;
+      return complex(A * e / f, -A / f);
    }
-   return result;
 }
 
-const complex operator/(const complex &lhs, const double &rhs) {
-   return complex (lhs.x / rhs, lhs.y / rhs);
-}
+const complex operator/(const complex &A, const double &B) { return complex(A.x / B, A.y / B); }
 
-double abscomplex(const complex &z) {
-   double w;
-   double xabs;
-   double yabs;
-   double v;
-   xabs = fabs(z.x);
-   yabs = fabs(z.y);
-   w = xabs > yabs ? xabs : yabs;
-   v = xabs < yabs ? xabs : yabs;
-   if (v == 0)
-      return w;
+double abscomplex(const complex &A) {
+   double Ax = fabs(A.x), Ay = fabs(A.y), Lo = Ax < Ay ? Ax : Ay, Hi = Ax > Ay ? Ax : Ay;
+   if (Lo == 0.0) return Hi;
    else {
-      double t = v / w;
-      return w * sqrt(1 + t * t);
+      double Span = Lo / Hi;
+      return Hi * sqrt(1.0 + Span * Span);
    }
 }
 
-complex conj(const complex &z) {
-   return complex (z.x, -z.y);
-}
-
-complex csqr(const complex &z) {
-   return complex (z.x * z.x - z.y * z.y, 2 * z.x * z.y);
-}
+complex conj(const complex &A) { return complex(A.x, -A.y); }
+complex csqr(const complex &A) { double Ax = A.x, Ay = A.y; return complex(Ax * Ax - Ay * Ay, 2.0 * Ax * Ay); }
 
 #ifdef AE_HPC
 ae_int_t getnworkers() { return alglib_impl::getnworkers(); }
