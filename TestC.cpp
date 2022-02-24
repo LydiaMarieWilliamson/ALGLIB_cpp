@@ -1261,7 +1261,7 @@ static void testablasfunit_refgerx(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t 
    ae_int_t i;
    ae_int_t j;
    double s;
-   if ((m <= 0 || n <= 0) || alpha == 0.0) {
+   if (m <= 0 || n <= 0 || alpha == 0.0) {
       return;
    }
    for (i = 0; i < m; i++) {
@@ -1365,7 +1365,7 @@ bool testablasf(bool silent) {
    bool xtrsverrors;
    bool result;
    maxn = 100;
-   tol = 10000 * machineepsilon;
+   tol = 10000.0 * machineepsilon;
    xdoterrors = testablasfunit_testxdot(maxn, tol);
    xseterrors = testablasfunit_testxset(maxn, tol);
    xadderrors = testablasfunit_testxadd(maxn, tol);
@@ -1376,7 +1376,7 @@ bool testablasf(bool silent) {
    xgemverrors = testablasfunit_testxgemv(maxn, tol);
    xgererrors = testablasfunit_testxger(maxn, tol);
    xtrsverrors = testablasfunit_testxtrsv(maxn, tol);
-   wereerrors = ((((((((xdoterrors || xseterrors) || xadderrors) || xmulerrors) || xmaxerrors) || xmergeerrors) || xcopyerrors) || xgemverrors) || xgererrors) || xtrsverrors;
+   wereerrors = xdoterrors || xseterrors || xadderrors || xmulerrors || xmaxerrors || xmergeerrors || xcopyerrors || xgemverrors || xgererrors || xtrsverrors;
 // report
    if (!silent) {
       printf("TESTING ABLASF\n");
@@ -1572,7 +1572,7 @@ static bool hqrnddiscretetest(bool silent) {
          }
       }
       for (i = 0; i < binscount; i++) {
-         if ((double)nn.xZ[i] < (double)xp / binscount - sigmathreshold * sigma || (double)nn.xZ[i] > (double)xp / binscount + sigmathreshold * sigma) {
+         if (nn.xZ[i] < (double)xp / binscount - sigmathreshold * sigma || nn.xZ[i] > (double)xp / binscount + sigmathreshold * sigma) {
             if (!silent) {
                printf("HQRNDDiscreteTest::ErrorReport::\n");
                printf("nn[%0d]=%0d;\n   xp/BinsCount=%0.5f;\n   C*sigma=%0.5f\n", (int)i, (int)nn.xZ[i], (double)xp / binscount, sigmathreshold * sigma);
@@ -1724,7 +1724,7 @@ bool testhqrnd(bool silent) {
       x.xR[i] = hqrnduniformr(&state);
    }
    for (i = 0; i < samplesize; i++) {
-      urerrors = (urerrors || x.xR[i] <= 0.0) || x.xR[i] >= 1.0;
+      urerrors = urerrors || x.xR[i] <= 0.0 || x.xR[i] >= 1.0;
    }
    testhqrndunit_calculatemv(&x, samplesize, &mean, &means, &stddev, &stddevs);
    if (means != 0.0) {
@@ -1747,7 +1747,7 @@ bool testhqrnd(bool silent) {
          x.xR[i] = (double)hqrnduniformi(&state, n);
       }
       for (i = 0; i < samplesize; i++) {
-         uierrors = (uierrors || x.xR[i] < 0.0) || x.xR[i] >= (double)n;
+         uierrors = uierrors || x.xR[i] < 0.0 || x.xR[i] >= n;
       }
       testhqrndunit_calculatemv(&x, samplesize, &mean, &means, &stddev, &stddevs);
       if (means != 0.0) {
@@ -1773,7 +1773,7 @@ bool testhqrnd(bool silent) {
       x.xR[i] = (double)hqrnduniformi(&state, n);
    }
    for (i = 0; i < samplesize; i++) {
-      uierrors = (uierrors || x.xR[i] < 0.0) || x.xR[i] >= (double)n;
+      uierrors = uierrors || x.xR[i] < 0.0 || x.xR[i] >= n;
    }
    testhqrndunit_calculatemv(&x, samplesize, &mean, &means, &stddev, &stddevs);
    if (means != 0.0) {
@@ -1867,7 +1867,7 @@ bool testhqrnd(bool silent) {
    }
    for (pass = 0; pass < n; pass++) {
       hqrndunit2(&state, &r1, &r2);
-      set_error_flag(&unit2errors, fabs(r1 * r1 + r2 * r2 - 1) > 100 * machineepsilon, __FILE__, __LINE__, "testhqrndunit.ap:292");
+      set_error_flag(&unit2errors, fabs(r1 * r1 + r2 * r2 - 1.0) > 100.0 * machineepsilon, __FILE__, __LINE__, "testhqrndunit.ap:292");
       k = ifloor((atan2(r1, r2) + pi) / (2 * pi) * bins.cnt);
       if (k < 0) {
          k = 0;
@@ -1907,7 +1907,7 @@ bool testhqrnd(bool silent) {
    discreteerr = hqrnddiscretetest(true);
    continuouserr = hqrndcontinuoustest(true);
 // Final report
-   waserrors = ((((((seederrors || urerrors) || uierrors) || normerrors) || unit2errors) || experrors) || discreteerr) || continuouserr;
+   waserrors = seederrors || urerrors || uierrors || normerrors || unit2errors || experrors || discreteerr || continuouserr;
    if (!silent) {
       printf("RNG TEST\n");
       printf("SEED TEST:                               ");
@@ -2481,7 +2481,7 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
    NewMatrix(rxl2, 0, 0, DT_REAL);
    NewMatrix(cxr2, 0, 0, DT_COMPLEX);
    NewMatrix(cxl2, 0, 0, DT_COMPLEX);
-   threshold = sqr((double)maxn) * 100 * machineepsilon;
+   threshold = sqr((double)maxn) * 100.0 * machineepsilon;
    result = false;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
@@ -2585,7 +2585,7 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
    // copy A, XR, XL (fill unused parts with random garbage)
       for (i = 0; i < 2 * m; i++) {
          for (j = 0; j < 2 * m; j++) {
-            if (((i >= aoffsi && i < aoffsi + m) && j >= aoffsj) && j < aoffsj + m) {
+            if (i >= aoffsi && i < aoffsi + m && j >= aoffsj && j < aoffsj + m) {
                ca.xyC[i][j] = refca.xyC[i][j];
                ra.xyR[i][j] = refra.xyR[i][j];
             } else {
@@ -2809,7 +2809,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
    NewMatrix(rct, 0, 0, DT_REAL);
    NewMatrix(cc, 0, 0, DT_COMPLEX);
    NewMatrix(cct, 0, 0, DT_COMPLEX);
-   threshold = maxn * 100 * machineepsilon;
+   threshold = maxn * 100.0 * machineepsilon;
    result = false;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
@@ -2882,7 +2882,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
    // copy A, C (fill unused parts with random garbage)
       for (i = 0; i < 2 * n; i++) {
          for (j = 0; j < 2 * n; j++) {
-            if (((i >= aoffsi && i < aoffsi + n) && j >= aoffsj) && j < aoffsj + n) {
+            if (i >= aoffsi && i < aoffsi + n && j >= aoffsj && j < aoffsj + n) {
                ca1.xyC[i][j] = refca.xyC[i][j];
                ca2.xyC[i][j] = refca.xyC[i][j];
                ra1.xyR[i][j] = refra.xyR[i][j];
@@ -3091,7 +3091,7 @@ static bool testablasunit_testgemm(ae_int_t minn, ae_int_t maxn) {
    NewMatrix(rc2, 0, 0, DT_REAL);
    NewMatrix(cc1, 0, 0, DT_COMPLEX);
    NewMatrix(cc2, 0, 0, DT_COMPLEX);
-   threshold = maxn * 100 * machineepsilon;
+   threshold = maxn * 100.0 * machineepsilon;
    result = false;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N/K in [1,MX] such that max(M,N,K)=MX
@@ -3210,7 +3210,7 @@ static bool testablasunit_testtrans(ae_int_t minn, ae_int_t maxn) {
    NewMatrix(refca, 0, 0, DT_COMPLEX);
    NewMatrix(refcb, 0, 0, DT_COMPLEX);
    result = false;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
    // Generate random V1 and V2 which are used to fill
@@ -3250,7 +3250,7 @@ static bool testablasunit_testtrans(ae_int_t minn, ae_int_t maxn) {
       rmatrixtranspose(m, n, &refra, aoffsi, aoffsj, &refrb, boffsi, boffsj);
       for (i = 0; i <= maxn; i++) {
          for (j = 0; j <= maxn; j++) {
-            if (((i < boffsi || i >= boffsi + n) || j < boffsj) || j >= boffsj + m) {
+            if (i < boffsi || i >= boffsi + n || j < boffsj || j >= boffsj + m) {
                result = result || fabs(refrb.xyR[i][j] - (v1 * i + v2 * j)) > threshold;
             } else {
                result = result || fabs(refrb.xyR[i][j] - refra.xyR[aoffsi + j - boffsj][aoffsj + i - boffsi]) > threshold;
@@ -3260,7 +3260,7 @@ static bool testablasunit_testtrans(ae_int_t minn, ae_int_t maxn) {
       cmatrixtranspose(m, n, &refca, aoffsi, aoffsj, &refcb, boffsi, boffsj);
       for (i = 0; i <= maxn; i++) {
          for (j = 0; j <= maxn; j++) {
-            if (((i < boffsi || i >= boffsi + n) || j < boffsj) || j >= boffsj + m) {
+            if (i < boffsi || i >= boffsi + n || j < boffsj || j >= boffsj + m) {
                result = result || abscomplex(ae_c_sub_d(refcb.xyC[i][j], v1 * i + v2 * j)) > threshold;
             } else {
                result = result || abscomplex(ae_c_sub(refcb.xyC[i][j], refca.xyC[aoffsi + j - boffsj][aoffsj + i - boffsi])) > threshold;
@@ -3299,7 +3299,7 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn) {
    NewVector(cu, 0, DT_COMPLEX);
    NewVector(cv, 0, DT_COMPLEX);
    result = false;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
       m = 1 + randominteger(mx);
@@ -3348,7 +3348,7 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn) {
       cmatrixrank1(m, n, &refca, aoffsi, aoffsj, &cu, uoffs, &cv, voffs);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            if (((i < aoffsi || i >= aoffsi + m) || j < aoffsj) || j >= aoffsj + n) {
+            if (i < aoffsi || i >= aoffsi + m || j < aoffsj || j >= aoffsj + n) {
                result = result || abscomplex(ae_c_sub(refca.xyC[i][j], refcb.xyC[i][j])) > threshold;
             } else {
                result = result || abscomplex(ae_c_sub(refca.xyC[i][j], ae_c_add(refcb.xyC[i][j], ae_c_mul(cu.xC[i - aoffsi + uoffs], cv.xC[j - aoffsj + voffs])))) > threshold;
@@ -3363,7 +3363,7 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn) {
       rmatrixrank1(m, n, &refra, aoffsi, aoffsj, &ru, uoffs, &rv, voffs);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            if (((i < aoffsi || i >= aoffsi + m) || j < aoffsj) || j >= aoffsj + n) {
+            if (i < aoffsi || i >= aoffsi + m || j < aoffsj || j >= aoffsj + n) {
                result = result || fabs(refra.xyR[i][j] - refrb.xyR[i][j]) > threshold;
             } else {
                result = result || fabs(refra.xyR[i][j] - (refrb.xyR[i][j] + ru.xR[i - aoffsi + uoffs] * rv.xR[j - aoffsj + voffs])) > threshold;
@@ -3379,7 +3379,7 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn) {
       rmatrixger(m, n, &refra, aoffsi, aoffsj, ralpha, &ru, uoffs, &rv, voffs);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            if (((i < aoffsi || i >= aoffsi + m) || j < aoffsj) || j >= aoffsj + n) {
+            if (i < aoffsi || i >= aoffsi + m || j < aoffsj || j >= aoffsj + n) {
                set_error_flag(&result, fabs(refra.xyR[i][j] - refrb.xyR[i][j]) != 0.0, __FILE__, __LINE__, "testablasunit.ap:1145");
             } else {
                set_error_flag(&result, fabs(refra.xyR[i][j] - (refrb.xyR[i][j] + ralpha * ru.xR[i - aoffsi + uoffs] * rv.xR[j - aoffsj + voffs])) > threshold, __FILE__, __LINE__, "testablasunit.ap:1147");
@@ -3423,7 +3423,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
    NewVector(cx, 0, DT_COMPLEX);
    NewVector(cy, 0, DT_COMPLEX);
    result = false;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
       m = 1 + randominteger(mx);
@@ -3494,7 +3494,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
       rmatrixmv(m, n, &refra, aoffsi, aoffsj, opra, &rx, xoffs, &ry, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < yoffs || i >= yoffs + m) {
-            result = result || ry.xR[i] != (double)i;
+            result = result || ry.xR[i] != i;
          } else {
             rv1 = ry.xR[i];
             rv2 = 0.0;
@@ -3514,7 +3514,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
       rmatrixgemv(m, n, ralpha, &refra, aoffsi, aoffsj, opra, &rx, xoffs, rbeta, &ry, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < yoffs || i >= yoffs + m) {
-            set_error_flag(&result, ry.xR[i] != (double)i, __FILE__, __LINE__, "testablasunit.ap:1295");
+            set_error_flag(&result, ry.xR[i] != i, __FILE__, __LINE__, "testablasunit.ap:1295");
          } else {
             rv1 = ry.xR[i];
             rv2 = 0.0;
@@ -3630,7 +3630,7 @@ static void testablasunit_testsymv(ae_int_t minn, ae_int_t maxn, bool *errorflag
    NewVector(rx, 0, DT_REAL);
    NewVector(ry, 0, DT_REAL);
    NewVector(rz, 0, DT_REAL);
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    for (n = minn; n <= maxn; n++) {
    // Initialize A by random matrix with size (MaxN+MaxN)*(MaxN+MaxN)
    // Initialize X by random vector with size (MaxN+MaxN)
@@ -3668,7 +3668,7 @@ static void testablasunit_testsymv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       testablasunit_refrmatrixsymv(n, ralpha, &refra, aoffsi, aoffsj, isuppera, &rx, xoffs, rbeta, &rz, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < yoffs || i >= yoffs + n) {
-            set_error_flag(errorflag, ry.xR[i] != (double)i, __FILE__, __LINE__, "testablasunit.ap:1393");
+            set_error_flag(errorflag, ry.xR[i] != i, __FILE__, __LINE__, "testablasunit.ap:1393");
          } else {
             set_error_flag(errorflag, fabs(ry.xR[i] - rz.xR[i]) > threshold * rmax3(fabs(ry.xR[i]), fabs(rz.xR[i]), 1.0), __FILE__, __LINE__, "testablasunit.ap:1395");
          }
@@ -3840,7 +3840,7 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
    NewMatrix(ca, 0, 0, DT_COMPLEX);
    NewMatrix(cb, 0, 0, DT_COMPLEX);
    result = false;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
       m = 1 + randominteger(mx);
@@ -3877,7 +3877,7 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
       cmatrixcopy(m, n, &ca, aoffsi, aoffsj, &cb, boffsi, boffsj);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            if (((i < boffsi || i >= boffsi + m) || j < boffsj) || j >= boffsj + n) {
+            if (i < boffsi || i >= boffsi + m || j < boffsj || j >= boffsj + n) {
                result = result || ae_c_neq_d(cb.xyC[i][j], (double)(1 + 2 * i + 3 * j));
             } else {
                result = result || abscomplex(ae_c_sub(ca.xyC[aoffsi + i - boffsi][aoffsj + j - boffsj], cb.xyC[i][j])) > threshold;
@@ -3887,8 +3887,8 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
       rmatrixcopy(m, n, &ra, aoffsi, aoffsj, &rb, boffsi, boffsj);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            if (((i < boffsi || i >= boffsi + m) || j < boffsj) || j >= boffsj + n) {
-               result = result || rb.xyR[i][j] != (double)(1 + 2 * i + 3 * j);
+            if (i < boffsi || i >= boffsi + m || j < boffsj || j >= boffsj + n) {
+               result = result || rb.xyR[i][j] != 1 + 2 * i + 3 * j;
             } else {
                result = result || fabs(ra.xyR[aoffsi + i - boffsi][aoffsj + j - boffsj] - rb.xyR[i][j]) > threshold;
             }
@@ -3912,7 +3912,7 @@ static void testablasunit_testcopy1(ae_int_t minn, ae_int_t maxn, bool *err) {
    ae_frame_make(&_frame_block);
    NewVector(ra, 0, DT_REAL);
    NewVector(rb, 0, DT_REAL);
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    for (ss = minn; ss <= maxn; ss++) {
    // Initialize A by random vector
    // Initialize X by random vector
@@ -3933,7 +3933,7 @@ static void testablasunit_testcopy1(ae_int_t minn, ae_int_t maxn, bool *err) {
       rvectorcopy(ss, &ra, aoffs, &rb, boffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < boffs || i >= boffs + ss) {
-            set_error_flag(err, rb.xR[i] != (double)(1 + 2 * i), __FILE__, __LINE__, "testablasunit.ap:1762");
+            set_error_flag(err, rb.xR[i] != 1 + 2 * i, __FILE__, __LINE__, "testablasunit.ap:1762");
          } else {
             set_error_flag(err, fabs(ra.xR[aoffs + i - boffs] - rb.xR[i]) > threshold, __FILE__, __LINE__, "testablasunit.ap:1764");
          }
@@ -3970,7 +3970,7 @@ static void testablasunit_testreflections(bool *errorflag) {
    NewMatrix(b, 0, 0, DT_REAL);
    NewMatrix(c, 0, 0, DT_REAL);
    passcount = 10;
-   threshold = 100 * machineepsilon;
+   threshold = 100.0 * machineepsilon;
    mer = 0.0;
    mel = 0.0;
    meg = 0.0;
@@ -4134,7 +4134,7 @@ static void testablasunit_testreflections(bool *errorflag) {
    }
    generatereflection(&v, 10, &tau);
 // Result
-   set_error_flag(errorflag, (meg > threshold || mel > threshold) || mer > threshold, __FILE__, __LINE__, "testablasunit.ap:1956");
+   set_error_flag(errorflag, meg > threshold || mel > threshold || mer > threshold, __FILE__, __LINE__, "testablasunit.ap:1956");
    ae_frame_leave();
 }
 
@@ -4189,7 +4189,7 @@ bool testablas(bool silent) {
    syrkerrors = syrkerrors || testablasunit_testsyrk(n0, n1);
    testablasunit_testcopy1(1, 3 * matrixtilesizea() + 1, &copy1errors);
 // report
-   waserrors = ((((((((((trsmerrors || syrkerrors) || gemmerrors) || transerrors) || rank1errors) || gemverrors) || symverrors) || trsverrors) || reflerrors) || copyerrors) || copy1errors) || specerrors;
+   waserrors = trsmerrors || syrkerrors || gemmerrors || transerrors || rank1errors || gemverrors || symverrors || trsverrors || reflerrors || copyerrors || copy1errors || specerrors;
    if (!silent) {
       printf("TESTING ABLAS\n");
       printf("LEVEL 3 FUNCTIONS:\n");
@@ -4305,7 +4305,7 @@ bool testhblas(bool silent) {
    mverr = 0.0;
    waserrors = false;
    maxn = 10;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
 // Test MV
    for (n = 2; n <= maxn; n++) {
       ae_matrix_set_length(&a, n + 1, n + 1);
@@ -4414,7 +4414,7 @@ bool testcreflections(bool silent) {
    NewMatrix(a, 0, 0, DT_COMPLEX);
    NewMatrix(b, 0, 0, DT_COMPLEX);
    NewMatrix(c, 0, 0, DT_COMPLEX);
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    passcount = 1000;
    mer = 0.0;
    mel = 0.0;
@@ -4543,7 +4543,7 @@ bool testcreflections(bool silent) {
    }
    complexgeneratereflection(&v, 10, &tau);
 // report
-   waserrors = (meg > threshold || mel > threshold) || mer > threshold;
+   waserrors = meg > threshold || mel > threshold || mer > threshold;
    if (!silent) {
       printf("TESTING COMPLEX REFLECTIONS\n");
       printf("Generate error:                          %5.3e\n", meg);
@@ -4589,7 +4589,7 @@ bool testsblas(bool silent) {
    mverr = 0.0;
    waserrors = false;
    maxn = 10;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
 // Test MV
    for (n = 2; n <= maxn; n++) {
       ae_matrix_set_length(&a, n + 1, n + 1);
@@ -4782,7 +4782,7 @@ static void testortfacunit_internalmatrixmatrixmultiply(RMatrix *a, ae_int_t ai1
       bcols = bi2 - bi1 + 1;
    }
    ae_assert(acols == brows, "MatrixMatrixMultiply: incorrect matrix sizes!");
-   if (((arows <= 0 || acols <= 0) || brows <= 0) || bcols <= 0) {
+   if (arows <= 0 || acols <= 0 || brows <= 0 || bcols <= 0) {
       ae_frame_leave();
       return;
    }
@@ -4926,7 +4926,7 @@ static void testortfacunit_testrqrproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    rmatrixqrunpackq(&b, m, n, &taub, k, &q2);
    for (i = 0; i < m; i++) {
       for (j = 0; j < k; j++) {
-         *qrerrors = *qrerrors || fabs(q2.xyR[i][j] - q.xyR[i][j]) > 10 * machineepsilon;
+         *qrerrors = *qrerrors || fabs(q2.xyR[i][j] - q.xyR[i][j]) > 10.0 * machineepsilon;
       }
    }
    ae_frame_leave();
@@ -4975,7 +4975,7 @@ static void testortfacunit_testcqrproblem(CMatrix *a, ae_int_t m, ae_int_t n, do
    cmatrixqrunpackq(&b, m, n, &taub, k, &q2);
    for (i = 0; i < m; i++) {
       for (j = 0; j < k; j++) {
-         *qrerrors = *qrerrors || abscomplex(ae_c_sub(q2.xyC[i][j], q.xyC[i][j])) > 10 * machineepsilon;
+         *qrerrors = *qrerrors || abscomplex(ae_c_sub(q2.xyC[i][j], q.xyC[i][j])) > 10.0 * machineepsilon;
       }
    }
    ae_frame_leave();
@@ -5024,7 +5024,7 @@ static void testortfacunit_testrlqproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    rmatrixlqunpackq(&b, m, n, &taub, k, &q2);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
-         *lqerrors = *lqerrors || fabs(q2.xyR[i][j] - q.xyR[i][j]) > 10 * machineepsilon;
+         *lqerrors = *lqerrors || fabs(q2.xyR[i][j] - q.xyR[i][j]) > 10.0 * machineepsilon;
       }
    }
    ae_frame_leave();
@@ -5073,7 +5073,7 @@ static void testortfacunit_testclqproblem(CMatrix *a, ae_int_t m, ae_int_t n, do
    cmatrixlqunpackq(&b, m, n, &taub, k, &q2);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
-         *lqerrors = *lqerrors || abscomplex(ae_c_sub(q2.xyC[i][j], q.xyC[i][j])) > 10 * machineepsilon;
+         *lqerrors = *lqerrors || abscomplex(ae_c_sub(q2.xyC[i][j], q.xyC[i][j])) > 10.0 * machineepsilon;
       }
    }
    ae_frame_leave();
@@ -5164,14 +5164,14 @@ static void testortfacunit_testrbdproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    rmatrixbdunpackq(&t, m, n, &tauq, k, &r);
    for (i = 0; i < m; i++) {
       for (j = 0; j < k; j++) {
-         *bderrors = *bderrors || fabs(r.xyR[i][j] - q.xyR[i][j]) > 10 * machineepsilon;
+         *bderrors = *bderrors || fabs(r.xyR[i][j] - q.xyR[i][j]) > 10.0 * machineepsilon;
       }
    }
    k = 1 + randominteger(n);
    rmatrixbdunpackpt(&t, m, n, &taup, k, &r);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
-         *bderrors = *bderrors || fabs(r.xyR[i][j] - pt.xyR[i][j]) > 10 * machineepsilon;
+         *bderrors = *bderrors || fabs(r.xyR[i][j] - pt.xyR[i][j]) > 10.0 * machineepsilon;
       }
    }
 // Multiplication test
@@ -5559,7 +5559,7 @@ bool testortfac(bool silent) {
    rhesserrors = false;
    rtderrors = false;
    ctderrors = false;
-   threshold = 5 * 1000 * machineepsilon;
+   threshold = 5.0 * 1000.0 * machineepsilon;
 // Medium-scale problems with various sparseness profiles
    for (mx = 1; mx <= 3 * matrixtilesizea() + 1; mx++) {
    // Rectangular factorizations: QR, LQ, bidiagonal
@@ -5716,7 +5716,7 @@ bool testortfac(bool silent) {
       testortfacunit_testctdproblem(&ca, mx, threshold, &ctderrors);
    }
 // report
-   waserrors = ((((((rqrerrors || rlqerrors) || cqrerrors) || clqerrors) || rbderrors) || rhesserrors) || rtderrors) || ctderrors;
+   waserrors = rqrerrors || rlqerrors || cqrerrors || clqerrors || rbderrors || rhesserrors || rtderrors || ctderrors;
    if (!silent) {
       printf("TESTING ORTFAC UNIT\n");
       printf("RQR ERRORS:                              ");
@@ -6410,7 +6410,7 @@ bool testmatgen(bool silent) {
    waserrors = false;
    maxn = 20;
    passcount = 15;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
 // Testing orthogonal
    for (n = 1; n <= maxn; n++) {
       for (pass = 1; pass <= passcount; pass++) {
@@ -6803,7 +6803,7 @@ bool testmatgen(bool silent) {
 // Test for symmetric matrices
    eulerr = testmatgenunit_testeult();
 // report
-   waserrors = (((((rerr || cerr) || serr) || spderr) || herr) || hpderr) || eulerr;
+   waserrors = rerr || cerr || serr || spderr || herr || hpderr || eulerr;
    if (!silent) {
       printf("TESTING MATRIX GENERATOR\n");
       printf("REAL TEST:                               ");
@@ -6988,11 +6988,11 @@ bool testtsort(bool silent) {
          if (distinctvals) {
             tagsortfasti(&a1, &ai, &bufr1, &bufi1, n);
             for (i = 0; i < n; i++) {
-               waserrors = (waserrors || a1.xR[i] != a0.xR[i]) || ai.xZ[i] != p1.xZ[i];
+               waserrors = waserrors || a1.xR[i] != a0.xR[i] || ai.xZ[i] != p1.xZ[i];
             }
             tagsortfastr(&a2, &ar, &bufr1, &bufr2, n);
             for (i = 0; i < n; i++) {
-               waserrors = (waserrors || a2.xR[i] != a0.xR[i]) || ar.xR[i] != (double)p1.xZ[i];
+               waserrors = waserrors || a2.xR[i] != a0.xR[i] || ar.xR[i] != p1.xZ[i];
             }
             tagsortfast(&a3, &bufr1, n);
             for (i = 0; i < n; i++) {
@@ -7000,11 +7000,11 @@ bool testtsort(bool silent) {
             }
             tagsortmiddleir(&a4, &ar2, 0, n);
             for (i = 0; i < n; i++) {
-               waserrors = (waserrors || (double)a4.xZ[i] != a0.xR[i]) || ar2.xR[i] != (double)p1.xZ[i];
+               waserrors = waserrors || a4.xZ[i] != a0.xR[i] || ar2.xR[i] != p1.xZ[i];
             }
             sortmiddlei(&a5, 0, n);
             for (i = 0; i < n; i++) {
-               waserrors = waserrors || (double)a5.xZ[i] != a0.xR[i];
+               waserrors = waserrors || a5.xZ[i] != a0.xR[i];
             }
          }
       // Non-distinct sort.
@@ -7049,11 +7049,11 @@ bool testtsort(bool silent) {
          }
          tagsortmiddleir(&a4, &ar2, 0, n);
          for (i = 0; i < n; i++) {
-            waserrors = waserrors || (double)a4.xZ[i] != a0.xR[i];
+            waserrors = waserrors || a4.xZ[i] != a0.xR[i];
          }
          sortmiddlei(&a5, 0, n);
          for (i = 0; i < n; i++) {
-            waserrors = waserrors || (double)a5.xZ[i] != a0.xR[i];
+            waserrors = waserrors || a5.xZ[i] != a0.xR[i];
          }
       // 'All same' sort
       // We test that keys are correctly reordered, but do NOT test order of values.
@@ -7095,7 +7095,7 @@ bool testtsort(bool silent) {
          }
          tagsortmiddleir(&a4, &ar2, 0, n);
          for (i = 0; i < n; i++) {
-            waserrors = waserrors || (double)a4.xZ[i] != a0.xR[i];
+            waserrors = waserrors || a4.xZ[i] != a0.xR[i];
          }
       // 0-1 sort
       // We test that keys are correctly reordered, but do NOT test order of values.
@@ -7137,7 +7137,7 @@ bool testtsort(bool silent) {
          }
          tagsortmiddleir(&a4, &ar2, 0, n);
          for (i = 0; i < n; i++) {
-            waserrors = waserrors || (double)a4.xZ[i] != a0.xR[i];
+            waserrors = waserrors || a4.xZ[i] != a0.xR[i];
          }
       // Special test for TagSortMiddleIR: sorting in the middle gives same results
       // as sorting in the beginning of the array
@@ -7166,7 +7166,7 @@ bool testtsort(bool silent) {
          if (distinctvals) {
             tagsortmiddleir(&i2, &ar2, offs, n);
             for (i = 0; i < n; i++) {
-               waserrors = (waserrors || i2.xZ[offs + i] != i1.xZ[i]) || ar2.xR[offs + i] != ar.xR[i];
+               waserrors = waserrors || i2.xZ[offs + i] != i1.xZ[i] || ar2.xR[offs + i] != ar.xR[i];
             }
          }
       }
@@ -7349,7 +7349,7 @@ static bool skstest() {
       // Try to call SparseRewriteExisting() for out-of-band elements, make sure that it returns False.
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               if ((i >= j && i - j > d.xZ[i]) || (i <= j && j - i > u.xZ[j])) {
+               if (i >= j && i - j > d.xZ[i] || i <= j && j - i > u.xZ[j]) {
                   set_error_flag(&result, sparserewriteexisting(&s0, i, j, 1.0), __FILE__, __LINE__, "testsparseunit.ap:490");
                }
             }
@@ -7870,7 +7870,7 @@ Spawn:
          sparsecreate(m, n, iround(pnz * m * n), sa);
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
-               if ((j <= i && g->triangle <= 0) || (j >= i && g->triangle >= 0)) {
+               if (j <= i && g->triangle <= 0 || j >= i && g->triangle >= 0) {
                   da->xyR[i][j] = g->bufa.xyR[i][j];
                   sparseset(sa, i, j, g->bufa.xyR[i][j]);
                } else {
@@ -7917,7 +7917,7 @@ Spawn:
          sparsecreate(n, n, iround(pnz * (n * n - n) + n), sa);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               if ((j <= i && g->triangle <= 0) || (j >= i && g->triangle >= 0)) {
+               if (j <= i && g->triangle <= 0 || j >= i && g->triangle >= 0) {
                   da->xyR[i][j] = g->bufa.xyR[i][j];
                   sparseset(sa, i, j, g->bufa.xyR[i][j]);
                } else {
@@ -7973,7 +7973,7 @@ static bool testlevel2unsymmetric() {
    NewObj(sparsematrix, sa);
    NewObj(sparsegenerator, g);
    NewObj(hqrndstate, rs);
-   eps = 10000 * machineepsilon;
+   eps = 10000.0 * machineepsilon;
    result = false;
    hqrndrandomize(&rs);
 // Test linear algebra functions
@@ -8131,7 +8131,7 @@ static bool testlevel3unsymmetric() {
    NewObj(sparsematrix, sa);
    NewObj(sparsegenerator, g);
    NewObj(hqrndstate, rs);
-   eps = 10000 * machineepsilon;
+   eps = 10000.0 * machineepsilon;
    result = false;
    hqrndrandomize(&rs);
 // Test linear algebra functions
@@ -8262,7 +8262,7 @@ static bool testlevel2symmetric() {
    NewObj(sparsematrix, sa);
    NewObj(sparsegenerator, g);
    NewObj(hqrndstate, rs);
-   eps = 10000 * machineepsilon;
+   eps = 10000.0 * machineepsilon;
    result = false;
    hqrndrandomize(&rs);
 // Test linear algebra functions
@@ -8301,8 +8301,8 @@ static bool testlevel2symmetric() {
                for (j = 0; j < n; j++) {
                   set_error_flag(&result, fabs(sparseget(&sa, i, j) - a.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1311");
                   set_error_flag(&result, fabs(sparseget(&s0, i, j) - a.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1312");
-                  set_error_flag(&result, (j < i && triangletype == 1) && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1313");
-                  set_error_flag(&result, (j > i && triangletype == -1) && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1314");
+                  set_error_flag(&result, j < i && triangletype == 1 && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1313");
+                  set_error_flag(&result, j > i && triangletype == -1 && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1314");
                }
             }
          // Before we proceed with testing, update empty triangle of A
@@ -8392,7 +8392,7 @@ static bool testlevel3symmetric() {
    NewObj(sparsematrix, sa);
    NewObj(sparsegenerator, g);
    NewObj(hqrndstate, rs);
-   eps = 10000 * machineepsilon;
+   eps = 10000.0 * machineepsilon;
    result = false;
    hqrndrandomize(&rs);
 // Test linear algebra functions
@@ -8433,8 +8433,8 @@ static bool testlevel3symmetric() {
                for (j = 0; j < n; j++) {
                   set_error_flag(&result, fabs(sparseget(&sa, i, j) - a.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1453");
                   set_error_flag(&result, fabs(sparseget(&s0, i, j) - a.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1454");
-                  set_error_flag(&result, (j < i && triangletype == 1) && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1455");
-                  set_error_flag(&result, (j > i && triangletype == -1) && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1456");
+                  set_error_flag(&result, j < i && triangletype == 1 && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1455");
+                  set_error_flag(&result, j > i && triangletype == -1 && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1456");
                }
             }
          // Before we proceed with testing, update empty triangle of A
@@ -8496,7 +8496,7 @@ static bool testsymmetricperm() {
    NewObj(sparsematrix, sb);
    NewVector(ptbl, 0, DT_INT);
    NewVector(pprod, 0, DT_INT);
-   eps = 10 * machineepsilon;
+   eps = 10.0 * machineepsilon;
    result = false;
    hqrndrandomize(&rs);
 // Try various N and fill factors
@@ -8562,8 +8562,8 @@ static bool testsymmetricperm() {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               set_error_flag(&result, (isupper && j >= i) && fabs(db.xyR[i][j] - sparseget(&sb, i, j)) > eps, __FILE__, __LINE__, "testsparseunit.ap:1590");
-               set_error_flag(&result, (isupper && j < i) && sparseget(&sb, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1591");
+               set_error_flag(&result, isupper && j >= i && fabs(db.xyR[i][j] - sparseget(&sb, i, j)) > eps, __FILE__, __LINE__, "testsparseunit.ap:1590");
+               set_error_flag(&result, isupper && j < i && sparseget(&sb, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1591");
             }
          }
       // Increase sparsity
@@ -8605,7 +8605,7 @@ static bool testlevel2triangular() {
    NewObj(sparsematrix, sa);
    NewObj(sparsegenerator, g);
    NewObj(hqrndstate, rs);
-   eps = 10000 * machineepsilon;
+   eps = 10000.0 * machineepsilon;
    result = false;
    hqrndrandomize(&rs);
 // Test sparseTRMV
@@ -9117,7 +9117,7 @@ static bool linearfunctionstest() {
    NewVector(y0, 0, DT_REAL);
    NewVector(yt0, 0, DT_REAL);
 // Accuracy
-   eps = 1000 * machineepsilon;
+   eps = 1000.0 * machineepsilon;
 // Size of the matrix (m*n)
    n = 10;
    m = 10;
@@ -9234,7 +9234,7 @@ static bool linearfunctionsstest() {
    NewVector(y, 0, DT_REAL);
    NewVector(yt, 0, DT_REAL);
 // Accuracy
-   eps = 1000 * machineepsilon;
+   eps = 1000.0 * machineepsilon;
 // Size of the matrix (m*m)
    m = 10;
 // Left and right borders, limiting matrix values
@@ -9322,7 +9322,7 @@ static bool linearfunctionsmmtest() {
    NewMatrix(y0, 0, 0, DT_REAL);
    NewMatrix(yt0, 0, 0, DT_REAL);
 // Accuracy
-   eps = 1000 * machineepsilon;
+   eps = 1000.0 * machineepsilon;
 // Size of the matrix (m*n)
    n = 32;
    m = 32;
@@ -9466,7 +9466,7 @@ static bool linearfunctionssmmtest() {
    NewMatrix(y, 0, 0, DT_REAL);
    NewMatrix(yt, 0, 0, DT_REAL);
 // Accuracy
-   eps = 1000 * machineepsilon;
+   eps = 1000.0 * machineepsilon;
 // Size of the matrix (m*m)
    m = 32;
    k = 32;
@@ -9688,7 +9688,7 @@ static bool copyfunctest(bool silent) {
    NewVector(cpy0, 0, DT_REAL);
    NewVector(cpyt0, 0, DT_REAL);
 // Accuracy
-   eps = 1000 * machineepsilon;
+   eps = 1000.0 * machineepsilon;
 // Size of the matrix (m*n)
    n = 30;
    m = 30;
@@ -9737,7 +9737,7 @@ static bool copyfunctest(bool silent) {
                sparsemtv(&ss, &x1, &cpyt);
             // Check for MV-result
                for (i1 = 0; i1 < i; i1++) {
-                  if ((fabs(y.xR[i1] - ty.xR[i1]) >= eps || fabs(cpy.xR[i1] - ty.xR[i1]) >= eps) || cpy.xR[i1] - y.xR[i1] != 0.0) {
+                  if (fabs(y.xR[i1] - ty.xR[i1]) >= eps || fabs(cpy.xR[i1] - ty.xR[i1]) >= eps || cpy.xR[i1] - y.xR[i1] != 0.0) {
                      if (!silent) {
                         printf("CopyFuncTest::Report::RES_MV\n");
                         printf("Y[%0d]=%0.5f; tY[%0d]=%0.5f\n", (int)i1, y.xR[i1], (int)i1, ty.xR[i1]);
@@ -9751,7 +9751,7 @@ static bool copyfunctest(bool silent) {
                }
             // Check for MTV-result
                for (i1 = 0; i1 < j; i1++) {
-                  if ((fabs(yt.xR[i1] - tyt.xR[i1]) >= eps || fabs(cpyt.xR[i1] - tyt.xR[i1]) >= eps) || cpyt.xR[i1] - yt.xR[i1] != 0.0) {
+                  if (fabs(yt.xR[i1] - tyt.xR[i1]) >= eps || fabs(cpyt.xR[i1] - tyt.xR[i1]) >= eps || cpyt.xR[i1] - yt.xR[i1] != 0.0) {
                      if (!silent) {
                         printf("CopyFuncTest::Report::RES_MTV\n");
                         printf("Yt[%0d]=%0.5f; tYt[%0d]=%0.5f\n", (int)i1, yt.xR[i1], (int)i1, tyt.xR[i1]);
@@ -9798,7 +9798,7 @@ static bool copyfunctest(bool silent) {
                sparsemv2(&ss, &x0, &cpy0, &cpyt0);
             // Check for MV2-result
                for (i1 = 0; i1 < i; i1++) {
-                  if (((((fabs(y0.xR[i1] - ty.xR[i1]) >= eps || fabs(yt0.xR[i1] - tyt.xR[i1]) >= eps) || fabs(cpy0.xR[i1] - ty.xR[i1]) >= eps) || fabs(cpyt0.xR[i1] - tyt.xR[i1]) >= eps) || cpy0.xR[i1] - y0.xR[i1] != 0.0) || cpyt0.xR[i1] - yt0.xR[i1] != 0.0) {
+                  if (fabs(y0.xR[i1] - ty.xR[i1]) >= eps || fabs(yt0.xR[i1] - tyt.xR[i1]) >= eps || fabs(cpy0.xR[i1] - ty.xR[i1]) >= eps || fabs(cpyt0.xR[i1] - tyt.xR[i1]) >= eps || cpy0.xR[i1] - y0.xR[i1] != 0.0 || cpyt0.xR[i1] - yt0.xR[i1] != 0.0) {
                      if (!silent) {
                         printf("CopyFuncTest::Report::RES_MV2\n");
                         printf("Y0[%0d]=%0.5f; tY[%0d]=%0.5f\n", (int)i1, y0.xR[i1], (int)i1, ty.xR[i1]);
@@ -9814,7 +9814,7 @@ static bool copyfunctest(bool silent) {
                }
             // Check for MV- and MTV-result by help MV2
                for (i1 = 0; i1 < i; i1++) {
-                  if (((fabs(y0.xR[i1] - y.xR[i1]) > eps || fabs(yt0.xR[i1] - yt.xR[i1]) > eps) || fabs(cpy0.xR[i1] - cpy.xR[i1]) > eps) || fabs(cpyt0.xR[i1] - cpyt.xR[i1]) > eps) {
+                  if (fabs(y0.xR[i1] - y.xR[i1]) > eps || fabs(yt0.xR[i1] - yt.xR[i1]) > eps || fabs(cpy0.xR[i1] - cpy.xR[i1]) > eps || fabs(cpyt0.xR[i1] - cpyt.xR[i1]) > eps) {
                      if (!silent) {
                         printf("CopyFuncTest::Report::RES_MV_MVT\n");
                         printf("Y0[%0d]=%0.5f; Y[%0d]=%0.5f\n", (int)i1, y0.xR[i1], (int)i1, y.xR[i1]);
@@ -10308,25 +10308,25 @@ static bool testsparseunit_testgcmatrixtype() {
       for (n = 1; n <= nsize; n++) {
          sparsecreate(m, n, 1, &s);
          sparseconverttocrs(&s);
-         if ((sparseishash(&s) || !sparseiscrs(&s)) || sparsegetmatrixtype(&s) != 1) {
+         if (sparseishash(&s) || !sparseiscrs(&s) || sparsegetmatrixtype(&s) != 1) {
             result = true;
             ae_frame_leave();
             return result;
          }
          sparseconverttohash(&s);
-         if ((!sparseishash(&s) || sparseiscrs(&s)) || sparsegetmatrixtype(&s) != 0) {
+         if (!sparseishash(&s) || sparseiscrs(&s) || sparsegetmatrixtype(&s) != 0) {
             result = true;
             ae_frame_leave();
             return result;
          }
          sparsecopytocrs(&s, &cs);
-         if ((sparseishash(&cs) || !sparseiscrs(&cs)) || sparsegetmatrixtype(&cs) != 1) {
+         if (sparseishash(&cs) || !sparseiscrs(&cs) || sparsegetmatrixtype(&cs) != 1) {
             result = true;
             ae_frame_leave();
             return result;
          }
          sparsecopytohash(&cs, &s);
-         if ((!sparseishash(&s) || sparseiscrs(&s)) || sparsegetmatrixtype(&s) != 0) {
+         if (!sparseishash(&s) || sparseiscrs(&s) || sparsegetmatrixtype(&s) != 0) {
             result = true;
             ae_frame_leave();
             return result;
@@ -10385,7 +10385,7 @@ bool testsparse(bool silent) {
    testsparseunit_testgetrow(&getrowerrors);
    testserialize(&serializeerrors);
 // report
-   waserrors = ((((((((((((((((((skserrors || crserrors) || getrowerrors) || serializeerrors) || basicerrors) || linearerrors) || basicrnderrors) || level2unsymmetricerrors) || level2symmetricerrors) || level2triangularerrors) || level3unsymmetricerrors) || level3symmetricerrors) || symmetricpermerrors) || linearserrors) || linearmmerrors) || linearsmmerrors) || copyerrors) || basiccopyerrors) || enumerateerrors) || rewriteexistingerr;
+   waserrors = skserrors || crserrors || getrowerrors || serializeerrors || basicerrors || linearerrors || basicrnderrors || level2unsymmetricerrors || level2symmetricerrors || level2triangularerrors || level3unsymmetricerrors || level3symmetricerrors || symmetricpermerrors || linearserrors || linearmmerrors || linearsmmerrors || copyerrors || basiccopyerrors || enumerateerrors || rewriteexistingerr;
    if (!silent) {
       printf("TESTING SPARSE\n");
       printf("STORAGE FORMAT SPECIFICS:\n");
@@ -10554,7 +10554,7 @@ static void testblasunit_naivematrixmatrixmultiply(RMatrix *a, ae_int_t ai1, ae_
       bcols = bi2 - bi1 + 1;
    }
    ae_assert(acols == brows, "NaiveMatrixMatrixMultiply: incorrect matrix sizes!");
-   if (((arows <= 0 || acols <= 0) || brows <= 0) || bcols <= 0) {
+   if (arows <= 0 || acols <= 0 || brows <= 0 || bcols <= 0) {
       ae_frame_leave();
       return;
    }
@@ -10645,7 +10645,7 @@ bool testblas(bool silent) {
    cterrors = false;
    mmerrors = false;
    waserrors = false;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
 // Test Norm2
    passcount = 1000;
    e1 = 0.0;
@@ -10679,7 +10679,7 @@ bool testblas(bool silent) {
    }
    e2 /= scl2;
    e3 /= scl3;
-   n2errors = (e1 >= threshold || e2 >= threshold) || e3 >= threshold;
+   n2errors = e1 >= threshold || e2 >= threshold || e3 >= threshold;
 // Testing VectorAbsMax, Column/Row AbsMax
    ae_vector_set_length(&x1, 5 + 1);
    x1.xR[1] = 2.0;
@@ -10687,7 +10687,7 @@ bool testblas(bool silent) {
    x1.xR[3] = -1.3;
    x1.xR[4] = 0.7;
    x1.xR[5] = -3.0;
-   amaxerrors = (vectoridxabsmax(&x1, 1, 5) != 5 || vectoridxabsmax(&x1, 1, 4) != 1) || vectoridxabsmax(&x1, 2, 4) != 3;
+   amaxerrors = vectoridxabsmax(&x1, 1, 5) != 5 || vectoridxabsmax(&x1, 1, 4) != 1 || vectoridxabsmax(&x1, 2, 4) != 3;
    n = 30;
    ae_vector_set_length(&x1, n + 1);
    ae_matrix_set_length(&a, n + 1, n + 1);
@@ -10714,7 +10714,7 @@ bool testblas(bool silent) {
          was2 = true;
       }
    }
-   amaxerrors = (amaxerrors || was1) || was2;
+   amaxerrors = amaxerrors || was1 || was2;
 // Testing upper Hessenberg 1-norm
    ae_matrix_set_length(&a, 3 + 1, 3 + 1);
    ae_vector_set_length(&x1, 3 + 1);
@@ -10874,7 +10874,7 @@ bool testblas(bool silent) {
    }
    mmerrors = was1;
 // report
-   waserrors = (((((n2errors || amaxerrors) || hsnerrors) || mverrors) || iterrors) || cterrors) || mmerrors;
+   waserrors = n2errors || amaxerrors || hsnerrors || mverrors || iterrors || cterrors || mmerrors;
    if (!silent) {
       printf("TESTING BLAS\n");
       printf("VectorNorm2:                             ");
@@ -12594,7 +12594,7 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
          }
       }
       testevdunit_testtdevdproblem(&d, &e, n, threshold, tderrors);
-      testevdunit_testtdevdbiproblem(&d, &e, n, (mkind == 5 || mkind == 6) || mkind == 7, bithreshold, tdbierrors, failc, runs);
+      testevdunit_testtdevdbiproblem(&d, &e, n, mkind == 5 || mkind == 6 || mkind == 7, bithreshold, tdbierrors, failc, runs);
    }
 // Test non-symmetric problems
 // Test non-symmetric problems: zero, random, sparse matrices.
@@ -13008,7 +13008,7 @@ bool testevd(bool silent) {
    }
 // report
    wfailed = (double)failc / runs > failthreshold;
-   waserrors = (((((((nserrors || serrors) || herrors) || tderrors) || sbierrors) || hbierrors) || tdbierrors) || wfailed) || sisymmerrors;
+   waserrors = nserrors || serrors || herrors || tderrors || sbierrors || hbierrors || tdbierrors || wfailed || sisymmerrors;
    if (!silent) {
       printf("TESTING EVD UNIT\n");
       printf("DENSE DIRECT SOLVERS:\n");
@@ -13169,7 +13169,7 @@ static bool sparserealcholeskytest() {
          sparsecreate(n, n, 0, &sa);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               if ((j <= i && !isupper) || (j >= i && isupper)) {
+               if (isupper ? j >= i : j <= i) {
                   sparseset(&sa, i, j, a.xyR[i][j]);
                }
             }
@@ -13268,7 +13268,7 @@ static bool sparserealcholeskytest() {
                }
             }
          // Check output sizes and formats
-            set_error_flag(&result, (!sparseiscrs(&sc) || sparsegetnrows(&sc) != n) || sparsegetncols(&sc) != n, __FILE__, __LINE__, "testtrfacunit.ap:784");
+            set_error_flag(&result, !sparseiscrs(&sc) || sparsegetnrows(&sc) != n || sparsegetncols(&sc) != n, __FILE__, __LINE__, "testtrfacunit.ap:784");
             set_error_flag(&result, p0.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:785");
             set_error_flag(&result, d.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:786");
             if (result) {
@@ -13399,7 +13399,7 @@ static bool sparserealcholeskytest() {
          sparsecreate(n, n, 0, &sa);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               if ((j <= i && !isupper) || (j >= i && isupper)) {
+               if (isupper ? j >= i : j <= i) {
                   sparseset(&sa, i, j, a.xyR[i][j]);
                }
             }
@@ -13455,7 +13455,7 @@ static bool sparserealcholeskytest() {
             }
          }
       // Check output sizes and formats
-         set_error_flag(&result, (!sparseiscrs(&sc) || sparsegetnrows(&sc) != n) || sparsegetncols(&sc) != n, __FILE__, __LINE__, "testtrfacunit.ap:993");
+         set_error_flag(&result, !sparseiscrs(&sc) || sparsegetnrows(&sc) != n || sparsegetncols(&sc) != n, __FILE__, __LINE__, "testtrfacunit.ap:993");
          set_error_flag(&result, p0.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:994");
          set_error_flag(&result, d.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:995");
          if (result) {
@@ -13561,7 +13561,7 @@ static bool sparserealcholeskytest() {
          sparsecreate(n, n, 0, &sa);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               if ((j <= i && !isupper) || (j >= i && isupper)) {
+               if (isupper ? j >= i : j <= i) {
                   sparseset(&sa, i, j, a.xyR[i][j]);
                }
             }
@@ -13690,7 +13690,7 @@ static bool sparserealcholeskytest() {
                return result;
             }
          // Check output sizes and formats
-            set_error_flag(&result, (!sparseiscrs(&sc) || sparsegetnrows(&sc) != n) || sparsegetncols(&sc) != n, __FILE__, __LINE__, "testtrfacunit.ap:1247");
+            set_error_flag(&result, !sparseiscrs(&sc) || sparsegetnrows(&sc) != n || sparsegetncols(&sc) != n, __FILE__, __LINE__, "testtrfacunit.ap:1247");
             set_error_flag(&result, p0.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:1248");
             set_error_flag(&result, d.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:1249");
             if (result) {
@@ -13794,7 +13794,7 @@ static bool sparserealcholeskytest() {
          ae_matrix_set_length(&a1, n, n);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               if ((j <= i && !isupper) || (j >= i && isupper)) {
+               if (isupper ? j >= i : j <= i) {
                // Copy one triangle
                   a1.xyR[i][j] = a.xyR[i][j];
                } else {
@@ -13814,7 +13814,7 @@ static bool sparserealcholeskytest() {
          sparsecreate(n, n, 0, &sa1);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               if ((j <= i && !isupper) || (j >= i && isupper)) {
+               if (isupper ? j >= i : j <= i) {
                   sparseset(&sa, i, j, a.xyR[i][j]);
                }
                sparseset(&sa1, i, j, a1.xyR[i][j]);
@@ -13880,10 +13880,10 @@ static bool sparserealcholeskytest() {
          set_error_flag(&result, sparsegetnrows(&sa1) != n, __FILE__, __LINE__, "testtrfacunit.ap:1459");
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               if ((j <= i && !isupper) || (j >= i && isupper)) {
-                  set_error_flag(&result, fabs(sparseget(&sa1, i, j) - sparseget(&sa, i, j)) > 10 * machineepsilon, __FILE__, __LINE__, "testtrfacunit.ap:1463");
+               if (isupper ? j >= i : j <= i) {
+                  set_error_flag(&result, fabs(sparseget(&sa1, i, j) - sparseget(&sa, i, j)) > 10.0 * machineepsilon, __FILE__, __LINE__, "testtrfacunit.ap:1463");
                } else {
-                  set_error_flag(&result, fabs(sparseget(&sa1, i, j) - a1.xyR[i][j]) > 10 * machineepsilon, __FILE__, __LINE__, "testtrfacunit.ap:1465");
+                  set_error_flag(&result, fabs(sparseget(&sa1, i, j) - a1.xyR[i][j]) > 10.0 * machineepsilon, __FILE__, __LINE__, "testtrfacunit.ap:1465");
                }
             }
          }
@@ -13962,7 +13962,7 @@ static bool sparserealcholeskytest() {
             nworse++;
          }
       }
-      set_error_flag(&result, (double)nbetter < 0.75 * (nbetter + nworse), __FILE__, __LINE__, "testtrfacunit.ap:1560");
+      set_error_flag(&result, nbetter < 0.75 * (nbetter + nworse), __FILE__, __LINE__, "testtrfacunit.ap:1560");
    }
    ae_frame_leave();
    return result;
@@ -14036,7 +14036,7 @@ static void sparsereallutest(bool *err) {
                return;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(err, ((pivr.xZ[i] < 0 || pivr.xZ[i] >= n) || pivc.xZ[i] < 0) || pivc.xZ[i] >= n, __FILE__, __LINE__, "testtrfacunit.ap:1638");
+               set_error_flag(err, pivr.xZ[i] < 0 || pivr.xZ[i] >= n || pivc.xZ[i] < 0 || pivc.xZ[i] >= n, __FILE__, __LINE__, "testtrfacunit.ap:1638");
             }
             for (i = 0; i < n; i++) {
                set_error_flag(err, pivottype == 1 && pivc.xZ[i] != i, __FILE__, __LINE__, "testtrfacunit.ap:1640");
@@ -14537,7 +14537,7 @@ bool testtrfac(bool silent) {
    waserrors = false;
    maxmn = 4 * matrixtilesizea() + 1;
    largemn = 256;
-   threshold = 1000 * machineepsilon * maxmn;
+   threshold = 1000.0 * machineepsilon * maxmn;
 // Sparse Cholesky
    sspderr = sparserealcholeskytest();
 // Sparse LU
@@ -14635,7 +14635,7 @@ bool testtrfac(bool silent) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (j > i) {
-                  hpderr = hpderr || ae_c_neq_d(cal.xyC[i][j], (double)i);
+                  hpderr = hpderr || ae_c_neq_d(cal.xyC[i][j], i);
                } else {
                   vc = ae_v_cdotproduct(cal.xyC[i], 1, "N", cal.xyC[j], 1, "Conj", j + 1);
                   hpderr = hpderr || abscomplex(ae_c_sub(ca.xyC[i][j], vc)) > threshold;
@@ -14649,7 +14649,7 @@ bool testtrfac(bool silent) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (j < i) {
-                  hpderr = hpderr || ae_c_neq_d(cau.xyC[i][j], (double)j);
+                  hpderr = hpderr || ae_c_neq_d(cau.xyC[i][j], j);
                } else {
                   vc = ae_v_cdotproduct(&cau.xyC[0][i], cau.stride, "Conj", &cau.xyC[0][j], cau.stride, "N", i + 1);
                   hpderr = hpderr || abscomplex(ae_c_sub(ca.xyC[i][j], vc)) > threshold;
@@ -14686,7 +14686,7 @@ bool testtrfac(bool silent) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (j > i) {
-                  dspderr = dspderr || ral.xyR[i][j] != (double)i;
+                  dspderr = dspderr || ral.xyR[i][j] != i;
                } else {
                   vr = ae_v_dotproduct(ral.xyR[i], 1, ral.xyR[j], 1, j + 1);
                   dspderr = dspderr || fabs(ra.xyR[i][j] - vr) > threshold;
@@ -14700,7 +14700,7 @@ bool testtrfac(bool silent) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (j < i) {
-                  dspderr = dspderr || rau.xyR[i][j] != (double)j;
+                  dspderr = dspderr || rau.xyR[i][j] != j;
                } else {
                   vr = ae_v_dotproduct(&rau.xyR[0][i], rau.stride, &rau.xyR[0][j], rau.stride, i + 1);
                   dspderr = dspderr || fabs(ra.xyR[i][j] - vr) > threshold;
@@ -14728,7 +14728,7 @@ bool testtrfac(bool silent) {
       set_error_flag(&hpderr, hpdmatrixcholesky(&ca, n, randombool()), __FILE__, __LINE__, "testtrfacunit.ap:510");
    }
 // report
-   waserrors = ((((((rerr || srerr) || dspderr) || sspderr) || cerr) || hpderr) || properr) || dspdupderr;
+   waserrors = rerr || srerr || dspderr || sspderr || cerr || hpderr || properr || dspdupderr;
    if (!silent) {
       printf("TESTING TRIANGULAR FACTORIZATIONS\n");
       printf("* REAL (dense):                          ");
@@ -14814,7 +14814,7 @@ bool testpolynomialsolver(bool silent) {
    polynomialsolve(&a, n, &x, &rep);
    set_error_flag(&wereerrors, fabs(x.xC[0].x + 2.0 / 3.0) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:33");
    set_error_flag(&wereerrors, x.xC[0].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:34");
-   set_error_flag(&wereerrors, rep.maxerr > 100 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:35");
+   set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:35");
    n = 2;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 1.0;
@@ -14823,7 +14823,7 @@ bool testpolynomialsolver(bool silent) {
    polynomialsolve(&a, n, &x, &rep);
    set_error_flag(&wereerrors, abscomplex(ae_c_sub_d(x.xC[0], 1)) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:43");
    set_error_flag(&wereerrors, abscomplex(ae_c_sub_d(x.xC[1], 1)) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:44");
-   set_error_flag(&wereerrors, rep.maxerr > 100 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:45");
+   set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:45");
    n = 2;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 2.0;
@@ -14839,7 +14839,7 @@ bool testpolynomialsolver(bool silent) {
    }
    set_error_flag(&wereerrors, x.xC[0].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:63");
    set_error_flag(&wereerrors, x.xC[1].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:64");
-   set_error_flag(&wereerrors, rep.maxerr > 100 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:65");
+   set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:65");
    n = 2;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 1.0;
@@ -14847,7 +14847,7 @@ bool testpolynomialsolver(bool silent) {
    a.xR[2] = 1.0;
    polynomialsolve(&a, n, &x, &rep);
    set_error_flag(&wereerrors, abscomplex(ae_c_add_d(ae_c_mul(x.xC[0], x.xC[0]), 1.0)) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:73");
-   set_error_flag(&wereerrors, rep.maxerr > 100 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:74");
+   set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:74");
    n = 4;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 0.0;
@@ -14860,7 +14860,7 @@ bool testpolynomialsolver(bool silent) {
    set_error_flag(&wereerrors, ae_c_neq_d(x.xC[1], 0.0), __FILE__, __LINE__, "testpolynomialsolverunit.ap:85");
    set_error_flag(&wereerrors, ae_c_neq_d(x.xC[2], 0.0), __FILE__, __LINE__, "testpolynomialsolverunit.ap:86");
    set_error_flag(&wereerrors, ae_c_neq_d(x.xC[3], 0.0), __FILE__, __LINE__, "testpolynomialsolverunit.ap:87");
-   set_error_flag(&wereerrors, rep.maxerr > 100 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:88");
+   set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:88");
    n = 2;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 0.0;
@@ -14876,7 +14876,7 @@ bool testpolynomialsolver(bool silent) {
       set_error_flag(&wereerrors, fabs(x.xC[0].x + 3.0 / 2.0) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:105");
       set_error_flag(&wereerrors, x.xC[0].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:106");
    }
-   set_error_flag(&wereerrors, rep.maxerr > 100 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:108");
+   set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:108");
    if (!silent) {
       printf("TESTING POLYNOMIAL SOLVER\n");
       if (wereerrors) {
@@ -15221,7 +15221,7 @@ bool testbdsvd(bool silent) {
    wfailed = false;
    waserrors = false;
    maxn = 15;
-   threshold = 5 * 100 * machineepsilon;
+   threshold = 5.0 * 100.0 * machineepsilon;
    ae_vector_set_length(&d, maxn - 1 + 1);
    ae_vector_set_length(&e, maxn - 2 + 1);
 // special case: zero divide matrix
@@ -15278,7 +15278,7 @@ bool testbdsvd(bool silent) {
    }
 // report
    failr = (double)failcount / (succcount + failcount);
-   waserrors = ((wfailed || materr > threshold) || orterr > threshold) || !wsorted;
+   waserrors = wfailed || materr > threshold || orterr > threshold || !wsorted;
    if (!silent) {
       printf("TESTING BIDIAGONAL SVD DECOMPOSITION\n");
       printf("SVD decomposition error:                 %5.3e\n", materr);
@@ -15472,7 +15472,7 @@ bool testsvd(bool silent) {
    wfailed = false;
    waserrors = false;
    maxmn = 30;
-   threshold = 5 * 100 * machineepsilon;
+   threshold = 5.0 * 100.0 * machineepsilon;
    ae_matrix_set_length(&a, maxmn - 1 + 1, maxmn - 1 + 1);
 // TODO: div by zero fail, convergence fail
    for (gpass = 1; gpass <= 1; gpass++) {
@@ -15535,7 +15535,7 @@ bool testsvd(bool silent) {
    }
 // report
    failr = (double)failcount / (succcount + failcount);
-   waserrors = (((wfailed || materr > threshold) || orterr > threshold) || othererr > threshold) || !wsorted;
+   waserrors = wfailed || materr > threshold || orterr > threshold || othererr > threshold || !wsorted;
    if (!silent) {
       printf("TESTING SVD DECOMPOSITION\n");
       printf("SVD decomposition error:                 %5.3e\n", materr);
@@ -15597,7 +15597,7 @@ bool testtrlinsolve(bool silent) {
    waserrors = false;
    maxmn = 15;
    passcount = 15;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
 // Different problems
    for (n = 1; n <= maxmn; n++) {
       ae_matrix_set_length(&aeffective, n - 1 + 1, n - 1 + 1);
@@ -15762,7 +15762,7 @@ bool testsafesolve(bool silent) {
    NewVector(rxs, 0, DT_REAL);
    NewVector(rxe, 0, DT_REAL);
    maxmn = 30;
-   threshold = 100000 * machineepsilon;
+   threshold = 100000.0 * machineepsilon;
    rerrors = false;
    cerrors = false;
    waserrors = false;
@@ -16586,7 +16586,7 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
       }
    }
 // report
-   result = !(((err50 || err90) || errless) || errspec);
+   result = !(err50 || err90 || errless || errspec);
    ae_frame_leave();
    return result;
 }
@@ -16715,7 +16715,7 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
       }
    }
 // report
-   result = !(((err50 || err90) || errless) || errspec);
+   result = !(err50 || err90 || errless || errspec);
    ae_frame_leave();
    return result;
 }
@@ -16843,7 +16843,7 @@ static bool testrcondunit_testrmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
       }
    }
 // report
-   result = !(((err50 || err90) || errless) || errspec);
+   result = !(err50 || err90 || errless || errspec);
    ae_frame_leave();
    return result;
 }
@@ -16972,7 +16972,7 @@ static bool testrcondunit_testcmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
       }
    }
 // report
-   result = !(((err50 || err90) || errless) || errspec);
+   result = !(err50 || err90 || errless || errspec);
    ae_frame_leave();
    return result;
 }
@@ -17073,7 +17073,7 @@ static bool testrcondunit_testspdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
       }
    }
 // report
-   result = !(((err50 || err90) || errless) || errspec);
+   result = !(err50 || err90 || errless || errspec);
    ae_frame_leave();
    return result;
 }
@@ -17174,7 +17174,7 @@ static bool testrcondunit_testhpdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
       }
    }
 // report
-   result = !(((err50 || err90) || errless) || errspec);
+   result = !(err50 || err90 || errless || errspec);
    ae_frame_leave();
    return result;
 }
@@ -17199,7 +17199,7 @@ bool testrcond(bool silent) {
    cerr = !testrcondunit_testcmatrixrcond(maxn, passcount);
    spderr = !testrcondunit_testspdmatrixrcond(maxn, passcount);
    hpderr = !testrcondunit_testhpdmatrixrcond(maxn, passcount);
-   waserrors = ((((rtrerr || ctrerr) || rerr) || cerr) || spderr) || hpderr;
+   waserrors = rtrerr || ctrerr || rerr || cerr || spderr || hpderr;
    if (!silent) {
       printf("TESTING RCOND\n");
       printf("REAL TRIANGULAR:                         ");
@@ -17278,7 +17278,7 @@ bool testxblas(bool silent) {
    approxerrors = false;
    exactnesserrors = false;
    waserrors = false;
-   approxthreshold = 1000 * machineepsilon;
+   approxthreshold = 1000.0 * machineepsilon;
    maxn = 1000;
    passcount = 10;
 // tests:
@@ -17454,8 +17454,8 @@ static bool testdirectdensesolversunit_rmatrixchecksolutionm(RMatrix *xe, ae_int
    if (info <= 0) {
       result = false;
    } else {
-      result = result && !(rep->r1 < 100 * machineepsilon || rep->r1 > 1 + 1000 * machineepsilon);
-      result = result && !(rep->rinf < 100 * machineepsilon || rep->rinf > 1 + 1000 * machineepsilon);
+      result = result && !(rep->r1 < 100.0 * machineepsilon || rep->r1 > 1.0 + 1000.0 * machineepsilon);
+      result = result && !(rep->rinf < 100.0 * machineepsilon || rep->rinf > 1.0 + 1000.0 * machineepsilon);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
             result = result && fabs(xe->xyR[i][j] - xs->xyR[i][j]) <= threshold;
@@ -17475,8 +17475,8 @@ static bool testdirectdensesolversunit_cmatrixchecksolutionm(CMatrix *xe, ae_int
    if (info <= 0) {
       result = false;
    } else {
-      result = result && !(rep->r1 < 100 * machineepsilon || rep->r1 > 1 + 1000 * machineepsilon);
-      result = result && !(rep->rinf < 100 * machineepsilon || rep->rinf > 1 + 1000 * machineepsilon);
+      result = result && !(rep->r1 < 100.0 * machineepsilon || rep->r1 > 1.0 + 1000.0 * machineepsilon);
+      result = result && !(rep->rinf < 100.0 * machineepsilon || rep->rinf > 1.0 + 1000.0 * machineepsilon);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
             result = result && abscomplex(ae_c_sub(xe->xyC[i][j], xs->xyC[i][j])) <= threshold;
@@ -17592,8 +17592,8 @@ static bool testdirectdensesolversunit_rmatrixchecksingularm(ae_int_t n, ae_int_
    if (info != -3 && info != 1) {
       result = false;
    } else {
-      result = result && !(rep->r1 < 0.0 || rep->r1 > 1000 * machineepsilon);
-      result = result && !(rep->rinf < 0.0 || rep->rinf > 1000 * machineepsilon);
+      result = result && !(rep->r1 < 0.0 || rep->r1 > 1000.0 * machineepsilon);
+      result = result && !(rep->rinf < 0.0 || rep->rinf > 1000.0 * machineepsilon);
       if (info == -3) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < m; j++) {
@@ -17616,8 +17616,8 @@ static bool testdirectdensesolversunit_cmatrixchecksingularm(ae_int_t n, ae_int_
       result = false;
       return result;
    }
-   result = result && !(rep->r1 < 0.0 || rep->r1 > 1000 * machineepsilon);
-   result = result && !(rep->rinf < 0.0 || rep->rinf > 1000 * machineepsilon);
+   result = result && !(rep->r1 < 0.0 || rep->r1 > 1000.0 * machineepsilon);
+   result = result && !(rep->rinf < 0.0 || rep->rinf > 1000.0 * machineepsilon);
    if (info == -3) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
@@ -17954,8 +17954,8 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
             if (info <= 0) {
                *rerrors = true;
             } else {
-               *rerrors = (*rerrors || repls.r2 < 100 * machineepsilon) || repls.r2 > 1 + 1000 * machineepsilon;
-               *rerrors = (*rerrors || repls.n != n) || repls.k != 0;
+               *rerrors = *rerrors || repls.r2 < 100.0 * machineepsilon || repls.r2 > 1.0 + 1000.0 * machineepsilon;
+               *rerrors = *rerrors || repls.n != n || repls.k != 0;
                for (i = 0; i < n; i++) {
                   *rerrors = *rerrors || fabs(xe.xyR[i][0] - xv.xR[i]) > threshold;
                }
@@ -17973,8 +17973,8 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
             if (info <= 0) {
                *rerrors = true;
             } else {
-               *rerrors = (*rerrors || repls.r2 < 100 * machineepsilon) || repls.r2 > 1 + 1000 * machineepsilon;
-               *rerrors = (*rerrors || repls.n != n) || repls.k != 0;
+               *rerrors = *rerrors || repls.r2 < 100.0 * machineepsilon || repls.r2 > 1.0 + 1000.0 * machineepsilon;
+               *rerrors = *rerrors || repls.n != n || repls.k != 0;
                for (i = 0; i < n; i++) {
                   *rerrors = *rerrors || fabs(xe.xyR[i][0] - xv.xR[i]) > threshold;
                }
@@ -17996,7 +17996,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                *rerrors = true;
             } else {
                *rerrors = *rerrors || repls.r2 != 0.0;
-               *rerrors = (*rerrors || repls.n != 2 * n) || repls.k != n;
+               *rerrors = *rerrors || repls.n != 2 * n || repls.k != n;
                for (i = 0; i < n; i++) {
                   *rerrors = *rerrors || fabs(xe.xyR[i][0] - xv.xR[i]) > threshold;
                }
@@ -18101,7 +18101,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksingularm(n, m, info, &rep, &x);
             // Test RMatrixSolveMFast(); performed only for matrices
             // with zero rows or columns
-               if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+               if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                   info = 0;
                   ae_matrix_set_length(&x, n, m);
                   for (i = 0; i < n; i++) {
@@ -18122,7 +18122,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksingular(n, info, &rep, &xv);
             // Test RMatrixSolveFast(); performed only for matrices
             // with zero rows or columns
-               if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+               if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                   info = 0;
                   ae_vector_set_length(&bv, n);
                   ae_v_move(bv.xR, 1, b.xyR[0], b.stride, n);
@@ -18137,7 +18137,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksingularm(n, m, info, &rep, &x);
             // Test RMatrixLUSolveMFast(); performed only for matrices
             // with zero rows or columns
-               if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+               if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                   info = 0;
                   ae_matrix_set_length(&x, n, m);
                   for (i = 0; i < n; i++) {
@@ -18158,7 +18158,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksingular(n, info, &rep, &xv);
             // Test RMatrixLUSolveFast(); performed only for matrices
             // with zero rows or columns
-               if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+               if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                   info = 0;
                   ae_vector_set_length(&bv, n);
                   ae_v_move(bv.xR, 1, b.xyR[0], b.stride, n);
@@ -18471,7 +18471,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksingularm(n, m, info, &rep, &x);
             // Test CMatrixSolveMFast(); performed only for matrices
             // with zero rows or columns
-               if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+               if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                   info = 0;
                   ae_matrix_set_length(&x, n, m);
                   for (i = 0; i < n; i++) {
@@ -18490,7 +18490,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
                cmatrixsolve(&a, n, &bv, &info, &rep, &xv);
                *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksingular(n, info, &rep, &xv);
-               if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+               if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                   info = 0;
                   ae_vector_set_length(&bv, n);
                   ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
@@ -18504,7 +18504,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                cmatrixlusolvem(&lua, &p, n, &b, m, &info, &rep, &x);
                *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksingularm(n, m, info, &rep, &x);
             // Test CMatrixLUSolveMFast()
-               if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+               if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                   info = 0;
                   ae_matrix_set_length(&x, n, m);
                   for (i = 0; i < n; i++) {
@@ -18524,7 +18524,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                cmatrixlusolve(&lua, &p, n, &bv, &info, &rep, &xv);
                *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksingular(n, info, &rep, &xv);
             // Test CMatrixLUSolveFast()
-               if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+               if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                   info = 0;
                   ae_vector_set_length(&bv, n);
                   ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
@@ -18815,7 +18815,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                spdmatrixsolvem(&a, n, isupper, &b, m, &info, &rep, &x);
                *spderrors = *spderrors || !testdirectdensesolversunit_rmatrixchecksingularm(n, m, info, &rep, &x);
             // Test SPDMatrixSolveMFast()
-               if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+               if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                   info = 0;
                   ae_matrix_set_length(&x, n, m);
                   for (i = 0; i < n; i++) {
@@ -18850,7 +18850,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                   testdirectdensesolversunit_unset2d(&x);
                   spdmatrixcholeskysolvem(&cha, n, isupper, &b, m, &info, &rep, &x);
                   *spderrors = *spderrors || !testdirectdensesolversunit_rmatrixchecksingularm(n, m, info, &rep, &x);
-                  if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+                  if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                      info = 0;
                      ae_matrix_set_length(&x, n, m);
                      for (i = 0; i < n; i++) {
@@ -18869,7 +18869,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                   ae_v_move(bv.xR, 1, b.xyR[0], b.stride, n);
                   spdmatrixcholeskysolve(&cha, n, isupper, &bv, &info, &rep, &xv);
                   *spderrors = *spderrors || !testdirectdensesolversunit_rmatrixchecksingular(n, info, &rep, &xv);
-                  if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+                  if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                      info = 0;
                      ae_vector_set_length(&bv, n);
                      ae_v_move(bv.xR, 1, b.xyR[0], b.stride, n);
@@ -19099,7 +19099,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                testdirectdensesolversunit_cunset2d(&x);
                hpdmatrixsolvem(&a, n, isupper, &b, m, &info, &rep, &x);
                *hpderrors = *hpderrors || !testdirectdensesolversunit_cmatrixchecksingularm(n, m, info, &rep, &x);
-               if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+               if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                   info = 0;
                   ae_matrix_set_length(&x, n, m);
                   for (i = 0; i < n; i++) {
@@ -19118,7 +19118,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
                hpdmatrixsolve(&a, n, isupper, &bv, &info, &rep, &xv);
                *hpderrors = *hpderrors || !testdirectdensesolversunit_cmatrixchecksingular(n, info, &rep, &xv);
-               if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+               if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                   info = 0;
                   ae_vector_set_length(&bv, n);
                   ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
@@ -19135,7 +19135,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                   testdirectdensesolversunit_cunset2d(&x);
                   hpdmatrixcholeskysolvem(&cha, n, isupper, &b, m, &info, &rep, &x);
                   *hpderrors = *hpderrors || !testdirectdensesolversunit_cmatrixchecksingularm(n, m, info, &rep, &x);
-                  if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+                  if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                      info = 0;
                      ae_matrix_set_length(&x, n, m);
                      for (i = 0; i < n; i++) {
@@ -19154,7 +19154,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                   ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
                   hpdmatrixcholeskysolve(&cha, n, isupper, &bv, &info, &rep, &xv);
                   *hpderrors = *hpderrors || !testdirectdensesolversunit_cmatrixchecksingular(n, info, &rep, &xv);
-                  if ((taskkind == 0 || taskkind == 1) || taskkind == 2) {
+                  if (taskkind == 0 || taskkind == 1 || taskkind == 2) {
                      ae_vector_set_length(&bv, n);
                      ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
                      hpdmatrixcholeskysolvefast(&cha, n, isupper, &bv, &info);
@@ -19184,7 +19184,7 @@ bool testdirectdensesolvers(bool silent) {
    maxn = 10;
    maxm = 5;
    passcount = 5;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    rfserrors = false;
    rerrors = false;
    cerrors = false;
@@ -19194,7 +19194,7 @@ bool testdirectdensesolvers(bool silent) {
    testdirectdensesolversunit_testspdsolver(maxn, maxm, passcount, threshold, &spderrors, &rfserrors);
    testdirectdensesolversunit_testcsolver(maxn, maxm, passcount, threshold, &cerrors, &rfserrors);
    testdirectdensesolversunit_testhpdsolver(maxn, maxm, passcount, threshold, &hpderrors, &rfserrors);
-   waserrors = (((rerrors || cerrors) || spderrors) || hpderrors) || rfserrors;
+   waserrors = rerrors || cerrors || spderrors || hpderrors || rfserrors;
    if (!silent) {
       printf("TESTING DENSE SOLVER\n");
       printf("* REAL:                                   ");
@@ -19552,7 +19552,7 @@ bool testdirectsparsesolvers(bool silent) {
    testdirectsparsesolversunit_testsks(&rskserrors);
    testdirectsparsesolversunit_testcholesky(&rcholerrors);
    testdirectsparsesolversunit_testgen(&rgenerrors);
-   wereerrors = (rskserrors || rcholerrors) || rgenerrors;
+   wereerrors = rskserrors || rcholerrors || rgenerrors;
    if (!silent) {
       printf("TESTING DIRECT SPARSE SOLVERS:\n");
       printf("* SPD-SKS (real)                          ");
@@ -19635,7 +19635,7 @@ static void testfblsunit_testgmres(bool *err) {
                if (i == j) {
                   v--;
                }
-               set_error_flag(err, fabs(v) > 100 * machineepsilon, __FILE__, __LINE__, "testfblsunit.ap:389");
+               set_error_flag(err, fabs(v) > 100.0 * machineepsilon, __FILE__, __LINE__, "testfblsunit.ap:389");
             }
          }
          if (*err) {
@@ -19650,7 +19650,7 @@ static void testfblsunit_testgmres(bool *err) {
       // Test condition
          set_error_flag(err, e >= eprev, __FILE__, __LINE__, "testfblsunit.ap:405");
          if (itscnt == n) {
-            set_error_flag(err, e > 10000 * machineepsilon, __FILE__, __LINE__, "testfblsunit.ap:407");
+            set_error_flag(err, e > 10000.0 * machineepsilon, __FILE__, __LINE__, "testfblsunit.ap:407");
          }
          eprev = e;
       }
@@ -19816,8 +19816,8 @@ bool testfbls(bool silent) {
          ae_v_sub(tmp2.xR, 1, b.xR, 1, n);
          v = ae_v_dotproduct(tmp2.xR, 1, tmp2.xR, 1, n);
          e2 = sqrt(v);
-         cgerrors = cgerrors || fabs(e1 - cgstate.e1) > 100 * machineepsilon * e1;
-         cgerrors = cgerrors || fabs(e2 - cgstate.e2) > 100 * machineepsilon * e1;
+         cgerrors = cgerrors || fabs(e1 - cgstate.e1) > 100.0 * machineepsilon * e1;
+         cgerrors = cgerrors || fabs(e2 - cgstate.e2) > 100.0 * machineepsilon * e1;
          cgerrors = cgerrors || e2 > 0.001 * e1;
       }
    }
@@ -19911,7 +19911,7 @@ bool testfbls(bool silent) {
       }
    }
 // report
-   waserrors = ((cgerrors || lserrors) || cholerrors) || gmreserrors;
+   waserrors = cgerrors || lserrors || cholerrors || gmreserrors;
    if (!silent) {
       printf("TESTING FBLS\n");
       printf("CG ERRORS:                               ");
@@ -20291,8 +20291,8 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
       return;
    }
    for (i = 0; i < n; i++) {
-      set_error_flag(err, fabs(repfirst.xR[i] - x0.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testiterativesparseunit.ap:398");
-      set_error_flag(err, fabs(replast.xR[i] - x.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testiterativesparseunit.ap:399");
+      set_error_flag(err, fabs(repfirst.xR[i] - x0.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testiterativesparseunit.ap:398");
+      set_error_flag(err, fabs(replast.xR[i] - x.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testiterativesparseunit.ap:399");
    }
    sparsesolversolve(&solver, &a, &b);
    sparsesolverresults(&solver, &x, &rep);
@@ -21717,7 +21717,7 @@ bool testlincg(bool silent) {
    sparseerrors = testlincgunit_sparsetest(true);
    preconderrors = testlincgunit_precondtest(true);
 // report
-   waserrors = ((((((basictestxerrors || complexreserrors) || complexerrors) || rcorrectness) || basictestiterserr) || krylovsubspaceerr) || sparseerrors) || preconderrors;
+   waserrors = basictestxerrors || complexreserrors || complexerrors || rcorrectness || basictestiterserr || krylovsubspaceerr || sparseerrors || preconderrors;
    if (!silent) {
       printf("TESTING LinCG\n");
       printf("BasicTestX:                                   ");
@@ -21845,7 +21845,7 @@ bool testnormestimator(bool silent) {
          sparseconverttocrs(&s);
          normestimatorestimatesparse(&e, &s);
          normestimatorresults(&e, &enorm);
-         waserrors = (waserrors || enorm > snorm * (1 + tol)) || enorm < snorm * (1 - tol);
+         waserrors = waserrors || enorm > snorm * (1.0 + tol) || enorm < snorm * (1.0 - tol);
       }
    }
 // NStart=10 should give statistically better results than NStart=1.
@@ -21887,7 +21887,7 @@ bool testnormestimator(bool silent) {
          nbetter++;
       }
    }
-   waserrors = waserrors || (double)nbetter < 0.5 * passcount + sigma * sqrt(0.25 * passcount);
+   waserrors = waserrors || nbetter < 0.5 * passcount + sigma * sqrt(0.25 * passcount);
 // Same as previous one (for NStart), but tests dependence on NIts.
    n = 3;
    normestimatorcreate(n, n, 1, 1, &e);
@@ -21915,7 +21915,7 @@ bool testnormestimator(bool silent) {
          nbetter++;
       }
    }
-   waserrors = waserrors || (double)nbetter < 0.5 * passcount + sigma * sqrt(0.25 * passcount);
+   waserrors = waserrors || nbetter < 0.5 * passcount + sigma * sqrt(0.25 * passcount);
 // report
    if (!silent) {
       printf("TESTING NORM ESTIMATOR\n");
@@ -22733,7 +22733,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
                // is't more than 'eps'(here S.R2=||rk||,
                // calculated by the algorithm for LSQR, and
                // TNorm=||A*S.x-b||, calculated by test function).
-                  if (s.r2 > rnorm + 1000 * machineepsilon * rmax2(rnorm, 1.0)) {
+                  if (s.r2 > rnorm + 1000.0 * machineepsilon * rmax2(rnorm, 1.0)) {
                      set_error_flag(&result, true, __FILE__, __LINE__, "testlinlsqrunit.ap:853");
                      ae_frame_leave();
                      return result;
@@ -23400,7 +23400,7 @@ bool testlinlsqr(bool silent) {
    prectesterrors = testlinlsqrunit_preconditionertest();
    testlinlsqrunit_testterminationrequests(&termreqerrors);
 // report
-   waserrors = ((((((((svdtesterrors || mwcranksvderr) || mwicranksvderr) || bidiagonalerr) || zeromatrixerr) || reportcorrectnesserr) || stoppingcriteriaerr) || analytictesterrors) || prectesterrors) || termreqerrors;
+   waserrors = svdtesterrors || mwcranksvderr || mwicranksvderr || bidiagonalerr || zeromatrixerr || reportcorrectnesserr || stoppingcriteriaerr || analytictesterrors || prectesterrors || termreqerrors;
    if (!silent) {
       printf("TESTING LinLSQR\n");
       printf("Different matrix types:\n");
@@ -23753,7 +23753,7 @@ bool testnleq(bool silent) {
          othererrors = othererrors || state.f > flast;
       // check correctness of function value
          v = sqr(state.x.xR[0] * state.x.xR[0] + state.x.xR[1] - 11) + sqr(state.x.xR[0] + state.x.xR[1] * state.x.xR[1] - 7);
-         othererrors = othererrors || fabs(v - state.f) / rmax2(v, 1.0) > 100 * machineepsilon;
+         othererrors = othererrors || fabs(v - state.f) / rmax2(v, 1.0) > 100.0 * machineepsilon;
       // update info and continue
          ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
          flast = state.f;
@@ -23766,9 +23766,9 @@ bool testnleq(bool silent) {
       }
    nleqresults(&state, &x, &rep);
    if (rep.terminationtype > 0) {
-      othererrors = (othererrors || xlast.xR[0] != x.xR[0]) || xlast.xR[1] != x.xR[1];
+      othererrors = othererrors || xlast.xR[0] != x.xR[0] || xlast.xR[1] != x.xR[1];
       v = sqr(x.xR[0] * x.xR[0] + x.xR[1] - 11) + sqr(x.xR[0] + x.xR[1] * x.xR[1] - 7);
-      othererrors = othererrors || fabs(flast - v) / rmax2(v, 1.0) > 100 * machineepsilon;
+      othererrors = othererrors || fabs(flast - v) / rmax2(v, 1.0) > 100.0 * machineepsilon;
    } else {
       converror = true;
    }
@@ -23792,7 +23792,7 @@ bool testnleq(bool silent) {
       if (state.needf || state.needfij) {
          testnlequnit_testfunchbm(&state);
       }
-      if ((state.needf || state.needfij) || state.xupdated) {
+      if (state.needf || state.needfij || state.xupdated) {
          othererrors = othererrors || sqrt(sqr(state.x.xR[0] - xlast.xR[0]) + sqr(state.x.xR[1] - xlast.xR[1])) > 1.00001 * stpmax;
       }
       if (state.xupdated) {
@@ -23801,7 +23801,7 @@ bool testnleq(bool silent) {
       }
    }
 // end
-   waserrors = (basicserrors || converror) || othererrors;
+   waserrors = basicserrors || converror || othererrors;
    if (!silent) {
       printf("TESTING NLEQ SOLVER\n");
       printf("BASIC FUNCTIONALITY:                      ");
@@ -23872,8 +23872,8 @@ static bool testmatinvunit_rmatrixcheckinverse(RMatrix *a, RMatrix *inva, ae_int
    if (info <= 0) {
       result = false;
    } else {
-      result = result && !(rep->r1 < 100 * machineepsilon || rep->r1 > 1 + 1000 * machineepsilon);
-      result = result && !(rep->rinf < 100 * machineepsilon || rep->rinf > 1 + 1000 * machineepsilon);
+      result = result && !(rep->r1 < 100.0 * machineepsilon || rep->r1 > 1.0 + 1000.0 * machineepsilon);
+      result = result && !(rep->rinf < 100.0 * machineepsilon || rep->rinf > 1.0 + 1000.0 * machineepsilon);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             v = ae_v_dotproduct(a->xyR[i], 1, &inva->xyR[0][j], inva->stride, n);
@@ -23898,8 +23898,8 @@ static bool testmatinvunit_cmatrixcheckinverse(CMatrix *a, CMatrix *inva, ae_int
    if (info <= 0) {
       result = false;
    } else {
-      result = result && !(rep->r1 < 100 * machineepsilon || rep->r1 > 1 + 1000 * machineepsilon);
-      result = result && !(rep->rinf < 100 * machineepsilon || rep->rinf > 1 + 1000 * machineepsilon);
+      result = result && !(rep->r1 < 100.0 * machineepsilon || rep->r1 > 1.0 + 1000.0 * machineepsilon);
+      result = result && !(rep->rinf < 100.0 * machineepsilon || rep->rinf > 1.0 + 1000.0 * machineepsilon);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             v = ae_v_cdotproduct(a->xyC[i], 1, "N", &inva->xyC[0][j], inva->stride, "N", n);
@@ -23937,8 +23937,8 @@ static bool testmatinvunit_spdmatrixcheckinverse(RMatrix *a, RMatrix *inva, bool
    if (info <= 0) {
       result = false;
    } else {
-      result = result && !(rep->r1 < 100 * machineepsilon || rep->r1 > 1 + 1000 * machineepsilon);
-      result = result && !(rep->rinf < 100 * machineepsilon || rep->rinf > 1 + 1000 * machineepsilon);
+      result = result && !(rep->r1 < 100.0 * machineepsilon || rep->r1 > 1.0 + 1000.0 * machineepsilon);
+      result = result && !(rep->rinf < 100.0 * machineepsilon || rep->rinf > 1.0 + 1000.0 * machineepsilon);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             v = ae_v_dotproduct(a->xyR[i], 1, &inva->xyR[0][j], inva->stride, n);
@@ -23977,8 +23977,8 @@ static bool testmatinvunit_hpdmatrixcheckinverse(CMatrix *a, CMatrix *inva, bool
    if (info <= 0) {
       result = false;
    } else {
-      result = result && !(rep->r1 < 100 * machineepsilon || rep->r1 > 1 + 1000 * machineepsilon);
-      result = result && !(rep->rinf < 100 * machineepsilon || rep->rinf > 1 + 1000 * machineepsilon);
+      result = result && !(rep->r1 < 100.0 * machineepsilon || rep->r1 > 1.0 + 1000.0 * machineepsilon);
+      result = result && !(rep->rinf < 100.0 * machineepsilon || rep->rinf > 1.0 + 1000.0 * machineepsilon);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             v = ae_v_cdotproduct(a->xyC[i], 1, "N", &inva->xyC[0][j], inva->stride, "N", n);
@@ -24003,8 +24003,8 @@ static bool testmatinvunit_rmatrixcheckinversesingular(RMatrix *inva, ae_int_t n
    if (info != -3 && info != 1) {
       result = false;
    } else {
-      result = result && !(rep->r1 < 0.0 || rep->r1 > 1000 * machineepsilon);
-      result = result && !(rep->rinf < 0.0 || rep->rinf > 1000 * machineepsilon);
+      result = result && !(rep->r1 < 0.0 || rep->r1 > 1000.0 * machineepsilon);
+      result = result && !(rep->rinf < 0.0 || rep->rinf > 1000.0 * machineepsilon);
       if (info == -3) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
@@ -24026,8 +24026,8 @@ static bool testmatinvunit_cmatrixcheckinversesingular(CMatrix *inva, ae_int_t n
    if (info != -3 && info != 1) {
       result = false;
    } else {
-      result = result && !(rep->r1 < 0.0 || rep->r1 > 1000 * machineepsilon);
-      result = result && !(rep->rinf < 0.0 || rep->rinf > 1000 * machineepsilon);
+      result = result && !(rep->r1 < 0.0 || rep->r1 > 1000.0 * machineepsilon);
+      result = result && !(rep->rinf < 0.0 || rep->rinf > 1000.0 * machineepsilon);
       if (info == -3) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
@@ -24634,8 +24634,8 @@ static void testmatinvunit_testspdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
             if (info != -3 && info != 1) {
                *spderrors = true;
             } else {
-               *spderrors = (*spderrors || rep.r1 < 0.0) || rep.r1 > 1000 * machineepsilon;
-               *spderrors = (*spderrors || rep.rinf < 0.0) || rep.rinf > 1000 * machineepsilon;
+               *spderrors = *spderrors || rep.r1 < 0.0 || rep.r1 > 1000.0 * machineepsilon;
+               *spderrors = *spderrors || rep.rinf < 0.0 || rep.rinf > 1000.0 * machineepsilon;
             }
          }
       }
@@ -24742,8 +24742,8 @@ static void testmatinvunit_testhpdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
             if (info != -3 && info != 1) {
                *hpderrors = true;
             } else {
-               *hpderrors = (*hpderrors || rep.r1 < 0.0) || rep.r1 > 1000 * machineepsilon;
-               *hpderrors = (*hpderrors || rep.rinf < 0.0) || rep.rinf > 1000 * machineepsilon;
+               *hpderrors = *hpderrors || rep.r1 < 0.0 || rep.r1 > 1000.0 * machineepsilon;
+               *hpderrors = *hpderrors || rep.rinf < 0.0 || rep.rinf > 1000.0 * machineepsilon;
             }
          }
       }
@@ -24770,7 +24770,7 @@ bool testmatinv(bool silent) {
    maxcn = 3 * matrixtilesizea() + 1;
    largen = 4 * matrixtilesizeb() + 1;
    passcount = 1;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    rtrerrors = false;
    ctrerrors = false;
    rerrors = false;
@@ -24789,7 +24789,7 @@ bool testmatinv(bool silent) {
    testmatinvunit_testspdinv(largen, largen, passcount, threshold, &spderrors);
    testmatinvunit_testcinv(largen, largen, passcount, threshold, &cerrors);
    testmatinvunit_testhpdinv(largen, largen, passcount, threshold, &hpderrors);
-   waserrors = ((((rtrerrors || ctrerrors) || rerrors) || cerrors) || spderrors) || hpderrors;
+   waserrors = rtrerrors || ctrerrors || rerrors || cerrors || spderrors || hpderrors;
    if (!silent) {
       printf("TESTING MATINV\n");
       printf("* REAL TRIANGULAR:                        ");
@@ -25318,7 +25318,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
             if (i == j) {
                a.xyR[i][i] = (i * i + 1) * (0.8 + 0.4 * randomreal());
             } else {
-               if ((pkind == 0 && j > i) || (pkind == 1 && j < i)) {
+               if (pkind == 0 && j > i || pkind == 1 && j < i) {
                   a.xyR[i][j] = 0.05 * randommid();
                } else {
                   a.xyR[i][j] = NAN;
@@ -25555,7 +25555,7 @@ static void testminlbfgsunit_testother(bool *err) {
    }
    minlbfgsresults(&state, &x, &rep);
    r = v / (s.xR[0] * diffstep);
-   set_error_flag(err, fabs(log(r)) > log(1 + 1000 * machineepsilon), __FILE__, __LINE__, "testminlbfgsunit.ap:836");
+   set_error_flag(err, fabs(log(r)) > log(1.0 + 1000.0 * machineepsilon), __FILE__, __LINE__, "testminlbfgsunit.ap:836");
 // test maximum step
    n = 1;
    m = 1;
@@ -25712,7 +25712,7 @@ static void testminlbfgsunit_testother(bool *err) {
          x.xR[0] = 0.0;
          minlbfgscreate(1, 1, &x, &state);
          minlbfgssetcond(&state, epsg, 0.0, 0.0, 0);
-         while (minlbfgsiteration(&state)) {
+         while (minlbfgsiteration(&state))
             if (state.needfg) {
                if (-0.999999 < state.x.xR[0] && state.x.xR[0] < 0.999999) {
                   state.f = 1 / (1 - state.x.xR[0]) + 1 / (1 + state.x.xR[0]) + vc * state.x.xR[0];
@@ -25721,7 +25721,6 @@ static void testminlbfgsunit_testother(bool *err) {
                   state.f = vm;
                }
             }
-         }
          minlbfgsresults(&state, &x, &rep);
          if (rep.terminationtype <= 0) {
             *err = true;
@@ -25971,7 +25970,7 @@ static void testminlbfgsunit_testoptguardc1test1reportfortask0(bool *err, optgua
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = (tooclose || fabs(va) < 1.0E-8) || fabs(vb) < 1.0E-8;
+         tooclose = tooclose || fabs(va) < 1.0E-8 || fabs(vb) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -26547,7 +26546,7 @@ bool testminlbfgs(bool silent) {
          }
       }
       minlbfgsresults(&state, &x, &rep);
-      referror = (((referror || rep.terminationtype <= 0) || fabs(x.xR[0] - 2) > 0.001) || fabs(x.xR[1]) > 0.001) || fabs(x.xR[2] - 2) > 0.001;
+      referror = referror || rep.terminationtype <= 0 || fabs(x.xR[0] - 2) > 0.001 || fabs(x.xR[1]) > 0.001 || fabs(x.xR[2] - 2) > 0.001;
    }
 // nonconvex problems with complex surface: we start from point with very small
 // gradient, but we need ever smaller gradient in the next step due to
@@ -26576,7 +26575,7 @@ bool testminlbfgs(bool silent) {
             }
          }
          minlbfgsresults(&state, &x, &rep);
-         nonconverror = (nonconverror || rep.terminationtype <= 0) || fabs(x.xR[0]) > 0.001;
+         nonconverror = nonconverror || rep.terminationtype <= 0 || fabs(x.xR[0]) > 0.001;
          v += 0.1;
       }
    }
@@ -26607,13 +26606,13 @@ bool testminlbfgs(bool silent) {
       x.xR[2] = 10 + 10 * randomreal();
       for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) testminlbfgsunit_testfunc2(&state);
       minlbfgsresults(&state, &x, &rep);
-      restartserror = (((restartserror || rep.terminationtype <= 0) || fabs(x.xR[0] - log(2.0)) > 0.01) || fabs(x.xR[1]) > 0.01) || fabs(x.xR[2] - log(2.0)) > 0.01;
+      restartserror = restartserror || rep.terminationtype <= 0 || fabs(x.xR[0] - log(2.0)) > 0.01 || fabs(x.xR[1]) > 0.01 || fabs(x.xR[2] - log(2.0)) > 0.01;
       x.xR[0] = 10 + 10 * randomreal();
       x.xR[1] = 10 + 10 * randomreal();
       x.xR[2] = 10 + 10 * randomreal();
       for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) testminlbfgsunit_testfunc2(&state);
       minlbfgsresults(&state, &x, &rep);
-      restartserror = (((restartserror || rep.terminationtype <= 0) || fabs(x.xR[0] - log(2.0)) > 0.01) || fabs(x.xR[1]) > 0.01) || fabs(x.xR[2] - log(2.0)) > 0.01;
+      restartserror = restartserror || rep.terminationtype <= 0 || fabs(x.xR[0] - log(2.0)) > 0.01 || fabs(x.xR[1]) > 0.01 || fabs(x.xR[2] - log(2.0)) > 0.01;
    }
 // Linear equations
    diffstep = 1.0E-6;
@@ -26736,7 +26735,7 @@ bool testminlbfgs(bool silent) {
       minlbfgssetcond(&state, 0.0, 0.0, 0.0, 10);
       while (minlbfgsiteration(&state)) testminlbfgsunit_testfunc3(&state);
       minlbfgsresults(&state, &x, &rep);
-      converror = (converror || rep.terminationtype != 5) || rep.iterationscount != 10;
+      converror = converror || rep.terminationtype != 5 || rep.iterationscount != 10;
    }
 // Crash test: too many iterations on a simple tasks
 // May fail when encounter zero step, underflow or something like that
@@ -26761,7 +26760,7 @@ bool testminlbfgs(bool silent) {
    optguarderr = false;
    testminlbfgsunit_testoptguard(&optguarderr);
 // end
-   waserrors = (((((((referror || nonconverror) || eqerror) || converror) || crashtest) || othererrors) || restartserror) || precerror) || optguarderr;
+   waserrors = referror || nonconverror || eqerror || converror || crashtest || othererrors || restartserror || precerror || optguarderr;
    if (!silent) {
       printf("TESTING L-BFGS OPTIMIZATION\n");
       printf("REFERENCE PROBLEM:                        ");
@@ -26955,19 +26954,19 @@ bool testcqmodels(bool silent) {
             }
          }
          v2 = cqmeval(&s, &x);
-         eval0errors = eval0errors || fabs(v - v2) > 10000 * machineepsilon;
+         eval0errors = eval0errors || fabs(v - v2) > 10000.0 * machineepsilon;
          cqmevalx(&s, &x, &v2, &noise);
-         eval0errors = eval0errors || fabs(v - v2) > 10000 * machineepsilon;
-         eval0errors = (eval0errors || noise < 0.0) || noise > 10000 * machineepsilon;
+         eval0errors = eval0errors || fabs(v - v2) > 10000.0 * machineepsilon;
+         eval0errors = eval0errors || noise < 0.0 || noise > 10000.0 * machineepsilon;
          v2 = cqmxtadx2(&s, &x, &tmp0);
-         eval0errors = eval0errors || fabs(xtadx2 - v2) > 10000 * machineepsilon;
+         eval0errors = eval0errors || fabs(xtadx2 - v2) > 10000.0 * machineepsilon;
          cqmgradunconstrained(&s, &x, &gt);
          for (i = 0; i < n; i++) {
-            eval0errors = eval0errors || fabs(ge.xR[i] - gt.xR[i]) > 10000 * machineepsilon;
+            eval0errors = eval0errors || fabs(ge.xR[i] - gt.xR[i]) > 10000.0 * machineepsilon;
          }
          cqmadx(&s, &x, &adx);
          for (i = 0; i < n; i++) {
-            eval0errors = eval0errors || fabs(adx.xR[i] - adxe.xR[i]) > 10000 * machineepsilon;
+            eval0errors = eval0errors || fabs(adx.xR[i] - adxe.xR[i]) > 10000.0 * machineepsilon;
          }
       }
    }
@@ -27029,9 +27028,9 @@ bool testcqmodels(bool silent) {
             v2 = ae_v_dotproduct(q.xyR[i], 1, xc.xR, 1, n);
             v += 0.5 * theta * sqr(v2 - r.xR[i]);
          }
-         eval1errors = eval1errors || fabs(v - cqmeval(&s, &xc)) > 10000 * machineepsilon;
-         eval1errors = eval1errors || fabs(v - cqmdebugconstrainedevalt(&s, &x)) > 10000 * machineepsilon;
-         eval1errors = eval1errors || fabs(v - cqmdebugconstrainedevale(&s, &x)) > 10000 * machineepsilon;
+         eval1errors = eval1errors || fabs(v - cqmeval(&s, &xc)) > 10000.0 * machineepsilon;
+         eval1errors = eval1errors || fabs(v - cqmdebugconstrainedevalt(&s, &x)) > 10000.0 * machineepsilon;
+         eval1errors = eval1errors || fabs(v - cqmdebugconstrainedevale(&s, &x)) > 10000.0 * machineepsilon;
       }
    }
    waserrors = waserrors || eval1errors;
@@ -27210,11 +27209,11 @@ bool testcqmodels(bool silent) {
             }
          }
          v2 = cqmeval(&s, &x);
-         eval2errors = eval2errors || fabs(v - v2) > 10000 * machineepsilon;
+         eval2errors = eval2errors || fabs(v - v2) > 10000.0 * machineepsilon;
          v2 = cqmdebugconstrainedevalt(&s, &x);
-         eval2errors = eval2errors || fabs(v - v2) > 10000 * machineepsilon;
+         eval2errors = eval2errors || fabs(v - v2) > 10000.0 * machineepsilon;
          v2 = cqmdebugconstrainedevale(&s, &x);
-         eval2errors = eval2errors || fabs(v - v2) > 10000 * machineepsilon;
+         eval2errors = eval2errors || fabs(v - v2) > 10000.0 * machineepsilon;
       }
    }
    waserrors = waserrors || eval2errors;
@@ -27315,7 +27314,7 @@ bool testcqmodels(bool silent) {
          // and that solution is true optimum
             f0 = cqmeval(&s, &x);
             for (i = 0; i < n; i++) {
-               newton1errors = newton1errors || (activeset.xB[i] && x.xR[i] != xc.xR[i]);
+               newton1errors = newton1errors || activeset.xB[i] && x.xR[i] != xc.xR[i];
                if (!activeset.xB[i]) {
                   v = x.xR[i];
                   x.xR[i] = v + h;
@@ -27384,8 +27383,8 @@ bool testcqmodels(bool silent) {
          // and that solution is true optimum
             f0 = cqmeval(&s, &x);
             for (i = 0; i < n; i++) {
-               newton2errors = newton2errors || (activeset.xB[i] && x.xR[i] != x0.xR[i]);
-               newton2errors = newton2errors || (!activeset.xB[i] && fabs(x.xR[i] - x0.xR[i]) > 1000 * machineepsilon);
+               newton2errors = newton2errors || activeset.xB[i] && x.xR[i] != x0.xR[i];
+               newton2errors = newton2errors || !activeset.xB[i] && fabs(x.xR[i] - x0.xR[i]) > 1000.0 * machineepsilon;
             }
          // Check that constrained evaluation at some point gives correct results
             for (i = 0; i < n; i++) {
@@ -27404,11 +27403,11 @@ bool testcqmodels(bool silent) {
                v += 0.5 * theta * sqr(v2 - r.xR[i]);
             }
             v2 = cqmeval(&s, &x);
-            newton2errors = (newton2errors || !isfinite(v2)) || fabs(v - v2) > 10000 * machineepsilon;
+            newton2errors = newton2errors || !isfinite(v2) || fabs(v - v2) > 10000.0 * machineepsilon;
             v2 = cqmdebugconstrainedevalt(&s, &x);
-            newton2errors = (newton2errors || !isfinite(v2)) || fabs(v - v2) > 10000 * machineepsilon;
+            newton2errors = newton2errors || !isfinite(v2) || fabs(v - v2) > 10000.0 * machineepsilon;
             v2 = cqmdebugconstrainedevale(&s, &x);
-            newton2errors = (newton2errors || !isfinite(v2)) || fabs(v - v2) > 10000 * machineepsilon;
+            newton2errors = newton2errors || !isfinite(v2) || fabs(v - v2) > 10000.0 * machineepsilon;
          } else {
             newton2errors = true;
          }
@@ -27803,7 +27802,7 @@ bool testsnnls(bool silent) {
       }
    }
 // report
-   waserrors = ((test0errors || test1errors) || test2errors) || testnewtonerrors;
+   waserrors = test0errors || test1errors || test2errors || testnewtonerrors;
    if (!silent) {
       printf("TESTING SPECIAL NNLS SOLVER\n");
       printf("TEST 0:                                   ");
@@ -28987,10 +28986,10 @@ static void testminbleicunit_testother(bool *err) {
          }
          minbleicresults(&state, &x, &rep);
          if (dkind == 0) {
-            *err = (*err || wasf) || !wasfg;
+            *err = *err || wasf || !wasfg;
          }
          if (dkind == 1) {
-            *err = (*err || !wasf) || wasfg;
+            *err = *err || !wasf || wasfg;
          }
       }
    }
@@ -29017,7 +29016,7 @@ static void testminbleicunit_testother(bool *err) {
       }
       minbleicresults(&state, &x, &rep);
       r = v / (s.xR[0] * diffstep);
-      *err = *err || fabs(log(r)) > log(1 + 1000 * machineepsilon);
+      *err = *err || fabs(log(r)) > log(1.0 + 1000.0 * machineepsilon);
    }
 // Test stpmax
    for (pass = 1; pass <= passcount; pass++) {
@@ -29236,7 +29235,7 @@ static void testminbleicunit_testother(bool *err) {
       ae_vector_set_length(&x, 2);
       ae_vector_set_length(&bl, 2);
       ae_vector_set_length(&bu, 2);
-      x.xR[0] = 10 * machineepsilon;
+      x.xR[0] = 10.0 * machineepsilon;
       x.xR[1] = 1.0;
       bl.xR[0] = 0.0;
       bu.xR[0] = +INFINITY;
@@ -29256,12 +29255,12 @@ static void testminbleicunit_testother(bool *err) {
          }
          while (minbleiciteration(&state))
             if (state.needfg) {
-               state.f = sqr(state.x.xR[0] + 1) + sqr(state.x.xR[1] + 1) + 10000 * machineepsilon * randomreal();
+               state.f = sqr(state.x.xR[0] + 1) + sqr(state.x.xR[1] + 1) + 10000.0 * machineepsilon * randomreal();
                state.g.xR[0] = 2 * (state.x.xR[0] + 1);
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
             }
          minbleicresults(&state, &xf, &rep);
-         if ((rep.terminationtype <= 0 || xf.xR[0] != 0.0) || xf.xR[1] != 0.0) {
+         if (rep.terminationtype <= 0 || xf.xR[0] != 0.0 || xf.xR[1] != 0.0) {
             *err = true;
             ae_frame_leave();
             return;
@@ -29292,7 +29291,7 @@ static void testminbleicunit_testother(bool *err) {
       ae_vector_set_length(&x, 2);
       ae_vector_set_length(&bl, 2);
       ae_vector_set_length(&bu, 2);
-      x.xR[0] = 10 * machineepsilon;
+      x.xR[0] = 10.0 * machineepsilon;
       x.xR[1] = 1.0;
       bl.xR[0] = 0.0;
       bu.xR[0] = +INFINITY;
@@ -29320,7 +29319,7 @@ static void testminbleicunit_testother(bool *err) {
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
             }
          minbleicresults(&state, &xf, &rep);
-         if ((rep.terminationtype <= 0 || xf.xR[0] != 0.0) || xf.xR[1] != 0.0) {
+         if (rep.terminationtype <= 0 || xf.xR[0] != 0.0 || xf.xR[1] != 0.0) {
             *err = true;
             ae_frame_leave();
             return;
@@ -30202,7 +30201,7 @@ static void testminbleicunit_testconv(bool *err) {
                   k++;
                   continue;
                }
-               if ((ct.xZ[i] > 0 && v <= tolconstr) || (ct.xZ[i] < 0 && v >= -tolconstr)) {
+               if (ct.xZ[i] > 0 && v <= tolconstr || ct.xZ[i] < 0 && v >= -tolconstr) {
                   for (j = 0; j < n; j++) {
                      ce.xyR[j][k] = sign((double)ct.xZ[i]) * c.xyR[i][j];
                   }
@@ -30698,7 +30697,7 @@ static void testminbleicunit_testoptguardc1test1reportfortask0(bool *err, optgua
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = (tooclose || fabs(va) < 1.0E-8) || fabs(vb) < 1.0E-8;
+         tooclose = tooclose || fabs(va) < 1.0E-8 || fabs(vb) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -31248,7 +31247,7 @@ bool testminbleic(bool silent) {
    testminbleicunit_testpreconditioning(&precerrors);
    testminbleicunit_testoptguard(&optguarderrors);
 // end
-   waserrors = (((((feasibilityerrors || othererrors) || converrors) || interrors) || precerrors) || optguarderrors) || bugs;
+   waserrors = feasibilityerrors || othererrors || converrors || interrors || precerrors || optguarderrors || bugs;
    if (!silent) {
       printf("TESTING BLEIC OPTIMIZATION\n");
       printf("FEASIBILITY PROPERTIES:                   ");
@@ -31424,7 +31423,7 @@ static bool simpletest() {
          minqpoptimize(&state);
          minqpresults(&state, &x, &rep);
          for (j = 0; j < sn; j++) {
-            if (fabs(tx.xR[j] - x.xR[j]) > eps || (x.xR[j] < db.xR[j] || x.xR[j] > ub.xR[j])) {
+            if (fabs(tx.xR[j] - x.xR[j]) > eps || x.xR[j] < db.xR[j] || x.xR[j] > ub.xR[j]) {
                result = true;
                ae_frame_leave();
                return result;
@@ -31534,7 +31533,7 @@ static double testminqpunit_projectedantigradnorm(ae_int_t n, RVector *x, RVecto
    r = 0.0;
    for (i = 0; i < n; i++) {
       ae_assert(x->xR[i] >= bndl->xR[i] && x->xR[i] <= bndu->xR[i], "ProjectedAntiGradNormal: boundary constraints violation");
-      if (((x->xR[i] > bndl->xR[i] && x->xR[i] < bndu->xR[i]) || (x->xR[i] == bndl->xR[i] && -g->xR[i] > 0.0)) || (x->xR[i] == bndu->xR[i] && -g->xR[i] < 0.0)) {
+      if (x->xR[i] > bndl->xR[i] && x->xR[i] < bndu->xR[i] || x->xR[i] == bndl->xR[i] && -g->xR[i] > 0.0 || x->xR[i] == bndu->xR[i] && -g->xR[i] < 0.0) {
          r += g->xR[i] * g->xR[i];
       }
    }
@@ -33046,7 +33045,7 @@ static bool bleictests() {
    set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:6906");
    if (rep.terminationtype > 0) {
       for (i = 0; i < n; i++) {
-         set_error_flag(&result, fabs(xend0.xR[i] + 1) > 100 * machineepsilon && fabs(xend0.xR[i] - 1) > 100 * machineepsilon, __FILE__, __LINE__, "testminqpunit.ap:6909");
+         set_error_flag(&result, fabs(xend0.xR[i] + 1.0) > 100.0 * machineepsilon && fabs(xend0.xR[i] - 1.0) > 100.0 * machineepsilon, __FILE__, __LINE__, "testminqpunit.ap:6909");
       }
    }
    minqpsetlc(&state, &c, &ct, 2 * (n - 1));
@@ -35102,7 +35101,7 @@ static void testminqpunit_icqptest(bool *err) {
          v = ae_v_dotproduct(c.xyR[i], 1, x0.xR, 1, n);
          c.xyR[i][n] = v;
          ct.xZ[i] = randominteger(3) - 1;
-         if ((double)i >= 0.5 * n && ct.xZ[i] == 0) {
+         if (i >= 0.5 * n && ct.xZ[i] == 0) {
             ct.xZ[i] = 1;
          }
          if (ct.xZ[i] < 0) {
@@ -35477,7 +35476,7 @@ static void testminqpunit_icqptest(bool *err) {
                   k++;
                   continue;
                }
-               if ((ct.xZ[i] > 0 && v <= tolconstr) || (ct.xZ[i] < 0 && v >= -tolconstr)) {
+               if (ct.xZ[i] > 0 && v <= tolconstr || ct.xZ[i] < 0 && v >= -tolconstr) {
                   for (j = 0; j < n; j++) {
                      ce.xyR[j][k] = sign((double)ct.xZ[i]) * c.xyR[i][j];
                   }
@@ -35661,7 +35660,7 @@ static void testminqpunit_randomlysplitandsetlc2(RMatrix *rawc, RVector *rawcl, 
             }
          }
       // Add duplicates which do not change constraint (after simplification)
-         while ((nnz > 0 && nnz < ci.cnt) && hqrnduniformr(rs) < 0.75) {
+         while (nnz > 0 && nnz < ci.cnt && hqrnduniformr(rs) < 0.75) {
             j = hqrnduniformi(rs, nnz);
             ci.xZ[nnz] = ci.xZ[j];
             cv.xR[nnz] = hqrndnormal(rs);
@@ -36334,7 +36333,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                if (solvertype == 0) {
                   tolconstr = 1.0E-8;
                } else {
-                  if ((solvertype == 1 || solvertype == 2) || solvertype == 3) {
+                  if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
                      tolconstr = 1.0E-3;
                      if (akind == 3) {
                         tolconstr *= 5;
@@ -36490,7 +36489,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                      k++;
                      continue;
                   }
-                  if ((rawct.xZ[i] > 0 && v <= tolconstr) || (rawct.xZ[i] < 0 && v >= -tolconstr)) {
+                  if (rawct.xZ[i] > 0 && v <= tolconstr || rawct.xZ[i] < 0 && v >= -tolconstr) {
                      for (j = 0; j < n; j++) {
                         ce.xyR[j][k] = sign((double)rawct.xZ[i]) * rawc.xyR[i][j];
                      }
@@ -36545,7 +36544,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                ftol = 1.0E-5;
                xtol = 1.0E-5;
             } else {
-               if ((solvertype == 1 || solvertype == 2) || solvertype == 3) {
+               if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
                   ftol = 1.0E-3;
                   xtol = 1.0E-3;
                } else {
@@ -36688,7 +36687,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          // * BLEIC or IPM do not guarantee that we perform steps exactly even
          //   when scale is 2^k, so we use non-zero XTol=1E-3
          // * DENSE-AUL provides such guarantee, so XTol=0
-            if ((solvertype == 0 || solvertype == 2) || solvertype == 3) {
+            if (solvertype == 0 || solvertype == 2 || solvertype == 3) {
                xtol = 1.0E-3;
             } else {
                if (solvertype == 1) {
@@ -36992,7 +36991,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          if (solvertype == 0) {
             xtol = 1.0E-5;
          } else {
-            if ((solvertype == 1 || solvertype == 2) || solvertype == 3) {
+            if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
                xtol = 5.0E-3;
             } else {
                ae_assert(false, "unexpected solver type");
@@ -37096,7 +37095,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          if (solvertype == 0) {
             xtol = 1.0E-3;
          } else {
-            if ((solvertype == 1 || solvertype == 2) || solvertype == 3) {
+            if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
                xtol = 1.0E-3;
             } else {
                ae_assert(false, "unexpected solver type");
@@ -37198,7 +37197,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                tolconstr = 1.0E-6;
                gtol = 1.0E-6;
             } else {
-               if ((solvertype == 1 || solvertype == 2) || solvertype == 3) {
+               if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
                   tolconstr = 1.0E-4;
                   gtol = 1.0E-4;
                } else {
@@ -37537,7 +37536,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          // * for overconstrained DENSE-AUL
             skiptest = false;
             skiptest = skiptest || solvertype == 0;
-            skiptest = skiptest || (solvertype == 1 && (double)nactive > 0.5 * (n - 1));
+            skiptest = skiptest || solvertype == 1 && nactive > 0.5 * (n - 1);
             if (!skiptest) {
                ae_vector_set_length(&gtrial, n);
                for (i = 0; i < n; i++) {
@@ -37579,7 +37578,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       if (solvertype == 0) {
          xtol = 1.0E-3;
       } else {
-         if ((solvertype == 1 || solvertype == 2) || solvertype == 3) {
+         if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
             xtol = 1.0E-3;
          } else {
             ae_assert(false, "unexpected solver type");
@@ -37672,7 +37671,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       if (solvertype == 0) {
          xtol = 1.0E-3;
       } else {
-         if ((solvertype == 1 || solvertype == 2) || solvertype == 3) {
+         if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
             xtol = 1.0E-3;
          } else {
             ae_assert(false, "unexpected solver type");
@@ -38762,10 +38761,10 @@ static void testminqpunit_ipmtests(bool *errorflag) {
             for (j = 0; j < n; j++) {
                bndl.xR[j] = -INFINITY;
                bndu.xR[j] = +INFINITY;
-               if ((hqrndnormal(&rs) > 0.0 || issemidefinite) || j >= nmain) {
+               if (hqrndnormal(&rs) > 0.0 || issemidefinite || j >= nmain) {
                   bndl.xR[j] = xf.xR[j] - pow(2.0, hqrndnormal(&rs));
                }
-               if ((hqrndnormal(&rs) > 0.0 || issemidefinite) || j >= nmain) {
+               if (hqrndnormal(&rs) > 0.0 || issemidefinite || j >= nmain) {
                   bndu.xR[j] = xf.xR[j] + pow(2.0, hqrndnormal(&rs));
                }
                if (lagbc.xR[j] != 0.0) {
@@ -39071,7 +39070,7 @@ bool testminqp(bool silent) {
    specerrors = false;
    testminqpunit_spectests(&specerrors);
 // report
-   waserrors = ((((((((((simpleerrors || func1errors) || func2errors) || bcqperrors) || ecqperrors) || icqperrors) || lcqperrors) || quickqperrors) || bleicerrors) || denseaulerrors) || ipmerrors) || specerrors;
+   waserrors = simpleerrors || func1errors || func2errors || bcqperrors || ecqperrors || icqperrors || lcqperrors || quickqperrors || bleicerrors || denseaulerrors || ipmerrors || specerrors;
    if (!silent) {
       printf("TESTING MinQP\n");
       printf("BASIC TESTS:\n");
@@ -39101,7 +39100,7 @@ bool testminqp(bool silent) {
          printf("OK\n");
       }
       printf("* linearly constrained:                   ");
-      if ((ecqperrors || icqperrors) || lcqperrors) {
+      if (ecqperrors || icqperrors || lcqperrors) {
          printf("FAILED\n");
       } else {
          printf("OK\n");
@@ -39197,27 +39196,27 @@ static bool testminlmunit_rkindvsstatecheck(ae_int_t rkind, minlmstate *state) {
       return result;
    }
    if (rkind == 0) {
-      result = (state->needf || state->needfij) || state->xupdated;
+      result = state->needf || state->needfij || state->xupdated;
       return result;
    }
    if (rkind == 1) {
-      result = ((state->needf || state->needfij) || state->needfg) || state->xupdated;
+      result = state->needf || state->needfij || state->needfg || state->xupdated;
       return result;
    }
    if (rkind == 2) {
-      result = ((state->needf || state->needfg) || state->needfgh) || state->xupdated;
+      result = state->needf || state->needfg || state->needfgh || state->xupdated;
       return result;
    }
    if (rkind == 3) {
-      result = (state->needfi || state->needfij) || state->xupdated;
+      result = state->needfi || state->needfij || state->xupdated;
       return result;
    }
    if (rkind == 4) {
-      result = (state->needfi || state->needfij) || state->xupdated;
+      result = state->needfi || state->needfij || state->xupdated;
       return result;
    }
    if (rkind == 5) {
-      result = (state->needfi || state->needfij) || state->xupdated;
+      result = state->needfi || state->needfij || state->xupdated;
       return result;
    }
    result = false;
@@ -39230,7 +39229,7 @@ static void testminlmunit_axmb(minlmstate *state, RMatrix *a, RVector *b, ae_int
    ae_int_t j;
    ae_int_t k;
    double v;
-   if ((state->needf || state->needfg) || state->needfgh) {
+   if (state->needf || state->needfg || state->needfgh) {
       state->f = 0.0;
    }
    if (state->needfg || state->needfgh) {
@@ -39247,7 +39246,7 @@ static void testminlmunit_axmb(minlmstate *state, RMatrix *a, RVector *b, ae_int
    }
    for (i = 0; i < n; i++) {
       v = ae_v_dotproduct(a->xyR[i], 1, state->x.xR, 1, n);
-      if ((state->needf || state->needfg) || state->needfgh) {
+      if (state->needf || state->needfg || state->needfgh) {
          state->f += sqr(v - b->xR[i]);
       }
       if (state->needfg || state->needfgh) {
@@ -39357,7 +39356,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
             state.j.xyR[2][1] = 0.0;
             state.j.xyR[2][2] = 1.0;
          }
-         if ((state.needf || state.needfg) || state.needfgh) {
+         if (state.needf || state.needfg || state.needfgh) {
             state.f = sqr(state.x.xR[0] - 2) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
          }
          if (state.needfg || state.needfgh) {
@@ -39431,7 +39430,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
             state.fi.xR[0] = sin(state.x.xR[0]);
             state.j.xyR[0][0] = cos(state.x.xR[0]);
          }
-         if ((state.needf || state.needfg) || state.needfgh) {
+         if (state.needf || state.needfg || state.needfgh) {
             state.f = sqr(sin(state.x.xR[0]));
          }
          if (state.needfg || state.needfgh) {
@@ -39598,7 +39597,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
                state.j.xyR[2][1] = 0.0;
                state.j.xyR[2][2] = 1.0;
             }
-            if ((state.needf || state.needfg) || state.needfgh) {
+            if (state.needf || state.needfg || state.needfgh) {
                state.f = s * sqr(exp(state.x.xR[0]) - 2) + sqr(sqr(state.x.xR[1]) + 1) + sqr(state.x.xR[2] - state.x.xR[0]);
             }
             if (state.needfg || state.needfgh) {
@@ -39733,7 +39732,7 @@ static void testminlmunit_testbc(bool *errorflag) {
                   state.fi.xR[i] = pow(state.x.xR[i] - xe.xR[i], 2.0);
                }
             }
-            if ((state.needf || state.needfg) || state.needfgh) {
+            if (state.needf || state.needfg || state.needfgh) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
                   state.f += pow(state.x.xR[i] - xe.xR[i], 4.0);
@@ -40077,8 +40076,8 @@ static void testminlmunit_testlc(bool *errorflag) {
                ae_assert(rawct.xZ[i] != 0, "Assertion failed");
                v = ae_v_dotproduct(rawc.xyR[i], 1, x1.xR, 1, n);
                v -= rawc.xyR[i][n];
-               bflag = bflag || (rawct.xZ[i] > 0 && v < 0.0);
-               bflag = bflag || (rawct.xZ[i] < 0 && v > 0.0);
+               bflag = bflag || rawct.xZ[i] > 0 && v < 0.0;
+               bflag = bflag || rawct.xZ[i] < 0 && v > 0.0;
             }
             if (bflag) {
                continue;
@@ -40372,7 +40371,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
             state.j.xyR[2][1] = 0.0;
             state.j.xyR[2][2] = 1.0;
          }
-         if ((state.needf || state.needfg) || state.needfgh) {
+         if (state.needf || state.needfg || state.needfgh) {
             state.f = s * sqr(exp(state.x.xR[0]) - 2) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
          }
          if (state.needfg || state.needfgh) {
@@ -40423,7 +40422,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
    minlmsetxrep(&state, true);
    xprev = x.xR[0];
    while (minlmiteration(&state)) {
-      if ((state.needf || state.needfg) || state.needfgh) {
+      if (state.needf || state.needfg || state.needfgh) {
          state.f = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
       }
       if (state.needfg || state.needfgh) {
@@ -40828,7 +40827,7 @@ static void testminlmunit_tryreproducefixedbugs(bool *err) {
          s.fi.xR[1] = sqr(s.x.xR[1]);
       }
    minlmresults(&s, &x, &rep);
-   set_error_flag(err, ((x.xR[0] < bl.xR[0] || x.xR[0] > bu.xR[0]) || x.xR[1] < bl.xR[1]) || x.xR[1] > bu.xR[1], __FILE__, __LINE__, "testminlmunit.ap:1923");
+   set_error_flag(err, x.xR[0] < bl.xR[0] || x.xR[0] > bu.xR[0] || x.xR[1] < bl.xR[1] || x.xR[1] > bu.xR[1], __FILE__, __LINE__, "testminlmunit.ap:1923");
    ae_frame_leave();
 }
 
@@ -40859,7 +40858,7 @@ bool testminlm(bool silent) {
    optguarderr = false;
    testminlmunit_testoptguard(&optguarderr);
 // end
-   waserrors = ((((uerrors || bcerrors) || lcerrors) || scerror) || othererrors) || optguarderr;
+   waserrors = uerrors || bcerrors || lcerrors || scerror || othererrors || optguarderr;
    if (!silent) {
       printf("TESTING LEVENBERG-MARQUARDT OPTIMIZATION\n");
       printf("PROBLEM TYPES:\n");
@@ -41032,10 +41031,10 @@ static void testother(bool *err) {
          }
          mincgresults(&state, &x, &rep);
          if (dkind == 0) {
-            *err = (*err || wasf) || !wasfg;
+            *err = *err || wasf || !wasfg;
          }
          if (dkind == 1) {
-            *err = (*err || !wasf) || wasfg;
+            *err = *err || !wasf || wasfg;
          }
       }
    // Test that numerical differentiation uses scaling.
@@ -41060,7 +41059,7 @@ static void testother(bool *err) {
       }
       mincgresults(&state, &x, &rep);
       r = v / (s.xR[0] * diffstep);
-      *err = *err || fabs(log(r)) > log(1 + 1000 * machineepsilon);
+      *err = *err || fabs(log(r)) > log(1.0 + 1000.0 * machineepsilon);
    // Test maximum step
       n = 1;
       ae_vector_set_length(&x, n);
@@ -41764,7 +41763,7 @@ static void testmincgunit_testoptguardc1test1reportfortask0(bool *err, optguardn
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = (tooclose || fabs(va) < 1.0E-8) || fabs(vb) < 1.0E-8;
+         tooclose = tooclose || fabs(va) < 1.0E-8 || fabs(vb) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -42338,7 +42337,7 @@ bool testmincg(bool silent) {
             }
          }
          mincgresults(&state, &x, &rep);
-         referror = (((referror || rep.terminationtype <= 0) || fabs(x.xR[0] - 2) > 0.001) || fabs(x.xR[1]) > 0.001) || fabs(x.xR[2] - 2) > 0.001;
+         referror = referror || rep.terminationtype <= 0 || fabs(x.xR[0] - 2) > 0.001 || fabs(x.xR[1]) > 0.001 || fabs(x.xR[2] - 2) > 0.001;
       // F2 problem with restarts:
       // * make several iterations and restart BEFORE termination
       // * iterate and restart AFTER termination
@@ -42365,13 +42364,13 @@ bool testmincg(bool silent) {
          x.xR[2] = 10 + 10 * randomreal();
          for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) testmincgunit_testfunc2(&state);
          mincgresults(&state, &x, &rep);
-         restartserror = (((restartserror || rep.terminationtype <= 0) || fabs(x.xR[0] - log(2.0)) > 0.01) || fabs(x.xR[1]) > 0.01) || fabs(x.xR[2] - log(2.0)) > 0.01;
+         restartserror = restartserror || rep.terminationtype <= 0 || fabs(x.xR[0] - log(2.0)) > 0.01 || fabs(x.xR[1]) > 0.01 || fabs(x.xR[2] - log(2.0)) > 0.01;
          x.xR[0] = 10 + 10 * randomreal();
          x.xR[1] = 10 + 10 * randomreal();
          x.xR[2] = 10 + 10 * randomreal();
          for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) testmincgunit_testfunc2(&state);
          mincgresults(&state, &x, &rep);
-         restartserror = (((restartserror || rep.terminationtype <= 0) || fabs(x.xR[0] - log(2.0)) > 0.01) || fabs(x.xR[1]) > 0.01) || fabs(x.xR[2] - log(2.0)) > 0.01;
+         restartserror = restartserror || rep.terminationtype <= 0 || fabs(x.xR[0] - log(2.0)) > 0.01 || fabs(x.xR[1]) > 0.01 || fabs(x.xR[2] - log(2.0)) > 0.01;
       // 1D problem #1
          ae_vector_set_length(&x, 0 + 1);
          n = 1;
@@ -42393,7 +42392,7 @@ bool testmincg(bool silent) {
             }
          }
          mincgresults(&state, &x, &rep);
-         linerror1 = (linerror1 || rep.terminationtype <= 0) || fabs(x.xR[0] / pi - round(x.xR[0] / pi)) > 0.001;
+         linerror1 = linerror1 || rep.terminationtype <= 0 || fabs(x.xR[0] / pi - round(x.xR[0] / pi)) > 0.001;
       // 1D problem #2
          ae_vector_set_length(&x, 0 + 1);
          n = 1;
@@ -42415,7 +42414,7 @@ bool testmincg(bool silent) {
             }
          }
          mincgresults(&state, &x, &rep);
-         linerror2 = (linerror2 || rep.terminationtype <= 0) || fabs(x.xR[0]) > 0.001;
+         linerror2 = linerror2 || rep.terminationtype <= 0 || fabs(x.xR[0]) > 0.001;
       // Linear equations
          diffstep = 1.0E-6;
          for (n = 1; n <= 10; n++) {
@@ -42534,14 +42533,14 @@ bool testmincg(bool silent) {
          mincgsetcgtype(&state, cgtype);
          while (mincgiteration(&state)) testmincgunit_testfunc3(&state);
          mincgresults(&state, &x, &rep);
-         converror = converror || !((rep.terminationtype == 5 && rep.iterationscount == 10) || rep.terminationtype == 7);
+         converror = converror || !(rep.terminationtype == 5 && rep.iterationscount == 10 || rep.terminationtype == 7);
       }
    }
 //  Test for MinCGGradientCheck
    optguarderr = false;
    testmincgunit_testoptguard(&optguarderr);
 // end
-   waserrors = (((((((referror || eqerror) || linerror1) || linerror2) || converror) || othererrors) || restartserror) || precerror) || optguarderr;
+   waserrors = referror || eqerror || linerror1 || linerror2 || converror || othererrors || restartserror || precerror || optguarderr;
    if (!silent) {
       printf("TESTING CG OPTIMIZATION\n");
       printf("REFERENCE PROBLEM:                        ");
@@ -42807,8 +42806,8 @@ static void testminlpunit_basictests(bool *err) {
          for (i = 0; i < n; i++) {
             set_error_flag(err, c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol), __FILE__, __LINE__, "testminlpunit.ap:141");
             set_error_flag(err, c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol), __FILE__, __LINE__, "testminlpunit.ap:142");
-            set_error_flag(err, (c.xR[i] > 0.0 && solvertype == 0) && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:143");
-            set_error_flag(err, (c.xR[i] < 0.0 && solvertype == 0) && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:144");
+            set_error_flag(err, c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:143");
+            set_error_flag(err, c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:144");
          }
          for (i = 0; i < n; i++) {
             c.xR[i] = hqrndnormal(&rs);
@@ -42839,8 +42838,8 @@ static void testminlpunit_basictests(bool *err) {
          for (i = 0; i < n; i++) {
             set_error_flag(err, c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol), __FILE__, __LINE__, "testminlpunit.ap:172");
             set_error_flag(err, c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol), __FILE__, __LINE__, "testminlpunit.ap:173");
-            set_error_flag(err, (c.xR[i] > 0.0 && solvertype == 0) && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:174");
-            set_error_flag(err, (c.xR[i] < 0.0 && solvertype == 0) && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:175");
+            set_error_flag(err, c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:174");
+            set_error_flag(err, c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:175");
          }
       // Feasible bounded problems with zeros in cost vector
          for (i = 0; i < n; i++) {
@@ -42868,8 +42867,8 @@ static void testminlpunit_basictests(bool *err) {
          for (i = 0; i < n; i++) {
             set_error_flag(err, c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol), __FILE__, __LINE__, "testminlpunit.ap:205");
             set_error_flag(err, c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol), __FILE__, __LINE__, "testminlpunit.ap:206");
-            set_error_flag(err, (c.xR[i] > 0.0 && solvertype == 0) && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:207");
-            set_error_flag(err, (c.xR[i] < 0.0 && solvertype == 0) && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:208");
+            set_error_flag(err, c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:207");
+            set_error_flag(err, c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:208");
          }
          set_error_flag(err, x.xR[k] != 0.0, __FILE__, __LINE__, "testminlpunit.ap:210");
          bndl.xR[k] = hqrndnormal(&rs);
@@ -42886,8 +42885,8 @@ static void testminlpunit_basictests(bool *err) {
          for (i = 0; i < n; i++) {
             set_error_flag(err, c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol), __FILE__, __LINE__, "testminlpunit.ap:223");
             set_error_flag(err, c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol), __FILE__, __LINE__, "testminlpunit.ap:224");
-            set_error_flag(err, (c.xR[i] > 0.0 && solvertype == 0) && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:225");
-            set_error_flag(err, (c.xR[i] < 0.0 && solvertype == 0) && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:226");
+            set_error_flag(err, c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:225");
+            set_error_flag(err, c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:226");
          }
          set_error_flag(err, x.xR[k] < bndl.xR[k], __FILE__, __LINE__, "testminlpunit.ap:228");
          set_error_flag(err, solvertype == 0 && x.xR[k] != bndl.xR[k], __FILE__, __LINE__, "testminlpunit.ap:229");
@@ -42905,8 +42904,8 @@ static void testminlpunit_basictests(bool *err) {
          for (i = 0; i < n; i++) {
             set_error_flag(err, c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol), __FILE__, __LINE__, "testminlpunit.ap:242");
             set_error_flag(err, c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol), __FILE__, __LINE__, "testminlpunit.ap:243");
-            set_error_flag(err, (c.xR[i] > 0.0 && solvertype == 0) && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:244");
-            set_error_flag(err, (c.xR[i] < 0.0 && solvertype == 0) && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:245");
+            set_error_flag(err, c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:244");
+            set_error_flag(err, c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:245");
          }
          set_error_flag(err, x.xR[k] > bndu.xR[k], __FILE__, __LINE__, "testminlpunit.ap:247");
          set_error_flag(err, solvertype == 0 && x.xR[k] != bndu.xR[k], __FILE__, __LINE__, "testminlpunit.ap:248");
@@ -43005,8 +43004,8 @@ static void testminlpunit_basictests(bool *err) {
       for (i = 0; i < n; i++) {
          set_error_flag(err, c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol), __FILE__, __LINE__, "testminlpunit.ap:349");
          set_error_flag(err, c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol), __FILE__, __LINE__, "testminlpunit.ap:350");
-         set_error_flag(err, (c.xR[i] > 0.0 && solvertype == 0) && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:351");
-         set_error_flag(err, (c.xR[i] < 0.0 && solvertype == 0) && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:352");
+         set_error_flag(err, c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:351");
+         set_error_flag(err, c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:352");
       }
    }
 // Test linearly constrained problems with all variables being boxed ones
@@ -43637,7 +43636,7 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix *a, RVe
             a1.xyR[ccnt + 0][j] = a->xyR[i][j];
             a1.xyR[ccnt + 1][j] = a->xyR[i][j];
          }
-         if ((isfinite(al->xR[i]) && isfinite(au->xR[i])) && al->xR[i] == au->xR[i]) {
+         if (isfinite(al->xR[i]) && isfinite(au->xR[i]) && al->xR[i] == au->xR[i]) {
             a1.xyR[ccnt][n] = al->xR[i];
             ct.xZ[ccnt] = 0;
             ccnt++;
@@ -43902,7 +43901,7 @@ static void testminlpunit_singlecalltests(bool *err) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(err, fabs(x0.xR[i] - x1.xR[i] / s.xR[i]) > 1000 * machineepsilon, __FILE__, __LINE__, "testminlpunit.ap:557");
+            set_error_flag(err, fabs(x0.xR[i] - x1.xR[i] / s.xR[i]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testminlpunit.ap:557");
          }
       }
    }
@@ -44345,10 +44344,10 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                      g += fulla.xyR[i][j] * x1.xR[j];
                   }
                   g *= s.xR[i];
-                  if ((isfinite(bndl.xR[i]) && fabs(x1.xR[i] - bndl.xR[i]) < tolx * s.xR[i]) && g > 0.0) {
+                  if (isfinite(bndl.xR[i]) && fabs(x1.xR[i] - bndl.xR[i]) < tolx * s.xR[i] && g > 0.0) {
                      g = 0.0;
                   }
-                  if ((isfinite(bndu.xR[i]) && fabs(x1.xR[i] - bndu.xR[i]) < tolx * s.xR[i]) && g < 0.0) {
+                  if (isfinite(bndu.xR[i]) && fabs(x1.xR[i] - bndu.xR[i]) < tolx * s.xR[i] && g < 0.0) {
                      g = 0.0;
                   }
                   gnorm += sqr(g);
@@ -44462,10 +44461,10 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                   for (j = 0; j < n; j++) {
                      g += fulla.xyR[i][j] * x1.xR[j];
                   }
-                  if ((isfinite(bndl.xR[i]) && fabs(x1.xR[i] - bndl.xR[i]) < tolx) && g > 0.0) {
+                  if (isfinite(bndl.xR[i]) && fabs(x1.xR[i] - bndl.xR[i]) < tolx && g > 0.0) {
                      g = 0.0;
                   }
-                  if ((isfinite(bndu.xR[i]) && fabs(x1.xR[i] - bndu.xR[i]) < tolx) && g < 0.0) {
+                  if (isfinite(bndu.xR[i]) && fabs(x1.xR[i] - bndu.xR[i]) < tolx && g < 0.0) {
                      g = 0.0;
                   }
                   gnorm += sqr(g);
@@ -45733,7 +45732,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                      k++;
                      continue;
                   }
-                  if ((ct.xZ[i] > 0 && v <= tolconstr) || (ct.xZ[i] < 0 && v >= -tolconstr)) {
+                  if (ct.xZ[i] > 0 && v <= tolconstr || ct.xZ[i] < 0 && v >= -tolconstr) {
                      for (j = 0; j < n; j++) {
                         ce.xyR[j][k] = sign((double)ct.xZ[i]) * c.xyR[i][j];
                      }
@@ -46016,10 +46015,10 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   g.xR[i] += fulla.xyR[i][j] * x1.xR[j];
                }
                g.xR[i] *= s.xR[i];
-               if ((isfinite(bndl.xR[i]) && fabs(x1.xR[i] - bndl.xR[i]) < tolx * s.xR[i]) && g.xR[i] > 0.0) {
+               if (isfinite(bndl.xR[i]) && fabs(x1.xR[i] - bndl.xR[i]) < tolx * s.xR[i] && g.xR[i] > 0.0) {
                   g.xR[i] = 0.0;
                }
-               if ((isfinite(bndu.xR[i]) && fabs(x1.xR[i] - bndu.xR[i]) < tolx * s.xR[i]) && g.xR[i] < 0.0) {
+               if (isfinite(bndu.xR[i]) && fabs(x1.xR[i] - bndu.xR[i]) < tolx * s.xR[i] && g.xR[i] < 0.0) {
                   g.xR[i] = 0.0;
                }
                gnorm2 += sqr(g.xR[i]);
@@ -47352,9 +47351,9 @@ static void testminnlcunit_testother(bool *wereerrors) {
    // Preconditioners must be significantly different,
    // with exact being best one, inexact being second,
    // "none" being worst option.
-      set_error_flag(wereerrors, !((double)nexactlowrank < 0.9 * nlbfgs), __FILE__, __LINE__, "testminnlcunit.ap:3795");
-      set_error_flag(wereerrors, !((double)nexactrobust < 0.9 * nlbfgs), __FILE__, __LINE__, "testminnlcunit.ap:3796");
-      set_error_flag(wereerrors, !((double)nlbfgs < 0.9 * nnone), __FILE__, __LINE__, "testminnlcunit.ap:3797");
+      set_error_flag(wereerrors, !(nexactlowrank < 0.9 * nlbfgs), __FILE__, __LINE__, "testminnlcunit.ap:3795");
+      set_error_flag(wereerrors, !(nexactrobust < 0.9 * nlbfgs), __FILE__, __LINE__, "testminnlcunit.ap:3796");
+      set_error_flag(wereerrors, !(nlbfgs < 0.9 * nnone), __FILE__, __LINE__, "testminnlcunit.ap:3797");
    }
    ae_frame_leave();
 }
@@ -47698,7 +47697,7 @@ static void testminnlcunit_testoptguardc1test1reportfortask0(bool *err, optguard
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = (tooclose || fabs(va) < 1.0E-8) || fabs(vb) < 1.0E-8;
+         tooclose = tooclose || fabs(va) < 1.0E-8 || fabs(vb) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -48334,8 +48333,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                         stplen += sqr(state.x.xR[i] - xlast.xR[i]);
                      }
                      stplen = sqrt(stplen);
-                     wasgoodlinesearch0 = wasgoodlinesearch0 || ((cntbelow >= 2 && cntabove >= 2) && stplen >= shortstplen);
-                     wasgoodlinesearch1 = wasgoodlinesearch1 || ((cntbelow >= 2 && cntabove >= 2) && stplen >= shortstplen);
+                     wasgoodlinesearch0 = wasgoodlinesearch0 || cntbelow >= 2 && cntabove >= 2 && stplen >= shortstplen;
+                     wasgoodlinesearch1 = wasgoodlinesearch1 || cntbelow >= 2 && cntabove >= 2 && stplen >= shortstplen;
                   }
                // Start new line search
                   linesearchstarted = true;
@@ -48782,7 +48781,7 @@ bool testminnlc(bool silent) {
    testminnlcunit_testother(&othererr);
    testminnlcunit_testoptguard(&optguarderr);
 // end
-   waserrors = ((((bcerr || lcerr) || nlcerr) || othererr) || bugs) || optguarderr;
+   waserrors = bcerr || lcerr || nlcerr || othererr || bugs || optguarderr;
    if (!silent) {
       printf("TESTING MINNLC OPTIMIZATION\n");
       printf("GENERIC TESTS:\n");
@@ -49356,16 +49355,16 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:668");
          set_error_flag(othererrors, werexreports && !requirexrep, __FILE__, __LINE__, "testminnsunit.ap:669");
          set_error_flag(othererrors, requirexrep && !werexreports, __FILE__, __LINE__, "testminnsunit.ap:670");
-         set_error_flag(othererrors, repferr > 10000 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:671");
-         if (*primaryerrors || (*othererrors)) {
+         set_error_flag(othererrors, repferr > 10000.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:671");
+         if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
             set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || fabs(x1.xR[i] - xc.xR[i]) / s.xR[i] > xtol, __FILE__, __LINE__, "testminnsunit.ap:676");
             if (requirexrep) {
-               set_error_flag(othererrors, !isfinite(xrfirst.xR[i]) || fabs(x0.xR[i] - xrfirst.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:679");
-               set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || fabs(x1.xR[i] - xrlast.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:680");
+               set_error_flag(othererrors, !isfinite(xrfirst.xR[i]) || fabs(x0.xR[i] - xrfirst.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:679");
+               set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || fabs(x1.xR[i] - xrlast.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:680");
             }
          }
       // Test numerical differentiation:
@@ -49405,8 +49404,8 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:731");
-         set_error_flag(othererrors, repferr > 10000 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:732");
-         if (*primaryerrors || (*othererrors)) {
+         set_error_flag(othererrors, repferr > 10000.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:732");
+         if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
@@ -49454,7 +49453,7 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:788");
-         if (*primaryerrors || (*othererrors)) {
+         if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
@@ -49474,12 +49473,12 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1s, &rep);
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:818");
-         if (*primaryerrors || (*othererrors)) {
+         if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, (!isfinite(x1.xR[i]) || !isfinite(x1s.xR[i])) || fabs(x1.xR[i] - x1s.xR[i] / s.xR[i]) > 1.0E-4, __FILE__, __LINE__, "testminnsunit.ap:823");
+            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || fabs(x1.xR[i] - x1s.xR[i] / s.xR[i]) > 1.0E-4, __FILE__, __LINE__, "testminnsunit.ap:823");
             set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || fabs(x1s.xR[i] - xrlast.xR[i]) > testminnsunit_scalingtesttol, __FILE__, __LINE__, "testminnsunit.ap:827");
          }
       }
@@ -49607,8 +49606,8 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:953");
          set_error_flag(othererrors, werexreports && !requirexrep, __FILE__, __LINE__, "testminnsunit.ap:954");
          set_error_flag(othererrors, requirexrep && !werexreports, __FILE__, __LINE__, "testminnsunit.ap:955");
-         set_error_flag(othererrors, repferr > 10000 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:956");
-         if (*primaryerrors || (*othererrors)) {
+         set_error_flag(othererrors, repferr > 10000.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:956");
+         if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
@@ -49617,8 +49616,8 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             set_error_flag(primaryerrors, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnsunit.ap:962");
             set_error_flag(primaryerrors, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnsunit.ap:963");
             if (requirexrep) {
-               set_error_flag(othererrors, !isfinite(xrfirst.xR[i]) || fabs(rboundval(x0.xR[i], bndl.xR[i], bndu.xR[i]) - xrfirst.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:966");
-               set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || fabs(x1.xR[i] - xrlast.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:967");
+               set_error_flag(othererrors, !isfinite(xrfirst.xR[i]) || fabs(rboundval(x0.xR[i], bndl.xR[i], bndu.xR[i]) - xrfirst.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:966");
+               set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || fabs(x1.xR[i] - xrlast.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:967");
             }
          }
       }
@@ -49670,7 +49669,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
          } else ae_assert(false, "Assertion failed");
       minnsresults(&state, &x1, &rep);
       set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1030");
-      if (*primaryerrors || (*othererrors)) {
+      if (*primaryerrors || *othererrors) {
          ae_frame_leave();
          return;
       }
@@ -49800,8 +49799,8 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1186");
-         set_error_flag(othererrors, repferr > 10000 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:1187");
-         if (*primaryerrors || (*othererrors)) {
+         set_error_flag(othererrors, repferr > 10000.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:1187");
+         if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
@@ -49879,7 +49878,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1272");
-         if (*primaryerrors || (*othererrors)) {
+         if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
@@ -49895,12 +49894,12 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1s, &rep);
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1293");
-         if (*primaryerrors || (*othererrors)) {
+         if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, (!isfinite(x1.xR[i]) || !isfinite(x1s.xR[i])) || fabs(x1.xR[i] - x1s.xR[i] / s.xR[i]) > testminnsunit_scalingtesttol, __FILE__, __LINE__, "testminnsunit.ap:1297");
+            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || fabs(x1.xR[i] - x1s.xR[i] / s.xR[i]) > testminnsunit_scalingtesttol, __FILE__, __LINE__, "testminnsunit.ap:1297");
          }
       }
    }
@@ -50008,8 +50007,8 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
          minnsresults(&state, &x1, &rep);
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1402");
          set_error_flag(primaryerrors, !isfinite(flast0), __FILE__, __LINE__, "testminnsunit.ap:1403");
-         set_error_flag(othererrors, repferr > 10000 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:1404");
-         if (*primaryerrors || (*othererrors)) {
+         set_error_flag(othererrors, repferr > 10000.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:1404");
+         if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
@@ -50054,7 +50053,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
          minnsresults(&state, &x2, &rep);
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1462");
          set_error_flag(primaryerrors, !isfinite(flast1), __FILE__, __LINE__, "testminnsunit.ap:1463");
-         if (*primaryerrors || (*othererrors)) {
+         if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
@@ -50098,7 +50097,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1516");
          for (i = 0; i < n; i++) {
             set_error_flag(primaryerrors, !isfinite(x1.xR[i]), __FILE__, __LINE__, "testminnsunit.ap:1519");
-            set_error_flag(primaryerrors, (fabs(x1.xR[i] - 1) > xtol && fabs(x1.xR[i]) > xtol) && fabs(x1.xR[i] + 1) > xtol, __FILE__, __LINE__, "testminnsunit.ap:1520");
+            set_error_flag(primaryerrors, fabs(x1.xR[i] - 1) > xtol && fabs(x1.xR[i]) > xtol && fabs(x1.xR[i] + 1) > xtol, __FILE__, __LINE__, "testminnsunit.ap:1520");
          }
       // Test scaling: we perform several steps on unit-scale problem,
       // then we perform same amount of steps on re-scaled problem,
@@ -50183,7 +50182,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1622");
-         if (*primaryerrors || (*othererrors)) {
+         if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
@@ -50199,12 +50198,12 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1s, &rep);
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1643");
-         if (*primaryerrors || (*othererrors)) {
+         if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, (!isfinite(x1.xR[i]) || !isfinite(x1s.xR[i])) || fabs(x1.xR[i] - x1s.xR[i] / s.xR[i]) > testminnsunit_scalingtesttol, __FILE__, __LINE__, "testminnsunit.ap:1647");
+            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || fabs(x1.xR[i] - x1s.xR[i] / s.xR[i]) > testminnsunit_scalingtesttol, __FILE__, __LINE__, "testminnsunit.ap:1647");
          }
       }
    }
@@ -50301,7 +50300,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                   } else ae_assert(false, "Assertion failed");
                minnsresults(&state, &x1, &rep);
                set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1743");
-               if (*primaryerrors || (*othererrors)) {
+               if (*primaryerrors || *othererrors) {
                   ae_frame_leave();
                   return;
                }
@@ -50362,7 +50361,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                   } else ae_assert(false, "Assertion failed");
                minnsresults(&state, &x1, &rep);
                set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1813");
-               if (*primaryerrors || (*othererrors)) {
+               if (*primaryerrors || *othererrors) {
                   ae_frame_leave();
                   return;
                }
@@ -50443,7 +50442,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                   } else ae_assert(false, "Assertion failed");
                minnsresults(&state, &x1, &rep);
                set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1906");
-               if (*primaryerrors || (*othererrors)) {
+               if (*primaryerrors || *othererrors) {
                   ae_frame_leave();
                   return;
                }
@@ -50465,7 +50464,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                   } else ae_assert(false, "Assertion failed");
                minnsresults(&state, &x1s, &rep);
                for (i = 0; i < n; i++) {
-                  set_error_flag(primaryerrors, (!isfinite(x1.xR[i]) || !isfinite(x1s.xR[i])) || fabs(x1.xR[i] - x1s.xR[i] / s.xR[i]) > testminnsunit_scalingtesttol, __FILE__, __LINE__, "testminnsunit.ap:1937");
+                  set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || fabs(x1.xR[i] - x1s.xR[i] / s.xR[i]) > testminnsunit_scalingtesttol, __FILE__, __LINE__, "testminnsunit.ap:1937");
                }
             }
          }
@@ -50566,7 +50565,7 @@ bool testminns(bool silent) {
    testminnsunit_testlc(&lcerrors, &othererrors);
    testminnsunit_testnlc(&nlcerrors, &othererrors);
 // end
-   wereerrors = (((ucerrors || bcerrors) || lcerrors) || nlcerrors) || othererrors;
+   wereerrors = ucerrors || bcerrors || lcerrors || nlcerrors || othererrors;
    if (!silent) {
       printf("TESTING MINNS OPTIMIZATION\n");
       printf("TESTS:\n");
@@ -51123,7 +51122,7 @@ static void testminbcunit_testother(bool *err) {
       }
       minbcresults(&state, &x, &rep);
       r = v / (s.xR[0] * diffstep);
-      set_error_flag(err, fabs(log(r)) > log(1 + 1000 * machineepsilon), __FILE__, __LINE__, "testminbcunit.ap:618");
+      set_error_flag(err, fabs(log(r)) > log(1.0 + 1000.0 * machineepsilon), __FILE__, __LINE__, "testminbcunit.ap:618");
    }
 // Test stpmax
    for (pass = 1; pass <= passcount; pass++) {
@@ -51332,7 +51331,7 @@ static void testminbcunit_testother(bool *err) {
       ae_vector_set_length(&x, 2);
       ae_vector_set_length(&bl, 2);
       ae_vector_set_length(&bu, 2);
-      x.xR[0] = 10 * machineepsilon;
+      x.xR[0] = 10.0 * machineepsilon;
       x.xR[1] = 1.0;
       bl.xR[0] = 0.0;
       bu.xR[0] = +INFINITY;
@@ -51352,12 +51351,12 @@ static void testminbcunit_testother(bool *err) {
          }
          while (minbciteration(&state))
             if (state.needfg) {
-               state.f = sqr(state.x.xR[0] + 1) + sqr(state.x.xR[1] + 1) + 10000 * machineepsilon * randomreal();
+               state.f = sqr(state.x.xR[0] + 1) + sqr(state.x.xR[1] + 1) + 10000.0 * machineepsilon * randomreal();
                state.g.xR[0] = 2 * (state.x.xR[0] + 1);
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
             }
          minbcresults(&state, &xf, &rep);
-         if ((rep.terminationtype <= 0 || xf.xR[0] != 0.0) || xf.xR[1] != 0.0) {
+         if (rep.terminationtype <= 0 || xf.xR[0] != 0.0 || xf.xR[1] != 0.0) {
             set_error_flag(err, true, __FILE__, __LINE__, "testminbcunit.ap:889");
             ae_frame_leave();
             return;
@@ -51388,7 +51387,7 @@ static void testminbcunit_testother(bool *err) {
       ae_vector_set_length(&x, 2);
       ae_vector_set_length(&bl, 2);
       ae_vector_set_length(&bu, 2);
-      x.xR[0] = 10 * machineepsilon;
+      x.xR[0] = 10.0 * machineepsilon;
       x.xR[1] = 1.0;
       bl.xR[0] = 0.0;
       bu.xR[0] = +INFINITY;
@@ -51416,7 +51415,7 @@ static void testminbcunit_testother(bool *err) {
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
             }
          minbcresults(&state, &xf, &rep);
-         if ((rep.terminationtype <= 0 || xf.xR[0] != 0.0) || xf.xR[1] != 0.0) {
+         if (rep.terminationtype <= 0 || xf.xR[0] != 0.0 || xf.xR[1] != 0.0) {
             set_error_flag(err, true, __FILE__, __LINE__, "testminbcunit.ap:952");
             ae_frame_leave();
             return;
@@ -51805,7 +51804,7 @@ static void testminbcunit_testoptguardc1test1reportfortask0(bool *err, optguardn
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = (tooclose || fabs(va) < 1.0E-8) || fabs(vb) < 1.0E-8;
+         tooclose = tooclose || fabs(va) < 1.0E-8 || fabs(vb) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -52351,7 +52350,7 @@ bool testminbc(bool silent) {
    testminbcunit_testpreconditioning(&precerrors);
    testminbcunit_testoptguard(&optguarderrors);
 // end
-   waserrors = ((((feasibilityerrors || othererrors) || converrors) || interrors) || precerrors) || optguarderrors;
+   waserrors = feasibilityerrors || othererrors || converrors || interrors || precerrors || optguarderrors;
    if (!silent) {
       printf("TESTING BC OPTIMIZATION\n");
       printf("FEASIBILITY PROPERTIES:                   ");
@@ -52503,7 +52502,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
    qcount = 10;
    ae_assert(n > 0, "Assertion failed");
 // Tol - roundoff error tolerance (for ' >= ' comparisons)
-   errtol = 100000 * machineepsilon;
+   errtol = 100000.0 * machineepsilon;
 // Evaluate bounding box and spread.
    ae_vector_set_length(&boxmin, nx);
    ae_vector_set_length(&boxmax, nx);
@@ -52570,7 +52569,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       kx = kdtreequeryknn(&treex, &ptx, k, true);
       kxy = kdtreequeryknn(&treexy, &ptx, k, true);
       kt = kdtreequeryknn(&treext, &ptx, k, true);
-      if ((kx != k || kxy != k) || kt != k) {
+      if (kx != k || kxy != k || kt != k) {
          *kdterrors = true;
          ae_frame_leave();
          return;
@@ -52635,7 +52634,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       kdtreequeryknn(&treex, &ptx, 1, true);
       kdtreequeryknn(&treexy, &ptx, 1, true);
       kdtreequeryknn(&treext, &ptx, 1, true);
-      if ((kx != k || kxy != k) || kt != k) {
+      if (kx != k || kxy != k || kt != k) {
          *kdterrors = true;
          ae_frame_leave();
          return;
@@ -52683,7 +52682,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          kx = kdtreequeryknn(&treex, &ptx, k, true);
          kxy = kdtreequeryknn(&treexy, &ptx, k, true);
          kt = kdtreequeryknn(&treext, &ptx, k, true);
-         if ((kx != k || kxy != k) || kt != k) {
+         if (kx != k || kxy != k || kt != k) {
             *kdterrors = true;
             ae_frame_leave();
             return;
@@ -52703,7 +52702,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          kx = kdtreequeryknn(&treex, &ptx, k, true);
          kxy = kdtreequeryknn(&treexy, &ptx, k, true);
          kt = kdtreequeryknn(&treext, &ptx, k, true);
-         if ((kx != k || kxy != k) || kt != k) {
+         if (kx != k || kxy != k || kt != k) {
             *kdterrors = true;
             ae_frame_leave();
             return;
@@ -52739,7 +52738,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
             kx = kdtreequeryknn(&treex, &ptx, k, true);
             kxy = kdtreequeryknn(&treexy, &ptx, k, true);
             kt = kdtreequeryknn(&treext, &ptx, k, true);
-            if ((kx != k || kxy != k) || kt != k) {
+            if (kx != k || kxy != k || kt != k) {
                *kdterrors = true;
                ae_frame_leave();
                return;
@@ -52753,8 +52752,8 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
             kdtreequeryresultstagsi(&treext, &qtags);
             kdtreequeryresultsdistancesi(&treext, &qr);
             *kdterrors = *kdterrors || testnearestneighborunit_kdtresultsdifferent(xy, n, &qx, &qxy, &qtags, k, nx, ny);
-            *kdterrors = (*kdterrors || qx.rows != k) || qx.cols != nx;
-            *kdterrors = (*kdterrors || qxy.rows != k) || qxy.cols != nx + ny;
+            *kdterrors = *kdterrors || qx.rows != k || qx.cols != nx;
+            *kdterrors = *kdterrors || qxy.rows != k || qxy.cols != nx + ny;
             *kdterrors = *kdterrors || qtags.cnt != k;
             *kdterrors = *kdterrors || qr.cnt != k;
          }
@@ -52791,7 +52790,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       kx = kdtreequeryaknn(&treex, &ptx, k, true, eps);
       kxy = kdtreequeryaknn(&treexy, &ptx, k, true, eps);
       kt = kdtreequeryaknn(&treext, &ptx, k, true, eps);
-      if ((kx != k || kxy != k) || kt != k) {
+      if (kx != k || kxy != k || kt != k) {
          *kdterrors = true;
          ae_frame_leave();
          return;
@@ -52856,7 +52855,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       kdtreequeryknn(&treex, &ptx, 1, true);
       kdtreequeryknn(&treexy, &ptx, 1, true);
       kdtreequeryknn(&treext, &ptx, 1, true);
-      if ((kx != k || kxy != k) || kt != k) {
+      if (kx != k || kxy != k || kt != k) {
          *kdterrors = true;
          ae_frame_leave();
          return;
@@ -53198,7 +53197,7 @@ static void testnearestneighborunit_testkdtreeserialization(bool *err) {
    NewMatrix(xy1, 0, 0, DT_REAL);
    NewVector(tags0, 0, DT_INT);
    NewVector(tags1, 0, DT_INT);
-   threshold = 100 * machineepsilon;
+   threshold = 100.0 * machineepsilon;
 // different N, NX, NY, NormType
    n = 1;
    while (n <= 51) {
@@ -54194,7 +54193,7 @@ bool testschur(bool silent) {
    waserrors = false;
    maxn = 70;
    passcount = 1;
-   threshold = 5 * 100 * machineepsilon;
+   threshold = 5.0 * 100.0 * machineepsilon;
    ae_matrix_set_length(&a, maxn - 1 + 1, maxn - 1 + 1);
 // zero matrix, several cases
    for (i = 0; i < maxn; i++) {
@@ -54223,7 +54222,7 @@ bool testschur(bool silent) {
       }
    }
 // report
-   waserrors = ((materr > threshold || orterr > threshold) || errstruct) || wfailed;
+   waserrors = materr > threshold || orterr > threshold || errstruct || wfailed;
    if (!silent) {
       printf("TESTING SCHUR DECOMPOSITION\n");
       printf("Schur decomposition error:               %5.3e\n", materr);
@@ -54287,7 +54286,7 @@ bool testspdgevd(bool silent) {
    NewMatrix(bfull, 0, 0, DT_REAL);
    NewMatrix(l, 0, 0, DT_REAL);
    NewMatrix(z, 0, 0, DT_REAL);
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    valerr = 0.0;
    wfailed = false;
    wnsorted = false;
@@ -54407,7 +54406,7 @@ bool testspdgevd(bool silent) {
       }
    }
 // report
-   waserrors = (valerr > threshold || wfailed) || wnsorted;
+   waserrors = valerr > threshold || wfailed || wnsorted;
    if (!silent) {
       printf("TESTING SYMMETRIC GEVD\n");
       printf("Av-lambdav error (generalized):          %5.3e\n", valerr);
@@ -54448,14 +54447,14 @@ bool testgammafunc(bool silent) {
    gammaerrors = false;
    lngammaerrors = false;
    waserrors = false;
-   threshold = 100 * machineepsilon;
+   threshold = 100.0 * machineepsilon;
 //
    gammaerrors = gammaerrors || fabs(gammafunction(0.5) - sqrt(pi)) > threshold;
    gammaerrors = gammaerrors || fabs(gammafunction(1.5) - 0.5 * sqrt(pi)) > threshold;
    v = lngamma(0.5, &s);
-   lngammaerrors = (lngammaerrors || fabs(v - log(sqrt(pi))) > threshold) || s != 1.0;
+   lngammaerrors = lngammaerrors || fabs(v - log(sqrt(pi))) > threshold || s != 1.0;
    v = lngamma(1.5, &s);
-   lngammaerrors = (lngammaerrors || fabs(v - log(0.5 * sqrt(pi))) > threshold) || s != 1.0;
+   lngammaerrors = lngammaerrors || fabs(v - log(0.5 * sqrt(pi))) > threshold || s != 1.0;
 // report
    waserrors = gammaerrors || lngammaerrors;
    if (!silent) {
@@ -54835,7 +54834,7 @@ bool testgq(bool silent) {
    waserrors = false;
    errtol = 1.0E-12;
    nonstricterrtol = 1.0E-6;
-   stricterrtol = 1000 * machineepsilon;
+   stricterrtol = 1000.0 * machineepsilon;
 // Three tests for rec-based Gauss quadratures with known weights/nodes:
 // 1. Gauss-Legendre with N=2
 // 2. Gauss-Legendre with N=5
@@ -55257,7 +55256,7 @@ bool testgkq(bool silent) {
    vstblerrors = false;
    generrors = false;
    waserrors = false;
-   errtol = 10000 * machineepsilon;
+   errtol = 10000.0 * machineepsilon;
 // test recurrence-based Legendre nodes against the precalculated table
    for (pkind = 0; pkind <= 5; pkind++) {
       n = 0;
@@ -55331,10 +55330,10 @@ bool testgkq(bool silent) {
             }
          }
       }
-      generrors = (generrors || err > errtol) || !successatleastonce;
+      generrors = generrors || err > errtol || !successatleastonce;
    }
 // end
-   waserrors = (intblerrors || vstblerrors) || generrors;
+   waserrors = intblerrors || vstblerrors || generrors;
    if (!silent) {
       printf("TESTING GAUSS-KRONROD QUADRATURES\n");
       printf("FINAL RESULT:                             ");
@@ -55395,7 +55394,7 @@ bool testautogk(bool silent) {
    simpleerrors = false;
    sngenderrors = false;
    waserrors = false;
-   errtol = 10000 * machineepsilon;
+   errtol = 10000.0 * machineepsilon;
 // Simple test: integral(exp(x),+-1,+-2), no maximum width requirements
    a = (2 * randominteger(2) - 1) * 1.0;
    b = (2 * randominteger(2) - 1) * 2.0;
@@ -55839,7 +55838,7 @@ static void testbasestatunit_testranking(bool *err) {
       rankdatacentered(&xy1, npoints, nfeatures);
       for (i = 0; i < npoints; i++) {
          for (j = 0; j < nfeatures; j++) {
-            if (xy1.xyR[i][j] != round(xy2.xyR[i][j]) - (double)(nfeatures - 1) / 2.0) {
+            if (xy1.xyR[i][j] != round(xy2.xyR[i][j]) - (nfeatures - 1) / 2.0) {
                *err = true;
             }
          }
@@ -55868,65 +55867,65 @@ static void testbasestatunit_testranking(bool *err) {
       }
    }
    rankdata(&xy0, npoints, nfeatures);
-   if (fabs(xy0.xyR[0][0] - 0.5) > 10 * machineepsilon) {
+   if (fabs(xy0.xyR[0][0] - 0.5) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy0.xyR[0][1] - 3.0) > 10 * machineepsilon) {
+   if (fabs(xy0.xyR[0][1] - 3.0) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy0.xyR[0][2] - 2.0) > 10 * machineepsilon) {
+   if (fabs(xy0.xyR[0][2] - 2.0) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy0.xyR[0][3] - 0.5) > 10 * machineepsilon) {
+   if (fabs(xy0.xyR[0][3] - 0.5) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy0.xyR[1][0] - 1.0) > 10 * machineepsilon) {
+   if (fabs(xy0.xyR[1][0] - 1.0) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy0.xyR[1][1] - 1.0) > 10 * machineepsilon) {
+   if (fabs(xy0.xyR[1][1] - 1.0) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy0.xyR[1][2] - 1.0) > 10 * machineepsilon) {
+   if (fabs(xy0.xyR[1][2] - 1.0) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy0.xyR[1][3] - 3.0) > 10 * machineepsilon) {
+   if (fabs(xy0.xyR[1][3] - 3.0) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy0.xyR[2][0] - 1.5) > 10 * machineepsilon) {
+   if (fabs(xy0.xyR[2][0] - 1.5) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy0.xyR[2][1] - 1.5) > 10 * machineepsilon) {
+   if (fabs(xy0.xyR[2][1] - 1.5) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy0.xyR[2][2] - 1.5) > 10 * machineepsilon) {
+   if (fabs(xy0.xyR[2][2] - 1.5) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy0.xyR[2][3] - 1.5) > 10 * machineepsilon) {
+   if (fabs(xy0.xyR[2][3] - 1.5) > 10.0 * machineepsilon) {
       *err = true;
    }
    rankdatacentered(&xy1, npoints, nfeatures);
-   if (fabs(xy1.xyR[0][0] + 1.0) > 10 * machineepsilon) {
+   if (fabs(xy1.xyR[0][0] + 1.0) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy1.xyR[0][1] - 1.5) > 10 * machineepsilon) {
+   if (fabs(xy1.xyR[0][1] - 1.5) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy1.xyR[0][2] - 0.5) > 10 * machineepsilon) {
+   if (fabs(xy1.xyR[0][2] - 0.5) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy1.xyR[0][3] + 1.0) > 10 * machineepsilon) {
+   if (fabs(xy1.xyR[0][3] + 1.0) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy1.xyR[1][0] + 0.5) > 10 * machineepsilon) {
+   if (fabs(xy1.xyR[1][0] + 0.5) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy1.xyR[1][1] + 0.5) > 10 * machineepsilon) {
+   if (fabs(xy1.xyR[1][1] + 0.5) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy1.xyR[1][2] + 0.5) > 10 * machineepsilon) {
+   if (fabs(xy1.xyR[1][2] + 0.5) > 10.0 * machineepsilon) {
       *err = true;
    }
-   if (fabs(xy1.xyR[1][3] - 1.5) > 10 * machineepsilon) {
+   if (fabs(xy1.xyR[1][3] - 1.5) > 10.0 * machineepsilon) {
       *err = true;
    }
    if (xy1.xyR[2][0] != 0.0) {
@@ -55985,7 +55984,7 @@ bool testbasestat(bool silent) {
    s1errors = false;
    covcorrerrors = false;
    rankerrors = false;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
 // Ranking
    testbasestatunit_testranking(&rankerrors);
 // * prepare X and Y - two test samples
@@ -56162,7 +56161,7 @@ bool testbasestat(bool silent) {
       }
    }
 // Final report
-   waserrors = (s1errors || covcorrerrors) || rankerrors;
+   waserrors = s1errors || covcorrerrors || rankerrors;
    if (!silent) {
       printf("DESC.STAT TEST\n");
       printf("TOTAL RESULTS:                           ");
@@ -56306,11 +56305,11 @@ bool testmannwhitneyu(bool silent) {
       // Generate uniform and sorted X/Y spanning [0,1]
          ae_vector_set_length(&x, n);
          for (i = 0; i < n; i++) {
-            x.xR[i] = (double)i / (n - 1) + 100 * machineepsilon * hqrndnormal(&rs);
+            x.xR[i] = (double)i / (n - 1) + 100.0 * machineepsilon * hqrndnormal(&rs);
          }
          ae_vector_set_length(&y, m);
          for (i = 0; i < m; i++) {
-            y.xR[i] = (double)i / (m - 1) + 100 * machineepsilon * hqrndnormal(&rs);
+            y.xR[i] = (double)i / (m - 1) + 100.0 * machineepsilon * hqrndnormal(&rs);
          }
       // Test 100 values of E
          ecnt = 100;
@@ -56879,7 +56878,7 @@ bool testratint(bool silent) {
 // LipschitzTol     Lipschitz constant increase allowed
 //                  when calculating constant on a twice denser grid
    passcount = 5;
-   threshold = 1000000 * machineepsilon;
+   threshold = 1000000.0 * machineepsilon;
    lipschitztol = 1.3;
 // Basic barycentric functions
    for (n = 1; n <= 10; n++) {
@@ -56950,7 +56949,7 @@ bool testratint(bool silent) {
                v2 = x.xR[i] + (t - x.xR[i]) * (j + 1) / k;
                s2 = rmax2(s2, fabs(barycentriccalc(&b1, v2) - barycentriccalc(&b1, v1)) / fabs(v2 - v1));
             }
-            bcerrors = bcerrors || (s2 > lipschitztol * s1 && s1 > threshold * k);
+            bcerrors = bcerrors || s2 > lipschitztol * s1 && s1 > threshold * k;
          }
       // test differentiation properties
          for (i = 0; i < n; i++) {
@@ -58514,7 +58513,7 @@ static bool testspline1dunit_testunpack(spline1dinterpolant *c, RVector *x) {
    for (i = 0; i < n - 1; i++) {
       err = rmax2(err, fabs(x->xR[i + 1] - tbl.xyR[i][1]));
    }
-   result = err < 100 * machineepsilon;
+   result = err < 100.0 * machineepsilon;
    ae_frame_leave();
    return result;
 }
@@ -58585,7 +58584,7 @@ static bool testspline1dunit_testmonotonespline() {
    NewVector(y, 0, DT_REAL);
    NewVector(d, 0, DT_REAL);
    NewVector(n, 0, DT_INT);
-   eps = 100 * machineepsilon;
+   eps = 100.0 * machineepsilon;
 // Special test - N=2.
 //
 // Following properties are tested:
@@ -58859,7 +58858,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
 // * threshold - for tests which must be satisfied exactly
 // * nonstrictthreshold - for approximate tests
    passcount = 20;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    nonstrictthreshold = 1.0E-6;
    lipschitzeps = 1.0E-6;
    *fiterrors = false;
@@ -59188,7 +59187,7 @@ bool testspline1d(bool silent) {
    maxn = 10;
    lipschitzeps = 1.0E-5;
    lipschitztol = 1.25;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    lserrors = false;
    cserrors = false;
    crserrors = false;
@@ -59347,8 +59346,8 @@ bool testspline1d(bool silent) {
                   err = rmax2(err, fabs(br - t));
                }
                if (bltype == -1 || brtype == -1) {
-                  spline1ddiff(&c, a + 100 * machineepsilon, &s, &ds, &d2s);
-                  spline1ddiff(&c, b - 100 * machineepsilon, &s2, &ds2, &d2s2);
+                  spline1ddiff(&c, a + 100.0 * machineepsilon, &s, &ds, &d2s);
+                  spline1ddiff(&c, b - 100.0 * machineepsilon, &s2, &ds2, &d2s2);
                   err = rmax2(err, fabs(s - s2));
                   err = rmax2(err, fabs(ds - ds2));
                   err = rmax2(err, fabs(d2s - d2s2));
@@ -59497,8 +59496,8 @@ bool testspline1d(bool silent) {
                err = rmax2(err, fabs(t));
             }
             if (bltype == -1) {
-               spline1ddiff(&c, a + 100 * machineepsilon, &s, &ds, &d2s);
-               spline1ddiff(&c, b - 100 * machineepsilon, &s2, &ds2, &d2s2);
+               spline1ddiff(&c, a + 100.0 * machineepsilon, &s, &ds, &d2s);
+               spline1ddiff(&c, b - 100.0 * machineepsilon, &s2, &ds2, &d2s2);
                err = rmax2(err, fabs(s - s2));
                err = rmax2(err, fabs(ds - ds2));
             }
@@ -59783,16 +59782,16 @@ bool testspline1d(bool silent) {
    ierrors = ierrors || fabs(intab - 1) > 0.001;
    for (i = -10; i <= 10; i++) {
       ierrors = ierrors || fabs(spline1dintegrate(&c, i + v) - (i * intab + vr)) > 0.001;
-      ierrors = ierrors || fabs(spline1dintegrate(&c, i - 1000 * machineepsilon) - i * intab) > 0.001;
+      ierrors = ierrors || fabs(spline1dintegrate(&c, i - 1000.0 * machineepsilon) - i * intab) > 0.001;
       ierrors = ierrors || fabs(spline1dintegrate(&c, (double)i) - i * intab) > 0.001;
-      ierrors = ierrors || fabs(spline1dintegrate(&c, i + 1000 * machineepsilon) - i * intab) > 0.001;
+      ierrors = ierrors || fabs(spline1dintegrate(&c, i + 1000.0 * machineepsilon) - i * intab) > 0.001;
    }
 // Test monotone cubic Hermit interpolation
    monotoneerr = testspline1dunit_testmonotonespline();
 // Test fitting errors
    testspline1dunit_testsplinefitting(&fiterr);
 // report
-   waserrors = ((((((((((lserrors || cserrors) || crserrors) || hserrors) || aserrors) || dserrors) || cperrors) || uperrors) || lterrors) || ierrors) || monotoneerr) || fiterr;
+   waserrors = lserrors || cserrors || crserrors || hserrors || aserrors || dserrors || cperrors || uperrors || lterrors || ierrors || monotoneerr || fiterr;
    if (!silent) {
       printf("TESTING SPLINE INTERPOLATION\n");
    // Normal tests
@@ -60176,7 +60175,7 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
 //                  when calculating constant on a twice denser grid
    passcount = 5;
    maxn = 15;
-   threshold = 1000000 * machineepsilon;
+   threshold = 1000000.0 * machineepsilon;
 // Test rational fitting:
    for (pass = 1; pass <= passcount; pass++) {
       for (n = 2; n <= maxn; n++) {
@@ -60419,7 +60418,7 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
 // * pass count
 // * threshold - for tests which must be satisfied exactly
    passcount = 20;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    *fiterrors = false;
 // Test fitting by Cubic and Hermite splines (obsolete, but still supported)
    for (pass = 1; pass <= passcount; pass++) {
@@ -60938,8 +60937,8 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                set_error_flag(errorflag, state.c.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2605");
             }
             if (state.needf) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, false);
-	    else if (state.needfg) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
-	    else ae_assert(false, "minlm test: integrity check failed");
+            else if (state.needfg) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
+            else ae_assert(false, "minlm test: integrity check failed");
          }
          lsfitresults(&state, &terminationtype, &c1, &rep);
          set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:2620");
@@ -61030,8 +61029,8 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                set_error_flag(errorflag, state.c.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2719");
             }
             if (state.needf) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, false);
-	    else if (state.needfg) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
-	    else ae_assert(false, "minlm test: integrity check failed");
+            else if (state.needfg) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
+            else ae_assert(false, "minlm test: integrity check failed");
          }
          lsfitresults(&state, &terminationtype, &c1, &rep);
          set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:2734");
@@ -61126,8 +61125,8 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                set_error_flag(errorflag, state.c.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2838");
             }
             if (state.needf) testlsfitunit_testfunc2(&state.x, nx, &state.c, nc, &state.f, true, &state.g, false);
-	    else if (state.needfg) testlsfitunit_testfunc2(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
-	    else ae_assert(false, "minlm test: integrity check failed");
+            else if (state.needfg) testlsfitunit_testfunc2(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
+            else ae_assert(false, "minlm test: integrity check failed");
          }
          lsfitresults(&state, &terminationtype, &c1, &rep);
          set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:2853");
@@ -61218,8 +61217,8 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                set_error_flag(errorflag, state.c.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2952");
             }
             if (state.needf) testlsfitunit_testfunc3(&state.x, nx, &state.c, nc, &state.f, true, &state.g, false);
-	    else if (state.needfg) testlsfitunit_testfunc3(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
-	    else ae_assert(false, "minlm test: integrity check failed");
+            else if (state.needfg) testlsfitunit_testfunc3(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
+            else ae_assert(false, "minlm test: integrity check failed");
          }
          lsfitresults(&state, &terminationtype, &c1, &rep);
          set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:2967");
@@ -61373,8 +61372,8 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
             set_error_flag(errorflag, state.c.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:3126");
          }
          if (state.needf) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, false);
-	 else if (state.needfg) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
-	 else ae_assert(false, "lsfit test: integrity check failed");
+         else if (state.needfg) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
+         else ae_assert(false, "lsfit test: integrity check failed");
       }
       lsfitresults(&state, &terminationtype, &c1, &rep);
       set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:3141");
@@ -61420,8 +61419,8 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
             ae_assert(rawct.xZ[i] != 0, "Assertion failed");
             v = ae_v_dotproduct(rawc.xyR[i], 1, c2.xR, 1, nc);
             v -= rawc.xyR[i][nc];
-            bflag = bflag || (rawct.xZ[i] > 0 && v < 0.0);
-            bflag = bflag || (rawct.xZ[i] < 0 && v > 0.0);
+            bflag = bflag || rawct.xZ[i] > 0 && v < 0.0;
+            bflag = bflag || rawct.xZ[i] < 0 && v > 0.0;
          }
          if (bflag) {
             continue;
@@ -61496,8 +61495,8 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
       lsfitsetlc(&state, &rawc, &rawct, rawccnt);
       while (lsfititeration(&state))
          if (state.needf) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, false);
-	 else if (state.needfg) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
-	 else ae_assert(false, "lsfit test: integrity check failed");
+         else if (state.needfg) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
+         else ae_assert(false, "lsfit test: integrity check failed");
       lsfitresults(&state, &terminationtype, &c1, &rep);
       set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:3295");
       if (*errorflag) {
@@ -61591,8 +61590,8 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          lsfitsetlc(&state, &rawc, &rawct, rawccnt);
          while (lsfititeration(&state))
             if (state.needf) testlsfitunit_testfunc2(&state.x, nx, &state.c, nc, &state.f, true, &state.g, false);
-	    else if (state.needfg) testlsfitunit_testfunc2(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
-	    else ae_assert(false, "minlm test: integrity check failed");
+            else if (state.needfg) testlsfitunit_testfunc2(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
+            else ae_assert(false, "minlm test: integrity check failed");
          lsfitresults(&state, &terminationtype, &c1, &rep);
          set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:3413");
          if (*errorflag) {
@@ -61649,8 +61648,8 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          lsfitsetlc(&state, &rawc, &rawct, rawccnt);
          while (lsfititeration(&state))
             if (state.needf) testlsfitunit_testfunc3(&state.x, nx, &state.c, nc, &state.f, true, &state.g, false);
-	    else if (state.needfg) testlsfitunit_testfunc3(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
-	    else ae_assert(false, "minlm test: integrity check failed");
+            else if (state.needfg) testlsfitunit_testfunc3(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
+            else ae_assert(false, "minlm test: integrity check failed");
          lsfitresults(&state, &terminationtype, &c1, &rep);
          set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:3481");
          if (*errorflag) {
@@ -61705,7 +61704,7 @@ static bool testlsfitunit_isglssolution(ae_int_t n, ae_int_t m, ae_int_t k, RVec
 // Threshold is small because CMatrix may be ill-conditioned
    delta = 0.001;
    threshold = sqrt(machineepsilon);
-   shift = 10000 * machineepsilon;
+   shift = 10000.0 * machineepsilon;
    ae_vector_set_length(&c2, m);
    ae_vector_set_length(&deltac, m);
    ae_vector_set_length(&deltaproj, m);
@@ -61757,7 +61756,7 @@ static bool testlsfitunit_isglssolution(ae_int_t n, ae_int_t m, ae_int_t k, RVec
       ae_v_move(c2.xR, 1, c->xR, 1, m);
       ae_v_sub(c2.xR, 1, deltaproj.xR, 1, m);
       s3 = testlsfitunit_getglserror(n, m, y, w, fmatrix, &c2);
-      result = (result && s2 >= s1 / (1 + threshold) - shift) && s3 >= s1 / (1 + threshold) - shift;
+      result = result && s2 >= s1 / (1.0 + threshold) - shift && s3 >= s1 / (1.0 + threshold) - shift;
    }
    ae_frame_leave();
    return result;
@@ -61878,7 +61877,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    NewObj(lsfitstate, state);
    *llserrors = false;
    *nlserrors = false;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    nlthreshold = 0.00001;
    diffstep = 0.0001;
    maxn = 6;
@@ -62351,7 +62350,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             avgdeviationnoise = 0.0;
             adncnt = 0.0;
             for (i = 0; i < n; i++) {
-               set_error_flag(llserrors, fabs(rep.covpar.xyR[i][i] - sqr(rep.errpar.xR[i])) > 100 * machineepsilon * rmax2(sqr(rep.errpar.xR[i]), rep.covpar.xyR[i][i]), __FILE__, __LINE__, "testlsfitunit.ap:1612");
+               set_error_flag(llserrors, fabs(rep.covpar.xyR[i][i] - sqr(rep.errpar.xR[i])) > 100.0 * machineepsilon * rmax2(sqr(rep.errpar.xR[i]), rep.covpar.xyR[i][i]), __FILE__, __LINE__, "testlsfitunit.ap:1612");
             }
             for (i = 0; i < n; i++) {
                avgdeviationpar = (avgdeviationpar * adpcnt + fabs(c.xR[i] - cend.xR[i]) / rep.errpar.xR[i]) / (adpcnt + 1);
@@ -62518,7 +62517,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    a.xyR[2][0] = 0.0;
    y.xR[2] = 0.0;
    lsfitlinear(&y, &a, 3, 1, &info, &c, &rep);
-   set_error_flag(llserrors, (info <= 0 || !isfinite(rep.r2)) || rep.r2 != 1.0, __FILE__, __LINE__, "testlsfitunit.ap:1815");
+   set_error_flag(llserrors, info <= 0 || !isfinite(rep.r2) || rep.r2 != 1.0, __FILE__, __LINE__, "testlsfitunit.ap:1815");
    ae_frame_leave();
 }
 
@@ -62651,8 +62650,8 @@ static void testlsfitunit_testrdp(bool *errorflag) {
          return;
       }
       for (i = 0; i < nsections; i++) {
-         set_error_flag(errorflag, fabs(x2.xR[i] - x3.xR[i]) > 1000 * machineepsilon, __FILE__, __LINE__, "testlsfitunit.ap:1965");
-         set_error_flag(errorflag, fabs(y2.xR[i] - y3.xR[i]) > 1000 * machineepsilon, __FILE__, __LINE__, "testlsfitunit.ap:1966");
+         set_error_flag(errorflag, fabs(x2.xR[i] - x3.xR[i]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testlsfitunit.ap:1965");
+         set_error_flag(errorflag, fabs(y2.xR[i] - y3.xR[i]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testlsfitunit.ap:1966");
       }
    // Next epsilon
       eps *= 0.5;
@@ -63401,7 +63400,7 @@ bool testlsfit(bool silent) {
    testlsfitunit_testgeneralfitting(&llserrors, &nlserrors);
    testlsfitunit_testgradientcheck(&graderrors);
 // report
-   waserrors = ((((((llserrors || nlserrors) || polfiterrors) || ratfiterrors) || splfiterrors) || graderrors) || logisticerrors) || rdperrors;
+   waserrors = llserrors || nlserrors || polfiterrors || ratfiterrors || splfiterrors || graderrors || logisticerrors || rdperrors;
    if (!silent) {
       printf("TESTING LEAST SQUARES\n");
       printf("POLYNOMIAL LEAST SQUARES:                ");
@@ -64190,7 +64189,7 @@ static void testparametricunit_testrdp(bool *errorflag) {
          for (i = 0; i <= nsections; i++) {
             set_error_flag(errorflag, idx2.xZ[i] != idx3.xZ[i], __FILE__, __LINE__, "testparametricunit.ap:273");
             for (j = 0; j < d; j++) {
-               set_error_flag(errorflag, fabs(xy2.xyR[i][j] - xy3.xyR[i][j]) > 1000 * machineepsilon, __FILE__, __LINE__, "testparametricunit.ap:275");
+               set_error_flag(errorflag, fabs(xy2.xyR[i][j] - xy3.xyR[i][j]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testparametricunit.ap:275");
             }
          }
       }
@@ -64285,7 +64284,7 @@ bool testparametric(bool silent) {
    NewObj(spline1dinterpolant, s);
    waserrors = false;
    maxn = 10;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    nonstrictthreshold = 0.00001;
    p2errors = false;
    p3errors = false;
@@ -64416,7 +64415,7 @@ bool testparametric(bool silent) {
                // near-boundary test for continuity of function values and derivatives:
                // 2-dimensional curve
                   ae_assert(skind == 1 || skind == 2, "TEST: unexpected spline type!");
-                  v0 = 100 * machineepsilon;
+                  v0 = 100.0 * machineepsilon;
                   v1 = 1 - v0;
                   pspline2calc(&p2, v0, &vx, &vy);
                   pspline2calc(&p2, v1, &vx2, &vy2);
@@ -64442,7 +64441,7 @@ bool testparametric(bool silent) {
                // near-boundary test for continuity of function values and derivatives:
                // 3-dimensional curve
                   ae_assert(skind == 1 || skind == 2, "TEST: unexpected spline type!");
-                  v0 = 100 * machineepsilon;
+                  v0 = 100.0 * machineepsilon;
                   v1 = 1 - v0;
                   pspline3calc(&p3, v0, &vx, &vy, &vz);
                   pspline3calc(&p3, v1, &vx2, &vy2, &vz2);
@@ -64589,7 +64588,7 @@ bool testparametric(bool silent) {
       p3errors = p3errors || fabs(pspline3arclength(&p3, a, b) - (b - a) * sqrt(3.0) * (n - 1)) > nonstrictthreshold;
    }
 // report
-   waserrors = (p2errors || p3errors) || rdperrors;
+   waserrors = p2errors || p3errors || rdperrors;
    if (!silent) {
       printf("TESTING PARAMETRIC INTERPOLATION\n");
    // Normal tests
@@ -64752,7 +64751,7 @@ static bool testspline2dunit_testunpack(spline2dinterpolant *c, RVector *lx, RVe
          }
       }
    }
-   result = err < 10000 * machineepsilon;
+   result = err < 10000.0 * machineepsilon;
    ae_frame_leave();
    return result;
 }
@@ -64830,7 +64829,7 @@ static bool testspline2dunit_testlintrans(spline2dinterpolant *c, ae_int_t d, do
          }
       }
    }
-   result = err < 10000 * machineepsilon;
+   result = err < 10000.0 * machineepsilon;
    ae_frame_leave();
    return result;
 }
@@ -64953,7 +64952,7 @@ static bool testspline2dunit_testspline2dvf(bool silent) {
       // works correctly.
       // And there is test for Spline2DUnpackV.
          spline2dunpackv(&vc, &tstm, &tstn, &tstd, &tsttbl1);
-         if ((tstm != m || tstn != n) || tstd != d) {
+         if (tstm != m || tstn != n || tstd != d) {
             if (!silent) {
                printf("TestSpline2DVF fail Spline2DUnpack:\n");
                printf("    TstM=%0d; M=%0d;\n    TstN=%0d; N=%0d;\n    TstD=%0d; D=%0d.\n", (int)tstm, (int)m, (int)tstn, (int)n, (int)tstd, (int)d);
@@ -66566,7 +66565,7 @@ bool testspline2d(bool silent) {
                   err = rmax2(err, fabs(f.xyR[i][j] - spline2dcalc(&c, x.xR[j], y.xR[i])));
                }
             }
-            blerrors = blerrors || err > 10000 * machineepsilon;
+            blerrors = blerrors || err > 10000.0 * machineepsilon;
             err = 0.0;
             for (i = 0; i < m - 1; i++) {
                for (j = 0; j < n - 1; j++) {
@@ -66580,7 +66579,7 @@ bool testspline2d(bool silent) {
                   err = rmax2(err, fabs(0.25 * (f1 + f2 + f3 + f4) - fm));
                }
             }
-            blerrors = blerrors || err > 10000 * machineepsilon;
+            blerrors = blerrors || err > 10000.0 * machineepsilon;
             testspline2dunit_lconst(&c, &lx, &ly, m, n, lstep, &l1, &l1x, &l1y, &l1xy);
             testspline2dunit_lconst(&c, &lx, &ly, m, n, lstep / 3, &l2, &l2x, &l2y, &l2xy);
             blerrors = blerrors || l2 / l1 > 1.2;
@@ -66612,7 +66611,7 @@ bool testspline2d(bool silent) {
                   err = rmax2(err, fabs(f.xyR[i][j] - spline2dcalc(&c, x.xR[j], y.xR[i])));
                }
             }
-            bcerrors = bcerrors || err > 10000 * machineepsilon;
+            bcerrors = bcerrors || err > 10000.0 * machineepsilon;
             testspline2dunit_lconst(&c, &lx, &ly, m, n, lstep, &l1, &l1x, &l1y, &l1xy);
             testspline2dunit_lconst(&c, &lx, &ly, m, n, lstep / 3, &l2, &l2x, &l2y, &l2xy);
             bcerrors = bcerrors || l2 / l1 > 1.2;
@@ -66656,7 +66655,7 @@ bool testspline2d(bool silent) {
                t2 = ay + (by - ay) * randomreal();
                err = rmax2(err, fabs(spline2dcalc(&c, t1, t2) - spline2dcalc(&c2, t1, t2)));
             }
-            cperrors = cperrors || err > 10000 * machineepsilon;
+            cperrors = cperrors || err > 10000.0 * machineepsilon;
          // Serialization test
             if (randombool()) {
                spline2dbuildbicubic(&x, &y, &f, m, n, &c);
@@ -66690,7 +66689,7 @@ bool testspline2d(bool silent) {
                t2 = ay + (by - ay) * randomreal();
                err = rmax2(err, fabs(spline2dcalc(&c, t1, t2) - spline2dcalc(&c2, t1, t2)));
             }
-            set_error_flag(&sererrors, err > 10000 * machineepsilon, __FILE__, __LINE__, "testspline2dunit.ap:292");
+            set_error_flag(&sererrors, err > 10000.0 * machineepsilon, __FILE__, __LINE__, "testspline2dunit.ap:292");
          // Special symmetry test
             err = 0.0;
             for (jobtype = 0; jobtype <= 1; jobtype++) {
@@ -66714,7 +66713,7 @@ bool testspline2d(bool silent) {
                   err = rmax2(err, fabs(spline2dcalc(&c, t1, t2) - spline2dcalc(&c2, t2, t1)));
                }
             }
-            syerrors = syerrors || err > 10000 * machineepsilon;
+            syerrors = syerrors || err > 10000.0 * machineepsilon;
          }
       }
    }
@@ -66758,10 +66757,10 @@ bool testspline2d(bool silent) {
                         }
                      }
                      if (jobtype == 0) {
-                        rlerrors = rlerrors || err / mf > 10000 * machineepsilon;
+                        rlerrors = rlerrors || err / mf > 10000.0 * machineepsilon;
                      }
                      if (jobtype == 1) {
-                        rcerrors = rcerrors || err / mf > 10000 * machineepsilon;
+                        rcerrors = rcerrors || err / mf > 10000.0 * machineepsilon;
                      }
                   }
                }
@@ -66772,7 +66771,7 @@ bool testspline2d(bool silent) {
 // Test for vector-function
    vferrors = testspline2dunit_testspline2dvf(true);
 // Report
-   waserrors = (((((((((((((blerrors || bcerrors) || dserrors) || cperrors) || sererrors) || uperrors) || lterrors) || syerrors) || rlerrors) || rcerrors) || vferrors) || fiterrorsprior) || fiterrorspenalty) || fiterrorsblocksolver) || fiterrorsfastddmsolver;
+   waserrors = blerrors || bcerrors || dserrors || cperrors || sererrors || uperrors || lterrors || syerrors || rlerrors || rcerrors || vferrors || fiterrorsprior || fiterrorspenalty || fiterrorsblocksolver || fiterrorsfastddmsolver;
    if (!silent) {
       printf("TESTING 2D SPLINE\n");
    // Normal tests
@@ -67028,7 +67027,7 @@ static bool testspline3dunit_basictest() {
    NewVector(z, 0, DT_REAL);
    NewVector(sf, 0, DT_REAL);
    NewVector(vf, 0, DT_REAL);
-   eps = 1000 * machineepsilon;
+   eps = 1000.0 * machineepsilon;
 // Test spline ability to reproduce D-dimensional vector function
 //     f[idx](x,y,z) = idx+AX*x + AY*y + AZ*z + AXY*x*y + AYZ*y*z
 // with random AX/AY/...
@@ -67194,7 +67193,7 @@ static bool testspline3dunit_testunpack() {
                // Check that all components are correct:
                //  *first check, that unpacked componets are equal
                //   to packed components;
-                  bperr = (((((((((((((((((un != n || um != m) || ul != l) || tbl1.xyR[p1][0] != x.xR[i]) || tbl1.xyR[p1][1] != x.xR[i + 1]) || tbl1.xyR[p1][2] != y.xR[j]) || tbl1.xyR[p1][3] != y.xR[j + 1]) || tbl1.xyR[p1][4] != z.xR[k]) || tbl1.xyR[p1][5] != z.xR[k + 1]) || uvn != n) || uvm != m) || uvl != l) || uvd != d) || tbl0.xyR[p0][0] != x.xR[i]) || tbl0.xyR[p0][1] != x.xR[i + 1]) || tbl0.xyR[p0][2] != y.xR[j]) || tbl0.xyR[p0][3] != y.xR[j + 1]) || tbl0.xyR[p0][4] != z.xR[k]) || tbl0.xyR[p0][5] != z.xR[k + 1];
+                  bperr = un != n || um != m || ul != l || tbl1.xyR[p1][0] != x.xR[i] || tbl1.xyR[p1][1] != x.xR[i + 1] || tbl1.xyR[p1][2] != y.xR[j] || tbl1.xyR[p1][3] != y.xR[j + 1] || tbl1.xyR[p1][4] != z.xR[k] || tbl1.xyR[p1][5] != z.xR[k + 1] || uvn != n || uvm != m || uvl != l || uvd != d || tbl0.xyR[p0][0] != x.xR[i] || tbl0.xyR[p0][1] != x.xR[i + 1] || tbl0.xyR[p0][2] != y.xR[j] || tbl0.xyR[p0][3] != y.xR[j + 1] || tbl0.xyR[p0][4] != z.xR[k] || tbl0.xyR[p0][5] != z.xR[k + 1];
                //  *check, that all components unpacked by Unpack
                //   function are equal to all components unpacked
                //   by UnpackV function.
@@ -67446,7 +67445,7 @@ bool testspline3d(bool silence) {
    unpackerr = testspline3dunit_testunpack();
    lintransferr = testspline3dunit_testlintrans();
    trilinreserr = testspline3dunit_testtrilinearresample();
-   waserrors = ((basicerr || unpackerr) || lintransferr) || trilinreserr;
+   waserrors = basicerr || unpackerr || lintransferr || trilinreserr;
    if (!silence) {
       printf("TESTING 3D SPLINE\n");
       printf("BASIC TEST:                              ");
@@ -67838,7 +67837,7 @@ static bool basicmultilayerrbf1dtest() {
       nlayers = 1;
       errtype = 1;
    // test multilayer algorithm with different parameters
-      while (q >= 1 / (2 * f2)) {
+      while (q * f2 >= 0.5) {
          rbfcreate(nx, ny, &s);
          rbfsetalgomultilayer(&s, r, nlayers, 0.0);
          if (linterm == 1) {
@@ -67914,7 +67913,7 @@ static bool basicmultilayerrbf1dtest() {
          }
          q /= 2;
          nlayers++;
-         if (errtype == 1 && q <= 1 / f2) {
+         if (errtype == 1 && q * f2 <= 1.0) {
             errtype = 2;
          }
       }
@@ -68151,7 +68150,7 @@ static bool testrbfunit_specialtest() {
             return result;
          }
          rbfunpack(&s, &tmpnx, &tmpny, &xwr, &tmpnc, &v, &modelversion);
-         if (((((tmpnx != nx || tmpny != ny) || tmpnc != xy.rows) || xwr.cols != nx + ny + 1) || xwr.rows != tmpnc) || modelversion != 1) {
+         if (tmpnx != nx || tmpny != ny || tmpnc != xy.rows || xwr.cols != nx + ny + 1 || xwr.rows != tmpnc || modelversion != 1) {
             result = true;
             ae_frame_leave();
             return result;
@@ -68493,7 +68492,7 @@ static bool testrbfunit_basicrbftest() {
                      }
                   // test for RBFUnpack
                      rbfunpack(&s, &unx, &uny, &xwr, &np, &v, &modelversion);
-                     if ((((((nx != unx || ny != uny) || xwr.rows != np) || xwr.cols != nx + ny + 1) || v.rows != ny) || v.cols != nx + 1) || modelversion != 1) {
+                     if (nx != unx || ny != uny || xwr.rows != np || xwr.cols != nx + ny + 1 || v.rows != ny || v.cols != nx + 1 || modelversion != 1) {
                         set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:735");
                         ae_frame_leave();
                         return result;
@@ -68607,7 +68606,7 @@ static bool testrbfunit_basicrbftest() {
                         }
                      // test for RBFUnpack
                         rbfunpack(&s, &unx, &uny, &xwr, &np, &v, &modelversion);
-                        if ((((((nx != unx || ny != uny) || xwr.rows != np) || xwr.cols != nx + ny + 1) || v.rows != ny) || v.cols != nx + 1) || modelversion != 1) {
+                        if (nx != unx || ny != uny || xwr.rows != np || xwr.cols != nx + ny + 1 || v.rows != ny || v.cols != nx + 1 || modelversion != 1) {
                            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:852");
                            ae_frame_leave();
                            return result;
@@ -68942,7 +68941,7 @@ static bool testrbfunit_linearitymodelrbftest() {
                   rbfbuildmodel(&s, &rep);
                // test for RBFUnpack
                   rbfunpack(&s, &unx, &uny, &xwr, &np, &v, &modelversion);
-                  if ((((((nx != unx || ny != uny) || xwr.rows != np) || xwr.cols != nx + ny + 1) || v.rows != ny) || v.cols != nx + 1) || modelversion != 1) {
+                  if (nx != unx || ny != uny || xwr.rows != np || xwr.cols != nx + ny + 1 || v.rows != ny || v.cols != nx + 1 || modelversion != 1) {
                      result = true;
                      ae_frame_leave();
                      return result;
@@ -68993,7 +68992,7 @@ static bool testrbfunit_linearitymodelrbftest() {
                      rbfbuildmodel(&s, &rep);
                   // test for RBFUnpack
                      rbfunpack(&s, &unx, &uny, &xwr, &np, &v, &modelversion);
-                     if ((((((nx != unx || ny != uny) || xwr.rows != np) || xwr.cols != nx + ny + 1) || v.rows != ny) || v.cols != nx + 1) || modelversion != 1) {
+                     if (nx != unx || ny != uny || xwr.rows != np || xwr.cols != nx + ny + 1 || v.rows != ny || v.cols != nx + 1 || modelversion != 1) {
                         result = true;
                         ae_frame_leave();
                         return result;
@@ -69305,7 +69304,7 @@ static bool testrbfunit_serializationtest() {
          n = iround(pow((double)gridsize, (double)nx));
          ae_matrix_set_length(&xy, n, nx + ny);
          ae_assert(gridsize > 1, "Assertion failed");
-         ae_assert((double)n == pow((double)gridsize, (double)nx), "Assertion failed");
+         ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
          for (i = 0; i < n; i++) {
             k = i;
             for (j = 0; j < nx; j++) {
@@ -69914,7 +69913,7 @@ static bool testrbfunit_basichrbftest() {
          n = iround(pow((double)gridsize, (double)nx));
          ae_matrix_set_length(&xy, n, nx + ny);
          ae_assert(gridsize > 1, "Assertion failed");
-         ae_assert((double)n == pow((double)gridsize, (double)nx), "Assertion failed");
+         ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
          for (i = 0; i < n; i++) {
             k = i;
             for (j = 0; j < nx; j++) {
@@ -70063,7 +70062,7 @@ static bool testrbfunit_basichrbftest() {
          n = iround(pow((double)gridsize, (double)nx));
          ae_matrix_set_length(&xy, n, nx + ny);
          ae_assert(gridsize > 1, "Assertion failed");
-         ae_assert((double)n == pow((double)gridsize, (double)nx), "Assertion failed");
+         ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
          for (i = 0; i < n; i++) {
             k = i;
             for (j = 0; j < nx; j++) {
@@ -70361,7 +70360,7 @@ static bool testrbfunit_basichrbftest() {
       ae_matrix_set_length(&xy, n, nx + ny);
       ae_matrix_set_length(&xy2, n, nx + ny);
       ae_assert(gridsize > 1, "Assertion failed");
-      ae_assert((double)n == pow((double)gridsize, (double)nx), "Assertion failed");
+      ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
       for (i = 0; i < n; i++) {
          k = i;
          for (j = 0; j < nx; j++) {
@@ -70595,7 +70594,7 @@ static bool testrbfunit_scaledhrbftest() {
             n = iround(pow((double)gridsize, (double)nx));
             ae_matrix_set_length(&xy, n, nx + ny);
             ae_assert(gridsize > 1, "Assertion failed");
-            ae_assert((double)n == pow((double)gridsize, (double)nx), "Assertion failed");
+            ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
             ae_vector_set_length(&c0, nx);
             for (j = 0; j < nx; j++) {
                c0.xR[j] = randomreal() - 0.5;
@@ -71075,7 +71074,7 @@ static bool testrbfunit_gridhrbftest() {
          SetVector(&yv2);
          rbfgridcalc2v(&s, &x0, n0, &x1, n1, &yv2);
          for (i = 0; i < ny * n0 * n1; i++) {
-            set_error_flag(&result, fabs(yv.xR[i] - yv2.xR[i]) > 100 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0), __FILE__, __LINE__, "testrbfunit.ap:3913");
+            set_error_flag(&result, fabs(yv.xR[i] - yv2.xR[i]) > 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0), __FILE__, __LINE__, "testrbfunit.ap:3913");
          }
       }
    }
@@ -71285,7 +71284,7 @@ static bool testrbfunit_gridhrbftest() {
          SetVector(&yv2);
          rbfgridcalc3v(&s, &x0, n0, &x1, n1, &x2, n2, &yv2);
          for (i = 0; i < ny * n0 * n1 * n2; i++) {
-            set_error_flag(&result, fabs(yv.xR[i] - yv2.xR[i]) > 100 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0), __FILE__, __LINE__, "testrbfunit.ap:4126");
+            set_error_flag(&result, fabs(yv.xR[i] - yv2.xR[i]) > 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0), __FILE__, __LINE__, "testrbfunit.ap:4126");
          }
       }
    }
@@ -71315,7 +71314,7 @@ bool testrbf(bool silent) {
    hrbfspecerrors = testrbfunit_spechrbftest();
    hrbfscaleerrors = testrbfunit_scaledhrbftest();
    hrbfgriderrors = testrbfunit_gridhrbftest();
-   hrbferrors = ((hrbfbasicerrors || hrbfspecerrors) || hrbfscaleerrors) || hrbfgriderrors;
+   hrbferrors = hrbfbasicerrors || hrbfspecerrors || hrbfscaleerrors || hrbfgriderrors;
 // Other tests
    specialerrors = testrbfunit_specialtest();
    basicrbferrors = testrbfunit_basicrbftest();
@@ -71328,7 +71327,7 @@ bool testrbf(bool silent) {
    gridcalc23errors = false;
    testrbfunit_gridcalc23test(&gridcalc23errors);
 // report
-   waserrors = ((((((((specialerrors || basicrbferrors) || irregularrbferrors) || linearitymodelrbferr) || sqrdegmatrixrbferr) || sererrors) || multilayerrbf1derrors) || multilayerrbferrors) || gridcalc23errors) || hrbferrors;
+   waserrors = specialerrors || basicrbferrors || irregularrbferrors || linearitymodelrbferr || sqrdegmatrixrbferr || sererrors || multilayerrbf1derrors || multilayerrbferrors || gridcalc23errors || hrbferrors;
    if (!silent) {
       printf("TESTING RBF\n");
       printf("GENERAL TESTS:\n");
@@ -71789,7 +71788,7 @@ bool testfft(bool silent) {
    }
    reinterrors = reinterrors || reinterr > errtol;
 // end
-   waserrors = (((bidierrors || bidirerrors) || referrors) || refrerrors) || reinterrors;
+   waserrors = bidierrors || bidirerrors || referrors || refrerrors || reinterrors;
    if (!silent) {
       printf("TESTING FFT\n");
       printf("FINAL RESULT:                             ");
@@ -72101,7 +72100,7 @@ bool testconv(bool silent) {
             for (rkind = -3; rkind <= 1; rkind++) {
             // skip impossible combinations of parameters:
             // * circular convolution, M<N, RKind != -3 - internal subroutine does not support M<N.
-               if ((circkind != 0 && m < n) && rkind != -3) {
+               if (circkind != 0 && m < n && rkind != -3) {
                   continue;
                }
             // Complex convolution
@@ -72252,7 +72251,7 @@ bool testconv(bool silent) {
    inverrors = inverrors || inverr > errtol;
    invrerrors = invrerrors || invrerr > errtol;
 // end
-   waserrors = ((referrors || refrerrors) || inverrors) || invrerrors;
+   waserrors = referrors || refrerrors || inverrors || invrerrors;
    if (!silent) {
       printf("TESTING CONVOLUTION\n");
       printf("FINAL RESULT:                             ");
@@ -72662,7 +72661,7 @@ bool testchebyshev(bool silent) {
       }
    }
 // Reporting
-   waserrors = ((err > threshold || sumerr > threshold) || cerr > threshold) || ferr > threshold;
+   waserrors = err > threshold || sumerr > threshold || cerr > threshold || ferr > threshold;
    if (!silent) {
       printf("TESTING CALCULATION OF THE CHEBYSHEV POLYNOMIALS\n");
       printf("Max error against table                   %5.2e\n", err);
@@ -72772,7 +72771,7 @@ bool testhermite(bool silent) {
    cerr = rmax2(cerr, fabs(c.xR[5] - 0));
    cerr = rmax2(cerr, fabs(c.xR[6] - 64));
 // Reporting
-   waserrors = (err > threshold || sumerr > threshold) || cerr > threshold;
+   waserrors = err > threshold || sumerr > threshold || cerr > threshold;
    if (!silent) {
       printf("TESTING CALCULATION OF THE HERMITE POLYNOMIALS\n");
       printf("Max error                                 %5.2e\n", err);
@@ -72872,7 +72871,7 @@ bool testlegendre(bool silent) {
    cerr = rmax2(cerr, fabs(c.xR[8] - 0));
    cerr = rmax2(cerr, fabs(c.xR[9] - 12155.0 / 128.0));
 // Reporting
-   waserrors = (err > threshold || sumerr > threshold) || cerr > threshold;
+   waserrors = err > threshold || sumerr > threshold || cerr > threshold;
    if (!silent) {
       printf("TESTING CALCULATION OF THE LEGENDRE POLYNOMIALS\n");
       printf("Max error                                 %5.2e\n", err);
@@ -72987,7 +72986,7 @@ bool testlaguerre(bool silent) {
    cerr = rmax2(cerr, fabs(c.xR[5] + 36.0 / 720.0));
    cerr = rmax2(cerr, fabs(c.xR[6] - 1.0 / 720.0));
 // Reporting
-   waserrors = (err > threshold || sumerr > threshold) || cerr > threshold;
+   waserrors = err > threshold || sumerr > threshold || cerr > threshold;
    if (!silent) {
       printf("TESTING CALCULATION OF THE LAGUERRE POLYNOMIALS\n");
       printf("Max error                                 %5.2e\n", err);
@@ -73262,7 +73261,7 @@ bool testpca(bool silent) {
             set_error_flag(&pcadensesubspaceerrors, fabs(s.xR[k]) < fabs(s.xR[k + 1]), __FILE__, __LINE__, "testpcaunit.ap:239");
          }
          for (k = 0; k < requested; k++) {
-            set_error_flag(&pcadensesubspaceerrors, s.xR[k] <= 0.0 && fabs(s.xR[k]) > 1000 * machineepsilon * fabs(s.xR[0]), __FILE__, __LINE__, "testpcaunit.ap:241");
+            set_error_flag(&pcadensesubspaceerrors, s.xR[k] <= 0.0 && fabs(s.xR[k]) > 1000.0 * machineepsilon * fabs(s.xR[0]), __FILE__, __LINE__, "testpcaunit.ap:241");
          }
       // Compare variance explained by top REQUESTED vectors from
       // full PCA and variance explained by reduced PCA.
@@ -73429,7 +73428,7 @@ bool testpca(bool silent) {
             set_error_flag(&pcasparsesubspaceerrors, fabs(s.xR[k]) < fabs(s.xR[k + 1]), __FILE__, __LINE__, "testpcaunit.ap:439");
          }
          for (k = 0; k < requested; k++) {
-            set_error_flag(&pcasparsesubspaceerrors, s.xR[k] <= 0.0 && fabs(s.xR[k]) > 1000 * machineepsilon * rmax2(fabs(s.xR[0]), 1.0), __FILE__, __LINE__, "testpcaunit.ap:441");
+            set_error_flag(&pcasparsesubspaceerrors, s.xR[k] <= 0.0 && fabs(s.xR[k]) > 1000.0 * machineepsilon * rmax2(fabs(s.xR[0]), 1.0), __FILE__, __LINE__, "testpcaunit.ap:441");
          }
       // Compare variance explained by top REQUESTED vectors from
       // full PCA and variance explained by reduced PCA.
@@ -73446,7 +73445,7 @@ bool testpca(bool silent) {
       }
    }
 // Final report
-   waserrors = ((((pcaconverrors || pcaorterrors) || pcavarerrors) || pcaopterrors) || pcadensesubspaceerrors) || pcasparsesubspaceerrors;
+   waserrors = pcaconverrors || pcaorterrors || pcavarerrors || pcaopterrors || pcadensesubspaceerrors || pcasparsesubspaceerrors;
    if (!silent) {
       printf("PCA TEST\n");
       printf("COMPLETE PCA:\n");
@@ -73670,11 +73669,11 @@ bool testbdss(bool silent) {
             split2errors = true;
             continue;
          }
-         split2errors = split2errors || fabs(threshold - 0.5) > 100 * machineepsilon;
-         split2errors = split2errors || fabs(pal - 1) > 100 * machineepsilon;
-         split2errors = split2errors || fabs(pbl - 0) > 100 * machineepsilon;
-         split2errors = split2errors || fabs(par - 0) > 100 * machineepsilon;
-         split2errors = split2errors || fabs(pbr - 1) > 100 * machineepsilon;
+         split2errors = split2errors || fabs(threshold - 0.5) > 100.0 * machineepsilon;
+         split2errors = split2errors || fabs(pal - 1.0) > 100.0 * machineepsilon;
+         split2errors = split2errors || fabs(pbl - 0.0) > 100.0 * machineepsilon;
+         split2errors = split2errors || fabs(par - 0.0) > 100.0 * machineepsilon;
+         split2errors = split2errors || fabs(pbr - 1.0) > 100.0 * machineepsilon;
       }
    }
 // Special "CREDIT"-test (transparency coefficient)
@@ -73905,7 +73904,7 @@ bool testbdss(bool silent) {
    if (info != 1) {
       split2errors = true;
    } else {
-      split2errors = split2errors || fabs(threshold - 0.195) > 100 * machineepsilon;
+      split2errors = split2errors || fabs(threshold - 0.195) > 100.0 * machineepsilon;
       split2errors = split2errors || fabs(pal - 0.80) > 0.02;
       split2errors = split2errors || fabs(pbl - 0.20) > 0.02;
       split2errors = split2errors || fabs(par - 0.97) > 0.02;
@@ -73942,15 +73941,15 @@ bool testbdss(bool silent) {
             split2errors = true;
             continue;
          }
-         split2errors = split2errors || fabs(threshold - 0.5) > 100 * machineepsilon;
-         split2errors = split2errors || fabs(rms - 0) > 100 * machineepsilon;
+         split2errors = split2errors || fabs(threshold - 0.5) > 100.0 * machineepsilon;
+         split2errors = split2errors || fabs(rms - 0.0) > 100.0 * machineepsilon;
          if (n == 2) {
-            split2errors = split2errors || fabs(cvrms - 0.5) > 100 * machineepsilon;
+            split2errors = split2errors || fabs(cvrms - 0.5) > 100.0 * machineepsilon;
          } else {
             if (n == 3) {
-               split2errors = split2errors || fabs(cvrms - sqrt((2 * 0 + 2 * 0 + 2 * 0.25) / 6)) > 100 * machineepsilon;
+               split2errors = split2errors || fabs(cvrms - sqrt((2 * 0 + 2 * 0 + 2 * 0.25) / 6)) > 100.0 * machineepsilon;
             } else {
-               split2errors = split2errors || fabs(cvrms) > 100 * machineepsilon;
+               split2errors = split2errors || fabs(cvrms) > 100.0 * machineepsilon;
             }
          }
       }
@@ -73973,9 +73972,9 @@ bool testbdss(bool silent) {
    if (info != 1) {
       split2errors = true;
    } else {
-      split2errors = split2errors || fabs(threshold - (n - 2.5)) > 100 * machineepsilon;
-      split2errors = split2errors || fabs(rms - sqrt((0.25 + 0.25 + 0.25 + 0.25) / (3 * n))) > 100 * machineepsilon;
-      split2errors = split2errors || fabs(cvrms - sqrt((double)(1 + 1 + 1 + 1) / (3 * n))) > 100 * machineepsilon;
+      split2errors = split2errors || fabs(threshold - (n - 2.5)) > 100.0 * machineepsilon;
+      split2errors = split2errors || fabs(rms - sqrt((0.25 + 0.25 + 0.25 + 0.25) / (3 * n))) > 100.0 * machineepsilon;
+      split2errors = split2errors || fabs(cvrms - sqrt((double)(1 + 1 + 1 + 1) / (3 * n))) > 100.0 * machineepsilon;
    }
 // Optimal split-K
 // General tests for different N's
@@ -74015,8 +74014,8 @@ bool testbdss(bool silent) {
             continue;
          }
          optimalsplitkerrors = optimalsplitkerrors || ni != 2;
-         optimalsplitkerrors = optimalsplitkerrors || fabs(thresholds.xR[0] - 0.5) > 100 * machineepsilon;
-         optimalsplitkerrors = optimalsplitkerrors || fabs(cve - (-c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)))) > 100 * machineepsilon;
+         optimalsplitkerrors = optimalsplitkerrors || fabs(thresholds.xR[0] - 0.5) > 100.0 * machineepsilon;
+         optimalsplitkerrors = optimalsplitkerrors || fabs(cve - (-c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)))) > 100.0 * machineepsilon;
       }
    // test #2
       if (n > 2) {
@@ -74037,8 +74036,8 @@ bool testbdss(bool silent) {
             continue;
          }
          optimalsplitkerrors = optimalsplitkerrors || ni != 2;
-         optimalsplitkerrors = optimalsplitkerrors || fabs(thresholds.xR[0] - 0.5) > 100 * machineepsilon;
-         optimalsplitkerrors = optimalsplitkerrors || fabs(cve - (-c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)))) > 100 * machineepsilon;
+         optimalsplitkerrors = optimalsplitkerrors || fabs(thresholds.xR[0] - 0.5) > 100.0 * machineepsilon;
+         optimalsplitkerrors = optimalsplitkerrors || fabs(cve - (-c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)))) > 100.0 * machineepsilon;
       }
    // multi-tie test
       if (n >= 16) {
@@ -74067,10 +74066,10 @@ bool testbdss(bool silent) {
          optimalsplitkerrors = optimalsplitkerrors || ni != nc;
          if (ni == nc) {
             for (i = 0; i < nc - 1; i++) {
-               optimalsplitkerrors = optimalsplitkerrors || fabs(thresholds.xR[i] - (c0 * (i + 1) - 1 + 0.5)) > 100 * machineepsilon;
+               optimalsplitkerrors = optimalsplitkerrors || fabs(thresholds.xR[i] - (c0 * (i + 1) - 1 + 0.5)) > 100.0 * machineepsilon;
             }
             cvr = -((nc - 1) * c0 * log((double)c0 / (c0 + nc - 1)) + c1 * log((double)c1 / (c1 + nc - 1)));
-            optimalsplitkerrors = optimalsplitkerrors || fabs(cve - cvr) > 100 * machineepsilon;
+            optimalsplitkerrors = optimalsplitkerrors || fabs(cve - cvr) > 100.0 * machineepsilon;
          }
       }
    }
@@ -74113,8 +74112,8 @@ bool testbdss(bool silent) {
          }
          splitkerrors = splitkerrors || ni != 2;
          if (ni == 2) {
-            splitkerrors = splitkerrors || fabs(thresholds.xR[0] - 0.5) > 100 * machineepsilon;
-            splitkerrors = splitkerrors || fabs(cve - (-c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)))) > 100 * machineepsilon;
+            splitkerrors = splitkerrors || fabs(thresholds.xR[0] - 0.5) > 100.0 * machineepsilon;
+            splitkerrors = splitkerrors || fabs(cve - (-c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)))) > 100.0 * machineepsilon;
          }
       }
    // test #2
@@ -74137,13 +74136,13 @@ bool testbdss(bool silent) {
          }
          splitkerrors = splitkerrors || ni != 2;
          if (ni == 2) {
-            splitkerrors = splitkerrors || fabs(thresholds.xR[0] - 0.5) > 100 * machineepsilon;
-            splitkerrors = splitkerrors || fabs(cve - (-c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)))) > 100 * machineepsilon;
+            splitkerrors = splitkerrors || fabs(thresholds.xR[0] - 0.5) > 100.0 * machineepsilon;
+            splitkerrors = splitkerrors || fabs(cve - (-c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)))) > 100.0 * machineepsilon;
          }
       }
    // multi-tie test
       for (c0 = 4; c0 <= n; c0++) {
-         if ((n % c0 == 0 && n / c0 <= c0) && n / c0 > 1) {
+         if (n % c0 == 0 && n / c0 <= c0 && n / c0 > 1) {
             nc = n / c0;
             for (i = 0; i < nc; i++) {
                for (j = c0 * i; j < c0 * (i + 1); j++) {
@@ -74159,16 +74158,16 @@ bool testbdss(bool silent) {
             splitkerrors = splitkerrors || ni != nc;
             if (ni == nc) {
                for (i = 0; i < nc - 1; i++) {
-                  splitkerrors = splitkerrors || fabs(thresholds.xR[i] - (c0 * (i + 1) - 1 + 0.5)) > 100 * machineepsilon;
+                  splitkerrors = splitkerrors || fabs(thresholds.xR[i] - (c0 * (i + 1) - 1 + 0.5)) > 100.0 * machineepsilon;
                }
                cvr = -nc * c0 * log((double)c0 / (c0 + nc - 1));
-               splitkerrors = splitkerrors || fabs(cve - cvr) > 100 * machineepsilon;
+               splitkerrors = splitkerrors || fabs(cve - cvr) > 100.0 * machineepsilon;
             }
          }
       }
    }
 // report
-   waserrors = ((tieserrors || split2errors) || optimalsplitkerrors) || splitkerrors;
+   waserrors = tieserrors || split2errors || optimalsplitkerrors || splitkerrors;
    if (!silent) {
       printf("TESTING BASIC DATASET SUBROUTINES\n");
       printf("TIES:                               ");
@@ -74229,7 +74228,7 @@ static double testmlpbaseunit_vectordiff(RVector *g0, RVector *g1, ae_int_t n, d
    norm0 = sqrt(norm0);
    norm1 = sqrt(norm1);
    diff = sqrt(diff);
-   if ((norm0 != 0.0 || norm1 != 0.0) || s != 0.0) {
+   if (norm0 != 0.0 || norm1 != 0.0 || s != 0.0) {
       diff /= rmax2(rmax2(norm0, norm1), s);
    } else {
       diff = 0.0;
@@ -74253,7 +74252,7 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
    ae_int_t mkind;
    ae_frame_make(&_frame_block);
    NewObj(multilayerperceptron, tmp);
-   ae_assert(((nin > 0 && nhid1 >= 0) && nhid2 >= 0) && nout > 0, "CreateNetwork error");
+   ae_assert(nin > 0 && nhid1 >= 0 && nhid2 >= 0 && nout > 0, "CreateNetwork error");
    ae_assert(nhid1 != 0 || nhid2 == 0, "CreateNetwork error");
    ae_assert(nkind != 1 || nout >= 2, "CreateNetwork error");
    mkind = randominteger(3);
@@ -74697,12 +74696,12 @@ static void testmlpbaseunit_testinformational(ae_int_t nkind, ae_int_t nin, ae_i
    NewMatrix(neurons, 0, 0, DT_REAL);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
-   threshold = 100000 * machineepsilon;
+   threshold = 100000.0 * machineepsilon;
    testmlpbaseunit_createnetwork(&network, nkind, 0.0, 0.0, nin, nhid1, nhid2, nout);
 // test MLPProperties()
    mlpproperties(&network, &n1, &n2, &wcount);
-   *err = ((*err || n1 != nin) || n2 != nout) || wcount <= 0;
-   *err = ((*err || mlpgetinputscount(&network) != nin) || mlpgetoutputscount(&network) != nout) || mlpgetweightscount(&network) != wcount;
+   *err = *err || n1 != nin || n2 != nout || wcount <= 0;
+   *err = *err || mlpgetinputscount(&network) != nin || mlpgetoutputscount(&network) != nout || mlpgetweightscount(&network) != wcount;
 // Test network geometry functions
 //
 // In order to do this we calculate neural network output using
@@ -75034,7 +75033,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
             v += y1.xR[i];
             *err = *err || y1.xR[i] < 0.0;
          }
-         *err = *err || fabs(v - 1) > 1000 * machineepsilon;
+         *err = *err || fabs(v - 1) > 1000.0 * machineepsilon;
       }
       if (nkind == 2) {
       // B-type network outputs are bounded from above/below
@@ -75057,7 +75056,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
          }
          mlpprocess(&network, &x1, &y1);
          for (i = 0; i < nout; i++) {
-            *err = (*err || y1.xR[i] < rmin2(a1, a2)) || y1.xR[i] > rmax2(a1, a2);
+            *err = *err || y1.xR[i] < rmin2(a1, a2) || y1.xR[i] > rmax2(a1, a2);
          }
       }
    // Comperison MLPInitPreprocessor results with
@@ -76231,7 +76230,7 @@ bool testmlpbase(bool silent) {
 // Test for MLPGradBatch____Subset()
    graderrors = graderrors || testmlpbaseunit_testmlpgbsubset();
 // Final report
-   waserrors = (((inferrors || procerrors) || graderrors) || hesserrors) || errerrors;
+   waserrors = inferrors || procerrors || graderrors || hesserrors || errerrors;
    if (!silent) {
       printf("MLP TEST\n");
       printf("INFORMATIONAL FUNCTIONS:                 ");
@@ -76279,7 +76278,7 @@ bool testmlpbase(bool silent) {
 // === mlpe testing unit ===
 // Network creation
 static void testmlpeunit_createensemble(mlpensemble *ensemble, ae_int_t nkind, double a1, double a2, ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, ae_int_t ec) {
-   ae_assert(((nin > 0 && nhid1 >= 0) && nhid2 >= 0) && nout > 0, "CreateNetwork error");
+   ae_assert(nin > 0 && nhid1 >= 0 && nhid2 >= 0 && nout > 0, "CreateNetwork error");
    ae_assert(nhid1 != 0 || nhid2 == 0, "CreateNetwork error");
    ae_assert(nkind != 1 || nout >= 2, "CreateNetwork error");
    if (nhid1 == 0) {
@@ -76352,7 +76351,7 @@ static void testmlpeunit_testinformational(ae_int_t nkind, ae_int_t nin, ae_int_
    NewObj(mlpensemble, ensemble);
    testmlpeunit_createensemble(&ensemble, nkind, -1.0, 1.0, nin, nhid1, nhid2, nout, ec);
    mlpeproperties(&ensemble, &n1, &n2);
-   *err = (*err || n1 != nin) || n2 != nout;
+   *err = *err || n1 != nin || n2 != nout;
    ae_frame_leave();
 }
 
@@ -76569,7 +76568,7 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
                v += y1.xR[i];
                *err = *err || y1.xR[i] < 0.0;
             }
-            *err = *err || fabs(v - 1) > 1000 * machineepsilon;
+            *err = *err || fabs(v - 1) > 1000.0 * machineepsilon;
          }
          if (nkind == 2) {
          // B-type network outputs are bounded from above/below
@@ -76592,7 +76591,7 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
             }
             mlpeprocess(&ensemble, &x1, &y1);
             for (i = 0; i < nout; i++) {
-               *err = (*err || y1.xR[i] < rmin2(a1, a2)) || y1.xR[i] > rmax2(a1, a2);
+               *err = *err || y1.xR[i] < rmin2(a1, a2) || y1.xR[i] > rmax2(a1, a2);
             }
          }
       }
@@ -76828,7 +76827,7 @@ bool testmlpe(bool silent) {
    sizemax = 1000;
    testmlpeunit_testerr(0, nf, nhid1, nhid2, nl, ec, 1, sizemin, sizemax, &errerrors);
 // Final report
-   waserrors = (inferrors || procerrors) || errerrors;
+   waserrors = inferrors || procerrors || errerrors;
    if (!silent) {
       printf("MLP ENSEMBLE TEST\n");
       printf("INFORMATIONAL FUNCTIONS:                 ");
@@ -76932,9 +76931,9 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
       return result;
    }
    bflag = bflag || rep->npoints != npoints;
-   bflag = (bflag || rep->z.rows != npoints - 1) || (npoints > 1 && rep->z.cols != 2);
-   bflag = (bflag || rep->pz.rows != npoints - 1) || (npoints > 1 && rep->pz.cols != 2);
-   bflag = (bflag || rep->pm.rows != npoints - 1) || (npoints > 1 && rep->pm.cols != 6);
+   bflag = bflag || rep->z.rows != npoints - 1 || npoints > 1 && rep->z.cols != 2;
+   bflag = bflag || rep->pz.rows != npoints - 1 || npoints > 1 && rep->pz.cols != 2;
+   bflag = bflag || rep->pm.rows != npoints - 1 || npoints > 1 && rep->pm.cols != 6;
    bflag = bflag || rep->mergedist.cnt != npoints - 1;
    bflag = bflag || rep->p.cnt != npoints;
    if (bflag) {
@@ -76947,7 +76946,7 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
       b.xB[i] = false;
    }
    for (i = 0; i < npoints; i++) {
-      if ((rep->p.xZ[i] < 0 || rep->p.xZ[i] >= npoints) || b.xB[rep->p.xZ[i]]) {
+      if (rep->p.xZ[i] < 0 || rep->p.xZ[i] >= npoints || b.xB[rep->p.xZ[i]]) {
          result = true;
          ae_frame_leave();
          return result;
@@ -76955,12 +76954,12 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
       b.xB[rep->p.xZ[i]] = true;
    }
    for (i = 0; i < npoints - 1; i++) {
-      if ((rep->z.xyZ[i][0] < 0 || rep->z.xyZ[i][0] >= rep->z.xyZ[i][1]) || rep->z.xyZ[i][1] >= npoints + i) {
+      if (rep->z.xyZ[i][0] < 0 || rep->z.xyZ[i][0] >= rep->z.xyZ[i][1] || rep->z.xyZ[i][1] >= npoints + i) {
          result = true;
          ae_frame_leave();
          return result;
       }
-      if ((rep->pz.xyZ[i][0] < 0 || rep->pz.xyZ[i][0] >= rep->pz.xyZ[i][1]) || rep->pz.xyZ[i][1] >= npoints + i) {
+      if (rep->pz.xyZ[i][0] < 0 || rep->pz.xyZ[i][0] >= rep->pz.xyZ[i][1] || rep->pz.xyZ[i][1] >= npoints + i) {
          result = true;
          ae_frame_leave();
          return result;
@@ -77071,12 +77070,12 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
       }
       c0 = rep->z.xyZ[mergeidx][0];
       c1 = rep->z.xyZ[mergeidx][1];
-      if (dm.xyR[c0][c1] > v + 10000 * machineepsilon) {
+      if (dm.xyR[c0][c1] > v + 10000.0 * machineepsilon) {
          result = true;
          ae_frame_leave();
          return result;
       }
-      if (rep->mergedist.xR[mergeidx] > v + 10000 * machineepsilon) {
+      if (rep->mergedist.xR[mergeidx] > v + 10000.0 * machineepsilon) {
          result = true;
          ae_frame_leave();
          return result;
@@ -77101,7 +77100,7 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
             return result;
          }
       }
-      if ((rep->pm.xyZ[mergeidx][1] - rep->pm.xyZ[mergeidx][0] != s0 - 1 || rep->pm.xyZ[mergeidx][3] - rep->pm.xyZ[mergeidx][2] != s1 - 1) || rep->pm.xyZ[mergeidx][2] != rep->pm.xyZ[mergeidx][1] + 1) {
+      if (rep->pm.xyZ[mergeidx][1] - rep->pm.xyZ[mergeidx][0] != s0 - 1 || rep->pm.xyZ[mergeidx][3] - rep->pm.xyZ[mergeidx][2] != s1 - 1 || rep->pm.xyZ[mergeidx][2] != rep->pm.xyZ[mergeidx][1] + 1) {
       // Cluster size (as given by PM) is inconsistent with its actual size.
          result = true;
          ae_frame_leave();
@@ -77219,7 +77218,7 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
          return result;
       }
       for (i = 0; i < k - 1; i++) {
-         if ((kidxz.xZ[i] < 0 || kidxz.xZ[i] >= kidxz.xZ[i + 1]) || kidxz.xZ[i + 1] > 2 * npoints - 2) {
+         if (kidxz.xZ[i] < 0 || kidxz.xZ[i] >= kidxz.xZ[i + 1] || kidxz.xZ[i + 1] > 2 * npoints - 2) {
          // CZ is inconsistent
             result = true;
             ae_frame_leave();
@@ -77305,7 +77304,7 @@ static bool testclusteringunit_basicahctests() {
    clusterizercreate(&s);
    clusterizersetpoints(&s, &xy, 2, 2, 0);
    clusterizerrunahc(&s, &rep);
-   if ((rep.npoints != 2 || rep.z.rows != 1) || rep.z.cols != 2) {
+   if (rep.npoints != 2 || rep.z.rows != 1 || rep.z.cols != 2) {
       ae_frame_leave();
       return result;
    }
@@ -77338,21 +77337,21 @@ static bool testclusteringunit_basicahctests() {
    clusterizersetpoints(&s, &xy, 4, 1, 0);
    clusterizersetahcalgo(&s, 0);
    clusterizerrunahc(&s, &rep);
-   if ((((rep.npoints != 4 || rep.z.rows != 3) || rep.z.cols != 2) || rep.pz.rows != 3) || rep.pz.cols != 2) {
+   if (rep.npoints != 4 || rep.z.rows != 3 || rep.z.cols != 2 || rep.pz.rows != 3 || rep.pz.cols != 2) {
       ae_frame_leave();
       return result;
    }
    berr = false;
-   berr = (berr || rep.z.xyZ[0][0] != 0) || rep.z.xyZ[0][1] != 1;
-   berr = (berr || rep.z.xyZ[1][0] != 2) || rep.z.xyZ[1][1] != 3;
-   berr = (berr || rep.z.xyZ[2][0] != 4) || rep.z.xyZ[2][1] != 5;
-   berr = (((berr || rep.p.xZ[0] != 0) || rep.p.xZ[1] != 1) || rep.p.xZ[2] != 2) || rep.p.xZ[3] != 3;
-   berr = (berr || rep.pz.xyZ[0][0] != 0) || rep.pz.xyZ[0][1] != 1;
-   berr = (berr || rep.pz.xyZ[1][0] != 2) || rep.pz.xyZ[1][1] != 3;
-   berr = (berr || rep.pz.xyZ[2][0] != 4) || rep.pz.xyZ[2][1] != 5;
-   berr = (((berr || rep.pm.xyZ[0][0] != 0) || rep.pm.xyZ[0][1] != 0) || rep.pm.xyZ[0][2] != 1) || rep.pm.xyZ[0][3] != 1;
-   berr = (((berr || rep.pm.xyZ[1][0] != 2) || rep.pm.xyZ[1][1] != 2) || rep.pm.xyZ[1][2] != 3) || rep.pm.xyZ[1][3] != 3;
-   berr = (((berr || rep.pm.xyZ[2][0] != 0) || rep.pm.xyZ[2][1] != 1) || rep.pm.xyZ[2][2] != 2) || rep.pm.xyZ[2][3] != 3;
+   berr = berr || rep.z.xyZ[0][0] != 0 || rep.z.xyZ[0][1] != 1;
+   berr = berr || rep.z.xyZ[1][0] != 2 || rep.z.xyZ[1][1] != 3;
+   berr = berr || rep.z.xyZ[2][0] != 4 || rep.z.xyZ[2][1] != 5;
+   berr = berr || rep.p.xZ[0] != 0 || rep.p.xZ[1] != 1 || rep.p.xZ[2] != 2 || rep.p.xZ[3] != 3;
+   berr = berr || rep.pz.xyZ[0][0] != 0 || rep.pz.xyZ[0][1] != 1;
+   berr = berr || rep.pz.xyZ[1][0] != 2 || rep.pz.xyZ[1][1] != 3;
+   berr = berr || rep.pz.xyZ[2][0] != 4 || rep.pz.xyZ[2][1] != 5;
+   berr = berr || rep.pm.xyZ[0][0] != 0 || rep.pm.xyZ[0][1] != 0 || rep.pm.xyZ[0][2] != 1 || rep.pm.xyZ[0][3] != 1;
+   berr = berr || rep.pm.xyZ[1][0] != 2 || rep.pm.xyZ[1][1] != 2 || rep.pm.xyZ[1][2] != 3 || rep.pm.xyZ[1][3] != 3;
+   berr = berr || rep.pm.xyZ[2][0] != 0 || rep.pm.xyZ[2][1] != 1 || rep.pm.xyZ[2][2] != 2 || rep.pm.xyZ[2][3] != 3;
    if (berr) {
       ae_frame_leave();
       return result;
@@ -77363,11 +77362,11 @@ static bool testclusteringunit_basicahctests() {
       ae_frame_leave();
       return result;
    }
-   if (((cidx.xZ[0] != cidx2.xZ[0] || cidx.xZ[1] != cidx2.xZ[1]) || cidx.xZ[2] != cidx2.xZ[2]) || cidx.xZ[3] != cidx2.xZ[3]) {
+   if (cidx.xZ[0] != cidx2.xZ[0] || cidx.xZ[1] != cidx2.xZ[1] || cidx.xZ[2] != cidx2.xZ[2] || cidx.xZ[3] != cidx2.xZ[3]) {
       ae_frame_leave();
       return result;
    }
-   if (((cz.xZ[0] != cz2.xZ[0] || cz.xZ[1] != cz2.xZ[1]) || cz.xZ[2] != cz2.xZ[2]) || cz.xZ[3] != cz2.xZ[3]) {
+   if (cz.xZ[0] != cz2.xZ[0] || cz.xZ[1] != cz2.xZ[1] || cz.xZ[2] != cz2.xZ[2] || cz.xZ[3] != cz2.xZ[3]) {
       ae_frame_leave();
       return result;
    }
@@ -77377,11 +77376,11 @@ static bool testclusteringunit_basicahctests() {
       ae_frame_leave();
       return result;
    }
-   if (((cidx.xZ[0] != cidx2.xZ[0] || cidx.xZ[1] != cidx2.xZ[1]) || cidx.xZ[2] != cidx2.xZ[2]) || cidx.xZ[3] != cidx2.xZ[3]) {
+   if (cidx.xZ[0] != cidx2.xZ[0] || cidx.xZ[1] != cidx2.xZ[1] || cidx.xZ[2] != cidx2.xZ[2] || cidx.xZ[3] != cidx2.xZ[3]) {
       ae_frame_leave();
       return result;
    }
-   if ((cz.xZ[0] != cz2.xZ[0] || cz.xZ[1] != cz2.xZ[1]) || cz.xZ[2] != cz2.xZ[2]) {
+   if (cz.xZ[0] != cz2.xZ[0] || cz.xZ[1] != cz2.xZ[1] || cz.xZ[2] != cz2.xZ[2]) {
       ae_frame_leave();
       return result;
    }
@@ -77391,7 +77390,7 @@ static bool testclusteringunit_basicahctests() {
       ae_frame_leave();
       return result;
    }
-   if (((cidx.xZ[0] != cidx2.xZ[0] || cidx.xZ[1] != cidx2.xZ[1]) || cidx.xZ[2] != cidx2.xZ[2]) || cidx.xZ[3] != cidx2.xZ[3]) {
+   if (cidx.xZ[0] != cidx2.xZ[0] || cidx.xZ[1] != cidx2.xZ[1] || cidx.xZ[2] != cidx2.xZ[2] || cidx.xZ[3] != cidx2.xZ[3]) {
       ae_frame_leave();
       return result;
    }
@@ -77439,11 +77438,11 @@ static bool testclusteringunit_basicahctests() {
       ae_frame_leave();
       return result;
    }
-   if (((cidx.xZ[0] != cidx2.xZ[0] || cidx.xZ[1] != cidx2.xZ[1]) || cidx.xZ[2] != cidx2.xZ[2]) || cidx.xZ[3] != cidx2.xZ[3]) {
+   if (cidx.xZ[0] != cidx2.xZ[0] || cidx.xZ[1] != cidx2.xZ[1] || cidx.xZ[2] != cidx2.xZ[2] || cidx.xZ[3] != cidx2.xZ[3]) {
       ae_frame_leave();
       return result;
    }
-   if (((cz.xZ[0] != cz2.xZ[0] || cz.xZ[1] != cz2.xZ[1]) || cz.xZ[2] != cz2.xZ[2]) || cz.xZ[3] != cz2.xZ[3]) {
+   if (cz.xZ[0] != cz2.xZ[0] || cz.xZ[1] != cz2.xZ[1] || cz.xZ[2] != cz2.xZ[2] || cz.xZ[3] != cz2.xZ[3]) {
       ae_frame_leave();
       return result;
    }
@@ -77453,11 +77452,11 @@ static bool testclusteringunit_basicahctests() {
       ae_frame_leave();
       return result;
    }
-   if (((cidx.xZ[0] != cidx2.xZ[0] || cidx.xZ[1] != cidx2.xZ[1]) || cidx.xZ[2] != cidx2.xZ[2]) || cidx.xZ[3] != cidx2.xZ[3]) {
+   if (cidx.xZ[0] != cidx2.xZ[0] || cidx.xZ[1] != cidx2.xZ[1] || cidx.xZ[2] != cidx2.xZ[2] || cidx.xZ[3] != cidx2.xZ[3]) {
       ae_frame_leave();
       return result;
    }
-   if ((cz.xZ[0] != cz2.xZ[0] || cz.xZ[1] != cz2.xZ[1]) || cz.xZ[2] != cz2.xZ[2]) {
+   if (cz.xZ[0] != cz2.xZ[0] || cz.xZ[1] != cz2.xZ[1] || cz.xZ[2] != cz2.xZ[2]) {
       ae_frame_leave();
       return result;
    }
@@ -77467,7 +77466,7 @@ static bool testclusteringunit_basicahctests() {
       ae_frame_leave();
       return result;
    }
-   if (((cidx.xZ[0] != cidx2.xZ[0] || cidx.xZ[1] != cidx2.xZ[1]) || cidx.xZ[2] != cidx2.xZ[2]) || cidx.xZ[3] != cidx2.xZ[3]) {
+   if (cidx.xZ[0] != cidx2.xZ[0] || cidx.xZ[1] != cidx2.xZ[1] || cidx.xZ[2] != cidx2.xZ[2] || cidx.xZ[3] != cidx2.xZ[3]) {
       ae_frame_leave();
       return result;
    }
@@ -77491,7 +77490,7 @@ static bool testclusteringunit_basicahctests() {
       ae_frame_leave();
       return result;
    }
-   if (((rep.z.rows != 5 || rep.z.cols != 2) || rep.pz.rows != 5) || rep.pz.cols != 2) {
+   if (rep.z.rows != 5 || rep.z.cols != 2 || rep.pz.rows != 5 || rep.pz.cols != 2) {
       ae_frame_leave();
       return result;
    }
@@ -77502,32 +77501,32 @@ static bool testclusteringunit_basicahctests() {
    berr = berr || rep.p.xZ[3] != 5;
    berr = berr || rep.p.xZ[4] != 0;
    berr = berr || rep.p.xZ[5] != 1;
-   berr = (berr || rep.z.xyZ[0][0] != 0) || rep.z.xyZ[0][1] != 1;
-   berr = (berr || rep.z.xyZ[1][0] != 2) || rep.z.xyZ[1][1] != 3;
-   berr = (berr || rep.z.xyZ[2][0] != 4) || rep.z.xyZ[2][1] != 5;
-   berr = (berr || rep.z.xyZ[3][0] != 6) || rep.z.xyZ[3][1] != 7;
-   berr = (berr || rep.z.xyZ[4][0] != 8) || rep.z.xyZ[4][1] != 9;
-   berr = (berr || rep.pz.xyZ[0][0] != 2) || rep.pz.xyZ[0][1] != 3;
-   berr = (berr || rep.pz.xyZ[1][0] != 4) || rep.pz.xyZ[1][1] != 5;
-   berr = (berr || rep.pz.xyZ[2][0] != 0) || rep.pz.xyZ[2][1] != 1;
-   berr = (berr || rep.pz.xyZ[3][0] != 6) || rep.pz.xyZ[3][1] != 7;
-   berr = (berr || rep.pz.xyZ[4][0] != 8) || rep.pz.xyZ[4][1] != 9;
+   berr = berr || rep.z.xyZ[0][0] != 0 || rep.z.xyZ[0][1] != 1;
+   berr = berr || rep.z.xyZ[1][0] != 2 || rep.z.xyZ[1][1] != 3;
+   berr = berr || rep.z.xyZ[2][0] != 4 || rep.z.xyZ[2][1] != 5;
+   berr = berr || rep.z.xyZ[3][0] != 6 || rep.z.xyZ[3][1] != 7;
+   berr = berr || rep.z.xyZ[4][0] != 8 || rep.z.xyZ[4][1] != 9;
+   berr = berr || rep.pz.xyZ[0][0] != 2 || rep.pz.xyZ[0][1] != 3;
+   berr = berr || rep.pz.xyZ[1][0] != 4 || rep.pz.xyZ[1][1] != 5;
+   berr = berr || rep.pz.xyZ[2][0] != 0 || rep.pz.xyZ[2][1] != 1;
+   berr = berr || rep.pz.xyZ[3][0] != 6 || rep.pz.xyZ[3][1] != 7;
+   berr = berr || rep.pz.xyZ[4][0] != 8 || rep.pz.xyZ[4][1] != 9;
    if (berr) {
       ae_frame_leave();
       return result;
    }
    clusterizersetahcalgo(&s, 1);
    clusterizerrunahc(&s, &rep);
-   if ((rep.npoints != 6 || rep.z.rows != 5) || rep.z.cols != 2) {
+   if (rep.npoints != 6 || rep.z.rows != 5 || rep.z.cols != 2) {
       ae_frame_leave();
       return result;
    }
    berr = false;
-   berr = (berr || rep.z.xyZ[0][0] != 0) || rep.z.xyZ[0][1] != 1;
-   berr = (berr || rep.z.xyZ[1][0] != 2) || rep.z.xyZ[1][1] != 6;
-   berr = (berr || rep.z.xyZ[2][0] != 3) || rep.z.xyZ[2][1] != 7;
-   berr = (berr || rep.z.xyZ[3][0] != 5) || rep.z.xyZ[3][1] != 8;
-   berr = (berr || rep.z.xyZ[4][0] != 4) || rep.z.xyZ[4][1] != 9;
+   berr = berr || rep.z.xyZ[0][0] != 0 || rep.z.xyZ[0][1] != 1;
+   berr = berr || rep.z.xyZ[1][0] != 2 || rep.z.xyZ[1][1] != 6;
+   berr = berr || rep.z.xyZ[2][0] != 3 || rep.z.xyZ[2][1] != 7;
+   berr = berr || rep.z.xyZ[3][0] != 5 || rep.z.xyZ[3][1] != 8;
+   berr = berr || rep.z.xyZ[4][0] != 4 || rep.z.xyZ[4][1] != 9;
    if (berr) {
       ae_frame_leave();
       return result;
@@ -77559,7 +77558,7 @@ static bool testclusteringunit_basicahctests() {
    for (ahcalgo = 0; ahcalgo <= 2; ahcalgo++) {
       clusterizersetahcalgo(&s, ahcalgo);
       clusterizerrunahc(&s, &rep);
-      if ((rep.npoints != 8 || rep.z.rows != 7) || rep.z.cols != 2) {
+      if (rep.npoints != 8 || rep.z.rows != 7 || rep.z.cols != 2) {
          ae_frame_leave();
          return result;
       }
@@ -77575,7 +77574,7 @@ static bool testclusteringunit_basicahctests() {
          ae_frame_leave();
          return result;
       }
-      if ((ahcalgo == 0 || ahcalgo == 2) && (rep.z.xyZ[5][0] != 8 && rep.z.xyZ[5][1] != 8)) {
+      if ((ahcalgo == 0 || ahcalgo == 2) && rep.z.xyZ[5][0] != 8 && rep.z.xyZ[5][1] != 8) {
          ae_frame_leave();
          return result;
       }
@@ -77611,7 +77610,7 @@ static bool testclusteringunit_basicahctests() {
    for (ahcalgo = 0; ahcalgo <= 2; ahcalgo++) {
       clusterizersetahcalgo(&s, ahcalgo);
       clusterizerrunahc(&s, &rep);
-      if ((rep.npoints != 8 || rep.z.rows != 7) || rep.z.cols != 2) {
+      if (rep.npoints != 8 || rep.z.rows != 7 || rep.z.cols != 2) {
          ae_frame_leave();
          return result;
       }
@@ -77627,7 +77626,7 @@ static bool testclusteringunit_basicahctests() {
          ae_frame_leave();
          return result;
       }
-      if (ahcalgo == 0 && (rep.z.xyZ[5][0] != 8 && rep.z.xyZ[5][1] != 8)) {
+      if (ahcalgo == 0 && rep.z.xyZ[5][0] != 8 && rep.z.xyZ[5][1] != 8) {
          ae_frame_leave();
          return result;
       }
@@ -77659,7 +77658,7 @@ static bool testclusteringunit_basicahctests() {
    for (ahcalgo = 2; ahcalgo <= 3; ahcalgo++) {
       clusterizersetahcalgo(&s, ahcalgo);
       clusterizerrunahc(&s, &rep);
-      if ((rep.npoints != 6 || rep.z.rows != 5) || rep.z.cols != 2) {
+      if (rep.npoints != 6 || rep.z.rows != 5 || rep.z.cols != 2) {
          ae_frame_leave();
          return result;
       }
@@ -77771,7 +77770,7 @@ static bool testclusteringunit_basicahctests() {
       clusterizersetdistances(&s, &d, npoints, true);
       clusterizersetahcalgo(&s, ahcalgo);
       clusterizerrunahc(&s, &rep);
-      if ((rep.npoints != npoints || rep.z.rows != npoints - 1) || rep.z.cols != 2) {
+      if (rep.npoints != npoints || rep.z.rows != npoints - 1 || rep.z.cols != 2) {
          ae_frame_leave();
          return result;
       }
@@ -77791,11 +77790,11 @@ static bool testclusteringunit_basicahctests() {
    clusterizersetahcalgo(&s, 0);
    clusterizerrunahc(&s, &rep);
    clusterizergetkclusters(&rep, 3, &cidx, &cz);
-   if (((((((cidx.xZ[0] != 1 || cidx.xZ[1] != 1) || cidx.xZ[2] != 0) || cidx.xZ[3] != 2) || cidx.xZ[4] != 2) || cidx.xZ[5] != 2) || cidx.xZ[6] != 2) || cidx.xZ[7] != 2) {
+   if (cidx.xZ[0] != 1 || cidx.xZ[1] != 1 || cidx.xZ[2] != 0 || cidx.xZ[3] != 2 || cidx.xZ[4] != 2 || cidx.xZ[5] != 2 || cidx.xZ[6] != 2 || cidx.xZ[7] != 2) {
       ae_frame_leave();
       return result;
    }
-   if ((cz.xZ[0] != 2 || cz.xZ[1] != 8) || cz.xZ[2] != 12) {
+   if (cz.xZ[0] != 2 || cz.xZ[1] != 8 || cz.xZ[2] != 12) {
       ae_frame_leave();
       return result;
    }
@@ -77814,7 +77813,7 @@ static double testclusteringunit_distfunc(RVector *x0, RVector *x1, ae_int_t d, 
    double s0;
    double s1;
    double result;
-   ae_assert((((((((disttype == 0 || disttype == 1) || disttype == 2) || disttype == 10) || disttype == 11) || disttype == 12) || disttype == 13) || disttype == 20) || disttype == 21, "Assertion failed");
+   ae_assert(disttype == 0 || disttype == 1 || disttype == 2 || disttype == 10 || disttype == 11 || disttype == 12 || disttype == 13 || disttype == 20 || disttype == 21, "Assertion failed");
    if (disttype == 0) {
       result = 0.0;
       for (i = 0; i < d; i++) {
@@ -77989,7 +77988,7 @@ static bool testclusteringunit_advancedahctests() {
          }
          for (i = 0; i < d * (n - 1); i++) {
          // Check correctness of I-th row of Z
-            if ((rep.z.xyZ[i][0] < 0 || rep.z.xyZ[i][0] >= rep.z.xyZ[i][1]) || rep.z.xyZ[i][1] >= d * n + i) {
+            if (rep.z.xyZ[i][0] < 0 || rep.z.xyZ[i][0] >= rep.z.xyZ[i][1] || rep.z.xyZ[i][1] >= d * n + i) {
                result = true;
                ae_frame_leave();
                return result;
@@ -78005,7 +78004,7 @@ static bool testclusteringunit_advancedahctests() {
          // belongs to the same cluster
             idx.xZ[n * d + i] = idx.xZ[rep.z.xyZ[i][1]];
          }
-         if (((ahcalgo == 0 || ahcalgo == 1) || ahcalgo == 2) || ahcalgo == 4) {
+         if (ahcalgo == 0 || ahcalgo == 1 || ahcalgo == 2 || ahcalgo == 4) {
             if (testclusteringunit_errorsinmerges(&dm, &xy, d * n, d, &rep, ahcalgo)) {
                result = true;
                ae_frame_leave();
@@ -78029,7 +78028,7 @@ static bool testclusteringunit_advancedahctests() {
          }
          for (i = 0; i < d * (n - 1); i++) {
          // Check correctness of I-th row of Z
-            if ((rep.z.xyZ[i][0] < 0 || rep.z.xyZ[i][0] >= rep.z.xyZ[i][1]) || rep.z.xyZ[i][1] >= d * n + i) {
+            if (rep.z.xyZ[i][0] < 0 || rep.z.xyZ[i][0] >= rep.z.xyZ[i][1] || rep.z.xyZ[i][1] >= d * n + i) {
                result = true;
                ae_frame_leave();
                return result;
@@ -78045,7 +78044,7 @@ static bool testclusteringunit_advancedahctests() {
          // belongs to the same cluster
             idx.xZ[n * d + i] = idx.xZ[rep.z.xyZ[i][1]];
          }
-         if (((ahcalgo == 0 || ahcalgo == 1) || ahcalgo == 2) || ahcalgo == 4) {
+         if (ahcalgo == 0 || ahcalgo == 1 || ahcalgo == 2 || ahcalgo == 4) {
             if (testclusteringunit_errorsinmerges(&dm, &xy, d * n, d, &rep, ahcalgo)) {
                result = true;
                ae_frame_leave();
@@ -78631,7 +78630,7 @@ static void testclusteringunit_kmeansinfinitelooptest(bool *othererrors) {
    clusterizerrunkmeans(&s, nclusters, &rep);
    *othererrors = *othererrors || rep.terminationtype <= 0;
    for (i = 0; i < nfeatures; i++) {
-      *othererrors = *othererrors || fabs(rep.c.xyR[0][i] - xy.xyR[0][i]) > 1000 * machineepsilon;
+      *othererrors = *othererrors || fabs(rep.c.xyR[0][i] - xy.xyR[0][i]) > 1000.0 * machineepsilon;
    }
    for (i = 0; i < npoints; i++) {
       *othererrors = *othererrors || rep.cidx.xZ[i] != 0;
@@ -78848,8 +78847,8 @@ bool testclustering(bool silent) {
    }
 // Results
    waserrors = false;
-   waserrors = waserrors || (basicahcerrors || ahcerrors);
-   waserrors = waserrors || (((kmeansconverrors || kmeansothererrors) || kmeanssimpleerrors) || kmeansrestartserrors);
+   waserrors = waserrors || basicahcerrors || ahcerrors;
+   waserrors = waserrors || kmeansconverrors || kmeansothererrors || kmeanssimpleerrors || kmeansrestartserrors;
    if (!silent) {
       printf("TESTING CLUSTERING\n");
       printf("AHC:                                \n");
@@ -79023,7 +79022,7 @@ static void testdforestunit_testprocessing(bool *err) {
          y1.xR[i] = hqrndnormal(&rs);
       }
       dfprocess(&df1, &x1, &y1);
-      set_error_flag(err, fabs(y1.xR[0] - dfprocess0(&df1, &x2)) > 100 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:225");
+      set_error_flag(err, fabs(y1.xR[0] - dfprocess0(&df1, &x2)) > 100.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:225");
    // DFClassify works as expected
       ae_vector_set_length(&x1, nvars);
       ae_vector_set_length(&x2, nvars);
@@ -79083,7 +79082,7 @@ static void testdforestunit_testprocessing(bool *err) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
-      set_error_flag(err, fabs(dfprocess0(&df1, &x1) - dfprocess0(&df2, &x2)) > 100 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:303");
+      set_error_flag(err, fabs(dfprocess0(&df1, &x1) - dfprocess0(&df2, &x2)) > 100.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:303");
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
@@ -79131,7 +79130,7 @@ static void testdforestunit_testprocessing(bool *err) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
-      set_error_flag(err, fabs(dfprocess0(&df1, &x1) - dfprocess0(&df2, &x2)) > 100 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:339");
+      set_error_flag(err, fabs(dfprocess0(&df1, &x1) - dfprocess0(&df2, &x2)) > 100.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:339");
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
@@ -79148,7 +79147,7 @@ static void testdforestunit_testprocessing(bool *err) {
             v += y1.xR[i];
             *err = *err || y1.xR[i] < 0.0;
          }
-         *err = *err || fabs(v - 1) > 1000 * machineepsilon;
+         *err = *err || fabs(v - 1) > 1000.0 * machineepsilon;
       }
    }
    ae_frame_leave();
@@ -79257,11 +79256,11 @@ static void testdforestunit_basictest1(bool *err) {
                      set_error_flag(err, y.xR[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:492");
                      s += y.xR[j];
                   }
-                  set_error_flag(err, fabs(s - 1) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:495");
-                  set_error_flag(err, fabs(y.xR[iround(xy.xyR[i][nvars])] - 1) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:496");
+                  set_error_flag(err, fabs(s - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:495");
+                  set_error_flag(err, fabs(y.xR[iround(xy.xyR[i][nvars])] - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:496");
                } else {
                // Regression problem
-                  set_error_flag(err, fabs(y.xR[0] - xy.xyR[i][nvars]) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:503");
+                  set_error_flag(err, fabs(y.xR[0] - xy.xyR[i][nvars]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:503");
                }
             }
          }
@@ -79308,8 +79307,8 @@ static void testdforestunit_basictest1(bool *err) {
                   set_error_flag(err, y.xR[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:564");
                   s += y.xR[j];
                }
-               set_error_flag(err, fabs(s - 1) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:567");
-               set_error_flag(err, fabs(y.xR[iround(xy.xyR[i][nvars])] - 1) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:568");
+               set_error_flag(err, fabs(s - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:567");
+               set_error_flag(err, fabs(y.xR[iround(xy.xyR[i][nvars])] - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:568");
             } else {
             // Regression problem
                set_error_flag(err, fabs(y.xR[0] - xy.xyR[i][nvars]) > tol16, __FILE__, __LINE__, "testdforestunit.ap:575");
@@ -79328,8 +79327,8 @@ static void testdforestunit_basictest1(bool *err) {
                   set_error_flag(err, y.xR[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:596");
                   s += y.xR[j];
                }
-               set_error_flag(err, fabs(s - 1) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:599");
-               set_error_flag(err, fabs(y.xR[iround(xy.xyR[i][nvars])] - 1) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:600");
+               set_error_flag(err, fabs(s - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:599");
+               set_error_flag(err, fabs(y.xR[iround(xy.xyR[i][nvars])] - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:600");
             } else {
             // Regression problem
                set_error_flag(err, fabs(y.xR[0] - xy.xyR[i][nvars]) > tol8, __FILE__, __LINE__, "testdforestunit.ap:607");
@@ -79410,7 +79409,7 @@ static void testdforestunit_basictest2(bool *err) {
       // Test for basic properties
          set_error_flag(err, y.xR[0] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:704");
          set_error_flag(err, y.xR[1] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:705");
-         set_error_flag(err, fabs(y.xR[0] + y.xR[1] - 1) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:706");
+         set_error_flag(err, fabs(y.xR[0] + y.xR[1] - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:706");
       // test for good correlation with results
          if (x.xR[0] < 1.0) {
             avgerr += fabs(1 - y.xR[0]);
@@ -79508,7 +79507,7 @@ static void testdforestunit_basictest3(bool *err) {
          // Test for basic properties
             set_error_flag(err, y.xR[0] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:831");
             set_error_flag(err, y.xR[1] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:832");
-            set_error_flag(err, fabs(y.xR[0] + y.xR[1] - 1) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:833");
+            set_error_flag(err, fabs(y.xR[0] + y.xR[1] - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:833");
          // test for good correlation with results
             r = sqrt(sqr(x.xR[0]) + sqr(x.xR[1]));
             if (r < 0.66 * 0.5) {
@@ -79673,13 +79672,13 @@ static void testdforestunit_basictest5(bool *err) {
    set_error_flag(err, rep.rmserror >= rep.oobrmserror, __FILE__, __LINE__, "testdforestunit.ap:1039");
    set_error_flag(err, rep.avgerror >= rep.oobavgerror, __FILE__, __LINE__, "testdforestunit.ap:1040");
    set_error_flag(err, rep.avgrelerror >= rep.oobavgrelerror, __FILE__, __LINE__, "testdforestunit.ap:1041");
-   set_error_flag(err, fabs(rep.rmserror) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1042");
-   set_error_flag(err, fabs(rep.avgerror) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1043");
-   set_error_flag(err, fabs(rep.avgrelerror) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1044");
+   set_error_flag(err, fabs(rep.rmserror) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1042");
+   set_error_flag(err, fabs(rep.avgerror) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1043");
+   set_error_flag(err, fabs(rep.avgrelerror) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1044");
    for (i = 0; i < npoints; i++) {
       ae_v_move(x.xR, 1, xy.xyR[i], 1, nvars);
       dfprocess(&df, &x, &y);
-      if (fabs(y.xR[0] - xy.xyR[i][nvars]) > 1000 * machineepsilon) {
+      if (fabs(y.xR[0] - xy.xyR[i][nvars]) > 1000.0 * machineepsilon) {
          set_error_flag(err, true, __FILE__, __LINE__, "testdforestunit.ap:1050");
       }
    }
@@ -79822,12 +79821,12 @@ static void testdforestunit_basictestrandom(bool *err) {
                dfprocess(&df, &x, &y);
                for (j = 0; j < nclasses; j++) {
                   v = y.xR[j];
-                  if ((double)j == xy.xyR[i][nvars]) {
+                  if (j == xy.xyR[i][nvars]) {
                      v--;
                   }
                   refrms += sqr(v);
                   refavg += fabs(v);
-                  if ((double)j == xy.xyR[i][nvars]) {
+                  if (j == xy.xyR[i][nvars]) {
                      refavgrel += fabs(v);
                      refavgce -= log(v);
                   }
@@ -79970,12 +79969,12 @@ static void testdforestunit_basictestallsame(bool *err) {
             dfprocess(&df, &x, &y);
             for (j = 0; j < nclasses; j++) {
                v = y.xR[j];
-               if ((double)j == xy.xyR[i][nvars]) {
+               if (j == xy.xyR[i][nvars]) {
                   v--;
                }
                refrms += sqr(v);
                refavg += fabs(v);
-               if ((double)j == xy.xyR[i][nvars]) {
+               if (j == xy.xyR[i][nvars]) {
                   refavgrel += fabs(v);
                   refavgce -= log(v);
                }
@@ -80070,7 +80069,7 @@ static void testdforestunit_testcompression(bool *err) {
             if (nclasses > 1) {
             // Compare output probabilities for classification problem
                for (j = 0; j < nclasses; j++) {
-                  set_error_flag(err, fabs(y0.xR[j] - y1.xR[j]) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1495");
+                  set_error_flag(err, fabs(y0.xR[j] - y1.xR[j]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1495");
                }
             } else {
             // Compare output values for regression problem
@@ -80089,7 +80088,7 @@ static void testdforestunit_testcompression(bool *err) {
             if (nclasses > 1) {
             // Compare output probabilities for classification problem
                for (j = 0; j < nclasses; j++) {
-                  set_error_flag(err, fabs(y0.xR[j] - y1.xR[j]) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1523");
+                  set_error_flag(err, fabs(y0.xR[j] - y1.xR[j]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1523");
                }
             } else {
             // Compare output values for regression problem
@@ -80144,7 +80143,7 @@ static void testdforestunit_testcompression(bool *err) {
          if (nclasses > 1) {
          // Compare output probabilities for classification problem
             for (j = 0; j < nclasses; j++) {
-               set_error_flag(err, fabs(y0.xR[j] - y1.xR[j]) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1593");
+               set_error_flag(err, fabs(y0.xR[j] - y1.xR[j]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1593");
             }
          } else {
          // Compare output values for regression problem
@@ -80163,7 +80162,7 @@ static void testdforestunit_testcompression(bool *err) {
          if (nclasses > 1) {
          // Compare output probabilities for classification problem
             for (j = 0; j < nclasses; j++) {
-               set_error_flag(err, fabs(y0.xR[j] - y1.xR[j]) > 1000 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1621");
+               set_error_flag(err, fabs(y0.xR[j] - y1.xR[j]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1621");
             }
          } else {
          // Compare output values for regression problem
@@ -80624,7 +80623,7 @@ bool testdforest(bool silent) {
    testdforestunit_testcompression(&compressionerrors);
    testdforestunit_testimportance(&importanceerrors);
 // Final report
-   waserrors = ((basicerrors || procerrors) || compressionerrors) || importanceerrors;
+   waserrors = basicerrors || procerrors || compressionerrors || importanceerrors;
    if (!silent) {
       printf("RANDOM FOREST TEST\n");
       printf("TOTAL RESULTS:                           ");
@@ -80890,7 +80889,7 @@ bool testlinreg(bool silent) {
    passcount = 3;
    estpasscount = 1000;
    sigmathreshold = 7.0;
-   threshold = 1000000 * machineepsilon;
+   threshold = 1000000.0 * machineepsilon;
    slerrors = false;
    slcerrors = false;
    grcoverrors = false;
@@ -80941,7 +80940,7 @@ bool testlinreg(bool silent) {
          if (info != 1 || info2 != 1) {
             slcerrors = true;
          } else {
-            slerrors = (slerrors || fabs(a - a2) > threshold) || fabs(b - b2) > threshold;
+            slerrors = slerrors || fabs(a - a2) > threshold || fabs(b - b2) > threshold;
          }
       // Test for A/B
       //
@@ -80957,7 +80956,7 @@ bool testlinreg(bool silent) {
          if (info != 1) {
             slcerrors = true;
          } else {
-            slerrors = (slerrors || fabs(a - ea) > 0.001) || fabs(b - eb) > 0.001;
+            slerrors = slerrors || fabs(a - ea) > 0.001 || fabs(b - eb) > 0.001;
          }
       // Test for VarA, VarB, P (P is being tested only for N>2)
          for (i = 0; i < qcnt; i++) {
@@ -80999,7 +80998,7 @@ bool testlinreg(bool silent) {
          slerrors = slerrors || fabs(stddev - sqrt(varbtested)) / stddevs >= sigmathreshold;
          if (n > 2) {
             for (i = 0; i < qcnt; i++) {
-               if (fabs(qtbl.xR[i] - qvals.xR[i]) / qsigma.xR[i] > sigmathreshold) {
+               if (fabs(qtbl.xR[i] - qvals.xR[i]) > qsigma.xR[i] * sigmathreshold) {
                   slerrors = true;
                }
             }
@@ -81271,7 +81270,7 @@ bool testlinreg(bool silent) {
                      fp += sqr((v + vv * hstep - xy.xyR[i][m]) / s.xR[i]);
                      fm += sqr((v - vv * hstep - xy.xyR[i][m]) / s.xR[i]);
                   }
-                  gropterrors = (gropterrors || f > fp) || f > fm;
+                  gropterrors = gropterrors || f > fp || f > fm;
                }
             // Covariance matrix test:
             // generate random vector, project coefficients on it,
@@ -81457,7 +81456,7 @@ bool testlinreg(bool silent) {
    }
 // TODO: Degenerate tests (when design matrix and right part are zero)
 // Final report
-   waserrors = (((((slerrors || slcerrors) || gropterrors) || grcoverrors) || gresterrors) || grothererrors) || grconverrors;
+   waserrors = slerrors || slcerrors || gropterrors || grcoverrors || gresterrors || grothererrors || grconverrors;
    if (!silent) {
       printf("REGRESSION TEST\n");
       printf("STRAIGHT LINE REGRESSION:                ");
@@ -81473,7 +81472,7 @@ bool testlinreg(bool silent) {
          printf("FAILED\n");
       }
       printf("GENERAL LINEAR REGRESSION:               ");
-      if (!((((gropterrors || grcoverrors) || gresterrors) || grothererrors) || grconverrors)) {
+      if (!gropterrors && !grcoverrors && !gresterrors && !grothererrors && !grconverrors) {
          printf("OK\n");
       } else {
          printf("FAILED\n");
@@ -81532,7 +81531,7 @@ static bool testsma(bool issilent) {
    bool result;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    if (!issilent) {
       printf("SMA(K) TEST\n");
    }
@@ -81551,15 +81550,15 @@ static bool testsma(bool issilent) {
    x.xR[1] = 8.0;
    x.xR[2] = 9.0;
    filtersma(&x, 3, 1);
-   precomputederrors = ((precomputederrors || x.xR[0] != 7.0) || x.xR[1] != 8.0) || x.xR[2] != 9.0;
+   precomputederrors = precomputederrors || x.xR[0] != 7.0 || x.xR[1] != 8.0 || x.xR[2] != 9.0;
    filtersma(&x, 3, 2);
-   precomputederrors = ((precomputederrors || x.xR[0] != 7.0) || x.xR[1] != 7.5) || x.xR[2] != 8.5;
+   precomputederrors = precomputederrors || x.xR[0] != 7.0 || x.xR[1] != 7.5 || x.xR[2] != 8.5;
    ae_vector_set_length(&x, 3);
    x.xR[0] = 7.0;
    x.xR[1] = 8.0;
    x.xR[2] = 9.0;
    filtersma(&x, 3, 4);
-   precomputederrors = ((precomputederrors || x.xR[0] != 7.0) || x.xR[1] != 7.5) || x.xR[2] != 8.0;
+   precomputederrors = precomputederrors || x.xR[0] != 7.0 || x.xR[1] != 7.5 || x.xR[2] != 8.0;
 // Test zero-handling:
 // a) when we have non-zero sequence (N1 elements) followed by zero sequence
 //    (N2 elements), then first N1+K-1 elements of the processed sequence are
@@ -81650,9 +81649,9 @@ static bool testema(bool issilent) {
    x.xR[1] = 8.0;
    x.xR[2] = 9.0;
    filterema(&x, 3, 1.0);
-   precomputederrors = ((precomputederrors || x.xR[0] != 7.0) || x.xR[1] != 8.0) || x.xR[2] != 9.0;
+   precomputederrors = precomputederrors || x.xR[0] != 7.0 || x.xR[1] != 8.0 || x.xR[2] != 9.0;
    filterema(&x, 3, 0.5);
-   precomputederrors = ((precomputederrors || x.xR[0] != 7.0) || x.xR[1] != 7.5) || x.xR[2] != 8.25;
+   precomputederrors = precomputederrors || x.xR[0] != 7.0 || x.xR[1] != 7.5 || x.xR[2] != 8.25;
 // Final result
    result = precomputederrors;
    ae_frame_leave();
@@ -81669,7 +81668,7 @@ static bool testlrma(bool issilent) {
    bool result;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    if (!issilent) {
       printf("LRMA(K) TEST\n");
    }
@@ -81687,9 +81686,9 @@ static bool testlrma(bool issilent) {
    x.xR[4] = 11.0;
    x.xR[5] = 12.0;
    filterlrma(&x, 6, 1);
-   precomputederrors = (((((precomputederrors || x.xR[0] != 7.0) || x.xR[1] != 8.0) || x.xR[2] != 9.0) || x.xR[3] != 10.0) || x.xR[4] != 11.0) || x.xR[5] != 12.0;
+   precomputederrors = precomputederrors || x.xR[0] != 7.0 || x.xR[1] != 8.0 || x.xR[2] != 9.0 || x.xR[3] != 10.0 || x.xR[4] != 11.0 || x.xR[5] != 12.0;
    filterlrma(&x, 6, 2);
-   precomputederrors = (((((precomputederrors || x.xR[0] != 7.0) || x.xR[1] != 8.0) || x.xR[2] != 9.0) || x.xR[3] != 10.0) || x.xR[4] != 11.0) || x.xR[5] != 12.0;
+   precomputederrors = precomputederrors || x.xR[0] != 7.0 || x.xR[1] != 8.0 || x.xR[2] != 9.0 || x.xR[3] != 10.0 || x.xR[4] != 11.0 || x.xR[5] != 12.0;
 // Check several precomputed problems
    ae_vector_set_length(&x, 6);
    x.xR[0] = 7.0;
@@ -81735,7 +81734,7 @@ bool testfilters(bool silent) {
    emaerrors = testema(true);
    lrmaerrors = testlrma(true);
 // Final report
-   waserrors = (smaerrors || emaerrors) || lrmaerrors;
+   waserrors = smaerrors || emaerrors || lrmaerrors;
    if (!silent) {
       printf("FILTERS TEST\n");
       printf("* SMA:                                   ");
@@ -83451,7 +83450,7 @@ static void testssaunit_testspecial(bool *errorflag) {
             set_error_flag(errorflag, a.rows != 1, __FILE__, __LINE__, "testssaunit.ap:1738");
             set_error_flag(errorflag, a.cols != 1, __FILE__, __LINE__, "testssaunit.ap:1739");
             set_error_flag(errorflag, sv.cnt != 1, __FILE__, __LINE__, "testssaunit.ap:1740");
-            set_error_flag(errorflag, fabs(fabs(a.xyR[0][0]) - 1) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1741");
+            set_error_flag(errorflag, fabs(fabs(a.xyR[0][0]) - 1.0) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1741");
          }
          if (hqrnduniformr(&rs) > skipprob) {
             windowwidth = -1;
@@ -83465,8 +83464,8 @@ static void testssaunit_testspecial(bool *errorflag) {
                ae_frame_leave();
                return;
             }
-            set_error_flag(errorflag, fabs(trend.xR[0] - x.xR[nlasttracklen - 1]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1754");
-            set_error_flag(errorflag, fabs(noise.xR[0]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1755");
+            set_error_flag(errorflag, fabs(trend.xR[0] - x.xR[nlasttracklen - 1]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1754");
+            set_error_flag(errorflag, fabs(noise.xR[0]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1755");
          }
          if (hqrnduniformr(&rs) > skipprob) {
             nanalyzed = 1 + hqrnduniformi(&rs, 10);
@@ -83484,8 +83483,8 @@ static void testssaunit_testspecial(bool *errorflag) {
                set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1770");
             }
             for (i = imax2(nanalyzed - nlasttracklen, 0); i < nanalyzed; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i - nanalyzed + nlasttracklen]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1774");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1775");
+               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i - nanalyzed + nlasttracklen]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1774");
+               set_error_flag(errorflag, fabs(noise.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1775");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83504,8 +83503,8 @@ static void testssaunit_testspecial(bool *errorflag) {
                return;
             }
             for (i = 0; i < nticks; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x2.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1793");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1794");
+               set_error_flag(errorflag, fabs(trend.xR[i] - x2.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1793");
+               set_error_flag(errorflag, fabs(noise.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1794");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83605,7 +83604,7 @@ static void testssaunit_testspecial(bool *errorflag) {
                   if (i == j) {
                      v--;
                   }
-                  set_error_flag(errorflag, fabs(v) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1899");
+                  set_error_flag(errorflag, fabs(v) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1899");
                }
             }
          }
@@ -83622,8 +83621,8 @@ static void testssaunit_testspecial(bool *errorflag) {
                return;
             }
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i - windowwidth + nlasttracklen]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1915");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1916");
+               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i - windowwidth + nlasttracklen]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1915");
+               set_error_flag(errorflag, fabs(noise.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1916");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83642,8 +83641,8 @@ static void testssaunit_testspecial(bool *errorflag) {
                set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1932");
             }
             for (i = imax2(nanalyzed - nlasttracklen, 0); i < nanalyzed; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i - nanalyzed + nlasttracklen]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1936");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1937");
+               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i - nanalyzed + nlasttracklen]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1936");
+               set_error_flag(errorflag, fabs(noise.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1937");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83663,11 +83662,11 @@ static void testssaunit_testspecial(bool *errorflag) {
             }
             for (i = 0; i < nticks; i++) {
                if (nticks >= windowwidth) {
-                  set_error_flag(errorflag, fabs(trend.xR[i] - x2.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1957");
-                  set_error_flag(errorflag, fabs(noise.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1958");
+                  set_error_flag(errorflag, fabs(trend.xR[i] - x2.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1957");
+                  set_error_flag(errorflag, fabs(noise.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1958");
                } else {
-                  set_error_flag(errorflag, fabs(trend.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1962");
-                  set_error_flag(errorflag, fabs(noise.xR[i] - x2.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1963");
+                  set_error_flag(errorflag, fabs(trend.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1962");
+                  set_error_flag(errorflag, fabs(noise.xR[i] - x2.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1963");
                }
             }
          }
@@ -84099,13 +84098,13 @@ static bool testldaunit_testwn(RMatrix *xy, RMatrix *wn, ae_int_t ns, ae_int_t n
    ae_matrix_set_length(&a, nf - 1 + 1, nf - 1 + 1);
    matrixmatrixmultiply(wn, 0, nf - 1, 0, nf - 1, false, wn, 0, nf - 1, 0, nf - 1, true, 1.0, &a, 0, nf - 1, 0, nf - 1, 0.0, &work);
    if (smatrixevd(&a, nf, 1, true, &tx, &z)) {
-      result = result && tx.xR[0] > tx.xR[nf - 1] * 1000 * machineepsilon;
+      result = result && tx.xR[0] > tx.xR[nf - 1] * 1000.0 * machineepsilon;
    }
 // Test for other properties
    for (j = 0; j < nf; j++) {
       v = ae_v_dotproduct(&wn->xyR[0][j], wn->stride, &wn->xyR[0][j], wn->stride, nf);
       v = sqrt(v);
-      result = result && fabs(v - 1) <= 1000 * machineepsilon;
+      result = result && fabs(v - 1) <= 1000.0 * machineepsilon;
       v = 0.0;
       for (i = 0; i < nf; i++) {
          v += wn->xyR[i][j];
@@ -84486,7 +84485,7 @@ static void testmcpdunit_testentryexit(bool *err) {
                   } else {
                      exitstate = randominteger(n);
                   }
-               } while (!((entrystate == -1 || exitstate == -1) || entrystate != exitstate));
+               } while (entrystate != -1 && exitstate != -1 && entrystate == exitstate);
             // Generate transition matrix P such that:
             // * columns corresponding to non-exit states sums to 1.0
             // * columns corresponding to exit states sums to 0.0
@@ -85031,7 +85030,7 @@ static void testmcpdunit_testlc(bool *err) {
             v = 0.0;
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  if (((i == 0 || i == n - 1) || j == 0) || j == n - 1) {
+                  if (i == 0 || i == n - 1 || j == 0 || j == n - 1) {
                      c.xyR[0][i * n + j] = 0.0;
                   } else {
                      c.xyR[0][i * n + j] = randomreal();
@@ -85270,7 +85269,7 @@ bool testmcpd(bool silent) {
    testmcpdunit_testbc(&bcerrors);
    testmcpdunit_testlc(&lcerrors);
 // Final report
-   waserrors = ((((othererrors || simpleerrors) || entryexiterrors) || ecerrors) || bcerrors) || lcerrors;
+   waserrors = othererrors || simpleerrors || entryexiterrors || ecerrors || bcerrors || lcerrors;
    if (!silent) {
       printf("MCPD TEST\n");
       printf("TOTAL RESULTS:                           ");
@@ -85595,8 +85594,8 @@ static void testknnunit_testknnalgo(bool *err) {
       knnprocessi(&model1, &x1, &y2);
       knntsprocess(&model1, &buf, &x1, &y3);
       for (i = 0; i < nout; i++) {
-         set_error_flag(err, fabs(y2.xR[i] - y1.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:232");
-         set_error_flag(err, fabs(y3.xR[i] - y1.xR[i]) > 100 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:233");
+         set_error_flag(err, fabs(y2.xR[i] - y1.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:232");
+         set_error_flag(err, fabs(y3.xR[i] - y1.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:233");
       }
    // Same inputs leads to same outputs
       ae_vector_set_length(&x1, nvars);
@@ -85664,7 +85663,7 @@ static void testknnunit_testknnalgo(bool *err) {
          x1.xR[i] = hqrndnormal(&rs);
          x2.xR[i] = x1.xR[i];
       }
-      set_error_flag(err, fabs(knnprocess0(&model1, &x1) - knnprocess0(&modelus, &x2)) > 100 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:293");
+      set_error_flag(err, fabs(knnprocess0(&model1, &x1) - knnprocess0(&modelus, &x2)) > 100.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:293");
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = hqrndnormal(&rs);
          x2.xR[i] = x1.xR[i];
@@ -85682,7 +85681,7 @@ static void testknnunit_testknnalgo(bool *err) {
          y1.xR[i] = hqrndnormal(&rs);
       }
       knnprocess(&model1, &x1, &y1);
-      set_error_flag(err, fabs(y1.xR[0] - knnprocess0(&model1, &x2)) > 100 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:318");
+      set_error_flag(err, fabs(y1.xR[0] - knnprocess0(&model1, &x2)) > 100.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:318");
    // KNNClassify works as expected
       ae_vector_set_length(&x1, nvars);
       ae_vector_set_length(&x2, nvars);
@@ -85715,7 +85714,7 @@ static void testknnunit_testknnalgo(bool *err) {
             v += y1.xR[i];
             set_error_flag(err, y1.xR[i] < 0.0, __FILE__, __LINE__, "testknnunit.ap:359");
          }
-         set_error_flag(err, fabs(v - 1) > 1000 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:361");
+         set_error_flag(err, fabs(v - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:361");
       }
    // Test various error metrics reported by algorithm:
    // * training set errors included in the report
@@ -85807,10 +85806,10 @@ static void testknnunit_testknnalgo(bool *err) {
             }
             knnprocess(&model1, &x1, &y1);
             if (iscls) {
-               set_error_flag(err, fabs(y1.xR[iround(xy.xyR[i][nvars])] - 1) > 10 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:479");
+               set_error_flag(err, fabs(y1.xR[iround(xy.xyR[i][nvars])] - 1) > 10.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:479");
             } else {
                for (j = 0; j < nout; j++) {
-                  set_error_flag(err, fabs(y1.xR[j] - xy.xyR[i][nvars + j]) > 10 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:483");
+                  set_error_flag(err, fabs(y1.xR[j] - xy.xyR[i][nvars + j]) > 10.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:483");
                }
             }
          }
@@ -85867,7 +85866,7 @@ static void testknnunit_testknnalgo(bool *err) {
       knnprocess(&model1, &x1, &y1);
       knnprocess(&model2, &x2, &y2);
       for (i = 0; i < nout; i++) {
-         set_error_flag(err, fabs(y1.xR[i] - y2.xR[i]) > 1000 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:553");
+         set_error_flag(err, fabs(y1.xR[i] - y2.xR[i]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:553");
       }
    }
 // Test generalization ability on a simple noisy classification task:
@@ -85911,7 +85910,7 @@ static void testknnunit_testknnalgo(bool *err) {
          knnprocess(&model1, &x1, &y1);
          set_error_flag(err, y1.xR[0] < 0.0, __FILE__, __LINE__, "testknnunit.ap:606");
          set_error_flag(err, y1.xR[1] < 0.0, __FILE__, __LINE__, "testknnunit.ap:607");
-         set_error_flag(err, fabs(y1.xR[0] + y1.xR[1] - 1) > 1000 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:608");
+         set_error_flag(err, fabs(y1.xR[0] + y1.xR[1] - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:608");
          if (x1.xR[0] < 1.0) {
             set_error_flag(err, y1.xR[0] < 0.8, __FILE__, __LINE__, "testknnunit.ap:610");
          }
@@ -87002,13 +87001,13 @@ static bool testmlptrainunit_testmlpcverror() {
       }
    }
    if (!isregr) {
-      if (diffms <= (double)r0 || diffms <= (double)r1) {
+      if (diffms <= r0 || diffms <= r1) {
          set_error_flag(&result, true, __FILE__, __LINE__, "testmlptrainunit.ap:1488");
          ae_frame_leave();
          return result;
       }
    }
-   if ((diffms <= (double)r2 || diffms <= (double)r3) || diffms <= (double)r4) {
+   if (diffms <= r2 || diffms <= r3 || diffms <= r4) {
       set_error_flag(&result, true, __FILE__, __LINE__, "testmlptrainunit.ap:1493");
       ae_frame_leave();
       return result;
@@ -87036,7 +87035,7 @@ static bool testmlptrainunit_testmlpcverror() {
          }
       }
       mlpkfoldcv(&trainer, &net, nneedrest, foldscount, &cvrep);
-      if (((((((cvrep.relclserror != 0.0 || cvrep.avgce != 0.0) || cvrep.rmserror != 0.0) || cvrep.avgerror != 0.0) || cvrep.avgrelerror != 0.0) || cvrep.ngrad != 0) || cvrep.nhess != 0) || cvrep.ncholesky != 0) {
+      if (cvrep.relclserror != 0.0 || cvrep.avgce != 0.0 || cvrep.rmserror != 0.0 || cvrep.avgerror != 0.0 || cvrep.avgrelerror != 0.0 || cvrep.ngrad != 0 || cvrep.nhess != 0 || cvrep.ncholesky != 0) {
          set_error_flag(&result, true, __FILE__, __LINE__, "testmlptrainunit.ap:1527");
          ae_frame_leave();
          return result;
@@ -87142,7 +87141,7 @@ static bool testmlptrainunit_testmlptrainens() {
          }
       }
    }
-   set_error_flag(&result, (double)(nall - nless) > 0.3 * nall, __FILE__, __LINE__, "testmlptrainunit.ap:1636");
+   set_error_flag(&result, nall - nless > 0.3 * nall, __FILE__, __LINE__, "testmlptrainunit.ap:1636");
    ae_frame_leave();
    return result;
 }
@@ -87433,7 +87432,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
          }
          mlpeprocess(&netens, &x, &y);
          for (j = 0; j < nout; j++) {
-            if ((double)j != xytrain.xyR[i][nin]) {
+            if (j != xytrain.xyR[i][nin]) {
                avgerr += y.xR[j];
             } else {
                avgerr += (1 - y.xR[j]);
@@ -87452,7 +87451,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
          ae_v_move(x.xR, 1, xytest.xyR[i], 1, nin);
          mlpeprocess(&netens, &x, &y);
          for (j = 0; j < nout; j++) {
-            if ((double)j != xytest.xyR[i][nin]) {
+            if (j != xytest.xyR[i][nin]) {
                avgerr += y.xR[j];
             } else {
                avgerr += (1 - y.xR[j]);
@@ -87528,9 +87527,9 @@ bool testmlptrain(bool silent) {
    mlpxorregrerr = testmlptrainunit_testmlpxorregr();
    mlpxorclserr = testmlptrainunit_testmlpxorcls();
 // Training for ensembles
-   mlptrainenserrors = (testmlptrainunit_testmlptrainens() || testmlptrainunit_testmlptrainensregr()) || testmlptrainunit_testmlptrainenscls();
+   mlptrainenserrors = testmlptrainunit_testmlptrainens() || testmlptrainunit_testmlptrainensregr() || testmlptrainunit_testmlptrainenscls();
 // Final report
-   waserrors = ((((((trnerrors || mlptrainregrerr) || mlptrainclasserr) || mlprestartserr) || mlpxorregrerr) || mlpxorclserr) || mlpcverrorerr) || mlptrainenserrors;
+   waserrors = trnerrors || mlptrainregrerr || mlptrainclasserr || mlprestartserr || mlpxorregrerr || mlpxorclserr || mlpcverrorerr || mlptrainenserrors;
    if (!silent) {
       printf("MLP TEST\n");
       printf("CROSS-VALIDATION ERRORS:                 ");
@@ -87990,7 +87989,7 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
       }
       ae_shared_pool_next_recycled(&pool, &_prec2);
    }
-   if ((val100cnt != 1 || val101cnt != 1) || val102cnt != 1) {
+   if (val100cnt != 1 || val101cnt != 1 || val102cnt != 1) {
       ae_frame_leave();
       return result;
    }
@@ -88010,7 +88009,7 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
       }
       ae_shared_pool_next_recycled(&pool, &_prec2);
    }
-   if ((val100cnt != 1 || val101cnt != 1) || val102cnt != 1) {
+   if (val100cnt != 1 || val101cnt != 1 || val102cnt != 1) {
       ae_frame_leave();
       return result;
    }
@@ -88437,7 +88436,7 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent) {
    ae_int_t pass;
    ae_int_t passcount;
    bool result;
-   threshold = 100 * machineepsilon;
+   threshold = 100.0 * machineepsilon;
    passcount = 1000;
    result = true;
    absc = true;
@@ -88464,33 +88463,33 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent) {
       ra = randommid();
       rb = randommid();
       res = ae_c_add(ca, cb);
-      addcc = (addcc && fabs(res.x - ca.x - cb.x) < threshold) && fabs(res.y - ca.y - cb.y) < threshold;
+      addcc = addcc && fabs(res.x - ca.x - cb.x) < threshold && fabs(res.y - ca.y - cb.y) < threshold;
       res = ae_c_add_d(ca, rb);
-      addcr = (addcr && fabs(res.x - ca.x - rb) < threshold) && fabs(res.y - ca.y) < threshold;
+      addcr = addcr && fabs(res.x - ca.x - rb) < threshold && fabs(res.y - ca.y) < threshold;
       res = ae_c_add_d(cb, ra);
-      addrc = (addrc && fabs(res.x - ra - cb.x) < threshold) && fabs(res.y - cb.y) < threshold;
+      addrc = addrc && fabs(res.x - ra - cb.x) < threshold && fabs(res.y - cb.y) < threshold;
    // test Sub
       ca = complex_from_d(randommid(), randommid());
       cb = complex_from_d(randommid(), randommid());
       ra = randommid();
       rb = randommid();
       res = ae_c_sub(ca, cb);
-      subcc = (subcc && fabs(res.x - (ca.x - cb.x)) < threshold) && fabs(res.y - (ca.y - cb.y)) < threshold;
+      subcc = subcc && fabs(res.x - (ca.x - cb.x)) < threshold && fabs(res.y - (ca.y - cb.y)) < threshold;
       res = ae_c_sub_d(ca, rb);
-      subcr = (subcr && fabs(res.x - (ca.x - rb)) < threshold) && fabs(res.y - ca.y) < threshold;
+      subcr = subcr && fabs(res.x - (ca.x - rb)) < threshold && fabs(res.y - ca.y) < threshold;
       res = ae_c_d_sub(ra, cb);
-      subrc = (subrc && fabs(res.x - (ra - cb.x)) < threshold) && fabs(res.y + cb.y) < threshold;
+      subrc = subrc && fabs(res.x - (ra - cb.x)) < threshold && fabs(res.y + cb.y) < threshold;
    // test Mul
       ca = complex_from_d(randommid(), randommid());
       cb = complex_from_d(randommid(), randommid());
       ra = randommid();
       rb = randommid();
       res = ae_c_mul(ca, cb);
-      mulcc = (mulcc && fabs(res.x - (ca.x * cb.x - ca.y * cb.y)) < threshold) && fabs(res.y - (ca.x * cb.y + ca.y * cb.x)) < threshold;
+      mulcc = mulcc && fabs(res.x - (ca.x * cb.x - ca.y * cb.y)) < threshold && fabs(res.y - (ca.x * cb.y + ca.y * cb.x)) < threshold;
       res = ae_c_mul_d(ca, rb);
-      mulcr = (mulcr && fabs(res.x - ca.x * rb) < threshold) && fabs(res.y - ca.y * rb) < threshold;
+      mulcr = mulcr && fabs(res.x - ca.x * rb) < threshold && fabs(res.y - ca.y * rb) < threshold;
       res = ae_c_mul_d(cb, ra);
-      mulrc = (mulrc && fabs(res.x - ra * cb.x) < threshold) && fabs(res.y - ra * cb.y) < threshold;
+      mulrc = mulrc && fabs(res.x - ra * cb.x) < threshold && fabs(res.y - ra * cb.y) < threshold;
    // test Div
       ca = complex_from_d(randommid(), randommid());
       do {
@@ -88501,11 +88500,11 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent) {
          rb = randommid();
       } while (fabs(rb) <= 0.5);
       res = ae_c_div(ca, cb);
-      divcc = (divcc && fabs(ae_c_mul(res, cb).x - ca.x) < threshold) && fabs(ae_c_mul(res, cb).y - ca.y) < threshold;
+      divcc = divcc && fabs(ae_c_mul(res, cb).x - ca.x) < threshold && fabs(ae_c_mul(res, cb).y - ca.y) < threshold;
       res = ae_c_div_d(ca, rb);
-      divcr = (divcr && fabs(res.x - ca.x / rb) < threshold) && fabs(res.y - ca.y / rb) < threshold;
+      divcr = divcr && fabs(res.x - ca.x / rb) < threshold && fabs(res.y - ca.y / rb) < threshold;
       res = ae_c_d_div(ra, cb);
-      divrc = (divrc && fabs(ae_c_mul(res, cb).x - ra) < threshold) && fabs(ae_c_mul(res, cb).y) < threshold;
+      divrc = divrc && fabs(ae_c_mul(res, cb).x - ra) < threshold && fabs(ae_c_mul(res, cb).y) < threshold;
    }
 // summary
    result = result && absc;
@@ -88980,7 +88979,7 @@ static bool testalglibbasicsunit_testswapfunctions(bool silent) {
    b22.xyB[0][0] = false;
    b22.xyB[1][0] = true;
    ae_swap_matrices(&b21, &b22);
-   if (((b21.rows == 2 && b21.cols == 1) && b22.rows == 1) && b22.cols == 2) {
+   if (b21.rows == 2 && b21.cols == 1 && b22.rows == 1 && b22.cols == 2) {
       okb2 = okb2 && !b21.xyB[0][0];
       okb2 = okb2 && b21.xyB[1][0];
       okb2 = okb2 && b22.xyB[0][0];
@@ -88996,7 +88995,7 @@ static bool testalglibbasicsunit_testswapfunctions(bool silent) {
    i22.xyZ[0][0] = 3;
    i22.xyZ[1][0] = 4;
    ae_swap_matrices(&i21, &i22);
-   if (((i21.rows == 2 && i21.cols == 1) && i22.rows == 1) && i22.cols == 2) {
+   if (i21.rows == 2 && i21.cols == 1 && i22.rows == 1 && i22.cols == 2) {
       oki2 = oki2 && i21.xyZ[0][0] == 3;
       oki2 = oki2 && i21.xyZ[1][0] == 4;
       oki2 = oki2 && i22.xyZ[0][0] == 1;
@@ -89012,7 +89011,7 @@ static bool testalglibbasicsunit_testswapfunctions(bool silent) {
    r22.xyR[0][0] = 3.0;
    r22.xyR[1][0] = 4.0;
    ae_swap_matrices(&r21, &r22);
-   if (((r21.rows == 2 && r21.cols == 1) && r22.rows == 1) && r22.cols == 2) {
+   if (r21.rows == 2 && r21.cols == 1 && r22.rows == 1 && r22.cols == 2) {
       okr2 = okr2 && r21.xyR[0][0] == 3.0;
       okr2 = okr2 && r21.xyR[1][0] == 4.0;
       okr2 = okr2 && r22.xyR[0][0] == 1.0;
@@ -89028,7 +89027,7 @@ static bool testalglibbasicsunit_testswapfunctions(bool silent) {
    c22.xyC[0][0] = complex_from_i(3);
    c22.xyC[1][0] = complex_from_i(4);
    ae_swap_matrices(&c21, &c22);
-   if (((c21.rows == 2 && c21.cols == 1) && c22.rows == 1) && c22.cols == 2) {
+   if (c21.rows == 2 && c21.cols == 1 && c22.rows == 1 && c22.cols == 2) {
       okc2 = okc2 && ae_c_eq_d(c21.xyC[0][0], 3.0);
       okc2 = okc2 && ae_c_eq_d(c21.xyC[1][0], 4.0);
       okc2 = okc2 && ae_c_eq_d(c22.xyC[0][0], 1.0);
@@ -89128,7 +89127,7 @@ static bool testalglibbasicsunit_testserializationfunctions(bool silent) {
                ae_serializer_stop(&_local_serializer);
                ae_frame_leave();
             }
-            if ((r0.b.cnt == r1.b.cnt && r0.i.cnt == r1.i.cnt) && r0.r.cnt == r1.r.cnt) {
+            if (r0.b.cnt == r1.b.cnt && r0.i.cnt == r1.i.cnt && r0.r.cnt == r1.r.cnt) {
                for (i = 0; i < nb; i++) {
                   okb = okb && r0.b.xB[i] == r1.b.xB[i];
                }
@@ -89237,7 +89236,7 @@ static bool testalglibbasicsunit_testsmp(bool silent) {
    t1 = testalglibbasicsunit_performtestsort1();
    t2 = testalglibbasicsunit_performtestsort2();
    ts = testalglibbasicsunit_performtestpoolsum();
-   result = ((t0 && t1) && t2) && ts;
+   result = t0 && t1 && t2 && ts;
    if (!silent) {
       if (result) {
          printf("SMP FUNCTIONS:                           OK\n");

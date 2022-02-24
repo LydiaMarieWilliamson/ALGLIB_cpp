@@ -29,7 +29,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
 // Prepare RComm
    state->PQ = -1;
 // check parameters.
-   if ((n <= 0 || m < 1) || eps == 0.0) {
+   if (n <= 0 || m < 1 || eps == 0.0) {
       state->repterminationtype = -1;
       return;
    }
@@ -53,7 +53,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
       return;
    }
    for (i = 1; i < m; i++) {
-      if ((x->xR[1] > x->xR[0] && x->xR[i] <= x->xR[i - 1]) || (x->xR[1] < x->xR[0] && x->xR[i] >= x->xR[i - 1])) {
+      if (x->xR[1] > x->xR[0] && x->xR[i] <= x->xR[i - 1] || x->xR[1] < x->xR[0] && x->xR[i] >= x->xR[i - 1]) {
          state->repterminationtype = -2;
          return;
       }
@@ -327,7 +327,7 @@ Spawn:
             } else {
                h2 = h * pow(state->eps / err, 0.2);
             }
-            if (h2 < h / odesolver_odesolvermaxshrink) {
+            if (h2 * odesolver_odesolvermaxshrink < h) {
                h2 = h / odesolver_odesolvermaxshrink;
             }
             if (err > state->eps) {

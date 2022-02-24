@@ -271,7 +271,7 @@ void rsetvx_sse2(const ae_int_t n, const double v, Real *__restrict x) {
          x[j] = v;
       return;
    }
-   if ((((ptrdiff_t)x) & 15) == 0) {
+   if (((ptrdiff_t)x & 15) == 0) {
       rsetv_sse2(n, v, x);
       return;
    }
@@ -328,7 +328,7 @@ void rmulvx_sse2(const ae_int_t n, const double v, double *__restrict x) {
          x[i] *= v;
       return;
    }
-   if ((((ptrdiff_t)x) & 15) == 0) {
+   if (((ptrdiff_t)x & 15) == 0) {
       rmulv_sse2(n, v, x);
       return;
    }
@@ -372,7 +372,7 @@ void raddvx_sse2(const ae_int_t n, const double alpha, const double *__restrict 
          x[i] += alpha * y[i];
       return;
    }
-   if ((((ptrdiff_t)x) & 15) == 0) {
+   if (((ptrdiff_t)x & 15) == 0) {
       raddvx_sse2_xaligned(n, alpha, y, x);
       return;
    }
@@ -498,7 +498,7 @@ static void rcopyvx_sse2_xaligned(const ae_int_t n, const double *__restrict x, 
 }
 
 void rcopyvx_sse2(const ae_int_t n, const double *__restrict x, double *__restrict y) {
-   if ((((ptrdiff_t)x) & 15) == 0) {
+   if (((ptrdiff_t)x & 15) == 0) {
       rcopyvx_sse2_xaligned(n, x, y);
       return;
    }

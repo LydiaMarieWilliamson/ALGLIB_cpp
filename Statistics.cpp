@@ -525,7 +525,7 @@ void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
 //
 // Try to use serial code for basecase problems, no SMP functionality, no shared pools.
    basecasecost = 10000;
-   if ((double)npoints * nfeatures * logbase2((double)nfeatures) < (double)basecasecost) {
+   if (npoints * nfeatures * logbase2((double)nfeatures) < basecasecost) {
       basestat_rankdatabasecase(xy, 0, npoints, nfeatures, false, &buf0, &buf1);
       ae_frame_leave();
       return;
@@ -577,7 +577,7 @@ void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
 //
 // Try to use serial code, no SMP functionality, no shared pools.
    basecasecost = 10000;
-   if ((double)npoints * nfeatures * logbase2((double)nfeatures) < (double)basecasecost) {
+   if (npoints * nfeatures * logbase2((double)nfeatures) < basecasecost) {
       basestat_rankdatabasecase(xy, 0, npoints, nfeatures, true, &buf0, &buf1);
       ae_frame_leave();
       return;

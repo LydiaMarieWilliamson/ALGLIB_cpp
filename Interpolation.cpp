@@ -429,7 +429,7 @@ static void ratint_barycentricnormalize(barycentricinterpolant *b) {
    for (i = 0; i < b->n; i++) {
       b->sy = rmax2(b->sy, fabs(b->y.xR[i]));
    }
-   if (b->sy > 0.0 && fabs(b->sy - 1) > 10 * machineepsilon) {
+   if (b->sy > 0.0 && fabs(b->sy - 1.0) > 10.0 * machineepsilon) {
       v = 1 / b->sy;
       ae_v_muld(b->y.xR, 1, b->n, v);
    }
@@ -437,7 +437,7 @@ static void ratint_barycentricnormalize(barycentricinterpolant *b) {
    for (i = 0; i < b->n; i++) {
       v = rmax2(v, fabs(b->w.xR[i]));
    }
-   if (v > 0.0 && fabs(v - 1) > 10 * machineepsilon) {
+   if (v > 0.0 && fabs(v - 1.0) > 10.0 * machineepsilon) {
       v = 1 / v;
       ae_v_muld(b->w.xR, 1, b->n, v);
    }
@@ -1159,7 +1159,7 @@ void idwtscalcbuf(idwmodel *s, idwcalcbuffer *buf, RVector *x, RVector *y) {
       invrdecay = 1 / s->rdecay;
       invr = 1 / s->r0;
       lambdadecay = s->lambdadecay;
-      fastcalcpossible = (ny == 1 && s->nlayers >= 3) && lambdadecay == 1.0;
+      fastcalcpossible = ny == 1 && s->nlayers >= 3 && lambdadecay == 1.0;
       if (fastcalcpossible) {
       // Important special case, NY=1, no lambda-decay,
       // we can perform optimized fast evaluation
@@ -4018,12 +4018,12 @@ static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_in
 // Special cases:
 // * N=2, parabolic terminated boundary condition on both ends
 // * N=2, periodic boundary condition
-   if ((n == 2 && boundltype == 0) && boundrtype == 0) {
+   if (n == 2 && boundltype == 0 && boundrtype == 0) {
       d->xR[0] = (y->xR[1] - y->xR[0]) / (x->xR[1] - x->xR[0]);
       d->xR[1] = d->xR[0];
       return;
    }
-   if ((n == 2 && boundltype == -1) && boundrtype == -1) {
+   if (n == 2 && boundltype == -1 && boundrtype == -1) {
       d->xR[0] = 0.0;
       d->xR[1] = 0.0;
       return;
@@ -4307,9 +4307,9 @@ void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype,
    NewVector(d, 0, DT_REAL);
    NewVector(p, 0, DT_INT);
 // check correctness of boundary conditions
-   ae_assert(((boundltype == -1 || boundltype == 0) || boundltype == 1) || boundltype == 2, "Spline1DBuildCubic: incorrect BoundLType!");
-   ae_assert(((boundrtype == -1 || boundrtype == 0) || boundrtype == 1) || boundrtype == 2, "Spline1DBuildCubic: incorrect BoundRType!");
-   ae_assert((boundrtype == -1 && boundltype == -1) || (boundrtype != -1 && boundltype != -1), "Spline1DBuildCubic: incorrect BoundLType/BoundRType!");
+   ae_assert(boundltype == -1 || boundltype == 0 || boundltype == 1 || boundltype == 2, "Spline1DBuildCubic: incorrect BoundLType!");
+   ae_assert(boundrtype == -1 || boundrtype == 0 || boundrtype == 1 || boundrtype == 2, "Spline1DBuildCubic: incorrect BoundRType!");
+   ae_assert((boundrtype == -1) == (boundltype == -1), "Spline1DBuildCubic: incorrect BoundLType/BoundRType!");
    if (boundltype == 1 || boundltype == 2) {
       ae_assert(isfinite(boundl), "Spline1DBuildCubic: BoundL is infinite or NAN!");
    }
@@ -4709,9 +4709,9 @@ void spline1dgriddiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
    NewVector(dt, 0, DT_REAL);
    NewVector(p, 0, DT_INT);
 // check correctness of boundary conditions
-   ae_assert(((boundltype == -1 || boundltype == 0) || boundltype == 1) || boundltype == 2, "Spline1DGridDiffCubic: incorrect BoundLType!");
-   ae_assert(((boundrtype == -1 || boundrtype == 0) || boundrtype == 1) || boundrtype == 2, "Spline1DGridDiffCubic: incorrect BoundRType!");
-   ae_assert((boundrtype == -1 && boundltype == -1) || (boundrtype != -1 && boundltype != -1), "Spline1DGridDiffCubic: incorrect BoundLType/BoundRType!");
+   ae_assert(boundltype == -1 || boundltype == 0 || boundltype == 1 || boundltype == 2, "Spline1DGridDiffCubic: incorrect BoundLType!");
+   ae_assert(boundrtype == -1 || boundrtype == 0 || boundrtype == 1 || boundrtype == 2, "Spline1DGridDiffCubic: incorrect BoundRType!");
+   ae_assert((boundrtype == -1) == (boundltype == -1), "Spline1DGridDiffCubic: incorrect BoundLType/BoundRType!");
    if (boundltype == 1 || boundltype == 2) {
       ae_assert(isfinite(boundl), "Spline1DGridDiffCubic: BoundL is infinite or NAN!");
    }
@@ -4827,9 +4827,9 @@ void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
    NewVector(dt, 0, DT_REAL);
    NewVector(p, 0, DT_INT);
 // check correctness of boundary conditions
-   ae_assert(((boundltype == -1 || boundltype == 0) || boundltype == 1) || boundltype == 2, "Spline1DGridDiff2Cubic: incorrect BoundLType!");
-   ae_assert(((boundrtype == -1 || boundrtype == 0) || boundrtype == 1) || boundrtype == 2, "Spline1DGridDiff2Cubic: incorrect BoundRType!");
-   ae_assert((boundrtype == -1 && boundltype == -1) || (boundrtype != -1 && boundltype != -1), "Spline1DGridDiff2Cubic: incorrect BoundLType/BoundRType!");
+   ae_assert(boundltype == -1 || boundltype == 0 || boundltype == 1 || boundltype == 2, "Spline1DGridDiff2Cubic: incorrect BoundLType!");
+   ae_assert(boundrtype == -1 || boundrtype == 0 || boundrtype == 1 || boundrtype == 2, "Spline1DGridDiff2Cubic: incorrect BoundRType!");
+   ae_assert((boundrtype == -1) == (boundltype == -1), "Spline1DGridDiff2Cubic: incorrect BoundLType/BoundRType!");
    if (boundltype == 1 || boundltype == 2) {
       ae_assert(isfinite(boundl), "Spline1DGridDiff2Cubic: BoundL is infinite or NAN!");
    }
@@ -5091,9 +5091,9 @@ void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, 
    NewVector(p, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
 // check correctness of boundary conditions
-   ae_assert(((boundltype == -1 || boundltype == 0) || boundltype == 1) || boundltype == 2, "Spline1DConvCubic: incorrect BoundLType!");
-   ae_assert(((boundrtype == -1 || boundrtype == 0) || boundrtype == 1) || boundrtype == 2, "Spline1DConvCubic: incorrect BoundRType!");
-   ae_assert((boundrtype == -1 && boundltype == -1) || (boundrtype != -1 && boundltype != -1), "Spline1DConvCubic: incorrect BoundLType/BoundRType!");
+   ae_assert(boundltype == -1 || boundltype == 0 || boundltype == 1 || boundltype == 2, "Spline1DConvCubic: incorrect BoundLType!");
+   ae_assert(boundrtype == -1 || boundrtype == 0 || boundrtype == 1 || boundrtype == 2, "Spline1DConvCubic: incorrect BoundRType!");
+   ae_assert((boundrtype == -1) == (boundltype == -1), "Spline1DConvCubic: incorrect BoundLType/BoundRType!");
    if (boundltype == 1 || boundltype == 2) {
       ae_assert(isfinite(boundl), "Spline1DConvCubic: BoundL is infinite or NAN!");
    }
@@ -5231,9 +5231,9 @@ void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
    NewVector(p, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
 // check correctness of boundary conditions
-   ae_assert(((boundltype == -1 || boundltype == 0) || boundltype == 1) || boundltype == 2, "Spline1DConvDiffCubic: incorrect BoundLType!");
-   ae_assert(((boundrtype == -1 || boundrtype == 0) || boundrtype == 1) || boundrtype == 2, "Spline1DConvDiffCubic: incorrect BoundRType!");
-   ae_assert((boundrtype == -1 && boundltype == -1) || (boundrtype != -1 && boundltype != -1), "Spline1DConvDiffCubic: incorrect BoundLType/BoundRType!");
+   ae_assert(boundltype == -1 || boundltype == 0 || boundltype == 1 || boundltype == 2, "Spline1DConvDiffCubic: incorrect BoundLType!");
+   ae_assert(boundrtype == -1 || boundrtype == 0 || boundrtype == 1 || boundrtype == 2, "Spline1DConvDiffCubic: incorrect BoundRType!");
+   ae_assert((boundrtype == -1) == (boundltype == -1), "Spline1DConvDiffCubic: incorrect BoundLType/BoundRType!");
    if (boundltype == 1 || boundltype == 2) {
       ae_assert(isfinite(boundl), "Spline1DConvDiffCubic: BoundL is infinite or NAN!");
    }
@@ -5377,9 +5377,9 @@ void spline1dconvdiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
    NewVector(p, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
 // check correctness of boundary conditions
-   ae_assert(((boundltype == -1 || boundltype == 0) || boundltype == 1) || boundltype == 2, "Spline1DConvDiff2Cubic: incorrect BoundLType!");
-   ae_assert(((boundrtype == -1 || boundrtype == 0) || boundrtype == 1) || boundrtype == 2, "Spline1DConvDiff2Cubic: incorrect BoundRType!");
-   ae_assert((boundrtype == -1 && boundltype == -1) || (boundrtype != -1 && boundltype != -1), "Spline1DConvDiff2Cubic: incorrect BoundLType/BoundRType!");
+   ae_assert(boundltype == -1 || boundltype == 0 || boundltype == 1 || boundltype == 2, "Spline1DConvDiff2Cubic: incorrect BoundLType!");
+   ae_assert(boundrtype == -1 || boundrtype == 0 || boundrtype == 1 || boundrtype == 2, "Spline1DConvDiff2Cubic: incorrect BoundRType!");
+   ae_assert((boundrtype == -1) == (boundltype == -1), "Spline1DConvDiff2Cubic: incorrect BoundLType/BoundRType!");
    if (boundltype == 1 || boundltype == 2) {
       ae_assert(isfinite(boundl), "Spline1DConvDiff2Cubic: BoundL is infinite or NAN!");
    }
@@ -6136,7 +6136,7 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
    if (a == 0.0) {
    // B != 0 and root inside [0;1]
    // one root
-      if ((b != 0.0 && sign(c) * sign(b) <= 0) && fabs(b) >= fabs(c)) {
+      if (b != 0.0 && sign(c) * sign(b) <= 0 && fabs(b) >= fabs(c)) {
          *x0 = -c / b;
          *nr = 1;
          return;
@@ -6163,7 +6163,7 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
          }
          *x0 = (-b - sqrt(dd)) / (2 * a);
          *x1 = (-b + sqrt(dd)) / (2 * a);
-         if ((extr >= 1.0 && *x1 <= extr) || (extr <= 0.0 && *x1 >= extr)) {
+         if (extr >= 1.0 && *x1 <= extr || extr <= 0.0 && *x1 >= extr) {
             *x0 = *x1;
          }
          return;
@@ -6500,12 +6500,12 @@ void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, dou
    ae_assert(a < b, "\nSolveCubicPolinom: incorrect borders for [A;B]!\n");
 // case 1
 // function can be identicaly to ZERO
-   if (((ma == 0.0 && mb == 0.0) && pa == pb) && pa == 0.0) {
+   if (ma == 0.0 && mb == 0.0 && pa == pb && pa == 0.0) {
       *nr = -1;
       *ne = -1;
       return;
    }
-   if ((ma == 0.0 && mb == 0.0) && pa == pb) {
+   if (ma == 0.0 && mb == 0.0 && pa == pb) {
       *nr = 0;
       *ne = -1;
       return;
@@ -7450,7 +7450,7 @@ static void lsfit_rdpanalyzesection(RVector *x, RVector *y, ae_int_t i0, ae_int_
    for (i = i0 + 1; i < i1; i++) {
       vx = x->xR[i];
       ve = fabs(a * vx + b - y->xR[i]);
-      if ((vx > xleft && vx < xright) && ve > *worsterror) {
+      if (vx > xleft && vx < xright && ve > *worsterror) {
          *worsterror = ve;
          *worstidx = i;
       }
@@ -8514,7 +8514,7 @@ void lsfitlinearwc(RVector *y, RVector *w, RMatrix *fmatrix, RMatrix *cmatrix, a
             cmatrix->xyR[i][j] = 0.0;
          }
       }
-      if (rmatrixlurcondinf(cmatrix, k) < 1000 * machineepsilon) {
+      if (rmatrixlurcondinf(cmatrix, k) < 1000.0 * machineepsilon) {
          *info = -3;
          ae_frame_leave();
          return;
@@ -8838,7 +8838,7 @@ static void lsfit_internalchebyshevfit(RVector *x, RVector *y, RVector *w, ae_in
    lsfit_clearreport(rep);
 // weight decay for correct handling of task which becomes
 // degenerate after constraints are applied
-   decay = 10000 * machineepsilon;
+   decay = 10000.0 * machineepsilon;
 // allocate space, initialize/fill:
 // * FMatrix-   values of basis functions at X[]
 // * CMatrix-   values (derivatives) of basis functions at XC[]
@@ -9380,7 +9380,7 @@ static void lsfit_logisticfitinternal(RVector *x, RVector *y, ae_int_t n, bool i
             } else {
                vp1 = pow(1 + vp0, tg);
             }
-            if ((!isfinite(vp1) || vp0 > 1.0E50) || vp1 > 1.0E50) {
+            if (!isfinite(vp1) || vp0 > 1.0E50 || vp1 > 1.0E50) {
             // VP0/VP1 are not finite, assume that it is +INF or -INF
                state->fi.xR[i] = td - y->xR[i];
                if (state->needfij) {
@@ -10460,7 +10460,7 @@ static void lsfit_barycentricfitwcfixedd(RVector *x, RVector *y, RVector *w, ae_
    NewVector(tmp, 0, DT_REAL);
    NewObj(lsfitreport, lrep);
    NewObj(barycentricinterpolant, b2);
-   if (((n < 1 || m < 2) || k < 0) || k >= m) {
+   if (n < 1 || m < 2 || k < 0 || k >= m) {
       *info = -1;
       ae_frame_leave();
       return;
@@ -10480,7 +10480,7 @@ static void lsfit_barycentricfitwcfixedd(RVector *x, RVector *y, RVector *w, ae_
    }
 // weight decay for correct handling of task which becomes
 // degenerate after constraints are applied
-   decay = 10000 * machineepsilon;
+   decay = 10000.0 * machineepsilon;
 // Scale X, Y, XC, YC
    lsfitscalexy(x, y, w, n, xc, yc, dc, k, &xa, &xb, &sa, &sb, &xoriginal, &yoriginal);
 // allocate space, initialize:
@@ -10711,7 +10711,7 @@ void barycentricfitfloaterhormannwc(RVector *x, RVector *y, RVector *w, ae_int_t
    *info = -3;
    for (d = 0; d < imin2(10, n); d++) {
       lsfit_barycentricfitwcfixedd(x, y, w, n, xc, yc, dc, k, m, d, &locinfo, &locb, &locrep);
-      ae_assert((locinfo == -4 || locinfo == -3) || locinfo > 0, "BarycentricFitFloaterHormannWC: unexpected result from BarycentricFitWCFixedD!");
+      ae_assert(locinfo == -4 || locinfo == -3 || locinfo > 0, "BarycentricFitFloaterHormannWC: unexpected result from BarycentricFitWCFixedD!");
       if (locinfo > 0) {
       // Calculate weghted RMS
          wrmscur = 0.0;
@@ -10846,7 +10846,7 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
       ae_frame_leave();
       return;
    }
-   if ((n < 1 || k < 0) || k >= m) {
+   if (n < 1 || k < 0 || k >= m) {
       *info = -1;
       ae_frame_leave();
       return;
@@ -10872,7 +10872,7 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
    }
 // weight decay for correct handling of task which becomes
 // degenerate after constraints are applied
-   decay = 10000 * machineepsilon;
+   decay = 10000.0 * machineepsilon;
 // Scale X, Y, XC, YC
    lsfitscalexy(x, y, w, n, xc, yc, dc, k, &xa, &xb, &sa, &sb, &xoriginal, &yoriginal);
 // allocate space, initialize:
@@ -14756,7 +14756,7 @@ void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, dou
       t -= ifloor(t);
    }
    pspline3diff(p, t, &v0, x, &v1, y, &v2, z);
-   if ((*x != 0.0 || *y != 0.0) || *z != 0.0) {
+   if (*x != 0.0 || *y != 0.0 || *z != 0.0) {
       v = safepythag3(*x, *y, *z);
       *x /= v;
       *y /= v;
@@ -16557,7 +16557,7 @@ void rbfv1gridcalc2(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int
          y->xyR[i][j] = 0.0;
       }
    }
-   if ((s->ny != 1 || s->nx != 2) || s->nc == 0) {
+   if (s->ny != 1 || s->nx != 2 || s->nc == 0) {
       ae_frame_leave();
       return;
    }
@@ -20828,8 +20828,8 @@ static void spline2d_fastddmfit(RVector *xy, ae_int_t npoints, ae_int_t d, ae_in
       ntotallayers++;
    }
    invscalexy = 1.0 / scalexy;
-   ae_assert((kxcur <= maxcoresize + 1 && kxcur == basecasex + 1) || kxcur % basecasex == 1, "Spline2DFit: integrity error");
-   ae_assert((kycur <= maxcoresize + 1 && kycur == basecasey + 1) || kycur % basecasey == 1, "Spline2DFit: integrity error");
+   ae_assert(kxcur <= maxcoresize + 1 && kxcur == basecasex + 1 || kxcur % basecasex == 1, "Spline2DFit: integrity error");
+   ae_assert(kycur <= maxcoresize + 1 && kycur == basecasey + 1 || kycur % basecasey == 1, "Spline2DFit: integrity error");
    ae_assert(kxcur == basecasex + 1 || kycur == basecasey + 1, "Spline2DFit: integrity error");
 // Initial scaling of dataset.
 // Store original target values to YRaw.
@@ -21409,7 +21409,7 @@ void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitrepo
    for (i = 0; i < npoints; i++) {
       vx = state->xy.xR[i * ew + 0];
       vy = state->xy.xR[i * ew + 1];
-      if (((xaraw - eps * hx <= vx && vx <= xbraw + eps * hx) && yaraw - eps * hy <= vy) && vy <= ybraw + eps * hy) {
+      if (xaraw - eps * hx <= vx && vx <= xbraw + eps * hx && yaraw - eps * hy <= vy && vy <= ybraw + eps * hy) {
          xywork.xR[acopied * ew + 0] = (vx - xa) * invhx;
          xywork.xR[acopied * ew + 1] = (vy - ya) * invhy;
          for (j = 0; j < d; j++) {
@@ -24138,7 +24138,7 @@ void rbfv2partialgridcalcrec(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x
          srcoffs = blocks0->xZ[i0] + (j1 + (j2 + j3 * n2) * n1) * n0;
          emptyrow = true;
          for (nodeidx = 0; nodeidx < nodescnt; nodeidx++) {
-            emptyrow = emptyrow && (sparsey && !flagy->xB[srcoffs + nodeidx]);
+            emptyrow = emptyrow && sparsey && !flagy->xB[srcoffs + nodeidx];
          }
          if (emptyrow) {
             continue;
@@ -24277,9 +24277,9 @@ void rbfv2gridcalcvx(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_in
    hqrndseed(532, 54734, &rs);
 // Perform integrity checks
    ae_assert(s->nx == 2 || s->nx == 3, "RBFGridCalcVX: integrity check failed");
-   ae_assert(s->nx >= 4 || ((x3->cnt >= 1 && x3->xR[0] == 0.0) && n3 == 1), "RBFGridCalcVX: integrity check failed");
-   ae_assert(s->nx >= 3 || ((x2->cnt >= 1 && x2->xR[0] == 0.0) && n2 == 1), "RBFGridCalcVX: integrity check failed");
-   ae_assert(s->nx >= 2 || ((x1->cnt >= 1 && x1->xR[0] == 0.0) && n1 == 1), "RBFGridCalcVX: integrity check failed");
+   ae_assert(s->nx >= 4 || x3->cnt >= 1 && x3->xR[0] == 0.0 && n3 == 1, "RBFGridCalcVX: integrity check failed");
+   ae_assert(s->nx >= 3 || x2->cnt >= 1 && x2->xR[0] == 0.0 && n2 == 1, "RBFGridCalcVX: integrity check failed");
+   ae_assert(s->nx >= 2 || x1->cnt >= 1 && x1->xR[0] == 0.0 && n1 == 1, "RBFGridCalcVX: integrity check failed");
 // Allocate arrays
    ae_assert(s->nx <= 4, "RBFGridCalcVX: integrity check failed");
    ae_vector_set_length(&z, ny);
@@ -24858,7 +24858,7 @@ void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVec
    ae_int_t h;
    ae_int_t i;
    ae_assert(c->stype == -1 || c->stype == -3, "Spline3DCalcVBuf: incorrect C (incorrect parameter C.SType)");
-   ae_assert((isfinite(x) && isfinite(y)) && isfinite(z), "Spline3DCalcVBuf: X, Y or Z contains NaN/Infinite");
+   ae_assert(isfinite(x) && isfinite(y) && isfinite(z), "Spline3DCalcVBuf: X, Y or Z contains NaN/Infinite");
    vectorsetlengthatleast(f, c->d);
 // Binary search in the [ x[0], ..., x[n-2] ] (x[n-1] is not included)
    l = 0;
@@ -24932,7 +24932,7 @@ void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVec
 void spline3dcalcv(spline3dinterpolant *c, double x, double y, double z, RVector *f) {
    SetVector(f);
    ae_assert(c->stype == -1 || c->stype == -3, "Spline3DCalcV: incorrect C (incorrect parameter C.SType)");
-   ae_assert((isfinite(x) && isfinite(y)) && isfinite(z), "Spline3DCalcV: X=NaN/Infinite, Y=NaN/Infinite or Z=NaN/Infinite");
+   ae_assert(isfinite(x) && isfinite(y) && isfinite(z), "Spline3DCalcV: X=NaN/Infinite, Y=NaN/Infinite or Z=NaN/Infinite");
    ae_vector_set_length(f, c->d);
    spline3dcalcvbuf(c, x, y, z, f);
 }
@@ -24957,7 +24957,7 @@ double spline3dcalc(spline3dinterpolant *c, double x, double y, double z) {
    double vxy;
    double result;
    ae_assert(c->stype == -1 || c->stype == -3, "Spline3DCalc: incorrect C (incorrect parameter C.SType)");
-   ae_assert((isfinite(x) && isfinite(y)) && isfinite(z), "Spline3DCalc: X=NaN/Infinite, Y=NaN/Infinite or Z=NaN/Infinite");
+   ae_assert(isfinite(x) && isfinite(y) && isfinite(z), "Spline3DCalc: X=NaN/Infinite, Y=NaN/Infinite or Z=NaN/Infinite");
    if (c->d != 1) {
       result = 0.0;
       return result;
@@ -25013,8 +25013,8 @@ void spline3dresampletrilinear(RVector *a, ae_int_t oldzcount, ae_int_t oldycoun
    ae_int_t j;
    ae_int_t k;
    SetVector(b);
-   ae_assert((oldycount > 1 && oldzcount > 1) && oldxcount > 1, "Spline3DResampleTrilinear: length/width/height less than 1");
-   ae_assert((newycount > 1 && newzcount > 1) && newxcount > 1, "Spline3DResampleTrilinear: length/width/height less than 1");
+   ae_assert(oldycount > 1 && oldzcount > 1 && oldxcount > 1, "Spline3DResampleTrilinear: length/width/height less than 1");
+   ae_assert(newycount > 1 && newzcount > 1 && newxcount > 1, "Spline3DResampleTrilinear: length/width/height less than 1");
    ae_assert(a->cnt >= oldycount * oldzcount * oldxcount, "Spline3DResampleTrilinear: length/width/height less than 1");
    ae_vector_set_length(b, newxcount * newycount * newzcount);
    for (i = 0; i < newxcount; i++) {
@@ -25089,8 +25089,8 @@ void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVe
    ae_assert(n >= 2, "Spline3DBuildTrilinearV: N<2");
    ae_assert(l >= 2, "Spline3DBuildTrilinearV: L<2");
    ae_assert(d >= 1, "Spline3DBuildTrilinearV: D<1");
-   ae_assert((x->cnt >= n && y->cnt >= m) && z->cnt >= l, "Spline3DBuildTrilinearV: length of X, Y or Z is too short (Length(X/Y/Z)<N/M/L)");
-   ae_assert((isfinitevector(x, n) && isfinitevector(y, m)) && isfinitevector(z, l), "Spline3DBuildTrilinearV: X, Y or Z contains NaN or Infinite value");
+   ae_assert(x->cnt >= n && y->cnt >= m && z->cnt >= l, "Spline3DBuildTrilinearV: length of X, Y or Z is too short (Length(X/Y/Z)<N/M/L)");
+   ae_assert(isfinitevector(x, n) && isfinitevector(y, m) && isfinitevector(z, l), "Spline3DBuildTrilinearV: X, Y or Z contains NaN or Infinite value");
    tblsize = n * m * l * d;
    ae_assert(f->cnt >= tblsize, "Spline3DBuildTrilinearV: length of F is too short (Length(F)<N*M*L*D)");
    ae_assert(isfinitevector(f, tblsize), "Spline3DBuildTrilinearV: F contains NaN or Infinite value");
@@ -25228,10 +25228,10 @@ void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay
       z.xR[i] = c->z.xR[i];
    }
 // Handle different combinations of zero/nonzero AX/AY/AZ
-   if ((ax != 0.0 && ay != 0.0) && az != 0.0) {
+   if (ax != 0.0 && ay != 0.0 && az != 0.0) {
       ae_v_move(f.xR, 1, c->f.xR, 1, c->m * c->n * c->l * c->d);
    }
-   if ((ax == 0.0 && ay != 0.0) && az != 0.0) {
+   if (ax == 0.0 && ay != 0.0 && az != 0.0) {
       for (i = 0; i < c->m; i++) {
          for (j = 0; j < c->l; j++) {
             spline3dcalcv(c, bx, y.xR[i], z.xR[j], &v);
@@ -25245,7 +25245,7 @@ void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay
       ax = 1.0;
       bx = 0.0;
    }
-   if ((ax != 0.0 && ay == 0.0) && az != 0.0) {
+   if (ax != 0.0 && ay == 0.0 && az != 0.0) {
       for (i = 0; i < c->n; i++) {
          for (j = 0; j < c->l; j++) {
             spline3dcalcv(c, x.xR[i], by, z.xR[j], &v);
@@ -25259,7 +25259,7 @@ void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay
       ay = 1.0;
       by = 0.0;
    }
-   if ((ax != 0.0 && ay != 0.0) && az == 0.0) {
+   if (ax != 0.0 && ay != 0.0 && az == 0.0) {
       for (i = 0; i < c->n; i++) {
          for (j = 0; j < c->m; j++) {
             spline3dcalcv(c, x.xR[i], y.xR[j], bz, &v);
@@ -25273,7 +25273,7 @@ void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay
       az = 1.0;
       bz = 0.0;
    }
-   if ((ax == 0.0 && ay == 0.0) && az != 0.0) {
+   if (ax == 0.0 && ay == 0.0 && az != 0.0) {
       for (i = 0; i < c->l; i++) {
          spline3dcalcv(c, bx, by, z.xR[i], &v);
          for (k = 0; k < c->m; k++) {
@@ -25289,7 +25289,7 @@ void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay
       ay = 1.0;
       by = 0.0;
    }
-   if ((ax == 0.0 && ay != 0.0) && az == 0.0) {
+   if (ax == 0.0 && ay != 0.0 && az == 0.0) {
       for (i = 0; i < c->m; i++) {
          spline3dcalcv(c, bx, y.xR[i], bz, &v);
          for (k = 0; k < c->l; k++) {
@@ -25305,7 +25305,7 @@ void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay
       az = 1.0;
       bz = 0.0;
    }
-   if ((ax != 0.0 && ay == 0.0) && az == 0.0) {
+   if (ax != 0.0 && ay == 0.0 && az == 0.0) {
       for (i = 0; i < c->n; i++) {
          spline3dcalcv(c, x.xR[i], by, bz, &v);
          for (k = 0; k < c->l; k++) {
@@ -25321,7 +25321,7 @@ void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay
       az = 1.0;
       bz = 0.0;
    }
-   if ((ax == 0.0 && ay == 0.0) && az == 0.0) {
+   if (ax == 0.0 && ay == 0.0 && az == 0.0) {
       spline3dcalcv(c, bx, by, bz, &v);
       for (k = 0; k < c->l; k++) {
          for (j = 0; j < c->m; j++) {
@@ -25829,7 +25829,7 @@ void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_in
    }
    pdecay = lambdav * fdmax / admax;
 // Calculate TDecay for Tikhonov regularization
-   tdecay = fdmax * (1 + pdecay) * 10 * machineepsilon;
+   tdecay = fdmax * (1.0 + pdecay) * 10.0 * machineepsilon;
 // Prepare system
 //
 // NOTE: FMatrix is spoiled during this process
@@ -26754,7 +26754,7 @@ void rbfsetcond(rbfmodel *s, double epsort, double epserr, ae_int_t maxits) {
    ae_assert(isfinite(epsort) && epsort >= 0.0, "RBFSetCond: EpsOrt is negative, INF or NAN");
    ae_assert(isfinite(epserr) && epserr >= 0.0, "RBFSetCond: EpsB is negative, INF or NAN");
    ae_assert(maxits >= 0, "RBFSetCond: MaxIts is negative");
-   if ((epsort == 0.0 && epserr == 0.0) && maxits == 0) {
+   if (epsort == 0.0 && epserr == 0.0 && maxits == 0) {
       s->epsort = rbf_eps;
       s->epserr = rbf_eps;
       s->maxits = 0;
@@ -26827,7 +26827,7 @@ void rbfbuildmodel(rbfmodel *s, rbfreport *rep) {
    s->terminationrequest = false;
 // Autoselect algorithm
    if (s->algorithmtype == 0) {
-      if ((s->nx < 2 || s->nx > 3) || s->hasscale) {
+      if (s->nx < 2 || s->nx > 3 || s->hasscale) {
          curalgorithmtype = 3;
       } else {
          curalgorithmtype = 1;
@@ -26838,7 +26838,7 @@ void rbfbuildmodel(rbfmodel *s, rbfreport *rep) {
 // Algorithms which generate V1 models
    if (curalgorithmtype == 1 || curalgorithmtype == 2) {
    // Perform compatibility checks
-      if ((s->nx < 2 || s->nx > 3) || s->hasscale) {
+      if (s->nx < 2 || s->nx > 3 || s->hasscale) {
          rep->terminationtype = -3;
          ae_frame_leave();
          return;

@@ -1235,7 +1235,7 @@ double incompletebeta(double a, double b, double x) {
    } else {
       xc = w;
    }
-   if ((flag == 1 && b * x <= 1.0) && x <= 0.95) {
+   if (flag == 1 && b * x <= 1.0 && x <= 0.95) {
       t = ibetaf_incompletebetaps(a, b, x, maxgam);
       if (t <= machineepsilon) {
          result = 1.0 - machineepsilon;
@@ -1252,7 +1252,7 @@ double incompletebeta(double a, double b, double x) {
    }
    y = a * log(x);
    t = b * log(xc);
-   if ((a + b < maxgam && fabs(y) < maxlog) && fabs(t) < maxlog) {
+   if (a + b < maxgam && fabs(y) < maxlog && fabs(t) < maxlog) {
       t = pow(xc, b);
       t *= pow(x, a);
       t /= a;
@@ -1786,7 +1786,7 @@ double invstudenttdistribution(ae_int_t k, double p) {
    double z;
    ae_int_t rflg;
    double result;
-   ae_assert((k > 0 && p > 0.0) && p < 1.0, "Domain error in InvStudentTDistribution");
+   ae_assert(k > 0 && p > 0.0 && p < 1.0, "Domain error in InvStudentTDistribution");
    rk = (double)k;
    if (p > 0.25 && p < 0.75) {
       if (p == 0.5) {
@@ -1873,7 +1873,7 @@ namespace alglib_impl {
 double fdistribution(ae_int_t a, ae_int_t b, double x) {
    double w;
    double result;
-   ae_assert((a >= 1 && b >= 1) && x >= 0.0, "Domain error in FDistribution");
+   ae_assert(a >= 1 && b >= 1 && x >= 0.0, "Domain error in FDistribution");
    w = a * x;
    w /= b + w;
    result = incompletebeta(0.5 * a, 0.5 * b, w);
@@ -1918,7 +1918,7 @@ double fdistribution(ae_int_t a, ae_int_t b, double x) {
 double fcdistribution(ae_int_t a, ae_int_t b, double x) {
    double w;
    double result;
-   ae_assert((a >= 1 && b >= 1) && x >= 0.0, "Domain error in FCDistribution");
+   ae_assert(a >= 1 && b >= 1 && x >= 0.0, "Domain error in FCDistribution");
    w = b / (b + a * x);
    result = incompletebeta(0.5 * b, 0.5 * a, w);
    return result;
@@ -1961,7 +1961,7 @@ double fcdistribution(ae_int_t a, ae_int_t b, double x) {
 double invfdistribution(ae_int_t a, ae_int_t b, double y) {
    double w;
    double result;
-   ae_assert(((a >= 1 && b >= 1) && y > 0.0) && y <= 1.0, "Domain error in InvFDistribution");
+   ae_assert(a >= 1 && b >= 1 && y > 0.0 && y <= 1.0, "Domain error in InvFDistribution");
 // Compute probability for x = 0.5
    w = incompletebeta(0.5 * b, 0.5 * a, 0.5);
 // If that is greater than y, then the solution w < .5
@@ -2468,7 +2468,7 @@ double chisquarecdistribution(double v, double x) {
 // API: double invchisquaredistribution(const double v, const double y);
 double invchisquaredistribution(double v, double y) {
    double result;
-   ae_assert((y >= 0.0 && y <= 1.0) && v >= 1.0, "Domain error in InvChiSquareDistribution");
+   ae_assert(y >= 0.0 && y <= 1.0 && v >= 1.0, "Domain error in InvChiSquareDistribution");
    result = 2 * invincompletegammac(0.5 * v, y);
    return result;
 }
@@ -2943,7 +2943,7 @@ double exponentialintegralen(double x, ae_int_t n) {
    double result;
    eul = 0.57721566490153286060;
    big = 1.44115188075855872 * pow(10.0, 17.0);
-   if (((n < 0 || x < 0.0) || x > 170.0) || (x == 0.0 && n < 2)) {
+   if (n < 0 || x < 0.0 || x > 170.0 || x == 0.0 && n < 2) {
       result = -1.0;
       return result;
    }
@@ -3883,7 +3883,7 @@ double poissoncdistribution(ae_int_t k, double m) {
 // API: double invpoissondistribution(const ae_int_t k, const double y);
 double invpoissondistribution(ae_int_t k, double y) {
    double result;
-   ae_assert((k >= 0 && y >= 0.0) && y < 1.0, "Domain error in InvPoissonDistribution");
+   ae_assert(k >= 0 && y >= 0.0 && y < 1.0, "Domain error in InvPoissonDistribution");
    result = invincompletegammac((double)(k + 1), y);
    return result;
 }
@@ -6110,7 +6110,7 @@ double laguerrecalculate(ae_int_t n, double x) {
       result = b;
    }
    i = 2.0;
-   while (i <= (double)n) {
+   while (i <= n) {
       result = ((2 * i - 1 - x) * b - (i - 1) * a) / i;
       a = b;
       b = result;

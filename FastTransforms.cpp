@@ -930,7 +930,7 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
    NewVector(buf, 0, DT_REAL);
    NewVector(buf2, 0, DT_REAL);
    NewObj(fasttransformplan, plan);
-   ae_assert((n > 0 && m > 0) && n <= m, "ConvC1DInv: incorrect N or M!");
+   ae_assert(n > 0 && m > 0 && n <= m, "ConvC1DInv: incorrect N or M!");
    p = ftbasefindsmooth(m);
    ftcomplexfftplan(p, 1, &plan);
    ae_vector_set_length(&buf, 2 * p);
@@ -1185,7 +1185,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       }
    // Another candidate - generic FFT code
       if (alg == -1) {
-         if ((circular && ftbaseissmooth(m)) && m % 2 == 0) {
+         if (circular && ftbaseissmooth(m) && m % 2 == 0) {
          // special code for circular convolution of a sequence with a smooth length
             flopcand = 3 * ftbasegetflopestimate(m / 2) + (double)(6 * m) / 2.0;
             if (flopcand < flopbest) {
@@ -1281,7 +1281,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
 // We assume that M+N-1>2 - we should call small case code otherwise
    if (alg == 1) {
       ae_assert(m + n - 1 > 2, "ConvR1DX: internal error!");
-      if ((circular && ftbaseissmooth(m)) && m % 2 == 0) {
+      if (circular && ftbaseissmooth(m) && m % 2 == 0) {
       // special code for circular convolution with smooth even M
          ae_vector_set_length(&buf, m);
          ae_v_move(buf.xR, 1, a->xR, 1, m);
@@ -1493,7 +1493,7 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
    NewVector(buf2, 0, DT_REAL);
    NewVector(buf3, 0, DT_REAL);
    NewObj(fasttransformplan, plan);
-   ae_assert((n > 0 && m > 0) && n <= m, "ConvR1DInv: incorrect N or M!");
+   ae_assert(n > 0 && m > 0 && n <= m, "ConvR1DInv: incorrect N or M!");
    p = ftbasefindsmootheven(m);
    ae_vector_set_length(&buf, p);
    ae_v_move(buf.xR, 1, a->xR, 1, m);

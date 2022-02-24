@@ -6208,7 +6208,7 @@ void rger(ae_int_t m, ae_int_t n, double Alpha, RVector *u, RVector *v, RMatrix 
    ae_int_t i;
    ae_int_t j;
    double s;
-   if ((m <= 0 || n <= 0) || Alpha == 0.0) {
+   if (m <= 0 || n <= 0 || Alpha == 0.0) {
       return;
    }
    for (i = 0; i < m; i++) {
@@ -6325,7 +6325,7 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, RM
    ae_int_t out0, out1;
    double *c;
    ae_int_t stride_c;
-   ae_int_t (*ablasf_packblk)(const double *, ae_int_t, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t, ae_int_t) = (k == 32 && block_size == 32) ? ablasf_packblkh32_avx2 : ablasf_packblkh_avx2;
+   ae_int_t (*ablasf_packblk)(const double *, ae_int_t, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t, ae_int_t) = k == 32 && block_size == 32 ? ablasf_packblkh32_avx2 : ablasf_packblkh_avx2;
    void (*ablasf_dotblk)(const double *, const double *, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t) = ablasf_dotblkh_avx2;
    void (*ablasf_daxpby)(ae_int_t, double, const double *, double, double *) = ablasf_daxpby_avx2;
 // Determine CPU and kernel support
@@ -6412,7 +6412,7 @@ void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector
    double v;
 // Try SIMD kernels
 #   if defined _ALGLIB_HAS_FMA_INTRINSICS
-   if (sstride == 4 || (blocksize == 2 && sstride == 2))
+   if (sstride == 4 || blocksize == 2 && sstride == 2)
       if (CurCPU & CPU_FMA) {
          spchol_propagatefwd_fma(x, cols0, blocksize, superrowidx, rbase, offdiagsize, rowstorage, offss, sstride, simdbuf, simdwidth);
          return;
@@ -7633,7 +7633,7 @@ static complex parse_complex_delim(const char *s, const char *delim) {
       if (!_parse_real_delim(s, "i", &c_result.y, &new_s))
          ThrowError("Cannot parse value");
       s = new_s + 1;
-      if (*s == 0 || strchr(delim, *s) == NULL)
+      if (*s == '\0' || strchr(delim, *s) == NULL)
          ThrowError("Cannot parse value");
       return c_result;
    }

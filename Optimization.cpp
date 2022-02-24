@@ -181,7 +181,7 @@ void smoothnessmonitorexportc1test1report(optguardnonc1test1report *srcrep, RVec
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
 bool optguardallclear(optguardreport *rep) {
    bool result;
-   result = !((rep->badgradsuspected || rep->nonc0suspected) || rep->nonc1suspected);
+   result = !(rep->badgradsuspected || rep->nonc0suspected || rep->nonc1suspected);
    return result;
 }
 
@@ -771,7 +771,7 @@ bool enforceboundaryconstraints(RVector *x, RVector *bl, BVector *havebl, RVecto
    bool result;
    result = false;
    for (i = 0; i < nmain; i++) {
-      if ((havebl->xB[i] && havebu->xB[i]) && bl->xR[i] > bu->xR[i]) {
+      if (havebl->xB[i] && havebu->xB[i] && bl->xR[i] > bu->xR[i]) {
          return result;
       }
       if (havebl->xB[i] && x->xR[i] < bl->xR[i]) {
@@ -822,11 +822,11 @@ bool enforceboundaryconstraints(RVector *x, RVector *bl, BVector *havebl, RVecto
 void projectgradientintobc(RVector *x, RVector *g, RVector *bl, BVector *havebl, RVector *bu, BVector *havebu, ae_int_t nmain, ae_int_t nslack) {
    ae_int_t i;
    for (i = 0; i < nmain; i++) {
-      ae_assert((!havebl->xB[i] || !havebu->xB[i]) || bl->xR[i] <= bu->xR[i], "ProjectGradientIntoBC: internal error (infeasible constraints)");
-      if ((havebl->xB[i] && x->xR[i] <= bl->xR[i]) && g->xR[i] > 0.0) {
+      ae_assert(!havebl->xB[i] || !havebu->xB[i] || bl->xR[i] <= bu->xR[i], "ProjectGradientIntoBC: internal error (infeasible constraints)");
+      if (havebl->xB[i] && x->xR[i] <= bl->xR[i] && g->xR[i] > 0.0) {
          g->xR[i] = 0.0;
       }
-      if ((havebu->xB[i] && x->xR[i] >= bu->xR[i]) && g->xR[i] < 0.0) {
+      if (havebu->xB[i] && x->xR[i] >= bu->xR[i] && g->xR[i] < 0.0) {
          g->xR[i] = 0.0;
       }
    }
@@ -1011,7 +1011,7 @@ ae_int_t postprocessboundedstep(RVector *x, RVector *xprev, RVector *bndl, BVect
 // Calculate number of constraints being activated
    result = 0;
    for (i = 0; i < nmain; i++) {
-      wasactivated = x->xR[i] != xprev->xR[i] && ((havebndl->xB[i] && x->xR[i] == bndl->xR[i]) || (havebndu->xB[i] && x->xR[i] == bndu->xR[i]));
+      wasactivated = x->xR[i] != xprev->xR[i] && (havebndl->xB[i] && x->xR[i] == bndl->xR[i] || havebndu->xB[i] && x->xR[i] == bndu->xR[i]);
       wasactivated = wasactivated || variabletofreeze == i;
       if (wasactivated) {
          result++;
@@ -1075,7 +1075,7 @@ void filterdirection(RVector *d, RVector *x, RVector *bndl, BVector *havebndl, R
    for (i = 0; i < nmain; i++) {
       ae_assert(!havebndl->xB[i] || x->xR[i] >= bndl->xR[i], "FilterDirection: infeasible point");
       ae_assert(!havebndu->xB[i] || x->xR[i] <= bndu->xR[i], "FilterDirection: infeasible point");
-      isactive = (havebndl->xB[i] && x->xR[i] == bndl->xR[i]) || (havebndu->xB[i] && x->xR[i] == bndu->xR[i]);
+      isactive = havebndl->xB[i] && x->xR[i] == bndl->xR[i] || havebndu->xB[i] && x->xR[i] == bndu->xR[i];
       if (isactive && fabs(d->xR[i] * s->xR[i]) <= droptol * scalednorm) {
          d->xR[i] = 0.0;
       }
@@ -1387,7 +1387,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
             mx = rmax2(mx, fabs(ce->xyR[i][j] * x->xR[j]));
             v += ce->xyR[i][j] * x->xR[j];
          }
-         converged = converged && fabs(v) <= 100 * machineepsilon * mx;
+         converged = converged && fabs(v) <= 100.0 * machineepsilon * mx;
       }
       feaserr0 = feaserr;
       if (converged) {
@@ -1782,7 +1782,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
       } else {
          itswithintolerance = 0;
       }
-      if ((!werechangesinconstraints || itswithintolerance >= maxitswithintolerance) || badits >= maxbadits) {
+      if (!werechangesinconstraints || itswithintolerance >= maxitswithintolerance || badits >= maxbadits) {
          result = feaserr <= epsi;
          break;
       }
@@ -1834,7 +1834,7 @@ bool derivativecheck(double f0, double df0, double f1, double df1, double f, dou
    dh = 1.5 * (f1 - f0) - 0.250 * (df0 + df1);
 // Check
    if (s != 0.0) {
-      if (fabs(h - f) / s > 0.001 || fabs(dh - df) / s > 0.001) {
+      if (fabs(h - f) > s * 0.001 || fabs(dh - df) > s * 0.001) {
          result = false;
          return result;
       }
@@ -2012,7 +2012,7 @@ void inexactlbfgspreconditioner(RVector *s, ae_int_t n, RVector *d, RVector *c, 
          v0 += vx * vx;
          v1 += vy * vy;
       }
-      if ((v > 0.0 && v0 * v1 > 0.0) && v / sqrt(v0 * v1) > n * 10 * machineepsilon) {
+      if (v > 0.0 && v0 * v1 > 0.0 && v > n * 10.0 * machineepsilon * sqrt(v0 * v1)) {
          buf->rho.xR[i] = 1 / v;
       } else {
          buf->rho.xR[i] = 0.0;
@@ -2629,7 +2629,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
    n = monitor->n;
    k = monitor->k;
 // Skip if inactive or spoiled by NAN
-   if ((!monitor->checksmoothness || monitor->linesearchspoiled) || !monitor->linesearchstarted) {
+   if (!monitor->checksmoothness || monitor->linesearchspoiled || !monitor->linesearchstarted) {
       return;
    }
    v = stp;
@@ -3065,7 +3065,7 @@ Spawn:
    k = monitor->k;
    monitor->needfij = false;
 // Quick exit
-   if (((n <= 0 || k <= 0) || !isfinite(teststep)) || teststep == 0.0) {
+   if (n <= 0 || k <= 0 || !isfinite(teststep) || teststep == 0.0) {
       goto Exit;
    }
    teststep = fabs(teststep);
@@ -3091,10 +3091,10 @@ Spawn:
 // Determine reference point, compute function vector and user-supplied Jacobian
    for (i = 0; i < n; i++) {
       v = unscaledx0->xR[i];
-      if ((hasboxconstraints && isfinite(bndl->xR[i])) && v < bndl->xR[i]) {
+      if (hasboxconstraints && isfinite(bndl->xR[i]) && v < bndl->xR[i]) {
          v = bndl->xR[i];
       }
-      if ((hasboxconstraints && isfinite(bndu->xR[i])) && v > bndu->xR[i]) {
+      if (hasboxconstraints && isfinite(bndu->xR[i]) && v > bndu->xR[i]) {
          v = bndu->xR[i];
       }
       monitor->xbase.xR[i] = v;
@@ -3115,15 +3115,15 @@ Spawn:
       v = monitor->xbase.xR[varidx];
       vm = v - s->xR[varidx] * teststep;
       vp = v + s->xR[varidx] * teststep;
-      if ((hasboxconstraints && isfinite(bndl->xR[varidx])) && vm < bndl->xR[varidx]) {
+      if (hasboxconstraints && isfinite(bndl->xR[varidx]) && vm < bndl->xR[varidx]) {
          vm = bndl->xR[varidx];
       }
-      if ((hasboxconstraints && isfinite(bndu->xR[varidx])) && vp > bndu->xR[varidx]) {
+      if (hasboxconstraints && isfinite(bndu->xR[varidx]) && vp > bndu->xR[varidx]) {
          vp = bndu->xR[varidx];
       }
       vc = vm + (vp - vm) / 2;
    // Quickly skip fixed variables
-      if ((vm == vp || vc == vm) || vc == vp) {
+      if (vm == vp || vc == vm || vc == vp) {
          for (i = 0; i < k; i++) {
             monitor->rep.badgradnum.xyR[i][varidx] = 0.0;
          }
@@ -3452,7 +3452,7 @@ void minlbfgssetcond(minlbfgsstate *state, double epsg, double epsf, double epsx
    ae_assert(isfinite(epsx), "MinLBFGSSetCond: EpsX is not finite number!");
    ae_assert(epsx >= 0.0, "MinLBFGSSetCond: negative EpsX!");
    ae_assert(maxits >= 0, "MinLBFGSSetCond: negative MaxIts!");
-   if (((epsg == 0.0 && epsf == 0.0) && epsx == 0.0) && maxits == 0) {
+   if (epsg == 0.0 && epsf == 0.0 && epsx == 0.0 && maxits == 0) {
       epsx = 1.0E-6;
    }
    state->epsg = epsg;
@@ -5211,8 +5211,8 @@ void cqmsetq(convexquadraticmodel *s, RMatrix *q, RVector *r, ae_int_t k, double
    ae_int_t i;
    ae_int_t j;
    ae_assert(k >= 0, "CQMSetQ: K<0");
-   ae_assert((k == 0 || theta == 0.0) || apservisfinitematrix(q, k, s->n), "CQMSetQ: Q is not finite matrix");
-   ae_assert((k == 0 || theta == 0.0) || isfinitevector(r, k), "CQMSetQ: R is not finite vector");
+   ae_assert(k == 0 || theta == 0.0 || apservisfinitematrix(q, k, s->n), "CQMSetQ: Q is not finite matrix");
+   ae_assert(k == 0 || theta == 0.0 || isfinitevector(r, k), "CQMSetQ: R is not finite vector");
    ae_assert(isfinite(theta) && theta >= 0.0, "CQMSetQ: Theta<0 or is not finite number");
 // degenerate case: K=0 or Theta=0
    if (k == 0 || theta == 0.0) {
@@ -5251,8 +5251,8 @@ void cqmsetactiveset(convexquadraticmodel *s, RVector *x, BVector *activeset) {
    ae_assert(x->cnt >= s->n, "CQMSetActiveSet: Length(X)<N");
    ae_assert(activeset->cnt >= s->n, "CQMSetActiveSet: Length(ActiveSet)<N");
    for (i = 0; i < s->n; i++) {
-      s->isactivesetchanged = s->isactivesetchanged || (s->activeset.xB[i] && !activeset->xB[i]);
-      s->isactivesetchanged = s->isactivesetchanged || (activeset->xB[i] && !s->activeset.xB[i]);
+      s->isactivesetchanged = s->isactivesetchanged || s->activeset.xB[i] && !activeset->xB[i];
+      s->isactivesetchanged = s->isactivesetchanged || activeset->xB[i] && !s->activeset.xB[i];
       s->activeset.xB[i] = activeset->xB[i];
       if (activeset->xB[i]) {
          ae_assert(isfinite(x->xR[i]), "CQMSetActiveSet: X[] contains infinite constraints");
@@ -5778,7 +5778,7 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
       }
    }
 // Calculate ECCM
-   if (((((s->isactivesetchanged || s->ismaintermchanged) || s->issecondarytermchanged) && s->k > 0) && s->theta > 0.0) && nfree > 0) {
+   if ((s->isactivesetchanged || s->ismaintermchanged || s->issecondarytermchanged) && s->k > 0 && s->theta > 0.0 && nfree > 0) {
    // Calculate ECCM - Cholesky factor of the "effective" capacitance
    // matrix CM = I + EQ*inv(EffectiveA)*EQ'.
    //
@@ -5848,7 +5848,7 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
 // ALGLIB: Copyright 10.05.2011 by Sergey Bochkanov
 static void cqmodels_cqmsolveea(convexquadraticmodel *s, RVector *x, RVector *tmp) {
    ae_int_t i;
-   ae_assert((s->ecakind == 0 || s->ecakind == 1) || (s->ecakind == -1 && s->nfree == 0), "CQMSolveEA: unexpected ECAKind");
+   ae_assert(s->ecakind == 0 || s->ecakind == 1 || s->ecakind == -1 && s->nfree == 0, "CQMSolveEA: unexpected ECAKind");
    if (s->ecakind == 0) {
    // Dense ECA, use FBLSCholeskySolve() dense solver.
       fblscholeskysolve(&s->ecadense, 1.0, s->nfree, true, x, tmp);
@@ -6151,7 +6151,7 @@ double cqmdebugconstrainedevale(convexquadraticmodel *s, RVector *x) {
       }
    }
 // ECA
-   ae_assert((s->ecakind == 0 || s->ecakind == 1) || (s->ecakind == -1 && nfree == 0), "CQMDebugConstrainedEvalE: unexpected ECAKind");
+   ae_assert(s->ecakind == 0 || s->ecakind == 1 || s->ecakind == -1 && nfree == 0, "CQMDebugConstrainedEvalE: unexpected ECAKind");
    if (s->ecakind == 0) {
    // Dense ECA
       for (i = 0; i < nfree; i++) {
@@ -6311,7 +6311,7 @@ void scaleshiftbcinplace(RVector *s, RVector *xorigin, RVector *bndl, RVector *b
       ae_assert(isfinite(bndu->xR[i]) || isposinf(bndu->xR[i]), "ScaleShiftBC: BndU[i] is -INF or NAN");
       hasbndl = isfinite(bndl->xR[i]);
       hasbndu = isfinite(bndu->xR[i]);
-      if ((hasbndl && hasbndu) && bndl->xR[i] == bndu->xR[i]) {
+      if (hasbndl && hasbndu && bndl->xR[i] == bndu->xR[i]) {
       // Make sure that BndL[I]=BndU[I] bit-to-bit
       // even with CRAZY optimizing compiler.
          bndu->xR[i] = (bndu->xR[i] - xorigin->xR[i]) / s->xR[i];
@@ -6403,7 +6403,7 @@ void scaleshiftmixedbrlcinplace(RVector *s, RVector *xorigin, ae_int_t n, sparse
    ae_int_t k1;
    double v;
    double vv;
-   ae_assert(msparse == 0 || ((sparsea->matrixtype == 1 && sparsea->m == msparse) && sparsea->n == n), "ScaleShiftMixedBRLCInplace: non-CRS sparse constraint matrix!");
+   ae_assert(msparse == 0 || sparsea->matrixtype == 1 && sparsea->m == msparse && sparsea->n == n, "ScaleShiftMixedBRLCInplace: non-CRS sparse constraint matrix!");
    for (i = 0; i < msparse; i++) {
    // Scale/shift constraint; shift its lower bound
    //
@@ -6497,7 +6497,7 @@ void scalesparseqpinplace(RVector *s, ae_int_t n, sparsematrix *sparsea, RVector
    ae_int_t k1;
    ae_int_t k;
    double si;
-   ae_assert((sparsea->matrixtype == 1 && sparsea->m == n) && sparsea->n == n, "ScaleSparseQPInplace: SparseA in unexpected format");
+   ae_assert(sparsea->matrixtype == 1 && sparsea->m == n && sparsea->n == n, "ScaleSparseQPInplace: SparseA in unexpected format");
    for (i = 0; i < n; i++) {
       si = s->xR[i];
       k0 = sparsea->ridx.xZ[i];
@@ -6610,7 +6610,7 @@ void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix 
    double v;
    double vv;
    double maxnrm2;
-   ae_assert(msparse == 0 || ((sparsea->matrixtype == 1 && sparsea->m == msparse) && sparsea->n == n), "ScaleShiftMixedBRLCInplace: non-CRS sparse constraint matrix!");
+   ae_assert(msparse == 0 || sparsea->matrixtype == 1 && sparsea->m == msparse && sparsea->n == n, "ScaleShiftMixedBRLCInplace: non-CRS sparse constraint matrix!");
    if (neednorms) {
       vectorsetlengthatleast(rownorms, mdense + msparse);
    }
@@ -6669,7 +6669,7 @@ void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix 
       }
    }
 // If amplification was limited, perform second round of normalization
-   if ((limitedamplification && maxnrm2 < 1.0) && maxnrm2 > 0.0) {
+   if (limitedamplification && maxnrm2 < 1.0 && maxnrm2 > 0.0) {
       if (neednorms) {
          rmulv(mdense + msparse, maxnrm2, rownorms);
       }
@@ -6788,7 +6788,7 @@ double normalizesparseqpinplace(sparsematrix *sparsea, bool isupper, RVector *de
    double mx;
    double v;
    double result;
-   ae_assert((sparsea->matrixtype == 1 && sparsea->m == n) && sparsea->n == n, "ScaleSparseQPInplace: SparseA in unexpected format");
+   ae_assert(sparsea->matrixtype == 1 && sparsea->m == n && sparsea->n == n, "ScaleSparseQPInplace: SparseA in unexpected format");
    mx = 0.0;
    for (i = 0; i < n; i++) {
       ae_assert(sparsea->didx.xZ[i] + 1 == sparsea->uidx.xZ[i], "NormalizeSparseQPInplace: critical integrity check failed, sparse diagonal not found");
@@ -7383,7 +7383,7 @@ void snnlssolve(snnlssolver *s, RVector *x) {
    // Calculate gradient G and constrained descent direction D
       snnls_funcgradu(s, x, &s->r, &s->g, &f0);
       for (i = 0; i < ns + nd; i++) {
-         if ((s->nnc.xB[i] && x->xR[i] == 0.0) && s->g.xR[i] > 0.0) {
+         if (s->nnc.xB[i] && x->xR[i] == 0.0 && s->g.xR[i] > 0.0) {
             s->d.xR[i] = 0.0;
          } else {
             s->d.xR[i] = -s->g.xR[i];
@@ -7400,7 +7400,7 @@ void snnlssolve(snnlssolver *s, RVector *x) {
    // NOTE: we do not increase outer iterations counter here
       kickneeded = false;
       for (i = 0; i < ns + nd; i++) {
-         if ((s->nnc.xB[i] && x->xR[i] == 0.0) && s->d.xR[i] > 0.0) {
+         if (s->nnc.xB[i] && x->xR[i] == 0.0 && s->d.xR[i] > 0.0) {
             kickneeded = true;
          }
       }
@@ -7950,7 +7950,7 @@ bool sasstartoptimization(sactiveset *state, RVector *x) {
       for (i = 0; i < n; i++) {
          state->tmp0.xR[i] = x->xR[i];
          state->cstatus.xZ[i] = -1;
-         if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
+         if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
             state->tmp0.xR[i] = state->bndl.xR[i];
             state->cstatus.xZ[i] = 1;
             continue;
@@ -7975,7 +7975,7 @@ bool sasstartoptimization(sactiveset *state, RVector *x) {
             v0 += sqr(vx);
             v1 += sqr(vc);
          }
-         vv = sqrt(v0) * sqrt(v1) * 1000 * machineepsilon;
+         vv = sqrt(v0) * sqrt(v1) * 1000.0 * machineepsilon;
          if (i < state->nec) {
             state->cstatus.xZ[n + i] = 1;
             state->feasinitpt = state->feasinitpt && fabs(v) < vv;
@@ -8016,11 +8016,11 @@ bool sasstartoptimization(sactiveset *state, RVector *x) {
          }
          ae_v_move(state->xc.xR, 1, state->tmpfeas.xR, 1, n);
          for (i = 0; i < n; i++) {
-            if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
+            if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
                state->cstatus.xZ[i] = 1;
                continue;
             }
-            if ((state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i]) || (state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i])) {
+            if (state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i] || state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i]) {
                state->cstatus.xZ[i] = 0;
                continue;
             }
@@ -8041,7 +8041,7 @@ bool sasstartoptimization(sactiveset *state, RVector *x) {
    // Only box constraints are present, quick code can be used
       for (i = 0; i < n; i++) {
          state->cstatus.xZ[i] = -1;
-         if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
+         if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
             state->cstatus.xZ[i] = 1;
             state->xc.xR[i] = state->bndl.xR[i];
             continue;
@@ -8419,13 +8419,13 @@ ae_int_t sasmoveto(sactiveset *state, RVector *xn, bool needact, ae_int_t cidx, 
    }
    for (i = 0; i < n; i++) {
    // Post-check (some constraints may be activated because of numerical errors)
-      if ((state->hasbndl.xB[i] && state->xc.xR[i] <= state->bndl.xR[i]) && state->xc.xR[i] != state->mtx.xR[i]) {
+      if (state->hasbndl.xB[i] && state->xc.xR[i] <= state->bndl.xR[i] && state->xc.xR[i] != state->mtx.xR[i]) {
          state->xc.xR[i] = state->bndl.xR[i];
          state->cstatus.xZ[i] = 1;
          state->mtnew.xB[i] = true;
          wasactivation = true;
       }
-      if ((state->hasbndu.xB[i] && state->xc.xR[i] >= state->bndu.xR[i]) && state->xc.xR[i] != state->mtx.xR[i]) {
+      if (state->hasbndu.xB[i] && state->xc.xR[i] >= state->bndu.xR[i] && state->xc.xR[i] != state->mtx.xR[i]) {
          state->xc.xR[i] = state->bndu.xR[i];
          state->cstatus.xZ[i] = 1;
          state->mtnew.xB[i] = true;
@@ -8690,7 +8690,7 @@ void sasrebuildbasis(sactiveset *state) {
       //       marginally higher than that of best candidate.
       //       No need to perform costly re-evaluation in order
       //       to get just few percents of improvement.
-         if (state->tmpnormestimates.xR[i] < vmax * (1 + sactivesets_minnormseparation)) {
+         if (state->tmpnormestimates.xR[i] < vmax * (1.0 + sactivesets_minnormseparation)) {
             continue;
          }
       // OK, upper bound is large enough... lets perform full
@@ -9199,15 +9199,15 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
 // only boundary constraints are present
    if (nec + nic == 0) {
       for (i = 0; i < n; i++) {
-         if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
+         if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
             state->cstatus.xZ[i] = 1;
             continue;
          }
-         if ((state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i]) && gc->xR[i] >= 0.0) {
+         if (state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i] && gc->xR[i] >= 0.0) {
             state->cstatus.xZ[i] = 1;
             continue;
          }
-         if ((state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i]) && gc->xR[i] <= 0.0) {
+         if (state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i] && gc->xR[i] <= 0.0) {
             state->cstatus.xZ[i] = 1;
             continue;
          }
@@ -9251,7 +9251,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
    // * fill RCTmpS by either +1 (lower bound) or -1 (upper bound)
    // * set RCTmpIsEquality to False (BndL<BndU) or True (BndL=BndU)
    // * increase counters
-      if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
+      if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
       // Equality constraint is activated
          state->rctmpconstraintidx.xZ[nactiveconstraints] = i;
          state->cstatus.xZ[i] = 0;
@@ -9309,15 +9309,15 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
 // Skip if no "candidate" constraints was found
    if (nactiveconstraints == 0) {
       for (i = 0; i < n; i++) {
-         if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
+         if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
             state->cstatus.xZ[i] = 1;
             continue;
          }
-         if ((state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i]) && gc->xR[i] >= 0.0) {
+         if (state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i] && gc->xR[i] >= 0.0) {
             state->cstatus.xZ[i] = 1;
             continue;
          }
-         if ((state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i]) && gc->xR[i] <= 0.0) {
+         if (state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i] && gc->xR[i] <= 0.0) {
             state->cstatus.xZ[i] = 1;
             continue;
          }
@@ -10055,8 +10055,8 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
       ae_assert(!sstate->havebndl.xB[i] || sstate->sas.xc.xR[i] >= sstate->bndl.xR[i], "CNewtonBuild: internal error");
       ae_assert(!sstate->havebndu.xB[i] || sstate->sas.xc.xR[i] <= sstate->bndu.xR[i], "CNewtonBuild: internal error");
       b = false;
-      b = b || (sstate->havebndl.xB[i] && sstate->sas.xc.xR[i] == sstate->bndl.xR[i]);
-      b = b || (sstate->havebndu.xB[i] && sstate->sas.xc.xR[i] == sstate->bndu.xR[i]);
+      b = b || sstate->havebndl.xB[i] && sstate->sas.xc.xR[i] == sstate->bndl.xR[i];
+      b = b || sstate->havebndu.xB[i] && sstate->sas.xc.xR[i] == sstate->bndu.xR[i];
       if (b) {
          sstate->yidx.xZ[ridx1] = i;
          ridx1--;
@@ -10243,8 +10243,8 @@ static bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings, a
       ae_assert(!sstate->havebndl.xB[i] || sstate->sas.xc.xR[i] >= sstate->bndl.xR[i], "CNewtonUpdate: internal error");
       ae_assert(!sstate->havebndu.xB[i] || sstate->sas.xc.xR[i] <= sstate->bndu.xR[i], "CNewtonUpdate: internal error");
       b = false;
-      b = b || (sstate->havebndl.xB[i] && sstate->sas.xc.xR[i] == sstate->bndl.xR[i]);
-      b = b || (sstate->havebndu.xB[i] && sstate->sas.xc.xR[i] == sstate->bndu.xR[i]);
+      b = b || sstate->havebndl.xB[i] && sstate->sas.xc.xR[i] == sstate->bndl.xR[i];
+      b = b || sstate->havebndu.xB[i] && sstate->sas.xc.xR[i] == sstate->bndu.xR[i];
       if (b) {
          sstate->tmpcni.xZ[ridx1] = i;
          ridx1--;
@@ -10460,7 +10460,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
    double f1;
    *terminationtype = 0;
 // Primary checks
-   ae_assert((akind == 0 || akind == 1) || akind == 2, "QQPOptimize: incorrect AKind");
+   ae_assert(akind == 0 || akind == 1 || akind == 2, "QQPOptimize: incorrect AKind");
    sstate->n = nc;
    n = sstate->n;
    *terminationtype = 0;
@@ -10590,7 +10590,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
                vv = fabs(v);
                sstate->densea.xyR[i][j] = v;
                sstate->densea.xyR[j][i] = v;
-               if ((double)i == v) {
+               if (i == v) {
                   k = 1;
                } else {
                   k = 2;
@@ -10607,7 +10607,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
                vv = fabs(v);
                sstate->densea.xyR[i][j] = v;
                sstate->densea.xyR[j][i] = v;
-               if ((double)i == v) {
+               if (i == v) {
                   k = 1;
                } else {
                   k = 2;
@@ -10678,9 +10678,9 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
    problemsolved = false;
    isconstrained = false;
    for (i = 0; i < n; i++) {
-      isconstrained = (isconstrained || sstate->havebndl.xB[i]) || sstate->havebndu.xB[i];
+      isconstrained = isconstrained || sstate->havebndl.xB[i] || sstate->havebndu.xB[i];
    }
-   if ((!isconstrained && settings->cnphase) && akind == 0) {
+   if (!isconstrained && settings->cnphase && akind == 0) {
       matrixsetlengthatleast(&sstate->densez, n, n);
       vectorsetlengthatleast(&sstate->tmpcn, n);
       for (i = 0; i < n; i++) {
@@ -10810,8 +10810,8 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
             for (i = 0; i < n; i++) {
                v += sstate->cgc.xR[i] * sstate->cgc.xR[i];
                vv += sstate->cgp.xR[i] * sstate->cgp.xR[i];
-               b = b || ((sstate->havebndl.xB[i] && sstate->sas.xc.xR[i] == sstate->bndl.xR[i]) && sstate->dp.xR[i] != 0.0);
-               b = b || ((sstate->havebndu.xB[i] && sstate->sas.xc.xR[i] == sstate->bndu.xR[i]) && sstate->dp.xR[i] != 0.0);
+               b = b || sstate->havebndl.xB[i] && sstate->sas.xc.xR[i] == sstate->bndl.xR[i] && sstate->dp.xR[i] != 0.0;
+               b = b || sstate->havebndu.xB[i] && sstate->sas.xc.xR[i] == sstate->bndu.xR[i] && sstate->dp.xR[i] != 0.0;
             }
             b = b || vv == 0.0;
             b = b || cgcnt % qqpsolver_quickqprestartcg == 0;
@@ -11238,7 +11238,7 @@ static void qpdenseaulsolver_generateexmodel(RMatrix *sclsfta, RVector *sclsftb,
    ntotal = nmain + nslack;
 // Integrity check for properly preallocated storage
    ae_assert(exa->rows >= ntotal && exa->cols >= ntotal, "QPDenseAUL.GenerateExModel - integrity check failed");
-   ae_assert((exb->cnt >= ntotal && exbndl->cnt >= ntotal) && exbndu->cnt >= ntotal, "QPDenseAUL.GenerateExModel - integrity check failed");
+   ae_assert(exb->cnt >= ntotal && exbndl->cnt >= ntotal && exbndu->cnt >= ntotal, "QPDenseAUL.GenerateExModel - integrity check failed");
 // Primary quadratic term
    for (i = 0; i < ntotal; i++) {
       for (j = i; j < ntotal; j++) {
@@ -11485,7 +11485,7 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
    // Handle active "simple" equality constraints
       for (i = 0; i < ntotal; i++) {
          isactive = false;
-         if (i < nmain && ((sclsfthasbndl->xB[i] && exxc->xR[i] == sclsftbndl->xR[i]) || (sclsfthasbndu->xB[i] && exxc->xR[i] == sclsftbndu->xR[i]))) {
+         if (i < nmain && (sclsfthasbndl->xB[i] && exxc->xR[i] == sclsftbndl->xR[i] || sclsfthasbndu->xB[i] && exxc->xR[i] == sclsftbndu->xR[i])) {
             isactive = true;
          }
          if (i >= nmain && exxc->xR[i] == 0.0) {
@@ -11509,7 +11509,7 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
          buffers->qrkkt.xyR[i][nqrcols] = buffers->qrrightpart.xR[i];
       }
       rmatrixqr(&buffers->qrkkt, nqrrows, nqrcols + 1, &buffers->qrtau);
-      if (rmatrixtrrcond1(&buffers->qrkkt, nqrcols, true, false) <= 1000 * machineepsilon) {
+      if (rmatrixtrrcond1(&buffers->qrkkt, nqrcols, true, false) <= 1000.0 * machineepsilon) {
          lambdareg = coalesce(10 * lambdareg, 1.0E-13);
          continue;
       }
@@ -12108,8 +12108,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
       // NOTE: we use selection sort algorithm because its O(NAdded*NWork) cost
       //       is still comparable to the cost of constraints evaluation
          workingsetextended = false;
-         i = 0;
-         while ((double)i < 1 + qpdenseaulsolver_expansionratio * nmain && nicwork < nictotal) {
+         for (i = 0; i < 1 + qpdenseaulsolver_expansionratio * nmain && nicwork < nictotal; i++) {
          // Select most violated constraint
             k = nicwork;
             for (j = nicwork; j < nictotal; j++) {
@@ -12130,7 +12129,6 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
                nicwork++;
                nwork++;
                kwork++;
-               i++;
                workingsetextended = true;
             } else {
                break;
@@ -12233,7 +12231,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
    }
    rmatrixgemv(nmain, nectotal + nicwork, -1.0, &state->sclsftcleic, 0, 0, 1, &state->nulc, 0, 1.0, &state->tmpg, 0);
    for (i = 0; i < nmain; i++) {
-      if ((state->sclsfthasbndl.xB[i] && state->exxc.xR[i] == state->sclsftbndl.xR[i]) || (state->sclsfthasbndu.xB[i] && state->exxc.xR[i] == state->sclsftbndu.xR[i])) {
+      if (state->sclsfthasbndl.xB[i] && state->exxc.xR[i] == state->sclsftbndl.xR[i] || state->sclsfthasbndu.xB[i] && state->exxc.xR[i] == state->sclsftbndu.xR[i]) {
          lagbc->xR[i] = -state->tmpg.xR[i];
       }
    }
@@ -12610,7 +12608,7 @@ void minbleicsetcond(minbleicstate *state, double epsg, double epsf, double epsx
    ae_assert(isfinite(epsx), "MinBLEICSetCond: EpsX is not finite number");
    ae_assert(epsx >= 0.0, "MinBLEICSetCond: negative EpsX");
    ae_assert(maxits >= 0, "MinBLEICSetCond: negative MaxIts!");
-   if (((epsg == 0.0 && epsf == 0.0) && epsx == 0.0) && maxits == 0) {
+   if (epsg == 0.0 && epsf == 0.0 && epsx == 0.0 && maxits == 0) {
       epsx = 1.0E-6;
    }
    state->epsg = epsg;
@@ -13497,7 +13495,7 @@ Spawn:
             }
             v = sqrt(v);
             b = false;
-            if ((state->cidx >= 0 && v <= minbleic_maxnonmonotoniclen) && state->nonmonotoniccnt > 0) {
+            if (state->cidx >= 0 && v <= minbleic_maxnonmonotoniclen && state->nonmonotoniccnt > 0) {
             // We try to enforce non-monotonic step:
             // * Stp    := CurStpMax
             // * MCINFO := 5
@@ -14800,7 +14798,7 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
             }
          }
       // Test for unconstrained direction of negative curvature
-         if ((d2est < 0 || (d2est == 0 && d1est < 0)) && !sstate->solver.boundedstep) {
+         if ((d2est < 0 || d2est == 0 && d1est < 0) && !sstate->solver.boundedstep) {
          // Function is unbounded from below:
          // * function will decrease along D, i.e. either:
          //   * D2<0
@@ -15203,7 +15201,7 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
    ae_assert(msparse >= 0, "VIPMSetConstraints: MSparse<0");
    ae_assert(apservisfinitematrix(densea, mdense, n), "VIPMSetConstraints: DenseA contains infinite or NaN values!");
    ae_assert(msparse == 0 || sparsea->matrixtype == 1, "VIPMSetConstraints: non-CRS constraint matrix!");
-   ae_assert(msparse == 0 || (sparsea->m == msparse && sparsea->n == n), "VIPMSetConstraints: constraint matrix has incorrect size");
+   ae_assert(msparse == 0 || sparsea->m == msparse && sparsea->n == n, "VIPMSetConstraints: constraint matrix has incorrect size");
    ae_assert(cl->cnt >= mdense + msparse, "VIPMSetConstraints: CL is too short!");
    ae_assert(cu->cnt >= mdense + msparse, "VIPMSetConstraints: CU is too short!");
 // Reset factorization flag
@@ -15219,7 +15217,7 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
    for (i = 0; i < n; i++) {
       state->hasbndl.xB[i] = isfinite(bndl->xR[i]);
       state->hasbndu.xB[i] = isfinite(bndu->xR[i]);
-      ae_assert(!((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && bndl->xR[i] > bndu->xR[i]), "VIPMInitDenseQuadratic: inconsistent range for box constraints");
+      ae_assert(!(state->hasbndl.xB[i] && state->hasbndu.xB[i] && bndl->xR[i] > bndu->xR[i]), "VIPMInitDenseQuadratic: inconsistent range for box constraints");
       state->bndl.xR[i] = bndl->xR[i];
       state->bndu.xR[i] = bndu->xR[i];
       state->rawbndl.xR[i] = bndl->xR[i];
@@ -16344,7 +16342,7 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree) {
    rsetallocv(n, 0.0, &state->diagr);
    vipmsolver_varsinitbyzero(&state->current, n, m);
    for (i = 0; i < n; i++) {
-      if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
+      if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
          state->isfrozen.xB[i] = true;
          state->hasgz.xB[i] = false;
          state->hasts.xB[i] = false;
@@ -16357,7 +16355,7 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree) {
    ballocv(m, &state->haspq);
    ballocv(m, &state->haswv);
    for (i = 0; i < m; i++) {
-      state->haswv.xB[i] = (state->slacksforequalityconstraints || !state->hasr.xB[i]) || state->r.xR[i] > 0.0;
+      state->haswv.xB[i] = state->slacksforequalityconstraints || !state->hasr.xB[i] || state->r.xR[i] > 0.0;
       state->haspq.xB[i] = state->hasr.xB[i] && state->haswv.xB[i];
    }
 // Only sparse factorization needs special powering up
@@ -17162,7 +17160,7 @@ static bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, 
    primaldestabilized = vrhspriminf <= state->epsp && vrespriminf >= rmax2(verybadres * vrhspriminf, state->epsp);
    dualdestabilized = vrhsdualinf <= state->epsd && vresdualinf >= rmax2(verybadres * vrhsdualinf, state->epsd);
    residualgrowth = sqrt((vresprim2 + vresdual2 + vrescmpl2) / coalesce(vrhsprim2 + vrhsdual2 + vrhscmpl2, 1.0));
-   if (((primaldestabilized || dualdestabilized) && residualgrowth > 0.01 * sqrt(machineepsilon)) && !isdampepslarge) {
+   if ((primaldestabilized || dualdestabilized) && residualgrowth > 0.01 * sqrt(machineepsilon) && !isdampepslarge) {
       result = false;
       return result;
    }
@@ -17560,7 +17558,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
 // * DampFree - additional damping coefficient for free variables
    regfree = pow(machineepsilon, 0.75);
    dampfree = 0.0;
-   regeps = 100 * machineepsilon;
+   regeps = 100.0 * machineepsilon;
    modeps = (100 + sqrt((double)n)) * machineepsilon;
    dampeps = (100 + sqrt((double)n)) * machineepsilon;
    safedampeps = sqrt(machineepsilon);
@@ -17633,7 +17631,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
          continue;
       }
       vipmsolver_vipmcomputesteplength(state, &state->current, &state->deltacorr, vipmsolver_steplengthdecay, &alphap, &alphad);
-      if ((double)iteridx >= vipmsolver_minitersbeforesafeguards && (alphap <= vipmsolver_badsteplength || alphad <= vipmsolver_badsteplength)) {
+      if (iteridx >= vipmsolver_minitersbeforesafeguards && (alphap <= vipmsolver_badsteplength || alphad <= vipmsolver_badsteplength)) {
       // Affine scaling step failed due to numerical errors.
       // Increase regularization parameter and skip this iteration.
          dampeps *= 10;
@@ -17667,13 +17665,13 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
             primalxscale = 1.0;
             primalxscale = rmax2(primalxscale, rmaxabsv(n, &state->current.x));
             for (i = 0; i < n; i++) {
-               if ((state->hasbndl.xB[i] && state->hasgz.xB[i]) && fabs(state->bndl.xR[i]) > vipmsolver_bigconstrmag * primalxscale) {
+               if (state->hasbndl.xB[i] && state->hasgz.xB[i] && fabs(state->bndl.xR[i]) > vipmsolver_bigconstrmag * primalxscale) {
                   state->hasgz.xB[i] = false;
                   state->current.g.xR[i] = 0.0;
                   state->current.z.xR[i] = 0.0;
                   droppedbounds++;
                }
-               if ((state->hasbndu.xB[i] && state->hasts.xB[i]) && fabs(state->bndu.xR[i]) > vipmsolver_bigconstrmag * primalxscale) {
+               if (state->hasbndu.xB[i] && state->hasts.xB[i] && fabs(state->bndu.xR[i]) > vipmsolver_bigconstrmag * primalxscale) {
                   state->hasts.xB[i] = false;
                   state->current.t.xR[i] = 0.0;
                   state->current.s.xR[i] = 0.0;
@@ -17693,7 +17691,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
             primalxscale = rmax2(primalxscale, rmaxabsv(n, &state->current.x));
             primalxscale = rmax2(primalxscale, rmaxabsv(m, &state->tmpax));
             for (i = 0; i < m; i++) {
-               if (((state->hasr.xB[i] && state->haspq.xB[i]) && fabs(state->b.xR[i] + state->r.xR[i]) > vipmsolver_bigconstrmag * primalxscale) && fabs(state->b.xR[i]) < vipmsolver_bigconstrmag * primalxscale) {
+               if (state->hasr.xB[i] && state->haspq.xB[i] && fabs(state->b.xR[i] + state->r.xR[i]) > vipmsolver_bigconstrmag * primalxscale && fabs(state->b.xR[i]) < vipmsolver_bigconstrmag * primalxscale) {
                   ae_assert(state->haswv.xB[i] && state->haspq.xB[i], "VIPMOptimize: unexpected integrity check failure (4y64)");
                   state->haspq.xB[i] = false;
                   state->current.p.xR[i] = 0.0;
@@ -17725,7 +17723,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       if (bestiteridx > 0 && iteridx > bestiteridx + vipmsolver_minitersbeforeeworststagnation) {
          break;
       }
-      if (((egap <= state->epsgap && errp2 >= vipmsolver_stagnationdelta * preverrp2) && errpinf >= vipmsolver_primalinfeasible1) && iteridx >= vipmsolver_minitersbeforestagnation) {
+      if (egap <= state->epsgap && errp2 >= vipmsolver_stagnationdelta * preverrp2 && errpinf >= vipmsolver_primalinfeasible1 && iteridx >= vipmsolver_minitersbeforestagnation) {
          primalstagnationcnt++;
          if (primalstagnationcnt >= vipmsolver_primalstagnationlen) {
             break;
@@ -17733,7 +17731,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
       } else {
          primalstagnationcnt = 0;
       }
-      if (((egap <= state->epsgap && errd2 >= vipmsolver_stagnationdelta * preverrd2) && errdinf >= vipmsolver_dualinfeasible1) && iteridx >= vipmsolver_minitersbeforestagnation) {
+      if (egap <= state->epsgap && errd2 >= vipmsolver_stagnationdelta * preverrd2 && errdinf >= vipmsolver_dualinfeasible1 && iteridx >= vipmsolver_minitersbeforestagnation) {
          dualstagnationcnt++;
          if (dualstagnationcnt >= vipmsolver_dualstagnationlen) {
             break;
@@ -17745,7 +17743,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
          *terminationtype = 7;
          break;
       }
-      if ((egap <= state->epsgap && eprimal <= state->epsp) && edual <= state->epsd) {
+      if (egap <= state->epsgap && eprimal <= state->epsp && edual <= state->epsd) {
          *terminationtype = 1;
          loadbest = false;
          break;
@@ -18264,7 +18262,7 @@ void minqpsetalgobleic(minqpstate *state, double epsg, double epsf, double epsx,
    ae_assert(epsx >= 0.0, "MinQPSetAlgoBLEIC: negative EpsX");
    ae_assert(maxits >= 0, "MinQPSetAlgoBLEIC: negative MaxIts!");
    state->algokind = 2;
-   if (((epsg == 0.0 && epsf == 0.0) && epsx == 0.0) && maxits == 0) {
+   if (epsg == 0.0 && epsf == 0.0 && epsx == 0.0 && maxits == 0) {
       epsx = 1.0E-6;
    }
    state->qpbleicsettingsuser.epsg = epsg;
@@ -18603,7 +18601,7 @@ void minqpsetalgoquickqp(minqpstate *state, double epsg, double epsf, double eps
    ae_assert(epsx >= 0.0, "MinQPSetAlgoQuickQP: negative EpsX");
    ae_assert(maxouterits >= 0, "MinQPSetAlgoQuickQP: negative MaxOuterIts!");
    state->algokind = 3;
-   if (((epsg == 0.0 && epsf == 0.0) && epsx == 0.0) && maxouterits == 0) {
+   if (epsg == 0.0 && epsf == 0.0 && epsx == 0.0 && maxouterits == 0) {
       epsx = 1.0E-6;
    }
    state->qqpsettingsuser.maxouterits = maxouterits;
@@ -20011,7 +20009,7 @@ void minqpoptimize(minqpstate *state) {
       neq = 0;
       nineq = 0;
       for (i = 0; i < m; i++) {
-         if ((isfinite(state->cl.xR[i]) && isfinite(state->cu.xR[i])) && state->cl.xR[i] == state->cu.xR[i]) {
+         if (isfinite(state->cl.xR[i]) && isfinite(state->cu.xR[i]) && state->cl.xR[i] == state->cu.xR[i]) {
             neq++;
             continue;
          }
@@ -20029,7 +20027,7 @@ void minqpoptimize(minqpstate *state) {
       curecpos = 0;
       curicpos = neq;
       for (i = 0; i < m; i++) {
-         if ((isfinite(state->cl.xR[i]) && isfinite(state->cu.xR[i])) && state->cl.xR[i] == state->cu.xR[i]) {
+         if (isfinite(state->cl.xR[i]) && isfinite(state->cu.xR[i]) && state->cl.xR[i] == state->cu.xR[i]) {
          // Offload equality constraint
             if (i < state->msparse) {
                for (j = 0; j < n; j++) {
@@ -21027,7 +21025,7 @@ void minlmsetlc(minlmstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
 // ALGLIB: Copyright 14.10.2010 by Sergey Bochkanov
 // API: void minlmsetacctype(const minlmstate &state, const ae_int_t acctype);
 void minlmsetacctype(minlmstate *state, ae_int_t acctype) {
-   ae_assert((acctype == 0 || acctype == 1) || acctype == 2, "MinLMSetAccType: incorrect AccType!");
+   ae_assert(acctype == 0 || acctype == 1 || acctype == 2, "MinLMSetAccType: incorrect AccType!");
    if (acctype == 2) {
       acctype = 0;
    }
@@ -21586,7 +21584,7 @@ static bool minlm_minlmstepfinderinit(minlmstepfinder *state, ae_int_t n, ae_int
 // * prepare QP subproblem which return us a feasible point
    result = true;
    for (i = 0; i < n; i++) {
-      if ((state->havebndl.xB[i] && state->havebndu.xB[i]) && state->bndl.xR[i] > state->bndu.xR[i]) {
+      if (state->havebndl.xB[i] && state->havebndu.xB[i] && state->bndl.xR[i] > state->bndu.xR[i]) {
          result = false;
          return result;
       }
@@ -21816,7 +21814,7 @@ Spawn:
       break;
    }
    *nu = 1.0;
-   ae_assert(((*iflag >= -3 && *iflag <= 0) || *iflag == -8) || *iflag > 0, "MinLM: internal integrity check failed!");
+   ae_assert(*iflag >= -3 && *iflag <= 0 || *iflag == -8 || *iflag > 0, "MinLM: internal integrity check failed!");
 Exit:
    state->PQ = -1;
    return false;
@@ -22136,7 +22134,7 @@ Spawn:
             goto Exit;
          }
          state->nu = 1.0;
-         ae_assert(((iflag >= -3 && iflag <= 0) || iflag == -8) || iflag > 0, "MinLM: internal integrity check failed!");
+         ae_assert(iflag >= -3 && iflag <= 0 || iflag == -8 || iflag > 0, "MinLM: internal integrity check failed!");
          if (iflag == -3) {
             state->repterminationtype = -3;
             goto Exit;
@@ -22453,7 +22451,7 @@ Spawn:
                }
             } else {
             // Either problem is non-convex (increase LambdaV) or constraints are inconsistent
-               ae_assert((state->qprep.terminationtype == -3 || state->qprep.terminationtype == -4) || state->qprep.terminationtype == -5, "MinLM: unexpected completion code from QP solver");
+               ae_assert(state->qprep.terminationtype == -3 || state->qprep.terminationtype == -4 || state->qprep.terminationtype == -5, "MinLM: unexpected completion code from QP solver");
                if (state->qprep.terminationtype == -3) {
                   iflag = -3;
                   break;
@@ -23460,7 +23458,7 @@ void mincgsetcond(mincgstate *state, double epsg, double epsf, double epsx, ae_i
    ae_assert(isfinite(epsx), "MinCGSetCond: EpsX is not finite number!");
    ae_assert(epsx >= 0.0, "MinCGSetCond: negative EpsX!");
    ae_assert(maxits >= 0, "MinCGSetCond: negative MaxIts!");
-   if (((epsg == 0.0 && epsf == 0.0) && epsx == 0.0) && maxits == 0) {
+   if (epsg == 0.0 && epsf == 0.0 && epsx == 0.0 && maxits == 0) {
       epsx = 1.0E-6;
    }
    state->epsg = epsg;
@@ -25425,10 +25423,10 @@ static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolve
    eignew = ynrm2 / sy;
    eigcorrection = 1.0;
    if (eignew > eigold * growth) {
-      eigcorrection = 1 / (eignew / (eigold * growth));
+      eigcorrection = eigold * growth / eignew;
    }
-   if (eignew < eigold / growth) {
-      eigcorrection = 1 / (eignew / (eigold / growth));
+   if (eignew * growth < eigold) {
+      eigcorrection = eigold / (eignew * growth);
    }
 // Update Hessian
    rmatrixger(n, n, &subsolver->h, 0, 0, -1 / shs, &subsolver->tmp0, 0, &subsolver->tmp0, 0);
@@ -25468,7 +25466,7 @@ static void nlcsqp_fassolve(minsqpsubsolver *subsolver, RVector *d0, RMatrix *h,
    subsolver->activesetsize = 0;
 // Activate equality constraints (at most N)
    for (i = 0; i < m; i++) {
-      if ((subsolver->hasal.xB[i] && subsolver->hasau.xB[i]) && al->xR[i] == au->xR[i]) {
+      if (subsolver->hasal.xB[i] && subsolver->hasau.xB[i] && al->xR[i] == au->xR[i]) {
       // Stop if full set of constraints is activated
          if (subsolver->activesetsize >= n) {
             break;
@@ -27511,7 +27509,7 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
 // Dense/sparse factorizations with dense PFI
 //
 // NOTE: although we solve B*x=r, internally we store factorization of B^T
-   if ((s->trftype == 0 || s->trftype == 1) || s->trftype == 2) {
+   if (s->trftype == 0 || s->trftype == 1 || s->trftype == 2) {
       ae_assert(s->trfage == 0 || s->trftype != 0, "BasisSolve: integrity check failed TrfAge vs TrfType");
       vectorsetlengthatleast(x, m);
       for (i = 0; i < m; i++) {
@@ -27625,7 +27623,7 @@ static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVec
    processed = false;
    vectorsetlengthatleast(tx, m);
 // Dense factorizations
-   if ((s->trftype == 0 || s->trftype == 1) || s->trftype == 2) {
+   if (s->trftype == 0 || s->trftype == 1 || s->trftype == 2) {
       ae_assert(s->trfage == 0 || s->trftype != 0, "BasisSolveT: integrity check failed TrfAge vs TrfType");
       vectorsetlengthatleast(x, m);
       for (i = 0; i < m; i++) {
@@ -27845,7 +27843,7 @@ static double reviseddualsimplex_basisminimumdiagonalelement(dualsimplexbasis *s
       result = 1.0;
       return result;
    }
-   ae_assert(((s->trftype == 0 || s->trftype == 1) || s->trftype == 2) || s->trftype == 3, "BasisMinimumDiagonalElement: unexpected TRF type");
+   ae_assert(s->trftype == 0 || s->trftype == 1 || s->trftype == 2 || s->trftype == 3, "BasisMinimumDiagonalElement: unexpected TRF type");
    ae_assert(s->isvalidtrf, "BasisMinimumDiagonalElement: TRF is invalid");
    v = maxrealnumber;
    for (i = 0; i < m; i++) {
@@ -28352,12 +28350,12 @@ static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubp
       for (ii = 0; ii < alphar->k; ii++) {
          j = alphar->idx.xZ[ii];
          bndt = s->bndt.xZ[j];
-         if ((j == q || bndt == reviseddualsimplex_ccfixed) || bndt == reviseddualsimplex_ccfree) {
+         if (j == q || bndt == reviseddualsimplex_ccfixed || bndt == reviseddualsimplex_ccfree) {
             continue;
          }
          sft = *thetad * (dir * alphar->vals.xR[ii]) - s->d.xR[j];
       // Handle variables at lower bound
-         if (bndt == reviseddualsimplex_cclower || (bndt == reviseddualsimplex_ccrange && s->xa.xR[j] == s->bndl.xR[j])) {
+         if (bndt == reviseddualsimplex_cclower || bndt == reviseddualsimplex_ccrange && s->xa.xR[j] == s->bndl.xR[j]) {
             sft -= settings->dtolabs;
             if (sft > 0) {
                s->effc.xR[j] += sft;
@@ -28365,7 +28363,7 @@ static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubp
             }
             continue;
          }
-         if (bndt == reviseddualsimplex_ccupper || (bndt == reviseddualsimplex_ccrange && s->xa.xR[j] == s->bndu.xR[j])) {
+         if (bndt == reviseddualsimplex_ccupper || bndt == reviseddualsimplex_ccrange && s->xa.xR[j] == s->bndu.xR[j]) {
             sft += settings->dtolabs;
             if (sft < 0) {
                s->effc.xR[j] += sft;
@@ -28395,7 +28393,7 @@ static void reviseddualsimplex_basisrequestweights(dualsimplexbasis *s, dualsimp
    double vv;
    m = s->m;
    ns = s->ns;
-   ae_assert((settings->pricing == -1 || settings->pricing == 0) || settings->pricing == 1, "BasisRequestWeights: unknown pricing type");
+   ae_assert(settings->pricing == -1 || settings->pricing == 0 || settings->pricing == 1, "BasisRequestWeights: unknown pricing type");
    ae_assert(s->isvalidtrf, "BasisRequestWeights: factorization is not computed prior to calling this function");
 // If weights are valid, return immediately
    if (s->dsevalid) {
@@ -28832,7 +28830,7 @@ static void reviseddualsimplex_ftranstep(dualsimplexstate *state, dualsimplexsub
       state->ftrantmp0.xR[state->at.idx.xZ[j]] = state->at.vals.xR[j];
    }
    reviseddualsimplex_basissolvex(&state->basis, &state->ftrantmp0, alphaq, alphaqim, true, &state->ftrantmp1);
-   ae_assert((settings->pricing == -1 || settings->pricing == 0) || settings->pricing == 1, "FTran: unexpected Settings.Pricing");
+   ae_assert(settings->pricing == -1 || settings->pricing == 0 || settings->pricing == 1, "FTran: unexpected Settings.Pricing");
    if (settings->pricing == 1) {
       reviseddualsimplex_basissolve(&state->basis, &rhor->dense, tau, &state->ftrantmp1);
    }
@@ -28918,14 +28916,14 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
       vx = s->xa.xR[nj];
       vp = settings->pivottol;
       alphawaver = dir * alphar->vals.xR[j];
-      if (bndt == reviseddualsimplex_cclower || (bndt == reviseddualsimplex_ccrange && vx == s->bndl.xR[nj])) {
+      if (bndt == reviseddualsimplex_cclower || bndt == reviseddualsimplex_ccrange && vx == s->bndl.xR[nj]) {
          if (alphawaver > vp) {
             state->eligiblealphar.xZ[eligiblecnt] = j;
             eligiblecnt++;
             continue;
          }
       }
-      if (bndt == reviseddualsimplex_ccupper || (bndt == reviseddualsimplex_ccrange && vx == s->bndu.xR[nj])) {
+      if (bndt == reviseddualsimplex_ccupper || bndt == reviseddualsimplex_ccrange && vx == s->bndu.xR[nj]) {
          if (alphawaver < -vp) {
             state->eligiblealphar.xZ[eligiblecnt] = j;
             eligiblecnt++;
@@ -29076,13 +29074,13 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
       }
    }
 // Update dense factorization
-   if (((s->trftype != settings->trftype || s->trftype == 0) || !s->isvalidtrf) || s->trfage >= settings->maxtrfage) {
+   if (s->trftype != settings->trftype || s->trftype == 0 || !s->isvalidtrf || s->trfage >= settings->maxtrfage) {
    // Complete refresh is needed for factorization
       s->isvalidtrf = false;
       reviseddualsimplex_basisfreshtrf(s, at, settings);
    } else {
       processed = false;
-      if ((s->trftype == 0 || s->trftype == 1) || s->trftype == 2) {
+      if (s->trftype == 0 || s->trftype == 1 || s->trftype == 2) {
       // Dense/sparse factorizations with dense PFI
          ae_assert(alphaq->xR[r] != 0.0, "BasisUpdateTrf: integrity check failed, AlphaQ[R]=0");
          rvectorgrowto(&s->densepfieta, (s->trfage + 1) * m);
@@ -29223,7 +29221,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
       ae_assert(processed, "BasisUpdateTrf: unexpected TRF type");
    }
 // Update pricing weights
-   ae_assert((settings->pricing == -1 || settings->pricing == 0) || settings->pricing == 1, "BasisUpdateTrf: unexpected Settings.Pricing");
+   ae_assert(settings->pricing == -1 || settings->pricing == 0 || settings->pricing == 1, "BasisUpdateTrf: unexpected Settings.Pricing");
    processed = false;
    if (settings->pricing == -1) {
    // Weights are recomputed from scratch at every step.
@@ -29358,7 +29356,7 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
    nx = s->ns + s->m;
    m = s->m;
 // Integrity checks
-   ae_assert((settings->ratiotest == 0 || settings->ratiotest == 1) || settings->ratiotest == 2, "UpdateStep: invalid X");
+   ae_assert(settings->ratiotest == 0 || settings->ratiotest == 1 || settings->ratiotest == 2, "UpdateStep: invalid X");
    ae_assert(s->state == reviseddualsimplex_ssvalid, "UpdateStep: invalid X");
    ae_assert(p >= 0 && q >= 0, "UpdateStep: invalid P/Q");
    ae_assert(delta != 0.0, "UpdateStep: Delta=0");
@@ -29677,7 +29675,7 @@ static bool reviseddualsimplex_hasbndl(dualsimplexsubproblem *subproblem, ae_int
    bool result;
    k = subproblem->bndt.xZ[i];
    result = false;
-   if ((k == 0 || k == 1) || k == 3) {
+   if (k == 0 || k == 1 || k == 3) {
       result = true;
       return result;
    }
@@ -29696,7 +29694,7 @@ static bool reviseddualsimplex_hasbndu(dualsimplexsubproblem *subproblem, ae_int
    bool result;
    k = subproblem->bndt.xZ[i];
    result = false;
-   if ((k == 0 || k == 2) || k == 3) {
+   if (k == 0 || k == 2 || k == 3) {
       result = true;
       return result;
    }
@@ -30094,7 +30092,7 @@ static bool reviseddualsimplex_isfree(dualsimplexsubproblem *subproblem, ae_int_
    bool result;
    k = subproblem->bndt.xZ[i];
    result = false;
-   if (((k == 0 || k == 1) || k == 2) || k == 3) {
+   if (k == 0 || k == 1 || k == 2 || k == 3) {
       result = false;
       return result;
    }
@@ -30587,7 +30585,7 @@ void dsssetproblem(dualsimplexstate *state, RVector *c, RVector *bndl, RVector *
    ae_assert(c->cnt >= ns, "SubproblemSetCost: Length(C)<N");
    ae_assert(isfinitevector(c, ns), "SubproblemSetCost: C contains infinite or NaN elements");
    ae_assert(akind == 0 || akind == 1, "DSSSetProblem: incorrect AKind");
-   ae_assert((basisinittype == 0 || basisinittype == 1) || basisinittype == 2, "DSSSetProblem: incorrect BasisInitType");
+   ae_assert(basisinittype == 0 || basisinittype == 1 || basisinittype == 2, "DSSSetProblem: incorrect BasisInitType");
    ae_assert(k >= 0, "DSSSetProblem: K<0");
    if (k > 0 && akind == 1) {
       ae_assert(sparsea->m == k, "DSSSetProblem: rows(A) != K");
@@ -31912,12 +31910,12 @@ void minlpoptimize(minlpstate *state) {
 // Most basic check for correctness of constraints
    badconstr = false;
    for (i = 0; i < n; i++) {
-      if ((isfinite(state->bndl.xR[i]) && isfinite(state->bndu.xR[i])) && state->bndl.xR[i] > state->bndu.xR[i]) {
+      if (isfinite(state->bndl.xR[i]) && isfinite(state->bndu.xR[i]) && state->bndl.xR[i] > state->bndu.xR[i]) {
          badconstr = true;
       }
    }
    for (i = 0; i < m; i++) {
-      if ((isfinite(state->al.xR[i]) && isfinite(state->au.xR[i])) && state->al.xR[i] > state->au.xR[i]) {
+      if (isfinite(state->al.xR[i]) && isfinite(state->au.xR[i]) && state->al.xR[i] > state->au.xR[i]) {
          badconstr = true;
       }
    }
@@ -32609,7 +32607,7 @@ static void nlcslp_lpsubproblemupdatehessian(minslpstate *sstate, minslpsubsolve
          subsolver->sk.xR[i] = sk;
          subsolver->yk.xR[i] = yk;
       }
-      if ((sqrt(v0) > rmax2(sstate->epsx, nlcslp_bfgstol) && sqrt(v1) > nlcslp_bfgstol * sqrt(v2)) && v > nlcslp_bfgstol * sqrt(v0) * sqrt(v1)) {
+      if (sqrt(v0) > rmax2(sstate->epsx, nlcslp_bfgstol) && sqrt(v1) > nlcslp_bfgstol * sqrt(v2) && v > nlcslp_bfgstol * sqrt(v0) * sqrt(v1)) {
       // Update Hessian if following criteria hold:
       // * MCINFO=1 (good step)
       // * step length is large enough
@@ -33863,7 +33861,7 @@ Spawn:
          *status = 1;
          goto Exit;
       }
-      if ((mcinfo != 1 && mcinfo != 3) && mcinfo != 5) {
+      if (mcinfo != 1 && mcinfo != 3 && mcinfo != 5) {
       // Line search ended with "bad" MCINFO
       // (neither sufficient decrease, neither maximum step);
       // terminate.
@@ -35818,7 +35816,7 @@ static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, 
 // NOTE: penalty term for inequality constraints is ignored because it
 //       is large only in exceptional cases.
    for (i = 0; i < n; i++) {
-      if ((hasbndl->xB[i] && hasbndu->xB[i]) && bndl->xR[i] == bndu->xR[i]) {
+      if (hasbndl->xB[i] && hasbndu->xB[i] && bndl->xR[i] == bndu->xR[i]) {
          minnlcequalitypenaltyfunction((x->xR[i] - bndl->xR[i]) * rho, &p, &dp, &d2p);
          bufd->xR[i] += d2p * rho;
          continue;
@@ -35932,7 +35930,7 @@ static void minnlc_penaltybc(RVector *x, RVector *bndl, BVector *hasbndl, RVecto
    double dp;
    double d2p;
    for (i = 0; i < n; i++) {
-      if ((hasbndl->xB[i] && hasbndu->xB[i]) && bndl->xR[i] == bndu->xR[i]) {
+      if (hasbndl->xB[i] && hasbndu->xB[i] && bndl->xR[i] == bndu->xR[i]) {
       // I-th boundary constraint is of equality-type
          minnlcequalitypenaltyfunction((x->xR[i] - bndl->xR[i]) * rho, &p, &dp, &d2p);
          *f += p / rho - nubc->xR[2 * i + 0] * (x->xR[i] - bndl->xR[i]);
@@ -36172,7 +36170,7 @@ Spawn:
    for (i = 0; i < n; i++) {
       state->nubc.xR[2 * i + 0] = 0.0;
       state->nubc.xR[2 * i + 1] = 0.0;
-      if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
+      if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
          continue;
       }
       if (state->hasbndl.xB[i]) {
@@ -36282,7 +36280,7 @@ Spawn:
             //   and V1 - directional derivative at XK1
             // * set GammaK to Max(GammaK, |V1-V0|/V2)
                for (i = 0; i < n; i++) {
-                  ae_assert(fabs(state->auloptimizer.x.xR[i] - state->xk1.xR[i]) <= 100 * machineepsilon || !(isfinite(state->auloptimizer.x.xR[i]) && isfinite(state->xk1.xR[i])), "MinNLC: integrity check failed, unexpected behavior of LBFGS optimizer");
+                  ae_assert(fabs(state->auloptimizer.x.xR[i] - state->xk1.xR[i]) <= 100.0 * machineepsilon || !(isfinite(state->auloptimizer.x.xR[i]) && isfinite(state->xk1.xR[i])), "MinNLC: integrity check failed, unexpected behavior of LBFGS optimizer");
                }
                v2 = 0.0;
                for (i = 0; i < n; i++) {
@@ -36346,7 +36344,7 @@ Spawn:
       for (i = 0; i < n; i++) {
       // Process coefficients corresponding to equality-type
       // constraints.
-         if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
+         if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
             minnlcequalitypenaltyfunction((state->xc.xR[i] - state->scaledbndl.xR[i]) * state->rho, &p, &dp, &d2p);
             state->nubc.xR[2 * i + 0] = rboundval(state->nubc.xR[2 * i + 0] - dp, -minnlc_maxlagmult, minnlc_maxlagmult);
             continue;
@@ -36600,7 +36598,7 @@ Spawn:
                for (k = 0; k < n; k++) {
                   vleft = state->xbase.xR[k] - state->s.xR[k] * state->diffstep;
                   vright = state->xbase.xR[k] + state->s.xR[k] * state->diffstep;
-                  if ((state->hasbndl.xB[k] && vleft < state->bndl.xR[k]) || (state->hasbndu.xB[k] && vright > state->bndu.xR[k])) {
+                  if (state->hasbndl.xB[k] && vleft < state->bndl.xR[k] || state->hasbndu.xB[k] && vright > state->bndu.xR[k]) {
                   // Box constraint is violated by 4-point centered formula, use 2-point uncentered one
                      if (state->hasbndl.xB[k] && vleft < state->bndl.xR[k]) {
                         vleft = state->bndl.xR[k];
@@ -36710,7 +36708,7 @@ Spawn:
                for (k = 0; k < n; k++) {
                   vleft = state->xbase.xR[k] - state->s.xR[k] * state->diffstep;
                   vright = state->xbase.xR[k] + state->s.xR[k] * state->diffstep;
-                  if ((state->hasbndl.xB[k] && vleft < state->bndl.xR[k]) || (state->hasbndu.xB[k] && vright > state->bndu.xR[k])) {
+                  if (state->hasbndl.xB[k] && vleft < state->bndl.xR[k] || state->hasbndu.xB[k] && vright > state->bndu.xR[k]) {
                   // Box constraint is violated by 4-point centered formula, use 2-point uncentered one
                      if (state->hasbndl.xB[k] && vleft < state->bndl.xR[k]) {
                         vleft = state->bndl.xR[k];
@@ -38145,7 +38143,7 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
    state->agsstattold = sqrt(machineepsilon);
    state->agsshortstpabs = 1.0E-10;
    state->agsshortstprel = 0.75;
-   state->agsshortf = 10 * machineepsilon;
+   state->agsshortf = 10.0 * machineepsilon;
    state->agsrhononlinear = 0.0;
    state->agsraddecay = 0.2;
    state->agsalphadecay = 0.5;
@@ -38947,7 +38945,7 @@ Spawn:
    vectorsetlengthatleast(&state->scaledbndu, n);
    for (i = 0; i < n; i++) {
    // Check and scale constraints
-      if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndu.xR[i] < state->bndl.xR[i]) {
+      if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndu.xR[i] < state->bndl.xR[i]) {
          state->repterminationtype = -3;
          goto Exit;
       }
@@ -38964,7 +38962,7 @@ Spawn:
       if (state->hasbndl.xB[i] && state->hasbndu.xB[i]) {
          ae_assert(state->scaledbndl.xR[i] <= state->scaledbndu.xR[i], "MinNS: integrity check failed (dfdf)");
       }
-      if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->bndl.xR[i] == state->bndu.xR[i]) {
+      if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
          ae_assert(state->scaledbndl.xR[i] == state->scaledbndu.xR[i], "MinNS: integrity check failed (dsgh)");
       }
    // Scale and constrain point
@@ -39142,7 +39140,7 @@ Spawn:
          // Undistorted position
             state->samplex.xyR[i][j] = state->xc.xR[j];
          // Do not apply distortion if the variable is fixed
-            if ((state->hasbndl.xB[j] && state->hasbndu.xB[j]) && state->scaledbndl.xR[j] == state->scaledbndu.xR[j]) {
+            if (state->hasbndl.xB[j] && state->hasbndu.xB[j] && state->scaledbndl.xR[j] == state->scaledbndu.xR[j]) {
                continue;
             }
          // Apply distortion
@@ -39178,7 +39176,7 @@ Spawn:
             ae_assert(!state->hasbndl.xB[i] || state->xc.xR[i] >= state->scaledbndl.xR[i], "MinNS: integrity error");
             ae_assert(!state->hasbndu.xB[i] || state->xc.xR[i] <= state->scaledbndu.xR[i], "MinNS: integrity error");
             state->samplegmbc.xyR[j][i] = state->samplegm.xyR[j][i];
-            if ((state->hasbndl.xB[i] && state->hasbndu.xB[i]) && state->scaledbndl.xR[i] == state->scaledbndu.xR[i]) {
+            if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->scaledbndl.xR[i] == state->scaledbndu.xR[i]) {
             // I-th box constraint is of equality type (lower bound matches upper one).
             // Simplest case, always active.
                state->samplegmbc.xyR[j][i] = 0.0;
@@ -39330,7 +39328,7 @@ Spawn:
             break;
          }
       }
-      if ((alpha * dnrminf <= state->agsshortstpabs || alpha * dnrminf <= state->agsshortstprel * radius) || fabs(state->samplef.xR[0] - state->samplef.xR[maxsamplesize]) <= state->agsshortf) {
+      if (alpha * dnrminf <= state->agsshortstpabs || alpha * dnrminf <= state->agsshortstprel * radius || fabs(state->samplef.xR[0] - state->samplef.xR[maxsamplesize]) <= state->agsshortf) {
          shortstepscnt++;
       } else {
          shortstepscnt = 0;
@@ -40118,7 +40116,7 @@ void minasasetcond(minasastate *state, double epsg, double epsf, double epsx, ae
    ae_assert(isfinite(epsx), "MinASASetCond: EpsX is not finite number!");
    ae_assert(epsx >= 0.0, "MinASASetCond: negative EpsX!");
    ae_assert(maxits >= 0, "MinASASetCond: negative MaxIts!");
-   if (((epsg == 0.0 && epsf == 0.0) && epsx == 0.0) && maxits == 0) {
+   if (epsg == 0.0 && epsf == 0.0 && epsx == 0.0 && maxits == 0) {
       epsx = 1.0E-6;
    }
    state->epsg = epsg;
@@ -41075,7 +41073,7 @@ void minbcsetcond(minbcstate *state, double epsg, double epsf, double epsx, ae_i
    ae_assert(isfinite(epsx), "MinBCSetCond: EpsX is not finite number");
    ae_assert(epsx >= 0.0, "MinBCSetCond: negative EpsX");
    ae_assert(maxits >= 0, "MinBCSetCond: negative MaxIts!");
-   if (((epsg == 0.0 && epsf == 0.0) && epsx == 0.0) && maxits == 0) {
+   if (epsg == 0.0 && epsf == 0.0 && epsx == 0.0 && maxits == 0) {
       epsx = 1.0E-6;
    }
    state->epsg = epsg;
@@ -41812,7 +41810,7 @@ Spawn:
       //
       // In order to correctly handle such cases we allow limited amount
       // of small steps which increase function value.
-         if ((freezeidx >= 0 && scaleddnorm * state->curstpmax <= minbc_maxnonmonotoniclen) && state->nonmonotoniccnt > 0) {
+         if (freezeidx >= 0 && scaleddnorm * state->curstpmax <= minbc_maxnonmonotoniclen && state->nonmonotoniccnt > 0) {
          // We enforce non-monotonic step:
          // * Stp    := CurStpMax
          // * MCINFO := 5
@@ -41935,8 +41933,8 @@ Spawn:
          ae_v_moveneg(state->d.xR, 1, state->work.xR, 1, n);
          b = false;
          for (i = 0; i < n; i++) {
-            b = b || ((state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i]) && state->d.xR[i] != 0.0);
-            b = b || ((state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i]) && state->d.xR[i] != 0.0);
+            b = b || state->hasbndl.xB[i] && state->xc.xR[i] == state->bndl.xR[i] && state->d.xR[i] != 0.0;
+            b = b || state->hasbndu.xB[i] && state->xc.xR[i] == state->bndu.xR[i] && state->d.xR[i] != 0.0;
          }
          ae_assert(!b, "MinBC: integrity check failed (q)");
          scaleddnorm = 0.0;
@@ -42095,10 +42093,10 @@ Spawn:
       // * update length of the good step
          activationstatus = false;
          for (i = 0; i < n; i++) {
-            if ((state->hasbndl.xB[i] && state->xn.xR[i] == state->bndl.xR[i]) && state->xn.xR[i] != state->xc.xR[i]) {
+            if (state->hasbndl.xB[i] && state->xn.xR[i] == state->bndl.xR[i] && state->xn.xR[i] != state->xc.xR[i]) {
                activationstatus = true;
             }
-            if ((state->hasbndu.xB[i] && state->xn.xR[i] == state->bndu.xR[i]) && state->xn.xR[i] != state->xc.xR[i]) {
+            if (state->hasbndu.xB[i] && state->xn.xR[i] == state->bndu.xR[i] && state->xn.xR[i] != state->xc.xR[i]) {
                activationstatus = true;
             }
          }

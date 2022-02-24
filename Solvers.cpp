@@ -3049,13 +3049,13 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    NewVector(tx, 0, DT_REAL);
    NewVector(buf, 0, DT_REAL);
    NewVector(w, 0, DT_REAL);
-   if ((nrows <= 0 || ncols <= 0) || threshold < 0.0) {
+   if (nrows <= 0 || ncols <= 0 || threshold < 0.0) {
       *info = -1;
       ae_frame_leave();
       return;
    }
    if (threshold == 0.0) {
-      threshold = 1000 * machineepsilon;
+      threshold = 1000.0 * machineepsilon;
    }
 // Factorize A first
    svdfailed = !rmatrixsvd(a, nrows, ncols, 1, 2, 2, &sv, &u, &vt);
@@ -6027,8 +6027,8 @@ Spawn:
          state->repterminationtype = 1;
          goto Exit;
       }
-      if (state->alphaip1 * fabs(state->ci) / state->anorm <= state->epsa) {
-      // ||A^T*Rk||/(||A||*||Rk||) <= EpsA, here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
+      if (state->alphaip1 * fabs(state->ci) <= state->epsa * state->anorm) {
+      // ||A^T*Rk|| <= EpsA*(||A||*||Rk||), here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
          state->running = false;
          state->repterminationtype = 4;
          goto Exit;
@@ -6172,7 +6172,7 @@ void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxi
    ae_assert(isfinite(epsa) && epsa >= 0.0, "LinLSQRSetCond: EpsA is negative, INF or NAN");
    ae_assert(isfinite(epsb) && epsb >= 0.0, "LinLSQRSetCond: EpsB is negative, INF or NAN");
    ae_assert(maxits >= 0, "LinLSQRSetCond: MaxIts is negative");
-   if ((epsa == 0.0 && epsb == 0.0) && maxits == 0) {
+   if (epsa == 0.0 && epsb == 0.0 && maxits == 0) {
       state->epsa = linlsqr_atol;
       state->epsb = linlsqr_btol;
       state->maxits = state->n;

@@ -217,7 +217,7 @@ bool aredistinct(RVector *x, ae_int_t n) {
    }
    ae_assert(!nonsorted, "APSERVAreDistinct: internal error (not sorted)");
    for (i = 1; i < n; i++) {
-      if ((x->xR[i] - a) / (b - a) + 1 == (x->xR[i - 1] - a) / (b - a) + 1) {
+      if ((x->xR[i] - a) / (b - a) == (x->xR[i - 1] - a) / (b - a)) {
          result = false;
          return result;
       }
@@ -2850,7 +2850,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
    ae_int_t i;
    ae_int_t j;
    double s;
-   if ((m <= 0 || n <= 0) || alpha == 0.0) {
+   if (m <= 0 || n <= 0 || alpha == 0.0) {
       return;
    }
    for (i = 0; i < m; i++) {
@@ -4492,7 +4492,7 @@ void complexgeneratereflection(CVector *x, ae_int_t n, complex *tau) {
 void complexapplyreflectionfromtheleft(CMatrix *c, complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work) {
    complex t;
    ae_int_t i;
-   if ((ae_c_eq_d(tau, 0.0) || n1 > n2) || m1 > m2) {
+   if (ae_c_eq_d(tau, 0.0) || n1 > n2 || m1 > m2) {
       return;
    }
 // w := C^T * conj(v)
@@ -4540,7 +4540,7 @@ void complexapplyreflectionfromtheright(CMatrix *c, complex tau, CVector *v, ae_
    complex t;
    ae_int_t i;
    ae_int_t vm;
-   if ((ae_c_eq_d(tau, 0.0) || n1 > n2) || m1 > m2) {
+   if (ae_c_eq_d(tau, 0.0) || n1 > n2 || m1 > m2) {
       return;
    }
 // w := C * v
@@ -6461,7 +6461,7 @@ void matrixmatrixmultiply(RMatrix *a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, 
       bcols = bi2 - bi1 + 1;
    }
    ae_assert(acols == brows, "MatrixMatrixMultiply: incorrect matrix sizes!");
-   if (((arows <= 0 || acols <= 0) || brows <= 0) || bcols <= 0) {
+   if (arows <= 0 || acols <= 0 || brows <= 0 || bcols <= 0) {
       return;
    }
    crows = arows;
@@ -7011,7 +7011,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
             grow = 1 / rmax2(xbnd, smlnum);
             xbnd = grow;
             j = jfirst;
-            while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast)) {
+            while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
             // Exit the loop if the growth factor is too small.
                if (grow <= smlnum) {
                   break;
@@ -7037,7 +7037,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
          // Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
             grow = rmin2(1.0, 1 / rmax2(xbnd, smlnum));
             j = jfirst;
-            while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast)) {
+            while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
             // Exit the loop if the growth factor is too small.
                if (grow <= smlnum) {
                   break;
@@ -7070,7 +7070,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
             grow = 1 / rmax2(xbnd, smlnum);
             xbnd = grow;
             j = jfirst;
-            while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast)) {
+            while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
             // Exit the loop if the growth factor is too small.
                if (grow <= smlnum) {
                   break;
@@ -7094,7 +7094,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
          // Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
             grow = rmin2(1.0, 1 / rmax2(xbnd, smlnum));
             j = jfirst;
-            while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast)) {
+            while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
             // Exit the loop if the growth factor is too small.
                if (grow <= smlnum) {
                   break;
@@ -7165,7 +7165,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
       if (notran) {
       // Solve A * x = b
          j = jfirst;
-         while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast)) {
+         while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
          // Compute x(j) = b(j) / A(j,j), scaling x if necessary.
             xj = fabs(x->xR[j]);
             flg = 0;
@@ -7276,7 +7276,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
       } else {
       // Solve A' * x = b
          j = jfirst;
-         while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast)) {
+         while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
          // Compute x(j) = b(j) - sum A(k,j)*x(k).
          //   k != j
             xj = fabs(x->xR[j]);
@@ -7689,7 +7689,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
    ae_frame_make(&_frame_block);
    NewVector(tmp, 0, DT_COMPLEX);
    ae_assert(n > 0, "CMatrixTRSafeSolve: incorrect N!");
-   ae_assert((trans == 0 || trans == 1) || trans == 2, "CMatrixTRSafeSolve: incorrect Trans!");
+   ae_assert(trans == 0 || trans == 1 || trans == 2, "CMatrixTRSafeSolve: incorrect Trans!");
    result = true;
    lnmax = log(maxrealnumber);
 // Quick return if possible
@@ -7978,7 +7978,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
       for (i = 0; i < n; i++) {
          v = w->xR[i];
          k = itrunc(v);
-         if (v != (double)k) {
+         if (v != k) {
             allzeros = false;
          }
          w->xR[i] = chunk * (v - k);
@@ -8115,7 +8115,7 @@ void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, complex *r, double
 // === LINMIN Package ===
 namespace alglib_impl {
 static const double linmin_ftol = 0.001;
-static const double linmin_xtol = 100 * machineepsilon;
+static const double linmin_xtol = 100.0 * machineepsilon;
 static const ae_int_t linmin_maxfev = 20;
 static const double linmin_stpmin = 1.0E-50;
 static const double linmin_defstpmax = 1.0E+50;
@@ -8160,7 +8160,7 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
    double theta;
    *info = 0;
 // Check the inputs for errors.
-   if (((*brackt && (*stp <= rmin2(*stx, *sty) || *stp >= rmax2(*stx, *sty))) || *dx * (*stp - (*stx)) >= 0.0) || stmax < stmin) {
+   if (*brackt && (*stp <= rmin2(*stx, *sty) || *stp >= rmax2(*stx, *sty)) || *dx * (*stp - *stx) >= 0.0 || stmax < stmin) {
       return;
    }
 // Determine if the derivatives have opposite sign.
@@ -8183,7 +8183,7 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
       r = p / q;
       stpc = *stx + r * (*stp - (*stx));
       stpq = *stx + *dx / ((*fx - fp) / (*stp - (*stx)) + (*dx)) / 2 * (*stp - (*stx));
-      if (fabs(stpc - (*stx)) < fabs(stpq - (*stx))) {
+      if (fabs(stpc - *stx) < fabs(stpq - *stx)) {
          stpf = stpc;
       } else {
          stpf = stpc + (stpq - stpc) / 2;
@@ -8206,7 +8206,7 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
       r = p / q;
       stpc = *stp + r * (*stx - (*stp));
       stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
-      if (fabs(stpc - (*stp)) > fabs(stpq - (*stp))) {
+      if (fabs(stpc - *stp) > fabs(stpq - *stp)) {
          stpf = stpc;
       } else {
          stpf = stpq;
@@ -8402,7 +8402,7 @@ Spawn:
       *stp = stpmax;
       goto Exit;
    }
-   if (((((((n <= 0 || *stp <= 0.0) || linmin_ftol < 0.0) || gtol < zero) || linmin_xtol < zero) || linmin_stpmin < zero) || stpmax < linmin_stpmin) || linmin_maxfev <= 0) {
+   if (n <= 0 || *stp <= 0.0 || linmin_ftol < 0.0 || gtol < zero || linmin_xtol < zero || linmin_stpmin < zero || stpmax < linmin_stpmin || linmin_maxfev <= 0) {
       goto Exit;
    }
 // Compute the initial gradient in the search direction and check that s is a descent direction.
@@ -8458,7 +8458,7 @@ Spawn:
          *stp = linmin_stpmin;
       }
    // If an unusual termination is to occur then let *stp be the lowest point obtained so far.
-      if ((((state->brackt && (*stp <= state->stmin || *stp >= state->stmax)) || *nfev >= linmin_maxfev - 1) || state->infoc == 0) || (state->brackt && state->stmax - state->stmin <= linmin_xtol * state->stmax)) {
+      if (state->brackt && (*stp <= state->stmin || *stp >= state->stmax) || *nfev >= linmin_maxfev - 1 || state->infoc == 0 || state->brackt && state->stmax - state->stmin <= linmin_xtol * state->stmax) {
          *stp = state->stx;
       }
    // Evaluate the function and gradient at *stp and compute the directional derivative.
@@ -8472,13 +8472,13 @@ Spawn:
       state->dg = v;
       state->ftest1 = state->finit + *stp * state->dgtest;
    // Test for convergence.
-      if ((state->brackt && (*stp <= state->stmin || *stp >= state->stmax)) || state->infoc == 0) {
+      if (state->brackt && (*stp <= state->stmin || *stp >= state->stmax) || state->infoc == 0) {
          *info = 6;
       }
-      if (((*stp == stpmax && f < state->finit) && f <= state->ftest1) && state->dg <= state->dgtest) {
+      if (*stp == stpmax && f < state->finit && f <= state->ftest1 && state->dg <= state->dgtest) {
          *info = 5;
       }
-      if (*stp == linmin_stpmin && ((f >= state->finit || f > state->ftest1) || state->dg >= state->dgtest)) {
+      if (*stp == linmin_stpmin && (f >= state->finit || f > state->ftest1 || state->dg >= state->dgtest)) {
          *info = 4;
       }
       if (*nfev >= linmin_maxfev) {
@@ -8487,7 +8487,7 @@ Spawn:
       if (state->brackt && state->stmax - state->stmin <= linmin_xtol * state->stmax) {
          *info = 2;
       }
-      if ((f < state->finit && f <= state->ftest1) && fabs(state->dg) <= -gtol * state->dginit) {
+      if (f < state->finit && f <= state->ftest1 && fabs(state->dg) <= -gtol * state->dginit) {
          *info = 1;
       }
    // Check for termination.
@@ -8505,13 +8505,13 @@ Spawn:
          goto Exit;
       }
    // In the first stage we seek a step for which the modified function has a non-positive value and non-negative derivative.
-      if ((state->stage1 && f <= state->ftest1) && state->dg >= rmin2(linmin_ftol, gtol) * state->dginit) {
+      if (state->stage1 && f <= state->ftest1 && state->dg >= rmin2(linmin_ftol, gtol) * state->dginit) {
          state->stage1 = false;
       }
    // A modified function is used to predict the step only if we have not obtained a step
    // for which the modified function has a non-positive function value and non-negative derivative,
    // and if a lower function value has been obtained but the decrease is not sufficient.
-      if ((state->stage1 && f <= state->fx) && f > state->ftest1) {
+      if (state->stage1 && f <= state->fx && f > state->ftest1) {
       // Define the modified function and derivative values.
          state->fm = f - *stp * state->dgtest;
          state->fxm = state->fx - state->stx * state->dgtest;
@@ -8605,7 +8605,7 @@ Spawn:
    n = 359;
    v = -58;
 // Routine body
-   if ((state->stplen <= 0.0 || state->stpmax < 0.0) || state->fmax < 2) {
+   if (state->stplen <= 0.0 || state->stpmax < 0.0 || state->fmax < 2) {
       state->info = 0;
       goto Exit;
    }
@@ -10297,7 +10297,7 @@ static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *
    }
 // In case no good codelet was found,
 // try to factorize N into product of ANY primes.
-   if (*n1 * (*n2) != n) {
+   if (*n1 * *n2 != n) {
       for (j = 2; j < n; j++) {
          if (n % j == 0) {
             *n1 = j;
@@ -10310,7 +10310,7 @@ static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *
       }
    }
 // normalize
-   if (*n1 > (*n2)) {
+   if (*n1 > *n2) {
       j = *n1;
       *n1 = *n2;
       *n2 = j;
@@ -10331,7 +10331,7 @@ void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1, ae_int_t *n2) 
    *n1 = 0;
    *n2 = 0;
 // try to find good codelet
-   if (*n1 * (*n2) != n) {
+   if (*n1 * *n2 != n) {
       for (j = ftbase_ftbasecodeletrecommended; j >= 2; j--) {
          if (n % j == 0) {
             *n1 = j;
@@ -10341,7 +10341,7 @@ void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1, ae_int_t *n2) 
       }
    }
 // try to factorize N
-   if (*n1 * (*n2) != n) {
+   if (*n1 * *n2 != n) {
       for (j = ftbase_ftbasecodeletrecommended + 1; j < n; j++) {
          if (n % j == 0) {
             *n1 = j;
@@ -10351,7 +10351,7 @@ void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1, ae_int_t *n2) 
       }
    }
 // looks like N is prime :(
-   if (*n1 * (*n2) != n) {
+   if (*n1 * *n2 != n) {
       *n1 = 1;
       *n2 = n;
    }

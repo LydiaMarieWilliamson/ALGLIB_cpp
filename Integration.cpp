@@ -425,7 +425,7 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
    SetVector(w);
    NewVector(a, 0, DT_REAL);
    NewVector(b, 0, DT_REAL);
-   if ((n < 1 || alpha <= -1.0) || beta <= -1.0) {
+   if (n < 1 || alpha <= -1.0 || beta <= -1.0) {
       *info = -1;
       ae_frame_leave();
       return;
@@ -928,7 +928,7 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
 // but without them compiler complains about uninitialized locals
    ng = 0;
 // Process
-   ae_assert(((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61, "GKQNodesTbl: incorrect N!");
+   ae_assert(n == 15 || n == 21 || n == 31 || n == 41 || n == 51 || n == 61, "GKQNodesTbl: incorrect N!");
    ae_vector_set_length(x, n);
    ae_vector_set_length(wkronrod, n);
    ae_vector_set_length(wgauss, n);
@@ -1297,7 +1297,7 @@ void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w
    SetVector(x);
    SetVector(wkronrod);
    SetVector(wgauss);
-   if (machineepsilon > 1.0E-32 && (((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61)) {
+   if (machineepsilon > 1.0E-32 && (n == 15 || n == 21 || n == 31 || n == 41 || n == 51 || n == 61)) {
       *info = 1;
       gkqlegendretbl(n, x, wkronrod, wgauss, &eps);
    } else {
@@ -1714,7 +1714,7 @@ Spawn:
    }
    state->info = 1;
    if (state->eps == 0.0) {
-      state->eps = 100000 * machineepsilon;
+      state->eps = 100000.0 * machineepsilon;
    }
 // First, prepare heap
 // * column 0   -   absolute error

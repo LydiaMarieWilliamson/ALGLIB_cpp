@@ -1217,7 +1217,7 @@ void ablasf_daxpby_avx2(ae_int_t n, double alpha, const double *src, double beta
    // Finally, we process tail.
       ae_int_t i, n4;
       __m256d avx_alpha = _mm256_set1_pd(alpha);
-      while (n > 0 && (((ptrdiff_t)dst) & 31)) {
+      while (n > 0 && ((ptrdiff_t)dst & 31)) {
          *dst += alpha * (*src);
          n--;
          dst++;
@@ -1235,7 +1235,7 @@ void ablasf_daxpby_avx2(ae_int_t n, double alpha, const double *src, double beta
       ae_int_t i, n4;
       __m256d avx_alpha = _mm256_set1_pd(alpha);
       __m256d avx_beta = _mm256_set1_pd(beta);
-      while (n > 0 && (((ptrdiff_t)dst) & 31)) {
+      while (n > 0 && ((ptrdiff_t)dst & 31)) {
          *dst = alpha * (*src) + beta * (*dst);
          n--;
          dst++;

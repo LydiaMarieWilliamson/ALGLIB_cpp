@@ -64,11 +64,11 @@ static void ablas_ablasinternalsplitlength(ae_int_t n, ae_int_t nb, ae_int_t *n1
       if (n % nb != 0) {
       // Split remainder
          *n2 = n % nb;
-         *n1 = n - (*n2);
+         *n1 = n - *n2;
       } else {
       // Split on block boundaries
          *n2 = n / 2;
-         *n1 = n - (*n2);
+         *n1 = n - *n2;
          if (*n1 % nb == 0) {
             return;
          }
@@ -325,7 +325,7 @@ void rmatrixgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, 
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
 void applyreflectionfromtheleft(RMatrix *c, double tau, RVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector *work) {
-   if ((tau == 0.0 || n1 > n2) || m1 > m2) {
+   if (tau == 0.0 || n1 > n2 || m1 > m2) {
       return;
    }
    vectorsetlengthatleast(work, n2 - n1 + 1);
@@ -360,7 +360,7 @@ void applyreflectionfromtheleft(RMatrix *c, double tau, RVector *v, ae_int_t m1,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
 void applyreflectionfromtheright(RMatrix *c, double tau, RVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector *work) {
-   if ((tau == 0.0 || n1 > n2) || m1 > m2) {
+   if (tau == 0.0 || n1 > n2 || m1 > m2) {
       return;
    }
    vectorsetlengthatleast(work, m2 - m1 + 1);
@@ -1039,12 +1039,12 @@ static void ablas_rmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, double alph
    }
    ae_assert(tscur >= 1, "RMatrixGEMMRec: integrity check failed");
 // Use MKL or ALGLIB basecase code
-   if ((m <= tsb && n <= tsb) && k <= tsb) {
+   if (m <= tsb && n <= tsb && k <= tsb) {
       if (rmatrixgemmmkl(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc)) {
          return;
       }
    }
-   if ((m <= tsa && n <= tsa) && k <= tsa) {
+   if (m <= tsa && n <= tsa && k <= tsa) {
       rmatrixgemmk(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
       return;
    }
@@ -1272,8 +1272,8 @@ void cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, 
    ae_int_t ts;
    ts = matrixtilesizeb();
 // Check input sizes for correctness
-   ae_assert((optypea == 0 || optypea == 1) || optypea == 2, "CMatrixGEMM: incorrect OpTypeA (must be 0 or 1 or 2)");
-   ae_assert((optypeb == 0 || optypeb == 1) || optypeb == 2, "CMatrixGEMM: incorrect OpTypeB (must be 0 or 1 or 2)");
+   ae_assert(optypea == 0 || optypea == 1 || optypea == 2, "CMatrixGEMM: incorrect OpTypeA (must be 0 or 1 or 2)");
+   ae_assert(optypeb == 0 || optypeb == 1 || optypeb == 2, "CMatrixGEMM: incorrect OpTypeB (must be 0 or 1 or 2)");
    ae_assert(ic + m <= c->rows, "CMatrixGEMM: incorect size of output matrix C");
    ae_assert(jc + n <= c->cols, "CMatrixGEMM: incorect size of output matrix C");
 // Decide whether it is feasible to activate multithreading
@@ -3362,7 +3362,7 @@ void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
    NewMatrix(tmpt, 0, 0, DT_REAL);
    NewMatrix(tmpr, 0, 0, DT_REAL);
    ae_assert(qcolumns <= m, "UnpackQFromQR: QColumns>M!");
-   if ((m <= 0 || n <= 0) || qcolumns <= 0) {
+   if (m <= 0 || n <= 0 || qcolumns <= 0) {
       ae_frame_leave();
       return;
    }
@@ -3627,7 +3627,7 @@ void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
    NewMatrix(tmpt, 0, 0, DT_REAL);
    NewMatrix(tmpr, 0, 0, DT_REAL);
    ae_assert(qrows <= n, "RMatrixLQUnpackQ: QRows>N!");
-   if ((m <= 0 || n <= 0) || qrows <= 0) {
+   if (m <= 0 || n <= 0 || qrows <= 0) {
       ae_frame_leave();
       return;
    }
@@ -4044,7 +4044,7 @@ void rmatrixbdmultiplybyq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, RM
    NewVector(v, 0, DT_REAL);
    NewVector(work, 0, DT_REAL);
    NewVector(dummy, 0, DT_REAL);
-   if (((m <= 0 || n <= 0) || zrows <= 0) || zcolumns <= 0) {
+   if (m <= 0 || n <= 0 || zrows <= 0 || zcolumns <= 0) {
       ae_frame_leave();
       return;
    }
@@ -4148,7 +4148,7 @@ void rmatrixbdunpackq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, ae_int
    SetMatrix(q);
    ae_assert(qcolumns <= m, "RMatrixBDUnpackQ: QColumns>M!");
    ae_assert(qcolumns >= 0, "RMatrixBDUnpackQ: QColumns<0!");
-   if ((m == 0 || n == 0) || qcolumns == 0) {
+   if (m == 0 || n == 0 || qcolumns == 0) {
       return;
    }
 // prepare Q
@@ -4203,7 +4203,7 @@ void rmatrixbdmultiplybyp(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, RM
    NewVector(v, 0, DT_REAL);
    NewVector(work, 0, DT_REAL);
    NewVector(dummy, 0, DT_REAL);
-   if (((m <= 0 || n <= 0) || zrows <= 0) || zcolumns <= 0) {
+   if (m <= 0 || n <= 0 || zrows <= 0 || zcolumns <= 0) {
       ae_frame_leave();
       return;
    }
@@ -4302,7 +4302,7 @@ void rmatrixbdunpackpt(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, ae_in
    SetMatrix(pt);
    ae_assert(ptrows <= n, "RMatrixBDUnpackPT: PTRows>N!");
    ae_assert(ptrows >= 0, "RMatrixBDUnpackPT: PTRows<0!");
-   if ((m == 0 || n == 0) || ptrows == 0) {
+   if (m == 0 || n == 0 || ptrows == 0) {
       return;
    }
 // prepare PT
@@ -6778,7 +6778,7 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
    ae_int_t tcode;
    ae_int_t k;
    bool b;
-   ae_assert((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2, "SparseSet: unsupported matrix storage format");
+   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2, "SparseSet: unsupported matrix storage format");
    ae_assert(i >= 0, "SparseSet: I<0");
    ae_assert(i < s->m, "SparseSet: I >= M");
    ae_assert(j >= 0, "SparseSet: J<0");
@@ -6788,7 +6788,7 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
    if (s->matrixtype == 0) {
       tcode = -1;
       k = s->tablesize;
-      if ((1 - sparse_maxloadfactor) * k >= (double)s->nfree) {
+      if ((1.0 - sparse_maxloadfactor) * k >= s->nfree) {
          sparseresizematrix(s);
          k = s->tablesize;
       }
@@ -6883,7 +6883,7 @@ void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
    }
    tcode = -1;
    k = s->tablesize;
-   if ((1 - sparse_maxloadfactor) * k >= (double)s->nfree) {
+   if ((1.0 - sparse_maxloadfactor) * k >= s->nfree) {
       sparseresizematrix(s);
       k = s->tablesize;
    }
@@ -8691,7 +8691,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
             stp = 1;
          }
          i = fst;
-         while ((stp > 0 && i <= lst) || (stp < 0 && i >= lst)) {
+         while (stp > 0 && i <= lst || stp < 0 && i >= lst) {
          // Select range of indexes to process
             if (isupper) {
                j0 = s->uidx.xZ[i];
@@ -8738,7 +8738,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
          }
          i = fst;
          v0 = 0.0;
-         while ((stp > 0 && i <= lst) || (stp < 0 && i >= lst)) {
+         while (stp > 0 && i <= lst || stp < 0 && i >= lst) {
             v = x->xR[i];
             if (v != 0.0) {
             // X[i] already stores A[i,i]*Y[i], the only thing left
@@ -8914,7 +8914,7 @@ void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematri
    ae_assert(a->m == a->n, "SparseSymmPermTblBuf: matrix is non-square");
    bflag = true;
    for (i = 0; i < a->n; i++) {
-      bflag = (bflag && p->xZ[i] >= 0) && p->xZ[i] < a->n;
+      bflag = bflag && p->xZ[i] >= 0 && p->xZ[i] < a->n;
    }
    ae_assert(bflag, "SparseSymmPermTblBuf: P[] contains values outside of [0,N) range");
    n = a->n;
@@ -9134,7 +9134,7 @@ bool sparseenumerate(sparsematrix *s, ae_int_t *t0, ae_int_t *t1, ae_int_t *i, a
    *j = 0;
    *v = 0;
    result = false;
-   if (*t0 < 0 || (s->matrixtype != 0 && *t1 < 0)) {
+   if (*t0 < 0 || s->matrixtype != 0 && *t1 < 0) {
    // Incorrect T0/T1, terminate enumeration
       result = false;
       return result;
@@ -9705,7 +9705,7 @@ void sparseconverttohash(sparsematrix *s) {
    NewVector(tdidx, 0, DT_INT);
    NewVector(tuidx, 0, DT_INT);
    NewVector(tvals, 0, DT_REAL);
-   ae_assert((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2, "SparseConvertToHash: invalid matrix type");
+   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2, "SparseConvertToHash: invalid matrix type");
    if (s->matrixtype == 0) {
    // Already in Hash mode
       ae_frame_leave();
@@ -9952,7 +9952,7 @@ void sparseconverttosks(sparsematrix *s) {
    NewVector(tdidx, 0, DT_INT);
    NewVector(tuidx, 0, DT_INT);
    NewVector(tvals, 0, DT_REAL);
-   ae_assert((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2, "SparseConvertToSKS: invalid matrix type");
+   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2, "SparseConvertToSKS: invalid matrix type");
    ae_assert(s->m == s->n, "SparseConvertToSKS: rectangular matrices are not supported");
    n = s->n;
    if (s->matrixtype == 2) {
@@ -10032,7 +10032,7 @@ void sparseconverttosks(sparsematrix *s) {
 // ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 // API: void sparseconvertto(const sparsematrix &s0, const ae_int_t fmt);
 void sparseconvertto(sparsematrix *s0, ae_int_t fmt) {
-   ae_assert((fmt == 0 || fmt == 1) || fmt == 2, "SparseConvertTo: invalid fmt parameter");
+   ae_assert(fmt == 0 || fmt == 1 || fmt == 2, "SparseConvertTo: invalid fmt parameter");
    if (fmt == 0) {
       sparseconverttohash(s0);
       return;
@@ -10067,7 +10067,7 @@ void sparsecopytohashbuf(sparsematrix *s0, sparsematrix *s1) {
    ae_int_t t1;
    ae_int_t i;
    ae_int_t j;
-   ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToHashBuf: invalid matrix type");
+   ae_assert(s0->matrixtype == 0 || s0->matrixtype == 1 || s0->matrixtype == 2, "SparseCopyToHashBuf: invalid matrix type");
    if (s0->matrixtype == 0) {
    // Already hash, just copy
       sparsecopybuf(s0, s1);
@@ -10116,7 +10116,7 @@ void sparsecopytohashbuf(sparsematrix *s0, sparsematrix *s1) {
 // API: void sparsecopytohash(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopytohash(sparsematrix *s0, sparsematrix *s1) {
    SetObj(sparsematrix, s1);
-   ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToHash: invalid matrix type");
+   ae_assert(s0->matrixtype == 0 || s0->matrixtype == 1 || s0->matrixtype == 2, "SparseCopyToHash: invalid matrix type");
    sparsecopytohashbuf(s0, s1);
 }
 
@@ -10146,7 +10146,7 @@ void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1) {
    ae_int_t m;
    ae_frame_make(&_frame_block);
    NewVector(temp, 0, DT_INT);
-   ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToCRSBuf: invalid matrix type");
+   ae_assert(s0->matrixtype == 0 || s0->matrixtype == 1 || s0->matrixtype == 2, "SparseCopyToCRSBuf: invalid matrix type");
    m = s0->m;
    if (s0->matrixtype == 0) {
    // Convert from hash-table to CRS
@@ -10289,7 +10289,7 @@ void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1) {
 // API: void sparsecopytocrs(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopytocrs(sparsematrix *s0, sparsematrix *s1) {
    SetObj(sparsematrix, s1);
-   ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToCRS: invalid matrix type");
+   ae_assert(s0->matrixtype == 0 || s0->matrixtype == 1 || s0->matrixtype == 2, "SparseCopyToCRS: invalid matrix type");
    sparsecopytocrsbuf(s0, s1);
 }
 
@@ -10314,7 +10314,7 @@ void sparsecopytosksbuf(sparsematrix *s0, sparsematrix *s1) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToSKSBuf: invalid matrix type");
+   ae_assert(s0->matrixtype == 0 || s0->matrixtype == 1 || s0->matrixtype == 2, "SparseCopyToSKSBuf: invalid matrix type");
    ae_assert(s0->m == s0->n, "SparseCopyToSKSBuf: rectangular matrices are not supported");
    n = s0->n;
    if (s0->matrixtype == 2) {
@@ -10388,7 +10388,7 @@ void sparsecopytosksbuf(sparsematrix *s0, sparsematrix *s1) {
 // API: void sparsecopytosks(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopytosks(sparsematrix *s0, sparsematrix *s1) {
    SetObj(sparsematrix, s1);
-   ae_assert((s0->matrixtype == 0 || s0->matrixtype == 1) || s0->matrixtype == 2, "SparseCopyToSKS: invalid matrix type");
+   ae_assert(s0->matrixtype == 0 || s0->matrixtype == 1 || s0->matrixtype == 2, "SparseCopyToSKS: invalid matrix type");
    sparsecopytosksbuf(s0, s1);
 }
 
@@ -10409,7 +10409,7 @@ void sparsecopytosks(sparsematrix *s0, sparsematrix *s1) {
 // ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 // API: void sparsecopytobuf(const sparsematrix &s0, const ae_int_t fmt, const sparsematrix &s1);
 void sparsecopytobuf(sparsematrix *s0, ae_int_t fmt, sparsematrix *s1) {
-   ae_assert((fmt == 0 || fmt == 1) || fmt == 2, "SparseCopyToBuf: invalid fmt parameter");
+   ae_assert(fmt == 0 || fmt == 1 || fmt == 2, "SparseCopyToBuf: invalid fmt parameter");
    if (fmt == 0) {
       sparsecopytohashbuf(s0, s1);
       return;
@@ -10515,7 +10515,7 @@ void sparsecreatecrsinplace(sparsematrix *s) {
 // API: ae_int_t sparsegetmatrixtype(const sparsematrix &s);
 ae_int_t sparsegetmatrixtype(sparsematrix *s) {
    ae_int_t result;
-   ae_assert((((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2) || s->matrixtype == -10081) || s->matrixtype == -10082, "SparseGetMatrixType: invalid matrix type");
+   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2 || s->matrixtype == -10081 || s->matrixtype == -10082, "SparseGetMatrixType: invalid matrix type");
    result = s->matrixtype;
    return result;
 }
@@ -10533,7 +10533,7 @@ ae_int_t sparsegetmatrixtype(sparsematrix *s) {
 // API: bool sparseishash(const sparsematrix &s);
 bool sparseishash(sparsematrix *s) {
    bool result;
-   ae_assert((((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2) || s->matrixtype == -10081) || s->matrixtype == -10082, "SparseIsHash: invalid matrix type");
+   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2 || s->matrixtype == -10081 || s->matrixtype == -10082, "SparseIsHash: invalid matrix type");
    result = s->matrixtype == 0;
    return result;
 }
@@ -10551,7 +10551,7 @@ bool sparseishash(sparsematrix *s) {
 // API: bool sparseiscrs(const sparsematrix &s);
 bool sparseiscrs(sparsematrix *s) {
    bool result;
-   ae_assert((((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2) || s->matrixtype == -10081) || s->matrixtype == -10082, "SparseIsCRS: invalid matrix type");
+   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2 || s->matrixtype == -10081 || s->matrixtype == -10082, "SparseIsCRS: invalid matrix type");
    result = s->matrixtype == 1;
    return result;
 }
@@ -10569,7 +10569,7 @@ bool sparseiscrs(sparsematrix *s) {
 // API: bool sparseissks(const sparsematrix &s);
 bool sparseissks(sparsematrix *s) {
    bool result;
-   ae_assert((((s->matrixtype == 0 || s->matrixtype == 1) || s->matrixtype == 2) || s->matrixtype == -10081) || s->matrixtype == -10082, "SparseIsSKS: invalid matrix type");
+   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2 || s->matrixtype == -10081 || s->matrixtype == -10082, "SparseIsSKS: invalid matrix type");
    result = s->matrixtype == 2;
    return result;
 }
@@ -10730,7 +10730,7 @@ ae_int_t sparsegetlowercount(sparsematrix *s) {
 void sparsealloc(ae_serializer *s, sparsematrix *a) {
    ae_int_t i;
    ae_int_t nused;
-   ae_assert((a->matrixtype == 0 || a->matrixtype == 1) || a->matrixtype == 2, "SparseAlloc: only CRS/SKS matrices are supported");
+   ae_assert(a->matrixtype == 0 || a->matrixtype == 1 || a->matrixtype == 2, "SparseAlloc: only CRS/SKS matrices are supported");
 // Header
    ae_serializer_alloc_entry(s);
    ae_serializer_alloc_entry(s);
@@ -10796,7 +10796,7 @@ void sparsealloc(ae_serializer *s, sparsematrix *a) {
 void sparseserialize(ae_serializer *s, sparsematrix *a) {
    ae_int_t i;
    ae_int_t nused;
-   ae_assert((a->matrixtype == 0 || a->matrixtype == 1) || a->matrixtype == 2, "SparseSerialize: only CRS/SKS matrices are supported");
+   ae_assert(a->matrixtype == 0 || a->matrixtype == 1 || a->matrixtype == 2, "SparseSerialize: only CRS/SKS matrices are supported");
 // Header
    ae_serializer_serialize_int(s, getsparsematrixserializationcode());
    ae_serializer_serialize_int(s, a->matrixtype);
@@ -10867,7 +10867,7 @@ void sparseunserialize(ae_serializer *s, sparsematrix *a) {
 // Check stream header: scode, matrix type, version type
    ae_assert(ae_serializer_unserialize_int(s) == getsparsematrixserializationcode(), "SparseUnserialize: stream header corrupted");
    a->matrixtype = ae_serializer_unserialize_int(s);
-   ae_assert((a->matrixtype == 0 || a->matrixtype == 1) || a->matrixtype == 2, "SparseUnserialize: unexpected matrix type");
+   ae_assert(a->matrixtype == 0 || a->matrixtype == 1 || a->matrixtype == 2, "SparseUnserialize: unexpected matrix type");
    ae_assert(ae_serializer_unserialize_int(s) == 0, "SparseUnserialize: stream header corrupted");
 // Unserialize other parameters
    if (a->matrixtype == 0) {
@@ -12107,7 +12107,7 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
    ae_vector_set_length(&tmpwi, imax2(n, 1) + 1);
    ae_assert(n >= 0, "InternalSchurDecomposition: incorrect N!");
    ae_assert(tneeded == 0 || tneeded == 1, "InternalSchurDecomposition: incorrect TNeeded!");
-   ae_assert((zneeded == 0 || zneeded == 1) || zneeded == 2, "InternalSchurDecomposition: incorrect ZNeeded!");
+   ae_assert(zneeded == 0 || zneeded == 1 || zneeded == 2, "InternalSchurDecomposition: incorrect ZNeeded!");
    wantt = tneeded == 1;
    initz = zneeded == 2;
    wantz = zneeded != 0;
@@ -12144,7 +12144,7 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
       }
    }
 // Test if N is sufficiently small
-   if ((ns <= 2 || ns > n) || maxb >= n) {
+   if (ns <= 2 || ns > n || maxb >= n) {
    // Use the standard double-shift algorithm
       hsschur_internalauxschur(wantt, wantz, n, 1, n, h, wr, wi, 1, n, z, &work, &workv3, &workc1, &works1, info);
    // fill entries under diagonal blocks of T with zeros
@@ -13000,7 +13000,7 @@ static void evd_internaltrevc(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t ho
       ae_frame_leave();
       return;
    }
-   if ((!allv && !over) && !somev) {
+   if (!allv && !over && !somev) {
       *info = -4;
       ae_frame_leave();
       return;
@@ -14817,7 +14817,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
    ncnvrg = false;
    toofew = false;
 // Simplifications:
-   if ((irange == 3 && il == 1) && iu == n) {
+   if (irange == 3 && il == 1 && iu == n) {
       irange = 1;
    }
 // Special Case when N=1
@@ -14957,7 +14957,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
          wul = work.xR[n + 1];
          nwu = iwork.xZ[3];
       }
-      if (((nwl < 0 || nwl >= n) || nwu < 1) || nwu > n) {
+      if (nwl < 0 || nwl >= n || nwu < 1 || nwu > n) {
          *errorcode = 4;
          result = false;
          ae_frame_leave();
@@ -15003,7 +15003,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
          if (irange == 1 || wu >= d->xR[ibegin] - pivmin) {
             nwu++;
          }
-         if (irange == 1 || (wl < d->xR[ibegin] - pivmin && wu >= d->xR[ibegin] - pivmin)) {
+         if (irange == 1 || wl < d->xR[ibegin] - pivmin && wu >= d->xR[ibegin] - pivmin) {
             ++*m;
             w->xR[*m] = d->xR[ibegin];
             iblock->xZ[*m] = jb;
@@ -16198,7 +16198,7 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
    NewVector(e1, 0, DT_REAL);
    NewMatrix(z2, 0, 0, DT_REAL);
    NewMatrix(z3, 0, 0, DT_REAL);
-   ae_assert((0 <= i1 && i1 <= i2) && i2 < n, "SMatrixTDEVDI: incorrect I1/I2!");
+   ae_assert(0 <= i1 && i1 <= i2 && i2 < n, "SMatrixTDEVDI: incorrect I1/I2!");
 // Copy D,E to D1, E1
    ae_vector_set_length(&d1, n + 1);
    ae_v_move(&d1.xR[1], 1, d->xR, 1, n);
@@ -16604,7 +16604,7 @@ bool hmatrixevdr(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double 
    result = smatrixtdevdr(w, &e, n, zneeded, b1, b2, m, &t);
 // Eigenvectors are needed
 // Calculate Z = Q*T = Re(Q)*T + i*Im(Q)*T
-   if ((result && zneeded != 0) && *m != 0) {
+   if (result && zneeded != 0 && *m != 0) {
       ae_vector_set_length(&work, *m - 1 + 1);
       ae_matrix_set_length(z, n - 1 + 1, *m - 1 + 1);
       for (i = 0; i < n; i++) {
@@ -17064,7 +17064,7 @@ Spawn:
          v = 0.0;
          vv = 0.0;
          for (j = 0; j < nwork; j++) {
-            if (state->wrank.xR[j] >= (double)(nwork - k)) {
+            if (state->wrank.xR[j] >= nwork - k) {
                v = rmax2(v, fabs(state->wcur.xR[j] - state->wprev.xR[j]));
                vv = rmax2(vv, fabs(state->wcur.xR[j]));
             }
@@ -17110,7 +17110,7 @@ Spawn:
    cnt = 0;
    for (i = nwork - 1; i >= nwork - k; i--) {
       for (i1 = 0; i1 < nwork; i1++) {
-         if (state->wrank.xR[i1] == (double)i) {
+         if (state->wrank.xR[i1] == i) {
             ae_assert(cnt < k, "EigSubspace: integrity check failed");
             state->rw.xR[cnt] = state->tw.xR[i1];
             for (j = 0; j < nwork; j++) {
@@ -18846,7 +18846,7 @@ static void sptrf_sparsetrailupdate(sluv2sparsetrail *a, ZVector *v0i, RVector *
       }
       a->nzc.xZ[i1] = nnz;
    // Densify column if needed
-      if ((densificationsupported && nnz > densifyabove) && !a->isdensified.xB[i1]) {
+      if (densificationsupported && nnz > densifyabove && !a->isdensified.xB[i1]) {
          sptrf_sparsetraildensify(a, i1, bupper, dtrail);
       }
    }
@@ -18911,7 +18911,7 @@ bool sptrflu(sparsematrix *a, ae_int_t pivottype, ZVector *pr, ZVector *pc, sluv
    bool result;
    ae_assert(sparseiscrs(a), "SparseLU: A is not stored in CRS format");
    ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SparseLU: non-square A");
-   ae_assert((pivottype == 0 || pivottype == 1) || pivottype == 2, "SparseLU: unexpected pivot type");
+   ae_assert(pivottype == 0 || pivottype == 1 || pivottype == 2, "SparseLU: unexpected pivot type");
    result = true;
    n = sparsegetnrows(a);
    if (pivottype == 0) {
@@ -20745,7 +20745,7 @@ static void amdordering_amdmasselimination(amdbuffer *buf, ae_int_t p, ae_int_t 
                amdordering_mtxaddcolumnto(&buf->mtxl, j, &buf->exactdegreetmp0);
             }
             amdordering_vtxupdateexactdegree(&buf->vertexdegrees, lpi, cntainoti + amdordering_nscountnotkth(&buf->exactdegreetmp0, &buf->setsuper, lpi));
-            ae_assert((amdordering_knscountkth(&buf->sete, lpi) > 2 || cntq > 0) || amdordering_vtxgetapprox(&buf->vertexdegrees, lpi) == amdordering_vtxgetexact(&buf->vertexdegrees, lpi), "AMD: integrity check 7206 failed");
+            ae_assert(amdordering_knscountkth(&buf->sete, lpi) > 2 || cntq > 0 || amdordering_vtxgetapprox(&buf->vertexdegrees, lpi) == amdordering_vtxgetexact(&buf->vertexdegrees, lpi), "AMD: integrity check 7206 failed");
             ae_assert(amdordering_vtxgetapprox(&buf->vertexdegrees, lpi) >= amdordering_vtxgetexact(&buf->vertexdegrees, lpi), "AMD: integrity check 8206 failed");
          }
       }
@@ -20947,7 +20947,7 @@ ae_int_t generateamdpermutationx(sparsematrix *a, ae_int_t n, ZVector *perm, ZVe
       }
       amdordering_amddetectsupernodes(buf);
       ae_assert(amdordering_vtxgetapprox(&buf->vertexdegrees, p) >= amdordering_nscount(&buf->lp), "AMD: integrity check 7956 failed");
-      ae_assert((amdordering_knscountkth(&buf->sete, p) > 2 || amdordering_nscount(&buf->setq) > 0) || amdordering_vtxgetapprox(&buf->vertexdegrees, p) == amdordering_nscount(&buf->lp), "AMD: integrity check 7295 failed");
+      ae_assert(amdordering_knscountkth(&buf->sete, p) > 2 || amdordering_nscount(&buf->setq) > 0 || amdordering_vtxgetapprox(&buf->vertexdegrees, p) == amdordering_nscount(&buf->lp), "AMD: integrity check 7295 failed");
       amdordering_knsstartenumeration(&buf->sete, p);
       while (amdordering_knsenumerate(&buf->sete, &j)) {
          amdordering_mtxclearcolumn(&buf->mtxl, j);
@@ -21935,7 +21935,7 @@ static void spchol_analyzesupernodaldependencies(spcholanalysis *analysis, spars
                tflagarray->xB[j] = false;
                rlast++;
                j = analysis->parentsupernode.xZ[j];
-               while ((j >= 0 && j < sidx) && tflagarray->xB[j]) {
+               while (j >= 0 && j < sidx && tflagarray->xB[j]) {
                   analysis->ladjplus.xZ[rlast] = j;
                   tflagarray->xB[j] = false;
                   rlast++;
@@ -22430,7 +22430,7 @@ static void spchol_topologicalpermutation(sparsematrix *a, ZVector *p, sparsemat
    n = a->n;
    for (i = 0; i < n; i++) {
       j = p->xZ[i];
-      bflag = (bflag && j >= 0) && j < n;
+      bflag = bflag && j >= 0 && j < n;
    }
    ae_assert(bflag, "TopologicalPermutation: P[] contains values outside of [0,N) range");
 // Prepare output
@@ -23116,7 +23116,7 @@ static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, 
 // Handle special cases
    if (trowstride == 4) {
    // Target is stride-4 column, try several kernels that may work with tWidth=3 and tWidth=4
-      if (((uwidth == 4 && twidth == 4) && urank == 4) && urowstride == 4) {
+      if (uwidth == 4 && twidth == 4 && urank == 4 && urowstride == 4) {
          if (spchol_updatekernel4444(&analysis->outputstorage, offss, theight, offsu, uheight, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
             return result;
          }
@@ -23493,7 +23493,7 @@ bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spchol
    ae_assert(sparseiscrs(a), "SPSymmAnalyze: A is not stored in CRS format");
    ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SPSymmAnalyze: non-square A");
    ae_assert(facttype == 0 || facttype == 1, "SPSymmAnalyze: unexpected FactType");
-   ae_assert((((((permtype == 0 || permtype == 1) || permtype == 2) || permtype == 3) || permtype == -1) || permtype == -2) || permtype == -3, "SPSymmAnalyze: unexpected PermType");
+   ae_assert(permtype == 0 || permtype == 1 || permtype == 2 || permtype == 3 || permtype == -1 || permtype == -2 || permtype == -3, "SPSymmAnalyze: unexpected PermType");
    if (permtype == 0) {
       permtype = 3;
    }
@@ -25229,7 +25229,7 @@ bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q) {
    SetVector(p);
    SetVector(q);
    NewObj(sluv2buffer, buf2);
-   ae_assert((pivottype == 0 || pivottype == 1) || pivottype == 2, "SparseLU: unexpected pivot type");
+   ae_assert(pivottype == 0 || pivottype == 1 || pivottype == 2, "SparseLU: unexpected pivot type");
    ae_assert(sparseiscrs(a), "SparseLU: A is not stored in CRS format");
    ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SparseLU: non-square A");
    result = sptrflu(a, pivottype, p, q, &buf2);
@@ -25688,7 +25688,7 @@ bool sparsecholeskyanalyze(sparsematrix *a, bool isupper, ae_int_t facttype, ae_
    SetObj(sparsedecompositionanalysis, analysis);
    ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SparseCholeskyAnalyze: A is not square");
    ae_assert(facttype == 0 || facttype == 1, "SparseCholeskyAnalyze: unexpected FactType");
-   ae_assert((((((permtype == 0 || permtype == 1) || permtype == 2) || permtype == 3) || permtype == -1) || permtype == -2) || permtype == -3, "SparseCholeskyAnalyze: unexpected PermType");
+   ae_assert(permtype == 0 || permtype == 1 || permtype == 2 || permtype == 3 || permtype == -1 || permtype == -2 || permtype == -3, "SparseCholeskyAnalyze: unexpected PermType");
    analysis->n = sparsegetnrows(a);
    analysis->facttype = facttype;
    analysis->permtype = permtype;
@@ -26204,7 +26204,7 @@ static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *s
       gasmal = true;
       if (ga > fa) {
          pmax = 2;
-         if (fa / ga < machineepsilon) {
+         if (fa < ga * machineepsilon) {
          // Case of very large GA
             gasmal = false;
             *ssmax = ga;
@@ -26557,7 +26557,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
       if (idir == 2 && fabs(d->xR[m]) < 1.0E-3 * fabs(d->xR[ll])) {
          bchangedir = true;
       }
-      if ((ll != oldll || m != oldm) || bchangedir) {
+      if (ll != oldll || m != oldm || bchangedir) {
          if (fabs(d->xR[ll]) >= fabs(d->xR[m])) {
          // Chase bulge from top (big end) to bottom (small end)
             idir = 1;
@@ -26570,7 +26570,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
       if (idir == 1) {
       // Run convergence test in forward direction
       // First apply standard test to bottom of matrix
-         if (fabs(e->xR[m - 1]) <= fabs(tol) * fabs(d->xR[m]) || (tol < 0.0 && fabs(e->xR[m - 1]) <= thresh)) {
+         if (fabs(e->xR[m - 1]) <= fabs(tol) * fabs(d->xR[m]) || tol < 0.0 && fabs(e->xR[m - 1]) <= thresh) {
             e->xR[m - 1] = 0.0;
             continue;
          }
@@ -26596,7 +26596,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
       } else {
       // Run convergence test in backward direction
       // First apply standard test to top of matrix
-         if (fabs(e->xR[ll]) <= fabs(tol) * fabs(d->xR[ll]) || (tol < 0.0 && fabs(e->xR[ll]) <= thresh)) {
+         if (fabs(e->xR[ll]) <= fabs(tol) * fabs(d->xR[ll]) || tol < 0.0 && fabs(e->xR[ll]) <= thresh) {
             e->xR[ll] = 0.0;
             continue;
          }
@@ -27110,7 +27110,7 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
    }
 // M much larger than N
 // Use bidiagonal reduction with QR-decomposition
-   if ((double)m > 1.6 * n) {
+   if (m > 1.6 * n) {
       if (uneeded == 0) {
       // No left singular vectors to be computed
          rmatrixqr(a, m, n, &tau);
@@ -27156,7 +27156,7 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
    }
 // N much larger than M
 // Use bidiagonal reduction with LQ-decomposition
-   if ((double)n > 1.6 * m) {
+   if (n > 1.6 * m) {
       if (vtneeded == 0) {
       // No right singular vectors to be computed
          rmatrixlq(a, m, n, &tau);
@@ -27366,7 +27366,7 @@ Spawn:
       }
       flg = false;
       for (i = 1; i <= n; i++) {
-         if ((x->xR[i] >= 0.0 && isgn->xZ[i] < 0) || (x->xR[i] < 0.0 && isgn->xZ[i] >= 0)) {
+         if (x->xR[i] >= 0.0 && isgn->xZ[i] < 0 || x->xR[i] < 0.0 && isgn->xZ[i] >= 0) {
             flg = true;
          }
       }
@@ -29334,7 +29334,7 @@ void fblssolvecgx(RMatrix *a, ae_int_t m, ae_int_t n, double alpha, RVector *b, 
       ae_v_move(&buf->xR[offsrk1], 1, &buf->xR[offsrk], 1, n);
       ae_v_subd(&buf->xR[offsrk1], 1, &buf->xR[offstmp2], 1, n, s);
       rk12 = ae_v_dotproduct(&buf->xR[offsrk1], 1, &buf->xR[offsrk1], 1, n);
-      if (sqrt(rk12) <= 100 * machineepsilon * sqrt(rk2)) {
+      if (sqrt(rk12) <= 100.0 * machineepsilon * sqrt(rk2)) {
       // X(k) = x(k+1) before exit -
       // - because we expect to find solution at x(k)
          ae_v_move(&buf->xR[offsxk], 1, &buf->xR[offsxk1], 1, n);
@@ -29505,7 +29505,7 @@ Spawn:
       ae_v_move(state->rk1.xR, 1, state->rk.xR, 1, n);
       ae_v_subd(state->rk1.xR, 1, state->tmp2.xR, 1, n, s);
       rk12 = ae_v_dotproduct(state->rk1.xR, 1, state->rk1.xR, 1, n);
-      if (sqrt(rk12) <= 100 * machineepsilon * state->e1) {
+      if (sqrt(rk12) <= 100.0 * machineepsilon * state->e1) {
       // X(k) = x(k+1) before exit -
       // - because we expect to find solution at x(k)
          ae_v_move(state->xk.xR, 1, state->xk1.xR, 1, n);
@@ -29567,7 +29567,7 @@ Pause:
 //       overflows, and so on.
 // ALGLIB: Copyright 18.11.2020 by Sergey Bochkanov
 void fblsgmrescreate(RVector *b, ae_int_t n, ae_int_t k, fblsgmresstate *state) {
-   ae_assert((n > 0 && k > 0) && k <= n, "FBLSGMRESCreate: incorrect params");
+   ae_assert(n > 0 && k > 0 && k <= n, "FBLSGMRESCreate: incorrect params");
    state->n = n;
    state->itscnt = k;
    state->epsort = (1000 + sqrt((double)n)) * machineepsilon;
@@ -29727,7 +29727,7 @@ Spawn:
          state->retcode = 5;
          break;
       }
-      if (resnrm / prevresnrm > state->epsred) {
+      if (resnrm > state->epsred * prevresnrm) {
          state->retcode = 6;
          break;
       }
@@ -31239,7 +31239,7 @@ void hpdmatrixcholeskyinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
    ae_assert(a->rows >= n, "HPDMatrixCholeskyInverse: rows(A)<N!");
    f = true;
    for (i = 0; i < n; i++) {
-      f = (f && isfinite(a->xyC[i][i].x)) && isfinite(a->xyC[i][i].y);
+      f = f && isfinite(a->xyC[i][i].x) && isfinite(a->xyC[i][i].y);
    }
    ae_assert(f, "HPDMatrixCholeskyInverse: A contains infinite or NaN values!");
    *info = 1;
@@ -32063,7 +32063,7 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
    NewVector(w3, 0, DT_REAL);
    NewObj(matinvreport, rep);
    ae_assert(n > 0, "SMatrixGEVDReduce: N <= 0!");
-   ae_assert((problemtype == 1 || problemtype == 2) || problemtype == 3, "SMatrixGEVDReduce: incorrect ProblemType!");
+   ae_assert(problemtype == 1 || problemtype == 2 || problemtype == 3, "SMatrixGEVDReduce: incorrect ProblemType!");
    result = true;
 // Problem 1:  A*x = lambda*B*x
 //

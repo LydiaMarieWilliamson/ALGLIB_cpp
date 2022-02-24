@@ -16,13 +16,13 @@ bool doc_test_int(ae_int_t v, ae_int_t t) {
 bool doc_test_real(double v, double t, double _threshold) {
    double s = _threshold >= 0 ? 1.0 : fabs(t);
    double threshold = fabs(_threshold);
-   return fabs(v - t) / s <= threshold;
+   return fabs(v - t) <= s * threshold;
 }
 
 bool doc_test_complex(complex v, complex t, double _threshold) {
    double s = _threshold >= 0 ? 1.0 : abscomplex(t);
    double threshold = fabs(_threshold);
-   return abscomplex(v - t) / s <= threshold;
+   return abscomplex(v - t) <= s * threshold;
 }
 
 bool doc_test_bool_vector(const boolean_1d_array &v, const boolean_1d_array &t) {
@@ -78,7 +78,7 @@ bool doc_test_real_vector(const real_1d_array &v, const real_1d_array &t, double
    for (i = 0; i < v.length(); i++) {
       double s = _threshold >= 0 ? 1.0 : fabs(t(i));
       double threshold = fabs(_threshold);
-      if (fabs(v(i) - t(i)) / s > threshold)
+      if (fabs(v(i) - t(i)) > s * threshold)
          return false;
    }
    return true;
@@ -94,7 +94,7 @@ bool doc_test_real_matrix(const real_2d_array &v, const real_2d_array &t, double
       for (j = 0; j < v.cols(); j++) {
          double s = _threshold >= 0 ? 1.0 : fabs(t(i, j));
          double threshold = fabs(_threshold);
-         if (fabs(v(i, j) - t(i, j)) / s > threshold)
+         if (fabs(v(i, j) - t(i, j)) > s * threshold)
             return false;
       }
    return true;
@@ -107,7 +107,7 @@ bool doc_test_complex_vector(const complex_1d_array &v, const complex_1d_array &
    for (i = 0; i < v.length(); i++) {
       double s = _threshold >= 0 ? 1.0 : abscomplex(t(i));
       double threshold = fabs(_threshold);
-      if (abscomplex(v(i) - t(i)) / s > threshold)
+      if (abscomplex(v(i) - t(i)) > s * threshold)
          return false;
    }
    return true;
@@ -123,7 +123,7 @@ bool doc_test_complex_matrix(const complex_2d_array &v, const complex_2d_array &
       for (j = 0; j < v.cols(); j++) {
          double s = _threshold >= 0 ? 1.0 : abscomplex(t(i, j));
          double threshold = fabs(_threshold);
-         if (abscomplex(v(i, j) - t(i, j)) / s > threshold)
+         if (abscomplex(v(i, j) - t(i, j)) > s * threshold)
             return false;
       }
    return true;
@@ -518,7 +518,7 @@ void s1_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *pt
 // function is trimmed when we calculate it near the singular points or outside of the [-1,+1].
 // Note that we do NOT calculate gradient in this case.
 //
-   if ((x[0] <= -0.999999999999) || (x[0] >= +0.999999999999)) {
+   if (x[0] <= -0.999999999999 || x[0] >= +0.999999999999) {
       func = 1.0E+300;
       return;
    }
