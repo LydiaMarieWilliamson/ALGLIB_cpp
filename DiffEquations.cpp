@@ -321,7 +321,7 @@ Spawn:
             } else {
                h2 = h * pow(state->eps / err, 0.2);
             }
-            if (h2 < h / odesolver_odesolvermaxshrink) {
+            if (h2 * odesolver_odesolvermaxshrink < h) {
                h2 = h / odesolver_odesolvermaxshrink;
             }
             if (err > state->eps) {

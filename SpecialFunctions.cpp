@@ -5459,7 +5459,7 @@ double laguerrecalculate(ae_int_t n, double x) {
       result = b;
    }
    i = 2.0;
-   while (i <= (double)n) {
+   while (i <= n) {
       result = ((2 * i - 1 - x) * b - (i - 1) * a) / i;
       a = b;
       b = result;

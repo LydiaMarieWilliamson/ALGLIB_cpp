@@ -6713,7 +6713,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
       for (i = 0; i < n; i++) {
          v = w->xR[i];
          k = itrunc(v);
-         if (v != (double)k) {
+         if (v != k) {
             allzeros = false;
          }
          w->xR[i] = chunk * (v - k);

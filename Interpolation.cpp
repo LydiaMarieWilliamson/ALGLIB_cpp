@@ -421,7 +421,7 @@ static void ratint_barycentricnormalize(barycentricinterpolant *b) {
    for (i = 0; i < b->n; i++) {
       b->sy = rmax2(b->sy, fabs(b->y.xR[i]));
    }
-   if (b->sy > 0.0 && !NearAtR(b->sy, 1.0, 10 * machineepsilon)) {
+   if (b->sy > 0.0 && !NearAtR(b->sy, 1.0, 10.0 * machineepsilon)) {
       v = 1 / b->sy;
       ae_v_muld(b->y.xR, 1, b->n, v);
    }
@@ -429,7 +429,7 @@ static void ratint_barycentricnormalize(barycentricinterpolant *b) {
    for (i = 0; i < b->n; i++) {
       v = rmax2(v, fabs(b->w.xR[i]));
    }
-   if (v > 0.0 && !NearAtR(v, 1.0, 10 * machineepsilon)) {
+   if (v > 0.0 && !NearAtR(v, 1.0, 10.0 * machineepsilon)) {
       v = 1 / v;
       ae_v_muld(b->w.xR, 1, b->n, v);
    }
@@ -5863,7 +5863,7 @@ void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_in
    }
    pdecay = lambdav * fdmax / admax;
 // Calculate TDecay for Tikhonov regularization
-   tdecay = fdmax * (1 + pdecay) * 10 * machineepsilon;
+   tdecay = fdmax * (1.0 + pdecay) * 10.0 * machineepsilon;
 // Prepare system
 //
 // NOTE: FMatrix is spoiled during this process
@@ -8742,7 +8742,7 @@ void lsfitlinearwc(RVector *y, RVector *w, RMatrix *fmatrix, RMatrix *cmatrix, a
             cmatrix->xyR[i][j] = 0.0;
          }
       }
-      if (rmatrixlurcondinf(cmatrix, k) < 1000 * machineepsilon) {
+      if (rmatrixlurcondinf(cmatrix, k) < 1000.0 * machineepsilon) {
          *info = -3;
          ae_frame_leave();
          return;
@@ -9066,7 +9066,7 @@ static void lsfit_internalchebyshevfit(RVector *x, RVector *y, RVector *w, ae_in
    lsfit_clearreport(rep);
 // weight decay for correct handling of task which becomes
 // degenerate after constraints are applied
-   decay = 10000 * machineepsilon;
+   decay = 10000.0 * machineepsilon;
 // allocate space, initialize/fill:
 // * FMatrix-   values of basis functions at X[]
 // * CMatrix-   values (derivatives) of basis functions at XC[]
@@ -10707,7 +10707,7 @@ static void lsfit_barycentricfitwcfixedd(RVector *x, RVector *y, RVector *w, ae_
    }
 // weight decay for correct handling of task which becomes
 // degenerate after constraints are applied
-   decay = 10000 * machineepsilon;
+   decay = 10000.0 * machineepsilon;
 // Scale X, Y, XC, YC
    lsfitscalexy(x, y, w, n, xc, yc, dc, k, &xa, &xb, &sa, &sb, &xoriginal, &yoriginal);
 // allocate space, initialize:
@@ -11099,7 +11099,7 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
    }
 // weight decay for correct handling of task which becomes
 // degenerate after constraints are applied
-   decay = 10000 * machineepsilon;
+   decay = 10000.0 * machineepsilon;
 // Scale X, Y, XC, YC
    lsfitscalexy(x, y, w, n, xc, yc, dc, k, &xa, &xb, &sa, &sb, &xoriginal, &yoriginal);
 // allocate space, initialize:

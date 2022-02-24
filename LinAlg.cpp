@@ -6710,7 +6710,7 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
    if (s->matrixtype == 0) {
       tcode = -1;
       k = s->tablesize;
-      if ((1 - sparse_maxloadfactor) * k >= (double)s->nfree) {
+      if ((1.0 - sparse_maxloadfactor) * k >= s->nfree) {
          sparseresizematrix(s);
          k = s->tablesize;
       }
@@ -6805,7 +6805,7 @@ void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
    }
    tcode = -1;
    k = s->tablesize;
-   if ((1 - sparse_maxloadfactor) * k >= (double)s->nfree) {
+   if ((1.0 - sparse_maxloadfactor) * k >= s->nfree) {
       sparseresizematrix(s);
       k = s->tablesize;
    }
@@ -8835,7 +8835,7 @@ void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematri
    ae_assert(a->m == a->n, "SparseSymmPermTblBuf: matrix is non-square");
    bflag = true;
    for (i = 0; i < a->n; i++) {
-      bflag = (bflag && p->xZ[i] >= 0) && p->xZ[i] < a->n;
+      bflag = bflag && p->xZ[i] >= 0 && p->xZ[i] < a->n;
    }
    ae_assert(bflag, "SparseSymmPermTblBuf: P[] contains values outside of [0,N) range");
    n = a->n;
@@ -16669,7 +16669,7 @@ Spawn:
          v = 0.0;
          vv = 0.0;
          for (j = 0; j < nwork; j++) {
-            if (state->wrank.xR[j] >= (double)(nwork - k)) {
+            if (state->wrank.xR[j] >= nwork - k) {
                v = rmax2(v, fabs(state->wcur.xR[j] - state->wprev.xR[j]));
                vv = rmax2(vv, fabs(state->wcur.xR[j]));
             }
@@ -16715,7 +16715,7 @@ Spawn:
    cnt = 0;
    for (i = nwork - 1; i >= nwork - k; i--) {
       for (i1 = 0; i1 < nwork; i1++) {
-         if (state->wrank.xR[i1] == (double)i) {
+         if (state->wrank.xR[i1] == i) {
             ae_assert(cnt < k, "EigSubspace: integrity check failed");
             state->rw.xR[cnt] = state->tw.xR[i1];
             for (j = 0; j < nwork; j++) {
@@ -24687,7 +24687,7 @@ static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *s
       gasmal = true;
       if (ga > fa) {
          pmax = 2;
-         if (fa / ga < machineepsilon) {
+         if (fa < ga * machineepsilon) {
          // Case of very large GA
             gasmal = false;
             *ssmax = ga;
@@ -25593,7 +25593,7 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
    }
 // M much larger than N
 // Use bidiagonal reduction with QR-decomposition
-   if ((double)m > 1.6 * n) {
+   if (m > 1.6 * n) {
       if (uneeded == 0) {
       // No left singular vectors to be computed
          rmatrixqr(a, m, n, &tau);
@@ -25639,7 +25639,7 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
    }
 // N much larger than M
 // Use bidiagonal reduction with LQ-decomposition
-   if ((double)n > 1.6 * m) {
+   if (n > 1.6 * m) {
       if (vtneeded == 0) {
       // No right singular vectors to be computed
          rmatrixlq(a, m, n, &tau);
@@ -27816,7 +27816,7 @@ void fblssolvecgx(RMatrix *a, ae_int_t m, ae_int_t n, double alpha, RVector *b, 
       ae_v_move(&buf->xR[offsrk1], 1, &buf->xR[offsrk], 1, n);
       ae_v_subd(&buf->xR[offsrk1], 1, &buf->xR[offstmp2], 1, n, s);
       rk12 = ae_v_dotproduct(&buf->xR[offsrk1], 1, &buf->xR[offsrk1], 1, n);
-      if (sqrt(rk12) <= 100 * machineepsilon * sqrt(rk2)) {
+      if (sqrt(rk12) <= 100.0 * machineepsilon * sqrt(rk2)) {
       // X(k) = x(k+1) before exit -
       // - because we expect to find solution at x(k)
          ae_v_move(&buf->xR[offsxk], 1, &buf->xR[offsxk1], 1, n);
@@ -27984,7 +27984,7 @@ Spawn:
       ae_v_move(state->rk1.xR, 1, state->rk.xR, 1, n);
       ae_v_subd(state->rk1.xR, 1, state->tmp2.xR, 1, n, s);
       rk12 = ae_v_dotproduct(state->rk1.xR, 1, state->rk1.xR, 1, n);
-      if (sqrt(rk12) <= 100 * machineepsilon * state->e1) {
+      if (sqrt(rk12) <= 100.0 * machineepsilon * state->e1) {
       // X(k) = x(k+1) before exit -
       // - because we expect to find solution at x(k)
          ae_v_move(state->xk.xR, 1, state->xk1.xR, 1, n);
@@ -28197,7 +28197,7 @@ Spawn:
          state->retcode = 5;
          break;
       }
-      if (resnrm / prevresnrm > state->epsred) {
+      if (resnrm > state->epsred * prevresnrm) {
          state->retcode = 6;
          break;
       }

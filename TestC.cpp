@@ -137,7 +137,7 @@ static bool hqrnddiscretetest() {
          }
       }
       for (i = 0; i < binscount; i++) {
-         if ((double)nn.xZ[i] < (double)xp / binscount - sigmathreshold * sigma || (double)nn.xZ[i] > (double)xp / binscount + sigmathreshold * sigma) {
+         if (nn.xZ[i] < (double)xp / binscount - sigmathreshold * sigma || nn.xZ[i] > (double)xp / binscount + sigmathreshold * sigma) {
             if (!silent) {
                printf("HQRNDDiscreteTest: Failed\n");
                printf("* nn[%0d] = %0d, xp/BinsCount = %0.5f, C*sigma = %0.5f\n", (int)i, (int)nn.xZ[i], (double)xp / binscount, sigmathreshold * sigma);
@@ -312,7 +312,7 @@ bool testhqrnd() {
          x.xR[i] = (double)hqrnduniformi(&state, n);
       }
       for (i = 0; i < samplesize; i++) {
-         uiOk = uiOk && x.xR[i] >= 0.0 && x.xR[i] < (double)n;
+         uiOk = uiOk && x.xR[i] >= 0.0 && x.xR[i] < n;
       }
       testhqrndunit_calculatemv(&x, samplesize, &mean, &means, &stddev, &stddevs);
       if (means != 0.0) {
@@ -338,7 +338,7 @@ bool testhqrnd() {
       x.xR[i] = (double)hqrnduniformi(&state, n);
    }
    for (i = 0; i < samplesize; i++) {
-      uiOk = uiOk && x.xR[i] >= 0.0 && x.xR[i] < (double)n;
+      uiOk = uiOk && x.xR[i] >= 0.0 && x.xR[i] < n;
    }
    testhqrndunit_calculatemv(&x, samplesize, &mean, &means, &stddev, &stddevs);
    if (means != 0.0) {
@@ -1004,7 +1004,7 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
    NewMatrix(rxl2, 0, 0, DT_REAL);
    NewMatrix(cxr2, 0, 0, DT_COMPLEX);
    NewMatrix(cxl2, 0, 0, DT_COMPLEX);
-   threshold = sqr(maxn) * 100 * machineepsilon;
+   threshold = sqr(maxn) * 100.0 * machineepsilon;
    Ok = true;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
@@ -1334,7 +1334,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
    NewMatrix(rct, 0, 0, DT_REAL);
    NewMatrix(cc, 0, 0, DT_COMPLEX);
    NewMatrix(cct, 0, 0, DT_COMPLEX);
-   threshold = maxn * 100 * machineepsilon;
+   threshold = maxn * 100.0 * machineepsilon;
    Ok = true;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
@@ -1616,7 +1616,7 @@ static bool testablasunit_testgemm(ae_int_t minn, ae_int_t maxn) {
    NewMatrix(rc2, 0, 0, DT_REAL);
    NewMatrix(cc1, 0, 0, DT_COMPLEX);
    NewMatrix(cc2, 0, 0, DT_COMPLEX);
-   threshold = maxn * 100 * machineepsilon;
+   threshold = maxn * 100.0 * machineepsilon;
    Ok = true;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N/K in [1,MX] such that max(M,N,K)=MX
@@ -1735,7 +1735,7 @@ static bool testablasunit_testtrans(ae_int_t minn, ae_int_t maxn) {
    NewMatrix(refca, 0, 0, DT_COMPLEX);
    NewMatrix(refcb, 0, 0, DT_COMPLEX);
    Ok = true;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
    // Generate random V1 and V2 which are used to fill
@@ -1824,7 +1824,7 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn) {
    NewVector(cu, 0, DT_COMPLEX);
    NewVector(cv, 0, DT_COMPLEX);
    Ok = true;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
       m = 1 + randominteger(mx);
@@ -1948,7 +1948,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
    NewVector(cx, 0, DT_COMPLEX);
    NewVector(cy, 0, DT_COMPLEX);
    Ok = true;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
       m = 1 + randominteger(mx);
@@ -1997,7 +1997,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
       cmatrixmv(m, n, &refca, aoffsi, aoffsj, opca, &cx, xoffs, &cy, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < yoffs || i >= yoffs + m) {
-            Ok = Ok && !ae_c_neq_d(cy.xC[i], (double)i);
+            Ok = Ok && !ae_c_neq_d(cy.xC[i], i);
          } else {
             cv1 = cy.xC[i];
             cv2 = complex_from_d(0.0);
@@ -2019,7 +2019,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
       rmatrixmv(m, n, &refra, aoffsi, aoffsj, opra, &rx, xoffs, &ry, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < yoffs || i >= yoffs + m) {
-            Ok = Ok && ry.xR[i] == (double)i;
+            Ok = Ok && ry.xR[i] == i;
          } else {
             rv1 = ry.xR[i];
             rv2 = 0.0;
@@ -2039,7 +2039,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
       rmatrixgemv(m, n, ralpha, &refra, aoffsi, aoffsj, opra, &rx, xoffs, rbeta, &ry, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < yoffs || i >= yoffs + m) {
-            Ok = Ok && ry.xR[i] == (double)i;
+            Ok = Ok && ry.xR[i] == i;
          } else {
             rv1 = ry.xR[i];
             rv2 = 0.0;
@@ -2154,7 +2154,7 @@ static bool testablasunit_testsymv(ae_int_t minn, ae_int_t maxn) {
    NewVector(rx, 0, DT_REAL);
    NewVector(ry, 0, DT_REAL);
    NewVector(rz, 0, DT_REAL);
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    for (n = minn; n <= maxn; n++) {
    // Initialize A by random matrix with size (MaxN+MaxN)*(MaxN+MaxN)
    // Initialize X by random vector with size (MaxN+MaxN)
@@ -2192,7 +2192,7 @@ static bool testablasunit_testsymv(ae_int_t minn, ae_int_t maxn) {
       testablasunit_refrmatrixsymv(n, ralpha, &refra, aoffsi, aoffsj, isuppera, &rx, xoffs, rbeta, &rz, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < yoffs || i >= yoffs + n) {
-            Ok = Ok && ry.xR[i] == (double)i;
+            Ok = Ok && ry.xR[i] == i;
          } else {
             Ok = Ok && NearAtR(ry.xR[i], rz.xR[i], threshold * rmax3(fabs(ry.xR[i]), fabs(rz.xR[i]), 1.0));
          }
@@ -2366,7 +2366,7 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
    NewMatrix(ca, 0, 0, DT_COMPLEX);
    NewMatrix(cb, 0, 0, DT_COMPLEX);
    Ok = true;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
       m = 1 + randominteger(mx);
@@ -2404,7 +2404,7 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
             if (i < boffsi || i >= boffsi + m || j < boffsj || j >= boffsj + n) {
-               Ok = Ok && !ae_c_neq_d(cb.xyC[i][j], (double)(1 + 2 * i + 3 * j));
+               Ok = Ok && !ae_c_neq_d(cb.xyC[i][j], 1 + 2 * i + 3 * j);
             } else {
                Ok = Ok && NearAtC(ca.xyC[aoffsi + i - boffsi][aoffsj + j - boffsj], cb.xyC[i][j], threshold);
             }
@@ -2414,7 +2414,7 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
             if (i < boffsi || i >= boffsi + m || j < boffsj || j >= boffsj + n) {
-               Ok = Ok && rb.xyR[i][j] == (double)(1 + 2 * i + 3 * j);
+               Ok = Ok && rb.xyR[i][j] == 1 + 2 * i + 3 * j;
             } else {
                Ok = Ok && NearAtR(ra.xyR[aoffsi + i - boffsi][aoffsj + j - boffsj], rb.xyR[i][j], threshold);
             }
@@ -2454,7 +2454,7 @@ static bool testablasunit_testreflections() {
    NewMatrix(b, 0, 0, DT_REAL);
    NewMatrix(c, 0, 0, DT_REAL);
    passcount = 10;
-   threshold = 100 * machineepsilon;
+   threshold = 100.0 * machineepsilon;
    mer = 0.0;
    mel = 0.0;
    meg = 0.0;
@@ -2717,7 +2717,7 @@ bool testhblas() {
    mverr = 0.0;
    Ok = true;
    maxn = 10;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
 // Test MV
    for (n = 2; n <= maxn; n++) {
       ae_matrix_set_length(&a, n + 1, n + 1);
@@ -2819,7 +2819,7 @@ bool testcreflections() {
    NewMatrix(a, 0, 0, DT_COMPLEX);
    NewMatrix(b, 0, 0, DT_COMPLEX);
    NewMatrix(c, 0, 0, DT_COMPLEX);
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    passcount = 1000;
    mer = 0.0;
    mel = 0.0;
@@ -2987,7 +2987,7 @@ bool testsblas() {
    mverr = 0.0;
    Ok = true;
    maxn = 10;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
 // Test MV
    for (n = 2; n <= maxn; n++) {
       ae_matrix_set_length(&a, n + 1, n + 1);
@@ -3319,7 +3319,7 @@ static bool testortfacunit_testrqrproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    rmatrixqrunpackq(&b, m, n, &taub, k, &q2);
    for (i = 0; i < m; i++) {
       for (j = 0; j < k; j++) {
-         Ok = Ok && NearAtR(q2.xyR[i][j], q.xyR[i][j], 10 * machineepsilon);
+         Ok = Ok && NearAtR(q2.xyR[i][j], q.xyR[i][j], 10.0 * machineepsilon);
       }
    }
    ae_frame_leave();
@@ -3421,7 +3421,7 @@ static bool testortfacunit_testrlqproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    rmatrixlqunpackq(&b, m, n, &taub, k, &q2);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
-         Ok = Ok && NearAtR(q2.xyR[i][j], q.xyR[i][j], 10 * machineepsilon);
+         Ok = Ok && NearAtR(q2.xyR[i][j], q.xyR[i][j], 10.0 * machineepsilon);
       }
    }
    ae_frame_leave();
@@ -3565,14 +3565,14 @@ static bool testortfacunit_testrbdproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    rmatrixbdunpackq(&t, m, n, &tauq, k, &r);
    for (i = 0; i < m; i++) {
       for (j = 0; j < k; j++) {
-         Ok = Ok && NearAtR(r.xyR[i][j], q.xyR[i][j], 10 * machineepsilon);
+         Ok = Ok && NearAtR(r.xyR[i][j], q.xyR[i][j], 10.0 * machineepsilon);
       }
    }
    k = 1 + randominteger(n);
    rmatrixbdunpackpt(&t, m, n, &taup, k, &r);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
-         Ok = Ok && NearAtR(r.xyR[i][j], pt.xyR[i][j], 10 * machineepsilon);
+         Ok = Ok && NearAtR(r.xyR[i][j], pt.xyR[i][j], 10.0 * machineepsilon);
       }
    }
 // Multiplication test
@@ -3966,7 +3966,7 @@ bool testortfac() {
    rhessOk = true;
    rtdOk = true;
    ctdOk = true;
-   threshold = 5 * 1000 * machineepsilon;
+   threshold = 5.0 * 1000.0 * machineepsilon;
 // Medium-scale problems with various sparseness profiles
    for (mx = 1; mx <= 3 * matrixtilesizea() + 1; mx++) {
    // Rectangular factorizations: QR, LQ, bidiagonal
@@ -4770,7 +4770,7 @@ bool testmatgen() {
    Ok = true;
    maxn = 20;
    passcount = 15;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
 // Testing orthogonal
    for (n = 1; n <= maxn; n++) {
       for (pass = 1; pass <= passcount; pass++) {
@@ -5309,7 +5309,7 @@ bool testtsort() {
             }
             tagsortfastr(&a2, &ar, &bufr1, &bufr2, n);
             for (i = 0; i < n; i++) {
-               Ok = Ok && a2.xR[i] == a0.xR[i] && ar.xR[i] == (double)p1.xZ[i];
+               Ok = Ok && a2.xR[i] == a0.xR[i] && ar.xR[i] == p1.xZ[i];
             }
             tagsortfast(&a3, &bufr1, n);
             for (i = 0; i < n; i++) {
@@ -5317,11 +5317,11 @@ bool testtsort() {
             }
             tagsortmiddleir(&a4, &ar2, n);
             for (i = 0; i < n; i++) {
-               Ok = Ok && (double)a4.xZ[i] == a0.xR[i] && ar2.xR[i] == (double)p1.xZ[i];
+               Ok = Ok && a4.xZ[i] == a0.xR[i] && ar2.xR[i] == p1.xZ[i];
             }
             tagsortmiddlei(&a5, n);
             for (i = 0; i < n; i++) {
-               Ok = Ok && (double)a5.xZ[i] == a0.xR[i];
+               Ok = Ok && a5.xZ[i] == a0.xR[i];
             }
          }
       // Non-distinct sort.
@@ -5366,11 +5366,11 @@ bool testtsort() {
          }
          tagsortmiddleir(&a4, &ar2, n);
          for (i = 0; i < n; i++) {
-            Ok = Ok && (double)a4.xZ[i] == a0.xR[i];
+            Ok = Ok && a4.xZ[i] == a0.xR[i];
          }
          tagsortmiddlei(&a5, n);
          for (i = 0; i < n; i++) {
-            Ok = Ok && (double)a5.xZ[i] == a0.xR[i];
+            Ok = Ok && a5.xZ[i] == a0.xR[i];
          }
       // 'All same' sort
       // We test that keys are correctly reordered, but do NOT test order of values.
@@ -5412,7 +5412,7 @@ bool testtsort() {
          }
          tagsortmiddleir(&a4, &ar2, n);
          for (i = 0; i < n; i++) {
-            Ok = Ok && (double)a4.xZ[i] == a0.xR[i];
+            Ok = Ok && a4.xZ[i] == a0.xR[i];
          }
       // 0-1 sort
       // We test that keys are correctly reordered, but do NOT test order of values.
@@ -5454,7 +5454,7 @@ bool testtsort() {
          }
          tagsortmiddleir(&a4, &ar2, n);
          for (i = 0; i < n; i++) {
-            Ok = Ok && (double)a4.xZ[i] == a0.xR[i];
+            Ok = Ok && a4.xZ[i] == a0.xR[i];
          }
       // Special test for TagSortMiddleIR: sorting in the middle gives same results
       // as sorting in the beginning of the array
@@ -6175,7 +6175,7 @@ static bool testlevel2unsymmetric() {
    NewObj(sparsematrix, sa);
    NewObj(sparsegenerator, g);
    NewObj(hqrndstate, rs);
-   eps = 10000 * machineepsilon;
+   eps = 10000.0 * machineepsilon;
    Ok = true;
    hqrndrandomize(&rs);
 // Test linear algebra functions
@@ -6331,7 +6331,7 @@ static bool testlevel3unsymmetric() {
    NewObj(sparsematrix, sa);
    NewObj(sparsegenerator, g);
    NewObj(hqrndstate, rs);
-   eps = 10000 * machineepsilon;
+   eps = 10000.0 * machineepsilon;
    Ok = true;
    hqrndrandomize(&rs);
 // Test linear algebra functions
@@ -6460,7 +6460,7 @@ static bool testlevel2symmetric() {
    NewObj(sparsematrix, sa);
    NewObj(sparsegenerator, g);
    NewObj(hqrndstate, rs);
-   eps = 10000 * machineepsilon;
+   eps = 10000.0 * machineepsilon;
    Ok = true;
    hqrndrandomize(&rs);
 // Test linear algebra functions
@@ -6588,7 +6588,7 @@ static bool testlevel3symmetric() {
    NewObj(sparsematrix, sa);
    NewObj(sparsegenerator, g);
    NewObj(hqrndstate, rs);
-   eps = 10000 * machineepsilon;
+   eps = 10000.0 * machineepsilon;
    Ok = true;
    hqrndrandomize(&rs);
 // Test linear algebra functions
@@ -6796,7 +6796,7 @@ static bool testlevel2triangular() {
    NewObj(sparsematrix, sa);
    NewObj(sparsegenerator, g);
    NewObj(hqrndstate, rs);
-   eps = 10000 * machineepsilon;
+   eps = 10000.0 * machineepsilon;
    Ok = true;
    hqrndrandomize(&rs);
 // Test sparseTRMV
@@ -7285,7 +7285,7 @@ static bool linearfunctionstest() {
    NewVector(y0, 0, DT_REAL);
    NewVector(yt0, 0, DT_REAL);
 // Accuracy
-   eps = 1000 * machineepsilon;
+   eps = 1000.0 * machineepsilon;
 // Size of the matrix (m*n)
    n = 10;
    m = 10;
@@ -7402,7 +7402,7 @@ static bool linearfunctionsstest() {
    NewVector(y, 0, DT_REAL);
    NewVector(yt, 0, DT_REAL);
 // Accuracy
-   eps = 1000 * machineepsilon;
+   eps = 1000.0 * machineepsilon;
 // Size of the matrix (m*m)
    m = 10;
 // Left and right borders, limiting matrix values
@@ -7490,7 +7490,7 @@ static bool linearfunctionsmmtest() {
    NewMatrix(y0, 0, 0, DT_REAL);
    NewMatrix(yt0, 0, 0, DT_REAL);
 // Accuracy
-   eps = 1000 * machineepsilon;
+   eps = 1000.0 * machineepsilon;
 // Size of the matrix (m*n)
    n = 32;
    m = 32;
@@ -7634,7 +7634,7 @@ static bool linearfunctionssmmtest() {
    NewMatrix(y, 0, 0, DT_REAL);
    NewMatrix(yt, 0, 0, DT_REAL);
 // Accuracy
-   eps = 1000 * machineepsilon;
+   eps = 1000.0 * machineepsilon;
 // Size of the matrix (m*m)
    m = 32;
    k = 32;
@@ -7850,7 +7850,7 @@ static bool copyfunctest() {
    NewVector(cpy0, 0, DT_REAL);
    NewVector(cpyt0, 0, DT_REAL);
 // Accuracy
-   eps = 1000 * machineepsilon;
+   eps = 1000.0 * machineepsilon;
 // Size of the matrix (m*n)
    n = 30;
    m = 30;
@@ -8685,7 +8685,7 @@ bool testblas() {
    ctOk = true;
    mmOk = true;
    Ok = true;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
 // Test Norm2
    passcount = 1000;
    e1 = 0.0;
@@ -10957,8 +10957,8 @@ static bool testevdunit_testsisymm() {
       eigsubspacesolvedenses(&s, &ra, true, &sw, &sz, &rep);
       cntc += rep.iterationscount;
    }
-   Ok = Ok && (double)cntb <= 0.66 * cnta;
-   Ok = Ok && (double)cntc >= 0.66 * cnta;
+   Ok = Ok && cntb <= 0.66 * cnta;
+   Ok = Ok && cntc >= 0.66 * cnta;
    ae_frame_leave();
    return Ok;
 }
@@ -12482,7 +12482,7 @@ bool testtrfac() {
    Ok = true;
    maxmn = 4 * matrixtilesizea() + 1;
    largemn = 256;
-   threshold = 1000 * machineepsilon * maxmn;
+   threshold = 1000.0 * machineepsilon * maxmn;
 // Sparse Cholesky
    sspdOk = sspdOk && sparserealcholeskytest();
 // Sparse LU
@@ -12713,7 +12713,7 @@ bool testpolynomialsolver() {
    polynomialsolve(&a, n, &x, &rep);
    Ok = Ok && NearAtR(x.xC[0].x, -2.0 / 3.0, eps);
    Ok = Ok && x.xC[0].y == 0.0;
-   Ok = Ok && rep.maxerr <= 100 * machineepsilon;
+   Ok = Ok && rep.maxerr <= 100.0 * machineepsilon;
    n = 2;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 1.0;
@@ -12722,7 +12722,7 @@ bool testpolynomialsolver() {
    polynomialsolve(&a, n, &x, &rep);
    Ok = Ok && NearAtCR(x.xC[0], 1.0, eps);
    Ok = Ok && NearAtCR(x.xC[1], 1.0, eps);
-   Ok = Ok && rep.maxerr <= 100 * machineepsilon;
+   Ok = Ok && rep.maxerr <= 100.0 * machineepsilon;
    n = 2;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 2.0;
@@ -12738,7 +12738,7 @@ bool testpolynomialsolver() {
    }
    Ok = Ok && x.xC[0].y == 0.0;
    Ok = Ok && x.xC[1].y == 0.0;
-   Ok = Ok && rep.maxerr <= 100 * machineepsilon;
+   Ok = Ok && rep.maxerr <= 100.0 * machineepsilon;
    n = 2;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 1.0;
@@ -12746,7 +12746,7 @@ bool testpolynomialsolver() {
    a.xR[2] = 1.0;
    polynomialsolve(&a, n, &x, &rep);
    Ok = Ok && NearAtCR(ae_c_mul(x.xC[0], x.xC[0]), -1.0, eps);
-   Ok = Ok && rep.maxerr <= 100 * machineepsilon;
+   Ok = Ok && rep.maxerr <= 100.0 * machineepsilon;
    n = 4;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 0.0;
@@ -12759,7 +12759,7 @@ bool testpolynomialsolver() {
    Ok = Ok && !ae_c_neq_d(x.xC[1], 0.0);
    Ok = Ok && !ae_c_neq_d(x.xC[2], 0.0);
    Ok = Ok && !ae_c_neq_d(x.xC[3], 0.0);
-   Ok = Ok && rep.maxerr <= 100 * machineepsilon;
+   Ok = Ok && rep.maxerr <= 100.0 * machineepsilon;
    n = 2;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 0.0;
@@ -12775,7 +12775,7 @@ bool testpolynomialsolver() {
       Ok = Ok && NearAtR(x.xC[0].x, -3.0 / 2.0, eps);
       Ok = Ok && x.xC[0].y == 0.0;
    }
-   Ok = Ok && rep.maxerr <= 100 * machineepsilon;
+   Ok = Ok && rep.maxerr <= 100.0 * machineepsilon;
 // The final report.
    if (!Ok || !silent) {
       printf("Polynomial Solver Test\n");
@@ -13117,7 +13117,7 @@ bool testbdsvd() {
    convOk = true;
    Ok = true;
    maxn = 15;
-   threshold = 5 * 100 * machineepsilon;
+   threshold = 5.0 * 100.0 * machineepsilon;
    ae_vector_set_length(&d, maxn);
    ae_vector_set_length(&e, maxn - 1);
 // special case: zero divide matrix
@@ -13355,7 +13355,7 @@ bool testsvd() {
    convOk = true;
    Ok = true;
    maxmn = 30;
-   threshold = 5 * 100 * machineepsilon;
+   threshold = 5.0 * 100.0 * machineepsilon;
    ae_matrix_set_length(&a, maxmn, maxmn);
 // TODO: div by zero fail, convergence fail
    for (gpass = 1; gpass <= 1; gpass++) {
@@ -13465,7 +13465,7 @@ bool testtrlinsolve() {
    Ok = true;
    maxmn = 15;
    passcount = 15;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
 // Different problems
    for (n = 1; n <= maxmn; n++) {
       ae_matrix_set_length(&aeffective, n, n);
@@ -13623,7 +13623,7 @@ bool testsafesolve() {
    NewVector(rxs, 0, DT_REAL);
    NewVector(rxe, 0, DT_REAL);
    maxmn = 30;
-   threshold = 100000 * machineepsilon;
+   threshold = 100000.0 * machineepsilon;
    rOk = true;
    cOk = true;
    Ok = true;
@@ -15086,7 +15086,7 @@ bool testxblas() {
    approxOk = true;
    exactnessOk = true;
    Ok = true;
-   approxthreshold = 1000 * machineepsilon;
+   approxthreshold = 1000.0 * machineepsilon;
    maxn = 1000;
    passcount = 10;
 // tests:
@@ -15245,8 +15245,8 @@ static bool testdirectdensesolversunit_rmatrixchecksolutionm(RMatrix *xe, ae_int
    if (info <= 0) {
       Ok = false;
    } else {
-      Ok = Ok && rep->r1 >= 100 * machineepsilon && rep->r1 <= 1 + 1000 * machineepsilon;
-      Ok = Ok && rep->rinf >= 100 * machineepsilon && rep->rinf <= 1 + 1000 * machineepsilon;
+      Ok = Ok && rep->r1 >= 100.0 * machineepsilon && rep->r1 <= 1.0 + 1000.0 * machineepsilon;
+      Ok = Ok && rep->rinf >= 100.0 * machineepsilon && rep->rinf <= 1.0 + 1000.0 * machineepsilon;
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
             Ok = Ok && NearAtR(xe->xyR[i][j], xs->xyR[i][j], threshold);
@@ -15265,8 +15265,8 @@ static bool testdirectdensesolversunit_cmatrixchecksolutionm(CMatrix *xe, ae_int
    if (info <= 0) {
       Ok = false;
    } else {
-      Ok = Ok && rep->r1 >= 100 * machineepsilon && rep->r1 <= 1 + 1000 * machineepsilon;
-      Ok = Ok && rep->rinf >= 100 * machineepsilon && rep->rinf <= 1 + 1000 * machineepsilon;
+      Ok = Ok && rep->r1 >= 100.0 * machineepsilon && rep->r1 <= 1.0 + 1000.0 * machineepsilon;
+      Ok = Ok && rep->rinf >= 100.0 * machineepsilon && rep->rinf <= 1.0 + 1000.0 * machineepsilon;
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
             Ok = Ok && NearAtC(xe->xyC[i][j], xs->xyC[i][j], threshold);
@@ -15375,8 +15375,8 @@ static bool testdirectdensesolversunit_rmatrixchecksingularm(ae_int_t n, ae_int_
    if (info != -3 && info != 1) {
       Ok = false;
    } else {
-      Ok = Ok && rep->r1 >= 0.0 && rep->r1 <= 1000 * machineepsilon;
-      Ok = Ok && rep->rinf >= 0.0 && rep->rinf <= 1000 * machineepsilon;
+      Ok = Ok && rep->r1 >= 0.0 && rep->r1 <= 1000.0 * machineepsilon;
+      Ok = Ok && rep->rinf >= 0.0 && rep->rinf <= 1000.0 * machineepsilon;
       if (info == -3) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < m; j++) {
@@ -15398,8 +15398,8 @@ static bool testdirectdensesolversunit_cmatrixchecksingularm(ae_int_t n, ae_int_
       Ok = false;
       return Ok;
    }
-   Ok = Ok && rep->r1 >= 0.0 && rep->r1 <= 1000 * machineepsilon;
-   Ok = Ok && rep->rinf >= 0.0 && rep->rinf <= 1000 * machineepsilon;
+   Ok = Ok && rep->r1 >= 0.0 && rep->r1 <= 1000.0 * machineepsilon;
+   Ok = Ok && rep->rinf >= 0.0 && rep->rinf <= 1000.0 * machineepsilon;
    if (info == -3) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
@@ -15731,7 +15731,7 @@ static bool testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
             if (info <= 0) {
                Ok = false;
             } else {
-               Ok = Ok && repls.r2 >= 100 * machineepsilon && repls.r2 <= 1 + 1000 * machineepsilon;
+               Ok = Ok && repls.r2 >= 100.0 * machineepsilon && repls.r2 <= 1.0 + 1000.0 * machineepsilon;
                Ok = Ok && repls.n == n && repls.k == 0;
                for (i = 0; i < n; i++) {
                   Ok = Ok && NearAtR(xe.xyR[i][0], xv.xR[i], threshold);
@@ -15750,7 +15750,7 @@ static bool testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
             if (info <= 0) {
                Ok = false;
             } else {
-               Ok = Ok && repls.r2 >= 100 * machineepsilon && repls.r2 <= 1 + 1000 * machineepsilon;
+               Ok = Ok && repls.r2 >= 100.0 * machineepsilon && repls.r2 <= 1.0 + 1000.0 * machineepsilon;
                Ok = Ok && repls.n == n && repls.k == 0;
                for (i = 0; i < n; i++) {
                   Ok = Ok && NearAtR(xe.xyR[i][0], xv.xR[i], threshold);
@@ -16955,7 +16955,7 @@ bool testdirectdensesolvers() {
    maxn = 10;
    maxm = 5;
    passcount = 5;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    rfsOk = true;
    rOk = true;
    cOk = true;
@@ -19194,7 +19194,7 @@ bool testnormestimator() {
          nbetter++;
       }
    }
-   Ok = Ok && (double)nbetter >= 0.5 * passcount + sigma * sqrt(0.25 * passcount);
+   Ok = Ok && nbetter >= 0.5 * passcount + sigma * sqrt(0.25 * passcount);
 // Same as previous one (for NStart), but tests dependence on NIts.
    n = 3;
    normestimatorcreate(n, n, 1, 1, &e);
@@ -19222,7 +19222,7 @@ bool testnormestimator() {
          nbetter++;
       }
    }
-   Ok = Ok && (double)nbetter >= 0.5 * passcount + sigma * sqrt(0.25 * passcount);
+   Ok = Ok && nbetter >= 0.5 * passcount + sigma * sqrt(0.25 * passcount);
 // The final report.
    if (!Ok || !silent) {
       printf("Norm Estimator Test\n");
@@ -21034,8 +21034,8 @@ static bool testmatinvunit_rmatrixcheckinverse(RMatrix *a, RMatrix *inva, ae_int
    if (info <= 0) {
       Ok = false;
    } else {
-      Ok = Ok && rep->r1 >= 100 * machineepsilon && rep->r1 <= 1 + 1000 * machineepsilon;
-      Ok = Ok && rep->rinf >= 100 * machineepsilon && rep->rinf <= 1 + 1000 * machineepsilon;
+      Ok = Ok && rep->r1 >= 100.0 * machineepsilon && rep->r1 <= 1.0 + 1000.0 * machineepsilon;
+      Ok = Ok && rep->rinf >= 100.0 * machineepsilon && rep->rinf <= 1.0 + 1000.0 * machineepsilon;
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             v = ae_v_dotproduct(a->xyR[i], 1, &inva->xyR[0][j], inva->stride, n);
@@ -21059,8 +21059,8 @@ static bool testmatinvunit_cmatrixcheckinverse(CMatrix *a, CMatrix *inva, ae_int
    if (info <= 0) {
       Ok = false;
    } else {
-      Ok = Ok && rep->r1 >= 100 * machineepsilon && rep->r1 <= 1 + 1000 * machineepsilon;
-      Ok = Ok && rep->rinf >= 100 * machineepsilon && rep->rinf <= 1 + 1000 * machineepsilon;
+      Ok = Ok && rep->r1 >= 100.0 * machineepsilon && rep->r1 <= 1.0 + 1000.0 * machineepsilon;
+      Ok = Ok && rep->rinf >= 100.0 * machineepsilon && rep->rinf <= 1.0 + 1000.0 * machineepsilon;
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             v = ae_v_cdotproduct(a->xyC[i], 1, "N", &inva->xyC[0][j], inva->stride, "N", n);
@@ -21097,8 +21097,8 @@ static bool testmatinvunit_spdmatrixcheckinverse(RMatrix *a, RMatrix *inva, bool
    if (info <= 0) {
       Ok = false;
    } else {
-      Ok = Ok && rep->r1 >= 100 * machineepsilon && rep->r1 <= 1 + 1000 * machineepsilon;
-      Ok = Ok && rep->rinf >= 100 * machineepsilon && rep->rinf <= 1 + 1000 * machineepsilon;
+      Ok = Ok && rep->r1 >= 100.0 * machineepsilon && rep->r1 <= 1.0 + 1000.0 * machineepsilon;
+      Ok = Ok && rep->rinf >= 100.0 * machineepsilon && rep->rinf <= 1.0 + 1000.0 * machineepsilon;
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             v = ae_v_dotproduct(a->xyR[i], 1, &inva->xyR[0][j], inva->stride, n);
@@ -21136,8 +21136,8 @@ static bool testmatinvunit_hpdmatrixcheckinverse(CMatrix *a, CMatrix *inva, bool
    if (info <= 0) {
       Ok = false;
    } else {
-      Ok = Ok && rep->r1 >= 100 * machineepsilon && rep->r1 <= 1 + 1000 * machineepsilon;
-      Ok = Ok && rep->rinf >= 100 * machineepsilon && rep->rinf <= 1 + 1000 * machineepsilon;
+      Ok = Ok && rep->r1 >= 100.0 * machineepsilon && rep->r1 <= 1.0 + 1000.0 * machineepsilon;
+      Ok = Ok && rep->rinf >= 100.0 * machineepsilon && rep->rinf <= 1.0 + 1000.0 * machineepsilon;
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             v = ae_v_cdotproduct(a->xyC[i], 1, "N", &inva->xyC[0][j], inva->stride, "N", n);
@@ -21161,8 +21161,8 @@ static bool testmatinvunit_rmatrixcheckinversesingular(RMatrix *inva, ae_int_t n
    if (info != -3 && info != 1) {
       Ok = false;
    } else {
-      Ok = Ok && rep->r1 >= 0.0 && rep->r1 <= 1000 * machineepsilon;
-      Ok = Ok && rep->rinf >= 0.0 && rep->rinf <= 1000 * machineepsilon;
+      Ok = Ok && rep->r1 >= 0.0 && rep->r1 <= 1000.0 * machineepsilon;
+      Ok = Ok && rep->rinf >= 0.0 && rep->rinf <= 1000.0 * machineepsilon;
       if (info == -3) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
@@ -21183,8 +21183,8 @@ static bool testmatinvunit_cmatrixcheckinversesingular(CMatrix *inva, ae_int_t n
    if (info != -3 && info != 1) {
       Ok = false;
    } else {
-      Ok = Ok && rep->r1 >= 0.0 && rep->r1 <= 1000 * machineepsilon;
-      Ok = Ok && rep->rinf >= 0.0 && rep->rinf <= 1000 * machineepsilon;
+      Ok = Ok && rep->r1 >= 0.0 && rep->r1 <= 1000.0 * machineepsilon;
+      Ok = Ok && rep->rinf >= 0.0 && rep->rinf <= 1000.0 * machineepsilon;
       if (info == -3) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
@@ -21800,8 +21800,8 @@ static bool testmatinvunit_testspdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
             if (info != -3 && info != 1) {
                Ok = false;
             } else {
-               Ok = Ok && rep.r1 >= 0.0 && rep.r1 <= 1000 * machineepsilon;
-               Ok = Ok && rep.rinf >= 0.0 && rep.rinf <= 1000 * machineepsilon;
+               Ok = Ok && rep.r1 >= 0.0 && rep.r1 <= 1000.0 * machineepsilon;
+               Ok = Ok && rep.rinf >= 0.0 && rep.rinf <= 1000.0 * machineepsilon;
             }
          }
       }
@@ -21910,8 +21910,8 @@ static bool testmatinvunit_testhpdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
             if (info != -3 && info != 1) {
                Ok = false;
             } else {
-               Ok = Ok && rep.r1 >= 0.0 && rep.r1 <= 1000 * machineepsilon;
-               Ok = Ok && rep.rinf >= 0.0 && rep.rinf <= 1000 * machineepsilon;
+               Ok = Ok && rep.r1 >= 0.0 && rep.r1 <= 1000.0 * machineepsilon;
+               Ok = Ok && rep.rinf >= 0.0 && rep.rinf <= 1000.0 * machineepsilon;
             }
          }
       }
@@ -21938,7 +21938,7 @@ bool testmatinv() {
    maxcn = 3 * matrixtilesizea() + 1;
    largen = 4 * matrixtilesizeb() + 1;
    passcount = 1;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    rtrOk = true;
    ctrOk = true;
    rOk = true;
@@ -22656,7 +22656,7 @@ static bool testminlbfgsunit_testother() {
    }
    minlbfgsresults(&state, &x, &rep);
    r = v / (s.xR[0] * diffstep);
-   Ok = Ok && SmallAtR(log(r), log(1 + 1000 * machineepsilon));
+   Ok = Ok && SmallAtR(log(r), log(1.0 + 1000.0 * machineepsilon));
 // test maximum step
    n = 1;
    m = 1;
@@ -24002,19 +24002,19 @@ bool testcqmodels() {
             }
          }
          v2 = cqmeval(&s, &x);
-         eval0Ok = eval0Ok && NearAtR(v, v2, 10000 * machineepsilon);
+         eval0Ok = eval0Ok && NearAtR(v, v2, 10000.0 * machineepsilon);
          cqmevalx(&s, &x, &v2, &noise);
-         eval0Ok = eval0Ok && NearAtR(v, v2, 10000 * machineepsilon);
-         eval0Ok = eval0Ok && noise >= 0.0 && noise <= 10000 * machineepsilon;
+         eval0Ok = eval0Ok && NearAtR(v, v2, 10000.0 * machineepsilon);
+         eval0Ok = eval0Ok && noise >= 0.0 && noise <= 10000.0 * machineepsilon;
          v2 = cqmxtadx2(&s, &x, &tmp0);
-         eval0Ok = eval0Ok && NearAtR(xtadx2, v2, 10000 * machineepsilon);
+         eval0Ok = eval0Ok && NearAtR(xtadx2, v2, 10000.0 * machineepsilon);
          cqmgradunconstrained(&s, &x, &gt);
          for (i = 0; i < n; i++) {
-            eval0Ok = eval0Ok && NearAtR(ge.xR[i], gt.xR[i], 10000 * machineepsilon);
+            eval0Ok = eval0Ok && NearAtR(ge.xR[i], gt.xR[i], 10000.0 * machineepsilon);
          }
          cqmadx(&s, &x, &adx);
          for (i = 0; i < n; i++) {
-            eval0Ok = eval0Ok && NearAtR(adx.xR[i], adxe.xR[i], 10000 * machineepsilon);
+            eval0Ok = eval0Ok && NearAtR(adx.xR[i], adxe.xR[i], 10000.0 * machineepsilon);
          }
       }
    }
@@ -24076,9 +24076,9 @@ bool testcqmodels() {
             v2 = ae_v_dotproduct(q.xyR[i], 1, xc.xR, 1, n);
             v += 0.5 * theta * sqr(v2 - r.xR[i]);
          }
-         eval1Ok = eval1Ok && NearAtR(v, cqmeval(&s, &xc), 10000 * machineepsilon);
-         eval1Ok = eval1Ok && NearAtR(v, cqmdebugconstrainedevalt(&s, &x), 10000 * machineepsilon);
-         eval1Ok = eval1Ok && NearAtR(v, cqmdebugconstrainedevale(&s, &x), 10000 * machineepsilon);
+         eval1Ok = eval1Ok && NearAtR(v, cqmeval(&s, &xc), 10000.0 * machineepsilon);
+         eval1Ok = eval1Ok && NearAtR(v, cqmdebugconstrainedevalt(&s, &x), 10000.0 * machineepsilon);
+         eval1Ok = eval1Ok && NearAtR(v, cqmdebugconstrainedevale(&s, &x), 10000.0 * machineepsilon);
       }
    }
    Ok = Ok && eval1Ok;
@@ -24257,11 +24257,11 @@ bool testcqmodels() {
             }
          }
          v2 = cqmeval(&s, &x);
-         eval2Ok = eval2Ok && NearAtR(v, v2, 10000 * machineepsilon);
+         eval2Ok = eval2Ok && NearAtR(v, v2, 10000.0 * machineepsilon);
          v2 = cqmdebugconstrainedevalt(&s, &x);
-         eval2Ok = eval2Ok && NearAtR(v, v2, 10000 * machineepsilon);
+         eval2Ok = eval2Ok && NearAtR(v, v2, 10000.0 * machineepsilon);
          v2 = cqmdebugconstrainedevale(&s, &x);
-         eval2Ok = eval2Ok && NearAtR(v, v2, 10000 * machineepsilon);
+         eval2Ok = eval2Ok && NearAtR(v, v2, 10000.0 * machineepsilon);
       }
    }
    Ok = Ok && eval2Ok;
@@ -24432,7 +24432,7 @@ bool testcqmodels() {
             f0 = cqmeval(&s, &x);
             for (i = 0; i < n; i++) {
                newton2Ok = newton2Ok && (!activeset.xB[i] || x.xR[i] == x0.xR[i]);
-               newton2Ok = newton2Ok && (activeset.xB[i] || NearAtR(x.xR[i], x0.xR[i], 1000 * machineepsilon));
+               newton2Ok = newton2Ok && (activeset.xB[i] || NearAtR(x.xR[i], x0.xR[i], 1000.0 * machineepsilon));
             }
          // Check that constrained evaluation at some point gives correct results
             for (i = 0; i < n; i++) {
@@ -24451,11 +24451,11 @@ bool testcqmodels() {
                v += 0.5 * theta * sqr(v2 - r.xR[i]);
             }
             v2 = cqmeval(&s, &x);
-            newton2Ok = newton2Ok && isfinite(v2) && NearAtR(v, v2, 10000 * machineepsilon);
+            newton2Ok = newton2Ok && isfinite(v2) && NearAtR(v, v2, 10000.0 * machineepsilon);
             v2 = cqmdebugconstrainedevalt(&s, &x);
-            newton2Ok = newton2Ok && isfinite(v2) && NearAtR(v, v2, 10000 * machineepsilon);
+            newton2Ok = newton2Ok && isfinite(v2) && NearAtR(v, v2, 10000.0 * machineepsilon);
             v2 = cqmdebugconstrainedevale(&s, &x);
-            newton2Ok = newton2Ok && isfinite(v2) && NearAtR(v, v2, 10000 * machineepsilon);
+            newton2Ok = newton2Ok && isfinite(v2) && NearAtR(v, v2, 10000.0 * machineepsilon);
          } else {
             newton2Ok = false;
          }
@@ -25981,7 +25981,7 @@ static bool testminbleicunit_testother() {
       }
       minbleicresults(&state, &x, &rep);
       r = v / (s.xR[0] * diffstep);
-      Ok = Ok && SmallAtR(log(r), log(1 + 1000 * machineepsilon));
+      Ok = Ok && SmallAtR(log(r), log(1.0 + 1000.0 * machineepsilon));
    }
 // Test stpmax
    for (pass = 1; pass <= passcount; pass++) {
@@ -26200,7 +26200,7 @@ static bool testminbleicunit_testother() {
       ae_vector_set_length(&x, 2);
       ae_vector_set_length(&bl, 2);
       ae_vector_set_length(&bu, 2);
-      x.xR[0] = 10 * machineepsilon;
+      x.xR[0] = 10.0 * machineepsilon;
       x.xR[1] = 1.0;
       bl.xR[0] = 0.0;
       bu.xR[0] = +INFINITY;
@@ -26220,7 +26220,7 @@ static bool testminbleicunit_testother() {
          }
          while (minbleiciteration(&state))
             if (state.needfg) {
-               state.f = sqr(state.x.xR[0] + 1) + sqr(state.x.xR[1] + 1) + 10000 * machineepsilon * randomreal();
+               state.f = sqr(state.x.xR[0] + 1) + sqr(state.x.xR[1] + 1) + 10000.0 * machineepsilon * randomreal();
                state.g.xR[0] = 2 * (state.x.xR[0] + 1);
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
             }
@@ -26256,7 +26256,7 @@ static bool testminbleicunit_testother() {
       ae_vector_set_length(&x, 2);
       ae_vector_set_length(&bl, 2);
       ae_vector_set_length(&bu, 2);
-      x.xR[0] = 10 * machineepsilon;
+      x.xR[0] = 10.0 * machineepsilon;
       x.xR[1] = 1.0;
       bl.xR[0] = 0.0;
       bu.xR[0] = +INFINITY;
@@ -29955,7 +29955,7 @@ static bool bleictests() {
    Ok = Ok && rep.terminationtype > 0;
    if (rep.terminationtype > 0) {
       for (i = 0; i < n; i++) {
-         Ok = Ok && (NearAtR(xend0.xR[i], -1.0, 100 * machineepsilon) || NearAtR(xend0.xR[i], 1, 100 * machineepsilon));
+         Ok = Ok && (NearAtR(xend0.xR[i], -1.0, 100.0 * machineepsilon) || NearAtR(xend0.xR[i], 1.0, 100.0 * machineepsilon));
       }
    }
    minqpsetlc(&state, &c, &ct, 2 * (n - 1));
@@ -34457,7 +34457,7 @@ static bool testminqpunit_generallcqptest() {
          // * for overconstrained DENSE-AUL
             skiptest = false;
             skiptest = skiptest || solvertype == 0;
-            skiptest = skiptest || solvertype == 1 && (double)nactive > 0.5 * (n - 1);
+            skiptest = skiptest || solvertype == 1 && nactive > 0.5 * (n - 1);
             if (!skiptest) {
                ae_vector_set_length(&gtrial, n);
                for (i = 0; i < n; i++) {
@@ -37866,7 +37866,7 @@ static bool testother() {
       }
       mincgresults(&state, &x, &rep);
       r = v / (s.xR[0] * diffstep);
-      Ok = Ok && SmallAtR(log(r), log(1 + 1000 * machineepsilon));
+      Ok = Ok && SmallAtR(log(r), log(1.0 + 1000.0 * machineepsilon));
    // Test maximum step
       n = 1;
       ae_vector_set_length(&x, n);
@@ -40648,7 +40648,7 @@ static bool testminlpunit_singlecalltests() {
             return Ok;
          }
          for (i = 0; i < n; i++) {
-            Ok = Ok && NearAtR(x0.xR[i], x1.xR[i] / s.xR[i], 1000 * machineepsilon);
+            Ok = Ok && NearAtR(x0.xR[i], x1.xR[i] / s.xR[i], 1000.0 * machineepsilon);
          }
       }
    }
@@ -44217,9 +44217,9 @@ static bool testminnlcunit_testother() {
    // Preconditioners must be significantly different,
    // with exact being best one, inexact being second,
    // "none" being worst option.
-      Ok = Ok && (double)nexactlowrank < 0.9 * nlbfgs;
-      Ok = Ok && (double)nexactrobust < 0.9 * nlbfgs;
-      Ok = Ok && (double)nlbfgs < 0.9 * nnone;
+      Ok = Ok && nexactlowrank < 0.9 * nlbfgs;
+      Ok = Ok && nexactrobust < 0.9 * nlbfgs;
+      Ok = Ok && nlbfgs < 0.9 * nnone;
    }
    ae_frame_leave();
    return Ok;
@@ -46198,7 +46198,7 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          *OtherOkP = *OtherOkP && werexreports == requirexrep;
-         *OtherOkP = *OtherOkP && repferr <= 10000 * machineepsilon;
+         *OtherOkP = *OtherOkP && repferr <= 10000.0 * machineepsilon;
          if (!Ok || !*OtherOkP) {
             ae_frame_leave();
             return Ok;
@@ -46206,8 +46206,8 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
          for (i = 0; i < n; i++) {
             Ok = Ok && isfinite(x1.xR[i]) && NearAtR(x1.xR[i], xc.xR[i], s.xR[i] * xtol);
             if (requirexrep) {
-               *OtherOkP = *OtherOkP && isfinite(xrfirst.xR[i]) && NearAtR(x0.xR[i], xrfirst.xR[i], 100 * machineepsilon);
-               *OtherOkP = *OtherOkP && isfinite(xrlast.xR[i]) && NearAtR(x1.xR[i], xrlast.xR[i], 100 * machineepsilon);
+               *OtherOkP = *OtherOkP && isfinite(xrfirst.xR[i]) && NearAtR(x0.xR[i], xrfirst.xR[i], 100.0 * machineepsilon);
+               *OtherOkP = *OtherOkP && isfinite(xrlast.xR[i]) && NearAtR(x1.xR[i], xrlast.xR[i], 100.0 * machineepsilon);
             }
          }
       // Test numerical differentiation:
@@ -46247,7 +46247,7 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
-         *OtherOkP = *OtherOkP && repferr <= 10000 * machineepsilon;
+         *OtherOkP = *OtherOkP && repferr <= 10000.0 * machineepsilon;
          if (!Ok || !*OtherOkP) {
             ae_frame_leave();
             return Ok;
@@ -46450,7 +46450,7 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          *OtherOkP = *OtherOkP && werexreports == requirexrep;
-         *OtherOkP = *OtherOkP && repferr <= 10000 * machineepsilon;
+         *OtherOkP = *OtherOkP && repferr <= 10000.0 * machineepsilon;
          if (!Ok || !*OtherOkP) {
             ae_frame_leave();
             return Ok;
@@ -46460,8 +46460,8 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
             Ok = Ok && x1.xR[i] >= bndl.xR[i];
             Ok = Ok && x1.xR[i] <= bndu.xR[i];
             if (requirexrep) {
-               *OtherOkP = *OtherOkP && isfinite(xrfirst.xR[i]) && NearAtR(rboundval(x0.xR[i], bndl.xR[i], bndu.xR[i]), xrfirst.xR[i], 100 * machineepsilon);
-               *OtherOkP = *OtherOkP && isfinite(xrlast.xR[i]) && NearAtR(x1.xR[i], xrlast.xR[i], 100 * machineepsilon);
+               *OtherOkP = *OtherOkP && isfinite(xrfirst.xR[i]) && NearAtR(rboundval(x0.xR[i], bndl.xR[i], bndu.xR[i]), xrfirst.xR[i], 100.0 * machineepsilon);
+               *OtherOkP = *OtherOkP && isfinite(xrlast.xR[i]) && NearAtR(x1.xR[i], xrlast.xR[i], 100.0 * machineepsilon);
             }
          }
       }
@@ -46643,7 +46643,7 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
-         *OtherOkP = *OtherOkP && repferr <= 10000 * machineepsilon;
+         *OtherOkP = *OtherOkP && repferr <= 10000.0 * machineepsilon;
          if (!Ok || !*OtherOkP) {
             ae_frame_leave();
             return Ok;
@@ -46853,7 +46853,7 @@ static bool testminnsunit_testlc(bool *OtherOkP) {
          minnsresults(&state, &x1, &rep);
          Ok = Ok && rep.terminationtype > 0;
          Ok = Ok && isfinite(flast0);
-         *OtherOkP = *OtherOkP && repferr <= 10000 * machineepsilon;
+         *OtherOkP = *OtherOkP && repferr <= 10000.0 * machineepsilon;
          if (!Ok || !*OtherOkP) {
             ae_frame_leave();
             return Ok;
@@ -47935,7 +47935,7 @@ static bool testminbcunit_testother() {
       }
       minbcresults(&state, &x, &rep);
       r = v / (s.xR[0] * diffstep);
-      Ok = Ok && SmallAtR(log(r), log(1 + 1000 * machineepsilon));
+      Ok = Ok && SmallAtR(log(r), log(1.0 + 1000.0 * machineepsilon));
    }
 // Test stpmax
    for (pass = 1; pass <= passcount; pass++) {
@@ -48144,7 +48144,7 @@ static bool testminbcunit_testother() {
       ae_vector_set_length(&x, 2);
       ae_vector_set_length(&bl, 2);
       ae_vector_set_length(&bu, 2);
-      x.xR[0] = 10 * machineepsilon;
+      x.xR[0] = 10.0 * machineepsilon;
       x.xR[1] = 1.0;
       bl.xR[0] = 0.0;
       bu.xR[0] = +INFINITY;
@@ -48164,7 +48164,7 @@ static bool testminbcunit_testother() {
          }
          while (minbciteration(&state))
             if (state.needfg) {
-               state.f = sqr(state.x.xR[0] + 1) + sqr(state.x.xR[1] + 1) + 10000 * machineepsilon * randomreal();
+               state.f = sqr(state.x.xR[0] + 1) + sqr(state.x.xR[1] + 1) + 10000.0 * machineepsilon * randomreal();
                state.g.xR[0] = 2 * (state.x.xR[0] + 1);
                state.g.xR[1] = 2 * (state.x.xR[1] + 1);
             }
@@ -48200,7 +48200,7 @@ static bool testminbcunit_testother() {
       ae_vector_set_length(&x, 2);
       ae_vector_set_length(&bl, 2);
       ae_vector_set_length(&bu, 2);
-      x.xR[0] = 10 * machineepsilon;
+      x.xR[0] = 10.0 * machineepsilon;
       x.xR[1] = 1.0;
       bl.xR[0] = 0.0;
       bu.xR[0] = +INFINITY;
@@ -49280,7 +49280,7 @@ static bool testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
    qcount = 10;
    ae_assert(n > 0, "Assertion failed");
 // Tol - roundoff error tolerance (for '>=' comparisons)
-   errtol = 100000 * machineepsilon;
+   errtol = 100000.0 * machineepsilon;
 // Evaluate bounding box and spread.
    ae_vector_set_length(&boxmin, nx);
    ae_vector_set_length(&boxmax, nx);
@@ -49975,7 +49975,7 @@ static bool testnearestneighborunit_testkdtreeserialization() {
    NewMatrix(xy1, 0, 0, DT_REAL);
    NewVector(tags0, 0, DT_INT);
    NewVector(tags1, 0, DT_INT);
-   threshold = 100 * machineepsilon;
+   threshold = 100.0 * machineepsilon;
 // different N, NX, NY, NormType
    n = 1;
    while (n <= 51) {
@@ -50924,7 +50924,7 @@ bool testschur() {
    Ok = true;
    maxn = 70;
    passcount = 1;
-   threshold = 5 * 100 * machineepsilon;
+   threshold = 5.0 * 100.0 * machineepsilon;
    ae_matrix_set_length(&a, maxn, maxn);
 // zero matrix, several cases
    for (i = 0; i < maxn; i++) {
@@ -51000,7 +51000,7 @@ bool testspdgevd() {
    NewMatrix(bfull, 0, 0, DT_REAL);
    NewMatrix(l, 0, 0, DT_REAL);
    NewMatrix(z, 0, 0, DT_REAL);
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    valerr = 0.0;
    convOk = true;
    sortOk = true;
@@ -51144,7 +51144,7 @@ bool testgammafunc() {
    gammaOk = true;
    lngammaOk = true;
    Ok = true;
-   threshold = 100 * machineepsilon;
+   threshold = 100.0 * machineepsilon;
 //
    gammaOk = gammaOk && NearAtR(gammafunction(0.5), sqrt(pi), threshold);
    gammaOk = gammaOk && NearAtR(gammafunction(1.5), 0.5 * sqrt(pi), threshold);
@@ -51494,7 +51494,7 @@ bool testgq() {
    Ok = true;
    errtol = 1.0E-12;
    nonstricterrtol = 1.0E-6;
-   stricterrtol = 1000 * machineepsilon;
+   stricterrtol = 1000.0 * machineepsilon;
 // Three tests for rec-based Gauss quadratures with known weights/nodes:
 // 1. Gauss-Legendre with N=2
 // 2. Gauss-Legendre with N=5
@@ -51893,7 +51893,7 @@ bool testgkq() {
    vstblOk = true;
    genOk = true;
    Ok = true;
-   errtol = 10000 * machineepsilon;
+   errtol = 10000.0 * machineepsilon;
 // test recurrence-based Legendre nodes against the precalculated table
    for (pkind = 0; pkind <= 5; pkind++) {
       n = 0;
@@ -52003,7 +52003,7 @@ bool testautogk() {
    simpleOk = true;
    sngendOk = true;
    Ok = true;
-   errtol = 10000 * machineepsilon;
+   errtol = 10000.0 * machineepsilon;
 // Simple test: integral(exp(x),+-1,+-2), no maximum width requirements
    a = (2 * randominteger(2) - 1) * 1.0;
    b = (2 * randominteger(2) - 1) * 2.0;
@@ -52411,7 +52411,7 @@ static bool testbasestatunit_testranking() {
       rankdatacentered(&xy1, npoints, nfeatures);
       for (i = 0; i < npoints; i++) {
          for (j = 0; j < nfeatures; j++) {
-            if (xy1.xyR[i][j] != round(xy2.xyR[i][j]) - (double)(nfeatures - 1) / 2.0) {
+            if (xy1.xyR[i][j] != round(xy2.xyR[i][j]) - (nfeatures - 1) / 2.0) {
                Ok = false;
             }
          }
@@ -52440,65 +52440,65 @@ static bool testbasestatunit_testranking() {
       }
    }
    rankdata(&xy0, npoints, nfeatures);
-   if (!NearAtR(xy0.xyR[0][0], 0.5, 10 * machineepsilon)) {
+   if (!NearAtR(xy0.xyR[0][0], 0.5, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy0.xyR[0][1], 3.0, 10 * machineepsilon)) {
+   if (!NearAtR(xy0.xyR[0][1], 3.0, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy0.xyR[0][2], 2.0, 10 * machineepsilon)) {
+   if (!NearAtR(xy0.xyR[0][2], 2.0, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy0.xyR[0][3], 0.5, 10 * machineepsilon)) {
+   if (!NearAtR(xy0.xyR[0][3], 0.5, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy0.xyR[1][0], 1.0, 10 * machineepsilon)) {
+   if (!NearAtR(xy0.xyR[1][0], 1.0, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy0.xyR[1][1], 1.0, 10 * machineepsilon)) {
+   if (!NearAtR(xy0.xyR[1][1], 1.0, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy0.xyR[1][2], 1.0, 10 * machineepsilon)) {
+   if (!NearAtR(xy0.xyR[1][2], 1.0, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy0.xyR[1][3], 3.0, 10 * machineepsilon)) {
+   if (!NearAtR(xy0.xyR[1][3], 3.0, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy0.xyR[2][0], 1.5, 10 * machineepsilon)) {
+   if (!NearAtR(xy0.xyR[2][0], 1.5, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy0.xyR[2][1], 1.5, 10 * machineepsilon)) {
+   if (!NearAtR(xy0.xyR[2][1], 1.5, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy0.xyR[2][2], 1.5, 10 * machineepsilon)) {
+   if (!NearAtR(xy0.xyR[2][2], 1.5, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy0.xyR[2][3], 1.5, 10 * machineepsilon)) {
+   if (!NearAtR(xy0.xyR[2][3], 1.5, 10.0 * machineepsilon)) {
       Ok = false;
    }
    rankdatacentered(&xy1, npoints, nfeatures);
-   if (!NearAtR(xy1.xyR[0][0], -1.0, 10 * machineepsilon)) {
+   if (!NearAtR(xy1.xyR[0][0], -1.0, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy1.xyR[0][1], 1.5, 10 * machineepsilon)) {
+   if (!NearAtR(xy1.xyR[0][1], 1.5, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy1.xyR[0][2], 0.5, 10 * machineepsilon)) {
+   if (!NearAtR(xy1.xyR[0][2], 0.5, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy1.xyR[0][3], -1.0, 10 * machineepsilon)) {
+   if (!NearAtR(xy1.xyR[0][3], -1.0, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy1.xyR[1][0], -0.5, 10 * machineepsilon)) {
+   if (!NearAtR(xy1.xyR[1][0], -0.5, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy1.xyR[1][1], -0.5, 10 * machineepsilon)) {
+   if (!NearAtR(xy1.xyR[1][1], -0.5, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy1.xyR[1][2], -0.5, 10 * machineepsilon)) {
+   if (!NearAtR(xy1.xyR[1][2], -0.5, 10.0 * machineepsilon)) {
       Ok = false;
    }
-   if (!NearAtR(xy1.xyR[1][3], 1.5, 10 * machineepsilon)) {
+   if (!NearAtR(xy1.xyR[1][3], 1.5, 10.0 * machineepsilon)) {
       Ok = false;
    }
    if (xy1.xyR[2][0] != 0.0) {
@@ -52557,7 +52557,7 @@ bool testbasestat() {
    s1Ok = true;
    covcorrOk = true;
    rankOk = true;
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
 // Ranking
    rankOk = rankOk && testbasestatunit_testranking();
 // * prepare X and Y - two test samples
@@ -52846,11 +52846,11 @@ bool testmannwhitneyu() {
       // Generate uniform and sorted X/Y spanning [0,1]
          ae_vector_set_length(&x, n);
          for (i = 0; i < n; i++) {
-            x.xR[i] = (double)i / (n - 1) + 100 * machineepsilon * hqrndnormal(&rs);
+            x.xR[i] = (double)i / (n - 1) + 100.0 * machineepsilon * hqrndnormal(&rs);
          }
          ae_vector_set_length(&y, m);
          for (i = 0; i < m; i++) {
-            y.xR[i] = (double)i / (m - 1) + 100 * machineepsilon * hqrndnormal(&rs);
+            y.xR[i] = (double)i / (m - 1) + 100.0 * machineepsilon * hqrndnormal(&rs);
          }
       // Test 100 values of E
          ecnt = 100;
@@ -53397,7 +53397,7 @@ bool testratint() {
 // LipschitzTol     Lipschitz constant increase allowed
 //                  when calculating constant on a twice denser grid
    passcount = 5;
-   threshold = 1000000 * machineepsilon;
+   threshold = 1000000.0 * machineepsilon;
    lipschitztol = 1.3;
 // Basic barycentric functions
    for (n = 1; n <= 10; n++) {
@@ -54977,7 +54977,7 @@ static bool testspline1dunit_testunpack(spline1dinterpolant *c, RVector *x) {
    for (i = 0; i < n - 1; i++) {
       err = rmax2(err, fabs(x->xR[i + 1] - tbl.xyR[i][1]));
    }
-   Ok = err < 100 * machineepsilon;
+   Ok = err < 100.0 * machineepsilon;
    ae_frame_leave();
    return Ok;
 }
@@ -55048,7 +55048,7 @@ static bool testspline1dunit_testmonotonespline() {
    NewVector(y, 0, DT_REAL);
    NewVector(d, 0, DT_REAL);
    NewVector(n, 0, DT_INT);
-   eps = 100 * machineepsilon;
+   eps = 100.0 * machineepsilon;
 // Special test - N=2.
 //
 // Following properties are tested:
@@ -55323,7 +55323,7 @@ static bool testspline1dunit_testsplinefitting() {
 // * threshold - for tests which must be satisfied exactly
 // * nonstrictthreshold - for approximate tests
    passcount = 20;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    nonstrictthreshold = 1.0E-6;
    lipschitzeps = 1.0E-6;
    Ok = true;
@@ -55627,7 +55627,7 @@ bool testspline1d() {
    h = 0.00001;
    maxn = 10;
    lipschitzeps = 1.0E-6;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    bool lsOk = true;
    bool csOk = true;
    bool crsOk = true;
@@ -55777,8 +55777,8 @@ bool testspline1d() {
                   err = rmax2(err, fabs(br - t));
                }
                if (bltype == -1 || brtype == -1) {
-                  spline1ddiff(&c, a + 100 * machineepsilon, &s, &ds, &d2s);
-                  spline1ddiff(&c, b - 100 * machineepsilon, &s2, &ds2, &d2s2);
+                  spline1ddiff(&c, a + 100.0 * machineepsilon, &s, &ds, &d2s);
+                  spline1ddiff(&c, b - 100.0 * machineepsilon, &s2, &ds2, &d2s2);
                   err = rmax2(err, fabs(s - s2));
                   err = rmax2(err, fabs(ds - ds2));
                   err = rmax2(err, fabs(d2s - d2s2));
@@ -55927,8 +55927,8 @@ bool testspline1d() {
                err = rmax2(err, fabs(t));
             }
             if (bltype == -1) {
-               spline1ddiff(&c, a + 100 * machineepsilon, &s, &ds, &d2s);
-               spline1ddiff(&c, b - 100 * machineepsilon, &s2, &ds2, &d2s2);
+               spline1ddiff(&c, a + 100.0 * machineepsilon, &s, &ds, &d2s);
+               spline1ddiff(&c, b - 100.0 * machineepsilon, &s2, &ds2, &d2s2);
                err = rmax2(err, fabs(s - s2));
                err = rmax2(err, fabs(ds - ds2));
             }
@@ -56213,9 +56213,9 @@ bool testspline1d() {
    iOk = iOk && NearAtR(intab, 1, 0.001);
    for (i = -10; i <= 10; i++) {
       iOk = iOk && NearAtR(spline1dintegrate(&c, i + v), i * intab + vr, 0.001);
-      iOk = iOk && NearAtR(spline1dintegrate(&c, i - 1000 * machineepsilon), i * intab, 0.001);
+      iOk = iOk && NearAtR(spline1dintegrate(&c, i - 1000.0 * machineepsilon), i * intab, 0.001);
       iOk = iOk && NearAtR(spline1dintegrate(&c, (double)i), i * intab, 0.001);
-      iOk = iOk && NearAtR(spline1dintegrate(&c, i + 1000 * machineepsilon), i * intab, 0.001);
+      iOk = iOk && NearAtR(spline1dintegrate(&c, i + 1000.0 * machineepsilon), i * intab, 0.001);
    }
 // Test monotone cubic Hermit interpolation
    bool monotoneOk = testspline1dunit_testmonotonespline();
@@ -56548,7 +56548,7 @@ static bool testlsfitunit_testrationalfitting() {
 //                  when calculating constant on a twice denser grid
    passcount = 5;
    maxn = 15;
-   threshold = 1000000 * machineepsilon;
+   threshold = 1000000.0 * machineepsilon;
 // Test rational fitting:
    for (pass = 1; pass <= passcount; pass++) {
       for (n = 2; n <= maxn; n++) {
@@ -56793,7 +56793,7 @@ static bool testlsfitunit_testsplinefitting() {
 // * pass count
 // * threshold - for tests which must be satisfied exactly
    passcount = 20;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    Ok = true;
 // Test fitting by Cubic and Hermite splines (obsolete, but still supported)
    for (pass = 1; pass <= passcount; pass++) {
@@ -58247,7 +58247,7 @@ static void testlsfitunit_testgeneralfitting(bool *LlsOkP, bool *NlsOkP) {
    NewObj(lsfitstate, state);
    *LlsOkP = true;
    *NlsOkP = true;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    nlthreshold = 0.00001;
    diffstep = 0.0001;
    maxn = 6;
@@ -58720,7 +58720,7 @@ static void testlsfitunit_testgeneralfitting(bool *LlsOkP, bool *NlsOkP) {
             avgdeviationnoise = 0.0;
             adncnt = 0.0;
             for (i = 0; i < n; i++) {
-               *LlsOkP = *LlsOkP && NearAtR(rep.covpar.xyR[i][i], sqr(rep.errpar.xR[i]), 100 * machineepsilon * rmax2(sqr(rep.errpar.xR[i]), rep.covpar.xyR[i][i]));
+               *LlsOkP = *LlsOkP && NearAtR(rep.covpar.xyR[i][i], sqr(rep.errpar.xR[i]), 100.0 * machineepsilon * rmax2(sqr(rep.errpar.xR[i]), rep.covpar.xyR[i][i]));
             }
             for (i = 0; i < n; i++) {
                avgdeviationpar = (avgdeviationpar * adpcnt + fabs(c.xR[i] - cend.xR[i]) / rep.errpar.xR[i]) / (adpcnt + 1);
@@ -59014,8 +59014,8 @@ static bool testlsfitunit_testrdp() {
          return Ok;
       }
       for (i = 0; i < nsections; i++) {
-         Ok = Ok && NearAtR(x2.xR[i], x3.xR[i], 1000 * machineepsilon);
-         Ok = Ok && NearAtR(y2.xR[i], y3.xR[i], 1000 * machineepsilon);
+         Ok = Ok && NearAtR(x2.xR[i], x3.xR[i], 1000.0 * machineepsilon);
+         Ok = Ok && NearAtR(y2.xR[i], y3.xR[i], 1000.0 * machineepsilon);
       }
    // Next epsilon
       eps *= 0.5;
@@ -60492,7 +60492,7 @@ static bool testparametricunit_testrdp() {
          for (i = 0; i <= nsections; i++) {
             Ok = Ok && idx2.xZ[i] == idx3.xZ[i];
             for (j = 0; j < d; j++) {
-               Ok = Ok && NearAtR(xy2.xyR[i][j], xy3.xyR[i][j], 1000 * machineepsilon);
+               Ok = Ok && NearAtR(xy2.xyR[i][j], xy3.xyR[i][j], 1000.0 * machineepsilon);
             }
          }
       }
@@ -60587,7 +60587,7 @@ bool testparametric() {
    NewObj(spline1dinterpolant, s);
    Ok = true;
    maxn = 10;
-   threshold = 10000 * machineepsilon;
+   threshold = 10000.0 * machineepsilon;
    nonstrictthreshold = 0.00001;
    p2Ok = true;
    p3Ok = true;
@@ -60718,7 +60718,7 @@ bool testparametric() {
                // near-boundary test for continuity of function values and derivatives:
                // 2-dimensional curve
                   ae_assert(skind == 1 || skind == 2, "TEST: unexpected spline type!");
-                  v0 = 100 * machineepsilon;
+                  v0 = 100.0 * machineepsilon;
                   v1 = 1 - v0;
                   pspline2calc(&p2, v0, &vx, &vy);
                   pspline2calc(&p2, v1, &vx2, &vy2);
@@ -60744,7 +60744,7 @@ bool testparametric() {
                // near-boundary test for continuity of function values and derivatives:
                // 3-dimensional curve
                   ae_assert(skind == 1 || skind == 2, "TEST: unexpected spline type!");
-                  v0 = 100 * machineepsilon;
+                  v0 = 100.0 * machineepsilon;
                   v1 = 1 - v0;
                   pspline3calc(&p3, v0, &vx, &vy, &vz);
                   pspline3calc(&p3, v1, &vx2, &vy2, &vz2);
@@ -61033,7 +61033,7 @@ static bool testspline2dunit_testunpack(spline2dinterpolant *c, RVector *lx, RVe
          }
       }
    }
-   Ok = err < 10000 * machineepsilon;
+   Ok = err < 10000.0 * machineepsilon;
    ae_frame_leave();
    return Ok;
 }
@@ -61111,7 +61111,7 @@ static bool testspline2dunit_testlintrans(spline2dinterpolant *c, ae_int_t d, do
          }
       }
    }
-   Ok = err < 10000 * machineepsilon;
+   Ok = err < 10000.0 * machineepsilon;
    ae_frame_leave();
    return Ok;
 }
@@ -62851,7 +62851,7 @@ bool testspline2d() {
                   err = rmax2(err, fabs(f.xyR[i][j] - spline2dcalc(&c, x.xR[j], y.xR[i])));
                }
             }
-            blOk = blOk && err <= 10000 * machineepsilon;
+            blOk = blOk && err <= 10000.0 * machineepsilon;
             err = 0.0;
             for (i = 0; i < m - 1; i++) {
                for (j = 0; j < n - 1; j++) {
@@ -62865,7 +62865,7 @@ bool testspline2d() {
                   err = rmax2(err, fabs(0.25 * (f1 + f2 + f3 + f4) - fm));
                }
             }
-            blOk = blOk && err <= 10000 * machineepsilon;
+            blOk = blOk && err <= 10000.0 * machineepsilon;
             testspline2dunit_lconst(&c, &lx, &ly, m, n, lstep, &l1, &l1x, &l1y, &l1xy);
             testspline2dunit_lconst(&c, &lx, &ly, m, n, lstep / 3, &l2, &l2x, &l2y, &l2xy);
             blOk = blOk && l2 / l1 <= 1.2;
@@ -62897,7 +62897,7 @@ bool testspline2d() {
                   err = rmax2(err, fabs(f.xyR[i][j] - spline2dcalc(&c, x.xR[j], y.xR[i])));
                }
             }
-            bcOk = bcOk && err <= 10000 * machineepsilon;
+            bcOk = bcOk && err <= 10000.0 * machineepsilon;
             testspline2dunit_lconst(&c, &lx, &ly, m, n, lstep, &l1, &l1x, &l1y, &l1xy);
             testspline2dunit_lconst(&c, &lx, &ly, m, n, lstep / 3, &l2, &l2x, &l2y, &l2xy);
             bcOk = bcOk && l2 / l1 <= 1.2;
@@ -62941,7 +62941,7 @@ bool testspline2d() {
                t2 = ay + (by - ay) * randomreal();
                err = rmax2(err, fabs(spline2dcalc(&c, t1, t2) - spline2dcalc(&c2, t1, t2)));
             }
-            cpOk = cpOk && err <= 10000 * machineepsilon;
+            cpOk = cpOk && err <= 10000.0 * machineepsilon;
          // Serialization test
             if (randombool()) {
                spline2dbuildbicubic(&x, &y, &f, m, n, &c);
@@ -62974,7 +62974,7 @@ bool testspline2d() {
                t2 = ay + (by - ay) * randomreal();
                err = rmax2(err, fabs(spline2dcalc(&c, t1, t2) - spline2dcalc(&c2, t1, t2)));
             }
-            serOk = serOk && err <= 10000 * machineepsilon;
+            serOk = serOk && err <= 10000.0 * machineepsilon;
          // Special symmetry test
             err = 0.0;
             for (jobtype = 0; jobtype <= 1; jobtype++) {
@@ -62998,7 +62998,7 @@ bool testspline2d() {
                   err = rmax2(err, fabs(spline2dcalc(&c, t1, t2) - spline2dcalc(&c2, t2, t1)));
                }
             }
-            syOk = syOk && err <= 10000 * machineepsilon;
+            syOk = syOk && err <= 10000.0 * machineepsilon;
          }
       }
    }
@@ -63042,10 +63042,10 @@ bool testspline2d() {
                         }
                      }
                      if (jobtype == 0) {
-                        rlOk = rlOk && err / mf <= 10000 * machineepsilon;
+                        rlOk = rlOk && err / mf <= 10000.0 * machineepsilon;
                      }
                      if (jobtype == 1) {
-                        rcOk = rcOk && err / mf <= 10000 * machineepsilon;
+                        rcOk = rcOk && err / mf <= 10000.0 * machineepsilon;
                      }
                   }
                }
@@ -63221,7 +63221,7 @@ static bool testspline3dunit_basictest() {
    NewVector(z, 0, DT_REAL);
    NewVector(sf, 0, DT_REAL);
    NewVector(vf, 0, DT_REAL);
-   eps = 1000 * machineepsilon;
+   eps = 1000.0 * machineepsilon;
 // Test spline ability to reproduce D-dimensional vector function
 //     f[idx](x,y,z) = idx+AX*x + AY*y + AZ*z + AXY*x*y + AYZ*y*z
 // with random AX/AY/...
@@ -63995,7 +63995,7 @@ static bool basicmultilayerrbf1dtest() {
       nlayers = 1;
       errtype = 1;
    // test multilayer algorithm with different parameters
-      while (q >= 1 / (2 * f2)) {
+      while (q * f2 >= 0.5) {
          rbfcreate(nx, ny, &s);
          rbfsetalgomultilayer(&s, r, nlayers, 0.0);
          if (linterm == 1) {
@@ -64071,7 +64071,7 @@ static bool basicmultilayerrbf1dtest() {
          }
          q /= 2;
          nlayers++;
-         if (errtype == 1 && q <= 1 / f2) {
+         if (errtype == 1 && q * f2 <= 1.0) {
             errtype = 2;
          }
       }
@@ -65460,7 +65460,7 @@ static bool testrbfunit_serializationtest() {
          n = iround(pow((double)gridsize, (double)nx));
          ae_matrix_set_length(&xy, n, nx + ny);
          ae_assert(gridsize > 1, "Assertion failed");
-         ae_assert((double)n == pow((double)gridsize, (double)nx), "Assertion failed");
+         ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
          for (i = 0; i < n; i++) {
             k = i;
             for (j = 0; j < nx; j++) {
@@ -66070,7 +66070,7 @@ static bool testrbfunit_basichrbftest() {
          n = iround(pow((double)gridsize, (double)nx));
          ae_matrix_set_length(&xy, n, nx + ny);
          ae_assert(gridsize > 1, "Assertion failed");
-         ae_assert((double)n == pow((double)gridsize, (double)nx), "Assertion failed");
+         ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
          for (i = 0; i < n; i++) {
             k = i;
             for (j = 0; j < nx; j++) {
@@ -66219,7 +66219,7 @@ static bool testrbfunit_basichrbftest() {
          n = iround(pow((double)gridsize, (double)nx));
          ae_matrix_set_length(&xy, n, nx + ny);
          ae_assert(gridsize > 1, "Assertion failed");
-         ae_assert((double)n == pow((double)gridsize, (double)nx), "Assertion failed");
+         ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
          for (i = 0; i < n; i++) {
             k = i;
             for (j = 0; j < nx; j++) {
@@ -66517,7 +66517,7 @@ static bool testrbfunit_basichrbftest() {
       ae_matrix_set_length(&xy, n, nx + ny);
       ae_matrix_set_length(&xy2, n, nx + ny);
       ae_assert(gridsize > 1, "Assertion failed");
-      ae_assert((double)n == pow((double)gridsize, (double)nx), "Assertion failed");
+      ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
       for (i = 0; i < n; i++) {
          k = i;
          for (j = 0; j < nx; j++) {
@@ -66749,7 +66749,7 @@ static bool testrbfunit_scaledhrbftest() {
             n = iround(pow((double)gridsize, (double)nx));
             ae_matrix_set_length(&xy, n, nx + ny);
             ae_assert(gridsize > 1, "Assertion failed");
-            ae_assert((double)n == pow((double)gridsize, (double)nx), "Assertion failed");
+            ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
             ae_vector_set_length(&c0, nx);
             for (j = 0; j < nx; j++) {
                c0.xR[j] = randomreal() - 0.5;
@@ -67227,7 +67227,7 @@ static bool testrbfunit_gridhrbftest() {
          SetVector(&yv2);
          rbfgridcalc2v(&s, &x0, n0, &x1, n1, &yv2);
          for (i = 0; i < ny * n0 * n1; i++) {
-            Ok = Ok && NearAtR(yv.xR[i], yv2.xR[i], 100 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0));
+            Ok = Ok && NearAtR(yv.xR[i], yv2.xR[i], 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0));
          }
       }
    }
@@ -67437,7 +67437,7 @@ static bool testrbfunit_gridhrbftest() {
          SetVector(&yv2);
          rbfgridcalc3v(&s, &x0, n0, &x1, n1, &x2, n2, &yv2);
          for (i = 0; i < ny * n0 * n1 * n2; i++) {
-            Ok = Ok && NearAtR(yv.xR[i], yv2.xR[i], 100 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0));
+            Ok = Ok && NearAtR(yv.xR[i], yv2.xR[i], 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0));
          }
       }
    }
@@ -69203,7 +69203,7 @@ bool testpca() {
             pcadensesubspaceOk = pcadensesubspaceOk && fabs(s.xR[k]) >= fabs(s.xR[k + 1]);
          }
          for (k = 0; k < requested; k++) {
-            pcadensesubspaceOk = pcadensesubspaceOk && (s.xR[k] > 0.0 || SmallAtR(s.xR[k], 1000 * machineepsilon * fabs(s.xR[0])));
+            pcadensesubspaceOk = pcadensesubspaceOk && (s.xR[k] > 0.0 || SmallAtR(s.xR[k], 1000.0 * machineepsilon * fabs(s.xR[0])));
          }
       // Compare variance explained by top REQUESTED vectors from
       // full PCA and variance explained by reduced PCA.
@@ -69370,7 +69370,7 @@ bool testpca() {
             pcasparsesubspaceOk = pcasparsesubspaceOk && fabs(s.xR[k]) >= fabs(s.xR[k + 1]);
          }
          for (k = 0; k < requested; k++) {
-            pcasparsesubspaceOk = pcasparsesubspaceOk && (s.xR[k] > 0.0 || SmallAtR(s.xR[k], 1000 * machineepsilon * rmax2(fabs(s.xR[0]), 1.0)));
+            pcasparsesubspaceOk = pcasparsesubspaceOk && (s.xR[k] > 0.0 || SmallAtR(s.xR[k], 1000.0 * machineepsilon * rmax2(fabs(s.xR[0]), 1.0)));
          }
       // Compare variance explained by top REQUESTED vectors from
       // full PCA and variance explained by reduced PCA.
@@ -69574,11 +69574,11 @@ bool testbdss() {
             split2Ok = false;
             continue;
          }
-         split2Ok = split2Ok && NearAtR(threshold, 0.5, 100 * machineepsilon);
-         split2Ok = split2Ok && NearAtR(pal, 1, 100 * machineepsilon);
-         split2Ok = split2Ok && NearAtR(pbl, 0, 100 * machineepsilon);
-         split2Ok = split2Ok && NearAtR(par, 0, 100 * machineepsilon);
-         split2Ok = split2Ok && NearAtR(pbr, 1, 100 * machineepsilon);
+         split2Ok = split2Ok && NearAtR(threshold, 0.5, 100.0 * machineepsilon);
+         split2Ok = split2Ok && NearAtR(pal, 1.0, 100.0 * machineepsilon);
+         split2Ok = split2Ok && NearAtR(pbl, 0.0, 100.0 * machineepsilon);
+         split2Ok = split2Ok && NearAtR(par, 0.0, 100.0 * machineepsilon);
+         split2Ok = split2Ok && NearAtR(pbr, 1.0, 100.0 * machineepsilon);
       }
    }
 // Special "CREDIT"-test (transparency coefficient)
@@ -69809,7 +69809,7 @@ bool testbdss() {
    if (info != 1) {
       split2Ok = false;
    } else {
-      split2Ok = split2Ok && NearAtR(threshold, 0.195, 100 * machineepsilon);
+      split2Ok = split2Ok && NearAtR(threshold, 0.195, 100.0 * machineepsilon);
       split2Ok = split2Ok && NearAtR(pal, 0.80, 0.02);
       split2Ok = split2Ok && NearAtR(pbl, 0.20, 0.02);
       split2Ok = split2Ok && NearAtR(par, 0.97, 0.02);
@@ -69846,15 +69846,15 @@ bool testbdss() {
             split2Ok = false;
             continue;
          }
-         split2Ok = split2Ok && NearAtR(threshold, 0.5, 100 * machineepsilon);
-         split2Ok = split2Ok && NearAtR(rms, 0, 100 * machineepsilon);
+         split2Ok = split2Ok && NearAtR(threshold, 0.5, 100.0 * machineepsilon);
+         split2Ok = split2Ok && NearAtR(rms, 0.0, 100.0 * machineepsilon);
          if (n == 2) {
-            split2Ok = split2Ok && NearAtR(cvrms, 0.5, 100 * machineepsilon);
+            split2Ok = split2Ok && NearAtR(cvrms, 0.5, 100.0 * machineepsilon);
          } else {
             if (n == 3) {
-               split2Ok = split2Ok && NearAtR(cvrms, sqrt((2 * 0 + 2 * 0 + 2 * 0.25) / 6), 100 * machineepsilon);
+               split2Ok = split2Ok && NearAtR(cvrms, sqrt((2 * 0 + 2 * 0 + 2 * 0.25) / 6), 100.0 * machineepsilon);
             } else {
-               split2Ok = split2Ok && SmallAtR(cvrms, 100 * machineepsilon);
+               split2Ok = split2Ok && SmallAtR(cvrms, 100.0 * machineepsilon);
             }
          }
       }
@@ -69877,9 +69877,9 @@ bool testbdss() {
    if (info != 1) {
       split2Ok = false;
    } else {
-      split2Ok = split2Ok && NearAtR(threshold, n - 2.5, 100 * machineepsilon);
-      split2Ok = split2Ok && NearAtR(rms, sqrt((0.25 + 0.25 + 0.25 + 0.25) / (3 * n)), 100 * machineepsilon);
-      split2Ok = split2Ok && NearAtR(cvrms, sqrt((double)(1 + 1 + 1 + 1) / (3 * n)), 100 * machineepsilon);
+      split2Ok = split2Ok && NearAtR(threshold, n - 2.5, 100.0 * machineepsilon);
+      split2Ok = split2Ok && NearAtR(rms, sqrt((0.25 + 0.25 + 0.25 + 0.25) / (3 * n)), 100.0 * machineepsilon);
+      split2Ok = split2Ok && NearAtR(cvrms, sqrt((double)(1 + 1 + 1 + 1) / (3 * n)), 100.0 * machineepsilon);
    }
 // Optimal split-K
 // General tests for different N's
@@ -69919,8 +69919,8 @@ bool testbdss() {
             continue;
          }
          optimalsplitkOk = optimalsplitkOk && ni == 2;
-         optimalsplitkOk = optimalsplitkOk && NearAtR(thresholds.xR[0], 0.5, 100 * machineepsilon);
-         optimalsplitkOk = optimalsplitkOk && NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100 * machineepsilon);
+         optimalsplitkOk = optimalsplitkOk && NearAtR(thresholds.xR[0], 0.5, 100.0 * machineepsilon);
+         optimalsplitkOk = optimalsplitkOk && NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100.0 * machineepsilon);
       }
    // test #2
       if (n > 2) {
@@ -69941,8 +69941,8 @@ bool testbdss() {
             continue;
          }
          optimalsplitkOk = optimalsplitkOk && ni == 2;
-         optimalsplitkOk = optimalsplitkOk && NearAtR(thresholds.xR[0], 0.5, 100 * machineepsilon);
-         optimalsplitkOk = optimalsplitkOk && NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100 * machineepsilon);
+         optimalsplitkOk = optimalsplitkOk && NearAtR(thresholds.xR[0], 0.5, 100.0 * machineepsilon);
+         optimalsplitkOk = optimalsplitkOk && NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100.0 * machineepsilon);
       }
    // multi-tie test
       if (n >= 16) {
@@ -69971,10 +69971,10 @@ bool testbdss() {
          optimalsplitkOk = optimalsplitkOk && ni == nc;
          if (ni == nc) {
             for (i = 0; i < nc - 1; i++) {
-               optimalsplitkOk = optimalsplitkOk && NearAtR(thresholds.xR[i], c0 * (i + 1) - 1.0 + 0.5, 100 * machineepsilon);
+               optimalsplitkOk = optimalsplitkOk && NearAtR(thresholds.xR[i], c0 * (i + 1) - 1.0 + 0.5, 100.0 * machineepsilon);
             }
             cvr = -((nc - 1) * c0 * log((double)c0 / (c0 + nc - 1)) + c1 * log((double)c1 / (c1 + nc - 1)));
-            optimalsplitkOk = optimalsplitkOk && NearAtR(cve, cvr, 100 * machineepsilon);
+            optimalsplitkOk = optimalsplitkOk && NearAtR(cve, cvr, 100.0 * machineepsilon);
          }
       }
    }
@@ -70017,8 +70017,8 @@ bool testbdss() {
          }
          splitkOk = splitkOk && ni == 2;
          if (ni == 2) {
-            splitkOk = splitkOk && NearAtR(thresholds.xR[0], 0.5, 100 * machineepsilon);
-            splitkOk = splitkOk && NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100 * machineepsilon);
+            splitkOk = splitkOk && NearAtR(thresholds.xR[0], 0.5, 100.0 * machineepsilon);
+            splitkOk = splitkOk && NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100.0 * machineepsilon);
          }
       }
    // test #2
@@ -70041,8 +70041,8 @@ bool testbdss() {
          }
          splitkOk = splitkOk && ni == 2;
          if (ni == 2) {
-            splitkOk = splitkOk && NearAtR(thresholds.xR[0], 0.5, 100 * machineepsilon);
-            splitkOk = splitkOk && NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100 * machineepsilon);
+            splitkOk = splitkOk && NearAtR(thresholds.xR[0], 0.5, 100.0 * machineepsilon);
+            splitkOk = splitkOk && NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100.0 * machineepsilon);
          }
       }
    // multi-tie test
@@ -70063,10 +70063,10 @@ bool testbdss() {
             splitkOk = splitkOk && ni == nc;
             if (ni == nc) {
                for (i = 0; i < nc - 1; i++) {
-                  splitkOk = splitkOk && NearAtR(thresholds.xR[i], c0 * (i + 1) - 1.0 + 0.5, 100 * machineepsilon);
+                  splitkOk = splitkOk && NearAtR(thresholds.xR[i], c0 * (i + 1) - 1.0 + 0.5, 100.0 * machineepsilon);
                }
                cvr = -nc * c0 * log((double)c0 / (c0 + nc - 1));
-               splitkOk = splitkOk && NearAtR(cve, cvr, 100 * machineepsilon);
+               splitkOk = splitkOk && NearAtR(cve, cvr, 100.0 * machineepsilon);
             }
          }
       }
@@ -70564,7 +70564,7 @@ static bool testmlpbaseunit_testinformational(ae_int_t nkind, ae_int_t nin, ae_i
    NewMatrix(neurons, 0, 0, DT_REAL);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
-   threshold = 100000 * machineepsilon;
+   threshold = 100000.0 * machineepsilon;
    testmlpbaseunit_createnetwork(&network, nkind, 0.0, 0.0, nin, nhid1, nhid2, nout);
 // test MLPProperties()
    mlpproperties(&network, &n1, &n2, &wcount);
@@ -70902,7 +70902,7 @@ static bool testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
             v += y1.xR[i];
             Ok = Ok && y1.xR[i] >= 0.0;
          }
-         Ok = Ok && NearAtR(v, 1, 1000 * machineepsilon);
+         Ok = Ok && NearAtR(v, 1, 1000.0 * machineepsilon);
       }
       if (nkind == 2) {
       // B-type network outputs are bounded from above/below
@@ -72409,7 +72409,7 @@ static bool testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
                v += y1.xR[i];
                Ok = Ok && y1.xR[i] >= 0.0;
             }
-            Ok = Ok && NearAtR(v, 1, 1000 * machineepsilon);
+            Ok = Ok && NearAtR(v, 1, 1000.0 * machineepsilon);
          }
          if (nkind == 2) {
          // B-type network outputs are bounded from above/below
@@ -72890,12 +72890,12 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
       }
       c0 = rep->z.xyZ[mergeidx][0];
       c1 = rep->z.xyZ[mergeidx][1];
-      if (dm.xyR[c0][c1] > v + 10000 * machineepsilon) {
+      if (dm.xyR[c0][c1] > v + 10000.0 * machineepsilon) {
          Ok = false;
          ae_frame_leave();
          return Ok;
       }
-      if (rep->mergedist.xR[mergeidx] > v + 10000 * machineepsilon) {
+      if (rep->mergedist.xR[mergeidx] > v + 10000.0 * machineepsilon) {
          Ok = false;
          ae_frame_leave();
          return Ok;
@@ -74444,7 +74444,7 @@ static bool testclusteringunit_kmeansinfinitelooptest() {
    clusterizerrunkmeans(&s, nclusters, &rep);
    Ok = Ok && rep.terminationtype > 0;
    for (i = 0; i < nfeatures; i++) {
-      Ok = Ok && NearAtR(rep.c.xyR[0][i], xy.xyR[0][i], 1000 * machineepsilon);
+      Ok = Ok && NearAtR(rep.c.xyR[0][i], xy.xyR[0][i], 1000.0 * machineepsilon);
    }
    for (i = 0; i < npoints; i++) {
       Ok = Ok && rep.cidx.xZ[i] == 0;
@@ -74798,7 +74798,7 @@ static bool testdforestunit_testprocessing() {
          y1.xR[i] = hqrndnormal(&rs);
       }
       dfprocess(&df1, &x1, &y1);
-      Ok = Ok && NearAtR(y1.xR[0], dfprocess0(&df1, &x2), 100 * machineepsilon);
+      Ok = Ok && NearAtR(y1.xR[0], dfprocess0(&df1, &x2), 100.0 * machineepsilon);
    // DFClassify works as expected
       ae_vector_set_length(&x1, nvars);
       ae_vector_set_length(&x2, nvars);
@@ -74858,7 +74858,7 @@ static bool testdforestunit_testprocessing() {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
-      Ok = Ok && NearAtR(dfprocess0(&df1, &x1), dfprocess0(&df2, &x2), 100 * machineepsilon);
+      Ok = Ok && NearAtR(dfprocess0(&df1, &x1), dfprocess0(&df2, &x2), 100.0 * machineepsilon);
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
@@ -74905,7 +74905,7 @@ static bool testdforestunit_testprocessing() {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
-      Ok = Ok && NearAtR(dfprocess0(&df1, &x1), dfprocess0(&df2, &x2), 100 * machineepsilon);
+      Ok = Ok && NearAtR(dfprocess0(&df1, &x1), dfprocess0(&df2, &x2), 100.0 * machineepsilon);
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
@@ -74922,7 +74922,7 @@ static bool testdforestunit_testprocessing() {
             v += y1.xR[i];
             Ok = Ok && y1.xR[i] >= 0.0;
          }
-         Ok = Ok && NearAtR(v, 1, 1000 * machineepsilon);
+         Ok = Ok && NearAtR(v, 1, 1000.0 * machineepsilon);
       }
    }
    ae_frame_leave();
@@ -75037,7 +75037,7 @@ static bool testdforestunit_basictest1() {
                   Ok = Ok && NearAtR(y.xR[iround(xy.xyR[i][nvars])], 1.0, 1000.0 * machineepsilon);
                } else {
                // Regression problem
-                  Ok = Ok && NearAtR(y.xR[0], xy.xyR[i][nvars], 1000 * machineepsilon);
+                  Ok = Ok && NearAtR(y.xR[0], xy.xyR[i][nvars], 1000.0 * machineepsilon);
                }
             }
          }
@@ -75450,13 +75450,13 @@ static bool testdforestunit_basictest5() {
    Ok = Ok && rep.rmserror < rep.oobrmserror;
    Ok = Ok && rep.avgerror < rep.oobavgerror;
    Ok = Ok && rep.avgrelerror < rep.oobavgrelerror;
-   Ok = Ok && SmallAtR(rep.rmserror, 1000 * machineepsilon);
-   Ok = Ok && SmallAtR(rep.avgerror, 1000 * machineepsilon);
-   Ok = Ok && SmallAtR(rep.avgrelerror, 1000 * machineepsilon);
+   Ok = Ok && SmallAtR(rep.rmserror, 1000.0 * machineepsilon);
+   Ok = Ok && SmallAtR(rep.avgerror, 1000.0 * machineepsilon);
+   Ok = Ok && SmallAtR(rep.avgrelerror, 1000.0 * machineepsilon);
    for (i = 0; i < npoints; i++) {
       ae_v_move(x.xR, 1, xy.xyR[i], 1, nvars);
       dfprocess(&df, &x, &y);
-      if (!NearAtR(y.xR[0], xy.xyR[i][nvars], 1000 * machineepsilon)) {
+      if (!NearAtR(y.xR[0], xy.xyR[i][nvars], 1000.0 * machineepsilon)) {
          Ok = false;
       }
    }
@@ -75601,13 +75601,13 @@ static bool testdforestunit_basictestrandom() {
                dfprocess(&df, &x, &y);
                for (j = 0; j < nclasses; j++) {
                   v = y.xR[j];
-                  if ((double)j == xy.xyR[i][nvars]) {
+                  if (j == xy.xyR[i][nvars]) {
                      refavgce -= log(coalesce(v, minrealnumber)); //(@) Added
                      v--;
                   }
                   refrms += sqr(v);
                   refavg += fabs(v);
-                  if ((double)j == xy.xyR[i][nvars]) {
+                  if (j == xy.xyR[i][nvars]) {
                      refavgrel += fabs(v);
                   // refavgce -= log(v); //(@) Removed
                   }
@@ -75752,13 +75752,13 @@ static bool testdforestunit_basictestallsame() {
             dfprocess(&df, &x, &y);
             for (j = 0; j < nclasses; j++) {
                v = y.xR[j];
-               if ((double)j == xy.xyR[i][nvars]) {
+               if (j == xy.xyR[i][nvars]) {
                   refavgce -= log(coalesce(v, minrealnumber)); //(@) Added
                   v--;
                }
                refrms += sqr(v);
                refavg += fabs(v);
-               if ((double)j == xy.xyR[i][nvars]) {
+               if (j == xy.xyR[i][nvars]) {
                   refavgrel += fabs(v);
                // refavgce -= log(v); //(@) Removed
                }
@@ -75855,7 +75855,7 @@ static bool testdforestunit_testcompression() {
             if (nclasses > 1) {
             // Compare output probabilities for classification problem
                for (j = 0; j < nclasses; j++) {
-                  Ok = Ok && NearAtR(y0.xR[j], y1.xR[j], 1000 * machineepsilon);
+                  Ok = Ok && NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon);
                }
             } else {
             // Compare output values for regression problem
@@ -75874,7 +75874,7 @@ static bool testdforestunit_testcompression() {
             if (nclasses > 1) {
             // Compare output probabilities for classification problem
                for (j = 0; j < nclasses; j++) {
-                  Ok = Ok && NearAtR(y0.xR[j], y1.xR[j], 1000 * machineepsilon);
+                  Ok = Ok && NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon);
                }
             } else {
             // Compare output values for regression problem
@@ -75929,7 +75929,7 @@ static bool testdforestunit_testcompression() {
          if (nclasses > 1) {
          // Compare output probabilities for classification problem
             for (j = 0; j < nclasses; j++) {
-               Ok = Ok && NearAtR(y0.xR[j], y1.xR[j], 1000 * machineepsilon);
+               Ok = Ok && NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon);
             }
          } else {
          // Compare output values for regression problem
@@ -75948,7 +75948,7 @@ static bool testdforestunit_testcompression() {
          if (nclasses > 1) {
          // Compare output probabilities for classification problem
             for (j = 0; j < nclasses; j++) {
-               Ok = Ok && NearAtR(y0.xR[j], y1.xR[j], 1000 * machineepsilon);
+               Ok = Ok && NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon);
             }
          } else {
          // Compare output values for regression problem
@@ -76640,7 +76640,7 @@ bool testlinreg() {
    passcount = 3;
    estpasscount = 1000;
    sigmathreshold = 7.0;
-   threshold = 1000000 * machineepsilon;
+   threshold = 1000000.0 * machineepsilon;
    slOk = true;
    slcOk = true;
    grcovOk = true;
@@ -77234,7 +77234,7 @@ static bool testsma() {
    bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    if (!silent) {
       printf("SMA(K) Test\n");
    }
@@ -77367,7 +77367,7 @@ static bool testlrma() {
    bool Ok;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
-   threshold = 1000 * machineepsilon;
+   threshold = 1000.0 * machineepsilon;
    if (!silent) {
       printf("LRMA(K) Test\n");
    }
@@ -79127,7 +79127,7 @@ static bool testssaunit_testspecial() {
             Ok = Ok && a.rows == 1;
             Ok = Ok && a.cols == 1;
             Ok = Ok && sv.cnt == 1;
-            Ok = Ok && NearAtR(fabs(a.xyR[0][0]), 1.0, 100 * machineepsilon);
+            Ok = Ok && NearAtR(fabs(a.xyR[0][0]), 1.0, 100.0 * machineepsilon);
          }
          if (hqrnduniformr(&rs) > skipprob) {
             windowwidth = -1;
@@ -79141,8 +79141,8 @@ static bool testssaunit_testspecial() {
                ae_frame_leave();
                return Ok;
             }
-            Ok = Ok && NearAtR(trend.xR[0], x.xR[nlasttracklen - 1], 100 * machineepsilon);
-            Ok = Ok && SmallAtR(noise.xR[0], 100 * machineepsilon);
+            Ok = Ok && NearAtR(trend.xR[0], x.xR[nlasttracklen - 1], 100.0 * machineepsilon);
+            Ok = Ok && SmallAtR(noise.xR[0], 100.0 * machineepsilon);
          }
          if (hqrnduniformr(&rs) > skipprob) {
             nanalyzed = 1 + hqrnduniformi(&rs, 10);
@@ -79160,8 +79160,8 @@ static bool testssaunit_testspecial() {
                Ok = Ok && noise.xR[i] == 0.0;
             }
             for (i = imax2(nanalyzed - nlasttracklen, 0); i < nanalyzed; i++) {
-               Ok = Ok && NearAtR(trend.xR[i], x.xR[i - nanalyzed + nlasttracklen], 100 * machineepsilon);
-               Ok = Ok && SmallAtR(noise.xR[i], 100 * machineepsilon);
+               Ok = Ok && NearAtR(trend.xR[i], x.xR[i - nanalyzed + nlasttracklen], 100.0 * machineepsilon);
+               Ok = Ok && SmallAtR(noise.xR[i], 100.0 * machineepsilon);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -79180,8 +79180,8 @@ static bool testssaunit_testspecial() {
                return Ok;
             }
             for (i = 0; i < nticks; i++) {
-               Ok = Ok && NearAtR(trend.xR[i], x2.xR[i], 100 * machineepsilon);
-               Ok = Ok && SmallAtR(noise.xR[i], 100 * machineepsilon);
+               Ok = Ok && NearAtR(trend.xR[i], x2.xR[i], 100.0 * machineepsilon);
+               Ok = Ok && SmallAtR(noise.xR[i], 100.0 * machineepsilon);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -79281,7 +79281,7 @@ static bool testssaunit_testspecial() {
                   if (i == j) {
                      v--;
                   }
-                  Ok = Ok && SmallAtR(v, 100 * machineepsilon);
+                  Ok = Ok && SmallAtR(v, 100.0 * machineepsilon);
                }
             }
          }
@@ -79298,8 +79298,8 @@ static bool testssaunit_testspecial() {
                return Ok;
             }
             for (i = 0; i < windowwidth; i++) {
-               Ok = Ok && NearAtR(trend.xR[i], x.xR[i - windowwidth + nlasttracklen], 100 * machineepsilon);
-               Ok = Ok && SmallAtR(noise.xR[i], 100 * machineepsilon);
+               Ok = Ok && NearAtR(trend.xR[i], x.xR[i - windowwidth + nlasttracklen], 100.0 * machineepsilon);
+               Ok = Ok && SmallAtR(noise.xR[i], 100.0 * machineepsilon);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -79318,8 +79318,8 @@ static bool testssaunit_testspecial() {
                Ok = Ok && noise.xR[i] == 0.0;
             }
             for (i = imax2(nanalyzed - nlasttracklen, 0); i < nanalyzed; i++) {
-               Ok = Ok && NearAtR(trend.xR[i], x.xR[i - nanalyzed + nlasttracklen], 100 * machineepsilon);
-               Ok = Ok && SmallAtR(noise.xR[i], 100 * machineepsilon);
+               Ok = Ok && NearAtR(trend.xR[i], x.xR[i - nanalyzed + nlasttracklen], 100.0 * machineepsilon);
+               Ok = Ok && SmallAtR(noise.xR[i], 100.0 * machineepsilon);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -79339,11 +79339,11 @@ static bool testssaunit_testspecial() {
             }
             for (i = 0; i < nticks; i++) {
                if (nticks >= windowwidth) {
-                  Ok = Ok && NearAtR(trend.xR[i], x2.xR[i], 100 * machineepsilon);
-                  Ok = Ok && SmallAtR(noise.xR[i], 100 * machineepsilon);
+                  Ok = Ok && NearAtR(trend.xR[i], x2.xR[i], 100.0 * machineepsilon);
+                  Ok = Ok && SmallAtR(noise.xR[i], 100.0 * machineepsilon);
                } else {
-                  Ok = Ok && SmallAtR(trend.xR[i], 100 * machineepsilon);
-                  Ok = Ok && NearAtR(noise.xR[i], x2.xR[i], 100 * machineepsilon);
+                  Ok = Ok && SmallAtR(trend.xR[i], 100.0 * machineepsilon);
+                  Ok = Ok && NearAtR(noise.xR[i], x2.xR[i], 100.0 * machineepsilon);
                }
             }
          }
@@ -79759,13 +79759,13 @@ static bool testldaunit_testwn(RMatrix *xy, RMatrix *wn, ae_int_t ns, ae_int_t n
    ae_matrix_set_length(&a, nf, nf);
    matrixmatrixmultiply(wn, 0, nf - 1, 0, nf - 1, false, wn, 0, nf - 1, 0, nf - 1, true, 1.0, &a, 0, nf - 1, 0, nf - 1, 0.0, &work);
    if (smatrixevd(&a, nf, 1, true, &tx, &z)) {
-      Ok = Ok && tx.xR[0] > tx.xR[nf - 1] * 1000 * machineepsilon;
+      Ok = Ok && tx.xR[0] > tx.xR[nf - 1] * 1000.0 * machineepsilon;
    }
 // Test for other properties
    for (j = 0; j < nf; j++) {
       v = ae_v_dotproduct(&wn->xyR[0][j], wn->stride, &wn->xyR[0][j], wn->stride, nf);
       v = sqrt(v);
-      Ok = Ok && NearAtR(v, 1.0, 1000 * machineepsilon);
+      Ok = Ok && NearAtR(v, 1.0, 1000.0 * machineepsilon);
       v = 0.0;
       for (i = 0; i < nf; i++) {
          v += wn->xyR[i][j];
@@ -81196,8 +81196,8 @@ static bool testknnunit_testknnalgo() {
       knnprocessi(&model1, &x1, &y2);
       knntsprocess(&model1, &buf, &x1, &y3);
       for (i = 0; i < nout; i++) {
-         Ok = Ok && NearAtR(y2.xR[i], y1.xR[i], 100 * machineepsilon);
-         Ok = Ok && NearAtR(y3.xR[i], y1.xR[i], 100 * machineepsilon);
+         Ok = Ok && NearAtR(y2.xR[i], y1.xR[i], 100.0 * machineepsilon);
+         Ok = Ok && NearAtR(y3.xR[i], y1.xR[i], 100.0 * machineepsilon);
       }
    // Same inputs leads to same outputs
       ae_vector_set_length(&x1, nvars);
@@ -81264,7 +81264,7 @@ static bool testknnunit_testknnalgo() {
          x1.xR[i] = hqrndnormal(&rs);
          x2.xR[i] = x1.xR[i];
       }
-      Ok = Ok && NearAtR(knnprocess0(&model1, &x1), knnprocess0(&modelus, &x2), 100 * machineepsilon);
+      Ok = Ok && NearAtR(knnprocess0(&model1, &x1), knnprocess0(&modelus, &x2), 100.0 * machineepsilon);
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = hqrndnormal(&rs);
          x2.xR[i] = x1.xR[i];
@@ -81282,7 +81282,7 @@ static bool testknnunit_testknnalgo() {
          y1.xR[i] = hqrndnormal(&rs);
       }
       knnprocess(&model1, &x1, &y1);
-      Ok = Ok && NearAtR(y1.xR[0], knnprocess0(&model1, &x2), 100 * machineepsilon);
+      Ok = Ok && NearAtR(y1.xR[0], knnprocess0(&model1, &x2), 100.0 * machineepsilon);
    // KNNClassify works as expected
       ae_vector_set_length(&x1, nvars);
       ae_vector_set_length(&x2, nvars);
@@ -81467,7 +81467,7 @@ static bool testknnunit_testknnalgo() {
       knnprocess(&model1, &x1, &y1);
       knnprocess(&model2, &x2, &y2);
       for (i = 0; i < nout; i++) {
-         Ok = Ok && NearAtR(y1.xR[i], y2.xR[i], 1000 * machineepsilon);
+         Ok = Ok && NearAtR(y1.xR[i], y2.xR[i], 1000.0 * machineepsilon);
       }
    }
 // Test generalization ability on a simple noisy classification task:
@@ -81511,7 +81511,7 @@ static bool testknnunit_testknnalgo() {
          knnprocess(&model1, &x1, &y1);
          Ok = Ok && y1.xR[0] >= 0.0;
          Ok = Ok && y1.xR[1] >= 0.0;
-         Ok = Ok && NearAtR(y1.xR[0] + y1.xR[1], 1.0, 1000 * machineepsilon);
+         Ok = Ok && NearAtR(y1.xR[0] + y1.xR[1], 1.0, 1000.0 * machineepsilon);
          if (x1.xR[0] < 1.0) {
             Ok = Ok && y1.xR[0] >= 0.8;
          }
@@ -82576,13 +82576,13 @@ static bool testmlptrainunit_testmlpcverror() {
       }
    }
    if (!isregr) {
-      if (diffms <= (double)r0 || diffms <= (double)r1) {
+      if (diffms <= r0 || diffms <= r1) {
          Ok = false;
          ae_frame_leave();
          return Ok;
       }
    }
-   if (diffms <= (double)r2 || diffms <= (double)r3 || diffms <= (double)r4) {
+   if (diffms <= r2 || diffms <= r3 || diffms <= r4) {
       Ok = false;
       ae_frame_leave();
       return Ok;
@@ -82693,7 +82693,7 @@ static bool testmlptrainunit_testmlptrainens() {
          }
       }
    }
-   Ok = Ok && (double)(nall - nless) <= 0.3 * nall;
+   Ok = Ok && nall - nless <= 0.3 * nall;
    ae_frame_leave();
    return Ok;
 }
@@ -82984,7 +82984,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
          }
          mlpeprocess(&netens, &x, &y);
          for (j = 0; j < nout; j++) {
-            if ((double)j != xytrain.xyR[i][nin]) {
+            if (j != xytrain.xyR[i][nin]) {
                avgerr += y.xR[j];
             } else {
                avgerr += 1 - y.xR[j];
@@ -83003,7 +83003,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
          ae_v_move(x.xR, 1, xytest.xyR[i], 1, nin);
          mlpeprocess(&netens, &x, &y);
          for (j = 0; j < nout; j++) {
-            if ((double)j != xytest.xyR[i][nin]) {
+            if (j != xytest.xyR[i][nin]) {
                avgerr += y.xR[j];
             } else {
                avgerr += 1 - y.xR[j];
@@ -83860,7 +83860,7 @@ static bool testalglibbasicsunit_testcomplexarithmetics() {
    ae_int_t pass;
    ae_int_t passcount;
    bool Ok;
-   threshold = 100 * machineepsilon;
+   threshold = 100.0 * machineepsilon;
    passcount = 1000;
    Ok = true;
    absc = true;

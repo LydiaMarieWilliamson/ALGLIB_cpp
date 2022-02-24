@@ -10308,7 +10308,7 @@ void clusterizerseparatedbydist(ahcreport *rep, double r, ae_int_t *k, ZVector *
    SetVector(cz);
    ae_assert(isfinite(r) && r >= 0.0, "ClusterizerSeparatedByDist: R is infinite or less than 0");
    *k = 1;
-   while (*k < rep->npoints && rep->mergedist.xR[rep->npoints - 1 - (*k)] >= r) {
+   while (*k < rep->npoints && rep->mergedist.xR[rep->npoints - 1 - *k] >= r) {
       ++*k;
    }
    clusterizergetkclusters(rep, *k, cidx, cz);
@@ -10366,7 +10366,7 @@ void clusterizerseparatedbycorr(ahcreport *rep, double r, ae_int_t *k, ZVector *
    SetVector(cz);
    ae_assert(isfinite(r) && r >= -1.0 && r <= 1.0, "ClusterizerSeparatedByCorr: R is infinite or less than 0");
    *k = 1;
-   while (*k < rep->npoints && rep->mergedist.xR[rep->npoints - 1 - (*k)] >= 1 - r) {
+   while (*k < rep->npoints && rep->mergedist.xR[rep->npoints - 1 - *k] >= 1 - r) {
       ++*k;
    }
    clusterizergetkclusters(rep, *k, cidx, cz);
@@ -15759,7 +15759,7 @@ void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, dou
    t = sqrt(4 * sqr(sx) + sqr(ss - sxx));
    e1 = 0.5 * (ss + sxx + t);
    e2 = 0.5 * (ss + sxx - t);
-   if (rmin2(e1, e2) <= 1000 * machineepsilon * rmax2(e1, e2)) {
+   if (rmin2(e1, e2) <= 1000.0 * machineepsilon * rmax2(e1, e2)) {
       *info = -3;
       return;
    }
@@ -16055,7 +16055,7 @@ void filtersma(RVector *x, ae_int_t n, ae_int_t k) {
       } else {
          zeroprefix = imin2(zeroprefix, i + 1);
       }
-      if ((double)zeroprefix == termsinsum) {
+      if (zeroprefix == termsinsum) {
          runningsum = 0.0;
       }
    }
@@ -16693,7 +16693,7 @@ static void ssa_updatebasis(ssamodel *s, ae_int_t appendlen, double updateits) {
          s->tmp0.xR[i] = v;
          nu2 += v * v;
       }
-      if (nu2 < 1 - 1000 * machineepsilon) {
+      if (nu2 < 1.0 - 1000.0 * machineepsilon) {
          rmatrixgemv(winw - 1, s->nbasis, 1 / (1 - nu2), &s->basist, 0, 0, 1, &s->tmp0, 0, 0.0, &s->forecasta, 0);
       } else {
          degeneraterecurrence = true;
@@ -18913,7 +18913,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
       return;
    }
    ae_matrix_set_length(w, nvars, nvars);
-   if (d.xR[nvars - 1] <= 0.0 || d.xR[0] <= 1000 * machineepsilon * d.xR[nvars - 1]) {
+   if (d.xR[nvars - 1] <= 0.0 || d.xR[0] <= 1000.0 * machineepsilon * d.xR[nvars - 1]) {
    // Special case: D[NVars-1] <= 0
    // Degenerate task (all variables takes the same value).
       if (d.xR[nvars - 1] <= 0.0) {
@@ -18943,7 +18943,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
    // factors to full N-dimensional subspace.
       m = 0;
       for (k = 0; k < nvars; k++) {
-         if (d.xR[k] <= 1000 * machineepsilon * d.xR[nvars - 1]) {
+         if (d.xR[k] <= 1000.0 * machineepsilon * d.xR[nvars - 1]) {
             m = k + 1;
          }
       }
@@ -22583,7 +22583,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
          stepnorm = ae_v_dotproduct(wdir.xR, 1, wdir.xR, 1, wcount);
          stepnorm = sqrt(stepnorm);
          enew = mlperror(network, xy, npoints) + 0.5 * decay * xnorm2;
-         if (stepnorm < lmsteptol * (1 + sqrt(xnorm2))) {
+         if (stepnorm < lmsteptol * (1.0 + sqrt(xnorm2))) {
             break;
          }
          if (enew > e) {
@@ -22918,7 +22918,7 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
                ae_v_move(wbest.xR, 1, network->weights.xR, 1, wcount);
                itbest = itcnt;
             }
-            if (itcnt > 30 && (double)itcnt > 1.5 * itbest) {
+            if (itcnt > 30 && itcnt > 1.5 * itbest) {
                *info = 6;
                break;
             }
@@ -23506,7 +23506,7 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
             ebest = eval;
             itbest = itcnt;
          }
-         if (itcnt > 30 && (double)itcnt > 1.5 * itbest) {
+         if (itcnt > 30 && itcnt > 1.5 * itbest) {
             break;
          }
          itcnt++;
@@ -23732,7 +23732,7 @@ static void mlptrain_mlptrainensemblex(mlptrainer *s, mlpensemble *ensemble, ae_
                   valsubsetsize++;
                }
             }
-         } while (!(trnsubsetsize != 0 && valsubsetsize != 0));
+         } while (trnsubsetsize == 0 || valsubsetsize == 0);
       }
       if (trainingmethod == 1) {
          valsubsetsize = 0;
@@ -24774,7 +24774,7 @@ void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double de
                valsize++;
             }
          }
-      } while (!(trnsize != 0 && valsize != 0));
+      } while (trnsize == 0 || valsize == 0);
    // Train
       mlptraines(&ensemble->network, &trnxy, trnsize, &valxy, valsize, decay, restarts, &tmpinfo, &tmprep);
       if (tmpinfo < 0) {

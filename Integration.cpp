@@ -1698,7 +1698,7 @@ Spawn:
    }
    state->info = 1;
    if (state->eps == 0.0) {
-      state->eps = 100000 * machineepsilon;
+      state->eps = 100000.0 * machineepsilon;
    }
 // First, prepare heap
 // * column 0   -   absolute error

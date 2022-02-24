@@ -1375,7 +1375,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
             mx = rmax2(mx, fabs(ce->xyR[i][j] * x->xR[j]));
             v += ce->xyR[i][j] * x->xR[j];
          }
-         converged = converged && SmallAtR(v, 100 * machineepsilon * mx);
+         converged = converged && SmallAtR(v, 100.0 * machineepsilon * mx);
       }
       feaserr0 = feaserr;
       if (converged) {
@@ -1752,7 +1752,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    //    Depending on feasibility error, True or False is returned.
       feaserr = optserv_feasibilityerror(ce, x, nmain, nslack, k, &tmpk);
       feaserr1 = feaserr;
-      if (feaserr1 >= feaserr0 * (1 - 1000 * machineepsilon)) {
+      if (feaserr1 >= feaserr0 * (1.0 - 1000.0 * machineepsilon)) {
          badits++;
       } else {
          badits = 0;
@@ -1992,7 +1992,7 @@ void inexactlbfgspreconditioner(RVector *s, ae_int_t n, RVector *d, RVector *c, 
          v0 += vx * vx;
          v1 += vy * vy;
       }
-      if (v > 0.0 && v0 * v1 > 0.0 && v / sqrt(v0 * v1) > n * 10 * machineepsilon) {
+      if (v > 0.0 && v0 * v1 > 0.0 && v > n * 10.0 * machineepsilon * sqrt(v0 * v1)) {
          buf->rho.xR[i] = 1 / v;
       } else {
          buf->rho.xR[i] = 0.0;
@@ -7925,7 +7925,7 @@ bool sasstartoptimization(sactiveset *state, RVector *x) {
             v0 += sqr(vx);
             v1 += sqr(vc);
          }
-         vv = sqrt(v0) * sqrt(v1) * 1000 * machineepsilon;
+         vv = sqrt(v0) * sqrt(v1) * 1000.0 * machineepsilon;
          if (i < state->nec) {
             state->cstatus.xZ[n + i] = 1;
             state->feasinitpt = state->feasinitpt && SmallR(v, vv);
@@ -8643,7 +8643,7 @@ void sasrebuildbasis(sactiveset *state) {
       //       marginally higher than that of best candidate.
       //       No need to perform costly re-evaluation in order
       //       to get just few percents of improvement.
-         if (state->tmpnormestimates.xR[i] < vmax * (1 + minnormseparation)) {
+         if (state->tmpnormestimates.xR[i] < vmax * (1.0 + minnormseparation)) {
             continue;
          }
       // OK, upper bound is large enough... lets perform full
@@ -11457,7 +11457,7 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
          buffers->qrkkt.xyR[i][nqrcols] = buffers->qrrightpart.xR[i];
       }
       rmatrixqr(&buffers->qrkkt, nqrrows, nqrcols + 1, &buffers->qrtau);
-      if (rmatrixtrrcond1(&buffers->qrkkt, nqrcols, true, false) <= 1000 * machineepsilon) {
+      if (rmatrixtrrcond1(&buffers->qrkkt, nqrcols, true, false) <= 1000.0 * machineepsilon) {
          lambdareg = coalesce(10 * lambdareg, 1.0E-13);
          continue;
       }
@@ -12055,8 +12055,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
       // NOTE: we use selection sort algorithm because its O(NAdded*NWork) cost
       //       is still comparable to the cost of constraints evaluation
          workingsetextended = false;
-         i = 0;
-         while ((double)i < 1 + expansionratio * nmain && nicwork < nictotal) {
+         for (i = 0; i < 1 + expansionratio * nmain && nicwork < nictotal; i++) {
          // Select most violated constraint
             k = nicwork;
             for (j = nicwork; j < nictotal; j++) {
@@ -12077,7 +12076,6 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
                nicwork++;
                nwork++;
                kwork++;
-               i++;
                workingsetextended = true;
             } else {
                break;
@@ -17561,7 +17559,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
 // * DampFree - additional damping coefficient for free variables
    regfree = pow(machineepsilon, 0.75);
    dampfree = 0.0;
-   regeps = 100 * machineepsilon;
+   regeps = 100.0 * machineepsilon;
    modeps = (100 + sqrt(n)) * machineepsilon;
    dampeps = (100 + sqrt(n)) * machineepsilon;
    safedampeps = sqrt(machineepsilon);
@@ -25242,10 +25240,10 @@ static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolve
    eignew = ynrm2 / sy;
    eigcorrection = 1.0;
    if (eignew > eigold * growth) {
-      eigcorrection = 1 / (eignew / (eigold * growth));
+      eigcorrection = eigold * growth / eignew;
    }
-   if (eignew < eigold / growth) {
-      eigcorrection = 1 / (eignew / (eigold / growth));
+   if (eignew * growth < eigold) {
+      eigcorrection = eigold / (eignew * growth);
    }
 // Update Hessian
    rmatrixger(n, n, &subsolver->h, 0, 0, -1 / shs, &subsolver->tmp0, 0, &subsolver->tmp0, 0);
@@ -35923,7 +35921,7 @@ Spawn:
             //   and V1 - directional derivative at XK1
             // * set GammaK to Max(GammaK, |V1-V0|/V2)
                for (i = 0; i < n; i++) {
-                  ae_assert(NearAtR(state->auloptimizer.x.xR[i], state->xk1.xR[i], 100 * machineepsilon) || !(isfinite(state->auloptimizer.x.xR[i]) && isfinite(state->xk1.xR[i])), "MinNLC: integrity check failed, unexpected behavior of LBFGS optimizer");
+                  ae_assert(NearAtR(state->auloptimizer.x.xR[i], state->xk1.xR[i], 100.0 * machineepsilon) || !(isfinite(state->auloptimizer.x.xR[i]) && isfinite(state->xk1.xR[i])), "MinNLC: integrity check failed, unexpected behavior of LBFGS optimizer");
                }
                v2 = 0.0;
                for (i = 0; i < n; i++) {
@@ -37777,7 +37775,7 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
    state->agsstattold = 1.0E-10;
    state->agsshortstpabs = 1.0E-10;
    state->agsshortstprel = 0.75;
-   state->agsshortf = 10 * machineepsilon;
+   state->agsshortf = 10.0 * machineepsilon;
    state->agsrhononlinear = 0.0;
    state->agsraddecay = 0.2;
    state->agsalphadecay = 0.5;

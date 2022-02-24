@@ -3034,7 +3034,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
       return;
    }
    if (threshold == 0.0) {
-      threshold = 1000 * machineepsilon;
+      threshold = 1000.0 * machineepsilon;
    }
 // Factorize A first
    svdfailed = !rmatrixsvd(a, nrows, ncols, 1, 2, 2, &sv, &u, &vt);
@@ -4914,8 +4914,8 @@ Spawn:
          state->repterminationtype = 1;
          goto Exit;
       }
-      if (state->alphaip1 * fabs(state->ci) / state->anorm <= state->epsa) {
-      // ||A^T*Rk||/(||A||*||Rk||) <= EpsA, here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
+      if (state->alphaip1 * fabs(state->ci) <= state->epsa * state->anorm) {
+      // ||A^T*Rk|| <= EpsA*(||A||*||Rk||), here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
          state->running = false;
          state->repterminationtype = 4;
          goto Exit;

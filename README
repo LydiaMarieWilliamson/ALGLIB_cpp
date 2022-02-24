@@ -36,4 +36,4 @@ ALGLIB++ is licensed under the same GPL restrictions as the GPL version of ALGLI
 ALGLIB++ undergoes a process of automated upgrade/reengineering/refactoring/testing.
 It does not use version numbers but, instead, is marked by the timestamp of the most recent test.
 The latest updates of the testing and development sequence are listed in section A6 of the ALGLIB++ Supplementary Sections (Notes.htm).
-The timestamp of the current revision is 1645175143 (620f6167).
+The timestamp of the current revision is 1645649689 (62169f19).
