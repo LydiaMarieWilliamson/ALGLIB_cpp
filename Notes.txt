@@ -507,6 +507,9 @@ A6.2. Test Stages
 	for C ≥ 0; in most places, removing a hidden bug in the PCA test in TestC.cpp, and possibly other hidden bugs, as a result.
 0-39	Removed stdafx.h.
 	Future expansion of ALGLIB++ to Windows support will take place either in LLVM or in VC with "precompiled headers" turned off.
+0-39	Ap.{cpp,h}: Reconciled with AlgLib++
+	―	Removed valgrind from ae_dyn_block (it was a recent addition to ALGLIB, and is redundant, unused except as a debugging hook.)
+	―	Commented out multi-threading stubs; reserving for later reuse or appropriation with a new multi-threading framework.
 
 A6.3. Test Results
 ──────────────────

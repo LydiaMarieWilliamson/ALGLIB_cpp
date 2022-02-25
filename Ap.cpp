@@ -120,6 +120,7 @@ void ae_state_set_flags(ae_uint64_t flags) { CurFlags = flags; }
 // A pointer to the top block in a stack of frames which hold dynamically allocated objects.
 AutoS ae_frame *volatile TopFr;
 
+#if 0 //(@) Not used, but retained for possible inclusion into the multi-threading core being created anew for ALGLIB++.
 // Threading information.
 // NOTES:
 // *	These are remnants from the Commercial Version, which worked with the (Commercial-only) file smp.h.
@@ -132,6 +133,7 @@ AutoS void *CurThread = NULL;
 AutoS void *CurTask = NULL;
 // *	The thread exception handler: the function which must be called by ae_assert() before raising an exception.
 AutoS void (*ErrorOp)(void *) = NULL;
+#endif
 
 // The stack and frame boundary special blocks.
 static unsigned char DynBottom = 1, DynFrame = 2;
@@ -161,8 +163,10 @@ void ae_state_init() {
    static ae_frame BotFr = { &BotFr, NULL, &DynBottom };
 // Set the status indicators and clear the frame.
    CurBreakAt = NULL, CurMsg = "", CurFlags = NonTH, TopFr = &BotFr;
+#if 0 //(@) Not used, but retained for possible inclusion into the multi-threading core being created anew for ALGLIB++.
 // Set the threading information.
    CurThread = NULL, CurTask = NULL, ErrorOp = NULL;
+#endif
 }
 
 // Clear the ALGLIB++ frame stack environment, freeing all the dynamic data in it that it controls.
@@ -177,7 +181,9 @@ void ae_state_clear() {
 // For TopFr != NULL call ErrorOp(), if defined.
 // For TopFr == NULL do nothing.
 void ae_clean_up() {
+#if 0 //(@) Not used, but retained for possible inclusion into the multi-threading core being created anew for ALGLIB++.
    if (TopFr != NULL && ErrorOp != NULL) ErrorOp(TopFr);
+#endif
 }
 
 // Abnormally abort the program, using one of several ways:
@@ -185,10 +191,14 @@ void ae_clean_up() {
 // *	else abort().
 // In all cases, for TopFr != NULL, set the CurStatus and CurMsg fields.
 // Clear the frame stack, if any, with ae_state_clear().
+#if 0 //(@) Not used, but retained for possible inclusion into the multi-threading core being created anew for ALGLIB++.
 // If TopFr != NULL and ErrorOp() != NULL, call ErrorOp() before handling errors and clearing TopFr.
+#endif
 static void ae_break(ae_error_type error_type, const char *msg) {
    if (TopFr == NULL) abort();
+#if 0 //(@) Not used, but retained for possible inclusion into the multi-threading core being created anew for ALGLIB++.
    if (ErrorOp != NULL) ErrorOp(TopFr);
+#endif
    ae_state_clear();
    CurStatus = error_type, CurMsg = msg;
    if (CurBreakAt != NULL) longjmp(*CurBreakAt, 1); else abort();
@@ -211,8 +221,6 @@ void ae_assert(bool cond, const char *msg) {
 #define _ALGLIB_FLG_THREADING_MASK	0x7
 #define _ALGLIB_FLG_THREADING_SHIFT	0
 
-// The following variables are included:
-// *	threading-related settings
 static unsigned char _alglib_global_threading_flags = SerTH >> _ALGLIB_FLG_THREADING_SHIFT;
 
 // Get/Set the default (global) threading model:
@@ -316,6 +324,14 @@ static ae_cpuid_t ae_cpuid() {
 #   elif AE_COMPILER == AE_MSVC
       int CPUInfo[4];
       __cpuid(CPUInfo, 1);
+#   endif
+   } { // Perform other CPU-related initializations.
+#   if AE_COMPILER == AE_GNUC && 0
+   // (@) Legacy code required for earlier versions of GCC, no longer needed here.
+   // (@) TODO: If it still needed to be used, then make ModeCPU externally accessible, so that it can be used to reset the CPU.
+   // Set rounding for floating-point math to double precision for x86/x64 processors under GCC.
+      fp_control_t ModeCPU; _FPU_GETCW(ModeCPU);
+      _FPU_SETCW(ModeCPU & ~(_FPU_EXTENDED | _FPU_SINGLE) | FPU_DOUBLE);
 #   endif
    }
 #endif
@@ -730,9 +746,8 @@ void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic) {
 // *	These strange dances around block->ptr are necessary in order to correctly handle possible exceptions during memory allocation.
    ae_assert(size >= 0, "ae_db_init: negative size");
    block->ptr = NULL;
-   block->valgrind_hint = NULL;
    if (make_automatic) ae_db_attach(block); else block->p_next = NULL;
-   if (size != 0) block->ptr = ae_malloc((size_t)size), block->valgrind_hint = aligned_extract_ptr(block->ptr);
+   if (size != 0) block->ptr = ae_malloc((size_t)size);
    block->deallocator = ae_free;
 }
 
@@ -746,9 +761,8 @@ void ae_db_realloc(ae_dyn_block *block, ae_int_t size) {
 // NOTE:
 // *	These strange dances around block->ptr are necessary in order to correctly handle possible exceptions during memory allocation.
    ae_assert(size >= 0, "ae_db_realloc: negative size");
-   if (block->ptr != NULL) block->deallocator(block->ptr), block->ptr = NULL, block->valgrind_hint = NULL;
+   if (block->ptr != NULL) block->deallocator(block->ptr), block->ptr = NULL;
    block->ptr = ae_malloc((size_t)size);
-   block->valgrind_hint = aligned_extract_ptr(block->ptr);
    block->deallocator = ae_free;
 }
 
@@ -758,7 +772,6 @@ void ae_db_realloc(ae_dyn_block *block, ae_int_t size) {
 // *	Avoid calling it for the special blocks which mark frame boundaries!
 void ae_db_free(ae_dyn_block *block) {
    if (block->ptr != NULL) block->deallocator(block->ptr), block->ptr = NULL;
-   block->valgrind_hint = NULL;
    block->deallocator = ae_free;
 }
 
@@ -768,13 +781,10 @@ void ae_db_free(ae_dyn_block *block) {
 // *	Avoid calling it for the special blocks which mark frame boundaries!
 void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2) {
    void *volatile ptr = block1->ptr;
-   void *valgrind_hint = block1->valgrind_hint;
    void (*deallocator)(void *) = block1->deallocator;
    block1->ptr = block2->ptr;
-   block1->valgrind_hint = block2->valgrind_hint;
    block1->deallocator = block2->deallocator;
    block2->ptr = ptr;
-   block2->valgrind_hint = valgrind_hint;
    block2->deallocator = deallocator;
 }
 
