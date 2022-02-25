@@ -505,6 +505,8 @@ A6.2. Test Stages
 	―	(A-B)/C ≥ D to A-B ≥ C×D,
 	―	|A-B|/C ≥ D to |A-B| ≥ C×D,
 	for C ≥ 0; in most places, removing a hidden bug in the PCA test in TestC.cpp, and possibly other hidden bugs, as a result.
+0-39	Removed stdafx.h.
+	Future expansion of ALGLIB++ to Windows support will take place either in LLVM or in VC with "precompiled headers" turned off.
 
 A6.3. Test Results
 ──────────────────
