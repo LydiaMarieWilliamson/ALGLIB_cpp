@@ -108,6 +108,21 @@ void ae_state_set_flags(ae_uint64_t flags) { CurFlags = flags; }
 // A pointer to the top block in a stack of frames which hold dynamically allocated objects.
 AutoS ae_frame *volatile TopFr;
 
+#if 0 //(@) Not used, but retained for possible inclusion into the multi-threading core being created anew for ALGLIB++.
+// Threading information.
+// NOTES:
+// *	These are remnants from the Commercial Version, which worked with the (Commercial-only) file smp.h.
+// *	They were declared as generic pointers of type (void *) in order to avoid explicit dependency on smp.h.
+// *	The current thread pool.
+// AutoS void *CurPool = NULL; //(@) Was never included in the Free Version.
+// *	The current worker thread.
+AutoS void *CurThread = NULL;
+// *	The parent task: the one we are solving right now.
+AutoS void *CurTask = NULL;
+// *	The thread exception handler: the function which must be called by ae_assert() before raising an exception.
+AutoS void (*ErrorOp)(void *) = NULL;
+#endif
+
 // The stack and frame boundary special blocks.
 static unsigned char DynBottom = 1, DynFrame = 2;
 
@@ -136,6 +151,10 @@ void ae_state_init() {
    static ae_frame BotFr = { &BotFr, NULL, &DynBottom };
 // Set the status indicators and clear the frame.
    CurBreakAt = NULL, CurMsg = "", CurFlags = NonTH, TopFr = &BotFr;
+#if 0 //(@) Not used, but retained for possible inclusion into the multi-threading core being created anew for ALGLIB++.
+// Set the threading information.
+   CurThread = NULL, CurTask = NULL, ErrorOp = NULL;
+#endif
 }
 
 // Clear the ALGLIB++ frame stack environment, freeing all the dynamic data in it that it controls.
@@ -146,13 +165,28 @@ void ae_state_clear() {
    TopFr = NULL;
 }
 
+// Clean up automatically managed memory before the caller terminates ALGLIB++.
+// For TopFr != NULL call ErrorOp(), if defined.
+// For TopFr == NULL do nothing.
+void ae_clean_up() {
+#if 0 //(@) Not used, but retained for possible inclusion into the multi-threading core being created anew for ALGLIB++.
+   if (TopFr != NULL && ErrorOp != NULL) ErrorOp(TopFr);
+#endif
+}
+
 // Abnormally abort the program, using one of several ways:
 // *	if TopFr != NULL and CurBreakAt points to a jmp_buf - longjmp() to the return site,
 // *	else abort().
 // In all cases, for TopFr != NULL, set the CurStatus and CurMsg fields.
 // Clear the frame stack, if any, with ae_state_clear().
+#if 0 //(@) Not used, but retained for possible inclusion into the multi-threading core being created anew for ALGLIB++.
+// If TopFr != NULL and ErrorOp() != NULL, call ErrorOp() before handling errors and clearing TopFr.
+#endif
 static void ae_break(ae_error_type error_type, const char *msg) {
    if (TopFr == NULL) abort();
+#if 0 //(@) Not used, but retained for possible inclusion into the multi-threading core being created anew for ALGLIB++.
+   if (ErrorOp != NULL) ErrorOp(TopFr);
+#endif
    ae_state_clear();
    CurStatus = error_type, CurMsg = msg;
    if (CurBreakAt != NULL) longjmp(*CurBreakAt, 1); else abort();
@@ -168,16 +202,13 @@ void ae_assert(bool cond, const char *msg) {
    if (!cond) ae_break(ERR_ASSERTION_FAILED, msg);
 }
 
-static void ae_impose(bool cond, const char *msg) {
-   if (!cond) fprintf(stderr, msg), abort();
-}
-
 #define AE_CRITICAL_ASSERT(x) if (!(x)) abort()
 
 // Make flags variables into one or more char-sized variables in order to avoid problems with non-atomic reads/writes
 // (single-byte ops are atomic on all contemporary CPUs).
 #define _ALGLIB_FLG_THREADING_MASK	0x7
 #define _ALGLIB_FLG_THREADING_SHIFT	0
+
 static unsigned char _alglib_global_threading_flags = SerTH >> _ALGLIB_FLG_THREADING_SHIFT;
 
 // Get/Set the default (global) threading model:
@@ -766,8 +797,8 @@ void ae_vector_free(ae_vector *dst, bool/* make_automatic*/) {
 
 // Efficiently swap ae_vector vec1 with ae_vector vec2, leaving other pararemeters (automatic management, etc.) intact.
 void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2) {
-   ae_impose(!vec1->is_attached, "ae_swap_vectors: internal error, attempt to swap vectors attached to X-object");
-   ae_impose(!vec2->is_attached, "ae_swap_vectors: internal error, attempt to swap vectors attached to X-object");
+   ae_assert(!vec1->is_attached, "ae_swap_vectors: internal error, attempt to swap vectors attached to X-object");
+   ae_assert(!vec2->is_attached, "ae_swap_vectors: internal error, attempt to swap vectors attached to X-object");
    ae_db_swap(&vec1->data, &vec2->data);
    ae_int_t cnt = vec1->cnt;
    ae_datatype datatype = vec1->datatype;
@@ -877,8 +908,8 @@ void ae_matrix_free(ae_matrix *dst, bool/* make_automatic*/) {
 
 // Efficiently swap ae_matrix mat1 with ae_matrix mat2, leaving other pararemeters (automatic management, etc.) intact.
 void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2) {
-   ae_impose(!mat1->is_attached, "ae_swap_matrices: internal error, attempt to swap matrices attached to X-object");
-   ae_impose(!mat2->is_attached, "ae_swap_matrices: internal error, attempt to swap matrices attached to X-object");
+   ae_assert(!mat1->is_attached, "ae_swap_matrices: internal error, attempt to swap matrices attached to X-object");
+   ae_assert(!mat2->is_attached, "ae_swap_matrices: internal error, attempt to swap matrices attached to X-object");
    ae_db_swap(&mat1->data, &mat2->data);
    ae_int_t cols = mat1->cols;
    ae_int_t rows = mat1->rows;
@@ -5808,7 +5839,7 @@ static complex parse_complex_delim(const char *s, const char *delim) {
       if (!_parse_real_delim(s, "i", &c_result.y, &new_s))
          ThrowError("Cannot parse value");
       s = new_s + 1;
-      if (*s == 0 || strchr(delim, *s) == NULL)
+      if (*s == '\0' || strchr(delim, *s) == NULL)
          ThrowError("Cannot parse value");
       return c_result;
    }

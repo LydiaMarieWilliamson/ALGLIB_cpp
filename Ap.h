@@ -215,6 +215,7 @@ void ae_frame_leave();
 void ae_state_init();
 void ae_state_clear();
 
+void ae_clean_up();
 void ae_assert(bool cond, const char *msg);
 
 // Get/set the threading model type.
@@ -283,12 +284,6 @@ struct ae_dyn_block {
    ae_deallocator deallocator; // Was: void *deallocator;
 // The argument for deallocator(); or NULL for 0-size blocks, or the DYN_BOTTOM or DYN_FRAME stack frame/boundary "special" blocks.
    void *volatile ptr;
-// A "hint" pointer for Valgrind and other similar memory checking tools,
-// that saves what malloc() actually returned, or NULL if the feature is disabled or lost.
-// It is always set at run-time to to (ptr == NULL? NULL: aligned_extract_ptr(ptr)).
-// Memory testing tools may sometimes report "(possibly) lost" memory for the pointers that ALGLIB++ assigns,
-// since it aligns pointers in such a way that X usually points beyond the actual allocated memory's start.
-   void *valgrind_hint; // It is always set to (ptr == NULL? NULL: aliged_extract_ptr(ptr)).
 };
 void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic);
 void ae_db_realloc(ae_dyn_block *block, ae_int_t size);
@@ -760,7 +755,7 @@ struct ap_error {
 #   define ThrowError(Msg)	throw ap_error(Msg)
 #   define ThrowErrorMsg(X)	throw ap_error()
 #   define BegPoll		{ try {
-#   define EndPoll		} catch(...) { alglib_impl::ae_state_clear(); throw; } }
+#   define EndPoll		} catch(...) { alglib_impl::ae_clean_up(), alglib_impl::ae_state_clear(); throw; } }
 #else
 // Exception-free code.
 #   define ThrowErrorMsg(X)	set_error_msg(); return X
