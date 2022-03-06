@@ -1136,7 +1136,7 @@ void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae
    v2 = maxrealnumber;
    j = -1;
    for (i = 1; i < tiecount; i++) {
-      if (fabs(ties.xZ[i] - 0.5 * (n - 1)) < v2) {
+      if (NearR(ties.xZ[i], 0.5 * (n - 1), v2)) {
          v2 = fabs(ties.xZ[i] - 0.5 * n);
          j = i;
       }
@@ -1349,7 +1349,7 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
       v2 = maxrealnumber;
       j = -1;
       for (i = 1; i < tiecount; i++) {
-         if (fabs(ties.xZ[i] - 0.5 * (n - 1)) < v2) {
+         if (NearR(ties.xZ[i], 0.5 * (n - 1), v2)) {
             v2 = fabs(ties.xZ[i] - 0.5 * (n - 1));
             j = i;
          }
@@ -2635,7 +2635,7 @@ void mlpactivationfunction(double net, ae_int_t k, double *f, double *df, double
    }
    if (k == 1) {
    // TanH activation function
-      if (fabs(net) < 100.0) {
+      if (SmallR(net, 100.0)) {
          *f = tanh(net);
       } else {
          *f = (double)sign(net);
@@ -2811,7 +2811,7 @@ static double mlpbase_safecrossentropy(double t, double z) {
    if (t == 0.0) {
       result = 0.0;
    } else {
-      if (fabs(z) > 1.0) {
+      if (!SmallAtR(z, 1.0)) {
       // Shouldn't be the case with softmax,
       // but we just want to be sure.
          if (t / z == 0.0) {
@@ -2821,7 +2821,7 @@ static double mlpbase_safecrossentropy(double t, double z) {
          }
       } else {
       // Normal case
-         if (z == 0.0 || fabs(t) >= maxrealnumber * fabs(z)) {
+         if (z == 0.0 || !SmallR(t, maxrealnumber * fabs(z))) {
             r = maxrealnumber;
          } else {
             r = t / z;
@@ -15614,7 +15614,7 @@ void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int
    for (j = 0; j < nvars; j++) {
       ae_v_move(x.xR, 1, &xy->xyR[0][j], xy->stride, npoints);
       samplemoments(&x, npoints, &mean, &variance, &skewness, &kurtosis);
-      if (fabs(mean) > sqrt(variance)) {
+      if (!SmallAtR(mean, sqrt(variance))) {
       // variation is relatively small, it is better to
       // bring mean value to 1
          c.xR[j] = mean;
@@ -20622,7 +20622,7 @@ Spawn:
       if (state->brackt && state->stmax - state->stmin <= logit_xtol * state->stmax) {
          *info = 2;
       }
-      if (f <= state->ftest1 && fabs(state->dg) <= -logit_gtol * state->dginit) {
+      if (f <= state->ftest1 && SmallAtR(state->dg, -logit_gtol * state->dginit)) {
          *info = 1;
       }
    // Check for termination.
@@ -20657,7 +20657,7 @@ Spawn:
       }
    // Force a sufficient decrease in the size of the uncertainty interval.
       if (state->brackt) {
-         if (fabs(state->sty - state->stx) >= p66 * state->width1) {
+         if (!NearR(state->sty, state->stx, p66 * state->width1)) {
             *stp = state->stx + p5 * (state->sty - state->stx);
          }
          state->width1 = state->width;

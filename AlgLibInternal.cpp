@@ -52,24 +52,6 @@ double logbase2(double x) {
    return result;
 }
 
-// This function compares two numbers for approximate equality, with tolerance
-// to errors as large as tol.
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-bool approxequal(double a, double b, double tol) {
-   bool result;
-   result = fabs(a - b) <= tol;
-   return result;
-}
-
-// This function compares two numbers for approximate equality, with tolerance
-// to errors as large as max(|a|,|b|)*tol.
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-bool approxequalrel(double a, double b, double tol) {
-   bool result;
-   result = fabs(a - b) <= rmax2(fabs(a), fabs(b)) * tol;
-   return result;
-}
-
 // This  function  generates  1-dimensional  general  interpolation task with
 // moderate Lipshitz constant (close to 1.0)
 //
@@ -793,14 +775,14 @@ ae_int_t saferdiv(double x, double y, double *r) {
 //
    if (y >= 1.0) {
       *r = x / y;
-      if (fabs(*r) <= minrealnumber) {
+      if (SmallAtR(*r, minrealnumber)) {
          result = -1;
          *r = 0.0;
       } else {
          result = 0;
       }
    } else {
-      if (fabs(x) >= maxrealnumber * y) {
+      if (!SmallR(x, maxrealnumber * y)) {
          if (x > 0.0) {
             *r = +INFINITY;
          } else {
@@ -8487,7 +8469,7 @@ Spawn:
       if (state->brackt && state->stmax - state->stmin <= linmin_xtol * state->stmax) {
          *info = 2;
       }
-      if (f < state->finit && f <= state->ftest1 && fabs(state->dg) <= -gtol * state->dginit) {
+      if (f < state->finit && f <= state->ftest1 && SmallAtR(state->dg, -gtol * state->dginit)) {
          *info = 1;
       }
    // Check for termination.
@@ -8532,7 +8514,7 @@ Spawn:
       }
    // Force a sufficient decrease in the size of the uncertainty interval.
       if (state->brackt) {
-         if (fabs(state->sty - state->stx) >= p66 * state->width1) {
+         if (!NearR(state->sty, state->stx, p66 * state->width1)) {
             *stp = state->stx + p5 * (state->sty - state->stx);
          }
          state->width1 = state->width;

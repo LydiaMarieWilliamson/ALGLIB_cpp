@@ -754,7 +754,7 @@ double bivariatenormalcdf(double x, double y, double rho) {
       result = normalcdf(x) * normalcdf(y);
       return result;
    }
-   if (fabs(rho) <= 0.8) {
+   if (SmallAtR(rho, 0.8)) {
    // Rho is small, compute integral using using formula (3) by Alan Genz, integrated
    // by means of 10-point Gauss-Legendre quadrature
       rangea = 0.0;
@@ -992,7 +992,7 @@ static double ibetaf_incompletebetafe(double a, double b, double x, double big, 
          qkm2 *= biginv;
          qkm1 *= biginv;
       }
-      if (fabs(qk) < biginv || fabs(pk) < biginv) {
+      if (SmallR(qk, biginv) || SmallR(pk, biginv)) {
          pkm2 *= big;
          pkm1 *= big;
          qkm2 *= big;
@@ -1090,7 +1090,7 @@ static double ibetaf_incompletebetafe2(double a, double b, double x, double big,
          qkm2 *= biginv;
          qkm1 *= biginv;
       }
-      if (fabs(qk) < biginv || fabs(pk) < biginv) {
+      if (SmallR(qk, biginv) || SmallR(pk, biginv)) {
          pkm2 *= big;
          pkm1 *= big;
          qkm2 *= big;
@@ -1126,7 +1126,7 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
    n = 2.0;
    s = 0.0;
    z = machineepsilon * ai;
-   while (fabs(v) > z) {
+   while (!SmallAtR(v, z)) {
       u = (n - b) * x / n;
       t *= u;
       v = t / (a + n);
@@ -1136,7 +1136,7 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
    s += t1;
    s += ai;
    u = a * log(x);
-   if (a + b < maxgam && fabs(u) < log(maxrealnumber)) {
+   if (a + b < maxgam && SmallR(u, log(maxrealnumber))) {
       t = gammafunction(a + b) / (gammafunction(a) * gammafunction(b));
       s *= t * pow(x, a);
    } else {
@@ -1252,7 +1252,7 @@ double incompletebeta(double a, double b, double x) {
    }
    y = a * log(x);
    t = b * log(xc);
-   if (a + b < maxgam && fabs(y) < maxlog && fabs(t) < maxlog) {
+   if (a + b < maxgam && SmallR(y, maxlog) && SmallR(t, maxlog)) {
       t = pow(xc, b);
       t *= pow(x, a);
       t /= a;
@@ -1420,7 +1420,7 @@ double invincompletebeta(double a, double b, double y) {
          x = aaa / (aaa + bbb * exp(d));
          yyy = incompletebeta(aaa, bbb, x);
          yp = (yyy - y0) / y0;
-         if (fabs(yp) < 0.2) {
+         if (SmallR(yp, 0.2)) {
             mainlooppos = newt;
             continue;
          }
@@ -1452,12 +1452,12 @@ double invincompletebeta(double a, double b, double y) {
                }
                yyy = incompletebeta(aaa, bbb, x);
                yp = (x1 - x0) / (x1 + x0);
-               if (fabs(yp) < dithresh) {
+               if (SmallR(yp, dithresh)) {
                   mainlooppos = newt;
                   continue;
                }
                yp = (yyy - y0) / y0;
-               if (fabs(yp) < dithresh) {
+               if (SmallR(yp, dithresh)) {
                   mainlooppos = newt;
                   continue;
                }
@@ -1611,7 +1611,7 @@ double invincompletebeta(double a, double b, double y) {
                }
             }
             x = xt;
-            if (fabs(d / x) < 128.0 * machineepsilon) {
+            if (SmallR(d / x, 128.0 * machineepsilon)) {
                break;
             }
             i++;
@@ -2169,7 +2169,7 @@ double incompletegammac(double a, double x) {
       pkm1 = pk;
       qkm2 = qkm1;
       qkm1 = qk;
-      if (fabs(pk) > igammabignumber) {
+      if (!SmallAtR(pk, igammabignumber)) {
          pkm2 *= igammabignumberinv;
          pkm1 *= igammabignumberinv;
          qkm2 *= igammabignumberinv;
@@ -2267,7 +2267,7 @@ double invincompletegammac(double a, double y0) {
       }
       d = -exp(d);
       d = (y - y0) / d;
-      if (fabs(d / x) < igammaepsilon) {
+      if (SmallR(d / x, igammaepsilon)) {
          result = x;
          return result;
       }
@@ -2296,11 +2296,11 @@ double invincompletegammac(double a, double y0) {
       x = x1 + d * (x0 - x1);
       y = incompletegammac(a, x);
       lgm = (x0 - x1) / (x1 + x0);
-      if (fabs(lgm) < dithresh) {
+      if (SmallR(lgm, dithresh)) {
          break;
       }
       lgm = (y - y0) / y0;
-      if (fabs(lgm) < dithresh) {
+      if (SmallR(lgm, dithresh)) {
          break;
       }
       if (x <= 0.0) {
@@ -3027,7 +3027,7 @@ double exponentialintegralen(double x, ae_int_t n) {
          pkm1 = pk;
          qkm2 = qkm1;
          qkm1 = qk;
-         if (fabs(pk) > big) {
+         if (!SmallAtR(pk, big)) {
             pkm2 /= big;
             pkm1 /= big;
             qkm2 /= big;
@@ -3147,7 +3147,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    c.xR[0] = sqrt(m);
    twon = 1.0;
    i = 0;
-   while (fabs(c.xR[i] / a.xR[i]) > machineepsilon) {
+   while (!SmallAtR(c.xR[i] / a.xR[i], machineepsilon)) {
       if (i > 7) {
          ae_assert(false, "Overflow in JacobianEllipticFunctions");
          break;
@@ -3459,7 +3459,7 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi) {
          a /= k;
          s += a / k;
          k++;
-      } while (fabs(a / s) >= machineepsilon);
+      } while (!SmallR(a / s, machineepsilon));
       s *= x;
    } else {
       if (x < 18.0) {
@@ -3948,7 +3948,7 @@ double beta(double a, double b) {
    ae_assert(a > 0.0 || a != floor(a), "Overflow in Beta");
    ae_assert(b > 0.0 || b != floor(b), "Overflow in Beta");
    y = a + b;
-   if (fabs(y) > 171.624376956302725) {
+   if (!SmallAtR(y, 171.624376956302725)) {
       y = lngamma(y, &s);
       sg *= s;
       y = lngamma(b, &s) - y;
@@ -5957,7 +5957,7 @@ double besselkn(ae_int_t nn, double x) {
          pn += 1.0 / (k + n);
          s += (pk + pn - tlg) * t;
          k++;
-      } while (fabs(t / s) > machineepsilon);
+      } while (!SmallAtR(t / s, machineepsilon));
       s = 0.5 * s / zmn;
       if (n % 2 != 0) {
          s = -s;
@@ -5991,7 +5991,7 @@ double besselkn(ae_int_t nn, double x) {
       fn++;
       pk += 2.0;
       i++;
-   } while (fabs(t / s) > machineepsilon);
+   } while (!SmallAtR(t / s, machineepsilon));
    result = exp(-x) * sqrt(pi / (2.0 * x)) * s;
    return result;
 }
@@ -6371,9 +6371,9 @@ double incompleteellipticintegralk(double phi, double m) {
    }
    b = sqrt(a);
    t = tan(phi);
-   if (fabs(t) > 10.0) {
+   if (!SmallAtR(t, 10.0)) {
       e = 1.0 / (b * t);
-      if (fabs(e) < 10.0) {
+      if (SmallR(e, 10.0)) {
          e = atan(e);
          if (npio2 == 0) {
             k = ellipticintegralk(1 - a);
@@ -6390,7 +6390,7 @@ double incompleteellipticintegralk(double phi, double m) {
    c = sqrt(m);
    d = 1;
    md = 0;
-   while (fabs(c / a) > machineepsilon) {
+   while (!SmallAtR(c / a, machineepsilon)) {
       temp = b / a;
       phi += atan(t * temp) + md * pi;
       md = itrunc((phi + pio2) / pi);
@@ -6545,11 +6545,11 @@ double incompleteellipticintegrale(double phi, double m) {
    b = sqrt(a);
 // Thanks to Brian Fitzgerald <fitzgb@mml0.meche.rpi.edu>
 // for pointing out an instability near odd multiples of pi/2
-   if (fabs(t) > 10.0) {
+   if (!SmallAtR(t, 10.0)) {
    // Transform the amplitude
       e = 1.0 / (b * t);
    // ... but avoid multiple recursions.
-      if (fabs(e) < 10.0) {
+      if (SmallR(e, 10.0)) {
          e = atan(e);
          temp = ebig + m * sin(lphi) * sin(e) - incompleteellipticintegrale(e, m);
          if (s < 0) {
@@ -6564,7 +6564,7 @@ double incompleteellipticintegrale(double phi, double m) {
    d = 1;
    e = 0.0;
    md = 0;
-   while (fabs(c / a) > machineepsilon) {
+   while (!SmallAtR(c / a, machineepsilon)) {
       temp = b / a;
       lphi += atan(t * temp) + md * pi;
       md = itrunc((lphi + pio2) / pi);

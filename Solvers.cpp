@@ -425,7 +425,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
                xb.xR[n] = b->xyR[i][k];
                xdot(&xa, &xb, n + 1, &tx, &v, &verr);
                y.xR[i] = -v;
-               smallerr = smallerr && fabs(v) < 4 * verr;
+               smallerr = smallerr && SmallR(v, 4.0 * verr);
             }
             if (smallerr) {
                terminatenexttime = true;
@@ -545,7 +545,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
                xb.xC[n] = bc.xC[i];
                xcdot(&xa, &xb, n + 1, &tmpbuf, &v, &verr);
                y.xC[i] = ae_c_neg(v);
-               smallerr = smallerr && abscomplex(v) < 4 * verr;
+               smallerr = smallerr && SmallC(v, 4.0 * verr);
             }
             if (smallerr) {
                terminatenexttime = true;
@@ -3141,7 +3141,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
             tx.xR[ncols] = b->xR[i];
             xdot(&ta, &tx, ncols + 1, &buf, &v, &verr);
             rp.xR[i] = -v;
-            smallerr = smallerr && fabs(v) < 4 * verr;
+            smallerr = smallerr && SmallR(v, 4.0 * verr);
          }
          if (smallerr) {
             terminatenexttime = true;

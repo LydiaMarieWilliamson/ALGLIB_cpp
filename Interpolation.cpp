@@ -144,7 +144,7 @@ void barycentricdiff1(barycentricinterpolant *b, double t, double *f, double *df
    xmax = b->x.xR[0];
    for (i = 1; i < b->n; i++) {
       vv = b->x.xR[i];
-      if (fabs(vv - t) < v) {
+      if (NearR(vv, t, v)) {
          v = fabs(vv - t);
          k = i;
       }
@@ -263,7 +263,7 @@ void barycentricdiff2(barycentricinterpolant *b, double t, double *f, double *df
    k = 0;
    for (i = 1; i < b->n; i++) {
       vv = b->x.xR[i];
-      if (fabs(vv - t) < v) {
+      if (NearR(vv, t, v)) {
          v = fabs(vv - t);
          k = i;
       }
@@ -429,7 +429,7 @@ static void ratint_barycentricnormalize(barycentricinterpolant *b) {
    for (i = 0; i < b->n; i++) {
       b->sy = rmax2(b->sy, fabs(b->y.xR[i]));
    }
-   if (b->sy > 0.0 && fabs(b->sy - 1.0) > 10.0 * machineepsilon) {
+   if (b->sy > 0.0 && !NearAtR(b->sy, 1.0, 10.0 * machineepsilon)) {
       v = 1 / b->sy;
       ae_v_muld(b->y.xR, 1, b->n, v);
    }
@@ -437,7 +437,7 @@ static void ratint_barycentricnormalize(barycentricinterpolant *b) {
    for (i = 0; i < b->n; i++) {
       v = rmax2(v, fabs(b->w.xR[i]));
    }
-   if (v > 0.0 && fabs(v - 1.0) > 10.0 * machineepsilon) {
+   if (v > 0.0 && !NearAtR(v, 1.0, 10.0 * machineepsilon)) {
       v = 1 / v;
       ae_v_muld(b->w.xR, 1, b->n, v);
    }
@@ -3339,7 +3339,7 @@ double polynomialcalceqdist(double a, double b, RVector *f, ae_int_t n, double t
       result = f->xR[j];
       return result;
    }
-   if (fabs(s) > threshold) {
+   if (!SmallAtR(s, threshold)) {
    // use fast formula
       j = -1;
       s = 1.0;
@@ -3473,7 +3473,7 @@ double polynomialcalccheb1(double a, double b, RVector *f, ae_int_t n, double t)
       result = f->xR[j];
       return result;
    }
-   if (fabs(s) > threshold) {
+   if (!SmallAtR(s, threshold)) {
    // use fast formula
       j = -1;
       s = 1.0;
@@ -3616,7 +3616,7 @@ double polynomialcalccheb2(double a, double b, RVector *f, ae_int_t n, double t)
       result = f->xR[j];
       return result;
    }
-   if (fabs(s) > threshold) {
+   if (!SmallAtR(s, threshold)) {
    // use fast formula
       j = -1;
       s = 1.0;
@@ -4606,7 +4606,7 @@ void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpola
       }
       for (j = i; j < sn - 1; j++) {
          delta = (ey.xR[j + 1] - ey.xR[j]) / (ex.xR[j + 1] - ex.xR[j]);
-         if (fabs(delta) <= epsilon) {
+         if (SmallAtR(delta, epsilon)) {
             d.xR[j] = 0.0;
             d.xR[j + 1] = 0.0;
          } else {
@@ -6401,7 +6401,7 @@ ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, doub
             }
          }
       }
-   } while (fabs(b0 - a0) >= eps);
+   } while (!NearR(b0, a0, eps));
    *x = m;
    result = 1;
    return result;

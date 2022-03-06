@@ -39,7 +39,7 @@ void set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, c
 //
 // This function returns value of COND.
 void seterrorflagdiff(bool *flag, double val, double refval, double tol, double s) {
-   set_error_flag(flag, fabs(val - refval) > tol * rmax2(fabs(refval), s), __FILE__, __LINE__, "apserv.ap:162");
+   set_error_flag(flag, !NearAtR(val, refval, tol * rmax2(fabs(refval), s)), __FILE__, __LINE__, "apserv.ap:162");
 }
 
 // === ablasf testing unit ===
@@ -809,10 +809,10 @@ static bool testablasfunit_testxdot(ae_int_t maxn, double tol) {
    // Compare playground snapshots - should be identical.
       ridx = randominteger(imax2(n, 1));
       ridx2 = randominteger(imax2(n, 1));
-      set_error_flag(&result, fabs(rdotv(n, &s0.x0, &s0.x1) - refrdotv(n, &s1.x0, &s1.x1)) > tol, __FILE__, __LINE__, "testablasfunit.ap:142");
-      set_error_flag(&result, fabs(rdotvr(n, &s0.x0, &s0.a0, ridx) - refrdotvr(n, &s1.x0, &s1.a0, ridx)) > tol, __FILE__, __LINE__, "testablasfunit.ap:143");
-      set_error_flag(&result, fabs(rdotrr(n, &s0.a0, ridx, &s0.a1, ridx2) - refrdotrr(n, &s1.a0, ridx, &s1.a1, ridx2)) > tol, __FILE__, __LINE__, "testablasfunit.ap:144");
-      set_error_flag(&result, fabs(rdotv2(n, &s0.x0) - refrdotv2(n, &s1.x0)) > tol, __FILE__, __LINE__, "testablasfunit.ap:145");
+      set_error_flag(&result, !NearAtR(rdotv(n, &s0.x0, &s0.x1), refrdotv(n, &s1.x0, &s1.x1), tol), __FILE__, __LINE__, "testablasfunit.ap:142");
+      set_error_flag(&result, !NearAtR(rdotvr(n, &s0.x0, &s0.a0, ridx), refrdotvr(n, &s1.x0, &s1.a0, ridx), tol), __FILE__, __LINE__, "testablasfunit.ap:143");
+      set_error_flag(&result, !NearAtR(rdotrr(n, &s0.a0, ridx, &s0.a1, ridx2), refrdotrr(n, &s1.a0, ridx, &s1.a1, ridx2), tol), __FILE__, __LINE__, "testablasfunit.ap:144");
+      set_error_flag(&result, !NearAtR(rdotv2(n, &s0.x0), refrdotv2(n, &s1.x0), tol), __FILE__, __LINE__, "testablasfunit.ap:145");
    }
    ae_frame_leave();
    return result;
@@ -1515,7 +1515,7 @@ static bool hqrndcontinuoustest(bool silent) {
          }
       }
       for (i = 0; i < nb; i++) {
-         result = result || fabs(bins.xZ[i] - (double)xp / nb) > sigma * sigmamax;
+         result = result || !NearAtR(bins.xZ[i], (double)xp / nb, sigma * sigmamax);
       }
    }
    ae_frame_leave();
@@ -1867,7 +1867,7 @@ bool testhqrnd(bool silent) {
    }
    for (pass = 0; pass < n; pass++) {
       hqrndunit2(&state, &r1, &r2);
-      set_error_flag(&unit2errors, fabs(r1 * r1 + r2 * r2 - 1.0) > 100.0 * machineepsilon, __FILE__, __LINE__, "testhqrndunit.ap:292");
+      set_error_flag(&unit2errors, !NearAtR(r1 * r1 + r2 * r2, 1.0, 100.0 * machineepsilon), __FILE__, __LINE__, "testhqrndunit.ap:292");
       k = ifloor((atan2(r1, r2) + pi) / (2 * pi) * bins.cnt);
       if (k < 0) {
          k = 0;
@@ -2629,7 +2629,7 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
       testablasunit_refcmatrixrighttrsm(n - xoffsi, m - xoffsj, &ca, aoffsi, aoffsj, uppertype == 0, unittype == 0, optype, &cxr2, xoffsi, xoffsj);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            result = result || abscomplex(ae_c_sub(cxr1.xyC[i][j], cxr2.xyC[i][j])) > threshold;
+            result = result || !NearAtC(cxr1.xyC[i][j], cxr2.xyC[i][j], threshold);
          }
       }
    // Test CXL
@@ -2637,7 +2637,7 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
       testablasunit_refcmatrixlefttrsm(m - xoffsi, n - xoffsj, &ca, aoffsi, aoffsj, uppertype == 0, unittype == 0, optype, &cxl2, xoffsi, xoffsj);
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
-            result = result || abscomplex(ae_c_sub(cxl1.xyC[i][j], cxl2.xyC[i][j])) > threshold;
+            result = result || !NearAtC(cxl1.xyC[i][j], cxl2.xyC[i][j], threshold);
          }
       }
       if (optype < 2) {
@@ -2646,7 +2646,7 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
          testablasunit_refrmatrixrighttrsm(n - xoffsi, m - xoffsj, &ra, aoffsi, aoffsj, uppertype == 0, unittype == 0, optype, &rxr2, xoffsi, xoffsj);
          for (i = 0; i < n; i++) {
             for (j = 0; j < m; j++) {
-               result = result || fabs(rxr1.xyR[i][j] - rxr2.xyR[i][j]) > threshold;
+               result = result || !NearAtR(rxr1.xyR[i][j], rxr2.xyR[i][j], threshold);
             }
          }
       // Test RXL
@@ -2654,7 +2654,7 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
          testablasunit_refrmatrixlefttrsm(m - xoffsi, n - xoffsj, &ra, aoffsi, aoffsj, uppertype == 0, unittype == 0, optype, &rxl2, xoffsi, xoffsj);
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
-               result = result || fabs(rxl1.xyR[i][j] - rxl2.xyR[i][j]) > threshold;
+               result = result || !NearAtR(rxl1.xyR[i][j], rxl2.xyR[i][j], threshold);
             }
          }
       }
@@ -2921,7 +2921,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            result = result || abscomplex(ae_c_sub(ca1.xyC[i][j], ca2.xyC[i][j])) > threshold;
+            result = result || !NearAtC(ca1.xyC[i][j], ca2.xyC[i][j], threshold);
          }
       }
    // Test old version of HERK (named SYRK)
@@ -2935,7 +2935,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            result = result || abscomplex(ae_c_sub(ca1.xyC[i][j], ca2.xyC[i][j])) > threshold;
+            result = result || !NearAtC(ca1.xyC[i][j], ca2.xyC[i][j], threshold);
          }
       }
    // Test real
@@ -2949,7 +2949,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            result = result || fabs(ra1.xyR[i][j] - ra2.xyR[i][j]) > threshold;
+            result = result || !NearAtR(ra1.xyR[i][j], ra2.xyR[i][j], threshold);
          }
       }
    }
@@ -3170,7 +3170,7 @@ static bool testablasunit_testgemm(ae_int_t minn, ae_int_t maxn) {
       testablasunit_refcmatrixgemm(m, n, k, alphac, &refca, aoffsi, aoffsj, aoptype, &refcb, boffsi, boffsj, boptype, betac, &cc2, coffsi, coffsj);
       for (i = 0; i <= maxn; i++) {
          for (j = 0; j <= maxn; j++) {
-            result = result || abscomplex(ae_c_sub(cc1.xyC[i][j], cc2.xyC[i][j])) > threshold;
+            result = result || !NearAtC(cc1.xyC[i][j], cc2.xyC[i][j], threshold);
          }
       }
    // Test real
@@ -3178,7 +3178,7 @@ static bool testablasunit_testgemm(ae_int_t minn, ae_int_t maxn) {
       testablasunit_refrmatrixgemm(m, n, k, alphar, &refra, aoffsi, aoffsj, aoptyper, &refrb, boffsi, boffsj, boptyper, betar, &rc2, coffsi, coffsj);
       for (i = 0; i <= maxn; i++) {
          for (j = 0; j <= maxn; j++) {
-            result = result || fabs(rc1.xyR[i][j] - rc2.xyR[i][j]) > threshold;
+            result = result || !NearAtR(rc1.xyR[i][j], rc2.xyR[i][j], threshold);
          }
       }
    }
@@ -3251,9 +3251,9 @@ static bool testablasunit_testtrans(ae_int_t minn, ae_int_t maxn) {
       for (i = 0; i <= maxn; i++) {
          for (j = 0; j <= maxn; j++) {
             if (i < boffsi || i >= boffsi + n || j < boffsj || j >= boffsj + m) {
-               result = result || fabs(refrb.xyR[i][j] - (v1 * i + v2 * j)) > threshold;
+               result = result || !NearAtR(refrb.xyR[i][j], v1 * i + v2 * j, threshold);
             } else {
-               result = result || fabs(refrb.xyR[i][j] - refra.xyR[aoffsi + j - boffsj][aoffsj + i - boffsi]) > threshold;
+               result = result || !NearAtR(refrb.xyR[i][j], refra.xyR[aoffsi + j - boffsj][aoffsj + i - boffsi], threshold);
             }
          }
       }
@@ -3261,9 +3261,9 @@ static bool testablasunit_testtrans(ae_int_t minn, ae_int_t maxn) {
       for (i = 0; i <= maxn; i++) {
          for (j = 0; j <= maxn; j++) {
             if (i < boffsi || i >= boffsi + n || j < boffsj || j >= boffsj + m) {
-               result = result || abscomplex(ae_c_sub_d(refcb.xyC[i][j], v1 * i + v2 * j)) > threshold;
+               result = result || !NearAtCR(refcb.xyC[i][j], v1 * i + v2 * j, threshold);
             } else {
-               result = result || abscomplex(ae_c_sub(refcb.xyC[i][j], refca.xyC[aoffsi + j - boffsj][aoffsj + i - boffsi])) > threshold;
+               result = result || !NearAtC(refcb.xyC[i][j], refca.xyC[aoffsi + j - boffsj][aoffsj + i - boffsi], threshold);
             }
          }
       }
@@ -3349,9 +3349,9 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn) {
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
             if (i < aoffsi || i >= aoffsi + m || j < aoffsj || j >= aoffsj + n) {
-               result = result || abscomplex(ae_c_sub(refca.xyC[i][j], refcb.xyC[i][j])) > threshold;
+               result = result || !NearAtC(refca.xyC[i][j], refcb.xyC[i][j], threshold);
             } else {
-               result = result || abscomplex(ae_c_sub(refca.xyC[i][j], ae_c_add(refcb.xyC[i][j], ae_c_mul(cu.xC[i - aoffsi + uoffs], cv.xC[j - aoffsj + voffs])))) > threshold;
+               result = result || !NearAtC(refca.xyC[i][j], ae_c_add(refcb.xyC[i][j], ae_c_mul(cu.xC[i - aoffsi + uoffs], cv.xC[j - aoffsj + voffs])), threshold);
             }
          }
       }
@@ -3364,9 +3364,9 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn) {
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
             if (i < aoffsi || i >= aoffsi + m || j < aoffsj || j >= aoffsj + n) {
-               result = result || fabs(refra.xyR[i][j] - refrb.xyR[i][j]) > threshold;
+               result = result || !NearAtR(refra.xyR[i][j], refrb.xyR[i][j], threshold);
             } else {
-               result = result || fabs(refra.xyR[i][j] - (refrb.xyR[i][j] + ru.xR[i - aoffsi + uoffs] * rv.xR[j - aoffsj + voffs])) > threshold;
+               result = result || !NearAtR(refra.xyR[i][j], refrb.xyR[i][j] + ru.xR[i - aoffsi + uoffs] * rv.xR[j - aoffsj + voffs], threshold);
             }
          }
       }
@@ -3382,7 +3382,7 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn) {
             if (i < aoffsi || i >= aoffsi + m || j < aoffsj || j >= aoffsj + n) {
                set_error_flag(&result, fabs(refra.xyR[i][j] - refrb.xyR[i][j]) != 0.0, __FILE__, __LINE__, "testablasunit.ap:1145");
             } else {
-               set_error_flag(&result, fabs(refra.xyR[i][j] - (refrb.xyR[i][j] + ralpha * ru.xR[i - aoffsi + uoffs] * rv.xR[j - aoffsj + voffs])) > threshold, __FILE__, __LINE__, "testablasunit.ap:1147");
+               set_error_flag(&result, !NearAtR(refra.xyR[i][j], refrb.xyR[i][j] + ralpha * ru.xR[i - aoffsi + uoffs] * rv.xR[j - aoffsj + voffs], threshold), __FILE__, __LINE__, "testablasunit.ap:1147");
             }
          }
       }
@@ -3485,7 +3485,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
             if (opca == 2) {
                cv2 = ae_v_cdotproduct(&refca.xyC[aoffsi][aoffsj + i - yoffs], refca.stride, "Conj", &cx.xC[xoffs], 1, "N", n);
             }
-            result = result || abscomplex(ae_c_sub(cv1, cv2)) > threshold;
+            result = result || !NearAtC(cv1, cv2, threshold);
          }
       }
       for (i = 0; i < 2 * maxn; i++) {
@@ -3504,7 +3504,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
             if (opra == 1) {
                rv2 = ae_v_dotproduct(&refra.xyR[aoffsi][aoffsj + i - yoffs], refra.stride, &rx.xR[xoffs], 1, n);
             }
-            result = result || fabs(rv1 - rv2) > threshold;
+            result = result || !NearAtR(rv1, rv2, threshold);
          }
       }
    // Test modern RMatrixGEMV()
@@ -3525,7 +3525,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
                rv2 = ae_v_dotproduct(&refra.xyR[aoffsi][aoffsj + i - yoffs], refra.stride, &rx.xR[xoffs], 1, n);
             }
             rv2 = rbeta * i + ralpha * rv2;
-            set_error_flag(&result, fabs(rv1 - rv2) > threshold, __FILE__, __LINE__, "testablasunit.ap:1305");
+            set_error_flag(&result, !NearAtR(rv1, rv2, threshold), __FILE__, __LINE__, "testablasunit.ap:1305");
          }
       }
    }
@@ -3670,13 +3670,13 @@ static void testablasunit_testsymv(ae_int_t minn, ae_int_t maxn, bool *errorflag
          if (i < yoffs || i >= yoffs + n) {
             set_error_flag(errorflag, ry.xR[i] != i, __FILE__, __LINE__, "testablasunit.ap:1393");
          } else {
-            set_error_flag(errorflag, fabs(ry.xR[i] - rz.xR[i]) > threshold * rmax3(fabs(ry.xR[i]), fabs(rz.xR[i]), 1.0), __FILE__, __LINE__, "testablasunit.ap:1395");
+            set_error_flag(errorflag, !NearAtR(ry.xR[i], rz.xR[i], threshold * rmax3(fabs(ry.xR[i]), fabs(rz.xR[i]), 1.0)), __FILE__, __LINE__, "testablasunit.ap:1395");
          }
       }
    // Test RMatrixSYVMV()
       rv1 = rmatrixsyvmv(n, &refra, aoffsi, aoffsj, isuppera, &rx, xoffs, &ry);
       rv2 = testablasunit_refrmatrixsyvmv(n, &refra, aoffsi, aoffsj, isuppera, &rx, xoffs);
-      set_error_flag(errorflag, fabs(rv1 - rv2) > threshold * rmax3(fabs(rv1), fabs(rv2), 1.0), __FILE__, __LINE__, "testablasunit.ap:1409");
+      set_error_flag(errorflag, !NearAtR(rv1, rv2, threshold * rmax3(fabs(rv1), fabs(rv2), 1.0)), __FILE__, __LINE__, "testablasunit.ap:1409");
    }
    ae_frame_leave();
 }
@@ -3769,7 +3769,7 @@ static void testablasunit_testtrsv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       }
       for (i = 0; i < n; i++) {
          v = ae_v_dotproduct(ea.xyR[i], 1, &rx.xR[xoffs], 1, n);
-         set_error_flag(errorflag, fabs(v - ry.xR[xoffs + i]) > threshold, __FILE__, __LINE__, "testablasunit.ap:1516");
+         set_error_flag(errorflag, !NearAtR(v, ry.xR[xoffs + i], threshold), __FILE__, __LINE__, "testablasunit.ap:1516");
       }
    }
    ae_frame_leave();
@@ -3880,7 +3880,7 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
             if (i < boffsi || i >= boffsi + m || j < boffsj || j >= boffsj + n) {
                result = result || ae_c_neq_d(cb.xyC[i][j], (double)(1 + 2 * i + 3 * j));
             } else {
-               result = result || abscomplex(ae_c_sub(ca.xyC[aoffsi + i - boffsi][aoffsj + j - boffsj], cb.xyC[i][j])) > threshold;
+               result = result || !NearAtC(ca.xyC[aoffsi + i - boffsi][aoffsj + j - boffsj], cb.xyC[i][j], threshold);
             }
          }
       }
@@ -3890,7 +3890,7 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
             if (i < boffsi || i >= boffsi + m || j < boffsj || j >= boffsj + n) {
                result = result || rb.xyR[i][j] != 1 + 2 * i + 3 * j;
             } else {
-               result = result || fabs(ra.xyR[aoffsi + i - boffsi][aoffsj + j - boffsj] - rb.xyR[i][j]) > threshold;
+               result = result || !NearAtR(ra.xyR[aoffsi + i - boffsi][aoffsj + j - boffsj], rb.xyR[i][j], threshold);
             }
          }
       }
@@ -3935,7 +3935,7 @@ static void testablasunit_testcopy1(ae_int_t minn, ae_int_t maxn, bool *err) {
          if (i < boffs || i >= boffs + ss) {
             set_error_flag(err, rb.xR[i] != 1 + 2 * i, __FILE__, __LINE__, "testablasunit.ap:1762");
          } else {
-            set_error_flag(err, fabs(ra.xR[aoffs + i - boffs] - rb.xR[i]) > threshold, __FILE__, __LINE__, "testablasunit.ap:1764");
+            set_error_flag(err, !NearAtR(ra.xR[aoffs + i - boffs], rb.xR[i], threshold), __FILE__, __LINE__, "testablasunit.ap:1764");
          }
       }
    }
@@ -4904,7 +4904,7 @@ static void testortfacunit_testrqrproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(q.xyR[i], 1, &r.xyR[0][j], r.stride, m);
-         *qrerrors = *qrerrors || fabs(v - a->xyR[i][j]) > threshold;
+         *qrerrors = *qrerrors || !NearAtR(v, a->xyR[i][j], threshold);
       }
    }
    for (i = 0; i < m; i++) {
@@ -4918,7 +4918,7 @@ static void testortfacunit_testrqrproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
          if (i == j) {
             v--;
          }
-         *qrerrors = *qrerrors || fabs(v) >= threshold;
+         *qrerrors = *qrerrors || !SmallR(v, threshold);
       }
    }
 // Test for other errors
@@ -4926,7 +4926,7 @@ static void testortfacunit_testrqrproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    rmatrixqrunpackq(&b, m, n, &taub, k, &q2);
    for (i = 0; i < m; i++) {
       for (j = 0; j < k; j++) {
-         *qrerrors = *qrerrors || fabs(q2.xyR[i][j] - q.xyR[i][j]) > 10.0 * machineepsilon;
+         *qrerrors = *qrerrors || !NearAtR(q2.xyR[i][j], q.xyR[i][j], 10.0 * machineepsilon);
       }
    }
    ae_frame_leave();
@@ -4953,7 +4953,7 @@ static void testortfacunit_testcqrproblem(CMatrix *a, ae_int_t m, ae_int_t n, do
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          v = ae_v_cdotproduct(q.xyC[i], 1, "N", &r.xyC[0][j], r.stride, "N", m);
-         *qrerrors = *qrerrors || abscomplex(ae_c_sub(v, a->xyC[i][j])) > threshold;
+         *qrerrors = *qrerrors || !NearAtC(v, a->xyC[i][j], threshold);
       }
    }
    for (i = 0; i < m; i++) {
@@ -4967,7 +4967,7 @@ static void testortfacunit_testcqrproblem(CMatrix *a, ae_int_t m, ae_int_t n, do
          if (i == j) {
             v = ae_c_sub_d(v, 1);
          }
-         *qrerrors = *qrerrors || abscomplex(v) >= threshold;
+         *qrerrors = *qrerrors || !SmallC(v, threshold);
       }
    }
 // Test for other errors
@@ -4975,7 +4975,7 @@ static void testortfacunit_testcqrproblem(CMatrix *a, ae_int_t m, ae_int_t n, do
    cmatrixqrunpackq(&b, m, n, &taub, k, &q2);
    for (i = 0; i < m; i++) {
       for (j = 0; j < k; j++) {
-         *qrerrors = *qrerrors || abscomplex(ae_c_sub(q2.xyC[i][j], q.xyC[i][j])) > 10.0 * machineepsilon;
+         *qrerrors = *qrerrors || !NearAtC(q2.xyC[i][j], q.xyC[i][j], 10.0 * machineepsilon);
       }
    }
    ae_frame_leave();
@@ -5002,7 +5002,7 @@ static void testortfacunit_testrlqproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(l.xyR[i], 1, &q.xyR[0][j], q.stride, n);
-         *lqerrors = *lqerrors || fabs(v - a->xyR[i][j]) >= threshold;
+         *lqerrors = *lqerrors || !NearR(v, a->xyR[i][j], threshold);
       }
    }
    for (i = 0; i < m; i++) {
@@ -5016,7 +5016,7 @@ static void testortfacunit_testrlqproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
          if (i == j) {
             v--;
          }
-         *lqerrors = *lqerrors || fabs(v) >= threshold;
+         *lqerrors = *lqerrors || !SmallR(v, threshold);
       }
    }
 // Test for other errors
@@ -5024,7 +5024,7 @@ static void testortfacunit_testrlqproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    rmatrixlqunpackq(&b, m, n, &taub, k, &q2);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
-         *lqerrors = *lqerrors || fabs(q2.xyR[i][j] - q.xyR[i][j]) > 10.0 * machineepsilon;
+         *lqerrors = *lqerrors || !NearAtR(q2.xyR[i][j], q.xyR[i][j], 10.0 * machineepsilon);
       }
    }
    ae_frame_leave();
@@ -5051,7 +5051,7 @@ static void testortfacunit_testclqproblem(CMatrix *a, ae_int_t m, ae_int_t n, do
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          v = ae_v_cdotproduct(l.xyC[i], 1, "N", &q.xyC[0][j], q.stride, "N", n);
-         *lqerrors = *lqerrors || abscomplex(ae_c_sub(v, a->xyC[i][j])) >= threshold;
+         *lqerrors = *lqerrors || !NearC(v, a->xyC[i][j], threshold);
       }
    }
    for (i = 0; i < m; i++) {
@@ -5065,7 +5065,7 @@ static void testortfacunit_testclqproblem(CMatrix *a, ae_int_t m, ae_int_t n, do
          if (i == j) {
             v = ae_c_sub_d(v, 1);
          }
-         *lqerrors = *lqerrors || abscomplex(v) >= threshold;
+         *lqerrors = *lqerrors || !SmallC(v, threshold);
       }
    }
 // Test for other errors
@@ -5073,7 +5073,7 @@ static void testortfacunit_testclqproblem(CMatrix *a, ae_int_t m, ae_int_t n, do
    cmatrixlqunpackq(&b, m, n, &taub, k, &q2);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
-         *lqerrors = *lqerrors || abscomplex(ae_c_sub(q2.xyC[i][j], q.xyC[i][j])) > 10.0 * machineepsilon;
+         *lqerrors = *lqerrors || !NearAtC(q2.xyC[i][j], q.xyC[i][j], 10.0 * machineepsilon);
       }
    }
    ae_frame_leave();
@@ -5135,7 +5135,7 @@ static void testortfacunit_testrbdproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(r.xyR[i], 1, &pt.xyR[0][j], pt.stride, n);
-         *bderrors = *bderrors || fabs(v - a->xyR[i][j]) > threshold;
+         *bderrors = *bderrors || !NearAtR(v, a->xyR[i][j], threshold);
       }
    }
 // Orthogonality test for Q/PT
@@ -5143,9 +5143,9 @@ static void testortfacunit_testrbdproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
       for (j = 0; j < m; j++) {
          v = ae_v_dotproduct(&q.xyR[0][i], q.stride, &q.xyR[0][j], q.stride, m);
          if (i == j) {
-            *bderrors = *bderrors || fabs(v - 1) > threshold;
+            *bderrors = *bderrors || !NearAtR(v, 1.0, threshold);
          } else {
-            *bderrors = *bderrors || fabs(v) > threshold;
+            *bderrors = *bderrors || !SmallAtR(v, threshold);
          }
       }
    }
@@ -5153,9 +5153,9 @@ static void testortfacunit_testrbdproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(pt.xyR[i], 1, pt.xyR[j], 1, n);
          if (i == j) {
-            *bderrors = *bderrors || fabs(v - 1) > threshold;
+            *bderrors = *bderrors || !NearAtR(v, 1.0, threshold);
          } else {
-            *bderrors = *bderrors || fabs(v) > threshold;
+            *bderrors = *bderrors || !SmallAtR(v, threshold);
          }
       }
    }
@@ -5164,14 +5164,14 @@ static void testortfacunit_testrbdproblem(RMatrix *a, ae_int_t m, ae_int_t n, do
    rmatrixbdunpackq(&t, m, n, &tauq, k, &r);
    for (i = 0; i < m; i++) {
       for (j = 0; j < k; j++) {
-         *bderrors = *bderrors || fabs(r.xyR[i][j] - q.xyR[i][j]) > 10.0 * machineepsilon;
+         *bderrors = *bderrors || !NearAtR(r.xyR[i][j], q.xyR[i][j], 10.0 * machineepsilon);
       }
    }
    k = 1 + randominteger(n);
    rmatrixbdunpackpt(&t, m, n, &taup, k, &r);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
-         *bderrors = *bderrors || fabs(r.xyR[i][j] - pt.xyR[i][j]) > 10.0 * machineepsilon;
+         *bderrors = *bderrors || !NearAtR(r.xyR[i][j], pt.xyR[i][j], 10.0 * machineepsilon);
       }
    }
 // Multiplication test
@@ -5253,7 +5253,7 @@ static void testortfacunit_testrhessproblem(RMatrix *a, ae_int_t n, double thres
          if (i == j) {
             v--;
          }
-         *hesserrors = *hesserrors || fabs(v) > threshold;
+         *hesserrors = *hesserrors || !SmallAtR(v, threshold);
       }
    }
    for (i = 0; i < n; i++) {
@@ -5342,7 +5342,7 @@ static void testortfacunit_testrtdproblem(RMatrix *a, ae_int_t n, double thresho
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         *tderrors = *tderrors || fabs(t3.xyR[i][j] - t.xyR[i][j]) > threshold;
+         *tderrors = *tderrors || !NearAtR(t3.xyR[i][j], t.xyR[i][j], threshold);
       }
    }
    for (i = 0; i < n; i++) {
@@ -5351,7 +5351,7 @@ static void testortfacunit_testrtdproblem(RMatrix *a, ae_int_t n, double thresho
          if (i == j) {
             v--;
          }
-         *tderrors = *tderrors || fabs(v) > threshold;
+         *tderrors = *tderrors || !SmallAtR(v, threshold);
       }
    }
 // Test 2tridiagonal: lower
@@ -5383,7 +5383,7 @@ static void testortfacunit_testrtdproblem(RMatrix *a, ae_int_t n, double thresho
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         *tderrors = *tderrors || fabs(t3.xyR[i][j] - t.xyR[i][j]) > threshold;
+         *tderrors = *tderrors || !NearAtR(t3.xyR[i][j], t.xyR[i][j], threshold);
       }
    }
    for (i = 0; i < n; i++) {
@@ -5392,7 +5392,7 @@ static void testortfacunit_testrtdproblem(RMatrix *a, ae_int_t n, double thresho
          if (i == j) {
             v--;
          }
-         *tderrors = *tderrors || fabs(v) > threshold;
+         *tderrors = *tderrors || !SmallAtR(v, threshold);
       }
    }
    ae_frame_leave();
@@ -5470,7 +5470,7 @@ static void testortfacunit_testctdproblem(CMatrix *a, ae_int_t n, double thresho
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         *tderrors = *tderrors || abscomplex(ae_c_sub(t3.xyC[i][j], t.xyC[i][j])) > threshold;
+         *tderrors = *tderrors || !NearAtC(t3.xyC[i][j], t.xyC[i][j], threshold);
       }
    }
    for (i = 0; i < n; i++) {
@@ -5479,7 +5479,7 @@ static void testortfacunit_testctdproblem(CMatrix *a, ae_int_t n, double thresho
          if (i == j) {
             v = ae_c_sub_d(v, 1);
          }
-         *tderrors = *tderrors || abscomplex(v) > threshold;
+         *tderrors = *tderrors || !SmallAtC(v, threshold);
       }
    }
 // Test 2tridiagonal: lower
@@ -5511,7 +5511,7 @@ static void testortfacunit_testctdproblem(CMatrix *a, ae_int_t n, double thresho
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         *tderrors = *tderrors || abscomplex(ae_c_sub(t3.xyC[i][j], t.xyC[i][j])) > threshold;
+         *tderrors = *tderrors || !NearAtC(t3.xyC[i][j], t.xyC[i][j], threshold);
       }
    }
    for (i = 0; i < n; i++) {
@@ -5520,7 +5520,7 @@ static void testortfacunit_testctdproblem(CMatrix *a, ae_int_t n, double thresho
          if (i == j) {
             v = ae_c_sub_d(v, 1);
          }
-         *tderrors = *tderrors || abscomplex(v) > threshold;
+         *tderrors = *tderrors || !SmallAtC(v, threshold);
       }
    }
    ae_frame_leave();
@@ -5934,7 +5934,7 @@ static bool testmatgenunit_testeult() {
       smatrixrndcond(n, c, &a);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            if (fabs(a.xyR[i][j] - a.xyR[j][i]) > eps) {
+            if (!NearAtR(a.xyR[i][j], a.xyR[j][i], eps)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -5944,7 +5944,7 @@ static bool testmatgenunit_testeult() {
       spdmatrixrndcond(n, c, &a);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            if (fabs(a.xyR[i][j] - a.xyR[j][i]) > eps) {
+            if (!NearAtR(a.xyR[i][j], a.xyR[j][i], eps)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -5954,7 +5954,7 @@ static bool testmatgenunit_testeult() {
       hmatrixrndcond(n, c, &b);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            if (fabs(b.xyC[i][j].x - b.xyC[j][i].x) > eps || fabs(b.xyC[i][j].y + b.xyC[j][i].y) > eps) {
+            if (!NearAtR(b.xyC[i][j].x, b.xyC[j][i].x, eps) || !NearAtR(b.xyC[i][j].y, -b.xyC[j][i].y, eps)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -5964,7 +5964,7 @@ static bool testmatgenunit_testeult() {
       hpdmatrixrndcond(n, c, &b);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            if (fabs(b.xyC[i][j].x - b.xyC[j][i].x) > eps || fabs(b.xyC[i][j].y + b.xyC[j][i].y) > eps) {
+            if (!NearAtR(b.xyC[i][j].x, b.xyC[j][i].x, eps) || !NearAtR(b.xyC[i][j].y, -b.xyC[j][i].y, eps)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -5985,7 +5985,7 @@ static bool testmatgenunit_testeult() {
       smatrixrndmultiply(&a, n);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            if (fabs(a.xyR[i][j] - a.xyR[j][i]) > eps) {
+            if (!NearAtR(a.xyR[i][j], a.xyR[j][i], eps)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -6009,7 +6009,7 @@ static bool testmatgenunit_testeult() {
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            if (fabs(b.xyC[i][j].x - b.xyC[j][i].x) > eps || fabs(b.xyC[i][j].y + b.xyC[j][i].y) > eps) {
+            if (!NearAtR(b.xyC[i][j].x, b.xyC[j][i].x, eps) || !NearAtR(b.xyC[i][j].y, -b.xyC[j][i].y, eps)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -6428,15 +6428,15 @@ bool testmatgen(bool silent) {
             // orthogonality test
                vt = ae_v_dotproduct(a.xyR[i], 1, a.xyR[j], 1, n);
                if (i == j) {
-                  rerr = rerr || fabs(vt - 1) > threshold;
+                  rerr = rerr || !NearAtR(vt, 1.0, threshold);
                } else {
-                  rerr = rerr || fabs(vt) > threshold;
+                  rerr = rerr || !SmallAtR(vt, threshold);
                }
                vt = ae_v_dotproduct(b.xyR[i], 1, b.xyR[j], 1, n);
                if (i == j) {
-                  rerr = rerr || fabs(vt - 1) > threshold;
+                  rerr = rerr || !NearAtR(vt, 1.0, threshold);
                } else {
-                  rerr = rerr || fabs(vt) > threshold;
+                  rerr = rerr || !SmallAtR(vt, threshold);
                }
             // test for difference in A and B
                if (n >= 2) {
@@ -6454,15 +6454,15 @@ bool testmatgen(bool silent) {
             // orthogonality test
                ct = ae_v_cdotproduct(ca.xyC[i], 1, "N", ca.xyC[j], 1, "Conj", n);
                if (i == j) {
-                  cerr = cerr || abscomplex(ae_c_sub_d(ct, 1)) > threshold;
+                  cerr = cerr || !NearAtCR(ct, 1.0, threshold);
                } else {
-                  cerr = cerr || abscomplex(ct) > threshold;
+                  cerr = cerr || !SmallAtC(ct, threshold);
                }
                ct = ae_v_cdotproduct(cb.xyC[i], 1, "N", cb.xyC[j], 1, "Conj", n);
                if (i == j) {
-                  cerr = cerr || abscomplex(ae_c_sub_d(ct, 1)) > threshold;
+                  cerr = cerr || !NearAtCR(ct, 1.0, threshold);
                } else {
-                  cerr = cerr || abscomplex(ct) > threshold;
+                  cerr = cerr || !SmallAtC(ct, threshold);
                }
             // test for difference in A and B
                if (n >= 2) {
@@ -6493,15 +6493,15 @@ bool testmatgen(bool silent) {
             // orthogonality test
                vt = ae_v_dotproduct(a.xyR[i], 1, a.xyR[j], 1, n);
                if (i == j) {
-                  rerr = rerr || fabs(vt - 1) > threshold;
+                  rerr = rerr || !NearAtR(vt, 1.0, threshold);
                } else {
-                  rerr = rerr || fabs(vt) > threshold;
+                  rerr = rerr || !SmallAtR(vt, threshold);
                }
                vt = ae_v_dotproduct(b.xyR[i], 1, b.xyR[j], 1, n);
                if (i == j) {
-                  rerr = rerr || fabs(vt - 1) > threshold;
+                  rerr = rerr || !NearAtR(vt, 1.0, threshold);
                } else {
-                  rerr = rerr || fabs(vt) > threshold;
+                  rerr = rerr || !SmallAtR(vt, threshold);
                }
             // test for difference in A and B
                if (n >= 2) {
@@ -6518,7 +6518,7 @@ bool testmatgen(bool silent) {
          rmatrixrndorthogonalfromtheright(&r2, 2 * n, n);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rerr = rerr || fabs(r2.xyR[i + n][j] - r2.xyR[i][j]) > threshold;
+               rerr = rerr || !NearAtR(r2.xyR[i + n][j], r2.xyR[i][j], threshold);
             }
          }
       // From the left real tests:
@@ -6544,15 +6544,15 @@ bool testmatgen(bool silent) {
             // orthogonality test
                vt = ae_v_dotproduct(a.xyR[i], 1, a.xyR[j], 1, n);
                if (i == j) {
-                  rerr = rerr || fabs(vt - 1) > threshold;
+                  rerr = rerr || !NearAtR(vt, 1.0, threshold);
                } else {
-                  rerr = rerr || fabs(vt) > threshold;
+                  rerr = rerr || !SmallAtR(vt, threshold);
                }
                vt = ae_v_dotproduct(b.xyR[i], 1, b.xyR[j], 1, n);
                if (i == j) {
-                  rerr = rerr || fabs(vt - 1) > threshold;
+                  rerr = rerr || !NearAtR(vt, 1.0, threshold);
                } else {
-                  rerr = rerr || fabs(vt) > threshold;
+                  rerr = rerr || !SmallAtR(vt, threshold);
                }
             // test for difference in A and B
                if (n >= 2) {
@@ -6569,7 +6569,7 @@ bool testmatgen(bool silent) {
          rmatrixrndorthogonalfromtheleft(&r1, n, 2 * n);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rerr = rerr || fabs(r1.xyR[i][j] - r1.xyR[i][j + n]) > threshold;
+               rerr = rerr || !NearAtR(r1.xyR[i][j], r1.xyR[i][j + n], threshold);
             }
          }
       // From the right complex tests:
@@ -6595,15 +6595,15 @@ bool testmatgen(bool silent) {
             // orthogonality test
                ct = ae_v_cdotproduct(ca.xyC[i], 1, "N", ca.xyC[j], 1, "Conj", n);
                if (i == j) {
-                  cerr = cerr || abscomplex(ae_c_sub_d(ct, 1)) > threshold;
+                  cerr = cerr || !NearAtCR(ct, 1.0, threshold);
                } else {
-                  cerr = cerr || abscomplex(ct) > threshold;
+                  cerr = cerr || !SmallAtC(ct, threshold);
                }
                ct = ae_v_cdotproduct(cb.xyC[i], 1, "N", cb.xyC[j], 1, "Conj", n);
                if (i == j) {
-                  cerr = cerr || abscomplex(ae_c_sub_d(ct, 1)) > threshold;
+                  cerr = cerr || !NearAtCR(ct, 1.0, threshold);
                } else {
-                  cerr = cerr || abscomplex(ct) > threshold;
+                  cerr = cerr || !SmallAtC(ct, threshold);
                }
             // test for difference in A and B
                cerr = cerr || ae_c_eq(ca.xyC[i][j], cb.xyC[i][j]);
@@ -6618,7 +6618,7 @@ bool testmatgen(bool silent) {
          cmatrixrndorthogonalfromtheright(&c2, 2 * n, n);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               cerr = cerr || abscomplex(ae_c_sub(c2.xyC[i + n][j], c2.xyC[i][j])) > threshold;
+               cerr = cerr || !NearAtC(c2.xyC[i + n][j], c2.xyC[i][j], threshold);
             }
          }
       // From the left complex tests:
@@ -6644,15 +6644,15 @@ bool testmatgen(bool silent) {
             // orthogonality test
                ct = ae_v_cdotproduct(ca.xyC[i], 1, "N", ca.xyC[j], 1, "Conj", n);
                if (i == j) {
-                  cerr = cerr || abscomplex(ae_c_sub_d(ct, 1)) > threshold;
+                  cerr = cerr || !NearAtCR(ct, 1.0, threshold);
                } else {
-                  cerr = cerr || abscomplex(ct) > threshold;
+                  cerr = cerr || !SmallAtC(ct, threshold);
                }
                ct = ae_v_cdotproduct(cb.xyC[i], 1, "N", cb.xyC[j], 1, "Conj", n);
                if (i == j) {
-                  cerr = cerr || abscomplex(ae_c_sub_d(ct, 1)) > threshold;
+                  cerr = cerr || !NearAtCR(ct, 1.0, threshold);
                } else {
-                  cerr = cerr || abscomplex(ct) > threshold;
+                  cerr = cerr || !SmallAtC(ct, threshold);
                }
             // test for difference in A and B
                cerr = cerr || ae_c_eq(ca.xyC[i][j], cb.xyC[i][j]);
@@ -6667,7 +6667,7 @@ bool testmatgen(bool silent) {
          cmatrixrndorthogonalfromtheleft(&c1, n, 2 * n);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               cerr = cerr || abscomplex(ae_c_sub(c1.xyC[i][j], c1.xyC[i][j + n])) > threshold;
+               cerr = cerr || !NearAtC(c1.xyC[i][j], c1.xyC[i][j + n], threshold);
             }
          }
       }
@@ -6697,7 +6697,7 @@ bool testmatgen(bool silent) {
                }
             }
             vt = maxw / minw / cond;
-            if (fabs(log(vt)) > log(1 + threshold)) {
+            if (!SmallAtR(log(vt), log(1.0 + threshold))) {
                rerr = true;
             }
          }
@@ -6719,7 +6719,7 @@ bool testmatgen(bool silent) {
       // test that A is symmetic
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               spderr = spderr || fabs(a.xyR[i][j] - a.xyR[j][i]) > threshold;
+               spderr = spderr || !NearAtR(a.xyR[i][j], a.xyR[j][i], threshold);
             }
          }
       // test for difference between A and B (subsequent matrix)
@@ -6744,7 +6744,7 @@ bool testmatgen(bool silent) {
       // test that A is Hermitian
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               hpderr = hpderr || abscomplex(ae_c_sub(ca.xyC[i][j], conj(ca.xyC[j][i]))) > threshold;
+               hpderr = hpderr || !NearAtC(ca.xyC[i][j], conj(ca.xyC[j][i]), threshold);
             }
          }
       // test for difference between A and B (subsequent matrix)
@@ -6785,7 +6785,7 @@ bool testmatgen(bool silent) {
       // test that A is Hermitian
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               herr = herr || abscomplex(ae_c_sub(ca.xyC[i][j], conj(ca.xyC[j][i]))) > threshold;
+               herr = herr || !NearAtC(ca.xyC[i][j], conj(ca.xyC[j][i]), threshold);
             }
          }
       // test for difference between A and B (subsequent matrix)
@@ -7991,8 +7991,8 @@ static bool testlevel2unsymmetric() {
          // Test SparseGet() for SA and S0 against matrix returned in A
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(&result, fabs(sparseget(&sa, i, j) - a.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:966");
-                  set_error_flag(&result, fabs(sparseget(&s0, i, j) - a.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:967");
+                  set_error_flag(&result, !NearAtR(sparseget(&sa, i, j), a.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:966");
+                  set_error_flag(&result, !NearAtR(sparseget(&s0, i, j), a.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:967");
                }
             }
          // Test SparseMV
@@ -8010,7 +8010,7 @@ static bool testlevel2unsymmetric() {
             }
             for (i = 0; i < m; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, x1.xR, 1, n);
-               set_error_flag(&result, fabs(v - y0.xR[i]) > eps, __FILE__, __LINE__, "testsparseunit.ap:987");
+               set_error_flag(&result, !NearAtR(v, y0.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:987");
             }
          // Test SparseMTV
             ae_vector_set_length(&x0, m);
@@ -8027,7 +8027,7 @@ static bool testlevel2unsymmetric() {
             }
             for (j = 0; j < n; j++) {
                v = ae_v_dotproduct(&a.xyR[0][j], a.stride, x1.xR, 1, m);
-               set_error_flag(&result, fabs(v - y0.xR[j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1007");
+               set_error_flag(&result, !NearAtR(v, y0.xR[j], eps), __FILE__, __LINE__, "testsparseunit.ap:1007");
             }
          // Sparse GEMV
             for (ops = 0; ops <= 1; ops++) {
@@ -8072,7 +8072,7 @@ static bool testlevel2unsymmetric() {
                   // Test
                      sparsegemv(&s0, alpha, ops, &x0, ix, beta, &y0, iy);
                      for (j = 0; j < iy + opm; j++) {
-                        set_error_flag(&result, fabs(y0.xR[j] - y1.xR[j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1068");
+                        set_error_flag(&result, !NearAtR(y0.xR[j], y1.xR[j], eps), __FILE__, __LINE__, "testsparseunit.ap:1068");
                      }
                   }
                }
@@ -8094,9 +8094,9 @@ static bool testlevel2unsymmetric() {
                }
                for (j = 0; j < n; j++) {
                   v = ae_v_dotproduct(a.xyR[j], 1, x1.xR, 1, n);
-                  set_error_flag(&result, fabs(v - y0.xR[j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1091");
+                  set_error_flag(&result, !NearAtR(v, y0.xR[j], eps), __FILE__, __LINE__, "testsparseunit.ap:1091");
                   v = ae_v_dotproduct(&a.xyR[0][j], a.stride, x1.xR, 1, n);
-                  set_error_flag(&result, fabs(v - y1.xR[j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1093");
+                  set_error_flag(&result, !NearAtR(v, y1.xR[j], eps), __FILE__, __LINE__, "testsparseunit.ap:1093");
                }
             }
          }
@@ -8174,7 +8174,7 @@ static bool testlevel3unsymmetric() {
             for (i = 0; i < m; i++) {
                for (j = 0; j < k; j++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, &x1.xyR[0][j], x1.stride, n);
-                  set_error_flag(&result, fabs(v - y0.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1180");
+                  set_error_flag(&result, !NearAtR(v, y0.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1180");
                }
             }
          // Test SparseMTM
@@ -8196,7 +8196,7 @@ static bool testlevel3unsymmetric() {
             for (i = 0; i < n; i++) {
                for (j = 0; j < k; j++) {
                   v = ae_v_dotproduct(&a.xyR[0][i], a.stride, &x1.xyR[0][j], x1.stride, m);
-                  set_error_flag(&result, fabs(v - y0.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1203");
+                  set_error_flag(&result, !NearAtR(v, y0.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1203");
                }
             }
          // Test SparseMM2
@@ -8221,9 +8221,9 @@ static bool testlevel3unsymmetric() {
                for (i = 0; i < n; i++) {
                   for (j = 0; j < k; j++) {
                      v = ae_v_dotproduct(a.xyR[i], 1, &x1.xyR[0][j], x1.stride, n);
-                     set_error_flag(&result, fabs(v - y0.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1230");
+                     set_error_flag(&result, !NearAtR(v, y0.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1230");
                      v = ae_v_dotproduct(&a.xyR[0][i], a.stride, &x1.xyR[0][j], x1.stride, n);
-                     set_error_flag(&result, fabs(v - y1.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1232");
+                     set_error_flag(&result, !NearAtR(v, y1.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1232");
                   }
                }
             }
@@ -8299,8 +8299,8 @@ static bool testlevel2symmetric() {
          // Test SparseGet() for SA and S0 against matrix returned in A
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(&result, fabs(sparseget(&sa, i, j) - a.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1311");
-                  set_error_flag(&result, fabs(sparseget(&s0, i, j) - a.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1312");
+                  set_error_flag(&result, !NearAtR(sparseget(&sa, i, j), a.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1311");
+                  set_error_flag(&result, !NearAtR(sparseget(&s0, i, j), a.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1312");
                   set_error_flag(&result, j < i && triangletype == 1 && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1313");
                   set_error_flag(&result, j > i && triangletype == -1 && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1314");
                }
@@ -8329,7 +8329,7 @@ static bool testlevel2symmetric() {
             }
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, x1.xR, 1, n);
-               set_error_flag(&result, fabs(v - y0.xR[i]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1343");
+               set_error_flag(&result, !NearAtR(v, y0.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:1343");
             }
             sparsesmv(&s1, isupper, &x0, &y1);
             set_error_flag(&result, y1.cnt < n, __FILE__, __LINE__, "testsparseunit.ap:1346");
@@ -8339,7 +8339,7 @@ static bool testlevel2symmetric() {
             }
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, x1.xR, 1, n);
-               set_error_flag(&result, fabs(v - y1.xR[i]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1352");
+               set_error_flag(&result, !NearAtR(v, y1.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:1352");
             }
          // Test SparseVSMV
             ae_vector_set_length(&x0, n);
@@ -8355,9 +8355,9 @@ static bool testlevel2symmetric() {
                }
             }
             va = sparsevsmv(&s0, isupper, &x0);
-            set_error_flag(&result, fabs(va - vb) > eps, __FILE__, __LINE__, "testsparseunit.ap:1370");
+            set_error_flag(&result, !NearAtR(va, vb, eps), __FILE__, __LINE__, "testsparseunit.ap:1370");
             va = sparsevsmv(&s1, isupper, &x0);
-            set_error_flag(&result, fabs(va - vb) > eps, __FILE__, __LINE__, "testsparseunit.ap:1372");
+            set_error_flag(&result, !NearAtR(va, vb, eps), __FILE__, __LINE__, "testsparseunit.ap:1372");
          }
       }
    }
@@ -8431,8 +8431,8 @@ static bool testlevel3symmetric() {
          // Test SparseGet() for SA and S0 against matrix returned in A
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(&result, fabs(sparseget(&sa, i, j) - a.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1453");
-                  set_error_flag(&result, fabs(sparseget(&s0, i, j) - a.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1454");
+                  set_error_flag(&result, !NearAtR(sparseget(&sa, i, j), a.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1453");
+                  set_error_flag(&result, !NearAtR(sparseget(&s0, i, j), a.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1454");
                   set_error_flag(&result, j < i && triangletype == 1 && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1455");
                   set_error_flag(&result, j > i && triangletype == -1 && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1456");
                }
@@ -8465,7 +8465,7 @@ static bool testlevel3symmetric() {
             for (i = 0; i < n; i++) {
                for (j = 0; j < k; j++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, &x1.xyR[0][j], x1.stride, n);
-                  set_error_flag(&result, fabs(v - y0.xyR[i][j]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1488");
+                  set_error_flag(&result, !NearAtR(v, y0.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1488");
                }
             }
          }
@@ -8562,7 +8562,7 @@ static bool testsymmetricperm() {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               set_error_flag(&result, isupper && j >= i && fabs(db.xyR[i][j] - sparseget(&sb, i, j)) > eps, __FILE__, __LINE__, "testsparseunit.ap:1590");
+               set_error_flag(&result, isupper && j >= i && !NearAtR(db.xyR[i][j], sparseget(&sb, i, j), eps), __FILE__, __LINE__, "testsparseunit.ap:1590");
                set_error_flag(&result, isupper && j < i && sparseget(&sb, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1591");
             }
          }
@@ -8679,7 +8679,7 @@ static bool testlevel2triangular() {
             }
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(ea.xyR[i], 1, x1.xR, 1, n);
-               set_error_flag(&result, fabs(v - y0.xR[i]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1712");
+               set_error_flag(&result, !NearAtR(v, y0.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:1712");
             }
             sparsetrmv(&s0, isupper, isunit, optype, &x0, &y1);
             set_error_flag(&result, y1.cnt < n, __FILE__, __LINE__, "testsparseunit.ap:1715");
@@ -8689,7 +8689,7 @@ static bool testlevel2triangular() {
             }
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(ea.xyR[i], 1, x1.xR, 1, n);
-               set_error_flag(&result, fabs(v - y1.xR[i]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1721");
+               set_error_flag(&result, !NearAtR(v, y1.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:1721");
             }
          }
       }
@@ -8769,7 +8769,7 @@ static bool testlevel2triangular() {
                return result;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(&result, fabs(ey.xR[i] - x0.xR[i]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1809");
+               set_error_flag(&result, !NearAtR(ey.xR[i], x0.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:1809");
             }
             sparsetrsv(&s1, isupper, isunit, optype, &x1);
             set_error_flag(&result, x1.cnt < n, __FILE__, __LINE__, "testsparseunit.ap:1811");
@@ -8778,7 +8778,7 @@ static bool testlevel2triangular() {
                return result;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(&result, fabs(ey.xR[i] - x1.xR[i]) > eps, __FILE__, __LINE__, "testsparseunit.ap:1815");
+               set_error_flag(&result, !NearAtR(ey.xR[i], x1.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:1815");
             }
          }
       }
@@ -9162,7 +9162,7 @@ static bool linearfunctionstest() {
             sparsemtv(&s, &x1, &yt);
          // Check for MV-result
             for (i1 = 0; i1 < i; i1++) {
-               if (fabs(y.xR[i1] - ty.xR[i1]) >= eps) {
+               if (!NearR(y.xR[i1], ty.xR[i1], eps)) {
                   result = true;
                   ae_frame_leave();
                   return result;
@@ -9170,7 +9170,7 @@ static bool linearfunctionstest() {
             }
          // Check for MTV-result
             for (i1 = 0; i1 < j; i1++) {
-               if (fabs(yt.xR[i1] - tyt.xR[i1]) >= eps) {
+               if (!NearR(yt.xR[i1], tyt.xR[i1], eps)) {
                   result = true;
                   ae_frame_leave();
                   return result;
@@ -9189,7 +9189,7 @@ static bool linearfunctionstest() {
             sparsemv2(&s, &x0, &y0, &yt0);
          // Check for MV2-result
             for (i1 = 0; i1 < i; i1++) {
-               if (fabs(y0.xR[i1] - ty.xR[i1]) >= eps || fabs(yt0.xR[i1] - tyt.xR[i1]) >= eps) {
+               if (!NearR(y0.xR[i1], ty.xR[i1], eps) || !NearR(yt0.xR[i1], tyt.xR[i1], eps)) {
                   result = true;
                   ae_frame_leave();
                   return result;
@@ -9197,7 +9197,7 @@ static bool linearfunctionstest() {
             }
          // Check for MV- and MTV-result by help MV2
             for (i1 = 0; i1 < i; i1++) {
-               if (fabs(y0.xR[i1] - y.xR[i1]) > eps || fabs(yt0.xR[i1] - yt.xR[i1]) > eps) {
+               if (!NearAtR(y0.xR[i1], y.xR[i1], eps) || !NearAtR(yt0.xR[i1], yt.xR[i1], eps)) {
                   result = true;
                   ae_frame_leave();
                   return result;
@@ -9280,7 +9280,7 @@ static bool linearfunctionsstest() {
       sparsesmv(&s, false, &x1, &yt);
    // Check for SMV-result
       for (i1 = 0; i1 < i; i1++) {
-         if (fabs(y.xR[i1] - ty.xR[i1]) >= eps || fabs(yt.xR[i1] - tyt.xR[i1]) >= eps) {
+         if (!NearR(y.xR[i1], ty.xR[i1], eps) || !NearR(yt.xR[i1], tyt.xR[i1], eps)) {
             result = true;
             ae_frame_leave();
             return result;
@@ -9389,7 +9389,7 @@ static bool linearfunctionsmmtest() {
             // Check for MM-result
                for (i1 = 0; i1 < i; i1++) {
                   for (j1 = 0; j1 < k; j1++) {
-                     if (fabs(y.xyR[i1][j1] - ty.xyR[i1][j1]) >= eps) {
+                     if (!NearR(y.xyR[i1][j1], ty.xyR[i1][j1], eps)) {
                         result = true;
                         ae_frame_leave();
                         return result;
@@ -9399,7 +9399,7 @@ static bool linearfunctionsmmtest() {
             // Check for MTM-result
                for (i1 = 0; i1 < j; i1++) {
                   for (j1 = 0; j1 < k; j1++) {
-                     if (fabs(yt.xyR[i1][j1] - tyt.xyR[i1][j1]) >= eps) {
+                     if (!NearR(yt.xyR[i1][j1], tyt.xyR[i1][j1], eps)) {
                         result = true;
                         ae_frame_leave();
                         return result;
@@ -9413,7 +9413,7 @@ static bool linearfunctionsmmtest() {
             // Check for MM2-result
                for (i1 = 0; i1 < i; i1++) {
                   for (j1 = 0; j1 < k; j1++) {
-                     if (fabs(y0.xyR[i1][j1] - ty.xyR[i1][j1]) >= eps || fabs(yt0.xyR[i1][j1] - tyt.xyR[i1][j1]) >= eps) {
+                     if (!NearR(y0.xyR[i1][j1], ty.xyR[i1][j1], eps) || !NearR(yt0.xyR[i1][j1], tyt.xyR[i1][j1], eps)) {
                         result = true;
                         ae_frame_leave();
                         return result;
@@ -9423,7 +9423,7 @@ static bool linearfunctionsmmtest() {
             // Check for MV- and MTM-result by help MV2
                for (i1 = 0; i1 < i; i1++) {
                   for (j1 = 0; j1 < k; j1++) {
-                     if (fabs(y0.xyR[i1][j1] - y.xyR[i1][j1]) > eps || fabs(yt0.xyR[i1][j1] - yt.xyR[i1][j1]) > eps) {
+                     if (!NearAtR(y0.xyR[i1][j1], y.xyR[i1][j1], eps) || !NearAtR(yt0.xyR[i1][j1], yt.xyR[i1][j1], eps)) {
                         result = true;
                         ae_frame_leave();
                         return result;
@@ -9521,7 +9521,7 @@ static bool linearfunctionssmmtest() {
       // Check for SMM-result
          for (k1 = 0; k1 < j; k1++) {
             for (i1 = 0; i1 < i; i1++) {
-               if (fabs(y.xyR[i1][k1] - ty.xyR[i1][k1]) >= eps || fabs(yt.xyR[i1][k1] - tyt.xyR[i1][k1]) >= eps) {
+               if (!NearR(y.xyR[i1][k1], ty.xyR[i1][k1], eps) || !NearR(yt.xyR[i1][k1], tyt.xyR[i1][k1], eps)) {
                   result = true;
                   ae_frame_leave();
                   return result;
@@ -9737,7 +9737,7 @@ static bool copyfunctest(bool silent) {
                sparsemtv(&ss, &x1, &cpyt);
             // Check for MV-result
                for (i1 = 0; i1 < i; i1++) {
-                  if (fabs(y.xR[i1] - ty.xR[i1]) >= eps || fabs(cpy.xR[i1] - ty.xR[i1]) >= eps || cpy.xR[i1] - y.xR[i1] != 0.0) {
+                  if (!NearR(y.xR[i1], ty.xR[i1], eps) || !NearR(cpy.xR[i1], ty.xR[i1], eps) || cpy.xR[i1] - y.xR[i1] != 0.0) {
                      if (!silent) {
                         printf("CopyFuncTest::Report::RES_MV\n");
                         printf("Y[%0d]=%0.5f; tY[%0d]=%0.5f\n", (int)i1, y.xR[i1], (int)i1, ty.xR[i1]);
@@ -9751,7 +9751,7 @@ static bool copyfunctest(bool silent) {
                }
             // Check for MTV-result
                for (i1 = 0; i1 < j; i1++) {
-                  if (fabs(yt.xR[i1] - tyt.xR[i1]) >= eps || fabs(cpyt.xR[i1] - tyt.xR[i1]) >= eps || cpyt.xR[i1] - yt.xR[i1] != 0.0) {
+                  if (!NearR(yt.xR[i1], tyt.xR[i1], eps) || !NearR(cpyt.xR[i1], tyt.xR[i1], eps) || cpyt.xR[i1] - yt.xR[i1] != 0.0) {
                      if (!silent) {
                         printf("CopyFuncTest::Report::RES_MTV\n");
                         printf("Yt[%0d]=%0.5f; tYt[%0d]=%0.5f\n", (int)i1, yt.xR[i1], (int)i1, tyt.xR[i1]);
@@ -9798,7 +9798,7 @@ static bool copyfunctest(bool silent) {
                sparsemv2(&ss, &x0, &cpy0, &cpyt0);
             // Check for MV2-result
                for (i1 = 0; i1 < i; i1++) {
-                  if (fabs(y0.xR[i1] - ty.xR[i1]) >= eps || fabs(yt0.xR[i1] - tyt.xR[i1]) >= eps || fabs(cpy0.xR[i1] - ty.xR[i1]) >= eps || fabs(cpyt0.xR[i1] - tyt.xR[i1]) >= eps || cpy0.xR[i1] - y0.xR[i1] != 0.0 || cpyt0.xR[i1] - yt0.xR[i1] != 0.0) {
+                  if (!NearR(y0.xR[i1], ty.xR[i1], eps) || !NearR(yt0.xR[i1], tyt.xR[i1], eps) || !NearR(cpy0.xR[i1], ty.xR[i1], eps) || !NearR(cpyt0.xR[i1], tyt.xR[i1], eps) || cpy0.xR[i1] - y0.xR[i1] != 0.0 || cpyt0.xR[i1] - yt0.xR[i1] != 0.0) {
                      if (!silent) {
                         printf("CopyFuncTest::Report::RES_MV2\n");
                         printf("Y0[%0d]=%0.5f; tY[%0d]=%0.5f\n", (int)i1, y0.xR[i1], (int)i1, ty.xR[i1]);
@@ -9814,7 +9814,7 @@ static bool copyfunctest(bool silent) {
                }
             // Check for MV- and MTV-result by help MV2
                for (i1 = 0; i1 < i; i1++) {
-                  if (fabs(y0.xR[i1] - y.xR[i1]) > eps || fabs(yt0.xR[i1] - yt.xR[i1]) > eps || fabs(cpy0.xR[i1] - cpy.xR[i1]) > eps || fabs(cpyt0.xR[i1] - cpyt.xR[i1]) > eps) {
+                  if (!NearAtR(y0.xR[i1], y.xR[i1], eps) || !NearAtR(yt0.xR[i1], yt.xR[i1], eps) || !NearAtR(cpy0.xR[i1], cpy.xR[i1], eps) || !NearAtR(cpyt0.xR[i1], cpyt.xR[i1], eps)) {
                      if (!silent) {
                         printf("CopyFuncTest::Report::RES_MV_MVT\n");
                         printf("Y0[%0d]=%0.5f; Y[%0d]=%0.5f\n", (int)i1, y0.xR[i1], (int)i1, y.xR[i1]);
@@ -10727,7 +10727,7 @@ bool testblas(bool silent) {
    a.xyR[3][1] = 99.0;
    a.xyR[3][2] = 3.0;
    a.xyR[3][3] = 1.0;
-   hsnerrors = fabs(upperhessenberg1norm(&a, 1, 3, 1, 3, &x1) - 11) > threshold;
+   hsnerrors = !NearAtR(upperhessenberg1norm(&a, 1, 3, 1, 3, &x1), 11.0, threshold);
 // Testing MatrixVectorMultiply
    ae_matrix_set_length(&a, 3 + 1, 5 + 1);
    ae_vector_set_length(&x1, 3 + 1);
@@ -11241,7 +11241,7 @@ static void testevdunit_testsevdproblem(RMatrix *a, RMatrix *al, RMatrix *au, ae
       return;
    }
    for (i = 0; i < n; i++) {
-      *serrors = *serrors || fabs(lambdav.xR[i] - lambdaref.xR[i]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[i], lambdaref.xR[i], threshold);
    }
 // Test simple EVD: values only, upper A
    testevdunit_unset1d(&lambdav);
@@ -11253,7 +11253,7 @@ static void testevdunit_testsevdproblem(RMatrix *a, RMatrix *al, RMatrix *au, ae
       return;
    }
    for (i = 0; i < n; i++) {
-      *serrors = *serrors || fabs(lambdav.xR[i] - lambdaref.xR[i]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[i], lambdaref.xR[i], threshold);
    }
    ae_frame_leave();
 }
@@ -11312,7 +11312,7 @@ static void testevdunit_testhevdproblem(CMatrix *a, CMatrix *al, CMatrix *au, ae
       return;
    }
    for (i = 0; i < n; i++) {
-      *herrors = *herrors || fabs(lambdav.xR[i] - lambdaref.xR[i]) > threshold;
+      *herrors = *herrors || !NearAtR(lambdav.xR[i], lambdaref.xR[i], threshold);
    }
 // Test simple EVD: values only, upper A
    testevdunit_unset1d(&lambdav);
@@ -11324,7 +11324,7 @@ static void testevdunit_testhevdproblem(CMatrix *a, CMatrix *al, CMatrix *au, ae
       return;
    }
    for (i = 0; i < n; i++) {
-      *herrors = *herrors || fabs(lambdav.xR[i] - lambdaref.xR[i]) > threshold;
+      *herrors = *herrors || !NearAtR(lambdav.xR[i], lambdaref.xR[i], threshold);
    }
    ae_frame_leave();
 }
@@ -11372,13 +11372,13 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
    i1 = randominteger(n);
    i2 = i1 + randominteger(n - i1);
    while (i1 > 0) {
-      if (fabs(lambdaref.xR[i1 - 1] - lambdaref.xR[i1]) > 10 * threshold) {
+      if (!NearAtR(lambdaref.xR[i1 - 1], lambdaref.xR[i1], 10 * threshold)) {
          break;
       }
       i1--;
    }
    while (i2 < n - 1) {
-      if (fabs(lambdaref.xR[i2 + 1] - lambdaref.xR[i2]) > 10 * threshold) {
+      if (!NearAtR(lambdaref.xR[i2 + 1], lambdaref.xR[i2], 10.0 * threshold)) {
          break;
       }
       i2++;
@@ -11409,7 +11409,7 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
       return;
    }
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
 // Test interval, no vectors, upper A
    testevdunit_unset1d(&lambdav);
@@ -11426,7 +11426,7 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
       return;
    }
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
 // Test indexes, no vectors, lower A
    testevdunit_unset1d(&lambdav);
@@ -11439,7 +11439,7 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
    }
    m = i2 - i1 + 1;
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
 // Test indexes, no vectors, upper A
    testevdunit_unset1d(&lambdav);
@@ -11452,7 +11452,7 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
    }
    m = i2 - i1 + 1;
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
 // Test interval, vectors, lower A
    testevdunit_unset1d(&lambdav);
@@ -11469,7 +11469,7 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
       return;
    }
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
    if (distvals) {
    // Distinct eigenvalues, test vectors
@@ -11481,7 +11481,7 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            *serrors = *serrors || fabs(z.xyR[i][j] - zref.xyR[i][i1 + j]) > threshold;
+            *serrors = *serrors || !NearAtR(z.xyR[i][j], zref.xyR[i][i1 + j], threshold);
          }
       }
    }
@@ -11500,7 +11500,7 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
       return;
    }
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
    if (distvals) {
    // Distinct eigenvalues, test vectors
@@ -11512,7 +11512,7 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            *serrors = *serrors || fabs(z.xyR[i][j] - zref.xyR[i][i1 + j]) > threshold;
+            *serrors = *serrors || !NearAtR(z.xyR[i][j], zref.xyR[i][i1 + j], threshold);
          }
       }
    }
@@ -11527,7 +11527,7 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
    }
    m = i2 - i1 + 1;
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
    if (distvals) {
    // Distinct eigenvalues, test vectors
@@ -11539,7 +11539,7 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            *serrors = *serrors || fabs(z.xyR[i][j] - zref.xyR[i][i1 + j]) > threshold;
+            *serrors = *serrors || !NearAtR(z.xyR[i][j], zref.xyR[i][i1 + j], threshold);
          }
       }
    }
@@ -11554,7 +11554,7 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
    }
    m = i2 - i1 + 1;
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
    if (distvals) {
    // Distinct eigenvalues, test vectors
@@ -11566,7 +11566,7 @@ static void testevdunit_testsevdbiproblem(RMatrix *afull, RMatrix *al, RMatrix *
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            *serrors = *serrors || fabs(z.xyR[i][j] - zref.xyR[i][i1 + j]) > threshold;
+            *serrors = *serrors || !NearAtR(z.xyR[i][j], zref.xyR[i][i1 + j], threshold);
          }
       }
    }
@@ -11616,13 +11616,13 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
    i1 = randominteger(n);
    i2 = i1 + randominteger(n - i1);
    while (i1 > 0) {
-      if (fabs(lambdaref.xR[i1 - 1] - lambdaref.xR[i1]) > 10 * threshold) {
+      if (!NearAtR(lambdaref.xR[i1 - 1], lambdaref.xR[i1], 10 * threshold)) {
          break;
       }
       i1--;
    }
    while (i2 < n - 1) {
-      if (fabs(lambdaref.xR[i2 + 1] - lambdaref.xR[i2]) > 10 * threshold) {
+      if (!NearAtR(lambdaref.xR[i2 + 1], lambdaref.xR[i2], 10.0 * threshold)) {
          break;
       }
       i2++;
@@ -11653,7 +11653,7 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
       return;
    }
    for (k = 0; k < m; k++) {
-      *herrors = *herrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *herrors = *herrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
 // Test interval, no vectors, upper A
    testevdunit_unset1d(&lambdav);
@@ -11670,7 +11670,7 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
       return;
    }
    for (k = 0; k < m; k++) {
-      *herrors = *herrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *herrors = *herrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
 // Test indexes, no vectors, lower A
    testevdunit_unset1d(&lambdav);
@@ -11683,7 +11683,7 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
    }
    m = i2 - i1 + 1;
    for (k = 0; k < m; k++) {
-      *herrors = *herrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *herrors = *herrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
 // Test indexes, no vectors, upper A
    testevdunit_unset1d(&lambdav);
@@ -11696,7 +11696,7 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
    }
    m = i2 - i1 + 1;
    for (k = 0; k < m; k++) {
-      *herrors = *herrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *herrors = *herrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
 // Test interval, vectors, lower A
    testevdunit_unset1d(&lambdav);
@@ -11713,7 +11713,7 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
       return;
    }
    for (k = 0; k < m; k++) {
-      *herrors = *herrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *herrors = *herrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
    if (distvals) {
    // Distinct eigenvalues, test vectors
@@ -11724,7 +11724,7 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            *herrors = *herrors || abscomplex(ae_c_sub(z.xyC[i][j], zref.xyC[i][i1 + j])) > threshold;
+            *herrors = *herrors || !NearAtC(z.xyC[i][j], zref.xyC[i][i1 + j], threshold);
          }
       }
    }
@@ -11743,7 +11743,7 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
       return;
    }
    for (k = 0; k < m; k++) {
-      *herrors = *herrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *herrors = *herrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
    if (distvals) {
    // Distinct eigenvalues, test vectors
@@ -11754,7 +11754,7 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            *herrors = *herrors || abscomplex(ae_c_sub(z.xyC[i][j], zref.xyC[i][i1 + j])) > threshold;
+            *herrors = *herrors || !NearAtC(z.xyC[i][j], zref.xyC[i][i1 + j], threshold);
          }
       }
    }
@@ -11769,7 +11769,7 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
    }
    m = i2 - i1 + 1;
    for (k = 0; k < m; k++) {
-      *herrors = *herrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *herrors = *herrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
    if (distvals) {
    // Distinct eigenvalues, test vectors
@@ -11780,7 +11780,7 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            *herrors = *herrors || abscomplex(ae_c_sub(z.xyC[i][j], zref.xyC[i][i1 + j])) > threshold;
+            *herrors = *herrors || !NearAtC(z.xyC[i][j], zref.xyC[i][i1 + j], threshold);
          }
       }
    }
@@ -11795,7 +11795,7 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
    }
    m = i2 - i1 + 1;
    for (k = 0; k < m; k++) {
-      *herrors = *herrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *herrors = *herrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
    if (distvals) {
    // Distinct eigenvalues, test vectors
@@ -11806,7 +11806,7 @@ static void testevdunit_testhevdbiproblem(CMatrix *afull, CMatrix *al, CMatrix *
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            *herrors = *herrors || abscomplex(ae_c_sub(z.xyC[i][j], zref.xyC[i][i1 + j])) > threshold;
+            *herrors = *herrors || !NearAtC(z.xyC[i][j], zref.xyC[i][i1 + j], threshold);
          }
       }
    }
@@ -11882,7 +11882,7 @@ static void testevdunit_testtdevdproblem(RVector *d, RVector *e, ae_int_t n, dou
       return;
    }
    for (i = 0; i < n; i++) {
-      set_error_flag(tderrors, fabs(lambda2.xR[i] - lambdav.xR[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1143");
+      set_error_flag(tderrors, !NearAtR(lambda2.xR[i], lambdav.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1143");
    }
 // Test multiplication variant
    for (i = 0; i < n; i++) {
@@ -11904,7 +11904,7 @@ static void testevdunit_testtdevdproblem(RVector *d, RVector *e, ae_int_t n, dou
       return;
    }
    for (i = 0; i < n; i++) {
-      set_error_flag(tderrors, fabs(lambda2.xR[i] - lambdav.xR[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1165");
+      set_error_flag(tderrors, !NearAtR(lambda2.xR[i], lambdav.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1165");
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
@@ -11913,7 +11913,7 @@ static void testevdunit_testtdevdproblem(RVector *d, RVector *e, ae_int_t n, dou
       // depending on algorithm used we can get either
       // z or -z as eigenvector. so we compare result
       // with both A*ZRef and -A*ZRef
-         set_error_flag(tderrors, fabs(v - a1.xyR[i][j]) > threshold && fabs(v + a1.xyR[i][j]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1177");
+         set_error_flag(tderrors, !NearAtR(v, a1.xyR[i][j], threshold) && !NearAtR(v, -a1.xyR[i][j], threshold), __FILE__, __LINE__, "testevdunit.ap:1177");
       }
    }
 // Test first row variant.
@@ -11951,12 +11951,12 @@ static void testevdunit_testtdevdproblem(RVector *d, RVector *e, ae_int_t n, dou
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(tderrors, fabs(lambda2.xR[i] - lambdav.xR[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1216");
+         set_error_flag(tderrors, !NearAtR(lambda2.xR[i], lambdav.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1216");
       // next line is a bit complicated because
       // depending on algorithm used we can get either
       // z or -z as eigenvector. so we compare result
       // with both z and -z
-         set_error_flag(tderrors, fabs(z.xyR[0][i] - zref.xyR[0][i]) > specialthreshold && fabs(z.xyR[0][i] + zref.xyR[0][i]) > specialthreshold, __FILE__, __LINE__, "testevdunit.ap:1224");
+         set_error_flag(tderrors, !NearAtR(z.xyR[0][i], zref.xyR[0][i], specialthreshold) && !NearAtR(z.xyR[0][i], -zref.xyR[0][i], specialthreshold), __FILE__, __LINE__, "testevdunit.ap:1224");
       }
    }
    ae_frame_leave();
@@ -12007,13 +12007,13 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
    i1 = randominteger(n);
    i2 = i1 + randominteger(n - i1);
    while (i1 > 0) {
-      if (fabs(lambdaref.xR[i1 - 1] - lambdaref.xR[i1]) > 10 * threshold) {
+      if (!NearAtR(lambdaref.xR[i1 - 1], lambdaref.xR[i1], 10 * threshold)) {
          break;
       }
       i1--;
    }
    while (i2 < n - 1) {
-      if (fabs(lambdaref.xR[i2 + 1] - lambdaref.xR[i2]) > 10 * threshold) {
+      if (!NearAtR(lambdaref.xR[i2 + 1], lambdaref.xR[i2], 10.0 * threshold)) {
          break;
       }
       i2++;
@@ -12047,7 +12047,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
       return;
    }
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
 // Test indexes, no vectors
    ae_vector_set_length(&lambdav, n - 1 + 1);
@@ -12062,7 +12062,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
    }
    m = i2 - i1 + 1;
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
 // Test interval, transform vectors
    ae_vector_set_length(&lambdav, n - 1 + 1);
@@ -12089,7 +12089,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
       return;
    }
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
    if (distvals) {
       ae_matrix_set_length(&ar, n - 1 + 1, m - 1 + 1);
@@ -12107,7 +12107,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            *serrors = *serrors || fabs(a1.xyR[i][j] - ar.xyR[i][j]) > threshold;
+            *serrors = *serrors || !NearAtR(a1.xyR[i][j], ar.xyR[i][j], threshold);
          }
       }
    }
@@ -12132,7 +12132,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
    }
    m = i2 - i1 + 1;
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
    if (distvals) {
       ae_matrix_set_length(&ar, n - 1 + 1, m - 1 + 1);
@@ -12150,7 +12150,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            *serrors = *serrors || fabs(a1.xyR[i][j] - ar.xyR[i][j]) > threshold;
+            *serrors = *serrors || !NearAtR(a1.xyR[i][j], ar.xyR[i][j], threshold);
          }
       }
    }
@@ -12172,7 +12172,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
       return;
    }
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
    if (distvals) {
       for (j = 0; j < m; j++) {
@@ -12183,7 +12183,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            *serrors = *serrors || fabs(z.xyR[i][j] - zref.xyR[i][i1 + j]) > threshold;
+            *serrors = *serrors || !NearAtR(z.xyR[i][j], zref.xyR[i][i1 + j], threshold);
          }
       }
    }
@@ -12201,7 +12201,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
    }
    m = i2 - i1 + 1;
    for (k = 0; k < m; k++) {
-      *serrors = *serrors || fabs(lambdav.xR[k] - lambdaref.xR[i1 + k]) > threshold;
+      *serrors = *serrors || !NearAtR(lambdav.xR[k], lambdaref.xR[i1 + k], threshold);
    }
    if (distvals) {
       for (j = 0; j < m; j++) {
@@ -12212,7 +12212,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            *serrors = *serrors || fabs(z.xyR[i][j] - zref.xyR[i][i1 + j]) > threshold;
+            *serrors = *serrors || !NearAtR(z.xyR[i][j], zref.xyR[i][i1 + j], threshold);
          }
       }
    }
@@ -12264,7 +12264,7 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
    mx = 0.0;
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         if (fabs(a->xyR[i][j]) > mx) {
+         if (!SmallAtR(a->xyR[i][j], mx)) {
             mx = fabs(a->xyR[i][j]);
          }
       }
@@ -12319,8 +12319,8 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
          }
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(nserrors, fabs(wr0s.xR[i] - wr1s.xR[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1604");
-         set_error_flag(nserrors, fabs(wi0s.xR[i] - wi1s.xR[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1605");
+         set_error_flag(nserrors, !NearAtR(wr0s.xR[i], wr1s.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1604");
+         set_error_flag(nserrors, !NearAtR(wi0s.xR[i], wi1s.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1605");
       }
    // Test right vectors
       if (needr) {
@@ -12363,8 +12363,8 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
             ae_v_addd(vec3i.xR, 1, vec1i.xR, 1, n, curwr);
             set_error_flag(nserrors, vnorm < 1.0E-3 || !isfinite(vnorm), __FILE__, __LINE__, "testevdunit.ap:1654");
             for (i = 0; i < n; i++) {
-               set_error_flag(nserrors, fabs(vec2r.xR[i] - vec3r.xR[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1657");
-               set_error_flag(nserrors, fabs(vec2i.xR[i] - vec3i.xR[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1658");
+               set_error_flag(nserrors, !NearAtR(vec2r.xR[i], vec3r.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1657");
+               set_error_flag(nserrors, !NearAtR(vec2i.xR[i], vec3i.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1658");
             }
             k++;
          }
@@ -12410,8 +12410,8 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
             ae_v_addd(vec3i.xR, 1, vec1i.xR, 1, n, -curwr);
             set_error_flag(nserrors, vnorm < 1.0E-3 || !isfinite(vnorm), __FILE__, __LINE__, "testevdunit.ap:1710");
             for (i = 0; i < n; i++) {
-               set_error_flag(nserrors, fabs(vec2r.xR[i] - vec3r.xR[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1713");
-               set_error_flag(nserrors, fabs(vec2i.xR[i] - vec3i.xR[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1714");
+               set_error_flag(nserrors, !NearAtR(vec2r.xR[i], vec3r.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1713");
+               set_error_flag(nserrors, !NearAtR(vec2i.xR[i], vec3i.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1714");
             }
             k++;
          }
@@ -12743,7 +12743,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
             }
          // Compare against reference values
             for (i = 0; i < m; i++) {
-               set_error_flag(errorflag, fabs(sw.xR[i] - diaga.xR[i]) > tollambda, __FILE__, __LINE__, "testevdunit.ap:2126");
+               set_error_flag(errorflag, !NearAtR(sw.xR[i], diaga.xR[i], tollambda), __FILE__, __LINE__, "testevdunit.ap:2126");
                v = ae_v_dotproduct(qa.xyR[i], 1, &sz.xyR[0][i], sz.stride, n);
                mx = 0.0;
                for (j = 0; j < n; j++) {
@@ -12844,7 +12844,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
          // Compare against reference values
             set_error_flag(errorflag, rep.iterationscount > itscount, __FILE__, __LINE__, "testevdunit.ap:2246");
             for (i = 0; i < m; i++) {
-               set_error_flag(errorflag, fabs(sw.xR[i] - diaga.xR[i]) > tollambda, __FILE__, __LINE__, "testevdunit.ap:2249");
+               set_error_flag(errorflag, !NearAtR(sw.xR[i], diaga.xR[i], tollambda), __FILE__, __LINE__, "testevdunit.ap:2249");
                v = ae_v_dotproduct(qa.xyR[i], 1, &sz.xyR[0][i], sz.stride, n);
                mx = 0.0;
                for (j = 0; j < n; j++) {
@@ -12880,7 +12880,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
                if (j == i) {
                   v--;
                }
-               set_error_flag(errorflag, fabs(v) > 1.0E3 * machineepsilon, __FILE__, __LINE__, "testevdunit.ap:2291");
+               set_error_flag(errorflag, !SmallAtR(v, 1.0E3 * machineepsilon), __FILE__, __LINE__, "testevdunit.ap:2291");
             }
             set_error_flag(errorflag, sw.xR[i] != 0.0, __FILE__, __LINE__, "testevdunit.ap:2293");
          }
@@ -12895,7 +12895,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
                if (j == i) {
                   v--;
                }
-               set_error_flag(errorflag, fabs(v) > 1.0E3 * machineepsilon, __FILE__, __LINE__, "testevdunit.ap:2310");
+               set_error_flag(errorflag, !SmallAtR(v, 1.0E3 * machineepsilon), __FILE__, __LINE__, "testevdunit.ap:2310");
             }
             set_error_flag(errorflag, sw.xR[i] != 0.0, __FILE__, __LINE__, "testevdunit.ap:2312");
          }
@@ -13327,7 +13327,7 @@ static bool sparserealcholeskytest() {
             }
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(&result, fabs(a.xyR[i][j] - a1.xyR[i][j]) > tol, __FILE__, __LINE__, "testtrfacunit.ap:844");
+                  set_error_flag(&result, !NearAtR(a.xyR[i][j], a1.xyR[i][j], tol), __FILE__, __LINE__, "testtrfacunit.ap:844");
                }
             }
          }
@@ -13514,7 +13514,7 @@ static bool sparserealcholeskytest() {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               set_error_flag(&result, fabs(a.xyR[i][j] - a1.xyR[i][j]) > tol, __FILE__, __LINE__, "testtrfacunit.ap:1053");
+               set_error_flag(&result, !NearAtR(a.xyR[i][j], a1.xyR[i][j], tol), __FILE__, __LINE__, "testtrfacunit.ap:1053");
             }
          }
       // Increase problem sparsity and try one more time.
@@ -13749,7 +13749,7 @@ static bool sparserealcholeskytest() {
             }
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(&result, fabs(a.xyR[i][j] - a1.xyR[i][j]) > tol, __FILE__, __LINE__, "testtrfacunit.ap:1307");
+                  set_error_flag(&result, !NearAtR(a.xyR[i][j], a1.xyR[i][j], tol), __FILE__, __LINE__, "testtrfacunit.ap:1307");
                }
             }
          }
@@ -13851,7 +13851,7 @@ static bool sparserealcholeskytest() {
                   for (k = 0; k < n; k++) {
                      v += sparseget(&sa, k, j) * sparseget(&sa, k, i);
                   }
-                  set_error_flag(&result, fabs(a.xyR[i][j] - v) > tol, __FILE__, __LINE__, "testtrfacunit.ap:1430");
+                  set_error_flag(&result, !NearAtR(a.xyR[i][j], v, tol), __FILE__, __LINE__, "testtrfacunit.ap:1430");
                }
             }
          } else {
@@ -13861,7 +13861,7 @@ static bool sparserealcholeskytest() {
                   for (k = 0; k < n; k++) {
                      v += sparseget(&sa, j, k) * sparseget(&sa, i, k);
                   }
-                  set_error_flag(&result, fabs(a.xyR[i][j] - v) > tol, __FILE__, __LINE__, "testtrfacunit.ap:1441");
+                  set_error_flag(&result, !NearAtR(a.xyR[i][j], v, tol), __FILE__, __LINE__, "testtrfacunit.ap:1441");
                }
             }
          }
@@ -13881,9 +13881,9 @@ static bool sparserealcholeskytest() {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (isupper ? j >= i : j <= i) {
-                  set_error_flag(&result, fabs(sparseget(&sa1, i, j) - sparseget(&sa, i, j)) > 10.0 * machineepsilon, __FILE__, __LINE__, "testtrfacunit.ap:1463");
+                  set_error_flag(&result, !NearAtR(sparseget(&sa1, i, j), sparseget(&sa, i, j), 10.0 * machineepsilon), __FILE__, __LINE__, "testtrfacunit.ap:1463");
                } else {
-                  set_error_flag(&result, fabs(sparseget(&sa1, i, j) - a1.xyR[i][j]) > 10.0 * machineepsilon, __FILE__, __LINE__, "testtrfacunit.ap:1465");
+                  set_error_flag(&result, !NearAtR(sparseget(&sa1, i, j), a1.xyR[i][j], 10.0 * machineepsilon), __FILE__, __LINE__, "testtrfacunit.ap:1465");
                }
             }
          }
@@ -14080,7 +14080,7 @@ static void sparsereallutest(bool *err) {
             }
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(err, fabs(c.xyR[i][j] - a.xyR[i][j]) > tol, __FILE__, __LINE__, "testtrfacunit.ap:1689");
+                  set_error_flag(err, !NearAtR(c.xyR[i][j], a.xyR[i][j], tol), __FILE__, __LINE__, "testtrfacunit.ap:1689");
                }
             }
             set_error_flag(err, success == haszero, __FILE__, __LINE__, "testtrfacunit.ap:1690");
@@ -14159,7 +14159,7 @@ static void testtrfacunit_testrluproblem(RMatrix *a, ae_int_t m, ae_int_t n, dou
    }
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         *err = *err || fabs(a->xyR[i][j] - ca2.xyR[i][j]) > threshold;
+         *err = *err || !NearAtR(a->xyR[i][j], ca2.xyR[i][j], threshold);
       }
    }
 // LUP test
@@ -14211,7 +14211,7 @@ static void testtrfacunit_testrluproblem(RMatrix *a, ae_int_t m, ae_int_t n, dou
    }
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         *err = *err || fabs(a->xyR[i][j] - ca2.xyR[i][j]) > threshold;
+         *err = *err || !NearAtR(a->xyR[i][j], ca2.xyR[i][j], threshold);
       }
    }
    ae_frame_leave();
@@ -14280,7 +14280,7 @@ static void testtrfacunit_testcluproblem(CMatrix *a, ae_int_t m, ae_int_t n, dou
    }
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         *err = *err || abscomplex(ae_c_sub(a->xyC[i][j], ca2.xyC[i][j])) > threshold;
+         *err = *err || !NearAtC(a->xyC[i][j], ca2.xyC[i][j], threshold);
       }
    }
 // LUP test
@@ -14332,7 +14332,7 @@ static void testtrfacunit_testcluproblem(CMatrix *a, ae_int_t m, ae_int_t n, dou
    }
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         *err = *err || abscomplex(ae_c_sub(a->xyC[i][j], ca2.xyC[i][j])) > threshold;
+         *err = *err || !NearAtC(a->xyC[i][j], ca2.xyC[i][j], threshold);
       }
    }
    ae_frame_leave();
@@ -14421,7 +14421,7 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            set_error_flag(spdupderrorflag, fabs(a0.xyR[i][j] - a1.xyR[i][j]) > tol, __FILE__, __LINE__, "testtrfacunit.ap:1788");
+            set_error_flag(spdupderrorflag, !NearAtR(a0.xyR[i][j], a1.xyR[i][j], tol), __FILE__, __LINE__, "testtrfacunit.ap:1788");
          }
       }
    }
@@ -14489,7 +14489,7 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            set_error_flag(spdupderrorflag, fabs(a0.xyR[i][j] - a1.xyR[i][j]) > tol, __FILE__, __LINE__, "testtrfacunit.ap:1849");
+            set_error_flag(spdupderrorflag, !NearAtR(a0.xyR[i][j], a1.xyR[i][j], tol), __FILE__, __LINE__, "testtrfacunit.ap:1849");
          }
       }
    }
@@ -14638,7 +14638,7 @@ bool testtrfac(bool silent) {
                   hpderr = hpderr || ae_c_neq_d(cal.xyC[i][j], i);
                } else {
                   vc = ae_v_cdotproduct(cal.xyC[i], 1, "N", cal.xyC[j], 1, "Conj", j + 1);
-                  hpderr = hpderr || abscomplex(ae_c_sub(ca.xyC[i][j], vc)) > threshold;
+                  hpderr = hpderr || !NearAtC(ca.xyC[i][j], vc, threshold);
                }
             }
          }
@@ -14652,7 +14652,7 @@ bool testtrfac(bool silent) {
                   hpderr = hpderr || ae_c_neq_d(cau.xyC[i][j], j);
                } else {
                   vc = ae_v_cdotproduct(&cau.xyC[0][i], cau.stride, "Conj", &cau.xyC[0][j], cau.stride, "N", i + 1);
-                  hpderr = hpderr || abscomplex(ae_c_sub(ca.xyC[i][j], vc)) > threshold;
+                  hpderr = hpderr || !NearAtC(ca.xyC[i][j], vc, threshold);
                }
             }
          }
@@ -14689,7 +14689,7 @@ bool testtrfac(bool silent) {
                   dspderr = dspderr || ral.xyR[i][j] != i;
                } else {
                   vr = ae_v_dotproduct(ral.xyR[i], 1, ral.xyR[j], 1, j + 1);
-                  dspderr = dspderr || fabs(ra.xyR[i][j] - vr) > threshold;
+                  dspderr = dspderr || !NearAtR(ra.xyR[i][j], vr, threshold);
                }
             }
          }
@@ -14703,7 +14703,7 @@ bool testtrfac(bool silent) {
                   dspderr = dspderr || rau.xyR[i][j] != j;
                } else {
                   vr = ae_v_dotproduct(&rau.xyR[0][i], rau.stride, &rau.xyR[0][j], rau.stride, i + 1);
-                  dspderr = dspderr || fabs(ra.xyR[i][j] - vr) > threshold;
+                  dspderr = dspderr || !NearAtR(ra.xyR[i][j], vr, threshold);
                }
             }
          }
@@ -14812,7 +14812,7 @@ bool testpolynomialsolver(bool silent) {
    a.xR[0] = 2.0;
    a.xR[1] = 3.0;
    polynomialsolve(&a, n, &x, &rep);
-   set_error_flag(&wereerrors, fabs(x.xC[0].x + 2.0 / 3.0) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:33");
+   set_error_flag(&wereerrors, !NearAtR(x.xC[0].x, -2.0 / 3.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:33");
    set_error_flag(&wereerrors, x.xC[0].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:34");
    set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:35");
    n = 2;
@@ -14821,8 +14821,8 @@ bool testpolynomialsolver(bool silent) {
    a.xR[1] = -2.0;
    a.xR[2] = 1.0;
    polynomialsolve(&a, n, &x, &rep);
-   set_error_flag(&wereerrors, abscomplex(ae_c_sub_d(x.xC[0], 1)) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:43");
-   set_error_flag(&wereerrors, abscomplex(ae_c_sub_d(x.xC[1], 1)) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:44");
+   set_error_flag(&wereerrors, !NearAtCR(x.xC[0], 1.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:43");
+   set_error_flag(&wereerrors, !NearAtCR(x.xC[1], 1.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:44");
    set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:45");
    n = 2;
    ae_vector_set_length(&a, n + 1);
@@ -14831,11 +14831,11 @@ bool testpolynomialsolver(bool silent) {
    a.xR[2] = 1.0;
    polynomialsolve(&a, n, &x, &rep);
    if (x.xC[0].x < x.xC[1].x) {
-      set_error_flag(&wereerrors, fabs(x.xC[0].x - 1) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:55");
-      set_error_flag(&wereerrors, fabs(x.xC[1].x - 2) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:56");
+      set_error_flag(&wereerrors, !NearAtR(x.xC[0].x, 1.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:55");
+      set_error_flag(&wereerrors, !NearAtR(x.xC[1].x, 2.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:56");
    } else {
-      set_error_flag(&wereerrors, fabs(x.xC[0].x - 2) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:60");
-      set_error_flag(&wereerrors, fabs(x.xC[1].x - 1) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:61");
+      set_error_flag(&wereerrors, !NearAtR(x.xC[0].x, 2.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:60");
+      set_error_flag(&wereerrors, !NearAtR(x.xC[1].x, 1.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:61");
    }
    set_error_flag(&wereerrors, x.xC[0].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:63");
    set_error_flag(&wereerrors, x.xC[1].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:64");
@@ -14846,7 +14846,7 @@ bool testpolynomialsolver(bool silent) {
    a.xR[1] = 0.0;
    a.xR[2] = 1.0;
    polynomialsolve(&a, n, &x, &rep);
-   set_error_flag(&wereerrors, abscomplex(ae_c_add_d(ae_c_mul(x.xC[0], x.xC[0]), 1.0)) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:73");
+   set_error_flag(&wereerrors, !NearAtCR(ae_c_mul(x.xC[0], x.xC[0]), -1.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:73");
    set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:74");
    n = 4;
    ae_vector_set_length(&a, n + 1);
@@ -14869,11 +14869,11 @@ bool testpolynomialsolver(bool silent) {
    polynomialsolve(&a, n, &x, &rep);
    if (x.xC[0].x > x.xC[1].x) {
       set_error_flag(&wereerrors, ae_c_neq_d(x.xC[0], 0.0), __FILE__, __LINE__, "testpolynomialsolverunit.ap:98");
-      set_error_flag(&wereerrors, fabs(x.xC[1].x + 3.0 / 2.0) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:99");
+      set_error_flag(&wereerrors, !NearAtR(x.xC[1].x, -3.0 / 2.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:99");
       set_error_flag(&wereerrors, x.xC[1].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:100");
    } else {
       set_error_flag(&wereerrors, ae_c_neq_d(x.xC[1], 0.0), __FILE__, __LINE__, "testpolynomialsolverunit.ap:104");
-      set_error_flag(&wereerrors, fabs(x.xC[0].x + 3.0 / 2.0) > eps, __FILE__, __LINE__, "testpolynomialsolverunit.ap:105");
+      set_error_flag(&wereerrors, !NearAtR(x.xC[0].x, -3.0 / 2.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:105");
       set_error_flag(&wereerrors, x.xC[0].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:106");
    }
    set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:108");
@@ -15115,12 +15115,12 @@ static void testbdsvdunit_testbdsvdproblem(RVector *d, RVector *e, ae_int_t n, d
    NewVector(w, 0, DT_REAL);
    mx = 0.0;
    for (i = 0; i < n; i++) {
-      if (fabs(d->xR[i]) > mx) {
+      if (!SmallAtR(d->xR[i], mx)) {
          mx = fabs(d->xR[i]);
       }
    }
    for (i = 0; i < n - 1; i++) {
-      if (fabs(e->xR[i]) > mx) {
+      if (!SmallAtR(e->xR[i], mx)) {
          mx = fabs(e->xR[i]);
       }
    }
@@ -15827,7 +15827,7 @@ bool testsafesolve(bool silent) {
       }
       if (cmatrixscaledtrsafesolve(&ca, scalea, n, &cxs, isupper, trans, isunit, sqrt(maxrealnumber))) {
          for (i = 0; i < n; i++) {
-            cerrors = cerrors || abscomplex(ae_c_sub(cxs.xC[i], cxe.xC[i])) > threshold;
+            cerrors = cerrors || !NearAtC(cxs.xC[i], cxe.xC[i], threshold);
          }
       } else {
          cerrors = true;
@@ -15883,7 +15883,7 @@ bool testsafesolve(bool silent) {
       }
       if (rmatrixscaledtrsafesolve(&ra, scalea, n, &rxs, isupper, trans, isunit, sqrt(maxrealnumber))) {
          for (i = 0; i < n; i++) {
-            rerrors = rerrors || fabs(rxs.xR[i] - rxe.xR[i]) > threshold;
+            rerrors = rerrors || !NearAtR(rxs.xR[i], rxe.xR[i], threshold);
          }
       } else {
          rerrors = true;
@@ -17304,7 +17304,7 @@ bool testxblas(bool silent) {
          }
          rv1 = ae_v_dotproduct(rx.xR, 1, ry.xR, 1, n);
          xdot(&rx, &ry, n, &temp, &rv2, &rv2err);
-         approxerrors = approxerrors || fabs(rv1 - rv2) > approxthreshold;
+         approxerrors = approxerrors || !NearAtR(rv1, rv2, approxthreshold);
       //  ability to approximately calculate complex dot product
          ae_vector_set_length(&cx, n);
          ae_vector_set_length(&cy, n);
@@ -17323,7 +17323,7 @@ bool testxblas(bool silent) {
          }
          cv1 = ae_v_cdotproduct(cx.xC, 1, "N", cy.xC, 1, "N", n);
          xcdot(&cx, &cy, n, &temp, &cv2, &cv2err);
-         approxerrors = approxerrors || abscomplex(ae_c_sub(cv1, cv2)) > approxthreshold;
+         approxerrors = approxerrors || !NearAtC(cv1, cv2, approxthreshold);
       }
    }
 // test of precision: real
@@ -17352,7 +17352,7 @@ bool testxblas(bool silent) {
       xdot(&rx, &ry, n, &temp, &rv2, &rv2err);
       exactnesserrors = exactnesserrors || rv2err < 0.0;
       exactnesserrors = exactnesserrors || rv2err > 4 * machineepsilon * fabs(ry.xR[0]);
-      exactnesserrors = exactnesserrors || fabs(rv2 - ry.xR[0]) > rv2err;
+      exactnesserrors = exactnesserrors || !NearAtR(rv2, ry.xR[0], rv2err);
    // First test: X + X + ... + X = N*X
       s = exp((double)imax2(pass, 50));
       if (pass == passcount - 1 && pass > 1) {
@@ -17368,7 +17368,7 @@ bool testxblas(bool silent) {
       xdot(&rx, &ry, n, &temp, &rv2, &rv2err);
       exactnesserrors = exactnesserrors || rv2err < 0.0;
       exactnesserrors = exactnesserrors || rv2err > 4 * machineepsilon * fabs(ry.xR[0]) * n;
-      exactnesserrors = exactnesserrors || fabs(rv2 - n * ry.xR[0]) > rv2err;
+      exactnesserrors = exactnesserrors || !NearAtR(rv2, n * ry.xR[0], rv2err);
    }
 // test of precision: complex
    n = 50000;
@@ -17396,7 +17396,7 @@ bool testxblas(bool silent) {
       xcdot(&cx, &cy, n, &temp, &cv2, &cv2err);
       exactnesserrors = exactnesserrors || cv2err < 0.0;
       exactnesserrors = exactnesserrors || cv2err > 4 * machineepsilon * abscomplex(cy.xC[0]);
-      exactnesserrors = exactnesserrors || abscomplex(ae_c_sub(cv2, cy.xC[0])) > cv2err;
+      exactnesserrors = exactnesserrors || !NearAtC(cv2, cy.xC[0], cv2err);
    // First test: X + X + ... + X = N*X
       s = exp((double)imax2(pass, 50));
       if (pass == passcount - 1 && pass > 1) {
@@ -17412,7 +17412,7 @@ bool testxblas(bool silent) {
       xcdot(&cx, &cy, n, &temp, &cv2, &cv2err);
       exactnesserrors = exactnesserrors || cv2err < 0.0;
       exactnesserrors = exactnesserrors || cv2err > 4 * machineepsilon * abscomplex(cy.xC[0]) * n;
-      exactnesserrors = exactnesserrors || abscomplex(ae_c_sub(cv2, ae_c_mul_d(cy.xC[0], 1.0 * n))) > cv2err;
+      exactnesserrors = exactnesserrors || !NearAtC(cv2, ae_c_mul_d(cy.xC[0], 1.0 * n), cv2err);
    }
 // report
    waserrors = approxerrors || exactnesserrors;
@@ -17458,7 +17458,7 @@ static bool testdirectdensesolversunit_rmatrixchecksolutionm(RMatrix *xe, ae_int
       result = result && !(rep->rinf < 100.0 * machineepsilon || rep->rinf > 1.0 + 1000.0 * machineepsilon);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            result = result && fabs(xe->xyR[i][j] - xs->xyR[i][j]) <= threshold;
+            result = result && NearAtR(xe->xyR[i][j], xs->xyR[i][j], threshold);
          }
       }
    }
@@ -17479,7 +17479,7 @@ static bool testdirectdensesolversunit_cmatrixchecksolutionm(CMatrix *xe, ae_int
       result = result && !(rep->rinf < 100.0 * machineepsilon || rep->rinf > 1.0 + 1000.0 * machineepsilon);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            result = result && abscomplex(ae_c_sub(xe->xyC[i][j], xs->xyC[i][j])) <= threshold;
+            result = result && NearAtC(xe->xyC[i][j], xs->xyC[i][j], threshold);
          }
       }
    }
@@ -17498,7 +17498,7 @@ static bool testdirectdensesolversunit_rmatrixchecksolutionmfast(RMatrix *xe, ae
    } else {
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            result = result && fabs(xe->xyR[i][j] - xs->xyR[i][j]) <= threshold;
+            result = result && NearAtR(xe->xyR[i][j], xs->xyR[i][j], threshold);
          }
       }
    }
@@ -17518,7 +17518,7 @@ static bool testdirectdensesolversunit_cmatrixchecksolutionmfast(CMatrix *xe, ae
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < m; j++) {
-         result = result && abscomplex(ae_c_sub(xe->xyC[i][j], xs->xyC[i][j])) <= threshold;
+         result = result && NearAtC(xe->xyC[i][j], xs->xyC[i][j], threshold);
       }
    }
    return result;
@@ -17562,7 +17562,7 @@ static bool testdirectdensesolversunit_rmatrixchecksolutionfast(RMatrix *xe, ae_
       result = false;
    } else {
       for (i = 0; i < n; i++) {
-         result = result && fabs(xe->xyR[i][0] - xs->xR[i]) <= threshold;
+         result = result && NearAtR(xe->xyR[i][0], xs->xR[i], threshold);
       }
    }
    return result;
@@ -17957,7 +17957,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                *rerrors = *rerrors || repls.r2 < 100.0 * machineepsilon || repls.r2 > 1.0 + 1000.0 * machineepsilon;
                *rerrors = *rerrors || repls.n != n || repls.k != 0;
                for (i = 0; i < n; i++) {
-                  *rerrors = *rerrors || fabs(xe.xyR[i][0] - xv.xR[i]) > threshold;
+                  *rerrors = *rerrors || !NearAtR(xe.xyR[i][0], xv.xR[i], threshold);
                }
             }
             info = 0;
@@ -17976,7 +17976,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                *rerrors = *rerrors || repls.r2 < 100.0 * machineepsilon || repls.r2 > 1.0 + 1000.0 * machineepsilon;
                *rerrors = *rerrors || repls.n != n || repls.k != 0;
                for (i = 0; i < n; i++) {
-                  *rerrors = *rerrors || fabs(xe.xyR[i][0] - xv.xR[i]) > threshold;
+                  *rerrors = *rerrors || !NearAtR(xe.xyR[i][0], xv.xR[i], threshold);
                }
             }
             info = 0;
@@ -17998,10 +17998,10 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                *rerrors = *rerrors || repls.r2 != 0.0;
                *rerrors = *rerrors || repls.n != 2 * n || repls.k != n;
                for (i = 0; i < n; i++) {
-                  *rerrors = *rerrors || fabs(xe.xyR[i][0] - xv.xR[i]) > threshold;
+                  *rerrors = *rerrors || !NearAtR(xe.xyR[i][0], xv.xR[i], threshold);
                }
                for (i = n; i < 2 * n; i++) {
-                  *rerrors = *rerrors || fabs(xv.xR[i]) > threshold;
+                  *rerrors = *rerrors || !SmallAtR(xv.xR[i], threshold);
                }
             }
          // ********************************************************
@@ -18221,7 +18221,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
          for (i = 0; i < n; i++) {
             ae_v_move(y.xR, 1, a.xyR[i], 1, n);
             xdot(&y, &xv, n, &tx, &v, &verr);
-            *rfserrors = *rfserrors || fabs(v - b.xyR[i][0]) > 8 * machineepsilon * rmax2(1.0, fabs(b.xyR[i][0]));
+            *rfserrors = *rfserrors || !NearAtR(v, b.xyR[i][0], 8.0 * machineepsilon * rmax2(1.0, fabs(b.xyR[i][0])));
          }
       }
    // Test RMatrixSolve()
@@ -18233,7 +18233,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
          for (i = 0; i < n; i++) {
             ae_v_move(y.xR, 1, a.xyR[i], 1, n);
             xdot(&y, &xv, n, &tx, &v, &verr);
-            *rfserrors = *rfserrors || fabs(v - bv.xR[i]) > 8 * machineepsilon * rmax2(1.0, fabs(bv.xR[i]));
+            *rfserrors = *rfserrors || !NearAtR(v, bv.xR[i], 8.0 * machineepsilon * rmax2(1.0, fabs(bv.xR[i])));
          }
       }
    // Test LS-solver on the same matrix
@@ -18244,7 +18244,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
          for (i = 0; i < n; i++) {
             ae_v_move(y.xR, 1, a.xyR[i], 1, n);
             xdot(&y, &xv, n, &tx, &v, &verr);
-            *rfserrors = *rfserrors || fabs(v - bv.xR[i]) > 8 * machineepsilon * rmax2(1.0, fabs(bv.xR[i]));
+            *rfserrors = *rfserrors || !NearAtR(v, bv.xR[i], 8.0 * machineepsilon * rmax2(1.0, fabs(bv.xR[i])));
          }
       }
    }
@@ -18588,7 +18588,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
          for (i = 0; i < n; i++) {
             ae_v_cmove(y.xC, 1, a.xyC[i], 1, "N", n);
             xcdot(&y, &xv, n, &tx, &v, &verr);
-            *rfserrors = *rfserrors || abscomplex(ae_c_sub(v, b.xyC[i][0])) > 8 * machineepsilon * rmax2(1.0, abscomplex(b.xyC[i][0]));
+            *rfserrors = *rfserrors || !NearAtC(v, b.xyC[i][0], 8.0 * machineepsilon * rmax2(1.0, abscomplex(b.xyC[i][0])));
          }
       }
    // Test CMatrixSolve()
@@ -18600,7 +18600,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
          for (i = 0; i < n; i++) {
             ae_v_cmove(y.xC, 1, a.xyC[i], 1, "N", n);
             xcdot(&y, &xv, n, &tx, &v, &verr);
-            *rfserrors = *rfserrors || abscomplex(ae_c_sub(v, bv.xC[i])) > 8 * machineepsilon * rmax2(1.0, abscomplex(bv.xC[i]));
+            *rfserrors = *rfserrors || !NearAtC(v, bv.xC[i], 8.0 * machineepsilon * rmax2(1.0, abscomplex(bv.xC[i])));
          }
       }
    // TODO: Test LS-solver on the same matrix
@@ -19318,7 +19318,7 @@ static void testdirectsparsesolversunit_testsks(bool *errorflag) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, fabs(xe.xR[i] - xs.xR[i]) > threshold, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:93");
+            set_error_flag(errorflag, !NearAtR(xe.xR[i], xs.xR[i], threshold), __FILE__, __LINE__, "testdirectsparsesolversunit.ap:93");
          }
       // Test solver #2
          sparsecopytosks(&sa, &sa2);
@@ -19336,7 +19336,7 @@ static void testdirectsparsesolversunit_testsks(bool *errorflag) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, fabs(xe.xR[i] - xs.xR[i]) > threshold, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:112");
+            set_error_flag(errorflag, !NearAtR(xe.xR[i], xs.xR[i], threshold), __FILE__, __LINE__, "testdirectsparsesolversunit.ap:112");
          }
       }
    }
@@ -19423,7 +19423,7 @@ static void testdirectsparsesolversunit_testcholesky(bool *errorflag) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, fabs(xe.xR[i] - xs.xR[i]) > threshold, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:201");
+            set_error_flag(errorflag, !NearAtR(xe.xR[i], xs.xR[i], threshold), __FILE__, __LINE__, "testdirectsparsesolversunit.ap:201");
          }
       }
    }
@@ -19512,7 +19512,7 @@ static void testdirectsparsesolversunit_testgen(bool *errorflag) {
                return;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, fabs(xe.xR[i] - xs.xR[i]) > threshold, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:290");
+               set_error_flag(errorflag, !NearAtR(xe.xR[i], xs.xR[i], threshold), __FILE__, __LINE__, "testdirectsparsesolversunit.ap:290");
             }
          // Test solver #2
             ae_vector_set_length(&xs, 0);
@@ -19526,7 +19526,7 @@ static void testdirectsparsesolversunit_testgen(bool *errorflag) {
                return;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, fabs(xe.xR[i] - xs2.xR[i]) > threshold, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:305");
+               set_error_flag(errorflag, !NearAtR(xe.xR[i], xs2.xR[i], threshold), __FILE__, __LINE__, "testdirectsparsesolversunit.ap:305");
             }
          // Update fill factor
             if (noffdiag == 0) {
@@ -19635,7 +19635,7 @@ static void testfblsunit_testgmres(bool *err) {
                if (i == j) {
                   v--;
                }
-               set_error_flag(err, fabs(v) > 100.0 * machineepsilon, __FILE__, __LINE__, "testfblsunit.ap:389");
+               set_error_flag(err, !SmallAtR(v, 100.0 * machineepsilon), __FILE__, __LINE__, "testfblsunit.ap:389");
             }
          }
          if (*err) {
@@ -19816,8 +19816,8 @@ bool testfbls(bool silent) {
          ae_v_sub(tmp2.xR, 1, b.xR, 1, n);
          v = ae_v_dotproduct(tmp2.xR, 1, tmp2.xR, 1, n);
          e2 = sqrt(v);
-         cgerrors = cgerrors || fabs(e1 - cgstate.e1) > 100.0 * machineepsilon * e1;
-         cgerrors = cgerrors || fabs(e2 - cgstate.e2) > 100.0 * machineepsilon * e1;
+         cgerrors = cgerrors || !NearAtR(e1, cgstate.e1, 100.0 * machineepsilon * e1);
+         cgerrors = cgerrors || !NearAtR(e2, cgstate.e2, 100.0 * machineepsilon * e1);
          cgerrors = cgerrors || e2 > 0.001 * e1;
       }
    }
@@ -19857,7 +19857,7 @@ bool testfbls(bool silent) {
          }
          fblssolvels(&a, &b, m, n, &tmp0, &tmp1, &tmp2);
          for (i = 0; i < n; i++) {
-            lserrors = lserrors || fabs(b.xR[i] - xe.xR[i]) > eps;
+            lserrors = lserrors || !NearAtR(b.xR[i], xe.xR[i], eps);
          }
       }
    }
@@ -19907,7 +19907,7 @@ bool testfbls(bool silent) {
    // Test
       fblscholeskysolve(&a, sqrt(scalea), n, uppera, &b, &buf);
       for (i = 0; i < n; i++) {
-         set_error_flag(&cholerrors, fabs(b.xR[i] - xe.xR[i]) > 1.0E3 * machineepsilon, __FILE__, __LINE__, "testfblsunit.ap:291");
+         set_error_flag(&cholerrors, !NearAtR(b.xR[i], xe.xR[i], 1.0E3 * machineepsilon), __FILE__, __LINE__, "testfblsunit.ap:291");
       }
    }
 // report
@@ -20025,11 +20025,11 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
          }
          rcopyvr(n, &x, &z, gmresk);
          rmatrixlq(&z, gmresk + 1, n, &tmp);
-         set_error_flag(err, fabs(z.xyR[gmresk][gmresk]) > 1.0E-6, __FILE__, __LINE__, "testiterativesparseunit.ap:125");
+         set_error_flag(err, !SmallAtR(z.xyR[gmresk][gmresk], 1.0E-6), __FILE__, __LINE__, "testiterativesparseunit.ap:125");
       // Additional test - R2 field is correct
          sparsemv(&crsa, &x, &ax);
          raddv(n, -1.0, &b, &ax);
-         set_error_flag(err, fabs(rep.r2 - rdotv2(n, &ax)) > 1.0E-6, __FILE__, __LINE__, "testiterativesparseunit.ap:132");
+         set_error_flag(err, !NearAtR(rep.r2, rdotv2(n, &ax), 1.0E-6), __FILE__, __LINE__, "testiterativesparseunit.ap:132");
       }
    }
 // Randomly generated sparse problem, possibly degenerate.
@@ -20268,7 +20268,7 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
          rcopyallocv(n, &xr, &replast);
          sparsemv(&crsa, &xr, &ax);
          raddv(n, -1.0, &b, &ax);
-         set_error_flag(err, fabs(rdotv2(n, &ax) - v) > tol * (1 + rdotv2(n, &ax)), __FILE__, __LINE__, "testiterativesparseunit.ap:376");
+         set_error_flag(err, !NearAtR(rdotv2(n, &ax), v, tol * (1.0 + rdotv2(n, &ax))), __FILE__, __LINE__, "testiterativesparseunit.ap:376");
          set_error_flag(err, v > rprev + tol, __FILE__, __LINE__, "testiterativesparseunit.ap:377");
          rprev = v;
          nreports++;
@@ -20291,8 +20291,8 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
       return;
    }
    for (i = 0; i < n; i++) {
-      set_error_flag(err, fabs(repfirst.xR[i] - x0.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testiterativesparseunit.ap:398");
-      set_error_flag(err, fabs(replast.xR[i] - x.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testiterativesparseunit.ap:399");
+      set_error_flag(err, !NearAtR(repfirst.xR[i], x0.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testiterativesparseunit.ap:398");
+      set_error_flag(err, !NearAtR(replast.xR[i], x.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testiterativesparseunit.ap:399");
    }
    sparsesolversolve(&solver, &a, &b);
    sparsesolverresults(&solver, &x, &rep);
@@ -20465,7 +20465,7 @@ static bool testlincgunit_complextest(bool silent) {
       }
       normofresidual = 0.0;
       for (i = 0; i < sz; i++) {
-         if (fabs(residual.xR[i]) > testlincgunit_e0) {
+         if (!SmallAtR(residual.xR[i], testlincgunit_e0)) {
             if (!silent) {
                printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
                printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::Discripancy[%0d]>E0!(%0.2e>%0.2e)\n", (int)sz, c, (int)i, residual.xR[i], testlincgunit_e0);
@@ -20476,7 +20476,7 @@ static bool testlincgunit_complextest(bool silent) {
          }
          normofresidual += residual.xR[i] * residual.xR[i];
       }
-      if (fabs(normofresidual - rep.r2) > testlincgunit_e0) {
+      if (!NearAtR(normofresidual, rep.r2, testlincgunit_e0)) {
          if (!silent) {
             printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
             printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::||NormOfResidual-Rep.R2||>E0!(%0.2e>%0.2e)\n", (int)sz, c, fabs(normofresidual - rep.r2), testlincgunit_e0);
@@ -20523,7 +20523,7 @@ static bool testlincgunit_complextest(bool silent) {
                }
                nv0 = sqrt(nv0);
                nv1 = sqrt(nv1);
-               if (fabs(sclr) > testlincgunit_e0 * na * rmax2(nv0, 1.0) * rmax2(nv1, 1.0)) {
+               if (!SmallAtR(sclr, testlincgunit_e0 * na * rmax2(nv0, 1.0) * rmax2(nv1, 1.0))) {
                   if (!silent) {
                      printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
                      printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::(Ap%0d,p%0d) != 0\n{Sclr=%0.15f; NA=%0.15f NV0=%0.15f NV1=%0.15f;}\n", (int)sz, c, (int)i, (int)j, sclr, na, nv0, nv1);
@@ -20547,7 +20547,7 @@ static bool testlincgunit_complextest(bool silent) {
                }
                nv0 = sqrt(nv0);
                nv1 = sqrt(nv1);
-               if (fabs(sclr) > testlincgunit_e0 * rmax2(nv0, 1.0) * rmax2(nv1, 1.0)) {
+               if (!SmallAtR(sclr, testlincgunit_e0 * rmax2(nv0, 1.0) * rmax2(nv1, 1.0))) {
                   if (!silent) {
                      printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
                      printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::(r%0d,p%0d) != 0\n{Sclr=%0.15f; NV0=%0.15f NV1=%0.15f;}\n", (int)sz, c, (int)i, (int)j, sclr, nv0, nv1);
@@ -20571,7 +20571,7 @@ static bool testlincgunit_complextest(bool silent) {
                }
                nv0 = sqrt(nv0);
                nv1 = sqrt(nv1);
-               if (fabs(sclr) > testlincgunit_e0 * rmax2(nv0, 1.0) * rmax2(nv1, 1.0)) {
+               if (!SmallAtR(sclr, testlincgunit_e0 * rmax2(nv0, 1.0) * rmax2(nv1, 1.0))) {
                   if (!silent) {
                      printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
                      printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::(rm,rk) != 0\n{Sclr=%0.15f; NV0=%0.15f NV1=%0.15f;}\n", (int)sz, c, sclr, nv0, nv1);
@@ -20905,7 +20905,7 @@ static bool testlincgunit_testrcorrectness(bool silent) {
             }
             r2 += sqr(v - b.xR[i]);
          }
-         if (fabs(r2 - s.r2) > rtol) {
+         if (!NearAtR(r2, s.r2, rtol)) {
             result = true;
             ae_frame_leave();
             return result;
@@ -21154,7 +21154,7 @@ static bool testlincgunit_frombasis(RVector *x, RMatrix *basis, ae_int_t n, ae_i
       for (j = 0; j < k2; j++) {
          alpha += alphas.xR[j] * ortnormbasis.xyR[j][i];
       }
-      if (fabs(x->xR[i] - alpha) > normx * eps) {
+      if (!NearAtR(x->xR[i], alpha, normx * eps)) {
          result = false;
          ae_frame_leave();
          return result;
@@ -21576,7 +21576,7 @@ static bool testlincgunit_precondtest(bool silent) {
    // points generated by modified problem.
       for (i = 0; i < numofit; i++) {
          for (j = 0; j < n; j++) {
-            if (fabs(mtx.xyR[i][j] - rde.xR[j] * mtprex.xyR[i][j]) > eps) {
+            if (!NearAtR(mtx.xyR[i][j], rde.xR[j] * mtprex.xyR[i][j], eps)) {
                if (!silent) {
                   printf("PrecondTest::fail\n");
                   printf("Size=%0d\n", (int)n);
@@ -21653,7 +21653,7 @@ static bool testlincgunit_precondtest(bool silent) {
       return result;
    }
    for (i = 0; i < n; i++) {
-      if (fabs(xe.xR[i] - x0.xR[i]) > 5.0E-2 / d.xR[i]) {
+      if (!NearAtR(xe.xR[i], x0.xR[i], 5.0E-2 / d.xR[i])) {
          result = true;
          ae_frame_leave();
          return result;
@@ -21665,7 +21665,7 @@ static bool testlincgunit_precondtest(bool silent) {
    if (rep.terminationtype > 0) {
       bflag = false;
       for (i = 0; i < n; i++) {
-         bflag = bflag || fabs(xe.xR[i] - x0.xR[i]) > 5.0E-2 / d.xR[i];
+         bflag = bflag || !NearAtR(xe.xR[i], x0.xR[i], 5.0E-2 / d.xR[i]);
       }
       if (!bflag) {
          result = true;
@@ -21682,7 +21682,7 @@ static bool testlincgunit_precondtest(bool silent) {
       return result;
    }
    for (i = 0; i < n; i++) {
-      if (fabs(xe.xR[i] - x0.xR[i]) > 5.0E-2 / d.xR[i]) {
+      if (!NearAtR(xe.xR[i], x0.xR[i], 5.0E-2 / d.xR[i])) {
          result = true;
          ae_frame_leave();
          return result;
@@ -22738,7 +22738,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
                      ae_frame_leave();
                      return result;
                   }
-                  if (fabs(s.r2 - tnorm) > eps) {
+                  if (!NearAtR(s.r2, tnorm, eps)) {
                      set_error_flag(&result, true, __FILE__, __LINE__, "testlinlsqrunit.ap:858");
                      ae_frame_leave();
                      return result;
@@ -23165,9 +23165,9 @@ static bool testlinlsqrunit_analytictest(bool silent) {
             for (j = 0; j < pointsstored - 1; j++) {
                if (i != j) {
                   v = ae_v_dotproduct(ap.xyR[i], 1, ap.xyR[j], 1, m);
-                  result = result || fabs(v) > tol;
+                  result = result || !SmallAtR(v, tol);
                   v = ae_v_dotproduct(r.xyR[i], 1, r.xyR[j], 1, n);
-                  result = result || fabs(v) > tol;
+                  result = result || !SmallAtR(v, tol);
                }
             }
          }
@@ -23334,7 +23334,7 @@ static bool testlinlsqrunit_preconditionertest() {
       return result;
    }
    for (i = 0; i < n; i++) {
-      if (fabs(xe.xR[i] - x0.xR[i]) > 5.0E-2 / d.xR[i]) {
+      if (!NearAtR(xe.xR[i], x0.xR[i], 5.0E-2 / d.xR[i])) {
          result = true;
          ae_frame_leave();
          return result;
@@ -23346,7 +23346,7 @@ static bool testlinlsqrunit_preconditionertest() {
    if (rep.terminationtype > 0) {
       bflag = false;
       for (i = 0; i < n; i++) {
-         bflag = bflag || fabs(xe.xR[i] - x0.xR[i]) > 5.0E-2 / d.xR[i];
+         bflag = bflag || !NearAtR(xe.xR[i], x0.xR[i], 5.0E-2 / d.xR[i]);
       }
       if (!bflag) {
          result = true;
@@ -23363,7 +23363,7 @@ static bool testlinlsqrunit_preconditionertest() {
       return result;
    }
    for (i = 0; i < n; i++) {
-      if (fabs(xe.xR[i] - x0.xR[i]) > 5.0E-2 / d.xR[i]) {
+      if (!NearAtR(xe.xR[i], x0.xR[i], 5.0E-2 / d.xR[i])) {
          result = true;
          ae_frame_leave();
          return result;
@@ -23753,7 +23753,7 @@ bool testnleq(bool silent) {
          othererrors = othererrors || state.f > flast;
       // check correctness of function value
          v = sqr(state.x.xR[0] * state.x.xR[0] + state.x.xR[1] - 11) + sqr(state.x.xR[0] + state.x.xR[1] * state.x.xR[1] - 7);
-         othererrors = othererrors || fabs(v - state.f) / rmax2(v, 1.0) > 100.0 * machineepsilon;
+         othererrors = othererrors || !NearAtR(v, state.f, rmax2(v, 1.0) * 100.0 * machineepsilon);
       // update info and continue
          ae_v_move(xlast.xR, 1, state.x.xR, 1, n);
          flast = state.f;
@@ -23768,7 +23768,7 @@ bool testnleq(bool silent) {
    if (rep.terminationtype > 0) {
       othererrors = othererrors || xlast.xR[0] != x.xR[0] || xlast.xR[1] != x.xR[1];
       v = sqr(x.xR[0] * x.xR[0] + x.xR[1] - 11) + sqr(x.xR[0] + x.xR[1] * x.xR[1] - 7);
-      othererrors = othererrors || fabs(flast - v) / rmax2(v, 1.0) > 100.0 * machineepsilon;
+      othererrors = othererrors || !NearAtR(flast, v, rmax2(v, 1.0) * 100.0 * machineepsilon);
    } else {
       converror = true;
    }
@@ -23880,7 +23880,7 @@ static bool testmatinvunit_rmatrixcheckinverse(RMatrix *a, RMatrix *inva, ae_int
             if (i == j) {
                v--;
             }
-            result = result && fabs(v) <= threshold;
+            result = result && SmallAtR(v, threshold);
          }
       }
    }
@@ -23906,7 +23906,7 @@ static bool testmatinvunit_cmatrixcheckinverse(CMatrix *a, CMatrix *inva, ae_int
             if (i == j) {
                v = ae_c_sub_d(v, 1);
             }
-            result = result && abscomplex(v) <= threshold;
+            result = result && SmallAtC(v, threshold);
          }
       }
    }
@@ -23945,7 +23945,7 @@ static bool testmatinvunit_spdmatrixcheckinverse(RMatrix *a, RMatrix *inva, bool
             if (i == j) {
                v--;
             }
-            result = result && fabs(v) <= threshold;
+            result = result && SmallAtR(v, threshold);
          }
       }
    }
@@ -23985,7 +23985,7 @@ static bool testmatinvunit_hpdmatrixcheckinverse(CMatrix *a, CMatrix *inva, bool
             if (i == j) {
                v = ae_c_sub_d(v, 1);
             }
-            result = result && abscomplex(v) <= threshold;
+            result = result && SmallAtC(v, threshold);
          }
       }
    }
@@ -24148,9 +24148,9 @@ static void testmatinvunit_testrtrinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
                for (j = 0; j < n; j++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, &b.xyR[0][j], b.stride, n);
                   if (j != i) {
-                     *rtrerrors = *rtrerrors || fabs(v) > threshold;
+                     *rtrerrors = *rtrerrors || !SmallAtR(v, threshold);
                   } else {
-                     *rtrerrors = *rtrerrors || fabs(v - 1) > threshold;
+                     *rtrerrors = *rtrerrors || !NearAtR(v, 1.0, threshold);
                   }
                }
             }
@@ -24997,7 +24997,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
       // * compare reference model against implementation being tested
          inexactlbfgspreconditioner(&s0, n, &vd, &vc, &va, k, &buf);
          for (i = 0; i < n; i++) {
-            set_error_flag(wereerrors, fabs(s2.xR[i] - s0.xR[i]) > tolg, __FILE__, __LINE__, "testoptservunit.ap:236");
+            set_error_flag(wereerrors, !NearAtR(s2.xR[i], s0.xR[i], tolg), __FILE__, __LINE__, "testoptservunit.ap:236");
          }
       // Second test - N-K zero rows appended to V and rows are
       // randomly reordered. Doing so should not change result,
@@ -25016,7 +25016,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
          }
          inexactlbfgspreconditioner(&s1, n, &vd, &vc, &va, n, &buf);
          for (i = 0; i < n; i++) {
-            set_error_flag(wereerrors, fabs(s2.xR[i] - s1.xR[i]) > tolg, __FILE__, __LINE__, "testoptservunit.ap:259");
+            set_error_flag(wereerrors, !NearAtR(s2.xR[i], s1.xR[i], tolg), __FILE__, __LINE__, "testoptservunit.ap:259");
          }
       }
    }
@@ -25091,7 +25091,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
          preparelowrankpreconditioner(&vd, &vc, &va, n, k, &lowrankbuf);
          applylowrankpreconditioner(&s0, &lowrankbuf);
          for (i = 0; i < n; i++) {
-            set_error_flag(wereerrors, fabs(s2.xR[i] - s0.xR[i]) > tolg, __FILE__, __LINE__, "testoptservunit.ap:341");
+            set_error_flag(wereerrors, !NearAtR(s2.xR[i], s0.xR[i], tolg), __FILE__, __LINE__, "testoptservunit.ap:341");
          }
       // Second test - N-K zero rows appended to V and rows are
       // randomly reordered. Doing so should not change result,
@@ -25111,7 +25111,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
          preparelowrankpreconditioner(&vd, &vc, &va, n, n, &lowrankbuf);
          applylowrankpreconditioner(&s1, &lowrankbuf);
          for (i = 0; i < n; i++) {
-            set_error_flag(wereerrors, fabs(s2.xR[i] - s1.xR[i]) > tolg, __FILE__, __LINE__, "testoptservunit.ap:365");
+            set_error_flag(wereerrors, !NearAtR(s2.xR[i], s1.xR[i], tolg), __FILE__, __LINE__, "testoptservunit.ap:365");
          }
       }
    }
@@ -25555,7 +25555,7 @@ static void testminlbfgsunit_testother(bool *err) {
    }
    minlbfgsresults(&state, &x, &rep);
    r = v / (s.xR[0] * diffstep);
-   set_error_flag(err, fabs(log(r)) > log(1.0 + 1000.0 * machineepsilon), __FILE__, __LINE__, "testminlbfgsunit.ap:836");
+   set_error_flag(err, !SmallAtR(log(r), log(1.0 + 1000.0 * machineepsilon)), __FILE__, __LINE__, "testminlbfgsunit.ap:836");
 // test maximum step
    n = 1;
    m = 1;
@@ -25571,9 +25571,9 @@ static void testminlbfgsunit_testother(bool *err) {
       if (state.needfg) {
          state.f = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
          state.g.xR[0] = exp(state.x.xR[0]) - exp(-state.x.xR[0]);
-         set_error_flag(err, fabs(state.x.xR[0] - xprev) > (1 + sqrt(machineepsilon)) * stpmax, __FILE__, __LINE__, "testminlbfgsunit.ap:858");
+         set_error_flag(err, !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax), __FILE__, __LINE__, "testminlbfgsunit.ap:858");
       } else if (state.xupdated) {
-         set_error_flag(err, fabs(state.x.xR[0] - xprev) > (1 + sqrt(machineepsilon)) * stpmax, __FILE__, __LINE__, "testminlbfgsunit.ap:862");
+         set_error_flag(err, !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax), __FILE__, __LINE__, "testminlbfgsunit.ap:862");
          xprev = state.x.xR[0];
       }
 // Test correctness of the scaling:
@@ -25727,7 +25727,7 @@ static void testminlbfgsunit_testother(bool *err) {
             ae_frame_leave();
             return;
          }
-         *err = *err || fabs(1 / sqr(1 - x.xR[0]) - 1 / sqr(1 + x.xR[0]) + vc) > epsg;
+         *err = *err || !NearAtR(1.0 / sqr(1.0 - x.xR[0]), 1.0 / sqr(1.0 + x.xR[0]) - vc, epsg);
       }
    }
 // Test integrity checks for NAN/INF:
@@ -25879,7 +25879,7 @@ static void testminlbfgsunit_testoptguardc1test0reportfortask0(bool *err, optgua
             }
             v += fabs(vv);
          }
-         set_error_flag(err, fabs(v - rep->f.xR[k]) > 1.0E-6 * rmax2(fabs(v), 1.0), __FILE__, __LINE__, "testminlbfgsunit.ap:1776");
+         set_error_flag(err, !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testminlbfgsunit.ap:1776");
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -25954,10 +25954,10 @@ static void testminlbfgsunit_testoptguardc1test1reportfortask0(bool *err, optgua
                vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
             v += sign(vv) * a->xyR[i][rep->vidx];
-            tooclose = tooclose || fabs(vv) < 1.0E-4;
+            tooclose = tooclose || SmallR(vv, 1.0E-4);
          }
          if (!tooclose) {
-            set_error_flag(err, fabs(v - rep->g.xR[k]) > 1.0E-6 * rmax2(fabs(v), 1.0), __FILE__, __LINE__, "testminlbfgsunit.ap:1873");
+            set_error_flag(err, !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testminlbfgsunit.ap:1873");
          }
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
@@ -25970,7 +25970,7 @@ static void testminlbfgsunit_testoptguardc1test1reportfortask0(bool *err, optgua
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = tooclose || fabs(va) < 1.0E-8 || fabs(vb) < 1.0E-8;
+         tooclose = tooclose || SmallR(va, 1.0E-8) || SmallR(vb, 1.0E-8);
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -26233,8 +26233,8 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
             set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminlbfgsunit.ap:1427");
          }
          for (j = 0; j < n; j++) {
-            set_error_flag(wereerrors, fabs(jactrue.xyR[0][j] - ogrep.badgradnum.xyR[0][j]) > 0.01 / s.xR[j], __FILE__, __LINE__, "testminlbfgsunit.ap:1431");
-            set_error_flag(wereerrors, fabs(jacdefect.xyR[0][j] - ogrep.badgraduser.xyR[0][j]) > 0.01 / s.xR[j], __FILE__, __LINE__, "testminlbfgsunit.ap:1432");
+            set_error_flag(wereerrors, !NearAtR(jactrue.xyR[0][j], ogrep.badgradnum.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminlbfgsunit.ap:1431");
+            set_error_flag(wereerrors, !NearAtR(jacdefect.xyR[0][j], ogrep.badgraduser.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminlbfgsunit.ap:1432");
          }
       }
    }
@@ -26546,7 +26546,7 @@ bool testminlbfgs(bool silent) {
          }
       }
       minlbfgsresults(&state, &x, &rep);
-      referror = referror || rep.terminationtype <= 0 || fabs(x.xR[0] - 2) > 0.001 || fabs(x.xR[1]) > 0.001 || fabs(x.xR[2] - 2) > 0.001;
+      referror = referror || rep.terminationtype <= 0 || !NearAtR(x.xR[0], 2.0, 0.001) || !SmallAtR(x.xR[1], 0.001) || !NearAtR(x.xR[2], 2.0, 0.001);
    }
 // nonconvex problems with complex surface: we start from point with very small
 // gradient, but we need ever smaller gradient in the next step due to
@@ -26575,7 +26575,7 @@ bool testminlbfgs(bool silent) {
             }
          }
          minlbfgsresults(&state, &x, &rep);
-         nonconverror = nonconverror || rep.terminationtype <= 0 || fabs(x.xR[0]) > 0.001;
+         nonconverror = nonconverror || rep.terminationtype <= 0 || !SmallAtR(x.xR[0], 0.001);
          v += 0.1;
       }
    }
@@ -26606,13 +26606,13 @@ bool testminlbfgs(bool silent) {
       x.xR[2] = 10 + 10 * randomreal();
       for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) testminlbfgsunit_testfunc2(&state);
       minlbfgsresults(&state, &x, &rep);
-      restartserror = restartserror || rep.terminationtype <= 0 || fabs(x.xR[0] - log(2.0)) > 0.01 || fabs(x.xR[1]) > 0.01 || fabs(x.xR[2] - log(2.0)) > 0.01;
+      restartserror = restartserror || rep.terminationtype <= 0 || !NearAtR(x.xR[0], log(2.0), 0.01) || !SmallAtR(x.xR[1], 0.01) || !NearAtR(x.xR[2], log(2.0), 0.01);
       x.xR[0] = 10 + 10 * randomreal();
       x.xR[1] = 10 + 10 * randomreal();
       x.xR[2] = 10 + 10 * randomreal();
       for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) testminlbfgsunit_testfunc2(&state);
       minlbfgsresults(&state, &x, &rep);
-      restartserror = restartserror || rep.terminationtype <= 0 || fabs(x.xR[0] - log(2.0)) > 0.01 || fabs(x.xR[1]) > 0.01 || fabs(x.xR[2] - log(2.0)) > 0.01;
+      restartserror = restartserror || rep.terminationtype <= 0 || !NearAtR(x.xR[0], log(2.0), 0.01) || !SmallAtR(x.xR[1], 0.01) || !NearAtR(x.xR[2], log(2.0), 0.01);
    }
 // Linear equations
    diffstep = 1.0E-6;
@@ -26673,7 +26673,7 @@ bool testminlbfgs(bool silent) {
             minlbfgsresults(&state, &x, &rep);
             eqerror = eqerror || rep.terminationtype <= 0;
             for (i = 0; i < n; i++) {
-               eqerror = eqerror || fabs(x.xR[i] - xe.xR[i]) > 0.001;
+               eqerror = eqerror || !NearAtR(x.xR[i], xe.xR[i], 0.001);
             }
          }
       }
@@ -26954,19 +26954,19 @@ bool testcqmodels(bool silent) {
             }
          }
          v2 = cqmeval(&s, &x);
-         eval0errors = eval0errors || fabs(v - v2) > 10000.0 * machineepsilon;
+         eval0errors = eval0errors || !NearAtR(v, v2, 10000.0 * machineepsilon);
          cqmevalx(&s, &x, &v2, &noise);
-         eval0errors = eval0errors || fabs(v - v2) > 10000.0 * machineepsilon;
+         eval0errors = eval0errors || !NearAtR(v, v2, 10000.0 * machineepsilon);
          eval0errors = eval0errors || noise < 0.0 || noise > 10000.0 * machineepsilon;
          v2 = cqmxtadx2(&s, &x, &tmp0);
-         eval0errors = eval0errors || fabs(xtadx2 - v2) > 10000.0 * machineepsilon;
+         eval0errors = eval0errors || !NearAtR(xtadx2, v2, 10000.0 * machineepsilon);
          cqmgradunconstrained(&s, &x, &gt);
          for (i = 0; i < n; i++) {
-            eval0errors = eval0errors || fabs(ge.xR[i] - gt.xR[i]) > 10000.0 * machineepsilon;
+            eval0errors = eval0errors || !NearAtR(ge.xR[i], gt.xR[i], 10000.0 * machineepsilon);
          }
          cqmadx(&s, &x, &adx);
          for (i = 0; i < n; i++) {
-            eval0errors = eval0errors || fabs(adx.xR[i] - adxe.xR[i]) > 10000.0 * machineepsilon;
+            eval0errors = eval0errors || !NearAtR(adx.xR[i], adxe.xR[i], 10000.0 * machineepsilon);
          }
       }
    }
@@ -27028,9 +27028,9 @@ bool testcqmodels(bool silent) {
             v2 = ae_v_dotproduct(q.xyR[i], 1, xc.xR, 1, n);
             v += 0.5 * theta * sqr(v2 - r.xR[i]);
          }
-         eval1errors = eval1errors || fabs(v - cqmeval(&s, &xc)) > 10000.0 * machineepsilon;
-         eval1errors = eval1errors || fabs(v - cqmdebugconstrainedevalt(&s, &x)) > 10000.0 * machineepsilon;
-         eval1errors = eval1errors || fabs(v - cqmdebugconstrainedevale(&s, &x)) > 10000.0 * machineepsilon;
+         eval1errors = eval1errors || !NearAtR(v, cqmeval(&s, &xc), 10000.0 * machineepsilon);
+         eval1errors = eval1errors || !NearAtR(v, cqmdebugconstrainedevalt(&s, &x), 10000.0 * machineepsilon);
+         eval1errors = eval1errors || !NearAtR(v, cqmdebugconstrainedevale(&s, &x), 10000.0 * machineepsilon);
       }
    }
    waserrors = waserrors || eval1errors;
@@ -27209,11 +27209,11 @@ bool testcqmodels(bool silent) {
             }
          }
          v2 = cqmeval(&s, &x);
-         eval2errors = eval2errors || fabs(v - v2) > 10000.0 * machineepsilon;
+         eval2errors = eval2errors || !NearAtR(v, v2, 10000.0 * machineepsilon);
          v2 = cqmdebugconstrainedevalt(&s, &x);
-         eval2errors = eval2errors || fabs(v - v2) > 10000.0 * machineepsilon;
+         eval2errors = eval2errors || !NearAtR(v, v2, 10000.0 * machineepsilon);
          v2 = cqmdebugconstrainedevale(&s, &x);
-         eval2errors = eval2errors || fabs(v - v2) > 10000.0 * machineepsilon;
+         eval2errors = eval2errors || !NearAtR(v, v2, 10000.0 * machineepsilon);
       }
    }
    waserrors = waserrors || eval2errors;
@@ -27263,7 +27263,7 @@ bool testcqmodels(bool silent) {
          cqmsetq(&s, &q, &r, k, theta);
          cqmconstrainedoptimum(&s, &x);
          for (i = 0; i < n; i++) {
-            newton0errors = newton0errors || fabs(x.xR[i] - x0.xR[i]) > 1.0E6 * machineepsilon;
+            newton0errors = newton0errors || !NearAtR(x.xR[i], x0.xR[i], 1.0E6 * machineepsilon);
          }
       }
    }
@@ -27384,7 +27384,7 @@ bool testcqmodels(bool silent) {
             f0 = cqmeval(&s, &x);
             for (i = 0; i < n; i++) {
                newton2errors = newton2errors || activeset.xB[i] && x.xR[i] != x0.xR[i];
-               newton2errors = newton2errors || !activeset.xB[i] && fabs(x.xR[i] - x0.xR[i]) > 1000.0 * machineepsilon;
+               newton2errors = newton2errors || !activeset.xB[i] && !NearAtR(x.xR[i], x0.xR[i], 1000.0 * machineepsilon);
             }
          // Check that constrained evaluation at some point gives correct results
             for (i = 0; i < n; i++) {
@@ -27403,11 +27403,11 @@ bool testcqmodels(bool silent) {
                v += 0.5 * theta * sqr(v2 - r.xR[i]);
             }
             v2 = cqmeval(&s, &x);
-            newton2errors = newton2errors || !isfinite(v2) || fabs(v - v2) > 10000.0 * machineepsilon;
+            newton2errors = newton2errors || !isfinite(v2) || !NearAtR(v, v2, 10000.0 * machineepsilon);
             v2 = cqmdebugconstrainedevalt(&s, &x);
-            newton2errors = newton2errors || !isfinite(v2) || fabs(v - v2) > 10000.0 * machineepsilon;
+            newton2errors = newton2errors || !isfinite(v2) || !NearAtR(v, v2, 10000.0 * machineepsilon);
             v2 = cqmdebugconstrainedevale(&s, &x);
-            newton2errors = newton2errors || !isfinite(v2) || fabs(v - v2) > 10000.0 * machineepsilon;
+            newton2errors = newton2errors || !isfinite(v2) || !NearAtR(v, v2, 10000.0 * machineepsilon);
          } else {
             newton2errors = true;
          }
@@ -27538,10 +27538,10 @@ bool testsnnls(bool silent) {
    // Check
       for (i = 0; i < nd; i++) {
          if (isconstrained.xB[i]) {
-            set_error_flag(&test2errors, fabs(x.xR[i] - rmax2(b.xR[i] / densea.xyR[i][i], 0.0)) > eps, __FILE__, __LINE__, "testsnnlsunit.ap:86");
+            set_error_flag(&test2errors, !NearAtR(x.xR[i], rmax2(b.xR[i] / densea.xyR[i][i], 0.0), eps), __FILE__, __LINE__, "testsnnlsunit.ap:86");
             set_error_flag(&test2errors, x.xR[i] < 0.0, __FILE__, __LINE__, "testsnnlsunit.ap:87");
          } else {
-            set_error_flag(&test2errors, fabs(x.xR[i] - b.xR[i] / densea.xyR[i][i]) > eps, __FILE__, __LINE__, "testsnnlsunit.ap:90");
+            set_error_flag(&test2errors, !NearAtR(x.xR[i], b.xR[i] / densea.xyR[i][i], eps), __FILE__, __LINE__, "testsnnlsunit.ap:90");
          }
       }
    }
@@ -27624,7 +27624,7 @@ bool testsnnls(bool silent) {
             }
             for (i = 0; i < ns + nd; i++) {
                if (!isconstrained.xB[i] || x.xR[i] > 0.0) {
-                  set_error_flag(&test0errors, fabs(g.xR[i]) > eps, __FILE__, __LINE__, "testsnnlsunit.ap:179");
+                  set_error_flag(&test0errors, !SmallAtR(g.xR[i], eps), __FILE__, __LINE__, "testsnnlsunit.ap:179");
                } else {
                   set_error_flag(&test0errors, g.xR[i] < -eps, __FILE__, __LINE__, "testsnnlsunit.ap:181");
                }
@@ -27711,7 +27711,7 @@ bool testsnnls(bool silent) {
                }
             // Compare with true solution
                for (i = 0; i < ns + nd; i++) {
-                  set_error_flag(&test1errors, fabs(xs.xR[i] - x.xR[i]) > rho * xtol, __FILE__, __LINE__, "testsnnlsunit.ap:269");
+                  set_error_flag(&test1errors, !NearAtR(xs.xR[i], x.xR[i], rho * xtol), __FILE__, __LINE__, "testsnnlsunit.ap:269");
                }
             }
          }
@@ -27796,7 +27796,7 @@ bool testsnnls(bool silent) {
                ae_v_addd(g.xR, 1, effectivea.xyR[i], 1, ns + nd, v);
             }
             for (i = 0; i < ns + nd; i++) {
-               set_error_flag(&testnewtonerrors, fabs(g.xR[i]) > eps, __FILE__, __LINE__, "testsnnlsunit.ap:358");
+               set_error_flag(&testnewtonerrors, !SmallAtR(g.xR[i], eps), __FILE__, __LINE__, "testsnnlsunit.ap:358");
             }
          }
       }
@@ -28208,7 +28208,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   }
                // Test feasibility of solution
                   v = ae_v_dotproduct(c.xyR[0], 1, x.xR, 1, n);
-                  *feaserr = *feaserr || fabs(v - c.xyR[0][n]) > epsfeas;
+                  *feaserr = *feaserr || !NearAtR(v, c.xyR[0][n], epsfeas);
                // if C is nonzero, test that result is
                // a stationary point of constrained F.
                //
@@ -28319,7 +28319,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                // check feasiblity properties
                   for (i = 0; i < k; i++) {
                      v = ae_v_dotproduct(c.xyR[i], 1, x.xR, 1, n);
-                     *feaserr = *feaserr || fabs(v - c.xyR[i][n]) > epsx;
+                     *feaserr = *feaserr || !NearAtR(v, c.xyR[i][n], epsx);
                   }
                // Compare with XS
                   v = 0.0;
@@ -28327,7 +28327,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      v += sqr(x.xR[i] - xs.xR[i]);
                   }
                   v = sqrt(v);
-                  set_error_flag(converr, fabs(v) > 0.001, __FILE__, __LINE__, "testminbleicunit.ap:393");
+                  set_error_flag(converr, !SmallAtR(v, 0.001), __FILE__, __LINE__, "testminbleicunit.ap:393");
                }
             }
          }
@@ -28645,7 +28645,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      v = ae_v_dotproduct(c.xyR[i], 1, x.xR, 1, n);
                      v -= c.xyR[i][n];
                      if (ct.xZ[i] == 0) {
-                        *feaserr = *feaserr || fabs(v) > epsfeas;
+                        *feaserr = *feaserr || !SmallAtR(v, epsfeas);
                      }
                      if (ct.xZ[i] < 0) {
                         *feaserr = *feaserr || v > epsfeas;
@@ -28906,7 +28906,7 @@ static void testminbleicunit_testother(bool *err) {
    set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:1051");
    if (rep.terminationtype > 0) {
       for (i = 0; i < n; i++) {
-         set_error_flag(err, fabs(xf.xR[i]) > 1.0E-10, __FILE__, __LINE__, "testminbleicunit.ap:1054");
+         set_error_flag(err, !SmallAtR(xf.xR[i], 1.0E-10), __FILE__, __LINE__, "testminbleicunit.ap:1054");
       }
    }
 // Test reports:
@@ -29016,7 +29016,7 @@ static void testminbleicunit_testother(bool *err) {
       }
       minbleicresults(&state, &x, &rep);
       r = v / (s.xR[0] * diffstep);
-      *err = *err || fabs(log(r)) > log(1.0 + 1000.0 * machineepsilon);
+      *err = *err || !SmallAtR(log(r), log(1.0 + 1000.0 * machineepsilon));
    }
 // Test stpmax
    for (pass = 1; pass <= passcount; pass++) {
@@ -29038,9 +29038,9 @@ static void testminbleicunit_testother(bool *err) {
          if (state.needfg) {
             state.f = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
             state.g.xR[0] = exp(state.x.xR[0]) - exp(-state.x.xR[0]);
-            *err = *err || fabs(state.x.xR[0] - xprev) > (1 + sqrt(machineepsilon)) * stpmax;
+            *err = *err || !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax);
          } else if (state.xupdated) {
-            *err = *err || fabs(state.x.xR[0] - xprev) > (1 + sqrt(machineepsilon)) * stpmax;
+            *err = *err || !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax);
             xprev = state.x.xR[0];
          }
    }
@@ -29062,7 +29062,7 @@ static void testminbleicunit_testother(bool *err) {
             state.g.xR[0] = -2.0E8 * state.x.xR[0];
          }
       minbleicresults(&state, &x, &rep);
-      *err = *err || fabs(x.xR[0] - bu.xR[0]) > epsx;
+      *err = *err || !NearAtR(x.xR[0], bu.xR[0], epsx);
    }
 // Test correctness of the scaling:
 // * initial point is random point from [+1,+2]^N
@@ -29202,7 +29202,7 @@ static void testminbleicunit_testother(bool *err) {
                ae_frame_leave();
                return;
             }
-            *err = *err || fabs(1 / sqr(1 - x.xR[0]) - 1 / sqr(1 + x.xR[0]) + vc) > epsg;
+            *err = *err || !NearAtR(1.0 / sqr(1.0 - x.xR[0]), 1.0 / sqr(1.0 + x.xR[0]) - vc, epsg);
          }
       }
    }
@@ -29565,7 +29565,7 @@ static void testminbleicunit_testother(bool *err) {
       minbleicresults(&state, &xf, &rep);
       set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:1819");
       for (i = 0; i < n; i++) {
-         set_error_flag(err, fabs(x0.xR[i] - xf.xR[i]) > 1.0E-12, __FILE__, __LINE__, "testminbleicunit.ap:1821");
+         set_error_flag(err, !NearAtR(x0.xR[i], xf.xR[i], 1.0E-12), __FILE__, __LINE__, "testminbleicunit.ap:1821");
       }
    }
    ae_frame_leave();
@@ -29675,8 +29675,8 @@ static void testminbleicunit_testconv(bool *err) {
          }
       minbleicresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
-         set_error_flag(err, fabs(x.xR[0] + 1) > tol, __FILE__, __LINE__, "testminbleicunit.ap:1935");
-         set_error_flag(err, fabs(x.xR[1] + 0.5) > tol, __FILE__, __LINE__, "testminbleicunit.ap:1936");
+         set_error_flag(err, !NearAtR(x.xR[0], -1.0, tol), __FILE__, __LINE__, "testminbleicunit.ap:1935");
+         set_error_flag(err, !NearAtR(x.xR[1], -0.5, tol), __FILE__, __LINE__, "testminbleicunit.ap:1936");
       } else {
          set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:1939");
       }
@@ -29695,8 +29695,8 @@ static void testminbleicunit_testconv(bool *err) {
          }
       minbleicresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
-         set_error_flag(err, fabs(x.xR[0] + 1) > tol, __FILE__, __LINE__, "testminbleicunit.ap:1962");
-         set_error_flag(err, fabs(x.xR[1]) > tol, __FILE__, __LINE__, "testminbleicunit.ap:1963");
+         set_error_flag(err, !NearAtR(x.xR[0], -1.0, tol), __FILE__, __LINE__, "testminbleicunit.ap:1962");
+         set_error_flag(err, !SmallAtR(x.xR[1], tol), __FILE__, __LINE__, "testminbleicunit.ap:1963");
       } else {
          set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:1966");
       }
@@ -29715,8 +29715,8 @@ static void testminbleicunit_testconv(bool *err) {
          }
       minbleicresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
-         set_error_flag(err, fabs(x.xR[0] + 1) > tol, __FILE__, __LINE__, "testminbleicunit.ap:1989");
-         set_error_flag(err, fabs(x.xR[1] - 0.5) > tol, __FILE__, __LINE__, "testminbleicunit.ap:1990");
+         set_error_flag(err, !NearAtR(x.xR[0], -1.0, tol), __FILE__, __LINE__, "testminbleicunit.ap:1989");
+         set_error_flag(err, !NearAtR(x.xR[1], 0.5, tol), __FILE__, __LINE__, "testminbleicunit.ap:1990");
       } else {
          set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:1993");
       }
@@ -29839,7 +29839,7 @@ static void testminbleicunit_testconv(bool *err) {
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(c.xyR[i], 1, x.xR, 1, n);
             v -= c.xyR[i][n];
-            if (ct.xZ[i] == 0 && fabs(v) > epsfeas) {
+            if (ct.xZ[i] == 0 && !SmallAtR(v, epsfeas)) {
                set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:2132");
                ae_frame_leave();
                return;
@@ -29889,7 +29889,7 @@ static void testminbleicunit_testconv(bool *err) {
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(c.xyR[i], 1, x.xR, 1, n);
             v -= c.xyR[i][n];
-            if (ct.xZ[i] == 0 && fabs(v) > epsfeas) {
+            if (ct.xZ[i] == 0 && !SmallAtR(v, epsfeas)) {
                set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:2188");
                ae_frame_leave();
                return;
@@ -29907,7 +29907,7 @@ static void testminbleicunit_testconv(bool *err) {
             f1 += 0.5 * sqr(v);
          }
       // compare F0 and F1
-         set_error_flag(err, fabs(f0 - f1) > 1.0E-4, __FILE__, __LINE__, "testminbleicunit.ap:2208");
+         set_error_flag(err, !NearAtR(f0, f1, 1.0E-4), __FILE__, __LINE__, "testminbleicunit.ap:2208");
       }
    }
 // Convex/nonconvex optimization problem with excessive
@@ -30190,7 +30190,7 @@ static void testminbleicunit_testconv(bool *err) {
             for (i = 0; i < ccnt; i++) {
                v = ae_v_dotproduct(c.xyR[i], 1, xs0.xR, 1, n);
                v -= c.xyR[i][n];
-               set_error_flag(err, ct.xZ[i] == 0 && fabs(v) > tolconstr, __FILE__, __LINE__, "testminbleicunit.ap:2540");
+               set_error_flag(err, ct.xZ[i] == 0 && !SmallAtR(v, tolconstr), __FILE__, __LINE__, "testminbleicunit.ap:2540");
                set_error_flag(err, ct.xZ[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminbleicunit.ap:2541");
                set_error_flag(err, ct.xZ[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminbleicunit.ap:2542");
                if (ct.xZ[i] == 0) {
@@ -30456,7 +30456,7 @@ static void testminbleicunit_testbugs(bool *err) {
             minbleicresultsbuf(&state, &x1, &rep);
             set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:2854");
             for (i = 0; i < n; i++) {
-               set_error_flag(err, fabs(x1.xR[i]) > tolx, __FILE__, __LINE__, "testminbleicunit.ap:2856");
+               set_error_flag(err, !SmallAtR(x1.xR[i], tolx), __FILE__, __LINE__, "testminbleicunit.ap:2856");
             }
          }
       }
@@ -30606,7 +30606,7 @@ static void testminbleicunit_testoptguardc1test0reportfortask0(bool *err, optgua
             }
             v += fabs(vv);
          }
-         set_error_flag(err, fabs(v - rep->f.xR[k]) > 1.0E-6 * rmax2(fabs(v), 1.0), __FILE__, __LINE__, "testminbleicunit.ap:3601");
+         set_error_flag(err, !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testminbleicunit.ap:3601");
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -30681,10 +30681,10 @@ static void testminbleicunit_testoptguardc1test1reportfortask0(bool *err, optgua
                vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
             v += sign(vv) * a->xyR[i][rep->vidx];
-            tooclose = tooclose || fabs(vv) < 1.0E-4;
+            tooclose = tooclose || SmallR(vv, 1.0E-4);
          }
          if (!tooclose) {
-            set_error_flag(err, fabs(v - rep->g.xR[k]) > 1.0E-6 * rmax2(fabs(v), 1.0), __FILE__, __LINE__, "testminbleicunit.ap:3698");
+            set_error_flag(err, !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testminbleicunit.ap:3698");
          }
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
@@ -30697,7 +30697,7 @@ static void testminbleicunit_testoptguardc1test1reportfortask0(bool *err, optgua
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = tooclose || fabs(va) < 1.0E-8 || fabs(vb) < 1.0E-8;
+         tooclose = tooclose || SmallR(va, 1.0E-8) || SmallR(vb, 1.0E-8);
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -30976,8 +30976,8 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
             set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminbleicunit.ap:3251");
          }
          for (j = 0; j < n; j++) {
-            set_error_flag(wereerrors, fabs(jactrue.xyR[0][j] - ogrep.badgradnum.xyR[0][j]) > 0.01 / s.xR[j], __FILE__, __LINE__, "testminbleicunit.ap:3255");
-            set_error_flag(wereerrors, fabs(jacdefect.xyR[0][j] - ogrep.badgraduser.xyR[0][j]) > 0.01 / s.xR[j], __FILE__, __LINE__, "testminbleicunit.ap:3256");
+            set_error_flag(wereerrors, !NearAtR(jactrue.xyR[0][j], ogrep.badgradnum.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminbleicunit.ap:3255");
+            set_error_flag(wereerrors, !NearAtR(jacdefect.xyR[0][j], ogrep.badgraduser.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminbleicunit.ap:3256");
          }
       }
    }
@@ -31423,7 +31423,7 @@ static bool simpletest() {
          minqpoptimize(&state);
          minqpresults(&state, &x, &rep);
          for (j = 0; j < sn; j++) {
-            if (fabs(tx.xR[j] - x.xR[j]) > eps || x.xR[j] < db.xR[j] || x.xR[j] > ub.xR[j]) {
+            if (!NearAtR(tx.xR[j], x.xR[j], eps) || x.xR[j] < db.xR[j] || x.xR[j] > ub.xR[j]) {
                result = true;
                ae_frame_leave();
                return result;
@@ -31512,7 +31512,7 @@ static bool functest1() {
          minqpoptimize(&state);
          minqpresults(&state, &x, &rep);
          for (j = 0; j < sn; j++) {
-            if (fabs(tx.xR[j] - x.xR[j]) > eps) {
+            if (!NearAtR(tx.xR[j], x.xR[j], eps)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -31667,7 +31667,7 @@ static bool functest2() {
          }
          anti = testminqpunit_projectedantigradnorm(sn, &x, &g, &db, &ub);
          for (j = 0; j < sn; j++) {
-            if (fabs(anti) > eps) {
+            if (!SmallAtR(anti, eps)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -31783,7 +31783,7 @@ static bool consoletest() {
             printf("DB[%0d]=%0.5f; UB[%0d]=%0.5f\n", (int)j, db.xR[j], (int)j, ub.xR[j]);
             printf("XORi[%0d]=%0.5f; XORiC[%0d]=%0.5f;\n", (int)j, xori.xR[j], (int)j, xoric.xR[j]);
             printf("Anti[%0d]=%0.5f;\n", (int)j, anti);
-            if (fabs(anti) > eps) {
+            if (!SmallAtR(anti, eps)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -32586,7 +32586,7 @@ static bool quickqptests() {
    minqpoptimize(&state);
    minqpresults(&state, &xend1, &rep);
    for (i = 0; i < n; i++) {
-      set_error_flag(&result, fabs(xend0.xR[i] - xend1.xR[i]) > eps, __FILE__, __LINE__, "testminqpunit.ap:6437");
+      set_error_flag(&result, !NearAtR(xend0.xR[i], xend1.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:6437");
    }
 // Test scale-invariance. QQP performs same steps on scaled and
 // unscaled problems (assuming that scale of the variables is known).
@@ -32643,7 +32643,7 @@ static bool quickqptests() {
    minqpoptimize(&state);
    minqpresults(&state, &xend1, &rep);
    for (i = 0; i < n; i++) {
-      set_error_flag(&result, fabs(s.xR[i] * xend0.xR[i] - xend1.xR[i]) > eps, __FILE__, __LINE__, "testminqpunit.ap:6494");
+      set_error_flag(&result, !NearAtR(s.xR[i] * xend0.xR[i], xend1.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:6494");
    }
 // Test that QQP can efficiently use sparse matrices (i.e. it is
 // not disguised version of some dense QP solver). In order to test
@@ -32755,7 +32755,7 @@ static bool bleictests() {
    minqpoptimize(&state);
    minqpresults(&state, &xend1, &rep);
    for (i = 0; i < n; i++) {
-      set_error_flag(&result, fabs(xend0.xR[i] - xend1.xR[i]) > eps, __FILE__, __LINE__, "testminqpunit.ap:6609");
+      set_error_flag(&result, !NearAtR(xend0.xR[i], xend1.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:6609");
    }
 // Test scale-invariance. BLEIC performs same steps on scaled and
 // unscaled problems (assuming that scale of the variables is known).
@@ -32807,7 +32807,7 @@ static bool bleictests() {
    minqpoptimize(&state);
    minqpresults(&state, &xend1, &rep);
    for (i = 0; i < n; i++) {
-      set_error_flag(&result, fabs(s.xR[i] * xend0.xR[i] - xend1.xR[i]) > eps, __FILE__, __LINE__, "testminqpunit.ap:6662");
+      set_error_flag(&result, !NearAtR(s.xR[i] * xend0.xR[i], xend1.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:6662");
    }
 // Test that BLEIC can efficiently use sparse matrices (i.e. it is
 // not disguised version of some dense QP solver). In order to test
@@ -33045,7 +33045,7 @@ static bool bleictests() {
    set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:6906");
    if (rep.terminationtype > 0) {
       for (i = 0; i < n; i++) {
-         set_error_flag(&result, fabs(xend0.xR[i] + 1.0) > 100.0 * machineepsilon && fabs(xend0.xR[i] - 1.0) > 100.0 * machineepsilon, __FILE__, __LINE__, "testminqpunit.ap:6909");
+         set_error_flag(&result, !NearAtR(xend0.xR[i], -1.0, 100.0 * machineepsilon) && !NearAtR(xend0.xR[i], 1.0, 100.0 * machineepsilon), __FILE__, __LINE__, "testminqpunit.ap:6909");
       }
    }
    minqpsetlc(&state, &c, &ct, 2 * (n - 1));
@@ -33491,7 +33491,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
                gtrial.xR[i] += rep.lagbc.xR[i];
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(wereerrors, fabs(gtrial.xR[i]) > 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:928");
+               set_error_flag(wereerrors, !SmallAtR(gtrial.xR[i], 1.0E-3), __FILE__, __LINE__, "testminqpunit.ap:928");
             }
          }
       }
@@ -33942,7 +33942,7 @@ static bool testminqpunit_ecqptest() {
             continue;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(&waserrors, fabs(xend.xR[i] - x0.xR[i]) > eps, __FILE__, __LINE__, "testminqpunit.ap:1404");
+            set_error_flag(&waserrors, !NearAtR(xend.xR[i], x0.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:1404");
          }
       }
    }
@@ -33999,7 +33999,7 @@ static bool testminqpunit_ecqptest() {
          }
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
-            set_error_flag(&waserrors, fabs(v - c.xyR[i][n]) > eps, __FILE__, __LINE__, "testminqpunit.ap:1478");
+            set_error_flag(&waserrors, !NearAtR(v, c.xyR[i][n], eps), __FILE__, __LINE__, "testminqpunit.ap:1478");
          }
          ae_vector_set_length(&g, n);
          ae_v_move(g.xR, 1, b.xR, 1, n);
@@ -34146,10 +34146,10 @@ static bool testminqpunit_ecqptest() {
             f1 += xend2.xR[i] * b.xR[i];
          }
       // Check feasibility properties and compare
-         set_error_flag(&waserrors, fabs(f0 - f1) > eps, __FILE__, __LINE__, "testminqpunit.ap:1657");
+         set_error_flag(&waserrors, !NearAtR(f0, f1, eps), __FILE__, __LINE__, "testminqpunit.ap:1657");
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
-            set_error_flag(&waserrors, fabs(v - c.xyR[i][n]) > 1.0E6 * machineepsilon, __FILE__, __LINE__, "testminqpunit.ap:1661");
+            set_error_flag(&waserrors, !NearAtR(v, c.xyR[i][n], 1.0E6 * machineepsilon), __FILE__, __LINE__, "testminqpunit.ap:1661");
          }
          for (i = 0; i < n; i++) {
             set_error_flag(&waserrors, xend.xR[i] < 0.0, __FILE__, __LINE__, "testminqpunit.ap:1665");
@@ -34242,10 +34242,10 @@ static bool testminqpunit_ecqptest() {
       // Check feasibility properties and compare solutions
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
-            set_error_flag(&waserrors, fabs(v - c.xyR[i][n]) > eps, __FILE__, __LINE__, "testminqpunit.ap:1778");
+            set_error_flag(&waserrors, !NearAtR(v, c.xyR[i][n], eps), __FILE__, __LINE__, "testminqpunit.ap:1778");
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(&waserrors, fabs(xend.xR[i] - xend2.xR[i]) > eps, __FILE__, __LINE__, "testminqpunit.ap:1782");
+            set_error_flag(&waserrors, !NearAtR(xend.xR[i], xend2.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:1782");
             set_error_flag(&waserrors, xend.xR[i] < 0.0, __FILE__, __LINE__, "testminqpunit.ap:1783");
             set_error_flag(&waserrors, xend.xR[i] > 1.0, __FILE__, __LINE__, "testminqpunit.ap:1784");
          }
@@ -34313,7 +34313,7 @@ static bool testminqpunit_ecqptest() {
       }
       for (i = 0; i < k; i++) {
          v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
-         set_error_flag(&waserrors, fabs(v - c.xyR[i][n]) > eps, __FILE__, __LINE__, "testminqpunit.ap:1864");
+         set_error_flag(&waserrors, !NearAtR(v, c.xyR[i][n], eps), __FILE__, __LINE__, "testminqpunit.ap:1864");
       }
    }
 // Boundary and linear equality constrained QP problem,
@@ -34397,7 +34397,7 @@ static bool testminqpunit_ecqptest() {
          f0 += xend.xR[i] * b.xR[i];
          f1 += xend2.xR[i] * b.xR[i];
       }
-      set_error_flag(&waserrors, fabs(f0 - f1) > eps, __FILE__, __LINE__, "testminqpunit.ap:1969");
+      set_error_flag(&waserrors, !NearAtR(f0, f1, eps), __FILE__, __LINE__, "testminqpunit.ap:1969");
    }
 // Test ability to correctly handle situation where algorithm
 // either:
@@ -34459,13 +34459,13 @@ static bool testminqpunit_ecqptest() {
          continue;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(&waserrors, fabs(xend.xR[i] - x0.xR[i]) > eps, __FILE__, __LINE__, "testminqpunit.ap:2044");
+         set_error_flag(&waserrors, !NearAtR(xend.xR[i], x0.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:2044");
       }
       v = -c.xyR[0][n];
       for (i = 0; i < n; i++) {
          v += xend.xR[i] * c.xyR[0][i];
       }
-      set_error_flag(&waserrors, fabs(v) > 1.0E5 * machineepsilon, __FILE__, __LINE__, "testminqpunit.ap:2048");
+      set_error_flag(&waserrors, !SmallAtR(v, 1.0E5 * machineepsilon), __FILE__, __LINE__, "testminqpunit.ap:2048");
    }
    result = waserrors;
    ae_frame_leave();
@@ -34591,7 +34591,7 @@ static void testminqpunit_icqptest(bool *err) {
          if (v >= 0.0) {
          // X1 is feasible, compare target function values at XEnd and X1
             for (i = 0; i < n; i++) {
-               set_error_flag(err, fabs(xend.xR[i] - x1.xR[i]) > eps, __FILE__, __LINE__, "testminqpunit.ap:2173");
+               set_error_flag(err, !NearAtR(xend.xR[i], x1.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:2173");
             }
          } else {
          // X1 is infeasible:
@@ -34709,7 +34709,7 @@ static void testminqpunit_icqptest(bool *err) {
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
             if (ct.xZ[i] == 0) {
-               set_error_flag(err, fabs(v - c.xyR[i][n]) > eps, __FILE__, __LINE__, "testminqpunit.ap:2323");
+               set_error_flag(err, !NearAtR(v, c.xyR[i][n], eps), __FILE__, __LINE__, "testminqpunit.ap:2323");
             }
             if (ct.xZ[i] > 0) {
                set_error_flag(err, v < c.xyR[i][n] - eps, __FILE__, __LINE__, "testminqpunit.ap:2325");
@@ -34719,7 +34719,7 @@ static void testminqpunit_icqptest(bool *err) {
             }
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(err, fabs(xend.xR[i] - xend2.xR[i]) > eps, __FILE__, __LINE__, "testminqpunit.ap:2331");
+            set_error_flag(err, !NearAtR(xend.xR[i], xend2.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:2331");
             set_error_flag(err, xend.xR[i] < 0.0, __FILE__, __LINE__, "testminqpunit.ap:2332");
             set_error_flag(err, xend.xR[i] > 1.0, __FILE__, __LINE__, "testminqpunit.ap:2333");
          }
@@ -34795,7 +34795,7 @@ static void testminqpunit_icqptest(bool *err) {
       for (i = 0; i < n; i++) {
          set_error_flag(err, xend.xR[i] < bndl.xR[i] - eps, __FILE__, __LINE__, "testminqpunit.ap:2426");
          set_error_flag(err, xend.xR[i] > bndu.xR[i] + eps, __FILE__, __LINE__, "testminqpunit.ap:2427");
-         set_error_flag(err, fabs(xend.xR[i] - xend2.xR[i]) > eps, __FILE__, __LINE__, "testminqpunit.ap:2428");
+         set_error_flag(err, !NearAtR(xend.xR[i], xend2.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:2428");
       }
    }
 // Boundary constraints posed as general linear ones:
@@ -34861,7 +34861,7 @@ static void testminqpunit_icqptest(bool *err) {
    // * compare solution with analytic one
    // * check feasibility
       for (i = 0; i < n; i++) {
-         set_error_flag(err, fabs(xend.xR[i] - rboundval(x0.xR[i], 0.0, 1.0)) > 0.05, __FILE__, __LINE__, "testminqpunit.ap:2507");
+         set_error_flag(err, !NearAtR(xend.xR[i], rboundval(x0.xR[i], 0.0, 1.0), 0.05), __FILE__, __LINE__, "testminqpunit.ap:2507");
          set_error_flag(err, xend.xR[i] < 0.0 - 1.0E-6, __FILE__, __LINE__, "testminqpunit.ap:2508");
          set_error_flag(err, xend.xR[i] > 1.0 + 1.0E-6, __FILE__, __LINE__, "testminqpunit.ap:2509");
       }
@@ -34937,7 +34937,7 @@ static void testminqpunit_icqptest(bool *err) {
       for (i = 0; i < k; i++) {
          v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
          if (ct.xZ[i] == 0) {
-            set_error_flag(err, fabs(v - c.xyR[i][n]) > eps, __FILE__, __LINE__, "testminqpunit.ap:2595");
+            set_error_flag(err, !NearAtR(v, c.xyR[i][n], eps), __FILE__, __LINE__, "testminqpunit.ap:2595");
          }
          if (ct.xZ[i] > 0) {
             set_error_flag(err, v < c.xyR[i][n] - eps, __FILE__, __LINE__, "testminqpunit.ap:2597");
@@ -35052,7 +35052,7 @@ static void testminqpunit_icqptest(bool *err) {
          tmp0.xR[i] /= da.xR[i];
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(err, fabs(tmp0.xR[i] - xend.xR[i]) > eps * rmax2(fabs(tmp0.xR[i]), 1.0), __FILE__, __LINE__, "testminqpunit.ap:2739");
+         set_error_flag(err, !NearAtR(tmp0.xR[i], xend.xR[i], eps * rmax2(fabs(tmp0.xR[i]), 1.0)), __FILE__, __LINE__, "testminqpunit.ap:2739");
       }
    }
 // Boundary and linear equality/inequality constrained QP problem,
@@ -35148,7 +35148,7 @@ static void testminqpunit_icqptest(bool *err) {
          f0 += xend.xR[i] * b.xR[i];
          f1 += xend2.xR[i] * b.xR[i];
       }
-      set_error_flag(err, fabs(f0 - f1) > eps, __FILE__, __LINE__, "testminqpunit.ap:2853");
+      set_error_flag(err, !NearAtR(f0, f1, eps), __FILE__, __LINE__, "testminqpunit.ap:2853");
    }
 // Convex/nonconvex optimization problem with excessive constraints:
 //
@@ -35465,7 +35465,7 @@ static void testminqpunit_icqptest(bool *err) {
             for (i = 0; i < ccnt; i++) {
                v = ae_v_dotproduct(c.xyR[i], 1, xs0.xR, 1, n);
                v -= c.xyR[i][n];
-               set_error_flag(err, ct.xZ[i] == 0 && fabs(v) > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:3212");
+               set_error_flag(err, ct.xZ[i] == 0 && !SmallAtR(v, tolconstr), __FILE__, __LINE__, "testminqpunit.ap:3212");
                set_error_flag(err, ct.xZ[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminqpunit.ap:3213");
                set_error_flag(err, ct.xZ[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:3214");
                if (ct.xZ[i] == 0) {
@@ -36089,7 +36089,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                f1 += 0.5 * x1.xR[i] * rawa.xyR[i][j] * x1.xR[j];
             }
          }
-         set_error_flag(errorflag, fabs(f0 - f1) > 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:3584");
+         set_error_flag(errorflag, !NearAtR(f0, f1, 1.0E-3), __FILE__, __LINE__, "testminqpunit.ap:3584");
       }
    // Inequality constrained convex problem:
    // * N*N diagonal A
@@ -36170,7 +36170,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             if (v >= 0.0) {
             // XS is feasible
                for (i = 0; i < n; i++) {
-                  set_error_flag(errorflag, fabs(x1.xR[i] - xs.xR[i]) > xtol, __FILE__, __LINE__, "testminqpunit.ap:3677");
+                  set_error_flag(errorflag, !NearAtR(x1.xR[i], xs.xR[i], xtol), __FILE__, __LINE__, "testminqpunit.ap:3677");
                }
             } else {
             // XS is infeasible:
@@ -36294,7 +36294,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          for (i = 0; i < n; i++) {
             set_error_flag(errorflag, x1.xR[i] < bndl.xR[i] - xtol, __FILE__, __LINE__, "testminqpunit.ap:3809");
             set_error_flag(errorflag, x1.xR[i] > bndu.xR[i] + xtol, __FILE__, __LINE__, "testminqpunit.ap:3810");
-            set_error_flag(errorflag, fabs(x1.xR[i] - x2.xR[i]) > xtol, __FILE__, __LINE__, "testminqpunit.ap:3811");
+            set_error_flag(errorflag, !NearAtR(x1.xR[i], x2.xR[i], xtol), __FILE__, __LINE__, "testminqpunit.ap:3811");
          }
       }
    // Convex/nonconvex optimization problem with combination of
@@ -36478,7 +36478,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                for (i = 0; i < rawccnt; i++) {
                   v = ae_v_dotproduct(rawc.xyR[i], 1, x1.xR, 1, n);
                   v -= rawc.xyR[i][n];
-                  set_error_flag(errorflag, rawct.xZ[i] == 0 && fabs(v) > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:4014");
+                  set_error_flag(errorflag, rawct.xZ[i] == 0 && !SmallAtR(v, tolconstr), __FILE__, __LINE__, "testminqpunit.ap:4014");
                   set_error_flag(errorflag, rawct.xZ[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminqpunit.ap:4015");
                   set_error_flag(errorflag, rawct.xZ[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:4016");
                   if (rawct.xZ[i] == 0) {
@@ -36656,9 +36656,9 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                f0 += (x1.xR[i] - xorigin.xR[i]) * b.xR[i];
                f1 += (x2.xR[i] - xorigin.xR[i]) * b.xR[i];
             }
-            set_error_flag(errorflag, fabs(f0 - f1) > ftol, __FILE__, __LINE__, "testminqpunit.ap:4200");
+            set_error_flag(errorflag, !NearAtR(f0, f1, ftol), __FILE__, __LINE__, "testminqpunit.ap:4200");
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, fabs(x1.xR[i] - x2.xR[i]) > xtol, __FILE__, __LINE__, "testminqpunit.ap:4202");
+               set_error_flag(errorflag, !NearAtR(x1.xR[i], x2.xR[i], xtol), __FILE__, __LINE__, "testminqpunit.ap:4202");
             }
          }
       }
@@ -36846,7 +36846,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             }
             mx = rmax2(mx, 1.0);
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, fabs(x1.xR[i] - x2.xR[i] / s.xR[i]) > xtol * mx, __FILE__, __LINE__, "testminqpunit.ap:4383");
+               set_error_flag(errorflag, !NearAtR(x1.xR[i], x2.xR[i] / s.xR[i], xtol * mx), __FILE__, __LINE__, "testminqpunit.ap:4383");
             }
          }
       }
@@ -36972,7 +36972,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             tmp0.xR[i] /= da.xR[i];
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, fabs(tmp0.xR[i] - x1.xR[i]) > xtol * rmax2(fabs(tmp0.xR[i]), 1.0), __FILE__, __LINE__, "testminqpunit.ap:4536");
+            set_error_flag(errorflag, !NearAtR(tmp0.xR[i], x1.xR[i], xtol * rmax2(fabs(tmp0.xR[i]), 1.0)), __FILE__, __LINE__, "testminqpunit.ap:4536");
          }
       }
    // Boundary and linear equality/inequality constrained QP problem with
@@ -37071,7 +37071,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(x1.xR, 1, rawc.xyR[i], 1, n);
             if (rawct.xZ[i] == 0) {
-               set_error_flag(errorflag, fabs(v - rawc.xyR[i][n]) > xtol, __FILE__, __LINE__, "testminqpunit.ap:4644");
+               set_error_flag(errorflag, !NearAtR(v, rawc.xyR[i][n], xtol), __FILE__, __LINE__, "testminqpunit.ap:4644");
             }
             if (rawct.xZ[i] > 0) {
                set_error_flag(errorflag, v < rawc.xyR[i][n] - xtol, __FILE__, __LINE__, "testminqpunit.ap:4646");
@@ -37165,7 +37165,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       // * compare solution with analytic one
       // * check feasibility
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, fabs(x1.xR[i] - rboundval(x0.xR[i], 0.0, 1.0)) > xtol, __FILE__, __LINE__, "testminqpunit.ap:4745");
+            set_error_flag(errorflag, !NearAtR(x1.xR[i], rboundval(x0.xR[i], 0.0, 1.0), xtol), __FILE__, __LINE__, "testminqpunit.ap:4745");
             set_error_flag(errorflag, x1.xR[i] < 0.0 - xtol, __FILE__, __LINE__, "testminqpunit.ap:4746");
             set_error_flag(errorflag, x1.xR[i] > 1.0 + xtol, __FILE__, __LINE__, "testminqpunit.ap:4747");
          }
@@ -37530,7 +37530,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          // Test function value at the solution
             f0 = testminqpunit_quadratictarget(&a, &b, n, &x1);
             f1 = testminqpunit_quadratictarget(&a, &b, n, &xf);
-            set_error_flag(errorflag, fabs(f0 - f1) > rmax3(fabs(f0), fabs(f1), 1.0) * 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:5150");
+            set_error_flag(errorflag, !NearAtR(f0, f1, rmax3(fabs(f0), fabs(f1), 1.0) * 1.0E-3), __FILE__, __LINE__, "testminqpunit.ap:5150");
          // Test Lagrange multipliers returned by the solver; test is skipped:
          // * for BLEIC solver
          // * for overconstrained DENSE-AUL
@@ -37555,7 +37555,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                   }
                }
                for (i = 0; i < n; i++) {
-                  set_error_flag(errorflag, fabs(gtrial.xR[i]) > 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:5176");
+                  set_error_flag(errorflag, !SmallAtR(gtrial.xR[i], 1.0E-3), __FILE__, __LINE__, "testminqpunit.ap:5176");
                }
             }
          }
@@ -37652,7 +37652,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       }
       fblssolvels(&kkt, &kktright, n + rawccnt, n + rawccnt, &tmp0, &tmp1, &tmp2);
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, fabs(kktright.xR[i] - x1.xR[i]) > xtol * rmax2(fabs(kktright.xR[i]), 1.0), __FILE__, __LINE__, "testminqpunit.ap:5280");
+         set_error_flag(errorflag, !NearAtR(kktright.xR[i], x1.xR[i], xtol * rmax2(fabs(kktright.xR[i]), 1.0)), __FILE__, __LINE__, "testminqpunit.ap:5280");
       }
    // General inequality constrained problem:
    // * N*N SPD diagonal A with moderate condtion number
@@ -37778,7 +37778,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          tmp0.xR[i] /= da.xR[i];
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, fabs(tmp0.xR[i] - x1.xR[i]) > xtol * rmax2(fabs(tmp0.xR[i]), 1.0), __FILE__, __LINE__, "testminqpunit.ap:5434");
+         set_error_flag(errorflag, !NearAtR(tmp0.xR[i], x1.xR[i], xtol * rmax2(fabs(tmp0.xR[i]), 1.0)), __FILE__, __LINE__, "testminqpunit.ap:5434");
       }
    }
    ae_frame_leave();
@@ -37865,7 +37865,7 @@ static bool testminqpunit_specialicqptests() {
    minqpresults(&state, &xend, &rep);
    if (rep.terminationtype > 0) {
       for (i = 0; i <= 2; i++) {
-         waserrors = waserrors || fabs(xend.xR[i] - xexact.xR[i]) > 1.0E6 * machineepsilon;
+         waserrors = waserrors || !NearAtR(xend.xR[i], xexact.xR[i], 1.0E6 * machineepsilon);
       }
    } else {
       waserrors = true;
@@ -37929,7 +37929,7 @@ static bool testminqpunit_specialicqptests() {
    minqpresults(&state, &xend, &rep);
    if (rep.terminationtype > 0) {
       for (i = 0; i <= 2; i++) {
-         waserrors = waserrors || fabs(xend.xR[i] - xexact.xR[i]) > 1.0E6 * machineepsilon;
+         waserrors = waserrors || !NearAtR(xend.xR[i], xexact.xR[i], 1.0E6 * machineepsilon);
       }
    } else {
       waserrors = true;
@@ -38031,7 +38031,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, fabs(xf.xR[i] - xsol.xR[i]) / s.xR[i] > xtol, __FILE__, __LINE__, "testminqpunit.ap:7158");
+            set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminqpunit.ap:7158");
          }
       }
    }
@@ -38082,7 +38082,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, fabs(xf.xR[i] - xsol.xR[i]) > xtol, __FILE__, __LINE__, "testminqpunit.ap:7222");
+         set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], xtol), __FILE__, __LINE__, "testminqpunit.ap:7222");
       }
    }
 // Test that box/linearly inequality constrained problem with ALL constraints
@@ -38178,7 +38178,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, fabs(xf.xR[i] - xsol.xR[i]) / s.xR[i] > xtol, __FILE__, __LINE__, "testminqpunit.ap:7343");
+            set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminqpunit.ap:7343");
          }
       }
    }
@@ -38278,7 +38278,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, fabs(xf.xR[i] - xsol.xR[i]) / s.xR[i] > xtol, __FILE__, __LINE__, "testminqpunit.ap:7457");
+            set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminqpunit.ap:7457");
          }
       }
    }
@@ -38380,7 +38380,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, fabs(xf.xR[i] - xsol.xR[i]) / s.xR[i] > xtol, __FILE__, __LINE__, "testminqpunit.ap:7573");
+            set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminqpunit.ap:7573");
          }
       }
    }
@@ -38489,7 +38489,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, fabs(xf.xR[i] - xsol.xR[i]) / s.xR[i] > xtol, __FILE__, __LINE__, "testminqpunit.ap:7700");
+            set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminqpunit.ap:7700");
          }
       }
    }
@@ -38548,7 +38548,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, fabs(fabs(xf.xR[i]) - 1) > xtol, __FILE__, __LINE__, "testminqpunit.ap:7769");
+         set_error_flag(errorflag, !NearAtR(fabs(xf.xR[i]), 1.0, xtol), __FILE__, __LINE__, "testminqpunit.ap:7769");
       }
    }
    ae_frame_leave();
@@ -38857,7 +38857,7 @@ static void testminqpunit_ipmtests(bool *errorflag) {
          // Test function value at the solution
             f0 = testminqpunit_quadratictarget(&fulla, &b, n, &x1);
             f1 = testminqpunit_quadratictarget(&fulla, &b, n, &xf);
-            set_error_flag(errorflag, fabs(f0 - f1) > rmax3(fabs(f0), fabs(f1), 1.0) * 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:8107");
+            set_error_flag(errorflag, !NearAtR(f0, f1, rmax3(fabs(f0), fabs(f1), 1.0) * 1.0E-3), __FILE__, __LINE__, "testminqpunit.ap:8107");
          // Test Lagrange multipliers returned by the solver
             ae_vector_set_length(&gtrial, n);
             for (i = 0; i < n; i++) {
@@ -38876,7 +38876,7 @@ static void testminqpunit_ipmtests(bool *errorflag) {
                }
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, fabs(gtrial.xR[i]) > 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:8126");
+               set_error_flag(errorflag, !SmallAtR(gtrial.xR[i], 1.0E-3), __FILE__, __LINE__, "testminqpunit.ap:8126");
             }
          }
       }
@@ -38930,7 +38930,7 @@ static void testminqpunit_ipmtests(bool *errorflag) {
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, fabs(xf.xR[i] - xsol.xR[i]) > xtol, __FILE__, __LINE__, "testminqpunit.ap:8191");
+         set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], xtol), __FILE__, __LINE__, "testminqpunit.ap:8191");
       }
    }
    ae_frame_leave();
@@ -39017,7 +39017,7 @@ static void testminqpunit_spectests(bool *errorflag) {
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, fabs(xs.xR[i] - xs2.xR[i]) > xtol, __FILE__, __LINE__, "testminqpunit.ap:8281");
+         set_error_flag(errorflag, !NearAtR(xs.xR[i], xs2.xR[i], xtol), __FILE__, __LINE__, "testminqpunit.ap:8281");
       }
    // Check that automatic scaling fails for matrices with zero or negative elements
       i = hqrnduniformi(&rs, n);
@@ -39379,9 +39379,9 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
       }
       minlmresults(&state, &x, &rep);
       set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:215");
-      set_error_flag(errorflag, fabs(x.xR[0] - 2) > 0.001, __FILE__, __LINE__, "testminlmunit.ap:216");
-      set_error_flag(errorflag, fabs(x.xR[1]) > 0.001, __FILE__, __LINE__, "testminlmunit.ap:217");
-      set_error_flag(errorflag, fabs(x.xR[2] - 2) > 0.001, __FILE__, __LINE__, "testminlmunit.ap:218");
+      set_error_flag(errorflag, !NearAtR(x.xR[0], 2.0, 0.001), __FILE__, __LINE__, "testminlmunit.ap:216");
+      set_error_flag(errorflag, !SmallAtR(x.xR[1], 0.001), __FILE__, __LINE__, "testminlmunit.ap:217");
+      set_error_flag(errorflag, !NearAtR(x.xR[2], 2.0, 0.001), __FILE__, __LINE__, "testminlmunit.ap:218");
    }
 // 1D problem #1
 //
@@ -39443,7 +39443,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
       }
       minlmresults(&state, &x, &rep);
       set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:284");
-      set_error_flag(errorflag, fabs(x.xR[0] / pi - round(x.xR[0] / pi)) > 0.001, __FILE__, __LINE__, "testminlmunit.ap:285");
+      set_error_flag(errorflag, !NearAtR(x.xR[0] / pi, round(x.xR[0] / pi), 0.001), __FILE__, __LINE__, "testminlmunit.ap:285");
    }
 // Linear equations: test normal optimization and optimization with restarts
    for (n = 1; n <= 10; n++) {
@@ -39509,7 +39509,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, fabs(x.xR[i] - xe.xR[i]) > 0.001, __FILE__, __LINE__, "testminlmunit.ap:364");
+            set_error_flag(errorflag, !NearAtR(x.xR[i], xe.xR[i], 0.001), __FILE__, __LINE__, "testminlmunit.ap:364");
          }
       // Now we try to restart algorithm from new point
          for (i = 0; i < n; i++) {
@@ -39526,7 +39526,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, fabs(x.xR[i] - xe.xR[i]) > 0.001, __FILE__, __LINE__, "testminlmunit.ap:382");
+            set_error_flag(errorflag, !NearAtR(x.xR[i], xe.xR[i], 0.001), __FILE__, __LINE__, "testminlmunit.ap:382");
          }
       }
    }
@@ -39625,9 +39625,9 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
             return;
          }
          if (ckind == 0) {
-            set_error_flag(errorflag, fabs(x.xR[0] - log(2.0)) > eps, __FILE__, __LINE__, "testminlmunit.ap:494");
-            set_error_flag(errorflag, fabs(x.xR[1]) > eps, __FILE__, __LINE__, "testminlmunit.ap:495");
-            set_error_flag(errorflag, fabs(x.xR[2] - log(2.0)) > eps, __FILE__, __LINE__, "testminlmunit.ap:496");
+            set_error_flag(errorflag, !NearAtR(x.xR[0], log(2.0), eps), __FILE__, __LINE__, "testminlmunit.ap:494");
+            set_error_flag(errorflag, !SmallAtR(x.xR[1], eps), __FILE__, __LINE__, "testminlmunit.ap:495");
+            set_error_flag(errorflag, !NearAtR(x.xR[2], log(2.0), eps), __FILE__, __LINE__, "testminlmunit.ap:496");
             set_error_flag(errorflag, rep.terminationtype != 2, __FILE__, __LINE__, "testminlmunit.ap:497");
          }
          if (ckind == 1) {
@@ -39757,7 +39757,7 @@ static void testminlmunit_testbc(bool *errorflag) {
          minlmresults(&state, &x, &rep);
          if (rep.terminationtype > 0) {
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, fabs(x.xR[i] - rboundval(xe.xR[i], bl.xR[i], bu.xR[i])) > 5.0E-2, __FILE__, __LINE__, "testminlmunit.ap:594");
+               set_error_flag(errorflag, !NearAtR(x.xR[i], rboundval(xe.xR[i], bl.xR[i], bu.xR[i]), 5.0E-2), __FILE__, __LINE__, "testminlmunit.ap:594");
             }
          } else {
             set_error_flag(errorflag, true, __FILE__, __LINE__, "testminlmunit.ap:597");
@@ -40158,7 +40158,7 @@ static void testminlmunit_testlc(bool *errorflag) {
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(rawc.xyR[i], 1, x.xR, 1, n);
          v -= rawc.xyR[i][n];
-         set_error_flag(errorflag, fabs(v) > xtol, __FILE__, __LINE__, "testminlmunit.ap:1042");
+         set_error_flag(errorflag, !SmallAtR(v, xtol), __FILE__, __LINE__, "testminlmunit.ap:1042");
       }
    // Make several random trial steps and:
    // 0) generate small random trial step
@@ -40280,9 +40280,9 @@ static void testminlmunit_testlc(bool *errorflag) {
       }
    // Compare solutions
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, fabs(x.xR[i] - x12.xR[i]) > 1.0E-3, __FILE__, __LINE__, "testminlmunit.ap:1204");
-         set_error_flag(errorflag, fabs(x.xR[i] - x12.xR[n + i]) > 1.0E-3, __FILE__, __LINE__, "testminlmunit.ap:1205");
-         set_error_flag(errorflag, fabs(x12.xR[i] - x12.xR[n + i]) > 1.0E-6, __FILE__, __LINE__, "testminlmunit.ap:1206");
+         set_error_flag(errorflag, !NearAtR(x.xR[i], x12.xR[i], 1.0E-3), __FILE__, __LINE__, "testminlmunit.ap:1204");
+         set_error_flag(errorflag, !NearAtR(x.xR[i], x12.xR[n + i], 1.0E-3), __FILE__, __LINE__, "testminlmunit.ap:1205");
+         set_error_flag(errorflag, !NearAtR(x12.xR[i], x12.xR[n + i], 1.0E-6), __FILE__, __LINE__, "testminlmunit.ap:1206");
       }
    }
    ae_frame_leave();
@@ -40431,7 +40431,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
       if (state.needfgh) {
          state.h.xyR[0][0] = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
       }
-      set_error_flag(errorflag, fabs(state.x.xR[0] - xprev) > (1 + sqrt(machineepsilon)) * stpmax, __FILE__, __LINE__, "testminlmunit.ap:1355");
+      set_error_flag(errorflag, !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax), __FILE__, __LINE__, "testminlmunit.ap:1355");
       if (state.xupdated) {
          xprev = state.x.xR[0];
       }
@@ -40787,8 +40787,8 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
             }
             for (i = 0; i <= 1; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(wereerrors, fabs(jactrue.xyR[i][j] - ogrep.badgradnum.xyR[i][j]) > 0.01 / s.xR[j], __FILE__, __LINE__, "testminlmunit.ap:1760");
-                  set_error_flag(wereerrors, fabs(jacdefect.xyR[i][j] - ogrep.badgraduser.xyR[i][j]) > 0.01 / s.xR[j], __FILE__, __LINE__, "testminlmunit.ap:1761");
+                  set_error_flag(wereerrors, !NearAtR(jactrue.xyR[i][j], ogrep.badgradnum.xyR[i][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminlmunit.ap:1760");
+                  set_error_flag(wereerrors, !NearAtR(jacdefect.xyR[i][j], ogrep.badgraduser.xyR[i][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminlmunit.ap:1761");
                }
             }
          }
@@ -41059,7 +41059,7 @@ static void testother(bool *err) {
       }
       mincgresults(&state, &x, &rep);
       r = v / (s.xR[0] * diffstep);
-      *err = *err || fabs(log(r)) > log(1.0 + 1000.0 * machineepsilon);
+      *err = *err || !SmallAtR(log(r), log(1.0 + 1000.0 * machineepsilon));
    // Test maximum step
       n = 1;
       ae_vector_set_length(&x, n);
@@ -41074,9 +41074,9 @@ static void testother(bool *err) {
          if (state.needfg) {
             state.f = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
             state.g.xR[0] = exp(state.x.xR[0]) - exp(-state.x.xR[0]);
-            *err = *err || fabs(state.x.xR[0] - xprev) > (1 + sqrt(machineepsilon)) * stpmax;
+            *err = *err || !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax);
          } else if (state.xupdated) {
-            *err = *err || fabs(state.x.xR[0] - xprev) > (1 + sqrt(machineepsilon)) * stpmax;
+            *err = *err || !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax);
             xprev = state.x.xR[0];
          }
    // Test correctness of the scaling:
@@ -41224,7 +41224,7 @@ static void testother(bool *err) {
                ae_frame_leave();
                return;
             }
-            *err = *err || fabs(1 / sqr(1 - x.xR[0]) - 1 / sqr(1 + x.xR[0]) + vc) > epsg;
+            *err = *err || !NearAtR(1.0 / sqr(1.0 - x.xR[0]), 1.0 / sqr(1.0 + x.xR[0]) - vc, epsg);
          }
       }
    }
@@ -41672,7 +41672,7 @@ static void testmincgunit_testoptguardc1test0reportfortask0(bool *err, optguardn
             }
             v += fabs(vv);
          }
-         set_error_flag(err, fabs(v - rep->f.xR[k]) > 1.0E-6 * rmax2(fabs(v), 1.0), __FILE__, __LINE__, "testmincgunit.ap:1803");
+         set_error_flag(err, !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testmincgunit.ap:1803");
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -41747,10 +41747,10 @@ static void testmincgunit_testoptguardc1test1reportfortask0(bool *err, optguardn
                vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
             v += sign(vv) * a->xyR[i][rep->vidx];
-            tooclose = tooclose || fabs(vv) < 1.0E-4;
+            tooclose = tooclose || SmallR(vv, 1.0E-4);
          }
          if (!tooclose) {
-            set_error_flag(err, fabs(v - rep->g.xR[k]) > 1.0E-6 * rmax2(fabs(v), 1.0), __FILE__, __LINE__, "testmincgunit.ap:1900");
+            set_error_flag(err, !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testmincgunit.ap:1900");
          }
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
@@ -41763,7 +41763,7 @@ static void testmincgunit_testoptguardc1test1reportfortask0(bool *err, optguardn
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = tooclose || fabs(va) < 1.0E-8 || fabs(vb) < 1.0E-8;
+         tooclose = tooclose || SmallR(va, 1.0E-8) || SmallR(vb, 1.0E-8);
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -42024,8 +42024,8 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
             set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testmincgunit.ap:1453");
          }
          for (j = 0; j < n; j++) {
-            set_error_flag(wereerrors, fabs(jactrue.xyR[0][j] - ogrep.badgradnum.xyR[0][j]) > 0.01 / s.xR[j], __FILE__, __LINE__, "testmincgunit.ap:1457");
-            set_error_flag(wereerrors, fabs(jacdefect.xyR[0][j] - ogrep.badgraduser.xyR[0][j]) > 0.01 / s.xR[j], __FILE__, __LINE__, "testmincgunit.ap:1458");
+            set_error_flag(wereerrors, !NearAtR(jactrue.xyR[0][j], ogrep.badgradnum.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testmincgunit.ap:1457");
+            set_error_flag(wereerrors, !NearAtR(jacdefect.xyR[0][j], ogrep.badgraduser.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testmincgunit.ap:1458");
          }
       }
    }
@@ -42337,7 +42337,7 @@ bool testmincg(bool silent) {
             }
          }
          mincgresults(&state, &x, &rep);
-         referror = referror || rep.terminationtype <= 0 || fabs(x.xR[0] - 2) > 0.001 || fabs(x.xR[1]) > 0.001 || fabs(x.xR[2] - 2) > 0.001;
+         referror = referror || rep.terminationtype <= 0 || !NearAtR(x.xR[0], 2.0, 0.001) || !SmallAtR(x.xR[1], 0.001) || !NearAtR(x.xR[2], 2.0, 0.001);
       // F2 problem with restarts:
       // * make several iterations and restart BEFORE termination
       // * iterate and restart AFTER termination
@@ -42364,13 +42364,13 @@ bool testmincg(bool silent) {
          x.xR[2] = 10 + 10 * randomreal();
          for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) testmincgunit_testfunc2(&state);
          mincgresults(&state, &x, &rep);
-         restartserror = restartserror || rep.terminationtype <= 0 || fabs(x.xR[0] - log(2.0)) > 0.01 || fabs(x.xR[1]) > 0.01 || fabs(x.xR[2] - log(2.0)) > 0.01;
+         restartserror = restartserror || rep.terminationtype <= 0 || !NearAtR(x.xR[0], log(2.0), 0.01) || !SmallAtR(x.xR[1], 0.01) || !NearAtR(x.xR[2], log(2.0), 0.01);
          x.xR[0] = 10 + 10 * randomreal();
          x.xR[1] = 10 + 10 * randomreal();
          x.xR[2] = 10 + 10 * randomreal();
          for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) testmincgunit_testfunc2(&state);
          mincgresults(&state, &x, &rep);
-         restartserror = restartserror || rep.terminationtype <= 0 || fabs(x.xR[0] - log(2.0)) > 0.01 || fabs(x.xR[1]) > 0.01 || fabs(x.xR[2] - log(2.0)) > 0.01;
+         restartserror = restartserror || rep.terminationtype <= 0 || !NearAtR(x.xR[0], log(2.0), 0.01) || !SmallAtR(x.xR[1], 0.01) || !NearAtR(x.xR[2], log(2.0), 0.01);
       // 1D problem #1
          ae_vector_set_length(&x, 0 + 1);
          n = 1;
@@ -42392,7 +42392,7 @@ bool testmincg(bool silent) {
             }
          }
          mincgresults(&state, &x, &rep);
-         linerror1 = linerror1 || rep.terminationtype <= 0 || fabs(x.xR[0] / pi - round(x.xR[0] / pi)) > 0.001;
+         linerror1 = linerror1 || rep.terminationtype <= 0 || !NearAtR(x.xR[0] / pi, round(x.xR[0] / pi), 0.001);
       // 1D problem #2
          ae_vector_set_length(&x, 0 + 1);
          n = 1;
@@ -42414,7 +42414,7 @@ bool testmincg(bool silent) {
             }
          }
          mincgresults(&state, &x, &rep);
-         linerror2 = linerror2 || rep.terminationtype <= 0 || fabs(x.xR[0]) > 0.001;
+         linerror2 = linerror2 || rep.terminationtype <= 0 || !SmallAtR(x.xR[0], 0.001);
       // Linear equations
          diffstep = 1.0E-6;
          for (n = 1; n <= 10; n++) {
@@ -42471,7 +42471,7 @@ bool testmincg(bool silent) {
             mincgresults(&state, &x, &rep);
             eqerror = eqerror || rep.terminationtype <= 0;
             for (i = 0; i < n; i++) {
-               eqerror = eqerror || fabs(x.xR[i] - xe.xR[i]) > 0.001;
+               eqerror = eqerror || !NearAtR(x.xR[i], xe.xR[i], 0.001);
             }
          }
       // Testing convergence properties
@@ -43052,9 +43052,9 @@ static void testminlpunit_basictests(bool *err) {
          return;
       }
       testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, ccnt, &x, &rep, solvertype, &v0, &v1, &errslack);
-      set_error_flag(err, fabs(v0) > primtol, __FILE__, __LINE__, "testminlpunit.ap:404");
-      set_error_flag(err, fabs(v1) > dualtol, __FILE__, __LINE__, "testminlpunit.ap:405");
-      set_error_flag(err, fabs(errslack) > slacktol, __FILE__, __LINE__, "testminlpunit.ap:406");
+      set_error_flag(err, !SmallAtR(v0, primtol), __FILE__, __LINE__, "testminlpunit.ap:404");
+      set_error_flag(err, !SmallAtR(v1, dualtol), __FILE__, __LINE__, "testminlpunit.ap:405");
+      set_error_flag(err, !SmallAtR(errslack, slacktol), __FILE__, __LINE__, "testminlpunit.ap:406");
    }
    ae_frame_leave();
 }
@@ -43830,12 +43830,12 @@ static void testminlpunit_singlecalltests(bool *err) {
             return;
          }
          testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
-         set_error_flag(err, fabs(errp) > primtol, __FILE__, __LINE__, "testminlpunit.ap:475");
-         set_error_flag(err, fabs(errd) > dualtol, __FILE__, __LINE__, "testminlpunit.ap:476");
-         set_error_flag(err, fabs(errs) > slacktol, __FILE__, __LINE__, "testminlpunit.ap:477");
-         set_error_flag(err, fabs(errp - rep0.primalerror) > etol * rmax2(errp, 1.0), __FILE__, __LINE__, "testminlpunit.ap:478");
-         set_error_flag(err, fabs(errd - rep0.dualerror) > etol * rmax2(errd, 1.0), __FILE__, __LINE__, "testminlpunit.ap:479");
-         set_error_flag(err, fabs(errs - rep0.slackerror) > etol * rmax2(errs, 1.0), __FILE__, __LINE__, "testminlpunit.ap:480");
+         set_error_flag(err, !SmallAtR(errp, primtol), __FILE__, __LINE__, "testminlpunit.ap:475");
+         set_error_flag(err, !SmallAtR(errd, dualtol), __FILE__, __LINE__, "testminlpunit.ap:476");
+         set_error_flag(err, !SmallAtR(errs, slacktol), __FILE__, __LINE__, "testminlpunit.ap:477");
+         set_error_flag(err, !NearAtR(errp, rep0.primalerror, etol * rmax2(errp, 1.0)), __FILE__, __LINE__, "testminlpunit.ap:478");
+         set_error_flag(err, !NearAtR(errd, rep0.dualerror, etol * rmax2(errd, 1.0)), __FILE__, __LINE__, "testminlpunit.ap:479");
+         set_error_flag(err, !NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0)), __FILE__, __LINE__, "testminlpunit.ap:480");
       // Apply random modification to the problem (and to the way
       // we pass constraints to the solver), try solving one more time
       // and compare with the original solution.
@@ -43863,7 +43863,7 @@ static void testminlpunit_singlecalltests(bool *err) {
             f += x0.xR[i] * c.xR[i];
             f1 += x1.xR[i] * c.xR[i];
          }
-         set_error_flag(err, fabs(f1 - f) > ftol, __FILE__, __LINE__, "testminlpunit.ap:511");
+         set_error_flag(err, !NearAtR(f1, f, ftol), __FILE__, __LINE__, "testminlpunit.ap:511");
       // Test scaling (random scale is applied, target values for
       // original and scaled problems are compared).
       //
@@ -43901,7 +43901,7 @@ static void testminlpunit_singlecalltests(bool *err) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(err, fabs(x0.xR[i] - x1.xR[i] / s.xR[i]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testminlpunit.ap:557");
+            set_error_flag(err, !NearAtR(x0.xR[i], x1.xR[i] / s.xR[i], 1000.0 * machineepsilon), __FILE__, __LINE__, "testminlpunit.ap:557");
          }
       }
    }
@@ -43930,9 +43930,9 @@ static void testminlpunit_singlecalltests(bool *err) {
             return;
          }
          testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
-         set_error_flag(err, fabs(errp - rep0.primalerror) > etol * rmax3(errp, rmaxabsv(n, &x0), 1.0), __FILE__, __LINE__, "testminlpunit.ap:589");
-         set_error_flag(err, fabs(errd - rep0.dualerror) > etol * rmax3(errd, rmaxabsv(n, &x0), 1.0), __FILE__, __LINE__, "testminlpunit.ap:590");
-         set_error_flag(err, fabs(errs - rep0.slackerror) > etol * rmax3(errs, rmaxabsv(n, &x0), 1.0), __FILE__, __LINE__, "testminlpunit.ap:591");
+         set_error_flag(err, !NearAtR(errp, rep0.primalerror, etol * rmax3(errp, rmaxabsv(n, &x0), 1.0)), __FILE__, __LINE__, "testminlpunit.ap:589");
+         set_error_flag(err, !NearAtR(errd, rep0.dualerror, etol * rmax3(errd, rmaxabsv(n, &x0), 1.0)), __FILE__, __LINE__, "testminlpunit.ap:590");
+         set_error_flag(err, !NearAtR(errs, rep0.slackerror, etol * rmax3(errs, rmaxabsv(n, &x0), 1.0)), __FILE__, __LINE__, "testminlpunit.ap:591");
       // Generate random primal infeasible
       //
       // NOTE: because we use constraint validation code, we can not
@@ -43954,9 +43954,9 @@ static void testminlpunit_singlecalltests(bool *err) {
             return;
          }
          testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
-         set_error_flag(err, fabs(errp - rep0.primalerror) > etol * rmax3(errp, rmaxabsv(n, &x0), 1.0), __FILE__, __LINE__, "testminlpunit.ap:615");
-         set_error_flag(err, fabs(errd - rep0.dualerror) > etol * rmax3(errd, rmaxabsv(n, &x0), 1.0), __FILE__, __LINE__, "testminlpunit.ap:616");
-         set_error_flag(err, fabs(errs - rep0.slackerror) > etol * rmax3(errs, rmaxabsv(n, &x0), 1.0), __FILE__, __LINE__, "testminlpunit.ap:617");
+         set_error_flag(err, !NearAtR(errp, rep0.primalerror, etol * rmax3(errp, rmaxabsv(n, &x0), 1.0)), __FILE__, __LINE__, "testminlpunit.ap:615");
+         set_error_flag(err, !NearAtR(errd, rep0.dualerror, etol * rmax3(errd, rmaxabsv(n, &x0), 1.0)), __FILE__, __LINE__, "testminlpunit.ap:616");
+         set_error_flag(err, !NearAtR(errs, rep0.slackerror, etol * rmax3(errs, rmaxabsv(n, &x0), 1.0)), __FILE__, __LINE__, "testminlpunit.ap:617");
       }
    }
    for (n = 2; n <= 50; n++) {
@@ -44032,10 +44032,10 @@ static void testminlpunit_singlecalltests(bool *err) {
             set_error_flag(err, x0.xR[i] < 1.0, __FILE__, __LINE__, "testminlpunit.ap:691");
          }
          testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
-         set_error_flag(err, fabs(errd) > 0.001, __FILE__, __LINE__, "testminlpunit.ap:693");
-         set_error_flag(err, fabs(errp - rep0.primalerror) > etol * rmax2(errp, 1.0), __FILE__, __LINE__, "testminlpunit.ap:694");
-         set_error_flag(err, fabs(errd - rep0.dualerror) > etol * rmax2(errd, 1.0), __FILE__, __LINE__, "testminlpunit.ap:695");
-         set_error_flag(err, fabs(errs - rep0.slackerror) > etol * rmax2(errs, 1.0), __FILE__, __LINE__, "testminlpunit.ap:696");
+         set_error_flag(err, !SmallAtR(errd, 0.001), __FILE__, __LINE__, "testminlpunit.ap:693");
+         set_error_flag(err, !NearAtR(errp, rep0.primalerror, etol * rmax2(errp, 1.0)), __FILE__, __LINE__, "testminlpunit.ap:694");
+         set_error_flag(err, !NearAtR(errd, rep0.dualerror, etol * rmax2(errd, 1.0)), __FILE__, __LINE__, "testminlpunit.ap:695");
+         set_error_flag(err, !NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0)), __FILE__, __LINE__, "testminlpunit.ap:696");
       }
    }
 // Check SetBCAll() and SetBCi()
@@ -44344,10 +44344,10 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                      g += fulla.xyR[i][j] * x1.xR[j];
                   }
                   g *= s.xR[i];
-                  if (isfinite(bndl.xR[i]) && fabs(x1.xR[i] - bndl.xR[i]) < tolx * s.xR[i] && g > 0.0) {
+                  if (isfinite(bndl.xR[i]) && NearR(x1.xR[i], bndl.xR[i], tolx * s.xR[i]) && g > 0.0) {
                      g = 0.0;
                   }
-                  if (isfinite(bndu.xR[i]) && fabs(x1.xR[i] - bndu.xR[i]) < tolx * s.xR[i] && g < 0.0) {
+                  if (isfinite(bndu.xR[i]) && NearR(x1.xR[i], bndu.xR[i], tolx * s.xR[i]) && g < 0.0) {
                      g = 0.0;
                   }
                   gnorm += sqr(g);
@@ -44461,10 +44461,10 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                   for (j = 0; j < n; j++) {
                      g += fulla.xyR[i][j] * x1.xR[j];
                   }
-                  if (isfinite(bndl.xR[i]) && fabs(x1.xR[i] - bndl.xR[i]) < tolx && g > 0.0) {
+                  if (isfinite(bndl.xR[i]) && NearR(x1.xR[i], bndl.xR[i], tolx) && g > 0.0) {
                      g = 0.0;
                   }
-                  if (isfinite(bndu.xR[i]) && fabs(x1.xR[i] - bndu.xR[i]) < tolx && g < 0.0) {
+                  if (isfinite(bndu.xR[i]) && NearR(x1.xR[i], bndu.xR[i], tolx) && g < 0.0) {
                      g = 0.0;
                   }
                   gnorm += sqr(g);
@@ -44660,7 +44660,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                   f0 += b.xR[i] * x0.xR[i] + 0.5 * sqr(x0.xR[i] / s.xR[i]);
                   f1 += b.xR[i] * x1.xR[i] + 0.5 * sqr(x1.xR[i] / s.xR[i]);
                }
-               set_error_flag(wereerrors, fabs(f1 - f0) > tolf, __FILE__, __LINE__, "testminnlcunit.ap:608");
+               set_error_flag(wereerrors, !NearAtR(f1, f0, tolf), __FILE__, __LINE__, "testminnlcunit.ap:608");
             }
          }
       }
@@ -44899,7 +44899,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          // Check feasibility properties and gradient projection
             for (i = 0; i < k; i++) {
                v = ae_v_dotproduct(x1.xR, 1, c.xyR[i], 1, n);
-               set_error_flag(wereerrors, fabs(v - c.xyR[i][n]) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:898");
+               set_error_flag(wereerrors, !NearAtR(v, c.xyR[i][n], tolx), __FILE__, __LINE__, "testminnlcunit.ap:898");
             }
             ae_vector_set_length(&g, n);
             ae_v_move(g.xR, 1, b.xR, 1, n);
@@ -45050,7 +45050,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                f1 += 0.5 * x2.xR[i] * fulla.xyR[i][j] * x2.xR[j];
             }
          }
-         set_error_flag(wereerrors, fabs(f0 - f1) > tolf, __FILE__, __LINE__, "testminnlcunit.ap:1080");
+         set_error_flag(wereerrors, !NearAtR(f0, f1, tolf), __FILE__, __LINE__, "testminnlcunit.ap:1080");
       }
    // Boundary and linear equality constrained QP problem with excessive
    // equality constraints:
@@ -45141,7 +45141,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          }
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(x1.xR, 1, c.xyR[i], 1, n);
-            set_error_flag(wereerrors, fabs(v - c.xyR[i][n]) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:1189");
+            set_error_flag(wereerrors, !NearAtR(v, c.xyR[i][n], tolx), __FILE__, __LINE__, "testminnlcunit.ap:1189");
          }
       }
    // Boundary and linear equality/inequality constrained QP problem with
@@ -45253,7 +45253,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(x1.xR, 1, c.xyR[i], 1, n);
             if (ct.xZ[i] == 0) {
-               set_error_flag(wereerrors, fabs(v - c.xyR[i][n]) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:1322");
+               set_error_flag(wereerrors, !NearAtR(v, c.xyR[i][n], tolx), __FILE__, __LINE__, "testminnlcunit.ap:1322");
             }
             if (ct.xZ[i] > 0) {
                set_error_flag(wereerrors, v < c.xyR[i][n] - tolx, __FILE__, __LINE__, "testminnlcunit.ap:1324");
@@ -45392,7 +45392,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             f0 += x0.xR[i] * b.xR[i];
             f1 += x1.xR[i] * b.xR[i];
          }
-         set_error_flag(wereerrors, fabs(f0 - f1) > tolf, __FILE__, __LINE__, "testminnlcunit.ap:1486");
+         set_error_flag(wereerrors, !NearAtR(f0, f1, tolf), __FILE__, __LINE__, "testminnlcunit.ap:1486");
       }
    // Convex/nonconvex optimization problem with excessive
    // (degenerate constraints):
@@ -45721,7 +45721,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                for (i = 0; i < ccnt; i++) {
                   v = ae_v_dotproduct(c.xyR[i], 1, xs0.xR, 1, n);
                   v -= c.xyR[i][n];
-                  set_error_flag(wereerrors, ct.xZ[i] == 0 && fabs(v) > tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1875");
+                  set_error_flag(wereerrors, ct.xZ[i] == 0 && !SmallAtR(v, tolconstr), __FILE__, __LINE__, "testminnlcunit.ap:1875");
                   set_error_flag(wereerrors, ct.xZ[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1876");
                   set_error_flag(wereerrors, ct.xZ[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1877");
                   if (ct.xZ[i] == 0) {
@@ -45859,8 +45859,8 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, fabs(x1.xR[0] - sqrt(2.0) / 2) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:1996");
-      set_error_flag(wereerrors, fabs(x1.xR[1] - sqrt(2.0) / 2) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:1997");
+      set_error_flag(wereerrors, !NearAtR(x1.xR[0], sqrt(2.0) / 2.0, tolx), __FILE__, __LINE__, "testminnlcunit.ap:1996");
+      set_error_flag(wereerrors, !NearAtR(x1.xR[1], sqrt(2.0) / 2.0, tolx), __FILE__, __LINE__, "testminnlcunit.ap:1997");
       minnlcsetnlc(&state, 1, 0);
       minnlcrestartfrom(&state, &x0);
       if (hqrndnormal(&rs) > 0.0) {
@@ -45886,8 +45886,8 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, fabs(x1.xR[0] - sqrt(2.0) / 2) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:2026");
-      set_error_flag(wereerrors, fabs(x1.xR[1] - sqrt(2.0) / 2) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:2027");
+      set_error_flag(wereerrors, !NearAtR(x1.xR[0], sqrt(2.0) / 2.0, tolx), __FILE__, __LINE__, "testminnlcunit.ap:2026");
+      set_error_flag(wereerrors, !NearAtR(x1.xR[1], sqrt(2.0) / 2.0, tolx), __FILE__, __LINE__, "testminnlcunit.ap:2027");
    // This test checks correctness of scaling being applied to nonlinear
    // constraints. We solve bound constrained scaled problem and check
    // that solution is correct.
@@ -46015,10 +46015,10 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   g.xR[i] += fulla.xyR[i][j] * x1.xR[j];
                }
                g.xR[i] *= s.xR[i];
-               if (isfinite(bndl.xR[i]) && fabs(x1.xR[i] - bndl.xR[i]) < tolx * s.xR[i] && g.xR[i] > 0.0) {
+               if (isfinite(bndl.xR[i]) && NearR(x1.xR[i], bndl.xR[i], tolx * s.xR[i]) && g.xR[i] > 0.0) {
                   g.xR[i] = 0.0;
                }
-               if (isfinite(bndu.xR[i]) && fabs(x1.xR[i] - bndu.xR[i]) < tolx * s.xR[i] && g.xR[i] < 0.0) {
+               if (isfinite(bndu.xR[i]) && NearR(x1.xR[i], bndu.xR[i], tolx * s.xR[i]) && g.xR[i] < 0.0) {
                   g.xR[i] = 0.0;
                }
                gnorm2 += sqr(g.xR[i]);
@@ -46233,8 +46233,8 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                }
                if (ckind.xZ[i] == 1) {
                // Bound equality constrained
-                  set_error_flag(wereerrors, fabs(x1.xR[2 * i + 0] - bndl.xR[2 * i + 0]) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:2458");
-                  set_error_flag(wereerrors, fabs(x1.xR[2 * i + 1] - bndl.xR[2 * i + 1]) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:2459");
+                  set_error_flag(wereerrors, !NearAtR(x1.xR[2 * i + 0], bndl.xR[2 * i + 0], tolx), __FILE__, __LINE__, "testminnlcunit.ap:2458");
+                  set_error_flag(wereerrors, !NearAtR(x1.xR[2 * i + 1], bndl.xR[2 * i + 1], tolx), __FILE__, __LINE__, "testminnlcunit.ap:2459");
                   continue;
                }
                if (ckind.xZ[i] == 2) {
@@ -46248,7 +46248,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                if (ckind.xZ[i] == 3) {
                // Linear equality constrained
                   v = x1.xR[2 * i + 0] * c.xyR[klc][2 * i + 0] + x1.xR[2 * i + 1] * c.xyR[klc][2 * i + 1] - c.xyR[klc][n];
-                  set_error_flag(wereerrors, fabs(v) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:2479");
+                  set_error_flag(wereerrors, !SmallAtR(v, tolx), __FILE__, __LINE__, "testminnlcunit.ap:2479");
                   klc++;
                   continue;
                }
@@ -46262,7 +46262,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                if (ckind.xZ[i] == 5) {
                // Nonlinear equality constrained
                   v = sqr(x1.xR[2 * i + 0]) + sqr(x1.xR[2 * i + 1]) - rnlc.xR[i];
-                  set_error_flag(wereerrors, fabs(v) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:2499");
+                  set_error_flag(wereerrors, !SmallAtR(v, tolx), __FILE__, __LINE__, "testminnlcunit.ap:2499");
                   continue;
                }
                if (ckind.xZ[i] == 6) {
@@ -46475,9 +46475,9 @@ static void testminnlcunit_testother(bool *wereerrors) {
       minnlcequalitypenaltyfunction(v + 2 * h, &fr2, &dfr2, &d2fr2);
       minnlcequalitypenaltyfunction(v, &f0, &df, &d2f);
       ndf = (-fr2 + 8 * fr - 8 * fl + fl2) / (12 * h);
-      set_error_flag(wereerrors, fabs(ndf - df) > dtol * rmax2(fabs(ndf), 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2727");
+      set_error_flag(wereerrors, !NearAtR(ndf, df, dtol * rmax2(fabs(ndf), 1.0)), __FILE__, __LINE__, "testminnlcunit.ap:2727");
       nd2f = (-dfr2 + 8 * dfr - 8 * dfl + dfl2) / (12 * h);
-      set_error_flag(wereerrors, fabs(nd2f - d2f) > dtol * rmax2(fabs(nd2f), 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2729");
+      set_error_flag(wereerrors, !NearAtR(nd2f, d2f, dtol * rmax2(fabs(nd2f), 1.0)), __FILE__, __LINE__, "testminnlcunit.ap:2729");
    // Next point
       v += h;
    }
@@ -46497,15 +46497,15 @@ static void testminnlcunit_testother(bool *wereerrors) {
       minnlcinequalityshiftfunction(v + 2 * h, &fr2, &dfr2, &d2fr2);
       minnlcinequalityshiftfunction(v, &f0, &df, &d2f);
       ndf = (-fr2 + 8 * fr - 8 * fl + fl2) / (12 * h);
-      set_error_flag(wereerrors, fabs(ndf - df) > dtol * rmax2(fabs(ndf), 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2762");
+      set_error_flag(wereerrors, !NearAtR(ndf, df, dtol * rmax2(fabs(ndf), 1.0)), __FILE__, __LINE__, "testminnlcunit.ap:2762");
       nd2f = (-dfr2 + 8 * dfr - 8 * dfl + dfl2) / (12 * h);
-      set_error_flag(wereerrors, fabs(nd2f - d2f) > dtol * rmax2(fabs(nd2f), 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2764");
+      set_error_flag(wereerrors, !NearAtR(nd2f, d2f, dtol * rmax2(fabs(nd2f), 1.0)), __FILE__, __LINE__, "testminnlcunit.ap:2764");
    // Next point
       v += h;
    }
    minnlcinequalityshiftfunction(1.0, &f0, &df, &d2f);
-   set_error_flag(wereerrors, fabs(f0) > 1.0E-6, __FILE__, __LINE__, "testminnlcunit.ap:2772");
-   set_error_flag(wereerrors, fabs(df + 1) > 1.0E-6, __FILE__, __LINE__, "testminnlcunit.ap:2773");
+   set_error_flag(wereerrors, !SmallAtR(f0, 1.0E-6), __FILE__, __LINE__, "testminnlcunit.ap:2772");
+   set_error_flag(wereerrors, !NearAtR(df, -1.0, 1.0E-6), __FILE__, __LINE__, "testminnlcunit.ap:2773");
 // Test different properties shared by all solvers
    for (solvertype = 0; solvertype <= testminnlcunit_maxsolvertype; solvertype++) {
    // Test location reports
@@ -46547,8 +46547,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
          } else if (state.xupdated) {
          // If first point reported, compare with initial one
             if (firstrep) {
-               set_error_flag(wereerrors, fabs(state.x.xR[0] - x0.xR[0]) > 1.0E4 * machineepsilon, __FILE__, __LINE__, "testminnlcunit.ap:2826");
-               set_error_flag(wereerrors, fabs(state.x.xR[1] - x0.xR[1]) > 1.0E4 * machineepsilon, __FILE__, __LINE__, "testminnlcunit.ap:2827");
+               set_error_flag(wereerrors, !NearAtR(state.x.xR[0], x0.xR[0], 1.0E4 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:2826");
+               set_error_flag(wereerrors, !NearAtR(state.x.xR[1], x0.xR[1], 1.0E4 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:2827");
             }
             firstrep = false;
          // Save last point
@@ -46562,8 +46562,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, fabs(x1.xR[0] - xlast.xR[0]) > 1.0E4 * machineepsilon, __FILE__, __LINE__, "testminnlcunit.ap:2849");
-      set_error_flag(wereerrors, fabs(x1.xR[1] - xlast.xR[1]) > 1.0E4 * machineepsilon, __FILE__, __LINE__, "testminnlcunit.ap:2850");
+      set_error_flag(wereerrors, !NearAtR(x1.xR[0], xlast.xR[0], 1.0E4 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:2849");
+      set_error_flag(wereerrors, !NearAtR(x1.xR[1], xlast.xR[1], 1.0E4 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:2850");
    // Test numerical differentiation
       aulits = 50;
       rho = 200.0;
@@ -46601,8 +46601,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, fabs(x1.xR[0] - sqrt(2.0) / 2) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:2890");
-      set_error_flag(wereerrors, fabs(x1.xR[1] - sqrt(2.0) / 2) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:2891");
+      set_error_flag(wereerrors, !NearAtR(x1.xR[0], sqrt(2.0) / 2.0, tolx), __FILE__, __LINE__, "testminnlcunit.ap:2890");
+      set_error_flag(wereerrors, !NearAtR(x1.xR[1], sqrt(2.0) / 2.0, tolx), __FILE__, __LINE__, "testminnlcunit.ap:2891");
    // Test integrity checks for NAN/INF:
    // * algorithm solves optimization problem, which is normal for some time (quadratic)
    // * after 5-th step we choose random component of gradient and consistently spoil
@@ -46802,7 +46802,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(wereerrors, fabs(x1.xR[i]) > tolx, __FILE__, __LINE__, "testminnlcunit.ap:3134");
+            set_error_flag(wereerrors, !SmallAtR(x1.xR[i], tolx), __FILE__, __LINE__, "testminnlcunit.ap:3134");
          }
       // Check constraint violation reports
          set_error_flag(wereerrors, rep.bcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3139");
@@ -46970,14 +46970,14 @@ static void testminnlcunit_testother(bool *wereerrors) {
             v = rmax2(bndl.xR[badidx1] - x1.xR[badidx1], x1.xR[badidx1] - bndu.xR[badidx1]);
             v /= s.xR[badidx1];
             set_error_flag(wereerrors, rep.bcidx != badidx1, __FILE__, __LINE__, "testminnlcunit.ap:3329");
-            set_error_flag(wereerrors, fabs(rep.bcerr - v) > 1.0E3 * machineepsilon, __FILE__, __LINE__, "testminnlcunit.ap:3331");
+            set_error_flag(wereerrors, !NearAtR(rep.bcerr, v, 1.0E3 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:3331");
          } else {
             set_error_flag(wereerrors, rep.bcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3336");
             set_error_flag(wereerrors, rep.bcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3337");
             set_error_flag(wereerrors, x1.xR[badidx1] < bndl.xR[badidx1] || x1.xR[badidx1] > bndu.xR[badidx1], __FILE__, __LINE__, "testminnlcunit.ap:3338");
          }
          set_error_flag(wereerrors, rep.lcidx != badidx0, __FILE__, __LINE__, "testminnlcunit.ap:3340");
-         set_error_flag(wereerrors, fabs(rep.lcerr - fabs(x1.xR[badidx1] - c.xyR[badidx0][n]) / s.xR[badidx1]) > 1.0E3 * machineepsilon, __FILE__, __LINE__, "testminnlcunit.ap:3341");
+         set_error_flag(wereerrors, !NearAtR(rep.lcerr, fabs(x1.xR[badidx1] - c.xyR[badidx0][n]) / s.xR[badidx1], 1.0E3 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:3341");
          set_error_flag(wereerrors, rep.nlcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3342");
          set_error_flag(wereerrors, rep.nlcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3343");
       }
@@ -47078,7 +47078,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
                v = rmax2(bndl.xR[badidx0] - x1.xR[badidx0], x1.xR[badidx0] - bndu.xR[badidx0]);
                v /= s.xR[badidx0];
                set_error_flag(wereerrors, rep.bcidx != badidx0, __FILE__, __LINE__, "testminnlcunit.ap:3460");
-               set_error_flag(wereerrors, fabs(rep.bcerr - v) > 1.0E3 * machineepsilon, __FILE__, __LINE__, "testminnlcunit.ap:3462");
+               set_error_flag(wereerrors, !NearAtR(rep.bcerr, v, 1.0E3 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:3462");
             } else {
                set_error_flag(wereerrors, rep.bcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3467");
                set_error_flag(wereerrors, rep.bcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3468");
@@ -47088,7 +47088,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
          set_error_flag(wereerrors, rep.lcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3472");
          set_error_flag(wereerrors, rep.lcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3473");
          set_error_flag(wereerrors, rep.nlcidx != badidx0, __FILE__, __LINE__, "testminnlcunit.ap:3474");
-         set_error_flag(wereerrors, fabs(rep.nlcerr - fabs(x1.xR[badidx0] - c.xyR[badidx0][n])) > 1.0E4 * machineepsilon, __FILE__, __LINE__, "testminnlcunit.ap:3475");
+         set_error_flag(wereerrors, !NearAtR(rep.nlcerr, fabs(x1.xR[badidx0] - c.xyR[badidx0][n]), 1.0E4 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:3475");
       }
    // Test support for termination requests:
    // * to terminate with correct return code = 8
@@ -47697,7 +47697,7 @@ static void testminnlcunit_testoptguardc1test1reportfortask0(bool *err, optguard
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = tooclose || fabs(va) < 1.0E-8 || fabs(vb) < 1.0E-8;
+         tooclose = tooclose || SmallR(va, 1.0E-8) || SmallR(vb, 1.0E-8);
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -48146,8 +48146,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                }
                for (i = 0; i <= 1; i++) {
                   for (j = 0; j < n; j++) {
-                     set_error_flag(wereerrors, fabs(jactrue.xyR[i][j] - ogrep.badgradnum.xyR[i][j]) > 0.01 / s.xR[j], __FILE__, __LINE__, "testminnlcunit.ap:4156");
-                     set_error_flag(wereerrors, fabs(jacdefect.xyR[i][j] - ogrep.badgraduser.xyR[i][j]) > 0.01 / s.xR[j], __FILE__, __LINE__, "testminnlcunit.ap:4157");
+                     set_error_flag(wereerrors, !NearAtR(jactrue.xyR[i][j], ogrep.badgradnum.xyR[i][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminnlcunit.ap:4156");
+                     set_error_flag(wereerrors, !NearAtR(jacdefect.xyR[i][j], ogrep.badgraduser.xyR[i][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminnlcunit.ap:4157");
                   }
                }
             }
@@ -48879,7 +48879,7 @@ static void testminnsunit_basictest0uc(bool *errors) {
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errors, !isfinite(x1.xR[i]) || fabs(x1.xR[i]) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:147");
+         set_error_flag(errors, !isfinite(x1.xR[i]) || !SmallAtR(x1.xR[i], 0.001), __FILE__, __LINE__, "testminnsunit.ap:147");
       }
       sumits += (double)rep.iterationscount / passcount;
       sumnfev += (double)rep.nfev / passcount;
@@ -48932,8 +48932,8 @@ static void testminnsunit_basictest1uc(bool *errors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(errors, !isfinite(x1.xR[0]) || fabs(x1.xR[0] - 1 / sqrt(2.0)) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:207");
-   set_error_flag(errors, !isfinite(x1.xR[1]) || fabs(x1.xR[1] - 1.0 / 2.0) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:208");
+   set_error_flag(errors, !isfinite(x1.xR[0]) || !NearAtR(x1.xR[0], 1.0 / sqrt(2.0), 0.001), __FILE__, __LINE__, "testminnsunit.ap:207");
+   set_error_flag(errors, !isfinite(x1.xR[1]) || !NearAtR(x1.xR[1], 1.0 / 2.0, 0.001), __FILE__, __LINE__, "testminnsunit.ap:208");
    ae_frame_leave();
 }
 
@@ -48991,7 +48991,7 @@ static void testminnsunit_basictest0bc(bool *errors) {
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errors, !isfinite(x1.xR[i]) || fabs(x1.xR[i] - rboundval(0.0, bl.xR[i], bu.xR[i])) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:267");
+         set_error_flag(errors, !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], rboundval(0.0, bl.xR[i], bu.xR[i]), 0.001), __FILE__, __LINE__, "testminnsunit.ap:267");
       }
       sumits += (double)rep.iterationscount / passcount;
       sumnfev += (double)rep.nfev / passcount;
@@ -49047,8 +49047,8 @@ static void testminnsunit_basictest1bc(bool *errors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(errors, !isfinite(x1.xR[0]) || fabs(x1.xR[0] - 1 / sqrt(2.0)) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:326");
-   set_error_flag(errors, !isfinite(x1.xR[1]) || fabs(x1.xR[1] - 1.0 / 2.0) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:327");
+   set_error_flag(errors, !isfinite(x1.xR[0]) || !NearAtR(x1.xR[0], 1.0 / sqrt(2.0), 0.001), __FILE__, __LINE__, "testminnsunit.ap:326");
+   set_error_flag(errors, !isfinite(x1.xR[1]) || !NearAtR(x1.xR[1], 1.0 / 2.0, 0.001), __FILE__, __LINE__, "testminnsunit.ap:327");
    ae_frame_leave();
 }
 
@@ -49120,7 +49120,7 @@ static void testminnsunit_basictest0lc(bool *errors) {
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errors, !isfinite(x1.xR[i]) || fabs(x1.xR[i]) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:408");
+         set_error_flag(errors, !isfinite(x1.xR[i]) || !SmallAtR(x1.xR[i], 0.001), __FILE__, __LINE__, "testminnsunit.ap:408");
       }
       sumits += (double)rep.iterationscount / passcount;
       sumnfev += (double)rep.nfev / passcount;
@@ -49180,8 +49180,8 @@ static void testminnsunit_basictest1lc(bool *errors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(errors, !isfinite(x1.xR[0]) || fabs(x1.xR[0] - 1 / sqrt(2.0)) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:473");
-   set_error_flag(errors, !isfinite(x1.xR[1]) || fabs(x1.xR[1] - 1.0 / 2.0) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:474");
+   set_error_flag(errors, !isfinite(x1.xR[0]) || !NearAtR(x1.xR[0], 1.0 / sqrt(2.0), 0.001), __FILE__, __LINE__, "testminnsunit.ap:473");
+   set_error_flag(errors, !isfinite(x1.xR[1]) || !NearAtR(x1.xR[1], 1.0 / 2.0, 0.001), __FILE__, __LINE__, "testminnsunit.ap:474");
    ae_frame_leave();
 }
 
@@ -49266,7 +49266,7 @@ static void testminnsunit_basictest0nlc(bool *errors) {
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errors, !isfinite(x1.xR[i]) || fabs(x1.xR[i]) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:571");
+         set_error_flag(errors, !isfinite(x1.xR[i]) || !SmallAtR(x1.xR[i], 0.001), __FILE__, __LINE__, "testminnsunit.ap:571");
       }
       sumits += (double)rep.iterationscount / passcount;
       sumnfev += (double)rep.nfev / passcount;
@@ -49361,10 +49361,10 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || fabs(x1.xR[i] - xc.xR[i]) / s.xR[i] > xtol, __FILE__, __LINE__, "testminnsunit.ap:676");
+            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], xc.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminnsunit.ap:676");
             if (requirexrep) {
-               set_error_flag(othererrors, !isfinite(xrfirst.xR[i]) || fabs(x0.xR[i] - xrfirst.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:679");
-               set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || fabs(x1.xR[i] - xrlast.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:680");
+               set_error_flag(othererrors, !isfinite(xrfirst.xR[i]) || !NearAtR(x0.xR[i], xrfirst.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testminnsunit.ap:679");
+               set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || !NearAtR(x1.xR[i], xrlast.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testminnsunit.ap:680");
             }
          }
       // Test numerical differentiation:
@@ -49410,7 +49410,7 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || fabs(x1.xR[i] - xc.xR[i]) / s.xR[i] > xtol, __FILE__, __LINE__, "testminnsunit.ap:736");
+            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], xc.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminnsunit.ap:736");
          }
       // Test scaling: we perform several steps on unit-scale problem,
       // then we perform same amount of steps on re-scaled problem,
@@ -49478,8 +49478,8 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || fabs(x1.xR[i] - x1s.xR[i] / s.xR[i]) > 1.0E-4, __FILE__, __LINE__, "testminnsunit.ap:823");
-            set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || fabs(x1s.xR[i] - xrlast.xR[i]) > testminnsunit_scalingtesttol, __FILE__, __LINE__, "testminnsunit.ap:827");
+            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], 1.0E-4), __FILE__, __LINE__, "testminnsunit.ap:823");
+            set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || !NearAtR(x1s.xR[i], xrlast.xR[i], testminnsunit_scalingtesttol), __FILE__, __LINE__, "testminnsunit.ap:827");
          }
       }
    }
@@ -49612,12 +49612,12 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || fabs(x1.xR[i] - rboundval(xc.xR[i], bndl.xR[i], bndu.xR[i])) / s.xR[i] > xtol, __FILE__, __LINE__, "testminnsunit.ap:961");
+            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], rboundval(xc.xR[i], bndl.xR[i], bndu.xR[i]), s.xR[i] * xtol), __FILE__, __LINE__, "testminnsunit.ap:961");
             set_error_flag(primaryerrors, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnsunit.ap:962");
             set_error_flag(primaryerrors, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnsunit.ap:963");
             if (requirexrep) {
-               set_error_flag(othererrors, !isfinite(xrfirst.xR[i]) || fabs(rboundval(x0.xR[i], bndl.xR[i], bndu.xR[i]) - xrfirst.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:966");
-               set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || fabs(x1.xR[i] - xrlast.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:967");
+               set_error_flag(othererrors, !isfinite(xrfirst.xR[i]) || !NearAtR(rboundval(x0.xR[i], bndl.xR[i], bndu.xR[i]), xrfirst.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testminnsunit.ap:966");
+               set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || !NearAtR(x1.xR[i], xrlast.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testminnsunit.ap:967");
             }
          }
       }
@@ -49805,7 +49805,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || fabs(x1.xR[i] - rboundval(xc.xR[i], bndl.xR[i], bndu.xR[i])) / s.xR[i] > xtol, __FILE__, __LINE__, "testminnsunit.ap:1191");
+            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], rboundval(xc.xR[i], bndl.xR[i], bndu.xR[i]), s.xR[i] * xtol), __FILE__, __LINE__, "testminnsunit.ap:1191");
          }
       }
    }
@@ -49899,7 +49899,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || fabs(x1.xR[i] - x1s.xR[i] / s.xR[i]) > testminnsunit_scalingtesttol, __FILE__, __LINE__, "testminnsunit.ap:1297");
+            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], testminnsunit_scalingtesttol), __FILE__, __LINE__, "testminnsunit.ap:1297");
          }
       }
    }
@@ -50057,7 +50057,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
             ae_frame_leave();
             return;
          }
-         set_error_flag(primaryerrors, fabs(flast0 - flast1) > ftol, __FILE__, __LINE__, "testminnsunit.ap:1466");
+         set_error_flag(primaryerrors, !NearAtR(flast0, flast1, ftol), __FILE__, __LINE__, "testminnsunit.ap:1466");
       // Test on HIGHLY nonconvex linearly constrained problem.
       // Algorithm should be able to stop at the bounds.
          ae_vector_set_length(&x0, n);
@@ -50097,7 +50097,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
          set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1516");
          for (i = 0; i < n; i++) {
             set_error_flag(primaryerrors, !isfinite(x1.xR[i]), __FILE__, __LINE__, "testminnsunit.ap:1519");
-            set_error_flag(primaryerrors, fabs(x1.xR[i] - 1) > xtol && fabs(x1.xR[i]) > xtol && fabs(x1.xR[i] + 1) > xtol, __FILE__, __LINE__, "testminnsunit.ap:1520");
+            set_error_flag(primaryerrors, !NearAtR(x1.xR[i], 1.0, xtol) && !SmallAtR(x1.xR[i], xtol) && !NearAtR(x1.xR[i], -1.0, xtol), __FILE__, __LINE__, "testminnsunit.ap:1520");
          }
       // Test scaling: we perform several steps on unit-scale problem,
       // then we perform same amount of steps on re-scaled problem,
@@ -50203,7 +50203,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || fabs(x1.xR[i] - x1s.xR[i] / s.xR[i]) > testminnsunit_scalingtesttol, __FILE__, __LINE__, "testminnsunit.ap:1647");
+            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], testminnsunit_scalingtesttol), __FILE__, __LINE__, "testminnsunit.ap:1647");
          }
       }
    }
@@ -50318,7 +50318,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                      }
                   }
                   set_error_flag(primaryerrors, !isfinite(x1.xR[i]), __FILE__, __LINE__, "testminnsunit.ap:1762");
-                  set_error_flag(primaryerrors, fabs(x1.xR[i] - v) > xtol * s.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1763");
+                  set_error_flag(primaryerrors, !NearAtR(x1.xR[i], v, xtol * s.xR[i]), __FILE__, __LINE__, "testminnsunit.ap:1763");
                }
             }
          }
@@ -50379,7 +50379,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                      }
                   }
                   set_error_flag(primaryerrors, !isfinite(x1.xR[i]), __FILE__, __LINE__, "testminnsunit.ap:1832");
-                  set_error_flag(primaryerrors, fabs(x1.xR[i] - v) > xtol * s.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1833");
+                  set_error_flag(primaryerrors, !NearAtR(x1.xR[i], v, xtol * s.xR[i]), __FILE__, __LINE__, "testminnsunit.ap:1833");
                }
             }
          }
@@ -50464,7 +50464,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                   } else ae_assert(false, "Assertion failed");
                minnsresults(&state, &x1s, &rep);
                for (i = 0; i < n; i++) {
-                  set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || fabs(x1.xR[i] - x1s.xR[i] / s.xR[i]) > testminnsunit_scalingtesttol, __FILE__, __LINE__, "testminnsunit.ap:1937");
+                  set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], testminnsunit_scalingtesttol), __FILE__, __LINE__, "testminnsunit.ap:1937");
                }
             }
          }
@@ -50529,8 +50529,8 @@ static void testminnsunit_testother(bool *othererrors) {
       set_error_flag(othererrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:2003");
       set_error_flag(othererrors, !isfinite(x1.xR[0]), __FILE__, __LINE__, "testminnsunit.ap:2004");
       set_error_flag(othererrors, !isfinite(x1.xR[1]), __FILE__, __LINE__, "testminnsunit.ap:2005");
-      set_error_flag(othererrors, fabs(x1.xR[0] - v) > xtol, __FILE__, __LINE__, "testminnsunit.ap:2006");
-      set_error_flag(othererrors, fabs(x1.xR[1] + v) > xtol, __FILE__, __LINE__, "testminnsunit.ap:2007");
+      set_error_flag(othererrors, !NearAtR(x1.xR[0], v, xtol), __FILE__, __LINE__, "testminnsunit.ap:2006");
+      set_error_flag(othererrors, !NearAtR(x1.xR[1], -v, xtol), __FILE__, __LINE__, "testminnsunit.ap:2007");
    }
    ae_frame_leave();
 }
@@ -51122,7 +51122,7 @@ static void testminbcunit_testother(bool *err) {
       }
       minbcresults(&state, &x, &rep);
       r = v / (s.xR[0] * diffstep);
-      set_error_flag(err, fabs(log(r)) > log(1.0 + 1000.0 * machineepsilon), __FILE__, __LINE__, "testminbcunit.ap:618");
+      set_error_flag(err, !SmallAtR(log(r), log(1.0 + 1000.0 * machineepsilon)), __FILE__, __LINE__, "testminbcunit.ap:618");
    }
 // Test stpmax
    for (pass = 1; pass <= passcount; pass++) {
@@ -51144,9 +51144,9 @@ static void testminbcunit_testother(bool *err) {
          if (state.needfg) {
             state.f = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
             state.g.xR[0] = exp(state.x.xR[0]) - exp(-state.x.xR[0]);
-            set_error_flag(err, fabs(state.x.xR[0] - xprev) > (1 + sqrt(machineepsilon)) * stpmax, __FILE__, __LINE__, "testminbcunit.ap:646");
+            set_error_flag(err, !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax), __FILE__, __LINE__, "testminbcunit.ap:646");
          } else if (state.xupdated) {
-            set_error_flag(err, fabs(state.x.xR[0] - xprev) > (1 + sqrt(machineepsilon)) * stpmax, __FILE__, __LINE__, "testminbcunit.ap:650");
+            set_error_flag(err, !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax), __FILE__, __LINE__, "testminbcunit.ap:650");
             xprev = state.x.xR[0];
          }
    }
@@ -51168,7 +51168,7 @@ static void testminbcunit_testother(bool *err) {
             state.g.xR[0] = -2.0E8 * state.x.xR[0];
          }
       minbcresults(&state, &x, &rep);
-      set_error_flag(err, fabs(x.xR[0] - bu.xR[0]) > epsx, __FILE__, __LINE__, "testminbcunit.ap:680");
+      set_error_flag(err, !NearAtR(x.xR[0], bu.xR[0], epsx), __FILE__, __LINE__, "testminbcunit.ap:680");
    }
 // Test correctness of the scaling:
 // * initial point is random point from [+1,+2]^N
@@ -51298,7 +51298,7 @@ static void testminbcunit_testother(bool *err) {
                ae_frame_leave();
                return;
             }
-            set_error_flag(err, fabs(1 / sqr(1 - x.xR[0]) - 1 / sqr(1 + x.xR[0]) + vc) > epsg, __FILE__, __LINE__, "testminbcunit.ap:825");
+            set_error_flag(err, !NearAtR(1.0 / sqr(1.0 - x.xR[0]), 1.0 / sqr(1.0 + x.xR[0]) - vc, epsg), __FILE__, __LINE__, "testminbcunit.ap:825");
          }
       }
    }
@@ -51713,7 +51713,7 @@ static void testminbcunit_testoptguardc1test0reportfortask0(bool *err, optguardn
             }
             v += fabs(vv);
          }
-         set_error_flag(err, fabs(v - rep->f.xR[k]) > 1.0E-6 * rmax2(fabs(v), 1.0), __FILE__, __LINE__, "testminbcunit.ap:1891");
+         set_error_flag(err, !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testminbcunit.ap:1891");
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -51788,10 +51788,10 @@ static void testminbcunit_testoptguardc1test1reportfortask0(bool *err, optguardn
                vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
             v += sign(vv) * a->xyR[i][rep->vidx];
-            tooclose = tooclose || fabs(vv) < 1.0E-4;
+            tooclose = tooclose || SmallR(vv, 1.0E-4);
          }
          if (!tooclose) {
-            set_error_flag(err, fabs(v - rep->g.xR[k]) > 1.0E-6 * rmax2(fabs(v), 1.0), __FILE__, __LINE__, "testminbcunit.ap:1988");
+            set_error_flag(err, !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testminbcunit.ap:1988");
          }
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
@@ -51804,7 +51804,7 @@ static void testminbcunit_testoptguardc1test1reportfortask0(bool *err, optguardn
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = tooclose || fabs(va) < 1.0E-8 || fabs(vb) < 1.0E-8;
+         tooclose = tooclose || SmallR(va, 1.0E-8) || SmallR(vb, 1.0E-8);
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -52083,8 +52083,8 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
             set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminbcunit.ap:1516");
          }
          for (j = 0; j < n; j++) {
-            set_error_flag(wereerrors, fabs(jactrue.xyR[0][j] - ogrep.badgradnum.xyR[0][j]) > 0.01 / s.xR[j], __FILE__, __LINE__, "testminbcunit.ap:1520");
-            set_error_flag(wereerrors, fabs(jacdefect.xyR[0][j] - ogrep.badgraduser.xyR[0][j]) > 0.01 / s.xR[j], __FILE__, __LINE__, "testminbcunit.ap:1521");
+            set_error_flag(wereerrors, !NearAtR(jactrue.xyR[0][j], ogrep.badgradnum.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminbcunit.ap:1520");
+            set_error_flag(wereerrors, !NearAtR(jacdefect.xyR[0][j], ogrep.badgraduser.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminbcunit.ap:1521");
          }
       }
    }
@@ -52615,7 +52615,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       for (i = 0; i < k; i++) {
          ae_v_move(tmpx.xR, 1, ptx.xR, 1, nx);
          ae_v_sub(tmpx.xR, 1, xy->xyR[qtags.xZ[i]], 1, nx);
-         *kdterrors = *kdterrors || fabs(testnearestneighborunit_vnorm(&tmpx, nx, normtype) - qr.xR[i]) > errtol;
+         *kdterrors = *kdterrors || !NearAtR(testnearestneighborunit_vnorm(&tmpx, nx, normtype), qr.xR[i], errtol);
       }
    // Test functions which use external buffer:
    // * create external request buffer, perform buffered request
@@ -52671,7 +52671,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       for (i = 0; i < k; i++) {
          ae_v_move(tmpx.xR, 1, ptx.xR, 1, nx);
          ae_v_sub(tmpx.xR, 1, xy->xyR[qtags.xZ[i]], 1, nx);
-         *kdterrors = *kdterrors || fabs(testnearestneighborunit_vnorm(&tmpx, nx, normtype) - qr.xR[i]) > errtol;
+         *kdterrors = *kdterrors || !NearAtR(testnearestneighborunit_vnorm(&tmpx, nx, normtype), qr.xR[i], errtol);
       }
    // Test reallocation properties: functions must automatically
    // resize array which is too small, but leave unchanged array which is
@@ -52836,7 +52836,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       for (i = 0; i < k; i++) {
          ae_v_move(tmpx.xR, 1, ptx.xR, 1, nx);
          ae_v_sub(tmpx.xR, 1, xy->xyR[qtags.xZ[i]], 1, nx);
-         *kdterrors = *kdterrors || fabs(testnearestneighborunit_vnorm(&tmpx, nx, normtype) - qr.xR[i]) > errtol;
+         *kdterrors = *kdterrors || !NearAtR(testnearestneighborunit_vnorm(&tmpx, nx, normtype), qr.xR[i], errtol);
       }
    // Test functions which use external buffer:
    // * create external request buffer, perform buffered request
@@ -52892,7 +52892,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       for (i = 0; i < k; i++) {
          ae_v_move(tmpx.xR, 1, ptx.xR, 1, nx);
          ae_v_sub(tmpx.xR, 1, xy->xyR[qtags.xZ[i]], 1, nx);
-         *kdterrors = *kdterrors || fabs(testnearestneighborunit_vnorm(&tmpx, nx, normtype) - qr.xR[i]) > errtol;
+         *kdterrors = *kdterrors || !NearAtR(testnearestneighborunit_vnorm(&tmpx, nx, normtype), qr.xR[i], errtol);
       }
    }
 // test ordered/unordered R-NN queries  (with self-matches):
@@ -53258,7 +53258,7 @@ static void testnearestneighborunit_testkdtreeserialization(bool *err) {
                      kdtreequeryresultsxy(&tree1, &xy1);
                      for (i = 0; i < k0; i++) {
                         for (j = 0; j < nx + ny; j++) {
-                           if (fabs(xy0.xyR[i][j] - xy1.xyR[i][j]) > threshold) {
+                           if (!NearAtR(xy0.xyR[i][j], xy1.xyR[i][j], threshold)) {
                               *err = true;
                               ae_frame_leave();
                               return;
@@ -53634,7 +53634,7 @@ static void testinverseupdateunit_matlu(RMatrix *a, ae_int_t m, ae_int_t n, ZVec
    // Find pivot and test for singularity.
       jp = j;
       for (i = j + 1; i < m; i++) {
-         if (fabs(a->xyR[i][j]) > fabs(a->xyR[jp][j])) {
+         if (!SmallAtR(a->xyR[i][j], fabs(a->xyR[jp][j]))) {
             jp = i;
          }
       }
@@ -54449,12 +54449,12 @@ bool testgammafunc(bool silent) {
    waserrors = false;
    threshold = 100.0 * machineepsilon;
 //
-   gammaerrors = gammaerrors || fabs(gammafunction(0.5) - sqrt(pi)) > threshold;
-   gammaerrors = gammaerrors || fabs(gammafunction(1.5) - 0.5 * sqrt(pi)) > threshold;
+   gammaerrors = gammaerrors || !NearAtR(gammafunction(0.5), sqrt(pi), threshold);
+   gammaerrors = gammaerrors || !NearAtR(gammafunction(1.5), 0.5 * sqrt(pi), threshold);
    v = lngamma(0.5, &s);
-   lngammaerrors = lngammaerrors || fabs(v - log(sqrt(pi))) > threshold || s != 1.0;
+   lngammaerrors = lngammaerrors || !NearAtR(v, log(sqrt(pi)), threshold) || s != 1.0;
    v = lngamma(1.5, &s);
-   lngammaerrors = lngammaerrors || fabs(v - log(0.5 * sqrt(pi))) > threshold || s != 1.0;
+   lngammaerrors = lngammaerrors || !NearAtR(v, log(0.5 * sqrt(pi)), threshold) || s != 1.0;
 // report
    waserrors = gammaerrors || lngammaerrors;
    if (!silent) {
@@ -54559,7 +54559,7 @@ static void testgqunit_buildgausslegendrequadrature(ae_int_t n, RVector *x, RVec
          dp3 = n * (r * p3 - p2) / (r * r - 1);
          r1 = r;
          r -= p3 / dp3;
-      } while (fabs(r - r1) >= machineepsilon * (1 + fabs(r)) * 100);
+      } while (!NearR(r, r1, machineepsilon * (1.0 + fabs(r)) * 100.0));
       x->xR[i] = r;
       x->xR[n - 1 - i] = -r;
       w->xR[i] = 2 / ((1 - r * r) * dp3 * dp3);
@@ -54663,7 +54663,7 @@ static void testgqunit_buildgaussjacobiquadrature(ae_int_t n, double alpha, doub
          pp = (n * (alpha - beta - temp * r) * p1 + 2 * (n + alpha) * (n + beta) * p2) / (temp * (1 - r * r));
          r1 = r;
          r = r1 - p1 / pp;
-      } while (fabs(r - r1) >= machineepsilon * (1 + fabs(r)) * 100);
+      } while (!NearR(r, r1, machineepsilon * (1.0 + fabs(r)) * 100.0));
       x->xR[i] = r;
       w->xR[i] = exp(lngamma(alpha + n, &tmpsgn) + lngamma(beta + n, &tmpsgn) - lngamma((double)(n + 1), &tmpsgn) - lngamma(n + alfbet + 1, &tmpsgn)) * temp * pow(2.0, alfbet) / (pp * p2);
    }
@@ -54719,7 +54719,7 @@ static void testgqunit_buildgausslaguerrequadrature(ae_int_t n, double alpha, RV
          dp3 = (n * p3 - (n + alpha) * p2) / r;
          r1 = r;
          r -= p3 / dp3;
-      } while (fabs(r - r1) >= machineepsilon * (1 + fabs(r)) * 100);
+      } while (!NearR(r, r1, machineepsilon * (1.0 + fabs(r)) * 100.0));
       x->xR[i] = r;
       w->xR[i] = -exp(lngamma(alpha + n, &tsg) - lngamma((double)n, &tsg)) / (dp3 * n * p2);
    }
@@ -54784,7 +54784,7 @@ static void testgqunit_buildgausshermitequadrature(ae_int_t n, RVector *x, RVect
          dp3 = sqrt((double)(2 * j)) * p2;
          r1 = r;
          r -= p3 / dp3;
-      } while (fabs(r - r1) >= machineepsilon * (1 + fabs(r)) * 100);
+      } while (!NearR(r, r1, machineepsilon * (1.0 + fabs(r)) * 100.0));
       x->xR[i] = r;
       w->xR[i] = 2 / (dp3 * dp3);
       x->xR[n - 1 - i] = -x->xR[i];
@@ -55285,9 +55285,9 @@ bool testgkq(bool silent) {
          break;
       }
       for (i = 0; i < n; i++) {
-         vstblerrors = vstblerrors || fabs(x1.xR[i] - x2.xR[i]) > errtol;
-         vstblerrors = vstblerrors || fabs(wk1.xR[i] - wk2.xR[i]) > errtol;
-         vstblerrors = vstblerrors || fabs(wg1.xR[i] - wg2.xR[i]) > errtol;
+         vstblerrors = vstblerrors || !NearAtR(x1.xR[i], x2.xR[i], errtol);
+         vstblerrors = vstblerrors || !NearAtR(wk1.xR[i], wk2.xR[i], errtol);
+         vstblerrors = vstblerrors || !NearAtR(wg1.xR[i], wg2.xR[i], errtol);
       }
    }
 // Test recurrence-baced Gauss-Kronrod nodes against Gauss-only nodes
@@ -55407,7 +55407,7 @@ bool testautogk(bool silent) {
    if (rep.terminationtype <= 0) {
       simpleerrors = true;
    } else {
-      simpleerrors = simpleerrors || fabs(exact - v) > errtol * eabs;
+      simpleerrors = simpleerrors || !NearAtR(exact, v, errtol * eabs);
    }
 // Simple test: integral(exp(x),+-1,+-2), XWidth=0.1
    a = (2 * randominteger(2) - 1) * 1.0;
@@ -55421,7 +55421,7 @@ bool testautogk(bool silent) {
    if (rep.terminationtype <= 0) {
       simpleerrors = true;
    } else {
-      simpleerrors = simpleerrors || fabs(exact - v) > errtol * eabs;
+      simpleerrors = simpleerrors || !NearAtR(exact, v, errtol * eabs);
    }
 // Simple test: integral(cos(100*x),0,2*pi), no maximum width requirements
    a = 0.0;
@@ -55435,7 +55435,7 @@ bool testautogk(bool silent) {
    if (rep.terminationtype <= 0) {
       simpleerrors = true;
    } else {
-      simpleerrors = simpleerrors || fabs(exact - v) > errtol * eabs;
+      simpleerrors = simpleerrors || !NearAtR(exact, v, errtol * eabs);
    }
 // Simple test: integral(cos(100*x),0,2*pi), XWidth=0.3
    a = 0.0;
@@ -55449,7 +55449,7 @@ bool testautogk(bool silent) {
    if (rep.terminationtype <= 0) {
       simpleerrors = true;
    } else {
-      simpleerrors = simpleerrors || fabs(exact - v) > errtol * eabs;
+      simpleerrors = simpleerrors || !NearAtR(exact, v, errtol * eabs);
    }
 // singular problem on [a,b] = [0.1, 0.5]
 //     f2(x) = (1+x)*(b-x)^alpha, -1 < alpha < 1
@@ -55494,7 +55494,7 @@ bool testautogk(bool silent) {
       if (rep.terminationtype <= 0) {
          sngenderrors = true;
       } else {
-         sngenderrors = sngenderrors || fabs(v - exact) > errtol * eabs;
+         sngenderrors = sngenderrors || !NearAtR(v, exact, errtol * eabs);
       }
       for (autogksingular(b, a, 0.0, alpha, &state); autogkiteration(&state); ) {
          if (state.bminusx > -0.01) {
@@ -55507,7 +55507,7 @@ bool testautogk(bool silent) {
       if (rep.terminationtype <= 0) {
          sngenderrors = true;
       } else {
-         sngenderrors = sngenderrors || fabs(-v - exact) > errtol * eabs;
+         sngenderrors = sngenderrors || !NearAtR(-v, exact, errtol * eabs);
       }
    // f1(x) = (1+x)*(b-x)^alpha, -1 < alpha < 1
    // 1. use singular integrator for [a,b]
@@ -55525,7 +55525,7 @@ bool testautogk(bool silent) {
       if (rep.terminationtype <= 0) {
          sngenderrors = true;
       } else {
-         sngenderrors = sngenderrors || fabs(v - exact) > errtol * eabs;
+         sngenderrors = sngenderrors || !NearAtR(v, exact, errtol * eabs);
       }
       for (autogksingular(b, a, alpha, 0.0, &state); autogkiteration(&state); ) {
          if (state.xminusa > -0.01) {
@@ -55538,7 +55538,7 @@ bool testautogk(bool silent) {
       if (rep.terminationtype <= 0) {
          sngenderrors = true;
       } else {
-         sngenderrors = sngenderrors || fabs(-v - exact) > errtol * eabs;
+         sngenderrors = sngenderrors || !NearAtR(-v, exact, errtol * eabs);
       }
    }
 // end
@@ -55594,7 +55594,7 @@ static void testnormaldistrunit_testnormal(bool *errorflag) {
       h = 1.0E-5;
       v0 = normalpdf(x);
       v1 = (normalcdf(x + h) - normalcdf(x - h)) / (2 * h);
-      set_error_flag(errorflag, fabs(v0 - v1) > 1.0E-4, __FILE__, __LINE__, "testnormaldistrunit.ap:75");
+      set_error_flag(errorflag, !NearAtR(v0, v1, 1.0E-4), __FILE__, __LINE__, "testnormaldistrunit.ap:75");
    }
    ae_frame_leave();
 }
@@ -55721,7 +55721,7 @@ static void testnormaldistrunit_testbvn(bool *errorflag) {
       h = 1.0E-5;
       v0 = bivariatenormalpdf(x, y, rho);
       v1 = (bivariatenormalcdf(x + h, y + h, rho) + bivariatenormalcdf(x - h, y - h, rho) - bivariatenormalcdf(x + h, y - h, rho) - bivariatenormalcdf(x - h, y + h, rho)) / sqr(2 * h);
-      set_error_flag(errorflag, fabs(v0 - v1) > 1.0E-4, __FILE__, __LINE__, "testnormaldistrunit.ap:215");
+      set_error_flag(errorflag, !NearAtR(v0, v1, 1.0E-4), __FILE__, __LINE__, "testnormaldistrunit.ap:215");
    }
    ae_frame_leave();
 }
@@ -55867,65 +55867,65 @@ static void testbasestatunit_testranking(bool *err) {
       }
    }
    rankdata(&xy0, npoints, nfeatures);
-   if (fabs(xy0.xyR[0][0] - 0.5) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy0.xyR[0][0], 0.5, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy0.xyR[0][1] - 3.0) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy0.xyR[0][1], 3.0, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy0.xyR[0][2] - 2.0) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy0.xyR[0][2], 2.0, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy0.xyR[0][3] - 0.5) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy0.xyR[0][3], 0.5, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy0.xyR[1][0] - 1.0) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy0.xyR[1][0], 1.0, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy0.xyR[1][1] - 1.0) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy0.xyR[1][1], 1.0, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy0.xyR[1][2] - 1.0) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy0.xyR[1][2], 1.0, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy0.xyR[1][3] - 3.0) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy0.xyR[1][3], 3.0, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy0.xyR[2][0] - 1.5) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy0.xyR[2][0], 1.5, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy0.xyR[2][1] - 1.5) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy0.xyR[2][1], 1.5, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy0.xyR[2][2] - 1.5) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy0.xyR[2][2], 1.5, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy0.xyR[2][3] - 1.5) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy0.xyR[2][3], 1.5, 10.0 * machineepsilon)) {
       *err = true;
    }
    rankdatacentered(&xy1, npoints, nfeatures);
-   if (fabs(xy1.xyR[0][0] + 1.0) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy1.xyR[0][0], -1.0, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy1.xyR[0][1] - 1.5) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy1.xyR[0][1], 1.5, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy1.xyR[0][2] - 0.5) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy1.xyR[0][2], 0.5, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy1.xyR[0][3] + 1.0) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy1.xyR[0][3], -1.0, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy1.xyR[1][0] + 0.5) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy1.xyR[1][0], -0.5, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy1.xyR[1][1] + 0.5) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy1.xyR[1][1], -0.5, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy1.xyR[1][2] + 0.5) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy1.xyR[1][2], -0.5, 10.0 * machineepsilon)) {
       *err = true;
    }
-   if (fabs(xy1.xyR[1][3] - 1.5) > 10.0 * machineepsilon) {
+   if (!NearAtR(xy1.xyR[1][3], 1.5, 10.0 * machineepsilon)) {
       *err = true;
    }
    if (xy1.xyR[2][0] != 0.0) {
@@ -55997,28 +55997,28 @@ bool testbasestat(bool silent) {
       x.xR[i] = sqr((double)i);
    }
    samplemoments(&x, n, &mean, &variance, &skewness, &kurtosis);
-   s1errors = s1errors || fabs(mean - 28.5) > 0.001;
-   s1errors = s1errors || fabs(variance - 801.1667) > 0.001;
-   s1errors = s1errors || fabs(skewness - 0.5751) > 0.001;
-   s1errors = s1errors || fabs(kurtosis + 1.2666) > 0.001;
+   s1errors = s1errors || !NearAtR(mean, 28.5, 0.001);
+   s1errors = s1errors || !NearAtR(variance, 801.1667, 0.001);
+   s1errors = s1errors || !NearAtR(skewness, 0.5751, 0.001);
+   s1errors = s1errors || !NearAtR(kurtosis, -1.2666, 0.001);
    tmean = samplemean(&x, n);
    tvariance = samplevariance(&x, n);
    tskewness = sampleskewness(&x, n);
    tkurtosis = samplekurtosis(&x, n);
-   s1errors = s1errors || fabs(mean - tmean) > 1.0E-15;
-   s1errors = s1errors || fabs(variance - tvariance) > 1.0E-15;
-   s1errors = s1errors || fabs(skewness - tskewness) > 1.0E-15;
-   s1errors = s1errors || fabs(kurtosis - tkurtosis) > 1.0E-15;
+   s1errors = s1errors || !NearAtR(mean, tmean, 1.0E-15);
+   s1errors = s1errors || !NearAtR(variance, tvariance, 1.0E-15);
+   s1errors = s1errors || !NearAtR(skewness, tskewness, 1.0E-15);
+   s1errors = s1errors || !NearAtR(kurtosis, tkurtosis, 1.0E-15);
    sampleadev(&x, n, &adev);
-   s1errors = s1errors || fabs(adev - 23.2000) > 0.001;
+   s1errors = s1errors || !NearAtR(adev, 23.2000, 0.001);
    samplemedian(&x, n, &median);
-   s1errors = s1errors || fabs(median - 0.5 * (16 + 25)) > 0.001;
+   s1errors = s1errors || !NearAtR(median, 0.5 * (16 + 25), 0.001);
    for (i = 0; i < n; i++) {
       samplepercentile(&x, n, (double)i / (n - 1), &pv);
-      s1errors = s1errors || fabs(pv - x.xR[i]) > 0.001;
+      s1errors = s1errors || !NearAtR(pv, x.xR[i], 0.001);
    }
    samplepercentile(&x, n, 0.5, &pv);
-   s1errors = s1errors || fabs(pv - 0.5 * (16 + 25)) > 0.001;
+   s1errors = s1errors || !NearAtR(pv, 0.5 * (16 + 25), 0.001);
 // test covariance/correlation:
 // * 2-sample coefficients
 //
@@ -56030,16 +56030,16 @@ bool testbasestat(bool silent) {
       x.xR[i] = sqr((double)i);
       y.xR[i] = (double)i;
    }
-   covcorrerrors = covcorrerrors || fabs(pearsoncorr2(&x, &y, n) - 0.9627) > 0.0001;
-   covcorrerrors = covcorrerrors || fabs(spearmancorr2(&x, &y, n) - 1.0000) > 0.0001;
-   covcorrerrors = covcorrerrors || fabs(cov2(&x, &y, n) - 82.5000) > 0.0001;
+   covcorrerrors = covcorrerrors || !NearAtR(pearsoncorr2(&x, &y, n), 0.9627, 0.0001);
+   covcorrerrors = covcorrerrors || !NearAtR(spearmancorr2(&x, &y, n), 1.0000, 0.0001);
+   covcorrerrors = covcorrerrors || !NearAtR(cov2(&x, &y, n), 82.5000, 0.0001);
    for (i = 0; i < n; i++) {
       x.xR[i] = sqr(i - 0.5 * n);
       y.xR[i] = (double)i;
    }
-   covcorrerrors = covcorrerrors || fabs(pearsoncorr2(&x, &y, n) + 0.3676) > 0.0001;
-   covcorrerrors = covcorrerrors || fabs(spearmancorr2(&x, &y, n) + 0.2761) > 0.0001;
-   covcorrerrors = covcorrerrors || fabs(cov2(&x, &y, n) + 9.1667) > 0.0001;
+   covcorrerrors = covcorrerrors || !NearAtR(pearsoncorr2(&x, &y, n), -0.3676, 0.0001);
+   covcorrerrors = covcorrerrors || !NearAtR(spearmancorr2(&x, &y, n), -0.2761, 0.0001);
+   covcorrerrors = covcorrerrors || !NearAtR(cov2(&x, &y, n), -9.1667, 0.0001);
 // test covariance/correlation:
 // * matrix covariance/correlation
 // * matrix cross-covariance/cross-correlation
@@ -56110,9 +56110,9 @@ bool testbasestat(bool silent) {
                         ae_v_move(x.xR, 1, &mx.xyR[0][i], mx.stride, n);
                         ae_v_move(y.xR, 1, &mx.xyR[0][j], mx.stride, n);
                      }
-                     covcorrerrors = covcorrerrors || fabs(cov2(&x, &y, n) - cc.xyR[i][j]) > threshold;
-                     covcorrerrors = covcorrerrors || fabs(pearsoncorr2(&x, &y, n) - cp.xyR[i][j]) > threshold;
-                     covcorrerrors = covcorrerrors || fabs(spearmancorr2(&x, &y, n) - cs.xyR[i][j]) > threshold;
+                     covcorrerrors = covcorrerrors || !NearAtR(cov2(&x, &y, n), cc.xyR[i][j], threshold);
+                     covcorrerrors = covcorrerrors || !NearAtR(pearsoncorr2(&x, &y, n), cp.xyR[i][j], threshold);
+                     covcorrerrors = covcorrerrors || !NearAtR(spearmancorr2(&x, &y, n), cs.xyR[i][j], threshold);
                   }
                }
                if (ctype != 0 && n > 0) {
@@ -56139,9 +56139,9 @@ bool testbasestat(bool silent) {
                         ae_v_move(x.xR, 1, &mx.xyR[0][i], mx.stride, n);
                         ae_v_move(y.xR, 1, &my.xyR[0][j], my.stride, n);
                      }
-                     covcorrerrors = covcorrerrors || fabs(cov2(&x, &y, n) - cc.xyR[i][j]) > threshold;
-                     covcorrerrors = covcorrerrors || fabs(pearsoncorr2(&x, &y, n) - cp.xyR[i][j]) > threshold;
-                     covcorrerrors = covcorrerrors || fabs(spearmancorr2(&x, &y, n) - cs.xyR[i][j]) > threshold;
+                     covcorrerrors = covcorrerrors || !NearAtR(cov2(&x, &y, n), cc.xyR[i][j], threshold);
+                     covcorrerrors = covcorrerrors || !NearAtR(pearsoncorr2(&x, &y, n), cp.xyR[i][j], threshold);
+                     covcorrerrors = covcorrerrors || !NearAtR(spearmancorr2(&x, &y, n), cs.xyR[i][j], threshold);
                   }
                }
                if (ctype != 0 && n > 0) {
@@ -56386,9 +56386,9 @@ bool testmannwhitneyu(bool silent) {
          }
          mannwhitneyutest(&x, n, &y, m, &tailb, &taill, &tailr);
          mannwhitneyutest(&y, m, &x, n, &tailb1, &taill1, &tailr1);
-         set_error_flag(&waserrors, fabs(tailb - tailb1) > 1.0E-12, __FILE__, __LINE__, "testmannwhitneyuunit.ap:126");
-         set_error_flag(&waserrors, fabs(taill - tailr1) > 1.0E-12, __FILE__, __LINE__, "testmannwhitneyuunit.ap:127");
-         set_error_flag(&waserrors, fabs(tailr - taill1) > 1.0E-12, __FILE__, __LINE__, "testmannwhitneyuunit.ap:128");
+         set_error_flag(&waserrors, !NearAtR(tailb, tailb1, 1.0E-12), __FILE__, __LINE__, "testmannwhitneyuunit.ap:126");
+         set_error_flag(&waserrors, !NearAtR(taill, tailr1, 1.0E-12), __FILE__, __LINE__, "testmannwhitneyuunit.ap:127");
+         set_error_flag(&waserrors, !NearAtR(tailr, taill1, 1.0E-12), __FILE__, __LINE__, "testmannwhitneyuunit.ap:128");
       }
    }
 // Test for integer overflow in the function: if one crucial
@@ -56444,21 +56444,21 @@ bool teststest(bool silent) {
    x.xR[4] = 2.0;
    x.xR[5] = 3.0;
    onesamplesigntest(&x, 6, 0.0, &tailb, &taill, &tailr);
-   waserrors = waserrors || fabs(taill - 0.65625) > eps;
-   waserrors = waserrors || fabs(tailr - 0.65625) > eps;
-   waserrors = waserrors || fabs(tailb - 1.00000) > eps;
+   waserrors = waserrors || !NearAtR(taill, 0.65625, eps);
+   waserrors = waserrors || !NearAtR(tailr, 0.65625, eps);
+   waserrors = waserrors || !NearAtR(tailb, 1.00000, eps);
    onesamplesigntest(&x, 6, -1.0, &tailb, &taill, &tailr);
-   waserrors = waserrors || fabs(taill - 0.81250) > eps;
-   waserrors = waserrors || fabs(tailr - 0.50000) > eps;
-   waserrors = waserrors || fabs(tailb - 1.00000) > eps;
+   waserrors = waserrors || !NearAtR(taill, 0.81250, eps);
+   waserrors = waserrors || !NearAtR(tailr, 0.50000, eps);
+   waserrors = waserrors || !NearAtR(tailb, 1.00000, eps);
    onesamplesigntest(&x, 6, -1.5, &tailb, &taill, &tailr);
-   waserrors = waserrors || fabs(taill - 0.89062) > eps;
-   waserrors = waserrors || fabs(tailr - 0.34375) > eps;
-   waserrors = waserrors || fabs(tailb - 0.68750) > eps;
+   waserrors = waserrors || !NearAtR(taill, 0.89062, eps);
+   waserrors = waserrors || !NearAtR(tailr, 0.34375, eps);
+   waserrors = waserrors || !NearAtR(tailb, 0.68750, eps);
    onesamplesigntest(&x, 6, -3.0, &tailb, &taill, &tailr);
-   waserrors = waserrors || fabs(taill - 1.00000) > eps;
-   waserrors = waserrors || fabs(tailr - 0.03125) > eps;
-   waserrors = waserrors || fabs(tailb - 0.06250) > eps;
+   waserrors = waserrors || !NearAtR(taill, 1.00000, eps);
+   waserrors = waserrors || !NearAtR(tailr, 0.03125, eps);
+   waserrors = waserrors || !NearAtR(tailb, 0.06250, eps);
 // Test 2
    ae_vector_set_length(&x, 3);
    x.xR[0] = 2.0;
@@ -56523,17 +56523,17 @@ bool teststudentttests(bool silent) {
    x.xR[6] = 1.5;
    x.xR[7] = 3.0;
    studentttest1(&x, n, 0.0, &tailb, &taill, &tailr);
-   waserrors = waserrors || fabs(tailb - 1.00000) > eps;
-   waserrors = waserrors || fabs(taill - 0.50000) > eps;
-   waserrors = waserrors || fabs(tailr - 0.50000) > eps;
+   waserrors = waserrors || !NearAtR(tailb, 1.00000, eps);
+   waserrors = waserrors || !NearAtR(taill, 0.50000, eps);
+   waserrors = waserrors || !NearAtR(tailr, 0.50000, eps);
    studentttest1(&x, n, 1.0, &tailb, &taill, &tailr);
-   waserrors = waserrors || fabs(tailb - 0.17816) > eps;
-   waserrors = waserrors || fabs(taill - 0.08908) > eps;
-   waserrors = waserrors || fabs(tailr - 0.91092) > eps;
+   waserrors = waserrors || !NearAtR(tailb, 0.17816, eps);
+   waserrors = waserrors || !NearAtR(taill, 0.08908, eps);
+   waserrors = waserrors || !NearAtR(tailr, 0.91092, eps);
    studentttest1(&x, n, -1.0, &tailb, &taill, &tailr);
-   waserrors = waserrors || fabs(tailb - 0.17816) > eps;
-   waserrors = waserrors || fabs(taill - 0.91092) > eps;
-   waserrors = waserrors || fabs(tailr - 0.08908) > eps;
+   waserrors = waserrors || !NearAtR(tailb, 0.17816, eps);
+   waserrors = waserrors || !NearAtR(taill, 0.91092, eps);
+   waserrors = waserrors || !NearAtR(tailr, 0.08908, eps);
    x.xR[0] = 1.1;
    x.xR[1] = 1.1;
    x.xR[2] = 1.1;
@@ -56580,17 +56580,17 @@ bool teststudentttests(bool silent) {
    y.xR[6] = 2.5;
    y.xR[7] = 4.0;
    studentttest2(&x, n, &y, n, &tailb, &taill, &tailr);
-   waserrors = waserrors || fabs(tailb - 0.30780) > eps;
-   waserrors = waserrors || fabs(taill - 0.15390) > eps;
-   waserrors = waserrors || fabs(tailr - 0.84610) > eps;
+   waserrors = waserrors || !NearAtR(tailb, 0.30780, eps);
+   waserrors = waserrors || !NearAtR(taill, 0.15390, eps);
+   waserrors = waserrors || !NearAtR(tailr, 0.84610, eps);
    studentttest2(&x, n, &y, n - 1, &tailb, &taill, &tailr);
-   waserrors = waserrors || fabs(tailb - 0.53853) > eps;
-   waserrors = waserrors || fabs(taill - 0.26927) > eps;
-   waserrors = waserrors || fabs(tailr - 0.73074) > eps;
+   waserrors = waserrors || !NearAtR(tailb, 0.53853, eps);
+   waserrors = waserrors || !NearAtR(taill, 0.26927, eps);
+   waserrors = waserrors || !NearAtR(tailr, 0.73074, eps);
    studentttest2(&x, n - 1, &y, n, &tailb, &taill, &tailr);
-   waserrors = waserrors || fabs(tailb - 0.13829) > eps;
-   waserrors = waserrors || fabs(taill - 0.06915) > eps;
-   waserrors = waserrors || fabs(tailr - 0.93086) > eps;
+   waserrors = waserrors || !NearAtR(tailb, 0.13829, eps);
+   waserrors = waserrors || !NearAtR(taill, 0.06915, eps);
+   waserrors = waserrors || !NearAtR(tailr, 0.93086, eps);
    x.xR[0] = -1.0;
    x.xR[1] = -1.0;
    x.xR[2] = -1.0;
@@ -56716,29 +56716,29 @@ bool teststudentttests(bool silent) {
    yb.xR[6] = 1.1;
    yb.xR[7] = 1.1;
    unequalvariancettest(&xa, n, &ya, n, &tailb, &taill, &tailr);
-   waserrors = waserrors || fabs(tailb - 0.25791) > eps;
-   waserrors = waserrors || fabs(taill - 0.12896) > eps;
-   waserrors = waserrors || fabs(tailr - 0.87105) > eps;
+   waserrors = waserrors || !NearAtR(tailb, 0.25791, eps);
+   waserrors = waserrors || !NearAtR(taill, 0.12896, eps);
+   waserrors = waserrors || !NearAtR(tailr, 0.87105, eps);
    unequalvariancettest(&xa, n, &yb, n, &tailb, &taill, &tailr);
    studentttest1(&xa, n, 1.1, &tailb1, &taill1, &tailr1);
-   waserrors = waserrors || fabs(tailb - tailb1) > eps;
-   waserrors = waserrors || fabs(taill - taill1) > eps;
-   waserrors = waserrors || fabs(tailr - tailr1) > eps;
+   waserrors = waserrors || !NearAtR(tailb, tailb1, eps);
+   waserrors = waserrors || !NearAtR(taill, taill1, eps);
+   waserrors = waserrors || !NearAtR(tailr, tailr1, eps);
    unequalvariancettest(&xa, n, &yb, 1, &tailb, &taill, &tailr);
    studentttest1(&xa, n, 1.1, &tailb1, &taill1, &tailr1);
-   waserrors = waserrors || fabs(tailb - tailb1) > eps;
-   waserrors = waserrors || fabs(taill - taill1) > eps;
-   waserrors = waserrors || fabs(tailr - tailr1) > eps;
+   waserrors = waserrors || !NearAtR(tailb, tailb1, eps);
+   waserrors = waserrors || !NearAtR(taill, taill1, eps);
+   waserrors = waserrors || !NearAtR(tailr, tailr1, eps);
    unequalvariancettest(&xb, n, &ya, n, &tailb, &taill, &tailr);
    studentttest1(&ya, n, -1.1, &tailb1, &taill1, &tailr1);
-   waserrors = waserrors || fabs(tailb - tailb1) > eps;
-   waserrors = waserrors || fabs(taill - tailr1) > eps;
-   waserrors = waserrors || fabs(tailr - taill1) > eps;
+   waserrors = waserrors || !NearAtR(tailb, tailb1, eps);
+   waserrors = waserrors || !NearAtR(taill, tailr1, eps);
+   waserrors = waserrors || !NearAtR(tailr, taill1, eps);
    unequalvariancettest(&xb, 1, &ya, n, &tailb, &taill, &tailr);
    studentttest1(&ya, n, -1.1, &tailb1, &taill1, &tailr1);
-   waserrors = waserrors || fabs(tailb - tailb1) > eps;
-   waserrors = waserrors || fabs(taill - tailr1) > eps;
-   waserrors = waserrors || fabs(tailr - taill1) > eps;
+   waserrors = waserrors || !NearAtR(tailb, tailb1, eps);
+   waserrors = waserrors || !NearAtR(taill, tailr1, eps);
+   waserrors = waserrors || !NearAtR(tailr, taill1, eps);
    unequalvariancettest(&xb, 1, &yb, 1, &tailb, &taill, &tailr);
    waserrors = waserrors || tailb != 0.0;
    waserrors = waserrors || taill != 0.0;
@@ -56915,20 +56915,20 @@ bool testratint(bool silent) {
          bcerrors = bcerrors || n2 != n;
          barycentricbuildxyw(&x2, &y2, &w2, n2, &b2);
          t = randommid();
-         bcerrors = bcerrors || fabs(barycentriccalc(&b1, t) - barycentriccalc(&b2, t)) > threshold;
+         bcerrors = bcerrors || !NearAtR(barycentriccalc(&b1, t), barycentriccalc(&b2, t), threshold);
       // copy, compare
          testratintunit_brcunset(&b2);
          barycentriccopy(&b1, &b2);
          t = randommid();
-         bcerrors = bcerrors || fabs(barycentriccalc(&b1, t) - barycentriccalc(&b2, t)) > threshold;
+         bcerrors = bcerrors || !NearAtR(barycentriccalc(&b1, t), barycentriccalc(&b2, t), threshold);
       // test interpolation properties
          for (i = 0; i < n; i++) {
          // test interpolation at nodes
-            bcerrors = bcerrors || fabs(barycentriccalc(&b1, x.xR[i]) - y.xR[i]) > threshold * fabs(y.xR[i]);
+            bcerrors = bcerrors || !NearAtR(barycentriccalc(&b1, x.xR[i]), y.xR[i], threshold * fabs(y.xR[i]));
          // compare with polynomial interpolation
             t = randommid();
             testratintunit_poldiff2(&x, &y, n, t, &v0, &v1, &v2);
-            bcerrors = bcerrors || fabs(barycentriccalc(&b1, t) - v0) > threshold * rmax2(fabs(v0), 1.0);
+            bcerrors = bcerrors || !NearAtR(barycentriccalc(&b1, t), v0, threshold * rmax2(fabs(v0), 1.0));
          // test continuity between nodes
          // calculate Lipschitz constant on two grids -
          // dense and even more dense. If Lipschitz constant
@@ -56959,15 +56959,15 @@ bool testratint(bool silent) {
             d1 = 0.0;
             d2 = 0.0;
             barycentricdiff1(&b1, t, &d0, &d1);
-            bcerrors = bcerrors || fabs(v0 - d0) > threshold * rmax2(fabs(v0), 1.0);
-            bcerrors = bcerrors || fabs(v1 - d1) > threshold * rmax2(fabs(v1), 1.0);
+            bcerrors = bcerrors || !NearAtR(v0, d0, threshold * rmax2(fabs(v0), 1.0));
+            bcerrors = bcerrors || !NearAtR(v1, d1, threshold * rmax2(fabs(v1), 1.0));
             d0 = 0.0;
             d1 = 0.0;
             d2 = 0.0;
             barycentricdiff2(&b1, t, &d0, &d1, &d2);
-            bcerrors = bcerrors || fabs(v0 - d0) > threshold * rmax2(fabs(v0), 1.0);
-            bcerrors = bcerrors || fabs(v1 - d1) > threshold * rmax2(fabs(v1), 1.0);
-            bcerrors = bcerrors || fabs(v2 - d2) > sqrt(threshold) * rmax2(fabs(v2), 1.0);
+            bcerrors = bcerrors || !NearAtR(v0, d0, threshold * rmax2(fabs(v0), 1.0));
+            bcerrors = bcerrors || !NearAtR(v1, d1, threshold * rmax2(fabs(v1), 1.0));
+            bcerrors = bcerrors || !NearAtR(v2, d2, sqrt(threshold) * rmax2(fabs(v2), 1.0));
          }
       // test linear translation
          t = randommid();
@@ -56976,19 +56976,19 @@ bool testratint(bool silent) {
          testratintunit_brcunset(&b2);
          barycentriccopy(&b1, &b2);
          barycentriclintransx(&b2, a, b);
-         bcerrors = bcerrors || fabs(barycentriccalc(&b1, a * t + b) - barycentriccalc(&b2, t)) > threshold;
+         bcerrors = bcerrors || !NearAtR(barycentriccalc(&b1, a * t + b), barycentriccalc(&b2, t), threshold);
          a = 0.0;
          b = randommid();
          testratintunit_brcunset(&b2);
          barycentriccopy(&b1, &b2);
          barycentriclintransx(&b2, a, b);
-         bcerrors = bcerrors || fabs(barycentriccalc(&b1, a * t + b) - barycentriccalc(&b2, t)) > threshold;
+         bcerrors = bcerrors || !NearAtR(barycentriccalc(&b1, a * t + b), barycentriccalc(&b2, t), threshold);
          a = randommid();
          b = randommid();
          testratintunit_brcunset(&b2);
          barycentriccopy(&b1, &b2);
          barycentriclintransy(&b2, a, b);
-         bcerrors = bcerrors || fabs(a * barycentriccalc(&b1, t) + b - barycentriccalc(&b2, t)) > threshold;
+         bcerrors = bcerrors || !NearAtR(a * barycentriccalc(&b1, t) + b, barycentriccalc(&b2, t), threshold);
       }
    }
    for (pass = 0; pass <= 3; pass++) {
@@ -57028,9 +57028,9 @@ bool testratint(bool silent) {
       d1 = 0.0;
       d2 = 0.0;
       barycentricdiff1(&b1, v0, &d0, &d1);
-      bcerrors = bcerrors || fabs(t - v0) > threshold * v0;
-      bcerrors = bcerrors || fabs(d0 - v0) > threshold * v0;
-      bcerrors = bcerrors || fabs(d1 - 1) > 1000 * threshold;
+      bcerrors = bcerrors || !NearAtR(t, v0, threshold * v0);
+      bcerrors = bcerrors || !NearAtR(d0, v0, threshold * v0);
+      bcerrors = bcerrors || !NearAtR(d1, 1.0, 1000.0 * threshold);
    }
 // crash test: large abscissas, small argument
 //
@@ -57060,9 +57060,9 @@ bool testratint(bool silent) {
    d1 = 0.0;
    d2 = 0.0;
    barycentricdiff1(&b1, v0, &d0, &d1);
-   bcerrors = bcerrors || fabs(t) > v0 * (1 + threshold);
-   bcerrors = bcerrors || fabs(d0) > v0 * (1 + threshold);
-   bcerrors = bcerrors || fabs(d1 - 1) > 1000 * threshold;
+   bcerrors = bcerrors || !SmallAtR(t, v0 * (1.0 + threshold));
+   bcerrors = bcerrors || !SmallAtR(d0, v0 * (1.0 + threshold));
+   bcerrors = bcerrors || !NearAtR(d1, 1.0, 1000.0 * threshold);
 // crash test: test safe barycentric formula
    ae_vector_set_length(&x, 4);
    ae_vector_set_length(&y, 4);
@@ -57083,7 +57083,7 @@ bool testratint(bool silent) {
    v0 = minrealnumber;
    barycentricbuildxyw(&x, &y, &w, 4, &b1);
    t = barycentriccalc(&b1, v0);
-   bcerrors = bcerrors || fabs(t - v0) / v0 > threshold;
+   bcerrors = bcerrors || !NearAtR(t, v0, v0 * threshold);
 // Testing "No Poles" interpolation
    maxerr = 0.0;
    for (pass = 1; pass < passcount; pass++) {
@@ -57537,10 +57537,10 @@ static void testidwunit_testcommon(bool *err) {
       // Test error metrics
       //
       // NOTE: we expect that dataset is reproduced exactly
-         set_error_flag(err, fabs(rep.rmserror) > tol, __FILE__, __LINE__, "testidwunit.ap:320");
-         set_error_flag(err, fabs(rep.avgerror) > tol, __FILE__, __LINE__, "testidwunit.ap:321");
-         set_error_flag(err, fabs(rep.maxerror) > tol, __FILE__, __LINE__, "testidwunit.ap:322");
-         set_error_flag(err, fabs(rep.r2) < 1 - tol, __FILE__, __LINE__, "testidwunit.ap:323");
+         set_error_flag(err, !SmallAtR(rep.rmserror, tol), __FILE__, __LINE__, "testidwunit.ap:320");
+         set_error_flag(err, !SmallAtR(rep.avgerror, tol), __FILE__, __LINE__, "testidwunit.ap:321");
+         set_error_flag(err, !SmallAtR(rep.maxerror, tol), __FILE__, __LINE__, "testidwunit.ap:322");
+         set_error_flag(err, SmallR(rep.r2, 1.0 - tol), __FILE__, __LINE__, "testidwunit.ap:323");
       // Test that dataset is actually exactly reproduced
          for (i = 0; i < n; i++) {
          // Test generic evaluation
@@ -57551,7 +57551,7 @@ static void testidwunit_testcommon(bool *err) {
             idwcalc(&model, &x, &y);
             set_error_flag(err, y.cnt != ny, __FILE__, __LINE__, "testidwunit.ap:337");
             for (j = 0; j < ny; j++) {
-               set_error_flag(err, fabs(y.xR[j] - xy.xyR[i][nx + j]) > tol, __FILE__, __LINE__, "testidwunit.ap:339");
+               set_error_flag(err, !NearAtR(y.xR[j], xy.xyR[i][nx + j], tol), __FILE__, __LINE__, "testidwunit.ap:339");
             }
             k = hqrnduniformi(&rs, 2 * ny + 1);
             ae_vector_set_length(&y, k);
@@ -57561,7 +57561,7 @@ static void testidwunit_testcommon(bool *err) {
             idwcalcbuf(&model, &x, &y);
             set_error_flag(err, y.cnt != imax2(ny, k), __FILE__, __LINE__, "testidwunit.ap:346");
             for (j = 0; j < ny; j++) {
-               set_error_flag(err, fabs(y.xR[j] - xy.xyR[i][nx + j]) > tol, __FILE__, __LINE__, "testidwunit.ap:348");
+               set_error_flag(err, !NearAtR(y.xR[j], xy.xyR[i][nx + j], tol), __FILE__, __LINE__, "testidwunit.ap:348");
             }
             k = hqrnduniformi(&rs, 2 * ny + 1);
             ae_vector_set_length(&y, k);
@@ -57571,18 +57571,18 @@ static void testidwunit_testcommon(bool *err) {
             idwtscalcbuf(&model, &buffer, &x, &y);
             set_error_flag(err, y.cnt != imax2(ny, k), __FILE__, __LINE__, "testidwunit.ap:355");
             for (j = 0; j < ny; j++) {
-               set_error_flag(err, fabs(y.xR[j] - xy.xyR[i][nx + j]) > tol, __FILE__, __LINE__, "testidwunit.ap:357");
+               set_error_flag(err, !NearAtR(y.xR[j], xy.xyR[i][nx + j], tol), __FILE__, __LINE__, "testidwunit.ap:357");
             }
          // Specialized 1, 2, 3-dimensional cases
             if (ny == 1) {
                if (nx == 1) {
-                  set_error_flag(err, fabs(idwcalc1(&model, x.xR[0]) - xy.xyR[i][nx]) > tol, __FILE__, __LINE__, "testidwunit.ap:366");
+                  set_error_flag(err, !NearAtR(idwcalc1(&model, x.xR[0]), xy.xyR[i][nx], tol), __FILE__, __LINE__, "testidwunit.ap:366");
                }
                if (nx == 2) {
-                  set_error_flag(err, fabs(idwcalc2(&model, x.xR[0], x.xR[1]) - xy.xyR[i][nx]) > tol, __FILE__, __LINE__, "testidwunit.ap:368");
+                  set_error_flag(err, !NearAtR(idwcalc2(&model, x.xR[0], x.xR[1]), xy.xyR[i][nx], tol), __FILE__, __LINE__, "testidwunit.ap:368");
                }
                if (nx == 3) {
-                  set_error_flag(err, fabs(idwcalc3(&model, x.xR[0], x.xR[1], x.xR[2]) - xy.xyR[i][nx]) > tol, __FILE__, __LINE__, "testidwunit.ap:370");
+                  set_error_flag(err, !NearAtR(idwcalc3(&model, x.xR[0], x.xR[1], x.xR[2]), xy.xyR[i][nx], tol), __FILE__, __LINE__, "testidwunit.ap:370");
                }
             }
          }
@@ -57635,7 +57635,7 @@ static void testidwunit_testcommon(bool *err) {
          }
          idwcalc(&model, &x, &y);
          for (j = 0; j < ny; j++) {
-            set_error_flag(err, fabs(y.xR[j] - meany.xR[j]) > tol, __FILE__, __LINE__, "testidwunit.ap:424");
+            set_error_flag(err, !NearAtR(y.xR[j], meany.xR[j], tol), __FILE__, __LINE__, "testidwunit.ap:424");
          }
       }
    // Generate random dataset with NONDISTINCT points, test approximation
@@ -57755,10 +57755,10 @@ static void testidwunit_testcommon(bool *err) {
          }
          idwcreatecalcbuffer(&model, &buffer);
       // Test error metrics
-         set_error_flag(err, fabs(rep.rmserror - refrms) > tol, __FILE__, __LINE__, "testidwunit.ap:562");
-         set_error_flag(err, fabs(rep.avgerror - refavg) > tol, __FILE__, __LINE__, "testidwunit.ap:563");
-         set_error_flag(err, fabs(rep.maxerror - refmax) > tol, __FILE__, __LINE__, "testidwunit.ap:564");
-         set_error_flag(err, fabs(rep.r2 - refr2) > tol, __FILE__, __LINE__, "testidwunit.ap:565");
+         set_error_flag(err, !NearAtR(rep.rmserror, refrms, tol), __FILE__, __LINE__, "testidwunit.ap:562");
+         set_error_flag(err, !NearAtR(rep.avgerror, refavg, tol), __FILE__, __LINE__, "testidwunit.ap:563");
+         set_error_flag(err, !NearAtR(rep.maxerror, refmax, tol), __FILE__, __LINE__, "testidwunit.ap:564");
+         set_error_flag(err, !NearAtR(rep.r2, refr2, tol), __FILE__, __LINE__, "testidwunit.ap:565");
       // Test ability to reproduce mean over non-distinct points
       //
       // NOTE: we do not test all evaluation functions, just IDWCalc()
@@ -57768,7 +57768,7 @@ static void testidwunit_testcommon(bool *err) {
             }
             idwcalc(&model, &x, &y);
             for (j = 0; j < ny; j++) {
-               set_error_flag(err, fabs(y.xR[j] - 0.5 * (xy.xyR[2 * i + 0][nx + j] + xy.xyR[2 * i + 1][nx + j])) > tol, __FILE__, __LINE__, "testidwunit.ap:578");
+               set_error_flag(err, !NearAtR(y.xR[j], 0.5 * (xy.xyR[2 * i + 0][nx + j] + xy.xyR[2 * i + 1][nx + j]), tol), __FILE__, __LINE__, "testidwunit.ap:578");
             }
          }
       // Test continuity properties:
@@ -57863,7 +57863,7 @@ static void testidwunit_testcommon(bool *err) {
             }
             idwcalc(&model, &x, &y);
             for (j = 0; j < ny; j++) {
-               set_error_flag(err, fabs(y.xR[j]) > tol, __FILE__, __LINE__, "testidwunit.ap:684");
+               set_error_flag(err, !SmallAtR(y.xR[j], tol), __FILE__, __LINE__, "testidwunit.ap:684");
             }
          }
       // Mean prior
@@ -57874,7 +57874,7 @@ static void testidwunit_testcommon(bool *err) {
          }
          idwcalc(&model, &x, &y);
          for (j = 0; j < ny; j++) {
-            set_error_flag(err, fabs(y.xR[j] - meany.xR[j]) > tol, __FILE__, __LINE__, "testidwunit.ap:696");
+            set_error_flag(err, !NearAtR(y.xR[j], meany.xR[j], tol), __FILE__, __LINE__, "testidwunit.ap:696");
          }
       // User-specified prior (not tested with textbook Shepard method)
          if (algotype != 0) {
@@ -57886,7 +57886,7 @@ static void testidwunit_testcommon(bool *err) {
             }
             idwcalc(&model, &x, &y);
             for (j = 0; j < ny; j++) {
-               set_error_flag(err, fabs(y.xR[j] - v) > tol, __FILE__, __LINE__, "testidwunit.ap:710");
+               set_error_flag(err, !NearAtR(y.xR[j], v, tol), __FILE__, __LINE__, "testidwunit.ap:710");
             }
          }
       }
@@ -58117,19 +58117,19 @@ bool testpolint(bool silent) {
          do {
             a = randommid();
             b = randommid();
-         } while (fabs(a - b) <= 0.2);
+         } while (NearAtR(a, b, 0.2));
          t = a + (1.2 * randomreal() - 0.1) * (b - a);
          taskgenint1dequidist(a, b, n, &x, &y);
       // test "fast" equidistant interpolation (no barycentric model)
-         interrors = interrors || fabs(polynomialcalceqdist(a, b, &y, n, t) - testpolintunit_internalpolint(&x, &y, n, t)) > threshold;
+         interrors = interrors || !NearAtR(polynomialcalceqdist(a, b, &y, n, t), testpolintunit_internalpolint(&x, &y, n, t), threshold);
       // test "slow" equidistant interpolation (create barycentric model)
          testpolintunit_brcunset(&p);
          polynomialbuild(&x, &y, n, &p);
-         interrors = interrors || fabs(barycentriccalc(&p, t) - testpolintunit_internalpolint(&x, &y, n, t)) > threshold;
+         interrors = interrors || !NearAtR(barycentriccalc(&p, t), testpolintunit_internalpolint(&x, &y, n, t), threshold);
       // test "fast" interpolation (create "fast" barycentric model)
          testpolintunit_brcunset(&p);
          polynomialbuildeqdist(a, b, &y, n, &p);
-         interrors = interrors || fabs(barycentriccalc(&p, t) - testpolintunit_internalpolint(&x, &y, n, t)) > threshold;
+         interrors = interrors || !NearAtR(barycentriccalc(&p, t), testpolintunit_internalpolint(&x, &y, n, t), threshold);
       }
    }
 // Test Chebyshev-1 interpolation
@@ -58142,19 +58142,19 @@ bool testpolint(bool silent) {
          do {
             a = randommid();
             b = randommid();
-         } while (fabs(a - b) <= 0.2);
+         } while (NearAtR(a, b, 0.2));
          t = a + (1.2 * randomreal() - 0.1) * (b - a);
          taskgenint1dcheb1(a, b, n, &x, &y);
       // test "fast" interpolation (no barycentric model)
-         interrors = interrors || fabs(polynomialcalccheb1(a, b, &y, n, t) - testpolintunit_internalpolint(&x, &y, n, t)) > threshold;
+         interrors = interrors || !NearAtR(polynomialcalccheb1(a, b, &y, n, t), testpolintunit_internalpolint(&x, &y, n, t), threshold);
       // test "slow" interpolation (create barycentric model)
          testpolintunit_brcunset(&p);
          polynomialbuild(&x, &y, n, &p);
-         interrors = interrors || fabs(barycentriccalc(&p, t) - testpolintunit_internalpolint(&x, &y, n, t)) > threshold;
+         interrors = interrors || !NearAtR(barycentriccalc(&p, t), testpolintunit_internalpolint(&x, &y, n, t), threshold);
       // test "fast" interpolation (create "fast" barycentric model)
          testpolintunit_brcunset(&p);
          polynomialbuildcheb1(a, b, &y, n, &p);
-         interrors = interrors || fabs(barycentriccalc(&p, t) - testpolintunit_internalpolint(&x, &y, n, t)) > threshold;
+         interrors = interrors || !NearAtR(barycentriccalc(&p, t), testpolintunit_internalpolint(&x, &y, n, t), threshold);
       }
    }
 // Test Chebyshev-2 interpolation
@@ -58167,19 +58167,19 @@ bool testpolint(bool silent) {
          do {
             a = randommid();
             b = randommid();
-         } while (fabs(a - b) <= 0.2);
+         } while (NearAtR(a, b, 0.2));
          t = a + (1.2 * randomreal() - 0.1) * (b - a);
          taskgenint1dcheb2(a, b, n, &x, &y);
       // test "fast" interpolation (no barycentric model)
-         interrors = interrors || fabs(polynomialcalccheb2(a, b, &y, n, t) - testpolintunit_internalpolint(&x, &y, n, t)) > threshold;
+         interrors = interrors || !NearAtR(polynomialcalccheb2(a, b, &y, n, t), testpolintunit_internalpolint(&x, &y, n, t), threshold);
       // test "slow" interpolation (create barycentric model)
          testpolintunit_brcunset(&p);
          polynomialbuild(&x, &y, n, &p);
-         interrors = interrors || fabs(barycentriccalc(&p, t) - testpolintunit_internalpolint(&x, &y, n, t)) > threshold;
+         interrors = interrors || !NearAtR(barycentriccalc(&p, t), testpolintunit_internalpolint(&x, &y, n, t), threshold);
       // test "fast" interpolation (create "fast" barycentric model)
          testpolintunit_brcunset(&p);
          polynomialbuildcheb2(a, b, &y, n, &p);
-         interrors = interrors || fabs(barycentriccalc(&p, t) - testpolintunit_internalpolint(&x, &y, n, t)) > threshold;
+         interrors = interrors || !NearAtR(barycentriccalc(&p, t), testpolintunit_internalpolint(&x, &y, n, t), threshold);
       }
    }
 // Testing conversion Barycentric<->Chebyshev
@@ -58218,18 +58218,18 @@ bool testpolint(bool silent) {
          polynomialbar2cheb(&p, a, b, &c);
          interrors = interrors || c.cnt != k;
          if (k >= 1) {
-            interrors = interrors || fabs(c.xR[0] - v0) > threshold;
+            interrors = interrors || !NearAtR(c.xR[0], v0, threshold);
          }
          if (k >= 2) {
-            interrors = interrors || fabs(c.xR[1] - v1) > threshold;
+            interrors = interrors || !NearAtR(c.xR[1], v1, threshold);
          }
          if (k >= 3) {
-            interrors = interrors || fabs(c.xR[2] - v2) > threshold;
+            interrors = interrors || !NearAtR(c.xR[2], v2, threshold);
          }
       // Test backward conversion
          polynomialcheb2bar(&c, k, a, b, &p2);
          v = a + randomreal() * (b - a);
-         interrors = interrors || fabs(barycentriccalc(&p, v) - barycentriccalc(&p2, v)) > threshold;
+         interrors = interrors || !NearAtR(barycentriccalc(&p, v), barycentriccalc(&p2, v), threshold);
       }
    }
 // Testing conversion Barycentric<->Power
@@ -58292,24 +58292,24 @@ bool testpolint(bool silent) {
          polynomialbar2pow(&p, poffset, pscale, &c);
          interrors = interrors || c.cnt != k;
          if (k >= 1) {
-            interrors = interrors || fabs(c.xR[0] - v0) > threshold;
+            interrors = interrors || !NearAtR(c.xR[0], v0, threshold);
          }
          if (k >= 2) {
-            interrors = interrors || fabs(c.xR[1] - v1) > threshold;
+            interrors = interrors || !NearAtR(c.xR[1], v1, threshold);
          }
          if (k >= 3) {
-            interrors = interrors || fabs(c.xR[2] - v2) > threshold;
+            interrors = interrors || !NearAtR(c.xR[2], v2, threshold);
          }
          if (k >= 4) {
-            interrors = interrors || fabs(c.xR[3] - v3) > threshold;
+            interrors = interrors || !NearAtR(c.xR[3], v3, threshold);
          }
          if (k >= 5) {
-            interrors = interrors || fabs(c.xR[4] - v4) > threshold;
+            interrors = interrors || !NearAtR(c.xR[4], v4, threshold);
          }
       // Test backward conversion
          polynomialpow2bar(&c, k, poffset, pscale, &p2);
          v = poffset + randommid() * pscale;
-         interrors = interrors || fabs(barycentriccalc(&p, v) - barycentriccalc(&p2, v)) > threshold;
+         interrors = interrors || !NearAtR(barycentriccalc(&p, v), barycentriccalc(&p2, v), threshold);
       }
    }
 // crash-test: ability to solve tasks which will overflow/underflow
@@ -58348,7 +58348,7 @@ bool testpolint(bool silent) {
    polynomialbuild(&x2, &y, n, &p);
    polynomialbar2pow(&p, 0.0, 1.0, &c1);
    for (i = 0; i < n; i++) {
-      set_error_flag(&interrors, fabs(c0.xR[i] - c1.xR[i] * pow(pscale, (double)i)) > eps, __FILE__, __LINE__, "testpolintunit.ap:395");
+      set_error_flag(&interrors, !NearAtR(c0.xR[i], c1.xR[i] * pow(pscale, (double)i), eps), __FILE__, __LINE__, "testpolintunit.ap:395");
    }
    pscale = 1.0E10;
    for (i = 0; i < n; i++) {
@@ -58357,7 +58357,7 @@ bool testpolint(bool silent) {
    polynomialbuild(&x2, &y, n, &p);
    polynomialbar2pow(&p, 0.0, 1.0, &c2);
    for (i = 0; i < n; i++) {
-      set_error_flag(&interrors, fabs(c0.xR[i] - c2.xR[i] * pow(pscale, (double)i)) > eps, __FILE__, __LINE__, "testpolintunit.ap:402");
+      set_error_flag(&interrors, !NearAtR(c0.xR[i], c2.xR[i] * pow(pscale, (double)i), eps), __FILE__, __LINE__, "testpolintunit.ap:402");
    }
 // report
    waserrors = interrors;
@@ -58603,7 +58603,7 @@ static bool testspline1dunit_testmonotonespline() {
    spline1dbuildmonotone(&x, &y, 2, &c);
    spline1dbuildhermite(&x, &y, &d, 2, &s2);
    v = randommid();
-   if (fabs(spline1dcalc(&c, v) - spline1dcalc(&s2, v)) > eps) {
+   if (!NearAtR(spline1dcalc(&c, v), spline1dcalc(&s2, v), eps)) {
       result = true;
       ae_frame_leave();
       return result;
@@ -58637,7 +58637,7 @@ static bool testspline1dunit_testmonotonespline() {
    spline1dbuildhermite(&x, &y, &d, 3, &s2);
    for (i = 0; i <= 10; i++) {
       v = x.xR[0] + (double)i / 10.0 *(x.xR[2] - x.xR[0]);
-      if (fabs(spline1dcalc(&c, v) - spline1dcalc(&s2, v)) > eps) {
+      if (!NearAtR(spline1dcalc(&c, v), spline1dcalc(&s2, v), eps)) {
          result = true;
          ae_frame_leave();
          return result;
@@ -58663,12 +58663,12 @@ static bool testspline1dunit_testmonotonespline() {
    spline1dbuildmonotone(&x, &y, 5, &c);
    for (i = 0; i <= 4; i++) {
       spline1ddiff(&c, x.xR[i], &v, &dv, &d2v);
-      if (fabs(v - y.xR[i]) > eps) {
+      if (!NearAtR(v, y.xR[i], eps)) {
          result = true;
          ae_frame_leave();
          return result;
       }
-      if (x.xR[i] == 3.0 ? fabs(dv - 1.0) > eps : dv != 0.0) {
+      if (x.xR[i] == 3.0 ? !NearAtR(dv, 1.0, eps) : dv != 0.0) {
          result = true;
          ae_frame_leave();
          return result;
@@ -58766,14 +58766,14 @@ static bool testspline1dunit_testmonotonespline() {
       }
       c0 = spline1dcalc(&c, x.xR[0] - delta);
       c1 = spline1dcalc(&c, x.xR[0]);
-      if (fabs(c0 - c1) > eps) {
+      if (!NearAtR(c0, c1, eps)) {
          result = true;
          ae_frame_leave();
          return result;
       }
       c0 = spline1dcalc(&c, x.xR[alln - 1]);
       c1 = spline1dcalc(&c, x.xR[alln - 1] + delta);
-      if (fabs(c0 - c1) > eps) {
+      if (!NearAtR(c0, c1, eps)) {
          result = true;
          ae_frame_leave();
          return result;
@@ -58883,7 +58883,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
          spline1dfit(&x, &y, 2, m, pow(10.0, rho), &c, &rep);
          v = randommid();
          v1 = (v - x.xR[0]) / (x.xR[1] - x.xR[0]) * y.xR[1] + (v - x.xR[1]) / (x.xR[0] - x.xR[1]) * y.xR[0];
-         set_error_flag(fiterrors, fabs(v1 - spline1dcalc(&c, v)) > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1509");
+         set_error_flag(fiterrors, !NearAtR(v1, spline1dcalc(&c, v), threshold), __FILE__, __LINE__, "testspline1dunit.ap:1509");
          set_error_flag(fiterrors, rep.rmserror > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1510");
          set_error_flag(fiterrors, rep.avgerror > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1511");
          set_error_flag(fiterrors, rep.maxerror > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1512");
@@ -58910,7 +58910,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       spline1dfit(&x, &y, n, m, pow(10.0, rho), &c, &rep);
    // Test that spline passes through all the points
       for (i = 0; i < n; i++) {
-         set_error_flag(fiterrors, fabs(y.xR[i] - spline1dcalc(&c, x.xR[i])) > nonstrictthreshold, __FILE__, __LINE__, "testspline1dunit.ap:1545");
+         set_error_flag(fiterrors, !NearAtR(y.xR[i], spline1dcalc(&c, x.xR[i]), nonstrictthreshold), __FILE__, __LINE__, "testspline1dunit.ap:1545");
       }
       set_error_flag(fiterrors, rep.rmserror > nonstrictthreshold, __FILE__, __LINE__, "testspline1dunit.ap:1546");
       set_error_flag(fiterrors, rep.avgerror > nonstrictthreshold, __FILE__, __LINE__, "testspline1dunit.ap:1547");
@@ -58938,7 +58938,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       testspline1dunit_unsetreport(&rep);
       spline1dfit(&x, &y, n, m, pow(10.0, rho), &c, &rep);
       for (i = 0; i < n; i++) {
-         set_error_flag(fiterrors, fabs(y.xR[i] - spline1dcalc(&c, x.xR[i])) > nonstrictthreshold, __FILE__, __LINE__, "testspline1dunit.ap:1578");
+         set_error_flag(fiterrors, !NearAtR(y.xR[i], spline1dcalc(&c, x.xR[i]), nonstrictthreshold), __FILE__, __LINE__, "testspline1dunit.ap:1578");
       }
       set_error_flag(fiterrors, rep.rmserror > nonstrictthreshold, __FILE__, __LINE__, "testspline1dunit.ap:1579");
       set_error_flag(fiterrors, rep.avgerror > nonstrictthreshold, __FILE__, __LINE__, "testspline1dunit.ap:1580");
@@ -59044,7 +59044,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
    rho = -5.0;
    spline1dfit(&x, &y, n, m, pow(10.0, rho), &c, &rep);
    for (i = 0; i < n; i++) {
-      set_error_flag(fiterrors, fabs(spline1dcalc(&c, x.xR[i]) - y.xR[i]) > 0.0001, __FILE__, __LINE__, "testspline1dunit.ap:1711");
+      set_error_flag(fiterrors, !NearAtR(spline1dcalc(&c, x.xR[i]), y.xR[i], 0.0001), __FILE__, __LINE__, "testspline1dunit.ap:1711");
    }
    set_error_flag(fiterrors, spline1dcalc(&c, 0.0) < 1.000, __FILE__, __LINE__, "testspline1dunit.ap:1712");
 // Check correctness of error reports
@@ -59092,11 +59092,11 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       refmax = rmax2(v1, v2);
       spline1dfit(&x, &y, 4, 4, 0.0, &c, &rep);
       s = spline1dcalc(&c, 0.0);
-      set_error_flag(fiterrors, fabs(s - v) > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1767");
-      set_error_flag(fiterrors, fabs(rep.rmserror - refrms) > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1768");
-      set_error_flag(fiterrors, fabs(rep.avgerror - refavg) > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1769");
-      set_error_flag(fiterrors, fabs(rep.avgrelerror - refavgrel) > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1770");
-      set_error_flag(fiterrors, fabs(rep.maxerror - refmax) > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1771");
+      set_error_flag(fiterrors, !NearAtR(s, v, threshold), __FILE__, __LINE__, "testspline1dunit.ap:1767");
+      set_error_flag(fiterrors, !NearAtR(rep.rmserror, refrms, threshold), __FILE__, __LINE__, "testspline1dunit.ap:1768");
+      set_error_flag(fiterrors, !NearAtR(rep.avgerror, refavg, threshold), __FILE__, __LINE__, "testspline1dunit.ap:1769");
+      set_error_flag(fiterrors, !NearAtR(rep.avgrelerror, refavgrel, threshold), __FILE__, __LINE__, "testspline1dunit.ap:1770");
+      set_error_flag(fiterrors, !NearAtR(rep.maxerror, refmax, threshold), __FILE__, __LINE__, "testspline1dunit.ap:1771");
    }
    ae_frame_leave();
 }
@@ -59681,14 +59681,14 @@ bool testspline1d(bool silent) {
          spline1dcopy(&c, &c2);
          spline1dlintransx(&c2, sa, sb);
          for (i = 0; i < xtest.cnt; i++) {
-            lterrors = lterrors || fabs(spline1dcalc(&c, xtest.xR[i]) - spline1dcalc(&c2, (xtest.xR[i] - sb) / sa)) > threshold;
+            lterrors = lterrors || !NearAtR(spline1dcalc(&c, xtest.xR[i]), spline1dcalc(&c2, (xtest.xR[i] - sb) / sa), threshold);
          }
       // LinTransX, special case: A=0
          sb = randommid();
          spline1dcopy(&c, &c2);
          spline1dlintransx(&c2, 0.0, sb);
          for (i = 0; i < xtest.cnt; i++) {
-            lterrors = lterrors || fabs(spline1dcalc(&c, sb) - spline1dcalc(&c2, xtest.xR[i])) > threshold;
+            lterrors = lterrors || !NearAtR(spline1dcalc(&c, sb), spline1dcalc(&c2, xtest.xR[i]), threshold);
          }
       // LinTransY
          sa = randommid();
@@ -59696,7 +59696,7 @@ bool testspline1d(bool silent) {
          spline1dcopy(&c, &c2);
          spline1dlintransy(&c2, sa, sb);
          for (i = 0; i < xtest.cnt; i++) {
-            lterrors = lterrors || fabs(sa * spline1dcalc(&c, xtest.xR[i]) + sb - spline1dcalc(&c2, xtest.xR[i])) > threshold;
+            lterrors = lterrors || !NearAtR(sa * spline1dcalc(&c, xtest.xR[i]) + sb, spline1dcalc(&c2, xtest.xR[i]), threshold);
          }
       }
    }
@@ -59779,12 +59779,12 @@ bool testspline1d(bool silent) {
    intab = spline1dintegrate(&c, 1.0);
    v = randomreal();
    vr = spline1dintegrate(&c, v);
-   ierrors = ierrors || fabs(intab - 1) > 0.001;
+   ierrors = ierrors || !NearAtR(intab, 1.0, 0.001);
    for (i = -10; i <= 10; i++) {
-      ierrors = ierrors || fabs(spline1dintegrate(&c, i + v) - (i * intab + vr)) > 0.001;
-      ierrors = ierrors || fabs(spline1dintegrate(&c, i - 1000.0 * machineepsilon) - i * intab) > 0.001;
-      ierrors = ierrors || fabs(spline1dintegrate(&c, (double)i) - i * intab) > 0.001;
-      ierrors = ierrors || fabs(spline1dintegrate(&c, i + 1000.0 * machineepsilon) - i * intab) > 0.001;
+      ierrors = ierrors || !NearAtR(spline1dintegrate(&c, i + v), i * intab + vr, 0.001);
+      ierrors = ierrors || !NearAtR(spline1dintegrate(&c, i - 1000.0 * machineepsilon), i * intab, 0.001);
+      ierrors = ierrors || !NearAtR(spline1dintegrate(&c, (double)i), i * intab, 0.001);
+      ierrors = ierrors || !NearAtR(spline1dintegrate(&c, i + 1000.0 * machineepsilon), i * intab, 0.001);
    }
 // Test monotone cubic Hermit interpolation
    monotoneerr = testspline1dunit_testmonotonespline();
@@ -59957,10 +59957,10 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
                *fiterrors = true;
             } else {
                for (i = 0; i < n - k; i++) {
-                  *fiterrors = *fiterrors || fabs(barycentriccalc(&p1, x.xR[i]) - y.xR[i]) > threshold;
+                  *fiterrors = *fiterrors || !NearAtR(barycentriccalc(&p1, x.xR[i]), y.xR[i], threshold);
                }
                for (i = 0; i < k; i++) {
-                  *fiterrors = *fiterrors || fabs(barycentriccalc(&p1, xc.xR[i]) - yc.xR[i]) > threshold;
+                  *fiterrors = *fiterrors || !NearAtR(barycentriccalc(&p1, xc.xR[i]), yc.xR[i], threshold);
                }
             }
          }
@@ -59990,9 +59990,9 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
                      *fiterrors = true;
                   } else {
                      barycentricdiff1(&p1, 0.0, &v0, &v1);
-                     *fiterrors = *fiterrors || fabs(v0 - yc.xR[0]) > threshold;
+                     *fiterrors = *fiterrors || !NearAtR(v0, yc.xR[0], threshold);
                      if (k == 2) {
-                        *fiterrors = *fiterrors || fabs(v1 - yc.xR[1]) > threshold;
+                        *fiterrors = *fiterrors || !NearAtR(v1, yc.xR[1], threshold);
                      }
                   }
                }
@@ -60038,7 +60038,7 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
             v1 = sqrt(v1 / n);
             v2 = sqrt(v2 / n);
             *fiterrors = *fiterrors || v2 > v1;
-            *fiterrors = *fiterrors || fabs(v2 - rep.rmserror) > threshold;
+            *fiterrors = *fiterrors || !NearAtR(v2, rep.rmserror, threshold);
          }
       // compare weighted and non-weighted
          n = 20;
@@ -60060,11 +60060,11 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
             t = randommid();
             v1 = barycentriccalc(&p1, t);
             v2 = barycentriccalc(&p2, t);
-            *fiterrors = *fiterrors || !approxequal(v2, v1, 1.0E-12);
-            *fiterrors = *fiterrors || !approxequal(rep.rmserror, rep2.rmserror, 1.0E-12 * rmax3(1.0, rep.rmserror, rep2.rmserror));
-            *fiterrors = *fiterrors || !approxequal(rep.avgerror, rep2.avgerror, 1.0E-12 * rmax3(1.0, rep.avgerror, rep2.avgerror));
-            *fiterrors = *fiterrors || !approxequal(rep.avgrelerror, rep2.avgrelerror, 1.0E-12 * rmax3(1.0, rep.avgrelerror, rep2.avgrelerror));
-            *fiterrors = *fiterrors || !approxequal(rep.maxerror, rep2.maxerror, 1.0E-12 * rmax3(1.0, rep.maxerror, rep2.maxerror));
+            *fiterrors = *fiterrors || !NearAtR(v2, v1, 1.0E-12);
+            *fiterrors = *fiterrors || !NearAtR(rep.rmserror, rep2.rmserror, 1.0E-12 * rmax3(1.0, rep.rmserror, rep2.rmserror));
+            *fiterrors = *fiterrors || !NearAtR(rep.avgerror, rep2.avgerror, 1.0E-12 * rmax3(1.0, rep.avgerror, rep2.avgerror));
+            *fiterrors = *fiterrors || !NearAtR(rep.avgrelerror, rep2.avgrelerror, 1.0E-12 * rmax3(1.0, rep.avgrelerror, rep2.avgrelerror));
+            *fiterrors = *fiterrors || !NearAtR(rep.maxerror, rep2.maxerror, 1.0E-12 * rmax3(1.0, rep.maxerror, rep2.maxerror));
          }
       }
    }
@@ -60119,11 +60119,11 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
             *fiterrors = true;
          } else {
             s = barycentriccalc(&p, 0.0);
-            *fiterrors = *fiterrors || fabs(s - v) > threshold;
-            *fiterrors = *fiterrors || fabs(rep.rmserror - refrms) > threshold;
-            *fiterrors = *fiterrors || fabs(rep.avgerror - refavg) > threshold;
-            *fiterrors = *fiterrors || fabs(rep.avgrelerror - refavgrel) > threshold;
-            *fiterrors = *fiterrors || fabs(rep.maxerror - refmax) > threshold;
+            *fiterrors = *fiterrors || !NearAtR(s, v, threshold);
+            *fiterrors = *fiterrors || !NearAtR(rep.rmserror, refrms, threshold);
+            *fiterrors = *fiterrors || !NearAtR(rep.avgerror, refavg, threshold);
+            *fiterrors = *fiterrors || !NearAtR(rep.avgrelerror, refavgrel, threshold);
+            *fiterrors = *fiterrors || !NearAtR(rep.maxerror, refmax, threshold);
          }
       }
    }
@@ -60204,10 +60204,10 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
                *fiterrors = true;
             } else {
                for (i = 0; i < n - k; i++) {
-                  *fiterrors = *fiterrors || fabs(barycentriccalc(&b1, x.xR[i]) - y.xR[i]) > threshold;
+                  *fiterrors = *fiterrors || !NearAtR(barycentriccalc(&b1, x.xR[i]), y.xR[i], threshold);
                }
                for (i = 0; i < k; i++) {
-                  *fiterrors = *fiterrors || fabs(barycentriccalc(&b1, xc.xR[i]) - yc.xR[i]) > threshold;
+                  *fiterrors = *fiterrors || !NearAtR(barycentriccalc(&b1, xc.xR[i]), yc.xR[i], threshold);
                }
             }
          }
@@ -60240,7 +60240,7 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
                } else {
                   for (i = 0; i < k; i++) {
                      barycentricdiff1(&b1, xc.xR[i], &v0, &v1);
-                     *fiterrors = *fiterrors || fabs(v0 - yc.xR[i]) > threshold;
+                     *fiterrors = *fiterrors || !NearAtR(v0, yc.xR[i], threshold);
                   }
                }
             }
@@ -60287,7 +60287,7 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
             v1 = sqrt(v1 / n);
             v2 = sqrt(v2 / n);
             *fiterrors = *fiterrors || v2 > v1;
-            *fiterrors = *fiterrors || fabs(v2 - rep.rmserror) > threshold;
+            *fiterrors = *fiterrors || !NearAtR(v2, rep.rmserror, threshold);
          }
       // compare weighted and non-weighted
          n = 20;
@@ -60309,11 +60309,11 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
             t = randommid();
             v1 = barycentriccalc(&b1, t);
             v2 = barycentriccalc(&b2, t);
-            *fiterrors = *fiterrors || !approxequal(v2, v1, 1.0E-12);
-            *fiterrors = *fiterrors || !approxequal(rep.rmserror, rep2.rmserror, 1.0E-12 * rmax3(1.0, rep.rmserror, rep2.rmserror));
-            *fiterrors = *fiterrors || !approxequal(rep.avgerror, rep2.avgerror, 1.0E-12 * rmax3(1.0, rep.avgerror, rep2.avgerror));
-            *fiterrors = *fiterrors || !approxequal(rep.avgrelerror, rep2.avgrelerror, 1.0E-12 * rmax3(1.0, rep.avgrelerror, rep2.avgrelerror));
-            *fiterrors = *fiterrors || !approxequal(rep.maxerror, rep2.maxerror, 1.0E-12 * rmax3(1.0, rep.maxerror, rep2.maxerror));
+            *fiterrors = *fiterrors || !NearAtR(v2, v1, 1.0E-12);
+            *fiterrors = *fiterrors || !NearAtR(rep.rmserror, rep2.rmserror, 1.0E-12 * rmax3(1.0, rep.rmserror, rep2.rmserror));
+            *fiterrors = *fiterrors || !NearAtR(rep.avgerror, rep2.avgerror, 1.0E-12 * rmax3(1.0, rep.avgerror, rep2.avgerror));
+            *fiterrors = *fiterrors || !NearAtR(rep.avgrelerror, rep2.avgrelerror, 1.0E-12 * rmax3(1.0, rep.avgrelerror, rep2.avgrelerror));
+            *fiterrors = *fiterrors || !NearAtR(rep.maxerror, rep2.maxerror, 1.0E-12 * rmax3(1.0, rep.maxerror, rep2.maxerror));
          }
       }
    }
@@ -60365,11 +60365,11 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
          *fiterrors = true;
       } else {
          s = barycentriccalc(&b1, 0.0);
-         *fiterrors = *fiterrors || fabs(s - v) > threshold;
-         *fiterrors = *fiterrors || fabs(rep.rmserror - refrms) > threshold;
-         *fiterrors = *fiterrors || fabs(rep.avgerror - refavg) > threshold;
-         *fiterrors = *fiterrors || fabs(rep.avgrelerror - refavgrel) > threshold;
-         *fiterrors = *fiterrors || fabs(rep.maxerror - refmax) > threshold;
+         *fiterrors = *fiterrors || !NearAtR(s, v, threshold);
+         *fiterrors = *fiterrors || !NearAtR(rep.rmserror, refrms, threshold);
+         *fiterrors = *fiterrors || !NearAtR(rep.avgerror, refavg, threshold);
+         *fiterrors = *fiterrors || !NearAtR(rep.avgrelerror, refavgrel, threshold);
+         *fiterrors = *fiterrors || !NearAtR(rep.maxerror, refmax, threshold);
       }
    }
    ae_frame_leave();
@@ -60463,13 +60463,13 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
                for (i = 0; i < k; i++) {
                   spline1ddiff(&c, xc.xR[i], &s, &ds, &d2s);
                   if (dc.xZ[i] == 0) {
-                     *fiterrors = *fiterrors || fabs(s - yc.xR[i]) > threshold;
+                     *fiterrors = *fiterrors || !NearAtR(s, yc.xR[i], threshold);
                   }
                   if (dc.xZ[i] == 1) {
-                     *fiterrors = *fiterrors || fabs(ds - yc.xR[i]) > threshold;
+                     *fiterrors = *fiterrors || !NearAtR(ds, yc.xR[i], threshold);
                   }
                   if (dc.xZ[i] == 2) {
-                     *fiterrors = *fiterrors || fabs(d2s - yc.xR[i]) > threshold;
+                     *fiterrors = *fiterrors || !NearAtR(d2s, yc.xR[i], threshold);
                   }
                }
             }
@@ -60502,13 +60502,13 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
          // Check that constraints are satisfied
             spline1ddiff(&c, xc.xR[0], &s, &ds, &d2s);
             if (dc.xZ[0] == 0) {
-               *fiterrors = *fiterrors || fabs(s - yc.xR[0]) > threshold;
+               *fiterrors = *fiterrors || !NearAtR(s, yc.xR[0], threshold);
             }
             if (dc.xZ[0] == 1) {
-               *fiterrors = *fiterrors || fabs(ds - yc.xR[0]) > threshold;
+               *fiterrors = *fiterrors || !NearAtR(ds, yc.xR[0], threshold);
             }
             if (dc.xZ[0] == 2) {
-               *fiterrors = *fiterrors || fabs(d2s - yc.xR[0]) > threshold;
+               *fiterrors = *fiterrors || !NearAtR(d2s, yc.xR[0], threshold);
             }
          }
       }
@@ -60556,13 +60556,13 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
                for (i = 0; i < k; i++) {
                   spline1ddiff(&c, xc.xR[i], &s, &ds, &d2s);
                   if (dc.xZ[i] == 0) {
-                     *fiterrors = *fiterrors || fabs(s - yc.xR[i]) > threshold;
+                     *fiterrors = *fiterrors || !NearAtR(s, yc.xR[i], threshold);
                   }
                   if (dc.xZ[i] == 1) {
-                     *fiterrors = *fiterrors || fabs(ds - yc.xR[i]) > threshold;
+                     *fiterrors = *fiterrors || !NearAtR(ds, yc.xR[i], threshold);
                   }
                   if (dc.xZ[i] == 2) {
-                     *fiterrors = *fiterrors || fabs(d2s - yc.xR[i]) > threshold;
+                     *fiterrors = *fiterrors || !NearAtR(d2s, yc.xR[i], threshold);
                   }
                }
             }
@@ -60598,13 +60598,13 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
          // Check that constraints are satisfied
             spline1ddiff(&c, xc.xR[0], &s, &ds, &d2s);
             if (dc.xZ[0] == 0) {
-               *fiterrors = *fiterrors || fabs(s - yc.xR[0]) > threshold;
+               *fiterrors = *fiterrors || !NearAtR(s, yc.xR[0], threshold);
             }
             if (dc.xZ[0] == 1) {
-               *fiterrors = *fiterrors || fabs(ds - yc.xR[0]) > threshold;
+               *fiterrors = *fiterrors || !NearAtR(ds, yc.xR[0], threshold);
             }
             if (dc.xZ[0] == 2) {
-               *fiterrors = *fiterrors || fabs(d2s - yc.xR[0]) > threshold;
+               *fiterrors = *fiterrors || !NearAtR(d2s, yc.xR[0], threshold);
             }
          }
       }
@@ -60678,7 +60678,7 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
             } else {
                for (i = 0; i < n; i++) {
                   v = sa * randomreal() + sb;
-                  *fiterrors = *fiterrors || fabs(spline1dcalc(&c, v) - spline1dcalc(&c2, v)) > threshold;
+                  *fiterrors = *fiterrors || !NearAtR(spline1dcalc(&c, v), spline1dcalc(&c2, v), threshold);
                }
             }
          }
@@ -60705,12 +60705,12 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
             } else {
                for (i = 0; i < n; i++) {
                   v = randomreal() * (n - 1);
-                  *fiterrors = *fiterrors || !approxequal(spline1dcalc(&c, v), spline1dcalc(&c2, v), 1.0E-12);
-                  *fiterrors = *fiterrors || !approxequal(rep.taskrcond, rep2.taskrcond, 1.0E-12 * rmax3(1.0, rep.taskrcond, rep2.taskrcond));
-                  *fiterrors = *fiterrors || !approxequal(rep.rmserror, rep2.rmserror, 1.0E-12 * rmax3(1.0, rep.rmserror, rep2.rmserror));
-                  *fiterrors = *fiterrors || !approxequal(rep.avgerror, rep2.avgerror, 1.0E-12 * rmax3(1.0, rep.avgerror, rep2.avgerror));
-                  *fiterrors = *fiterrors || !approxequal(rep.avgrelerror, rep2.avgrelerror, 1.0E-12 * rmax3(1.0, rep.avgrelerror, rep2.avgrelerror));
-                  *fiterrors = *fiterrors || !approxequal(rep.maxerror, rep2.maxerror, 1.0E-12 * rmax3(1.0, rep.maxerror, rep2.maxerror));
+                  *fiterrors = *fiterrors || !NearAtR(spline1dcalc(&c, v), spline1dcalc(&c2, v), 1.0E-12);
+                  *fiterrors = *fiterrors || !NearAtR(rep.taskrcond, rep2.taskrcond, 1.0E-12 * rmax3(1.0, rep.taskrcond, rep2.taskrcond));
+                  *fiterrors = *fiterrors || !NearAtR(rep.rmserror, rep2.rmserror, 1.0E-12 * rmax3(1.0, rep.rmserror, rep2.rmserror));
+                  *fiterrors = *fiterrors || !NearAtR(rep.avgerror, rep2.avgerror, 1.0E-12 * rmax3(1.0, rep.avgerror, rep2.avgerror));
+                  *fiterrors = *fiterrors || !NearAtR(rep.avgrelerror, rep2.avgrelerror, 1.0E-12 * rmax3(1.0, rep.avgrelerror, rep2.avgrelerror));
+                  *fiterrors = *fiterrors || !NearAtR(rep.maxerror, rep2.maxerror, 1.0E-12 * rmax3(1.0, rep.maxerror, rep2.maxerror));
                }
             }
          }
@@ -60723,12 +60723,12 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
             } else {
                for (i = 0; i < n; i++) {
                   v = randomreal() * (n - 1);
-                  *fiterrors = *fiterrors || !approxequal(spline1dcalc(&c, v), spline1dcalc(&c2, v), 1.0E-12);
-                  *fiterrors = *fiterrors || !approxequal(rep.taskrcond, rep2.taskrcond, 1.0E-12 * rmax3(1.0, rep.taskrcond, rep2.taskrcond));
-                  *fiterrors = *fiterrors || !approxequal(rep.rmserror, rep2.rmserror, 1.0E-12 * rmax3(1.0, rep.rmserror, rep2.rmserror));
-                  *fiterrors = *fiterrors || !approxequal(rep.avgerror, rep2.avgerror, 1.0E-12 * rmax3(1.0, rep.avgerror, rep2.avgerror));
-                  *fiterrors = *fiterrors || !approxequal(rep.avgrelerror, rep2.avgrelerror, 1.0E-12 * rmax3(1.0, rep.avgrelerror, rep2.avgrelerror));
-                  *fiterrors = *fiterrors || !approxequal(rep.maxerror, rep2.maxerror, 1.0E-12 * rmax3(1.0, rep.maxerror, rep2.maxerror));
+                  *fiterrors = *fiterrors || !NearAtR(spline1dcalc(&c, v), spline1dcalc(&c2, v), 1.0E-12);
+                  *fiterrors = *fiterrors || !NearAtR(rep.taskrcond, rep2.taskrcond, 1.0E-12 * rmax3(1.0, rep.taskrcond, rep2.taskrcond));
+                  *fiterrors = *fiterrors || !NearAtR(rep.rmserror, rep2.rmserror, 1.0E-12 * rmax3(1.0, rep.rmserror, rep2.rmserror));
+                  *fiterrors = *fiterrors || !NearAtR(rep.avgerror, rep2.avgerror, 1.0E-12 * rmax3(1.0, rep.avgerror, rep2.avgerror));
+                  *fiterrors = *fiterrors || !NearAtR(rep.avgrelerror, rep2.avgrelerror, 1.0E-12 * rmax3(1.0, rep.avgrelerror, rep2.avgrelerror));
+                  *fiterrors = *fiterrors || !NearAtR(rep.maxerror, rep2.maxerror, 1.0E-12 * rmax3(1.0, rep.maxerror, rep2.maxerror));
                }
             }
          }
@@ -60783,11 +60783,11 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
          *fiterrors = true;
       } else {
          s = spline1dcalc(&c, 0.0);
-         *fiterrors = *fiterrors || fabs(s - v) > threshold;
-         *fiterrors = *fiterrors || fabs(rep.rmserror - refrms) > threshold;
-         *fiterrors = *fiterrors || fabs(rep.avgerror - refavg) > threshold;
-         *fiterrors = *fiterrors || fabs(rep.avgrelerror - refavgrel) > threshold;
-         *fiterrors = *fiterrors || fabs(rep.maxerror - refmax) > threshold;
+         *fiterrors = *fiterrors || !NearAtR(s, v, threshold);
+         *fiterrors = *fiterrors || !NearAtR(rep.rmserror, refrms, threshold);
+         *fiterrors = *fiterrors || !NearAtR(rep.avgerror, refavg, threshold);
+         *fiterrors = *fiterrors || !NearAtR(rep.avgrelerror, refavgrel, threshold);
+         *fiterrors = *fiterrors || !NearAtR(rep.maxerror, refmax, threshold);
       }
    // Test Hermite fitting
       spline1dfithermite(&x, &y, 4, 4, &info, &c, &rep);
@@ -60795,11 +60795,11 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
          *fiterrors = true;
       } else {
          s = spline1dcalc(&c, 0.0);
-         *fiterrors = *fiterrors || fabs(s - v) > threshold;
-         *fiterrors = *fiterrors || fabs(rep.rmserror - refrms) > threshold;
-         *fiterrors = *fiterrors || fabs(rep.avgerror - refavg) > threshold;
-         *fiterrors = *fiterrors || fabs(rep.avgrelerror - refavgrel) > threshold;
-         *fiterrors = *fiterrors || fabs(rep.maxerror - refmax) > threshold;
+         *fiterrors = *fiterrors || !NearAtR(s, v, threshold);
+         *fiterrors = *fiterrors || !NearAtR(rep.rmserror, refrms, threshold);
+         *fiterrors = *fiterrors || !NearAtR(rep.avgerror, refavg, threshold);
+         *fiterrors = *fiterrors || !NearAtR(rep.avgrelerror, refavgrel, threshold);
+         *fiterrors = *fiterrors || !NearAtR(rep.maxerror, refmax, threshold);
       }
    }
    ae_frame_leave();
@@ -61507,7 +61507,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(rawc.xyR[i], 1, c1.xR, 1, nc);
          v -= rawc.xyR[i][nc];
-         set_error_flag(errorflag, fabs(v) > xtol, __FILE__, __LINE__, "testlsfitunit.ap:3306");
+         set_error_flag(errorflag, !SmallAtR(v, xtol), __FILE__, __LINE__, "testlsfitunit.ap:3306");
       }
    // Make several random trial steps and:
    // 0) generate small random trial step
@@ -61598,7 +61598,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
             ae_frame_leave();
             return;
          }
-         set_error_flag(errorflag, fabs(c1.xR[0] - rawc.xyR[0][1]) > 1.0E-6, __FILE__, __LINE__, "testlsfitunit.ap:3418");
+         set_error_flag(errorflag, !NearAtR(c1.xR[0], rawc.xyR[0][1], 1.0E-6), __FILE__, __LINE__, "testlsfitunit.ap:3418");
       }
    }
 // Fit
@@ -61660,7 +61660,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          for (j = 0; j < nc; j++) {
             v += rawc.xyR[0][j] * c1.xR[j];
          }
-         set_error_flag(errorflag, fabs(v) > 1.0E-6, __FILE__, __LINE__, "testlsfitunit.ap:3489");
+         set_error_flag(errorflag, !SmallAtR(v, 1.0E-6), __FILE__, __LINE__, "testlsfitunit.ap:3489");
       }
    }
    ae_frame_leave();
@@ -61711,7 +61711,7 @@ static bool testlsfitunit_isglssolution(ae_int_t n, ae_int_t m, ae_int_t k, RVec
 // test whether C is feasible point or not (projC must be close to C)
    for (i = 0; i < k; i++) {
       v = ae_v_dotproduct(cmatrix->xyR[i], 1, c->xR, 1, m);
-      if (fabs(v - cmatrix->xyR[i][m]) > threshold) {
+      if (!NearAtR(v, cmatrix->xyR[i][m], threshold)) {
          result = false;
          ae_frame_leave();
          return result;
@@ -61936,7 +61936,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             // test answer correctness using design matrix properties
             // and previous task solution
                for (j = 0; j < m; j++) {
-                  set_error_flag(llserrors, fabs(c2.xR[2 * j + 0] + c2.xR[2 * j + 1] - c.xR[j]) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1126");
+                  set_error_flag(llserrors, !NearAtR(c2.xR[2 * j + 0] + c2.xR[2 * j + 1], c.xR[j], threshold), __FILE__, __LINE__, "testlsfitunit.ap:1126");
                }
             }
          // test non-weighted fitting
@@ -61951,9 +61951,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             } else {
             // test answer correctness
                for (j = 0; j < m; j++) {
-                  set_error_flag(llserrors, fabs(c.xR[j] - c2.xR[j]) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1145");
+                  set_error_flag(llserrors, !NearAtR(c.xR[j], c2.xR[j], threshold), __FILE__, __LINE__, "testlsfitunit.ap:1145");
                }
-               set_error_flag(llserrors, fabs(rep.taskrcond - rep2.taskrcond) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1146");
+               set_error_flag(llserrors, !NearAtR(rep.taskrcond, rep2.taskrcond, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1146");
             }
          // test nonlinear fitting on the linear task
          // (only non-degenerate tasks are tested)
@@ -61973,7 +61973,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1170");
                } else {
                   for (i = 0; i < m; i++) {
-                     set_error_flag(nlserrors, fabs(c.xR[i] - c2.xR[i]) > 100 * nlthreshold, __FILE__, __LINE__, "testlsfitunit.ap:1174");
+                     set_error_flag(nlserrors, !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1174");
                   }
                }
                for (i = 0; i < m; i++) {
@@ -61987,7 +61987,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1184");
                } else {
                   for (i = 0; i < m; i++) {
-                     set_error_flag(nlserrors, fabs(c.xR[i] - c2.xR[i]) > 100 * nlthreshold, __FILE__, __LINE__, "testlsfitunit.ap:1188");
+                     set_error_flag(nlserrors, !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1188");
                   }
                }
                for (i = 0; i < m; i++) {
@@ -62001,7 +62001,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1198");
                } else {
                   for (i = 0; i < m; i++) {
-                     set_error_flag(nlserrors, fabs(c.xR[i] - c2.xR[i]) > 100 * nlthreshold, __FILE__, __LINE__, "testlsfitunit.ap:1202");
+                     set_error_flag(nlserrors, !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1202");
                   }
                }
             // test gradient-only or Hessian-based fitting without weights
@@ -62017,7 +62017,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1217");
                } else {
                   for (i = 0; i < m; i++) {
-                     set_error_flag(nlserrors, fabs(c.xR[i] - c2.xR[i]) > 100 * nlthreshold, __FILE__, __LINE__, "testlsfitunit.ap:1221");
+                     set_error_flag(nlserrors, !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1221");
                   }
                }
                for (i = 0; i < m; i++) {
@@ -62031,7 +62031,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1231");
                } else {
                   for (i = 0; i < m; i++) {
-                     set_error_flag(nlserrors, fabs(c.xR[i] - c2.xR[i]) > 100 * nlthreshold, __FILE__, __LINE__, "testlsfitunit.ap:1235");
+                     set_error_flag(nlserrors, !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1235");
                   }
                }
                for (i = 0; i < m; i++) {
@@ -62045,7 +62045,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1245");
                } else {
                   for (i = 0; i < m; i++) {
-                     set_error_flag(nlserrors, fabs(c.xR[i] - c2.xR[i]) > 100 * nlthreshold, __FILE__, __LINE__, "testlsfitunit.ap:1249");
+                     set_error_flag(nlserrors, !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1249");
                   }
                }
             }
@@ -62076,7 +62076,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
       if (info <= 0) {
          set_error_flag(llserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1281");
       } else {
-         set_error_flag(llserrors, fabs(rep.taskrcond - v1 / v2) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1283");
+         set_error_flag(llserrors, !NearAtR(rep.taskrcond, v1 / v2, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1283");
       }
    }
 // Test constrained least squares
@@ -62133,9 +62133,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                } else {
                // test answer correctness
                   for (j = 0; j < m; j++) {
-                     set_error_flag(llserrors, fabs(c.xR[j] - c2.xR[j]) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1352");
+                     set_error_flag(llserrors, !NearAtR(c.xR[j], c2.xR[j], threshold), __FILE__, __LINE__, "testlsfitunit.ap:1352");
                   }
-                  set_error_flag(llserrors, fabs(rep.taskrcond - rep2.taskrcond) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1353");
+                  set_error_flag(llserrors, !NearAtR(rep.taskrcond, rep2.taskrcond, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1353");
                }
             }
          }
@@ -62167,7 +62167,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    if (info <= 0) {
       set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1389");
    } else {
-      set_error_flag(nlserrors, fabs(c.xR[0] - 2) > 100 * nlthreshold, __FILE__, __LINE__, "testlsfitunit.ap:1391");
+      set_error_flag(nlserrors, !NearAtR(c.xR[0], 2.0, 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1391");
    }
 // solve simple task (fitting by constant function) and check
 // correctness of the errors calculated by subroutines
@@ -62198,11 +62198,11 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
       if (info <= 0) {
          set_error_flag(llserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1429");
       } else {
-         set_error_flag(llserrors, fabs(c.xR[0] - v) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1432");
-         set_error_flag(llserrors, fabs(rep.rmserror - refrms) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1433");
-         set_error_flag(llserrors, fabs(rep.avgerror - refavg) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1434");
-         set_error_flag(llserrors, fabs(rep.avgrelerror - refavgrel) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1435");
-         set_error_flag(llserrors, fabs(rep.maxerror - refmax) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1436");
+         set_error_flag(llserrors, !NearAtR(c.xR[0], v, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1432");
+         set_error_flag(llserrors, !NearAtR(rep.rmserror, refrms, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1433");
+         set_error_flag(llserrors, !NearAtR(rep.avgerror, refavg, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1434");
+         set_error_flag(llserrors, !NearAtR(rep.avgrelerror, refavgrel, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1435");
+         set_error_flag(llserrors, !NearAtR(rep.maxerror, refmax, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1436");
       }
    // Test NLS
       lsfitcreatefg(&a, &y, &c, 4, 1, 1, true, &state);
@@ -62218,11 +62218,11 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
       if (info <= 0) {
          set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1456");
       } else {
-         set_error_flag(nlserrors, fabs(c.xR[0] - v) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1459");
-         set_error_flag(nlserrors, fabs(rep.rmserror - refrms) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1460");
-         set_error_flag(nlserrors, fabs(rep.avgerror - refavg) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1461");
-         set_error_flag(nlserrors, fabs(rep.avgrelerror - refavgrel) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1462");
-         set_error_flag(nlserrors, fabs(rep.maxerror - refmax) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1463");
+         set_error_flag(nlserrors, !NearAtR(c.xR[0], v, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1459");
+         set_error_flag(nlserrors, !NearAtR(rep.rmserror, refrms, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1460");
+         set_error_flag(nlserrors, !NearAtR(rep.avgerror, refavg, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1461");
+         set_error_flag(nlserrors, !NearAtR(rep.avgrelerror, refavgrel, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1462");
+         set_error_flag(nlserrors, !NearAtR(rep.maxerror, refmax, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1463");
       }
    }
 // Check covariance matrix, errors-in-parameters.
@@ -62350,7 +62350,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             avgdeviationnoise = 0.0;
             adncnt = 0.0;
             for (i = 0; i < n; i++) {
-               set_error_flag(llserrors, fabs(rep.covpar.xyR[i][i] - sqr(rep.errpar.xR[i])) > 100.0 * machineepsilon * rmax2(sqr(rep.errpar.xR[i]), rep.covpar.xyR[i][i]), __FILE__, __LINE__, "testlsfitunit.ap:1612");
+               set_error_flag(llserrors, !NearAtR(rep.covpar.xyR[i][i], sqr(rep.errpar.xR[i]), 100.0 * machineepsilon * rmax2(sqr(rep.errpar.xR[i]), rep.covpar.xyR[i][i])), __FILE__, __LINE__, "testlsfitunit.ap:1612");
             }
             for (i = 0; i < n; i++) {
                avgdeviationpar = (avgdeviationpar * adpcnt + fabs(c.xR[i] - cend.xR[i]) / rep.errpar.xR[i]) / (adpcnt + 1);
@@ -62465,7 +62465,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    // Compare covariance matrices, it should be enough to test algorithm
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            set_error_flag(nlserrors, fabs(rep.covpar.xyR[i][j] - rep2.covpar.xyR[i][j]) > 1.0E-4 * rmax2(rep.covpar.xyR[i][i], rep.covpar.xyR[j][j]), __FILE__, __LINE__, "testlsfitunit.ap:1762");
+            set_error_flag(nlserrors, !NearAtR(rep.covpar.xyR[i][j], rep2.covpar.xyR[i][j], 1.0E-4 * rmax2(rep.covpar.xyR[i][i], rep.covpar.xyR[j][j])), __FILE__, __LINE__, "testlsfitunit.ap:1762");
          }
       }
    }
@@ -62490,9 +62490,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    a.xyR[3][1] = 2.0;
    y.xR[3] = 2.0;
    lsfitlinear(&y, &a, 4, 1, &info, &c, &rep);
-   set_error_flag(llserrors, info <= 0 || fabs(rep.r2 - 0) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1788");
+   set_error_flag(llserrors, info <= 0 || !NearAtR(rep.r2, 0.0, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1788");
    lsfitlinear(&y, &a, 4, 2, &info, &c, &rep);
-   set_error_flag(llserrors, info <= 0 || fabs(rep.r2 - 1) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1790");
+   set_error_flag(llserrors, info <= 0 || !NearAtR(rep.r2, 1.0, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1790");
    a.xyR[0][0] = 1.0;
    a.xyR[0][1] = -1.0;
    y.xR[0] = -1.0;
@@ -62506,7 +62506,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    a.xyR[3][1] = 1.0;
    y.xR[3] = 0.0;
    lsfitlinear(&y, &a, 4, 2, &info, &c, &rep);
-   set_error_flag(llserrors, info <= 0 || fabs(rep.r2 - 0.5) > threshold, __FILE__, __LINE__, "testlsfitunit.ap:1804");
+   set_error_flag(llserrors, info <= 0 || !NearAtR(rep.r2, 0.5, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1804");
    n = 3;
    ae_matrix_set_length(&a, 3, 1);
    ae_vector_set_length(&y, 3);
@@ -62640,7 +62640,7 @@ static void testlsfitunit_testrdp(bool *errorflag) {
       }
       spline1dbuildlinear(&x2, &y2, nsections + 1, &s);
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, fabs(spline1dcalc(&s, x.xR[i]) - y.xR[i]) > eps, __FILE__, __LINE__, "testlsfitunit.ap:1954");
+         set_error_flag(errorflag, !NearAtR(spline1dcalc(&s, x.xR[i]), y.xR[i], eps), __FILE__, __LINE__, "testlsfitunit.ap:1954");
       }
    // compare results with values returned by section-based algorithm
       lstfitpiecewiselinearrdpfixed(&x, &y, n, nsections, &x3, &y3, &nsections3);
@@ -62650,8 +62650,8 @@ static void testlsfitunit_testrdp(bool *errorflag) {
          return;
       }
       for (i = 0; i < nsections; i++) {
-         set_error_flag(errorflag, fabs(x2.xR[i] - x3.xR[i]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testlsfitunit.ap:1965");
-         set_error_flag(errorflag, fabs(y2.xR[i] - y3.xR[i]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testlsfitunit.ap:1966");
+         set_error_flag(errorflag, !NearAtR(x2.xR[i], x3.xR[i], 1000.0 * machineepsilon), __FILE__, __LINE__, "testlsfitunit.ap:1965");
+         set_error_flag(errorflag, !NearAtR(y2.xR[i], y3.xR[i], 1000.0 * machineepsilon), __FILE__, __LINE__, "testlsfitunit.ap:1966");
       }
    // Next epsilon
       eps *= 0.5;
@@ -62770,7 +62770,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
                         }
                      }
                      v0 = logisticcalc4(v, a, b, c, d);
-                     set_error_flag(fiterrors, fabs(vv - v0) > tol, __FILE__, __LINE__, "testlsfitunit.ap:2057");
+                     set_error_flag(fiterrors, !NearAtR(vv, v0, tol), __FILE__, __LINE__, "testlsfitunit.ap:2057");
                   // Test 5PL calculation
                      if (v != 0.0) {
                         vv = d + (a - d) / pow(1 + pow(v / c, b), g);
@@ -62786,7 +62786,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
                         }
                      }
                      v0 = logisticcalc5(v, a, b, c, d, g);
-                     set_error_flag(fiterrors, fabs(vv - v0) > tol, __FILE__, __LINE__, "testlsfitunit.ap:2074");
+                     set_error_flag(fiterrors, !NearAtR(vv, v0, tol), __FILE__, __LINE__, "testlsfitunit.ap:2074");
                   }
                }
             }
@@ -63122,11 +63122,11 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
       if (k > 0) {
          eavgrel /= k;
       }
-      set_error_flag(fiterrors, fabs(erms - rep.rmserror) > tol, __FILE__, __LINE__, "testlsfitunit.ap:2477");
-      set_error_flag(fiterrors, fabs(eavg - rep.avgerror) > tol, __FILE__, __LINE__, "testlsfitunit.ap:2478");
-      set_error_flag(fiterrors, fabs(emax - rep.maxerror) > tol, __FILE__, __LINE__, "testlsfitunit.ap:2479");
-      set_error_flag(fiterrors, fabs(eavgrel - rep.avgrelerror) > tol, __FILE__, __LINE__, "testlsfitunit.ap:2480");
-      set_error_flag(fiterrors, fabs(er2 - rep.r2) > tol, __FILE__, __LINE__, "testlsfitunit.ap:2481");
+      set_error_flag(fiterrors, !NearAtR(erms, rep.rmserror, tol), __FILE__, __LINE__, "testlsfitunit.ap:2477");
+      set_error_flag(fiterrors, !NearAtR(eavg, rep.avgerror, tol), __FILE__, __LINE__, "testlsfitunit.ap:2478");
+      set_error_flag(fiterrors, !NearAtR(emax, rep.maxerror, tol), __FILE__, __LINE__, "testlsfitunit.ap:2479");
+      set_error_flag(fiterrors, !NearAtR(eavgrel, rep.avgrelerror, tol), __FILE__, __LINE__, "testlsfitunit.ap:2480");
+      set_error_flag(fiterrors, !NearAtR(er2, rep.r2, tol), __FILE__, __LINE__, "testlsfitunit.ap:2481");
    }
 // Test previously fixed bug #834
    ae_vector_set_length(&x, 0);
@@ -63569,7 +63569,7 @@ static void testfitsphereunit_testspherefittingls(bool *err) {
          }
          vv += sqrt(v) / npoints;
       }
-      set_error_flag(err, fabs(vv - rlo) > xtol, __FILE__, __LINE__, "testfitsphereunit.ap:118");
+      set_error_flag(err, !NearAtR(vv, rlo, xtol), __FILE__, __LINE__, "testfitsphereunit.ap:118");
       testfitsphereunit_calclserror(&xy, npoints, nx, &cx, &v0);
    // Check that small perturbations to center position increase target function
    //
@@ -63829,10 +63829,10 @@ static void testfitsphereunit_testspherefittingvosswinkel2(bool *err) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(err, fabs(cx.xR[0] + 0.050884688) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:398");
-   set_error_flag(err, fabs(cx.xR[1] + 0.011472328) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:399");
-   set_error_flag(err, fabs(rlo - 0.150973382) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:400");
-   set_error_flag(err, fabs(rhi - 0.164374709) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:401");
+   set_error_flag(err, !NearAtR(cx.xR[0], -0.050884688, tol), __FILE__, __LINE__, "testfitsphereunit.ap:398");
+   set_error_flag(err, !NearAtR(cx.xR[1], -0.011472328, tol), __FILE__, __LINE__, "testfitsphereunit.ap:399");
+   set_error_flag(err, !NearAtR(rlo, 0.150973382, tol), __FILE__, __LINE__, "testfitsphereunit.ap:400");
+   set_error_flag(err, !NearAtR(rhi, 0.164374709, tol), __FILE__, __LINE__, "testfitsphereunit.ap:401");
    SetVector(&cx);
    rlo = 0.0;
    rhi = 0.0;
@@ -63842,10 +63842,10 @@ static void testfitsphereunit_testspherefittingvosswinkel2(bool *err) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(err, fabs(cx.xR[0] + 0.050884688) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:409");
-   set_error_flag(err, fabs(cx.xR[1] + 0.011472328) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:410");
-   set_error_flag(err, fabs(rlo - 0.150973382) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:411");
-   set_error_flag(err, fabs(rhi - 0.164374709) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:412");
+   set_error_flag(err, !NearAtR(cx.xR[0], -0.050884688, tol), __FILE__, __LINE__, "testfitsphereunit.ap:409");
+   set_error_flag(err, !NearAtR(cx.xR[1], -0.011472328, tol), __FILE__, __LINE__, "testfitsphereunit.ap:410");
+   set_error_flag(err, !NearAtR(rlo, 0.150973382, tol), __FILE__, __LINE__, "testfitsphereunit.ap:411");
+   set_error_flag(err, !NearAtR(rhi, 0.164374709, tol), __FILE__, __LINE__, "testfitsphereunit.ap:412");
 // MC problem, NLC solver
    SetVector(&cx);
    rlo = 0.0;
@@ -63856,10 +63856,10 @@ static void testfitsphereunit_testspherefittingvosswinkel2(bool *err) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(err, fabs(cx.xR[0] + 0.051137580) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:424");
-   set_error_flag(err, fabs(cx.xR[1] + 0.011680985) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:425");
+   set_error_flag(err, !NearAtR(cx.xR[0], -0.051137580, tol), __FILE__, __LINE__, "testfitsphereunit.ap:424");
+   set_error_flag(err, !NearAtR(cx.xR[1], -0.011680985, tol), __FILE__, __LINE__, "testfitsphereunit.ap:425");
    set_error_flag(err, rlo != 0.0, __FILE__, __LINE__, "testfitsphereunit.ap:426");
-   set_error_flag(err, fabs(rhi - 0.164365735) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:427");
+   set_error_flag(err, !NearAtR(rhi, 0.164365735, tol), __FILE__, __LINE__, "testfitsphereunit.ap:427");
    SetVector(&cx);
    rlo = 0.0;
    rhi = 0.0;
@@ -63869,10 +63869,10 @@ static void testfitsphereunit_testspherefittingvosswinkel2(bool *err) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(err, fabs(cx.xR[0] + 0.051137580) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:435");
-   set_error_flag(err, fabs(cx.xR[1] + 0.011680985) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:436");
+   set_error_flag(err, !NearAtR(cx.xR[0], -0.051137580, tol), __FILE__, __LINE__, "testfitsphereunit.ap:435");
+   set_error_flag(err, !NearAtR(cx.xR[1], -0.011680985, tol), __FILE__, __LINE__, "testfitsphereunit.ap:436");
    set_error_flag(err, rlo != 0.0, __FILE__, __LINE__, "testfitsphereunit.ap:437");
-   set_error_flag(err, fabs(rhi - 0.164365735) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:438");
+   set_error_flag(err, !NearAtR(rhi, 0.164365735, tol), __FILE__, __LINE__, "testfitsphereunit.ap:438");
 // MI problem, NLC solver
    SetVector(&cx);
    rlo = 0.0;
@@ -63883,9 +63883,9 @@ static void testfitsphereunit_testspherefittingvosswinkel2(bool *err) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(err, fabs(cx.xR[0] + 0.054593489) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:450");
-   set_error_flag(err, fabs(cx.xR[1] + 0.007459466) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:451");
-   set_error_flag(err, fabs(rlo - 0.152429205) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:452");
+   set_error_flag(err, !NearAtR(cx.xR[0], -0.054593489, tol), __FILE__, __LINE__, "testfitsphereunit.ap:450");
+   set_error_flag(err, !NearAtR(cx.xR[1], -0.007459466, tol), __FILE__, __LINE__, "testfitsphereunit.ap:451");
+   set_error_flag(err, !NearAtR(rlo, 0.152429205, tol), __FILE__, __LINE__, "testfitsphereunit.ap:452");
    set_error_flag(err, rhi != 0.0, __FILE__, __LINE__, "testfitsphereunit.ap:453");
    SetVector(&cx);
    rlo = 0.0;
@@ -63896,9 +63896,9 @@ static void testfitsphereunit_testspherefittingvosswinkel2(bool *err) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(err, fabs(cx.xR[0] + 0.054593489) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:461");
-   set_error_flag(err, fabs(cx.xR[1] + 0.007459466) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:462");
-   set_error_flag(err, fabs(rlo - 0.152429205) > tol, __FILE__, __LINE__, "testfitsphereunit.ap:463");
+   set_error_flag(err, !NearAtR(cx.xR[0], -0.054593489, tol), __FILE__, __LINE__, "testfitsphereunit.ap:461");
+   set_error_flag(err, !NearAtR(cx.xR[1], -0.007459466, tol), __FILE__, __LINE__, "testfitsphereunit.ap:462");
+   set_error_flag(err, !NearAtR(rlo, 0.152429205, tol), __FILE__, __LINE__, "testfitsphereunit.ap:463");
    set_error_flag(err, rhi != 0.0, __FILE__, __LINE__, "testfitsphereunit.ap:464");
    ae_frame_leave();
 }
@@ -64189,7 +64189,7 @@ static void testparametricunit_testrdp(bool *errorflag) {
          for (i = 0; i <= nsections; i++) {
             set_error_flag(errorflag, idx2.xZ[i] != idx3.xZ[i], __FILE__, __LINE__, "testparametricunit.ap:273");
             for (j = 0; j < d; j++) {
-               set_error_flag(errorflag, fabs(xy2.xyR[i][j] - xy3.xyR[i][j]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testparametricunit.ap:275");
+               set_error_flag(errorflag, !NearAtR(xy2.xyR[i][j], xy3.xyR[i][j], 1000.0 * machineepsilon), __FILE__, __LINE__, "testparametricunit.ap:275");
             }
          }
       }
@@ -64365,13 +64365,13 @@ bool testparametric(bool silent) {
                for (i = 0; i < n; i++) {
                // 2-dimensional test
                   pspline2calc(&p2, t2.xR[i], &vx, &vy);
-                  p2errors = p2errors || fabs(vx - x.xR[i]) > threshold;
-                  p2errors = p2errors || fabs(vy - y.xR[i]) > threshold;
+                  p2errors = p2errors || !NearAtR(vx, x.xR[i], threshold);
+                  p2errors = p2errors || !NearAtR(vy, y.xR[i], threshold);
                // 3-dimensional test
                   pspline3calc(&p3, t3.xR[i], &vx, &vy, &vz);
-                  p3errors = p3errors || fabs(vx - x.xR[i]) > threshold;
-                  p3errors = p3errors || fabs(vy - y.xR[i]) > threshold;
-                  p3errors = p3errors || fabs(vz - z.xR[i]) > threshold;
+                  p3errors = p3errors || !NearAtR(vx, x.xR[i], threshold);
+                  p3errors = p3errors || !NearAtR(vy, y.xR[i], threshold);
+                  p3errors = p3errors || !NearAtR(vz, z.xR[i], threshold);
                }
             // Test periodicity (if needed)
                if (periodic) {
@@ -64379,39 +64379,39 @@ bool testparametric(bool silent) {
                   for (i = 0; i < n; i++) {
                   // 2-dimensional test
                      pspline2calc(&p2, t2.xR[i] + randominteger(10) - 5, &vx, &vy);
-                     p2errors = p2errors || fabs(vx - x.xR[i]) > threshold;
-                     p2errors = p2errors || fabs(vy - y.xR[i]) > threshold;
+                     p2errors = p2errors || !NearAtR(vx, x.xR[i], threshold);
+                     p2errors = p2errors || !NearAtR(vy, y.xR[i], threshold);
                      pspline2diff(&p2, t2.xR[i] + randominteger(10) - 5, &vx, &vdx, &vy, &vdy);
-                     p2errors = p2errors || fabs(vx - x.xR[i]) > threshold;
-                     p2errors = p2errors || fabs(vy - y.xR[i]) > threshold;
+                     p2errors = p2errors || !NearAtR(vx, x.xR[i], threshold);
+                     p2errors = p2errors || !NearAtR(vy, y.xR[i], threshold);
                      pspline2diff2(&p2, t2.xR[i] + randominteger(10) - 5, &vx, &vdx, &vd2x, &vy, &vdy, &vd2y);
-                     p2errors = p2errors || fabs(vx - x.xR[i]) > threshold;
-                     p2errors = p2errors || fabs(vy - y.xR[i]) > threshold;
+                     p2errors = p2errors || !NearAtR(vx, x.xR[i], threshold);
+                     p2errors = p2errors || !NearAtR(vy, y.xR[i], threshold);
                   // 3-dimensional test
                      pspline3calc(&p3, t3.xR[i] + randominteger(10) - 5, &vx, &vy, &vz);
-                     p3errors = p3errors || fabs(vx - x.xR[i]) > threshold;
-                     p3errors = p3errors || fabs(vy - y.xR[i]) > threshold;
-                     p3errors = p3errors || fabs(vz - z.xR[i]) > threshold;
+                     p3errors = p3errors || !NearAtR(vx, x.xR[i], threshold);
+                     p3errors = p3errors || !NearAtR(vy, y.xR[i], threshold);
+                     p3errors = p3errors || !NearAtR(vz, z.xR[i], threshold);
                      pspline3diff(&p3, t3.xR[i] + randominteger(10) - 5, &vx, &vdx, &vy, &vdy, &vz, &vdz);
-                     p3errors = p3errors || fabs(vx - x.xR[i]) > threshold;
-                     p3errors = p3errors || fabs(vy - y.xR[i]) > threshold;
-                     p3errors = p3errors || fabs(vz - z.xR[i]) > threshold;
+                     p3errors = p3errors || !NearAtR(vx, x.xR[i], threshold);
+                     p3errors = p3errors || !NearAtR(vy, y.xR[i], threshold);
+                     p3errors = p3errors || !NearAtR(vz, z.xR[i], threshold);
                      pspline3diff2(&p3, t3.xR[i] + randominteger(10) - 5, &vx, &vdx, &vd2x, &vy, &vdy, &vd2y, &vz, &vdz, &vd2z);
-                     p3errors = p3errors || fabs(vx - x.xR[i]) > threshold;
-                     p3errors = p3errors || fabs(vy - y.xR[i]) > threshold;
-                     p3errors = p3errors || fabs(vz - z.xR[i]) > threshold;
+                     p3errors = p3errors || !NearAtR(vx, x.xR[i], threshold);
+                     p3errors = p3errors || !NearAtR(vy, y.xR[i], threshold);
+                     p3errors = p3errors || !NearAtR(vz, z.xR[i], threshold);
                   }
                // periodicity between nodes
                   v0 = randomreal();
                   pspline2calc(&p2, v0, &vx, &vy);
                   pspline2calc(&p2, v0 + randominteger(10) - 5, &vx2, &vy2);
-                  p2errors = p2errors || fabs(vx - vx2) > threshold;
-                  p2errors = p2errors || fabs(vy - vy2) > threshold;
+                  p2errors = p2errors || !NearAtR(vx, vx2, threshold);
+                  p2errors = p2errors || !NearAtR(vy, vy2, threshold);
                   pspline3calc(&p3, v0, &vx, &vy, &vz);
                   pspline3calc(&p3, v0 + randominteger(10) - 5, &vx2, &vy2, &vz2);
-                  p3errors = p3errors || fabs(vx - vx2) > threshold;
-                  p3errors = p3errors || fabs(vy - vy2) > threshold;
-                  p3errors = p3errors || fabs(vz - vz2) > threshold;
+                  p3errors = p3errors || !NearAtR(vx, vx2, threshold);
+                  p3errors = p3errors || !NearAtR(vy, vy2, threshold);
+                  p3errors = p3errors || !NearAtR(vz, vz2, threshold);
                // near-boundary test for continuity of function values and derivatives:
                // 2-dimensional curve
                   ae_assert(skind == 1 || skind == 2, "TEST: unexpected spline type!");
@@ -64419,24 +64419,24 @@ bool testparametric(bool silent) {
                   v1 = 1 - v0;
                   pspline2calc(&p2, v0, &vx, &vy);
                   pspline2calc(&p2, v1, &vx2, &vy2);
-                  p2errors = p2errors || fabs(vx - vx2) > threshold;
-                  p2errors = p2errors || fabs(vy - vy2) > threshold;
+                  p2errors = p2errors || !NearAtR(vx, vx2, threshold);
+                  p2errors = p2errors || !NearAtR(vy, vy2, threshold);
                   pspline2diff(&p2, v0, &vx, &vdx, &vy, &vdy);
                   pspline2diff(&p2, v1, &vx2, &vdx2, &vy2, &vdy2);
-                  p2errors = p2errors || fabs(vx - vx2) > threshold;
-                  p2errors = p2errors || fabs(vy - vy2) > threshold;
-                  p2errors = p2errors || fabs(vdx - vdx2) > nonstrictthreshold;
-                  p2errors = p2errors || fabs(vdy - vdy2) > nonstrictthreshold;
+                  p2errors = p2errors || !NearAtR(vx, vx2, threshold);
+                  p2errors = p2errors || !NearAtR(vy, vy2, threshold);
+                  p2errors = p2errors || !NearAtR(vdx, vdx2, nonstrictthreshold);
+                  p2errors = p2errors || !NearAtR(vdy, vdy2, nonstrictthreshold);
                   pspline2diff2(&p2, v0, &vx, &vdx, &vd2x, &vy, &vdy, &vd2y);
                   pspline2diff2(&p2, v1, &vx2, &vdx2, &vd2x2, &vy2, &vdy2, &vd2y2);
-                  p2errors = p2errors || fabs(vx - vx2) > threshold;
-                  p2errors = p2errors || fabs(vy - vy2) > threshold;
-                  p2errors = p2errors || fabs(vdx - vdx2) > nonstrictthreshold;
-                  p2errors = p2errors || fabs(vdy - vdy2) > nonstrictthreshold;
+                  p2errors = p2errors || !NearAtR(vx, vx2, threshold);
+                  p2errors = p2errors || !NearAtR(vy, vy2, threshold);
+                  p2errors = p2errors || !NearAtR(vdx, vdx2, nonstrictthreshold);
+                  p2errors = p2errors || !NearAtR(vdy, vdy2, nonstrictthreshold);
                   if (skind == 2) {
                   // second derivative test only for cubic splines
-                     p2errors = p2errors || fabs(vd2x - vd2x2) > nonstrictthreshold;
-                     p2errors = p2errors || fabs(vd2y - vd2y2) > nonstrictthreshold;
+                     p2errors = p2errors || !NearAtR(vd2x, vd2x2, nonstrictthreshold);
+                     p2errors = p2errors || !NearAtR(vd2y, vd2y2, nonstrictthreshold);
                   }
                // near-boundary test for continuity of function values and derivatives:
                // 3-dimensional curve
@@ -64445,30 +64445,30 @@ bool testparametric(bool silent) {
                   v1 = 1 - v0;
                   pspline3calc(&p3, v0, &vx, &vy, &vz);
                   pspline3calc(&p3, v1, &vx2, &vy2, &vz2);
-                  p3errors = p3errors || fabs(vx - vx2) > threshold;
-                  p3errors = p3errors || fabs(vy - vy2) > threshold;
-                  p3errors = p3errors || fabs(vz - vz2) > threshold;
+                  p3errors = p3errors || !NearAtR(vx, vx2, threshold);
+                  p3errors = p3errors || !NearAtR(vy, vy2, threshold);
+                  p3errors = p3errors || !NearAtR(vz, vz2, threshold);
                   pspline3diff(&p3, v0, &vx, &vdx, &vy, &vdy, &vz, &vdz);
                   pspline3diff(&p3, v1, &vx2, &vdx2, &vy2, &vdy2, &vz2, &vdz2);
-                  p3errors = p3errors || fabs(vx - vx2) > threshold;
-                  p3errors = p3errors || fabs(vy - vy2) > threshold;
-                  p3errors = p3errors || fabs(vz - vz2) > threshold;
-                  p3errors = p3errors || fabs(vdx - vdx2) > nonstrictthreshold;
-                  p3errors = p3errors || fabs(vdy - vdy2) > nonstrictthreshold;
-                  p3errors = p3errors || fabs(vdz - vdz2) > nonstrictthreshold;
+                  p3errors = p3errors || !NearAtR(vx, vx2, threshold);
+                  p3errors = p3errors || !NearAtR(vy, vy2, threshold);
+                  p3errors = p3errors || !NearAtR(vz, vz2, threshold);
+                  p3errors = p3errors || !NearAtR(vdx, vdx2, nonstrictthreshold);
+                  p3errors = p3errors || !NearAtR(vdy, vdy2, nonstrictthreshold);
+                  p3errors = p3errors || !NearAtR(vdz, vdz2, nonstrictthreshold);
                   pspline3diff2(&p3, v0, &vx, &vdx, &vd2x, &vy, &vdy, &vd2y, &vz, &vdz, &vd2z);
                   pspline3diff2(&p3, v1, &vx2, &vdx2, &vd2x2, &vy2, &vdy2, &vd2y2, &vz2, &vdz2, &vd2z2);
-                  p3errors = p3errors || fabs(vx - vx2) > threshold;
-                  p3errors = p3errors || fabs(vy - vy2) > threshold;
-                  p3errors = p3errors || fabs(vz - vz2) > threshold;
-                  p3errors = p3errors || fabs(vdx - vdx2) > nonstrictthreshold;
-                  p3errors = p3errors || fabs(vdy - vdy2) > nonstrictthreshold;
-                  p3errors = p3errors || fabs(vdz - vdz2) > nonstrictthreshold;
+                  p3errors = p3errors || !NearAtR(vx, vx2, threshold);
+                  p3errors = p3errors || !NearAtR(vy, vy2, threshold);
+                  p3errors = p3errors || !NearAtR(vz, vz2, threshold);
+                  p3errors = p3errors || !NearAtR(vdx, vdx2, nonstrictthreshold);
+                  p3errors = p3errors || !NearAtR(vdy, vdy2, nonstrictthreshold);
+                  p3errors = p3errors || !NearAtR(vdz, vdz2, nonstrictthreshold);
                   if (skind == 2) {
                   // second derivative test only for cubic splines
-                     p3errors = p3errors || fabs(vd2x - vd2x2) > nonstrictthreshold;
-                     p3errors = p3errors || fabs(vd2y - vd2y2) > nonstrictthreshold;
-                     p3errors = p3errors || fabs(vd2z - vd2z2) > nonstrictthreshold;
+                     p3errors = p3errors || !NearAtR(vd2x, vd2x2, nonstrictthreshold);
+                     p3errors = p3errors || !NearAtR(vd2y, vd2y2, nonstrictthreshold);
+                     p3errors = p3errors || !NearAtR(vd2z, vd2z2, nonstrictthreshold);
                   }
                }
             }
@@ -64521,50 +64521,50 @@ bool testparametric(bool silent) {
       spline1ddiff(&s, v0, &vz2, &vdz2, &vd2z2);
    // 2D test
       pspline2calc(&p2, v0, &vx, &vy);
-      p2errors = p2errors || fabs(vx - vx2) > threshold;
-      p2errors = p2errors || fabs(vy - vy2) > threshold;
+      p2errors = p2errors || !NearAtR(vx, vx2, threshold);
+      p2errors = p2errors || !NearAtR(vy, vy2, threshold);
       pspline2diff(&p2, v0, &vx, &vdx, &vy, &vdy);
-      p2errors = p2errors || fabs(vx - vx2) > threshold;
-      p2errors = p2errors || fabs(vy - vy2) > threshold;
-      p2errors = p2errors || fabs(vdx - vdx2) > threshold;
-      p2errors = p2errors || fabs(vdy - vdy2) > threshold;
+      p2errors = p2errors || !NearAtR(vx, vx2, threshold);
+      p2errors = p2errors || !NearAtR(vy, vy2, threshold);
+      p2errors = p2errors || !NearAtR(vdx, vdx2, threshold);
+      p2errors = p2errors || !NearAtR(vdy, vdy2, threshold);
       pspline2diff2(&p2, v0, &vx, &vdx, &vd2x, &vy, &vdy, &vd2y);
-      p2errors = p2errors || fabs(vx - vx2) > threshold;
-      p2errors = p2errors || fabs(vy - vy2) > threshold;
-      p2errors = p2errors || fabs(vdx - vdx2) > threshold;
-      p2errors = p2errors || fabs(vdy - vdy2) > threshold;
-      p2errors = p2errors || fabs(vd2x - vd2x2) > threshold;
-      p2errors = p2errors || fabs(vd2y - vd2y2) > threshold;
+      p2errors = p2errors || !NearAtR(vx, vx2, threshold);
+      p2errors = p2errors || !NearAtR(vy, vy2, threshold);
+      p2errors = p2errors || !NearAtR(vdx, vdx2, threshold);
+      p2errors = p2errors || !NearAtR(vdy, vdy2, threshold);
+      p2errors = p2errors || !NearAtR(vd2x, vd2x2, threshold);
+      p2errors = p2errors || !NearAtR(vd2y, vd2y2, threshold);
    // 3D test
       pspline3calc(&p3, v0, &vx, &vy, &vz);
-      p3errors = p3errors || fabs(vx - vx2) > threshold;
-      p3errors = p3errors || fabs(vy - vy2) > threshold;
-      p3errors = p3errors || fabs(vz - vz2) > threshold;
+      p3errors = p3errors || !NearAtR(vx, vx2, threshold);
+      p3errors = p3errors || !NearAtR(vy, vy2, threshold);
+      p3errors = p3errors || !NearAtR(vz, vz2, threshold);
       pspline3diff(&p3, v0, &vx, &vdx, &vy, &vdy, &vz, &vdz);
-      p3errors = p3errors || fabs(vx - vx2) > threshold;
-      p3errors = p3errors || fabs(vy - vy2) > threshold;
-      p3errors = p3errors || fabs(vz - vz2) > threshold;
-      p3errors = p3errors || fabs(vdx - vdx2) > threshold;
-      p3errors = p3errors || fabs(vdy - vdy2) > threshold;
-      p3errors = p3errors || fabs(vdz - vdz2) > threshold;
+      p3errors = p3errors || !NearAtR(vx, vx2, threshold);
+      p3errors = p3errors || !NearAtR(vy, vy2, threshold);
+      p3errors = p3errors || !NearAtR(vz, vz2, threshold);
+      p3errors = p3errors || !NearAtR(vdx, vdx2, threshold);
+      p3errors = p3errors || !NearAtR(vdy, vdy2, threshold);
+      p3errors = p3errors || !NearAtR(vdz, vdz2, threshold);
       pspline3diff2(&p3, v0, &vx, &vdx, &vd2x, &vy, &vdy, &vd2y, &vz, &vdz, &vd2z);
-      p3errors = p3errors || fabs(vx - vx2) > threshold;
-      p3errors = p3errors || fabs(vy - vy2) > threshold;
-      p3errors = p3errors || fabs(vz - vz2) > threshold;
-      p3errors = p3errors || fabs(vdx - vdx2) > threshold;
-      p3errors = p3errors || fabs(vdy - vdy2) > threshold;
-      p3errors = p3errors || fabs(vdz - vdz2) > threshold;
-      p3errors = p3errors || fabs(vd2x - vd2x2) > threshold;
-      p3errors = p3errors || fabs(vd2y - vd2y2) > threshold;
-      p3errors = p3errors || fabs(vd2z - vd2z2) > threshold;
+      p3errors = p3errors || !NearAtR(vx, vx2, threshold);
+      p3errors = p3errors || !NearAtR(vy, vy2, threshold);
+      p3errors = p3errors || !NearAtR(vz, vz2, threshold);
+      p3errors = p3errors || !NearAtR(vdx, vdx2, threshold);
+      p3errors = p3errors || !NearAtR(vdy, vdy2, threshold);
+      p3errors = p3errors || !NearAtR(vdz, vdz2, threshold);
+      p3errors = p3errors || !NearAtR(vd2x, vd2x2, threshold);
+      p3errors = p3errors || !NearAtR(vd2y, vd2y2, threshold);
+      p3errors = p3errors || !NearAtR(vd2z, vd2z2, threshold);
    // Test tangents for 2D/3D
       pspline2tangent(&p2, v0, &vx, &vy);
-      p2errors = p2errors || fabs(vx - vdx2 / safepythag2(vdx2, vdy2)) > threshold;
-      p2errors = p2errors || fabs(vy - vdy2 / safepythag2(vdx2, vdy2)) > threshold;
+      p2errors = p2errors || !NearAtR(vx, vdx2 / safepythag2(vdx2, vdy2), threshold);
+      p2errors = p2errors || !NearAtR(vy, vdy2 / safepythag2(vdx2, vdy2), threshold);
       pspline3tangent(&p3, v0, &vx, &vy, &vz);
-      p3errors = p3errors || fabs(vx - vdx2 / safepythag3(vdx2, vdy2, vdz2)) > threshold;
-      p3errors = p3errors || fabs(vy - vdy2 / safepythag3(vdx2, vdy2, vdz2)) > threshold;
-      p3errors = p3errors || fabs(vz - vdz2 / safepythag3(vdx2, vdy2, vdz2)) > threshold;
+      p3errors = p3errors || !NearAtR(vx, vdx2 / safepythag3(vdx2, vdy2, vdz2), threshold);
+      p3errors = p3errors || !NearAtR(vy, vdy2 / safepythag3(vdx2, vdy2, vdz2), threshold);
+      p3errors = p3errors || !NearAtR(vz, vdz2 / safepythag3(vdx2, vdy2, vdz2), threshold);
    }
 // Arc length test.
 //
@@ -64584,8 +64584,8 @@ bool testparametric(bool silent) {
       pspline3build(&xyz, n, 1, 0, &p3);
       a = randomreal();
       b = randomreal();
-      p2errors = p2errors || fabs(pspline2arclength(&p2, a, b) - (b - a) * sqrt(2.0) * (n - 1)) > nonstrictthreshold;
-      p3errors = p3errors || fabs(pspline3arclength(&p3, a, b) - (b - a) * sqrt(3.0) * (n - 1)) > nonstrictthreshold;
+      p2errors = p2errors || !NearAtR(pspline2arclength(&p2, a, b), (b - a) * sqrt(2.0) * (n - 1), nonstrictthreshold);
+      p3errors = p3errors || !NearAtR(pspline3arclength(&p3, a, b), (b - a) * sqrt(3.0) * (n - 1), nonstrictthreshold);
    }
 // report
    waserrors = p2errors || p3errors || rdperrors;
@@ -65021,15 +65021,15 @@ static bool testspline2dunit_testspline2dvf(bool silent) {
                // Test calculation at grid points
                   spline2dcalcv(&vc, x.xR[i], y.xR[j], &resf);
                   resef = spline2dcalc(&sc, x.xR[i], y.xR[j]);
-                  set_error_flag(&result, fabs(resf.xR[k] - resef) > eps, __FILE__, __LINE__, "testspline2dunit.ap:914");
-                  set_error_flag(&result, fabs(spline2dcalcvi(&vc, x.xR[i], y.xR[j], k) - resef) > eps, __FILE__, __LINE__, "testspline2dunit.ap:915");
+                  set_error_flag(&result, !NearAtR(resf.xR[k], resef, eps), __FILE__, __LINE__, "testspline2dunit.ap:914");
+                  set_error_flag(&result, !NearAtR(spline2dcalcvi(&vc, x.xR[i], y.xR[j], k), resef, eps), __FILE__, __LINE__, "testspline2dunit.ap:915");
                // Test differentiation at grid points
                   spline2ddiffvi(&vc, x.xR[i], y.xR[j], k, &vi, &vxi, &vyi, &vxyi);
                   spline2ddiff(&sc, x.xR[i], y.xR[j], &si, &sxi, &syi, &sxyi);
-                  set_error_flag(&result, fabs(vi - si) > eps * (fabs(si) + 1), __FILE__, __LINE__, "testspline2dunit.ap:922");
-                  set_error_flag(&result, fabs(vxi - sxi) > eps * (fabs(sxi) + 1), __FILE__, __LINE__, "testspline2dunit.ap:923");
-                  set_error_flag(&result, fabs(vyi - syi) > eps * (fabs(syi) + 1), __FILE__, __LINE__, "testspline2dunit.ap:924");
-                  set_error_flag(&result, fabs(vxyi - sxyi) > eps * (fabs(sxyi) + 1), __FILE__, __LINE__, "testspline2dunit.ap:925");
+                  set_error_flag(&result, !NearAtR(vi, si, eps * (fabs(si) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:922");
+                  set_error_flag(&result, !NearAtR(vxi, sxi, eps * (fabs(sxi) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:923");
+                  set_error_flag(&result, !NearAtR(vyi, syi, eps * (fabs(syi) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:924");
+                  set_error_flag(&result, !NearAtR(vxyi, sxyi, eps * (fabs(sxyi) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:925");
                }
             }
          // Test at random points
@@ -65039,15 +65039,15 @@ static bool testspline2dunit_testspline2dvf(bool silent) {
             // Test calculation at random points
                spline2dcalcv(&vc, rndx, rndy, &resf);
                resef = spline2dcalc(&sc, rndx, rndy);
-               set_error_flag(&result, fabs(resf.xR[k] - resef) > eps, __FILE__, __LINE__, "testspline2dunit.ap:941");
-               set_error_flag(&result, fabs(spline2dcalcvi(&vc, rndx, rndy, k) - resef) > eps, __FILE__, __LINE__, "testspline2dunit.ap:942");
+               set_error_flag(&result, !NearAtR(resf.xR[k], resef, eps), __FILE__, __LINE__, "testspline2dunit.ap:941");
+               set_error_flag(&result, !NearAtR(spline2dcalcvi(&vc, rndx, rndy, k), resef, eps), __FILE__, __LINE__, "testspline2dunit.ap:942");
             // Test differentiation at random points
                spline2ddiffvi(&vc, rndx, rndy, k, &vi, &vxi, &vyi, &vxyi);
                spline2ddiff(&sc, rndx, rndy, &si, &sxi, &syi, &sxyi);
-               set_error_flag(&result, fabs(vi - si) > eps * (fabs(si) + 1), __FILE__, __LINE__, "testspline2dunit.ap:949");
-               set_error_flag(&result, fabs(vxi - sxi) > eps * (fabs(sxi) + 1), __FILE__, __LINE__, "testspline2dunit.ap:950");
-               set_error_flag(&result, fabs(vyi - syi) > eps * (fabs(syi) + 1), __FILE__, __LINE__, "testspline2dunit.ap:951");
-               set_error_flag(&result, fabs(vxyi - sxyi) > eps * (fabs(sxyi) + 1), __FILE__, __LINE__, "testspline2dunit.ap:952");
+               set_error_flag(&result, !NearAtR(vi, si, eps * (fabs(si) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:949");
+               set_error_flag(&result, !NearAtR(vxi, sxi, eps * (fabs(sxi) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:950");
+               set_error_flag(&result, !NearAtR(vyi, syi, eps * (fabs(syi) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:951");
+               set_error_flag(&result, !NearAtR(vxyi, sxyi, eps * (fabs(sxyi) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:952");
             }
          }
       }
@@ -65155,7 +65155,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                   spline2dcalcv(&s, tmp0.xR[0], tmp0.xR[1], &tmp1);
                   for (j = 0; j < d; j++) {
                      v = vterm.xyR[j][0] * tmp0.xR[0] + vterm.xyR[j][1] * tmp0.xR[1] + vterm.xyR[j][2];
-                     set_error_flag(errorflag, fabs(tmp1.xR[j] - v) / rmax2(fabs(v), 1.0) > tol, __FILE__, __LINE__, "testspline2dunit.ap:1094");
+                     set_error_flag(errorflag, !NearAtR(tmp1.xR[j], v, rmax2(fabs(v), 1.0) * tol), __FILE__, __LINE__, "testspline2dunit.ap:1094");
                   }
                }
                set_error_flag(errorflag, rep.rmserror > tol, __FILE__, __LINE__, "testspline2dunit.ap:1097");
@@ -65172,7 +65172,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                   spline2dcalcv(&s, tmp0.xR[0], tmp0.xR[1], &tmp1);
                   for (j = 0; j < d; j++) {
                      v = vterm.xyR[j][0] * tmp0.xR[0] + vterm.xyR[j][1] * tmp0.xR[1] + vterm.xyR[j][2];
-                     bad = bad || fabs(tmp1.xR[j] - v) > tol;
+                     bad = bad || !NearAtR(tmp1.xR[j], v, tol);
                   }
                }
                set_error_flag(errorflag, !bad, __FILE__, __LINE__, "testspline2dunit.ap:1118");
@@ -65210,7 +65210,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                   spline2dcalcv(&s, tmp0.xR[0], tmp0.xR[1], &tmp1);
                   for (j = 0; j < d; j++) {
                      v = vterm.xyR[j][0] * tmp0.xR[0] + vterm.xyR[j][1] * tmp0.xR[1] + vterm.xyR[j][2];
-                     set_error_flag(errorflag, fabs(tmp1.xR[j] - v) / rmax2(fabs(v), 1.0) > tol, __FILE__, __LINE__, "testspline2dunit.ap:1159");
+                     set_error_flag(errorflag, !NearAtR(tmp1.xR[j], v, rmax2(fabs(v), 1.0) * tol), __FILE__, __LINE__, "testspline2dunit.ap:1159");
                   }
                }
                set_error_flag(errorflag, rep.rmserror > tol, __FILE__, __LINE__, "testspline2dunit.ap:1162");
@@ -65243,7 +65243,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                   tmp0.xR[2] = 1.0;
                   spline2dcalcv(&s, tmp0.xR[0], tmp0.xR[1], &tmp1);
                   for (j = 0; j < d; j++) {
-                     set_error_flag(errorflag, fabs(tmp1.xR[j] - vprior) > tol, __FILE__, __LINE__, "testspline2dunit.ap:1199");
+                     set_error_flag(errorflag, !NearAtR(tmp1.xR[j], vprior, tol), __FILE__, __LINE__, "testspline2dunit.ap:1199");
                   }
                }
                set_error_flag(errorflag, rep.rmserror > tol, __FILE__, __LINE__, "testspline2dunit.ap:1201");
@@ -65258,7 +65258,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                   tmp0.xR[2] = 1.0;
                   spline2dcalcv(&s, tmp0.xR[0], tmp0.xR[1], &tmp1);
                   for (j = 0; j < d; j++) {
-                     set_error_flag(errorflag, fabs(tmp1.xR[j] - vprior) <= tol, __FILE__, __LINE__, "testspline2dunit.ap:1216");
+                     set_error_flag(errorflag, NearAtR(tmp1.xR[j], vprior, tol), __FILE__, __LINE__, "testspline2dunit.ap:1216");
                   }
                }
             }
@@ -65346,7 +65346,7 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
             }
          }
          spline2dfit(&state, &s, &rep);
-         set_error_flag(errorflag, fabs(spline2dcalc(&s, 0.0, 0.0) - 0.25 * (xy.xyR[0][2] + xy.xyR[1][2] + xy.xyR[2][2] + xy.xyR[3][2])) > 1.0E-4, __FILE__, __LINE__, "testspline2dunit.ap:1305");
+         set_error_flag(errorflag, !NearAtR(spline2dcalc(&s, 0.0, 0.0), 0.25 * (xy.xyR[0][2] + xy.xyR[1][2] + xy.xyR[2][2] + xy.xyR[3][2]), 1.0E-4), __FILE__, __LINE__, "testspline2dunit.ap:1305");
       // Check fitting without penalty
          if (solvertype == 1) {
             spline2dbuildersetalgoblocklls(&state, 0.0);
@@ -65358,7 +65358,7 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
             }
          }
          spline2dfit(&state, &s2, &rep2);
-         set_error_flag(errorflag, fabs(spline2dcalc(&s2, 0.0, 0.0)) > 1.0E-4, __FILE__, __LINE__, "testspline2dunit.ap:1318");
+         set_error_flag(errorflag, !SmallAtR(spline2dcalc(&s2, 0.0, 0.0), 1.0E-4), __FILE__, __LINE__, "testspline2dunit.ap:1318");
       }
    }
 // Solve a sequence of problems with increasing value of penalty coefficient;
@@ -65679,11 +65679,11 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
                   }
                   rmserror = sqrt(rmserror / (npoints * d));
                   r2 = 1.0 - rss / coalesce(tss, 1.0);
-                  set_error_flag(errorflag, fabs(rmserror - rep.rmserror) > errtol, __FILE__, __LINE__, "testspline2dunit.ap:1654");
-                  set_error_flag(errorflag, fabs(avgerror - rep.avgerror) > errtol, __FILE__, __LINE__, "testspline2dunit.ap:1655");
-                  set_error_flag(errorflag, fabs(maxerror - rep.maxerror) > errtol, __FILE__, __LINE__, "testspline2dunit.ap:1656");
+                  set_error_flag(errorflag, !NearAtR(rmserror, rep.rmserror, errtol), __FILE__, __LINE__, "testspline2dunit.ap:1654");
+                  set_error_flag(errorflag, !NearAtR(avgerror, rep.avgerror, errtol), __FILE__, __LINE__, "testspline2dunit.ap:1655");
+                  set_error_flag(errorflag, !NearAtR(maxerror, rep.maxerror, errtol), __FILE__, __LINE__, "testspline2dunit.ap:1656");
                   if (tss > 1.0E-3) {
-                     set_error_flag(errorflag, fabs(r2 - rep.r2) > errtol, __FILE__, __LINE__, "testspline2dunit.ap:1658");
+                     set_error_flag(errorflag, !NearAtR(r2, rep.r2, errtol), __FILE__, __LINE__, "testspline2dunit.ap:1658");
                   }
                // Minimalistic test for fitting quality: R2 is better than zero
                // (zero value = fitting by median value).
@@ -65768,7 +65768,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
          // Test
             for (i = 0; i < npoints; i++) {
                for (k = 0; k < d; k++) {
-                  set_error_flag(errorflag, fabs(spline2dcalcvi(&s, xy.xyR[i][0], xy.xyR[i][1], k) - xy.xyR[i][2 + k]) > 1.0E-6, __FILE__, __LINE__, "testspline2dunit.ap:1754");
+                  set_error_flag(errorflag, !NearAtR(spline2dcalcvi(&s, xy.xyR[i][0], xy.xyR[i][1], k), xy.xyR[i][2 + k], 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:1754");
                }
             }
          }
@@ -65808,7 +65808,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
                spline2dcalcv(&s, xy.xyR[i][0], xy.xyR[i][1], &tmp0);
                spline2dcalcv(&s2, xy.xyR[i][0], xy.xyR[i][1], &tmp1);
                for (j = 0; j < d; j++) {
-                  set_error_flag(errorflag, fabs(tmp0.xR[j] - tmp1.xR[j]) > 1.0E-6, __FILE__, __LINE__, "testspline2dunit.ap:1801");
+                  set_error_flag(errorflag, !NearAtR(tmp0.xR[j], tmp1.xR[j], 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:1801");
                   mx = rmax2(mx, fabs(tmp0.xR[j] - tmp1.xR[j]));
                }
             }
@@ -65978,11 +65978,11 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          }
          rmserror = sqrt(rmserror / (npoints * d));
          r2 = 1.0 - rss / coalesce(tss, 1.0);
-         set_error_flag(errorflag, fabs(rmserror - rep1.rmserror) > 1.0E-6, __FILE__, __LINE__, "testspline2dunit.ap:1988");
-         set_error_flag(errorflag, fabs(avgerror - rep1.avgerror) > 1.0E-6, __FILE__, __LINE__, "testspline2dunit.ap:1989");
-         set_error_flag(errorflag, fabs(maxerror - rep1.maxerror) > 1.0E-6, __FILE__, __LINE__, "testspline2dunit.ap:1990");
+         set_error_flag(errorflag, !NearAtR(rmserror, rep1.rmserror, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:1988");
+         set_error_flag(errorflag, !NearAtR(avgerror, rep1.avgerror, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:1989");
+         set_error_flag(errorflag, !NearAtR(maxerror, rep1.maxerror, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:1990");
          if (tss > 1.0E-3) {
-            set_error_flag(errorflag, fabs(r2 - rep1.r2) > 1.0E-6, __FILE__, __LINE__, "testspline2dunit.ap:1992");
+            set_error_flag(errorflag, !NearAtR(r2, rep1.r2, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:1992");
          }
       }
    }
@@ -66107,11 +66107,11 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          }
          rmserror = sqrt(rmserror / (npoints * d));
          r2 = 1.0 - rss / coalesce(tss, 1.0);
-         set_error_flag(errorflag, fabs(rmserror - rep1.rmserror) > 1.0E-6, __FILE__, __LINE__, "testspline2dunit.ap:2152");
-         set_error_flag(errorflag, fabs(avgerror - rep1.avgerror) > 1.0E-6, __FILE__, __LINE__, "testspline2dunit.ap:2153");
-         set_error_flag(errorflag, fabs(maxerror - rep1.maxerror) > 1.0E-6, __FILE__, __LINE__, "testspline2dunit.ap:2154");
+         set_error_flag(errorflag, !NearAtR(rmserror, rep1.rmserror, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:2152");
+         set_error_flag(errorflag, !NearAtR(avgerror, rep1.avgerror, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:2153");
+         set_error_flag(errorflag, !NearAtR(maxerror, rep1.maxerror, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:2154");
          if (tss > 1.0E-3) {
-            set_error_flag(errorflag, fabs(r2 - rep1.r2) > 1.0E-6, __FILE__, __LINE__, "testspline2dunit.ap:2156");
+            set_error_flag(errorflag, !NearAtR(r2, rep1.r2, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:2156");
          }
       }
    }
@@ -67073,7 +67073,7 @@ static bool testspline3dunit_basictest() {
       vz = randomreal() * l;
       spline3dcalcv(&c, vx, vy, vz, &vf);
       for (di = 0; di < d; di++) {
-         if (fabs(di + ax * vx + ay * vy + az * vz + axy * vx * vy + ayz * vy * vz - vf.xR[di]) > eps) {
+         if (!NearAtR(di + ax * vx + ay * vy + az * vz + axy * vx * vy + ayz * vy * vz, vf.xR[di], eps)) {
             result = true;
             ae_frame_leave();
             return result;
@@ -67081,7 +67081,7 @@ static bool testspline3dunit_basictest() {
       }
       if (d == 1) {
          vsf = spline3dcalc(&c, vx, vy, vz);
-         if (fabs(ax * vx + ay * vy + az * vz + axy * vx * vy + ayz * vy * vz - vsf) > eps) {
+         if (!NearAtR(ax * vx + ay * vy + az * vz + axy * vx * vy + ayz * vy * vz, vsf, eps)) {
             result = true;
             ae_frame_leave();
             return result;
@@ -67104,7 +67104,7 @@ static bool testspline3dunit_basictest() {
             for (k = 0; k < l; k++) {
                spline3dcalcv(&c, x.xR[i], y.xR[j], z.xR[k], &vvf);
                for (di = 0; di < d; di++) {
-                  if (fabs(vf.xR[d * (n * (m * k + j) + i) + di] - vvf.xR[di]) > eps) {
+                  if (!NearAtR(vf.xR[d * (n * (m * k + j) + i) + di], vvf.xR[di], eps)) {
                      result = true;
                      ae_frame_leave();
                      return result;
@@ -67592,7 +67592,7 @@ static bool sqrdegmatrixrbftest(bool silent) {
                x.xR[1] = gp.xyR[i][1];
                rbfcalc(&s, &x, &y);
                for (j = 0; j < ny; j++) {
-                  if (fabs(gp.xyR[i][nx + j] - y.xR[j]) > sy * eps) {
+                  if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
                      result = true;
                      ae_frame_leave();
                      return result;
@@ -67647,7 +67647,7 @@ static bool sqrdegmatrixrbftest(bool silent) {
                      x.xR[2] = gp.xyR[i][2];
                      rbfcalc(&s, &x, &y);
                      for (j = 0; j < ny; j++) {
-                        if (fabs(gp.xyR[i][nx + j] - y.xR[j]) > sy * eps) {
+                        if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
                            result = true;
                            ae_frame_leave();
                            return result;
@@ -68043,7 +68043,7 @@ static bool testrbfunit_specialtest() {
                return result;
             }
             for (i = 0; i < ny; i++) {
-               if (fabs(y.xR[i] - xy.xyR[0][nx + i]) > errtol) {
+               if (!NearAtR(y.xR[i], xy.xyR[0][nx + i], errtol)) {
                   set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:267");
                   ae_frame_leave();
                   return result;
@@ -68060,7 +68060,7 @@ static bool testrbfunit_specialtest() {
                return result;
             }
             for (i = 0; i < ny; i++) {
-               if (fabs(y.xR[i] - xy.xyR[0][nx + i]) > errtol) {
+               if (!NearAtR(y.xR[i], xy.xyR[0][nx + i], errtol)) {
                   set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:285");
                   ae_frame_leave();
                   return result;
@@ -68110,7 +68110,7 @@ static bool testrbfunit_specialtest() {
                   return result;
                }
                for (i = 0; i < ny; i++) {
-                  if (fabs(y.xR[i] - xy.xyR[j][nx + i]) > errtol) {
+                  if (!NearAtR(y.xR[i], xy.xyR[j][nx + i], errtol)) {
                      result = true;
                      ae_frame_leave();
                      return result;
@@ -68156,13 +68156,13 @@ static bool testrbfunit_specialtest() {
             return result;
          }
          for (i = 0; i < tmpnc - 1; i++) {
-            if (fabs(xwr.xyR[i][nx + ny] - sx) > errtol) {
+            if (!NearAtR(xwr.xyR[i][nx + ny], sx, errtol)) {
                result = true;
                ae_frame_leave();
                return result;
             }
          }
-         if (fabs(xwr.xyR[tmpnc - 1][nx + ny] - z * sx) > errtol) {
+         if (!NearAtR(xwr.xyR[tmpnc - 1][nx + ny], z * sx, errtol)) {
             result = true;
             ae_frame_leave();
             return result;
@@ -68206,14 +68206,14 @@ static bool testrbfunit_specialtest() {
       ae_vector_set_length(&x, 2);
       x.xR[0] = (n - 1) * randomreal();
       x.xR[1] = (n - 1) * randomreal();
-      if (ny == 1 && fabs(rbfcalc2(&s, x.xR[0], x.xR[1]) - (va * x.xR[0] + vb * x.xR[1] + vc)) > errtol) {
+      if (ny == 1 && !NearAtR(rbfcalc2(&s, x.xR[0], x.xR[1]), va * x.xR[0] + vb * x.xR[1] + vc, errtol)) {
          result = true;
          ae_frame_leave();
          return result;
       }
       rbfcalc(&s, &x, &y);
       for (k = 0; k < ny; k++) {
-         if (fabs(y.xR[k] - ((va + 0.1 * k) * x.xR[0] + (vb + 0.2 * k) * x.xR[1] + (vc + 0.3 * k))) > errtol) {
+         if (!NearAtR(y.xR[k], (va + 0.1 * k) * x.xR[0] + (vb + 0.2 * k) * x.xR[1] + (vc + 0.3 * k), errtol)) {
             result = true;
             ae_frame_leave();
             return result;
@@ -68249,14 +68249,14 @@ static bool testrbfunit_specialtest() {
       x.xR[0] = (n - 1) * randomreal();
       x.xR[1] = (n - 1) * randomreal();
       x.xR[2] = (n - 1) * randomreal();
-      if (ny == 1 && fabs(rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]) - (va * x.xR[0] + vb * x.xR[1] + vc * x.xR[2] + vd)) > errtol) {
+      if (ny == 1 && !NearAtR(rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]), va * x.xR[0] + vb * x.xR[1] + vc * x.xR[2] + vd, errtol)) {
          result = true;
          ae_frame_leave();
          return result;
       }
       rbfcalc(&s, &x, &y);
       for (k = 0; k < ny; k++) {
-         if (fabs(y.xR[k] - ((va + 0.1 * k) * x.xR[0] + (vb + 0.2 * k) * x.xR[1] + (vc + 0.3 * k) * x.xR[2] + (vd + 0.4 * k))) > errtol) {
+         if (!NearAtR(y.xR[k], (va + 0.1 * k) * x.xR[0] + (vb + 0.2 * k) * x.xR[1] + (vc + 0.3 * k) * x.xR[2] + (vd + 0.4 * k), errtol)) {
             result = true;
             ae_frame_leave();
             return result;
@@ -68308,7 +68308,7 @@ static bool testrbfunit_specialtest() {
             for (j = 0; j < nx; j++) {
                vv += vf.xyR[k][j] * x.xR[j];
             }
-            set_error_flag(&result, fabs(vv - y.xR[k]) > errtol, __FILE__, __LINE__, "testrbfunit.ap:537");
+            set_error_flag(&result, !NearAtR(vv, y.xR[k], errtol), __FILE__, __LINE__, "testrbfunit.ap:537");
          }
       }
    }
@@ -68431,7 +68431,7 @@ static bool testrbfunit_basicrbftest() {
                         rbfgridcalc2(&s, &gpgx0, k0, &gpgx1, k1, &gy);
                         for (i = 0; i < k0; i++) {
                            for (j = 0; j < k1; j++) {
-                              if (fabs(gy.xyR[i][j] - gp.xyR[i * k1 + j][nx]) > sy * eps) {
+                              if (!NearAtR(gy.xyR[i][j], gp.xyR[i * k1 + j][nx], sy * eps)) {
                                  result = true;
                                  ae_frame_leave();
                                  return result;
@@ -68453,7 +68453,7 @@ static bool testrbfunit_basicrbftest() {
                         fidx = randominteger(4);
                         if (fidx == 0 && ny == 1) {
                            y.xR[0] = rbfcalc2(&s, x.xR[0], x.xR[1]);
-                           if (fabs(gp.xyR[i][nx] - y.xR[0]) > sy * eps) {
+                           if (!NearAtR(gp.xyR[i][nx], y.xR[0], sy * eps)) {
                               result = true;
                               ae_frame_leave();
                               return result;
@@ -68462,7 +68462,7 @@ static bool testrbfunit_basicrbftest() {
                         if (fidx == 1) {
                            rbfcalc(&s, &x, &y);
                            for (j = 0; j < ny; j++) {
-                              if (fabs(gp.xyR[i][nx + j] - y.xR[j]) > sy * eps) {
+                              if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
                                  result = true;
                                  ae_frame_leave();
                                  return result;
@@ -68472,7 +68472,7 @@ static bool testrbfunit_basicrbftest() {
                         if (fidx == 2) {
                            rbfcalcbuf(&s, &x, &y);
                            for (j = 0; j < ny; j++) {
-                              if (fabs(gp.xyR[i][nx + j] - y.xR[j]) > sy * eps) {
+                              if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
                                  result = true;
                                  ae_frame_leave();
                                  return result;
@@ -68482,7 +68482,7 @@ static bool testrbfunit_basicrbftest() {
                         if (fidx == 3) {
                            rbftscalcbuf(&s, &calcbuf, &x, &y);
                            for (j = 0; j < ny; j++) {
-                              if (fabs(gp.xyR[i][nx + j] - y.xR[j]) > sy * eps) {
+                              if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
                                  result = true;
                                  ae_frame_leave();
                                  return result;
@@ -68498,7 +68498,7 @@ static bool testrbfunit_basicrbftest() {
                         return result;
                      }
                      for (i = 0; i < np; i++) {
-                        if (fabs(xwr.xyR[i][unx + uny] - q * sx) > sx * eps) {
+                        if (!NearAtR(xwr.xyR[i][unx + uny], q * sx, sx * eps)) {
                            result = true;
                            ae_frame_leave();
                            return result;
@@ -68567,7 +68567,7 @@ static bool testrbfunit_basicrbftest() {
                            fidx = randominteger(4);
                            if (fidx == 0 && ny == 1) {
                               y.xR[0] = rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]);
-                              if (fabs(gp.xyR[i][nx] - y.xR[0]) > sy * eps) {
+                              if (!NearAtR(gp.xyR[i][nx], y.xR[0], sy * eps)) {
                                  result = true;
                                  ae_frame_leave();
                                  return result;
@@ -68576,7 +68576,7 @@ static bool testrbfunit_basicrbftest() {
                            if (fidx == 1) {
                               rbfcalc(&s, &x, &y);
                               for (j = 0; j < ny; j++) {
-                                 if (fabs(gp.xyR[i][nx + j] - y.xR[j]) > sy * eps) {
+                                 if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
                                     result = true;
                                     ae_frame_leave();
                                     return result;
@@ -68586,7 +68586,7 @@ static bool testrbfunit_basicrbftest() {
                            if (fidx == 2) {
                               rbfcalcbuf(&s, &x, &y);
                               for (j = 0; j < ny; j++) {
-                                 if (fabs(gp.xyR[i][nx + j] - y.xR[j]) > sy * eps) {
+                                 if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
                                     result = true;
                                     ae_frame_leave();
                                     return result;
@@ -68596,7 +68596,7 @@ static bool testrbfunit_basicrbftest() {
                            if (fidx == 3) {
                               rbftscalcbuf(&s, &calcbuf, &x, &y);
                               for (j = 0; j < ny; j++) {
-                                 if (fabs(gp.xyR[i][nx + j] - y.xR[j]) > sy * eps) {
+                                 if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
                                     result = true;
                                     ae_frame_leave();
                                     return result;
@@ -68612,7 +68612,7 @@ static bool testrbfunit_basicrbftest() {
                            return result;
                         }
                         for (i = 0; i < np; i++) {
-                           if (fabs(xwr.xyR[i][unx + uny] - q * sx) > sx * eps) {
+                           if (!NearAtR(xwr.xyR[i][unx + uny], q * sx, sx * eps)) {
                               result = true;
                               ae_frame_leave();
                               return result;
@@ -68752,7 +68752,7 @@ static bool testrbfunit_irregularrbftest() {
                         x.xR[1] = gp.xyR[i][1];
                         if (ny == 1) {
                            y.xR[0] = rbfcalc2(&s, x.xR[0], x.xR[1]);
-                           if (fabs(gp.xyR[i][nx] - y.xR[0]) > sy * eps) {
+                           if (!NearAtR(gp.xyR[i][nx], y.xR[0], sy * eps)) {
                               result = true;
                               ae_frame_leave();
                               return result;
@@ -68760,7 +68760,7 @@ static bool testrbfunit_irregularrbftest() {
                         }
                         rbfcalc(&s, &x, &y);
                         for (j = 0; j < ny; j++) {
-                           if (fabs(gp.xyR[i][nx + j] - y.xR[j]) > sy * eps) {
+                           if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
                               result = true;
                               ae_frame_leave();
                               return result;
@@ -68768,7 +68768,7 @@ static bool testrbfunit_irregularrbftest() {
                         }
                         rbfcalcbuf(&s, &x, &y);
                         for (j = 0; j < ny; j++) {
-                           if (fabs(gp.xyR[i][nx + j] - y.xR[j]) > sy * eps) {
+                           if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
                               result = true;
                               ae_frame_leave();
                               return result;
@@ -68806,7 +68806,7 @@ static bool testrbfunit_irregularrbftest() {
                            x.xR[2] = gp.xyR[i][2];
                            if (ny == 1) {
                               y.xR[0] = rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]);
-                              if (fabs(gp.xyR[i][nx] - y.xR[0]) > sy * eps) {
+                              if (!NearAtR(gp.xyR[i][nx], y.xR[0], sy * eps)) {
                                  result = true;
                                  ae_frame_leave();
                                  return result;
@@ -68814,7 +68814,7 @@ static bool testrbfunit_irregularrbftest() {
                            }
                            rbfcalc(&s, &x, &y);
                            for (j = 0; j < ny; j++) {
-                              if (fabs(gp.xyR[i][nx + j] - y.xR[j]) > sy * eps) {
+                              if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
                                  result = true;
                                  ae_frame_leave();
                                  return result;
@@ -68822,7 +68822,7 @@ static bool testrbfunit_irregularrbftest() {
                            }
                            rbfcalcbuf(&s, &x, &y);
                            for (j = 0; j < ny; j++) {
-                              if (fabs(gp.xyR[i][nx + j] - y.xR[j]) > sy * eps) {
+                              if (!NearAtR(gp.xyR[i][nx + j], y.xR[j], sy * eps)) {
                                  result = true;
                                  ae_frame_leave();
                                  return result;
@@ -68947,19 +68947,19 @@ static bool testrbfunit_linearitymodelrbftest() {
                      return result;
                   }
                   for (i = 0; i < nx; i++) {
-                     if (fabs(v.xyR[0][i] - a.xR[i]) > sy / sx * testrbfunit_tol) {
+                     if (!NearAtR(v.xyR[0][i], a.xR[i], sy / sx * testrbfunit_tol)) {
                         result = true;
                         ae_frame_leave();
                         return result;
                      }
                   }
-                  if (fabs(v.xyR[0][nx] - a.xR[nx]) > sy * testrbfunit_tol) {
+                  if (!NearAtR(v.xyR[0][nx], a.xR[nx], sy * testrbfunit_tol)) {
                      result = true;
                      ae_frame_leave();
                      return result;
                   }
                   for (i = 0; i < np; i++) {
-                     if (fabs(xwr.xyR[i][unx]) > sy * testrbfunit_tol) {
+                     if (!SmallAtR(xwr.xyR[i][unx], sy * testrbfunit_tol)) {
                         result = true;
                         ae_frame_leave();
                         return result;
@@ -68998,19 +68998,19 @@ static bool testrbfunit_linearitymodelrbftest() {
                         return result;
                      }
                      for (i = 0; i < nx; i++) {
-                        if (fabs(v.xyR[0][i] - a.xR[i]) > sy / sx * testrbfunit_tol) {
+                        if (!NearAtR(v.xyR[0][i], a.xR[i], sy / sx * testrbfunit_tol)) {
                            result = true;
                            ae_frame_leave();
                            return result;
                         }
                      }
-                     if (fabs(v.xyR[0][nx] - a.xR[nx]) > sy * testrbfunit_tol) {
+                     if (!NearAtR(v.xyR[0][nx], a.xR[nx], sy * testrbfunit_tol)) {
                         result = true;
                         ae_frame_leave();
                         return result;
                      }
                      for (i = 0; i < np; i++) {
-                        if (fabs(xwr.xyR[i][unx]) > sy * testrbfunit_tol) {
+                        if (!SmallAtR(xwr.xyR[i][unx], sy * testrbfunit_tol)) {
                            result = true;
                            ae_frame_leave();
                            return result;
@@ -69504,7 +69504,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
             rbfgridcalc2(&s, &gpgx0, k0, &gpgx1, k1, &gy);
             for (i = 0; i < k0; i++) {
                for (j = 0; j < k1; j++) {
-                  set_error_flag(&result, fabs(gy.xyR[i][j] - gp.xyR[i * k1 + j][nx]) > s2 * eps, __FILE__, __LINE__, "testrbfunit.ap:2216");
+                  set_error_flag(&result, !NearAtR(gy.xyR[i][j], gp.xyR[i * k1 + j][nx], s2 * eps), __FILE__, __LINE__, "testrbfunit.ap:2216");
                }
             }
          }
@@ -69536,7 +69536,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
                rbftscalcbuf(&s, &calcbuf, &x, &y);
             }
             for (j = 0; j < ny; j++) {
-               set_error_flag(&result, fabs(gp.xyR[i][nx + j] - y.xR[j]) > s2 * eps, __FILE__, __LINE__, "testrbfunit.ap:2244");
+               set_error_flag(&result, !NearAtR(gp.xyR[i][nx + j], y.xR[j], s2 * eps), __FILE__, __LINE__, "testrbfunit.ap:2244");
             }
          }
       }
@@ -69602,7 +69602,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
                rbftscalcbuf(&s, &calcbuf, &x, &y);
             }
             for (j = 0; j < ny; j++) {
-               set_error_flag(&result, fabs(gp.xyR[i][nx + j] - y.xR[j]) > s2 * eps, __FILE__, __LINE__, "testrbfunit.ap:2312");
+               set_error_flag(&result, !NearAtR(gp.xyR[i][nx + j], y.xR[j], s2 * eps), __FILE__, __LINE__, "testrbfunit.ap:2312");
             }
          }
       // Test RBFGridCalc3V vs RBFCalc()
@@ -69615,7 +69615,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
                   x.xR[2] = gpgx2.xR[k];
                   rbfcalcbuf(&s, &x, &y);
                   for (l = 0; l < ny; l++) {
-                     set_error_flag(&result, fabs(y.xR[l] - gcy.xR[l + ny * (i + j * k0 + k * k0 * k1)]) > 1.0E-9 * s2, __FILE__, __LINE__, "testrbfunit.ap:2329");
+                     set_error_flag(&result, !NearAtR(y.xR[l], gcy.xR[l + ny * (i + j * k0 + k * k0 * k1)], 1.0E-9 * s2), __FILE__, __LINE__, "testrbfunit.ap:2329");
                   }
                }
             }
@@ -69782,7 +69782,7 @@ static void testrbfunit_gridcalc23test(bool *errorflag) {
                x.xR[2] = x2.xR[k];
                rbfcalcbuf(&s, &x, &y);
                for (l = 0; l < ny; l++) {
-                  set_error_flag(errorflag, fabs(y.xR[l] - gy.xR[l + ny * (i + j * kx.xZ[0] + k * kx.xZ[0] * kx.xZ[1])]) > 1.0E-9 * sy, __FILE__, __LINE__, "testrbfunit.ap:2516");
+                  set_error_flag(errorflag, !NearAtR(y.xR[l], gy.xR[l + ny * (i + j * kx.xZ[0] + k * kx.xZ[0] * kx.xZ[1])], 1.0E-9 * sy), __FILE__, __LINE__, "testrbfunit.ap:2516");
                }
             }
          }
@@ -69818,7 +69818,7 @@ static void testrbfunit_gridcalc23test(bool *errorflag) {
       rbfgridcalc3vsubset(&s, &x0, kx.xZ[0], &x1, kx.xZ[1], &x2, kx.xZ[2], &gf, &gy);
       rbfgridcalc3v(&s, &x0, kx.xZ[0], &x1, kx.xZ[1], &x2, kx.xZ[2], &gy2);
       for (i = 0; i < ny * kx.xZ[0] * kx.xZ[1] * kx.xZ[2]; i++) {
-         set_error_flag(errorflag, gf.xB[i / ny] && fabs(gy.xR[i] - gy2.xR[i]) > 1.0E-9 * sy, __FILE__, __LINE__, "testrbfunit.ap:2558");
+         set_error_flag(errorflag, gf.xB[i / ny] && !NearAtR(gy.xR[i], gy2.xR[i], 1.0E-9 * sy), __FILE__, __LINE__, "testrbfunit.ap:2558");
          set_error_flag(errorflag, !rf.xB[i / (ny * kx.xZ[0])] && gy.xR[i] != 0.0, __FILE__, __LINE__, "testrbfunit.ap:2559");
       }
    }
@@ -69967,7 +69967,7 @@ static bool testrbfunit_basichrbftest() {
             }
             rbfcalc(&s, &x, &yref);
             for (j = 0; j < ny; j++) {
-               set_error_flag(&result, fabs(yref.xR[j] - xy.xyR[i][nx + j]) > errtol, __FILE__, __LINE__, "testrbfunit.ap:2712");
+               set_error_flag(&result, !NearAtR(yref.xR[j], xy.xyR[i][nx + j], errtol), __FILE__, __LINE__, "testrbfunit.ap:2712");
             }
             set_error_flag(&result, yref.cnt != ny, __FILE__, __LINE__, "testrbfunit.ap:2713");
             if (nx == 1 && ny == 1) {
@@ -70163,7 +70163,7 @@ static bool testrbfunit_basichrbftest() {
                }
             }
             for (j = 0; j < ny; j++) {
-               set_error_flag(&result, fabs(y.xR[j] - yref.xR[j]) > 1.0E-9, __FILE__, __LINE__, "testrbfunit.ap:2932");
+               set_error_flag(&result, !NearAtR(y.xR[j], yref.xR[j], 1.0E-9), __FILE__, __LINE__, "testrbfunit.ap:2932");
             }
          }
       }
@@ -70677,7 +70677,7 @@ static bool testrbfunit_scaledhrbftest() {
                }
                rbfcalc(&s2, &x, &y2);
                for (j = 0; j < ny; j++) {
-                  set_error_flag(&result, fabs(y.xR[j] - y2.xR[j] / scaley.xR[j]) > errtol, __FILE__, __LINE__, "testrbfunit.ap:3505");
+                  set_error_flag(&result, !NearAtR(y.xR[j], y2.xR[j] / scaley.xR[j], errtol), __FILE__, __LINE__, "testrbfunit.ap:3505");
                }
             }
          // Compare model values in random points
@@ -70692,7 +70692,7 @@ static bool testrbfunit_scaledhrbftest() {
                }
                rbfcalc(&s2, &x, &y2);
                for (j = 0; j < ny; j++) {
-                  set_error_flag(&result, fabs(y.xR[j] - y2.xR[j] / scaley.xR[j]) > errtol, __FILE__, __LINE__, "testrbfunit.ap:3521");
+                  set_error_flag(&result, !NearAtR(y.xR[j], y2.xR[j] / scaley.xR[j], errtol), __FILE__, __LINE__, "testrbfunit.ap:3521");
                }
             }
          }
@@ -70736,7 +70736,7 @@ static bool testrbfunit_spechrbftest() {
    while (d2 < 100.0) {
       vref = exp(-d2);
       vfunc = rbfv2basisfunc(0, d2);
-      set_error_flag(&result, fabs(vref - vfunc) > 1.0E-9 * vref, __FILE__, __LINE__, "testrbfunit.ap:3563");
+      set_error_flag(&result, !NearAtR(vref, vfunc, 1.0E-9 * vref), __FILE__, __LINE__, "testrbfunit.ap:3563");
       d2 += 1.0 / 64.0;
    }
    d2 = 0.0;
@@ -70745,7 +70745,7 @@ static bool testrbfunit_spechrbftest() {
       vref = rmax2(1 - d2 / 9, 0.0) * exp(-d2);
       vfunc = rbfv2basisfunc(1, d2);
       maxerr = rmax2(maxerr, fabs(vref - vfunc));
-      set_error_flag(&result, fabs(vref - vfunc) > 0.005, __FILE__, __LINE__, "testrbfunit.ap:3573");
+      set_error_flag(&result, !NearAtR(vref, vfunc, 0.005), __FILE__, __LINE__, "testrbfunit.ap:3573");
       d2 += 1.0 / 64.0;
    }
 // Test that tiny changes in dataset points introduce tiny
@@ -70981,7 +70981,7 @@ static bool testrbfunit_gridhrbftest() {
                x.xR[1] = x1.xR[i1];
                rbfcalc(&s, &x, &y);
                for (i = 0; i < ny; i++) {
-                  set_error_flag(&result, fabs(y.xR[i] - yv.xR[i + ny * (i0 + i1 * n0)]) > errtol, __FILE__, __LINE__, "testrbfunit.ap:3814");
+                  set_error_flag(&result, !NearAtR(y.xR[i], yv.xR[i + ny * (i0 + i1 * n0)], errtol), __FILE__, __LINE__, "testrbfunit.ap:3814");
                }
             }
          }
@@ -70998,13 +70998,13 @@ static bool testrbfunit_gridhrbftest() {
          SetVector(&yv2);
          rbfgridcalc2vsubset(&s, &x0, n0, &x1, n1, &needy, &yv2);
          for (i = 0; i < ny * n0 * n1; i++) {
-            set_error_flag(&result, needy.xB[i / ny] && fabs(yv.xR[i] - yv2.xR[i]) > errtol, __FILE__, __LINE__, "testrbfunit.ap:3833");
+            set_error_flag(&result, needy.xB[i / ny] && !NearAtR(yv.xR[i], yv2.xR[i], errtol), __FILE__, __LINE__, "testrbfunit.ap:3833");
          }
       // Test legacy function
          rbfgridcalc2(&s, &x0, n0, &x1, n1, &y2);
          for (i = 0; i < n0 * n1; i++) {
             if (ny == 1) {
-               set_error_flag(&result, fabs(yv.xR[i] - y2.xyR[i % n0][i / n0]) > errtol, __FILE__, __LINE__, "testrbfunit.ap:3843");
+               set_error_flag(&result, !NearAtR(yv.xR[i], y2.xyR[i % n0][i / n0], errtol), __FILE__, __LINE__, "testrbfunit.ap:3843");
             } else {
                set_error_flag(&result, y2.xyR[i % n0][i / n0] != 0.0, __FILE__, __LINE__, "testrbfunit.ap:3845");
             }
@@ -71074,7 +71074,7 @@ static bool testrbfunit_gridhrbftest() {
          SetVector(&yv2);
          rbfgridcalc2v(&s, &x0, n0, &x1, n1, &yv2);
          for (i = 0; i < ny * n0 * n1; i++) {
-            set_error_flag(&result, fabs(yv.xR[i] - yv2.xR[i]) > 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0), __FILE__, __LINE__, "testrbfunit.ap:3913");
+            set_error_flag(&result, !NearAtR(yv.xR[i], yv2.xR[i], 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0)), __FILE__, __LINE__, "testrbfunit.ap:3913");
          }
       }
    }
@@ -71185,7 +71185,7 @@ static bool testrbfunit_gridhrbftest() {
                   x.xR[2] = x2.xR[i2];
                   rbfcalc(&s, &x, &y);
                   for (i = 0; i < ny; i++) {
-                     set_error_flag(&result, fabs(y.xR[i] - yv.xR[i + ny * (i0 + i1 * n0 + i2 * n0 * n1)]) > errtol, __FILE__, __LINE__, "testrbfunit.ap:4027");
+                     set_error_flag(&result, !NearAtR(y.xR[i], yv.xR[i + ny * (i0 + i1 * n0 + i2 * n0 * n1)], errtol), __FILE__, __LINE__, "testrbfunit.ap:4027");
                   }
                }
             }
@@ -71212,7 +71212,7 @@ static bool testrbfunit_gridhrbftest() {
          SetVector(&yv2);
          rbfgridcalc3vsubset(&s, &x0, n0, &x1, n1, &x2, n2, &needy, &yv2);
          for (i = 0; i < ny * n0 * n1 * n2; i++) {
-            set_error_flag(&result, needy.xB[i / ny] && fabs(yv.xR[i] - yv2.xR[i]) > errtol, __FILE__, __LINE__, "testrbfunit.ap:4054");
+            set_error_flag(&result, needy.xB[i / ny] && !NearAtR(yv.xR[i], yv2.xR[i], errtol), __FILE__, __LINE__, "testrbfunit.ap:4054");
             set_error_flag(&result, !rowflags.xB[i / (ny * n0)] && yv2.xR[i] != 0.0, __FILE__, __LINE__, "testrbfunit.ap:4055");
          }
       // Test that scaling RBase, XY, X0, X1 and X2 by some power of 2
@@ -71284,7 +71284,7 @@ static bool testrbfunit_gridhrbftest() {
          SetVector(&yv2);
          rbfgridcalc3v(&s, &x0, n0, &x1, n1, &x2, n2, &yv2);
          for (i = 0; i < ny * n0 * n1 * n2; i++) {
-            set_error_flag(&result, fabs(yv.xR[i] - yv2.xR[i]) > 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0), __FILE__, __LINE__, "testrbfunit.ap:4126");
+            set_error_flag(&result, !NearAtR(yv.xR[i], yv2.xR[i], 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0)), __FILE__, __LINE__, "testrbfunit.ap:4126");
          }
       }
    }
@@ -73134,7 +73134,7 @@ bool testpca(bool silent) {
                if (i == j) {
                   t--;
                }
-               pcaorterrors = pcaorterrors || fabs(t) > threshold;
+               pcaorterrors = pcaorterrors || !SmallAtR(t, threshold);
             }
          }
       // Variance test
@@ -73150,7 +73150,7 @@ bool testpca(bool silent) {
             } else {
                t = 0.0;
             }
-            pcavarerrors = pcavarerrors || fabs(t - s.xR[k]) > threshold;
+            pcavarerrors = pcavarerrors || !NearAtR(t, s.xR[k], threshold);
          }
          for (k = 0; k < m - 1; k++) {
             pcavarerrors = pcavarerrors || s.xR[k] < s.xR[k + 1];
@@ -73201,7 +73201,7 @@ bool testpca(bool silent) {
             if (i == j) {
                t--;
             }
-            pcaorterrors = pcaorterrors || fabs(t) > threshold;
+            pcaorterrors = pcaorterrors || !SmallAtR(t, threshold);
          }
       }
    }
@@ -73239,7 +73239,7 @@ bool testpca(bool silent) {
                if (i == j) {
                   t--;
                }
-               set_error_flag(&pcadensesubspaceerrors, fabs(t) > threshold, __FILE__, __LINE__, "testpcaunit.ap:217");
+               set_error_flag(&pcadensesubspaceerrors, !SmallAtR(t, threshold), __FILE__, __LINE__, "testpcaunit.ap:217");
             }
          }
       // Variance test
@@ -73255,13 +73255,13 @@ bool testpca(bool silent) {
             } else {
                t = 0.0;
             }
-            set_error_flag(&pcadensesubspaceerrors, fabs(t - s.xR[k]) > threshold, __FILE__, __LINE__, "testpcaunit.ap:236");
+            set_error_flag(&pcadensesubspaceerrors, !NearAtR(t, s.xR[k], threshold), __FILE__, __LINE__, "testpcaunit.ap:236");
          }
          for (k = 0; k < requested - 1; k++) {
             set_error_flag(&pcadensesubspaceerrors, fabs(s.xR[k]) < fabs(s.xR[k + 1]), __FILE__, __LINE__, "testpcaunit.ap:239");
          }
          for (k = 0; k < requested; k++) {
-            set_error_flag(&pcadensesubspaceerrors, s.xR[k] <= 0.0 && fabs(s.xR[k]) > 1000.0 * machineepsilon * fabs(s.xR[0]), __FILE__, __LINE__, "testpcaunit.ap:241");
+            set_error_flag(&pcadensesubspaceerrors, s.xR[k] <= 0.0 && !SmallAtR(s.xR[k], 1000.0 * machineepsilon * fabs(s.xR[0])), __FILE__, __LINE__, "testpcaunit.ap:241");
          }
       // Compare variance explained by top REQUESTED vectors from
       // full PCA and variance explained by reduced PCA.
@@ -73328,7 +73328,7 @@ bool testpca(bool silent) {
             if (i == j) {
                t--;
             }
-            set_error_flag(&pcadensesubspaceerrors, fabs(t) > threshold, __FILE__, __LINE__, "testpcaunit.ap:323");
+            set_error_flag(&pcadensesubspaceerrors, !SmallAtR(t, threshold), __FILE__, __LINE__, "testpcaunit.ap:323");
          }
       }
    // Variance test
@@ -73344,7 +73344,7 @@ bool testpca(bool silent) {
          } else {
             t = 0.0;
          }
-         set_error_flag(&pcadensesubspaceerrors, fabs(t - s.xR[k]) > threshold, __FILE__, __LINE__, "testpcaunit.ap:342");
+         set_error_flag(&pcadensesubspaceerrors, !NearAtR(t, s.xR[k], threshold), __FILE__, __LINE__, "testpcaunit.ap:342");
       }
       for (k = 0; k < requested - 1; k++) {
          set_error_flag(&pcadensesubspaceerrors, s.xR[k] < s.xR[k + 1], __FILE__, __LINE__, "testpcaunit.ap:345");
@@ -73406,7 +73406,7 @@ bool testpca(bool silent) {
                if (i == j) {
                   t--;
                }
-               set_error_flag(&pcasparsesubspaceerrors, fabs(t) > threshold, __FILE__, __LINE__, "testpcaunit.ap:417");
+               set_error_flag(&pcasparsesubspaceerrors, !SmallAtR(t, threshold), __FILE__, __LINE__, "testpcaunit.ap:417");
             }
          }
       // Variance test
@@ -73422,13 +73422,13 @@ bool testpca(bool silent) {
             } else {
                t = 0.0;
             }
-            set_error_flag(&pcasparsesubspaceerrors, fabs(t - s.xR[k]) > threshold * rmaxabs3(t, s.xR[k], 1.0), __FILE__, __LINE__, "testpcaunit.ap:436");
+            set_error_flag(&pcasparsesubspaceerrors, !NearAtR(t, s.xR[k], threshold * rmaxabs3(t, s.xR[k], 1.0)), __FILE__, __LINE__, "testpcaunit.ap:436");
          }
          for (k = 0; k < requested - 1; k++) {
             set_error_flag(&pcasparsesubspaceerrors, fabs(s.xR[k]) < fabs(s.xR[k + 1]), __FILE__, __LINE__, "testpcaunit.ap:439");
          }
          for (k = 0; k < requested; k++) {
-            set_error_flag(&pcasparsesubspaceerrors, s.xR[k] <= 0.0 && fabs(s.xR[k]) > 1000.0 * machineepsilon * rmax2(fabs(s.xR[0]), 1.0), __FILE__, __LINE__, "testpcaunit.ap:441");
+            set_error_flag(&pcasparsesubspaceerrors, s.xR[k] <= 0.0 && !SmallAtR(s.xR[k], 1000.0 * machineepsilon * rmax2(fabs(s.xR[0]), 1.0)), __FILE__, __LINE__, "testpcaunit.ap:441");
          }
       // Compare variance explained by top REQUESTED vectors from
       // full PCA and variance explained by reduced PCA.
@@ -73669,11 +73669,11 @@ bool testbdss(bool silent) {
             split2errors = true;
             continue;
          }
-         split2errors = split2errors || fabs(threshold - 0.5) > 100.0 * machineepsilon;
-         split2errors = split2errors || fabs(pal - 1.0) > 100.0 * machineepsilon;
-         split2errors = split2errors || fabs(pbl - 0.0) > 100.0 * machineepsilon;
-         split2errors = split2errors || fabs(par - 0.0) > 100.0 * machineepsilon;
-         split2errors = split2errors || fabs(pbr - 1.0) > 100.0 * machineepsilon;
+         split2errors = split2errors || !NearAtR(threshold, 0.5, 100.0 * machineepsilon);
+         split2errors = split2errors || !NearAtR(pal, 1.0, 100.0 * machineepsilon);
+         split2errors = split2errors || !NearAtR(pbl, 0.0, 100.0 * machineepsilon);
+         split2errors = split2errors || !NearAtR(par, 0.0, 100.0 * machineepsilon);
+         split2errors = split2errors || !NearAtR(pbr, 1.0, 100.0 * machineepsilon);
       }
    }
 // Special "CREDIT"-test (transparency coefficient)
@@ -73904,11 +73904,11 @@ bool testbdss(bool silent) {
    if (info != 1) {
       split2errors = true;
    } else {
-      split2errors = split2errors || fabs(threshold - 0.195) > 100.0 * machineepsilon;
-      split2errors = split2errors || fabs(pal - 0.80) > 0.02;
-      split2errors = split2errors || fabs(pbl - 0.20) > 0.02;
-      split2errors = split2errors || fabs(par - 0.97) > 0.02;
-      split2errors = split2errors || fabs(pbr - 0.03) > 0.02;
+      split2errors = split2errors || !NearAtR(threshold, 0.195, 100.0 * machineepsilon);
+      split2errors = split2errors || !NearAtR(pal, 0.80, 0.02);
+      split2errors = split2errors || !NearAtR(pbl, 0.20, 0.02);
+      split2errors = split2errors || !NearAtR(par, 0.97, 0.02);
+      split2errors = split2errors || !NearAtR(pbr, 0.03, 0.02);
    }
 // split-2 fast
 // General tests for different N's
@@ -73941,15 +73941,15 @@ bool testbdss(bool silent) {
             split2errors = true;
             continue;
          }
-         split2errors = split2errors || fabs(threshold - 0.5) > 100.0 * machineepsilon;
-         split2errors = split2errors || fabs(rms - 0.0) > 100.0 * machineepsilon;
+         split2errors = split2errors || !NearAtR(threshold, 0.5, 100.0 * machineepsilon);
+         split2errors = split2errors || !NearAtR(rms, 0.0, 100.0 * machineepsilon);
          if (n == 2) {
-            split2errors = split2errors || fabs(cvrms - 0.5) > 100.0 * machineepsilon;
+            split2errors = split2errors || !NearAtR(cvrms, 0.5, 100.0 * machineepsilon);
          } else {
             if (n == 3) {
-               split2errors = split2errors || fabs(cvrms - sqrt((2 * 0 + 2 * 0 + 2 * 0.25) / 6)) > 100.0 * machineepsilon;
+               split2errors = split2errors || !NearAtR(cvrms, sqrt((2 * 0 + 2 * 0 + 2 * 0.25) / 6), 100.0 * machineepsilon);
             } else {
-               split2errors = split2errors || fabs(cvrms) > 100.0 * machineepsilon;
+               split2errors = split2errors || !SmallAtR(cvrms, 100.0 * machineepsilon);
             }
          }
       }
@@ -73972,9 +73972,9 @@ bool testbdss(bool silent) {
    if (info != 1) {
       split2errors = true;
    } else {
-      split2errors = split2errors || fabs(threshold - (n - 2.5)) > 100.0 * machineepsilon;
-      split2errors = split2errors || fabs(rms - sqrt((0.25 + 0.25 + 0.25 + 0.25) / (3 * n))) > 100.0 * machineepsilon;
-      split2errors = split2errors || fabs(cvrms - sqrt((double)(1 + 1 + 1 + 1) / (3 * n))) > 100.0 * machineepsilon;
+      split2errors = split2errors || !NearAtR(threshold, n - 2.5, 100.0 * machineepsilon);
+      split2errors = split2errors || !NearAtR(rms, sqrt((0.25 + 0.25 + 0.25 + 0.25) / (3 * n)), 100.0 * machineepsilon);
+      split2errors = split2errors || !NearAtR(cvrms, sqrt((double)(1 + 1 + 1 + 1) / (3 * n)), 100.0 * machineepsilon);
    }
 // Optimal split-K
 // General tests for different N's
@@ -74014,8 +74014,8 @@ bool testbdss(bool silent) {
             continue;
          }
          optimalsplitkerrors = optimalsplitkerrors || ni != 2;
-         optimalsplitkerrors = optimalsplitkerrors || fabs(thresholds.xR[0] - 0.5) > 100.0 * machineepsilon;
-         optimalsplitkerrors = optimalsplitkerrors || fabs(cve - (-c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)))) > 100.0 * machineepsilon;
+         optimalsplitkerrors = optimalsplitkerrors || !NearAtR(thresholds.xR[0], 0.5, 100.0 * machineepsilon);
+         optimalsplitkerrors = optimalsplitkerrors || !NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100.0 * machineepsilon);
       }
    // test #2
       if (n > 2) {
@@ -74036,8 +74036,8 @@ bool testbdss(bool silent) {
             continue;
          }
          optimalsplitkerrors = optimalsplitkerrors || ni != 2;
-         optimalsplitkerrors = optimalsplitkerrors || fabs(thresholds.xR[0] - 0.5) > 100.0 * machineepsilon;
-         optimalsplitkerrors = optimalsplitkerrors || fabs(cve - (-c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)))) > 100.0 * machineepsilon;
+         optimalsplitkerrors = optimalsplitkerrors || !NearAtR(thresholds.xR[0], 0.5, 100.0 * machineepsilon);
+         optimalsplitkerrors = optimalsplitkerrors || !NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100.0 * machineepsilon);
       }
    // multi-tie test
       if (n >= 16) {
@@ -74066,10 +74066,10 @@ bool testbdss(bool silent) {
          optimalsplitkerrors = optimalsplitkerrors || ni != nc;
          if (ni == nc) {
             for (i = 0; i < nc - 1; i++) {
-               optimalsplitkerrors = optimalsplitkerrors || fabs(thresholds.xR[i] - (c0 * (i + 1) - 1 + 0.5)) > 100.0 * machineepsilon;
+               optimalsplitkerrors = optimalsplitkerrors || !NearAtR(thresholds.xR[i], c0 * (i + 1) - 1 + 0.5, 100.0 * machineepsilon);
             }
             cvr = -((nc - 1) * c0 * log((double)c0 / (c0 + nc - 1)) + c1 * log((double)c1 / (c1 + nc - 1)));
-            optimalsplitkerrors = optimalsplitkerrors || fabs(cve - cvr) > 100.0 * machineepsilon;
+            optimalsplitkerrors = optimalsplitkerrors || !NearAtR(cve, cvr, 100.0 * machineepsilon);
          }
       }
    }
@@ -74112,8 +74112,8 @@ bool testbdss(bool silent) {
          }
          splitkerrors = splitkerrors || ni != 2;
          if (ni == 2) {
-            splitkerrors = splitkerrors || fabs(thresholds.xR[0] - 0.5) > 100.0 * machineepsilon;
-            splitkerrors = splitkerrors || fabs(cve - (-c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)))) > 100.0 * machineepsilon;
+            splitkerrors = splitkerrors || !NearAtR(thresholds.xR[0], 0.5, 100.0 * machineepsilon);
+            splitkerrors = splitkerrors || !NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100.0 * machineepsilon);
          }
       }
    // test #2
@@ -74136,8 +74136,8 @@ bool testbdss(bool silent) {
          }
          splitkerrors = splitkerrors || ni != 2;
          if (ni == 2) {
-            splitkerrors = splitkerrors || fabs(thresholds.xR[0] - 0.5) > 100.0 * machineepsilon;
-            splitkerrors = splitkerrors || fabs(cve - (-c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)))) > 100.0 * machineepsilon;
+            splitkerrors = splitkerrors || !NearAtR(thresholds.xR[0], 0.5, 100.0 * machineepsilon);
+            splitkerrors = splitkerrors || !NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100.0 * machineepsilon);
          }
       }
    // multi-tie test
@@ -74158,10 +74158,10 @@ bool testbdss(bool silent) {
             splitkerrors = splitkerrors || ni != nc;
             if (ni == nc) {
                for (i = 0; i < nc - 1; i++) {
-                  splitkerrors = splitkerrors || fabs(thresholds.xR[i] - (c0 * (i + 1) - 1 + 0.5)) > 100.0 * machineepsilon;
+                  splitkerrors = splitkerrors || !NearAtR(thresholds.xR[i], c0 * (i + 1) - 1 + 0.5, 100.0 * machineepsilon);
                }
                cvr = -nc * c0 * log((double)c0 / (c0 + nc - 1));
-               splitkerrors = splitkerrors || fabs(cve - cvr) > 100.0 * machineepsilon;
+               splitkerrors = splitkerrors || !NearAtR(cve, cvr, 100.0 * machineepsilon);
             }
          }
       }
@@ -74772,7 +74772,7 @@ static void testmlpbaseunit_testinformational(ae_int_t nkind, ae_int_t nin, ae_i
    }
    mlpprocess(&network, &x, &y);
    for (j = 0; j < nout; j++) {
-      *err = *err || fabs(neurons.xyR[nlayers - 1][j] - y.xR[j]) > threshold;
+      *err = *err || !NearAtR(neurons.xyR[nlayers - 1][j], y.xR[j], threshold);
    }
    ae_frame_leave();
 }
@@ -75033,7 +75033,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
             v += y1.xR[i];
             *err = *err || y1.xR[i] < 0.0;
          }
-         *err = *err || fabs(v - 1) > 1000.0 * machineepsilon;
+         *err = *err || !NearAtR(v, 1.0, 1000.0 * machineepsilon);
       }
       if (nkind == 2) {
       // B-type network outputs are bounded from above/below
@@ -75091,7 +75091,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
          mlpprocess(&network, &x1, &y1);
          mlpprocess(&network2, &x1, &y2);
          for (j = 0; j < nout; j++) {
-            *err = *err || fabs(y1.xR[j] - y2.xR[j]) > 1.0E-6;
+            *err = *err || !NearAtR(y1.xR[j], y2.xR[j], 1.0E-6);
          }
       }
    }
@@ -75676,20 +75676,20 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
          } else {
             mlphessiannbatch(&network, &xy, ssize, &e2, &grad2, &h2);
          }
-         set_error_flag(err, fabs(e1 - e2) / e1 > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1440");
+         set_error_flag(err, !NearAtR(e1, e2, e1 * etol), __FILE__, __LINE__, "testmlpbaseunit.ap:1440");
          for (i = 0; i < wcount; i++) {
-            if (fabs(grad1.xR[i]) > 1.0E-2) {
-               set_error_flag(err, fabs((grad2.xR[i] - grad1.xR[i]) / grad1.xR[i]) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1443");
+            if (!SmallAtR(grad1.xR[i], 1.0E-2)) {
+               set_error_flag(err, !NearAtR(grad2.xR[i], grad1.xR[i], fabs(grad1.xR[i]) * etol), __FILE__, __LINE__, "testmlpbaseunit.ap:1443");
             } else {
-               set_error_flag(err, fabs(grad2.xR[i] - grad1.xR[i]) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1445");
+               set_error_flag(err, !NearAtR(grad2.xR[i], grad1.xR[i], etol), __FILE__, __LINE__, "testmlpbaseunit.ap:1445");
             }
          }
          for (i = 0; i < wcount; i++) {
             for (j = 0; j < wcount; j++) {
-               if (fabs(h1.xyR[i][j]) > 5.0E-2) {
-                  set_error_flag(err, fabs((h1.xyR[i][j] - h2.xyR[i][j]) / h1.xyR[i][j]) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1449");
+               if (!SmallAtR(h1.xyR[i][j], 5.0E-2)) {
+                  set_error_flag(err, !NearAtR(h1.xyR[i][j], h2.xyR[i][j], fabs(h1.xyR[i][j]) * etol), __FILE__, __LINE__, "testmlpbaseunit.ap:1449");
                } else {
-                  set_error_flag(err, fabs(h2.xyR[i][j] - h1.xyR[i][j]) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1451");
+                  set_error_flag(err, !NearAtR(h2.xyR[i][j], h1.xyR[i][j], etol), __FILE__, __LINE__, "testmlpbaseunit.ap:1451");
                }
             }
          }
@@ -75924,9 +75924,9 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
    // difference in classification of two samples.
       if (ssize > 0) {
          relclstolerance = 2.5 / ssize;
-         set_error_flag(err, fabs(mlpclserror(&network, &xy, ssize) - refclserror) > ssize * relclstolerance, __FILE__, __LINE__, "testmlpbaseunit.ap:1732");
-         set_error_flag(err, fabs(mlprelclserror(&network, &xy, ssize) - refrelclserror) > relclstolerance, __FILE__, __LINE__, "testmlpbaseunit.ap:1733");
-         set_error_flag(err, fabs(mlprelclserrorsparse(&network, &sparsexy, ssize) - refrelclserror) > relclstolerance, __FILE__, __LINE__, "testmlpbaseunit.ap:1734");
+         set_error_flag(err, !NearAtR(mlpclserror(&network, &xy, ssize), refclserror, ssize * relclstolerance), __FILE__, __LINE__, "testmlpbaseunit.ap:1732");
+         set_error_flag(err, !NearAtR(mlprelclserror(&network, &xy, ssize), refrelclserror, relclstolerance), __FILE__, __LINE__, "testmlpbaseunit.ap:1733");
+         set_error_flag(err, !NearAtR(mlprelclserrorsparse(&network, &sparsexy, ssize), refrelclserror, relclstolerance), __FILE__, __LINE__, "testmlpbaseunit.ap:1734");
       }
    }
    ae_frame_leave();
@@ -76119,13 +76119,13 @@ static bool testmlpbaseunit_testmlpgbsubset() {
          mlpgradbatch(&net, &parta, sbsize, &e1, &grad1);
          mlpgradbatchsubset(&net, &a, ssize, &idx, sbsize, &e2, &grad2);
       // Test for dense matrix
-         if (fabs(e1 - e2) > 1.0E-6) {
+         if (!NearAtR(e1, e2, 1.0E-6)) {
             result = true;
             ae_frame_leave();
             return result;
          }
          for (i = 0; i < wcount; i++) {
-            if (fabs(grad1.xR[i] - grad2.xR[i]) > 1.0E-6) {
+            if (!NearAtR(grad1.xR[i], grad2.xR[i], 1.0E-6)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -76134,13 +76134,13 @@ static bool testmlpbaseunit_testmlpgbsubset() {
       // Test for sparse matrix
          mlpgradbatchsparse(&net, &partsa, sbsize, &e1, &grad1);
          mlpgradbatchsparsesubset(&net, &sa, ssize, &idx, sbsize, &e2, &grad2);
-         if (fabs(e1 - e2) > 1.0E-6) {
+         if (!NearAtR(e1, e2, 1.0E-6)) {
             result = true;
             ae_frame_leave();
             return result;
          }
          for (i = 0; i < wcount; i++) {
-            if (fabs(grad1.xR[i] - grad2.xR[i]) > 1.0E-6) {
+            if (!NearAtR(grad1.xR[i], grad2.xR[i], 1.0E-6)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -76568,7 +76568,7 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
                v += y1.xR[i];
                *err = *err || y1.xR[i] < 0.0;
             }
-            *err = *err || fabs(v - 1) > 1000.0 * machineepsilon;
+            *err = *err || !NearAtR(v, 1.0, 1000.0 * machineepsilon);
          }
          if (nkind == 2) {
          // B-type network outputs are bounded from above/below
@@ -78112,7 +78112,7 @@ static bool testclusteringunit_advancedahctests() {
          clusterizergetdistances(&xy, npoints, d, disttypes.xZ[disttype], &dm2);
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < npoints; j++) {
-               if (!isfinite(dm2.xyR[i][j]) || fabs(dm.xyR[i][j] - dm2.xyR[i][j]) > 1.0E5 * machineepsilon) {
+               if (!isfinite(dm2.xyR[i][j]) || !NearAtR(dm.xyR[i][j], dm2.xyR[i][j], 1.0E5 * machineepsilon)) {
                   result = true;
                   ae_frame_leave();
                   return result;
@@ -78427,7 +78427,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
             testclusteringunit_kmeansreferenceupdatedistances(&xy, npoints, nfeatures, &c, nclusters, &xycref, &xydist2ref);
             for (i = 0; i < npoints; i++) {
                set_error_flag(othererrors, xyc.xZ[i] != xycref.xZ[i], __FILE__, __LINE__, "testclusteringunit.ap:1137");
-               set_error_flag(othererrors, fabs(xydist2.xR[i] - xydist2ref.xR[i]) > 1.0E-6, __FILE__, __LINE__, "testclusteringunit.ap:1138");
+               set_error_flag(othererrors, !NearAtR(xydist2.xR[i], xydist2ref.xR[i], 1.0E-6), __FILE__, __LINE__, "testclusteringunit.ap:1138");
             }
          }
       }
@@ -78630,7 +78630,7 @@ static void testclusteringunit_kmeansinfinitelooptest(bool *othererrors) {
    clusterizerrunkmeans(&s, nclusters, &rep);
    *othererrors = *othererrors || rep.terminationtype <= 0;
    for (i = 0; i < nfeatures; i++) {
-      *othererrors = *othererrors || fabs(rep.c.xyR[0][i] - xy.xyR[0][i]) > 1000.0 * machineepsilon;
+      *othererrors = *othererrors || !NearAtR(rep.c.xyR[0][i], xy.xyR[0][i], 1000.0 * machineepsilon);
    }
    for (i = 0; i < npoints; i++) {
       *othererrors = *othererrors || rep.cidx.xZ[i] != 0;
@@ -79022,7 +79022,7 @@ static void testdforestunit_testprocessing(bool *err) {
          y1.xR[i] = hqrndnormal(&rs);
       }
       dfprocess(&df1, &x1, &y1);
-      set_error_flag(err, fabs(y1.xR[0] - dfprocess0(&df1, &x2)) > 100.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:225");
+      set_error_flag(err, !NearAtR(y1.xR[0], dfprocess0(&df1, &x2), 100.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:225");
    // DFClassify works as expected
       ae_vector_set_length(&x1, nvars);
       ae_vector_set_length(&x2, nvars);
@@ -79082,7 +79082,7 @@ static void testdforestunit_testprocessing(bool *err) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
-      set_error_flag(err, fabs(dfprocess0(&df1, &x1) - dfprocess0(&df2, &x2)) > 100.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:303");
+      set_error_flag(err, !NearAtR(dfprocess0(&df1, &x1), dfprocess0(&df2, &x2), 100.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:303");
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
@@ -79130,7 +79130,7 @@ static void testdforestunit_testprocessing(bool *err) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
-      set_error_flag(err, fabs(dfprocess0(&df1, &x1) - dfprocess0(&df2, &x2)) > 100.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:339");
+      set_error_flag(err, !NearAtR(dfprocess0(&df1, &x1), dfprocess0(&df2, &x2), 100.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:339");
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
@@ -79147,7 +79147,7 @@ static void testdforestunit_testprocessing(bool *err) {
             v += y1.xR[i];
             *err = *err || y1.xR[i] < 0.0;
          }
-         *err = *err || fabs(v - 1) > 1000.0 * machineepsilon;
+         *err = *err || !NearAtR(v, 1.0, 1000.0 * machineepsilon);
       }
    }
    ae_frame_leave();
@@ -79241,11 +79241,11 @@ static void testdforestunit_basictest1(bool *err) {
                }
             }
          // Test
-            set_error_flag(err, fabs(rep.rmserror) > 1.0E-9, __FILE__, __LINE__, "testdforestunit.ap:475");
-            set_error_flag(err, fabs(rep.avgerror) > 1.0E-9, __FILE__, __LINE__, "testdforestunit.ap:476");
-            set_error_flag(err, fabs(rep.avgrelerror) > 1.0E-9, __FILE__, __LINE__, "testdforestunit.ap:477");
-            set_error_flag(err, fabs(rep.relclserror) > 0.0, __FILE__, __LINE__, "testdforestunit.ap:478");
-            set_error_flag(err, fabs(rep.avgce) > 0.0, __FILE__, __LINE__, "testdforestunit.ap:479");
+            set_error_flag(err, !SmallAtR(rep.rmserror, 1.0E-9), __FILE__, __LINE__, "testdforestunit.ap:475");
+            set_error_flag(err, !SmallAtR(rep.avgerror, 1.0E-9), __FILE__, __LINE__, "testdforestunit.ap:476");
+            set_error_flag(err, !SmallAtR(rep.avgrelerror, 1.0E-9), __FILE__, __LINE__, "testdforestunit.ap:477");
+            set_error_flag(err, !SmallAtR(rep.relclserror, 0.0), __FILE__, __LINE__, "testdforestunit.ap:478");
+            set_error_flag(err, !SmallAtR(rep.avgce, 0.0), __FILE__, __LINE__, "testdforestunit.ap:479");
             for (i = 0; i < npoints; i++) {
                ae_v_move(x.xR, 1, xy.xyR[i], 1, nvars);
                dfprocess(&df, &x, &y);
@@ -79256,11 +79256,11 @@ static void testdforestunit_basictest1(bool *err) {
                      set_error_flag(err, y.xR[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:492");
                      s += y.xR[j];
                   }
-                  set_error_flag(err, fabs(s - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:495");
-                  set_error_flag(err, fabs(y.xR[iround(xy.xyR[i][nvars])] - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:496");
+                  set_error_flag(err, !NearAtR(s, 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:495");
+                  set_error_flag(err, !NearAtR(y.xR[iround(xy.xyR[i][nvars])], 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:496");
                } else {
                // Regression problem
-                  set_error_flag(err, fabs(y.xR[0] - xy.xyR[i][nvars]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:503");
+                  set_error_flag(err, !NearAtR(y.xR[0], xy.xyR[i][nvars], 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:503");
                }
             }
          }
@@ -79289,11 +79289,11 @@ static void testdforestunit_basictest1(bool *err) {
          dfbuildersetdataset(&builder, &xy, npoints, nvars, nclasses);
          dfbuildersetsubsampleratio(&builder, 1.0);
          dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep);
-         set_error_flag(err, fabs(rep.rmserror) > 1.0E-9, __FILE__, __LINE__, "testdforestunit.ap:541");
-         set_error_flag(err, fabs(rep.avgerror) > 1.0E-9, __FILE__, __LINE__, "testdforestunit.ap:542");
-         set_error_flag(err, fabs(rep.avgrelerror) > 1.0E-9, __FILE__, __LINE__, "testdforestunit.ap:543");
-         set_error_flag(err, fabs(rep.relclserror) > 0.0, __FILE__, __LINE__, "testdforestunit.ap:544");
-         set_error_flag(err, fabs(rep.avgce) > 0.0, __FILE__, __LINE__, "testdforestunit.ap:545");
+         set_error_flag(err, !SmallAtR(rep.rmserror, 1.0E-9), __FILE__, __LINE__, "testdforestunit.ap:541");
+         set_error_flag(err, !SmallAtR(rep.avgerror, 1.0E-9), __FILE__, __LINE__, "testdforestunit.ap:542");
+         set_error_flag(err, !SmallAtR(rep.avgrelerror, 1.0E-9), __FILE__, __LINE__, "testdforestunit.ap:543");
+         set_error_flag(err, !SmallAtR(rep.relclserror, 0.0), __FILE__, __LINE__, "testdforestunit.ap:544");
+         set_error_flag(err, !SmallAtR(rep.avgce, 0.0), __FILE__, __LINE__, "testdforestunit.ap:545");
       // Test 16-bit compression
          dfcopy(&df, &df1);
          dfbinarycompression(&df1);
@@ -79307,11 +79307,11 @@ static void testdforestunit_basictest1(bool *err) {
                   set_error_flag(err, y.xR[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:564");
                   s += y.xR[j];
                }
-               set_error_flag(err, fabs(s - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:567");
-               set_error_flag(err, fabs(y.xR[iround(xy.xyR[i][nvars])] - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:568");
+               set_error_flag(err, !NearAtR(s, 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:567");
+               set_error_flag(err, !NearAtR(y.xR[iround(xy.xyR[i][nvars])], 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:568");
             } else {
             // Regression problem
-               set_error_flag(err, fabs(y.xR[0] - xy.xyR[i][nvars]) > tol16, __FILE__, __LINE__, "testdforestunit.ap:575");
+               set_error_flag(err, !NearAtR(y.xR[0], xy.xyR[i][nvars], tol16), __FILE__, __LINE__, "testdforestunit.ap:575");
             }
          }
       // Test 8-bit compression
@@ -79327,11 +79327,11 @@ static void testdforestunit_basictest1(bool *err) {
                   set_error_flag(err, y.xR[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:596");
                   s += y.xR[j];
                }
-               set_error_flag(err, fabs(s - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:599");
-               set_error_flag(err, fabs(y.xR[iround(xy.xyR[i][nvars])] - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:600");
+               set_error_flag(err, !NearAtR(s, 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:599");
+               set_error_flag(err, !NearAtR(y.xR[iround(xy.xyR[i][nvars])], 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:600");
             } else {
             // Regression problem
-               set_error_flag(err, fabs(y.xR[0] - xy.xyR[i][nvars]) > tol8, __FILE__, __LINE__, "testdforestunit.ap:607");
+               set_error_flag(err, !NearAtR(y.xR[0], xy.xyR[i][nvars], tol8), __FILE__, __LINE__, "testdforestunit.ap:607");
             }
          }
       }
@@ -79394,7 +79394,7 @@ static void testdforestunit_basictest2(bool *err) {
       dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1));
       dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep);
    // Check report fields
-      set_error_flag(err, fabs(rep.oobrelclserror - 1.0 / 12.0) > 0.50 * (1.0 / 12.0), __FILE__, __LINE__, "testdforestunit.ap:684");
+      set_error_flag(err, !NearAtR(rep.oobrelclserror, 1.0 / 12.0, 0.50 * (1.0 / 12.0)), __FILE__, __LINE__, "testdforestunit.ap:684");
       set_error_flag(err, rep.relclserror > rep.oobrelclserror, __FILE__, __LINE__, "testdforestunit.ap:685");
       set_error_flag(err, rep.avgce >= rep.oobavgce, __FILE__, __LINE__, "testdforestunit.ap:686");
       set_error_flag(err, rep.rmserror >= rep.oobrmserror, __FILE__, __LINE__, "testdforestunit.ap:687");
@@ -79409,7 +79409,7 @@ static void testdforestunit_basictest2(bool *err) {
       // Test for basic properties
          set_error_flag(err, y.xR[0] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:704");
          set_error_flag(err, y.xR[1] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:705");
-         set_error_flag(err, fabs(y.xR[0] + y.xR[1] - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:706");
+         set_error_flag(err, !NearAtR(y.xR[0] + y.xR[1], 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:706");
       // test for good correlation with results
          if (x.xR[0] < 1.0) {
             avgerr += fabs(1 - y.xR[0]);
@@ -79507,7 +79507,7 @@ static void testdforestunit_basictest3(bool *err) {
          // Test for basic properties
             set_error_flag(err, y.xR[0] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:831");
             set_error_flag(err, y.xR[1] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:832");
-            set_error_flag(err, fabs(y.xR[0] + y.xR[1] - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:833");
+            set_error_flag(err, !NearAtR(y.xR[0] + y.xR[1], 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:833");
          // test for good correlation with results
             r = sqrt(sqr(x.xR[0]) + sqr(x.xR[1]));
             if (r < 0.66 * 0.5) {
@@ -79672,13 +79672,13 @@ static void testdforestunit_basictest5(bool *err) {
    set_error_flag(err, rep.rmserror >= rep.oobrmserror, __FILE__, __LINE__, "testdforestunit.ap:1039");
    set_error_flag(err, rep.avgerror >= rep.oobavgerror, __FILE__, __LINE__, "testdforestunit.ap:1040");
    set_error_flag(err, rep.avgrelerror >= rep.oobavgrelerror, __FILE__, __LINE__, "testdforestunit.ap:1041");
-   set_error_flag(err, fabs(rep.rmserror) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1042");
-   set_error_flag(err, fabs(rep.avgerror) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1043");
-   set_error_flag(err, fabs(rep.avgrelerror) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1044");
+   set_error_flag(err, !SmallAtR(rep.rmserror, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1042");
+   set_error_flag(err, !SmallAtR(rep.avgerror, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1043");
+   set_error_flag(err, !SmallAtR(rep.avgrelerror, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1044");
    for (i = 0; i < npoints; i++) {
       ae_v_move(x.xR, 1, xy.xyR[i], 1, nvars);
       dfprocess(&df, &x, &y);
-      if (fabs(y.xR[0] - xy.xyR[i][nvars]) > 1000.0 * machineepsilon) {
+      if (!NearAtR(y.xR[0], xy.xyR[i][nvars], 1000.0 * machineepsilon)) {
          set_error_flag(err, true, __FILE__, __LINE__, "testdforestunit.ap:1050");
       }
    }
@@ -79795,22 +79795,22 @@ static void testdforestunit_basictestrandom(bool *err) {
             refavgrel /= coalesce((double)relcnt, 1.0);
             set_error_flag(err, rep.relclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1171");
             set_error_flag(err, rep.avgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1172");
-            set_error_flag(err, fabs(rep.rmserror - refrms) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1173");
-            set_error_flag(err, fabs(rep.avgerror - refavg) / refavg > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1174");
-            set_error_flag(err, fabs(rep.avgrelerror - refavgrel) / refavgrel > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1175");
+            set_error_flag(err, !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1173");
+            set_error_flag(err, !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1174");
+            set_error_flag(err, !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1175");
             set_error_flag(err, dfrelclserror(&df, &xy, npoints) != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1176");
             set_error_flag(err, dfavgce(&df, &xy, npoints) != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1177");
-            set_error_flag(err, fabs(dfrmserror(&df, &xy, npoints) - refrms) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1178");
-            set_error_flag(err, fabs(dfavgerror(&df, &xy, npoints) - refavg) / refavg > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1179");
-            set_error_flag(err, fabs(dfavgrelerror(&df, &xy, npoints) - refavgrel) / refavgrel > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1180");
+            set_error_flag(err, !NearAtR(dfrmserror(&df, &xy, npoints), refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1178");
+            set_error_flag(err, !NearAtR(dfavgerror(&df, &xy, npoints), refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1179");
+            set_error_flag(err, !NearAtR(dfavgrelerror(&df, &xy, npoints), refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1180");
          // Check OOB errors against training set errors:
          // * RelCLS and AvgCE are not calculated for regression problems
          // * RMS and AVG should be roughly FACTOR times larger
          // * AVG-REL should be just larger (it is more prone to sampling noise than previous two)
             set_error_flag(err, rep.oobrelclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1188");
             set_error_flag(err, rep.oobavgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1189");
-            set_error_flag(err, fabs(rep.oobrmserror / rep.rmserror - factor) > oobtol * factor, __FILE__, __LINE__, "testdforestunit.ap:1190");
-            set_error_flag(err, fabs(rep.oobavgerror / rep.avgerror - factor) > oobtol * factor, __FILE__, __LINE__, "testdforestunit.ap:1191");
+            set_error_flag(err, !NearAtR(rep.oobrmserror / rep.rmserror, factor, oobtol * factor), __FILE__, __LINE__, "testdforestunit.ap:1190");
+            set_error_flag(err, !NearAtR(rep.oobavgerror / rep.avgerror, factor, oobtol * factor), __FILE__, __LINE__, "testdforestunit.ap:1191");
             set_error_flag(err, rep.oobavgrelerror < rep.avgrelerror, __FILE__, __LINE__, "testdforestunit.ap:1192");
          } else {
          // Check training set errors
@@ -79837,14 +79837,16 @@ static void testdforestunit_basictestrandom(bool *err) {
             refavgrel /= npoints;
             refavgce /= npoints;
             set_error_flag(err, fabs(rep.avgce - refavgce) / refavgce > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1222");
-            set_error_flag(err, fabs(rep.rmserror - refrms) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1223");
-            set_error_flag(err, fabs(rep.avgerror - refavg) / refavg > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1224");
-            set_error_flag(err, fabs(rep.avgrelerror - refavgrel) / refavgrel > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1225");
+//(@)       set_error_flag(err, !NearAtR(rep.avgce, refavgce, refavgce * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1222");
+            set_error_flag(err, !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1223");
+            set_error_flag(err, !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1224");
+            set_error_flag(err, !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1225");
             set_error_flag(err, fabs(dfrelclserror(&df, &xy, npoints) - rep.relclserror) * npoints > 5.0, __FILE__, __LINE__, "testdforestunit.ap:1227");
             set_error_flag(err, fabs(dfavgce(&df, &xy, npoints) - refavgce) / refavgce > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1228");
-            set_error_flag(err, fabs(dfrmserror(&df, &xy, npoints) - refrms) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1229");
-            set_error_flag(err, fabs(dfavgerror(&df, &xy, npoints) - refavg) / refavg > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1230");
-            set_error_flag(err, fabs(dfavgrelerror(&df, &xy, npoints) - refavgrel) / refavgrel > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1231");
+//(@)       set_error_flag(err, !NearAtR(dfavgce(&df, &xy, npoints), refavgce, refavgce * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1228");
+            set_error_flag(err, !NearAtR(dfrmserror(&df, &xy, npoints), refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1229");
+            set_error_flag(err, !NearAtR(dfavgerror(&df, &xy, npoints), refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1230");
+            set_error_flag(err, !NearAtR(dfavgrelerror(&df, &xy, npoints), refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1231");
          // Check OOB errors against training set errors
          // * RelCLS, AvgCE and AvgRel should be just larger (too prone to sampling noise to perform more sensitive tests)
          // * RMS and AVG should be roughly FACTOR times larger
@@ -79852,8 +79854,8 @@ static void testdforestunit_basictestrandom(bool *err) {
             set_error_flag(err, rep.oobrelclserror < rep.relclserror, __FILE__, __LINE__, "testdforestunit.ap:1239");
             set_error_flag(err, rep.oobavgce < rep.avgce, __FILE__, __LINE__, "testdforestunit.ap:1240");
             set_error_flag(err, rep.oobavgrelerror < rep.avgrelerror, __FILE__, __LINE__, "testdforestunit.ap:1241");
-            set_error_flag(err, fabs(rep.oobrmserror / rep.rmserror - factor) > oobtol * factor, __FILE__, __LINE__, "testdforestunit.ap:1242");
-            set_error_flag(err, fabs(rep.oobavgerror / rep.avgerror - factor) > oobtol * factor, __FILE__, __LINE__, "testdforestunit.ap:1243");
+            set_error_flag(err, !NearAtR(rep.oobrmserror / rep.rmserror, factor, oobtol * factor), __FILE__, __LINE__, "testdforestunit.ap:1242");
+            set_error_flag(err, !NearAtR(rep.oobavgerror / rep.avgerror, factor, oobtol * factor), __FILE__, __LINE__, "testdforestunit.ap:1243");
          }
       }
    }
@@ -79950,16 +79952,16 @@ static void testdforestunit_basictestallsame(bool *err) {
          refavgrel /= coalesce((double)relcnt, 1.0);
          set_error_flag(err, rep.relclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1346");
          set_error_flag(err, rep.avgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1347");
-         set_error_flag(err, fabs(rep.rmserror - refrms) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1348");
-         set_error_flag(err, fabs(rep.avgerror - refavg) / refavg > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1349");
-         set_error_flag(err, fabs(rep.avgrelerror - refavgrel) / refavgrel > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1350");
+         set_error_flag(err, !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1348");
+         set_error_flag(err, !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1349");
+         set_error_flag(err, !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1350");
       // Check OOB errors against training set errors:
       // * RelCLS and AvgCE are not calculated for regression problems
       // * RMS and AVG should be roughly same
          set_error_flag(err, rep.oobrelclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1357");
          set_error_flag(err, rep.oobavgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1358");
-         set_error_flag(err, fabs(rep.oobrmserror / rep.rmserror - 1) > oobtol, __FILE__, __LINE__, "testdforestunit.ap:1359");
-         set_error_flag(err, fabs(rep.oobavgerror / rep.avgerror - 1) > oobtol, __FILE__, __LINE__, "testdforestunit.ap:1360");
+         set_error_flag(err, !NearAtR(rep.oobrmserror / rep.rmserror, 1.0, oobtol), __FILE__, __LINE__, "testdforestunit.ap:1359");
+         set_error_flag(err, !NearAtR(rep.oobavgerror / rep.avgerror, 1.0, oobtol), __FILE__, __LINE__, "testdforestunit.ap:1360");
       } else {
       // Check training set errors
          for (i = 0; i < npoints; i++) {
@@ -79985,14 +79987,15 @@ static void testdforestunit_basictestallsame(bool *err) {
          refavgrel /= npoints;
          refavgce /= npoints;
          set_error_flag(err, fabs(rep.avgce - refavgce) / refavgce > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1390");
-         set_error_flag(err, fabs(rep.rmserror - refrms) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1391");
-         set_error_flag(err, fabs(rep.avgerror - refavg) / refavg > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1392");
-         set_error_flag(err, fabs(rep.avgrelerror - refavgrel) / refavgrel > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1393");
+//(@)    set_error_flag(err, !NearAtR(rep.avgce, refavgce, refavgce * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1390");
+         set_error_flag(err, !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1391");
+         set_error_flag(err, !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1392");
+         set_error_flag(err, !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1393");
       // Check OOB errors against training set errors
       // * RMS and AVG should be roughly same
       //
-         set_error_flag(err, fabs(rep.oobrmserror / rep.rmserror - 1) > oobtol, __FILE__, __LINE__, "testdforestunit.ap:1400");
-         set_error_flag(err, fabs(rep.oobavgerror / rep.avgerror - 1) > oobtol, __FILE__, __LINE__, "testdforestunit.ap:1401");
+         set_error_flag(err, !NearAtR(rep.oobrmserror / rep.rmserror, 1.0, oobtol), __FILE__, __LINE__, "testdforestunit.ap:1400");
+         set_error_flag(err, !NearAtR(rep.oobavgerror / rep.avgerror, 1.0, oobtol), __FILE__, __LINE__, "testdforestunit.ap:1401");
       }
    }
    ae_frame_leave();
@@ -80069,11 +80072,11 @@ static void testdforestunit_testcompression(bool *err) {
             if (nclasses > 1) {
             // Compare output probabilities for classification problem
                for (j = 0; j < nclasses; j++) {
-                  set_error_flag(err, fabs(y0.xR[j] - y1.xR[j]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1495");
+                  set_error_flag(err, !NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1495");
                }
             } else {
             // Compare output values for regression problem
-               set_error_flag(err, fabs(y0.xR[0] - y1.xR[0]) > tol16, __FILE__, __LINE__, "testdforestunit.ap:1502");
+               set_error_flag(err, !NearAtR(y0.xR[0], y1.xR[0], tol16), __FILE__, __LINE__, "testdforestunit.ap:1502");
             }
          }
       // Test 8-bit compression
@@ -80088,11 +80091,11 @@ static void testdforestunit_testcompression(bool *err) {
             if (nclasses > 1) {
             // Compare output probabilities for classification problem
                for (j = 0; j < nclasses; j++) {
-                  set_error_flag(err, fabs(y0.xR[j] - y1.xR[j]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1523");
+                  set_error_flag(err, !NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1523");
                }
             } else {
             // Compare output values for regression problem
-               set_error_flag(err, fabs(y0.xR[0] - y1.xR[0]) > tol8, __FILE__, __LINE__, "testdforestunit.ap:1530");
+               set_error_flag(err, !NearAtR(y0.xR[0], y1.xR[0], tol8), __FILE__, __LINE__, "testdforestunit.ap:1530");
             }
          }
       }
@@ -80143,11 +80146,11 @@ static void testdforestunit_testcompression(bool *err) {
          if (nclasses > 1) {
          // Compare output probabilities for classification problem
             for (j = 0; j < nclasses; j++) {
-               set_error_flag(err, fabs(y0.xR[j] - y1.xR[j]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1593");
+               set_error_flag(err, !NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1593");
             }
          } else {
          // Compare output values for regression problem
-            set_error_flag(err, fabs(y0.xR[0] - y1.xR[0]) > tol16, __FILE__, __LINE__, "testdforestunit.ap:1600");
+            set_error_flag(err, !NearAtR(y0.xR[0], y1.xR[0], tol16), __FILE__, __LINE__, "testdforestunit.ap:1600");
          }
       }
    // Test 8-bit compression
@@ -80162,11 +80165,11 @@ static void testdforestunit_testcompression(bool *err) {
          if (nclasses > 1) {
          // Compare output probabilities for classification problem
             for (j = 0; j < nclasses; j++) {
-               set_error_flag(err, fabs(y0.xR[j] - y1.xR[j]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:1621");
+               set_error_flag(err, !NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1621");
             }
          } else {
          // Compare output values for regression problem
-            set_error_flag(err, fabs(y0.xR[0] - y1.xR[0]) > tol8, __FILE__, __LINE__, "testdforestunit.ap:1628");
+            set_error_flag(err, !NearAtR(y0.xR[0], y1.xR[0], tol8), __FILE__, __LINE__, "testdforestunit.ap:1628");
          }
       }
    }
@@ -80425,7 +80428,7 @@ static void testdforestunit_testimportance(bool *err) {
             for (j = 0; j < nvars; j++) {
                v += rep.varimportances.xR[j];
             }
-            set_error_flag(err, fabs(v - 1) > 1.0e-6, __FILE__, __LINE__, "testdforestunit.ap:1886");
+            set_error_flag(err, !NearAtR(v, 1.0, 1.0e-6), __FILE__, __LINE__, "testdforestunit.ap:1886");
          }
       }
    // Test that on a problem where:
@@ -80503,7 +80506,7 @@ static void testdforestunit_testimportance(bool *err) {
             for (j = 0; j < nvars; j++) {
                v += rep.varimportances.xR[j];
             }
-            set_error_flag(err, fabs(v - 1) > 1.0e-6, __FILE__, __LINE__, "testdforestunit.ap:1977");
+            set_error_flag(err, !NearAtR(v, 1.0, 1.0e-6), __FILE__, __LINE__, "testdforestunit.ap:1977");
          }
       }
    }
@@ -80592,7 +80595,7 @@ static void testdforestunit_testimportance(bool *err) {
    // Compare
       for (k = 0; k < nvars; k++) {
          v = 1 - vloss.xR[nvars] / vloss.xR[nvars + 1] - (1 - vloss.xR[k] / vloss.xR[nvars + 1]);
-         set_error_flag(err, fabs(v - rep.varimportances.xR[k]) > 0.25, __FILE__, __LINE__, "testdforestunit.ap:2081");
+         set_error_flag(err, !NearAtR(v, rep.varimportances.xR[k], 0.25), __FILE__, __LINE__, "testdforestunit.ap:2081");
       }
    }
    ae_frame_leave();
@@ -80940,7 +80943,7 @@ bool testlinreg(bool silent) {
          if (info != 1 || info2 != 1) {
             slcerrors = true;
          } else {
-            slerrors = slerrors || fabs(a - a2) > threshold || fabs(b - b2) > threshold;
+            slerrors = slerrors || !NearAtR(a, a2, threshold) || !NearAtR(b, b2, threshold);
          }
       // Test for A/B
       //
@@ -80956,7 +80959,7 @@ bool testlinreg(bool silent) {
          if (info != 1) {
             slcerrors = true;
          } else {
-            slerrors = slerrors || fabs(a - ea) > 0.001 || fabs(b - eb) > 0.001;
+            slerrors = slerrors || !NearAtR(a, ea, 0.001) || !NearAtR(b, eb, 0.001);
          }
       // Test for VarA, VarB, P (P is being tested only for N>2)
          for (i = 0; i < qcnt; i++) {
@@ -80991,14 +80994,14 @@ bool testlinreg(bool silent) {
             }
          }
          testlinregunit_calculatemv(&ta, estpasscount, &mean, &means, &stddev, &stddevs);
-         slerrors = slerrors || fabs(mean - ea) / means >= sigmathreshold;
-         slerrors = slerrors || fabs(stddev - sqrt(varatested)) / stddevs >= sigmathreshold;
+         slerrors = slerrors || !NearR(mean, ea, means * sigmathreshold);
+         slerrors = slerrors || !NearR(stddev, sqrt(varatested), stddevs * sigmathreshold);
          testlinregunit_calculatemv(&tb, estpasscount, &mean, &means, &stddev, &stddevs);
-         slerrors = slerrors || fabs(mean - eb) / means >= sigmathreshold;
-         slerrors = slerrors || fabs(stddev - sqrt(varbtested)) / stddevs >= sigmathreshold;
+         slerrors = slerrors || !NearR(mean, eb, means * sigmathreshold);
+         slerrors = slerrors || !NearR(stddev, sqrt(varbtested), stddevs * sigmathreshold);
          if (n > 2) {
             for (i = 0; i < qcnt; i++) {
-               if (fabs(qtbl.xR[i] - qvals.xR[i]) > qsigma.xR[i] * sigmathreshold) {
+               if (!NearAtR(qtbl.xR[i], qvals.xR[i], qsigma.xR[i] * sigmathreshold)) {
                   slerrors = true;
                }
             }
@@ -81055,12 +81058,12 @@ bool testlinreg(bool silent) {
       }
       lrunpack(&wt, &tmpweights, &tmpi);
       lrlines(&xy, &s, n, &info2, &a, &b, &vara, &varb, &covab, &corrab, &p);
-      gropterrors = gropterrors || fabs(a - tmpweights.xR[1]) > threshold;
-      gropterrors = gropterrors || fabs(b - tmpweights.xR[0]) > threshold;
-      grcoverrors = grcoverrors || fabs(vara - ar.c.xyR[1][1]) > threshold;
-      grcoverrors = grcoverrors || fabs(varb - ar.c.xyR[0][0]) > threshold;
-      grcoverrors = grcoverrors || fabs(covab - ar.c.xyR[1][0]) > threshold;
-      grcoverrors = grcoverrors || fabs(covab - ar.c.xyR[0][1]) > threshold;
+      gropterrors = gropterrors || !NearAtR(a, tmpweights.xR[1], threshold);
+      gropterrors = gropterrors || !NearAtR(b, tmpweights.xR[0], threshold);
+      grcoverrors = grcoverrors || !NearAtR(vara, ar.c.xyR[1][1], threshold);
+      grcoverrors = grcoverrors || !NearAtR(varb, ar.c.xyR[0][0], threshold);
+      grcoverrors = grcoverrors || !NearAtR(covab, ar.c.xyR[1][0], threshold);
+      grcoverrors = grcoverrors || !NearAtR(covab, ar.c.xyR[0][1], threshold);
       lrbuild(&xy, n, 1, &info, &wt, &ar);
       if (info != 1) {
          grconverrors = true;
@@ -81068,8 +81071,8 @@ bool testlinreg(bool silent) {
       }
       lrunpack(&wt, &tmpweights, &tmpi);
       lrline(&xy, n, &info2, &a, &b);
-      gropterrors = gropterrors || fabs(a - tmpweights.xR[1]) > threshold;
-      gropterrors = gropterrors || fabs(b - tmpweights.xR[0]) > threshold;
+      gropterrors = gropterrors || !NearAtR(a, tmpweights.xR[1], threshold);
+      gropterrors = gropterrors || !NearAtR(b, tmpweights.xR[0], threshold);
    }
 // S covariance versus S-less covariance.
 // Slightly skewed task, large sample size.
@@ -81088,10 +81091,10 @@ bool testlinreg(bool silent) {
    if (info != 1 || info2 != 1) {
       grconverrors = true;
    } else {
-      grcoverrors = grcoverrors || fabs(log(ar.c.xyR[0][0] / varb)) > log(1.2);
-      grcoverrors = grcoverrors || fabs(log(ar.c.xyR[1][1] / vara)) > log(1.2);
-      grcoverrors = grcoverrors || fabs(log(ar.c.xyR[0][1] / covab)) > log(1.2);
-      grcoverrors = grcoverrors || fabs(log(ar.c.xyR[1][0] / covab)) > log(1.2);
+      grcoverrors = grcoverrors || !SmallAtR(log(ar.c.xyR[0][0] / varb), log(1.2));
+      grcoverrors = grcoverrors || !SmallAtR(log(ar.c.xyR[1][1] / vara), log(1.2));
+      grcoverrors = grcoverrors || !SmallAtR(log(ar.c.xyR[0][1] / covab), log(1.2));
+      grcoverrors = grcoverrors || !SmallAtR(log(ar.c.xyR[1][0] / covab), log(1.2));
    }
 // General tests:
 // * basis functions - up to cubic
@@ -81234,7 +81237,7 @@ bool testlinreg(bool silent) {
                   x.xR[i] = randommid();
                   v += tmpweights.xR[i] * x.xR[i];
                }
-               grothererrors = grothererrors || fabs(v - lrprocess(&wt, &x)) / rmax2(fabs(v), 1.0) > threshold;
+               grothererrors = grothererrors || !NearAtR(v, lrprocess(&wt, &x), rmax2(fabs(v), 1.0) * threshold);
             // LRPack test
                lrpack(&tmpweights, m, &wt2);
                ae_vector_set_length(&x, m - 1 + 1);
@@ -81242,7 +81245,7 @@ bool testlinreg(bool silent) {
                   x.xR[i] = randommid();
                }
                v = lrprocess(&wt, &x);
-               grothererrors = grothererrors || fabs(v - lrprocess(&wt2, &x)) / fabs(v) > threshold;
+               grothererrors = grothererrors || !NearAtR(v, lrprocess(&wt2, &x), fabs(v) * threshold);
             // Optimality test
                for (k = 0; k <= m; k++) {
                   if (modeltype == 1 && k == m) {
@@ -81308,7 +81311,7 @@ bool testlinreg(bool silent) {
                   tc.xR[i] = v;
                }
                v = ae_v_dotproduct(tc.xR, 1, tb.xR, 1, m + 1);
-               grcoverrors = grcoverrors || fabs((sqrt(v) - stddev) / stddevs) >= sigmathreshold;
+               grcoverrors = grcoverrors || !NearR(sqrt(v), stddev, stddevs * sigmathreshold);
             // Test for the fast CV error:
             // calculate CV error by definition (leaving out N
             // points and recalculating solution).
@@ -81369,12 +81372,12 @@ bool testlinreg(bool silent) {
                rmserror = sqrt(rmserror / n);
                avgerror /= n;
                avgrelerror /= n;
-               gresterrors = gresterrors || fabs(log(ar.cvrmserror / cvrmserror)) > log(1 + 1.0E-5);
-               gresterrors = gresterrors || fabs(log(ar.cvavgerror / cvavgerror)) > log(1 + 1.0E-5);
-               gresterrors = gresterrors || fabs(log(ar.cvavgrelerror / cvavgrelerror)) > log(1 + 1.0E-5);
-               gresterrors = gresterrors || fabs(log(ar.rmserror / rmserror)) > log(1 + 1.0E-5);
-               gresterrors = gresterrors || fabs(log(ar.avgerror / avgerror)) > log(1 + 1.0E-5);
-               gresterrors = gresterrors || fabs(log(ar.avgrelerror / avgrelerror)) > log(1 + 1.0E-5);
+               gresterrors = gresterrors || !SmallAtR(log(ar.cvrmserror / cvrmserror), log(1.0 + 1.0E-5));
+               gresterrors = gresterrors || !SmallAtR(log(ar.cvavgerror / cvavgerror), log(1.0 + 1.0E-5));
+               gresterrors = gresterrors || !SmallAtR(log(ar.cvavgrelerror / cvavgrelerror), log(1.0 + 1.0E-5));
+               gresterrors = gresterrors || !SmallAtR(log(ar.rmserror / rmserror), log(1.0 + 1.0E-5));
+               gresterrors = gresterrors || !SmallAtR(log(ar.avgerror / avgerror), log(1.0 + 1.0E-5));
+               gresterrors = gresterrors || !SmallAtR(log(ar.avgrelerror / avgrelerror), log(1.0 + 1.0E-5));
             }
          }
       }
@@ -81385,7 +81388,7 @@ bool testlinreg(bool silent) {
       do {
          noiselevel = randomreal() + 0.1;
          tasklevel = randommid();
-      } while (fabs(noiselevel - tasklevel) <= 0.05);
+      } while (NearAtR(noiselevel, tasklevel, 0.05));
       ae_matrix_set_length(&xy, 3 * n - 1 + 1, 1 + 1);
       for (i = 0; i < n; i++) {
          xy.xyR[3 * i + 0][0] = (double)i;
@@ -81399,12 +81402,12 @@ bool testlinreg(bool silent) {
       if (info == 1) {
          lrunpack(&wt, &tmpweights, &tmpi);
          v = lrrmserror(&wt, &xy, 3 * n);
-         grothererrors = grothererrors || fabs(v - noiselevel * sqrt(2.0 / 3.0)) > threshold;
+         grothererrors = grothererrors || !NearAtR(v, noiselevel * sqrt(2.0 / 3.0), threshold);
          v = lravgerror(&wt, &xy, 3 * n);
-         grothererrors = grothererrors || fabs(v - noiselevel * (2.0 / 3.0)) > threshold;
+         grothererrors = grothererrors || !NearAtR(v, noiselevel * (2.0 / 3.0), threshold);
          v = lravgrelerror(&wt, &xy, 3 * n);
          vv = (fabs(noiselevel / (tasklevel - noiselevel)) + fabs(noiselevel / (tasklevel + noiselevel))) / 3;
-         grothererrors = grothererrors || fabs(v - vv) > threshold * vv;
+         grothererrors = grothererrors || !NearAtR(v, vv, threshold * vv);
       } else {
          grothererrors = true;
       }
@@ -81420,7 +81423,7 @@ bool testlinreg(bool silent) {
       if (info == 1) {
          lrunpack(&wt, &tmpweights, &tmpi);
          v = lravgrelerror(&wt, &xy, 3 * n);
-         grothererrors = grothererrors || fabs(v - 1) > threshold;
+         grothererrors = grothererrors || !NearAtR(v, 1.0, threshold);
       } else {
          grothererrors = true;
       }
@@ -81583,13 +81586,13 @@ static bool testsma(bool issilent) {
    x.xR[8] = 0.0;
    x.xR[9] = 0.0;
    filtersma(&x, 10, 3);
-   zerohandlingerrors = zerohandlingerrors || fabs(x.xR[0] - sqrt(2.0)) > threshold;
-   zerohandlingerrors = zerohandlingerrors || fabs(x.xR[1] - (sqrt(2.0) + sqrt(3.0)) / 2) > threshold;
-   zerohandlingerrors = zerohandlingerrors || fabs(x.xR[2] - (sqrt(2.0) + sqrt(3.0) + sqrt(5.0)) / 3) > threshold;
-   zerohandlingerrors = zerohandlingerrors || fabs(x.xR[3] - (sqrt(3.0) + sqrt(5.0) + sqrt(6.0)) / 3) > threshold;
-   zerohandlingerrors = zerohandlingerrors || fabs(x.xR[4] - (sqrt(5.0) + sqrt(6.0) + sqrt(7.0)) / 3) > threshold;
-   zerohandlingerrors = zerohandlingerrors || fabs(x.xR[5] - (sqrt(6.0) + sqrt(7.0)) / 3) > threshold;
-   zerohandlingerrors = zerohandlingerrors || fabs(x.xR[6] - sqrt(7.0) / 3) > threshold;
+   zerohandlingerrors = zerohandlingerrors || !NearAtR(x.xR[0], sqrt(2.0), threshold);
+   zerohandlingerrors = zerohandlingerrors || !NearAtR(x.xR[1], (sqrt(2.0) + sqrt(3.0)) / 2.0, threshold);
+   zerohandlingerrors = zerohandlingerrors || !NearAtR(x.xR[2], (sqrt(2.0) + sqrt(3.0) + sqrt(5.0)) / 3.0, threshold);
+   zerohandlingerrors = zerohandlingerrors || !NearAtR(x.xR[3], (sqrt(3.0) + sqrt(5.0) + sqrt(6.0)) / 3.0, threshold);
+   zerohandlingerrors = zerohandlingerrors || !NearAtR(x.xR[4], (sqrt(5.0) + sqrt(6.0) + sqrt(7.0)) / 3.0, threshold);
+   zerohandlingerrors = zerohandlingerrors || !NearAtR(x.xR[5], (sqrt(6.0) + sqrt(7.0)) / 3.0, threshold);
+   zerohandlingerrors = zerohandlingerrors || !NearAtR(x.xR[6], sqrt(7.0) / 3.0, threshold);
    zerohandlingerrors = zerohandlingerrors || x.xR[7] != 0.0;
    zerohandlingerrors = zerohandlingerrors || x.xR[8] != 0.0;
    zerohandlingerrors = zerohandlingerrors || x.xR[9] != 0.0;
@@ -81609,11 +81612,11 @@ static bool testsma(bool issilent) {
    zerohandlingerrors = zerohandlingerrors || x.xR[2] != 0.0;
    zerohandlingerrors = zerohandlingerrors || x.xR[3] != 0.0;
    zerohandlingerrors = zerohandlingerrors || x.xR[4] != 0.0;
-   zerohandlingerrors = zerohandlingerrors || fabs(x.xR[5] - sqrt(2.0) / 3) > threshold;
-   zerohandlingerrors = zerohandlingerrors || fabs(x.xR[6] - (sqrt(2.0) + sqrt(3.0)) / 3) > threshold;
-   zerohandlingerrors = zerohandlingerrors || fabs(x.xR[7] - (sqrt(2.0) + sqrt(3.0) + sqrt(5.0)) / 3) > threshold;
-   zerohandlingerrors = zerohandlingerrors || fabs(x.xR[8] - (sqrt(3.0) + sqrt(5.0) + sqrt(6.0)) / 3) > threshold;
-   zerohandlingerrors = zerohandlingerrors || fabs(x.xR[9] - (sqrt(5.0) + sqrt(6.0) + sqrt(7.0)) / 3) > threshold;
+   zerohandlingerrors = zerohandlingerrors || !NearAtR(x.xR[5], sqrt(2.0) / 3.0, threshold);
+   zerohandlingerrors = zerohandlingerrors || !NearAtR(x.xR[6], (sqrt(2.0) + sqrt(3.0)) / 3.0, threshold);
+   zerohandlingerrors = zerohandlingerrors || !NearAtR(x.xR[7], (sqrt(2.0) + sqrt(3.0) + sqrt(5.0)) / 3.0, threshold);
+   zerohandlingerrors = zerohandlingerrors || !NearAtR(x.xR[8], (sqrt(3.0) + sqrt(5.0) + sqrt(6.0)) / 3.0, threshold);
+   zerohandlingerrors = zerohandlingerrors || !NearAtR(x.xR[9], (sqrt(5.0) + sqrt(6.0) + sqrt(7.0)) / 3.0, threshold);
 // Final result
    result = precomputederrors || zerohandlingerrors;
    ae_frame_leave();
@@ -81698,12 +81701,12 @@ static bool testlrma(bool issilent) {
    x.xR[4] = 11.0;
    x.xR[5] = 12.0;
    filterlrma(&x, 6, 3);
-   precomputederrors = precomputederrors || fabs(x.xR[0] - 7) > threshold;
-   precomputederrors = precomputederrors || fabs(x.xR[1] - 8) > threshold;
-   precomputederrors = precomputederrors || fabs(x.xR[2] - 9) > threshold;
-   precomputederrors = precomputederrors || fabs(x.xR[3] - 10) > threshold;
-   precomputederrors = precomputederrors || fabs(x.xR[4] - 11) > threshold;
-   precomputederrors = precomputederrors || fabs(x.xR[5] - 12) > threshold;
+   precomputederrors = precomputederrors || !NearAtR(x.xR[0], 7.0, threshold);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[1], 8.0, threshold);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[2], 9.0, threshold);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[3], 10.0, threshold);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[4], 11.0, threshold);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[5], 12.0, threshold);
    ae_vector_set_length(&x, 6);
    x.xR[0] = 7.0;
    x.xR[1] = 8.0;
@@ -81712,12 +81715,12 @@ static bool testlrma(bool issilent) {
    x.xR[4] = 12.0;
    x.xR[5] = 12.0;
    filterlrma(&x, 6, 3);
-   precomputederrors = precomputederrors || fabs(x.xR[0] - 7.0000000000) > 1.0E-5;
-   precomputederrors = precomputederrors || fabs(x.xR[1] - 8.0000000000) > 1.0E-5;
-   precomputederrors = precomputederrors || fabs(x.xR[2] - 8.1666666667) > 1.0E-5;
-   precomputederrors = precomputederrors || fabs(x.xR[3] - 8.8333333333) > 1.0E-5;
-   precomputederrors = precomputederrors || fabs(x.xR[4] - 11.6666666667) > 1.0E-5;
-   precomputederrors = precomputederrors || fabs(x.xR[5] - 12.5000000000) > 1.0E-5;
+   precomputederrors = precomputederrors || !NearAtR(x.xR[0], 7.0000000000, 1.0E-5);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[1], 8.0000000000, 1.0E-5);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[2], 8.1666666667, 1.0E-5);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[3], 8.8333333333, 1.0E-5);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[4], 11.6666666667, 1.0E-5);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[5], 12.5000000000, 1.0E-5);
 // Final result
    result = precomputederrors;
    ae_frame_leave();
@@ -81877,8 +81880,8 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[nlasttracklen + i - windowwidth]) > tol, __FILE__, __LINE__, "testssaunit.ap:150");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:151");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[nlasttracklen + i - windowwidth], tol), __FILE__, __LINE__, "testssaunit.ap:150");
+               set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:151");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -81890,8 +81893,8 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             for (i = 0; i < nlasttracklen; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:163");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:164");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:163");
+               set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:164");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -81904,7 +81907,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             for (i = 0; i < trend.cnt; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[nlasttracklen - 1]) > tol, __FILE__, __LINE__, "testssaunit.ap:176");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[nlasttracklen - 1], tol), __FILE__, __LINE__, "testssaunit.ap:176");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -81918,7 +81921,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             for (i = 0; i < trend.cnt; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[nlasttracklen - 1]) > tol, __FILE__, __LINE__, "testssaunit.ap:188");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[nlasttracklen - 1], tol), __FILE__, __LINE__, "testssaunit.ap:188");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -81937,7 +81940,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             for (i = 0; i < forecastlen; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[datalen - 1]) > tol, __FILE__, __LINE__, "testssaunit.ap:204");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[datalen - 1], tol), __FILE__, __LINE__, "testssaunit.ap:204");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -81957,7 +81960,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             for (i = 0; i < forecastlen; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[datalen - 1]) > tol, __FILE__, __LINE__, "testssaunit.ap:221");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[datalen - 1], tol), __FILE__, __LINE__, "testssaunit.ap:221");
             }
          }
       }
@@ -82037,7 +82040,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
             for (j = 0; j < nbasis; j++) {
                v = a.xyR[1][j] - a.xyR[0][j];
                for (i = 2; i < windowwidth; i++) {
-                  set_error_flag(errorflag, fabs(a.xyR[i][j] - a.xyR[i - 1][j] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:304");
+                  set_error_flag(errorflag, !NearAtR(a.xyR[i][j], a.xyR[i - 1][j] + v, tol), __FILE__, __LINE__, "testssaunit.ap:304");
                }
             }
          }
@@ -82051,8 +82054,8 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:317");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:318");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:317");
+               set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:318");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -82064,8 +82067,8 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:330");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:331");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:330");
+               set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:331");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -82077,9 +82080,9 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             v = x.xR[windowwidth - 1] - x.xR[windowwidth - 2];
-            set_error_flag(errorflag, fabs(trend.xR[0] - x.xR[windowwidth - 1] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:342");
+            set_error_flag(errorflag, !NearAtR(trend.xR[0], x.xR[windowwidth - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:342");
             for (i = 1; i < nticks; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - trend.xR[i - 1] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:344");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:344");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -82093,9 +82096,9 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             v = x.xR[windowwidth - 1] - x.xR[windowwidth - 2];
-            set_error_flag(errorflag, fabs(trend.xR[0] - x.xR[windowwidth - 1] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:356");
+            set_error_flag(errorflag, !NearAtR(trend.xR[0], x.xR[windowwidth - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:356");
             for (i = 1; i < nticks; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - trend.xR[i - 1] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:358");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:358");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -82114,9 +82117,9 @@ static void testssaunit_testgeneral(bool *errorflag) {
                ae_frame_leave();
                return;
             }
-            set_error_flag(errorflag, fabs(trend.xR[0] - x.xR[datalen - 1] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:374");
+            set_error_flag(errorflag, !NearAtR(trend.xR[0], x.xR[datalen - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:374");
             for (i = 1; i < forecastlen; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - trend.xR[i - 1] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:376");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:376");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -82136,9 +82139,9 @@ static void testssaunit_testgeneral(bool *errorflag) {
                ae_frame_leave();
                return;
             }
-            set_error_flag(errorflag, fabs(trend.xR[0] - x.xR[datalen - 1] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:393");
+            set_error_flag(errorflag, !NearAtR(trend.xR[0], x.xR[datalen - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:393");
             for (i = 1; i < forecastlen; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - trend.xR[i - 1] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:395");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:395");
             }
          }
       }
@@ -82196,8 +82199,8 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[nlasttracklen + i - windowwidth]) > tol, __FILE__, __LINE__, "testssaunit.ap:451");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:452");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[nlasttracklen + i - windowwidth], tol), __FILE__, __LINE__, "testssaunit.ap:451");
+               set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:452");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -82209,8 +82212,8 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             for (i = 0; i < nlasttracklen; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:464");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:465");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:464");
+               set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:465");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -82222,9 +82225,9 @@ static void testssaunit_testgeneral(bool *errorflag) {
                return;
             }
             v = x.xR[nlasttracklen - 1] - x.xR[nlasttracklen - 2];
-            set_error_flag(errorflag, fabs(trend.xR[0] - x.xR[nlasttracklen - 1] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:476");
+            set_error_flag(errorflag, !NearAtR(trend.xR[0], x.xR[nlasttracklen - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:476");
             for (i = 1; i < nticks; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - trend.xR[i - 1] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:478");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:478");
             }
          }
       }
@@ -82303,8 +82306,8 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
          for (i = 0; i < nticks; i++) {
             v = sineamp * sin((i + sineoffs) / windowwidth * 2 * pi * sinefreq);
-            set_error_flag(errorflag, fabs(trend.xR[i] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:565");
-            set_error_flag(errorflag, fabs(noise.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:566");
+            set_error_flag(errorflag, !NearAtR(trend.xR[i], v, tol), __FILE__, __LINE__, "testssaunit.ap:565");
+            set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:566");
          }
          forecastlen = 1 + hqrnduniformi(&rs, nticks - windowwidth);
          datalen = nticks - forecastlen;
@@ -82314,7 +82317,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
          ssaforecastsequence(&state, &x2, datalen, forecastlen, hqrndnormal(&rs) > 0.0, &trend);
          for (i = 0; i < forecastlen; i++) {
-            set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[datalen + i]) > tol, __FILE__, __LINE__, "testssaunit.ap:575");
+            set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[datalen + i], tol), __FILE__, __LINE__, "testssaunit.ap:575");
          }
          ae_vector_set_length(&tmp0, 0);
          windowwidth2 = -1;
@@ -82327,7 +82330,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
          for (i = windowwidth - 1; i < nticks; i++) {
             v = ae_v_dotproduct(&x.xR[i - (windowwidth - 1)], 1, tmp0.xR, 1, windowwidth - 1);
-            set_error_flag(errorflag, fabs(v - x.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:586");
+            set_error_flag(errorflag, !NearAtR(v, x.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:586");
          }
          nticks = windowwidth + 1 + hqrnduniformi(&rs, windowwidth);
          sineoffs = (double)hqrnduniformi(&rs, windowwidth);
@@ -82346,8 +82349,8 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
          for (i = 0; i < nticks; i++) {
             v = sineamp * sin((i + sineoffs) / windowwidth * 2 * pi * sinefreq);
-            set_error_flag(errorflag, fabs(trend.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:604");
-            set_error_flag(errorflag, fabs(noise.xR[i] - v) > tol, __FILE__, __LINE__, "testssaunit.ap:605");
+            set_error_flag(errorflag, !SmallAtR(trend.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:604");
+            set_error_flag(errorflag, !NearAtR(noise.xR[i], v, tol), __FILE__, __LINE__, "testssaunit.ap:605");
          }
          forecastlen = 1 + hqrnduniformi(&rs, nticks - windowwidth);
          datalen = nticks - forecastlen;
@@ -82357,7 +82360,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
          ssaforecastsequence(&state, &x2, datalen, forecastlen, true, &trend);
          for (i = 0; i < forecastlen; i++) {
-            set_error_flag(errorflag, fabs(trend.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:614");
+            set_error_flag(errorflag, !SmallAtR(trend.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:614");
          }
       }
    // Test appendPoint() functionality.
@@ -82505,12 +82508,12 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
       // Compare results
          for (i = 0; i < nbasis; i++) {
-            set_error_flag(errorflag, fabs(sv.xR[i] - sv2.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:759");
+            set_error_flag(errorflag, !NearAtR(sv.xR[i], sv2.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:759");
          }
          for (j = 0; j < nbasis; j++) {
             v = ae_v_dotproduct(&a.xyR[0][j], a.stride, &a2.xyR[0][j], a2.stride, windowwidth);
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, fabs(a.xyR[i][j] - sign(v) * a2.xyR[i][j]) > tol, __FILE__, __LINE__, "testssaunit.ap:764");
+               set_error_flag(errorflag, !NearAtR(a.xyR[i][j], sign(v) * a2.xyR[i][j], tol), __FILE__, __LINE__, "testssaunit.ap:764");
             }
          }
       }
@@ -82657,12 +82660,12 @@ static void testssaunit_testgeneral(bool *errorflag) {
             return;
          }
          for (i = 0; i < nbasis; i++) {
-            set_error_flag(errorflag, fabs(sv.xR[i] - sv2.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:923");
+            set_error_flag(errorflag, !NearAtR(sv.xR[i], sv2.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:923");
          }
          for (j = 0; j < nbasis; j++) {
             v = ae_v_dotproduct(&a.xyR[0][j], a.stride, &a2.xyR[0][j], a2.stride, windowwidth);
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, fabs(a.xyR[i][j] - sign(v) * a2.xyR[i][j]) > tol, __FILE__, __LINE__, "testssaunit.ap:928");
+               set_error_flag(errorflag, !NearAtR(a.xyR[i][j], sign(v) * a2.xyR[i][j], tol), __FILE__, __LINE__, "testssaunit.ap:928");
             }
          }
       }
@@ -82720,8 +82723,8 @@ static void testssaunit_testgeneral(bool *errorflag) {
             ssaanalyzelast(&state, nticks, &trend, &noise);
             ssaanalyzelast(&state2, nticks, &trend2, &noise2);
             for (i = 0; i < nticks; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - trend2.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:1001");
-               set_error_flag(errorflag, fabs(noise.xR[i] - noise2.xR[i]) > tol, __FILE__, __LINE__, "testssaunit.ap:1002");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], trend2.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:1001");
+               set_error_flag(errorflag, !NearAtR(noise.xR[i], noise2.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:1002");
             }
          // Additional tests for sizes of internal arrays.
          // Implementation-dependent, may fail due to future changes in the core.
@@ -82845,7 +82848,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
                vv = rmax2(vv, fabs(a.xyR[i][j] - sign(v) * a2.xyR[i][j]));
             }
          }
-         set_error_flag(errorflag, fabs(vv) < tol, __FILE__, __LINE__, "testssaunit.ap:1136");
+         set_error_flag(errorflag, SmallR(vv, tol), __FILE__, __LINE__, "testssaunit.ap:1136");
       }
       for (i = x2.cnt; i < x.cnt; i++) {
          ssaappendpointandupdate(&state, x.xR[i], 1.0);
@@ -82874,7 +82877,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
             vv = rmax2(vv, fabs(a.xyR[i][j] - sign(v) * a2.xyR[i][j]));
          }
       }
-      set_error_flag(errorflag, fabs(vv) > tol, __FILE__, __LINE__, "testssaunit.ap:1161");
+      set_error_flag(errorflag, !SmallAtR(vv, tol), __FILE__, __LINE__, "testssaunit.ap:1161");
    }
 // Test that SSAForecastAvgLast/Sequence() actually performs averaging.
 // We test it by comparing its results vs manually averaged predictions.
@@ -82907,7 +82910,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
       }
       for (i = 0; i < forecastlen; i++) {
-         set_error_flag(errorflag, fabs(trend.xR[i] - trend2.xR[i]) > tol * rmax3(fabs(trend.xR[i]), fabs(trend2.xR[i]), 1.0), __FILE__, __LINE__, "testssaunit.ap:1198");
+         set_error_flag(errorflag, !NearAtR(trend.xR[i], trend2.xR[i], tol * rmax3(fabs(trend.xR[i]), fabs(trend2.xR[i]), 1.0)), __FILE__, __LINE__, "testssaunit.ap:1198");
       }
       nticks = 75 + hqrnduniformi(&rs, 75);
       j = hqrnduniformi(&rs, 150) - 75;
@@ -82927,7 +82930,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
       }
       for (i = 0; i < forecastlen; i++) {
-         set_error_flag(errorflag, fabs(trend.xR[i] - trend2.xR[i]) > tol * rmax3(fabs(trend.xR[i]), fabs(trend2.xR[i]), 1.0), __FILE__, __LINE__, "testssaunit.ap:1217");
+         set_error_flag(errorflag, !NearAtR(trend.xR[i], trend2.xR[i], tol * rmax3(fabs(trend.xR[i]), fabs(trend2.xR[i]), 1.0)), __FILE__, __LINE__, "testssaunit.ap:1217");
       }
       nticks = 75 + hqrnduniformi(&rs, 75);
       j = hqrnduniformi(&rs, 150) - 75;
@@ -82947,7 +82950,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
       }
       for (i = 0; i < forecastlen; i++) {
-         set_error_flag(errorflag, fabs(trend.xR[i] - trend2.xR[i]) > tol * rmax3(fabs(trend.xR[i]), fabs(trend2.xR[i]), 1.0), __FILE__, __LINE__, "testssaunit.ap:1236");
+         set_error_flag(errorflag, !NearAtR(trend.xR[i], trend2.xR[i], tol * rmax3(fabs(trend.xR[i]), fabs(trend2.xR[i]), 1.0)), __FILE__, __LINE__, "testssaunit.ap:1236");
       }
    }
    ae_frame_leave();
@@ -83393,8 +83396,8 @@ static void testssaunit_testspecial(bool *errorflag) {
          ssaanalyzelast(&state, x.cnt, &trend, &noise);
          ssaanalyzelast(&state2, x.cnt, &trend2, &noise2);
          for (i = 0; i < x.cnt; i++) {
-            set_error_flag(errorflag, fabs(trend.xR[i] - trend2.xR[i]) > 1.0E-5, __FILE__, __LINE__, "testssaunit.ap:1675");
-            set_error_flag(errorflag, fabs(noise.xR[i] - noise2.xR[i]) > 1.0E-5, __FILE__, __LINE__, "testssaunit.ap:1676");
+            set_error_flag(errorflag, !NearAtR(trend.xR[i], trend2.xR[i], 1.0E-5), __FILE__, __LINE__, "testssaunit.ap:1675");
+            set_error_flag(errorflag, !NearAtR(noise.xR[i], noise2.xR[i], 1.0E-5), __FILE__, __LINE__, "testssaunit.ap:1676");
          }
       }
    // Test that for model with some algo being set, one/few tracks and unit window length:
@@ -83450,7 +83453,7 @@ static void testssaunit_testspecial(bool *errorflag) {
             set_error_flag(errorflag, a.rows != 1, __FILE__, __LINE__, "testssaunit.ap:1738");
             set_error_flag(errorflag, a.cols != 1, __FILE__, __LINE__, "testssaunit.ap:1739");
             set_error_flag(errorflag, sv.cnt != 1, __FILE__, __LINE__, "testssaunit.ap:1740");
-            set_error_flag(errorflag, fabs(fabs(a.xyR[0][0]) - 1.0) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1741");
+            set_error_flag(errorflag, !NearAtR(fabs(a.xyR[0][0]), 1.0, 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1741");
          }
          if (hqrnduniformr(&rs) > skipprob) {
             windowwidth = -1;
@@ -83464,8 +83467,8 @@ static void testssaunit_testspecial(bool *errorflag) {
                ae_frame_leave();
                return;
             }
-            set_error_flag(errorflag, fabs(trend.xR[0] - x.xR[nlasttracklen - 1]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1754");
-            set_error_flag(errorflag, fabs(noise.xR[0]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1755");
+            set_error_flag(errorflag, !NearAtR(trend.xR[0], x.xR[nlasttracklen - 1], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1754");
+            set_error_flag(errorflag, !SmallAtR(noise.xR[0], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1755");
          }
          if (hqrnduniformr(&rs) > skipprob) {
             nanalyzed = 1 + hqrnduniformi(&rs, 10);
@@ -83483,8 +83486,8 @@ static void testssaunit_testspecial(bool *errorflag) {
                set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1770");
             }
             for (i = imax2(nanalyzed - nlasttracklen, 0); i < nanalyzed; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i - nanalyzed + nlasttracklen]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1774");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1775");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i - nanalyzed + nlasttracklen], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1774");
+               set_error_flag(errorflag, !SmallAtR(noise.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1775");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83503,8 +83506,8 @@ static void testssaunit_testspecial(bool *errorflag) {
                return;
             }
             for (i = 0; i < nticks; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x2.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1793");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1794");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x2.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1793");
+               set_error_flag(errorflag, !SmallAtR(noise.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1794");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83604,7 +83607,7 @@ static void testssaunit_testspecial(bool *errorflag) {
                   if (i == j) {
                      v--;
                   }
-                  set_error_flag(errorflag, fabs(v) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1899");
+                  set_error_flag(errorflag, !SmallAtR(v, 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1899");
                }
             }
          }
@@ -83621,8 +83624,8 @@ static void testssaunit_testspecial(bool *errorflag) {
                return;
             }
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i - windowwidth + nlasttracklen]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1915");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1916");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i - windowwidth + nlasttracklen], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1915");
+               set_error_flag(errorflag, !SmallAtR(noise.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1916");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83641,8 +83644,8 @@ static void testssaunit_testspecial(bool *errorflag) {
                set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1932");
             }
             for (i = imax2(nanalyzed - nlasttracklen, 0); i < nanalyzed; i++) {
-               set_error_flag(errorflag, fabs(trend.xR[i] - x.xR[i - nanalyzed + nlasttracklen]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1936");
-               set_error_flag(errorflag, fabs(noise.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1937");
+               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i - nanalyzed + nlasttracklen], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1936");
+               set_error_flag(errorflag, !SmallAtR(noise.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1937");
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83662,11 +83665,11 @@ static void testssaunit_testspecial(bool *errorflag) {
             }
             for (i = 0; i < nticks; i++) {
                if (nticks >= windowwidth) {
-                  set_error_flag(errorflag, fabs(trend.xR[i] - x2.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1957");
-                  set_error_flag(errorflag, fabs(noise.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1958");
+                  set_error_flag(errorflag, !NearAtR(trend.xR[i], x2.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1957");
+                  set_error_flag(errorflag, !SmallAtR(noise.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1958");
                } else {
-                  set_error_flag(errorflag, fabs(trend.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1962");
-                  set_error_flag(errorflag, fabs(noise.xR[i] - x2.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1963");
+                  set_error_flag(errorflag, !SmallAtR(trend.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1962");
+                  set_error_flag(errorflag, !NearAtR(noise.xR[i], x2.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1963");
                }
             }
          }
@@ -84104,7 +84107,7 @@ static bool testldaunit_testwn(RMatrix *xy, RMatrix *wn, ae_int_t ns, ae_int_t n
    for (j = 0; j < nf; j++) {
       v = ae_v_dotproduct(&wn->xyR[0][j], wn->stride, &wn->xyR[0][j], wn->stride, nf);
       v = sqrt(v);
-      result = result && fabs(v - 1) <= 1000.0 * machineepsilon;
+      result = result && NearAtR(v, 1.0, 1000.0 * machineepsilon);
       v = 0.0;
       for (i = 0; i < nf; i++) {
          v += wn->xyR[i][j];
@@ -84158,7 +84161,7 @@ bool testlda(bool silent) {
                continue;
             }
             set_error_flag(&ldanerrors, !testldaunit_testwn(&xy, &wn, ns, nf, nc, 0), __FILE__, __LINE__, "testldaunit.ap:56");
-            set_error_flag(&ldanerrors, fabs(wn.xyR[axis][0]) <= 0.75, __FILE__, __LINE__, "testldaunit.ap:57");
+            set_error_flag(&ldanerrors, SmallAtR(wn.xyR[axis][0], 0.75), __FILE__, __LINE__, "testldaunit.ap:57");
             fisherlda(&xy, ns, nf, nc, &info, &w1);
             for (i = 0; i < nf; i++) {
                set_error_flag(&lda1errors, w1.xR[i] != wn.xyR[i][0], __FILE__, __LINE__, "testldaunit.ap:60");
@@ -84175,7 +84178,7 @@ bool testlda(bool silent) {
                   set_error_flag(&ldanerrors, true, __FILE__, __LINE__, "testldaunit.ap:78");
                   continue;
                }
-               set_error_flag(&ldanerrors, fabs(wn.xyR[axis][0]) <= 0.75, __FILE__, __LINE__, "testldaunit.ap:81");
+               set_error_flag(&ldanerrors, SmallAtR(wn.xyR[axis][0], 0.75), __FILE__, __LINE__, "testldaunit.ap:81");
                fisherlda(&xy, ns, nf, nc, &info, &w1);
                for (i = 0; i < nf; i++) {
                   set_error_flag(&lda1errors, w1.xR[i] != wn.xyR[i][0], __FILE__, __LINE__, "testldaunit.ap:84");
@@ -84284,7 +84287,7 @@ static void testmcpdunit_testsimple(bool *err) {
       if (rep.terminationtype > 0) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               *err = *err || fabs(p.xyR[i][j] - pexact.xyR[i][j]) > threshold;
+               *err = *err || !NearAtR(p.xyR[i][j], pexact.xyR[i][j], threshold);
             }
          }
       } else {
@@ -84358,7 +84361,7 @@ static void testmcpdunit_testsimple(bool *err) {
       if (rep.terminationtype > 0) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               *err = *err || fabs(p.xyR[i][j] - pexact.xyR[i][j]) > threshold;
+               *err = *err || !NearAtR(p.xyR[i][j], pexact.xyR[i][j], threshold);
             }
          }
       } else {
@@ -84433,7 +84436,7 @@ static void testmcpdunit_testsimple(bool *err) {
       if (rep.terminationtype > 0) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               *err = *err || fabs(p.xyR[i][j] - pexact.xyR[i][j]) > threshold;
+               *err = *err || !NearAtR(p.xyR[i][j], pexact.xyR[i][j], threshold);
             }
          }
       } else {
@@ -84575,7 +84578,7 @@ static void testmcpdunit_testentryexit(bool *err) {
                if (rep.terminationtype > 0) {
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        *err = *err || fabs(p.xyR[i][j] - pexact.xyR[i][j]) > threshold;
+                        *err = *err || !NearAtR(p.xyR[i][j], pexact.xyR[i][j], threshold);
                      }
                   }
                } else {
@@ -85062,7 +85065,7 @@ static void testmcpdunit_testlc(bool *err) {
                   *err = *err || v >= c.xyR[0][n * n] + threshold;
                }
                if (ct.xZ[0] == 0) {
-                  *err = *err || fabs(v - c.xyR[0][n * n]) >= threshold;
+                  *err = *err || !NearR(v, c.xyR[0][n * n], threshold);
                }
                if (ct.xZ[0] > 0) {
                   *err = *err || v <= c.xyR[0][n * n] - threshold;
@@ -85231,7 +85234,7 @@ static void testmcpdunit_testlc(bool *err) {
                   *err = *err || v >= c.xyR[t][n * n] + threshold;
                }
                if (ct.xZ[t] == 0) {
-                  *err = *err || fabs(v - c.xyR[t][n * n]) >= threshold;
+                  *err = *err || !NearR(v, c.xyR[t][n * n], threshold);
                }
                if (ct.xZ[t] > 0) {
                   *err = *err || v <= c.xyR[t][n * n] - threshold;
@@ -85594,8 +85597,8 @@ static void testknnunit_testknnalgo(bool *err) {
       knnprocessi(&model1, &x1, &y2);
       knntsprocess(&model1, &buf, &x1, &y3);
       for (i = 0; i < nout; i++) {
-         set_error_flag(err, fabs(y2.xR[i] - y1.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:232");
-         set_error_flag(err, fabs(y3.xR[i] - y1.xR[i]) > 100.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:233");
+         set_error_flag(err, !NearAtR(y2.xR[i], y1.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:232");
+         set_error_flag(err, !NearAtR(y3.xR[i], y1.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:233");
       }
    // Same inputs leads to same outputs
       ae_vector_set_length(&x1, nvars);
@@ -85663,7 +85666,7 @@ static void testknnunit_testknnalgo(bool *err) {
          x1.xR[i] = hqrndnormal(&rs);
          x2.xR[i] = x1.xR[i];
       }
-      set_error_flag(err, fabs(knnprocess0(&model1, &x1) - knnprocess0(&modelus, &x2)) > 100.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:293");
+      set_error_flag(err, !NearAtR(knnprocess0(&model1, &x1), knnprocess0(&modelus, &x2), 100.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:293");
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = hqrndnormal(&rs);
          x2.xR[i] = x1.xR[i];
@@ -85681,7 +85684,7 @@ static void testknnunit_testknnalgo(bool *err) {
          y1.xR[i] = hqrndnormal(&rs);
       }
       knnprocess(&model1, &x1, &y1);
-      set_error_flag(err, fabs(y1.xR[0] - knnprocess0(&model1, &x2)) > 100.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:318");
+      set_error_flag(err, !NearAtR(y1.xR[0], knnprocess0(&model1, &x2), 100.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:318");
    // KNNClassify works as expected
       ae_vector_set_length(&x1, nvars);
       ae_vector_set_length(&x2, nvars);
@@ -85714,7 +85717,7 @@ static void testknnunit_testknnalgo(bool *err) {
             v += y1.xR[i];
             set_error_flag(err, y1.xR[i] < 0.0, __FILE__, __LINE__, "testknnunit.ap:359");
          }
-         set_error_flag(err, fabs(v - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:361");
+         set_error_flag(err, !NearAtR(v, 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:361");
       }
    // Test various error metrics reported by algorithm:
    // * training set errors included in the report
@@ -85725,8 +85728,8 @@ static void testknnunit_testknnalgo(bool *err) {
    //       for completely unknown values
       testknnunit_testseterrors(&model1, nvars, nout, iscls, &xy, npoints, &refavgce, &refcls0, &refcls1, &refrms, &refavg, &refavgrel);
       if (iscls) {
-         set_error_flag(err, fabs(rep.avgce - refavgce) > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:377");
-         set_error_flag(err, fabs(knnavgce(&model1, &xy, npoints) - refavgce) > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:378");
+         set_error_flag(err, !NearAtR(rep.avgce, refavgce, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:377");
+         set_error_flag(err, !NearAtR(knnavgce(&model1, &xy, npoints), refavgce, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:378");
          set_error_flag(err, rep.relclserror < refcls0 - 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:381");
          set_error_flag(err, rep.relclserror > refcls1 + 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:382");
          set_error_flag(err, knnrelclserror(&model1, &xy, npoints) < refcls0 - 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:383");
@@ -85737,12 +85740,12 @@ static void testknnunit_testknnalgo(bool *err) {
          set_error_flag(err, rep.relclserror != 0.0, __FILE__, __LINE__, "testknnunit.ap:393");
          set_error_flag(err, knnrelclserror(&model1, &xy, npoints) != 0.0, __FILE__, __LINE__, "testknnunit.ap:394");
       }
-      set_error_flag(err, fabs(rep.rmserror - refrms) > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:396");
-      set_error_flag(err, fabs(rep.avgerror - refavg) > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:397");
-      set_error_flag(err, fabs(rep.avgrelerror - refavgrel) > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:398");
-      set_error_flag(err, fabs(knnrmserror(&model1, &xy, npoints) - refrms) > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:399");
-      set_error_flag(err, fabs(knnavgerror(&model1, &xy, npoints) - refavg) > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:400");
-      set_error_flag(err, fabs(knnavgrelerror(&model1, &xy, npoints) - refavgrel) > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:401");
+      set_error_flag(err, !NearAtR(rep.rmserror, refrms, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:396");
+      set_error_flag(err, !NearAtR(rep.avgerror, refavg, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:397");
+      set_error_flag(err, !NearAtR(rep.avgrelerror, refavgrel, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:398");
+      set_error_flag(err, !NearAtR(knnrmserror(&model1, &xy, npoints), refrms, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:399");
+      set_error_flag(err, !NearAtR(knnavgerror(&model1, &xy, npoints), refavg, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:400");
+      set_error_flag(err, !NearAtR(knnavgrelerror(&model1, &xy, npoints), refavgrel, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:401");
       testknnunit_testseterrors(&model1, nvars, nout, iscls, &testxy, testnpoints, &refavgce, &refcls0, &refcls1, &refrms, &refavg, &refavgrel);
       knnallerrors(&model1, &testxy, testnpoints, &tstrep);
       if (iscls) {
@@ -85752,9 +85755,9 @@ static void testknnunit_testknnalgo(bool *err) {
          set_error_flag(err, tstrep.avgce != 0.0, __FILE__, __LINE__, "testknnunit.ap:411");
          set_error_flag(err, tstrep.relclserror != 0.0, __FILE__, __LINE__, "testknnunit.ap:412");
       }
-      set_error_flag(err, fabs(tstrep.rmserror - refrms) > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:414");
-      set_error_flag(err, fabs(tstrep.avgerror - refavg) > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:415");
-      set_error_flag(err, fabs(tstrep.avgrelerror - refavgrel) > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:416");
+      set_error_flag(err, !NearAtR(tstrep.rmserror, refrms, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:414");
+      set_error_flag(err, !NearAtR(tstrep.avgerror, refavg, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:415");
+      set_error_flag(err, !NearAtR(tstrep.avgrelerror, refavgrel, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:416");
    }
 // Test that model built with K=1 and Eps=0 remembers all training cases
    for (nvars = 1; nvars <= 4; nvars++) {
@@ -85806,10 +85809,10 @@ static void testknnunit_testknnalgo(bool *err) {
             }
             knnprocess(&model1, &x1, &y1);
             if (iscls) {
-               set_error_flag(err, fabs(y1.xR[iround(xy.xyR[i][nvars])] - 1) > 10.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:479");
+               set_error_flag(err, !NearAtR(y1.xR[iround(xy.xyR[i][nvars])], 1.0, 10.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:479");
             } else {
                for (j = 0; j < nout; j++) {
-                  set_error_flag(err, fabs(y1.xR[j] - xy.xyR[i][nvars + j]) > 10.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:483");
+                  set_error_flag(err, !NearAtR(y1.xR[j], xy.xyR[i][nvars + j], 10.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:483");
                }
             }
          }
@@ -85866,7 +85869,7 @@ static void testknnunit_testknnalgo(bool *err) {
       knnprocess(&model1, &x1, &y1);
       knnprocess(&model2, &x2, &y2);
       for (i = 0; i < nout; i++) {
-         set_error_flag(err, fabs(y1.xR[i] - y2.xR[i]) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:553");
+         set_error_flag(err, !NearAtR(y1.xR[i], y2.xR[i], 1000.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:553");
       }
    }
 // Test generalization ability on a simple noisy classification task:
@@ -85910,12 +85913,12 @@ static void testknnunit_testknnalgo(bool *err) {
          knnprocess(&model1, &x1, &y1);
          set_error_flag(err, y1.xR[0] < 0.0, __FILE__, __LINE__, "testknnunit.ap:606");
          set_error_flag(err, y1.xR[1] < 0.0, __FILE__, __LINE__, "testknnunit.ap:607");
-         set_error_flag(err, fabs(y1.xR[0] + y1.xR[1] - 1) > 1000.0 * machineepsilon, __FILE__, __LINE__, "testknnunit.ap:608");
+         set_error_flag(err, !NearAtR(y1.xR[0] + y1.xR[1], 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:608");
          if (x1.xR[0] < 1.0) {
             set_error_flag(err, y1.xR[0] < 0.8, __FILE__, __LINE__, "testknnunit.ap:610");
          }
          if (x1.xR[0] >= 1.0 && x1.xR[0] <= 2.0) {
-            set_error_flag(err, fabs(y1.xR[1] - (x1.xR[0] - 1)) > 0.5, __FILE__, __LINE__, "testknnunit.ap:612");
+            set_error_flag(err, !NearAtR(y1.xR[1], x1.xR[0] - 1.0, 0.5), __FILE__, __LINE__, "testknnunit.ap:612");
          }
          if (x1.xR[0] > 2.0) {
             set_error_flag(err, y1.xR[1] < 0.8, __FILE__, __LINE__, "testknnunit.ap:614");
@@ -88456,55 +88459,55 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent) {
    // Test AbsC
       ca = complex_from_d(randommid(), randommid());
       ra = abscomplex(ca);
-      absc = absc && fabs(ra - sqrt(sqr(ca.x) + sqr(ca.y))) < threshold;
+      absc = absc && NearR(ra, sqrt(sqr(ca.x) + sqr(ca.y)), threshold);
    // test Add
       ca = complex_from_d(randommid(), randommid());
       cb = complex_from_d(randommid(), randommid());
       ra = randommid();
       rb = randommid();
       res = ae_c_add(ca, cb);
-      addcc = addcc && fabs(res.x - ca.x - cb.x) < threshold && fabs(res.y - ca.y - cb.y) < threshold;
+      addcc = addcc && NearR(res.x, ca.x + cb.x, threshold) && NearR(res.y, ca.y + cb.y, threshold);
       res = ae_c_add_d(ca, rb);
-      addcr = addcr && fabs(res.x - ca.x - rb) < threshold && fabs(res.y - ca.y) < threshold;
+      addcr = addcr && NearR(res.x, ca.x + rb, threshold) && NearR(res.y, ca.y, threshold);
       res = ae_c_add_d(cb, ra);
-      addrc = addrc && fabs(res.x - ra - cb.x) < threshold && fabs(res.y - cb.y) < threshold;
+      addrc = addrc && NearR(res.x, ra + cb.x, threshold) && NearR(res.y, cb.y, threshold);
    // test Sub
       ca = complex_from_d(randommid(), randommid());
       cb = complex_from_d(randommid(), randommid());
       ra = randommid();
       rb = randommid();
       res = ae_c_sub(ca, cb);
-      subcc = subcc && fabs(res.x - (ca.x - cb.x)) < threshold && fabs(res.y - (ca.y - cb.y)) < threshold;
+      subcc = subcc && NearR(res.x, ca.x - cb.x, threshold) && NearR(res.y, ca.y - cb.y, threshold);
       res = ae_c_sub_d(ca, rb);
-      subcr = subcr && fabs(res.x - (ca.x - rb)) < threshold && fabs(res.y - ca.y) < threshold;
+      subcr = subcr && NearR(res.x, ca.x - rb, threshold) && NearR(res.y, ca.y, threshold);
       res = ae_c_d_sub(ra, cb);
-      subrc = subrc && fabs(res.x - (ra - cb.x)) < threshold && fabs(res.y + cb.y) < threshold;
+      subrc = subrc && NearR(res.x, ra - cb.x, threshold) && NearR(res.y, -cb.y, threshold);
    // test Mul
       ca = complex_from_d(randommid(), randommid());
       cb = complex_from_d(randommid(), randommid());
       ra = randommid();
       rb = randommid();
       res = ae_c_mul(ca, cb);
-      mulcc = mulcc && fabs(res.x - (ca.x * cb.x - ca.y * cb.y)) < threshold && fabs(res.y - (ca.x * cb.y + ca.y * cb.x)) < threshold;
+      mulcc = mulcc && NearR(res.x, ca.x * cb.x - ca.y * cb.y, threshold) && NearR(res.y, ca.x * cb.y + ca.y * cb.x, threshold);
       res = ae_c_mul_d(ca, rb);
-      mulcr = mulcr && fabs(res.x - ca.x * rb) < threshold && fabs(res.y - ca.y * rb) < threshold;
+      mulcr = mulcr && NearR(res.x, ca.x * rb, threshold) && NearR(res.y, ca.y * rb, threshold);
       res = ae_c_mul_d(cb, ra);
-      mulrc = mulrc && fabs(res.x - ra * cb.x) < threshold && fabs(res.y - ra * cb.y) < threshold;
+      mulrc = mulrc && NearR(res.x, ra * cb.x, threshold) && NearR(res.y, ra * cb.y, threshold);
    // test Div
       ca = complex_from_d(randommid(), randommid());
       do {
          cb = complex_from_d(randommid(), randommid());
-      } while (abscomplex(cb) <= 0.5);
+      } while (SmallAtC(cb, 0.5));
       ra = randommid();
       do {
          rb = randommid();
-      } while (fabs(rb) <= 0.5);
+      } while (SmallAtR(rb, 0.5));
       res = ae_c_div(ca, cb);
-      divcc = divcc && fabs(ae_c_mul(res, cb).x - ca.x) < threshold && fabs(ae_c_mul(res, cb).y - ca.y) < threshold;
+      divcc = divcc && NearR(ae_c_mul(res, cb).x, ca.x, threshold) && NearR(ae_c_mul(res, cb).y, ca.y, threshold);
       res = ae_c_div_d(ca, rb);
-      divcr = divcr && fabs(res.x - ca.x / rb) < threshold && fabs(res.y - ca.y / rb) < threshold;
+      divcr = divcr && NearR(res.x, ca.x / rb, threshold) && NearR(res.y, ca.y / rb, threshold);
       res = ae_c_d_div(ra, cb);
-      divrc = divrc && fabs(ae_c_mul(res, cb).x - ra) < threshold && fabs(ae_c_mul(res, cb).y) < threshold;
+      divrc = divrc && NearR(ae_c_mul(res, cb).x, ra, threshold) && SmallR(ae_c_mul(res, cb).y, threshold);
    }
 // summary
    result = result && absc;

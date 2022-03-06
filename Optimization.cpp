@@ -1076,13 +1076,13 @@ void filterdirection(RVector *d, RVector *x, RVector *bndl, BVector *havebndl, R
       ae_assert(!havebndl->xB[i] || x->xR[i] >= bndl->xR[i], "FilterDirection: infeasible point");
       ae_assert(!havebndu->xB[i] || x->xR[i] <= bndu->xR[i], "FilterDirection: infeasible point");
       isactive = havebndl->xB[i] && x->xR[i] == bndl->xR[i] || havebndu->xB[i] && x->xR[i] == bndu->xR[i];
-      if (isactive && fabs(d->xR[i] * s->xR[i]) <= droptol * scalednorm) {
+      if (isactive && SmallAtR(d->xR[i] * s->xR[i], droptol * scalednorm)) {
          d->xR[i] = 0.0;
       }
    }
    for (i = 0; i < nslack; i++) {
       ae_assert(x->xR[nmain + i] >= 0.0, "FilterDirection: infeasible point");
-      if (x->xR[nmain + i] == 0.0 && fabs(d->xR[nmain + i] * s->xR[nmain + i]) <= droptol * scalednorm) {
+      if (x->xR[nmain + i] == 0.0 && SmallAtR(d->xR[nmain + i] * s->xR[nmain + i], droptol * scalednorm)) {
          d->xR[nmain + i] = 0.0;
       }
    }
@@ -1387,7 +1387,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
             mx = rmax2(mx, fabs(ce->xyR[i][j] * x->xR[j]));
             v += ce->xyR[i][j] * x->xR[j];
          }
-         converged = converged && fabs(v) <= 100.0 * machineepsilon * mx;
+         converged = converged && SmallAtR(v, 100.0 * machineepsilon * mx);
       }
       feaserr0 = feaserr;
       if (converged) {
@@ -1834,7 +1834,7 @@ bool derivativecheck(double f0, double df0, double f1, double df1, double f, dou
    dh = 1.5 * (f1 - f0) - 0.250 * (df0 + df1);
 // Check
    if (s != 0.0) {
-      if (fabs(h - f) > s * 0.001 || fabs(dh - df) > s * 0.001) {
+      if (!NearAtR(h, f, s * 0.001) || !NearAtR(dh, df, s * 0.001)) {
          result = false;
          return result;
       }
@@ -1918,7 +1918,7 @@ void estimateparabolicmodel(double absasum, double absasum2, double mx, double m
    e1 = eps * md * (mx * absasum + mb);
    e2 = eps * md * (mx * sqrt(absasum2) + mb);
    d1esterror = sqrt(e1 * e2);
-   if (fabs(d1) <= d1esterror) {
+   if (SmallAtR(d1, d1esterror)) {
       *d1est = 0;
    } else {
       *d1est = sign(d1);
@@ -1926,7 +1926,7 @@ void estimateparabolicmodel(double absasum, double absasum2, double mx, double m
    e1 = eps * md * md * absasum;
    e2 = eps * md * md * sqrt(absasum2);
    d2esterror = sqrt(e1 * e2);
-   if (fabs(d2) <= d2esterror) {
+   if (SmallAtR(d2, d2esterror)) {
       *d2est = 0;
    } else {
       *d2est = sign(d2);
@@ -7978,7 +7978,7 @@ bool sasstartoptimization(sactiveset *state, RVector *x) {
          vv = sqrt(v0) * sqrt(v1) * 1000.0 * machineepsilon;
          if (i < state->nec) {
             state->cstatus.xZ[n + i] = 1;
-            state->feasinitpt = state->feasinitpt && fabs(v) < vv;
+            state->feasinitpt = state->feasinitpt && SmallR(v, vv);
          } else {
             state->feasinitpt = state->feasinitpt && v < vv;
             if (v < -vv) {
@@ -11806,7 +11806,7 @@ static double qpdenseaulsolver_normalizequadraticterm(RMatrix *a, RVector *b, ae
             v += tmp2->xyR[i][j] * cleic->xyR[i][j];
             vv += sqr(cleic->xyR[i][j]);
          }
-         ae_assert(fabs(vv - 1) < 1.0E-9 || vv == 0.0, "DENSE-AUL: integrity check failed");
+         ae_assert(NearR(vv, 1.0, 1.0E-9) || vv == 0.0, "DENSE-AUL: integrity check failed");
          maxcac = rmax2(maxcac, fabs(v));
       }
    } else {
@@ -13614,7 +13614,7 @@ Spawn:
                break;
             }
          // Function change is small enough
-            if (fabs(state->fp - state->fc) <= state->epsf * rmax2(fabs(state->fc), rmax2(fabs(state->fp), 1.0))) {
+            if (NearAtR(state->fp, state->fc, state->epsf * rmax2(fabs(state->fc), rmax2(fabs(state->fp), 1.0)))) {
                state->repterminationtype = 1;
                break;
             }
@@ -14757,7 +14757,7 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
                v = 1 / sqrt(v);
                ae_v_muld(sstate->tmp0.xR, 1, n, v);
                v = ae_v_dotproduct(sstate->tmp0.xR, 1, sstate->tmp1.xR, 1, n);
-               if (fabs(v) <= settings->epsg) {
+               if (SmallAtR(v, settings->epsg)) {
                   *terminationtype = 4;
                   for (i = 0; i < n; i++) {
                      xs->xR[i] = sstate->solver.x.xR[i];
@@ -14771,7 +14771,7 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
             // 3. stop if function change is small enough
                v = -d1 / (2 * d2);
                v1 = d2 * v * v + d1 * v;
-               if (fabs(v1) <= settings->epsf * rmax2(d0, 1.0)) {
+               if (SmallAtR(v1, settings->epsf * rmax2(d0, 1.0))) {
                   *terminationtype = 1;
                   for (i = 0; i < n; i++) {
                      xs->xR[i] = sstate->solver.x.xR[i];
@@ -17665,13 +17665,13 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
             primalxscale = 1.0;
             primalxscale = rmax2(primalxscale, rmaxabsv(n, &state->current.x));
             for (i = 0; i < n; i++) {
-               if (state->hasbndl.xB[i] && state->hasgz.xB[i] && fabs(state->bndl.xR[i]) > vipmsolver_bigconstrmag * primalxscale) {
+               if (state->hasbndl.xB[i] && state->hasgz.xB[i] && !SmallAtR(state->bndl.xR[i], vipmsolver_bigconstrmag * primalxscale)) {
                   state->hasgz.xB[i] = false;
                   state->current.g.xR[i] = 0.0;
                   state->current.z.xR[i] = 0.0;
                   droppedbounds++;
                }
-               if (state->hasbndu.xB[i] && state->hasts.xB[i] && fabs(state->bndu.xR[i]) > vipmsolver_bigconstrmag * primalxscale) {
+               if (state->hasbndu.xB[i] && state->hasts.xB[i] && !SmallAtR(state->bndu.xR[i], vipmsolver_bigconstrmag * primalxscale)) {
                   state->hasts.xB[i] = false;
                   state->current.t.xR[i] = 0.0;
                   state->current.s.xR[i] = 0.0;
@@ -17691,7 +17691,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
             primalxscale = rmax2(primalxscale, rmaxabsv(n, &state->current.x));
             primalxscale = rmax2(primalxscale, rmaxabsv(m, &state->tmpax));
             for (i = 0; i < m; i++) {
-               if (state->hasr.xB[i] && state->haspq.xB[i] && fabs(state->b.xR[i] + state->r.xR[i]) > vipmsolver_bigconstrmag * primalxscale && fabs(state->b.xR[i]) < vipmsolver_bigconstrmag * primalxscale) {
+               if (state->hasr.xB[i] && state->haspq.xB[i] && !SmallAtR(state->b.xR[i] + state->r.xR[i], vipmsolver_bigconstrmag * primalxscale) && SmallR(state->b.xR[i], vipmsolver_bigconstrmag * primalxscale)) {
                   ae_assert(state->haswv.xB[i] && state->haspq.xB[i], "VIPMOptimize: unexpected integrity check failure (4y64)");
                   state->haspq.xB[i] = false;
                   state->current.p.xR[i] = 0.0;
@@ -26290,7 +26290,7 @@ Spawn:
          if (i >= nec) {
             v = rmax2(v, 0.0);
          }
-         meritstate->increasebigc = meritstate->increasebigc || fabs(v) > vv;
+         meritstate->increasebigc = meritstate->increasebigc || !SmallAtR(v, vv);
       }
       for (i = 1; i < nlec + nlic; i++) {
          v = state->stepkfi.xR[i];
@@ -26301,7 +26301,7 @@ Spawn:
          if (i >= nlec + 1) {
             v = rmax2(v, 0.0);
          }
-         meritstate->increasebigc = meritstate->increasebigc || fabs(v) > vv;
+         meritstate->increasebigc = meritstate->increasebigc || !SmallAtR(v, vv);
       }
    }
 #if 0 //(@) Not used.
@@ -26754,7 +26754,7 @@ Spawn:
       }
    // Advance outer iteration counter, test stopping criteria
       state->repiterationscount++;
-      if (fabs(state->stepkfi.xR[0] - state->step0fi.xR[0]) <= nlcsqp_stagnationepsf * fabs(state->step0fi.xR[0])) {
+      if (NearAtR(state->stepkfi.xR[0], state->step0fi.xR[0], nlcsqp_stagnationepsf * fabs(state->step0fi.xR[0]))) {
          state->fstagnationcnt++;
       } else {
          state->fstagnationcnt = 0;
@@ -29292,7 +29292,7 @@ static double reviseddualsimplex_sparsityof(RVector *x, ae_int_t n) {
    mx *= 1.0E5 * machineepsilon;
    k = 0;
    for (i = 0; i < n; i++) {
-      if (fabs(x->xR[i]) > mx) {
+      if (!SmallAtR(x->xR[i], mx)) {
          k++;
       }
    }
@@ -29479,8 +29479,8 @@ static bool reviseddualsimplex_refactorizationrequired(dualsimplexstate *state, 
       }
    }
    mx = sqrt(mx);
-   result = result || fabs(alphaqpiv - alpharpiv) > reviseddualsimplex_alphatrigger * (1.0 + mx);
-   result = result || fabs(alphaqpiv - alpharpiv) > reviseddualsimplex_alphatrigger2 * fabs(alpharpiv);
+   result = result || !NearAtR(alphaqpiv, alpharpiv, reviseddualsimplex_alphatrigger * (1.0 + mx));
+   result = result || !NearAtR(alphaqpiv, alpharpiv, reviseddualsimplex_alphatrigger2 * fabs(alpharpiv));
    return result;
 }
 
@@ -34251,7 +34251,7 @@ Spawn:
       }
    // Advance outer iteration counter, test stopping criteria
       state->repouteriterationscount++;
-      if (fabs(state->stepkfi.xR[0] - state->step0fi.xR[0]) <= nlcslp_stagnationepsf * fabs(state->step0fi.xR[0])) {
+      if (NearAtR(state->stepkfi.xR[0], state->step0fi.xR[0], nlcslp_stagnationepsf * fabs(state->step0fi.xR[0]))) {
          state->fstagnationcnt++;
       } else {
          state->fstagnationcnt = 0;
@@ -36280,7 +36280,7 @@ Spawn:
             //   and V1 - directional derivative at XK1
             // * set GammaK to Max(GammaK, |V1-V0|/V2)
                for (i = 0; i < n; i++) {
-                  ae_assert(fabs(state->auloptimizer.x.xR[i] - state->xk1.xR[i]) <= 100.0 * machineepsilon || !(isfinite(state->auloptimizer.x.xR[i]) && isfinite(state->xk1.xR[i])), "MinNLC: integrity check failed, unexpected behavior of LBFGS optimizer");
+                  ae_assert(NearAtR(state->auloptimizer.x.xR[i], state->xk1.xR[i], 100.0 * machineepsilon) || !(isfinite(state->auloptimizer.x.xR[i]) && isfinite(state->xk1.xR[i])), "MinNLC: integrity check failed, unexpected behavior of LBFGS optimizer");
                }
                v2 = 0.0;
                for (i = 0; i < n; i++) {
@@ -39328,7 +39328,7 @@ Spawn:
             break;
          }
       }
-      if (alpha * dnrminf <= state->agsshortstpabs || alpha * dnrminf <= state->agsshortstprel * radius || fabs(state->samplef.xR[0] - state->samplef.xR[maxsamplesize]) <= state->agsshortf) {
+      if (alpha * dnrminf <= state->agsshortstpabs || alpha * dnrminf <= state->agsshortstprel * radius || NearAtR(state->samplef.xR[0], state->samplef.xR[maxsamplesize], state->agsshortf)) {
          shortstepscnt++;
       } else {
          shortstepscnt = 0;
@@ -40304,7 +40304,7 @@ static bool mincomp_asauisempty(minasastate *state) {
    d32 = d * d2;
    result = true;
    for (i = 0; i < state->n; i++) {
-      if (fabs(state->g.xR[i]) >= d2 && rmin2(state->x.xR[i] - state->bndl.xR[i], state->bndu.xR[i] - state->x.xR[i]) >= d32) {
+      if (!SmallR(state->g.xR[i], d2) && rmin2(state->x.xR[i] - state->bndl.xR[i], state->bndu.xR[i] - state->x.xR[i]) >= d32) {
          result = false;
          return result;
       }
@@ -41861,7 +41861,7 @@ Spawn:
             state->repterminationtype = 2;
             goto Exit;
          }
-         if (fabs(state->fp - state->fc) <= state->epsf * rmax2(fabs(state->fc), rmax2(fabs(state->fp), 1.0))) {
+         if (NearAtR(state->fp, state->fc, state->epsf * rmax2(fabs(state->fc), rmax2(fabs(state->fp), 1.0)))) {
          // Function change is small enough
             state->repterminationtype = 1;
             goto Exit;

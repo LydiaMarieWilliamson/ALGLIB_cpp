@@ -11771,7 +11771,7 @@ static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_
       for (its = 0; its <= itmax; its++) {
       // Look for a single small subdiagonal element.
          for (k = i; k >= l + 1; k--) {
-            if (fabs(h->xyR[k][k - 1]) <= smlnum) {
+            if (SmallAtR(h->xyR[k][k - 1], smlnum)) {
                break;
             }
             tst = fabs(h->xyR[k - 1][k - 1]) + fabs(h->xyR[k][k]);
@@ -11787,7 +11787,7 @@ static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_
          // .    deflation  criterion due to Ahues & Tisseur (LAWN 122,
          // .    1997). It has better mathematical foundation and
          // .    improves accuracy in some cases.  ====
-            if (fabs(h->xyR[k][k - 1]) <= ulp * tst) {
+            if (SmallAtR(h->xyR[k][k - 1], ulp * tst)) {
                ab = rmax2(fabs(h->xyR[k][k - 1]), fabs(h->xyR[k - 1][k]));
                ba = rmin2(fabs(h->xyR[k][k - 1]), fabs(h->xyR[k - 1][k]));
                aa = rmax2(fabs(h->xyR[k][k]), fabs(h->xyR[k - 1][k - 1] - h->xyR[k][k]));
@@ -12219,7 +12219,7 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
             if (tst1 == 0.0) {
                tst1 = upperhessenberg1norm(h, l, i, l, i, &work);
             }
-            if (fabs(h->xyR[k][k - 1]) <= rmax2(ulp * tst1, smlnum)) {
+            if (SmallAtR(h->xyR[k][k - 1], rmax2(ulp * tst1, smlnum))) {
                break;
             }
          }
@@ -12696,7 +12696,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          cmax = 0.0;
          icmax = 0;
          for (j = 1; j <= 4; j++) {
-            if (fabs(crv4->xR[j]) > cmax) {
+            if (!SmallAtR(crv4->xR[j], cmax)) {
                cmax = fabs(crv4->xR[j]);
                icmax = j;
             }
@@ -12725,7 +12725,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          lr21 = ur11r * cr21;
          ur22 = cr22 - ur12 * lr21;
       // If smaller pivot < SMINI, use SMINI
-         if (fabs(ur22) < smini) {
+         if (SmallR(ur22, smini)) {
             ur22 = smini;
             *info = 1;
          }
@@ -12738,7 +12738,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          }
          br2 -= lr21 * br1;
          bbnd = rmax2(fabs(br1 * (ur22 * ur11r)), fabs(br2));
-         if (bbnd > 1.0 && fabs(ur22) < 1.0) {
+         if (bbnd > 1.0 && SmallR(ur22, 1.0)) {
             if (bbnd >= bignum * fabs(ur22)) {
                *scl = 1 / bbnd;
             }
@@ -14517,7 +14517,7 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
       for (ji = 1; ji <= minp; ji++) {
          for (jp = 1; jp <= 2; jp++) {
             tmp1 = d->xR[1] - ab->xyR[ji][jp];
-            if (fabs(tmp1) < pivmin) {
+            if (SmallR(tmp1, pivmin)) {
                tmp1 = -pivmin;
             }
             nab->xyZ[ji][jp] = 0;
@@ -14526,7 +14526,7 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
             }
             for (j = 2; j <= n; j++) {
                tmp1 = d->xR[j] - e2->xR[j - 1] / tmp1 - ab->xyR[ji][jp];
-               if (fabs(tmp1) < pivmin) {
+               if (SmallR(tmp1, pivmin)) {
                   tmp1 = -pivmin;
                }
                if (tmp1 <= 0.0) {
@@ -15317,7 +15317,7 @@ static void evd_tdininternaldlagtf(ae_int_t n, RVector *a, double lambdav, RVect
          iin->xZ[n] = k;
       }
    }
-   if (fabs(a->xR[n]) <= scale1 * tl && iin->xZ[n] == 0) {
+   if (SmallAtR(a->xR[n], scale1 * tl) && iin->xZ[n] == 0) {
       iin->xZ[n] = n;
    }
 }
@@ -15393,7 +15393,7 @@ static void evd_tdininternaldlagts(ae_int_t n, RVector *a, RVector *b, RVector *
                   ak *= bignum;
                }
             } else {
-               if (fabs(temp) > absak * bignum) {
+               if (!SmallAtR(temp, absak * bignum)) {
                   ak += pert;
                   pert *= 2;
                   continue;
@@ -15603,7 +15603,7 @@ static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, R
             // Reorthogonalize by modified Gram-Schmidt if eigenvalues are
             // close enough.
                if (jblk != 1) {
-                  if (fabs(xj - xjm) > ortol) {
+                  if (!NearAtR(xj, xjm, ortol)) {
                      gpind = j;
                   }
                   if (gpind != j) {
@@ -26473,7 +26473,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
          return result;
       }
    // Find diagonal block of matrix to work on
-      if (tol < 0.0 && fabs(d->xR[m]) <= thresh) {
+      if (tol < 0.0 && SmallAtR(d->xR[m], thresh)) {
          d->xR[m] = 0.0;
       }
       smax = fabs(d->xR[m]);
@@ -26551,10 +26551,10 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
    // fixed thanks to Michael Rolle < m@rolle.name >
    // Very strange that LAPACK still contains it.
       bchangedir = false;
-      if (idir == 1 && fabs(d->xR[ll]) < 1.0E-3 * fabs(d->xR[m])) {
+      if (idir == 1 && SmallR(d->xR[ll], 1.0E-3 * fabs(d->xR[m]))) {
          bchangedir = true;
       }
-      if (idir == 2 && fabs(d->xR[m]) < 1.0E-3 * fabs(d->xR[ll])) {
+      if (idir == 2 && SmallR(d->xR[m], 1.0E-3 * fabs(d->xR[ll]))) {
          bchangedir = true;
       }
       if (ll != oldll || m != oldm || bchangedir) {
@@ -26570,7 +26570,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
       if (idir == 1) {
       // Run convergence test in forward direction
       // First apply standard test to bottom of matrix
-         if (fabs(e->xR[m - 1]) <= fabs(tol) * fabs(d->xR[m]) || tol < 0.0 && fabs(e->xR[m - 1]) <= thresh) {
+         if (SmallAtR(e->xR[m - 1], fabs(tol) * fabs(d->xR[m])) || tol < 0.0 && SmallAtR(e->xR[m - 1], thresh)) {
             e->xR[m - 1] = 0.0;
             continue;
          }
@@ -26581,7 +26581,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
             sminl = mu;
             iterflag = false;
             for (lll = ll; lll < m; lll++) {
-               if (fabs(e->xR[lll]) <= tol * mu) {
+               if (SmallAtR(e->xR[lll], tol * mu)) {
                   e->xR[lll] = 0.0;
                   iterflag = true;
                   break;
@@ -26596,7 +26596,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
       } else {
       // Run convergence test in backward direction
       // First apply standard test to top of matrix
-         if (fabs(e->xR[ll]) <= fabs(tol) * fabs(d->xR[ll]) || tol < 0.0 && fabs(e->xR[ll]) <= thresh) {
+         if (SmallAtR(e->xR[ll], fabs(tol) * fabs(d->xR[ll])) || tol < 0.0 && SmallAtR(e->xR[ll], thresh)) {
             e->xR[ll] = 0.0;
             continue;
          }
@@ -26607,7 +26607,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
             sminl = mu;
             iterflag = false;
             for (lll = m - 1; lll >= ll; lll--) {
-               if (fabs(e->xR[lll]) <= tol * mu) {
+               if (SmallAtR(e->xR[lll], tol * mu)) {
                   e->xR[lll] = 0.0;
                   iterflag = true;
                   break;
@@ -26678,7 +26678,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
                applyrotationsfromtheleft(fwddir, ll + cstart - 1, m + cstart - 1, cstart, cend, &work2, &work3, c, &ctemp);
             }
          // Test convergence
-            if (fabs(e->xR[m - 1]) <= thresh) {
+            if (SmallAtR(e->xR[m - 1], thresh)) {
                e->xR[m - 1] = 0.0;
             }
          } else {
@@ -26712,7 +26712,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
                applyrotationsfromtheleft(!fwddir, ll + cstart - 1, m + cstart - 1, cstart, cend, &work0, &work1, c, &ctemp);
             }
          // Test convergence
-            if (fabs(e->xR[ll]) <= thresh) {
+            if (SmallAtR(e->xR[ll], thresh)) {
                e->xR[ll] = 0.0;
             }
          }
@@ -26757,7 +26757,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
                applyrotationsfromtheleft(fwddir, ll + cstart - 1, m + cstart - 1, cstart, cend, &work2, &work3, c, &ctemp);
             }
          // Test convergence
-            if (fabs(e->xR[m - 1]) <= thresh) {
+            if (SmallAtR(e->xR[m - 1], thresh)) {
                e->xR[m - 1] = 0.0;
             }
          } else {
@@ -26789,7 +26789,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
             }
             e->xR[ll] = f;
          // Test convergence
-            if (fabs(e->xR[ll]) <= thresh) {
+            if (SmallAtR(e->xR[ll], thresh)) {
                e->xR[ll] = 0.0;
             }
          // Update singular vectors if desired
@@ -27280,7 +27280,7 @@ static ae_int_t rcond_internalcomplexrcondicmax1(CVector *x, ae_int_t n) {
    result = 1;
    m = abscomplex(x->xC[1]);
    for (i = 2; i <= n; i++) {
-      if (abscomplex(x->xC[i]) > m) {
+      if (!SmallAtC(x->xC[i], m)) {
          result = i;
          m = abscomplex(x->xC[i]);
       }
