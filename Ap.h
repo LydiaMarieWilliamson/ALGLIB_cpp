@@ -746,72 +746,36 @@ extern const double pi;
 #if defined _ALGLIB_IMPL_DEFINES
 #   define _ALGLIB_SIMD_ALIGNMENT_DOUBLES 8
 #   define _ALGLIB_SIMD_ALIGNMENT_BYTES   (_ALGLIB_SIMD_ALIGNMENT_DOUBLES*8)
-   // SIMD kernel dispatchers
+// SIMD kernel dispatchers.
 #   if defined _ALGLIB_HAS_SSE2_INTRINSICS
-#      define _ALGLIB_KKK_VOID_SSE2(fname,params)   if (CurCPU & CPU_SSE2) { fname##_sse2 params; return; }
-#      define _ALGLIB_KKK_RETURN_SSE2(fname,params) if (CurCPU & CPU_SSE2) { return fname##_sse2 params; }
+#      define _KerSubSse2(Op) if (CurCPU & CPU_SSE2) { sse2_##Op; return; }
+#      define _KerFunSse2(Op) if (CurCPU & CPU_SSE2) { return sse2_##Op; }
 #   else
-#      define _ALGLIB_KKK_VOID_SSE2(fname,params)
-#      define _ALGLIB_KKK_RETURN_SSE2(fname,params)
+#      define _KerSubSse2(Op)
+#      define _KerFunSse2(Op)
 #   endif
 #   if defined _ALGLIB_HAS_AVX2_INTRINSICS
-#      define _ALGLIB_KKK_VOID_AVX2(fname,params)   if (CurCPU & CPU_AVX2) { fname##_avx2 params; return; }
-#      define _ALGLIB_KKK_RETURN_AVX2(fname,params) if (CurCPU & CPU_AVX2) { return fname##_avx2 params; }
+#      define _KerSubAvx2(Op) if (CurCPU & CPU_AVX2) { avx2_##Op; return; }
+#      define _KerFunAvx2(Op) if (CurCPU & CPU_AVX2) { return avx2_##Op; }
 #   else
-#      define _ALGLIB_KKK_VOID_AVX2(fname,params)
-#      define _ALGLIB_KKK_RETURN_AVX2(fname,params)
+#      define _KerSubAvx2(Op)
+#      define _KerFunAvx2(Op)
 #   endif
 #   if defined _ALGLIB_HAS_FMA_INTRINSICS
-#      define _ALGLIB_KKK_VOID_FMA(fname,params)    if (CurCPU & CPU_FMA)  { fname##_fma params; return; }
-#      define _ALGLIB_KKK_RETURN_FMA(fname,params)  if (CurCPU & CPU_FMA)  { return fname##_fma params; }
+#      define _KerSubFma(Op) if (CurCPU & CPU_FMA) { fma_##Op; return; }
+#      define _KerFunFma(Op) if (CurCPU & CPU_FMA) { return fma_##Op; }
 #   else
-#      define _ALGLIB_KKK_VOID_FMA(fname,params)
-#      define _ALGLIB_KKK_RETURN_FMA(fname,params)
+#      define _KerSubFma(Op)
+#      define _KerFunFma(Op)
 #   endif
-#   if defined _ALGLIB_HAS_SSE2_INTRINSICS || defined _ALGLIB_HAS_AVX2_INTRINSICS
-#      define _ALGLIB_KERNEL_VOID_SSE2_AVX2(fname,params) { \
-            _ALGLIB_KKK_VOID_AVX2(fname,params) _ALGLIB_KKK_VOID_SSE2(fname,params) \
-        }
-#      define _ALGLIB_KERNEL_RETURN_SSE2_AVX2(fname,params) { \
-            _ALGLIB_KKK_RETURN_AVX2(fname,params) _ALGLIB_KKK_RETURN_SSE2(fname,params) \
-        }
-#   else
-#      define _ALGLIB_KERNEL_VOID_SSE2_AVX2(fname,params)   {}
-#      define _ALGLIB_KERNEL_RETURN_SSE2_AVX2(fname,params) {}
-#   endif
-#   if defined _ALGLIB_HAS_SSE2_INTRINSICS || defined _ALGLIB_HAS_AVX2_INTRINSICS || defined _ALGLIB_HAS_FMA_INTRINSICS
-#      define _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(fname,params) { \
-            _ALGLIB_KKK_VOID_FMA(fname,params) _ALGLIB_KKK_VOID_AVX2(fname,params) _ALGLIB_KKK_VOID_SSE2(fname,params) \
-        }
-#      define _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(fname,params) { \
-            _ALGLIB_KKK_RETURN_FMA(fname,params) _ALGLIB_KKK_RETURN_AVX2(fname,params) _ALGLIB_KKK_RETURN_SSE2(fname,params) \
-        }
-#   else
-#      define _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(fname,params)   {}
-#      define _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(fname,params) {}
-#   endif
-#   if defined _ALGLIB_HAS_AVX2_INTRINSICS || defined _ALGLIB_HAS_FMA_INTRINSICS
-#      define _ALGLIB_KERNEL_VOID_AVX2_FMA(fname,params) { \
-            _ALGLIB_KKK_VOID_FMA(fname,params) _ALGLIB_KKK_VOID_AVX2(fname,params) \
-        }
-#      define _ALGLIB_KERNEL_RETURN_AVX2_FMA(fname,params) { \
-            _ALGLIB_KKK_RETURN_FMA(fname,params) _ALGLIB_KKK_RETURN_AVX2(fname,params) \
-        }
-#   else
-#      define _ALGLIB_KERNEL_VOID_AVX2_FMA(fname,params) {}
-#      define _ALGLIB_KERNEL_RETURN_AVX2_FMA(fname,params) {}
-#   endif
-#   if defined _ALGLIB_HAS_AVX2_INTRINSICS
-#      define _ALGLIB_KERNEL_VOID_AVX2(fname,params) { \
-            _ALGLIB_KKK_VOID_AVX2(fname,params) \
-        }
-#      define _ALGLIB_KERNEL_RETURN_AVX2(fname,params) { \
-            _ALGLIB_KKK_RETURN_AVX2(fname,params)\
-        }
-#   else
-#      define _ALGLIB_KERNEL_VOID_AVX2(fname,params) {}
-#      define _ALGLIB_KERNEL_RETURN_AVX2(fname,params) {}
-#   endif
+#   define KerSubSse2Avx2(Op) { _KerSubAvx2(Op) _KerSubSse2(Op) }
+#   define KerFunSse2Avx2(Op) { _KerFunAvx2(Op) _KerFunSse2(Op) }
+#   define KerSubSse2Avx2Fma(Op) { _KerSubFma(Op) _KerSubAvx2(Op) _KerSubSse2(Op) }
+#   define KerFunSse2Avx2Fma(Op) { _KerFunFma(Op) _KerFunAvx2(Op) _KerFunSse2(Op) }
+#   define KerSubAvx2Fma(Op) { _KerSubFma(Op) _KerSubAvx2(Op) }
+#   define KerFunAvx2Fma(Op) { _KerFunFma(Op) _KerFunAvx2(Op) }
+#   define KerSubAvx2(Op) { _KerSubAvx2(Op) }
+#   define KerFunAvx2(Op) { _KerFunAvx2(Op) }
 #   ifdef FP_FAST_FMA
 #      define APPROX_FMA(x, y, z) fma((x), (y), (z))
 #   else
@@ -853,52 +817,51 @@ void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const doub
 #   endif
 // ABLASF kernels
 double rdotv(ae_int_t n, RVector *x, RVector *y);
-double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i);
-double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib);
+double rdotvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy);
+double rdotrr(ae_int_t n, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy);
 double rdotv2(ae_int_t n, RVector *x);
-void rcopyv(ae_int_t n, RVector *x, RVector *y);
-void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i);
-void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x);
-void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k);
-void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y);
-void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx);
-void icopyv(ae_int_t n, ZVector *x, ZVector *y);
 void bcopyv(ae_int_t n, BVector *x, BVector *y);
-void rsetv(ae_int_t n, double v, RVector *x);
-void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i);
-void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx);
+void icopyv(ae_int_t n, ZVector *x, ZVector *y);
+void rcopyv(ae_int_t n, RVector *x, RVector *y);
+void rcopyvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy);
+void rcopyrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y);
+void rcopyrr(ae_int_t n, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy);
+void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y);
+void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t iy);
+void bsetv(ae_int_t n, bool v, BVector *y);
+void isetv(ae_int_t n, ae_int_t v, ZVector *y);
+void rsetv(ae_int_t n, double v, RVector *y);
+void rsetr(ae_int_t n, double v, RMatrix *y, ae_int_t iy);
+void rsetvx(ae_int_t n, double v, RVector *y, ae_int_t y0);
 void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a);
-void isetv(ae_int_t n, ae_int_t v, ZVector *x);
-void bsetv(ae_int_t n, bool v, BVector *x);
-void rmulv(ae_int_t n, double v, RVector *x);
-void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx);
-void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx);
-void raddv(ae_int_t n, double alpha, RVector *y, RVector *x);
-void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx);
-void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x);
-void raddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst);
-void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx);
+void rmulv(ae_int_t n, double v, RVector *y);
+void rmulr(ae_int_t n, double v, RMatrix *y, ae_int_t iy);
+void rmulvx(ae_int_t n, double v, RVector *y, ae_int_t y0);
+void raddv(ae_int_t n, double Alpha, RVector *x, RVector *y);
+void raddvr(ae_int_t n, double Alpha, RVector *x, RMatrix *y, ae_int_t iy);
+void raddrv(ae_int_t n, double Alpha, RMatrix *x, ae_int_t ix, RVector *y);
+void raddrr(ae_int_t n, double Alpha, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy);
+void raddvx(ae_int_t n, double Alpha, RVector *x, ae_int_t x0, RVector *y, ae_int_t y0);
 void rmergemulv(ae_int_t n, RVector *y, RVector *x);
-void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx);
-void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x);
+void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t ix);
+void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t iy, RVector *x);
 void rmergemaxv(ae_int_t n, RVector *y, RVector *x);
-void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx);
-void rmergemaxrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x);
+void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t ix);
+void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y);
 void rmergeminv(ae_int_t n, RVector *y, RVector *x);
-void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx);
-void rmergeminrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x);
+void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t ix);
+void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y);
 double rmaxv(ae_int_t n, RVector *x);
-double rmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx);
+double rmaxr(ae_int_t n, RMatrix *x, ae_int_t ix);
 double rmaxabsv(ae_int_t n, RVector *x);
-double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx);
-void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy);
-void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy);
-void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVector *x, double beta, RVector *y);
-void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy);
-void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix *a);
-void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix);
-bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
-// Sparse supernodal Cholesky kernels
+double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t ix);
+void icopyvx(ae_int_t n, ZVector *x, ae_int_t x0, ZVector *y, ae_int_t y0);
+void rcopyvx(ae_int_t n, RVector *x, ae_int_t x0, RVector *y, ae_int_t y0);
+void rgemv(ae_int_t m, ae_int_t n, double Alpha, RMatrix *a, ae_int_t opa, RVector *x, double Beta, RVector *y);
+void rgemvx(ae_int_t m, ae_int_t n, double Alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double Beta, RVector *y, ae_int_t iy);
+void rger(ae_int_t m, ae_int_t n, double Alpha, RVector *u, RVector *v, RMatrix *a);
+void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t opa, RVector *x, ae_int_t ix);
+bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, RMatrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double Beta, RMatrix *_c, ae_int_t ic, ae_int_t jc);
 ae_int_t spchol_spsymmgetmaxsimd();
 void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth);
 bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase);
