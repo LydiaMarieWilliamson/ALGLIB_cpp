@@ -79822,13 +79822,14 @@ static void testdforestunit_basictestrandom(bool *err) {
                for (j = 0; j < nclasses; j++) {
                   v = y.xR[j];
                   if (j == xy.xyR[i][nvars]) {
+                     refavgce -= log(coalesce(v, minrealnumber)); //(@) Added
                      v--;
                   }
                   refrms += sqr(v);
                   refavg += fabs(v);
                   if (j == xy.xyR[i][nvars]) {
                      refavgrel += fabs(v);
-                     refavgce -= log(v);
+                  // refavgce -= log(v); //(@) Removed.
                   }
                }
             }
@@ -79836,14 +79837,12 @@ static void testdforestunit_basictestrandom(bool *err) {
             refavg /= npoints * nclasses;
             refavgrel /= npoints;
             refavgce /= npoints;
-            set_error_flag(err, fabs(rep.avgce - refavgce) / refavgce > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1222");
-//(@)       set_error_flag(err, !NearAtR(rep.avgce, refavgce, refavgce * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1222");
+            set_error_flag(err, !NearAtR(rep.avgce, refavgce, refavgce * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1222");
             set_error_flag(err, !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1223");
             set_error_flag(err, !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1224");
             set_error_flag(err, !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1225");
             set_error_flag(err, fabs(dfrelclserror(&df, &xy, npoints) - rep.relclserror) * npoints > 5.0, __FILE__, __LINE__, "testdforestunit.ap:1227");
-            set_error_flag(err, fabs(dfavgce(&df, &xy, npoints) - refavgce) / refavgce > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1228");
-//(@)       set_error_flag(err, !NearAtR(dfavgce(&df, &xy, npoints), refavgce, refavgce * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1228");
+            set_error_flag(err, !NearAtR(dfavgce(&df, &xy, npoints), refavgce, refavgce * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1228");
             set_error_flag(err, !NearAtR(dfrmserror(&df, &xy, npoints), refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1229");
             set_error_flag(err, !NearAtR(dfavgerror(&df, &xy, npoints), refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1230");
             set_error_flag(err, !NearAtR(dfavgrelerror(&df, &xy, npoints), refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1231");
@@ -79972,13 +79971,14 @@ static void testdforestunit_basictestallsame(bool *err) {
             for (j = 0; j < nclasses; j++) {
                v = y.xR[j];
                if (j == xy.xyR[i][nvars]) {
+                  refavgce -= log(coalesce(v, minrealnumber)); //(@) Added
                   v--;
                }
                refrms += sqr(v);
                refavg += fabs(v);
                if (j == xy.xyR[i][nvars]) {
                   refavgrel += fabs(v);
-                  refavgce -= log(v);
+               // refavgce -= log(v); //(@) Removed.
                }
             }
          }
@@ -79986,8 +79986,7 @@ static void testdforestunit_basictestallsame(bool *err) {
          refavg /= npoints * nclasses;
          refavgrel /= npoints;
          refavgce /= npoints;
-         set_error_flag(err, fabs(rep.avgce - refavgce) / refavgce > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1390");
-//(@)    set_error_flag(err, !NearAtR(rep.avgce, refavgce, refavgce * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1390");
+         set_error_flag(err, !NearAtR(rep.avgce, refavgce, refavgce * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1390");
          set_error_flag(err, !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1391");
          set_error_flag(err, !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1392");
          set_error_flag(err, !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1393");

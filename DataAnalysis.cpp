@@ -12900,10 +12900,12 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
       }
    }
    rep->relclserror /= npoints;
+   rep->avgce /= npoints; //(@) Added to the original.
    rep->rmserror = sqrt(rep->rmserror / (npoints * nclasses));
    rep->avgerror /= npoints * nclasses;
    rep->avgrelerror /= coalesce((double)avgrelcnt, 1.0);
    rep->oobrelclserror /= npoints;
+   rep->oobavgce /= npoints; //(@) Added to the original.
    rep->oobrmserror = sqrt(rep->oobrmserror / (npoints * nclasses));
    rep->oobavgerror /= npoints * nclasses;
    rep->oobavgrelerror /= coalesce((double)oobavgrelcnt, 1.0);
