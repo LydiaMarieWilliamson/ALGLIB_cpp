@@ -25763,7 +25763,7 @@ static ae_int_t rcond_internalcomplexrcondicmax1(CVector *x, ae_int_t n) {
    result = 1;
    m = abscomplex(x->xC[1]);
    for (i = 2; i <= n; i++) {
-      if (abscomplex(x->xC[i]) > m) {
+      if (!SmallAtC(x->xC[i], m)) {
          result = i;
          m = abscomplex(x->xC[i]);
       }

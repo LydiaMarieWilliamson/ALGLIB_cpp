@@ -1994,7 +1994,7 @@ void ae_shared_pool_reset(ae_shared_pool *pool) {
 }
 
 // Convert the six-bit value v in the range [0,0100) to digits, letters, minuses and underscores.
-// Any v outside the range [0,0100) is convereted to   '?'.
+// Any v outside the range [0,0100) is convereted to '?'.
 static char ae_sixbits2char(ae_int_t v) {
    static char _sixbits2char_tbl[0100] = {
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
@@ -2261,7 +2261,7 @@ static ae_int_t ae_str2int(const char *buf, const char **pasttheend) {
    if (sixbitsread == 0) ae_break(ERR_ASSERTION_FAILED, emsg);
    for (ae_int_t i = sixbitsread; i < 12; i++) sixbits[i] = 0;
    union { ae_int_t ival; unsigned char bytes[9]; } u;
-   ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
+   ae_foursixbits2threebytes(sixbits, u.bytes);
    ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
    if (ByteOrder == AE_BIG_ENDIAN)
@@ -2315,7 +2315,7 @@ static void ae_int2str(ae_int_t v, char *buf) {
 // NOTE:
 // *	The last element of sixbits is always zero, and is not output.
    ae_int_t sixbits[12];
-   ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
+   ae_threebytes2foursixbits(u.bytes, sixbits);
    ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
    ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
    for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
@@ -2377,7 +2377,7 @@ static ae_int64_t ae_str2int64(const char *buf, const char **pasttheend) {
    if (sixbitsread == 0) ae_break(ERR_ASSERTION_FAILED, emsg);
    for (ae_int_t i = sixbitsread; i < 12; i++) sixbits[i] = 0;
    unsigned char bytes[9];
-   ae_foursixbits2threebytes(sixbits + 0, bytes + 0);
+   ae_foursixbits2threebytes(sixbits, bytes);
    ae_foursixbits2threebytes(sixbits + 4, bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, bytes + 6);
    if (ByteOrder == AE_BIG_ENDIAN)
@@ -2430,7 +2430,7 @@ static void ae_int642str(ae_int64_t v, char *buf) {
 // NOTE:
 // *	The last element of sixbits is always zero, we do not output it.
    ae_int_t sixbits[12];
-   ae_threebytes2foursixbits(bytes + 0, sixbits + 0);
+   ae_threebytes2foursixbits(bytes, sixbits);
    ae_threebytes2foursixbits(bytes + 3, sixbits + 4);
    ae_threebytes2foursixbits(bytes + 6, sixbits + 8);
    for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
@@ -2504,7 +2504,7 @@ static double ae_str2double(const char *buf, const char **pasttheend) {
    if (sixbitsread != AE_SER_ENTRY_LENGTH) ae_break(ERR_ASSERTION_FAILED, emsg);
    sixbits[AE_SER_ENTRY_LENGTH] = 0;
    union { double dval; unsigned char bytes[9]; } u;
-   ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
+   ae_foursixbits2threebytes(sixbits, u.bytes);
    ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
    if (ByteOrder == AE_BIG_ENDIAN)
@@ -2564,7 +2564,7 @@ static void ae_double2str(double v, char *buf) {
          u.bytes[i1] = tc;
       }
    ae_int_t sixbits[12];
-   ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
+   ae_threebytes2foursixbits(u.bytes, sixbits);
    ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
    ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
    for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
@@ -3641,7 +3641,7 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          vrx = _mm_setzero_pd();
          vry = _mm_setzero_pd();
       } else {
-         __m128d vtx = _mm_loadh_pd(_mm_load_sd(dy + 0), dy + 2 * stride + 0);
+         __m128d vtx = _mm_loadh_pd(_mm_load_sd(dy), dy + 2 * stride);
          __m128d vty = _mm_loadh_pd(_mm_load_sd(dy + 1), dy + 2 * stride + 1);
          vrx = _mm_sub_pd(_mm_mul_pd(vbetax, vtx), _mm_mul_pd(vbetay, vty));
          vry = _mm_add_pd(_mm_mul_pd(vbetax, vty), _mm_mul_pd(vbetay, vtx));
@@ -3650,8 +3650,8 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
       __m128d vty = _mm_add_pd(_mm_mul_pd(valphax, vy), _mm_mul_pd(valphay, vx));
       vrx = _mm_add_pd(vrx, vtx);
       vry = _mm_add_pd(vry, vty);
-      _mm_storel_pd(dy + 0, vrx);
-      _mm_storeh_pd(dy + 2 * stride + 0, vrx);
+      _mm_storel_pd(dy, vrx);
+      _mm_storeh_pd(dy + 2 * stride, vrx);
       _mm_storel_pd(dy + 1, vry);
       _mm_storeh_pd(dy + 2 * stride + 1, vry);
       dy += 4 * stride;

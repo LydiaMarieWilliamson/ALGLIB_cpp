@@ -75602,14 +75602,14 @@ static bool testdforestunit_basictestrandom() {
                for (j = 0; j < nclasses; j++) {
                   v = y.xR[j];
                   if (j == xy.xyR[i][nvars]) {
-                     refavgce -= log(coalesce(v, minrealnumber)); //(@) Added
+                     refavgce -= log(coalesce(v, minrealnumber)); //(@) Added.
                      v--;
                   }
                   refrms += sqr(v);
                   refavg += fabs(v);
                   if (j == xy.xyR[i][nvars]) {
                      refavgrel += fabs(v);
-                  // refavgce -= log(v); //(@) Removed
+                  // refavgce -= log(v); //(@) Removed.
                   }
                }
             }
@@ -75753,14 +75753,14 @@ static bool testdforestunit_basictestallsame() {
             for (j = 0; j < nclasses; j++) {
                v = y.xR[j];
                if (j == xy.xyR[i][nvars]) {
-                  refavgce -= log(coalesce(v, minrealnumber)); //(@) Added
+                  refavgce -= log(coalesce(v, minrealnumber)); //(@) Added.
                   v--;
                }
                refrms += sqr(v);
                refavg += fabs(v);
                if (j == xy.xyR[i][nvars]) {
                   refavgrel += fabs(v);
-               // refavgce -= log(v); //(@) Removed
+               // refavgce -= log(v); //(@) Removed.
                }
             }
          }

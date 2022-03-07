@@ -2325,7 +2325,7 @@ static void optserv_testc0continuity(double f0, double f1, double f2, double f3,
 // This subroutine checks C1 continuity using test #0 (function  values  from
 // the line search log are studied, gradient is not used).
 //
-// An interval between F[StpIdx+0] and F[StpIdx+5]is  tested for  continuity.
+// An interval between F[StpIdx] and F[StpIdx+5] is  tested for  continuity.
 // An normalized error metric (Lipschitz constant growth for the  derivative)
 // for the interval in question is calculated. Values above  50  are  a  good
 // indication of the discontinuity.
@@ -2476,7 +2476,7 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
 // This  subroutine checks C1 continuity using test #1  (individual  gradient
 // components from the line search log are studied for continuity).
 //
-// An interval between F[StpIdx+0] and F[StpIdx+3]is  tested for  continuity.
+// An interval between F[StpIdx] and F[StpIdx+3] is  tested for  continuity.
 // An normalized error metric (Lipschitz constant growth for the  derivative)
 // for the interval in question is calculated. Values above  50  are  a  good
 // indication of the discontinuity.
@@ -26096,7 +26096,7 @@ Spawn:
          if (i >= nec) {
             v = rmax2(v, 0.0);
          }
-         meritstate->increasebigc = meritstate->increasebigc || fabs(v) > vv;
+         meritstate->increasebigc = meritstate->increasebigc || !SmallAtR(v, vv);
       }
       for (i = 1; i < nlec + nlic; i++) {
          v = state->stepkfi.xR[i];
@@ -26107,7 +26107,7 @@ Spawn:
          if (i >= nlec + 1) {
             v = rmax2(v, 0.0);
          }
-         meritstate->increasebigc = meritstate->increasebigc || fabs(v) > vv;
+         meritstate->increasebigc = meritstate->increasebigc || !SmallAtR(v, vv);
       }
    }
 #if 0 //(@) Not used.
@@ -29013,7 +29013,7 @@ static double reviseddualsimplex_sparsityof(RVector *x, ae_int_t n) {
    mx *= 1.0E5 * machineepsilon;
    k = 0;
    for (i = 0; i < n; i++) {
-      if (fabs(x->xR[i]) > mx) {
+      if (!SmallAtR(x->xR[i], mx)) {
          k++;
       }
    }
