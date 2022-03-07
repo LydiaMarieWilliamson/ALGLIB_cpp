@@ -61,7 +61,7 @@ void fftc1d(CVector *a, ae_int_t n) {
 // convert input array to the more convinient format
    ae_vector_set_length(&buf, 2 * n);
    for (i = 0; i < n; i++) {
-      buf.xR[2 * i + 0] = a->xC[i].x;
+      buf.xR[2 * i] = a->xC[i].x;
       buf.xR[2 * i + 1] = a->xC[i].y;
    }
 // Generate plan and execute it.
@@ -73,7 +73,7 @@ void fftc1d(CVector *a, ae_int_t n) {
    ftapplyplan(&plan, &buf, 0, 1);
 // result
    for (i = 0; i < n; i++) {
-      a->xC[i] = complex_from_d(buf.xR[2 * i + 0], buf.xR[2 * i + 1]);
+      a->xC[i] = complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
    }
    ae_frame_leave();
 }
@@ -178,9 +178,9 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f) {
       ae_vector_set_length(f, n);
       for (i = 0; i <= n2; i++) {
          idx = 2 * (i % n2);
-         hn = complex_from_d(buf.xR[idx + 0], buf.xR[idx + 1]);
+         hn = complex_from_d(buf.xR[idx], buf.xR[idx + 1]);
          idx = 2 * ((n2 - i) % n2);
-         hmnc = complex_from_d(buf.xR[idx + 0], -buf.xR[idx + 1]);
+         hmnc = complex_from_d(buf.xR[idx], -buf.xR[idx + 1]);
          v = complex_from_d(-sin(-2 * pi * i / n), cos(-2 * pi * i / n));
          f->xC[i] = ae_c_sub(ae_c_add(hn, hmnc), ae_c_mul(v, ae_c_sub(hn, hmnc)));
          f->xC[i].x *= 0.5;
@@ -313,12 +313,12 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
    a->xR[0] = buf->xR[0] + buf->xR[1];
    for (i = 1; i < n2; i++) {
       idx = 2 * (i % n2);
-      hn = complex_from_d(buf->xR[idx + 0], buf->xR[idx + 1]);
+      hn = complex_from_d(buf->xR[idx], buf->xR[idx + 1]);
       idx = 2 * (n2 - i);
-      hmnc = complex_from_d(buf->xR[idx + 0], -buf->xR[idx + 1]);
+      hmnc = complex_from_d(buf->xR[idx], -buf->xR[idx + 1]);
       v = complex_from_d(-sin(-2 * pi * i / n), cos(-2 * pi * i / n));
       v = ae_c_sub(ae_c_add(hn, hmnc), ae_c_mul(v, ae_c_sub(hn, hmnc)));
-      a->xR[2 * i + 0] = 0.5 * v.x;
+      a->xR[2 * i] = 0.5 * v.x;
       a->xR[2 * i + 1] = 0.5 * v.y;
    }
    a->xR[1] = buf->xR[0] - buf->xR[1];
@@ -352,7 +352,7 @@ void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformpl
    n2 = n / 2;
    buf->xR[0] = a->xR[0];
    for (i = 1; i < n2; i++) {
-      x = a->xR[2 * i + 0];
+      x = a->xR[2 * i];
       y = a->xR[2 * i + 1];
       buf->xR[i] = x - y;
       buf->xR[n - i] = x + y;
@@ -362,7 +362,7 @@ void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformpl
    a->xR[0] = buf->xR[0] / n;
    t = 1.0 / n;
    for (i = 1; i < n2; i++) {
-      x = buf->xR[2 * i + 0];
+      x = buf->xR[2 * i];
       y = buf->xR[2 * i + 1];
       a->xR[i] = t * (x - y);
       a->xR[n - i] = t * (x + y);
@@ -685,35 +685,35 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          ftcomplexfftplan(m, 1, &plan);
          ae_vector_set_length(&buf, 2 * m);
          for (i = 0; i < m; i++) {
-            buf.xR[2 * i + 0] = a->xC[i].x;
+            buf.xR[2 * i] = a->xC[i].x;
             buf.xR[2 * i + 1] = a->xC[i].y;
          }
          ae_vector_set_length(&buf2, 2 * m);
          for (i = 0; i < n; i++) {
-            buf2.xR[2 * i + 0] = b->xC[i].x;
+            buf2.xR[2 * i] = b->xC[i].x;
             buf2.xR[2 * i + 1] = b->xC[i].y;
          }
          for (i = n; i < m; i++) {
-            buf2.xR[2 * i + 0] = 0.0;
+            buf2.xR[2 * i] = 0.0;
             buf2.xR[2 * i + 1] = 0.0;
          }
          ftapplyplan(&plan, &buf, 0, 1);
          ftapplyplan(&plan, &buf2, 0, 1);
          for (i = 0; i < m; i++) {
-            ax = buf.xR[2 * i + 0];
+            ax = buf.xR[2 * i];
             ay = buf.xR[2 * i + 1];
-            bx = buf2.xR[2 * i + 0];
+            bx = buf2.xR[2 * i];
             by = buf2.xR[2 * i + 1];
             tx = ax * bx - ay * by;
             ty = ax * by + ay * bx;
-            buf.xR[2 * i + 0] = tx;
+            buf.xR[2 * i] = tx;
             buf.xR[2 * i + 1] = -ty;
          }
          ftapplyplan(&plan, &buf, 0, 1);
          t = 1.0 / m;
          ae_vector_set_length(r, m);
          for (i = 0; i < m; i++) {
-            r->xC[i] = complex_from_d(t * buf.xR[2 * i + 0], -t * buf.xR[2 * i + 1]);
+            r->xC[i] = complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
          }
       } else {
       // M is non-smooth, general code (circular/non-circular):
@@ -726,32 +726,32 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          ftcomplexfftplan(p, 1, &plan);
          ae_vector_set_length(&buf, 2 * p);
          for (i = 0; i < m; i++) {
-            buf.xR[2 * i + 0] = a->xC[i].x;
+            buf.xR[2 * i] = a->xC[i].x;
             buf.xR[2 * i + 1] = a->xC[i].y;
          }
          for (i = m; i < p; i++) {
-            buf.xR[2 * i + 0] = 0.0;
+            buf.xR[2 * i] = 0.0;
             buf.xR[2 * i + 1] = 0.0;
          }
          ae_vector_set_length(&buf2, 2 * p);
          for (i = 0; i < n; i++) {
-            buf2.xR[2 * i + 0] = b->xC[i].x;
+            buf2.xR[2 * i] = b->xC[i].x;
             buf2.xR[2 * i + 1] = b->xC[i].y;
          }
          for (i = n; i < p; i++) {
-            buf2.xR[2 * i + 0] = 0.0;
+            buf2.xR[2 * i] = 0.0;
             buf2.xR[2 * i + 1] = 0.0;
          }
          ftapplyplan(&plan, &buf, 0, 1);
          ftapplyplan(&plan, &buf2, 0, 1);
          for (i = 0; i < p; i++) {
-            ax = buf.xR[2 * i + 0];
+            ax = buf.xR[2 * i];
             ay = buf.xR[2 * i + 1];
-            bx = buf2.xR[2 * i + 0];
+            bx = buf2.xR[2 * i];
             by = buf2.xR[2 * i + 1];
             tx = ax * bx - ay * by;
             ty = ax * by + ay * bx;
-            buf.xR[2 * i + 0] = tx;
+            buf.xR[2 * i] = tx;
             buf.xR[2 * i + 1] = -ty;
          }
          ftapplyplan(&plan, &buf, 0, 1);
@@ -760,17 +760,17 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
          // circular, add tail to head
             ae_vector_set_length(r, m);
             for (i = 0; i < m; i++) {
-               r->xC[i] = complex_from_d(t * buf.xR[2 * i + 0], -t * buf.xR[2 * i + 1]);
+               r->xC[i] = complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
             }
             for (i = m; i < m + n - 1; i++) {
-               r->xC[i - m].x += t * buf.xR[2 * i + 0];
+               r->xC[i - m].x += t * buf.xR[2 * i];
                r->xC[i - m].y -= t * buf.xR[2 * i + 1];
             }
          } else {
          // non-circular, just copy
             ae_vector_set_length(r, m + n - 1);
             for (i = 0; i < m + n - 1; i++) {
-               r->xC[i] = complex_from_d(t * buf.xR[2 * i + 0], -t * buf.xR[2 * i + 1]);
+               r->xC[i] = complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
             }
          }
       }
@@ -813,22 +813,22 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       while (i < m) {
          p = imin2(q, m - i);
          for (j = 0; j < p; j++) {
-            buf.xR[2 * j + 0] = a->xC[i + j].x;
+            buf.xR[2 * j] = a->xC[i + j].x;
             buf.xR[2 * j + 1] = a->xC[i + j].y;
          }
          for (j = p; j < q + n - 1; j++) {
-            buf.xR[2 * j + 0] = 0.0;
+            buf.xR[2 * j] = 0.0;
             buf.xR[2 * j + 1] = 0.0;
          }
          ftapplyplan(&plan, &buf, 0, 1);
          for (j = 0; j < q + n - 1; j++) {
-            ax = buf.xR[2 * j + 0];
+            ax = buf.xR[2 * j];
             ay = buf.xR[2 * j + 1];
             bx = bbuf.xC[j].x;
             by = bbuf.xC[j].y;
             tx = ax * bx - ay * by;
             ty = ax * by + ay * bx;
-            buf.xR[2 * j + 0] = tx;
+            buf.xR[2 * j] = tx;
             buf.xR[2 * j + 1] = -ty;
          }
          ftapplyplan(&plan, &buf, 0, 1);
@@ -841,11 +841,11 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             j2 = j1 + 1;
          }
          for (j = 0; j <= j1; j++) {
-            r->xC[i + j].x += buf.xR[2 * j + 0] * t;
+            r->xC[i + j].x += buf.xR[2 * j] * t;
             r->xC[i + j].y -= buf.xR[2 * j + 1] * t;
          }
          for (j = j2; j < p + n - 1; j++) {
-            r->xC[j - j2].x += buf.xR[2 * j + 0] * t;
+            r->xC[j - j2].x += buf.xR[2 * j] * t;
             r->xC[j - j2].y -= buf.xR[2 * j + 1] * t;
          }
          i += p;
@@ -935,36 +935,36 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
    ftcomplexfftplan(p, 1, &plan);
    ae_vector_set_length(&buf, 2 * p);
    for (i = 0; i < m; i++) {
-      buf.xR[2 * i + 0] = a->xC[i].x;
+      buf.xR[2 * i] = a->xC[i].x;
       buf.xR[2 * i + 1] = a->xC[i].y;
    }
    for (i = m; i < p; i++) {
-      buf.xR[2 * i + 0] = 0.0;
+      buf.xR[2 * i] = 0.0;
       buf.xR[2 * i + 1] = 0.0;
    }
    ae_vector_set_length(&buf2, 2 * p);
    for (i = 0; i < n; i++) {
-      buf2.xR[2 * i + 0] = b->xC[i].x;
+      buf2.xR[2 * i] = b->xC[i].x;
       buf2.xR[2 * i + 1] = b->xC[i].y;
    }
    for (i = n; i < p; i++) {
-      buf2.xR[2 * i + 0] = 0.0;
+      buf2.xR[2 * i] = 0.0;
       buf2.xR[2 * i + 1] = 0.0;
    }
    ftapplyplan(&plan, &buf, 0, 1);
    ftapplyplan(&plan, &buf2, 0, 1);
    for (i = 0; i < p; i++) {
-      c1 = complex_from_d(buf.xR[2 * i + 0], buf.xR[2 * i + 1]);
-      c2 = complex_from_d(buf2.xR[2 * i + 0], buf2.xR[2 * i + 1]);
+      c1 = complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
+      c2 = complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
       c3 = ae_c_div(c1, c2);
-      buf.xR[2 * i + 0] = c3.x;
+      buf.xR[2 * i] = c3.x;
       buf.xR[2 * i + 1] = -c3.y;
    }
    ftapplyplan(&plan, &buf, 0, 1);
    t = 1.0 / p;
    ae_vector_set_length(r, m - n + 1);
    for (i = 0; i <= m - n; i++) {
-      r->xC[i] = complex_from_d(t * buf.xR[2 * i + 0], -t * buf.xR[2 * i + 1]);
+      r->xC[i] = complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
    }
    ae_frame_leave();
 }
@@ -1087,32 +1087,32 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
    ftcomplexfftplan(m, 1, &plan);
    ae_vector_set_length(&buf, 2 * m);
    for (i = 0; i < m; i++) {
-      buf.xR[2 * i + 0] = a->xC[i].x;
+      buf.xR[2 * i] = a->xC[i].x;
       buf.xR[2 * i + 1] = a->xC[i].y;
    }
    ae_vector_set_length(&buf2, 2 * m);
    for (i = 0; i < n; i++) {
-      buf2.xR[2 * i + 0] = b->xC[i].x;
+      buf2.xR[2 * i] = b->xC[i].x;
       buf2.xR[2 * i + 1] = b->xC[i].y;
    }
    for (i = n; i < m; i++) {
-      buf2.xR[2 * i + 0] = 0.0;
+      buf2.xR[2 * i] = 0.0;
       buf2.xR[2 * i + 1] = 0.0;
    }
    ftapplyplan(&plan, &buf, 0, 1);
    ftapplyplan(&plan, &buf2, 0, 1);
    for (i = 0; i < m; i++) {
-      c1 = complex_from_d(buf.xR[2 * i + 0], buf.xR[2 * i + 1]);
-      c2 = complex_from_d(buf2.xR[2 * i + 0], buf2.xR[2 * i + 1]);
+      c1 = complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
+      c2 = complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
       c3 = ae_c_div(c1, c2);
-      buf.xR[2 * i + 0] = c3.x;
+      buf.xR[2 * i] = c3.x;
       buf.xR[2 * i + 1] = -c3.y;
    }
    ftapplyplan(&plan, &buf, 0, 1);
    t = 1.0 / m;
    ae_vector_set_length(r, m);
    for (i = 0; i < m; i++) {
-      r->xC[i] = complex_from_d(t * buf.xR[2 * i + 0], -t * buf.xR[2 * i + 1]);
+      r->xC[i] = complex_from_d(t * buf.xR[2 * i], -t * buf.xR[2 * i + 1]);
    }
    ae_frame_leave();
 }
@@ -1297,13 +1297,13 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          buf.xR[0] *= buf2.xR[0];
          buf.xR[1] *= buf2.xR[1];
          for (i = 1; i < m / 2; i++) {
-            ax = buf.xR[2 * i + 0];
+            ax = buf.xR[2 * i];
             ay = buf.xR[2 * i + 1];
-            bx = buf2.xR[2 * i + 0];
+            bx = buf2.xR[2 * i];
             by = buf2.xR[2 * i + 1];
             tx = ax * bx - ay * by;
             ty = ax * by + ay * bx;
-            buf.xR[2 * i + 0] = tx;
+            buf.xR[2 * i] = tx;
             buf.xR[2 * i + 1] = ty;
          }
          fftr1dinvinternaleven(&buf, m, &buf3, &plan);
@@ -1334,13 +1334,13 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          buf.xR[0] *= buf2.xR[0];
          buf.xR[1] *= buf2.xR[1];
          for (i = 1; i < p / 2; i++) {
-            ax = buf.xR[2 * i + 0];
+            ax = buf.xR[2 * i];
             ay = buf.xR[2 * i + 1];
-            bx = buf2.xR[2 * i + 0];
+            bx = buf2.xR[2 * i];
             by = buf2.xR[2 * i + 1];
             tx = ax * bx - ay * by;
             ty = ax * by + ay * bx;
-            buf.xR[2 * i + 0] = tx;
+            buf.xR[2 * i] = tx;
             buf.xR[2 * i + 1] = ty;
          }
          fftr1dinvinternaleven(&buf, p, &buf3, &plan);
@@ -1397,13 +1397,13 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          buf.xR[0] *= buf2.xR[0];
          buf.xR[1] *= buf2.xR[1];
          for (j = 1; j < (q + n - 1) / 2; j++) {
-            ax = buf.xR[2 * j + 0];
+            ax = buf.xR[2 * j];
             ay = buf.xR[2 * j + 1];
-            bx = buf2.xR[2 * j + 0];
+            bx = buf2.xR[2 * j];
             by = buf2.xR[2 * j + 1];
             tx = ax * bx - ay * by;
             ty = ax * by + ay * bx;
-            buf.xR[2 * j + 0] = tx;
+            buf.xR[2 * j] = tx;
             buf.xR[2 * j + 1] = ty;
          }
          fftr1dinvinternaleven(&buf, q + n - 1, &buf3, &plan);
@@ -1512,10 +1512,10 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
    buf.xR[0] /= buf2.xR[0];
    buf.xR[1] /= buf2.xR[1];
    for (i = 1; i < p / 2; i++) {
-      c1 = complex_from_d(buf.xR[2 * i + 0], buf.xR[2 * i + 1]);
-      c2 = complex_from_d(buf2.xR[2 * i + 0], buf2.xR[2 * i + 1]);
+      c1 = complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
+      c2 = complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
       c3 = ae_c_div(c1, c2);
-      buf.xR[2 * i + 0] = c3.x;
+      buf.xR[2 * i] = c3.x;
       buf.xR[2 * i + 1] = c3.y;
    }
    fftr1dinvinternaleven(&buf, p, &buf3, &plan);
@@ -1652,10 +1652,10 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
       buf.xR[0] /= buf2.xR[0];
       buf.xR[1] /= buf2.xR[1];
       for (i = 1; i < Mq; i++) {
-         c1 = complex_from_d(buf.xR[2 * i + 0], buf.xR[2 * i + 1]);
-         c2 = complex_from_d(buf2.xR[2 * i + 0], buf2.xR[2 * i + 1]);
+         c1 = complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
+         c2 = complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
          c3 = ae_c_div(c1, c2);
-         buf.xR[2 * i + 0] = c3.x;
+         buf.xR[2 * i] = c3.x;
          buf.xR[2 * i + 1] = c3.y;
       }
       fftr1dinvinternaleven(&buf, m, &buf3, &plan);

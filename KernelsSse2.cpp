@@ -47,7 +47,7 @@ double sse2_rdotv(const ae_int_t n, const Real *x, const Real *y) {
          case 2:
             unroll1 = _mm_add_pd(_mm_mul_pd(pX[i + 1], pY[i + 1]), unroll1);
          case 1:
-            unroll0 = _mm_add_pd(_mm_mul_pd(pX[i + 0], pY[i + 0]), unroll0);
+            unroll0 = _mm_add_pd(_mm_mul_pd(pX[i], pY[i]), unroll0);
       }
       ans = _mm_add_pd(_mm_add_pd(_mm_add_pd(unroll0, unroll1), _mm_add_pd(unroll2, unroll3)), _mm_add_pd(_mm_add_pd(unroll4, unroll5), _mm_add_pd(unroll6, unroll7)));
    } else {
@@ -130,7 +130,7 @@ double sse2_rdotv2(const ae_int_t n, const Real *x) {
          case 2:
             unroll1 = _mm_add_pd(_mm_mul_pd(pX[i + 1], pX[i + 1]), unroll1);
          case 1:
-            unroll0 = _mm_add_pd(_mm_mul_pd(pX[i + 0], pX[i + 0]), unroll0);
+            unroll0 = _mm_add_pd(_mm_mul_pd(pX[i], pX[i]), unroll0);
       }
       ans = _mm_add_pd(_mm_add_pd(_mm_add_pd(unroll0, unroll1), _mm_add_pd(unroll2, unroll3)), _mm_add_pd(_mm_add_pd(unroll4, unroll5), _mm_add_pd(unroll6, unroll7)));
    } else {
@@ -241,7 +241,7 @@ void sse2_bcopyv(const ae_int_t n, const bool *__restrict x, bool *__restrict y)
       i += 4;
    }
    if (tail & 2) {
-      *(y + i + 0) = *(x + i + 0);
+      *(y + i) = *(x + i);
       *(y + i + 1) = *(x + i + 1);
       i += 2;
    }

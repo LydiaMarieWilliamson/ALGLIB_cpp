@@ -56,12 +56,12 @@ double avx2_rdotv(const ae_int_t n, const Real *__restrict x, const Real *__rest
          break;
       }
       case 2:{
-         dot += x[tail + 0] * y[tail + 0];
+         dot += x[tail] * y[tail];
          dot += x[tail + 1] * y[tail + 1];
          break;
       }
       case 3:{
-         dot += x[tail + 0] * y[tail + 0];
+         dot += x[tail] * y[tail];
          dot += x[tail + 1] * y[tail + 1];
          dot += x[tail + 2] * y[tail + 2];
          break;
@@ -119,12 +119,12 @@ double avx2_rdotv2(const ae_int_t n, const Real *__restrict x) {
          break;
       }
       case 2:{
-         dot += x[tail + 0] * x[tail + 0];
+         dot += x[tail] * x[tail];
          dot += x[tail + 1] * x[tail + 1];
          break;
       }
       case 3:{
-         dot += x[tail + 0] * x[tail + 0];
+         dot += x[tail] * x[tail];
          dot += x[tail + 1] * x[tail + 1];
          dot += x[tail + 2] * x[tail + 2];
          break;
@@ -228,7 +228,7 @@ void avx2_bcopyv(const ae_int_t n, const bool *__restrict x, bool *__restrict y)
       i += 4;
    }
    if (tail & 2) {
-      *(y + i + 0) = *(x + i + 0);
+      *(y + i) = *(x + i);
       *(y + i + 1) = *(x + i + 1);
       i += 2;
    }
@@ -757,7 +757,7 @@ void avx2_rgemv_straight(const ae_int_t m, const ae_int_t n, const double alpha,
             case 2:
                u1 = _mm256_add_pd(_mm256_mul_pd(pX[at + 1], pRow[at + 1]), u1);
             case 1:
-               u0 = _mm256_add_pd(_mm256_mul_pd(pX[at + 0], pRow[at + 0]), u0);
+               u0 = _mm256_add_pd(_mm256_mul_pd(pX[at], pRow[at]), u0);
          }
          sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(u0, u1), _mm256_add_pd(u2, u3)), _mm256_add_pd(_mm256_add_pd(u4, u5), _mm256_add_pd(u6, u7)));
       } else {
@@ -862,7 +862,7 @@ void avx2_rgemvx_straight_xaligned(const ae_int_t m, const ae_int_t n, const dou
             case 2:
                u1 = _mm256_add_pd(_mm256_mul_pd(pX[at + 1], ULOAD256PD(pRow[at + 1])), u1);
             case 1:
-               u0 = _mm256_add_pd(_mm256_mul_pd(pX[at + 0], ULOAD256PD(pRow[at + 0])), u0);
+               u0 = _mm256_add_pd(_mm256_mul_pd(pX[at], ULOAD256PD(pRow[at])), u0);
          }
          sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(u0, u1), _mm256_add_pd(u2, u3)), _mm256_add_pd(_mm256_add_pd(u4, u5), _mm256_add_pd(u6, u7)));
       } else {
@@ -1308,14 +1308,14 @@ bool avx2_spchol_updatekernelabc4(double *rowstorage, ae_int_t offss, ae_int_t t
       for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
-         _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 0), u_0123_0)));
+         _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row), u_0123_0)));
       }
    }
    if (urank == 2) {
       for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
-         _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 0), u_0123_0)));
+         _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1)), _mm256_mul_pd(_mm256_broadcast_sd(update_row), u_0123_0)));
       }
    }
    if (urank == 3) {
@@ -1323,7 +1323,7 @@ bool avx2_spchol_updatekernelabc4(double *rowstorage, ae_int_t offss, ae_int_t t
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
          _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_sub_pd(_mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 1),
-                     u_0123_1)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 0), u_0123_0)));
+                     u_0123_1)), _mm256_mul_pd(_mm256_broadcast_sd(update_row), u_0123_0)));
       }
    }
    if (urank == 4) {
@@ -1331,7 +1331,7 @@ bool avx2_spchol_updatekernelabc4(double *rowstorage, ae_int_t offss, ae_int_t t
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
          _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_sub_pd(_mm256_sub_pd(_mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 3), u_0123_3)),
-                     _mm256_mul_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 0), u_0123_0)));
+                     _mm256_mul_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1)), _mm256_mul_pd(_mm256_broadcast_sd(update_row), u_0123_0)));
       }
    }
    return true;
@@ -1345,10 +1345,10 @@ bool avx2_spchol_updatekernel4444(double *rowstorage, ae_int_t offss, ae_int_t s
    __m256d v_w0, v_w1, v_w2, v_w3, u01_lo, u01_hi, u23_lo, u23_hi;
 // Compute W = -D*transpose(U[0:3])
    v_negd = _mm256_mul_pd(_mm256_loadu_pd(diagd + offsd), _mm256_set1_pd(-1.0));
-   v_negd_u0 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu + 0 * 4), v_negd);
-   v_negd_u1 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu + 1 * 4), v_negd);
-   v_negd_u2 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu + 2 * 4), v_negd);
-   v_negd_u3 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu + 3 * 4), v_negd);
+   v_negd_u0 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu), v_negd);
+   v_negd_u1 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu + 4), v_negd);
+   v_negd_u2 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu + 8), v_negd);
+   v_negd_u3 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu + 12), v_negd);
    u01_lo = _mm256_unpacklo_pd(v_negd_u0, v_negd_u1);
    u01_hi = _mm256_unpackhi_pd(v_negd_u0, v_negd_u1);
    u23_lo = _mm256_unpacklo_pd(v_negd_u2, v_negd_u3);
@@ -1367,7 +1367,7 @@ bool avx2_spchol_updatekernel4444(double *rowstorage, ae_int_t offss, ae_int_t s
          targetrow = offss + k * 4;
          offsk = offsu + k * 4;
          target = _mm256_load_pd(rowstorage + targetrow);
-         target = _mm256_add_pd(_mm256_mul_pd(_mm256_broadcast_sd(rowstorage + offsk + 0), v_w0), target);
+         target = _mm256_add_pd(_mm256_mul_pd(_mm256_broadcast_sd(rowstorage + offsk), v_w0), target);
          target = _mm256_add_pd(_mm256_mul_pd(_mm256_broadcast_sd(rowstorage + offsk + 1), v_w1), target);
          target = _mm256_add_pd(_mm256_mul_pd(_mm256_broadcast_sd(rowstorage + offsk + 2), v_w2), target);
          target = _mm256_add_pd(_mm256_mul_pd(_mm256_broadcast_sd(rowstorage + offsk + 3), v_w3), target);
@@ -1380,7 +1380,7 @@ bool avx2_spchol_updatekernel4444(double *rowstorage, ae_int_t offss, ae_int_t s
          targetrow = offss + raw2smap[superrowidx[urbase + k]] * 4;
          offsk = offsu + k * 4;
          target = _mm256_load_pd(rowstorage + targetrow);
-         v_uk0 = _mm256_broadcast_sd(rowstorage + offsk + 0);
+         v_uk0 = _mm256_broadcast_sd(rowstorage + offsk);
          v_uk1 = _mm256_broadcast_sd(rowstorage + offsk + 1);
          v_uk2 = _mm256_broadcast_sd(rowstorage + offsk + 2);
          v_uk3 = _mm256_broadcast_sd(rowstorage + offsk + 3);

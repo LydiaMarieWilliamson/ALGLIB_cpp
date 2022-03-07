@@ -573,9 +573,9 @@ void dsnormalize(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, 
    }
    *info = 1;
 // Standartization
-   ae_vector_set_length(means, nvars - 1 + 1);
-   ae_vector_set_length(sigmas, nvars - 1 + 1);
-   ae_vector_set_length(&tmp, npoints - 1 + 1);
+   ae_vector_set_length(means, nvars);
+   ae_vector_set_length(sigmas, nvars);
+   ae_vector_set_length(&tmp, npoints);
    for (j = 0; j < nvars; j++) {
       ae_v_move(tmp.xR, 1, &xy->xyR[0][j], xy->stride, npoints);
       samplemoments(&tmp, npoints, &mean, &variance, &skewness, &kurtosis);
@@ -612,9 +612,9 @@ void dsnormalizec(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
    }
    *info = 1;
 // Standartization
-   ae_vector_set_length(means, nvars - 1 + 1);
-   ae_vector_set_length(sigmas, nvars - 1 + 1);
-   ae_vector_set_length(&tmp, npoints - 1 + 1);
+   ae_vector_set_length(means, nvars);
+   ae_vector_set_length(sigmas, nvars);
+   ae_vector_set_length(&tmp, npoints);
    for (j = 0; j < nvars; j++) {
       ae_v_move(tmp.xR, 1, &xy->xyR[0][j], xy->stride, npoints);
       samplemoments(&tmp, npoints, &mean, &variance, &skewness, &kurtosis);
@@ -644,11 +644,11 @@ double dsgetmeanmindistance(RMatrix *xy, ae_int_t npoints, ae_int_t nvars) {
       return result;
    }
 // Process
-   ae_vector_set_length(&tmp, npoints - 1 + 1);
+   ae_vector_set_length(&tmp, npoints);
    for (i = 0; i < npoints; i++) {
       tmp.xR[i] = maxrealnumber;
    }
-   ae_vector_set_length(&tmp2, nvars - 1 + 1);
+   ae_vector_set_length(&tmp2, nvars);
    for (i = 0; i < npoints; i++) {
       for (j = i + 1; j < npoints; j++) {
          ae_v_move(tmp2.xR, 1, xy->xyR[i], 1, nvars);
@@ -1128,9 +1128,9 @@ void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae
 // General case:
 // 0. allocate arrays
    kmax = imin2(kmax, tiecount);
-   ae_vector_set_length(&bestsizes, kmax - 1 + 1);
-   ae_vector_set_length(&cursizes, kmax - 1 + 1);
-   ae_vector_set_length(&cnt, nc - 1 + 1);
+   ae_vector_set_length(&bestsizes, kmax);
+   ae_vector_set_length(&cursizes, kmax);
+   ae_vector_set_length(&cnt, nc);
 // General case:
 // 1. prepare "weak" solution (two subintervals, divided at median)
    v2 = maxrealnumber;
@@ -1221,7 +1221,7 @@ void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae
 // Transform from sizes to thresholds
    *cve = bestcve;
    *ni = bestk;
-   ae_vector_set_length(thresholds, *ni - 2 + 1);
+   ae_vector_set_length(thresholds, *ni - 1);
    j = bestsizes.xZ[0];
    for (i = 1; i < bestk; i++) {
       thresholds->xR[i - 1] = 0.5 * (a->xR[j - 1] + a->xR[j]);
@@ -1291,10 +1291,10 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
 // General case
 // Use dynamic programming to find best split in O(KMax*NC*TieCount^2) time
    kmax = imin2(kmax, tiecount);
-   ae_matrix_set_length(&cv, kmax - 1 + 1, tiecount - 1 + 1);
-   ae_matrix_set_length(&splits, kmax - 1 + 1, tiecount - 1 + 1);
-   ae_vector_set_length(&cnt, nc - 1 + 1);
-   ae_vector_set_length(&cnt2, nc - 1 + 1);
+   ae_matrix_set_length(&cv, kmax, tiecount);
+   ae_matrix_set_length(&splits, kmax, tiecount);
+   ae_vector_set_length(&cnt, nc);
+   ae_vector_set_length(&cnt2, nc);
    for (j = 0; j < nc; j++) {
       cnt.xZ[j] = 0;
    }
@@ -1378,7 +1378,7 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
    //
    // NOTE: we initialize both JL and JR (left and right bounds),
    //       altough algorithm needs only JL.
-      ae_vector_set_length(thresholds, koptimal - 1 + 1);
+      ae_vector_set_length(thresholds, koptimal);
       *ni = koptimal + 1;
       jr = tiecount - 1;
       *cve = cv.xyR[koptimal][jr];
@@ -1497,7 +1497,7 @@ static void mlpbase_hladdinputlayer(multilayerperceptron *network, ae_int_t *con
    ae_int_t offs;
    offs = mlpbase_hlnfieldwidth * (*neuroidx);
    for (i = 0; i < nin; i++) {
-      network->hlneurons.xZ[offs + 0] = 0;
+      network->hlneurons.xZ[offs] = 0;
       network->hlneurons.xZ[offs + 1] = i;
       network->hlneurons.xZ[offs + 2] = -1;
       network->hlneurons.xZ[offs + 3] = -1;
@@ -1538,7 +1538,7 @@ static void mlpbase_hladdoutputlayer(multilayerperceptron *network, ae_int_t *co
    if (!iscls) {
    // Regression network
       for (i = 0; i < nout; i++) {
-         network->hlneurons.xZ[neurooffs + 0] = k;
+         network->hlneurons.xZ[neurooffs] = k;
          network->hlneurons.xZ[neurooffs + 1] = i;
          network->hlneurons.xZ[neurooffs + 2] = *structinfoidx + 1 + nout + i;
          network->hlneurons.xZ[neurooffs + 3] = *weightsidx + nprev + (nprev + 1) * i;
@@ -1546,7 +1546,7 @@ static void mlpbase_hladdoutputlayer(multilayerperceptron *network, ae_int_t *co
       }
       for (i = 0; i < nprev; i++) {
          for (j = 0; j < nout; j++) {
-            network->hlconnections.xZ[connoffs + 0] = k - 1;
+            network->hlconnections.xZ[connoffs] = k - 1;
             network->hlconnections.xZ[connoffs + 1] = i;
             network->hlconnections.xZ[connoffs + 2] = k;
             network->hlconnections.xZ[connoffs + 3] = j;
@@ -1561,19 +1561,19 @@ static void mlpbase_hladdoutputlayer(multilayerperceptron *network, ae_int_t *co
    } else {
    // Classification network
       for (i = 0; i < nout - 1; i++) {
-         network->hlneurons.xZ[neurooffs + 0] = k;
+         network->hlneurons.xZ[neurooffs] = k;
          network->hlneurons.xZ[neurooffs + 1] = i;
          network->hlneurons.xZ[neurooffs + 2] = -1;
          network->hlneurons.xZ[neurooffs + 3] = *weightsidx + nprev + (nprev + 1) * i;
          neurooffs += mlpbase_hlnfieldwidth;
       }
-      network->hlneurons.xZ[neurooffs + 0] = k;
+      network->hlneurons.xZ[neurooffs] = k;
       network->hlneurons.xZ[neurooffs + 1] = i;
       network->hlneurons.xZ[neurooffs + 2] = -1;
       network->hlneurons.xZ[neurooffs + 3] = -1;
       for (i = 0; i < nprev; i++) {
          for (j = 0; j < nout - 1; j++) {
-            network->hlconnections.xZ[connoffs + 0] = k - 1;
+            network->hlconnections.xZ[connoffs] = k - 1;
             network->hlconnections.xZ[connoffs + 1] = i;
             network->hlconnections.xZ[connoffs + 2] = k;
             network->hlconnections.xZ[connoffs + 3] = j;
@@ -1614,7 +1614,7 @@ static void mlpbase_hladdhiddenlayer(multilayerperceptron *network, ae_int_t *co
    neurooffs = mlpbase_hlnfieldwidth * (*neuroidx);
    connoffs = mlpbase_hlconnfieldwidth * (*connidx);
    for (i = 0; i < ncur; i++) {
-      network->hlneurons.xZ[neurooffs + 0] = k;
+      network->hlneurons.xZ[neurooffs] = k;
       network->hlneurons.xZ[neurooffs + 1] = i;
       network->hlneurons.xZ[neurooffs + 2] = *structinfoidx + 1 + ncur + i;
       network->hlneurons.xZ[neurooffs + 3] = *weightsidx + nprev + (nprev + 1) * i;
@@ -1622,7 +1622,7 @@ static void mlpbase_hladdhiddenlayer(multilayerperceptron *network, ae_int_t *co
    }
    for (i = 0; i < nprev; i++) {
       for (j = 0; j < ncur; j++) {
-         network->hlconnections.xZ[connoffs + 0] = k - 1;
+         network->hlconnections.xZ[connoffs] = k - 1;
          network->hlconnections.xZ[connoffs + 1] = i;
          network->hlconnections.xZ[connoffs + 2] = k;
          network->hlconnections.xZ[connoffs + 3] = j;
@@ -1774,7 +1774,7 @@ static void mlpbase_randomizebackwardpass(multilayerperceptron *network, ae_int_
    ae_int_t offs;
    ae_int_t i;
    istart = network->structinfo.xZ[5];
-   neurontype = network->structinfo.xZ[istart + neuronidx * mlpbase_nfieldwidth + 0];
+   neurontype = network->structinfo.xZ[istart + neuronidx * mlpbase_nfieldwidth];
    if (neurontype == -2) {
    // Input neuron - stop
       return;
@@ -1874,30 +1874,30 @@ void mlprandomize(multilayerperceptron *network) {
 // During this stage we use Network.RndBuf, which is grouped into NTotal
 // entries, each of them having following format:
 //
-// Buf[Offset+0]        mean value of neuron's output
+// Buf[Offset]          mean value of neuron's output
 // Buf[Offset+1]        standard deviation of neuron's output
 //
 //
    entrysize = 2;
    vectorsetlengthatleast(&network->rndbuf, entrysize * ntotal);
    for (neuronidx = 0; neuronidx < ntotal; neuronidx++) {
-      neurontype = network->structinfo.xZ[istart + neuronidx * mlpbase_nfieldwidth + 0];
+      neurontype = network->structinfo.xZ[istart + neuronidx * mlpbase_nfieldwidth];
       entryoffs = entrysize * neuronidx;
       if (neurontype == -2) {
       // Input neuron: zero mean, unit variance.
-         network->rndbuf.xR[entryoffs + 0] = 0.0;
+         network->rndbuf.xR[entryoffs] = 0.0;
          network->rndbuf.xR[entryoffs + 1] = 1.0;
          continue;
       }
       if (neurontype == -3) {
       // "-1" neuron: mean=-1, zero variance.
-         network->rndbuf.xR[entryoffs + 0] = -1.0;
+         network->rndbuf.xR[entryoffs] = -1.0;
          network->rndbuf.xR[entryoffs + 1] = 0.0;
          continue;
       }
       if (neurontype == -4) {
       // "0" neuron: mean=0, zero variance.
-         network->rndbuf.xR[entryoffs + 0] = 0.0;
+         network->rndbuf.xR[entryoffs] = 0.0;
          network->rndbuf.xR[entryoffs + 1] = 0.0;
          continue;
       }
@@ -1919,16 +1919,16 @@ void mlprandomize(multilayerperceptron *network) {
          vmean = 0.0;
          vvar = 0.0;
          for (i = n1; i <= n2; i++) {
-            vvar += sqr(network->rndbuf.xR[entrysize * i + 0]) + sqr(network->rndbuf.xR[entrysize * i + 1]);
+            vvar += sqr(network->rndbuf.xR[entrysize * i]) + sqr(network->rndbuf.xR[entrysize * i + 1]);
          }
-         network->rndbuf.xR[entryoffs + 0] = vmean;
+         network->rndbuf.xR[entryoffs] = vmean;
          network->rndbuf.xR[entryoffs + 1] = sqrt(vvar);
          continue;
       }
       if (neurontype == -5) {
       // Linear activation function
          i = network->structinfo.xZ[istart + neuronidx * mlpbase_nfieldwidth + 2];
-         vmean = network->rndbuf.xR[entrysize * i + 0];
+         vmean = network->rndbuf.xR[entrysize * i];
          vvar = sqr(network->rndbuf.xR[entrysize * i + 1]);
          if (vvar > 0.0) {
             wscale = desiredsigma / sqrt(vvar);
@@ -1936,7 +1936,7 @@ void mlprandomize(multilayerperceptron *network) {
             wscale = 1.0;
          }
          mlpbase_randomizebackwardpass(network, i, wscale);
-         network->rndbuf.xR[entryoffs + 0] = vmean * wscale;
+         network->rndbuf.xR[entryoffs] = vmean * wscale;
          network->rndbuf.xR[entryoffs + 1] = desiredsigma;
          continue;
       }
@@ -1947,7 +1947,7 @@ void mlprandomize(multilayerperceptron *network) {
       //   (we simulate different inputs with unit deviation and
       //   sample activation function output on such inputs)
          i = network->structinfo.xZ[istart + neuronidx * mlpbase_nfieldwidth + 2];
-         vmean = network->rndbuf.xR[entrysize * i + 0];
+         vmean = network->rndbuf.xR[entrysize * i];
          vvar = sqr(network->rndbuf.xR[entrysize * i + 1]);
          if (vvar > 0.0) {
             wscale = desiredsigma / sqrt(vvar);
@@ -1965,7 +1965,7 @@ void mlprandomize(multilayerperceptron *network) {
          }
          ef /= montecarlocnt;
          ef2 /= montecarlocnt;
-         network->rndbuf.xR[entryoffs + 0] = ef;
+         network->rndbuf.xR[entryoffs] = ef;
          network->rndbuf.xR[entryoffs + 1] = rmax2(ef2 - ef * ef, 0.0);
          continue;
       }
@@ -2002,7 +2002,7 @@ void mlprandomizefull(multilayerperceptron *network) {
    if (!mlpissoftmax(network)) {
       for (i = 0; i < nout; i++) {
          offs = istart + (ntotal - nout + i) * mlpbase_nfieldwidth;
-         ntype = network->structinfo.xZ[offs + 0];
+         ntype = network->structinfo.xZ[offs];
          if (ntype == 0) {
          // Shifts are changed only for linear outputs neurons
             network->columnmeans.xR[nin + i] = randommid();
@@ -2044,8 +2044,8 @@ static void mlpbase_mlpcreate(ae_int_t nin, ae_int_t nout, ZVector *lsizes, ZVec
       ae_assert(lconnlast->xZ[i] >= lconnfirst->xZ[i] && (lconnlast->xZ[i] < i || i == 0), "MLPCreate: wrong LConnLast!");
    }
 // Build network geometry
-   ae_vector_set_length(&lnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lnsyn, layerscount - 1 + 1);
+   ae_vector_set_length(&lnfirst, layerscount);
+   ae_vector_set_length(&lnsyn, layerscount);
    ntotal = 0;
    wcount = 0;
    for (i = 0; i < layerscount; i++) {
@@ -2072,22 +2072,22 @@ static void mlpbase_mlpcreate(ae_int_t nin, ae_int_t nout, ZVector *lsizes, ZVec
    }
    ssize = 7 + ntotal * mlpbase_nfieldwidth;
 // Allocate
-   ae_vector_set_length(&network->structinfo, ssize - 1 + 1);
-   ae_vector_set_length(&network->weights, wcount - 1 + 1);
+   ae_vector_set_length(&network->structinfo, ssize);
+   ae_vector_set_length(&network->weights, wcount);
    if (isclsnet) {
-      ae_vector_set_length(&network->columnmeans, nin - 1 + 1);
-      ae_vector_set_length(&network->columnsigmas, nin - 1 + 1);
+      ae_vector_set_length(&network->columnmeans, nin);
+      ae_vector_set_length(&network->columnsigmas, nin);
    } else {
-      ae_vector_set_length(&network->columnmeans, nin + nout - 1 + 1);
-      ae_vector_set_length(&network->columnsigmas, nin + nout - 1 + 1);
+      ae_vector_set_length(&network->columnmeans, nin + nout);
+      ae_vector_set_length(&network->columnsigmas, nin + nout);
    }
-   ae_vector_set_length(&network->neurons, ntotal - 1 + 1);
-   ae_vector_set_length(&network->nwbuf, imax2(wcount, 2 * nout) - 1 + 1);
+   ae_vector_set_length(&network->neurons, ntotal);
+   ae_vector_set_length(&network->nwbuf, imax2(wcount, 2 * nout));
    ae_vector_set_length(&network->integerbuf, 3 + 1);
-   ae_vector_set_length(&network->dfdnet, ntotal - 1 + 1);
-   ae_vector_set_length(&network->x, nin - 1 + 1);
-   ae_vector_set_length(&network->y, nout - 1 + 1);
-   ae_vector_set_length(&network->derror, ntotal - 1 + 1);
+   ae_vector_set_length(&network->dfdnet, ntotal);
+   ae_vector_set_length(&network->x, nin);
+   ae_vector_set_length(&network->y, nout);
+   ae_vector_set_length(&network->derror, ntotal);
 // Fill structure:
 // * first, fill by dummy values to avoid spurious reports by Valgrind
 // * then fill global info header
@@ -2111,7 +2111,7 @@ static void mlpbase_mlpcreate(ae_int_t nin, ae_int_t nout, ZVector *lsizes, ZVec
    for (i = 0; i < layerscount; i++) {
       for (j = 0; j < lsizes->xZ[i]; j++) {
          offs = network->structinfo.xZ[5] + nprocessed * mlpbase_nfieldwidth;
-         network->structinfo.xZ[offs + 0] = ltypes->xZ[i];
+         network->structinfo.xZ[offs] = ltypes->xZ[i];
          if (ltypes->xZ[i] == 0) {
          // Adaptive summator:
          // * connections with weights to previous neurons
@@ -2178,10 +2178,10 @@ void mlpcreate0(ae_int_t nin, ae_int_t nout, multilayerperceptron *network) {
    NewVector(lconnlast, 0, DT_INT);
    layerscount = 1 + 3;
 // Allocate arrays
-   ae_vector_set_length(&lsizes, layerscount - 1 + 1);
-   ae_vector_set_length(&ltypes, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnlast, layerscount - 1 + 1);
+   ae_vector_set_length(&lsizes, layerscount);
+   ae_vector_set_length(&ltypes, layerscount);
+   ae_vector_set_length(&lconnfirst, layerscount);
+   ae_vector_set_length(&lconnlast, layerscount);
 // Layers
    mlpbase_addinputlayer(nin, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
    mlpbase_addbiasedsummatorlayer(nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
@@ -2208,10 +2208,10 @@ void mlpcreate1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, multilayerperceptron
    NewVector(lconnlast, 0, DT_INT);
    layerscount = 1 + 3 + 3;
 // Allocate arrays
-   ae_vector_set_length(&lsizes, layerscount - 1 + 1);
-   ae_vector_set_length(&ltypes, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnlast, layerscount - 1 + 1);
+   ae_vector_set_length(&lsizes, layerscount);
+   ae_vector_set_length(&ltypes, layerscount);
+   ae_vector_set_length(&lconnfirst, layerscount);
+   ae_vector_set_length(&lconnlast, layerscount);
 // Layers
    mlpbase_addinputlayer(nin, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
    mlpbase_addbiasedsummatorlayer(nhid, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
@@ -2241,10 +2241,10 @@ void mlpcreate2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, mul
    NewVector(lconnlast, 0, DT_INT);
    layerscount = 1 + 3 + 3 + 3;
 // Allocate arrays
-   ae_vector_set_length(&lsizes, layerscount - 1 + 1);
-   ae_vector_set_length(&ltypes, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnlast, layerscount - 1 + 1);
+   ae_vector_set_length(&lsizes, layerscount);
+   ae_vector_set_length(&ltypes, layerscount);
+   ae_vector_set_length(&lconnfirst, layerscount);
+   ae_vector_set_length(&lconnlast, layerscount);
 // Layers
    mlpbase_addinputlayer(nin, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
    mlpbase_addbiasedsummatorlayer(nhid1, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
@@ -2290,10 +2290,10 @@ void mlpcreateb0(ae_int_t nin, ae_int_t nout, double b, double d, multilayerperc
       d = -1.0;
    }
 // Allocate arrays
-   ae_vector_set_length(&lsizes, layerscount - 1 + 1);
-   ae_vector_set_length(&ltypes, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnlast, layerscount - 1 + 1);
+   ae_vector_set_length(&lsizes, layerscount);
+   ae_vector_set_length(&ltypes, layerscount);
+   ae_vector_set_length(&lconnfirst, layerscount);
+   ae_vector_set_length(&lconnlast, layerscount);
 // Layers
    mlpbase_addinputlayer(nin, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
    mlpbase_addbiasedsummatorlayer(nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
@@ -2330,10 +2330,10 @@ void mlpcreateb1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, double b, double d,
       d = -1.0;
    }
 // Allocate arrays
-   ae_vector_set_length(&lsizes, layerscount - 1 + 1);
-   ae_vector_set_length(&ltypes, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnlast, layerscount - 1 + 1);
+   ae_vector_set_length(&lsizes, layerscount);
+   ae_vector_set_length(&ltypes, layerscount);
+   ae_vector_set_length(&lconnfirst, layerscount);
+   ae_vector_set_length(&lconnlast, layerscount);
 // Layers
    mlpbase_addinputlayer(nin, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
    mlpbase_addbiasedsummatorlayer(nhid, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
@@ -2372,10 +2372,10 @@ void mlpcreateb2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, do
       d = -1.0;
    }
 // Allocate arrays
-   ae_vector_set_length(&lsizes, layerscount - 1 + 1);
-   ae_vector_set_length(&ltypes, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnlast, layerscount - 1 + 1);
+   ae_vector_set_length(&lsizes, layerscount);
+   ae_vector_set_length(&ltypes, layerscount);
+   ae_vector_set_length(&lconnfirst, layerscount);
+   ae_vector_set_length(&lconnlast, layerscount);
 // Layers
    mlpbase_addinputlayer(nin, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
    mlpbase_addbiasedsummatorlayer(nhid1, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
@@ -2413,10 +2413,10 @@ void mlpcreater0(ae_int_t nin, ae_int_t nout, double a, double b, multilayerperc
    NewVector(lconnlast, 0, DT_INT);
    layerscount = 1 + 3;
 // Allocate arrays
-   ae_vector_set_length(&lsizes, layerscount - 1 + 1);
-   ae_vector_set_length(&ltypes, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnlast, layerscount - 1 + 1);
+   ae_vector_set_length(&lsizes, layerscount);
+   ae_vector_set_length(&ltypes, layerscount);
+   ae_vector_set_length(&lconnfirst, layerscount);
+   ae_vector_set_length(&lconnlast, layerscount);
 // Layers
    mlpbase_addinputlayer(nin, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
    mlpbase_addbiasedsummatorlayer(nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
@@ -2448,10 +2448,10 @@ void mlpcreater1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, double a, double b,
    NewVector(lconnlast, 0, DT_INT);
    layerscount = 1 + 3 + 3;
 // Allocate arrays
-   ae_vector_set_length(&lsizes, layerscount - 1 + 1);
-   ae_vector_set_length(&ltypes, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnlast, layerscount - 1 + 1);
+   ae_vector_set_length(&lsizes, layerscount);
+   ae_vector_set_length(&ltypes, layerscount);
+   ae_vector_set_length(&lconnfirst, layerscount);
+   ae_vector_set_length(&lconnlast, layerscount);
 // Layers
    mlpbase_addinputlayer(nin, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
    mlpbase_addbiasedsummatorlayer(nhid, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
@@ -2485,10 +2485,10 @@ void mlpcreater2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, do
    NewVector(lconnlast, 0, DT_INT);
    layerscount = 1 + 3 + 3 + 3;
 // Allocate arrays
-   ae_vector_set_length(&lsizes, layerscount - 1 + 1);
-   ae_vector_set_length(&ltypes, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnlast, layerscount - 1 + 1);
+   ae_vector_set_length(&lsizes, layerscount);
+   ae_vector_set_length(&ltypes, layerscount);
+   ae_vector_set_length(&lconnfirst, layerscount);
+   ae_vector_set_length(&lconnlast, layerscount);
 // Layers
    mlpbase_addinputlayer(nin, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
    mlpbase_addbiasedsummatorlayer(nhid1, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
@@ -2527,10 +2527,10 @@ void mlpcreatec0(ae_int_t nin, ae_int_t nout, multilayerperceptron *network) {
    ae_assert(nout >= 2, "MLPCreateC0: NOut<2!");
    layerscount = 1 + 2 + 1;
 // Allocate arrays
-   ae_vector_set_length(&lsizes, layerscount - 1 + 1);
-   ae_vector_set_length(&ltypes, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnlast, layerscount - 1 + 1);
+   ae_vector_set_length(&lsizes, layerscount);
+   ae_vector_set_length(&ltypes, layerscount);
+   ae_vector_set_length(&lconnfirst, layerscount);
+   ae_vector_set_length(&lconnlast, layerscount);
 // Layers
    mlpbase_addinputlayer(nin, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
    mlpbase_addbiasedsummatorlayer(nout - 1, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
@@ -2557,10 +2557,10 @@ void mlpcreatec1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, multilayerperceptro
    ae_assert(nout >= 2, "MLPCreateC1: NOut<2!");
    layerscount = 1 + 3 + 2 + 1;
 // Allocate arrays
-   ae_vector_set_length(&lsizes, layerscount - 1 + 1);
-   ae_vector_set_length(&ltypes, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnlast, layerscount - 1 + 1);
+   ae_vector_set_length(&lsizes, layerscount);
+   ae_vector_set_length(&ltypes, layerscount);
+   ae_vector_set_length(&lconnfirst, layerscount);
+   ae_vector_set_length(&lconnlast, layerscount);
 // Layers
    mlpbase_addinputlayer(nin, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
    mlpbase_addbiasedsummatorlayer(nhid, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
@@ -2589,10 +2589,10 @@ void mlpcreatec2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, mu
    ae_assert(nout >= 2, "MLPCreateC2: NOut<2!");
    layerscount = 1 + 3 + 3 + 2 + 1;
 // Allocate arrays
-   ae_vector_set_length(&lsizes, layerscount - 1 + 1);
-   ae_vector_set_length(&ltypes, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnfirst, layerscount - 1 + 1);
-   ae_vector_set_length(&lconnlast, layerscount - 1 + 1);
+   ae_vector_set_length(&lsizes, layerscount);
+   ae_vector_set_length(&ltypes, layerscount);
+   ae_vector_set_length(&lconnfirst, layerscount);
+   ae_vector_set_length(&lconnlast, layerscount);
 // Layers
    mlpbase_addinputlayer(nin, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
    mlpbase_addbiasedsummatorlayer(nhid1, &lsizes, &ltypes, &lconnfirst, &lconnlast, &lastproc);
@@ -2705,14 +2705,14 @@ void mlpinternalprocessvector(ZVector *structinfo, RVector *weights, RVector *co
 // Process network
    for (i = 0; i < ntotal; i++) {
       offs = istart + i * mlpbase_nfieldwidth;
-      if (structinfo->xZ[offs + 0] > 0 || structinfo->xZ[offs + 0] == -5) {
+      if (structinfo->xZ[offs] > 0 || structinfo->xZ[offs] == -5) {
       // Activation function
-         mlpactivationfunction(neurons->xR[structinfo->xZ[offs + 2]], structinfo->xZ[offs + 0], &f, &df, &d2f);
+         mlpactivationfunction(neurons->xR[structinfo->xZ[offs + 2]], structinfo->xZ[offs], &f, &df, &d2f);
          neurons->xR[i] = f;
          dfdnet->xR[i] = df;
          continue;
       }
-      if (structinfo->xZ[offs + 0] == 0) {
+      if (structinfo->xZ[offs] == 0) {
       // Adaptive summator
          n1 = structinfo->xZ[offs + 2];
       // ae_int_t n2 = n1 + structinfo->xZ[offs + 1] - 1; //(@) Unused.
@@ -2723,18 +2723,18 @@ void mlpinternalprocessvector(ZVector *structinfo, RVector *weights, RVector *co
          dfdnet->xR[i] = 1.0;
          continue;
       }
-      if (structinfo->xZ[offs + 0] < 0) {
+      if (structinfo->xZ[offs] < 0) {
          perr = true;
-         if (structinfo->xZ[offs + 0] == -2) {
+         if (structinfo->xZ[offs] == -2) {
          // input neuron, left unchanged
             perr = false;
          }
-         if (structinfo->xZ[offs + 0] == -3) {
+         if (structinfo->xZ[offs] == -3) {
          // "-1" neuron
             neurons->xR[i] = -1.0;
             perr = false;
          }
-         if (structinfo->xZ[offs + 0] == -4) {
+         if (structinfo->xZ[offs] == -4) {
          // "0" neuron
             neurons->xR[i] = 0.0;
             perr = false;
@@ -2894,14 +2894,14 @@ static void mlpbase_mlpinternalcalculategradient(multilayerperceptron *network, 
    for (i = ntotal - 1; i >= 0; i--) {
    // Extract info
       offs = istart + i * mlpbase_nfieldwidth;
-      if (network->structinfo.xZ[offs + 0] > 0 || network->structinfo.xZ[offs + 0] == -5) {
+      if (network->structinfo.xZ[offs] > 0 || network->structinfo.xZ[offs] == -5) {
       // Activation function
          dedf = network->derror.xR[i];
          dfdnet = network->dfdnet.xR[i];
          derror->xR[network->structinfo.xZ[offs + 2]] += dedf * dfdnet;
          continue;
       }
-      if (network->structinfo.xZ[offs + 0] == 0) {
+      if (network->structinfo.xZ[offs] == 0) {
       // Adaptive summator
          n1 = network->structinfo.xZ[offs + 2];
          n2 = n1 + network->structinfo.xZ[offs + 1] - 1;
@@ -2914,9 +2914,9 @@ static void mlpbase_mlpinternalcalculategradient(multilayerperceptron *network, 
          ae_v_addd(&derror->xR[n1], 1, &weights->xR[w1], 1, n2 - n1 + 1, v);
          continue;
       }
-      if (network->structinfo.xZ[offs + 0] < 0) {
+      if (network->structinfo.xZ[offs] < 0) {
          bflag = false;
-         if (network->structinfo.xZ[offs + 0] == -2 || network->structinfo.xZ[offs + 0] == -3 || network->structinfo.xZ[offs + 0] == -4) {
+         if (network->structinfo.xZ[offs] == -2 || network->structinfo.xZ[offs] == -3 || network->structinfo.xZ[offs] == -4) {
          // Special neuron type, no back-propagation required
             bflag = true;
          }
@@ -3010,7 +3010,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
    for (neuronidx = 0; neuronidx < ntotal; neuronidx++) {
       entryoffs = entrysize * neuronidx;
       offs = istart + neuronidx * mlpbase_nfieldwidth;
-      neurontype = network->structinfo.xZ[offs + 0];
+      neurontype = network->structinfo.xZ[offs];
       if (neurontype > 0 || neurontype == -5) {
       // "activation function" neuron, which takes value of neuron SrcNeuronIdx
       // and applies activation function to it.
@@ -3018,9 +3018,9 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
       // This neuron has no weights and no tunable parameters.
          srcneuronidx = network->structinfo.xZ[offs + 2];
          srcentryoffs = entrysize * srcneuronidx;
-         mlpactivationfunction(batch4buf->xR[srcentryoffs + 0], neurontype, &f, &df, &d2f);
-         batch4buf->xR[entryoffs + 0] = f;
-         batch4buf->xR[entryoffs + 0 + dfoffs] = df;
+         mlpactivationfunction(batch4buf->xR[srcentryoffs], neurontype, &f, &df, &d2f);
+         batch4buf->xR[entryoffs] = f;
+         batch4buf->xR[entryoffs + dfoffs] = df;
          mlpactivationfunction(batch4buf->xR[srcentryoffs + 1], neurontype, &f, &df, &d2f);
          batch4buf->xR[entryoffs + 1] = f;
          batch4buf->xR[entryoffs + 1 + dfoffs] = df;
@@ -3046,17 +3046,17 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          for (j = 0; j < nweights; j++) {
             v = network->weights.xR[srcweightidx];
             srcweightidx++;
-            v0 += v * batch4buf->xR[srcentryoffs + 0];
+            v0 += v * batch4buf->xR[srcentryoffs];
             v1 += v * batch4buf->xR[srcentryoffs + 1];
             v2 += v * batch4buf->xR[srcentryoffs + 2];
             v3 += v * batch4buf->xR[srcentryoffs + 3];
             srcentryoffs += entrysize;
          }
-         batch4buf->xR[entryoffs + 0] = v0;
+         batch4buf->xR[entryoffs] = v0;
          batch4buf->xR[entryoffs + 1] = v1;
          batch4buf->xR[entryoffs + 2] = v2;
          batch4buf->xR[entryoffs + 3] = v3;
-         batch4buf->xR[entryoffs + 0 + dfoffs] = 1.0;
+         batch4buf->xR[entryoffs + dfoffs] = 1.0;
          batch4buf->xR[entryoffs + 1 + dfoffs] = 1.0;
          batch4buf->xR[entryoffs + 2 + dfoffs] = 1.0;
          batch4buf->xR[entryoffs + 3 + dfoffs] = 1.0;
@@ -3070,11 +3070,11 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          }
          if (neurontype == -3) {
          // "-1" neuron
-            batch4buf->xR[entryoffs + 0] = -1.0;
+            batch4buf->xR[entryoffs] = -1.0;
             batch4buf->xR[entryoffs + 1] = -1.0;
             batch4buf->xR[entryoffs + 2] = -1.0;
             batch4buf->xR[entryoffs + 3] = -1.0;
-            batch4buf->xR[entryoffs + 0 + dfoffs] = 0.0;
+            batch4buf->xR[entryoffs + dfoffs] = 0.0;
             batch4buf->xR[entryoffs + 1 + dfoffs] = 0.0;
             batch4buf->xR[entryoffs + 2 + dfoffs] = 0.0;
             batch4buf->xR[entryoffs + 3 + dfoffs] = 0.0;
@@ -3082,11 +3082,11 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          }
          if (neurontype == -4) {
          // "0" neuron
-            batch4buf->xR[entryoffs + 0] = 0.0;
+            batch4buf->xR[entryoffs] = 0.0;
             batch4buf->xR[entryoffs + 1] = 0.0;
             batch4buf->xR[entryoffs + 2] = 0.0;
             batch4buf->xR[entryoffs + 3] = 0.0;
-            batch4buf->xR[entryoffs + 0 + dfoffs] = 0.0;
+            batch4buf->xR[entryoffs + dfoffs] = 0.0;
             batch4buf->xR[entryoffs + 1 + dfoffs] = 0.0;
             batch4buf->xR[entryoffs + 2 + dfoffs] = 0.0;
             batch4buf->xR[entryoffs + 3 + dfoffs] = 0.0;
@@ -3129,13 +3129,13 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
    //       (V0,V1,V2,V3), your program will continue  working  -
    //       although with less robustness.
       entryoffs = entrysize * (ntotal - nout);
-      v0 = batch4buf->xR[entryoffs + 0];
+      v0 = batch4buf->xR[entryoffs];
       v1 = batch4buf->xR[entryoffs + 1];
       v2 = batch4buf->xR[entryoffs + 2];
       v3 = batch4buf->xR[entryoffs + 3];
       entryoffs += entrysize;
       for (i = 1; i < nout; i++) {
-         v = batch4buf->xR[entryoffs + 0];
+         v = batch4buf->xR[entryoffs];
          if (v > v0) {
             v0 = v;
          }
@@ -3164,9 +3164,9 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
       s2 = 0.0;
       s3 = 0.0;
       for (i = 0; i < nout; i++) {
-         v = exp(batch4buf->xR[entryoffs + 0] - v0);
+         v = exp(batch4buf->xR[entryoffs] - v0);
          s0 += v;
-         batch4buf->xR[offs0 + 0] = v;
+         batch4buf->xR[offs0] = v;
          v = exp(batch4buf->xR[entryoffs + 1] - v1);
          s1 += v;
          batch4buf->xR[offs0 + 1] = v;
@@ -3180,7 +3180,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          offs0 += chunksize;
       }
       offs0 = entrysize * ntotal + 2 * nout * chunksize;
-      batch4buf->xR[offs0 + 0] = s0;
+      batch4buf->xR[offs0] = s0;
       batch4buf->xR[offs0 + 1] = s1;
       batch4buf->xR[offs0 + 2] = s2;
       batch4buf->xR[offs0 + 3] = s3;
@@ -3289,7 +3289,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
    for (neuronidx = ntotal - 1; neuronidx >= 0; neuronidx--) {
       entryoffs = entrysize * neuronidx;
       offs = istart + neuronidx * mlpbase_nfieldwidth;
-      neurontype = network->structinfo.xZ[offs + 0];
+      neurontype = network->structinfo.xZ[offs];
       if (neurontype > 0 || neurontype == -5) {
       // Activation function
          srcneuronidx = network->structinfo.xZ[offs + 2];
@@ -3297,7 +3297,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          offs0 = srcentryoffs + derroroffs;
          offs1 = entryoffs + derroroffs;
          offs2 = entryoffs + dfoffs;
-         batch4buf->xR[offs0 + 0] += batch4buf->xR[offs1 + 0] * batch4buf->xR[offs2 + 0];
+         batch4buf->xR[offs0] += batch4buf->xR[offs1] * batch4buf->xR[offs2];
          batch4buf->xR[offs0 + 1] += batch4buf->xR[offs1 + 1] * batch4buf->xR[offs2 + 1];
          batch4buf->xR[offs0 + 2] += batch4buf->xR[offs1 + 2] * batch4buf->xR[offs2 + 2];
          batch4buf->xR[offs0 + 3] += batch4buf->xR[offs1 + 3] * batch4buf->xR[offs2 + 3];
@@ -3309,7 +3309,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
          srcneuronidx = network->structinfo.xZ[offs + 2];
          srcentryoffs = entrysize * srcneuronidx;
          srcweightidx = network->structinfo.xZ[offs + 3];
-         v0 = batch4buf->xR[entryoffs + derroroffs + 0];
+         v0 = batch4buf->xR[entryoffs + derroroffs];
          v1 = batch4buf->xR[entryoffs + derroroffs + 1];
          v2 = batch4buf->xR[entryoffs + derroroffs + 2];
          v3 = batch4buf->xR[entryoffs + derroroffs + 3];
@@ -3317,8 +3317,8 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
             offs0 = srcentryoffs;
             offs1 = srcentryoffs + derroroffs;
             v = network->weights.xR[srcweightidx];
-            hpcbuf->xR[srcweightidx] += batch4buf->xR[offs0 + 0] * v0 + batch4buf->xR[offs0 + 1] * v1 + batch4buf->xR[offs0 + 2] * v2 + batch4buf->xR[offs0 + 3] * v3;
-            batch4buf->xR[offs1 + 0] += v * v0;
+            hpcbuf->xR[srcweightidx] += batch4buf->xR[offs0] * v0 + batch4buf->xR[offs0 + 1] * v1 + batch4buf->xR[offs0 + 2] * v2 + batch4buf->xR[offs0 + 3] * v3;
+            batch4buf->xR[offs1] += v * v0;
             batch4buf->xR[offs1 + 1] += v * v1;
             batch4buf->xR[offs1 + 2] += v * v2;
             batch4buf->xR[offs1 + 3] += v * v3;
@@ -3409,7 +3409,7 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
    for (neuronidx = 0; neuronidx < ntotal; neuronidx++) {
       entryoffs = entrysize * neuronidx;
       offs = istart + neuronidx * mlpbase_nfieldwidth;
-      neurontype = network->structinfo.xZ[offs + 0];
+      neurontype = network->structinfo.xZ[offs];
       if (neurontype > 0 || neurontype == -5) {
       // "activation function" neuron, which takes value of neuron SrcNeuronIdx
       // and applies activation function to it.
@@ -3417,8 +3417,8 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
       // This neuron has no weights and no tunable parameters.
          srcneuronidx = network->structinfo.xZ[offs + 2];
          srcentryoffs = entrysize * srcneuronidx;
-         mlpactivationfunction(batch4buf->xR[srcentryoffs + 0], neurontype, &f, &df, &d2f);
-         batch4buf->xR[entryoffs + 0] = f;
+         mlpactivationfunction(batch4buf->xR[srcentryoffs], neurontype, &f, &df, &d2f);
+         batch4buf->xR[entryoffs] = f;
          mlpactivationfunction(batch4buf->xR[srcentryoffs + 1], neurontype, &f, &df, &d2f);
          batch4buf->xR[entryoffs + 1] = f;
          mlpactivationfunction(batch4buf->xR[srcentryoffs + 2], neurontype, &f, &df, &d2f);
@@ -3441,13 +3441,13 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
          for (j = 0; j < nweights; j++) {
             v = network->weights.xR[srcweightidx];
             srcweightidx++;
-            v0 += v * batch4buf->xR[srcentryoffs + 0];
+            v0 += v * batch4buf->xR[srcentryoffs];
             v1 += v * batch4buf->xR[srcentryoffs + 1];
             v2 += v * batch4buf->xR[srcentryoffs + 2];
             v3 += v * batch4buf->xR[srcentryoffs + 3];
             srcentryoffs += entrysize;
          }
-         batch4buf->xR[entryoffs + 0] = v0;
+         batch4buf->xR[entryoffs] = v0;
          batch4buf->xR[entryoffs + 1] = v1;
          batch4buf->xR[entryoffs + 2] = v2;
          batch4buf->xR[entryoffs + 3] = v3;
@@ -3461,7 +3461,7 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
          }
          if (neurontype == -3) {
          // "-1" neuron
-            batch4buf->xR[entryoffs + 0] = -1.0;
+            batch4buf->xR[entryoffs] = -1.0;
             batch4buf->xR[entryoffs + 1] = -1.0;
             batch4buf->xR[entryoffs + 2] = -1.0;
             batch4buf->xR[entryoffs + 3] = -1.0;
@@ -3469,7 +3469,7 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
          }
          if (neurontype == -4) {
          // "0" neuron
-            batch4buf->xR[entryoffs + 0] = 0.0;
+            batch4buf->xR[entryoffs] = 0.0;
             batch4buf->xR[entryoffs + 1] = 0.0;
             batch4buf->xR[entryoffs + 2] = 0.0;
             batch4buf->xR[entryoffs + 3] = 0.0;
@@ -3496,13 +3496,13 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
    //       (V0,V1,V2,V3), your program will continue  working  -
    //       although with less robustness.
       entryoffs = entrysize * (ntotal - nout);
-      v0 = batch4buf->xR[entryoffs + 0];
+      v0 = batch4buf->xR[entryoffs];
       v1 = batch4buf->xR[entryoffs + 1];
       v2 = batch4buf->xR[entryoffs + 2];
       v3 = batch4buf->xR[entryoffs + 3];
       entryoffs += entrysize;
       for (i = 1; i < nout; i++) {
-         v = batch4buf->xR[entryoffs + 0];
+         v = batch4buf->xR[entryoffs];
          if (v > v0) {
             v0 = v;
          }
@@ -3530,9 +3530,9 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
       s2 = 0.0;
       s3 = 0.0;
       for (i = 0; i < nout; i++) {
-         v = exp(batch4buf->xR[entryoffs + 0] - v0);
+         v = exp(batch4buf->xR[entryoffs] - v0);
          s0 += v;
-         batch4buf->xR[offs0 + 0] = v;
+         batch4buf->xR[offs0] = v;
          v = exp(batch4buf->xR[entryoffs + 1] - v1);
          s1 += v;
          batch4buf->xR[offs0 + 1] = v;
@@ -3549,7 +3549,7 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
       offs0 = entrysize * ntotal;
       for (i = 0; i < nout; i++) {
          if (csize > 0) {
-            xy->xyR[cstart + 0][nin + i] = batch4buf->xR[offs0 + 0] / s0;
+            xy->xyR[cstart][nin + i] = batch4buf->xR[offs0] / s0;
          }
          if (csize > 1) {
             xy->xyR[cstart + 1][nin + i] = batch4buf->xR[offs0 + 1] / s1;
@@ -4200,14 +4200,14 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
    ntotal = network->structinfo.xZ[3];
    istart = network->structinfo.xZ[5];
 // Prepare
-   ae_vector_set_length(&x, nin - 1 + 1);
-   ae_vector_set_length(&desiredy, nout - 1 + 1);
-   ae_vector_set_length(&zeros, wcount - 1 + 1);
-   ae_vector_set_length(&gt, wcount - 1 + 1);
-   ae_matrix_set_length(&rx, ntotal + nout - 1 + 1, wcount - 1 + 1);
-   ae_matrix_set_length(&ry, ntotal + nout - 1 + 1, wcount - 1 + 1);
-   ae_matrix_set_length(&rdx, ntotal + nout - 1 + 1, wcount - 1 + 1);
-   ae_matrix_set_length(&rdy, ntotal + nout - 1 + 1, wcount - 1 + 1);
+   ae_vector_set_length(&x, nin);
+   ae_vector_set_length(&desiredy, nout);
+   ae_vector_set_length(&zeros, wcount);
+   ae_vector_set_length(&gt, wcount);
+   ae_matrix_set_length(&rx, ntotal + nout, wcount);
+   ae_matrix_set_length(&ry, ntotal + nout, wcount);
+   ae_matrix_set_length(&rdx, ntotal + nout, wcount);
+   ae_matrix_set_length(&rdy, ntotal + nout, wcount);
    *e = 0.0;
    for (i = 0; i < wcount; i++) {
       zeros.xR[i] = 0.0;
@@ -4249,7 +4249,7 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
          offs = istart + i * mlpbase_nfieldwidth;
          ae_v_move(rx.xyR[i], 1, zeros.xR, 1, wcount);
          ae_v_move(ry.xyR[i], 1, zeros.xR, 1, wcount);
-         if (network->structinfo.xZ[offs + 0] > 0 || network->structinfo.xZ[offs + 0] == -5) {
+         if (network->structinfo.xZ[offs] > 0 || network->structinfo.xZ[offs] == -5) {
          // Activation function
             n1 = network->structinfo.xZ[offs + 2];
             ae_v_move(rx.xyR[i], 1, ry.xyR[n1], 1, wcount);
@@ -4257,7 +4257,7 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
             ae_v_moved(ry.xyR[i], 1, rx.xyR[i], 1, wcount, v);
             continue;
          }
-         if (network->structinfo.xZ[offs + 0] == 0) {
+         if (network->structinfo.xZ[offs] == 0) {
          // Adaptive summator
             n1 = network->structinfo.xZ[offs + 2];
             n2 = n1 + network->structinfo.xZ[offs + 1] - 1;
@@ -4271,17 +4271,17 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
             ae_v_move(ry.xyR[i], 1, rx.xyR[i], 1, wcount);
             continue;
          }
-         if (network->structinfo.xZ[offs + 0] < 0) {
+         if (network->structinfo.xZ[offs] < 0) {
             bflag = true;
-            if (network->structinfo.xZ[offs + 0] == -2) {
+            if (network->structinfo.xZ[offs] == -2) {
             // input neuron, left unchanged
                bflag = false;
             }
-            if (network->structinfo.xZ[offs + 0] == -3) {
+            if (network->structinfo.xZ[offs] == -3) {
             // "-1" neuron, left unchanged
                bflag = false;
             }
-            if (network->structinfo.xZ[offs + 0] == -4) {
+            if (network->structinfo.xZ[offs] == -4) {
             // "0" neuron, left unchanged
                bflag = false;
             }
@@ -4412,10 +4412,10 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
       // 2. Adaptive summator
       // 3. Special neuron
          offs = istart + i * mlpbase_nfieldwidth;
-         if (network->structinfo.xZ[offs + 0] > 0 || network->structinfo.xZ[offs + 0] == -5) {
+         if (network->structinfo.xZ[offs] > 0 || network->structinfo.xZ[offs] == -5) {
             n1 = network->structinfo.xZ[offs + 2];
          // First, calculate R(dE/dX).
-            mlpactivationfunction(network->neurons.xR[n1], network->structinfo.xZ[offs + 0], &f, &df, &d2f);
+            mlpactivationfunction(network->neurons.xR[n1], network->structinfo.xZ[offs], &f, &df, &d2f);
             v = d2f * network->derror.xR[i];
             ae_v_moved(rdx.xyR[i], 1, rdy.xyR[i], 1, wcount, df);
             ae_v_addd(rdx.xyR[i], 1, rx.xyR[i], 1, wcount, v);
@@ -4427,7 +4427,7 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
             ae_v_add(rdy.xyR[n1], 1, rdx.xyR[i], 1, wcount);
             continue;
          }
-         if (network->structinfo.xZ[offs + 0] == 0) {
+         if (network->structinfo.xZ[offs] == 0) {
          // Adaptive summator
             n1 = network->structinfo.xZ[offs + 2];
             n2 = n1 + network->structinfo.xZ[offs + 1] - 1;
@@ -4450,9 +4450,9 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
             }
             continue;
          }
-         if (network->structinfo.xZ[offs + 0] < 0) {
+         if (network->structinfo.xZ[offs] < 0) {
             bflag = false;
-            if (network->structinfo.xZ[offs + 0] == -2 || network->structinfo.xZ[offs + 0] == -3 || network->structinfo.xZ[offs + 0] == -4) {
+            if (network->structinfo.xZ[offs] == -2 || network->structinfo.xZ[offs] == -3 || network->structinfo.xZ[offs] == -4) {
             // Special neuron type, no back-propagation required
                bflag = true;
             }
@@ -4636,7 +4636,7 @@ void mlpgetneuroninfo(multilayerperceptron *network, ae_int_t k, ae_int_t i, ae_
 // 1. find offset of the activation function record in the
    if (network->hlneurons.xZ[highlevelidx * mlpbase_hlnfieldwidth + 2] >= 0) {
       activationoffset = istart + network->hlneurons.xZ[highlevelidx * mlpbase_hlnfieldwidth + 2] * mlpbase_nfieldwidth;
-      *fkind = network->structinfo.xZ[activationoffset + 0];
+      *fkind = network->structinfo.xZ[activationoffset];
    } else {
       *fkind = 0;
    }
@@ -4788,7 +4788,7 @@ void mlpsetneuroninfo(multilayerperceptron *network, ae_int_t k, ae_int_t i, ae_
 // activation function
    if (network->hlneurons.xZ[highlevelidx * mlpbase_hlnfieldwidth + 2] >= 0) {
       activationoffset = istart + network->hlneurons.xZ[highlevelidx * mlpbase_hlnfieldwidth + 2] * mlpbase_nfieldwidth;
-      network->structinfo.xZ[activationoffset + 0] = fkind;
+      network->structinfo.xZ[activationoffset] = fkind;
    } else {
       ae_assert(fkind == 0, "MLPSetNeuronInfo: you try to set activation function for neuron which can not have one");
    }
@@ -5109,7 +5109,7 @@ void mlpserializeold(multilayerperceptron *network, RVector *ra, ae_int_t *rlen)
 //      SigmaLen    ColumnMeans
 //      SigmaLen    ColumnSigmas
    *rlen = 3 + ssize + wcount + 2 * sigmalen;
-   ae_vector_set_length(ra, *rlen - 1 + 1);
+   ae_vector_set_length(ra, *rlen);
    ra->xR[0] = (double)*rlen;
    ra->xR[1] = (double)mlpbase_mlpvnum;
    ra->xR[2] = (double)ssize;
@@ -5148,7 +5148,7 @@ void mlpunserializeold(RVector *ra, multilayerperceptron *network) {
 // Unload StructInfo from IA
    offs = 3;
    ssize = iround(ra->xR[2]);
-   ae_vector_set_length(&network->structinfo, ssize - 1 + 1);
+   ae_vector_set_length(&network->structinfo, ssize);
    for (i = 0; i < ssize; i++) {
       network->structinfo.xZ[i] = iround(ra->xR[offs + i]);
    }
@@ -5165,15 +5165,15 @@ void mlpunserializeold(RVector *ra, multilayerperceptron *network) {
       sigmalen = nin;
    }
 // Allocate space for other fields
-   ae_vector_set_length(&network->weights, wcount - 1 + 1);
-   ae_vector_set_length(&network->columnmeans, sigmalen - 1 + 1);
-   ae_vector_set_length(&network->columnsigmas, sigmalen - 1 + 1);
-   ae_vector_set_length(&network->neurons, ntotal - 1 + 1);
-   ae_vector_set_length(&network->nwbuf, imax2(wcount, 2 * nout) - 1 + 1);
-   ae_vector_set_length(&network->dfdnet, ntotal - 1 + 1);
-   ae_vector_set_length(&network->x, nin - 1 + 1);
-   ae_vector_set_length(&network->y, nout - 1 + 1);
-   ae_vector_set_length(&network->derror, ntotal - 1 + 1);
+   ae_vector_set_length(&network->weights, wcount);
+   ae_vector_set_length(&network->columnmeans, sigmalen);
+   ae_vector_set_length(&network->columnsigmas, sigmalen);
+   ae_vector_set_length(&network->neurons, ntotal);
+   ae_vector_set_length(&network->nwbuf, imax2(wcount, 2 * nout));
+   ae_vector_set_length(&network->dfdnet, ntotal);
+   ae_vector_set_length(&network->x, nin);
+   ae_vector_set_length(&network->y, nout);
+   ae_vector_set_length(&network->derror, ntotal);
 // Copy parameters from RA
    ae_v_move(network->weights.xR, 1, &ra->xR[offs], 1, wcount);
    offs += wcount;
@@ -5245,7 +5245,7 @@ void mlpinitpreprocessor(multilayerperceptron *network, RMatrix *xy, ae_int_t ss
    if (!mlpissoftmax(network)) {
       for (i = 0; i < nout; i++) {
          offs = istart + (ntotal - nout + i) * mlpbase_nfieldwidth;
-         ntype = network->structinfo.xZ[offs + 0];
+         ntype = network->structinfo.xZ[offs];
       // Linear outputs
          if (ntype == 0) {
             network->columnmeans.xR[nin + i] = means.xR[nin + i];
@@ -5345,7 +5345,7 @@ void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, 
    if (!mlpissoftmax(network)) {
       for (i = 0; i < nout; i++) {
          offs = istart + (ntotal - nout + i) * mlpbase_nfieldwidth;
-         ntype = network->structinfo.xZ[offs + 0];
+         ntype = network->structinfo.xZ[offs];
       // Linear outputs
          if (ntype == 0) {
             network->columnmeans.xR[nin + i] = means.xR[nin + i];
@@ -5471,7 +5471,7 @@ void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_in
    if (!mlpissoftmax(network)) {
       for (i = 0; i < nout; i++) {
          offs = istart + (ntotal - nout + i) * mlpbase_nfieldwidth;
-         ntype = network->structinfo.xZ[offs + 0];
+         ntype = network->structinfo.xZ[offs];
       // Linear outputs
          if (ntype == 0) {
             network->columnmeans.xR[nin + i] = means.xR[nin + i];
@@ -5600,7 +5600,7 @@ void mlpinitpreprocessorsparsesubset(multilayerperceptron *network, sparsematrix
    if (!mlpissoftmax(network)) {
       for (i = 0; i < nout; i++) {
          offs = istart + (ntotal - nout + i) * mlpbase_nfieldwidth;
-         ntype = network->structinfo.xZ[offs + 0];
+         ntype = network->structinfo.xZ[offs];
       // Linear outputs
          if (ntype == 0) {
             network->columnmeans.xR[nin + i] = means.xR[nin + i];
@@ -12643,8 +12643,8 @@ static void dforest_analyzeandpreprocessdataset(decisionforestbuilder *s) {
    vectorsetlengthatleast(&s->dsmax, nvars);
    vectorsetlengthatleast(&s->dsbinary, nvars);
    for (i = 0; i < nvars; i++) {
-      v0 = s->dsdata.xR[i * npoints + 0];
-      v1 = s->dsdata.xR[i * npoints + 0];
+      v0 = s->dsdata.xR[i * npoints];
+      v1 = s->dsdata.xR[i * npoints];
       for (j = 1; j < npoints; j++) {
          v = s->dsdata.xR[i * npoints + j];
          if (v < v0) {
@@ -13079,11 +13079,11 @@ static void dforest_streamfloat(ae_vector *buf, bool usemantissa8, ae_int_t *off
 // Special case: zero
    if (v == 0.0) {
       if (usemantissa8) {
-         buf->xU[*offs + 0] = (unsigned char)(0);
+         buf->xU[*offs] = (unsigned char)(0);
          buf->xU[*offs + 1] = (unsigned char)(0);
          *offs += 2;
       } else {
-         buf->xU[*offs + 0] = (unsigned char)(0);
+         buf->xU[*offs] = (unsigned char)(0);
          buf->xU[*offs + 1] = (unsigned char)(0);
          buf->xU[*offs + 2] = (unsigned char)(0);
          *offs += 3;
@@ -13144,7 +13144,7 @@ static void dforest_streamfloat(ae_vector *buf, bool usemantissa8, ae_int_t *off
          m /= 2;
          e = imin2(e + 1, 63);
       }
-      buf->xU[*offs + 0] = (unsigned char)(e + 64 + signbit);
+      buf->xU[*offs] = (unsigned char)(e + 64 + signbit);
       buf->xU[*offs + 1] = (unsigned char)(m);
       *offs += 2;
    } else {
@@ -13153,7 +13153,7 @@ static void dforest_streamfloat(ae_vector *buf, bool usemantissa8, ae_int_t *off
          m /= 2;
          e = imin2(e + 1, 63);
       }
-      buf->xU[*offs + 0] = (unsigned char)(e + 64 + signbit);
+      buf->xU[*offs] = (unsigned char)(e + 64 + signbit);
       buf->xU[*offs + 1] = (unsigned char)(m % 256);
       buf->xU[*offs + 2] = (unsigned char)(m / 256);
       *offs += 3;
@@ -13176,11 +13176,11 @@ static double dforest_unstreamfloat(ae_vector *buf, bool usemantissa8, ae_int_t 
 // Read from stream
    inv256 = 1.0 / 256.0;
    if (usemantissa8) {
-      e = buf->xU[*offs + 0];
+      e = buf->xU[*offs];
       v = buf->xU[*offs + 1] * inv256;
       *offs += 2;
    } else {
-      e = buf->xU[*offs + 0];
+      e = buf->xU[*offs];
       v = (buf->xU[*offs + 1] * inv256 + buf->xU[*offs + 2]) * inv256;
       *offs += 3;
    }
@@ -13838,8 +13838,8 @@ static ae_int_t dforest_dfclserror(decisionforest *df, RMatrix *xy, ae_int_t npo
       ae_frame_leave();
       return result;
    }
-   ae_vector_set_length(&x, df->nvars - 1 + 1);
-   ae_vector_set_length(&y, df->nclasses - 1 + 1);
+   ae_vector_set_length(&x, df->nvars);
+   ae_vector_set_length(&y, df->nclasses);
    result = 0;
    for (i = 0; i < npoints; i++) {
       ae_v_move(x.xR, 1, xy->xyR[i], 1, df->nvars);
@@ -13899,8 +13899,8 @@ double dfavgce(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
-   ae_vector_set_length(&x, df->nvars - 1 + 1);
-   ae_vector_set_length(&y, df->nclasses - 1 + 1);
+   ae_vector_set_length(&x, df->nvars);
+   ae_vector_set_length(&y, df->nclasses);
    result = 0.0;
    for (i = 0; i < npoints; i++) {
       ae_v_move(x.xR, 1, xy->xyR[i], 1, df->nvars);
@@ -13950,8 +13950,8 @@ double dfrmserror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
-   ae_vector_set_length(&x, df->nvars - 1 + 1);
-   ae_vector_set_length(&y, df->nclasses - 1 + 1);
+   ae_vector_set_length(&x, df->nvars);
+   ae_vector_set_length(&y, df->nclasses);
    result = 0.0;
    for (i = 0; i < npoints; i++) {
       ae_v_move(x.xR, 1, xy->xyR[i], 1, df->nvars);
@@ -14004,8 +14004,8 @@ double dfavgerror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
-   ae_vector_set_length(&x, df->nvars - 1 + 1);
-   ae_vector_set_length(&y, df->nclasses - 1 + 1);
+   ae_vector_set_length(&x, df->nvars);
+   ae_vector_set_length(&y, df->nclasses);
    result = 0.0;
    for (i = 0; i < npoints; i++) {
       ae_v_move(x.xR, 1, xy->xyR[i], 1, df->nvars);
@@ -14053,8 +14053,8 @@ double dfavgrelerror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
-   ae_vector_set_length(&x, df->nvars - 1 + 1);
-   ae_vector_set_length(&y, df->nclasses - 1 + 1);
+   ae_vector_set_length(&x, df->nvars);
+   ae_vector_set_length(&y, df->nclasses);
    result = 0.0;
    relcnt = 0;
    for (i = 0; i < npoints; i++) {
@@ -15168,8 +15168,8 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
    }
    *info = 1;
 // Create design matrix
-   ae_matrix_set_length(&a, npoints - 1 + 1, nvars - 1 + 1);
-   ae_vector_set_length(&b, npoints - 1 + 1);
+   ae_matrix_set_length(&a, npoints, nvars);
+   ae_vector_set_length(&b, npoints);
    for (i = 0; i < npoints; i++) {
       r = 1 / s->xR[i];
       ae_v_moved(a.xyR[i], 1, xy->xyR[i], 1, nvars, r);
@@ -15180,7 +15180,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
 // W[1]     version number, 0
 // W[2]     NVars (minus 1, to be compatible with external representation)
 // W[3]     coefficients offset
-   ae_vector_set_length(&lm->w, 4 + nvars - 1 + 1);
+   ae_vector_set_length(&lm->w, 4 + nvars);
    offs = 4;
    lm->w.xR[0] = (double)(4 + nvars);
    lm->w.xR[1] = (double)linreg_lrvnum;
@@ -15195,10 +15195,10 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
 // 4. cov(wi,wj) = SUM(Vji*Vjk/sv[i]^2,K=1..M)
 //
 // see $15.4 of "Numerical Recipes in C" for more information
-   ae_vector_set_length(&t, nvars - 1 + 1);
-   ae_vector_set_length(&svi, nvars - 1 + 1);
-   ae_matrix_set_length(&ar->c, nvars - 1 + 1, nvars - 1 + 1);
-   ae_matrix_set_length(&vm, nvars - 1 + 1, nvars - 1 + 1);
+   ae_vector_set_length(&t, nvars);
+   ae_vector_set_length(&svi, nvars);
+   ae_matrix_set_length(&ar->c, nvars, nvars);
+   ae_matrix_set_length(&vm, nvars, nvars);
    if (!rmatrixsvd(&a, npoints, nvars, 1, 1, 2, &sv, &u, &vt)) {
       *info = -4;
       ae_frame_leave();
@@ -15216,11 +15216,11 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
       ar->cvavgerror = ar->avgerror;
       ar->cvavgrelerror = ar->avgrelerror;
       ar->ncvdefects = 0;
-      ae_vector_set_length(&ar->cvdefects, nvars - 1 + 1);
+      ae_vector_set_length(&ar->cvdefects, nvars);
       for (i = 0; i < nvars; i++) {
          ar->cvdefects.xZ[i] = -1;
       }
-      ae_matrix_set_length(&ar->c, nvars - 1 + 1, nvars - 1 + 1);
+      ae_matrix_set_length(&ar->c, nvars, nvars);
       for (i = 0; i < nvars; i++) {
          for (j = 0; j < nvars; j++) {
             ar->c.xyR[i][j] = 0.0;
@@ -15239,7 +15239,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
       for (k = nvars; k >= 1; k--) {
          if (sv.xR[k - 1] > epstol * machineepsilon * sv.xR[0]) {
          // Reduce
-            ae_matrix_set_length(&xym, npoints - 1 + 1, k + 1);
+            ae_matrix_set_length(&xym, npoints, k + 1);
             for (i = 0; i < npoints; i++) {
                for (j = 0; j < k; j++) {
                   r = ae_v_dotproduct(xy->xyR[i], 1, vt.xyR[j], 1, nvars);
@@ -15268,14 +15268,14 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
             ar->cvavgerror = ar2.cvavgerror;
             ar->cvavgrelerror = ar2.cvavgrelerror;
             ar->ncvdefects = ar2.ncvdefects;
-            ae_vector_set_length(&ar->cvdefects, nvars - 1 + 1);
+            ae_vector_set_length(&ar->cvdefects, nvars);
             for (j = 0; j < ar->ncvdefects; j++) {
                ar->cvdefects.xZ[j] = ar2.cvdefects.xZ[j];
             }
             for (j = ar->ncvdefects; j < nvars; j++) {
                ar->cvdefects.xZ[j] = -1;
             }
-            ae_matrix_set_length(&ar->c, nvars - 1 + 1, nvars - 1 + 1);
+            ae_matrix_set_length(&ar->c, nvars, nvars);
             ae_vector_set_length(&work, nvars + 1);
             matrixmatrixmultiply(&ar2.c, 0, k - 1, 0, k - 1, false, &vt, 0, k - 1, 0, nvars - 1, false, 1.0, &vm, 0, k - 1, 0, nvars - 1, 0.0, &work);
             matrixmatrixmultiply(&vt, 0, k - 1, 0, nvars - 1, true, &vm, 0, k - 1, 0, nvars - 1, false, 1.0, &ar->c, 0, nvars - 1, 0, nvars - 1, 0.0, &work);
@@ -15365,7 +15365,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
    ar->cvavgerror = 0.0;
    ar->cvavgrelerror = 0.0;
    ar->ncvdefects = 0;
-   ae_vector_set_length(&ar->cvdefects, nvars - 1 + 1);
+   ae_vector_set_length(&ar->cvdefects, nvars);
    for (i = 0; i < nvars; i++) {
       ar->cvdefects.xZ[i] = -1;
    }
@@ -15465,16 +15465,16 @@ void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_
       return;
    }
 // Copy data, add one more column (constant term)
-   ae_matrix_set_length(&xyi, npoints - 1 + 1, nvars + 1 + 1);
+   ae_matrix_set_length(&xyi, npoints, nvars + 1 + 1);
    for (i = 0; i < npoints; i++) {
       ae_v_move(xyi.xyR[i], 1, xy->xyR[i], 1, nvars);
       xyi.xyR[i][nvars] = 1.0;
       xyi.xyR[i][nvars + 1] = xy->xyR[i][nvars];
    }
 // Standartization
-   ae_vector_set_length(&x, npoints - 1 + 1);
-   ae_vector_set_length(&means, nvars - 1 + 1);
-   ae_vector_set_length(&sigmas, nvars - 1 + 1);
+   ae_vector_set_length(&x, npoints);
+   ae_vector_set_length(&means, nvars);
+   ae_vector_set_length(&sigmas, nvars);
    for (j = 0; j < nvars; j++) {
       ae_v_move(x.xR, 1, &xy->xyR[0][j], xy->stride, npoints);
       samplemoments(&x, npoints, &mean, &variance, &skewness, &kurtosis);
@@ -15557,7 +15557,7 @@ void lrbuild(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, line
       ae_frame_leave();
       return;
    }
-   ae_vector_set_length(&s, npoints - 1 + 1);
+   ae_vector_set_length(&s, npoints);
    for (i = 0; i < npoints; i++) {
       s.xR[i] = 1.0;
    }
@@ -15604,15 +15604,15 @@ void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int
       return;
    }
 // Copy data, add one more column (constant term)
-   ae_matrix_set_length(&xyi, npoints - 1 + 1, nvars + 1 + 1);
+   ae_matrix_set_length(&xyi, npoints, nvars + 1 + 1);
    for (i = 0; i < npoints; i++) {
       ae_v_move(xyi.xyR[i], 1, xy->xyR[i], 1, nvars);
       xyi.xyR[i][nvars] = 0.0;
       xyi.xyR[i][nvars + 1] = xy->xyR[i][nvars];
    }
 // Standartization: unusual scaling
-   ae_vector_set_length(&x, npoints - 1 + 1);
-   ae_vector_set_length(&c, nvars - 1 + 1);
+   ae_vector_set_length(&x, npoints);
+   ae_vector_set_length(&c, nvars);
    for (j = 0; j < nvars; j++) {
       ae_v_move(x.xR, 1, &xy->xyR[0][j], xy->stride, npoints);
       samplemoments(&x, npoints, &mean, &variance, &skewness, &kurtosis);
@@ -15670,7 +15670,7 @@ void lrbuildz(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, lin
       ae_frame_leave();
       return;
    }
-   ae_vector_set_length(&s, npoints - 1 + 1);
+   ae_vector_set_length(&s, npoints);
    for (i = 0; i < npoints; i++) {
       s.xR[i] = 1.0;
    }
@@ -15767,7 +15767,7 @@ void lrcopy(linearmodel *lm1, linearmodel *lm2) {
    ae_int_t k;
    SetObj(linearmodel, lm2);
    k = iround(lm1->w.xR[0]);
-   ae_vector_set_length(&lm2->w, k - 1 + 1);
+   ae_vector_set_length(&lm2->w, k);
    ae_v_move(lm2->w.xR, 1, lm1->w.xR, 1, k);
 }
 
@@ -15867,7 +15867,7 @@ void lrline(RMatrix *xy, ae_int_t n, ae_int_t *info, double *a, double *b) {
       ae_frame_leave();
       return;
    }
-   ae_vector_set_length(&s, n - 1 + 1);
+   ae_vector_set_length(&s, n);
    for (i = 0; i < n; i++) {
       s.xR[i] = 1.0;
    }
@@ -20752,7 +20752,7 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
 // Allocate array
    offs = 5;
    ssize = 5 + (nvars + 1) * (nclasses - 1) + nclasses;
-   ae_vector_set_length(&lm->w, ssize - 1 + 1);
+   ae_vector_set_length(&lm->w, ssize);
    lm->w.xR[0] = (double)ssize;
    lm->w.xR[1] = (double)logit_logitvnum;
    lm->w.xR[2] = (double)nvars;
@@ -20795,11 +20795,11 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
    for (i = 0; i < wcount; i++) {
       network.weights.xR[i] = randommid() / nvars;
    }
-   ae_vector_set_length(&g, wcount - 1 + 1);
-   ae_matrix_set_length(&h, wcount - 1 + 1, wcount - 1 + 1);
-   ae_vector_set_length(&wbase, wcount - 1 + 1);
-   ae_vector_set_length(&wdir, wcount - 1 + 1);
-   ae_vector_set_length(&work, wcount - 1 + 1);
+   ae_vector_set_length(&g, wcount);
+   ae_matrix_set_length(&h, wcount, wcount);
+   ae_vector_set_length(&wbase, wcount);
+   ae_vector_set_length(&wdir, wcount);
+   ae_vector_set_length(&work, wcount);
 // First stage: optimize in gradient direction.
    for (k = 0; k <= wcount / 3 + 10; k++) {
    // Calculate gradient in starting point
@@ -20911,7 +20911,7 @@ void mnlunpack(logitmodel *lm, RMatrix *a, ae_int_t *nvars, ae_int_t *nclasses) 
    *nvars = iround(lm->w.xR[2]);
    *nclasses = iround(lm->w.xR[3]);
    offs = iround(lm->w.xR[4]);
-   ae_matrix_set_length(a, *nclasses - 2 + 1, *nvars + 1);
+   ae_matrix_set_length(a, *nclasses - 1, *nvars + 1);
    for (i = 0; i < *nclasses - 1; i++) {
       ae_v_move(a->xyR[i], 1, &lm->w.xR[offs + i * (*nvars + 1)], 1, *nvars + 1);
    }
@@ -20936,7 +20936,7 @@ void mnlpack(RMatrix *a, ae_int_t nvars, ae_int_t nclasses, logitmodel *lm) {
    SetObj(logitmodel, lm);
    offs = 5;
    ssize = 5 + (nvars + 1) * (nclasses - 1) + nclasses;
-   ae_vector_set_length(&lm->w, ssize - 1 + 1);
+   ae_vector_set_length(&lm->w, ssize);
    lm->w.xR[0] = (double)ssize;
    lm->w.xR[1] = (double)logit_logitvnum;
    lm->w.xR[2] = (double)nvars;
@@ -20959,7 +20959,7 @@ void mnlcopy(logitmodel *lm1, logitmodel *lm2) {
    ae_int_t k;
    SetObj(logitmodel, lm2);
    k = iround(lm1->w.xR[0]);
-   ae_vector_set_length(&lm2->w, k - 1 + 1);
+   ae_vector_set_length(&lm2->w, k);
    ae_v_move(lm2->w.xR, 1, lm1->w.xR, 1, k);
 }
 
@@ -20983,8 +20983,8 @@ static void logit_mnlallerrors(logitmodel *lm, RMatrix *xy, ae_int_t npoints, do
    ae_assert(iround(lm->w.xR[1]) == logit_logitvnum, "MNL unit: Incorrect MNL version!");
    nvars = iround(lm->w.xR[2]);
    nclasses = iround(lm->w.xR[3]);
-   ae_vector_set_length(&workx, nvars - 1 + 1);
-   ae_vector_set_length(&y, nclasses - 1 + 1);
+   ae_vector_set_length(&workx, nvars);
+   ae_vector_set_length(&y, nclasses);
    ae_vector_set_length(&dy, 0 + 1);
    dserrallocate(nclasses, &buf);
    for (i = 0; i < npoints; i++) {
@@ -21025,8 +21025,8 @@ double mnlavgce(logitmodel *lm, RMatrix *xy, ae_int_t npoints) {
    ae_assert(lm->w.xR[1] == (double)logit_logitvnum, "MNLClsError: unexpected model version");
    nvars = iround(lm->w.xR[2]);
    nclasses = iround(lm->w.xR[3]);
-   ae_vector_set_length(&workx, nvars - 1 + 1);
-   ae_vector_set_length(&worky, nclasses - 1 + 1);
+   ae_vector_set_length(&workx, nvars);
+   ae_vector_set_length(&worky, nclasses);
    result = 0.0;
    for (i = 0; i < npoints; i++) {
       ae_assert(iround(xy->xyR[i][nvars]) >= 0 && iround(xy->xyR[i][nvars]) < nclasses, "MNLAvgCE: incorrect class number!");
@@ -21061,8 +21061,8 @@ ae_int_t mnlclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints) {
    ae_assert(lm->w.xR[1] == (double)logit_logitvnum, "MNLClsError: unexpected model version");
    nvars = iround(lm->w.xR[2]);
    nclasses = iround(lm->w.xR[3]);
-   ae_vector_set_length(&workx, nvars - 1 + 1);
-   ae_vector_set_length(&worky, nclasses - 1 + 1);
+   ae_vector_set_length(&workx, nvars);
+   ae_vector_set_length(&worky, nclasses);
    result = 0;
    for (i = 0; i < npoints; i++) {
    // Process
@@ -22623,14 +22623,14 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
 // General case.
 // Prepare task and network. Allocate space.
    mlpinitpreprocessor(network, xy, npoints);
-   ae_vector_set_length(&g, wcount - 1 + 1);
-   ae_matrix_set_length(&h, wcount - 1 + 1, wcount - 1 + 1);
-   ae_matrix_set_length(&hmod, wcount - 1 + 1, wcount - 1 + 1);
-   ae_vector_set_length(&wbase, wcount - 1 + 1);
-   ae_vector_set_length(&wdir, wcount - 1 + 1);
-   ae_vector_set_length(&wbest, wcount - 1 + 1);
-   ae_vector_set_length(&wt, wcount - 1 + 1);
-   ae_vector_set_length(&wx, wcount - 1 + 1);
+   ae_vector_set_length(&g, wcount);
+   ae_matrix_set_length(&h, wcount, wcount);
+   ae_matrix_set_length(&hmod, wcount, wcount);
+   ae_vector_set_length(&wbase, wcount);
+   ae_vector_set_length(&wdir, wcount);
+   ae_vector_set_length(&wbest, wcount);
+   ae_vector_set_length(&wt, wcount);
+   ae_vector_set_length(&wx, wcount);
    ebest = maxrealnumber;
 // Multiple passes
    for (pass = 1; pass <= restarts; pass++) {
@@ -22855,8 +22855,8 @@ void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints,
    *info = 2;
 // Prepare
    mlpinitpreprocessor(network, xy, npoints);
-   ae_vector_set_length(&w, wcount - 1 + 1);
-   ae_vector_set_length(&wbest, wcount - 1 + 1);
+   ae_vector_set_length(&w, wcount);
+   ae_vector_set_length(&wbest, wcount);
    ebest = maxrealnumber;
 // Multiple starts
    rep->ncholesky = 0;
@@ -22994,9 +22994,9 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
    *info = 2;
 // Prepare
    mlpinitpreprocessor(network, trnxy, trnsize);
-   ae_vector_set_length(&w, wcount - 1 + 1);
-   ae_vector_set_length(&wbest, wcount - 1 + 1);
-   ae_vector_set_length(&wfinal, wcount - 1 + 1);
+   ae_vector_set_length(&w, wcount);
+   ae_vector_set_length(&wbest, wcount);
+   ae_vector_set_length(&wfinal, wcount);
    efinal = maxrealnumber;
    for (i = 0; i < wcount; i++) {
       wfinal.xR[i] = 0.0;
@@ -23072,7 +23072,7 @@ static void mlptrain_mlpkfoldsplit(RMatrix *xy, ae_int_t npoints, ae_int_t nclas
    ae_assert(!stratifiedsplits, "MLPKFoldSplit: stratified splits are not supported!");
 // Folds
    hqrndrandomize(&rs);
-   ae_vector_set_length(folds, npoints - 1 + 1);
+   ae_vector_set_length(folds, npoints);
    for (i = 0; i < npoints; i++) {
       folds->xZ[i] = i * foldscount / npoints;
    }
@@ -23130,10 +23130,10 @@ static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron *n, RMatrix *xy, ae_
    mlpcopy(n, &network);
 // K-fold out cross-validation.
 // First, estimate generalization error
-   ae_matrix_set_length(&testset, npoints - 1 + 1, rowlen - 1 + 1);
-   ae_matrix_set_length(&cvset, npoints - 1 + 1, rowlen - 1 + 1);
-   ae_vector_set_length(&x, nin - 1 + 1);
-   ae_vector_set_length(&y, nout - 1 + 1);
+   ae_matrix_set_length(&testset, npoints, rowlen);
+   ae_matrix_set_length(&cvset, npoints, rowlen);
+   ae_vector_set_length(&x, nin);
+   ae_vector_set_length(&y, nout);
    mlptrain_mlpkfoldsplit(xy, npoints, nclasses, foldscount, false, &folds);
    cvrep->relclserror = 0.0;
    cvrep->avgce = 0.0;

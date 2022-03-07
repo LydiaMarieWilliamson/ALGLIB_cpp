@@ -3143,12 +3143,12 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
          // This submatrix is calculated as sum of K rank-1 products,
          // with operands cached in local variables in order to speed
          // up operations with arrays.
-            idxa0 = ia + i + 0;
+            idxa0 = ia + i;
             idxa1 = ia + i + 1;
             idxa2 = ia + i + 2;
             idxa3 = ia + i + 3;
             offsa = ja;
-            idxb0 = jb + j + 0;
+            idxb0 = jb + j;
             idxb1 = jb + j + 1;
             idxb2 = jb + j + 2;
             idxb3 = jb + j + 3;
@@ -3199,36 +3199,36 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                offsb++;
             }
             if (beta == 0.0) {
-               c->xyR[ic + i + 0][jc + j + 0] = alpha * v00;
-               c->xyR[ic + i + 0][jc + j + 1] = alpha * v01;
-               c->xyR[ic + i + 0][jc + j + 2] = alpha * v02;
-               c->xyR[ic + i + 0][jc + j + 3] = alpha * v03;
-               c->xyR[ic + i + 1][jc + j + 0] = alpha * v10;
+               c->xyR[ic + i][jc + j] = alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = alpha * v10;
                c->xyR[ic + i + 1][jc + j + 1] = alpha * v11;
                c->xyR[ic + i + 1][jc + j + 2] = alpha * v12;
                c->xyR[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->xyR[ic + i + 2][jc + j + 0] = alpha * v20;
+               c->xyR[ic + i + 2][jc + j] = alpha * v20;
                c->xyR[ic + i + 2][jc + j + 1] = alpha * v21;
                c->xyR[ic + i + 2][jc + j + 2] = alpha * v22;
                c->xyR[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->xyR[ic + i + 3][jc + j + 0] = alpha * v30;
+               c->xyR[ic + i + 3][jc + j] = alpha * v30;
                c->xyR[ic + i + 3][jc + j + 1] = alpha * v31;
                c->xyR[ic + i + 3][jc + j + 2] = alpha * v32;
                c->xyR[ic + i + 3][jc + j + 3] = alpha * v33;
             } else {
-               c->xyR[ic + i + 0][jc + j + 0] = beta * c->xyR[ic + i + 0][jc + j + 0] + alpha * v00;
-               c->xyR[ic + i + 0][jc + j + 1] = beta * c->xyR[ic + i + 0][jc + j + 1] + alpha * v01;
-               c->xyR[ic + i + 0][jc + j + 2] = beta * c->xyR[ic + i + 0][jc + j + 2] + alpha * v02;
-               c->xyR[ic + i + 0][jc + j + 3] = beta * c->xyR[ic + i + 0][jc + j + 3] + alpha * v03;
-               c->xyR[ic + i + 1][jc + j + 0] = beta * c->xyR[ic + i + 1][jc + j + 0] + alpha * v10;
+               c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j] + alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = beta * c->xyR[ic + i][jc + j + 1] + alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = beta * c->xyR[ic + i][jc + j + 2] + alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = beta * c->xyR[ic + i][jc + j + 3] + alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = beta * c->xyR[ic + i + 1][jc + j] + alpha * v10;
                c->xyR[ic + i + 1][jc + j + 1] = beta * c->xyR[ic + i + 1][jc + j + 1] + alpha * v11;
                c->xyR[ic + i + 1][jc + j + 2] = beta * c->xyR[ic + i + 1][jc + j + 2] + alpha * v12;
                c->xyR[ic + i + 1][jc + j + 3] = beta * c->xyR[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->xyR[ic + i + 2][jc + j + 0] = beta * c->xyR[ic + i + 2][jc + j + 0] + alpha * v20;
+               c->xyR[ic + i + 2][jc + j] = beta * c->xyR[ic + i + 2][jc + j] + alpha * v20;
                c->xyR[ic + i + 2][jc + j + 1] = beta * c->xyR[ic + i + 2][jc + j + 1] + alpha * v21;
                c->xyR[ic + i + 2][jc + j + 2] = beta * c->xyR[ic + i + 2][jc + j + 2] + alpha * v22;
                c->xyR[ic + i + 2][jc + j + 3] = beta * c->xyR[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->xyR[ic + i + 3][jc + j + 0] = beta * c->xyR[ic + i + 3][jc + j + 0] + alpha * v30;
+               c->xyR[ic + i + 3][jc + j] = beta * c->xyR[ic + i + 3][jc + j] + alpha * v30;
                c->xyR[ic + i + 3][jc + j + 1] = beta * c->xyR[ic + i + 3][jc + j + 1] + alpha * v31;
                c->xyR[ic + i + 3][jc + j + 2] = beta * c->xyR[ic + i + 3][jc + j + 2] + alpha * v32;
                c->xyR[ic + i + 3][jc + j + 3] = beta * c->xyR[ic + i + 3][jc + j + 3] + alpha * v33;
@@ -3345,12 +3345,12 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
          // This submatrix is calculated as sum of K rank-1 products,
          // with operands cached in local variables in order to speed
          // up operations with arrays.
-            idxa0 = ia + i + 0;
+            idxa0 = ia + i;
             idxa1 = ia + i + 1;
             idxa2 = ia + i + 2;
             idxa3 = ia + i + 3;
             offsa = ja;
-            idxb0 = ib + j + 0;
+            idxb0 = ib + j;
             idxb1 = ib + j + 1;
             idxb2 = ib + j + 2;
             idxb3 = ib + j + 3;
@@ -3400,36 +3400,36 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                offsb++;
             }
             if (beta == 0.0) {
-               c->xyR[ic + i + 0][jc + j + 0] = alpha * v00;
-               c->xyR[ic + i + 0][jc + j + 1] = alpha * v01;
-               c->xyR[ic + i + 0][jc + j + 2] = alpha * v02;
-               c->xyR[ic + i + 0][jc + j + 3] = alpha * v03;
-               c->xyR[ic + i + 1][jc + j + 0] = alpha * v10;
+               c->xyR[ic + i][jc + j] = alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = alpha * v10;
                c->xyR[ic + i + 1][jc + j + 1] = alpha * v11;
                c->xyR[ic + i + 1][jc + j + 2] = alpha * v12;
                c->xyR[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->xyR[ic + i + 2][jc + j + 0] = alpha * v20;
+               c->xyR[ic + i + 2][jc + j] = alpha * v20;
                c->xyR[ic + i + 2][jc + j + 1] = alpha * v21;
                c->xyR[ic + i + 2][jc + j + 2] = alpha * v22;
                c->xyR[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->xyR[ic + i + 3][jc + j + 0] = alpha * v30;
+               c->xyR[ic + i + 3][jc + j] = alpha * v30;
                c->xyR[ic + i + 3][jc + j + 1] = alpha * v31;
                c->xyR[ic + i + 3][jc + j + 2] = alpha * v32;
                c->xyR[ic + i + 3][jc + j + 3] = alpha * v33;
             } else {
-               c->xyR[ic + i + 0][jc + j + 0] = beta * c->xyR[ic + i + 0][jc + j + 0] + alpha * v00;
-               c->xyR[ic + i + 0][jc + j + 1] = beta * c->xyR[ic + i + 0][jc + j + 1] + alpha * v01;
-               c->xyR[ic + i + 0][jc + j + 2] = beta * c->xyR[ic + i + 0][jc + j + 2] + alpha * v02;
-               c->xyR[ic + i + 0][jc + j + 3] = beta * c->xyR[ic + i + 0][jc + j + 3] + alpha * v03;
-               c->xyR[ic + i + 1][jc + j + 0] = beta * c->xyR[ic + i + 1][jc + j + 0] + alpha * v10;
+               c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j] + alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = beta * c->xyR[ic + i][jc + j + 1] + alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = beta * c->xyR[ic + i][jc + j + 2] + alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = beta * c->xyR[ic + i][jc + j + 3] + alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = beta * c->xyR[ic + i + 1][jc + j] + alpha * v10;
                c->xyR[ic + i + 1][jc + j + 1] = beta * c->xyR[ic + i + 1][jc + j + 1] + alpha * v11;
                c->xyR[ic + i + 1][jc + j + 2] = beta * c->xyR[ic + i + 1][jc + j + 2] + alpha * v12;
                c->xyR[ic + i + 1][jc + j + 3] = beta * c->xyR[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->xyR[ic + i + 2][jc + j + 0] = beta * c->xyR[ic + i + 2][jc + j + 0] + alpha * v20;
+               c->xyR[ic + i + 2][jc + j] = beta * c->xyR[ic + i + 2][jc + j] + alpha * v20;
                c->xyR[ic + i + 2][jc + j + 1] = beta * c->xyR[ic + i + 2][jc + j + 1] + alpha * v21;
                c->xyR[ic + i + 2][jc + j + 2] = beta * c->xyR[ic + i + 2][jc + j + 2] + alpha * v22;
                c->xyR[ic + i + 2][jc + j + 3] = beta * c->xyR[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->xyR[ic + i + 3][jc + j + 0] = beta * c->xyR[ic + i + 3][jc + j + 0] + alpha * v30;
+               c->xyR[ic + i + 3][jc + j] = beta * c->xyR[ic + i + 3][jc + j] + alpha * v30;
                c->xyR[ic + i + 3][jc + j + 1] = beta * c->xyR[ic + i + 3][jc + j + 1] + alpha * v31;
                c->xyR[ic + i + 3][jc + j + 2] = beta * c->xyR[ic + i + 3][jc + j + 2] + alpha * v32;
                c->xyR[ic + i + 3][jc + j + 3] = beta * c->xyR[ic + i + 3][jc + j + 3] + alpha * v33;
@@ -3546,12 +3546,12 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
          // This submatrix is calculated as sum of K rank-1 products,
          // with operands cached in local variables in order to speed
          // up operations with arrays.
-            idxa0 = ja + i + 0;
+            idxa0 = ja + i;
             idxa1 = ja + i + 1;
             idxa2 = ja + i + 2;
             idxa3 = ja + i + 3;
             offsa = ia;
-            idxb0 = jb + j + 0;
+            idxb0 = jb + j;
             idxb1 = jb + j + 1;
             idxb2 = jb + j + 2;
             idxb3 = jb + j + 3;
@@ -3601,36 +3601,36 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                offsb++;
             }
             if (beta == 0.0) {
-               c->xyR[ic + i + 0][jc + j + 0] = alpha * v00;
-               c->xyR[ic + i + 0][jc + j + 1] = alpha * v01;
-               c->xyR[ic + i + 0][jc + j + 2] = alpha * v02;
-               c->xyR[ic + i + 0][jc + j + 3] = alpha * v03;
-               c->xyR[ic + i + 1][jc + j + 0] = alpha * v10;
+               c->xyR[ic + i][jc + j] = alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = alpha * v10;
                c->xyR[ic + i + 1][jc + j + 1] = alpha * v11;
                c->xyR[ic + i + 1][jc + j + 2] = alpha * v12;
                c->xyR[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->xyR[ic + i + 2][jc + j + 0] = alpha * v20;
+               c->xyR[ic + i + 2][jc + j] = alpha * v20;
                c->xyR[ic + i + 2][jc + j + 1] = alpha * v21;
                c->xyR[ic + i + 2][jc + j + 2] = alpha * v22;
                c->xyR[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->xyR[ic + i + 3][jc + j + 0] = alpha * v30;
+               c->xyR[ic + i + 3][jc + j] = alpha * v30;
                c->xyR[ic + i + 3][jc + j + 1] = alpha * v31;
                c->xyR[ic + i + 3][jc + j + 2] = alpha * v32;
                c->xyR[ic + i + 3][jc + j + 3] = alpha * v33;
             } else {
-               c->xyR[ic + i + 0][jc + j + 0] = beta * c->xyR[ic + i + 0][jc + j + 0] + alpha * v00;
-               c->xyR[ic + i + 0][jc + j + 1] = beta * c->xyR[ic + i + 0][jc + j + 1] + alpha * v01;
-               c->xyR[ic + i + 0][jc + j + 2] = beta * c->xyR[ic + i + 0][jc + j + 2] + alpha * v02;
-               c->xyR[ic + i + 0][jc + j + 3] = beta * c->xyR[ic + i + 0][jc + j + 3] + alpha * v03;
-               c->xyR[ic + i + 1][jc + j + 0] = beta * c->xyR[ic + i + 1][jc + j + 0] + alpha * v10;
+               c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j] + alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = beta * c->xyR[ic + i][jc + j + 1] + alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = beta * c->xyR[ic + i][jc + j + 2] + alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = beta * c->xyR[ic + i][jc + j + 3] + alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = beta * c->xyR[ic + i + 1][jc + j] + alpha * v10;
                c->xyR[ic + i + 1][jc + j + 1] = beta * c->xyR[ic + i + 1][jc + j + 1] + alpha * v11;
                c->xyR[ic + i + 1][jc + j + 2] = beta * c->xyR[ic + i + 1][jc + j + 2] + alpha * v12;
                c->xyR[ic + i + 1][jc + j + 3] = beta * c->xyR[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->xyR[ic + i + 2][jc + j + 0] = beta * c->xyR[ic + i + 2][jc + j + 0] + alpha * v20;
+               c->xyR[ic + i + 2][jc + j] = beta * c->xyR[ic + i + 2][jc + j] + alpha * v20;
                c->xyR[ic + i + 2][jc + j + 1] = beta * c->xyR[ic + i + 2][jc + j + 1] + alpha * v21;
                c->xyR[ic + i + 2][jc + j + 2] = beta * c->xyR[ic + i + 2][jc + j + 2] + alpha * v22;
                c->xyR[ic + i + 2][jc + j + 3] = beta * c->xyR[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->xyR[ic + i + 3][jc + j + 0] = beta * c->xyR[ic + i + 3][jc + j + 0] + alpha * v30;
+               c->xyR[ic + i + 3][jc + j] = beta * c->xyR[ic + i + 3][jc + j] + alpha * v30;
                c->xyR[ic + i + 3][jc + j + 1] = beta * c->xyR[ic + i + 3][jc + j + 1] + alpha * v31;
                c->xyR[ic + i + 3][jc + j + 2] = beta * c->xyR[ic + i + 3][jc + j + 2] + alpha * v32;
                c->xyR[ic + i + 3][jc + j + 3] = beta * c->xyR[ic + i + 3][jc + j + 3] + alpha * v33;
@@ -3748,12 +3748,12 @@ void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
          // This submatrix is calculated as sum of K rank-1 products,
          // with operands cached in local variables in order to speed
          // up operations with arrays.
-            idxa0 = ja + i + 0;
+            idxa0 = ja + i;
             idxa1 = ja + i + 1;
             idxa2 = ja + i + 2;
             idxa3 = ja + i + 3;
             offsa = ia;
-            idxb0 = ib + j + 0;
+            idxb0 = ib + j;
             idxb1 = ib + j + 1;
             idxb2 = ib + j + 2;
             idxb3 = ib + j + 3;
@@ -3803,36 +3803,36 @@ void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                offsb++;
             }
             if (beta == 0.0) {
-               c->xyR[ic + i + 0][jc + j + 0] = alpha * v00;
-               c->xyR[ic + i + 0][jc + j + 1] = alpha * v01;
-               c->xyR[ic + i + 0][jc + j + 2] = alpha * v02;
-               c->xyR[ic + i + 0][jc + j + 3] = alpha * v03;
-               c->xyR[ic + i + 1][jc + j + 0] = alpha * v10;
+               c->xyR[ic + i][jc + j] = alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = alpha * v10;
                c->xyR[ic + i + 1][jc + j + 1] = alpha * v11;
                c->xyR[ic + i + 1][jc + j + 2] = alpha * v12;
                c->xyR[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->xyR[ic + i + 2][jc + j + 0] = alpha * v20;
+               c->xyR[ic + i + 2][jc + j] = alpha * v20;
                c->xyR[ic + i + 2][jc + j + 1] = alpha * v21;
                c->xyR[ic + i + 2][jc + j + 2] = alpha * v22;
                c->xyR[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->xyR[ic + i + 3][jc + j + 0] = alpha * v30;
+               c->xyR[ic + i + 3][jc + j] = alpha * v30;
                c->xyR[ic + i + 3][jc + j + 1] = alpha * v31;
                c->xyR[ic + i + 3][jc + j + 2] = alpha * v32;
                c->xyR[ic + i + 3][jc + j + 3] = alpha * v33;
             } else {
-               c->xyR[ic + i + 0][jc + j + 0] = beta * c->xyR[ic + i + 0][jc + j + 0] + alpha * v00;
-               c->xyR[ic + i + 0][jc + j + 1] = beta * c->xyR[ic + i + 0][jc + j + 1] + alpha * v01;
-               c->xyR[ic + i + 0][jc + j + 2] = beta * c->xyR[ic + i + 0][jc + j + 2] + alpha * v02;
-               c->xyR[ic + i + 0][jc + j + 3] = beta * c->xyR[ic + i + 0][jc + j + 3] + alpha * v03;
-               c->xyR[ic + i + 1][jc + j + 0] = beta * c->xyR[ic + i + 1][jc + j + 0] + alpha * v10;
+               c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j] + alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = beta * c->xyR[ic + i][jc + j + 1] + alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = beta * c->xyR[ic + i][jc + j + 2] + alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = beta * c->xyR[ic + i][jc + j + 3] + alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = beta * c->xyR[ic + i + 1][jc + j] + alpha * v10;
                c->xyR[ic + i + 1][jc + j + 1] = beta * c->xyR[ic + i + 1][jc + j + 1] + alpha * v11;
                c->xyR[ic + i + 1][jc + j + 2] = beta * c->xyR[ic + i + 1][jc + j + 2] + alpha * v12;
                c->xyR[ic + i + 1][jc + j + 3] = beta * c->xyR[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->xyR[ic + i + 2][jc + j + 0] = beta * c->xyR[ic + i + 2][jc + j + 0] + alpha * v20;
+               c->xyR[ic + i + 2][jc + j] = beta * c->xyR[ic + i + 2][jc + j] + alpha * v20;
                c->xyR[ic + i + 2][jc + j + 1] = beta * c->xyR[ic + i + 2][jc + j + 1] + alpha * v21;
                c->xyR[ic + i + 2][jc + j + 2] = beta * c->xyR[ic + i + 2][jc + j + 2] + alpha * v22;
                c->xyR[ic + i + 2][jc + j + 3] = beta * c->xyR[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->xyR[ic + i + 3][jc + j + 0] = beta * c->xyR[ic + i + 3][jc + j + 0] + alpha * v30;
+               c->xyR[ic + i + 3][jc + j] = beta * c->xyR[ic + i + 3][jc + j] + alpha * v30;
                c->xyR[ic + i + 3][jc + j + 1] = beta * c->xyR[ic + i + 3][jc + j + 1] + alpha * v31;
                c->xyR[ic + i + 3][jc + j + 2] = beta * c->xyR[ic + i + 3][jc + j + 2] + alpha * v32;
                c->xyR[ic + i + 3][jc + j + 3] = beta * c->xyR[ic + i + 3][jc + j + 3] + alpha * v33;
@@ -4106,20 +4106,20 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
             v11x = 0.0;
             v11y = 0.0;
             if (optypea == 0) {
-               idxa0 = ia + i + 0;
+               idxa0 = ia + i;
                idxa1 = ia + i + 1;
                offsa = ja;
             } else {
-               idxa0 = ja + i + 0;
+               idxa0 = ja + i;
                idxa1 = ja + i + 1;
                offsa = ia;
             }
             if (optypeb == 0) {
-               idxb0 = jb + j + 0;
+               idxb0 = jb + j;
                idxb1 = jb + j + 1;
                offsb = ib;
             } else {
-               idxb0 = ib + j + 0;
+               idxb0 = ib + j;
                idxb1 = ib + j + 1;
                offsb = jb;
             }
@@ -4176,14 +4176,14 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
             v01 = complex_from_d(v01x, v01y);
             v11 = complex_from_d(v11x, v11y);
             if (ae_c_eq_d(beta, 0.0)) {
-               c->xyC[ic + i + 0][jc + j + 0] = ae_c_mul(alpha, v00);
-               c->xyC[ic + i + 0][jc + j + 1] = ae_c_mul(alpha, v01);
-               c->xyC[ic + i + 1][jc + j + 0] = ae_c_mul(alpha, v10);
+               c->xyC[ic + i][jc + j] = ae_c_mul(alpha, v00);
+               c->xyC[ic + i][jc + j + 1] = ae_c_mul(alpha, v01);
+               c->xyC[ic + i + 1][jc + j] = ae_c_mul(alpha, v10);
                c->xyC[ic + i + 1][jc + j + 1] = ae_c_mul(alpha, v11);
             } else {
-               c->xyC[ic + i + 0][jc + j + 0] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 0][jc + j + 0]), ae_c_mul(alpha, v00));
-               c->xyC[ic + i + 0][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 0][jc + j + 1]), ae_c_mul(alpha, v01));
-               c->xyC[ic + i + 1][jc + j + 0] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 1][jc + j + 0]), ae_c_mul(alpha, v10));
+               c->xyC[ic + i][jc + j] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i][jc + j]), ae_c_mul(alpha, v00));
+               c->xyC[ic + i][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i][jc + j + 1]), ae_c_mul(alpha, v01));
+               c->xyC[ic + i + 1][jc + j] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 1][jc + j]), ae_c_mul(alpha, v10));
                c->xyC[ic + i + 1][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 1][jc + j + 1]), ae_c_mul(alpha, v11));
             }
          } else {
@@ -5718,7 +5718,7 @@ void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t offset, ae_int_t n) {
       }
    }
    for (i = n - 1; i >= 1; i--) {
-      p0 = offset + 0;
+      p0 = offset;
       p1 = offset + i;
       tmp = a->xZ[p1];
       a->xZ[p1] = a->xZ[p0];
@@ -5799,7 +5799,7 @@ void tagsortmiddlei(ZVector *a, ae_int_t offset, ae_int_t n) {
       }
    }
    for (i = n - 1; i >= 1; i--) {
-      p0 = offset + 0;
+      p0 = offset;
       p1 = offset + i;
       tmp = a->xZ[p1];
       a->xZ[p1] = a->xZ[p0];
@@ -5867,7 +5867,7 @@ void sortmiddlei(ZVector *a, ae_int_t offset, ae_int_t n) {
       }
    }
    for (i = n - 1; i >= 1; i--) {
-      p0 = offset + 0;
+      p0 = offset;
       p1 = offset + i;
       tmp = a->xZ[p1];
       a->xZ[p1] = a->xZ[p0];
@@ -8057,7 +8057,7 @@ void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, complex *r, double
    mx = 0.0;
    for (i = 0; i < n; i++) {
       v = a->xC[i].x * b->xC[i].x;
-      temp->xR[2 * i + 0] = v;
+      temp->xR[2 * i] = v;
       mx = rmax2(mx, fabs(v));
       v = -a->xC[i].y * b->xC[i].y;
       temp->xR[2 * i + 1] = v;
@@ -8073,7 +8073,7 @@ void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, complex *r, double
    mx = 0.0;
    for (i = 0; i < n; i++) {
       v = a->xC[i].x * b->xC[i].y;
-      temp->xR[2 * i + 0] = v;
+      temp->xR[2 * i] = v;
       mx = rmax2(mx, fabs(v));
       v = a->xC[i].y * b->xC[i].x;
       temp->xR[2 * i + 1] = v;
@@ -9140,14 +9140,14 @@ static void ftbase_ftapplycomplexreffft(RVector *a, ae_int_t offs, ae_int_t oper
          hre = 0.0;
          him = 0.0;
          for (k = 0; k < n; k++) {
-            re = a->xR[offs + opidx * operandsize * 2 + 2 * k + 0];
+            re = a->xR[offs + opidx * operandsize * 2 + 2 * k];
             im = a->xR[offs + opidx * operandsize * 2 + 2 * k + 1];
             c = cos(-2 * pi * k * i / n);
             s = sin(-2 * pi * k * i / n);
             hre += c * re - s * im;
             him += c * im + s * re;
          }
-         buf->xR[2 * i + 0] = hre;
+         buf->xR[2 * i] = hre;
          buf->xR[2 * i + 1] = him;
       }
       for (i = 0; i < operandsize * 2; i++) {
@@ -9233,7 +9233,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t 
    if (n == 2) {
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         a0x = a->xR[aoffset + 0];
+         a0x = a->xR[aoffset];
          a0y = a->xR[aoffset + 1];
          a1x = a->xR[aoffset + 2];
          a1y = a->xR[aoffset + 3];
@@ -9241,7 +9241,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t 
          v1 = a0y + a1y;
          v2 = a0x - a1x;
          v3 = a0y - a1y;
-         a->xR[aoffset + 0] = v0;
+         a->xR[aoffset] = v0;
          a->xR[aoffset + 1] = v1;
          a->xR[aoffset + 2] = v2;
          a->xR[aoffset + 3] = v3;
@@ -9253,7 +9253,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t 
       c2 = sin(2 * pi / 3);
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         a0x = a->xR[aoffset + 0];
+         a0x = a->xR[aoffset];
          a0y = a->xR[aoffset + 1];
          a1x = a->xR[aoffset + 2];
          a1y = a->xR[aoffset + 3];
@@ -9273,7 +9273,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t 
          a1y = s1y + m2y;
          a2x = s1x - m2x;
          a2y = s1y - m2y;
-         a->xR[aoffset + 0] = a0x;
+         a->xR[aoffset] = a0x;
          a->xR[aoffset + 1] = a0y;
          a->xR[aoffset + 2] = a1x;
          a->xR[aoffset + 3] = a1y;
@@ -9285,7 +9285,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t 
    if (n == 4) {
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         a0x = a->xR[aoffset + 0];
+         a0x = a->xR[aoffset];
          a0y = a->xR[aoffset + 1];
          a1x = a->xR[aoffset + 2];
          a1y = a->xR[aoffset + 3];
@@ -9301,7 +9301,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t 
          m2y = a0y - a2y;
          m3x = a1y - a3y;
          m3y = a3x - a1x;
-         a->xR[aoffset + 0] = t1x + t2x;
+         a->xR[aoffset] = t1x + t2x;
          a->xR[aoffset + 1] = t1y + t2y;
          a->xR[aoffset + 4] = t1x - t2x;
          a->xR[aoffset + 5] = t1y - t2y;
@@ -9331,7 +9331,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t 
          t4y = a->xR[aoffset + 7] - a->xR[aoffset + 5];
          t5x = t1x + t2x;
          t5y = t1y + t2y;
-         a->xR[aoffset + 0] += t5x;
+         a->xR[aoffset] += t5x;
          a->xR[aoffset + 1] += t5y;
          m1x = c1 * t5x;
          m1y = c1 * t5y;
@@ -9347,7 +9347,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t 
          s3y = m3y - m4y;
          s5x = m3x + m5x;
          s5y = m3y + m5y;
-         s1x = a->xR[aoffset + 0] + m1x;
+         s1x = a->xR[aoffset] + m1x;
          s1y = a->xR[aoffset + 1] + m1y;
          s2x = s1x + m2x;
          s2y = s1y + m2y;
@@ -9371,7 +9371,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t 
       c4 = sin(-pi / 3);
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         a0x = a->xR[aoffset + 0];
+         a0x = a->xR[aoffset];
          a0y = a->xR[aoffset + 1];
          a1x = a->xR[aoffset + 2];
          a1y = a->xR[aoffset + 3];
@@ -9437,7 +9437,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t 
          a4y = s1y + m2y;
          a5x = s1x - m2x;
          a5y = s1y - m2y;
-         a->xR[aoffset + 0] = a0x;
+         a->xR[aoffset] = a0x;
          a->xR[aoffset + 1] = a0y;
          a->xR[aoffset + 2] = a3x;
          a->xR[aoffset + 3] = a3y;
@@ -9849,17 +9849,17 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector *a, ae_int_t offs, ae_int_
          twxm1 = 0.0;
          twy = 0.0;
          for (mvidx = 0; mvidx < m; mvidx++) {
-            a0x = a->xR[aoffset0 + 0];
+            a0x = a->xR[aoffset0];
             a0y = a->xR[aoffset0 + 1];
-            a1x = a->xR[aoffset2 + 0];
+            a1x = a->xR[aoffset2];
             a1y = a->xR[aoffset2 + 1];
-            a2x = a->xR[aoffset4 + 0];
+            a2x = a->xR[aoffset4];
             a2y = a->xR[aoffset4 + 1];
-            a3x = a->xR[aoffset6 + 0];
+            a3x = a->xR[aoffset6];
             a3y = a->xR[aoffset6 + 1];
-            a4x = a->xR[aoffset8 + 0];
+            a4x = a->xR[aoffset8];
             a4y = a->xR[aoffset8 + 1];
-            a5x = a->xR[aoffset10 + 0];
+            a5x = a->xR[aoffset10];
             a5y = a->xR[aoffset10 + 1];
             v0 = a0x;
             v1 = a0y;
@@ -9923,17 +9923,17 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector *a, ae_int_t offs, ae_int_
             tw4y = 2 * tw2x * tw2y;
             tw5x = tw3x * tw2x - tw3y * tw2y;
             tw5y = tw3x * tw2y + tw3y * tw2x;
-            a->xR[aoffset0 + 0] = a0x;
+            a->xR[aoffset0] = a0x;
             a->xR[aoffset0 + 1] = a0y;
-            a->xR[aoffset2 + 0] = a3x * twx - a3y * twy;
+            a->xR[aoffset2] = a3x * twx - a3y * twy;
             a->xR[aoffset2 + 1] = a3y * twx + a3x * twy;
-            a->xR[aoffset4 + 0] = a1x * tw2x - a1y * tw2y;
+            a->xR[aoffset4] = a1x * tw2x - a1y * tw2y;
             a->xR[aoffset4 + 1] = a1y * tw2x + a1x * tw2y;
-            a->xR[aoffset6 + 0] = a4x * tw3x - a4y * tw3y;
+            a->xR[aoffset6] = a4x * tw3x - a4y * tw3y;
             a->xR[aoffset6 + 1] = a4y * tw3x + a4x * tw3y;
-            a->xR[aoffset8 + 0] = a2x * tw4x - a2y * tw4y;
+            a->xR[aoffset8] = a2x * tw4x - a2y * tw4y;
             a->xR[aoffset8 + 1] = a2y * tw4x + a2x * tw4y;
-            a->xR[aoffset10 + 0] = a5x * tw5x - a5y * tw5y;
+            a->xR[aoffset10] = a5x * tw5x - a5y * tw5y;
             a->xR[aoffset10 + 1] = a5y * tw5x + a5x * tw5y;
             aoffset0 += 2;
             aoffset2 += 2;
@@ -9988,11 +9988,11 @@ static void ftbase_ffttwcalc(RVector *a, ae_int_t aoffset, ae_int_t n1, ae_int_t
 //     >     for J:=1 to N1-1 do
 //     >     begin
 //     >         Idx:=K*N1+J;
-//     >         X:=A[AOffset+2*Idx+0];
+//     >         X:=A[AOffset+2*Idx];
 //     >         Y:=A[AOffset+2*Idx+1];
 //     >         TwX:=Cos(-2*Pi()*K*J/(N1*N2));
 //     >         TwY:=Sin(-2*Pi()*K*J/(N1*N2));
-//     >         A[AOffset+2*Idx+0]:=X*TwX-Y*TwY;
+//     >         A[AOffset+2*Idx]:=X*TwX-Y*TwY;
 //     >         A[AOffset+2*Idx+1]:=X*TwY+Y*TwX;
 //     >     end;
 //
@@ -10042,11 +10042,11 @@ static void ftbase_ffttwcalc(RVector *a, ae_int_t aoffset, ae_int_t n1, ae_int_t
       // * update twiddle factor (unconditional update)
       // * process second element
       // * conditional update of the twiddle factor
-         x = a->xR[offs + 0];
+         x = a->xR[offs];
          y = a->xR[offs + 1];
          tmpx = x * (1 + twxm1) - y * twy;
          tmpy = x * twy + y * (1 + twxm1);
-         a->xR[offs + 0] = tmpx;
+         a->xR[offs] = tmpx;
          a->xR[offs + 1] = tmpy;
          tmpx = (1 + twxm1) * twrowxm1 - twy * twrowy;
          twy += (1 + twxm1) * twrowy + twy * twrowxm1;
@@ -10073,11 +10073,11 @@ static void ftbase_ffttwcalc(RVector *a, ae_int_t aoffset, ae_int_t n1, ae_int_t
       }
       if (n1 % 2 == 1) {
       // Handle residual chunk
-         x = a->xR[offs + 0];
+         x = a->xR[offs];
          y = a->xR[offs + 1];
          tmpx = x * (1 + twxm1) - y * twy;
          tmpy = x * twy + y * (1 + twxm1);
-         a->xR[offs + 0] = tmpx;
+         a->xR[offs] = tmpx;
          a->xR[offs + 1] = tmpy;
          offs += 2;
       }
@@ -10191,7 +10191,7 @@ static void ftbase_ffticltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVe
          idx1 = bstart + 2 * i;
          idx2 = astart + 2 * i * astride;
          for (j = 0; j < n; j++) {
-            b->xR[idx1 + 0] = a->xR[idx2 + 0];
+            b->xR[idx1] = a->xR[idx2];
             b->xR[idx1 + 1] = a->xR[idx2 + 1];
             idx1 += m2;
             idx2 += 2;
@@ -10508,11 +10508,11 @@ static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector *a, ae_int_t
       p0 = abase + aoffset + op * 2 * n;
       p1 = precoffs;
       for (i = 0; i < n; i++) {
-         x = a->xR[p0 + 0];
+         x = a->xR[p0];
          y = a->xR[p0 + 1];
-         bx = plan->precr.xR[p1 + 0];
+         bx = plan->precr.xR[p1];
          by = -plan->precr.xR[p1 + 1];
-         bufa->xR[2 * i + 0] = x * bx - y * by;
+         bufa->xR[2 * i] = x * bx - y * by;
          bufa->xR[2 * i + 1] = x * by + y * bx;
          p0 += 2;
          p1 += 2;
@@ -10526,11 +10526,11 @@ static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector *a, ae_int_t
       p0 = 0;
       p1 = precoffs + 2 * m;
       for (i = 0; i < m; i++) {
-         ax = bufa->xR[p0 + 0];
+         ax = bufa->xR[p0];
          ay = bufa->xR[p0 + 1];
-         bx = plan->precr.xR[p1 + 0];
+         bx = plan->precr.xR[p1];
          by = plan->precr.xR[p1 + 1];
-         bufa->xR[p0 + 0] = ax * bx - ay * by;
+         bufa->xR[p0] = ax * bx - ay * by;
          bufa->xR[p0 + 1] = -(ax * by + ay * bx);
          p0 += 2;
          p1 += 2;
@@ -10544,11 +10544,11 @@ static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector *a, ae_int_t
       p1 = 0;
       p2 = abase + aoffset + op * 2 * n;
       for (i = 0; i < n; i++) {
-         bx = plan->precr.xR[p0 + 0];
+         bx = plan->precr.xR[p0];
          by = plan->precr.xR[p0 + 1];
-         rx = bufa->xR[p1 + 0] / m;
+         rx = bufa->xR[p1] / m;
          ry = -bufa->xR[p1 + 1] / m;
-         a->xR[p2 + 0] = rx * bx - ry * (-by);
+         a->xR[p2] = rx * bx - ry * (-by);
          a->xR[p2 + 1] = rx * (-by) + ry * bx;
          p0 += 2;
          p1 += 2;
@@ -10601,14 +10601,14 @@ static void ftbase_ftradersfft(fasttransformplan *plan, RVector *a, ae_int_t aba
       kq = 1;
       p0 = abase + aoffset + opidx * n * 2;
       p1 = aoffset + opidx * n * 2;
-      rx = a->xR[p0 + 0];
+      rx = a->xR[p0];
       ry = a->xR[p0 + 1];
       x0 = rx;
       y0 = ry;
       for (q = 0; q < n - 1; q++) {
-         ax = a->xR[p0 + 2 * kq + 0];
+         ax = a->xR[p0 + 2 * kq];
          ay = a->xR[p0 + 2 * kq + 1];
-         buf->xR[p1 + 0] = ax;
+         buf->xR[p1] = ax;
          buf->xR[p1 + 1] = ay;
          rx += ax;
          ry += ay;
@@ -10628,11 +10628,11 @@ static void ftbase_ftradersfft(fasttransformplan *plan, RVector *a, ae_int_t aba
       p0 = abase + aoffset + opidx * n * 2;
       p1 = precoffs;
       for (i = 0; i < n - 1; i++) {
-         ax = a->xR[p0 + 0];
+         ax = a->xR[p0];
          ay = a->xR[p0 + 1];
-         bx = plan->precr.xR[p1 + 0];
+         bx = plan->precr.xR[p1];
          by = plan->precr.xR[p1 + 1];
-         a->xR[p0 + 0] = ax * bx - ay * by;
+         a->xR[p0] = ax * bx - ay * by;
          a->xR[p0 + 1] = -(ax * by + ay * bx);
          p0 += 2;
          p1 += 2;
@@ -10640,18 +10640,18 @@ static void ftbase_ftradersfft(fasttransformplan *plan, RVector *a, ae_int_t aba
       ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset + opidx * n * 2, buf, 1);
       p0 = abase + aoffset + opidx * n * 2;
       for (i = 0; i < n - 1; i++) {
-         a->xR[p0 + 0] /= n - 1;
+         a->xR[p0] /= n - 1;
          a->xR[p0 + 1] /= 1 - n;
          p0 += 2;
       }
    // Result
-      buf->xR[aoffset + opidx * n * 2 + 0] = rx;
+      buf->xR[aoffset + opidx * n * 2] = rx;
       buf->xR[aoffset + opidx * n * 2 + 1] = ry;
       kiq = 1;
       p0 = aoffset + opidx * n * 2;
       p1 = abase + aoffset + opidx * n * 2;
       for (q = 0; q < n - 1; q++) {
-         buf->xR[p0 + 2 * kiq + 0] = x0 + a->xR[p1 + 0];
+         buf->xR[p0 + 2 * kiq] = x0 + a->xR[p1];
          buf->xR[p0 + 2 * kiq + 1] = y0 + a->xR[p1 + 1];
          kiq = kiq * riq % n;
          p1 += 2;
@@ -10969,9 +10969,9 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector *pr
    for (i = 0; i < n; i++) {
       bx = cos(pi / n * i * i);
       by = sin(pi / n * i * i);
-      precr->xR[offs + 2 * i + 0] = bx;
+      precr->xR[offs + 2 * i] = bx;
       precr->xR[offs + 2 * i + 1] = by;
-      precr->xR[offs + 2 * ((m - i) % m) + 0] = bx;
+      precr->xR[offs + 2 * ((m - i) % m)] = bx;
       precr->xR[offs + 2 * ((m - i) % m) + 1] = by;
    }
 // Precomputed FFT
@@ -11012,7 +11012,7 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, 
    kiq = 1;
    for (q = 0; q < n - 1; q++) {
       v = -2 * pi * kiq / n;
-      precr->xR[offs + 2 * q + 0] = cos(v);
+      precr->xR[offs + 2 * q] = cos(v);
       precr->xR[offs + 2 * q + 1] = sin(v);
       kiq = kiq * riq % n;
    }

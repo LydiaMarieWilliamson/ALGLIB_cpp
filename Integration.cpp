@@ -762,7 +762,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
       s.xR[i] = 0.0;
    }
 // Algorithm from Dirk P. Laurie, "Calculation of Gauss-Kronrod quadrature rules", 1997.
-   t.xR[woffs + 0] = beta->xR[n + 1];
+   t.xR[woffs] = beta->xR[n + 1];
    for (m = 0; m < n - 1; m++) {
       u = 0.0;
       for (k = (m + 1) / 2; k >= 0; k--) {
@@ -796,7 +796,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
       ae_v_move(t.xR, 1, s.xR, 1, wlen);
       ae_v_move(s.xR, 1, ta.xR, 1, wlen);
    }
-   alpha->xR[2 * n] = alpha->xR[n - 1] - beta->xR[2 * n] * s.xR[woffs + 0] / t.xR[woffs + 0];
+   alpha->xR[2 * n] = alpha->xR[n - 1] - beta->xR[2 * n] * s.xR[woffs] / t.xR[woffs];
 // calculation of Kronrod nodes and weights, unpacking of Gauss weights
    gqgeneraterec(alpha, beta, mu0, 2 * n + 1, info, x, wkronrod);
    if (*info == -2) {

@@ -4415,9 +4415,9 @@ void rmatrixhessenberg(RMatrix *a, ae_int_t n, RVector *tau) {
       return;
    }
 // Allocate place
-   ae_vector_set_length(tau, n - 2 + 1);
+   ae_vector_set_length(tau, n - 1);
    ae_vector_set_length(&t, n + 1);
-   ae_vector_set_length(&work, n - 1 + 1);
+   ae_vector_set_length(&work, n);
 // MKL version
    if (rmatrixhessenbergmkl(a, n, tau)) {
       ae_frame_leave();
@@ -4465,9 +4465,9 @@ void rmatrixhessenbergunpackq(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q) 
       return;
    }
 // init
-   ae_matrix_set_length(q, n - 1 + 1, n - 1 + 1);
-   ae_vector_set_length(&v, n - 1 + 1);
-   ae_vector_set_length(&work, n - 1 + 1);
+   ae_matrix_set_length(q, n, n);
+   ae_vector_set_length(&v, n);
+   ae_vector_set_length(&work, n);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          if (i == j) {
@@ -4514,7 +4514,7 @@ void rmatrixhessenbergunpackh(RMatrix *a, ae_int_t n, RMatrix *h) {
       ae_frame_leave();
       return;
    }
-   ae_matrix_set_length(h, n - 1 + 1, n - 1 + 1);
+   ae_matrix_set_length(h, n, n);
    for (i = 0; i < n; i++) {
       for (j = 0; j < i - 1; j++) {
          h->xyR[i][j] = 0.0;
@@ -4614,11 +4614,11 @@ void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, R
    ae_vector_set_length(&t2, n + 1);
    ae_vector_set_length(&t3, n + 1);
    if (n > 1) {
-      ae_vector_set_length(tau, n - 2 + 1);
+      ae_vector_set_length(tau, n - 1);
    }
-   ae_vector_set_length(d, n - 1 + 1);
+   ae_vector_set_length(d, n);
    if (n > 1) {
-      ae_vector_set_length(e, n - 2 + 1);
+      ae_vector_set_length(e, n - 1);
    }
 // Try to use MKL
    if (smatrixtdmkl(a, n, isupper, tau, d, e)) {
@@ -4787,13 +4787,13 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
       ae_assert(a->xyC[i][i].y == 0.0, "Assertion failed");
    }
    if (n > 1) {
-      ae_vector_set_length(tau, n - 2 + 1);
-      ae_vector_set_length(e, n - 2 + 1);
+      ae_vector_set_length(tau, n - 1);
+      ae_vector_set_length(e, n - 1);
    }
-   ae_vector_set_length(d, n - 1 + 1);
-   ae_vector_set_length(&t, n - 1 + 1);
-   ae_vector_set_length(&t2, n - 1 + 1);
-   ae_vector_set_length(&t3, n - 1 + 1);
+   ae_vector_set_length(d, n);
+   ae_vector_set_length(&t, n);
+   ae_vector_set_length(&t2, n);
+   ae_vector_set_length(&t3, n);
 // MKL version
    if (hmatrixtdmkl(a, n, isupper, tau, d, e)) {
       ae_frame_leave();
@@ -4904,9 +4904,9 @@ void smatrixtdunpackq(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatri
       return;
    }
 // init
-   ae_matrix_set_length(q, n - 1 + 1, n - 1 + 1);
+   ae_matrix_set_length(q, n, n);
    ae_vector_set_length(&v, n + 1);
-   ae_vector_set_length(&work, n - 1 + 1);
+   ae_vector_set_length(&work, n);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          if (i == j) {
@@ -4967,9 +4967,9 @@ void hmatrixtdunpackq(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatri
       return;
    }
 // init
-   ae_matrix_set_length(q, n - 1 + 1, n - 1 + 1);
+   ae_matrix_set_length(q, n, n);
    ae_vector_set_length(&v, n + 1);
-   ae_vector_set_length(&work, n - 1 + 1);
+   ae_vector_set_length(&work, n);
 // MKL version
    if (hmatrixtdunpackqmkl(a, n, isupper, tau, q)) {
       ae_frame_leave();
@@ -10740,7 +10740,7 @@ void sparsealloc(ae_serializer *s, sparsematrix *a) {
    // Alloc Hash
       nused = 0;
       for (i = 0; i < a->tablesize; i++) {
-         if (a->idx.xZ[2 * i + 0] >= 0) {
+         if (a->idx.xZ[2 * i] >= 0) {
             nused++;
          }
       }
@@ -10748,7 +10748,7 @@ void sparsealloc(ae_serializer *s, sparsematrix *a) {
       ae_serializer_alloc_entry(s);
       ae_serializer_alloc_entry(s);
       for (i = 0; i < a->tablesize; i++) {
-         if (a->idx.xZ[2 * i + 0] >= 0) {
+         if (a->idx.xZ[2 * i] >= 0) {
             ae_serializer_alloc_entry(s);
             ae_serializer_alloc_entry(s);
             ae_serializer_alloc_entry(s);
@@ -10806,7 +10806,7 @@ void sparseserialize(ae_serializer *s, sparsematrix *a) {
    // Serialize Hash
       nused = 0;
       for (i = 0; i < a->tablesize; i++) {
-         if (a->idx.xZ[2 * i + 0] >= 0) {
+         if (a->idx.xZ[2 * i] >= 0) {
             nused++;
          }
       }
@@ -10814,8 +10814,8 @@ void sparseserialize(ae_serializer *s, sparsematrix *a) {
       ae_serializer_serialize_int(s, a->n);
       ae_serializer_serialize_int(s, nused);
       for (i = 0; i < a->tablesize; i++) {
-         if (a->idx.xZ[2 * i + 0] >= 0) {
-            ae_serializer_serialize_int(s, a->idx.xZ[2 * i + 0]);
+         if (a->idx.xZ[2 * i] >= 0) {
+            ae_serializer_serialize_int(s, a->idx.xZ[2 * i]);
             ae_serializer_serialize_int(s, a->idx.xZ[2 * i + 1]);
             ae_serializer_serialize_double(s, a->vals.xR[i]);
          }
@@ -12680,13 +12680,13 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
    // 2x2 System
    //
    // Compute the real part of  C = ca A - w D  (or  ca A' - w D )
-      crv4->xR[1 + 0] = ca * a->xyR[1][1] - wr * d1;
+      crv4->xR[1] = ca * a->xyR[1][1] - wr * d1;
       crv4->xR[2 + 2] = ca * a->xyR[2][2] - wr * d2;
       if (ltrans) {
          crv4->xR[1 + 2] = ca * a->xyR[2][1];
-         crv4->xR[2 + 0] = ca * a->xyR[1][2];
+         crv4->xR[2] = ca * a->xyR[1][2];
       } else {
-         crv4->xR[2 + 0] = ca * a->xyR[2][1];
+         crv4->xR[2] = ca * a->xyR[2][1];
          crv4->xR[1 + 2] = ca * a->xyR[1][2];
       }
       if (nw == 1) {
@@ -12767,8 +12767,8 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
       // Complex 2x2 system  (w is complex)
       //
       // Find the largest element in C
-         civ4->xR[1 + 0] = -wi * d1;
-         civ4->xR[2 + 0] = 0.0;
+         civ4->xR[1] = -wi * d1;
+         civ4->xR[2] = 0.0;
          civ4->xR[1 + 2] = 0.0;
          civ4->xR[2 + 2] = -wi * d2;
          cmax = 0.0;
@@ -14030,8 +14030,8 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
    maxit = 30;
 // Initialize arrays
    ae_vector_set_length(&wtemp, n + 1);
-   ae_vector_set_length(&work1, n - 1 + 1);
-   ae_vector_set_length(&work2, n - 1 + 1);
+   ae_vector_set_length(&work1, n);
+   ae_vector_set_length(&work2, n);
    ae_vector_set_length(&workc, n + 1);
    ae_vector_set_length(&works, n + 1);
 // Determine the unit roundoff and over/underflow thresholds.
@@ -15899,7 +15899,7 @@ bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix 
          return result;
       }
       if (zneeded == 2) {
-         ae_matrix_set_length(z, n - 1 + 1, n - 1 + 1);
+         ae_matrix_set_length(z, n, n);
          for (i = 1; i <= n; i++) {
             ae_v_move(z->xyR[i - 1], 1, &z1.xyR[i][1], 1, n);
          }
@@ -15907,7 +15907,7 @@ bool smatrixtdevd(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix 
          return result;
       }
       if (zneeded == 3) {
-         ae_matrix_set_length(z, 0 + 1, n - 1 + 1);
+         ae_matrix_set_length(z, 0 + 1, n);
          ae_v_move(z->xyR[0], 1, &z1.xyR[1][1], 1, n);
          ae_frame_leave();
          return result;
@@ -16006,7 +16006,7 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
    ae_vector_set_length(&d1, n + 1);
    ae_v_move(&d1.xR[1], 1, d->xR, 1, n);
    if (n > 1) {
-      ae_vector_set_length(&e1, n - 1 + 1);
+      ae_vector_set_length(&e1, n);
       ae_v_move(&e1.xR[1], 1, e->xR, 1, n - 1);
    }
 // No eigen vectors
@@ -16017,7 +16017,7 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
          ae_frame_leave();
          return result;
       }
-      ae_vector_set_length(d, *m - 1 + 1);
+      ae_vector_set_length(d, *m);
       ae_v_move(d->xR, 1, &w.xR[1], 1, *m);
       ae_frame_leave();
       return result;
@@ -16066,12 +16066,12 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
             z2.xyR[i][j] = v;
          }
       }
-      ae_matrix_set_length(z, n - 1 + 1, *m - 1 + 1);
+      ae_matrix_set_length(z, n, *m);
       for (i = 1; i <= *m; i++) {
          ae_v_move(&z->xyR[0][i - 1], z->stride, &z2.xyR[1][i], z2.stride, n);
       }
    // Store W
-      ae_vector_set_length(d, *m - 1 + 1);
+      ae_vector_set_length(d, *m);
       for (i = 1; i <= *m; i++) {
          d->xR[i - 1] = w.xR[i];
       }
@@ -16112,11 +16112,11 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
          }
       }
    // Store W
-      ae_vector_set_length(d, *m - 1 + 1);
+      ae_vector_set_length(d, *m);
       for (i = 1; i <= *m; i++) {
          d->xR[i - 1] = w.xR[i];
       }
-      ae_matrix_set_length(z, n - 1 + 1, *m - 1 + 1);
+      ae_matrix_set_length(z, n, *m);
       for (i = 1; i <= *m; i++) {
          ae_v_move(&z->xyR[0][i - 1], z->stride, &z2.xyR[1][i], z2.stride, n);
       }
@@ -16203,7 +16203,7 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
    ae_vector_set_length(&d1, n + 1);
    ae_v_move(&d1.xR[1], 1, d->xR, 1, n);
    if (n > 1) {
-      ae_vector_set_length(&e1, n - 1 + 1);
+      ae_vector_set_length(&e1, n);
       ae_v_move(&e1.xR[1], 1, e->xR, 1, n - 1);
    }
 // No eigen vectors
@@ -16218,7 +16218,7 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
          ae_frame_leave();
          return result;
       }
-      ae_vector_set_length(d, m - 1 + 1);
+      ae_vector_set_length(d, m);
       for (i = 1; i <= m; i++) {
          d->xR[i - 1] = w.xR[i];
       }
@@ -16272,12 +16272,12 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
             z2.xyR[i][j] = v;
          }
       }
-      ae_matrix_set_length(z, n - 1 + 1, m - 1 + 1);
+      ae_matrix_set_length(z, n, m);
       for (i = 1; i <= m; i++) {
          ae_v_move(&z->xyR[0][i - 1], z->stride, &z2.xyR[1][i], z2.stride, n);
       }
    // Store W
-      ae_vector_set_length(d, m - 1 + 1);
+      ae_vector_set_length(d, m);
       for (i = 1; i <= m; i++) {
          d->xR[i - 1] = w.xR[i];
       }
@@ -16321,12 +16321,12 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
          }
       }
    // Store Z
-      ae_matrix_set_length(z, n - 1 + 1, m - 1 + 1);
+      ae_matrix_set_length(z, n, m);
       for (i = 1; i <= m; i++) {
          ae_v_move(&z->xyR[0][i - 1], z->stride, &z2.xyR[1][i], z2.stride, n);
       }
    // Store W
-      ae_vector_set_length(d, m - 1 + 1);
+      ae_vector_set_length(d, m);
       for (i = 1; i <= m; i++) {
          d->xR[i - 1] = w.xR[i];
       }
@@ -16605,8 +16605,8 @@ bool hmatrixevdr(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double 
 // Eigenvectors are needed
 // Calculate Z = Q*T = Re(Q)*T + i*Im(Q)*T
    if (result && zneeded != 0 && *m != 0) {
-      ae_vector_set_length(&work, *m - 1 + 1);
-      ae_matrix_set_length(z, n - 1 + 1, *m - 1 + 1);
+      ae_vector_set_length(&work, *m);
+      ae_matrix_set_length(z, n, *m);
       for (i = 0; i < n; i++) {
       // Calculate real part
          for (k = 0; k < *m; k++) {
@@ -16758,8 +16758,8 @@ bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_
 // Calculate Z = Q*T = Re(Q)*T + i*Im(Q)*T
    m = i2 - i1 + 1;
    if (result && zneeded != 0) {
-      ae_vector_set_length(&work, m - 1 + 1);
-      ae_matrix_set_length(z, n - 1 + 1, m - 1 + 1);
+      ae_vector_set_length(&work, m);
+      ae_matrix_set_length(z, n, m);
       for (i = 0; i < n; i++) {
       // Calculate real part
          for (k = 0; k < m; k++) {
@@ -18161,7 +18161,7 @@ static void sptrf_sluv2list1appendsequencetomatrix(sluv2list1matrix *a, ae_int_t
       s->idx.xZ[i1] = a->strgidx.xZ[2 * jp + 1];
       s->vals.xR[i1] = a->strgval.xR[jp];
       nnz++;
-      jp = a->strgidx.xZ[2 * jp + 0];
+      jp = a->strgidx.xZ[2 * jp];
    }
    for (i = 0; i < nnz; i++) {
       s->idx.xZ[i0 + i] = s->idx.xZ[i1 + i];
@@ -18192,7 +18192,7 @@ static void sptrf_sluv2list1pushsparsevector(sluv2list1matrix *a, ZVector *si, R
    for (idx = 0; idx < nz; idx++) {
       i = si->xZ[idx];
       v = sv->xR[idx];
-      a->strgidx.xZ[2 * nused + 0] = a->idxfirst.xZ[i];
+      a->strgidx.xZ[2 * nused] = a->idxfirst.xZ[i];
       a->strgidx.xZ[2 * nused + 1] = k;
       a->strgval.xR[nused] = v;
       a->idxfirst.xZ[i] = nused;
@@ -18297,9 +18297,9 @@ static void sptrf_sparsetrailinit(sparsematrix *s, sluv2sparsetrail *a) {
       // Insert into column list
          p = a->slscolptr.xZ[j];
          if (p >= 0) {
-            a->slsidx.xZ[p * sptrf_slswidth + 0] = slsused;
+            a->slsidx.xZ[p * sptrf_slswidth] = slsused;
          }
-         a->slsidx.xZ[slsused * sptrf_slswidth + 0] = -1;
+         a->slsidx.xZ[slsused * sptrf_slswidth] = -1;
          a->slsidx.xZ[slsused * sptrf_slswidth + 1] = p;
          a->slscolptr.xZ[j] = slsused;
       // Insert into row list
@@ -18597,7 +18597,7 @@ static void sptrf_sparsetrailpivotout(sluv2sparsetrail *a, ae_int_t ipiv, ae_int
       v1r->xR[*nz1] = a->slsval.xR[entry];
       ++*nz1;
    // Remove element from the column list
-      pprev = a->slsidx.xZ[entry * sptrf_slswidth + 0];
+      pprev = a->slsidx.xZ[entry * sptrf_slswidth];
       pnext = a->slsidx.xZ[entry * sptrf_slswidth + 1];
       if (pprev >= 0) {
          a->slsidx.xZ[pprev * sptrf_slswidth + 1] = pnext;
@@ -18605,7 +18605,7 @@ static void sptrf_sparsetrailpivotout(sluv2sparsetrail *a, ae_int_t ipiv, ae_int
          a->slscolptr.xZ[j] = pnext;
       }
       if (pnext >= 0) {
-         a->slsidx.xZ[pnext * sptrf_slswidth + 0] = pprev;
+         a->slsidx.xZ[pnext * sptrf_slswidth] = pprev;
       }
    // Select next entry
       entry = a->slsidx.xZ[entry * sptrf_slswidth + 3];
@@ -18617,7 +18617,7 @@ static void sptrf_sparsetrailpivotout(sluv2sparsetrail *a, ae_int_t ipiv, ae_int
       a->slsidx.xZ[entry * sptrf_slswidth + 4] = ipiv;
    // Resort column affected by row pivoting
       j = a->slsidx.xZ[entry * sptrf_slswidth + 5];
-      pprev = a->slsidx.xZ[entry * sptrf_slswidth + 0];
+      pprev = a->slsidx.xZ[entry * sptrf_slswidth];
       pnext = a->slsidx.xZ[entry * sptrf_slswidth + 1];
       while (pnext >= 0 && a->slsidx.xZ[pnext * sptrf_slswidth + 4] < ipiv) {
          pnextnext = a->slsidx.xZ[pnext * sptrf_slswidth + 1];
@@ -18628,14 +18628,14 @@ static void sptrf_sparsetrailpivotout(sluv2sparsetrail *a, ae_int_t ipiv, ae_int
             a->slscolptr.xZ[j] = pnext;
          }
       // entry->prev, entry->next
-         a->slsidx.xZ[entry * sptrf_slswidth + 0] = pnext;
+         a->slsidx.xZ[entry * sptrf_slswidth] = pnext;
          a->slsidx.xZ[entry * sptrf_slswidth + 1] = pnextnext;
       // next->prev, next->next
-         a->slsidx.xZ[pnext * sptrf_slswidth + 0] = pprev;
+         a->slsidx.xZ[pnext * sptrf_slswidth] = pprev;
          a->slsidx.xZ[pnext * sptrf_slswidth + 1] = entry;
       // nextnext->prev
          if (pnextnext >= 0) {
-            a->slsidx.xZ[pnextnext * sptrf_slswidth + 0] = entry;
+            a->slsidx.xZ[pnextnext * sptrf_slswidth] = entry;
          }
       // PPrev, Item, PNext
          pprev = pnext;
@@ -18692,7 +18692,7 @@ static void sptrf_sparsetraildensify(sluv2sparsetrail *a, ae_int_t i1, sluv2list
    jp = bupper->idxfirst.xZ[i1];
    while (jp >= 0) {
       a->tmp0.xR[bupper->strgidx.xZ[2 * jp + 1]] = bupper->strgval.xR[jp];
-      jp = bupper->strgidx.xZ[2 * jp + 0];
+      jp = bupper->strgidx.xZ[2 * jp];
    }
    sptrf_sluv2list1dropsequence(bupper, i1);
 // Offload items [K,N) of densified column from BLeft
@@ -18804,7 +18804,7 @@ static void sptrf_sparsetrailupdate(sluv2sparsetrail *a, ZVector *v0i, RVector *
             a->slsidx.xZ[newoffs + 5] = i1;
             a->slsval.xR[newentry] = -v1 * v0r->xR[i];
          // Insert entry into column list
-            a->slsidx.xZ[newoffs + 0] = pprev;
+            a->slsidx.xZ[newoffs] = pprev;
             a->slsidx.xZ[newoffs + 1] = pnext;
             if (pprev >= 0) {
                a->slsidx.xZ[pprev * sptrf_slswidth + 1] = newentry;
@@ -18812,7 +18812,7 @@ static void sptrf_sparsetrailupdate(sluv2sparsetrail *a, ZVector *v0i, RVector *
                a->slscolptr.xZ[i1] = newentry;
             }
             if (entry >= 0) {
-               a->slsidx.xZ[entry * sptrf_slswidth + 0] = newentry;
+               a->slsidx.xZ[entry * sptrf_slswidth] = newentry;
             }
          // Insert entry into row list
             p = a->slsrowptr.xZ[i0];
@@ -19669,7 +19669,7 @@ static void amdordering_knscompressstorage(amdknset *sa) {
    srcoffs = 0;
    dstoffs = 0;
    while (srcoffs < sa->dataused) {
-      blocklen = sa->data.xZ[srcoffs + 0];
+      blocklen = sa->data.xZ[srcoffs];
       setidx = sa->data.xZ[srcoffs + 1];
       ae_assert(blocklen >= amdordering_knsheadersize, "knsCompressStorage: integrity check 6385 failed");
       if (setidx < 0) {
@@ -20130,7 +20130,7 @@ static void amdordering_knsclearkthreclaim(amdknset *sa, ae_int_t k) {
    sa->vcnt.xZ[k] = 0;
    if (allocated >= amdordering_knsheadersize) {
       sa->data.xZ[idxbegin - 2] = 2;
-      sa->data.xZ[idxbegin + 0] = allocated;
+      sa->data.xZ[idxbegin] = allocated;
       sa->data.xZ[idxbegin + 1] = -1;
       sa->vallocated.xZ[k] = 0;
    }
@@ -20194,19 +20194,19 @@ static void amdordering_mtxinsertnewelement(amdllmatrix *a, ae_int_t i, ae_int_t
       newsize = 2 * a->entriesinitialized + 1;
       ivectorresize(&a->entries, newsize * amdordering_llmentrysize);
       for (k = a->entriesinitialized; k < newsize - 1; k++) {
-         a->entries.xZ[k * amdordering_llmentrysize + 0] = k + 1;
+         a->entries.xZ[k * amdordering_llmentrysize] = k + 1;
       }
-      a->entries.xZ[(newsize - 1) * amdordering_llmentrysize + 0] = a->vbegin.xZ[2 * n];
+      a->entries.xZ[(newsize - 1) * amdordering_llmentrysize] = a->vbegin.xZ[2 * n];
       a->vbegin.xZ[2 * n] = a->entriesinitialized;
       a->entriesinitialized = newsize;
    }
    eidx = a->vbegin.xZ[2 * n];
    offs = eidx * amdordering_llmentrysize;
-   a->vbegin.xZ[2 * n] = a->entries.xZ[offs + 0];
-   a->entries.xZ[offs + 0] = -1;
+   a->vbegin.xZ[2 * n] = a->entries.xZ[offs];
+   a->entries.xZ[offs] = -1;
    a->entries.xZ[offs + 1] = a->vbegin.xZ[i];
    if (a->vbegin.xZ[i] >= 0) {
-      a->entries.xZ[a->vbegin.xZ[i] * amdordering_llmentrysize + 0] = eidx;
+      a->entries.xZ[a->vbegin.xZ[i] * amdordering_llmentrysize] = eidx;
    }
    a->entries.xZ[offs + 2] = -1;
    a->entries.xZ[offs + 3] = a->vbegin.xZ[j + n];
@@ -20293,7 +20293,7 @@ static void amdordering_mtxclearx(amdllmatrix *a, ae_int_t k, bool iscol) {
       } else {
          enext = a->entries.xZ[eidx * amdordering_llmentrysize + 1];
       }
-      idxprev = a->entries.xZ[eidx * amdordering_llmentrysize + 0];
+      idxprev = a->entries.xZ[eidx * amdordering_llmentrysize];
       idxnext = a->entries.xZ[eidx * amdordering_llmentrysize + 1];
       if (idxprev >= 0) {
          a->entries.xZ[idxprev * amdordering_llmentrysize + 1] = idxnext;
@@ -20301,7 +20301,7 @@ static void amdordering_mtxclearx(amdllmatrix *a, ae_int_t k, bool iscol) {
          a->vbegin.xZ[idxr] = idxnext;
       }
       if (idxnext >= 0) {
-         a->entries.xZ[idxnext * amdordering_llmentrysize + 0] = idxprev;
+         a->entries.xZ[idxnext * amdordering_llmentrysize] = idxprev;
       }
       idxprev = a->entries.xZ[eidx * amdordering_llmentrysize + 2];
       idxnext = a->entries.xZ[eidx * amdordering_llmentrysize + 3];
@@ -20313,7 +20313,7 @@ static void amdordering_mtxclearx(amdllmatrix *a, ae_int_t k, bool iscol) {
       if (idxnext >= 0) {
          a->entries.xZ[idxnext * amdordering_llmentrysize + 2] = idxprev;
       }
-      a->entries.xZ[eidx * amdordering_llmentrysize + 0] = a->vbegin.xZ[2 * n];
+      a->entries.xZ[eidx * amdordering_llmentrysize] = a->vbegin.xZ[2 * n];
       a->vbegin.xZ[2 * n] = eidx;
       eidx = enext;
       if (!iscol) {
@@ -22526,34 +22526,34 @@ static bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_
    double uk2;
    double uk3;
    bool result;
-   d0 = diagd->xR[offsd + 0];
+   d0 = diagd->xR[offsd];
    d1 = diagd->xR[offsd + 1];
    d2 = diagd->xR[offsd + 2];
    d3 = diagd->xR[offsd + 3];
-   u00 = d0 * rowstorage->xR[offsu + 0 * 4 + 0];
-   u01 = d1 * rowstorage->xR[offsu + 0 * 4 + 1];
-   u02 = d2 * rowstorage->xR[offsu + 0 * 4 + 2];
-   u03 = d3 * rowstorage->xR[offsu + 0 * 4 + 3];
-   u10 = d0 * rowstorage->xR[offsu + 1 * 4 + 0];
-   u11 = d1 * rowstorage->xR[offsu + 1 * 4 + 1];
-   u12 = d2 * rowstorage->xR[offsu + 1 * 4 + 2];
-   u13 = d3 * rowstorage->xR[offsu + 1 * 4 + 3];
-   u20 = d0 * rowstorage->xR[offsu + 2 * 4 + 0];
-   u21 = d1 * rowstorage->xR[offsu + 2 * 4 + 1];
-   u22 = d2 * rowstorage->xR[offsu + 2 * 4 + 2];
-   u23 = d3 * rowstorage->xR[offsu + 2 * 4 + 3];
-   u30 = d0 * rowstorage->xR[offsu + 3 * 4 + 0];
-   u31 = d1 * rowstorage->xR[offsu + 3 * 4 + 1];
-   u32 = d2 * rowstorage->xR[offsu + 3 * 4 + 2];
-   u33 = d3 * rowstorage->xR[offsu + 3 * 4 + 3];
+   u00 = d0 * rowstorage->xR[offsu];
+   u01 = d1 * rowstorage->xR[offsu + 1];
+   u02 = d2 * rowstorage->xR[offsu + 2];
+   u03 = d3 * rowstorage->xR[offsu + 3];
+   u10 = d0 * rowstorage->xR[offsu + 4];
+   u11 = d1 * rowstorage->xR[offsu + 5];
+   u12 = d2 * rowstorage->xR[offsu + 6];
+   u13 = d3 * rowstorage->xR[offsu + 7];
+   u20 = d0 * rowstorage->xR[offsu + 8];
+   u21 = d1 * rowstorage->xR[offsu + 9];
+   u22 = d2 * rowstorage->xR[offsu + 10];
+   u23 = d3 * rowstorage->xR[offsu + 11];
+   u30 = d0 * rowstorage->xR[offsu + 12];
+   u31 = d1 * rowstorage->xR[offsu + 13];
+   u32 = d2 * rowstorage->xR[offsu + 14];
+   u33 = d3 * rowstorage->xR[offsu + 15];
    for (k = 0; k < uheight; k++) {
       targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
       offsk = offsu + k * 4;
-      uk0 = rowstorage->xR[offsk + 0];
+      uk0 = rowstorage->xR[offsk];
       uk1 = rowstorage->xR[offsk + 1];
       uk2 = rowstorage->xR[offsk + 2];
       uk3 = rowstorage->xR[offsk + 3];
-      rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+      rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
       rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
       rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
       rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
@@ -22673,7 +22673,7 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
    u32 = 0.0;
    u33 = 0.0;
    if (urank >= 1) {
-      d0 = diagd->xR[offsd + 0];
+      d0 = diagd->xR[offsd];
    }
    if (urank >= 2) {
       d1 = diagd->xR[offsd + 1];
@@ -22686,7 +22686,7 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
    }
    if (srccol0 >= 0) {
       if (urank >= 1) {
-         u00 = d0 * rowstorage->xR[offsu + srccol0 * urowstride + 0];
+         u00 = d0 * rowstorage->xR[offsu + srccol0 * urowstride];
       }
       if (urank >= 2) {
          u01 = d1 * rowstorage->xR[offsu + srccol0 * urowstride + 1];
@@ -22700,7 +22700,7 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
    }
    if (srccol1 >= 0) {
       if (urank >= 1) {
-         u10 = d0 * rowstorage->xR[offsu + srccol1 * urowstride + 0];
+         u10 = d0 * rowstorage->xR[offsu + srccol1 * urowstride];
       }
       if (urank >= 2) {
          u11 = d1 * rowstorage->xR[offsu + srccol1 * urowstride + 1];
@@ -22714,7 +22714,7 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
    }
    if (srccol2 >= 0) {
       if (urank >= 1) {
-         u20 = d0 * rowstorage->xR[offsu + srccol2 * urowstride + 0];
+         u20 = d0 * rowstorage->xR[offsu + srccol2 * urowstride];
       }
       if (urank >= 2) {
          u21 = d1 * rowstorage->xR[offsu + srccol2 * urowstride + 1];
@@ -22728,7 +22728,7 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
    }
    if (srccol3 >= 0) {
       if (urank >= 1) {
-         u30 = d0 * rowstorage->xR[offsu + srccol3 * urowstride + 0];
+         u30 = d0 * rowstorage->xR[offsu + srccol3 * urowstride];
       }
       if (urank >= 2) {
          u31 = d1 * rowstorage->xR[offsu + srccol3 * urowstride + 1];
@@ -22745,8 +22745,8 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
-         uk0 = rowstorage->xR[offsk + 0];
-         rowstorage->xR[targetrow + 0] -= u00 * uk0;
+         uk0 = rowstorage->xR[offsk];
+         rowstorage->xR[targetrow] -= u00 * uk0;
          rowstorage->xR[targetrow + 1] -= u10 * uk0;
          rowstorage->xR[targetrow + 2] -= u20 * uk0;
          rowstorage->xR[targetrow + 3] -= u30 * uk0;
@@ -22756,9 +22756,9 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
-         uk0 = rowstorage->xR[offsk + 0];
+         uk0 = rowstorage->xR[offsk];
          uk1 = rowstorage->xR[offsk + 1];
-         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1;
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1;
          rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1;
          rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1;
          rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1;
@@ -22768,10 +22768,10 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
-         uk0 = rowstorage->xR[offsk + 0];
+         uk0 = rowstorage->xR[offsk];
          uk1 = rowstorage->xR[offsk + 1];
          uk2 = rowstorage->xR[offsk + 2];
-         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1 + u02 * uk2;
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2;
          rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2;
          rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2;
          rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2;
@@ -22781,11 +22781,11 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
-         uk0 = rowstorage->xR[offsk + 0];
+         uk0 = rowstorage->xR[offsk];
          uk1 = rowstorage->xR[offsk + 1];
          uk2 = rowstorage->xR[offsk + 2];
          uk3 = rowstorage->xR[offsk + 3];
-         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
          rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
          rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
          rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
@@ -22849,8 +22849,8 @@ static bool spchol_updatekernelrank1(RVector *rowstorage, ae_int_t offss, ae_int
    u20 = 0.0;
    u30 = 0.0;
    if (uwidth >= 1) {
-      col0 = raw2smap->xZ[superrowidx->xZ[urbase + 0]];
-      u00 = d0 * rowstorage->xR[offsu + 0];
+      col0 = raw2smap->xZ[superrowidx->xZ[urbase]];
+      u00 = d0 * rowstorage->xR[offsu];
    }
    if (uwidth >= 2) {
       col1 = raw2smap->xZ[superrowidx->xZ[urbase + 1]];
@@ -22967,30 +22967,30 @@ static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int
    u30 = 0.0;
    u31 = 0.0;
    if (uwidth >= 1) {
-      col0 = raw2smap->xZ[superrowidx->xZ[urbase + 0]];
-      u00 = d0 * rowstorage->xR[offsu + 0];
+      col0 = raw2smap->xZ[superrowidx->xZ[urbase]];
+      u00 = d0 * rowstorage->xR[offsu];
       u01 = d1 * rowstorage->xR[offsu + 1];
    }
    if (uwidth >= 2) {
       col1 = raw2smap->xZ[superrowidx->xZ[urbase + 1]];
-      u10 = d0 * rowstorage->xR[offsu + 1 * 2 + 0];
+      u10 = d0 * rowstorage->xR[offsu + 1 * 2];
       u11 = d1 * rowstorage->xR[offsu + 1 * 2 + 1];
    }
    if (uwidth >= 3) {
       col2 = raw2smap->xZ[superrowidx->xZ[urbase + 2]];
-      u20 = d0 * rowstorage->xR[offsu + 2 * 2 + 0];
+      u20 = d0 * rowstorage->xR[offsu + 2 * 2];
       u21 = d1 * rowstorage->xR[offsu + 2 * 2 + 1];
    }
    if (uwidth >= 4) {
       col3 = raw2smap->xZ[superrowidx->xZ[urbase + 3]];
-      u30 = d0 * rowstorage->xR[offsu + 3 * 2 + 0];
+      u30 = d0 * rowstorage->xR[offsu + 3 * 2];
       u31 = d1 * rowstorage->xR[offsu + 3 * 2 + 1];
    }
 // Run update
    if (uwidth == 1) {
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * trowstride;
-         uk0 = rowstorage->xR[offsu + 2 * k + 0];
+         uk0 = rowstorage->xR[offsu + 2 * k];
          uk1 = rowstorage->xR[offsu + 2 * k + 1];
          rowstorage->xR[targetrow + col0] -= u00 * uk0 + u01 * uk1;
       }
@@ -22998,7 +22998,7 @@ static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int
    if (uwidth == 2) {
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * trowstride;
-         uk0 = rowstorage->xR[offsu + 2 * k + 0];
+         uk0 = rowstorage->xR[offsu + 2 * k];
          uk1 = rowstorage->xR[offsu + 2 * k + 1];
          rowstorage->xR[targetrow + col0] -= u00 * uk0 + u01 * uk1;
          rowstorage->xR[targetrow + col1] -= u10 * uk0 + u11 * uk1;
@@ -23007,7 +23007,7 @@ static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int
    if (uwidth == 3) {
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * trowstride;
-         uk0 = rowstorage->xR[offsu + 2 * k + 0];
+         uk0 = rowstorage->xR[offsu + 2 * k];
          uk1 = rowstorage->xR[offsu + 2 * k + 1];
          rowstorage->xR[targetrow + col0] -= u00 * uk0 + u01 * uk1;
          rowstorage->xR[targetrow + col1] -= u10 * uk0 + u11 * uk1;
@@ -23017,7 +23017,7 @@ static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int
    if (uwidth == 4) {
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * trowstride;
-         uk0 = rowstorage->xR[offsu + 2 * k + 0];
+         uk0 = rowstorage->xR[offsu + 2 * k];
          uk1 = rowstorage->xR[offsu + 2 * k + 1];
          rowstorage->xR[targetrow + col0] -= u00 * uk0 + u01 * uk1;
          rowstorage->xR[targetrow + col1] -= u10 * uk0 + u11 * uk1;
@@ -24872,7 +24872,7 @@ void spdmatrixcholeskyupdateadd1buf(RMatrix *a, ae_int_t n, bool isupper, RVecto
       // Update all previous updates [Idx+1...I-1] to I-th row
          vv = bufr->xR[i];
          for (j = nz; j < i; j++) {
-            cs = bufr->xR[n + 2 * j + 0];
+            cs = bufr->xR[n + 2 * j];
             sn = bufr->xR[n + 2 * j + 1];
             v = a->xyR[i][j];
             a->xyR[i][j] = cs * v + sn * vv;
@@ -24881,7 +24881,7 @@ void spdmatrixcholeskyupdateadd1buf(RMatrix *a, ae_int_t n, bool isupper, RVecto
       // generate rotation applied to I-th element of update vector
          generaterotation(a->xyR[i][i], vv, &cs, &sn, &v);
          a->xyR[i][i] = v;
-         bufr->xR[n + 2 * i + 0] = cs;
+         bufr->xR[n + 2 * i] = cs;
          bufr->xR[n + 2 * i + 1] = sn;
       }
    }
@@ -25100,7 +25100,7 @@ void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector
             // Update all previous updates [Idx+1...I-1] to I-th row
                vv = bufr->xR[i];
                for (j = idx + 1; j < i; j++) {
-                  cs = bufr->xR[n + 2 * j + 0];
+                  cs = bufr->xR[n + 2 * j];
                   sn = bufr->xR[n + 2 * j + 1];
                   v = a->xyR[i][j];
                   a->xyR[i][j] = cs * v + sn * vv;
@@ -25109,7 +25109,7 @@ void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector
             // generate rotation applied to I-th element of update vector
                generaterotation(a->xyR[i][i], vv, &cs, &sn, &v);
                a->xyR[i][i] = v;
-               bufr->xR[n + 2 * i + 0] = cs;
+               bufr->xR[n + 2 * i] = cs;
                bufr->xR[n + 2 * i + 1] = sn;
             }
          }
@@ -26370,10 +26370,10 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
    ll = 0;
    oldsn = 0.0;
 // init
-   ae_vector_set_length(&work0, n - 1 + 1);
-   ae_vector_set_length(&work1, n - 1 + 1);
-   ae_vector_set_length(&work2, n - 1 + 1);
-   ae_vector_set_length(&work3, n - 1 + 1);
+   ae_vector_set_length(&work0, n);
+   ae_vector_set_length(&work1, n);
+   ae_vector_set_length(&work2, n);
+   ae_vector_set_length(&work3, n);
    uend = ustart + imax2(nru - 1, 0);
    vend = vstart + imax2(ncvt - 1, 0);
    cend = cstart + imax2(ncc - 1, 0);
@@ -26968,7 +26968,7 @@ bool rmatrixbdsvd(RVector *d, RVector *e, ae_int_t n, bool isupper, bool isfract
    ae_vector_set_length(&d1, n + 1);
    ae_v_move(&d1.xR[1], 1, d->xR, 1, n);
    if (n > 1) {
-      ae_vector_set_length(&e1, n - 1 + 1);
+      ae_vector_set_length(&e1, n);
       ae_v_move(&e1.xR[1], 1, e->xR, 1, n - 1);
    }
    result = bdsvd_bidiagonalsvddecompositioninternal(&d1, &e1, n, isupper, isfractionalaccuracyrequired, u, 0, nru, c, 0, ncc, vt, 0, ncvt);
@@ -27089,24 +27089,24 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
    if (uneeded == 1) {
       nru = m;
       ncu = minmn;
-      ae_matrix_set_length(u, nru - 1 + 1, ncu - 1 + 1);
+      ae_matrix_set_length(u, nru, ncu);
    }
    if (uneeded == 2) {
       nru = m;
       ncu = m;
-      ae_matrix_set_length(u, nru - 1 + 1, ncu - 1 + 1);
+      ae_matrix_set_length(u, nru, ncu);
    }
    nrvt = 0;
    ncvt = 0;
    if (vtneeded == 1) {
       nrvt = minmn;
       ncvt = n;
-      ae_matrix_set_length(vt, nrvt - 1 + 1, ncvt - 1 + 1);
+      ae_matrix_set_length(vt, nrvt, ncvt);
    }
    if (vtneeded == 2) {
       nrvt = n;
       ncvt = n;
-      ae_matrix_set_length(vt, nrvt - 1 + 1, ncvt - 1 + 1);
+      ae_matrix_set_length(vt, nrvt, ncvt);
    }
 // M much larger than N
 // Use bidiagonal reduction with QR-decomposition
@@ -27228,7 +27228,7 @@ bool rmatrixsvd(RMatrix *a, ae_int_t m, ae_int_t n, ae_int_t uneeded, ae_int_t v
       result = rmatrixbdsvd(w, &e, minmn, isupper, false, u, nru, a, 0, vt, ncvt);
    } else {
    // We can use additional memory
-      ae_matrix_set_length(&t2, minmn - 1 + 1, m - 1 + 1);
+      ae_matrix_set_length(&t2, minmn, m);
       copyandtranspose(u, 0, m - 1, 0, minmn - 1, &t2, 0, minmn - 1, 0, m - 1);
       result = rmatrixbdsvd(w, &e, minmn, isupper, false, u, 0, &t2, m, vt, ncvt);
       copyandtranspose(&t2, 0, minmn - 1, 0, m - 1, u, 0, m - 1, 0, minmn - 1);
@@ -29700,14 +29700,14 @@ Spawn:
       }
       rcopyvc(itidx + 2, &state->tmp1, &state->hr, itidx);
       for (j = 0; j <= itidx + 1; j++) {
-         v = state->hq.xyR[itidx + 0][j];
+         v = state->hq.xyR[itidx][j];
          vv = state->hq.xyR[itidx + 1][j];
-         state->hq.xyR[itidx + 0][j] = cs * v + sn * vv;
+         state->hq.xyR[itidx][j] = cs * v + sn * vv;
          state->hq.xyR[itidx + 1][j] = -sn * v + cs * vv;
       }
-      v = state->hqb.xR[itidx + 0];
+      v = state->hqb.xR[itidx];
       vv = state->hqb.xR[itidx + 1];
-      state->hqb.xR[itidx + 0] = cs * v + sn * vv;
+      state->hqb.xR[itidx] = cs * v + sn * vv;
       state->hqb.xR[itidx + 1] = -sn * v + cs * vv;
       resnrm = fabs(state->hqb.xR[itidx + 1]);
    // Previous attempt to extend R was successful (no small diagonal elements).
@@ -30249,7 +30249,7 @@ static void matinv_rmatrixtrinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bo
             }
          // Compute elements 1:j-1 of j-th column.
             if (j > 0) {
-               ae_v_move(&tmp->xR[offs + 0], 1, &a->xyR[offs + 0][offs + j], a->stride, j);
+               ae_v_move(&tmp->xR[offs], 1, &a->xyR[offs][offs + j], a->stride, j);
                for (i = 0; i < j; i++) {
                   if (i < j - 1) {
                      v = ae_v_dotproduct(&a->xyR[offs + i][offs + i + 1], 1, &tmp->xR[offs + i + 1], 1, j - i - 1);
@@ -30262,7 +30262,7 @@ static void matinv_rmatrixtrinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bo
                      a->xyR[offs + i][offs + j] = v + tmp->xR[offs + i];
                   }
                }
-               ae_v_muld(&a->xyR[offs + 0][offs + j], a->stride, j, ajj);
+               ae_v_muld(&a->xyR[offs][offs + j], a->stride, j, ajj);
             }
          }
       } else {
@@ -30368,7 +30368,7 @@ static void matinv_cmatrixtrinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
             }
          // Compute elements 1:j-1 of j-th column.
             if (j > 0) {
-               ae_v_cmove(&tmp->xC[offs + 0], 1, &a->xyC[offs + 0][offs + j], a->stride, "N", j);
+               ae_v_cmove(&tmp->xC[offs], 1, &a->xyC[offs][offs + j], a->stride, "N", j);
                for (i = 0; i < j; i++) {
                   if (i < j - 1) {
                      v = ae_v_cdotproduct(&a->xyC[offs + i][offs + i + 1], 1, "N", &tmp->xC[offs + i + 1], 1, "N", j - i - 1);
@@ -30381,7 +30381,7 @@ static void matinv_cmatrixtrinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
                      a->xyC[offs + i][offs + j] = ae_c_add(v, tmp->xC[offs + i]);
                   }
                }
-               ae_v_cmulc(&a->xyC[offs + 0][offs + j], a->stride, j, ajj);
+               ae_v_cmulc(&a->xyC[offs][offs + j], a->stride, j, ajj);
             }
          }
       } else {
@@ -31735,8 +31735,8 @@ void rmatrixinvupdatesimple(RMatrix *inva, ae_int_t n, ae_int_t updrow, ae_int_t
    NewVector(t2, 0, DT_REAL);
    ae_assert(updrow >= 0 && updrow < n, "RMatrixInvUpdateSimple: incorrect UpdRow!");
    ae_assert(updcolumn >= 0 && updcolumn < n, "RMatrixInvUpdateSimple: incorrect UpdColumn!");
-   ae_vector_set_length(&t1, n - 1 + 1);
-   ae_vector_set_length(&t2, n - 1 + 1);
+   ae_vector_set_length(&t1, n);
+   ae_vector_set_length(&t2, n);
 // T1 = InvA * U
    ae_v_move(t1.xR, 1, &inva->xyR[0][updrow], inva->stride, n);
 // T2 = v*InvA
@@ -31779,8 +31779,8 @@ void rmatrixinvupdaterow(RMatrix *inva, ae_int_t n, ae_int_t updrow, RVector *v)
    ae_frame_make(&_frame_block);
    NewVector(t1, 0, DT_REAL);
    NewVector(t2, 0, DT_REAL);
-   ae_vector_set_length(&t1, n - 1 + 1);
-   ae_vector_set_length(&t2, n - 1 + 1);
+   ae_vector_set_length(&t1, n);
+   ae_vector_set_length(&t2, n);
 // T1 = InvA * U
    ae_v_move(t1.xR, 1, &inva->xyR[0][updrow], inva->stride, n);
 // T2 = v*InvA
@@ -31824,8 +31824,8 @@ void rmatrixinvupdatecolumn(RMatrix *inva, ae_int_t n, ae_int_t updcolumn, RVect
    ae_frame_make(&_frame_block);
    NewVector(t1, 0, DT_REAL);
    NewVector(t2, 0, DT_REAL);
-   ae_vector_set_length(&t1, n - 1 + 1);
-   ae_vector_set_length(&t2, n - 1 + 1);
+   ae_vector_set_length(&t1, n);
+   ae_vector_set_length(&t2, n);
 // T1 = InvA * U
 // Lambda = v * InvA * U
    for (i = 0; i < n; i++) {
@@ -31870,8 +31870,8 @@ void rmatrixinvupdateuv(RMatrix *inva, ae_int_t n, RVector *u, RVector *v) {
    ae_frame_make(&_frame_block);
    NewVector(t1, 0, DT_REAL);
    NewVector(t2, 0, DT_REAL);
-   ae_vector_set_length(&t1, n - 1 + 1);
-   ae_vector_set_length(&t2, n - 1 + 1);
+   ae_vector_set_length(&t1, n);
+   ae_vector_set_length(&t2, n);
 // T1 = InvA * U
 // Lambda = v * T1
    for (i = 0; i < n; i++) {
@@ -32073,7 +32073,7 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
 //     x = L^(-T) * y
    if (problemtype == 1) {
    // Factorize B in T: B = LL'
-      ae_matrix_set_length(&t, n - 1 + 1, n - 1 + 1);
+      ae_matrix_set_length(&t, n, n);
       if (isupperb) {
          for (i = 0; i < n; i++) {
             ae_v_move(&t.xyR[i][i], t.stride, &b->xyR[i][i], 1, n - i);
@@ -32098,7 +32098,7 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
    // Build L^(-1) * A * L^(-T) in R
       ae_vector_set_length(&w1, n + 1);
       ae_vector_set_length(&w2, n + 1);
-      ae_matrix_set_length(r, n - 1 + 1, n - 1 + 1);
+      ae_matrix_set_length(r, n, n);
       for (j = 1; j <= n; j++) {
       // Form w2 = A * l'(j) (here l'(j) is j-th column of L^(-T))
          ae_v_move(&w1.xR[1], 1, t.xyR[j - 1], 1, j);
@@ -32141,7 +32141,7 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
 //     B = U'* U
    if (problemtype == 2 || problemtype == 3) {
    // Factorize B in T: B = U'*U
-      ae_matrix_set_length(&t, n - 1 + 1, n - 1 + 1);
+      ae_matrix_set_length(&t, n, n);
       if (isupperb) {
          for (i = 0; i < n; i++) {
             ae_v_move(&t.xyR[i][i], 1, &b->xyR[i][i], 1, n - i);
@@ -32160,7 +32160,7 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
       ae_vector_set_length(&w1, n + 1);
       ae_vector_set_length(&w2, n + 1);
       ae_vector_set_length(&w3, n + 1);
-      ae_matrix_set_length(r, n - 1 + 1, n - 1 + 1);
+      ae_matrix_set_length(r, n, n);
       for (j = 1; j <= n; j++) {
       // Form w2 = A * u'(j) (here u'(j) is j-th column of U')
          ae_v_move(&w1.xR[1], 1, &t.xyR[j - 1][j - 1], 1, n - j + 1);
@@ -32295,7 +32295,7 @@ bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupper
 // Transform eigenvectors if needed
    if (zneeded != 0) {
    // fill Z with zeros
-      ae_matrix_set_length(z, n - 1 + 1, n - 1 + 1);
+      ae_matrix_set_length(z, n, n);
       for (j = 0; j < n; j++) {
          z->xyR[0][j] = 0.0;
       }

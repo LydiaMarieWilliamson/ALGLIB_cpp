@@ -2345,7 +2345,7 @@ static void optserv_testc0continuity(double f0, double f1, double f2, double f3,
 // This subroutine checks C1 continuity using test #0 (function  values  from
 // the line search log are studied, gradient is not used).
 //
-// An interval between F[StpIdx+0] and F[StpIdx+5]is  tested for  continuity.
+// An interval between F[StpIdx] and F[StpIdx+5] is  tested for  continuity.
 // An normalized error metric (Lipschitz constant growth for the  derivative)
 // for the interval in question is calculated. Values above  50  are  a  good
 // indication of the discontinuity.
@@ -2393,7 +2393,7 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
    ae_assert(monitor->sortedstp.xR[0] == 0.0, "C1ContinuityTest0: integrity check failed");
    ae_assert(monitor->sortedstp.xR[sortedcnt - 1] > 0.0, "C1ContinuityTest0: integrity check failed");
 // Fetch F, noise, Delta's
-   f0 = monitor->f.xR[stpidx + 0];
+   f0 = monitor->f.xR[stpidx];
    f1 = monitor->f.xR[stpidx + 1];
    f2 = monitor->f.xR[stpidx + 2];
    f3 = monitor->f.xR[stpidx + 3];
@@ -2405,7 +2405,7 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
    noise3 = optserv_ognoiselevelf * rmax2(fabs(f3), 1.0);
    noise4 = optserv_ognoiselevelf * rmax2(fabs(f4), 1.0);
    noise5 = optserv_ognoiselevelf * rmax2(fabs(f5), 1.0);
-   delta0 = monitor->sortedstp.xR[stpidx + 1] - monitor->sortedstp.xR[stpidx + 0];
+   delta0 = monitor->sortedstp.xR[stpidx + 1] - monitor->sortedstp.xR[stpidx];
    delta1 = monitor->sortedstp.xR[stpidx + 2] - monitor->sortedstp.xR[stpidx + 1];
    delta2 = monitor->sortedstp.xR[stpidx + 3] - monitor->sortedstp.xR[stpidx + 2];
    delta3 = monitor->sortedstp.xR[stpidx + 4] - monitor->sortedstp.xR[stpidx + 3];
@@ -2496,7 +2496,7 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
 // This  subroutine checks C1 continuity using test #1  (individual  gradient
 // components from the line search log are studied for continuity).
 //
-// An interval between F[StpIdx+0] and F[StpIdx+3]is  tested for  continuity.
+// An interval between F[StpIdx] and F[StpIdx+3] is  tested for  continuity.
 // An normalized error metric (Lipschitz constant growth for the  derivative)
 // for the interval in question is calculated. Values above  50  are  a  good
 // indication of the discontinuity.
@@ -2523,7 +2523,7 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
    ae_assert(monitor->sortedstp.xR[sortedcnt - 1] > 0.0, "C1ContinuityTest1: integrity check failed");
 // Study each component of the gradient in the interval in question
    for (varidx = 0; varidx < n; varidx++) {
-      f0 = monitor->g.xR[(stpidx + 0) * n + varidx];
+      f0 = monitor->g.xR[(stpidx) * n + varidx];
       f1 = monitor->g.xR[(stpidx + 1) * n + varidx];
       f2 = monitor->g.xR[(stpidx + 2) * n + varidx];
       f3 = monitor->g.xR[(stpidx + 3) * n + varidx];
@@ -2531,7 +2531,7 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
       noise1 = optserv_ognoiselevelg * rmax2(fabs(f1), 1.0);
       noise2 = optserv_ognoiselevelg * rmax2(fabs(f2), 1.0);
       noise3 = optserv_ognoiselevelg * rmax2(fabs(f3), 1.0);
-      optserv_testc0continuity(f0, f1, f2, f3, noise0, noise1, noise2, noise3, monitor->sortedstp.xR[stpidx + 1] - monitor->sortedstp.xR[stpidx + 0], monitor->sortedstp.xR[stpidx + 2] - monitor->sortedstp.xR[stpidx + 1], monitor->sortedstp.xR[stpidx + 3] - monitor->sortedstp.xR[stpidx + 2], false, &rating, &lipschitz);
+      optserv_testc0continuity(f0, f1, f2, f3, noise0, noise1, noise2, noise3, monitor->sortedstp.xR[stpidx + 1] - monitor->sortedstp.xR[stpidx], monitor->sortedstp.xR[stpidx + 2] - monitor->sortedstp.xR[stpidx + 1], monitor->sortedstp.xR[stpidx + 3] - monitor->sortedstp.xR[stpidx + 2], false, &rating, &lipschitz);
    // Store results
       if (rating > optserv_ogminrating1) {
       // Store to total report
@@ -2550,7 +2550,7 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
             monitor->nonc1test1strrep.vidx = varidx;
             monitor->nonc1test1strrep.n = n;
             monitor->nonc1test1strrep.cnt = sortedcnt;
-            monitor->nonc1test1strrep.stpidxa = stpidx + 0;
+            monitor->nonc1test1strrep.stpidxa = stpidx;
             monitor->nonc1test1strrep.stpidxb = stpidx + 3;
             vectorsetlengthatleast(&monitor->nonc1test1strrep.x0, n);
             vectorsetlengthatleast(&monitor->nonc1test1strrep.d, n);
@@ -2581,7 +2581,7 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
             monitor->nonc1test1lngrep.vidx = varidx;
             monitor->nonc1test1lngrep.n = n;
             monitor->nonc1test1lngrep.cnt = sortedcnt;
-            monitor->nonc1test1lngrep.stpidxa = stpidx + 0;
+            monitor->nonc1test1lngrep.stpidxa = stpidx;
             monitor->nonc1test1lngrep.stpidxb = stpidx + 3;
             vectorsetlengthatleast(&monitor->nonc1test1lngrep.x0, n);
             vectorsetlengthatleast(&monitor->nonc1test1lngrep.d, n);
@@ -2724,7 +2724,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
    // sources of numerical noise and different false positive scenarios.
       if (funcidx == 0) {
          for (stpidx = 0; stpidx < sortedcnt - 3; stpidx++) {
-            f0 = monitor->f.xR[stpidx + 0];
+            f0 = monitor->f.xR[stpidx];
             f1 = monitor->f.xR[stpidx + 1];
             f2 = monitor->f.xR[stpidx + 2];
             f3 = monitor->f.xR[stpidx + 3];
@@ -2735,7 +2735,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
             if (!(f1 < f0 + (noise0 + noise1) && f1 < f2)) {
                continue;
             }
-            optserv_testc0continuity(f0, f1, f2, f3, noise0, noise1, noise2, noise3, monitor->sortedstp.xR[stpidx + 1] - monitor->sortedstp.xR[stpidx + 0], monitor->sortedstp.xR[stpidx + 2] - monitor->sortedstp.xR[stpidx + 1], monitor->sortedstp.xR[stpidx + 3] - monitor->sortedstp.xR[stpidx + 2], false, &rating, &lipschitz);
+            optserv_testc0continuity(f0, f1, f2, f3, noise0, noise1, noise2, noise3, monitor->sortedstp.xR[stpidx + 1] - monitor->sortedstp.xR[stpidx], monitor->sortedstp.xR[stpidx + 2] - monitor->sortedstp.xR[stpidx + 1], monitor->sortedstp.xR[stpidx + 3] - monitor->sortedstp.xR[stpidx + 2], false, &rating, &lipschitz);
             if (rating > optserv_ogminrating0) {
             // Store to total report
                monitor->rep.nonc0suspected = true;
@@ -2752,7 +2752,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
                   monitor->nonc0strrep.fidx = funcidx;
                   monitor->nonc0strrep.n = n;
                   monitor->nonc0strrep.cnt = sortedcnt;
-                  monitor->nonc0strrep.stpidxa = stpidx + 0;
+                  monitor->nonc0strrep.stpidxa = stpidx;
                   monitor->nonc0strrep.stpidxb = stpidx + 3;
                   vectorsetlengthatleast(&monitor->nonc0strrep.x0, n);
                   vectorsetlengthatleast(&monitor->nonc0strrep.d, n);
@@ -2782,7 +2782,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
                   monitor->nonc0lngrep.fidx = funcidx;
                   monitor->nonc0lngrep.n = n;
                   monitor->nonc0lngrep.cnt = sortedcnt;
-                  monitor->nonc0lngrep.stpidxa = stpidx + 0;
+                  monitor->nonc0lngrep.stpidxa = stpidx;
                   monitor->nonc0lngrep.stpidxb = stpidx + 3;
                   vectorsetlengthatleast(&monitor->nonc0lngrep.x0, n);
                   vectorsetlengthatleast(&monitor->nonc0lngrep.d, n);
@@ -2822,13 +2822,13 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
                continue;
             }
          }
-         optserv_c1continuitytest0(monitor, funcidx, stpidx + 0, sortedcnt);
+         optserv_c1continuitytest0(monitor, funcidx, stpidx, sortedcnt);
          optserv_c1continuitytest0(monitor, funcidx, stpidx + 1, sortedcnt);
       }
    // C1 continuity test #1
       for (stpidx = 0; stpidx < sortedcnt - 3; stpidx++) {
       // Fetch function values from the interval being tested
-         f0 = monitor->f.xR[stpidx + 0];
+         f0 = monitor->f.xR[stpidx];
          f1 = monitor->f.xR[stpidx + 1];
          f2 = monitor->f.xR[stpidx + 2];
          f3 = monitor->f.xR[stpidx + 3];
@@ -2967,7 +2967,7 @@ Spawn:
             idx = -1;
             vlargest = 0.0;
             for (j = 0; j < monitor->probingnstepsstored - 2; j++) {
-               v0 = (monitor->probingvalues.xyR[j + 1][0] - monitor->probingvalues.xyR[j + 0][0]) / (monitor->probingsteps.xR[j + 1] - monitor->probingsteps.xR[j + 0] + machineepsilon);
+               v0 = (monitor->probingvalues.xyR[j + 1][0] - monitor->probingvalues.xyR[j][0]) / (monitor->probingsteps.xR[j + 1] - monitor->probingsteps.xR[j] + machineepsilon);
                v1 = (monitor->probingvalues.xyR[j + 2][0] - monitor->probingvalues.xyR[j + 1][0]) / (monitor->probingsteps.xR[j + 2] - monitor->probingsteps.xR[j + 1] + machineepsilon);
                v = fabs(v0 - v1);
                if (idx < 0 || v > vlargest) {
@@ -2975,10 +2975,10 @@ Spawn:
                   vlargest = v;
                }
             }
-            if (monitor->probingsteps.xR[idx + 2] - monitor->probingsteps.xR[idx + 1] > monitor->probingsteps.xR[idx + 1] - monitor->probingsteps.xR[idx + 0]) {
+            if (monitor->probingsteps.xR[idx + 2] - monitor->probingsteps.xR[idx + 1] > monitor->probingsteps.xR[idx + 1] - monitor->probingsteps.xR[idx]) {
                monitor->probingstp = 0.5 * (monitor->probingsteps.xR[idx + 2] + monitor->probingsteps.xR[idx + 1]);
             } else {
-               monitor->probingstp = 0.5 * (monitor->probingsteps.xR[idx + 1] + monitor->probingsteps.xR[idx + 0]);
+               monitor->probingstp = 0.5 * (monitor->probingsteps.xR[idx + 1] + monitor->probingsteps.xR[idx]);
             }
          }
       }
@@ -25649,9 +25649,9 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
       }
    // Set up slack variables
       if (i < nec) {
-         subsolver->sparseefflc.vals.xR[offs + 0] = -1.0;
+         subsolver->sparseefflc.vals.xR[offs] = -1.0;
          subsolver->sparseefflc.vals.xR[offs + 1] = 1.0;
-         subsolver->sparseefflc.idx.xZ[offs + 0] = offsslackec + 2 * i + 0;
+         subsolver->sparseefflc.idx.xZ[offs] = offsslackec + 2 * i;
          subsolver->sparseefflc.idx.xZ[offs + 1] = offsslackec + 2 * i + 1;
          offs += 2;
       } else {
@@ -25670,15 +25670,15 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
       if (i < nec) {
          subsolver->cural.xR[i] = -v;
          subsolver->curau.xR[i] = -v;
-         subsolver->curbndl.xR[offsslackec + 2 * i + 0] = 0.0;
+         subsolver->curbndl.xR[offsslackec + 2 * i] = 0.0;
          subsolver->curbndl.xR[offsslackec + 2 * i + 1] = 0.0;
-         subsolver->curbndu.xR[offsslackec + 2 * i + 0] = fabs(v);
+         subsolver->curbndu.xR[offsslackec + 2 * i] = fabs(v);
          subsolver->curbndu.xR[offsslackec + 2 * i + 1] = fabs(v);
          if (v >= 0.0) {
-            subsolver->d0.xR[offsslackec + 2 * i + 0] = fabs(v);
+            subsolver->d0.xR[offsslackec + 2 * i] = fabs(v);
             subsolver->d0.xR[offsslackec + 2 * i + 1] = 0.0;
          } else {
-            subsolver->d0.xR[offsslackec + 2 * i + 0] = 0.0;
+            subsolver->d0.xR[offsslackec + 2 * i] = 0.0;
             subsolver->d0.xR[offsslackec + 2 * i + 1] = fabs(v);
          }
       } else {
@@ -25710,9 +25710,9 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
       }
       if (i < nlec) {
       // Add slack terms for equality constraints
-         subsolver->sparseefflc.vals.xR[offs + 0] = -1.0;
+         subsolver->sparseefflc.vals.xR[offs] = -1.0;
          subsolver->sparseefflc.vals.xR[offs + 1] = 1.0;
-         subsolver->sparseefflc.idx.xZ[offs + 0] = offsslacknlec + 2 * i + 0;
+         subsolver->sparseefflc.idx.xZ[offs] = offsslacknlec + 2 * i;
          subsolver->sparseefflc.idx.xZ[offs + 1] = offsslacknlec + 2 * i + 1;
          offs += 2;
       } else {
@@ -25728,15 +25728,15 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
       // Equality constraint
          subsolver->cural.xR[subsolver->sparseefflc.m + i] = -v;
          subsolver->curau.xR[subsolver->sparseefflc.m + i] = -v;
-         subsolver->curbndl.xR[offsslacknlec + 2 * i + 0] = 0.0;
+         subsolver->curbndl.xR[offsslacknlec + 2 * i] = 0.0;
          subsolver->curbndl.xR[offsslacknlec + 2 * i + 1] = 0.0;
-         subsolver->curbndu.xR[offsslacknlec + 2 * i + 0] = fabs(v);
+         subsolver->curbndu.xR[offsslacknlec + 2 * i] = fabs(v);
          subsolver->curbndu.xR[offsslacknlec + 2 * i + 1] = fabs(v);
          if (v >= 0.0) {
-            subsolver->d0.xR[offsslacknlec + 2 * i + 0] = fabs(v);
+            subsolver->d0.xR[offsslacknlec + 2 * i] = fabs(v);
             subsolver->d0.xR[offsslacknlec + 2 * i + 1] = 0.0;
          } else {
-            subsolver->d0.xR[offsslacknlec + 2 * i + 0] = 0.0;
+            subsolver->d0.xR[offsslacknlec + 2 * i] = 0.0;
             subsolver->d0.xR[offsslacknlec + 2 * i + 1] = fabs(v);
          }
       } else {
@@ -32777,9 +32777,9 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       }
    // Set up slack variables
       if (i < nec) {
-         subsolver->sparseefflc.vals.xR[offs + 0] = -1.0;
+         subsolver->sparseefflc.vals.xR[offs] = -1.0;
          subsolver->sparseefflc.vals.xR[offs + 1] = 1.0;
-         subsolver->sparseefflc.idx.xZ[offs + 0] = offsslackec + 2 * i + 0;
+         subsolver->sparseefflc.idx.xZ[offs] = offsslackec + 2 * i;
          subsolver->sparseefflc.idx.xZ[offs + 1] = offsslackec + 2 * i + 1;
          offs += 2;
       } else {
@@ -32798,9 +32798,9 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       if (i < nec) {
          subsolver->cural.xR[i] = -v;
          subsolver->curau.xR[i] = -v;
-         subsolver->curbndl.xR[offsslackec + 2 * i + 0] = 0.0;
+         subsolver->curbndl.xR[offsslackec + 2 * i] = 0.0;
          subsolver->curbndl.xR[offsslackec + 2 * i + 1] = 0.0;
-         subsolver->curbndu.xR[offsslackec + 2 * i + 0] = fabs(v);
+         subsolver->curbndu.xR[offsslackec + 2 * i] = fabs(v);
          subsolver->curbndu.xR[offsslackec + 2 * i + 1] = fabs(v);
       } else {
          subsolver->cural.xR[i] = -INFINITY;
@@ -32830,9 +32830,9 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       }
       if (i < nlec) {
       // Add slack terms for equality constraints
-         subsolver->sparseefflc.vals.xR[offs + 0] = -1.0;
+         subsolver->sparseefflc.vals.xR[offs] = -1.0;
          subsolver->sparseefflc.vals.xR[offs + 1] = 1.0;
-         subsolver->sparseefflc.idx.xZ[offs + 0] = offsslacknlec + 2 * i + 0;
+         subsolver->sparseefflc.idx.xZ[offs] = offsslacknlec + 2 * i;
          subsolver->sparseefflc.idx.xZ[offs + 1] = offsslacknlec + 2 * i + 1;
          offs += 2;
       } else {
@@ -32848,9 +32848,9 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       // Equality constraint
          subsolver->cural.xR[subsolver->sparseefflc.m + i] = -v;
          subsolver->curau.xR[subsolver->sparseefflc.m + i] = -v;
-         subsolver->curbndl.xR[offsslacknlec + 2 * i + 0] = 0.0;
+         subsolver->curbndl.xR[offsslacknlec + 2 * i] = 0.0;
          subsolver->curbndl.xR[offsslacknlec + 2 * i + 1] = 0.0;
-         subsolver->curbndu.xR[offsslacknlec + 2 * i + 0] = fabs(v);
+         subsolver->curbndu.xR[offsslacknlec + 2 * i] = fabs(v);
          subsolver->curbndu.xR[offsslacknlec + 2 * i + 1] = fabs(v);
       } else {
       // Inequality constraint
@@ -35823,7 +35823,7 @@ static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, 
       }
       if (hasbndl->xB[i]) {
          minnlcinequalityshiftfunction((x->xR[i] - bndl->xR[i]) * rho + 1, &p, &dp, &d2p);
-         bufd->xR[i] += nubc->xR[2 * i + 0] * d2p * rho;
+         bufd->xR[i] += nubc->xR[2 * i] * d2p * rho;
       }
       if (hasbndu->xB[i]) {
          minnlcinequalityshiftfunction((bndu->xR[i] - x->xR[i]) * rho + 1, &p, &dp, &d2p);
@@ -35933,8 +35933,8 @@ static void minnlc_penaltybc(RVector *x, RVector *bndl, BVector *hasbndl, RVecto
       if (hasbndl->xB[i] && hasbndu->xB[i] && bndl->xR[i] == bndu->xR[i]) {
       // I-th boundary constraint is of equality-type
          minnlcequalitypenaltyfunction((x->xR[i] - bndl->xR[i]) * rho, &p, &dp, &d2p);
-         *f += p / rho - nubc->xR[2 * i + 0] * (x->xR[i] - bndl->xR[i]);
-         g->xR[i] += dp - nubc->xR[2 * i + 0];
+         *f += p / rho - nubc->xR[2 * i] * (x->xR[i] - bndl->xR[i]);
+         g->xR[i] += dp - nubc->xR[2 * i];
          continue;
       }
       if (hasbndl->xB[i]) {
@@ -35943,8 +35943,8 @@ static void minnlc_penaltybc(RVector *x, RVector *bndl, BVector *hasbndl, RVecto
          *f += rho * p;
          g->xR[i] += rho * dp;
          minnlcinequalityshiftfunction((x->xR[i] - bndl->xR[i]) * rho + 1, &p, &dp, &d2p);
-         *f += p / rho * nubc->xR[2 * i + 0];
-         g->xR[i] += dp * nubc->xR[2 * i + 0];
+         *f += p / rho * nubc->xR[2 * i];
+         g->xR[i] += dp * nubc->xR[2 * i];
       }
       if (hasbndu->xB[i]) {
       // Handle upper bound
@@ -36168,13 +36168,13 @@ Spawn:
    vectorsetlengthatleast(&state->xk1, n);
    vectorsetlengthatleast(&state->gk1, n);
    for (i = 0; i < n; i++) {
-      state->nubc.xR[2 * i + 0] = 0.0;
+      state->nubc.xR[2 * i] = 0.0;
       state->nubc.xR[2 * i + 1] = 0.0;
       if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
          continue;
       }
       if (state->hasbndl.xB[i]) {
-         state->nubc.xR[2 * i + 0] = state->initialinequalitymultiplier;
+         state->nubc.xR[2 * i] = state->initialinequalitymultiplier;
       }
       if (state->hasbndu.xB[i]) {
          state->nubc.xR[2 * i + 1] = state->initialinequalitymultiplier;
@@ -36346,7 +36346,7 @@ Spawn:
       // constraints.
          if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
             minnlcequalitypenaltyfunction((state->xc.xR[i] - state->scaledbndl.xR[i]) * state->rho, &p, &dp, &d2p);
-            state->nubc.xR[2 * i + 0] = rboundval(state->nubc.xR[2 * i + 0] - dp, -minnlc_maxlagmult, minnlc_maxlagmult);
+            state->nubc.xR[2 * i] = rboundval(state->nubc.xR[2 * i] - dp, -minnlc_maxlagmult, minnlc_maxlagmult);
             continue;
          }
       // Process coefficients corresponding to inequality-type
@@ -36358,7 +36358,7 @@ Spawn:
             v = fabs(dp);
             v = rmin2(v, minnlc_aulmaxgrowth);
             v = rmax2(v, 1 / minnlc_aulmaxgrowth);
-            state->nubc.xR[2 * i + 0] = rboundval(state->nubc.xR[2 * i + 0] * v, -minnlc_maxlagmult, minnlc_maxlagmult);
+            state->nubc.xR[2 * i] = rboundval(state->nubc.xR[2 * i] * v, -minnlc_maxlagmult, minnlc_maxlagmult);
          }
          if (state->hasbndu.xB[i]) {
             minnlcinequalityshiftfunction((state->scaledbndu.xR[i] - state->xc.xR[i]) * state->rho + 1, &p, &dp, &d2p);

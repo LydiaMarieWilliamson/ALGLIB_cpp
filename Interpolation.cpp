@@ -1190,7 +1190,7 @@ void idwtscalcbuf(idwmodel *s, idwcalcbuffer *buf, RVector *x, RVector *y) {
          // Important special case, fast evaluation possible
             v = vv * vv;
             v = (1 - v) * (1 - v) / (v + lambdacur);
-            f = buf->tsxy.xyR[i][nx + 0];
+            f = buf->tsxy.xyR[i][nx];
             wf0 += v * f;
             ws0 += v;
             vv *= invrdecay;
@@ -4164,12 +4164,12 @@ void spline1dbuildlinear(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant
       c->x.xR[i] = x->xR[i];
    }
    for (i = 0; i < n - 1; i++) {
-      c->c.xR[4 * i + 0] = y->xR[i];
+      c->c.xR[4 * i] = y->xR[i];
       c->c.xR[4 * i + 1] = (y->xR[i + 1] - y->xR[i]) / (x->xR[i + 1] - x->xR[i]);
       c->c.xR[4 * i + 2] = 0.0;
       c->c.xR[4 * i + 3] = 0.0;
    }
-   c->c.xR[4 * (n - 1) + 0] = y->xR[n - 1];
+   c->c.xR[4 * (n - 1)] = y->xR[n - 1];
    c->c.xR[4 * (n - 1) + 1] = c->c.xR[4 * (n - 2) + 1];
    ae_frame_leave();
 }
@@ -4231,12 +4231,12 @@ void spline1dbuildhermite(RVector *x, RVector *y, RVector *d, ae_int_t n, spline
       delta = x->xR[i + 1] - x->xR[i];
       delta2 = sqr(delta);
       delta3 = delta * delta2;
-      c->c.xR[4 * i + 0] = y->xR[i];
+      c->c.xR[4 * i] = y->xR[i];
       c->c.xR[4 * i + 1] = d->xR[i];
       c->c.xR[4 * i + 2] = (3 * (y->xR[i + 1] - y->xR[i]) - 2 * d->xR[i] * delta - d->xR[i + 1] * delta) / delta2;
       c->c.xR[4 * i + 3] = (2 * (y->xR[i] - y->xR[i + 1]) + d->xR[i] * delta + d->xR[i + 1] * delta) / delta3;
    }
-   c->c.xR[4 * (n - 1) + 0] = y->xR[n - 1];
+   c->c.xR[4 * (n - 1)] = y->xR[n - 1];
    c->c.xR[4 * (n - 1) + 1] = d->xR[n - 1];
    ae_frame_leave();
 }
@@ -5467,7 +5467,7 @@ double spline1dcalc(spline1dinterpolant *c, double x) {
    }
 // Binary search in the [ x[0], ..., x[n-2] ] (x[n-1] is not included)
    l = 0;
-   r = c->n - 2 + 1;
+   r = c->n - 1;
    while (l != r - 1) {
       m = (l + r) / 2;
       if (c->x.xR[m] >= x) {
@@ -5518,7 +5518,7 @@ void spline1ddiff(spline1dinterpolant *c, double x, double *s, double *ds, doubl
    }
 // Binary search
    l = 0;
-   r = c->n - 2 + 1;
+   r = c->n - 1;
    while (l != r - 1) {
       m = (l + r) / 2;
       if (c->x.xR[m] >= x) {
@@ -5587,7 +5587,7 @@ void spline1dunpack(spline1dinterpolant *c, ae_int_t *n, RMatrix *tbl) {
    ae_int_t j;
    *n = 0;
    SetMatrix(tbl);
-   ae_matrix_set_length(tbl, c->n - 2 + 1, 2 + c->k + 1);
+   ae_matrix_set_length(tbl, c->n - 1, 2 + c->k + 1);
    *n = c->n;
 // Fill
    for (i = 0; i < *n - 1; i++) {
@@ -5679,7 +5679,7 @@ void spline1dlintransy(spline1dinterpolant *c, double a, double b) {
          c->c.xR[4 * i + j] *= a;
       }
    }
-   c->c.xR[4 * (n - 1) + 0] = a * c->c.xR[4 * (n - 1) + 0] + b;
+   c->c.xR[4 * (n - 1)] = a * c->c.xR[4 * (n - 1)] + b;
    c->c.xR[4 * (n - 1) + 1] *= a;
 }
 
@@ -5736,7 +5736,7 @@ double spline1dintegrate(spline1dinterpolant *c, double x) {
    }
 // Binary search in the [ x[0], ..., x[n-2] ] (x[n-1] is not included)
    l = 0;
-   r = n - 2 + 1;
+   r = n - 1;
    while (l != r - 1) {
       m = (l + r) / 2;
       if (c->x.xR[m] >= x) {
@@ -5902,7 +5902,7 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
 // Compute total-sum-of-squares (needed later for R2 coefficient).
    ae_vector_set_length(&xywork, 2 * n);
    for (i = 0; i < n; i++) {
-      xywork.xR[2 * i + 0] = (x->xR[i] - xa) / (xb - xa);
+      xywork.xR[2 * i] = (x->xR[i] - xa) / (xb - xa);
       xywork.xR[2 * i + 1] = y->xR[i];
    }
    buildpriorterm1(&xywork, n, 1, 1, 1, 0.0, &vterm);
@@ -5941,11 +5941,11 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
    scalepenaltyby = 1 / sqrt((double)m);
    for (i = 0; i < n; i++) {
    // Generate design matrix row #I which corresponds to I-th dataset point
-      k = ifloor(rboundval(xywork.xR[2 * i + 0] * (m - 1), 0.0, (double)(m - 1)));
+      k = ifloor(rboundval(xywork.xR[2 * i] * (m - 1), 0.0, (double)(m - 1)));
       k0 = imax2(k - (bfrad - 1), 0);
       k1 = imin2(k + bfrad, m - 1);
       for (j = k0; j <= k1; j++) {
-         sparseset(&av, i, j, spline1dcalc(&basis1, xywork.xR[2 * i + 0] - (double)j / (m - 1)) * scaletargetsby);
+         sparseset(&av, i, j, spline1dcalc(&basis1, xywork.xR[2 * i] - (double)j / (m - 1)) * scaletargetsby);
       }
       targets.xR[i] = xywork.xR[2 * i + 1] * scaletargetsby;
    }
@@ -13584,13 +13584,13 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
       bl.xR[j] = cx->xR[j] - safeguard * spread;
       bu.xR[j] = cx->xR[j] + safeguard * spread;
    }
-   pcr.xR[nx + 0] = *rlo;
+   pcr.xR[nx] = *rlo;
    pcr.xR[nx + 1] = *rhi;
-   scr.xR[nx + 0] = 0.5 * spread;
+   scr.xR[nx] = 0.5 * spread;
    scr.xR[nx + 1] = 0.5 * spread;
-   bl.xR[nx + 0] = 0.0;
+   bl.xR[nx] = 0.0;
    bl.xR[nx + 1] = 0.0;
-   bu.xR[nx + 0] = safeguard * (*rhi);
+   bu.xR[nx] = safeguard * (*rhi);
    bu.xR[nx + 1] = safeguard * (*rhi);
 // First branch: least squares fitting vs MI/MC/MZ fitting
    if (problemtype == 0) {
@@ -13674,11 +13674,11 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
          for (minnlcrestartfrom(&nlcstate, &pcr); minnlciteration(&nlcstate); )
             if (nlcstate.needfij) {
                rep->nfev++;
-               nlcstate.fi.xR[0] = vhi * nlcstate.x.xR[nx + 1] - vlo * nlcstate.x.xR[nx + 0];
+               nlcstate.fi.xR[0] = vhi * nlcstate.x.xR[nx + 1] - vlo * nlcstate.x.xR[nx];
                for (j = 0; j < nx; j++) {
                   nlcstate.j.xyR[0][j] = 0.0;
                }
-               nlcstate.j.xyR[0][nx + 0] = -1 * vlo;
+               nlcstate.j.xyR[0][nx] = -1 * vlo;
                nlcstate.j.xyR[0][nx + 1] = 1 * vhi;
                for (i = 0; i < npoints; i++) {
                   suboffset = 0;
@@ -13692,7 +13692,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                      }
                      vv = nlcstate.x.xR[nx + 1];
                      v -= vv * vv;
-                     nlcstate.j.xyR[dstrow][nx + 0] = 0.0;
+                     nlcstate.j.xyR[dstrow][nx] = 0.0;
                      nlcstate.j.xyR[dstrow][nx + 1] = -2 * vv;
                      nlcstate.fi.xR[dstrow] = v;
                      suboffset++;
@@ -13705,9 +13705,9 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                         v -= vv * vv;
                         nlcstate.j.xyR[dstrow][j] = -2 * vv;
                      }
-                     vv = nlcstate.x.xR[nx + 0];
+                     vv = nlcstate.x.xR[nx];
                      v += vv * vv;
-                     nlcstate.j.xyR[dstrow][nx + 0] = 2 * vv;
+                     nlcstate.j.xyR[dstrow][nx] = 2 * vv;
                      nlcstate.j.xyR[dstrow][nx + 1] = 0.0;
                      nlcstate.fi.xR[dstrow] = v;
                      suboffset++;
@@ -13772,7 +13772,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                *rhi = rmax2(*rhi, v);
                *rlo = rmin2(*rlo, v);
             }
-            pcr.xR[nx + 0] = *rlo * 0.99999;
+            pcr.xR[nx] = *rlo * 0.99999;
             pcr.xR[nx + 1] = *rhi / 0.99999;
          // Generate matrix of linear constraints
             for (i = 0; i < npoints; i++) {
@@ -13787,7 +13787,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                   for (j = 0; j < nx; j++) {
                      cmatrix.xyR[dstrow][j] = pcr.xR[j] / 2 - xy->xyR[i][j];
                   }
-                  cmatrix.xyR[dstrow][nx + 0] = 0.0;
+                  cmatrix.xyR[dstrow][nx] = 0.0;
                   cmatrix.xyR[dstrow][nx + 1] = -*rhi / 2;
                   cmatrix.xyR[dstrow][nx + 2] = bi;
                   ct.xZ[dstrow] = -1;
@@ -13798,7 +13798,7 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
                   for (j = 0; j < nx; j++) {
                      cmatrix.xyR[dstrow][j] = -(pcr.xR[j] / 2 - xy->xyR[i][j]);
                   }
-                  cmatrix.xyR[dstrow][nx + 0] = *rlo / 2;
+                  cmatrix.xyR[dstrow][nx] = *rlo / 2;
                   cmatrix.xyR[dstrow][nx + 1] = 0.0;
                   cmatrix.xyR[dstrow][nx + 2] = -bi;
                   ct.xZ[dstrow] = -1;
@@ -13814,11 +13814,11 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
             for (minbleicrestartfrom(&blcstate, &pcr); minbleiciteration(&blcstate); )
                if (blcstate.needfg) {
                   rep->nfev++;
-                  blcstate.f = vhi * blcstate.x.xR[nx + 1] - vlo * blcstate.x.xR[nx + 0];
+                  blcstate.f = vhi * blcstate.x.xR[nx + 1] - vlo * blcstate.x.xR[nx];
                   for (j = 0; j < nx; j++) {
                      blcstate.g.xR[j] = 0.0;
                   }
-                  blcstate.g.xR[nx + 0] = -1 * vlo;
+                  blcstate.g.xR[nx] = -1 * vlo;
                   blcstate.g.xR[nx + 1] = 1 * vhi;
                }
             minbleicresults(&blcstate, &pcr, &blcrep);
@@ -16799,7 +16799,7 @@ void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae
                         v = pbuf->expbuf1.xR[j] * pbuf->expbuf2.xR[k];
                      // Optimized for NY=1
                         if (s->ny == 1) {
-                           w0 = s->wr.xyR[tg][1 + t * s->ny + 0];
+                           w0 = s->wr.xyR[tg][1 + t * s->ny];
                            ubnd = blocks0->xZ[i0 + 1] - 1;
                            for (i = blocks0->xZ[i0]; i <= ubnd; i++) {
                               basisfuncval = pbuf->expbuf0.xR[i] * v;
@@ -16810,12 +16810,12 @@ void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae
                         }
                      // Optimized for NY=2
                         if (s->ny == 2) {
-                           w0 = s->wr.xyR[tg][1 + t * s->ny + 0];
+                           w0 = s->wr.xyR[tg][1 + t * s->ny];
                            w1 = s->wr.xyR[tg][1 + t * s->ny + 1];
                            ubnd = blocks0->xZ[i0 + 1] - 1;
                            for (i = blocks0->xZ[i0]; i <= ubnd; i++) {
                               basisfuncval = pbuf->expbuf0.xR[i] * v;
-                              y->xR[dstoffs + 0] += basisfuncval * w0;
+                              y->xR[dstoffs] += basisfuncval * w0;
                               y->xR[dstoffs + 1] += basisfuncval * w1;
                               dstoffs += 2;
                            }
@@ -16823,13 +16823,13 @@ void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae
                         }
                      // Optimized for NY=3
                         if (s->ny == 3) {
-                           w0 = s->wr.xyR[tg][1 + t * s->ny + 0];
+                           w0 = s->wr.xyR[tg][1 + t * s->ny];
                            w1 = s->wr.xyR[tg][1 + t * s->ny + 1];
                            w2 = s->wr.xyR[tg][1 + t * s->ny + 2];
                            ubnd = blocks0->xZ[i0 + 1] - 1;
                            for (i = blocks0->xZ[i0]; i <= ubnd; i++) {
                               basisfuncval = pbuf->expbuf0.xR[i] * v;
-                              y->xR[dstoffs + 0] += basisfuncval * w0;
+                              y->xR[dstoffs] += basisfuncval * w0;
                               y->xR[dstoffs + 1] += basisfuncval * w1;
                               y->xR[dstoffs + 2] += basisfuncval * w2;
                               dstoffs += 3;
@@ -18744,9 +18744,9 @@ void spline2dunpackv(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, ae_int_t 
                y3 = c->f.xR[*d * (*n * (i + 1) + (j + 1)) + k];
                y4 = c->f.xR[*d * (*n * (i + 1) + j) + k];
                tbl->xyR[p][4] = y1;
-               tbl->xyR[p][4 + 1 * 4 + 0] = y2 - y1;
-               tbl->xyR[p][4 + 0 * 4 + 1] = y4 - y1;
-               tbl->xyR[p][4 + 1 * 4 + 1] = y3 - y2 - y4 + y1;
+               tbl->xyR[p][8] = y2 - y1;
+               tbl->xyR[p][5] = y4 - y1;
+               tbl->xyR[p][9] = y3 - y2 - y4 + y1;
             }
          // Bicubic interpolation
             if (c->stype == -3) {
@@ -18754,22 +18754,22 @@ void spline2dunpackv(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, ae_int_t 
                s2 = *d * (*n * i + (j + 1)) + k;
                s3 = *d * (*n * (i + 1) + (j + 1)) + k;
                s4 = *d * (*n * (i + 1) + j) + k;
-               tbl->xyR[p][4 + 0 * 4 + 0] = c->f.xR[s1];
-               tbl->xyR[p][4 + 0 * 4 + 1] = c->f.xR[sfy + s1] / du;
-               tbl->xyR[p][4 + 0 * 4 + 2] = -3 * c->f.xR[s1] + 3 * c->f.xR[s4] - 2 * c->f.xR[sfy + s1] / du - c->f.xR[sfy + s4] / du;
-               tbl->xyR[p][4 + 0 * 4 + 3] = 2 * c->f.xR[s1] - 2 * c->f.xR[s4] + c->f.xR[sfy + s1] / du + c->f.xR[sfy + s4] / du;
-               tbl->xyR[p][4 + 1 * 4 + 0] = c->f.xR[sfx + s1] / dt;
-               tbl->xyR[p][4 + 1 * 4 + 1] = c->f.xR[sfxy + s1] / (dt * du);
-               tbl->xyR[p][4 + 1 * 4 + 2] = -3 * c->f.xR[sfx + s1] / dt + 3 * c->f.xR[sfx + s4] / dt - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
-               tbl->xyR[p][4 + 1 * 4 + 3] = 2 * c->f.xR[sfx + s1] / dt - 2 * c->f.xR[sfx + s4] / dt + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
-               tbl->xyR[p][4 + 2 * 4 + 0] = -3 * c->f.xR[s1] + 3 * c->f.xR[s2] - 2 * c->f.xR[sfx + s1] / dt - c->f.xR[sfx + s2] / dt;
-               tbl->xyR[p][4 + 2 * 4 + 1] = -3 * c->f.xR[sfy + s1] / du + 3 * c->f.xR[sfy + s2] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du);
-               tbl->xyR[p][4 + 2 * 4 + 2] = 9 * c->f.xR[s1] - 9 * c->f.xR[s2] + 9 * c->f.xR[s3] - 9 * c->f.xR[s4] + 6 * c->f.xR[sfx + s1] / dt + 3 * c->f.xR[sfx + s2] / dt - 3 * c->f.xR[sfx + s3] / dt - 6 * c->f.xR[sfx + s4] / dt + 6 * c->f.xR[sfy + s1] / du - 6 * c->f.xR[sfy + s2] / du - 3 * c->f.xR[sfy + s3] / du + 3 * c->f.xR[sfy + s4] / du + 4 * c->f.xR[sfxy + s1] / (dt * du) + 2 * c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + 2 * c->f.xR[sfxy + s4] / (dt * du);
-               tbl->xyR[p][4 + 2 * 4 + 3] = -6 * c->f.xR[s1] + 6 * c->f.xR[s2] - 6 * c->f.xR[s3] + 6 * c->f.xR[s4] - 4 * c->f.xR[sfx + s1] / dt - 2 * c->f.xR[sfx + s2] / dt + 2 * c->f.xR[sfx + s3] / dt + 4 * c->f.xR[sfx + s4] / dt - 3 * c->f.xR[sfy + s1] / du + 3 * c->f.xR[sfy + s2] / du + 3 * c->f.xR[sfy + s3] / du - 3 * c->f.xR[sfy + s4] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - 2 * c->f.xR[sfxy + s4] / (dt * du);
-               tbl->xyR[p][4 + 3 * 4 + 0] = 2 * c->f.xR[s1] - 2 * c->f.xR[s2] + c->f.xR[sfx + s1] / dt + c->f.xR[sfx + s2] / dt;
-               tbl->xyR[p][4 + 3 * 4 + 1] = 2 * c->f.xR[sfy + s1] / du - 2 * c->f.xR[sfy + s2] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du);
-               tbl->xyR[p][4 + 3 * 4 + 2] = -6 * c->f.xR[s1] + 6 * c->f.xR[s2] - 6 * c->f.xR[s3] + 6 * c->f.xR[s4] - 3 * c->f.xR[sfx + s1] / dt - 3 * c->f.xR[sfx + s2] / dt + 3 * c->f.xR[sfx + s3] / dt + 3 * c->f.xR[sfx + s4] / dt - 4 * c->f.xR[sfy + s1] / du + 4 * c->f.xR[sfy + s2] / du + 2 * c->f.xR[sfy + s3] / du - 2 * c->f.xR[sfy + s4] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - 2 * c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
-               tbl->xyR[p][4 + 3 * 4 + 3] = 4 * c->f.xR[s1] - 4 * c->f.xR[s2] + 4 * c->f.xR[s3] - 4 * c->f.xR[s4] + 2 * c->f.xR[sfx + s1] / dt + 2 * c->f.xR[sfx + s2] / dt - 2 * c->f.xR[sfx + s3] / dt - 2 * c->f.xR[sfx + s4] / dt + 2 * c->f.xR[sfy + s1] / du - 2 * c->f.xR[sfy + s2] / du - 2 * c->f.xR[sfy + s3] / du + 2 * c->f.xR[sfy + s4] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
+               tbl->xyR[p][4] = c->f.xR[s1];
+               tbl->xyR[p][5] = c->f.xR[sfy + s1] / du;
+               tbl->xyR[p][6] = -3 * c->f.xR[s1] + 3 * c->f.xR[s4] - 2 * c->f.xR[sfy + s1] / du - c->f.xR[sfy + s4] / du;
+               tbl->xyR[p][7] = 2 * c->f.xR[s1] - 2 * c->f.xR[s4] + c->f.xR[sfy + s1] / du + c->f.xR[sfy + s4] / du;
+               tbl->xyR[p][8] = c->f.xR[sfx + s1] / dt;
+               tbl->xyR[p][9] = c->f.xR[sfxy + s1] / (dt * du);
+               tbl->xyR[p][10] = -3 * c->f.xR[sfx + s1] / dt + 3 * c->f.xR[sfx + s4] / dt - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
+               tbl->xyR[p][11] = 2 * c->f.xR[sfx + s1] / dt - 2 * c->f.xR[sfx + s4] / dt + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
+               tbl->xyR[p][12] = -3 * c->f.xR[s1] + 3 * c->f.xR[s2] - 2 * c->f.xR[sfx + s1] / dt - c->f.xR[sfx + s2] / dt;
+               tbl->xyR[p][13] = -3 * c->f.xR[sfy + s1] / du + 3 * c->f.xR[sfy + s2] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du);
+               tbl->xyR[p][14] = 9 * c->f.xR[s1] - 9 * c->f.xR[s2] + 9 * c->f.xR[s3] - 9 * c->f.xR[s4] + 6 * c->f.xR[sfx + s1] / dt + 3 * c->f.xR[sfx + s2] / dt - 3 * c->f.xR[sfx + s3] / dt - 6 * c->f.xR[sfx + s4] / dt + 6 * c->f.xR[sfy + s1] / du - 6 * c->f.xR[sfy + s2] / du - 3 * c->f.xR[sfy + s3] / du + 3 * c->f.xR[sfy + s4] / du + 4 * c->f.xR[sfxy + s1] / (dt * du) + 2 * c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + 2 * c->f.xR[sfxy + s4] / (dt * du);
+               tbl->xyR[p][15] = -6 * c->f.xR[s1] + 6 * c->f.xR[s2] - 6 * c->f.xR[s3] + 6 * c->f.xR[s4] - 4 * c->f.xR[sfx + s1] / dt - 2 * c->f.xR[sfx + s2] / dt + 2 * c->f.xR[sfx + s3] / dt + 4 * c->f.xR[sfx + s4] / dt - 3 * c->f.xR[sfy + s1] / du + 3 * c->f.xR[sfy + s2] / du + 3 * c->f.xR[sfy + s3] / du - 3 * c->f.xR[sfy + s4] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - 2 * c->f.xR[sfxy + s4] / (dt * du);
+               tbl->xyR[p][16] = 2 * c->f.xR[s1] - 2 * c->f.xR[s2] + c->f.xR[sfx + s1] / dt + c->f.xR[sfx + s2] / dt;
+               tbl->xyR[p][17] = 2 * c->f.xR[sfy + s1] / du - 2 * c->f.xR[sfy + s2] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du);
+               tbl->xyR[p][18] = -6 * c->f.xR[s1] + 6 * c->f.xR[s2] - 6 * c->f.xR[s3] + 6 * c->f.xR[s4] - 3 * c->f.xR[sfx + s1] / dt - 3 * c->f.xR[sfx + s2] / dt + 3 * c->f.xR[sfx + s3] / dt + 3 * c->f.xR[sfx + s4] / dt - 4 * c->f.xR[sfy + s1] / du + 4 * c->f.xR[sfy + s2] / du + 2 * c->f.xR[sfy + s3] / du - 2 * c->f.xR[sfy + s4] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - 2 * c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
+               tbl->xyR[p][19] = 4 * c->f.xR[s1] - 4 * c->f.xR[s2] + 4 * c->f.xR[s3] - 4 * c->f.xR[s4] + 2 * c->f.xR[sfx + s1] / dt + 2 * c->f.xR[sfx + s2] / dt - 2 * c->f.xR[sfx + s3] / dt - 2 * c->f.xR[sfx + s4] / dt + 2 * c->f.xR[sfy + s1] / du - 2 * c->f.xR[sfy + s2] / du - 2 * c->f.xR[sfy + s3] / du + 2 * c->f.xR[sfy + s4] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
             }
          // Rescale Cij
             for (ci = 0; ci <= 3; ci++) {
@@ -18843,9 +18843,9 @@ void spline2dunpack(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, RMatrix *t
             y3 = c->f.xR[*n * (i + 1) + (j + 1)];
             y4 = c->f.xR[*n * (i + 1) + j];
             tbl->xyR[p][4] = y1;
-            tbl->xyR[p][4 + 1 * 4 + 0] = y2 - y1;
-            tbl->xyR[p][4 + 0 * 4 + 1] = y4 - y1;
-            tbl->xyR[p][4 + 1 * 4 + 1] = y3 - y2 - y4 + y1;
+            tbl->xyR[p][8] = y2 - y1;
+            tbl->xyR[p][5] = y4 - y1;
+            tbl->xyR[p][9] = y3 - y2 - y4 + y1;
          }
       // Bicubic interpolation
          if (c->stype == -3) {
@@ -18853,22 +18853,22 @@ void spline2dunpack(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, RMatrix *t
             s2 = *n * i + (j + 1);
             s3 = *n * (i + 1) + (j + 1);
             s4 = *n * (i + 1) + j;
-            tbl->xyR[p][4 + 0 * 4 + 0] = c->f.xR[s1];
-            tbl->xyR[p][4 + 0 * 4 + 1] = c->f.xR[sfy + s1] / du;
-            tbl->xyR[p][4 + 0 * 4 + 2] = -3 * c->f.xR[s1] + 3 * c->f.xR[s4] - 2 * c->f.xR[sfy + s1] / du - c->f.xR[sfy + s4] / du;
-            tbl->xyR[p][4 + 0 * 4 + 3] = 2 * c->f.xR[s1] - 2 * c->f.xR[s4] + c->f.xR[sfy + s1] / du + c->f.xR[sfy + s4] / du;
-            tbl->xyR[p][4 + 1 * 4 + 0] = c->f.xR[sfx + s1] / dt;
-            tbl->xyR[p][4 + 1 * 4 + 1] = c->f.xR[sfxy + s1] / (dt * du);
-            tbl->xyR[p][4 + 1 * 4 + 2] = -3 * c->f.xR[sfx + s1] / dt + 3 * c->f.xR[sfx + s4] / dt - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
-            tbl->xyR[p][4 + 1 * 4 + 3] = 2 * c->f.xR[sfx + s1] / dt - 2 * c->f.xR[sfx + s4] / dt + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
-            tbl->xyR[p][4 + 2 * 4 + 0] = -3 * c->f.xR[s1] + 3 * c->f.xR[s2] - 2 * c->f.xR[sfx + s1] / dt - c->f.xR[sfx + s2] / dt;
-            tbl->xyR[p][4 + 2 * 4 + 1] = -3 * c->f.xR[sfy + s1] / du + 3 * c->f.xR[sfy + s2] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du);
-            tbl->xyR[p][4 + 2 * 4 + 2] = 9 * c->f.xR[s1] - 9 * c->f.xR[s2] + 9 * c->f.xR[s3] - 9 * c->f.xR[s4] + 6 * c->f.xR[sfx + s1] / dt + 3 * c->f.xR[sfx + s2] / dt - 3 * c->f.xR[sfx + s3] / dt - 6 * c->f.xR[sfx + s4] / dt + 6 * c->f.xR[sfy + s1] / du - 6 * c->f.xR[sfy + s2] / du - 3 * c->f.xR[sfy + s3] / du + 3 * c->f.xR[sfy + s4] / du + 4 * c->f.xR[sfxy + s1] / (dt * du) + 2 * c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + 2 * c->f.xR[sfxy + s4] / (dt * du);
-            tbl->xyR[p][4 + 2 * 4 + 3] = -6 * c->f.xR[s1] + 6 * c->f.xR[s2] - 6 * c->f.xR[s3] + 6 * c->f.xR[s4] - 4 * c->f.xR[sfx + s1] / dt - 2 * c->f.xR[sfx + s2] / dt + 2 * c->f.xR[sfx + s3] / dt + 4 * c->f.xR[sfx + s4] / dt - 3 * c->f.xR[sfy + s1] / du + 3 * c->f.xR[sfy + s2] / du + 3 * c->f.xR[sfy + s3] / du - 3 * c->f.xR[sfy + s4] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - 2 * c->f.xR[sfxy + s4] / (dt * du);
-            tbl->xyR[p][4 + 3 * 4 + 0] = 2 * c->f.xR[s1] - 2 * c->f.xR[s2] + c->f.xR[sfx + s1] / dt + c->f.xR[sfx + s2] / dt;
-            tbl->xyR[p][4 + 3 * 4 + 1] = 2 * c->f.xR[sfy + s1] / du - 2 * c->f.xR[sfy + s2] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du);
-            tbl->xyR[p][4 + 3 * 4 + 2] = -6 * c->f.xR[s1] + 6 * c->f.xR[s2] - 6 * c->f.xR[s3] + 6 * c->f.xR[s4] - 3 * c->f.xR[sfx + s1] / dt - 3 * c->f.xR[sfx + s2] / dt + 3 * c->f.xR[sfx + s3] / dt + 3 * c->f.xR[sfx + s4] / dt - 4 * c->f.xR[sfy + s1] / du + 4 * c->f.xR[sfy + s2] / du + 2 * c->f.xR[sfy + s3] / du - 2 * c->f.xR[sfy + s4] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - 2 * c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
-            tbl->xyR[p][4 + 3 * 4 + 3] = 4 * c->f.xR[s1] - 4 * c->f.xR[s2] + 4 * c->f.xR[s3] - 4 * c->f.xR[s4] + 2 * c->f.xR[sfx + s1] / dt + 2 * c->f.xR[sfx + s2] / dt - 2 * c->f.xR[sfx + s3] / dt - 2 * c->f.xR[sfx + s4] / dt + 2 * c->f.xR[sfy + s1] / du - 2 * c->f.xR[sfy + s2] / du - 2 * c->f.xR[sfy + s3] / du + 2 * c->f.xR[sfy + s4] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
+            tbl->xyR[p][4] = c->f.xR[s1];
+            tbl->xyR[p][5] = c->f.xR[sfy + s1] / du;
+            tbl->xyR[p][6] = -3 * c->f.xR[s1] + 3 * c->f.xR[s4] - 2 * c->f.xR[sfy + s1] / du - c->f.xR[sfy + s4] / du;
+            tbl->xyR[p][7] = 2 * c->f.xR[s1] - 2 * c->f.xR[s4] + c->f.xR[sfy + s1] / du + c->f.xR[sfy + s4] / du;
+            tbl->xyR[p][8] = c->f.xR[sfx + s1] / dt;
+            tbl->xyR[p][9] = c->f.xR[sfxy + s1] / (dt * du);
+            tbl->xyR[p][10] = -3 * c->f.xR[sfx + s1] / dt + 3 * c->f.xR[sfx + s4] / dt - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
+            tbl->xyR[p][11] = 2 * c->f.xR[sfx + s1] / dt - 2 * c->f.xR[sfx + s4] / dt + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
+            tbl->xyR[p][12] = -3 * c->f.xR[s1] + 3 * c->f.xR[s2] - 2 * c->f.xR[sfx + s1] / dt - c->f.xR[sfx + s2] / dt;
+            tbl->xyR[p][13] = -3 * c->f.xR[sfy + s1] / du + 3 * c->f.xR[sfy + s2] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du);
+            tbl->xyR[p][14] = 9 * c->f.xR[s1] - 9 * c->f.xR[s2] + 9 * c->f.xR[s3] - 9 * c->f.xR[s4] + 6 * c->f.xR[sfx + s1] / dt + 3 * c->f.xR[sfx + s2] / dt - 3 * c->f.xR[sfx + s3] / dt - 6 * c->f.xR[sfx + s4] / dt + 6 * c->f.xR[sfy + s1] / du - 6 * c->f.xR[sfy + s2] / du - 3 * c->f.xR[sfy + s3] / du + 3 * c->f.xR[sfy + s4] / du + 4 * c->f.xR[sfxy + s1] / (dt * du) + 2 * c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + 2 * c->f.xR[sfxy + s4] / (dt * du);
+            tbl->xyR[p][15] = -6 * c->f.xR[s1] + 6 * c->f.xR[s2] - 6 * c->f.xR[s3] + 6 * c->f.xR[s4] - 4 * c->f.xR[sfx + s1] / dt - 2 * c->f.xR[sfx + s2] / dt + 2 * c->f.xR[sfx + s3] / dt + 4 * c->f.xR[sfx + s4] / dt - 3 * c->f.xR[sfy + s1] / du + 3 * c->f.xR[sfy + s2] / du + 3 * c->f.xR[sfy + s3] / du - 3 * c->f.xR[sfy + s4] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - 2 * c->f.xR[sfxy + s4] / (dt * du);
+            tbl->xyR[p][16] = 2 * c->f.xR[s1] - 2 * c->f.xR[s2] + c->f.xR[sfx + s1] / dt + c->f.xR[sfx + s2] / dt;
+            tbl->xyR[p][17] = 2 * c->f.xR[sfy + s1] / du - 2 * c->f.xR[sfy + s2] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du);
+            tbl->xyR[p][18] = -6 * c->f.xR[s1] + 6 * c->f.xR[s2] - 6 * c->f.xR[s3] + 6 * c->f.xR[s4] - 3 * c->f.xR[sfx + s1] / dt - 3 * c->f.xR[sfx + s2] / dt + 3 * c->f.xR[sfx + s3] / dt + 3 * c->f.xR[sfx + s4] / dt - 4 * c->f.xR[sfy + s1] / du + 4 * c->f.xR[sfy + s2] / du + 2 * c->f.xR[sfy + s3] / du - 2 * c->f.xR[sfy + s4] / du - 2 * c->f.xR[sfxy + s1] / (dt * du) - 2 * c->f.xR[sfxy + s2] / (dt * du) - c->f.xR[sfxy + s3] / (dt * du) - c->f.xR[sfxy + s4] / (dt * du);
+            tbl->xyR[p][19] = 4 * c->f.xR[s1] - 4 * c->f.xR[s2] + 4 * c->f.xR[s3] - 4 * c->f.xR[s4] + 2 * c->f.xR[sfx + s1] / dt + 2 * c->f.xR[sfx + s2] / dt - 2 * c->f.xR[sfx + s3] / dt - 2 * c->f.xR[sfx + s4] / dt + 2 * c->f.xR[sfy + s1] / du - 2 * c->f.xR[sfy + s2] / du - 2 * c->f.xR[sfy + s3] / du + 2 * c->f.xR[sfy + s4] / du + c->f.xR[sfxy + s1] / (dt * du) + c->f.xR[sfxy + s2] / (dt * du) + c->f.xR[sfxy + s3] / (dt * du) + c->f.xR[sfxy + s4] / (dt * du);
          }
       // Rescale Cij
          for (ci = 0; ci <= 3; ci++) {
@@ -19998,7 +19998,7 @@ static void spline2d_generatedesignmatrix(RVector *xy, ae_int_t npoints, ae_int_
    ae_vector_set_length(&crx, npoints);
    ae_vector_set_length(&cry, npoints);
    for (i = 0; i < npoints; i++) {
-      crx.xZ[i] = iboundval(ifloor(xy->xR[i * ew + 0]) - nzshift, 0, kx - nzwidth);
+      crx.xZ[i] = iboundval(ifloor(xy->xR[i * ew]) - nzshift, 0, kx - nzwidth);
       cry.xZ[i] = iboundval(ifloor(xy->xR[i * ew + 1]) - nzshift, 0, ky - nzwidth);
    }
 // Create vertical and horizontal design matrices
@@ -20029,7 +20029,7 @@ static void spline2d_generatedesignmatrix(RVector *xy, ae_int_t npoints, ae_int_
    for (i = 0; i < npoints; i++) {
       for (j1 = 0; j1 < nzwidth; j1++) {
          for (j0 = 0; j0 < nzwidth; j0++) {
-            v0 = spline1dcalc(basis1, xy->xR[i * ew + 0] - (crx.xZ[i] + j0));
+            v0 = spline1dcalc(basis1, xy->xR[i * ew] - (crx.xZ[i] + j0));
             v1 = spline1dcalc(basis1, xy->xR[i * ew + 1] - (cry.xZ[i] + j1));
             sparseset(av, dstidx + i, (cry.xZ[i] + j1) * kx + (crx.xZ[i] + j0), v0 * v1);
          }
@@ -20261,7 +20261,7 @@ static void spline2d_xdesigngenerate(RVector *xy, ZVector *xyindex, ae_int_t kx0
          a->batchbases.xZ[batchesdone] = baseidx;
          for (i = pt0; i < pt1; i++) {
             for (k0 = 0; k0 < nzwidth; k0++) {
-               a->tmp0.xR[k0] = spline1dcalc(basis1, xy->xR[i * entrywidth + 0] - (base0 + kx0 + k0));
+               a->tmp0.xR[k0] = spline1dcalc(basis1, xy->xR[i * entrywidth] - (base0 + kx0 + k0));
             }
             for (k1 = 0; k1 < nzwidth; k1++) {
                a->tmp1.xR[k1] = spline1dcalc(basis1, xy->xR[i * entrywidth + 1] - (base1 + ky0 + k1));
@@ -20539,7 +20539,7 @@ static void spline2d_computeresidualsfromscratchrec(RVector *xy, RVector *yraw, 
 // Serial execution
    ae_shared_pool_retrieve(pool, &_pbuf);
    for (i = pt0; i < pt1; i++) {
-      spline2dcalcvbuf(spline, xy->xR[i * xew + 0] * scalexy, xy->xR[i * xew + 1] * scalexy, pbuf);
+      spline2dcalcvbuf(spline, xy->xR[i * xew] * scalexy, xy->xR[i * xew + 1] * scalexy, pbuf);
       for (j = 0; j < d; j++) {
          xy->xR[i * xew + 2 + j] = yraw->xR[i * d + j] - pbuf->xR[j];
       }
@@ -20656,7 +20656,7 @@ static void spline2d_reorderdatasetandbuildindex(RVector *xy, ae_int_t npoints, 
    vectorsetlengthatleast(xyindex, (kx - 1) * (ky - 1) + 1);
    vectorsetlengthatleast(bufi, npoints);
    for (i = 0; i < npoints; i++) {
-      i0 = iboundval(ifloor(xy->xR[i * entrywidth + 0]), 0, kx - 2);
+      i0 = iboundval(ifloor(xy->xR[i * entrywidth]), 0, kx - 2);
       i1 = iboundval(ifloor(xy->xR[i * entrywidth + 1]), 0, ky - 2);
       bufi->xZ[i] = i1 * (kx - 1) + i0;
    }
@@ -20681,29 +20681,29 @@ static void spline2d_expandindexrows(RVector *xy, ae_int_t d, RVector *shadow, a
    entrywidth = 2 + d;
    efficiency = 0.1;
    cost = d * (pt1 - pt0 + 1) * (log((double)kxnew) / log(2.0)) / efficiency;
-   ae_assert(xyindexprev->xZ[row0 * (kxprev - 1) + 0] == pt0, "Spline2DFit.ExpandIndexRows: integrity check failed");
-   ae_assert(xyindexprev->xZ[row1 * (kxprev - 1) + 0] == pt1, "Spline2DFit.ExpandIndexRows: integrity check failed");
+   ae_assert(xyindexprev->xZ[row0 * (kxprev - 1)] == pt0, "Spline2DFit.ExpandIndexRows: integrity check failed");
+   ae_assert(xyindexprev->xZ[row1 * (kxprev - 1)] == pt1, "Spline2DFit.ExpandIndexRows: integrity check failed");
 // Parallelism
 // Parallelism was tried if: ((rootcall && pt1 - pt0 > 10000) && row1 - row0 >= 2) && cost > smpactivationlevel()
 // Partition
    if (row1 - row0 >= 2) {
       tiledsplit(row1 - row0, 1, &i0, &i1);
       rowmid = row0 + i0;
-      spline2d_expandindexrows(xy, d, shadow, ns, cidx, pt0, xyindexprev->xZ[rowmid * (kxprev - 1) + 0], xyindexprev, row0, rowmid, xyindexnew, kxnew, kynew, false);
-      spline2d_expandindexrows(xy, d, shadow, ns, cidx, xyindexprev->xZ[rowmid * (kxprev - 1) + 0], pt1, xyindexprev, rowmid, row1, xyindexnew, kxnew, kynew, false);
+      spline2d_expandindexrows(xy, d, shadow, ns, cidx, pt0, xyindexprev->xZ[rowmid * (kxprev - 1)], xyindexprev, row0, rowmid, xyindexnew, kxnew, kynew, false);
+      spline2d_expandindexrows(xy, d, shadow, ns, cidx, xyindexprev->xZ[rowmid * (kxprev - 1)], pt1, xyindexprev, rowmid, row1, xyindexnew, kxnew, kynew, false);
       return;
    }
 // Serial execution
    for (i = pt0; i < pt1; i++) {
-      v = 2 * xy->xR[i * entrywidth + 0];
-      xy->xR[i * entrywidth + 0] = v;
+      v = 2 * xy->xR[i * entrywidth];
+      xy->xR[i * entrywidth] = v;
       i0 = iboundval(ifloor(v), 0, kxnew - 2);
       v = 2 * xy->xR[i * entrywidth + 1];
       xy->xR[i * entrywidth + 1] = v;
       i1 = iboundval(ifloor(v), 0, kynew - 2);
       cidx->xZ[i] = i1 * (kxnew - 1) + i0;
    }
-   spline2d_reorderdatasetandbuildindexrec(xy, d, shadow, ns, cidx, pt0, pt1, xyindexnew, 2 * row0 * (kxnew - 1) + 0, 2 * row1 * (kxnew - 1) + 0, false);
+   spline2d_reorderdatasetandbuildindexrec(xy, d, shadow, ns, cidx, pt0, pt1, xyindexnew, 2 * row0 * (kxnew - 1), 2 * row1 * (kxnew - 1), false);
 }
 
 // This function multiplies all points in dataset by 2.0 and rebuilds  index,
@@ -20835,7 +20835,7 @@ static void spline2d_fastddmfit(RVector *xy, ae_int_t npoints, ae_int_t d, ae_in
 // Store original target values to YRaw.
    vectorsetlengthatleast(&yraw, npoints * d);
    for (i = 0; i < npoints; i++) {
-      xy->xR[xew * i + 0] *= invscalexy;
+      xy->xR[xew * i] *= invscalexy;
       xy->xR[xew * i + 1] *= invscalexy;
       for (j = 0; j < d; j++) {
          yraw.xR[i * d + j] = xy->xR[xew * i + 2 + j];
@@ -21237,8 +21237,8 @@ void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitrepo
          ya = state->xy.xR[1];
          yb = state->xy.xR[1];
          for (i = 1; i < npoints; i++) {
-            xa = rmin2(xa, state->xy.xR[i * ew + 0]);
-            xb = rmax2(xb, state->xy.xR[i * ew + 0]);
+            xa = rmin2(xa, state->xy.xR[i * ew]);
+            xb = rmax2(xb, state->xy.xR[i * ew]);
             ya = rmin2(ya, state->xy.xR[i * ew + 1]);
             yb = rmax2(yb, state->xy.xR[i * ew + 1]);
          }
@@ -21407,10 +21407,10 @@ void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitrepo
    acopied = 0;
    eps = 1.0E-6;
    for (i = 0; i < npoints; i++) {
-      vx = state->xy.xR[i * ew + 0];
+      vx = state->xy.xR[i * ew];
       vy = state->xy.xR[i * ew + 1];
       if (xaraw - eps * hx <= vx && vx <= xbraw + eps * hx && yaraw - eps * hy <= vy && vy <= ybraw + eps * hy) {
-         xywork.xR[acopied * ew + 0] = (vx - xa) * invhx;
+         xywork.xR[acopied * ew] = (vx - xa) * invhx;
          xywork.xR[acopied * ew + 1] = (vy - ya) * invhy;
          for (j = 0; j < d; j++) {
             v = state->xy.xR[i * ew + 2 + j];
@@ -22205,7 +22205,7 @@ static void rbfv2_converttreerec(kdtree *curtree, ae_int_t n, ae_int_t nx, ae_in
       kdtreeexploreleaf(curtree, nodeoffset, xybuf, &cnt);
       ae_assert(localnodes->cnt >= *localnodessize + 2, "ConvertTreeRec: integrity check failed");
       ae_assert(localcw->cnt >= *localcwsize + cnt * (nx + ny), "ConvertTreeRec: integrity check failed");
-      localnodes->xZ[*localnodessize + 0] = cnt;
+      localnodes->xZ[*localnodessize] = cnt;
       localnodes->xZ[*localnodessize + 1] = cwbase + (*localcwsize);
       *localnodessize += 2;
       for (i = 0; i < cnt; i++) {
@@ -22222,13 +22222,13 @@ static void rbfv2_converttreerec(kdtree *curtree, ae_int_t n, ae_int_t nx, ae_in
       ae_assert(localnodes->cnt >= *localnodessize + rbfv2_maxnodesize, "ConvertTreeRec: integrity check failed");
       ae_assert(localsplits->cnt >= *localsplitssize + 1, "ConvertTreeRec: integrity check failed");
       oldnodessize = *localnodessize;
-      localnodes->xZ[*localnodessize + 0] = 0;
+      localnodes->xZ[*localnodessize] = 0;
       localnodes->xZ[*localnodessize + 1] = d;
       localnodes->xZ[*localnodessize + 2] = splitsbase + (*localsplitssize);
       localnodes->xZ[*localnodessize + 3] = -1;
       localnodes->xZ[*localnodessize + 4] = -1;
       *localnodessize += 5;
-      localsplits->xR[*localsplitssize + 0] = s;
+      localsplits->xR[*localsplitssize] = s;
       ++*localsplitssize;
       localnodes->xZ[oldnodessize + 3] = nodesbase + (*localnodessize);
       rbfv2_converttreerec(curtree, n, nx, ny, nodele, nodesbase, splitsbase, cwbase, localnodes, localnodessize, localsplits, localsplitssize, localcw, localcwsize, xybuf);
@@ -22421,7 +22421,7 @@ static void rbfv2_partialcalcrec(rbfv2model *s, rbfv2calcbuffer *buf, ae_int_t r
    val = 0.0;
 // Leaf node.
    if (s->kdnodes.xZ[rootidx] > 0) {
-      cwcnt = s->kdnodes.xZ[rootidx + 0];
+      cwcnt = s->kdnodes.xZ[rootidx];
       cwoffs = s->kdnodes.xZ[rootidx + 1];
       for (i = 0; i < cwcnt; i++) {
       // Calculate distance
@@ -22584,7 +22584,7 @@ static void rbfv2_partialrowcalcrec(rbfv2model *s, rbfv2calcbuffer *buf, ae_int_
    ny = s->ny;
 // Leaf node.
    if (s->kdnodes.xZ[rootidx] > 0) {
-      cwcnt = s->kdnodes.xZ[rootidx + 0];
+      cwcnt = s->kdnodes.xZ[rootidx];
       cwoffs = s->kdnodes.xZ[rootidx + 1];
       for (i0 = 0; i0 < cwcnt; i0++) {
       // Calculate partial distance (components from 1 to NX-1)
@@ -22764,7 +22764,7 @@ static void rbfv2_partialqueryrec(ZVector *kdnodes, RVector *kdsplits, RVector *
    double t1;
 // Leaf node.
    if (kdnodes->xZ[rootidx] > 0) {
-      cwcnt = kdnodes->xZ[rootidx + 0];
+      cwcnt = kdnodes->xZ[rootidx];
       cwoffs = kdnodes->xZ[rootidx + 1];
       for (i = 0; i < cwcnt; i++) {
       // Calculate distance
@@ -22885,7 +22885,7 @@ static ae_int_t rbfv2_partialcountrec(ZVector *kdnodes, RVector *kdsplits, RVect
    result = 0;
 // Leaf node.
    if (kdnodes->xZ[rootidx] > 0) {
-      cwcnt = kdnodes->xZ[rootidx + 0];
+      cwcnt = kdnodes->xZ[rootidx];
       cwoffs = kdnodes->xZ[rootidx + 1];
       for (i = 0; i < cwcnt; i++) {
       // Calculate distance
@@ -22988,7 +22988,7 @@ static void rbfv2_partialunpackrec(ZVector *kdnodes, RVector *kdsplits, RVector 
    ae_int_t cwcnt;
 // Leaf node.
    if (kdnodes->xZ[rootidx] > 0) {
-      cwcnt = kdnodes->xZ[rootidx + 0];
+      cwcnt = kdnodes->xZ[rootidx];
       cwoffs = kdnodes->xZ[rootidx + 1];
       for (i = 0; i < cwcnt; i++) {
          itemoffs = cwoffs + i * (nx + ny);
@@ -23146,7 +23146,7 @@ static void rbfv2_designmatrixgeneraterow(ZVector *kdnodes, RVector *kdsplits, R
          ae_assert((tmpoffs->xZ[j] - cwrange->xZ[level0]) % (nx + ny) == 0, "DesignMatrixRowSize: integrity failure (g)");
          rbfv2basisfuncdiff2(bf, tmpr2->xR[j] * invri2, &val, &dval, &d2val);
          rowidx->xZ[*rowsize + j] = (tmpoffs->xZ[j] - cwrange->xZ[level0]) / (nx + ny);
-         rowval->xR[(*rowsize + j) * rowsperpoint + 0] = val;
+         rowval->xR[(*rowsize + j) * rowsperpoint] = val;
          if (rowsperpoint == 1) {
             continue;
          }
@@ -25519,14 +25519,14 @@ void spline3dunpackv(spline3dinterpolant *c, ae_int_t *n, ae_int_t *m, ae_int_t 
                   for (i0 = 6; i0 <= 13; i0++) {
                      tbl->xyR[p][i0] = 0.0;
                   }
-                  tbl->xyR[p][6 + 2 * (2 * 0 + 0) + 0] = c->f.xR[*d * (*n * (*m * k + j) + i) + di];
-                  tbl->xyR[p][6 + 2 * (2 * 0 + 0) + 1] = c->f.xR[*d * (*n * (*m * k + j) + (i + 1)) + di] - c->f.xR[*d * (*n * (*m * k + j) + i) + di];
-                  tbl->xyR[p][6 + 2 * (2 * 0 + 1) + 0] = c->f.xR[*d * (*n * (*m * k + (j + 1)) + i) + di] - c->f.xR[*d * (*n * (*m * k + j) + i) + di];
-                  tbl->xyR[p][6 + 2 * (2 * 0 + 1) + 1] = c->f.xR[*d * (*n * (*m * k + (j + 1)) + (i + 1)) + di] - c->f.xR[*d * (*n * (*m * k + (j + 1)) + i) + di] - c->f.xR[*d * (*n * (*m * k + j) + (i + 1)) + di] + c->f.xR[*d * (*n * (*m * k + j) + i) + di];
-                  tbl->xyR[p][6 + 2 * (2 * 1 + 0) + 0] = c->f.xR[*d * (*n * (*m * (k + 1) + j) + i) + di] - c->f.xR[*d * (*n * (*m * k + j) + i) + di];
-                  tbl->xyR[p][6 + 2 * (2 * 1 + 0) + 1] = c->f.xR[*d * (*n * (*m * (k + 1) + j) + (i + 1)) + di] - c->f.xR[*d * (*n * (*m * (k + 1) + j) + i) + di] - c->f.xR[*d * (*n * (*m * k + j) + (i + 1)) + di] + c->f.xR[*d * (*n * (*m * k + j) + i) + di];
-                  tbl->xyR[p][6 + 2 * (2 * 1 + 1) + 0] = c->f.xR[*d * (*n * (*m * (k + 1) + (j + 1)) + i) + di] - c->f.xR[*d * (*n * (*m * (k + 1) + j) + i) + di] - c->f.xR[*d * (*n * (*m * k + (j + 1)) + i) + di] + c->f.xR[*d * (*n * (*m * k + j) + i) + di];
-                  tbl->xyR[p][6 + 2 * (2 * 1 + 1) + 1] = c->f.xR[*d * (*n * (*m * (k + 1) + (j + 1)) + (i + 1)) + di] - c->f.xR[*d * (*n * (*m * (k + 1) + (j + 1)) + i) + di] - c->f.xR[*d * (*n * (*m * (k + 1) + j) + (i + 1)) + di] + c->f.xR[*d * (*n * (*m * (k + 1) + j) + i) + di] - c->f.xR[*d * (*n * (*m * k + (j + 1)) + (i + 1)) + di] + c->f.xR[*d * (*n * (*m * k + (j + 1)) + i) + di] + c->f.xR[*d * (*n * (*m * k + j) + (i + 1)) + di] - c->f.xR[*d * (*n * (*m * k + j) + i) + di];
+                  tbl->xyR[p][6] = c->f.xR[*d * (*n * (*m * k + j) + i) + di];
+                  tbl->xyR[p][7] = c->f.xR[*d * (*n * (*m * k + j) + (i + 1)) + di] - c->f.xR[*d * (*n * (*m * k + j) + i) + di];
+                  tbl->xyR[p][8] = c->f.xR[*d * (*n * (*m * k + (j + 1)) + i) + di] - c->f.xR[*d * (*n * (*m * k + j) + i) + di];
+                  tbl->xyR[p][9] = c->f.xR[*d * (*n * (*m * k + (j + 1)) + (i + 1)) + di] - c->f.xR[*d * (*n * (*m * k + (j + 1)) + i) + di] - c->f.xR[*d * (*n * (*m * k + j) + (i + 1)) + di] + c->f.xR[*d * (*n * (*m * k + j) + i) + di];
+                  tbl->xyR[p][10] = c->f.xR[*d * (*n * (*m * (k + 1) + j) + i) + di] - c->f.xR[*d * (*n * (*m * k + j) + i) + di];
+                  tbl->xyR[p][11] = c->f.xR[*d * (*n * (*m * (k + 1) + j) + (i + 1)) + di] - c->f.xR[*d * (*n * (*m * (k + 1) + j) + i) + di] - c->f.xR[*d * (*n * (*m * k + j) + (i + 1)) + di] + c->f.xR[*d * (*n * (*m * k + j) + i) + di];
+                  tbl->xyR[p][12] = c->f.xR[*d * (*n * (*m * (k + 1) + (j + 1)) + i) + di] - c->f.xR[*d * (*n * (*m * (k + 1) + j) + i) + di] - c->f.xR[*d * (*n * (*m * k + (j + 1)) + i) + di] + c->f.xR[*d * (*n * (*m * k + j) + i) + di];
+                  tbl->xyR[p][13] = c->f.xR[*d * (*n * (*m * (k + 1) + (j + 1)) + (i + 1)) + di] - c->f.xR[*d * (*n * (*m * (k + 1) + (j + 1)) + i) + di] - c->f.xR[*d * (*n * (*m * (k + 1) + j) + (i + 1)) + di] + c->f.xR[*d * (*n * (*m * (k + 1) + j) + i) + di] - c->f.xR[*d * (*n * (*m * k + (j + 1)) + (i + 1)) + di] + c->f.xR[*d * (*n * (*m * k + (j + 1)) + i) + di] + c->f.xR[*d * (*n * (*m * k + j) + (i + 1)) + di] - c->f.xR[*d * (*n * (*m * k + j) + i) + di];
                }
             // Rescale Cij
                for (ci = 0; ci <= 1; ci++) {

@@ -245,7 +245,7 @@ void hqrndnormalv(hqrndstate *state, ae_int_t n, RVector *x) {
    rallocv(n, x);
    for (i = 0; i < n2; i++) {
       hqrndnormal2(state, &v1, &v2);
-      x->xR[2 * i + 0] = v1;
+      x->xR[2 * i] = v1;
       x->xR[2 * i + 1] = v2;
    }
    if (n % 2 != 0) {
@@ -273,7 +273,7 @@ void hqrndnormalm(hqrndstate *state, ae_int_t m, ae_int_t n, RMatrix *x) {
    for (i = 0; i < m; i++) {
       for (j = 0; j < n2; j++) {
          hqrndnormal2(state, &v1, &v2);
-         x->xyR[i][2 * j + 0] = v1;
+         x->xyR[i][2 * j] = v1;
          x->xyR[i][2 * j + 1] = v2;
       }
       if (n % 2 != 0) {
@@ -1557,7 +1557,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
    ae_assert(i2 > i1, "KDTreeGenerateTreeRec: internal error");
 // Generate leaf if needed
    if (i2 - i1 <= maxleafsize) {
-      kdt->nodes.xZ[*nodesoffs + 0] = i2 - i1;
+      kdt->nodes.xZ[*nodesoffs] = i2 - i1;
       kdt->nodes.xZ[*nodesoffs + 1] = i1;
       *nodesoffs += 2;
       return;
@@ -1578,7 +1578,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
       }
    }
    if (ds == 0.0) {
-      kdt->nodes.xZ[*nodesoffs + 0] = i2 - i1;
+      kdt->nodes.xZ[*nodesoffs] = i2 - i1;
       kdt->nodes.xZ[*nodesoffs + 1] = i1;
       *nodesoffs += 2;
       return;
@@ -1668,10 +1668,10 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
       }
    }
 // Generate 'split' node
-   kdt->nodes.xZ[*nodesoffs + 0] = 0;
+   kdt->nodes.xZ[*nodesoffs] = 0;
    kdt->nodes.xZ[*nodesoffs + 1] = d;
    kdt->nodes.xZ[*nodesoffs + 2] = *splitsoffs;
-   kdt->splits.xR[*splitsoffs + 0] = s;
+   kdt->splits.xR[*splitsoffs] = s;
    oldoffs = *nodesoffs;
    *nodesoffs += nearestneighbor_splitnodesize;
    ++*splitsoffs;

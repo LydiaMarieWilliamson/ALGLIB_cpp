@@ -9044,8 +9044,8 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
       ae_frame_leave();
       return;
    }
-   ae_vector_set_length(&r, ns - 1 + 1);
-   ae_vector_set_length(&c, ns - 1 + 1);
+   ae_vector_set_length(&r, ns);
+   ae_vector_set_length(&c, ns);
    for (i = 0; i < ns; i++) {
       r.xR[i] = fabs(x->xR[i] - e);
       c.xZ[i] = i;
@@ -12655,8 +12655,8 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
       return;
    }
    ns = n + m;
-   ae_vector_set_length(&r, ns - 1 + 1);
-   ae_vector_set_length(&c, ns - 1 + 1);
+   ae_vector_set_length(&r, ns);
+   ae_vector_set_length(&c, ns);
    for (i = 0; i < n; i++) {
       r.xR[i] = x->xR[i];
       c.xZ[i] = 0;
@@ -12724,7 +12724,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
 // compute tied ranks
    i = 0;
    tiecount = 0;
-   ae_vector_set_length(&tiesize, ns - 1 + 1);
+   ae_vector_set_length(&tiesize, ns);
    while (i < ns) {
       j = i + 1;
       while (j < ns) {

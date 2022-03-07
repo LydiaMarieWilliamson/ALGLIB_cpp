@@ -2339,7 +2339,7 @@ static ae_int_t ae_str2int(const char *buf, const char **pasttheend) {
    if (sixbitsread == 0) ae_break(ERR_ASSERTION_FAILED, emsg);
    for (ae_int_t i = sixbitsread; i < 12; i++) sixbits[i] = 0;
    union { ae_int_t ival; unsigned char bytes[9]; } u;
-   ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
+   ae_foursixbits2threebytes(sixbits, u.bytes);
    ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
    if (ByteOrder == AE_BIG_ENDIAN)
@@ -2393,7 +2393,7 @@ static void ae_int2str(ae_int_t v, char *buf) {
 // NOTE:
 // *	The last element of sixbits is always zero, and is not output.
    ae_int_t sixbits[12];
-   ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
+   ae_threebytes2foursixbits(u.bytes, sixbits);
    ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
    ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
    for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
@@ -2455,7 +2455,7 @@ static ae_int64_t ae_str2int64(const char *buf, const char **pasttheend) {
    if (sixbitsread == 0) ae_break(ERR_ASSERTION_FAILED, emsg);
    for (ae_int_t i = sixbitsread; i < 12; i++) sixbits[i] = 0;
    unsigned char bytes[9];
-   ae_foursixbits2threebytes(sixbits + 0, bytes + 0);
+   ae_foursixbits2threebytes(sixbits, bytes);
    ae_foursixbits2threebytes(sixbits + 4, bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, bytes + 6);
    if (ByteOrder == AE_BIG_ENDIAN)
@@ -2508,7 +2508,7 @@ static void ae_int642str(ae_int64_t v, char *buf) {
 // NOTE:
 // *	The last element of sixbits is always zero, we do not output it.
    ae_int_t sixbits[12];
-   ae_threebytes2foursixbits(bytes + 0, sixbits + 0);
+   ae_threebytes2foursixbits(bytes, sixbits);
    ae_threebytes2foursixbits(bytes + 3, sixbits + 4);
    ae_threebytes2foursixbits(bytes + 6, sixbits + 8);
    for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
@@ -2582,7 +2582,7 @@ static double ae_str2double(const char *buf, const char **pasttheend) {
    if (sixbitsread != AE_SER_ENTRY_LENGTH) ae_break(ERR_ASSERTION_FAILED, emsg);
    sixbits[AE_SER_ENTRY_LENGTH] = 0;
    union { double dval; unsigned char bytes[9]; } u;
-   ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
+   ae_foursixbits2threebytes(sixbits, u.bytes);
    ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
    ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
    if (ByteOrder == AE_BIG_ENDIAN)
@@ -2642,7 +2642,7 @@ static void ae_double2str(double v, char *buf) {
          u.bytes[i1] = tc;
       }
    ae_int_t sixbits[12];
-   ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
+   ae_threebytes2foursixbits(u.bytes, sixbits);
    ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
    ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
    for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
@@ -3719,7 +3719,7 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          vrx = _mm_setzero_pd();
          vry = _mm_setzero_pd();
       } else {
-         __m128d vtx = _mm_loadh_pd(_mm_load_sd(dy + 0), dy + 2 * stride + 0);
+         __m128d vtx = _mm_loadh_pd(_mm_load_sd(dy), dy + 2 * stride);
          __m128d vty = _mm_loadh_pd(_mm_load_sd(dy + 1), dy + 2 * stride + 1);
          vrx = _mm_sub_pd(_mm_mul_pd(vbetax, vtx), _mm_mul_pd(vbetay, vty));
          vry = _mm_add_pd(_mm_mul_pd(vbetax, vty), _mm_mul_pd(vbetay, vtx));
@@ -3728,8 +3728,8 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
       __m128d vty = _mm_add_pd(_mm_mul_pd(valphax, vy), _mm_mul_pd(valphay, vx));
       vrx = _mm_add_pd(vrx, vtx);
       vry = _mm_add_pd(vry, vty);
-      _mm_storel_pd(dy + 0, vrx);
-      _mm_storeh_pd(dy + 2 * stride + 0, vrx);
+      _mm_storel_pd(dy, vrx);
+      _mm_storeh_pd(dy + 2 * stride, vrx);
       _mm_storel_pd(dy + 1, vry);
       _mm_storeh_pd(dy + 2 * stride + 1, vry);
       dy += 4 * stride;
@@ -6442,7 +6442,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
    u32 = 0.0;
    u33 = 0.0;
    if (urank >= 1) {
-      d0 = diagd->xR[offsd + 0];
+      d0 = diagd->xR[offsd];
    }
    if (urank >= 2) {
       d1 = diagd->xR[offsd + 1];
@@ -6455,7 +6455,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
    }
    if (srccol0 >= 0) {
       if (urank >= 1) {
-         u00 = d0 * rowstorage->xR[offsu + srccol0 * urowstride + 0];
+         u00 = d0 * rowstorage->xR[offsu + srccol0 * urowstride];
       }
       if (urank >= 2) {
          u01 = d1 * rowstorage->xR[offsu + srccol0 * urowstride + 1];
@@ -6469,7 +6469,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
    }
    if (srccol1 >= 0) {
       if (urank >= 1) {
-         u10 = d0 * rowstorage->xR[offsu + srccol1 * urowstride + 0];
+         u10 = d0 * rowstorage->xR[offsu + srccol1 * urowstride];
       }
       if (urank >= 2) {
          u11 = d1 * rowstorage->xR[offsu + srccol1 * urowstride + 1];
@@ -6483,7 +6483,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
    }
    if (srccol2 >= 0) {
       if (urank >= 1) {
-         u20 = d0 * rowstorage->xR[offsu + srccol2 * urowstride + 0];
+         u20 = d0 * rowstorage->xR[offsu + srccol2 * urowstride];
       }
       if (urank >= 2) {
          u21 = d1 * rowstorage->xR[offsu + srccol2 * urowstride + 1];
@@ -6497,7 +6497,7 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
    }
    if (srccol3 >= 0) {
       if (urank >= 1) {
-         u30 = d0 * rowstorage->xR[offsu + srccol3 * urowstride + 0];
+         u30 = d0 * rowstorage->xR[offsu + srccol3 * urowstride];
       }
       if (urank >= 2) {
          u31 = d1 * rowstorage->xR[offsu + srccol3 * urowstride + 1];
@@ -6514,8 +6514,8 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
-         uk0 = rowstorage->xR[offsk + 0];
-         rowstorage->xR[targetrow + 0] -= u00 * uk0;
+         uk0 = rowstorage->xR[offsk];
+         rowstorage->xR[targetrow] -= u00 * uk0;
          rowstorage->xR[targetrow + 1] -= u10 * uk0;
          rowstorage->xR[targetrow + 2] -= u20 * uk0;
          rowstorage->xR[targetrow + 3] -= u30 * uk0;
@@ -6525,9 +6525,9 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
-         uk0 = rowstorage->xR[offsk + 0];
+         uk0 = rowstorage->xR[offsk];
          uk1 = rowstorage->xR[offsk + 1];
-         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1;
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1;
          rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1;
          rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1;
          rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1;
@@ -6537,10 +6537,10 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
-         uk0 = rowstorage->xR[offsk + 0];
+         uk0 = rowstorage->xR[offsk];
          uk1 = rowstorage->xR[offsk + 1];
          uk2 = rowstorage->xR[offsk + 2];
-         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1 + u02 * uk2;
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2;
          rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2;
          rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2;
          rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2;
@@ -6550,11 +6550,11 @@ bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidt
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * urowstride;
-         uk0 = rowstorage->xR[offsk + 0];
+         uk0 = rowstorage->xR[offsk];
          uk1 = rowstorage->xR[offsk + 1];
          uk2 = rowstorage->xR[offsk + 2];
          uk3 = rowstorage->xR[offsk + 3];
-         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
          rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
          rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
          rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
@@ -6611,23 +6611,23 @@ bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheig
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    KerFunAvx2Fma(spchol_updatekernel4444(rowstorage->xR, offss, sheight, offsu, uheight, diagd->xR, offsd, raw2smap->xZ, superrowidx->xZ, urbase))
 // Generic C fallback code
-   d0 = diagd->xR[offsd + 0];
+   d0 = diagd->xR[offsd];
    d1 = diagd->xR[offsd + 1];
    d2 = diagd->xR[offsd + 2];
    d3 = diagd->xR[offsd + 3];
-   u00 = d0 * rowstorage->xR[offsu + 0 * 4 + 0];
+   u00 = d0 * rowstorage->xR[offsu + 0 * 4];
    u01 = d1 * rowstorage->xR[offsu + 0 * 4 + 1];
    u02 = d2 * rowstorage->xR[offsu + 0 * 4 + 2];
    u03 = d3 * rowstorage->xR[offsu + 0 * 4 + 3];
-   u10 = d0 * rowstorage->xR[offsu + 1 * 4 + 0];
+   u10 = d0 * rowstorage->xR[offsu + 1 * 4];
    u11 = d1 * rowstorage->xR[offsu + 1 * 4 + 1];
    u12 = d2 * rowstorage->xR[offsu + 1 * 4 + 2];
    u13 = d3 * rowstorage->xR[offsu + 1 * 4 + 3];
-   u20 = d0 * rowstorage->xR[offsu + 2 * 4 + 0];
+   u20 = d0 * rowstorage->xR[offsu + 2 * 4];
    u21 = d1 * rowstorage->xR[offsu + 2 * 4 + 1];
    u22 = d2 * rowstorage->xR[offsu + 2 * 4 + 2];
    u23 = d3 * rowstorage->xR[offsu + 2 * 4 + 3];
-   u30 = d0 * rowstorage->xR[offsu + 3 * 4 + 0];
+   u30 = d0 * rowstorage->xR[offsu + 3 * 4];
    u31 = d1 * rowstorage->xR[offsu + 3 * 4 + 1];
    u32 = d2 * rowstorage->xR[offsu + 3 * 4 + 2];
    u33 = d3 * rowstorage->xR[offsu + 3 * 4 + 3];
@@ -6636,11 +6636,11 @@ bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheig
       for (k = 0; k < uheight; k++) {
          targetrow = offss + k * 4;
          offsk = offsu + k * 4;
-         uk0 = rowstorage->xR[offsk + 0];
+         uk0 = rowstorage->xR[offsk];
          uk1 = rowstorage->xR[offsk + 1];
          uk2 = rowstorage->xR[offsk + 2];
          uk3 = rowstorage->xR[offsk + 3];
-         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
          rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
          rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
          rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
@@ -6650,11 +6650,11 @@ bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheig
       for (k = 0; k < uheight; k++) {
          targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
          offsk = offsu + k * 4;
-         uk0 = rowstorage->xR[offsk + 0];
+         uk0 = rowstorage->xR[offsk];
          uk1 = rowstorage->xR[offsk + 1];
          uk2 = rowstorage->xR[offsk + 2];
          uk3 = rowstorage->xR[offsk + 3];
-         rowstorage->xR[targetrow + 0] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
          rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
          rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
          rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
