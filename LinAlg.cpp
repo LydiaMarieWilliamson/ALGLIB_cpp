@@ -12,6 +12,9 @@
 //
 //	A copy of the GNU General Public License is available at http://www.fsf.org/licensing/licenses
 #define InAlgLib
+// Must be defined before we include anything depending on any kernel headers.
+#define _ALGLIB_IMPL_DEFINES
+#define _ALGLIB_INTEGRITY_CHECKS_ONCE
 #include "LinAlg.h"
 
 // === ABLAS Package ===
@@ -21211,24 +21214,18 @@ static const ae_int_t spchol_smallfakestolerance = 2;
 static const ae_int_t spchol_maxfastkernel = 4;
 static const bool spchol_relaxedsupernodes = true;
 
-#ifdef ALGLIB_NO_FAST_KERNELS
-// Informational function, useful for debugging
+// The recommended width of the SIMD-friendly buffer.
+// Informational function, useful for debugging.
 static ae_int_t spchol_spsymmgetmaxsimd() {
-   ae_int_t result;
-   result = 1;
-   return result;
+#   if !defined ALGLIB_NO_FAST_KERNELS && AE_CPU == AE_INTEL
+   return 4;
+#   else
+   return 1;
+#   endif
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
-// Solving linear system: propagating computed supernode.
-//
-// Propagates computed supernode to the rest of the RHS  using  SIMD-friendly
-// RHS storage format.
-//
-// Inputs:
-//
-// Outputs:
+// Solve a linear system: propagating the computed supernode.
+// Propagate the computed supernode to the rest of the RHS using an SIMD-friendly RHS storage format.
 // ALGLIB Routine: Copyright 08.09.2021 by Sergey Bochkanov
 static void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth) {
    ae_int_t i;
@@ -21236,6 +21233,33 @@ static void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, 
    ae_int_t k;
    ae_int_t baseoffs;
    double v;
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try SIMD kernels
+#   if defined _ALGLIB_HAS_FMA_INTRINSICS
+   if (sstride == 4 || blocksize == 2 && sstride == 2)
+      if (CurCPU & CPU_FMA) {
+         fma_spchol_propagatefwd(x, cols0, blocksize, superrowidx, rbase, offdiagsize, rowstorage, offss, sstride, simdbuf, simdwidth);
+         return;
+      }
+#   endif
+// Propagate rank-1 node (can not be accelerated with SIMD)
+   if (blocksize == 1 && sstride == 1) {
+   // blocksize is 1, stride is 1
+      double vx = x->xR[cols0];
+      double *p_mat_row = rowstorage->xR + offss + 1 * 1;
+      double *p_simd_buf = simdbuf->xR;
+      ae_int_t *p_rowidx = superrowidx->xZ + rbase;
+      if (simdwidth == 4) {
+         for (k = 0; k < offdiagsize; k++)
+            p_simd_buf[p_rowidx[k] * 4] -= p_mat_row[k] * vx;
+      } else {
+         for (k = 0; k < offdiagsize; k++)
+            p_simd_buf[p_rowidx[k] * simdwidth] -= p_mat_row[k] * vx;
+      }
+      return;
+   }
+#endif
+// Generic C code for generic propagate.
    for (k = 0; k < offdiagsize; k++) {
       i = superrowidx->xZ[rbase + k];
       baseoffs = offss + (k + blocksize) * sstride;
@@ -21246,7 +21270,6 @@ static void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, 
       simdbuf->xR[i * simdwidth] = v;
    }
 }
-#endif
 
 // This function generates test reodering used for debug purposes only
 //
@@ -22476,26 +22499,18 @@ static void spchol_topologicalpermutation(sparsematrix *a, ZVector *p, sparsemat
    }
 }
 
-#ifdef ALGLIB_NO_FAST_KERNELS
-// Fast kernels for small supernodal updates: special 4x4x4x4 function.
-//
-// ! See comments on UpdateSupernode() for information  on generic supernodal
-// ! updates, including notation used below.
-//
-// The generic update has following form:
-//
-//     S := S - scatter(U*D*Uc')
-//
-// This specialized function performs 4x4x4x4 update, i.e.:
-// * S is a tHeight*4 matrix
-// * U is a uHeight*4 matrix
-// * Uc' is a 4*4 matrix
-// * scatter() scatters rows of U*Uc', but does not scatter columns (they are
-//   densely packed).
-//
+// Fast kernels for small supernodal updates: special 4 x 4 x 4 x 4 function.
+// *	See comments on UpdateSupernode() for information on generic supernodal updates, including notation used below.
+// The generic update has the following form:
+//	S = S - scatter(U D Uc^T).
+// This specialized function performs a 4 x 4 x 4 x 4 update, i.e.:
+// *	S is a tHeight x 4 matrix,
+// *	U is a uHeight x 4 matrix,
+// *	Uc^T is a 4 x 4 matrix,
+// *	scatter() scatters rows of U Uc^T, but does not scatter columns (they are densely packed).
 // Return Value:
-// * True if update was applied
-// * False if kernel refused to perform an update.
+// *	true if an update was applied,
+// *	false if the kernel refused to perform an update.
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 static bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
    ae_int_t k;
@@ -22526,6 +22541,12 @@ static bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_
    double uk2;
    double uk3;
    bool result;
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   KerFunAvx2Fma(spchol_updatekernel4444(rowstorage->xR, offss, sheight, offsu, uheight, diagd->xR, offsd, raw2smap->xZ, superrowidx->xZ, urbase))
+#endif
+// Generic C fallback code.
    d0 = diagd->xR[offsd];
    d1 = diagd->xR[offsd + 1];
    d2 = diagd->xR[offsd + 2];
@@ -22546,46 +22567,62 @@ static bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_
    u31 = d1 * rowstorage->xR[offsu + 13];
    u32 = d2 * rowstorage->xR[offsu + 14];
    u33 = d3 * rowstorage->xR[offsu + 15];
-   for (k = 0; k < uheight; k++) {
-      targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
-      offsk = offsu + k * 4;
-      uk0 = rowstorage->xR[offsk];
-      uk1 = rowstorage->xR[offsk + 1];
-      uk2 = rowstorage->xR[offsk + 2];
-      uk3 = rowstorage->xR[offsk + 3];
-      rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
-      rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
-      rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
-      rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
+   if (sheight == uheight) {
+   // No row scatter, the most efficient code
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + k * 4;
+         offsk = offsu + k * 4;
+         uk0 = rowstorage->xR[offsk];
+         uk1 = rowstorage->xR[offsk + 1];
+         uk2 = rowstorage->xR[offsk + 2];
+         uk3 = rowstorage->xR[offsk + 3];
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
+      }
+   } else {
+   // Row scatter is performed, less efficient code using double mapping to determine target row index
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
+         offsk = offsu + k * 4;
+         uk0 = rowstorage->xR[offsk];
+         uk1 = rowstorage->xR[offsk + 1];
+         uk2 = rowstorage->xR[offsk + 2];
+         uk3 = rowstorage->xR[offsk + 3];
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
+      }
    }
    result = true;
    return result;
 }
-#endif
 
-#ifdef ALGLIB_NO_FAST_KERNELS
 // Fast kernels for small supernodal updates: special 4x4x4x4 function.
-//
-// ! See comments on UpdateSupernode() for information  on generic supernodal
-// ! updates, including notation used below.
-//
-// The generic update has following form:
-//
-//     S := S - scatter(U*D*Uc')
-//
-// This specialized function performs AxBxCx4 update, i.e.:
-// * S is a tHeight*A matrix with row stride equal to 4 (usually it means that
-//   it has 3 or 4 columns)
-// * U is a uHeight*B matrix
-// * Uc' is a B*C matrix, with C <= A
-// * scatter() scatters rows and columns of U*Uc'
-//
+// *	See comments on UpdateSupernode() for information on generic supernodal updates, including notation used below.
+// The generic update has the following form:
+//	S = S - scatter(U D Uc^T).
+// This specialized function performs an A x B x C x 4 update, i.e.:
+// *	S is a tHeight x A matrix with row stride equal to 4 (usually it means that it has 3 or 4 columns),
+// *	U is a uHeight x B matrix,
+// *	Uc^T is a B x C matrix, with C <= A,
+// *	scatter() scatters rows and columns of U Uc^T.
 // Return Value:
-// * True if update was applied
-// * False if kernel refused to perform an update (quick exit for unsupported
-//   combinations of input sizes)
+// *	true if an update was applied,
+// *	false if the kernel refused to perform an update (quick exit for unsupported combinations of input sizes).
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
+#if defined ALGLIB_NO_FAST_KERNELS
+   const ae_int_t louwidth = 3;
+#else
+   const ae_int_t louwidth = 1;
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   KerFunAvx2Fma(spchol_updatekernelabc4(rowstorage->xR, offss, twidth, offsu, uheight, urank, urowstride, uwidth, diagd->xR, offsd, raw2smap->xZ, superrowidx->xZ, urbase))
+#endif
+// Generic code.
    ae_int_t k;
    ae_int_t targetrow;
    ae_int_t targetcol;
@@ -22624,7 +22661,7 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
    if (twidth < 3 || twidth > 4) {
       return result;
    }
-   if (uwidth < 3 || uwidth > 4) {
+   if (uwidth < louwidth || uwidth > 4) {
       return result;
    }
    if (urank > 4) {
@@ -22794,27 +22831,19 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
    result = true;
    return result;
 }
-#endif
 
 // Fast kernels for small supernodal updates: special rank-1 function.
-//
-// ! See comments on UpdateSupernode() for information  on generic supernodal
-// ! updates, including notation used below.
-//
-// The generic update has following form:
-//
-//     S := S - scatter(U*D*Uc')
-//
-// This specialized function performs rank-1 update, i.e.:
-// * S is a tHeight*A matrix, with A <= 4
-// * U is a uHeight*1 matrix with unit stride
-// * Uc' is a 1*B matrix, with B <= A
-// * scatter() scatters rows and columns of U*Uc'
-//
+// ∙	See comments on UpdateSupernode() for information on generic supernodal updates, including notation used below.
+// The generic update has the following form:
+//	S = S - scatter(U D Uc^T).
+// This specialized function performs a rank-1 update, i.e.:
+// *	S is a tHeight x A matrix, with A <= 4,
+// *	U is a uHeight x 1 matrix with unit stride,
+// *	Uc^T is a 1 x B matrix, with B <= A,
+// *	scatter() scatters rows and columns of U Uc^T.
 // Return Value:
-// * True if update was applied
-// * False if kernel refused to perform an update (quick exit for unsupported
-//   combinations of input sizes)
+// *	true if an update was applied,
+// *	false if the kernel refused to perform an update (quick exit for unsupported combinations of input sizes).
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 static bool spchol_updatekernelrank1(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t trowstride, ae_int_t offsu, ae_int_t uheight, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
    ae_int_t k;
@@ -22904,24 +22933,17 @@ static bool spchol_updatekernelrank1(RVector *rowstorage, ae_int_t offss, ae_int
 }
 
 // Fast kernels for small supernodal updates: special rank-2 function.
-//
-// ! See comments on UpdateSupernode() for information  on generic supernodal
-// ! updates, including notation used below.
-//
-// The generic update has following form:
-//
-//     S := S - scatter(U*D*Uc')
-//
-// This specialized function performs rank-2 update, i.e.:
-// * S is a tHeight*A matrix, with A <= 4
-// * U is a uHeight*2 matrix with row stride equal to 2
-// * Uc' is a 2*B matrix, with B <= A
-// * scatter() scatters rows and columns of U*Uc
-//
+// *	See comments on UpdateSupernode() for information on generic supernodal updates, including notation used below.
+// The generic update has the following form:
+//	S = S - scatter(U D Uc^T).
+// This specialized function performs a rank-2 update, i.e.:
+// *	S is a tHeight x A matrix, with A <= 4,
+// *	U is a uHeight x 2 matrix with row stride equal to 2,
+// *	Uc^T is a 2 x B matrix, with B <= A,
+// *	scatter() scatters rows and columns of U Uc^T.
 // Return Value:
-// * True if update was applied
-// * False if kernel refused to perform an update (quick exit for unsupported
-//   combinations of input sizes)
+// *	true if an update was applied,
+// *	false if the kernel refused to perform an update (quick exit for unsupported combinations of input sizes).
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t trowstride, ae_int_t offsu, ae_int_t uheight, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
    ae_int_t k;
@@ -23033,7 +23055,7 @@ static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int
 // is a supernodal equivalent  of  the  column  update  in  the  left-looking
 // Cholesky.
 //
-// The generic update has following form:
+// The generic update has the following form:
 //
 //     S := S - scatter(U*D*Uc')
 //

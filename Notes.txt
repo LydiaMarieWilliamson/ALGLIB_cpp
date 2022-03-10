@@ -542,6 +542,21 @@ A6.2. Test Stages
 	-	testdforestunit_basictestallsame() and testdforestunit_basictestrandom() in TestC.cpp.
 	-	dforest_processvotingresults() in DataAnalysis.cpp
 	to make them consistent with dfavgce() in DataAnalysis.cpp.
+40	{Ap,AlgLibInternal,LinAlg,Kernel*}.*: Root canal.
+	Also: integrating some of the recoding from the local, non-public-facing, version of AlgLib++.
+	Cleaning up the mess inherited from the changes made to the infrastructure of ALGLIB between from version 3.17 and version 3.18.
+	―	Kernels{Avx2,Fma,Sse2}.{cpp,h}: Removed the redundant _ALGLI_HAS_*_INTRINSIC guards for #include "Kernel*.h" in Ap.h.
+	―	KernelsFma.h: The wrong guard (_ALGLIB_HAS_AVX2_INTRINSICS) is used in KernelsFma.h.
+		Replaced it with _ALGLIB_HAS_FMA_INTRINSICS.
+	―	Broadened the range of Kernel*.h:
+		―	Moved the #include "Kernels*.h" from Ap.cpp to Ap.h, under _ALGLIB_IMPL_DEFINES guard.
+		―	Moved the #defines {_ALGLIB_IMPL_DEFINES,_ALGLIB_INTEGRITY_CHECKS_ONCE} from Ap.cpp to {LinAlg,AlgLibInternal}.cpp.
+	―	Ap.{cpp,h}, LinAlg.cpp: Collated {Ap.cpp,LinAlg.cpp} kernel-dependent spchol functions:
+		―	Combined the Ap versus LinAlg functions.
+		―	Moved the Ap functions into LinAlg, made them local and removed their declarations.
+	―	Ap.{cpp,h}, AlgLibInternal.cpp: Collated {Ap.cpp,AlgLibInternal.cpp} kernel-dependent ablasf functions:
+		―	Combined the Ap versus AlgLibInternal functions.
+		―	Moved the Ap functions into AlgLibInternal, made them local and removed their declarations.
 
 A6.3. Test Results
 ──────────────────
@@ -592,6 +607,7 @@ A6.3. Test Results
 39	5952 1.0x 9616 1.0x 11368 1.1x 9471 1.0x 1646544809 (622447a9) 80 // TestC: the hidden bug is temporarily re-hidden.
 39	7463 1.0x 11495 1.0x 11115 1.0x 9246 1.0x 1646545184 (62244920) 78 // Checking TestX; suspicious changes in speed.
 39	7937 1.0x 12196 1.0x 12199 0.9x 8892 1.1x 1646593750 (622506d6) 79 // Removed the dforest bug and resolved the TestC failure.
+40	7937 1.0x 12347 0.9x 12199 1.0x 9673 1.0x 1646868186 (622936da) 79 // Root canal on the kernel dispatcher.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -650,17 +666,17 @@ Issues:
 Performance:
 * RGEMM-SEQ-16   (MFLOPS)   7937
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12196
-* RGEMM-MTN-32              1.0x
+* RGEMM-SEQ-32   (MFLOPS)  12347
+* RGEMM-MTN-32              0.9x
 * RGEMM-SEQ-64   (MFLOPS)  12199
-* RGEMM-MTN-64              0.9x
-* RGEMM-SEQ-1024 (MFLOPS)   8892
-* RGEMM-MTN-1024            1.1x
+* RGEMM-MTN-64              1.0x
+* RGEMM-SEQ-1024 (MFLOPS)   9673
+* RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1646593750
+SEED: 1646868186
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian

@@ -1,10 +1,9 @@
 #define InAlgLib
-//
-// Must be defined before we include kernel header
-//
+// Must be defined before we include kernel header.
 #define _ALGLIB_IMPL_DEFINES
 #define _ALGLIB_INTEGRITY_CHECKS_ONCE
 #include "KernelsSse2.h"
+
 namespace alglib_impl {
 #if !defined ALGLIB_NO_FAST_KERNELS && defined _ALGLIB_HAS_SSE2_INTRINSICS
 double sse2_rdotv(const ae_int_t n, const Real *x, const Real *y) {

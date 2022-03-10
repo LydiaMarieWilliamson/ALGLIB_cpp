@@ -117,8 +117,7 @@ TestY.cpp:	LinAlg.h
 TestZ.cpp:	Interpolation.h
 
 ## Header - Header dependencies:
-## KernelsAvx2, KernelsFma, KernelsSse2 -> Ap
-## Optimization -> Solvers -> LinAlg -> AlgLibMisc -> AlgLibInternal -> Ap
+## Optimization -> Solvers -> LinAlg -> AlgLibMisc -> AlgLibInternal -> Ap -> KernelsAvx2, KernelsFma, KernelsSse2
 ## DiffEquations, FastTransforms -> AlgLibInternal
 ## SpecialFunctions -> AlgLibMisc
 ## Statistics, Integration -> SpecialFunctions, LinAlg
@@ -130,7 +129,7 @@ TestZ.cpp:	Interpolation.h
 ## TestY -> LinAlg
 ## TestZ -> Interpolation
 AlgLibInternal.h:	Ap.h
-KernelsAvx2.h KernelsFma.h KernelsSse2.h: Ap.h
+Ap.h: KernelsAvx2.h KernelsFma.h KernelsSse2.h
 AlgLibMisc.h DiffEquations.h FastTransforms.h:	AlgLibInternal.h
 LinAlg.h SpecialFunctions.h:	AlgLibMisc.h
 Integration.h Statistics.h Solvers.h:	LinAlg.h

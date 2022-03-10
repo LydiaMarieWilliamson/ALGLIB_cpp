@@ -741,9 +741,29 @@ extern const double pi;
 #   define pi			3.1415926535897932384626433832795
 #endif
 
-// Internal macros, defined only when _ALGLIB_IMPL_DEFINES is defined before
-// inclusion of this header file
+// Optimized shared C/C++ linear algebra code.
+#define ALGLIB_INTERCEPTS_ABLAS
+bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
+bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
+bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
+bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
+bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
+bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
+void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst);
+void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode);
+void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride);
+} // end of namespace alglib_impl
+
+// Internal macros, defined only when _ALGLIB_IMPL_DEFINES is defined before inclusion of this header file.
 #if defined _ALGLIB_IMPL_DEFINES
+#   include "KernelsAvx2.h"
+#   include "KernelsFma.h"
+#   include "KernelsSse2.h"
 #   define _ALGLIB_SIMD_ALIGNMENT_DOUBLES 8
 #   define _ALGLIB_SIMD_ALIGNMENT_BYTES   (_ALGLIB_SIMD_ALIGNMENT_DOUBLES*8)
 // SIMD kernel dispatchers.
@@ -781,28 +801,8 @@ extern const double pi;
 #   else
 #      define APPROX_FMA(x, y, z) ((x)*(y) + (z))
 #   endif
-#endif
-
-// Optimized shared C/C++ linear algebra code.
-#define ALGLIB_INTERCEPTS_ABLAS
-bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
-bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
-bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
-bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
-bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
-bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
-bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
-void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst);
-void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode);
-void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride);
-
-#if !defined ALGLIB_NO_FAST_KERNELS
-#   if defined _ALGLIB_IMPL_DEFINES
-   // Arrays shorter than that will be processed with generic C implementation
+#   if !defined ALGLIB_NO_FAST_KERNELS
+// Arrays shorter than that will be processed with generic C implementation
 #      if !defined _ABLASF_KERNEL_SIZE1
 #         define _ABLASF_KERNEL_SIZE1 16
 #      endif
@@ -815,59 +815,7 @@ void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const doub
 #         define ULOAD256PD(x) _mm256_loadu_pd((const double *)&x)
 #      endif
 #   endif
-// ABLASF kernels
-double rdotv(ae_int_t n, RVector *x, RVector *y);
-double rdotvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy);
-double rdotrr(ae_int_t n, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy);
-double rdotv2(ae_int_t n, RVector *x);
-void bcopyv(ae_int_t n, BVector *x, BVector *y);
-void icopyv(ae_int_t n, ZVector *x, ZVector *y);
-void rcopyv(ae_int_t n, RVector *x, RVector *y);
-void rcopyvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy);
-void rcopyrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y);
-void rcopyrr(ae_int_t n, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy);
-void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y);
-void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t iy);
-void bsetv(ae_int_t n, bool v, BVector *y);
-void isetv(ae_int_t n, ae_int_t v, ZVector *y);
-void rsetv(ae_int_t n, double v, RVector *y);
-void rsetr(ae_int_t n, double v, RMatrix *y, ae_int_t iy);
-void rsetvx(ae_int_t n, double v, RVector *y, ae_int_t y0);
-void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a);
-void rmulv(ae_int_t n, double v, RVector *y);
-void rmulr(ae_int_t n, double v, RMatrix *y, ae_int_t iy);
-void rmulvx(ae_int_t n, double v, RVector *y, ae_int_t y0);
-void raddv(ae_int_t n, double Alpha, RVector *x, RVector *y);
-void raddvr(ae_int_t n, double Alpha, RVector *x, RMatrix *y, ae_int_t iy);
-void raddrv(ae_int_t n, double Alpha, RMatrix *x, ae_int_t ix, RVector *y);
-void raddrr(ae_int_t n, double Alpha, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy);
-void raddvx(ae_int_t n, double Alpha, RVector *x, ae_int_t x0, RVector *y, ae_int_t y0);
-void rmergemulv(ae_int_t n, RVector *y, RVector *x);
-void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t ix);
-void rmergemulrv(ae_int_t n, RMatrix *y, ae_int_t iy, RVector *x);
-void rmergemaxv(ae_int_t n, RVector *y, RVector *x);
-void rmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t ix);
-void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y);
-void rmergeminv(ae_int_t n, RVector *y, RVector *x);
-void rmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t ix);
-void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y);
-double rmaxv(ae_int_t n, RVector *x);
-double rmaxr(ae_int_t n, RMatrix *x, ae_int_t ix);
-double rmaxabsv(ae_int_t n, RVector *x);
-double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t ix);
-void icopyvx(ae_int_t n, ZVector *x, ae_int_t x0, ZVector *y, ae_int_t y0);
-void rcopyvx(ae_int_t n, RVector *x, ae_int_t x0, RVector *y, ae_int_t y0);
-void rgemv(ae_int_t m, ae_int_t n, double Alpha, RMatrix *a, ae_int_t opa, RVector *x, double Beta, RVector *y);
-void rgemvx(ae_int_t m, ae_int_t n, double Alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double Beta, RVector *y, ae_int_t iy);
-void rger(ae_int_t m, ae_int_t n, double Alpha, RVector *u, RVector *v, RMatrix *a);
-void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t opa, RVector *x, ae_int_t ix);
-bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, RMatrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double Beta, RMatrix *_c, ae_int_t ic, ae_int_t jc);
-ae_int_t spchol_spsymmgetmaxsimd();
-void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth);
-bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase);
-bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase);
-#endif // ALGLIB_NO_FAST_KERNELS
-} // end of namespace alglib_impl
+#endif
 
 namespace alglib {
 // Declarations for C++-related functionality.

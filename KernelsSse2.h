@@ -25,8 +25,7 @@ double sse2_rmaxv(ae_int_t n, const Real *__restrict x);
 double sse2_rmaxabsv(ae_int_t n, const Real *__restrict x);
 void sse2_rcopyvx(const ae_int_t n, const double *__restrict x, double *__restrict y);
 void sse2_icopyvx(const ae_int_t n, const ae_int_t *__restrict x, ae_int_t *__restrict y);
-// ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_SSE2_INTRINSICS
-#endif
+#endif // ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_SSE2_INTRINSICS
 } // end of namespace alglib_impl
 
 #endif // OnceOnly

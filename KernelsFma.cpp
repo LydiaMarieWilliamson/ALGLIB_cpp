@@ -1,10 +1,9 @@
 #define InAlgLib
-//
-// Must be defined before we include kernel header
-//
+// Must be defined before we include kernel header.
 #define _ALGLIB_IMPL_DEFINES
 #define _ALGLIB_INTEGRITY_CHECKS_ONCE
 #include "KernelsFma.h"
+
 namespace alglib_impl {
 #if !defined ALGLIB_NO_FAST_KERNELS && defined _ALGLIB_HAS_FMA_INTRINSICS
 double fma_rdotv(const ae_int_t n, const Real *__restrict x, const Real *__restrict y) {
