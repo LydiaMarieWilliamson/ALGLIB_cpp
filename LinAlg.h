@@ -658,7 +658,7 @@ struct spcholanalysis {
    ae_vector ladjplus;
    ae_vector outrowcounts;
    sparsematrix wrkat;
-   ae_vector rowstorage;
+   ae_vector outputstorage;
    ae_vector rowstrides;
    ae_vector rowoffsets;
    ae_vector diagd;

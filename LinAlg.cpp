@@ -12,6 +12,9 @@
 //
 //	A copy of the GNU General Public License is available at http://www.fsf.org/licensing/licenses
 #define InAlgLib
+// Must be defined before we include anything depending on any kernel headers.
+#define _ALGLIB_IMPL_DEFINES
+#define _ALGLIB_INTEGRITY_CHECKS_ONCE
 #include "LinAlg.h"
 
 // === ABLAS Package ===
@@ -21430,27 +21433,20 @@ static void spchol_topologicalpermutation(sparsematrix *a, ZVector *p, sparsemat
    }
 }
 
-// Fast kernels for small supernodal updates: special 4x4x4x4 function.
-//
-// ! See comments on UpdateSupernode() for information  on generic supernodal
-// ! updates, including notation used below.
-//
-// The generic update has following form:
-//
-//     S := S - scatter(U*D*Uc')
-//
-// This specialized function performs 4x4x4x4 update, i.e.:
-// * S is a tHeight*4 matrix
-// * U is a uHeight*4 matrix
-// * Uc' is a 4*4 matrix
-// * scatter() scatters rows of U*Uc', but does not scatter columns (they are
-//   densely packed).
-//
-// Return value:
-// * True if update was applied
-// * False if kernel refused to perform an update.
+// Fast kernels for small supernodal updates: special 4 x 4 x 4 x 4 function.
+// *	See comments on UpdateSupernode() for information on generic supernodal updates, including notation used below.
+// The generic update has the following form:
+//	S = S - scatter(U D Uc^T).
+// This specialized function performs a 4 x 4 x 4 x 4 update, i.e.:
+// *	S is a tHeight x 4 matrix,
+// *	U is a uHeight x 4 matrix,
+// *	Uc^T is a 4 x 4 matrix,
+// *	scatter() scatters rows of U Uc^T, but does not scatter columns (they are densely packed).
+// Return Value:
+// *	true if an update was applied,
+// *	false if the kernel refused to perform an update.
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
-static bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
+static bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
    ae_int_t k;
    ae_int_t targetrow;
    ae_int_t offsk;
@@ -21479,6 +21475,12 @@ static bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_
    double uk2;
    double uk3;
    bool result;
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   KerFunAvx2Fma(spchol_updatekernel4444(rowstorage->xR, offss, sheight, offsu, uheight, diagd->xR, offsd, raw2smap->xZ, superrowidx->xZ, urbase))
+#endif
+// Generic C fallback code.
    d0 = diagd->xR[offsd];
    d1 = diagd->xR[offsd + 1];
    d2 = diagd->xR[offsd + 2];
@@ -21499,44 +21501,62 @@ static bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_
    u31 = d1 * rowstorage->xR[offsu + 13];
    u32 = d2 * rowstorage->xR[offsu + 14];
    u33 = d3 * rowstorage->xR[offsu + 15];
-   for (k = 0; k < uheight; k++) {
-      targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
-      offsk = offsu + k * 4;
-      uk0 = rowstorage->xR[offsk];
-      uk1 = rowstorage->xR[offsk + 1];
-      uk2 = rowstorage->xR[offsk + 2];
-      uk3 = rowstorage->xR[offsk + 3];
-      rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
-      rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
-      rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
-      rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
+   if (sheight == uheight) {
+   // No row scatter, the most efficient code
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + k * 4;
+         offsk = offsu + k * 4;
+         uk0 = rowstorage->xR[offsk];
+         uk1 = rowstorage->xR[offsk + 1];
+         uk2 = rowstorage->xR[offsk + 2];
+         uk3 = rowstorage->xR[offsk + 3];
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
+      }
+   } else {
+   // Row scatter is performed, less efficient code using double mapping to determine target row index
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
+         offsk = offsu + k * 4;
+         uk0 = rowstorage->xR[offsk];
+         uk1 = rowstorage->xR[offsk + 1];
+         uk2 = rowstorage->xR[offsk + 2];
+         uk3 = rowstorage->xR[offsk + 3];
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
+      }
    }
    result = true;
    return result;
 }
 
 // Fast kernels for small supernodal updates: special 4x4x4x4 function.
-//
-// ! See comments on UpdateSupernode() for information  on generic supernodal
-// ! updates, including notation used below.
-//
-// The generic update has following form:
-//
-//     S := S - scatter(U*D*Uc')
-//
-// This specialized function performs AxBxCx4 update, i.e.:
-// * S is a tHeight*A matrix with row stride equal to 4 (usually it means that
-//   it has 3 or 4 columns)
-// * U is a uHeight*B matrix
-// * Uc' is a B*C matrix, with C <= A
-// * scatter() scatters rows and columns of U*Uc'
-//
-// Return value:
-// * True if update was applied
-// * False if kernel refused to perform an update (quick exit for unsupported
-//   combinations of input sizes)
+// *	See comments on UpdateSupernode() for information on generic supernodal updates, including notation used below.
+// The generic update has the following form:
+//	S = S - scatter(U D Uc^T).
+// This specialized function performs an A x B x C x 4 update, i.e.:
+// *	S is a tHeight x A matrix with row stride equal to 4 (usually it means that it has 3 or 4 columns),
+// *	U is a uHeight x B matrix,
+// *	Uc^T is a B x C matrix, with C <= A,
+// *	scatter() scatters rows and columns of U Uc^T.
+// Return Value:
+// *	true if an update was applied,
+// *	false if the kernel refused to perform an update (quick exit for unsupported combinations of input sizes).
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
+#if defined ALGLIB_NO_FAST_KERNELS
+   const ae_int_t louwidth = 3;
+#else
+   const ae_int_t louwidth = 1;
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   KerFunAvx2Fma(spchol_updatekernelabc4(rowstorage->xR, offss, twidth, offsu, uheight, urank, urowstride, uwidth, diagd->xR, offsd, raw2smap->xZ, superrowidx->xZ, urbase))
+#endif
+// Generic code.
    ae_int_t k;
    ae_int_t targetrow;
    ae_int_t targetcol;
@@ -21575,7 +21595,7 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
    if (twidth < 3 || twidth > 4) {
       return result;
    }
-   if (uwidth < 3 || uwidth > 4) {
+   if (uwidth < louwidth || uwidth > 4) {
       return result;
    }
    if (urank > 4) {
@@ -21747,24 +21767,17 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
 }
 
 // Fast kernels for small supernodal updates: special rank-1 function.
-//
-// ! See comments on UpdateSupernode() for information  on generic supernodal
-// ! updates, including notation used below.
-//
-// The generic update has following form:
-//
-//     S := S - scatter(U*D*Uc')
-//
-// This specialized function performs rank-1 update, i.e.:
-// * S is a tHeight*A matrix, with A <= 4
-// * U is a uHeight*1 matrix with unit stride
-// * Uc' is a 1*B matrix, with B <= A
-// * scatter() scatters rows and columns of U*Uc'
-//
-// Return value:
-// * True if update was applied
-// * False if kernel refused to perform an update (quick exit for unsupported
-//   combinations of input sizes)
+// *	See comments on UpdateSupernode() for information on generic supernodal updates, including notation used below.
+// The generic update has the following form:
+//	S = S - scatter(U D Uc^T).
+// This specialized function performs a rank-1 update, i.e.:
+// *	S is a tHeight x A matrix, with A <= 4,
+// *	U is a uHeight x 1 matrix with unit stride,
+// *	Uc^T is a 1 x B matrix, with B <= A,
+// *	scatter() scatters rows and columns of U Uc^T.
+// Return Value:
+// *	true if an update was applied,
+// *	false if the kernel refused to perform an update (quick exit for unsupported combinations of input sizes).
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 static bool spchol_updatekernelrank1(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t trowstride, ae_int_t offsu, ae_int_t uheight, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
    ae_int_t k;
@@ -21854,24 +21867,17 @@ static bool spchol_updatekernelrank1(RVector *rowstorage, ae_int_t offss, ae_int
 }
 
 // Fast kernels for small supernodal updates: special rank-2 function.
-//
-// ! See comments on UpdateSupernode() for information  on generic supernodal
-// ! updates, including notation used below.
-//
-// The generic update has following form:
-//
-//     S := S - scatter(U*D*Uc')
-//
-// This specialized function performs rank-2 update, i.e.:
-// * S is a tHeight*A matrix, with A <= 4
-// * U is a uHeight*2 matrix with row stride equal to 2
-// * Uc' is a 2*B matrix, with B <= A
-// * scatter() scatters rows and columns of U*Uc
-//
-// Return value:
-// * True if update was applied
-// * False if kernel refused to perform an update (quick exit for unsupported
-//   combinations of input sizes)
+// *	See comments on UpdateSupernode() for information on generic supernodal updates, including notation used below.
+// The generic update has the following form:
+//	S = S - scatter(U D Uc^T).
+// This specialized function performs a rank-2 update, i.e.:
+// *	S is a tHeight x A matrix, with A <= 4,
+// *	U is a uHeight x 2 matrix with row stride equal to 2,
+// *	Uc^T is a 2 x B matrix, with B <= A,
+// *	scatter() scatters rows and columns of U Uc^T.
+// Return Value:
+// *	true if an update was applied,
+// *	false if the kernel refused to perform an update (quick exit for unsupported combinations of input sizes).
 // ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
 static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t trowstride, ae_int_t offsu, ae_int_t uheight, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
    ae_int_t k;
@@ -21983,7 +21989,7 @@ static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int
 // is a supernodal equivalent  of  the  column  update  in  the  left-looking
 // Cholesky.
 //
-// The generic update has following form:
+// The generic update has the following form:
 //
 //     S := S - scatter(U*D*Uc')
 //
@@ -22024,6 +22030,7 @@ static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, 
    ae_int_t uheight;
    ae_int_t urowstride;
    ae_int_t twidth;
+   ae_int_t theight;
    ae_int_t trowstride;
    ae_int_t targetrow;
    ae_int_t targetcol;
@@ -22036,6 +22043,7 @@ static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, 
    double v;
    ae_int_t result;
    twidth = cols1 - cols0;
+   theight = twidth + (analysis->superrowridx.xZ[sidx + 1] - analysis->superrowridx.xZ[sidx]);
    offsu = analysis->rowoffsets.xZ[uidx];
    colu0 = analysis->supercolrange.xZ[uidx];
    colu1 = analysis->supercolrange.xZ[uidx + 1];
@@ -22065,21 +22073,21 @@ static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, 
    if (trowstride == 4) {
    // Target is stride-4 column, try several kernels that may work with tWidth=3 and tWidth=4
       if (uwidth == 4 && twidth == 4 && urank == 4 && urowstride == 4) {
-         if (spchol_updatekernel4444(&analysis->rowstorage, offss, offsu, uheight, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
+         if (spchol_updatekernel4444(&analysis->outputstorage, offss, theight, offsu, uheight, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
             return result;
          }
       }
-      if (spchol_updatekernelabc4(&analysis->rowstorage, offss, twidth, offsu, uheight, urank, urowstride, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
+      if (spchol_updatekernelabc4(&analysis->outputstorage, offss, twidth, offsu, uheight, urank, urowstride, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
          return result;
       }
    }
    if (urank == 1 && urowstride == 1) {
-      if (spchol_updatekernelrank1(&analysis->rowstorage, offss, twidth, trowstride, offsu, uheight, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
+      if (spchol_updatekernelrank1(&analysis->outputstorage, offss, twidth, trowstride, offsu, uheight, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
          return result;
       }
    }
    if (urank == 2 && urowstride == 2) {
-      if (spchol_updatekernelrank2(&analysis->rowstorage, offss, twidth, trowstride, offsu, uheight, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
+      if (spchol_updatekernelrank2(&analysis->outputstorage, offss, twidth, trowstride, offsu, uheight, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
          return result;
       }
    }
@@ -22097,11 +22105,11 @@ static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, 
             offsj = offsu + j * urowstride;
             offsk = offsu + k * urowstride;
             offs0 = targetrow + targetcol;
-            v = analysis->rowstorage.xR[offs0];
+            v = analysis->outputstorage.xR[offs0];
             for (i = 0; i < urank; i++) {
-               v -= analysis->rowstorage.xR[offsj + i] * analysis->rowstorage.xR[offsk + i];
+               v -= analysis->outputstorage.xR[offsj + i] * analysis->outputstorage.xR[offsk + i];
             }
-            analysis->rowstorage.xR[offs0] = v;
+            analysis->outputstorage.xR[offs0] = v;
          }
       }
    } else {
@@ -22113,11 +22121,11 @@ static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, 
             offsj = offsu + j * urowstride;
             offsk = offsu + k * urowstride;
             offs0 = targetrow + targetcol;
-            v = analysis->rowstorage.xR[offs0];
+            v = analysis->outputstorage.xR[offs0];
             for (i = 0; i < urank; i++) {
-               v -= analysis->rowstorage.xR[offsj + i] * diagd->xR[offsd + i] * analysis->rowstorage.xR[offsk + i];
+               v -= analysis->outputstorage.xR[offsj + i] * diagd->xR[offsd + i] * analysis->outputstorage.xR[offsk + i];
             }
-            analysis->rowstorage.xR[offs0] = v;
+            analysis->outputstorage.xR[offs0] = v;
          }
       }
    }
@@ -22156,11 +22164,11 @@ static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx) {
       // Compute J-th column
          vs = 0.0;
          for (k = j; k < blocksize + offdiagsize; k++) {
-            v = analysis->rowstorage.xR[offss + k * sstride + j];
+            v = analysis->outputstorage.xR[offss + k * sstride + j];
             for (i = 0; i < j; i++) {
-               v -= analysis->rowstorage.xR[offss + k * sstride + i] * analysis->rowstorage.xR[offss + j * sstride + i];
+               v -= analysis->outputstorage.xR[offss + k * sstride + i] * analysis->outputstorage.xR[offss + j * sstride + i];
             }
-            analysis->rowstorage.xR[offss + k * sstride + j] = v;
+            analysis->outputstorage.xR[offss + k * sstride + j] = v;
             vs += fabs(v);
          }
          if (controloverflow && vs > analysis->modparam1) {
@@ -22169,15 +22177,15 @@ static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx) {
             return result;
          }
       // Handle pivot element
-         v = analysis->rowstorage.xR[offss + j * sstride + j];
+         v = analysis->outputstorage.xR[offss + j * sstride + j];
          if (controlpivot && v <= analysis->modparam0) {
          // Basic modified Cholesky
             v = sqrt(analysis->modparam0);
             analysis->diagd.xR[cols0 + j] = 1.0;
-            analysis->rowstorage.xR[offss + j * sstride + j] = v;
+            analysis->outputstorage.xR[offss + j * sstride + j] = v;
             v = 1 / v;
             for (k = j + 1; k < blocksize + offdiagsize; k++) {
-               analysis->rowstorage.xR[offss + k * sstride + j] *= v;
+               analysis->outputstorage.xR[offss + k * sstride + j] *= v;
             }
          } else {
          // Default case
@@ -22188,7 +22196,7 @@ static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx) {
             analysis->diagd.xR[cols0 + j] = 1.0;
             v = 1 / sqrt(v);
             for (k = j; k < blocksize + offdiagsize; k++) {
-               analysis->rowstorage.xR[offss + k * sstride + j] *= v;
+               analysis->outputstorage.xR[offss + k * sstride + j] *= v;
             }
          }
       }
@@ -22198,11 +22206,11 @@ static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx) {
       // Compute J-th column
          vs = 0.0;
          for (k = j; k < blocksize + offdiagsize; k++) {
-            v = analysis->rowstorage.xR[offss + k * sstride + j];
+            v = analysis->outputstorage.xR[offss + k * sstride + j];
             for (i = 0; i < j; i++) {
-               v -= analysis->rowstorage.xR[offss + k * sstride + i] * analysis->diagd.xR[cols0 + i] * analysis->rowstorage.xR[offss + j * sstride + i];
+               v -= analysis->outputstorage.xR[offss + k * sstride + i] * analysis->diagd.xR[cols0 + i] * analysis->outputstorage.xR[offss + j * sstride + i];
             }
-            analysis->rowstorage.xR[offss + k * sstride + j] = v;
+            analysis->outputstorage.xR[offss + k * sstride + j] = v;
             vs += fabs(v);
          }
          if (controloverflow && vs > analysis->modparam1) {
@@ -22213,15 +22221,15 @@ static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx) {
       // Handle pivot element
          ae_assert(analysis->wrkat.idx.xZ[analysis->wrkat.ridx.xZ[cols0 + j]] == cols0 + j, "FactorizeSupernode: integrity check failed");
          possignvraw = possign(analysis->wrkat.vals.xR[analysis->wrkat.ridx.xZ[cols0 + j]]);
-         v = analysis->rowstorage.xR[offss + j * sstride + j];
+         v = analysis->outputstorage.xR[offss + j * sstride + j];
          if (controlpivot && v / possignvraw <= analysis->modparam0) {
          // Basic modified LDLT
             v = possignvraw * analysis->modparam0;
             analysis->diagd.xR[cols0 + j] = v;
-            analysis->rowstorage.xR[offss + j * sstride + j] = 1.0;
+            analysis->outputstorage.xR[offss + j * sstride + j] = 1.0;
             v = 1 / v;
             for (k = j + 1; k < blocksize + offdiagsize; k++) {
-               analysis->rowstorage.xR[offss + k * sstride + j] *= v;
+               analysis->outputstorage.xR[offss + k * sstride + j] *= v;
             }
          } else {
          // Unmodified LDLT
@@ -22232,7 +22240,7 @@ static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx) {
             analysis->diagd.xR[cols0 + j] = v;
             v = 1 / v;
             for (k = j; k < blocksize + offdiagsize; k++) {
-               analysis->rowstorage.xR[offss + k * sstride + j] *= v;
+               analysis->outputstorage.xR[offss + k * sstride + j] *= v;
             }
          }
       }
@@ -22541,7 +22549,7 @@ bool spsymmfactorize(spcholanalysis *analysis, sparsematrix *a, RVector *d, ZVec
    bsetallocv(n, false, &analysis->flagarray);
    isetallocv(analysis->nsuper, 0, &analysis->wrkrows);
    rsetallocv(n, 0.0, &analysis->diagd);
-   rsetallocv(analysis->rowoffsets.xZ[analysis->nsuper], 0.0, &analysis->rowstorage);
+   rsetallocv(analysis->rowoffsets.xZ[analysis->nsuper], 0.0, &analysis->outputstorage);
 // Now we can run actual supernodal Cholesky
    for (sidx = 0; sidx < analysis->nsuper; sidx++) {
       cols0 = analysis->supercolrange.xZ[sidx];
@@ -22561,7 +22569,7 @@ bool spsymmfactorize(spcholanalysis *analysis, sparsematrix *a, RVector *d, ZVec
          i0 = analysis->wrkat.ridx.xZ[j];
          i1 = analysis->wrkat.ridx.xZ[j + 1] - 1;
          for (ii = i0; ii <= i1; ii++) {
-            analysis->rowstorage.xR[offss + analysis->raw2smap.xZ[analysis->wrkat.idx.xZ[ii]] * sstride + (j - cols0)] = analysis->wrkat.vals.xR[ii];
+            analysis->outputstorage.xR[offss + analysis->raw2smap.xZ[analysis->wrkat.idx.xZ[ii]] * sstride + (j - cols0)] = analysis->wrkat.vals.xR[ii];
          }
       }
    // Update current supernode with nonzeros from the current row
@@ -22576,7 +22584,7 @@ bool spsymmfactorize(spcholanalysis *analysis, sparsematrix *a, RVector *d, ZVec
       }
    }
 // Convert from supernodal storage to SparseMatrix format
-   spchol_extractmatrix(analysis, &analysis->rowoffsets, &analysis->rowstrides, &analysis->rowstorage, &analysis->diagd, n, a, d, p, &analysis->tmp0);
+   spchol_extractmatrix(analysis, &analysis->rowoffsets, &analysis->rowstrides, &analysis->outputstorage, &analysis->diagd, n, a, d, p, &analysis->tmp0);
    return result;
 }
 
@@ -22596,7 +22604,7 @@ void spcholanalysis_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->ladjplus, 0, DT_INT, make_automatic);
    ae_vector_init(&p->outrowcounts, 0, DT_INT, make_automatic);
    sparsematrix_init(&p->wrkat, make_automatic);
-   ae_vector_init(&p->rowstorage, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->outputstorage, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->rowstrides, 0, DT_INT, make_automatic);
    ae_vector_init(&p->rowoffsets, 0, DT_INT, make_automatic);
    ae_vector_init(&p->diagd, 0, DT_REAL, make_automatic);
@@ -22644,7 +22652,7 @@ void spcholanalysis_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->ladjplus, &src->ladjplus, make_automatic);
    ae_vector_copy(&dst->outrowcounts, &src->outrowcounts, make_automatic);
    sparsematrix_copy(&dst->wrkat, &src->wrkat, make_automatic);
-   ae_vector_copy(&dst->rowstorage, &src->rowstorage, make_automatic);
+   ae_vector_copy(&dst->outputstorage, &src->outputstorage, make_automatic);
    ae_vector_copy(&dst->rowstrides, &src->rowstrides, make_automatic);
    ae_vector_copy(&dst->rowoffsets, &src->rowoffsets, make_automatic);
    ae_vector_copy(&dst->diagd, &src->diagd, make_automatic);
@@ -22679,7 +22687,7 @@ void spcholanalysis_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->ladjplus, make_automatic);
    ae_vector_free(&p->outrowcounts, make_automatic);
    sparsematrix_free(&p->wrkat, make_automatic);
-   ae_vector_free(&p->rowstorage, make_automatic);
+   ae_vector_free(&p->outputstorage, make_automatic);
    ae_vector_free(&p->rowstrides, make_automatic);
    ae_vector_free(&p->rowoffsets, make_automatic);
    ae_vector_free(&p->diagd, make_automatic);

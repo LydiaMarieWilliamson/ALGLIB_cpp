@@ -115,25 +115,43 @@ typedef enum { NonTH, SerTH, ParTH } xparams;
 #   include <stdint.h>
 #endif
 
-// SSE2 intrinsics.
+// Intel SIMD intrinsics
 // The preprocessor directives below:
-// -	include headers for SSE2 intrinsics,
-// -	define AE_HAS_SSE2_INTRINSICS definition.
+// -	include headers for SSE2/AVX2/AVX2+FMA3 intrinsics,
+// -	define _ALGLIB_HAS_SSE2_INTRINSICS, _ALGLIB_HAS_AVX2_INTRINSICS and _ALGLIB_HAS_FMA_INTRINSICS definitions.
 // These actions are performed when we have:
 // -	an x86 architecture definition AE_CPU == AE_INTEL,
 // -	a compiler which supports intrinsics.
-// The presence of AE_HAS_SSE2_INTRINSICS does NOT mean that our CPU actually supports SSE2 -
+// The presence of _ALGLIB_HAS_???_INTRINSICS does NOT mean that our CPU actually supports these intrinsics -
 // such things should be determined by CurCPU, which is initialized on start-up.
-// It means that we are working under Intel and our compiler can issue SSE2-capable code.
+// It means that we are working under Intel and our compiler can issue SIMD-capable code.
 #if defined AE_CPU && AE_CPU == AE_INTEL // Intel definitions.
-#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
+// Other than Sun studio, we only assume that the compiler supports all instruction sets if something is not explicitly turned off.
+#   if AE_COMPILER == AE_GNUC && !defined AE_NO_SSE2 || AE_COMPILER == AE_SUNC
 #      include <xmmintrin.h>
 #   endif
-#   if AE_COMPILER == AE_MSVC || AE_COMPILER == AE_SUNC
+#   if AE_COMPILER == AE_MSVC && !defined AE_NO_SSE2 || AE_COMPILER == AE_SUNC
 #      include <emmintrin.h>
 #   endif
-#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_MSVC || AE_COMPILER == AE_SUNC
+#   if !defined AE_NO_SSE2 || AE_COMPILER == AE_SUNC
 #      define AE_HAS_SSE2_INTRINSICS
+#      define _ALGLIB_HAS_SSE2_INTRINSICS
+#   endif
+#   if (AE_COMPILER == AE_GNUC && !defined AE_NO_AVX2 || AE_COMPILER == AE_OTHERC) && !defined AE_NO_SSE2 || AE_COMPILER == AE_SUNC
+#      include <immintrin.h> //(@) Oriignally preceded the #defines *HAS_SSE2_INTRINSICS for AE_OTHER_OS.
+#   endif
+#   if AE_COMPILER == AE_MSVC && !defined AE_NO_SSE2 && !defined AE_NO_AVX2
+#      include <intrin.h>
+#   endif
+#   if !defined AE_NO_SSE2 && !defined AE_NO_AVX2 || AE_COMPILER == AE_SUNC
+#      define _ALGLIB_HAS_AVX2_INTRINSICS
+#   endif
+#   if !defined AE_NO_SSE2 && !defined AE_NO_AVX2 && !defined AE_NO_FMA || AE_COMPILER == AE_SUNC
+#      define _ALGLIB_HAS_FMA_INTRINSICS
+#   endif
+// Intel integrity checks.
+#   if defined _ALGLIB_INTEGRITY_CHECKS_ONCE && defined _ALGLIB_FAIL_WITHOUT_FMA_INTRINSICS && !defined _ALGLIB_HAS_FMA_INTRINSICS
+#      error ALGLIB was requested to fail without FMA intrinsics
 #   endif
 #endif
 
@@ -181,6 +199,8 @@ typedef unsigned long long ae_uint64_t;
 #if !defined AE_INT_T
 typedef ptrdiff_t ae_int_t;
 #endif
+
+typedef double Real; // Used in the Kernel*.{cpp,h} files.
 
 struct complex { double x, y; };
 
@@ -738,6 +758,64 @@ void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_strid
 void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode);
 void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride);
 } // end of namespace alglib_impl
+
+// Internal macros, defined only when _ALGLIB_IMPL_DEFINES is defined before inclusion of this header file.
+#if defined _ALGLIB_IMPL_DEFINES
+#   include "KernelsAvx2.h"
+#   include "KernelsFma.h"
+#   include "KernelsSse2.h"
+#   define _ALGLIB_SIMD_ALIGNMENT_DOUBLES 8
+#   define _ALGLIB_SIMD_ALIGNMENT_BYTES   (_ALGLIB_SIMD_ALIGNMENT_DOUBLES*8)
+// SIMD kernel dispatchers.
+#   if defined _ALGLIB_HAS_SSE2_INTRINSICS
+#      define _KerSubSse2(Op) if (CurCPU & CPU_SSE2) { sse2_##Op; return; }
+#      define _KerFunSse2(Op) if (CurCPU & CPU_SSE2) { return sse2_##Op; }
+#   else
+#      define _KerSubSse2(Op)
+#      define _KerFunSse2(Op)
+#   endif
+#   if defined _ALGLIB_HAS_AVX2_INTRINSICS
+#      define _KerSubAvx2(Op) if (CurCPU & CPU_AVX2) { avx2_##Op; return; }
+#      define _KerFunAvx2(Op) if (CurCPU & CPU_AVX2) { return avx2_##Op; }
+#   else
+#      define _KerSubAvx2(Op)
+#      define _KerFunAvx2(Op)
+#   endif
+#   if defined _ALGLIB_HAS_FMA_INTRINSICS
+#      define _KerSubFma(Op) if (CurCPU & CPU_FMA) { fma_##Op; return; }
+#      define _KerFunFma(Op) if (CurCPU & CPU_FMA) { return fma_##Op; }
+#   else
+#      define _KerSubFma(Op)
+#      define _KerFunFma(Op)
+#   endif
+#   define KerSubSse2Avx2(Op) { _KerSubAvx2(Op) _KerSubSse2(Op) }
+#   define KerFunSse2Avx2(Op) { _KerFunAvx2(Op) _KerFunSse2(Op) }
+#   define KerSubSse2Avx2Fma(Op) { _KerSubFma(Op) _KerSubAvx2(Op) _KerSubSse2(Op) }
+#   define KerFunSse2Avx2Fma(Op) { _KerFunFma(Op) _KerFunAvx2(Op) _KerFunSse2(Op) }
+#   define KerSubAvx2Fma(Op) { _KerSubFma(Op) _KerSubAvx2(Op) }
+#   define KerFunAvx2Fma(Op) { _KerFunFma(Op) _KerFunAvx2(Op) }
+#   define KerSubAvx2(Op) { _KerSubAvx2(Op) }
+#   define KerFunAvx2(Op) { _KerFunAvx2(Op) }
+#   ifdef FP_FAST_FMA
+#      define APPROX_FMA(x, y, z) fma((x), (y), (z))
+#   else
+#      define APPROX_FMA(x, y, z) ((x)*(y) + (z))
+#   endif
+#   if !defined ALGLIB_NO_FAST_KERNELS
+// Arrays shorter than that will be processed with generic C implementation
+#      if !defined _ABLASF_KERNEL_SIZE1
+#         define _ABLASF_KERNEL_SIZE1 16
+#      endif
+#      if !defined _ABLASF_KERNEL_SIZE2
+#         define _ABLASF_KERNEL_SIZE2 16
+#      endif
+#      define _ABLASF_BLOCK_SIZE 32
+#      define _ABLASF_MICRO_SIZE  2
+#      if defined _ALGLIB_HAS_AVX2_INTRINSICS || defined _ALGLIB_HAS_FMA_INTRINSICS
+#         define ULOAD256PD(x) _mm256_loadu_pd((const double *)&x)
+#      endif
+#   endif
+#endif
 
 namespace alglib {
 // Declarations for C++-related functionality.

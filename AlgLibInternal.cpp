@@ -12,6 +12,9 @@
 //
 //	A copy of the GNU General Public License is available at http://www.fsf.org/licensing/licenses
 #define InAlgLib
+// Must be defined before we include anything depending on any kernel headers.
+#define _ALGLIB_IMPL_DEFINES
+#define _ALGLIB_INTEGRITY_CHECKS_ONCE
 #include "AlgLibInternal.h"
 
 // === APSERV Package ===
@@ -1469,735 +1472,1197 @@ void RVector_free(void *_p, bool make_automatic) {
 
 // === ABLASF Package ===
 namespace alglib_impl {
-// Currently: bcopyv, raddvr, raddvx, rcopymulv, rcopyvx, rsetc are not used anywhere.
-
-// Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
-//
+// The dot product of elements [0,n) of vectors x and y.
 // Inputs:
-//     N       -   vector length
-//     X       -   array[N], vector to process
-//     Y       -   array[N], vector to process
-//
+//	n:	The vector length.
+//	x:	An n-vector to process.
+//	y:	An n-vector to process.
 // Result:
-//     (X,Y)
+//	The inner product (x,y).
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotv(ae_int_t n, RVector *x, RVector *y) {
-   double result = 0.0;
-   for (ae_int_t i = 0; i < n; i++) result += x->xR[i] * y->xR[i];
-   return result;
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// Use KerSub* for a kernel that does not return result.
+   if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2Fma(rdotv(n, x->xR, y->xR))
+#endif
+// Original generic C implementation
+   double dot = 0.0;
+   for (ae_int_t i = 0; i < n; i++) dot += x->xR[i] * y->xR[i];
+   return dot;
 }
 
-// Computes dot product (X,A[i]) for elements [0,N) of vector X[] and row A[i,*]
-//
+// The dot product of elements [0,n) of vectors x and y[iy,_].
 // Inputs:
-//     N       -   vector length
-//     X       -   array[N], vector to process
-//     A       -   array[?,N], matrix to process
-//     I       -   row index of A
-//
+//	n:	The vector length.
+//	x:	An n-vector to process.
+//	y:	A ? x n matrix to process.
+//	iy:	A row index in y.
 // Result:
-//     (X,Ai)
+//	The inner product (x,y[iy,_]).
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i) {
-   double result = 0.0;
-   for (ae_int_t j = 0; j < n; j++) result += x->xR[j] * a->xyR[i][j];
-   return result;
+double rdotvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2Fma(rdotv(n, x->xR, y->xyR[iy]))
+#endif
+   double dot = 0.0;
+   for (ae_int_t j = 0; j < n; j++) dot += x->xR[j] * y->xyR[iy][j];
+   return dot;
 }
 
-// Computes dot product (A[ia],B[ib]) for rows A[ia,*] and B[ib,*]
-//
+// The dot product of elements [0,n) of vectors x[ix,_] and y[iy,_].
 // Inputs:
-//     N       -   vector length
-//     A       -   array[?,N], matrix to process
-//     IA      -   row index of A
-//     B       -   array[?,N], matrix to process
-//     IB      -   row index of B
-//
+//	n:	The vector length.
+//	x:	An n x n matrix to process.
+//	ix:	A row index in x.
+//	y:	A ? x n matrix to process.
+//	iy:	A row index in y.
 // Result:
-//     (A[ia],B[ib])
+//	The inner product (x[ix,_],y[iy,_]).
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib) {
-   double result = 0.0;
-   for (ae_int_t j = 0; j < n; j++) result += a->xyR[ia][j] * b->xyR[ib][j];
-   return result;
+double rdotrr(ae_int_t n, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2Fma(rdotv(n, x->xyR[ix], y->xyR[iy]))
+#endif
+   double dot = 0.0;
+   for (ae_int_t j = 0; j < n; j++) dot += x->xyR[ix][j] * y->xyR[iy][j];
+   return dot;
 }
 
-// Computes dot product (X,X) for elements [0,N) of X[]
-//
+// The dot product square of elements [0,n) of the vector x.
 // Inputs:
-//     N       -   vector length
-//     X       -   array[N], vector to process
-//
+//	n:	The vector length.
+//	x:	The n-vector to process.
 // Result:
-//     (X,X)
+//	The inner product square (x,x).
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rdotv2(ae_int_t n, RVector *x) {
-   double result = 0.0;
-   for (ae_int_t i = 0; i < n; i++) result += sqr(x->xR[i]);
-   return result;
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2Fma(rdotv2(n, x->xR))
+#endif
+   double dot = 0.0;
+   for (ae_int_t i = 0; i < n; i++) dot += sqr(x->xR[i]);
+   return dot;
 }
 
-// Performs in-place addition of Y[] to X[]
-//
+// Add elements [0,n) of the vector x to y.
 // Inputs:
-//     N       -   vector length
-//     Alpha   -   multiplier
-//     Y       -   array[N], vector to process
-//     X       -   array[N], vector to process
-//
+//	n:	The vector length.
+//	alpha:	The multiplier.
+//	x:	An n-vector to process.
+//	y:	An n-vector to process.
 // Result:
-//     X := X + alpha*Y
+//	y += alpha x.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddv(ae_int_t n, double alpha, RVector *y, RVector *x) {
-   for (ae_int_t i = 0; i < n; i++) x->xR[i] += alpha * y->xR[i];
+void raddv(ae_int_t n, double alpha, RVector *x, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2Fma(raddv(n, alpha, x->xR, y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] += alpha * x->xR[i];
 }
 
-// Performs in-place addition of Y[] to X[]
-//
+// Add elements [0,n) of the vector x to y[iy,_].
 // Inputs:
-//     N       -   vector length
-//     Alpha   -   multiplier
-//     Y       -   source vector
-//     OffsY   -   source offset
-//     X       -   destination vector
-//     OffsX   -   destination offset
-//
+//	n:	The vector length.
+//	alpha:	The multiplier.
+//	x:	An n-vector to add.
+//	y:	A matrix.
+//	iy:	The destination row index in y.
 // Result:
-//     X := X + alpha*Y
+//	y[iy,_] += alpha x.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx) {
-   for (ae_int_t i = 0; i < n; i++) x->xR[offsx + i] += alpha * y->xR[offsy + i];
+void raddvr(ae_int_t n, double alpha, RVector *x, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2Fma(raddv(n, alpha, x->xR, y->xyR[iy]))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] += alpha * x->xR[i];
 }
 
-// Performs in-place addition of vector Y[] to column X[]
-//
+// Add elements [0,n) of the vector x[ix,_] to y.
 // Inputs:
-//     N       -   vector length
-//     Alpha   -   multiplier
-//     Y       -   vector to add
-//     X       -   target matrix
-//     colidx  -   target column index of X
-//
+//	n:	The vector length.
+//	alpha:	The multiplier.
+//	x:	The source ? x n matrix.
+//	ix:	A row index in x.
+//	y:	The n-vector to process.
 // Result:
-//     X := X + alpha*Y
+//	y += alpha x[ix,_].
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddvc(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t colidx) {
-   for (ae_int_t i = 0; i < n; i++) x->xyR[i][colidx] += alpha * y->xR[i];
+void raddrv(ae_int_t n, double alpha, RMatrix *x, ae_int_t ix, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2Fma(raddv(n, alpha, x->xyR[ix], y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] += alpha * x->xyR[ix][i];
 }
 
-// Performs in-place addition of vector Y[] to row X[]
-//
+// Add elements [0,n) of the vector x[ix,_] to y[iy,_].
 // Inputs:
-//     N       -   vector length
-//     Alpha   -   multiplier
-//     Y       -   vector to add
-//     X       -   matrix to add to
-//     RowIdx  -   target row index of X
-//
+//	n:	The vector length.
+//	alpha:	A multiplier.
+//	x:	The source ? x n matrix.
+//	ix:	The source row index in x.
+//	y:	The destination ? x n matrix.
+//	iy:	The destination row index in y.
 // Result:
-//     X := X + alpha*Y
+//	y[iy,_] += alpha x[ix,_].
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx) {
-   for (ae_int_t i = 0; i < n; i++) x->xyR[rowidx][i] += alpha * y->xR[i];
+void raddrr(ae_int_t n, double alpha, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2Fma(raddv(n, alpha, x->xyR[ix], y->xyR[iy]))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] += alpha * x->xyR[ix][i];
 }
 
-// Performs componentwise multiplication of row X[] by vector Y[]
-//
+// Add elements [x0,x0+n) of the vector x to elements [y0,y0+n) of y.
 // Inputs:
-//     N       -   vector length
-//     Y       -   vector to multiply by
-//     X       -   matrix to multiply into
-//     RowIdx  -   target row index of X
-//
+//	n:	The vector length.
+//	alpha:	The multiplier.
+//	x:	The source vector.
+//	x0:	The source offset in x.
+//	y:	The destination vector.
+//	y0:	The destination offset in y.
 // Result:
-//     X[RowIdx] := componentwise(X[RowIdx]*Y)
+//	y[y0+i] += alpha x[x0+i], for i in [0,n).
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx) {
-   for (ae_int_t i = 0; i < n; i++) x->xyR[rowidx][i] *= y->xR[i];
+void raddvx(ae_int_t n, double alpha, RVector *x, ae_int_t x0, RVector *y, ae_int_t y0) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2Fma(raddvx(n, alpha, x->xR + x0, y->xR + y0))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[y0 + i] += alpha * x->xR[x0 + i];
 }
 
-// Performs componentwise max of row X[I] and vector Y[]
-//
+// Add elements [0,n) of the vector x to y[_,jy].
 // Inputs:
-//     N       -   vector length
-//     X       -   source matrix
-//     RowIdx  -   target row index of X
-//     Y       -   vector to maximize with
-//
+//	n:	The vector length.
+//	alpha:	The multiplier.
+//	x:	The vector to add.
+//	y:	The target matrix.
+//	jy:	The target column index in y.
 // Result:
-//     X[RowIdx] := componentwise(max(X[RowIdx],Y))
+//	y[i,jy] += alpha x[i], for i in [0,n).
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y) {
-   for (ae_int_t i = 0; i < n; i++) y->xR[i] = rmax2(y->xR[i], x->xyR[rowidx][i]);
+void raddvc(ae_int_t n, double alpha, RVector *x, RMatrix *y, ae_int_t jy) {
+   for (ae_int_t i = 0; i < n; i++) y->xyR[i][jy] += alpha * x->xR[i];
 }
 
-// Performs in-place addition of Y[RIdx,...] to X[]
-//
+// Component-wise multiply elements [0,n) of the vector y by x.
 // Inputs:
-//     N       -   vector length
-//     Alpha   -   multiplier
-//     Y       -   array[?,N], matrix whose RIdx-th row is added
-//     RIdx    -   row index of Y
-//     X       -   array[N], vector to process
-//
+//	n:	The vector length.
+//	x:	An n-vector to multiply by.
+//	y:	The target vector.
 // Result:
-//     X := X + alpha*Y
+//	y[i] *= x[i], for i in [0,n).
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x) {
-   for (ae_int_t i = 0; i < n; i++) x->xR[i] += alpha * y->xyR[ridx][i];
+void rmergemulv(ae_int_t n, RVector *x, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergemulv(n, x->xR, y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] *= x->xR[i];
 }
 
-// Performs in-place multiplication of X[] by V
-//
+// Component-wise multiply elements [0,n) of the vector y[iy,_] by x.
 // Inputs:
-//     N       -   vector length
-//     V       -   multiplier
-//     X       -   array[N], vector to process
-//
-// Outputs:
-//     X       -   elements 0...N-1 multiplied by V
+//	n:	The vector length.
+//	x:	A vector to multiply by.
+//	y:	The target matrix.
+//	iy:	The target row index in y.
+// Result:
+//	y[iy,i] *= x[i], for i in [0,n).
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmulv(ae_int_t n, double v, RVector *x) {
-   for (ae_int_t i = 0; i < n; i++) x->xR[i] *= v;
+void rmergemulvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergemulv(n, x->xR, y->xyR[iy]))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] *= x->xR[i];
 }
 
-// Performs in-place multiplication of X[] by V
-//
+// Component-wise multiply elements [0,n) of the vector y by x[ix,_].
 // Inputs:
-//     N       -   row length
-//     X       -   array[?,N], matrix to process
-//     RowIdx  -   target row index of X
-//     V       -   multiplier
-//
-// Outputs:
-//     X       -   elements 0...N-1 of row RowIdx are multiplied by V
+//	n:	The vector length.
+//	x:	A matrix to multiply from.
+//	ix:	The row index in x.
+//	y:	The target vector.
+// Result:
+//	y[i] *= x[ix,i], for i in [0,n).
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx) {
-   for (ae_int_t i = 0; i < n; i++) x->xyR[rowidx][i] *= v;
+void rmergemulrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergemulv(n, x->xyR[ix], y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] *= x->xyR[ix][i];
 }
 
-// Performs in-place multiplication of X[OffsX:OffsX+N-1] by V
-//
+// Component-wise max elements [0,n) of the vector x into y.
 // Inputs:
-//     N       -   subvector length
-//     V       -   multiplier
-//     X       -   vector to process
-//     OffsX   -   target offset
-//
-// Outputs:
-//     X       -   elements OffsX:OffsX+N-1 multiplied by V
+//	n:	The vector length.
+//	x:	The vector to max from.
+//	y:	The target vector.
+// Result:
+//	y[i] = max(y[i],x[i]), for i in [0,n).
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx) {
-   for (ae_int_t i = 0; i < n; i++) x->xR[offsx + i] *= v;
+void rmergemaxv(ae_int_t n, RVector *x, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergemaxv(n, x->xR, y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] = rmax2(y->xR[i], x->xR[i]);
 }
 
-// Return maximum |X|.
+// Component-wise max elements [0,n) of the vector x into y[iy,_].
 // Inputs:
-//     N       -   the vector length.
-//     X       -   the n-vector to process.
-// Outputs:
-//     max(|X[i]|)
+//	n:	The vector length.
+//	x:	The vector to max from.
+//	y:	The matrix to max into.
+//	iy:	A row index in y.
+// Result:
+//	y[iy,i] = max(y[iy,i],x[i]), for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergemaxvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergemaxv(n, x->xR, y->xyR[iy]))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] = rmax2(y->xyR[iy][i], x->xR[i]);
+}
+
+// Component-wise max elements [0,n) of the vector x[ix,_] into y.
+// Inputs:
+//	n:	The vector length.
+//	x:	The source matrix.
+//	ix:	A row index in x.
+//	y:	The destination vector.
+// Result:
+//	y[i] = max(y[i],x[ix,i]), for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergemaxv(n, x->xyR[ix], y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] = rmax2(y->xR[i], x->xyR[ix][i]);
+}
+
+// Component-wise min elements [0,n) of the vector x into y.
+// Inputs:
+//	n:	The vector length.
+//	x:	The source vector.
+//	y:	The target vector.
+// Result:
+//	y[i] = min(y[i],x[i]), for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergeminv(ae_int_t n, RVector *x, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergeminv(n, x->xR, y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] = rmin2(y->xR[i], x->xR[i]);
+}
+
+// Component-wise min elements [0,n) of the vector x into y[iy,_].
+// Inputs:
+//	n:	The vector length.
+//	x:	The vector to min from.
+//	y:	The target matrix.
+//	iy:	A row index in y.
+// Result:
+//	y[iy,i] = min(y[iy,i],x[i]), for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergeminvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergeminv(n, x->xR, y->xyR[iy]))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] = rmin2(y->xyR[iy][i], x->xR[i]);
+}
+
+// Component-wise min elements [0,n) of the vector x[ix,_] into y.
+// Inputs:
+//	n:	The vector length.
+//	x:	The source matrix.
+//	ix:	A row index in x.
+//	y:	The target vector.
+// Result:
+//	y[i] = min(y[i],x[ix,i]), for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergeminv(n, x->xyR[ix], y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] = rmin2(y->xR[i], x->xyR[ix][i]);
+}
+
+// Multiply elements [0,n) of the vector y by the scalar v.
+// Inputs:
+//	n:	The vector length.
+//	v:	The multiplier.
+//	y:	The n-vector to process.
+// Output:
+//	y:	Elements [0,n) of y *= v.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmulv(ae_int_t n, double v, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmulv(n, v, y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] *= v;
+}
+
+// Multiply the n-vector y[iy,_] by the scalar v.
+// Inputs:
+//	n:	The row length.
+//	v:	The multiplier.
+//	y:	The ? x n matrix to process.
+//	iy:	The row of y to process.
+// Output:
+//	y:	Elements [0,n) of y[iy,_] *= v.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmulr(ae_int_t n, double v, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmulv(n, v, y->xyR[iy]))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] *= v;
+}
+
+// Multiply elements [y0,y0+n) of the vector y by the scalar v.
+// Inputs:
+//	n:	The sub-vector length.
+//	v:	The multiplier.
+//	y:	The vector to process.
+//	y0:	An offset location in y.
+// Output:
+//	y:	y[y0+i] *= v, for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmulvx(ae_int_t n, double v, RVector *y, ae_int_t y0) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmulvx(n, v, y->xR + y0))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[y0 + i] *= v;
+}
+
+// The maximum over elements [0,n) of the vector x.
+// Inputs:
+//	n:	The vector length.
+//	x:	The n-vector to process.
+// Output:
+//	max(x[i], i in [0,n)), or 0 for n == 0.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rmaxv(ae_int_t n, RVector *x) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2(rmaxv(n, x->xR));
+#endif
+   if (n <= 0) return 0.0;
+   double max = x->xR[0];
+   for (ae_int_t i = 1; i < n; i++) max = rmax2(max, x->xR[i]);
+   return max;
+}
+
+// The maximum over elements [0,n) of the vector x[ix,_].
+// Inputs:
+//	n:	The vector length.
+//	x:	The matrix to process.
+//	ix:	A row index in x.
+// Output:
+//	max(x[ix,i], i in [0,n)), or 0 for n == 0.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rmaxr(ae_int_t n, RMatrix *x, ae_int_t ix) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2(rmaxv(n, x->xyR[ix]))
+#endif
+   if (n <= 0) return 0.0;
+   double max = x->xyR[ix][0];
+   for (ae_int_t i = 1; i < n; i++) max = rmax2(max, x->xyR[ix][i]);
+   return max;
+}
+
+// The maximum over elements [0,n) of the vector |x[_]|.
+// Inputs:
+//	n:	The vector length.
+//	x:	The n-vector to process.
+// Output:
+//	max(|x[i]|, i in [0,n)), or 0 for n == 0.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 double rmaxabsv(ae_int_t n, RVector *x) {
-   double result = 0.0;
-   for (ae_int_t i = 0; i < n; i++) {
-      double v = fabs(x->xR[i]);
-      if (v > result) result = v;
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2(rmaxabsv(n, x->xR))
+#endif
+   double max = 0.0;
+   for (ae_int_t i = 0; i < n; i++) max = rmax2(max, fabs(x->xR[i]));
+   return max;
+}
+
+// The maximum over elements [0,n) of the vector |x[ix,_]|.
+// Inputs:
+//	n:	The vector length.
+//	x:	The matrix to process.
+//	ix:	A row index in x.
+// Output:
+//	max(|x[ix,i]|, i in [0,n)), or 0 for n == 0.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t ix) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2(rmaxabsv(n, x->xyR[ix]))
+#endif
+   double max = 0.0;
+   for (ae_int_t i = 0; i < n; i++) max = rmax2(max, fabs(x->xyR[ix][i]));
+   return max;
+}
+
+// Set elements [0,n) of the vector y to v.
+// Inputs:
+//	n:	The vector length.
+//	v:	The value to set.
+//	y:	An n-vector.
+// Output:
+//	y:	Elements [0,n) of y are set to v.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+// Boolean:
+void bsetv(ae_int_t n, bool v, BVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1 * 8) KerSubSse2Avx2(bsetv(n, v, y->xB))
+#endif
+   for (ae_int_t j = 0; j < n; j++) y->xB[j] = v;
+}
+// Integer:
+void isetv(ae_int_t n, ae_int_t v, ZVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(isetv(n, v, y->xZ))
+#endif
+   for (ae_int_t j = 0; j < n; j++) y->xZ[j] = v;
+}
+// Real:
+void rsetv(ae_int_t n, double v, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rsetv(n, v, y->xR))
+#endif
+   for (ae_int_t j = 0; j < n; j++) y->xR[j] = v;
+}
+
+// Set elements [y0,y0+n) of the vector y to v.
+// Inputs:
+//	n:	The sub-vector length.
+//	v:	The value to set.
+//	y:	A vector to process.
+//	y0:	The offset of y.
+// Output:
+//	y:	y[y0+i] = v, for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetvx(ae_int_t n, double v, RVector *y, ae_int_t y0) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rsetvx(n, v, y->xR + y0))
+#endif
+   for (ae_int_t j = 0; j < n; j++) y->xR[y0 + j] = v;
+}
+
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Set elements of [0,n) of the vector yp[_] to v.
+// Inputs:
+//	n:	The vector size.
+//	v:	The value to set.
+//	yp:	An n-vector.
+// Output:
+//	yp:	Elements [0,n) of yp are set to v.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+static void rsetm_simd(const ae_int_t n, const double v, double *yp) {
+   KerSubSse2Avx2(rsetv(n, v, yp));
+   for (ae_int_t j = 0; j < n; j++) yp[j] = v;
+}
+#endif
+ 
+// Set elements [0,m) x [0,n) of the matrix y to v.
+// Inputs:
+//	m, n:	The row and column counts.
+//	v:	The value to set.
+//	y:	The m x n matrix.
+// Output:
+//	y:	Elements [0,m) x [0,n) of y are set to v.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) {
+      for (ae_int_t i = 0; i < m; i++) rsetm_simd(n, v, y->xyR[i]);
+      return;
    }
-   return result;
+#endif
+   for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) y->xyR[i][j] = v;
 }
 
-// Sets vector X[] to V
-//
+// Set elements [0,n) of the vector y[iy,_] to v.
 // Inputs:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   array[N]
-//
-// Outputs:
-//     X       -   leading N elements are replaced by V
+//	n:	The vector length.
+//	v:	The value to set.
+//	y:	A matrix of size n x n or larger.
+//	iy:	A row index in y.
+// Output:
+//	y:	y[iy,j] = v, for j in [0,n).
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bsetv(ae_int_t n, bool v, BVector *x) {
-   for (ae_int_t j = 0; j < n; j++) x->xB[j] = v;
+void rsetr(ae_int_t n, double v, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rsetv(n, v, y->xyR[iy]))
+#endif
+   for (ae_int_t j = 0; j < n; j++) y->xyR[iy][j] = v;
 }
 
-// Sets vector X[] to V
-//
+// Set elements [0,n) of the vector y[_,jy] to v.
 // Inputs:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   array[N]
-//
-// Outputs:
-//     X       -   leading N elements are replaced by V
+//	n:	The vector length.
+//	v:	The value to set.
+//	y:	A matrix of size n x n or larger.
+//	jy:	A column index in y.
+// Output:
+//	y:	y[i,jy] = v, for i in [0,n).
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void isetv(ae_int_t n, ae_int_t v, ZVector *x) {
-   for (ae_int_t j = 0; j < n; j++) x->xZ[j] = v;
+void rsetc(ae_int_t n, double v, RMatrix *y, ae_int_t jy) {
+   for (ae_int_t i = 0; i < n; i++) y->xyR[i][jy] = v;
 }
 
-// Sets vector X[] to V
-//
+// Set elements [0,n) of the vector y to v, reallocating y if it's too small.
 // Inputs:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   array[N]
-//
-// Outputs:
-//     X       -   leading N elements are replaced by V
+//	n:	The vector length.
+//	v:	The value to set.
+//	y:	A possibly-preallocated vector.
+// Output:
+//	y:	Elements [0,n) of y are set to v; y is reallocated, if it is shorter than n.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetv(ae_int_t n, double v, RVector *x) {
-   for (ae_int_t j = 0; j < n; j++) x->xR[j] = v;
+// Boolean:
+void bsetallocv(ae_int_t n, bool v, BVector *y) {
+   if (y->cnt < n) ae_vector_set_length(y, n);
+   bsetv(n, v, y);
+}
+// Integer:
+void isetallocv(ae_int_t n, ae_int_t v, ZVector *y) {
+   if (y->cnt < n) ae_vector_set_length(y, n);
+   isetv(n, v, y);
+}
+// Real:
+void rsetallocv(ae_int_t n, double v, RVector *y) {
+   if (y->cnt < n) ae_vector_set_length(y, n);
+   rsetv(n, v, y);
 }
 
-// Sets X[OffsX:OffsX+N-1] to V
-//
+// Set elements [0,m) x [0,n) of the matrix y to v, reallocating y if it's too small.
 // Inputs:
-//     N       -   subvector length
-//     V       -   value to set
-//     X       -   array[N]
-//     OffsX   -   target offset
-//
-// Outputs:
-//     X       -   X[OffsX:OffsX+N-1] is replaced by V
+//	m:	The row count.
+//	n:	The column count.
+//	v:	The value to set.
+//	y:	A possibly-preallocated matrix.
+// Output:
+//	y:	Elements [0,m) x [0,n) of y are set to v; y is reallocated, if its row or column counts are too small.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx) {
-   for (ae_int_t j = 0; j < n; j++) x->xR[offsx + j] = v;
+void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *y) {
+   if (y->rows < m || y->cols < n) ae_matrix_set_length(y, m, n);
+   rsetm(m, n, v, y);
 }
 
-// Sets matrix A[] to V
-//
+// Reallocate the vector x, if its length is less than n.
+// Leave it unchanged, if it is large enough.
 // Inputs:
-//     M, N    -   rows/cols count
-//     V       -   value to set
-//     A       -   array[M,N]
-//
-// Outputs:
-//     A       -   leading M rows, N cols are replaced by V
+//	n:	The desired vector length.
+//	x:	A possibly-preallocated array.
+// Output:
+//	x:	A vector, at least of length n.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a) {
-   for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) a->xyR[i][j] = v;
-}
-
-// Sets vector X[] to V, reallocating X[] if too small
-//
-// Inputs:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   possibly pre-allocated array
-//
-// Outputs:
-//     X       -   leading N elements are replaced by V; array is reallocated
-//                 if its length is less than N.
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bsetallocv(ae_int_t n, bool v, BVector *x) {
-   vectorsetlengthatleast(x, n);
-   bsetv(n, v, x);
-}
-
-// Sets vector X[] to V, reallocating X[] if too small
-//
-// Inputs:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   possibly pre-allocated array
-//
-// Outputs:
-//     X       -   leading N elements are replaced by V; array is reallocated
-//                 if its length is less than N.
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void isetallocv(ae_int_t n, ae_int_t v, ZVector *x) {
-   vectorsetlengthatleast(x, n);
-   isetv(n, v, x);
-}
-
-// Sets vector X[] to V, reallocating X[] if too small
-//
-// Inputs:
-//     N       -   vector length
-//     V       -   value to set
-//     X       -   possibly pre-allocated array
-//
-// Outputs:
-//     X       -   leading N elements are replaced by V; array is reallocated
-//                 if its length is less than N.
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetallocv(ae_int_t n, double v, RVector *x) {
-   vectorsetlengthatleast(x, n);
-   rsetv(n, v, x);
-}
-
-// Sets vector A[] to V, reallocating A[] if too small.
-//
-// Inputs:
-//     M       -   rows count
-//     N       -   cols count
-//     V       -   value to set
-//     A       -   possibly pre-allocated matrix
-//
-// Outputs:
-//     A       -   leading M rows, N cols are replaced by V; the matrix is
-//                 reallocated if its rows/cols count is less than M/N.
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *a) {
-   matrixsetlengthatleast(a, m, n);
-   rsetm(m, n, v, a);
-}
-
-// Reallocates X[] if its length is less than required value. Does not change
-// its length and contents if it is large enough.
-//
-// Inputs:
-//     N       -   desired vector length
-//     X       -   possibly pre-allocated array
-//
-// Outputs:
-//     X       -   length(X) >= N
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+// Boolean:
 void ballocv(ae_int_t n, BVector *x) {
-   vectorsetlengthatleast(x, n);
+   if (x->cnt < n) ae_vector_set_length(x, n);
 }
-
-// Reallocates X[] if its length is less than required value. Does not change
-// its length and contents if it is large enough.
-//
-// Inputs:
-//     N       -   desired vector length
-//     X       -   possibly pre-allocated array
-//
-// Outputs:
-//     X       -   length(X) >= N
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+// Integer:
+void iallocv(ae_int_t n, ZVector *x) {
+   if (x->cnt < n) ae_vector_set_length(x, n);
+}
+// Real:
 void rallocv(ae_int_t n, RVector *x) {
-   vectorsetlengthatleast(x, n);
+   if (x->cnt < n) ae_vector_set_length(x, n);
 }
 
-// Reallocates matrix if its rows or cols count is less than  required.  Does
-// not change its size if it is exactly that size or larger.
-//
+// Reallocate the matrix x, if its size is less than m x n.
+// Leave it unchanged, if it is large enough.
 // Inputs:
-//     M       -   rows count
-//     N       -   cols count
-//     A       -   possibly pre-allocated matrix
-//
-// Outputs:
-//     A       -   size is at least M*N
+//	m:	The row count.
+//	n:	The column count.
+//	x:	A possibly-preallocated matrix.
+// Output:
+//	x:	A matrix, at least of size m x n.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rallocm(ae_int_t m, ae_int_t n, RMatrix *a) {
-   matrixsetlengthatleast(a, m, n);
+void rallocm(ae_int_t m, ae_int_t n, RMatrix *x) {
+   if (x->rows < m || x->cols < n) ae_matrix_set_length(x, m, n);
 }
 
-// Sets row I of A[,] to V
-//
+// Copy elements [0,n) of the vector x into y.
 // Inputs:
-//     N       -   vector length
-//     V       -   value to set
-//     A       -   array[N,N] or larger
-//     I       -   row index
-//
-// Outputs:
-//     A       -   leading N elements of I-th row are replaced by V
+//	n:	The vector length.
+//	x:	The source n-vector.
+//	y:	A preallocated n-vector.
+// Output:
+//	y:	A copy of elements [0,n) of x into y.
+// Note:
+// *	The destination and source should NOT overlap.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i) {
-   for (ae_int_t j = 0; j < n; j++) a->xyR[i][j] = v;
-}
-
-// Sets col J of A[,] to V
-//
-// Inputs:
-//     N       -   vector length
-//     V       -   value to set
-//     A       -   array[N,N] or larger
-//     J       -   col index of A
-//
-// Outputs:
-//     A       -   leading N elements of I-th col are replaced by V
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rsetc(ae_int_t n, double v, RMatrix *a, ae_int_t j) {
-   for (ae_int_t i = 0; i < n; i++) a->xyR[i][j] = v;
-}
-
-// Copies vector X[] to Y[]
-//
-// Inputs:
-//     N       -   vector length
-//     X       -   array[N], source
-//     Y       -   pre-allocated array[N]
-//
-// Outputs:
-//     Y       -   leading N elements are replaced by X
-//
-// NOTE: destination and source should NOT overlap
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+// Boolean:
 void bcopyv(ae_int_t n, BVector *x, BVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1 * 8) KerSubSse2Avx2(bcopyv(n, x->xB, y->xB))
+#endif
    for (ae_int_t j = 0; j < n; j++) y->xB[j] = x->xB[j];
 }
-
-// Copies vector X[] to Y[]
-//
-// Inputs:
-//     N       -   vector length
-//     X       -   source array
-//     Y       -   pre-allocated array[N]
-//
-// Outputs:
-//     Y       -   X copied to Y
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+// Integer:
 void icopyv(ae_int_t n, ZVector *x, ZVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(icopyv(n, x->xZ, y->xZ))
+#endif
    for (ae_int_t j = 0; j < n; j++) y->xZ[j] = x->xZ[j];
 }
-
-// Copies vector X[] to Y[]
-//
-// Inputs:
-//     N       -   vector length
-//     X       -   array[N], source
-//     Y       -   pre-allocated array[N]
-//
-// Outputs:
-//     Y       -   leading N elements are replaced by X
-//
-// NOTE: destination and source should NOT overlap
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+// Real:
 void rcopyv(ae_int_t n, RVector *x, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopyv(n, x->xR, y->xR))
+#endif
    for (ae_int_t j = 0; j < n; j++) y->xR[j] = x->xR[j];
 }
 
-// Copies vector X[] to Y[], extended version
-//
+// Copy elements [0,n) of the vector x into y[iy,_].
 // Inputs:
-//     N       -   vector length
-//     X       -   source array
-//     OffsX   -   source offset
-//     Y       -   pre-allocated array[N]
-//     OffsY   -   destination offset
-//
-// Outputs:
-//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
-//
-// NOTE: destination and source should NOT overlap
+//	n:	The vector length.
+//	x:	The source n-vector.
+//	y:	A preallocated matrix large enough to store the result.
+//	iy:	The destination row index in y.
+// Output:
+//	y:	A copy of elements [0,n) of x into y[iy,_].
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy) {
-   for (ae_int_t j = 0; j < n; j++) y->xZ[offsy + j] = x->xZ[offsx + j];
+void rcopyvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopyv(n, x->xR, y->xyR[iy]))
+#endif
+   for (ae_int_t j = 0; j < n; j++) y->xyR[iy][j] = x->xR[j];
 }
 
-// Copies vector X[] to Y[], extended version
-//
+// Copy elements [0,n) of the vector x[ix,_] into y.
 // Inputs:
-//     N       -   vector length
-//     X       -   source array
-//     OffsX   -   source offset
-//     Y       -   pre-allocated array[N]
-//     OffsY   -   destination offset
-//
-// Outputs:
-//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
-//
-// NOTE: destination and source should NOT overlap
+//	n:	The vector length.
+//	x:	The source matrix.
+//	ix:	The source row index in x.
+//	y:	A preallocated destination vector.
+// Output:
+//	y:	A copy of elements [0,n) of x[ix,_] into y.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy) {
-   for (ae_int_t j = 0; j < n; j++) y->xR[offsy + j] = x->xR[offsx + j];
+void rcopyrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopyv(n, x->xyR[ix], y->xR))
+#endif
+   for (ae_int_t j = 0; j < n; j++) y->xR[j] = x->xyR[ix][j];
 }
 
-// Copies vector X[] to Y[], resizing Y[] if needed.
-//
+// Copy elements [0,n) of the vector x[ix,_] into y[iy,_].
 // Inputs:
-//     N       -   vector length
-//     X       -   array[N], source
-//     Y       -   possibly pre-allocated array[N] (resized if needed)
-//
-// Outputs:
-//     Y       -   leading N elements are replaced by X
+//	n:	The vector length.
+//	x:	The source n x n matrix.
+//	ix:	The source row index in x.
+//	y:	A preallocated destination matrix.
+//	iy:	The destination row index in y.
+// Output:
+//	y:	A copy of elements [0,n) of x[ix,_] into y[iy,_].
+// Note:
+// *	x[ix,_] and y[iy,_] may not overlap. //(@) The original said they may overlap.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void bcopyallocv(ae_int_t n, BVector *x, BVector *y) {
-   vectorsetlengthatleast(y, n);
-   for (ae_int_t j = 0; j < n; j++) y->xB[j] = x->xB[j];
+void rcopyrr(ae_int_t n, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopyv(n, x->xyR[ix], y->xyR[iy]))
+#endif
+   for (ae_int_t j = 0; j < n; j++) y->xyR[iy][j] = x->xyR[ix][j];
 }
 
-// Copies vector X[] to Y[], resizing Y[] if needed.
-//
+// Copy elements [x0,x0+n) of the vector x to elements [y0,y0+n) of the vector y, extended version.
 // Inputs:
-//     N       -   vector length
-//     X       -   array[N], source
-//     Y       -   possibly pre-allocated array[N] (resized if needed)
-//
-// Outputs:
-//     Y       -   leading N elements are replaced by X
+//	n:	The vector length.
+//	x:	The source vector.
+//	x0:	The source offset in x.
+//	y:	A preallocated n-vector.
+//	y0:	The destination offset in y.
+// Output:
+//	y:	y[y0+j] = x[x0+j], for j in [0,n).
+// Note:
+// *	The destination and source should NOT overlap.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void icopyallocv(ae_int_t n, ZVector *x, ZVector *y) {
-   vectorsetlengthatleast(y, n);
-   for (ae_int_t j = 0; j < n; j++) y->xZ[j] = x->xZ[j];
+// Integer:
+void icopyvx(ae_int_t n, ZVector *x, ae_int_t x0, ZVector *y, ae_int_t y0) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(icopyvx(n, x->xZ + x0, y->xZ + y0))
+#endif
+   for (ae_int_t j = 0; j < n; j++) y->xZ[y0 + j] = x->xZ[x0 + j];
+}
+// Real:
+void rcopyvx(ae_int_t n, RVector *x, ae_int_t x0, RVector *y, ae_int_t y0) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopyvx(n, x->xR + x0, y->xR + y0))
+#endif
+   for (ae_int_t j = 0; j < n; j++) y->xR[y0 + j] = x->xR[x0 + j];
 }
 
-// Copies vector X[] to Y[], resizing Y[] if needed.
-//
+// Copy elements [0,n) of the vector x into y[_,jy].
 // Inputs:
-//     N       -   vector length
-//     X       -   array[N], source
-//     Y       -   possibly pre-allocated array[N] (resized if needed)
-//
-// Outputs:
-//     Y       -   leading N elements are replaced by X
+//	n:	The vector length.
+//	x:	The source n-vector.
+//	y:	A preallocated matrix large enough to store the result.
+//	jy:	The destination column index in y.
+// Output:
+//	y:	A copy of elements [0,n) of x into y[_,jy].
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyallocv(ae_int_t n, RVector *x, RVector *y) {
-   vectorsetlengthatleast(y, n);
-   for (ae_int_t j = 0; j < n; j++) y->xR[j] = x->xR[j];
+void rcopyvc(ae_int_t n, RVector *x, RMatrix *y, ae_int_t jy) {
+   for (ae_int_t i = 0; i < n; i++) y->xyR[i][jy] = x->xR[i];
 }
 
-// Copies matrix X[] to Y[], resizing Y[] if needed. On resize, dimensions of
-// Y[] are increased - but not decreased.
-//
+// Copy elements [0,n) of the vector x[_,jx] into y.
 // Inputs:
-//     M       -   rows count
-//     N       -   cols count
-//     X       -   array[M,N], source
-//     Y       -   possibly pre-allocated array[M,N] (resized if needed)
-//
-// Outputs:
-//     Y       -   leading [M,N] elements are replaced by X
+//	n:	The vector length.
+//	x:	The source matrix.
+//	jx:	The source column index in x.
+//	y:	A preallocated destination n-vector.
+// Output:
+//	y:	A copy of elements [0,n) of x[_,jx] into y.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y) {
+void rcopycv(ae_int_t n, RMatrix *x, ae_int_t jx, RVector *y) {
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] = x->xyR[i][jx];
+}
+
+// Copy elements [0,m) x [0,n) of the matrix x to y, resizing y if needed.
+// On resize, the dimensions of y are increased - but not decreased.
+// Inputs:
+//	m:	The row count.
+//	n:	The column count.
+//	x:	The source m x n matrix.
+//	y:	A possibly-preallocated m x n matrix, resized if needed.
+// Output:
+//	y:	Elements [0,m) x [0,n) of x copied into y.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopym(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y) {
    if (m == 0 || n == 0) return;
-   matrixsetlengthatleast(y, imax2(m, y->rows), imax2(n, y->cols));
    for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) y->xyR[i][j] = x->xyR[i][j];
 }
 
-// Grows X, i.e. changes its size in such a way that:
-// a) contents is preserved
-// b) new size is at least N
-// c) actual size can be larger than N, so subsequent grow() calls can return
-//    without reallocation
+// Multiply elements [0,n) of the vector x by v into y.
+// Inputs:
+//	n:	The vector length.
+//	v:	The multiplier.
+//	x:	The source n-vector.
+//	y:	A preallocated n-vector.
+// Output:
+//	y:	y[i] = v x[i], for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopymulv(n, v, x->xR, y->xR))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] = v * x->xR[i];
+}
+
+// Multiply elements [0,n) of the vector x by v into y[iy,_].
+// Inputs:
+//	n:	The vector length.
+//	v:	The multiplier.
+//	x:	The source n-vector.
+//	y:	A preallocated ? x n matrix.
+//	iy:	The destination row index in y.
+// Output:
+//	y:	y[iy,i] = v x[i], for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t iy) {
+#if !defined ALGLIB_NO_FAST_KERNELS
+// Try fast kernels.
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+   if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopymulv(n, v, x->xR, y->xyR[iy]))
+#endif
+   for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] = v * x->xR[i];
+}
+
+// Multiply elements [0,n) of the vector x by v into y[_,jy].
+// Inputs:
+//	n:	The vector length.
+//	v:	The multiplier.
+//	x:	The source n-vector.
+//	y:	A preallocated n x ? matrix.
+//	jy:	The destination column index in y.
+// Output:
+//	y:	y[i,jy] = v x[i], for i in [0,n).
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopymulvc(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t jy) {
+   for (ae_int_t i = 0; i < n; i++) y->xyR[i][jy] = v * x->xR[i];
+}
+
+// Copy elements [0,n) of the vector x into y, resizing y if needed.
+// Inputs:
+//	n:	The vector length.
+//	x:	The source n-vector.
+//	y:	A possibly-preallocated n-vector, resized if needed.
+// Output:
+//	y:	Elements [0,n) of x are copied into y.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+// Boolean:
+void bcopyallocv(ae_int_t n, BVector *x, BVector *y) {
+   if (y->cnt < n) ae_vector_set_length(y, n);
+   bcopyv(n, x, y);
+}
+// Integer:
+void icopyallocv(ae_int_t n, ZVector *x, ZVector *y) {
+   if (y->cnt < n) ae_vector_set_length(y, n);
+   icopyv(n, x, y);
+}
+// Real:
+void rcopyallocv(ae_int_t n, RVector *x, RVector *y) {
+   if (y->cnt < n) ae_vector_set_length(y, n);
+   rcopyv(n, x, y);
+}
+
+// Copy elements [0,m) x [0,n) of the matrix x into y, resizing y if needed.
+// On resize, the dimensions of y are increased - but not decreased.
+// Inputs:
+//	m:	The row count.
+//	n:	The column count.
+//	x:	The m x n source matrix.
+//	y:	A possibly-preallocated m x n matrix, resized if needed.
+// Output:
+//	y:	Elements [0,m) x [0,n) of x are copied into y.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y) {
+   if (m == 0 || n == 0) return;
+   if (y->rows < m || y->cols < n) ae_matrix_set_length(y, imax2(m, y->rows), imax2(n, y->cols));
+   rcopym(m, n, x, y);
+}
+
+// Grow the vector x, i.e. changes its size in such a way that:
+// *	its contents is preserved,
+// *	its new size is at least newn,
+// *	its actual size may be larger than newn, so that subsequent grow() calls can return without reallocation.
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+// Integer:
 void igrowv(ae_int_t newn, ZVector *x) {
    ae_frame _frame_block;
    ae_frame_make(&_frame_block);
-   NewVector(oldx, 0, DT_INT);
    if (x->cnt >= newn) {
       ae_frame_leave();
       return;
    }
    ae_int_t oldn = x->cnt;
    newn = imax2(newn, iround(1.8 * oldn + 1));
+   NewVector(oldx, 0, DT_INT);
    ae_swap_vectors(x, &oldx);
    ae_vector_set_length(x, newn);
    icopyv(oldn, &oldx, x);
    ae_frame_leave();
 }
-
-// Performs copying with multiplication of V*X[] to Y[]
-//
-// Inputs:
-//     N       -   vector length
-//     V       -   multiplier
-//     X       -   array[N], source
-//     Y       -   pre-allocated array[N]
-//
-// Outputs:
-//     Y       -   array[N], Y = V*X
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y) {
-   for (ae_int_t i = 0; i < n; i++) y->xR[i] = v * x->xR[i];
+// Real:
+void rgrowv(ae_int_t newn, RVector *x) {
+   ae_frame _frame_block;
+   ae_frame_make(&_frame_block);
+   if (x->cnt >= newn) {
+      ae_frame_leave();
+      return;
+   }
+   ae_int_t oldn = x->cnt;
+   newn = imax2(newn, iround(1.8 * oldn + 1));
+   NewVector(oldx, 0, DT_REAL);
+   ae_swap_vectors(x, &oldx);
+   ae_vector_set_length(x, newn);
+   rcopyv(oldn, &oldx, x);
+   ae_frame_leave();
 }
 
-// Performs copying with multiplication of V*X[] to Y[I,*]
-//
+// Matrix-vector product: y = alpha a' x + beta y.
+// Note:
+// *	This function expects y to be large enough to store the result.
+//	No automatic preallocation happens for smaller arrays.
+//	No integrity checks are performed for the sizes of a, x, y.
 // Inputs:
-//     N       -   vector length
-//     V       -   multiplier
-//     X       -   array[N], source
-//     Y       -   pre-allocated array[?,N]
-//     RIdx    -   destination row index of Y
+//	m:	The number of rows of a'.
+//	n:	The number of columns of a'.
+//	alpha:	The coefficient.
+//	a:	A source matrix.
+//	opa:	The operation type:
+//		0:	a' = a,
+//		1:	a' = a^T.
+//	x:	An input vector, at least of size n.
+//	beta:	A coefficient.
+//	y:	A preallocated output vector, at least of size m.
+// Output:
+//	y:	The vector which stores the result.
 //
-// Outputs:
-//     Y       -   Y[RIdx,...] = V*X
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx) {
-   for (ae_int_t i = 0; i < n; i++) y->xyR[ridx][i] = v * x->xR[i];
+// Handling of Special Cases:
+// --------------------------
+// *	If m == 0, then the subroutine does nothing.
+//	It does not even touch the arrays.
+// *	If n == 0 or alpha == 0.0, then:
+//	-	If beta == 0.0, then y is filled by 0's.
+//		a and x are not referenced at all.
+//		The initial values of y are ignored (we do not multiply y by 0, we just rewrite it by 0's).
+//	-	If beta != 0.0, then y is replaced by beta y.
+// *	If m > 0, n > 0, alpha != 0.0, but beta == 0.0, then y is replaced by a x;
+//	the initial state of y is ignored (rewritten by a x, without initial multiplication by 0's).
+// ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
+void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVector *x, double beta, RVector *y) {
+// Properly premultiply y by beta.
+// Quick exit for m == 0, n == 0 or alpha == 0.0.
+// After this block we have m > 0, n > 0, alpha != 0.
+   if (m <= 0) return;
+   if (beta != 0.0) rmulv(m, beta, y); else rsetv(m, 0.0, y);
+   if (n <= 0 || alpha == 0.0) return;
+// Straight or transposed?
+   switch (opa) {
+   // y += a x.
+      case 0:
+#if !defined ALGLIB_NO_FAST_KERNELS
+      // Try SIMD code.
+         if (n >= _ABLASF_KERNEL_SIZE2) KerSubAvx2Fma(rgemv_straight(m, n, alpha, a, x->xR, y->xR))
+#endif
+      // Generic C version.
+         for (ae_int_t i = 0; i < m; i++) {
+            double v = 0.0;
+            for (ae_int_t j = 0; j < n; j++) v += a->xyR[i][j] * x->xR[j];
+            y->xR[i] += alpha * v;
+         }
+      break;
+   // y += a^T x.
+      case 1:
+#if !defined ALGLIB_NO_FAST_KERNELS
+      // Try SIMD code.
+         if (m >= _ABLASF_KERNEL_SIZE2) KerSubAvx2Fma(rgemv_transposed(m, n, alpha, a, x->xR, y->xR))
+#endif
+      // Generic C version.
+         for (ae_int_t i = 0; i < n; i++) {
+            double v = alpha * x->xR[i];
+            for (ae_int_t j = 0; j < m; j++) y->xR[j] += v * a->xyR[i][j];
+         }
+      break;
+   }
 }
 
-// Copies vector X[] to row I of A[,]
-//
+// Matrix-vector product: y = alpha a' x + beta y.
+// Here x, y, a are sub-vectors/sub-matrices of larger vectors/matrices.
+// Note:
+// *	This function expects y to be large enough to store the result.
+//	No automatic preallocation happens for smaller arrays.
+//	No integrity checks are performed on the sizes of a, x, y.
 // Inputs:
-//     N       -   vector length
-//     X       -   array[N], source
-//     A       -   pre-allocated 2D array large enough to store result
-//     I       -   destination row index
+//	m:	The number of rows of a'.
+//	n:	The number of columns of a'.
+//	alpha:	A coefficient.
+//	a:	The source matrix.
+//	ia:	The sub-matrix offset (row index).
+//	ja:	The sub-matrix offset (column index).
+//	opa:	The operation type:
+//		0:	a' = a,
+//		1:	a' = a^T.
+//	x:	The input vector, at least of size n+ix.
+//	ix:	The sub-vector offset in x.
+//	beta:	A coefficient.
+//	y:	A preallocated output array, at least of size m+iy.
+//	iy:	The sub-vector offset in b.
+// Output:
+//	y:	The vector which stores the result.
 //
-// Outputs:
-//     A       -   leading N elements of I-th row are replaced by X
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i) {
-   for (ae_int_t j = 0; j < n; j++) a->xyR[i][j] = x->xR[j];
+// Handling of Special Cases:
+// --------------------------
+// *	If m == 0, then the subroutine does nothing.
+//	It does not even touch the arrays.
+// *	If n == 0 or alpha == 0.0, then:
+//	-	If beta == 0.0, then y is filled by 0's.
+//		a and x are not referenced at all.
+//		The initial values of y are ignored (we do not multiply y by 0, we just rewrite it by 0's).
+//	-	If beta != 0.0, then y is replaced by beta y.
+// *	If m > 0, n > 0, alpha != 0.0, but beta == 0.0, then y is replaced by a x;
+//	the initial state of y is ignored (rewritten by a x, without initial multiplication by 0's).
+// ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
+void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
+// Properly premultiply y by beta.
+// Quick exit for m == 0, n == 0 or alpha == 0.0.
+// After this block we have m > 0, n > 0, alpha != 0.0.
+   if (m <= 0) return;
+   if (beta != 0.0) rmulvx(m, beta, y, iy); else rsetvx(m, 0.0, y, iy);
+   if (n <= 0 || alpha == 0.0) return;
+// Straight or transposed?
+   switch (opa) {
+   // y += a x.
+      case 0:
+#if !defined ALGLIB_NO_FAST_KERNELS
+      // Try SIMD code.
+         if (n >= _ABLASF_KERNEL_SIZE2) KerSubAvx2Fma(rgemvx_straight(m, n, alpha, a, ia, ja, x->xR + ix, y->xR + iy))
+#endif
+      // Generic C code.
+         for (ae_int_t i = 0; i < m; i++) {
+            double v = 0.0;
+            for (ae_int_t j = 0; j < n; j++) v += a->xyR[ia + i][ja + j] * x->xR[ix + j];
+            y->xR[iy + i] += alpha * v;
+         }
+      break;
+   // y += a^T x.
+      case 1:
+#if !defined ALGLIB_NO_FAST_KERNELS
+      // Try SIMD code.
+         if (m >= _ABLASF_KERNEL_SIZE2) KerSubAvx2Fma(rgemvx_transposed(m, n, alpha, a, ia, ja, x->xR + ix, y->xR + iy))
+#endif
+      // Generic C code.
+         for (ae_int_t i = 0; i < n; i++) {
+            double v = alpha * x->xR[ix + i];
+            for (ae_int_t j = 0; j < m; j++) y->xR[iy + j] += v * a->xyR[ia + i][ja + j];
+         }
+      break;
+   }
 }
 
-// Copies row I of A[,] to vector X[]
-//
+// Rank-1 correction: a += alpha u v^T.
+// Note:
+// *	This function expects a to be large enough to store the result.
+//	No automatic preallocation happens for smaller arrays.
+//	No integrity checks are performed on the sizes of a, u, v.
 // Inputs:
-//     N       -   vector length
-//     A       -   2D array, source
-//     I       -   source row index
-//     X       -   pre-allocated destination
-//
-// Outputs:
-//     X       -   array[N], destination
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x) {
-   for (ae_int_t j = 0; j < n; j++) x->xR[j] = a->xyR[i][j];
+//	m:	The number of rows.
+//	n:	The number of columns.
+//	alpha:	A coefficient.
+//	u:	Vector #1
+//	v:	Vector #2.
+//	a:	The target m x n matrix.
+// ALGLIB Routine: Copyright 07.09.2021 by Sergey Bochkanov
+void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix *a) {
+   if (m <= 0 || n <= 0 || alpha == 0.0) return;
+   for (ae_int_t i = 0; i < m; i++) {
+      double s = alpha * u->xR[i];
+      for (ae_int_t j = 0; j < n; j++) a->xyR[i][j] += s * v->xR[j];
+   }
 }
 
-// Copies row I of A[,] to row K of B[,].
-//
-// A[i,...] and B[k,...] may overlap.
-//
+// Solve the linear system a' x = b for x, where:
+// *	a is an n x n upper/lower triangular/unitriangular matrix,
+// *	x and b are n x 1 vectors,
+// *	the operation a' may be the identity operation a |-> a, or transposition a |-> a^T.
+// The solution replaces x.
+// IMPORTANT:
+// *	No overflow/underflow/denegeracy tests are performed.
+// *	No integrity checks for operand sizes, out-of-bounds accesses and so on are performed.
 // Inputs:
-//     N       -   vector length
-//     A       -   2D array, source
-//     I       -   source row index
-//     B       -   pre-allocated destination
-//     K       -   destination row index
-//
-// Outputs:
-//     B       -   row K overwritten
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k) {
-   for (ae_int_t j = 0; j < n; j++) b->xyR[k][j] = a->xyR[i][j];
-}
-
-// Copies vector X[] to column J of A[,]
-//
-// Inputs:
-//     N       -   vector length
-//     X       -   array[N], source
-//     A       -   pre-allocated 2D array large enough to store result
-//     J       -   destination col index of A
-//
-// Outputs:
-//     A       -   leading N elements of J-th column are replaced by X
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopyvc(ae_int_t n, RVector *x, RMatrix *a, ae_int_t j) {
-   for (ae_int_t i = 0; i < n; i++) a->xyR[i][j] = x->xR[i];
-}
-
-// Copies column J of A[,] to vector X[]
-//
-// Inputs:
-//     N       -   vector length
-//     A       -   source 2D array
-//     J       -   source col index of A
-//
-// Outputs:
-//     X       -   pre-allocated array[N], destination
-// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rcopycv(ae_int_t n, RMatrix *a, ae_int_t j, RVector *x) {
-   for (ae_int_t i = 0; i < n; i++) x->xR[i] = a->xyR[i][j];
+//	n:	The matrix size; n >= 0.
+//	a:	A matrix containing the n x n matrix in elements [ia,ia+n) x [ja,ja+n).
+//	ia:	The row sub-matrix offset.
+//	ja:	The column sub-matrix offset.
+//	isupper: Whether the matrix is upper triangular.
+//	isunit:	Whether the matrix is unitriangular.
+//	opa:	The transformation type:
+//		0:	no transformation: a' = a.
+//		1:	transposition: a' = a^T.
+//	x:	A vector containing the right-hand side n-vector in elements [ix,ix+n).
+//	ix:	The offset in x.
+// Output:
+//	x:	The solution n-vector in elements [ix,ix+n) of x.
+// ALGLIB Routine: Copyright 07.09.2021 by Sergey Bochkanov
+void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t opa, RVector *x, ae_int_t ix) {
+   if (n <= 0) return;
+   else switch (opa) {
+      case 0:
+         if (isupper) for (ae_int_t i = n - 1; i >= 0; i--) {
+            double v = x->xR[ix + i];
+            for (ae_int_t j = i + 1; j < n; j++) v -= a->xyR[ia + i][ja + j] * x->xR[ix + j];
+            if (!isunit) v /= a->xyR[ia + i][ja + i];
+            x->xR[ix + i] = v;
+         } else for (ae_int_t i = 0; i < n; i++) {
+            double v = x->xR[ix + i];
+            for (ae_int_t j = 0; j < i; j++) v -= a->xyR[ia + i][ja + j] * x->xR[ix + j];
+            if (!isunit) v /= a->xyR[ia + i][ja + i];
+            x->xR[ix + i] = v;
+         }
+      break;
+      case 1:
+         if (isupper) for (ae_int_t i = 0; i < n; i++) {
+            double v = x->xR[ix + i];
+            if (!isunit) v /= a->xyR[ia + i][ja + i];
+            x->xR[ix + i] = v;
+            if (v == 0.0) continue;
+            for (ae_int_t j = i + 1; j < n; j++) x->xR[ix + j] -= v * a->xyR[ia + i][ja + j];
+         } else for (ae_int_t i = n - 1; i >= 0; i--) {
+            double v = x->xR[ix + i];
+            if (!isunit) v /= a->xyR[ia + i][ja + i];
+            x->xR[ix + i] = v;
+            if (v == 0.0) continue;
+            for (ae_int_t j = 0; j < i; j++) x->xR[ix + j] -= v * a->xyR[ia + i][ja + j];
+         }
+      break;
+      default: ae_assert(false, "rTRSVX: unexpected operation type"); break;
+   }
 }
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool rmatrixgerf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double ralpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
+   return false;
 #else
    return _ialglib_i_rmatrixgerf(m, n, a, ia, ja, ralpha, u, iu, v, iv);
 #endif
@@ -2207,9 +2672,7 @@ bool rmatrixgerf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, d
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool rmatrixrank1f(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
+   return false;
 #else
    return _ialglib_i_rmatrixrank1f(m, n, a, ia, ja, u, iu, v, iv);
 #endif
@@ -2219,9 +2682,7 @@ bool rmatrixrank1f(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja,
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
+   return false;
 #else
    return _ialglib_i_cmatrixrank1f(m, n, a, ia, ja, u, iu, v, iv);
 #endif
@@ -2231,9 +2692,7 @@ bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja,
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
+   return false;
 #else
    return _ialglib_i_rmatrixlefttrsmf(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
 #endif
@@ -2243,9 +2702,7 @@ bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t 
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool cmatrixlefttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
+   return false;
 #else
    return _ialglib_i_cmatrixlefttrsmf(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
 #endif
@@ -2255,9 +2712,7 @@ bool cmatrixlefttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t 
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool rmatrixrighttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
+   return false;
 #else
    return _ialglib_i_rmatrixrighttrsmf(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
 #endif
@@ -2267,9 +2722,7 @@ bool rmatrixrighttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
+   return false;
 #else
    return _ialglib_i_cmatrixrighttrsmf(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
 #endif
@@ -2277,1221 +2730,527 @@ bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+bool rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
+   return false;
 #else
-   return _ialglib_i_rmatrixsyrkf(n, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
+   return _ialglib_i_rmatrixsyrkf(n, k, alpha, a, ia, ja, opa, beta, c, ic, jc, isupper);
 #endif
 }
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
+   return false;
 #else
-   return _ialglib_i_cmatrixherkf(n, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
+   return _ialglib_i_cmatrixherkf(n, k, alpha, a, ia, ja, opa, beta, c, ic, jc, isupper);
 #endif
 }
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
+bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
+   return false;
 #else
-   return _ialglib_i_rmatrixgemmf(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+   return _ialglib_i_cmatrixgemmf(m, n, k, alpha, a, ia, ja, opa, b, ib, jb, opb, beta, c, ic, jc);
 #endif
 }
 
-// Fast kernel
-// ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
-#ifndef ALGLIB_INTERCEPTS_ABLAS
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_cmatrixgemmf(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-#endif
-}
-
-// RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
-// with OpTypeA=0 and OpTypeB=0.
-//
+// rmatrixgemm() kernels: the base case code for rmatrixgemm(), and its specializations to (opa, opb) in {0,1} x {0,1}.
+//	c = alpha a' b' + beta c
+// where:
+// *	c is an m x n general matrix, a' is an m x k matrix, b' is a k x n matrix, with:
+// *	a' = a if opa == 0, a' = a^T if opa == 1,
+// *	b' = b if opb == 0, b' = b^T if opb == 1.
 // Additional info:
-// * this function requires that Alpha != 0 (assertion is thrown otherwise)
-//
+// *	The multiplication result replaces c.
+// *	If beta == 0.0, c is not used in the calculations (not multiplied by 0.0 - just not referenced).
+// *	If alpha == 0.0, a is not used (not multiplied by 0.0 - just not referenced).
+// *	If both beta == 0.0 and alpha == 0.0, c is filled by 0's.
+// *	The specialized functions require that alpha != 0.0; an exception is thrown otherwise.
+// Important:
+// *	This function requires the output matrix c to be pre-allocated.
+//	An exception will be thrown, if it is not large enough to store the result.
 // Inputs:
-//     M       -   matrix size, M > 0
-//     N       -   matrix size, N > 0
-//     K       -   matrix size, K > 0
-//     Alpha   -   coefficient
-//     A       -   matrix
-//     IA      -   submatrix offset
-//     JA      -   submatrix offset
-//     B       -   matrix
-//     IB      -   submatrix offset
-//     JB      -   submatrix offset
-//     Beta    -   coefficient
-//     C       -   PREALLOCATED output matrix
-//     IC      -   submatrix offset
-//     JC      -   submatrix offset
+//	m, n, k:	The matrix sizes; m, n, k > 0.
+//	alpha, beta:	The coefficients.
+//	a, ia, ja:	A matrix and its sub-matrix offsets.
+//	opa:		The transformation type for a:
+//			0:	no transformation: a' = a,
+//			1:	transposition: a' = a^T.
+//			a' is an m x k matrix.
+//	b, ib, jb:	A matrix and its sub-matrix offsets.
+//	opb:		The transformation type for b:
+//			0:	no transformation: b' = b,
+//			1:	transposition: b' = b^T.
+//			b' is an k x n matrix.
+//	c, ic, jc:	The m x n PRE-ALLOCATED output matrix and its sub-matrix offsets.
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
+
+// rmatrixgemm() kernel: the base case code for rmatrixgemm(), specialized to opa == 0 and opb == 0.
 void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-   ae_int_t i;
-   ae_int_t j;
-   double v;
-   double v00;
-   double v01;
-   double v02;
-   double v03;
-   double v10;
-   double v11;
-   double v12;
-   double v13;
-   double v20;
-   double v21;
-   double v22;
-   double v23;
-   double v30;
-   double v31;
-   double v32;
-   double v33;
-   double a0;
-   double a1;
-   double a2;
-   double a3;
-   double b0;
-   double b1;
-   double b2;
-   double b3;
-   ae_int_t idxa0;
-   ae_int_t idxa1;
-   ae_int_t idxa2;
-   ae_int_t idxa3;
-   ae_int_t idxb0;
-   ae_int_t idxb1;
-   ae_int_t idxb2;
-   ae_int_t idxb3;
-   ae_int_t i0;
-   ae_int_t i1;
-   ae_int_t ik;
-   ae_int_t j0;
-   ae_int_t j1;
-   ae_int_t jk;
-   ae_int_t t;
-   ae_int_t offsa;
-   ae_int_t offsb;
-   ae_assert(alpha != 0.0, "rmatrixgemmk44v00: internal error (alpha == 0)");
-// if matrix size is zero
-   if (m == 0 || n == 0) {
-      return;
-   }
-// A*B
-   i = 0;
-   while (i < m) {
-      j = 0;
-      while (j < n) {
-      // Choose between specialized 4x4 code and general code
-         if (i + 4 <= m && j + 4 <= n) {
-         // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
-         //
-         // This submatrix is calculated as sum of K rank-1 products,
-         // with operands cached in local variables in order to speed
-         // up operations with arrays.
-            idxa0 = ia + i + 0;
-            idxa1 = ia + i + 1;
-            idxa2 = ia + i + 2;
-            idxa3 = ia + i + 3;
-            offsa = ja;
-            idxb0 = jb + j + 0;
-            idxb1 = jb + j + 1;
-            idxb2 = jb + j + 2;
-            idxb3 = jb + j + 3;
-            offsb = ib;
-            v00 = 0.0;
-            v01 = 0.0;
-            v02 = 0.0;
-            v03 = 0.0;
-            v10 = 0.0;
-            v11 = 0.0;
-            v12 = 0.0;
-            v13 = 0.0;
-            v20 = 0.0;
-            v21 = 0.0;
-            v22 = 0.0;
-            v23 = 0.0;
-            v30 = 0.0;
-            v31 = 0.0;
-            v32 = 0.0;
-            v33 = 0.0;
-         // Different variants of internal loop
-            for (t = 0; t < k; t++) {
-               a0 = a->xyR[idxa0][offsa];
-               a1 = a->xyR[idxa1][offsa];
-               b0 = b->xyR[offsb][idxb0];
-               b1 = b->xyR[offsb][idxb1];
-               v00 += a0 * b0;
-               v01 += a0 * b1;
-               v10 += a1 * b0;
-               v11 += a1 * b1;
-               a2 = a->xyR[idxa2][offsa];
-               a3 = a->xyR[idxa3][offsa];
-               v20 += a2 * b0;
-               v21 += a2 * b1;
-               v30 += a3 * b0;
-               v31 += a3 * b1;
-               b2 = b->xyR[offsb][idxb2];
-               b3 = b->xyR[offsb][idxb3];
-               v22 += a2 * b2;
-               v23 += a2 * b3;
-               v32 += a3 * b2;
-               v33 += a3 * b3;
-               v02 += a0 * b2;
-               v03 += a0 * b3;
-               v12 += a1 * b2;
-               v13 += a1 * b3;
-               offsa++;
-               offsb++;
-            }
-            if (beta == 0.0) {
-               c->xyR[ic + i][jc + j] = alpha * v00;
-               c->xyR[ic + i][jc + j + 1] = alpha * v01;
-               c->xyR[ic + i][jc + j + 2] = alpha * v02;
-               c->xyR[ic + i][jc + j + 3] = alpha * v03;
-               c->xyR[ic + i + 1][jc + j] = alpha * v10;
-               c->xyR[ic + i + 1][jc + j + 1] = alpha * v11;
-               c->xyR[ic + i + 1][jc + j + 2] = alpha * v12;
-               c->xyR[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->xyR[ic + i + 2][jc + j] = alpha * v20;
-               c->xyR[ic + i + 2][jc + j + 1] = alpha * v21;
-               c->xyR[ic + i + 2][jc + j + 2] = alpha * v22;
-               c->xyR[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->xyR[ic + i + 3][jc + j] = alpha * v30;
-               c->xyR[ic + i + 3][jc + j + 1] = alpha * v31;
-               c->xyR[ic + i + 3][jc + j + 2] = alpha * v32;
-               c->xyR[ic + i + 3][jc + j + 3] = alpha * v33;
-            } else {
-               c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j] + alpha * v00;
-               c->xyR[ic + i][jc + j + 1] = beta * c->xyR[ic + i][jc + j + 1] + alpha * v01;
-               c->xyR[ic + i][jc + j + 2] = beta * c->xyR[ic + i][jc + j + 2] + alpha * v02;
-               c->xyR[ic + i][jc + j + 3] = beta * c->xyR[ic + i][jc + j + 3] + alpha * v03;
-               c->xyR[ic + i + 1][jc + j] = beta * c->xyR[ic + i + 1][jc + j] + alpha * v10;
-               c->xyR[ic + i + 1][jc + j + 1] = beta * c->xyR[ic + i + 1][jc + j + 1] + alpha * v11;
-               c->xyR[ic + i + 1][jc + j + 2] = beta * c->xyR[ic + i + 1][jc + j + 2] + alpha * v12;
-               c->xyR[ic + i + 1][jc + j + 3] = beta * c->xyR[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->xyR[ic + i + 2][jc + j] = beta * c->xyR[ic + i + 2][jc + j] + alpha * v20;
-               c->xyR[ic + i + 2][jc + j + 1] = beta * c->xyR[ic + i + 2][jc + j + 1] + alpha * v21;
-               c->xyR[ic + i + 2][jc + j + 2] = beta * c->xyR[ic + i + 2][jc + j + 2] + alpha * v22;
-               c->xyR[ic + i + 2][jc + j + 3] = beta * c->xyR[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->xyR[ic + i + 3][jc + j] = beta * c->xyR[ic + i + 3][jc + j] + alpha * v30;
-               c->xyR[ic + i + 3][jc + j + 1] = beta * c->xyR[ic + i + 3][jc + j + 1] + alpha * v31;
-               c->xyR[ic + i + 3][jc + j + 2] = beta * c->xyR[ic + i + 3][jc + j + 2] + alpha * v32;
-               c->xyR[ic + i + 3][jc + j + 3] = beta * c->xyR[ic + i + 3][jc + j + 3] + alpha * v33;
-            }
-         } else {
-         // Determine submatrix [I0..I1]x[J0..J1] to process
-            i0 = i;
-            i1 = imin2(i + 3, m - 1);
-            j0 = j;
-            j1 = imin2(j + 3, n - 1);
-         // Process submatrix
-            for (ik = i0; ik <= i1; ik++) {
-               for (jk = j0; jk <= j1; jk++) {
-                  if (k == 0 || alpha == 0.0) {
-                     v = 0.0;
-                  } else {
-                     v = ae_v_dotproduct(&a->xyR[ia + ik][ja], 1, &b->xyR[ib][jb + jk], b->stride, k);
-                  }
-                  if (beta == 0.0) {
-                     c->xyR[ic + ik][jc + jk] = alpha * v;
-                  } else {
-                     c->xyR[ic + ik][jc + jk] = beta * c->xyR[ic + ik][jc + jk] + alpha * v;
-                  }
-               }
-            }
+   ae_assert(alpha != 0.0, "RMatrixGEMMK44V00: internal error (alpha == 0)");
+// If the matrix size is 0.
+   if (m == 0 || n == 0) return;
+// a b:
+   for (ae_int_t i = 0; i < m; i += 4) for (ae_int_t j = 0; j < n; j += 4) {
+   // Choose between the specialized 4 x 4 code and the general code.
+      if (i + 4 <= m && j + 4 <= n) {
+      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
+      // This sub-matrix is calculated as sum of k rank-1 products,
+      // with operands cached in local variables in order to speed up array operations.
+         ae_int_t ax0 = ia + i, ax1 = ia + i + 1, ax2 = ia + i + 2, ax3 = ia + i + 3, ay = ja;
+         ae_int_t bx0 = jb + j, bx1 = jb + j + 1, bx2 = jb + j + 2, bx3 = jb + j + 3, by = ib;
+         double v00 = 0.0, v01 = 0.0, v02 = 0.0, v03 = 0.0;
+         double v10 = 0.0, v11 = 0.0, v12 = 0.0, v13 = 0.0;
+         double v20 = 0.0, v21 = 0.0, v22 = 0.0, v23 = 0.0;
+         double v30 = 0.0, v31 = 0.0, v32 = 0.0, v33 = 0.0;
+      // Different variants of the internal loop.
+         for (ae_int_t t = 0; t < k; ay++, by++, t++) {
+            double a0 = a->xyR[ax0][ay], a1 = a->xyR[ax1][ay], a2 = a->xyR[ax2][ay], a3 = a->xyR[ax3][ay];
+            double b0 = b->xyR[by][bx0], b1 = b->xyR[by][bx1], b2 = b->xyR[by][bx2], b3 = b->xyR[by][bx3];
+            v00 += a0 * b0, v01 += a0 * b1, v02 += a0 * b2, v03 += a0 * b3;
+            v10 += a1 * b0, v11 += a1 * b1, v12 += a1 * b2, v13 += a1 * b3;
+            v20 += a2 * b0, v21 += a2 * b1, v22 += a2 * b2, v23 += a2 * b3;
+            v30 += a3 * b0, v31 += a3 * b1, v32 += a3 * b2, v33 += a3 * b3;
          }
-         j += 4;
+         v00 *= alpha, v01 *= alpha, v02 *= alpha, v03 *= alpha;
+         v10 *= alpha, v11 *= alpha, v12 *= alpha, v13 *= alpha;
+         v20 *= alpha, v21 *= alpha, v22 *= alpha, v23 *= alpha;
+         v30 *= alpha, v31 *= alpha, v32 *= alpha, v33 *= alpha;
+         ae_int_t ic0 = ic + i, ic1 = ic0 + 1, ic2 = ic0 + 2, ic3 = ic0 + 3;
+         ae_int_t jc0 = jc + j, jc1 = jc0 + 1, jc2 = jc0 + 2, jc3 = jc0 + 3;
+         if (beta == 0.0) {
+            c->xyR[ic0][jc0] = v00, c->xyR[ic0][jc1] = v01, c->xyR[ic0][jc2] = v02, c->xyR[ic0][jc3] = v03;
+            c->xyR[ic1][jc0] = v10, c->xyR[ic1][jc1] = v11, c->xyR[ic1][jc2] = v12, c->xyR[ic1][jc3] = v13;
+            c->xyR[ic2][jc0] = v20, c->xyR[ic2][jc1] = v21, c->xyR[ic2][jc2] = v22, c->xyR[ic2][jc3] = v23;
+            c->xyR[ic3][jc0] = v30, c->xyR[ic3][jc1] = v31, c->xyR[ic3][jc2] = v32, c->xyR[ic3][jc3] = v33;
+         } else {
+            c->xyR[ic0][jc0] = beta * c->xyR[ic0][jc0] + v00, c->xyR[ic0][jc1] = beta * c->xyR[ic0][jc1] + v01;
+            c->xyR[ic0][jc2] = beta * c->xyR[ic0][jc2] + v02, c->xyR[ic0][jc3] = beta * c->xyR[ic0][jc3] + v03;
+            c->xyR[ic1][jc0] = beta * c->xyR[ic1][jc0] + v10, c->xyR[ic1][jc1] = beta * c->xyR[ic1][jc1] + v11;
+            c->xyR[ic1][jc2] = beta * c->xyR[ic1][jc2] + v12, c->xyR[ic1][jc3] = beta * c->xyR[ic1][jc3] + v13;
+            c->xyR[ic2][jc0] = beta * c->xyR[ic2][jc0] + v20, c->xyR[ic2][jc1] = beta * c->xyR[ic2][jc1] + v21;
+            c->xyR[ic2][jc2] = beta * c->xyR[ic2][jc2] + v22, c->xyR[ic2][jc3] = beta * c->xyR[ic2][jc3] + v23;
+            c->xyR[ic3][jc0] = beta * c->xyR[ic3][jc0] + v30, c->xyR[ic3][jc1] = beta * c->xyR[ic3][jc1] + v31;
+            c->xyR[ic3][jc2] = beta * c->xyR[ic3][jc2] + v32, c->xyR[ic3][jc3] = beta * c->xyR[ic3][jc3] + v33;
+         }
+      } else {
+      // Determine the sub-matrix of c of which elements [i0,i1) x [j0,j1) to process.
+         ae_int_t i0 = i, i1 = imin2(i + 4, m), j0 = j, j1 = imin2(j + 4, n);
+      // Process the sub-matrix.
+         for (ae_int_t ik = i0; ik < i1; ik++) for (ae_int_t jk = j0; jk < j1; jk++) {
+            double v = k == 0 || alpha == 0.0 ? 0.0 : alpha * ae_v_dotproduct(&a->xyR[ia + ik][ja], 1, &b->xyR[ib][jb + jk], b->stride, k);
+            c->xyR[ic + ik][jc + jk] = beta == 0.0 ? v : beta * c->xyR[ic + ik][jc + jk] + v;
+         }
       }
-      i += 4;
    }
 }
 
-// RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
-// with OpTypeA=0 and OpTypeB=1.
-//
-// Additional info:
-// * this function requires that Alpha != 0 (assertion is thrown otherwise)
-//
-// Inputs:
-//     M       -   matrix size, M > 0
-//     N       -   matrix size, N > 0
-//     K       -   matrix size, K > 0
-//     Alpha   -   coefficient
-//     A       -   matrix
-//     IA      -   submatrix offset
-//     JA      -   submatrix offset
-//     B       -   matrix
-//     IB      -   submatrix offset
-//     JB      -   submatrix offset
-//     Beta    -   coefficient
-//     C       -   PREALLOCATED output matrix
-//     IC      -   submatrix offset
-//     JC      -   submatrix offset
-// ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
+// rmatrixgemm() kernel: the base case code for rmatrixgemm(), specialized to opa == 0 and opb == 1.
 void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-   ae_int_t i;
-   ae_int_t j;
-   double v;
-   double v00;
-   double v01;
-   double v02;
-   double v03;
-   double v10;
-   double v11;
-   double v12;
-   double v13;
-   double v20;
-   double v21;
-   double v22;
-   double v23;
-   double v30;
-   double v31;
-   double v32;
-   double v33;
-   double a0;
-   double a1;
-   double a2;
-   double a3;
-   double b0;
-   double b1;
-   double b2;
-   double b3;
-   ae_int_t idxa0;
-   ae_int_t idxa1;
-   ae_int_t idxa2;
-   ae_int_t idxa3;
-   ae_int_t idxb0;
-   ae_int_t idxb1;
-   ae_int_t idxb2;
-   ae_int_t idxb3;
-   ae_int_t i0;
-   ae_int_t i1;
-   ae_int_t ik;
-   ae_int_t j0;
-   ae_int_t j1;
-   ae_int_t jk;
-   ae_int_t t;
-   ae_int_t offsa;
-   ae_int_t offsb;
-   ae_assert(alpha != 0.0, "rmatrixgemmk44v01: internal error (alpha == 0)");
-// if matrix size is zero
-   if (m == 0 || n == 0) {
-      return;
-   }
-// A*B'
-   i = 0;
-   while (i < m) {
-      j = 0;
-      while (j < n) {
-      // Choose between specialized 4x4 code and general code
-         if (i + 4 <= m && j + 4 <= n) {
-         // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
-         //
-         // This submatrix is calculated as sum of K rank-1 products,
-         // with operands cached in local variables in order to speed
-         // up operations with arrays.
-            idxa0 = ia + i + 0;
-            idxa1 = ia + i + 1;
-            idxa2 = ia + i + 2;
-            idxa3 = ia + i + 3;
-            offsa = ja;
-            idxb0 = ib + j + 0;
-            idxb1 = ib + j + 1;
-            idxb2 = ib + j + 2;
-            idxb3 = ib + j + 3;
-            offsb = jb;
-            v00 = 0.0;
-            v01 = 0.0;
-            v02 = 0.0;
-            v03 = 0.0;
-            v10 = 0.0;
-            v11 = 0.0;
-            v12 = 0.0;
-            v13 = 0.0;
-            v20 = 0.0;
-            v21 = 0.0;
-            v22 = 0.0;
-            v23 = 0.0;
-            v30 = 0.0;
-            v31 = 0.0;
-            v32 = 0.0;
-            v33 = 0.0;
-            for (t = 0; t < k; t++) {
-               a0 = a->xyR[idxa0][offsa];
-               a1 = a->xyR[idxa1][offsa];
-               b0 = b->xyR[idxb0][offsb];
-               b1 = b->xyR[idxb1][offsb];
-               v00 += a0 * b0;
-               v01 += a0 * b1;
-               v10 += a1 * b0;
-               v11 += a1 * b1;
-               a2 = a->xyR[idxa2][offsa];
-               a3 = a->xyR[idxa3][offsa];
-               v20 += a2 * b0;
-               v21 += a2 * b1;
-               v30 += a3 * b0;
-               v31 += a3 * b1;
-               b2 = b->xyR[idxb2][offsb];
-               b3 = b->xyR[idxb3][offsb];
-               v22 += a2 * b2;
-               v23 += a2 * b3;
-               v32 += a3 * b2;
-               v33 += a3 * b3;
-               v02 += a0 * b2;
-               v03 += a0 * b3;
-               v12 += a1 * b2;
-               v13 += a1 * b3;
-               offsa++;
-               offsb++;
-            }
-            if (beta == 0.0) {
-               c->xyR[ic + i][jc + j] = alpha * v00;
-               c->xyR[ic + i][jc + j + 1] = alpha * v01;
-               c->xyR[ic + i][jc + j + 2] = alpha * v02;
-               c->xyR[ic + i][jc + j + 3] = alpha * v03;
-               c->xyR[ic + i + 1][jc + j] = alpha * v10;
-               c->xyR[ic + i + 1][jc + j + 1] = alpha * v11;
-               c->xyR[ic + i + 1][jc + j + 2] = alpha * v12;
-               c->xyR[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->xyR[ic + i + 2][jc + j] = alpha * v20;
-               c->xyR[ic + i + 2][jc + j + 1] = alpha * v21;
-               c->xyR[ic + i + 2][jc + j + 2] = alpha * v22;
-               c->xyR[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->xyR[ic + i + 3][jc + j] = alpha * v30;
-               c->xyR[ic + i + 3][jc + j + 1] = alpha * v31;
-               c->xyR[ic + i + 3][jc + j + 2] = alpha * v32;
-               c->xyR[ic + i + 3][jc + j + 3] = alpha * v33;
-            } else {
-               c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j] + alpha * v00;
-               c->xyR[ic + i][jc + j + 1] = beta * c->xyR[ic + i][jc + j + 1] + alpha * v01;
-               c->xyR[ic + i][jc + j + 2] = beta * c->xyR[ic + i][jc + j + 2] + alpha * v02;
-               c->xyR[ic + i][jc + j + 3] = beta * c->xyR[ic + i][jc + j + 3] + alpha * v03;
-               c->xyR[ic + i + 1][jc + j] = beta * c->xyR[ic + i + 1][jc + j] + alpha * v10;
-               c->xyR[ic + i + 1][jc + j + 1] = beta * c->xyR[ic + i + 1][jc + j + 1] + alpha * v11;
-               c->xyR[ic + i + 1][jc + j + 2] = beta * c->xyR[ic + i + 1][jc + j + 2] + alpha * v12;
-               c->xyR[ic + i + 1][jc + j + 3] = beta * c->xyR[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->xyR[ic + i + 2][jc + j] = beta * c->xyR[ic + i + 2][jc + j] + alpha * v20;
-               c->xyR[ic + i + 2][jc + j + 1] = beta * c->xyR[ic + i + 2][jc + j + 1] + alpha * v21;
-               c->xyR[ic + i + 2][jc + j + 2] = beta * c->xyR[ic + i + 2][jc + j + 2] + alpha * v22;
-               c->xyR[ic + i + 2][jc + j + 3] = beta * c->xyR[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->xyR[ic + i + 3][jc + j] = beta * c->xyR[ic + i + 3][jc + j] + alpha * v30;
-               c->xyR[ic + i + 3][jc + j + 1] = beta * c->xyR[ic + i + 3][jc + j + 1] + alpha * v31;
-               c->xyR[ic + i + 3][jc + j + 2] = beta * c->xyR[ic + i + 3][jc + j + 2] + alpha * v32;
-               c->xyR[ic + i + 3][jc + j + 3] = beta * c->xyR[ic + i + 3][jc + j + 3] + alpha * v33;
-            }
-         } else {
-         // Determine submatrix [I0..I1]x[J0..J1] to process
-            i0 = i;
-            i1 = imin2(i + 3, m - 1);
-            j0 = j;
-            j1 = imin2(j + 3, n - 1);
-         // Process submatrix
-            for (ik = i0; ik <= i1; ik++) {
-               for (jk = j0; jk <= j1; jk++) {
-                  if (k == 0 || alpha == 0.0) {
-                     v = 0.0;
-                  } else {
-                     v = ae_v_dotproduct(&a->xyR[ia + ik][ja], 1, &b->xyR[ib + jk][jb], 1, k);
-                  }
-                  if (beta == 0.0) {
-                     c->xyR[ic + ik][jc + jk] = alpha * v;
-                  } else {
-                     c->xyR[ic + ik][jc + jk] = beta * c->xyR[ic + ik][jc + jk] + alpha * v;
-                  }
-               }
-            }
+   ae_assert(alpha != 0.0, "RMatrixGEMMK44V00: internal error (alpha=0)");
+// If the matrix size is 0.
+   if (m == 0 || n == 0) return;
+// a b':
+   for (ae_int_t i = 0; i < m; i += 4) for (ae_int_t j = 0; j < n; j += 4) {
+   // Choose between the specialized 4 x 4 code and the general code.
+      if (i + 4 <= m && j + 4 <= n) {
+      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
+      // This sub-matrix is calculated as sum of k rank-1 products,
+      // with operands cached in local variables in order to speed up array operations.
+         ae_int_t ax0 = ia + i, ax1 = ia + i + 1, ax2 = ia + i + 2, ax3 = ia + i + 3, ay = ja;
+         ae_int_t bx0 = ib + j, bx1 = ib + j + 1, bx2 = ib + j + 2, bx3 = ib + j + 3, by = jb;
+         double v00 = 0.0, v01 = 0.0, v02 = 0.0, v03 = 0.0;
+         double v10 = 0.0, v11 = 0.0, v12 = 0.0, v13 = 0.0;
+         double v20 = 0.0, v21 = 0.0, v22 = 0.0, v23 = 0.0;
+         double v30 = 0.0, v31 = 0.0, v32 = 0.0, v33 = 0.0;
+         for (ae_int_t t = 0; t < k; ay++, by++, t++) {
+            double a0 = a->xyR[ax0][ay], a1 = a->xyR[ax1][ay], a2 = a->xyR[ax2][ay], a3 = a->xyR[ax3][ay];
+            double b0 = b->xyR[bx0][by], b1 = b->xyR[bx1][by], b2 = b->xyR[bx2][by], b3 = b->xyR[bx3][by];
+            v00 += a0 * b0, v01 += a0 * b1, v02 += a0 * b2, v03 += a0 * b3;
+            v10 += a1 * b0, v11 += a1 * b1, v12 += a1 * b2, v13 += a1 * b3;
+            v20 += a2 * b0, v21 += a2 * b1, v22 += a2 * b2, v23 += a2 * b3;
+            v30 += a3 * b0, v31 += a3 * b1; v32 += a3 * b2, v33 += a3 * b3;
          }
-         j += 4;
+         v00 *= alpha, v01 *= alpha, v02 *= alpha, v03 *= alpha;
+         v10 *= alpha, v11 *= alpha, v12 *= alpha, v13 *= alpha;
+         v20 *= alpha, v21 *= alpha, v22 *= alpha, v23 *= alpha;
+         v30 *= alpha, v31 *= alpha, v32 *= alpha, v33 *= alpha;
+         ae_int_t ic0 = ic + i, ic1 = ic0 + 1, ic2 = ic0 + 2, ic3 = ic0 + 3;
+         ae_int_t jc0 = jc + j, jc1 = jc0 + 1, jc2 = jc0 + 2, jc3 = jc0 + 3;
+         if (beta == 0.0) {
+            c->xyR[ic0][jc0] = v00, c->xyR[ic0][jc1] = v01, c->xyR[ic0][jc2] = v02, c->xyR[ic0][jc3] = v03;
+            c->xyR[ic1][jc0] = v10, c->xyR[ic1][jc1] = v11, c->xyR[ic1][jc2] = v12, c->xyR[ic1][jc3] = v13;
+            c->xyR[ic2][jc0] = v20, c->xyR[ic2][jc1] = v21, c->xyR[ic2][jc2] = v22, c->xyR[ic2][jc3] = v23;
+            c->xyR[ic3][jc0] = v30, c->xyR[ic3][jc1] = v31, c->xyR[ic3][jc2] = v32, c->xyR[ic3][jc3] = v33;
+         } else {
+            c->xyR[ic0][jc0] = beta * c->xyR[ic0][jc0] + v00, c->xyR[ic0][jc1] = beta * c->xyR[ic0][jc1] + v01;
+            c->xyR[ic0][jc2] = beta * c->xyR[ic0][jc2] + v02, c->xyR[ic0][jc3] = beta * c->xyR[ic0][jc3] + v03;
+            c->xyR[ic1][jc0] = beta * c->xyR[ic1][jc0] + v10, c->xyR[ic1][jc1] = beta * c->xyR[ic1][jc1] + v11;
+            c->xyR[ic1][jc2] = beta * c->xyR[ic1][jc2] + v12, c->xyR[ic1][jc3] = beta * c->xyR[ic1][jc3] + v13;
+            c->xyR[ic2][jc0] = beta * c->xyR[ic2][jc0] + v20, c->xyR[ic2][jc1] = beta * c->xyR[ic2][jc1] + v21;
+            c->xyR[ic2][jc2] = beta * c->xyR[ic2][jc2] + v22, c->xyR[ic2][jc3] = beta * c->xyR[ic2][jc3] + v23;
+            c->xyR[ic3][jc0] = beta * c->xyR[ic3][jc0] + v30, c->xyR[ic3][jc1] = beta * c->xyR[ic3][jc1] + v31;
+            c->xyR[ic3][jc2] = beta * c->xyR[ic3][jc2] + v32, c->xyR[ic3][jc3] = beta * c->xyR[ic3][jc3] + v33;
+         }
+      } else {
+      // Determine the sub-matrix of c of which elements [i0,i1) x [j0,j1) to process.
+         ae_int_t i0 = i, i1 = imin2(i + 4, m);
+         ae_int_t j0 = j, j1 = imin2(j + 4, n);
+      // Process the sub-matrix.
+         for (ae_int_t ik = i0; ik < i1; ik++) for (ae_int_t jk = j0; jk < j1; jk++) {
+            double v = k == 0 || alpha == 0.0 ? 0.0 : alpha * ae_v_dotproduct(&a->xyR[ia + ik][ja], 1, &b->xyR[ib + jk][jb], 1, k);
+            c->xyR[ic + ik][jc + jk] = beta == 0.0 ? v : beta * c->xyR[ic + ik][jc + jk] + v;
+         }
       }
-      i += 4;
    }
 }
 
-// RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
-// with OpTypeA=1 and OpTypeB=0.
-//
-// Additional info:
-// * this function requires that Alpha != 0 (assertion is thrown otherwise)
-//
-// Inputs:
-//     M       -   matrix size, M > 0
-//     N       -   matrix size, N > 0
-//     K       -   matrix size, K > 0
-//     Alpha   -   coefficient
-//     A       -   matrix
-//     IA      -   submatrix offset
-//     JA      -   submatrix offset
-//     B       -   matrix
-//     IB      -   submatrix offset
-//     JB      -   submatrix offset
-//     Beta    -   coefficient
-//     C       -   PREALLOCATED output matrix
-//     IC      -   submatrix offset
-//     JC      -   submatrix offset
-// ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
+// rmatrixgemm() kernel: the base case code for rmatrixgemm(), specialized to opa == 1 and opb == 0.
 void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-   ae_int_t i;
-   ae_int_t j;
-   double v;
-   double v00;
-   double v01;
-   double v02;
-   double v03;
-   double v10;
-   double v11;
-   double v12;
-   double v13;
-   double v20;
-   double v21;
-   double v22;
-   double v23;
-   double v30;
-   double v31;
-   double v32;
-   double v33;
-   double a0;
-   double a1;
-   double a2;
-   double a3;
-   double b0;
-   double b1;
-   double b2;
-   double b3;
-   ae_int_t idxa0;
-   ae_int_t idxa1;
-   ae_int_t idxa2;
-   ae_int_t idxa3;
-   ae_int_t idxb0;
-   ae_int_t idxb1;
-   ae_int_t idxb2;
-   ae_int_t idxb3;
-   ae_int_t i0;
-   ae_int_t i1;
-   ae_int_t ik;
-   ae_int_t j0;
-   ae_int_t j1;
-   ae_int_t jk;
-   ae_int_t t;
-   ae_int_t offsa;
-   ae_int_t offsb;
-   ae_assert(alpha != 0.0, "rmatrixgemmk44v10: internal error (alpha == 0)");
-// if matrix size is zero
-   if (m == 0 || n == 0) {
-      return;
-   }
-// A'*B
-   i = 0;
-   while (i < m) {
-      j = 0;
-      while (j < n) {
-      // Choose between specialized 4x4 code and general code
-         if (i + 4 <= m && j + 4 <= n) {
-         // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
-         //
-         // This submatrix is calculated as sum of K rank-1 products,
-         // with operands cached in local variables in order to speed
-         // up operations with arrays.
-            idxa0 = ja + i + 0;
-            idxa1 = ja + i + 1;
-            idxa2 = ja + i + 2;
-            idxa3 = ja + i + 3;
-            offsa = ia;
-            idxb0 = jb + j + 0;
-            idxb1 = jb + j + 1;
-            idxb2 = jb + j + 2;
-            idxb3 = jb + j + 3;
-            offsb = ib;
-            v00 = 0.0;
-            v01 = 0.0;
-            v02 = 0.0;
-            v03 = 0.0;
-            v10 = 0.0;
-            v11 = 0.0;
-            v12 = 0.0;
-            v13 = 0.0;
-            v20 = 0.0;
-            v21 = 0.0;
-            v22 = 0.0;
-            v23 = 0.0;
-            v30 = 0.0;
-            v31 = 0.0;
-            v32 = 0.0;
-            v33 = 0.0;
-            for (t = 0; t < k; t++) {
-               a0 = a->xyR[offsa][idxa0];
-               a1 = a->xyR[offsa][idxa1];
-               b0 = b->xyR[offsb][idxb0];
-               b1 = b->xyR[offsb][idxb1];
-               v00 += a0 * b0;
-               v01 += a0 * b1;
-               v10 += a1 * b0;
-               v11 += a1 * b1;
-               a2 = a->xyR[offsa][idxa2];
-               a3 = a->xyR[offsa][idxa3];
-               v20 += a2 * b0;
-               v21 += a2 * b1;
-               v30 += a3 * b0;
-               v31 += a3 * b1;
-               b2 = b->xyR[offsb][idxb2];
-               b3 = b->xyR[offsb][idxb3];
-               v22 += a2 * b2;
-               v23 += a2 * b3;
-               v32 += a3 * b2;
-               v33 += a3 * b3;
-               v02 += a0 * b2;
-               v03 += a0 * b3;
-               v12 += a1 * b2;
-               v13 += a1 * b3;
-               offsa++;
-               offsb++;
-            }
-            if (beta == 0.0) {
-               c->xyR[ic + i][jc + j] = alpha * v00;
-               c->xyR[ic + i][jc + j + 1] = alpha * v01;
-               c->xyR[ic + i][jc + j + 2] = alpha * v02;
-               c->xyR[ic + i][jc + j + 3] = alpha * v03;
-               c->xyR[ic + i + 1][jc + j] = alpha * v10;
-               c->xyR[ic + i + 1][jc + j + 1] = alpha * v11;
-               c->xyR[ic + i + 1][jc + j + 2] = alpha * v12;
-               c->xyR[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->xyR[ic + i + 2][jc + j] = alpha * v20;
-               c->xyR[ic + i + 2][jc + j + 1] = alpha * v21;
-               c->xyR[ic + i + 2][jc + j + 2] = alpha * v22;
-               c->xyR[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->xyR[ic + i + 3][jc + j] = alpha * v30;
-               c->xyR[ic + i + 3][jc + j + 1] = alpha * v31;
-               c->xyR[ic + i + 3][jc + j + 2] = alpha * v32;
-               c->xyR[ic + i + 3][jc + j + 3] = alpha * v33;
-            } else {
-               c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j] + alpha * v00;
-               c->xyR[ic + i][jc + j + 1] = beta * c->xyR[ic + i][jc + j + 1] + alpha * v01;
-               c->xyR[ic + i][jc + j + 2] = beta * c->xyR[ic + i][jc + j + 2] + alpha * v02;
-               c->xyR[ic + i][jc + j + 3] = beta * c->xyR[ic + i][jc + j + 3] + alpha * v03;
-               c->xyR[ic + i + 1][jc + j] = beta * c->xyR[ic + i + 1][jc + j] + alpha * v10;
-               c->xyR[ic + i + 1][jc + j + 1] = beta * c->xyR[ic + i + 1][jc + j + 1] + alpha * v11;
-               c->xyR[ic + i + 1][jc + j + 2] = beta * c->xyR[ic + i + 1][jc + j + 2] + alpha * v12;
-               c->xyR[ic + i + 1][jc + j + 3] = beta * c->xyR[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->xyR[ic + i + 2][jc + j] = beta * c->xyR[ic + i + 2][jc + j] + alpha * v20;
-               c->xyR[ic + i + 2][jc + j + 1] = beta * c->xyR[ic + i + 2][jc + j + 1] + alpha * v21;
-               c->xyR[ic + i + 2][jc + j + 2] = beta * c->xyR[ic + i + 2][jc + j + 2] + alpha * v22;
-               c->xyR[ic + i + 2][jc + j + 3] = beta * c->xyR[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->xyR[ic + i + 3][jc + j] = beta * c->xyR[ic + i + 3][jc + j] + alpha * v30;
-               c->xyR[ic + i + 3][jc + j + 1] = beta * c->xyR[ic + i + 3][jc + j + 1] + alpha * v31;
-               c->xyR[ic + i + 3][jc + j + 2] = beta * c->xyR[ic + i + 3][jc + j + 2] + alpha * v32;
-               c->xyR[ic + i + 3][jc + j + 3] = beta * c->xyR[ic + i + 3][jc + j + 3] + alpha * v33;
-            }
-         } else {
-         // Determine submatrix [I0..I1]x[J0..J1] to process
-            i0 = i;
-            i1 = imin2(i + 3, m - 1);
-            j0 = j;
-            j1 = imin2(j + 3, n - 1);
-         // Process submatrix
-            for (ik = i0; ik <= i1; ik++) {
-               for (jk = j0; jk <= j1; jk++) {
-                  if (k == 0 || alpha == 0.0) {
-                     v = 0.0;
-                  } else {
-                     v = 0.0;
-                     v = ae_v_dotproduct(&a->xyR[ia][ja + ik], a->stride, &b->xyR[ib][jb + jk], b->stride, k);
-                  }
-                  if (beta == 0.0) {
-                     c->xyR[ic + ik][jc + jk] = alpha * v;
-                  } else {
-                     c->xyR[ic + ik][jc + jk] = beta * c->xyR[ic + ik][jc + jk] + alpha * v;
-                  }
-               }
-            }
+   ae_assert(alpha != 0.0, "RMatrixGEMMK44V00: internal error (alpha=0)");
+// If the matrix size is 0.
+   if (m == 0 || n == 0) return;
+// a' b:
+   for (ae_int_t i = 0; i < m; i += 4) for (ae_int_t j = 0; j < n; j += 4) {
+   // Choose between the specialized 4 x 4 code and the general code.
+      if (i + 4 <= m && j + 4 <= n) {
+      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
+      // This sub-matrix is calculated as sum of k rank-1 products,
+      // with operands cached in local variables in order to speed up array operations.
+         ae_int_t ax0 = ja + i, ax1 = ja + i + 1, ax2 = ja + i + 2, ax3 = ja + i + 3, ay = ia;
+         ae_int_t bx0 = jb + j, bx1 = jb + j + 1, bx2 = jb + j + 2, bx3 = jb + j + 3, by = ib;
+         double v00 = 0.0, v01 = 0.0, v02 = 0.0, v03 = 0.0;
+         double v10 = 0.0, v11 = 0.0, v12 = 0.0, v13 = 0.0;
+         double v20 = 0.0, v21 = 0.0, v22 = 0.0, v23 = 0.0;
+         double v30 = 0.0, v31 = 0.0, v32 = 0.0, v33 = 0.0;
+         for (ae_int_t t = 0; t < k; ay++, by++, t++) {
+            double a0 = a->xyR[ay][ax0], a1 = a->xyR[ay][ax1], a2 = a->xyR[ay][ax2], a3 = a->xyR[ay][ax3];
+            double b0 = b->xyR[by][bx0], b1 = b->xyR[by][bx1], b2 = b->xyR[by][bx2], b3 = b->xyR[by][bx3];
+            v00 += a0 * b0, v01 += a0 * b1, v02 += a0 * b2, v03 += a0 * b3;
+            v10 += a1 * b0, v11 += a1 * b1, v12 += a1 * b2, v13 += a1 * b3;
+            v20 += a2 * b0, v21 += a2 * b1, v22 += a2 * b2, v23 += a2 * b3;
+            v30 += a3 * b0, v31 += a3 * b1, v32 += a3 * b2, v33 += a3 * b3;
          }
-         j += 4;
+         v00 *= alpha, v01 *= alpha, v02 *= alpha, v03 *= alpha;
+         v10 *= alpha, v11 *= alpha, v12 *= alpha, v13 *= alpha;
+         v20 *= alpha, v21 *= alpha, v22 *= alpha, v23 *= alpha;
+         v30 *= alpha, v31 *= alpha, v32 *= alpha, v33 *= alpha;
+         ae_int_t ic0 = ic + i, ic1 = ic0 + 1, ic2 = ic0 + 2, ic3 = ic0 + 3;
+         ae_int_t jc0 = jc + j, jc1 = jc0 + 1, jc2 = jc0 + 2, jc3 = jc0 + 3;
+         if (beta == 0.0) {
+            c->xyR[ic0][jc0] = v00, c->xyR[ic0][jc1] = v01, c->xyR[ic0][jc2] = v02, c->xyR[ic0][jc3] = v03;
+            c->xyR[ic1][jc0] = v10, c->xyR[ic1][jc1] = v11, c->xyR[ic1][jc2] = v12, c->xyR[ic1][jc3] = v13;
+            c->xyR[ic2][jc0] = v20, c->xyR[ic2][jc1] = v21, c->xyR[ic2][jc2] = v22, c->xyR[ic2][jc3] = v23;
+            c->xyR[ic3][jc0] = v30, c->xyR[ic3][jc1] = v31, c->xyR[ic3][jc2] = v32, c->xyR[ic3][jc3] = v33;
+         } else {
+            c->xyR[ic0][jc0] = beta * c->xyR[ic0][jc0] + v00, c->xyR[ic0][jc1] = beta * c->xyR[ic0][jc1] + v01;
+            c->xyR[ic0][jc2] = beta * c->xyR[ic0][jc2] + v02, c->xyR[ic0][jc3] = beta * c->xyR[ic0][jc3] + v03;
+            c->xyR[ic1][jc0] = beta * c->xyR[ic1][jc0] + v10, c->xyR[ic1][jc1] = beta * c->xyR[ic1][jc1] + v11;
+            c->xyR[ic1][jc2] = beta * c->xyR[ic1][jc2] + v12, c->xyR[ic1][jc3] = beta * c->xyR[ic1][jc3] + v13;
+            c->xyR[ic2][jc0] = beta * c->xyR[ic2][jc0] + v20, c->xyR[ic2][jc1] = beta * c->xyR[ic2][jc1] + v21;
+            c->xyR[ic2][jc2] = beta * c->xyR[ic2][jc2] + v22, c->xyR[ic2][jc3] = beta * c->xyR[ic2][jc3] + v23;
+            c->xyR[ic3][jc0] = beta * c->xyR[ic3][jc0] + v30, c->xyR[ic3][jc1] = beta * c->xyR[ic3][jc1] + v31;
+            c->xyR[ic3][jc2] = beta * c->xyR[ic3][jc2] + v32, c->xyR[ic3][jc3] = beta * c->xyR[ic3][jc3] + v33;
+         }
+      } else {
+      // Determine the sub-matrix of c of which elements [i0,i1) x [j0,j1) to process.
+         double i0 = i, i1 = imin2(i + 4, m);
+         double j0 = j, j1 = imin2(j + 4, n);
+      // Process the sub-matrix.
+         for (ae_int_t ik = i0; ik < i1; ik++) for (ae_int_t jk = j0; jk < j1; jk++) {
+            double v = k == 0 || alpha == 0.0 ? 0.0 : alpha * ae_v_dotproduct(&a->xyR[ia][ja + ik], a->stride, &b->xyR[ib][jb + jk], b->stride, k);
+            c->xyR[ic + ik][jc + jk] = beta == 0.0 ? v : beta * c->xyR[ic + ik][jc + jk] + v;
+         }
       }
-      i += 4;
    }
 }
 
-// RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
-// with OpTypeA=1 and OpTypeB=1.
-//
-// Additional info:
-// * this function requires that Alpha != 0 (assertion is thrown otherwise)
-//
-// Inputs:
-//     M       -   matrix size, M > 0
-//     N       -   matrix size, N > 0
-//     K       -   matrix size, K > 0
-//     Alpha   -   coefficient
-//     A       -   matrix
-//     IA      -   submatrix offset
-//     JA      -   submatrix offset
-//     B       -   matrix
-//     IB      -   submatrix offset
-//     JB      -   submatrix offset
-//     Beta    -   coefficient
-//     C       -   PREALLOCATED output matrix
-//     IC      -   submatrix offset
-//     JC      -   submatrix offset
-// ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
+// rmatrixgemm() kernel: the base case code for rmatrixgemm(), specialized to opa == 1 and opb == 1.
 void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-   ae_int_t i;
-   ae_int_t j;
-   double v;
-   double v00;
-   double v01;
-   double v02;
-   double v03;
-   double v10;
-   double v11;
-   double v12;
-   double v13;
-   double v20;
-   double v21;
-   double v22;
-   double v23;
-   double v30;
-   double v31;
-   double v32;
-   double v33;
-   double a0;
-   double a1;
-   double a2;
-   double a3;
-   double b0;
-   double b1;
-   double b2;
-   double b3;
-   ae_int_t idxa0;
-   ae_int_t idxa1;
-   ae_int_t idxa2;
-   ae_int_t idxa3;
-   ae_int_t idxb0;
-   ae_int_t idxb1;
-   ae_int_t idxb2;
-   ae_int_t idxb3;
-   ae_int_t i0;
-   ae_int_t i1;
-   ae_int_t ik;
-   ae_int_t j0;
-   ae_int_t j1;
-   ae_int_t jk;
-   ae_int_t t;
-   ae_int_t offsa;
-   ae_int_t offsb;
-   ae_assert(alpha != 0.0, "rmatrixgemmk44v11: internal error (alpha == 0)");
-// if matrix size is zero
-   if (m == 0 || n == 0) {
-      return;
-   }
-// A'*B'
-   i = 0;
-   while (i < m) {
-      j = 0;
-      while (j < n) {
-      // Choose between specialized 4x4 code and general code
-         if (i + 4 <= m && j + 4 <= n) {
-         // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
-         //
-         // This submatrix is calculated as sum of K rank-1 products,
-         // with operands cached in local variables in order to speed
-         // up operations with arrays.
-            idxa0 = ja + i + 0;
-            idxa1 = ja + i + 1;
-            idxa2 = ja + i + 2;
-            idxa3 = ja + i + 3;
-            offsa = ia;
-            idxb0 = ib + j + 0;
-            idxb1 = ib + j + 1;
-            idxb2 = ib + j + 2;
-            idxb3 = ib + j + 3;
-            offsb = jb;
-            v00 = 0.0;
-            v01 = 0.0;
-            v02 = 0.0;
-            v03 = 0.0;
-            v10 = 0.0;
-            v11 = 0.0;
-            v12 = 0.0;
-            v13 = 0.0;
-            v20 = 0.0;
-            v21 = 0.0;
-            v22 = 0.0;
-            v23 = 0.0;
-            v30 = 0.0;
-            v31 = 0.0;
-            v32 = 0.0;
-            v33 = 0.0;
-            for (t = 0; t < k; t++) {
-               a0 = a->xyR[offsa][idxa0];
-               a1 = a->xyR[offsa][idxa1];
-               b0 = b->xyR[idxb0][offsb];
-               b1 = b->xyR[idxb1][offsb];
-               v00 += a0 * b0;
-               v01 += a0 * b1;
-               v10 += a1 * b0;
-               v11 += a1 * b1;
-               a2 = a->xyR[offsa][idxa2];
-               a3 = a->xyR[offsa][idxa3];
-               v20 += a2 * b0;
-               v21 += a2 * b1;
-               v30 += a3 * b0;
-               v31 += a3 * b1;
-               b2 = b->xyR[idxb2][offsb];
-               b3 = b->xyR[idxb3][offsb];
-               v22 += a2 * b2;
-               v23 += a2 * b3;
-               v32 += a3 * b2;
-               v33 += a3 * b3;
-               v02 += a0 * b2;
-               v03 += a0 * b3;
-               v12 += a1 * b2;
-               v13 += a1 * b3;
-               offsa++;
-               offsb++;
-            }
-            if (beta == 0.0) {
-               c->xyR[ic + i][jc + j] = alpha * v00;
-               c->xyR[ic + i][jc + j + 1] = alpha * v01;
-               c->xyR[ic + i][jc + j + 2] = alpha * v02;
-               c->xyR[ic + i][jc + j + 3] = alpha * v03;
-               c->xyR[ic + i + 1][jc + j] = alpha * v10;
-               c->xyR[ic + i + 1][jc + j + 1] = alpha * v11;
-               c->xyR[ic + i + 1][jc + j + 2] = alpha * v12;
-               c->xyR[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->xyR[ic + i + 2][jc + j] = alpha * v20;
-               c->xyR[ic + i + 2][jc + j + 1] = alpha * v21;
-               c->xyR[ic + i + 2][jc + j + 2] = alpha * v22;
-               c->xyR[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->xyR[ic + i + 3][jc + j] = alpha * v30;
-               c->xyR[ic + i + 3][jc + j + 1] = alpha * v31;
-               c->xyR[ic + i + 3][jc + j + 2] = alpha * v32;
-               c->xyR[ic + i + 3][jc + j + 3] = alpha * v33;
-            } else {
-               c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j] + alpha * v00;
-               c->xyR[ic + i][jc + j + 1] = beta * c->xyR[ic + i][jc + j + 1] + alpha * v01;
-               c->xyR[ic + i][jc + j + 2] = beta * c->xyR[ic + i][jc + j + 2] + alpha * v02;
-               c->xyR[ic + i][jc + j + 3] = beta * c->xyR[ic + i][jc + j + 3] + alpha * v03;
-               c->xyR[ic + i + 1][jc + j] = beta * c->xyR[ic + i + 1][jc + j] + alpha * v10;
-               c->xyR[ic + i + 1][jc + j + 1] = beta * c->xyR[ic + i + 1][jc + j + 1] + alpha * v11;
-               c->xyR[ic + i + 1][jc + j + 2] = beta * c->xyR[ic + i + 1][jc + j + 2] + alpha * v12;
-               c->xyR[ic + i + 1][jc + j + 3] = beta * c->xyR[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->xyR[ic + i + 2][jc + j] = beta * c->xyR[ic + i + 2][jc + j] + alpha * v20;
-               c->xyR[ic + i + 2][jc + j + 1] = beta * c->xyR[ic + i + 2][jc + j + 1] + alpha * v21;
-               c->xyR[ic + i + 2][jc + j + 2] = beta * c->xyR[ic + i + 2][jc + j + 2] + alpha * v22;
-               c->xyR[ic + i + 2][jc + j + 3] = beta * c->xyR[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->xyR[ic + i + 3][jc + j] = beta * c->xyR[ic + i + 3][jc + j] + alpha * v30;
-               c->xyR[ic + i + 3][jc + j + 1] = beta * c->xyR[ic + i + 3][jc + j + 1] + alpha * v31;
-               c->xyR[ic + i + 3][jc + j + 2] = beta * c->xyR[ic + i + 3][jc + j + 2] + alpha * v32;
-               c->xyR[ic + i + 3][jc + j + 3] = beta * c->xyR[ic + i + 3][jc + j + 3] + alpha * v33;
-            }
-         } else {
-         // Determine submatrix [I0..I1]x[J0..J1] to process
-            i0 = i;
-            i1 = imin2(i + 3, m - 1);
-            j0 = j;
-            j1 = imin2(j + 3, n - 1);
-         // Process submatrix
-            for (ik = i0; ik <= i1; ik++) {
-               for (jk = j0; jk <= j1; jk++) {
-                  if (k == 0 || alpha == 0.0) {
-                     v = 0.0;
-                  } else {
-                     v = 0.0;
-                     v = ae_v_dotproduct(&a->xyR[ia][ja + ik], a->stride, &b->xyR[ib + jk][jb], 1, k);
-                  }
-                  if (beta == 0.0) {
-                     c->xyR[ic + ik][jc + jk] = alpha * v;
-                  } else {
-                     c->xyR[ic + ik][jc + jk] = beta * c->xyR[ic + ik][jc + jk] + alpha * v;
-                  }
-               }
-            }
+   ae_assert(alpha != 0.0, "RMatrixGEMMK44V00: internal error (alpha=0)");
+// If the matrix size is 0.
+   if (m == 0 || n == 0) return;
+// a' b':
+   for (ae_int_t i = 0; i < m; i += 4) for (ae_int_t j = 0; j < n; j += 4) {
+   // Choose between the specialized 4 x 4 code and the general code.
+      if (i + 4 <= m && j + 4 <= n) {
+      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
+      // This sub-matrix is calculated as sum of k rank-1 products,
+      // with operands cached in local variables in order to speed up array operations.
+         ae_int_t ax0 = ja + i, ax1 = ja + i + 1, ax2 = ja + i + 2, ax3 = ja + i + 3, ay = ia;
+         ae_int_t bx0 = ib + j, bx1 = ib + j + 1, bx2 = ib + j + 2, bx3 = ib + j + 3, by = jb;
+         double v00 = 0.0, v01 = 0.0, v02 = 0.0, v03 = 0.0;
+         double v10 = 0.0, v11 = 0.0, v12 = 0.0, v13 = 0.0;
+         double v20 = 0.0, v21 = 0.0, v22 = 0.0, v23 = 0.0;
+         double v30 = 0.0, v31 = 0.0, v32 = 0.0, v33 = 0.0;
+         for (ae_int_t t = 0; t < k; ay++, by++, t++) {
+            double a0 = a->xyR[ay][ax0], a1 = a->xyR[ay][ax1], a2 = a->xyR[ay][ax2], a3 = a->xyR[ay][ax3];
+            double b0 = b->xyR[bx0][by], b1 = b->xyR[bx1][by], b2 = b->xyR[bx2][by], b3 = b->xyR[bx3][by];
+            v00 += a0 * b0, v01 += a0 * b1, v02 += a0 * b2, v03 += a0 * b3;
+            v10 += a1 * b0, v11 += a1 * b1, v12 += a1 * b2, v13 += a1 * b3;
+            v20 += a2 * b0, v21 += a2 * b1, v22 += a2 * b2, v23 += a2 * b3;
+            v30 += a3 * b0, v31 += a3 * b1, v32 += a3 * b2, v33 += a3 * b3;
          }
-         j += 4;
+         v00 *= alpha, v01 *= alpha, v02 *= alpha, v03 *= alpha;
+         v10 *= alpha, v11 *= alpha, v12 *= alpha, v13 *= alpha;
+         v20 *= alpha, v21 *= alpha, v22 *= alpha, v23 *= alpha;
+         v30 *= alpha, v31 *= alpha, v32 *= alpha, v33 *= alpha;
+         ae_int_t ic0 = ic + i, ic1 = ic0 + 1, ic2 = ic0 + 2, ic3 = ic0 + 3;
+         ae_int_t jc0 = jc + j, jc1 = jc0 + 1, jc2 = jc0 + 2, jc3 = jc0 + 3;
+         if (beta == 0.0) {
+            c->xyR[ic0][jc0] = v00, c->xyR[ic0][jc1] = v01, c->xyR[ic0][jc2] = v02, c->xyR[ic0][jc3] = v03;
+            c->xyR[ic1][jc0] = v10, c->xyR[ic1][jc1] = v11, c->xyR[ic1][jc2] = v12, c->xyR[ic1][jc3] = v13;
+            c->xyR[ic2][jc0] = v20, c->xyR[ic2][jc1] = v21, c->xyR[ic2][jc2] = v22, c->xyR[ic2][jc3] = v23;
+            c->xyR[ic3][jc0] = v30, c->xyR[ic3][jc1] = v31, c->xyR[ic3][jc2] = v32, c->xyR[ic3][jc3] = v33;
+         } else {
+            c->xyR[ic0][jc0] = beta * c->xyR[ic0][jc0] + v00, c->xyR[ic0][jc1] = beta * c->xyR[ic0][jc1] + v01;
+            c->xyR[ic0][jc2] = beta * c->xyR[ic0][jc2] + v02, c->xyR[ic0][jc3] = beta * c->xyR[ic0][jc3] + v03;
+            c->xyR[ic1][jc0] = beta * c->xyR[ic1][jc0] + v10, c->xyR[ic1][jc1] = beta * c->xyR[ic1][jc1] + v11;
+            c->xyR[ic1][jc2] = beta * c->xyR[ic1][jc2] + v12, c->xyR[ic1][jc3] = beta * c->xyR[ic1][jc3] + v13;
+            c->xyR[ic2][jc0] = beta * c->xyR[ic2][jc0] + v20, c->xyR[ic2][jc1] = beta * c->xyR[ic2][jc1] + v21;
+            c->xyR[ic2][jc2] = beta * c->xyR[ic2][jc2] + v22, c->xyR[ic2][jc3] = beta * c->xyR[ic2][jc3] + v23;
+            c->xyR[ic3][jc0] = beta * c->xyR[ic3][jc0] + v30, c->xyR[ic3][jc1] = beta * c->xyR[ic3][jc1] + v31;
+            c->xyR[ic3][jc2] = beta * c->xyR[ic3][jc2] + v32, c->xyR[ic3][jc3] = beta * c->xyR[ic3][jc3] + v33;
+         }
+      } else {
+      // Determine the sub-matrix of c of which elements [i0,i1) x [j0,j1) to process.
+         ae_int_t i0 = i, i1 = imin2(i + 4, m);
+         ae_int_t j0 = j, j1 = imin2(j + 4, n);
+      // Process the sub-matrix.
+         for (ae_int_t ik = i0; ik < i1; ik++) for (ae_int_t jk = j0; jk < j1; jk++) {
+            double v = k == 0 || alpha == 0.0 ? 0.0 : alpha * ae_v_dotproduct(&a->xyR[ia][ja + ik], a->stride, &b->xyR[ib + jk][jb], 1, k);
+            c->xyR[ic + ik][jc + jk] = beta == 0.0 ? v : beta * c->xyR[ic + ik][jc + jk] + v;
+         }
       }
-      i += 4;
    }
 }
 
-// RMatrixGEMM kernel, basecase code for RMatrixGEMM.
-//
-// This subroutine calculates C = alpha*op1(A)*op2(B) +beta*C where:
-// * C is MxN general matrix
-// * op1(A) is MxK matrix
-// * op2(B) is KxN matrix
-// * "op" may be identity transformation, transposition
-//
-// Additional info:
-// * multiplication result replaces C. If Beta=0, C elements are not used in
-//   calculations (not multiplied by zero - just not referenced)
-// * if Alpha=0, A is not used (not multiplied by zero - just not referenced)
-// * if both Beta and Alpha are zero, C is filled by zeros.
-//
-// IMPORTANT:
-//
-// This function does NOT pre-allocate output matrix C, it MUST be pre-allocated
-// by caller prior to calling this function. In case C does not have  enough
-// space to store result, exception will be generated.
-//
-// Inputs:
-//     M       -   matrix size, M > 0
-//     N       -   matrix size, N > 0
-//     K       -   matrix size, K > 0
-//     Alpha   -   coefficient
-//     A       -   matrix
-//     IA      -   submatrix offset
-//     JA      -   submatrix offset
-//     OpTypeA -   transformation type:
-//                 * 0 - no transformation
-//                 * 1 - transposition
-//     B       -   matrix
-//     IB      -   submatrix offset
-//     JB      -   submatrix offset
-//     OpTypeB -   transformation type:
-//                 * 0 - no transformation
-//                 * 1 - transposition
-//     Beta    -   coefficient
-//     C       -   PREALLOCATED output matrix
-//     IC      -   submatrix offset
-//     JC      -   submatrix offset
-// ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
-void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-   ae_int_t i;
-   ae_int_t j;
-// if matrix size is zero
-   if (m == 0 || n == 0) {
-      return;
-   }
-// Try optimized code
-   if (rmatrixgemmf(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc)) {
-      return;
-   }
-// if K=0 or Alpha=0, then C=Beta*C
-   if (k == 0 || alpha == 0.0) {
-      if (beta != 1.0) {
-         if (beta != 0.0) {
-            for (i = 0; i < m; i++) {
-               for (j = 0; j < n; j++) {
-                  c->xyR[ic + i][jc + j] *= beta;
-               }
-            }
-         } else {
-            for (i = 0; i < m; i++) {
-               for (j = 0; j < n; j++) {
-                  c->xyR[ic + i][jc + j] = 0.0;
-               }
-            }
-         }
+// Fast rmatrixgemm() kernel: with AVX2/FMA support.
+#if defined ALGLIB_NO_FAST_KERNELS
+// ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
+#else
+// ALGLIB Routine: Copyright 19.09.2021 by Sergey Bochkanov
+#endif
+static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
+#if defined ALGLIB_NO_FAST_KERNELS || !defined _ALGLIB_HAS_AVX2_INTRINSICS
+   return false;
+#else
+   const ae_int_t block_size = _ABLASF_BLOCK_SIZE;
+   const ae_int_t micro_size = _ABLASF_MICRO_SIZE;
+   ae_int_t (*ablasf_packblk)(const double *, ae_int_t, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t, ae_int_t) = k == 32 && block_size == 32 ? avx2_ablasf_packblkh32 : avx2_ablasf_packblkh;
+   void (*ablasf_dotblk)(const double *, const double *, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t) = avx2_ablasf_dotblkh;
+   void (*ablasf_daxpby)(ae_int_t, double, const double *, double, double *) = avx2_ablasf_daxpby;
+// Determine CPU and kernel support
+   if (m > block_size || n > block_size || k > block_size || m == 0 || n == 0 || !(CurCPU & CPU_AVX2)) return false;
+#if defined _ALGLIB_HAS_FMA_INTRINSICS
+   if (CurCPU & CPU_FMA) ablasf_dotblk = fma_ablasf_dotblkh;
+#endif
+// Prepare c.
+   double *cp = c->xyR[ic] + jc;
+   ae_int_t stride_c = c->stride;
+// Do we have alpha a b?
+   if (alpha != 0.0 && k > 0) {
+   // Prepare the structures.
+      double *ap = a->xyR[ia] + ja; ae_int_t stride_a = a->stride;
+      double *bp = b->xyR[ib] + jb; ae_int_t stride_b = b->stride;
+      double _blka[_ABLASF_BLOCK_SIZE * _ABLASF_MICRO_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
+      double _blkb_long[_ABLASF_BLOCK_SIZE * _ABLASF_BLOCK_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
+      double _blkc[_ABLASF_MICRO_SIZE * _ABLASF_BLOCK_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
+      double *blka = (double *)ae_align(_blka, _ALGLIB_SIMD_ALIGNMENT_BYTES);
+      double *storageb_long = (double *)ae_align(_blkb_long, _ALGLIB_SIMD_ALIGNMENT_BYTES);
+      double *blkc = (double *)ae_align(_blkc, _ALGLIB_SIMD_ALIGNMENT_BYTES);
+   // Pack transform(b) into precomputed block form.
+      for (ae_int_t base1 = 0; base1 < n; base1 += micro_size) {
+         const ae_int_t lim1 = n - base1 < micro_size ? n - base1 : micro_size;
+         double *curb = storageb_long + base1 * block_size;
+         ablasf_packblk(bp + (opb == 0 ? base1 : base1 * stride_b), stride_b, opb == 0 ? 1 : 0, k, lim1, curb, block_size, micro_size);
       }
+   // Output.
+      for (ae_int_t base0 = 0; base0 < m; base0 += micro_size) {
+      // Load block row of transfors(a).
+         const ae_int_t lim0 = m - base0 < micro_size ? m - base0 : micro_size;
+         const ae_int_t round_k = ablasf_packblk(ap + (opa == 0 ? base0 * stride_a : base0), stride_a, opa, k, lim0, blka, block_size, micro_size);
+      // Compute block(a)' entire(b).
+         for (ae_int_t base1 = 0; base1 < n; base1 += micro_size)
+            ablasf_dotblk(blka, storageb_long + base1 * block_size, round_k, block_size, micro_size, blkc + base1, block_size);
+      // Output block row of block(a)' entire(b).
+         for (ae_int_t offs0 = 0; offs0 < lim0; offs0++)
+            ablasf_daxpby(n, alpha, blkc + offs0 * block_size, beta, cp + (base0 + offs0) * stride_c);
+      }
+   } else {
+   // No a b, just beta c (degenerate case, not optimized).
+      if (beta == 0.0)
+         for (ae_int_t out0 = 0; out0 < m; out0++) for (ae_int_t out1 = 0; out1 < n; out1++) cp[out0 * stride_c + out1] = 0.0;
+      else if (beta != 1.0)
+         for (ae_int_t out0 = 0; out0 < m; out0++) for (ae_int_t out1 = 0; out1 < n; out1++) cp[out0 * stride_c + out1] *= beta;
+   }
+   return true;
+#endif
+}
+
+// rmatrixgemm() kernel: the base case code for rmatrixgemm().
+void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
+// If the matrix size is 0.
+   if (m == 0 || n == 0) return;
+// Try the optimized code.
+   if (ablasf_rgemm32basecase(m, n, k, alpha, a, ia, ja, opa, b, ib, jb, opb, beta, c, ic, jc)) return;
+// If k == 0 or alpha == 0.0, then c = beta c.
+   if (k == 0 || alpha == 0.0) {
+      if (beta == 0.0)
+         for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) c->xyR[ic + i][jc + j] = 0.0;
+      else if (beta != 1.0)
+         for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) c->xyR[ic + i][jc + j] *= beta;
       return;
    }
 // Call specialized code.
-//
-// NOTE: specialized code was moved to separate function because of strange
-//       issues with instructions cache on some systems; Having too long
-//       functions significantly slows down internal loop of the algorithm.
-   if (optypea == 0 && optypeb == 0) {
-      rmatrixgemmk44v00(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc);
-   }
-   if (optypea == 0 && optypeb != 0) {
-      rmatrixgemmk44v01(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc);
-   }
-   if (optypea != 0 && optypeb == 0) {
-      rmatrixgemmk44v10(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc);
-   }
-   if (optypea != 0 && optypeb != 0) {
-      rmatrixgemmk44v11(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc);
+// Note:
+// *	The specialized code was moved to separate functions because of strange issues with the instruction cache on some systems.
+//	Having too-long functions significantly slows down the internal loop of the algorithm.
+   switch (opa) {
+      case 0: switch (opb) {
+         case 0: rmatrixgemmk44v00(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc); break;
+         default:
+         case 1: rmatrixgemmk44v01(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc); break;
+      }
+      break;
+      default: switch (opb) {
+         case 0: rmatrixgemmk44v10(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc); break;
+         default:
+         case 1: rmatrixgemmk44v11(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc); break;
+      }
+      break;
    }
 }
 
-// CMatrixGEMM kernel, basecase code for CMatrixGEMM.
-//
-// This subroutine calculates C = alpha*op1(A)*op2(B) +beta*C where:
-// * C is MxN general matrix
-// * op1(A) is MxK matrix
-// * op2(B) is KxN matrix
-// * "op" may be identity transformation, transposition, conjugate transposition
-//
+// cmatrixgemm() kernels the base case code for cmatrixgemm().
+//	c = alpha a' b' + beta c
+// where:
+// *	c is an m x n general matrix, a' is an m x k matrix, b' is a k x n matrix, with:
+// *	a' = a if opa == 0, a' = a^T if opa == 1, a' = a^+ if opa == 2,
+// *	b' = b if opb == 0, b' = b^T if opb == 1. b' = b^+ if opa == 2,
 // Additional info:
-// * multiplication result replaces C. If Beta=0, C elements are not used in
-//   calculations (not multiplied by zero - just not referenced)
-// * if Alpha=0, A is not used (not multiplied by zero - just not referenced)
-// * if both Beta and Alpha are zero, C is filled by zeros.
-//
-// IMPORTANT:
-//
-// This function does NOT pre-allocate output matrix C, it MUST be pre-allocated
-// by caller prior to calling this function. In case C does not have  enough
-// space to store result, exception will be generated.
-//
+// *	The multiplication result replaces c.
+// *	If beta == 0.0, c is not used in the calculations (not multiplied by 0.0 - just not referenced).
+// *	If alpha == 0.0, a is not used (not multiplied by 0.0 - just not referenced).
+// *	If both beta == 0.0 and alpha == 0.0, c is filled by 0's.
+// *	This function requires that alpha != 0.0; an exception is thrown otherwise.
+// Important:
+// *	This function requires the output matrix c to be pre-allocated.
+//	An exception will be thrown, if it is not large enough to store the result.
 // Inputs:
-//     M       -   matrix size, M > 0
-//     N       -   matrix size, N > 0
-//     K       -   matrix size, K > 0
-//     Alpha   -   coefficient
-//     A       -   matrix
-//     IA      -   submatrix offset
-//     JA      -   submatrix offset
-//     OpTypeA -   transformation type:
-//                 * 0 - no transformation
-//                 * 1 - transposition
-//                 * 2 - conjugate transposition
-//     B       -   matrix
-//     IB      -   submatrix offset
-//     JB      -   submatrix offset
-//     OpTypeB -   transformation type:
-//                 * 0 - no transformation
-//                 * 1 - transposition
-//                 * 2 - conjugate transposition
-//     Beta    -   coefficient
-//     C       -   PREALLOCATED output matrix
-//     IC      -   submatrix offset
-//     JC      -   submatrix offset
+// Inputs:
+//	m, n, k:	The matrix sizes; m, n, k > 0.
+//	alpha, beta:	The coefficients.
+//	a, ia, ja:	A matrix and its sub-matrix offsets.
+//	opa:		The transformation type for a:
+//			0:	no transformation: a' = a,
+//			1:	transposition: a' = a^T,
+//			2:	conjugate transposition: a' = a^+.
+//			a' is an m x k matrix.
+//	b, ib, jb:	A matrix and its sub-matrix offsets.
+//	opb:		The transformation type for b:
+//			0:	no transformation: b' = b,
+//			1:	transposition: b' = b^T.
+//			2:	conjugate transposition: b' = b^+.
+//			b' is an k x n matrix.
+//	c, ic, jc:	The m x n PRE-ALLOCATED output matrix and its sub-matrix offsets.
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
-void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
-   ae_int_t i;
-   ae_int_t j;
-   complex v;
-   complex v00;
-   complex v01;
-   complex v10;
-   complex v11;
-   double v00x;
-   double v00y;
-   double v01x;
-   double v01y;
-   double v10x;
-   double v10y;
-   double v11x;
-   double v11y;
-   double a0x;
-   double a0y;
-   double a1x;
-   double a1y;
-   double b0x;
-   double b0y;
-   double b1x;
-   double b1y;
-   ae_int_t idxa0;
-   ae_int_t idxa1;
-   ae_int_t idxb0;
-   ae_int_t idxb1;
-   ae_int_t i0;
-   ae_int_t i1;
-   ae_int_t ik;
-   ae_int_t j0;
-   ae_int_t j1;
-   ae_int_t jk;
-   ae_int_t t;
-   ae_int_t offsa;
-   ae_int_t offsb;
-// if matrix size is zero
-   if (m == 0 || n == 0) {
-      return;
-   }
-// Try optimized code
-   if (cmatrixgemmf(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc)) {
-      return;
-   }
-// if K=0 or Alpha=0, then C=Beta*C
+void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
+// If the matrix size is 0.
+   if (m == 0 || n == 0) return;
+// Try the optimized code.
+   if (cmatrixgemmf(m, n, k, alpha, a, ia, ja, opa, b, ib, jb, opb, beta, c, ic, jc)) return;
+// If k == 0 or alpha == 0.0, then c = beta c.
    if (k == 0 || ae_c_eq_d(alpha, 0.0)) {
-      if (ae_c_neq_d(beta, 1.0)) {
-         if (ae_c_neq_d(beta, 0.0)) {
-            for (i = 0; i < m; i++) {
-               for (j = 0; j < n; j++) {
-                  c->xyC[ic + i][jc + j] = ae_c_mul(beta, c->xyC[ic + i][jc + j]);
-               }
-            }
-         } else {
-            for (i = 0; i < m; i++) {
-               for (j = 0; j < n; j++) {
-                  c->xyC[ic + i][jc + j] = complex_from_i(0);
-               }
-            }
-         }
-      }
+      if (ae_c_eq_d(beta, 0.0))
+         for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) c->xyC[ic + i][jc + j] = complex_from_i(0);
+      else if (ae_c_neq_d(beta, 1.0))
+         for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) c->xyC[ic + i][jc + j] = ae_c_mul(beta, c->xyC[ic + i][jc + j]);
       return;
    }
-// This phase is not really necessary, but compiler complains
-// about "possibly uninitialized variables"
-   a0x = 0.0;
-   a0y = 0.0;
-   a1x = 0.0;
-   a1y = 0.0;
-   b0x = 0.0;
-   b0y = 0.0;
-   b1x = 0.0;
-   b1y = 0.0;
+// This phase is not really necessary, but compiler complains about "possibly uninitialized variables".
+   double a0x = 0.0, a0y = 0.0, a1x = 0.0, a1y = 0.0;
+   double b0x = 0.0, b0y = 0.0, b1x = 0.0, b1y = 0.0;
 // General case
-   i = 0;
-   while (i < m) {
-      j = 0;
-      while (j < n) {
-      // Choose between specialized 4x4 code and general code
-         if (i + 2 <= m && j + 2 <= n) {
-         // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
-         //
-         // This submatrix is calculated as sum of K rank-1 products,
-         // with operands cached in local variables in order to speed
-         // up operations with arrays.
-            v00x = 0.0;
-            v00y = 0.0;
-            v01x = 0.0;
-            v01y = 0.0;
-            v10x = 0.0;
-            v10y = 0.0;
-            v11x = 0.0;
-            v11y = 0.0;
-            if (optypea == 0) {
-               idxa0 = ia + i + 0;
-               idxa1 = ia + i + 1;
-               offsa = ja;
-            } else {
-               idxa0 = ja + i + 0;
-               idxa1 = ja + i + 1;
-               offsa = ia;
+   for (ae_int_t i = 0; i < m; i += 2) for (ae_int_t j = 0; j < n; j += 2) {
+   // Choose between the specialized 4 x 4 code and the general code.
+      if (i + 2 <= m && j + 2 <= n) {
+      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
+      // This sub-matrix is calculated as sum of k rank-1 products,
+      // with operands cached in local variables in order to speed up array operations.
+         double v00x = 0.0, v00y = 0.0, v01x = 0.0, v01y = 0.0;
+         double v10x = 0.0, v10y = 0.0, v11x = 0.0, v11y = 0.0;
+         ae_int_t xa = opa == 0? ia: ja, a0 = opa == 0? ja: ia, ax0 = xa + i, ax1 = ax0 + 1;
+         ae_int_t xb = opb == 0? jb: ib, b0 = opb == 0? ib: jb, bx0 = xb + j, bx1 = bx0 + 1;
+         for (ae_int_t t = 0; t < k; a0++, b0++, t++) {
+            switch (opa) {
+               case 0: a0x = a->xyC[ax0][a0].x, a0y = a->xyC[ax0][a0].y, a1x = a->xyC[ax1][a0].x, a1y = a->xyC[ax1][a0].y; break;
+               case 1: a0x = a->xyC[a0][ax0].x, a0y = a->xyC[a0][ax0].y, a1x = a->xyC[a0][ax1].x, a1y = a->xyC[a0][ax1].y; break;
+               case 2: a0x = a->xyC[a0][ax0].x, a0y = -a->xyC[a0][ax0].y, a1x = a->xyC[a0][ax1].x, a1y = -a->xyC[a0][ax1].y; break;
             }
-            if (optypeb == 0) {
-               idxb0 = jb + j + 0;
-               idxb1 = jb + j + 1;
-               offsb = ib;
-            } else {
-               idxb0 = ib + j + 0;
-               idxb1 = ib + j + 1;
-               offsb = jb;
+            switch (opb) {
+               case 0: b0x = b->xyC[b0][bx0].x, b0y = b->xyC[b0][bx0].y, b1x = b->xyC[b0][bx1].x, b1y = b->xyC[b0][bx1].y; break;
+               case 1: b0x = b->xyC[bx0][b0].x, b0y = b->xyC[bx0][b0].y, b1x = b->xyC[bx1][b0].x, b1y = b->xyC[bx1][b0].y; break;
+               case 2: b0x = b->xyC[bx0][b0].x, b0y = -b->xyC[bx0][b0].y, b1x = b->xyC[bx1][b0].x, b1y = -b->xyC[bx1][b0].y; break;
             }
-            for (t = 0; t < k; t++) {
-               if (optypea == 0) {
-                  a0x = a->xyC[idxa0][offsa].x;
-                  a0y = a->xyC[idxa0][offsa].y;
-                  a1x = a->xyC[idxa1][offsa].x;
-                  a1y = a->xyC[idxa1][offsa].y;
-               }
-               if (optypea == 1) {
-                  a0x = a->xyC[offsa][idxa0].x;
-                  a0y = a->xyC[offsa][idxa0].y;
-                  a1x = a->xyC[offsa][idxa1].x;
-                  a1y = a->xyC[offsa][idxa1].y;
-               }
-               if (optypea == 2) {
-                  a0x = a->xyC[offsa][idxa0].x;
-                  a0y = -a->xyC[offsa][idxa0].y;
-                  a1x = a->xyC[offsa][idxa1].x;
-                  a1y = -a->xyC[offsa][idxa1].y;
-               }
-               if (optypeb == 0) {
-                  b0x = b->xyC[offsb][idxb0].x;
-                  b0y = b->xyC[offsb][idxb0].y;
-                  b1x = b->xyC[offsb][idxb1].x;
-                  b1y = b->xyC[offsb][idxb1].y;
-               }
-               if (optypeb == 1) {
-                  b0x = b->xyC[idxb0][offsb].x;
-                  b0y = b->xyC[idxb0][offsb].y;
-                  b1x = b->xyC[idxb1][offsb].x;
-                  b1y = b->xyC[idxb1][offsb].y;
-               }
-               if (optypeb == 2) {
-                  b0x = b->xyC[idxb0][offsb].x;
-                  b0y = -b->xyC[idxb0][offsb].y;
-                  b1x = b->xyC[idxb1][offsb].x;
-                  b1y = -b->xyC[idxb1][offsb].y;
-               }
-               v00x += a0x * b0x - a0y * b0y;
-               v00y += a0x * b0y + a0y * b0x;
-               v01x += a0x * b1x - a0y * b1y;
-               v01y += a0x * b1y + a0y * b1x;
-               v10x += a1x * b0x - a1y * b0y;
-               v10y += a1x * b0y + a1y * b0x;
-               v11x += a1x * b1x - a1y * b1y;
-               v11y += a1x * b1y + a1y * b1x;
-               offsa++;
-               offsb++;
-            }
-            v00 = complex_from_d(v00x, v00y);
-            v10 = complex_from_d(v10x, v10y);
-            v01 = complex_from_d(v01x, v01y);
-            v11 = complex_from_d(v11x, v11y);
-            if (ae_c_eq_d(beta, 0.0)) {
-               c->xyC[ic + i][jc + j] = ae_c_mul(alpha, v00);
-               c->xyC[ic + i][jc + j + 1] = ae_c_mul(alpha, v01);
-               c->xyC[ic + i + 1][jc + j] = ae_c_mul(alpha, v10);
-               c->xyC[ic + i + 1][jc + j + 1] = ae_c_mul(alpha, v11);
-            } else {
-               c->xyC[ic + i][jc + j] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i][jc + j]), ae_c_mul(alpha, v00));
-               c->xyC[ic + i][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i][jc + j + 1]), ae_c_mul(alpha, v01));
-               c->xyC[ic + i + 1][jc + j] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 1][jc + j]), ae_c_mul(alpha, v10));
-               c->xyC[ic + i + 1][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 1][jc + j + 1]), ae_c_mul(alpha, v11));
-            }
-         } else {
-         // Determine submatrix [I0..I1]x[J0..J1] to process
-            i0 = i;
-            i1 = imin2(i + 1, m - 1);
-            j0 = j;
-            j1 = imin2(j + 1, n - 1);
-         // Process submatrix
-            for (ik = i0; ik <= i1; ik++) {
-               for (jk = j0; jk <= j1; jk++) {
-                  if (k == 0 || ae_c_eq_d(alpha, 0.0)) {
-                     v = complex_from_i(0);
-                  } else {
-                     v = complex_from_d(0.0);
-                     if (optypea == 0 && optypeb == 0) {
-                        v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib][jb + jk], b->stride, "N", k);
-                     }
-                     if (optypea == 0 && optypeb == 1) {
-                        v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib + jk][jb], 1, "N", k);
-                     }
-                     if (optypea == 0 && optypeb == 2) {
-                        v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib + jk][jb], 1, "Conj", k);
-                     }
-                     if (optypea == 1 && optypeb == 0) {
-                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib][jb + jk], b->stride, "N", k);
-                     }
-                     if (optypea == 1 && optypeb == 1) {
-                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib + jk][jb], 1, "N", k);
-                     }
-                     if (optypea == 1 && optypeb == 2) {
-                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib + jk][jb], 1, "Conj", k);
-                     }
-                     if (optypea == 2 && optypeb == 0) {
-                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib][jb + jk], b->stride, "N", k);
-                     }
-                     if (optypea == 2 && optypeb == 1) {
-                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib + jk][jb], 1, "N", k);
-                     }
-                     if (optypea == 2 && optypeb == 2) {
-                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib + jk][jb], 1, "Conj", k);
-                     }
-                  }
-                  if (ae_c_eq_d(beta, 0.0)) {
-                     c->xyC[ic + ik][jc + jk] = ae_c_mul(alpha, v);
-                  } else {
-                     c->xyC[ic + ik][jc + jk] = ae_c_add(ae_c_mul(beta, c->xyC[ic + ik][jc + jk]), ae_c_mul(alpha, v));
-                  }
-               }
-            }
+            v00x += a0x * b0x - a0y * b0y, v00y += a0x * b0y + a0y * b0x;
+            v01x += a0x * b1x - a0y * b1y, v01y += a0x * b1y + a0y * b1x;
+            v10x += a1x * b0x - a1y * b0y, v10y += a1x * b0y + a1y * b0x;
+            v11x += a1x * b1x - a1y * b1y, v11y += a1x * b1y + a1y * b1x;
          }
-         j += 2;
+         complex v00 = ae_c_mul(complex_from_d(v00x, v00y), alpha), v01 = ae_c_mul(complex_from_d(v01x, v01y), alpha);
+         complex v10 = ae_c_mul(complex_from_d(v10x, v10y), alpha), v11 = ae_c_mul(complex_from_d(v11x, v11y), alpha);
+         ae_int_t ic0 = ic + i, ic1 = ic0 + 1;
+         ae_int_t jc0 = jc + j, jc1 = jc0 + 1;
+         if (ae_c_eq_d(beta, 0.0)) {
+            c->xyC[ic0][jc0] = v00;
+            c->xyC[ic0][jc1] = v01;
+            c->xyC[ic1][jc0] = v10;
+            c->xyC[ic1][jc1] = v11;
+         } else {
+            c->xyC[ic0][jc0] = ae_c_add(ae_c_mul(beta, c->xyC[ic0][jc0]), v00);
+            c->xyC[ic0][jc1] = ae_c_add(ae_c_mul(beta, c->xyC[ic0][jc1]), v01);
+            c->xyC[ic1][jc0] = ae_c_add(ae_c_mul(beta, c->xyC[ic1][jc0]), v10);
+            c->xyC[ic1][jc1] = ae_c_add(ae_c_mul(beta, c->xyC[ic1][jc1]), v11);
+         }
+      } else {
+      // Determine the sub-matrix of c of which elements [i0,i1) x [j0,j1) to process.
+         ae_int_t i0 = i, i1 = imin2(i + 2, m);
+         ae_int_t j0 = j, j1 = imin2(j + 2, n);
+      // Process the sub-matrix.
+         for (ae_int_t ik = i0; ik < i1; ik++) for (ae_int_t jk = j0; jk < j1; jk++) {
+            complex v = complex_from_i(0);
+            if (k > 0 || ae_c_neq_d(alpha, 0.0)) switch (opa) {
+               case 0: switch (opb) {
+                  case 0: v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib][jb + jk], b->stride, "N", k); break;
+                  case 1: v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib + jk][jb], 1, "N", k); break;
+                  case 2: v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib + jk][jb], 1, "Conj", k); break;
+                  default: v = complex_from_d(0.0); break;
+               }
+               break;
+               case 1: switch (opb) {
+                  case 0: v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib][jb + jk], b->stride, "N", k); break;
+                  case 1: v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib + jk][jb], 1, "N", k); break;
+                  case 2: v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib + jk][jb], 1, "Conj", k); break;
+                  default: v = complex_from_d(0.0); break;
+               }
+               break;
+               case 2: switch (opb) {
+                  case 0: v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib][jb + jk], b->stride, "N", k); break;
+                  case 1: v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib + jk][jb], 1, "N", k); break;
+                  case 2: v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib + jk][jb], 1, "Conj", k); break;
+                  default: v = complex_from_d(0.0); break;
+               }
+               break;
+               default: v = complex_from_d(0.0); break;
+            }
+            c->xyC[ic + ik][jc + jk] = ae_c_eq_d(beta, 0.0) ? ae_c_mul(alpha, v) : ae_c_add(ae_c_mul(beta, c->xyC[ic + ik][jc + jk]), ae_c_mul(alpha, v));
+         }
       }
-      i += 2;
    }
 }
 } // end of namespace alglib_impl

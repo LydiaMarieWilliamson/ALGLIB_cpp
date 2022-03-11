@@ -250,20 +250,59 @@ static ae_cpuid_t ae_cpuid() {
 // There is no synchronization, but this can be safely done on a per-thread basis,
 // provided that simultaneous writes by different cores to the same location will be executed in serial manner,
 // which is true of contemporary architectures.
-   static volatile bool _ae_cpuid_initialized = false, _ae_cpuid_has_sse2 = false;
+   static volatile bool _ae_cpuid_initialized = false, _ae_cpuid_has_sse2 = false, _ae_cpuid_has_avx2 = false, _ae_cpuid_has_fma = false;
 // If not initialized, then determine the system properties.
    if (!_ae_cpuid_initialized) {
 #if defined AE_CPU && AE_CPU == AE_INTEL
    { // SSE2
-#   if defined AE_HAS_SSE2_INTRINSICS
-#      if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
+#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
       ae_int_t a, b, c, d;
+#   elif AE_COMPILER == AE_MSVC
+      int CPUInfo[4];
+#   endif
+   // SSE2 support
+#   if defined _ALGLIB_HAS_SSE2_INTRINSICS || AE_COMPILER == AE_SUNC
+#      if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
       __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
       if (d & 0x04000000) _ae_cpuid_has_sse2 = true;
 #      elif AE_COMPILER == AE_MSVC
-      int CPUInfo[4];
       __cpuid(CPUInfo, 1);
       if (CPUInfo[3] & 0x04000000) _ae_cpuid_has_sse2 = true;
+#      endif
+#   endif
+#   if defined _ALGLIB_HAS_AVX2_INTRINSICS
+   // Check OS support for XSAVE XGETBV
+#      if AE_COMPILER == AE_GNUC
+      __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
+      if (c & (0x1 << 27)) {
+         __asm__ volatile ("xgetbv":"=a" (a), "=d"(d):"c"(0));
+         if ((a & 0x6) == 0x6) {
+            if (_ae_cpuid_has_sse2) { // AVX2 support
+               __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(7), "c"(0));
+               if (b & (0x1 << 5)) _ae_cpuid_has_avx2 = true;
+            }
+#         if defined _ALGLIB_HAS_FMA_INTRINSICS
+            if (_ae_cpuid_has_avx2) { // FMA support
+               __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
+               if (c & (0x1 << 12)) _ae_cpuid_has_fma = true;
+            }
+#         endif
+         }
+      }
+#      elif AE_COMPILER == AE_MSVC && _MSC_VER >= 1600
+      __cpuid(CPUInfo, 1);
+      if ((CPUInfo[2] & (0x1 << 27)) && (_xgetbv(0) & 0x6) == 0x6) {
+         if (_ae_cpuid_has_sse2) { // AVX2 support
+            __cpuidex(CPUInfo, 7, 0);
+            if ((CPUInfo[1] & (0x1 << 5)) != 0) _ae_cpuid_has_avx2 = true;
+         }
+#         if defined _ALGLIB_HAS_FMA_INTRINSICS
+         if (_ae_cpuid_has_avx2) { // FMA support
+            __cpuid(CPUInfo, 1);
+            if ((CPUInfo[2] & (0x1 << 12)) != 0) _ae_cpuid_has_fma = true;
+         }
+#         endif
+      }
 #      endif
 #   endif
    } { // Perform one more CPUID call to generate memory fence
@@ -287,7 +326,11 @@ static ae_cpuid_t ae_cpuid() {
    // Set the initialization flag.
       _ae_cpuid_initialized = true;
    }
-   return _ae_cpuid_has_sse2 ? CPU_SSE2 : (ae_cpuid_t)0;
+   return (ae_cpuid_t)(
+      (_ae_cpuid_has_sse2 ? (int)CPU_SSE2 : 0) |
+      (_ae_cpuid_has_avx2 ? (int)CPU_AVX2 : 0) |
+      (_ae_cpuid_has_fma ? (int)CPU_FMA : 0)
+   );
 }
 
 const/* AutoS */ae_cpuid_t CurCPU = ae_cpuid();
@@ -333,6 +376,25 @@ static bool _use_vendor_kernels = true;
 static bool debug_workstealing = false; // Debug work-stealing environment? false by default.
 static ae_int_t dbgws_pushroot_ok = 0;
 static ae_int_t dbgws_pushroot_failed = 0;
+
+// Standard function wrappers for better GLIBC portability
+#if defined X_FOR_LINUX
+__asm__(".symver exp,exp@GLIBC_2.2.5");
+__asm__(".symver log,log@GLIBC_2.2.5");
+__asm__(".symver pow,pow@GLIBC_2.2.5");
+
+double __wrap_exp(double x) {
+   return exp(x);
+}
+
+double __wrap_log(double x) {
+   return log(x);
+}
+
+double __wrap_pow(double x, double y) {
+   return pow(x, y);
+}
+#endif
 
 ae_int64_t ae_get_dbg_value(debug_flag_t id) {
    switch (id) {
@@ -429,6 +491,8 @@ static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
    AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
 #if AE_COMPILER == AE_GNUC && AE_CPU == AE_INTEL && 100 * __GNUC__ + __GNUC__ >= 470
    __atomic_add_fetch(p, v, __ATOMIC_RELAXED);
+#elif defined __clang__ && AE_CPU == AE_INTEL
+   __atomic_fetch_add(p, v, __ATOMIC_RELAXED);
 #elif AE_OS == AE_WINDOWS
    while (true) {
    // Convert between ae_int_t * and void ** without compiler warnings about indirection levels.
@@ -453,6 +517,8 @@ static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
    AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
 #if AE_COMPILER == AE_GNUC && AE_CPU == AE_INTEL && 100 * __GNUC__ + __GNUC__ >= 470
    __atomic_sub_fetch(p, v, __ATOMIC_RELAXED);
+#elif defined __clang__ && AE_CPU == AE_INTEL
+   __atomic_fetch_sub(p, v, __ATOMIC_RELAXED);
 #elif AE_OS == AE_WINDOWS
    while (true) {
    // Convert between ae_int_t * and void ** without compiler warnings about indirection levels.
