@@ -276,7 +276,9 @@ ae_int_t getmlpeserializationcode();
 ae_int_t getrbfserializationcode();
 ae_int_t getspline2dserializationcode();
 ae_int_t getidwserializationcode();
+ae_int_t getsparsematrixserializationcode();
 ae_int_t getknnserializationcode();
+ae_int_t getlptestserializationcode();
 } // end of namespace alglib_impl
 
 // === TSORT Package ===

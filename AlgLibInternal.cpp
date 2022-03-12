@@ -1483,11 +1483,11 @@ namespace alglib_impl {
 double rdotv(ae_int_t n, RVector *x, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
 // Use KerSub* for a kernel that does not return result.
    if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2Fma(rdotv(n, x->xR, y->xR))
 #endif
-// Original generic C implementation
+// Original generic C implementation.
    double dot = 0.0;
    for (ae_int_t i = 0; i < n; i++) dot += x->xR[i] * y->xR[i];
    return dot;
@@ -1505,7 +1505,7 @@ double rdotv(ae_int_t n, RVector *x, RVector *y) {
 double rdotvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2Fma(rdotv(n, x->xR, y->xyR[iy]))
 #endif
    double dot = 0.0;
@@ -1526,7 +1526,7 @@ double rdotvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
 double rdotrr(ae_int_t n, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2Fma(rdotv(n, x->xyR[ix], y->xyR[iy]))
 #endif
    double dot = 0.0;
@@ -1544,7 +1544,7 @@ double rdotrr(ae_int_t n, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy) {
 double rdotv2(ae_int_t n, RVector *x) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2Fma(rdotv2(n, x->xR))
 #endif
    double dot = 0.0;
@@ -1564,7 +1564,7 @@ double rdotv2(ae_int_t n, RVector *x) {
 void raddv(ae_int_t n, double alpha, RVector *x, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2Fma(raddv(n, alpha, x->xR, y->xR))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[i] += alpha * x->xR[i];
@@ -1583,7 +1583,7 @@ void raddv(ae_int_t n, double alpha, RVector *x, RVector *y) {
 void raddvr(ae_int_t n, double alpha, RVector *x, RMatrix *y, ae_int_t iy) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2Fma(raddv(n, alpha, x->xR, y->xyR[iy]))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] += alpha * x->xR[i];
@@ -1602,7 +1602,7 @@ void raddvr(ae_int_t n, double alpha, RVector *x, RMatrix *y, ae_int_t iy) {
 void raddrv(ae_int_t n, double alpha, RMatrix *x, ae_int_t ix, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2Fma(raddv(n, alpha, x->xyR[ix], y->xR))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[i] += alpha * x->xyR[ix][i];
@@ -1622,7 +1622,7 @@ void raddrv(ae_int_t n, double alpha, RMatrix *x, ae_int_t ix, RVector *y) {
 void raddrr(ae_int_t n, double alpha, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2Fma(raddv(n, alpha, x->xyR[ix], y->xyR[iy]))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] += alpha * x->xyR[ix][i];
@@ -1642,7 +1642,7 @@ void raddrr(ae_int_t n, double alpha, RMatrix *x, ae_int_t ix, RMatrix *y, ae_in
 void raddvx(ae_int_t n, double alpha, RVector *x, ae_int_t x0, RVector *y, ae_int_t y0) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2Fma(raddvx(n, alpha, x->xR + x0, y->xR + y0))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[y0 + i] += alpha * x->xR[x0 + i];
@@ -1673,7 +1673,7 @@ void raddvc(ae_int_t n, double alpha, RVector *x, RMatrix *y, ae_int_t jy) {
 void rmergemulv(ae_int_t n, RVector *x, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergemulv(n, x->xR, y->xR))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[i] *= x->xR[i];
@@ -1691,7 +1691,7 @@ void rmergemulv(ae_int_t n, RVector *x, RVector *y) {
 void rmergemulvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergemulv(n, x->xR, y->xyR[iy]))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] *= x->xR[i];
@@ -1709,7 +1709,7 @@ void rmergemulvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
 void rmergemulrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergemulv(n, x->xyR[ix], y->xR))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[i] *= x->xyR[ix][i];
@@ -1726,7 +1726,7 @@ void rmergemulrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
 void rmergemaxv(ae_int_t n, RVector *x, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergemaxv(n, x->xR, y->xR))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[i] = rmax2(y->xR[i], x->xR[i]);
@@ -1744,7 +1744,7 @@ void rmergemaxv(ae_int_t n, RVector *x, RVector *y) {
 void rmergemaxvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergemaxv(n, x->xR, y->xyR[iy]))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] = rmax2(y->xyR[iy][i], x->xR[i]);
@@ -1762,7 +1762,7 @@ void rmergemaxvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
 void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergemaxv(n, x->xyR[ix], y->xR))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[i] = rmax2(y->xR[i], x->xyR[ix][i]);
@@ -1779,7 +1779,7 @@ void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
 void rmergeminv(ae_int_t n, RVector *x, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergeminv(n, x->xR, y->xR))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[i] = rmin2(y->xR[i], x->xR[i]);
@@ -1797,7 +1797,7 @@ void rmergeminv(ae_int_t n, RVector *x, RVector *y) {
 void rmergeminvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergeminv(n, x->xR, y->xyR[iy]))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] = rmin2(y->xyR[iy][i], x->xR[i]);
@@ -1815,7 +1815,7 @@ void rmergeminvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
 void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmergeminv(n, x->xyR[ix], y->xR))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[i] = rmin2(y->xR[i], x->xyR[ix][i]);
@@ -1832,7 +1832,7 @@ void rmergeminrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
 void rmulv(ae_int_t n, double v, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmulv(n, v, y->xR))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[i] *= v;
@@ -1850,7 +1850,7 @@ void rmulv(ae_int_t n, double v, RVector *y) {
 void rmulr(ae_int_t n, double v, RMatrix *y, ae_int_t iy) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmulv(n, v, y->xyR[iy]))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] *= v;
@@ -1868,7 +1868,7 @@ void rmulr(ae_int_t n, double v, RMatrix *y, ae_int_t iy) {
 void rmulvx(ae_int_t n, double v, RVector *y, ae_int_t y0) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rmulvx(n, v, y->xR + y0))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[y0 + i] *= v;
@@ -1884,7 +1884,7 @@ void rmulvx(ae_int_t n, double v, RVector *y, ae_int_t y0) {
 double rmaxv(ae_int_t n, RVector *x) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2(rmaxv(n, x->xR));
 #endif
    if (n <= 0) return 0.0;
@@ -1904,7 +1904,7 @@ double rmaxv(ae_int_t n, RVector *x) {
 double rmaxr(ae_int_t n, RMatrix *x, ae_int_t ix) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2(rmaxv(n, x->xyR[ix]))
 #endif
    if (n <= 0) return 0.0;
@@ -1923,7 +1923,7 @@ double rmaxr(ae_int_t n, RMatrix *x, ae_int_t ix) {
 double rmaxabsv(ae_int_t n, RVector *x) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2(rmaxabsv(n, x->xR))
 #endif
    double max = 0.0;
@@ -1942,7 +1942,7 @@ double rmaxabsv(ae_int_t n, RVector *x) {
 double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t ix) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2(rmaxabsv(n, x->xyR[ix]))
 #endif
    double max = 0.0;
@@ -1962,8 +1962,8 @@ double rmaxabsr(ae_int_t n, RMatrix *x, ae_int_t ix) {
 void bsetv(ae_int_t n, bool v, BVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1 * 8) KerSubSse2Avx2(bsetv(n, v, y->xB))
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
+   if (n >= 8 * _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(bsetv(n, v, y->xB))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xB[j] = v;
 }
@@ -1971,7 +1971,7 @@ void bsetv(ae_int_t n, bool v, BVector *y) {
 void isetv(ae_int_t n, ae_int_t v, ZVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(isetv(n, v, y->xZ))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xZ[j] = v;
@@ -1980,7 +1980,7 @@ void isetv(ae_int_t n, ae_int_t v, ZVector *y) {
 void rsetv(ae_int_t n, double v, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rsetv(n, v, y->xR))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xR[j] = v;
@@ -1998,7 +1998,7 @@ void rsetv(ae_int_t n, double v, RVector *y) {
 void rsetvx(ae_int_t n, double v, RVector *y, ae_int_t y0) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rsetvx(n, v, y->xR + y0))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xR[y0 + j] = v;
@@ -2030,7 +2030,7 @@ static void rsetm_simd(const ae_int_t n, const double v, double *yp) {
 void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) {
       for (ae_int_t i = 0; i < m; i++) rsetm_simd(n, v, y->xyR[i]);
       return;
@@ -2051,7 +2051,7 @@ void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *y) {
 void rsetr(ae_int_t n, double v, RMatrix *y, ae_int_t iy) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rsetv(n, v, y->xyR[iy]))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xyR[iy][j] = v;
@@ -2156,8 +2156,8 @@ void rallocm(ae_int_t m, ae_int_t n, RMatrix *x) {
 void bcopyv(ae_int_t n, BVector *x, BVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-   if (n >= _ABLASF_KERNEL_SIZE1 * 8) KerSubSse2Avx2(bcopyv(n, x->xB, y->xB))
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
+   if (n >= 8 * _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(bcopyv(n, x->xB, y->xB))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xB[j] = x->xB[j];
 }
@@ -2165,7 +2165,7 @@ void bcopyv(ae_int_t n, BVector *x, BVector *y) {
 void icopyv(ae_int_t n, ZVector *x, ZVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(icopyv(n, x->xZ, y->xZ))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xZ[j] = x->xZ[j];
@@ -2174,7 +2174,7 @@ void icopyv(ae_int_t n, ZVector *x, ZVector *y) {
 void rcopyv(ae_int_t n, RVector *x, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopyv(n, x->xR, y->xR))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xR[j] = x->xR[j];
@@ -2192,7 +2192,7 @@ void rcopyv(ae_int_t n, RVector *x, RVector *y) {
 void rcopyvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopyv(n, x->xR, y->xyR[iy]))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xyR[iy][j] = x->xR[j];
@@ -2210,7 +2210,7 @@ void rcopyvr(ae_int_t n, RVector *x, RMatrix *y, ae_int_t iy) {
 void rcopyrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopyv(n, x->xyR[ix], y->xR))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xR[j] = x->xyR[ix][j];
@@ -2231,7 +2231,7 @@ void rcopyrv(ae_int_t n, RMatrix *x, ae_int_t ix, RVector *y) {
 void rcopyrr(ae_int_t n, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopyv(n, x->xyR[ix], y->xyR[iy]))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xyR[iy][j] = x->xyR[ix][j];
@@ -2253,7 +2253,7 @@ void rcopyrr(ae_int_t n, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy) {
 void icopyvx(ae_int_t n, ZVector *x, ae_int_t x0, ZVector *y, ae_int_t y0) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(icopyvx(n, x->xZ + x0, y->xZ + y0))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xZ[y0 + j] = x->xZ[x0 + j];
@@ -2262,7 +2262,7 @@ void icopyvx(ae_int_t n, ZVector *x, ae_int_t x0, ZVector *y, ae_int_t y0) {
 void rcopyvx(ae_int_t n, RVector *x, ae_int_t x0, RVector *y, ae_int_t y0) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopyvx(n, x->xR + x0, y->xR + y0))
 #endif
    for (ae_int_t j = 0; j < n; j++) y->xR[y0 + j] = x->xR[x0 + j];
@@ -2321,7 +2321,7 @@ void rcopym(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y) {
 void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopymulv(n, v, x->xR, y->xR))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xR[i] = v * x->xR[i];
@@ -2340,7 +2340,7 @@ void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y) {
 void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t iy) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
-// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
+// On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
    if (n >= _ABLASF_KERNEL_SIZE1) KerSubSse2Avx2(rcopymulv(n, v, x->xR, y->xyR[iy]))
 #endif
    for (ae_int_t i = 0; i < n; i++) y->xyR[iy][i] = v * x->xR[i];
@@ -2791,18 +2791,17 @@ bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
 
 // rmatrixgemm() kernel: the base case code for rmatrixgemm(), specialized to opa == 0 and opb == 0.
 void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-   ae_assert(alpha != 0.0, "RMatrixGEMMK44V00: internal error (alpha == 0)");
-// If the matrix size is 0.
+   ae_assert(alpha != 0.0, "rmatrixgemmk44v00: internal error (alpha == 0)");
+// Size-0 matrices require nothing to be done.
    if (m == 0 || n == 0) return;
 // a b:
    for (ae_int_t i = 0; i < m; i += 4) for (ae_int_t j = 0; j < n; j += 4) {
    // Choose between the specialized 4 x 4 code and the general code.
       if (i + 4 <= m && j + 4 <= n) {
       // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
-      // This sub-matrix is calculated as sum of k rank-1 products,
-      // with operands cached in local variables in order to speed up array operations.
-         ae_int_t ax0 = ia + i, ax1 = ia + i + 1, ax2 = ia + i + 2, ax3 = ia + i + 3, ay = ja;
-         ae_int_t bx0 = jb + j, bx1 = jb + j + 1, bx2 = jb + j + 2, bx3 = jb + j + 3, by = ib;
+      // A sum of K rank-1 products, with operands cached in local variables in order to speed up array operations.
+         ae_int_t ax0 = ia + i, ax1 = ax0 + 1, ax2 = ax0 + 2, ax3 = ax0 + 3, ay = ja;
+         ae_int_t bx0 = jb + j, bx1 = bx0 + 1, bx2 = bx0 + 2, bx3 = bx0 + 3, by = ib;
          double v00 = 0.0, v01 = 0.0, v02 = 0.0, v03 = 0.0;
          double v10 = 0.0, v11 = 0.0, v12 = 0.0, v13 = 0.0;
          double v20 = 0.0, v21 = 0.0, v22 = 0.0, v23 = 0.0;
@@ -2851,18 +2850,17 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 
 // rmatrixgemm() kernel: the base case code for rmatrixgemm(), specialized to opa == 0 and opb == 1.
 void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-   ae_assert(alpha != 0.0, "RMatrixGEMMK44V00: internal error (alpha=0)");
-// If the matrix size is 0.
+   ae_assert(alpha != 0.0, "rmatrixgemmk44v01: internal error (alpha == 0)");
+// Size-0 matrices require nothing to be done.
    if (m == 0 || n == 0) return;
 // a b':
    for (ae_int_t i = 0; i < m; i += 4) for (ae_int_t j = 0; j < n; j += 4) {
    // Choose between the specialized 4 x 4 code and the general code.
       if (i + 4 <= m && j + 4 <= n) {
       // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
-      // This sub-matrix is calculated as sum of k rank-1 products,
-      // with operands cached in local variables in order to speed up array operations.
-         ae_int_t ax0 = ia + i, ax1 = ia + i + 1, ax2 = ia + i + 2, ax3 = ia + i + 3, ay = ja;
-         ae_int_t bx0 = ib + j, bx1 = ib + j + 1, bx2 = ib + j + 2, bx3 = ib + j + 3, by = jb;
+      // A sum of K rank-1 products, with operands cached in local variables in order to speed up array operations.
+         ae_int_t ax0 = ia + i, ax1 = ax0 + 1, ax2 = ax0 + 2, ax3 = ax0 + 3, ay = ja;
+         ae_int_t bx0 = ib + j, bx1 = bx0 + 1, bx2 = bx0 + 2, bx3 = bx0 + 3, by = jb;
          double v00 = 0.0, v01 = 0.0, v02 = 0.0, v03 = 0.0;
          double v10 = 0.0, v11 = 0.0, v12 = 0.0, v13 = 0.0;
          double v20 = 0.0, v21 = 0.0, v22 = 0.0, v23 = 0.0;
@@ -2911,18 +2909,17 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 
 // rmatrixgemm() kernel: the base case code for rmatrixgemm(), specialized to opa == 1 and opb == 0.
 void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-   ae_assert(alpha != 0.0, "RMatrixGEMMK44V00: internal error (alpha=0)");
-// If the matrix size is 0.
+   ae_assert(alpha != 0.0, "rmatrixgemmk44v10: internal error (alpha == 0)");
+// Size-0 matrices require nothing to be done.
    if (m == 0 || n == 0) return;
 // a' b:
    for (ae_int_t i = 0; i < m; i += 4) for (ae_int_t j = 0; j < n; j += 4) {
    // Choose between the specialized 4 x 4 code and the general code.
       if (i + 4 <= m && j + 4 <= n) {
       // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
-      // This sub-matrix is calculated as sum of k rank-1 products,
-      // with operands cached in local variables in order to speed up array operations.
-         ae_int_t ax0 = ja + i, ax1 = ja + i + 1, ax2 = ja + i + 2, ax3 = ja + i + 3, ay = ia;
-         ae_int_t bx0 = jb + j, bx1 = jb + j + 1, bx2 = jb + j + 2, bx3 = jb + j + 3, by = ib;
+      // A sum of K rank-1 products, with operands cached in local variables in order to speed up array operations.
+         ae_int_t ax0 = ja + i, ax1 = ax0 + 1, ax2 = ax0 + 2, ax3 = ax0 + 3, ay = ia;
+         ae_int_t bx0 = jb + j, bx1 = bx0 + 1, bx2 = bx0 + 2, bx3 = bx0 + 3, by = ib;
          double v00 = 0.0, v01 = 0.0, v02 = 0.0, v03 = 0.0;
          double v10 = 0.0, v11 = 0.0, v12 = 0.0, v13 = 0.0;
          double v20 = 0.0, v21 = 0.0, v22 = 0.0, v23 = 0.0;
@@ -2971,18 +2968,17 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 
 // rmatrixgemm() kernel: the base case code for rmatrixgemm(), specialized to opa == 1 and opb == 1.
 void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-   ae_assert(alpha != 0.0, "RMatrixGEMMK44V00: internal error (alpha=0)");
-// If the matrix size is 0.
+   ae_assert(alpha != 0.0, "rmatrixgemmk44v11: internal error (alpha == 0)");
+// Size-0 matrices require nothing to be done.
    if (m == 0 || n == 0) return;
 // a' b':
    for (ae_int_t i = 0; i < m; i += 4) for (ae_int_t j = 0; j < n; j += 4) {
    // Choose between the specialized 4 x 4 code and the general code.
       if (i + 4 <= m && j + 4 <= n) {
       // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
-      // This sub-matrix is calculated as sum of k rank-1 products,
-      // with operands cached in local variables in order to speed up array operations.
-         ae_int_t ax0 = ja + i, ax1 = ja + i + 1, ax2 = ja + i + 2, ax3 = ja + i + 3, ay = ia;
-         ae_int_t bx0 = ib + j, bx1 = ib + j + 1, bx2 = ib + j + 2, bx3 = ib + j + 3, by = jb;
+      // A sum of K rank-1 products, with operands cached in local variables in order to speed up array operations.
+         ae_int_t ax0 = ja + i, ax1 = ax0 + 1, ax2 = ax0 + 2, ax3 = ax0 + 3, ay = ia;
+         ae_int_t bx0 = ib + j, bx1 = bx0 + 1, bx2 = bx0 + 2, bx3 = bx0 + 3, by = jb;
          double v00 = 0.0, v01 = 0.0, v02 = 0.0, v03 = 0.0;
          double v10 = 0.0, v11 = 0.0, v12 = 0.0, v13 = 0.0;
          double v20 = 0.0, v21 = 0.0, v22 = 0.0, v23 = 0.0;
@@ -3094,7 +3090,7 @@ static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double al
 
 // rmatrixgemm() kernel: the base case code for rmatrixgemm().
 void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-// If the matrix size is 0.
+// Size-0 matrices require nothing to be done.
    if (m == 0 || n == 0) return;
 // Try the optimized code.
    if (ablasf_rgemm32basecase(m, n, k, alpha, a, ia, ja, opa, b, ib, jb, opb, beta, c, ic, jc)) return;
@@ -3159,7 +3155,7 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, 
 //	c, ic, jc:	The m x n PRE-ALLOCATED output matrix and its sub-matrix offsets.
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
 void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
-// If the matrix size is 0.
+// Size-0 matrices require nothing to be done.
    if (m == 0 || n == 0) return;
 // Try the optimized code.
    if (cmatrixgemmf(m, n, k, alpha, a, ia, ja, opa, b, ib, jb, opb, beta, c, ic, jc)) return;
@@ -3179,12 +3175,11 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
    // Choose between the specialized 4 x 4 code and the general code.
       if (i + 2 <= m && j + 2 <= n) {
       // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
-      // This sub-matrix is calculated as sum of k rank-1 products,
-      // with operands cached in local variables in order to speed up array operations.
+      // A sum of K rank-1 products, with operands cached in local variables in order to speed up array operations.
          double v00x = 0.0, v00y = 0.0, v01x = 0.0, v01y = 0.0;
          double v10x = 0.0, v10y = 0.0, v11x = 0.0, v11y = 0.0;
-         ae_int_t xa = opa == 0? ia: ja, a0 = opa == 0? ja: ia, ax0 = xa + i, ax1 = ax0 + 1;
-         ae_int_t xb = opb == 0? jb: ib, b0 = opb == 0? ib: jb, bx0 = xb + j, bx1 = bx0 + 1;
+         ae_int_t xa = opa == 0 ? ia : ja, a0 = opa == 0 ? ja : ia, ax0 = xa + i, ax1 = ax0 + 1;
+         ae_int_t xb = opb == 0 ? jb : ib, b0 = opb == 0 ? ib : jb, bx0 = xb + j, bx1 = bx0 + 1;
          for (ae_int_t t = 0; t < k; a0++, b0++, t++) {
             switch (opa) {
                case 0: a0x = a->xyC[ax0][a0].x, a0y = a->xyC[ax0][a0].y, a1x = a->xyC[ax1][a0].x, a1y = a->xyC[ax1][a0].y; break;
@@ -4129,9 +4124,21 @@ ae_int_t getidwserializationcode() {
    return result;
 }
 
+ae_int_t getsparsematrixserializationcode() {
+   ae_int_t result;
+   result = 8;
+   return result;
+}
+
 ae_int_t getknnserializationcode() {
    ae_int_t result;
    result = 108;
+   return result;
+}
+
+ae_int_t getlptestserializationcode() {
+   ae_int_t result;
+   result = 200;
    return result;
 }
 } // end of namespace alglib_impl
