@@ -1068,12 +1068,14 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 39	Ap.{cpp,h}: Re-include the multi-threading stub routines for multi-threading originally in Ap.{cpp,h} for possible future appropriation.
 39	Ap.{cpp,h}: Another minor fix to better match 3.18.0.
 39	Synthesis of more instances of {Near,Small}[At]{R,C}() (in LinAlg.cpp).
-40	{Ap,Kernel*}.*: Upgrading to version 3.18.0.
-	∙	Kernels{Avx2,Fma,Sse2}.{cpp,h}: Adding the kernel dispatcher, new to version 3.18.
+40	Ap.*, Kernels*.*, AlgLibInternal.*, LinAlg.*: Integrating changes made in version 3.18.0.
+	∙	Kernels{Avx2,Fma,Sse2}.{cpp,h}: Adding the kernel dispatcher, new to version 3.18.0.
 	∙	Ap.{cpp,h}: Updating to version 3.18.0.
-	∙	LinAlg.cpp, Ap.{cpp,h}: Integrate the new SPCHOL routines from alglib.3.18.
+	∙	LinAlg.cpp, Ap.{cpp,h}: Integrating the new SPCHOL routines from alglib.3.18.
 		and changing one field: spcholanalysis::rowstorage to spcholanalysis::outputstorage.
-	∙	AlgLibInternal.cpp, Ap.{cpp,h}: Integrate the new ABLAS routines from alglib.3.18.
+	∙	AlgLibInternal.cpp, Ap.{cpp,h}: Integrating the new ABLAS routines from alglib.3.18.
+40	AlgLibInternal.{cpp,h}: Updating to version 3.18.0.
+40	AlgLibInternal.{cpp,h}: Adding rmatrixgemmf().
 </pre>
 </p>
 <p>
@@ -1223,7 +1225,8 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 39	5435 1.0x 8404 1.0x 8267 1.0x 7255 1.0x 1644800572 (6209aa3c) 75 // Adding changes made into the RCOMM interface for 3.18.0 into here.
 39	4237 1.0x 6897 1.1x 8406 1.0x 7386 1.0x 1645175143 (620f6167) 77 // Adding changes made separately for 3.18.0 to Ap.* and TestX.cpp.
 39	5102 1.0x 8334 0.9x 8200 1.0x 7149 1.0x 1645649689 (62169f19) 79 // Adding changes made to conditionals in 3.18.0.
-40	6289 1.0x 10990 1.1x 12052 0.9x 9679 1.0x 1646959113 (622a9a09) 81 // Integrating {Ap,Kernel*}.* from version 3.18.0.
+40	6289 1.0x 10990 1.1x 12052 0.9x 9679 1.0x 1646959113 (622a9a09) 81 // Updating Ap.* to 3.18.0 and adding Kernel*.*.
+40	6289 1.0x 10001 1.0x 10993 1.1x 9251 1.0x 1647127950 (622d2d8e) 78 // Updating AlgLibInternal.* to 3.18.0
 </pre>
 </p>
 </div>
