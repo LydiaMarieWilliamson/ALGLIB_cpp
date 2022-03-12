@@ -2787,7 +2787,7 @@ bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
 //			1:	transposition: b' = b^T.
 //			b' is an k x n matrix.
 //	c, ic, jc:	The m x n PRE-ALLOCATED output matrix and its sub-matrix offsets.
-// ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
+// ALGLIB Routines: Copyright 27.03.2013 by Sergey Bochkanov
 
 // rmatrixgemm() kernel: the base case code for rmatrixgemm(), specialized to opa == 0 and opb == 0.
 void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
@@ -2873,7 +2873,7 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
             v00 += a0 * b0, v01 += a0 * b1, v02 += a0 * b2, v03 += a0 * b3;
             v10 += a1 * b0, v11 += a1 * b1, v12 += a1 * b2, v13 += a1 * b3;
             v20 += a2 * b0, v21 += a2 * b1, v22 += a2 * b2, v23 += a2 * b3;
-            v30 += a3 * b0, v31 += a3 * b1; v32 += a3 * b2, v33 += a3 * b3;
+            v30 += a3 * b0, v31 += a3 * b1, v32 += a3 * b2, v33 += a3 * b3;
          }
          v00 *= alpha, v01 *= alpha, v02 *= alpha, v03 *= alpha;
          v10 *= alpha, v11 *= alpha, v12 *= alpha, v13 *= alpha;
@@ -2958,8 +2958,8 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
          }
       } else {
       // Determine the sub-matrix of c of which elements [i0,i1) x [j0,j1) to process.
-         double i0 = i, i1 = imin2(i + 4, m);
-         double j0 = j, j1 = imin2(j + 4, n);
+         ae_int_t i0 = i, i1 = imin2(i + 4, m);
+         ae_int_t j0 = j, j1 = imin2(j + 4, n);
       // Process the sub-matrix.
          for (ae_int_t ik = i0; ik < i1; ik++) for (ae_int_t jk = j0; jk < j1; jk++) {
             double v = k == 0 || alpha == 0.0 ? 0.0 : alpha * ae_v_dotproduct(&a->xyR[ia][ja + ik], a->stride, &b->xyR[ib][jb + jk], b->stride, k);
@@ -3071,7 +3071,7 @@ static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double al
       }
    // Output.
       for (ae_int_t base0 = 0; base0 < m; base0 += micro_size) {
-      // Load block row of transfors(a).
+      // Load block row of transform(a).
          const ae_int_t lim0 = m - base0 < micro_size ? m - base0 : micro_size;
          const ae_int_t round_k = ablasf_packblk(ap + (opa == 0 ? base0 * stride_a : base0), stride_a, opa, k, lim0, blka, block_size, micro_size);
       // Compute block(a)' entire(b).
@@ -3131,7 +3131,7 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, 
 // where:
 // *	c is an m x n general matrix, a' is an m x k matrix, b' is a k x n matrix, with:
 // *	a' = a if opa == 0, a' = a^T if opa == 1, a' = a^+ if opa == 2,
-// *	b' = b if opb == 0, b' = b^T if opb == 1. b' = b^+ if opa == 2,
+// *	b' = b if opb == 0, b' = b^T if opb == 1. b' = b^+ if opa == 2.
 // Additional info:
 // *	The multiplication result replaces c.
 // *	If beta == 0.0, c is not used in the calculations (not multiplied by 0.0 - just not referenced).
@@ -3141,7 +3141,6 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, 
 // Important:
 // *	This function requires the output matrix c to be pre-allocated.
 //	An exception will be thrown, if it is not large enough to store the result.
-// Inputs:
 // Inputs:
 //	m, n, k:	The matrix sizes; m, n, k > 0.
 //	alpha, beta:	The coefficients.
@@ -3224,29 +3223,25 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
       // Process the sub-matrix.
          for (ae_int_t ik = i0; ik < i1; ik++) for (ae_int_t jk = j0; jk < j1; jk++) {
             complex v = complex_from_i(0);
-            if (k > 0 || ae_c_neq_d(alpha, 0.0)) switch (opa) {
+            if (k > 0 && ae_c_neq_d(alpha, 0.0)) switch (opa) {
                case 0: switch (opb) {
                   case 0: v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib][jb + jk], b->stride, "N", k); break;
                   case 1: v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib + jk][jb], 1, "N", k); break;
                   case 2: v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib + jk][jb], 1, "Conj", k); break;
-                  default: v = complex_from_d(0.0); break;
                }
                break;
                case 1: switch (opb) {
                   case 0: v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib][jb + jk], b->stride, "N", k); break;
                   case 1: v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib + jk][jb], 1, "N", k); break;
                   case 2: v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib + jk][jb], 1, "Conj", k); break;
-                  default: v = complex_from_d(0.0); break;
                }
                break;
                case 2: switch (opb) {
                   case 0: v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib][jb + jk], b->stride, "N", k); break;
                   case 1: v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib + jk][jb], 1, "N", k); break;
                   case 2: v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib + jk][jb], 1, "Conj", k); break;
-                  default: v = complex_from_d(0.0); break;
                }
                break;
-               default: v = complex_from_d(0.0); break;
             }
             c->xyC[ic + ik][jc + jk] = ae_c_eq_d(beta, 0.0) ? ae_c_mul(alpha, v) : ae_c_add(ae_c_mul(beta, c->xyC[ic + ik][jc + jk]), ae_c_mul(alpha, v));
          }
