@@ -419,7 +419,7 @@ void hqrndrandomize(hqrndstate &state) {
 ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::hqrnduniformi(ConstT(hqrndstate, state), n);
+   ae_int_t Z = alglib_impl::hqrnduniformi(ConstT(hqrndstate, state), n);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -1204,7 +1204,7 @@ void xdebuginitrecord1(xdebugrecord1 &rec1) {
 ae_int_t xdebugb1count(const boolean_1d_array &a) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::xdebugb1count(ConstT(ae_vector, a));
+   ae_int_t Z = alglib_impl::xdebugb1count(ConstT(ae_vector, a));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -1233,7 +1233,7 @@ void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a) {
 ae_int_t xdebugi1sum(const integer_1d_array &a) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::xdebugi1sum(ConstT(ae_vector, a));
+   ae_int_t Z = alglib_impl::xdebugi1sum(ConstT(ae_vector, a));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -1320,7 +1320,7 @@ void xdebugc1outeven(const ae_int_t n, complex_1d_array &a) {
 ae_int_t xdebugb2count(const boolean_2d_array &a) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::xdebugb2count(ConstT(ae_matrix, a));
+   ae_int_t Z = alglib_impl::xdebugb2count(ConstT(ae_matrix, a));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -1349,7 +1349,7 @@ void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a) {
 ae_int_t xdebugi2sum(const integer_2d_array &a) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::xdebugi2sum(ConstT(ae_matrix, a));
+   ae_int_t Z = alglib_impl::xdebugi2sum(ConstT(ae_matrix, a));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3498,7 +3498,7 @@ DefClass(kdtreerequestbuffer, )
 DefClass(kdtree, )
 
 void kdtreeserialize(kdtree &obj, std::string &s_out) {
-   alglib_impl::ae_int_t ssize;
+   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
    NewSerializer(serializer);
@@ -3588,7 +3588,7 @@ void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, 
 ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryaknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch, eps);
+   ae_int_t Z = alglib_impl::kdtreetsqueryaknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch, eps);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3597,7 +3597,7 @@ ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, co
    bool selfmatch = true;
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryaknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch, eps);
+   ae_int_t Z = alglib_impl::kdtreetsqueryaknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch, eps);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3606,7 +3606,7 @@ ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, co
 ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryaknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch, eps);
+   ae_int_t Z = alglib_impl::kdtreequeryaknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch, eps);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3615,7 +3615,7 @@ ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int
    bool selfmatch = true;
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryaknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch, eps);
+   ae_int_t Z = alglib_impl::kdtreequeryaknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch, eps);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3624,7 +3624,7 @@ ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int
 ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch);
+   ae_int_t Z = alglib_impl::kdtreetsqueryknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3633,7 +3633,7 @@ ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, con
    bool selfmatch = true;
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch);
+   ae_int_t Z = alglib_impl::kdtreetsqueryknn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), k, selfmatch);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3642,7 +3642,7 @@ ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, con
 ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch);
+   ae_int_t Z = alglib_impl::kdtreequeryknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3651,7 +3651,7 @@ ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_
    bool selfmatch = true;
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch);
+   ae_int_t Z = alglib_impl::kdtreequeryknn(ConstT(kdtree, kdt), ConstT(ae_vector, x), k, selfmatch);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3660,7 +3660,7 @@ ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_
 ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryrnn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch);
+   ae_int_t Z = alglib_impl::kdtreetsqueryrnn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3669,7 +3669,7 @@ ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, con
    bool selfmatch = true;
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryrnn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch);
+   ae_int_t Z = alglib_impl::kdtreetsqueryrnn(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3678,7 +3678,7 @@ ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, con
 ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryrnn(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch);
+   ae_int_t Z = alglib_impl::kdtreequeryrnn(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3687,7 +3687,7 @@ ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double 
    bool selfmatch = true;
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryrnn(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch);
+   ae_int_t Z = alglib_impl::kdtreequeryrnn(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3696,7 +3696,7 @@ ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double 
 ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryrnnu(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch);
+   ae_int_t Z = alglib_impl::kdtreetsqueryrnnu(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3705,7 +3705,7 @@ ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, co
    bool selfmatch = true;
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreetsqueryrnnu(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch);
+   ae_int_t Z = alglib_impl::kdtreetsqueryrnnu(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, x), r, selfmatch);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3714,7 +3714,7 @@ ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, co
 ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryrnnu(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch);
+   ae_int_t Z = alglib_impl::kdtreequeryrnnu(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3723,7 +3723,7 @@ ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double
    bool selfmatch = true;
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreequeryrnnu(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch);
+   ae_int_t Z = alglib_impl::kdtreequeryrnnu(ConstT(kdtree, kdt), ConstT(ae_vector, x), r, selfmatch);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3732,7 +3732,7 @@ ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double
 ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &boxmin, const real_1d_array &boxmax) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreetsquerybox(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, boxmin), ConstT(ae_vector, boxmax));
+   ae_int_t Z = alglib_impl::kdtreetsquerybox(ConstT(kdtree, kdt), ConstT(kdtreerequestbuffer, buf), ConstT(ae_vector, boxmin), ConstT(ae_vector, boxmax));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -3740,7 +3740,7 @@ ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, con
 ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const real_1d_array &boxmax) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::kdtreequerybox(ConstT(kdtree, kdt), ConstT(ae_vector, boxmin), ConstT(ae_vector, boxmax));
+   ae_int_t Z = alglib_impl::kdtreequerybox(ConstT(kdtree, kdt), ConstT(ae_vector, boxmin), ConstT(ae_vector, boxmax));
    alglib_impl::ae_state_clear();
    return Z;
 }

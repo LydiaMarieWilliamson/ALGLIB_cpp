@@ -11014,7 +11014,7 @@ DefClass(sparsematrix, )
 DefClass(sparsebuffers, )
 
 void sparseserialize(sparsematrix &obj, std::string &s_out) {
-   alglib_impl::ae_int_t ssize;
+   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
    NewSerializer(serializer);
@@ -11438,7 +11438,7 @@ void sparsecopytobuf(const sparsematrix &s0, const ae_int_t fmt, const sparsemat
 ae_int_t sparsegetmatrixtype(const sparsematrix &s) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::sparsegetmatrixtype(ConstT(sparsematrix, s));
+   ae_int_t Z = alglib_impl::sparsegetmatrixtype(ConstT(sparsematrix, s));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -11477,7 +11477,7 @@ void sparsefree(sparsematrix &s) {
 ae_int_t sparsegetncols(const sparsematrix &s) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::sparsegetncols(ConstT(sparsematrix, s));
+   ae_int_t Z = alglib_impl::sparsegetncols(ConstT(sparsematrix, s));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -11485,7 +11485,7 @@ ae_int_t sparsegetncols(const sparsematrix &s) {
 ae_int_t sparsegetnrows(const sparsematrix &s) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::sparsegetnrows(ConstT(sparsematrix, s));
+   ae_int_t Z = alglib_impl::sparsegetnrows(ConstT(sparsematrix, s));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -11493,7 +11493,7 @@ ae_int_t sparsegetnrows(const sparsematrix &s) {
 ae_int_t sparsegetuppercount(const sparsematrix &s) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::sparsegetuppercount(ConstT(sparsematrix, s));
+   ae_int_t Z = alglib_impl::sparsegetuppercount(ConstT(sparsematrix, s));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -11501,7 +11501,7 @@ ae_int_t sparsegetuppercount(const sparsematrix &s) {
 ae_int_t sparsegetlowercount(const sparsematrix &s) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::sparsegetlowercount(ConstT(sparsematrix, s));
+   ae_int_t Z = alglib_impl::sparsegetlowercount(ConstT(sparsematrix, s));
    alglib_impl::ae_state_clear();
    return Z;
 }

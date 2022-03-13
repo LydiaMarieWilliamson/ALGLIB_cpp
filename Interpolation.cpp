@@ -2004,7 +2004,7 @@ DefClass(idwbuilder, )
 DefClass(idwreport, DecVal(rmserror) DecVal(avgerror) DecVal(maxerror) DecVal(r2))
 
 void idwserialize(idwmodel &obj, std::string &s_out) {
-   alglib_impl::ae_int_t ssize;
+   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
    NewSerializer(serializer);
@@ -21808,7 +21808,7 @@ DefClass(spline2dbuilder, )
 DefClass(spline2dfitreport, DecVal(rmserror) DecVal(avgerror) DecVal(maxerror) DecVal(r2))
 
 void spline2dserialize(spline2dinterpolant &obj, std::string &s_out) {
-   alglib_impl::ae_int_t ssize;
+   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
    NewSerializer(serializer);
@@ -28072,7 +28072,7 @@ DefClass(rbfmodel, )
 DefClass(rbfreport, DecVal(rmserror) DecVal(maxerror) DecVal(arows) DecVal(acols) DecVal(annz) DecVal(iterationscount) DecVal(nmv) DecVal(terminationtype))
 
 void rbfserialize(rbfmodel &obj, std::string &s_out) {
-   alglib_impl::ae_int_t ssize;
+   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
    NewSerializer(serializer);
@@ -28344,7 +28344,7 @@ void rbfunpack(const rbfmodel &s, ae_int_t &nx, ae_int_t &ny, real_2d_array &xwr
 ae_int_t rbfgetmodelversion(const rbfmodel &s) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::rbfgetmodelversion(ConstT(rbfmodel, s));
+   ae_int_t Z = alglib_impl::rbfgetmodelversion(ConstT(rbfmodel, s));
    alglib_impl::ae_state_clear();
    return Z;
 }

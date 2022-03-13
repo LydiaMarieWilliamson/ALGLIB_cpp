@@ -6953,7 +6953,7 @@ DefClass(modelerrors, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(
 DefClass(multilayerperceptron, )
 
 void mlpserialize(multilayerperceptron &obj, std::string &s_out) {
-   alglib_impl::ae_int_t ssize;
+   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
    NewSerializer(serializer);
@@ -7200,7 +7200,7 @@ void mlphessianbatch(const multilayerperceptron &network, const real_2d_array &x
 ae_int_t mlpgetinputscount(const multilayerperceptron &network) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::mlpgetinputscount(ConstT(multilayerperceptron, network));
+   ae_int_t Z = alglib_impl::mlpgetinputscount(ConstT(multilayerperceptron, network));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -7208,7 +7208,7 @@ ae_int_t mlpgetinputscount(const multilayerperceptron &network) {
 ae_int_t mlpgetoutputscount(const multilayerperceptron &network) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::mlpgetoutputscount(ConstT(multilayerperceptron, network));
+   ae_int_t Z = alglib_impl::mlpgetoutputscount(ConstT(multilayerperceptron, network));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -7216,7 +7216,7 @@ ae_int_t mlpgetoutputscount(const multilayerperceptron &network) {
 ae_int_t mlpgetweightscount(const multilayerperceptron &network) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::mlpgetweightscount(ConstT(multilayerperceptron, network));
+   ae_int_t Z = alglib_impl::mlpgetweightscount(ConstT(multilayerperceptron, network));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -7224,7 +7224,7 @@ ae_int_t mlpgetweightscount(const multilayerperceptron &network) {
 ae_int_t mlpgetlayerscount(const multilayerperceptron &network) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::mlpgetlayerscount(ConstT(multilayerperceptron, network));
+   ae_int_t Z = alglib_impl::mlpgetlayerscount(ConstT(multilayerperceptron, network));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -7232,7 +7232,7 @@ ae_int_t mlpgetlayerscount(const multilayerperceptron &network) {
 ae_int_t mlpgetlayersize(const multilayerperceptron &network, const ae_int_t k) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::mlpgetlayersize(ConstT(multilayerperceptron, network), k);
+   ae_int_t Z = alglib_impl::mlpgetlayersize(ConstT(multilayerperceptron, network), k);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -7342,7 +7342,7 @@ double mlperrorn(const multilayerperceptron &network, const real_2d_array &xy, c
 ae_int_t mlpclserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::mlpclserror(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints);
+   ae_int_t Z = alglib_impl::mlpclserror(ConstT(multilayerperceptron, network), ConstT(ae_matrix, xy), npoints);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -8112,7 +8112,7 @@ namespace alglib {
 DefClass(mlpensemble, )
 
 void mlpeserialize(mlpensemble &obj, std::string &s_out) {
-   alglib_impl::ae_int_t ssize;
+   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
    NewSerializer(serializer);
@@ -14751,7 +14751,7 @@ DefClass(decisionforest, )
 DefClass(dfreport, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror) DecVal(oobrelclserror) DecVal(oobavgce) DecVal(oobrmserror) DecVal(oobavgerror) DecVal(oobavgrelerror) DecVar(topvars) DecVar(varimportances))
 
 void dfserialize(decisionforest &obj, std::string &s_out) {
-   alglib_impl::ae_int_t ssize;
+   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
    NewSerializer(serializer);
@@ -14952,7 +14952,7 @@ double dfprocess0(const decisionforest &model, const real_1d_array &x) {
 ae_int_t dfclassify(const decisionforest &model, const real_1d_array &x) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::dfclassify(ConstT(decisionforest, model), ConstT(ae_vector, x));
+   ae_int_t Z = alglib_impl::dfclassify(ConstT(decisionforest, model), ConstT(ae_vector, x));
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -21293,7 +21293,7 @@ double mnlavgce(const logitmodel &lm, const real_2d_array &xy, const ae_int_t np
 ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::mnlclserror(ConstT(logitmodel, lm), ConstT(ae_matrix, xy), npoints);
+   ae_int_t Z = alglib_impl::mnlclserror(ConstT(logitmodel, lm), ConstT(ae_matrix, xy), npoints);
    alglib_impl::ae_state_clear();
    return Z;
 }
@@ -22337,7 +22337,7 @@ DefClass(knnmodel, )
 DefClass(knnreport, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror))
 
 void knnserialize(knnmodel &obj, std::string &s_out) {
-   alglib_impl::ae_int_t ssize;
+   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
    NewSerializer(serializer);
@@ -22465,7 +22465,7 @@ double knnprocess0(const knnmodel &model, const real_1d_array &x) {
 ae_int_t knnclassify(const knnmodel &model, const real_1d_array &x) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::knnclassify(ConstT(knnmodel, model), ConstT(ae_vector, x));
+   alglib_impl::knnclassify(ConstT(knnmodel, model), ConstT(ae_vector, x));
    alglib_impl::ae_state_clear();
    return Z;
 }

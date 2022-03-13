@@ -43199,7 +43199,7 @@ namespace alglib {
 DefClass(lptestproblem, )
 
 void lptestproblemserialize(lptestproblem &obj, std::string &s_out) {
-   alglib_impl::ae_int_t ssize;
+   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
    NewSerializer(serializer);

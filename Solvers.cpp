@@ -6461,7 +6461,7 @@ void linlsqrsetxrep(const linlsqrstate &state, const bool needxrep) {
 ae_int_t linlsqrpeekiterationscount(const linlsqrstate &s) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::ae_int_t Z = alglib_impl::linlsqrpeekiterationscount(ConstT(linlsqrstate, s));
+   ae_int_t Z = alglib_impl::linlsqrpeekiterationscount(ConstT(linlsqrstate, s));
    alglib_impl::ae_state_clear();
    return Z;
 }
