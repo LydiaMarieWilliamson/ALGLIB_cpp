@@ -6674,8 +6674,8 @@ static double spline1d_rescaleval(double a0, double b0, double a1, double b1, do
 //
 // REMARK:
 //
-// If 'NR' is -1 it's mean, than polinom has infiniti roots.
-// If 'NE' is -1 it's mean, than polinom has infiniti extremums.
+// If 'NR' is -1 its mean, than polinom has infiniti roots.
+// If 'NE' is -1 its mean, than polinom has infiniti extremums.
 // ALGLIB Project: Copyright 26.09.2011 by Sergey Bochkanov
 void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, double b, double *x0, double *x1, double *x2, double *ex0, double *ex1, ae_int_t *nr, ae_int_t *ne, RVector *tempdata) {
    ae_int_t i;

@@ -73741,7 +73741,7 @@ static bool testclusteringunit_advancedahctests() {
 // * for each merge we check that it merges points
 //   from same cluster;
 //
-// Additonally, we call ErrorsInMerges(). See function comments
+// Additionally, we call ErrorsInMerges(). See function comments
 // for more information about specific tests performed. This function
 // allows us to check that clusters are built exactly as specified by
 // definition of the clustering algorithm.
