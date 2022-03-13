@@ -6479,8 +6479,8 @@ static double spline1d_rescaleval(double a0, double b0, double a1, double b1, do
 //
 // REMARK:
 //
-// If 'NR' is -1 it's mean, than polinom has infiniti roots.
-// If 'NE' is -1 it's mean, than polinom has infiniti extremums.
+// If 'NR' is -1 its mean, than polinom has infiniti roots.
+// If 'NE' is -1 its mean, than polinom has infiniti extremums.
 // ALGLIB Project: Copyright 26.09.2011 by Sergey Bochkanov
 void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, double b, double *x0, double *x1, double *x2, double *ex0, double *ex1, ae_int_t *nr, ae_int_t *ne, RVector *tempdata) {
    ae_int_t i;
@@ -9074,7 +9074,7 @@ void polynomialfitwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc
 // * BX, BY store barycentric model nodes
 // * FMatrix is reused (remember - it is at least MxM, what we need)
 //
-// Model intialization is done in O(M^2). In principle, it can be
+// Model initialization is done in O(M^2). In principle, it can be
 // done in O(M*log(M)), but before it we solved task with O(N*M^2)
 // complexity, so it is only a small amount of total time spent.
    ae_vector_set_length(&bx, m);
@@ -13297,7 +13297,7 @@ bool lsfititeration(const lsfitstate &state) {
    return Ok;
 }
 
-// This family of functions is used to launcn iterations of nonlinear fitter
+// This family of functions is used to launch iterations of nonlinear fitter
 //
 // These functions accept following parameters:
 //     state   -   algorithm state

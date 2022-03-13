@@ -2189,7 +2189,7 @@ bool autogkiteration(const autogkstate &state) {
    return Ok;
 }
 
-// This function is used to launcn iterations of the 1-dimensional integrator
+// This function is used to launch iterations of the 1-dimensional integrator
 //
 // It accepts following parameters:
 //     func    -   callback which calculates f(x) for given x

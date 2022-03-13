@@ -15654,7 +15654,7 @@ static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, R
    ae_frame_leave();
 }
 
-// Clears request fileds (to be sure that we don't forgot to clear something)
+// Clears request fields (to be sure that we don't forgot to clear something)
 static void evd_clearrfields(eigsubspacestate *state) {
    state->requesttype = -1;
    state->requestsize = -1;
@@ -22192,7 +22192,7 @@ static void spchol_extractmatrix(spcholanalysis *analysis, ZVector *offsets, ZVe
 //     A       -   lower triangular  matrix  A whose partial sparsity pattern
 //                 is  needed.  Only  sparsity  structure  matters,  specific
 //                 element values are ignored.
-//     Head,Tail-  sizes of the leading/traling submatrices
+//     Head,Tail-  sizes of the leading/trailing submatrices
 //
 //     tmpParent,
 //     tmpChildrenR,

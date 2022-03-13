@@ -4881,7 +4881,7 @@ bool minlbfgsiteration(const minlbfgsstate &state) {
    return Ok;
 }
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -14408,7 +14408,7 @@ bool minbleiciteration(const minbleicstate &state) {
    return Ok;
 }
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -14924,7 +14924,7 @@ static const double vipmsolver_badsteplength = 1.0E-3;
 
 // Sets linear/quadratic terms for QP-IPM solver
 //
-// If you initialized solver with VIMPInitDenseWithSlacks(), NMain below is a
+// If you initialized solver with VIPMInitDenseWithSlacks(), NMain below is a
 // number of non-slack variables. In other cases, NMain=N.
 //
 // Inputs:
@@ -23271,7 +23271,7 @@ bool minlmiteration(const minlmstate &state) {
    return Ok;
 }
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -25061,7 +25061,7 @@ bool mincgiteration(const mincgstate &state) {
    return Ok;
 }
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -30675,7 +30675,7 @@ void dsssetproblem(dualsimplexstate *state, RVector *c, RVector *bndl, RVector *
    //       normalize rows using 2-norm, not INF-norm. Having rows
    //       normalized with 2-norm makes every element less than
    //       1.0 in magnitude, which allows us later to move logical
-   //       columns to the beginning of LU factors without loosing
+   //       columns to the beginning of LU factors without losing
    //       stability.
       vectorsetlengthatleast(&state->at.vals, sparsea->ridx.xZ[k] + k);
       vectorsetlengthatleast(&state->at.idx, sparsea->ridx.xZ[k] + k);
@@ -37620,7 +37620,7 @@ bool minnlciteration(const minnlcstate &state) {
    return Ok;
 }
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -39983,7 +39983,7 @@ bool minnsiteration(const minnsstate &state) {
    return Ok;
 }
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -40943,7 +40943,7 @@ bool minasaiteration(const minasastate &state) {
    return Ok;
 }
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -42841,7 +42841,7 @@ bool minbciteration(const minbcstate &state) {
    return Ok;
 }
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state

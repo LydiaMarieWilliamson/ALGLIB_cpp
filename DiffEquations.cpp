@@ -506,7 +506,7 @@ bool odesolveriteration(const odesolverstate &state) {
    return Ok;
 }
 
-// This function is used to launcn iterations of ODE solver
+// This function is used to launch iterations of ODE solver
 //
 // It accepts following parameters:
 //     diff    -   callback which calculates dy/dx for given y and x

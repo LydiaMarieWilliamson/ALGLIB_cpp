@@ -3991,12 +3991,12 @@ void sparsesolversetxrep(sparsesolverstate *state, bool needxrep) {
    state->xrep = needxrep;
 }
 
-// Clears request fileds (to be sure that we don't forgot to clear something)
+// Clears request fields (to be sure that we don't forgot to clear something)
 static void iterativesparse_clearrequestfields(sparsesolverstate *state) {
    state->requesttype = -999;
 }
 
-// Clears report fileds (to be sure that we don't forgot to clear something)
+// Clears report fields (to be sure that we don't forgot to clear something)
 static void iterativesparse_clearreportfields(sparsesolverstate *state) {
    state->repiterationscount = 0;
    state->repnmv = 0;
@@ -4940,7 +4940,7 @@ void sparsesolverrequesttermination(const sparsesolverstate &state) {
 namespace alglib_impl {
 static const double lincg_defaultprecision = 1.0E-6;
 
-// Clears request fileds (to be sure that we don't forgot to clear something)
+// Clears request fields (to be sure that we don't forgot to clear something)
 static void lincg_updateitersdata(lincgstate *state) {
    state->repiterationscount = 0;
    state->repnmv = 0;
@@ -7024,7 +7024,7 @@ bool nleqiteration(const nleqstate &state) {
    return Ok;
 }
 
-// This family of functions is used to launcn iterations of nonlinear solver
+// This family of functions is used to launch iterations of nonlinear solver
 //
 // These functions accept following parameters:
 //     state   -   algorithm state

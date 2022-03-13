@@ -542,7 +542,7 @@ void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
 // * tied data are correctly handled (tied ranks are calculated)
 // * centered ranks are just usual ranks, but centered in such way  that  sum
 //   of within-row values is equal to 0.0.
-// * centering is performed by subtracting mean from each row, i.e it changes
+// * centering is performed by subtracting mean from each row, i.e. it changes
 //   mean value, but does NOT change higher moments
 //
 // Inputs:
@@ -626,7 +626,7 @@ double cov2(RVector *x, RVector *y, ae_int_t n) {
 // Calculate mean.
 //
 //
-// Additonally we calculate SameX and SameY -
+// Additionally we calculate SameX and SameY -
 // flag variables which are set to True when
 // all X[] (or Y[]) contain exactly same value.
 //
@@ -704,7 +704,7 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
 // Calculate mean.
 //
 //
-// Additonally we calculate SameX and SameY -
+// Additionally we calculate SameX and SameY -
 // flag variables which are set to True when
 // all X[] (or Y[]) contain exactly same value.
 //

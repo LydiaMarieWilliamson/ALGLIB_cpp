@@ -48893,7 +48893,7 @@ static void testminnsunit_basictest0uc(bool *errors) {
 //     minimize [ 10*|x0^2-x1| + (1-x0)^2 + 100*max(sqrt(2)*x0-1,0) + 100*max(2*x1-1,0) ]
 //              [                                                                       ]
 //
-// It's exact solution is x0=1/sqrt(2), x1=1/2
+// Its exact solution is x0=1/sqrt(2), x1=1/2
 static void testminnsunit_basictest1uc(bool *errors) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -49007,7 +49007,7 @@ static void testminnsunit_basictest0bc(bool *errors) {
 //
 //     s.t. x0 <= 1/sqrt(2), x1 <= 0.5
 //
-// It's exact solution is x0=1/sqrt(2), x1=1/2
+// Its exact solution is x0=1/sqrt(2), x1=1/2
 static void testminnsunit_basictest1bc(bool *errors) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -49136,7 +49136,7 @@ static void testminnsunit_basictest0lc(bool *errors) {
 //
 //     s.t. x0 <= 1/sqrt(2), x1 <= 0.5
 //
-// It's exact solution is x0=1/sqrt(2), x1=1/2
+// Its exact solution is x0=1/sqrt(2), x1=1/2
 static void testminnsunit_basictest1lc(bool *errors) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -64636,7 +64636,7 @@ static void testspline2dunit_twodnumder(spline2dinterpolant *c, double x, double
    *fxy = (spline2dcalc(c, x + h, y + h) - spline2dcalc(c, x - h, y + h) - spline2dcalc(c, x + h, y - h) + spline2dcalc(c, x - h, y - h)) / sqr(2 * h);
 }
 
-// Lipschitz constants for spline inself, first and second derivatives.
+// Lipschitz constants for spline itself, first and second derivatives.
 static void testspline2dunit_lconst(spline2dinterpolant *c, RVector *lx, RVector *ly, ae_int_t m, ae_int_t n, double lstep, double *lc, double *lcx, double *lcy, double *lcxy) {
    ae_int_t i;
    ae_int_t j;
@@ -77926,7 +77926,7 @@ static bool testclusteringunit_advancedahctests() {
 // * for each merge we check that it merges points
 //   from same cluster;
 //
-// Additonally, we call ErrorsInMerges(). See function comments
+// Additionally, we call ErrorsInMerges(). See function comments
 // for more information about specific tests performed. This function
 // allows us to check that clusters are built exactly as specified by
 // definition of the clustering algorithm.

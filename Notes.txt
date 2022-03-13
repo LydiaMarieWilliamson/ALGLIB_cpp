@@ -558,6 +558,11 @@ A6.2. Test Stages
 		―	Combined the Ap versus AlgLibInternal functions.
 		―	Moved the Ap functions into AlgLibInternal, made them local and removed their declarations.
 40	AlgLibInternal.{cpp,h}: added rmatrixgemmf() alongside cmatrixgemmf().
+0-39	Corrections in the comments & printouts; e.g.
+	―	"launcn" → "launch", "traling" → "trailing", "trainig" → "training", "i.e \." → "i.e.", "i.e" → "i.e.",
+	―	"inself" → "itself", "it's" → "its", "discripancy" → "discrepancy", "strucure" → "structure",
+	―	"⋯intial⋯" → "⋯initial⋯", "lentgh" → "length", "loosing" → "losing", "Additonally" → "Additionally",
+	―	"VIMP⋯" → "VIPM⋯", "fileds" → "fields", "ouput" → "output", "paremeter" → "parameter".
 
 A6.3. Test Results
 ──────────────────

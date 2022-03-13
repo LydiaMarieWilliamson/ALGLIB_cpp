@@ -5069,7 +5069,7 @@ void mlpimporttunableparameters(multilayerperceptron *network, RVector *p) {
    }
 }
 
-// Serialization of MultiLayerPerceptron strucure
+// Serialization of MultiLayerPerceptron structure
 //
 // Inputs:
 //     Network -   original
@@ -5126,7 +5126,7 @@ void mlpserializeold(multilayerperceptron *network, RVector *ra, ae_int_t *rlen)
    offs += sigmalen;
 }
 
-// Unserialization of MultiLayerPerceptron strucure
+// Unserialization of MultiLayerPerceptron structure
 //
 // Inputs:
 //     RA      -   real array which stores network
@@ -7653,7 +7653,7 @@ void mlpecreatec2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, a
    ae_frame_leave();
 }
 
-// Copying of MLPEnsemble strucure
+// Copying of MLPEnsemble structure
 //
 // Inputs:
 //     Ensemble1 -   original
@@ -13795,7 +13795,7 @@ ae_int_t dfclassify(decisionforest *model, RVector *x) {
 //
 // Thread-safe procesing using external buffer for temporaries.
 //
-// This function is thread-safe (i.e .  you  can  use  same  DF   model  from
+// This function is thread-safe (i.e.  you  can  use  same  DF   model  from
 // multiple threads) as long as you use different buffer objects for different
 // threads.
 //
@@ -14084,7 +14084,7 @@ double dfavgrelerror(decisionforest *df, RMatrix *xy, ae_int_t npoints) {
    return result;
 }
 
-// Copying of DecisionForest strucure
+// Copying of DecisionForest structure
 //
 // Inputs:
 //     DF1 -   original
@@ -15755,7 +15755,7 @@ double lrprocess(linearmodel *lm, RVector *x) {
    return result;
 }
 
-// Copying of LinearModel strucure
+// Copying of LinearModel structure
 //
 // Inputs:
 //     LM1 -   original
@@ -18046,7 +18046,7 @@ void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *tr
 // * no algorithm is specified (no analysis can be done)
 // * last sequence is shorter than the WindowWidth   (analysis  can  be done,
 //   but we can not perform forecasting on the last sequence)
-// * window lentgh is 1 (impossible to use for forecasting)
+// * window length is 1 (impossible to use for forecasting)
 // * SSA analysis algorithm is  configured  to  extract  basis  whose size is
 //   equal to window length (impossible to use for  forecasting;  only  basis
 //   whose size is less than window length can be used).
@@ -18191,7 +18191,7 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend) {
 // * no algorithm is specified (no analysis can be done)
 // * data sequence is shorter than the WindowWidth   (analysis  can  be done,
 //   but we can not perform forecasting on the last sequence)
-// * window lentgh is 1 (impossible to use for forecasting)
+// * window length is 1 (impossible to use for forecasting)
 // * SSA analysis algorithm is  configured  to  extract  basis  whose size is
 //   equal to window length (impossible to use for  forecasting;  only  basis
 //   whose size is less than window length can be used).
@@ -18334,7 +18334,7 @@ void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t 
 // * no algorithm is specified (no analysis can be done)
 // * last sequence is shorter than the WindowWidth   (analysis  can  be done,
 //   but we can not perform forecasting on the last sequence)
-// * window lentgh is 1 (impossible to use for forecasting)
+// * window length is 1 (impossible to use for forecasting)
 // * SSA analysis algorithm is  configured  to  extract  basis  whose size is
 //   equal to window length (impossible to use for  forecasting;  only  basis
 //   whose size is less than window length can be used).
@@ -18464,7 +18464,7 @@ void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend
 // * no algorithm is specified (no analysis can be done)
 // * data sequence is shorter than the WindowWidth   (analysis  can  be done,
 //   but we can not perform forecasting on the last sequence)
-// * window lentgh is 1 (impossible to use for forecasting)
+// * window length is 1 (impossible to use for forecasting)
 // * SSA analysis algorithm is  configured  to  extract  basis  whose size is
 //   equal to window length (impossible to use for  forecasting;  only  basis
 //   whose size is less than window length can be used).
@@ -20947,7 +20947,7 @@ void mnlpack(RMatrix *a, ae_int_t nvars, ae_int_t nclasses, logitmodel *lm) {
    }
 }
 
-// Copying of LogitModel strucure
+// Copying of LogitModel structure
 //
 // Inputs:
 //     LM1 -   original
@@ -21815,7 +21815,7 @@ void knnrewritekeps(knnmodel *model, ae_int_t k, double eps) {
 
 // Thread-safe procesing using external buffer for temporaries.
 //
-// This function is thread-safe (i.e .  you  can  use  same  KNN  model  from
+// This function is thread-safe (i.e.  you  can  use  same  KNN  model  from
 // multiple threads) as long as you use different buffer objects for different
 // threads.
 //
