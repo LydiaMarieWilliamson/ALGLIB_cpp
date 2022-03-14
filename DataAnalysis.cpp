@@ -22465,7 +22465,7 @@ double knnprocess0(const knnmodel &model, const real_1d_array &x) {
 ae_int_t knnclassify(const knnmodel &model, const real_1d_array &x) {
    alglib_impl::ae_state_init();
    TryCatch(0)
-   alglib_impl::knnclassify(ConstT(knnmodel, model), ConstT(ae_vector, x));
+   ae_int_t Z = alglib_impl::knnclassify(ConstT(knnmodel, model), ConstT(ae_vector, x));
    alglib_impl::ae_state_clear();
    return Z;
 }

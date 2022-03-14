@@ -89290,231 +89290,207 @@ bool testalglibbasics(bool silent) {
 }
 
 // === main testing unit ===
+// Configuration-dependent functions for mutexs and threads.
 #if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
 #   include <unistd.h>
 #   include <pthread.h>
-#endif
-#if AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
+typedef pthread_mutex_t MutEx_t;
+inline void acquire_mutex(MutEx_t *MutEx) { pthread_mutex_lock(MutEx); }
+inline void release_mutex(MutEx_t *MutEx) { pthread_mutex_unlock(MutEx); }
+inline void init_mutex(MutEx_t *MutEx) { pthread_mutex_init(MutEx, NULL); }
+inline void free_mutex(MutEx_t *MutEx) { pthread_mutex_destroy(MutEx); }
+typedef const pthread_attr_t ThAttr_t;
+typedef void *ThArg_t;
+typedef void *ThRet_t;
+const ThRet_t ThNoRet = (ThRet_t)NULL;
+typedef ThRet_t (*ThOp_t)(ThArg_t);
+typedef pthread_t Thread_t;
+inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { return pthread_create(Th, Attr, Op, Arg); }
+inline void join_threads(long N, Thread_t *Bundle) { for (int T = 0; T < N; T++) pthread_join(Bundle[T], NULL); }
+#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
 #   include <windows.h>
+typedef CRITICAL_SECTION MutEx_t;
+inline void acquire_mutex(MutEx_t *MutEx) { EnterCriticalSection(MutEx); }
+inline void release_mutex(MutEx_t *MutEx) { LeaveCriticalSection(MutEx); }
+inline void init_mutex(MutEx_t *MutEx) { InitializeCriticalSection(MutEx); }
+inline void free_mutex(MutEx_t *MutEx) { DeleteCriticalSection(MutEx); }
+typedef LPSECURITY_ATTRIBUTES ThAttr_t;
+typedef LPVOID ThArg_t;
+typedef DWORD WINAPI ThRet_t;
+const ThRet_t ThNoRet = (ThRet_t)0;
+typedef LPTHREAD_START_ROUTINE ThOp_t;
+typedef HANDLE Thread_t;
+inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { *Th = CreateThread(Attr, 0, Op, Arg, 0, NULL); return *Th != NULL; }
+inline void join_threads(long N, Thread_t *Bundle) { WaitForMultipleObjects(N, Bundle, TRUE, INFINITE); }
+#else
+// These are totally bogus stubs.
+// You need to replace them with whatever specializations you need for your target configuration.
+typedef void *MutEx_t;
+inline void acquire_mutex(MutEx_t *MutEx) { }
+inline void release_mutex(MutEx_t *MutEx) { }
+inline void init_mutex(MutEx_t *MutEx) { }
+inline void free_mutex(MutEx_t *MutEx) { }
+typedef void *ThAttr_t;
+typedef void *ThArg_t;
+typedef void ThRet_t;
+const ThRet_t ThNoRet = (ThRet_t)NULL;
+typedef ThRet_t (*ThOp_t)(ThArg_t);
+struct Thread_t { ThAttr_t Attr; ThOp_t Op; ThArg_t Arg; };
+inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { Th->Attr = Attr, Th->Op = Op, Th->Arg = Arg; return 0; }
+inline void join_threads(long N, Thread_t *Bundle) { }
 #endif
-
-unsigned seed;
 
 static const enum {
    AE_NOENV, AE_SINGLECORE, AE_SEQUENTIAL_MULTICORE, AE_PARALLEL_SINGLECORE, AE_PARALLEL_MULTICORE, AE_SKIP_TEST
 } TestMode = AE_SINGLECORE;
 
-int global_failure_flag = 0;
+int global_failure_flag = EXIT_SUCCESS;
 bool use_smp = false;
 
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-pthread_mutex_t tests_lock;
-pthread_mutex_t print_lock;
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-CRITICAL_SECTION tests_lock;
-CRITICAL_SECTION print_lock;
-#else
-void *tests_lock = NULL;
-void *print_lock = NULL;
-#endif
+MutEx_t tests_mutex; //(@) Was initialized to NULL for the non-OS version.
+MutEx_t print_mutex; //(@) Was initialized to NULL for the non-OS version.
 
-struct _s_testrecord {
-   const char *name;
-   bool (*testfunc)(bool);
-};
-
-int unittests_processed = 0;
-
-_s_testrecord unittests[] = {
-   { "ablasf", testablasf },
-   { "hqrnd", testhqrnd },
-   { "ablas", testablas },
-   { "hblas", testhblas },
-   { "creflections", testcreflections },
-   { "sblas", testsblas },
-   { "ortfac", testortfac },
-   { "matgen", testmatgen },
-   { "tsort", testtsort },
-   { "sparse", testsparse },
-   { "blas", testblas },
-   { "evd", testevd },
-   { "trfac", testtrfac },
-   { "polynomialsolver", testpolynomialsolver },
-   { "bdsvd", testbdsvd },
-   { "svd", testsvd },
-   { "trlinsolve", testtrlinsolve },
-   { "safesolve", testsafesolve },
-   { "rcond", testrcond },
-   { "xblas", testxblas },
-   { "directdensesolvers", testdirectdensesolvers },
-   { "directsparsesolvers", testdirectsparsesolvers },
-   { "fbls", testfbls },
-   { "iterativesparse", testiterativesparse },
-   { "lincg", testlincg },
-   { "normestimator", testnormestimator },
-   { "linlsqr", testlinlsqr },
-   { "linmin", testlinmin },
-   { "nleq", testnleq },
-   { "matinv", testmatinv },
-   { "optserv", testoptserv },
-   { "minlbfgs", testminlbfgs },
-   { "cqmodels", testcqmodels },
-   { "snnls", testsnnls },
-   { "sactivesets", testsactivesets },
-   { "minbleic", testminbleic },
-   { "minqp", testminqp },
-   { "minlm", testminlm },
-   { "mincg", testmincg },
-   { "minlp", testminlp },
-   { "minnlc", testminnlc },
-   { "minns", testminns },
-   { "minbc", testminbc },
-   { "nearestneighbor", testnearestneighbor },
-   { "odesolver", testodesolver },
-   { "inverseupdate", testinverseupdate },
-   { "schur", testschur },
-   { "spdgevd", testspdgevd },
-   { "gammafunc", testgammafunc },
-   { "gq", testgq },
-   { "gkq", testgkq },
-   { "autogk", testautogk },
-   { "normaldistr", testnormaldistr },
-   { "basestat", testbasestat },
-   { "wsr", testwsr },
-   { "mannwhitneyu", testmannwhitneyu },
-   { "stest", teststest },
-   { "studentttests", teststudentttests },
-   { "ratint", testratint },
-   { "idw", testidw },
-   { "polint", testpolint },
-   { "spline1d", testspline1d },
-   { "lsfit", testlsfit },
-   { "fitsphere", testfitsphere },
-   { "parametric", testparametric },
-   { "spline2d", testspline2d },
-   { "spline3d", testspline3d },
-   { "rbf", testrbf },
-   { "fft", testfft },
-   { "fht", testfht },
-   { "conv", testconv },
-   { "corr", testcorr },
-   { "chebyshev", testchebyshev },
-   { "hermite", testhermite },
-   { "legendre", testlegendre },
-   { "laguerre", testlaguerre },
-   { "pca", testpca },
-   { "bdss", testbdss },
-   { "mlpbase", testmlpbase },
-   { "mlpe", testmlpe },
-   { "clustering", testclustering },
-   { "dforest", testdforest },
-   { "linreg", testlinreg },
-   { "filters", testfilters },
-   { "ssa", testssa },
-   { "lda", testlda },
-   { "mcpd", testmcpd },
-   { "knn", testknn },
-   { "mlptrain", testmlptrain },
-   { "alglibbasics", testalglibbasics },
-   { NULL, NULL }
-};
-
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-void acquire_lock(pthread_mutex_t *p_lock) {
-   pthread_mutex_lock(p_lock);
-}
-
-void release_lock(pthread_mutex_t *p_lock) {
-   pthread_mutex_unlock(p_lock);
-}
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-void acquire_lock(CRITICAL_SECTION *p_lock) {
-   EnterCriticalSection(p_lock);
-}
-
-void release_lock(CRITICAL_SECTION *p_lock) {
-   LeaveCriticalSection(p_lock);
-}
-#else
-void acquire_lock(void **p_lock) {
-}
-
-void release_lock(void **p_lock) {
-}
-#endif
-
-bool call_unittest(bool (*testfunc)(bool), int *psticky) {
+bool call_unittest(bool (*testfunc)(bool)) {
 #ifndef AE_USE_CPP_ERROR_HANDLING
    ae_frame _frame_block;
-   bool result;
    ae_state_init();
    TryX {
-      *psticky = 1;
       return false;
    }
-   if (use_smp)
-      ae_state_set_flags(ParTH);
+   if (use_smp) ae_state_set_flags(ParTH);
    ae_frame_make(&_frame_block);
-   result = testfunc(true);
+   bool Ok = testfunc(true);
    ae_state_clear();
-   if (!result)
-      *psticky = 1;
-   return result;
+   return Ok;
 #else
    try {
       ae_frame _frame_block;
-      bool result;
       ae_state_init();
       ae_frame_make(&_frame_block);
-      if (use_smp)
-         ae_state_set_flags(ParTH);
-      result = testfunc(true);
+      if (use_smp) ae_state_set_flags(ParTH);
+      bool Ok = testfunc(true);
       ae_state_clear();
-      if (!result)
-         *psticky = 1;
-      return result;
+      return Ok;
    } catch(...) {
-      *psticky = 1;
       return false;
    }
 #endif
 }
 
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-void *tester_function(void *T) {
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-DWORD WINAPI tester_function(LPVOID T) {
-#else
-void tester_function(void *T) {
-#endif
-   int idx;
-   bool status;
+ThRet_t tester_function(ThArg_t T) {
+   static struct {
+      const char *name;
+      bool (*testfunc)(bool);
+   } unittests[] = {
+      { "ablasf", testablasf },
+      { "hqrnd", testhqrnd },
+      { "ablas", testablas },
+      { "hblas", testhblas },
+      { "creflections", testcreflections },
+      { "sblas", testsblas },
+      { "ortfac", testortfac },
+      { "matgen", testmatgen },
+      { "tsort", testtsort },
+      { "sparse", testsparse },
+      { "blas", testblas },
+      { "evd", testevd },
+      { "trfac", testtrfac },
+      { "polynomialsolver", testpolynomialsolver },
+      { "bdsvd", testbdsvd },
+      { "svd", testsvd },
+      { "trlinsolve", testtrlinsolve },
+      { "safesolve", testsafesolve },
+      { "rcond", testrcond },
+      { "xblas", testxblas },
+      { "directdensesolvers", testdirectdensesolvers },
+      { "directsparsesolvers", testdirectsparsesolvers },
+      { "fbls", testfbls },
+      { "iterativesparse", testiterativesparse },
+      { "lincg", testlincg },
+      { "normestimator", testnormestimator },
+      { "linlsqr", testlinlsqr },
+      { "linmin", testlinmin },
+      { "nleq", testnleq },
+      { "matinv", testmatinv },
+      { "optserv", testoptserv },
+      { "minlbfgs", testminlbfgs },
+      { "cqmodels", testcqmodels },
+      { "snnls", testsnnls },
+      { "sactivesets", testsactivesets },
+      { "minbleic", testminbleic },
+      { "minqp", testminqp },
+      { "minlm", testminlm },
+      { "mincg", testmincg },
+      { "minlp", testminlp },
+      { "minnlc", testminnlc },
+      { "minns", testminns },
+      { "minbc", testminbc },
+      { "nearestneighbor", testnearestneighbor },
+      { "odesolver", testodesolver },
+      { "inverseupdate", testinverseupdate },
+      { "schur", testschur },
+      { "spdgevd", testspdgevd },
+      { "gammafunc", testgammafunc },
+      { "gq", testgq },
+      { "gkq", testgkq },
+      { "autogk", testautogk },
+      { "normaldistr", testnormaldistr },
+      { "basestat", testbasestat },
+      { "wsr", testwsr },
+      { "mannwhitneyu", testmannwhitneyu },
+      { "stest", teststest },
+      { "studentttests", teststudentttests },
+      { "ratint", testratint },
+      { "idw", testidw },
+      { "polint", testpolint },
+      { "spline1d", testspline1d },
+      { "lsfit", testlsfit },
+      { "fitsphere", testfitsphere },
+      { "parametric", testparametric },
+      { "spline2d", testspline2d },
+      { "spline3d", testspline3d },
+      { "rbf", testrbf },
+      { "fft", testfft },
+      { "fht", testfht },
+      { "conv", testconv },
+      { "corr", testcorr },
+      { "chebyshev", testchebyshev },
+      { "hermite", testhermite },
+      { "legendre", testlegendre },
+      { "laguerre", testlaguerre },
+      { "pca", testpca },
+      { "bdss", testbdss },
+      { "mlpbase", testmlpbase },
+      { "mlpe", testmlpe },
+      { "clustering", testclustering },
+      { "dforest", testdforest },
+      { "linreg", testlinreg },
+      { "filters", testfilters },
+      { "ssa", testssa },
+      { "lda", testlda },
+      { "mcpd", testmcpd },
+      { "knn", testknn },
+      { "mlptrain", testmlptrain },
+      { "alglibbasics", testalglibbasics }
+   };
+   const size_t tests = sizeof unittests/sizeof unittests[0];
+   int unittests_processed = 0;
    while (true) {
-   // try to acquire test record
-      acquire_lock(&tests_lock);
-      if (unittests[unittests_processed].name == NULL) {
-         release_lock(&tests_lock);
-         break;
-      }
-      idx = unittests_processed;
-      unittests_processed++;
-      release_lock(&tests_lock);
-   // Call unit test
-      status = call_unittest(unittests[idx].testfunc, &global_failure_flag);
-      acquire_lock(&print_lock);
-      if (status)
-         printf("%-32s OK\n", unittests[idx].name);
-      else
-         printf("%-32s FAILED\n", unittests[idx].name);
+   // Try to acquire the test record.
+      acquire_mutex(&tests_mutex);
+      int test = unittests_processed++;
+      release_mutex(&tests_mutex);
+      if (test >= tests) break;
+   // Call the unit test.
+      bool Ok = call_unittest(unittests[test].testfunc);
+      if (!Ok) global_failure_flag = EXIT_FAILURE;
+   // Display the test results.
+      acquire_mutex(&print_mutex);
+      printf("%2d/%d: %-32s %s\n", test + 1, tests, unittests[test].name, Ok? "Ok": "Failed");
       fflush(stdout);
-      release_lock(&print_lock);
+      release_mutex(&print_mutex);
    }
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-   return NULL;
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-   return 0;
-#else
-#endif
+   return ThNoRet;
 }
 
 int main(int argc, char **argv) {
@@ -89523,70 +89499,66 @@ int main(int argc, char **argv) {
       double a;
       ae_int32_t p[2];
    } u;
+   unsigned seed;
    if (argc == 2)
       seed = (unsigned)atoi(argv[1]);
    else {
       time_t t;
       seed = (unsigned)time(&t);
    }
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-   pthread_mutex_init(&tests_lock, NULL);
-   pthread_mutex_init(&print_lock, NULL);
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-   InitializeCriticalSection(&tests_lock);
-   InitializeCriticalSection(&print_lock);
-#endif
+   init_mutex(&tests_mutex);
+   init_mutex(&print_mutex);
 // SMP settings
    use_smp = TestMode == AE_PARALLEL_MULTICORE || TestMode == AE_SEQUENTIAL_MULTICORE;
 // Seed
-   printf("SEED: %u\n", (unsigned int)seed);
+   printf("Seed: %u (%x)\n", seed, seed);
    srand(seed);
 // Compiler
 #if AE_COMPILER == AE_GNUC
-   printf("COMPILER: GCC\n");
+   printf("Compiler: GCC\n");
 #elif AE_COMPILER == AE_SUNC
-   printf("COMPILER: SunStudio\n");
+   printf("Compiler: SunStudio\n");
 #elif AE_COMPILER == AE_MSVC
-   printf("COMPILER: MSVC\n");
+   printf("Compiler: MSVC\n");
 #else
-   printf("COMPILER: unknown\n");
+   printf("Compiler: Other\n");
 #endif
 // Architecture
    if (sizeof(void *) == 4)
-      printf("HARDWARE: 32-bit\n");
+      printf("Hardware: 32-bit\n");
    else if (sizeof(void *) == 8)
-      printf("HARDWARE: 64-bit\n");
+      printf("Hardware: 64-bit\n");
    else
-      printf("HARDWARE: strange (non-32, non-64)\n");
-// Determine the native byte ordering of the hardware.
-// 1983 is a good number - non-periodic double representation allow us to
-// easily distinguish between upper and lower halfs and to detect mixed endian hardware.
+      printf("Hardware: Other (non-32, non-64)\n");
+// Determine the native byte order of the hardware.
+// 1983 is a good number - a non-periodic double representation allows us to
+// easily distinguish between the upper and lower halves and to detect mixed endian hardware.
    u.a = 1.0 / 1983.0;
    if (u.p[1] == 0x3f408642)
-      printf("HARDWARE: little-endian\n");
+      printf("Byte Order: little-endian\n");
    else if (u.p[0] == 0x3f408642)
-      printf("HARDWARE: big-endian\n");
+      printf("Byte Order: big-endian\n");
    else
-      printf("HARDWARE: mixed-endian\n");
+      printf("Byte Order: mixed-endian\n");
 // CPU (as defined)
 #if AE_CPU == AE_INTEL
-   printf("CPU:   Intel\n");
+   printf("CPU: Intel\n");
 #elif AE_CPU == AE_SPARC
-   printf("CPU:   SPARC\n");
+   printf("CPU: SPARC\n");
 #else
-   printf("CPU:   unknown\n");
+   printf("CPU: Other\n");
 #endif
 // Cores count
 #ifdef _ALGLIB_HAS_WORKSTEALING
-   printf("CORES: %d\n", (int)ae_cores_count());
+   printf("Cores: %d\n", (int)ae_cores_count());
 #else
-   printf("CORES: 1 (serial version)\n");
+   printf("Cores: 1 (serial version)\n");
 #endif
 // Support for vendor libraries
 #ifdef AE_MKL
-   printf("LIBS:  MKL (Intel)\n");
+   printf("Libs: MKL (Intel)\n");
 #else
-   printf("LIBS:  \n");
+   printf("Libs: (None)\n");
 #endif
 // CPUID results
    printf("CPUID:%s%s%s\n", CurCPU & CPU_SSE2 ? " sse2" : "", CurCPU & CPU_AVX2 ? " avx2" : "", CurCPU & CPU_FMA ? " fma" : "");
@@ -89596,7 +89568,7 @@ int main(int argc, char **argv) {
 #elif AE_OS == AE_WINDOWS
    printf("OS: Windows\n");
 #else
-   printf("OS: unknown\n");
+   printf("OS: Other\n");
 #endif
 // Testing mode
    switch (TestMode) {
@@ -89623,31 +89595,20 @@ int main(int argc, char **argv) {
 #ifdef _ALGLIB_HAS_WORKSTEALING
          setnworkers(0);
 #endif
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-         long cpu_cnt = sysconf(_SC_NPROCESSORS_ONLN);
+         long cpu_cnt = ae_cores_count();
          ae_assert(cpu_cnt >= 1, "processors count is less than 1");
-         pthread_t *Bundle = (pthread_t *)malloc(cpu_cnt * sizeof *Bundle);
+         Thread_t *Bundle = (Thread_t *)malloc(cpu_cnt * sizeof *Bundle);
          ae_assert(Bundle != NULL, "malloc failure");
          for (int cpu = 0; cpu < cpu_cnt; cpu++) {
-            int status = pthread_create(&Bundle[cpu], NULL, tester_function, NULL);
+            int status = init_thread(&Bundle[cpu], NULL, tester_function, NULL);
             if (status != 0) {
                printf("Failed to create thread\n");
                abort();
             }
          }
-         for (int cpu = 0; cpu < cpu_cnt; cpu++) pthread_join(Bundle[cpu], NULL);
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-         SYSTEM_INFO sysInfo; GetSystemInfo(&sysInfo); long cpu_cnt = sysInfo.dwNumberOfProcessors;
-         ae_assert(cpu_cnt >= 1, "processors count is less than 1");
-         HANDLE *Bundle = (HANDLE *)malloc(cpu_cnt * sizeof *Bundle);
-         ae_assert(Bundle != NULL, "malloc failure");
-         for (int cpu = 0; cpu < cpu_cnt; cpu++)
-            Bundle[cpu] = CreateThread(NULL, 0, tester_function, NULL, 0, NULL);
-         WaitForMultipleObjects(cpu_cnt, Bundle, TRUE, INFINITE);
-#else
-#   error Unable to determine OS (define AE_OS, AE_DEBUG4POSIX or AE_DEBUG4WINDOWS)
-#endif
+         join_threads(cpu_cnt, Bundle);
       }
+      break;
       default: printf("Unexpected test mode\n"); return EXIT_FAILURE;
    }
    time(&time_1);
@@ -89655,17 +89616,12 @@ int main(int argc, char **argv) {
    if (global_failure_flag)
       printf("Last error at %s:%d (%s)\n", sef_file, (int)sef_line, sef_xdesc);
 // Free structures
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-   pthread_mutex_destroy(&tests_lock);
-   pthread_mutex_destroy(&print_lock);
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-   DeleteCriticalSection(&tests_lock);
-   DeleteCriticalSection(&print_lock);
-#endif
+   free_mutex(&tests_mutex);
+   free_mutex(&print_mutex);
 #ifdef AE_HPC
    ae_free_disposed_items();
    ae_complete_finalization_before_exit();
 #endif
-// Return result
+// Return the result.
    return global_failure_flag;
 }
