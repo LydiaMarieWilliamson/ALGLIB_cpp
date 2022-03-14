@@ -232,7 +232,7 @@ struct async_rbf_record {
 
 ThRet_t async_build_rbf_model(ThArg_t T) {
    async_rbf_record *p = (async_rbf_record *)T;
-   rbfbuildmodel(*(p->p_model), *(p->p_report));
+   rbfbuildmodel(*p->p_model, *p->p_report);
    p->thread_finished = true;
    return ThNoRet;
 }

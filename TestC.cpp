@@ -84576,10 +84576,10 @@ bool testalglibbasics() {
 #   include <unistd.h>
 #   include <pthread.h>
 typedef pthread_mutex_t MutEx_t;
-inline void acquire_mutex(MutEx_t *L) { pthread_mutex_lock(L); }
-inline void release_mutex(MutEx_t *L) { pthread_mutex_unlock(L); }
-inline void init_mutex(MutEx_t *L) { pthread_mutex_init(L, NULL); }
-inline void free_mutex(MutEx_t *L) { pthread_mutex_destroy(L); }
+inline void acquire_mutex(MutEx_t *MutEx) { pthread_mutex_lock(MutEx); }
+inline void release_mutex(MutEx_t *MutEx) { pthread_mutex_unlock(MutEx); }
+inline void init_mutex(MutEx_t *MutEx) { pthread_mutex_init(MutEx, NULL); }
+inline void free_mutex(MutEx_t *MutEx) { pthread_mutex_destroy(MutEx); }
 typedef const pthread_attr_t ThAttr_t;
 typedef void *ThArg_t;
 typedef void *ThRet_t;
@@ -84591,10 +84591,10 @@ inline void join_threads(long N, Thread_t *Bundle) { for (int T = 0; T < N; T++)
 #elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
 #   include <windows.h>
 typedef CRITICAL_SECTION MutEx_t;
-inline void acquire_mutex(MutEx_t *L) { EnterCriticalSection(L); }
-inline void release_mutex(MutEx_t *L) { LeaveCriticalSection(L); }
-inline void init_mutex(MutEx_t *L) { InitializeCriticalSection(L); }
-inline void free_mutex(MutEx_t *L) { DeleteCriticalSection(L); }
+inline void acquire_mutex(MutEx_t *MutEx) { EnterCriticalSection(MutEx); }
+inline void release_mutex(MutEx_t *MutEx) { LeaveCriticalSection(MutEx); }
+inline void init_mutex(MutEx_t *MutEx) { InitializeCriticalSection(MutEx); }
+inline void free_mutex(MutEx_t *MutEx) { DeleteCriticalSection(MutEx); }
 typedef LPSECURITY_ATTRIBUTES ThAttr_t;
 typedef LPVOID ThArg_t;
 typedef DWORD WINAPI ThRet_t;
@@ -84607,10 +84607,10 @@ inline void join_threads(long N, Thread_t *Bundle) { WaitForMultipleObjects(N, B
 // These are totally bogus stubs.
 // You need to replace them with whatever specializations you need for your target configuration.
 typedef void *MutEx_t;
-inline void acquire_mutex(MutEx_t *L) { }
-inline void release_mutex(MutEx_t *L) { }
-inline void init_mutex(MutEx_t *L) { }
-inline void free_mutex(MutEx_t *L) { }
+inline void acquire_mutex(MutEx_t *MutEx) { }
+inline void release_mutex(MutEx_t *MutEx) { }
+inline void init_mutex(MutEx_t *MutEx) { }
+inline void free_mutex(MutEx_t *MutEx) { }
 typedef void *ThAttr_t;
 typedef void *ThArg_t;
 typedef void ThRet_t;
@@ -84628,8 +84628,8 @@ static const enum {
 int global_failure_flag = EXIT_SUCCESS;
 bool use_smp = false;
 
-MutEx_t tests_mutex;
-MutEx_t print_mutex;
+MutEx_t tests_mutex; //(@) Was initialized to NULL for the non-OS version.
+MutEx_t print_mutex; //(@) Was initialized to NULL for the non-OS version.
 
 bool call_unittest(bool (*testfunc)()) {
 #ifndef AE_USE_CPP_ERROR_HANDLING
@@ -84812,9 +84812,9 @@ int main(int argc, char **argv) {
       printf("Hardware: 64-bit\n");
    else
       printf("Hardware: Other (non-32, non-64)\n");
-// determine byte order of hardware.
-// 1983 is a good number - non-periodic double representation allow us to
-// easily distinguish between upper and lower halfs and to detect mixed endian hardware.
+// Determine the native byte order of the hardware.
+// 1983 is a good number - a non-periodic double representation allows us to
+// easily distinguish between the upper and lower halves and to detect mixed endian hardware.
    u.a = 1.0 / 1983.0;
    if (u.p[1] == 0x3f408642)
       printf("Byte Order: little-endian\n");
@@ -84840,7 +84840,7 @@ int main(int argc, char **argv) {
 #ifdef AE_MKL
    printf("Libs: MKL (Intel)\n");
 #else
-   printf("Libs:\n");
+   printf("Libs: (None)\n");
 #endif
 // CPUID results
    printf("CPUID:%s%s%s\n", CurCPU & CPU_SSE2 ? " sse2" : "", CurCPU & CPU_AVX2 ? " avx2" : "", CurCPU & CPU_FMA ? " fma" : "");
@@ -84856,8 +84856,8 @@ int main(int argc, char **argv) {
    switch (TestMode) {
       case AE_NOENV: case AE_SINGLECORE: printf("Testing Mode: single core\n"); break;
       case AE_PARALLEL_SINGLECORE: printf("Testing Mode: single core, parallel\n"); break;
-      case AE_SEQUENTIAL_MULTICORE: printf("Testing Mode: milti-core, sequential\n"); break;
-      case AE_PARALLEL_MULTICORE: printf("Testing Mode: milti-core, parallel\n"); break;
+      case AE_SEQUENTIAL_MULTICORE: printf("Testing Mode: multi-core, sequential\n"); break;
+      case AE_PARALLEL_MULTICORE: printf("Testing Mode: multi-core, parallel\n"); break;
       case AE_SKIP_TEST: printf("Testing Mode: just compiling\nDone in 0 seconds\n"); return EXIT_SUCCESS;
       default: printf("Testing Mode: unknown\n"); return EXIT_FAILURE;
    }
@@ -84879,7 +84879,7 @@ int main(int argc, char **argv) {
 #endif
          long cpu_cnt = ae_cores_count();
          ae_assert(cpu_cnt >= 1, "processors count is less than 1");
-         Thread_t *Bundle = (Thread_t *) malloc(cpu_cnt * sizeof *Bundle);
+         Thread_t *Bundle = (Thread_t *)malloc(cpu_cnt * sizeof *Bundle);
          ae_assert(Bundle != NULL, "malloc failure");
          for (int cpu = 0; cpu < cpu_cnt; cpu++) {
             int status = init_thread(&Bundle[cpu], NULL, tester_function, NULL);
@@ -84890,6 +84890,7 @@ int main(int argc, char **argv) {
          }
          join_threads(cpu_cnt, Bundle);
       }
+      break;
       default: printf("Unexpected test mode\n"); return EXIT_FAILURE;
    }
    time(&time_1);
@@ -84901,6 +84902,6 @@ int main(int argc, char **argv) {
    ae_free_disposed_items();
    ae_complete_finalization_before_exit();
 #endif
-// Return result
+// Return the result.
    return global_failure_flag;
 }

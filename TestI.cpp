@@ -124,7 +124,7 @@ bool doc_test_complex_matrix(const complex_2d_array &v, const complex_2d_array &
    return true;
 }
 
-template < class T > void spoil_vector_by_adding_element(T &x) {
+template<class T> void spoil_vector_by_adding_element(T &x) {
    T y = x;
    x.setlength(y.length() + 1);
    for (ae_int_t i = 0; i < y.length(); i++)
@@ -132,14 +132,14 @@ template < class T > void spoil_vector_by_adding_element(T &x) {
    x(y.length()) = 0;
 }
 
-template < class T > void spoil_vector_by_deleting_element(T &x) {
+template<class T> void spoil_vector_by_deleting_element(T &x) {
    T y = x;
    x.setlength(y.length() - 1);
    for (ae_int_t i = 0; i < y.length() - 1; i++)
       x(i) = y(i);
 }
 
-template < class T > void spoil_matrix_by_adding_row(T &x) {
+template<class T> void spoil_matrix_by_adding_row(T &x) {
    T y = x;
    x.setlength(y.rows() + 1, y.cols());
    for (ae_int_t i = 0; i < y.rows(); i++)
@@ -149,7 +149,7 @@ template < class T > void spoil_matrix_by_adding_row(T &x) {
       x(y.rows(), j) = 0;
 }
 
-template < class T > void spoil_matrix_by_deleting_row(T &x) {
+template<class T> void spoil_matrix_by_deleting_row(T &x) {
    T y = x;
    x.setlength(y.rows() - 1, y.cols());
    for (ae_int_t i = 0; i < y.rows() - 1; i++)
@@ -157,7 +157,7 @@ template < class T > void spoil_matrix_by_deleting_row(T &x) {
          x(i, j) = y(i, j);
 }
 
-template < class T > void spoil_matrix_by_adding_col(T &x) {
+template<class T> void spoil_matrix_by_adding_col(T &x) {
    T y = x;
    x.setlength(y.rows(), y.cols() + 1);
    for (ae_int_t i = 0; i < y.rows(); i++)
@@ -167,7 +167,7 @@ template < class T > void spoil_matrix_by_adding_col(T &x) {
       x(i, y.cols()) = 0;
 }
 
-template < class T > void spoil_matrix_by_deleting_col(T &x) {
+template<class T> void spoil_matrix_by_deleting_col(T &x) {
    T y = x;
    x.setlength(y.rows(), y.cols() - 1);
    for (ae_int_t i = 0; i < y.rows(); i++)
@@ -175,32 +175,32 @@ template < class T > void spoil_matrix_by_deleting_col(T &x) {
          x(i, j) = y(i, j);
 }
 
-template < class T > void spoil_vector_by_nan(T &x) {
+template<class T> void spoil_vector_by_nan(T &x) {
    if (x.length() != 0)
       x(randominteger(x.length())) = NAN;
 }
 
-template < class T > void spoil_vector_by_posinf(T &x) {
+template<class T> void spoil_vector_by_posinf(T &x) {
    if (x.length() != 0)
       x(randominteger(x.length())) = +INFINITY;
 }
 
-template < class T > void spoil_vector_by_neginf(T &x) {
+template<class T> void spoil_vector_by_neginf(T &x) {
    if (x.length() != 0)
       x(randominteger(x.length())) = -INFINITY;
 }
 
-template < class T > void spoil_matrix_by_nan(T &x) {
+template<class T> void spoil_matrix_by_nan(T &x) {
    if (x.rows() != 0 && x.cols() != 0)
       x(randominteger(x.rows()), randominteger(x.cols())) = NAN;
 }
 
-template < class T > void spoil_matrix_by_posinf(T &x) {
+template<class T> void spoil_matrix_by_posinf(T &x) {
    if (x.rows() != 0 && x.cols() != 0)
       x(randominteger(x.rows()), randominteger(x.cols())) = +INFINITY;
 }
 
-template < class T > void spoil_matrix_by_neginf(T &x) {
+template<class T> void spoil_matrix_by_neginf(T &x) {
    if (x.rows() != 0 && x.cols() != 0)
       x(randominteger(x.rows()), randominteger(x.cols())) = -INFINITY;
 }
@@ -570,9 +570,8 @@ int main() {
    }
 #endif
    try {
-      bool Ok = true;
    // printf("TEST ablas_d_gemm: Matrix multiplication (single-threaded)\n"), fflush(stdout);
-      Ok = true;
+      bool Ok = true;
       try {
          real_2d_array a = "[[2,1],[1,3]]";
          real_2d_array b = "[[2,1],[0,1]]";
@@ -713,7 +712,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST sparse_d_1: Basic operations with sparse matrices\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 1; _spoil_scenario++) {
+      for (int Test = -1; Test < 1; Test++) {
          try {
          //
          // This example demonstrates creation/initialization of the sparse matrix
@@ -765,14 +764,14 @@ int main() {
          // Lets calculate A*x for some x.
          //
             real_1d_array x = "[1,-1]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[]";
             sparsemv(s, x, y);
             Ok = Ok && doc_test_real_vector(y, "[1.000,-5.000]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -782,7 +781,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST sparse_d_crs: Advanced topic: creation in the CRS format.\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 2; _spoil_scenario++) {
+      for (int Test = -1; Test < 2; Test++) {
          try {
          //
          // This example demonstrates creation/initialization of the sparse matrix in the
@@ -807,7 +806,7 @@ int main() {
          //
             sparsematrix s;
             integer_1d_array row_sizes = "[2,2,2,1]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_deleting_element(row_sizes);
             sparsecreatecrs(4, 4, row_sizes, s);
             sparseset(s, 0, 0, 2.0);
@@ -847,14 +846,14 @@ int main() {
          // Lets calculate A*x for some x.
          //
             real_1d_array x = "[1,-1,1,-1]";
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[]";
             sparsemv(s, x, y);
             Ok = Ok && doc_test_real_vector(y, "[1.000,-2.000,2.000,-9]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -864,7 +863,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST solvesks_d_1: Solving positive definite sparse system using Skyline (SKS) solver\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 4; _spoil_scenario++) {
+      for (int Test = -1; Test < 4; Test++) {
          try {
          //
          // This example demonstrates creation/initialization of the sparse matrix
@@ -908,22 +907,22 @@ int main() {
          // After successful creation we can call SKS solver.
          //
             real_1d_array b = "[4,10,15,11]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(b);
             sparsesolverreport rep;
             real_1d_array x;
             bool isuppertriangle = true;
             sparsespdsolvesks(s, isuppertriangle, b, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[1.0000, 2.0000, 3.0000, 4.0000]", 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -933,7 +932,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lincg_d_1: Solution of sparse linear systems with CG\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 4; _spoil_scenario++) {
+      for (int Test = -1; Test < 4; Test++) {
          try {
          //
          // This example illustrates solution of sparse linear systems with
@@ -995,13 +994,13 @@ int main() {
          // Initialization of the right part
          //
             real_1d_array b = "[7,17,14,10,6]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(b);
          //
          // Now we have to create linear solver object and to use it for the
@@ -1020,9 +1019,9 @@ int main() {
             lincgresults(s, x, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, 1);
             Ok = Ok && doc_test_real_vector(x, "[1.000,2.000,1.000,2.000,1.000]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -1032,7 +1031,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST linlsqr_d_1: Solution of sparse linear systems with CG\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 4; _spoil_scenario++) {
+      for (int Test = -1; Test < 4; Test++) {
          try {
          //
          // This example illustrates solution of sparse linear least squares problem
@@ -1084,13 +1083,13 @@ int main() {
          // Initialization of the right part
          //
             real_1d_array b = "[4,2,4,1,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(b);
          //
          // Now we have to create linear solver object and to use it for the
@@ -1104,9 +1103,9 @@ int main() {
             linlsqrresults(s, x, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, 4);
             Ok = Ok && doc_test_real_vector(x, "[1.000,2.000]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -1116,22 +1115,22 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matinv_d_r1: Real matrix inverse\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      for (int Test = -1; Test < 7; Test++) {
          try {
             real_2d_array a = "[[1,-1],[1,1]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(a);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_adding_row(a);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_adding_col(a);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_deleting_row(a);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_matrix_by_deleting_col(a);
             ae_int_t info;
             matinvreport rep;
@@ -1140,9 +1139,9 @@ int main() {
             Ok = Ok && doc_test_real_matrix(a, "[[0.5,0.5],[-0.5,0.5]]", 0.00005);
             Ok = Ok && doc_test_real(rep.r1, 0.5, 0.00005);
             Ok = Ok && doc_test_real(rep.rinf, 0.5, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -1152,22 +1151,22 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matinv_d_c1: Complex matrix inverse\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      for (int Test = -1; Test < 7; Test++) {
          try {
             complex_2d_array a = "[[1i,-1],[1i,1]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(a);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_adding_row(a);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_adding_col(a);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_deleting_row(a);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_matrix_by_deleting_col(a);
             ae_int_t info;
             matinvreport rep;
@@ -1176,9 +1175,9 @@ int main() {
             Ok = Ok && doc_test_complex_matrix(a, "[[-0.5i,-0.5i],[-0.5,0.5]]", 0.00005);
             Ok = Ok && doc_test_real(rep.r1, 0.5, 0.00005);
             Ok = Ok && doc_test_real(rep.rinf, 0.5, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -1188,31 +1187,31 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matinv_d_spd1: SPD matrix inverse\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      for (int Test = -1; Test < 7; Test++) {
          try {
             real_2d_array a = "[[2,1],[1,2]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(a);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_adding_row(a);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_adding_col(a);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_deleting_row(a);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_matrix_by_deleting_col(a);
             ae_int_t info;
             matinvreport rep;
             spdmatrixinverse(a, info, rep);
             Ok = Ok && doc_test_int(info, 1);
             Ok = Ok && doc_test_real_matrix(a, "[[0.666666,-0.333333],[-0.333333,0.666666]]", 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -1222,31 +1221,31 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matinv_d_hpd1: HPD matrix inverse\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      for (int Test = -1; Test < 7; Test++) {
          try {
             complex_2d_array a = "[[2,1],[1,2]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(a);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_adding_row(a);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_adding_col(a);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_deleting_row(a);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_matrix_by_deleting_col(a);
             ae_int_t info;
             matinvreport rep;
             hpdmatrixinverse(a, info, rep);
             Ok = Ok && doc_test_int(info, 1);
             Ok = Ok && doc_test_complex_matrix(a, "[[0.666666,-0.333333],[-0.333333,0.666666]]", 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -1322,7 +1321,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minlbfgs_d_1: Nonlinear optimization by L-BFGS\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
+      for (int Test = -1; Test < 15; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -1339,39 +1338,39 @@ int main() {
          // First, we create optimizer object and tune its properties
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsg = 0.0;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsg = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsg = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsg = -INFINITY;
             double epsf = 0.0;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                epsf = NAN;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                epsf = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                epsf = -INFINITY;
             double epsx = 0.0000000001;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                epsx = NAN;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsx = +INFINITY;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlbfgsstate state;
@@ -1418,9 +1417,9 @@ int main() {
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -1430,7 +1429,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minlbfgs_d_2: Nonlinear optimization with additional settings and restarts\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
+      for (int Test = -1; Test < 21; Test++) {
          try {
          //
          // This example demonstrates minimization of f(x,y) = 100*(x+3)^4+(y-3)^4
@@ -1441,46 +1440,46 @@ int main() {
          // * restart from new point
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsg = 0.0;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsg = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsg = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsg = -INFINITY;
             double epsf = 0.0;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                epsf = NAN;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                epsf = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                epsf = -INFINITY;
             double epsx = 0.0000000001;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                epsx = NAN;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsx = +INFINITY;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsx = -INFINITY;
             double stpmax = 0.1;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                stpmax = NAN;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                stpmax = +INFINITY;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                stpmax = -INFINITY;
             ae_int_t maxits = 0;
             minlbfgsstate state;
@@ -1506,11 +1505,11 @@ int main() {
             Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
          // second run - algorithm is restarted
             x = "[10,10]";
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                spoil_vector_by_neginf(x);
             minlbfgsrestartfrom(state, x);
             minlbfgsoptimize(state, function1_grad);
@@ -1525,9 +1524,9 @@ int main() {
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -1537,46 +1536,46 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minlbfgs_numdiff: Nonlinear optimization by L-BFGS with numerical differentiation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
+      for (int Test = -1; Test < 15; Test++) {
          try {
          //
          // This example demonstrates minimization of f(x,y) = 100*(x+3)^4+(y-3)^4
          // using numerical differentiation to calculate gradient.
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             double epsg = 0.0000000001;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                epsg = NAN;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                epsg = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                epsg = -INFINITY;
             double epsf = 0.0;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsf = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsf = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsf = -INFINITY;
             double epsx = 0.0;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                epsx = NAN;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                epsx = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                epsx = -INFINITY;
             double diffstep = 1.0e-6;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                diffstep = NAN;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                diffstep = +INFINITY;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                diffstep = -INFINITY;
             ae_int_t maxits = 0;
             minlbfgsstate state;
@@ -1587,9 +1586,9 @@ int main() {
             minlbfgsresults(state, x, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, 4);
             Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -1599,7 +1598,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minbleic_d_1: Nonlinear optimization with bound constraints\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 20; _spoil_scenario++) {
+      for (int Test = -1; Test < 20; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -1623,51 +1622,51 @@ int main() {
          // * set stopping criteria
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_deleting_element(s);
             real_1d_array bndl = "[-1,-1]";
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_nan(bndl);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_deleting_element(bndl);
             real_1d_array bndu = "[+1,+1]";
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_nan(bndu);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_deleting_element(bndu);
             double epsg = 0.0;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                epsg = NAN;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                epsg = +INFINITY;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsg = -INFINITY;
             double epsf = 0.0;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsf = NAN;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                epsf = +INFINITY;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                epsf = -INFINITY;
             double epsx = 0.000001;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                epsx = NAN;
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                epsx = +INFINITY;
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minbleicstate state;
@@ -1716,9 +1715,9 @@ int main() {
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -1728,7 +1727,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minbleic_d_2: Nonlinear optimization with linear inequality constraints\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 22; _spoil_scenario++) {
+      for (int Test = -1; Test < 22; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -1753,56 +1752,56 @@ int main() {
          // * set stopping criteria
          //
             real_1d_array x = "[5,5]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_deleting_element(s);
             real_2d_array c = "[[1,0,2],[1,1,6]]";
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_matrix_by_nan(c);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_matrix_by_posinf(c);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_matrix_by_neginf(c);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_matrix_by_deleting_row(c);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_matrix_by_deleting_col(c);
             integer_1d_array ct = "[1,1]";
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_deleting_element(ct);
             minbleicstate state;
             double epsg = 0.0;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsg = NAN;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsg = +INFINITY;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                epsg = -INFINITY;
             double epsf = 0.0;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                epsf = NAN;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                epsf = +INFINITY;
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                epsf = -INFINITY;
             double epsx = 0.000001;
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                epsx = NAN;
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                epsx = +INFINITY;
-            if (_spoil_scenario == 21)
+            if (Test == 21)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minbleiccreate(x, state);
@@ -1850,9 +1849,9 @@ int main() {
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -1862,7 +1861,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minbleic_numdiff: Nonlinear optimization with bound constraints and numerical differentiation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 23; _spoil_scenario++) {
+      for (int Test = -1; Test < 23; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -1887,60 +1886,60 @@ int main() {
          // * set stopping criteria
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_deleting_element(s);
             real_1d_array bndl = "[-1,-1]";
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_nan(bndl);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_deleting_element(bndl);
             real_1d_array bndu = "[+1,+1]";
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_nan(bndu);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_deleting_element(bndu);
             minbleicstate state;
             double epsg = 0.0;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                epsg = NAN;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                epsg = +INFINITY;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsg = -INFINITY;
             double epsf = 0.0;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsf = NAN;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                epsf = +INFINITY;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                epsf = -INFINITY;
             double epsx = 0.000001;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                epsx = NAN;
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                epsx = +INFINITY;
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             double diffstep = 1.0e-6;
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                diffstep = NAN;
-            if (_spoil_scenario == 21)
+            if (Test == 21)
                diffstep = +INFINITY;
-            if (_spoil_scenario == 22)
+            if (Test == 22)
                diffstep = -INFINITY;
             minbleiccreatef(x, diffstep, state);
             minbleicsetbc(state, bndl, bndu);
@@ -1977,9 +1976,9 @@ int main() {
             minbleicoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -1989,7 +1988,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minqp_d_u1: Unconstrained dense quadratic programming\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 17; _spoil_scenario++) {
+      for (int Test = -1; Test < 17; Test++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1
@@ -2012,42 +2011,42 @@ int main() {
          // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
          //
             real_2d_array a = "[[2,0],[0,2]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(a);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(a);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(a);
             real_1d_array b = "[-6,-4]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(b);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(b);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(b);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_deleting_element(b);
             real_1d_array x0 = "[0,1]";
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_nan(x0);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_posinf(x0);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_neginf(x0);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_deleting_element(x0);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_neginf(s);
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_deleting_element(s);
             real_1d_array x;
             minqpstate state;
@@ -2107,9 +2106,9 @@ int main() {
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[3,2]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -2119,7 +2118,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minqp_d_bc1: Bound constrained dense quadratic programming\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
+      for (int Test = -1; Test < 21; Test++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1
@@ -2143,52 +2142,52 @@ int main() {
          // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
          //
             real_2d_array a = "[[2,0],[0,2]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(a);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(a);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(a);
             real_1d_array b = "[-6,-4]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(b);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(b);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(b);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_deleting_element(b);
             real_1d_array x0 = "[0,1]";
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_nan(x0);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_posinf(x0);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_neginf(x0);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_deleting_element(x0);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_neginf(s);
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_deleting_element(s);
             real_1d_array bndl = "[0.0,0.0]";
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                spoil_vector_by_nan(bndl);
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_deleting_element(bndl);
             real_1d_array bndu = "[2.5,2.5]";
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_nan(bndu);
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                spoil_vector_by_deleting_element(bndu);
             real_1d_array x;
             minqpstate state;
@@ -2248,9 +2247,9 @@ int main() {
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[2.5,2]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -2260,7 +2259,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minqp_d_lc1: Linearly constrained dense quadratic programming\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 16; _spoil_scenario++) {
+      for (int Test = -1; Test < 16; Test++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1
@@ -2278,40 +2277,40 @@ int main() {
          // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
          //
             real_2d_array a = "[[2,0],[0,2]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(a);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(a);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(a);
             real_1d_array b = "[-6,-4]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(b);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(b);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(b);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_deleting_element(b);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_neginf(s);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_deleting_element(s);
             real_2d_array c = "[[1.0,1.0,2.0]]";
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_matrix_by_nan(c);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_matrix_by_posinf(c);
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_matrix_by_neginf(c);
             integer_1d_array ct = "[-1]";
             real_1d_array x;
@@ -2370,9 +2369,9 @@ int main() {
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, -5);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -2382,7 +2381,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minqp_d_u2: Unconstrained sparse quadratic programming\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      for (int Test = -1; Test < 12; Test++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1,
@@ -2405,31 +2404,31 @@ int main() {
          //
             sparsematrix a;
             real_1d_array b = "[-6,-4]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(b);
             real_1d_array x0 = "[0,1]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(x0);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(x0);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(x0);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(x0);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_neginf(s);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_deleting_element(s);
             real_1d_array x;
             minqpstate state;
@@ -2465,9 +2464,9 @@ int main() {
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[3,2]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -2477,7 +2476,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minqp_d_nonconvex: Nonconvex quadratic programming\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
+      for (int Test = -1; Test < 21; Test++) {
          try {
          //
          // This example demonstrates minimization of nonconvex function
@@ -2501,43 +2500,43 @@ int main() {
          // and pass diag(-2,-2) as quadratic term - NOT diag(-1,-1)!
          //
             real_2d_array a = "[[-2,0],[0,-2]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(a);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(a);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(a);
             real_1d_array x0 = "[1,1]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(x0);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(x0);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(x0);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_deleting_element(x0);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_neginf(s);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_deleting_element(s);
             real_1d_array bndl = "[1.0,1.0]";
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_vector_by_nan(bndl);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_vector_by_deleting_element(bndl);
             real_1d_array bndu = "[2.0,2.0]";
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_nan(bndu);
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_deleting_element(bndu);
             real_1d_array x;
             minqpstate state;
@@ -2598,23 +2597,23 @@ int main() {
          // -4 is returned as completion code. However, DENSE-AUL is unable to detect
          // such situation and it will cycle forever (we do not test it here).
             real_1d_array nobndl = "[-inf,-inf]";
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                spoil_vector_by_nan(nobndl);
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_deleting_element(nobndl);
             real_1d_array nobndu = "[+inf,+inf]";
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_nan(nobndu);
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                spoil_vector_by_deleting_element(nobndu);
             minqpsetbc(state, nobndl, nobndu);
             minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, -4);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -2624,7 +2623,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minlm_d_v: Nonlinear least squares optimization using function vector only\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      for (int Test = -1; Test < 9; Test++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
@@ -2640,25 +2639,25 @@ int main() {
          // No other information (Jacobian, gradient, etc.) is needed.
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsx = 0.0000000001;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsx = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsx = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
@@ -2677,7 +2676,7 @@ int main() {
          //
             minlmoptimize(state, function1_fvec);
          //
-         // _spoil_scenario optimization results
+         // Test optimization results
          //
          // NOTE: because we use numerical differentiation, we do not
          //       verify Jacobian correctness - it is always "correct".
@@ -2686,9 +2685,9 @@ int main() {
          //
             minlmresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -2698,7 +2697,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minlm_d_vj: Nonlinear least squares optimization using function vector and Jacobian\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      for (int Test = -1; Test < 9; Test++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
@@ -2713,25 +2712,25 @@ int main() {
          // * Jacobian matrix J = {dfi/dxj}.
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsx = 0.0000000001;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsx = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsx = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
@@ -2763,7 +2762,7 @@ int main() {
          //
             minlmoptimize(state, function1_fvec, function1_jac);
          //
-         // _spoil_scenario optimization results
+         // Test optimization results
          //
             minlmreport rep;
             minlmresults(state, x, rep);
@@ -2781,9 +2780,9 @@ int main() {
             optguardreport ogrep;
             minlmoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -2793,7 +2792,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minlm_d_fgh: Nonlinear Hessian-based optimization for general functions\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = 100*(x0+3)^4+(x1-3)^4
@@ -2808,18 +2807,18 @@ int main() {
          // * Hessian H={d2F/(dxi*dxj)}
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             double epsx = 0.0000000001;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                epsx = NAN;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                epsx = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
@@ -2829,9 +2828,9 @@ int main() {
             minlmoptimize(state, function1_func, function1_grad, function1_hess);
             minlmresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -2841,7 +2840,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minlm_d_vb: Bound constrained nonlinear least squares optimization\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 13; _spoil_scenario++) {
+      for (int Test = -1; Test < 13; Test++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
@@ -2862,35 +2861,35 @@ int main() {
          // No other information (Jacobian, gradient, etc.) is needed.
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             real_1d_array bndl = "[-1,-1]";
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_nan(bndl);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(bndl);
             real_1d_array bndu = "[+1,+1]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(bndu);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(bndu);
             double epsx = 0.0000000001;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                epsx = NAN;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                epsx = +INFINITY;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
@@ -2910,7 +2909,7 @@ int main() {
          //
             minlmoptimize(state, function1_fvec);
          //
-         // _spoil_scenario optimization results
+         // Test optimization results
          //
          // NOTE: because we use numerical differentiation, we do not
          //       verify Jacobian correctness - it is always "correct".
@@ -2920,9 +2919,9 @@ int main() {
             minlmreport rep;
             minlmresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-1,+1]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -2932,7 +2931,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minlm_d_restarts: Efficient restarts of LM optimizer\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      for (int Test = -1; Test < 9; Test++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
@@ -2944,11 +2943,11 @@ int main() {
          //
             real_1d_array x;
             double epsx = 0.0000000001;
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                epsx = NAN;
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                epsx = +INFINITY;
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
@@ -2957,11 +2956,11 @@ int main() {
          // create optimizer using minlmcreatev()
          //
             x = "[10,10]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(x);
             minlmcreatev(2, x, 0.0001, state);
             minlmsetcond(state, epsx, maxits);
@@ -2976,19 +2975,19 @@ int main() {
          // must remain unchanged.
          //
             x = "[4,4]";
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_neginf(x);
             minlmrestartfrom(state, x);
             minlmoptimize(state, function2_fvec);
             minlmresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[0,1]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -2998,21 +2997,21 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minlm_t_1: Nonlinear least squares optimization, FJ scheme (obsolete, but supported)\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             double epsx = 0.0000000001;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                epsx = NAN;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                epsx = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
@@ -3022,9 +3021,9 @@ int main() {
             minlmoptimize(state, function1_func, function1_jac);
             minlmresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -3034,21 +3033,21 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minlm_t_2: Nonlinear least squares optimization, FGJ scheme (obsolete, but supported)\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             double epsx = 0.0000000001;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                epsx = NAN;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                epsx = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
@@ -3058,9 +3057,9 @@ int main() {
             minlmoptimize(state, function1_func, function1_grad, function1_jac);
             minlmresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -3070,7 +3069,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST mincg_d_1: Nonlinear optimization by CG\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
+      for (int Test = -1; Test < 15; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -3087,39 +3086,39 @@ int main() {
          // First, we create optimizer object and tune its properties
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsg = 0.0;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsg = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsg = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsg = -INFINITY;
             double epsf = 0.0;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                epsf = NAN;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                epsf = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                epsf = -INFINITY;
             double epsx = 0.0000000001;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                epsx = NAN;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsx = +INFINITY;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             mincgstate state;
@@ -3166,9 +3165,9 @@ int main() {
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -3178,7 +3177,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST mincg_d_2: Nonlinear optimization with additional settings and restarts\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
+      for (int Test = -1; Test < 21; Test++) {
          try {
          //
          // This example demonstrates minimization of f(x,y) = 100*(x+3)^4+(y-3)^4
@@ -3189,46 +3188,46 @@ int main() {
          // * restart from new point
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsg = 0.0;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsg = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsg = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsg = -INFINITY;
             double epsf = 0.0;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                epsf = NAN;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                epsf = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                epsf = -INFINITY;
             double epsx = 0.0000000001;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                epsx = NAN;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsx = +INFINITY;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsx = -INFINITY;
             double stpmax = 0.1;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                stpmax = NAN;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                stpmax = +INFINITY;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                stpmax = -INFINITY;
             ae_int_t maxits = 0;
             mincgstate state;
@@ -3254,11 +3253,11 @@ int main() {
             Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
          // second run - algorithm is restarted with mincgrestartfrom()
             x = "[10,10]";
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                spoil_vector_by_neginf(x);
             mincgrestartfrom(state, x);
             mincgoptimize(state, function1_grad);
@@ -3273,9 +3272,9 @@ int main() {
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -3285,7 +3284,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST mincg_numdiff: Nonlinear optimization by CG with numerical differentiation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 18; _spoil_scenario++) {
+      for (int Test = -1; Test < 18; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -3301,46 +3300,46 @@ int main() {
          // First, we set up optimizer...
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsg = 0.0;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsg = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsg = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsg = -INFINITY;
             double epsf = 0.0;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                epsf = NAN;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                epsf = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                epsf = -INFINITY;
             double epsx = 0.0000000001;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                epsx = NAN;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsx = +INFINITY;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsx = -INFINITY;
             double diffstep = 1.0e-6;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                diffstep = NAN;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                diffstep = +INFINITY;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                diffstep = -INFINITY;
             ae_int_t maxits = 0;
             mincgstate state;
@@ -3377,9 +3376,9 @@ int main() {
             mincgoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -3389,7 +3388,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minlp_basic: Basic linear programming example\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
+      for (int Test = -1; Test < 15; Test++) {
          try {
          //
          // This example demonstrates how to minimize
@@ -3416,41 +3415,41 @@ int main() {
          //       BndL[i]=BndU[i]).
          //
             real_2d_array a = "[[1,-1],[1,+1]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_deleting_row(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_deleting_col(a);
             real_1d_array al = "[-1,-inf]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(al);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_deleting_element(al);
             real_1d_array au = "[+inf,+1]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(au);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_deleting_element(au);
             real_1d_array c = "[-0.1,-1]";
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_nan(c);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_deleting_element(c);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_deleting_element(s);
             real_1d_array bndl = "[-1,-1]";
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_nan(bndl);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_deleting_element(bndl);
             real_1d_array bndu = "[+1,+1]";
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_vector_by_nan(bndu);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_vector_by_deleting_element(bndu);
             real_1d_array x;
             minlpstate state;
@@ -3490,9 +3489,9 @@ int main() {
             minlpoptimize(state);
             minlpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[0,1]", 0.0005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -3502,7 +3501,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minnlc_d_inequality: Nonlinearly constrained optimization (inequality constraints)\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      for (int Test = -1; Test < 9; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -3518,25 +3517,25 @@ int main() {
          //    x0^2 + x1^2 - 1 <= 0
          //
             real_1d_array x0 = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x0);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x0);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x0);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsx = 0.000001;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsx = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsx = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             real_1d_array bndl = "[0,0]";
@@ -3659,9 +3658,9 @@ int main() {
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -3671,7 +3670,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minnlc_d_equality: Nonlinearly constrained optimization (equality constraints)\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      for (int Test = -1; Test < 9; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -3683,25 +3682,25 @@ int main() {
          //    x0^2 + x1^2 - 1 = 0
          //
             real_1d_array x0 = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x0);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x0);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x0);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsx = 0.000001;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsx = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsx = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minnlcstate state;
@@ -3825,9 +3824,9 @@ int main() {
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -3837,7 +3836,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minnlc_d_mixed: Nonlinearly constrained optimization with mixed equality/inequality constraints\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      for (int Test = -1; Test < 9; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -3853,25 +3852,25 @@ int main() {
          //    x2-exp(x0) = 0
          //
             real_1d_array x0 = "[0,0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x0);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x0);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x0);
             real_1d_array s = "[1,1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsx = 0.000001;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsx = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsx = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minnlcstate state;
@@ -3998,9 +3997,9 @@ int main() {
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -4010,7 +4009,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minns_d_unconstrained: Nonsmooth unconstrained optimization\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
+      for (int Test = -1; Test < 15; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -4020,39 +4019,39 @@ int main() {
          // using nonsmooth nonlinear optimizer.
          //
             real_1d_array x0 = "[1,1]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x0);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x0);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x0);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsx = 0.00001;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsx = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsx = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsx = -INFINITY;
             double radius = 0.1;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                radius = NAN;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                radius = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                radius = -INFINITY;
             double rho = 0.0;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                rho = NAN;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                rho = +INFINITY;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                rho = -INFINITY;
             ae_int_t maxits = 0;
             minnsstate state;
@@ -4128,9 +4127,9 @@ int main() {
             minnsoptimize(state, nsfunc1_jac);
             minnsresults(state, x1, rep);
             Ok = Ok && doc_test_real_vector(x1, "[0.0000,0.0000]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -4140,7 +4139,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minns_d_diff: Nonsmooth unconstrained optimization with numerical differentiation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 18; _spoil_scenario++) {
+      for (int Test = -1; Test < 18; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -4162,46 +4161,46 @@ int main() {
          //       function evaluations will be performed.
          //
             real_1d_array x0 = "[1,1]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x0);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x0);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x0);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsx = 0.00001;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsx = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsx = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsx = -INFINITY;
             double diffstep = 0.000001;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                diffstep = NAN;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                diffstep = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                diffstep = -INFINITY;
             double radius = 0.1;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                radius = NAN;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                radius = +INFINITY;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                radius = -INFINITY;
             double rho = 0.0;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                rho = NAN;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                rho = +INFINITY;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                rho = -INFINITY;
             ae_int_t maxits = 0;
             minnsstate state;
@@ -4237,9 +4236,9 @@ int main() {
             minnsoptimize(state, nsfunc1_fvec);
             minnsresults(state, x1, rep);
             Ok = Ok && doc_test_real_vector(x1, "[0.0000,0.0000]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -4249,7 +4248,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minns_d_bc: Nonsmooth box constrained optimization\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 17; _spoil_scenario++) {
+      for (int Test = -1; Test < 17; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -4264,45 +4263,45 @@ int main() {
          // using nonsmooth nonlinear optimizer.
          //
             real_1d_array x0 = "[1,1]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x0);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x0);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x0);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             real_1d_array bndl = "[1,-inf]";
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_nan(bndl);
             real_1d_array bndu = "[+inf,+inf]";
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_nan(bndu);
             double epsx = 0.00001;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsx = NAN;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                epsx = +INFINITY;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                epsx = -INFINITY;
             double radius = 0.1;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                radius = NAN;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                radius = +INFINITY;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                radius = -INFINITY;
             double rho = 0.0;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                rho = NAN;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                rho = +INFINITY;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                rho = -INFINITY;
             ae_int_t maxits = 0;
             minnsstate state;
@@ -4389,9 +4388,9 @@ int main() {
             minnsoptimize(state, nsfunc1_jac);
             minnsresults(state, x1, rep);
             Ok = Ok && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -4401,7 +4400,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minns_d_nlc: Nonsmooth nonlinearly constrained optimization\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
+      for (int Test = -1; Test < 15; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -4418,39 +4417,39 @@ int main() {
          // demonstrate nonlinearly constrained optimization setup.
          //
             real_1d_array x0 = "[1,1]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x0);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x0);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x0);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
             double epsx = 0.00001;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                epsx = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                epsx = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                epsx = -INFINITY;
             double radius = 0.1;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                radius = NAN;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                radius = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                radius = -INFINITY;
             double rho = 50.0;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                rho = NAN;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                rho = +INFINITY;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                rho = -INFINITY;
             ae_int_t maxits = 0;
             minnsstate state;
@@ -4545,9 +4544,9 @@ int main() {
             minnsoptimize(state, nsfunc2_jac);
             minnsresults(state, x1, rep);
             Ok = Ok && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -4557,7 +4556,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minbc_d_1: Nonlinear optimization with box constraints\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 20; _spoil_scenario++) {
+      for (int Test = -1; Test < 20; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -4581,52 +4580,52 @@ int main() {
          // * set stopping criteria
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_deleting_element(s);
             real_1d_array bndl = "[-1,-1]";
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_nan(bndl);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_deleting_element(bndl);
             real_1d_array bndu = "[+1,+1]";
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_nan(bndu);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_deleting_element(bndu);
             minbcstate state;
             double epsg = 0.0;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                epsg = NAN;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                epsg = +INFINITY;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsg = -INFINITY;
             double epsf = 0.0;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsf = NAN;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                epsf = +INFINITY;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                epsf = -INFINITY;
             double epsx = 0.000001;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                epsx = NAN;
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                epsx = +INFINITY;
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minbccreate(x, state);
@@ -4673,9 +4672,9 @@ int main() {
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -4685,7 +4684,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST minbc_numdiff: Nonlinear optimization with bound constraints and numerical differentiation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 23; _spoil_scenario++) {
+      for (int Test = -1; Test < 23; Test++) {
          try {
          //
          // This example demonstrates minimization of
@@ -4705,60 +4704,60 @@ int main() {
          //   for some common errors like nonsmoothness or bad analytic gradient
          //
             real_1d_array x = "[0,0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             real_1d_array s = "[1,1]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(s);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_deleting_element(s);
             real_1d_array bndl = "[-1,-1]";
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_nan(bndl);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_deleting_element(bndl);
             real_1d_array bndu = "[+1,+1]";
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_nan(bndu);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_deleting_element(bndu);
             minbcstate state;
             double epsg = 0.0;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                epsg = NAN;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                epsg = +INFINITY;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsg = -INFINITY;
             double epsf = 0.0;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsf = NAN;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                epsf = +INFINITY;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                epsf = -INFINITY;
             double epsx = 0.000001;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                epsx = NAN;
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                epsx = +INFINITY;
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             double diffstep = 1.0e-6;
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                diffstep = NAN;
-            if (_spoil_scenario == 21)
+            if (Test == 21)
                diffstep = +INFINITY;
-            if (_spoil_scenario == 22)
+            if (Test == 22)
                diffstep = -INFINITY;
          //
          // Now we are ready to actually optimize something:
@@ -4801,9 +4800,9 @@ int main() {
             minbcoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
             Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -4812,14 +4811,15 @@ int main() {
       }
       AllOk = AllOk && Ok;
    // printf("TEST nneighbor_d_1: Nearest neighbor search, KNN queries\n"), fflush(stdout);
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int Test = -1; Test < 3; Test++) {
          try {
             real_2d_array a = "[[0,0],[0,1],[1,0],[1,1]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(a);
             ae_int_t nx = 2;
             ae_int_t ny = 0;
@@ -4834,9 +4834,9 @@ int main() {
             Ok = Ok && doc_test_int(k, 1);
             kdtreequeryresultsx(kdt, r);
             Ok = Ok && doc_test_real_matrix(r, "[[0,0]]", 0.05);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -4846,14 +4846,14 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST nneighbor_t_2: Subsequent queries; buffered functions must use previously allocated storage (if large enough), so buffer may contain some info from previous call\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
             real_2d_array a = "[[0,0],[0,1],[1,0],[1,1]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(a);
             ae_int_t nx = 2;
             ae_int_t ny = 0;
@@ -4873,9 +4873,9 @@ int main() {
             Ok = Ok && doc_test_int(k, 1);
             kdtreequeryresultsx(kdt, rx);
             Ok = Ok && doc_test_real_matrix(rx, "[[0,0],[1,1]]", 0.05);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -4885,14 +4885,14 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST nneighbor_d_2: Serialization of KD-trees\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
             real_2d_array a = "[[0,0],[0,1],[1,0],[1,1]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(a);
             ae_int_t nx = 2;
             ae_int_t ny = 0;
@@ -4919,9 +4919,9 @@ int main() {
             kdtreequeryresultsx(kdt1, r1);
             Ok = Ok && doc_test_real_matrix(r0, "[[0,0]]", 0.05);
             Ok = Ok && doc_test_real_matrix(r1, "[[0,0]]", 0.05);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -4931,37 +4931,37 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST odesolver_d1: Solving y'=-y with ODE solver\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 13; _spoil_scenario++) {
+      for (int Test = -1; Test < 13; Test++) {
          try {
             real_1d_array y = "[1]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(y);
             real_1d_array x = "[0, 1, 2, 3]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(x);
             double eps = 0.00001;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                eps = NAN;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                eps = +INFINITY;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                eps = -INFINITY;
             double h = 0.0;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                h = NAN;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                h = +INFINITY;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                h = -INFINITY;
             odesolverstate s;
             ae_int_t m;
@@ -4974,9 +4974,9 @@ int main() {
             Ok = Ok && doc_test_int(m, 4);
             Ok = Ok && doc_test_real_vector(xtbl, "[0, 1, 2, 3]", 0.005);
             Ok = Ok && doc_test_real_matrix(ytbl, "[[1], [0.367], [0.135], [0.050]]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -4986,29 +4986,29 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matdet_d_1: Determinant calculation, real matrix, short form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      for (int Test = -1; Test < 7; Test++) {
          try {
             real_2d_array b = "[[1,2],[2,1]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_adding_row(b);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_adding_col(b);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_deleting_row(b);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_matrix_by_deleting_col(b);
             double a;
             a = rmatrixdet(b);
             Ok = Ok && doc_test_real(a, -3, 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5018,25 +5018,25 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matdet_d_2: Determinant calculation, real matrix, full form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      for (int Test = -1; Test < 5; Test++) {
          try {
             real_2d_array b = "[[5,4],[4,5]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(b);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(b);
             double a;
             a = rmatrixdet(b, 2);
             Ok = Ok && doc_test_real(a, 9, 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5046,29 +5046,29 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matdet_d_3: Determinant calculation, complex matrix, short form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      for (int Test = -1; Test < 7; Test++) {
          try {
             complex_2d_array b = "[[1+1i,2],[2,1-1i]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_adding_row(b);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_adding_col(b);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_deleting_row(b);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_matrix_by_deleting_col(b);
             complex a;
             a = cmatrixdet(b);
             Ok = Ok && doc_test_complex(a, -2, 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5078,25 +5078,25 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matdet_d_4: Determinant calculation, complex matrix, full form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      for (int Test = -1; Test < 5; Test++) {
          try {
             complex a;
             complex_2d_array b = "[[5i,4],[4i,5]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(b);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(b);
             a = cmatrixdet(b, 2);
             Ok = Ok && doc_test_complex(a, complex(0, 9), 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5106,29 +5106,29 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matdet_d_5: Determinant calculation, complex matrix with zero imaginary part, short form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      for (int Test = -1; Test < 7; Test++) {
          try {
             complex a;
             complex_2d_array b = "[[9,1],[2,1]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_adding_row(b);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_adding_col(b);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_deleting_row(b);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_matrix_by_deleting_col(b);
             a = cmatrixdet(b);
             Ok = Ok && doc_test_complex(a, 7, 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5138,25 +5138,25 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matdet_t_0: Determinant calculation, real matrix, full form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      for (int Test = -1; Test < 5; Test++) {
          try {
             double a;
             real_2d_array b = "[[3,4],[-4,3]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(b);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(b);
             a = rmatrixdet(b, 2);
             Ok = Ok && doc_test_real(a, 25, 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5166,34 +5166,34 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matdet_t_1: Determinant calculation, real matrix, LU, short form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      for (int Test = -1; Test < 9; Test++) {
          try {
             double a;
             real_2d_array b = "[[1,2],[2,5]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_adding_row(b);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_adding_col(b);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_deleting_row(b);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_matrix_by_deleting_col(b);
             integer_1d_array p = "[1,1]";
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_adding_element(p);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_deleting_element(p);
             a = rmatrixludet(b, p);
             Ok = Ok && doc_test_real(a, -5, 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5203,28 +5203,28 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matdet_t_2: Determinant calculation, real matrix, LU, full form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
             double a;
             real_2d_array b = "[[5,4],[4,5]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(b);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(b);
             integer_1d_array p = "[0,1]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_deleting_element(p);
             a = rmatrixludet(b, p, 2);
             Ok = Ok && doc_test_real(a, 25, 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5234,25 +5234,25 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matdet_t_3: Determinant calculation, complex matrix, full form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      for (int Test = -1; Test < 5; Test++) {
          try {
             complex a;
             complex_2d_array b = "[[5i,4],[-4,5i]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(b);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(b);
             a = cmatrixdet(b, 2);
             Ok = Ok && doc_test_complex(a, -9, 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5262,34 +5262,34 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matdet_t_4: Determinant calculation, complex matrix, LU, short form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      for (int Test = -1; Test < 9; Test++) {
          try {
             complex a;
             complex_2d_array b = "[[1,2],[2,5i]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_adding_row(b);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_adding_col(b);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_deleting_row(b);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_matrix_by_deleting_col(b);
             integer_1d_array p = "[1,1]";
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_adding_element(p);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_deleting_element(p);
             a = cmatrixludet(b, p);
             Ok = Ok && doc_test_complex(a, complex(0, -5), 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5299,28 +5299,28 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST matdet_t_5: Determinant calculation, complex matrix, LU, full form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
             complex a;
             complex_2d_array b = "[[5,4i],[4,5]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(b);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(b);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(b);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(b);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(b);
             integer_1d_array p = "[0,1]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_deleting_element(p);
             a = cmatrixludet(b, p, 2);
             Ok = Ok && doc_test_complex(a, 25, 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5330,7 +5330,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST autogk_d1: Integrating f=exp(x) by adaptive integrator\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
          //
          // This example demonstrates integration of f=exp(x) on [0,1]:
@@ -5339,18 +5339,18 @@ int main() {
          // * and finally we obtain results with autogkresults() call
          //
             double a = 0.0;
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                a = NAN;
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                a = +INFINITY;
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                a = -INFINITY;
             double b = 1.0;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                b = NAN;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                b = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                b = -INFINITY;
             autogkstate s;
             double v;
@@ -5359,9 +5359,9 @@ int main() {
             autogkintegrate(s, int_function_1_func);
             autogkresults(s, v, rep);
             Ok = Ok && doc_test_real(v, 1.7182, 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5371,14 +5371,14 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST basestat_d_base: Basic functionality (moments, adev, median, percentile)\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
             real_1d_array x = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             double mean;
             double variance;
@@ -5407,17 +5407,17 @@ int main() {
             samplemedian(x, v);
             Ok = Ok && doc_test_real(v, 20.5, 0.01);
             p = 0.5;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                p = NAN;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                p = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                p = -INFINITY;
             samplepercentile(x, p, v);
             Ok = Ok && doc_test_real(v, 20.5, 0.01);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5427,32 +5427,32 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST basestat_d_c2: Correlation (covariance) between two random variables\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
+      for (int Test = -1; Test < 10; Test++) {
          try {
          //
          // We have two samples - x and y, and want to measure dependency between them
          //
             real_1d_array x = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_adding_element(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0,1,2,3,4,5,6,7,8,9]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             double v;
          //
@@ -5467,9 +5467,9 @@ int main() {
             Ok = Ok && doc_test_real(v, 0.9627, 0.001);
             v = spearmancorr2(x, y);
             Ok = Ok && doc_test_real(v, 1.000, 0.001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5479,7 +5479,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST basestat_d_cm: Correlation (covariance) between components of random vector\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // X is a sample matrix:
@@ -5487,11 +5487,11 @@ int main() {
          // * J-th column corresponds to J-th variable
          //
             real_2d_array x = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(x);
             real_2d_array c;
          //
@@ -5509,9 +5509,9 @@ int main() {
             Ok = Ok && doc_test_real_matrix(c, "[[1.000,0.535,-0.272],[0.535,1.000,-0.249],[-0.272,-0.249,1.000]]", 0.01);
             spearmancorrm(x, c);
             Ok = Ok && doc_test_real_matrix(c, "[[1.000,0.556,-0.306],[0.556,1.000,-0.750],[-0.306,-0.750,1.000]]", 0.01);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5521,7 +5521,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST basestat_d_cm2: Correlation (covariance) between two random vectors\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
          //
          // X and Y are sample matrices:
@@ -5529,18 +5529,18 @@ int main() {
          // * J-th column corresponds to J-th variable
          //
             real_2d_array x = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(x);
             real_2d_array y = "[[2,3],[2,1],[-1,6],[-9,9],[7,1]]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_nan(y);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_posinf(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_neginf(y);
             real_2d_array c;
          //
@@ -5558,9 +5558,9 @@ int main() {
             Ok = Ok && doc_test_real_matrix(c, "[[0.519,-0.699],[0.497,-0.518],[0.596,-0.433]]", 0.01);
             spearmancorrm2(x, y, c);
             Ok = Ok && doc_test_real_matrix(c, "[[0.541,-0.649],[0.216,-0.433],[0.433,-0.135]]", 0.01);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5570,7 +5570,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST basestat_t_base: Tests ability to detect errors in inputs\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 34; _spoil_scenario++) {
+      for (int Test = -1; Test < 34; Test++) {
          try {
             double mean;
             double variance;
@@ -5583,97 +5583,97 @@ int main() {
          // first, we test short form of functions
          //
             real_1d_array x1 = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x1);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x1);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x1);
             samplemoments(x1, mean, variance, skewness, kurtosis);
             real_1d_array x2 = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(x2);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(x2);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(x2);
             sampleadev(x2, adev);
             real_1d_array x3 = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_nan(x3);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_posinf(x3);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_neginf(x3);
             samplemedian(x3, v);
             real_1d_array x4 = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_nan(x4);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_posinf(x4);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_neginf(x4);
             p = 0.5;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                p = NAN;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                p = +INFINITY;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                p = -INFINITY;
             samplepercentile(x4, p, v);
          //
          // and then we test full form
          //
             real_1d_array x5 = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_nan(x5);
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_posinf(x5);
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                spoil_vector_by_neginf(x5);
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_deleting_element(x5);
             samplemoments(x5, 10, mean, variance, skewness, kurtosis);
             real_1d_array x6 = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_nan(x6);
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                spoil_vector_by_posinf(x6);
-            if (_spoil_scenario == 21)
+            if (Test == 21)
                spoil_vector_by_neginf(x6);
-            if (_spoil_scenario == 22)
+            if (Test == 22)
                spoil_vector_by_deleting_element(x6);
             sampleadev(x6, 10, adev);
             real_1d_array x7 = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 23)
+            if (Test == 23)
                spoil_vector_by_nan(x7);
-            if (_spoil_scenario == 24)
+            if (Test == 24)
                spoil_vector_by_posinf(x7);
-            if (_spoil_scenario == 25)
+            if (Test == 25)
                spoil_vector_by_neginf(x7);
-            if (_spoil_scenario == 26)
+            if (Test == 26)
                spoil_vector_by_deleting_element(x7);
             samplemedian(x7, 10, v);
             real_1d_array x8 = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 27)
+            if (Test == 27)
                spoil_vector_by_nan(x8);
-            if (_spoil_scenario == 28)
+            if (Test == 28)
                spoil_vector_by_posinf(x8);
-            if (_spoil_scenario == 29)
+            if (Test == 29)
                spoil_vector_by_neginf(x8);
-            if (_spoil_scenario == 30)
+            if (Test == 30)
                spoil_vector_by_deleting_element(x8);
             p = 0.5;
-            if (_spoil_scenario == 31)
+            if (Test == 31)
                p = NAN;
-            if (_spoil_scenario == 32)
+            if (Test == 32)
                p = +INFINITY;
-            if (_spoil_scenario == 33)
+            if (Test == 33)
                p = -INFINITY;
             samplepercentile(x8, 10, p, v);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -5683,7 +5683,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST basestat_t_covcorr: Tests ability to detect errors in inputs\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 126; _spoil_scenario++) {
+      for (int Test = -1; Test < 126; Test++) {
          try {
             double v;
             real_2d_array c;
@@ -5691,323 +5691,323 @@ int main() {
          // 2-sample short-form cov/corr are tested
          //
             real_1d_array x1 = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x1);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x1);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x1);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_adding_element(x1);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_deleting_element(x1);
             real_1d_array y1 = "[0,1,2,3,4,5,6,7,8,9]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y1);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y1);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y1);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y1);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y1);
             v = cov2(x1, y1);
             real_1d_array x2 = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_nan(x2);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_posinf(x2);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_neginf(x2);
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_vector_by_adding_element(x2);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_vector_by_deleting_element(x2);
             real_1d_array y2 = "[0,1,2,3,4,5,6,7,8,9]";
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_nan(y2);
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_posinf(y2);
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                spoil_vector_by_neginf(y2);
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_adding_element(y2);
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_deleting_element(y2);
             v = pearsoncorr2(x2, y2);
             real_1d_array x3 = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                spoil_vector_by_nan(x3);
-            if (_spoil_scenario == 21)
+            if (Test == 21)
                spoil_vector_by_posinf(x3);
-            if (_spoil_scenario == 22)
+            if (Test == 22)
                spoil_vector_by_neginf(x3);
-            if (_spoil_scenario == 23)
+            if (Test == 23)
                spoil_vector_by_adding_element(x3);
-            if (_spoil_scenario == 24)
+            if (Test == 24)
                spoil_vector_by_deleting_element(x3);
             real_1d_array y3 = "[0,1,2,3,4,5,6,7,8,9]";
-            if (_spoil_scenario == 25)
+            if (Test == 25)
                spoil_vector_by_nan(y3);
-            if (_spoil_scenario == 26)
+            if (Test == 26)
                spoil_vector_by_posinf(y3);
-            if (_spoil_scenario == 27)
+            if (Test == 27)
                spoil_vector_by_neginf(y3);
-            if (_spoil_scenario == 28)
+            if (Test == 28)
                spoil_vector_by_adding_element(y3);
-            if (_spoil_scenario == 29)
+            if (Test == 29)
                spoil_vector_by_deleting_element(y3);
             v = spearmancorr2(x3, y3);
          //
          // 2-sample full-form cov/corr are tested
          //
             real_1d_array x1a = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 30)
+            if (Test == 30)
                spoil_vector_by_nan(x1a);
-            if (_spoil_scenario == 31)
+            if (Test == 31)
                spoil_vector_by_posinf(x1a);
-            if (_spoil_scenario == 32)
+            if (Test == 32)
                spoil_vector_by_neginf(x1a);
-            if (_spoil_scenario == 33)
+            if (Test == 33)
                spoil_vector_by_deleting_element(x1a);
             real_1d_array y1a = "[0,1,2,3,4,5,6,7,8,9]";
-            if (_spoil_scenario == 34)
+            if (Test == 34)
                spoil_vector_by_nan(y1a);
-            if (_spoil_scenario == 35)
+            if (Test == 35)
                spoil_vector_by_posinf(y1a);
-            if (_spoil_scenario == 36)
+            if (Test == 36)
                spoil_vector_by_neginf(y1a);
-            if (_spoil_scenario == 37)
+            if (Test == 37)
                spoil_vector_by_deleting_element(y1a);
             v = cov2(x1a, y1a, 10);
             real_1d_array x2a = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 38)
+            if (Test == 38)
                spoil_vector_by_nan(x2a);
-            if (_spoil_scenario == 39)
+            if (Test == 39)
                spoil_vector_by_posinf(x2a);
-            if (_spoil_scenario == 40)
+            if (Test == 40)
                spoil_vector_by_neginf(x2a);
-            if (_spoil_scenario == 41)
+            if (Test == 41)
                spoil_vector_by_deleting_element(x2a);
             real_1d_array y2a = "[0,1,2,3,4,5,6,7,8,9]";
-            if (_spoil_scenario == 42)
+            if (Test == 42)
                spoil_vector_by_nan(y2a);
-            if (_spoil_scenario == 43)
+            if (Test == 43)
                spoil_vector_by_posinf(y2a);
-            if (_spoil_scenario == 44)
+            if (Test == 44)
                spoil_vector_by_neginf(y2a);
-            if (_spoil_scenario == 45)
+            if (Test == 45)
                spoil_vector_by_deleting_element(y2a);
             v = pearsoncorr2(x2a, y2a, 10);
             real_1d_array x3a = "[0,1,4,9,16,25,36,49,64,81]";
-            if (_spoil_scenario == 46)
+            if (Test == 46)
                spoil_vector_by_nan(x3a);
-            if (_spoil_scenario == 47)
+            if (Test == 47)
                spoil_vector_by_posinf(x3a);
-            if (_spoil_scenario == 48)
+            if (Test == 48)
                spoil_vector_by_neginf(x3a);
-            if (_spoil_scenario == 49)
+            if (Test == 49)
                spoil_vector_by_deleting_element(x3a);
             real_1d_array y3a = "[0,1,2,3,4,5,6,7,8,9]";
-            if (_spoil_scenario == 50)
+            if (Test == 50)
                spoil_vector_by_nan(y3a);
-            if (_spoil_scenario == 51)
+            if (Test == 51)
                spoil_vector_by_posinf(y3a);
-            if (_spoil_scenario == 52)
+            if (Test == 52)
                spoil_vector_by_neginf(y3a);
-            if (_spoil_scenario == 53)
+            if (Test == 53)
                spoil_vector_by_deleting_element(y3a);
             v = spearmancorr2(x3a, y3a, 10);
          //
          // vector short-form cov/corr are tested.
          //
             real_2d_array x4 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 54)
+            if (Test == 54)
                spoil_matrix_by_nan(x4);
-            if (_spoil_scenario == 55)
+            if (Test == 55)
                spoil_matrix_by_posinf(x4);
-            if (_spoil_scenario == 56)
+            if (Test == 56)
                spoil_matrix_by_neginf(x4);
             covm(x4, c);
             real_2d_array x5 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 57)
+            if (Test == 57)
                spoil_matrix_by_nan(x5);
-            if (_spoil_scenario == 58)
+            if (Test == 58)
                spoil_matrix_by_posinf(x5);
-            if (_spoil_scenario == 59)
+            if (Test == 59)
                spoil_matrix_by_neginf(x5);
             pearsoncorrm(x5, c);
             real_2d_array x6 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 60)
+            if (Test == 60)
                spoil_matrix_by_nan(x6);
-            if (_spoil_scenario == 61)
+            if (Test == 61)
                spoil_matrix_by_posinf(x6);
-            if (_spoil_scenario == 62)
+            if (Test == 62)
                spoil_matrix_by_neginf(x6);
             spearmancorrm(x6, c);
          //
          // vector full-form cov/corr are tested.
          //
             real_2d_array x7 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 63)
+            if (Test == 63)
                spoil_matrix_by_nan(x7);
-            if (_spoil_scenario == 64)
+            if (Test == 64)
                spoil_matrix_by_posinf(x7);
-            if (_spoil_scenario == 65)
+            if (Test == 65)
                spoil_matrix_by_neginf(x7);
-            if (_spoil_scenario == 66)
+            if (Test == 66)
                spoil_matrix_by_deleting_row(x7);
-            if (_spoil_scenario == 67)
+            if (Test == 67)
                spoil_matrix_by_deleting_col(x7);
             covm(x7, 5, 3, c);
             real_2d_array x8 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 68)
+            if (Test == 68)
                spoil_matrix_by_nan(x8);
-            if (_spoil_scenario == 69)
+            if (Test == 69)
                spoil_matrix_by_posinf(x8);
-            if (_spoil_scenario == 70)
+            if (Test == 70)
                spoil_matrix_by_neginf(x8);
-            if (_spoil_scenario == 71)
+            if (Test == 71)
                spoil_matrix_by_deleting_row(x8);
-            if (_spoil_scenario == 72)
+            if (Test == 72)
                spoil_matrix_by_deleting_col(x8);
             pearsoncorrm(x8, 5, 3, c);
             real_2d_array x9 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 73)
+            if (Test == 73)
                spoil_matrix_by_nan(x9);
-            if (_spoil_scenario == 74)
+            if (Test == 74)
                spoil_matrix_by_posinf(x9);
-            if (_spoil_scenario == 75)
+            if (Test == 75)
                spoil_matrix_by_neginf(x9);
-            if (_spoil_scenario == 76)
+            if (Test == 76)
                spoil_matrix_by_deleting_row(x9);
-            if (_spoil_scenario == 77)
+            if (Test == 77)
                spoil_matrix_by_deleting_col(x9);
             spearmancorrm(x9, 5, 3, c);
          //
          // cross-vector short-form cov/corr are tested.
          //
             real_2d_array x10 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 78)
+            if (Test == 78)
                spoil_matrix_by_nan(x10);
-            if (_spoil_scenario == 79)
+            if (Test == 79)
                spoil_matrix_by_posinf(x10);
-            if (_spoil_scenario == 80)
+            if (Test == 80)
                spoil_matrix_by_neginf(x10);
             real_2d_array y10 = "[[2,3],[2,1],[-1,6],[-9,9],[7,1]]";
-            if (_spoil_scenario == 81)
+            if (Test == 81)
                spoil_matrix_by_nan(y10);
-            if (_spoil_scenario == 82)
+            if (Test == 82)
                spoil_matrix_by_posinf(y10);
-            if (_spoil_scenario == 83)
+            if (Test == 83)
                spoil_matrix_by_neginf(y10);
             covm2(x10, y10, c);
             real_2d_array x11 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 84)
+            if (Test == 84)
                spoil_matrix_by_nan(x11);
-            if (_spoil_scenario == 85)
+            if (Test == 85)
                spoil_matrix_by_posinf(x11);
-            if (_spoil_scenario == 86)
+            if (Test == 86)
                spoil_matrix_by_neginf(x11);
             real_2d_array y11 = "[[2,3],[2,1],[-1,6],[-9,9],[7,1]]";
-            if (_spoil_scenario == 87)
+            if (Test == 87)
                spoil_matrix_by_nan(y11);
-            if (_spoil_scenario == 88)
+            if (Test == 88)
                spoil_matrix_by_posinf(y11);
-            if (_spoil_scenario == 89)
+            if (Test == 89)
                spoil_matrix_by_neginf(y11);
             pearsoncorrm2(x11, y11, c);
             real_2d_array x12 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 90)
+            if (Test == 90)
                spoil_matrix_by_nan(x12);
-            if (_spoil_scenario == 91)
+            if (Test == 91)
                spoil_matrix_by_posinf(x12);
-            if (_spoil_scenario == 92)
+            if (Test == 92)
                spoil_matrix_by_neginf(x12);
             real_2d_array y12 = "[[2,3],[2,1],[-1,6],[-9,9],[7,1]]";
-            if (_spoil_scenario == 93)
+            if (Test == 93)
                spoil_matrix_by_nan(y12);
-            if (_spoil_scenario == 94)
+            if (Test == 94)
                spoil_matrix_by_posinf(y12);
-            if (_spoil_scenario == 95)
+            if (Test == 95)
                spoil_matrix_by_neginf(y12);
             spearmancorrm2(x12, y12, c);
          //
          // cross-vector full-form cov/corr are tested.
          //
             real_2d_array x13 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 96)
+            if (Test == 96)
                spoil_matrix_by_nan(x13);
-            if (_spoil_scenario == 97)
+            if (Test == 97)
                spoil_matrix_by_posinf(x13);
-            if (_spoil_scenario == 98)
+            if (Test == 98)
                spoil_matrix_by_neginf(x13);
-            if (_spoil_scenario == 99)
+            if (Test == 99)
                spoil_matrix_by_deleting_row(x13);
-            if (_spoil_scenario == 100)
+            if (Test == 100)
                spoil_matrix_by_deleting_col(x13);
             real_2d_array y13 = "[[2,3],[2,1],[-1,6],[-9,9],[7,1]]";
-            if (_spoil_scenario == 101)
+            if (Test == 101)
                spoil_matrix_by_nan(y13);
-            if (_spoil_scenario == 102)
+            if (Test == 102)
                spoil_matrix_by_posinf(y13);
-            if (_spoil_scenario == 103)
+            if (Test == 103)
                spoil_matrix_by_neginf(y13);
-            if (_spoil_scenario == 104)
+            if (Test == 104)
                spoil_matrix_by_deleting_row(y13);
-            if (_spoil_scenario == 105)
+            if (Test == 105)
                spoil_matrix_by_deleting_col(y13);
             covm2(x13, y13, 5, 3, 2, c);
             real_2d_array x14 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 106)
+            if (Test == 106)
                spoil_matrix_by_nan(x14);
-            if (_spoil_scenario == 107)
+            if (Test == 107)
                spoil_matrix_by_posinf(x14);
-            if (_spoil_scenario == 108)
+            if (Test == 108)
                spoil_matrix_by_neginf(x14);
-            if (_spoil_scenario == 109)
+            if (Test == 109)
                spoil_matrix_by_deleting_row(x14);
-            if (_spoil_scenario == 110)
+            if (Test == 110)
                spoil_matrix_by_deleting_col(x14);
             real_2d_array y14 = "[[2,3],[2,1],[-1,6],[-9,9],[7,1]]";
-            if (_spoil_scenario == 111)
+            if (Test == 111)
                spoil_matrix_by_nan(y14);
-            if (_spoil_scenario == 112)
+            if (Test == 112)
                spoil_matrix_by_posinf(y14);
-            if (_spoil_scenario == 113)
+            if (Test == 113)
                spoil_matrix_by_neginf(y14);
-            if (_spoil_scenario == 114)
+            if (Test == 114)
                spoil_matrix_by_deleting_row(y14);
-            if (_spoil_scenario == 115)
+            if (Test == 115)
                spoil_matrix_by_deleting_col(y14);
             pearsoncorrm2(x14, y14, 5, 3, 2, c);
             real_2d_array x15 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
-            if (_spoil_scenario == 116)
+            if (Test == 116)
                spoil_matrix_by_nan(x15);
-            if (_spoil_scenario == 117)
+            if (Test == 117)
                spoil_matrix_by_posinf(x15);
-            if (_spoil_scenario == 118)
+            if (Test == 118)
                spoil_matrix_by_neginf(x15);
-            if (_spoil_scenario == 119)
+            if (Test == 119)
                spoil_matrix_by_deleting_row(x15);
-            if (_spoil_scenario == 120)
+            if (Test == 120)
                spoil_matrix_by_deleting_col(x15);
             real_2d_array y15 = "[[2,3],[2,1],[-1,6],[-9,9],[7,1]]";
-            if (_spoil_scenario == 121)
+            if (Test == 121)
                spoil_matrix_by_nan(y15);
-            if (_spoil_scenario == 122)
+            if (Test == 122)
                spoil_matrix_by_posinf(y15);
-            if (_spoil_scenario == 123)
+            if (Test == 123)
                spoil_matrix_by_neginf(y15);
-            if (_spoil_scenario == 124)
+            if (Test == 124)
                spoil_matrix_by_deleting_row(y15);
-            if (_spoil_scenario == 125)
+            if (Test == 125)
                spoil_matrix_by_deleting_col(y15);
             spearmancorrm2(x15, y15, 5, 3, 2, c);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6017,7 +6017,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST idw_d_mstab: Simple model built with IDW-MSTAB algorithm\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // This example illustrates basic concepts of the IDW models:
@@ -6054,11 +6054,11 @@ int main() {
          // and two function values f(x0)=2, f(x1)=3.
          //
             real_2d_array xy = "[[-1,0,2],[+1,0,3]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             idwbuildersetpoints(builder, xy);
          //
@@ -6080,9 +6080,9 @@ int main() {
          //
             v = idwcalc2(model, 1.0, 0.0);
             Ok = Ok && doc_test_real(v, 3.000, 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6092,7 +6092,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST idw_d_serialize: IDW model serialization/unserialization\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // This example shows how to serialize and unserialize IDW model.
@@ -6113,11 +6113,11 @@ int main() {
             std::string s;
             double v;
             real_2d_array xy = "[[-1,0,2],[+1,0,3]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             idwbuilder builder;
             idwmodel model;
@@ -6140,9 +6140,9 @@ int main() {
          //
             v = idwcalc2(model2, 1.0, 0.0);
             Ok = Ok && doc_test_real(v, 3.000, 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6152,38 +6152,38 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_d_calcdiff: Interpolation and differentiation using barycentric representation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      for (int Test = -1; Test < 12; Test++) {
          try {
          //
          // Here we demonstrate polynomial interpolation and differentiation
          // of y=x^2-x sampled at [0,1,2]. Barycentric representation of polynomial is used.
          //
             real_1d_array x = "[0,1,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_adding_element(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0,0,2]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             double t = -1.0;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                t = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                t = -INFINITY;
             double v;
             double dv;
@@ -6206,9 +6206,9 @@ int main() {
             Ok = Ok && doc_test_real(v, 2.0, 0.00005);
             Ok = Ok && doc_test_real(dv, -3.0, 0.00005);
             Ok = Ok && doc_test_real(d2v, 2.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6218,23 +6218,23 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_d_conv: Conversion between power basis and barycentric representation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      for (int Test = -1; Test < 5; Test++) {
          try {
          //
          // Here we demonstrate conversion of y=x^2-x
          // between power basis and barycentric representation.
          //
             real_1d_array a = "[0,-1,+1]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(a);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(a);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(a);
             double t = 2.0;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                t = +INFINITY;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = -INFINITY;
             real_1d_array a2;
             double v;
@@ -6253,9 +6253,9 @@ int main() {
          // we can also convert back from barycentric representation to power basis
             polynomialbar2pow(p, a2);
             Ok = Ok && doc_test_real_vector(a2, "[0,-1,+1]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6265,7 +6265,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_d_spec: Polynomial interpolation on special grids (equidistant, Chebyshev I/II)\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
+      for (int Test = -1; Test < 11; Test++) {
          try {
          //
          // Temporaries:
@@ -6277,25 +6277,25 @@ int main() {
          // * vectors to store coefficients of quadratic representation
          //
             real_1d_array y_eqdist = "[0,0,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y_eqdist);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y_eqdist);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y_eqdist);
             real_1d_array y_cheb1 = "[-0.116025,0.000000,1.616025]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(y_cheb1);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(y_cheb1);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(y_cheb1);
             real_1d_array y_cheb2 = "[0,0,2]";
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_nan(y_cheb2);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_posinf(y_cheb2);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_neginf(y_cheb2);
             barycentricinterpolant p_eqdist;
             barycentricinterpolant p_cheb1;
@@ -6327,9 +6327,9 @@ int main() {
          // In all three cases we should get same f=6
          //
             double t = -2.0;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                t = +INFINITY;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                t = -INFINITY;
             double v;
             v = polynomialcalceqdist(0.0, 2.0, y_eqdist, t);
@@ -6338,9 +6338,9 @@ int main() {
             Ok = Ok && doc_test_real(v, 6.0, 0.00005);
             v = polynomialcalccheb2(-1, +1, y_cheb2, t);
             Ok = Ok && doc_test_real(v, 6.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6350,39 +6350,39 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_1: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
+      for (int Test = -1; Test < 10; Test++) {
          try {
             real_1d_array x = "[0,1,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0,0,2]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             double t = -1.0;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                t = +INFINITY;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                t = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuild(x, y, 3, p);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 2.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6392,30 +6392,30 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_2: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
             real_1d_array y = "[0,0,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(y);
             double t = -1.0;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                t = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuildeqdist(0.0, 2.0, y, 3, p);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 2.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6425,30 +6425,30 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_3: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
             real_1d_array y = "[-0.116025,0.000000,1.616025]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(y);
             double t = -1.0;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                t = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuildcheb1(-1.0, +1.0, y, 3, p);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 2.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6458,44 +6458,44 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_4: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      for (int Test = -1; Test < 12; Test++) {
          try {
             real_1d_array y = "[0,0,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(y);
             double t = -2.0;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                t = -INFINITY;
             double a = -1.0;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                a = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                a = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                a = -INFINITY;
             double b = +1.0;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                b = NAN;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                b = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                b = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuildcheb2(a, b, y, 3, p);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 6.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6505,28 +6505,28 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_5: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
             real_1d_array y = "[0,0,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(y);
             double t = -1.0;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                t = -INFINITY;
             double v;
             v = polynomialcalceqdist(0.0, 2.0, y, 3, t);
             Ok = Ok && doc_test_real(v, 2.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6536,42 +6536,42 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_6: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      for (int Test = -1; Test < 12; Test++) {
          try {
             real_1d_array y = "[-0.116025,0.000000,1.616025]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(y);
             double t = -1.0;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                t = -INFINITY;
             double a = -1.0;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                a = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                a = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                a = -INFINITY;
             double b = +1.0;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                b = NAN;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                b = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                b = -INFINITY;
             double v;
             v = polynomialcalccheb1(a, b, y, 3, t);
             Ok = Ok && doc_test_real(v, 2.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6581,42 +6581,42 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_7: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      for (int Test = -1; Test < 12; Test++) {
          try {
             real_1d_array y = "[0,0,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(y);
             double t = -2.0;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                t = -INFINITY;
             double a = -1.0;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                a = NAN;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                a = +INFINITY;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                a = -INFINITY;
             double b = +1.0;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                b = NAN;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                b = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                b = -INFINITY;
             double v;
             v = polynomialcalccheb2(a, b, y, 3, t);
             Ok = Ok && doc_test_real(v, 6.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6626,28 +6626,28 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_8: Polynomial interpolation: y=x^2-x, equidistant grid, barycentric form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      for (int Test = -1; Test < 5; Test++) {
          try {
             real_1d_array y = "[0,0,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
             double t = -1.0;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                t = +INFINITY;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuildeqdist(0.0, 2.0, y, p);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 2.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6657,42 +6657,42 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_9: Polynomial interpolation: y=x^2-x, Chebyshev grid (first kind), barycentric form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
+      for (int Test = -1; Test < 11; Test++) {
          try {
             real_1d_array y = "[-0.116025,0.000000,1.616025]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
             double t = -1.0;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                t = +INFINITY;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = -INFINITY;
             double a = -1.0;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                a = NAN;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                a = +INFINITY;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                a = -INFINITY;
             double b = +1.0;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                b = NAN;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                b = +INFINITY;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                b = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuildcheb1(a, b, y, p);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 2.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6702,42 +6702,42 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_10: Polynomial interpolation: y=x^2-x, Chebyshev grid (second kind), barycentric form\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
+      for (int Test = -1; Test < 11; Test++) {
          try {
             real_1d_array y = "[0,0,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
             double t = -2.0;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                t = +INFINITY;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = -INFINITY;
             double a = -1.0;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                a = NAN;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                a = +INFINITY;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                a = -INFINITY;
             double b = +1.0;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                b = NAN;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                b = +INFINITY;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                b = -INFINITY;
             barycentricinterpolant p;
             double v;
             polynomialbuildcheb2(a, b, y, p);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 6.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6747,26 +6747,26 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_11: Polynomial interpolation: y=x^2-x, equidistant grid\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      for (int Test = -1; Test < 5; Test++) {
          try {
             real_1d_array y = "[0,0,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
             double t = -1.0;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                t = +INFINITY;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = -INFINITY;
             double v;
             v = polynomialcalceqdist(0.0, 2.0, y, t);
             Ok = Ok && doc_test_real(v, 2.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6776,40 +6776,40 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_12: Polynomial interpolation: y=x^2-x, Chebyshev grid (first kind)\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
+      for (int Test = -1; Test < 11; Test++) {
          try {
             real_1d_array y = "[-0.116025,0.000000,1.616025]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
             double t = -1.0;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                t = +INFINITY;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = -INFINITY;
             double a = -1.0;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                a = NAN;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                a = +INFINITY;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                a = -INFINITY;
             double b = +1.0;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                b = NAN;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                b = +INFINITY;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                b = -INFINITY;
             double v;
             v = polynomialcalccheb1(a, b, y, t);
             Ok = Ok && doc_test_real(v, 2.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6819,40 +6819,40 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST polint_t_13: Polynomial interpolation: y=x^2-x, Chebyshev grid (second kind)\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
+      for (int Test = -1; Test < 11; Test++) {
          try {
             real_1d_array y = "[0,0,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
             double t = -2.0;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                t = +INFINITY;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                t = -INFINITY;
             double a = -1.0;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                a = NAN;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                a = +INFINITY;
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                a = -INFINITY;
             double b = +1.0;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                b = NAN;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                b = +INFINITY;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                b = -INFINITY;
             double v;
             v = polynomialcalccheb2(a, b, y, t);
             Ok = Ok && doc_test_real(v, 6.0, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6862,38 +6862,38 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline1d_d_linear: Piecewise linear spline interpolation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      for (int Test = -1; Test < 12; Test++) {
          try {
          //
          // We use piecewise linear spline to interpolate f(x)=x^2 sampled
          // at 5 equidistant nodes on [-1,+1].
          //
             real_1d_array x = "[-1.0,-0.5,0.0,+0.5,+1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_adding_element(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[+1.0,0.25,0.0,0.25,+1.0]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             double t = 0.25;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                t = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                t = -INFINITY;
             double v;
             spline1dinterpolant s;
@@ -6902,9 +6902,9 @@ int main() {
          // calculate S(0.25) - it is quite different from 0.25^2=0.0625
             v = spline1dcalc(s, t);
             Ok = Ok && doc_test_real(v, 0.125, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6914,7 +6914,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline1d_d_cubic: Cubic spline interpolation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
+      for (int Test = -1; Test < 10; Test++) {
          try {
          //
          // We use cubic spline to interpolate f(x)=x^2 sampled
@@ -6930,48 +6930,48 @@ int main() {
          // and see that such spline interpolated f(x) with small error.
          //
             real_1d_array x = "[-1.0,-0.5,0.0,+0.5,+1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[+1.0,0.25,0.0,0.25,+1.0]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             double t = 0.25;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                t = +INFINITY;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                t = -INFINITY;
             double v;
             spline1dinterpolant s;
             ae_int_t natural_bound_type = 2;
          //
-         // _spoil_scenario exact boundary conditions: build S(x), calculare S(0.25)
+         // Test exact boundary conditions: build S(x), calculare S(0.25)
          // (almost same as original function)
          //
             spline1dbuildcubic(x, y, s);
             v = spline1dcalc(s, t);
             Ok = Ok && doc_test_real(v, 0.0625, 0.00001);
          //
-         // _spoil_scenario natural boundary conditions: build S(x), calculare S(0.25)
+         // Test natural boundary conditions: build S(x), calculare S(0.25)
          // (small interpolation error)
          //
             spline1dbuildcubic(x, y, 5, natural_bound_type, 0.0, natural_bound_type, 0.0, s);
             v = spline1dcalc(s, t);
             Ok = Ok && doc_test_real(v, 0.0580, 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -6981,7 +6981,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline1d_d_monotone: Monotone interpolation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
+      for (int Test = -1; Test < 10; Test++) {
          try {
          //
          // Spline built witn spline1dbuildcubic() can be non-monotone even when
@@ -6997,26 +6997,26 @@ int main() {
          // into monotone subsequences and builds piecewise monotonic spline.
          //
             real_1d_array x = "[0,1,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_adding_element(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0,1,1]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             spline1dinterpolant s;
          // build spline
@@ -7036,9 +7036,9 @@ int main() {
             Ok = Ok && doc_test_real(v, 1.0000, 0.00005);
             v = spline1dcalc(s, 2.0);
             Ok = Ok && doc_test_real(v, 1.0000, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -7048,7 +7048,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline1d_d_griddiff: Differentiation on the grid using cubic splines\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
+      for (int Test = -1; Test < 10; Test++) {
          try {
          //
          // We use cubic spline to do grid differentiation, i.e. having
@@ -7068,26 +7068,26 @@ int main() {
          // understandable results.
          //
             real_1d_array x = "[-1.0,-0.5,0.0,+0.5,+1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_adding_element(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[+1.0,0.25,0.0,0.25,+1.0]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             real_1d_array d1;
             real_1d_array d2;
@@ -7103,9 +7103,9 @@ int main() {
             spline1dgriddiff2cubic(x, y, d1, d2);
             Ok = Ok && doc_test_real_vector(d1, "[-2.0, -1.0, 0.0, +1.0, +2.0]", 0.0001);
             Ok = Ok && doc_test_real_vector(d2, "[ 2.0,  2.0, 2.0,  2.0,  2.0]", 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -7115,7 +7115,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline1d_d_convdiff: Resampling using cubic splines\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
+      for (int Test = -1; Test < 11; Test++) {
          try {
          //
          // We use cubic spline to do resampling, i.e. having
@@ -7137,29 +7137,29 @@ int main() {
          // understandable results.
          //
             real_1d_array x_old = "[-1.0,-0.5,0.0,+0.5,+1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x_old);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x_old);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x_old);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x_old);
             real_1d_array y_old = "[+1.0,0.25,0.0,0.25,+1.0]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y_old);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y_old);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y_old);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y_old);
             real_1d_array x_new = "[-1.00,-0.75,-0.50,-0.25,0.00,+0.25,+0.50,+0.75,+1.00]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(x_new);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_posinf(x_new);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_neginf(x_new);
             real_1d_array y_new;
             real_1d_array d1_new;
@@ -7185,9 +7185,9 @@ int main() {
             Ok = Ok && doc_test_real_vector(y_new, "[1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]", 0.0001);
             Ok = Ok && doc_test_real_vector(d1_new, "[-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]", 0.0001);
             Ok = Ok && doc_test_real_vector(d2_new, "[2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]", 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -7197,7 +7197,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_nlf: Nonlinear fitting using function value only\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 24; _spoil_scenario++) {
+      for (int Test = -1; Test < 24; Test++) {
          try {
          //
          // In this example we demonstrate exponential fitting
@@ -7209,51 +7209,51 @@ int main() {
          // (we have to tell algorithm what step to use).
          //
             real_2d_array x = "[[-1],[-0.8],[-0.6],[-0.4],[-0.2],[0],[0.2],[0.4],[0.6],[0.8],[1.0]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(x);
             real_1d_array y = "[0.223130, 0.382893, 0.582748, 0.786628, 0.941765, 1.000000, 0.941765, 0.786628, 0.582748, 0.382893, 0.223130]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             real_1d_array c = "[0.3]";
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_nan(c);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_posinf(c);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_neginf(c);
             double epsx = 0.000001;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsx = NAN;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsx = +INFINITY;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             ae_int_t info;
             lsfitstate state;
             lsfitreport rep;
             double diffstep = 0.0001;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                diffstep = NAN;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                diffstep = +INFINITY;
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                diffstep = -INFINITY;
          //
          // Fitting without weights
@@ -7269,15 +7269,15 @@ int main() {
          // (you can change weights and see how it changes result)
          //
             real_1d_array w = "[1,1,1,1,1,1,1,1,1,1,1]";
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_nan(w);
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                spoil_vector_by_posinf(w);
-            if (_spoil_scenario == 21)
+            if (Test == 21)
                spoil_vector_by_neginf(w);
-            if (_spoil_scenario == 22)
+            if (Test == 22)
                spoil_vector_by_adding_element(w);
-            if (_spoil_scenario == 23)
+            if (Test == 23)
                spoil_vector_by_deleting_element(w);
             lsfitcreatewf(x, y, w, c, diffstep, state);
             lsfitsetcond(state, epsx, maxits);
@@ -7285,9 +7285,9 @@ int main() {
             lsfitresults(state, info, c, rep);
             Ok = Ok && doc_test_int(info, 2);
             Ok = Ok && doc_test_real_vector(c, "[1.5]", 0.05);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -7297,7 +7297,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_nlfg: Nonlinear fitting using gradient\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
+      for (int Test = -1; Test < 21; Test++) {
          try {
          //
          // In this example we demonstrate exponential fitting
@@ -7305,40 +7305,40 @@ int main() {
          // using function value and gradient (with respect to c).
          //
             real_2d_array x = "[[-1],[-0.8],[-0.6],[-0.4],[-0.2],[0],[0.2],[0.4],[0.6],[0.8],[1.0]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(x);
             real_1d_array y = "[0.223130, 0.382893, 0.582748, 0.786628, 0.941765, 1.000000, 0.941765, 0.786628, 0.582748, 0.382893, 0.223130]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             real_1d_array c = "[0.3]";
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_nan(c);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_posinf(c);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_neginf(c);
             double epsx = 0.000001;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsx = NAN;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsx = +INFINITY;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             ae_int_t info;
@@ -7358,15 +7358,15 @@ int main() {
          // (you can change weights and see how it changes result)
          //
             real_1d_array w = "[1,1,1,1,1,1,1,1,1,1,1]";
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_nan(w);
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                spoil_vector_by_posinf(w);
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_neginf(w);
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_adding_element(w);
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                spoil_vector_by_deleting_element(w);
             lsfitcreatewfg(x, y, w, c, true, state);
             lsfitsetcond(state, epsx, maxits);
@@ -7374,9 +7374,9 @@ int main() {
             lsfitresults(state, info, c, rep);
             Ok = Ok && doc_test_int(info, 2);
             Ok = Ok && doc_test_real_vector(c, "[1.5]", 0.05);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -7386,7 +7386,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_nlfgh: Nonlinear fitting using gradient and Hessian\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
+      for (int Test = -1; Test < 21; Test++) {
          try {
          //
          // In this example we demonstrate exponential fitting
@@ -7394,40 +7394,40 @@ int main() {
          // using function value, gradient and Hessian (with respect to c)
          //
             real_2d_array x = "[[-1],[-0.8],[-0.6],[-0.4],[-0.2],[0],[0.2],[0.4],[0.6],[0.8],[1.0]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(x);
             real_1d_array y = "[0.223130, 0.382893, 0.582748, 0.786628, 0.941765, 1.000000, 0.941765, 0.786628, 0.582748, 0.382893, 0.223130]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             real_1d_array c = "[0.3]";
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_nan(c);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_posinf(c);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_neginf(c);
             double epsx = 0.000001;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsx = NAN;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsx = +INFINITY;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             ae_int_t info;
@@ -7447,15 +7447,15 @@ int main() {
          // (you can change weights and see how it changes result)
          //
             real_1d_array w = "[1,1,1,1,1,1,1,1,1,1,1]";
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_nan(w);
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                spoil_vector_by_posinf(w);
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_neginf(w);
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_adding_element(w);
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                spoil_vector_by_deleting_element(w);
             lsfitcreatewfgh(x, y, w, c, state);
             lsfitsetcond(state, epsx, maxits);
@@ -7463,9 +7463,9 @@ int main() {
             lsfitresults(state, info, c, rep);
             Ok = Ok && doc_test_int(info, 2);
             Ok = Ok && doc_test_real_vector(c, "[1.5]", 0.05);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -7475,7 +7475,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_nlfb: Bound contstrained nonlinear fitting using function value only\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 23; _spoil_scenario++) {
+      for (int Test = -1; Test < 23; Test++) {
          try {
          //
          // In this example we demonstrate exponential fitting by
@@ -7492,61 +7492,61 @@ int main() {
          // get c=1.0 (at the boundary).
          //
             real_2d_array x = "[[-1],[-0.8],[-0.6],[-0.4],[-0.2],[0],[0.2],[0.4],[0.6],[0.8],[1.0]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(x);
             real_1d_array y = "[0.223130, 0.382893, 0.582748, 0.786628, 0.941765, 1.000000, 0.941765, 0.786628, 0.582748, 0.382893, 0.223130]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             real_1d_array c = "[0.3]";
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_nan(c);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_posinf(c);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_neginf(c);
             real_1d_array bndl = "[0.0]";
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_vector_by_nan(bndl);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_vector_by_deleting_element(bndl);
             real_1d_array bndu = "[1.0]";
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_nan(bndu);
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_deleting_element(bndu);
             double epsx = 0.000001;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                epsx = NAN;
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                epsx = +INFINITY;
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             ae_int_t info;
             lsfitstate state;
             lsfitreport rep;
             double diffstep = 0.0001;
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                diffstep = NAN;
-            if (_spoil_scenario == 21)
+            if (Test == 21)
                diffstep = +INFINITY;
-            if (_spoil_scenario == 22)
+            if (Test == 22)
                diffstep = -INFINITY;
             lsfitcreatef(x, y, c, diffstep, state);
             lsfitsetbc(state, bndl, bndu);
@@ -7554,9 +7554,9 @@ int main() {
             lsfitfit(state, function_cx_1_func);
             lsfitresults(state, info, c, rep);
             Ok = Ok && doc_test_real_vector(c, "[1.0]", 0.05);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -7566,7 +7566,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_nlscale: Nonlinear fitting with custom scaling and bound constraints\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 27; _spoil_scenario++) {
+      for (int Test = -1; Test < 27; Test++) {
          try {
          //
          // In this example we demonstrate fitting by
@@ -7595,70 +7595,70 @@ int main() {
          // see that algorithm will fail to converge.
          //
             real_2d_array x = "[[2000],[2001],[2002],[2003],[2004],[2005],[2006],[2007],[2008]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(x);
             real_1d_array y = "[4323239600000.0, 4560913100000.0, 5564091500000.0, 6743189300000.0, 7284064600000.0, 7050129600000.0, 7092221500000.0, 8483907600000.0, 8625804400000.0]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             real_1d_array c = "[1.0e+13, 1, 1]";
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_nan(c);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_posinf(c);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_neginf(c);
             double epsx = 1.0e-5;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                epsx = NAN;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                epsx = +INFINITY;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                epsx = -INFINITY;
             real_1d_array bndl = "[-inf, -10, 0.1]";
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_nan(bndl);
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                spoil_vector_by_deleting_element(bndl);
             real_1d_array bndu = "[+inf, +10, 2.0]";
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_nan(bndu);
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_deleting_element(bndu);
             real_1d_array s = "[1.0e+12, 1, 1]";
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                spoil_vector_by_nan(s);
-            if (_spoil_scenario == 21)
+            if (Test == 21)
                spoil_vector_by_posinf(s);
-            if (_spoil_scenario == 22)
+            if (Test == 22)
                spoil_vector_by_neginf(s);
-            if (_spoil_scenario == 23)
+            if (Test == 23)
                spoil_vector_by_deleting_element(s);
             ae_int_t maxits = 0;
             ae_int_t info;
             lsfitstate state;
             lsfitreport rep;
             double diffstep = 1.0e-5;
-            if (_spoil_scenario == 24)
+            if (Test == 24)
                diffstep = NAN;
-            if (_spoil_scenario == 25)
+            if (Test == 25)
                diffstep = +INFINITY;
-            if (_spoil_scenario == 26)
+            if (Test == 26)
                diffstep = -INFINITY;
             lsfitcreatef(x, y, c, diffstep, state);
             lsfitsetcond(state, epsx, maxits);
@@ -7668,9 +7668,9 @@ int main() {
             lsfitresults(state, info, c, rep);
             Ok = Ok && doc_test_int(info, 2);
             Ok = Ok && doc_test_real_vector(c, "[4.142560e+12, 0.434240, 0.565376]", -0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -7680,7 +7680,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_lin: Unconstrained (general) linear least squares fitting with and without weights\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 13; _spoil_scenario++) {
+      for (int Test = -1; Test < 13; Test++) {
          try {
          //
          // In this example we demonstrate linear fitting by f(x|a) = a*exp(0.5*x).
@@ -7691,22 +7691,22 @@ int main() {
          //              Actually, we have only one basis function F0 = exp(0.5*x).
          //
             real_2d_array fmatrix = "[[0.606531],[0.670320],[0.740818],[0.818731],[0.904837],[1.000000],[1.105171],[1.221403],[1.349859],[1.491825],[1.648721]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(fmatrix);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(fmatrix);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(fmatrix);
             real_1d_array y = "[1.133719, 1.306522, 1.504604, 1.554663, 1.884638, 2.072436, 2.257285, 2.534068, 2.622017, 2.897713, 3.219371]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             ae_int_t info;
             real_1d_array c;
@@ -7722,22 +7722,22 @@ int main() {
          // Slightly different result is returned.
          //
             real_1d_array w = "[1.414213, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(w);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_posinf(w);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_neginf(w);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_adding_element(w);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_deleting_element(w);
             lsfitlinearw(y, w, fmatrix, info, c, rep);
             Ok = Ok && doc_test_int(info, 1);
             Ok = Ok && doc_test_real_vector(c, "[1.983354]", 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -7747,7 +7747,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_linc: Constrained (general) linear least squares fitting with and without weights\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 20; _spoil_scenario++) {
+      for (int Test = -1; Test < 20; Test++) {
          try {
          //
          // In this example we demonstrate linear fitting by f(x|a,b) = a*x+b
@@ -7771,37 +7771,37 @@ int main() {
          //              So [1,0,0] means "1*constant_term + 0*linear_term = 0"
          //
             real_1d_array y = "[0.072436,0.246944,0.491263,0.522300,0.714064,0.921929]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_deleting_element(y);
             real_2d_array fmatrix = "[[1,0.0],[1,0.2],[1,0.4],[1,0.6],[1,0.8],[1,1.0]]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_nan(fmatrix);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_matrix_by_posinf(fmatrix);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_matrix_by_neginf(fmatrix);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_matrix_by_adding_row(fmatrix);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_matrix_by_adding_col(fmatrix);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_matrix_by_deleting_row(fmatrix);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_matrix_by_deleting_col(fmatrix);
             real_2d_array cmatrix = "[[1,0,0]]";
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_matrix_by_nan(cmatrix);
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_matrix_by_posinf(cmatrix);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_matrix_by_neginf(cmatrix);
             ae_int_t info;
             real_1d_array c;
@@ -7816,22 +7816,22 @@ int main() {
          // Constrained fitting with individual weights
          //
             real_1d_array w = "[1, 1.414213, 1, 1, 1, 1]";
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_nan(w);
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_posinf(w);
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                spoil_vector_by_neginf(w);
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_adding_element(w);
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_deleting_element(w);
             lsfitlinearwc(y, w, fmatrix, cmatrix, info, c, rep);
             Ok = Ok && doc_test_int(info, 1);
             Ok = Ok && doc_test_real_vector(c, "[0,0.938322]", 0.0005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -7841,7 +7841,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_pol: Unconstrained polynomial fitting\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 20; _spoil_scenario++) {
+      for (int Test = -1; Test < 20; Test++) {
          try {
          //
          // This example demonstrates polynomial fitting.
@@ -7861,32 +7861,32 @@ int main() {
          // more weight than other ones.
          //
             real_1d_array x = "[0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_adding_element(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.00,0.05,0.26,0.32,0.33,0.43,0.60,0.60,0.77,0.98,1.02]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             ae_int_t m = 2;
             double t = 2.0;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                t = +INFINITY;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                t = -INFINITY;
             ae_int_t info;
             barycentricinterpolant p;
@@ -7910,31 +7910,31 @@ int main() {
          // NOTE: slightly different result is returned
          //
             real_1d_array w = "[1,1.414213562,1,1,1,1,1,1,1,1,1]";
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_nan(w);
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_vector_by_posinf(w);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_vector_by_neginf(w);
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_adding_element(w);
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_deleting_element(w);
             real_1d_array xc = "[]";
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                spoil_vector_by_adding_element(xc);
             real_1d_array yc = "[]";
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_adding_element(yc);
             integer_1d_array dc = "[]";
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_adding_element(dc);
             polynomialfitwc(x, y, w, xc, yc, dc, m, info, p, rep);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 2.023, 0.002);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -7944,7 +7944,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_polc: Constrained polynomial fitting\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 29; _spoil_scenario++) {
+      for (int Test = -1; Test < 29; Test++) {
          try {
          //
          // This example demonstrates polynomial fitting.
@@ -7967,69 +7967,69 @@ int main() {
          //          (0 means function itself, 1 means first derivative)
          //
             real_1d_array x = "[1.0,1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_adding_element(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.9,1.1]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             real_1d_array w = "[1,1]";
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_nan(w);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_posinf(w);
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_neginf(w);
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_vector_by_adding_element(w);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_vector_by_deleting_element(w);
             real_1d_array xc = "[0]";
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_nan(xc);
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_posinf(xc);
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                spoil_vector_by_neginf(xc);
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_adding_element(xc);
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_deleting_element(xc);
             real_1d_array yc = "[0]";
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                spoil_vector_by_nan(yc);
-            if (_spoil_scenario == 21)
+            if (Test == 21)
                spoil_vector_by_posinf(yc);
-            if (_spoil_scenario == 22)
+            if (Test == 22)
                spoil_vector_by_neginf(yc);
-            if (_spoil_scenario == 23)
+            if (Test == 23)
                spoil_vector_by_adding_element(yc);
-            if (_spoil_scenario == 24)
+            if (Test == 24)
                spoil_vector_by_deleting_element(yc);
             integer_1d_array dc = "[0]";
-            if (_spoil_scenario == 25)
+            if (Test == 25)
                spoil_vector_by_adding_element(dc);
-            if (_spoil_scenario == 26)
+            if (Test == 26)
                spoil_vector_by_deleting_element(dc);
             double t = 2.0;
-            if (_spoil_scenario == 27)
+            if (Test == 27)
                t = +INFINITY;
-            if (_spoil_scenario == 28)
+            if (Test == 28)
                t = -INFINITY;
             ae_int_t m = 2;
             ae_int_t info;
@@ -8039,9 +8039,9 @@ int main() {
             polynomialfitwc(x, y, w, xc, yc, dc, m, info, p, rep);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 2.000, 0.001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8051,7 +8051,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_spline: Unconstrained fitting by penalized regression spline\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 19; _spoil_scenario++) {
+      for (int Test = -1; Test < 19; Test++) {
          try {
          //
          // In this example we demonstrate penalized spline fitting of noisy data
@@ -8061,26 +8061,26 @@ int main() {
          // * y - vector of experimental data, straight line with small noise
          //
             real_1d_array x = "[0.00,0.10,0.20,0.30,0.40,0.50,0.60,0.70,0.80,0.90]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_adding_element(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.10,0.00,0.30,0.40,0.30,0.40,0.62,0.68,0.75,0.95]";
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_adding_element(y);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_deleting_element(y);
             ae_int_t info;
             double v;
@@ -8094,11 +8094,11 @@ int main() {
          // With such small regularization penalized spline almost fully reproduces function values
          //
             rho = -5.0;
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                rho = NAN;
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                rho = +INFINITY;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                rho = -INFINITY;
             spline1dfitpenalized(x, y, 50, rho, info, s, rep);
             Ok = Ok && doc_test_int(info, 1);
@@ -8112,11 +8112,11 @@ int main() {
          // We will compare its value in x=1.0 with results obtained from such fit.
          //
             rho = +10.0;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                rho = NAN;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                rho = +INFINITY;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                rho = -INFINITY;
             spline1dfitpenalized(x, y, 50, rho, info, s, rep);
             Ok = Ok && doc_test_int(info, 1);
@@ -8127,17 +8127,17 @@ int main() {
          // so we try to fit once more with rho=3.0.
          //
             rho = +3.0;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                rho = NAN;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                rho = +INFINITY;
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                rho = -INFINITY;
             spline1dfitpenalized(x, y, 50, rho, info, s, rep);
             Ok = Ok && doc_test_int(info, 1);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8147,31 +8147,31 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_t_polfit_1: Polynomial fitting, full list of parameters.\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
+      for (int Test = -1; Test < 10; Test++) {
          try {
             real_1d_array x = "[0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.00,0.05,0.26,0.32,0.33,0.43,0.60,0.60,0.77,0.98,1.02]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             ae_int_t m = 2;
             double t = 2.0;
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                t = +INFINITY;
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                t = -INFINITY;
             ae_int_t info;
             barycentricinterpolant p;
@@ -8180,9 +8180,9 @@ int main() {
             polynomialfit(x, y, 11, m, info, p, rep);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 2.011, 0.002);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8192,43 +8192,43 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_t_polfit_2: Polynomial fitting, full list of parameters.\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 14; _spoil_scenario++) {
+      for (int Test = -1; Test < 14; Test++) {
          try {
             real_1d_array x = "[0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.00,0.05,0.26,0.32,0.33,0.43,0.60,0.60,0.77,0.98,1.02]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             real_1d_array w = "[1,1.414213562,1,1,1,1,1,1,1,1,1]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(w);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_posinf(w);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_neginf(w);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_deleting_element(w);
             real_1d_array xc = "[]";
             real_1d_array yc = "[]";
             integer_1d_array dc = "[]";
             ae_int_t m = 2;
             double t = 2.0;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                t = +INFINITY;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                t = -INFINITY;
             ae_int_t info;
             barycentricinterpolant p;
@@ -8237,9 +8237,9 @@ int main() {
             polynomialfitwc(x, y, w, 11, xc, yc, dc, 0, m, info, p, rep);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 2.023, 0.002);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8249,61 +8249,61 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_t_polfit_3: Polynomial fitting, full list of parameters.\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 23; _spoil_scenario++) {
+      for (int Test = -1; Test < 23; Test++) {
          try {
             real_1d_array x = "[1.0,1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.9,1.1]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             real_1d_array w = "[1,1]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(w);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_posinf(w);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_neginf(w);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_deleting_element(w);
             real_1d_array xc = "[0]";
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_nan(xc);
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_vector_by_posinf(xc);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_vector_by_neginf(xc);
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_deleting_element(xc);
             real_1d_array yc = "[0]";
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                spoil_vector_by_nan(yc);
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                spoil_vector_by_posinf(yc);
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                spoil_vector_by_neginf(yc);
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                spoil_vector_by_deleting_element(yc);
             integer_1d_array dc = "[0]";
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                spoil_vector_by_deleting_element(dc);
             ae_int_t m = 2;
             double t = 2.0;
-            if (_spoil_scenario == 21)
+            if (Test == 21)
                t = +INFINITY;
-            if (_spoil_scenario == 22)
+            if (Test == 22)
                t = -INFINITY;
             ae_int_t info;
             barycentricinterpolant p;
@@ -8312,9 +8312,9 @@ int main() {
             polynomialfitwc(x, y, w, 2, xc, yc, dc, 1, m, info, p, rep);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 2.000, 0.001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8324,25 +8324,25 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_t_4pl: 4-parameter logistic fitting\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 8; _spoil_scenario++) {
+      for (int Test = -1; Test < 8; Test++) {
          try {
             real_1d_array x = "[1,2,3,4,5,6,7,8]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.06313223,0.44552624,0.61838364,0.71385108,0.77345838,0.81383140,0.84280033,0.86449822]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             ae_int_t n = 8;
             double a;
@@ -8351,7 +8351,7 @@ int main() {
             double d;
             lsfitreport rep;
          //
-         // _spoil_scenario logisticfit4() on carefully designed data with a priori known answer.
+         // Test logisticfit4() on carefully designed data with a priori known answer.
          //
             logisticfit4(x, y, n, a, b, c, d, rep);
             Ok = Ok && doc_test_real(a, -1.000, 0.01);
@@ -8364,9 +8364,9 @@ int main() {
             double v;
             v = logisticcalc4(0.5, a, b, c, d);
             Ok = Ok && doc_test_real(v, -0.33874308, 0.001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8376,25 +8376,25 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST lsfit_t_5pl: 5-parameter logistic fitting\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 8; _spoil_scenario++) {
+      for (int Test = -1; Test < 8; Test++) {
          try {
             real_1d_array x = "[1,2,3,4,5,6,7,8]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.1949776139,0.5710060208,0.726002637,0.8060434158,0.8534547965,0.8842071579,0.9054773317,0.9209088299]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             ae_int_t n = 8;
             double a;
@@ -8404,7 +8404,7 @@ int main() {
             double g;
             lsfitreport rep;
          //
-         // _spoil_scenario logisticfit5() on carefully designed data with a priori known answer.
+         // Test logisticfit5() on carefully designed data with a priori known answer.
          //
             logisticfit5(x, y, n, a, b, c, d, g, rep);
             Ok = Ok && doc_test_real(a, -1.000, 0.01);
@@ -8418,9 +8418,9 @@ int main() {
             double v;
             v = logisticcalc5(0.5, a, b, c, d, g);
             Ok = Ok && doc_test_real(v, -0.2354656824, 0.001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8430,7 +8430,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST parametric_rdp: Parametric Ramer-Douglas-Peucker approximation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      for (int Test = -1; Test < 7; Test++) {
          try {
          //
          // We use RDP algorithm to approximate parametric 2D curve given by
@@ -8453,15 +8453,15 @@ int main() {
             ae_int_t npoints = 4;
             ae_int_t ndimensions = 2;
             real_2d_array x = "[[0,0],[2,1],[3,3],[6,3]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(x);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(x);
          //
          // Approximation of parametric curve is performed by another parametric curve
@@ -8489,16 +8489,16 @@ int main() {
             ae_int_t nsections;
             ae_int_t limitcnt = 0;
             double limiteps = 0.8;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                limiteps = +INFINITY;
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                limiteps = -INFINITY;
             parametricrdpfixed(x, npoints, ndimensions, limitcnt, limiteps, y, idxy, nsections);
             Ok = Ok && doc_test_int(nsections, 2);
             Ok = Ok && doc_test_int_vector(idxy, "[0,2,3]");
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8508,48 +8508,48 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline2d_bilinear: Bilinear spline interpolation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 16; _spoil_scenario++) {
+      for (int Test = -1; Test < 16; Test++) {
          try {
          //
          // We use bilinear spline to interpolate f(x,y)=x^2+2*y^2 sampled
          // at (x,y) from [0.0, 0.5, 1.0] X [0.0, 1.0].
          //
             real_1d_array x = "[0.0, 0.5, 1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.0, 1.0]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             real_1d_array f = "[0.00,0.25,1.00,2.00,2.25,3.00]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(f);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_posinf(f);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_neginf(f);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_deleting_element(f);
             double vx = 0.25;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                vx = +INFINITY;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                vx = -INFINITY;
             double vy = 0.50;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                vy = +INFINITY;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                vy = -INFINITY;
             double v;
             spline2dinterpolant s;
@@ -8558,9 +8558,9 @@ int main() {
          // calculate S(0.25,0.50)
             v = spline2dcalc(s, vx, vy);
             Ok = Ok && doc_test_real(v, 1.1250, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8570,48 +8570,48 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline2d_bicubic: Bilinear spline interpolation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 16; _spoil_scenario++) {
+      for (int Test = -1; Test < 16; Test++) {
          try {
          //
          // We use bilinear spline to interpolate f(x,y)=x^2+2*y^2 sampled
          // at (x,y) from [0.0, 0.5, 1.0] X [0.0, 1.0].
          //
             real_1d_array x = "[0.0, 0.5, 1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.0, 1.0]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             real_1d_array f = "[0.00,0.25,1.00,2.00,2.25,3.00]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(f);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_posinf(f);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_neginf(f);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_deleting_element(f);
             double vx = 0.25;
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                vx = +INFINITY;
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                vx = -INFINITY;
             double vy = 0.50;
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                vy = +INFINITY;
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                vy = -INFINITY;
             double v;
             double dx;
@@ -8628,9 +8628,9 @@ int main() {
             Ok = Ok && doc_test_real(v, 1.0625, 0.00005);
             Ok = Ok && doc_test_real(dx, 0.5000, 0.00005);
             Ok = Ok && doc_test_real(dy, 2.0000, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8640,7 +8640,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline2d_fit_blocklls: Fitting bicubic spline to irregular data\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      for (int Test = -1; Test < 5; Test++) {
          try {
          //
          // We use bicubic spline to reproduce f(x,y)=1/(1+x^2+2*y^2) sampled
@@ -8651,15 +8651,15 @@ int main() {
          // the spline, i.e. to solve least squares problem
          //
             real_2d_array xy = "[[-0.987,-0.902,0.359],[0.948,-0.992,0.347],[-1.000,1.000,0.333],[1.000,0.973,0.339],[0.017,0.180,0.968]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_deleting_row(xy);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_deleting_col(xy);
          //
          // First step is to create spline2dbuilder object and set its properties:
@@ -8701,9 +8701,9 @@ int main() {
             Ok = Ok && doc_test_real(v, 0.333000, 0.005);
          // check maximum error - it must be nearly zero
             Ok = Ok && doc_test_real(rep.maxerror, 0.000, 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8713,38 +8713,38 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline2d_unpack: Unpacking bilinear spline\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      for (int Test = -1; Test < 12; Test++) {
          try {
          //
          // We build bilinear spline for f(x,y)=x+2*y+3*xy for (x,y) in [0,1].
          // Then we demonstrate how to unpack it.
          //
             real_1d_array x = "[0.0, 1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.0, 1.0]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             real_1d_array f = "[0.00,1.00,2.00,6.00]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(f);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_posinf(f);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_neginf(f);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_deleting_element(f);
             real_2d_array c;
             ae_int_t m;
@@ -8756,9 +8756,9 @@ int main() {
          // unpack and test
             spline2dunpackv(s, m, n, d, c);
             Ok = Ok && doc_test_real_matrix(c, "[[0, 1, 0, 1, 0,2,0,0, 1,3,0,0, 0,0,0,0, 0,0,0,0 ]]", 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8768,38 +8768,38 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline2d_copytrans: Copy and transform\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 16; _spoil_scenario++) {
+      for (int Test = -1; Test < 16; Test++) {
          try {
          //
          // We build bilinear spline for f(x,y)=x+2*y for (x,y) in [0,1].
          // Then we apply several transformations to this spline.
          //
             real_1d_array x = "[0.0, 1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.0, 1.0]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             real_1d_array f = "[0.00,1.00,2.00,3.00]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(f);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_posinf(f);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_neginf(f);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_deleting_element(f);
             spline2dinterpolant s;
             spline2dinterpolant snew;
@@ -8820,13 +8820,13 @@ int main() {
          // Same example, but for vector spline (f0,f1) = {x+2*y, 2*x+y}
          //
             real_1d_array f2 = "[0.00,0.00, 1.00,2.00, 2.00,1.00, 3.00,3.00]";
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_nan(f2);
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_vector_by_posinf(f2);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_vector_by_neginf(f2);
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_deleting_element(f2);
             real_1d_array vr;
             spline2dbuildbilinearv(x, 2, y, 2, f2, 2, s);
@@ -8840,9 +8840,9 @@ int main() {
             spline2dlintransf(snew, 2.0, 3.0);
             spline2dcalcv(snew, 0.5, 1.0, vr);
             Ok = Ok && doc_test_real_vector(vr, "[8.000,7.000]", 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8852,7 +8852,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline2d_vector: Copy and transform\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      for (int Test = -1; Test < 12; Test++) {
          try {
          //
          // We build bilinear vector-valued spline (f0,f1) = {x+2*y, 2*x+y}
@@ -8860,40 +8860,40 @@ int main() {
          // Then we perform evaluation at (x,y)=(0.1,0.3)
          //
             real_1d_array x = "[0.0, 1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.0, 1.0]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             real_1d_array f = "[0.00,0.00, 1.00,2.00, 2.00,1.00, 3.00,3.00]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(f);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_posinf(f);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_neginf(f);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_deleting_element(f);
             spline2dinterpolant s;
             real_1d_array vr;
             spline2dbuildbilinearv(x, 2, y, 2, f, 2, s);
             spline2dcalcv(s, 0.1, 0.3, vr);
             Ok = Ok && doc_test_real_vector(vr, "[0.700,0.500]", 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8903,7 +8903,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline3d_trilinear: Trilinear spline interpolation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 22; _spoil_scenario++) {
+      for (int Test = -1; Test < 22; Test++) {
          try {
          //
          // We use trilinear spline to interpolate f(x,y,z)=x+xy+z sampled
@@ -8921,55 +8921,55 @@ int main() {
          //     f[7]     (x,y,z) = (1,1,1)
          //
             real_1d_array x = "[0.0, 1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.0, 1.0]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             real_1d_array z = "[0.0, 1.0]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(z);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_posinf(z);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_neginf(z);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_deleting_element(z);
             real_1d_array f = "[0,1,0,2,1,2,1,3]";
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_nan(f);
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_vector_by_posinf(f);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_vector_by_neginf(f);
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_deleting_element(f);
             double vx = 0.50;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                vx = +INFINITY;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                vx = -INFINITY;
             double vy = 0.50;
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                vy = +INFINITY;
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                vy = -INFINITY;
             double vz = 0.50;
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                vz = +INFINITY;
-            if (_spoil_scenario == 21)
+            if (Test == 21)
                vz = -INFINITY;
             double v;
             spline3dinterpolant s;
@@ -8978,9 +8978,9 @@ int main() {
          // calculate S(0.5,0.5,0.5)
             v = spline3dcalc(s, vx, vy, vz);
             Ok = Ok && doc_test_real(v, 1.2500, 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -8990,7 +8990,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST spline3d_vector: Vector-valued trilinear spline interpolation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 22; _spoil_scenario++) {
+      for (int Test = -1; Test < 22; Test++) {
          try {
          //
          // We use trilinear vector-valued spline to interpolate {f0,f1}={x+xy+z,x+xy+yz+z}
@@ -9016,55 +9016,55 @@ int main() {
          //     f[15]    f1, (x,y,z) = (1,1,1)
          //
             real_1d_array x = "[0.0, 1.0]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[0.0, 1.0]";
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_vector_by_nan(y);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_vector_by_posinf(y);
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_neginf(y);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_deleting_element(y);
             real_1d_array z = "[0.0, 1.0]";
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_nan(z);
-            if (_spoil_scenario == 9)
+            if (Test == 9)
                spoil_vector_by_posinf(z);
-            if (_spoil_scenario == 10)
+            if (Test == 10)
                spoil_vector_by_neginf(z);
-            if (_spoil_scenario == 11)
+            if (Test == 11)
                spoil_vector_by_deleting_element(z);
             real_1d_array f = "[0,0, 1,1, 0,0, 2,2, 1,1, 2,2, 1,2, 3,4]";
-            if (_spoil_scenario == 12)
+            if (Test == 12)
                spoil_vector_by_nan(f);
-            if (_spoil_scenario == 13)
+            if (Test == 13)
                spoil_vector_by_posinf(f);
-            if (_spoil_scenario == 14)
+            if (Test == 14)
                spoil_vector_by_neginf(f);
-            if (_spoil_scenario == 15)
+            if (Test == 15)
                spoil_vector_by_deleting_element(f);
             double vx = 0.50;
-            if (_spoil_scenario == 16)
+            if (Test == 16)
                vx = +INFINITY;
-            if (_spoil_scenario == 17)
+            if (Test == 17)
                vx = -INFINITY;
             double vy = 0.50;
-            if (_spoil_scenario == 18)
+            if (Test == 18)
                vy = +INFINITY;
-            if (_spoil_scenario == 19)
+            if (Test == 19)
                vy = -INFINITY;
             double vz = 0.50;
-            if (_spoil_scenario == 20)
+            if (Test == 20)
                vz = +INFINITY;
-            if (_spoil_scenario == 21)
+            if (Test == 21)
                vz = -INFINITY;
             spline3dinterpolant s;
          // build spline
@@ -9073,9 +9073,9 @@ int main() {
             real_1d_array v;
             spline3dcalcv(s, vx, vy, vz, v);
             Ok = Ok && doc_test_real_vector(v, "[1.2500,1.5000]", 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9085,7 +9085,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST rbf_d_hrbf: Simple model built with HRBF algorithm\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // This example illustrates basic concepts of the RBF models: creation, modification,
@@ -9127,11 +9127,11 @@ int main() {
          // If we call rbfcalc2(), we still will get 0.0 as result.
          //
             real_2d_array xy = "[[-1,0,2],[+1,0,3]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             rbfsetpoints(model, xy);
             v = rbfcalc2(model, 0.0, 0.0);
@@ -9161,9 +9161,9 @@ int main() {
          //
             v = rbfcalc2(model, 0.0, 0.0);
             Ok = Ok && doc_test_real(v, 2.500, 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9173,7 +9173,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST rbf_d_vector: Working with vector functions\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
          //
          // Suppose that we have set of 2-dimensional points with associated VECTOR
@@ -9199,11 +9199,11 @@ int main() {
             rbfmodel model;
             rbfcreate(2, 2, model);
             x = "[+1,+1]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             rbfcalc(model, x, y);
             Ok = Ok && doc_test_real_vector(y, "[0.000,0.000]", 0.005);
@@ -9217,11 +9217,11 @@ int main() {
          // * (x3,y3) = (-1,+1), f(x3,y3)=(+1,0)
          //
             real_2d_array xy = "[[+1,+1,0,-1],[+1,-1,-1,0],[-1,-1,0,+1],[-1,+1,+1,0]]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_neginf(xy);
             rbfsetpoints(model, xy);
          // We added points, but model was not rebuild yet.
@@ -9253,9 +9253,9 @@ int main() {
          //
             rbfcalc(model, x, y);
             Ok = Ok && doc_test_real_vector(y, "[0.000,-1.000]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9265,7 +9265,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST rbf_d_polterm: RBF models - working with polynomial term\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // This example show how to work with polynomial term
@@ -9283,11 +9283,11 @@ int main() {
             double v;
             rbfmodel model;
             real_2d_array xy = "[[-1,0,2],[+1,0,3]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             rbfreport rep;
             rbfcreate(2, 1, model);
@@ -9355,9 +9355,9 @@ int main() {
          // asymptotic behavior of our function is just zero constant
             v = rbfcalc2(model, 1000.0, 0.0);
             Ok = Ok && doc_test_real(v, 0.000, 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9367,7 +9367,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST rbf_d_serialize: Serialization/unserialization\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // This example show how to serialize and unserialize RBF model
@@ -9384,11 +9384,11 @@ int main() {
             rbfmodel model0;
             rbfmodel model1;
             real_2d_array xy = "[[-1,0,2],[+1,0,3]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             rbfreport rep;
          // model initialization
@@ -9444,9 +9444,9 @@ int main() {
             rbfbuildmodel(model1, rep);
             v = rbfcalc2(model1, 0.0, 0.0);
             Ok = Ok && doc_test_real(v, 0.000, 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9456,18 +9456,18 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST fft_complex_d1: Complex FFT: simple example\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // first we demonstrate forward FFT:
          // [1i,1i,1i,1i] is converted to [4i, 0, 0, 0]
          //
             complex_1d_array z = "[1i,1i,1i,1i]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(z);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(z);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(z);
             fftc1d(z);
             Ok = Ok && doc_test_complex_vector(z, "[4i,0,0,0]", 0.0001);
@@ -9477,9 +9477,9 @@ int main() {
          //
             fftc1dinv(z);
             Ok = Ok && doc_test_complex_vector(z, "[1i,1i,1i,1i]", 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9489,18 +9489,18 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST fft_complex_d2: Complex FFT: advanced example\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // first we demonstrate forward FFT:
          // [0,1,0,1i] is converted to [1+1i, -1-1i, -1-1i, 1+1i]
          //
             complex_1d_array z = "[0,1,0,1i]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(z);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(z);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(z);
             fftc1d(z);
             Ok = Ok && doc_test_complex_vector(z, "[1+1i, -1-1i, -1-1i, 1+1i]", 0.0001);
@@ -9509,9 +9509,9 @@ int main() {
          //
             fftc1dinv(z);
             Ok = Ok && doc_test_complex_vector(z, "[0,1,0,1i]", 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9521,18 +9521,18 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST fft_real_d1: Real FFT: simple example\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // first we demonstrate forward FFT:
          // [1,1,1,1] is converted to [4, 0, 0, 0]
          //
             real_1d_array x = "[1,1,1,1]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             complex_1d_array f;
             real_1d_array x2;
@@ -9544,9 +9544,9 @@ int main() {
          //
             fftr1dinv(f, x2);
             Ok = Ok && doc_test_real_vector(x2, "[1,1,1,1]", 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9556,7 +9556,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST fft_real_d2: Real FFT: advanced example\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // first we demonstrate forward FFT:
@@ -9568,11 +9568,11 @@ int main() {
          // * f[2] = conj(f[2])
          //
             real_1d_array x = "[1,2,3,4]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
             complex_1d_array f;
             real_1d_array x2;
@@ -9596,9 +9596,9 @@ int main() {
             f = "[10, -2+2i, -2]";
             fftr1dinv(f, 4, x2);
             Ok = Ok && doc_test_real_vector(x2, "[1,2,3,4]", 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9608,20 +9608,20 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST fft_complex_e1: error detection in backward FFT\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
             complex_1d_array z = "[0,2,0,-2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(z);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(z);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(z);
             fftc1dinv(z);
             Ok = Ok && doc_test_complex_vector(z, "[0,1i,0,-1i]", 0.0001);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9631,7 +9631,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST clst_ahc: Simple hierarchical clusterization with Euclidean distance function\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // The very simple clusterization example
@@ -9662,11 +9662,11 @@ int main() {
             clusterizerstate s;
             ahcreport rep;
             real_2d_array xy = "[[1,1],[1,2],[4,1],[2,3],[4,1.5]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             clusterizercreate(s);
             clusterizersetpoints(s, xy, 2);
@@ -9738,9 +9738,9 @@ int main() {
          //
             Ok = Ok && doc_test_int_vector(rep.p, "[3,4,0,2,1]");
             Ok = Ok && doc_test_int_matrix(rep.pm, "[[0,0,1,1,0,0],[3,3,4,4,0,0],[2,2,3,4,0,1],[0,1,2,4,1,2]]");
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9750,7 +9750,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST clst_kmeans: Simple k-means clusterization\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // The very simple clusterization example
@@ -9780,11 +9780,11 @@ int main() {
             clusterizerstate s;
             kmeansreport rep;
             real_2d_array xy = "[[1,1],[1,2],[4,1],[2,3],[4,1.5]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             clusterizercreate(s);
             clusterizersetpoints(s, xy, 2);
@@ -9808,9 +9808,9 @@ int main() {
             clusterizersetpoints(s, xy, 0);
             clusterizerrunkmeans(s, 2, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, -5);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9820,7 +9820,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST clst_linkage: Clusterization with different linkage types\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // We have a set of points in 1D space:
@@ -9838,11 +9838,11 @@ int main() {
             clusterizerstate s;
             ahcreport rep;
             real_2d_array xy = "[[1],[3],[10],[16],[20]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             integer_1d_array cidx;
             integer_1d_array cz;
@@ -9862,9 +9862,9 @@ int main() {
             clusterizerrunahc(s, rep);
             clusterizergetkclusters(rep, 2, cidx, cz);
             Ok = Ok && doc_test_int_vector(cidx, "[0,0,1,1,1]");
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9874,7 +9874,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST clst_distance: Clusterization with different metric types\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // We have three points in 4D space:
@@ -9893,11 +9893,11 @@ int main() {
             ahcreport rep;
             ae_int_t disttype;
             real_2d_array xy = "[[1, 2, 1, 2], [6, 7, 6, 7], [7, 6, 7, 6]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             clusterizercreate(s);
          // With Euclidean distance function (disttype=2) two closest points
@@ -9927,9 +9927,9 @@ int main() {
             clusterizersetdistances(s, d, true);
             clusterizerrunahc(s, rep);
             Ok = Ok && doc_test_int_matrix(rep.z, "[[0,2],[1,3]]");
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9939,7 +9939,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST clst_kclusters: Obtaining K top clusters from clusterization tree\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // We have a set of points in 2D space:
@@ -9959,11 +9959,11 @@ int main() {
             clusterizerstate s;
             ahcreport rep;
             real_2d_array xy = "[[1,1],[1,2],[4,1],[2,3],[4,1.5]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             integer_1d_array cidx;
             integer_1d_array cz;
@@ -9980,9 +9980,9 @@ int main() {
          // with K=3 we have three clusters C0=[P3], C1=[P2,P4], C2=[P0,P1]
             clusterizergetkclusters(rep, 3, cidx, cz);
             Ok = Ok && doc_test_int_vector(cidx, "[2,2,1,0,1]");
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -9992,7 +9992,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST randomforest_cls: Simple classification with random forests\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // The very simple classification example: classify points (x,y) in 2D space
@@ -10025,11 +10025,11 @@ int main() {
             ae_int_t nclasses = 2;
             ae_int_t npoints = 4;
             real_2d_array xy = "[[1,1,0],[1,-1,0],[-1,1,1],[-1,-1,1]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             dfbuildercreate(builder);
             dfbuildersetdataset(builder, xy, npoints, nvars, nclasses);
@@ -10061,9 +10061,9 @@ int main() {
             ae_int_t i;
             i = dfclassify(forest, x);
             Ok = Ok && doc_test_int(i, 0);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10073,7 +10073,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST randomforest_reg: Simple regression with decision forest\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // The very simple regression example: model f(x,y)=x+y
@@ -10097,11 +10097,11 @@ int main() {
             ae_int_t nclasses = 1;
             ae_int_t npoints = 4;
             real_2d_array xy = "[[1,1,+2],[1,-1,0],[-1,1,0],[-1,-1,-2]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             dfbuildercreate(builder);
             dfbuildersetdataset(builder, xy, npoints, nvars, nclasses);
@@ -10134,9 +10134,9 @@ int main() {
             ae_int_t i;
             i = dfclassify(model, x);
             Ok = Ok && doc_test_int(i, -1);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10173,17 +10173,17 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST filters_d_sma: SMA(k) filter\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // Here we demonstrate SMA(k) filtering for time series.
          //
             real_1d_array x = "[5,6,7,8]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
          //
          // Apply filter.
@@ -10191,9 +10191,9 @@ int main() {
          //
             filtersma(x, 2);
             Ok = Ok && doc_test_real_vector(x, "[5,5.5,6.5,7.5]", 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10203,17 +10203,17 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST filters_d_ema: EMA(alpha) filter\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // Here we demonstrate EMA(0.5) filtering for time series.
          //
             real_1d_array x = "[5,6,7,8]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
          //
          // Apply filter.
@@ -10221,9 +10221,9 @@ int main() {
          //
             filterema(x, 0.5);
             Ok = Ok && doc_test_real_vector(x, "[5,5.5,6.25,7.125]", 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10233,17 +10233,17 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST filters_d_lrma: LRMA(k) filter\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // Here we demonstrate LRMA(3) filtering for time series.
          //
             real_1d_array x = "[7,8,8,9,12,12]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
          //
          // Apply filter.
@@ -10251,9 +10251,9 @@ int main() {
          //
             filterlrma(x, 3);
             Ok = Ok && doc_test_real_vector(x, "[7.0000,8.0000,8.1667,8.8333,11.6667,12.5000]", 0.00005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10263,7 +10263,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST ssa_d_basic: Simple SSA analysis demo\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // Here we demonstrate SSA trend/noise separation for some toy problem:
@@ -10273,11 +10273,11 @@ int main() {
          //
             ssamodel s;
             real_1d_array x = "[0,0.5,1,1,1.5,2]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
          //
          // First, we create SSA model, set its properties and add dataset.
@@ -10306,9 +10306,9 @@ int main() {
             real_1d_array noise;
             ssaanalyzesequence(s, x, trend, noise);
             Ok = Ok && doc_test_real_vector(trend, "[0.3815,0.5582,0.7810,1.0794,1.5041,2.0105]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10318,7 +10318,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST ssa_d_forecast: Simple SSA forecasting demo\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // Here we demonstrate SSA forecasting on some toy problem with clearly
@@ -10326,11 +10326,11 @@ int main() {
          //
             ssamodel s;
             real_1d_array x = "[0.05,0.96,2.04,3.11,3.97,5.03,5.98,7.02,8.02]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x);
          //
          // First, we create SSA model, set its properties and add dataset.
@@ -10366,9 +10366,9 @@ int main() {
          // which can be explained by the artificial noise in the dataset.
          //
             Ok = Ok && doc_test_real_vector(trend, "[9.0005,9.9322,10.8051]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10378,7 +10378,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST ssa_d_realtime: Real-time SSA algorithm with fast incremental updates\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      for (int Test = -1; Test < 9; Test++) {
          try {
          //
          // Suppose that you have a constant stream of incoming data, and you want
@@ -10406,11 +10406,11 @@ int main() {
             ae_int_t w;
             ae_int_t k;
             real_1d_array x0 = "[0.009,0.976,1.999,2.984,3.977,5.002]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_vector_by_nan(x0);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_vector_by_posinf(x0);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_vector_by_neginf(x0);
             ssacreate(s1);
             ssasetwindow(s1, 3);
@@ -10432,11 +10432,11 @@ int main() {
          // performance constraints, you may specify fractional amount of iterations,
          // which means that iteration is performed with required probability.
             double updateits = 1.0;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                updateits = NAN;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                updateits = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                updateits = -INFINITY;
             ssaappendpointandupdate(s1, 5.951, updateits);
             ssagetbasis(s1, a1, sv1, w, k);
@@ -10466,11 +10466,11 @@ int main() {
             real_2d_array a2;
             real_1d_array sv2;
             real_1d_array x2 = "[0.009,0.976,1.999,2.984,3.977,5.002,5.951,7.074,7.925,8.992,9.942,11.051,11.965,13.047,13.970]";
-            if (_spoil_scenario == 6)
+            if (Test == 6)
                spoil_vector_by_nan(x2);
-            if (_spoil_scenario == 7)
+            if (Test == 7)
                spoil_vector_by_posinf(x2);
-            if (_spoil_scenario == 8)
+            if (Test == 8)
                spoil_vector_by_neginf(x2);
             ssacreate(s2);
             ssasetwindow(s2, 3);
@@ -10479,9 +10479,9 @@ int main() {
             ssagetbasis(s2, a2, sv2, w, k);
          // it is exactly the same as one calculated with incremental approach!
             Ok = Ok && doc_test_real_matrix(a2, "[[0.510607,0.753611],[0.575201,0.058445],[0.639081,-0.654717]]", 0.0005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10491,7 +10491,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST mcpd_simple1: Simple unconstrained MCPD model (no entry/exit states)\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
          //
          // The very simple MCPD example
@@ -10529,18 +10529,18 @@ int main() {
             mcpdreport rep;
             real_2d_array p;
             real_2d_array track0 = "[[1.00000,0.00000],[0.95000,0.05000],[0.92750,0.07250],[0.91738,0.08263],[0.91282,0.08718]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(track0);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(track0);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(track0);
             real_2d_array track1 = "[[0.80000,0.20000],[0.86000,0.14000],[0.88700,0.11300],[0.89915,0.10085]]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_nan(track1);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_posinf(track1);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_neginf(track1);
             mcpdcreate(2, s);
             mcpdaddtrack(s, track0);
@@ -10556,9 +10556,9 @@ int main() {
          // while "bad" loans will return to good state with 50% probability.
          //
             Ok = Ok && doc_test_real_matrix(p, "[[0.95,0.50],[0.05,0.50]]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10568,7 +10568,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST mcpd_simple2: Simple MCPD model (no entry/exit states) with equality constraints\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
          //
          // Simple MCPD example
@@ -10612,18 +10612,18 @@ int main() {
             mcpdreport rep;
             real_2d_array p;
             real_2d_array track0 = "[[1.000000,0.000000,0.000000],[0.950000,0.050000,0.000000],[0.927500,0.060000,0.012500],[0.911125,0.061375,0.027500],[0.896256,0.060900,0.042844]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(track0);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(track0);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(track0);
             real_2d_array track1 = "[[0.800000,0.200000,0.000000],[0.860000,0.090000,0.050000],[0.862000,0.065500,0.072500],[0.851650,0.059475,0.088875],[0.838805,0.057451,0.103744]]";
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                spoil_matrix_by_nan(track1);
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                spoil_matrix_by_posinf(track1);
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                spoil_matrix_by_neginf(track1);
             mcpdcreate(3, s);
             mcpdaddtrack(s, track0);
@@ -10644,9 +10644,9 @@ int main() {
          // return back to normal state with 50% probability.
          //
             Ok = Ok && doc_test_real_matrix(p, "[[0.95,0.50,0.00],[0.05,0.25,0.00],[0.00,0.25,1.00]]", 0.005);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10656,7 +10656,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST knn_cls: Simple classification with KNN model\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // The very simple classification example: classify points (x,y) in 2D space
@@ -10690,11 +10690,11 @@ int main() {
             ae_int_t nclasses = 2;
             ae_int_t npoints = 4;
             real_2d_array xy = "[[1,1,0],[1,-1,0],[-1,1,1],[-1,-1,1]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             knnbuildercreate(builder);
             knnbuildersetdatasetcls(builder, xy, npoints, nvars, nclasses);
@@ -10722,9 +10722,9 @@ int main() {
             ae_int_t i;
             i = knnclassify(model, x);
             Ok = Ok && doc_test_int(i, 0);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10734,7 +10734,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST knn_reg: Simple classification with KNN model\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // The very simple regression example: model f(x,y)=x+y
@@ -10764,11 +10764,11 @@ int main() {
             ae_int_t nout = 1;
             ae_int_t npoints = 4;
             real_2d_array xy = "[[1,1,+2],[1,-1,0],[-1,1,0],[-1,-1,-2]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             knnbuildercreate(builder);
             knnbuildersetdatasetreg(builder, xy, npoints, nvars, nout);
@@ -10797,9 +10797,9 @@ int main() {
             ae_int_t i;
             i = knnclassify(model, x);
             Ok = Ok && doc_test_int(i, -1);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10809,7 +10809,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST nn_regr: Regression problem with one output (2=>1)\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // The very simple example on neural network: network is trained to reproduce
@@ -10834,11 +10834,11 @@ int main() {
          // [2 * 2 = 4]
          //
             real_2d_array xy = "[[1,1,1],[1,2,2],[2,1,2],[2,2,4]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
          //
          // Network is created.
@@ -10859,9 +10859,9 @@ int main() {
             real_1d_array y = "[0]";
             mlpprocess(network, x, y);
             Ok = Ok && doc_test_real_vector(y, "[4.000]", 0.05);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10871,7 +10871,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST nn_regr_n: Regression problem with multiple outputs (2=>2)\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // Network with 2 inputs and 2 outputs is trained to reproduce vector function:
@@ -10897,11 +10897,11 @@ int main() {
          // [ 2   2  2+2  2*2 ]
          //
             real_2d_array xy = "[[1,1,2,1],[1,2,3,2],[2,1,3,2],[2,2,4,4]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
          //
          // Network is created.
@@ -10923,9 +10923,9 @@ int main() {
             real_1d_array y = "[0,0]";
             mlpprocess(network, x, y);
             Ok = Ok && doc_test_real_vector(y, "[3.000,2.000]", 0.05);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -10935,7 +10935,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST nn_cls2: Binary classification problem\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // Suppose that we want to classify numbers as positive (class 0) and negative
@@ -10971,11 +10971,11 @@ int main() {
          // [  0  1]   !!
          //
             real_2d_array xy = "[[+1,0],[+2,0],[-1,1],[-2,1],[0,0],[0,1]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
          //
          //
@@ -11004,7 +11004,7 @@ int main() {
          //
             mlptrainnetwork(trn, network, 5, rep);
          //
-         // _spoil_scenario our neural network on strictly positive and strictly negative numbers.
+         // Test our neural network on strictly positive and strictly negative numbers.
          //
          // IMPORTANT! Classifier network returns class membership probabilities instead
          // of class indexes. Network returns two values (probabilities) instead of one
@@ -11036,9 +11036,9 @@ int main() {
             x = "[0]";
             mlpprocess(network, x, y);
             Ok = Ok && doc_test_real_vector(y, "[0.500,0.500]", 0.05);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -11048,7 +11048,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST nn_cls3: Multiclass classification problem\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // Suppose that we want to classify numbers as positive (class 0) and negative
@@ -11077,11 +11077,11 @@ int main() {
          // [  0  2]
          //
             real_2d_array xy = "[[+1,0],[+2,0],[-1,1],[-2,1],[0,2]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
          //
          //
@@ -11110,7 +11110,7 @@ int main() {
          //
             mlptrainnetwork(trn, network, 5, rep);
          //
-         // _spoil_scenario our neural network on strictly positive and strictly negative numbers.
+         // Test our neural network on strictly positive and strictly negative numbers.
          //
          // IMPORTANT! Classifier network returns class membership probabilities instead
          // of class indexes. Network returns three values (probabilities) instead of one
@@ -11133,9 +11133,9 @@ int main() {
             x = "[0]";
             mlpprocess(network, x, y);
             Ok = Ok && doc_test_real_vector(y, "[0.000,0.000,1.000]", 0.05);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -11145,7 +11145,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST nn_trainerobject: Advanced example on trainer object\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      for (int Test = -1; Test < 6; Test++) {
          try {
          //
          // Trainer object is used to train network. It stores dataset, training settings,
@@ -11192,11 +11192,11 @@ int main() {
          //     [2 * 2 = 4]   [ 2 2 4 ]
          //
             real_2d_array xy = "[[1,1,1],[1,2,2],[2,1,2],[2,2,4]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             mlpsetdataset(trn, xy, 4);
          //
@@ -11208,11 +11208,11 @@ int main() {
          //   is zero, which means than this condition is not active)
          //
             double wstep = 0.000;
-            if (_spoil_scenario == 3)
+            if (Test == 3)
                wstep = NAN;
-            if (_spoil_scenario == 4)
+            if (Test == 4)
                wstep = +INFINITY;
-            if (_spoil_scenario == 5)
+            if (Test == 5)
                wstep = -INFINITY;
             ae_int_t maxits = 100;
             mlpsetdecay(trn, 0.01);
@@ -11243,9 +11243,9 @@ int main() {
             mlptrainnetwork(trn, net1, 5, rep);
             mlptrainnetwork(trn, net2, 5, rep);
             mlptrainnetwork(trn, net3, 5, rep);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -11255,7 +11255,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST nn_crossvalidation: Cross-validation\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // This example shows how to perform cross-validation with ALGLIB
@@ -11268,11 +11268,11 @@ int main() {
          // One row corresponds to one record [x,f(x)]
          //
             real_2d_array xy = "[[-2.0,0.2],[-1.6,0.3],[-1.3,0.4],[-1,0.5],[-0.6,0.7],[-0.3,0.9],[0,1],[2.0,0.2],[1.6,0.3],[1.3,0.4],[1,0.5],[0.6,0.7],[0.3,0.9]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
          //
          // Trainer object is created.
@@ -11311,9 +11311,9 @@ int main() {
          // mlpkfoldcv(). Every CV round will return slightly different
          // estimates.
          //
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -11323,7 +11323,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST nn_ensembles_es: Early stopping ensembles\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // This example shows how to train early stopping ensebles.
@@ -11336,11 +11336,11 @@ int main() {
          // One row corresponds to one record [x,f(x)]
          //
             real_2d_array xy = "[[-2.0,0.2],[-1.6,0.3],[-1.3,0.4],[-1,0.5],[-0.6,0.7],[-0.3,0.9],[0,1],[2.0,0.2],[1.6,0.3],[1.3,0.4],[1,0.5],[0.6,0.7],[0.3,0.9]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
          //
          // Trainer object is created.
@@ -11359,9 +11359,9 @@ int main() {
          //
             mlpecreate1(1, 4, 1, 50, ensemble);
             mlptrainensemblees(trn, ensemble, 5, rep);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -11371,7 +11371,7 @@ int main() {
       AllOk = AllOk && Ok;
    // printf("TEST nn_parallel: Parallel training\n"), fflush(stdout);
       Ok = true;
-      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      for (int Test = -1; Test < 3; Test++) {
          try {
          //
          // This example shows how to use parallel functionality of ALGLIB.
@@ -11390,11 +11390,11 @@ int main() {
             mlpensemble ensemble;
             mlpreport rep;
             real_2d_array xy = "[[-2.0,0.2],[-1.6,0.3],[-1.3,0.4],[-1,0.5],[-0.6,0.7],[-0.3,0.9],[0,1],[2.0,0.2],[1.6,0.3],[1.3,0.4],[1,0.5],[0.6,0.7],[0.3,0.9]]";
-            if (_spoil_scenario == 0)
+            if (Test == 0)
                spoil_matrix_by_nan(xy);
-            if (_spoil_scenario == 1)
+            if (Test == 1)
                spoil_matrix_by_posinf(xy);
-            if (_spoil_scenario == 2)
+            if (Test == 2)
                spoil_matrix_by_neginf(xy);
             mlpcreatetrainer(1, 1, trn);
             mlpsetdataset(trn, xy, 13);
@@ -11451,9 +11451,9 @@ int main() {
          // networks aretrained in total.
          //
             mlptrainensemblees(trn, ensemble, 5, rep);
-            Ok = Ok && _spoil_scenario == -1;
+            Ok = Ok && Test == -1;
          } catch(ap_error) {
-            Ok = Ok && _spoil_scenario != -1;
+            Ok = Ok && Test != -1;
          }
       }
       if (!Ok) {
@@ -11473,7 +11473,7 @@ int main() {
    if (alglib_impl::_alloc_counter != 0) {
       printf("Failure: _alloc_counter is non-zero on end!\n");
       return 1;
-   } else printf("OK\n");
+   } else printf("Ok\n");
 #endif
    return AllOk ? 0 : 1;
 }
