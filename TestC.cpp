@@ -8,8 +8,8 @@
 const bool silent = true;
 using namespace alglib_impl;
 
-// Test the relative error of A with respect to B, or the absolute error with respect to scale Sc if |B| < Sc.
-inline static bool RelNear(double A, double B, double Tiny, double Sc) { return NearAtR(A, B, Tiny*rmax2(fabs(B), Sc)); }
+// Test the relative error in A with respect to B, with the absolute error scaled with respect to Scale, if |B| < Scale.
+inline static bool RelNear(double A, double B, double Tiny, double Scale) { return NearAtR(A, B, Tiny * rmax2(fabs(B), Scale)); }
 
 // === ablasf testing unit ===
 bool testablasf() {
