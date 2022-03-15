@@ -5,42 +5,11 @@
 #include "FastTransforms.h"
 #include "Interpolation.h"
 
+const bool silent = true;
 using namespace alglib_impl;
 
-// Error tracking facilities; this fields are modified every time set_error_flag()
-// is called with non-zero cond. Thread unsafe access, but it does not matter actually.
-static const char *sef_file = "";
-static int sef_line = 0;
-static const char *sef_xdesc = "";
-
-void set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *xdesc) {
-   if (cond) {
-      *p_flag = true;
-      sef_file = filename;
-      sef_line = lineno;
-      sef_xdesc = xdesc;
-#ifdef ALGLIB_ABORT_ON_ERROR_FLAG
-      printf("[ALGLIB] aborting on set_error_flag(cond=true)\n");
-      printf("[ALGLIB] %s:%d\n", filename, lineno);
-      printf("[ALGLIB] %s\n", xdesc);
-      fflush(stdout);
-      abort();
-#endif
-   }
-}
-
-// Internally calls SetErrorFlag() with condition:
-//
-//     Abs(Val-RefVal)>Tol*Max(Abs(RefVal),S)
-//
-// This function is used to test relative error in Val against  RefVal,  with
-// relative error being replaced by absolute when scale  of  RefVal  is  less
-// than S.
-//
-// This function returns value of COND.
-void seterrorflagdiff(bool *flag, double val, double refval, double tol, double s) {
-   set_error_flag(flag, !NearAtR(val, refval, tol * rmax2(fabs(refval), s)), __FILE__, __LINE__, "apserv.ap:162");
-}
+// Test the relative error in A with respect to B, with the absolute error scaled with respect to Scale, if |B| < Scale.
+inline static bool RelNear(double A, double B, double Tiny, double Scale) { return NearAtR(A, B, Tiny * rmax2(fabs(B), Scale)); }
 
 // === ablasf testing unit ===
 struct ablasfplayground {
@@ -809,10 +778,10 @@ static bool testablasfunit_testxdot(ae_int_t maxn, double tol) {
    // Compare playground snapshots - should be identical.
       ridx = randominteger(imax2(n, 1));
       ridx2 = randominteger(imax2(n, 1));
-      set_error_flag(&result, !NearAtR(rdotv(n, &s0.x0, &s0.x1), refrdotv(n, &s1.x0, &s1.x1), tol), __FILE__, __LINE__, "testablasfunit.ap:142");
-      set_error_flag(&result, !NearAtR(rdotvr(n, &s0.x0, &s0.a0, ridx), refrdotvr(n, &s1.x0, &s1.a0, ridx), tol), __FILE__, __LINE__, "testablasfunit.ap:143");
-      set_error_flag(&result, !NearAtR(rdotrr(n, &s0.a0, ridx, &s0.a1, ridx2), refrdotrr(n, &s1.a0, ridx, &s1.a1, ridx2), tol), __FILE__, __LINE__, "testablasfunit.ap:144");
-      set_error_flag(&result, !NearAtR(rdotv2(n, &s0.x0), refrdotv2(n, &s1.x0), tol), __FILE__, __LINE__, "testablasfunit.ap:145");
+      result = result || !NearAtR(rdotv(n, &s0.x0, &s0.x1), refrdotv(n, &s1.x0, &s1.x1), tol);
+      result = result || !NearAtR(rdotvr(n, &s0.x0, &s0.a0, ridx), refrdotvr(n, &s1.x0, &s1.a0, ridx), tol);
+      result = result || !NearAtR(rdotrr(n, &s0.a0, ridx, &s0.a1, ridx2), refrdotrr(n, &s1.a0, ridx, &s1.a1, ridx2), tol);
+      result = result || !NearAtR(rdotv2(n, &s0.x0), refrdotv2(n, &s1.x0), tol);
    }
    ae_frame_leave();
    return result;
@@ -852,37 +821,37 @@ static bool testablasfunit_testxset(ae_int_t maxn, double tol) {
       testablasfunit_initplayground(n, iseed, &s1);
       rsetv(n, alpha, &s0.x0);
       refrsetv(n, alpha, &s1.x0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:183");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rsetr(n, alpha, &s0.a0, ridx);
       refrsetr(n, alpha, &s1.a0, ridx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:189");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rsetc(n, alpha, &s0.a0, cidx);
       refrsetc(n, alpha, &s1.a0, cidx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:195");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rsetm(m0, m1, alpha, &s0.a0);
       refrsetm(m0, m1, alpha, &s1.a0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:201");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       isetv(n, ialpha, &s0.ix0);
       refisetv(n, ialpha, &s1.ix0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:207");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       bsetv(n, balpha, &s0.bx0);
       refbsetv(n, balpha, &s1.bx0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:213");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rsetvx(n / 2, alpha, &s0.x0, offsx);
       refrsetvx(n / 2, alpha, &s1.x0, offsx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:219");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
    // Increment seed
       iseed++;
    }
@@ -920,32 +889,32 @@ static bool testablasfunit_testxadd(ae_int_t maxn, double tol) {
       testablasfunit_initplayground(n, iseed, &s1);
       raddv(n, alpha, &s0.x0, &s0.x1);
       refraddv(n, alpha, &s1.x0, &s1.x1);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:257");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       raddvr(n, alpha, &s0.x0, &s0.a0, cidx);
       refraddvr(n, alpha, &s1.x0, &s1.a0, cidx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:263");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       raddvc(n, alpha, &s0.x0, &s0.a0, cidx);
       refraddvc(n, alpha, &s1.x0, &s1.a0, cidx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:269");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       raddrv(n, alpha, &s0.a0, ridx, &s0.x0);
       refraddrv(n, alpha, &s1.a0, ridx, &s1.x0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:275");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       raddrr(n, alpha, &s0.a0, ridx, &s0.a1, ridx2);
       refraddrr(n, alpha, &s1.a0, ridx, &s1.a1, ridx2);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:281");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       raddvx(n / 2, alpha, &s0.x0, offsx, &s0.x1, offsy);
       refraddvx(n / 2, alpha, &s1.x0, offsx, &s1.x1, offsy);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:287");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
    // Increment seed
       iseed++;
    }
@@ -977,17 +946,17 @@ static bool testablasfunit_testxmul(ae_int_t maxn, double tol) {
       testablasfunit_initplayground(n, iseed, &s1);
       rmulv(n, alpha, &s0.x0);
       refrmulv(n, alpha, &s1.x0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:322");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rmulr(n, alpha, &s0.a0, ridx);
       refrmulr(n, alpha, &s1.a0, ridx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:328");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rmulvx(n / 2, alpha, &s0.x0, offsx);
       refrmulvx(n / 2, alpha, &s1.x0, offsx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:334");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
    // Increment seed
       iseed++;
    }
@@ -1015,22 +984,22 @@ static bool testablasfunit_testxmax(ae_int_t maxn, double tol) {
       testablasfunit_initplayground(n, iseed, &s1);
       s0.v0 = rmaxv(n, &s0.x0);
       s1.v0 = refrmaxv(n, &s1.x0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:365");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       s0.v0 = rmaxabsv(n, &s0.x0);
       s1.v0 = refrmaxabsv(n, &s1.x0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:371");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       s0.v0 = rmaxr(n, &s0.a0, ridx);
       s1.v0 = refrmaxr(n, &s1.a0, ridx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:377");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       s0.v0 = rmaxabsr(n, &s0.a0, ridx);
       s1.v0 = refrmaxabsr(n, &s1.a0, ridx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:383");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
    // Increment seed
       iseed++;
    }
@@ -1058,47 +1027,47 @@ static bool testablasfunit_testxmerge(ae_int_t maxn, double tol) {
       testablasfunit_initplayground(n, iseed, &s1);
       rmergemulv(n, &s0.x0, &s0.x1);
       refrmergemulv(n, &s1.x0, &s1.x1);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:414");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rmergemulvr(n, &s0.x0, &s0.a0, ridx);
       refrmergemulvr(n, &s1.x0, &s1.a0, ridx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:420");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rmergemulrv(n, &s0.a0, ridx, &s0.x0);
       refrmergemulrv(n, &s1.a0, ridx, &s1.x0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:426");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rmergemaxv(n, &s0.x0, &s0.x1);
       refrmergemaxv(n, &s1.x0, &s1.x1);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:432");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rmergemaxvr(n, &s0.x0, &s0.a0, ridx);
       refrmergemaxvr(n, &s1.x0, &s1.a0, ridx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:438");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rmergemaxrv(n, &s0.a0, ridx, &s0.x0);
       refrmergemaxrv(n, &s1.a0, ridx, &s1.x0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:444");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rmergeminv(n, &s0.x0, &s0.x1);
       refrmergeminv(n, &s1.x0, &s1.x1);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:450");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rmergeminvr(n, &s0.x0, &s0.a0, ridx);
       refrmergeminvr(n, &s1.x0, &s1.a0, ridx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:456");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rmergeminrv(n, &s0.a0, ridx, &s0.x0);
       refrmergeminrv(n, &s1.a0, ridx, &s1.x0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:462");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
    // Increment seed
       iseed++;
    }
@@ -1136,67 +1105,67 @@ static bool testablasfunit_testxcopy(ae_int_t maxn, double tol) {
       testablasfunit_initplayground(n, iseed, &s1);
       rcopyv(n, &s0.x0, &s0.x1);
       refrcopyv(n, &s1.x0, &s1.x1);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:500");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       icopyv(n, &s0.ix0, &s0.ix1);
       reficopyv(n, &s1.ix0, &s1.ix1);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:506");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       bcopyv(n, &s0.bx0, &s0.bx1);
       refbcopyv(n, &s1.bx0, &s1.bx1);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:512");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rcopyvr(n, &s0.x0, &s0.a0, ridx);
       refrcopyvr(n, &s1.x0, &s1.a0, ridx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:518");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rcopyrv(n, &s0.a0, ridx, &s0.x0);
       refrcopyrv(n, &s1.a0, ridx, &s1.x0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:524");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rcopyrr(n, &s0.a0, ridx, &s0.a1, ridx2);
       refrcopyrr(n, &s1.a0, ridx, &s1.a1, ridx2);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:530");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rcopyvc(n, &s0.x0, &s0.a0, cidx);
       refrcopyvc(n, &s1.x0, &s1.a0, cidx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:536");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rcopycv(n, &s0.a0, cidx, &s0.x0);
       refrcopycv(n, &s1.a0, cidx, &s1.x0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:542");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rcopyvx(n / 2, &s0.x0, offsx, &s0.x1, offsy);
       refrcopyvx(n / 2, &s1.x0, offsx, &s1.x1, offsy);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:548");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       icopyvx(n / 2, &s0.ix0, offsx, &s0.ix1, offsy);
       reficopyvx(n / 2, &s1.ix0, offsx, &s1.ix1, offsy);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:554");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rcopymulv(n, alpha, &s0.x0, &s0.x1);
       refrcopymulv(n, alpha, &s1.x0, &s1.x1);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:560");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rcopymulvr(n, alpha, &s0.x0, &s0.a0, ridx);
       refrcopymulvr(n, alpha, &s1.x0, &s1.a0, ridx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:566");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(n, iseed, &s0);
       testablasfunit_initplayground(n, iseed, &s1);
       rcopymulvc(n, alpha, &s0.x0, &s0.a0, cidx);
       refrcopymulvc(n, alpha, &s1.x0, &s1.a0, cidx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:572");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
    // Increment seed
       iseed++;
    }
@@ -1240,12 +1209,12 @@ static bool testablasfunit_testxgemv(ae_int_t maxn, double tol) {
       testablasfunit_initplayground(2 * n + padding, iseed, &s1);
       rgemv(m, n, alpha, &s0.a0, opa, &s0.x0, beta, &s0.x1);
       refrgemvx(m, n, alpha, &s1.a0, 0, 0, opa, &s1.x0, 0, beta, &s1.x1, 0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:615");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(2 * n + padding, iseed, &s0);
       testablasfunit_initplayground(2 * n + padding, iseed, &s1);
       rgemvx(m, n, alpha, &s0.a0, offs0, offs1, opa, &s0.x0, offsx, beta, &s0.x1, offsy);
       refrgemvx(m, n, alpha, &s1.a0, offs0, offs1, opa, &s1.x0, offsx, beta, &s1.x1, offsy);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:621");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
    // Increment seed
       iseed++;
    }
@@ -1296,12 +1265,12 @@ static bool testablasfunit_testxger(ae_int_t maxn, double tol) {
       testablasfunit_initplayground(2 * n + padding, iseed, &s1);
       rger(m, n, alpha, &s0.x0, &s0.x1, &s0.a0);
       testablasfunit_refgerx(m, n, &s1.a0, 0, 0, alpha, &s1.x0, 0, &s1.x1, 0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:656");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
       testablasfunit_initplayground(2 * n + padding, iseed, &s0);
       testablasfunit_initplayground(2 * n + padding, iseed, &s1);
       rger(n, m, alpha, &s0.x0, &s0.x1, &s0.a0);
       testablasfunit_refgerx(n, m, &s1.a0, 0, 0, alpha, &s1.x0, 0, &s1.x1, 0);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:662");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
    // Increment seed
       iseed++;
    }
@@ -1341,7 +1310,7 @@ static bool testablasfunit_testxtrsv(ae_int_t maxn, double tol) {
       testablasfunit_initplayground(2 * n + padding, iseed, &s1);
       rtrsvx(n, &s0.a0, offs0, offs1, isupper, isunit, opa, &s0.x0, offsx);
       reftrsvx(n, &s1.a0, offs0, offs1, isupper, isunit, opa, &s1.x0, offsx);
-      set_error_flag(&result, testablasfunit_compareplaygrounds(&s0, &s1) > tol, __FILE__, __LINE__, "testablasfunit.ap:703");
+      result = result || testablasfunit_compareplaygrounds(&s0, &s1) > tol;
    // Increment seed
       iseed++;
    }
@@ -1349,7 +1318,7 @@ static bool testablasfunit_testxtrsv(ae_int_t maxn, double tol) {
    return result;
 }
 
-bool testablasf(bool silent) {
+bool testablasf() {
    ae_int_t maxn;
    double tol;
    bool wereerrors;
@@ -1378,7 +1347,7 @@ bool testablasf(bool silent) {
    xtrsverrors = testablasfunit_testxtrsv(maxn, tol);
    wereerrors = xdoterrors || xseterrors || xadderrors || xmulerrors || xmaxerrors || xmergeerrors || xcopyerrors || xgemverrors || xgererrors || xtrsverrors;
 // report
-   if (!silent) {
+   if (wereerrors || !silent) {
       printf("TESTING ABLASF\n");
       printf("xDotXX:                                  ");
       if (xdoterrors) {
@@ -1453,7 +1422,7 @@ bool testablasf(bool silent) {
 
 // === hqrnd testing unit ===
 // Function for test HQRNDContinuous function
-static bool hqrndcontinuoustest(bool silent) {
+static bool hqrndcontinuoustest() {
    ae_frame _frame_block;
    ae_int_t nb;
    ae_int_t samplesize;
@@ -1523,7 +1492,7 @@ static bool hqrndcontinuoustest(bool silent) {
 }
 
 // Function for test HQRNDDiscrete function
-static bool hqrnddiscretetest(bool silent) {
+static bool hqrnddiscretetest() {
    ae_frame _frame_block;
    double sigma;
    double sigmathreshold;
@@ -1643,7 +1612,7 @@ static void testhqrndunit_unsetstate(hqrndstate *state) {
    state->magicv = 0;
 }
 
-bool testhqrnd(bool silent) {
+bool testhqrnd() {
    ae_frame _frame_block;
    bool waserrors;
    ae_int_t samplesize;
@@ -1811,39 +1780,39 @@ bool testhqrnd(bool silent) {
    } else {
       normerrors = true;
    }
-   set_error_flag(&normerrors, normsigmaerr > sigmathreshold, __FILE__, __LINE__, "testhqrndunit.ap:230");
+   normerrors = normerrors || normsigmaerr > sigmathreshold;
    ae_vector_set_length(&x, 0);
    hqrndnormalv(&state, samplesize, &x);
-   set_error_flag(&normerrors, x.cnt != samplesize, __FILE__, __LINE__, "testhqrndunit.ap:233");
-   set_error_flag(&normerrors, !isfinitevector(&x, samplesize), __FILE__, __LINE__, "testhqrndunit.ap:234");
+   normerrors = normerrors || x.cnt != samplesize;
+   normerrors = normerrors || !isfinitevector(&x, samplesize);
    if (!normerrors) {
    // Check mean/sigma of the distribution
       testhqrndunit_calculatemv(&x, samplesize, &mean, &means, &stddev, &stddevs);
-      set_error_flag(&normerrors, means == 0.0, __FILE__, __LINE__, "testhqrndunit.ap:241");
-      set_error_flag(&normerrors, stddevs == 0.0, __FILE__, __LINE__, "testhqrndunit.ap:242");
+      normerrors = normerrors || means == 0.0;
+      normerrors = normerrors || stddevs == 0.0;
       normsigmaerr = 0.0;
       normsigmaerr = rmax2(normsigmaerr, fabs((mean - 0) / coalesce(means, 1.0)));
       normsigmaerr = rmax2(normsigmaerr, fabs((stddev - 1) / coalesce(stddevs, 1.0)));
-      set_error_flag(&normerrors, normsigmaerr > sigmathreshold, __FILE__, __LINE__, "testhqrndunit.ap:246");
+      normerrors = normerrors || normsigmaerr > sigmathreshold;
    // Check that subsequent differences are normally distributed too
       ae_vector_set_length(&dx, samplesize - 1);
       for (i = 0; i < samplesize - 1; i++) {
          dx.xR[i] = x.xR[i + 1] - x.xR[i];
       }
       testhqrndunit_calculatemv(&dx, samplesize - 1, &mean, &means, &stddev, &stddevs);
-      set_error_flag(&normerrors, means == 0.0, __FILE__, __LINE__, "testhqrndunit.ap:255");
-      set_error_flag(&normerrors, stddevs == 0.0, __FILE__, __LINE__, "testhqrndunit.ap:256");
+      normerrors = normerrors || means == 0.0;
+      normerrors = normerrors || stddevs == 0.0;
       normsigmaerr = 0.0;
       normsigmaerr = rmax2(normsigmaerr, fabs((mean - 0) / coalesce(means, 1.0)));
       normsigmaerr = rmax2(normsigmaerr, fabs((stddev - sqrt(2.0)) / coalesce(stddevs, 1.0)));
-      set_error_flag(&normerrors, normsigmaerr > sigmathreshold, __FILE__, __LINE__, "testhqrndunit.ap:260");
+      normerrors = normerrors || normsigmaerr > sigmathreshold;
    }
    am = 1 + randominteger(iround(sqrt((double)samplesize)));
    an = 1 + samplesize / am;
    hqrndnormalm(&state, am, an, &a);
-   set_error_flag(&normerrors, a.rows != am, __FILE__, __LINE__, "testhqrndunit.ap:265");
-   set_error_flag(&normerrors, a.cols != an, __FILE__, __LINE__, "testhqrndunit.ap:266");
-   set_error_flag(&normerrors, !apservisfinitematrix(&a, am, an), __FILE__, __LINE__, "testhqrndunit.ap:267");
+   normerrors = normerrors || a.rows != am;
+   normerrors = normerrors || a.cols != an;
+   normerrors = normerrors || !apservisfinitematrix(&a, am, an);
    ae_vector_set_length(&x, am * an);
    for (i = 0; i < am; i++) {
       for (j = 0; j < an; j++) {
@@ -1851,12 +1820,12 @@ bool testhqrnd(bool silent) {
       }
    }
    testhqrndunit_calculatemv(&x, am * an, &mean, &means, &stddev, &stddevs);
-   set_error_flag(&normerrors, means == 0.0, __FILE__, __LINE__, "testhqrndunit.ap:273");
-   set_error_flag(&normerrors, stddevs == 0.0, __FILE__, __LINE__, "testhqrndunit.ap:274");
+   normerrors = normerrors || means == 0.0;
+   normerrors = normerrors || stddevs == 0.0;
    normsigmaerr = 0.0;
    normsigmaerr = rmax2(normsigmaerr, fabs((mean - 0) / coalesce(means, 1.0)));
    normsigmaerr = rmax2(normsigmaerr, fabs((stddev - 1) / coalesce(stddevs, 1.0)));
-   set_error_flag(&normerrors, normsigmaerr > sigmathreshold, __FILE__, __LINE__, "testhqrndunit.ap:278");
+   normerrors = normerrors || normsigmaerr > sigmathreshold;
 // Test unit2
    testhqrndunit_unsetstate(&state);
    hqrndrandomize(&state);
@@ -1867,7 +1836,7 @@ bool testhqrnd(bool silent) {
    }
    for (pass = 0; pass < n; pass++) {
       hqrndunit2(&state, &r1, &r2);
-      set_error_flag(&unit2errors, !NearAtR(r1 * r1 + r2 * r2, 1.0, 100.0 * machineepsilon), __FILE__, __LINE__, "testhqrndunit.ap:292");
+      unit2errors = unit2errors || !NearAtR(r1 * r1 + r2 * r2, 1.0, 100.0 * machineepsilon);
       k = ifloor((atan2(r1, r2) + pi) / (2 * pi) * bins.cnt);
       if (k < 0) {
          k = 0;
@@ -1878,7 +1847,7 @@ bool testhqrnd(bool silent) {
       bins.xZ[k]++;
    }
    for (i = 0; i < bins.cnt; i++) {
-      set_error_flag(&unit2errors, (double)bins.xZ[i] < 0.9 * n / bins.cnt || (double)bins.xZ[i] > 1.1 * n / bins.cnt, __FILE__, __LINE__, "testhqrndunit.ap:301");
+      unit2errors = unit2errors || (double)bins.xZ[i] < 0.9 * n / bins.cnt || (double)bins.xZ[i] > 1.1 * n / bins.cnt;
    }
 // Test exponential
    testhqrndunit_unsetstate(&state);
@@ -1904,11 +1873,11 @@ bool testhqrnd(bool silent) {
    }
    experrors = experrors || expsigmaerr > sigmathreshold;
 // Discrete/Continuous tests
-   discreteerr = hqrnddiscretetest(true);
-   continuouserr = hqrndcontinuoustest(true);
+   discreteerr = hqrnddiscretetest();
+   continuouserr = hqrndcontinuoustest();
 // Final report
    waserrors = seederrors || urerrors || uierrors || normerrors || unit2errors || experrors || discreteerr || continuouserr;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("RNG TEST\n");
       printf("SEED TEST:                               ");
       if (!seederrors) {
@@ -3380,9 +3349,9 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn) {
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
             if (i < aoffsi || i >= aoffsi + m || j < aoffsj || j >= aoffsj + n) {
-               set_error_flag(&result, fabs(refra.xyR[i][j] - refrb.xyR[i][j]) != 0.0, __FILE__, __LINE__, "testablasunit.ap:1145");
+               result = result || fabs(refra.xyR[i][j] - refrb.xyR[i][j]) != 0.0;
             } else {
-               set_error_flag(&result, !NearAtR(refra.xyR[i][j], refrb.xyR[i][j] + ralpha * ru.xR[i - aoffsi + uoffs] * rv.xR[j - aoffsj + voffs], threshold), __FILE__, __LINE__, "testablasunit.ap:1147");
+               result = result || !NearAtR(refra.xyR[i][j], refrb.xyR[i][j] + ralpha * ru.xR[i - aoffsi + uoffs] * rv.xR[j - aoffsj + voffs], threshold);
             }
          }
       }
@@ -3514,7 +3483,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
       rmatrixgemv(m, n, ralpha, &refra, aoffsi, aoffsj, opra, &rx, xoffs, rbeta, &ry, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < yoffs || i >= yoffs + m) {
-            set_error_flag(&result, ry.xR[i] != i, __FILE__, __LINE__, "testablasunit.ap:1295");
+            result = result || ry.xR[i] != i;
          } else {
             rv1 = ry.xR[i];
             rv2 = 0.0;
@@ -3525,7 +3494,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
                rv2 = ae_v_dotproduct(&refra.xyR[aoffsi][aoffsj + i - yoffs], refra.stride, &rx.xR[xoffs], 1, n);
             }
             rv2 = rbeta * i + ralpha * rv2;
-            set_error_flag(&result, !NearAtR(rv1, rv2, threshold), __FILE__, __LINE__, "testablasunit.ap:1305");
+            result = result || !NearAtR(rv1, rv2, threshold);
          }
       }
    }
@@ -3668,15 +3637,15 @@ static void testablasunit_testsymv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       testablasunit_refrmatrixsymv(n, ralpha, &refra, aoffsi, aoffsj, isuppera, &rx, xoffs, rbeta, &rz, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < yoffs || i >= yoffs + n) {
-            set_error_flag(errorflag, ry.xR[i] != i, __FILE__, __LINE__, "testablasunit.ap:1393");
+            *errorflag = *errorflag || ry.xR[i] != i;
          } else {
-            set_error_flag(errorflag, !NearAtR(ry.xR[i], rz.xR[i], threshold * rmax3(fabs(ry.xR[i]), fabs(rz.xR[i]), 1.0)), __FILE__, __LINE__, "testablasunit.ap:1395");
+            *errorflag = *errorflag || !NearAtR(ry.xR[i], rz.xR[i], threshold * rmax3(fabs(ry.xR[i]), fabs(rz.xR[i]), 1.0));
          }
       }
    // Test RMatrixSYVMV()
       rv1 = rmatrixsyvmv(n, &refra, aoffsi, aoffsj, isuppera, &rx, xoffs, &ry);
       rv2 = testablasunit_refrmatrixsyvmv(n, &refra, aoffsi, aoffsj, isuppera, &rx, xoffs);
-      set_error_flag(errorflag, !NearAtR(rv1, rv2, threshold * rmax3(fabs(rv1), fabs(rv2), 1.0)), __FILE__, __LINE__, "testablasunit.ap:1409");
+      *errorflag = *errorflag || !NearAtR(rv1, rv2, threshold * rmax3(fabs(rv1), fabs(rv2), 1.0));
    }
    ae_frame_leave();
 }
@@ -3747,7 +3716,7 @@ static void testablasunit_testtrsv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       rmatrixtrsv(n, &refra, aoffsi, aoffsj, isuppera, isunita, opa, &rx, xoffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < xoffs || i > xoffs + n - 1) {
-            set_error_flag(errorflag, rx.xR[i] != ry.xR[i], __FILE__, __LINE__, "testablasunit.ap:1493");
+            *errorflag = *errorflag || rx.xR[i] != ry.xR[i];
          }
       }
       ae_matrix_set_length(&ea, n, n);
@@ -3769,7 +3738,7 @@ static void testablasunit_testtrsv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       }
       for (i = 0; i < n; i++) {
          v = ae_v_dotproduct(ea.xyR[i], 1, &rx.xR[xoffs], 1, n);
-         set_error_flag(errorflag, !NearAtR(v, ry.xR[xoffs + i], threshold), __FILE__, __LINE__, "testablasunit.ap:1516");
+         *errorflag = *errorflag || !NearAtR(v, ry.xR[xoffs + i], threshold);
       }
    }
    ae_frame_leave();
@@ -3933,9 +3902,9 @@ static void testablasunit_testcopy1(ae_int_t minn, ae_int_t maxn, bool *err) {
       rvectorcopy(ss, &ra, aoffs, &rb, boffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < boffs || i >= boffs + ss) {
-            set_error_flag(err, rb.xR[i] != 1 + 2 * i, __FILE__, __LINE__, "testablasunit.ap:1762");
+            *err = *err || rb.xR[i] != 1 + 2 * i;
          } else {
-            set_error_flag(err, !NearAtR(ra.xR[aoffs + i - boffs], rb.xR[i], threshold), __FILE__, __LINE__, "testablasunit.ap:1764");
+            *err = *err || !NearAtR(ra.xR[aoffs + i - boffs], rb.xR[i], threshold);
          }
       }
    }
@@ -4134,11 +4103,11 @@ static void testablasunit_testreflections(bool *errorflag) {
    }
    generatereflection(&v, 10, &tau);
 // Result
-   set_error_flag(errorflag, meg > threshold || mel > threshold || mer > threshold, __FILE__, __LINE__, "testablasunit.ap:1956");
+   *errorflag = *errorflag || meg > threshold || mel > threshold || mer > threshold;
    ae_frame_leave();
 }
 
-bool testablas(bool silent) {
+bool testablas() {
    ae_frame _frame_block;
    ae_int_t n0;
    ae_int_t n1;
@@ -4190,7 +4159,7 @@ bool testablas(bool silent) {
    testablasunit_testcopy1(1, 3 * matrixtilesizea() + 1, &copy1errors);
 // report
    waserrors = trsmerrors || syrkerrors || gemmerrors || transerrors || rank1errors || gemverrors || symverrors || trsverrors || reflerrors || copyerrors || copy1errors || specerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING ABLAS\n");
       printf("LEVEL 3 FUNCTIONS:\n");
       printf("* TRSM                                   ");
@@ -4280,7 +4249,7 @@ bool testablas(bool silent) {
 }
 
 // === hblas testing unit ===
-bool testhblas(bool silent) {
+bool testhblas() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t maxn;
@@ -4370,7 +4339,7 @@ bool testhblas(bool silent) {
    }
 // report
    waserrors = mverr > threshold;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING HERMITIAN BLAS\n");
       printf("MV error:                                %5.3e\n", mverr);
       printf("Threshold:                               %5.3e\n", threshold);
@@ -4387,7 +4356,7 @@ bool testhblas(bool silent) {
 }
 
 // === creflections testing unit ===
-bool testcreflections(bool silent) {
+bool testcreflections() {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -4544,7 +4513,7 @@ bool testcreflections(bool silent) {
    complexgeneratereflection(&v, 10, &tau);
 // report
    waserrors = meg > threshold || mel > threshold || mer > threshold;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING COMPLEX REFLECTIONS\n");
       printf("Generate error:                          %5.3e\n", meg);
       printf("Apply(L) error:                          %5.3e\n", mel);
@@ -4564,7 +4533,7 @@ bool testcreflections(bool silent) {
 }
 
 // === sblas testing unit ===
-bool testsblas(bool silent) {
+bool testsblas() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t maxn;
@@ -4654,7 +4623,7 @@ bool testsblas(bool silent) {
    }
 // report
    waserrors = mverr > threshold;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING SYMMETRIC BLAS\n");
       printf("MV error:                                %5.3e\n", mverr);
       printf("Threshold:                               %5.3e\n", threshold);
@@ -5527,7 +5496,7 @@ static void testortfacunit_testctdproblem(CMatrix *a, ae_int_t n, double thresho
 }
 
 // Main unittest subroutine
-bool testortfac(bool silent) {
+bool testortfac() {
    ae_frame _frame_block;
    double threshold;
    ae_int_t mx;
@@ -5717,7 +5686,7 @@ bool testortfac(bool silent) {
    }
 // report
    waserrors = rqrerrors || rlqerrors || cqrerrors || clqerrors || rbderrors || rhesserrors || rtderrors || ctderrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING ORTFAC UNIT\n");
       printf("RQR ERRORS:                              ");
       if (!rqrerrors) {
@@ -6365,7 +6334,7 @@ static double testmatgenunit_svdcond(RMatrix *a, ae_int_t n) {
    return result;
 }
 
-bool testmatgen(bool silent) {
+bool testmatgen() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t maxn;
@@ -6804,7 +6773,7 @@ bool testmatgen(bool silent) {
    eulerr = testmatgenunit_testeult();
 // report
    waserrors = rerr || cerr || serr || spderr || herr || hpderr || eulerr;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING MATRIX GENERATOR\n");
       printf("REAL TEST:                               ");
       if (!rerr) {
@@ -6911,7 +6880,7 @@ static void testtsortunit_testsortresults(RVector *asorted, ZVector *p1, ZVector
 }
 
 // Testing tag sort
-bool testtsort(bool silent) {
+bool testtsort() {
    ae_frame _frame_block;
    bool waserrors;
    ae_int_t n;
@@ -7172,7 +7141,7 @@ bool testtsort(bool silent) {
       }
    }
 // report
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING TAGSORT\n");
       if (waserrors) {
          printf("TEST FAILED\n");
@@ -7316,7 +7285,7 @@ static bool skstest() {
             for (j = 0; j < n; j++) {
                if (a.xyR[i][j] != 0.0) {
                   if (hqrndnormal(&rs) > 0.0) {
-                     set_error_flag(&result, !sparserewriteexisting(&s0, i, j, a.xyR[i][j]), __FILE__, __LINE__, "testsparseunit.ap:456");
+                     result = result || !sparserewriteexisting(&s0, i, j, a.xyR[i][j]);
                   } else {
                      sparseset(&s0, i, j, a.xyR[i][j]);
                   }
@@ -7333,16 +7302,16 @@ static bool skstest() {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (i >= j && i - j > d.xZ[i]) {
-                  set_error_flag(&result, sparseexists(&s0, i, j), __FILE__, __LINE__, "testsparseunit.ap:475");
+                  result = result || sparseexists(&s0, i, j);
                }
                if (i >= j && i - j <= d.xZ[i]) {
-                  set_error_flag(&result, !sparseexists(&s0, i, j), __FILE__, __LINE__, "testsparseunit.ap:477");
+                  result = result || !sparseexists(&s0, i, j);
                }
                if (i <= j && j - i > u.xZ[j]) {
-                  set_error_flag(&result, sparseexists(&s0, i, j), __FILE__, __LINE__, "testsparseunit.ap:479");
+                  result = result || sparseexists(&s0, i, j);
                }
                if (i <= j && j - i <= u.xZ[j]) {
-                  set_error_flag(&result, !sparseexists(&s0, i, j), __FILE__, __LINE__, "testsparseunit.ap:481");
+                  result = result || !sparseexists(&s0, i, j);
                }
             }
          }
@@ -7350,7 +7319,7 @@ static bool skstest() {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (i >= j && i - j > d.xZ[i] || i <= j && j - i > u.xZ[j]) {
-                  set_error_flag(&result, sparserewriteexisting(&s0, i, j, 1.0), __FILE__, __LINE__, "testsparseunit.ap:490");
+                  result = result || sparserewriteexisting(&s0, i, j, 1.0);
                }
             }
          }
@@ -7363,37 +7332,37 @@ static bool skstest() {
          sparsecopytohashbuf(&s0, &s5);
          sparsecopy(&s0, &s6);
          sparseconverttohash(&s6);
-         set_error_flag(&result, sparsegetnrows(&s0) != n, __FILE__, __LINE__, "testsparseunit.ap:503");
-         set_error_flag(&result, sparsegetncols(&s0) != n, __FILE__, __LINE__, "testsparseunit.ap:504");
-         set_error_flag(&result, sparsegetmatrixtype(&s0) != 2, __FILE__, __LINE__, "testsparseunit.ap:505");
-         set_error_flag(&result, !sparseissks(&s0), __FILE__, __LINE__, "testsparseunit.ap:506");
-         set_error_flag(&result, sparseiscrs(&s0), __FILE__, __LINE__, "testsparseunit.ap:507");
-         set_error_flag(&result, sparseishash(&s0), __FILE__, __LINE__, "testsparseunit.ap:508");
-         set_error_flag(&result, sparseissks(&s1), __FILE__, __LINE__, "testsparseunit.ap:509");
-         set_error_flag(&result, !sparseiscrs(&s1), __FILE__, __LINE__, "testsparseunit.ap:510");
-         set_error_flag(&result, sparseishash(&s1), __FILE__, __LINE__, "testsparseunit.ap:511");
+         result = result || sparsegetnrows(&s0) != n;
+         result = result || sparsegetncols(&s0) != n;
+         result = result || sparsegetmatrixtype(&s0) != 2;
+         result = result || !sparseissks(&s0);
+         result = result || sparseiscrs(&s0);
+         result = result || sparseishash(&s0);
+         result = result || sparseissks(&s1);
+         result = result || !sparseiscrs(&s1);
+         result = result || sparseishash(&s1);
          for (i = 0; i < n; i++) {
             v1 = a.xyR[i][i];
             v0 = sparsegetdiagonal(&s0, i);
-            set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:516");
+            result = result || v0 != v1;
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                v1 = a.xyR[i][j];
                v0 = sparseget(&s0, i, j);
-               set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:523");
+               result = result || v0 != v1;
                v0 = sparseget(&s1, i, j);
-               set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:525");
+               result = result || v0 != v1;
                v0 = sparseget(&s2, i, j);
-               set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:527");
+               result = result || v0 != v1;
                v0 = sparseget(&s3, i, j);
-               set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:529");
+               result = result || v0 != v1;
                v0 = sparseget(&s4, i, j);
-               set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:531");
+               result = result || v0 != v1;
                v0 = sparseget(&s5, i, j);
-               set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:533");
+               result = result || v0 != v1;
                v0 = sparseget(&s6, i, j);
-               set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:535");
+               result = result || v0 != v1;
             }
          }
       // Check enumeration capabilities:
@@ -7408,19 +7377,19 @@ static bool skstest() {
          t0 = 0;
          t1 = 0;
          while (sparseenumerate(&s0, &t0, &t1, &i, &j, &v0)) {
-            set_error_flag(&result, wasenumerated.xyB[i][j], __FILE__, __LINE__, "testsparseunit.ap:551");
+            result = result || wasenumerated.xyB[i][j];
             wasenumerated.xyB[i][j] = true;
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (a.xyR[i][j] != 0.0) {
-                  set_error_flag(&result, !wasenumerated.xyB[i][j], __FILE__, __LINE__, "testsparseunit.ap:557");
+                  result = result || !wasenumerated.xyB[i][j];
                }
             }
          }
       // Check UpperCnt()/LowerCnt()
-         set_error_flag(&result, sparsegetuppercount(&s0) != uppercnt, __FILE__, __LINE__, "testsparseunit.ap:562");
-         set_error_flag(&result, sparsegetlowercount(&s0) != lowercnt, __FILE__, __LINE__, "testsparseunit.ap:563");
+         result = result || sparsegetuppercount(&s0) != uppercnt;
+         result = result || sparsegetlowercount(&s0) != lowercnt;
       // Check in-place transposition
          sparsecopy(&s0, &s1);
          sparsetransposesks(&s1);
@@ -7428,7 +7397,7 @@ static bool skstest() {
             for (j = 0; j < n; j++) {
                v0 = sparseget(&s0, i, j);
                v1 = sparseget(&s1, j, i);
-               set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:575");
+               result = result || v0 != v1;
             }
          }
       // One more check - matrix is initially created in some other format
@@ -7445,24 +7414,24 @@ static bool skstest() {
          sparseconverttosks(&s1);
          sparsecopytosks(&s0, &s2);
          sparsecopytosksbuf(&s0, &s3);
-         set_error_flag(&result, !sparseissks(&s1), __FILE__, __LINE__, "testsparseunit.ap:591");
-         set_error_flag(&result, sparseiscrs(&s1), __FILE__, __LINE__, "testsparseunit.ap:592");
-         set_error_flag(&result, sparseishash(&s1), __FILE__, __LINE__, "testsparseunit.ap:593");
-         set_error_flag(&result, !sparseissks(&s2), __FILE__, __LINE__, "testsparseunit.ap:594");
-         set_error_flag(&result, sparseiscrs(&s2), __FILE__, __LINE__, "testsparseunit.ap:595");
-         set_error_flag(&result, sparseishash(&s2), __FILE__, __LINE__, "testsparseunit.ap:596");
-         set_error_flag(&result, !sparseissks(&s3), __FILE__, __LINE__, "testsparseunit.ap:597");
-         set_error_flag(&result, sparseiscrs(&s3), __FILE__, __LINE__, "testsparseunit.ap:598");
-         set_error_flag(&result, sparseishash(&s3), __FILE__, __LINE__, "testsparseunit.ap:599");
+         result = result || !sparseissks(&s1);
+         result = result || sparseiscrs(&s1);
+         result = result || sparseishash(&s1);
+         result = result || !sparseissks(&s2);
+         result = result || sparseiscrs(&s2);
+         result = result || sparseishash(&s2);
+         result = result || !sparseissks(&s3);
+         result = result || sparseiscrs(&s3);
+         result = result || sparseishash(&s3);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                v1 = a.xyR[i][j];
                v0 = sparseget(&s1, i, j);
-               set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:605");
+               result = result || v0 != v1;
                v0 = sparseget(&s2, i, j);
-               set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:607");
+               result = result || v0 != v1;
                v0 = sparseget(&s3, i, j);
-               set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit.ap:609");
+               result = result || v0 != v1;
             }
          }
       // Increase problem sparsity and try one more time.
@@ -7516,20 +7485,20 @@ static void crstest(bool *errorflag) {
             sparsecreate(m, n, iround(nz * hqrnduniformr(&rs)), &s0);
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(errorflag, sparseexists(&s0, i, j), __FILE__, __LINE__, "testsparseunit.ap:676");
+                  *errorflag = *errorflag || sparseexists(&s0, i, j);
                   if (hqrnduniformr(&rs) <= pnz) {
                      sparseset(&s0, i, j, hqrndnormal(&rs));
-                     set_error_flag(errorflag, !sparseexists(&s0, i, j), __FILE__, __LINE__, "testsparseunit.ap:680");
+                     *errorflag = *errorflag || !sparseexists(&s0, i, j);
                   }
                }
             }
             sparsecopytocrs(&s0, &s1);
-            set_error_flag(errorflag, !sparseiscrs(&s1), __FILE__, __LINE__, "testsparseunit.ap:684");
+            *errorflag = *errorflag || !sparseiscrs(&s1);
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(errorflag, sparseget(&s0, i, j) != sparseget(&s1, i, j), __FILE__, __LINE__, "testsparseunit.ap:688");
-                  set_error_flag(errorflag, sparseexists(&s0, i, j) && !sparseexists(&s1, i, j), __FILE__, __LINE__, "testsparseunit.ap:689");
-                  set_error_flag(errorflag, sparseexists(&s1, i, j) && !sparseexists(&s0, i, j), __FILE__, __LINE__, "testsparseunit.ap:690");
+                  *errorflag = *errorflag || sparseget(&s0, i, j) != sparseget(&s1, i, j);
+                  *errorflag = *errorflag || sparseexists(&s0, i, j) && !sparseexists(&s1, i, j);
+                  *errorflag = *errorflag || sparseexists(&s1, i, j) && !sparseexists(&s0, i, j);
                }
             }
             if (*errorflag) {
@@ -7539,16 +7508,16 @@ static void crstest(bool *errorflag) {
          // Check transposition
             sparsecopytocrs(&s1, &s2);
             sparsetransposecrs(&s2);
-            set_error_flag(errorflag, !sparseiscrs(&s2), __FILE__, __LINE__, "testsparseunit.ap:700");
-            set_error_flag(errorflag, sparsegetnrows(&s1) != sparsegetncols(&s2), __FILE__, __LINE__, "testsparseunit.ap:701");
-            set_error_flag(errorflag, sparsegetncols(&s1) != sparsegetnrows(&s2), __FILE__, __LINE__, "testsparseunit.ap:702");
+            *errorflag = *errorflag || !sparseiscrs(&s2);
+            *errorflag = *errorflag || sparsegetnrows(&s1) != sparsegetncols(&s2);
+            *errorflag = *errorflag || sparsegetncols(&s1) != sparsegetnrows(&s2);
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(errorflag, sparseget(&s1, i, j) != sparseget(&s2, j, i), __FILE__, __LINE__, "testsparseunit.ap:707");
+                  *errorflag = *errorflag || sparseget(&s1, i, j) != sparseget(&s2, j, i);
                }
             }
             if (*errorflag) {
@@ -7557,16 +7526,16 @@ static void crstest(bool *errorflag) {
             }
          // Check transposition
             sparsecopytransposecrs(&s1, &s3);
-            set_error_flag(errorflag, !sparseiscrs(&s3), __FILE__, __LINE__, "testsparseunit.ap:715");
-            set_error_flag(errorflag, sparsegetnrows(&s1) != sparsegetncols(&s3), __FILE__, __LINE__, "testsparseunit.ap:716");
-            set_error_flag(errorflag, sparsegetncols(&s1) != sparsegetnrows(&s3), __FILE__, __LINE__, "testsparseunit.ap:717");
+            *errorflag = *errorflag || !sparseiscrs(&s3);
+            *errorflag = *errorflag || sparsegetnrows(&s1) != sparsegetncols(&s3);
+            *errorflag = *errorflag || sparsegetncols(&s1) != sparsegetnrows(&s3);
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(errorflag, sparseget(&s1, i, j) != sparseget(&s3, j, i), __FILE__, __LINE__, "testsparseunit.ap:722");
+                  *errorflag = *errorflag || sparseget(&s1, i, j) != sparseget(&s3, j, i);
                }
             }
             if (*errorflag) {
@@ -7575,16 +7544,16 @@ static void crstest(bool *errorflag) {
             }
          // Check transposition
             sparsecopytransposecrs(&s1, &s4);
-            set_error_flag(errorflag, !sparseiscrs(&s4), __FILE__, __LINE__, "testsparseunit.ap:730");
-            set_error_flag(errorflag, sparsegetnrows(&s1) != sparsegetncols(&s4), __FILE__, __LINE__, "testsparseunit.ap:731");
-            set_error_flag(errorflag, sparsegetncols(&s1) != sparsegetnrows(&s4), __FILE__, __LINE__, "testsparseunit.ap:732");
+            *errorflag = *errorflag || !sparseiscrs(&s4);
+            *errorflag = *errorflag || sparsegetnrows(&s1) != sparsegetncols(&s4);
+            *errorflag = *errorflag || sparsegetncols(&s1) != sparsegetnrows(&s4);
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(errorflag, sparseget(&s1, i, j) != sparseget(&s4, j, i), __FILE__, __LINE__, "testsparseunit.ap:737");
+                  *errorflag = *errorflag || sparseget(&s1, i, j) != sparseget(&s4, j, i);
                }
             }
             if (*errorflag) {
@@ -7644,15 +7613,15 @@ static void testserialize(bool *errorflag) {
                sparsecreate(m, n, iround(nz * hqrnduniformr(&rs)), &s0);
                for (i = 0; i < m; i++) {
                   for (j = 0; j < n; j++) {
-                     set_error_flag(errorflag, sparseexists(&s0, i, j), __FILE__, __LINE__, "testsparseunit.ap:797");
+                     *errorflag = *errorflag || sparseexists(&s0, i, j);
                      if (hqrnduniformr(&rs) <= pnz) {
                         sparseset(&s0, i, j, hqrndnormal(&rs));
-                        set_error_flag(errorflag, !sparseexists(&s0, i, j), __FILE__, __LINE__, "testsparseunit.ap:801");
+                        *errorflag = *errorflag || !sparseexists(&s0, i, j);
                      }
                   }
                }
                sparseconvertto(&s0, mtype);
-               set_error_flag(errorflag, sparsegetmatrixtype(&s0) != mtype, __FILE__, __LINE__, "testsparseunit.ap:805");
+               *errorflag = *errorflag || sparsegetmatrixtype(&s0) != mtype;
             // Check copy-through-serialization
                {
                // This code passes data structure through serializers
@@ -7674,16 +7643,16 @@ static void testserialize(bool *errorflag) {
                   ae_serializer_stop(&_local_serializer);
                   ae_frame_leave();
                }
-               set_error_flag(errorflag, sparsegetmatrixtype(&s1) != mtype, __FILE__, __LINE__, "testsparseunit.ap:811");
-               set_error_flag(errorflag, sparsegetnrows(&s0) != sparsegetnrows(&s1), __FILE__, __LINE__, "testsparseunit.ap:812");
-               set_error_flag(errorflag, sparsegetncols(&s0) != sparsegetncols(&s1), __FILE__, __LINE__, "testsparseunit.ap:813");
+               *errorflag = *errorflag || sparsegetmatrixtype(&s1) != mtype;
+               *errorflag = *errorflag || sparsegetnrows(&s0) != sparsegetnrows(&s1);
+               *errorflag = *errorflag || sparsegetncols(&s0) != sparsegetncols(&s1);
                if (*errorflag) {
                   ae_frame_leave();
                   return;
                }
                for (i = 0; i < m; i++) {
                   for (j = 0; j < n; j++) {
-                     set_error_flag(errorflag, sparseget(&s0, i, j) != sparseget(&s1, i, j), __FILE__, __LINE__, "testsparseunit.ap:818");
+                     *errorflag = *errorflag || sparseget(&s0, i, j) != sparseget(&s1, i, j);
                   }
                }
                if (*errorflag) {
@@ -7756,8 +7725,8 @@ static bool basicfunctest() {
                return result;
             }
          }
-         set_error_flag(&result, sparsegetuppercount(&s) != uppercnt, __FILE__, __LINE__, "testsparseunit.ap:887");
-         set_error_flag(&result, sparsegetlowercount(&s) != lowercnt, __FILE__, __LINE__, "testsparseunit.ap:888");
+         result = result || sparsegetuppercount(&s) != uppercnt;
+         result = result || sparsegetlowercount(&s) != lowercnt;
       // Checking for Matrix with CRS type
          sparseconverttocrs(&s);
          for (i1 = 0; i1 < i; i1++) {
@@ -7776,8 +7745,8 @@ static bool basicfunctest() {
                return result;
             }
          }
-         set_error_flag(&result, sparsegetuppercount(&s) != uppercnt, __FILE__, __LINE__, "testsparseunit.ap:907");
-         set_error_flag(&result, sparsegetlowercount(&s) != lowercnt, __FILE__, __LINE__, "testsparseunit.ap:908");
+         result = result || sparsegetuppercount(&s) != uppercnt;
+         result = result || sparsegetlowercount(&s) != lowercnt;
       }
    }
    ae_frame_leave();
@@ -7991,8 +7960,8 @@ static bool testlevel2unsymmetric() {
          // Test SparseGet() for SA and S0 against matrix returned in A
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(&result, !NearAtR(sparseget(&sa, i, j), a.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:966");
-                  set_error_flag(&result, !NearAtR(sparseget(&s0, i, j), a.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:967");
+                  result = result || !NearAtR(sparseget(&sa, i, j), a.xyR[i][j], eps);
+                  result = result || !NearAtR(sparseget(&s0, i, j), a.xyR[i][j], eps);
                }
             }
          // Test SparseMV
@@ -8003,14 +7972,14 @@ static bool testlevel2unsymmetric() {
                x1.xR[j] = x0.xR[j];
             }
             sparsemv(&s0, &x0, &y0);
-            set_error_flag(&result, y0.cnt < m, __FILE__, __LINE__, "testsparseunit.ap:981");
+            result = result || y0.cnt < m;
             if (result) {
                ae_frame_leave();
                return result;
             }
             for (i = 0; i < m; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, x1.xR, 1, n);
-               set_error_flag(&result, !NearAtR(v, y0.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:987");
+               result = result || !NearAtR(v, y0.xR[i], eps);
             }
          // Test SparseMTV
             ae_vector_set_length(&x0, m);
@@ -8020,14 +7989,14 @@ static bool testlevel2unsymmetric() {
                x1.xR[j] = x0.xR[j];
             }
             sparsemtv(&s0, &x0, &y0);
-            set_error_flag(&result, y0.cnt < n, __FILE__, __LINE__, "testsparseunit.ap:1001");
+            result = result || y0.cnt < n;
             if (result) {
                ae_frame_leave();
                return result;
             }
             for (j = 0; j < n; j++) {
                v = ae_v_dotproduct(&a.xyR[0][j], a.stride, x1.xR, 1, m);
-               set_error_flag(&result, !NearAtR(v, y0.xR[j], eps), __FILE__, __LINE__, "testsparseunit.ap:1007");
+               result = result || !NearAtR(v, y0.xR[j], eps);
             }
          // Sparse GEMV
             for (ops = 0; ops <= 1; ops++) {
@@ -8072,7 +8041,7 @@ static bool testlevel2unsymmetric() {
                   // Test
                      sparsegemv(&s0, alpha, ops, &x0, ix, beta, &y0, iy);
                      for (j = 0; j < iy + opm; j++) {
-                        set_error_flag(&result, !NearAtR(y0.xR[j], y1.xR[j], eps), __FILE__, __LINE__, "testsparseunit.ap:1068");
+                        result = result || !NearAtR(y0.xR[j], y1.xR[j], eps);
                      }
                   }
                }
@@ -8086,17 +8055,17 @@ static bool testlevel2unsymmetric() {
                   x1.xR[j] = x0.xR[j];
                }
                sparsemv2(&s0, &x0, &y0, &y1);
-               set_error_flag(&result, y0.cnt < n, __FILE__, __LINE__, "testsparseunit.ap:1084");
-               set_error_flag(&result, y1.cnt < n, __FILE__, __LINE__, "testsparseunit.ap:1085");
+               result = result || y0.cnt < n;
+               result = result || y1.cnt < n;
                if (result) {
                   ae_frame_leave();
                   return result;
                }
                for (j = 0; j < n; j++) {
                   v = ae_v_dotproduct(a.xyR[j], 1, x1.xR, 1, n);
-                  set_error_flag(&result, !NearAtR(v, y0.xR[j], eps), __FILE__, __LINE__, "testsparseunit.ap:1091");
+                  result = result || !NearAtR(v, y0.xR[j], eps);
                   v = ae_v_dotproduct(&a.xyR[0][j], a.stride, x1.xR, 1, n);
-                  set_error_flag(&result, !NearAtR(v, y1.xR[j], eps), __FILE__, __LINE__, "testsparseunit.ap:1093");
+                  result = result || !NearAtR(v, y1.xR[j], eps);
                }
             }
          }
@@ -8151,8 +8120,8 @@ static bool testlevel3unsymmetric() {
          // Test SparseGet() for SA and S0 against matrix returned in A
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(&result, sparseget(&sa, i, j) != a.xyR[i][j], __FILE__, __LINE__, "testsparseunit.ap:1156");
-                  set_error_flag(&result, sparseget(&s0, i, j) != a.xyR[i][j], __FILE__, __LINE__, "testsparseunit.ap:1157");
+                  result = result || sparseget(&sa, i, j) != a.xyR[i][j];
+                  result = result || sparseget(&s0, i, j) != a.xyR[i][j];
                }
             }
          // Test SparseMV
@@ -8165,8 +8134,8 @@ static bool testlevel3unsymmetric() {
                }
             }
             sparsemm(&s0, &x0, k, &y0);
-            set_error_flag(&result, y0.rows < m, __FILE__, __LINE__, "testsparseunit.ap:1172");
-            set_error_flag(&result, y0.cols < k, __FILE__, __LINE__, "testsparseunit.ap:1173");
+            result = result || y0.rows < m;
+            result = result || y0.cols < k;
             if (result) {
                ae_frame_leave();
                return result;
@@ -8174,7 +8143,7 @@ static bool testlevel3unsymmetric() {
             for (i = 0; i < m; i++) {
                for (j = 0; j < k; j++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, &x1.xyR[0][j], x1.stride, n);
-                  set_error_flag(&result, !NearAtR(v, y0.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1180");
+                  result = result || !NearAtR(v, y0.xyR[i][j], eps);
                }
             }
          // Test SparseMTM
@@ -8187,8 +8156,8 @@ static bool testlevel3unsymmetric() {
                }
             }
             sparsemtm(&s0, &x0, k, &y0);
-            set_error_flag(&result, y0.rows < n, __FILE__, __LINE__, "testsparseunit.ap:1195");
-            set_error_flag(&result, y0.cols < k, __FILE__, __LINE__, "testsparseunit.ap:1196");
+            result = result || y0.rows < n;
+            result = result || y0.cols < k;
             if (result) {
                ae_frame_leave();
                return result;
@@ -8196,7 +8165,7 @@ static bool testlevel3unsymmetric() {
             for (i = 0; i < n; i++) {
                for (j = 0; j < k; j++) {
                   v = ae_v_dotproduct(&a.xyR[0][i], a.stride, &x1.xyR[0][j], x1.stride, m);
-                  set_error_flag(&result, !NearAtR(v, y0.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1203");
+                  result = result || !NearAtR(v, y0.xyR[i][j], eps);
                }
             }
          // Test SparseMM2
@@ -8210,10 +8179,10 @@ static bool testlevel3unsymmetric() {
                   }
                }
                sparsemm2(&s0, &x0, k, &y0, &y1);
-               set_error_flag(&result, y0.rows < n, __FILE__, __LINE__, "testsparseunit.ap:1220");
-               set_error_flag(&result, y0.cols < k, __FILE__, __LINE__, "testsparseunit.ap:1221");
-               set_error_flag(&result, y1.rows < n, __FILE__, __LINE__, "testsparseunit.ap:1222");
-               set_error_flag(&result, y1.cols < k, __FILE__, __LINE__, "testsparseunit.ap:1223");
+               result = result || y0.rows < n;
+               result = result || y0.cols < k;
+               result = result || y1.rows < n;
+               result = result || y1.cols < k;
                if (result) {
                   ae_frame_leave();
                   return result;
@@ -8221,9 +8190,9 @@ static bool testlevel3unsymmetric() {
                for (i = 0; i < n; i++) {
                   for (j = 0; j < k; j++) {
                      v = ae_v_dotproduct(a.xyR[i], 1, &x1.xyR[0][j], x1.stride, n);
-                     set_error_flag(&result, !NearAtR(v, y0.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1230");
+                     result = result || !NearAtR(v, y0.xyR[i][j], eps);
                      v = ae_v_dotproduct(&a.xyR[0][i], a.stride, &x1.xyR[0][j], x1.stride, n);
-                     set_error_flag(&result, !NearAtR(v, y1.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1232");
+                     result = result || !NearAtR(v, y1.xyR[i][j], eps);
                   }
                }
             }
@@ -8299,10 +8268,10 @@ static bool testlevel2symmetric() {
          // Test SparseGet() for SA and S0 against matrix returned in A
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(&result, !NearAtR(sparseget(&sa, i, j), a.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1311");
-                  set_error_flag(&result, !NearAtR(sparseget(&s0, i, j), a.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1312");
-                  set_error_flag(&result, j < i && triangletype == 1 && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1313");
-                  set_error_flag(&result, j > i && triangletype == -1 && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1314");
+                  result = result || !NearAtR(sparseget(&sa, i, j), a.xyR[i][j], eps);
+                  result = result || !NearAtR(sparseget(&s0, i, j), a.xyR[i][j], eps);
+                  result = result || j < i && triangletype == 1 && sparseget(&s0, i, j) != 0.0;
+                  result = result || j > i && triangletype == -1 && sparseget(&s0, i, j) != 0.0;
                }
             }
          // Before we proceed with testing, update empty triangle of A
@@ -8322,24 +8291,24 @@ static bool testlevel2symmetric() {
                x1.xR[j] = x0.xR[j];
             }
             sparsesmv(&s0, isupper, &x0, &y0);
-            set_error_flag(&result, y0.cnt < n, __FILE__, __LINE__, "testsparseunit.ap:1337");
+            result = result || y0.cnt < n;
             if (result) {
                ae_frame_leave();
                return result;
             }
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, x1.xR, 1, n);
-               set_error_flag(&result, !NearAtR(v, y0.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:1343");
+               result = result || !NearAtR(v, y0.xR[i], eps);
             }
             sparsesmv(&s1, isupper, &x0, &y1);
-            set_error_flag(&result, y1.cnt < n, __FILE__, __LINE__, "testsparseunit.ap:1346");
+            result = result || y1.cnt < n;
             if (result) {
                ae_frame_leave();
                return result;
             }
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, x1.xR, 1, n);
-               set_error_flag(&result, !NearAtR(v, y1.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:1352");
+               result = result || !NearAtR(v, y1.xR[i], eps);
             }
          // Test SparseVSMV
             ae_vector_set_length(&x0, n);
@@ -8355,9 +8324,9 @@ static bool testlevel2symmetric() {
                }
             }
             va = sparsevsmv(&s0, isupper, &x0);
-            set_error_flag(&result, !NearAtR(va, vb, eps), __FILE__, __LINE__, "testsparseunit.ap:1370");
+            result = result || !NearAtR(va, vb, eps);
             va = sparsevsmv(&s1, isupper, &x0);
-            set_error_flag(&result, !NearAtR(va, vb, eps), __FILE__, __LINE__, "testsparseunit.ap:1372");
+            result = result || !NearAtR(va, vb, eps);
          }
       }
    }
@@ -8431,10 +8400,10 @@ static bool testlevel3symmetric() {
          // Test SparseGet() for SA and S0 against matrix returned in A
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(&result, !NearAtR(sparseget(&sa, i, j), a.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1453");
-                  set_error_flag(&result, !NearAtR(sparseget(&s0, i, j), a.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1454");
-                  set_error_flag(&result, j < i && triangletype == 1 && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1455");
-                  set_error_flag(&result, j > i && triangletype == -1 && sparseget(&s0, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1456");
+                  result = result || !NearAtR(sparseget(&sa, i, j), a.xyR[i][j], eps);
+                  result = result || !NearAtR(sparseget(&s0, i, j), a.xyR[i][j], eps);
+                  result = result || j < i && triangletype == 1 && sparseget(&s0, i, j) != 0.0;
+                  result = result || j > i && triangletype == -1 && sparseget(&s0, i, j) != 0.0;
                }
             }
          // Before we proceed with testing, update empty triangle of A
@@ -8456,8 +8425,8 @@ static bool testlevel3symmetric() {
                }
             }
             sparsesmm(&s0, isupper, &x0, k, &y0);
-            set_error_flag(&result, y0.rows < n, __FILE__, __LINE__, "testsparseunit.ap:1480");
-            set_error_flag(&result, y0.cols < k, __FILE__, __LINE__, "testsparseunit.ap:1481");
+            result = result || y0.rows < n;
+            result = result || y0.cols < k;
             if (result) {
                ae_frame_leave();
                return result;
@@ -8465,7 +8434,7 @@ static bool testlevel3symmetric() {
             for (i = 0; i < n; i++) {
                for (j = 0; j < k; j++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, &x1.xyR[0][j], x1.stride, n);
-                  set_error_flag(&result, !NearAtR(v, y0.xyR[i][j], eps), __FILE__, __LINE__, "testsparseunit.ap:1488");
+                  result = result || !NearAtR(v, y0.xyR[i][j], eps);
                }
             }
          }
@@ -8553,17 +8522,17 @@ static bool testsymmetricperm() {
          if (functype == 1) {
             sparsesymmpermtbl(&sa, isupper, &ptbl, &sb);
          }
-         set_error_flag(&result, !sparseiscrs(&sb), __FILE__, __LINE__, "testsparseunit.ap:1582");
-         set_error_flag(&result, sparsegetnrows(&sb) != n, __FILE__, __LINE__, "testsparseunit.ap:1583");
-         set_error_flag(&result, sparsegetncols(&sb) != n, __FILE__, __LINE__, "testsparseunit.ap:1584");
+         result = result || !sparseiscrs(&sb);
+         result = result || sparsegetnrows(&sb) != n;
+         result = result || sparsegetncols(&sb) != n;
          if (result) {
             ae_frame_leave();
             return result;
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               set_error_flag(&result, isupper && j >= i && !NearAtR(db.xyR[i][j], sparseget(&sb, i, j), eps), __FILE__, __LINE__, "testsparseunit.ap:1590");
-               set_error_flag(&result, isupper && j < i && sparseget(&sb, i, j) != 0.0, __FILE__, __LINE__, "testsparseunit.ap:1591");
+               result = result || isupper && j >= i && !NearAtR(db.xyR[i][j], sparseget(&sb, i, j), eps);
+               result = result || isupper && j < i && sparseget(&sb, i, j) != 0.0;
             }
          }
       // Increase sparsity
@@ -8672,24 +8641,24 @@ static bool testlevel2triangular() {
                x1.xR[j] = x0.xR[j];
             }
             sparsetrmv(&s0, isupper, isunit, optype, &x0, &y0);
-            set_error_flag(&result, y0.cnt < n, __FILE__, __LINE__, "testsparseunit.ap:1706");
+            result = result || y0.cnt < n;
             if (result) {
                ae_frame_leave();
                return result;
             }
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(ea.xyR[i], 1, x1.xR, 1, n);
-               set_error_flag(&result, !NearAtR(v, y0.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:1712");
+               result = result || !NearAtR(v, y0.xR[i], eps);
             }
             sparsetrmv(&s0, isupper, isunit, optype, &x0, &y1);
-            set_error_flag(&result, y1.cnt < n, __FILE__, __LINE__, "testsparseunit.ap:1715");
+            result = result || y1.cnt < n;
             if (result) {
                ae_frame_leave();
                return result;
             }
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(ea.xyR[i], 1, x1.xR, 1, n);
-               set_error_flag(&result, !NearAtR(v, y1.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:1721");
+               result = result || !NearAtR(v, y1.xR[i], eps);
             }
          }
       }
@@ -8763,22 +8732,22 @@ static bool testlevel2triangular() {
             }
          // Test SparseTRSV
             sparsetrsv(&s0, isupper, isunit, optype, &x0);
-            set_error_flag(&result, x0.cnt < n, __FILE__, __LINE__, "testsparseunit.ap:1805");
+            result = result || x0.cnt < n;
             if (result) {
                ae_frame_leave();
                return result;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(&result, !NearAtR(ey.xR[i], x0.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:1809");
+               result = result || !NearAtR(ey.xR[i], x0.xR[i], eps);
             }
             sparsetrsv(&s1, isupper, isunit, optype, &x1);
-            set_error_flag(&result, x1.cnt < n, __FILE__, __LINE__, "testsparseunit.ap:1811");
+            result = result || x1.cnt < n;
             if (result) {
                ae_frame_leave();
                return result;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(&result, !NearAtR(ey.xR[i], x1.xR[i], eps), __FILE__, __LINE__, "testsparseunit.ap:1815");
+               result = result || !NearAtR(ey.xR[i], x1.xR[i], eps);
             }
          }
       }
@@ -9538,7 +9507,7 @@ static bool linearfunctionssmmtest() {
 // Function for basic test SparseCopy
 //
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-static bool basiccopyfunctest(bool silent) {
+static bool basiccopyfunctest() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t m;
@@ -9656,7 +9625,7 @@ static bool basiccopyfunctest(bool silent) {
 // Function for testing SparseCopy
 //
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
-static bool copyfunctest(bool silent) {
+static bool copyfunctest() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t m;
@@ -9925,7 +9894,7 @@ static bool testsparseunit_enumeratetest() {
                ta.xyB[i][j] = true;
                counter++;
                if (v != a.xyR[i][j]) {
-                  set_error_flag(&result, true, __FILE__, __LINE__, "testsparseunit.ap:3112");
+                  result = true;
                   ae_frame_leave();
                   return result;
                }
@@ -9934,14 +9903,14 @@ static bool testsparseunit_enumeratetest() {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
                   if (ta.xyB[i][j] && a.xyR[i][j] == 0.0) {
-                     set_error_flag(&result, true, __FILE__, __LINE__, "testsparseunit.ap:3124");
+                     result = true;
                      ae_frame_leave();
                      return result;
                   }
                }
             }
             if (ne != counter) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testsparseunit.ap:3130");
+               result = true;
                ae_frame_leave();
                return result;
             }
@@ -10140,7 +10109,7 @@ static void testsparseunit_testgetrow(bool *err) {
                sparsegetrow(&s, i, &mrow);
                for (j = 0; j < n; j++) {
                   if (mrow.xR[j] != a.xyR[i][j] || mrow.xR[j] != sparseget(&s, i, j)) {
-                     set_error_flag(err, true, __FILE__, __LINE__, "testsparseunit.ap:3355");
+                     *err = true;
                      ae_frame_leave();
                      return;
                   }
@@ -10151,7 +10120,7 @@ static void testsparseunit_testgetrow(bool *err) {
             for (i = 0; i < m; i++) {
                sparsegetcompressedrow(&s, i, &colidx, &vals, &nz);
                if (nz < 0 || nz > n) {
-                  set_error_flag(err, true, __FILE__, __LINE__, "testsparseunit.ap:3369");
+                  *err = true;
                   ae_frame_leave();
                   return;
                }
@@ -10160,16 +10129,16 @@ static void testsparseunit_testgetrow(bool *err) {
                }
                for (j = 0; j < nz; j++) {
                   if (colidx.xZ[j] < 0 || colidx.xZ[j] > n) {
-                     set_error_flag(err, true, __FILE__, __LINE__, "testsparseunit.ap:3378");
+                     *err = true;
                      ae_frame_leave();
                      return;
                   }
-                  set_error_flag(err, j > 0 && colidx.xZ[j] <= colidx.xZ[j - 1], __FILE__, __LINE__, "testsparseunit.ap:3381");
-                  set_error_flag(err, vals.xR[j] != a.xyR[i][colidx.xZ[j]] || vals.xR[j] != sparseget(&s, i, colidx.xZ[j]), __FILE__, __LINE__, "testsparseunit.ap:3382");
+                  *err = *err || j > 0 && colidx.xZ[j] <= colidx.xZ[j - 1];
+                  *err = *err || vals.xR[j] != a.xyR[i][colidx.xZ[j]] || vals.xR[j] != sparseget(&s, i, colidx.xZ[j]);
                   wasreturned.xB[colidx.xZ[j]] = true;
                }
                for (j = 0; j < n; j++) {
-                  set_error_flag(err, a.xyR[i][j] != 0.0 && !wasreturned.xB[j], __FILE__, __LINE__, "testsparseunit.ap:3386");
+                  *err = *err || a.xyR[i][j] != 0.0 && !wasreturned.xB[j];
                }
             }
          }
@@ -10338,7 +10307,7 @@ static bool testsparseunit_testgcmatrixtype() {
    return result;
 }
 
-bool testsparse(bool silent) {
+bool testsparse() {
    bool waserrors;
    bool basicerrors;
    bool linearerrors;
@@ -10378,15 +10347,15 @@ bool testsparse(bool silent) {
    linearserrors = linearfunctionsstest();
    linearmmerrors = linearfunctionsmmtest();
    linearsmmerrors = linearfunctionssmmtest();
-   copyerrors = copyfunctest(true) || testsparseunit_testconvertsm();
-   basiccopyerrors = basiccopyfunctest(true);
+   copyerrors = copyfunctest() || testsparseunit_testconvertsm();
+   basiccopyerrors = basiccopyfunctest();
    enumerateerrors = testsparseunit_enumeratetest();
    rewriteexistingerr = testsparseunit_rewriteexistingtest();
    testsparseunit_testgetrow(&getrowerrors);
    testserialize(&serializeerrors);
 // report
    waserrors = skserrors || crserrors || getrowerrors || serializeerrors || basicerrors || linearerrors || basicrnderrors || level2unsymmetricerrors || level2symmetricerrors || level2triangularerrors || level3unsymmetricerrors || level3symmetricerrors || symmetricpermerrors || linearserrors || linearmmerrors || linearsmmerrors || copyerrors || basiccopyerrors || enumerateerrors || rewriteexistingerr;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING SPARSE\n");
       printf("STORAGE FORMAT SPECIFICS:\n");
       printf("* SKS:                                   ");
@@ -10588,7 +10557,7 @@ static void testblasunit_naivematrixmatrixmultiply(RMatrix *a, ae_int_t ai1, ae_
    ae_frame_leave();
 }
 
-bool testblas(bool silent) {
+bool testblas() {
    ae_frame _frame_block;
    ae_int_t pass;
    ae_int_t passcount;
@@ -10875,7 +10844,7 @@ bool testblas(bool silent) {
    mmerrors = was1;
 // report
    waserrors = n2errors || amaxerrors || hsnerrors || mverrors || iterrors || cterrors || mmerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING BLAS\n");
       printf("VectorNorm2:                             ");
       if (n2errors) {
@@ -11849,15 +11818,15 @@ static void testevdunit_testtdevdproblem(RVector *d, RVector *e, ae_int_t n, dou
    testevdunit_unset2d(&z);
    wsucc = smatrixtdevd(&lambdav, &ee, n, 2, &z);
    if (!wsucc) {
-      set_error_flag(tderrors, true, __FILE__, __LINE__, "testevdunit.ap:1113");
+      *tderrors = true;
       ae_frame_leave();
       return;
    }
-   set_error_flag(tderrors, testevdunit_tdtestproduct(d, e, n, &z, &lambdav) > threshold, __FILE__, __LINE__, "testevdunit.ap:1116");
-   set_error_flag(tderrors, testevdunit_testort(&z, n) > threshold, __FILE__, __LINE__, "testevdunit.ap:1117");
+   *tderrors = *tderrors || testevdunit_tdtestproduct(d, e, n, &z, &lambdav) > threshold;
+   *tderrors = *tderrors || testevdunit_testort(&z, n) > threshold;
    for (i = 0; i < n - 1; i++) {
       if (lambdav.xR[i + 1] < lambdav.xR[i]) {
-         set_error_flag(tderrors, true, __FILE__, __LINE__, "testevdunit.ap:1121");
+         *tderrors = true;
          ae_frame_leave();
          return;
       }
@@ -11877,12 +11846,12 @@ static void testevdunit_testtdevdproblem(RVector *d, RVector *e, ae_int_t n, dou
    testevdunit_unset2d(&z);
    wsucc = smatrixtdevd(&lambda2, &ee, n, 0, &z);
    if (!wsucc) {
-      set_error_flag(tderrors, true, __FILE__, __LINE__, "testevdunit.ap:1139");
+      *tderrors = true;
       ae_frame_leave();
       return;
    }
    for (i = 0; i < n; i++) {
-      set_error_flag(tderrors, !NearAtR(lambda2.xR[i], lambdav.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1143");
+      *tderrors = *tderrors || !NearAtR(lambda2.xR[i], lambdav.xR[i], threshold);
    }
 // Test multiplication variant
    for (i = 0; i < n; i++) {
@@ -11899,12 +11868,12 @@ static void testevdunit_testtdevdproblem(RVector *d, RVector *e, ae_int_t n, dou
    }
    wsucc = smatrixtdevd(&lambda2, &ee, n, 1, &a1);
    if (!wsucc) {
-      set_error_flag(tderrors, true, __FILE__, __LINE__, "testevdunit.ap:1161");
+      *tderrors = true;
       ae_frame_leave();
       return;
    }
    for (i = 0; i < n; i++) {
-      set_error_flag(tderrors, !NearAtR(lambda2.xR[i], lambdav.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1165");
+      *tderrors = *tderrors || !NearAtR(lambda2.xR[i], lambdav.xR[i], threshold);
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
@@ -11913,7 +11882,7 @@ static void testevdunit_testtdevdproblem(RVector *d, RVector *e, ae_int_t n, dou
       // depending on algorithm used we can get either
       // z or -z as eigenvector. so we compare result
       // with both A*ZRef and -A*ZRef
-         set_error_flag(tderrors, !NearAtR(v, a1.xyR[i][j], threshold) && !NearAtR(v, -a1.xyR[i][j], threshold), __FILE__, __LINE__, "testevdunit.ap:1177");
+         *tderrors = *tderrors || !NearAtR(v, a1.xyR[i][j], threshold) && !NearAtR(v, -a1.xyR[i][j], threshold);
       }
    }
 // Test first row variant.
@@ -11946,17 +11915,17 @@ static void testevdunit_testtdevdproblem(RVector *d, RVector *e, ae_int_t n, dou
       testevdunit_unset2d(&z);
       wsucc = smatrixtdevd(&lambda2, &ee, n, 3, &z);
       if (!wsucc) {
-         set_error_flag(tderrors, true, __FILE__, __LINE__, "testevdunit.ap:1211");
+         *tderrors = true;
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(tderrors, !NearAtR(lambda2.xR[i], lambdav.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1216");
+         *tderrors = *tderrors || !NearAtR(lambda2.xR[i], lambdav.xR[i], threshold);
       // next line is a bit complicated because
       // depending on algorithm used we can get either
       // z or -z as eigenvector. so we compare result
       // with both z and -z
-         set_error_flag(tderrors, !NearAtR(z.xyR[0][i], zref.xyR[0][i], specialthreshold) && !NearAtR(z.xyR[0][i], -zref.xyR[0][i], specialthreshold), __FILE__, __LINE__, "testevdunit.ap:1224");
+         *tderrors = *tderrors || !NearAtR(z.xyR[0][i], zref.xyR[0][i], specialthreshold) && !NearAtR(z.xyR[0][i], -zref.xyR[0][i], specialthreshold);
       }
    }
    ae_frame_leave();
@@ -12274,7 +12243,7 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
    }
 // Load values-only
    if (!rmatrixevd(a, n, 0, &wr0, &wi0, &vl, &vr)) {
-      set_error_flag(nserrors, true, __FILE__, __LINE__, "testevdunit.ap:1554");
+      *nserrors = true;
       ae_frame_leave();
       return;
    }
@@ -12283,7 +12252,7 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
       needr = vjob == 1 || vjob == 3;
       needl = vjob == 2 || vjob == 3;
       if (!rmatrixevd(a, n, vjob, &wr1, &wi1, &vl, &vr)) {
-         set_error_flag(nserrors, true, __FILE__, __LINE__, "testevdunit.ap:1567");
+         *nserrors = true;
          ae_frame_leave();
          return;
       }
@@ -12319,8 +12288,8 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
          }
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(nserrors, !NearAtR(wr0s.xR[i], wr1s.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1604");
-         set_error_flag(nserrors, !NearAtR(wi0s.xR[i], wi1s.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1605");
+         *nserrors = *nserrors || !NearAtR(wr0s.xR[i], wr1s.xR[i], threshold);
+         *nserrors = *nserrors || !NearAtR(wi0s.xR[i], wi1s.xR[i], threshold);
       }
    // Test right vectors
       if (needr) {
@@ -12361,10 +12330,10 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
             ae_v_subd(vec3r.xR, 1, vec1i.xR, 1, n, curwi);
             ae_v_moved(vec3i.xR, 1, vec1r.xR, 1, n, curwi);
             ae_v_addd(vec3i.xR, 1, vec1i.xR, 1, n, curwr);
-            set_error_flag(nserrors, vnorm < 1.0E-3 || !isfinite(vnorm), __FILE__, __LINE__, "testevdunit.ap:1654");
+            *nserrors = *nserrors || vnorm < 1.0E-3 || !isfinite(vnorm);
             for (i = 0; i < n; i++) {
-               set_error_flag(nserrors, !NearAtR(vec2r.xR[i], vec3r.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1657");
-               set_error_flag(nserrors, !NearAtR(vec2i.xR[i], vec3i.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1658");
+               *nserrors = *nserrors || !NearAtR(vec2r.xR[i], vec3r.xR[i], threshold);
+               *nserrors = *nserrors || !NearAtR(vec2i.xR[i], vec3i.xR[i], threshold);
             }
             k++;
          }
@@ -12408,10 +12377,10 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
             ae_v_addd(vec3r.xR, 1, vec1i.xR, 1, n, curwi);
             ae_v_moved(vec3i.xR, 1, vec1r.xR, 1, n, curwi);
             ae_v_addd(vec3i.xR, 1, vec1i.xR, 1, n, -curwr);
-            set_error_flag(nserrors, vnorm < 1.0E-3 || !isfinite(vnorm), __FILE__, __LINE__, "testevdunit.ap:1710");
+            *nserrors = *nserrors || vnorm < 1.0E-3 || !isfinite(vnorm);
             for (i = 0; i < n; i++) {
-               set_error_flag(nserrors, !NearAtR(vec2r.xR[i], vec3r.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1713");
-               set_error_flag(nserrors, !NearAtR(vec2i.xR[i], vec3i.xR[i], threshold), __FILE__, __LINE__, "testevdunit.ap:1714");
+               *nserrors = *nserrors || !NearAtR(vec2r.xR[i], vec3r.xR[i], threshold);
+               *nserrors = *nserrors || !NearAtR(vec2i.xR[i], vec3i.xR[i], threshold);
             }
             k++;
          }
@@ -12743,13 +12712,13 @@ static void testevdunit_testsisymm(bool *errorflag) {
             }
          // Compare against reference values
             for (i = 0; i < m; i++) {
-               set_error_flag(errorflag, !NearAtR(sw.xR[i], diaga.xR[i], tollambda), __FILE__, __LINE__, "testevdunit.ap:2126");
+               *errorflag = *errorflag || !NearAtR(sw.xR[i], diaga.xR[i], tollambda);
                v = ae_v_dotproduct(qa.xyR[i], 1, &sz.xyR[0][i], sz.stride, n);
                mx = 0.0;
                for (j = 0; j < n; j++) {
                   mx = rmax2(mx, fabs(sz.xyR[j][i] * sign(v) - qa.xyR[i][j]));
                }
-               set_error_flag(errorflag, mx > tolvector, __FILE__, __LINE__, "testevdunit.ap:2131");
+               *errorflag = *errorflag || mx > tolvector;
             }
          }
       }
@@ -12835,22 +12804,22 @@ static void testevdunit_testsisymm(bool *errorflag) {
                         callcount++;
                      }
                      eigsubspaceoocstop(&s, &sw, &sz, &rep);
-                     set_error_flag(errorflag, callcount > itscount + 2, __FILE__, __LINE__, "testevdunit.ap:2238");
+                     *errorflag = *errorflag || callcount > itscount + 2;
                   } else {
                      ae_assert(false, "unittest: integrity check failed");
                   }
                }
             }
          // Compare against reference values
-            set_error_flag(errorflag, rep.iterationscount > itscount, __FILE__, __LINE__, "testevdunit.ap:2246");
+            *errorflag = *errorflag || rep.iterationscount > itscount;
             for (i = 0; i < m; i++) {
-               set_error_flag(errorflag, !NearAtR(sw.xR[i], diaga.xR[i], tollambda), __FILE__, __LINE__, "testevdunit.ap:2249");
+               *errorflag = *errorflag || !NearAtR(sw.xR[i], diaga.xR[i], tollambda);
                v = ae_v_dotproduct(qa.xyR[i], 1, &sz.xyR[0][i], sz.stride, n);
                mx = 0.0;
                for (j = 0; j < n; j++) {
                   mx = rmax2(mx, fabs(sz.xyR[j][i] * sign(v) - qa.xyR[i][j]));
                }
-               set_error_flag(errorflag, mx > tolvector, __FILE__, __LINE__, "testevdunit.ap:2254");
+               *errorflag = *errorflag || mx > tolvector;
             }
          }
       }
@@ -12873,16 +12842,16 @@ static void testevdunit_testsisymm(bool *errorflag) {
          eigsubspacecreate(n, m, &s);
          eigsubspacesetcond(&s, 0.0, itscount);
          eigsubspacesolvedenses(&s, &densea, true, &sw, &sz, &rep);
-         set_error_flag(errorflag, rep.iterationscount > itscount, __FILE__, __LINE__, "testevdunit.ap:2283");
+         *errorflag = *errorflag || rep.iterationscount > itscount;
          for (i = 0; i < m; i++) {
             for (j = i; j < m; j++) {
                v = ae_v_dotproduct(&sz.xyR[0][i], sz.stride, &sz.xyR[0][j], sz.stride, n);
                if (j == i) {
                   v--;
                }
-               set_error_flag(errorflag, !SmallAtR(v, 1.0E3 * machineepsilon), __FILE__, __LINE__, "testevdunit.ap:2291");
+               *errorflag = *errorflag || !SmallAtR(v, 1.0E3 * machineepsilon);
             }
-            set_error_flag(errorflag, sw.xR[i] != 0.0, __FILE__, __LINE__, "testevdunit.ap:2293");
+            *errorflag = *errorflag || sw.xR[i] != 0.0;
          }
       // Solve with eigensolver operating in dense mode,
       // eps-based stopping condition.
@@ -12895,9 +12864,9 @@ static void testevdunit_testsisymm(bool *errorflag) {
                if (j == i) {
                   v--;
                }
-               set_error_flag(errorflag, !SmallAtR(v, 1.0E3 * machineepsilon), __FILE__, __LINE__, "testevdunit.ap:2310");
+               *errorflag = *errorflag || !SmallAtR(v, 1.0E3 * machineepsilon);
             }
-            set_error_flag(errorflag, sw.xR[i] != 0.0, __FILE__, __LINE__, "testevdunit.ap:2312");
+            *errorflag = *errorflag || sw.xR[i] != 0.0;
          }
       }
    }
@@ -12954,13 +12923,13 @@ static void testevdunit_testsisymm(bool *errorflag) {
       eigsubspacesolvedenses(&s, &ra, true, &sw, &sz, &rep);
       cntc += rep.iterationscount;
    }
-   set_error_flag(errorflag, (double)cntb > 0.66 * cnta, __FILE__, __LINE__, "testevdunit.ap:2387");
-   set_error_flag(errorflag, (double)cntc < 0.66 * cnta, __FILE__, __LINE__, "testevdunit.ap:2388");
+   *errorflag = *errorflag || (double)cntb > 0.66 * cnta;
+   *errorflag = *errorflag || (double)cntc < 0.66 * cnta;
    ae_frame_leave();
 }
 
 // Testing symmetric EVD subroutine
-bool testevd(bool silent) {
+bool testevd() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t j;
@@ -13009,7 +12978,7 @@ bool testevd(bool silent) {
 // report
    wfailed = (double)failc / runs > failthreshold;
    waserrors = nserrors || serrors || herrors || tderrors || sbierrors || hbierrors || tdbierrors || wfailed || sisymmerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING EVD UNIT\n");
       printf("DENSE DIRECT SOLVERS:\n");
       printf("* NS                                     ");
@@ -13194,7 +13163,7 @@ static bool sparserealcholeskytest() {
             if (routinetype == 0) {
             // Positive-definite Cholesky without permutation
                if (!sparsecholesky(&sc, isupper)) {
-                  set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:697");
+                  result = true;
                   ae_frame_leave();
                   return result;
                }
@@ -13208,7 +13177,7 @@ static bool sparserealcholeskytest() {
             if (routinetype == 1) {
             // Positive-definite Cholesky with permutation
                if (!sparsecholeskyp(&sc, isupper, &p0)) {
-                  set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:715");
+                  result = true;
                   ae_frame_leave();
                   return result;
                }
@@ -13233,51 +13202,51 @@ static bool sparserealcholeskytest() {
                if (hqrndnormal(&rs) > 0.0) {
                // Test analyze/factorize sequence
                   if (!sparsecholeskyanalyze(&sc, isupper, 0, permtype, &analysis)) {
-                     set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:742");
+                     result = true;
                      ae_frame_leave();
                      return result;
                   }
                   sparsecreate(1, 1, 0, &sc);
                   if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
-                     set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:748");
+                     result = true;
                      ae_frame_leave();
                      return result;
                   }
                } else {
                // Test analyze/reload/factorize sequence
                   if (!sparsecholeskyanalyze(&sp, isupper, 0, permtype, &analysis)) {
-                     set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:759");
+                     result = true;
                      ae_frame_leave();
                      return result;
                   }
                   sparsecholeskyreload(&analysis, &sc, isupper);
                   sparsecreate(1, 1, 0, &sc);
                   if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
-                     set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:766");
+                     result = true;
                      ae_frame_leave();
                      return result;
                   }
                }
                if (d.cnt != n) {
-                  set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:772");
+                  result = true;
                   ae_frame_leave();
                   return result;
                }
                for (i = 0; i < n; i++) {
-                  set_error_flag(&result, d.xR[i] != 1.0, __FILE__, __LINE__, "testtrfacunit.ap:776");
+                  result = result || d.xR[i] != 1.0;
                }
             }
          // Check output sizes and formats
-            set_error_flag(&result, !sparseiscrs(&sc) || sparsegetnrows(&sc) != n || sparsegetncols(&sc) != n, __FILE__, __LINE__, "testtrfacunit.ap:784");
-            set_error_flag(&result, p0.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:785");
-            set_error_flag(&result, d.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:786");
+            result = result || !sparseiscrs(&sc) || sparsegetnrows(&sc) != n || sparsegetncols(&sc) != n;
+            result = result || p0.cnt != n;
+            result = result || d.cnt != n;
             if (result) {
                ae_frame_leave();
                return result;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(&result, p0.xZ[i] < i || p0.xZ[i] >= n, __FILE__, __LINE__, "testtrfacunit.ap:791");
-               set_error_flag(&result, !isfinite(d.xR[i]), __FILE__, __LINE__, "testtrfacunit.ap:792");
+               result = result || p0.xZ[i] < i || p0.xZ[i] >= n;
+               result = result || !isfinite(d.xR[i]);
             }
             if (result) {
                ae_frame_leave();
@@ -13286,8 +13255,8 @@ static bool sparserealcholeskytest() {
             t0 = 0;
             t1 = 0;
             while (sparseenumerate(&sc, &t0, &t1, &i, &j, &v)) {
-               set_error_flag(&result, j < i && isupper, __FILE__, __LINE__, "testtrfacunit.ap:800");
-               set_error_flag(&result, j > i && !isupper, __FILE__, __LINE__, "testtrfacunit.ap:801");
+               result = result || j < i && isupper;
+               result = result || j > i && !isupper;
             }
             if (result) {
                ae_frame_leave();
@@ -13327,7 +13296,7 @@ static bool sparserealcholeskytest() {
             }
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(&result, !NearAtR(a.xyR[i][j], a1.xyR[i][j], tol), __FILE__, __LINE__, "testtrfacunit.ap:844");
+                  result = result || !NearAtR(a.xyR[i][j], a1.xyR[i][j], tol);
                }
             }
          }
@@ -13340,10 +13309,10 @@ static bool sparserealcholeskytest() {
             sparseset(&sc, k, k, 0.0);
             sparseconvertto(&sc, hqrnduniformi(&rs, maxfmt + 1));
             if (routinetype == 0) {
-               set_error_flag(&result, sparsecholesky(&sc, isupper), __FILE__, __LINE__, "testtrfacunit.ap:861");
+               result = result || sparsecholesky(&sc, isupper);
             }
             if (routinetype == 1) {
-               set_error_flag(&result, sparsecholeskyp(&sc, isupper, &p0), __FILE__, __LINE__, "testtrfacunit.ap:863");
+               result = result || sparsecholeskyp(&sc, isupper, &p0);
             }
          // Negative definite matrix
             sparsecopy(&sa, &sc);
@@ -13352,10 +13321,10 @@ static bool sparserealcholeskytest() {
             sparseset(&sc, k, k, -1.0E10);
             sparseconvertto(&sc, hqrnduniformi(&rs, maxfmt + 1));
             if (routinetype == 0) {
-               set_error_flag(&result, sparsecholesky(&sc, isupper), __FILE__, __LINE__, "testtrfacunit.ap:874");
+               result = result || sparsecholesky(&sc, isupper);
             }
             if (routinetype == 1) {
-               set_error_flag(&result, sparsecholeskyp(&sc, isupper, &p0), __FILE__, __LINE__, "testtrfacunit.ap:876");
+               result = result || sparsecholeskyp(&sc, isupper, &p0);
             }
          }
       // Increase problem sparsity and try one more time.
@@ -13429,42 +13398,42 @@ static bool sparserealcholeskytest() {
          if (hqrndnormal(&rs) > 0.0) {
          // Test analyze/factorize sequence
             if (!sparsecholeskyanalyze(&sc, isupper, facttype, permtype, &analysis)) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:961");
+               result = true;
                ae_frame_leave();
                return result;
             }
             sparsecreate(1, 1, 0, &sc);
             if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:967");
+               result = true;
                ae_frame_leave();
                return result;
             }
          } else {
          // Test analyze/reload/factorize sequence
             if (!sparsecholeskyanalyze(&sp, isupper, facttype, permtype, &analysis)) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:978");
+               result = true;
                ae_frame_leave();
                return result;
             }
             sparsecholeskyreload(&analysis, &sc, isupper);
             sparsecreate(1, 1, 0, &sc);
             if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:985");
+               result = true;
                ae_frame_leave();
                return result;
             }
          }
       // Check output sizes and formats
-         set_error_flag(&result, !sparseiscrs(&sc) || sparsegetnrows(&sc) != n || sparsegetncols(&sc) != n, __FILE__, __LINE__, "testtrfacunit.ap:993");
-         set_error_flag(&result, p0.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:994");
-         set_error_flag(&result, d.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:995");
+         result = result || !sparseiscrs(&sc) || sparsegetnrows(&sc) != n || sparsegetncols(&sc) != n;
+         result = result || p0.cnt != n;
+         result = result || d.cnt != n;
          if (result) {
             ae_frame_leave();
             return result;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(&result, p0.xZ[i] < i || p0.xZ[i] >= n, __FILE__, __LINE__, "testtrfacunit.ap:1000");
-            set_error_flag(&result, !isfinite(d.xR[i]), __FILE__, __LINE__, "testtrfacunit.ap:1001");
+            result = result || p0.xZ[i] < i || p0.xZ[i] >= n;
+            result = result || !isfinite(d.xR[i]);
          }
          if (result) {
             ae_frame_leave();
@@ -13473,8 +13442,8 @@ static bool sparserealcholeskytest() {
          t0 = 0;
          t1 = 0;
          while (sparseenumerate(&sc, &t0, &t1, &i, &j, &v)) {
-            set_error_flag(&result, j < i && isupper, __FILE__, __LINE__, "testtrfacunit.ap:1009");
-            set_error_flag(&result, j > i && !isupper, __FILE__, __LINE__, "testtrfacunit.ap:1010");
+            result = result || j < i && isupper;
+            result = result || j > i && !isupper;
          }
          if (result) {
             ae_frame_leave();
@@ -13514,7 +13483,7 @@ static bool sparserealcholeskytest() {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               set_error_flag(&result, !NearAtR(a.xyR[i][j], a1.xyR[i][j], tol), __FILE__, __LINE__, "testtrfacunit.ap:1053");
+               result = result || !NearAtR(a.xyR[i][j], a1.xyR[i][j], tol);
             }
          }
       // Increase problem sparsity and try one more time.
@@ -13571,12 +13540,12 @@ static bool sparserealcholeskytest() {
          permtype = minperm + hqrnduniformi(&rs, maxperm - minperm + 1);
          sparsecopy(&sa, &sc);
          if (!sparsecholeskyanalyze(&sc, isupper, facttype, permtype, &analysis)) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:1121");
+            result = true;
             ae_frame_leave();
             return result;
          }
          if (sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:1126");
+            result = true;
             ae_frame_leave();
             return result;
          }
@@ -13584,7 +13553,7 @@ static bool sparserealcholeskytest() {
          sparsecholeskysetmodtype(&analysis, 1, 1.0, 0.0, 0.0, 0.0);
          sparsecholeskyreload(&analysis, &sc, isupper);
          if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:1134");
+            result = true;
             ae_frame_leave();
             return result;
          }
@@ -13680,26 +13649,26 @@ static bool sparserealcholeskytest() {
             facttype = hqrnduniformi(&rs, 2);
             permtype = minperm + hqrnduniformi(&rs, maxperm - minperm + 1);
             if (!sparsecholeskyanalyze(&sa, isupper, facttype, permtype, &analysis)) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:1234");
+               result = true;
                ae_frame_leave();
                return result;
             }
             if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:1239");
+               result = true;
                ae_frame_leave();
                return result;
             }
          // Check output sizes and formats
-            set_error_flag(&result, !sparseiscrs(&sc) || sparsegetnrows(&sc) != n || sparsegetncols(&sc) != n, __FILE__, __LINE__, "testtrfacunit.ap:1247");
-            set_error_flag(&result, p0.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:1248");
-            set_error_flag(&result, d.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:1249");
+            result = result || !sparseiscrs(&sc) || sparsegetnrows(&sc) != n || sparsegetncols(&sc) != n;
+            result = result || p0.cnt != n;
+            result = result || d.cnt != n;
             if (result) {
                ae_frame_leave();
                return result;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(&result, p0.xZ[i] < i || p0.xZ[i] >= n, __FILE__, __LINE__, "testtrfacunit.ap:1254");
-               set_error_flag(&result, !isfinite(d.xR[i]), __FILE__, __LINE__, "testtrfacunit.ap:1255");
+               result = result || p0.xZ[i] < i || p0.xZ[i] >= n;
+               result = result || !isfinite(d.xR[i]);
             }
             if (result) {
                ae_frame_leave();
@@ -13708,8 +13677,8 @@ static bool sparserealcholeskytest() {
             t0 = 0;
             t1 = 0;
             while (sparseenumerate(&sc, &t0, &t1, &i, &j, &v)) {
-               set_error_flag(&result, j < i && isupper, __FILE__, __LINE__, "testtrfacunit.ap:1263");
-               set_error_flag(&result, j > i && !isupper, __FILE__, __LINE__, "testtrfacunit.ap:1264");
+               result = result || j < i && isupper;
+               result = result || j > i && !isupper;
             }
             if (result) {
                ae_frame_leave();
@@ -13749,7 +13718,7 @@ static bool sparserealcholeskytest() {
             }
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(&result, !NearAtR(a.xyR[i][j], a1.xyR[i][j], tol), __FILE__, __LINE__, "testtrfacunit.ap:1307");
+                  result = result || !NearAtR(a.xyR[i][j], a1.xyR[i][j], tol);
                }
             }
          }
@@ -13831,18 +13800,18 @@ static bool sparserealcholeskytest() {
       //   that only one triangle of SA is filled, and another one is
       //   exactly zero.
          if (!sparsecholeskyskyline(&sa, n, isupper)) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:1409");
+            result = true;
             ae_frame_leave();
             return result;
          }
-         set_error_flag(&result, !sparseissks(&sa), __FILE__, __LINE__, "testtrfacunit.ap:1412");
-         set_error_flag(&result, sparsegetncols(&sa) != n, __FILE__, __LINE__, "testtrfacunit.ap:1413");
-         set_error_flag(&result, sparsegetnrows(&sa) != n, __FILE__, __LINE__, "testtrfacunit.ap:1414");
+         result = result || !sparseissks(&sa);
+         result = result || sparsegetncols(&sa) != n;
+         result = result || sparsegetnrows(&sa) != n;
          t0 = 0;
          t1 = 0;
          while (sparseenumerate(&sa, &t0, &t1, &i, &j, &v)) {
-            set_error_flag(&result, j < i && isupper, __FILE__, __LINE__, "testtrfacunit.ap:1419");
-            set_error_flag(&result, j > i && !isupper, __FILE__, __LINE__, "testtrfacunit.ap:1420");
+            result = result || j < i && isupper;
+            result = result || j > i && !isupper;
          }
          if (isupper) {
             for (i = 0; i < n; i++) {
@@ -13851,7 +13820,7 @@ static bool sparserealcholeskytest() {
                   for (k = 0; k < n; k++) {
                      v += sparseget(&sa, k, j) * sparseget(&sa, k, i);
                   }
-                  set_error_flag(&result, !NearAtR(a.xyR[i][j], v, tol), __FILE__, __LINE__, "testtrfacunit.ap:1430");
+                  result = result || !NearAtR(a.xyR[i][j], v, tol);
                }
             }
          } else {
@@ -13861,7 +13830,7 @@ static bool sparserealcholeskytest() {
                   for (k = 0; k < n; k++) {
                      v += sparseget(&sa, j, k) * sparseget(&sa, i, k);
                   }
-                  set_error_flag(&result, !NearAtR(a.xyR[i][j], v, tol), __FILE__, __LINE__, "testtrfacunit.ap:1441");
+                  result = result || !NearAtR(a.xyR[i][j], v, tol);
                }
             }
          }
@@ -13871,19 +13840,19 @@ static bool sparserealcholeskytest() {
       // * check that factorized triangle matches contents of SA,
       //   and another triangle was unchanged (matches contents of A1).
          if (!sparsecholeskyskyline(&sa1, n, isupper)) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:1454");
+            result = true;
             ae_frame_leave();
             return result;
          }
-         set_error_flag(&result, !sparseissks(&sa1), __FILE__, __LINE__, "testtrfacunit.ap:1457");
-         set_error_flag(&result, sparsegetncols(&sa1) != n, __FILE__, __LINE__, "testtrfacunit.ap:1458");
-         set_error_flag(&result, sparsegetnrows(&sa1) != n, __FILE__, __LINE__, "testtrfacunit.ap:1459");
+         result = result || !sparseissks(&sa1);
+         result = result || sparsegetncols(&sa1) != n;
+         result = result || sparsegetnrows(&sa1) != n;
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (isupper ? j >= i : j <= i) {
-                  set_error_flag(&result, !NearAtR(sparseget(&sa1, i, j), sparseget(&sa, i, j), 10.0 * machineepsilon), __FILE__, __LINE__, "testtrfacunit.ap:1463");
+                  result = result || !NearAtR(sparseget(&sa1, i, j), sparseget(&sa, i, j), 10.0 * machineepsilon);
                } else {
-                  set_error_flag(&result, !NearAtR(sparseget(&sa1, i, j), a1.xyR[i][j], 10.0 * machineepsilon), __FILE__, __LINE__, "testtrfacunit.ap:1465");
+                  result = result || !NearAtR(sparseget(&sa1, i, j), a1.xyR[i][j], 10.0 * machineepsilon);
                }
             }
          }
@@ -13937,22 +13906,22 @@ static bool sparserealcholeskytest() {
          sparsecopy(&sa, &sa1);
       // Factorize with AMD and without it
          if (!sparsecholeskyanalyze(&sa, false, 0, permtype, &analysis)) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:1537");
+            result = true;
             ae_frame_leave();
             return result;
          }
          if (!sparsecholeskyfactorize(&analysis, false, &sa, &d, &p0)) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:1542");
+            result = true;
             ae_frame_leave();
             return result;
          }
          if (!sparsecholeskyanalyze(&sa1, false, 0, -2, &analysis)) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:1547");
+            result = true;
             ae_frame_leave();
             return result;
          }
          if (!sparsecholeskyfactorize(&analysis, false, &sa1, &d, &p0)) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testtrfacunit.ap:1552");
+            result = true;
             ae_frame_leave();
             return result;
          }
@@ -13962,7 +13931,7 @@ static bool sparserealcholeskytest() {
             nworse++;
          }
       }
-      set_error_flag(&result, nbetter < 0.75 * (nbetter + nworse), __FILE__, __LINE__, "testtrfacunit.ap:1560");
+      result = result || nbetter < 0.75 * (nbetter + nworse);
    }
    ae_frame_leave();
    return result;
@@ -14026,20 +13995,20 @@ static void sparsereallutest(bool *err) {
             ae_vector_set_length(&pivr, 0);
             ae_vector_set_length(&pivc, 0);
             success = sparselu(&crsa, pivottype, &pivr, &pivc);
-            set_error_flag(err, !sparseiscrs(&crsa), __FILE__, __LINE__, "testtrfacunit.ap:1630");
-            set_error_flag(err, sparsegetncols(&crsa) != n, __FILE__, __LINE__, "testtrfacunit.ap:1631");
-            set_error_flag(err, sparsegetnrows(&crsa) != n, __FILE__, __LINE__, "testtrfacunit.ap:1632");
-            set_error_flag(err, pivr.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:1633");
-            set_error_flag(err, pivc.cnt != n, __FILE__, __LINE__, "testtrfacunit.ap:1634");
+            *err = *err || !sparseiscrs(&crsa);
+            *err = *err || sparsegetncols(&crsa) != n;
+            *err = *err || sparsegetnrows(&crsa) != n;
+            *err = *err || pivr.cnt != n;
+            *err = *err || pivc.cnt != n;
             if (*err) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(err, pivr.xZ[i] < 0 || pivr.xZ[i] >= n || pivc.xZ[i] < 0 || pivc.xZ[i] >= n, __FILE__, __LINE__, "testtrfacunit.ap:1638");
+               *err = *err || pivr.xZ[i] < 0 || pivr.xZ[i] >= n || pivc.xZ[i] < 0 || pivc.xZ[i] >= n;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(err, pivottype == 1 && pivc.xZ[i] != i, __FILE__, __LINE__, "testtrfacunit.ap:1640");
+               *err = *err || pivottype == 1 && pivc.xZ[i] != i;
             }
             ae_matrix_set_length(&b1, n, n);
             ae_matrix_set_length(&b2, n, n);
@@ -14080,10 +14049,10 @@ static void sparsereallutest(bool *err) {
             }
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(err, !NearAtR(c.xyR[i][j], a.xyR[i][j], tol), __FILE__, __LINE__, "testtrfacunit.ap:1689");
+                  *err = *err || !NearAtR(c.xyR[i][j], a.xyR[i][j], tol);
                }
             }
-            set_error_flag(err, success == haszero, __FILE__, __LINE__, "testtrfacunit.ap:1690");
+            *err = *err || success == haszero;
          }
       // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
@@ -14397,7 +14366,7 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
    //
    // We randomly test either SPDMatrixCholeskyUpdateFix() or its
    // buffered version, SPDMatrixCholeskyUpdateFixBuf()
-      set_error_flag(spdupderrorflag, !spdmatrixcholesky(&a0, n, isupper), __FILE__, __LINE__, "testtrfacunit.ap:1772");
+      *spdupderrorflag = *spdupderrorflag || !spdmatrixcholesky(&a0, n, isupper);
       if (*spdupderrorflag) {
          ae_frame_leave();
          return;
@@ -14414,14 +14383,14 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
             }
          }
       }
-      set_error_flag(spdupderrorflag, !spdmatrixcholesky(&a1, n, isupper), __FILE__, __LINE__, "testtrfacunit.ap:1783");
+      *spdupderrorflag = *spdupderrorflag || !spdmatrixcholesky(&a1, n, isupper);
       if (*spdupderrorflag) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            set_error_flag(spdupderrorflag, !NearAtR(a0.xyR[i][j], a1.xyR[i][j], tol), __FILE__, __LINE__, "testtrfacunit.ap:1788");
+            *spdupderrorflag = *spdupderrorflag || !NearAtR(a0.xyR[i][j], a1.xyR[i][j], tol);
          }
       }
    }
@@ -14459,7 +14428,7 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
    //
    // We randomly test either SPDMatrixCholeskyUpdateFix() or its
    // buffered version, SPDMatrixCholeskyUpdateFixBuf()
-      set_error_flag(spdupderrorflag, !spdmatrixcholesky(&a0, n, isupper), __FILE__, __LINE__, "testtrfacunit.ap:1827");
+      *spdupderrorflag = *spdupderrorflag || !spdmatrixcholesky(&a0, n, isupper);
       if (*spdupderrorflag) {
          ae_frame_leave();
          return;
@@ -14482,21 +14451,21 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
             }
          }
       }
-      set_error_flag(spdupderrorflag, !spdmatrixcholesky(&a1, n, isupper), __FILE__, __LINE__, "testtrfacunit.ap:1844");
+      *spdupderrorflag = *spdupderrorflag || !spdmatrixcholesky(&a1, n, isupper);
       if (*spdupderrorflag) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            set_error_flag(spdupderrorflag, !NearAtR(a0.xyR[i][j], a1.xyR[i][j], tol), __FILE__, __LINE__, "testtrfacunit.ap:1849");
+            *spdupderrorflag = *spdupderrorflag || !NearAtR(a0.xyR[i][j], a1.xyR[i][j], tol);
          }
       }
    }
    ae_frame_leave();
 }
 
-bool testtrfac(bool silent) {
+bool testtrfac() {
    ae_frame _frame_block;
    ae_int_t m;
    ae_int_t n;
@@ -14724,12 +14693,12 @@ bool testtrfac(bool silent) {
       }
       ra.xyR[n / 2][n / 2] = -1.0;
       ca.xyC[n / 2][n / 2] = complex_from_d(-1.0);
-      set_error_flag(&dspderr, spdmatrixcholesky(&ra, n, randombool()), __FILE__, __LINE__, "testtrfacunit.ap:509");
-      set_error_flag(&hpderr, hpdmatrixcholesky(&ca, n, randombool()), __FILE__, __LINE__, "testtrfacunit.ap:510");
+      dspderr = dspderr || spdmatrixcholesky(&ra, n, randombool());
+      hpderr = hpderr || hpdmatrixcholesky(&ca, n, randombool());
    }
 // report
    waserrors = rerr || srerr || dspderr || sspderr || cerr || hpderr || properr || dspdupderr;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING TRIANGULAR FACTORIZATIONS\n");
       printf("* REAL (dense):                          ");
       if (rerr) {
@@ -14794,7 +14763,7 @@ bool testtrfac(bool silent) {
 
 // === polynomialsolver testing unit ===
 // Test
-bool testpolynomialsolver(bool silent) {
+bool testpolynomialsolver() {
    ae_frame _frame_block;
    bool wereerrors;
    double eps;
@@ -14812,18 +14781,18 @@ bool testpolynomialsolver(bool silent) {
    a.xR[0] = 2.0;
    a.xR[1] = 3.0;
    polynomialsolve(&a, n, &x, &rep);
-   set_error_flag(&wereerrors, !NearAtR(x.xC[0].x, -2.0 / 3.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:33");
-   set_error_flag(&wereerrors, x.xC[0].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:34");
-   set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:35");
+   wereerrors = wereerrors || !NearAtR(x.xC[0].x, -2.0 / 3.0, eps);
+   wereerrors = wereerrors || x.xC[0].y != 0.0;
+   wereerrors = wereerrors || rep.maxerr > 100.0 * machineepsilon;
    n = 2;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 1.0;
    a.xR[1] = -2.0;
    a.xR[2] = 1.0;
    polynomialsolve(&a, n, &x, &rep);
-   set_error_flag(&wereerrors, !NearAtCR(x.xC[0], 1.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:43");
-   set_error_flag(&wereerrors, !NearAtCR(x.xC[1], 1.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:44");
-   set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:45");
+   wereerrors = wereerrors || !NearAtCR(x.xC[0], 1.0, eps);
+   wereerrors = wereerrors || !NearAtCR(x.xC[1], 1.0, eps);
+   wereerrors = wereerrors || rep.maxerr > 100.0 * machineepsilon;
    n = 2;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 2.0;
@@ -14831,23 +14800,23 @@ bool testpolynomialsolver(bool silent) {
    a.xR[2] = 1.0;
    polynomialsolve(&a, n, &x, &rep);
    if (x.xC[0].x < x.xC[1].x) {
-      set_error_flag(&wereerrors, !NearAtR(x.xC[0].x, 1.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:55");
-      set_error_flag(&wereerrors, !NearAtR(x.xC[1].x, 2.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:56");
+      wereerrors = wereerrors || !NearAtR(x.xC[0].x, 1.0, eps);
+      wereerrors = wereerrors || !NearAtR(x.xC[1].x, 2.0, eps);
    } else {
-      set_error_flag(&wereerrors, !NearAtR(x.xC[0].x, 2.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:60");
-      set_error_flag(&wereerrors, !NearAtR(x.xC[1].x, 1.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:61");
+      wereerrors = wereerrors || !NearAtR(x.xC[0].x, 2.0, eps);
+      wereerrors = wereerrors || !NearAtR(x.xC[1].x, 1.0, eps);
    }
-   set_error_flag(&wereerrors, x.xC[0].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:63");
-   set_error_flag(&wereerrors, x.xC[1].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:64");
-   set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:65");
+   wereerrors = wereerrors || x.xC[0].y != 0.0;
+   wereerrors = wereerrors || x.xC[1].y != 0.0;
+   wereerrors = wereerrors || rep.maxerr > 100.0 * machineepsilon;
    n = 2;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 1.0;
    a.xR[1] = 0.0;
    a.xR[2] = 1.0;
    polynomialsolve(&a, n, &x, &rep);
-   set_error_flag(&wereerrors, !NearAtCR(ae_c_mul(x.xC[0], x.xC[0]), -1.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:73");
-   set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:74");
+   wereerrors = wereerrors || !NearAtCR(ae_c_mul(x.xC[0], x.xC[0]), -1.0, eps);
+   wereerrors = wereerrors || rep.maxerr > 100.0 * machineepsilon;
    n = 4;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 0.0;
@@ -14856,11 +14825,11 @@ bool testpolynomialsolver(bool silent) {
    a.xR[3] = 0.0;
    a.xR[4] = 1.0;
    polynomialsolve(&a, n, &x, &rep);
-   set_error_flag(&wereerrors, ae_c_neq_d(x.xC[0], 0.0), __FILE__, __LINE__, "testpolynomialsolverunit.ap:84");
-   set_error_flag(&wereerrors, ae_c_neq_d(x.xC[1], 0.0), __FILE__, __LINE__, "testpolynomialsolverunit.ap:85");
-   set_error_flag(&wereerrors, ae_c_neq_d(x.xC[2], 0.0), __FILE__, __LINE__, "testpolynomialsolverunit.ap:86");
-   set_error_flag(&wereerrors, ae_c_neq_d(x.xC[3], 0.0), __FILE__, __LINE__, "testpolynomialsolverunit.ap:87");
-   set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:88");
+   wereerrors = wereerrors || ae_c_neq_d(x.xC[0], 0.0);
+   wereerrors = wereerrors || ae_c_neq_d(x.xC[1], 0.0);
+   wereerrors = wereerrors || ae_c_neq_d(x.xC[2], 0.0);
+   wereerrors = wereerrors || ae_c_neq_d(x.xC[3], 0.0);
+   wereerrors = wereerrors || rep.maxerr > 100.0 * machineepsilon;
    n = 2;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 0.0;
@@ -14868,16 +14837,16 @@ bool testpolynomialsolver(bool silent) {
    a.xR[2] = 2.0;
    polynomialsolve(&a, n, &x, &rep);
    if (x.xC[0].x > x.xC[1].x) {
-      set_error_flag(&wereerrors, ae_c_neq_d(x.xC[0], 0.0), __FILE__, __LINE__, "testpolynomialsolverunit.ap:98");
-      set_error_flag(&wereerrors, !NearAtR(x.xC[1].x, -3.0 / 2.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:99");
-      set_error_flag(&wereerrors, x.xC[1].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:100");
+      wereerrors = wereerrors || ae_c_neq_d(x.xC[0], 0.0);
+      wereerrors = wereerrors || !NearAtR(x.xC[1].x, -3.0 / 2.0, eps);
+      wereerrors = wereerrors || x.xC[1].y != 0.0;
    } else {
-      set_error_flag(&wereerrors, ae_c_neq_d(x.xC[1], 0.0), __FILE__, __LINE__, "testpolynomialsolverunit.ap:104");
-      set_error_flag(&wereerrors, !NearAtR(x.xC[0].x, -3.0 / 2.0, eps), __FILE__, __LINE__, "testpolynomialsolverunit.ap:105");
-      set_error_flag(&wereerrors, x.xC[0].y != 0.0, __FILE__, __LINE__, "testpolynomialsolverunit.ap:106");
+      wereerrors = wereerrors || ae_c_neq_d(x.xC[1], 0.0);
+      wereerrors = wereerrors || !NearAtR(x.xC[0].x, -3.0 / 2.0, eps);
+      wereerrors = wereerrors || x.xC[0].y != 0.0;
    }
-   set_error_flag(&wereerrors, rep.maxerr > 100.0 * machineepsilon, __FILE__, __LINE__, "testpolynomialsolverunit.ap:108");
-   if (!silent) {
+   wereerrors = wereerrors || rep.maxerr > 100.0 * machineepsilon;
+   if (wereerrors || !silent) {
       printf("TESTING POLYNOMIAL SOLVER\n");
       if (wereerrors) {
          printf("TEST FAILED\n");
@@ -15193,7 +15162,7 @@ static void testbdsvdunit_testbdsvdproblem(RVector *d, RVector *e, ae_int_t n, d
 }
 
 // Testing bidiagonal SVD decomposition subroutine
-bool testbdsvd(bool silent) {
+bool testbdsvd() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t maxn;
@@ -15279,7 +15248,7 @@ bool testbdsvd(bool silent) {
 // report
    failr = (double)failcount / (succcount + failcount);
    waserrors = wfailed || materr > threshold || orterr > threshold || !wsorted;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING BIDIAGONAL SVD DECOMPOSITION\n");
       printf("SVD decomposition error:                 %5.3e\n", materr);
       printf("SVD orthogonality error:                 %5.3e\n", orterr);
@@ -15441,7 +15410,7 @@ static void testsvdunit_testsvdproblem(RMatrix *a, ae_int_t m, ae_int_t n, doubl
 }
 
 // Testing SVD decomposition subroutine
-bool testsvd(bool silent) {
+bool testsvd() {
    ae_frame _frame_block;
    ae_int_t m;
    ae_int_t n;
@@ -15536,7 +15505,7 @@ bool testsvd(bool silent) {
 // report
    failr = (double)failcount / (succcount + failcount);
    waserrors = wfailed || materr > threshold || orterr > threshold || othererr > threshold || !wsorted;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING SVD DECOMPOSITION\n");
       printf("SVD decomposition error:                 %5.3e\n", materr);
       printf("SVD orthogonality error:                 %5.3e\n", orterr);
@@ -15569,7 +15538,7 @@ bool testsvd(bool silent) {
 
 // === trlinsolve testing unit ===
 // Main unittest subroutine
-bool testtrlinsolve(bool silent) {
+bool testtrlinsolve() {
    ae_frame _frame_block;
    ae_int_t maxmn;
    ae_int_t passcount;
@@ -15688,7 +15657,7 @@ bool testtrlinsolve(bool silent) {
       }
    }
 // report
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING RMatrixTRSafeSolve\n");
       if (waserrors) {
          printf("TEST FAILED\n");
@@ -15730,7 +15699,7 @@ static void testsafesolveunit_cmatrixmakeacopy(CMatrix *a, ae_int_t m, ae_int_t 
 }
 
 // Main unittest subroutine
-bool testsafesolve(bool silent) {
+bool testsafesolve() {
    ae_frame _frame_block;
    ae_int_t maxmn;
    double threshold;
@@ -15944,7 +15913,7 @@ bool testsafesolve(bool silent) {
    rerrors = rerrors || rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, randombool(), randominteger(2), false, sqrt(maxrealnumber));
 // report
    waserrors = rerrors || cerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING SAFE TR SOLVER\n");
       printf("REAL:                                    ");
       if (!rerrors) {
@@ -17179,7 +17148,7 @@ static bool testrcondunit_testhpdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
    return result;
 }
 
-bool testrcond(bool silent) {
+bool testrcond() {
    ae_int_t maxn;
    ae_int_t passcount;
    bool waserrors;
@@ -17200,7 +17169,7 @@ bool testrcond(bool silent) {
    spderr = !testrcondunit_testspdmatrixrcond(maxn, passcount);
    hpderr = !testrcondunit_testhpdmatrixrcond(maxn, passcount);
    waserrors = rtrerr || ctrerr || rerr || cerr || spderr || hpderr;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING RCOND\n");
       printf("REAL TRIANGULAR:                         ");
       if (!rtrerr) {
@@ -17250,7 +17219,7 @@ bool testrcond(bool silent) {
 }
 
 // === xblas testing unit ===
-bool testxblas(bool silent) {
+bool testxblas() {
    ae_frame _frame_block;
    bool approxerrors;
    bool exactnesserrors;
@@ -17416,7 +17385,7 @@ bool testxblas(bool silent) {
    }
 // report
    waserrors = approxerrors || exactnesserrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING XBLAS\n");
       printf("APPROX.TESTS:                            ");
       if (approxerrors) {
@@ -17916,7 +17885,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                }
             }
             rmatrixlusolvemfast(&lua, &p, n, &x, m, &info);
-            set_error_flag(rerrors, !testdirectdensesolversunit_rmatrixchecksolutionmfast(&xe, n, m, threshold, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:552");
+            *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksolutionmfast(&xe, n, m, threshold, info, &x);
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep);
             testdirectdensesolversunit_unset1d(&xv);
@@ -17928,7 +17897,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
             ae_vector_set_length(&bv, n);
             ae_v_move(xv.xR, 1, b.xyR[0], b.stride, n);
             rmatrixlusolvefast(&lua, &p, n, &xv, &info);
-            set_error_flag(rerrors, !testdirectdensesolversunit_rmatrixchecksolutionfast(&xe, n, threshold, info, &xv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:566");
+            *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksolutionfast(&xe, n, threshold, info, &xv);
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep);
             testdirectdensesolversunit_unset2d(&x);
@@ -18127,7 +18096,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_vector_set_length(&bv, n);
                   ae_v_move(bv.xR, 1, b.xyR[0], b.stride, n);
                   rmatrixsolvefast(&a, n, &bv, &info);
-                  set_error_flag(rerrors, !testdirectdensesolversunit_rmatrixchecksingularfast(n, info, &bv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:784");
+                  *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksingularfast(n, info, &bv);
                }
             // Test RMatrixLUSolveM()
                info = 0;
@@ -18146,7 +18115,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                      }
                   }
                   rmatrixlusolvemfast(&lua, &p, n, &x, m, &info);
-                  set_error_flag(rerrors, !testdirectdensesolversunit_rmatrixchecksingularmfast(n, m, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:808");
+                  *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksingularmfast(n, m, info, &x);
                }
             // Test RMatrixLUSolve()
                info = 0;
@@ -18163,7 +18132,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_vector_set_length(&bv, n);
                   ae_v_move(bv.xR, 1, b.xyR[0], b.stride, n);
                   rmatrixlusolvefast(&lua, &p, n, &bv, &info);
-                  set_error_flag(rerrors, !testdirectdensesolversunit_rmatrixchecksingularfast(n, info, &bv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:832");
+                  *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksingularfast(n, info, &bv);
                }
             // Test RMatrixMixedSolveM()
                info = 0;
@@ -18349,7 +18318,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                }
             }
             cmatrixlusolvemfast(&lua, &p, n, &x, m, &info);
-            set_error_flag(cerrors, !testdirectdensesolversunit_cmatrixchecksolutionmfast(&xe, n, m, threshold, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1358");
+            *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksolutionmfast(&xe, n, m, threshold, info, &x);
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep);
             testdirectdensesolversunit_cunset1d(&xv);
@@ -18361,7 +18330,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
             ae_vector_set_length(&bv, n);
             ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
             cmatrixlusolvefast(&lua, &p, n, &bv, &info);
-            set_error_flag(cerrors, !testdirectdensesolversunit_cmatrixchecksolutionfast(&xe, n, threshold, info, &bv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1372");
+            *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksolutionfast(&xe, n, threshold, info, &bv);
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep);
             testdirectdensesolversunit_cunset2d(&x);
@@ -18480,7 +18449,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                      }
                   }
                   cmatrixsolvemfast(&a, n, &x, m, &info);
-                  set_error_flag(cerrors, !testdirectdensesolversunit_cmatrixchecksingularmfast(n, m, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1515");
+                  *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksingularmfast(n, m, info, &x);
                }
             // Test CMatrixSolve()
                info = 0;
@@ -18495,7 +18464,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_vector_set_length(&bv, n);
                   ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
                   cmatrixsolvefast(&a, n, &bv, &info);
-                  set_error_flag(cerrors, !testdirectdensesolversunit_cmatrixchecksingularfast(n, info, &bv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1535");
+                  *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksingularfast(n, info, &bv);
                }
             // Test CMatrixLUSolveM()
                info = 0;
@@ -18513,7 +18482,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                      }
                   }
                   cmatrixlusolvemfast(&lua, &p, n, &x, m, &info);
-                  set_error_flag(cerrors, !testdirectdensesolversunit_cmatrixchecksingularmfast(n, m, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1559");
+                  *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksingularmfast(n, m, info, &x);
                }
             // Test CMatrixLUSolve()
                info = 0;
@@ -18529,7 +18498,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_vector_set_length(&bv, n);
                   ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
                   cmatrixlusolvefast(&lua, &p, n, &bv, &info);
-                  set_error_flag(cerrors, !testdirectdensesolversunit_cmatrixchecksingularfast(n, info, &bv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1582");
+                  *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksingularfast(n, info, &bv);
                }
             // Test CMatrixMixedSolveM()
                info = 0;
@@ -18687,7 +18656,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                }
             }
             spdmatrixsolvemfast(&a, n, isupper, &x, m, &info);
-            set_error_flag(spderrors, !testdirectdensesolversunit_rmatrixchecksolutionmfast(&xe, n, m, threshold, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1023");
+            *spderrors = *spderrors || !testdirectdensesolversunit_rmatrixchecksolutionmfast(&xe, n, m, threshold, info, &x);
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep);
             testdirectdensesolversunit_unset1d(&xv);
@@ -18699,7 +18668,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
             ae_vector_set_length(&bv, n);
             ae_v_move(bv.xR, 1, b.xyR[0], b.stride, n);
             spdmatrixsolvefast(&a, n, isupper, &bv, &info);
-            set_error_flag(spderrors, !testdirectdensesolversunit_rmatrixchecksolutionfast(&xe, n, threshold, info, &bv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1037");
+            *spderrors = *spderrors || !testdirectdensesolversunit_rmatrixchecksolutionfast(&xe, n, threshold, info, &bv);
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep);
             testdirectdensesolversunit_unset2d(&x);
@@ -18713,7 +18682,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                }
             }
             spdmatrixcholeskysolvemfast(&cha, n, isupper, &x, m, &info);
-            set_error_flag(spderrors, !testdirectdensesolversunit_rmatrixchecksolutionmfast(&xe, n, m, threshold, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1051");
+            *spderrors = *spderrors || !testdirectdensesolversunit_rmatrixchecksolutionmfast(&xe, n, m, threshold, info, &x);
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep);
             testdirectdensesolversunit_unset1d(&xv);
@@ -18725,7 +18694,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
             ae_vector_set_length(&bv, n);
             ae_v_move(bv.xR, 1, b.xyR[0], b.stride, n);
             spdmatrixcholeskysolvefast(&cha, n, isupper, &bv, &info);
-            set_error_flag(spderrors, !testdirectdensesolversunit_rmatrixchecksolutionfast(&xe, n, threshold, info, &bv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1065");
+            *spderrors = *spderrors || !testdirectdensesolversunit_rmatrixchecksolutionfast(&xe, n, threshold, info, &bv);
          // ********************************************************
          // EXACTLY SINGULAR MATRICES
          // ability to detect singularity is tested
@@ -18824,7 +18793,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                      }
                   }
                   spdmatrixsolvemfast(&a, n, isupper, &x, m, &info);
-                  set_error_flag(spderrors, !testdirectdensesolversunit_rmatrixchecksingularmfast(n, m, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1181");
+                  *spderrors = *spderrors || !testdirectdensesolversunit_rmatrixchecksingularmfast(n, m, info, &x);
                }
             // Test SPDMatrixSolve()
                info = 0;
@@ -18839,7 +18808,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                ae_vector_set_length(&bv, n);
                ae_v_move(bv.xR, 1, b.xyR[0], b.stride, n);
                spdmatrixsolvefast(&a, n, isupper, &bv, &info);
-               set_error_flag(spderrors, !testdirectdensesolversunit_rmatrixchecksingular(n, info, &rep, &bv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1202");
+               *spderrors = *spderrors || !testdirectdensesolversunit_rmatrixchecksingular(n, info, &rep, &bv);
             // 'equal columns/rows' are degenerate, but
             // Cholesky matrix with equal columns/rows IS NOT degenerate,
             // so it is not used for testing purposes.
@@ -18859,7 +18828,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                         }
                      }
                      spdmatrixcholeskysolvemfast(&a, n, isupper, &x, m, &info);
-                     set_error_flag(spderrors, !testdirectdensesolversunit_rmatrixchecksingularmfast(n, m, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1227");
+                     *spderrors = *spderrors || !testdirectdensesolversunit_rmatrixchecksingularmfast(n, m, info, &x);
                   }
                // Test SPDMatrixLUSolve()
                   info = 0;
@@ -18874,7 +18843,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                      ae_vector_set_length(&bv, n);
                      ae_v_move(bv.xR, 1, b.xyR[0], b.stride, n);
                      spdmatrixcholeskysolvefast(&a, n, isupper, &bv, &info);
-                     set_error_flag(spderrors, !testdirectdensesolversunit_rmatrixchecksingularfast(n, info, &bv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1246");
+                     *spderrors = *spderrors || !testdirectdensesolversunit_rmatrixchecksingularfast(n, info, &bv);
                   }
                }
             }
@@ -18963,7 +18932,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                }
             }
             hpdmatrixsolvemfast(&a, n, isupper, &x, m, &info);
-            set_error_flag(hpderrors, !testdirectdensesolversunit_cmatrixchecksolutionmfast(&xe, n, m, threshold, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1771");
+            *hpderrors = *hpderrors || !testdirectdensesolversunit_cmatrixchecksolutionmfast(&xe, n, m, threshold, info, &x);
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep);
             testdirectdensesolversunit_cunset1d(&xv);
@@ -18989,7 +18958,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                }
             }
             hpdmatrixcholeskysolvemfast(&cha, n, isupper, &x, m, &info);
-            set_error_flag(hpderrors, !testdirectdensesolversunit_cmatrixchecksolutionmfast(&xe, n, m, threshold, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1799");
+            *hpderrors = *hpderrors || !testdirectdensesolversunit_cmatrixchecksolutionmfast(&xe, n, m, threshold, info, &x);
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep);
             testdirectdensesolversunit_cunset1d(&xv);
@@ -19001,7 +18970,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
             ae_vector_set_length(&bv, n);
             ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
             hpdmatrixcholeskysolvefast(&cha, n, isupper, &bv, &info);
-            set_error_flag(hpderrors, !testdirectdensesolversunit_cmatrixchecksolutionfast(&xe, n, threshold, info, &bv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1813");
+            *hpderrors = *hpderrors || !testdirectdensesolversunit_cmatrixchecksolutionfast(&xe, n, threshold, info, &bv);
          // ********************************************************
          // EXACTLY SINGULAR MATRICES
          // ability to detect singularity is tested
@@ -19108,7 +19077,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                      }
                   }
                   hpdmatrixsolvemfast(&a, n, isupper, &x, m, &info);
-                  set_error_flag(hpderrors, !testdirectdensesolversunit_cmatrixchecksingularmfast(n, m, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1934");
+                  *hpderrors = *hpderrors || !testdirectdensesolversunit_cmatrixchecksingularmfast(n, m, info, &x);
                }
             // Test SPDMatrixSolve()
                info = 0;
@@ -19123,7 +19092,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                   ae_vector_set_length(&bv, n);
                   ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
                   hpdmatrixsolvefast(&a, n, isupper, &bv, &info);
-                  set_error_flag(hpderrors, !testdirectdensesolversunit_cmatrixchecksingularfast(n, info, &bv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1953");
+                  *hpderrors = *hpderrors || !testdirectdensesolversunit_cmatrixchecksingularfast(n, info, &bv);
                }
             // 'equal columns/rows' are degenerate, but
             // Cholesky matrix with equal columns/rows IS NOT degenerate,
@@ -19144,7 +19113,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                         }
                      }
                      hpdmatrixcholeskysolvemfast(&cha, n, isupper, &x, m, &info);
-                     set_error_flag(hpderrors, !testdirectdensesolversunit_cmatrixchecksingularmfast(n, m, info, &x), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1979");
+                     *hpderrors = *hpderrors || !testdirectdensesolversunit_cmatrixchecksingularmfast(n, m, info, &x);
                   }
                // Test HPDMatrixCholeskySolve() (fast)
                   info = 0;
@@ -19158,7 +19127,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                      ae_vector_set_length(&bv, n);
                      ae_v_cmove(bv.xC, 1, b.xyC[0], b.stride, "N", n);
                      hpdmatrixcholeskysolvefast(&cha, n, isupper, &bv, &info);
-                     set_error_flag(hpderrors, !testdirectdensesolversunit_cmatrixchecksingularfast(n, info, &bv), __FILE__, __LINE__, "testdirectdensesolversunit.ap:1997");
+                     *hpderrors = *hpderrors || !testdirectdensesolversunit_cmatrixchecksingularfast(n, info, &bv);
                   }
                }
             }
@@ -19169,7 +19138,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
 }
 
 // Test
-bool testdirectdensesolvers(bool silent) {
+bool testdirectdensesolvers() {
    ae_int_t maxn;
    ae_int_t maxm;
    ae_int_t passcount;
@@ -19195,7 +19164,7 @@ bool testdirectdensesolvers(bool silent) {
    testdirectdensesolversunit_testcsolver(maxn, maxm, passcount, threshold, &cerrors, &rfserrors);
    testdirectdensesolversunit_testhpdsolver(maxn, maxm, passcount, threshold, &hpderrors, &rfserrors);
    waserrors = rerrors || cerrors || spderrors || hpderrors || rfserrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING DENSE SOLVER\n");
       printf("* REAL:                                   ");
       if (rerrors) {
@@ -19311,32 +19280,32 @@ static void testdirectsparsesolversunit_testsks(bool *errorflag) {
          ae_vector_set_length(&xs, 0);
          sparsecopytosks(&sa, &sa2);
          sparsespdsolvesks(&sa2, isupper, &b, &xs, &rep);
-         set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:88");
-         set_error_flag(errorflag, xs.cnt != n, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:89");
+         *errorflag = *errorflag || rep.terminationtype <= 0;
+         *errorflag = *errorflag || xs.cnt != n;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, !NearAtR(xe.xR[i], xs.xR[i], threshold), __FILE__, __LINE__, "testdirectsparsesolversunit.ap:93");
+            *errorflag = *errorflag || !NearAtR(xe.xR[i], xs.xR[i], threshold);
          }
       // Test solver #2
          sparsecopytosks(&sa, &sa2);
          if (!sparsecholeskyskyline(&sa2, n, isupper)) {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:102");
+            *errorflag = true;
             ae_frame_leave();
             return;
          }
          ae_vector_set_length(&xs, 0);
          sparsespdcholeskysolve(&sa2, isupper, &b, &xs, &rep);
-         set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:107");
-         set_error_flag(errorflag, xs.cnt != n, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:108");
+         *errorflag = *errorflag || rep.terminationtype <= 0;
+         *errorflag = *errorflag || xs.cnt != n;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, !NearAtR(xe.xR[i], xs.xR[i], threshold), __FILE__, __LINE__, "testdirectsparsesolversunit.ap:112");
+            *errorflag = *errorflag || !NearAtR(xe.xR[i], xs.xR[i], threshold);
          }
       }
    }
@@ -19416,14 +19385,14 @@ static void testdirectsparsesolversunit_testcholesky(bool *errorflag) {
          ae_vector_set_length(&xs, 0);
          sparsecopy(&sa, &sa2);
          sparsespdsolve(&sa2, isupper, &b, &xs, &rep);
-         set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:196");
-         set_error_flag(errorflag, xs.cnt != n, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:197");
+         *errorflag = *errorflag || rep.terminationtype <= 0;
+         *errorflag = *errorflag || xs.cnt != n;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, !NearAtR(xe.xR[i], xs.xR[i], threshold), __FILE__, __LINE__, "testdirectsparsesolversunit.ap:201");
+            *errorflag = *errorflag || !NearAtR(xe.xR[i], xs.xR[i], threshold);
          }
       }
    }
@@ -19505,28 +19474,28 @@ static void testdirectsparsesolversunit_testgen(bool *errorflag) {
          // Test solver #1
             ae_vector_set_length(&xs, 0);
             sparsesolve(&sa, &b, &xs, &rep);
-            set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:285");
-            set_error_flag(errorflag, xs.cnt != n, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:286");
+            *errorflag = *errorflag || rep.terminationtype <= 0;
+            *errorflag = *errorflag || xs.cnt != n;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, !NearAtR(xe.xR[i], xs.xR[i], threshold), __FILE__, __LINE__, "testdirectsparsesolversunit.ap:290");
+               *errorflag = *errorflag || !NearAtR(xe.xR[i], xs.xR[i], threshold);
             }
          // Test solver #2
             ae_vector_set_length(&xs, 0);
             sparsecopytocrs(&sa, &sa2);
             sparselu(&sa2, 0, &pivp, &pivq);
             sparselusolve(&sa2, &pivp, &pivq, &b, &xs2, &rep);
-            set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:300");
-            set_error_flag(errorflag, xs2.cnt != n, __FILE__, __LINE__, "testdirectsparsesolversunit.ap:301");
+            *errorflag = *errorflag || rep.terminationtype <= 0;
+            *errorflag = *errorflag || xs2.cnt != n;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, !NearAtR(xe.xR[i], xs2.xR[i], threshold), __FILE__, __LINE__, "testdirectsparsesolversunit.ap:305");
+               *errorflag = *errorflag || !NearAtR(xe.xR[i], xs2.xR[i], threshold);
             }
          // Update fill factor
             if (noffdiag == 0) {
@@ -19540,7 +19509,7 @@ static void testdirectsparsesolversunit_testgen(bool *errorflag) {
 }
 
 // Test
-bool testdirectsparsesolvers(bool silent) {
+bool testdirectsparsesolvers() {
    bool rskserrors;
    bool rcholerrors;
    bool rgenerrors;
@@ -19553,7 +19522,7 @@ bool testdirectsparsesolvers(bool silent) {
    testdirectsparsesolversunit_testcholesky(&rcholerrors);
    testdirectsparsesolversunit_testgen(&rgenerrors);
    wereerrors = rskserrors || rcholerrors || rgenerrors;
-   if (!silent) {
+   if (wereerrors || !silent) {
       printf("TESTING DIRECT SPARSE SOLVERS:\n");
       printf("* SPD-SKS (real)                          ");
       if (rskserrors) {
@@ -19623,8 +19592,8 @@ static void testfblsunit_testgmres(bool *err) {
             rmatrixmv(n, n, &a, 0, 0, 0, &state.x, 0, &state.ax, 0);
          }
       // Check orthonormality of Qi
-         set_error_flag(err, state.qi.rows < itscnt, __FILE__, __LINE__, "testfblsunit.ap:379");
-         set_error_flag(err, state.qi.cols < n, __FILE__, __LINE__, "testfblsunit.ap:380");
+         *err = *err || state.qi.rows < itscnt;
+         *err = *err || state.qi.cols < n;
          if (*err) {
             ae_frame_leave();
             return;
@@ -19635,7 +19604,7 @@ static void testfblsunit_testgmres(bool *err) {
                if (i == j) {
                   v--;
                }
-               set_error_flag(err, !SmallAtR(v, 100.0 * machineepsilon), __FILE__, __LINE__, "testfblsunit.ap:389");
+               *err = *err || !SmallAtR(v, 100.0 * machineepsilon);
             }
          }
          if (*err) {
@@ -19648,9 +19617,9 @@ static void testfblsunit_testgmres(bool *err) {
          raddv(n, -1.0, &b, &r);
          e = sqrt(rdotv2(n, &r));
       // Test condition
-         set_error_flag(err, e >= eprev, __FILE__, __LINE__, "testfblsunit.ap:405");
+         *err = *err || e >= eprev;
          if (itscnt == n) {
-            set_error_flag(err, e > 10000.0 * machineepsilon, __FILE__, __LINE__, "testfblsunit.ap:407");
+            *err = *err || e > 10000.0 * machineepsilon;
          }
          eprev = e;
       }
@@ -19677,7 +19646,7 @@ static void testfblsunit_testgmres(bool *err) {
             raddv(n, -1.0, &b, &r);
             e = sqrt(rdotv2(n, &r));
          // Test condition
-            set_error_flag(err, e > 1.0E6 * machineepsilon, __FILE__, __LINE__, "testfblsunit.ap:451");
+            *err = *err || e > 1.0E6 * machineepsilon;
          }
       }
    }
@@ -19698,7 +19667,7 @@ static void testfblsunit_testgmres(bool *err) {
          }
       // Test solution
          for (i = 0; i < n; i++) {
-            set_error_flag(err, state.xs.xR[i] != 0.0, __FILE__, __LINE__, "testfblsunit.ap:481");
+            *err = *err || state.xs.xR[i] != 0.0;
          }
       }
    }
@@ -19706,7 +19675,7 @@ static void testfblsunit_testgmres(bool *err) {
 }
 
 // Testing
-bool testfbls(bool silent) {
+bool testfbls() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t m;
@@ -19907,12 +19876,12 @@ bool testfbls(bool silent) {
    // Test
       fblscholeskysolve(&a, sqrt(scalea), n, uppera, &b, &buf);
       for (i = 0; i < n; i++) {
-         set_error_flag(&cholerrors, !NearAtR(b.xR[i], xe.xR[i], 1.0E3 * machineepsilon), __FILE__, __LINE__, "testfblsunit.ap:291");
+         cholerrors = cholerrors || !NearAtR(b.xR[i], xe.xR[i], 1.0E3 * machineepsilon);
       }
    }
 // report
    waserrors = cgerrors || lserrors || cholerrors || gmreserrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING FBLS\n");
       printf("CG ERRORS:                               ");
       if (cgerrors) {
@@ -20009,8 +19978,8 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
          sparsesolversetcond(&solver, 0.0, gmresk);
          sparsesolversolve(&solver, &a, &b);
          sparsesolverresults(&solver, &x, &rep);
-         set_error_flag(err, x.cnt != n, __FILE__, __LINE__, "testiterativesparseunit.ap:107");
-         set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testiterativesparseunit.ap:108");
+         *err = *err || x.cnt != n;
+         *err = *err || rep.terminationtype <= 0;
          if (*err) {
             ae_frame_leave();
             return;
@@ -20025,11 +19994,11 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
          }
          rcopyvr(n, &x, &z, gmresk);
          rmatrixlq(&z, gmresk + 1, n, &tmp);
-         set_error_flag(err, !SmallAtR(z.xyR[gmresk][gmresk], 1.0E-6), __FILE__, __LINE__, "testiterativesparseunit.ap:125");
+         *err = *err || !SmallAtR(z.xyR[gmresk][gmresk], 1.0E-6);
       // Additional test - R2 field is correct
          sparsemv(&crsa, &x, &ax);
          raddv(n, -1.0, &b, &ax);
-         set_error_flag(err, !NearAtR(rep.r2, rdotv2(n, &ax), 1.0E-6), __FILE__, __LINE__, "testiterativesparseunit.ap:132");
+         *err = *err || !NearAtR(rep.r2, rdotv2(n, &ax), 1.0E-6);
       }
    }
 // Randomly generated sparse problem, possibly degenerate.
@@ -20071,8 +20040,8 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
          sparsesolversetcond(&solver, epsf, 0);
          sparsesolversolvesymmetric(&solver, &a, isupper, &b);
          sparsesolverresults(&solver, &x, &rep);
-         set_error_flag(err, x.cnt != n, __FILE__, __LINE__, "testiterativesparseunit.ap:180");
-         set_error_flag(err, rep.terminationtype != 1, __FILE__, __LINE__, "testiterativesparseunit.ap:181");
+         *err = *err || x.cnt != n;
+         *err = *err || rep.terminationtype != 1;
          if (*err) {
             ae_frame_leave();
             return;
@@ -20083,11 +20052,11 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
             v += sqr(b.xR[i] - b2.xR[i]);
          }
          v = sqrt(v) / coalesce(sqrt(rdotv2(n, &b)), 1.0);
-         set_error_flag(err, v > 1.1 * epsf, __FILE__, __LINE__, "testiterativesparseunit.ap:189");
+         *err = *err || v > 1.1 * epsf;
          ae_vector_set_length(&x, 0);
          sparsesolvesymmetricgmres(&a, isupper, &b, gmresk, epsf, 0, &x, &rep);
-         set_error_flag(err, x.cnt != n, __FILE__, __LINE__, "testiterativesparseunit.ap:193");
-         set_error_flag(err, rep.terminationtype != 1, __FILE__, __LINE__, "testiterativesparseunit.ap:194");
+         *err = *err || x.cnt != n;
+         *err = *err || rep.terminationtype != 1;
          if (*err) {
             ae_frame_leave();
             return;
@@ -20098,7 +20067,7 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
             v += sqr(b.xR[i] - b2.xR[i]);
          }
          v = sqrt(v) / coalesce(sqrt(rdotv2(n, &b)), 1.0);
-         set_error_flag(err, v > 1.1 * epsf, __FILE__, __LINE__, "testiterativesparseunit.ap:202");
+         *err = *err || v > 1.1 * epsf;
       // Nonsymmetric solve
          gmresk = 5 + hqrnduniformi(&rs, 2 * n + 1);
          sparsemv(&crsa, &xref, &b);
@@ -20108,8 +20077,8 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
          sparsesolversetcond(&solver, epsf, 0);
          sparsesolversolve(&solver, &a, &b);
          sparsesolverresults(&solver, &x, &rep);
-         set_error_flag(err, x.cnt != n, __FILE__, __LINE__, "testiterativesparseunit.ap:215");
-         set_error_flag(err, rep.terminationtype != 1, __FILE__, __LINE__, "testiterativesparseunit.ap:216");
+         *err = *err || x.cnt != n;
+         *err = *err || rep.terminationtype != 1;
          if (*err) {
             ae_frame_leave();
             return;
@@ -20120,11 +20089,11 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
             v += sqr(b.xR[i] - b2.xR[i]);
          }
          v = sqrt(v) / coalesce(sqrt(rdotv2(n, &b)), 1.0);
-         set_error_flag(err, v > 1.1 * epsf, __FILE__, __LINE__, "testiterativesparseunit.ap:224");
+         *err = *err || v > 1.1 * epsf;
          ae_vector_set_length(&x, 0);
          sparsesolvegmres(&a, &b, gmresk, epsf, 0, &x, &rep);
-         set_error_flag(err, x.cnt != n, __FILE__, __LINE__, "testiterativesparseunit.ap:228");
-         set_error_flag(err, rep.terminationtype != 1, __FILE__, __LINE__, "testiterativesparseunit.ap:229");
+         *err = *err || x.cnt != n;
+         *err = *err || rep.terminationtype != 1;
          if (*err) {
             ae_frame_leave();
             return;
@@ -20135,7 +20104,7 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
             v += sqr(b.xR[i] - b2.xR[i]);
          }
          v = sqrt(v) / coalesce(sqrt(rdotv2(n, &b)), 1.0);
-         set_error_flag(err, v > 1.1 * epsf, __FILE__, __LINE__, "testiterativesparseunit.ap:237");
+         *err = *err || v > 1.1 * epsf;
       // Increase sparsity
          if (nnz == 0) {
             break;
@@ -20172,16 +20141,16 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
    sparsesolversetcond(&solver, epsf, 0);
    sparsesolversolve(&solver, &a, &b);
    sparsesolverresults(&solver, &x, &rep);
-   set_error_flag(err, rep.terminationtype != 1, __FILE__, __LINE__, "testiterativesparseunit.ap:278");
-   set_error_flag(err, rep.iterationscount <= 1, __FILE__, __LINE__, "testiterativesparseunit.ap:279");
+   *err = *err || rep.terminationtype != 1;
+   *err = *err || rep.iterationscount <= 1;
    if (*err) {
       ae_frame_leave();
       return;
    }
    sparsesolversolve(&solver, &a, &b);
    sparsesolverresults(&solver, &x, &rep);
-   set_error_flag(err, rep.terminationtype != 1, __FILE__, __LINE__, "testiterativesparseunit.ap:285");
-   set_error_flag(err, rep.iterationscount <= 1, __FILE__, __LINE__, "testiterativesparseunit.ap:286");
+   *err = *err || rep.terminationtype != 1;
+   *err = *err || rep.iterationscount <= 1;
    if (*err) {
       ae_frame_leave();
       return;
@@ -20189,8 +20158,8 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
    sparsesolversetstartingpoint(&solver, &x);
    sparsesolversolve(&solver, &a, &b);
    sparsesolverresults(&solver, &x, &rep);
-   set_error_flag(err, rep.terminationtype != 1, __FILE__, __LINE__, "testiterativesparseunit.ap:293");
-   set_error_flag(err, rep.iterationscount > 1, __FILE__, __LINE__, "testiterativesparseunit.ap:294");
+   *err = *err || rep.terminationtype != 1;
+   *err = *err || rep.iterationscount > 1;
    if (*err) {
       ae_frame_leave();
       return;
@@ -20224,7 +20193,7 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
       }
    }
    sparsesolveroocstop(&solver, &x, &rep);
-   set_error_flag(err, rep.terminationtype != 8, __FILE__, __LINE__, "testiterativesparseunit.ap:329");
+   *err = *err || rep.terminationtype != 8;
 // Check OOC API, check reports:
 // * OOC API works correctly
 // * solver reports a sequence of decreased residuals
@@ -20268,8 +20237,8 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
          rcopyallocv(n, &xr, &replast);
          sparsemv(&crsa, &xr, &ax);
          raddv(n, -1.0, &b, &ax);
-         set_error_flag(err, !NearAtR(rdotv2(n, &ax), v, tol * (1.0 + rdotv2(n, &ax))), __FILE__, __LINE__, "testiterativesparseunit.ap:376");
-         set_error_flag(err, v > rprev + tol, __FILE__, __LINE__, "testiterativesparseunit.ap:377");
+         *err = *err || !NearAtR(rdotv2(n, &ax), v, tol * (1.0 + rdotv2(n, &ax)));
+         *err = *err || v > rprev + tol;
          rprev = v;
          nreports++;
       } else {
@@ -20281,29 +20250,29 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
       }
    }
    sparsesolveroocstop(&solver, &x, &rep);
-   set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testiterativesparseunit.ap:389");
-   set_error_flag(err, rep.nmv != nmv, __FILE__, __LINE__, "testiterativesparseunit.ap:390");
-   set_error_flag(err, rep.iterationscount < (nreports - 2) * gmresk, __FILE__, __LINE__, "testiterativesparseunit.ap:391");
-   set_error_flag(err, repfirst.cnt != n, __FILE__, __LINE__, "testiterativesparseunit.ap:392");
-   set_error_flag(err, replast.cnt != n, __FILE__, __LINE__, "testiterativesparseunit.ap:393");
+   *err = *err || rep.terminationtype <= 0;
+   *err = *err || rep.nmv != nmv;
+   *err = *err || rep.iterationscount < (nreports - 2) * gmresk;
+   *err = *err || repfirst.cnt != n;
+   *err = *err || replast.cnt != n;
    if (*err) {
       ae_frame_leave();
       return;
    }
    for (i = 0; i < n; i++) {
-      set_error_flag(err, !NearAtR(repfirst.xR[i], x0.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testiterativesparseunit.ap:398");
-      set_error_flag(err, !NearAtR(replast.xR[i], x.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testiterativesparseunit.ap:399");
+      *err = *err || !NearAtR(repfirst.xR[i], x0.xR[i], 100.0 * machineepsilon);
+      *err = *err || !NearAtR(replast.xR[i], x.xR[i], 100.0 * machineepsilon);
    }
    sparsesolversolve(&solver, &a, &b);
    sparsesolverresults(&solver, &x, &rep);
-   set_error_flag(err, rep.terminationtype != 1, __FILE__, __LINE__, "testiterativesparseunit.ap:403");
+   *err = *err || rep.terminationtype != 1;
    sparsesolversolvesymmetric(&solver, &a, hqrndnormal(&rs) > 0.0, &b);
    sparsesolverresults(&solver, &x, &rep);
-   set_error_flag(err, rep.terminationtype != 1, __FILE__, __LINE__, "testiterativesparseunit.ap:406");
+   *err = *err || rep.terminationtype != 1;
    ae_frame_leave();
 }
 
-bool testiterativesparse(bool silent) {
+bool testiterativesparse() {
    ae_int_t maxn;
    bool gmreserrors;
    bool wereerrors;
@@ -20315,7 +20284,7 @@ bool testiterativesparse(bool silent) {
    testiterativesparseunit_testgmres(maxn, &gmreserrors);
 // report
    wereerrors = gmreserrors;
-   if (!silent) {
+   if (wereerrors || !silent) {
       printf("TESTING ITERATIVE SPARSE SOLVERS:\n");
       printf("* GMRES:                                      ");
       if (gmreserrors) {
@@ -20351,7 +20320,7 @@ static const double testlincgunit_maxcond = 30.0;
 // INPUT:
 //     Silent   -   if true then function output report
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
-static bool testlincgunit_complextest(bool silent) {
+static bool testlincgunit_complextest() {
    ae_frame _frame_block;
    ae_int_t n;
    double c;
@@ -20434,7 +20403,7 @@ static bool testlincgunit_complextest(bool silent) {
          } else if (state.xupdated) {
          // Save current point to MtX, it will be used later for additional tests
             if (numofit >= mtx.rows) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testlincgunit.ap:208");
+               result = true;
                ae_frame_leave();
                return result;
             }
@@ -20450,7 +20419,7 @@ static bool testlincgunit_complextest(bool silent) {
             printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
             printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::GetRNorm!=Rep.R2!(%0.2e!=%0.2e)\n", (int)sz, c, getrnorm, rep.r2);
          }
-         set_error_flag(&result, true, __FILE__, __LINE__, "testlincgunit.ap:227");
+         result = true;
          ae_frame_leave();
          return result;
       }
@@ -20470,7 +20439,7 @@ static bool testlincgunit_complextest(bool silent) {
                printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
                printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::Discripancy[%0d]>E0!(%0.2e>%0.2e)\n", (int)sz, c, (int)i, residual.xR[i], testlincgunit_e0);
             }
-            set_error_flag(&result, true, __FILE__, __LINE__, "testlincgunit.ap:254");
+            result = true;
             ae_frame_leave();
             return result;
          }
@@ -20482,7 +20451,7 @@ static bool testlincgunit_complextest(bool silent) {
             printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::||NormOfResidual-Rep.R2||>E0!(%0.2e>%0.2e)\n", (int)sz, c, fabs(normofresidual - rep.r2), testlincgunit_e0);
             printf("NormOfResidual=%0.2e; Rep.R2=%0.2e\n", normofresidual, rep.r2);
          }
-         set_error_flag(&result, true, __FILE__, __LINE__, "testlincgunit.ap:270");
+         result = true;
          ae_frame_leave();
          return result;
       }
@@ -20528,7 +20497,7 @@ static bool testlincgunit_complextest(bool silent) {
                      printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
                      printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::(Ap%0d,p%0d) != 0\n{Sclr=%0.15f; NA=%0.15f NV0=%0.15f NV1=%0.15f;}\n", (int)sz, c, (int)i, (int)j, sclr, na, nv0, nv1);
                   }
-                  set_error_flag(&result, true, __FILE__, __LINE__, "testlincgunit.ap:327");
+                  result = true;
                   ae_frame_leave();
                   return result;
                }
@@ -20552,7 +20521,7 @@ static bool testlincgunit_complextest(bool silent) {
                      printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
                      printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::(r%0d,p%0d) != 0\n{Sclr=%0.15f; NV0=%0.15f NV1=%0.15f;}\n", (int)sz, c, (int)i, (int)j, sclr, nv0, nv1);
                   }
-                  set_error_flag(&result, true, __FILE__, __LINE__, "testlincgunit.ap:360");
+                  result = true;
                   ae_frame_leave();
                   return result;
                }
@@ -20576,7 +20545,7 @@ static bool testlincgunit_complextest(bool silent) {
                      printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
                      printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::(rm,rk) != 0\n{Sclr=%0.15f; NV0=%0.15f NV1=%0.15f;}\n", (int)sz, c, sclr, nv0, nv1);
                   }
-                  set_error_flag(&result, true, __FILE__, __LINE__, "testlincgunit.ap:392");
+                  result = true;
                   ae_frame_leave();
                   return result;
                }
@@ -20597,7 +20566,7 @@ static bool testlincgunit_complextest(bool silent) {
 //     1. achieved the required precision(StCrit=0);
 //     2. execution of the required number of iterations(StCrit=1).
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
-static bool testlincgunit_complexres(bool silent) {
+static bool testlincgunit_complexres() {
    ae_frame _frame_block;
    double err;
    ae_int_t n;
@@ -20721,7 +20690,7 @@ static bool testlincgunit_complexres(bool silent) {
 // This function check, that XUpdated return State.X=X0 at zero iteration and
 // State.X=X(algorithm result) at last.
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
-static bool testlincgunit_basictestx(bool silent) {
+static bool testlincgunit_basictestx() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t sz;
@@ -20845,7 +20814,7 @@ static bool testlincgunit_basictestx(bool silent) {
 // large badly conditioned problem (N=50), which should be large enough and
 // ill-conditioned enough to cause periodic recalculation of R.
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
-static bool testlincgunit_testrcorrectness(bool silent) {
+static bool testlincgunit_testrcorrectness() {
    ae_frame _frame_block;
    ae_int_t n;
    double c;
@@ -20924,7 +20893,7 @@ static bool testlincgunit_testrcorrectness(bool silent) {
 
 // This function check, that number of iterations are't more than MaxIts.
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
-static bool testlincgunit_basictestiters(bool silent) {
+static bool testlincgunit_basictestiters() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t sz;
@@ -21167,7 +21136,7 @@ static bool testlincgunit_frombasis(RVector *x, RMatrix *basis, ae_int_t n, ae_i
 
 // This function check, that programmed method is Krylov subspace methed.
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
-static bool testlincgunit_krylovsubspacetest(bool silent) {
+static bool testlincgunit_krylovsubspacetest() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t sz;
@@ -21303,7 +21272,7 @@ static bool testlincgunit_krylovsubspacetest(bool silent) {
                printf("KrylovSubspaceTest::FAIL\n");
                printf("Size=%0d; Iters=%0d;\n", (int)n, (int)i);
             }
-            set_error_flag(&result, true, __FILE__, __LINE__, "testlincgunit.ap:1129");
+            result = true;
             ae_frame_leave();
             return result;
          }
@@ -21320,7 +21289,7 @@ static bool testlincgunit_krylovsubspacetest(bool silent) {
 // a known solution 'Xs'(A*Xs-b=0). There b is A*Xs. After, function calculate
 // result by LinCGSolveSparse and compares it with 'Xs'.
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
-static bool testlincgunit_sparsetest(bool silent) {
+static bool testlincgunit_sparsetest() {
    ae_frame _frame_block;
    double err;
    ae_int_t n;
@@ -21416,7 +21385,7 @@ static bool testlincgunit_sparsetest(bool silent) {
 
 // Function for testing  the preconditioned conjugate gradient method.
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
-static bool testlincgunit_precondtest(bool silent) {
+static bool testlincgunit_precondtest() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t sz;
@@ -21697,7 +21666,7 @@ static bool testlincgunit_precondtest(bool silent) {
    return result;
 }
 
-bool testlincg(bool silent) {
+bool testlincg() {
    bool basictestxerrors;
    bool basictestiterserr;
    bool complexreserrors;
@@ -21708,17 +21677,17 @@ bool testlincg(bool silent) {
    bool preconderrors;
    bool waserrors;
    bool result;
-   basictestxerrors = testlincgunit_basictestx(true);
-   basictestiterserr = testlincgunit_basictestiters(true);
-   complexreserrors = testlincgunit_complexres(true);
-   complexerrors = testlincgunit_complextest(true);
-   rcorrectness = testlincgunit_testrcorrectness(true);
-   krylovsubspaceerr = testlincgunit_krylovsubspacetest(true);
-   sparseerrors = testlincgunit_sparsetest(true);
-   preconderrors = testlincgunit_precondtest(true);
+   basictestxerrors = testlincgunit_basictestx();
+   basictestiterserr = testlincgunit_basictestiters();
+   complexreserrors = testlincgunit_complexres();
+   complexerrors = testlincgunit_complextest();
+   rcorrectness = testlincgunit_testrcorrectness();
+   krylovsubspaceerr = testlincgunit_krylovsubspacetest();
+   sparseerrors = testlincgunit_sparsetest();
+   preconderrors = testlincgunit_precondtest();
 // report
    waserrors = basictestxerrors || complexreserrors || complexerrors || rcorrectness || basictestiterserr || krylovsubspaceerr || sparseerrors || preconderrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING LinCG\n");
       printf("BasicTestX:                                   ");
       if (basictestxerrors) {
@@ -21781,7 +21750,7 @@ bool testlincg(bool silent) {
 }
 
 // === normestimator testing unit ===
-bool testnormestimator(bool silent) {
+bool testnormestimator() {
    ae_frame _frame_block;
    double tol;
    ae_int_t maxmn;
@@ -21917,7 +21886,7 @@ bool testnormestimator(bool silent) {
    }
    waserrors = waserrors || nbetter < 0.5 * passcount + sigma * sqrt(0.25 * passcount);
 // report
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING NORM ESTIMATOR\n");
       printf("TEST:                                    ");
       if (!waserrors) {
@@ -22092,7 +22061,7 @@ static bool testlinlsqrunit_isitgoodsolution(RMatrix *a, RVector *b, ae_int_t m,
 // INPUT:
 //     Silent   -   if true then function output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-static bool testlinlsqrunit_svdtest(bool silent) {
+static bool testlinlsqrunit_svdtest() {
    ae_frame _frame_block;
    ae_int_t szn;
    ae_int_t szm;
@@ -22188,7 +22157,7 @@ static bool testlinlsqrunit_svdtest(bool silent) {
 // INPUT:
 //     Silent   -   if true then function does not outputs results to console
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-static bool testlinlsqrunit_mwcranksvdtest(bool silent) {
+static bool testlinlsqrunit_mwcranksvdtest() {
    ae_frame _frame_block;
    double bnorm;
    ae_int_t szm;
@@ -22299,7 +22268,7 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent) {
 // INPUT:
 //     Silent   -   if true then function output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-static bool testlinlsqrunit_mwicranksvdtest(bool silent) {
+static bool testlinlsqrunit_mwicranksvdtest() {
    ae_frame _frame_block;
    double bnorm;
    ae_int_t szm;
@@ -22419,7 +22388,7 @@ static bool testlinlsqrunit_mwicranksvdtest(bool silent) {
 // INPUT:
 //     Silent   -   if true then function output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-static bool testlinlsqrunit_bidiagonaltest(bool silent) {
+static bool testlinlsqrunit_bidiagonaltest() {
    ae_frame _frame_block;
    double bnorm;
    ae_int_t sz;
@@ -22550,7 +22519,7 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent) {
 // INPUT:
 //     Silent   -   if true then function output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-static bool testlinlsqrunit_zeromatrixtest(bool silent) {
+static bool testlinlsqrunit_zeromatrixtest() {
    ae_frame _frame_block;
    ae_int_t sz;
    ae_int_t n;
@@ -22634,7 +22603,7 @@ static bool testlinlsqrunit_zeromatrixtest(bool silent) {
 // INPUT:
 //     Silent   -   if true then function output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
+static bool testlinlsqrunit_reportcorrectnesstest() {
    ae_frame _frame_block;
    double rnorm;
    double tnorm;
@@ -22703,7 +22672,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
             linlsqrsetcond(&s, 0.0, 0.0, n);
             linlsqrsetlambdai(&s, (double)lambdai);
             linlsqrsetxrep(&s, true);
-            set_error_flag(&result, linlsqrpeekiterationscount(&s) != 0, __FILE__, __LINE__, "testlinlsqrunit.ap:811");
+            result = result || linlsqrpeekiterationscount(&s) != 0;
             while (linlsqriteration(&s))
                if (s.needmv) {
                   for (i = 0; i < m; i++) {
@@ -22734,12 +22703,12 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
                // calculated by the algorithm for LSQR, and
                // TNorm=||A*S.x-b||, calculated by test function).
                   if (s.r2 > rnorm + 1000.0 * machineepsilon * rmax2(rnorm, 1.0)) {
-                     set_error_flag(&result, true, __FILE__, __LINE__, "testlinlsqrunit.ap:853");
+                     result = true;
                      ae_frame_leave();
                      return result;
                   }
                   if (!NearAtR(s.r2, tnorm, eps)) {
-                     set_error_flag(&result, true, __FILE__, __LINE__, "testlinlsqrunit.ap:858");
+                     result = true;
                      ae_frame_leave();
                      return result;
                   }
@@ -22758,10 +22727,10 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
                      }
                   }
                // check iterations counter
-                  set_error_flag(&result, linlsqrpeekiterationscount(&s) != its, __FILE__, __LINE__, "testlinlsqrunit.ap:878");
+                  result = result || linlsqrpeekiterationscount(&s) != its;
                }
             linlsqrresults(&s, &x0, &rep);
-            set_error_flag(&result, linlsqrpeekiterationscount(&s) != n, __FILE__, __LINE__, "testlinlsqrunit.ap:882");
+            result = result || linlsqrpeekiterationscount(&s) != n;
          // check, that FirstX is equal to zero and LastX
          // is equal to x0.
             for (i = 0; i < n; i++) {
@@ -22776,7 +22745,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
                         printf("x[%0d]=%0.10e; LastX[%0d]=%0.10e\n", (int)j, x0.xR[j], (int)j, lastx.xR[j]);
                      }
                   }
-                  set_error_flag(&result, true, __FILE__, __LINE__, "testlinlsqrunit.ap:902");
+                  result = true;
                   ae_frame_leave();
                   return result;
                }
@@ -22796,7 +22765,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
 // INPUT:
 //     Silent   -   if true then function output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
+static bool testlinlsqrunit_stoppingcriteriatest() {
    ae_frame _frame_block;
    double bnorm;
    ae_int_t sz;
@@ -23042,7 +23011,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
 // INPUT:
 //     Silent   -   if true then function does not output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-static bool testlinlsqrunit_analytictest(bool silent) {
+static bool testlinlsqrunit_analytictest() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t m;
@@ -23252,9 +23221,9 @@ static void testlinlsqrunit_testterminationrequests(bool *err) {
             }
          }
       linlsqrresults(&s, &x1, &rep);
-      set_error_flag(err, rep.terminationtype != 8, __FILE__, __LINE__, "testlinlsqrunit.ap:1460");
-      set_error_flag(err, !isfinitevector(&x1, n), __FILE__, __LINE__, "testlinlsqrunit.ap:1461");
-      set_error_flag(err, reportsafterrequest != 1, __FILE__, __LINE__, "testlinlsqrunit.ap:1462");
+      *err = *err || rep.terminationtype != 8;
+      *err = *err || !isfinitevector(&x1, n);
+      *err = *err || reportsafterrequest != 1;
    }
    ae_frame_leave();
 }
@@ -23375,7 +23344,7 @@ static bool testlinlsqrunit_preconditionertest() {
    return result;
 }
 
-bool testlinlsqr(bool silent) {
+bool testlinlsqr() {
    bool svdtesterrors;
    bool mwcranksvderr;
    bool mwicranksvderr;
@@ -23389,19 +23358,19 @@ bool testlinlsqr(bool silent) {
    bool waserrors;
    bool result;
    termreqerrors = false;
-   svdtesterrors = testlinlsqrunit_svdtest(true);
-   mwcranksvderr = testlinlsqrunit_mwcranksvdtest(true);
-   mwicranksvderr = testlinlsqrunit_mwicranksvdtest(true);
-   bidiagonalerr = testlinlsqrunit_bidiagonaltest(true);
-   zeromatrixerr = testlinlsqrunit_zeromatrixtest(true);
-   reportcorrectnesserr = testlinlsqrunit_reportcorrectnesstest(true);
-   stoppingcriteriaerr = testlinlsqrunit_stoppingcriteriatest(true);
-   analytictesterrors = testlinlsqrunit_analytictest(true);
+   svdtesterrors = testlinlsqrunit_svdtest();
+   mwcranksvderr = testlinlsqrunit_mwcranksvdtest();
+   mwicranksvderr = testlinlsqrunit_mwicranksvdtest();
+   bidiagonalerr = testlinlsqrunit_bidiagonaltest();
+   zeromatrixerr = testlinlsqrunit_zeromatrixtest();
+   reportcorrectnesserr = testlinlsqrunit_reportcorrectnesstest();
+   stoppingcriteriaerr = testlinlsqrunit_stoppingcriteriatest();
+   analytictesterrors = testlinlsqrunit_analytictest();
    prectesterrors = testlinlsqrunit_preconditionertest();
    testlinlsqrunit_testterminationrequests(&termreqerrors);
 // report
    waserrors = svdtesterrors || mwcranksvderr || mwicranksvderr || bidiagonalerr || zeromatrixerr || reportcorrectnesserr || stoppingcriteriaerr || analytictesterrors || prectesterrors || termreqerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING LinLSQR\n");
       printf("Different matrix types:\n");
       printf("* general M*N                                 ");
@@ -23478,11 +23447,11 @@ bool testlinlsqr(bool silent) {
 }
 
 // === linmin testing unit ===
-bool testlinmin(bool silent) {
+bool testlinmin() {
    bool waserrors;
    bool result;
    waserrors = false;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING LINMIN\n");
       if (waserrors) {
          printf("TEST FAILED\n");
@@ -23584,7 +23553,7 @@ static void testnlequnit_testfuncshbm(nleqstate *state) {
    }
 }
 
-bool testnleq(bool silent) {
+bool testnleq() {
    ae_frame _frame_block;
    bool waserrors;
    bool basicserrors;
@@ -23802,7 +23771,7 @@ bool testnleq(bool silent) {
    }
 // end
    waserrors = basicserrors || converror || othererrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING NLEQ SOLVER\n");
       printf("BASIC FUNCTIONALITY:                      ");
       if (basicserrors) {
@@ -24752,7 +24721,7 @@ static void testmatinvunit_testhpdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
 }
 
 // Test
-bool testmatinv(bool silent) {
+bool testmatinv() {
    ae_int_t maxrn;
    ae_int_t maxcn;
    ae_int_t largen;
@@ -24790,7 +24759,7 @@ bool testmatinv(bool silent) {
    testmatinvunit_testcinv(largen, largen, passcount, threshold, &cerrors);
    testmatinvunit_testhpdinv(largen, largen, passcount, threshold, &hpderrors);
    waserrors = rtrerrors || ctrerrors || rerrors || cerrors || spderrors || hpderrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING MATINV\n");
       printf("* REAL TRIANGULAR:                        ");
       if (rtrerrors) {
@@ -24997,7 +24966,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
       // * compare reference model against implementation being tested
          inexactlbfgspreconditioner(&s0, n, &vd, &vc, &va, k, &buf);
          for (i = 0; i < n; i++) {
-            set_error_flag(wereerrors, !NearAtR(s2.xR[i], s0.xR[i], tolg), __FILE__, __LINE__, "testoptservunit.ap:236");
+            *wereerrors = *wereerrors || !NearAtR(s2.xR[i], s0.xR[i], tolg);
          }
       // Second test - N-K zero rows appended to V and rows are
       // randomly reordered. Doing so should not change result,
@@ -25016,7 +24985,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
          }
          inexactlbfgspreconditioner(&s1, n, &vd, &vc, &va, n, &buf);
          for (i = 0; i < n; i++) {
-            set_error_flag(wereerrors, !NearAtR(s2.xR[i], s1.xR[i], tolg), __FILE__, __LINE__, "testoptservunit.ap:259");
+            *wereerrors = *wereerrors || !NearAtR(s2.xR[i], s1.xR[i], tolg);
          }
       }
    }
@@ -25091,7 +25060,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
          preparelowrankpreconditioner(&vd, &vc, &va, n, k, &lowrankbuf);
          applylowrankpreconditioner(&s0, &lowrankbuf);
          for (i = 0; i < n; i++) {
-            set_error_flag(wereerrors, !NearAtR(s2.xR[i], s0.xR[i], tolg), __FILE__, __LINE__, "testoptservunit.ap:341");
+            *wereerrors = *wereerrors || !NearAtR(s2.xR[i], s0.xR[i], tolg);
          }
       // Second test - N-K zero rows appended to V and rows are
       // randomly reordered. Doing so should not change result,
@@ -25111,14 +25080,14 @@ static void testoptservunit_testprec(bool *wereerrors) {
          preparelowrankpreconditioner(&vd, &vc, &va, n, n, &lowrankbuf);
          applylowrankpreconditioner(&s1, &lowrankbuf);
          for (i = 0; i < n; i++) {
-            set_error_flag(wereerrors, !NearAtR(s2.xR[i], s1.xR[i], tolg), __FILE__, __LINE__, "testoptservunit.ap:365");
+            *wereerrors = *wereerrors || !NearAtR(s2.xR[i], s1.xR[i], tolg);
          }
       }
    }
    ae_frame_leave();
 }
 
-bool testoptserv(bool silent) {
+bool testoptserv() {
    bool precerrors;
    bool wereerrors;
    bool result;
@@ -25126,7 +25095,7 @@ bool testoptserv(bool silent) {
    testoptservunit_testprec(&precerrors);
 // report
    wereerrors = precerrors;
-   if (!silent) {
+   if (wereerrors || !silent) {
       printf("TESTING OPTSERV\n");
       printf("TESTS:                                    \n");
       printf("* PRECONDITIONERS                         ");
@@ -25477,10 +25446,10 @@ static void testminlbfgsunit_testother(bool *err) {
             state.g.xR[i] = 2 * (1 + i) * state.x.xR[i];
          }
       } else if (state.xupdated) {
-         set_error_flag(err, state.f > fprev, __FILE__, __LINE__, "testminlbfgsunit.ap:758");
+         *err = *err || state.f > fprev;
          if (fprev == maxrealnumber) {
             for (i = 0; i < n; i++) {
-               set_error_flag(err, state.x.xR[i] != x.xR[i], __FILE__, __LINE__, "testminlbfgsunit.ap:761");
+               *err = *err || state.x.xR[i] != x.xR[i];
             }
          }
          fprev = state.f;
@@ -25488,7 +25457,7 @@ static void testminlbfgsunit_testother(bool *err) {
       }
    minlbfgsresults(&state, &x, &rep);
    for (i = 0; i < n; i++) {
-      set_error_flag(err, x.xR[i] != xlast.xR[i], __FILE__, __LINE__, "testminlbfgsunit.ap:768");
+      *err = *err || x.xR[i] != xlast.xR[i];
    }
 // Test differentiation vs. analytic gradient
 // (first one issues NeedF requests, second one issues NeedFG requests)
@@ -25527,10 +25496,10 @@ static void testminlbfgsunit_testother(bool *err) {
       }
       minlbfgsresults(&state, &x, &rep);
       if (dkind == 0) {
-         set_error_flag(err, wasf || !wasfg, __FILE__, __LINE__, "testminlbfgsunit.ap:806");
+         *err = *err || wasf || !wasfg;
       }
       if (dkind == 1) {
-         set_error_flag(err, !wasf || wasfg, __FILE__, __LINE__, "testminlbfgsunit.ap:808");
+         *err = *err || !wasf || wasfg;
       }
    }
 // Test that numerical differentiation uses scaling.
@@ -25555,7 +25524,7 @@ static void testminlbfgsunit_testother(bool *err) {
    }
    minlbfgsresults(&state, &x, &rep);
    r = v / (s.xR[0] * diffstep);
-   set_error_flag(err, !SmallAtR(log(r), log(1.0 + 1000.0 * machineepsilon)), __FILE__, __LINE__, "testminlbfgsunit.ap:836");
+   *err = *err || !SmallAtR(log(r), log(1.0 + 1000.0 * machineepsilon));
 // test maximum step
    n = 1;
    m = 1;
@@ -25571,9 +25540,9 @@ static void testminlbfgsunit_testother(bool *err) {
       if (state.needfg) {
          state.f = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
          state.g.xR[0] = exp(state.x.xR[0]) - exp(-state.x.xR[0]);
-         set_error_flag(err, !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax), __FILE__, __LINE__, "testminlbfgsunit.ap:858");
+         *err = *err || !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax);
       } else if (state.xupdated) {
-         set_error_flag(err, !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax), __FILE__, __LINE__, "testminlbfgsunit.ap:862");
+         *err = *err || !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax);
          xprev = state.x.xR[0];
       }
 // Test correctness of the scaling:
@@ -25789,7 +25758,7 @@ static void testminlbfgsunit_testother(bool *err) {
             k++;
          } else ae_assert(false, "Assertion failed");
       minlbfgsresults(&state, &x1, &rep);
-      set_error_flag(err, rep.terminationtype != -8, __FILE__, __LINE__, "testminlbfgsunit.ap:1123");
+      *err = *err || rep.terminationtype != -8;
    }
 // Check algorithm ability to handle request for termination:
 // * to terminate with correct return code = 8
@@ -25827,9 +25796,9 @@ static void testminlbfgsunit_testother(bool *err) {
             }
          } else ae_assert(false, "Assertion failed");
       minlbfgsresults(&state, &x, &rep);
-      set_error_flag(err, rep.terminationtype != 8, __FILE__, __LINE__, "testminlbfgsunit.ap:1173");
+      *err = *err || rep.terminationtype != 8;
       for (i = 0; i < n; i++) {
-         set_error_flag(err, x.xR[i] != xlast.xR[i], __FILE__, __LINE__, "testminlbfgsunit.ap:1175");
+         *err = *err || x.xR[i] != xlast.xR[i];
       }
    }
    ae_frame_leave();
@@ -25850,25 +25819,25 @@ static void testminlbfgsunit_testoptguardc1test0reportfortask0(bool *err, optgua
    bool hasc1discontinuities;
    if (rep->positive) {
    // Check positive report, first checks
-      set_error_flag(err, rep->fidx != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1743");
-      set_error_flag(err, rep->n != n, __FILE__, __LINE__, "testminlbfgsunit.ap:1744");
-      set_error_flag(err, !(0 <= rep->stpidxa), __FILE__, __LINE__, "testminlbfgsunit.ap:1745");
-      set_error_flag(err, !(rep->stpidxa < rep->stpidxb), __FILE__, __LINE__, "testminlbfgsunit.ap:1746");
-      set_error_flag(err, !(rep->stpidxb < rep->cnt), __FILE__, __LINE__, "testminlbfgsunit.ap:1747");
-      set_error_flag(err, rep->x0.cnt != rep->n, __FILE__, __LINE__, "testminlbfgsunit.ap:1748");
-      set_error_flag(err, rep->d.cnt != rep->n, __FILE__, __LINE__, "testminlbfgsunit.ap:1749");
-      set_error_flag(err, rep->stp.cnt != rep->cnt, __FILE__, __LINE__, "testminlbfgsunit.ap:1750");
-      set_error_flag(err, rep->f.cnt != rep->cnt, __FILE__, __LINE__, "testminlbfgsunit.ap:1751");
-      set_error_flag(err, !isfinitevector(&rep->x0, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1752");
-      set_error_flag(err, !isfinitevector(&rep->d, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1753");
-      set_error_flag(err, !isfinitevector(&rep->stp, rep->cnt), __FILE__, __LINE__, "testminlbfgsunit.ap:1754");
-      set_error_flag(err, !isfinitevector(&rep->f, rep->cnt), __FILE__, __LINE__, "testminlbfgsunit.ap:1755");
+      *err = *err || rep->fidx != 0;
+      *err = *err || rep->n != n;
+      *err = *err || !(0 <= rep->stpidxa);
+      *err = *err || !(rep->stpidxa < rep->stpidxb);
+      *err = *err || !(rep->stpidxb < rep->cnt);
+      *err = *err || rep->x0.cnt != rep->n;
+      *err = *err || rep->d.cnt != rep->n;
+      *err = *err || rep->stp.cnt != rep->cnt;
+      *err = *err || rep->f.cnt != rep->cnt;
+      *err = *err || !isfinitevector(&rep->x0, n);
+      *err = *err || !isfinitevector(&rep->d, n);
+      *err = *err || !isfinitevector(&rep->stp, rep->cnt);
+      *err = *err || !isfinitevector(&rep->f, rep->cnt);
       if (*err) {
          return;
       }
    // Check consistency of X0, D, Stp and F
       for (k = 0; k < rep->cnt - 1; k++) {
-         set_error_flag(err, rep->stp.xR[k] >= rep->stp.xR[k + 1], __FILE__, __LINE__, "testminlbfgsunit.ap:1763");
+         *err = *err || rep->stp.xR[k] >= rep->stp.xR[k + 1];
       }
       for (k = 0; k < rep->cnt; k++) {
          v = 0.0;
@@ -25879,7 +25848,7 @@ static void testminlbfgsunit_testoptguardc1test0reportfortask0(bool *err, optgua
             }
             v += fabs(vv);
          }
-         set_error_flag(err, !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testminlbfgsunit.ap:1776");
+         *err = *err || !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -25892,18 +25861,18 @@ static void testminlbfgsunit_testoptguardc1test0reportfortask0(bool *err, optgua
          }
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
-      set_error_flag(err, !hasc1discontinuities, __FILE__, __LINE__, "testminlbfgsunit.ap:1794");
+      *err = *err || !hasc1discontinuities;
    } else {
    // Check negative report: fields must be empty
-      set_error_flag(err, rep->stpidxa != -1, __FILE__, __LINE__, "testminlbfgsunit.ap:1801");
-      set_error_flag(err, rep->stpidxb != -1, __FILE__, __LINE__, "testminlbfgsunit.ap:1802");
-      set_error_flag(err, rep->fidx != -1, __FILE__, __LINE__, "testminlbfgsunit.ap:1803");
-      set_error_flag(err, rep->cnt != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1804");
-      set_error_flag(err, rep->n != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1805");
-      set_error_flag(err, rep->x0.cnt != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1806");
-      set_error_flag(err, rep->d.cnt != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1807");
-      set_error_flag(err, rep->stp.cnt != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1808");
-      set_error_flag(err, rep->f.cnt != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1809");
+      *err = *err || rep->stpidxa != -1;
+      *err = *err || rep->stpidxb != -1;
+      *err = *err || rep->fidx != -1;
+      *err = *err || rep->cnt != 0;
+      *err = *err || rep->n != 0;
+      *err = *err || rep->x0.cnt != 0;
+      *err = *err || rep->d.cnt != 0;
+      *err = *err || rep->stp.cnt != 0;
+      *err = *err || rep->f.cnt != 0;
    }
 }
 
@@ -25923,27 +25892,27 @@ static void testminlbfgsunit_testoptguardc1test1reportfortask0(bool *err, optgua
    bool hasc1discontinuities;
    if (rep->positive) {
    // Check positive report, first checks
-      set_error_flag(err, rep->fidx != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1837");
-      set_error_flag(err, rep->vidx < 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1838");
-      set_error_flag(err, rep->vidx > n, __FILE__, __LINE__, "testminlbfgsunit.ap:1839");
-      set_error_flag(err, rep->n != n, __FILE__, __LINE__, "testminlbfgsunit.ap:1840");
-      set_error_flag(err, !(0 <= rep->stpidxa), __FILE__, __LINE__, "testminlbfgsunit.ap:1841");
-      set_error_flag(err, !(rep->stpidxa < rep->stpidxb), __FILE__, __LINE__, "testminlbfgsunit.ap:1842");
-      set_error_flag(err, !(rep->stpidxb < rep->cnt), __FILE__, __LINE__, "testminlbfgsunit.ap:1843");
-      set_error_flag(err, rep->x0.cnt != rep->n, __FILE__, __LINE__, "testminlbfgsunit.ap:1844");
-      set_error_flag(err, rep->d.cnt != rep->n, __FILE__, __LINE__, "testminlbfgsunit.ap:1845");
-      set_error_flag(err, rep->stp.cnt != rep->cnt, __FILE__, __LINE__, "testminlbfgsunit.ap:1846");
-      set_error_flag(err, rep->g.cnt != rep->cnt, __FILE__, __LINE__, "testminlbfgsunit.ap:1847");
-      set_error_flag(err, !isfinitevector(&rep->x0, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1848");
-      set_error_flag(err, !isfinitevector(&rep->d, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1849");
-      set_error_flag(err, !isfinitevector(&rep->stp, rep->cnt), __FILE__, __LINE__, "testminlbfgsunit.ap:1850");
-      set_error_flag(err, !isfinitevector(&rep->g, rep->cnt), __FILE__, __LINE__, "testminlbfgsunit.ap:1851");
+      *err = *err || rep->fidx != 0;
+      *err = *err || rep->vidx < 0;
+      *err = *err || rep->vidx > n;
+      *err = *err || rep->n != n;
+      *err = *err || !(0 <= rep->stpidxa);
+      *err = *err || !(rep->stpidxa < rep->stpidxb);
+      *err = *err || !(rep->stpidxb < rep->cnt);
+      *err = *err || rep->x0.cnt != rep->n;
+      *err = *err || rep->d.cnt != rep->n;
+      *err = *err || rep->stp.cnt != rep->cnt;
+      *err = *err || rep->g.cnt != rep->cnt;
+      *err = *err || !isfinitevector(&rep->x0, n);
+      *err = *err || !isfinitevector(&rep->d, n);
+      *err = *err || !isfinitevector(&rep->stp, rep->cnt);
+      *err = *err || !isfinitevector(&rep->g, rep->cnt);
       if (*err) {
          return;
       }
    // Check consistency of X0, D, Stp and G
       for (k = 0; k < rep->cnt - 1; k++) {
-         set_error_flag(err, rep->stp.xR[k] >= rep->stp.xR[k + 1], __FILE__, __LINE__, "testminlbfgsunit.ap:1859");
+         *err = *err || rep->stp.xR[k] >= rep->stp.xR[k + 1];
       }
       for (k = 0; k < rep->cnt; k++) {
          v = 0.0;
@@ -25957,7 +25926,7 @@ static void testminlbfgsunit_testoptguardc1test1reportfortask0(bool *err, optgua
             tooclose = tooclose || SmallR(vv, 1.0E-4);
          }
          if (!tooclose) {
-            set_error_flag(err, !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testminlbfgsunit.ap:1873");
+            *err = *err || !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
          }
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
@@ -25974,20 +25943,20 @@ static void testminlbfgsunit_testoptguardc1test1reportfortask0(bool *err, optgua
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
-         set_error_flag(err, !hasc1discontinuities, __FILE__, __LINE__, "testminlbfgsunit.ap:1894");
+         *err = *err || !hasc1discontinuities;
       }
    } else {
    // Check negative report: fields must be empty
-      set_error_flag(err, rep->stpidxa != -1, __FILE__, __LINE__, "testminlbfgsunit.ap:1901");
-      set_error_flag(err, rep->stpidxb != -1, __FILE__, __LINE__, "testminlbfgsunit.ap:1902");
-      set_error_flag(err, rep->fidx != -1, __FILE__, __LINE__, "testminlbfgsunit.ap:1903");
-      set_error_flag(err, rep->vidx != -1, __FILE__, __LINE__, "testminlbfgsunit.ap:1904");
-      set_error_flag(err, rep->cnt != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1905");
-      set_error_flag(err, rep->n != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1906");
-      set_error_flag(err, rep->x0.cnt != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1907");
-      set_error_flag(err, rep->d.cnt != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1908");
-      set_error_flag(err, rep->stp.cnt != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1909");
-      set_error_flag(err, rep->g.cnt != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1910");
+      *err = *err || rep->stpidxa != -1;
+      *err = *err || rep->stpidxb != -1;
+      *err = *err || rep->fidx != -1;
+      *err = *err || rep->vidx != -1;
+      *err = *err || rep->cnt != 0;
+      *err = *err || rep->n != 0;
+      *err = *err || rep->x0.cnt != 0;
+      *err = *err || rep->d.cnt != 0;
+      *err = *err || rep->stp.cnt != 0;
+      *err = *err || rep->g.cnt != 0;
    }
 }
 
@@ -26063,24 +26032,24 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
       } else ae_assert(false, "Assertion failed");
    minlbfgsresults(&state, &x1, &rep);
    minlbfgsoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1248");
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1249");
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.badgradxbase.cnt != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1252");
-   set_error_flag(wereerrors, ogrep.badgraduser.rows != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1253");
-   set_error_flag(wereerrors, ogrep.badgraduser.cols != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1254");
-   set_error_flag(wereerrors, ogrep.badgradnum.rows != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1255");
-   set_error_flag(wereerrors, ogrep.badgradnum.cols != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1256");
+   *wereerrors = *wereerrors || ogrep.badgradxbase.cnt != 0;
+   *wereerrors = *wereerrors || ogrep.badgraduser.rows != 0;
+   *wereerrors = *wereerrors || ogrep.badgraduser.cols != 0;
+   *wereerrors = *wereerrors || ogrep.badgradnum.rows != 0;
+   *wereerrors = *wereerrors || ogrep.badgradnum.cols != 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.badgradsuspected, __FILE__, __LINE__, "testminlbfgsunit.ap:1259");
-   set_error_flag(wereerrors, ogrep.badgradfidx != -1, __FILE__, __LINE__, "testminlbfgsunit.ap:1260");
-   set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminlbfgsunit.ap:1261");
+   *wereerrors = *wereerrors || ogrep.badgradsuspected;
+   *wereerrors = *wereerrors || ogrep.badgradfidx != -1;
+   *wereerrors = *wereerrors || ogrep.badgradvidx != -1;
 // Test that C0/C1 continuity monitoring is disabled by default;
 // we solve nonsmooth problem and test that nothing is returned
 // by OptGuard.
@@ -26117,19 +26086,19 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
       } else ae_assert(false, "Assertion failed");
    minlbfgsresults(&state, &x1, &rep);
    minlbfgsoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1301");
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1302");
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminlbfgsunit.ap:1305");
-   set_error_flag(wereerrors, ogrep.nonc1suspected, __FILE__, __LINE__, "testminlbfgsunit.ap:1306");
-   set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminlbfgsunit.ap:1307");
-   set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1308");
-   set_error_flag(wereerrors, ogrep.nonc1fidx >= 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1309");
-   set_error_flag(wereerrors, ogrep.nonc1test0positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1310");
-   set_error_flag(wereerrors, ogrep.nonc1test1positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1311");
+   *wereerrors = *wereerrors || ogrep.nonc0suspected;
+   *wereerrors = *wereerrors || ogrep.nonc1suspected;
+   *wereerrors = *wereerrors || !optguardallclear(&ogrep);
+   *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
+   *wereerrors = *wereerrors || ogrep.nonc1fidx >= 0;
+   *wereerrors = *wereerrors || ogrep.nonc1test0positive;
+   *wereerrors = *wereerrors || ogrep.nonc1test1positive;
 // Test gradient checking functionality, try various
 // defect types:
 // * accidental zeroing of some gradient component
@@ -26181,14 +26150,14 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
          minlbfgsresults(&state, &x1, &rep);
          minlbfgsoptguardresults(&state, &ogrep);
       // Check that something is returned
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1377");
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1378");
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
          if (*wereerrors) {
             ae_frame_leave();
             return;
          }
       // Compute reference values for true and spoiled Jacobian at X0
-         set_error_flag(wereerrors, !isfinitevector(&ogrep.badgradxbase, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1385");
+         *wereerrors = *wereerrors || !isfinitevector(&ogrep.badgradxbase, n);
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -26217,24 +26186,24 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
             jacdefect.xyR[0][i] /= s.xR[i];
          }
       // Check OptGuard report
-         set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgraduser, 1, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1413");
-         set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgradnum, 1, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1414");
+         *wereerrors = *wereerrors || !apservisfinitematrix(&ogrep.badgraduser, 1, n);
+         *wereerrors = *wereerrors || !apservisfinitematrix(&ogrep.badgradnum, 1, n);
          if (*wereerrors) {
             ae_frame_leave();
             return;
          }
          if (defecttype >= 0) {
-            set_error_flag(wereerrors, !ogrep.badgradsuspected, __FILE__, __LINE__, "testminlbfgsunit.ap:1419");
-            set_error_flag(wereerrors, ogrep.badgradfidx != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1420");
-            set_error_flag(wereerrors, ogrep.badgradvidx != varidx, __FILE__, __LINE__, "testminlbfgsunit.ap:1421");
+            *wereerrors = *wereerrors || !ogrep.badgradsuspected;
+            *wereerrors = *wereerrors || ogrep.badgradfidx != 0;
+            *wereerrors = *wereerrors || ogrep.badgradvidx != varidx;
          } else {
-            set_error_flag(wereerrors, ogrep.badgradsuspected, __FILE__, __LINE__, "testminlbfgsunit.ap:1425");
-            set_error_flag(wereerrors, ogrep.badgradfidx != -1, __FILE__, __LINE__, "testminlbfgsunit.ap:1426");
-            set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminlbfgsunit.ap:1427");
+            *wereerrors = *wereerrors || ogrep.badgradsuspected;
+            *wereerrors = *wereerrors || ogrep.badgradfidx != -1;
+            *wereerrors = *wereerrors || ogrep.badgradvidx != -1;
          }
          for (j = 0; j < n; j++) {
-            set_error_flag(wereerrors, !NearAtR(jactrue.xyR[0][j], ogrep.badgradnum.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminlbfgsunit.ap:1431");
-            set_error_flag(wereerrors, !NearAtR(jacdefect.xyR[0][j], ogrep.badgraduser.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminlbfgsunit.ap:1432");
+            *wereerrors = *wereerrors || !NearAtR(jactrue.xyR[0][j], ogrep.badgradnum.xyR[0][j], 0.01 / s.xR[j]);
+            *wereerrors = *wereerrors || !NearAtR(jacdefect.xyR[0][j], ogrep.badgraduser.xyR[0][j], 0.01 / s.xR[j]);
          }
       }
    }
@@ -26304,8 +26273,8 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
       minlbfgsresults(&state, &x1, &rep);
       minlbfgsoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1513");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1514");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
@@ -26315,8 +26284,8 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
    // (C0 violation being reported) and "soft" ones
    // (C1 violation is NOT reported) which accumulate
    // until we exhaust limit.
-      set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminlbfgsunit.ap:1525");
-      set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1526");
+      *wereerrors = *wereerrors || ogrep.nonc0suspected;
+      *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
       failed = false;
       failed = failed || optguardallclear(&ogrep);
       failed = failed || !ogrep.nonc1suspected;
@@ -26328,43 +26297,43 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
       minlbfgsoptguardnonc1test0results(&state, &ognonc1test0strrep, &ognonc1test0lngrep);
       minlbfgsoptguardnonc1test1results(&state, &ognonc1test1strrep, &ognonc1test1lngrep);
       if (ogrep.nonc1test0positive) {
-         set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminlbfgsunit.ap:1541");
-         set_error_flag(wereerrors, !ognonc1test0strrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1542");
-         set_error_flag(wereerrors, !ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1543");
-         set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1544");
+         *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+         *wereerrors = *wereerrors || !ognonc1test0strrep.positive;
+         *wereerrors = *wereerrors || !ognonc1test0lngrep.positive;
+         *wereerrors = *wereerrors || ogrep.nonc1fidx != 0;
          testminlbfgsunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testminlbfgsunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
          avgstr0len += (double)ognonc1test0strrep.cnt / passcount;
          avglng0len += (double)ognonc1test0lngrep.cnt / passcount;
       } else {
-         set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1552");
-         set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1553");
+         *wereerrors = *wereerrors || ognonc1test0strrep.positive;
+         *wereerrors = *wereerrors || ognonc1test0lngrep.positive;
          testminlbfgsunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testminlbfgsunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
          c1test0fails++;
       }
       if (ogrep.nonc1test1positive) {
-         set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminlbfgsunit.ap:1560");
-         set_error_flag(wereerrors, !ognonc1test1strrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1561");
-         set_error_flag(wereerrors, !ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1562");
-         set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1563");
+         *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+         *wereerrors = *wereerrors || !ognonc1test1strrep.positive;
+         *wereerrors = *wereerrors || !ognonc1test1lngrep.positive;
+         *wereerrors = *wereerrors || ogrep.nonc1fidx != 0;
          testminlbfgsunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testminlbfgsunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
          avgstr1len += (double)ognonc1test1strrep.cnt / passcount;
          avglng1len += (double)ognonc1test1lngrep.cnt / passcount;
       } else {
-         set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1571");
-         set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1572");
+         *wereerrors = *wereerrors || ognonc1test1strrep.positive;
+         *wereerrors = *wereerrors || ognonc1test1lngrep.positive;
          testminlbfgsunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testminlbfgsunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
          c1test1fails++;
       }
    }
-   set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminlbfgsunit.ap:1579");
-   set_error_flag(wereerrors, c1test0fails > maxc1test0fails, __FILE__, __LINE__, "testminlbfgsunit.ap:1580");
-   set_error_flag(wereerrors, c1test1fails > maxc1test1fails, __FILE__, __LINE__, "testminlbfgsunit.ap:1581");
-   set_error_flag(wereerrors, avglng0len <= avgstr0len, __FILE__, __LINE__, "testminlbfgsunit.ap:1582");
-   set_error_flag(wereerrors, avglng1len <= avgstr1len, __FILE__, __LINE__, "testminlbfgsunit.ap:1583");
+   *wereerrors = *wereerrors || failurecounter > maxfails;
+   *wereerrors = *wereerrors || c1test0fails > maxc1test0fails;
+   *wereerrors = *wereerrors || c1test1fails > maxc1test1fails;
+   *wereerrors = *wereerrors || avglng0len <= avgstr0len;
+   *wereerrors = *wereerrors || avglng1len <= avgstr1len;
 // Detection of C1 continuity violations in the target under numerical differentiation:
 // * target function is a sum of |(x,c_i)| for i=1..N.
 // * no constraints is present.
@@ -26414,8 +26383,8 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
       minlbfgsresults(&state, &x1, &rep);
       minlbfgsoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1646");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1647");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
@@ -26425,8 +26394,8 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
    // (C0 violation being reported) and "soft" ones
    // (C1 violation is NOT reported) which accumulate
    // until we exhaust limit.
-      set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminlbfgsunit.ap:1658");
-      set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1659");
+      *wereerrors = *wereerrors || ogrep.nonc0suspected;
+      *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
       failed = false;
       failed = failed || optguardallclear(&ogrep);
       failed = failed || !ogrep.nonc1suspected;
@@ -26435,7 +26404,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
          failurecounter++;
       }
    }
-   set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminlbfgsunit.ap:1667");
+   *wereerrors = *wereerrors || failurecounter > maxfails;
 // Make sure than no false positives are reported for larger
 // problems where numerical noise can be an issue:
 // * N=100 dimensions
@@ -26467,18 +26436,18 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
          }
       } else ae_assert(false, "Assertion failed");
    minlbfgsresults(&state, &x1, &rep);
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminlbfgsunit.ap:1711");
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1712");
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
    minlbfgsoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminlbfgsunit.ap:1716");
+   *wereerrors = *wereerrors || !optguardallclear(&ogrep);
    ae_frame_leave();
 }
 
-bool testminlbfgs(bool silent) {
+bool testminlbfgs() {
    ae_frame _frame_block;
    bool waserrors;
    bool referror;
@@ -26761,7 +26730,7 @@ bool testminlbfgs(bool silent) {
    testminlbfgsunit_testoptguard(&optguarderr);
 // end
    waserrors = referror || nonconverror || eqerror || converror || crashtest || othererrors || restartserror || precerror || optguarderr;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING L-BFGS OPTIMIZATION\n");
       printf("REFERENCE PROBLEM:                        ");
       if (referror) {
@@ -26830,7 +26799,7 @@ bool testminlbfgs(bool silent) {
 }
 
 // === cqmodels testing unit ===
-bool testcqmodels(bool silent) {
+bool testcqmodels() {
    ae_frame _frame_block;
    bool eval0errors;
    bool eval1errors;
@@ -27415,7 +27384,7 @@ bool testcqmodels(bool silent) {
    }
    waserrors = waserrors || newton2errors;
 // report
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING CONVEX QUADRATIC MODELS\n");
       printf("Eval0 test:                               ");
       if (eval0errors) {
@@ -27466,7 +27435,7 @@ bool testcqmodels(bool silent) {
 }
 
 // === snnls testing unit ===
-bool testsnnls(bool silent) {
+bool testsnnls() {
    ae_frame _frame_block;
    bool test0errors;
    bool test1errors;
@@ -27538,10 +27507,10 @@ bool testsnnls(bool silent) {
    // Check
       for (i = 0; i < nd; i++) {
          if (isconstrained.xB[i]) {
-            set_error_flag(&test2errors, !NearAtR(x.xR[i], rmax2(b.xR[i] / densea.xyR[i][i], 0.0), eps), __FILE__, __LINE__, "testsnnlsunit.ap:86");
-            set_error_flag(&test2errors, x.xR[i] < 0.0, __FILE__, __LINE__, "testsnnlsunit.ap:87");
+            test2errors = test2errors || !NearAtR(x.xR[i], rmax2(b.xR[i] / densea.xyR[i][i], 0.0), eps);
+            test2errors = test2errors || x.xR[i] < 0.0;
          } else {
-            set_error_flag(&test2errors, !NearAtR(x.xR[i], b.xR[i] / densea.xyR[i][i], eps), __FILE__, __LINE__, "testsnnlsunit.ap:90");
+            test2errors = test2errors || !NearAtR(x.xR[i], b.xR[i] / densea.xyR[i][i], eps);
          }
       }
    }
@@ -27609,7 +27578,7 @@ bool testsnnls(bool silent) {
             snnlssolve(&s, &x);
          // Check non-negativity
             for (i = 0; i < ns + nd; i++) {
-               set_error_flag(&test0errors, isconstrained.xB[i] && x.xR[i] < 0.0, __FILE__, __LINE__, "testsnnlsunit.ap:160");
+               test0errors = test0errors || isconstrained.xB[i] && x.xR[i] < 0.0;
             }
          // Calculate gradient A'*A*x-b'*A.
          // Check projected gradient (each component must be less than Eps).
@@ -27624,9 +27593,9 @@ bool testsnnls(bool silent) {
             }
             for (i = 0; i < ns + nd; i++) {
                if (!isconstrained.xB[i] || x.xR[i] > 0.0) {
-                  set_error_flag(&test0errors, !SmallAtR(g.xR[i], eps), __FILE__, __LINE__, "testsnnlsunit.ap:179");
+                  test0errors = test0errors || !SmallAtR(g.xR[i], eps);
                } else {
-                  set_error_flag(&test0errors, g.xR[i] < -eps, __FILE__, __LINE__, "testsnnlsunit.ap:181");
+                  test0errors = test0errors || g.xR[i] < -eps;
                }
             }
          }
@@ -27707,11 +27676,11 @@ bool testsnnls(bool silent) {
                snnlssolve(&s, &x);
             // Check non-negativity
                for (i = 0; i < ns + nd; i++) {
-                  set_error_flag(&test1errors, isconstrained.xB[i] && x.xR[i] < 0.0, __FILE__, __LINE__, "testsnnlsunit.ap:263");
+                  test1errors = test1errors || isconstrained.xB[i] && x.xR[i] < 0.0;
                }
             // Compare with true solution
                for (i = 0; i < ns + nd; i++) {
-                  set_error_flag(&test1errors, !NearAtR(xs.xR[i], x.xR[i], rho * xtol), __FILE__, __LINE__, "testsnnlsunit.ap:269");
+                  test1errors = test1errors || !NearAtR(xs.xR[i], x.xR[i], rho * xtol);
                }
             }
          }
@@ -27796,14 +27765,14 @@ bool testsnnls(bool silent) {
                ae_v_addd(g.xR, 1, effectivea.xyR[i], 1, ns + nd, v);
             }
             for (i = 0; i < ns + nd; i++) {
-               set_error_flag(&testnewtonerrors, !SmallAtR(g.xR[i], eps), __FILE__, __LINE__, "testsnnlsunit.ap:358");
+               testnewtonerrors = testnewtonerrors || !SmallAtR(g.xR[i], eps);
             }
          }
       }
    }
 // report
    waserrors = test0errors || test1errors || test2errors || testnewtonerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING SPECIAL NNLS SOLVER\n");
       printf("TEST 0:                                   ");
       if (test0errors) {
@@ -28003,20 +27972,20 @@ static void testsactivesetsunit_testspecproperties(bool *err) {
          sassetscale(&state, &s);
          sassetlc(&state, &c, &ct, nec + nic);
          sasstartoptimization(&state, &x);
-         set_error_flag(err, !state.feasinitpt, __FILE__, __LINE__, "testsactivesetsunit.ap:225");
+         *err = *err || !state.feasinitpt;
       // Solve for infeasible initial X and check State.FeasInitPt flag
          x.xR[distortidx] += s.xR[distortidx] * distortmag;
          sasinit(n, &state);
          sassetscale(&state, &s);
          sassetlc(&state, &c, &ct, nec + nic);
          sasstartoptimization(&state, &x);
-         set_error_flag(err, state.feasinitpt, __FILE__, __LINE__, "testsactivesetsunit.ap:235");
+         *err = *err || state.feasinitpt;
       }
    }
    ae_frame_leave();
 }
 
-bool testsactivesets(bool silent) {
+bool testsactivesets() {
    bool waserrors;
    bool specerr;
    bool result;
@@ -28024,7 +27993,7 @@ bool testsactivesets(bool silent) {
    testsactivesetsunit_testspecproperties(&specerr);
 // report
    waserrors = specerr;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING ACTIVE SETS\n");
       printf("* SPECIAL PROPERTIES                      ");
       if (specerr) {
@@ -28202,7 +28171,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   }
                   minbleicresults(&state, &x, &rep);
                   if (rep.terminationtype <= 0) {
-                     set_error_flag(converr, true, __FILE__, __LINE__, "testminbleicunit.ap:250");
+                     *converr = true;
                      ae_frame_leave();
                      return;
                   }
@@ -28226,7 +28195,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      vv = v / v2;
                      ae_v_subd(g.xR, 1, c.xyR[0], 1, n, vv);
                      v3 = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
-                     set_error_flag(converr, sqrt(v3) > weakepsg, __FILE__, __LINE__, "testminbleicunit.ap:281");
+                     *converr = *converr || sqrt(v3) > weakepsg;
                   }
                }
             }
@@ -28283,7 +28252,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                         c.xyR[i][n] = v;
                         ct.xZ[i] = 0;
                      }
-                     set_error_flag(feaserr, !rmatrixsvd(&c, k, n, 0, 0, 0, &svdw, &svdu, &svdvt), __FILE__, __LINE__, "testminbleicunit.ap:342");
+                     *feaserr = *feaserr || !rmatrixsvd(&c, k, n, 0, 0, 0, &svdw, &svdu, &svdvt);
                   } while (!(svdw.xR[0] > 0.0 && svdw.xR[k - 1] > 0.001 * svdw.xR[0]));
                   ae_v_move(x0.xR, 1, xs.xR, 1, n);
                   ae_v_add(x0.xR, 1, c.xyR[0], 1, n);
@@ -28312,7 +28281,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   }
                   minbleicresults(&state, &x, &rep);
                   if (rep.terminationtype <= 0) {
-                     set_error_flag(converr, true, __FILE__, __LINE__, "testminbleicunit.ap:373");
+                     *converr = true;
                      ae_frame_leave();
                      return;
                   }
@@ -28327,7 +28296,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      v += sqr(x.xR[i] - xs.xR[i]);
                   }
                   v = sqrt(v);
-                  set_error_flag(converr, !SmallAtR(v, 0.001), __FILE__, __LINE__, "testminbleicunit.ap:393");
+                  *converr = *converr || !SmallAtR(v, 0.001);
                }
             }
          }
@@ -28390,7 +28359,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   }
                   minbleicresults(&state, &x, &rep);
                   if (rep.terminationtype <= 0) {
-                     set_error_flag(converr, true, __FILE__, __LINE__, "testminbleicunit.ap:461");
+                     *converr = true;
                      ae_frame_leave();
                      return;
                   }
@@ -28404,7 +28373,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      *feaserr = *feaserr || x.xR[i] < 0.0;
                      *feaserr = *feaserr || x.xR[i] > 1.0;
                   }
-                  set_error_flag(converr, sqrt(v) > weakepsg, __FILE__, __LINE__, "testminbleicunit.ap:477");
+                  *converr = *converr || sqrt(v) > weakepsg;
                }
             }
          }
@@ -28472,7 +28441,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   }
                   minbleicresults(&state, &x, &rep);
                   if (rep.terminationtype <= 0) {
-                     set_error_flag(converr, true, __FILE__, __LINE__, "testminbleicunit.ap:553");
+                     *converr = true;
                      ae_frame_leave();
                      return;
                   }
@@ -28486,7 +28455,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      *feaserr = *feaserr || x.xR[i] < bl.xR[i];
                      *feaserr = *feaserr || x.xR[i] > bu.xR[i];
                   }
-                  set_error_flag(converr, sqrt(v) > weakepsg, __FILE__, __LINE__, "testminbleicunit.ap:569");
+                  *converr = *converr || sqrt(v) > weakepsg;
                }
             }
          }
@@ -28549,7 +28518,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   }
                minbleicresults(&state, &x, &rep);
                if (rep.terminationtype <= 0) {
-                  set_error_flag(converr, true, __FILE__, __LINE__, "testminbleicunit.ap:648");
+                  *converr = true;
                   ae_frame_leave();
                   return;
                }
@@ -28563,7 +28532,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   *feaserr = *feaserr || x.xR[i] < 0.0 - epsfeas;
                   *feaserr = *feaserr || x.xR[i] > 1.0 + epsfeas;
                }
-               set_error_flag(converr, sqrt(v) > weakepsg, __FILE__, __LINE__, "testminbleicunit.ap:664");
+               *converr = *converr || sqrt(v) > weakepsg;
             }
          }
       }
@@ -28632,7 +28601,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      }
                   minbleicresults(&state, &x, &rep);
                   if (rep.terminationtype <= 0) {
-                     set_error_flag(converr, true, __FILE__, __LINE__, "testminbleicunit.ap:751");
+                     *converr = true;
                      ae_frame_leave();
                      return;
                   }
@@ -28885,10 +28854,10 @@ static void testminbleicunit_testother(bool *err) {
          }
       }
    minbleicresults(&state, &xf, &rep);
-   set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:1030");
+   *err = *err || rep.terminationtype <= 0;
    if (rep.terminationtype > 0) {
       for (i = 0; i < n; i++) {
-         set_error_flag(err, xf.xR[i] != 0.0, __FILE__, __LINE__, "testminbleicunit.ap:1033");
+         *err = *err || xf.xR[i] != 0.0;
       }
    }
    minbleiccreate(n, &x, &state);
@@ -28903,10 +28872,10 @@ static void testminbleicunit_testother(bool *err) {
          }
       }
    minbleicresults(&state, &xf, &rep);
-   set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:1051");
+   *err = *err || rep.terminationtype <= 0;
    if (rep.terminationtype > 0) {
       for (i = 0; i < n; i++) {
-         set_error_flag(err, !SmallAtR(xf.xR[i], 1.0E-10), __FILE__, __LINE__, "testminbleicunit.ap:1054");
+         *err = *err || !SmallAtR(xf.xR[i], 1.0E-10);
       }
    }
 // Test reports:
@@ -29140,7 +29109,7 @@ static void testminbleicunit_testother(bool *err) {
                   v += sqr(s.xR[i] * 2 * a.xR[i] * x.xR[i]);
                }
                v = sqrt(v);
-               set_error_flag(err, v > tmpeps, __FILE__, __LINE__, "testminbleicunit.ap:1320");
+               *err = *err || v > tmpeps;
             }
          }
       }
@@ -29385,7 +29354,7 @@ static void testminbleicunit_testother(bool *err) {
             k++;
          } else ae_assert(false, "Assertion failed");
       minbleicresults(&state, &x1, &rep);
-      set_error_flag(err, rep.terminationtype != -8, __FILE__, __LINE__, "testminbleicunit.ap:1603");
+      *err = *err || rep.terminationtype != -8;
    }
 // Check algorithm ability to handle request for termination:
 // * to terminate with correct return code = 8
@@ -29431,9 +29400,9 @@ static void testminbleicunit_testother(bool *err) {
             }
          } else ae_assert(false, "Assertion failed");
       minbleicresults(&state, &x, &rep);
-      set_error_flag(err, rep.terminationtype != 8, __FILE__, __LINE__, "testminbleicunit.ap:1661");
+      *err = *err || rep.terminationtype != 8;
       for (i = 0; i < n; i++) {
-         set_error_flag(err, x.xR[i] != xlast.xR[i], __FILE__, __LINE__, "testminbleicunit.ap:1663");
+         *err = *err || x.xR[i] != xlast.xR[i];
       }
    }
 // N-dimensional problem with Ne equality and Ni inequality constraints.
@@ -29563,9 +29532,9 @@ static void testminbleicunit_testother(bool *err) {
             }
          }
       minbleicresults(&state, &xf, &rep);
-      set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:1819");
+      *err = *err || rep.terminationtype <= 0;
       for (i = 0; i < n; i++) {
-         set_error_flag(err, !NearAtR(x0.xR[i], xf.xR[i], 1.0E-12), __FILE__, __LINE__, "testminbleicunit.ap:1821");
+         *err = *err || !NearAtR(x0.xR[i], xf.xR[i], 1.0E-12);
       }
    }
    ae_frame_leave();
@@ -29675,10 +29644,10 @@ static void testminbleicunit_testconv(bool *err) {
          }
       minbleicresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
-         set_error_flag(err, !NearAtR(x.xR[0], -1.0, tol), __FILE__, __LINE__, "testminbleicunit.ap:1935");
-         set_error_flag(err, !NearAtR(x.xR[1], -0.5, tol), __FILE__, __LINE__, "testminbleicunit.ap:1936");
+         *err = *err || !NearAtR(x.xR[0], -1.0, tol);
+         *err = *err || !NearAtR(x.xR[1], -0.5, tol);
       } else {
-         set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:1939");
+         *err = true;
       }
    // f1
       x.xR[0] = 0.1 * randommid();
@@ -29695,10 +29664,10 @@ static void testminbleicunit_testconv(bool *err) {
          }
       minbleicresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
-         set_error_flag(err, !NearAtR(x.xR[0], -1.0, tol), __FILE__, __LINE__, "testminbleicunit.ap:1962");
-         set_error_flag(err, !SmallAtR(x.xR[1], tol), __FILE__, __LINE__, "testminbleicunit.ap:1963");
+         *err = *err || !NearAtR(x.xR[0], -1.0, tol);
+         *err = *err || !SmallAtR(x.xR[1], tol);
       } else {
-         set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:1966");
+         *err = true;
       }
    // f2
       x.xR[0] = 0.1 * randommid();
@@ -29715,10 +29684,10 @@ static void testminbleicunit_testconv(bool *err) {
          }
       minbleicresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
-         set_error_flag(err, !NearAtR(x.xR[0], -1.0, tol), __FILE__, __LINE__, "testminbleicunit.ap:1989");
-         set_error_flag(err, !NearAtR(x.xR[1], 0.5, tol), __FILE__, __LINE__, "testminbleicunit.ap:1990");
+         *err = *err || !NearAtR(x.xR[0], -1.0, tol);
+         *err = *err || !NearAtR(x.xR[1], 0.5, tol);
       } else {
-         set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:1993");
+         *err = true;
       }
    }
 // Degenerate optimization problem with excessive constraints.
@@ -29825,13 +29794,13 @@ static void testminbleicunit_testconv(bool *err) {
          }
          minbleicresults(&state, &x, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:2117");
+            *err = true;
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
             if (x.xR[i] < bl.xR[i] || x.xR[i] > bu.xR[i]) {
-               set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:2123");
+               *err = true;
                ae_frame_leave();
                return;
             }
@@ -29840,12 +29809,12 @@ static void testminbleicunit_testconv(bool *err) {
             v = ae_v_dotproduct(c.xyR[i], 1, x.xR, 1, n);
             v -= c.xyR[i][n];
             if (ct.xZ[i] == 0 && !SmallAtR(v, epsfeas)) {
-               set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:2132");
+               *err = true;
                ae_frame_leave();
                return;
             }
             if (ct.xZ[i] < 0 && v > epsfeas) {
-               set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:2137");
+               *err = true;
                ae_frame_leave();
                return;
             }
@@ -29875,13 +29844,13 @@ static void testminbleicunit_testconv(bool *err) {
          }
          minbleicresults(&state, &x, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:2173");
+            *err = true;
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
             if (x.xR[i] < bl.xR[i] || x.xR[i] > bu.xR[i]) {
-               set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:2179");
+               *err = true;
                ae_frame_leave();
                return;
             }
@@ -29890,12 +29859,12 @@ static void testminbleicunit_testconv(bool *err) {
             v = ae_v_dotproduct(c.xyR[i], 1, x.xR, 1, n);
             v -= c.xyR[i][n];
             if (ct.xZ[i] == 0 && !SmallAtR(v, epsfeas)) {
-               set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:2188");
+               *err = true;
                ae_frame_leave();
                return;
             }
             if (ct.xZ[i] < 0 && v > epsfeas) {
-               set_error_flag(err, true, __FILE__, __LINE__, "testminbleicunit.ap:2193");
+               *err = true;
                ae_frame_leave();
                return;
             }
@@ -29907,7 +29876,7 @@ static void testminbleicunit_testconv(bool *err) {
             f1 += 0.5 * sqr(v);
          }
       // compare F0 and F1
-         set_error_flag(err, !NearAtR(f0, f1, 1.0E-4), __FILE__, __LINE__, "testminbleicunit.ap:2208");
+         *err = *err || !NearAtR(f0, f1, 1.0E-4);
       }
    }
 // Convex/nonconvex optimization problem with excessive
@@ -30018,7 +29987,7 @@ static void testminbleicunit_testconv(bool *err) {
                      }
                   } else ae_assert(false, "Assertion failed");
                minbleicresults(&state, &xs0, &rep);
-               set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:2341");
+               *err = *err || rep.terminationtype <= 0;
                if (*err) {
                   ae_frame_leave();
                   return;
@@ -30037,7 +30006,7 @@ static void testminbleicunit_testconv(bool *err) {
                   vv += sqr(v);
                }
                vv = sqrt(vv);
-               set_error_flag(err, vv > 1.0E-5, __FILE__, __LINE__, "testminbleicunit.ap:2365");
+               *err = *err || vv > 1.0E-5;
             }
          }
       }
@@ -30141,7 +30110,7 @@ static void testminbleicunit_testconv(bool *err) {
                   }
                } else ae_assert(false, "Assertion failed");
             minbleicresults(&state, &xs0, &rep);
-            set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:2487");
+            *err = *err || rep.terminationtype <= 0;
             if (*err) {
                ae_frame_leave();
                return;
@@ -30166,8 +30135,8 @@ static void testminbleicunit_testconv(bool *err) {
             ae_vector_set_length(&nonnegative, n + ccnt);
             k = 0;
             for (i = 0; i < n; i++) {
-               set_error_flag(err, xs0.xR[i] < bl.xR[i], __FILE__, __LINE__, "testminbleicunit.ap:2515");
-               set_error_flag(err, xs0.xR[i] > bu.xR[i], __FILE__, __LINE__, "testminbleicunit.ap:2516");
+               *err = *err || xs0.xR[i] < bl.xR[i];
+               *err = *err || xs0.xR[i] > bu.xR[i];
                if (xs0.xR[i] <= bl.xR[i] + tolconstr) {
                   for (j = 0; j < n; j++) {
                      ce.xyR[j][k] = 0.0;
@@ -30190,9 +30159,9 @@ static void testminbleicunit_testconv(bool *err) {
             for (i = 0; i < ccnt; i++) {
                v = ae_v_dotproduct(c.xyR[i], 1, xs0.xR, 1, n);
                v -= c.xyR[i][n];
-               set_error_flag(err, ct.xZ[i] == 0 && !SmallAtR(v, tolconstr), __FILE__, __LINE__, "testminbleicunit.ap:2540");
-               set_error_flag(err, ct.xZ[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminbleicunit.ap:2541");
-               set_error_flag(err, ct.xZ[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminbleicunit.ap:2542");
+               *err = *err || ct.xZ[i] == 0 && !SmallAtR(v, tolconstr);
+               *err = *err || ct.xZ[i] > 0 && v < -tolconstr;
+               *err = *err || ct.xZ[i] < 0 && v > tolconstr;
                if (ct.xZ[i] == 0) {
                   for (j = 0; j < n; j++) {
                      ce.xyR[j][k] = c.xyR[i][j];
@@ -30225,7 +30194,7 @@ static void testminbleicunit_testconv(bool *err) {
             }
             vv = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
             vv = sqrt(vv);
-            set_error_flag(err, vv > 1.0E-5, __FILE__, __LINE__, "testminbleicunit.ap:2571");
+            *err = *err || vv > 1.0E-5;
          }
       }
    }
@@ -30454,9 +30423,9 @@ static void testminbleicunit_testbugs(bool *err) {
                   }
                } else ae_assert(false, "Assertion failed");
             minbleicresultsbuf(&state, &x1, &rep);
-            set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:2854");
+            *err = *err || rep.terminationtype <= 0;
             for (i = 0; i < n; i++) {
-               set_error_flag(err, !SmallAtR(x1.xR[i], tolx), __FILE__, __LINE__, "testminbleicunit.ap:2856");
+               *err = *err || !SmallAtR(x1.xR[i], tolx);
             }
          }
       }
@@ -30577,25 +30546,25 @@ static void testminbleicunit_testoptguardc1test0reportfortask0(bool *err, optgua
    bool hasc1discontinuities;
    if (rep->positive) {
    // Check positive report, first checks
-      set_error_flag(err, rep->fidx != 0, __FILE__, __LINE__, "testminbleicunit.ap:3568");
-      set_error_flag(err, rep->n != n, __FILE__, __LINE__, "testminbleicunit.ap:3569");
-      set_error_flag(err, !(0 <= rep->stpidxa), __FILE__, __LINE__, "testminbleicunit.ap:3570");
-      set_error_flag(err, !(rep->stpidxa < rep->stpidxb), __FILE__, __LINE__, "testminbleicunit.ap:3571");
-      set_error_flag(err, !(rep->stpidxb < rep->cnt), __FILE__, __LINE__, "testminbleicunit.ap:3572");
-      set_error_flag(err, rep->x0.cnt != rep->n, __FILE__, __LINE__, "testminbleicunit.ap:3573");
-      set_error_flag(err, rep->d.cnt != rep->n, __FILE__, __LINE__, "testminbleicunit.ap:3574");
-      set_error_flag(err, rep->stp.cnt != rep->cnt, __FILE__, __LINE__, "testminbleicunit.ap:3575");
-      set_error_flag(err, rep->f.cnt != rep->cnt, __FILE__, __LINE__, "testminbleicunit.ap:3576");
-      set_error_flag(err, !isfinitevector(&rep->x0, n), __FILE__, __LINE__, "testminbleicunit.ap:3577");
-      set_error_flag(err, !isfinitevector(&rep->d, n), __FILE__, __LINE__, "testminbleicunit.ap:3578");
-      set_error_flag(err, !isfinitevector(&rep->stp, rep->cnt), __FILE__, __LINE__, "testminbleicunit.ap:3579");
-      set_error_flag(err, !isfinitevector(&rep->f, rep->cnt), __FILE__, __LINE__, "testminbleicunit.ap:3580");
+      *err = *err || rep->fidx != 0;
+      *err = *err || rep->n != n;
+      *err = *err || !(0 <= rep->stpidxa);
+      *err = *err || !(rep->stpidxa < rep->stpidxb);
+      *err = *err || !(rep->stpidxb < rep->cnt);
+      *err = *err || rep->x0.cnt != rep->n;
+      *err = *err || rep->d.cnt != rep->n;
+      *err = *err || rep->stp.cnt != rep->cnt;
+      *err = *err || rep->f.cnt != rep->cnt;
+      *err = *err || !isfinitevector(&rep->x0, n);
+      *err = *err || !isfinitevector(&rep->d, n);
+      *err = *err || !isfinitevector(&rep->stp, rep->cnt);
+      *err = *err || !isfinitevector(&rep->f, rep->cnt);
       if (*err) {
          return;
       }
    // Check consistency of X0, D, Stp and F
       for (k = 0; k < rep->cnt - 1; k++) {
-         set_error_flag(err, rep->stp.xR[k] >= rep->stp.xR[k + 1], __FILE__, __LINE__, "testminbleicunit.ap:3588");
+         *err = *err || rep->stp.xR[k] >= rep->stp.xR[k + 1];
       }
       for (k = 0; k < rep->cnt; k++) {
          v = 0.0;
@@ -30606,7 +30575,7 @@ static void testminbleicunit_testoptguardc1test0reportfortask0(bool *err, optgua
             }
             v += fabs(vv);
          }
-         set_error_flag(err, !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testminbleicunit.ap:3601");
+         *err = *err || !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -30619,18 +30588,18 @@ static void testminbleicunit_testoptguardc1test0reportfortask0(bool *err, optgua
          }
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
-      set_error_flag(err, !hasc1discontinuities, __FILE__, __LINE__, "testminbleicunit.ap:3619");
+      *err = *err || !hasc1discontinuities;
    } else {
    // Check negative report: fields must be empty
-      set_error_flag(err, rep->stpidxa != -1, __FILE__, __LINE__, "testminbleicunit.ap:3626");
-      set_error_flag(err, rep->stpidxb != -1, __FILE__, __LINE__, "testminbleicunit.ap:3627");
-      set_error_flag(err, rep->fidx != -1, __FILE__, __LINE__, "testminbleicunit.ap:3628");
-      set_error_flag(err, rep->cnt != 0, __FILE__, __LINE__, "testminbleicunit.ap:3629");
-      set_error_flag(err, rep->n != 0, __FILE__, __LINE__, "testminbleicunit.ap:3630");
-      set_error_flag(err, rep->x0.cnt != 0, __FILE__, __LINE__, "testminbleicunit.ap:3631");
-      set_error_flag(err, rep->d.cnt != 0, __FILE__, __LINE__, "testminbleicunit.ap:3632");
-      set_error_flag(err, rep->stp.cnt != 0, __FILE__, __LINE__, "testminbleicunit.ap:3633");
-      set_error_flag(err, rep->f.cnt != 0, __FILE__, __LINE__, "testminbleicunit.ap:3634");
+      *err = *err || rep->stpidxa != -1;
+      *err = *err || rep->stpidxb != -1;
+      *err = *err || rep->fidx != -1;
+      *err = *err || rep->cnt != 0;
+      *err = *err || rep->n != 0;
+      *err = *err || rep->x0.cnt != 0;
+      *err = *err || rep->d.cnt != 0;
+      *err = *err || rep->stp.cnt != 0;
+      *err = *err || rep->f.cnt != 0;
    }
 }
 
@@ -30650,27 +30619,27 @@ static void testminbleicunit_testoptguardc1test1reportfortask0(bool *err, optgua
    bool hasc1discontinuities;
    if (rep->positive) {
    // Check positive report, first checks
-      set_error_flag(err, rep->fidx != 0, __FILE__, __LINE__, "testminbleicunit.ap:3662");
-      set_error_flag(err, rep->vidx < 0, __FILE__, __LINE__, "testminbleicunit.ap:3663");
-      set_error_flag(err, rep->vidx > n, __FILE__, __LINE__, "testminbleicunit.ap:3664");
-      set_error_flag(err, rep->n != n, __FILE__, __LINE__, "testminbleicunit.ap:3665");
-      set_error_flag(err, !(0 <= rep->stpidxa), __FILE__, __LINE__, "testminbleicunit.ap:3666");
-      set_error_flag(err, !(rep->stpidxa < rep->stpidxb), __FILE__, __LINE__, "testminbleicunit.ap:3667");
-      set_error_flag(err, !(rep->stpidxb < rep->cnt), __FILE__, __LINE__, "testminbleicunit.ap:3668");
-      set_error_flag(err, rep->x0.cnt != rep->n, __FILE__, __LINE__, "testminbleicunit.ap:3669");
-      set_error_flag(err, rep->d.cnt != rep->n, __FILE__, __LINE__, "testminbleicunit.ap:3670");
-      set_error_flag(err, rep->stp.cnt != rep->cnt, __FILE__, __LINE__, "testminbleicunit.ap:3671");
-      set_error_flag(err, rep->g.cnt != rep->cnt, __FILE__, __LINE__, "testminbleicunit.ap:3672");
-      set_error_flag(err, !isfinitevector(&rep->x0, n), __FILE__, __LINE__, "testminbleicunit.ap:3673");
-      set_error_flag(err, !isfinitevector(&rep->d, n), __FILE__, __LINE__, "testminbleicunit.ap:3674");
-      set_error_flag(err, !isfinitevector(&rep->stp, rep->cnt), __FILE__, __LINE__, "testminbleicunit.ap:3675");
-      set_error_flag(err, !isfinitevector(&rep->g, rep->cnt), __FILE__, __LINE__, "testminbleicunit.ap:3676");
+      *err = *err || rep->fidx != 0;
+      *err = *err || rep->vidx < 0;
+      *err = *err || rep->vidx > n;
+      *err = *err || rep->n != n;
+      *err = *err || !(0 <= rep->stpidxa);
+      *err = *err || !(rep->stpidxa < rep->stpidxb);
+      *err = *err || !(rep->stpidxb < rep->cnt);
+      *err = *err || rep->x0.cnt != rep->n;
+      *err = *err || rep->d.cnt != rep->n;
+      *err = *err || rep->stp.cnt != rep->cnt;
+      *err = *err || rep->g.cnt != rep->cnt;
+      *err = *err || !isfinitevector(&rep->x0, n);
+      *err = *err || !isfinitevector(&rep->d, n);
+      *err = *err || !isfinitevector(&rep->stp, rep->cnt);
+      *err = *err || !isfinitevector(&rep->g, rep->cnt);
       if (*err) {
          return;
       }
    // Check consistency of X0, D, Stp and G
       for (k = 0; k < rep->cnt - 1; k++) {
-         set_error_flag(err, rep->stp.xR[k] >= rep->stp.xR[k + 1], __FILE__, __LINE__, "testminbleicunit.ap:3684");
+         *err = *err || rep->stp.xR[k] >= rep->stp.xR[k + 1];
       }
       for (k = 0; k < rep->cnt; k++) {
          v = 0.0;
@@ -30684,7 +30653,7 @@ static void testminbleicunit_testoptguardc1test1reportfortask0(bool *err, optgua
             tooclose = tooclose || SmallR(vv, 1.0E-4);
          }
          if (!tooclose) {
-            set_error_flag(err, !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testminbleicunit.ap:3698");
+            *err = *err || !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
          }
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
@@ -30701,20 +30670,20 @@ static void testminbleicunit_testoptguardc1test1reportfortask0(bool *err, optgua
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
-         set_error_flag(err, !hasc1discontinuities, __FILE__, __LINE__, "testminbleicunit.ap:3719");
+         *err = *err || !hasc1discontinuities;
       }
    } else {
    // Check negative report: fields must be empty
-      set_error_flag(err, rep->stpidxa != -1, __FILE__, __LINE__, "testminbleicunit.ap:3726");
-      set_error_flag(err, rep->stpidxb != -1, __FILE__, __LINE__, "testminbleicunit.ap:3727");
-      set_error_flag(err, rep->fidx != -1, __FILE__, __LINE__, "testminbleicunit.ap:3728");
-      set_error_flag(err, rep->vidx != -1, __FILE__, __LINE__, "testminbleicunit.ap:3729");
-      set_error_flag(err, rep->cnt != 0, __FILE__, __LINE__, "testminbleicunit.ap:3730");
-      set_error_flag(err, rep->n != 0, __FILE__, __LINE__, "testminbleicunit.ap:3731");
-      set_error_flag(err, rep->x0.cnt != 0, __FILE__, __LINE__, "testminbleicunit.ap:3732");
-      set_error_flag(err, rep->d.cnt != 0, __FILE__, __LINE__, "testminbleicunit.ap:3733");
-      set_error_flag(err, rep->stp.cnt != 0, __FILE__, __LINE__, "testminbleicunit.ap:3734");
-      set_error_flag(err, rep->g.cnt != 0, __FILE__, __LINE__, "testminbleicunit.ap:3735");
+      *err = *err || rep->stpidxa != -1;
+      *err = *err || rep->stpidxb != -1;
+      *err = *err || rep->fidx != -1;
+      *err = *err || rep->vidx != -1;
+      *err = *err || rep->cnt != 0;
+      *err = *err || rep->n != 0;
+      *err = *err || rep->x0.cnt != 0;
+      *err = *err || rep->d.cnt != 0;
+      *err = *err || rep->stp.cnt != 0;
+      *err = *err || rep->g.cnt != 0;
    }
 }
 
@@ -30791,24 +30760,24 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
       } else ae_assert(false, "Assertion failed");
    minbleicresults(&state, &x1, &rep);
    minbleicoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:3057");
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminbleicunit.ap:3058");
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.badgradxbase.cnt != 0, __FILE__, __LINE__, "testminbleicunit.ap:3061");
-   set_error_flag(wereerrors, ogrep.badgraduser.rows != 0, __FILE__, __LINE__, "testminbleicunit.ap:3062");
-   set_error_flag(wereerrors, ogrep.badgraduser.cols != 0, __FILE__, __LINE__, "testminbleicunit.ap:3063");
-   set_error_flag(wereerrors, ogrep.badgradnum.rows != 0, __FILE__, __LINE__, "testminbleicunit.ap:3064");
-   set_error_flag(wereerrors, ogrep.badgradnum.cols != 0, __FILE__, __LINE__, "testminbleicunit.ap:3065");
+   *wereerrors = *wereerrors || ogrep.badgradxbase.cnt != 0;
+   *wereerrors = *wereerrors || ogrep.badgraduser.rows != 0;
+   *wereerrors = *wereerrors || ogrep.badgraduser.cols != 0;
+   *wereerrors = *wereerrors || ogrep.badgradnum.rows != 0;
+   *wereerrors = *wereerrors || ogrep.badgradnum.cols != 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.badgradsuspected, __FILE__, __LINE__, "testminbleicunit.ap:3068");
-   set_error_flag(wereerrors, ogrep.badgradfidx != -1, __FILE__, __LINE__, "testminbleicunit.ap:3069");
-   set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminbleicunit.ap:3070");
+   *wereerrors = *wereerrors || ogrep.badgradsuspected;
+   *wereerrors = *wereerrors || ogrep.badgradfidx != -1;
+   *wereerrors = *wereerrors || ogrep.badgradvidx != -1;
 // Test that C0/C1 continuity monitoring is disabled by default;
 // we solve nonsmooth problem and test that nothing is returned
 // by OptGuard.
@@ -30845,19 +30814,19 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
       } else ae_assert(false, "Assertion failed");
    minbleicresults(&state, &x1, &rep);
    minbleicoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminbleicunit.ap:3110");
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:3111");
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminbleicunit.ap:3114");
-   set_error_flag(wereerrors, ogrep.nonc1suspected, __FILE__, __LINE__, "testminbleicunit.ap:3115");
-   set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminbleicunit.ap:3116");
-   set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminbleicunit.ap:3117");
-   set_error_flag(wereerrors, ogrep.nonc1fidx >= 0, __FILE__, __LINE__, "testminbleicunit.ap:3118");
-   set_error_flag(wereerrors, ogrep.nonc1test0positive, __FILE__, __LINE__, "testminbleicunit.ap:3119");
-   set_error_flag(wereerrors, ogrep.nonc1test1positive, __FILE__, __LINE__, "testminbleicunit.ap:3120");
+   *wereerrors = *wereerrors || ogrep.nonc0suspected;
+   *wereerrors = *wereerrors || ogrep.nonc1suspected;
+   *wereerrors = *wereerrors || !optguardallclear(&ogrep);
+   *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
+   *wereerrors = *wereerrors || ogrep.nonc1fidx >= 0;
+   *wereerrors = *wereerrors || ogrep.nonc1test0positive;
+   *wereerrors = *wereerrors || ogrep.nonc1test1positive;
 // Test gradient checking functionality, try various
 // defect types:
 // * accidental zeroing of some gradient component
@@ -30896,8 +30865,8 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
          while (minbleiciteration(&state))
             if (state.needfg) {
                for (i = 0; i < n; i++) {
-                  set_error_flag(wereerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminbleicunit.ap:3167");
-                  set_error_flag(wereerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminbleicunit.ap:3168");
+                  *wereerrors = *wereerrors || state.x.xR[i] < bndl.xR[i];
+                  *wereerrors = *wereerrors || state.x.xR[i] > bndu.xR[i];
                }
                state.f = 0.0;
                for (i = 0; i < n; i++) {
@@ -30924,14 +30893,14 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
          minbleicresults(&state, &x1, &rep);
          minbleicoptguardresults(&state, &ogrep);
       // Check that something is returned
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:3201");
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminbleicunit.ap:3202");
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
          if (*wereerrors) {
             ae_frame_leave();
             return;
          }
       // Compute reference values for true and spoiled Jacobian at X0
-         set_error_flag(wereerrors, !isfinitevector(&ogrep.badgradxbase, n), __FILE__, __LINE__, "testminbleicunit.ap:3209");
+         *wereerrors = *wereerrors || !isfinitevector(&ogrep.badgradxbase, n);
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -30960,24 +30929,24 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
             jacdefect.xyR[0][i] /= s.xR[i];
          }
       // Check OptGuard report
-         set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgraduser, 1, n), __FILE__, __LINE__, "testminbleicunit.ap:3237");
-         set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgradnum, 1, n), __FILE__, __LINE__, "testminbleicunit.ap:3238");
+         *wereerrors = *wereerrors || !apservisfinitematrix(&ogrep.badgraduser, 1, n);
+         *wereerrors = *wereerrors || !apservisfinitematrix(&ogrep.badgradnum, 1, n);
          if (*wereerrors) {
             ae_frame_leave();
             return;
          }
          if (defecttype >= 0) {
-            set_error_flag(wereerrors, !ogrep.badgradsuspected, __FILE__, __LINE__, "testminbleicunit.ap:3243");
-            set_error_flag(wereerrors, ogrep.badgradfidx != 0, __FILE__, __LINE__, "testminbleicunit.ap:3244");
-            set_error_flag(wereerrors, ogrep.badgradvidx != varidx, __FILE__, __LINE__, "testminbleicunit.ap:3245");
+            *wereerrors = *wereerrors || !ogrep.badgradsuspected;
+            *wereerrors = *wereerrors || ogrep.badgradfidx != 0;
+            *wereerrors = *wereerrors || ogrep.badgradvidx != varidx;
          } else {
-            set_error_flag(wereerrors, ogrep.badgradsuspected, __FILE__, __LINE__, "testminbleicunit.ap:3249");
-            set_error_flag(wereerrors, ogrep.badgradfidx != -1, __FILE__, __LINE__, "testminbleicunit.ap:3250");
-            set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminbleicunit.ap:3251");
+            *wereerrors = *wereerrors || ogrep.badgradsuspected;
+            *wereerrors = *wereerrors || ogrep.badgradfidx != -1;
+            *wereerrors = *wereerrors || ogrep.badgradvidx != -1;
          }
          for (j = 0; j < n; j++) {
-            set_error_flag(wereerrors, !NearAtR(jactrue.xyR[0][j], ogrep.badgradnum.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminbleicunit.ap:3255");
-            set_error_flag(wereerrors, !NearAtR(jacdefect.xyR[0][j], ogrep.badgraduser.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminbleicunit.ap:3256");
+            *wereerrors = *wereerrors || !NearAtR(jactrue.xyR[0][j], ogrep.badgradnum.xyR[0][j], 0.01 / s.xR[j]);
+            *wereerrors = *wereerrors || !NearAtR(jacdefect.xyR[0][j], ogrep.badgraduser.xyR[0][j], 0.01 / s.xR[j]);
          }
       }
    }
@@ -31047,8 +31016,8 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
       minbleicresults(&state, &x1, &rep);
       minbleicoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminbleicunit.ap:3337");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:3338");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
@@ -31058,8 +31027,8 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
    // (C0 violation being reported) and "soft" ones
    // (C1 violation is NOT reported) which accumulate
    // until we exhaust limit.
-      set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminbleicunit.ap:3349");
-      set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminbleicunit.ap:3350");
+      *wereerrors = *wereerrors || ogrep.nonc0suspected;
+      *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
       failed = false;
       failed = failed || optguardallclear(&ogrep);
       failed = failed || !ogrep.nonc1suspected;
@@ -31071,43 +31040,43 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
       minbleicoptguardnonc1test0results(&state, &ognonc1test0strrep, &ognonc1test0lngrep);
       minbleicoptguardnonc1test1results(&state, &ognonc1test1strrep, &ognonc1test1lngrep);
       if (ogrep.nonc1test0positive) {
-         set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminbleicunit.ap:3365");
-         set_error_flag(wereerrors, !ognonc1test0strrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3366");
-         set_error_flag(wereerrors, !ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3367");
-         set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminbleicunit.ap:3368");
+         *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+         *wereerrors = *wereerrors || !ognonc1test0strrep.positive;
+         *wereerrors = *wereerrors || !ognonc1test0lngrep.positive;
+         *wereerrors = *wereerrors || ogrep.nonc1fidx != 0;
          testminbleicunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testminbleicunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
          avgstr0len += (double)ognonc1test0strrep.cnt / passcount;
          avglng0len += (double)ognonc1test0lngrep.cnt / passcount;
       } else {
-         set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3376");
-         set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3377");
+         *wereerrors = *wereerrors || ognonc1test0strrep.positive;
+         *wereerrors = *wereerrors || ognonc1test0lngrep.positive;
          testminbleicunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testminbleicunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
          c1test0fails++;
       }
       if (ogrep.nonc1test1positive) {
-         set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminbleicunit.ap:3384");
-         set_error_flag(wereerrors, !ognonc1test1strrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3385");
-         set_error_flag(wereerrors, !ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3386");
-         set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminbleicunit.ap:3387");
+         *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+         *wereerrors = *wereerrors || !ognonc1test1strrep.positive;
+         *wereerrors = *wereerrors || !ognonc1test1lngrep.positive;
+         *wereerrors = *wereerrors || ogrep.nonc1fidx != 0;
          testminbleicunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testminbleicunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
          avgstr1len += (double)ognonc1test1strrep.cnt / passcount;
          avglng1len += (double)ognonc1test1lngrep.cnt / passcount;
       } else {
-         set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3395");
-         set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3396");
+         *wereerrors = *wereerrors || ognonc1test1strrep.positive;
+         *wereerrors = *wereerrors || ognonc1test1lngrep.positive;
          testminbleicunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testminbleicunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
          c1test1fails++;
       }
    }
-   set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminbleicunit.ap:3403");
-   set_error_flag(wereerrors, c1test0fails > maxc1test0fails, __FILE__, __LINE__, "testminbleicunit.ap:3404");
-   set_error_flag(wereerrors, c1test1fails > maxc1test1fails, __FILE__, __LINE__, "testminbleicunit.ap:3405");
-   set_error_flag(wereerrors, avglng0len <= avgstr0len, __FILE__, __LINE__, "testminbleicunit.ap:3406");
-   set_error_flag(wereerrors, avglng1len <= avgstr1len, __FILE__, __LINE__, "testminbleicunit.ap:3407");
+   *wereerrors = *wereerrors || failurecounter > maxfails;
+   *wereerrors = *wereerrors || c1test0fails > maxc1test0fails;
+   *wereerrors = *wereerrors || c1test1fails > maxc1test1fails;
+   *wereerrors = *wereerrors || avglng0len <= avgstr0len;
+   *wereerrors = *wereerrors || avglng1len <= avgstr1len;
 // Detection of C1 continuity violations in the target under numerical differentiation:
 // * target function is a sum of |(x,c_i)| for i=1..N.
 // * no constraints is present.
@@ -31159,8 +31128,8 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
       minbleicresults(&state, &x1, &rep);
       minbleicoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminbleicunit.ap:3472");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:3473");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
@@ -31170,8 +31139,8 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
    // (C0 violation being reported) and "soft" ones
    // (C1 violation is NOT reported) which accumulate
    // until we exhaust limit.
-      set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminbleicunit.ap:3484");
-      set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminbleicunit.ap:3485");
+      *wereerrors = *wereerrors || ogrep.nonc0suspected;
+      *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
       failed = false;
       failed = failed || optguardallclear(&ogrep);
       failed = failed || !ogrep.nonc1suspected;
@@ -31180,7 +31149,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
          failurecounter++;
       }
    }
-   set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminbleicunit.ap:3493");
+   *wereerrors = *wereerrors || failurecounter > maxfails;
 // Make sure than no false positives are reported for larger
 // problems where numerical noise can be an issue:
 // * N=100 dimensions
@@ -31211,18 +31180,18 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
          }
       } else ae_assert(false, "Assertion failed");
    minbleicresults(&state, &x1, &rep);
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminbleicunit.ap:3536");
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbleicunit.ap:3537");
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
    minbleicoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminbleicunit.ap:3541");
+   *wereerrors = *wereerrors || !optguardallclear(&ogrep);
    ae_frame_leave();
 }
 
-bool testminbleic(bool silent) {
+bool testminbleic() {
    bool waserrors;
    bool feasibilityerrors;
    bool othererrors;
@@ -31248,7 +31217,7 @@ bool testminbleic(bool silent) {
    testminbleicunit_testoptguard(&optguarderrors);
 // end
    waserrors = feasibilityerrors || othererrors || converrors || interrors || precerrors || optguarderrors || bugs;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING BLEIC OPTIMIZATION\n");
       printf("FEASIBILITY PROPERTIES:                   ");
       if (feasibilityerrors) {
@@ -31972,7 +31941,7 @@ static bool quickqptests() {
          }
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:5703");
+         result = result || rep.terminationtype <= 0;
          if (rep.terminationtype <= 0) {
             ae_frame_leave();
             return result;
@@ -31988,7 +31957,7 @@ static bool quickqptests() {
             gnorm += sqr(g);
          }
          gnorm = sqrt(gnorm);
-         set_error_flag(&result, gnorm > eps, __FILE__, __LINE__, "testminqpunit.ap:5721");
+         result = result || gnorm > eps;
       }
    }
 // Convex test:
@@ -32080,7 +32049,7 @@ static bool quickqptests() {
          minqpsetbc(&state, &bndl, &bndu);
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:5818");
+         result = result || rep.terminationtype <= 0;
          if (rep.terminationtype <= 0) {
             ae_frame_leave();
             return result;
@@ -32100,11 +32069,11 @@ static bool quickqptests() {
                g = 0.0;
             }
             gnorm += sqr(g);
-            set_error_flag(&result, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:5838");
-            set_error_flag(&result, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:5839");
+            result = result || x1.xR[i] < bndl.xR[i];
+            result = result || x1.xR[i] > bndu.xR[i];
          }
          gnorm = sqrt(gnorm);
-         set_error_flag(&result, gnorm > eps, __FILE__, __LINE__, "testminqpunit.ap:5842");
+         result = result || gnorm > eps;
       }
    }
 // Strongly non-convex test:
@@ -32165,11 +32134,11 @@ static bool quickqptests() {
          }
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(&result, rep.terminationtype != -4, __FILE__, __LINE__, "testminqpunit.ap:5907");
+         result = result || rep.terminationtype != -4;
          minqpsetbc(&state, &bndl, &bndu);
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:5911");
+         result = result || rep.terminationtype <= 0;
          if (rep.terminationtype <= 0) {
             ae_frame_leave();
             return result;
@@ -32187,11 +32156,11 @@ static bool quickqptests() {
                g = 0.0;
             }
             gnorm += sqr(g);
-            set_error_flag(&result, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:5930");
-            set_error_flag(&result, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:5931");
+            result = result || x1.xR[i] < bndl.xR[i];
+            result = result || x1.xR[i] > bndu.xR[i];
          }
          gnorm = sqrt(gnorm);
-         set_error_flag(&result, gnorm > eps, __FILE__, __LINE__, "testminqpunit.ap:5934");
+         result = result || gnorm > eps;
       }
    }
 // Basic semi-definite test:
@@ -32268,11 +32237,11 @@ static bool quickqptests() {
          }
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(&result, rep.terminationtype != -4, __FILE__, __LINE__, "testminqpunit.ap:6017");
+         result = result || rep.terminationtype != -4;
          minqpsetbc(&state, &bndl, &bndu);
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:6021");
+         result = result || rep.terminationtype <= 0;
          if (rep.terminationtype <= 0) {
             ae_frame_leave();
             return result;
@@ -32292,11 +32261,11 @@ static bool quickqptests() {
                g = 0.0;
             }
             gnorm += sqr(g);
-            set_error_flag(&result, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6042");
-            set_error_flag(&result, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6043");
+            result = result || x1.xR[i] < bndl.xR[i];
+            result = result || x1.xR[i] > bndu.xR[i];
          }
          gnorm = sqrt(gnorm);
-         set_error_flag(&result, gnorm > eps, __FILE__, __LINE__, "testminqpunit.ap:6046");
+         result = result || gnorm > eps;
       }
    }
 // Linear (zero-quadratic) test:
@@ -32346,11 +32315,11 @@ static bool quickqptests() {
          }
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(&result, rep.terminationtype != -4, __FILE__, __LINE__, "testminqpunit.ap:6104");
+         result = result || rep.terminationtype != -4;
          minqpsetbc(&state, &bndl, &bndu);
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:6108");
+         result = result || rep.terminationtype <= 0;
          if (rep.terminationtype <= 0) {
             ae_frame_leave();
             return result;
@@ -32358,8 +32327,8 @@ static bool quickqptests() {
       // Test - calculate constrained gradient at solution,
       // check its norm.
          for (i = 0; i < n; i++) {
-            set_error_flag(&result, b.xR[i] > 0.0 && x1.xR[i] > bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6118");
-            set_error_flag(&result, b.xR[i] < 0.0 && x1.xR[i] < bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6119");
+            result = result || b.xR[i] > 0.0 && x1.xR[i] > bndl.xR[i];
+            result = result || b.xR[i] < 0.0 && x1.xR[i] < bndu.xR[i];
          }
       }
    }
@@ -32408,7 +32377,7 @@ static bool quickqptests() {
       minqpsetbc(&state, &bndl, &bndu);
       minqpoptimize(&state);
       minqpresults(&state, &x1, &rep);
-      set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:6179");
+      result = result || rep.terminationtype <= 0;
       if (rep.terminationtype <= 0) {
          ae_frame_leave();
          return result;
@@ -32428,11 +32397,11 @@ static bool quickqptests() {
             g = 0.0;
          }
          gnorm += sqr(g);
-         set_error_flag(&result, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6199");
-         set_error_flag(&result, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6200");
+         result = result || x1.xR[i] < bndl.xR[i];
+         result = result || x1.xR[i] > bndu.xR[i];
       }
       gnorm = sqrt(gnorm);
-      set_error_flag(&result, gnorm > eps, __FILE__, __LINE__, "testminqpunit.ap:6203");
+      result = result || gnorm > eps;
    }
 // Test for Newton phase of QQP algorithm - we test that Newton
 // updates work correctly, i.e. that CNewtonUpdate() internal
@@ -32499,27 +32468,27 @@ static bool quickqptests() {
       state.qqpsettingsuser.cnmaxupdates = 0;
       minqpoptimize(&state);
       minqpresults(&state, &x1, &rep);
-      set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:6282");
+      result = result || rep.terminationtype <= 0;
       if (result) {
          ae_frame_leave();
          return result;
       }
       flag = false;
       testminqpunit_testbcgradandfeasibility(&a, &b, &bndl, &bndu, n, &x1, eps, &flag);
-      set_error_flag(&result, !flag, __FILE__, __LINE__, "testminqpunit.ap:6287");
+      result = result || !flag;
    // Now with Newton updates - it must succeeed.
       state.qqpsettingsuser.cgphase = false;
       state.qqpsettingsuser.cnmaxupdates = n;
       minqpoptimize(&state);
       minqpresults(&state, &x1, &rep);
-      set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:6296");
+      result = result || rep.terminationtype <= 0;
       if (result) {
          ae_frame_leave();
          return result;
       }
       flag = false;
       testminqpunit_testbcgradandfeasibility(&a, &b, &bndl, &bndu, n, &x1, eps, &flag);
-      set_error_flag(&result, flag, __FILE__, __LINE__, "testminqpunit.ap:6301");
+      result = result || flag;
    }
 // Check that problem with general constraints results in
 // correct error code (-5 should be returned).
@@ -32534,7 +32503,7 @@ static bool quickqptests() {
    minqpsetlc(&state, &c, &ct, 1);
    minqpoptimize(&state);
    minqpresults(&state, &x1, &rep);
-   set_error_flag(&result, rep.terminationtype != -5, __FILE__, __LINE__, "testminqpunit.ap:6319");
+   result = result || rep.terminationtype != -5;
 // Test sparse functionality. QQP solver must perform
 // same steps independently of matrix type (dense or sparse).
 //
@@ -32586,7 +32555,7 @@ static bool quickqptests() {
    minqpoptimize(&state);
    minqpresults(&state, &xend1, &rep);
    for (i = 0; i < n; i++) {
-      set_error_flag(&result, !NearAtR(xend0.xR[i], xend1.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:6437");
+      result = result || !NearAtR(xend0.xR[i], xend1.xR[i], eps);
    }
 // Test scale-invariance. QQP performs same steps on scaled and
 // unscaled problems (assuming that scale of the variables is known).
@@ -32643,7 +32612,7 @@ static bool quickqptests() {
    minqpoptimize(&state);
    minqpresults(&state, &xend1, &rep);
    for (i = 0; i < n; i++) {
-      set_error_flag(&result, !NearAtR(s.xR[i] * xend0.xR[i], xend1.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:6494");
+      result = result || !NearAtR(s.xR[i] * xend0.xR[i], xend1.xR[i], eps);
    }
 // Test that QQP can efficiently use sparse matrices (i.e. it is
 // not disguised version of some dense QP solver). In order to test
@@ -32755,7 +32724,7 @@ static bool bleictests() {
    minqpoptimize(&state);
    minqpresults(&state, &xend1, &rep);
    for (i = 0; i < n; i++) {
-      set_error_flag(&result, !NearAtR(xend0.xR[i], xend1.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:6609");
+      result = result || !NearAtR(xend0.xR[i], xend1.xR[i], eps);
    }
 // Test scale-invariance. BLEIC performs same steps on scaled and
 // unscaled problems (assuming that scale of the variables is known).
@@ -32807,7 +32776,7 @@ static bool bleictests() {
    minqpoptimize(&state);
    minqpresults(&state, &xend1, &rep);
    for (i = 0; i < n; i++) {
-      set_error_flag(&result, !NearAtR(s.xR[i] * xend0.xR[i], xend1.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:6662");
+      result = result || !NearAtR(s.xR[i] * xend0.xR[i], xend1.xR[i], eps);
    }
 // Test that BLEIC can efficiently use sparse matrices (i.e. it is
 // not disguised version of some dense QP solver). In order to test
@@ -32930,11 +32899,11 @@ static bool bleictests() {
          }
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(&result, rep.terminationtype != -4, __FILE__, __LINE__, "testminqpunit.ap:6790");
+         result = result || rep.terminationtype != -4;
          minqpsetbc(&state, &bndl, &bndu);
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:6794");
+         result = result || rep.terminationtype <= 0;
          if (rep.terminationtype <= 0) {
             ae_frame_leave();
             return result;
@@ -32954,11 +32923,11 @@ static bool bleictests() {
                g = 0.0;
             }
             gnorm += sqr(g);
-            set_error_flag(&result, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6814");
-            set_error_flag(&result, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6815");
+            result = result || x1.xR[i] < bndl.xR[i];
+            result = result || x1.xR[i] > bndu.xR[i];
          }
          gnorm = sqrt(gnorm);
-         set_error_flag(&result, gnorm > eps, __FILE__, __LINE__, "testminqpunit.ap:6818");
+         result = result || gnorm > eps;
       }
    }
 // Test that BLEIC-based QP solver can solve non-convex problems
@@ -32989,10 +32958,10 @@ static bool bleictests() {
    minqpsetstartingpoint(&state, &x);
    minqpoptimize(&state);
    minqpresults(&state, &xend0, &rep);
-   set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:6851");
+   result = result || rep.terminationtype <= 0;
    if (rep.terminationtype > 0) {
       for (i = 0; i < n; i++) {
-         set_error_flag(&result, xend0.xR[i] != -1.0 && xend0.xR[i] != 1.0, __FILE__, __LINE__, "testminqpunit.ap:6854");
+         result = result || xend0.xR[i] != -1.0 && xend0.xR[i] != 1.0;
       }
    }
    i = randominteger(n);
@@ -33001,7 +32970,7 @@ static bool bleictests() {
    minqpsetbc(&state, &bndl, &bndu);
    minqpoptimize(&state);
    minqpresults(&state, &xend0, &rep);
-   set_error_flag(&result, rep.terminationtype != -4, __FILE__, __LINE__, "testminqpunit.ap:6861");
+   result = result || rep.terminationtype != -4;
 // Test that BLEIC-based QP solver can solve non-convex problems
 // which are bounded from below on the feasible set:
 //
@@ -33042,16 +33011,16 @@ static bool bleictests() {
    minqpsetstartingpoint(&state, &x);
    minqpoptimize(&state);
    minqpresults(&state, &xend0, &rep);
-   set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:6906");
+   result = result || rep.terminationtype <= 0;
    if (rep.terminationtype > 0) {
       for (i = 0; i < n; i++) {
-         set_error_flag(&result, !NearAtR(xend0.xR[i], -1.0, 100.0 * machineepsilon) && !NearAtR(xend0.xR[i], 1.0, 100.0 * machineepsilon), __FILE__, __LINE__, "testminqpunit.ap:6909");
+         result = result || !NearAtR(xend0.xR[i], -1.0, 100.0 * machineepsilon) && !NearAtR(xend0.xR[i], 1.0, 100.0 * machineepsilon);
       }
    }
    minqpsetlc(&state, &c, &ct, 2 * (n - 1));
    minqpoptimize(&state);
    minqpresults(&state, &xend0, &rep);
-   set_error_flag(&result, rep.terminationtype != -4, __FILE__, __LINE__, "testminqpunit.ap:6913");
+   result = result || rep.terminationtype != -4;
 // Test that BLEIC-based QP solver can solve QP problems with
 // zero quadratic term:
 //
@@ -33080,11 +33049,11 @@ static bool bleictests() {
    minqpsetbc(&state, &bndl, &bndu);
    minqpoptimize(&state);
    minqpresults(&state, &xend0, &rep);
-   set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:6947");
+   result = result || rep.terminationtype <= 0;
    if (rep.terminationtype > 0) {
       for (i = 0; i < n; i++) {
-         set_error_flag(&result, b.xR[i] > 0.0 && xend0.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6951");
-         set_error_flag(&result, b.xR[i] < 0.0 && xend0.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6952");
+         result = result || b.xR[i] > 0.0 && xend0.xR[i] != bndl.xR[i];
+         result = result || b.xR[i] < 0.0 && xend0.xR[i] != bndu.xR[i];
       }
    }
    minqpcreate(n, &state);
@@ -33094,11 +33063,11 @@ static bool bleictests() {
    minqpsetquadratictermsparse(&state, &sa, true);
    minqpoptimize(&state);
    minqpresults(&state, &xend0, &rep);
-   set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:6961");
+   result = result || rep.terminationtype <= 0;
    if (rep.terminationtype > 0) {
       for (i = 0; i < n; i++) {
-         set_error_flag(&result, b.xR[i] > 0.0 && xend0.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6965");
-         set_error_flag(&result, b.xR[i] < 0.0 && xend0.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:6966");
+         result = result || b.xR[i] > 0.0 && xend0.xR[i] != bndl.xR[i];
+         result = result || b.xR[i] < 0.0 && xend0.xR[i] != bndu.xR[i];
       }
    }
 // Test specific problem sent by V.Semenenko, which resulted in
@@ -33449,9 +33418,9 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
          }
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:882");
-         set_error_flag(wereerrors, x1.cnt < n, __FILE__, __LINE__, "testminqpunit.ap:883");
-         set_error_flag(wereerrors, rep.lagbc.cnt < n, __FILE__, __LINE__, "testminqpunit.ap:884");
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
+         *wereerrors = *wereerrors || x1.cnt < n;
+         *wereerrors = *wereerrors || rep.lagbc.cnt < n;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -33471,11 +33440,11 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
                g = 0.0;
             }
             gnorm += sqr(g);
-            set_error_flag(wereerrors, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:904");
-            set_error_flag(wereerrors, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:905");
+            *wereerrors = *wereerrors || x1.xR[i] < bndl.xR[i];
+            *wereerrors = *wereerrors || x1.xR[i] > bndu.xR[i];
          }
          gnorm = sqrt(gnorm);
-         set_error_flag(wereerrors, gnorm > eps, __FILE__, __LINE__, "testminqpunit.ap:908");
+         *wereerrors = *wereerrors || gnorm > eps;
       // Test Lagrange multipliers returned by the solver (we skip
       // BLEIC solver because it does not return Lagrange vals).
          if (solvertype != -1 && solvertype != 0) {
@@ -33491,7 +33460,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
                gtrial.xR[i] += rep.lagbc.xR[i];
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(wereerrors, !SmallAtR(gtrial.xR[i], 1.0E-3), __FILE__, __LINE__, "testminqpunit.ap:928");
+               *wereerrors = *wereerrors || !SmallAtR(gtrial.xR[i], 1.0E-3);
             }
          }
       }
@@ -33580,7 +33549,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
          minqpsetbcall(&state, vl, vu);
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:1017");
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (rep.terminationtype <= 0) {
             ae_frame_leave();
             return;
@@ -33600,11 +33569,11 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
                g = 0.0;
             }
             gnorm += sqr(g);
-            set_error_flag(wereerrors, x1.xR[i] < vl, __FILE__, __LINE__, "testminqpunit.ap:1037");
-            set_error_flag(wereerrors, x1.xR[i] > vu, __FILE__, __LINE__, "testminqpunit.ap:1038");
+            *wereerrors = *wereerrors || x1.xR[i] < vl;
+            *wereerrors = *wereerrors || x1.xR[i] > vu;
          }
          gnorm = sqrt(gnorm);
-         set_error_flag(wereerrors, gnorm > eps, __FILE__, __LINE__, "testminqpunit.ap:1041");
+         *wereerrors = *wereerrors || gnorm > eps;
       }
    }
 // Semidefinite test:
@@ -33657,7 +33626,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
          minqpsetbc(&state, &bndl, &bndu);
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:1101");
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (rep.terminationtype <= 0) {
             ae_frame_leave();
             return;
@@ -33677,11 +33646,11 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
                g = 0.0;
             }
             gnorm += sqr(g);
-            set_error_flag(wereerrors, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:1121");
-            set_error_flag(wereerrors, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:1122");
+            *wereerrors = *wereerrors || x1.xR[i] < bndl.xR[i];
+            *wereerrors = *wereerrors || x1.xR[i] > bndu.xR[i];
          }
          gnorm = sqrt(gnorm);
-         set_error_flag(wereerrors, gnorm > eps, __FILE__, __LINE__, "testminqpunit.ap:1125");
+         *wereerrors = *wereerrors || gnorm > eps;
       }
    }
 // Non-convex test:
@@ -33743,11 +33712,11 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
          }
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, rep.terminationtype != -4, __FILE__, __LINE__, "testminqpunit.ap:1192");
+         *wereerrors = *wereerrors || rep.terminationtype != -4;
          minqpsetbc(&state, &bndl, &bndu);
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:1196");
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (rep.terminationtype <= 0) {
             ae_frame_leave();
             return;
@@ -33765,11 +33734,11 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
                g = 0.0;
             }
             gnorm += sqr(g);
-            set_error_flag(wereerrors, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:1215");
-            set_error_flag(wereerrors, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:1216");
+            *wereerrors = *wereerrors || x1.xR[i] < bndl.xR[i];
+            *wereerrors = *wereerrors || x1.xR[i] > bndu.xR[i];
          }
          gnorm = sqrt(gnorm);
-         set_error_flag(wereerrors, gnorm > eps, __FILE__, __LINE__, "testminqpunit.ap:1219");
+         *wereerrors = *wereerrors || gnorm > eps;
       }
    }
 // Linear (zero-quadratic) test:
@@ -33820,11 +33789,11 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
          }
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, rep.terminationtype != -4 && rep.terminationtype != -2, __FILE__, __LINE__, "testminqpunit.ap:1278");
+         *wereerrors = *wereerrors || rep.terminationtype != -4 && rep.terminationtype != -2;
          minqpsetbc(&state, &bndl, &bndu);
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:1283");
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (rep.terminationtype <= 0) {
             ae_frame_leave();
             return;
@@ -33832,8 +33801,8 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
       // Test - calculate constrained gradient at solution,
       // check its norm.
          for (i = 0; i < n; i++) {
-            set_error_flag(wereerrors, b.xR[i] > 0.0 && x1.xR[i] > bndl.xR[i] + bctol, __FILE__, __LINE__, "testminqpunit.ap:1293");
-            set_error_flag(wereerrors, b.xR[i] < 0.0 && x1.xR[i] < bndu.xR[i] - bctol, __FILE__, __LINE__, "testminqpunit.ap:1294");
+            *wereerrors = *wereerrors || b.xR[i] > 0.0 && x1.xR[i] > bndl.xR[i] + bctol;
+            *wereerrors = *wereerrors || b.xR[i] < 0.0 && x1.xR[i] < bndu.xR[i] - bctol;
          }
       }
    }
@@ -33938,11 +33907,11 @@ static bool testminqpunit_ecqptest() {
          minqpresults(&state, &xend, &rep);
       // Compare with analytic solution
          if (rep.terminationtype <= 0) {
-            set_error_flag(&waserrors, true, __FILE__, __LINE__, "testminqpunit.ap:1400");
+            waserrors = true;
             continue;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(&waserrors, !NearAtR(xend.xR[i], x0.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:1404");
+            waserrors = waserrors || !NearAtR(xend.xR[i], x0.xR[i], eps);
          }
       }
    }
@@ -33994,12 +33963,12 @@ static bool testminqpunit_ecqptest() {
          minqpresults(&state, &xend, &rep);
       // Calculate gradient, check projection
          if (rep.terminationtype <= 0) {
-            set_error_flag(&waserrors, true, __FILE__, __LINE__, "testminqpunit.ap:1472");
+            waserrors = true;
             continue;
          }
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
-            set_error_flag(&waserrors, !NearAtR(v, c.xyR[i][n], eps), __FILE__, __LINE__, "testminqpunit.ap:1478");
+            waserrors = waserrors || !NearAtR(v, c.xyR[i][n], eps);
          }
          ae_vector_set_length(&g, n);
          ae_v_move(g.xR, 1, b.xR, 1, n);
@@ -34012,7 +33981,7 @@ static bool testminqpunit_ecqptest() {
             ae_v_subd(g.xR, 1, c.xyR[i], 1, n, v);
          }
          v = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
-         set_error_flag(&waserrors, sqrt(v) > eps, __FILE__, __LINE__, "testminqpunit.ap:1493");
+         waserrors = waserrors || sqrt(v) > eps;
       }
    }
 // Boundary and linear equality constrained QP problem:
@@ -34086,7 +34055,7 @@ static bool testminqpunit_ecqptest() {
          minqpoptimize(&state);
          minqpresults(&state, &xend, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&waserrors, true, __FILE__, __LINE__, "testminqpunit.ap:1580");
+            waserrors = true;
             continue;
          }
       // Solve problem using barrier functions (quadrative objective, boundary constraints,
@@ -34125,7 +34094,7 @@ static bool testminqpunit_ecqptest() {
             minqpoptimize(&state2);
             minqpresults(&state2, &xend2, &rep);
             if (rep.terminationtype <= 0) {
-               set_error_flag(&waserrors, true, __FILE__, __LINE__, "testminqpunit.ap:1627");
+               waserrors = true;
                continue;
             }
             for (j = 0; j < k; j++) {
@@ -34146,14 +34115,14 @@ static bool testminqpunit_ecqptest() {
             f1 += xend2.xR[i] * b.xR[i];
          }
       // Check feasibility properties and compare
-         set_error_flag(&waserrors, !NearAtR(f0, f1, eps), __FILE__, __LINE__, "testminqpunit.ap:1657");
+         waserrors = waserrors || !NearAtR(f0, f1, eps);
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
-            set_error_flag(&waserrors, !NearAtR(v, c.xyR[i][n], 1.0E6 * machineepsilon), __FILE__, __LINE__, "testminqpunit.ap:1661");
+            waserrors = waserrors || !NearAtR(v, c.xyR[i][n], 1.0E6 * machineepsilon);
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(&waserrors, xend.xR[i] < 0.0, __FILE__, __LINE__, "testminqpunit.ap:1665");
-            set_error_flag(&waserrors, xend.xR[i] > 1.0, __FILE__, __LINE__, "testminqpunit.ap:1666");
+            waserrors = waserrors || xend.xR[i] < 0.0;
+            waserrors = waserrors || xend.xR[i] > 1.0;
          }
       }
    }
@@ -34222,7 +34191,7 @@ static bool testminqpunit_ecqptest() {
          minqpoptimize(&state);
          minqpresults(&state, &xend, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&waserrors, true, __FILE__, __LINE__, "testminqpunit.ap:1750");
+            waserrors = true;
             continue;
          }
       // Solve problem using explicit origin
@@ -34236,18 +34205,18 @@ static bool testminqpunit_ecqptest() {
          minqpoptimize(&state2);
          minqpresults(&state2, &xend2, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&waserrors, true, __FILE__, __LINE__, "testminqpunit.ap:1768");
+            waserrors = true;
             continue;
          }
       // Check feasibility properties and compare solutions
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
-            set_error_flag(&waserrors, !NearAtR(v, c.xyR[i][n], eps), __FILE__, __LINE__, "testminqpunit.ap:1778");
+            waserrors = waserrors || !NearAtR(v, c.xyR[i][n], eps);
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(&waserrors, !NearAtR(xend.xR[i], xend2.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:1782");
-            set_error_flag(&waserrors, xend.xR[i] < 0.0, __FILE__, __LINE__, "testminqpunit.ap:1783");
-            set_error_flag(&waserrors, xend.xR[i] > 1.0, __FILE__, __LINE__, "testminqpunit.ap:1784");
+            waserrors = waserrors || !NearAtR(xend.xR[i], xend2.xR[i], eps);
+            waserrors = waserrors || xend.xR[i] < 0.0;
+            waserrors = waserrors || xend.xR[i] > 1.0;
          }
       }
    }
@@ -34308,12 +34277,12 @@ static bool testminqpunit_ecqptest() {
    //
    // NOTE: we do not check termination type because some solvers (IPM) may return feasible X even with negative code
       if (xend.cnt != n) {
-         set_error_flag(&waserrors, true, __FILE__, __LINE__, "testminqpunit.ap:1858");
+         waserrors = true;
          continue;
       }
       for (i = 0; i < k; i++) {
          v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
-         set_error_flag(&waserrors, !NearAtR(v, c.xyR[i][n], eps), __FILE__, __LINE__, "testminqpunit.ap:1864");
+         waserrors = waserrors || !NearAtR(v, c.xyR[i][n], eps);
       }
    }
 // Boundary and linear equality constrained QP problem,
@@ -34375,7 +34344,7 @@ static bool testminqpunit_ecqptest() {
       minqpoptimize(&state);
       minqpresults(&state, &xend, &rep);
       if (rep.terminationtype <= 0) {
-         set_error_flag(&waserrors, true, __FILE__, __LINE__, "testminqpunit.ap:1938");
+         waserrors = true;
          continue;
       }
    // Solve with XStart2
@@ -34383,7 +34352,7 @@ static bool testminqpunit_ecqptest() {
       minqpoptimize(&state);
       minqpresults(&state, &xend2, &rep);
       if (rep.terminationtype <= 0) {
-         set_error_flag(&waserrors, true, __FILE__, __LINE__, "testminqpunit.ap:1950");
+         waserrors = true;
          continue;
       }
    // Calculate function value and XEnd and XEnd2, compare solutions
@@ -34397,7 +34366,7 @@ static bool testminqpunit_ecqptest() {
          f0 += xend.xR[i] * b.xR[i];
          f1 += xend2.xR[i] * b.xR[i];
       }
-      set_error_flag(&waserrors, !NearAtR(f0, f1, eps), __FILE__, __LINE__, "testminqpunit.ap:1969");
+      waserrors = waserrors || !NearAtR(f0, f1, eps);
    }
 // Test ability to correctly handle situation where algorithm
 // either:
@@ -34455,17 +34424,17 @@ static bool testminqpunit_ecqptest() {
       minqpoptimize(&state);
       minqpresults(&state, &xend, &rep);
       if (rep.terminationtype <= 0) {
-         set_error_flag(&waserrors, true, __FILE__, __LINE__, "testminqpunit.ap:2040");
+         waserrors = true;
          continue;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(&waserrors, !NearAtR(xend.xR[i], x0.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:2044");
+         waserrors = waserrors || !NearAtR(xend.xR[i], x0.xR[i], eps);
       }
       v = -c.xyR[0][n];
       for (i = 0; i < n; i++) {
          v += xend.xR[i] * c.xyR[0][i];
       }
-      set_error_flag(&waserrors, !SmallAtR(v, 1.0E5 * machineepsilon), __FILE__, __LINE__, "testminqpunit.ap:2048");
+      waserrors = waserrors || !SmallAtR(v, 1.0E5 * machineepsilon);
    }
    result = waserrors;
    ae_frame_leave();
@@ -34584,21 +34553,21 @@ static void testminqpunit_icqptest(bool *err) {
          minqpresults(&state, &xend, &rep);
       // Test
          if (rep.terminationtype <= 0) {
-            set_error_flag(err, true, __FILE__, __LINE__, "testminqpunit.ap:2160");
+            *err = true;
             continue;
          }
          v = ae_v_dotproduct(x1.xR, 1, c.xyR[0], 1, n);
          if (v >= 0.0) {
          // X1 is feasible, compare target function values at XEnd and X1
             for (i = 0; i < n; i++) {
-               set_error_flag(err, !NearAtR(xend.xR[i], x1.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:2173");
+               *err = *err || !NearAtR(xend.xR[i], x1.xR[i], eps);
             }
          } else {
          // X1 is infeasible:
          // * XEnd must be approximately feasible
          // * gradient projection onto c'*x=0 must be zero
             v = ae_v_dotproduct(xend.xR, 1, c.xyR[0], 1, n);
-            set_error_flag(err, v < -eps, __FILE__, __LINE__, "testminqpunit.ap:2183");
+            *err = *err || v < -eps;
             ae_vector_set_length(&g, n);
             ae_v_move(g.xR, 1, b.xR, 1, n);
             for (i = 0; i < n; i++) {
@@ -34608,7 +34577,7 @@ static void testminqpunit_icqptest(bool *err) {
             v = ae_v_dotproduct(g.xR, 1, c.xyR[0], 1, n);
             ae_v_subd(g.xR, 1, c.xyR[0], 1, n, v);
             v = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
-            set_error_flag(err, sqrt(v) > eps, __FILE__, __LINE__, "testminqpunit.ap:2194");
+            *err = *err || sqrt(v) > eps;
          }
       }
    }
@@ -34677,7 +34646,7 @@ static void testminqpunit_icqptest(bool *err) {
          minqpoptimize(&state);
          minqpresults(&state, &xend, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(err, true, __FILE__, __LINE__, "testminqpunit.ap:2278");
+            *err = true;
             continue;
          }
       // Solve problem using explicit origin
@@ -34691,7 +34660,7 @@ static void testminqpunit_icqptest(bool *err) {
          minqpoptimize(&state2);
          minqpresults(&state2, &xend2, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(err, true, __FILE__, __LINE__, "testminqpunit.ap:2296");
+            *err = true;
             continue;
          }
       // Calculate function value and XEnd and XEnd2
@@ -34709,19 +34678,19 @@ static void testminqpunit_icqptest(bool *err) {
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
             if (ct.xZ[i] == 0) {
-               set_error_flag(err, !NearAtR(v, c.xyR[i][n], eps), __FILE__, __LINE__, "testminqpunit.ap:2323");
+               *err = *err || !NearAtR(v, c.xyR[i][n], eps);
             }
             if (ct.xZ[i] > 0) {
-               set_error_flag(err, v < c.xyR[i][n] - eps, __FILE__, __LINE__, "testminqpunit.ap:2325");
+               *err = *err || v < c.xyR[i][n] - eps;
             }
             if (ct.xZ[i] < 0) {
-               set_error_flag(err, v > c.xyR[i][n] + eps, __FILE__, __LINE__, "testminqpunit.ap:2327");
+               *err = *err || v > c.xyR[i][n] + eps;
             }
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(err, !NearAtR(xend.xR[i], xend2.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:2331");
-            set_error_flag(err, xend.xR[i] < 0.0, __FILE__, __LINE__, "testminqpunit.ap:2332");
-            set_error_flag(err, xend.xR[i] > 1.0, __FILE__, __LINE__, "testminqpunit.ap:2333");
+            *err = *err || !NearAtR(xend.xR[i], xend2.xR[i], eps);
+            *err = *err || xend.xR[i] < 0.0;
+            *err = *err || xend.xR[i] > 1.0;
          }
       }
    }
@@ -34789,13 +34758,13 @@ static void testminqpunit_icqptest(bool *err) {
       minqpresults(&state2, &xend2, &rep2);
    // Calculate gradient, check projection
       if (rep.terminationtype <= 0 || rep2.terminationtype <= 0) {
-         set_error_flag(err, true, __FILE__, __LINE__, "testminqpunit.ap:2421");
+         *err = true;
          continue;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(err, xend.xR[i] < bndl.xR[i] - eps, __FILE__, __LINE__, "testminqpunit.ap:2426");
-         set_error_flag(err, xend.xR[i] > bndu.xR[i] + eps, __FILE__, __LINE__, "testminqpunit.ap:2427");
-         set_error_flag(err, !NearAtR(xend.xR[i], xend2.xR[i], eps), __FILE__, __LINE__, "testminqpunit.ap:2428");
+         *err = *err || xend.xR[i] < bndl.xR[i] - eps;
+         *err = *err || xend.xR[i] > bndu.xR[i] + eps;
+         *err = *err || !NearAtR(xend.xR[i], xend2.xR[i], eps);
       }
    }
 // Boundary constraints posed as general linear ones:
@@ -34855,15 +34824,15 @@ static void testminqpunit_icqptest(bool *err) {
       minqpoptimize(&state);
       minqpresults(&state, &xend, &rep);
       if (rep.terminationtype <= 0) {
-         set_error_flag(err, true, __FILE__, __LINE__, "testminqpunit.ap:2497");
+         *err = true;
          continue;
       }
    // * compare solution with analytic one
    // * check feasibility
       for (i = 0; i < n; i++) {
-         set_error_flag(err, !NearAtR(xend.xR[i], rboundval(x0.xR[i], 0.0, 1.0), 0.05), __FILE__, __LINE__, "testminqpunit.ap:2507");
-         set_error_flag(err, xend.xR[i] < 0.0 - 1.0E-6, __FILE__, __LINE__, "testminqpunit.ap:2508");
-         set_error_flag(err, xend.xR[i] > 1.0 + 1.0E-6, __FILE__, __LINE__, "testminqpunit.ap:2509");
+         *err = *err || !NearAtR(xend.xR[i], rboundval(x0.xR[i], 0.0, 1.0), 0.05);
+         *err = *err || xend.xR[i] < 0.0 - 1.0E-6;
+         *err = *err || xend.xR[i] > 1.0 + 1.0E-6;
       }
    }
 // Boundary and linear equality/inequality constrained QP problem with
@@ -34931,19 +34900,19 @@ static void testminqpunit_icqptest(bool *err) {
    //
    // NOTE: we do not check termination type because some solvers (IPM) may return feasible X even with negative code
       if (xend.cnt != n) {
-         set_error_flag(err, true, __FILE__, __LINE__, "testminqpunit.ap:2588");
+         *err = true;
          continue;
       }
       for (i = 0; i < k; i++) {
          v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
          if (ct.xZ[i] == 0) {
-            set_error_flag(err, !NearAtR(v, c.xyR[i][n], eps), __FILE__, __LINE__, "testminqpunit.ap:2595");
+            *err = *err || !NearAtR(v, c.xyR[i][n], eps);
          }
          if (ct.xZ[i] > 0) {
-            set_error_flag(err, v < c.xyR[i][n] - eps, __FILE__, __LINE__, "testminqpunit.ap:2597");
+            *err = *err || v < c.xyR[i][n] - eps;
          }
          if (ct.xZ[i] < 0) {
-            set_error_flag(err, v > c.xyR[i][n] + eps, __FILE__, __LINE__, "testminqpunit.ap:2599");
+            *err = *err || v > c.xyR[i][n] + eps;
          }
       }
    }
@@ -34998,12 +34967,12 @@ static void testminqpunit_icqptest(bool *err) {
       minqpoptimize(&state);
       minqpresults(&state, &xend, &rep);
       if (rep.terminationtype <= 0) {
-         set_error_flag(err, true, __FILE__, __LINE__, "testminqpunit.ap:2665");
+         *err = true;
          continue;
       }
       for (i = 0; i < n; i++) {
          v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
-         set_error_flag(err, v < c.xyR[i][n] - eps, __FILE__, __LINE__, "testminqpunit.ap:2671");
+         *err = *err || v < c.xyR[i][n] - eps;
       }
    // Generate dual problem:
    // * A2 stores new quadratic term
@@ -35041,7 +35010,7 @@ static void testminqpunit_icqptest(bool *err) {
       minqpoptimize(&state2);
       minqpresults(&state2, &xend2, &rep2);
       if (rep2.terminationtype <= 0) {
-         set_error_flag(err, true, __FILE__, __LINE__, "testminqpunit.ap:2726");
+         *err = true;
          continue;
       }
       for (i = 0; i < n; i++) {
@@ -35052,7 +35021,7 @@ static void testminqpunit_icqptest(bool *err) {
          tmp0.xR[i] /= da.xR[i];
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(err, !NearAtR(tmp0.xR[i], xend.xR[i], eps * rmax2(fabs(tmp0.xR[i]), 1.0)), __FILE__, __LINE__, "testminqpunit.ap:2739");
+         *err = *err || !NearAtR(tmp0.xR[i], xend.xR[i], eps * rmax2(fabs(tmp0.xR[i]), 1.0));
       }
    }
 // Boundary and linear equality/inequality constrained QP problem,
@@ -35125,7 +35094,7 @@ static void testminqpunit_icqptest(bool *err) {
       ae_vector_set_length(&xend, 0);
       minqpresults(&state, &xend, &rep);
       if (xend.cnt != n || !isfinitevector(&xend, n)) {
-         set_error_flag(err, true, __FILE__, __LINE__, "testminqpunit.ap:2821");
+         *err = true;
          continue;
       }
    // Solve with XStart2
@@ -35134,7 +35103,7 @@ static void testminqpunit_icqptest(bool *err) {
       ae_vector_set_length(&xend2, 0);
       minqpresults(&state, &xend2, &rep);
       if (xend2.cnt != n || !isfinitevector(&xend2, n)) {
-         set_error_flag(err, true, __FILE__, __LINE__, "testminqpunit.ap:2834");
+         *err = true;
          continue;
       }
    // Calculate function value and XEnd and XEnd2, compare solutions
@@ -35148,7 +35117,7 @@ static void testminqpunit_icqptest(bool *err) {
          f0 += xend.xR[i] * b.xR[i];
          f1 += xend2.xR[i] * b.xR[i];
       }
-      set_error_flag(err, !NearAtR(f0, f1, eps), __FILE__, __LINE__, "testminqpunit.ap:2853");
+      *err = *err || !NearAtR(f0, f1, eps);
    }
 // Convex/nonconvex optimization problem with excessive constraints:
 //
@@ -35275,7 +35244,7 @@ static void testminqpunit_icqptest(bool *err) {
                minqpsetquadraticterm(&state, &a, randombool());
                minqpoptimize(&state);
                minqpresults(&state, &xs0, &rep);
-               set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:3000");
+               *err = *err || rep.terminationtype <= 0;
                if (*err) {
                   ae_frame_leave();
                   return;
@@ -35294,7 +35263,7 @@ static void testminqpunit_icqptest(bool *err) {
                   vv += sqr(v);
                }
                vv = sqrt(vv);
-               set_error_flag(err, vv > 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:3024");
+               *err = *err || vv > 1.0E-3;
             }
          }
       }
@@ -35416,7 +35385,7 @@ static void testminqpunit_icqptest(bool *err) {
             minqpsetquadraticterm(&state, &a, randombool());
             minqpoptimize(&state);
             minqpresults(&state, &xs0, &rep);
-            set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:3159");
+            *err = *err || rep.terminationtype <= 0;
             if (*err) {
                ae_frame_leave();
                return;
@@ -35441,8 +35410,8 @@ static void testminqpunit_icqptest(bool *err) {
             ae_vector_set_length(&nonnegative, n + ccnt);
             k = 0;
             for (i = 0; i < n; i++) {
-               set_error_flag(err, xs0.xR[i] < bl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:3187");
-               set_error_flag(err, xs0.xR[i] > bu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:3188");
+               *err = *err || xs0.xR[i] < bl.xR[i];
+               *err = *err || xs0.xR[i] > bu.xR[i];
                if (xs0.xR[i] <= bl.xR[i] + tolconstr) {
                   for (j = 0; j < n; j++) {
                      ce.xyR[j][k] = 0.0;
@@ -35465,9 +35434,9 @@ static void testminqpunit_icqptest(bool *err) {
             for (i = 0; i < ccnt; i++) {
                v = ae_v_dotproduct(c.xyR[i], 1, xs0.xR, 1, n);
                v -= c.xyR[i][n];
-               set_error_flag(err, ct.xZ[i] == 0 && !SmallAtR(v, tolconstr), __FILE__, __LINE__, "testminqpunit.ap:3212");
-               set_error_flag(err, ct.xZ[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminqpunit.ap:3213");
-               set_error_flag(err, ct.xZ[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:3214");
+               *err = *err || ct.xZ[i] == 0 && !SmallAtR(v, tolconstr);
+               *err = *err || ct.xZ[i] > 0 && v < -tolconstr;
+               *err = *err || ct.xZ[i] < 0 && v > tolconstr;
                if (ct.xZ[i] == 0) {
                   for (j = 0; j < n; j++) {
                      ce.xyR[j][k] = c.xyR[i][j];
@@ -35501,9 +35470,9 @@ static void testminqpunit_icqptest(bool *err) {
             vv = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
             vv = sqrt(vv);
             if (akind == 3 || akind == 4) {
-               set_error_flag(err, vv > 1.0E-2, __FILE__, __LINE__, "testminqpunit.ap:3244");
+               *err = *err || vv > 1.0E-2;
             } else {
-               set_error_flag(err, vv > 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:3246");
+               *err = *err || vv > 1.0E-3;
             }
          }
       }
@@ -36075,7 +36044,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       // b) check constraint violation with good precision
       // c) perform comparison for |X1-XS| with LOW precision
          if (rep.terminationtype <= 0) {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:3569");
+            *errorflag = true;
             ae_frame_leave();
             return;
          }
@@ -36089,7 +36058,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                f1 += 0.5 * x1.xR[i] * rawa.xyR[i][j] * x1.xR[j];
             }
          }
-         set_error_flag(errorflag, !NearAtR(f0, f1, 1.0E-3), __FILE__, __LINE__, "testminqpunit.ap:3584");
+         *errorflag = *errorflag || !NearAtR(f0, f1, 1.0E-3);
       }
    // Inequality constrained convex problem:
    // * N*N diagonal A
@@ -36162,7 +36131,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             minqpresults(&state, &x1, &rep);
          // Test
             if (rep.terminationtype <= 0) {
-               set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:3667");
+               *errorflag = true;
                ae_frame_leave();
                return;
             }
@@ -36170,14 +36139,14 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             if (v >= 0.0) {
             // XS is feasible
                for (i = 0; i < n; i++) {
-                  set_error_flag(errorflag, !NearAtR(x1.xR[i], xs.xR[i], xtol), __FILE__, __LINE__, "testminqpunit.ap:3677");
+                  *errorflag = *errorflag || !NearAtR(x1.xR[i], xs.xR[i], xtol);
                }
             } else {
             // XS is infeasible:
             // * X1 must be approximately feasible
             // * gradient projection onto c'*x=0 must be zero
                v = ae_v_dotproduct(x1.xR, 1, rawc.xyR[0], 1, n);
-               set_error_flag(errorflag, v < -xtol, __FILE__, __LINE__, "testminqpunit.ap:3687");
+               *errorflag = *errorflag || v < -xtol;
                ae_vector_set_length(&g, n);
                ae_v_move(g.xR, 1, b.xR, 1, n);
                for (i = 0; i < n; i++) {
@@ -36187,7 +36156,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                v = ae_v_dotproduct(g.xR, 1, rawc.xyR[0], 1, n);
                ae_v_subd(g.xR, 1, rawc.xyR[0], 1, n, v);
                v = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
-               set_error_flag(errorflag, sqrt(v) > gtol, __FILE__, __LINE__, "testminqpunit.ap:3698");
+               *errorflag = *errorflag || sqrt(v) > gtol;
             }
          }
       }
@@ -36287,14 +36256,14 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          minqpresults(&state2, &x2, &rep2);
       // Calculate gradient, check projection
          if (rep.terminationtype <= 0 || rep2.terminationtype <= 0) {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:3804");
+            *errorflag = true;
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, x1.xR[i] < bndl.xR[i] - xtol, __FILE__, __LINE__, "testminqpunit.ap:3809");
-            set_error_flag(errorflag, x1.xR[i] > bndu.xR[i] + xtol, __FILE__, __LINE__, "testminqpunit.ap:3810");
-            set_error_flag(errorflag, !NearAtR(x1.xR[i], x2.xR[i], xtol), __FILE__, __LINE__, "testminqpunit.ap:3811");
+            *errorflag = *errorflag || x1.xR[i] < bndl.xR[i] - xtol;
+            *errorflag = *errorflag || x1.xR[i] > bndu.xR[i] + xtol;
+            *errorflag = *errorflag || !NearAtR(x1.xR[i], x2.xR[i], xtol);
          }
       }
    // Convex/nonconvex optimization problem with combination of
@@ -36429,7 +36398,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                testminqpunit_randomlyselectconvertandsetquadraticterm(&a, n, &state, &rs);
                minqpoptimize(&state);
                minqpresults(&state, &x1, &rep);
-               set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:3961");
+               *errorflag = *errorflag || rep.terminationtype <= 0;
                if (*errorflag) {
                   ae_frame_leave();
                   return;
@@ -36454,8 +36423,8 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                ae_vector_set_length(&nonnegative, n + rawccnt);
                k = 0;
                for (i = 0; i < n; i++) {
-                  set_error_flag(errorflag, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminqpunit.ap:3989");
-                  set_error_flag(errorflag, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminqpunit.ap:3990");
+                  *errorflag = *errorflag || x1.xR[i] < bndl.xR[i];
+                  *errorflag = *errorflag || x1.xR[i] > bndu.xR[i];
                   if (x1.xR[i] <= bndl.xR[i] + tolconstr) {
                      for (j = 0; j < n; j++) {
                         ce.xyR[j][k] = 0.0;
@@ -36478,9 +36447,9 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                for (i = 0; i < rawccnt; i++) {
                   v = ae_v_dotproduct(rawc.xyR[i], 1, x1.xR, 1, n);
                   v -= rawc.xyR[i][n];
-                  set_error_flag(errorflag, rawct.xZ[i] == 0 && !SmallAtR(v, tolconstr), __FILE__, __LINE__, "testminqpunit.ap:4014");
-                  set_error_flag(errorflag, rawct.xZ[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminqpunit.ap:4015");
-                  set_error_flag(errorflag, rawct.xZ[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:4016");
+                  *errorflag = *errorflag || rawct.xZ[i] == 0 && !SmallAtR(v, tolconstr);
+                  *errorflag = *errorflag || rawct.xZ[i] > 0 && v < -tolconstr;
+                  *errorflag = *errorflag || rawct.xZ[i] < 0 && v > tolconstr;
                   if (rawct.xZ[i] == 0) {
                      for (j = 0; j < n; j++) {
                         ce.xyR[j][k] = rawc.xyR[i][j];
@@ -36513,7 +36482,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                }
                vv = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
                vv = sqrt(vv);
-               set_error_flag(errorflag, vv > gtol, __FILE__, __LINE__, "testminqpunit.ap:4045");
+               *errorflag = *errorflag || vv > gtol;
             }
          }
       }
@@ -36611,7 +36580,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             minqpoptimize(&state);
             minqpresults(&state, &x1, &rep);
             if (rep.terminationtype <= 0) {
-               set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:4153");
+               *errorflag = true;
                continue;
             }
          // Solve problem using explicit origin
@@ -36641,7 +36610,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             minqpoptimize(&state2);
             minqpresults(&state2, &x2, &rep);
             if (rep.terminationtype <= 0) {
-               set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:4180");
+               *errorflag = true;
                continue;
             }
          // Calculate function value at X1/X2.
@@ -36656,9 +36625,9 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                f0 += (x1.xR[i] - xorigin.xR[i]) * b.xR[i];
                f1 += (x2.xR[i] - xorigin.xR[i]) * b.xR[i];
             }
-            set_error_flag(errorflag, !NearAtR(f0, f1, ftol), __FILE__, __LINE__, "testminqpunit.ap:4200");
+            *errorflag = *errorflag || !NearAtR(f0, f1, ftol);
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, !NearAtR(x1.xR[i], x2.xR[i], xtol), __FILE__, __LINE__, "testminqpunit.ap:4202");
+               *errorflag = *errorflag || !NearAtR(x1.xR[i], x2.xR[i], xtol);
             }
          }
       }
@@ -36761,7 +36730,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             minqpoptimize(&state);
             minqpresults(&state, &x1, &rep);
             if (rep.terminationtype <= 0) {
-               set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:4306");
+               *errorflag = true;
                continue;
             }
          // Scale problem and solve one more time.
@@ -36836,7 +36805,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             minqpoptimize(&state);
             minqpresults(&state, &x2, &rep);
             if (rep.terminationtype <= 0) {
-               set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:4371");
+               *errorflag = true;
                continue;
             }
          // Compare
@@ -36846,7 +36815,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             }
             mx = rmax2(mx, 1.0);
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, !NearAtR(x1.xR[i], x2.xR[i] / s.xR[i], xtol * mx), __FILE__, __LINE__, "testminqpunit.ap:4383");
+               *errorflag = *errorflag || !NearAtR(x1.xR[i], x2.xR[i] / s.xR[i], xtol * mx);
             }
          }
       }
@@ -36918,12 +36887,12 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:4462");
+            *errorflag = true;
             continue;
          }
          for (i = 0; i < n; i++) {
             v = ae_v_dotproduct(x1.xR, 1, rawc.xyR[i], 1, n);
-            set_error_flag(errorflag, v < rawc.xyR[i][n] - xtol, __FILE__, __LINE__, "testminqpunit.ap:4468");
+            *errorflag = *errorflag || v < rawc.xyR[i][n] - xtol;
          }
       // Generate dual problem:
       // * A2 stores new quadratic term
@@ -36961,7 +36930,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          minqpoptimize(&state2);
          minqpresults(&state2, &x2, &rep2);
          if (rep2.terminationtype <= 0) {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:4523");
+            *errorflag = true;
             continue;
          }
          for (i = 0; i < n; i++) {
@@ -36972,7 +36941,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             tmp0.xR[i] /= da.xR[i];
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, !NearAtR(tmp0.xR[i], x1.xR[i], xtol * rmax2(fabs(tmp0.xR[i]), 1.0)), __FILE__, __LINE__, "testminqpunit.ap:4536");
+            *errorflag = *errorflag || !NearAtR(tmp0.xR[i], x1.xR[i], xtol * rmax2(fabs(tmp0.xR[i]), 1.0));
          }
       }
    // Boundary and linear equality/inequality constrained QP problem with
@@ -37065,19 +37034,19 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       //
       // NOTE: we do not check termination type because some solvers (IPM) may return feasible X even with negative code
          if (x1.cnt != n) {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:4637");
+            *errorflag = true;
             continue;
          }
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(x1.xR, 1, rawc.xyR[i], 1, n);
             if (rawct.xZ[i] == 0) {
-               set_error_flag(errorflag, !NearAtR(v, rawc.xyR[i][n], xtol), __FILE__, __LINE__, "testminqpunit.ap:4644");
+               *errorflag = *errorflag || !NearAtR(v, rawc.xyR[i][n], xtol);
             }
             if (rawct.xZ[i] > 0) {
-               set_error_flag(errorflag, v < rawc.xyR[i][n] - xtol, __FILE__, __LINE__, "testminqpunit.ap:4646");
+               *errorflag = *errorflag || v < rawc.xyR[i][n] - xtol;
             }
             if (rawct.xZ[i] < 0) {
-               set_error_flag(errorflag, v > rawc.xyR[i][n] + xtol, __FILE__, __LINE__, "testminqpunit.ap:4648");
+               *errorflag = *errorflag || v > rawc.xyR[i][n] + xtol;
             }
          }
       }
@@ -37159,15 +37128,15 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:4735");
+            *errorflag = true;
             continue;
          }
       // * compare solution with analytic one
       // * check feasibility
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, !NearAtR(x1.xR[i], rboundval(x0.xR[i], 0.0, 1.0), xtol), __FILE__, __LINE__, "testminqpunit.ap:4745");
-            set_error_flag(errorflag, x1.xR[i] < 0.0 - xtol, __FILE__, __LINE__, "testminqpunit.ap:4746");
-            set_error_flag(errorflag, x1.xR[i] > 1.0 + xtol, __FILE__, __LINE__, "testminqpunit.ap:4747");
+            *errorflag = *errorflag || !NearAtR(x1.xR[i], rboundval(x0.xR[i], 0.0, 1.0), xtol);
+            *errorflag = *errorflag || x1.xR[i] < 0.0 - xtol;
+            *errorflag = *errorflag || x1.xR[i] > 1.0 + xtol;
          }
       }
    // Convex optimization problem with excessive constraints:
@@ -37264,7 +37233,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             testminqpunit_randomlyselectconvertandsetquadraticterm(&a, n, &state, &rs);
             minqpoptimize(&state);
             minqpresults(&state, &x1, &rep);
-            set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:4858");
+            *errorflag = *errorflag || rep.terminationtype <= 0;
             if (*errorflag) {
                ae_frame_leave();
                return;
@@ -37283,7 +37252,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                vv += sqr(v);
             }
             vv = sqrt(vv);
-            set_error_flag(errorflag, vv > gtol, __FILE__, __LINE__, "testminqpunit.ap:4882");
+            *errorflag = *errorflag || vv > gtol;
          }
       }
    // Convex optimization problem with known answer (we generate constraints
@@ -37519,10 +37488,10 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             minqpsetorigin(&state, &xorigin);
             minqpoptimize(&state);
             minqpresults(&state, &x1, &rep);
-            set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:5138");
-            set_error_flag(errorflag, x1.cnt < n, __FILE__, __LINE__, "testminqpunit.ap:5139");
-            set_error_flag(errorflag, rep.lagbc.cnt < n, __FILE__, __LINE__, "testminqpunit.ap:5140");
-            set_error_flag(errorflag, rep.laglc.cnt < rawccnt, __FILE__, __LINE__, "testminqpunit.ap:5141");
+            *errorflag = *errorflag || rep.terminationtype <= 0;
+            *errorflag = *errorflag || x1.cnt < n;
+            *errorflag = *errorflag || rep.lagbc.cnt < n;
+            *errorflag = *errorflag || rep.laglc.cnt < rawccnt;
             if (*errorflag) {
                ae_frame_leave();
                return;
@@ -37530,7 +37499,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          // Test function value at the solution
             f0 = testminqpunit_quadratictarget(&a, &b, n, &x1);
             f1 = testminqpunit_quadratictarget(&a, &b, n, &xf);
-            set_error_flag(errorflag, !NearAtR(f0, f1, rmax3(fabs(f0), fabs(f1), 1.0) * 1.0E-3), __FILE__, __LINE__, "testminqpunit.ap:5150");
+            *errorflag = *errorflag || !NearAtR(f0, f1, rmax3(fabs(f0), fabs(f1), 1.0) * 1.0E-3);
          // Test Lagrange multipliers returned by the solver; test is skipped:
          // * for BLEIC solver
          // * for overconstrained DENSE-AUL
@@ -37555,7 +37524,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                   }
                }
                for (i = 0; i < n; i++) {
-                  set_error_flag(errorflag, !SmallAtR(gtrial.xR[i], 1.0E-3), __FILE__, __LINE__, "testminqpunit.ap:5176");
+                  *errorflag = *errorflag || !SmallAtR(gtrial.xR[i], 1.0E-3);
                }
             }
          }
@@ -37627,12 +37596,12 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       minqpoptimize(&state);
       minqpresults(&state, &x1, &rep);
       if (rep.terminationtype <= 0) {
-         set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:5255");
+         *errorflag = true;
          continue;
       }
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(x1.xR, 1, rawc.xyR[i], 1, n);
-         set_error_flag(errorflag, v < rawc.xyR[i][n] - xtol, __FILE__, __LINE__, "testminqpunit.ap:5261");
+         *errorflag = *errorflag || v < rawc.xyR[i][n] - xtol;
       }
       ae_matrix_set_length(&kkt, n + rawccnt, n + rawccnt);
       ae_vector_set_length(&kktright, n + rawccnt);
@@ -37652,7 +37621,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       }
       fblssolvels(&kkt, &kktright, n + rawccnt, n + rawccnt, &tmp0, &tmp1, &tmp2);
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, !NearAtR(kktright.xR[i], x1.xR[i], xtol * rmax2(fabs(kktright.xR[i]), 1.0)), __FILE__, __LINE__, "testminqpunit.ap:5280");
+         *errorflag = *errorflag || !NearAtR(kktright.xR[i], x1.xR[i], xtol * rmax2(fabs(kktright.xR[i]), 1.0));
       }
    // General inequality constrained problem:
    // * N*N SPD diagonal A with moderate condtion number
@@ -37728,12 +37697,12 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       minqpoptimize(&state);
       minqpresults(&state, &x1, &rep);
       if (rep.terminationtype <= 0) {
-         set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:5362");
+         *errorflag = true;
          continue;
       }
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(x1.xR, 1, rawc.xyR[i], 1, n);
-         set_error_flag(errorflag, v < rawc.xyR[i][n] - xtol, __FILE__, __LINE__, "testminqpunit.ap:5368");
+         *errorflag = *errorflag || v < rawc.xyR[i][n] - xtol;
       }
       ae_matrix_set_length(&t3, n, rawccnt);
       ae_matrix_set_length(&a2, rawccnt, rawccnt);
@@ -37767,7 +37736,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       minqpoptimize(&state2);
       minqpresults(&state2, &x2, &rep2);
       if (rep2.terminationtype <= 0) {
-         set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:5421");
+         *errorflag = true;
          continue;
       }
       for (i = 0; i < n; i++) {
@@ -37778,7 +37747,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          tmp0.xR[i] /= da.xR[i];
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, !NearAtR(tmp0.xR[i], x1.xR[i], xtol * rmax2(fabs(tmp0.xR[i]), 1.0)), __FILE__, __LINE__, "testminqpunit.ap:5434");
+         *errorflag = *errorflag || !NearAtR(tmp0.xR[i], x1.xR[i], xtol * rmax2(fabs(tmp0.xR[i]), 1.0));
       }
    }
    ae_frame_leave();
@@ -38026,12 +37995,12 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          minqpresults(&state, &xf, &rep);
       // Compare against analytically known solution
          if (rep.terminationtype <= 0) {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:7154");
+            *errorflag = true;
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminqpunit.ap:7158");
+            *errorflag = *errorflag || !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol);
          }
       }
    }
@@ -38077,12 +38046,12 @@ static void testminqpunit_denseaultests(bool *errorflag) {
       minqpresults(&state, &xf, &rep);
    // Compare against analytically known solution
       if (rep.terminationtype <= 0) {
-         set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:7218");
+         *errorflag = true;
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], xtol), __FILE__, __LINE__, "testminqpunit.ap:7222");
+         *errorflag = *errorflag || !NearAtR(xf.xR[i], xsol.xR[i], xtol);
       }
    }
 // Test that box/linearly inequality constrained problem with ALL constraints
@@ -38173,12 +38142,12 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          minqpresults(&state, &xf, &rep);
       // Compare against analytically known solution
          if (rep.terminationtype <= 0) {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:7339");
+            *errorflag = true;
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminqpunit.ap:7343");
+            *errorflag = *errorflag || !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol);
          }
       }
    }
@@ -38273,12 +38242,12 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          ae_assert(k > 0, "MinQPTest: integrity check failed");
       // Compare against analytically known solution
          if (rep.terminationtype <= 0) {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:7453");
+            *errorflag = true;
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminqpunit.ap:7457");
+            *errorflag = *errorflag || !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol);
          }
       }
    }
@@ -38375,12 +38344,12 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          ae_assert(k > 0, "MinQPTest: integrity check failed");
       // Compare against analytically known solution
          if (rep.terminationtype <= 0) {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:7569");
+            *errorflag = true;
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminqpunit.ap:7573");
+            *errorflag = *errorflag || !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol);
          }
       }
    }
@@ -38484,12 +38453,12 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          minqpresults(&state, &xf, &rep);
       // Compare against analytically known solution
          if (rep.terminationtype <= 0) {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:7696");
+            *errorflag = true;
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminqpunit.ap:7700");
+            *errorflag = *errorflag || !NearAtR(xf.xR[i], xsol.xR[i], s.xR[i] * xtol);
          }
       }
    }
@@ -38542,13 +38511,13 @@ static void testminqpunit_denseaultests(bool *errorflag) {
       minqpoptimize(&state);
       minqpresults(&state, &xf, &rep);
    // Test
-      set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:7765");
+      *errorflag = *errorflag || rep.terminationtype <= 0;
       if (*errorflag) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, !NearAtR(fabs(xf.xR[i]), 1.0, xtol), __FILE__, __LINE__, "testminqpunit.ap:7769");
+         *errorflag = *errorflag || !NearAtR(fabs(xf.xR[i]), 1.0, xtol);
       }
    }
    ae_frame_leave();
@@ -38846,10 +38815,10 @@ static void testminqpunit_ipmtests(bool *errorflag) {
             vipmsetconstraints(&vsolver, &bndl, &bndu, &sparsec, sparseccnt, &densec, denseccnt, &rawcl, &rawcu);
             vipmsetcond(&vsolver, epsx, epsx, epsx);
             vipmoptimize(&vsolver, false, &x1, &replagbc, &replaglc, &repterminationtype);
-            set_error_flag(errorflag, repterminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:8095");
-            set_error_flag(errorflag, x1.cnt < n, __FILE__, __LINE__, "testminqpunit.ap:8096");
-            set_error_flag(errorflag, replagbc.cnt < n, __FILE__, __LINE__, "testminqpunit.ap:8097");
-            set_error_flag(errorflag, replaglc.cnt < rawccnt, __FILE__, __LINE__, "testminqpunit.ap:8098");
+            *errorflag = *errorflag || repterminationtype <= 0;
+            *errorflag = *errorflag || x1.cnt < n;
+            *errorflag = *errorflag || replagbc.cnt < n;
+            *errorflag = *errorflag || replaglc.cnt < rawccnt;
             if (*errorflag) {
                ae_frame_leave();
                return;
@@ -38857,7 +38826,7 @@ static void testminqpunit_ipmtests(bool *errorflag) {
          // Test function value at the solution
             f0 = testminqpunit_quadratictarget(&fulla, &b, n, &x1);
             f1 = testminqpunit_quadratictarget(&fulla, &b, n, &xf);
-            set_error_flag(errorflag, !NearAtR(f0, f1, rmax3(fabs(f0), fabs(f1), 1.0) * 1.0E-3), __FILE__, __LINE__, "testminqpunit.ap:8107");
+            *errorflag = *errorflag || !NearAtR(f0, f1, rmax3(fabs(f0), fabs(f1), 1.0) * 1.0E-3);
          // Test Lagrange multipliers returned by the solver
             ae_vector_set_length(&gtrial, n);
             for (i = 0; i < n; i++) {
@@ -38876,7 +38845,7 @@ static void testminqpunit_ipmtests(bool *errorflag) {
                }
             }
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, !SmallAtR(gtrial.xR[i], 1.0E-3), __FILE__, __LINE__, "testminqpunit.ap:8126");
+               *errorflag = *errorflag || !SmallAtR(gtrial.xR[i], 1.0E-3);
             }
          }
       }
@@ -38925,12 +38894,12 @@ static void testminqpunit_ipmtests(bool *errorflag) {
       minqpresults(&state, &xf, &rep);
    // Compare against analytically known solution
       if (rep.terminationtype <= 0) {
-         set_error_flag(errorflag, true, __FILE__, __LINE__, "testminqpunit.ap:8187");
+         *errorflag = true;
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, !NearAtR(xf.xR[i], xsol.xR[i], xtol), __FILE__, __LINE__, "testminqpunit.ap:8191");
+         *errorflag = *errorflag || !NearAtR(xf.xR[i], xsol.xR[i], xtol);
       }
    }
    ae_frame_leave();
@@ -38997,8 +38966,8 @@ static void testminqpunit_spectests(bool *errorflag) {
       minqpsetscaleautodiag(&state);
       minqpoptimize(&state);
       minqpresults(&state, &xs, &rep);
-      set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:8266");
-      set_error_flag(errorflag, xs.cnt != n, __FILE__, __LINE__, "testminqpunit.ap:8267");
+      *errorflag = *errorflag || rep.terminationtype <= 0;
+      *errorflag = *errorflag || xs.cnt != n;
       if (*errorflag) {
          ae_frame_leave();
          return;
@@ -39010,14 +38979,14 @@ static void testminqpunit_spectests(bool *errorflag) {
       minqpsetscale(&state, &s);
       minqpoptimize(&state);
       minqpresults(&state, &xs2, &rep);
-      set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit.ap:8276");
-      set_error_flag(errorflag, xs2.cnt != n, __FILE__, __LINE__, "testminqpunit.ap:8277");
+      *errorflag = *errorflag || rep.terminationtype <= 0;
+      *errorflag = *errorflag || xs2.cnt != n;
       if (*errorflag) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, !NearAtR(xs.xR[i], xs2.xR[i], xtol), __FILE__, __LINE__, "testminqpunit.ap:8281");
+         *errorflag = *errorflag || !NearAtR(xs.xR[i], xs2.xR[i], xtol);
       }
    // Check that automatic scaling fails for matrices with zero or negative elements
       i = hqrnduniformi(&rs, n);
@@ -39027,12 +38996,12 @@ static void testminqpunit_spectests(bool *errorflag) {
       minqpsetscaleautodiag(&state);
       minqpoptimize(&state);
       minqpresults(&state, &xs, &rep);
-      set_error_flag(errorflag, rep.terminationtype != -9, __FILE__, __LINE__, "testminqpunit.ap:8294");
+      *errorflag = *errorflag || rep.terminationtype != -9;
    }
    ae_frame_leave();
 }
 
-bool testminqp(bool silent) {
+bool testminqp() {
    bool simpleerrors;
    bool func1errors;
    bool func2errors;
@@ -39071,7 +39040,7 @@ bool testminqp(bool silent) {
    testminqpunit_spectests(&specerrors);
 // report
    waserrors = simpleerrors || func1errors || func2errors || bcqperrors || ecqperrors || icqperrors || lcqperrors || quickqperrors || bleicerrors || denseaulerrors || ipmerrors || specerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING MinQP\n");
       printf("BASIC TESTS:\n");
       printf("* SimpleTest:                             ");
@@ -39375,13 +39344,13 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
             state.h.xyR[2][1] = 0.0;
             state.h.xyR[2][2] = 2.0;
          }
-         set_error_flag(statefieldsconsistencyflag, !testminlmunit_rkindvsstatecheck(rkind, &state), __FILE__, __LINE__, "testminlmunit.ap:212");
+         *statefieldsconsistencyflag = *statefieldsconsistencyflag || !testminlmunit_rkindvsstatecheck(rkind, &state);
       }
       minlmresults(&state, &x, &rep);
-      set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:215");
-      set_error_flag(errorflag, !NearAtR(x.xR[0], 2.0, 0.001), __FILE__, __LINE__, "testminlmunit.ap:216");
-      set_error_flag(errorflag, !SmallAtR(x.xR[1], 0.001), __FILE__, __LINE__, "testminlmunit.ap:217");
-      set_error_flag(errorflag, !NearAtR(x.xR[2], 2.0, 0.001), __FILE__, __LINE__, "testminlmunit.ap:218");
+      *errorflag = *errorflag || rep.terminationtype <= 0;
+      *errorflag = *errorflag || !NearAtR(x.xR[0], 2.0, 0.001);
+      *errorflag = *errorflag || !SmallAtR(x.xR[1], 0.001);
+      *errorflag = *errorflag || !NearAtR(x.xR[2], 2.0, 0.001);
    }
 // 1D problem #1
 //
@@ -39439,11 +39408,11 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
          if (state.needfgh) {
             state.h.xyR[0][0] = 2 * (cos(state.x.xR[0]) * cos(state.x.xR[0]) - sin(state.x.xR[0]) * sin(state.x.xR[0]));
          }
-         set_error_flag(statefieldsconsistencyflag, !testminlmunit_rkindvsstatecheck(rkind, &state), __FILE__, __LINE__, "testminlmunit.ap:281");
+         *statefieldsconsistencyflag = *statefieldsconsistencyflag || !testminlmunit_rkindvsstatecheck(rkind, &state);
       }
       minlmresults(&state, &x, &rep);
-      set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:284");
-      set_error_flag(errorflag, !NearAtR(x.xR[0] / pi, round(x.xR[0] / pi), 0.001), __FILE__, __LINE__, "testminlmunit.ap:285");
+      *errorflag = *errorflag || rep.terminationtype <= 0;
+      *errorflag = *errorflag || !NearAtR(x.xR[0] / pi, round(x.xR[0] / pi), 0.001);
    }
 // Linear equations: test normal optimization and optimization with restarts
    for (n = 1; n <= 10; n++) {
@@ -39500,16 +39469,16 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
          }
          while (minlmiteration(&state)) {
             testminlmunit_axmb(&state, &a, &b, n);
-            set_error_flag(statefieldsconsistencyflag, !testminlmunit_rkindvsstatecheck(rkind, &state), __FILE__, __LINE__, "testminlmunit.ap:357");
+            *statefieldsconsistencyflag = *statefieldsconsistencyflag || !testminlmunit_rkindvsstatecheck(rkind, &state);
          }
          minlmresults(&state, &x, &rep);
-         set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:360");
+         *errorflag = *errorflag || rep.terminationtype <= 0;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, !NearAtR(x.xR[i], xe.xR[i], 0.001), __FILE__, __LINE__, "testminlmunit.ap:364");
+            *errorflag = *errorflag || !NearAtR(x.xR[i], xe.xR[i], 0.001);
          }
       // Now we try to restart algorithm from new point
          for (i = 0; i < n; i++) {
@@ -39517,16 +39486,16 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
          }
          for (minlmrestartfrom(&state, &x); minlmiteration(&state); ) {
             testminlmunit_axmb(&state, &a, &b, n);
-            set_error_flag(statefieldsconsistencyflag, !testminlmunit_rkindvsstatecheck(rkind, &state), __FILE__, __LINE__, "testminlmunit.ap:375");
+            *statefieldsconsistencyflag = *statefieldsconsistencyflag || !testminlmunit_rkindvsstatecheck(rkind, &state);
          }
          minlmresults(&state, &x, &rep);
-         set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:378");
+         *errorflag = *errorflag || rep.terminationtype <= 0;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, !NearAtR(x.xR[i], xe.xR[i], 0.001), __FILE__, __LINE__, "testminlmunit.ap:382");
+            *errorflag = *errorflag || !NearAtR(x.xR[i], xe.xR[i], 0.001);
          }
       }
    }
@@ -39616,23 +39585,23 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
                state.h.xyR[2][1] = 0.0;
                state.h.xyR[2][2] = 2.0;
             }
-            set_error_flag(statefieldsconsistencyflag, !testminlmunit_rkindvsstatecheck(rkind, &state), __FILE__, __LINE__, "testminlmunit.ap:486");
+            *statefieldsconsistencyflag = *statefieldsconsistencyflag || !testminlmunit_rkindvsstatecheck(rkind, &state);
          }
          minlmresults(&state, &x, &rep);
-         set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:489");
+         *errorflag = *errorflag || rep.terminationtype <= 0;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          if (ckind == 0) {
-            set_error_flag(errorflag, !NearAtR(x.xR[0], log(2.0), eps), __FILE__, __LINE__, "testminlmunit.ap:494");
-            set_error_flag(errorflag, !SmallAtR(x.xR[1], eps), __FILE__, __LINE__, "testminlmunit.ap:495");
-            set_error_flag(errorflag, !NearAtR(x.xR[2], log(2.0), eps), __FILE__, __LINE__, "testminlmunit.ap:496");
-            set_error_flag(errorflag, rep.terminationtype != 2, __FILE__, __LINE__, "testminlmunit.ap:497");
+            *errorflag = *errorflag || !NearAtR(x.xR[0], log(2.0), eps);
+            *errorflag = *errorflag || !SmallAtR(x.xR[1], eps);
+            *errorflag = *errorflag || !NearAtR(x.xR[2], log(2.0), eps);
+            *errorflag = *errorflag || rep.terminationtype != 2;
          }
          if (ckind == 1) {
-            set_error_flag(errorflag, rep.terminationtype != 5, __FILE__, __LINE__, "testminlmunit.ap:501");
-            set_error_flag(errorflag, rep.iterationscount != maxits, __FILE__, __LINE__, "testminlmunit.ap:502");
+            *errorflag = *errorflag || rep.terminationtype != 5;
+            *errorflag = *errorflag || rep.iterationscount != maxits;
          }
       }
    }
@@ -39757,10 +39726,10 @@ static void testminlmunit_testbc(bool *errorflag) {
          minlmresults(&state, &x, &rep);
          if (rep.terminationtype > 0) {
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, !NearAtR(x.xR[i], rboundval(xe.xR[i], bl.xR[i], bu.xR[i]), 5.0E-2), __FILE__, __LINE__, "testminlmunit.ap:594");
+               *errorflag = *errorflag || !NearAtR(x.xR[i], rboundval(xe.xR[i], bl.xR[i], bu.xR[i]), 5.0E-2);
             }
          } else {
-            set_error_flag(errorflag, true, __FILE__, __LINE__, "testminlmunit.ap:597");
+            *errorflag = true;
          }
       }
    }
@@ -39800,21 +39769,15 @@ static void testminlmunit_testbc(bool *errorflag) {
          minlmsetbc(&state, &bl, &bu);
          while (minlmiteration(&state)) {
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, state.x.xR[i] < bl.xR[i], __FILE__, __LINE__, "testminlmunit.ap:639");
-               set_error_flag(errorflag, state.x.xR[i] > bu.xR[i], __FILE__, __LINE__, "testminlmunit.ap:640");
+               *errorflag = *errorflag || state.x.xR[i] < bl.xR[i];
+               *errorflag = *errorflag || state.x.xR[i] > bu.xR[i];
             }
-            if (state.needfi) {
-               testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, false);
-               continue;
-            }
-            if (state.needfij) {
-               testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, true);
-               continue;
-            }
-            ae_assert(false, "minlm test: integrity check failed");
+            if (state.needfi) testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, false);
+            else if (state.needfij) testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, true);
+            else ae_assert(false, "minlm test: integrity check failed");
          }
          minlmresults(&state, &x, &rep);
-         set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:655");
+         *errorflag = *errorflag || rep.terminationtype <= 0;
          if (*errorflag) {
             ae_frame_leave();
             return;
@@ -39823,15 +39786,15 @@ static void testminlmunit_testbc(bool *errorflag) {
          ae_vector_set_length(&x1, n);
          h = 0.001;
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, x.xR[i] < bl.xR[i], __FILE__, __LINE__, "testminlmunit.ap:664");
-            set_error_flag(errorflag, x.xR[i] > bu.xR[i], __FILE__, __LINE__, "testminlmunit.ap:665");
+            *errorflag = *errorflag || x.xR[i] < bl.xR[i];
+            *errorflag = *errorflag || x.xR[i] > bu.xR[i];
             if (x.xR[i] + h >= bl.xR[i]) {
                for (j = 0; j < n; j++) {
                   x1.xR[j] = x.xR[j];
                }
                x1.xR[i] = x.xR[i] + h;
                testminlmunit_testfunc1(n, m, &c, &x1, &f1, true, &state.fi, false, &state.j, false);
-               set_error_flag(errorflag, f1 < f0 * (1 - tolf), __FILE__, __LINE__, "testminlmunit.ap:674");
+               *errorflag = *errorflag || f1 < f0 * (1 - tolf);
             }
             if (x.xR[i] - h >= bl.xR[i]) {
                for (j = 0; j < n; j++) {
@@ -39839,7 +39802,7 @@ static void testminlmunit_testbc(bool *errorflag) {
                }
                x1.xR[i] = x.xR[i] - h;
                testminlmunit_testfunc1(n, m, &c, &x1, &f1, true, &state.fi, false, &state.j, false);
-               set_error_flag(errorflag, f1 < f0 * (1 - tolf), __FILE__, __LINE__, "testminlmunit.ap:684");
+               *errorflag = *errorflag || f1 < f0 * (1 - tolf);
             }
          }
       }
@@ -39880,21 +39843,15 @@ static void testminlmunit_testbc(bool *errorflag) {
          minlmsetbc(&state, &bl, &bu);
          while (minlmiteration(&state)) {
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, state.x.xR[i] < bl.xR[i], __FILE__, __LINE__, "testminlmunit.ap:728");
-               set_error_flag(errorflag, state.x.xR[i] > bu.xR[i], __FILE__, __LINE__, "testminlmunit.ap:729");
+               *errorflag = *errorflag || state.x.xR[i] < bl.xR[i];
+               *errorflag = *errorflag || state.x.xR[i] > bu.xR[i];
             }
-            if (state.needfi) {
-               testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, false);
-               continue;
-            }
-            if (state.needfij) {
-               testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, true);
-               continue;
-            }
-            ae_assert(false, "minlm test: integrity check failed");
+            if (state.needfi) testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, false);
+            else if (state.needfij) testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, true);
+            else ae_assert(false, "minlm test: integrity check failed");
          }
          minlmresults(&state, &x, &rep);
-         set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:744");
+         *errorflag = *errorflag || rep.terminationtype <= 0;
          if (*errorflag) {
             ae_frame_leave();
             return;
@@ -39903,15 +39860,15 @@ static void testminlmunit_testbc(bool *errorflag) {
          ae_vector_set_length(&x1, n);
          h = 0.001;
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, x.xR[i] < bl.xR[i], __FILE__, __LINE__, "testminlmunit.ap:753");
-            set_error_flag(errorflag, x.xR[i] > bu.xR[i], __FILE__, __LINE__, "testminlmunit.ap:754");
+            *errorflag = *errorflag || x.xR[i] < bl.xR[i];
+            *errorflag = *errorflag || x.xR[i] > bu.xR[i];
             if (x.xR[i] + h >= bl.xR[i] && x.xR[i] + h <= bu.xR[i]) {
                for (j = 0; j < n; j++) {
                   x1.xR[j] = x.xR[j];
                }
                x1.xR[i] = x.xR[i] + h;
                testminlmunit_testfunc1(n, m, &c, &x1, &f1, true, &state.fi, false, &state.j, false);
-               set_error_flag(errorflag, f1 < f0 * (1 - tolf), __FILE__, __LINE__, "testminlmunit.ap:763");
+               *errorflag = *errorflag || f1 < f0 * (1 - tolf);
             }
             if (x.xR[i] - h >= bl.xR[i] && x.xR[i] - h <= bu.xR[i]) {
                for (j = 0; j < n; j++) {
@@ -39919,7 +39876,7 @@ static void testminlmunit_testbc(bool *errorflag) {
                }
                x1.xR[i] = x.xR[i] - h;
                testminlmunit_testfunc1(n, m, &c, &x1, &f1, true, &state.fi, false, &state.j, false);
-               set_error_flag(errorflag, f1 < f0 * (1 - tolf), __FILE__, __LINE__, "testminlmunit.ap:773");
+               *errorflag = *errorflag || f1 < f0 * (1 - tolf);
             }
          }
       }
@@ -40024,38 +39981,32 @@ static void testminlmunit_testlc(bool *errorflag) {
          minlmsetlc(&state, &rawc, &rawct, rawccnt);
          while (minlmiteration(&state)) {
             for (i = 0; i < n; i++) {
-               set_error_flag(errorflag, state.x.xR[i] < bl.xR[i], __FILE__, __LINE__, "testminlmunit.ap:878");
-               set_error_flag(errorflag, state.x.xR[i] > bu.xR[i], __FILE__, __LINE__, "testminlmunit.ap:879");
+               *errorflag = *errorflag || state.x.xR[i] < bl.xR[i];
+               *errorflag = *errorflag || state.x.xR[i] > bu.xR[i];
             }
-            if (state.needfi) {
-               testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, false);
-               continue;
-            }
-            if (state.needfij) {
-               testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, true);
-               continue;
-            }
-            ae_assert(false, "minlm test: integrity check failed");
+            if (state.needfi) testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, false);
+            else if (state.needfij) testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, true);
+            else ae_assert(false, "minlm test: integrity check failed");
          }
          minlmresults(&state, &x, &rep);
-         set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:894");
+         *errorflag = *errorflag || rep.terminationtype <= 0;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
       // Test feasibility w.r.t. box and linear inequality constraints
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, x.xR[i] < bl.xR[i], __FILE__, __LINE__, "testminlmunit.ap:903");
-            set_error_flag(errorflag, x.xR[i] > bu.xR[i], __FILE__, __LINE__, "testminlmunit.ap:904");
+            *errorflag = *errorflag || x.xR[i] < bl.xR[i];
+            *errorflag = *errorflag || x.xR[i] > bu.xR[i];
          }
          for (i = 0; i < rawccnt; i++) {
             v = ae_v_dotproduct(rawc.xyR[i], 1, x.xR, 1, n);
             v -= rawc.xyR[i][n];
             if (rawct.xZ[i] > 0) {
-               set_error_flag(errorflag, v < -xtol, __FILE__, __LINE__, "testminlmunit.ap:911");
+               *errorflag = *errorflag || v < -xtol;
             }
             if (rawct.xZ[i] < 0) {
-               set_error_flag(errorflag, v > xtol, __FILE__, __LINE__, "testminlmunit.ap:913");
+               *errorflag = *errorflag || v > xtol;
             }
          }
       // Make several random trial steps and:
@@ -40083,7 +40034,7 @@ static void testminlmunit_testlc(bool *errorflag) {
                continue;
             }
             testminlmunit_testfunc1(n, m, &c, &x1, &f1, true, &state.fi, false, &state.j, false);
-            set_error_flag(errorflag, f1 < f0 * (1 - tolf), __FILE__, __LINE__, "testminlmunit.ap:950");
+            *errorflag = *errorflag || f1 < f0 * (1 - tolf);
          }
       }
    }
@@ -40149,7 +40100,7 @@ static void testminlmunit_testlc(bool *errorflag) {
          else if (state.needfij) testminlmunit_testfunc1(n, m, &c, &state.x, &v, false, &state.fi, true, &state.j, true);
          else ae_assert(false, "minlm test: integrity check failed");
       minlmresults(&state, &x, &rep);
-      set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:1031");
+      *errorflag = *errorflag || rep.terminationtype <= 0;
       if (*errorflag) {
          ae_frame_leave();
          return;
@@ -40158,7 +40109,7 @@ static void testminlmunit_testlc(bool *errorflag) {
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(rawc.xyR[i], 1, x.xR, 1, n);
          v -= rawc.xyR[i][n];
-         set_error_flag(errorflag, !SmallAtR(v, xtol), __FILE__, __LINE__, "testminlmunit.ap:1042");
+         *errorflag = *errorflag || !SmallAtR(v, xtol);
       }
    // Make several random trial steps and:
    // 0) generate small random trial step
@@ -40181,7 +40132,7 @@ static void testminlmunit_testlc(bool *errorflag) {
          ae_v_muld(x1.xR, 1, n, v);
          ae_v_add(x1.xR, 1, x.xR, 1, n);
          testminlmunit_testfunc1(n, m, &c, &x1, &f1, true, &state.fi, false, &state.j, false);
-         set_error_flag(errorflag, f1 < f0 * (1 - tolf), __FILE__, __LINE__, "testminlmunit.ap:1072");
+         *errorflag = *errorflag || f1 < f0 * (1 - tolf);
       }
    }
 // Minimize
@@ -40259,7 +40210,7 @@ static void testminlmunit_testlc(bool *errorflag) {
          else if (state.needfij) testminlmunit_testfunc1(n, m1 + m2, &c, &state.x, &v, false, &state.fi, true, &state.j, true);
          else ae_assert(false, "minlm test: integrity check failed");
       minlmresults(&state, &x, &rep);
-      set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:1170");
+      *errorflag = *errorflag || rep.terminationtype <= 0;
       if (*errorflag) {
          ae_frame_leave();
          return;
@@ -40273,16 +40224,16 @@ static void testminlmunit_testlc(bool *errorflag) {
          else if (state.needfij) testminlmunit_testfunc1(2 * n, m1 + m2, &c12, &state.x, &v, false, &state.fi, true, &state.j, true);
          else ae_assert(false, "minlm test: integrity check failed");
       minlmresults(&state, &x12, &rep);
-      set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:1195");
+      *errorflag = *errorflag || rep.terminationtype <= 0;
       if (*errorflag) {
          ae_frame_leave();
          return;
       }
    // Compare solutions
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, !NearAtR(x.xR[i], x12.xR[i], 1.0E-3), __FILE__, __LINE__, "testminlmunit.ap:1204");
-         set_error_flag(errorflag, !NearAtR(x.xR[i], x12.xR[n + i], 1.0E-3), __FILE__, __LINE__, "testminlmunit.ap:1205");
-         set_error_flag(errorflag, !NearAtR(x12.xR[i], x12.xR[n + i], 1.0E-6), __FILE__, __LINE__, "testminlmunit.ap:1206");
+         *errorflag = *errorflag || !NearAtR(x.xR[i], x12.xR[i], 1.0E-3);
+         *errorflag = *errorflag || !NearAtR(x.xR[i], x12.xR[n + i], 1.0E-3);
+         *errorflag = *errorflag || !NearAtR(x12.xR[i], x12.xR[n + i], 1.0E-6);
       }
    }
    ae_frame_leave();
@@ -40390,12 +40341,12 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
             state.h.xyR[2][1] = 0.0;
             state.h.xyR[2][2] = 2.0;
          }
-         set_error_flag(statefieldsconsistencyflag, !testminlmunit_rkindvsstatecheck(rkind, &state), __FILE__, __LINE__, "testminlmunit.ap:1320");
+         *statefieldsconsistencyflag = *statefieldsconsistencyflag || !testminlmunit_rkindvsstatecheck(rkind, &state);
          if (state.xupdated) {
-            set_error_flag(errorflag, state.f > fprev, __FILE__, __LINE__, "testminlmunit.ap:1323");
+            *errorflag = *errorflag || state.f > fprev;
             if (fprev == maxrealnumber) {
                for (i = 0; i < n; i++) {
-                  set_error_flag(errorflag, state.x.xR[i] != x.xR[i], __FILE__, __LINE__, "testminlmunit.ap:1326");
+                  *errorflag = *errorflag || state.x.xR[i] != x.xR[i];
                }
             }
             fprev = state.f;
@@ -40403,13 +40354,13 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
          }
       }
       minlmresults(&state, &x, &rep);
-      set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:1332");
+      *errorflag = *errorflag || rep.terminationtype <= 0;
       if (*errorflag) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, x.xR[i] != xlast.xR[i], __FILE__, __LINE__, "testminlmunit.ap:1336");
+         *errorflag = *errorflag || x.xR[i] != xlast.xR[i];
       }
    }
    n = 1;
@@ -40431,7 +40382,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
       if (state.needfgh) {
          state.h.xyR[0][0] = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
       }
-      set_error_flag(errorflag, !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax), __FILE__, __LINE__, "testminlmunit.ap:1355");
+      *errorflag = *errorflag || !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax);
       if (state.xupdated) {
          xprev = state.x.xR[0];
       }
@@ -40483,9 +40434,9 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
             }
          } else ae_assert(false, "Assertion failed");
       minlmresults(&state, &x, &rep);
-      set_error_flag(errorflag, rep.terminationtype != 8, __FILE__, __LINE__, "testminlmunit.ap:1419");
+      *errorflag = *errorflag || rep.terminationtype != 8;
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, x.xR[i] != xlast.xR[i], __FILE__, __LINE__, "testminlmunit.ap:1421");
+         *errorflag = *errorflag || x.xR[i] != xlast.xR[i];
       }
    }
 // Test ability to detect NAN/INF values.
@@ -40560,8 +40511,8 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
          }
       } else ae_assert(false, "Assertion failed");
    minlmresults(&state, &x, &rep);
-   set_error_flag(errorflag, rep.terminationtype != -8, __FILE__, __LINE__, "testminlmunit.ap:1513");
-   set_error_flag(errorflag, spoilcnt != 1, __FILE__, __LINE__, "testminlmunit.ap:1514");
+   *errorflag = *errorflag || rep.terminationtype != -8;
+   *errorflag = *errorflag || spoilcnt != 1;
    ae_frame_leave();
 }
 
@@ -40621,24 +40572,24 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
       } else ae_assert(false, "Assertion failed");
    minlmresults(&state, &x1, &rep);
    minlmoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:1575");
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminlmunit.ap:1576");
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.badgradxbase.cnt != 0, __FILE__, __LINE__, "testminlmunit.ap:1579");
-   set_error_flag(wereerrors, ogrep.badgraduser.rows != 0, __FILE__, __LINE__, "testminlmunit.ap:1580");
-   set_error_flag(wereerrors, ogrep.badgraduser.cols != 0, __FILE__, __LINE__, "testminlmunit.ap:1581");
-   set_error_flag(wereerrors, ogrep.badgradnum.rows != 0, __FILE__, __LINE__, "testminlmunit.ap:1582");
-   set_error_flag(wereerrors, ogrep.badgradnum.cols != 0, __FILE__, __LINE__, "testminlmunit.ap:1583");
+   *wereerrors = *wereerrors || ogrep.badgradxbase.cnt != 0;
+   *wereerrors = *wereerrors || ogrep.badgraduser.rows != 0;
+   *wereerrors = *wereerrors || ogrep.badgraduser.cols != 0;
+   *wereerrors = *wereerrors || ogrep.badgradnum.rows != 0;
+   *wereerrors = *wereerrors || ogrep.badgradnum.cols != 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.badgradsuspected, __FILE__, __LINE__, "testminlmunit.ap:1586");
-   set_error_flag(wereerrors, ogrep.badgradfidx != -1, __FILE__, __LINE__, "testminlmunit.ap:1587");
-   set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminlmunit.ap:1588");
+   *wereerrors = *wereerrors || ogrep.badgradsuspected;
+   *wereerrors = *wereerrors || ogrep.badgradfidx != -1;
+   *wereerrors = *wereerrors || ogrep.badgradvidx != -1;
 // Test gradient checking functionality, try various
 // defect types:
 // * accidental zeroing of some gradient component
@@ -40678,8 +40629,8 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
             while (minlmiteration(&state))
                if (state.needfi || state.needfij) {
                   for (i = 0; i < n; i++) {
-                     set_error_flag(wereerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminlmunit.ap:1637");
-                     set_error_flag(wereerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminlmunit.ap:1638");
+                     *wereerrors = *wereerrors || state.x.xR[i] < bndl.xR[i];
+                     *wereerrors = *wereerrors || state.x.xR[i] > bndu.xR[i];
                   }
                   state.fi.xR[0] = 0.0;
                   for (i = 0; i < n; i++) {
@@ -40724,14 +40675,14 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
             minlmresults(&state, &x1, &rep);
             minlmoptguardresults(&state, &ogrep);
          // Check that something is returned
-            set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlmunit.ap:1695");
-            set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminlmunit.ap:1696");
+            *wereerrors = *wereerrors || rep.terminationtype <= 0;
+            *wereerrors = *wereerrors || !isfinitevector(&x1, n);
             if (*wereerrors) {
                ae_frame_leave();
                return;
             }
          // Compute reference values for true and spoiled Jacobian at X0
-            set_error_flag(wereerrors, !isfinitevector(&ogrep.badgradxbase, n), __FILE__, __LINE__, "testminlmunit.ap:1703");
+            *wereerrors = *wereerrors || !isfinitevector(&ogrep.badgradxbase, n);
             if (*wereerrors) {
                ae_frame_leave();
                return;
@@ -40770,25 +40721,25 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
                jacdefect.xyR[1][i] /= s.xR[i];
             }
          // Check OptGuard report
-            set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgraduser, 2, n), __FILE__, __LINE__, "testminlmunit.ap:1741");
-            set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgradnum, 2, n), __FILE__, __LINE__, "testminlmunit.ap:1742");
+            *wereerrors = *wereerrors || !apservisfinitematrix(&ogrep.badgraduser, 2, n);
+            *wereerrors = *wereerrors || !apservisfinitematrix(&ogrep.badgradnum, 2, n);
             if (*wereerrors) {
                ae_frame_leave();
                return;
             }
             if (defecttype >= 0) {
-               set_error_flag(wereerrors, !ogrep.badgradsuspected, __FILE__, __LINE__, "testminlmunit.ap:1747");
-               set_error_flag(wereerrors, ogrep.badgradfidx != funcidx, __FILE__, __LINE__, "testminlmunit.ap:1748");
-               set_error_flag(wereerrors, ogrep.badgradvidx != varidx, __FILE__, __LINE__, "testminlmunit.ap:1749");
+               *wereerrors = *wereerrors || !ogrep.badgradsuspected;
+               *wereerrors = *wereerrors || ogrep.badgradfidx != funcidx;
+               *wereerrors = *wereerrors || ogrep.badgradvidx != varidx;
             } else {
-               set_error_flag(wereerrors, ogrep.badgradsuspected, __FILE__, __LINE__, "testminlmunit.ap:1753");
-               set_error_flag(wereerrors, ogrep.badgradfidx != -1, __FILE__, __LINE__, "testminlmunit.ap:1754");
-               set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminlmunit.ap:1755");
+               *wereerrors = *wereerrors || ogrep.badgradsuspected;
+               *wereerrors = *wereerrors || ogrep.badgradfidx != -1;
+               *wereerrors = *wereerrors || ogrep.badgradvidx != -1;
             }
             for (i = 0; i <= 1; i++) {
                for (j = 0; j < n; j++) {
-                  set_error_flag(wereerrors, !NearAtR(jactrue.xyR[i][j], ogrep.badgradnum.xyR[i][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminlmunit.ap:1760");
-                  set_error_flag(wereerrors, !NearAtR(jacdefect.xyR[i][j], ogrep.badgraduser.xyR[i][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminlmunit.ap:1761");
+                  *wereerrors = *wereerrors || !NearAtR(jactrue.xyR[i][j], ogrep.badgradnum.xyR[i][j], 0.01 / s.xR[j]);
+                  *wereerrors = *wereerrors || !NearAtR(jacdefect.xyR[i][j], ogrep.badgraduser.xyR[i][j], 0.01 / s.xR[j]);
                }
             }
          }
@@ -40827,11 +40778,11 @@ static void testminlmunit_tryreproducefixedbugs(bool *err) {
          s.fi.xR[1] = sqr(s.x.xR[1]);
       }
    minlmresults(&s, &x, &rep);
-   set_error_flag(err, x.xR[0] < bl.xR[0] || x.xR[0] > bu.xR[0] || x.xR[1] < bl.xR[1] || x.xR[1] > bu.xR[1], __FILE__, __LINE__, "testminlmunit.ap:1923");
+   *err = *err || x.xR[0] < bl.xR[0] || x.xR[0] > bu.xR[0] || x.xR[1] < bl.xR[1] || x.xR[1] > bu.xR[1];
    ae_frame_leave();
 }
 
-bool testminlm(bool silent) {
+bool testminlm() {
    bool waserrors;
    bool uerrors;
    bool bcerrors;
@@ -40859,7 +40810,7 @@ bool testminlm(bool silent) {
    testminlmunit_testoptguard(&optguarderr);
 // end
    waserrors = uerrors || bcerrors || lcerrors || scerror || othererrors || optguarderr;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING LEVENBERG-MARQUARDT OPTIMIZATION\n");
       printf("PROBLEM TYPES:\n");
       printf("* UNCONSTRAINED                           ");
@@ -41287,7 +41238,7 @@ static void testother(bool *err) {
             k++;
          } else ae_assert(false, "Assertion failed");
       mincgresults(&state, &x1, &rep);
-      set_error_flag(err, rep.terminationtype != -8, __FILE__, __LINE__, "testmincgunit.ap:1151");
+      *err = *err || rep.terminationtype != -8;
    }
 // Check algorithm ability to handle request for termination:
 // * to terminate with correct return code = 8
@@ -41325,9 +41276,9 @@ static void testother(bool *err) {
             }
          } else ae_assert(false, "Assertion failed");
       mincgresults(&state, &x, &rep);
-      set_error_flag(err, rep.terminationtype != 8, __FILE__, __LINE__, "testmincgunit.ap:1201");
+      *err = *err || rep.terminationtype != 8;
       for (i = 0; i < n; i++) {
-         set_error_flag(err, x.xR[i] != xlast.xR[i], __FILE__, __LINE__, "testmincgunit.ap:1203");
+         *err = *err || x.xR[i] != xlast.xR[i];
       }
    }
    ae_frame_leave();
@@ -41643,25 +41594,25 @@ static void testmincgunit_testoptguardc1test0reportfortask0(bool *err, optguardn
    bool hasc1discontinuities;
    if (rep->positive) {
    // Check positive report, first checks
-      set_error_flag(err, rep->fidx != 0, __FILE__, __LINE__, "testmincgunit.ap:1770");
-      set_error_flag(err, rep->n != n, __FILE__, __LINE__, "testmincgunit.ap:1771");
-      set_error_flag(err, !(0 <= rep->stpidxa), __FILE__, __LINE__, "testmincgunit.ap:1772");
-      set_error_flag(err, !(rep->stpidxa < rep->stpidxb), __FILE__, __LINE__, "testmincgunit.ap:1773");
-      set_error_flag(err, !(rep->stpidxb < rep->cnt), __FILE__, __LINE__, "testmincgunit.ap:1774");
-      set_error_flag(err, rep->x0.cnt != rep->n, __FILE__, __LINE__, "testmincgunit.ap:1775");
-      set_error_flag(err, rep->d.cnt != rep->n, __FILE__, __LINE__, "testmincgunit.ap:1776");
-      set_error_flag(err, rep->stp.cnt != rep->cnt, __FILE__, __LINE__, "testmincgunit.ap:1777");
-      set_error_flag(err, rep->f.cnt != rep->cnt, __FILE__, __LINE__, "testmincgunit.ap:1778");
-      set_error_flag(err, !isfinitevector(&rep->x0, n), __FILE__, __LINE__, "testmincgunit.ap:1779");
-      set_error_flag(err, !isfinitevector(&rep->d, n), __FILE__, __LINE__, "testmincgunit.ap:1780");
-      set_error_flag(err, !isfinitevector(&rep->stp, rep->cnt), __FILE__, __LINE__, "testmincgunit.ap:1781");
-      set_error_flag(err, !isfinitevector(&rep->f, rep->cnt), __FILE__, __LINE__, "testmincgunit.ap:1782");
+      *err = *err || rep->fidx != 0;
+      *err = *err || rep->n != n;
+      *err = *err || !(0 <= rep->stpidxa);
+      *err = *err || !(rep->stpidxa < rep->stpidxb);
+      *err = *err || !(rep->stpidxb < rep->cnt);
+      *err = *err || rep->x0.cnt != rep->n;
+      *err = *err || rep->d.cnt != rep->n;
+      *err = *err || rep->stp.cnt != rep->cnt;
+      *err = *err || rep->f.cnt != rep->cnt;
+      *err = *err || !isfinitevector(&rep->x0, n);
+      *err = *err || !isfinitevector(&rep->d, n);
+      *err = *err || !isfinitevector(&rep->stp, rep->cnt);
+      *err = *err || !isfinitevector(&rep->f, rep->cnt);
       if (*err) {
          return;
       }
    // Check consistency of X0, D, Stp and F
       for (k = 0; k < rep->cnt - 1; k++) {
-         set_error_flag(err, rep->stp.xR[k] >= rep->stp.xR[k + 1], __FILE__, __LINE__, "testmincgunit.ap:1790");
+         *err = *err || rep->stp.xR[k] >= rep->stp.xR[k + 1];
       }
       for (k = 0; k < rep->cnt; k++) {
          v = 0.0;
@@ -41672,7 +41623,7 @@ static void testmincgunit_testoptguardc1test0reportfortask0(bool *err, optguardn
             }
             v += fabs(vv);
          }
-         set_error_flag(err, !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testmincgunit.ap:1803");
+         *err = *err || !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -41685,18 +41636,18 @@ static void testmincgunit_testoptguardc1test0reportfortask0(bool *err, optguardn
          }
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
-      set_error_flag(err, !hasc1discontinuities, __FILE__, __LINE__, "testmincgunit.ap:1821");
+      *err = *err || !hasc1discontinuities;
    } else {
    // Check negative report: fields must be empty
-      set_error_flag(err, rep->stpidxa != -1, __FILE__, __LINE__, "testmincgunit.ap:1828");
-      set_error_flag(err, rep->stpidxb != -1, __FILE__, __LINE__, "testmincgunit.ap:1829");
-      set_error_flag(err, rep->fidx != -1, __FILE__, __LINE__, "testmincgunit.ap:1830");
-      set_error_flag(err, rep->cnt != 0, __FILE__, __LINE__, "testmincgunit.ap:1831");
-      set_error_flag(err, rep->n != 0, __FILE__, __LINE__, "testmincgunit.ap:1832");
-      set_error_flag(err, rep->x0.cnt != 0, __FILE__, __LINE__, "testmincgunit.ap:1833");
-      set_error_flag(err, rep->d.cnt != 0, __FILE__, __LINE__, "testmincgunit.ap:1834");
-      set_error_flag(err, rep->stp.cnt != 0, __FILE__, __LINE__, "testmincgunit.ap:1835");
-      set_error_flag(err, rep->f.cnt != 0, __FILE__, __LINE__, "testmincgunit.ap:1836");
+      *err = *err || rep->stpidxa != -1;
+      *err = *err || rep->stpidxb != -1;
+      *err = *err || rep->fidx != -1;
+      *err = *err || rep->cnt != 0;
+      *err = *err || rep->n != 0;
+      *err = *err || rep->x0.cnt != 0;
+      *err = *err || rep->d.cnt != 0;
+      *err = *err || rep->stp.cnt != 0;
+      *err = *err || rep->f.cnt != 0;
    }
 }
 
@@ -41716,27 +41667,27 @@ static void testmincgunit_testoptguardc1test1reportfortask0(bool *err, optguardn
    bool hasc1discontinuities;
    if (rep->positive) {
    // Check positive report, first checks
-      set_error_flag(err, rep->fidx != 0, __FILE__, __LINE__, "testmincgunit.ap:1864");
-      set_error_flag(err, rep->vidx < 0, __FILE__, __LINE__, "testmincgunit.ap:1865");
-      set_error_flag(err, rep->vidx > n, __FILE__, __LINE__, "testmincgunit.ap:1866");
-      set_error_flag(err, rep->n != n, __FILE__, __LINE__, "testmincgunit.ap:1867");
-      set_error_flag(err, !(0 <= rep->stpidxa), __FILE__, __LINE__, "testmincgunit.ap:1868");
-      set_error_flag(err, !(rep->stpidxa < rep->stpidxb), __FILE__, __LINE__, "testmincgunit.ap:1869");
-      set_error_flag(err, !(rep->stpidxb < rep->cnt), __FILE__, __LINE__, "testmincgunit.ap:1870");
-      set_error_flag(err, rep->x0.cnt != rep->n, __FILE__, __LINE__, "testmincgunit.ap:1871");
-      set_error_flag(err, rep->d.cnt != rep->n, __FILE__, __LINE__, "testmincgunit.ap:1872");
-      set_error_flag(err, rep->stp.cnt != rep->cnt, __FILE__, __LINE__, "testmincgunit.ap:1873");
-      set_error_flag(err, rep->g.cnt != rep->cnt, __FILE__, __LINE__, "testmincgunit.ap:1874");
-      set_error_flag(err, !isfinitevector(&rep->x0, n), __FILE__, __LINE__, "testmincgunit.ap:1875");
-      set_error_flag(err, !isfinitevector(&rep->d, n), __FILE__, __LINE__, "testmincgunit.ap:1876");
-      set_error_flag(err, !isfinitevector(&rep->stp, rep->cnt), __FILE__, __LINE__, "testmincgunit.ap:1877");
-      set_error_flag(err, !isfinitevector(&rep->g, rep->cnt), __FILE__, __LINE__, "testmincgunit.ap:1878");
+      *err = *err || rep->fidx != 0;
+      *err = *err || rep->vidx < 0;
+      *err = *err || rep->vidx > n;
+      *err = *err || rep->n != n;
+      *err = *err || !(0 <= rep->stpidxa);
+      *err = *err || !(rep->stpidxa < rep->stpidxb);
+      *err = *err || !(rep->stpidxb < rep->cnt);
+      *err = *err || rep->x0.cnt != rep->n;
+      *err = *err || rep->d.cnt != rep->n;
+      *err = *err || rep->stp.cnt != rep->cnt;
+      *err = *err || rep->g.cnt != rep->cnt;
+      *err = *err || !isfinitevector(&rep->x0, n);
+      *err = *err || !isfinitevector(&rep->d, n);
+      *err = *err || !isfinitevector(&rep->stp, rep->cnt);
+      *err = *err || !isfinitevector(&rep->g, rep->cnt);
       if (*err) {
          return;
       }
    // Check consistency of X0, D, Stp and G
       for (k = 0; k < rep->cnt - 1; k++) {
-         set_error_flag(err, rep->stp.xR[k] >= rep->stp.xR[k + 1], __FILE__, __LINE__, "testmincgunit.ap:1886");
+         *err = *err || rep->stp.xR[k] >= rep->stp.xR[k + 1];
       }
       for (k = 0; k < rep->cnt; k++) {
          v = 0.0;
@@ -41750,7 +41701,7 @@ static void testmincgunit_testoptguardc1test1reportfortask0(bool *err, optguardn
             tooclose = tooclose || SmallR(vv, 1.0E-4);
          }
          if (!tooclose) {
-            set_error_flag(err, !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testmincgunit.ap:1900");
+            *err = *err || !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
          }
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
@@ -41767,20 +41718,20 @@ static void testmincgunit_testoptguardc1test1reportfortask0(bool *err, optguardn
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
-         set_error_flag(err, !hasc1discontinuities, __FILE__, __LINE__, "testmincgunit.ap:1921");
+         *err = *err || !hasc1discontinuities;
       }
    } else {
    // Check negative report: fields must be empty
-      set_error_flag(err, rep->stpidxa != -1, __FILE__, __LINE__, "testmincgunit.ap:1928");
-      set_error_flag(err, rep->stpidxb != -1, __FILE__, __LINE__, "testmincgunit.ap:1929");
-      set_error_flag(err, rep->fidx != -1, __FILE__, __LINE__, "testmincgunit.ap:1930");
-      set_error_flag(err, rep->vidx != -1, __FILE__, __LINE__, "testmincgunit.ap:1931");
-      set_error_flag(err, rep->cnt != 0, __FILE__, __LINE__, "testmincgunit.ap:1932");
-      set_error_flag(err, rep->n != 0, __FILE__, __LINE__, "testmincgunit.ap:1933");
-      set_error_flag(err, rep->x0.cnt != 0, __FILE__, __LINE__, "testmincgunit.ap:1934");
-      set_error_flag(err, rep->d.cnt != 0, __FILE__, __LINE__, "testmincgunit.ap:1935");
-      set_error_flag(err, rep->stp.cnt != 0, __FILE__, __LINE__, "testmincgunit.ap:1936");
-      set_error_flag(err, rep->g.cnt != 0, __FILE__, __LINE__, "testmincgunit.ap:1937");
+      *err = *err || rep->stpidxa != -1;
+      *err = *err || rep->stpidxb != -1;
+      *err = *err || rep->fidx != -1;
+      *err = *err || rep->vidx != -1;
+      *err = *err || rep->cnt != 0;
+      *err = *err || rep->n != 0;
+      *err = *err || rep->x0.cnt != 0;
+      *err = *err || rep->d.cnt != 0;
+      *err = *err || rep->stp.cnt != 0;
+      *err = *err || rep->g.cnt != 0;
    }
 }
 
@@ -41855,24 +41806,24 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
       } else ae_assert(false, "Assertion failed");
    mincgresults(&state, &x1, &rep);
    mincgoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testmincgunit.ap:1276");
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testmincgunit.ap:1277");
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.badgradxbase.cnt != 0, __FILE__, __LINE__, "testmincgunit.ap:1280");
-   set_error_flag(wereerrors, ogrep.badgraduser.rows != 0, __FILE__, __LINE__, "testmincgunit.ap:1281");
-   set_error_flag(wereerrors, ogrep.badgraduser.cols != 0, __FILE__, __LINE__, "testmincgunit.ap:1282");
-   set_error_flag(wereerrors, ogrep.badgradnum.rows != 0, __FILE__, __LINE__, "testmincgunit.ap:1283");
-   set_error_flag(wereerrors, ogrep.badgradnum.cols != 0, __FILE__, __LINE__, "testmincgunit.ap:1284");
+   *wereerrors = *wereerrors || ogrep.badgradxbase.cnt != 0;
+   *wereerrors = *wereerrors || ogrep.badgraduser.rows != 0;
+   *wereerrors = *wereerrors || ogrep.badgraduser.cols != 0;
+   *wereerrors = *wereerrors || ogrep.badgradnum.rows != 0;
+   *wereerrors = *wereerrors || ogrep.badgradnum.cols != 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.badgradsuspected, __FILE__, __LINE__, "testmincgunit.ap:1287");
-   set_error_flag(wereerrors, ogrep.badgradfidx != -1, __FILE__, __LINE__, "testmincgunit.ap:1288");
-   set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testmincgunit.ap:1289");
+   *wereerrors = *wereerrors || ogrep.badgradsuspected;
+   *wereerrors = *wereerrors || ogrep.badgradfidx != -1;
+   *wereerrors = *wereerrors || ogrep.badgradvidx != -1;
 // Test that C0/C1 continuity monitoring is disabled by default;
 // we solve nonsmooth problem and test that nothing is returned
 // by OptGuard.
@@ -41909,19 +41860,19 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
       } else ae_assert(false, "Assertion failed");
    mincgresults(&state, &x1, &rep);
    mincgoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testmincgunit.ap:1329");
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testmincgunit.ap:1330");
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testmincgunit.ap:1333");
-   set_error_flag(wereerrors, ogrep.nonc1suspected, __FILE__, __LINE__, "testmincgunit.ap:1334");
-   set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testmincgunit.ap:1335");
-   set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testmincgunit.ap:1336");
-   set_error_flag(wereerrors, ogrep.nonc1fidx >= 0, __FILE__, __LINE__, "testmincgunit.ap:1337");
-   set_error_flag(wereerrors, ogrep.nonc1test0positive, __FILE__, __LINE__, "testmincgunit.ap:1338");
-   set_error_flag(wereerrors, ogrep.nonc1test1positive, __FILE__, __LINE__, "testmincgunit.ap:1339");
+   *wereerrors = *wereerrors || ogrep.nonc0suspected;
+   *wereerrors = *wereerrors || ogrep.nonc1suspected;
+   *wereerrors = *wereerrors || !optguardallclear(&ogrep);
+   *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
+   *wereerrors = *wereerrors || ogrep.nonc1fidx >= 0;
+   *wereerrors = *wereerrors || ogrep.nonc1test0positive;
+   *wereerrors = *wereerrors || ogrep.nonc1test1positive;
 // Test gradient checking functionality, try various
 // defect types:
 // * accidental zeroing of some gradient component
@@ -41972,14 +41923,14 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
          mincgresults(&state, &x1, &rep);
          mincgoptguardresults(&state, &ogrep);
       // Check that something is returned
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testmincgunit.ap:1403");
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testmincgunit.ap:1404");
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
          if (*wereerrors) {
             ae_frame_leave();
             return;
          }
       // Compute reference values for true and spoiled Jacobian at X0
-         set_error_flag(wereerrors, !isfinitevector(&ogrep.badgradxbase, n), __FILE__, __LINE__, "testmincgunit.ap:1411");
+         *wereerrors = *wereerrors || !isfinitevector(&ogrep.badgradxbase, n);
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -42008,24 +41959,24 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
             jacdefect.xyR[0][i] /= s.xR[i];
          }
       // Check OptGuard report
-         set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgraduser, 1, n), __FILE__, __LINE__, "testmincgunit.ap:1439");
-         set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgradnum, 1, n), __FILE__, __LINE__, "testmincgunit.ap:1440");
+         *wereerrors = *wereerrors || !apservisfinitematrix(&ogrep.badgraduser, 1, n);
+         *wereerrors = *wereerrors || !apservisfinitematrix(&ogrep.badgradnum, 1, n);
          if (*wereerrors) {
             ae_frame_leave();
             return;
          }
          if (defecttype >= 0) {
-            set_error_flag(wereerrors, !ogrep.badgradsuspected, __FILE__, __LINE__, "testmincgunit.ap:1445");
-            set_error_flag(wereerrors, ogrep.badgradfidx != 0, __FILE__, __LINE__, "testmincgunit.ap:1446");
-            set_error_flag(wereerrors, ogrep.badgradvidx != varidx, __FILE__, __LINE__, "testmincgunit.ap:1447");
+            *wereerrors = *wereerrors || !ogrep.badgradsuspected;
+            *wereerrors = *wereerrors || ogrep.badgradfidx != 0;
+            *wereerrors = *wereerrors || ogrep.badgradvidx != varidx;
          } else {
-            set_error_flag(wereerrors, ogrep.badgradsuspected, __FILE__, __LINE__, "testmincgunit.ap:1451");
-            set_error_flag(wereerrors, ogrep.badgradfidx != -1, __FILE__, __LINE__, "testmincgunit.ap:1452");
-            set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testmincgunit.ap:1453");
+            *wereerrors = *wereerrors || ogrep.badgradsuspected;
+            *wereerrors = *wereerrors || ogrep.badgradfidx != -1;
+            *wereerrors = *wereerrors || ogrep.badgradvidx != -1;
          }
          for (j = 0; j < n; j++) {
-            set_error_flag(wereerrors, !NearAtR(jactrue.xyR[0][j], ogrep.badgradnum.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testmincgunit.ap:1457");
-            set_error_flag(wereerrors, !NearAtR(jacdefect.xyR[0][j], ogrep.badgraduser.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testmincgunit.ap:1458");
+            *wereerrors = *wereerrors || !NearAtR(jactrue.xyR[0][j], ogrep.badgradnum.xyR[0][j], 0.01 / s.xR[j]);
+            *wereerrors = *wereerrors || !NearAtR(jacdefect.xyR[0][j], ogrep.badgraduser.xyR[0][j], 0.01 / s.xR[j]);
          }
       }
    }
@@ -42095,8 +42046,8 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
       mincgresults(&state, &x1, &rep);
       mincgoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testmincgunit.ap:1539");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testmincgunit.ap:1540");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
@@ -42106,8 +42057,8 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
    // (C0 violation being reported) and "soft" ones
    // (C1 violation is NOT reported) which accumulate
    // until we exhaust limit.
-      set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testmincgunit.ap:1551");
-      set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testmincgunit.ap:1552");
+      *wereerrors = *wereerrors || ogrep.nonc0suspected;
+      *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
       failed = false;
       failed = failed || optguardallclear(&ogrep);
       failed = failed || !ogrep.nonc1suspected;
@@ -42119,43 +42070,43 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
       mincgoptguardnonc1test0results(&state, &ognonc1test0strrep, &ognonc1test0lngrep);
       mincgoptguardnonc1test1results(&state, &ognonc1test1strrep, &ognonc1test1lngrep);
       if (ogrep.nonc1test0positive) {
-         set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testmincgunit.ap:1567");
-         set_error_flag(wereerrors, !ognonc1test0strrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1568");
-         set_error_flag(wereerrors, !ognonc1test0lngrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1569");
-         set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testmincgunit.ap:1570");
+         *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+         *wereerrors = *wereerrors || !ognonc1test0strrep.positive;
+         *wereerrors = *wereerrors || !ognonc1test0lngrep.positive;
+         *wereerrors = *wereerrors || ogrep.nonc1fidx != 0;
          testmincgunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testmincgunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
          avgstr0len += (double)ognonc1test0strrep.cnt / passcount;
          avglng0len += (double)ognonc1test0lngrep.cnt / passcount;
       } else {
-         set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1578");
-         set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1579");
+         *wereerrors = *wereerrors || ognonc1test0strrep.positive;
+         *wereerrors = *wereerrors || ognonc1test0lngrep.positive;
          testmincgunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testmincgunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
          c1test0fails++;
       }
       if (ogrep.nonc1test1positive) {
-         set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testmincgunit.ap:1586");
-         set_error_flag(wereerrors, !ognonc1test1strrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1587");
-         set_error_flag(wereerrors, !ognonc1test1lngrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1588");
-         set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testmincgunit.ap:1589");
+         *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+         *wereerrors = *wereerrors || !ognonc1test1strrep.positive;
+         *wereerrors = *wereerrors || !ognonc1test1lngrep.positive;
+         *wereerrors = *wereerrors || ogrep.nonc1fidx != 0;
          testmincgunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testmincgunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
          avgstr1len += (double)ognonc1test1strrep.cnt / passcount;
          avglng1len += (double)ognonc1test1lngrep.cnt / passcount;
       } else {
-         set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1597");
-         set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1598");
+         *wereerrors = *wereerrors || ognonc1test1strrep.positive;
+         *wereerrors = *wereerrors || ognonc1test1lngrep.positive;
          testmincgunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testmincgunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
          c1test1fails++;
       }
    }
-   set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testmincgunit.ap:1605");
-   set_error_flag(wereerrors, c1test0fails > maxc1test0fails, __FILE__, __LINE__, "testmincgunit.ap:1606");
-   set_error_flag(wereerrors, c1test1fails > maxc1test1fails, __FILE__, __LINE__, "testmincgunit.ap:1607");
-   set_error_flag(wereerrors, avglng0len <= avgstr0len, __FILE__, __LINE__, "testmincgunit.ap:1608");
-   set_error_flag(wereerrors, avglng1len <= avgstr1len, __FILE__, __LINE__, "testmincgunit.ap:1609");
+   *wereerrors = *wereerrors || failurecounter > maxfails;
+   *wereerrors = *wereerrors || c1test0fails > maxc1test0fails;
+   *wereerrors = *wereerrors || c1test1fails > maxc1test1fails;
+   *wereerrors = *wereerrors || avglng0len <= avgstr0len;
+   *wereerrors = *wereerrors || avglng1len <= avgstr1len;
 // Detection of C1 continuity violations in the target under numerical differentiation:
 // * target function is a sum of |(x,c_i)| for i=1..N.
 // * no constraints is present.
@@ -42207,8 +42158,8 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
       mincgresults(&state, &x1, &rep);
       mincgoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testmincgunit.ap:1674");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testmincgunit.ap:1675");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
@@ -42218,8 +42169,8 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
    // (C0 violation being reported) and "soft" ones
    // (C1 violation is NOT reported) which accumulate
    // until we exhaust limit.
-      set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testmincgunit.ap:1686");
-      set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testmincgunit.ap:1687");
+      *wereerrors = *wereerrors || ogrep.nonc0suspected;
+      *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
       failed = false;
       failed = failed || optguardallclear(&ogrep);
       failed = failed || !ogrep.nonc1suspected;
@@ -42228,7 +42179,7 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
          failurecounter++;
       }
    }
-   set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testmincgunit.ap:1695");
+   *wereerrors = *wereerrors || failurecounter > maxfails;
 // Make sure than no false positives are reported for larger
 // problems where numerical noise can be an issue:
 // * N=100 dimensions
@@ -42259,18 +42210,18 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
          }
       } else ae_assert(false, "Assertion failed");
    mincgresults(&state, &x1, &rep);
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testmincgunit.ap:1738");
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testmincgunit.ap:1739");
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
    mincgoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testmincgunit.ap:1743");
+   *wereerrors = *wereerrors || !optguardallclear(&ogrep);
    ae_frame_leave();
 }
 
-bool testmincg(bool silent) {
+bool testmincg() {
    ae_frame _frame_block;
    bool waserrors;
    bool referror;
@@ -42541,7 +42492,7 @@ bool testmincg(bool silent) {
    testmincgunit_testoptguard(&optguarderr);
 // end
    waserrors = referror || eqerror || linerror1 || linerror2 || converror || othererrors || restartserror || precerror || optguarderr;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING CG OPTIMIZATION\n");
       printf("REFERENCE PROBLEM:                        ");
       if (referror) {
@@ -42767,14 +42718,14 @@ static void testminlpunit_basictests(bool *err) {
       testminlpunit_selectrandomsolver(&state);
       minlpoptimize(&state);
       minlpresults(&state, &x, &rep);
-      set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:100");
-      set_error_flag(err, x.cnt < n, __FILE__, __LINE__, "testminlpunit.ap:101");
+      *err = *err || rep.terminationtype <= 0;
+      *err = *err || x.cnt < n;
       if (*err) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(err, x.xR[i] != 0.0, __FILE__, __LINE__, "testminlpunit.ap:105");
+         *err = *err || x.xR[i] != 0.0;
       }
    }
 // Test box constrained problems without linear constraints
@@ -42797,17 +42748,17 @@ static void testminlpunit_basictests(bool *err) {
          minlpsetbc(&state, &bndl, &bndu);
          minlpoptimize(&state);
          minlpresults(&state, &x, &rep);
-         set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:135");
-         set_error_flag(err, x.cnt < n, __FILE__, __LINE__, "testminlpunit.ap:136");
+         *err = *err || rep.terminationtype <= 0;
+         *err = *err || x.cnt < n;
          if (*err) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(err, c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol), __FILE__, __LINE__, "testminlpunit.ap:141");
-            set_error_flag(err, c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol), __FILE__, __LINE__, "testminlpunit.ap:142");
-            set_error_flag(err, c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:143");
-            set_error_flag(err, c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:144");
+            *err = *err || c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol);
+            *err = *err || c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol);
+            *err = *err || c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i];
+            *err = *err || c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i];
          }
          for (i = 0; i < n; i++) {
             c.xR[i] = hqrndnormal(&rs);
@@ -42829,17 +42780,17 @@ static void testminlpunit_basictests(bool *err) {
          minlpsetbc(&state, &bndl, &bndu);
          minlpoptimize(&state);
          minlpresults(&state, &x, &rep);
-         set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:166");
-         set_error_flag(err, x.cnt < n, __FILE__, __LINE__, "testminlpunit.ap:167");
+         *err = *err || rep.terminationtype <= 0;
+         *err = *err || x.cnt < n;
          if (*err) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(err, c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol), __FILE__, __LINE__, "testminlpunit.ap:172");
-            set_error_flag(err, c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol), __FILE__, __LINE__, "testminlpunit.ap:173");
-            set_error_flag(err, c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:174");
-            set_error_flag(err, c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:175");
+            *err = *err || c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol);
+            *err = *err || c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol);
+            *err = *err || c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i];
+            *err = *err || c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i];
          }
       // Feasible bounded problems with zeros in cost vector
          for (i = 0; i < n; i++) {
@@ -42858,57 +42809,57 @@ static void testminlpunit_basictests(bool *err) {
          minlpsetbc(&state, &bndl, &bndu);
          minlpoptimize(&state);
          minlpresults(&state, &x, &rep);
-         set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:199");
-         set_error_flag(err, x.cnt < n, __FILE__, __LINE__, "testminlpunit.ap:200");
+         *err = *err || rep.terminationtype <= 0;
+         *err = *err || x.cnt < n;
          if (*err) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(err, c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol), __FILE__, __LINE__, "testminlpunit.ap:205");
-            set_error_flag(err, c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol), __FILE__, __LINE__, "testminlpunit.ap:206");
-            set_error_flag(err, c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:207");
-            set_error_flag(err, c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:208");
+            *err = *err || c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol);
+            *err = *err || c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol);
+            *err = *err || c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i];
+            *err = *err || c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i];
          }
-         set_error_flag(err, x.xR[k] != 0.0, __FILE__, __LINE__, "testminlpunit.ap:210");
+         *err = *err || x.xR[k] != 0.0;
          bndl.xR[k] = hqrndnormal(&rs);
          bndu.xR[k] = +INFINITY;
          minlpsetbc(&state, &bndl, &bndu);
          minlpoptimize(&state);
          minlpresults(&state, &x, &rep);
-         set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:217");
-         set_error_flag(err, x.cnt < n, __FILE__, __LINE__, "testminlpunit.ap:218");
+         *err = *err || rep.terminationtype <= 0;
+         *err = *err || x.cnt < n;
          if (*err) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(err, c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol), __FILE__, __LINE__, "testminlpunit.ap:223");
-            set_error_flag(err, c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol), __FILE__, __LINE__, "testminlpunit.ap:224");
-            set_error_flag(err, c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:225");
-            set_error_flag(err, c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:226");
+            *err = *err || c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol);
+            *err = *err || c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol);
+            *err = *err || c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i];
+            *err = *err || c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i];
          }
-         set_error_flag(err, x.xR[k] < bndl.xR[k], __FILE__, __LINE__, "testminlpunit.ap:228");
-         set_error_flag(err, solvertype == 0 && x.xR[k] != bndl.xR[k], __FILE__, __LINE__, "testminlpunit.ap:229");
+         *err = *err || x.xR[k] < bndl.xR[k];
+         *err = *err || solvertype == 0 && x.xR[k] != bndl.xR[k];
          bndl.xR[k] = -INFINITY;
          bndu.xR[k] = hqrndnormal(&rs);
          minlpsetbc(&state, &bndl, &bndu);
          minlpoptimize(&state);
          minlpresults(&state, &x, &rep);
-         set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:236");
-         set_error_flag(err, x.cnt < n, __FILE__, __LINE__, "testminlpunit.ap:237");
+         *err = *err || rep.terminationtype <= 0;
+         *err = *err || x.cnt < n;
          if (*err) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(err, c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol), __FILE__, __LINE__, "testminlpunit.ap:242");
-            set_error_flag(err, c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol), __FILE__, __LINE__, "testminlpunit.ap:243");
-            set_error_flag(err, c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:244");
-            set_error_flag(err, c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:245");
+            *err = *err || c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol);
+            *err = *err || c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol);
+            *err = *err || c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i];
+            *err = *err || c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i];
          }
-         set_error_flag(err, x.xR[k] > bndu.xR[k], __FILE__, __LINE__, "testminlpunit.ap:247");
-         set_error_flag(err, solvertype == 0 && x.xR[k] != bndu.xR[k], __FILE__, __LINE__, "testminlpunit.ap:248");
+         *err = *err || x.xR[k] > bndu.xR[k];
+         *err = *err || solvertype == 0 && x.xR[k] != bndu.xR[k];
       // Infeasible problems
          ae_vector_set_length(&x, 0);
          for (i = 0; i < n; i++) {
@@ -42924,8 +42875,8 @@ static void testminlpunit_basictests(bool *err) {
          minlpsetbc(&state, &bndl, &bndu);
          minlpoptimize(&state);
          minlpresults(&state, &x, &rep);
-         set_error_flag(err, rep.terminationtype != -3, __FILE__, __LINE__, "testminlpunit.ap:268");
-         set_error_flag(err, x.cnt < n, __FILE__, __LINE__, "testminlpunit.ap:269");
+         *err = *err || rep.terminationtype != -3;
+         *err = *err || x.cnt < n;
          if (*err) {
             ae_frame_leave();
             return;
@@ -42954,8 +42905,8 @@ static void testminlpunit_basictests(bool *err) {
             minlpsetbc(&state, &bndl, &bndu);
             minlpoptimize(&state);
             minlpresults(&state, &x, &rep);
-            set_error_flag(err, rep.terminationtype != -4, __FILE__, __LINE__, "testminlpunit.ap:300");
-            set_error_flag(err, x.cnt < n, __FILE__, __LINE__, "testminlpunit.ap:301");
+            *err = *err || rep.terminationtype != -4;
+            *err = *err || x.cnt < n;
             if (*err) {
                ae_frame_leave();
                return;
@@ -42995,17 +42946,17 @@ static void testminlpunit_basictests(bool *err) {
       minlpsetlc2dense(&state, &a, &al, &au, ccnt);
       minlpoptimize(&state);
       minlpresults(&state, &x, &rep);
-      set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:343");
-      set_error_flag(err, x.cnt < n, __FILE__, __LINE__, "testminlpunit.ap:344");
+      *err = *err || rep.terminationtype <= 0;
+      *err = *err || x.cnt < n;
       if (*err) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(err, c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol), __FILE__, __LINE__, "testminlpunit.ap:349");
-         set_error_flag(err, c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol), __FILE__, __LINE__, "testminlpunit.ap:350");
-         set_error_flag(err, c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i], __FILE__, __LINE__, "testminlpunit.ap:351");
-         set_error_flag(err, c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i], __FILE__, __LINE__, "testminlpunit.ap:352");
+         *err = *err || c.xR[i] > 0.0 && (x.xR[i] < bndl.xR[i] || x.xR[i] > bndl.xR[i] + primtol);
+         *err = *err || c.xR[i] < 0.0 && (x.xR[i] > bndu.xR[i] || x.xR[i] < bndu.xR[i] - primtol);
+         *err = *err || c.xR[i] > 0.0 && solvertype == 0 && x.xR[i] != bndl.xR[i];
+         *err = *err || c.xR[i] < 0.0 && solvertype == 0 && x.xR[i] != bndu.xR[i];
       }
    }
 // Test linearly constrained problems with all variables being boxed ones
@@ -43043,18 +42994,18 @@ static void testminlpunit_basictests(bool *err) {
       minlpsetlc2dense(&state, &a, &al, &au, ccnt);
       minlpoptimize(&state);
       minlpresults(&state, &x, &rep);
-      set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:397");
-      set_error_flag(err, x.cnt != n, __FILE__, __LINE__, "testminlpunit.ap:398");
-      set_error_flag(err, rep.y.cnt != ccnt, __FILE__, __LINE__, "testminlpunit.ap:399");
-      set_error_flag(err, rep.stats.cnt != n + ccnt, __FILE__, __LINE__, "testminlpunit.ap:400");
+      *err = *err || rep.terminationtype <= 0;
+      *err = *err || x.cnt != n;
+      *err = *err || rep.y.cnt != ccnt;
+      *err = *err || rep.stats.cnt != n + ccnt;
       if (*err) {
          ae_frame_leave();
          return;
       }
       testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, ccnt, &x, &rep, solvertype, &v0, &v1, &errslack);
-      set_error_flag(err, !SmallAtR(v0, primtol), __FILE__, __LINE__, "testminlpunit.ap:404");
-      set_error_flag(err, !SmallAtR(v1, dualtol), __FILE__, __LINE__, "testminlpunit.ap:405");
-      set_error_flag(err, !SmallAtR(errslack, slacktol), __FILE__, __LINE__, "testminlpunit.ap:406");
+      *err = *err || !SmallAtR(v0, primtol);
+      *err = *err || !SmallAtR(v1, dualtol);
+      *err = *err || !SmallAtR(errslack, slacktol);
    }
    ae_frame_leave();
 }
@@ -43823,19 +43774,19 @@ static void testminlpunit_singlecalltests(bool *err) {
          minlpsetlc2dense(&state0, &a, &al, &au, m);
          minlpoptimize(&state0);
          minlpresults(&state0, &x0, &rep0);
-         set_error_flag(err, rep0.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:470");
-         set_error_flag(err, x0.cnt != n || !isfinitevector(&x0, n), __FILE__, __LINE__, "testminlpunit.ap:471");
+         *err = *err || rep0.terminationtype <= 0;
+         *err = *err || x0.cnt != n || !isfinitevector(&x0, n);
          if (*err) {
             ae_frame_leave();
             return;
          }
          testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
-         set_error_flag(err, !SmallAtR(errp, primtol), __FILE__, __LINE__, "testminlpunit.ap:475");
-         set_error_flag(err, !SmallAtR(errd, dualtol), __FILE__, __LINE__, "testminlpunit.ap:476");
-         set_error_flag(err, !SmallAtR(errs, slacktol), __FILE__, __LINE__, "testminlpunit.ap:477");
-         set_error_flag(err, !NearAtR(errp, rep0.primalerror, etol * rmax2(errp, 1.0)), __FILE__, __LINE__, "testminlpunit.ap:478");
-         set_error_flag(err, !NearAtR(errd, rep0.dualerror, etol * rmax2(errd, 1.0)), __FILE__, __LINE__, "testminlpunit.ap:479");
-         set_error_flag(err, !NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0)), __FILE__, __LINE__, "testminlpunit.ap:480");
+         *err = *err || !SmallAtR(errp, primtol);
+         *err = *err || !SmallAtR(errd, dualtol);
+         *err = *err || !SmallAtR(errs, slacktol);
+         *err = *err || !NearAtR(errp, rep0.primalerror, etol * rmax2(errp, 1.0));
+         *err = *err || !NearAtR(errd, rep0.dualerror, etol * rmax2(errd, 1.0));
+         *err = *err || !NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0));
       // Apply random modification to the problem (and to the way
       // we pass constraints to the solver), try solving one more time
       // and compare with the original solution.
@@ -43851,8 +43802,8 @@ static void testminlpunit_singlecalltests(bool *err) {
          testminlpunit_modifyandsendconstraintsto(n, &a, &al, &au, m, &rs, &state1);
          minlpoptimize(&state1);
          minlpresults(&state1, &x1, &rep1);
-         set_error_flag(err, rep1.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:500");
-         set_error_flag(err, x1.cnt != n, __FILE__, __LINE__, "testminlpunit.ap:501");
+         *err = *err || rep1.terminationtype <= 0;
+         *err = *err || x1.cnt != n;
          if (*err) {
             ae_frame_leave();
             return;
@@ -43863,7 +43814,7 @@ static void testminlpunit_singlecalltests(bool *err) {
             f += x0.xR[i] * c.xR[i];
             f1 += x1.xR[i] * c.xR[i];
          }
-         set_error_flag(err, !NearAtR(f1, f, ftol), __FILE__, __LINE__, "testminlpunit.ap:511");
+         *err = *err || !NearAtR(f1, f, ftol);
       // Test scaling (random scale is applied, target values for
       // original and scaled problems are compared).
       //
@@ -43894,14 +43845,14 @@ static void testminlpunit_singlecalltests(bool *err) {
          minlpsetlc2dense(&state1, &a1, &al, &au, m);
          minlpoptimize(&state1);
          minlpresults(&state1, &x1, &rep1);
-         set_error_flag(err, rep1.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:544");
-         set_error_flag(err, x1.cnt != n, __FILE__, __LINE__, "testminlpunit.ap:545");
+         *err = *err || rep1.terminationtype <= 0;
+         *err = *err || x1.cnt != n;
          if (*err) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(err, !NearAtR(x0.xR[i], x1.xR[i] / s.xR[i], 1000.0 * machineepsilon), __FILE__, __LINE__, "testminlpunit.ap:557");
+            *err = *err || !NearAtR(x0.xR[i], x1.xR[i] / s.xR[i], 1000.0 * machineepsilon);
          }
       }
    }
@@ -43923,16 +43874,16 @@ static void testminlpunit_singlecalltests(bool *err) {
          minlpsetlc2dense(&state0, &a, &al, &au, m);
          minlpoptimize(&state0);
          minlpresults(&state0, &x0, &rep0);
-         set_error_flag(err, rep0.terminationtype != -4 && rep0.terminationtype != -2, __FILE__, __LINE__, "testminlpunit.ap:584");
-         set_error_flag(err, x0.cnt != n || !isfinitevector(&x0, n), __FILE__, __LINE__, "testminlpunit.ap:585");
+         *err = *err || rep0.terminationtype != -4 && rep0.terminationtype != -2;
+         *err = *err || x0.cnt != n || !isfinitevector(&x0, n);
          if (*err) {
             ae_frame_leave();
             return;
          }
          testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
-         set_error_flag(err, !NearAtR(errp, rep0.primalerror, etol * rmax3(errp, rmaxabsv(n, &x0), 1.0)), __FILE__, __LINE__, "testminlpunit.ap:589");
-         set_error_flag(err, !NearAtR(errd, rep0.dualerror, etol * rmax3(errd, rmaxabsv(n, &x0), 1.0)), __FILE__, __LINE__, "testminlpunit.ap:590");
-         set_error_flag(err, !NearAtR(errs, rep0.slackerror, etol * rmax3(errs, rmaxabsv(n, &x0), 1.0)), __FILE__, __LINE__, "testminlpunit.ap:591");
+         *err = *err || !NearAtR(errp, rep0.primalerror, etol * rmax3(errp, rmaxabsv(n, &x0), 1.0));
+         *err = *err || !NearAtR(errd, rep0.dualerror, etol * rmax3(errd, rmaxabsv(n, &x0), 1.0));
+         *err = *err || !NearAtR(errs, rep0.slackerror, etol * rmax3(errs, rmaxabsv(n, &x0), 1.0));
       // Generate random primal infeasible
       //
       // NOTE: because we use constraint validation code, we can not
@@ -43947,16 +43898,16 @@ static void testminlpunit_singlecalltests(bool *err) {
          minlpsetlc2dense(&state0, &a, &al, &au, m);
          minlpoptimize(&state0);
          minlpresults(&state0, &x0, &rep0);
-         set_error_flag(err, rep0.terminationtype != -3 && rep0.terminationtype != -2, __FILE__, __LINE__, "testminlpunit.ap:610");
-         set_error_flag(err, x0.cnt != n || !isfinitevector(&x0, n), __FILE__, __LINE__, "testminlpunit.ap:611");
+         *err = *err || rep0.terminationtype != -3 && rep0.terminationtype != -2;
+         *err = *err || x0.cnt != n || !isfinitevector(&x0, n);
          if (*err) {
             ae_frame_leave();
             return;
          }
          testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
-         set_error_flag(err, !NearAtR(errp, rep0.primalerror, etol * rmax3(errp, rmaxabsv(n, &x0), 1.0)), __FILE__, __LINE__, "testminlpunit.ap:615");
-         set_error_flag(err, !NearAtR(errd, rep0.dualerror, etol * rmax3(errd, rmaxabsv(n, &x0), 1.0)), __FILE__, __LINE__, "testminlpunit.ap:616");
-         set_error_flag(err, !NearAtR(errs, rep0.slackerror, etol * rmax3(errs, rmaxabsv(n, &x0), 1.0)), __FILE__, __LINE__, "testminlpunit.ap:617");
+         *err = *err || !NearAtR(errp, rep0.primalerror, etol * rmax3(errp, rmaxabsv(n, &x0), 1.0));
+         *err = *err || !NearAtR(errd, rep0.dualerror, etol * rmax3(errd, rmaxabsv(n, &x0), 1.0));
+         *err = *err || !NearAtR(errs, rep0.slackerror, etol * rmax3(errs, rmaxabsv(n, &x0), 1.0));
       }
    }
    for (n = 2; n <= 50; n++) {
@@ -44022,20 +43973,20 @@ static void testminlpunit_singlecalltests(bool *err) {
          minlpsetlc2dense(&state0, &a, &al, &au, m);
          minlpoptimize(&state0);
          minlpresults(&state0, &x0, &rep0);
-         set_error_flag(err, rep0.terminationtype != -3 && rep0.terminationtype != -2, __FILE__, __LINE__, "testminlpunit.ap:686");
-         set_error_flag(err, x0.cnt != n || !isfinitevector(&x0, n), __FILE__, __LINE__, "testminlpunit.ap:687");
+         *err = *err || rep0.terminationtype != -3 && rep0.terminationtype != -2;
+         *err = *err || x0.cnt != n || !isfinitevector(&x0, n);
          if (*err) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n0; i++) {
-            set_error_flag(err, x0.xR[i] < 1.0, __FILE__, __LINE__, "testminlpunit.ap:691");
+            *err = *err || x0.xR[i] < 1.0;
          }
          testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
-         set_error_flag(err, !SmallAtR(errd, 0.001), __FILE__, __LINE__, "testminlpunit.ap:693");
-         set_error_flag(err, !NearAtR(errp, rep0.primalerror, etol * rmax2(errp, 1.0)), __FILE__, __LINE__, "testminlpunit.ap:694");
-         set_error_flag(err, !NearAtR(errd, rep0.dualerror, etol * rmax2(errd, 1.0)), __FILE__, __LINE__, "testminlpunit.ap:695");
-         set_error_flag(err, !NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0)), __FILE__, __LINE__, "testminlpunit.ap:696");
+         *err = *err || !SmallAtR(errd, 0.001);
+         *err = *err || !NearAtR(errp, rep0.primalerror, etol * rmax2(errp, 1.0));
+         *err = *err || !NearAtR(errd, rep0.dualerror, etol * rmax2(errd, 1.0));
+         *err = *err || !NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0));
       }
    }
 // Check SetBCAll() and SetBCi()
@@ -44085,8 +44036,8 @@ static void testminlpunit_singlecalltests(bool *err) {
       minlpsetlc2dense(&state0, &a, &al, &au, m);
       minlpoptimize(&state0);
       minlpresults(&state0, &x0, &rep0);
-      set_error_flag(err, rep0.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:754");
-      set_error_flag(err, x0.cnt != n, __FILE__, __LINE__, "testminlpunit.ap:755");
+      *err = *err || rep0.terminationtype <= 0;
+      *err = *err || x0.cnt != n;
       if (*err) {
          ae_frame_leave();
          return;
@@ -44098,14 +44049,14 @@ static void testminlpunit_singlecalltests(bool *err) {
       minlpsetlc2dense(&state1, &a, &al, &au, m);
       minlpoptimize(&state1);
       minlpresults(&state1, &x1, &rep1);
-      set_error_flag(err, rep1.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:765");
-      set_error_flag(err, x1.cnt != n, __FILE__, __LINE__, "testminlpunit.ap:766");
+      *err = *err || rep1.terminationtype <= 0;
+      *err = *err || x1.cnt != n;
       if (*err) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(err, x0.xR[i] != x1.xR[i], __FILE__, __LINE__, "testminlpunit.ap:770");
+         *err = *err || x0.xR[i] != x1.xR[i];
       }
    // SetBCi() vs SetBC()
       ae_vector_set_length(&x0, hqrnduniformi(&rs, 2 * n));
@@ -44118,28 +44069,28 @@ static void testminlpunit_singlecalltests(bool *err) {
       minlpsetbc(&state0, &bndl, &bndu);
       minlpoptimize(&state0);
       minlpresults(&state0, &x0, &rep0);
-      set_error_flag(err, rep0.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:786");
-      set_error_flag(err, x0.cnt != n, __FILE__, __LINE__, "testminlpunit.ap:787");
+      *err = *err || rep0.terminationtype <= 0;
+      *err = *err || x0.cnt != n;
       if (*err) {
          ae_frame_leave();
          return;
       }
       minlpoptimize(&state1);
       minlpresults(&state1, &x1, &rep1);
-      set_error_flag(err, rep1.terminationtype <= 0, __FILE__, __LINE__, "testminlpunit.ap:792");
-      set_error_flag(err, x1.cnt != n, __FILE__, __LINE__, "testminlpunit.ap:793");
+      *err = *err || rep1.terminationtype <= 0;
+      *err = *err || x1.cnt != n;
       if (*err) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(err, x0.xR[i] != x1.xR[i], __FILE__, __LINE__, "testminlpunit.ap:797");
+         *err = *err || x0.xR[i] != x1.xR[i];
       }
    }
    ae_frame_leave();
 }
 
-bool testminlp(bool silent) {
+bool testminlp() {
    bool basicerrors;
    bool singlecall;
    bool wereerrors;
@@ -44151,7 +44102,7 @@ bool testminlp(bool silent) {
    testminlpunit_singlecalltests(&singlecall);
 // report
    wereerrors = basicerrors || singlecall;
-   if (!silent) {
+   if (wereerrors || !silent) {
       printf("TESTING MinLP\n");
       printf("BASIC TESTS                               ");
       if (basicerrors) {
@@ -44315,25 +44266,25 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                      }
                   } else ae_assert(false, "Assertion failed");
                minnlcresults(&state, &x1, &rep);
-               set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:240");
-               set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:241");
+               *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+               *wereerrors = *wereerrors || rep.terminationtype <= 0;
                if (hqrndnormal(&rs) > 0.0) {
                   minnlcoptguardresults(&state, &ogrep);
-                  set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:245");
+                  *wereerrors = *wereerrors || !optguardallclear(&ogrep);
                }
                if (*wereerrors) {
                   ae_frame_leave();
                   return;
                }
             // Check constraint violation reports
-               set_error_flag(wereerrors, rep.bcerr > tolx, __FILE__, __LINE__, "testminnlcunit.ap:253");
-               set_error_flag(wereerrors, rep.bcidx >= n, __FILE__, __LINE__, "testminnlcunit.ap:254");
-               set_error_flag(wereerrors, rep.lcerr > 0.0, __FILE__, __LINE__, "testminnlcunit.ap:255");
-               set_error_flag(wereerrors, rep.lcidx >= 0, __FILE__, __LINE__, "testminnlcunit.ap:256");
+               *wereerrors = *wereerrors || rep.bcerr > tolx;
+               *wereerrors = *wereerrors || rep.bcidx >= n;
+               *wereerrors = *wereerrors || rep.lcerr > 0.0;
+               *wereerrors = *wereerrors || rep.lcidx >= 0;
             // Check feasibility properties
                for (i = 0; i < n; i++) {
-                  set_error_flag(wereerrors, isfinite(bndl.xR[i]) && x1.xR[i] <= bndl.xR[i] - tolx * s.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:263");
-                  set_error_flag(wereerrors, isfinite(bndu.xR[i]) && x1.xR[i] >= bndu.xR[i] + tolx * s.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:264");
+                  *wereerrors = *wereerrors || isfinite(bndl.xR[i]) && x1.xR[i] <= bndl.xR[i] - tolx * s.xR[i];
+                  *wereerrors = *wereerrors || isfinite(bndu.xR[i]) && x1.xR[i] >= bndu.xR[i] + tolx * s.xR[i];
                }
             // Test - calculate scaled constrained gradient at solution,
             // check its norm.
@@ -44353,7 +44304,7 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                   gnorm += sqr(g);
                }
                gnorm = sqrt(gnorm);
-               set_error_flag(wereerrors, gnorm > tolg, __FILE__, __LINE__, "testminnlcunit.ap:286");
+               *wereerrors = *wereerrors || gnorm > tolg;
             }
          }
       }
@@ -44438,11 +44389,11 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                      }
                   } else ae_assert(false, "Assertion failed");
                minnlcresults(&state, &x1, &rep);
-               set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:378");
-               set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:379");
+               *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+               *wereerrors = *wereerrors || rep.terminationtype <= 0;
                if (hqrndnormal(&rs) > 0.0) {
                   minnlcoptguardresults(&state, &ogrep);
-                  set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:383");
+                  *wereerrors = *wereerrors || !optguardallclear(&ogrep);
                }
                if (*wereerrors) {
                   ae_frame_leave();
@@ -44450,8 +44401,8 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                }
             // Check feasibility properties
                for (i = 0; i < n; i++) {
-                  set_error_flag(wereerrors, isfinite(bndl.xR[i]) && x1.xR[i] <= bndl.xR[i] - tolx, __FILE__, __LINE__, "testminnlcunit.ap:393");
-                  set_error_flag(wereerrors, isfinite(bndu.xR[i]) && x1.xR[i] >= bndu.xR[i] + tolx, __FILE__, __LINE__, "testminnlcunit.ap:394");
+                  *wereerrors = *wereerrors || isfinite(bndl.xR[i]) && x1.xR[i] <= bndl.xR[i] - tolx;
+                  *wereerrors = *wereerrors || isfinite(bndu.xR[i]) && x1.xR[i] >= bndu.xR[i] + tolx;
                }
             // Test - calculate scaled constrained gradient at solution,
             // check its norm.
@@ -44470,7 +44421,7 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                   gnorm += sqr(g);
                }
                gnorm = sqrt(gnorm);
-               set_error_flag(wereerrors, gnorm > tolg, __FILE__, __LINE__, "testminnlcunit.ap:415");
+               *wereerrors = *wereerrors || gnorm > tolg;
             }
          }
       }
@@ -44638,21 +44589,21 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                      }
                   } else ae_assert(false, "Assertion failed");
                minnlcresults(&state, &x1, &rep);
-               set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:580");
-               set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:581");
+               *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+               *wereerrors = *wereerrors || rep.terminationtype <= 0;
                if (hqrndnormal(&rs) > 0.0) {
                   minnlcoptguardresults(&state, &ogrep);
-                  set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:585");
+                  *wereerrors = *wereerrors || !optguardallclear(&ogrep);
                }
                if (*wereerrors) {
                   ae_frame_leave();
                   return;
                }
             // Check constraint violation reports
-               set_error_flag(wereerrors, rep.bcerr > 0.0, __FILE__, __LINE__, "testminnlcunit.ap:593");
-               set_error_flag(wereerrors, rep.bcidx >= 0, __FILE__, __LINE__, "testminnlcunit.ap:594");
-               set_error_flag(wereerrors, rep.lcerr > tolx, __FILE__, __LINE__, "testminnlcunit.ap:595");
-               set_error_flag(wereerrors, rep.lcidx >= n, __FILE__, __LINE__, "testminnlcunit.ap:596");
+               *wereerrors = *wereerrors || rep.bcerr > 0.0;
+               *wereerrors = *wereerrors || rep.bcidx >= 0;
+               *wereerrors = *wereerrors || rep.lcerr > tolx;
+               *wereerrors = *wereerrors || rep.lcidx >= n;
             // Compare with analytic solution
                f0 = 0.0;
                f1 = 0.0;
@@ -44660,7 +44611,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                   f0 += b.xR[i] * x0.xR[i] + 0.5 * sqr(x0.xR[i] / s.xR[i]);
                   f1 += b.xR[i] * x1.xR[i] + 0.5 * sqr(x1.xR[i] / s.xR[i]);
                }
-               set_error_flag(wereerrors, !NearAtR(f1, f0, tolf), __FILE__, __LINE__, "testminnlcunit.ap:608");
+               *wereerrors = *wereerrors || !NearAtR(f1, f0, tolf);
             }
          }
       }
@@ -44765,21 +44716,21 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                   }
                } else ae_assert(false, "Assertion failed");
             minnlcresults(&state, &x1, &rep);
-            set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:730");
-            set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:731");
+            *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+            *wereerrors = *wereerrors || rep.terminationtype <= 0;
             if (hqrndnormal(&rs) > 0.0) {
                minnlcoptguardresults(&state, &ogrep);
-               set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:735");
+               *wereerrors = *wereerrors || !optguardallclear(&ogrep);
             }
             if (*wereerrors) {
                ae_frame_leave();
                return;
             }
          // Check constraint violation reports
-            set_error_flag(wereerrors, rep.bcerr > 0.0, __FILE__, __LINE__, "testminnlcunit.ap:743");
-            set_error_flag(wereerrors, rep.bcidx >= 0, __FILE__, __LINE__, "testminnlcunit.ap:744");
-            set_error_flag(wereerrors, rep.lcerr > tolx, __FILE__, __LINE__, "testminnlcunit.ap:745");
-            set_error_flag(wereerrors, rep.lcidx >= n, __FILE__, __LINE__, "testminnlcunit.ap:746");
+            *wereerrors = *wereerrors || rep.bcerr > 0.0;
+            *wereerrors = *wereerrors || rep.bcidx >= 0;
+            *wereerrors = *wereerrors || rep.lcerr > tolx;
+            *wereerrors = *wereerrors || rep.lcidx >= n;
          // Test solution
             ae_vector_set_length(&g, n);
             ae_v_move(g.xR, 1, b.xR, 1, n);
@@ -44788,7 +44739,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                g.xR[i] += v;
             }
             v = ae_v_dotproduct(x1.xR, 1, c.xyR[0], 1, n);
-            set_error_flag(wereerrors, v < -tolx, __FILE__, __LINE__, "testminnlcunit.ap:759");
+            *wereerrors = *wereerrors || v < -tolx;
             if (v < tolx) {
             // Point at the boundary, project gradient into
             // equality-constrained subspace.
@@ -44805,7 +44756,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v += sqr(g.xR[i] * s.xR[i]);
             }
-            set_error_flag(wereerrors, sqrt(v) > tolg, __FILE__, __LINE__, "testminnlcunit.ap:779");
+            *wereerrors = *wereerrors || sqrt(v) > tolg;
          }
       }
    // Equality-constrained test:
@@ -44881,25 +44832,25 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                   }
                } else ae_assert(false, "Assertion failed");
             minnlcresults(&state, &x1, &rep);
-            set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:874");
-            set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:875");
+            *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+            *wereerrors = *wereerrors || rep.terminationtype <= 0;
             if (hqrndnormal(&rs) > 0.0) {
                minnlcoptguardresults(&state, &ogrep);
-               set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:879");
+               *wereerrors = *wereerrors || !optguardallclear(&ogrep);
             }
             if (*wereerrors) {
                ae_frame_leave();
                return;
             }
          // Check constraint violation reports
-            set_error_flag(wereerrors, rep.bcerr > 0.0, __FILE__, __LINE__, "testminnlcunit.ap:887");
-            set_error_flag(wereerrors, rep.bcidx >= 0, __FILE__, __LINE__, "testminnlcunit.ap:888");
-            set_error_flag(wereerrors, rep.lcerr > tolx, __FILE__, __LINE__, "testminnlcunit.ap:889");
-            set_error_flag(wereerrors, rep.lcidx >= n, __FILE__, __LINE__, "testminnlcunit.ap:890");
+            *wereerrors = *wereerrors || rep.bcerr > 0.0;
+            *wereerrors = *wereerrors || rep.bcidx >= 0;
+            *wereerrors = *wereerrors || rep.lcerr > tolx;
+            *wereerrors = *wereerrors || rep.lcidx >= n;
          // Check feasibility properties and gradient projection
             for (i = 0; i < k; i++) {
                v = ae_v_dotproduct(x1.xR, 1, c.xyR[i], 1, n);
-               set_error_flag(wereerrors, !NearAtR(v, c.xyR[i][n], tolx), __FILE__, __LINE__, "testminnlcunit.ap:898");
+               *wereerrors = *wereerrors || !NearAtR(v, c.xyR[i][n], tolx);
             }
             ae_vector_set_length(&g, n);
             ae_v_move(g.xR, 1, b.xR, 1, n);
@@ -44912,7 +44863,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                ae_v_subd(g.xR, 1, c.xyR[i], 1, n, v);
             }
             v = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
-            set_error_flag(wereerrors, sqrt(v) > tolg, __FILE__, __LINE__, "testminnlcunit.ap:913");
+            *wereerrors = *wereerrors || sqrt(v) > tolg;
          }
       }
    // Boundary constraints vs linear ones:
@@ -44994,11 +44945,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:1013");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:1014");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (hqrndnormal(&rs) > 0.0) {
             minnlcoptguardresults(&state, &ogrep);
-            set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:1018");
+            *wereerrors = *wereerrors || !optguardallclear(&ogrep);
          }
          if (*wereerrors) {
             ae_frame_leave();
@@ -45033,8 +44984,8 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x2, &rep);
-         set_error_flag(wereerrors, !isfinitevector(&x2, n), __FILE__, __LINE__, "testminnlcunit.ap:1060");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:1061");
+         *wereerrors = *wereerrors || !isfinitevector(&x2, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -45050,7 +45001,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                f1 += 0.5 * x2.xR[i] * fulla.xyR[i][j] * x2.xR[j];
             }
          }
-         set_error_flag(wereerrors, !NearAtR(f0, f1, tolf), __FILE__, __LINE__, "testminnlcunit.ap:1080");
+         *wereerrors = *wereerrors || !NearAtR(f0, f1, tolf);
       }
    // Boundary and linear equality constrained QP problem with excessive
    // equality constraints:
@@ -45129,11 +45080,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:1177");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:1178");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (hqrndnormal(&rs) > 0.0) {
             minnlcoptguardresults(&state, &ogrep);
-            set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:1182");
+            *wereerrors = *wereerrors || !optguardallclear(&ogrep);
          }
          if (*wereerrors) {
             ae_frame_leave();
@@ -45141,7 +45092,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          }
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(x1.xR, 1, c.xyR[i], 1, n);
-            set_error_flag(wereerrors, !NearAtR(v, c.xyR[i][n], tolx), __FILE__, __LINE__, "testminnlcunit.ap:1189");
+            *wereerrors = *wereerrors || !NearAtR(v, c.xyR[i][n], tolx);
          }
       }
    // Boundary and linear equality/inequality constrained QP problem with
@@ -45240,11 +45191,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:1309");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:1310");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (hqrndnormal(&rs) > 0.0) {
             minnlcoptguardresults(&state, &ogrep);
-            set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:1314");
+            *wereerrors = *wereerrors || !optguardallclear(&ogrep);
          }
          if (*wereerrors) {
             ae_frame_leave();
@@ -45253,13 +45204,13 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(x1.xR, 1, c.xyR[i], 1, n);
             if (ct.xZ[i] == 0) {
-               set_error_flag(wereerrors, !NearAtR(v, c.xyR[i][n], tolx), __FILE__, __LINE__, "testminnlcunit.ap:1322");
+               *wereerrors = *wereerrors || !NearAtR(v, c.xyR[i][n], tolx);
             }
             if (ct.xZ[i] > 0) {
-               set_error_flag(wereerrors, v < c.xyR[i][n] - tolx, __FILE__, __LINE__, "testminnlcunit.ap:1324");
+               *wereerrors = *wereerrors || v < c.xyR[i][n] - tolx;
             }
             if (ct.xZ[i] < 0) {
-               set_error_flag(wereerrors, v > c.xyR[i][n] + tolx, __FILE__, __LINE__, "testminnlcunit.ap:1326");
+               *wereerrors = *wereerrors || v > c.xyR[i][n] + tolx;
             }
          }
       }
@@ -45348,11 +45299,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x0, &rep);
-         set_error_flag(wereerrors, !isfinitevector(&x0, n), __FILE__, __LINE__, "testminnlcunit.ap:1430");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:1431");
+         *wereerrors = *wereerrors || !isfinitevector(&x0, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (hqrndnormal(&rs) > 0.0) {
             minnlcoptguardresults(&state, &ogrep);
-            set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:1435");
+            *wereerrors = *wereerrors || !optguardallclear(&ogrep);
          }
          if (*wereerrors) {
             ae_frame_leave();
@@ -45375,8 +45326,8 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:1466");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:1467");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -45392,7 +45343,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             f0 += x0.xR[i] * b.xR[i];
             f1 += x1.xR[i] * b.xR[i];
          }
-         set_error_flag(wereerrors, !NearAtR(f0, f1, tolf), __FILE__, __LINE__, "testminnlcunit.ap:1486");
+         *wereerrors = *wereerrors || !NearAtR(f0, f1, tolf);
       }
    // Convex/nonconvex optimization problem with excessive
    // (degenerate constraints):
@@ -45520,10 +45471,10 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                   }
                } else ae_assert(false, "Assertion failed");
             minnlcresults(&state, &xs0, &rep);
-            set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:1641");
+            *wereerrors = *wereerrors || rep.terminationtype <= 0;
             if (hqrndnormal(&rs) > 0.0) {
                minnlcoptguardresults(&state, &ogrep);
-               set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:1645");
+               *wereerrors = *wereerrors || !optguardallclear(&ogrep);
             }
             if (*wereerrors) {
                ae_frame_leave();
@@ -45545,7 +45496,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                vv += sqr(v);
             }
             vv = sqrt(vv / (gnrm2 + 1.0));
-            set_error_flag(wereerrors, vv > 1.0E-2, __FILE__, __LINE__, "testminnlcunit.ap:1672");
+            *wereerrors = *wereerrors || vv > 1.0E-2;
          }
       }
    // Linear/convex optimization problem with combination of
@@ -45668,10 +45619,10 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                      }
                   } else ae_assert(false, "Assertion failed");
                minnlcresults(&state, &xs0, &rep);
-               set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:1817");
+               *wereerrors = *wereerrors || rep.terminationtype <= 0;
                if (hqrndnormal(&rs) > 0.0) {
                   minnlcoptguardresults(&state, &ogrep);
-                  set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:1821");
+                  *wereerrors = *wereerrors || !optguardallclear(&ogrep);
                }
                if (*wereerrors) {
                   ae_frame_leave();
@@ -45697,8 +45648,8 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                ae_vector_set_length(&nonnegative, n + ccnt);
                k = 0;
                for (i = 0; i < n; i++) {
-                  set_error_flag(wereerrors, xs0.xR[i] < bl.xR[i] - tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1850");
-                  set_error_flag(wereerrors, xs0.xR[i] > bu.xR[i] + tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1851");
+                  *wereerrors = *wereerrors || xs0.xR[i] < bl.xR[i] - tolconstr;
+                  *wereerrors = *wereerrors || xs0.xR[i] > bu.xR[i] + tolconstr;
                   if (xs0.xR[i] <= bl.xR[i] + tolconstr) {
                      for (j = 0; j < n; j++) {
                         ce.xyR[j][k] = 0.0;
@@ -45721,9 +45672,9 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                for (i = 0; i < ccnt; i++) {
                   v = ae_v_dotproduct(c.xyR[i], 1, xs0.xR, 1, n);
                   v -= c.xyR[i][n];
-                  set_error_flag(wereerrors, ct.xZ[i] == 0 && !SmallAtR(v, tolconstr), __FILE__, __LINE__, "testminnlcunit.ap:1875");
-                  set_error_flag(wereerrors, ct.xZ[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1876");
-                  set_error_flag(wereerrors, ct.xZ[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1877");
+                  *wereerrors = *wereerrors || ct.xZ[i] == 0 && !SmallAtR(v, tolconstr);
+                  *wereerrors = *wereerrors || ct.xZ[i] > 0 && v < -tolconstr;
+                  *wereerrors = *wereerrors || ct.xZ[i] < 0 && v > tolconstr;
                   if (ct.xZ[i] == 0) {
                      for (j = 0; j < n; j++) {
                         ce.xyR[j][k] = c.xyR[i][j];
@@ -45756,7 +45707,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                }
                vv = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
                vv = sqrt(vv);
-               set_error_flag(wereerrors, vv > 1.0E-3, __FILE__, __LINE__, "testminnlcunit.ap:1906");
+               *wereerrors = *wereerrors || vv > 1.0E-3;
             }
          }
       }
@@ -45853,14 +45804,14 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
             state.j.xyR[1][1] = 2 * state.x.xR[1];
          } else ae_assert(false, "Assertion failed");
       minnlcresults(&state, &x1, &rep);
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:1992");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:1993");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, !NearAtR(x1.xR[0], sqrt(2.0) / 2.0, tolx), __FILE__, __LINE__, "testminnlcunit.ap:1996");
-      set_error_flag(wereerrors, !NearAtR(x1.xR[1], sqrt(2.0) / 2.0, tolx), __FILE__, __LINE__, "testminnlcunit.ap:1997");
+      *wereerrors = *wereerrors || !NearAtR(x1.xR[0], sqrt(2.0) / 2.0, tolx);
+      *wereerrors = *wereerrors || !NearAtR(x1.xR[1], sqrt(2.0) / 2.0, tolx);
       minnlcsetnlc(&state, 1, 0);
       minnlcrestartfrom(&state, &x0);
       if (hqrndnormal(&rs) > 0.0) {
@@ -45876,18 +45827,18 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
             state.j.xyR[1][1] = 2 * state.x.xR[1];
          } else ae_assert(false, "Assertion failed");
       minnlcresults(&state, &x1, &rep);
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:2017");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:2018");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (hqrndnormal(&rs) > 0.0) {
          minnlcoptguardresults(&state, &ogrep);
-         set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:2022");
+         *wereerrors = *wereerrors || !optguardallclear(&ogrep);
       }
       if (*wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, !NearAtR(x1.xR[0], sqrt(2.0) / 2.0, tolx), __FILE__, __LINE__, "testminnlcunit.ap:2026");
-      set_error_flag(wereerrors, !NearAtR(x1.xR[1], sqrt(2.0) / 2.0, tolx), __FILE__, __LINE__, "testminnlcunit.ap:2027");
+      *wereerrors = *wereerrors || !NearAtR(x1.xR[0], sqrt(2.0) / 2.0, tolx);
+      *wereerrors = *wereerrors || !NearAtR(x1.xR[1], sqrt(2.0) / 2.0, tolx);
    // This test checks correctness of scaling being applied to nonlinear
    // constraints. We solve bound constrained scaled problem and check
    // that solution is correct.
@@ -45990,11 +45941,11 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   }
                } else ae_assert(false, "Assertion failed");
             minnlcresults(&state, &x1, &rep);
-            set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:2161");
-            set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:2162");
+            *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+            *wereerrors = *wereerrors || rep.terminationtype <= 0;
             if (hqrndnormal(&rs) > 0.0) {
                minnlcoptguardresults(&state, &ogrep);
-               set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:2166");
+               *wereerrors = *wereerrors || !optguardallclear(&ogrep);
             }
             if (*wereerrors) {
                ae_frame_leave();
@@ -46002,8 +45953,8 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
             }
          // Check feasibility properties
             for (i = 0; i < n; i++) {
-               set_error_flag(wereerrors, isfinite(bndl.xR[i]) && x1.xR[i] <= bndl.xR[i] - tolx * s.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:2176");
-               set_error_flag(wereerrors, isfinite(bndu.xR[i]) && x1.xR[i] >= bndu.xR[i] + tolx * s.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:2177");
+               *wereerrors = *wereerrors || isfinite(bndl.xR[i]) && x1.xR[i] <= bndl.xR[i] - tolx * s.xR[i];
+               *wereerrors = *wereerrors || isfinite(bndu.xR[i]) && x1.xR[i] >= bndu.xR[i] + tolx * s.xR[i];
             }
          // Test - calculate scaled constrained gradient at solution,
          // check its norm.
@@ -46023,7 +45974,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                }
                gnorm2 += sqr(g.xR[i]);
             }
-            set_error_flag(wereerrors, gnorm2 > sqr(tolg), __FILE__, __LINE__, "testminnlcunit.ap:2199");
+            *wereerrors = *wereerrors || gnorm2 > sqr(tolg);
          }
       }
    // Complex problem with mix of boundary, linear and nonlinear constraints:
@@ -46214,11 +46165,11 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   ae_assert(knlic == 1 + cntnlec + cntnlic, "Assertion failed");
                } else ae_assert(false, "Assertion failed");
             minnlcresults(&state, &x1, &rep);
-            set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:2430");
-            set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:2431");
+            *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+            *wereerrors = *wereerrors || rep.terminationtype <= 0;
             if (hqrndnormal(&rs) > 0.0) {
                minnlcoptguardresults(&state, &ogrep);
-               set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:2435");
+               *wereerrors = *wereerrors || !optguardallclear(&ogrep);
             }
             if (*wereerrors) {
                ae_frame_leave();
@@ -46233,42 +46184,42 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                }
                if (ckind.xZ[i] == 1) {
                // Bound equality constrained
-                  set_error_flag(wereerrors, !NearAtR(x1.xR[2 * i], bndl.xR[2 * i], tolx), __FILE__, __LINE__, "testminnlcunit.ap:2458");
-                  set_error_flag(wereerrors, !NearAtR(x1.xR[2 * i + 1], bndl.xR[2 * i + 1], tolx), __FILE__, __LINE__, "testminnlcunit.ap:2459");
+                  *wereerrors = *wereerrors || !NearAtR(x1.xR[2 * i], bndl.xR[2 * i], tolx);
+                  *wereerrors = *wereerrors || !NearAtR(x1.xR[2 * i + 1], bndl.xR[2 * i + 1], tolx);
                   continue;
                }
                if (ckind.xZ[i] == 2) {
                // Bound inequality constrained
-                  set_error_flag(wereerrors, x1.xR[2 * i] < bndl.xR[2 * i] - tolx, __FILE__, __LINE__, "testminnlcunit.ap:2467");
-                  set_error_flag(wereerrors, x1.xR[2 * i] > bndu.xR[2 * i] + tolx, __FILE__, __LINE__, "testminnlcunit.ap:2468");
-                  set_error_flag(wereerrors, x1.xR[2 * i + 1] < bndl.xR[2 * i + 1] - tolx, __FILE__, __LINE__, "testminnlcunit.ap:2469");
-                  set_error_flag(wereerrors, x1.xR[2 * i + 1] > bndu.xR[2 * i + 1] + tolx, __FILE__, __LINE__, "testminnlcunit.ap:2470");
+                  *wereerrors = *wereerrors || x1.xR[2 * i] < bndl.xR[2 * i] - tolx;
+                  *wereerrors = *wereerrors || x1.xR[2 * i] > bndu.xR[2 * i] + tolx;
+                  *wereerrors = *wereerrors || x1.xR[2 * i + 1] < bndl.xR[2 * i + 1] - tolx;
+                  *wereerrors = *wereerrors || x1.xR[2 * i + 1] > bndu.xR[2 * i + 1] + tolx;
                   continue;
                }
                if (ckind.xZ[i] == 3) {
                // Linear equality constrained
                   v = x1.xR[2 * i] * c.xyR[klc][2 * i] + x1.xR[2 * i + 1] * c.xyR[klc][2 * i + 1] - c.xyR[klc][n];
-                  set_error_flag(wereerrors, !SmallAtR(v, tolx), __FILE__, __LINE__, "testminnlcunit.ap:2479");
+                  *wereerrors = *wereerrors || !SmallAtR(v, tolx);
                   klc++;
                   continue;
                }
                if (ckind.xZ[i] == 4) {
                // Linear inequality constrained
                   v = x1.xR[2 * i] * c.xyR[klc][2 * i] + x1.xR[2 * i + 1] * c.xyR[klc][2 * i + 1] - c.xyR[klc][n];
-                  set_error_flag(wereerrors, v > tolx, __FILE__, __LINE__, "testminnlcunit.ap:2489");
+                  *wereerrors = *wereerrors || v > tolx;
                   klc++;
                   continue;
                }
                if (ckind.xZ[i] == 5) {
                // Nonlinear equality constrained
                   v = sqr(x1.xR[2 * i]) + sqr(x1.xR[2 * i + 1]) - rnlc.xR[i];
-                  set_error_flag(wereerrors, !SmallAtR(v, tolx), __FILE__, __LINE__, "testminnlcunit.ap:2499");
+                  *wereerrors = *wereerrors || !SmallAtR(v, tolx);
                   continue;
                }
                if (ckind.xZ[i] == 6) {
                // Nonlinear inequality constrained
                   v = sqr(x1.xR[2 * i]) + sqr(x1.xR[2 * i + 1]) - rnlc.xR[i];
-                  set_error_flag(wereerrors, v > tolx, __FILE__, __LINE__, "testminnlcunit.ap:2508");
+                  *wereerrors = *wereerrors || v > tolx;
                   continue;
                }
                ae_assert(false, "Assertion failed");
@@ -46291,7 +46242,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                if (ckind.xZ[i] == 0) {
                // Unconstrained
                   gnorm2 += sqr(g.xR[2 * i]) + sqr(g.xR[2 * i + 1]);
-                  set_error_flag(wereerrors, gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2538");
+                  *wereerrors = *wereerrors || gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0);
                   continue;
                }
                if (ckind.xZ[i] == 1) {
@@ -46299,7 +46250,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   g.xR[2 * i] = 0.0;
                   g.xR[2 * i + 1] = 0.0;
                   gnorm2 += sqr(g.xR[2 * i]) + sqr(g.xR[2 * i + 1]);
-                  set_error_flag(wereerrors, gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2549");
+                  *wereerrors = *wereerrors || gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0);
                   continue;
                }
                if (ckind.xZ[i] == 2) {
@@ -46312,7 +46263,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                      g.xR[2 * i + 1] = 0.0;
                   }
                   gnorm2 += sqr(g.xR[2 * i]) + sqr(g.xR[2 * i + 1]);
-                  set_error_flag(wereerrors, gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2563");
+                  *wereerrors = *wereerrors || gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0);
                   continue;
                }
                if (ckind.xZ[i] == 3) {
@@ -46324,7 +46275,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   g.xR[2 * i + 1] -= c.xyR[klc][2 * i + 1] * (v / vv);
                   klc++;
                   gnorm2 += sqr(g.xR[2 * i]) + sqr(g.xR[2 * i + 1]);
-                  set_error_flag(wereerrors, gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2578");
+                  *wereerrors = *wereerrors || gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0);
                   continue;
                }
                if (ckind.xZ[i] == 4) {
@@ -46339,7 +46290,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   }
                   klc++;
                   gnorm2 += sqr(g.xR[2 * i]) + sqr(g.xR[2 * i + 1]);
-                  set_error_flag(wereerrors, gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2597");
+                  *wereerrors = *wereerrors || gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0);
                   continue;
                }
                if (ckind.xZ[i] == 5) {
@@ -46354,7 +46305,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   g.xR[2 * i] -= vx * v;
                   g.xR[2 * i + 1] -= vy * v;
                   gnorm2 += sqr(g.xR[2 * i]) + sqr(g.xR[2 * i + 1]);
-                  set_error_flag(wereerrors, gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2615");
+                  *wereerrors = *wereerrors || gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0);
                   continue;
                }
                if (ckind.xZ[i] == 6) {
@@ -46373,7 +46324,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                      g.xR[2 * i + 1] -= vy * v;
                   }
                   gnorm2 += sqr(g.xR[2 * i]) + sqr(g.xR[2 * i + 1]);
-                  set_error_flag(wereerrors, gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2638");
+                  *wereerrors = *wereerrors || gnorm2 > sqr(tolg) * rmax2(rawgnorm2, 1.0);
                   continue;
                }
                ae_assert(false, "Assertion failed");
@@ -46475,15 +46426,15 @@ static void testminnlcunit_testother(bool *wereerrors) {
       minnlcequalitypenaltyfunction(v + 2 * h, &fr2, &dfr2, &d2fr2);
       minnlcequalitypenaltyfunction(v, &f0, &df, &d2f);
       ndf = (-fr2 + 8 * fr - 8 * fl + fl2) / (12 * h);
-      set_error_flag(wereerrors, !NearAtR(ndf, df, dtol * rmax2(fabs(ndf), 1.0)), __FILE__, __LINE__, "testminnlcunit.ap:2727");
+      *wereerrors = *wereerrors || !NearAtR(ndf, df, dtol * rmax2(fabs(ndf), 1.0));
       nd2f = (-dfr2 + 8 * dfr - 8 * dfl + dfl2) / (12 * h);
-      set_error_flag(wereerrors, !NearAtR(nd2f, d2f, dtol * rmax2(fabs(nd2f), 1.0)), __FILE__, __LINE__, "testminnlcunit.ap:2729");
+      *wereerrors = *wereerrors || !NearAtR(nd2f, d2f, dtol * rmax2(fabs(nd2f), 1.0));
    // Next point
       v += h;
    }
    minnlcequalitypenaltyfunction(0.0, &f0, &df, &d2f);
-   set_error_flag(wereerrors, f0 != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:2737");
-   set_error_flag(wereerrors, df != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:2738");
+   *wereerrors = *wereerrors || f0 != 0.0;
+   *wereerrors = *wereerrors || df != 0.0;
 // Test inequality penalty function (correctly calculated and smooth)
    h = 1.0E-4;
    v = 0.02;
@@ -46497,15 +46448,15 @@ static void testminnlcunit_testother(bool *wereerrors) {
       minnlcinequalityshiftfunction(v + 2 * h, &fr2, &dfr2, &d2fr2);
       minnlcinequalityshiftfunction(v, &f0, &df, &d2f);
       ndf = (-fr2 + 8 * fr - 8 * fl + fl2) / (12 * h);
-      set_error_flag(wereerrors, !NearAtR(ndf, df, dtol * rmax2(fabs(ndf), 1.0)), __FILE__, __LINE__, "testminnlcunit.ap:2762");
+      *wereerrors = *wereerrors || !NearAtR(ndf, df, dtol * rmax2(fabs(ndf), 1.0));
       nd2f = (-dfr2 + 8 * dfr - 8 * dfl + dfl2) / (12 * h);
-      set_error_flag(wereerrors, !NearAtR(nd2f, d2f, dtol * rmax2(fabs(nd2f), 1.0)), __FILE__, __LINE__, "testminnlcunit.ap:2764");
+      *wereerrors = *wereerrors || !NearAtR(nd2f, d2f, dtol * rmax2(fabs(nd2f), 1.0));
    // Next point
       v += h;
    }
    minnlcinequalityshiftfunction(1.0, &f0, &df, &d2f);
-   set_error_flag(wereerrors, !SmallAtR(f0, 1.0E-6), __FILE__, __LINE__, "testminnlcunit.ap:2772");
-   set_error_flag(wereerrors, !NearAtR(df, -1.0, 1.0E-6), __FILE__, __LINE__, "testminnlcunit.ap:2773");
+   *wereerrors = *wereerrors || !SmallAtR(f0, 1.0E-6);
+   *wereerrors = *wereerrors || !NearAtR(df, -1.0, 1.0E-6);
 // Test different properties shared by all solvers
    for (solvertype = 0; solvertype <= testminnlcunit_maxsolvertype; solvertype++) {
    // Test location reports
@@ -46547,8 +46498,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
          } else if (state.xupdated) {
          // If first point reported, compare with initial one
             if (firstrep) {
-               set_error_flag(wereerrors, !NearAtR(state.x.xR[0], x0.xR[0], 1.0E4 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:2826");
-               set_error_flag(wereerrors, !NearAtR(state.x.xR[1], x0.xR[1], 1.0E4 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:2827");
+               *wereerrors = *wereerrors || !NearAtR(state.x.xR[0], x0.xR[0], 1.0E4 * machineepsilon);
+               *wereerrors = *wereerrors || !NearAtR(state.x.xR[1], x0.xR[1], 1.0E4 * machineepsilon);
             }
             firstrep = false;
          // Save last point
@@ -46556,14 +46507,14 @@ static void testminnlcunit_testother(bool *wereerrors) {
             xlast.xR[1] = state.x.xR[1];
          } else ae_assert(false, "Assertion failed");
       minnlcresults(&state, &x1, &rep);
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:2845");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:2846");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, !NearAtR(x1.xR[0], xlast.xR[0], 1.0E4 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:2849");
-      set_error_flag(wereerrors, !NearAtR(x1.xR[1], xlast.xR[1], 1.0E4 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:2850");
+      *wereerrors = *wereerrors || !NearAtR(x1.xR[0], xlast.xR[0], 1.0E4 * machineepsilon);
+      *wereerrors = *wereerrors || !NearAtR(x1.xR[1], xlast.xR[1], 1.0E4 * machineepsilon);
    // Test numerical differentiation
       aulits = 50;
       rho = 200.0;
@@ -46595,14 +46546,14 @@ static void testminnlcunit_testother(bool *wereerrors) {
             state.fi.xR[1] = sqr(state.x.xR[0]) + sqr(state.x.xR[1]) - 1;
          } else ae_assert(false, "Assertion failed");
       minnlcresults(&state, &x1, &rep);
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:2886");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:2887");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, !NearAtR(x1.xR[0], sqrt(2.0) / 2.0, tolx), __FILE__, __LINE__, "testminnlcunit.ap:2890");
-      set_error_flag(wereerrors, !NearAtR(x1.xR[1], sqrt(2.0) / 2.0, tolx), __FILE__, __LINE__, "testminnlcunit.ap:2891");
+      *wereerrors = *wereerrors || !NearAtR(x1.xR[0], sqrt(2.0) / 2.0, tolx);
+      *wereerrors = *wereerrors || !NearAtR(x1.xR[1], sqrt(2.0) / 2.0, tolx);
    // Test integrity checks for NAN/INF:
    // * algorithm solves optimization problem, which is normal for some time (quadratic)
    // * after 5-th step we choose random component of gradient and consistently spoil
@@ -46677,7 +46628,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
                k++;
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, rep.terminationtype != -8, __FILE__, __LINE__, "testminnlcunit.ap:2984");
+         *wereerrors = *wereerrors || rep.terminationtype != -8;
       }
    // Test that optimizer respects box constraints in all
    // intermediate points:
@@ -46721,8 +46672,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  set_error_flag(wereerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:3039");
-                  set_error_flag(wereerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:3040");
+                  *wereerrors = *wereerrors || state.x.xR[i] < bndl.xR[i];
+                  *wereerrors = *wereerrors || state.x.xR[i] > bndu.xR[i];
                   state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                   state.j.xyR[0][i] = b.xR[i];
                   for (j = 0; j < n; j++) {
@@ -46732,7 +46683,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:3054");
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
       // Check numerical Jacobian
          minnlccreatef(n, &x0, 1.0E-4, &state);
          if (solvertype == 1) {
@@ -46750,8 +46701,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfi) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  set_error_flag(wereerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:3075");
-                  set_error_flag(wereerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:3076");
+                  *wereerrors = *wereerrors || state.x.xR[i] < bndl.xR[i];
+                  *wereerrors = *wereerrors || state.x.xR[i] > bndu.xR[i];
                   state.fi.xR[0] += b.xR[i] * state.x.xR[i];
                   for (j = 0; j < n; j++) {
                      state.fi.xR[0] += 0.5 * state.x.xR[i] * fulla.xyR[i][j] * state.x.xR[j];
@@ -46759,7 +46710,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:3086");
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
       }
    // Test constraint violation reports for completely unconstrained
    // problems and problems with all constraints being satisfied exactly
@@ -46795,22 +46746,22 @@ static void testminnlcunit_testother(bool *wereerrors) {
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
       // Check solution itself
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:3129");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:3130");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(wereerrors, !SmallAtR(x1.xR[i], tolx), __FILE__, __LINE__, "testminnlcunit.ap:3134");
+            *wereerrors = *wereerrors || !SmallAtR(x1.xR[i], tolx);
          }
       // Check constraint violation reports
-         set_error_flag(wereerrors, rep.bcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3139");
-         set_error_flag(wereerrors, rep.bcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3140");
-         set_error_flag(wereerrors, rep.lcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3141");
-         set_error_flag(wereerrors, rep.lcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3142");
-         set_error_flag(wereerrors, rep.nlcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3143");
-         set_error_flag(wereerrors, rep.nlcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3144");
+         *wereerrors = *wereerrors || rep.bcerr != 0.0;
+         *wereerrors = *wereerrors || rep.bcidx != -1;
+         *wereerrors = *wereerrors || rep.lcerr != 0.0;
+         *wereerrors = *wereerrors || rep.lcidx != -1;
+         *wereerrors = *wereerrors || rep.nlcerr != 0.0;
+         *wereerrors = *wereerrors || rep.nlcidx != -1;
       }
       for (pass = 1; pass <= 10; pass++) {
          n = 1 + hqrnduniformi(&rs, 5);
@@ -46866,19 +46817,19 @@ static void testminnlcunit_testother(bool *wereerrors) {
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
       // Check solution itself, calculate reference violation values
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:3209");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:3210");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
          }
       // Check constraint violation reports
-         set_error_flag(wereerrors, rep.bcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3217");
-         set_error_flag(wereerrors, rep.bcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3218");
-         set_error_flag(wereerrors, rep.lcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3219");
-         set_error_flag(wereerrors, rep.lcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3220");
-         set_error_flag(wereerrors, rep.nlcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3221");
-         set_error_flag(wereerrors, rep.nlcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3222");
+         *wereerrors = *wereerrors || rep.bcerr != 0.0;
+         *wereerrors = *wereerrors || rep.bcidx != -1;
+         *wereerrors = *wereerrors || rep.lcerr != 0.0;
+         *wereerrors = *wereerrors || rep.lcidx != -1;
+         *wereerrors = *wereerrors || rep.nlcerr != 0.0;
+         *wereerrors = *wereerrors || rep.nlcidx != -1;
       }
    // Test constraint violation reports for box/linearly constrained
    // problems. We generate a problem which can not satisfy one (and
@@ -46959,8 +46910,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
       // Check solution itself, calculate reference violation values
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:3317");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:3318");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -46969,17 +46920,17 @@ static void testminnlcunit_testother(bool *wereerrors) {
          if (rep.bcerr > 0.0) {
             v = rmax2(bndl.xR[badidx1] - x1.xR[badidx1], x1.xR[badidx1] - bndu.xR[badidx1]);
             v /= s.xR[badidx1];
-            set_error_flag(wereerrors, rep.bcidx != badidx1, __FILE__, __LINE__, "testminnlcunit.ap:3329");
-            set_error_flag(wereerrors, !NearAtR(rep.bcerr, v, 1.0E3 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:3331");
+            *wereerrors = *wereerrors || rep.bcidx != badidx1;
+            *wereerrors = *wereerrors || !NearAtR(rep.bcerr, v, 1.0E3 * machineepsilon);
          } else {
-            set_error_flag(wereerrors, rep.bcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3336");
-            set_error_flag(wereerrors, rep.bcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3337");
-            set_error_flag(wereerrors, x1.xR[badidx1] < bndl.xR[badidx1] || x1.xR[badidx1] > bndu.xR[badidx1], __FILE__, __LINE__, "testminnlcunit.ap:3338");
+            *wereerrors = *wereerrors || rep.bcerr != 0.0;
+            *wereerrors = *wereerrors || rep.bcidx != -1;
+            *wereerrors = *wereerrors || x1.xR[badidx1] < bndl.xR[badidx1] || x1.xR[badidx1] > bndu.xR[badidx1];
          }
-         set_error_flag(wereerrors, rep.lcidx != badidx0, __FILE__, __LINE__, "testminnlcunit.ap:3340");
-         set_error_flag(wereerrors, !NearAtR(rep.lcerr, fabs(x1.xR[badidx1] - c.xyR[badidx0][n]) / s.xR[badidx1], 1.0E3 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:3341");
-         set_error_flag(wereerrors, rep.nlcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3342");
-         set_error_flag(wereerrors, rep.nlcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3343");
+         *wereerrors = *wereerrors || rep.lcidx != badidx0;
+         *wereerrors = *wereerrors || !NearAtR(rep.lcerr, fabs(x1.xR[badidx1] - c.xyR[badidx0][n]) / s.xR[badidx1], 1.0E3 * machineepsilon);
+         *wereerrors = *wereerrors || rep.nlcerr != 0.0;
+         *wereerrors = *wereerrors || rep.nlcidx != -1;
       }
    // Test constraint violation reports for box/nonlinearly constrained
    // problems. We generate a problem which can not satisfy one (and
@@ -47066,8 +47017,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
       // Check solution itself, calculate reference violation values
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:3446");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:3447");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -47077,18 +47028,18 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (rep.bcerr > 0.0) {
                v = rmax2(bndl.xR[badidx0] - x1.xR[badidx0], x1.xR[badidx0] - bndu.xR[badidx0]);
                v /= s.xR[badidx0];
-               set_error_flag(wereerrors, rep.bcidx != badidx0, __FILE__, __LINE__, "testminnlcunit.ap:3460");
-               set_error_flag(wereerrors, !NearAtR(rep.bcerr, v, 1.0E3 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:3462");
+               *wereerrors = *wereerrors || rep.bcidx != badidx0;
+               *wereerrors = *wereerrors || !NearAtR(rep.bcerr, v, 1.0E3 * machineepsilon);
             } else {
-               set_error_flag(wereerrors, rep.bcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3467");
-               set_error_flag(wereerrors, rep.bcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3468");
-               set_error_flag(wereerrors, x1.xR[badidx0] < bndl.xR[badidx0] || x1.xR[badidx0] > bndu.xR[badidx0], __FILE__, __LINE__, "testminnlcunit.ap:3469");
+               *wereerrors = *wereerrors || rep.bcerr != 0.0;
+               *wereerrors = *wereerrors || rep.bcidx != -1;
+               *wereerrors = *wereerrors || x1.xR[badidx0] < bndl.xR[badidx0] || x1.xR[badidx0] > bndu.xR[badidx0];
             }
          }
-         set_error_flag(wereerrors, rep.lcidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3472");
-         set_error_flag(wereerrors, rep.lcerr != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:3473");
-         set_error_flag(wereerrors, rep.nlcidx != badidx0, __FILE__, __LINE__, "testminnlcunit.ap:3474");
-         set_error_flag(wereerrors, !NearAtR(rep.nlcerr, fabs(x1.xR[badidx0] - c.xyR[badidx0][n]), 1.0E4 * machineepsilon), __FILE__, __LINE__, "testminnlcunit.ap:3475");
+         *wereerrors = *wereerrors || rep.lcidx != -1;
+         *wereerrors = *wereerrors || rep.lcerr != 0.0;
+         *wereerrors = *wereerrors || rep.nlcidx != badidx0;
+         *wereerrors = *wereerrors || !NearAtR(rep.nlcerr, fabs(x1.xR[badidx0] - c.xyR[badidx0][n]), 1.0E4 * machineepsilon);
       }
    // Test support for termination requests:
    // * to terminate with correct return code = 8
@@ -47139,9 +47090,9 @@ static void testminnlcunit_testother(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, rep.terminationtype != 8, __FILE__, __LINE__, "testminnlcunit.ap:3532");
+         *wereerrors = *wereerrors || rep.terminationtype != 8;
          for (i = 0; i < n; i++) {
-            set_error_flag(wereerrors, x1.xR[i] != xlast.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:3534");
+            *wereerrors = *wereerrors || x1.xR[i] != xlast.xR[i];
          }
       }
    }
@@ -47239,8 +47190,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:3658");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:3659");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -47272,8 +47223,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:3699");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:3700");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -47305,8 +47256,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:3740");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:3741");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -47338,8 +47289,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:3781");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:3782");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -47351,9 +47302,9 @@ static void testminnlcunit_testother(bool *wereerrors) {
    // Preconditioners must be significantly different,
    // with exact being best one, inexact being second,
    // "none" being worst option.
-      set_error_flag(wereerrors, !(nexactlowrank < 0.9 * nlbfgs), __FILE__, __LINE__, "testminnlcunit.ap:3795");
-      set_error_flag(wereerrors, !(nexactrobust < 0.9 * nlbfgs), __FILE__, __LINE__, "testminnlcunit.ap:3796");
-      set_error_flag(wereerrors, !(nlbfgs < 0.9 * nnone), __FILE__, __LINE__, "testminnlcunit.ap:3797");
+      *wereerrors = *wereerrors || !(nexactlowrank < 0.9 * nlbfgs);
+      *wereerrors = *wereerrors || !(nexactrobust < 0.9 * nlbfgs);
+      *wereerrors = *wereerrors || !(nlbfgs < 0.9 * nnone);
    }
    ae_frame_leave();
 }
@@ -47445,12 +47396,12 @@ static void testminnlcunit_testbugs(bool *wereerrors) {
             }
          } else ae_assert(false, "Assertion failed");
       minnlcresults(&state, &x1, &rep);
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:4949");
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, x1.xR[0] > -1.0E6, __FILE__, __LINE__, "testminnlcunit.ap:4952");
+      *wereerrors = *wereerrors || x1.xR[0] > -1.0E6;
       minnlccreate(n, &x0, &state);
       state.stabilizingpoint = -1.0E2;
       state.initialinequalitymultiplier = 1.0E-12;
@@ -47475,12 +47426,12 @@ static void testminnlcunit_testbugs(bool *wereerrors) {
             }
          } else ae_assert(false, "Assertion failed");
       minnlcresults(&state, &x1, &rep);
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:4981");
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, x1.xR[0] < 3 * state.stabilizingpoint, __FILE__, __LINE__, "testminnlcunit.ap:4984");
+      *wereerrors = *wereerrors || x1.xR[0] < 3 * state.stabilizingpoint;
       minnlccreate(n, &x0, &state);
       minnlcsetalgoaul(&state, rho, aulits);
       minnlcsetcond(&state, 0.0, maxits);
@@ -47503,12 +47454,12 @@ static void testminnlcunit_testbugs(bool *wereerrors) {
             }
          } else ae_assert(false, "Assertion failed");
       minnlcresults(&state, &x1, &rep);
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:5011");
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, x1.xR[0] < 3 * state.stabilizingpoint, __FILE__, __LINE__, "testminnlcunit.ap:5014");
+      *wereerrors = *wereerrors || x1.xR[0] < 3 * state.stabilizingpoint;
    }
 // This test checks report by E. Pozamantir. Relevant for SLP
 // and related methods, but we test it for all algorithms.
@@ -47581,8 +47532,8 @@ static void testminnlcunit_testbugs(bool *wereerrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnlcresults(&state, &x1, &rep);
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:5101");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:5102");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -47605,25 +47556,25 @@ static void testminnlcunit_testoptguardc1test0reportfortask0(bool *err, optguard
    bool hasc1discontinuities;
    if (rep->positive) {
    // Check positive report, first checks
-      set_error_flag(err, rep->fidx != 0, __FILE__, __LINE__, "testminnlcunit.ap:5131");
-      set_error_flag(err, rep->n != n, __FILE__, __LINE__, "testminnlcunit.ap:5132");
-      set_error_flag(err, !(0 <= rep->stpidxa), __FILE__, __LINE__, "testminnlcunit.ap:5133");
-      set_error_flag(err, !(rep->stpidxa < rep->stpidxb), __FILE__, __LINE__, "testminnlcunit.ap:5134");
-      set_error_flag(err, !(rep->stpidxb < rep->cnt), __FILE__, __LINE__, "testminnlcunit.ap:5135");
-      set_error_flag(err, rep->x0.cnt != rep->n, __FILE__, __LINE__, "testminnlcunit.ap:5136");
-      set_error_flag(err, rep->d.cnt != rep->n, __FILE__, __LINE__, "testminnlcunit.ap:5137");
-      set_error_flag(err, rep->stp.cnt != rep->cnt, __FILE__, __LINE__, "testminnlcunit.ap:5138");
-      set_error_flag(err, rep->f.cnt != rep->cnt, __FILE__, __LINE__, "testminnlcunit.ap:5139");
-      set_error_flag(err, !isfinitevector(&rep->x0, n), __FILE__, __LINE__, "testminnlcunit.ap:5140");
-      set_error_flag(err, !isfinitevector(&rep->d, n), __FILE__, __LINE__, "testminnlcunit.ap:5141");
-      set_error_flag(err, !isfinitevector(&rep->stp, rep->cnt), __FILE__, __LINE__, "testminnlcunit.ap:5142");
-      set_error_flag(err, !isfinitevector(&rep->f, rep->cnt), __FILE__, __LINE__, "testminnlcunit.ap:5143");
+      *err = *err || rep->fidx != 0;
+      *err = *err || rep->n != n;
+      *err = *err || !(0 <= rep->stpidxa);
+      *err = *err || !(rep->stpidxa < rep->stpidxb);
+      *err = *err || !(rep->stpidxb < rep->cnt);
+      *err = *err || rep->x0.cnt != rep->n;
+      *err = *err || rep->d.cnt != rep->n;
+      *err = *err || rep->stp.cnt != rep->cnt;
+      *err = *err || rep->f.cnt != rep->cnt;
+      *err = *err || !isfinitevector(&rep->x0, n);
+      *err = *err || !isfinitevector(&rep->d, n);
+      *err = *err || !isfinitevector(&rep->stp, rep->cnt);
+      *err = *err || !isfinitevector(&rep->f, rep->cnt);
       if (*err) {
          return;
       }
    // Check consistency of Stp.
       for (k = 0; k < rep->cnt - 1; k++) {
-         set_error_flag(err, rep->stp.xR[k] >= rep->stp.xR[k + 1], __FILE__, __LINE__, "testminnlcunit.ap:5151");
+         *err = *err || rep->stp.xR[k] >= rep->stp.xR[k + 1];
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -47636,18 +47587,18 @@ static void testminnlcunit_testoptguardc1test0reportfortask0(bool *err, optguard
          }
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
-      set_error_flag(err, !hasc1discontinuities, __FILE__, __LINE__, "testminnlcunit.ap:5168");
+      *err = *err || !hasc1discontinuities;
    } else {
    // Check negative report: fields must be empty
-      set_error_flag(err, rep->stpidxa != -1, __FILE__, __LINE__, "testminnlcunit.ap:5175");
-      set_error_flag(err, rep->stpidxb != -1, __FILE__, __LINE__, "testminnlcunit.ap:5176");
-      set_error_flag(err, rep->fidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:5177");
-      set_error_flag(err, rep->cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5178");
-      set_error_flag(err, rep->n != 0, __FILE__, __LINE__, "testminnlcunit.ap:5179");
-      set_error_flag(err, rep->x0.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5180");
-      set_error_flag(err, rep->d.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5181");
-      set_error_flag(err, rep->stp.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5182");
-      set_error_flag(err, rep->f.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5183");
+      *err = *err || rep->stpidxa != -1;
+      *err = *err || rep->stpidxb != -1;
+      *err = *err || rep->fidx != -1;
+      *err = *err || rep->cnt != 0;
+      *err = *err || rep->n != 0;
+      *err = *err || rep->x0.cnt != 0;
+      *err = *err || rep->d.cnt != 0;
+      *err = *err || rep->stp.cnt != 0;
+      *err = *err || rep->f.cnt != 0;
    }
 }
 
@@ -47665,27 +47616,27 @@ static void testminnlcunit_testoptguardc1test1reportfortask0(bool *err, optguard
    bool hasc1discontinuities;
    if (rep->positive) {
    // Check positive report, first checks
-      set_error_flag(err, rep->fidx != 0, __FILE__, __LINE__, "testminnlcunit.ap:5211");
-      set_error_flag(err, rep->vidx < 0, __FILE__, __LINE__, "testminnlcunit.ap:5212");
-      set_error_flag(err, rep->vidx > n, __FILE__, __LINE__, "testminnlcunit.ap:5213");
-      set_error_flag(err, rep->n != n, __FILE__, __LINE__, "testminnlcunit.ap:5214");
-      set_error_flag(err, !(0 <= rep->stpidxa), __FILE__, __LINE__, "testminnlcunit.ap:5215");
-      set_error_flag(err, !(rep->stpidxa < rep->stpidxb), __FILE__, __LINE__, "testminnlcunit.ap:5216");
-      set_error_flag(err, !(rep->stpidxb < rep->cnt), __FILE__, __LINE__, "testminnlcunit.ap:5217");
-      set_error_flag(err, rep->x0.cnt != rep->n, __FILE__, __LINE__, "testminnlcunit.ap:5218");
-      set_error_flag(err, rep->d.cnt != rep->n, __FILE__, __LINE__, "testminnlcunit.ap:5219");
-      set_error_flag(err, rep->stp.cnt != rep->cnt, __FILE__, __LINE__, "testminnlcunit.ap:5220");
-      set_error_flag(err, rep->g.cnt != rep->cnt, __FILE__, __LINE__, "testminnlcunit.ap:5221");
-      set_error_flag(err, !isfinitevector(&rep->x0, n), __FILE__, __LINE__, "testminnlcunit.ap:5222");
-      set_error_flag(err, !isfinitevector(&rep->d, n), __FILE__, __LINE__, "testminnlcunit.ap:5223");
-      set_error_flag(err, !isfinitevector(&rep->stp, rep->cnt), __FILE__, __LINE__, "testminnlcunit.ap:5224");
-      set_error_flag(err, !isfinitevector(&rep->g, rep->cnt), __FILE__, __LINE__, "testminnlcunit.ap:5225");
+      *err = *err || rep->fidx != 0;
+      *err = *err || rep->vidx < 0;
+      *err = *err || rep->vidx > n;
+      *err = *err || rep->n != n;
+      *err = *err || !(0 <= rep->stpidxa);
+      *err = *err || !(rep->stpidxa < rep->stpidxb);
+      *err = *err || !(rep->stpidxb < rep->cnt);
+      *err = *err || rep->x0.cnt != rep->n;
+      *err = *err || rep->d.cnt != rep->n;
+      *err = *err || rep->stp.cnt != rep->cnt;
+      *err = *err || rep->g.cnt != rep->cnt;
+      *err = *err || !isfinitevector(&rep->x0, n);
+      *err = *err || !isfinitevector(&rep->d, n);
+      *err = *err || !isfinitevector(&rep->stp, rep->cnt);
+      *err = *err || !isfinitevector(&rep->g, rep->cnt);
       if (*err) {
          return;
       }
    // Check consistency of Stp
       for (k = 0; k < rep->cnt - 1; k++) {
-         set_error_flag(err, rep->stp.xR[k] >= rep->stp.xR[k + 1], __FILE__, __LINE__, "testminnlcunit.ap:5233");
+         *err = *err || rep->stp.xR[k] >= rep->stp.xR[k + 1];
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       tooclose = false;
@@ -47701,20 +47652,20 @@ static void testminnlcunit_testoptguardc1test1reportfortask0(bool *err, optguard
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
-         set_error_flag(err, !hasc1discontinuities, __FILE__, __LINE__, "testminnlcunit.ap:5253");
+         *err = *err || !hasc1discontinuities;
       }
    } else {
    // Check negative report: fields must be empty
-      set_error_flag(err, rep->stpidxa != -1, __FILE__, __LINE__, "testminnlcunit.ap:5260");
-      set_error_flag(err, rep->stpidxb != -1, __FILE__, __LINE__, "testminnlcunit.ap:5261");
-      set_error_flag(err, rep->fidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:5262");
-      set_error_flag(err, rep->vidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:5263");
-      set_error_flag(err, rep->cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5264");
-      set_error_flag(err, rep->n != 0, __FILE__, __LINE__, "testminnlcunit.ap:5265");
-      set_error_flag(err, rep->x0.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5266");
-      set_error_flag(err, rep->d.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5267");
-      set_error_flag(err, rep->stp.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5268");
-      set_error_flag(err, rep->g.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5269");
+      *err = *err || rep->stpidxa != -1;
+      *err = *err || rep->stpidxb != -1;
+      *err = *err || rep->fidx != -1;
+      *err = *err || rep->vidx != -1;
+      *err = *err || rep->cnt != 0;
+      *err = *err || rep->n != 0;
+      *err = *err || rep->x0.cnt != 0;
+      *err = *err || rep->d.cnt != 0;
+      *err = *err || rep->stp.cnt != 0;
+      *err = *err || rep->g.cnt != 0;
    }
 }
 
@@ -47725,33 +47676,33 @@ static void testminnlcunit_testoptguardc1test1reportfortask0(bool *err, optguard
 static void testminnlcunit_testoptguardc1test0reportfortask1(bool *err, optguardnonc1test0report *rep, RMatrix *a, ae_int_t n, ae_int_t goodidx) {
    if (rep->positive) {
    // Check positive report, first checks
-      set_error_flag(err, rep->fidx == goodidx + 1, __FILE__, __LINE__, "testminnlcunit.ap:5293");
-      set_error_flag(err, rep->n != n, __FILE__, __LINE__, "testminnlcunit.ap:5294");
-      set_error_flag(err, !(0 <= rep->stpidxa), __FILE__, __LINE__, "testminnlcunit.ap:5295");
-      set_error_flag(err, !(rep->stpidxa < rep->stpidxb), __FILE__, __LINE__, "testminnlcunit.ap:5296");
-      set_error_flag(err, !(rep->stpidxb < rep->cnt), __FILE__, __LINE__, "testminnlcunit.ap:5297");
-      set_error_flag(err, rep->x0.cnt != rep->n, __FILE__, __LINE__, "testminnlcunit.ap:5298");
-      set_error_flag(err, rep->d.cnt != rep->n, __FILE__, __LINE__, "testminnlcunit.ap:5299");
-      set_error_flag(err, rep->stp.cnt != rep->cnt, __FILE__, __LINE__, "testminnlcunit.ap:5300");
-      set_error_flag(err, rep->f.cnt != rep->cnt, __FILE__, __LINE__, "testminnlcunit.ap:5301");
-      set_error_flag(err, !isfinitevector(&rep->x0, n), __FILE__, __LINE__, "testminnlcunit.ap:5302");
-      set_error_flag(err, !isfinitevector(&rep->d, n), __FILE__, __LINE__, "testminnlcunit.ap:5303");
-      set_error_flag(err, !isfinitevector(&rep->stp, rep->cnt), __FILE__, __LINE__, "testminnlcunit.ap:5304");
-      set_error_flag(err, !isfinitevector(&rep->f, rep->cnt), __FILE__, __LINE__, "testminnlcunit.ap:5305");
+      *err = *err || rep->fidx == goodidx + 1;
+      *err = *err || rep->n != n;
+      *err = *err || !(0 <= rep->stpidxa);
+      *err = *err || !(rep->stpidxa < rep->stpidxb);
+      *err = *err || !(rep->stpidxb < rep->cnt);
+      *err = *err || rep->x0.cnt != rep->n;
+      *err = *err || rep->d.cnt != rep->n;
+      *err = *err || rep->stp.cnt != rep->cnt;
+      *err = *err || rep->f.cnt != rep->cnt;
+      *err = *err || !isfinitevector(&rep->x0, n);
+      *err = *err || !isfinitevector(&rep->d, n);
+      *err = *err || !isfinitevector(&rep->stp, rep->cnt);
+      *err = *err || !isfinitevector(&rep->f, rep->cnt);
       if (*err) {
          return;
       }
    } else {
    // Check negative report: fields must be empty
-      set_error_flag(err, rep->stpidxa != -1, __FILE__, __LINE__, "testminnlcunit.ap:5314");
-      set_error_flag(err, rep->stpidxb != -1, __FILE__, __LINE__, "testminnlcunit.ap:5315");
-      set_error_flag(err, rep->fidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:5316");
-      set_error_flag(err, rep->cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5317");
-      set_error_flag(err, rep->n != 0, __FILE__, __LINE__, "testminnlcunit.ap:5318");
-      set_error_flag(err, rep->x0.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5319");
-      set_error_flag(err, rep->d.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5320");
-      set_error_flag(err, rep->stp.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5321");
-      set_error_flag(err, rep->f.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5322");
+      *err = *err || rep->stpidxa != -1;
+      *err = *err || rep->stpidxb != -1;
+      *err = *err || rep->fidx != -1;
+      *err = *err || rep->cnt != 0;
+      *err = *err || rep->n != 0;
+      *err = *err || rep->x0.cnt != 0;
+      *err = *err || rep->d.cnt != 0;
+      *err = *err || rep->stp.cnt != 0;
+      *err = *err || rep->f.cnt != 0;
    }
 }
 
@@ -47761,36 +47712,36 @@ static void testminnlcunit_testoptguardc1test0reportfortask1(bool *err, optguard
 static void testminnlcunit_testoptguardc1test1reportfortask1(bool *err, optguardnonc1test1report *rep, RMatrix *a, ae_int_t n, ae_int_t goodidx) {
    if (rep->positive) {
    // Check positive report, first checks
-      set_error_flag(err, rep->fidx == goodidx + 1, __FILE__, __LINE__, "testminnlcunit.ap:5345");
-      set_error_flag(err, rep->vidx < 0, __FILE__, __LINE__, "testminnlcunit.ap:5346");
-      set_error_flag(err, rep->vidx > n, __FILE__, __LINE__, "testminnlcunit.ap:5347");
-      set_error_flag(err, rep->n != n, __FILE__, __LINE__, "testminnlcunit.ap:5348");
-      set_error_flag(err, !(0 <= rep->stpidxa), __FILE__, __LINE__, "testminnlcunit.ap:5349");
-      set_error_flag(err, !(rep->stpidxa < rep->stpidxb), __FILE__, __LINE__, "testminnlcunit.ap:5350");
-      set_error_flag(err, !(rep->stpidxb < rep->cnt), __FILE__, __LINE__, "testminnlcunit.ap:5351");
-      set_error_flag(err, rep->x0.cnt != rep->n, __FILE__, __LINE__, "testminnlcunit.ap:5352");
-      set_error_flag(err, rep->d.cnt != rep->n, __FILE__, __LINE__, "testminnlcunit.ap:5353");
-      set_error_flag(err, rep->stp.cnt != rep->cnt, __FILE__, __LINE__, "testminnlcunit.ap:5354");
-      set_error_flag(err, rep->g.cnt != rep->cnt, __FILE__, __LINE__, "testminnlcunit.ap:5355");
-      set_error_flag(err, !isfinitevector(&rep->x0, n), __FILE__, __LINE__, "testminnlcunit.ap:5356");
-      set_error_flag(err, !isfinitevector(&rep->d, n), __FILE__, __LINE__, "testminnlcunit.ap:5357");
-      set_error_flag(err, !isfinitevector(&rep->stp, rep->cnt), __FILE__, __LINE__, "testminnlcunit.ap:5358");
-      set_error_flag(err, !isfinitevector(&rep->g, rep->cnt), __FILE__, __LINE__, "testminnlcunit.ap:5359");
+      *err = *err || rep->fidx == goodidx + 1;
+      *err = *err || rep->vidx < 0;
+      *err = *err || rep->vidx > n;
+      *err = *err || rep->n != n;
+      *err = *err || !(0 <= rep->stpidxa);
+      *err = *err || !(rep->stpidxa < rep->stpidxb);
+      *err = *err || !(rep->stpidxb < rep->cnt);
+      *err = *err || rep->x0.cnt != rep->n;
+      *err = *err || rep->d.cnt != rep->n;
+      *err = *err || rep->stp.cnt != rep->cnt;
+      *err = *err || rep->g.cnt != rep->cnt;
+      *err = *err || !isfinitevector(&rep->x0, n);
+      *err = *err || !isfinitevector(&rep->d, n);
+      *err = *err || !isfinitevector(&rep->stp, rep->cnt);
+      *err = *err || !isfinitevector(&rep->g, rep->cnt);
       if (*err) {
          return;
       }
    } else {
    // Check negative report: fields must be empty
-      set_error_flag(err, rep->stpidxa != -1, __FILE__, __LINE__, "testminnlcunit.ap:5368");
-      set_error_flag(err, rep->stpidxb != -1, __FILE__, __LINE__, "testminnlcunit.ap:5369");
-      set_error_flag(err, rep->fidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:5370");
-      set_error_flag(err, rep->vidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:5371");
-      set_error_flag(err, rep->cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5372");
-      set_error_flag(err, rep->n != 0, __FILE__, __LINE__, "testminnlcunit.ap:5373");
-      set_error_flag(err, rep->x0.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5374");
-      set_error_flag(err, rep->d.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5375");
-      set_error_flag(err, rep->stp.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5376");
-      set_error_flag(err, rep->g.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:5377");
+      *err = *err || rep->stpidxa != -1;
+      *err = *err || rep->stpidxb != -1;
+      *err = *err || rep->fidx != -1;
+      *err = *err || rep->vidx != -1;
+      *err = *err || rep->cnt != 0;
+      *err = *err || rep->n != 0;
+      *err = *err || rep->x0.cnt != 0;
+      *err = *err || rep->d.cnt != 0;
+      *err = *err || rep->stp.cnt != 0;
+      *err = *err || rep->g.cnt != 0;
    }
 }
 
@@ -47910,24 +47861,24 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          } else ae_assert(false, "Assertion failed");
       minnlcresults(&state, &x1, &rep);
       minnlcoptguardresults(&state, &ogrep);
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:3909");
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:3910");
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
       if (*wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, ogrep.badgradxbase.cnt != 0, __FILE__, __LINE__, "testminnlcunit.ap:3913");
-      set_error_flag(wereerrors, ogrep.badgraduser.rows != 0, __FILE__, __LINE__, "testminnlcunit.ap:3914");
-      set_error_flag(wereerrors, ogrep.badgraduser.cols != 0, __FILE__, __LINE__, "testminnlcunit.ap:3915");
-      set_error_flag(wereerrors, ogrep.badgradnum.rows != 0, __FILE__, __LINE__, "testminnlcunit.ap:3916");
-      set_error_flag(wereerrors, ogrep.badgradnum.cols != 0, __FILE__, __LINE__, "testminnlcunit.ap:3917");
+      *wereerrors = *wereerrors || ogrep.badgradxbase.cnt != 0;
+      *wereerrors = *wereerrors || ogrep.badgraduser.rows != 0;
+      *wereerrors = *wereerrors || ogrep.badgraduser.cols != 0;
+      *wereerrors = *wereerrors || ogrep.badgradnum.rows != 0;
+      *wereerrors = *wereerrors || ogrep.badgradnum.cols != 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, ogrep.badgradsuspected, __FILE__, __LINE__, "testminnlcunit.ap:3920");
-      set_error_flag(wereerrors, ogrep.badgradfidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3921");
-      set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:3922");
+      *wereerrors = *wereerrors || ogrep.badgradsuspected;
+      *wereerrors = *wereerrors || ogrep.badgradfidx != -1;
+      *wereerrors = *wereerrors || ogrep.badgradvidx != -1;
    // Test that C0/C1 continuity monitoring is disabled by default;
    // we solve nonsmooth problem and test that nothing is returned
    // by OptGuard.
@@ -47977,19 +47928,19 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          } else ae_assert(false, "Assertion failed");
       minnlcresults(&state, &x1, &rep);
       minnlcoptguardresults(&state, &ogrep);
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:3970");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:3971");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
       }
-      set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminnlcunit.ap:3974");
-      set_error_flag(wereerrors, ogrep.nonc1suspected, __FILE__, __LINE__, "testminnlcunit.ap:3975");
-      set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:3976");
-      set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminnlcunit.ap:3977");
-      set_error_flag(wereerrors, ogrep.nonc1fidx >= 0, __FILE__, __LINE__, "testminnlcunit.ap:3978");
-      set_error_flag(wereerrors, ogrep.nonc1test0positive, __FILE__, __LINE__, "testminnlcunit.ap:3979");
-      set_error_flag(wereerrors, ogrep.nonc1test1positive, __FILE__, __LINE__, "testminnlcunit.ap:3980");
+      *wereerrors = *wereerrors || ogrep.nonc0suspected;
+      *wereerrors = *wereerrors || ogrep.nonc1suspected;
+      *wereerrors = *wereerrors || !optguardallclear(&ogrep);
+      *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
+      *wereerrors = *wereerrors || ogrep.nonc1fidx >= 0;
+      *wereerrors = *wereerrors || ogrep.nonc1test0positive;
+      *wereerrors = *wereerrors || ogrep.nonc1test1positive;
    // Test gradient checking functionality, try various
    // defect types:
    // * accidental zeroing of some gradient component
@@ -48044,8 +47995,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                   if (state.needfij) {
                      if (solvertype != 0) {
                         for (i = 0; i < n; i++) {
-                           set_error_flag(wereerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:4040");
-                           set_error_flag(wereerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnlcunit.ap:4041");
+                           *wereerrors = *wereerrors || state.x.xR[i] < bndl.xR[i];
+                           *wereerrors = *wereerrors || state.x.xR[i] > bndu.xR[i];
                         }
                      }
                      state.fi.xR[0] = 0.0;
@@ -48083,14 +48034,14 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                minnlcresults(&state, &x1, &rep);
                minnlcoptguardresults(&state, &ogrep);
             // Check that something is returned
-               set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:4091");
-               set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:4092");
+               *wereerrors = *wereerrors || rep.terminationtype <= 0;
+               *wereerrors = *wereerrors || !isfinitevector(&x1, n);
                if (*wereerrors) {
                   ae_frame_leave();
                   return;
                }
             // Compute reference values for true and spoiled Jacobian at X0
-               set_error_flag(wereerrors, !isfinitevector(&ogrep.badgradxbase, n), __FILE__, __LINE__, "testminnlcunit.ap:4099");
+               *wereerrors = *wereerrors || !isfinitevector(&ogrep.badgradxbase, n);
                if (*wereerrors) {
                   ae_frame_leave();
                   return;
@@ -48129,25 +48080,25 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                   jacdefect.xyR[1][i] /= s.xR[i];
                }
             // Check OptGuard report
-               set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgraduser, 2, n), __FILE__, __LINE__, "testminnlcunit.ap:4137");
-               set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgradnum, 2, n), __FILE__, __LINE__, "testminnlcunit.ap:4138");
+               *wereerrors = *wereerrors || !apservisfinitematrix(&ogrep.badgraduser, 2, n);
+               *wereerrors = *wereerrors || !apservisfinitematrix(&ogrep.badgradnum, 2, n);
                if (*wereerrors) {
                   ae_frame_leave();
                   return;
                }
                if (defecttype >= 0) {
-                  set_error_flag(wereerrors, !ogrep.badgradsuspected, __FILE__, __LINE__, "testminnlcunit.ap:4143");
-                  set_error_flag(wereerrors, ogrep.badgradfidx != funcidx, __FILE__, __LINE__, "testminnlcunit.ap:4144");
-                  set_error_flag(wereerrors, ogrep.badgradvidx != varidx, __FILE__, __LINE__, "testminnlcunit.ap:4145");
+                  *wereerrors = *wereerrors || !ogrep.badgradsuspected;
+                  *wereerrors = *wereerrors || ogrep.badgradfidx != funcidx;
+                  *wereerrors = *wereerrors || ogrep.badgradvidx != varidx;
                } else {
-                  set_error_flag(wereerrors, ogrep.badgradsuspected, __FILE__, __LINE__, "testminnlcunit.ap:4149");
-                  set_error_flag(wereerrors, ogrep.badgradfidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:4150");
-                  set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminnlcunit.ap:4151");
+                  *wereerrors = *wereerrors || ogrep.badgradsuspected;
+                  *wereerrors = *wereerrors || ogrep.badgradfidx != -1;
+                  *wereerrors = *wereerrors || ogrep.badgradvidx != -1;
                }
                for (i = 0; i <= 1; i++) {
                   for (j = 0; j < n; j++) {
-                     set_error_flag(wereerrors, !NearAtR(jactrue.xyR[i][j], ogrep.badgradnum.xyR[i][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminnlcunit.ap:4156");
-                     set_error_flag(wereerrors, !NearAtR(jacdefect.xyR[i][j], ogrep.badgraduser.xyR[i][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminnlcunit.ap:4157");
+                     *wereerrors = *wereerrors || !NearAtR(jactrue.xyR[i][j], ogrep.badgradnum.xyR[i][j], 0.01 / s.xR[j]);
+                     *wereerrors = *wereerrors || !NearAtR(jacdefect.xyR[i][j], ogrep.badgraduser.xyR[i][j], 0.01 / s.xR[j]);
                   }
                }
             }
@@ -48202,14 +48153,14 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             }
          } else ae_assert(false, "Assertion failed");
       minnlcresults(&state, &x1, &rep);
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:4215");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:4216");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
       }
       minnlcoptguardresults(&state, &ogrep);
-      set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:4220");
+      *wereerrors = *wereerrors || !optguardallclear(&ogrep);
    }
 // Test functionality which works only in some NLC solvers
    for (solvertype = 0; solvertype <= testminnlcunit_maxsolvertype; solvertype++) {
@@ -48356,8 +48307,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             minnlcresults(&state, &x1, &rep);
             minnlcoptguardresults(&state, &ogrep);
          // Check basic properties of the solution
-            set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:4397");
-            set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:4398");
+            *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+            *wereerrors = *wereerrors || rep.terminationtype <= 0;
             if (*wereerrors) {
                ae_frame_leave();
                return;
@@ -48365,18 +48316,18 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          // Check OptGuard report, increase
             if (defecttype == 0) {
                if (wasgoodlinesearch0) {
-                  set_error_flag(wereerrors, optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:4409");
-                  set_error_flag(wereerrors, !ogrep.nonc0suspected, __FILE__, __LINE__, "testminnlcunit.ap:4410");
-                  set_error_flag(wereerrors, ogrep.nonc0fidx != 0, __FILE__, __LINE__, "testminnlcunit.ap:4411");
+                  *wereerrors = *wereerrors || optguardallclear(&ogrep);
+                  *wereerrors = *wereerrors || !ogrep.nonc0suspected;
+                  *wereerrors = *wereerrors || ogrep.nonc0fidx != 0;
                } else {
                   shortsessions++;
                }
             }
             if (defecttype == 1) {
                if (wasgoodlinesearch1) {
-                  set_error_flag(wereerrors, optguardallclear(&ogrep), __FILE__, __LINE__, "testminnlcunit.ap:4420");
-                  set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminnlcunit.ap:4421");
-                  set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminnlcunit.ap:4422");
+                  *wereerrors = *wereerrors || optguardallclear(&ogrep);
+                  *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+                  *wereerrors = *wereerrors || ogrep.nonc1fidx != 0;
                } else {
                   shortsessions++;
                }
@@ -48387,7 +48338,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             }
          }
       // Check that short optimization sessions are rare.
-         set_error_flag(wereerrors, shortsessions > maxshortsessions, __FILE__, __LINE__, "testminnlcunit.ap:4434");
+         *wereerrors = *wereerrors || shortsessions > maxshortsessions;
       }
    // One more test for detection of C1 continuity violations in the target.
    //
@@ -48470,8 +48421,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          minnlcresults(&state, &x1, &rep);
          minnlcoptguardresults(&state, &ogrep);
       // Check basic properties of the solution
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:4524");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:4525");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -48481,8 +48432,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
       // (C0 violation being reported) and "soft" ones
       // (C1 violation is NOT reported) which accumulate
       // until we exhaust limit.
-         set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminnlcunit.ap:4536");
-         set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminnlcunit.ap:4537");
+         *wereerrors = *wereerrors || ogrep.nonc0suspected;
+         *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
          failed = false;
          failed = failed || optguardallclear(&ogrep);
          failed = failed || !ogrep.nonc1suspected;
@@ -48494,43 +48445,43 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          minnlcoptguardnonc1test0results(&state, &ognonc1test0strrep, &ognonc1test0lngrep);
          minnlcoptguardnonc1test1results(&state, &ognonc1test1strrep, &ognonc1test1lngrep);
          if (ogrep.nonc1test0positive) {
-            set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminnlcunit.ap:4552");
-            set_error_flag(wereerrors, !ognonc1test0strrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4553");
-            set_error_flag(wereerrors, !ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4554");
-            set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminnlcunit.ap:4555");
+            *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+            *wereerrors = *wereerrors || !ognonc1test0strrep.positive;
+            *wereerrors = *wereerrors || !ognonc1test0lngrep.positive;
+            *wereerrors = *wereerrors || ogrep.nonc1fidx != 0;
             testminnlcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
             testminnlcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
             avgstr0len += (double)ognonc1test0strrep.cnt / passcount;
             avglng0len += (double)ognonc1test0lngrep.cnt / passcount;
          } else {
-            set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4563");
-            set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4564");
+            *wereerrors = *wereerrors || ognonc1test0strrep.positive;
+            *wereerrors = *wereerrors || ognonc1test0lngrep.positive;
             testminnlcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
             testminnlcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
             c1test0fails++;
          }
          if (ogrep.nonc1test1positive) {
-            set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminnlcunit.ap:4571");
-            set_error_flag(wereerrors, !ognonc1test1strrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4572");
-            set_error_flag(wereerrors, !ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4573");
-            set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminnlcunit.ap:4574");
+            *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+            *wereerrors = *wereerrors || !ognonc1test1strrep.positive;
+            *wereerrors = *wereerrors || !ognonc1test1lngrep.positive;
+            *wereerrors = *wereerrors || ogrep.nonc1fidx != 0;
             testminnlcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
             testminnlcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
             avgstr1len += (double)ognonc1test1strrep.cnt / passcount;
             avglng1len += (double)ognonc1test1lngrep.cnt / passcount;
          } else {
-            set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4582");
-            set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4583");
+            *wereerrors = *wereerrors || ognonc1test1strrep.positive;
+            *wereerrors = *wereerrors || ognonc1test1lngrep.positive;
             testminnlcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
             testminnlcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
             c1test1fails++;
          }
       }
-      set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminnlcunit.ap:4590");
-      set_error_flag(wereerrors, c1test0fails > maxc1test0fails, __FILE__, __LINE__, "testminnlcunit.ap:4591");
-      set_error_flag(wereerrors, c1test1fails > maxc1test1fails, __FILE__, __LINE__, "testminnlcunit.ap:4592");
-      set_error_flag(wereerrors, avglng0len <= avgstr0len, __FILE__, __LINE__, "testminnlcunit.ap:4593");
-      set_error_flag(wereerrors, avglng1len <= avgstr1len, __FILE__, __LINE__, "testminnlcunit.ap:4594");
+      *wereerrors = *wereerrors || failurecounter > maxfails;
+      *wereerrors = *wereerrors || c1test0fails > maxc1test0fails;
+      *wereerrors = *wereerrors || c1test1fails > maxc1test1fails;
+      *wereerrors = *wereerrors || avglng0len <= avgstr0len;
+      *wereerrors = *wereerrors || avglng1len <= avgstr1len;
    // Detection of C1 continuity violations in the target under numerical differentiation:
    // * target function is a sum of |(x,c_i)| for i=1..N.
    // * no constraints is present.
@@ -48597,8 +48548,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          minnlcresults(&state, &x1, &rep);
          minnlcoptguardresults(&state, &ogrep);
       // Check basic properties of the solution
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:4669");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:4670");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -48608,8 +48559,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
       // (C0 violation being reported) and "soft" ones
       // (C1 violation is NOT reported) which accumulate
       // until we exhaust limit.
-         set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminnlcunit.ap:4681");
-         set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminnlcunit.ap:4682");
+         *wereerrors = *wereerrors || ogrep.nonc0suspected;
+         *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
          failed = false;
          failed = failed || optguardallclear(&ogrep);
          failed = failed || !ogrep.nonc1suspected;
@@ -48618,7 +48569,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             failurecounter++;
          }
       }
-      set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminnlcunit.ap:4690");
+      *wereerrors = *wereerrors || failurecounter > maxfails;
    // Detection of C1 continuity violations in the nonlinear constraints.
    //
    // This test is a bit tricky because optimizers are less sensitive to
@@ -48697,8 +48648,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          minnlcresults(&state, &x1, &rep);
          minnlcoptguardresults(&state, &ogrep);
       // Check basic properties of the solution
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminnlcunit.ap:4786");
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnlcunit.ap:4787");
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -48708,9 +48659,9 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
       // (C0 violation being reported) and "soft" ones
       // (C1 violation is NOT reported) which accumulate
       // until we exhaust limit.
-         set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminnlcunit.ap:4798");
-         set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminnlcunit.ap:4799");
-         set_error_flag(wereerrors, ogrep.nonc1fidx == goodidx + 1, __FILE__, __LINE__, "testminnlcunit.ap:4800");
+         *wereerrors = *wereerrors || ogrep.nonc0suspected;
+         *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
+         *wereerrors = *wereerrors || ogrep.nonc1fidx == goodidx + 1;
          failed = false;
          failed = failed || optguardallclear(&ogrep);
          failed = failed || !ogrep.nonc1suspected;
@@ -48721,44 +48672,44 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          minnlcoptguardnonc1test0results(&state, &ognonc1test0strrep, &ognonc1test0lngrep);
          minnlcoptguardnonc1test1results(&state, &ognonc1test1strrep, &ognonc1test1lngrep);
          if (ogrep.nonc1test0positive) {
-            set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminnlcunit.ap:4814");
-            set_error_flag(wereerrors, !ognonc1test0strrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4815");
-            set_error_flag(wereerrors, !ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4816");
-            set_error_flag(wereerrors, ogrep.nonc1fidx < 1, __FILE__, __LINE__, "testminnlcunit.ap:4817");
-            set_error_flag(wereerrors, ogrep.nonc1fidx > n, __FILE__, __LINE__, "testminnlcunit.ap:4818");
-            set_error_flag(wereerrors, ogrep.nonc1fidx == goodidx + 1, __FILE__, __LINE__, "testminnlcunit.ap:4819");
+            *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+            *wereerrors = *wereerrors || !ognonc1test0strrep.positive;
+            *wereerrors = *wereerrors || !ognonc1test0lngrep.positive;
+            *wereerrors = *wereerrors || ogrep.nonc1fidx < 1;
+            *wereerrors = *wereerrors || ogrep.nonc1fidx > n;
+            *wereerrors = *wereerrors || ogrep.nonc1fidx == goodidx + 1;
             testminnlcunit_testoptguardc1test0reportfortask1(wereerrors, &ognonc1test0strrep, &a, n, goodidx);
             testminnlcunit_testoptguardc1test0reportfortask1(wereerrors, &ognonc1test0lngrep, &a, n, goodidx);
          } else {
-            set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4825");
-            set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4826");
+            *wereerrors = *wereerrors || ognonc1test0strrep.positive;
+            *wereerrors = *wereerrors || ognonc1test0lngrep.positive;
             testminnlcunit_testoptguardc1test0reportfortask1(wereerrors, &ognonc1test0strrep, &a, n, goodidx);
             testminnlcunit_testoptguardc1test0reportfortask1(wereerrors, &ognonc1test0lngrep, &a, n, goodidx);
             c1test0fails++;
          }
          if (ogrep.nonc1test1positive) {
-            set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminnlcunit.ap:4833");
-            set_error_flag(wereerrors, !ognonc1test1strrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4834");
-            set_error_flag(wereerrors, !ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4835");
-            set_error_flag(wereerrors, ogrep.nonc1fidx < 1, __FILE__, __LINE__, "testminnlcunit.ap:4836");
-            set_error_flag(wereerrors, ogrep.nonc1fidx > n, __FILE__, __LINE__, "testminnlcunit.ap:4837");
-            set_error_flag(wereerrors, ogrep.nonc1fidx == goodidx + 1, __FILE__, __LINE__, "testminnlcunit.ap:4838");
+            *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+            *wereerrors = *wereerrors || !ognonc1test1strrep.positive;
+            *wereerrors = *wereerrors || !ognonc1test1lngrep.positive;
+            *wereerrors = *wereerrors || ogrep.nonc1fidx < 1;
+            *wereerrors = *wereerrors || ogrep.nonc1fidx > n;
+            *wereerrors = *wereerrors || ogrep.nonc1fidx == goodidx + 1;
             testminnlcunit_testoptguardc1test1reportfortask1(wereerrors, &ognonc1test1strrep, &a, n, goodidx);
             testminnlcunit_testoptguardc1test1reportfortask1(wereerrors, &ognonc1test1lngrep, &a, n, goodidx);
          } else {
-            set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4844");
-            set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4845");
+            *wereerrors = *wereerrors || ognonc1test1strrep.positive;
+            *wereerrors = *wereerrors || ognonc1test1lngrep.positive;
             testminnlcunit_testoptguardc1test1reportfortask1(wereerrors, &ognonc1test1strrep, &a, n, goodidx);
             testminnlcunit_testoptguardc1test1reportfortask1(wereerrors, &ognonc1test1lngrep, &a, n, goodidx);
             c1test1fails++;
          }
       }
-      set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminnlcunit.ap:4851");
+      *wereerrors = *wereerrors || failurecounter > maxfails;
    }
    ae_frame_leave();
 }
 
-bool testminnlc(bool silent) {
+bool testminnlc() {
    bool waserrors;
    bool bcerr;
    bool lcerr;
@@ -48782,7 +48733,7 @@ bool testminnlc(bool silent) {
    testminnlcunit_testoptguard(&optguarderr);
 // end
    waserrors = bcerr || lcerr || nlcerr || othererr || bugs || optguarderr;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING MINNLC OPTIMIZATION\n");
       printf("GENERIC TESTS:\n");
       printf("* box constrained                         ");
@@ -48873,13 +48824,13 @@ static void testminnsunit_basictest0uc(bool *errors) {
             }
          } else ae_assert(false, "Assertion failed");
       minnsresults(&s, &x1, &rep);
-      set_error_flag(errors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:143");
+      *errors = *errors || rep.terminationtype <= 0;
       if (*errors) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errors, !isfinite(x1.xR[i]) || !SmallAtR(x1.xR[i], 0.001), __FILE__, __LINE__, "testminnsunit.ap:147");
+         *errors = *errors || !isfinite(x1.xR[i]) || !SmallAtR(x1.xR[i], 0.001);
       }
       sumits += (double)rep.iterationscount / passcount;
       sumnfev += (double)rep.nfev / passcount;
@@ -48927,13 +48878,13 @@ static void testminnsunit_basictest1uc(bool *errors) {
          }
       } else ae_assert(false, "Assertion failed");
    minnsresults(&s, &x1, &rep);
-   set_error_flag(errors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:204");
+   *errors = *errors || rep.terminationtype <= 0;
    if (*errors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(errors, !isfinite(x1.xR[0]) || !NearAtR(x1.xR[0], 1.0 / sqrt(2.0), 0.001), __FILE__, __LINE__, "testminnsunit.ap:207");
-   set_error_flag(errors, !isfinite(x1.xR[1]) || !NearAtR(x1.xR[1], 1.0 / 2.0, 0.001), __FILE__, __LINE__, "testminnsunit.ap:208");
+   *errors = *errors || !isfinite(x1.xR[0]) || !NearAtR(x1.xR[0], 1.0 / sqrt(2.0), 0.001);
+   *errors = *errors || !isfinite(x1.xR[1]) || !NearAtR(x1.xR[1], 1.0 / 2.0, 0.001);
    ae_frame_leave();
 }
 
@@ -48985,13 +48936,13 @@ static void testminnsunit_basictest0bc(bool *errors) {
             }
          } else ae_assert(false, "Assertion failed");
       minnsresults(&s, &x1, &rep);
-      set_error_flag(errors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:263");
+      *errors = *errors || rep.terminationtype <= 0;
       if (*errors) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errors, !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], rboundval(0.0, bl.xR[i], bu.xR[i]), 0.001), __FILE__, __LINE__, "testminnsunit.ap:267");
+         *errors = *errors || !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], rboundval(0.0, bl.xR[i], bu.xR[i]), 0.001);
       }
       sumits += (double)rep.iterationscount / passcount;
       sumnfev += (double)rep.nfev / passcount;
@@ -49042,13 +48993,13 @@ static void testminnsunit_basictest1bc(bool *errors) {
          s.j.xyR[0][1] = (double)(10 * sign(sqr(v0) - v1) * (-1));
       } else ae_assert(false, "Assertion failed");
    minnsresults(&s, &x1, &rep);
-   set_error_flag(errors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:323");
+   *errors = *errors || rep.terminationtype <= 0;
    if (*errors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(errors, !isfinite(x1.xR[0]) || !NearAtR(x1.xR[0], 1.0 / sqrt(2.0), 0.001), __FILE__, __LINE__, "testminnsunit.ap:326");
-   set_error_flag(errors, !isfinite(x1.xR[1]) || !NearAtR(x1.xR[1], 1.0 / 2.0, 0.001), __FILE__, __LINE__, "testminnsunit.ap:327");
+   *errors = *errors || !isfinite(x1.xR[0]) || !NearAtR(x1.xR[0], 1.0 / sqrt(2.0), 0.001);
+   *errors = *errors || !isfinite(x1.xR[1]) || !NearAtR(x1.xR[1], 1.0 / 2.0, 0.001);
    ae_frame_leave();
 }
 
@@ -49114,13 +49065,13 @@ static void testminnsunit_basictest0lc(bool *errors) {
             }
          } else ae_assert(false, "Assertion failed");
       minnsresults(&s, &x1, &rep);
-      set_error_flag(errors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:404");
+      *errors = *errors || rep.terminationtype <= 0;
       if (*errors) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errors, !isfinite(x1.xR[i]) || !SmallAtR(x1.xR[i], 0.001), __FILE__, __LINE__, "testminnsunit.ap:408");
+         *errors = *errors || !isfinite(x1.xR[i]) || !SmallAtR(x1.xR[i], 0.001);
       }
       sumits += (double)rep.iterationscount / passcount;
       sumnfev += (double)rep.nfev / passcount;
@@ -49175,13 +49126,13 @@ static void testminnsunit_basictest1lc(bool *errors) {
          s.j.xyR[0][1] = (double)(10 * sign(sqr(v0) - v1) * (-1));
       } else ae_assert(false, "Assertion failed");
    minnsresults(&s, &x1, &rep);
-   set_error_flag(errors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:470");
+   *errors = *errors || rep.terminationtype <= 0;
    if (*errors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(errors, !isfinite(x1.xR[0]) || !NearAtR(x1.xR[0], 1.0 / sqrt(2.0), 0.001), __FILE__, __LINE__, "testminnsunit.ap:473");
-   set_error_flag(errors, !isfinite(x1.xR[1]) || !NearAtR(x1.xR[1], 1.0 / 2.0, 0.001), __FILE__, __LINE__, "testminnsunit.ap:474");
+   *errors = *errors || !isfinite(x1.xR[0]) || !NearAtR(x1.xR[0], 1.0 / sqrt(2.0), 0.001);
+   *errors = *errors || !isfinite(x1.xR[1]) || !NearAtR(x1.xR[1], 1.0 / 2.0, 0.001);
    ae_frame_leave();
 }
 
@@ -49260,13 +49211,13 @@ static void testminnsunit_basictest0nlc(bool *errors) {
             }
          } else ae_assert(false, "Assertion failed");
       minnsresults(&s, &x1, &rep);
-      set_error_flag(errors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:567");
+      *errors = *errors || rep.terminationtype <= 0;
       if (*errors) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < n; i++) {
-         set_error_flag(errors, !isfinite(x1.xR[i]) || !SmallAtR(x1.xR[i], 0.001), __FILE__, __LINE__, "testminnsunit.ap:571");
+         *errors = *errors || !isfinite(x1.xR[i]) || !SmallAtR(x1.xR[i], 0.001);
       }
       sumits += (double)rep.iterationscount / passcount;
       sumnfev += (double)rep.nfev / passcount;
@@ -49352,19 +49303,19 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
                repferr = rmax2(repferr, fabs(v - state.f));
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:668");
-         set_error_flag(othererrors, werexreports && !requirexrep, __FILE__, __LINE__, "testminnsunit.ap:669");
-         set_error_flag(othererrors, requirexrep && !werexreports, __FILE__, __LINE__, "testminnsunit.ap:670");
-         set_error_flag(othererrors, repferr > 10000.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:671");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
+         *othererrors = *othererrors || werexreports && !requirexrep;
+         *othererrors = *othererrors || requirexrep && !werexreports;
+         *othererrors = *othererrors || repferr > 10000.0 * machineepsilon;
          if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], xc.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminnsunit.ap:676");
+            *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], xc.xR[i], s.xR[i] * xtol);
             if (requirexrep) {
-               set_error_flag(othererrors, !isfinite(xrfirst.xR[i]) || !NearAtR(x0.xR[i], xrfirst.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testminnsunit.ap:679");
-               set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || !NearAtR(x1.xR[i], xrlast.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testminnsunit.ap:680");
+               *othererrors = *othererrors || !isfinite(xrfirst.xR[i]) || !NearAtR(x0.xR[i], xrfirst.xR[i], 100.0 * machineepsilon);
+               *othererrors = *othererrors || !isfinite(xrlast.xR[i]) || !NearAtR(x1.xR[i], xrlast.xR[i], 100.0 * machineepsilon);
             }
          }
       // Test numerical differentiation:
@@ -49403,14 +49354,14 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
                repferr = rmax2(repferr, fabs(v - state.f));
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:731");
-         set_error_flag(othererrors, repferr > 10000.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:732");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
+         *othererrors = *othererrors || repferr > 10000.0 * machineepsilon;
          if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], xc.xR[i], s.xR[i] * xtol), __FILE__, __LINE__, "testminnsunit.ap:736");
+            *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], xc.xR[i], s.xR[i] * xtol);
          }
       // Test scaling: we perform several steps on unit-scale problem,
       // then we perform same amount of steps on re-scaled problem,
@@ -49452,7 +49403,7 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:788");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
          if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
@@ -49472,14 +49423,14 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
                werexreports = true;
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1s, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:818");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
          if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], 1.0E-4), __FILE__, __LINE__, "testminnsunit.ap:823");
-            set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || !NearAtR(x1s.xR[i], xrlast.xR[i], testminnsunit_scalingtesttol), __FILE__, __LINE__, "testminnsunit.ap:827");
+            *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], 1.0E-4);
+            *othererrors = *othererrors || !isfinite(xrlast.xR[i]) || !NearAtR(x1s.xR[i], xrlast.xR[i], testminnsunit_scalingtesttol);
          }
       }
    }
@@ -49598,26 +49549,26 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
                }
                repferr = rmax2(repferr, fabs(v - state.f));
                for (i = 0; i < n; i++) {
-                  set_error_flag(primaryerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnsunit.ap:944");
-                  set_error_flag(primaryerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnsunit.ap:945");
+                  *primaryerrors = *primaryerrors || state.x.xR[i] < bndl.xR[i];
+                  *primaryerrors = *primaryerrors || state.x.xR[i] > bndu.xR[i];
                }
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:953");
-         set_error_flag(othererrors, werexreports && !requirexrep, __FILE__, __LINE__, "testminnsunit.ap:954");
-         set_error_flag(othererrors, requirexrep && !werexreports, __FILE__, __LINE__, "testminnsunit.ap:955");
-         set_error_flag(othererrors, repferr > 10000.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:956");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
+         *othererrors = *othererrors || werexreports && !requirexrep;
+         *othererrors = *othererrors || requirexrep && !werexreports;
+         *othererrors = *othererrors || repferr > 10000.0 * machineepsilon;
          if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], rboundval(xc.xR[i], bndl.xR[i], bndu.xR[i]), s.xR[i] * xtol), __FILE__, __LINE__, "testminnsunit.ap:961");
-            set_error_flag(primaryerrors, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnsunit.ap:962");
-            set_error_flag(primaryerrors, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnsunit.ap:963");
+            *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], rboundval(xc.xR[i], bndl.xR[i], bndu.xR[i]), s.xR[i] * xtol);
+            *primaryerrors = *primaryerrors || x1.xR[i] < bndl.xR[i];
+            *primaryerrors = *primaryerrors || x1.xR[i] > bndu.xR[i];
             if (requirexrep) {
-               set_error_flag(othererrors, !isfinite(xrfirst.xR[i]) || !NearAtR(rboundval(x0.xR[i], bndl.xR[i], bndu.xR[i]), xrfirst.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testminnsunit.ap:966");
-               set_error_flag(othererrors, !isfinite(xrlast.xR[i]) || !NearAtR(x1.xR[i], xrlast.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testminnsunit.ap:967");
+               *othererrors = *othererrors || !isfinite(xrfirst.xR[i]) || !NearAtR(rboundval(x0.xR[i], bndl.xR[i], bndu.xR[i]), xrfirst.xR[i], 100.0 * machineepsilon);
+               *othererrors = *othererrors || !isfinite(xrlast.xR[i]) || !NearAtR(x1.xR[i], xrlast.xR[i], 100.0 * machineepsilon);
             }
          }
       }
@@ -49668,7 +49619,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             }
          } else ae_assert(false, "Assertion failed");
       minnsresults(&state, &x1, &rep);
-      set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1030");
+      *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
       if (*primaryerrors || *othererrors) {
          ae_frame_leave();
          return;
@@ -49686,11 +49637,11 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             v = 0.0;
          }
          gnorm += sqr(v);
-         set_error_flag(primaryerrors, x1.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1045");
-         set_error_flag(primaryerrors, x1.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1046");
+         *primaryerrors = *primaryerrors || x1.xR[i] < bndl.xR[i];
+         *primaryerrors = *primaryerrors || x1.xR[i] > bndu.xR[i];
       }
       gnorm = sqrt(gnorm);
-      set_error_flag(primaryerrors, gnorm > 1.0E-4, __FILE__, __LINE__, "testminnsunit.ap:1049");
+      *primaryerrors = *primaryerrors || gnorm > 1.0E-4;
    }
 // Test on HIGHLY nonconvex bound constrained problem.
 // Algorithm should be able to stop.
@@ -49725,11 +49676,11 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1095");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
          for (i = 0; i < n; i++) {
             v = fabs(x1.xR[i]);
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]), __FILE__, __LINE__, "testminnsunit.ap:1099");
-            set_error_flag(primaryerrors, v != 1.0 && v > xtol, __FILE__, __LINE__, "testminnsunit.ap:1100");
+            *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]);
+            *primaryerrors = *primaryerrors || v != 1.0 && v > xtol;
          }
       }
    }
@@ -49785,27 +49736,27 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
                   state.fi.xR[0] += d.xR[i] * fabs(state.x.xR[i] - xc.xR[i]);
-                  set_error_flag(primaryerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1164");
-                  set_error_flag(primaryerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1165");
+                  *primaryerrors = *primaryerrors || state.x.xR[i] < bndl.xR[i];
+                  *primaryerrors = *primaryerrors || state.x.xR[i] > bndu.xR[i];
                }
             } else if (state.xupdated) {
                v = 0.0;
                for (i = 0; i < n; i++) {
                   v += d.xR[i] * fabs(state.x.xR[i] - xc.xR[i]);
-                  set_error_flag(primaryerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1176");
-                  set_error_flag(primaryerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminnsunit.ap:1177");
+                  *primaryerrors = *primaryerrors || state.x.xR[i] < bndl.xR[i];
+                  *primaryerrors = *primaryerrors || state.x.xR[i] > bndu.xR[i];
                }
                repferr = rmax2(repferr, fabs(v - state.f));
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1186");
-         set_error_flag(othererrors, repferr > 10000.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:1187");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
+         *othererrors = *othererrors || repferr > 10000.0 * machineepsilon;
          if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], rboundval(xc.xR[i], bndl.xR[i], bndu.xR[i]), s.xR[i] * xtol), __FILE__, __LINE__, "testminnsunit.ap:1191");
+            *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]) || !NearAtR(x1.xR[i], rboundval(xc.xR[i], bndl.xR[i], bndu.xR[i]), s.xR[i] * xtol);
          }
       }
    }
@@ -49877,7 +49828,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1272");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
          if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
@@ -49893,13 +49844,13 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1s, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1293");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
          if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], testminnsunit_scalingtesttol), __FILE__, __LINE__, "testminnsunit.ap:1297");
+            *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], testminnsunit_scalingtesttol);
          }
       }
    }
@@ -50005,9 +49956,9 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
                repferr = rmax2(repferr, fabs(flast0 - state.f));
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1402");
-         set_error_flag(primaryerrors, !isfinite(flast0), __FILE__, __LINE__, "testminnsunit.ap:1403");
-         set_error_flag(othererrors, repferr > 10000.0 * machineepsilon, __FILE__, __LINE__, "testminnsunit.ap:1404");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
+         *primaryerrors = *primaryerrors || !isfinite(flast0);
+         *othererrors = *othererrors || repferr > 10000.0 * machineepsilon;
          if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
@@ -50051,13 +50002,13 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x2, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1462");
-         set_error_flag(primaryerrors, !isfinite(flast1), __FILE__, __LINE__, "testminnsunit.ap:1463");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
+         *primaryerrors = *primaryerrors || !isfinite(flast1);
          if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
-         set_error_flag(primaryerrors, !NearAtR(flast0, flast1, ftol), __FILE__, __LINE__, "testminnsunit.ap:1466");
+         *primaryerrors = *primaryerrors || !NearAtR(flast0, flast1, ftol);
       // Test on HIGHLY nonconvex linearly constrained problem.
       // Algorithm should be able to stop at the bounds.
          ae_vector_set_length(&x0, n);
@@ -50094,10 +50045,10 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1516");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]), __FILE__, __LINE__, "testminnsunit.ap:1519");
-            set_error_flag(primaryerrors, !NearAtR(x1.xR[i], 1.0, xtol) && !SmallAtR(x1.xR[i], xtol) && !NearAtR(x1.xR[i], -1.0, xtol), __FILE__, __LINE__, "testminnsunit.ap:1520");
+            *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]);
+            *primaryerrors = *primaryerrors || !NearAtR(x1.xR[i], 1.0, xtol) && !SmallAtR(x1.xR[i], xtol) && !NearAtR(x1.xR[i], -1.0, xtol);
          }
       // Test scaling: we perform several steps on unit-scale problem,
       // then we perform same amount of steps on re-scaled problem,
@@ -50181,7 +50132,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1622");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
          if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
@@ -50197,13 +50148,13 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
                }
             } else ae_assert(false, "Assertion failed");
          minnsresults(&state, &x1s, &rep);
-         set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1643");
+         *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
          if (*primaryerrors || *othererrors) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], testminnsunit_scalingtesttol), __FILE__, __LINE__, "testminnsunit.ap:1647");
+            *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], testminnsunit_scalingtesttol);
          }
       }
    }
@@ -50299,7 +50250,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                      }
                   } else ae_assert(false, "Assertion failed");
                minnsresults(&state, &x1, &rep);
-               set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1743");
+               *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
                if (*primaryerrors || *othererrors) {
                   ae_frame_leave();
                   return;
@@ -50317,8 +50268,8 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                         v = rmax2(v, 0.0);
                      }
                   }
-                  set_error_flag(primaryerrors, !isfinite(x1.xR[i]), __FILE__, __LINE__, "testminnsunit.ap:1762");
-                  set_error_flag(primaryerrors, !NearAtR(x1.xR[i], v, xtol * s.xR[i]), __FILE__, __LINE__, "testminnsunit.ap:1763");
+                  *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]);
+                  *primaryerrors = *primaryerrors || !NearAtR(x1.xR[i], v, xtol * s.xR[i]);
                }
             }
          }
@@ -50360,7 +50311,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                      }
                   } else ae_assert(false, "Assertion failed");
                minnsresults(&state, &x1, &rep);
-               set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1813");
+               *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
                if (*primaryerrors || *othererrors) {
                   ae_frame_leave();
                   return;
@@ -50378,8 +50329,8 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                         v = rmax2(v, 0.0);
                      }
                   }
-                  set_error_flag(primaryerrors, !isfinite(x1.xR[i]), __FILE__, __LINE__, "testminnsunit.ap:1832");
-                  set_error_flag(primaryerrors, !NearAtR(x1.xR[i], v, xtol * s.xR[i]), __FILE__, __LINE__, "testminnsunit.ap:1833");
+                  *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]);
+                  *primaryerrors = *primaryerrors || !NearAtR(x1.xR[i], v, xtol * s.xR[i]);
                }
             }
          }
@@ -50441,7 +50392,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                      }
                   } else ae_assert(false, "Assertion failed");
                minnsresults(&state, &x1, &rep);
-               set_error_flag(primaryerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:1906");
+               *primaryerrors = *primaryerrors || rep.terminationtype <= 0;
                if (*primaryerrors || *othererrors) {
                   ae_frame_leave();
                   return;
@@ -50464,7 +50415,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                   } else ae_assert(false, "Assertion failed");
                minnsresults(&state, &x1s, &rep);
                for (i = 0; i < n; i++) {
-                  set_error_flag(primaryerrors, !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], testminnsunit_scalingtesttol), __FILE__, __LINE__, "testminnsunit.ap:1937");
+                  *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], testminnsunit_scalingtesttol);
                }
             }
          }
@@ -50526,16 +50477,16 @@ static void testminnsunit_testother(bool *othererrors) {
             state.j.xyR[2][1] = 0.0;
          } else ae_assert(false, "Assertion failed");
       minnsresults(&state, &x1, &rep);
-      set_error_flag(othererrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminnsunit.ap:2003");
-      set_error_flag(othererrors, !isfinite(x1.xR[0]), __FILE__, __LINE__, "testminnsunit.ap:2004");
-      set_error_flag(othererrors, !isfinite(x1.xR[1]), __FILE__, __LINE__, "testminnsunit.ap:2005");
-      set_error_flag(othererrors, !NearAtR(x1.xR[0], v, xtol), __FILE__, __LINE__, "testminnsunit.ap:2006");
-      set_error_flag(othererrors, !NearAtR(x1.xR[1], -v, xtol), __FILE__, __LINE__, "testminnsunit.ap:2007");
+      *othererrors = *othererrors || rep.terminationtype <= 0;
+      *othererrors = *othererrors || !isfinite(x1.xR[0]);
+      *othererrors = *othererrors || !isfinite(x1.xR[1]);
+      *othererrors = *othererrors || !NearAtR(x1.xR[0], v, xtol);
+      *othererrors = *othererrors || !NearAtR(x1.xR[1], -v, xtol);
    }
    ae_frame_leave();
 }
 
-bool testminns(bool silent) {
+bool testminns() {
    bool wereerrors;
    bool ucerrors;
    bool bcerrors;
@@ -50566,7 +50517,7 @@ bool testminns(bool silent) {
    testminnsunit_testnlc(&nlcerrors, &othererrors);
 // end
    wereerrors = ucerrors || bcerrors || lcerrors || nlcerrors || othererrors;
-   if (!silent) {
+   if (wereerrors || !silent) {
       printf("TESTING MINNS OPTIMIZATION\n");
       printf("TESTS:\n");
       printf("* UNCONSTRAINED                           ");
@@ -51009,10 +50960,10 @@ static void testminbcunit_testother(bool *err) {
          }
       }
    minbcresults(&state, &xf, &rep);
-   set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbcunit.ap:494");
+   *err = *err || rep.terminationtype <= 0;
    if (rep.terminationtype > 0) {
       for (i = 0; i < n; i++) {
-         set_error_flag(err, xf.xR[i] != 0.0, __FILE__, __LINE__, "testminbcunit.ap:497");
+         *err = *err || xf.xR[i] != 0.0;
       }
    }
 // Test reports:
@@ -51044,7 +50995,7 @@ static void testminbcunit_testother(bool *err) {
          } else if (state.xupdated) {
             if (fprev == maxrealnumber) {
                for (i = 0; i < n; i++) {
-                  set_error_flag(err, state.x.xR[i] != x.xR[i], __FILE__, __LINE__, "testminbcunit.ap:538");
+                  *err = *err || state.x.xR[i] != x.xR[i];
                }
             }
             fprev = state.f;
@@ -51052,7 +51003,7 @@ static void testminbcunit_testother(bool *err) {
          }
       minbcresults(&state, &x, &rep);
       for (i = 0; i < n; i++) {
-         set_error_flag(err, x.xR[i] != xlast.xR[i], __FILE__, __LINE__, "testminbcunit.ap:545");
+         *err = *err || x.xR[i] != xlast.xR[i];
       }
    }
 // Test differentiation vs. analytic gradient
@@ -51092,10 +51043,10 @@ static void testminbcunit_testother(bool *err) {
          }
          minbcresults(&state, &x, &rep);
          if (dkind == 0) {
-            set_error_flag(err, wasf || !wasfg, __FILE__, __LINE__, "testminbcunit.ap:585");
+            *err = *err || wasf || !wasfg;
          }
          if (dkind == 1) {
-            set_error_flag(err, !wasf || wasfg, __FILE__, __LINE__, "testminbcunit.ap:587");
+            *err = *err || !wasf || wasfg;
          }
       }
    }
@@ -51122,7 +51073,7 @@ static void testminbcunit_testother(bool *err) {
       }
       minbcresults(&state, &x, &rep);
       r = v / (s.xR[0] * diffstep);
-      set_error_flag(err, !SmallAtR(log(r), log(1.0 + 1000.0 * machineepsilon)), __FILE__, __LINE__, "testminbcunit.ap:618");
+      *err = *err || !SmallAtR(log(r), log(1.0 + 1000.0 * machineepsilon));
    }
 // Test stpmax
    for (pass = 1; pass <= passcount; pass++) {
@@ -51144,9 +51095,9 @@ static void testminbcunit_testother(bool *err) {
          if (state.needfg) {
             state.f = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
             state.g.xR[0] = exp(state.x.xR[0]) - exp(-state.x.xR[0]);
-            set_error_flag(err, !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax), __FILE__, __LINE__, "testminbcunit.ap:646");
+            *err = *err || !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax);
          } else if (state.xupdated) {
-            set_error_flag(err, !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax), __FILE__, __LINE__, "testminbcunit.ap:650");
+            *err = *err || !NearAtR(state.x.xR[0], xprev, (1.0 + sqrt(machineepsilon)) * stpmax);
             xprev = state.x.xR[0];
          }
    }
@@ -51168,7 +51119,7 @@ static void testminbcunit_testother(bool *err) {
             state.g.xR[0] = -2.0E8 * state.x.xR[0];
          }
       minbcresults(&state, &x, &rep);
-      set_error_flag(err, !NearAtR(x.xR[0], bu.xR[0], epsx), __FILE__, __LINE__, "testminbcunit.ap:680");
+      *err = *err || !NearAtR(x.xR[0], bu.xR[0], epsx);
    }
 // Test correctness of the scaling:
 // * initial point is random point from [+1,+2]^N
@@ -51227,7 +51178,7 @@ static void testminbcunit_testother(bool *err) {
                   }
                minbcresults(&state, &x, &rep);
                if (rep.terminationtype <= 0) {
-                  set_error_flag(err, true, __FILE__, __LINE__, "testminbcunit.ap:747");
+                  *err = true;
                   ae_frame_leave();
                   return;
                }
@@ -51236,7 +51187,7 @@ static void testminbcunit_testother(bool *err) {
                   v += sqr(s.xR[i] * 2 * a.xR[i] * x.xR[i]);
                }
                v = sqrt(v);
-               set_error_flag(err, v > tmpeps, __FILE__, __LINE__, "testminbcunit.ap:754");
+               *err = *err || v > tmpeps;
             }
          }
       }
@@ -51294,11 +51245,11 @@ static void testminbcunit_testother(bool *err) {
                }
             minbcresults(&state, &x, &rep);
             if (rep.terminationtype <= 0) {
-               set_error_flag(err, true, __FILE__, __LINE__, "testminbcunit.ap:822");
+               *err = true;
                ae_frame_leave();
                return;
             }
-            set_error_flag(err, !NearAtR(1.0 / sqr(1.0 - x.xR[0]), 1.0 / sqr(1.0 + x.xR[0]) - vc, epsg), __FILE__, __LINE__, "testminbcunit.ap:825");
+            *err = *err || !NearAtR(1.0 / sqr(1.0 - x.xR[0]), 1.0 / sqr(1.0 + x.xR[0]) - vc, epsg);
          }
       }
    }
@@ -51357,7 +51308,7 @@ static void testminbcunit_testother(bool *err) {
             }
          minbcresults(&state, &xf, &rep);
          if (rep.terminationtype <= 0 || xf.xR[0] != 0.0 || xf.xR[1] != 0.0) {
-            set_error_flag(err, true, __FILE__, __LINE__, "testminbcunit.ap:889");
+            *err = true;
             ae_frame_leave();
             return;
          }
@@ -51416,7 +51367,7 @@ static void testminbcunit_testother(bool *err) {
             }
          minbcresults(&state, &xf, &rep);
          if (rep.terminationtype <= 0 || xf.xR[0] != 0.0 || xf.xR[1] != 0.0) {
-            set_error_flag(err, true, __FILE__, __LINE__, "testminbcunit.ap:952");
+            *err = true;
             ae_frame_leave();
             return;
          }
@@ -51481,7 +51432,7 @@ static void testminbcunit_testother(bool *err) {
             k++;
          } else ae_assert(false, "Assertion failed");
       minbcresults(&state, &x1, &rep);
-      set_error_flag(err, rep.terminationtype != -8, __FILE__, __LINE__, "testminbcunit.ap:1037");
+      *err = *err || rep.terminationtype != -8;
    }
 // Check algorithm ability to handle request for termination:
 // * to terminate with correct return code = 8
@@ -51527,9 +51478,9 @@ static void testminbcunit_testother(bool *err) {
             }
          } else ae_assert(false, "Assertion failed");
       minbcresults(&state, &x, &rep);
-      set_error_flag(err, rep.terminationtype != 8, __FILE__, __LINE__, "testminbcunit.ap:1095");
+      *err = *err || rep.terminationtype != 8;
       for (i = 0; i < n; i++) {
-         set_error_flag(err, x.xR[i] != xlast.xR[i], __FILE__, __LINE__, "testminbcunit.ap:1097");
+         *err = *err || x.xR[i] != xlast.xR[i];
       }
    }
    ae_frame_leave();
@@ -51684,25 +51635,25 @@ static void testminbcunit_testoptguardc1test0reportfortask0(bool *err, optguardn
    bool hasc1discontinuities;
    if (rep->positive) {
    // Check positive report, first checks
-      set_error_flag(err, rep->fidx != 0, __FILE__, __LINE__, "testminbcunit.ap:1858");
-      set_error_flag(err, rep->n != n, __FILE__, __LINE__, "testminbcunit.ap:1859");
-      set_error_flag(err, !(0 <= rep->stpidxa), __FILE__, __LINE__, "testminbcunit.ap:1860");
-      set_error_flag(err, !(rep->stpidxa < rep->stpidxb), __FILE__, __LINE__, "testminbcunit.ap:1861");
-      set_error_flag(err, !(rep->stpidxb < rep->cnt), __FILE__, __LINE__, "testminbcunit.ap:1862");
-      set_error_flag(err, rep->x0.cnt != rep->n, __FILE__, __LINE__, "testminbcunit.ap:1863");
-      set_error_flag(err, rep->d.cnt != rep->n, __FILE__, __LINE__, "testminbcunit.ap:1864");
-      set_error_flag(err, rep->stp.cnt != rep->cnt, __FILE__, __LINE__, "testminbcunit.ap:1865");
-      set_error_flag(err, rep->f.cnt != rep->cnt, __FILE__, __LINE__, "testminbcunit.ap:1866");
-      set_error_flag(err, !isfinitevector(&rep->x0, n), __FILE__, __LINE__, "testminbcunit.ap:1867");
-      set_error_flag(err, !isfinitevector(&rep->d, n), __FILE__, __LINE__, "testminbcunit.ap:1868");
-      set_error_flag(err, !isfinitevector(&rep->stp, rep->cnt), __FILE__, __LINE__, "testminbcunit.ap:1869");
-      set_error_flag(err, !isfinitevector(&rep->f, rep->cnt), __FILE__, __LINE__, "testminbcunit.ap:1870");
+      *err = *err || rep->fidx != 0;
+      *err = *err || rep->n != n;
+      *err = *err || !(0 <= rep->stpidxa);
+      *err = *err || !(rep->stpidxa < rep->stpidxb);
+      *err = *err || !(rep->stpidxb < rep->cnt);
+      *err = *err || rep->x0.cnt != rep->n;
+      *err = *err || rep->d.cnt != rep->n;
+      *err = *err || rep->stp.cnt != rep->cnt;
+      *err = *err || rep->f.cnt != rep->cnt;
+      *err = *err || !isfinitevector(&rep->x0, n);
+      *err = *err || !isfinitevector(&rep->d, n);
+      *err = *err || !isfinitevector(&rep->stp, rep->cnt);
+      *err = *err || !isfinitevector(&rep->f, rep->cnt);
       if (*err) {
          return;
       }
    // Check consistency of X0, D, Stp and F
       for (k = 0; k < rep->cnt - 1; k++) {
-         set_error_flag(err, rep->stp.xR[k] >= rep->stp.xR[k + 1], __FILE__, __LINE__, "testminbcunit.ap:1878");
+         *err = *err || rep->stp.xR[k] >= rep->stp.xR[k + 1];
       }
       for (k = 0; k < rep->cnt; k++) {
          v = 0.0;
@@ -51713,7 +51664,7 @@ static void testminbcunit_testoptguardc1test0reportfortask0(bool *err, optguardn
             }
             v += fabs(vv);
          }
-         set_error_flag(err, !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testminbcunit.ap:1891");
+         *err = *err || !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -51726,18 +51677,18 @@ static void testminbcunit_testoptguardc1test0reportfortask0(bool *err, optguardn
          }
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
-      set_error_flag(err, !hasc1discontinuities, __FILE__, __LINE__, "testminbcunit.ap:1909");
+      *err = *err || !hasc1discontinuities;
    } else {
    // Check negative report: fields must be empty
-      set_error_flag(err, rep->stpidxa != -1, __FILE__, __LINE__, "testminbcunit.ap:1916");
-      set_error_flag(err, rep->stpidxb != -1, __FILE__, __LINE__, "testminbcunit.ap:1917");
-      set_error_flag(err, rep->fidx != -1, __FILE__, __LINE__, "testminbcunit.ap:1918");
-      set_error_flag(err, rep->cnt != 0, __FILE__, __LINE__, "testminbcunit.ap:1919");
-      set_error_flag(err, rep->n != 0, __FILE__, __LINE__, "testminbcunit.ap:1920");
-      set_error_flag(err, rep->x0.cnt != 0, __FILE__, __LINE__, "testminbcunit.ap:1921");
-      set_error_flag(err, rep->d.cnt != 0, __FILE__, __LINE__, "testminbcunit.ap:1922");
-      set_error_flag(err, rep->stp.cnt != 0, __FILE__, __LINE__, "testminbcunit.ap:1923");
-      set_error_flag(err, rep->f.cnt != 0, __FILE__, __LINE__, "testminbcunit.ap:1924");
+      *err = *err || rep->stpidxa != -1;
+      *err = *err || rep->stpidxb != -1;
+      *err = *err || rep->fidx != -1;
+      *err = *err || rep->cnt != 0;
+      *err = *err || rep->n != 0;
+      *err = *err || rep->x0.cnt != 0;
+      *err = *err || rep->d.cnt != 0;
+      *err = *err || rep->stp.cnt != 0;
+      *err = *err || rep->f.cnt != 0;
    }
 }
 
@@ -51757,27 +51708,27 @@ static void testminbcunit_testoptguardc1test1reportfortask0(bool *err, optguardn
    bool hasc1discontinuities;
    if (rep->positive) {
    // Check positive report, first checks
-      set_error_flag(err, rep->fidx != 0, __FILE__, __LINE__, "testminbcunit.ap:1952");
-      set_error_flag(err, rep->vidx < 0, __FILE__, __LINE__, "testminbcunit.ap:1953");
-      set_error_flag(err, rep->vidx > n, __FILE__, __LINE__, "testminbcunit.ap:1954");
-      set_error_flag(err, rep->n != n, __FILE__, __LINE__, "testminbcunit.ap:1955");
-      set_error_flag(err, !(0 <= rep->stpidxa), __FILE__, __LINE__, "testminbcunit.ap:1956");
-      set_error_flag(err, !(rep->stpidxa < rep->stpidxb), __FILE__, __LINE__, "testminbcunit.ap:1957");
-      set_error_flag(err, !(rep->stpidxb < rep->cnt), __FILE__, __LINE__, "testminbcunit.ap:1958");
-      set_error_flag(err, rep->x0.cnt != rep->n, __FILE__, __LINE__, "testminbcunit.ap:1959");
-      set_error_flag(err, rep->d.cnt != rep->n, __FILE__, __LINE__, "testminbcunit.ap:1960");
-      set_error_flag(err, rep->stp.cnt != rep->cnt, __FILE__, __LINE__, "testminbcunit.ap:1961");
-      set_error_flag(err, rep->g.cnt != rep->cnt, __FILE__, __LINE__, "testminbcunit.ap:1962");
-      set_error_flag(err, !isfinitevector(&rep->x0, n), __FILE__, __LINE__, "testminbcunit.ap:1963");
-      set_error_flag(err, !isfinitevector(&rep->d, n), __FILE__, __LINE__, "testminbcunit.ap:1964");
-      set_error_flag(err, !isfinitevector(&rep->stp, rep->cnt), __FILE__, __LINE__, "testminbcunit.ap:1965");
-      set_error_flag(err, !isfinitevector(&rep->g, rep->cnt), __FILE__, __LINE__, "testminbcunit.ap:1966");
+      *err = *err || rep->fidx != 0;
+      *err = *err || rep->vidx < 0;
+      *err = *err || rep->vidx > n;
+      *err = *err || rep->n != n;
+      *err = *err || !(0 <= rep->stpidxa);
+      *err = *err || !(rep->stpidxa < rep->stpidxb);
+      *err = *err || !(rep->stpidxb < rep->cnt);
+      *err = *err || rep->x0.cnt != rep->n;
+      *err = *err || rep->d.cnt != rep->n;
+      *err = *err || rep->stp.cnt != rep->cnt;
+      *err = *err || rep->g.cnt != rep->cnt;
+      *err = *err || !isfinitevector(&rep->x0, n);
+      *err = *err || !isfinitevector(&rep->d, n);
+      *err = *err || !isfinitevector(&rep->stp, rep->cnt);
+      *err = *err || !isfinitevector(&rep->g, rep->cnt);
       if (*err) {
          return;
       }
    // Check consistency of X0, D, Stp and G
       for (k = 0; k < rep->cnt - 1; k++) {
-         set_error_flag(err, rep->stp.xR[k] >= rep->stp.xR[k + 1], __FILE__, __LINE__, "testminbcunit.ap:1974");
+         *err = *err || rep->stp.xR[k] >= rep->stp.xR[k + 1];
       }
       for (k = 0; k < rep->cnt; k++) {
          v = 0.0;
@@ -51791,7 +51742,7 @@ static void testminbcunit_testoptguardc1test1reportfortask0(bool *err, optguardn
             tooclose = tooclose || SmallR(vv, 1.0E-4);
          }
          if (!tooclose) {
-            set_error_flag(err, !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0)), __FILE__, __LINE__, "testminbcunit.ap:1988");
+            *err = *err || !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
          }
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
@@ -51808,20 +51759,20 @@ static void testminbcunit_testoptguardc1test1reportfortask0(bool *err, optguardn
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
-         set_error_flag(err, !hasc1discontinuities, __FILE__, __LINE__, "testminbcunit.ap:2009");
+         *err = *err || !hasc1discontinuities;
       }
    } else {
    // Check negative report: fields must be empty
-      set_error_flag(err, rep->stpidxa != -1, __FILE__, __LINE__, "testminbcunit.ap:2016");
-      set_error_flag(err, rep->stpidxb != -1, __FILE__, __LINE__, "testminbcunit.ap:2017");
-      set_error_flag(err, rep->fidx != -1, __FILE__, __LINE__, "testminbcunit.ap:2018");
-      set_error_flag(err, rep->vidx != -1, __FILE__, __LINE__, "testminbcunit.ap:2019");
-      set_error_flag(err, rep->cnt != 0, __FILE__, __LINE__, "testminbcunit.ap:2020");
-      set_error_flag(err, rep->n != 0, __FILE__, __LINE__, "testminbcunit.ap:2021");
-      set_error_flag(err, rep->x0.cnt != 0, __FILE__, __LINE__, "testminbcunit.ap:2022");
-      set_error_flag(err, rep->d.cnt != 0, __FILE__, __LINE__, "testminbcunit.ap:2023");
-      set_error_flag(err, rep->stp.cnt != 0, __FILE__, __LINE__, "testminbcunit.ap:2024");
-      set_error_flag(err, rep->g.cnt != 0, __FILE__, __LINE__, "testminbcunit.ap:2025");
+      *err = *err || rep->stpidxa != -1;
+      *err = *err || rep->stpidxb != -1;
+      *err = *err || rep->fidx != -1;
+      *err = *err || rep->vidx != -1;
+      *err = *err || rep->cnt != 0;
+      *err = *err || rep->n != 0;
+      *err = *err || rep->x0.cnt != 0;
+      *err = *err || rep->d.cnt != 0;
+      *err = *err || rep->stp.cnt != 0;
+      *err = *err || rep->g.cnt != 0;
    }
 }
 
@@ -51898,24 +51849,24 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
       } else ae_assert(false, "Assertion failed");
    minbcresults(&state, &x1, &rep);
    minbcoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbcunit.ap:1321");
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminbcunit.ap:1322");
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.badgradxbase.cnt != 0, __FILE__, __LINE__, "testminbcunit.ap:1325");
-   set_error_flag(wereerrors, ogrep.badgraduser.rows != 0, __FILE__, __LINE__, "testminbcunit.ap:1326");
-   set_error_flag(wereerrors, ogrep.badgraduser.cols != 0, __FILE__, __LINE__, "testminbcunit.ap:1327");
-   set_error_flag(wereerrors, ogrep.badgradnum.rows != 0, __FILE__, __LINE__, "testminbcunit.ap:1328");
-   set_error_flag(wereerrors, ogrep.badgradnum.cols != 0, __FILE__, __LINE__, "testminbcunit.ap:1329");
+   *wereerrors = *wereerrors || ogrep.badgradxbase.cnt != 0;
+   *wereerrors = *wereerrors || ogrep.badgraduser.rows != 0;
+   *wereerrors = *wereerrors || ogrep.badgraduser.cols != 0;
+   *wereerrors = *wereerrors || ogrep.badgradnum.rows != 0;
+   *wereerrors = *wereerrors || ogrep.badgradnum.cols != 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.badgradsuspected, __FILE__, __LINE__, "testminbcunit.ap:1332");
-   set_error_flag(wereerrors, ogrep.badgradfidx != -1, __FILE__, __LINE__, "testminbcunit.ap:1333");
-   set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminbcunit.ap:1334");
+   *wereerrors = *wereerrors || ogrep.badgradsuspected;
+   *wereerrors = *wereerrors || ogrep.badgradfidx != -1;
+   *wereerrors = *wereerrors || ogrep.badgradvidx != -1;
 // Test that C0/C1 continuity monitoring is disabled by default;
 // we solve nonsmooth problem and test that nothing is returned
 // by OptGuard.
@@ -51952,19 +51903,19 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
       } else ae_assert(false, "Assertion failed");
    minbcresults(&state, &x1, &rep);
    minbcoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminbcunit.ap:1374");
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbcunit.ap:1375");
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminbcunit.ap:1378");
-   set_error_flag(wereerrors, ogrep.nonc1suspected, __FILE__, __LINE__, "testminbcunit.ap:1379");
-   set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminbcunit.ap:1380");
-   set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminbcunit.ap:1381");
-   set_error_flag(wereerrors, ogrep.nonc1fidx >= 0, __FILE__, __LINE__, "testminbcunit.ap:1382");
-   set_error_flag(wereerrors, ogrep.nonc1test0positive, __FILE__, __LINE__, "testminbcunit.ap:1383");
-   set_error_flag(wereerrors, ogrep.nonc1test1positive, __FILE__, __LINE__, "testminbcunit.ap:1384");
+   *wereerrors = *wereerrors || ogrep.nonc0suspected;
+   *wereerrors = *wereerrors || ogrep.nonc1suspected;
+   *wereerrors = *wereerrors || !optguardallclear(&ogrep);
+   *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
+   *wereerrors = *wereerrors || ogrep.nonc1fidx >= 0;
+   *wereerrors = *wereerrors || ogrep.nonc1test0positive;
+   *wereerrors = *wereerrors || ogrep.nonc1test1positive;
 // Test gradient checking functionality, try various
 // defect types:
 // * accidental zeroing of some gradient component
@@ -52003,8 +51954,8 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
          while (minbciteration(&state))
             if (state.needfg) {
                for (i = 0; i < n; i++) {
-                  set_error_flag(wereerrors, state.x.xR[i] < bndl.xR[i], __FILE__, __LINE__, "testminbcunit.ap:1432");
-                  set_error_flag(wereerrors, state.x.xR[i] > bndu.xR[i], __FILE__, __LINE__, "testminbcunit.ap:1433");
+                  *wereerrors = *wereerrors || state.x.xR[i] < bndl.xR[i];
+                  *wereerrors = *wereerrors || state.x.xR[i] > bndu.xR[i];
                }
                state.f = 0.0;
                for (i = 0; i < n; i++) {
@@ -52031,14 +51982,14 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
          minbcresults(&state, &x1, &rep);
          minbcoptguardresults(&state, &ogrep);
       // Check that something is returned
-         set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbcunit.ap:1466");
-         set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminbcunit.ap:1467");
+         *wereerrors = *wereerrors || rep.terminationtype <= 0;
+         *wereerrors = *wereerrors || !isfinitevector(&x1, n);
          if (*wereerrors) {
             ae_frame_leave();
             return;
          }
       // Compute reference values for true and spoiled Jacobian at X0
-         set_error_flag(wereerrors, !isfinitevector(&ogrep.badgradxbase, n), __FILE__, __LINE__, "testminbcunit.ap:1474");
+         *wereerrors = *wereerrors || !isfinitevector(&ogrep.badgradxbase, n);
          if (*wereerrors) {
             ae_frame_leave();
             return;
@@ -52067,24 +52018,24 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
             jacdefect.xyR[0][i] /= s.xR[i];
          }
       // Check OptGuard report
-         set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgraduser, 1, n), __FILE__, __LINE__, "testminbcunit.ap:1502");
-         set_error_flag(wereerrors, !apservisfinitematrix(&ogrep.badgradnum, 1, n), __FILE__, __LINE__, "testminbcunit.ap:1503");
+         *wereerrors = *wereerrors || !apservisfinitematrix(&ogrep.badgraduser, 1, n);
+         *wereerrors = *wereerrors || !apservisfinitematrix(&ogrep.badgradnum, 1, n);
          if (*wereerrors) {
             ae_frame_leave();
             return;
          }
          if (defecttype >= 0) {
-            set_error_flag(wereerrors, !ogrep.badgradsuspected, __FILE__, __LINE__, "testminbcunit.ap:1508");
-            set_error_flag(wereerrors, ogrep.badgradfidx != 0, __FILE__, __LINE__, "testminbcunit.ap:1509");
-            set_error_flag(wereerrors, ogrep.badgradvidx != varidx, __FILE__, __LINE__, "testminbcunit.ap:1510");
+            *wereerrors = *wereerrors || !ogrep.badgradsuspected;
+            *wereerrors = *wereerrors || ogrep.badgradfidx != 0;
+            *wereerrors = *wereerrors || ogrep.badgradvidx != varidx;
          } else {
-            set_error_flag(wereerrors, ogrep.badgradsuspected, __FILE__, __LINE__, "testminbcunit.ap:1514");
-            set_error_flag(wereerrors, ogrep.badgradfidx != -1, __FILE__, __LINE__, "testminbcunit.ap:1515");
-            set_error_flag(wereerrors, ogrep.badgradvidx != -1, __FILE__, __LINE__, "testminbcunit.ap:1516");
+            *wereerrors = *wereerrors || ogrep.badgradsuspected;
+            *wereerrors = *wereerrors || ogrep.badgradfidx != -1;
+            *wereerrors = *wereerrors || ogrep.badgradvidx != -1;
          }
          for (j = 0; j < n; j++) {
-            set_error_flag(wereerrors, !NearAtR(jactrue.xyR[0][j], ogrep.badgradnum.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminbcunit.ap:1520");
-            set_error_flag(wereerrors, !NearAtR(jacdefect.xyR[0][j], ogrep.badgraduser.xyR[0][j], 0.01 / s.xR[j]), __FILE__, __LINE__, "testminbcunit.ap:1521");
+            *wereerrors = *wereerrors || !NearAtR(jactrue.xyR[0][j], ogrep.badgradnum.xyR[0][j], 0.01 / s.xR[j]);
+            *wereerrors = *wereerrors || !NearAtR(jacdefect.xyR[0][j], ogrep.badgraduser.xyR[0][j], 0.01 / s.xR[j]);
          }
       }
    }
@@ -52154,8 +52105,8 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
       minbcresults(&state, &x1, &rep);
       minbcoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminbcunit.ap:1602");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbcunit.ap:1603");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
@@ -52165,8 +52116,8 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
    // (C0 violation being reported) and "soft" ones
    // (C1 violation is NOT reported) which accumulate
    // until we exhaust limit.
-      set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminbcunit.ap:1614");
-      set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminbcunit.ap:1615");
+      *wereerrors = *wereerrors || ogrep.nonc0suspected;
+      *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
       failed = false;
       failed = failed || optguardallclear(&ogrep);
       failed = failed || !ogrep.nonc1suspected;
@@ -52178,43 +52129,43 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
       minbcoptguardnonc1test0results(&state, &ognonc1test0strrep, &ognonc1test0lngrep);
       minbcoptguardnonc1test1results(&state, &ognonc1test1strrep, &ognonc1test1lngrep);
       if (ogrep.nonc1test0positive) {
-         set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminbcunit.ap:1630");
-         set_error_flag(wereerrors, !ognonc1test0strrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1631");
-         set_error_flag(wereerrors, !ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1632");
-         set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminbcunit.ap:1633");
+         *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+         *wereerrors = *wereerrors || !ognonc1test0strrep.positive;
+         *wereerrors = *wereerrors || !ognonc1test0lngrep.positive;
+         *wereerrors = *wereerrors || ogrep.nonc1fidx != 0;
          testminbcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testminbcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
          avgstr0len += (double)ognonc1test0strrep.cnt / passcount;
          avglng0len += (double)ognonc1test0lngrep.cnt / passcount;
       } else {
-         set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1641");
-         set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1642");
+         *wereerrors = *wereerrors || ognonc1test0strrep.positive;
+         *wereerrors = *wereerrors || ognonc1test0lngrep.positive;
          testminbcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testminbcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
          c1test0fails++;
       }
       if (ogrep.nonc1test1positive) {
-         set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminbcunit.ap:1649");
-         set_error_flag(wereerrors, !ognonc1test1strrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1650");
-         set_error_flag(wereerrors, !ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1651");
-         set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminbcunit.ap:1652");
+         *wereerrors = *wereerrors || !ogrep.nonc1suspected;
+         *wereerrors = *wereerrors || !ognonc1test1strrep.positive;
+         *wereerrors = *wereerrors || !ognonc1test1lngrep.positive;
+         *wereerrors = *wereerrors || ogrep.nonc1fidx != 0;
          testminbcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testminbcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
          avgstr1len += (double)ognonc1test1strrep.cnt / passcount;
          avglng1len += (double)ognonc1test1lngrep.cnt / passcount;
       } else {
-         set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1660");
-         set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1661");
+         *wereerrors = *wereerrors || ognonc1test1strrep.positive;
+         *wereerrors = *wereerrors || ognonc1test1lngrep.positive;
          testminbcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testminbcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
          c1test1fails++;
       }
    }
-   set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminbcunit.ap:1668");
-   set_error_flag(wereerrors, c1test0fails > maxc1test0fails, __FILE__, __LINE__, "testminbcunit.ap:1669");
-   set_error_flag(wereerrors, c1test1fails > maxc1test1fails, __FILE__, __LINE__, "testminbcunit.ap:1670");
-   set_error_flag(wereerrors, avglng0len <= avgstr0len, __FILE__, __LINE__, "testminbcunit.ap:1671");
-   set_error_flag(wereerrors, avglng1len <= avgstr1len, __FILE__, __LINE__, "testminbcunit.ap:1672");
+   *wereerrors = *wereerrors || failurecounter > maxfails;
+   *wereerrors = *wereerrors || c1test0fails > maxc1test0fails;
+   *wereerrors = *wereerrors || c1test1fails > maxc1test1fails;
+   *wereerrors = *wereerrors || avglng0len <= avgstr0len;
+   *wereerrors = *wereerrors || avglng1len <= avgstr1len;
 // Detection of C1 continuity violations in the target under numerical differentiation:
 // * target function is a sum of |(x,c_i)| for i=1..N.
 // * no constraints is present.
@@ -52266,8 +52217,8 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
       minbcresults(&state, &x1, &rep);
       minbcoptguardresults(&state, &ogrep);
    // Check basic properties of the solution
-      set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminbcunit.ap:1738");
-      set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbcunit.ap:1739");
+      *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+      *wereerrors = *wereerrors || rep.terminationtype <= 0;
       if (*wereerrors) {
          ae_frame_leave();
          return;
@@ -52277,8 +52228,8 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
    // (C0 violation being reported) and "soft" ones
    // (C1 violation is NOT reported) which accumulate
    // until we exhaust limit.
-      set_error_flag(wereerrors, ogrep.nonc0suspected, __FILE__, __LINE__, "testminbcunit.ap:1750");
-      set_error_flag(wereerrors, ogrep.nonc0fidx >= 0, __FILE__, __LINE__, "testminbcunit.ap:1751");
+      *wereerrors = *wereerrors || ogrep.nonc0suspected;
+      *wereerrors = *wereerrors || ogrep.nonc0fidx >= 0;
       failed = false;
       failed = failed || optguardallclear(&ogrep);
       failed = failed || !ogrep.nonc1suspected;
@@ -52287,7 +52238,7 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
          failurecounter++;
       }
    }
-   set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminbcunit.ap:1759");
+   *wereerrors = *wereerrors || failurecounter > maxfails;
 // Make sure than no false positives are reported for larger
 // problems where numerical noise can be an issue:
 // * N=100 dimensions
@@ -52318,18 +52269,18 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
          }
       } else ae_assert(false, "Assertion failed");
    minbcresults(&state, &x1, &rep);
-   set_error_flag(wereerrors, !isfinitevector(&x1, n), __FILE__, __LINE__, "testminbcunit.ap:1802");
-   set_error_flag(wereerrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testminbcunit.ap:1803");
+   *wereerrors = *wereerrors || !isfinitevector(&x1, n);
+   *wereerrors = *wereerrors || rep.terminationtype <= 0;
    if (*wereerrors) {
       ae_frame_leave();
       return;
    }
    minbcoptguardresults(&state, &ogrep);
-   set_error_flag(wereerrors, !optguardallclear(&ogrep), __FILE__, __LINE__, "testminbcunit.ap:1807");
+   *wereerrors = *wereerrors || !optguardallclear(&ogrep);
    ae_frame_leave();
 }
 
-bool testminbc(bool silent) {
+bool testminbc() {
    bool waserrors;
    bool feasibilityerrors;
    bool othererrors;
@@ -52351,7 +52302,7 @@ bool testminbc(bool silent) {
    testminbcunit_testoptguard(&optguarderrors);
 // end
    waserrors = feasibilityerrors || othererrors || converrors || interrors || precerrors || optguarderrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING BC OPTIMIZATION\n");
       printf("FEASIBILITY PROPERTIES:                   ");
       if (feasibilityerrors) {
@@ -52933,7 +52884,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          kt = kdtreequeryrnnu(&treext, &ptx, r, true);
       }
       if (kxy != kx || kt != kx) {
-         set_error_flag(kdterrors, true, __FILE__, __LINE__, "testnearestneighborunit.ap:648");
+         *kdterrors = true;
          ae_frame_leave();
          return;
       }
@@ -52945,7 +52896,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       kdtreequeryresultsxyi(&treexy, &qxy);
       kdtreequeryresultstagsi(&treext, &qtags);
       kdtreequeryresultsdistancesi(&treext, &qr);
-      set_error_flag(kdterrors, testnearestneighborunit_kdtresultsdifferent(xy, n, &qx, &qxy, &qtags, kx, nx, ny), __FILE__, __LINE__, "testnearestneighborunit.ap:659");
+      *kdterrors = *kdterrors || testnearestneighborunit_kdtresultsdifferent(xy, n, &qx, &qxy, &qtags, kx, nx, ny);
       SetMatrix(&qx);
       SetMatrix(&qxy);
       SetVector(&qtags);
@@ -52954,7 +52905,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       kdtreequeryresultsxy(&treexy, &qxy);
       kdtreequeryresultstags(&treext, &qtags);
       kdtreequeryresultsdistances(&treext, &qr);
-      set_error_flag(kdterrors, testnearestneighborunit_kdtresultsdifferent(xy, n, &qx, &qxy, &qtags, kx, nx, ny), __FILE__, __LINE__, "testnearestneighborunit.ap:668");
+      *kdterrors = *kdterrors || testnearestneighborunit_kdtresultsdifferent(xy, n, &qx, &qxy, &qtags, kx, nx, ny);
       for (i = 0; i < n; i++) {
          tmpb.xB[i] = true;
       }
@@ -52965,14 +52916,14 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          ae_v_move(tmpx.xR, 1, ptx.xR, 1, nx);
          ae_v_sub(tmpx.xR, 1, xy->xyR[i], 1, nx);
          if (tmpb.xB[i]) {
-            set_error_flag(kdterrors, testnearestneighborunit_vnorm(&tmpx, nx, normtype) < r * (1 - errtol), __FILE__, __LINE__, "testnearestneighborunit.ap:678");
+            *kdterrors = *kdterrors || testnearestneighborunit_vnorm(&tmpx, nx, normtype) < r * (1 - errtol);
          } else {
-            set_error_flag(kdterrors, testnearestneighborunit_vnorm(&tmpx, nx, normtype) > r * (1 + errtol), __FILE__, __LINE__, "testnearestneighborunit.ap:680");
+            *kdterrors = *kdterrors || testnearestneighborunit_vnorm(&tmpx, nx, normtype) > r * (1 + errtol);
          }
       }
       if (orderedrnn) {
          for (i = 0; i < kx - 1; i++) {
-            set_error_flag(kdterrors, qr.xR[i] > qr.xR[i + 1], __FILE__, __LINE__, "testnearestneighborunit.ap:685");
+            *kdterrors = *kdterrors || qr.xR[i] > qr.xR[i + 1];
          }
       }
    // Test functions which use external buffer:
@@ -52999,7 +52950,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       kdtreequeryknn(&treexy, &ptx, 1, true);
       kdtreequeryknn(&treext, &ptx, 1, true);
       if (kxy != kx || kt != kx) {
-         set_error_flag(kdterrors, true, __FILE__, __LINE__, "testnearestneighborunit.ap:718");
+         *kdterrors = true;
          ae_frame_leave();
          return;
       }
@@ -53011,7 +52962,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       kdtreetsqueryresultsxy(&treexy, &bufxy, &qxy);
       kdtreetsqueryresultstags(&treext, &bufxt, &qtags);
       kdtreetsqueryresultsdistances(&treext, &bufxt, &qr);
-      set_error_flag(kdterrors, testnearestneighborunit_kdtresultsdifferent(xy, n, &qx, &qxy, &qtags, kx, nx, ny), __FILE__, __LINE__, "testnearestneighborunit.ap:729");
+      *kdterrors = *kdterrors || testnearestneighborunit_kdtresultsdifferent(xy, n, &qx, &qxy, &qtags, kx, nx, ny);
       for (i = 0; i < n; i++) {
          tmpb.xB[i] = true;
       }
@@ -53022,14 +52973,14 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
          ae_v_move(tmpx.xR, 1, ptx.xR, 1, nx);
          ae_v_sub(tmpx.xR, 1, xy->xyR[i], 1, nx);
          if (tmpb.xB[i]) {
-            set_error_flag(kdterrors, testnearestneighborunit_vnorm(&tmpx, nx, normtype) < r * (1 - errtol), __FILE__, __LINE__, "testnearestneighborunit.ap:739");
+            *kdterrors = *kdterrors || testnearestneighborunit_vnorm(&tmpx, nx, normtype) < r * (1 - errtol);
          } else {
-            set_error_flag(kdterrors, testnearestneighborunit_vnorm(&tmpx, nx, normtype) > r * (1 + errtol), __FILE__, __LINE__, "testnearestneighborunit.ap:741");
+            *kdterrors = *kdterrors || testnearestneighborunit_vnorm(&tmpx, nx, normtype) > r * (1 + errtol);
          }
       }
       if (orderedrnn) {
          for (i = 0; i < kx - 1; i++) {
-            set_error_flag(kdterrors, qr.xR[i] > qr.xR[i + 1], __FILE__, __LINE__, "testnearestneighborunit.ap:746");
+            *kdterrors = *kdterrors || qr.xR[i] > qr.xR[i + 1];
          }
       }
    }
@@ -53059,12 +53010,12 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       kdtreetsqueryresultstags(&treext, &bufxt, &qtags);
       kdtreetsqueryresultsdistances(&treext, &bufxt, &qr);
       for (i = 0; i < kx; i++) {
-         set_error_flag(kdterrors, qr.xR[i] != 0.0, __FILE__, __LINE__, "testnearestneighborunit.ap:783");
+         *kdterrors = *kdterrors || qr.xR[i] != 0.0;
       }
       for (i = 0; i < kx; i++) {
          for (j = 0; j < nx; j++) {
-            set_error_flag(kdterrors, qx.xyR[i][j] != xy->xyR[k][j], __FILE__, __LINE__, "testnearestneighborunit.ap:788");
-            set_error_flag(kdterrors, qx.xyR[i][j] != xy->xyR[qtags.xZ[i]][j], __FILE__, __LINE__, "testnearestneighborunit.ap:789");
+            *kdterrors = *kdterrors || qx.xyR[i][j] != xy->xyR[k][j];
+            *kdterrors = *kdterrors || qx.xyR[i][j] != xy->xyR[qtags.xZ[i]][j];
          }
       }
    // Test for randomly generated box (thread-safe version)
@@ -53083,7 +53034,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       kdtreetsqueryresultstags(&treext, &bufxt, &qtags);
       kdtreetsqueryresultsdistances(&treext, &bufxt, &qr);
       for (i = 0; i < kx; i++) {
-         set_error_flag(kdterrors, qr.xR[i] != 0.0, __FILE__, __LINE__, "testnearestneighborunit.ap:812");
+         *kdterrors = *kdterrors || qr.xR[i] != 0.0;
       }
       for (i = 0; i < n; i++) {
          tmpb.xB[i] = false;
@@ -53098,9 +53049,9 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
             inthebox = inthebox && xy->xyR[i][j] <= qmax.xR[j];
          }
          if (tmpb.xB[i]) {
-            set_error_flag(kdterrors, !inthebox, __FILE__, __LINE__, "testnearestneighborunit.ap:826");
+            *kdterrors = *kdterrors || !inthebox;
          } else {
-            set_error_flag(kdterrors, inthebox, __FILE__, __LINE__, "testnearestneighborunit.ap:828");
+            *kdterrors = *kdterrors || inthebox;
          }
       }
    // Test for randomly generated box (non-thread-safe version)
@@ -53119,7 +53070,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
       kdtreequeryresultstags(&treext, &qtags);
       kdtreequeryresultsdistances(&treext, &qr);
       for (i = 0; i < kx; i++) {
-         set_error_flag(kdterrors, qr.xR[i] != 0.0, __FILE__, __LINE__, "testnearestneighborunit.ap:850");
+         *kdterrors = *kdterrors || qr.xR[i] != 0.0;
       }
       for (i = 0; i < n; i++) {
          tmpb.xB[i] = false;
@@ -53134,9 +53085,9 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
             inthebox = inthebox && xy->xyR[i][j] <= qmax.xR[j];
          }
          if (tmpb.xB[i]) {
-            set_error_flag(kdterrors, !inthebox, __FILE__, __LINE__, "testnearestneighborunit.ap:864");
+            *kdterrors = *kdterrors || !inthebox;
          } else {
-            set_error_flag(kdterrors, inthebox, __FILE__, __LINE__, "testnearestneighborunit.ap:866");
+            *kdterrors = *kdterrors || inthebox;
          }
       }
    }
@@ -53363,7 +53314,7 @@ static bool testnearestneighborunit_testspecialcases() {
 }
 
 // Testing Nearest Neighbor Search
-bool testnearestneighbor(bool silent) {
+bool testnearestneighbor() {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -53429,7 +53380,7 @@ bool testnearestneighbor(bool silent) {
    kdterrors = kdterrors || testnearestneighborunit_testspecialcases();
 // report
    waserrors = kdterrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING NEAREST NEIGHBOR SEARCH\n");
       printf("* KD TREES:                              ");
       if (!kdterrors) {
@@ -53451,7 +53402,7 @@ bool testnearestneighbor(bool silent) {
 
 // === odesolver testing unit ===
 // Test
-bool testodesolver(bool silent) {
+bool testodesolver() {
    ae_frame _frame_block;
    ae_int_t passcount;
    bool curerrors;
@@ -53579,7 +53530,7 @@ bool testodesolver(bool silent) {
    }
 // end
    waserrors = rkckerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING ODE SOLVER\n");
       printf("* RK CASH-KARP:                           ");
       if (rkckerrors) {
@@ -53968,7 +53919,7 @@ static double testinverseupdateunit_normalizednrm(RMatrix *a, ae_int_t n) {
    return result;
 }
 
-bool testinverseupdate(bool silent) {
+bool testinverseupdate() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t maxn;
@@ -54005,7 +53956,7 @@ bool testinverseupdate(bool silent) {
          testinverseupdateunit_generaterandommatrixcond(&a, n, c);
          testinverseupdateunit_makeacopy(&a, n, n, &inva);
          if (!testinverseupdateunit_invmat(&inva, n)) {
-            set_error_flag(&waserrors, true, __FILE__, __LINE__, "testinverseupdateunit.ap:642");
+            waserrors = true;
             break;
          }
       // Test simple update
@@ -54026,12 +53977,12 @@ bool testinverseupdate(bool silent) {
          }
          testinverseupdateunit_makeacopy(&a, n, n, &b1);
          if (!testinverseupdateunit_updandinv(&b1, &u, &v, n)) {
-            set_error_flag(&waserrors, true, __FILE__, __LINE__, "testinverseupdateunit.ap:666");
+            waserrors = true;
             break;
          }
          testinverseupdateunit_makeacopy(&inva, n, n, &b2);
          rmatrixinvupdatesimple(&b2, n, updrow, updcol, val);
-         set_error_flag(&waserrors, testinverseupdateunit_matrixdiff(&b1, &b2, n, n) > threshold * testinverseupdateunit_normalizednrm(&b1, n), __FILE__, __LINE__, "testinverseupdateunit.ap:671");
+         waserrors = waserrors || testinverseupdateunit_matrixdiff(&b1, &b2, n, n) > threshold * testinverseupdateunit_normalizednrm(&b1, n);
       // Test row update
          updrow = randominteger(n);
          for (i = 0; i < n; i++) {
@@ -54044,12 +53995,12 @@ bool testinverseupdate(bool silent) {
          }
          testinverseupdateunit_makeacopy(&a, n, n, &b1);
          if (!testinverseupdateunit_updandinv(&b1, &u, &v, n)) {
-            set_error_flag(&waserrors, true, __FILE__, __LINE__, "testinverseupdateunit.ap:688");
+            waserrors = true;
             break;
          }
          testinverseupdateunit_makeacopy(&inva, n, n, &b2);
          rmatrixinvupdaterow(&b2, n, updrow, &v);
-         set_error_flag(&waserrors, testinverseupdateunit_matrixdiff(&b1, &b2, n, n) > threshold * testinverseupdateunit_normalizednrm(&b1, n), __FILE__, __LINE__, "testinverseupdateunit.ap:693");
+         waserrors = waserrors || testinverseupdateunit_matrixdiff(&b1, &b2, n, n) > threshold * testinverseupdateunit_normalizednrm(&b1, n);
       // Test column update
          updcol = randominteger(n);
          for (i = 0; i < n; i++) {
@@ -54062,12 +54013,12 @@ bool testinverseupdate(bool silent) {
          }
          testinverseupdateunit_makeacopy(&a, n, n, &b1);
          if (!testinverseupdateunit_updandinv(&b1, &u, &v, n)) {
-            set_error_flag(&waserrors, true, __FILE__, __LINE__, "testinverseupdateunit.ap:710");
+            waserrors = true;
             break;
          }
          testinverseupdateunit_makeacopy(&inva, n, n, &b2);
          rmatrixinvupdatecolumn(&b2, n, updcol, &u);
-         set_error_flag(&waserrors, testinverseupdateunit_matrixdiff(&b1, &b2, n, n) > threshold * testinverseupdateunit_normalizednrm(&b1, n), __FILE__, __LINE__, "testinverseupdateunit.ap:715");
+         waserrors = waserrors || testinverseupdateunit_matrixdiff(&b1, &b2, n, n) > threshold * testinverseupdateunit_normalizednrm(&b1, n);
       // Test full update
          for (i = 0; i < n; i++) {
             v.xR[i] = 0.1 * randommid();
@@ -54075,16 +54026,16 @@ bool testinverseupdate(bool silent) {
          }
          testinverseupdateunit_makeacopy(&a, n, n, &b1);
          if (!testinverseupdateunit_updandinv(&b1, &u, &v, n)) {
-            set_error_flag(&waserrors, true, __FILE__, __LINE__, "testinverseupdateunit.ap:728");
+            waserrors = true;
             break;
          }
          testinverseupdateunit_makeacopy(&inva, n, n, &b2);
          rmatrixinvupdateuv(&b2, n, &u, &v);
-         set_error_flag(&waserrors, testinverseupdateunit_matrixdiff(&b1, &b2, n, n) > threshold * testinverseupdateunit_normalizednrm(&b1, n), __FILE__, __LINE__, "testinverseupdateunit.ap:733");
+         waserrors = waserrors || testinverseupdateunit_matrixdiff(&b1, &b2, n, n) > threshold * testinverseupdateunit_normalizednrm(&b1, n);
       }
    }
 // report
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING INVERSE UPDATE (REAL)\n");
       if (waserrors) {
          printf("TEST FAILED\n");
@@ -54169,7 +54120,7 @@ static void testschurunit_testschurproblem(RMatrix *a, ae_int_t n, double *mater
 }
 
 // Testing Schur decomposition subroutine
-bool testschur(bool silent) {
+bool testschur() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t maxn;
@@ -54223,7 +54174,7 @@ bool testschur(bool silent) {
    }
 // report
    waserrors = materr > threshold || orterr > threshold || errstruct || wfailed;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING SCHUR DECOMPOSITION\n");
       printf("Schur decomposition error:               %5.3e\n", materr);
       printf("Schur orthogonality error:               %5.3e\n", orterr);
@@ -54254,7 +54205,7 @@ bool testschur(bool silent) {
 
 // === spdgevd testing unit ===
 // Testing bidiagonal SVD decomposition subroutine
-bool testspdgevd(bool silent) {
+bool testspdgevd() {
    ae_frame _frame_block;
    ae_int_t pass;
    ae_int_t n;
@@ -54407,7 +54358,7 @@ bool testspdgevd(bool silent) {
    }
 // report
    waserrors = valerr > threshold || wfailed || wnsorted;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING SYMMETRIC GEVD\n");
       printf("Av-lambdav error (generalized):          %5.3e\n", valerr);
       printf("Eigen values order:                      ");
@@ -54436,7 +54387,7 @@ bool testspdgevd(bool silent) {
 }
 
 // === gammafunc testing unit ===
-bool testgammafunc(bool silent) {
+bool testgammafunc() {
    double threshold;
    double v;
    double s;
@@ -54457,7 +54408,7 @@ bool testgammafunc(bool silent) {
    lngammaerrors = lngammaerrors || !NearAtR(v, log(0.5 * sqrt(pi)), threshold) || s != 1.0;
 // report
    waserrors = gammaerrors || lngammaerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING GAMMA FUNCTION\n");
       printf("GAMMA:                                   ");
       if (gammaerrors) {
@@ -54805,7 +54756,7 @@ static void testgqunit_buildgausshermitequadrature(ae_int_t n, RVector *x, RVect
 }
 
 // Test
-bool testgq(bool silent) {
+bool testgq() {
    ae_frame _frame_block;
    double err;
    ae_int_t n;
@@ -55142,7 +55093,7 @@ bool testgq(bool silent) {
    }
 // end
    waserrors = recerrors || specerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING GAUSS QUADRATURES\n");
       printf("FINAL RESULT:                             ");
       if (waserrors) {
@@ -55223,7 +55174,7 @@ static double testgkqunit_mapkind(ae_int_t k) {
 }
 
 // Test
-bool testgkq(bool silent) {
+bool testgkq() {
    ae_frame _frame_block;
    ae_int_t pkind;
    double errtol;
@@ -55334,7 +55285,7 @@ bool testgkq(bool silent) {
    }
 // end
    waserrors = intblerrors || vstblerrors || generrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING GAUSS-KRONROD QUADRATURES\n");
       printf("FINAL RESULT:                             ");
       if (waserrors) {
@@ -55374,7 +55325,7 @@ bool testgkq(bool silent) {
 
 // === autogk testing unit ===
 // Test
-bool testautogk(bool silent) {
+bool testautogk() {
    ae_frame _frame_block;
    double a;
    double b;
@@ -55543,7 +55494,7 @@ bool testautogk(bool silent) {
    }
 // end
    waserrors = simpleerrors || sngenderrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING AUTOGK\n");
       printf("INTEGRATION WITH GIVEN ACCURACY:          ");
       if (simpleerrors || sngenderrors) {
@@ -55594,7 +55545,7 @@ static void testnormaldistrunit_testnormal(bool *errorflag) {
       h = 1.0E-5;
       v0 = normalpdf(x);
       v1 = (normalcdf(x + h) - normalcdf(x - h)) / (2 * h);
-      set_error_flag(errorflag, !NearAtR(v0, v1, 1.0E-4), __FILE__, __LINE__, "testnormaldistrunit.ap:75");
+      *errorflag = *errorflag || !NearAtR(v0, v1, 1.0E-4);
    }
    ae_frame_leave();
 }
@@ -55636,7 +55587,7 @@ static void testnormaldistrunit_testbvn(bool *errorflag) {
    err = rmax2(err, fabs(0.868844042717264000 - bivariatenormalcdf(2.369093655782270000, 1.148153167494120000, 0.297877516862745000)));
    err = rmax2(err, fabs(0.999356215351682000 - bivariatenormalcdf(4.352384277131720000, 3.221749932900420000, -0.257163446680127000)));
    err = rmax2(err, fabs(0.998760969813713000 - bivariatenormalcdf(3.422289814750960000, 3.111433954663520000, 0.198012195099628000)));
-   set_error_flag(errorflag, err > 1.0E-12, __FILE__, __LINE__, "testnormaldistrunit.ap:121");
+   *errorflag = *errorflag || err > 1.0E-12;
    err = 0.0;
    err = rmax2(err, fabs(0.080575405379940000 - bivariatenormalcdf(-1.060937077356340000, 1.523763953950230000, -0.999999999999000000)));
    err = rmax2(err, fabs(0.000000000000000007 - bivariatenormalcdf(-1.060937077356340000, -1.060937077356340000, -0.999999999999000000)));
@@ -55710,7 +55661,7 @@ static void testnormaldistrunit_testbvn(bool *errorflag) {
    err = rmax2(err, fabs(0.000064751025417698 - bivariatenormalcdf(3.421155338081630000, -3.827403648909790000, 0.999999999999000000)));
    err = rmax2(err, fabs(0.999688220825439000 - bivariatenormalcdf(3.421155338081630000, 3.421155338081630000, 0.999999999999000000)));
    err = rmax2(err, fabs(0.999688221472430000 - bivariatenormalcdf(3.421155338081630000, 3.421174755498880000, 0.999999999999000000)));
-   set_error_flag(errorflag, err > 1.0E-12, __FILE__, __LINE__, "testnormaldistrunit.ap:195");
+   *errorflag = *errorflag || err > 1.0E-12;
 // Test that BVN PDF is roughly equal to derivative of BVN CDF
    for (k = 0; k <= 999; k++) {
    // Generate trial point
@@ -55721,12 +55672,12 @@ static void testnormaldistrunit_testbvn(bool *errorflag) {
       h = 1.0E-5;
       v0 = bivariatenormalpdf(x, y, rho);
       v1 = (bivariatenormalcdf(x + h, y + h, rho) + bivariatenormalcdf(x - h, y - h, rho) - bivariatenormalcdf(x + h, y - h, rho) - bivariatenormalcdf(x - h, y + h, rho)) / sqr(2 * h);
-      set_error_flag(errorflag, !NearAtR(v0, v1, 1.0E-4), __FILE__, __LINE__, "testnormaldistrunit.ap:215");
+      *errorflag = *errorflag || !NearAtR(v0, v1, 1.0E-4);
    }
    ae_frame_leave();
 }
 
-bool testnormaldistr(bool silent) {
+bool testnormaldistr() {
    bool nrmerr;
    bool bvnerr;
    bool wereerrors;
@@ -55737,7 +55688,7 @@ bool testnormaldistr(bool silent) {
    testnormaldistrunit_testbvn(&bvnerr);
 // report
    wereerrors = bvnerr || nrmerr;
-   if (!silent) {
+   if (wereerrors || !silent) {
       printf("TESTING NORMAL DISTRIBUTION\n");
       printf("NORMAL DISTRIBUTION:                     ");
       if (nrmerr) {
@@ -55943,7 +55894,7 @@ static void testbasestatunit_testranking(bool *err) {
    ae_frame_leave();
 }
 
-bool testbasestat(bool silent) {
+bool testbasestat() {
    ae_frame _frame_block;
    bool waserrors;
    bool s1errors;
@@ -56162,7 +56113,7 @@ bool testbasestat(bool silent) {
    }
 // Final report
    waserrors = s1errors || covcorrerrors || rankerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("DESC.STAT TEST\n");
       printf("TOTAL RESULTS:                           ");
       if (!waserrors) {
@@ -56201,7 +56152,7 @@ bool testbasestat(bool silent) {
 }
 
 // === wsr testing unit ===
-bool testwsr(bool silent) {
+bool testwsr() {
    ae_frame _frame_block;
    bool waserrors;
    ae_int_t n;
@@ -56231,9 +56182,9 @@ bool testwsr(bool silent) {
       taillprev = 1.0;
       for (i = 0; i <= n; i++) {
          wilcoxonsignedranktest(&xa, n, ebase + eshift * i, &tailb, &taill, &tailr);
-         set_error_flag(&waserrors, tailb != 2 * rmin2(taill, tailr), __FILE__, __LINE__, "testwsrunit.ap:42");
-         set_error_flag(&waserrors, tailrprev > tailr, __FILE__, __LINE__, "testwsrunit.ap:43");
-         set_error_flag(&waserrors, taillprev < taill, __FILE__, __LINE__, "testwsrunit.ap:44");
+         waserrors = waserrors || tailb != 2 * rmin2(taill, tailr);
+         waserrors = waserrors || tailrprev > tailr;
+         waserrors = waserrors || taillprev < taill;
          tailrprev = tailr;
          taillprev = taill;
       }
@@ -56251,11 +56202,11 @@ bool testwsr(bool silent) {
       xa.xR[i] = sin((double)(10 * i));
    }
    wilcoxonsignedranktest(&xa, n, 0.0, &tailb, &taill, &tailr);
-   set_error_flag(&waserrors, !isfinite(tailb), __FILE__, __LINE__, "testwsrunit.ap:64");
-   set_error_flag(&waserrors, !isfinite(taill), __FILE__, __LINE__, "testwsrunit.ap:65");
-   set_error_flag(&waserrors, !isfinite(tailr), __FILE__, __LINE__, "testwsrunit.ap:66");
+   waserrors = waserrors || !isfinite(tailb);
+   waserrors = waserrors || !isfinite(taill);
+   waserrors = waserrors || !isfinite(tailr);
 //
-   if (!silent) {
+   if (waserrors || !silent) {
       if (waserrors) {
          printf("TEST FAILED\n");
       } else {
@@ -56268,7 +56219,7 @@ bool testwsr(bool silent) {
 }
 
 // === mannwhitneyu testing unit ===
-bool testmannwhitneyu(bool silent) {
+bool testmannwhitneyu() {
    ae_frame _frame_block;
    bool waserrors;
    ae_int_t testmin;
@@ -56322,9 +56273,9 @@ bool testmannwhitneyu(bool silent) {
          }
          for (k = 0; k < ecnt; k++) {
             mannwhitneyutest(&x, n, &y, m, &tailb, &taill, &tailr);
-            set_error_flag(&waserrors, tailb != 2 * rmin2(taill, tailr), __FILE__, __LINE__, "testmannwhitneyuunit.ap:57");
-            set_error_flag(&waserrors, tailrprev > tailr, __FILE__, __LINE__, "testmannwhitneyuunit.ap:58");
-            set_error_flag(&waserrors, taillprev < taill, __FILE__, __LINE__, "testmannwhitneyuunit.ap:59");
+            waserrors = waserrors || tailb != 2 * rmin2(taill, tailr);
+            waserrors = waserrors || tailrprev > tailr;
+            waserrors = waserrors || taillprev < taill;
             tailrprev = tailr;
             taillprev = taill;
             for (i = 0; i < m; i++) {
@@ -56360,15 +56311,15 @@ bool testmannwhitneyu(bool silent) {
       worsterr = rmax2(worsterr, v);
    // Test error in quantile; for different N's we have different tolerances
       if (n < 10) {
-         set_error_flag(&waserrors, v > 0.035, __FILE__, __LINE__, "testmannwhitneyuunit.ap:101");
+         waserrors = waserrors || v > 0.035;
       } else {
          if (n < 15) {
-            set_error_flag(&waserrors, v > 0.025, __FILE__, __LINE__, "testmannwhitneyuunit.ap:103");
+            waserrors = waserrors || v > 0.025;
          } else {
             if (n < 30) {
-               set_error_flag(&waserrors, v > 0.020, __FILE__, __LINE__, "testmannwhitneyuunit.ap:105");
+               waserrors = waserrors || v > 0.020;
             } else {
-               set_error_flag(&waserrors, v > 0.015, __FILE__, __LINE__, "testmannwhitneyuunit.ap:107");
+               waserrors = waserrors || v > 0.015;
             }
          }
       }
@@ -56386,9 +56337,9 @@ bool testmannwhitneyu(bool silent) {
          }
          mannwhitneyutest(&x, n, &y, m, &tailb, &taill, &tailr);
          mannwhitneyutest(&y, m, &x, n, &tailb1, &taill1, &tailr1);
-         set_error_flag(&waserrors, !NearAtR(tailb, tailb1, 1.0E-12), __FILE__, __LINE__, "testmannwhitneyuunit.ap:126");
-         set_error_flag(&waserrors, !NearAtR(taill, tailr1, 1.0E-12), __FILE__, __LINE__, "testmannwhitneyuunit.ap:127");
-         set_error_flag(&waserrors, !NearAtR(tailr, taill1, 1.0E-12), __FILE__, __LINE__, "testmannwhitneyuunit.ap:128");
+         waserrors = waserrors || !NearAtR(tailb, tailb1, 1.0E-12);
+         waserrors = waserrors || !NearAtR(taill, tailr1, 1.0E-12);
+         waserrors = waserrors || !NearAtR(tailr, taill1, 1.0E-12);
       }
    }
 // Test for integer overflow in the function: if one crucial
@@ -56406,11 +56357,11 @@ bool testmannwhitneyu(bool silent) {
       y.xR[i] = sin((double)(13 * i));
    }
    mannwhitneyutest(&x, n, &y, n, &tailb, &taill, &tailr);
-   set_error_flag(&waserrors, !isfinite(tailb), __FILE__, __LINE__, "testmannwhitneyuunit.ap:149");
-   set_error_flag(&waserrors, !isfinite(taill), __FILE__, __LINE__, "testmannwhitneyuunit.ap:150");
-   set_error_flag(&waserrors, !isfinite(tailr), __FILE__, __LINE__, "testmannwhitneyuunit.ap:151");
+   waserrors = waserrors || !isfinite(tailb);
+   waserrors = waserrors || !isfinite(taill);
+   waserrors = waserrors || !isfinite(tailr);
 //
-   if (!silent) {
+   if (waserrors || !silent) {
       if (waserrors) {
          printf("TEST FAILED\n");
       } else {
@@ -56423,7 +56374,7 @@ bool testmannwhitneyu(bool silent) {
 }
 
 // === stest testing unit ===
-bool teststest(bool silent) {
+bool teststest() {
    ae_frame _frame_block;
    double taill;
    double tailr;
@@ -56469,7 +56420,7 @@ bool teststest(bool silent) {
    waserrors = waserrors || tailr != 1.0;
    waserrors = waserrors || tailb != 1.0;
 // Final report
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("SIGN TEST:                               ");
       if (!waserrors) {
          printf("OK\n");
@@ -56489,7 +56440,7 @@ bool teststest(bool silent) {
 }
 
 // === studentttests testing unit ===
-bool teststudentttests(bool silent) {
+bool teststudentttests() {
    ae_frame _frame_block;
    bool waserrors;
    double eps;
@@ -56767,7 +56718,7 @@ bool teststudentttests(bool silent) {
    }
    unequalvariancettest(&xa, n, &ya, n, &tailb, &taill, &tailr);
 //
-   if (!silent) {
+   if (waserrors || !silent) {
       if (waserrors) {
          printf("TEST FAILED\n");
       } else {
@@ -56827,7 +56778,7 @@ static void testratintunit_brcunset(barycentricinterpolant *b) {
    ae_frame_leave();
 }
 
-bool testratint(bool silent) {
+bool testratint() {
    ae_frame _frame_block;
    bool waserrors;
    bool bcerrors;
@@ -57212,7 +57163,7 @@ bool testratint(bool silent) {
    }
 // report
    waserrors = bcerrors || nperrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING RATIONAL INTERPOLATION\n");
       printf("BASIC BARYCENTRIC FUNCTIONS:             ");
       if (bcerrors) {
@@ -57281,7 +57232,7 @@ static void testidwunit_testcontinuity(idwmodel *model, ae_int_t nx, ae_int_t ny
             lc2 = rmax2(lc2, fabs(yy.xyR[i][j] - yy.xyR[i + 2][j]) / 2);
          }
       }
-      set_error_flag(err, lc2 > 1.0E-4 && lc1 > 1.750 * lc2, __FILE__, __LINE__, "testidwunit.ap:67");
+      *err = *err || lc2 > 1.0E-4 && lc1 > 1.750 * lc2;
    // Differentiate function, repeat one more time
       for (i = 0; i < nsteps - 1; i++) {
          for (j = 0; j < ny; j++) {
@@ -57390,22 +57341,22 @@ static void testidwunit_testcommon(bool *err) {
             }
             idwcreatecalcbuffer(&model, &buffer);
          // Test report
-            set_error_flag(err, rep.rmserror != 0.0, __FILE__, __LINE__, "testidwunit.ap:169");
-            set_error_flag(err, rep.avgerror != 0.0, __FILE__, __LINE__, "testidwunit.ap:170");
-            set_error_flag(err, rep.maxerror != 0.0, __FILE__, __LINE__, "testidwunit.ap:171");
-            set_error_flag(err, rep.r2 != 1.0, __FILE__, __LINE__, "testidwunit.ap:172");
+            *err = *err || rep.rmserror != 0.0;
+            *err = *err || rep.avgerror != 0.0;
+            *err = *err || rep.maxerror != 0.0;
+            *err = *err || rep.r2 != 1.0;
          // Test simplified evaluation
             x0 = hqrndnormal(&rs);
             x1 = hqrndnormal(&rs);
             x2 = hqrndnormal(&rs);
             if (nx == 1 && ny == 1) {
-               set_error_flag(err, idwcalc1(&model, x0) != 0.0, __FILE__, __LINE__, "testidwunit.ap:181");
+               *err = *err || idwcalc1(&model, x0) != 0.0;
             }
             if (nx == 2 && ny == 1) {
-               set_error_flag(err, idwcalc2(&model, x0, x1) != 0.0, __FILE__, __LINE__, "testidwunit.ap:183");
+               *err = *err || idwcalc2(&model, x0, x1) != 0.0;
             }
             if (nx == 3 && ny == 1) {
-               set_error_flag(err, idwcalc3(&model, x0, x1, x2) != 0.0, __FILE__, __LINE__, "testidwunit.ap:185");
+               *err = *err || idwcalc3(&model, x0, x1, x2) != 0.0;
             }
          // Test generic evaluation
             ae_vector_set_length(&x, nx);
@@ -57414,33 +57365,33 @@ static void testidwunit_testcommon(bool *err) {
             }
             ae_vector_set_length(&y, 0);
             idwcalc(&model, &x, &y);
-            set_error_flag(err, y.cnt != ny, __FILE__, __LINE__, "testidwunit.ap:195");
+            *err = *err || y.cnt != ny;
             if (*err) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < ny; i++) {
-               set_error_flag(err, y.xR[i] != 0.0, __FILE__, __LINE__, "testidwunit.ap:199");
+               *err = *err || y.xR[i] != 0.0;
             }
             ae_vector_set_length(&y, 0);
             idwcalcbuf(&model, &x, &y);
-            set_error_flag(err, y.cnt != ny, __FILE__, __LINE__, "testidwunit.ap:202");
+            *err = *err || y.cnt != ny;
             if (*err) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < ny; i++) {
-               set_error_flag(err, y.xR[i] != 0.0, __FILE__, __LINE__, "testidwunit.ap:206");
+               *err = *err || y.xR[i] != 0.0;
             }
             ae_vector_set_length(&y, 0);
             idwtscalcbuf(&model, &buffer, &x, &y);
-            set_error_flag(err, y.cnt != ny, __FILE__, __LINE__, "testidwunit.ap:209");
+            *err = *err || y.cnt != ny;
             if (*err) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < ny; i++) {
-               set_error_flag(err, y.xR[i] != 0.0, __FILE__, __LINE__, "testidwunit.ap:213");
+               *err = *err || y.xR[i] != 0.0;
             }
          }
       }
@@ -57537,10 +57488,10 @@ static void testidwunit_testcommon(bool *err) {
       // Test error metrics
       //
       // NOTE: we expect that dataset is reproduced exactly
-         set_error_flag(err, !SmallAtR(rep.rmserror, tol), __FILE__, __LINE__, "testidwunit.ap:320");
-         set_error_flag(err, !SmallAtR(rep.avgerror, tol), __FILE__, __LINE__, "testidwunit.ap:321");
-         set_error_flag(err, !SmallAtR(rep.maxerror, tol), __FILE__, __LINE__, "testidwunit.ap:322");
-         set_error_flag(err, SmallR(rep.r2, 1.0 - tol), __FILE__, __LINE__, "testidwunit.ap:323");
+         *err = *err || !SmallAtR(rep.rmserror, tol);
+         *err = *err || !SmallAtR(rep.avgerror, tol);
+         *err = *err || !SmallAtR(rep.maxerror, tol);
+         *err = *err || SmallR(rep.r2, 1.0 - tol);
       // Test that dataset is actually exactly reproduced
          for (i = 0; i < n; i++) {
          // Test generic evaluation
@@ -57549,9 +57500,9 @@ static void testidwunit_testcommon(bool *err) {
             }
             ae_vector_set_length(&y, 0);
             idwcalc(&model, &x, &y);
-            set_error_flag(err, y.cnt != ny, __FILE__, __LINE__, "testidwunit.ap:337");
+            *err = *err || y.cnt != ny;
             for (j = 0; j < ny; j++) {
-               set_error_flag(err, !NearAtR(y.xR[j], xy.xyR[i][nx + j], tol), __FILE__, __LINE__, "testidwunit.ap:339");
+               *err = *err || !NearAtR(y.xR[j], xy.xyR[i][nx + j], tol);
             }
             k = hqrnduniformi(&rs, 2 * ny + 1);
             ae_vector_set_length(&y, k);
@@ -57559,9 +57510,9 @@ static void testidwunit_testcommon(bool *err) {
                y.xR[j] = 0.0;
             }
             idwcalcbuf(&model, &x, &y);
-            set_error_flag(err, y.cnt != imax2(ny, k), __FILE__, __LINE__, "testidwunit.ap:346");
+            *err = *err || y.cnt != imax2(ny, k);
             for (j = 0; j < ny; j++) {
-               set_error_flag(err, !NearAtR(y.xR[j], xy.xyR[i][nx + j], tol), __FILE__, __LINE__, "testidwunit.ap:348");
+               *err = *err || !NearAtR(y.xR[j], xy.xyR[i][nx + j], tol);
             }
             k = hqrnduniformi(&rs, 2 * ny + 1);
             ae_vector_set_length(&y, k);
@@ -57569,20 +57520,20 @@ static void testidwunit_testcommon(bool *err) {
                y.xR[j] = 0.0;
             }
             idwtscalcbuf(&model, &buffer, &x, &y);
-            set_error_flag(err, y.cnt != imax2(ny, k), __FILE__, __LINE__, "testidwunit.ap:355");
+            *err = *err || y.cnt != imax2(ny, k);
             for (j = 0; j < ny; j++) {
-               set_error_flag(err, !NearAtR(y.xR[j], xy.xyR[i][nx + j], tol), __FILE__, __LINE__, "testidwunit.ap:357");
+               *err = *err || !NearAtR(y.xR[j], xy.xyR[i][nx + j], tol);
             }
          // Specialized 1, 2, 3-dimensional cases
             if (ny == 1) {
                if (nx == 1) {
-                  set_error_flag(err, !NearAtR(idwcalc1(&model, x.xR[0]), xy.xyR[i][nx], tol), __FILE__, __LINE__, "testidwunit.ap:366");
+                  *err = *err || !NearAtR(idwcalc1(&model, x.xR[0]), xy.xyR[i][nx], tol);
                }
                if (nx == 2) {
-                  set_error_flag(err, !NearAtR(idwcalc2(&model, x.xR[0], x.xR[1]), xy.xyR[i][nx], tol), __FILE__, __LINE__, "testidwunit.ap:368");
+                  *err = *err || !NearAtR(idwcalc2(&model, x.xR[0], x.xR[1]), xy.xyR[i][nx], tol);
                }
                if (nx == 3) {
-                  set_error_flag(err, !NearAtR(idwcalc3(&model, x.xR[0], x.xR[1], x.xR[2]), xy.xyR[i][nx], tol), __FILE__, __LINE__, "testidwunit.ap:370");
+                  *err = *err || !NearAtR(idwcalc3(&model, x.xR[0], x.xR[1], x.xR[2]), xy.xyR[i][nx], tol);
                }
             }
          }
@@ -57635,7 +57586,7 @@ static void testidwunit_testcommon(bool *err) {
          }
          idwcalc(&model, &x, &y);
          for (j = 0; j < ny; j++) {
-            set_error_flag(err, !NearAtR(y.xR[j], meany.xR[j], tol), __FILE__, __LINE__, "testidwunit.ap:424");
+            *err = *err || !NearAtR(y.xR[j], meany.xR[j], tol);
          }
       }
    // Generate random dataset with NONDISTINCT points, test approximation
@@ -57755,10 +57706,10 @@ static void testidwunit_testcommon(bool *err) {
          }
          idwcreatecalcbuffer(&model, &buffer);
       // Test error metrics
-         set_error_flag(err, !NearAtR(rep.rmserror, refrms, tol), __FILE__, __LINE__, "testidwunit.ap:562");
-         set_error_flag(err, !NearAtR(rep.avgerror, refavg, tol), __FILE__, __LINE__, "testidwunit.ap:563");
-         set_error_flag(err, !NearAtR(rep.maxerror, refmax, tol), __FILE__, __LINE__, "testidwunit.ap:564");
-         set_error_flag(err, !NearAtR(rep.r2, refr2, tol), __FILE__, __LINE__, "testidwunit.ap:565");
+         *err = *err || !NearAtR(rep.rmserror, refrms, tol);
+         *err = *err || !NearAtR(rep.avgerror, refavg, tol);
+         *err = *err || !NearAtR(rep.maxerror, refmax, tol);
+         *err = *err || !NearAtR(rep.r2, refr2, tol);
       // Test ability to reproduce mean over non-distinct points
       //
       // NOTE: we do not test all evaluation functions, just IDWCalc()
@@ -57768,7 +57719,7 @@ static void testidwunit_testcommon(bool *err) {
             }
             idwcalc(&model, &x, &y);
             for (j = 0; j < ny; j++) {
-               set_error_flag(err, !NearAtR(y.xR[j], 0.5 * (xy.xyR[2 * i][nx + j] + xy.xyR[2 * i + 1][nx + j]), tol), __FILE__, __LINE__, "testidwunit.ap:578");
+               *err = *err || !NearAtR(y.xR[j], 0.5 * (xy.xyR[2 * i][nx + j] + xy.xyR[2 * i + 1][nx + j]), tol);
             }
          }
       // Test continuity properties:
@@ -57863,7 +57814,7 @@ static void testidwunit_testcommon(bool *err) {
             }
             idwcalc(&model, &x, &y);
             for (j = 0; j < ny; j++) {
-               set_error_flag(err, !SmallAtR(y.xR[j], tol), __FILE__, __LINE__, "testidwunit.ap:684");
+               *err = *err || !SmallAtR(y.xR[j], tol);
             }
          }
       // Mean prior
@@ -57874,7 +57825,7 @@ static void testidwunit_testcommon(bool *err) {
          }
          idwcalc(&model, &x, &y);
          for (j = 0; j < ny; j++) {
-            set_error_flag(err, !NearAtR(y.xR[j], meany.xR[j], tol), __FILE__, __LINE__, "testidwunit.ap:696");
+            *err = *err || !NearAtR(y.xR[j], meany.xR[j], tol);
          }
       // User-specified prior (not tested with textbook Shepard method)
          if (algotype != 0) {
@@ -57886,7 +57837,7 @@ static void testidwunit_testcommon(bool *err) {
             }
             idwcalc(&model, &x, &y);
             for (j = 0; j < ny; j++) {
-               set_error_flag(err, !NearAtR(y.xR[j], v, tol), __FILE__, __LINE__, "testidwunit.ap:710");
+               *err = *err || !NearAtR(y.xR[j], v, tol);
             }
          }
       }
@@ -57926,7 +57877,7 @@ static void testidwunit_testmstab(bool *err) {
    idwbuildersetpoints(&builder, &xy, 3);
    idwfit(&builder, &model, &rep);
    v = 0.01;
-   set_error_flag(err, (idwcalc1(&model, v) - idwcalc1(&model, -v)) / (2 * v) < 0.1, __FILE__, __LINE__, "testidwunit.ap:758");
+   *err = *err || (idwcalc1(&model, v) - idwcalc1(&model, -v)) / (2 * v) < 0.1;
 // Basic test #2: good smoothness
 // * 2D task, dataset is composed from 3 parallel lines
 //   along y=-0.1, y=0, y=+0.1, with outer lines having
@@ -57959,7 +57910,7 @@ static void testidwunit_testmstab(bool *err) {
       v = rmax2(v, fabs(idwcalc2(&model, hqrnduniformr(&rs), 0.1)));
       v = rmax2(v, fabs(idwcalc2(&model, hqrnduniformr(&rs), 0.0) - 1));
    }
-   set_error_flag(err, v > 0.001, __FILE__, __LINE__, "testidwunit.ap:796");
+   *err = *err || v > 0.001;
 // Continuity when moving away from the dataset
    ae_matrix_set_length(&xy, 1, 2);
    xy.xyR[0][0] = 0.0;
@@ -57970,7 +57921,7 @@ static void testidwunit_testmstab(bool *err) {
    idwbuildersetpoints(&builder, &xy, 1);
    idwbuildersetzeroterm(&builder);
    idwfit(&builder, &model, &rep);
-   set_error_flag(err, idwcalc1(&model, 100000.0) != 0.0, __FILE__, __LINE__, "testidwunit.ap:810");
+   *err = *err || idwcalc1(&model, 100000.0) != 0.0;
    v = 0.0;
    for (i = 0; i <= 500; i++) {
       x0 = 1.2 * rbase * ((double)i / 500.0);
@@ -57983,12 +57934,12 @@ static void testidwunit_testmstab(bool *err) {
       x1 = 1.2 * rbase * ((double)(i + 1) / 1000.0);
       vv = rmax2(vv, fabs((idwcalc1(&model, x1) - idwcalc1(&model, x0)) / (x1 - x0)));
    }
-   set_error_flag(err, vv / v > 1.333, __FILE__, __LINE__, "testidwunit.ap:825");
+   *err = *err || vv / v > 1.333;
    ae_frame_leave();
 }
 
 // Testing IDW interpolation
-bool testidw(bool silent) {
+bool testidw() {
    bool waserrors;
    bool commonerrors;
    bool mstaberrors;
@@ -57998,7 +57949,7 @@ bool testidw(bool silent) {
    testidwunit_testcommon(&commonerrors);
    testidwunit_testmstab(&mstaberrors);
    waserrors = commonerrors || mstaberrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING INVERSE DISTANCE WEIGHTING\n");
       printf("* common properties                      ");
       if (!commonerrors) {
@@ -58059,7 +58010,7 @@ static void testpolintunit_brcunset(barycentricinterpolant *b) {
 }
 
 // Unit test
-bool testpolint(bool silent) {
+bool testpolint() {
    ae_frame _frame_block;
    bool waserrors;
    bool interrors;
@@ -58348,7 +58299,7 @@ bool testpolint(bool silent) {
    polynomialbuild(&x2, &y, n, &p);
    polynomialbar2pow(&p, 0.0, 1.0, &c1);
    for (i = 0; i < n; i++) {
-      set_error_flag(&interrors, !NearAtR(c0.xR[i], c1.xR[i] * pow(pscale, (double)i), eps), __FILE__, __LINE__, "testpolintunit.ap:395");
+      interrors = interrors || !NearAtR(c0.xR[i], c1.xR[i] * pow(pscale, (double)i), eps);
    }
    pscale = 1.0E10;
    for (i = 0; i < n; i++) {
@@ -58357,11 +58308,11 @@ bool testpolint(bool silent) {
    polynomialbuild(&x2, &y, n, &p);
    polynomialbar2pow(&p, 0.0, 1.0, &c2);
    for (i = 0; i < n; i++) {
-      set_error_flag(&interrors, !NearAtR(c0.xR[i], c2.xR[i] * pow(pscale, (double)i), eps), __FILE__, __LINE__, "testpolintunit.ap:402");
+      interrors = interrors || !NearAtR(c0.xR[i], c2.xR[i] * pow(pscale, (double)i), eps);
    }
 // report
    waserrors = interrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING POLYNOMIAL INTERPOLATION\n");
    // Normal tests
       printf("INTERPOLATION TEST:                      ");
@@ -58883,10 +58834,10 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
          spline1dfit(&x, &y, 2, m, pow(10.0, rho), &c, &rep);
          v = randommid();
          v1 = (v - x.xR[0]) / (x.xR[1] - x.xR[0]) * y.xR[1] + (v - x.xR[1]) / (x.xR[0] - x.xR[1]) * y.xR[0];
-         set_error_flag(fiterrors, !NearAtR(v1, spline1dcalc(&c, v), threshold), __FILE__, __LINE__, "testspline1dunit.ap:1509");
-         set_error_flag(fiterrors, rep.rmserror > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1510");
-         set_error_flag(fiterrors, rep.avgerror > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1511");
-         set_error_flag(fiterrors, rep.maxerror > threshold, __FILE__, __LINE__, "testspline1dunit.ap:1512");
+         *fiterrors = *fiterrors || !NearAtR(v1, spline1dcalc(&c, v), threshold);
+         *fiterrors = *fiterrors || rep.rmserror > threshold;
+         *fiterrors = *fiterrors || rep.avgerror > threshold;
+         *fiterrors = *fiterrors || rep.maxerror > threshold;
       }
    }
 // Test spline ability to reproduce target:
@@ -58910,18 +58861,18 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       spline1dfit(&x, &y, n, m, pow(10.0, rho), &c, &rep);
    // Test that spline passes through all the points
       for (i = 0; i < n; i++) {
-         set_error_flag(fiterrors, !NearAtR(y.xR[i], spline1dcalc(&c, x.xR[i]), nonstrictthreshold), __FILE__, __LINE__, "testspline1dunit.ap:1545");
+         *fiterrors = *fiterrors || !NearAtR(y.xR[i], spline1dcalc(&c, x.xR[i]), nonstrictthreshold);
       }
-      set_error_flag(fiterrors, rep.rmserror > nonstrictthreshold, __FILE__, __LINE__, "testspline1dunit.ap:1546");
-      set_error_flag(fiterrors, rep.avgerror > nonstrictthreshold, __FILE__, __LINE__, "testspline1dunit.ap:1547");
-      set_error_flag(fiterrors, rep.maxerror > nonstrictthreshold, __FILE__, __LINE__, "testspline1dunit.ap:1548");
+      *fiterrors = *fiterrors || rep.rmserror > nonstrictthreshold;
+      *fiterrors = *fiterrors || rep.avgerror > nonstrictthreshold;
+      *fiterrors = *fiterrors || rep.maxerror > nonstrictthreshold;
    // Test continuity properties
       s = 0.01 * (1.0 / m);
       testspline1dunit_lconst(0.0, 1.0, &c, s, &u, &u1, &u2);
       testspline1dunit_lconst(0.0, 1.0, &c, s / 2, &v, &v1, &v2);
-      set_error_flag(fiterrors, v / (u + lipschitzeps) > 1.2, __FILE__, __LINE__, "testspline1dunit.ap:1557");
-      set_error_flag(fiterrors, v1 / (u1 + lipschitzeps * m) > 1.2, __FILE__, __LINE__, "testspline1dunit.ap:1558");
-      set_error_flag(fiterrors, v2 / (u2 + lipschitzeps * sqr((double)m)) > 1.2, __FILE__, __LINE__, "testspline1dunit.ap:1559");
+      *fiterrors = *fiterrors || v / (u + lipschitzeps) > 1.2;
+      *fiterrors = *fiterrors || v1 / (u1 + lipschitzeps * m) > 1.2;
+      *fiterrors = *fiterrors || v2 / (u2 + lipschitzeps * sqr((double)m)) > 1.2;
    }
    for (n = 2; n <= 20; n++) {
       m = 5 * n;
@@ -58938,18 +58889,18 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       testspline1dunit_unsetreport(&rep);
       spline1dfit(&x, &y, n, m, pow(10.0, rho), &c, &rep);
       for (i = 0; i < n; i++) {
-         set_error_flag(fiterrors, !NearAtR(y.xR[i], spline1dcalc(&c, x.xR[i]), nonstrictthreshold), __FILE__, __LINE__, "testspline1dunit.ap:1578");
+         *fiterrors = *fiterrors || !NearAtR(y.xR[i], spline1dcalc(&c, x.xR[i]), nonstrictthreshold);
       }
-      set_error_flag(fiterrors, rep.rmserror > nonstrictthreshold, __FILE__, __LINE__, "testspline1dunit.ap:1579");
-      set_error_flag(fiterrors, rep.avgerror > nonstrictthreshold, __FILE__, __LINE__, "testspline1dunit.ap:1580");
-      set_error_flag(fiterrors, rep.maxerror > nonstrictthreshold, __FILE__, __LINE__, "testspline1dunit.ap:1581");
+      *fiterrors = *fiterrors || rep.rmserror > nonstrictthreshold;
+      *fiterrors = *fiterrors || rep.avgerror > nonstrictthreshold;
+      *fiterrors = *fiterrors || rep.maxerror > nonstrictthreshold;
    // Test continuity properties
       s = 0.01 * (1.0 / m);
       testspline1dunit_lconst(0.0, 1.0, &c, s, &u, &u1, &u2);
       testspline1dunit_lconst(0.0, 1.0, &c, s / 2, &v, &v1, &v2);
-      set_error_flag(fiterrors, v / (u + lipschitzeps) > 1.2, __FILE__, __LINE__, "testspline1dunit.ap:1590");
-      set_error_flag(fiterrors, v1 / (u1 + lipschitzeps * m) > 1.2, __FILE__, __LINE__, "testspline1dunit.ap:1591");
-      set_error_flag(fiterrors, v2 / (u2 + lipschitzeps * sqr((double)m)) > 1.2, __FILE__, __LINE__, "testspline1dunit.ap:1592");
+      *fiterrors = *fiterrors || v / (u + lipschitzeps) > 1.2;
+      *fiterrors = *fiterrors || v1 / (u1 + lipschitzeps * m) > 1.2;
+      *fiterrors = *fiterrors || v2 / (u2 + lipschitzeps * sqr((double)m)) > 1.2;
    }
 // Test smoothing properties: a sequence of problems with increasing Rho
 // results in residuals monotonically increasing and nonlinearity penalty
@@ -58997,9 +58948,9 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
          s = 0.01 * ((b - a) / m);
          testspline1dunit_lconst(a, b, &c, s, &u, &u1, &u2);
          testspline1dunit_lconst(a, b, &c, s / 2, &v, &v1, &v2);
-         set_error_flag(fiterrors, v / (u + lipschitzeps) > 1.2, __FILE__, __LINE__, "testspline1dunit.ap:1654");
-         set_error_flag(fiterrors, v1 / (u1 + lipschitzeps * m) > 1.2, __FILE__, __LINE__, "testspline1dunit.ap:1655");
-         set_error_flag(fiterrors, v2 / (u2 + lipschitzeps * sqr((double)m)) > 1.2, __FILE__, __LINE__, "testspline1dunit.ap:1656");
+         *fiterrors = *fiterrors || v / (u + lipschitzeps) > 1.2;
+         *fiterrors = *fiterrors || v1 / (u1 + lipschitzeps * m) > 1.2;
+         *fiterrors = *fiterrors || v2 / (u2 + lipschitzeps * sqr((double)m)) > 1.2;
       // Compute residuals and penalty
          residuals = 0.0;
          for (i = 0; i < n; i++) {
@@ -59018,14 +58969,14 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       // Compare with previous, update previous, update Rho
       //
       // Write('M=%i    N=%i    %.15e    %.15e    %.15e\n', M, N, Residuals, Penalty, MxD2);
-         set_error_flag(fiterrors, residuals <= prevresiduals, __FILE__, __LINE__, "testspline1dunit.ap:1682");
-         set_error_flag(fiterrors, penalty >= prevpenalty, __FILE__, __LINE__, "testspline1dunit.ap:1683");
+         *fiterrors = *fiterrors || residuals <= prevresiduals;
+         *fiterrors = *fiterrors || penalty >= prevpenalty;
          prevresiduals = residuals;
          prevpenalty = penalty;
          rho++;
       }
-      set_error_flag(fiterrors, penalty >= 1.0E-6, __FILE__, __LINE__, "testspline1dunit.ap:1688");
-      set_error_flag(fiterrors, mxd2 >= 1.0E-3, __FILE__, __LINE__, "testspline1dunit.ap:1689");
+      *fiterrors = *fiterrors || penalty >= 1.0E-6;
+      *fiterrors = *fiterrors || mxd2 >= 1.0E-3;
    }
 // Special test which allows to distinguish "true smoothing" from
 // basic regularization enforced upon spline coefficients.
@@ -59044,9 +58995,9 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
    rho = -5.0;
    spline1dfit(&x, &y, n, m, pow(10.0, rho), &c, &rep);
    for (i = 0; i < n; i++) {
-      set_error_flag(fiterrors, !NearAtR(spline1dcalc(&c, x.xR[i]), y.xR[i], 0.0001), __FILE__, __LINE__, "testspline1dunit.ap:1711");
+      *fiterrors = *fiterrors || !NearAtR(spline1dcalc(&c, x.xR[i]), y.xR[i], 0.0001);
    }
-   set_error_flag(fiterrors, spline1dcalc(&c, 0.0) < 1.000, __FILE__, __LINE__, "testspline1dunit.ap:1712");
+   *fiterrors = *fiterrors || spline1dcalc(&c, 0.0) < 1.000;
 // Check correctness of error reports
    for (pass = 1; pass <= passcount; pass++) {
       ae_assert(passcount >= 2, "PassCount should be 2 or greater!");
@@ -59092,16 +59043,16 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       refmax = rmax2(v1, v2);
       spline1dfit(&x, &y, 4, 4, 0.0, &c, &rep);
       s = spline1dcalc(&c, 0.0);
-      set_error_flag(fiterrors, !NearAtR(s, v, threshold), __FILE__, __LINE__, "testspline1dunit.ap:1767");
-      set_error_flag(fiterrors, !NearAtR(rep.rmserror, refrms, threshold), __FILE__, __LINE__, "testspline1dunit.ap:1768");
-      set_error_flag(fiterrors, !NearAtR(rep.avgerror, refavg, threshold), __FILE__, __LINE__, "testspline1dunit.ap:1769");
-      set_error_flag(fiterrors, !NearAtR(rep.avgrelerror, refavgrel, threshold), __FILE__, __LINE__, "testspline1dunit.ap:1770");
-      set_error_flag(fiterrors, !NearAtR(rep.maxerror, refmax, threshold), __FILE__, __LINE__, "testspline1dunit.ap:1771");
+      *fiterrors = *fiterrors || !NearAtR(s, v, threshold);
+      *fiterrors = *fiterrors || !NearAtR(rep.rmserror, refrms, threshold);
+      *fiterrors = *fiterrors || !NearAtR(rep.avgerror, refavg, threshold);
+      *fiterrors = *fiterrors || !NearAtR(rep.avgrelerror, refavgrel, threshold);
+      *fiterrors = *fiterrors || !NearAtR(rep.maxerror, refmax, threshold);
    }
    ae_frame_leave();
 }
 
-bool testspline1d(bool silent) {
+bool testspline1d() {
    ae_frame _frame_block;
    bool waserrors;
    bool crserrors;
@@ -59314,7 +59265,7 @@ bool testspline1d(bool silent) {
                      err = rmax2(err, fabs(y.xR[i] - spline1dcalc(&c, x.xR[i])));
                   }
                }
-               set_error_flag(&cserrors, err > threshold, __FILE__, __LINE__, "testspline1dunit.ap:223");
+               cserrors = cserrors || err > threshold;
             // check boundary conditions
                err = 0.0;
                if (bltype == 0) {
@@ -59352,18 +59303,18 @@ bool testspline1d(bool silent) {
                   err = rmax2(err, fabs(ds - ds2));
                   err = rmax2(err, fabs(d2s - d2s2));
                }
-               set_error_flag(&cserrors, err > 1.0E-3, __FILE__, __LINE__, "testspline1dunit.ap:271");
+               cserrors = cserrors || err > 1.0E-3;
             // Check Lipschitz continuity
                testspline1dunit_lconst(a, b, &c, lstep, &l10, &l11, &l12);
                testspline1dunit_lconst(a, b, &c, lstep / 3, &l20, &l21, &l22);
                if (l10 > lipschitzeps) {
-                  set_error_flag(&cserrors, l20 / (l10 + lipschitzeps) > lipschitztol, __FILE__, __LINE__, "testspline1dunit.ap:279");
+                  cserrors = cserrors || l20 / (l10 + lipschitzeps) > lipschitztol;
                }
                if (l11 > lipschitzeps) {
-                  set_error_flag(&cserrors, l21 / (l11 + lipschitzeps) > lipschitztol, __FILE__, __LINE__, "testspline1dunit.ap:281");
+                  cserrors = cserrors || l21 / (l11 + lipschitzeps) > lipschitztol;
                }
                if (l12 > lipschitzeps) {
-                  set_error_flag(&cserrors, l22 / (l12 + lipschitzeps) > lipschitztol, __FILE__, __LINE__, "testspline1dunit.ap:283");
+                  cserrors = cserrors || l22 / (l12 + lipschitzeps) > lipschitztol;
                }
             // compare spline1dgriddiff() and spline1ddiff() results
                err = 0.0;
@@ -59387,7 +59338,7 @@ bool testspline1d(bool silent) {
                   err = rmax2(err, fabs(ds - tmp1.xR[i]));
                   err = rmax2(err, fabs(d2s - tmp2.xR[i]));
                }
-               set_error_flag(&cserrors, err > threshold, __FILE__, __LINE__, "testspline1dunit.ap:309");
+               cserrors = cserrors || err > threshold;
             // compare spline1dconv()/convdiff()/convdiff2() and spline1ddiff() results
                n2 = 2 + randominteger(2 * n);
                ae_vector_set_length(&tmpx, n2);
@@ -59425,7 +59376,7 @@ bool testspline1d(bool silent) {
                   err = rmax2(err, fabs(ds - tmp1.xR[i]));
                   err = rmax2(err, fabs(d2s - tmp2.xR[i]));
                }
-               set_error_flag(&cserrors, err > threshold, __FILE__, __LINE__, "testspline1dunit.ap:353");
+               cserrors = cserrors || err > threshold;
             }
          }
       // Build Catmull-Rom spline.
@@ -59522,17 +59473,17 @@ bool testspline1d(bool silent) {
          for (i = 0; i < n; i++) {
             err = rmax2(err, fabs(y.xR[i] - spline1dcalc(&c, x.xR[i])));
          }
-         set_error_flag(&hserrors, err > threshold, __FILE__, __LINE__, "testspline1dunit.ap:478");
+         hserrors = hserrors || err > threshold;
          err = 0.0;
          for (i = 0; i < n; i++) {
             t = (spline1dcalc(&c, x.xR[i] + h) - spline1dcalc(&c, x.xR[i] - h)) / (2 * h);
             err = rmax2(err, fabs(d.xR[i] - t));
          }
-         set_error_flag(&hserrors, err > 1.0E-3, __FILE__, __LINE__, "testspline1dunit.ap:485");
+         hserrors = hserrors || err > 1.0E-3;
          testspline1dunit_lconst(a, b, &c, lstep, &l10, &l11, &l12);
          testspline1dunit_lconst(a, b, &c, lstep / 3, &l20, &l21, &l22);
-         set_error_flag(&hserrors, l20 / (l10 + lipschitzeps) > lipschitztol, __FILE__, __LINE__, "testspline1dunit.ap:488");
-         set_error_flag(&hserrors, l21 / (l11 + lipschitzeps) > lipschitztol, __FILE__, __LINE__, "testspline1dunit.ap:489");
+         hserrors = hserrors || l20 / (l10 + lipschitzeps) > lipschitztol;
+         hserrors = hserrors || l21 / (l11 + lipschitzeps) > lipschitztol;
       // Build Akima spline
       // Test for general interpolation scheme properties:
       // * values at nodes
@@ -59547,8 +59498,8 @@ bool testspline1d(bool silent) {
          aserrors = aserrors || err > threshold;
          testspline1dunit_lconst(a, b, &c, lstep, &l10, &l11, &l12);
          testspline1dunit_lconst(a, b, &c, lstep / 3, &l20, &l21, &l22);
-         set_error_flag(&aserrors, l20 / (l10 + lipschitzeps) > lipschitztol, __FILE__, __LINE__, "testspline1dunit.ap:506");
-         set_error_flag(&aserrors, l21 / (l11 + lipschitzeps) > lipschitztol, __FILE__, __LINE__, "testspline1dunit.ap:507");
+         aserrors = aserrors || l20 / (l10 + lipschitzeps) > lipschitztol;
+         aserrors = aserrors || l21 / (l11 + lipschitzeps) > lipschitztol;
       }
    }
 // Special linear spline test:
@@ -59792,7 +59743,7 @@ bool testspline1d(bool silent) {
    testspline1dunit_testsplinefitting(&fiterr);
 // report
    waserrors = lserrors || cserrors || crserrors || hserrors || aserrors || dserrors || cperrors || uperrors || lterrors || ierrors || monotoneerr || fiterr;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING SPLINE INTERPOLATION\n");
    // Normal tests
       printf("INTERPOLATION:\n");
@@ -60933,15 +60884,15 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
          lsfitsetbc(&state, &bl, &bu);
          while (lsfititeration(&state)) {
             for (i = 0; i < nc; i++) {
-               set_error_flag(errorflag, state.c.xR[i] < bl.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2604");
-               set_error_flag(errorflag, state.c.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2605");
+               *errorflag = *errorflag || state.c.xR[i] < bl.xR[i];
+               *errorflag = *errorflag || state.c.xR[i] > bu.xR[i];
             }
             if (state.needf) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, false);
             else if (state.needfg) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
             else ae_assert(false, "minlm test: integrity check failed");
          }
          lsfitresults(&state, &terminationtype, &c1, &rep);
-         set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:2620");
+         *errorflag = *errorflag || terminationtype <= 0;
          if (*errorflag) {
             ae_frame_leave();
             return;
@@ -60955,8 +60906,8 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
          h = 0.001;
          ae_vector_set_length(&c2, nc);
          for (i = 0; i < nc; i++) {
-            set_error_flag(errorflag, c1.xR[i] < bl.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2637");
-            set_error_flag(errorflag, c1.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2638");
+            *errorflag = *errorflag || c1.xR[i] < bl.xR[i];
+            *errorflag = *errorflag || c1.xR[i] > bu.xR[i];
             if (c1.xR[i] + h >= bl.xR[i]) {
                for (j = 0; j < nc; j++) {
                   c2.xR[j] = c1.xR[j];
@@ -60968,7 +60919,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
                   f1 += sqr(v - y.xR[ii]);
                }
-               set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2653");
+               *errorflag = *errorflag || f1 < f0;
             }
             if (c1.xR[i] - h >= bl.xR[i]) {
                for (j = 0; j < nc; j++) {
@@ -60981,7 +60932,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
                   f1 += sqr(v - y.xR[ii]);
                }
-               set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2669");
+               *errorflag = *errorflag || f1 < f0;
             }
          }
       }
@@ -61025,15 +60976,15 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
          lsfitsetbc(&state, &bl, &bu);
          while (lsfititeration(&state)) {
             for (i = 0; i < nc; i++) {
-               set_error_flag(errorflag, state.c.xR[i] < bl.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2718");
-               set_error_flag(errorflag, state.c.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2719");
+               *errorflag = *errorflag || state.c.xR[i] < bl.xR[i];
+               *errorflag = *errorflag || state.c.xR[i] > bu.xR[i];
             }
             if (state.needf) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, false);
             else if (state.needfg) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
             else ae_assert(false, "minlm test: integrity check failed");
          }
          lsfitresults(&state, &terminationtype, &c1, &rep);
-         set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:2734");
+         *errorflag = *errorflag || terminationtype <= 0;
          if (*errorflag) {
             ae_frame_leave();
             return;
@@ -61049,8 +61000,8 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
          relaxationshift = rmax2(fabs(f0), 1.0) * sqrt(machineepsilon);
          ae_vector_set_length(&c2, nc);
          for (i = 0; i < nc; i++) {
-            set_error_flag(errorflag, c1.xR[i] < bl.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2754");
-            set_error_flag(errorflag, c1.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2755");
+            *errorflag = *errorflag || c1.xR[i] < bl.xR[i];
+            *errorflag = *errorflag || c1.xR[i] > bu.xR[i];
             if (c1.xR[i] + h >= bl.xR[i] && c1.xR[i] + h <= bu.xR[i]) {
                for (j = 0; j < nc; j++) {
                   c2.xR[j] = c1.xR[j];
@@ -61062,7 +61013,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
                   f1 += sqr(v - y.xR[ii]);
                }
-               set_error_flag(errorflag, f1 < f0 - relaxationshift, __FILE__, __LINE__, "testlsfitunit.ap:2770");
+               *errorflag = *errorflag || f1 < f0 - relaxationshift;
             }
             if (c1.xR[i] - h >= bl.xR[i] && c1.xR[i] - h <= bu.xR[i]) {
                for (j = 0; j < nc; j++) {
@@ -61075,7 +61026,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
                   f1 += sqr(v - y.xR[ii]);
                }
-               set_error_flag(errorflag, f1 < f0 - relaxationshift, __FILE__, __LINE__, "testlsfitunit.ap:2786");
+               *errorflag = *errorflag || f1 < f0 - relaxationshift;
             }
          }
       }
@@ -61121,15 +61072,15 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
          lsfitsetbc(&state, &bl, &bu);
          while (lsfititeration(&state)) {
             for (i = 0; i < nc; i++) {
-               set_error_flag(errorflag, state.c.xR[i] < bl.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2837");
-               set_error_flag(errorflag, state.c.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2838");
+               *errorflag = *errorflag || state.c.xR[i] < bl.xR[i];
+               *errorflag = *errorflag || state.c.xR[i] > bu.xR[i];
             }
             if (state.needf) testlsfitunit_testfunc2(&state.x, nx, &state.c, nc, &state.f, true, &state.g, false);
             else if (state.needfg) testlsfitunit_testfunc2(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
             else ae_assert(false, "minlm test: integrity check failed");
          }
          lsfitresults(&state, &terminationtype, &c1, &rep);
-         set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:2853");
+         *errorflag = *errorflag || terminationtype <= 0;
          if (*errorflag) {
             ae_frame_leave();
             return;
@@ -61143,8 +61094,8 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
          h = 0.001;
          ae_vector_set_length(&c2, nc);
          for (i = 0; i < nc; i++) {
-            set_error_flag(errorflag, c1.xR[i] < bl.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2870");
-            set_error_flag(errorflag, c1.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2871");
+            *errorflag = *errorflag || c1.xR[i] < bl.xR[i];
+            *errorflag = *errorflag || c1.xR[i] > bu.xR[i];
             if (c1.xR[i] + h >= bl.xR[i] && c1.xR[i] + h <= bu.xR[i]) {
                for (j = 0; j < nc; j++) {
                   c2.xR[j] = c1.xR[j];
@@ -61156,7 +61107,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                   testlsfitunit_testfunc2(&x, nx, &c2, nc, &v, true, &state.g, false);
                   f1 += sqr(v - y.xR[ii]);
                }
-               set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2886");
+               *errorflag = *errorflag || f1 < f0;
             }
             if (c1.xR[i] - h >= bl.xR[i] && c1.xR[i] - h <= bu.xR[i]) {
                for (j = 0; j < nc; j++) {
@@ -61169,7 +61120,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                   testlsfitunit_testfunc2(&x, nx, &c2, nc, &v, true, &state.g, false);
                   f1 += sqr(v - y.xR[ii]);
                }
-               set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2902");
+               *errorflag = *errorflag || f1 < f0;
             }
          }
       }
@@ -61213,15 +61164,15 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
          lsfitsetbc(&state, &bl, &bu);
          while (lsfititeration(&state)) {
             for (i = 0; i < nc; i++) {
-               set_error_flag(errorflag, state.c.xR[i] < bl.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2951");
-               set_error_flag(errorflag, state.c.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2952");
+               *errorflag = *errorflag || state.c.xR[i] < bl.xR[i];
+               *errorflag = *errorflag || state.c.xR[i] > bu.xR[i];
             }
             if (state.needf) testlsfitunit_testfunc3(&state.x, nx, &state.c, nc, &state.f, true, &state.g, false);
             else if (state.needfg) testlsfitunit_testfunc3(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
             else ae_assert(false, "minlm test: integrity check failed");
          }
          lsfitresults(&state, &terminationtype, &c1, &rep);
-         set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:2967");
+         *errorflag = *errorflag || terminationtype <= 0;
          if (*errorflag) {
             ae_frame_leave();
             return;
@@ -61235,8 +61186,8 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
          h = 0.001;
          ae_vector_set_length(&c2, nc);
          for (i = 0; i < nc; i++) {
-            set_error_flag(errorflag, c1.xR[i] < bl.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2984");
-            set_error_flag(errorflag, c1.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:2985");
+            *errorflag = *errorflag || c1.xR[i] < bl.xR[i];
+            *errorflag = *errorflag || c1.xR[i] > bu.xR[i];
             if (c1.xR[i] + h >= bl.xR[i] && c1.xR[i] + h <= bu.xR[i]) {
                for (j = 0; j < nc; j++) {
                   c2.xR[j] = c1.xR[j];
@@ -61248,7 +61199,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                   testlsfitunit_testfunc3(&x, nx, &c2, nc, &v, true, &state.g, false);
                   f1 += sqr(v - y.xR[ii]);
                }
-               set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:3000");
+               *errorflag = *errorflag || f1 < f0;
             }
             if (c1.xR[i] - h >= bl.xR[i] && c1.xR[i] - h <= bu.xR[i]) {
                for (j = 0; j < nc; j++) {
@@ -61261,7 +61212,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                   testlsfitunit_testfunc3(&x, nx, &c2, nc, &v, true, &state.g, false);
                   f1 += sqr(v - y.xR[ii]);
                }
-               set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:3016");
+               *errorflag = *errorflag || f1 < f0;
             }
          }
       }
@@ -61368,32 +61319,32 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
       lsfitsetlc(&state, &rawc, &rawct, rawccnt);
       while (lsfititeration(&state)) {
          for (i = 0; i < nc; i++) {
-            set_error_flag(errorflag, state.c.xR[i] < bl.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:3125");
-            set_error_flag(errorflag, state.c.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:3126");
+            *errorflag = *errorflag || state.c.xR[i] < bl.xR[i];
+            *errorflag = *errorflag || state.c.xR[i] > bu.xR[i];
          }
          if (state.needf) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, false);
          else if (state.needfg) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
          else ae_assert(false, "lsfit test: integrity check failed");
       }
       lsfitresults(&state, &terminationtype, &c1, &rep);
-      set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:3141");
+      *errorflag = *errorflag || terminationtype <= 0;
       if (*errorflag) {
          ae_frame_leave();
          return;
       }
    // Test feasibility w.r.t. box and linear inequality constraints
       for (i = 0; i < nc; i++) {
-         set_error_flag(errorflag, c1.xR[i] < bl.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:3150");
-         set_error_flag(errorflag, c1.xR[i] > bu.xR[i], __FILE__, __LINE__, "testlsfitunit.ap:3151");
+         *errorflag = *errorflag || c1.xR[i] < bl.xR[i];
+         *errorflag = *errorflag || c1.xR[i] > bu.xR[i];
       }
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(rawc.xyR[i], 1, c1.xR, 1, nc);
          v -= rawc.xyR[i][nc];
          if (rawct.xZ[i] > 0) {
-            set_error_flag(errorflag, v < -xtol, __FILE__, __LINE__, "testlsfitunit.ap:3158");
+            *errorflag = *errorflag || v < -xtol;
          }
          if (rawct.xZ[i] < 0) {
-            set_error_flag(errorflag, v > xtol, __FILE__, __LINE__, "testlsfitunit.ap:3160");
+            *errorflag = *errorflag || v > xtol;
          }
       }
    // Make several random trial steps and:
@@ -61431,7 +61382,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
             testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
             f1 += sqr(v - y.xR[ii]);
          }
-         set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:3209");
+         *errorflag = *errorflag || f1 < f0;
       }
    }
 // Minimize
@@ -61498,7 +61449,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          else if (state.needfg) testlsfitunit_testfunc1(nx, &state.x, &state.c, &state.f, true, &state.g, true);
          else ae_assert(false, "lsfit test: integrity check failed");
       lsfitresults(&state, &terminationtype, &c1, &rep);
-      set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:3295");
+      *errorflag = *errorflag || terminationtype <= 0;
       if (*errorflag) {
          ae_frame_leave();
          return;
@@ -61507,7 +61458,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(rawc.xyR[i], 1, c1.xR, 1, nc);
          v -= rawc.xyR[i][nc];
-         set_error_flag(errorflag, !SmallAtR(v, xtol), __FILE__, __LINE__, "testlsfitunit.ap:3306");
+         *errorflag = *errorflag || !SmallAtR(v, xtol);
       }
    // Make several random trial steps and:
    // 0) generate small random trial step
@@ -61540,7 +61491,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
             testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
             f1 += sqr(v - y.xR[ii]);
          }
-         set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:3348");
+         *errorflag = *errorflag || f1 < f0;
       }
    }
 // Fit
@@ -61593,12 +61544,12 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
             else if (state.needfg) testlsfitunit_testfunc2(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
             else ae_assert(false, "minlm test: integrity check failed");
          lsfitresults(&state, &terminationtype, &c1, &rep);
-         set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:3413");
+         *errorflag = *errorflag || terminationtype <= 0;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
-         set_error_flag(errorflag, !NearAtR(c1.xR[0], rawc.xyR[0][1], 1.0E-6), __FILE__, __LINE__, "testlsfitunit.ap:3418");
+         *errorflag = *errorflag || !NearAtR(c1.xR[0], rawc.xyR[0][1], 1.0E-6);
       }
    }
 // Fit
@@ -61651,7 +61602,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
             else if (state.needfg) testlsfitunit_testfunc3(&state.x, nx, &state.c, nc, &state.f, true, &state.g, true);
             else ae_assert(false, "minlm test: integrity check failed");
          lsfitresults(&state, &terminationtype, &c1, &rep);
-         set_error_flag(errorflag, terminationtype <= 0, __FILE__, __LINE__, "testlsfitunit.ap:3481");
+         *errorflag = *errorflag || terminationtype <= 0;
          if (*errorflag) {
             ae_frame_leave();
             return;
@@ -61660,7 +61611,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          for (j = 0; j < nc; j++) {
             v += rawc.xyR[0][j] * c1.xR[j];
          }
-         set_error_flag(errorflag, !SmallAtR(v, 1.0E-6), __FILE__, __LINE__, "testlsfitunit.ap:3489");
+         *errorflag = *errorflag || !SmallAtR(v, 1.0E-6);
       }
    }
    ae_frame_leave();
@@ -61918,9 +61869,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
          //    of previous task
             lsfitlinearw(&y, &w, &a, n, m, &info, &c, &rep);
             if (info <= 0) {
-               set_error_flag(llserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1106");
+               *llserrors = true;
             } else {
-               set_error_flag(llserrors, !testlsfitunit_isglssolution(n, m, 0, &y, &w, &a, &cm, &c), __FILE__, __LINE__, "testlsfitunit.ap:1108");
+               *llserrors = *llserrors || !testlsfitunit_isglssolution(n, m, 0, &y, &w, &a, &cm, &c);
             }
             ae_matrix_set_length(&a2, n, 2 * m);
             for (i = 0; i < n; i++) {
@@ -61931,12 +61882,12 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             }
             lsfitlinearw(&y, &w, &a2, n, 2 * m, &info, &c2, &rep);
             if (info <= 0) {
-               set_error_flag(llserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1118");
+               *llserrors = true;
             } else {
             // test answer correctness using design matrix properties
             // and previous task solution
                for (j = 0; j < m; j++) {
-                  set_error_flag(llserrors, !NearAtR(c2.xR[2 * j] + c2.xR[2 * j + 1], c.xR[j], threshold), __FILE__, __LINE__, "testlsfitunit.ap:1126");
+                  *llserrors = *llserrors || !NearAtR(c2.xR[2 * j] + c2.xR[2 * j + 1], c.xR[j], threshold);
                }
             }
          // test non-weighted fitting
@@ -61947,13 +61898,13 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             lsfitlinearw(&y, &w2, &a, n, m, &info, &c, &rep);
             lsfitlinear(&y, &a, n, m, &info2, &c2, &rep2);
             if (info <= 0 || info2 <= 0) {
-               set_error_flag(llserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1138");
+               *llserrors = true;
             } else {
             // test answer correctness
                for (j = 0; j < m; j++) {
-                  set_error_flag(llserrors, !NearAtR(c.xR[j], c2.xR[j], threshold), __FILE__, __LINE__, "testlsfitunit.ap:1145");
+                  *llserrors = *llserrors || !NearAtR(c.xR[j], c2.xR[j], threshold);
                }
-               set_error_flag(llserrors, !NearAtR(rep.taskrcond, rep2.taskrcond, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1146");
+               *llserrors = *llserrors || !NearAtR(rep.taskrcond, rep2.taskrcond, threshold);
             }
          // test nonlinear fitting on the linear task
          // (only non-degenerate tasks are tested)
@@ -61970,10 +61921,10 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                testlsfitunit_fitlinearnonlinear(m, 0, &a, &state, nlserrors);
                lsfitresults(&state, &info, &c2, &rep2);
                if (info <= 0) {
-                  set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1170");
+                  *nlserrors = true;
                } else {
                   for (i = 0; i < m; i++) {
-                     set_error_flag(nlserrors, !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1174");
+                     *nlserrors = *nlserrors || !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold);
                   }
                }
                for (i = 0; i < m; i++) {
@@ -61984,10 +61935,10 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                testlsfitunit_fitlinearnonlinear(m, 1, &a, &state, nlserrors);
                lsfitresults(&state, &info, &c2, &rep2);
                if (info <= 0) {
-                  set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1184");
+                  *nlserrors = true;
                } else {
                   for (i = 0; i < m; i++) {
-                     set_error_flag(nlserrors, !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1188");
+                     *nlserrors = *nlserrors || !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold);
                   }
                }
                for (i = 0; i < m; i++) {
@@ -61998,10 +61949,10 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                testlsfitunit_fitlinearnonlinear(m, 2, &a, &state, nlserrors);
                lsfitresults(&state, &info, &c2, &rep2);
                if (info <= 0) {
-                  set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1198");
+                  *nlserrors = true;
                } else {
                   for (i = 0; i < m; i++) {
-                     set_error_flag(nlserrors, !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1202");
+                     *nlserrors = *nlserrors || !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold);
                   }
                }
             // test gradient-only or Hessian-based fitting without weights
@@ -62014,10 +61965,10 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                testlsfitunit_fitlinearnonlinear(m, 0, &a, &state, nlserrors);
                lsfitresults(&state, &info, &c2, &rep2);
                if (info <= 0) {
-                  set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1217");
+                  *nlserrors = true;
                } else {
                   for (i = 0; i < m; i++) {
-                     set_error_flag(nlserrors, !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1221");
+                     *nlserrors = *nlserrors || !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold);
                   }
                }
                for (i = 0; i < m; i++) {
@@ -62028,10 +61979,10 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                testlsfitunit_fitlinearnonlinear(m, 1, &a, &state, nlserrors);
                lsfitresults(&state, &info, &c2, &rep2);
                if (info <= 0) {
-                  set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1231");
+                  *nlserrors = true;
                } else {
                   for (i = 0; i < m; i++) {
-                     set_error_flag(nlserrors, !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1235");
+                     *nlserrors = *nlserrors || !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold);
                   }
                }
                for (i = 0; i < m; i++) {
@@ -62042,10 +61993,10 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                testlsfitunit_fitlinearnonlinear(m, 2, &a, &state, nlserrors);
                lsfitresults(&state, &info, &c2, &rep2);
                if (info <= 0) {
-                  set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1245");
+                  *nlserrors = true;
                } else {
                   for (i = 0; i < m; i++) {
-                     set_error_flag(nlserrors, !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1249");
+                     *nlserrors = *nlserrors || !NearAtR(c.xR[i], c2.xR[i], 100.0 * nlthreshold);
                   }
                }
             }
@@ -62074,9 +62025,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
       }
       lsfitlinearw(&y, &w, &a, n, n, &info, &c, &rep);
       if (info <= 0) {
-         set_error_flag(llserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1281");
+         *llserrors = true;
       } else {
-         set_error_flag(llserrors, !NearAtR(rep.taskrcond, v1 / v2, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1283");
+         *llserrors = *llserrors || !NearAtR(rep.taskrcond, v1 / v2, threshold);
       }
    }
 // Test constrained least squares
@@ -62117,9 +62068,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             // Solve constrained task
                lsfitlinearwc(&y, &w, &a, &cm, n, m, k, &info, &c, &rep);
                if (info <= 0) {
-                  set_error_flag(llserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1331");
+                  *llserrors = true;
                } else {
-                  set_error_flag(llserrors, !testlsfitunit_isglssolution(n, m, k, &y, &w, &a, &cm, &c), __FILE__, __LINE__, "testlsfitunit.ap:1333");
+                  *llserrors = *llserrors || !testlsfitunit_isglssolution(n, m, k, &y, &w, &a, &cm, &c);
                }
             // test non-weighted fitting
                ae_vector_set_length(&w2, n);
@@ -62129,13 +62080,13 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                lsfitlinearwc(&y, &w2, &a, &cm, n, m, k, &info, &c, &rep);
                lsfitlinearc(&y, &a, &cm, n, m, k, &info2, &c2, &rep2);
                if (info <= 0 || info2 <= 0) {
-                  set_error_flag(llserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1345");
+                  *llserrors = true;
                } else {
                // test answer correctness
                   for (j = 0; j < m; j++) {
-                     set_error_flag(llserrors, !NearAtR(c.xR[j], c2.xR[j], threshold), __FILE__, __LINE__, "testlsfitunit.ap:1352");
+                     *llserrors = *llserrors || !NearAtR(c.xR[j], c2.xR[j], threshold);
                   }
-                  set_error_flag(llserrors, !NearAtR(rep.taskrcond, rep2.taskrcond, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1353");
+                  *llserrors = *llserrors || !NearAtR(rep.taskrcond, rep2.taskrcond, threshold);
                }
             }
          }
@@ -62165,9 +62116,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
       }
    lsfitresults(&state, &info, &c, &rep);
    if (info <= 0) {
-      set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1389");
+      *nlserrors = true;
    } else {
-      set_error_flag(nlserrors, !NearAtR(c.xR[0], 2.0, 100.0 * nlthreshold), __FILE__, __LINE__, "testlsfitunit.ap:1391");
+      *nlserrors = *nlserrors || !NearAtR(c.xR[0], 2.0, 100.0 * nlthreshold);
    }
 // solve simple task (fitting by constant function) and check
 // correctness of the errors calculated by subroutines
@@ -62196,13 +62147,13 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    // Test LLS
       lsfitlinear(&y, &a, 4, 1, &info, &c, &rep);
       if (info <= 0) {
-         set_error_flag(llserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1429");
+         *llserrors = true;
       } else {
-         set_error_flag(llserrors, !NearAtR(c.xR[0], v, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1432");
-         set_error_flag(llserrors, !NearAtR(rep.rmserror, refrms, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1433");
-         set_error_flag(llserrors, !NearAtR(rep.avgerror, refavg, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1434");
-         set_error_flag(llserrors, !NearAtR(rep.avgrelerror, refavgrel, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1435");
-         set_error_flag(llserrors, !NearAtR(rep.maxerror, refmax, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1436");
+         *llserrors = *llserrors || !NearAtR(c.xR[0], v, threshold);
+         *llserrors = *llserrors || !NearAtR(rep.rmserror, refrms, threshold);
+         *llserrors = *llserrors || !NearAtR(rep.avgerror, refavg, threshold);
+         *llserrors = *llserrors || !NearAtR(rep.avgrelerror, refavgrel, threshold);
+         *llserrors = *llserrors || !NearAtR(rep.maxerror, refmax, threshold);
       }
    // Test NLS
       lsfitcreatefg(&a, &y, &c, 4, 1, 1, true, &state);
@@ -62216,13 +62167,13 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
          }
       lsfitresults(&state, &info, &c, &rep);
       if (info <= 0) {
-         set_error_flag(nlserrors, true, __FILE__, __LINE__, "testlsfitunit.ap:1456");
+         *nlserrors = true;
       } else {
-         set_error_flag(nlserrors, !NearAtR(c.xR[0], v, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1459");
-         set_error_flag(nlserrors, !NearAtR(rep.rmserror, refrms, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1460");
-         set_error_flag(nlserrors, !NearAtR(rep.avgerror, refavg, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1461");
-         set_error_flag(nlserrors, !NearAtR(rep.avgrelerror, refavgrel, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1462");
-         set_error_flag(nlserrors, !NearAtR(rep.maxerror, refmax, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1463");
+         *nlserrors = *nlserrors || !NearAtR(c.xR[0], v, threshold);
+         *nlserrors = *nlserrors || !NearAtR(rep.rmserror, refrms, threshold);
+         *nlserrors = *nlserrors || !NearAtR(rep.avgerror, refavg, threshold);
+         *nlserrors = *nlserrors || !NearAtR(rep.avgrelerror, refavgrel, threshold);
+         *nlserrors = *nlserrors || !NearAtR(rep.maxerror, refmax, threshold);
       }
    }
 // Check covariance matrix, errors-in-parameters.
@@ -62350,7 +62301,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             avgdeviationnoise = 0.0;
             adncnt = 0.0;
             for (i = 0; i < n; i++) {
-               set_error_flag(llserrors, !NearAtR(rep.covpar.xyR[i][i], sqr(rep.errpar.xR[i]), 100.0 * machineepsilon * rmax2(sqr(rep.errpar.xR[i]), rep.covpar.xyR[i][i])), __FILE__, __LINE__, "testlsfitunit.ap:1612");
+               *llserrors = *llserrors || !NearAtR(rep.covpar.xyR[i][i], sqr(rep.errpar.xR[i]), 100.0 * machineepsilon * rmax2(sqr(rep.errpar.xR[i]), rep.covpar.xyR[i][i]));
             }
             for (i = 0; i < n; i++) {
                avgdeviationpar = (avgdeviationpar * adpcnt + fabs(c.xR[i] - cend.xR[i]) / rep.errpar.xR[i]) / (adpcnt + 1);
@@ -62366,14 +62317,14 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             }
          // Check that estimates are not too optimistic.
          // This test is performed always.
-            set_error_flag(llserrors, avgdeviationpar > tol, __FILE__, __LINE__, "testlsfitunit.ap:1632");
-            set_error_flag(llserrors, avgdeviationcurve > tol, __FILE__, __LINE__, "testlsfitunit.ap:1633");
-            set_error_flag(llserrors, avgdeviationnoise > 1.50, __FILE__, __LINE__, "testlsfitunit.ap:1634");
-            set_error_flag(llserrors, avgdeviationnoise < 0.66, __FILE__, __LINE__, "testlsfitunit.ap:1635");
+            *llserrors = *llserrors || avgdeviationpar > tol;
+            *llserrors = *llserrors || avgdeviationcurve > tol;
+            *llserrors = *llserrors || avgdeviationnoise > 1.50;
+            *llserrors = *llserrors || avgdeviationnoise < 0.66;
          // Test for estimates being too pessimistic is performed only
          // when we have more than 4 parameters.
-            set_error_flag(llserrors, n >= 5 && avgdeviationcurve < 0.01, __FILE__, __LINE__, "testlsfitunit.ap:1641");
-            set_error_flag(llserrors, n >= 5 && avgdeviationpar < 0.01, __FILE__, __LINE__, "testlsfitunit.ap:1642");
+            *llserrors = *llserrors || n >= 5 && avgdeviationcurve < 0.01;
+            *llserrors = *llserrors || n >= 5 && avgdeviationpar < 0.01;
          }
       }
    }
@@ -62465,7 +62416,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    // Compare covariance matrices, it should be enough to test algorithm
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            set_error_flag(nlserrors, !NearAtR(rep.covpar.xyR[i][j], rep2.covpar.xyR[i][j], 1.0E-4 * rmax2(rep.covpar.xyR[i][i], rep.covpar.xyR[j][j])), __FILE__, __LINE__, "testlsfitunit.ap:1762");
+            *nlserrors = *nlserrors || !NearAtR(rep.covpar.xyR[i][j], rep2.covpar.xyR[i][j], 1.0E-4 * rmax2(rep.covpar.xyR[i][i], rep.covpar.xyR[j][j]));
          }
       }
    }
@@ -62490,9 +62441,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    a.xyR[3][1] = 2.0;
    y.xR[3] = 2.0;
    lsfitlinear(&y, &a, 4, 1, &info, &c, &rep);
-   set_error_flag(llserrors, info <= 0 || !NearAtR(rep.r2, 0.0, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1788");
+   *llserrors = *llserrors || info <= 0 || !NearAtR(rep.r2, 0.0, threshold);
    lsfitlinear(&y, &a, 4, 2, &info, &c, &rep);
-   set_error_flag(llserrors, info <= 0 || !NearAtR(rep.r2, 1.0, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1790");
+   *llserrors = *llserrors || info <= 0 || !NearAtR(rep.r2, 1.0, threshold);
    a.xyR[0][0] = 1.0;
    a.xyR[0][1] = -1.0;
    y.xR[0] = -1.0;
@@ -62506,7 +62457,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    a.xyR[3][1] = 1.0;
    y.xR[3] = 0.0;
    lsfitlinear(&y, &a, 4, 2, &info, &c, &rep);
-   set_error_flag(llserrors, info <= 0 || !NearAtR(rep.r2, 0.5, threshold), __FILE__, __LINE__, "testlsfitunit.ap:1804");
+   *llserrors = *llserrors || info <= 0 || !NearAtR(rep.r2, 0.5, threshold);
    n = 3;
    ae_matrix_set_length(&a, 3, 1);
    ae_vector_set_length(&y, 3);
@@ -62517,7 +62468,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    a.xyR[2][0] = 0.0;
    y.xR[2] = 0.0;
    lsfitlinear(&y, &a, 3, 1, &info, &c, &rep);
-   set_error_flag(llserrors, info <= 0 || !isfinite(rep.r2) || rep.r2 != 1.0, __FILE__, __LINE__, "testlsfitunit.ap:1815");
+   *llserrors = *llserrors || info <= 0 || !isfinite(rep.r2) || rep.r2 != 1.0;
    ae_frame_leave();
 }
 
@@ -62556,12 +62507,12 @@ static void testlsfitunit_testrdp(bool *errorflag) {
    y.xR[0] = 2.0;
    y.xR[1] = 3.0;
    lstfitpiecewiselinearrdpfixed(&x, &y, 2, 1, &x2, &y2, &nsections);
-   set_error_flag(errorflag, nsections != 1, __FILE__, __LINE__, "testlsfitunit.ap:1850");
+   *errorflag = *errorflag || nsections != 1;
    if (nsections == 1) {
-      set_error_flag(errorflag, x2.xR[0] != 0.0, __FILE__, __LINE__, "testlsfitunit.ap:1853");
-      set_error_flag(errorflag, x2.xR[1] != 1.5, __FILE__, __LINE__, "testlsfitunit.ap:1854");
-      set_error_flag(errorflag, y2.xR[0] != 2.0, __FILE__, __LINE__, "testlsfitunit.ap:1855");
-      set_error_flag(errorflag, y2.xR[1] != 3.0, __FILE__, __LINE__, "testlsfitunit.ap:1856");
+      *errorflag = *errorflag || x2.xR[0] != 0.0;
+      *errorflag = *errorflag || x2.xR[1] != 1.5;
+      *errorflag = *errorflag || y2.xR[0] != 2.0;
+      *errorflag = *errorflag || y2.xR[1] != 3.0;
    }
 // Non-parametric, single section tied test (fixed)
    ae_vector_set_length(&x, 5);
@@ -62577,12 +62528,12 @@ static void testlsfitunit_testrdp(bool *errorflag) {
    y.xR[3] = 1.0;
    y.xR[4] = 5.0;
    lstfitpiecewiselinearrdpfixed(&x, &y, 5, 1, &x2, &y2, &nsections);
-   set_error_flag(errorflag, nsections != 1, __FILE__, __LINE__, "testlsfitunit.ap:1875");
+   *errorflag = *errorflag || nsections != 1;
    if (nsections == 1) {
-      set_error_flag(errorflag, x2.xR[0] != 0.0, __FILE__, __LINE__, "testlsfitunit.ap:1878");
-      set_error_flag(errorflag, x2.xR[1] != 1.5, __FILE__, __LINE__, "testlsfitunit.ap:1879");
-      set_error_flag(errorflag, y2.xR[0] != 2.0, __FILE__, __LINE__, "testlsfitunit.ap:1880");
-      set_error_flag(errorflag, y2.xR[1] != 3.0, __FILE__, __LINE__, "testlsfitunit.ap:1881");
+      *errorflag = *errorflag || x2.xR[0] != 0.0;
+      *errorflag = *errorflag || x2.xR[1] != 1.5;
+      *errorflag = *errorflag || y2.xR[0] != 2.0;
+      *errorflag = *errorflag || y2.xR[1] != 3.0;
    }
 // Non-parametric, two-section test (fixed)
    ae_vector_set_length(&x, 5);
@@ -62598,14 +62549,14 @@ static void testlsfitunit_testrdp(bool *errorflag) {
    y.xR[3] = 5.21;
    y.xR[4] = 6.0;
    lstfitpiecewiselinearrdpfixed(&x, &y, 5, 2, &x2, &y2, &nsections);
-   set_error_flag(errorflag, nsections != 2, __FILE__, __LINE__, "testlsfitunit.ap:1900");
+   *errorflag = *errorflag || nsections != 2;
    if (nsections == 2) {
-      set_error_flag(errorflag, x2.xR[0] != 0.0, __FILE__, __LINE__, "testlsfitunit.ap:1903");
-      set_error_flag(errorflag, x2.xR[1] != 1.0, __FILE__, __LINE__, "testlsfitunit.ap:1904");
-      set_error_flag(errorflag, x2.xR[2] != 2.0, __FILE__, __LINE__, "testlsfitunit.ap:1905");
-      set_error_flag(errorflag, y2.xR[0] != 1.0, __FILE__, __LINE__, "testlsfitunit.ap:1906");
-      set_error_flag(errorflag, y2.xR[1] != 3.0, __FILE__, __LINE__, "testlsfitunit.ap:1907");
-      set_error_flag(errorflag, y2.xR[2] != 6.0, __FILE__, __LINE__, "testlsfitunit.ap:1908");
+      *errorflag = *errorflag || x2.xR[0] != 0.0;
+      *errorflag = *errorflag || x2.xR[1] != 1.0;
+      *errorflag = *errorflag || x2.xR[2] != 2.0;
+      *errorflag = *errorflag || y2.xR[0] != 1.0;
+      *errorflag = *errorflag || y2.xR[1] != 3.0;
+      *errorflag = *errorflag || y2.xR[2] != 6.0;
    }
 // Non-parametric, variable precision test (non-fixed), results are compared against fixed-section test
    eps = 10.0;
@@ -62629,29 +62580,29 @@ static void testlsfitunit_testrdp(bool *errorflag) {
       }
    // Perform run of eps-based RDP algorithm
       lstfitpiecewiselinearrdp(&x, &y, n, eps, &x2, &y2, &nsections);
-      set_error_flag(errorflag, nsections == 0, __FILE__, __LINE__, "testlsfitunit.ap:1943");
+      *errorflag = *errorflag || nsections == 0;
       if (nsections == 0) {
          ae_frame_leave();
          return;
       }
    // Check properties
       for (i = 0; i < nsections; i++) {
-         set_error_flag(errorflag, x2.xR[i] > x2.xR[i + 1], __FILE__, __LINE__, "testlsfitunit.ap:1951");
+         *errorflag = *errorflag || x2.xR[i] > x2.xR[i + 1];
       }
       spline1dbuildlinear(&x2, &y2, nsections + 1, &s);
       for (i = 0; i < n; i++) {
-         set_error_flag(errorflag, !NearAtR(spline1dcalc(&s, x.xR[i]), y.xR[i], eps), __FILE__, __LINE__, "testlsfitunit.ap:1954");
+         *errorflag = *errorflag || !NearAtR(spline1dcalc(&s, x.xR[i]), y.xR[i], eps);
       }
    // compare results with values returned by section-based algorithm
       lstfitpiecewiselinearrdpfixed(&x, &y, n, nsections, &x3, &y3, &nsections3);
-      set_error_flag(errorflag, nsections3 != nsections, __FILE__, __LINE__, "testlsfitunit.ap:1960");
+      *errorflag = *errorflag || nsections3 != nsections;
       if (*errorflag) {
          ae_frame_leave();
          return;
       }
       for (i = 0; i < nsections; i++) {
-         set_error_flag(errorflag, !NearAtR(x2.xR[i], x3.xR[i], 1000.0 * machineepsilon), __FILE__, __LINE__, "testlsfitunit.ap:1965");
-         set_error_flag(errorflag, !NearAtR(y2.xR[i], y3.xR[i], 1000.0 * machineepsilon), __FILE__, __LINE__, "testlsfitunit.ap:1966");
+         *errorflag = *errorflag || !NearAtR(x2.xR[i], x3.xR[i], 1000.0 * machineepsilon);
+         *errorflag = *errorflag || !NearAtR(y2.xR[i], y3.xR[i], 1000.0 * machineepsilon);
       }
    // Next epsilon
       eps *= 0.5;
@@ -62665,7 +62616,7 @@ static void testlsfitunit_testrdp(bool *errorflag) {
       y.xR[i] = sin(x.xR[i]) + 0.01 * (hqrnduniformr(&rs) - 0.5);
    }
    lstfitpiecewiselinearrdpfixed(&x, &y, n, n, &x2, &y2, &nsections);
-   set_error_flag(errorflag, nsections > n - 1, __FILE__, __LINE__, "testlsfitunit.ap:1987");
+   *errorflag = *errorflag || nsections > n - 1;
    ae_frame_leave();
 }
 
@@ -62770,7 +62721,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
                         }
                      }
                      v0 = logisticcalc4(v, a, b, c, d);
-                     set_error_flag(fiterrors, !NearAtR(vv, v0, tol), __FILE__, __LINE__, "testlsfitunit.ap:2057");
+                     *fiterrors = *fiterrors || !NearAtR(vv, v0, tol);
                   // Test 5PL calculation
                      if (v != 0.0) {
                         vv = d + (a - d) / pow(1 + pow(v / c, b), g);
@@ -62786,7 +62737,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
                         }
                      }
                      v0 = logisticcalc5(v, a, b, c, d, g);
-                     set_error_flag(fiterrors, !NearAtR(vv, v0, tol), __FILE__, __LINE__, "testlsfitunit.ap:2074");
+                     *fiterrors = *fiterrors || !NearAtR(vv, v0, tol);
                   }
                }
             }
@@ -62861,11 +62812,11 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
    // NOTE: we test that B >= 0 is returned. If BE<0, we use
    //       symmetry property of 4PL model.
       logisticfit4(&x, &y, ntotal, &a, &b, &c, &d, &rep);
-      set_error_flag(fiterrors, !isfinite(a), __FILE__, __LINE__, "testlsfitunit.ap:2162");
-      set_error_flag(fiterrors, !isfinite(b), __FILE__, __LINE__, "testlsfitunit.ap:2163");
-      set_error_flag(fiterrors, !isfinite(c), __FILE__, __LINE__, "testlsfitunit.ap:2164");
-      set_error_flag(fiterrors, !isfinite(d), __FILE__, __LINE__, "testlsfitunit.ap:2165");
-      set_error_flag(fiterrors, b < 0.0, __FILE__, __LINE__, "testlsfitunit.ap:2166");
+      *fiterrors = *fiterrors || !isfinite(a);
+      *fiterrors = *fiterrors || !isfinite(b);
+      *fiterrors = *fiterrors || !isfinite(c);
+      *fiterrors = *fiterrors || !isfinite(d);
+      *fiterrors = *fiterrors || b < 0.0;
       v = 0.0;
       for (i = 0; i < ntotal; i++) {
          if (x.xR[i] != 0.0) {
@@ -62876,7 +62827,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
          v += sqr(y.xR[i] - vv);
       }
       v = sqrt(v / ntotal);
-      set_error_flag(fiterrors, v > (1 + tol) * noise, __FILE__, __LINE__, "testlsfitunit.ap:2177");
+      *fiterrors = *fiterrors || v > (1 + tol) * noise;
    // Constrained fit and test
    //
    // NOTE: we test that B >= 0 is returned. If BE<0, we use
@@ -62905,13 +62856,13 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
          // Fit
             logisticfit4ec(&x, &y, ntotal, v0, v1, &a, &b, &c, &d, &rep);
          // Check
-            set_error_flag(fiterrors, !isfinite(a), __FILE__, __LINE__, "testlsfitunit.ap:2218");
-            set_error_flag(fiterrors, !isfinite(b), __FILE__, __LINE__, "testlsfitunit.ap:2219");
-            set_error_flag(fiterrors, !isfinite(c), __FILE__, __LINE__, "testlsfitunit.ap:2220");
-            set_error_flag(fiterrors, !isfinite(d), __FILE__, __LINE__, "testlsfitunit.ap:2221");
-            set_error_flag(fiterrors, b < 0.0, __FILE__, __LINE__, "testlsfitunit.ap:2222");
-            set_error_flag(fiterrors, k0 != 0 && a != v0, __FILE__, __LINE__, "testlsfitunit.ap:2223");
-            set_error_flag(fiterrors, k1 != 0 && d != v1, __FILE__, __LINE__, "testlsfitunit.ap:2224");
+            *fiterrors = *fiterrors || !isfinite(a);
+            *fiterrors = *fiterrors || !isfinite(b);
+            *fiterrors = *fiterrors || !isfinite(c);
+            *fiterrors = *fiterrors || !isfinite(d);
+            *fiterrors = *fiterrors || b < 0.0;
+            *fiterrors = *fiterrors || k0 != 0 && a != v0;
+            *fiterrors = *fiterrors || k1 != 0 && d != v1;
             v = 0.0;
             for (i = 0; i < ntotal; i++) {
                if (x.xR[i] != 0.0) {
@@ -62926,7 +62877,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
                v += sqr(y.xR[i] - vv);
             }
             v = sqrt(v / ntotal);
-            set_error_flag(fiterrors, v > (1 + tol) * noise, __FILE__, __LINE__, "testlsfitunit.ap:2240");
+            *fiterrors = *fiterrors || v > (1 + tol) * noise;
          }
       }
    }
@@ -62999,7 +62950,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
          v += sqr(y.xR[i] - vv);
       }
       v = sqrt(v / n);
-      set_error_flag(fiterrors, v > scaley * tol, __FILE__, __LINE__, "testlsfitunit.ap:2325");
+      *fiterrors = *fiterrors || v > scaley * tol;
    // Constrained fit and test
       for (k0 = 0; k0 <= 1; k0++) {
          for (k1 = 0; k1 <= 1; k1++) {
@@ -63024,16 +62975,16 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
             }
          // Fit
             logisticfit5ec(&x, &y, n, v0, v1, &a, &b, &c, &d, &g, &rep);
-            set_error_flag(fiterrors, !isfinite(a), __FILE__, __LINE__, "testlsfitunit.ap:2359");
-            set_error_flag(fiterrors, !isfinite(b), __FILE__, __LINE__, "testlsfitunit.ap:2360");
-            set_error_flag(fiterrors, !isfinite(c), __FILE__, __LINE__, "testlsfitunit.ap:2361");
-            set_error_flag(fiterrors, !isfinite(d), __FILE__, __LINE__, "testlsfitunit.ap:2362");
+            *fiterrors = *fiterrors || !isfinite(a);
+            *fiterrors = *fiterrors || !isfinite(b);
+            *fiterrors = *fiterrors || !isfinite(c);
+            *fiterrors = *fiterrors || !isfinite(d);
             if (b > 0.0) {
-               set_error_flag(fiterrors, k0 != 0 && a != v0, __FILE__, __LINE__, "testlsfitunit.ap:2365");
-               set_error_flag(fiterrors, k1 != 0 && d != v1, __FILE__, __LINE__, "testlsfitunit.ap:2366");
+               *fiterrors = *fiterrors || k0 != 0 && a != v0;
+               *fiterrors = *fiterrors || k1 != 0 && d != v1;
             } else {
-               set_error_flag(fiterrors, k0 != 0 && d != v0, __FILE__, __LINE__, "testlsfitunit.ap:2370");
-               set_error_flag(fiterrors, k1 != 0 && a != v1, __FILE__, __LINE__, "testlsfitunit.ap:2371");
+               *fiterrors = *fiterrors || k0 != 0 && d != v0;
+               *fiterrors = *fiterrors || k1 != 0 && a != v1;
             }
             v = 0.0;
             for (i = 0; i < n; i++) {
@@ -63049,7 +63000,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
                v += sqr(y.xR[i] - vv);
             }
             v = sqrt(v / n);
-            set_error_flag(fiterrors, v > scaley * tol, __FILE__, __LINE__, "testlsfitunit.ap:2388");
+            *fiterrors = *fiterrors || v > scaley * tol;
          }
       }
    }
@@ -63122,11 +63073,11 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
       if (k > 0) {
          eavgrel /= k;
       }
-      set_error_flag(fiterrors, !NearAtR(erms, rep.rmserror, tol), __FILE__, __LINE__, "testlsfitunit.ap:2477");
-      set_error_flag(fiterrors, !NearAtR(eavg, rep.avgerror, tol), __FILE__, __LINE__, "testlsfitunit.ap:2478");
-      set_error_flag(fiterrors, !NearAtR(emax, rep.maxerror, tol), __FILE__, __LINE__, "testlsfitunit.ap:2479");
-      set_error_flag(fiterrors, !NearAtR(eavgrel, rep.avgrelerror, tol), __FILE__, __LINE__, "testlsfitunit.ap:2480");
-      set_error_flag(fiterrors, !NearAtR(er2, rep.r2, tol), __FILE__, __LINE__, "testlsfitunit.ap:2481");
+      *fiterrors = *fiterrors || !NearAtR(erms, rep.rmserror, tol);
+      *fiterrors = *fiterrors || !NearAtR(eavg, rep.avgerror, tol);
+      *fiterrors = *fiterrors || !NearAtR(emax, rep.maxerror, tol);
+      *fiterrors = *fiterrors || !NearAtR(eavgrel, rep.avgrelerror, tol);
+      *fiterrors = *fiterrors || !NearAtR(er2, rep.r2, tol);
    }
 // Test previously fixed bug #834
    ae_vector_set_length(&x, 0);
@@ -63170,10 +63121,10 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
    testlsfitunit_append10(&y, 0.57766, 0.61960, 0.65400, 0.68936, 0.72268, 0.75573, 0.78446, 0.81169, 0.83185, 0.86247);
    testlsfitunit_append10(&y, 0.88797, 0.91083, 0.93142, 0.94916, 0.96463, 0.97881, 0.98809, 0.99774, 0.99844, 1.00000);
    logisticfit4(&x, &y, 190, &a, &b, &c, &d, &rep);
-   set_error_flag(fiterrors, b < 31.90 || b > 32.00, __FILE__, __LINE__, "testlsfitunit.ap:2528");
-   set_error_flag(fiterrors, rep.rmserror > 0.02, __FILE__, __LINE__, "testlsfitunit.ap:2529");
+   *fiterrors = *fiterrors || b < 31.90 || b > 32.00;
+   *fiterrors = *fiterrors || rep.rmserror > 0.02;
    logisticfit5(&x, &y, 190, &a, &b, &c, &d, &g, &rep2);
-   set_error_flag(fiterrors, rep2.rmserror > 0.95 * rep.rmserror, __FILE__, __LINE__, "testlsfitunit.ap:2531");
+   *fiterrors = *fiterrors || rep2.rmserror > 0.95 * rep.rmserror;
    ae_frame_leave();
 }
 
@@ -63344,7 +63295,7 @@ static void testlsfitunit_testgradientcheck(bool *testg) {
    // Check that error code does not equal to -7 and parameter .VarIdx
    // equal to -1.
       if (info == -7 || rep.varidx != -1) {
-         set_error_flag(testg, true, __FILE__, __LINE__, "testlsfitunit.ap:3923");
+         *testg = true;
          ae_frame_leave();
          return;
       }
@@ -63364,7 +63315,7 @@ static void testlsfitunit_testgradientcheck(bool *testg) {
    // Check that error code equal to -7 and parameter .VarIdx
    // equal to number of incorrect component.
       if (info != -7 || rep.varidx != nbrcomp) {
-         set_error_flag(testg, true, __FILE__, __LINE__, "testlsfitunit.ap:3955");
+         *testg = true;
          ae_frame_leave();
          return;
       }
@@ -63372,7 +63323,7 @@ static void testlsfitunit_testgradientcheck(bool *testg) {
    ae_frame_leave();
 }
 
-bool testlsfit(bool silent) {
+bool testlsfit() {
    bool waserrors;
    bool llserrors;
    bool nlserrors;
@@ -63401,7 +63352,7 @@ bool testlsfit(bool silent) {
    testlsfitunit_testgradientcheck(&graderrors);
 // report
    waserrors = llserrors || nlserrors || polfiterrors || ratfiterrors || splfiterrors || graderrors || logisticerrors || rdperrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING LEAST SQUARES\n");
       printf("POLYNOMIAL LEAST SQUARES:                ");
       if (polfiterrors) {
@@ -63560,7 +63511,7 @@ static void testfitsphereunit_testspherefittingls(bool *err) {
       rhi = 0.0;
       problemtype = 0;
       fitspherex(&xy, npoints, nx, problemtype, 0.0, 0, 0.0, &cx, &rlo, &rhi);
-      set_error_flag(err, rlo != rhi, __FILE__, __LINE__, "testfitsphereunit.ap:109");
+      *err = *err || rlo != rhi;
       vv = 0.0;
       for (i = 0; i < npoints; i++) {
          v = 0.0;
@@ -63569,7 +63520,7 @@ static void testfitsphereunit_testspherefittingls(bool *err) {
          }
          vv += sqrt(v) / npoints;
       }
-      set_error_flag(err, !NearAtR(vv, rlo, xtol), __FILE__, __LINE__, "testfitsphereunit.ap:118");
+      *err = *err || !NearAtR(vv, rlo, xtol);
       testfitsphereunit_calclserror(&xy, npoints, nx, &cx, &v0);
    // Check that small perturbations to center position increase target function
    //
@@ -63584,19 +63535,19 @@ static void testfitsphereunit_testspherefittingls(bool *err) {
          }
          cy.xR[j] = cx.xR[j] + xtol;
          testfitsphereunit_calclserror(&xy, npoints, nx, &cy, &v1);
-         set_error_flag(err, v1 < v0 - ftol, __FILE__, __LINE__, "testfitsphereunit.ap:137");
+         *err = *err || v1 < v0 - ftol;
          for (k = 0; k < nx; k++) {
             cy.xR[k] = cx.xR[k];
          }
          cy.xR[j] = cx.xR[j] - xtol;
          testfitsphereunit_calclserror(&xy, npoints, nx, &cy, &v1);
-         set_error_flag(err, v1 < v0 - ftol, __FILE__, __LINE__, "testfitsphereunit.ap:144");
+         *err = *err || v1 < v0 - ftol;
       }
    // Compare against results returned by specific solver
       fitspherels(&xy, npoints, nx, &cy, &v);
-      set_error_flag(err, v != rlo, __FILE__, __LINE__, "testfitsphereunit.ap:151");
+      *err = *err || v != rlo;
       for (j = 0; j < nx; j++) {
-         set_error_flag(err, cy.xR[j] != cx.xR[j], __FILE__, __LINE__, "testfitsphereunit.ap:153");
+         *err = *err || cy.xR[j] != cx.xR[j];
       }
    }
    ae_frame_leave();
@@ -63679,35 +63630,35 @@ static void testfitsphereunit_testspherefittingns(bool *err) {
             }
             cy.xR[j] = cx.xR[j] + xtol;
             testfitsphereunit_calcradii(&xy, npoints, nx, &cy, &rlo2, &rhi2);
-            set_error_flag(err, rhi2 * vhi - rlo2 * vlo < rhi * vhi - rlo * vlo - ftol, __FILE__, __LINE__, "testfitsphereunit.ap:245");
+            *err = *err || rhi2 * vhi - rlo2 * vlo < rhi * vhi - rlo * vlo - ftol;
             for (k = 0; k < nx; k++) {
                cy.xR[k] = cx.xR[k];
             }
             cy.xR[j] = cx.xR[j] - xtol;
             testfitsphereunit_calcradii(&xy, npoints, nx, &cy, &rlo2, &rhi2);
-            set_error_flag(err, rhi2 * vhi - rlo2 * vlo < rhi * vhi - rlo * vlo - ftol, __FILE__, __LINE__, "testfitsphereunit.ap:252");
+            *err = *err || rhi2 * vhi - rlo2 * vlo < rhi * vhi - rlo * vlo - ftol;
          }
       // Compare against results returned by specific solver
          if (problemtype == 1) {
             fitspheremc(&xy, npoints, nx, &cy, &rhi2);
-            set_error_flag(err, rhi2 != rhi, __FILE__, __LINE__, "testfitsphereunit.ap:261");
+            *err = *err || rhi2 != rhi;
             for (j = 0; j < nx; j++) {
-               set_error_flag(err, cy.xR[j] != cx.xR[j], __FILE__, __LINE__, "testfitsphereunit.ap:263");
+               *err = *err || cy.xR[j] != cx.xR[j];
             }
          }
          if (problemtype == 2) {
             fitspheremi(&xy, npoints, nx, &cy, &rlo2);
-            set_error_flag(err, rlo2 != rlo, __FILE__, __LINE__, "testfitsphereunit.ap:268");
+            *err = *err || rlo2 != rlo;
             for (j = 0; j < nx; j++) {
-               set_error_flag(err, cy.xR[j] != cx.xR[j], __FILE__, __LINE__, "testfitsphereunit.ap:270");
+               *err = *err || cy.xR[j] != cx.xR[j];
             }
          }
          if (problemtype == 3) {
             fitspheremz(&xy, npoints, nx, &cy, &rlo2, &rhi2);
-            set_error_flag(err, rlo2 != rlo, __FILE__, __LINE__, "testfitsphereunit.ap:275");
-            set_error_flag(err, rhi2 != rhi, __FILE__, __LINE__, "testfitsphereunit.ap:276");
+            *err = *err || rlo2 != rlo;
+            *err = *err || rhi2 != rhi;
             for (j = 0; j < nx; j++) {
-               set_error_flag(err, cy.xR[j] != cx.xR[j], __FILE__, __LINE__, "testfitsphereunit.ap:278");
+               *err = *err || cy.xR[j] != cx.xR[j];
             }
          }
       }
@@ -63824,86 +63775,86 @@ static void testfitsphereunit_testspherefittingvosswinkel2(bool *err) {
    rlo = 0.0;
    rhi = 0.0;
    fitspheremz(&xy, xy.rows, xy.cols, &cx, &rlo, &rhi);
-   set_error_flag(err, cx.cnt != 2, __FILE__, __LINE__, "testfitsphereunit.ap:395");
+   *err = *err || cx.cnt != 2;
    if (*err) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(err, !NearAtR(cx.xR[0], -0.050884688, tol), __FILE__, __LINE__, "testfitsphereunit.ap:398");
-   set_error_flag(err, !NearAtR(cx.xR[1], -0.011472328, tol), __FILE__, __LINE__, "testfitsphereunit.ap:399");
-   set_error_flag(err, !NearAtR(rlo, 0.150973382, tol), __FILE__, __LINE__, "testfitsphereunit.ap:400");
-   set_error_flag(err, !NearAtR(rhi, 0.164374709, tol), __FILE__, __LINE__, "testfitsphereunit.ap:401");
+   *err = *err || !NearAtR(cx.xR[0], -0.050884688, tol);
+   *err = *err || !NearAtR(cx.xR[1], -0.011472328, tol);
+   *err = *err || !NearAtR(rlo, 0.150973382, tol);
+   *err = *err || !NearAtR(rhi, 0.164374709, tol);
    SetVector(&cx);
    rlo = 0.0;
    rhi = 0.0;
    fitspherex(&xy, xy.rows, xy.cols, 3, 0.0, 0, 0.0, &cx, &rlo, &rhi);
-   set_error_flag(err, cx.cnt != 2, __FILE__, __LINE__, "testfitsphereunit.ap:406");
+   *err = *err || cx.cnt != 2;
    if (*err) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(err, !NearAtR(cx.xR[0], -0.050884688, tol), __FILE__, __LINE__, "testfitsphereunit.ap:409");
-   set_error_flag(err, !NearAtR(cx.xR[1], -0.011472328, tol), __FILE__, __LINE__, "testfitsphereunit.ap:410");
-   set_error_flag(err, !NearAtR(rlo, 0.150973382, tol), __FILE__, __LINE__, "testfitsphereunit.ap:411");
-   set_error_flag(err, !NearAtR(rhi, 0.164374709, tol), __FILE__, __LINE__, "testfitsphereunit.ap:412");
+   *err = *err || !NearAtR(cx.xR[0], -0.050884688, tol);
+   *err = *err || !NearAtR(cx.xR[1], -0.011472328, tol);
+   *err = *err || !NearAtR(rlo, 0.150973382, tol);
+   *err = *err || !NearAtR(rhi, 0.164374709, tol);
 // MC problem, NLC solver
    SetVector(&cx);
    rlo = 0.0;
    rhi = 0.0;
    fitspheremc(&xy, xy.rows, xy.cols, &cx, &rhi);
-   set_error_flag(err, cx.cnt != 2, __FILE__, __LINE__, "testfitsphereunit.ap:421");
+   *err = *err || cx.cnt != 2;
    if (*err) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(err, !NearAtR(cx.xR[0], -0.051137580, tol), __FILE__, __LINE__, "testfitsphereunit.ap:424");
-   set_error_flag(err, !NearAtR(cx.xR[1], -0.011680985, tol), __FILE__, __LINE__, "testfitsphereunit.ap:425");
-   set_error_flag(err, rlo != 0.0, __FILE__, __LINE__, "testfitsphereunit.ap:426");
-   set_error_flag(err, !NearAtR(rhi, 0.164365735, tol), __FILE__, __LINE__, "testfitsphereunit.ap:427");
+   *err = *err || !NearAtR(cx.xR[0], -0.051137580, tol);
+   *err = *err || !NearAtR(cx.xR[1], -0.011680985, tol);
+   *err = *err || rlo != 0.0;
+   *err = *err || !NearAtR(rhi, 0.164365735, tol);
    SetVector(&cx);
    rlo = 0.0;
    rhi = 0.0;
    fitspherex(&xy, xy.rows, xy.cols, 1, 0.0, 0, 0.0, &cx, &rlo, &rhi);
-   set_error_flag(err, cx.cnt != 2, __FILE__, __LINE__, "testfitsphereunit.ap:432");
+   *err = *err || cx.cnt != 2;
    if (*err) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(err, !NearAtR(cx.xR[0], -0.051137580, tol), __FILE__, __LINE__, "testfitsphereunit.ap:435");
-   set_error_flag(err, !NearAtR(cx.xR[1], -0.011680985, tol), __FILE__, __LINE__, "testfitsphereunit.ap:436");
-   set_error_flag(err, rlo != 0.0, __FILE__, __LINE__, "testfitsphereunit.ap:437");
-   set_error_flag(err, !NearAtR(rhi, 0.164365735, tol), __FILE__, __LINE__, "testfitsphereunit.ap:438");
+   *err = *err || !NearAtR(cx.xR[0], -0.051137580, tol);
+   *err = *err || !NearAtR(cx.xR[1], -0.011680985, tol);
+   *err = *err || rlo != 0.0;
+   *err = *err || !NearAtR(rhi, 0.164365735, tol);
 // MI problem, NLC solver
    SetVector(&cx);
    rlo = 0.0;
    rhi = 0.0;
    fitspheremi(&xy, xy.rows, xy.cols, &cx, &rlo);
-   set_error_flag(err, cx.cnt != 2, __FILE__, __LINE__, "testfitsphereunit.ap:447");
+   *err = *err || cx.cnt != 2;
    if (*err) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(err, !NearAtR(cx.xR[0], -0.054593489, tol), __FILE__, __LINE__, "testfitsphereunit.ap:450");
-   set_error_flag(err, !NearAtR(cx.xR[1], -0.007459466, tol), __FILE__, __LINE__, "testfitsphereunit.ap:451");
-   set_error_flag(err, !NearAtR(rlo, 0.152429205, tol), __FILE__, __LINE__, "testfitsphereunit.ap:452");
-   set_error_flag(err, rhi != 0.0, __FILE__, __LINE__, "testfitsphereunit.ap:453");
+   *err = *err || !NearAtR(cx.xR[0], -0.054593489, tol);
+   *err = *err || !NearAtR(cx.xR[1], -0.007459466, tol);
+   *err = *err || !NearAtR(rlo, 0.152429205, tol);
+   *err = *err || rhi != 0.0;
    SetVector(&cx);
    rlo = 0.0;
    rhi = 0.0;
    fitspherex(&xy, xy.rows, xy.cols, 2, 0.0, 0, 0.0, &cx, &rlo, &rhi);
-   set_error_flag(err, cx.cnt != 2, __FILE__, __LINE__, "testfitsphereunit.ap:458");
+   *err = *err || cx.cnt != 2;
    if (*err) {
       ae_frame_leave();
       return;
    }
-   set_error_flag(err, !NearAtR(cx.xR[0], -0.054593489, tol), __FILE__, __LINE__, "testfitsphereunit.ap:461");
-   set_error_flag(err, !NearAtR(cx.xR[1], -0.007459466, tol), __FILE__, __LINE__, "testfitsphereunit.ap:462");
-   set_error_flag(err, !NearAtR(rlo, 0.152429205, tol), __FILE__, __LINE__, "testfitsphereunit.ap:463");
-   set_error_flag(err, rhi != 0.0, __FILE__, __LINE__, "testfitsphereunit.ap:464");
+   *err = *err || !NearAtR(cx.xR[0], -0.054593489, tol);
+   *err = *err || !NearAtR(cx.xR[1], -0.007459466, tol);
+   *err = *err || !NearAtR(rlo, 0.152429205, tol);
+   *err = *err || rhi != 0.0;
    ae_frame_leave();
 }
 
-bool testfitsphere(bool silent) {
+bool testfitsphere() {
    bool nserrors;
    bool lserrors;
    bool wereerrors;
@@ -63916,7 +63867,7 @@ bool testfitsphere(bool silent) {
    testfitsphereunit_testspherefittingvosswinkel2(&nserrors);
 // report
    wereerrors = nserrors || lserrors;
-   if (!silent) {
+   if (wereerrors || !silent) {
       printf("TESTING FITSPHERE\n");
       printf("* LEAST SQUARES CIRCLE FITTING            ");
       if (lserrors) {
@@ -63981,85 +63932,85 @@ static void testparametricunit_testrdp(bool *errorflag) {
    xy.xyR[3][0] = 3.0;
    xy.xyR[3][1] = 3.0;
    parametricrdpfixed(&xy, 4, 2, 0, sqrt(2.0) + 0.001, &xy2, &idx2, &nsections);
-   set_error_flag(errorflag, nsections != 1, __FILE__, __LINE__, "testparametricunit.ap:41");
+   *errorflag = *errorflag || nsections != 1;
    if (nsections == 1) {
-      set_error_flag(errorflag, xy2.xyR[0][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:44");
-      set_error_flag(errorflag, xy2.xyR[0][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:45");
-      set_error_flag(errorflag, idx2.xZ[0] != 0, __FILE__, __LINE__, "testparametricunit.ap:46");
-      set_error_flag(errorflag, xy2.xyR[1][0] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:47");
-      set_error_flag(errorflag, xy2.xyR[1][1] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:48");
-      set_error_flag(errorflag, idx2.xZ[1] != 3, __FILE__, __LINE__, "testparametricunit.ap:49");
+      *errorflag = *errorflag || xy2.xyR[0][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[0][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[0] != 0;
+      *errorflag = *errorflag || xy2.xyR[1][0] != 3.0;
+      *errorflag = *errorflag || xy2.xyR[1][1] != 3.0;
+      *errorflag = *errorflag || idx2.xZ[1] != 3;
    }
    parametricrdpfixed(&xy, 4, 2, 0, sqrt(2.0) - 0.001, &xy2, &idx2, &nsections);
-   set_error_flag(errorflag, nsections != 3, __FILE__, __LINE__, "testparametricunit.ap:52");
+   *errorflag = *errorflag || nsections != 3;
    if (nsections == 3) {
-      set_error_flag(errorflag, xy2.xyR[0][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:55");
-      set_error_flag(errorflag, xy2.xyR[0][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:56");
-      set_error_flag(errorflag, idx2.xZ[0] != 0, __FILE__, __LINE__, "testparametricunit.ap:57");
-      set_error_flag(errorflag, xy2.xyR[1][0] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:58");
-      set_error_flag(errorflag, xy2.xyR[1][1] != 2.0, __FILE__, __LINE__, "testparametricunit.ap:59");
-      set_error_flag(errorflag, idx2.xZ[1] != 1, __FILE__, __LINE__, "testparametricunit.ap:60");
-      set_error_flag(errorflag, xy2.xyR[2][0] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:61");
-      set_error_flag(errorflag, xy2.xyR[2][1] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:62");
-      set_error_flag(errorflag, idx2.xZ[2] != 2, __FILE__, __LINE__, "testparametricunit.ap:63");
-      set_error_flag(errorflag, xy2.xyR[3][0] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:64");
-      set_error_flag(errorflag, xy2.xyR[3][1] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:65");
-      set_error_flag(errorflag, idx2.xZ[3] != 3, __FILE__, __LINE__, "testparametricunit.ap:66");
+      *errorflag = *errorflag || xy2.xyR[0][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[0][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[0] != 0;
+      *errorflag = *errorflag || xy2.xyR[1][0] != 1.0;
+      *errorflag = *errorflag || xy2.xyR[1][1] != 2.0;
+      *errorflag = *errorflag || idx2.xZ[1] != 1;
+      *errorflag = *errorflag || xy2.xyR[2][0] != 3.0;
+      *errorflag = *errorflag || xy2.xyR[2][1] != 1.0;
+      *errorflag = *errorflag || idx2.xZ[2] != 2;
+      *errorflag = *errorflag || xy2.xyR[3][0] != 3.0;
+      *errorflag = *errorflag || xy2.xyR[3][1] != 3.0;
+      *errorflag = *errorflag || idx2.xZ[3] != 3;
    }
    parametricrdpfixed(&xy, 4, 2, 1, 0.0, &xy2, &idx2, &nsections);
-   set_error_flag(errorflag, nsections != 1, __FILE__, __LINE__, "testparametricunit.ap:69");
+   *errorflag = *errorflag || nsections != 1;
    if (nsections == 1) {
-      set_error_flag(errorflag, xy2.xyR[0][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:72");
-      set_error_flag(errorflag, xy2.xyR[0][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:73");
-      set_error_flag(errorflag, idx2.xZ[0] != 0, __FILE__, __LINE__, "testparametricunit.ap:74");
-      set_error_flag(errorflag, xy2.xyR[1][0] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:75");
-      set_error_flag(errorflag, xy2.xyR[1][1] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:76");
-      set_error_flag(errorflag, idx2.xZ[1] != 3, __FILE__, __LINE__, "testparametricunit.ap:77");
+      *errorflag = *errorflag || xy2.xyR[0][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[0][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[0] != 0;
+      *errorflag = *errorflag || xy2.xyR[1][0] != 3.0;
+      *errorflag = *errorflag || xy2.xyR[1][1] != 3.0;
+      *errorflag = *errorflag || idx2.xZ[1] != 3;
    }
    parametricrdpfixed(&xy, 4, 2, 2, 0.0, &xy2, &idx2, &nsections);
-   set_error_flag(errorflag, nsections != 2, __FILE__, __LINE__, "testparametricunit.ap:80");
+   *errorflag = *errorflag || nsections != 2;
    if (nsections == 2) {
-      set_error_flag(errorflag, xy2.xyR[0][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:83");
-      set_error_flag(errorflag, xy2.xyR[0][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:84");
-      set_error_flag(errorflag, idx2.xZ[0] != 0, __FILE__, __LINE__, "testparametricunit.ap:85");
-      set_error_flag(errorflag, xy2.xyR[1][0] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:86");
-      set_error_flag(errorflag, xy2.xyR[1][1] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:87");
-      set_error_flag(errorflag, idx2.xZ[1] != 2, __FILE__, __LINE__, "testparametricunit.ap:88");
-      set_error_flag(errorflag, xy2.xyR[2][0] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:89");
-      set_error_flag(errorflag, xy2.xyR[2][1] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:90");
-      set_error_flag(errorflag, idx2.xZ[2] != 3, __FILE__, __LINE__, "testparametricunit.ap:91");
+      *errorflag = *errorflag || xy2.xyR[0][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[0][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[0] != 0;
+      *errorflag = *errorflag || xy2.xyR[1][0] != 3.0;
+      *errorflag = *errorflag || xy2.xyR[1][1] != 1.0;
+      *errorflag = *errorflag || idx2.xZ[1] != 2;
+      *errorflag = *errorflag || xy2.xyR[2][0] != 3.0;
+      *errorflag = *errorflag || xy2.xyR[2][1] != 3.0;
+      *errorflag = *errorflag || idx2.xZ[2] != 3;
    }
    parametricrdpfixed(&xy, 4, 2, 3, 0.0, &xy2, &idx2, &nsections);
-   set_error_flag(errorflag, nsections != 3, __FILE__, __LINE__, "testparametricunit.ap:94");
+   *errorflag = *errorflag || nsections != 3;
    if (nsections == 3) {
-      set_error_flag(errorflag, xy2.xyR[0][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:97");
-      set_error_flag(errorflag, xy2.xyR[0][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:98");
-      set_error_flag(errorflag, idx2.xZ[0] != 0, __FILE__, __LINE__, "testparametricunit.ap:99");
-      set_error_flag(errorflag, xy2.xyR[1][0] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:100");
-      set_error_flag(errorflag, xy2.xyR[1][1] != 2.0, __FILE__, __LINE__, "testparametricunit.ap:101");
-      set_error_flag(errorflag, idx2.xZ[1] != 1, __FILE__, __LINE__, "testparametricunit.ap:102");
-      set_error_flag(errorflag, xy2.xyR[2][0] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:103");
-      set_error_flag(errorflag, xy2.xyR[2][1] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:104");
-      set_error_flag(errorflag, idx2.xZ[2] != 2, __FILE__, __LINE__, "testparametricunit.ap:105");
-      set_error_flag(errorflag, xy2.xyR[3][0] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:106");
-      set_error_flag(errorflag, xy2.xyR[3][1] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:107");
-      set_error_flag(errorflag, idx2.xZ[3] != 3, __FILE__, __LINE__, "testparametricunit.ap:108");
+      *errorflag = *errorflag || xy2.xyR[0][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[0][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[0] != 0;
+      *errorflag = *errorflag || xy2.xyR[1][0] != 1.0;
+      *errorflag = *errorflag || xy2.xyR[1][1] != 2.0;
+      *errorflag = *errorflag || idx2.xZ[1] != 1;
+      *errorflag = *errorflag || xy2.xyR[2][0] != 3.0;
+      *errorflag = *errorflag || xy2.xyR[2][1] != 1.0;
+      *errorflag = *errorflag || idx2.xZ[2] != 2;
+      *errorflag = *errorflag || xy2.xyR[3][0] != 3.0;
+      *errorflag = *errorflag || xy2.xyR[3][1] != 3.0;
+      *errorflag = *errorflag || idx2.xZ[3] != 3;
    }
    parametricrdpfixed(&xy, 4, 2, 4, 0.0, &xy2, &idx2, &nsections);
-   set_error_flag(errorflag, nsections != 3, __FILE__, __LINE__, "testparametricunit.ap:111");
+   *errorflag = *errorflag || nsections != 3;
    if (nsections == 3) {
-      set_error_flag(errorflag, xy2.xyR[0][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:114");
-      set_error_flag(errorflag, xy2.xyR[0][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:115");
-      set_error_flag(errorflag, idx2.xZ[0] != 0, __FILE__, __LINE__, "testparametricunit.ap:116");
-      set_error_flag(errorflag, xy2.xyR[1][0] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:117");
-      set_error_flag(errorflag, xy2.xyR[1][1] != 2.0, __FILE__, __LINE__, "testparametricunit.ap:118");
-      set_error_flag(errorflag, idx2.xZ[1] != 1, __FILE__, __LINE__, "testparametricunit.ap:119");
-      set_error_flag(errorflag, xy2.xyR[2][0] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:120");
-      set_error_flag(errorflag, xy2.xyR[2][1] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:121");
-      set_error_flag(errorflag, idx2.xZ[2] != 2, __FILE__, __LINE__, "testparametricunit.ap:122");
-      set_error_flag(errorflag, xy2.xyR[3][0] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:123");
-      set_error_flag(errorflag, xy2.xyR[3][1] != 3.0, __FILE__, __LINE__, "testparametricunit.ap:124");
-      set_error_flag(errorflag, idx2.xZ[3] != 3, __FILE__, __LINE__, "testparametricunit.ap:125");
+      *errorflag = *errorflag || xy2.xyR[0][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[0][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[0] != 0;
+      *errorflag = *errorflag || xy2.xyR[1][0] != 1.0;
+      *errorflag = *errorflag || xy2.xyR[1][1] != 2.0;
+      *errorflag = *errorflag || idx2.xZ[1] != 1;
+      *errorflag = *errorflag || xy2.xyR[2][0] != 3.0;
+      *errorflag = *errorflag || xy2.xyR[2][1] != 1.0;
+      *errorflag = *errorflag || idx2.xZ[2] != 2;
+      *errorflag = *errorflag || xy2.xyR[3][0] != 3.0;
+      *errorflag = *errorflag || xy2.xyR[3][1] != 3.0;
+      *errorflag = *errorflag || idx2.xZ[3] != 3;
    }
 // Parametric test 2: closed curve
    ae_matrix_set_length(&xy, 5, 2);
@@ -64074,59 +64025,59 @@ static void testparametricunit_testrdp(bool *errorflag) {
    xy.xyR[4][0] = 0.0;
    xy.xyR[4][1] = 0.0;
    parametricrdpfixed(&xy, 5, 2, 0, sqrt(2.0) + 0.001, &xy2, &idx2, &nsections);
-   set_error_flag(errorflag, nsections != 1, __FILE__, __LINE__, "testparametricunit.ap:144");
+   *errorflag = *errorflag || nsections != 1;
    if (nsections == 1) {
-      set_error_flag(errorflag, xy2.xyR[0][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:147");
-      set_error_flag(errorflag, xy2.xyR[0][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:148");
-      set_error_flag(errorflag, idx2.xZ[0] != 0, __FILE__, __LINE__, "testparametricunit.ap:149");
-      set_error_flag(errorflag, xy2.xyR[1][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:150");
-      set_error_flag(errorflag, xy2.xyR[1][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:151");
-      set_error_flag(errorflag, idx2.xZ[1] != 4, __FILE__, __LINE__, "testparametricunit.ap:152");
+      *errorflag = *errorflag || xy2.xyR[0][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[0][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[0] != 0;
+      *errorflag = *errorflag || xy2.xyR[1][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[1][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[1] != 4;
    }
    parametricrdpfixed(&xy, 5, 2, 0, sqrt(2.0) - 0.001, &xy2, &idx2, &nsections);
-   set_error_flag(errorflag, nsections != 2, __FILE__, __LINE__, "testparametricunit.ap:155");
+   *errorflag = *errorflag || nsections != 2;
    if (nsections == 2) {
-      set_error_flag(errorflag, xy2.xyR[0][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:158");
-      set_error_flag(errorflag, xy2.xyR[0][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:159");
-      set_error_flag(errorflag, idx2.xZ[0] != 0, __FILE__, __LINE__, "testparametricunit.ap:160");
-      set_error_flag(errorflag, xy2.xyR[1][0] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:161");
-      set_error_flag(errorflag, xy2.xyR[1][1] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:162");
-      set_error_flag(errorflag, idx2.xZ[1] != 2, __FILE__, __LINE__, "testparametricunit.ap:163");
-      set_error_flag(errorflag, xy2.xyR[2][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:164");
-      set_error_flag(errorflag, xy2.xyR[2][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:165");
-      set_error_flag(errorflag, idx2.xZ[2] != 4, __FILE__, __LINE__, "testparametricunit.ap:166");
+      *errorflag = *errorflag || xy2.xyR[0][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[0][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[0] != 0;
+      *errorflag = *errorflag || xy2.xyR[1][0] != 1.0;
+      *errorflag = *errorflag || xy2.xyR[1][1] != 1.0;
+      *errorflag = *errorflag || idx2.xZ[1] != 2;
+      *errorflag = *errorflag || xy2.xyR[2][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[2][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[2] != 4;
    }
    parametricrdpfixed(&xy, 5, 2, 0, sqrt(2.0) / 2 + 0.001, &xy2, &idx2, &nsections);
-   set_error_flag(errorflag, nsections != 2, __FILE__, __LINE__, "testparametricunit.ap:169");
+   *errorflag = *errorflag || nsections != 2;
    if (nsections == 2) {
-      set_error_flag(errorflag, xy2.xyR[0][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:172");
-      set_error_flag(errorflag, xy2.xyR[0][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:173");
-      set_error_flag(errorflag, idx2.xZ[0] != 0, __FILE__, __LINE__, "testparametricunit.ap:174");
-      set_error_flag(errorflag, xy2.xyR[1][0] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:175");
-      set_error_flag(errorflag, xy2.xyR[1][1] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:176");
-      set_error_flag(errorflag, idx2.xZ[1] != 2, __FILE__, __LINE__, "testparametricunit.ap:177");
-      set_error_flag(errorflag, xy2.xyR[2][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:178");
-      set_error_flag(errorflag, xy2.xyR[2][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:179");
-      set_error_flag(errorflag, idx2.xZ[2] != 4, __FILE__, __LINE__, "testparametricunit.ap:180");
+      *errorflag = *errorflag || xy2.xyR[0][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[0][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[0] != 0;
+      *errorflag = *errorflag || xy2.xyR[1][0] != 1.0;
+      *errorflag = *errorflag || xy2.xyR[1][1] != 1.0;
+      *errorflag = *errorflag || idx2.xZ[1] != 2;
+      *errorflag = *errorflag || xy2.xyR[2][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[2][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[2] != 4;
    }
    parametricrdpfixed(&xy, 5, 2, 0, sqrt(2.0) / 2 - 0.001, &xy2, &idx2, &nsections);
-   set_error_flag(errorflag, nsections != 4, __FILE__, __LINE__, "testparametricunit.ap:183");
+   *errorflag = *errorflag || nsections != 4;
    if (nsections == 4) {
-      set_error_flag(errorflag, xy2.xyR[0][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:186");
-      set_error_flag(errorflag, xy2.xyR[0][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:187");
-      set_error_flag(errorflag, idx2.xZ[0] != 0, __FILE__, __LINE__, "testparametricunit.ap:188");
-      set_error_flag(errorflag, xy2.xyR[1][0] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:189");
-      set_error_flag(errorflag, xy2.xyR[1][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:190");
-      set_error_flag(errorflag, idx2.xZ[1] != 1, __FILE__, __LINE__, "testparametricunit.ap:191");
-      set_error_flag(errorflag, xy2.xyR[2][0] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:192");
-      set_error_flag(errorflag, xy2.xyR[2][1] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:193");
-      set_error_flag(errorflag, idx2.xZ[2] != 2, __FILE__, __LINE__, "testparametricunit.ap:194");
-      set_error_flag(errorflag, xy2.xyR[3][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:195");
-      set_error_flag(errorflag, xy2.xyR[3][1] != 1.0, __FILE__, __LINE__, "testparametricunit.ap:196");
-      set_error_flag(errorflag, idx2.xZ[3] != 3, __FILE__, __LINE__, "testparametricunit.ap:197");
-      set_error_flag(errorflag, xy2.xyR[4][0] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:198");
-      set_error_flag(errorflag, xy2.xyR[4][1] != 0.0, __FILE__, __LINE__, "testparametricunit.ap:199");
-      set_error_flag(errorflag, idx2.xZ[4] != 4, __FILE__, __LINE__, "testparametricunit.ap:200");
+      *errorflag = *errorflag || xy2.xyR[0][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[0][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[0] != 0;
+      *errorflag = *errorflag || xy2.xyR[1][0] != 1.0;
+      *errorflag = *errorflag || xy2.xyR[1][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[1] != 1;
+      *errorflag = *errorflag || xy2.xyR[2][0] != 1.0;
+      *errorflag = *errorflag || xy2.xyR[2][1] != 1.0;
+      *errorflag = *errorflag || idx2.xZ[2] != 2;
+      *errorflag = *errorflag || xy2.xyR[3][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[3][1] != 1.0;
+      *errorflag = *errorflag || idx2.xZ[3] != 3;
+      *errorflag = *errorflag || xy2.xyR[4][0] != 0.0;
+      *errorflag = *errorflag || xy2.xyR[4][1] != 0.0;
+      *errorflag = *errorflag || idx2.xZ[4] != 4;
    }
 // Parametric, variable precision test (non-fixed), results are compared against fixed-section test
    eps = 10.0;
@@ -64144,20 +64095,20 @@ static void testparametricunit_testrdp(bool *errorflag) {
          }
       // Perform run of eps-based RDP algorithm
          parametricrdpfixed(&xy, n, d, 0, eps, &xy2, &idx2, &nsections);
-         set_error_flag(errorflag, nsections == 0, __FILE__, __LINE__, "testparametricunit.ap:231");
+         *errorflag = *errorflag || nsections == 0;
          if (nsections == 0) {
             ae_frame_leave();
             return;
          }
       // Check properties
-         set_error_flag(errorflag, idx2.xZ[0] != 0, __FILE__, __LINE__, "testparametricunit.ap:238");
+         *errorflag = *errorflag || idx2.xZ[0] != 0;
          for (i = 0; i < nsections; i++) {
-            set_error_flag(errorflag, idx2.xZ[i] >= idx2.xZ[i + 1], __FILE__, __LINE__, "testparametricunit.ap:240");
+            *errorflag = *errorflag || idx2.xZ[i] >= idx2.xZ[i + 1];
          }
-         set_error_flag(errorflag, idx2.xZ[nsections] != n - 1, __FILE__, __LINE__, "testparametricunit.ap:241");
+         *errorflag = *errorflag || idx2.xZ[nsections] != n - 1;
          for (i = 0; i <= nsections; i++) {
             for (j = 0; j < d; j++) {
-               set_error_flag(errorflag, xy2.xyR[i][j] != xy.xyR[idx2.xZ[i]][j], __FILE__, __LINE__, "testparametricunit.ap:244");
+               *errorflag = *errorflag || xy2.xyR[i][j] != xy.xyR[idx2.xZ[i]][j];
             }
          }
          ae_vector_set_length(&x, nsections + 1);
@@ -64177,19 +64128,19 @@ static void testparametricunit_testrdp(bool *errorflag) {
             }
          }
          for (i = 0; i < n; i++) {
-            set_error_flag(errorflag, sqrt(e.xR[i]) > eps, __FILE__, __LINE__, "testparametricunit.ap:262");
+            *errorflag = *errorflag || sqrt(e.xR[i]) > eps;
          }
       // compare results with values returned by section-based algorithm
          parametricrdpfixed(&xy, n, d, nsections, 0.0, &xy3, &idx3, &nsections3);
-         set_error_flag(errorflag, nsections3 != nsections, __FILE__, __LINE__, "testparametricunit.ap:268");
+         *errorflag = *errorflag || nsections3 != nsections;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i <= nsections; i++) {
-            set_error_flag(errorflag, idx2.xZ[i] != idx3.xZ[i], __FILE__, __LINE__, "testparametricunit.ap:273");
+            *errorflag = *errorflag || idx2.xZ[i] != idx3.xZ[i];
             for (j = 0; j < d; j++) {
-               set_error_flag(errorflag, !NearAtR(xy2.xyR[i][j], xy3.xyR[i][j], 1000.0 * machineepsilon), __FILE__, __LINE__, "testparametricunit.ap:275");
+               *errorflag = *errorflag || !NearAtR(xy2.xyR[i][j], xy3.xyR[i][j], 1000.0 * machineepsilon);
             }
          }
       }
@@ -64231,7 +64182,7 @@ static void testparametricunit_unsetp3(pspline3interpolant *p) {
    ae_frame_leave();
 }
 
-bool testparametric(bool silent) {
+bool testparametric() {
    ae_frame _frame_block;
    bool waserrors;
    bool p2errors;
@@ -64589,7 +64540,7 @@ bool testparametric(bool silent) {
    }
 // report
    waserrors = p2errors || p3errors || rdperrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING PARAMETRIC INTERPOLATION\n");
    // Normal tests
       printf("2D SPLINES:                              ");
@@ -64860,7 +64811,7 @@ static void testspline2dunit_unsetspline2d(spline2dinterpolant *c) {
 // The function check, that follow functions works correctly:
 //     Spline2DBilinearV, Spline2DBicubicV, Spline2DCalcV, Spline2DCalcVI,
 //     Spline2DDiffVI and Spline2DUnpackV.
-static bool testspline2dunit_testspline2dvf(bool silent) {
+static bool testspline2dunit_testspline2dvf() {
    ae_frame _frame_block;
    double range;
    double rndx;
@@ -65021,15 +64972,15 @@ static bool testspline2dunit_testspline2dvf(bool silent) {
                // Test calculation at grid points
                   spline2dcalcv(&vc, x.xR[i], y.xR[j], &resf);
                   resef = spline2dcalc(&sc, x.xR[i], y.xR[j]);
-                  set_error_flag(&result, !NearAtR(resf.xR[k], resef, eps), __FILE__, __LINE__, "testspline2dunit.ap:914");
-                  set_error_flag(&result, !NearAtR(spline2dcalcvi(&vc, x.xR[i], y.xR[j], k), resef, eps), __FILE__, __LINE__, "testspline2dunit.ap:915");
+                  result = result || !NearAtR(resf.xR[k], resef, eps);
+                  result = result || !NearAtR(spline2dcalcvi(&vc, x.xR[i], y.xR[j], k), resef, eps);
                // Test differentiation at grid points
                   spline2ddiffvi(&vc, x.xR[i], y.xR[j], k, &vi, &vxi, &vyi, &vxyi);
                   spline2ddiff(&sc, x.xR[i], y.xR[j], &si, &sxi, &syi, &sxyi);
-                  set_error_flag(&result, !NearAtR(vi, si, eps * (fabs(si) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:922");
-                  set_error_flag(&result, !NearAtR(vxi, sxi, eps * (fabs(sxi) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:923");
-                  set_error_flag(&result, !NearAtR(vyi, syi, eps * (fabs(syi) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:924");
-                  set_error_flag(&result, !NearAtR(vxyi, sxyi, eps * (fabs(sxyi) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:925");
+                  result = result || !NearAtR(vi, si, eps * (fabs(si) + 1.0));
+                  result = result || !NearAtR(vxi, sxi, eps * (fabs(sxi) + 1.0));
+                  result = result || !NearAtR(vyi, syi, eps * (fabs(syi) + 1.0));
+                  result = result || !NearAtR(vxyi, sxyi, eps * (fabs(sxyi) + 1.0));
                }
             }
          // Test at random points
@@ -65039,15 +64990,15 @@ static bool testspline2dunit_testspline2dvf(bool silent) {
             // Test calculation at random points
                spline2dcalcv(&vc, rndx, rndy, &resf);
                resef = spline2dcalc(&sc, rndx, rndy);
-               set_error_flag(&result, !NearAtR(resf.xR[k], resef, eps), __FILE__, __LINE__, "testspline2dunit.ap:941");
-               set_error_flag(&result, !NearAtR(spline2dcalcvi(&vc, rndx, rndy, k), resef, eps), __FILE__, __LINE__, "testspline2dunit.ap:942");
+               result = result || !NearAtR(resf.xR[k], resef, eps);
+               result = result || !NearAtR(spline2dcalcvi(&vc, rndx, rndy, k), resef, eps);
             // Test differentiation at random points
                spline2ddiffvi(&vc, rndx, rndy, k, &vi, &vxi, &vyi, &vxyi);
                spline2ddiff(&sc, rndx, rndy, &si, &sxi, &syi, &sxyi);
-               set_error_flag(&result, !NearAtR(vi, si, eps * (fabs(si) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:949");
-               set_error_flag(&result, !NearAtR(vxi, sxi, eps * (fabs(sxi) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:950");
-               set_error_flag(&result, !NearAtR(vyi, syi, eps * (fabs(syi) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:951");
-               set_error_flag(&result, !NearAtR(vxyi, sxyi, eps * (fabs(sxyi) + 1.0)), __FILE__, __LINE__, "testspline2dunit.ap:952");
+               result = result || !NearAtR(vi, si, eps * (fabs(si) + 1.0));
+               result = result || !NearAtR(vxi, sxi, eps * (fabs(sxi) + 1.0));
+               result = result || !NearAtR(vyi, syi, eps * (fabs(syi) + 1.0));
+               result = result || !NearAtR(vxyi, sxyi, eps * (fabs(sxyi) + 1.0));
             }
          }
       }
@@ -65155,12 +65106,12 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                   spline2dcalcv(&s, tmp0.xR[0], tmp0.xR[1], &tmp1);
                   for (j = 0; j < d; j++) {
                      v = vterm.xyR[j][0] * tmp0.xR[0] + vterm.xyR[j][1] * tmp0.xR[1] + vterm.xyR[j][2];
-                     set_error_flag(errorflag, !NearAtR(tmp1.xR[j], v, rmax2(fabs(v), 1.0) * tol), __FILE__, __LINE__, "testspline2dunit.ap:1094");
+                     *errorflag = *errorflag || !NearAtR(tmp1.xR[j], v, rmax2(fabs(v), 1.0) * tol);
                   }
                }
-               set_error_flag(errorflag, rep.rmserror > tol, __FILE__, __LINE__, "testspline2dunit.ap:1097");
-               set_error_flag(errorflag, rep.avgerror > tol, __FILE__, __LINE__, "testspline2dunit.ap:1098");
-               set_error_flag(errorflag, rep.maxerror > tol, __FILE__, __LINE__, "testspline2dunit.ap:1099");
+               *errorflag = *errorflag || rep.rmserror > tol;
+               *errorflag = *errorflag || rep.avgerror > tol;
+               *errorflag = *errorflag || rep.maxerror > tol;
                spline2dbuildersetconstterm(&state);
                spline2dfit(&state, &s, &rep);
                ae_vector_set_length(&tmp0, 3);
@@ -65175,7 +65126,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                      bad = bad || !NearAtR(tmp1.xR[j], v, tol);
                   }
                }
-               set_error_flag(errorflag, !bad, __FILE__, __LINE__, "testspline2dunit.ap:1118");
+               *errorflag = *errorflag || !bad;
             // Generate perfectly constant dataset, check against constant prior.
             // At least 8 points is required to get stable results.
                ae_matrix_set_length(&vterm, d, 3);
@@ -65210,12 +65161,12 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                   spline2dcalcv(&s, tmp0.xR[0], tmp0.xR[1], &tmp1);
                   for (j = 0; j < d; j++) {
                      v = vterm.xyR[j][0] * tmp0.xR[0] + vterm.xyR[j][1] * tmp0.xR[1] + vterm.xyR[j][2];
-                     set_error_flag(errorflag, !NearAtR(tmp1.xR[j], v, rmax2(fabs(v), 1.0) * tol), __FILE__, __LINE__, "testspline2dunit.ap:1159");
+                     *errorflag = *errorflag || !NearAtR(tmp1.xR[j], v, rmax2(fabs(v), 1.0) * tol);
                   }
                }
-               set_error_flag(errorflag, rep.rmserror > tol, __FILE__, __LINE__, "testspline2dunit.ap:1162");
-               set_error_flag(errorflag, rep.avgerror > tol, __FILE__, __LINE__, "testspline2dunit.ap:1163");
-               set_error_flag(errorflag, rep.maxerror > tol, __FILE__, __LINE__, "testspline2dunit.ap:1164");
+               *errorflag = *errorflag || rep.rmserror > tol;
+               *errorflag = *errorflag || rep.avgerror > tol;
+               *errorflag = *errorflag || rep.maxerror > tol;
             // Generate perfectly constant dataset, check against user-defined constant prior.
             // At least 8 points is required to get stable results.
                vprior = hqrndnormal(&rs);
@@ -65243,12 +65194,12 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                   tmp0.xR[2] = 1.0;
                   spline2dcalcv(&s, tmp0.xR[0], tmp0.xR[1], &tmp1);
                   for (j = 0; j < d; j++) {
-                     set_error_flag(errorflag, !NearAtR(tmp1.xR[j], vprior, tol), __FILE__, __LINE__, "testspline2dunit.ap:1199");
+                     *errorflag = *errorflag || !NearAtR(tmp1.xR[j], vprior, tol);
                   }
                }
-               set_error_flag(errorflag, rep.rmserror > tol, __FILE__, __LINE__, "testspline2dunit.ap:1201");
-               set_error_flag(errorflag, rep.avgerror > tol, __FILE__, __LINE__, "testspline2dunit.ap:1202");
-               set_error_flag(errorflag, rep.maxerror > tol, __FILE__, __LINE__, "testspline2dunit.ap:1203");
+               *errorflag = *errorflag || rep.rmserror > tol;
+               *errorflag = *errorflag || rep.avgerror > tol;
+               *errorflag = *errorflag || rep.maxerror > tol;
                spline2dbuildersetuserterm(&state, vprior + (2 * hqrnduniformi(&rs, 2) - 1));
                spline2dfit(&state, &s, &rep);
                ae_vector_set_length(&tmp0, 3);
@@ -65258,7 +65209,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                   tmp0.xR[2] = 1.0;
                   spline2dcalcv(&s, tmp0.xR[0], tmp0.xR[1], &tmp1);
                   for (j = 0; j < d; j++) {
-                     set_error_flag(errorflag, NearAtR(tmp1.xR[j], vprior, tol), __FILE__, __LINE__, "testspline2dunit.ap:1216");
+                     *errorflag = *errorflag || NearAtR(tmp1.xR[j], vprior, tol);
                   }
                }
             }
@@ -65346,7 +65297,7 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
             }
          }
          spline2dfit(&state, &s, &rep);
-         set_error_flag(errorflag, !NearAtR(spline2dcalc(&s, 0.0, 0.0), 0.25 * (xy.xyR[0][2] + xy.xyR[1][2] + xy.xyR[2][2] + xy.xyR[3][2]), 1.0E-4), __FILE__, __LINE__, "testspline2dunit.ap:1305");
+         *errorflag = *errorflag || !NearAtR(spline2dcalc(&s, 0.0, 0.0), 0.25 * (xy.xyR[0][2] + xy.xyR[1][2] + xy.xyR[2][2] + xy.xyR[3][2]), 1.0E-4);
       // Check fitting without penalty
          if (solvertype == 1) {
             spline2dbuildersetalgoblocklls(&state, 0.0);
@@ -65358,7 +65309,7 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
             }
          }
          spline2dfit(&state, &s2, &rep2);
-         set_error_flag(errorflag, !SmallAtR(spline2dcalc(&s2, 0.0, 0.0), 1.0E-4), __FILE__, __LINE__, "testspline2dunit.ap:1318");
+         *errorflag = *errorflag || !SmallAtR(spline2dcalc(&s2, 0.0, 0.0), 1.0E-4);
       }
    }
 // Solve a sequence of problems with increasing value of penalty coefficient;
@@ -65468,9 +65419,9 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
                   }
                }
             }
-            set_error_flag(errorflag, rep.rmserror <= rmserror, __FILE__, __LINE__, "testspline2dunit.ap:1448");
+            *errorflag = *errorflag || rep.rmserror <= rmserror;
             for (k = 0; k < d; k++) {
-               set_error_flag(errorflag, penalty2.xR[k] >= penalty.xR[k], __FILE__, __LINE__, "testspline2dunit.ap:1450");
+               *errorflag = *errorflag || penalty2.xR[k] >= penalty.xR[k];
             }
             rmserror = rep.rmserror;
             for (k = 0; k < d; k++) {
@@ -65578,12 +65529,12 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
                   spline2dfit(&state, &s, &rep);
                // Test
                   for (j = 0; j < d; j++) {
-                     set_error_flag(errorflag, spline2dcalcvi(&s, hqrndnormal(&rs), hqrndnormal(&rs), j) != 0.0, __FILE__, __LINE__, "testspline2dunit.ap:1550");
+                     *errorflag = *errorflag || spline2dcalcvi(&s, hqrndnormal(&rs), hqrndnormal(&rs), j) != 0.0;
                   }
-                  set_error_flag(errorflag, rep.rmserror != 0.0, __FILE__, __LINE__, "testspline2dunit.ap:1551");
-                  set_error_flag(errorflag, rep.avgerror != 0.0, __FILE__, __LINE__, "testspline2dunit.ap:1552");
-                  set_error_flag(errorflag, rep.maxerror != 0.0, __FILE__, __LINE__, "testspline2dunit.ap:1553");
-                  set_error_flag(errorflag, rep.r2 != 1.0, __FILE__, __LINE__, "testspline2dunit.ap:1554");
+                  *errorflag = *errorflag || rep.rmserror != 0.0;
+                  *errorflag = *errorflag || rep.avgerror != 0.0;
+                  *errorflag = *errorflag || rep.maxerror != 0.0;
+                  *errorflag = *errorflag || rep.r2 != 1.0;
                }
             }
          }
@@ -65679,15 +65630,15 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
                   }
                   rmserror = sqrt(rmserror / (npoints * d));
                   r2 = 1.0 - rss / coalesce(tss, 1.0);
-                  set_error_flag(errorflag, !NearAtR(rmserror, rep.rmserror, errtol), __FILE__, __LINE__, "testspline2dunit.ap:1654");
-                  set_error_flag(errorflag, !NearAtR(avgerror, rep.avgerror, errtol), __FILE__, __LINE__, "testspline2dunit.ap:1655");
-                  set_error_flag(errorflag, !NearAtR(maxerror, rep.maxerror, errtol), __FILE__, __LINE__, "testspline2dunit.ap:1656");
+                  *errorflag = *errorflag || !NearAtR(rmserror, rep.rmserror, errtol);
+                  *errorflag = *errorflag || !NearAtR(avgerror, rep.avgerror, errtol);
+                  *errorflag = *errorflag || !NearAtR(maxerror, rep.maxerror, errtol);
                   if (tss > 1.0E-3) {
-                     set_error_flag(errorflag, !NearAtR(r2, rep.r2, errtol), __FILE__, __LINE__, "testspline2dunit.ap:1658");
+                     *errorflag = *errorflag || !NearAtR(r2, rep.r2, errtol);
                   }
                // Minimalistic test for fitting quality: R2 is better than zero
                // (zero value = fitting by median value).
-                  set_error_flag(errorflag, rep.r2 < 0.0, __FILE__, __LINE__, "testspline2dunit.ap:1664");
+                  *errorflag = *errorflag || rep.r2 < 0.0;
                // Indirect test for solver: test that fitting on residuals from
                // previous fitting does not significantly decrease residuals.
                //
@@ -65712,7 +65663,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
                      }
                      spline2dbuildersetpoints(&state, &xy2, npoints);
                      spline2dfit(&state, &s2, &rep2);
-                     set_error_flag(errorflag, rep2.rmserror < 0.8 * rep.rmserror, __FILE__, __LINE__, "testspline2dunit.ap:1693");
+                     *errorflag = *errorflag || rep2.rmserror < 0.8 * rep.rmserror;
                   }
                }
             }
@@ -65768,7 +65719,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
          // Test
             for (i = 0; i < npoints; i++) {
                for (k = 0; k < d; k++) {
-                  set_error_flag(errorflag, !NearAtR(spline2dcalcvi(&s, xy.xyR[i][0], xy.xyR[i][1], k), xy.xyR[i][2 + k], 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:1754");
+                  *errorflag = *errorflag || !NearAtR(spline2dcalcvi(&s, xy.xyR[i][0], xy.xyR[i][1], k), xy.xyR[i][2 + k], 1.0E-6);
                }
             }
          }
@@ -65808,7 +65759,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
                spline2dcalcv(&s, xy.xyR[i][0], xy.xyR[i][1], &tmp0);
                spline2dcalcv(&s2, xy.xyR[i][0], xy.xyR[i][1], &tmp1);
                for (j = 0; j < d; j++) {
-                  set_error_flag(errorflag, !NearAtR(tmp0.xR[j], tmp1.xR[j], 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:1801");
+                  *errorflag = *errorflag || !NearAtR(tmp0.xR[j], tmp1.xR[j], 1.0E-6);
                   mx = rmax2(mx, fabs(tmp0.xR[j] - tmp1.xR[j]));
                }
             }
@@ -65847,7 +65798,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
       maxerror = rmax2(maxerror, fabs(spline2dcalc(&s, v0, v1) - spline2dcalc(&s2, v0, v1)));
       mx = rmax2(mx, fabs(spline2dcalc(&s, v0, v1)));
    }
-   set_error_flag(errorflag, maxerror / mx > 1.0E-12, __FILE__, __LINE__, "testspline2dunit.ap:1846");
+   *errorflag = *errorflag || maxerror / mx > 1.0E-12;
    ae_frame_leave();
 }
 
@@ -65959,7 +65910,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
                ernd = rmax2(ernd, fabs(v0 - v1));
             }
          }
-         set_error_flag(errorflag, ernd / smax > 0.001, __FILE__, __LINE__, "testspline2dunit.ap:1964");
+         *errorflag = *errorflag || ernd / smax > 0.001;
       // Test report fields
          rmserror = 0.0;
          avgerror = 0.0;
@@ -65978,11 +65929,11 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          }
          rmserror = sqrt(rmserror / (npoints * d));
          r2 = 1.0 - rss / coalesce(tss, 1.0);
-         set_error_flag(errorflag, !NearAtR(rmserror, rep1.rmserror, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:1988");
-         set_error_flag(errorflag, !NearAtR(avgerror, rep1.avgerror, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:1989");
-         set_error_flag(errorflag, !NearAtR(maxerror, rep1.maxerror, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:1990");
+         *errorflag = *errorflag || !NearAtR(rmserror, rep1.rmserror, 1.0E-6);
+         *errorflag = *errorflag || !NearAtR(avgerror, rep1.avgerror, 1.0E-6);
+         *errorflag = *errorflag || !NearAtR(maxerror, rep1.maxerror, 1.0E-6);
          if (tss > 1.0E-3) {
-            set_error_flag(errorflag, !NearAtR(r2, rep1.r2, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:1992");
+            *errorflag = *errorflag || !NearAtR(r2, rep1.r2, 1.0E-6);
          }
       }
    }
@@ -66043,7 +65994,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
             ernd = rmax2(ernd, fabs(v0 - v1));
          }
       }
-      set_error_flag(errorflag, ernd / smax > 0.010, __FILE__, __LINE__, "testspline2dunit.ap:2071");
+      *errorflag = *errorflag || ernd / smax > 0.010;
       ept = 0.0;
       for (i = 0; i < npoints; i++) {
          vx = xy.xyR[i][0];
@@ -66055,7 +66006,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
             ept = rmax2(ept, fabs(v0 - v1));
          }
       }
-      set_error_flag(errorflag, ept / smax > 0.001, __FILE__, __LINE__, "testspline2dunit.ap:2085");
+      *errorflag = *errorflag || ept / smax > 0.001;
    }
 // Test correctness of error reporting in multilevel setting:
 // * grid whose size is larger than TileSize+1
@@ -66107,11 +66058,11 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          }
          rmserror = sqrt(rmserror / (npoints * d));
          r2 = 1.0 - rss / coalesce(tss, 1.0);
-         set_error_flag(errorflag, !NearAtR(rmserror, rep1.rmserror, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:2152");
-         set_error_flag(errorflag, !NearAtR(avgerror, rep1.avgerror, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:2153");
-         set_error_flag(errorflag, !NearAtR(maxerror, rep1.maxerror, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:2154");
+         *errorflag = *errorflag || !NearAtR(rmserror, rep1.rmserror, 1.0E-6);
+         *errorflag = *errorflag || !NearAtR(avgerror, rep1.avgerror, 1.0E-6);
+         *errorflag = *errorflag || !NearAtR(maxerror, rep1.maxerror, 1.0E-6);
          if (tss > 1.0E-3) {
-            set_error_flag(errorflag, !NearAtR(r2, rep1.r2, 1.0E-6), __FILE__, __LINE__, "testspline2dunit.ap:2156");
+            *errorflag = *errorflag || !NearAtR(r2, rep1.r2, 1.0E-6);
          }
       }
    }
@@ -66154,7 +66105,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          vy = hqrnduniformr(&rs);
          vmax = rmax2(vmax, fabs(spline2dcalc(&s1, vx, vy) - spline2dcalc(&s2, vx, vy)));
       }
-      set_error_flag(errorflag, vmax > 1.0E-12, __FILE__, __LINE__, "testspline2dunit.ap:2212");
+      *errorflag = *errorflag || vmax > 1.0E-12;
    }
 // Ability to reproduce target function in multilayer setup:
 // * small tile size
@@ -66195,8 +66146,8 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
             eavg += v / (npoints * d);
          }
       }
-      set_error_flag(errorflag, emax > 0.00100, __FILE__, __LINE__, "testspline2dunit.ap:2265");
-      set_error_flag(errorflag, eavg > 0.00010, __FILE__, __LINE__, "testspline2dunit.ap:2266");
+      *errorflag = *errorflag || emax > 0.00100;
+      *errorflag = *errorflag || eavg > 0.00010;
       vmax = rmax2(vmax, fabs(emax));
    }
 // Test that increasing LambdaV results in decrease of S'' integral;
@@ -66297,7 +66248,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          rmsa.xR[k] = rep1.rmserror;
       }
       for (k = 0; k < lambdaa.cnt - 1; k++) {
-         set_error_flag(errorflag, penaltya.xR[k] < penaltya.xR[k + 1], __FILE__, __LINE__, "testspline2dunit.ap:2387");
+         *errorflag = *errorflag || penaltya.xR[k] < penaltya.xR[k + 1];
       }
    }
 // Test that refining grid in "K:=2*K-1" fashion results in
@@ -66373,13 +66324,13 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          kycur = 2 * kycur - 1;
       }
       for (k = 0; k < rmsa.cnt - 1; k++) {
-         set_error_flag(errorflag, rmsa.xR[k] <= rmsa.xR[k + 1], __FILE__, __LINE__, "testspline2dunit.ap:2479");
+         *errorflag = *errorflag || rmsa.xR[k] <= rmsa.xR[k + 1];
       }
    }
    ae_frame_leave();
 }
 
-bool testspline2d(bool silent) {
+bool testspline2d() {
    ae_frame _frame_block;
    bool waserrors;
    bool blerrors;
@@ -66689,7 +66640,7 @@ bool testspline2d(bool silent) {
                t2 = ay + (by - ay) * randomreal();
                err = rmax2(err, fabs(spline2dcalc(&c, t1, t2) - spline2dcalc(&c2, t1, t2)));
             }
-            set_error_flag(&sererrors, err > 10000.0 * machineepsilon, __FILE__, __LINE__, "testspline2dunit.ap:292");
+            sererrors = sererrors || err > 10000.0 * machineepsilon;
          // Special symmetry test
             err = 0.0;
             for (jobtype = 0; jobtype <= 1; jobtype++) {
@@ -66769,10 +66720,10 @@ bool testspline2d(bool silent) {
       }
    }
 // Test for vector-function
-   vferrors = testspline2dunit_testspline2dvf(true);
+   vferrors = testspline2dunit_testspline2dvf();
 // Report
    waserrors = blerrors || bcerrors || dserrors || cperrors || sererrors || uperrors || lterrors || syerrors || rlerrors || rcerrors || vferrors || fiterrorsprior || fiterrorspenalty || fiterrorsblocksolver || fiterrorsfastddmsolver;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING 2D SPLINE\n");
    // Normal tests
       printf("INTERPOLATION:\n");
@@ -67434,7 +67385,7 @@ static bool testspline3dunit_testtrilinearresample() {
    return result;
 }
 
-bool testspline3d(bool silence) {
+bool testspline3d() {
    bool waserrors;
    bool basicerr;
    bool unpackerr;
@@ -67446,7 +67397,7 @@ bool testspline3d(bool silence) {
    lintransferr = testspline3dunit_testlintrans();
    trilinreserr = testspline3dunit_testtrilinearresample();
    waserrors = basicerr || unpackerr || lintransferr || trilinreserr;
-   if (!silence) {
+   if (!silent) {
       printf("TESTING 3D SPLINE\n");
       printf("BASIC TEST:                              ");
       if (basicerr) {
@@ -67494,7 +67445,7 @@ static const double testrbfunit_heps = 1.0E-12;
 //     * used model with linear term;
 //     * points locate in a subspace of dimension less than an original space.
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
-static bool sqrdegmatrixrbftest(bool silent);
+static bool sqrdegmatrixrbftest();
 
 // Function for testing basic functionality of RBF module on regular grids with
 // multi-layer algorithm in 1D.
@@ -67506,7 +67457,7 @@ static bool basicmultilayerrbf1dtest();
 //     * used model with linear term;
 //     * points locate in a subspace of dimension less than an original space.
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
-static bool sqrdegmatrixrbftest(bool silent) {
+static bool sqrdegmatrixrbftest() {
    ae_frame _frame_block;
    ae_int_t nx;
    ae_int_t ny;
@@ -67980,7 +67931,7 @@ static bool testrbfunit_specialtest() {
          if (randombool()) {
             rbfbuildmodel(&s, &rep);
             if (rep.terminationtype <= 0) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:202");
+               result = true;
                ae_frame_leave();
                return result;
             }
@@ -67992,13 +67943,13 @@ static bool testrbfunit_specialtest() {
          }
          rbfcalc(&s, &x, &y);
          if (y.cnt != ny) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:213");
+            result = true;
             ae_frame_leave();
             return result;
          }
          for (i = 0; i < ny; i++) {
             if (y.xR[i] != 0.0) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:219");
+               result = true;
                ae_frame_leave();
                return result;
             }
@@ -68027,7 +67978,7 @@ static bool testrbfunit_specialtest() {
             rbfsetpoints(&s, &xy, 1);
             rbfbuildmodel(&s, &rep);
             if (rep.terminationtype <= 0) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:248");
+               result = true;
                ae_frame_leave();
                return result;
             }
@@ -68038,13 +67989,13 @@ static bool testrbfunit_specialtest() {
             }
             rbfcalc(&s, &x, &y);
             if (y.cnt != ny) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:261");
+               result = true;
                ae_frame_leave();
                return result;
             }
             for (i = 0; i < ny; i++) {
                if (!NearAtR(y.xR[i], xy.xyR[0][nx + i], errtol)) {
-                  set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:267");
+                  result = true;
                   ae_frame_leave();
                   return result;
                }
@@ -68055,13 +68006,13 @@ static bool testrbfunit_specialtest() {
             }
             rbfcalc(&s, &x, &y);
             if (y.cnt != ny) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:279");
+               result = true;
                ae_frame_leave();
                return result;
             }
             for (i = 0; i < ny; i++) {
                if (!NearAtR(y.xR[i], xy.xyR[0][nx + i], errtol)) {
-                  set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:285");
+                  result = true;
                   ae_frame_leave();
                   return result;
                }
@@ -68294,7 +68245,7 @@ static bool testrbfunit_specialtest() {
          rbfsetalgohierarchical(&s, 1.0, 0, 0.0);
          rbfbuildmodel(&s, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:525");
+            result = true;
             ae_frame_leave();
             return result;
          }
@@ -68308,7 +68259,7 @@ static bool testrbfunit_specialtest() {
             for (j = 0; j < nx; j++) {
                vv += vf.xyR[k][j] * x.xR[j];
             }
-            set_error_flag(&result, !NearAtR(vv, y.xR[k], errtol), __FILE__, __LINE__, "testrbfunit.ap:537");
+            result = result || !NearAtR(vv, y.xR[k], errtol);
          }
       }
    }
@@ -68493,7 +68444,7 @@ static bool testrbfunit_basicrbftest() {
                   // test for RBFUnpack
                      rbfunpack(&s, &unx, &uny, &xwr, &np, &v, &modelversion);
                      if (nx != unx || ny != uny || xwr.rows != np || xwr.cols != nx + ny + 1 || v.rows != ny || v.cols != nx + 1 || modelversion != 1) {
-                        set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:735");
+                        result = true;
                         ae_frame_leave();
                         return result;
                      }
@@ -68607,7 +68558,7 @@ static bool testrbfunit_basicrbftest() {
                      // test for RBFUnpack
                         rbfunpack(&s, &unx, &uny, &xwr, &np, &v, &modelversion);
                         if (nx != unx || ny != uny || xwr.rows != np || xwr.cols != nx + ny + 1 || v.rows != ny || v.cols != nx + 1 || modelversion != 1) {
-                           set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:852");
+                           result = true;
                            ae_frame_leave();
                            return result;
                         }
@@ -69504,7 +69455,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
             rbfgridcalc2(&s, &gpgx0, k0, &gpgx1, k1, &gy);
             for (i = 0; i < k0; i++) {
                for (j = 0; j < k1; j++) {
-                  set_error_flag(&result, !NearAtR(gy.xyR[i][j], gp.xyR[i * k1 + j][nx], s2 * eps), __FILE__, __LINE__, "testrbfunit.ap:2216");
+                  result = result || !NearAtR(gy.xyR[i][j], gp.xyR[i * k1 + j][nx], s2 * eps);
                }
             }
          }
@@ -69536,7 +69487,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
                rbftscalcbuf(&s, &calcbuf, &x, &y);
             }
             for (j = 0; j < ny; j++) {
-               set_error_flag(&result, !NearAtR(gp.xyR[i][nx + j], y.xR[j], s2 * eps), __FILE__, __LINE__, "testrbfunit.ap:2244");
+               result = result || !NearAtR(gp.xyR[i][nx + j], y.xR[j], s2 * eps);
             }
          }
       }
@@ -69602,7 +69553,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
                rbftscalcbuf(&s, &calcbuf, &x, &y);
             }
             for (j = 0; j < ny; j++) {
-               set_error_flag(&result, !NearAtR(gp.xyR[i][nx + j], y.xR[j], s2 * eps), __FILE__, __LINE__, "testrbfunit.ap:2312");
+               result = result || !NearAtR(gp.xyR[i][nx + j], y.xR[j], s2 * eps);
             }
          }
       // Test RBFGridCalc3V vs RBFCalc()
@@ -69615,7 +69566,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
                   x.xR[2] = gpgx2.xR[k];
                   rbfcalcbuf(&s, &x, &y);
                   for (l = 0; l < ny; l++) {
-                     set_error_flag(&result, !NearAtR(y.xR[l], gcy.xR[l + ny * (i + j * k0 + k * k0 * k1)], 1.0E-9 * s2), __FILE__, __LINE__, "testrbfunit.ap:2329");
+                     result = result || !NearAtR(y.xR[l], gcy.xR[l + ny * (i + j * k0 + k * k0 * k1)], 1.0E-9 * s2);
                   }
                }
             }
@@ -69657,7 +69608,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
          v = rmax2(v, fabs(rbfcalc2(&s, (double)i, (double)j)));
       }
    }
-   set_error_flag(&result, v > threshold, __FILE__, __LINE__, "testrbfunit.ap:2376");
+   result = result || v > threshold;
    ae_frame_leave();
    return result;
 }
@@ -69748,7 +69699,7 @@ static void testrbfunit_gridcalc23test(bool *errorflag) {
       }
       rbfsetpoints(&s, &xy, npoints);
       rbfbuildmodel(&s, &rep);
-      set_error_flag(errorflag, rep.terminationtype <= 0, __FILE__, __LINE__, "testrbfunit.ap:2473");
+      *errorflag = *errorflag || rep.terminationtype <= 0;
       if (*errorflag) {
          ae_frame_leave();
          return;
@@ -69782,7 +69733,7 @@ static void testrbfunit_gridcalc23test(bool *errorflag) {
                x.xR[2] = x2.xR[k];
                rbfcalcbuf(&s, &x, &y);
                for (l = 0; l < ny; l++) {
-                  set_error_flag(errorflag, !NearAtR(y.xR[l], gy.xR[l + ny * (i + j * kx.xZ[0] + k * kx.xZ[0] * kx.xZ[1])], 1.0E-9 * sy), __FILE__, __LINE__, "testrbfunit.ap:2516");
+                  *errorflag = *errorflag || !NearAtR(y.xR[l], gy.xR[l + ny * (i + j * kx.xZ[0] + k * kx.xZ[0] * kx.xZ[1])], 1.0E-9 * sy);
                }
             }
          }
@@ -69818,8 +69769,8 @@ static void testrbfunit_gridcalc23test(bool *errorflag) {
       rbfgridcalc3vsubset(&s, &x0, kx.xZ[0], &x1, kx.xZ[1], &x2, kx.xZ[2], &gf, &gy);
       rbfgridcalc3v(&s, &x0, kx.xZ[0], &x1, kx.xZ[1], &x2, kx.xZ[2], &gy2);
       for (i = 0; i < ny * kx.xZ[0] * kx.xZ[1] * kx.xZ[2]; i++) {
-         set_error_flag(errorflag, gf.xB[i / ny] && !NearAtR(gy.xR[i], gy2.xR[i], 1.0E-9 * sy), __FILE__, __LINE__, "testrbfunit.ap:2558");
-         set_error_flag(errorflag, !rf.xB[i / (ny * kx.xZ[0])] && gy.xR[i] != 0.0, __FILE__, __LINE__, "testrbfunit.ap:2559");
+         *errorflag = *errorflag || gf.xB[i / ny] && !NearAtR(gy.xR[i], gy2.xR[i], 1.0E-9 * sy);
+         *errorflag = *errorflag || !rf.xB[i / (ny * kx.xZ[0])] && gy.xR[i] != 0.0;
       }
    }
    ae_frame_leave();
@@ -69940,7 +69891,7 @@ static bool testrbfunit_basichrbftest() {
          rbfsetpoints(&s, &xy, n);
          rbfbuildmodel(&s, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:2683");
+            result = true;
             ae_frame_leave();
             return result;
          }
@@ -69967,46 +69918,46 @@ static bool testrbfunit_basichrbftest() {
             }
             rbfcalc(&s, &x, &yref);
             for (j = 0; j < ny; j++) {
-               set_error_flag(&result, !NearAtR(yref.xR[j], xy.xyR[i][nx + j], errtol), __FILE__, __LINE__, "testrbfunit.ap:2712");
+               result = result || !NearAtR(yref.xR[j], xy.xyR[i][nx + j], errtol);
             }
-            set_error_flag(&result, yref.cnt != ny, __FILE__, __LINE__, "testrbfunit.ap:2713");
+            result = result || yref.cnt != ny;
             if (nx == 1 && ny == 1) {
                rbfcalc(&s, &xzero, &y);
-               set_error_flag(&result, rbfcalc1(&s, x.xR[0]) != yref.xR[0], __FILE__, __LINE__, "testrbfunit.ap:2719");
+               result = result || rbfcalc1(&s, x.xR[0]) != yref.xR[0];
             }
             if (nx == 2 && ny == 1) {
                rbfcalc(&s, &xzero, &y);
-               set_error_flag(&result, rbfcalc2(&s, x.xR[0], x.xR[1]) != yref.xR[0], __FILE__, __LINE__, "testrbfunit.ap:2726");
+               result = result || rbfcalc2(&s, x.xR[0], x.xR[1]) != yref.xR[0];
             }
             if (nx == 3 && ny == 1) {
                rbfcalc(&s, &xzero, &y);
-               set_error_flag(&result, rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]) != yref.xR[0], __FILE__, __LINE__, "testrbfunit.ap:2733");
+               result = result || rbfcalc3(&s, x.xR[0], x.xR[1], x.xR[2]) != yref.xR[0];
             }
             rbfcalc(&s, &xzero, &y);
             if (randombool()) {
                ae_vector_set_length(&y, ny + 1);
                rbfcalcbuf(&s, &x, &y);
-               set_error_flag(&result, y.cnt != ny + 1, __FILE__, __LINE__, "testrbfunit.ap:2742");
+               result = result || y.cnt != ny + 1;
             } else {
                ae_vector_set_length(&y, ny - 1);
                rbfcalcbuf(&s, &x, &y);
-               set_error_flag(&result, y.cnt != ny, __FILE__, __LINE__, "testrbfunit.ap:2748");
+               result = result || y.cnt != ny;
             }
             for (j = 0; j < ny; j++) {
-               set_error_flag(&result, y.xR[j] != yref.xR[j], __FILE__, __LINE__, "testrbfunit.ap:2751");
+               result = result || y.xR[j] != yref.xR[j];
             }
             rbfcalc(&s, &xzero, &y);
             if (randombool()) {
                ae_vector_set_length(&y, ny + 1);
                rbftscalcbuf(&s, &tsbuf, &x, &y);
-               set_error_flag(&result, y.cnt != ny + 1, __FILE__, __LINE__, "testrbfunit.ap:2759");
+               result = result || y.cnt != ny + 1;
             } else {
                ae_vector_set_length(&y, ny - 1);
                rbftscalcbuf(&s, &tsbuf, &x, &y);
-               set_error_flag(&result, y.cnt != ny, __FILE__, __LINE__, "testrbfunit.ap:2765");
+               result = result || y.cnt != ny;
             }
             for (j = 0; j < ny; j++) {
-               set_error_flag(&result, y.xR[j] != yref.xR[j], __FILE__, __LINE__, "testrbfunit.ap:2768");
+               result = result || y.xR[j] != yref.xR[j];
             }
          }
       // Test that:
@@ -70031,7 +69982,7 @@ static bool testrbfunit_basichrbftest() {
             }
             rbfcalc(&s, &x, &y2);
             for (j = 0; j < ny; j++) {
-               set_error_flag(&result, y.xR[j] != y2.xR[j], __FILE__, __LINE__, "testrbfunit.ap:2792");
+               result = result || y.xR[j] != y2.xR[j];
             }
          }
          if (linterm == 3) {
@@ -70044,7 +69995,7 @@ static bool testrbfunit_basichrbftest() {
             }
             rbfcalc(&s, &x, &y);
             for (j = 0; j < ny; j++) {
-               set_error_flag(&result, y.xR[j] != 0.0, __FILE__, __LINE__, "testrbfunit.ap:2803");
+               result = result || y.xR[j] != 0.0;
             }
          }
       }
@@ -70100,38 +70051,38 @@ static bool testrbfunit_basichrbftest() {
          }
          rbfbuildmodel(&s, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:2864");
+            result = true;
             ae_frame_leave();
             return result;
          }
       // Test RBFUnpack()
          rbfunpack(&s, &unx, &uny, &uxwr, &unc, &uv, &modelversion);
          if (modelversion != 2) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:2874");
+            result = true;
             ae_frame_leave();
             return result;
          }
          if (unx != nx || uny != ny) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:2879");
+            result = true;
             ae_frame_leave();
             return result;
          }
          if (uv.cols != nx + 1 || uv.rows != ny) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:2884");
+            result = true;
             ae_frame_leave();
             return result;
          }
          if (linterm == 2) {
             for (i = 0; i < ny; i++) {
                for (j = 0; j < nx; j++) {
-                  set_error_flag(&result, uv.xyR[i][j] != 0.0, __FILE__, __LINE__, "testrbfunit.ap:2891");
+                  result = result || uv.xyR[i][j] != 0.0;
                }
             }
          }
          if (linterm == 3) {
             for (i = 0; i < ny; i++) {
                for (j = 0; j <= nx; j++) {
-                  set_error_flag(&result, uv.xyR[i][j] != 0.0, __FILE__, __LINE__, "testrbfunit.ap:2897");
+                  result = result || uv.xyR[i][j] != 0.0;
                }
             }
          }
@@ -70163,7 +70114,7 @@ static bool testrbfunit_basichrbftest() {
                }
             }
             for (j = 0; j < ny; j++) {
-               set_error_flag(&result, !NearAtR(y.xR[j], yref.xR[j], 1.0E-9), __FILE__, __LINE__, "testrbfunit.ap:2932");
+               result = result || !NearAtR(y.xR[j], yref.xR[j], 1.0E-9);
             }
          }
       }
@@ -70305,7 +70256,7 @@ static bool testrbfunit_basichrbftest() {
                rbfsetpoints(&s, &xy, n);
                rbfbuildmodel(&s, &rep);
                if (rep.terminationtype <= 0) {
-                  set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3106");
+                  result = true;
                   ae_frame_leave();
                   return result;
                }
@@ -70323,7 +70274,7 @@ static bool testrbfunit_basichrbftest() {
             }
          }
       // Check error
-         set_error_flag(&result, maxerr > errtol, __FILE__, __LINE__, "testrbfunit.ap:3128");
+         result = result || maxerr > errtol;
       }
    }
 // Scaling test - random problem, we test that after
@@ -70389,7 +70340,7 @@ static bool testrbfunit_basichrbftest() {
       rbfsetpoints(&s, &xy, n);
       rbfbuildmodel(&s, &rep);
       if (rep.terminationtype <= 0) {
-         set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3204");
+         result = true;
          ae_frame_leave();
          return result;
       }
@@ -70409,7 +70360,7 @@ static bool testrbfunit_basichrbftest() {
       rbfsetpoints(&s2, &xy2, n);
       rbfbuildmodel(&s2, &rep);
       if (rep.terminationtype <= 0) {
-         set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3224");
+         result = true;
          ae_frame_leave();
          return result;
       }
@@ -70427,7 +70378,7 @@ static bool testrbfunit_basichrbftest() {
          }
          rbfcalc(&s2, &x, &y2);
          for (j = 0; j < ny; j++) {
-            set_error_flag(&result, y.xR[j] != y2.xR[j], __FILE__, __LINE__, "testrbfunit.ap:3243");
+            result = result || y.xR[j] != y2.xR[j];
          }
       }
    }
@@ -70453,11 +70404,11 @@ static bool testrbfunit_basichrbftest() {
       // Build model, check model version
          rbfbuildmodel(&s, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3279");
+            result = true;
             ae_frame_leave();
             return result;
          }
-         set_error_flag(&result, rbfgetmodelversion(&s) != 2, __FILE__, __LINE__, "testrbfunit.ap:3282");
+         result = result || rbfgetmodelversion(&s) != 2;
       }
    }
 // Test smoothing properties of RBF model: model with just one layer
@@ -70492,7 +70443,7 @@ static bool testrbfunit_basichrbftest() {
       rbfsetpoints(&s, &xy, gridsize * gridsize);
       rbfbuildmodel(&s, &rep);
       if (rep.terminationtype <= 0) {
-         set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3322");
+         result = true;
          ae_frame_leave();
          return result;
       }
@@ -70502,7 +70453,7 @@ static bool testrbfunit_basichrbftest() {
             v = rmax2(v, fabs(rbfcalc2(&s, (double)i, (double)j)));
          }
       }
-      set_error_flag(&result, v > threshold, __FILE__, __LINE__, "testrbfunit.ap:3329");
+      result = result || v > threshold;
    }
    ae_frame_leave();
    return result;
@@ -70642,7 +70593,7 @@ static bool testrbfunit_scaledhrbftest() {
             rbfsetpoints(&s, &xy, n);
             rbfbuildmodel(&s, &rep);
             if (rep.terminationtype <= 0) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3472");
+               result = true;
                ae_frame_leave();
                return result;
             }
@@ -70661,7 +70612,7 @@ static bool testrbfunit_scaledhrbftest() {
             rbfsetpointsandscales(&s2, &xy2, n, &scalex);
             rbfbuildmodel(&s2, &rep);
             if (rep.terminationtype <= 0) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3488");
+               result = true;
                ae_frame_leave();
                return result;
             }
@@ -70677,7 +70628,7 @@ static bool testrbfunit_scaledhrbftest() {
                }
                rbfcalc(&s2, &x, &y2);
                for (j = 0; j < ny; j++) {
-                  set_error_flag(&result, !NearAtR(y.xR[j], y2.xR[j] / scaley.xR[j], errtol), __FILE__, __LINE__, "testrbfunit.ap:3505");
+                  result = result || !NearAtR(y.xR[j], y2.xR[j] / scaley.xR[j], errtol);
                }
             }
          // Compare model values in random points
@@ -70692,7 +70643,7 @@ static bool testrbfunit_scaledhrbftest() {
                }
                rbfcalc(&s2, &x, &y2);
                for (j = 0; j < ny; j++) {
-                  set_error_flag(&result, !NearAtR(y.xR[j], y2.xR[j] / scaley.xR[j], errtol), __FILE__, __LINE__, "testrbfunit.ap:3521");
+                  result = result || !NearAtR(y.xR[j], y2.xR[j] / scaley.xR[j], errtol);
                }
             }
          }
@@ -70736,7 +70687,7 @@ static bool testrbfunit_spechrbftest() {
    while (d2 < 100.0) {
       vref = exp(-d2);
       vfunc = rbfv2basisfunc(0, d2);
-      set_error_flag(&result, !NearAtR(vref, vfunc, 1.0E-9 * vref), __FILE__, __LINE__, "testrbfunit.ap:3563");
+      result = result || !NearAtR(vref, vfunc, 1.0E-9 * vref);
       d2 += 1.0 / 64.0;
    }
    d2 = 0.0;
@@ -70745,7 +70696,7 @@ static bool testrbfunit_spechrbftest() {
       vref = rmax2(1 - d2 / 9, 0.0) * exp(-d2);
       vfunc = rbfv2basisfunc(1, d2);
       maxerr = rmax2(maxerr, fabs(vref - vfunc));
-      set_error_flag(&result, !NearAtR(vref, vfunc, 0.005), __FILE__, __LINE__, "testrbfunit.ap:3573");
+      result = result || !NearAtR(vref, vfunc, 0.005);
       d2 += 1.0 / 64.0;
    }
 // Test that tiny changes in dataset points introduce tiny
@@ -70774,7 +70725,7 @@ static bool testrbfunit_spechrbftest() {
    rbfsetpoints(&s0, &xy, n * n);
    rbfbuildmodel(&s0, &rep);
    if (rep.terminationtype <= 0) {
-      set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3608");
+      result = true;
       ae_frame_leave();
       return result;
    }
@@ -70788,7 +70739,7 @@ static bool testrbfunit_spechrbftest() {
    rbfsetpoints(&s1, &xy, n * n);
    rbfbuildmodel(&s1, &rep);
    if (rep.terminationtype <= 0) {
-      set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3623");
+      result = true;
       ae_frame_leave();
       return result;
    }
@@ -70798,7 +70749,7 @@ static bool testrbfunit_spechrbftest() {
          vdiff += fabs(rbfcalc2(&s0, 0.5 + i, 0.5 + j) - rbfcalc2(&s1, 0.5 + i, 0.5 + j)) / sqr((double)(n - 1));
       }
    }
-   set_error_flag(&result, vdiff > 0.00200 || vdiff < 0.00001, __FILE__, __LINE__, "testrbfunit.ap:3630");
+   result = result || vdiff > 0.00200 || vdiff < 0.00001;
 // Test progress reports: progress before model construction is
 // zero, progress after model is built is 1. More detailed tests
 // are performed in the multithreaded TestHRBFProgress().
@@ -70815,24 +70766,24 @@ static bool testrbfunit_spechrbftest() {
    }
    rbfcreate(nx, ny, &s0);
    rbfsetalgohierarchical(&s0, rbase, nlayers, 0.0);
-   set_error_flag(&result, rbfpeekprogress(&s0) != 0.0, __FILE__, __LINE__, "testrbfunit.ap:3652");
+   result = result || rbfpeekprogress(&s0) != 0.0;
    rbfbuildmodel(&s0, &rep);
-   set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testrbfunit.ap:3654");
-   set_error_flag(&result, rbfpeekprogress(&s0) != 1.0, __FILE__, __LINE__, "testrbfunit.ap:3655");
+   result = result || rep.terminationtype <= 0;
+   result = result || rbfpeekprogress(&s0) != 1.0;
    rbfcreate(nx, ny, &s0);
    rbfsetpoints(&s0, &xy, n);
    rbfsetalgohierarchical(&s0, rbase, 0, 0.0);
-   set_error_flag(&result, rbfpeekprogress(&s0) != 0.0, __FILE__, __LINE__, "testrbfunit.ap:3661");
+   result = result || rbfpeekprogress(&s0) != 0.0;
    rbfbuildmodel(&s0, &rep);
-   set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testrbfunit.ap:3663");
-   set_error_flag(&result, rbfpeekprogress(&s0) != 1.0, __FILE__, __LINE__, "testrbfunit.ap:3664");
+   result = result || rep.terminationtype <= 0;
+   result = result || rbfpeekprogress(&s0) != 1.0;
    rbfcreate(nx, ny, &s0);
    rbfsetpoints(&s0, &xy, n);
    rbfsetalgohierarchical(&s0, rbase, nlayers, 0.0);
-   set_error_flag(&result, rbfpeekprogress(&s0) != 0.0, __FILE__, __LINE__, "testrbfunit.ap:3670");
+   result = result || rbfpeekprogress(&s0) != 0.0;
    rbfbuildmodel(&s0, &rep);
-   set_error_flag(&result, rep.terminationtype <= 0, __FILE__, __LINE__, "testrbfunit.ap:3672");
-   set_error_flag(&result, rbfpeekprogress(&s0) != 1.0, __FILE__, __LINE__, "testrbfunit.ap:3673");
+   result = result || rep.terminationtype <= 0;
+   result = result || rbfpeekprogress(&s0) != 1.0;
    ae_frame_leave();
    return result;
 }
@@ -70934,7 +70885,7 @@ static bool testrbfunit_gridhrbftest() {
          }
          rbfbuildmodel(&s, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3765");
+            result = true;
             ae_frame_leave();
             return result;
          }
@@ -70981,7 +70932,7 @@ static bool testrbfunit_gridhrbftest() {
                x.xR[1] = x1.xR[i1];
                rbfcalc(&s, &x, &y);
                for (i = 0; i < ny; i++) {
-                  set_error_flag(&result, !NearAtR(y.xR[i], yv.xR[i + ny * (i0 + i1 * n0)], errtol), __FILE__, __LINE__, "testrbfunit.ap:3814");
+                  result = result || !NearAtR(y.xR[i], yv.xR[i + ny * (i0 + i1 * n0)], errtol);
                }
             }
          }
@@ -70998,15 +70949,15 @@ static bool testrbfunit_gridhrbftest() {
          SetVector(&yv2);
          rbfgridcalc2vsubset(&s, &x0, n0, &x1, n1, &needy, &yv2);
          for (i = 0; i < ny * n0 * n1; i++) {
-            set_error_flag(&result, needy.xB[i / ny] && !NearAtR(yv.xR[i], yv2.xR[i], errtol), __FILE__, __LINE__, "testrbfunit.ap:3833");
+            result = result || needy.xB[i / ny] && !NearAtR(yv.xR[i], yv2.xR[i], errtol);
          }
       // Test legacy function
          rbfgridcalc2(&s, &x0, n0, &x1, n1, &y2);
          for (i = 0; i < n0 * n1; i++) {
             if (ny == 1) {
-               set_error_flag(&result, !NearAtR(yv.xR[i], y2.xyR[i % n0][i / n0], errtol), __FILE__, __LINE__, "testrbfunit.ap:3843");
+               result = result || !NearAtR(yv.xR[i], y2.xyR[i % n0][i / n0], errtol);
             } else {
-               set_error_flag(&result, y2.xyR[i % n0][i / n0] != 0.0, __FILE__, __LINE__, "testrbfunit.ap:3845");
+               result = result || y2.xyR[i % n0][i / n0] != 0.0;
             }
          }
       // Test that scaling RBase, XY, X0, X1 by some power of 2
@@ -71039,14 +70990,14 @@ static bool testrbfunit_gridhrbftest() {
          rbfsetalgohierarchical(&s, rbase * scalefactor, nlayers, lambdav);
          rbfbuildmodel(&s, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3877");
+            result = true;
             ae_frame_leave();
             return result;
          }
          SetVector(&yv2);
          rbfgridcalc2v(&s, &x02, n0, &x12, n1, &yv2);
          for (i = 0; i < ny * n0 * n1; i++) {
-            set_error_flag(&result, yv.xR[i] != yv2.xR[i], __FILE__, __LINE__, "testrbfunit.ap:3883");
+            result = result || yv.xR[i] != yv2.xR[i];
          }
       // Test that scaling RBase and scale vector by some power of 2
       // (increase RBase and decreasing scale, or vice versa) does not
@@ -71067,14 +71018,14 @@ static bool testrbfunit_gridhrbftest() {
          rbfsetalgohierarchical(&s, rbase * scalefactor, nlayers, lambdav);
          rbfbuildmodel(&s, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3907");
+            result = true;
             ae_frame_leave();
             return result;
          }
          SetVector(&yv2);
          rbfgridcalc2v(&s, &x0, n0, &x1, n1, &yv2);
          for (i = 0; i < ny * n0 * n1; i++) {
-            set_error_flag(&result, !NearAtR(yv.xR[i], yv2.xR[i], 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0)), __FILE__, __LINE__, "testrbfunit.ap:3913");
+            result = result || !NearAtR(yv.xR[i], yv2.xR[i], 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0));
          }
       }
    }
@@ -71126,7 +71077,7 @@ static bool testrbfunit_gridhrbftest() {
          }
          rbfbuildmodel(&s, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:3968");
+            result = true;
             ae_frame_leave();
             return result;
          }
@@ -71185,7 +71136,7 @@ static bool testrbfunit_gridhrbftest() {
                   x.xR[2] = x2.xR[i2];
                   rbfcalc(&s, &x, &y);
                   for (i = 0; i < ny; i++) {
-                     set_error_flag(&result, !NearAtR(y.xR[i], yv.xR[i + ny * (i0 + i1 * n0 + i2 * n0 * n1)], errtol), __FILE__, __LINE__, "testrbfunit.ap:4027");
+                     result = result || !NearAtR(y.xR[i], yv.xR[i + ny * (i0 + i1 * n0 + i2 * n0 * n1)], errtol);
                   }
                }
             }
@@ -71212,8 +71163,8 @@ static bool testrbfunit_gridhrbftest() {
          SetVector(&yv2);
          rbfgridcalc3vsubset(&s, &x0, n0, &x1, n1, &x2, n2, &needy, &yv2);
          for (i = 0; i < ny * n0 * n1 * n2; i++) {
-            set_error_flag(&result, needy.xB[i / ny] && !NearAtR(yv.xR[i], yv2.xR[i], errtol), __FILE__, __LINE__, "testrbfunit.ap:4054");
-            set_error_flag(&result, !rowflags.xB[i / (ny * n0)] && yv2.xR[i] != 0.0, __FILE__, __LINE__, "testrbfunit.ap:4055");
+            result = result || needy.xB[i / ny] && !NearAtR(yv.xR[i], yv2.xR[i], errtol);
+            result = result || !rowflags.xB[i / (ny * n0)] && yv2.xR[i] != 0.0;
          }
       // Test that scaling RBase, XY, X0, X1 and X2 by some power of 2
       // does not change values at grid (quite a strict requirement, but
@@ -71249,14 +71200,14 @@ static bool testrbfunit_gridhrbftest() {
          rbfsetalgohierarchical(&s, rbase * scalefactor, nlayers, lambdav);
          rbfbuildmodel(&s, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:4090");
+            result = true;
             ae_frame_leave();
             return result;
          }
          SetVector(&yv2);
          rbfgridcalc3v(&s, &x02, n0, &x12, n1, &x22, n2, &yv2);
          for (i = 0; i < ny * n0 * n1 * n2; i++) {
-            set_error_flag(&result, yv.xR[i] != yv2.xR[i], __FILE__, __LINE__, "testrbfunit.ap:4096");
+            result = result || yv.xR[i] != yv2.xR[i];
          }
       // Test that scaling RBase and scale vector by some power of 2
       // (increase RBase and decreasing scale, or vice versa) does not
@@ -71277,14 +71228,14 @@ static bool testrbfunit_gridhrbftest() {
          rbfsetalgohierarchical(&s, rbase * scalefactor, nlayers, lambdav);
          rbfbuildmodel(&s, &rep);
          if (rep.terminationtype <= 0) {
-            set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit.ap:4120");
+            result = true;
             ae_frame_leave();
             return result;
          }
          SetVector(&yv2);
          rbfgridcalc3v(&s, &x0, n0, &x1, n1, &x2, n2, &yv2);
          for (i = 0; i < ny * n0 * n1 * n2; i++) {
-            set_error_flag(&result, !NearAtR(yv.xR[i], yv2.xR[i], 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0)), __FILE__, __LINE__, "testrbfunit.ap:4126");
+            result = result || !NearAtR(yv.xR[i], yv2.xR[i], 100.0 * machineepsilon * rmax3(fabs(yv.xR[i]), fabs(yv2.xR[i]), 1.0));
          }
       }
    }
@@ -71292,7 +71243,7 @@ static bool testrbfunit_gridhrbftest() {
    return result;
 }
 
-bool testrbf(bool silent) {
+bool testrbf() {
    bool specialerrors;
    bool basicrbferrors;
    bool irregularrbferrors;
@@ -71320,7 +71271,7 @@ bool testrbf(bool silent) {
    basicrbferrors = testrbfunit_basicrbftest();
    irregularrbferrors = testrbfunit_irregularrbftest();
    linearitymodelrbferr = testrbfunit_linearitymodelrbftest();
-   sqrdegmatrixrbferr = sqrdegmatrixrbftest(true);
+   sqrdegmatrixrbferr = sqrdegmatrixrbftest();
    multilayerrbf1derrors = false;
    multilayerrbferrors = testrbfunit_basicmultilayerrbftest();
    sererrors = testrbfunit_serializationtest();
@@ -71328,7 +71279,7 @@ bool testrbf(bool silent) {
    testrbfunit_gridcalc23test(&gridcalc23errors);
 // report
    waserrors = specialerrors || basicrbferrors || irregularrbferrors || linearitymodelrbferr || sqrdegmatrixrbferr || sererrors || multilayerrbf1derrors || multilayerrbferrors || gridcalc23errors || hrbferrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING RBF\n");
       printf("GENERAL TESTS:\n");
       printf("* serialization test:                              ");
@@ -71590,7 +71541,7 @@ static void testfftunit_quicktest(ae_int_t n, double *referr, double *refrerr) {
 }
 
 // Test
-bool testfft(bool silent) {
+bool testfft() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t i;
@@ -71789,7 +71740,7 @@ bool testfft(bool silent) {
    reinterrors = reinterrors || reinterr > errtol;
 // end
    waserrors = bidierrors || bidirerrors || referrors || refrerrors || reinterrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING FFT\n");
       printf("FINAL RESULT:                             ");
       if (waserrors) {
@@ -71873,7 +71824,7 @@ static void testfhtunit_reffhtr1dinv(RVector *a, ae_int_t n) {
 }
 
 // Test
-bool testfht(bool silent) {
+bool testfht() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t i;
@@ -71947,7 +71898,7 @@ bool testfht(bool silent) {
    referrors = referrors || referr > errtol;
 // end
    waserrors = bidierrors || referrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING FHT\n");
       printf("FINAL RESULT:                             ");
       if (waserrors) {
@@ -72054,7 +72005,7 @@ static void testconvunit_refconvc1dcircular(CVector *a, ae_int_t m, CVector *b, 
 }
 
 // Test
-bool testconv(bool silent) {
+bool testconv() {
    ae_frame _frame_block;
    ae_int_t m;
    ae_int_t n;
@@ -72252,7 +72203,7 @@ bool testconv(bool silent) {
    invrerrors = invrerrors || invrerr > errtol;
 // end
    waserrors = referrors || refrerrors || inverrors || invrerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING CONVOLUTION\n");
       printf("FINAL RESULT:                             ");
       if (waserrors) {
@@ -72399,7 +72350,7 @@ static void testcorrunit_refcorrc1dcircular(CVector *signal, ae_int_t n, CVector
 }
 
 // Test
-bool testcorr(bool silent) {
+bool testcorr() {
    ae_frame _frame_block;
    ae_int_t m;
    ae_int_t n;
@@ -72479,7 +72430,7 @@ bool testcorr(bool silent) {
    refrerrors = refrerrors || refrerr > errtol;
 // end
    waserrors = referrors || refrerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING CORRELATION\n");
       printf("FINAL RESULT:                             ");
       if (waserrors) {
@@ -72511,7 +72462,7 @@ bool testcorr(bool silent) {
 }
 
 // === chebyshev testing unit ===
-bool testchebyshev(bool silent) {
+bool testchebyshev() {
    ae_frame _frame_block;
    double err;
    double sumerr;
@@ -72662,7 +72613,7 @@ bool testchebyshev(bool silent) {
    }
 // Reporting
    waserrors = err > threshold || sumerr > threshold || cerr > threshold || ferr > threshold;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING CALCULATION OF THE CHEBYSHEV POLYNOMIALS\n");
       printf("Max error against table                   %5.2e\n", err);
       printf("Summation error                           %5.2e\n", sumerr);
@@ -72681,7 +72632,7 @@ bool testchebyshev(bool silent) {
 }
 
 // === hermite testing unit ===
-bool testhermite(bool silent) {
+bool testhermite() {
    ae_frame _frame_block;
    double err;
    double sumerr;
@@ -72772,7 +72723,7 @@ bool testhermite(bool silent) {
    cerr = rmax2(cerr, fabs(c.xR[6] - 64));
 // Reporting
    waserrors = err > threshold || sumerr > threshold || cerr > threshold;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING CALCULATION OF THE HERMITE POLYNOMIALS\n");
       printf("Max error                                 %5.2e\n", err);
       printf("Summation error                           %5.2e\n", sumerr);
@@ -72790,7 +72741,7 @@ bool testhermite(bool silent) {
 }
 
 // === legendre testing unit ===
-bool testlegendre(bool silent) {
+bool testlegendre() {
    ae_frame _frame_block;
    double err;
    double sumerr;
@@ -72872,7 +72823,7 @@ bool testlegendre(bool silent) {
    cerr = rmax2(cerr, fabs(c.xR[9] - 12155.0 / 128.0));
 // Reporting
    waserrors = err > threshold || sumerr > threshold || cerr > threshold;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING CALCULATION OF THE LEGENDRE POLYNOMIALS\n");
       printf("Max error                                 %5.2e\n", err);
       printf("Summation error                           %5.2e\n", sumerr);
@@ -72890,7 +72841,7 @@ bool testlegendre(bool silent) {
 }
 
 // === laguerre testing unit ===
-bool testlaguerre(bool silent) {
+bool testlaguerre() {
    ae_frame _frame_block;
    double err;
    double sumerr;
@@ -72987,7 +72938,7 @@ bool testlaguerre(bool silent) {
    cerr = rmax2(cerr, fabs(c.xR[6] - 1.0 / 720.0));
 // Reporting
    waserrors = err > threshold || sumerr > threshold || cerr > threshold;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING CALCULATION OF THE LAGUERRE POLYNOMIALS\n");
       printf("Max error                                 %5.2e\n", err);
       printf("Summation error                           %5.2e\n", sumerr);
@@ -73050,7 +73001,7 @@ static void testpcaunit_calculatemv(RVector *x, ae_int_t n, double *mean, double
    *stddevs = *stddev * sqrt(2.0) / sqrt((double)(n - 1));
 }
 
-bool testpca(bool silent) {
+bool testpca() {
    ae_frame _frame_block;
    ae_int_t maxn;
    ae_int_t maxm;
@@ -73239,7 +73190,7 @@ bool testpca(bool silent) {
                if (i == j) {
                   t--;
                }
-               set_error_flag(&pcadensesubspaceerrors, !SmallAtR(t, threshold), __FILE__, __LINE__, "testpcaunit.ap:217");
+               pcadensesubspaceerrors = pcadensesubspaceerrors || !SmallAtR(t, threshold);
             }
          }
       // Variance test
@@ -73255,13 +73206,13 @@ bool testpca(bool silent) {
             } else {
                t = 0.0;
             }
-            set_error_flag(&pcadensesubspaceerrors, !NearAtR(t, s.xR[k], threshold), __FILE__, __LINE__, "testpcaunit.ap:236");
+            pcadensesubspaceerrors = pcadensesubspaceerrors || !NearAtR(t, s.xR[k], threshold);
          }
          for (k = 0; k < requested - 1; k++) {
-            set_error_flag(&pcadensesubspaceerrors, fabs(s.xR[k]) < fabs(s.xR[k + 1]), __FILE__, __LINE__, "testpcaunit.ap:239");
+            pcadensesubspaceerrors = pcadensesubspaceerrors || fabs(s.xR[k]) < fabs(s.xR[k + 1]);
          }
          for (k = 0; k < requested; k++) {
-            set_error_flag(&pcadensesubspaceerrors, s.xR[k] <= 0.0 && !SmallAtR(s.xR[k], 1000.0 * machineepsilon * fabs(s.xR[0])), __FILE__, __LINE__, "testpcaunit.ap:241");
+            pcadensesubspaceerrors = pcadensesubspaceerrors || s.xR[k] <= 0.0 && !SmallAtR(s.xR[k], 1000.0 * machineepsilon * fabs(s.xR[0]));
          }
       // Compare variance explained by top REQUESTED vectors from
       // full PCA and variance explained by reduced PCA.
@@ -73273,8 +73224,8 @@ bool testpca(bool silent) {
             varreduced += s.xR[k];
             varcomplete += s2.xR[k];
          }
-         set_error_flag(&pcadensesubspaceerrors, (varreduced - varcomplete) / varcomplete < -tolreduced, __FILE__, __LINE__, "testpcaunit.ap:256");
-         set_error_flag(&pcadensesubspaceerrors, (varreduced - varcomplete) / varcomplete > 1.0E5 * machineepsilon, __FILE__, __LINE__, "testpcaunit.ap:257");
+         pcadensesubspaceerrors = pcadensesubspaceerrors || (varreduced - varcomplete) / varcomplete < -tolreduced;
+         pcadensesubspaceerrors = pcadensesubspaceerrors || (varreduced - varcomplete) / varcomplete > 1.0E5 * machineepsilon;
       }
    }
 // Test dense subspace reduced PCA on specially designed problem with good
@@ -73328,7 +73279,7 @@ bool testpca(bool silent) {
             if (i == j) {
                t--;
             }
-            set_error_flag(&pcadensesubspaceerrors, !SmallAtR(t, threshold), __FILE__, __LINE__, "testpcaunit.ap:323");
+            pcadensesubspaceerrors = pcadensesubspaceerrors || !SmallAtR(t, threshold);
          }
       }
    // Variance test
@@ -73344,10 +73295,10 @@ bool testpca(bool silent) {
          } else {
             t = 0.0;
          }
-         set_error_flag(&pcadensesubspaceerrors, !NearAtR(t, s.xR[k], threshold), __FILE__, __LINE__, "testpcaunit.ap:342");
+         pcadensesubspaceerrors = pcadensesubspaceerrors || !NearAtR(t, s.xR[k], threshold);
       }
       for (k = 0; k < requested - 1; k++) {
-         set_error_flag(&pcadensesubspaceerrors, s.xR[k] < s.xR[k + 1], __FILE__, __LINE__, "testpcaunit.ap:345");
+         pcadensesubspaceerrors = pcadensesubspaceerrors || s.xR[k] < s.xR[k + 1];
       }
    // Compare variance explained by top REQUESTED vectors from
    // full PCA and variance explained by reduced PCA.
@@ -73359,8 +73310,8 @@ bool testpca(bool silent) {
          varreduced += s.xR[k];
          varcomplete += s2.xR[k];
       }
-      set_error_flag(&pcadensesubspaceerrors, (varreduced - varcomplete) / varcomplete < -tolreduced, __FILE__, __LINE__, "testpcaunit.ap:360");
-      set_error_flag(&pcadensesubspaceerrors, (varreduced - varcomplete) / varcomplete > 1.0E5 * machineepsilon, __FILE__, __LINE__, "testpcaunit.ap:361");
+      pcadensesubspaceerrors = pcadensesubspaceerrors || (varreduced - varcomplete) / varcomplete < -tolreduced;
+      pcadensesubspaceerrors = pcadensesubspaceerrors || (varreduced - varcomplete) / varcomplete > 1.0E5 * machineepsilon;
    }
 // Test sparse reduced subspace PCA on randomly generated matrix with
 // two non-zero elements at each row. Because matrix is random, it may
@@ -73406,7 +73357,7 @@ bool testpca(bool silent) {
                if (i == j) {
                   t--;
                }
-               set_error_flag(&pcasparsesubspaceerrors, !SmallAtR(t, threshold), __FILE__, __LINE__, "testpcaunit.ap:417");
+               pcasparsesubspaceerrors = pcasparsesubspaceerrors || !SmallAtR(t, threshold);
             }
          }
       // Variance test
@@ -73422,13 +73373,13 @@ bool testpca(bool silent) {
             } else {
                t = 0.0;
             }
-            set_error_flag(&pcasparsesubspaceerrors, !NearAtR(t, s.xR[k], threshold * rmaxabs3(t, s.xR[k], 1.0)), __FILE__, __LINE__, "testpcaunit.ap:436");
+            pcasparsesubspaceerrors = pcasparsesubspaceerrors || !NearAtR(t, s.xR[k], threshold * rmaxabs3(t, s.xR[k], 1.0));
          }
          for (k = 0; k < requested - 1; k++) {
-            set_error_flag(&pcasparsesubspaceerrors, fabs(s.xR[k]) < fabs(s.xR[k + 1]), __FILE__, __LINE__, "testpcaunit.ap:439");
+            pcasparsesubspaceerrors = pcasparsesubspaceerrors || fabs(s.xR[k]) < fabs(s.xR[k + 1]);
          }
          for (k = 0; k < requested; k++) {
-            set_error_flag(&pcasparsesubspaceerrors, s.xR[k] <= 0.0 && !SmallAtR(s.xR[k], 1000.0 * machineepsilon * rmax2(fabs(s.xR[0]), 1.0)), __FILE__, __LINE__, "testpcaunit.ap:441");
+            pcasparsesubspaceerrors = pcasparsesubspaceerrors || s.xR[k] <= 0.0 && !SmallAtR(s.xR[k], 1000.0 * machineepsilon * rmax2(fabs(s.xR[0]), 1.0));
          }
       // Compare variance explained by top REQUESTED vectors from
       // full PCA and variance explained by reduced PCA.
@@ -73440,13 +73391,13 @@ bool testpca(bool silent) {
             varreduced += s.xR[k];
             varcomplete += s2.xR[k];
          }
-         set_error_flag(&pcasparsesubspaceerrors, (varreduced - varcomplete) / rmax2(varcomplete, 1.0) < -tolreduced, __FILE__, __LINE__, "testpcaunit.ap:456");
-         set_error_flag(&pcasparsesubspaceerrors, (varreduced - varcomplete) / rmax2(varcomplete, 1.0) > 1.0E5 * machineepsilon, __FILE__, __LINE__, "testpcaunit.ap:457");
+         pcasparsesubspaceerrors = pcasparsesubspaceerrors || (varreduced - varcomplete) / rmax2(varcomplete, 1.0) < -tolreduced;
+         pcasparsesubspaceerrors = pcasparsesubspaceerrors || (varreduced - varcomplete) / rmax2(varcomplete, 1.0) > 1.0E5 * machineepsilon;
       }
    }
 // Final report
    waserrors = pcaconverrors || pcaorterrors || pcavarerrors || pcaopterrors || pcadensesubspaceerrors || pcasparsesubspaceerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("PCA TEST\n");
       printf("COMPLETE PCA:\n");
       printf("* CONVERGENCE                            ");
@@ -73506,7 +73457,7 @@ static void testbdssunit_unset1di(ZVector *a) {
 }
 
 // Testing BDSS operations
-bool testbdss(bool silent) {
+bool testbdss() {
    ae_frame _frame_block;
    ae_int_t n;
    ae_int_t i;
@@ -74168,7 +74119,7 @@ bool testbdss(bool silent) {
    }
 // report
    waserrors = tieserrors || split2errors || optimalsplitkerrors || splitkerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING BASIC DATASET SUBROUTINES\n");
       printf("TIES:                               ");
       if (!tieserrors) {
@@ -74856,7 +74807,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       }
       mlpprocess(&network, &x1, &y1);
       mlpprocess(&network, &x2, &y2);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0) != 0.0, __FILE__, __LINE__, "testmlpbaseunit.ap:513");
+      *err = *err || testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0) != 0.0;
    // Same inputs on original network leads to same outputs
    // on copy created:
    // * using MLPCopy
@@ -74875,7 +74826,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       mlpcopy(&network, &network2);
       mlpprocess(&network, &x1, &y1);
       mlpprocess(&network2, &x2, &y2);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0) != 0.0, __FILE__, __LINE__, "testmlpbaseunit.ap:534");
+      *err = *err || testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0) != 0.0;
       for (i = 0; i < nout; i++) {
          y2.xR[i] = randommid();
       }
@@ -74883,7 +74834,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       mlpcopyshared(&network, &network2);
       mlpprocess(&network, &x1, &y1);
       mlpprocess(&network2, &x2, &y2);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0) != 0.0, __FILE__, __LINE__, "testmlpbaseunit.ap:541");
+      *err = *err || testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0) != 0.0;
    // Additionally we tests functions for copying of tunable
    // parameters by:
    // * copying network using MLPCopy
@@ -74909,7 +74860,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       mlpcopytunableparameters(&network, &network2);
       mlpprocess(&network, &x1, &y1);
       mlpprocess(&network2, &x2, &y2);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0) != 0.0, __FILE__, __LINE__, "testmlpbaseunit.ap:571");
+      *err = *err || testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0) != 0.0;
       for (i = 0; i < nout; i++) {
          y2.xR[i] = randommid();
       }
@@ -74924,7 +74875,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       mlpimporttunableparameters(&network2, &p1);
       mlpprocess(&network, &x1, &y1);
       mlpprocess(&network2, &x2, &y2);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0) != 0.0, __FILE__, __LINE__, "testmlpbaseunit.ap:585");
+      *err = *err || testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0) != 0.0;
    // Same inputs on original network leads to same outputs
    // on copy created using MLPSerialize
       testmlpbaseunit_unsetnetwork(&network2);
@@ -75250,10 +75201,10 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
          referenceg.xR[i] = (v1 - 8 * v2 + 8 * v3 - v4) / (12 * h);
       }
       mlpgrad(&network, &x, &y, &e, &grad2);
-      seterrorflagdiff(err, e, referencee, etol, escale);
-      seterrorflagdiff(err, mlperror(&network, &xy, 1), referencee, etol, escale);
-      seterrorflagdiff(err, mlperrorsparse(&network, &sparsexy, 1), referencee, etol, escale);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:948");
+      *err = *err || !RelNear(e, referencee, etol, escale);
+      *err = *err || !RelNear(mlperror(&network, &xy, 1), referencee, etol, escale);
+      *err = *err || !RelNear(mlperrorsparse(&network, &sparsexy, 1), referencee, etol, escale);
+      *err = *err || testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > etol;
    // Test MLPErrorN(), MLPGradN() for single-element dataset:
    // * generate input X, output Y, combine them in dataset XY
    // * calculate "reference" error on dataset manually (call MLPProcess and evaluate sum-of-squared errors)
@@ -75327,9 +75278,9 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
          referenceg.xR[i] = v;
       }
       mlpgradn(&network, &x, &y, &e, &grad2);
-      seterrorflagdiff(err, e, referencee, etol, escale);
-      seterrorflagdiff(err, mlperrorn(&network, &xy, 1), referencee, etol, escale);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > nonstricttolerance, __FILE__, __LINE__, "testmlpbaseunit.ap:1029");
+      *err = *err || !RelNear(e, referencee, etol, escale);
+      *err = *err || !RelNear(mlperrorn(&network, &xy, 1), referencee, etol, escale);
+      *err = *err || testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > nonstricttolerance;
    // Test that gradient calculation functions automatically allocate
    // space for gradient, if needed.
    //
@@ -75338,16 +75289,16 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       sparseconverttocrs(&sparsexy);
       ae_vector_set_length(&grad1, 1);
       mlpgradbatch(&network, &xy, 0, &e1, &grad1);
-      set_error_flag(err, grad1.cnt != wcount, __FILE__, __LINE__, "testmlpbaseunit.ap:1042");
+      *err = *err || grad1.cnt != wcount;
       ae_vector_set_length(&grad1, 1);
       mlpgradbatchsparse(&network, &sparsexy, 0, &e1, &grad1);
-      set_error_flag(err, grad1.cnt != wcount, __FILE__, __LINE__, "testmlpbaseunit.ap:1045");
+      *err = *err || grad1.cnt != wcount;
       ae_vector_set_length(&grad1, 1);
       mlpgradbatchsubset(&network, &xy, 0, &idx, 0, &e1, &grad1);
-      set_error_flag(err, grad1.cnt != wcount, __FILE__, __LINE__, "testmlpbaseunit.ap:1048");
+      *err = *err || grad1.cnt != wcount;
       ae_vector_set_length(&grad1, 1);
       mlpgradbatchsparsesubset(&network, &sparsexy, 0, &idx, 0, &e1, &grad1);
-      set_error_flag(err, grad1.cnt != wcount, __FILE__, __LINE__, "testmlpbaseunit.ap:1051");
+      *err = *err || grad1.cnt != wcount;
    // Test MLPError(), MLPErrorSparse(), MLPGradBatch(), MLPGradBatchSparse() for many-element dataset:
    // * generate random dataset XY
    // * calculate "reference" error/gradient using MLPGrad(), which was tested in previous
@@ -75388,15 +75339,15 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       }
       sparseconverttocrs(&sparsexy);
       e2 = mlperror(&network, &xy, ssize);
-      seterrorflagdiff(err, e2, referencee, etol, escale);
+      *err = *err || !RelNear(e2, referencee, etol, escale);
       e2 = mlperrorsparse(&network, &sparsexy, ssize);
-      seterrorflagdiff(err, e2, referencee, etol, escale);
+      *err = *err || !RelNear(e2, referencee, etol, escale);
       mlpgradbatch(&network, &xy, ssize, &e2, &grad2);
-      seterrorflagdiff(err, e2, referencee, etol, escale);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1104");
+      *err = *err || !RelNear(e2, referencee, etol, escale);
+      *err = *err || testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > etol;
       mlpgradbatchsparse(&network, &sparsexy, ssize, &esp, &gradsp);
-      seterrorflagdiff(err, esp, referencee, etol, escale);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&referenceg, &gradsp, wcount, gscale) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1107");
+      *err = *err || !RelNear(esp, referencee, etol, escale);
+      *err = *err || testmlpbaseunit_vectordiff(&referenceg, &gradsp, wcount, gscale) > etol;
    // Test MLPErrorSubset(), MLPGradBatchSubset(), MLPErrorSparseSubset(), MLPGradBatchSparseSubset()
    // for many-element dataset with different types of subsets:
    // * generate random dataset XY
@@ -75460,36 +75411,36 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       mlpgradbatch(&network, &xy, ssize, &referencee, &referenceg);
       e2 = mlperrorsubset(&network, &xy, ssize, &idx, -1);
       esp = mlperrorsparsesubset(&network, &sparsexy, ssize, &idx, -1);
-      seterrorflagdiff(err, e2, referencee, etol, escale);
-      seterrorflagdiff(err, esp, referencee, etol, escale);
+      *err = *err || !RelNear(e2, referencee, etol, escale);
+      *err = *err || !RelNear(esp, referencee, etol, escale);
       mlpgradbatchsubset(&network, &xy, ssize, &idx, -1, &e2, &grad2);
       mlpgradbatchsparsesubset(&network, &sparsexy, ssize, &idx, -1, &esp, &gradsp);
-      seterrorflagdiff(err, e2, referencee, etol, escale);
-      seterrorflagdiff(err, esp, referencee, etol, escale);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1192");
-      set_error_flag(err, testmlpbaseunit_vectordiff(&referenceg, &gradsp, wcount, gscale) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1193");
+      *err = *err || !RelNear(e2, referencee, etol, escale);
+      *err = *err || !RelNear(esp, referencee, etol, escale);
+      *err = *err || testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > etol;
+      *err = *err || testmlpbaseunit_vectordiff(&referenceg, &gradsp, wcount, gscale) > etol;
       mlpgradbatch(&network, &xy, 0, &referencee, &referenceg);
       e2 = mlperrorsubset(&network, &xy, ssize, &idx, 0);
       esp = mlperrorsparsesubset(&network, &sparsexy, ssize, &idx, 0);
-      seterrorflagdiff(err, e2, referencee, etol, escale);
-      seterrorflagdiff(err, esp, referencee, etol, escale);
+      *err = *err || !RelNear(e2, referencee, etol, escale);
+      *err = *err || !RelNear(esp, referencee, etol, escale);
       mlpgradbatchsubset(&network, &xy, ssize, &idx, 0, &e2, &grad2);
       mlpgradbatchsparsesubset(&network, &sparsexy, ssize, &idx, 0, &esp, &gradsp);
-      seterrorflagdiff(err, e2, referencee, etol, escale);
-      seterrorflagdiff(err, esp, referencee, etol, escale);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1205");
-      set_error_flag(err, testmlpbaseunit_vectordiff(&referenceg, &gradsp, wcount, gscale) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1206");
+      *err = *err || !RelNear(e2, referencee, etol, escale);
+      *err = *err || !RelNear(esp, referencee, etol, escale);
+      *err = *err || testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > etol;
+      *err = *err || testmlpbaseunit_vectordiff(&referenceg, &gradsp, wcount, gscale) > etol;
       mlpgradbatch(&network, &xy2, subsetsize, &referencee, &referenceg);
       e2 = mlperrorsubset(&network, &xy, ssize, &idx, subsetsize);
       esp = mlperrorsparsesubset(&network, &sparsexy, ssize, &idx, subsetsize);
-      seterrorflagdiff(err, e2, referencee, etol, escale);
-      seterrorflagdiff(err, esp, referencee, etol, escale);
+      *err = *err || !RelNear(e2, referencee, etol, escale);
+      *err = *err || !RelNear(esp, referencee, etol, escale);
       mlpgradbatchsubset(&network, &xy, ssize, &idx, subsetsize, &e2, &grad2);
       mlpgradbatchsparsesubset(&network, &sparsexy, ssize, &idx, subsetsize, &esp, &gradsp);
-      seterrorflagdiff(err, e2, referencee, etol, escale);
-      seterrorflagdiff(err, esp, referencee, etol, escale);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1218");
-      set_error_flag(err, testmlpbaseunit_vectordiff(&referenceg, &gradsp, wcount, gscale) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1219");
+      *err = *err || !RelNear(e2, referencee, etol, escale);
+      *err = *err || !RelNear(esp, referencee, etol, escale);
+      *err = *err || testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > etol;
+      *err = *err || testmlpbaseunit_vectordiff(&referenceg, &gradsp, wcount, gscale) > etol;
    // Test MLPGradNBatch() for many-element dataset:
    // * generate random dataset XY
    // * calculate "reference" error/gradient using MLPGrad(), which was tested in previous
@@ -75523,8 +75474,8 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
          ae_v_add(referenceg.xR, 1, grad2.xR, 1, wcount);
       }
       mlpgradnbatch(&network, &xy, ssize, &e2, &grad2);
-      seterrorflagdiff(err, e2, referencee, etol, escale);
-      set_error_flag(err, testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > etol, __FILE__, __LINE__, "testmlpbaseunit.ap:1258");
+      *err = *err || !RelNear(e2, referencee, etol, escale);
+      *err = *err || testmlpbaseunit_vectordiff(&referenceg, &grad2, wcount, gscale) > etol;
    }
    ae_frame_leave();
 }
@@ -75676,20 +75627,20 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
          } else {
             mlphessiannbatch(&network, &xy, ssize, &e2, &grad2, &h2);
          }
-         set_error_flag(err, !NearAtR(e1, e2, e1 * etol), __FILE__, __LINE__, "testmlpbaseunit.ap:1440");
+         *err = *err || !NearAtR(e1, e2, e1 * etol);
          for (i = 0; i < wcount; i++) {
             if (!SmallAtR(grad1.xR[i], 1.0E-2)) {
-               set_error_flag(err, !NearAtR(grad2.xR[i], grad1.xR[i], fabs(grad1.xR[i]) * etol), __FILE__, __LINE__, "testmlpbaseunit.ap:1443");
+               *err = *err || !NearAtR(grad2.xR[i], grad1.xR[i], fabs(grad1.xR[i]) * etol);
             } else {
-               set_error_flag(err, !NearAtR(grad2.xR[i], grad1.xR[i], etol), __FILE__, __LINE__, "testmlpbaseunit.ap:1445");
+               *err = *err || !NearAtR(grad2.xR[i], grad1.xR[i], etol);
             }
          }
          for (i = 0; i < wcount; i++) {
             for (j = 0; j < wcount; j++) {
                if (!SmallAtR(h1.xyR[i][j], 5.0E-2)) {
-                  set_error_flag(err, !NearAtR(h1.xyR[i][j], h2.xyR[i][j], fabs(h1.xyR[i][j]) * etol), __FILE__, __LINE__, "testmlpbaseunit.ap:1449");
+                  *err = *err || !NearAtR(h1.xyR[i][j], h2.xyR[i][j], fabs(h1.xyR[i][j]) * etol);
                } else {
-                  set_error_flag(err, !NearAtR(h2.xyR[i][j], h1.xyR[i][j], etol), __FILE__, __LINE__, "testmlpbaseunit.ap:1451");
+                  *err = *err || !NearAtR(h2.xyR[i][j], h1.xyR[i][j], etol);
                }
             }
          }
@@ -75864,24 +75815,24 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
          refavgrelerror /= avgrelcnt;
       }
    // Test "continuous" errors on full dataset
-      seterrorflagdiff(err, mlprmserror(&network, &xy, ssize), refrmserror, etol, escale);
-      seterrorflagdiff(err, mlpavgce(&network, &xy, ssize), refavgce, etol, escale);
-      seterrorflagdiff(err, mlpavgerror(&network, &xy, ssize), refavgerror, etol, escale);
-      seterrorflagdiff(err, mlpavgrelerror(&network, &xy, ssize), refavgrelerror, etol, escale);
-      seterrorflagdiff(err, mlprmserrorsparse(&network, &sparsexy, ssize), refrmserror, etol, escale);
-      seterrorflagdiff(err, mlpavgcesparse(&network, &sparsexy, ssize), refavgce, etol, escale);
-      seterrorflagdiff(err, mlpavgerrorsparse(&network, &sparsexy, ssize), refavgerror, etol, escale);
-      seterrorflagdiff(err, mlpavgrelerrorsparse(&network, &sparsexy, ssize), refavgrelerror, etol, escale);
+      *err = *err || !RelNear(mlprmserror(&network, &xy, ssize), refrmserror, etol, escale);
+      *err = *err || !RelNear(mlpavgce(&network, &xy, ssize), refavgce, etol, escale);
+      *err = *err || !RelNear(mlpavgerror(&network, &xy, ssize), refavgerror, etol, escale);
+      *err = *err || !RelNear(mlpavgrelerror(&network, &xy, ssize), refavgrelerror, etol, escale);
+      *err = *err || !RelNear(mlprmserrorsparse(&network, &sparsexy, ssize), refrmserror, etol, escale);
+      *err = *err || !RelNear(mlpavgcesparse(&network, &sparsexy, ssize), refavgce, etol, escale);
+      *err = *err || !RelNear(mlpavgerrorsparse(&network, &sparsexy, ssize), refavgerror, etol, escale);
+      *err = *err || !RelNear(mlpavgrelerrorsparse(&network, &sparsexy, ssize), refavgrelerror, etol, escale);
       mlpallerrorssubset(&network, &xy, ssize, &dummy, -1, &allerrors);
-      seterrorflagdiff(err, allerrors.avgce, refavgce, etol, escale);
-      seterrorflagdiff(err, allerrors.rmserror, refrmserror, etol, escale);
-      seterrorflagdiff(err, allerrors.avgerror, refavgerror, etol, escale);
-      seterrorflagdiff(err, allerrors.avgrelerror, refavgrelerror, etol, escale);
+      *err = *err || !RelNear(allerrors.avgce, refavgce, etol, escale);
+      *err = *err || !RelNear(allerrors.rmserror, refrmserror, etol, escale);
+      *err = *err || !RelNear(allerrors.avgerror, refavgerror, etol, escale);
+      *err = *err || !RelNear(allerrors.avgrelerror, refavgrelerror, etol, escale);
       mlpallerrorssparsesubset(&network, &sparsexy, ssize, &dummy, -1, &allerrors);
-      seterrorflagdiff(err, allerrors.avgce, refavgce, etol, escale);
-      seterrorflagdiff(err, allerrors.rmserror, refrmserror, etol, escale);
-      seterrorflagdiff(err, allerrors.avgerror, refavgerror, etol, escale);
-      seterrorflagdiff(err, allerrors.avgrelerror, refavgrelerror, etol, escale);
+      *err = *err || !RelNear(allerrors.avgce, refavgce, etol, escale);
+      *err = *err || !RelNear(allerrors.rmserror, refrmserror, etol, escale);
+      *err = *err || !RelNear(allerrors.avgerror, refavgerror, etol, escale);
+      *err = *err || !RelNear(allerrors.avgrelerror, refavgrelerror, etol, escale);
    // Test errors on dataset given by subset.
    // We perform only limited test for RMS error, assuming that either all errors
    // are calculated correctly (subject to subset given by Idx) - or none of them.
@@ -75915,18 +75866,18 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
          refrmserror = sqrt(refrmserror / (subsetsize * nout));
       }
       mlpallerrorssubset(&network, &xy, ssize, &idx, subsetsize, &allerrors);
-      seterrorflagdiff(err, allerrors.rmserror, refrmserror, etol, escale);
+      *err = *err || !RelNear(allerrors.rmserror, refrmserror, etol, escale);
       mlpallerrorssparsesubset(&network, &sparsexy, ssize, &idx, subsetsize, &allerrors);
-      seterrorflagdiff(err, allerrors.rmserror, refrmserror, etol, escale);
+      *err = *err || !RelNear(allerrors.rmserror, refrmserror, etol, escale);
    // Test "discontinuous" error function.
    // Even slight changes in the network output may force these functions
    // to change by 1. So, we test them with relaxed criteria, corresponding to
    // difference in classification of two samples.
       if (ssize > 0) {
          relclstolerance = 2.5 / ssize;
-         set_error_flag(err, !NearAtR(mlpclserror(&network, &xy, ssize), refclserror, ssize * relclstolerance), __FILE__, __LINE__, "testmlpbaseunit.ap:1732");
-         set_error_flag(err, !NearAtR(mlprelclserror(&network, &xy, ssize), refrelclserror, relclstolerance), __FILE__, __LINE__, "testmlpbaseunit.ap:1733");
-         set_error_flag(err, !NearAtR(mlprelclserrorsparse(&network, &sparsexy, ssize), refrelclserror, relclstolerance), __FILE__, __LINE__, "testmlpbaseunit.ap:1734");
+         *err = *err || !NearAtR(mlpclserror(&network, &xy, ssize), refclserror, ssize * relclstolerance);
+         *err = *err || !NearAtR(mlprelclserror(&network, &xy, ssize), refrelclserror, relclstolerance);
+         *err = *err || !NearAtR(mlprelclserrorsparse(&network, &sparsexy, ssize), refrelclserror, relclstolerance);
       }
    }
    ae_frame_leave();
@@ -75955,10 +75906,10 @@ static void testmlpbaseunit_spectests(bool *inferrors, bool *procerrors, bool *g
       net.weights.xR[i] = 10000000.0;
    }
    mlpgradbatch(&net, &xy, 1, &f, &g);
-   set_error_flag(graderrors, !isfinite(f), __FILE__, __LINE__, "testmlpbaseunit.ap:1907");
-   set_error_flag(graderrors, !isfinite(mlperror(&net, &xy, 1)), __FILE__, __LINE__, "testmlpbaseunit.ap:1908");
+   *graderrors = *graderrors || !isfinite(f);
+   *graderrors = *graderrors || !isfinite(mlperror(&net, &xy, 1));
    for (i = 0; i < mlpgetweightscount(&net); i++) {
-      set_error_flag(graderrors, !isfinite(g.xR[i]), __FILE__, __LINE__, "testmlpbaseunit.ap:1910");
+      *graderrors = *graderrors || !isfinite(g.xR[i]);
    }
 // Special test for overflow in SOFTMAX layer:
 // * create 1x1x2 classifier network
@@ -75974,10 +75925,10 @@ static void testmlpbaseunit_spectests(bool *inferrors, bool *procerrors, bool *g
       net.weights.xR[i] = 10000000.0;
    }
    mlpgradbatch(&net, &xy, 1, &f, &g);
-   set_error_flag(graderrors, !isfinite(f), __FILE__, __LINE__, "testmlpbaseunit.ap:1928");
-   set_error_flag(graderrors, !isfinite(mlperror(&net, &xy, 1)), __FILE__, __LINE__, "testmlpbaseunit.ap:1929");
+   *graderrors = *graderrors || !isfinite(f);
+   *graderrors = *graderrors || !isfinite(mlperror(&net, &xy, 1));
    for (i = 0; i < mlpgetweightscount(&net); i++) {
-      set_error_flag(graderrors, !isfinite(g.xR[i]), __FILE__, __LINE__, "testmlpbaseunit.ap:1931");
+      *graderrors = *graderrors || !isfinite(g.xR[i]);
    }
    ae_frame_leave();
 }
@@ -76153,7 +76104,7 @@ static bool testmlpbaseunit_testmlpgbsubset() {
    return result;
 }
 
-bool testmlpbase(bool silent) {
+bool testmlpbase() {
    ae_frame _frame_block;
    bool waserrors;
    ae_int_t passcount;
@@ -76231,7 +76182,7 @@ bool testmlpbase(bool silent) {
    graderrors = graderrors || testmlpbaseunit_testmlpgbsubset();
 // Final report
    waserrors = inferrors || procerrors || graderrors || hesserrors || errerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("MLP TEST\n");
       printf("INFORMATIONAL FUNCTIONS:                 ");
       if (!inferrors) {
@@ -76755,15 +76706,15 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
          refavgrelerror /= avgrelcnt;
       }
    // Test "continuous" errors on full dataset
-      seterrorflagdiff(err, mlpermserror(&ensemble, &xy, ssize), refrmserror, etol, escale);
-      seterrorflagdiff(err, mlpeavgce(&ensemble, &xy, ssize), refavgce, etol, escale);
-      seterrorflagdiff(err, mlpeavgerror(&ensemble, &xy, ssize), refavgerror, etol, escale);
-      seterrorflagdiff(err, mlpeavgrelerror(&ensemble, &xy, ssize), refavgrelerror, etol, escale);
+      *err = *err || !RelNear(mlpermserror(&ensemble, &xy, ssize), refrmserror, etol, escale);
+      *err = *err || !RelNear(mlpeavgce(&ensemble, &xy, ssize), refavgce, etol, escale);
+      *err = *err || !RelNear(mlpeavgerror(&ensemble, &xy, ssize), refavgerror, etol, escale);
+      *err = *err || !RelNear(mlpeavgrelerror(&ensemble, &xy, ssize), refavgrelerror, etol, escale);
    }
    ae_frame_leave();
 }
 
-bool testmlpe(bool silent) {
+bool testmlpe() {
    bool waserrors;
    bool inferrors;
    bool procerrors;
@@ -76828,7 +76779,7 @@ bool testmlpe(bool silent) {
    testmlpeunit_testerr(0, nf, nhid1, nhid2, nl, ec, 1, sizemin, sizemax, &errerrors);
 // Final report
    waserrors = inferrors || procerrors || errerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("MLP ENSEMBLE TEST\n");
       printf("INFORMATIONAL FUNCTIONS:                 ");
       if (!inferrors) {
@@ -78371,13 +78322,13 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
          // Run clusterization
             clusterizersetpoints(&s, &xy, npoints, nfeatures, 2);
             clusterizerrunkmeans(&s, nclusters, &rep);
-            set_error_flag(othererrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testclusteringunit.ap:1069");
+            *othererrors = *othererrors || rep.terminationtype <= 0;
             energies.xR[initalgo] += rep.energy / passcount;
          }
       }
    // Compare
-      set_error_flag(othererrors, !(energies.xR[2] < energies.xR[1]), __FILE__, __LINE__, "testclusteringunit.ap:1077");
-      set_error_flag(othererrors, !(energies.xR[3] < energies.xR[1]), __FILE__, __LINE__, "testclusteringunit.ap:1078");
+      *othererrors = *othererrors || !(energies.xR[2] < energies.xR[1]);
+      *othererrors = *othererrors || !(energies.xR[3] < energies.xR[1]);
    }
 // Test distance calculation algorithm
    ae_vector_set_length(&pointslist, 6);
@@ -78426,8 +78377,8 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
             kmeansupdatedistances(&xy, 0, npoints, nfeatures, &c, 0, nclusters, &xyc, &xydist2, &bufferpool);
             testclusteringunit_kmeansreferenceupdatedistances(&xy, npoints, nfeatures, &c, nclusters, &xycref, &xydist2ref);
             for (i = 0; i < npoints; i++) {
-               set_error_flag(othererrors, xyc.xZ[i] != xycref.xZ[i], __FILE__, __LINE__, "testclusteringunit.ap:1137");
-               set_error_flag(othererrors, !NearAtR(xydist2.xR[i], xydist2ref.xR[i], 1.0E-6), __FILE__, __LINE__, "testclusteringunit.ap:1138");
+               *othererrors = *othererrors || xyc.xZ[i] != xycref.xZ[i];
+               *othererrors = *othererrors || !NearAtR(xydist2.xR[i], xydist2ref.xR[i], 1.0E-6);
             }
          }
       }
@@ -78468,7 +78419,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
             clusterizersetkmeanslimits(&s, 1, 0);
             clusterizersetkmeansinit(&s, initalgo);
             clusterizerrunkmeans(&s, nclusters, &rep);
-            set_error_flag(othererrors, rep.terminationtype != -3, __FILE__, __LINE__, "testclusteringunit.ap:1185");
+            *othererrors = *othererrors || rep.terminationtype != -3;
          }
       }
    }
@@ -78498,7 +78449,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
       allsame = true;
       for (pass = 0; pass <= 10; pass++) {
          clusterizerrunkmeans(&s, nclusters, &rep);
-         set_error_flag(othererrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testclusteringunit.ap:1221");
+         *othererrors = *othererrors || rep.terminationtype <= 0;
          if (*othererrors) {
             ae_frame_leave();
             return;
@@ -78520,7 +78471,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
             }
          }
       }
-      set_error_flag(othererrors, allsame, __FILE__, __LINE__, "testclusteringunit.ap:1244");
+      *othererrors = *othererrors || allsame;
    // Clusterize with positive seed.
    //
    // Perform multiple runs, compare results with
@@ -78533,7 +78484,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
       allsame = true;
       for (pass = 0; pass <= 10; pass++) {
          clusterizerrunkmeans(&s, nclusters, &rep);
-         set_error_flag(othererrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testclusteringunit.ap:1261");
+         *othererrors = *othererrors || rep.terminationtype <= 0;
          if (*othererrors) {
             ae_frame_leave();
             return;
@@ -78555,7 +78506,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
             }
          }
       }
-      set_error_flag(othererrors, !allsame, __FILE__, __LINE__, "testclusteringunit.ap:1284");
+      *othererrors = *othererrors || !allsame;
    // Clusterize with default seed.
    //
    // Perform multiple runs, compare results with
@@ -78567,7 +78518,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
       allsame = true;
       for (pass = 0; pass <= 10; pass++) {
          clusterizerrunkmeans(&s, nclusters, &rep);
-         set_error_flag(othererrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testclusteringunit.ap:1301");
+         *othererrors = *othererrors || rep.terminationtype <= 0;
          if (*othererrors) {
             ae_frame_leave();
             return;
@@ -78589,7 +78540,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
             }
          }
       }
-      set_error_flag(othererrors, !allsame, __FILE__, __LINE__, "testclusteringunit.ap:1324");
+      *othererrors = *othererrors || !allsame;
    }
    ae_frame_leave();
 }
@@ -78816,7 +78767,7 @@ static void testclusteringunit_kmeansrestartstest(bool *converrors, bool *restar
 }
 
 // Testing clustering
-bool testclustering(bool silent) {
+bool testclustering() {
    bool waserrors;
    bool basicahcerrors;
    bool ahcerrors;
@@ -78849,7 +78800,7 @@ bool testclustering(bool silent) {
    waserrors = false;
    waserrors = waserrors || basicahcerrors || ahcerrors;
    waserrors = waserrors || kmeansconverrors || kmeansothererrors || kmeanssimpleerrors || kmeansrestartserrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("TESTING CLUSTERING\n");
       printf("AHC:                                \n");
       printf("* BASIC TESTS                       ");
@@ -79022,7 +78973,7 @@ static void testdforestunit_testprocessing(bool *err) {
          y1.xR[i] = hqrndnormal(&rs);
       }
       dfprocess(&df1, &x1, &y1);
-      set_error_flag(err, !NearAtR(y1.xR[0], dfprocess0(&df1, &x2), 100.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:225");
+      *err = *err || !NearAtR(y1.xR[0], dfprocess0(&df1, &x2), 100.0 * machineepsilon);
    // DFClassify works as expected
       ae_vector_set_length(&x1, nvars);
       ae_vector_set_length(&x2, nvars);
@@ -79038,10 +78989,10 @@ static void testdforestunit_testprocessing(bool *err) {
          dfprocess(&df1, &x1, &y1);
          j = dfclassify(&df1, &x2);
          for (i = 0; i < nclasses; i++) {
-            set_error_flag(err, y1.xR[i] > y1.xR[j], __FILE__, __LINE__, "testdforestunit.ap:248");
+            *err = *err || y1.xR[i] > y1.xR[j];
          }
       } else {
-         set_error_flag(err, dfclassify(&df1, &x2) != -1, __FILE__, __LINE__, "testdforestunit.ap:251");
+         *err = *err || dfclassify(&df1, &x2) != -1;
       }
    // DFTsProcess() works as expected
       for (i = 0; i < nvars; i++) {
@@ -79058,7 +79009,7 @@ static void testdforestunit_testprocessing(bool *err) {
       for (i = 0; i < nclasses; i++) {
          allsame = allsame && y1.xR[i] == y2.xR[i];
       }
-      set_error_flag(err, !allsame, __FILE__, __LINE__, "testdforestunit.ap:272");
+      *err = *err || !allsame;
    // Same inputs on original forest leads to same outputs
    // on copy created using DFCopy
       testdforestunit_unsetdf(&df2);
@@ -79082,12 +79033,12 @@ static void testdforestunit_testprocessing(bool *err) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
-      set_error_flag(err, !NearAtR(dfprocess0(&df1, &x1), dfprocess0(&df2, &x2), 100.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:303");
+      *err = *err || !NearAtR(dfprocess0(&df1, &x1), dfprocess0(&df2, &x2), 100.0 * machineepsilon);
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
-      set_error_flag(err, dfclassify(&df1, &x1) != dfclassify(&df2, &x2), __FILE__, __LINE__, "testdforestunit.ap:309");
+      *err = *err || dfclassify(&df1, &x1) != dfclassify(&df2, &x2);
    // Same inputs on original forest leads to same outputs
    // on copy created using DFSerialize
       testdforestunit_unsetdf(&df2);
@@ -79130,12 +79081,12 @@ static void testdforestunit_testprocessing(bool *err) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
-      set_error_flag(err, !NearAtR(dfprocess0(&df1, &x1), dfprocess0(&df2, &x2), 100.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:339");
+      *err = *err || !NearAtR(dfprocess0(&df1, &x1), dfprocess0(&df2, &x2), 100.0 * machineepsilon);
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = randommid();
          x2.xR[i] = x1.xR[i];
       }
-      set_error_flag(err, dfclassify(&df1, &x1) != dfclassify(&df2, &x2), __FILE__, __LINE__, "testdforestunit.ap:345");
+      *err = *err || dfclassify(&df1, &x1) != dfclassify(&df2, &x2);
    // Normalization properties
       if (nclasses > 1) {
          for (i = 0; i < nvars; i++) {
@@ -79235,17 +79186,17 @@ static void testdforestunit_basictest1(bool *err) {
                   dfbuildrandomdecisionforestx1(&xy, npoints, nvars, nclasses, ntrees, 1, 1.0, &info, &df, &rep);
                }
                if (info <= 0) {
-                  set_error_flag(err, true, __FILE__, __LINE__, "testdforestunit.ap:467");
+                  *err = true;
                   ae_frame_leave();
                   return;
                }
             }
          // Test
-            set_error_flag(err, !SmallAtR(rep.rmserror, 1.0E-9), __FILE__, __LINE__, "testdforestunit.ap:475");
-            set_error_flag(err, !SmallAtR(rep.avgerror, 1.0E-9), __FILE__, __LINE__, "testdforestunit.ap:476");
-            set_error_flag(err, !SmallAtR(rep.avgrelerror, 1.0E-9), __FILE__, __LINE__, "testdforestunit.ap:477");
-            set_error_flag(err, !SmallAtR(rep.relclserror, 0.0), __FILE__, __LINE__, "testdforestunit.ap:478");
-            set_error_flag(err, !SmallAtR(rep.avgce, 0.0), __FILE__, __LINE__, "testdforestunit.ap:479");
+            *err = *err || !SmallAtR(rep.rmserror, 1.0E-9);
+            *err = *err || !SmallAtR(rep.avgerror, 1.0E-9);
+            *err = *err || !SmallAtR(rep.avgrelerror, 1.0E-9);
+            *err = *err || !SmallAtR(rep.relclserror, 0.0);
+            *err = *err || !SmallAtR(rep.avgce, 0.0);
             for (i = 0; i < npoints; i++) {
                ae_v_move(x.xR, 1, xy.xyR[i], 1, nvars);
                dfprocess(&df, &x, &y);
@@ -79253,14 +79204,14 @@ static void testdforestunit_basictest1(bool *err) {
                // Checks for classification tasks
                   s = 0.0;
                   for (j = 0; j < nclasses; j++) {
-                     set_error_flag(err, y.xR[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:492");
+                     *err = *err || y.xR[j] < 0.0;
                      s += y.xR[j];
                   }
-                  set_error_flag(err, !NearAtR(s, 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:495");
-                  set_error_flag(err, !NearAtR(y.xR[iround(xy.xyR[i][nvars])], 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:496");
+                  *err = *err || !NearAtR(s, 1.0, 1000.0 * machineepsilon);
+                  *err = *err || !NearAtR(y.xR[iround(xy.xyR[i][nvars])], 1.0, 1000.0 * machineepsilon);
                } else {
                // Regression problem
-                  set_error_flag(err, !NearAtR(y.xR[0], xy.xyR[i][nvars], 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:503");
+                  *err = *err || !NearAtR(y.xR[0], xy.xyR[i][nvars], 1000.0 * machineepsilon);
                }
             }
          }
@@ -79289,11 +79240,11 @@ static void testdforestunit_basictest1(bool *err) {
          dfbuildersetdataset(&builder, &xy, npoints, nvars, nclasses);
          dfbuildersetsubsampleratio(&builder, 1.0);
          dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep);
-         set_error_flag(err, !SmallAtR(rep.rmserror, 1.0E-9), __FILE__, __LINE__, "testdforestunit.ap:541");
-         set_error_flag(err, !SmallAtR(rep.avgerror, 1.0E-9), __FILE__, __LINE__, "testdforestunit.ap:542");
-         set_error_flag(err, !SmallAtR(rep.avgrelerror, 1.0E-9), __FILE__, __LINE__, "testdforestunit.ap:543");
-         set_error_flag(err, !SmallAtR(rep.relclserror, 0.0), __FILE__, __LINE__, "testdforestunit.ap:544");
-         set_error_flag(err, !SmallAtR(rep.avgce, 0.0), __FILE__, __LINE__, "testdforestunit.ap:545");
+         *err = *err || !SmallAtR(rep.rmserror, 1.0E-9);
+         *err = *err || !SmallAtR(rep.avgerror, 1.0E-9);
+         *err = *err || !SmallAtR(rep.avgrelerror, 1.0E-9);
+         *err = *err || !SmallAtR(rep.relclserror, 0.0);
+         *err = *err || !SmallAtR(rep.avgce, 0.0);
       // Test 16-bit compression
          dfcopy(&df, &df1);
          dfbinarycompression(&df1);
@@ -79304,14 +79255,14 @@ static void testdforestunit_basictest1(bool *err) {
             // Checks for classification tasks
                s = 0.0;
                for (j = 0; j < nclasses; j++) {
-                  set_error_flag(err, y.xR[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:564");
+                  *err = *err || y.xR[j] < 0.0;
                   s += y.xR[j];
                }
-               set_error_flag(err, !NearAtR(s, 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:567");
-               set_error_flag(err, !NearAtR(y.xR[iround(xy.xyR[i][nvars])], 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:568");
+               *err = *err || !NearAtR(s, 1.0, 1000.0 * machineepsilon);
+               *err = *err || !NearAtR(y.xR[iround(xy.xyR[i][nvars])], 1.0, 1000.0 * machineepsilon);
             } else {
             // Regression problem
-               set_error_flag(err, !NearAtR(y.xR[0], xy.xyR[i][nvars], tol16), __FILE__, __LINE__, "testdforestunit.ap:575");
+               *err = *err || !NearAtR(y.xR[0], xy.xyR[i][nvars], tol16);
             }
          }
       // Test 8-bit compression
@@ -79324,14 +79275,14 @@ static void testdforestunit_basictest1(bool *err) {
             // Checks for classification tasks
                s = 0.0;
                for (j = 0; j < nclasses; j++) {
-                  set_error_flag(err, y.xR[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:596");
+                  *err = *err || y.xR[j] < 0.0;
                   s += y.xR[j];
                }
-               set_error_flag(err, !NearAtR(s, 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:599");
-               set_error_flag(err, !NearAtR(y.xR[iround(xy.xyR[i][nvars])], 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:600");
+               *err = *err || !NearAtR(s, 1.0, 1000.0 * machineepsilon);
+               *err = *err || !NearAtR(y.xR[iround(xy.xyR[i][nvars])], 1.0, 1000.0 * machineepsilon);
             } else {
             // Regression problem
-               set_error_flag(err, !NearAtR(y.xR[0], xy.xyR[i][nvars], tol8), __FILE__, __LINE__, "testdforestunit.ap:607");
+               *err = *err || !NearAtR(y.xR[0], xy.xyR[i][nvars], tol8);
             }
          }
       }
@@ -79394,12 +79345,12 @@ static void testdforestunit_basictest2(bool *err) {
       dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1));
       dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep);
    // Check report fields
-      set_error_flag(err, !NearAtR(rep.oobrelclserror, 1.0 / 12.0, 0.50 * (1.0 / 12.0)), __FILE__, __LINE__, "testdforestunit.ap:684");
-      set_error_flag(err, rep.relclserror > rep.oobrelclserror, __FILE__, __LINE__, "testdforestunit.ap:685");
-      set_error_flag(err, rep.avgce >= rep.oobavgce, __FILE__, __LINE__, "testdforestunit.ap:686");
-      set_error_flag(err, rep.rmserror >= rep.oobrmserror, __FILE__, __LINE__, "testdforestunit.ap:687");
-      set_error_flag(err, rep.avgerror >= rep.oobavgerror, __FILE__, __LINE__, "testdforestunit.ap:688");
-      set_error_flag(err, rep.avgrelerror >= rep.oobavgrelerror, __FILE__, __LINE__, "testdforestunit.ap:689");
+      *err = *err || !NearAtR(rep.oobrelclserror, 1.0 / 12.0, 0.50 * (1.0 / 12.0));
+      *err = *err || rep.relclserror > rep.oobrelclserror;
+      *err = *err || rep.avgce >= rep.oobavgce;
+      *err = *err || rep.rmserror >= rep.oobrmserror;
+      *err = *err || rep.avgerror >= rep.oobavgerror;
+      *err = *err || rep.avgrelerror >= rep.oobavgrelerror;
    // Check outputs
       avgerr = 0.0;
       cnt = 0;
@@ -79407,9 +79358,9 @@ static void testdforestunit_basictest2(bool *err) {
       while (x.xR[0] <= 3.0) {
          dfprocess(&df, &x, &y);
       // Test for basic properties
-         set_error_flag(err, y.xR[0] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:704");
-         set_error_flag(err, y.xR[1] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:705");
-         set_error_flag(err, !NearAtR(y.xR[0] + y.xR[1], 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:706");
+         *err = *err || y.xR[0] < 0.0;
+         *err = *err || y.xR[1] < 0.0;
+         *err = *err || !NearAtR(y.xR[0] + y.xR[1], 1.0, 1000.0 * machineepsilon);
       // test for good correlation with results
          if (x.xR[0] < 1.0) {
             avgerr += fabs(1 - y.xR[0]);
@@ -79425,7 +79376,7 @@ static void testdforestunit_basictest2(bool *err) {
          x.xR[0] += 0.01;
       }
       avgerr /= cnt;
-      set_error_flag(err, avgerr > 0.05, __FILE__, __LINE__, "testdforestunit.ap:725");
+      *err = *err || avgerr > 0.05;
    }
    ae_frame_leave();
 }
@@ -79493,7 +79444,7 @@ static void testdforestunit_basictest3(bool *err) {
             dfbuildrandomdecisionforestx1(&xy, npoints, 2, 2, ntrees, 1, 0.10, &info, &df, &rep);
          }
          if (info <= 0) {
-            set_error_flag(err, true, __FILE__, __LINE__, "testdforestunit.ap:813");
+            *err = true;
             ae_frame_leave();
             return;
          }
@@ -79505,16 +79456,16 @@ static void testdforestunit_basictest3(bool *err) {
             x.xR[1] = (double)j / (testgridsize / 2);
             dfprocess(&df, &x, &y);
          // Test for basic properties
-            set_error_flag(err, y.xR[0] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:831");
-            set_error_flag(err, y.xR[1] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:832");
-            set_error_flag(err, !NearAtR(y.xR[0] + y.xR[1], 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:833");
+            *err = *err || y.xR[0] < 0.0;
+            *err = *err || y.xR[1] < 0.0;
+            *err = *err || !NearAtR(y.xR[0] + y.xR[1], 1.0, 1000.0 * machineepsilon);
          // test for good correlation with results
             r = sqrt(sqr(x.xR[0]) + sqr(x.xR[1]));
             if (r < 0.66 * 0.5) {
-               set_error_flag(err, y.xR[0] < 0.66, __FILE__, __LINE__, "testdforestunit.ap:840");
+               *err = *err || y.xR[0] < 0.66;
             }
             if (r > 1.33 * 0.5) {
-               set_error_flag(err, y.xR[1] < 0.66, __FILE__, __LINE__, "testdforestunit.ap:842");
+               *err = *err || y.xR[1] < 0.66;
             }
          }
       }
@@ -79582,23 +79533,23 @@ static void testdforestunit_basictest4(bool *err) {
             dfbuildrandomdecisionforestx1(&xy, npoints, 2, 1, ntrees, 1, 0.10, &info, &df, &rep);
          }
          if (info <= 0) {
-            set_error_flag(err, true, __FILE__, __LINE__, "testdforestunit.ap:931");
+            *err = true;
             ae_frame_leave();
             return;
          }
       }
    // Check report fields
-      set_error_flag(err, rep.relclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:939");
-      set_error_flag(err, rep.avgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:940");
-      set_error_flag(err, rep.oobrelclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:941");
-      set_error_flag(err, rep.oobavgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:942");
-      set_error_flag(err, rep.rmserror >= rep.oobrmserror, __FILE__, __LINE__, "testdforestunit.ap:943");
-      set_error_flag(err, rep.avgerror >= rep.oobavgerror, __FILE__, __LINE__, "testdforestunit.ap:944");
-      set_error_flag(err, rep.avgrelerror >= rep.oobavgrelerror, __FILE__, __LINE__, "testdforestunit.ap:945");
-      set_error_flag(err, rep.oobrmserror > 0.05, __FILE__, __LINE__, "testdforestunit.ap:946");
-      set_error_flag(err, rep.oobavgerror > 0.05, __FILE__, __LINE__, "testdforestunit.ap:947");
-      set_error_flag(err, rep.oobrmserror < 0.001, __FILE__, __LINE__, "testdforestunit.ap:948");
-      set_error_flag(err, rep.oobavgerror < 0.001, __FILE__, __LINE__, "testdforestunit.ap:949");
+      *err = *err || rep.relclserror != 0.0;
+      *err = *err || rep.avgce != 0.0;
+      *err = *err || rep.oobrelclserror != 0.0;
+      *err = *err || rep.oobavgce != 0.0;
+      *err = *err || rep.rmserror >= rep.oobrmserror;
+      *err = *err || rep.avgerror >= rep.oobavgerror;
+      *err = *err || rep.avgrelerror >= rep.oobavgrelerror;
+      *err = *err || rep.oobrmserror > 0.05;
+      *err = *err || rep.oobavgerror > 0.05;
+      *err = *err || rep.oobrmserror < 0.001;
+      *err = *err || rep.oobavgerror < 0.001;
    // Test
       maxerr = 0.0;
       avgerr = 0.0;
@@ -79615,8 +79566,8 @@ static void testdforestunit_basictest4(bool *err) {
          }
       }
       avgerr /= cnt;
-      set_error_flag(err, maxerr > 0.15, __FILE__, __LINE__, "testdforestunit.ap:969");
-      set_error_flag(err, avgerr > 0.05, __FILE__, __LINE__, "testdforestunit.ap:970");
+      *err = *err || maxerr > 0.15;
+      *err = *err || avgerr > 0.05;
    }
    ae_frame_leave();
 }
@@ -79669,17 +79620,17 @@ static void testdforestunit_basictest5(bool *err) {
    dfbuildersetrdfsplitstrength(&builder, randominteger(testdforestunit_splitmax + 1));
    dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep);
 // Test
-   set_error_flag(err, rep.rmserror >= rep.oobrmserror, __FILE__, __LINE__, "testdforestunit.ap:1039");
-   set_error_flag(err, rep.avgerror >= rep.oobavgerror, __FILE__, __LINE__, "testdforestunit.ap:1040");
-   set_error_flag(err, rep.avgrelerror >= rep.oobavgrelerror, __FILE__, __LINE__, "testdforestunit.ap:1041");
-   set_error_flag(err, !SmallAtR(rep.rmserror, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1042");
-   set_error_flag(err, !SmallAtR(rep.avgerror, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1043");
-   set_error_flag(err, !SmallAtR(rep.avgrelerror, 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1044");
+   *err = *err || rep.rmserror >= rep.oobrmserror;
+   *err = *err || rep.avgerror >= rep.oobavgerror;
+   *err = *err || rep.avgrelerror >= rep.oobavgrelerror;
+   *err = *err || !SmallAtR(rep.rmserror, 1000.0 * machineepsilon);
+   *err = *err || !SmallAtR(rep.avgerror, 1000.0 * machineepsilon);
+   *err = *err || !SmallAtR(rep.avgrelerror, 1000.0 * machineepsilon);
    for (i = 0; i < npoints; i++) {
       ae_v_move(x.xR, 1, xy.xyR[i], 1, nvars);
       dfprocess(&df, &x, &y);
       if (!NearAtR(y.xR[0], xy.xyR[i][nvars], 1000.0 * machineepsilon)) {
-         set_error_flag(err, true, __FILE__, __LINE__, "testdforestunit.ap:1050");
+         *err = true;
       }
    }
    ae_frame_leave();
@@ -79765,11 +79716,11 @@ static void testdforestunit_basictestrandom(bool *err) {
          }
          dfbuildersetrdfalgo(&builder, randominteger(testdforestunit_algomax + 1));
          dfbuildersetrdfsplitstrength(&builder, randominteger(testdforestunit_splitmax + 1));
-         set_error_flag(err, dfbuildergetprogress(&builder) != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1139");
-         set_error_flag(err, dfbuilderpeekprogress(&builder) != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1140");
+         *err = *err || dfbuildergetprogress(&builder) != 0.0;
+         *err = *err || dfbuilderpeekprogress(&builder) != 0.0;
          dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep);
-         set_error_flag(err, dfbuildergetprogress(&builder) != 1.0, __FILE__, __LINE__, "testdforestunit.ap:1142");
-         set_error_flag(err, dfbuilderpeekprogress(&builder) != 1.0, __FILE__, __LINE__, "testdforestunit.ap:1143");
+         *err = *err || dfbuildergetprogress(&builder) != 1.0;
+         *err = *err || dfbuilderpeekprogress(&builder) != 1.0;
          refavgce = 0.0;
          refrms = 0.0;
          refavg = 0.0;
@@ -79793,25 +79744,25 @@ static void testdforestunit_basictestrandom(bool *err) {
             refrms = sqrt(refrms / npoints);
             refavg /= npoints;
             refavgrel /= coalesce((double)relcnt, 1.0);
-            set_error_flag(err, rep.relclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1171");
-            set_error_flag(err, rep.avgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1172");
-            set_error_flag(err, !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1173");
-            set_error_flag(err, !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1174");
-            set_error_flag(err, !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1175");
-            set_error_flag(err, dfrelclserror(&df, &xy, npoints) != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1176");
-            set_error_flag(err, dfavgce(&df, &xy, npoints) != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1177");
-            set_error_flag(err, !NearAtR(dfrmserror(&df, &xy, npoints), refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1178");
-            set_error_flag(err, !NearAtR(dfavgerror(&df, &xy, npoints), refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1179");
-            set_error_flag(err, !NearAtR(dfavgrelerror(&df, &xy, npoints), refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1180");
+            *err = *err || rep.relclserror != 0.0;
+            *err = *err || rep.avgce != 0.0;
+            *err = *err || !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6);
+            *err = *err || !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6);
+            *err = *err || !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6);
+            *err = *err || dfrelclserror(&df, &xy, npoints) != 0.0;
+            *err = *err || dfavgce(&df, &xy, npoints) != 0.0;
+            *err = *err || !NearAtR(dfrmserror(&df, &xy, npoints), refrms, refrms * 1.0E-6);
+            *err = *err || !NearAtR(dfavgerror(&df, &xy, npoints), refavg, refavg * 1.0E-6);
+            *err = *err || !NearAtR(dfavgrelerror(&df, &xy, npoints), refavgrel, refavgrel * 1.0E-6);
          // Check OOB errors against training set errors:
          // * RelCLS and AvgCE are not calculated for regression problems
          // * RMS and AVG should be roughly FACTOR times larger
          // * AVG-REL should be just larger (it is more prone to sampling noise than previous two)
-            set_error_flag(err, rep.oobrelclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1188");
-            set_error_flag(err, rep.oobavgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1189");
-            set_error_flag(err, !NearAtR(rep.oobrmserror / rep.rmserror, factor, oobtol * factor), __FILE__, __LINE__, "testdforestunit.ap:1190");
-            set_error_flag(err, !NearAtR(rep.oobavgerror / rep.avgerror, factor, oobtol * factor), __FILE__, __LINE__, "testdforestunit.ap:1191");
-            set_error_flag(err, rep.oobavgrelerror < rep.avgrelerror, __FILE__, __LINE__, "testdforestunit.ap:1192");
+            *err = *err || rep.oobrelclserror != 0.0;
+            *err = *err || rep.oobavgce != 0.0;
+            *err = *err || !NearAtR(rep.oobrmserror / rep.rmserror, factor, oobtol * factor);
+            *err = *err || !NearAtR(rep.oobavgerror / rep.avgerror, factor, oobtol * factor);
+            *err = *err || rep.oobavgrelerror < rep.avgrelerror;
          } else {
          // Check training set errors
             for (i = 0; i < npoints; i++) {
@@ -79837,24 +79788,24 @@ static void testdforestunit_basictestrandom(bool *err) {
             refavg /= npoints * nclasses;
             refavgrel /= npoints;
             refavgce /= npoints;
-            set_error_flag(err, !NearAtR(rep.avgce, refavgce, refavgce * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1222");
-            set_error_flag(err, !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1223");
-            set_error_flag(err, !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1224");
-            set_error_flag(err, !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1225");
-            set_error_flag(err, fabs(dfrelclserror(&df, &xy, npoints) - rep.relclserror) * npoints > 5.0, __FILE__, __LINE__, "testdforestunit.ap:1227");
-            set_error_flag(err, !NearAtR(dfavgce(&df, &xy, npoints), refavgce, refavgce * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1228");
-            set_error_flag(err, !NearAtR(dfrmserror(&df, &xy, npoints), refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1229");
-            set_error_flag(err, !NearAtR(dfavgerror(&df, &xy, npoints), refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1230");
-            set_error_flag(err, !NearAtR(dfavgrelerror(&df, &xy, npoints), refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1231");
+            *err = *err || !NearAtR(rep.avgce, refavgce, refavgce * 1.0E-6);
+            *err = *err || !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6);
+            *err = *err || !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6);
+            *err = *err || !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6);
+            *err = *err || fabs(dfrelclserror(&df, &xy, npoints) - rep.relclserror) * npoints > 5.0;
+            *err = *err || !NearAtR(dfavgce(&df, &xy, npoints), refavgce, refavgce * 1.0E-6);
+            *err = *err || !NearAtR(dfrmserror(&df, &xy, npoints), refrms, refrms * 1.0E-6);
+            *err = *err || !NearAtR(dfavgerror(&df, &xy, npoints), refavg, refavg * 1.0E-6);
+            *err = *err || !NearAtR(dfavgrelerror(&df, &xy, npoints), refavgrel, refavgrel * 1.0E-6);
          // Check OOB errors against training set errors
          // * RelCLS, AvgCE and AvgRel should be just larger (too prone to sampling noise to perform more sensitive tests)
          // * RMS and AVG should be roughly FACTOR times larger
          //
-            set_error_flag(err, rep.oobrelclserror < rep.relclserror, __FILE__, __LINE__, "testdforestunit.ap:1239");
-            set_error_flag(err, rep.oobavgce < rep.avgce, __FILE__, __LINE__, "testdforestunit.ap:1240");
-            set_error_flag(err, rep.oobavgrelerror < rep.avgrelerror, __FILE__, __LINE__, "testdforestunit.ap:1241");
-            set_error_flag(err, !NearAtR(rep.oobrmserror / rep.rmserror, factor, oobtol * factor), __FILE__, __LINE__, "testdforestunit.ap:1242");
-            set_error_flag(err, !NearAtR(rep.oobavgerror / rep.avgerror, factor, oobtol * factor), __FILE__, __LINE__, "testdforestunit.ap:1243");
+            *err = *err || rep.oobrelclserror < rep.relclserror;
+            *err = *err || rep.oobavgce < rep.avgce;
+            *err = *err || rep.oobavgrelerror < rep.avgrelerror;
+            *err = *err || !NearAtR(rep.oobrmserror / rep.rmserror, factor, oobtol * factor);
+            *err = *err || !NearAtR(rep.oobavgerror / rep.avgerror, factor, oobtol * factor);
          }
       }
    }
@@ -79949,18 +79900,18 @@ static void testdforestunit_basictestallsame(bool *err) {
          refrms = sqrt(refrms / npoints);
          refavg /= npoints;
          refavgrel /= coalesce((double)relcnt, 1.0);
-         set_error_flag(err, rep.relclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1346");
-         set_error_flag(err, rep.avgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1347");
-         set_error_flag(err, !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1348");
-         set_error_flag(err, !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1349");
-         set_error_flag(err, !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1350");
+         *err = *err || rep.relclserror != 0.0;
+         *err = *err || rep.avgce != 0.0;
+         *err = *err || !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6);
+         *err = *err || !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6);
+         *err = *err || !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6);
       // Check OOB errors against training set errors:
       // * RelCLS and AvgCE are not calculated for regression problems
       // * RMS and AVG should be roughly same
-         set_error_flag(err, rep.oobrelclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1357");
-         set_error_flag(err, rep.oobavgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1358");
-         set_error_flag(err, !NearAtR(rep.oobrmserror / rep.rmserror, 1.0, oobtol), __FILE__, __LINE__, "testdforestunit.ap:1359");
-         set_error_flag(err, !NearAtR(rep.oobavgerror / rep.avgerror, 1.0, oobtol), __FILE__, __LINE__, "testdforestunit.ap:1360");
+         *err = *err || rep.oobrelclserror != 0.0;
+         *err = *err || rep.oobavgce != 0.0;
+         *err = *err || !NearAtR(rep.oobrmserror / rep.rmserror, 1.0, oobtol);
+         *err = *err || !NearAtR(rep.oobavgerror / rep.avgerror, 1.0, oobtol);
       } else {
       // Check training set errors
          for (i = 0; i < npoints; i++) {
@@ -79986,15 +79937,15 @@ static void testdforestunit_basictestallsame(bool *err) {
          refavg /= npoints * nclasses;
          refavgrel /= npoints;
          refavgce /= npoints;
-         set_error_flag(err, !NearAtR(rep.avgce, refavgce, refavgce * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1390");
-         set_error_flag(err, !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1391");
-         set_error_flag(err, !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1392");
-         set_error_flag(err, !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6), __FILE__, __LINE__, "testdforestunit.ap:1393");
+         *err = *err || !NearAtR(rep.avgce, refavgce, refavgce * 1.0E-6);
+         *err = *err || !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6);
+         *err = *err || !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6);
+         *err = *err || !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6);
       // Check OOB errors against training set errors
       // * RMS and AVG should be roughly same
       //
-         set_error_flag(err, !NearAtR(rep.oobrmserror / rep.rmserror, 1.0, oobtol), __FILE__, __LINE__, "testdforestunit.ap:1400");
-         set_error_flag(err, !NearAtR(rep.oobavgerror / rep.avgerror, 1.0, oobtol), __FILE__, __LINE__, "testdforestunit.ap:1401");
+         *err = *err || !NearAtR(rep.oobrmserror / rep.rmserror, 1.0, oobtol);
+         *err = *err || !NearAtR(rep.oobavgerror / rep.avgerror, 1.0, oobtol);
       }
    }
    ae_frame_leave();
@@ -80071,11 +80022,11 @@ static void testdforestunit_testcompression(bool *err) {
             if (nclasses > 1) {
             // Compare output probabilities for classification problem
                for (j = 0; j < nclasses; j++) {
-                  set_error_flag(err, !NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1495");
+                  *err = *err || !NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon);
                }
             } else {
             // Compare output values for regression problem
-               set_error_flag(err, !NearAtR(y0.xR[0], y1.xR[0], tol16), __FILE__, __LINE__, "testdforestunit.ap:1502");
+               *err = *err || !NearAtR(y0.xR[0], y1.xR[0], tol16);
             }
          }
       // Test 8-bit compression
@@ -80090,11 +80041,11 @@ static void testdforestunit_testcompression(bool *err) {
             if (nclasses > 1) {
             // Compare output probabilities for classification problem
                for (j = 0; j < nclasses; j++) {
-                  set_error_flag(err, !NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1523");
+                  *err = *err || !NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon);
                }
             } else {
             // Compare output values for regression problem
-               set_error_flag(err, !NearAtR(y0.xR[0], y1.xR[0], tol8), __FILE__, __LINE__, "testdforestunit.ap:1530");
+               *err = *err || !NearAtR(y0.xR[0], y1.xR[0], tol8);
             }
          }
       }
@@ -80145,11 +80096,11 @@ static void testdforestunit_testcompression(bool *err) {
          if (nclasses > 1) {
          // Compare output probabilities for classification problem
             for (j = 0; j < nclasses; j++) {
-               set_error_flag(err, !NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1593");
+               *err = *err || !NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon);
             }
          } else {
          // Compare output values for regression problem
-            set_error_flag(err, !NearAtR(y0.xR[0], y1.xR[0], tol16), __FILE__, __LINE__, "testdforestunit.ap:1600");
+            *err = *err || !NearAtR(y0.xR[0], y1.xR[0], tol16);
          }
       }
    // Test 8-bit compression
@@ -80164,11 +80115,11 @@ static void testdforestunit_testcompression(bool *err) {
          if (nclasses > 1) {
          // Compare output probabilities for classification problem
             for (j = 0; j < nclasses; j++) {
-               set_error_flag(err, !NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon), __FILE__, __LINE__, "testdforestunit.ap:1621");
+               *err = *err || !NearAtR(y0.xR[j], y1.xR[j], 1000.0 * machineepsilon);
             }
          } else {
          // Compare output values for regression problem
-            set_error_flag(err, !NearAtR(y0.xR[0], y1.xR[0], tol8), __FILE__, __LINE__, "testdforestunit.ap:1628");
+            *err = *err || !NearAtR(y0.xR[0], y1.xR[0], tol8);
          }
       }
    }
@@ -80260,15 +80211,15 @@ static void testdforestunit_testimportance(bool *err) {
       dfbuildersetdataset(&builder, &xy, npoints, nvars, nclasses);
       dfbuildersetsubsampleratio(&builder, 0.66);
       dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep);
-      set_error_flag(err, rep.varimportances.cnt != nvars, __FILE__, __LINE__, "testdforestunit.ap:1694");
-      set_error_flag(err, rep.topvars.cnt != nvars, __FILE__, __LINE__, "testdforestunit.ap:1695");
+      *err = *err || rep.varimportances.cnt != nvars;
+      *err = *err || rep.topvars.cnt != nvars;
       if (*err) {
          ae_frame_leave();
          return;
       }
       for (j = 0; j < nvars; j++) {
-         set_error_flag(err, rep.varimportances.xR[j] != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1700");
-         set_error_flag(err, rep.topvars.xZ[j] != j, __FILE__, __LINE__, "testdforestunit.ap:1701");
+         *err = *err || rep.varimportances.xR[j] != 0.0;
+         *err = *err || rep.topvars.xZ[j] != j;
       }
    }
 // Test that degenerate cases are handled correctly
@@ -80306,16 +80257,16 @@ static void testdforestunit_testimportance(bool *err) {
                   dfbuildersetimportancetrngini(&builder);
                }
                dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep);
-               set_error_flag(err, rep.varimportances.cnt != nvars, __FILE__, __LINE__, "testdforestunit.ap:1744");
-               set_error_flag(err, rep.topvars.cnt != nvars, __FILE__, __LINE__, "testdforestunit.ap:1745");
+               *err = *err || rep.varimportances.cnt != nvars;
+               *err = *err || rep.topvars.cnt != nvars;
                if (*err) {
                   ae_frame_leave();
                   return;
                }
                if (npoints == 1 || stype == 1) {
                   for (j = 0; j < nvars; j++) {
-                     set_error_flag(err, rep.varimportances.xR[j] != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1752");
-                     set_error_flag(err, rep.topvars.xZ[j] != j, __FILE__, __LINE__, "testdforestunit.ap:1753");
+                     *err = *err || rep.varimportances.xR[j] != 0.0;
+                     *err = *err || rep.topvars.xZ[j] != j;
                   }
                }
             }
@@ -80397,29 +80348,29 @@ static void testdforestunit_testimportance(bool *err) {
             dfbuildersetimportancetrngini(&builder);
          }
          dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep);
-         set_error_flag(err, rep.varimportances.cnt != nvars, __FILE__, __LINE__, "testdforestunit.ap:1855");
-         set_error_flag(err, rep.topvars.cnt != nvars, __FILE__, __LINE__, "testdforestunit.ap:1856");
+         *err = *err || rep.varimportances.cnt != nvars;
+         *err = *err || rep.topvars.cnt != nvars;
          if (*err) {
             ae_frame_leave();
             return;
          }
          for (j = 0; j < nvars; j++) {
-            set_error_flag(err, rep.varimportances.xR[j] < unimportantlo, __FILE__, __LINE__, "testdforestunit.ap:1863");
-            set_error_flag(err, rep.varimportances.xR[j] > unimportanthi, __FILE__, __LINE__, "testdforestunit.ap:1864");
+            *err = *err || rep.varimportances.xR[j] < unimportantlo;
+            *err = *err || rep.varimportances.xR[j] > unimportanthi;
          }
          setlengthzero(&tmp, nvars);
          for (j = 0; j < nvars; j++) {
-            set_error_flag(err, rep.topvars.xZ[j] < 0, __FILE__, __LINE__, "testdforestunit.ap:1869");
-            set_error_flag(err, rep.topvars.xZ[j] >= nvars, __FILE__, __LINE__, "testdforestunit.ap:1870");
+            *err = *err || rep.topvars.xZ[j] < 0;
+            *err = *err || rep.topvars.xZ[j] >= nvars;
             if (*err) {
                ae_frame_leave();
                return;
             }
-            set_error_flag(err, tmp.xR[rep.topvars.xZ[j]] != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1873");
+            *err = *err || tmp.xR[rep.topvars.xZ[j]] != 0.0;
             tmp.xR[rep.topvars.xZ[j]]++;
          }
          for (j = 0; j < nvars - 1; j++) {
-            set_error_flag(err, rep.varimportances.xR[rep.topvars.xZ[j]] < rep.varimportances.xR[rep.topvars.xZ[j + 1]], __FILE__, __LINE__, "testdforestunit.ap:1877");
+            *err = *err || rep.varimportances.xR[rep.topvars.xZ[j]] < rep.varimportances.xR[rep.topvars.xZ[j + 1]];
          }
          if (ntype == 2) {
          // TRN-Gini importances sum to 1.0
@@ -80427,7 +80378,7 @@ static void testdforestunit_testimportance(bool *err) {
             for (j = 0; j < nvars; j++) {
                v += rep.varimportances.xR[j];
             }
-            set_error_flag(err, !NearAtR(v, 1.0, 1.0e-6), __FILE__, __LINE__, "testdforestunit.ap:1886");
+            *err = *err || !NearAtR(v, 1.0, 1.0e-6);
          }
       }
    // Test that on a problem where:
@@ -80475,29 +80426,29 @@ static void testdforestunit_testimportance(bool *err) {
             dfbuildersetimportancetrngini(&builder);
          }
          dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep);
-         set_error_flag(err, rep.varimportances.cnt != nvars, __FILE__, __LINE__, "testdforestunit.ap:1946");
-         set_error_flag(err, rep.topvars.cnt != nvars, __FILE__, __LINE__, "testdforestunit.ap:1947");
+         *err = *err || rep.varimportances.cnt != nvars;
+         *err = *err || rep.topvars.cnt != nvars;
          if (*err) {
             ae_frame_leave();
             return;
          }
          for (j = 0; j < nvars; j++) {
-            set_error_flag(err, rep.varimportances.xR[j] < importantlo, __FILE__, __LINE__, "testdforestunit.ap:1954");
-            set_error_flag(err, rep.varimportances.xR[j] > importanthi, __FILE__, __LINE__, "testdforestunit.ap:1955");
+            *err = *err || rep.varimportances.xR[j] < importantlo;
+            *err = *err || rep.varimportances.xR[j] > importanthi;
          }
          setlengthzero(&tmp, nvars);
          for (j = 0; j < nvars; j++) {
-            set_error_flag(err, rep.topvars.xZ[j] < 0, __FILE__, __LINE__, "testdforestunit.ap:1960");
-            set_error_flag(err, rep.topvars.xZ[j] >= nvars, __FILE__, __LINE__, "testdforestunit.ap:1961");
+            *err = *err || rep.topvars.xZ[j] < 0;
+            *err = *err || rep.topvars.xZ[j] >= nvars;
             if (*err) {
                ae_frame_leave();
                return;
             }
-            set_error_flag(err, tmp.xR[rep.topvars.xZ[j]] != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1964");
+            *err = *err || tmp.xR[rep.topvars.xZ[j]] != 0.0;
             tmp.xR[rep.topvars.xZ[j]]++;
          }
          for (j = 0; j < nvars - 1; j++) {
-            set_error_flag(err, rep.varimportances.xR[rep.topvars.xZ[j]] < rep.varimportances.xR[rep.topvars.xZ[j + 1]], __FILE__, __LINE__, "testdforestunit.ap:1968");
+            *err = *err || rep.varimportances.xR[rep.topvars.xZ[j]] < rep.varimportances.xR[rep.topvars.xZ[j + 1]];
          }
          if (ntype == 2) {
          // TRN-Gini importances sum to 1.0
@@ -80505,7 +80456,7 @@ static void testdforestunit_testimportance(bool *err) {
             for (j = 0; j < nvars; j++) {
                v += rep.varimportances.xR[j];
             }
-            set_error_flag(err, !NearAtR(v, 1.0, 1.0e-6), __FILE__, __LINE__, "testdforestunit.ap:1977");
+            *err = *err || !NearAtR(v, 1.0, 1.0e-6);
          }
       }
    }
@@ -80556,8 +80507,8 @@ static void testdforestunit_testimportance(bool *err) {
       dfbuildersetimportancepermutation(&builder);
       dfbuildersetrndvars(&builder, nvars);
       dfbuilderbuildrandomforest(&builder, ntrees, &df, &rep);
-      set_error_flag(err, rep.varimportances.cnt != nvars, __FILE__, __LINE__, "testdforestunit.ap:2036");
-      set_error_flag(err, rep.topvars.cnt != nvars, __FILE__, __LINE__, "testdforestunit.ap:2037");
+      *err = *err || rep.varimportances.cnt != nvars;
+      *err = *err || rep.topvars.cnt != nvars;
       if (*err) {
          ae_frame_leave();
          return;
@@ -80594,13 +80545,13 @@ static void testdforestunit_testimportance(bool *err) {
    // Compare
       for (k = 0; k < nvars; k++) {
          v = 1 - vloss.xR[nvars] / vloss.xR[nvars + 1] - (1 - vloss.xR[k] / vloss.xR[nvars + 1]);
-         set_error_flag(err, !NearAtR(v, rep.varimportances.xR[k], 0.25), __FILE__, __LINE__, "testdforestunit.ap:2081");
+         *err = *err || !NearAtR(v, rep.varimportances.xR[k], 0.25);
       }
    }
    ae_frame_leave();
 }
 
-bool testdforest(bool silent) {
+bool testdforest() {
    bool waserrors;
    bool basicerrors;
    bool procerrors;
@@ -80626,7 +80577,7 @@ bool testdforest(bool silent) {
    testdforestunit_testimportance(&importanceerrors);
 // Final report
    waserrors = basicerrors || procerrors || compressionerrors || importanceerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("RANDOM FOREST TEST\n");
       printf("TOTAL RESULTS:                           ");
       if (!waserrors) {
@@ -80794,7 +80745,7 @@ static void testlinregunit_unsetlr(linearmodel *lr) {
    ae_frame_leave();
 }
 
-bool testlinreg(bool silent) {
+bool testlinreg() {
    ae_frame _frame_block;
    double sigmathreshold;
    ae_int_t maxn;
@@ -81459,7 +81410,7 @@ bool testlinreg(bool silent) {
 // TODO: Degenerate tests (when design matrix and right part are zero)
 // Final report
    waserrors = slerrors || slcerrors || gropterrors || grcoverrors || gresterrors || grothererrors || grconverrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("REGRESSION TEST\n");
       printf("STRAIGHT LINE REGRESSION:                ");
       if (!slerrors) {
@@ -81525,7 +81476,7 @@ bool testlinreg(bool silent) {
 // This function tests SMA(k) filter. It returns True on error.
 //
 // Additional IsSilent parameter controls detailed error reporting.
-static bool testsma(bool issilent) {
+static bool testsma() {
    ae_frame _frame_block;
    bool precomputederrors;
    bool zerohandlingerrors;
@@ -81534,7 +81485,7 @@ static bool testsma(bool issilent) {
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    threshold = 1000.0 * machineepsilon;
-   if (!issilent) {
+   if (!silent) {
       printf("SMA(K) TEST\n");
    }
 // Test several pre-computed problems.
@@ -81625,13 +81576,13 @@ static bool testsma(bool issilent) {
 // This function tests EMA(alpha) filter. It returns True on error.
 //
 // Additional IsSilent parameter controls detailed error reporting.
-static bool testema(bool issilent) {
+static bool testema() {
    ae_frame _frame_block;
    bool precomputederrors;
    bool result;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
-   if (!issilent) {
+   if (!silent) {
       printf("EMA(alpha) TEST\n");
    }
 // Test several pre-computed problems.
@@ -81663,7 +81614,7 @@ static bool testema(bool issilent) {
 // This function tests LRMA(k) filter. It returns True on error.
 //
 // Additional IsSilent parameter controls detailed error reporting.
-static bool testlrma(bool issilent) {
+static bool testlrma() {
    ae_frame _frame_block;
    bool precomputederrors;
    double threshold;
@@ -81671,7 +81622,7 @@ static bool testlrma(bool issilent) {
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    threshold = 1000.0 * machineepsilon;
-   if (!issilent) {
+   if (!silent) {
       printf("LRMA(K) TEST\n");
    }
    precomputederrors = false;
@@ -81726,18 +81677,18 @@ static bool testlrma(bool issilent) {
    return result;
 }
 
-bool testfilters(bool silent) {
+bool testfilters() {
    bool waserrors;
    bool smaerrors;
    bool emaerrors;
    bool lrmaerrors;
    bool result;
-   smaerrors = testsma(true);
-   emaerrors = testema(true);
-   lrmaerrors = testlrma(true);
+   smaerrors = testsma();
+   emaerrors = testema();
+   lrmaerrors = testlrma();
 // Final report
    waserrors = smaerrors || emaerrors || lrmaerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("FILTERS TEST\n");
       printf("* SMA:                                   ");
       if (!smaerrors) {
@@ -81871,42 +81822,42 @@ static void testssaunit_testgeneral(bool *errorflag) {
          tol = 1.0E-6;
          if (hqrnduniformr(&rs) > skipprob) {
             ssaanalyzelastwindow(&state, &trend, &noise, &nticks);
-            set_error_flag(errorflag, nticks != windowwidth, __FILE__, __LINE__, "testssaunit.ap:143");
-            set_error_flag(errorflag, noise.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:144");
-            set_error_flag(errorflag, trend.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:145");
+            *errorflag = *errorflag || nticks != windowwidth;
+            *errorflag = *errorflag || noise.cnt != windowwidth;
+            *errorflag = *errorflag || trend.cnt != windowwidth;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[nlasttracklen + i - windowwidth], tol), __FILE__, __LINE__, "testssaunit.ap:150");
-               set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:151");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[nlasttracklen + i - windowwidth], tol);
+               *errorflag = *errorflag || !SmallAtR(noise.xR[i], tol);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
             ssaanalyzelast(&state, nlasttracklen, &trend, &noise);
-            set_error_flag(errorflag, noise.cnt != nlasttracklen, __FILE__, __LINE__, "testssaunit.ap:157");
-            set_error_flag(errorflag, trend.cnt != nlasttracklen, __FILE__, __LINE__, "testssaunit.ap:158");
+            *errorflag = *errorflag || noise.cnt != nlasttracklen;
+            *errorflag = *errorflag || trend.cnt != nlasttracklen;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < nlasttracklen; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:163");
-               set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:164");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[i], tol);
+               *errorflag = *errorflag || !SmallAtR(noise.xR[i], tol);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
             nticks = 1 + hqrnduniformi(&rs, 2 * windowwidth);
             ae_vector_set_length(&trend, 0);
             ssaforecastlast(&state, nticks, &trend);
-            set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:172");
+            *errorflag = *errorflag || trend.cnt != nticks;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < trend.cnt; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[nlasttracklen - 1], tol), __FILE__, __LINE__, "testssaunit.ap:176");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[nlasttracklen - 1], tol);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -81914,13 +81865,13 @@ static void testssaunit_testgeneral(bool *errorflag) {
             navg = 1 + hqrnduniformi(&rs, windowwidth + 3);
             ae_vector_set_length(&trend, 0);
             ssaforecastavglast(&state, navg, nticks, &trend);
-            set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:184");
+            *errorflag = *errorflag || trend.cnt != nticks;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < trend.cnt; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[nlasttracklen - 1], tol), __FILE__, __LINE__, "testssaunit.ap:188");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[nlasttracklen - 1], tol);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -81933,13 +81884,13 @@ static void testssaunit_testgeneral(bool *errorflag) {
             }
             ae_vector_set_length(&trend, 0);
             ssaforecastsequence(&state, &x, datalen, forecastlen, hqrndnormal(&rs) > 0.0, &trend);
-            set_error_flag(errorflag, trend.cnt != forecastlen, __FILE__, __LINE__, "testssaunit.ap:200");
+            *errorflag = *errorflag || trend.cnt != forecastlen;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < forecastlen; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[datalen - 1], tol), __FILE__, __LINE__, "testssaunit.ap:204");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[datalen - 1], tol);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -81953,13 +81904,13 @@ static void testssaunit_testgeneral(bool *errorflag) {
             }
             ae_vector_set_length(&trend, 0);
             ssaforecastavgsequence(&state, &x, datalen, navg, forecastlen, hqrndnormal(&rs) > 0.0, &trend);
-            set_error_flag(errorflag, trend.cnt != forecastlen, __FILE__, __LINE__, "testssaunit.ap:217");
+            *errorflag = *errorflag || trend.cnt != forecastlen;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < forecastlen; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[datalen - 1], tol), __FILE__, __LINE__, "testssaunit.ap:221");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[datalen - 1], tol);
             }
          }
       }
@@ -82027,11 +81978,11 @@ static void testssaunit_testgeneral(bool *errorflag) {
          if (hqrnduniformr(&rs) > skipprob) {
          // Basis vectors must be linear/constant functions
             ssagetbasis(&state, &a, &sv, &windowwidth2, &nbasis);
-            set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:293");
-            set_error_flag(errorflag, nbasis != 2, __FILE__, __LINE__, "testssaunit.ap:294");
-            set_error_flag(errorflag, a.cols != nbasis, __FILE__, __LINE__, "testssaunit.ap:295");
-            set_error_flag(errorflag, a.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:296");
-            set_error_flag(errorflag, sv.cnt != nbasis, __FILE__, __LINE__, "testssaunit.ap:297");
+            *errorflag = *errorflag || windowwidth2 != windowwidth;
+            *errorflag = *errorflag || nbasis != 2;
+            *errorflag = *errorflag || a.cols != nbasis;
+            *errorflag = *errorflag || a.rows != windowwidth;
+            *errorflag = *errorflag || sv.cnt != nbasis;
             if (*errorflag) {
                ae_frame_leave();
                return;
@@ -82039,49 +81990,49 @@ static void testssaunit_testgeneral(bool *errorflag) {
             for (j = 0; j < nbasis; j++) {
                v = a.xyR[1][j] - a.xyR[0][j];
                for (i = 2; i < windowwidth; i++) {
-                  set_error_flag(errorflag, !NearAtR(a.xyR[i][j], a.xyR[i - 1][j] + v, tol), __FILE__, __LINE__, "testssaunit.ap:304");
+                  *errorflag = *errorflag || !NearAtR(a.xyR[i][j], a.xyR[i - 1][j] + v, tol);
                }
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
             ssaanalyzelastwindow(&state, &trend, &noise, &nticks);
-            set_error_flag(errorflag, nticks != windowwidth, __FILE__, __LINE__, "testssaunit.ap:310");
-            set_error_flag(errorflag, noise.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:311");
-            set_error_flag(errorflag, trend.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:312");
+            *errorflag = *errorflag || nticks != windowwidth;
+            *errorflag = *errorflag || noise.cnt != windowwidth;
+            *errorflag = *errorflag || trend.cnt != windowwidth;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:317");
-               set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:318");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[i], tol);
+               *errorflag = *errorflag || !SmallAtR(noise.xR[i], tol);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
             ssaanalyzelast(&state, windowwidth, &trend, &noise);
-            set_error_flag(errorflag, noise.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:324");
-            set_error_flag(errorflag, trend.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:325");
+            *errorflag = *errorflag || noise.cnt != windowwidth;
+            *errorflag = *errorflag || trend.cnt != windowwidth;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:330");
-               set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:331");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[i], tol);
+               *errorflag = *errorflag || !SmallAtR(noise.xR[i], tol);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
             nticks = 1 + hqrnduniformi(&rs, 2 * windowwidth);
             ssaforecastlast(&state, nticks, &trend);
-            set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:338");
+            *errorflag = *errorflag || trend.cnt != nticks;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             v = x.xR[windowwidth - 1] - x.xR[windowwidth - 2];
-            set_error_flag(errorflag, !NearAtR(trend.xR[0], x.xR[windowwidth - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:342");
+            *errorflag = *errorflag || !NearAtR(trend.xR[0], x.xR[windowwidth - 1] + v, tol);
             for (i = 1; i < nticks; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:344");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -82089,15 +82040,15 @@ static void testssaunit_testgeneral(bool *errorflag) {
             navg = 1 + hqrnduniformi(&rs, windowwidth + 5);
             ae_vector_set_length(&trend, 0);
             ssaforecastavglast(&state, navg, nticks, &trend);
-            set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:352");
+            *errorflag = *errorflag || trend.cnt != nticks;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             v = x.xR[windowwidth - 1] - x.xR[windowwidth - 2];
-            set_error_flag(errorflag, !NearAtR(trend.xR[0], x.xR[windowwidth - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:356");
+            *errorflag = *errorflag || !NearAtR(trend.xR[0], x.xR[windowwidth - 1] + v, tol);
             for (i = 1; i < nticks; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:358");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -82111,14 +82062,14 @@ static void testssaunit_testgeneral(bool *errorflag) {
             }
             ae_vector_set_length(&trend, 0);
             ssaforecastsequence(&state, &x, datalen, forecastlen, hqrndnormal(&rs) > 0.0, &trend);
-            set_error_flag(errorflag, trend.cnt != forecastlen, __FILE__, __LINE__, "testssaunit.ap:371");
+            *errorflag = *errorflag || trend.cnt != forecastlen;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
-            set_error_flag(errorflag, !NearAtR(trend.xR[0], x.xR[datalen - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:374");
+            *errorflag = *errorflag || !NearAtR(trend.xR[0], x.xR[datalen - 1] + v, tol);
             for (i = 1; i < forecastlen; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:376");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -82133,14 +82084,14 @@ static void testssaunit_testgeneral(bool *errorflag) {
             }
             ae_vector_set_length(&trend, 0);
             ssaforecastavgsequence(&state, &x, datalen, navg, forecastlen, hqrndnormal(&rs) > 0.0, &trend);
-            set_error_flag(errorflag, trend.cnt != forecastlen, __FILE__, __LINE__, "testssaunit.ap:390");
+            *errorflag = *errorflag || trend.cnt != forecastlen;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
-            set_error_flag(errorflag, !NearAtR(trend.xR[0], x.xR[datalen - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:393");
+            *errorflag = *errorflag || !NearAtR(trend.xR[0], x.xR[datalen - 1] + v, tol);
             for (i = 1; i < forecastlen; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:395");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol);
             }
          }
       }
@@ -82190,43 +82141,43 @@ static void testssaunit_testgeneral(bool *errorflag) {
          tol = 1.0E-6;
          if (hqrnduniformr(&rs) > skipprob) {
             ssaanalyzelastwindow(&state, &trend, &noise, &nticks);
-            set_error_flag(errorflag, nticks != windowwidth, __FILE__, __LINE__, "testssaunit.ap:444");
-            set_error_flag(errorflag, noise.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:445");
-            set_error_flag(errorflag, trend.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:446");
+            *errorflag = *errorflag || nticks != windowwidth;
+            *errorflag = *errorflag || noise.cnt != windowwidth;
+            *errorflag = *errorflag || trend.cnt != windowwidth;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[nlasttracklen + i - windowwidth], tol), __FILE__, __LINE__, "testssaunit.ap:451");
-               set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:452");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[nlasttracklen + i - windowwidth], tol);
+               *errorflag = *errorflag || !SmallAtR(noise.xR[i], tol);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
             ssaanalyzelast(&state, nlasttracklen, &trend, &noise);
-            set_error_flag(errorflag, noise.cnt != nlasttracklen, __FILE__, __LINE__, "testssaunit.ap:458");
-            set_error_flag(errorflag, trend.cnt != nlasttracklen, __FILE__, __LINE__, "testssaunit.ap:459");
+            *errorflag = *errorflag || noise.cnt != nlasttracklen;
+            *errorflag = *errorflag || trend.cnt != nlasttracklen;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < nlasttracklen; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:464");
-               set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:465");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[i], tol);
+               *errorflag = *errorflag || !SmallAtR(noise.xR[i], tol);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
             nticks = 1 + hqrnduniformi(&rs, 10);
             ssaforecastlast(&state, nticks, &trend);
-            set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:472");
+            *errorflag = *errorflag || trend.cnt != nticks;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             v = x.xR[nlasttracklen - 1] - x.xR[nlasttracklen - 2];
-            set_error_flag(errorflag, !NearAtR(trend.xR[0], x.xR[nlasttracklen - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:476");
+            *errorflag = *errorflag || !NearAtR(trend.xR[0], x.xR[nlasttracklen - 1] + v, tol);
             for (i = 1; i < nticks; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol), __FILE__, __LINE__, "testssaunit.ap:478");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], trend.xR[i - 1] + v, tol);
             }
          }
       }
@@ -82297,16 +82248,16 @@ static void testssaunit_testgeneral(bool *errorflag) {
             x.xR[i] = sineamp * sin((i + sineoffs) / windowwidth * 2 * pi * sinefreq);
          }
          ssaanalyzesequence(&state, &x, nticks, &trend, &noise);
-         set_error_flag(errorflag, noise.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:558");
-         set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:559");
+         *errorflag = *errorflag || noise.cnt != nticks;
+         *errorflag = *errorflag || trend.cnt != nticks;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < nticks; i++) {
             v = sineamp * sin((i + sineoffs) / windowwidth * 2 * pi * sinefreq);
-            set_error_flag(errorflag, !NearAtR(trend.xR[i], v, tol), __FILE__, __LINE__, "testssaunit.ap:565");
-            set_error_flag(errorflag, !SmallAtR(noise.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:566");
+            *errorflag = *errorflag || !NearAtR(trend.xR[i], v, tol);
+            *errorflag = *errorflag || !SmallAtR(noise.xR[i], tol);
          }
          forecastlen = 1 + hqrnduniformi(&rs, nticks - windowwidth);
          datalen = nticks - forecastlen;
@@ -82316,20 +82267,20 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
          ssaforecastsequence(&state, &x2, datalen, forecastlen, hqrndnormal(&rs) > 0.0, &trend);
          for (i = 0; i < forecastlen; i++) {
-            set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[datalen + i], tol), __FILE__, __LINE__, "testssaunit.ap:575");
+            *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[datalen + i], tol);
          }
          ae_vector_set_length(&tmp0, 0);
          windowwidth2 = -1;
          ssagetlrr(&state, &tmp0, &windowwidth2);
-         set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:579");
-         set_error_flag(errorflag, tmp0.cnt != windowwidth - 1, __FILE__, __LINE__, "testssaunit.ap:580");
+         *errorflag = *errorflag || windowwidth2 != windowwidth;
+         *errorflag = *errorflag || tmp0.cnt != windowwidth - 1;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = windowwidth - 1; i < nticks; i++) {
             v = ae_v_dotproduct(&x.xR[i - (windowwidth - 1)], 1, tmp0.xR, 1, windowwidth - 1);
-            set_error_flag(errorflag, !NearAtR(v, x.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:586");
+            *errorflag = *errorflag || !NearAtR(v, x.xR[i], tol);
          }
          nticks = windowwidth + 1 + hqrnduniformi(&rs, windowwidth);
          sineoffs = (double)hqrnduniformi(&rs, windowwidth);
@@ -82340,16 +82291,16 @@ static void testssaunit_testgeneral(bool *errorflag) {
             x.xR[i] = sineamp * sin((i + sineoffs) / windowwidth * 2 * pi * sinefreq);
          }
          ssaanalyzesequence(&state, &x, nticks, &trend, &noise);
-         set_error_flag(errorflag, noise.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:597");
-         set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:598");
+         *errorflag = *errorflag || noise.cnt != nticks;
+         *errorflag = *errorflag || trend.cnt != nticks;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < nticks; i++) {
             v = sineamp * sin((i + sineoffs) / windowwidth * 2 * pi * sinefreq);
-            set_error_flag(errorflag, !SmallAtR(trend.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:604");
-            set_error_flag(errorflag, !NearAtR(noise.xR[i], v, tol), __FILE__, __LINE__, "testssaunit.ap:605");
+            *errorflag = *errorflag || !SmallAtR(trend.xR[i], tol);
+            *errorflag = *errorflag || !NearAtR(noise.xR[i], v, tol);
          }
          forecastlen = 1 + hqrnduniformi(&rs, nticks - windowwidth);
          datalen = nticks - forecastlen;
@@ -82359,7 +82310,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
          ssaforecastsequence(&state, &x2, datalen, forecastlen, true, &trend);
          for (i = 0; i < forecastlen; i++) {
-            set_error_flag(errorflag, !SmallAtR(trend.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:614");
+            *errorflag = *errorflag || !SmallAtR(trend.xR[i], tol);
          }
       }
    // Test appendPoint() functionality.
@@ -82447,11 +82398,11 @@ static void testssaunit_testgeneral(bool *errorflag) {
             windowwidth2 = -1;
             nbasis2 = -1;
             ssagetbasis(&state, &a, &sv, &windowwidth2, &nbasis2);
-            set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:705");
-            set_error_flag(errorflag, nbasis2 != nbasis, __FILE__, __LINE__, "testssaunit.ap:706");
-            set_error_flag(errorflag, a.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:707");
-            set_error_flag(errorflag, a.cols != nbasis, __FILE__, __LINE__, "testssaunit.ap:708");
-            set_error_flag(errorflag, sv.cnt != nbasis, __FILE__, __LINE__, "testssaunit.ap:709");
+            *errorflag = *errorflag || windowwidth2 != windowwidth;
+            *errorflag = *errorflag || nbasis2 != nbasis;
+            *errorflag = *errorflag || a.rows != windowwidth;
+            *errorflag = *errorflag || a.cols != nbasis;
+            *errorflag = *errorflag || sv.cnt != nbasis;
             if (*errorflag) {
                ae_frame_leave();
                return;
@@ -82465,11 +82416,11 @@ static void testssaunit_testgeneral(bool *errorflag) {
          windowwidth2 = -1;
          nbasis2 = -1;
          ssagetbasis(&state, &a, &sv, &windowwidth2, &nbasis2);
-         set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:720");
-         set_error_flag(errorflag, nbasis2 != nbasis, __FILE__, __LINE__, "testssaunit.ap:721");
-         set_error_flag(errorflag, a.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:722");
-         set_error_flag(errorflag, a.cols != nbasis, __FILE__, __LINE__, "testssaunit.ap:723");
-         set_error_flag(errorflag, sv.cnt != nbasis, __FILE__, __LINE__, "testssaunit.ap:724");
+         *errorflag = *errorflag || windowwidth2 != windowwidth;
+         *errorflag = *errorflag || nbasis2 != nbasis;
+         *errorflag = *errorflag || a.rows != windowwidth;
+         *errorflag = *errorflag || a.cols != nbasis;
+         *errorflag = *errorflag || sv.cnt != nbasis;
          if (*errorflag) {
             ae_frame_leave();
             return;
@@ -82496,23 +82447,23 @@ static void testssaunit_testgeneral(bool *errorflag) {
          windowwidth2 = -1;
          nbasis2 = -1;
          ssagetbasis(&state2, &a2, &sv2, &windowwidth2, &nbasis2);
-         set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:747");
-         set_error_flag(errorflag, nbasis2 != nbasis, __FILE__, __LINE__, "testssaunit.ap:748");
-         set_error_flag(errorflag, a2.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:749");
-         set_error_flag(errorflag, a2.cols != nbasis, __FILE__, __LINE__, "testssaunit.ap:750");
-         set_error_flag(errorflag, sv2.cnt != nbasis, __FILE__, __LINE__, "testssaunit.ap:751");
+         *errorflag = *errorflag || windowwidth2 != windowwidth;
+         *errorflag = *errorflag || nbasis2 != nbasis;
+         *errorflag = *errorflag || a2.rows != windowwidth;
+         *errorflag = *errorflag || a2.cols != nbasis;
+         *errorflag = *errorflag || sv2.cnt != nbasis;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
       // Compare results
          for (i = 0; i < nbasis; i++) {
-            set_error_flag(errorflag, !NearAtR(sv.xR[i], sv2.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:759");
+            *errorflag = *errorflag || !NearAtR(sv.xR[i], sv2.xR[i], tol);
          }
          for (j = 0; j < nbasis; j++) {
             v = ae_v_dotproduct(&a.xyR[0][j], a.stride, &a2.xyR[0][j], a2.stride, windowwidth);
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, !NearAtR(a.xyR[i][j], sign(v) * a2.xyR[i][j], tol), __FILE__, __LINE__, "testssaunit.ap:764");
+               *errorflag = *errorflag || !NearAtR(a.xyR[i][j], sign(v) * a2.xyR[i][j], tol);
             }
          }
       }
@@ -82598,11 +82549,11 @@ static void testssaunit_testgeneral(bool *errorflag) {
             windowwidth2 = -1;
             nbasis2 = -1;
             ssagetbasis(&state2, &a2, &sv2, &windowwidth2, &nbasis2);
-            set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:865");
-            set_error_flag(errorflag, nbasis2 != nbasis, __FILE__, __LINE__, "testssaunit.ap:866");
-            set_error_flag(errorflag, a2.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:867");
-            set_error_flag(errorflag, a2.cols != nbasis, __FILE__, __LINE__, "testssaunit.ap:868");
-            set_error_flag(errorflag, sv2.cnt != nbasis, __FILE__, __LINE__, "testssaunit.ap:869");
+            *errorflag = *errorflag || windowwidth2 != windowwidth;
+            *errorflag = *errorflag || nbasis2 != nbasis;
+            *errorflag = *errorflag || a2.rows != windowwidth;
+            *errorflag = *errorflag || a2.cols != nbasis;
+            *errorflag = *errorflag || sv2.cnt != nbasis;
             if (*errorflag) {
                ae_frame_leave();
                return;
@@ -82635,11 +82586,11 @@ static void testssaunit_testgeneral(bool *errorflag) {
          windowwidth2 = -1;
          nbasis2 = -1;
          ssagetbasis(&state, &a, &sv, &windowwidth2, &nbasis2);
-         set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:903");
-         set_error_flag(errorflag, nbasis2 != nbasis, __FILE__, __LINE__, "testssaunit.ap:904");
-         set_error_flag(errorflag, a.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:905");
-         set_error_flag(errorflag, a.cols != nbasis, __FILE__, __LINE__, "testssaunit.ap:906");
-         set_error_flag(errorflag, sv.cnt != nbasis, __FILE__, __LINE__, "testssaunit.ap:907");
+         *errorflag = *errorflag || windowwidth2 != windowwidth;
+         *errorflag = *errorflag || nbasis2 != nbasis;
+         *errorflag = *errorflag || a.rows != windowwidth;
+         *errorflag = *errorflag || a.cols != nbasis;
+         *errorflag = *errorflag || sv.cnt != nbasis;
          if (*errorflag) {
             ae_frame_leave();
             return;
@@ -82649,22 +82600,22 @@ static void testssaunit_testgeneral(bool *errorflag) {
          windowwidth2 = -1;
          nbasis2 = -1;
          ssagetbasis(&state2, &a2, &sv2, &windowwidth2, &nbasis2);
-         set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:915");
-         set_error_flag(errorflag, nbasis2 != nbasis, __FILE__, __LINE__, "testssaunit.ap:916");
-         set_error_flag(errorflag, a2.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:917");
-         set_error_flag(errorflag, a2.cols != nbasis, __FILE__, __LINE__, "testssaunit.ap:918");
-         set_error_flag(errorflag, sv2.cnt != nbasis, __FILE__, __LINE__, "testssaunit.ap:919");
+         *errorflag = *errorflag || windowwidth2 != windowwidth;
+         *errorflag = *errorflag || nbasis2 != nbasis;
+         *errorflag = *errorflag || a2.rows != windowwidth;
+         *errorflag = *errorflag || a2.cols != nbasis;
+         *errorflag = *errorflag || sv2.cnt != nbasis;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < nbasis; i++) {
-            set_error_flag(errorflag, !NearAtR(sv.xR[i], sv2.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:923");
+            *errorflag = *errorflag || !NearAtR(sv.xR[i], sv2.xR[i], tol);
          }
          for (j = 0; j < nbasis; j++) {
             v = ae_v_dotproduct(&a.xyR[0][j], a.stride, &a2.xyR[0][j], a2.stride, windowwidth);
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, !NearAtR(a.xyR[i][j], sign(v) * a2.xyR[i][j], tol), __FILE__, __LINE__, "testssaunit.ap:928");
+               *errorflag = *errorflag || !NearAtR(a.xyR[i][j], sign(v) * a2.xyR[i][j], tol);
             }
          }
       }
@@ -82722,20 +82673,20 @@ static void testssaunit_testgeneral(bool *errorflag) {
             ssaanalyzelast(&state, nticks, &trend, &noise);
             ssaanalyzelast(&state2, nticks, &trend2, &noise2);
             for (i = 0; i < nticks; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], trend2.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:1001");
-               set_error_flag(errorflag, !NearAtR(noise.xR[i], noise2.xR[i], tol), __FILE__, __LINE__, "testssaunit.ap:1002");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], trend2.xR[i], tol);
+               *errorflag = *errorflag || !NearAtR(noise.xR[i], noise2.xR[i], tol);
             }
          // Additional tests for sizes of internal arrays.
          // Implementation-dependent, may fail due to future changes in the core.
             if (mlimit >= 0) {
                k = imax2(4 * windowwidth * windowwidth, iround(pow(2.0, (double)mlimit)));
-               set_error_flag(errorflag, state.uxbatch.cols * state.uxbatch.rows > k, __FILE__, __LINE__, "testssaunit.ap:1012");
-               set_error_flag(errorflag, state.aseqtrajectory.cols * state.aseqtrajectory.rows > k, __FILE__, __LINE__, "testssaunit.ap:1013");
-               set_error_flag(errorflag, state.aseqtbproduct.cols * state.aseqtbproduct.rows > k, __FILE__, __LINE__, "testssaunit.ap:1014");
+               *errorflag = *errorflag || state.uxbatch.cols * state.uxbatch.rows > k;
+               *errorflag = *errorflag || state.aseqtrajectory.cols * state.aseqtrajectory.rows > k;
+               *errorflag = *errorflag || state.aseqtbproduct.cols * state.aseqtbproduct.rows > k;
             } else {
-               set_error_flag(errorflag, state.uxbatch.rows != nticks - windowwidth + 1, __FILE__, __LINE__, "testssaunit.ap:1018");
-               set_error_flag(errorflag, state.aseqtrajectory.rows != nticks - windowwidth + 1, __FILE__, __LINE__, "testssaunit.ap:1019");
-               set_error_flag(errorflag, state.aseqtbproduct.rows != nticks - windowwidth + 1, __FILE__, __LINE__, "testssaunit.ap:1020");
+               *errorflag = *errorflag || state.uxbatch.rows != nticks - windowwidth + 1;
+               *errorflag = *errorflag || state.aseqtrajectory.rows != nticks - windowwidth + 1;
+               *errorflag = *errorflag || state.aseqtbproduct.rows != nticks - windowwidth + 1;
             }
          }
       }
@@ -82797,11 +82748,11 @@ static void testssaunit_testgeneral(bool *errorflag) {
       windowwidth2 = -1;
       nbasis2 = -1;
       ssagetbasis(&state2, &a2, &sv2, &windowwidth2, &nbasis2);
-      set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1088");
-      set_error_flag(errorflag, nbasis2 != nbasis, __FILE__, __LINE__, "testssaunit.ap:1089");
-      set_error_flag(errorflag, a2.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1090");
-      set_error_flag(errorflag, a2.cols != nbasis, __FILE__, __LINE__, "testssaunit.ap:1091");
-      set_error_flag(errorflag, sv2.cnt != nbasis, __FILE__, __LINE__, "testssaunit.ap:1092");
+      *errorflag = *errorflag || windowwidth2 != windowwidth;
+      *errorflag = *errorflag || nbasis2 != nbasis;
+      *errorflag = *errorflag || a2.rows != windowwidth;
+      *errorflag = *errorflag || a2.cols != nbasis;
+      *errorflag = *errorflag || sv2.cnt != nbasis;
       if (*errorflag) {
          ae_frame_leave();
          return;
@@ -82828,11 +82779,11 @@ static void testssaunit_testgeneral(bool *errorflag) {
          windowwidth2 = -1;
          nbasis2 = -1;
          ssagetbasis(&state, &a, &sv, &windowwidth2, &nbasis2);
-         set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1120");
-         set_error_flag(errorflag, nbasis2 != nbasis, __FILE__, __LINE__, "testssaunit.ap:1121");
-         set_error_flag(errorflag, a.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1122");
-         set_error_flag(errorflag, a.cols != nbasis, __FILE__, __LINE__, "testssaunit.ap:1123");
-         set_error_flag(errorflag, sv.cnt != nbasis, __FILE__, __LINE__, "testssaunit.ap:1124");
+         *errorflag = *errorflag || windowwidth2 != windowwidth;
+         *errorflag = *errorflag || nbasis2 != nbasis;
+         *errorflag = *errorflag || a.rows != windowwidth;
+         *errorflag = *errorflag || a.cols != nbasis;
+         *errorflag = *errorflag || sv.cnt != nbasis;
          if (*errorflag) {
             ae_frame_leave();
             return;
@@ -82847,7 +82798,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
                vv = rmax2(vv, fabs(a.xyR[i][j] - sign(v) * a2.xyR[i][j]));
             }
          }
-         set_error_flag(errorflag, SmallR(vv, tol), __FILE__, __LINE__, "testssaunit.ap:1136");
+         *errorflag = *errorflag || SmallR(vv, tol);
       }
       for (i = x2.cnt; i < x.cnt; i++) {
          ssaappendpointandupdate(&state, x.xR[i], 1.0);
@@ -82857,11 +82808,11 @@ static void testssaunit_testgeneral(bool *errorflag) {
       windowwidth2 = -1;
       nbasis2 = -1;
       ssagetbasis(&state, &a, &sv, &windowwidth2, &nbasis2);
-      set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1145");
-      set_error_flag(errorflag, nbasis2 != nbasis, __FILE__, __LINE__, "testssaunit.ap:1146");
-      set_error_flag(errorflag, a.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1147");
-      set_error_flag(errorflag, a.cols != nbasis, __FILE__, __LINE__, "testssaunit.ap:1148");
-      set_error_flag(errorflag, sv.cnt != nbasis, __FILE__, __LINE__, "testssaunit.ap:1149");
+      *errorflag = *errorflag || windowwidth2 != windowwidth;
+      *errorflag = *errorflag || nbasis2 != nbasis;
+      *errorflag = *errorflag || a.rows != windowwidth;
+      *errorflag = *errorflag || a.cols != nbasis;
+      *errorflag = *errorflag || sv.cnt != nbasis;
       if (*errorflag) {
          ae_frame_leave();
          return;
@@ -82876,7 +82827,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
             vv = rmax2(vv, fabs(a.xyR[i][j] - sign(v) * a2.xyR[i][j]));
          }
       }
-      set_error_flag(errorflag, !SmallAtR(vv, tol), __FILE__, __LINE__, "testssaunit.ap:1161");
+      *errorflag = *errorflag || !SmallAtR(vv, tol);
    }
 // Test that SSAForecastAvgLast/Sequence() actually performs averaging.
 // We test it by comparing its results vs manually averaged predictions.
@@ -82909,7 +82860,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
       }
       for (i = 0; i < forecastlen; i++) {
-         set_error_flag(errorflag, !NearAtR(trend.xR[i], trend2.xR[i], tol * rmax3(fabs(trend.xR[i]), fabs(trend2.xR[i]), 1.0)), __FILE__, __LINE__, "testssaunit.ap:1198");
+         *errorflag = *errorflag || !NearAtR(trend.xR[i], trend2.xR[i], tol * rmax3(fabs(trend.xR[i]), fabs(trend2.xR[i]), 1.0));
       }
       nticks = 75 + hqrnduniformi(&rs, 75);
       j = hqrnduniformi(&rs, 150) - 75;
@@ -82929,7 +82880,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
       }
       for (i = 0; i < forecastlen; i++) {
-         set_error_flag(errorflag, !NearAtR(trend.xR[i], trend2.xR[i], tol * rmax3(fabs(trend.xR[i]), fabs(trend2.xR[i]), 1.0)), __FILE__, __LINE__, "testssaunit.ap:1217");
+         *errorflag = *errorflag || !NearAtR(trend.xR[i], trend2.xR[i], tol * rmax3(fabs(trend.xR[i]), fabs(trend2.xR[i]), 1.0));
       }
       nticks = 75 + hqrnduniformi(&rs, 75);
       j = hqrnduniformi(&rs, 150) - 75;
@@ -82949,7 +82900,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          }
       }
       for (i = 0; i < forecastlen; i++) {
-         set_error_flag(errorflag, !NearAtR(trend.xR[i], trend2.xR[i], tol * rmax3(fabs(trend.xR[i]), fabs(trend2.xR[i]), 1.0)), __FILE__, __LINE__, "testssaunit.ap:1236");
+         *errorflag = *errorflag || !NearAtR(trend.xR[i], trend2.xR[i], tol * rmax3(fabs(trend.xR[i]), fabs(trend2.xR[i]), 1.0));
       }
    }
    ae_frame_leave();
@@ -83013,18 +82964,18 @@ static void testssaunit_testspecial(bool *errorflag) {
       ssacreate(&state);
       if (hqrnduniformr(&rs) > skipprob) {
          ssagetbasis(&state, &a, &sv, &windowwidth, &nbasis);
-         set_error_flag(errorflag, windowwidth != 1, __FILE__, __LINE__, "testssaunit.ap:1299");
-         set_error_flag(errorflag, nbasis != 1, __FILE__, __LINE__, "testssaunit.ap:1300");
-         set_error_flag(errorflag, a.rows != 1, __FILE__, __LINE__, "testssaunit.ap:1301");
-         set_error_flag(errorflag, a.cols != 1, __FILE__, __LINE__, "testssaunit.ap:1302");
-         set_error_flag(errorflag, sv.cnt != 1, __FILE__, __LINE__, "testssaunit.ap:1303");
+         *errorflag = *errorflag || windowwidth != 1;
+         *errorflag = *errorflag || nbasis != 1;
+         *errorflag = *errorflag || a.rows != 1;
+         *errorflag = *errorflag || a.cols != 1;
+         *errorflag = *errorflag || sv.cnt != 1;
          for (i = 0; i < a.rows; i++) {
             for (j = 0; j < a.cols; j++) {
-               set_error_flag(errorflag, a.xyR[i][j] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1306");
+               *errorflag = *errorflag || a.xyR[i][j] != 0.0;
             }
          }
          for (i = 0; i < sv.cnt; i++) {
-            set_error_flag(errorflag, sv.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1308");
+            *errorflag = *errorflag || sv.xR[i] != 0.0;
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
@@ -83032,24 +82983,24 @@ static void testssaunit_testspecial(bool *errorflag) {
          ae_vector_set_length(&trend, 0);
          ae_vector_set_length(&noise, 0);
          ssaanalyzelastwindow(&state, &trend, &noise, &windowwidth);
-         set_error_flag(errorflag, windowwidth != 1, __FILE__, __LINE__, "testssaunit.ap:1316");
-         set_error_flag(errorflag, trend.cnt != 1 || trend.xR[0] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1317");
-         set_error_flag(errorflag, noise.cnt != 1 || noise.xR[0] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1318");
+         *errorflag = *errorflag || windowwidth != 1;
+         *errorflag = *errorflag || trend.cnt != 1 || trend.xR[0] != 0.0;
+         *errorflag = *errorflag || noise.cnt != 1 || noise.xR[0] != 0.0;
       }
       if (hqrnduniformr(&rs) > skipprob) {
          nticks = 1 + hqrnduniformi(&rs, 10);
          ae_vector_set_length(&trend, 0);
          ae_vector_set_length(&noise, 0);
          ssaanalyzelast(&state, nticks, &trend, &noise);
-         set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1326");
-         set_error_flag(errorflag, noise.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1327");
+         *errorflag = *errorflag || trend.cnt != nticks;
+         *errorflag = *errorflag || noise.cnt != nticks;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < nticks; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1332");
-            set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1333");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
+            *errorflag = *errorflag || noise.xR[i] != 0.0;
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
@@ -83061,28 +83012,28 @@ static void testssaunit_testspecial(bool *errorflag) {
          ae_vector_set_length(&trend, 0);
          ae_vector_set_length(&noise, 0);
          ssaanalyzesequence(&state, &x, nticks, &trend, &noise);
-         set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1345");
-         set_error_flag(errorflag, noise.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1346");
+         *errorflag = *errorflag || trend.cnt != nticks;
+         *errorflag = *errorflag || noise.cnt != nticks;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < nticks; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1351");
-            set_error_flag(errorflag, noise.xR[i] != x.xR[i], __FILE__, __LINE__, "testssaunit.ap:1352");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
+            *errorflag = *errorflag || noise.xR[i] != x.xR[i];
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
          nticks = 1 + hqrnduniformi(&rs, 10);
          ae_vector_set_length(&trend, 0);
          ssaforecastlast(&state, nticks, &trend);
-         set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1360");
+         *errorflag = *errorflag || trend.cnt != nticks;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < nticks; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1364");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
@@ -83094,13 +83045,13 @@ static void testssaunit_testspecial(bool *errorflag) {
          }
          ae_vector_set_length(&trend, 0);
          ssaforecastsequence(&state, &x, datalen, forecastlen, hqrndnormal(&rs) > 0.0, &trend);
-         set_error_flag(errorflag, trend.cnt != forecastlen, __FILE__, __LINE__, "testssaunit.ap:1375");
+         *errorflag = *errorflag || trend.cnt != forecastlen;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < forecastlen; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1379");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
          }
       }
    }
@@ -83118,18 +83069,18 @@ static void testssaunit_testspecial(bool *errorflag) {
       ssasetwindow(&state, windowwidth2);
       if (hqrnduniformr(&rs) > skipprob) {
          ssagetbasis(&state, &a, &sv, &windowwidth, &nbasis);
-         set_error_flag(errorflag, windowwidth != windowwidth2, __FILE__, __LINE__, "testssaunit.ap:1401");
-         set_error_flag(errorflag, nbasis != 1, __FILE__, __LINE__, "testssaunit.ap:1402");
-         set_error_flag(errorflag, a.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1403");
-         set_error_flag(errorflag, a.cols != 1, __FILE__, __LINE__, "testssaunit.ap:1404");
-         set_error_flag(errorflag, sv.cnt != 1, __FILE__, __LINE__, "testssaunit.ap:1405");
+         *errorflag = *errorflag || windowwidth != windowwidth2;
+         *errorflag = *errorflag || nbasis != 1;
+         *errorflag = *errorflag || a.rows != windowwidth;
+         *errorflag = *errorflag || a.cols != 1;
+         *errorflag = *errorflag || sv.cnt != 1;
          for (i = 0; i < a.rows; i++) {
             for (j = 0; j < a.cols; j++) {
-               set_error_flag(errorflag, a.xyR[i][j] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1408");
+               *errorflag = *errorflag || a.xyR[i][j] != 0.0;
             }
          }
          for (i = 0; i < sv.cnt; i++) {
-            set_error_flag(errorflag, sv.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1410");
+            *errorflag = *errorflag || sv.xR[i] != 0.0;
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
@@ -83137,14 +83088,14 @@ static void testssaunit_testspecial(bool *errorflag) {
          ae_vector_set_length(&trend, 0);
          ae_vector_set_length(&noise, 0);
          ssaanalyzelastwindow(&state, &trend, &noise, &windowwidth);
-         set_error_flag(errorflag, windowwidth != windowwidth2, __FILE__, __LINE__, "testssaunit.ap:1418");
-         set_error_flag(errorflag, trend.cnt != windowwidth2, __FILE__, __LINE__, "testssaunit.ap:1419");
-         set_error_flag(errorflag, noise.cnt != windowwidth2, __FILE__, __LINE__, "testssaunit.ap:1420");
+         *errorflag = *errorflag || windowwidth != windowwidth2;
+         *errorflag = *errorflag || trend.cnt != windowwidth2;
+         *errorflag = *errorflag || noise.cnt != windowwidth2;
          for (i = 0; i < trend.cnt; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1422");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
          }
          for (i = 0; i < noise.cnt; i++) {
-            set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1424");
+            *errorflag = *errorflag || noise.xR[i] != 0.0;
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
@@ -83152,15 +83103,15 @@ static void testssaunit_testspecial(bool *errorflag) {
          ae_vector_set_length(&trend, 0);
          ae_vector_set_length(&noise, 0);
          ssaanalyzelast(&state, nticks, &trend, &noise);
-         set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1432");
-         set_error_flag(errorflag, noise.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1433");
+         *errorflag = *errorflag || trend.cnt != nticks;
+         *errorflag = *errorflag || noise.cnt != nticks;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < nticks; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1438");
-            set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1439");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
+            *errorflag = *errorflag || noise.xR[i] != 0.0;
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
@@ -83172,28 +83123,28 @@ static void testssaunit_testspecial(bool *errorflag) {
          ae_vector_set_length(&trend, 0);
          ae_vector_set_length(&noise, 0);
          ssaanalyzesequence(&state, &x, nticks, &trend, &noise);
-         set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1451");
-         set_error_flag(errorflag, noise.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1452");
+         *errorflag = *errorflag || trend.cnt != nticks;
+         *errorflag = *errorflag || noise.cnt != nticks;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < nticks; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1457");
-            set_error_flag(errorflag, noise.xR[i] != x.xR[i], __FILE__, __LINE__, "testssaunit.ap:1458");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
+            *errorflag = *errorflag || noise.xR[i] != x.xR[i];
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
          nticks = 1 + hqrnduniformi(&rs, 10);
          ae_vector_set_length(&trend, 0);
          ssaforecastlast(&state, nticks, &trend);
-         set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1466");
+         *errorflag = *errorflag || trend.cnt != nticks;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < nticks; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1470");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
@@ -83205,13 +83156,13 @@ static void testssaunit_testspecial(bool *errorflag) {
          }
          ae_vector_set_length(&trend, 0);
          ssaforecastsequence(&state, &x, datalen, forecastlen, hqrndnormal(&rs) > 0.0, &trend);
-         set_error_flag(errorflag, trend.cnt != forecastlen, __FILE__, __LINE__, "testssaunit.ap:1481");
+         *errorflag = *errorflag || trend.cnt != forecastlen;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < forecastlen; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1485");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
          }
       }
    }
@@ -83247,18 +83198,18 @@ static void testssaunit_testspecial(bool *errorflag) {
    // Test
       if (hqrnduniformr(&rs) > skipprob) {
          ssagetbasis(&state, &a, &sv, &windowwidth, &nbasis);
-         set_error_flag(errorflag, windowwidth != windowwidth2, __FILE__, __LINE__, "testssaunit.ap:1532");
-         set_error_flag(errorflag, nbasis != 1, __FILE__, __LINE__, "testssaunit.ap:1533");
-         set_error_flag(errorflag, a.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1534");
-         set_error_flag(errorflag, a.cols != 1, __FILE__, __LINE__, "testssaunit.ap:1535");
-         set_error_flag(errorflag, sv.cnt != 1, __FILE__, __LINE__, "testssaunit.ap:1536");
+         *errorflag = *errorflag || windowwidth != windowwidth2;
+         *errorflag = *errorflag || nbasis != 1;
+         *errorflag = *errorflag || a.rows != windowwidth;
+         *errorflag = *errorflag || a.cols != 1;
+         *errorflag = *errorflag || sv.cnt != 1;
          for (i = 0; i < a.rows; i++) {
             for (j = 0; j < a.cols; j++) {
-               set_error_flag(errorflag, a.xyR[i][j] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1539");
+               *errorflag = *errorflag || a.xyR[i][j] != 0.0;
             }
          }
          for (i = 0; i < sv.cnt; i++) {
-            set_error_flag(errorflag, sv.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1541");
+            *errorflag = *errorflag || sv.xR[i] != 0.0;
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
@@ -83266,21 +83217,21 @@ static void testssaunit_testspecial(bool *errorflag) {
          ae_vector_set_length(&trend, 0);
          ae_vector_set_length(&noise, 0);
          ssaanalyzelastwindow(&state, &trend, &noise, &windowwidth);
-         set_error_flag(errorflag, windowwidth != windowwidth2, __FILE__, __LINE__, "testssaunit.ap:1549");
-         set_error_flag(errorflag, trend.cnt != windowwidth2, __FILE__, __LINE__, "testssaunit.ap:1550");
-         set_error_flag(errorflag, noise.cnt != windowwidth2, __FILE__, __LINE__, "testssaunit.ap:1551");
+         *errorflag = *errorflag || windowwidth != windowwidth2;
+         *errorflag = *errorflag || trend.cnt != windowwidth2;
+         *errorflag = *errorflag || noise.cnt != windowwidth2;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < windowwidth; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1555");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
          }
          for (i = 0; i < imax2(windowwidth - nlasttracklen, 0); i++) {
-            set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1557");
+            *errorflag = *errorflag || noise.xR[i] != 0.0;
          }
          for (i = imax2(windowwidth - nlasttracklen, 0); i < windowwidth; i++) {
-            set_error_flag(errorflag, noise.xR[i] != x.xR[nlasttracklen + (i - windowwidth)], __FILE__, __LINE__, "testssaunit.ap:1559");
+            *errorflag = *errorflag || noise.xR[i] != x.xR[nlasttracklen + (i - windowwidth)];
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
@@ -83288,20 +83239,20 @@ static void testssaunit_testspecial(bool *errorflag) {
          ae_vector_set_length(&trend, 0);
          ae_vector_set_length(&noise, 0);
          ssaanalyzelast(&state, nanalyzed, &trend, &noise);
-         set_error_flag(errorflag, trend.cnt != nanalyzed, __FILE__, __LINE__, "testssaunit.ap:1567");
-         set_error_flag(errorflag, noise.cnt != nanalyzed, __FILE__, __LINE__, "testssaunit.ap:1568");
+         *errorflag = *errorflag || trend.cnt != nanalyzed;
+         *errorflag = *errorflag || noise.cnt != nanalyzed;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < nanalyzed; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1572");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
          }
          for (i = 0; i < imax2(nanalyzed - nlasttracklen, 0); i++) {
-            set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1574");
+            *errorflag = *errorflag || noise.xR[i] != 0.0;
          }
          for (i = imax2(nanalyzed - nlasttracklen, 0); i < nanalyzed; i++) {
-            set_error_flag(errorflag, noise.xR[i] != x.xR[nlasttracklen + (i - nanalyzed)], __FILE__, __LINE__, "testssaunit.ap:1576");
+            *errorflag = *errorflag || noise.xR[i] != x.xR[nlasttracklen + (i - nanalyzed)];
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
@@ -83313,28 +83264,28 @@ static void testssaunit_testspecial(bool *errorflag) {
          ae_vector_set_length(&trend, 0);
          ae_vector_set_length(&noise, 0);
          ssaanalyzesequence(&state, &x, nticks, &trend, &noise);
-         set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1587");
-         set_error_flag(errorflag, noise.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1588");
+         *errorflag = *errorflag || trend.cnt != nticks;
+         *errorflag = *errorflag || noise.cnt != nticks;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < nticks; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1593");
-            set_error_flag(errorflag, noise.xR[i] != x.xR[i], __FILE__, __LINE__, "testssaunit.ap:1594");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
+            *errorflag = *errorflag || noise.xR[i] != x.xR[i];
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
          nticks = 1 + hqrnduniformi(&rs, 10);
          ae_vector_set_length(&trend, 0);
          ssaforecastlast(&state, nticks, &trend);
-         set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1602");
+         *errorflag = *errorflag || trend.cnt != nticks;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < nticks; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1606");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
          }
       }
       if (hqrnduniformr(&rs) > skipprob) {
@@ -83346,13 +83297,13 @@ static void testssaunit_testspecial(bool *errorflag) {
          }
          ae_vector_set_length(&trend, 0);
          ssaforecastsequence(&state, &x, datalen, forecastlen, hqrndnormal(&rs) > 0.0, &trend);
-         set_error_flag(errorflag, trend.cnt != forecastlen, __FILE__, __LINE__, "testssaunit.ap:1617");
+         *errorflag = *errorflag || trend.cnt != forecastlen;
          if (*errorflag) {
             ae_frame_leave();
             return;
          }
          for (i = 0; i < forecastlen; i++) {
-            set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1621");
+            *errorflag = *errorflag || trend.xR[i] != 0.0;
          }
       }
    }
@@ -83395,8 +83346,8 @@ static void testssaunit_testspecial(bool *errorflag) {
          ssaanalyzelast(&state, x.cnt, &trend, &noise);
          ssaanalyzelast(&state2, x.cnt, &trend2, &noise2);
          for (i = 0; i < x.cnt; i++) {
-            set_error_flag(errorflag, !NearAtR(trend.xR[i], trend2.xR[i], 1.0E-5), __FILE__, __LINE__, "testssaunit.ap:1675");
-            set_error_flag(errorflag, !NearAtR(noise.xR[i], noise2.xR[i], 1.0E-5), __FILE__, __LINE__, "testssaunit.ap:1676");
+            *errorflag = *errorflag || !NearAtR(trend.xR[i], trend2.xR[i], 1.0E-5);
+            *errorflag = *errorflag || !NearAtR(noise.xR[i], noise2.xR[i], 1.0E-5);
          }
       }
    // Test that for model with some algo being set, one/few tracks and unit window length:
@@ -83447,46 +83398,46 @@ static void testssaunit_testspecial(bool *errorflag) {
       // Test
          if (hqrnduniformr(&rs) > skipprob) {
             ssagetbasis(&state, &a, &sv, &windowwidth, &nbasis);
-            set_error_flag(errorflag, windowwidth != 1, __FILE__, __LINE__, "testssaunit.ap:1736");
-            set_error_flag(errorflag, nbasis != 1, __FILE__, __LINE__, "testssaunit.ap:1737");
-            set_error_flag(errorflag, a.rows != 1, __FILE__, __LINE__, "testssaunit.ap:1738");
-            set_error_flag(errorflag, a.cols != 1, __FILE__, __LINE__, "testssaunit.ap:1739");
-            set_error_flag(errorflag, sv.cnt != 1, __FILE__, __LINE__, "testssaunit.ap:1740");
-            set_error_flag(errorflag, !NearAtR(fabs(a.xyR[0][0]), 1.0, 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1741");
+            *errorflag = *errorflag || windowwidth != 1;
+            *errorflag = *errorflag || nbasis != 1;
+            *errorflag = *errorflag || a.rows != 1;
+            *errorflag = *errorflag || a.cols != 1;
+            *errorflag = *errorflag || sv.cnt != 1;
+            *errorflag = *errorflag || !NearAtR(fabs(a.xyR[0][0]), 1.0, 100.0 * machineepsilon);
          }
          if (hqrnduniformr(&rs) > skipprob) {
             windowwidth = -1;
             ae_vector_set_length(&trend, 0);
             ae_vector_set_length(&noise, 0);
             ssaanalyzelastwindow(&state, &trend, &noise, &windowwidth);
-            set_error_flag(errorflag, windowwidth != 1, __FILE__, __LINE__, "testssaunit.ap:1749");
-            set_error_flag(errorflag, trend.cnt != 1, __FILE__, __LINE__, "testssaunit.ap:1750");
-            set_error_flag(errorflag, noise.cnt != 1, __FILE__, __LINE__, "testssaunit.ap:1751");
+            *errorflag = *errorflag || windowwidth != 1;
+            *errorflag = *errorflag || trend.cnt != 1;
+            *errorflag = *errorflag || noise.cnt != 1;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
-            set_error_flag(errorflag, !NearAtR(trend.xR[0], x.xR[nlasttracklen - 1], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1754");
-            set_error_flag(errorflag, !SmallAtR(noise.xR[0], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1755");
+            *errorflag = *errorflag || !NearAtR(trend.xR[0], x.xR[nlasttracklen - 1], 100.0 * machineepsilon);
+            *errorflag = *errorflag || !SmallAtR(noise.xR[0], 100.0 * machineepsilon);
          }
          if (hqrnduniformr(&rs) > skipprob) {
             nanalyzed = 1 + hqrnduniformi(&rs, 10);
             ae_vector_set_length(&trend, 0);
             ae_vector_set_length(&noise, 0);
             ssaanalyzelast(&state, nanalyzed, &trend, &noise);
-            set_error_flag(errorflag, trend.cnt != nanalyzed, __FILE__, __LINE__, "testssaunit.ap:1763");
-            set_error_flag(errorflag, noise.cnt != nanalyzed, __FILE__, __LINE__, "testssaunit.ap:1764");
+            *errorflag = *errorflag || trend.cnt != nanalyzed;
+            *errorflag = *errorflag || noise.cnt != nanalyzed;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < imax2(nanalyzed - nlasttracklen, 0); i++) {
-               set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1769");
-               set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1770");
+               *errorflag = *errorflag || trend.xR[i] != 0.0;
+               *errorflag = *errorflag || noise.xR[i] != 0.0;
             }
             for (i = imax2(nanalyzed - nlasttracklen, 0); i < nanalyzed; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i - nanalyzed + nlasttracklen], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1774");
-               set_error_flag(errorflag, !SmallAtR(noise.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1775");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[i - nanalyzed + nlasttracklen], 100.0 * machineepsilon);
+               *errorflag = *errorflag || !SmallAtR(noise.xR[i], 100.0 * machineepsilon);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83498,28 +83449,28 @@ static void testssaunit_testspecial(bool *errorflag) {
             ae_vector_set_length(&trend, 0);
             ae_vector_set_length(&noise, 0);
             ssaanalyzesequence(&state, &x2, nticks, &trend, &noise);
-            set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1787");
-            set_error_flag(errorflag, noise.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1788");
+            *errorflag = *errorflag || trend.cnt != nticks;
+            *errorflag = *errorflag || noise.cnt != nticks;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < nticks; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x2.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1793");
-               set_error_flag(errorflag, !SmallAtR(noise.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1794");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x2.xR[i], 100.0 * machineepsilon);
+               *errorflag = *errorflag || !SmallAtR(noise.xR[i], 100.0 * machineepsilon);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
             nticks = 1 + hqrnduniformi(&rs, 10);
             ae_vector_set_length(&trend, 0);
             ssaforecastlast(&state, nticks, &trend);
-            set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1802");
+            *errorflag = *errorflag || trend.cnt != nticks;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < nticks; i++) {
-               set_error_flag(errorflag, trend.xR[i] != x.xR[nlasttracklen - 1], __FILE__, __LINE__, "testssaunit.ap:1806");
+               *errorflag = *errorflag || trend.xR[i] != x.xR[nlasttracklen - 1];
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83531,13 +83482,13 @@ static void testssaunit_testspecial(bool *errorflag) {
             }
             ae_vector_set_length(&trend, 0);
             ssaforecastsequence(&state, &x, datalen, forecastlen, hqrndnormal(&rs) > 0.0, &trend);
-            set_error_flag(errorflag, trend.cnt != forecastlen, __FILE__, __LINE__, "testssaunit.ap:1817");
+            *errorflag = *errorflag || trend.cnt != forecastlen;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < forecastlen; i++) {
-               set_error_flag(errorflag, trend.xR[i] != x.xR[datalen - 1], __FILE__, __LINE__, "testssaunit.ap:1821");
+               *errorflag = *errorflag || trend.xR[i] != x.xR[datalen - 1];
             }
          }
       }
@@ -83595,18 +83546,18 @@ static void testssaunit_testspecial(bool *errorflag) {
       // Test
          if (hqrnduniformr(&rs) > skipprob) {
             ssagetbasis(&state, &a, &sv, &windowwidth2, &nbasis);
-            set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1888");
-            set_error_flag(errorflag, nbasis != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1889");
-            set_error_flag(errorflag, a.rows != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1890");
-            set_error_flag(errorflag, a.cols != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1891");
-            set_error_flag(errorflag, sv.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1892");
+            *errorflag = *errorflag || windowwidth2 != windowwidth;
+            *errorflag = *errorflag || nbasis != windowwidth;
+            *errorflag = *errorflag || a.rows != windowwidth;
+            *errorflag = *errorflag || a.cols != windowwidth;
+            *errorflag = *errorflag || sv.cnt != windowwidth;
             for (i = 0; i < windowwidth; i++) {
                for (j = 0; j < windowwidth; j++) {
                   v = ae_v_dotproduct(a.xyR[i], 1, a.xyR[j], 1, windowwidth);
                   if (i == j) {
                      v--;
                   }
-                  set_error_flag(errorflag, !SmallAtR(v, 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1899");
+                  *errorflag = *errorflag || !SmallAtR(v, 100.0 * machineepsilon);
                }
             }
          }
@@ -83615,16 +83566,16 @@ static void testssaunit_testspecial(bool *errorflag) {
             ae_vector_set_length(&trend, 0);
             ae_vector_set_length(&noise, 0);
             ssaanalyzelastwindow(&state, &trend, &noise, &windowwidth2);
-            set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1908");
-            set_error_flag(errorflag, trend.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1909");
-            set_error_flag(errorflag, noise.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:1910");
+            *errorflag = *errorflag || windowwidth2 != windowwidth;
+            *errorflag = *errorflag || trend.cnt != windowwidth;
+            *errorflag = *errorflag || noise.cnt != windowwidth;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i - windowwidth + nlasttracklen], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1915");
-               set_error_flag(errorflag, !SmallAtR(noise.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1916");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[i - windowwidth + nlasttracklen], 100.0 * machineepsilon);
+               *errorflag = *errorflag || !SmallAtR(noise.xR[i], 100.0 * machineepsilon);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83632,19 +83583,19 @@ static void testssaunit_testspecial(bool *errorflag) {
             ae_vector_set_length(&trend, 0);
             ae_vector_set_length(&noise, 0);
             ssaanalyzelast(&state, nanalyzed, &trend, &noise);
-            set_error_flag(errorflag, trend.cnt != nanalyzed, __FILE__, __LINE__, "testssaunit.ap:1925");
-            set_error_flag(errorflag, noise.cnt != nanalyzed, __FILE__, __LINE__, "testssaunit.ap:1926");
+            *errorflag = *errorflag || trend.cnt != nanalyzed;
+            *errorflag = *errorflag || noise.cnt != nanalyzed;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < imax2(nanalyzed - nlasttracklen, 0); i++) {
-               set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1931");
-               set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1932");
+               *errorflag = *errorflag || trend.xR[i] != 0.0;
+               *errorflag = *errorflag || noise.xR[i] != 0.0;
             }
             for (i = imax2(nanalyzed - nlasttracklen, 0); i < nanalyzed; i++) {
-               set_error_flag(errorflag, !NearAtR(trend.xR[i], x.xR[i - nanalyzed + nlasttracklen], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1936");
-               set_error_flag(errorflag, !SmallAtR(noise.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1937");
+               *errorflag = *errorflag || !NearAtR(trend.xR[i], x.xR[i - nanalyzed + nlasttracklen], 100.0 * machineepsilon);
+               *errorflag = *errorflag || !SmallAtR(noise.xR[i], 100.0 * machineepsilon);
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83656,19 +83607,19 @@ static void testssaunit_testspecial(bool *errorflag) {
             ae_vector_set_length(&trend, 0);
             ae_vector_set_length(&noise, 0);
             ssaanalyzesequence(&state, &x2, nticks, &trend, &noise);
-            set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1949");
-            set_error_flag(errorflag, noise.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1950");
+            *errorflag = *errorflag || trend.cnt != nticks;
+            *errorflag = *errorflag || noise.cnt != nticks;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < nticks; i++) {
                if (nticks >= windowwidth) {
-                  set_error_flag(errorflag, !NearAtR(trend.xR[i], x2.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1957");
-                  set_error_flag(errorflag, !SmallAtR(noise.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1958");
+                  *errorflag = *errorflag || !NearAtR(trend.xR[i], x2.xR[i], 100.0 * machineepsilon);
+                  *errorflag = *errorflag || !SmallAtR(noise.xR[i], 100.0 * machineepsilon);
                } else {
-                  set_error_flag(errorflag, !SmallAtR(trend.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1962");
-                  set_error_flag(errorflag, !NearAtR(noise.xR[i], x2.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testssaunit.ap:1963");
+                  *errorflag = *errorflag || !SmallAtR(trend.xR[i], 100.0 * machineepsilon);
+                  *errorflag = *errorflag || !NearAtR(noise.xR[i], x2.xR[i], 100.0 * machineepsilon);
                }
             }
          }
@@ -83676,13 +83627,13 @@ static void testssaunit_testspecial(bool *errorflag) {
             nticks = 1 + hqrnduniformi(&rs, 10);
             ae_vector_set_length(&trend, 0);
             ssaforecastlast(&state, nticks, &trend);
-            set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:1972");
+            *errorflag = *errorflag || trend.cnt != nticks;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < nticks; i++) {
-               set_error_flag(errorflag, trend.xR[i] != x.xR[nlasttracklen - 1], __FILE__, __LINE__, "testssaunit.ap:1976");
+               *errorflag = *errorflag || trend.xR[i] != x.xR[nlasttracklen - 1];
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
@@ -83695,13 +83646,13 @@ static void testssaunit_testspecial(bool *errorflag) {
                }
                ae_vector_set_length(&trend, 0);
                ssaforecastsequence(&state, &x, datalen, forecastlen, hqrndnormal(&rs) > 0.0, &trend);
-               set_error_flag(errorflag, trend.cnt != forecastlen, __FILE__, __LINE__, "testssaunit.ap:1990");
+               *errorflag = *errorflag || trend.cnt != forecastlen;
                if (*errorflag) {
                   ae_frame_leave();
                   return;
                }
                for (i = 0; i < forecastlen; i++) {
-                  set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:1994");
+                  *errorflag = *errorflag || trend.xR[i] != 0.0;
                }
             }
             datalen = windowwidth + hqrnduniformi(&rs, windowwidth);
@@ -83712,13 +83663,13 @@ static void testssaunit_testspecial(bool *errorflag) {
             }
             ae_vector_set_length(&trend, 0);
             ssaforecastsequence(&state, &x, datalen, forecastlen, hqrndnormal(&rs) > 0.0, &trend);
-            set_error_flag(errorflag, trend.cnt != forecastlen, __FILE__, __LINE__, "testssaunit.ap:2005");
+            *errorflag = *errorflag || trend.cnt != forecastlen;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < forecastlen; i++) {
-               set_error_flag(errorflag, trend.xR[i] != x.xR[datalen - 1], __FILE__, __LINE__, "testssaunit.ap:2009");
+               *errorflag = *errorflag || trend.xR[i] != x.xR[datalen - 1];
             }
          }
       }
@@ -83781,20 +83732,20 @@ static void testssaunit_testspecial(bool *errorflag) {
             ae_vector_set_length(&trend, 0);
             ae_vector_set_length(&noise, 0);
             ssaanalyzelastwindow(&state, &trend, &noise, &windowwidth2);
-            set_error_flag(errorflag, windowwidth2 != windowwidth, __FILE__, __LINE__, "testssaunit.ap:2078");
-            set_error_flag(errorflag, trend.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:2079");
-            set_error_flag(errorflag, noise.cnt != windowwidth, __FILE__, __LINE__, "testssaunit.ap:2080");
+            *errorflag = *errorflag || windowwidth2 != windowwidth;
+            *errorflag = *errorflag || trend.cnt != windowwidth;
+            *errorflag = *errorflag || noise.cnt != windowwidth;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < windowwidth; i++) {
-               set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:2085");
+               *errorflag = *errorflag || trend.xR[i] != 0.0;
                j = nlasttracklen + (i - windowwidth);
                if (j >= 0) {
-                  set_error_flag(errorflag, noise.xR[i] != x.xR[j], __FILE__, __LINE__, "testssaunit.ap:2088");
+                  *errorflag = *errorflag || noise.xR[i] != x.xR[j];
                } else {
-                  set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:2090");
+                  *errorflag = *errorflag || noise.xR[i] != 0.0;
                }
             }
          }
@@ -83803,32 +83754,32 @@ static void testssaunit_testspecial(bool *errorflag) {
             ae_vector_set_length(&trend, 0);
             ae_vector_set_length(&noise, 0);
             ssaanalyzelast(&state, nanalyzed, &trend, &noise);
-            set_error_flag(errorflag, trend.cnt != nanalyzed, __FILE__, __LINE__, "testssaunit.ap:2099");
-            set_error_flag(errorflag, noise.cnt != nanalyzed, __FILE__, __LINE__, "testssaunit.ap:2100");
+            *errorflag = *errorflag || trend.cnt != nanalyzed;
+            *errorflag = *errorflag || noise.cnt != nanalyzed;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < imax2(nanalyzed - nlasttracklen, 0); i++) {
-               set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:2105");
-               set_error_flag(errorflag, noise.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:2106");
+               *errorflag = *errorflag || trend.xR[i] != 0.0;
+               *errorflag = *errorflag || noise.xR[i] != 0.0;
             }
             for (i = imax2(nanalyzed - nlasttracklen, 0); i < nanalyzed; i++) {
-               set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:2110");
-               set_error_flag(errorflag, noise.xR[i] != x.xR[nlasttracklen + (i - nanalyzed)], __FILE__, __LINE__, "testssaunit.ap:2111");
+               *errorflag = *errorflag || trend.xR[i] != 0.0;
+               *errorflag = *errorflag || noise.xR[i] != x.xR[nlasttracklen + (i - nanalyzed)];
             }
          }
          if (hqrnduniformr(&rs) > skipprob) {
             nticks = 1 + hqrnduniformi(&rs, 10);
             ae_vector_set_length(&trend, 0);
             ssaforecastlast(&state, nticks, &trend);
-            set_error_flag(errorflag, trend.cnt != nticks, __FILE__, __LINE__, "testssaunit.ap:2119");
+            *errorflag = *errorflag || trend.cnt != nticks;
             if (*errorflag) {
                ae_frame_leave();
                return;
             }
             for (i = 0; i < nticks; i++) {
-               set_error_flag(errorflag, trend.xR[i] != 0.0, __FILE__, __LINE__, "testssaunit.ap:2123");
+               *errorflag = *errorflag || trend.xR[i] != 0.0;
             }
          }
       }
@@ -83836,7 +83787,7 @@ static void testssaunit_testspecial(bool *errorflag) {
    ae_frame_leave();
 }
 
-bool testssa(bool silent) {
+bool testssa() {
    bool specerrors;
    bool generrors;
    bool wereerrors;
@@ -83847,7 +83798,7 @@ bool testssa(bool silent) {
    testssaunit_testgeneral(&generrors);
 // Final report
    wereerrors = specerrors || generrors;
-   if (!silent) {
+   if (wereerrors || !silent) {
       printf("SSA TEST\n");
       printf("* GENERAL TEST SUITE                     ");
       if (!generrors) {
@@ -84117,7 +84068,7 @@ static bool testldaunit_testwn(RMatrix *xy, RMatrix *wn, ae_int_t ns, ae_int_t n
    return result;
 }
 
-bool testlda(bool silent) {
+bool testlda() {
    ae_frame _frame_block;
    ae_int_t maxnf;
    ae_int_t maxns;
@@ -84156,14 +84107,14 @@ bool testlda(bool silent) {
             testldaunit_gensimpleset(nf, nc, ns, axis, &xy);
             fisherldan(&xy, ns, nf, nc, &info, &wn);
             if (info != 1) {
-               set_error_flag(&ldanerrors, true, __FILE__, __LINE__, "testldaunit.ap:53");
+               ldanerrors = true;
                continue;
             }
-            set_error_flag(&ldanerrors, !testldaunit_testwn(&xy, &wn, ns, nf, nc, 0), __FILE__, __LINE__, "testldaunit.ap:56");
-            set_error_flag(&ldanerrors, SmallAtR(wn.xyR[axis][0], 0.75), __FILE__, __LINE__, "testldaunit.ap:57");
+            ldanerrors = ldanerrors || !testldaunit_testwn(&xy, &wn, ns, nf, nc, 0);
+            ldanerrors = ldanerrors || SmallAtR(wn.xyR[axis][0], 0.75);
             fisherlda(&xy, ns, nf, nc, &info, &w1);
             for (i = 0; i < nf; i++) {
-               set_error_flag(&lda1errors, w1.xR[i] != wn.xyR[i][0], __FILE__, __LINE__, "testldaunit.ap:60");
+               lda1errors = lda1errors || w1.xR[i] != wn.xyR[i][0];
             }
          // Degenerate test for LDA-N
             if (nf >= 3) {
@@ -84174,13 +84125,13 @@ bool testlda(bool silent) {
                testldaunit_gendeg1set(nf, nc, ns, axis, &xy);
                fisherldan(&xy, ns, nf, nc, &info, &wn);
                if (info != 2) {
-                  set_error_flag(&ldanerrors, true, __FILE__, __LINE__, "testldaunit.ap:78");
+                  ldanerrors = true;
                   continue;
                }
-               set_error_flag(&ldanerrors, SmallAtR(wn.xyR[axis][0], 0.75), __FILE__, __LINE__, "testldaunit.ap:81");
+               ldanerrors = ldanerrors || SmallAtR(wn.xyR[axis][0], 0.75);
                fisherlda(&xy, ns, nf, nc, &info, &w1);
                for (i = 0; i < nf; i++) {
-                  set_error_flag(&lda1errors, w1.xR[i] != wn.xyR[i][0], __FILE__, __LINE__, "testldaunit.ap:84");
+                  lda1errors = lda1errors || w1.xR[i] != wn.xyR[i][0];
                }
             }
          }
@@ -84188,7 +84139,7 @@ bool testlda(bool silent) {
    }
 // Final report
    waserrors = ldanerrors || lda1errors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("LDA TEST\n");
       printf("FISHER LDA-N:                            ");
       if (!ldanerrors) {
@@ -85247,7 +85198,7 @@ static void testmcpdunit_testlc(bool *err) {
    ae_frame_leave();
 }
 
-bool testmcpd(bool silent) {
+bool testmcpd() {
    bool waserrors;
    bool simpleerrors;
    bool entryexiterrors;
@@ -85272,7 +85223,7 @@ bool testmcpd(bool silent) {
    testmcpdunit_testlc(&lcerrors);
 // Final report
    waserrors = othererrors || simpleerrors || entryexiterrors || ecerrors || bcerrors || lcerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("MCPD TEST\n");
       printf("TOTAL RESULTS:                           ");
       if (!waserrors) {
@@ -85567,22 +85518,22 @@ static void testknnunit_testknnalgo(bool *err) {
       }
       ae_vector_set_length(&y1, nout + 1);
       knnprocess(&model1, &x1, &y1);
-      set_error_flag(err, y1.cnt != nout + 1, __FILE__, __LINE__, "testknnunit.ap:200");
+      *err = *err || y1.cnt != nout + 1;
       ae_vector_set_length(&y1, nout - 1);
       knnprocess(&model1, &x1, &y1);
-      set_error_flag(err, y1.cnt != nout, __FILE__, __LINE__, "testknnunit.ap:203");
+      *err = *err || y1.cnt != nout;
       ae_vector_set_length(&y1, nout + 1);
       knntsprocess(&model1, &buf, &x1, &y1);
-      set_error_flag(err, y1.cnt != nout + 1, __FILE__, __LINE__, "testknnunit.ap:207");
+      *err = *err || y1.cnt != nout + 1;
       ae_vector_set_length(&y1, nout - 1);
       knntsprocess(&model1, &buf, &x1, &y1);
-      set_error_flag(err, y1.cnt != nout, __FILE__, __LINE__, "testknnunit.ap:210");
+      *err = *err || y1.cnt != nout;
       ae_vector_set_length(&y1, nout + 1);
       knnprocessi(&model1, &x1, &y1);
-      set_error_flag(err, y1.cnt != nout, __FILE__, __LINE__, "testknnunit.ap:214");
+      *err = *err || y1.cnt != nout;
       ae_vector_set_length(&y1, nout - 1);
       knnprocessi(&model1, &x1, &y1);
-      set_error_flag(err, y1.cnt != nout, __FILE__, __LINE__, "testknnunit.ap:217");
+      *err = *err || y1.cnt != nout;
       if (*err) {
          ae_frame_leave();
          return;
@@ -85596,8 +85547,8 @@ static void testknnunit_testknnalgo(bool *err) {
       knnprocessi(&model1, &x1, &y2);
       knntsprocess(&model1, &buf, &x1, &y3);
       for (i = 0; i < nout; i++) {
-         set_error_flag(err, !NearAtR(y2.xR[i], y1.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:232");
-         set_error_flag(err, !NearAtR(y3.xR[i], y1.xR[i], 100.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:233");
+         *err = *err || !NearAtR(y2.xR[i], y1.xR[i], 100.0 * machineepsilon);
+         *err = *err || !NearAtR(y3.xR[i], y1.xR[i], 100.0 * machineepsilon);
       }
    // Same inputs leads to same outputs
       ae_vector_set_length(&x1, nvars);
@@ -85618,7 +85569,7 @@ static void testknnunit_testknnalgo(bool *err) {
       for (i = 0; i < nout; i++) {
          allsame = allsame && y1.xR[i] == y2.xR[i];
       }
-      set_error_flag(err, !allsame, __FILE__, __LINE__, "testknnunit.ap:259");
+      *err = *err || !allsame;
    // Same inputs on original forest leads to same outputs
    // on copy created using KNNSerialize
       ae_vector_set_length(&x1, nvars);
@@ -85660,17 +85611,17 @@ static void testknnunit_testknnalgo(bool *err) {
       for (i = 0; i < nout; i++) {
          allsame = allsame && y1.xR[i] == y2.xR[i];
       }
-      set_error_flag(err, !allsame, __FILE__, __LINE__, "testknnunit.ap:287");
+      *err = *err || !allsame;
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = hqrndnormal(&rs);
          x2.xR[i] = x1.xR[i];
       }
-      set_error_flag(err, !NearAtR(knnprocess0(&model1, &x1), knnprocess0(&modelus, &x2), 100.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:293");
+      *err = *err || !NearAtR(knnprocess0(&model1, &x1), knnprocess0(&modelus, &x2), 100.0 * machineepsilon);
       for (i = 0; i < nvars; i++) {
          x1.xR[i] = hqrndnormal(&rs);
          x2.xR[i] = x1.xR[i];
       }
-      set_error_flag(err, knnclassify(&model1, &x1) != knnclassify(&modelus, &x2), __FILE__, __LINE__, "testknnunit.ap:299");
+      *err = *err || knnclassify(&model1, &x1) != knnclassify(&modelus, &x2);
    // KNNProcess0 works as expected
       ae_vector_set_length(&x1, nvars);
       ae_vector_set_length(&x2, nvars);
@@ -85683,7 +85634,7 @@ static void testknnunit_testknnalgo(bool *err) {
          y1.xR[i] = hqrndnormal(&rs);
       }
       knnprocess(&model1, &x1, &y1);
-      set_error_flag(err, !NearAtR(y1.xR[0], knnprocess0(&model1, &x2), 100.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:318");
+      *err = *err || !NearAtR(y1.xR[0], knnprocess0(&model1, &x2), 100.0 * machineepsilon);
    // KNNClassify works as expected
       ae_vector_set_length(&x1, nvars);
       ae_vector_set_length(&x2, nvars);
@@ -85699,10 +85650,10 @@ static void testknnunit_testknnalgo(bool *err) {
          knnprocess(&model1, &x1, &y1);
          j = knnclassify(&model1, &x2);
          for (i = 0; i < nout; i++) {
-            set_error_flag(err, y1.xR[i] > y1.xR[j], __FILE__, __LINE__, "testknnunit.ap:341");
+            *err = *err || y1.xR[i] > y1.xR[j];
          }
       } else {
-         set_error_flag(err, knnclassify(&model1, &x2) != -1, __FILE__, __LINE__, "testknnunit.ap:344");
+         *err = *err || knnclassify(&model1, &x2) != -1;
       }
    // Normalization properties
       if (iscls) {
@@ -85714,9 +85665,9 @@ static void testknnunit_testknnalgo(bool *err) {
          v = 0.0;
          for (i = 0; i < nout; i++) {
             v += y1.xR[i];
-            set_error_flag(err, y1.xR[i] < 0.0, __FILE__, __LINE__, "testknnunit.ap:359");
+            *err = *err || y1.xR[i] < 0.0;
          }
-         set_error_flag(err, !NearAtR(v, 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:361");
+         *err = *err || !NearAtR(v, 1.0, 1000.0 * machineepsilon);
       }
    // Test various error metrics reported by algorithm:
    // * training set errors included in the report
@@ -85727,36 +85678,36 @@ static void testknnunit_testknnalgo(bool *err) {
    //       for completely unknown values
       testknnunit_testseterrors(&model1, nvars, nout, iscls, &xy, npoints, &refavgce, &refcls0, &refcls1, &refrms, &refavg, &refavgrel);
       if (iscls) {
-         set_error_flag(err, !NearAtR(rep.avgce, refavgce, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:377");
-         set_error_flag(err, !NearAtR(knnavgce(&model1, &xy, npoints), refavgce, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:378");
-         set_error_flag(err, rep.relclserror < refcls0 - 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:381");
-         set_error_flag(err, rep.relclserror > refcls1 + 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:382");
-         set_error_flag(err, knnrelclserror(&model1, &xy, npoints) < refcls0 - 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:383");
-         set_error_flag(err, knnrelclserror(&model1, &xy, npoints) > refcls1 + 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:384");
+         *err = *err || !NearAtR(rep.avgce, refavgce, 1.0E-6);
+         *err = *err || !NearAtR(knnavgce(&model1, &xy, npoints), refavgce, 1.0E-6);
+         *err = *err || rep.relclserror < refcls0 - 1.0E-6;
+         *err = *err || rep.relclserror > refcls1 + 1.0E-6;
+         *err = *err || knnrelclserror(&model1, &xy, npoints) < refcls0 - 1.0E-6;
+         *err = *err || knnrelclserror(&model1, &xy, npoints) > refcls1 + 1.0E-6;
       } else {
-         set_error_flag(err, rep.avgce != 0.0, __FILE__, __LINE__, "testknnunit.ap:389");
-         set_error_flag(err, knnavgce(&model1, &xy, npoints) != 0.0, __FILE__, __LINE__, "testknnunit.ap:390");
-         set_error_flag(err, rep.relclserror != 0.0, __FILE__, __LINE__, "testknnunit.ap:393");
-         set_error_flag(err, knnrelclserror(&model1, &xy, npoints) != 0.0, __FILE__, __LINE__, "testknnunit.ap:394");
+         *err = *err || rep.avgce != 0.0;
+         *err = *err || knnavgce(&model1, &xy, npoints) != 0.0;
+         *err = *err || rep.relclserror != 0.0;
+         *err = *err || knnrelclserror(&model1, &xy, npoints) != 0.0;
       }
-      set_error_flag(err, !NearAtR(rep.rmserror, refrms, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:396");
-      set_error_flag(err, !NearAtR(rep.avgerror, refavg, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:397");
-      set_error_flag(err, !NearAtR(rep.avgrelerror, refavgrel, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:398");
-      set_error_flag(err, !NearAtR(knnrmserror(&model1, &xy, npoints), refrms, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:399");
-      set_error_flag(err, !NearAtR(knnavgerror(&model1, &xy, npoints), refavg, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:400");
-      set_error_flag(err, !NearAtR(knnavgrelerror(&model1, &xy, npoints), refavgrel, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:401");
+      *err = *err || !NearAtR(rep.rmserror, refrms, 1.0E-6);
+      *err = *err || !NearAtR(rep.avgerror, refavg, 1.0E-6);
+      *err = *err || !NearAtR(rep.avgrelerror, refavgrel, 1.0E-6);
+      *err = *err || !NearAtR(knnrmserror(&model1, &xy, npoints), refrms, 1.0E-6);
+      *err = *err || !NearAtR(knnavgerror(&model1, &xy, npoints), refavg, 1.0E-6);
+      *err = *err || !NearAtR(knnavgrelerror(&model1, &xy, npoints), refavgrel, 1.0E-6);
       testknnunit_testseterrors(&model1, nvars, nout, iscls, &testxy, testnpoints, &refavgce, &refcls0, &refcls1, &refrms, &refavg, &refavgrel);
       knnallerrors(&model1, &testxy, testnpoints, &tstrep);
       if (iscls) {
-         set_error_flag(err, tstrep.relclserror < refcls0 - 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:406");
-         set_error_flag(err, tstrep.relclserror > refcls1 + 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:407");
+         *err = *err || tstrep.relclserror < refcls0 - 1.0E-6;
+         *err = *err || tstrep.relclserror > refcls1 + 1.0E-6;
       } else {
-         set_error_flag(err, tstrep.avgce != 0.0, __FILE__, __LINE__, "testknnunit.ap:411");
-         set_error_flag(err, tstrep.relclserror != 0.0, __FILE__, __LINE__, "testknnunit.ap:412");
+         *err = *err || tstrep.avgce != 0.0;
+         *err = *err || tstrep.relclserror != 0.0;
       }
-      set_error_flag(err, !NearAtR(tstrep.rmserror, refrms, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:414");
-      set_error_flag(err, !NearAtR(tstrep.avgerror, refavg, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:415");
-      set_error_flag(err, !NearAtR(tstrep.avgrelerror, refavgrel, 1.0E-6), __FILE__, __LINE__, "testknnunit.ap:416");
+      *err = *err || !NearAtR(tstrep.rmserror, refrms, 1.0E-6);
+      *err = *err || !NearAtR(tstrep.avgerror, refavg, 1.0E-6);
+      *err = *err || !NearAtR(tstrep.avgrelerror, refavgrel, 1.0E-6);
    }
 // Test that model built with K=1 and Eps=0 remembers all training cases
    for (nvars = 1; nvars <= 4; nvars++) {
@@ -85796,11 +85747,11 @@ static void testknnunit_testknnalgo(bool *err) {
          }
          knnbuildersetnorm(&builder, hqrnduniformi(&rs, 3));
          knnbuilderbuildknnmodel(&builder, 1, 0.0, &model1, &rep);
-         set_error_flag(err, rep.avgce > 0.0, __FILE__, __LINE__, "testknnunit.ap:467");
-         set_error_flag(err, rep.relclserror > 0.0, __FILE__, __LINE__, "testknnunit.ap:468");
-         set_error_flag(err, rep.rmserror > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:469");
-         set_error_flag(err, rep.avgerror > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:470");
-         set_error_flag(err, rep.avgrelerror > 1.0E-6, __FILE__, __LINE__, "testknnunit.ap:471");
+         *err = *err || rep.avgce > 0.0;
+         *err = *err || rep.relclserror > 0.0;
+         *err = *err || rep.rmserror > 1.0E-6;
+         *err = *err || rep.avgerror > 1.0E-6;
+         *err = *err || rep.avgrelerror > 1.0E-6;
          ae_vector_set_length(&x1, nvars);
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < nvars; j++) {
@@ -85808,10 +85759,10 @@ static void testknnunit_testknnalgo(bool *err) {
             }
             knnprocess(&model1, &x1, &y1);
             if (iscls) {
-               set_error_flag(err, !NearAtR(y1.xR[iround(xy.xyR[i][nvars])], 1.0, 10.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:479");
+               *err = *err || !NearAtR(y1.xR[iround(xy.xyR[i][nvars])], 1.0, 10.0 * machineepsilon);
             } else {
                for (j = 0; j < nout; j++) {
-                  set_error_flag(err, !NearAtR(y1.xR[j], xy.xyR[i][nvars + j], 10.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:483");
+                  *err = *err || !NearAtR(y1.xR[j], xy.xyR[i][nvars + j], 10.0 * machineepsilon);
                }
             }
          }
@@ -85868,7 +85819,7 @@ static void testknnunit_testknnalgo(bool *err) {
       knnprocess(&model1, &x1, &y1);
       knnprocess(&model2, &x2, &y2);
       for (i = 0; i < nout; i++) {
-         set_error_flag(err, !NearAtR(y1.xR[i], y2.xR[i], 1000.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:553");
+         *err = *err || !NearAtR(y1.xR[i], y2.xR[i], 1000.0 * machineepsilon);
       }
    }
 // Test generalization ability on a simple noisy classification task:
@@ -85910,17 +85861,17 @@ static void testknnunit_testknnalgo(bool *err) {
       x1.xR[0] = 0.0;
       while (x1.xR[0] <= 3.0) {
          knnprocess(&model1, &x1, &y1);
-         set_error_flag(err, y1.xR[0] < 0.0, __FILE__, __LINE__, "testknnunit.ap:606");
-         set_error_flag(err, y1.xR[1] < 0.0, __FILE__, __LINE__, "testknnunit.ap:607");
-         set_error_flag(err, !NearAtR(y1.xR[0] + y1.xR[1], 1.0, 1000.0 * machineepsilon), __FILE__, __LINE__, "testknnunit.ap:608");
+         *err = *err || y1.xR[0] < 0.0;
+         *err = *err || y1.xR[1] < 0.0;
+         *err = *err || !NearAtR(y1.xR[0] + y1.xR[1], 1.0, 1000.0 * machineepsilon);
          if (x1.xR[0] < 1.0) {
-            set_error_flag(err, y1.xR[0] < 0.8, __FILE__, __LINE__, "testknnunit.ap:610");
+            *err = *err || y1.xR[0] < 0.8;
          }
          if (x1.xR[0] >= 1.0 && x1.xR[0] <= 2.0) {
-            set_error_flag(err, !NearAtR(y1.xR[1], x1.xR[0] - 1.0, 0.5), __FILE__, __LINE__, "testknnunit.ap:612");
+            *err = *err || !NearAtR(y1.xR[1], x1.xR[0] - 1.0, 0.5);
          }
          if (x1.xR[0] > 2.0) {
-            set_error_flag(err, y1.xR[1] < 0.8, __FILE__, __LINE__, "testknnunit.ap:614");
+            *err = *err || y1.xR[1] < 0.8;
          }
          x1.xR[0] += 0.01;
       }
@@ -85963,17 +85914,17 @@ static void testknnunit_testknnalgo(bool *err) {
       cnt++;
    }
    avgerr /= cnt;
-   set_error_flag(err, maxerr > 0.15, __FILE__, __LINE__, "testknnunit.ap:669");
-   set_error_flag(err, avgerr > 0.05, __FILE__, __LINE__, "testknnunit.ap:670");
+   *err = *err || maxerr > 0.15;
+   *err = *err || avgerr > 0.05;
 // Build model with Eps=1.0, compare error metrics with Eps=0
    knnbuilderbuildknnmodel(&builder, k, 1.0, &model2, &rep2);
-   set_error_flag(err, rep2.rmserror <= rep.rmserror, __FILE__, __LINE__, "testknnunit.ap:676");
-   set_error_flag(err, rep2.rmserror <= rep.rmserror + 0.001, __FILE__, __LINE__, "testknnunit.ap:677");
-   set_error_flag(err, rep2.rmserror >= rep.rmserror + 0.020, __FILE__, __LINE__, "testknnunit.ap:678");
+   *err = *err || rep2.rmserror <= rep.rmserror;
+   *err = *err || rep2.rmserror <= rep.rmserror + 0.001;
+   *err = *err || rep2.rmserror >= rep.rmserror + 0.020;
    ae_frame_leave();
 }
 
-bool testknn(bool silent) {
+bool testknn() {
    bool waserrors;
    bool knnerrors;
    bool result;
@@ -85984,7 +85935,7 @@ bool testknn(bool silent) {
    testknnunit_testknnalgo(&knnerrors);
 // Final report
    waserrors = knnerrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("KNN CLASSIFIER/REGRESSION TEST\n");
       printf("TOTAL RESULTS:                           ");
       if (!waserrors) {
@@ -86305,7 +86256,7 @@ static bool testmlptrainunit_testmlpxorregr() {
          }
       }
    }
-   set_error_flag(&result, nfailures >= 2, __FILE__, __LINE__, "testmlptrainunit.ap:580");
+   result = result || nfailures >= 2;
    ae_frame_leave();
    return result;
 }
@@ -86412,7 +86363,7 @@ static bool testmlptrainunit_testmlptrainclass() {
          // Negative number has to be negative and
          // positive number has to be positive.
             if (x.xR[0] < 0.0 ? y.xR[0] < 0.95 && y.xR[1] > 0.05 : y.xR[0] > 0.05 && y.xR[1] < 0.95) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testmlptrainunit.ap:730");
+               result = true;
                ae_frame_leave();
                return result;
             }
@@ -86422,7 +86373,7 @@ static bool testmlptrainunit_testmlptrainclass() {
             x.xR[0] = pow(-1.0, (double)randominteger(2)) * ((mxc - mnc) * randomreal() + mnc);
             mlpprocess(&net, &x, &y);
             if (x.xR[0] < 0.0 ? y.xR[0] < 0.95 && y.xR[1] > 0.05 : y.xR[0] > 0.05 && y.xR[1] < 0.95) {
-               set_error_flag(&result, true, __FILE__, __LINE__, "testmlptrainunit.ap:745");
+               result = true;
                ae_frame_leave();
                return result;
             }
@@ -87004,13 +86955,13 @@ static bool testmlptrainunit_testmlpcverror() {
    }
    if (!isregr) {
       if (diffms <= r0 || diffms <= r1) {
-         set_error_flag(&result, true, __FILE__, __LINE__, "testmlptrainunit.ap:1488");
+         result = true;
          ae_frame_leave();
          return result;
       }
    }
    if (diffms <= r2 || diffms <= r3 || diffms <= r4) {
-      set_error_flag(&result, true, __FILE__, __LINE__, "testmlptrainunit.ap:1493");
+      result = true;
       ae_frame_leave();
       return result;
    }
@@ -87038,7 +86989,7 @@ static bool testmlptrainunit_testmlpcverror() {
       }
       mlpkfoldcv(&trainer, &net, nneedrest, foldscount, &cvrep);
       if (cvrep.relclserror != 0.0 || cvrep.avgce != 0.0 || cvrep.rmserror != 0.0 || cvrep.avgerror != 0.0 || cvrep.avgrelerror != 0.0 || cvrep.ngrad != 0 || cvrep.nhess != 0 || cvrep.ncholesky != 0) {
-         set_error_flag(&result, true, __FILE__, __LINE__, "testmlptrainunit.ap:1527");
+         result = true;
          ae_frame_leave();
          return result;
       }
@@ -87143,7 +87094,7 @@ static bool testmlptrainunit_testmlptrainens() {
          }
       }
    }
-   set_error_flag(&result, nall - nless > 0.3 * nall, __FILE__, __LINE__, "testmlptrainunit.ap:1636");
+   result = result || nall - nless > 0.3 * nall;
    ae_frame_leave();
    return result;
 }
@@ -87265,11 +87216,11 @@ static bool testmlptrainunit_testmlptrainensregr() {
       }
    // Test that Rep contains correct error values
       mlpeallerrorsx(&netens, &xytrain, &xytrainsp, ntrain, 0, &netens.network.dummyidx, 0, ntrain, 0, &netens.network.buf, &repx);
-      seterrorflagdiff(&result, rep.relclserror, repx.relclserror, 1.0E-4, 1.0E-2);
-      seterrorflagdiff(&result, rep.avgce, repx.avgce, 1.0E-4, 1.0E-2);
-      seterrorflagdiff(&result, rep.rmserror, repx.rmserror, 1.0E-4, 1.0E-2);
-      seterrorflagdiff(&result, rep.avgerror, repx.avgerror, 1.0E-4, 1.0E-2);
-      seterrorflagdiff(&result, rep.avgrelerror, repx.avgrelerror, 1.0E-4, 1.0E-2);
+      result = result || !RelNear(rep.relclserror, repx.relclserror, 1.0E-4, 1.0E-2);
+      result = result || !RelNear(rep.avgce, repx.avgce, 1.0E-4, 1.0E-2);
+      result = result || !RelNear(rep.rmserror, repx.rmserror, 1.0E-4, 1.0E-2);
+      result = result || !RelNear(rep.avgerror, repx.avgerror, 1.0E-4, 1.0E-2);
+      result = result || !RelNear(rep.avgrelerror, repx.avgrelerror, 1.0E-4, 1.0E-2);
    // Test that network fits data well. Calculate average error:
    //  * on training dataset;
    //  * on test dataset. (here we reduce the accuracy
@@ -87286,7 +87237,7 @@ static bool testmlptrainunit_testmlptrainensregr() {
          avgerr += fabs(y.xR[0] - xytrain.xyR[i][nin]);
       }
       avgerr /= ntrain;
-      set_error_flag(&result, avgerr > eps, __FILE__, __LINE__, "testmlptrainunit.ap:1817");
+      result = result || avgerr > eps;
       avgerr = 0.0;
       for (i = 0; i < ntest; i++) {
          ae_v_move(x.xR, 1, xytest.xyR[i], 1, nin);
@@ -87294,7 +87245,7 @@ static bool testmlptrainunit_testmlptrainensregr() {
          avgerr += fabs(y.xR[0] - xytest.xyR[i][nin]);
       }
       avgerr /= ntest;
-      set_error_flag(&result, avgerr > 2 * eps, __FILE__, __LINE__, "testmlptrainunit.ap:1826");
+      result = result || avgerr > 2 * eps;
    }
 // Catch bug in implementation of MLPTrainEnsembleX:
 // test ensemble training on empty dataset.
@@ -87472,7 +87423,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
    return result;
 }
 
-bool testmlptrain(bool silent) {
+bool testmlptrain() {
    ae_frame _frame_block;
    bool waserrors;
    ae_int_t info;
@@ -87532,7 +87483,7 @@ bool testmlptrain(bool silent) {
    mlptrainenserrors = testmlptrainunit_testmlptrainens() || testmlptrainunit_testmlptrainensregr() || testmlptrainunit_testmlptrainenscls();
 // Final report
    waserrors = trnerrors || mlptrainregrerr || mlptrainclasserr || mlprestartserr || mlpxorregrerr || mlpxorclserr || mlpcverrorerr || mlptrainenserrors;
-   if (!silent) {
+   if (waserrors || !silent) {
       printf("MLP TEST\n");
       printf("CROSS-VALIDATION ERRORS:                 ");
       if (!mlpcverrorerr) {
@@ -88158,10 +88109,10 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
    return result;
 }
 
-static bool testalglibbasicsunit_testsharedpool(bool silent) {
+static bool testalglibbasicsunit_testsharedpool() {
    bool result;
    result = !testalglibbasicsunit_sharedpoolerrors();
-   if (!silent) {
+   if (!result || !silent) {
       if (result) {
          printf("SHARED POOL:                             OK\n");
       } else {
@@ -88415,7 +88366,7 @@ static bool testalglibbasicsunit_performtestsort2() {
 }
 
 // Complex arithmetics test
-static bool testalglibbasicsunit_testcomplexarithmetics(bool silent) {
+static bool testalglibbasicsunit_testcomplexarithmetics() {
    bool absc;
    bool addcc;
    bool addcr;
@@ -88522,7 +88473,7 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent) {
    result = result && divcc;
    result = result && divcr;
    result = result && divrc;
-   if (!silent) {
+   if (!result || !silent) {
       if (result) {
          printf("COMPLEX ARITHMETICS:                     OK\n");
       } else {
@@ -88605,7 +88556,7 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent) {
 }
 
 // Tests for IEEE special quantities
-static bool testalglibbasicsunit_testieeespecial(bool silent) {
+static bool testalglibbasicsunit_testieeespecial() {
    bool oknan;
    bool okinf;
    bool okother;
@@ -88880,7 +88831,7 @@ static bool testalglibbasicsunit_testieeespecial(bool silent) {
 }
 
 // Tests for swapping functions
-static bool testalglibbasicsunit_testswapfunctions(bool silent) {
+static bool testalglibbasicsunit_testswapfunctions() {
    ae_frame _frame_block;
    bool okb1;
    bool okb2;
@@ -89058,7 +89009,7 @@ static bool testalglibbasicsunit_testswapfunctions(bool silent) {
 }
 
 // Tests for standard functions
-static bool testalglibbasicsunit_teststandardfunctions(bool silent) {
+static bool testalglibbasicsunit_teststandardfunctions() {
    bool result;
    result = true;
 // Test Sign()
@@ -89077,7 +89028,7 @@ static bool testalglibbasicsunit_teststandardfunctions(bool silent) {
 }
 
 // Tests for serualization functions
-static bool testalglibbasicsunit_testserializationfunctions(bool silent) {
+static bool testalglibbasicsunit_testserializationfunctions() {
    ae_frame _frame_block;
    bool okb;
    bool oki;
@@ -89228,7 +89179,7 @@ static bool testalglibbasicsunit_performtestpoolsum() {
    return result;
 }
 
-static bool testalglibbasicsunit_testsmp(bool silent) {
+static bool testalglibbasicsunit_testsmp() {
    bool t0;
    bool t1;
    bool t2;
@@ -89239,7 +89190,7 @@ static bool testalglibbasicsunit_testsmp(bool silent) {
    t2 = testalglibbasicsunit_performtestsort2();
    ts = testalglibbasicsunit_performtestpoolsum();
    result = t0 && t1 && t2 && ts;
-   if (!silent) {
+   if (!result || !silent) {
       if (result) {
          printf("SMP FUNCTIONS:                           OK\n");
       } else {
@@ -89273,17 +89224,17 @@ static bool testalglibbasicsunit_testsmp(bool silent) {
    return result;
 }
 
-bool testalglibbasics(bool silent) {
+bool testalglibbasics() {
    bool result;
    result = true;
-   result = result && testalglibbasicsunit_testcomplexarithmetics(silent);
-   result = result && testalglibbasicsunit_testieeespecial(silent);
-   result = result && testalglibbasicsunit_testswapfunctions(silent);
-   result = result && testalglibbasicsunit_teststandardfunctions(silent);
-   result = result && testalglibbasicsunit_testserializationfunctions(silent);
-   result = result && testalglibbasicsunit_testsharedpool(silent);
-   result = result && testalglibbasicsunit_testsmp(silent);
-   if (!silent) {
+   result = result && testalglibbasicsunit_testcomplexarithmetics();
+   result = result && testalglibbasicsunit_testieeespecial();
+   result = result && testalglibbasicsunit_testswapfunctions();
+   result = result && testalglibbasicsunit_teststandardfunctions();
+   result = result && testalglibbasicsunit_testserializationfunctions();
+   result = result && testalglibbasicsunit_testsharedpool();
+   result = result && testalglibbasicsunit_testsmp();
+   if (!result || !silent) {
       printf("\n\n");
    }
    return result;
@@ -89350,7 +89301,7 @@ bool use_smp = false;
 MutEx_t tests_mutex; //(@) Was initialized to NULL for the non-OS version.
 MutEx_t print_mutex; //(@) Was initialized to NULL for the non-OS version.
 
-bool call_unittest(bool (*testfunc)(bool)) {
+bool call_unittest(bool (*testfunc)()) {
 #ifndef AE_USE_CPP_ERROR_HANDLING
    ae_frame _frame_block;
    ae_state_init();
@@ -89359,7 +89310,7 @@ bool call_unittest(bool (*testfunc)(bool)) {
    }
    if (use_smp) ae_state_set_flags(ParTH);
    ae_frame_make(&_frame_block);
-   bool Ok = testfunc(true);
+   bool Ok = testfunc();
    ae_state_clear();
    return Ok;
 #else
@@ -89368,7 +89319,7 @@ bool call_unittest(bool (*testfunc)(bool)) {
       ae_state_init();
       ae_frame_make(&_frame_block);
       if (use_smp) ae_state_set_flags(ParTH);
-      bool Ok = testfunc(true);
+      bool Ok = testfunc();
       ae_state_clear();
       return Ok;
    } catch(...) {
@@ -89380,7 +89331,7 @@ bool call_unittest(bool (*testfunc)(bool)) {
 ThRet_t tester_function(ThArg_t T) {
    static struct {
       const char *name;
-      bool (*testfunc)(bool);
+      bool (*testfunc)();
    } unittests[] = {
       { "ablasf", testablasf },
       { "hqrnd", testhqrnd },
@@ -89487,6 +89438,7 @@ ThRet_t tester_function(ThArg_t T) {
    // Display the test results.
       acquire_mutex(&print_mutex);
       printf("%2d/%d: %-32s %s\n", test + 1, tests, unittests[test].name, Ok? "Ok": "Failed");
+      if (!silent) putchar('\n');
       fflush(stdout);
       release_mutex(&print_mutex);
    }
@@ -89613,8 +89565,6 @@ int main(int argc, char **argv) {
    }
    time(&time_1);
    printf("Done in %ld seconds\n", (long)difftime(time_1, time_0));
-   if (global_failure_flag)
-      printf("Last error at %s:%d (%s)\n", sef_file, (int)sef_line, sef_xdesc);
 // Free structures
    free_mutex(&tests_mutex);
    free_mutex(&print_mutex);
