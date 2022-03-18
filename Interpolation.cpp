@@ -4207,7 +4207,7 @@ void spline1dbuildhermite(RVector *x, RVector *y, RVector *d, ae_int_t n, spline
 //     X           -   spline nodes, array[0..N-1].
 //     Y           -   function values, array[0..N-1].
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N >= 2
 //                     * if given, only first N points are used to build spline
@@ -4307,7 +4307,7 @@ void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype,
 //     X           -   spline nodes, array[0..N-1].
 //     Y           -   function values, array[0..N-1].
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N >= 2
 //                     * if given, only first N points are used to build spline
@@ -4598,7 +4598,7 @@ void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpola
 //     X           -   spline nodes
 //     Y           -   function values
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N >= 2
 //                     * if given, only first N points are used
@@ -4709,7 +4709,7 @@ void spline1dgriddiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 //     X           -   spline nodes
 //     Y           -   function values
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N >= 2
 //                     * if given, only first N points are used
@@ -4969,7 +4969,7 @@ static void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold
 //     Y           -   function values
 //     X2           -  new spline nodes
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N >= 2
 //                     * if given, only first N points from X/Y are used
@@ -5106,7 +5106,7 @@ void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, 
 //     Y           -   function values
 //     X2           -  new spline nodes
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N >= 2
 //                     * if given, only first N points from X/Y are used
@@ -5250,7 +5250,7 @@ void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 //     Y           -   function values
 //     X2           -  new spline nodes
 //
-// OPTIONAL PARAMETERS:
+// Optional Parameters:
 //     N           -   points count:
 //                     * N >= 2
 //                     * if given, only first N points from X/Y are used

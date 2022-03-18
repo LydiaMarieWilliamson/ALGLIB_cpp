@@ -4498,7 +4498,7 @@ void minlbfgsoptguardnonc1test1results(minlbfgsstate *state, optguardnonc1test1r
 
 // L-BFGS algorithm results
 //
-// Buffered implementation of MinLBFGSResults which uses pre-allocated buffer
+// Buffered implementation of MinLBFGSResults which uses preallocated buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -13936,7 +13936,7 @@ void minbleicoptguardnonc1test1results(minbleicstate *state, optguardnonc1test1r
 
 // BLEIC results
 //
-// Buffered implementation of MinBLEICResults() which uses pre-allocated buffer
+// Buffered implementation of MinBLEICResults() which uses preallocated buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -20039,7 +20039,7 @@ void minqpoptimize(minqpstate *state) {
 
 // QP results
 //
-// Buffered implementation of MinQPResults() which uses pre-allocated  buffer
+// Buffered implementation of MinQPResults() which uses preallocated  buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -22578,7 +22578,7 @@ void minlmoptguardresults(minlmstate *state, optguardreport *rep) {
 
 // Levenberg-Marquardt algorithm results
 //
-// Buffered implementation of MinLMResults(), which uses pre-allocated buffer
+// Buffered implementation of MinLMResults(), which uses preallocated buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -24546,7 +24546,7 @@ void mincgoptguardnonc1test1results(mincgstate *state, optguardnonc1test1report 
 
 // Conjugate gradient results
 //
-// Buffered implementation of MinCGResults(), which uses pre-allocated buffer
+// Buffered implementation of MinCGResults(), which uses preallocated buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -31758,7 +31758,7 @@ void minlpoptimize(minlpstate *state) {
 
 // LP results
 //
-// Buffered implementation of MinLPResults() which uses pre-allocated  buffer
+// Buffered implementation of MinLPResults() which uses preallocated  buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -36737,7 +36737,7 @@ void minnlcoptguardnonc1test1results(minnlcstate *state, optguardnonc1test1repor
 
 // NLC results
 //
-// Buffered implementation of MinNLCResults() which uses pre-allocated buffer
+// Buffered implementation of MinNLCResults() which uses preallocated buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -39231,7 +39231,7 @@ Pause:
    return true;
 }
 
-// Buffered implementation of minnsresults() which uses pre-allocated  buffer
+// Buffered implementation of minnsresults() which uses preallocated  buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -42141,7 +42141,7 @@ void minbcoptguardnonc1test1results(minbcstate *state, optguardnonc1test1report 
 
 // BC results
 //
-// Buffered implementation of MinBCResults() which uses pre-allocated buffer
+// Buffered implementation of MinBCResults() which uses preallocated buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.

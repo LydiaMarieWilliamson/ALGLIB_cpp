@@ -2169,7 +2169,7 @@ function - kdtreetsqueryresultsdistances().
 
 Inputs:
     KDT     -   KD-tree
-    R       -   possibly pre-allocated buffer. If X is too small to store
+    R       -   possibly preallocated buffer. If X is too small to store
                 result, it is resized. If size(X) is enough to store
                 result, it is left unchanged.
 
@@ -2224,7 +2224,7 @@ function - kdtreetsqueryresultstags().
 
 Inputs:
     KDT     -   KD-tree
-    Tags    -   possibly pre-allocated buffer. If X is too small to store
+    Tags    -   possibly preallocated buffer. If X is too small to store
                 result, it is resized. If size(X) is enough to store
                 result, it is left unchanged.
 
@@ -2280,7 +2280,7 @@ function - kdtreetsqueryresultsx().
 
 Inputs:
     KDT     -   KD-tree
-    X       -   possibly pre-allocated buffer. If X is too small to store
+    X       -   possibly preallocated buffer. If X is too small to store
                 result, it is resized. If size(X) is enough to store
                 result, it is left unchanged.
 
@@ -2335,7 +2335,7 @@ function - kdtreetsqueryresultsxy().
 
 Inputs:
     KDT     -   KD-tree
-    XY      -   possibly pre-allocated buffer. If XY is too small to store
+    XY      -   possibly preallocated buffer. If XY is too small to store
                 result, it is resized. If size(XY) is enough to store
                 result, it is left unchanged.
 
@@ -2645,7 +2645,7 @@ Inputs:
     KDT     -   KD-tree
     Buf     -   request  buffer  object  created   for   this   particular
                 instance of kd-tree structure.
-    R       -   possibly pre-allocated buffer. If X is too small to store
+    R       -   possibly preallocated buffer. If X is too small to store
                 result, it is resized. If size(X) is enough to store
                 result, it is left unchanged.
 
@@ -2685,7 +2685,7 @@ Inputs:
     KDT     -   KD-tree
     Buf     -   request  buffer  object  created   for   this   particular
                 instance of kd-tree structure.
-    Tags    -   possibly pre-allocated buffer. If X is too small to store
+    Tags    -   possibly preallocated buffer. If X is too small to store
                 result, it is resized. If size(X) is enough to store
                 result, it is left unchanged.
 
@@ -2721,7 +2721,7 @@ Inputs:
     KDT     -   KD-tree
     Buf     -   request  buffer  object  created   for   this   particular
                 instance of kd-tree structure.
-    X       -   possibly pre-allocated buffer. If X is too small to store
+    X       -   possibly preallocated buffer. If X is too small to store
                 result, it is resized. If size(X) is enough to store
                 result, it is left unchanged.
 
@@ -2756,7 +2756,7 @@ Inputs:
     KDT     -   KD-tree
     Buf     -   request  buffer  object  created   for   this   particular
                 instance of kd-tree structure.
-    XY      -   possibly pre-allocated buffer. If XY is too small to store
+    XY      -   possibly preallocated buffer. If XY is too small to store
                 result, it is resized. If size(XY) is enough to store
                 result, it is left unchanged.
 
@@ -21532,7 +21532,7 @@ Inputs:
     X           -   spline nodes, array[0..N-1].
     Y           -   function values, array[0..N-1].
 
-OPTIONAL PARAMETERS:
+Optional Parameters:
     N           -   points count:
                     * N &ge; 2
                     * if given, only first N points are used to build spline
@@ -21576,7 +21576,7 @@ Inputs:
     X           -   spline nodes, array[0..N-1].
     Y           -   function values, array[0..N-1].
 
-OPTIONAL PARAMETERS:
+Optional Parameters:
     N           -   points count:
                     * N &ge; 2
                     * if given, only first N points are used to build spline
@@ -21741,7 +21741,7 @@ Inputs:
     Y           -   function values
     X2           -  new spline nodes
 
-OPTIONAL PARAMETERS:
+Optional Parameters:
     N           -   points count:
                     * N &ge; 2
                     * if given, only first N points from X/Y are used
@@ -21814,7 +21814,7 @@ Inputs:
     Y           -   function values
     X2           -  new spline nodes
 
-OPTIONAL PARAMETERS:
+Optional Parameters:
     N           -   points count:
                     * N &ge; 2
                     * if given, only first N points from X/Y are used
@@ -21888,7 +21888,7 @@ Inputs:
     Y           -   function values
     X2           -  new spline nodes
 
-OPTIONAL PARAMETERS:
+Optional Parameters:
     N           -   points count:
                     * N &ge; 2
                     * if given, only first N points from X/Y are used
@@ -22031,7 +22031,7 @@ Inputs:
     X           -   spline nodes
     Y           -   function values
 
-OPTIONAL PARAMETERS:
+Optional Parameters:
     N           -   points count:
                     * N &ge; 2
                     * if given, only first N points are used
@@ -22099,7 +22099,7 @@ Inputs:
     X           -   spline nodes
     Y           -   function values
 
-OPTIONAL PARAMETERS:
+Optional Parameters:
     N           -   points count:
                     * N &ge; 2
                     * if given, only first N points are used
@@ -28506,7 +28506,7 @@ maximum extent possible.
 
 Inputs:
     S0          -   sparse matrix in any format.
-    S1          -   matrix which may contain some pre-allocated memory, or
+    S1          -   matrix which may contain some preallocated memory, or
                     can be just uninitialized structure.
 
 Outputs:
@@ -31584,7 +31584,7 @@ ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 <pre class=narration>
 BC results
 
-Buffered implementation of MinBCResults() which uses pre-allocated buffer
+Buffered implementation of MinBCResults() which uses preallocated buffer
 to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 intended to be used in the inner cycles of performance critical algorithms
 where array reallocation penalty is too large to be ignored.
@@ -32626,7 +32626,7 @@ ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 <pre class=narration>
 BLEIC results
 
-Buffered implementation of MinBLEICResults() which uses pre-allocated buffer
+Buffered implementation of MinBLEICResults() which uses preallocated buffer
 to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 intended to be used in the inner cycles of performance critical algorithms
 where array reallocation penalty is too large to be ignored.
@@ -33772,7 +33772,7 @@ ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
 <pre class=narration>
 Conjugate gradient results
 
-Buffered implementation of MinCGResults(), which uses pre-allocated buffer
+Buffered implementation of MinCGResults(), which uses preallocated buffer
 to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 intended to be used in the inner cycles of performance critical algorithms
 where array reallocation penalty is too large to be ignored.
@@ -35052,7 +35052,7 @@ ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 <pre class=narration>
 L-BFGS algorithm results
 
-Buffered implementation of MinLBFGSResults which uses pre-allocated buffer
+Buffered implementation of MinLBFGSResults which uses preallocated buffer
 to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 intended to be used in the inner cycles of performance critical algorithms
 where array reallocation penalty is too large to be ignored.
@@ -36007,7 +36007,7 @@ ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 <pre class=narration>
 Levenberg-Marquardt algorithm results
 
-Buffered implementation of MinLMResults(), which uses pre-allocated buffer
+Buffered implementation of MinLMResults(), which uses preallocated buffer
 to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 intended to be used in the inner cycles of performance critical algorithms
 where array reallocation penalty is too large to be ignored.
@@ -36818,7 +36818,7 @@ ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 <pre class=narration>
 LP results
 
-Buffered implementation of MinLPResults() which uses pre-allocated  buffer
+Buffered implementation of MinLPResults() which uses preallocated  buffer
 to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 intended to be used in the inner cycles of performance critical algorithms
 where array reallocation penalty is too large to be ignored.
@@ -37996,7 +37996,7 @@ ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 <pre class=narration>
 NLC results
 
-Buffered implementation of MinNLCResults() which uses pre-allocated buffer
+Buffered implementation of MinNLCResults() which uses preallocated buffer
 to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 intended to be used in the inner cycles of performance critical algorithms
 where array reallocation penalty is too large to be ignored.
@@ -39528,7 +39528,7 @@ ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 <a name=sub_minnsresultsbuf></a><h6 class=pageheader>minnsresultsbuf Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
-Buffered implementation of minnsresults() which uses pre-allocated  buffer
+Buffered implementation of minnsresults() which uses preallocated  buffer
 to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 intended to be used in the inner cycles of performance critical algorithms
 where array reallocation penalty is too large to be ignored.
@@ -40613,7 +40613,7 @@ ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 <pre class=narration>
 QP results
 
-Buffered implementation of MinQPResults() which uses pre-allocated  buffer
+Buffered implementation of MinQPResults() which uses preallocated  buffer
 to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 intended to be used in the inner cycles of performance critical algorithms
 where array reallocation penalty is too large to be ignored.
@@ -45186,7 +45186,7 @@ ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
 <pre class=narration>
 NLEQ solver results
 
-Buffered implementation of NLEQResults(), which uses pre-allocated  buffer
+Buffered implementation of NLEQResults(), which uses preallocated  buffer
 to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 intended to be used in the inner cycles of performance critical algorithms
 where array reallocation penalty is too large to be ignored.

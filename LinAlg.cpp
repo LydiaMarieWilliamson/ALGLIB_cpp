@@ -2603,7 +2603,7 @@ namespace alglib_impl {
 // * fill diagonal of reflectors matrix by ones
 // * generate triangular factor T
 //
-// PARAMETERS:
+// Parameters:
 //     A           -   either LengthA*BlockSize (if ColumnwiseA) or
 //                     BlockSize*LengthA (if not ColumnwiseA) matrix of
 //                     elementary reflectors.
@@ -10017,7 +10017,7 @@ void sparsecopytohash(sparsematrix *s0, sparsematrix *s1) {
 //
 // Inputs:
 //     S0          -   sparse matrix in any format.
-//     S1          -   matrix which may contain some pre-allocated memory, or
+//     S1          -   matrix which may contain some preallocated memory, or
 //                     can be just uninitialized structure.
 //
 // Outputs:
@@ -11221,7 +11221,7 @@ static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, doub
       // Swap rows and columns
          *cs = 0.0;
          *sn = 1.0;
-         swapr(a, d);
+         swapr(d, a);
          *b = -*c;
          *c = 0.0;
       } else {
@@ -18251,7 +18251,7 @@ static void sptrf_sparsetrailpivotout(sluv2sparsetrail *a, ae_int_t ipiv, ae_int
 
 // This function densifies I1-th column of the sparse trail.
 //
-// PARAMETERS:
+// Parameters:
 //     A           -   sparse trail
 //     I1          -   column index
 //     BUpper      -   upper rectangular submatrix, updated during densification
@@ -18315,7 +18315,7 @@ static void sptrf_sparsetraildensify(sluv2sparsetrail *a, ae_int_t i1, sluv2list
 // you start updating sparse one (otherwise, recently densified columns  will
 // be updated twice).
 //
-// PARAMETERS:
+// Parameters:
 //     A           -   sparse trail
 //     V0I, V0R    -   update column returned by SparseTrailPivotOut (MUST be
 //                     array[N] independently of the NZ0).

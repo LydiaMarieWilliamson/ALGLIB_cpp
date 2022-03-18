@@ -1064,7 +1064,7 @@ void unserializerealarray(ae_serializer *s, RVector *v) {
    }
 }
 
-// Allocation of serializer: ae_int_t array
+// Allocation of serializer: Integer array
 void allocintegerarray(ae_serializer *s, ZVector *v, ae_int_t n) {
    ae_int_t i;
    if (n < 0) {
@@ -1076,7 +1076,7 @@ void allocintegerarray(ae_serializer *s, ZVector *v, ae_int_t n) {
    }
 }
 
-// Serialization: ae_int_t array
+// Serialization: Integer array
 void serializeintegerarray(ae_serializer *s, ZVector *v, ae_int_t n) {
    ae_int_t i;
    if (n < 0) {
@@ -2781,7 +2781,7 @@ bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
 // *	If both beta == 0.0 and alpha == 0.0, c is filled by 0's.
 // *	The specialized functions require that alpha != 0.0; an exception is thrown otherwise.
 // Important:
-// *	This function requires the output matrix c to be pre-allocated.
+// *	This function requires the output matrix c to be preallocated.
 //	An exception will be thrown, if it is not large enough to store the result.
 // Inputs:
 //	m, n, k:	The matrix sizes; m, n, k > 0.
@@ -3145,7 +3145,7 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, 
 // *	If both beta == 0.0 and alpha == 0.0, c is filled by 0's.
 // *	This function requires that alpha != 0.0; an exception is thrown otherwise.
 // Important:
-// *	This function requires the output matrix c to be pre-allocated.
+// *	This function requires the output matrix c to be preallocated.
 //	An exception will be thrown, if it is not large enough to store the result.
 // Inputs:
 //	m, n, k:	The matrix sizes; m, n, k > 0.
@@ -3873,7 +3873,7 @@ bool rmatrixplumkl(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *p
 
 // MKL-based kernel.
 //
-// NOTE: this function needs pre-allocated output/temporary arrays.
+// NOTE: this function needs preallocated output/temporary arrays.
 //       D and E must be at least max(M,N)-wide.
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
 bool rmatrixbdmkl(RMatrix *a, ae_int_t m, ae_int_t n, RVector *d, RVector *e, RVector *tauq, RVector *taup) {
@@ -3903,7 +3903,7 @@ bool rmatrixbdmultiplybymkl(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, 
 
 // MKL-based kernel.
 //
-// NOTE: Tau must be pre-allocated array with at least N-1 elements.
+// NOTE: Tau must be preallocated array with at least N-1 elements.
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
 bool rmatrixhessenbergmkl(RMatrix *a, ae_int_t n, RVector *tau) {
 #ifndef ALGLIB_INTERCEPTS_MKL
@@ -3917,7 +3917,7 @@ bool rmatrixhessenbergmkl(RMatrix *a, ae_int_t n, RVector *tau) {
 
 // MKL-based kernel.
 //
-// NOTE: Q must be pre-allocated N*N array
+// NOTE: Q must be preallocated N*N array
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
 bool rmatrixhessenbergunpackqmkl(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q) {
 #ifndef ALGLIB_INTERCEPTS_MKL
@@ -3931,7 +3931,7 @@ bool rmatrixhessenbergunpackqmkl(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *
 
 // MKL-based kernel.
 //
-// NOTE: Tau, D, E must be pre-allocated arrays;
+// NOTE: Tau, D, E must be preallocated arrays;
 //       length(E)=length(Tau)=N-1 (or larger)
 //       length(D)=N (or larger)
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
@@ -3947,7 +3947,7 @@ bool smatrixtdmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d
 
 // MKL-based kernel.
 //
-// NOTE: Tau, D, E must be pre-allocated arrays;
+// NOTE: Tau, D, E must be preallocated arrays;
 //       length(E)=length(Tau)=N-1 (or larger)
 //       length(D)=N (or larger)
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
@@ -3963,7 +3963,7 @@ bool hmatrixtdmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d
 
 // MKL-based kernel.
 //
-// NOTE: Q must be pre-allocated N*N array
+// NOTE: Q must be preallocated N*N array
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
 bool smatrixtdunpackqmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatrix *q) {
 #ifndef ALGLIB_INTERCEPTS_MKL
@@ -3977,7 +3977,7 @@ bool smatrixtdunpackqmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMa
 
 // MKL-based kernel.
 //
-// NOTE: Q must be pre-allocated N*N array
+// NOTE: Q must be preallocated N*N array
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
 bool hmatrixtdunpackqmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatrix *q) {
 #ifndef ALGLIB_INTERCEPTS_MKL
@@ -3994,7 +3994,7 @@ bool hmatrixtdunpackqmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMa
 // Returns True if MKL was present and handled request (MKL  completion  code
 // is returned as separate output parameter).
 //
-// D and E are pre-allocated arrays with length N (both of them!). On output,
+// D and E are preallocated arrays with length N (both of them!). On output,
 // D constraints singular values, and E is destroyed.
 //
 // SVDResult is modified if and only if MKL is present.
@@ -4013,8 +4013,8 @@ bool rmatrixbdsvdmkl(RVector *d, RVector *e, ae_int_t n, bool isupper, RMatrix *
 //
 // Returns True if MKL was present and handled request.
 //
-// WR and WI are pre-allocated arrays with length N.
-// Z is pre-allocated array[N,N].
+// WR and WI are preallocated arrays with length N.
+// Z is preallocated array[N,N].
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
 bool rmatrixinternalschurdecompositionmkl(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info) {
 #ifndef ALGLIB_INTERCEPTS_MKL
@@ -4032,7 +4032,7 @@ bool rmatrixinternalschurdecompositionmkl(RMatrix *h, ae_int_t n, ae_int_t tneed
 //
 // NOTE: this function does NOT support HOWMNY=3!!!!
 //
-// VL and VR are pre-allocated arrays with length N*N, if required. If particalar
+// VL and VR are preallocated arrays with length N*N, if required. If particalar
 // variables is not required, it can be dummy (empty) array.
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
 bool rmatrixinternaltrevcmkl(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info) {
@@ -4050,10 +4050,10 @@ bool rmatrixinternaltrevcmkl(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t how
 // Returns True if MKL was present and handled request (MKL  completion  code
 // is returned as separate output parameter).
 //
-// D and E are pre-allocated arrays with length N (both of them!). On output,
+// D and E are preallocated arrays with length N (both of them!). On output,
 // D constraints eigenvalues, and E is destroyed.
 //
-// Z is pre-allocated array[N,N] for ZNeeded != 0; ignored for ZNeeded=0.
+// Z is preallocated array[N,N] for ZNeeded != 0; ignored for ZNeeded=0.
 //
 // EVDResult is modified if and only if MKL is present.
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
@@ -4072,10 +4072,10 @@ bool smatrixtdevdmkl(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatr
 // Returns True if MKL was present and handled request (MKL  completion  code
 // is returned as separate output parameter).
 //
-// D and E are pre-allocated arrays with length N (both of them!). On output,
+// D and E are preallocated arrays with length N (both of them!). On output,
 // D constraints eigenvalues, and E is destroyed.
 //
-// Z is pre-allocated array[N,N] for ZNeeded != 0; ignored for ZNeeded=0.
+// Z is preallocated array[N,N] for ZNeeded != 0; ignored for ZNeeded=0.
 //
 // EVDResult is modified if and only if MKL is present.
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
@@ -4424,7 +4424,7 @@ void tagsortmiddlei(ZVector *a, ae_int_t n, ae_int_t offset/* = 0*/) {
    }
 }
 
-// Buffered variant of TagSort, which accepts pre-allocated output arrays as
+// Buffered variant of TagSort, which accepts preallocated output arrays as
 // well as special structure for buffered allocations. If arrays are too
 // short, they are reallocated. If they are large enough, no memory
 // allocation is done.
@@ -4528,7 +4528,7 @@ void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2) {
 
 // Heap operations: adds element to the heap
 //
-// PARAMETERS:
+// Parameters:
 //     A       -   heap itself, must be at least array[0..N]
 //     B       -   array of integer tags, which are updated according to
 //                 permutations in the heap
@@ -4579,7 +4579,7 @@ void tagheappushi(RVector *a, ZVector *b, ae_int_t *n, double va, ae_int_t vb) {
 // Heap operations: replaces top element with new element
 // (which is moved down)
 //
-// PARAMETERS:
+// Parameters:
 //     A       -   heap itself, must be at least array[0..N-1]
 //     B       -   array of integer tags, which are updated according to
 //                 permutations in the heap
@@ -4658,7 +4658,7 @@ void tagheapreplacetopi(RVector *a, ZVector *b, ae_int_t n, double va, ae_int_t 
 
 // Heap operations: pops top element from the heap
 //
-// PARAMETERS:
+// Parameters:
 //     A       -   heap itself, must be at least array[0..N-1]
 //     B       -   array of integer tags, which are updated according to
 //                 permutations in the heap
@@ -4690,7 +4690,7 @@ void tagheappopi(RVector *a, ZVector *b, ae_int_t *n) {
 
 // Search first element less than T in sorted array.
 //
-// PARAMETERS:
+// Parameters:
 //     A - sorted array by ascending from 0 to N-1
 //     N - number of elements in array
 //     T - the desired element
@@ -4722,7 +4722,7 @@ ae_int_t lowerbound(RVector *a, ae_int_t n, double t) {
 
 // Search first element more than T in sorted array.
 //
-// PARAMETERS:
+// Parameters:
 //     A - sorted array by ascending from 0 to N-1
 //     N - number of elements in array
 //     T - the desired element
@@ -6509,7 +6509,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
 //     A       -   array[0..N-1], vector 1
 //     B       -   array[0..N-1], vector 2
 //     N       -   vectors length, N<2^29.
-//     Temp    -   array[0..N-1], pre-allocated temporary storage
+//     Temp    -   array[0..N-1], preallocated temporary storage
 //
 // Outputs:
 //     R       -   (A,B)
@@ -6553,7 +6553,7 @@ void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *
 //     A       -   array[0..N-1], vector 1
 //     B       -   array[0..N-1], vector 2
 //     N       -   vectors length, N<2^29.
-//     Temp    -   array[0..2*N-1], pre-allocated temporary storage
+//     Temp    -   array[0..2*N-1], preallocated temporary storage
 //
 // Outputs:
 //     R       -   (A,B)
@@ -8456,7 +8456,7 @@ void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan);
 // Inputs:
 //     n  - the original size of the transform.
 //     m  - the size of the "padded" Bluestein's transform.
-//     zp - the pre-allocated array; assumed to be of length at least 4m.
+//     zp - the preallocated array; assumed to be of length at least 4m.
 // Outputs:
 //     zp - the 4M-vector, modified so that:
 //          * zp[0:2m-1] = (1^{i k^2/2n}: 0 <= i < 2m)
@@ -8489,7 +8489,7 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, double *zp)
 //     n   - the original size of the transform; before reduction to n - 1.
 //     rq  - a primitive root modulo n.
 //     riq - the inverse of the primitive root modulo n.
-//     zp  - a pre-allocated vector of size at least 2 (n - 1).
+//     zp  - a preallocated vector of size at least 2 (n - 1).
 // Outputs:
 //     zp  - a 2(n-1)-vector for the FFT of Rader's factors.
 // NOTE:

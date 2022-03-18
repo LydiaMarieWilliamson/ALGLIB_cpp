@@ -5994,7 +5994,7 @@ static bool basicfunctest() {
 // This function initializes sparse matrix generator, which is used to generate
 // a set of matrices with sequentially increasing sparsity.
 //
-// PARAMETERS:
+// Parameters:
 //     M, N        -   matrix size. If M=0, then matrix is square N*N.
 //                     N and M must be small enough to store N*M dense matrix.
 //     MatKind     -   matrix properties:
@@ -75996,7 +75996,6 @@ static bool testdforestunit_testimportance() {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_int_t i1;
    ae_int_t npoints;
    ae_int_t npoints2;
    ae_int_t nvars;
@@ -76359,15 +76358,13 @@ static bool testdforestunit_testimportance() {
          }
          if (k < nvars) {
             for (i = 0; i < npoints2; i++) {
-               i1 = i + hqrnduniformi(&rs, npoints2 - i);
-               swapr(&xyp.xyR[i][k], &xyp.xyR[i1][k]);
+               swapr(&xyp.xyR[i][k], &xyp.xyR[i + hqrnduniformi(&rs, npoints2 - i)][k]);
             }
          }
          if (k == nvars + 1) {
             for (j = 0; j < nvars; j++) {
                for (i = 0; i < npoints2; i++) {
-                  i1 = i + hqrnduniformi(&rs, npoints2 - i);
-                  swapr(&xyp.xyR[i][j], &xyp.xyR[i1][j]);
+                  swapr(&xyp.xyR[i][j], &xyp.xyR[i + hqrnduniformi(&rs, npoints2 - i)][j]);
                }
             }
          }

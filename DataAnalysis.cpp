@@ -1109,9 +1109,7 @@ void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae
    dstie(a, n, &ties, &tiecount, &p1, &p2);
    for (i = 0; i < n; i++) {
       if (p2.xZ[i] != i) {
-         k = c->xZ[i];
-         c->xZ[i] = c->xZ[p2.xZ[i]];
-         c->xZ[p2.xZ[i]] = k;
+         swapi(&c->xZ[i], &c->xZ[p2.xZ[i]]);
       }
    }
 // Special cases
@@ -1272,9 +1270,7 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
    dstie(a, n, &ties, &tiecount, &p1, &p2);
    for (i = 0; i < n; i++) {
       if (p2.xZ[i] != i) {
-         k = c->xZ[i];
-         c->xZ[i] = c->xZ[p2.xZ[i]];
-         c->xZ[p2.xZ[i]] = k;
+         swapi(&c->xZ[i], &c->xZ[p2.xZ[i]]);
       }
    }
 // Special cases
@@ -12873,7 +12869,7 @@ static ae_int_t dforest_computecompresseduintsize(ae_int_t v) {
 // This function returns exact number of bytes required to  store  compressed
 // version of the tree starting at location TreeBase.
 //
-// PARAMETERS:
+// Parameters:
 //     DF              -   decision forest
 //     UseMantissa8    -   whether 8-bit or 16-bit mantissas are used to store
 //                         floating point numbers
@@ -13140,7 +13136,7 @@ static double dforest_unstreamfloat(ae_vector *buf, bool usemantissa8, ae_int_t 
 // This function returns exact number of bytes required to  store  compressed
 // version of the tree starting at location TreeBase.
 //
-// PARAMETERS:
+// Parameters:
 //     DF              -   decision forest
 //     UseMantissa8    -   whether 8-bit or 16-bit mantissas are used to store
 //                         floating point numbers

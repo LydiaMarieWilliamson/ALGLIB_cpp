@@ -1450,7 +1450,7 @@ static ae_int_t nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i
 
 // Recursive kd-tree generation subroutine.
 //
-// PARAMETERS
+// Parameters:
 //     KDT         tree
 //     NodesOffs   unused part of Nodes[] which must be filled by tree
 //     SplitsOffs  unused part of Splits[]
@@ -2721,7 +2721,7 @@ ae_int_t kdtreequerybox(kdtree *kdt, RVector *boxmin, RVector *boxmax) {
 //     KDT     -   KD-tree
 //     Buf     -   request  buffer  object  created   for   this   particular
 //                 instance of kd-tree structure.
-//     X       -   possibly pre-allocated buffer. If X is too small to store
+//     X       -   possibly preallocated buffer. If X is too small to store
 //                 result, it is resized. If size(X) is enough to store
 //                 result, it is left unchanged.
 //
@@ -2767,7 +2767,7 @@ void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *x) {
 //
 // Inputs:
 //     KDT     -   KD-tree
-//     X       -   possibly pre-allocated buffer. If X is too small to store
+//     X       -   possibly preallocated buffer. If X is too small to store
 //                 result, it is resized. If size(X) is enough to store
 //                 result, it is left unchanged.
 //
@@ -2799,7 +2799,7 @@ void kdtreequeryresultsx(kdtree *kdt, RMatrix *x) {
 //     KDT     -   KD-tree
 //     Buf     -   request  buffer  object  created   for   this   particular
 //                 instance of kd-tree structure.
-//     XY      -   possibly pre-allocated buffer. If XY is too small to store
+//     XY      -   possibly preallocated buffer. If XY is too small to store
 //                 result, it is resized. If size(XY) is enough to store
 //                 result, it is left unchanged.
 //
@@ -2846,7 +2846,7 @@ void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *xy) 
 //
 // Inputs:
 //     KDT     -   KD-tree
-//     XY      -   possibly pre-allocated buffer. If XY is too small to store
+//     XY      -   possibly preallocated buffer. If XY is too small to store
 //                 result, it is resized. If size(XY) is enough to store
 //                 result, it is left unchanged.
 //
@@ -2884,7 +2884,7 @@ void kdtreequeryresultsxy(kdtree *kdt, RMatrix *xy) {
 //     KDT     -   KD-tree
 //     Buf     -   request  buffer  object  created   for   this   particular
 //                 instance of kd-tree structure.
-//     Tags    -   possibly pre-allocated buffer. If X is too small to store
+//     Tags    -   possibly preallocated buffer. If X is too small to store
 //                 result, it is resized. If size(X) is enough to store
 //                 result, it is left unchanged.
 //
@@ -2931,7 +2931,7 @@ void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector *ta
 //
 // Inputs:
 //     KDT     -   KD-tree
-//     Tags    -   possibly pre-allocated buffer. If X is too small to store
+//     Tags    -   possibly preallocated buffer. If X is too small to store
 //                 result, it is resized. If size(X) is enough to store
 //                 result, it is left unchanged.
 //
@@ -2969,7 +2969,7 @@ void kdtreequeryresultstags(kdtree *kdt, ZVector *tags) {
 //     KDT     -   KD-tree
 //     Buf     -   request  buffer  object  created   for   this   particular
 //                 instance of kd-tree structure.
-//     R       -   possibly pre-allocated buffer. If X is too small to store
+//     R       -   possibly preallocated buffer. If X is too small to store
 //                 result, it is resized. If size(X) is enough to store
 //                 result, it is left unchanged.
 //
@@ -3031,7 +3031,7 @@ void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVecto
 //
 // Inputs:
 //     KDT     -   KD-tree
-//     R       -   possibly pre-allocated buffer. If X is too small to store
+//     R       -   possibly preallocated buffer. If X is too small to store
 //                 result, it is resized. If size(X) is enough to store
 //                 result, it is left unchanged.
 //

@@ -5721,7 +5721,7 @@ Pause:
 
 // NLEQ solver results
 //
-// Buffered implementation of NLEQResults(), which uses pre-allocated  buffer
+// Buffered implementation of NLEQResults(), which uses preallocated  buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
