@@ -572,6 +572,65 @@ A6.2. Test Stages
 		Converted set_error_flag(&X, Y) ⇒ X = X || Y;
 		Converted set_error_flag(P, Y) ⇒ *P = *P || Y;
 	―	Removed ALGLIB_ABORT_ON_ERROR_FLAG, effectively freezing it out to false (it's not used anywhere else).
+0-39	AlgLibInternal.{cpp,h}: Adding changes made in AlgLib++.
+	AlgLibInternal.{cpp,h}: Recoding of internal and non-API routines.
+	Integrating changes to AlgLibInternal.{cpp,h} already made in AlgLib++.
+	―	Relabelling in some calls of ae_assert().
+	―	Re-commenting in many places.
+	―	swapb(), swapc() added.
+		swap{b,i,r,c}() synthesized in numerous places.
+	―	Non-API routine tiledsplit(tasksize, tilesize, &task0, &task1)
+		redefined as task0 = tiledsplit(tasksize, tilesize), task1 = tasksize - task0;
+	―	Non-API routine splitlength(tasksize, chunksize, &task0, &task1)
+		redefined as task0 = splitlength(tasksize, chunksize), task1 = tasksize - task0;
+	―	Non-API routine splitlengtheven(tasksize, &task0, &task1)
+		redefined as task0 = splitlengtheven(tasksize), task1 = tasksize - task0;
+	―	Non-API routine sortmiddlei() removed and replaced by its duplicate tagsortmiddlei() [newly added to version 3.17.0].
+	―	Non-API routines tagsortmiddleir(), tagsortmiddlei() redeclared with default offset = 0, and recoded.
+		Declarations changed from tagsortmiddlei*(a, b, offset, n) to tagsortmiddlei*(a, b, n, offset = 0).
+	―	Non-API routines tagsortfast[ir]() recoded.
+	―	Local routines tsort_tagsortfast[ir]rec() recoded.
+	―	Local routine tsort_tagsortfastirec(a, b, bufa, bufb, i1, i2)
+		redefined as tsort_tagsortfastirec(a->xR + i1, b->xZ + i1, bufa->xR + i1, bufb->xZ + i1, i2 - i1 + 1)
+	―	Local routine tsort_tagsortfastrrec(a, b, bufa, bufb, i1, i2)
+		redefined as tsort_tagsortfastrrec(a->xR + i1, b->xR + i1, bufa->xR + i1, bufb->xR + i1, i2 - i1 + 1)
+	―	Local routine tsort_tagsortfastrec(a, bufa, i1, i2)
+		redefined as tsort_tagsortfastrec(a->xR + i1, bufa->xR + i1, i2 - i1 + 1)
+	―	Localized static constants linmin_{armijofactor,ftol,xtol,maxfev,defstpmax} to the routines they are used in,
+		and removed the "linmin_" prefix.
+	―	All of the routines in the FTBASE package were recoded.
+	―	Non-API routine ftapplyplan(&plan, &buf, offset, reps) redeclared with default offset = 0 and reps = 1, and recoded.
+	―	Local routines ftbase_ftpushentry{2,4}() combined with ftbase_ftpushentry() by making defaults eparam1 = -1, eparam2 = 0, eparam3 = 0.
+	―	Local routine(s) ftbase_ftpushentry*(plan, ⋯) redefined as ftbase_ftpushentry*(&plan->entries, ⋯).
+	―	Local routine ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m, n)
+		redefined as ftbase_fftirltrec(a->xR + astart, astride, b->xR + bstart, bstride, m, n).
+	―	Local routine ftbase_ffticltrec(a, astart, astride, b, bstart, bstride, m, n)
+		redefined as ftbase_ffticltrec(a->xR + astart, astride, b->xR + bstart, bstride, m, n).
+	―	Local routine ftbase_internalcomplexlintranspose(a, n, m, astart, buf)
+		redefined as ftbase_internalcomplexlintranspose(a->xR + astart, n, m, buf).
+	―	Local routine ftbase_ftapplycomplexcodelettwfft(a, offs, args, n, mun)
+		redefined as ftbase_ftapplycomplexcodelettwfft(a->xR + offs, args, n, mun).
+	―	Local routine ftbase_ffttwcalc(a, aoffset, n1, n2)
+		redefined as ftbase_ffttwcalc(a->xR + aoffset, n1, n2).
+	―	Local routine ftbase_ftapplycomplexreffft(a, offs, args, n, mun, buf)
+		redefined as ftbase_ftapplycomplexreffft(a->xR + offs, args, n, buf).
+		The mun == 2 assertion is placed outside and before the call.
+	―	Local routine ftbase_ftapplycomplexcodeletfft(a, offs, args, n, mun)
+		redefined as ftbase_ftapplycomplexcodeletfft(a->xR + offs, args, n).
+		The mun == 2 assertion is placed outside and before the call.
+	―	Local routine ftbase_ftbluesteinsfft(plan, a, abase, aoffset, ⋯, bufa, bufb, bufc, bufd)
+		redefined as ftbase_ftbluesteinsfft(plan, a->xR + abase + aoffset, ⋯, bufa, bufc).
+	―	Local routine ftbase_ftradersfft(plan, a, abase, aoffset, ⋯, buf)
+		redefined as ftbase_ftradersfft(plan, a->xR + abase + aoffset, aoffset, ⋯, buf).
+	―	Local routine ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset, buf, repcnt)
+		redefined as ftbase_ftapplysubplan(plan, subplan, a->xR + abase + aoffset, aoffset, buf, repcnt).
+	―	Local routine ftbase_ftprecomputebluesteinsfft(n, m, precr, offs)
+		redefined as ftbase_ftprecomputebluesteinsfft(n, m, precr->xR + offs).
+	―	Local routine ftbase_ftprecomputeradersfft(n, rq, riq, precr, offs)
+		redefined as ftbase_ftprecomputeradersfft(n, rq, riq, precr->xR + offs).
+0-39	LinAlg.{cpp,h}: Adding some changes made in AlgLib++.
+	LinAlg.cpp: Recoded {r,c}matrixgemm[rec] to increase efficiency
+	Reformatted the layout to combine the type/object section with function section in each namespace.
 
 A6.3. Test Results
 ──────────────────
@@ -626,6 +685,7 @@ A6.3. Test Results
 40	7874 1.0x 11237 0.8x 8932 1.1x 9158 1.0x 1647129328 (622d32f0) 80 // Added rmatrixgemmf() alongside cmatrixgemmf().
 0-39	7937 1.0x 11906 1.0x 12052 1.0x 9327 1.0x 1647218937 (622e90f9) 77 // Test{I,X,C}: Synchronize to AlgLib++.
 0-39	6289 1.0x 10001 1.0x 12199 1.0x 9158 1.0x 1647383434 (6231138a) 78 // Adding more changes made in AlgLib++ to TestC.cpp.
+9-39	7874 0.4x 11629 1.1x 12199 1.0x 8801 1.0x 1647593235 (62344713) 79 // Integrating changes made in AlgLib++ to AlgLibInternal.{cpp,h}.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -677,19 +737,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   6289
-* RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  10001
-* RGEMM-MTN-32              1.0x
+* RGEMM-SEQ-16   (MFLOPS)   7874
+* RGEMM-MTN-16              0.4x
+* RGEMM-SEQ-32   (MFLOPS)  11629
+* RGEMM-MTN-32              1.1x
 * RGEMM-SEQ-64   (MFLOPS)  12199
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9158
+* RGEMM-SEQ-1024 (MFLOPS)   8801
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-Seed: 1647383434 (6231138a)
+Seed: 1647593235 (62344713)
 Compiler: GCC
 Hardware: 64-bit
 Byte Order: little-endian
@@ -789,4 +849,4 @@ Testing Mode: single core
 88/90: knn                              Ok
 89/90: mlptrain                         Ok
 90/90: alglibbasics                     Ok
-Done in 78 seconds
+Done in 79 seconds

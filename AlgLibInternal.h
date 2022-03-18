@@ -35,6 +35,7 @@ void apbuffers_init(void *_p, bool make_automatic);
 void apbuffers_copy(void *_dst, void *_src, bool make_automatic);
 void apbuffers_free(void *_p, bool make_automatic);
 
+// typedef ae_vector RVector; //(@) In Ap.h.
 void RVector_init(void *_p, bool make_automatic);
 void RVector_copy(void *_dst, void *_src, bool make_automatic);
 void RVector_free(void *_p, bool make_automatic);
@@ -88,8 +89,10 @@ double safeminposrv(double x, double y, double v);
 void apperiodicmap(double *x, double a, double b, double *k);
 double randomnormal();
 void randomunit(ae_int_t n, RVector *x);
+void swapb(bool *v0, bool *v1);
 void swapi(ae_int_t *v0, ae_int_t *v1);
 void swapr(double *v0, double *v1);
+void swapc(complex *v0, complex *v1);
 void swapcols(RMatrix *a, ae_int_t j0, ae_int_t j1, ae_int_t nrows);
 void swaprows(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t ncols);
 void swapentries(RVector *a, ae_int_t i0, ae_int_t i1, ae_int_t entrywidth);
@@ -113,9 +116,9 @@ void copyintegerarray(ZVector *src, ZVector *dst);
 void copyrealarray(RVector *src, RVector *dst);
 void copyrealmatrix(RMatrix *src, RMatrix *dst);
 ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize);
-void tiledsplit(ae_int_t tasksize, ae_int_t tilesize, ae_int_t *task0, ae_int_t *task1);
-void splitlength(ae_int_t tasksize, ae_int_t chunksize, ae_int_t *task0, ae_int_t *task1);
-void splitlengtheven(ae_int_t tasksize, ae_int_t *task0, ae_int_t *task1);
+ae_int_t tiledsplit(ae_int_t tasksize, ae_int_t tilesize);
+ae_int_t splitlength(ae_int_t tasksize, ae_int_t chunksize);
+ae_int_t splitlengtheven(ae_int_t tasksize);
 ae_int_t recsearch(ZVector *a, ae_int_t nrec, ae_int_t nheader, ae_int_t i0, ae_int_t i1, ZVector *b);
 double sparselevel2density();
 ae_int_t matrixtilesizea();
@@ -285,9 +288,8 @@ namespace alglib_impl {
 void tagsortfasti(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t n);
 void tagsortfastr(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t n);
 void tagsortfast(RVector *a, RVector *bufa, ae_int_t n);
-void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t offset, ae_int_t n);
-void tagsortmiddlei(ZVector *a, ae_int_t offset, ae_int_t n);
-void sortmiddlei(ZVector *a, ae_int_t offset, ae_int_t n);
+void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t n, ae_int_t offset = 0);
+void tagsortmiddlei(ZVector *a, ae_int_t n, ae_int_t offset = 0);
 void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf);
 void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2);
 void tagheappushi(RVector *a, ZVector *b, ae_int_t *n, double va, ae_int_t vb);
@@ -407,7 +409,7 @@ void armijoresults(armijostate *state, ae_int_t *info, double *stp, double *f);
 namespace alglib_impl {
 double nulog1p(double x);
 double nuexpm1(double x);
-double nucosm1(double x);
+double nucosm1(double x); //(@) Not used or tested anywhere.
 } // end of namespace alglib_impl
 
 // === NTHEORY Package ===
@@ -434,7 +436,7 @@ void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1, ae_int_t *n2);
 bool ftbaseissmooth(ae_int_t n);
 ae_int_t ftbasefindsmooth(ae_int_t n);
 ae_int_t ftbasefindsmootheven(ae_int_t n);
-void ftapplyplan(fasttransformplan *plan, RVector *a, ae_int_t offsa, ae_int_t repcnt);
+void ftapplyplan(fasttransformplan *plan, RVector *a, ae_int_t offsa = 0, ae_int_t repcnt = 1);
 void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan);
 } // end of namespace alglib_impl
 

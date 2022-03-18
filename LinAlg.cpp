@@ -1029,71 +1029,31 @@ void rmatrixtrsv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper,
 // activate workers or not).
 // ALGLIB Routine: Copyright 10.01.2019 by Sergey Bochkanov
 static void ablas_rmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-   ae_int_t s1;
-   ae_int_t s2;
-   ae_int_t tsa;
-   ae_int_t tsb;
-   ae_int_t tscur;
-   tsa = matrixtilesizea();
-   tsb = matrixtilesizeb();
-   tscur = tsb;
-   if (imax3(m, n, k) <= tsb) {
-      tscur = tsa;
-   }
+   ae_int_t mnk = imax3(m, n, k);
+   ae_int_t tsa = matrixtilesizea(), tsb = matrixtilesizeb(), tscur = mnk <= tsb? tsa: tsb;
    ae_assert(tscur >= 1, "RMatrixGEMMRec: integrity check failed");
 // Use MKL or ALGLIB basecase code
-   if (m <= tsb && n <= tsb && k <= tsb) {
-      if (rmatrixgemmmkl(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc)) {
-         return;
-      }
-   }
-   if (m <= tsa && n <= tsa && k <= tsa) {
-      rmatrixgemmk(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      return;
-   }
+   if (mnk <= tsb && rmatrixgemmmkl(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc)) return;
+   else if (mnk <= tsa) rmatrixgemmk(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
 // Recursive algorithm: split on M or N
-   if (m >= n && m >= k) {
-   // A*B = (A1 A2)^T*B
-      tiledsplit(m, tscur, &s1, &s2);
-      if (optypea == 0) {
-         ablas_rmatrixgemmrec(s2, n, k, alpha, a, ia + s1, ja, optypea, b, ib, jb, optypeb, beta, c, ic + s1, jc);
-         ablas_rmatrixgemmrec(s1, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      } else {
-         ablas_rmatrixgemmrec(s2, n, k, alpha, a, ia, ja + s1, optypea, b, ib, jb, optypeb, beta, c, ic + s1, jc);
-         ablas_rmatrixgemmrec(s1, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      }
-      return;
-   }
-   if (n >= m && n >= k) {
-   // A*B = A*(B1 B2)
-      tiledsplit(n, tscur, &s1, &s2);
-      if (optypeb == 0) {
-         ablas_rmatrixgemmrec(m, s2, k, alpha, a, ia, ja, optypea, b, ib, jb + s1, optypeb, beta, c, ic, jc + s1);
-         ablas_rmatrixgemmrec(m, s1, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      } else {
-         ablas_rmatrixgemmrec(m, s2, k, alpha, a, ia, ja, optypea, b, ib + s1, jb, optypeb, beta, c, ic, jc + s1);
-         ablas_rmatrixgemmrec(m, s1, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      }
-      return;
-   }
-// Recursive algorithm: split on K
-// A*B = (A1 A2)*(B1 B2)^T
-   tiledsplit(k, tscur, &s1, &s2);
-   if (optypea == 0 && optypeb == 0) {
-      ablas_rmatrixgemmrec(m, n, s1, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      ablas_rmatrixgemmrec(m, n, s2, alpha, a, ia, ja + s1, optypea, b, ib + s1, jb, optypeb, 1.0, c, ic, jc);
-   }
-   if (optypea == 0 && optypeb != 0) {
-      ablas_rmatrixgemmrec(m, n, s1, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      ablas_rmatrixgemmrec(m, n, s2, alpha, a, ia, ja + s1, optypea, b, ib, jb + s1, optypeb, 1.0, c, ic, jc);
-   }
-   if (optypea != 0 && optypeb == 0) {
-      ablas_rmatrixgemmrec(m, n, s1, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      ablas_rmatrixgemmrec(m, n, s2, alpha, a, ia + s1, ja, optypea, b, ib + s1, jb, optypeb, 1.0, c, ic, jc);
-   }
-   if (optypea != 0 && optypeb != 0) {
-      ablas_rmatrixgemmrec(m, n, s1, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      ablas_rmatrixgemmrec(m, n, s2, alpha, a, ia + s1, ja, optypea, b, ib, jb + s1, optypeb, 1.0, c, ic, jc);
+   else if (mnk <= m) { // A*B = (A1 A2)^T*B
+      ae_int_t m0 = tiledsplit(m, tscur), m1 = m - m0;
+      ablas_rmatrixgemmrec(m0, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+      ic += m0;
+      if (optypea == 0) ia += m0; else ja += m0;
+      ablas_rmatrixgemmrec(m1, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+   } else if (mnk <= n) { // A*B = A*(B1 B2)
+      ae_int_t n0 = tiledsplit(n, tscur), n1 = n - n0;
+      ablas_rmatrixgemmrec(m, n0, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+      jc += n0;
+      if (optypeb == 0) jb += n0; else ib += n0;
+      ablas_rmatrixgemmrec(m, n1, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+   } else { // Recursive algorithm: split on K: A*B = (A1 A2)*(B1 B2)^T
+      ae_int_t k0 = tiledsplit(k, tscur), k1 = k - k0;
+      ablas_rmatrixgemmrec(m, n, k0, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+      if (optypea == 0) ja += k0; else ia += k0;
+      if (optypeb == 0) ib += k0; else jb += k0;
+      ablas_rmatrixgemmrec(m, n, k1, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, 1.0, c, ic, jc);
    }
 }
 
@@ -1103,71 +1063,32 @@ static void ablas_rmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, double alph
 // activate workers or not).
 // ALGLIB Routine: Copyright 10.01.2019 by Sergey Bochkanov
 static void ablas_cmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
-   ae_int_t s1;
-   ae_int_t s2;
-   ae_int_t tsa;
-   ae_int_t tsb;
-   ae_int_t tscur;
+   ae_int_t mnk = imax3(m, n, k);
 // Tile hierarchy: B -> A -> A/2
-   tsa = matrixtilesizea() / 2;
-   tsb = matrixtilesizeb();
-   tscur = tsb;
-   if (imax3(m, n, k) <= tsb) {
-      tscur = tsa;
-   }
+   ae_int_t tsa = matrixtilesizea() / 2, tsb = matrixtilesizeb(), tscur = mnk <= tsb? tsa: tsb;
    ae_assert(tscur >= 1, "CMatrixGEMMRec: integrity check failed");
 // Use MKL or ALGLIB basecase code
-   if (imax3(m, n, k) <= tsb) {
-      if (cmatrixgemmmkl(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc)) {
-         return;
-      }
-   }
-   if (imax3(m, n, k) <= tsa) {
-      cmatrixgemmk(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      return;
-   }
+   if (mnk <= tsb && cmatrixgemmmkl(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc)) return;
+   else if (mnk <= tsa) cmatrixgemmk(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
 // Recursive algorithm: parallel splitting on M/N
-   if (m >= n && m >= k) {
-   // A*B = (A1 A2)^T*B
-      tiledsplit(m, tscur, &s1, &s2);
-      ablas_cmatrixgemmrec(s1, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      if (optypea == 0) {
-         ablas_cmatrixgemmrec(s2, n, k, alpha, a, ia + s1, ja, optypea, b, ib, jb, optypeb, beta, c, ic + s1, jc);
-      } else {
-         ablas_cmatrixgemmrec(s2, n, k, alpha, a, ia, ja + s1, optypea, b, ib, jb, optypeb, beta, c, ic + s1, jc);
-      }
-      return;
-   }
-   if (n >= m && n >= k) {
-   // A*B = A*(B1 B2)
-      tiledsplit(n, tscur, &s1, &s2);
-      if (optypeb == 0) {
-         ablas_cmatrixgemmrec(m, s1, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-         ablas_cmatrixgemmrec(m, s2, k, alpha, a, ia, ja, optypea, b, ib, jb + s1, optypeb, beta, c, ic, jc + s1);
-      } else {
-         ablas_cmatrixgemmrec(m, s1, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-         ablas_cmatrixgemmrec(m, s2, k, alpha, a, ia, ja, optypea, b, ib + s1, jb, optypeb, beta, c, ic, jc + s1);
-      }
-      return;
-   }
-// Recursive algorithm: serial splitting on K
-// A*B = (A1 A2)*(B1 B2)^T
-   tiledsplit(k, tscur, &s1, &s2);
-   if (optypea == 0 && optypeb == 0) {
-      ablas_cmatrixgemmrec(m, n, s1, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      ablas_cmatrixgemmrec(m, n, s2, alpha, a, ia, ja + s1, optypea, b, ib + s1, jb, optypeb, complex_from_d(1.0), c, ic, jc);
-   }
-   if (optypea == 0 && optypeb != 0) {
-      ablas_cmatrixgemmrec(m, n, s1, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      ablas_cmatrixgemmrec(m, n, s2, alpha, a, ia, ja + s1, optypea, b, ib, jb + s1, optypeb, complex_from_d(1.0), c, ic, jc);
-   }
-   if (optypea != 0 && optypeb == 0) {
-      ablas_cmatrixgemmrec(m, n, s1, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      ablas_cmatrixgemmrec(m, n, s2, alpha, a, ia + s1, ja, optypea, b, ib + s1, jb, optypeb, complex_from_d(1.0), c, ic, jc);
-   }
-   if (optypea != 0 && optypeb != 0) {
-      ablas_cmatrixgemmrec(m, n, s1, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-      ablas_cmatrixgemmrec(m, n, s2, alpha, a, ia + s1, ja, optypea, b, ib, jb + s1, optypeb, complex_from_d(1.0), c, ic, jc);
+   else if (mnk <= m) { // A*B = (A1 A2)^T*B
+      ae_int_t m0 = tiledsplit(m, tscur), m1 = m - m0;
+      ablas_cmatrixgemmrec(m0, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+      ic += m0;
+      if (optypea == 0) ia += m0; else ja += m0;
+      ablas_cmatrixgemmrec(m1, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+   } else if (mnk <= n) { // A*B = A*(B1 B2)
+      ae_int_t n0 = tiledsplit(n, tscur), n1 = n - n0;
+      ablas_cmatrixgemmrec(m, n0, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+      jc += n0;
+      if (optypeb == 0) jb += n0; else ib += n0;
+      ablas_cmatrixgemmrec(m, n1, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+   } else { // Recursive algorithm: serial splitting on K: A*B = (A1 A2)*(B1 B2)^T
+      ae_int_t k0 = tiledsplit(k, tscur), k1 = k - k0;
+      ablas_cmatrixgemmrec(m, n, k0, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+      if (optypea == 0) ja += k0; else ia += k0;
+      if (optypeb == 0) ib += k0; else jb += k0;
+      ablas_cmatrixgemmrec(m, n, k1, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, complex_from_d(1.0), c, ic, jc);
    }
 }
 
@@ -1545,7 +1466,7 @@ void rmatrixrighttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t 
 // Parallelism was tried if: m >= 2 * tsb && (double)m * n * n >= smpactivationlevel()
    if (m >= 2 * tsb) {
    // Split X: X*A = (X1 X2)^T*A
-      tiledsplit(m, tsb, &s1, &s2);
+      s1 = tiledsplit(m, tsb), s2 = m - s1;
       rmatrixrighttrsm(s1, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
       rmatrixrighttrsm(s2, n, a, i1, j1, isupper, isunit, optype, x, i2 + s1, j2);
       return;
@@ -1563,7 +1484,7 @@ void rmatrixrighttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t 
 // Recursive subdivision
    if (m >= n) {
    // Split X: X*A = (X1 X2)^T*A
-      tiledsplit(m, tscur, &s1, &s2);
+      s1 = tiledsplit(m, tscur), s2 = m - s1;
       rmatrixrighttrsm(s1, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
       rmatrixrighttrsm(s2, n, a, i1, j1, isupper, isunit, optype, x, i2 + s1, j2);
    } else {
@@ -1574,7 +1495,7 @@ void rmatrixrighttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t 
    //
    // Different variants depending on
    // IsUpper/OpType combinations
-      tiledsplit(n, tscur, &s1, &s2);
+      s1 = tiledsplit(n, tscur), s2 = n - s1;
       if (isupper && optype == 0) {
       //                  (A1  A12)-1
       // X*A^-1 = (X1 X2)*(       )
@@ -1652,7 +1573,7 @@ void cmatrixrighttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t 
 // Parallelism was tried if: m >= 2 * tsb && 4.0 * m * n * n >= smpactivationlevel()
    if (m >= 2 * tsb) {
    // Split X: X*A = (X1 X2)^T*A
-      tiledsplit(m, tsb, &s1, &s2);
+      s1 = tiledsplit(m, tsb), s2 = m - s1;
       cmatrixrighttrsm(s1, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
       cmatrixrighttrsm(s2, n, a, i1, j1, isupper, isunit, optype, x, i2 + s1, j2);
       return;
@@ -1670,7 +1591,7 @@ void cmatrixrighttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t 
 // Recursive subdivision
    if (m >= n) {
    // Split X: X*A = (X1 X2)^T*A
-      tiledsplit(m, tscur, &s1, &s2);
+      s1 = tiledsplit(m, tscur), s2 = m - s1;
       cmatrixrighttrsm(s1, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
       cmatrixrighttrsm(s2, n, a, i1, j1, isupper, isunit, optype, x, i2 + s1, j2);
    } else {
@@ -1681,7 +1602,7 @@ void cmatrixrighttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t 
    //
    // Different variants depending on
    // IsUpper/OpType combinations
-      tiledsplit(n, tscur, &s1, &s2);
+      s1 = tiledsplit(n, tscur), s2 = n - s1;
       if (isupper && optype == 0) {
       //                  (A1  A12)-1
       // X*A^-1 = (X1 X2)*(       )
@@ -1957,7 +1878,7 @@ void rmatrixlefttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j
 // * perform optionally parallelized splits on N
 // Parallelism was tried if: n >= 2 * tsb && (double)n * m * m >= smpactivationlevel()
    if (n >= 2 * tsb) {
-      tiledsplit(n, tscur, &s1, &s2);
+      s1 = tiledsplit(n, tscur), s2 = n - s1;
       rmatrixlefttrsm(m, s2, a, i1, j1, isupper, isunit, optype, x, i2, j2 + s1);
       rmatrixlefttrsm(m, s1, a, i1, j1, isupper, isunit, optype, x, i2, j2);
       return;
@@ -1975,12 +1896,12 @@ void rmatrixlefttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j
 // Recursive subdivision
    if (n >= m) {
    // Split X: op(A)^-1*X = op(A)^-1*(X1 X2)
-      tiledsplit(n, tscur, &s1, &s2);
+      s1 = tiledsplit(n, tscur), s2 = n - s1;
       rmatrixlefttrsm(m, s1, a, i1, j1, isupper, isunit, optype, x, i2, j2);
       rmatrixlefttrsm(m, s2, a, i1, j1, isupper, isunit, optype, x, i2, j2 + s1);
    } else {
    // Split A
-      tiledsplit(m, tscur, &s1, &s2);
+      s1 = tiledsplit(m, tscur), s2 = m - s1;
       if (isupper && optype == 0) {
       //           (A1  A12)-1  ( X1 )
       // A^-1*X* = (       )   *(    )
@@ -2057,7 +1978,7 @@ void cmatrixlefttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j
 // * perform optionally parallelized splits on N
 // Parallelism was tried if: n >= 2 * tsb && 4.0 * n * m * m >= smpactivationlevel()
    if (n >= 2 * tsb) {
-      tiledsplit(n, tscur, &s1, &s2);
+      s1 = tiledsplit(n, tscur), s2 = n - s1;
       cmatrixlefttrsm(m, s2, a, i1, j1, isupper, isunit, optype, x, i2, j2 + s1);
       cmatrixlefttrsm(m, s1, a, i1, j1, isupper, isunit, optype, x, i2, j2);
       return;
@@ -2075,12 +1996,12 @@ void cmatrixlefttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j
 // Recursive subdivision
    if (n >= m) {
    // Split X: op(A)^-1*X = op(A)^-1*(X1 X2)
-      tiledsplit(n, tscur, &s1, &s2);
+      s1 = tiledsplit(n, tscur), s2 = n - s1;
       cmatrixlefttrsm(m, s1, a, i1, j1, isupper, isunit, optype, x, i2, j2);
       cmatrixlefttrsm(m, s2, a, i1, j1, isupper, isunit, optype, x, i2, j2 + s1);
    } else {
    // Split A
-      tiledsplit(m, tscur, &s1, &s2);
+      s1 = tiledsplit(m, tscur), s2 = m - s1;
       if (isupper && optype == 0) {
       //           (A1  A12)-1  ( X1 )
       // A^-1*X* = (       )   *(    )
@@ -2326,7 +2247,7 @@ void rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, 
 // Recursive subdivision of the problem
    if (k >= n) {
    // Split K
-      tiledsplit(k, tscur, &s1, &s2);
+      s1 = tiledsplit(k, tscur), s2 = k - s1;
       if (optypea == 0) {
          rmatrixsyrk(n, s1, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
          rmatrixsyrk(n, s2, alpha, a, ia, ja + s1, optypea, 1.0, c, ic, jc, isupper);
@@ -2336,7 +2257,7 @@ void rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, 
       }
    } else {
    // Split N
-      tiledsplit(n, tscur, &s1, &s2);
+      s1 = tiledsplit(n, tscur), s2 = n - s1;
       if (optypea == 0 && isupper) {
          rmatrixsyrk(s1, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
          rmatrixsyrk(s2, k, alpha, a, ia + s1, ja, optypea, beta, c, ic + s1, jc + s1, isupper);
@@ -2418,7 +2339,7 @@ void cmatrixherk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, 
 // Recursive division of the problem
    if (k >= n) {
    // Split K
-      tiledsplit(k, tscur, &s1, &s2);
+      s1 = tiledsplit(k, tscur), s2 = k - s1;
       if (optypea == 0) {
          cmatrixherk(n, s1, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
          cmatrixherk(n, s2, alpha, a, ia, ja + s1, optypea, 1.0, c, ic, jc, isupper);
@@ -2428,7 +2349,7 @@ void cmatrixherk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, 
       }
    } else {
    // Split N
-      tiledsplit(n, tscur, &s1, &s2);
+      s1 = tiledsplit(n, tscur), s2 = n - s1;
       if (optypea == 0 && isupper) {
          cmatrixherk(s1, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
          cmatrixherk(s2, k, alpha, a, ia + s1, ja, optypea, beta, c, ic + s1, jc + s1, isupper);
@@ -8908,7 +8829,6 @@ void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematri
    ae_int_t j1;
    ae_int_t k0;
    ae_int_t k1;
-   ae_int_t kk;
    ae_int_t n;
    ae_int_t dst;
    bool bflag;
@@ -8977,11 +8897,7 @@ void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematri
             j = a->idx.xZ[jj];
             k0 = p->xZ[i];
             k1 = p->xZ[j];
-            if (k1 < k0) {
-               kk = k0;
-               k0 = k1;
-               k1 = kk;
-            }
+            if (k1 < k0) swapi(&k0, &k1);
             dst = b->uidx.xZ[k0];
             b->idx.xZ[dst] = k1;
             b->vals.xR[dst] = a->vals.xR[jj];
@@ -8994,11 +8910,7 @@ void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematri
             j = a->idx.xZ[jj];
             k0 = p->xZ[i];
             k1 = p->xZ[j];
-            if (k1 > k0) {
-               kk = k0;
-               k0 = k1;
-               k1 = kk;
-            }
+            if (k1 > k0) swapi(&k0, &k1);
             dst = b->uidx.xZ[k0];
             b->idx.xZ[dst] = k1;
             b->vals.xR[dst] = a->vals.xR[jj];
@@ -9008,7 +8920,7 @@ void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematri
    }
 // Finalize matrix
    for (i = 0; i < n; i++) {
-      tagsortmiddleir(&b->idx, &b->vals, b->ridx.xZ[i], b->ridx.xZ[i + 1] - b->ridx.xZ[i]);
+      tagsortmiddleir(&b->idx, &b->vals, b->ridx.xZ[i + 1] - b->ridx.xZ[i], b->ridx.xZ[i]);
    }
    sparseinitduidx(b);
 }
@@ -9397,17 +9309,13 @@ void sparsetransposesks(sparsematrix *s) {
    for (i = 1; i < n; i++) {
       d = s->didx.xZ[i];
       u = s->uidx.xZ[i];
-      k = s->uidx.xZ[i];
-      s->uidx.xZ[i] = s->didx.xZ[i];
-      s->didx.xZ[i] = k;
+      swapi(&s->uidx.xZ[i], &s->didx.xZ[i]);
       if (d == u) {
       // Upper skyline height equal to lower skyline height,
       // simple exchange is needed for transposition
          t0 = s->ridx.xZ[i];
          for (k = 0; k < d; k++) {
-            v = s->vals.xR[t0 + k];
-            s->vals.xR[t0 + k] = s->vals.xR[t0 + d + 1 + k];
-            s->vals.xR[t0 + d + 1 + k] = v;
+            swapr(&s->vals.xR[t0 + k], &s->vals.xR[t0 + d + 1 + k]);
          }
       }
       if (d > u) {
@@ -9425,34 +9333,26 @@ void sparsetransposesks(sparsematrix *s) {
          t0 = s->ridx.xZ[i];
          t1 = s->ridx.xZ[i] + d + 1;
          for (k = 0; k < u; k++) {
-            v = s->vals.xR[t0 + k];
-            s->vals.xR[t0 + k] = s->vals.xR[t1 + k];
-            s->vals.xR[t1 + k] = v;
+            swapr(&s->vals.xR[t0 + k], &s->vals.xR[t1 + k]);
          }
          t0 = s->ridx.xZ[i] + u;
          t1 = s->ridx.xZ[i + 1] - 1;
          while (t1 > t0) {
-            v = s->vals.xR[t0];
-            s->vals.xR[t0] = s->vals.xR[t1];
-            s->vals.xR[t1] = v;
+            swapr(&s->vals.xR[t0], &s->vals.xR[t1]);
             t0++;
             t1--;
          }
          t0 = s->ridx.xZ[i] + u;
          t1 = s->ridx.xZ[i] + u + u;
          while (t1 > t0) {
-            v = s->vals.xR[t0];
-            s->vals.xR[t0] = s->vals.xR[t1];
-            s->vals.xR[t1] = v;
+            swapr(&s->vals.xR[t0], &s->vals.xR[t1]);
             t0++;
             t1--;
          }
          t0 = s->ridx.xZ[i + 1] - (d - u);
          t1 = s->ridx.xZ[i + 1] - 1;
          while (t1 > t0) {
-            v = s->vals.xR[t0];
-            s->vals.xR[t0] = s->vals.xR[t1];
-            s->vals.xR[t1] = v;
+            swapr(&s->vals.xR[t0], &s->vals.xR[t1]);
             t0++;
             t1--;
          }
@@ -9472,42 +9372,32 @@ void sparsetransposesks(sparsematrix *s) {
          t0 = s->ridx.xZ[i];
          t1 = s->ridx.xZ[i + 1] - d;
          for (k = 0; k < d; k++) {
-            v = s->vals.xR[t0 + k];
-            s->vals.xR[t0 + k] = s->vals.xR[t1 + k];
-            s->vals.xR[t1 + k] = v;
+            swapr(&s->vals.xR[t0 + k], &s->vals.xR[t1 + k]);
          }
          t0 = s->ridx.xZ[i];
          t1 = s->ridx.xZ[i] + u;
          while (t1 > t0) {
-            v = s->vals.xR[t0];
-            s->vals.xR[t0] = s->vals.xR[t1];
-            s->vals.xR[t1] = v;
+            swapr(&s->vals.xR[t0], &s->vals.xR[t1]);
             t0++;
             t1--;
          }
          t0 = s->ridx.xZ[i];
          t1 = s->ridx.xZ[i] + u - d - 1;
          while (t1 > t0) {
-            v = s->vals.xR[t0];
-            s->vals.xR[t0] = s->vals.xR[t1];
-            s->vals.xR[t1] = v;
+            swapr(&s->vals.xR[t0], &s->vals.xR[t1]);
             t0++;
             t1--;
          }
          t0 = s->ridx.xZ[i] + u - d;
          t1 = s->ridx.xZ[i + 1] - d - 1;
          while (t1 > t0) {
-            v = s->vals.xR[t0];
-            s->vals.xR[t0] = s->vals.xR[t1];
-            s->vals.xR[t1] = v;
+            swapr(&s->vals.xR[t0], &s->vals.xR[t1]);
             t0++;
             t1--;
          }
       }
    }
-   k = s->uidx.xZ[n];
-   s->uidx.xZ[n] = s->didx.xZ[n];
-   s->didx.xZ[n] = k;
+   swapi(&s->uidx.xZ[n], &s->didx.xZ[n]);
 }
 
 // This function performs transpose of CRS matrix.
@@ -9841,7 +9731,7 @@ void sparseconverttocrs(sparsematrix *s) {
          }
       }
       for (i = 0; i < s->m; i++) {
-         tagsortmiddleir(&s->idx, &s->vals, s->ridx.xZ[i], s->ridx.xZ[i + 1] - s->ridx.xZ[i]);
+         tagsortmiddleir(&s->idx, &s->vals, s->ridx.xZ[i + 1] - s->ridx.xZ[i], s->ridx.xZ[i]);
       }
    // Initialization 'S.UIdx' and 'S.DIdx'
       sparseinitduidx(s);
@@ -10193,7 +10083,7 @@ void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1) {
       s1->ninitialized = s1->ridx.xZ[s1->m];
    // Sorting of elements
       for (i = 0; i < s1->m; i++) {
-         tagsortmiddleir(&s1->idx, &s1->vals, s1->ridx.xZ[i], s1->ridx.xZ[i + 1] - s1->ridx.xZ[i]);
+         tagsortmiddleir(&s1->idx, &s1->vals, s1->ridx.xZ[i + 1] - s1->ridx.xZ[i], s1->ridx.xZ[i]);
       }
    // Initialization 'S.UIdx' and 'S.DIdx'
       sparseinitduidx(s1);
@@ -10496,7 +10386,7 @@ void sparsecreatecrsinplace(sparsematrix *s) {
    s->matrixtype = 1;
    s->ninitialized = s->ridx.xZ[m];
    for (i = 0; i < m; i++) {
-      tagsortmiddleir(&s->idx, &s->vals, s->ridx.xZ[i], s->ridx.xZ[i + 1] - s->ridx.xZ[i]);
+      tagsortmiddleir(&s->idx, &s->vals, s->ridx.xZ[i + 1] - s->ridx.xZ[i], s->ridx.xZ[i]);
    }
    sparseinitduidx(s);
 }
@@ -11566,9 +11456,7 @@ static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, doub
       // Swap rows and columns
          *cs = 0.0;
          *sn = 1.0;
-         temp = *d;
-         *d = *a;
-         *a = temp;
+         swapr(d, a);
          *b = -*c;
          *c = 0.0;
       } else {
@@ -14407,9 +14295,7 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
       }
       if (n == 2) {
          if (d->xR[1] > d->xR[2]) {
-            tmp = d->xR[1];
-            d->xR[1] = d->xR[2];
-            d->xR[2] = tmp;
+            swapr(&d->xR[1], &d->xR[2]);
          }
          ae_frame_leave();
          return result;
@@ -14422,9 +14308,7 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
             if (d->xR[k] >= d->xR[t]) {
                t = 1;
             } else {
-               tmp = d->xR[k];
-               d->xR[k] = d->xR[t];
-               d->xR[t] = tmp;
+               swapr(&d->xR[k], &d->xR[t]);
                t = k;
             }
          }
@@ -14432,9 +14316,7 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
       } while (i <= n);
       i = n - 1;
       do {
-         tmp = d->xR[i + 1];
-         d->xR[i + 1] = d->xR[1];
-         d->xR[1] = tmp;
+         swapr(&d->xR[i + 1], &d->xR[1]);
          t = 1;
          while (t != 0) {
             k = 2 * t;
@@ -14449,9 +14331,7 @@ static bool evd_tridiagonalevd(RVector *d, RVector *e, ae_int_t n, ae_int_t znee
                if (d->xR[t] >= d->xR[k]) {
                   t = 0;
                } else {
-                  tmp = d->xR[k];
-                  d->xR[k] = d->xR[t];
-                  d->xR[t] = tmp;
+                  swapr(&d->xR[k], &d->xR[t]);
                   t = k;
                }
             }
@@ -14647,22 +14527,12 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
          // Converged -- Swap with position KFNEW,
          // then increment KFNEW
             if (ji > kfnew) {
-               tmp1 = ab->xyR[ji][1];
-               tmp2 = ab->xyR[ji][2];
-               itmp1 = nab->xyZ[ji][1];
-               itmp2 = nab->xyZ[ji][2];
-               ab->xyR[ji][1] = ab->xyR[kfnew][1];
-               ab->xyR[ji][2] = ab->xyR[kfnew][2];
-               nab->xyZ[ji][1] = nab->xyZ[kfnew][1];
-               nab->xyZ[ji][2] = nab->xyZ[kfnew][2];
-               ab->xyR[kfnew][1] = tmp1;
-               ab->xyR[kfnew][2] = tmp2;
-               nab->xyZ[kfnew][1] = itmp1;
-               nab->xyZ[kfnew][2] = itmp2;
+               swapr(&ab->xyR[ji][1], &ab->xyR[kfnew][1]);
+               swapr(&ab->xyR[ji][2], &ab->xyR[kfnew][2]);
+               swapi(&nab->xyZ[ji][1], &nab->xyZ[kfnew][1]);
+               swapi(&nab->xyZ[ji][2], &nab->xyZ[kfnew][2]);
                if (ijob == 3) {
-                  itmp1 = nval->xZ[ji];
-                  nval->xZ[ji] = nval->xZ[kfnew];
-                  nval->xZ[kfnew] = itmp1;
+                  swapi(&nval->xZ[ji], &nval->xZ[kfnew]);
                }
             }
             kfnew++;
@@ -14704,7 +14574,6 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
    ae_int_t iw;
    ae_int_t iwoff;
    ae_int_t j;
-   ae_int_t itmp1;
    ae_int_t jb;
    ae_int_t jdisc;
    ae_int_t je;
@@ -15221,11 +15090,9 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
             }
          }
          if (ie != 0) {
-            itmp1 = iblock->xZ[ie];
             w->xR[ie] = w->xR[je];
-            iblock->xZ[ie] = iblock->xZ[je];
             w->xR[je] = tmp1;
-            iblock->xZ[je] = itmp1;
+            swapi(&iblock->xZ[ie], &iblock->xZ[je]);
          }
       }
    }
@@ -16049,13 +15916,9 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
                k = j;
             }
          }
-         v = w.xR[i];
-         w.xR[i] = w.xR[k];
-         w.xR[k] = v;
+         swapr(&w.xR[i], &w.xR[k]);
          for (j = 1; j <= n; j++) {
-            v = z2.xyR[j][i];
-            z2.xyR[j][i] = z2.xyR[j][k];
-            z2.xyR[j][k] = v;
+            swapr(&z2.xyR[j][i], &z2.xyR[j][k]);
          }
       }
    // Transform Z2 and overwrite Z
@@ -16105,13 +15968,9 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
                k = j;
             }
          }
-         v = w.xR[i];
-         w.xR[i] = w.xR[k];
-         w.xR[k] = v;
+         swapr(&w.xR[i], &w.xR[k]);
          for (j = 1; j <= n; j++) {
-            v = z2.xyR[j][i];
-            z2.xyR[j][i] = z2.xyR[j][k];
-            z2.xyR[j][k] = v;
+            swapr(&z2.xyR[j][i], &z2.xyR[j][k]);
          }
       }
    // Store W
@@ -16255,13 +16114,9 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
                k = j;
             }
          }
-         v = w.xR[i];
-         w.xR[i] = w.xR[k];
-         w.xR[k] = v;
+         swapr(&w.xR[i], &w.xR[k]);
          for (j = 1; j <= n; j++) {
-            v = z2.xyR[j][i];
-            z2.xyR[j][i] = z2.xyR[j][k];
-            z2.xyR[j][k] = v;
+            swapr(&z2.xyR[j][i], &z2.xyR[j][k]);
          }
       }
    // Transform Z2 and overwrite Z
@@ -16314,13 +16169,9 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
                k = j;
             }
          }
-         v = w.xR[i];
-         w.xR[i] = w.xR[k];
-         w.xR[k] = v;
+         swapr(&w.xR[i], &w.xR[k]);
          for (j = 1; j <= n; j++) {
-            v = z2.xyR[j][i];
-            z2.xyR[j][i] = z2.xyR[j][k];
-            z2.xyR[j][k] = v;
+            swapr(&z2.xyR[j][i], &z2.xyR[j][k]);
          }
       }
    // Store Z
@@ -17905,9 +17756,7 @@ static void dlu_rmatrixplu2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, Z
       if (a->xyR[offs + jp][offs + j] != 0.0) {
          if (jp != j) {
             for (i = 0; i < n; i++) {
-               s = a->xyR[offs + j][offs + i];
-               a->xyR[offs + j][offs + i] = a->xyR[offs + jp][offs + i];
-               a->xyR[offs + jp][offs + i] = s;
+               swapr(&a->xyR[offs + j][offs + i], &a->xyR[offs + jp][offs + i]);
             }
          }
          if (j + 1 < m) {
@@ -17948,9 +17797,7 @@ static void dlu_cmatrixplu2(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, Z
       if (ae_c_neq_d(a->xyC[offs + jp][offs + j], 0.0)) {
          if (jp != j) {
             for (i = 0; i < n; i++) {
-               s = a->xyC[offs + j][offs + i];
-               a->xyC[offs + j][offs + i] = a->xyC[offs + jp][offs + i];
-               a->xyC[offs + jp][offs + i] = s;
+               swapc(&a->xyC[offs + j][offs + i], &a->xyC[offs + jp][offs + i]);
             }
          }
          if (j + 1 < m) {
@@ -18000,7 +17847,7 @@ void rmatrixplurec(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *p
       n1 = tsb;
       n2 = n - n1;
    } else {
-      tiledsplit(n, tsa, &n1, &n2);
+      n1 = tiledsplit(n, tsa), n2 = n - n1;
    }
    rmatrixplurec(a, offs, m, n1, pivots, tmp);
    if (n2 > 0) {
@@ -18053,7 +17900,7 @@ void cmatrixplurec(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *p
       n1 = tsb;
       n2 = n - n1;
    } else {
-      tiledsplit(n, tsa, &n1, &n2);
+      n1 = tiledsplit(n, tsa), n2 = n - n1;
    }
    cmatrixplurec(a, offs, m, n1, pivots, tmp);
    if (n2 > 0) {
@@ -18107,10 +17954,7 @@ static void sptrf_sluv2list1init(ae_int_t n, sluv2list1matrix *a) {
 // This function swaps sequences #I and #J stored by the structure
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_sluv2list1swap(sluv2list1matrix *a, ae_int_t i, ae_int_t j) {
-   ae_int_t k;
-   k = a->idxfirst.xZ[i];
-   a->idxfirst.xZ[i] = a->idxfirst.xZ[j];
-   a->idxfirst.xZ[j] = k;
+   swapi(&a->idxfirst.xZ[i], &a->idxfirst.xZ[j]);
 }
 
 // This function drops sequence #I from the structure
@@ -18463,9 +18307,7 @@ static void sptrf_sparsetrailpivotout(sluv2sparsetrail *a, ae_int_t ipiv, ae_int
    ae_int_t i;
    ae_int_t j;
    ae_int_t entry;
-   double v;
    double s;
-   bool vb;
    ae_int_t pos0k;
    ae_int_t pos0piv;
    ae_int_t pprev;
@@ -18558,12 +18400,8 @@ static void sptrf_sparsetrailpivotout(sluv2sparsetrail *a, ae_int_t ipiv, ae_int
             if (v0i->xZ[i] < v0i->xZ[i + 1]) {
                break;
             }
-            j = v0i->xZ[i];
-            v0i->xZ[i] = v0i->xZ[i + 1];
-            v0i->xZ[i + 1] = j;
-            v = v0r->xR[i];
-            v0r->xR[i] = v0r->xR[i + 1];
-            v0r->xR[i + 1] = v;
+            swapi(&v0i->xZ[i], &v0i->xZ[i + 1]);
+            swapr(&v0r->xR[i], &v0r->xR[i + 1]);
          }
       }
       if (pos0k < 0 && pos0piv >= 0) {
@@ -18648,15 +18486,9 @@ static void sptrf_sparsetrailpivotout(sluv2sparsetrail *a, ae_int_t ipiv, ae_int
       entry = a->slsidx.xZ[entry * sptrf_slswidth + 3];
    }
 // Reorder other structures
-   i = a->nzc.xZ[k];
-   a->nzc.xZ[k] = a->nzc.xZ[jpiv];
-   a->nzc.xZ[jpiv] = i;
-   i = a->colid.xZ[k];
-   a->colid.xZ[k] = a->colid.xZ[jpiv];
-   a->colid.xZ[jpiv] = i;
-   vb = a->isdensified.xB[k];
-   a->isdensified.xB[k] = a->isdensified.xB[jpiv];
-   a->isdensified.xB[jpiv] = vb;
+   swapi(&a->nzc.xZ[k], &a->nzc.xZ[jpiv]);
+   swapi(&a->colid.xZ[k], &a->colid.xZ[jpiv]);
+   swapb(&a->isdensified.xB[k], &a->isdensified.xB[jpiv]);
 // Handle removal of col/row #K
    for (i = 0; i < *nz1; i++) {
       j = v1i->xZ[i];
@@ -18977,9 +18809,7 @@ bool sptrflu(sparsematrix *a, ae_int_t pivottype, ZVector *pr, ZVector *pc, sluv
       }
       pc->xZ[k] = jbest;
       pr->xZ[k] = ibest;
-      j = buf->rowpermrawidx.xZ[k];
-      buf->rowpermrawidx.xZ[k] = buf->rowpermrawidx.xZ[ibest];
-      buf->rowpermrawidx.xZ[ibest] = j;
+      swapi(&buf->rowpermrawidx.xZ[k], &buf->rowpermrawidx.xZ[ibest]);
    // Apply pivoting to BL and BU
       sptrf_sluv2list1swap(&buf->bleft, k, ibest);
       sptrf_sluv2list1swap(&buf->bupper, k, jbest);
@@ -18989,9 +18819,7 @@ bool sptrflu(sparsematrix *a, ae_int_t pivottype, ZVector *pr, ZVector *pc, sluv
    // Pivot dense trail
       tmpndense = buf->dtrail.ndense;
       for (i = 0; i < tmpndense; i++) {
-         v = buf->dtrail.d.xyR[k][i];
-         buf->dtrail.d.xyR[k][i] = buf->dtrail.d.xyR[ibest][i];
-         buf->dtrail.d.xyR[ibest][i] = v;
+         swapr(&buf->dtrail.d.xyR[k][i], &buf->dtrail.d.xyR[ibest][i]);
       }
    // Output to LU matrix
       sptrf_sluv2list1appendsequencetomatrix(&buf->bupper, k, true, uu, n, &buf->sparseut, k);
@@ -19036,9 +18864,7 @@ bool sptrflu(sparsematrix *a, ae_int_t pivottype, ZVector *pr, ZVector *pc, sluv
             }
          }
          ae_assert(jp >= 0, "SPTRF: integrity check failed during reordering");
-         k = buf->strail.colid.xZ[i];
-         buf->strail.colid.xZ[i] = buf->strail.colid.xZ[jp];
-         buf->strail.colid.xZ[jp] = k;
+         swapi(&buf->strail.colid.xZ[i], &buf->strail.colid.xZ[jp]);
          pc->xZ[i] = jp;
       }
    // Perform dense LU decomposition on dense trail
@@ -19055,9 +18881,7 @@ bool sptrflu(sparsematrix *a, ae_int_t pivottype, ZVector *pr, ZVector *pc, sluv
       for (i = 0; i < tmpndense; i++) {
          pr->xZ[i + (n - tmpndense)] = buf->tmpp.xZ[i] + (n - tmpndense);
          sptrf_sluv2list1swap(&buf->bleft, i + (n - tmpndense), pr->xZ[i + (n - tmpndense)]);
-         j = buf->rowpermrawidx.xZ[i + (n - tmpndense)];
-         buf->rowpermrawidx.xZ[i + (n - tmpndense)] = buf->rowpermrawidx.xZ[pr->xZ[i + (n - tmpndense)]];
-         buf->rowpermrawidx.xZ[pr->xZ[i + (n - tmpndense)]] = j;
+         swapi(&buf->rowpermrawidx.xZ[i + (n - tmpndense)], &buf->rowpermrawidx.xZ[pr->xZ[i + (n - tmpndense)]]);
       }
    // Convert U-factor
       ivectorgrowto(&buf->sparseut.idx, buf->sparseut.ridx.xZ[n - tmpndense] + n * tmpndense);
@@ -21665,7 +21489,7 @@ static ae_int_t spchol_computenonzeropattern(sparsematrix *wrkat, ae_int_t colum
       for (ii = rfirst; ii < rlast; ii++) {
          truearray->xB[superrowidx->xZ[ii]] = true;
       }
-      tagsortmiddlei(superrowidx, rfirst, rlast - rfirst);
+      tagsortmiddlei(superrowidx, rlast - rfirst, rfirst);
       result = rlast;
    }
    return result;
@@ -22085,7 +21909,7 @@ static void spchol_extractmatrix(spcholanalysis *analysis, ZVector *offsets, ZVe
       }
       for (i = 0; i < n; i++) {
          ae_assert(a->didx.xZ[i] == a->ridx.xZ[i + 1], "ExtractMatrix: integrity check failed (9473t)");
-         tagsortmiddleir(&a->idx, &a->vals, a->ridx.xZ[i], a->ridx.xZ[i + 1] - a->ridx.xZ[i]);
+         tagsortmiddleir(&a->idx, &a->vals, a->ridx.xZ[i + 1] - a->ridx.xZ[i], a->ridx.xZ[i]);
          ae_assert(a->idx.xZ[a->ridx.xZ[i + 1] - 1] == i, "ExtractMatrix: integrity check failed (e4tfd)");
       }
       sparseinitduidx(a);
@@ -22163,12 +21987,9 @@ static void spchol_extractmatrix(spcholanalysis *analysis, ZVector *offsets, ZVe
          k = analysis->inveffectiveperm.xZ[i];
          j = tmpp->xZ[k];
       // Swap elements of P[I:N-1] that is used to store current locations of elements in different way
-         i0 = p->xZ[i];
-         p->xZ[i] = p->xZ[j];
-         p->xZ[j] = i0;
+         swapi(&p->xZ[i], &p->xZ[j]);
       // record pivoting of positions I and J
-         p->xZ[i] = j;
-         tmpp->xZ[i0] = j;
+         p->xZ[i] = tmpp->xZ[p->xZ[j]] = j;
       }
    }
 }
@@ -24619,7 +24440,7 @@ bool spdmatrixcholeskyrec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, R
       n2 = n - n1;
    } else {
    // Smaller than B-size, perform cache-oblivious split
-      tiledsplit(n, tsa, &n1, &n2);
+      n1 = tiledsplit(n, tsa), n2 = n - n1;
    }
    result = spdmatrixcholeskyrec(a, offs, n1, isupper, tmp);
    if (!result) {
@@ -24684,7 +24505,7 @@ static bool trfac_hpdmatrixcholeskyrec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
       n2 = n - n1;
    } else {
    // Smaller than B-size, perform cache-oblivious split
-      tiledsplit(n, tsa, &n1, &n2);
+      n1 = tiledsplit(n, tsa), n2 = n - n1;
    }
    result = trfac_hpdmatrixcholeskyrec(a, offs, n1, isupper, tmp);
    if (!result) {
@@ -26150,7 +25971,6 @@ static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *s
    double slt;
    double srt;
    double t;
-   double temp;
    double tsign;
    double tt;
    double v;
@@ -26180,12 +26000,8 @@ static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *s
    if (swp) {
    // Now FA .ge. HA
       pmax = 3;
-      temp = ft;
-      ft = ht;
-      ht = temp;
-      temp = fa;
-      fa = ha;
-      ha = temp;
+      swapr(&ft, &ht);
+      swapr(&fa, &ha);
    }
    gt = g;
    ga = fabs(gt);
@@ -30297,7 +30113,7 @@ static void matinv_rmatrixtrinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bo
       return;
    }
 // Recursive case
-   tiledsplit(n, tscur, &n1, &n2);
+   n1 = tiledsplit(n, tscur), n2 = n - n1;
 // ae_int_t mn = imin2(n1, n2); //(@) Unused.
    if (n2 > 0) {
       if (isupper) {
@@ -30416,7 +30232,7 @@ static void matinv_cmatrixtrinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
       return;
    }
 // Recursive case
-   tiledsplit(n, tscur, &n1, &n2);
+   n1 = tiledsplit(n, tscur), n2 = n - n1;
 // ae_int_t mn = imin2(n1, n2); //(@) Unused.
    if (n2 > 0) {
       if (isupper) {
@@ -30516,7 +30332,7 @@ static void matinv_rmatrixluinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, RV
 // * Y := -inv(U2)*Y       /
 //
 // * Z := inv(L2*U2)
-   tiledsplit(n, tscur, &n1, &n2);
+   n1 = tiledsplit(n, tscur), n2 = n - n1;
 // ae_int_t mn = imin2(n1, n2); //(@) Unused.
    ae_assert(n2 > 0, "LUInverseRec: internal error!");
 // X := inv(U1)*U12
@@ -30626,7 +30442,7 @@ static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CV
 // * Y := -inv(U2)*Y       /
 //
 // * Z := inv(L2*U2)
-   tiledsplit(n, tscur, &n1, &n2);
+   n1 = tiledsplit(n, tscur), n2 = n - n1;
 // ae_int_t mn = imin2(n1, n2); //(@) Unused.
    ae_assert(n2 > 0, "LUInverseRec: internal error!");
 // X := inv(U1)*U12
@@ -30745,7 +30561,7 @@ void spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isu
    }
 // Recursive code: triangular factor inversion merged with
 // UU' or L'L multiplication
-   tiledsplit(n, tscur, &n1, &n2);
+   n1 = tiledsplit(n, tscur), n2 = n - n1;
 // form off-diagonal block of trangular inverse
    if (isupper) {
       for (i = 0; i < n1; i++) {
@@ -30861,7 +30677,7 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
    }
 // Recursive code: triangular factor inversion merged with
 // UU' or L'L multiplication
-   tiledsplit(n, tscur, &n1, &n2);
+   n1 = tiledsplit(n, tscur), n2 = n - n1;
 // form off-diagonal block of trangular inverse
    if (isupper) {
       for (i = 0; i < n1; i++) {
@@ -30927,8 +30743,6 @@ void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_int_t k;
-   double v;
    ae_frame_make(&_frame_block);
    *info = 0;
    SetObj(matinvreport, rep);
@@ -30967,10 +30781,7 @@ void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
 // apply permutations
    for (i = 0; i < n; i++) {
       for (j = n - 2; j >= 0; j--) {
-         k = pivots->xZ[j];
-         v = a->xyR[i][j];
-         a->xyR[i][j] = a->xyR[i][k];
-         a->xyR[i][k] = v;
+         swapr(&a->xyR[i][j], &a->xyR[i][pivots->xZ[j]]);
       }
    }
    ae_frame_leave();
@@ -31000,8 +30811,6 @@ void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
-   ae_int_t k;
-   complex v;
    ae_frame_make(&_frame_block);
    *info = 0;
    SetObj(matinvreport, rep);
@@ -31040,10 +30849,7 @@ void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
 // apply permutations
    for (i = 0; i < n; i++) {
       for (j = n - 2; j >= 0; j--) {
-         k = pivots->xZ[j];
-         v = a->xyC[i][j];
-         a->xyC[i][j] = a->xyC[i][k];
-         a->xyC[i][k] = v;
+         swapc(&a->xyC[i][j], &a->xyC[i][pivots->xZ[j]]);
       }
    }
    ae_frame_leave();

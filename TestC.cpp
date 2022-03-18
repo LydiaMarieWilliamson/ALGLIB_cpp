@@ -6868,9 +6868,7 @@ static void testtsortunit_testsortresults(RVector *asorted, ZVector *p1, ZVector
    }
    for (i = 0; i < n; i++) {
       if (p2->xZ[i] != i) {
-         t = a2.xR[i];
-         a2.xR[i] = a2.xR[p2->xZ[i]];
-         a2.xR[p2->xZ[i]] = t;
+         swapr(&a2.xR[i], &a2.xR[p2->xZ[i]]);
       }
    }
    for (i = 0; i < n; i++) {
@@ -6967,11 +6965,11 @@ bool testtsort() {
             for (i = 0; i < n; i++) {
                waserrors = waserrors || a3.xR[i] != a0.xR[i];
             }
-            tagsortmiddleir(&a4, &ar2, 0, n);
+            tagsortmiddleir(&a4, &ar2, n);
             for (i = 0; i < n; i++) {
                waserrors = waserrors || a4.xZ[i] != a0.xR[i] || ar2.xR[i] != p1.xZ[i];
             }
-            sortmiddlei(&a5, 0, n);
+            tagsortmiddlei(&a5, n);
             for (i = 0; i < n; i++) {
                waserrors = waserrors || a5.xZ[i] != a0.xR[i];
             }
@@ -7016,11 +7014,11 @@ bool testtsort() {
          for (i = 0; i < n; i++) {
             waserrors = waserrors || a3.xR[i] != a0.xR[i];
          }
-         tagsortmiddleir(&a4, &ar2, 0, n);
+         tagsortmiddleir(&a4, &ar2, n);
          for (i = 0; i < n; i++) {
             waserrors = waserrors || a4.xZ[i] != a0.xR[i];
          }
-         sortmiddlei(&a5, 0, n);
+         tagsortmiddlei(&a5, n);
          for (i = 0; i < n; i++) {
             waserrors = waserrors || a5.xZ[i] != a0.xR[i];
          }
@@ -7062,7 +7060,7 @@ bool testtsort() {
          for (i = 0; i < n; i++) {
             waserrors = waserrors || a3.xR[i] != a0.xR[i];
          }
-         tagsortmiddleir(&a4, &ar2, 0, n);
+         tagsortmiddleir(&a4, &ar2, n);
          for (i = 0; i < n; i++) {
             waserrors = waserrors || a4.xZ[i] != a0.xR[i];
          }
@@ -7104,7 +7102,7 @@ bool testtsort() {
          for (i = 0; i < n; i++) {
             waserrors = waserrors || a3.xR[i] != a0.xR[i];
          }
-         tagsortmiddleir(&a4, &ar2, 0, n);
+         tagsortmiddleir(&a4, &ar2, n);
          for (i = 0; i < n; i++) {
             waserrors = waserrors || a4.xZ[i] != a0.xR[i];
          }
@@ -7128,12 +7126,12 @@ bool testtsort() {
             i1.xZ[i] = i1.xZ[offs + i];
             ar.xR[i] = ar.xR[offs + i];
          }
-         tagsortmiddleir(&i1, &ar, 0, n);
+         tagsortmiddleir(&i1, &ar, n);
          for (i = 1; i < n; i++) {
             distinctvals = distinctvals && i1.xZ[i] != i1.xZ[i - 1];
          }
          if (distinctvals) {
-            tagsortmiddleir(&i2, &ar2, offs, n);
+            tagsortmiddleir(&i2, &ar2, n, offs);
             for (i = 0; i < n; i++) {
                waserrors = waserrors || i2.xZ[offs + i] != i1.xZ[i] || ar2.xR[offs + i] != ar.xR[i];
             }
@@ -8504,9 +8502,7 @@ static bool testsymmetricperm() {
          }
          for (i = 0; i < n; i++) {
             pprod.xZ[i] = i + hqrnduniformi(&rs, n - i);
-            j = ptbl.xZ[i];
-            ptbl.xZ[i] = ptbl.xZ[pprod.xZ[i]];
-            ptbl.xZ[pprod.xZ[i]] = j;
+            swapi(&ptbl.xZ[i], &ptbl.xZ[pprod.xZ[i]]);
          }
          ae_matrix_set_length(&db, n, n);
          for (i = 0; i < n; i++) {
@@ -12264,12 +12260,8 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
       for (i = 0; i < n; i++) {
          for (j = 0; j < n - 1 - i; j++) {
             if (wr0s.xR[j] > wr0s.xR[j + 1]) {
-               tmp = wr0s.xR[j];
-               wr0s.xR[j] = wr0s.xR[j + 1];
-               wr0s.xR[j + 1] = tmp;
-               tmp = wi0s.xR[j];
-               wi0s.xR[j] = wi0s.xR[j + 1];
-               wi0s.xR[j + 1] = tmp;
+               swapr(&wr0s.xR[j], &wr0s.xR[j + 1]);
+               swapr(&wi0s.xR[j], &wi0s.xR[j + 1]);
             }
          }
       }
@@ -12278,12 +12270,8 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
       for (i = 0; i < n; i++) {
          for (j = 0; j < n - 1 - i; j++) {
             if (wr1s.xR[j] > wr1s.xR[j + 1]) {
-               tmp = wr1s.xR[j];
-               wr1s.xR[j] = wr1s.xR[j + 1];
-               wr1s.xR[j + 1] = tmp;
-               tmp = wi1s.xR[j];
-               wi1s.xR[j] = wi1s.xR[j + 1];
-               wi1s.xR[j + 1] = tmp;
+               swapr(&wr1s.xR[j], &wr1s.xR[j + 1]);
+               swapr(&wi1s.xR[j], &wi1s.xR[j + 1]);
             }
          }
       }
@@ -14034,17 +14022,13 @@ static void sparsereallutest(bool *err) {
             for (i = n - 1; i >= 0; i--) {
                j = pivr.xZ[i];
                for (k = 0; k < n; k++) {
-                  v = c.xyR[i][k];
-                  c.xyR[i][k] = c.xyR[j][k];
-                  c.xyR[j][k] = v;
+                  swapr(&c.xyR[i][k], &c.xyR[j][k]);
                }
             }
             for (i = n - 1; i >= 0; i--) {
                j = pivc.xZ[i];
                for (k = 0; k < n; k++) {
-                  v = c.xyR[k][i];
-                  c.xyR[k][i] = c.xyR[k][j];
-                  c.xyR[k][j] = v;
+                  swapr(&c.xyR[k][i], &c.xyR[k][j]);
                }
             }
             for (i = 0; i < n; i++) {
@@ -24890,16 +24874,10 @@ static void testoptservunit_testprec(bool *wereerrors) {
             for (j = 0; j < k - 1; j++) {
                if (norms.xR[j] > norms.xR[j + 1]) {
                // Swap elements J and J+1
-                  v = norms.xR[j];
-                  norms.xR[j] = norms.xR[j + 1];
-                  norms.xR[j + 1] = v;
-                  v = vc.xR[j];
-                  vc.xR[j] = vc.xR[j + 1];
-                  vc.xR[j + 1] = v;
+                  swapr(&norms.xR[j], &norms.xR[j + 1]);
+                  swapr(&vc.xR[j], &vc.xR[j + 1]);
                   for (j0 = 0; j0 < n; j0++) {
-                     v = va.xyR[j][j0];
-                     va.xyR[j][j0] = va.xyR[j + 1][j0];
-                     va.xyR[j + 1][j0] = v;
+                     swapr(&va.xyR[j][j0], &va.xyR[j + 1][j0]);
                   }
                }
             }
@@ -24974,13 +24952,9 @@ static void testoptservunit_testprec(bool *wereerrors) {
       // and skip zero updates.
          for (i = 0; i < n; i++) {
             i0 = i + hqrnduniformi(&rs, n - i);
-            v = vc.xR[i];
-            vc.xR[i] = vc.xR[i0];
-            vc.xR[i0] = v;
+            swapr(&vc.xR[i], &vc.xR[i0]);
             for (j = 0; j < n; j++) {
-               v = va.xyR[i][j];
-               va.xyR[i][j] = va.xyR[i0][j];
-               va.xyR[i0][j] = v;
+               swapr(&va.xyR[i][j], &va.xyR[i0][j]);
             }
          }
          inexactlbfgspreconditioner(&s1, n, &vd, &vc, &va, n, &buf);
@@ -25068,13 +25042,9 @@ static void testoptservunit_testprec(bool *wereerrors) {
       // and skip zero updates.
          for (i = 0; i < n; i++) {
             i0 = i + hqrnduniformi(&rs, n - i);
-            v = vc.xR[i];
-            vc.xR[i] = vc.xR[i0];
-            vc.xR[i0] = v;
+            swapr(&vc.xR[i], &vc.xR[i0]);
             for (j = 0; j < n; j++) {
-               v = va.xyR[i][j];
-               va.xyR[i][j] = va.xyR[i0][j];
-               va.xyR[i0][j] = v;
+               swapr(&va.xyR[i][j], &va.xyR[i0][j]);
             }
          }
          preparelowrankpreconditioner(&vd, &vc, &va, n, n, &lowrankbuf);
@@ -43023,7 +42993,6 @@ static void testminlpunit_generatecabxd(hqrndstate *rs, ae_int_t n, ae_int_t m, 
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_int_t kk;
    double v;
    double mincoeff;
    ae_frame_make(&_frame_block);
@@ -43044,9 +43013,7 @@ static void testminlpunit_generatecabxd(hqrndstate *rs, ae_int_t n, ae_int_t m, 
    }
    for (i = 0; i < m; i++) {
       k = i + hqrnduniformi(rs, n + m - i);
-      kk = basicnonbasic->xZ[i];
-      basicnonbasic->xZ[i] = basicnonbasic->xZ[k];
-      basicnonbasic->xZ[k] = kk;
+      swapi(&basicnonbasic->xZ[i], &basicnonbasic->xZ[k]);
    }
 // Generate constraint matrix A
    ae_matrix_set_length(a, m, n);
@@ -43481,9 +43448,7 @@ static void testminlpunit_generateinfeasiblelpproblem(hqrndstate *rs, ae_int_t n
          bndu->xR[i] = v + pow(q, hqrndnormal(rs));
       }
       i = hqrnduniformi(rs, n);
-      v = bndl->xR[i];
-      bndl->xR[i] = bndu->xR[i];
-      bndu->xR[i] = v;
+      swapr(&bndl->xR[i], &bndu->xR[i]);
       ae_frame_leave();
       return;
    }
@@ -43558,7 +43523,6 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix *a, RVe
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_int_t t;
    ae_int_t minit;
    ae_int_t nadd;
    ae_int_t ndup;
@@ -43696,12 +43660,8 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix *a, RVe
             nzmod = nz + nadd + 2 * ndup;
             for (j = 0; j < nzmod; j++) {
                k = j + hqrnduniformi(rs, nzmod - j);
-               t = idxi.xZ[j];
-               idxi.xZ[j] = idxi.xZ[k];
-               idxi.xZ[k] = t;
-               v = ai.xR[j];
-               ai.xR[j] = ai.xR[k];
-               ai.xR[k] = v;
+               swapi(&idxi.xZ[j], &idxi.xZ[k]);
+               swapr(&ai.xR[j], &ai.xR[k]);
             }
             minlpaddlc2(state, &idxi, &ai, nzmod, al->xR[i], au->xR[i]);
          }
@@ -54519,12 +54479,8 @@ static void testgqunit_buildgausslegendrequadrature(ae_int_t n, RVector *x, RVec
    for (i = 0; i < n; i++) {
       for (j = 0; j < n - 1 - i; j++) {
          if (x->xR[j] >= x->xR[j + 1]) {
-            tmp = x->xR[j];
-            x->xR[j] = x->xR[j + 1];
-            x->xR[j + 1] = tmp;
-            tmp = w->xR[j];
-            w->xR[j] = w->xR[j + 1];
-            w->xR[j + 1] = tmp;
+            swapr(&x->xR[j], &x->xR[j + 1]);
+            swapr(&w->xR[j], &w->xR[j + 1]);
          }
       }
    }
@@ -54621,12 +54577,8 @@ static void testgqunit_buildgaussjacobiquadrature(ae_int_t n, double alpha, doub
    for (i = 0; i < n; i++) {
       for (j = 0; j < n - 1 - i; j++) {
          if (x->xR[j] >= x->xR[j + 1]) {
-            tmp = x->xR[j];
-            x->xR[j] = x->xR[j + 1];
-            x->xR[j + 1] = tmp;
-            tmp = w->xR[j];
-            w->xR[j] = w->xR[j + 1];
-            w->xR[j + 1] = tmp;
+            swapr(&x->xR[j], &x->xR[j + 1]);
+            swapr(&w->xR[j], &w->xR[j + 1]);
          }
       }
    }
@@ -54677,12 +54629,8 @@ static void testgqunit_buildgausslaguerrequadrature(ae_int_t n, double alpha, RV
    for (i = 0; i < n; i++) {
       for (j = 0; j < n - 1 - i; j++) {
          if (x->xR[j] >= x->xR[j + 1]) {
-            tmp = x->xR[j];
-            x->xR[j] = x->xR[j + 1];
-            x->xR[j + 1] = tmp;
-            tmp = w->xR[j];
-            w->xR[j] = w->xR[j + 1];
-            w->xR[j + 1] = tmp;
+            swapr(&x->xR[j], &x->xR[j + 1]);
+            swapr(&w->xR[j], &w->xR[j + 1]);
          }
       }
    }
@@ -54744,12 +54692,8 @@ static void testgqunit_buildgausshermitequadrature(ae_int_t n, RVector *x, RVect
    for (i = 0; i < n; i++) {
       for (j = 0; j < n - 1 - i; j++) {
          if (x->xR[j] >= x->xR[j + 1]) {
-            tmp = x->xR[j];
-            x->xR[j] = x->xR[j + 1];
-            x->xR[j + 1] = tmp;
-            tmp = w->xR[j];
-            w->xR[j] = w->xR[j + 1];
-            w->xR[j + 1] = tmp;
+            swapr(&x->xR[j], &x->xR[j + 1]);
+            swapr(&w->xR[j], &w->xR[j + 1]);
          }
       }
    }
@@ -55765,9 +55709,7 @@ static void testbasestatunit_testranking(bool *err) {
          for (j = 0; j < nfeatures - 1; j++) {
             k = randominteger(nfeatures - j);
             if (k != 0) {
-               v = xy0.xyR[i][j];
-               xy0.xyR[i][j] = xy0.xyR[i][j + k];
-               xy0.xyR[i][j + k] = v;
+               swapr(&xy0.xyR[i][j], &xy0.xyR[i][j + k]);
             }
          }
          for (j = 0; j < nfeatures; j++) {
@@ -57073,15 +57015,9 @@ bool testratint() {
          for (i = 0; i < n; i++) {
             k = randominteger(n);
             if (k != i) {
-               t = x.xR[i];
-               x.xR[i] = x.xR[k];
-               x.xR[k] = t;
-               t = y.xR[i];
-               y.xR[i] = y.xR[k];
-               y.xR[k] = t;
-               t = w.xR[i];
-               w.xR[i] = w.xR[k];
-               w.xR[k] = t;
+               swapr(&x.xR[i], &x.xR[k]);
+               swapr(&y.xR[i], &y.xR[k]);
+               swapr(&w.xR[i], &w.xR[k]);
             }
          }
       // Build and test
@@ -57137,15 +57073,9 @@ bool testratint() {
             for (i = 0; i < n; i++) {
                k = randominteger(n);
                if (k != i) {
-                  t = x.xR[i];
-                  x.xR[i] = x.xR[k];
-                  x.xR[k] = t;
-                  t = y.xR[i];
-                  y.xR[i] = y.xR[k];
-                  y.xR[k] = t;
-                  t = w.xR[i];
-                  w.xR[i] = w.xR[k];
-                  w.xR[k] = t;
+                  swapr(&x.xR[i], &x.xR[k]);
+                  swapr(&y.xR[i], &y.xR[k]);
+                  swapr(&w.xR[i], &w.xR[k]);
                }
             }
          // Build and test
@@ -58921,10 +58851,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
          x.xR[i] = x.xR[i - 1] + 0.25 + hqrnduniformr(&rs);
       }
       for (i = 0; i < n; i++) {
-         k = i + hqrnduniformi(&rs, n - i);
-         v = x.xR[i];
-         x.xR[i] = x.xR[k];
-         x.xR[k] = v;
+         swapr(&x.xR[i], &x.xR[i + hqrnduniformi(&rs, n - i)]);
       }
       ae_vector_set_length(&y, n);
       for (i = 0; i < n; i++) {
@@ -59181,18 +59108,10 @@ bool testspline1d() {
          for (i = 0; i < n; i++) {
             k = randominteger(n);
             if (k != i) {
-               t = x.xR[i];
-               x.xR[i] = x.xR[k];
-               x.xR[k] = t;
-               t = y.xR[i];
-               y.xR[i] = y.xR[k];
-               y.xR[k] = t;
-               t = yp.xR[i];
-               yp.xR[i] = yp.xR[k];
-               yp.xR[k] = t;
-               t = d.xR[i];
-               d.xR[i] = d.xR[k];
-               d.xR[k] = t;
+               swapr(&x.xR[i], &x.xR[k]);
+               swapr(&y.xR[i], &y.xR[k]);
+               swapr(&yp.xR[i], &yp.xR[k]);
+               swapr(&d.xR[i], &d.xR[k]);
             }
          }
       // Build linear spline
@@ -62571,12 +62490,8 @@ static void testlsfitunit_testrdp(bool *errorflag) {
       }
       for (i = 0; i < n - 1; i++) {
          k = i + hqrnduniformi(&rs, n - i);
-         v = x.xR[i];
-         x.xR[i] = x.xR[k];
-         x.xR[k] = v;
-         v = y.xR[i];
-         y.xR[i] = y.xR[k];
-         y.xR[k] = v;
+         swapr(&x.xR[i], &x.xR[k]);
+         swapr(&y.xR[i], &y.xR[k]);
       }
    // Perform run of eps-based RDP algorithm
       lstfitpiecewiselinearrdp(&x, &y, n, eps, &x2, &y2, &nsections);
@@ -66366,7 +66281,6 @@ bool testspline2d() {
    ae_int_t n2;
    ae_int_t m2;
    double err;
-   double t;
    double t1;
    double t2;
    double l1;
@@ -66465,9 +66379,7 @@ bool testspline2d() {
             for (j = 0; j < n; j++) {
                k = randominteger(n);
                if (k != j) {
-                  t = x.xR[j];
-                  x.xR[j] = x.xR[k];
-                  x.xR[k] = t;
+                  swapr(&x.xR[j], &x.xR[k]);
                }
             }
             for (i = 0; i < m; i++) {
@@ -66486,9 +66398,7 @@ bool testspline2d() {
             for (i = 0; i < m; i++) {
                k = randominteger(m);
                if (k != i) {
-                  t = y.xR[i];
-                  y.xR[i] = y.xR[k];
-                  y.xR[k] = t;
+                  swapr(&y.xR[i], &y.xR[k]);
                }
             }
             for (i = 0; i < m; i++) {
@@ -66888,10 +66798,7 @@ static void testspline3dunit_buildrndgrid(bool isvect, bool reorder, ae_int_t *n
    }
    if (reorder) {
       for (i = 0; i < *n; i++) {
-         k = randominteger(*n);
-         v = x->xR[i];
-         x->xR[i] = x->xR[k];
-         x->xR[k] = v;
+         swapr(&x->xR[i], &x->xR[randominteger(*n)]);
       }
    }
 // Fill Y
@@ -66907,10 +66814,7 @@ static void testspline3dunit_buildrndgrid(bool isvect, bool reorder, ae_int_t *n
    }
    if (reorder) {
       for (i = 0; i < *m; i++) {
-         k = randominteger(*m);
-         v = y->xR[i];
-         y->xR[i] = y->xR[k];
-         y->xR[k] = v;
+         swapr(&y->xR[i], &y->xR[randominteger(*m)]);
       }
    }
 // Fill Z
@@ -66926,10 +66830,7 @@ static void testspline3dunit_buildrndgrid(bool isvect, bool reorder, ae_int_t *n
    }
    if (reorder) {
       for (i = 0; i < *l; i++) {
-         k = randominteger(*l);
-         v = z->xR[i];
-         z->xR[i] = z->xR[k];
-         z->xR[k] = v;
+         swapr(&z->xR[i], &z->xR[randominteger(*l)]);
       }
    }
 // Fill F
@@ -77842,7 +77743,6 @@ static bool testclusteringunit_advancedahctests() {
    ae_int_t j;
    ae_int_t k;
    double v;
-   ae_int_t t;
    ae_int_t euclidean;
    bool result;
    ae_frame_make(&_frame_block);
@@ -77903,13 +77803,9 @@ static bool testclusteringunit_advancedahctests() {
             k = randominteger(n * d);
             if (k != i) {
                for (j = 0; j < d; j++) {
-                  v = xy.xyR[i][j];
-                  xy.xyR[i][j] = xy.xyR[k][j];
-                  xy.xyR[k][j] = v;
+                  swapr(&xy.xyR[i][j], &xy.xyR[k][j]);
                }
-               t = idx.xZ[k];
-               idx.xZ[k] = idx.xZ[i];
-               idx.xZ[i] = t;
+               swapi(&idx.xZ[k], &idx.xZ[i]);
             }
          }
          ae_matrix_set_length(&dm, npoints, npoints);
@@ -80162,7 +80058,6 @@ static void testdforestunit_testimportance(bool *err) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_int_t i1;
    ae_int_t npoints;
    ae_int_t npoints2;
    ae_int_t nvars;
@@ -80524,19 +80419,13 @@ static void testdforestunit_testimportance(bool *err) {
          }
          if (k < nvars) {
             for (i = 0; i < npoints2; i++) {
-               i1 = i + hqrnduniformi(&rs, npoints2 - i);
-               v = xyp.xyR[i][k];
-               xyp.xyR[i][k] = xyp.xyR[i1][k];
-               xyp.xyR[i1][k] = v;
+               swapr(&xyp.xyR[i][k], &xyp.xyR[i + hqrnduniformi(&rs, npoints2 - i)][k]);
             }
          }
          if (k == nvars + 1) {
             for (j = 0; j < nvars; j++) {
                for (i = 0; i < npoints2; i++) {
-                  i1 = i + hqrnduniformi(&rs, npoints2 - i);
-                  v = xyp.xyR[i][j];
-                  xyp.xyR[i][j] = xyp.xyR[i1][j];
-                  xyp.xyR[i1][j] = v;
+                  swapr(&xyp.xyR[i][j], &xyp.xyR[i + hqrnduniformi(&rs, npoints2 - i)][j]);
                }
             }
          }
@@ -86320,12 +86209,8 @@ static bool testmlptrainunit_testmlptrainclass() {
             do {
                rndind = randominteger(n);
             } while (rndind == i);
-            tmp = xy.xyR[i][0];
-            xy.xyR[i][0] = xy.xyR[rndind][0];
-            xy.xyR[rndind][0] = tmp;
-            tmp = xy.xyR[i][1];
-            xy.xyR[i][1] = xy.xyR[rndind][1];
-            xy.xyR[rndind][1] = tmp;
+            swapr(&xy.xyR[i][0], &xy.xyR[rndind][0]);
+            swapr(&xy.xyR[i][1], &xy.xyR[rndind][1]);
          }
       // Create and train a neural network
          mlpcreatec0(1, 2, &net);
@@ -88197,9 +88082,7 @@ static bool testalglibbasicsunit_performtestsort0() {
    for (i = 0; i < n; i++) {
       k = randominteger(n);
       if (k != i) {
-         t = a.xZ[i];
-         a.xZ[i] = a.xZ[k];
-         a.xZ[k] = t;
+         swapi(&a.xZ[i], &a.xZ[k]);
       }
    }
    testalglibbasicsunit_testsort0func(&a, &buf, 0, n);
@@ -88280,9 +88163,7 @@ static bool testalglibbasicsunit_performtestsort1() {
    for (i = 0; i < n; i++) {
       k = randominteger(n);
       if (k != i) {
-         t = a.xZ[i];
-         a.xZ[i] = a.xZ[k];
-         a.xZ[k] = t;
+         swapi(&a.xZ[i], &a.xZ[k]);
       }
    }
    testalglibbasicsunit_testsort1func(&a, &buf, 0, n, true);
@@ -88290,9 +88171,7 @@ static bool testalglibbasicsunit_performtestsort1() {
    for (i = 0; i < n; i++) {
       k = randominteger(n);
       if (k != i) {
-         t = a.xZ[i];
-         a.xZ[i] = a.xZ[k];
-         a.xZ[k] = t;
+         swapi(&a.xZ[i], &a.xZ[k]);
       }
    }
    testalglibbasicsunit_testsort1func(&a, &buf, 0, n, false);
@@ -88300,9 +88179,7 @@ static bool testalglibbasicsunit_performtestsort1() {
    for (i = 0; i < n; i++) {
       k = randominteger(n);
       if (k != i) {
-         t = a.xZ[i];
-         a.xZ[i] = a.xZ[k];
-         a.xZ[k] = t;
+         swapi(&a.xZ[i], &a.xZ[k]);
       }
    }
    testalglibbasicsunit_testsort1func(&a, &buf, 0, n, true);
@@ -88351,9 +88228,7 @@ static bool testalglibbasicsunit_performtestsort2() {
    for (i = 0; i < n; i++) {
       k = randominteger(n);
       if (k != i) {
-         t = a.xZ[i];
-         a.xZ[i] = a.xZ[k];
-         a.xZ[k] = t;
+         swapi(&a.xZ[i], &a.xZ[k]);
       }
    }
    testalglibbasicsunit_testsort2func(&a, &buf, 0, n);

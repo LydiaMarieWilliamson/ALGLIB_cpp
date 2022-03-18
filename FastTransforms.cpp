@@ -70,7 +70,7 @@ void fftc1d(CVector *a, ae_int_t n) {
 // precomputed data. It is much like a FFTW plan, but is not stored
 // between subroutine calls and is much simpler.
    ftcomplexfftplan(n, 1, &plan);
-   ftapplyplan(&plan, &buf, 0, 1);
+   ftapplyplan(&plan, &buf);
 // result
    for (i = 0; i < n; i++) {
       a->xC[i] = complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
@@ -174,7 +174,7 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f) {
       ae_vector_set_length(&buf, n);
       ae_v_move(buf.xR, 1, a->xR, 1, n);
       ftcomplexfftplan(n2, 1, &plan);
-      ftapplyplan(&plan, &buf, 0, 1);
+      ftapplyplan(&plan, &buf);
       ae_vector_set_length(f, n);
       for (i = 0; i <= n2; i++) {
          idx = 2 * (i % n2);
@@ -309,7 +309,7 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
 // even-size real FFT, use reduction to the complex task
    n2 = n / 2;
    ae_v_move(buf->xR, 1, a->xR, 1, n);
-   ftapplyplan(plan, buf, 0, 1);
+   ftapplyplan(plan, buf);
    a->xR[0] = buf->xR[0] + buf->xR[1];
    for (i = 1; i < n2; i++) {
       idx = 2 * (i % n2);
@@ -697,8 +697,8 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             buf2.xR[2 * i] = 0.0;
             buf2.xR[2 * i + 1] = 0.0;
          }
-         ftapplyplan(&plan, &buf, 0, 1);
-         ftapplyplan(&plan, &buf2, 0, 1);
+         ftapplyplan(&plan, &buf);
+         ftapplyplan(&plan, &buf2);
          for (i = 0; i < m; i++) {
             ax = buf.xR[2 * i];
             ay = buf.xR[2 * i + 1];
@@ -709,7 +709,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             buf.xR[2 * i] = tx;
             buf.xR[2 * i + 1] = -ty;
          }
-         ftapplyplan(&plan, &buf, 0, 1);
+         ftapplyplan(&plan, &buf);
          t = 1.0 / m;
          ae_vector_set_length(r, m);
          for (i = 0; i < m; i++) {
@@ -742,8 +742,8 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             buf2.xR[2 * i] = 0.0;
             buf2.xR[2 * i + 1] = 0.0;
          }
-         ftapplyplan(&plan, &buf, 0, 1);
-         ftapplyplan(&plan, &buf2, 0, 1);
+         ftapplyplan(&plan, &buf);
+         ftapplyplan(&plan, &buf2);
          for (i = 0; i < p; i++) {
             ax = buf.xR[2 * i];
             ay = buf.xR[2 * i + 1];
@@ -754,7 +754,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             buf.xR[2 * i] = tx;
             buf.xR[2 * i + 1] = -ty;
          }
-         ftapplyplan(&plan, &buf, 0, 1);
+         ftapplyplan(&plan, &buf);
          t = 1.0 / p;
          if (circular) {
          // circular, add tail to head
@@ -820,7 +820,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             buf.xR[2 * j] = 0.0;
             buf.xR[2 * j + 1] = 0.0;
          }
-         ftapplyplan(&plan, &buf, 0, 1);
+         ftapplyplan(&plan, &buf);
          for (j = 0; j < q + n - 1; j++) {
             ax = buf.xR[2 * j];
             ay = buf.xR[2 * j + 1];
@@ -831,7 +831,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
             buf.xR[2 * j] = tx;
             buf.xR[2 * j + 1] = -ty;
          }
-         ftapplyplan(&plan, &buf, 0, 1);
+         ftapplyplan(&plan, &buf);
          t = 1.0 / (q + n - 1);
          if (circular) {
             j1 = imin2(i + p + n - 2, m - 1) - i;
@@ -951,8 +951,8 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
       buf2.xR[2 * i] = 0.0;
       buf2.xR[2 * i + 1] = 0.0;
    }
-   ftapplyplan(&plan, &buf, 0, 1);
-   ftapplyplan(&plan, &buf2, 0, 1);
+   ftapplyplan(&plan, &buf);
+   ftapplyplan(&plan, &buf2);
    for (i = 0; i < p; i++) {
       c1 = complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
       c2 = complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
@@ -960,7 +960,7 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
       buf.xR[2 * i] = c3.x;
       buf.xR[2 * i + 1] = -c3.y;
    }
-   ftapplyplan(&plan, &buf, 0, 1);
+   ftapplyplan(&plan, &buf);
    t = 1.0 / p;
    ae_vector_set_length(r, m - n + 1);
    for (i = 0; i <= m - n; i++) {
@@ -1099,8 +1099,8 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
       buf2.xR[2 * i] = 0.0;
       buf2.xR[2 * i + 1] = 0.0;
    }
-   ftapplyplan(&plan, &buf, 0, 1);
-   ftapplyplan(&plan, &buf2, 0, 1);
+   ftapplyplan(&plan, &buf);
+   ftapplyplan(&plan, &buf2);
    for (i = 0; i < m; i++) {
       c1 = complex_from_d(buf.xR[2 * i], buf.xR[2 * i + 1]);
       c2 = complex_from_d(buf2.xR[2 * i], buf2.xR[2 * i + 1]);
@@ -1108,7 +1108,7 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
       buf.xR[2 * i] = c3.x;
       buf.xR[2 * i + 1] = -c3.y;
    }
-   ftapplyplan(&plan, &buf, 0, 1);
+   ftapplyplan(&plan, &buf);
    t = 1.0 / m;
    ae_vector_set_length(r, m);
    for (i = 0; i < m; i++) {

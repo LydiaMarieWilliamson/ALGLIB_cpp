@@ -1480,10 +1480,8 @@ static void nearestneighbor_kdtreeallocdatasetdependent(kdtree *kdt, ae_int_t n,
 // This subroutine doesn't create tree structures, just rearranges nodes.
 static void nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i2, ae_int_t d, double s, ae_int_t *i3) {
    ae_int_t i;
-   ae_int_t j;
    ae_int_t ileft;
    ae_int_t iright;
-   double v;
    *i3 = 0;
    ae_assert(kdt->n > 0, "KDTreeSplit: internal error");
 // split XY/Tags in two parts:
@@ -1505,13 +1503,9 @@ static void nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i2, a
       // XY[ILeft,..] must be at IRight.
       // Swap and advance IRight.
          for (i = 0; i < 2 * kdt->nx + kdt->ny; i++) {
-            v = kdt->xy.xyR[ileft][i];
-            kdt->xy.xyR[ileft][i] = kdt->xy.xyR[iright][i];
-            kdt->xy.xyR[iright][i] = v;
+            swapr(&kdt->xy.xyR[ileft][i], &kdt->xy.xyR[iright][i]);
          }
-         j = kdt->tags.xZ[ileft];
-         kdt->tags.xZ[ileft] = kdt->tags.xZ[iright];
-         kdt->tags.xZ[iright] = j;
+         swapi(&kdt->tags.xZ[ileft], &kdt->tags.xZ[iright]);
          iright--;
       }
    }
@@ -1538,7 +1532,6 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
    ae_int_t nx;
    ae_int_t ny;
    ae_int_t i;
-   ae_int_t j;
    ae_int_t oldoffs;
    ae_int_t i3;
    ae_int_t cntless;
@@ -1640,13 +1633,9 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
          s = minv;
          if (minidx != i1) {
             for (i = 0; i < 2 * nx + ny; i++) {
-               v = kdt->xy.xyR[minidx][i];
-               kdt->xy.xyR[minidx][i] = kdt->xy.xyR[i1][i];
-               kdt->xy.xyR[i1][i] = v;
+               swapr(&kdt->xy.xyR[minidx][i], &kdt->xy.xyR[i1][i]);
             }
-            j = kdt->tags.xZ[minidx];
-            kdt->tags.xZ[minidx] = kdt->tags.xZ[i1];
-            kdt->tags.xZ[i1] = j;
+            swapi(&kdt->tags.xZ[minidx], &kdt->tags.xZ[i1]);
          }
          i3 = i1 + 1;
       } else {
@@ -1656,13 +1645,9 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
          s = maxv;
          if (maxidx != i2 - 1) {
             for (i = 0; i < 2 * nx + ny; i++) {
-               v = kdt->xy.xyR[maxidx][i];
-               kdt->xy.xyR[maxidx][i] = kdt->xy.xyR[i2 - 1][i];
-               kdt->xy.xyR[i2 - 1][i] = v;
+               swapr(&kdt->xy.xyR[maxidx][i], &kdt->xy.xyR[i2 - 1][i]);
             }
-            j = kdt->tags.xZ[maxidx];
-            kdt->tags.xZ[maxidx] = kdt->tags.xZ[i2 - 1];
-            kdt->tags.xZ[i2 - 1] = j;
+            swapi(&kdt->tags.xZ[maxidx], &kdt->tags.xZ[i2 - 1]);
          }
          i3 = i2 - 1;
       }

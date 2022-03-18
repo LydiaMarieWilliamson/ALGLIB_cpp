@@ -336,15 +336,9 @@ void barycentriclintransx(barycentricinterpolant *b, double ca, double cb) {
       for (i = 0; i < b->n; i++) {
          if (i < b->n - 1 - i) {
             j = b->n - 1 - i;
-            v = b->x.xR[i];
-            b->x.xR[i] = b->x.xR[j];
-            b->x.xR[j] = v;
-            v = b->y.xR[i];
-            b->y.xR[i] = b->y.xR[j];
-            b->y.xR[j] = v;
-            v = b->w.xR[i];
-            b->w.xR[i] = b->w.xR[j];
-            b->w.xR[j] = v;
+            swapr(&b->x.xR[i], &b->x.xR[j]);
+            swapr(&b->y.xR[i], &b->y.xR[j]);
+            swapr(&b->w.xR[i], &b->w.xR[j]);
          } else {
             break;
          }
@@ -446,12 +440,8 @@ static void ratint_barycentricnormalize(barycentricinterpolant *b) {
          tagsort(&b->x, b->n, &p1, &p2);
          for (j = 0; j < b->n; j++) {
             j2 = p2.xZ[j];
-            v = b->y.xR[j];
-            b->y.xR[j] = b->y.xR[j2];
-            b->y.xR[j2] = v;
-            v = b->w.xR[j];
-            b->w.xR[j] = b->w.xR[j2];
-            b->w.xR[j2] = v;
+            swapr(&b->y.xR[j], &b->y.xR[j2]);
+            swapr(&b->w.xR[j], &b->w.xR[j2]);
          }
          break;
       }
@@ -6121,7 +6111,6 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
    double b;
    double c;
    double dd;
-   double tmp;
    double exf;
    double extr;
    *x0 = 0;
@@ -6212,9 +6201,7 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
             *nr = 2;
          // roots must placed ascending
             if (*x0 > *x1) {
-               tmp = *x0;
-               *x0 = *x1;
-               *x1 = tmp;
+               swapr(x0, x1);
             }
             return;
          }
@@ -6243,9 +6230,7 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
             *nr = 2;
          // roots must placed ascending
             if (*x0 > *x1) {
-               tmp = *x0;
-               *x0 = *x1;
-               *x1 = tmp;
+               swapr(x0, x1);
             }
             return;
          }
@@ -6268,9 +6253,7 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
             *nr = 2;
          // roots must placed ascending
             if (*x0 > *x1) {
-               tmp = *x0;
-               *x0 = *x1;
-               *x1 = tmp;
+               swapr(x0, x1);
             }
             return;
          } else {
@@ -18084,7 +18067,6 @@ void spline2dresamplebilinear(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth,
 // ALGLIB Project: Copyright 16.04.2012 by Sergey Bochkanov
 // API: void spline2dbuildbilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c);
 void spline2dbuildbilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *f, ae_int_t d, spline2dinterpolant *c) {
-   double t;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -18126,14 +18108,10 @@ void spline2dbuildbilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVec
       if (k != j) {
          for (i = 0; i < c->m; i++) {
             for (i0 = 0; i0 < c->d; i0++) {
-               t = c->f.xR[c->d * (i * c->n + j) + i0];
-               c->f.xR[c->d * (i * c->n + j) + i0] = c->f.xR[c->d * (i * c->n + k) + i0];
-               c->f.xR[c->d * (i * c->n + k) + i0] = t;
+               swapr(&c->f.xR[c->d * (i * c->n + j) + i0], &c->f.xR[c->d * (i * c->n + k) + i0]);
             }
          }
-         t = c->x.xR[j];
-         c->x.xR[j] = c->x.xR[k];
-         c->x.xR[k] = t;
+         swapr(&c->x.xR[j], &c->x.xR[k]);
       }
    }
    for (i = 0; i < c->m; i++) {
@@ -18146,14 +18124,10 @@ void spline2dbuildbilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVec
       if (k != i) {
          for (j = 0; j < c->n; j++) {
             for (i0 = 0; i0 < c->d; i0++) {
-               t = c->f.xR[c->d * (i * c->n + j) + i0];
-               c->f.xR[c->d * (i * c->n + j) + i0] = c->f.xR[c->d * (k * c->n + j) + i0];
-               c->f.xR[c->d * (k * c->n + j) + i0] = t;
+               swapr(&c->f.xR[c->d * (i * c->n + j) + i0], &c->f.xR[c->d * (k * c->n + j) + i0]);
             }
          }
-         t = c->y.xR[i];
-         c->y.xR[i] = c->y.xR[k];
-         c->y.xR[k] = t;
+         swapr(&c->y.xR[i], &c->y.xR[k]);
       }
    }
 }
@@ -18241,7 +18215,6 @@ static void spline2d_bicubiccalcderivatives(RMatrix *a, RVector *x, RVector *y, 
 // API: void spline2dbuildbicubicv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c);
 void spline2dbuildbicubicv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *f, ae_int_t d, spline2dinterpolant *c) {
    ae_frame _frame_block;
-   double t;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -18296,14 +18269,10 @@ void spline2dbuildbicubicv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVect
       if (k != j) {
          for (i = 0; i < c->m; i++) {
             for (di = 0; di < c->d; di++) {
-               t = f->xR[c->d * (i * c->n + j) + di];
-               f->xR[c->d * (i * c->n + j) + di] = f->xR[c->d * (i * c->n + k) + di];
-               f->xR[c->d * (i * c->n + k) + di] = t;
+               swapr(&f->xR[c->d * (i * c->n + j) + di], &f->xR[c->d * (i * c->n + k) + di]);
             }
          }
-         t = c->x.xR[j];
-         c->x.xR[j] = c->x.xR[k];
-         c->x.xR[k] = t;
+         swapr(&c->x.xR[j], &c->x.xR[k]);
       }
    }
    for (i = 0; i < c->m; i++) {
@@ -18316,14 +18285,10 @@ void spline2dbuildbicubicv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVect
       if (k != i) {
          for (j = 0; j < c->n; j++) {
             for (di = 0; di < c->d; di++) {
-               t = f->xR[c->d * (i * c->n + j) + di];
-               f->xR[c->d * (i * c->n + j) + di] = f->xR[c->d * (k * c->n + j) + di];
-               f->xR[c->d * (k * c->n + j) + di] = t;
+               swapr(&f->xR[c->d * (i * c->n + j) + di], &f->xR[c->d * (k * c->n + j) + di]);
             }
          }
-         t = c->y.xR[i];
-         c->y.xR[i] = c->y.xR[k];
-         c->y.xR[k] = t;
+         swapr(&c->y.xR[i], &c->y.xR[k]);
       }
    }
    for (di = 0; di < c->d; di++) {
@@ -18353,7 +18318,6 @@ void spline2dbuildbicubicv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVect
 // ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 // API: void spline2dbuildbilinear(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c);
 void spline2dbuildbilinear(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_int_t n, spline2dinterpolant *c) {
-   double t;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -18393,13 +18357,9 @@ void spline2dbuildbilinear(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_in
       }
       if (k != j) {
          for (i = 0; i < c->m; i++) {
-            t = c->f.xR[i * c->n + j];
-            c->f.xR[i * c->n + j] = c->f.xR[i * c->n + k];
-            c->f.xR[i * c->n + k] = t;
+            swapr(&c->f.xR[i * c->n + j], &c->f.xR[i * c->n + k]);
          }
-         t = c->x.xR[j];
-         c->x.xR[j] = c->x.xR[k];
-         c->x.xR[k] = t;
+         swapr(&c->x.xR[j], &c->x.xR[k]);
       }
    }
    for (i = 0; i < c->m; i++) {
@@ -18411,13 +18371,9 @@ void spline2dbuildbilinear(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_in
       }
       if (k != i) {
          for (j = 0; j < c->n; j++) {
-            t = c->f.xR[i * c->n + j];
-            c->f.xR[i * c->n + j] = c->f.xR[k * c->n + j];
-            c->f.xR[k * c->n + j] = t;
+            swapr(&c->f.xR[i * c->n + j], &c->f.xR[k * c->n + j]);
          }
-         t = c->y.xR[i];
-         c->y.xR[i] = c->y.xR[k];
-         c->y.xR[k] = t;
+         swapr(&c->y.xR[i], &c->y.xR[k]);
       }
    }
 }
@@ -18433,7 +18389,6 @@ void spline2dbuildbicubic(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_int
    ae_int_t sfx;
    ae_int_t sfy;
    ae_int_t sfxy;
-   double t;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -18484,13 +18439,9 @@ void spline2dbuildbicubic(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_int
       }
       if (k != j) {
          for (i = 0; i < c->m; i++) {
-            t = f->xyR[i][j];
-            f->xyR[i][j] = f->xyR[i][k];
-            f->xyR[i][k] = t;
+            swapr(&f->xyR[i][j], &f->xyR[i][k]);
          }
-         t = c->x.xR[j];
-         c->x.xR[j] = c->x.xR[k];
-         c->x.xR[k] = t;
+         swapr(&c->x.xR[j], &c->x.xR[k]);
       }
    }
    for (i = 0; i < c->m; i++) {
@@ -18502,13 +18453,9 @@ void spline2dbuildbicubic(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_int
       }
       if (k != i) {
          for (j = 0; j < c->n; j++) {
-            t = f->xyR[i][j];
-            f->xyR[i][j] = f->xyR[k][j];
-            f->xyR[k][j] = t;
+            swapr(&f->xyR[i][j], &f->xyR[k][j]);
          }
-         t = c->y.xR[i];
-         c->y.xR[i] = c->y.xR[k];
-         c->y.xR[k] = t;
+         swapr(&c->y.xR[i], &c->y.xR[k]);
       }
    }
    spline2d_bicubiccalcderivatives(f, &c->x, &c->y, c->m, c->n, &dx, &dy, &dxy);
@@ -20415,7 +20362,7 @@ static void spline2d_fastddmfitlayer(RVector *xy, ae_int_t d, ae_int_t scalexy, 
       //       residuals in the inner cells defined by XYIndex[],
       //       but we still have to compute residuals for cells
       //       BETWEEN two recursive subdivisions of the task.
-         tiledsplit(tiley1 - tiley0, 1, &j0, &j1);
+         j0 = tiledsplit(tiley1 - tiley0, 1), j1 = tiley1 - tiley0 - j0;
          spline2d_fastddmfitlayer(xy, d, scalexy, xyindex, basecasex, tilex0, tilex1, tilescountx, basecasey, tiley0, tiley0 + j0, tilescounty, maxcoresize, interfacesize, lsqrcnt, lambdareg, basis1, pool, spline);
          spline2d_fastddmfitlayer(xy, d, scalexy, xyindex, basecasex, tilex0, tilex1, tilescountx, basecasey, tiley0 + j0, tiley1, tilescounty, maxcoresize, interfacesize, lsqrcnt, lambdareg, basis1, pool, spline);
       } else {
@@ -20425,7 +20372,7 @@ static void spline2d_fastddmfitlayer(RVector *xy, ae_int_t d, ae_int_t scalexy, 
       //       residuals in the inner cells defined by XYIndex[],
       //       but we still have to compute residuals for cells
       //       BETWEEN two recursive subdivisions of the task.
-         tiledsplit(tilex1 - tilex0, 1, &j0, &j1);
+         j0 = tiledsplit(tilex1 - tilex0, 1), j1 = tilex1 - tilex0 - j0;
          spline2d_fastddmfitlayer(xy, d, scalexy, xyindex, basecasex, tilex0, tilex0 + j0, tilescountx, basecasey, tiley0, tiley1, tilescounty, maxcoresize, interfacesize, lsqrcnt, lambdareg, basis1, pool, spline);
          spline2d_fastddmfitlayer(xy, d, scalexy, xyindex, basecasex, tilex0 + j0, tilex1, tilescountx, basecasey, tiley0, tiley1, tilescounty, maxcoresize, interfacesize, lsqrcnt, lambdareg, basis1, pool, spline);
       }
@@ -20530,7 +20477,7 @@ static void spline2d_computeresidualsfromscratchrec(RVector *xy, RVector *yraw, 
    xew = 2 + d;
 // Parallelism
    if (pt1 - pt0 > chunksize) {
-      tiledsplit(pt1 - pt0, chunksize, &i, &j);
+      i = tiledsplit(pt1 - pt0, chunksize), j = pt1 - pt0 - i;
       spline2d_computeresidualsfromscratchrec(xy, yraw, pt0, pt0 + i, chunksize, d, scalexy, spline, pool);
       spline2d_computeresidualsfromscratchrec(xy, yraw, pt0 + i, pt1, chunksize, d, scalexy, spline, pool);
       ae_frame_leave();
@@ -20687,7 +20634,7 @@ static void spline2d_expandindexrows(RVector *xy, ae_int_t d, RVector *shadow, a
 // Parallelism was tried if: ((rootcall && pt1 - pt0 > 10000) && row1 - row0 >= 2) && cost > smpactivationlevel()
 // Partition
    if (row1 - row0 >= 2) {
-      tiledsplit(row1 - row0, 1, &i0, &i1);
+      i0 = tiledsplit(row1 - row0, 1), i1 = row1 - row0 - i0;
       rowmid = row0 + i0;
       spline2d_expandindexrows(xy, d, shadow, ns, cidx, pt0, xyindexprev->xZ[rowmid * (kxprev - 1)], xyindexprev, row0, rowmid, xyindexnew, kxnew, kynew, false);
       spline2d_expandindexrows(xy, d, shadow, ns, cidx, xyindexprev->xZ[rowmid * (kxprev - 1)], pt1, xyindexprev, rowmid, row1, xyindexnew, kxnew, kynew, false);
@@ -25077,7 +25024,6 @@ void spline3dresampletrilinear(RVector *a, ae_int_t oldzcount, ae_int_t oldycoun
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 // API: void spline3dbuildtrilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &z, const ae_int_t l, const real_1d_array &f, const ae_int_t d, spline3dinterpolant &c);
 void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *z, ae_int_t l, RVector *f, ae_int_t d, spline3dinterpolant *c) {
-   double t;
    ae_int_t tblsize;
    ae_int_t i;
    ae_int_t j;
@@ -25132,15 +25078,11 @@ void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVe
          for (i = 0; i < c->m; i++) {
             for (j0 = 0; j0 < c->l; j0++) {
                for (i0 = 0; i0 < c->d; i0++) {
-                  t = c->f.xR[c->d * (c->n * (c->m * j0 + i) + j) + i0];
-                  c->f.xR[c->d * (c->n * (c->m * j0 + i) + j) + i0] = c->f.xR[c->d * (c->n * (c->m * j0 + i) + k) + i0];
-                  c->f.xR[c->d * (c->n * (c->m * j0 + i) + k) + i0] = t;
+                  swapr(&c->f.xR[c->d * (c->n * (c->m * j0 + i) + j) + i0], &c->f.xR[c->d * (c->n * (c->m * j0 + i) + k) + i0]);
                }
             }
          }
-         t = c->x.xR[j];
-         c->x.xR[j] = c->x.xR[k];
-         c->x.xR[k] = t;
+         swapr(&c->x.xR[j], &c->x.xR[k]);
       }
    }
    for (i = 0; i < c->m; i++) {
@@ -25154,15 +25096,11 @@ void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVe
          for (j = 0; j < c->n; j++) {
             for (j0 = 0; j0 < c->l; j0++) {
                for (i0 = 0; i0 < c->d; i0++) {
-                  t = c->f.xR[c->d * (c->n * (c->m * j0 + i) + j) + i0];
-                  c->f.xR[c->d * (c->n * (c->m * j0 + i) + j) + i0] = c->f.xR[c->d * (c->n * (c->m * j0 + k) + j) + i0];
-                  c->f.xR[c->d * (c->n * (c->m * j0 + k) + j) + i0] = t;
+                  swapr(&c->f.xR[c->d * (c->n * (c->m * j0 + i) + j) + i0], &c->f.xR[c->d * (c->n * (c->m * j0 + k) + j) + i0]);
                }
             }
          }
-         t = c->y.xR[i];
-         c->y.xR[i] = c->y.xR[k];
-         c->y.xR[k] = t;
+         swapr(&c->y.xR[i], &c->y.xR[k]);
       }
    }
    for (k = 0; k < c->l; k++) {
@@ -25176,15 +25114,11 @@ void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVe
          for (j = 0; j < c->m; j++) {
             for (j0 = 0; j0 < c->n; j0++) {
                for (i0 = 0; i0 < c->d; i0++) {
-                  t = c->f.xR[c->d * (c->n * (c->m * k + j) + j0) + i0];
-                  c->f.xR[c->d * (c->n * (c->m * k + j) + j0) + i0] = c->f.xR[c->d * (c->n * (c->m * i + j) + j0) + i0];
-                  c->f.xR[c->d * (c->n * (c->m * i + j) + j0) + i0] = t;
+                  swapr(&c->f.xR[c->d * (c->n * (c->m * k + j) + j0) + i0], &c->f.xR[c->d * (c->n * (c->m * i + j) + j0) + i0]);
                }
             }
          }
-         t = c->z.xR[k];
-         c->z.xR[k] = c->z.xR[i];
-         c->z.xR[i] = t;
+         swapr(&c->z.xR[k], &c->z.xR[i]);
       }
    }
 }

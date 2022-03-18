@@ -1530,13 +1530,9 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
                idx0 = p2.xZ[j];
                idx1 = j;
                for (i = 0; i < k; i++) {
-                  v = permce.xyR[i][idx0];
-                  permce.xyR[i][idx0] = permce.xyR[i][idx1];
-                  permce.xyR[i][idx1] = v;
+                  swapr(&permce.xyR[i][idx0], &permce.xyR[i][idx1]);
                }
-               v = permx.xR[idx0];
-               permx.xR[idx0] = permx.xR[idx1];
-               permx.xR[idx1] = v;
+               swapr(&permx.xR[idx0], &permx.xR[idx1]);
             }
          }
       // Calculate (unprojected) gradient:
@@ -1611,11 +1607,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
       // Post-reordering of Newton step
          for (j = nmain + nslack - 1; j >= 0; j--) {
             if (p2.xZ[j] != j) {
-               idx0 = p2.xZ[j];
-               idx1 = j;
-               v = newtonstep.xR[idx0];
-               newtonstep.xR[idx0] = newtonstep.xR[idx1];
-               newtonstep.xR[idx1] = v;
+               swapr(&newtonstep.xR[p2.xZ[j]], &newtonstep.xR[j]);
             }
          }
       // NewtonStep contains Newton step subject to active bound constraints.
@@ -2691,12 +2683,8 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
          if (monitor->sortedstp.xR[i] <= monitor->sortedstp.xR[i + 1]) {
             break;
          }
-         v = monitor->sortedstp.xR[i];
-         monitor->sortedstp.xR[i] = monitor->sortedstp.xR[i + 1];
-         monitor->sortedstp.xR[i + 1] = v;
-         j = monitor->sortedidx.xZ[i];
-         monitor->sortedidx.xZ[i] = monitor->sortedidx.xZ[i + 1];
-         monitor->sortedidx.xZ[i + 1] = j;
+         swapr(&monitor->sortedstp.xR[i], &monitor->sortedstp.xR[i + 1]);
+         swapi(&monitor->sortedidx.xZ[i], &monitor->sortedidx.xZ[i + 1]);
       }
    }
 // Scan sorted representation, check for C0 and C1 continuity
@@ -2943,7 +2931,7 @@ Spawn:
    // Determine probing step length, save step to the end of the storage
       if (i <= 10) {
       // First 11 steps are performed over equidistant grid
-         monitor->probingstp = (double)i / 10.0 *monitor->probingstepmax;
+         monitor->probingstp = (double)i / 10.0 * monitor->probingstepmax;
       } else {
       // Subsequent steps target either points with maximum change in F[0]
       // (search for discontinuity) or maximum change in slope of F[0] (search
@@ -19706,7 +19694,7 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
       state->sparsec.idx.xZ[offs + i] = idxa->xZ[i];
       state->sparsec.vals.xR[offs + i] = vala->xR[i];
    }
-   tagsortmiddleir(&state->sparsec.idx, &state->sparsec.vals, offs, nnz);
+   tagsortmiddleir(&state->sparsec.idx, &state->sparsec.vals, nnz, offs);
    offsdst = offs;
    for (i = 1; i < nnz; i++) {
       if (state->sparsec.idx.xZ[offsdst] != state->sparsec.idx.xZ[offs + i]) {
@@ -27871,7 +27859,6 @@ static double reviseddualsimplex_basisminimumdiagonalelement(dualsimplexbasis *s
 static void reviseddualsimplex_pivottobwd(ZVector *p, ae_int_t m, ZVector *bwd) {
    ae_int_t i;
    ae_int_t k;
-   ae_int_t t;
    vectorsetlengthatleast(bwd, m);
    for (i = 0; i < m; i++) {
       bwd->xZ[i] = i;
@@ -27879,9 +27866,7 @@ static void reviseddualsimplex_pivottobwd(ZVector *p, ae_int_t m, ZVector *bwd) 
    for (i = 0; i < m; i++) {
       k = p->xZ[i];
       if (k != i) {
-         t = bwd->xZ[i];
-         bwd->xZ[i] = bwd->xZ[k];
-         bwd->xZ[k] = t;
+         swapi(&bwd->xZ[i], &bwd->xZ[k]);
       }
    }
 }
@@ -27977,19 +27962,15 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
       nlogical = 0;
       for (i = 0; i < m; i++) {
          if (s->idx.xZ[i] >= ns) {
-            j = s->rowpermbwd.xZ[nlogical];
-            s->rowpermbwd.xZ[nlogical] = s->rowpermbwd.xZ[i];
-            s->rowpermbwd.xZ[i] = j;
+            swapi(&s->rowpermbwd.xZ[nlogical], &s->rowpermbwd.xZ[i]);
             j1 = s->tcinvidx.xZ[s->idx.xZ[i] - ns];
-            j = s->colpermbwd.xZ[j1];
-            s->colpermbwd.xZ[j1] = s->colpermbwd.xZ[nlogical];
-            s->colpermbwd.xZ[nlogical] = j;
+            swapi(&s->colpermbwd.xZ[j1], &s->colpermbwd.xZ[nlogical]);
             s->tcinvidx.xZ[s->colpermbwd.xZ[nlogical]] = nlogical;
             s->tcinvidx.xZ[s->colpermbwd.xZ[j1]] = j1;
             nlogical++;
          }
       }
-      sortmiddlei(&s->colpermbwd, nlogical, m - nlogical);
+      tagsortmiddlei(&s->colpermbwd, m - nlogical, nlogical);
       for (i = 0; i < m; i++) {
          s->tcinvidx.xZ[s->colpermbwd.xZ[i]] = i;
       }
@@ -28043,7 +28024,7 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
       // LU2 does NOT need resorting because trailing NStructural
       // elements of permutation were post-sorted to produce
       // already sorted results.
-         tagsortmiddleir(&s->sparselu1.idx, &s->sparselu1.vals, s->sparselu1.ridx.xZ[k], offs1 - s->sparselu1.ridx.xZ[k]);
+         tagsortmiddleir(&s->sparselu1.idx, &s->sparselu1.vals, offs1 - s->sparselu1.ridx.xZ[k], s->sparselu1.ridx.xZ[k]);
          s->sparselu1.ridx.xZ[k + 1] = offs1;
          s->sparselu2.ridx.xZ[k + 1] = offs2;
       }
@@ -28054,12 +28035,8 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
       if (nstructural > 0) {
          sptrflu(&s->sparselu2, 2, &s->densep2, &s->densep2c, &s->lubuf2);
          for (i = 0; i < nstructural; i++) {
-            j = s->rowpermbwd.xZ[i + nlogical];
-            s->rowpermbwd.xZ[i + nlogical] = s->rowpermbwd.xZ[s->densep2.xZ[i] + nlogical];
-            s->rowpermbwd.xZ[s->densep2.xZ[i] + nlogical] = j;
-            j = s->colpermbwd.xZ[i + nlogical];
-            s->colpermbwd.xZ[i + nlogical] = s->colpermbwd.xZ[s->densep2c.xZ[i] + nlogical];
-            s->colpermbwd.xZ[s->densep2c.xZ[i] + nlogical] = j;
+            swapi(&s->rowpermbwd.xZ[i + nlogical], &s->rowpermbwd.xZ[s->densep2.xZ[i] + nlogical]);
+            swapi(&s->colpermbwd.xZ[i + nlogical], &s->colpermbwd.xZ[s->densep2c.xZ[i] + nlogical]);
          }
       // Process L factor:
       //
@@ -31800,7 +31777,7 @@ void minlpaddlc2(minlpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
       state->a.idx.xZ[offs + i] = idxa->xZ[i];
       state->a.vals.xR[offs + i] = vala->xR[i];
    }
-   tagsortmiddleir(&state->a.idx, &state->a.vals, offs, nnz);
+   tagsortmiddleir(&state->a.idx, &state->a.vals, nnz, offs);
    offsdst = offs;
    for (i = 1; i < nnz; i++) {
       if (state->a.idx.xZ[offsdst] != state->a.idx.xZ[offs + i]) {

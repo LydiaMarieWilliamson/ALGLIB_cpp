@@ -774,7 +774,6 @@ static double bdss_xlny(double x, double y) {
 void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double *threshold, double *pal, double *pbl, double *par, double *pbr, double *cve) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_int_t t;
    double s;
    ae_int_t tiecount;
    ae_int_t k;
@@ -814,9 +813,7 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
    dstie(a, n, &ties, &tiecount, &p1, &p2);
    for (i = 0; i < n; i++) {
       if (p2.xZ[i] != i) {
-         t = c->xZ[i];
-         c->xZ[i] = c->xZ[p2.xZ[i]];
-         c->xZ[p2.xZ[i]] = t;
+         swapi(&c->xZ[i], &c->xZ[p2.xZ[i]]);
       }
    }
 // Special case: number of ties is 1.
@@ -1114,9 +1111,7 @@ void dssplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae
    dstie(a, n, &ties, &tiecount, &p1, &p2);
    for (i = 0; i < n; i++) {
       if (p2.xZ[i] != i) {
-         k = c->xZ[i];
-         c->xZ[i] = c->xZ[p2.xZ[i]];
-         c->xZ[p2.xZ[i]] = k;
+         swapi(&c->xZ[i], &c->xZ[p2.xZ[i]]);
       }
    }
 // Special cases
@@ -1277,9 +1272,7 @@ void dsoptimalsplitk(RVector *a, ZVector *c, ae_int_t n, ae_int_t nc, ae_int_t k
    dstie(a, n, &ties, &tiecount, &p1, &p2);
    for (i = 0; i < n; i++) {
       if (p2.xZ[i] != i) {
-         k = c->xZ[i];
-         c->xZ[i] = c->xZ[p2.xZ[i]];
-         c->xZ[p2.xZ[i]] = k;
+         swapi(&c->xZ[i], &c->xZ[p2.xZ[i]]);
       }
    }
 // Special cases
@@ -3748,7 +3741,7 @@ void mlpgradbatchx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
    problemcost *= wcount * 2;
 // Parallelism was tried if: problemcost >= smpactivationlevel() && subset1 - subset0 >= 2 * mlpbase_microbatchsize
    if (subset1 - subset0 >= 2 * mlpbase_microbatchsize && problemcost > spawnlevel()) {
-      splitlength(subset1 - subset0, mlpbase_microbatchsize, &len0, &len1);
+      len0 = splitlength(subset1 - subset0, mlpbase_microbatchsize), len1 = subset1 - subset0 - len0;
       mlpgradbatchx(network, densexy, sparsexy, datasetsize, datasettype, idx, subset0, subset0 + len0, subsettype, buf, gradbuf);
       mlpgradbatchx(network, densexy, sparsexy, datasetsize, datasettype, idx, subset0 + len0, subset1, subsettype, buf, gradbuf);
       ae_frame_leave();
@@ -5673,7 +5666,7 @@ void mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
    problemcost *= wcount * 2;
 // Parallelism was tried if: problemcost >= smpactivationlevel() && subset1 - subset0 >= 2 * mlpbase_microbatchsize
    if (subset1 - subset0 >= 2 * mlpbase_microbatchsize && problemcost > spawnlevel()) {
-      splitlength(subset1 - subset0, mlpbase_microbatchsize, &len0, &len1);
+      len0 = splitlength(subset1 - subset0, mlpbase_microbatchsize), len1 = subset1 - subset0 - len0;
       mlpallerrorsx(network, densexy, sparsexy, datasetsize, datasettype, idx, subset0, subset0 + len0, subsettype, buf, &rep0);
       mlpallerrorsx(network, densexy, sparsexy, datasetsize, datasettype, idx, subset0 + len0, subset1, subsettype, buf, &rep1);
       rep->relclserror = (len0 * rep0.relclserror + len1 * rep1.relclserror) / (len0 + len1);
@@ -8445,7 +8438,7 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
    rcomplexity = 2.0 * (idx1 - idx0) * (cidx1 - cidx0) * nvars;
 // Parallelism was tried if: rcomplexity >= smpactivationlevel() && idx1 - idx0 >= 2 * clustering_kmeansblocksize
    if (rcomplexity >= spawnlevel() && idx1 - idx0 >= 2 * clustering_kmeansblocksize && nvars >= clustering_kmeansparalleldim && cidx1 - cidx0 >= clustering_kmeansparallelk) {
-      splitlength(idx1 - idx0, clustering_kmeansblocksize, &task0, &task1);
+      task0 = splitlength(idx1 - idx0, clustering_kmeansblocksize), task1 = idx1 - idx0 - task0;
       kmeansupdatedistances(xy, idx0, idx0 + task0, nvars, ct, cidx0, cidx1, xyc, xydist2, bufferpool);
       kmeansupdatedistances(xy, idx0 + task0, idx1, nvars, ct, cidx0, cidx1, xyc, xydist2, bufferpool);
       ae_frame_leave();
@@ -9445,11 +9438,11 @@ static void clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatures
    if (rcomplexity >= spawnlevel() && (i1 - i0 > 2 || j1 - j0 > 2)) {
    // Recursive division along largest of dimensions
       if (i1 - i0 > j1 - j0) {
-         splitlengtheven(i1 - i0, &len0, &len1);
+         len0 = splitlengtheven(i1 - i0), len1 = i1 - i0 - len0;
          clustering_evaluatedistancematrixrec(xy, nfeatures, disttype, d, i0, i0 + len0, j0, j1);
          clustering_evaluatedistancematrixrec(xy, nfeatures, disttype, d, i0 + len0, i1, j0, j1);
       } else {
-         splitlengtheven(j1 - j0, &len0, &len1);
+         len0 = splitlengtheven(j1 - j0), len1 = j1 - j0 - len0;
          clustering_evaluatedistancematrixrec(xy, nfeatures, disttype, d, i0, i1, j0, j0 + len0);
          clustering_evaluatedistancematrixrec(xy, nfeatures, disttype, d, i0, i1, j0 + len0, j1);
       }
@@ -12058,17 +12051,11 @@ static void dforest_buildrandomtreerec(decisionforestbuilder *s, dfworkbuf *work
          i2--;
          continue;
       }
-      j = workbuf->trnset.xZ[i1];
-      workbuf->trnset.xZ[i1] = workbuf->trnset.xZ[i2];
-      workbuf->trnset.xZ[i2] = j;
+      swapi(&workbuf->trnset.xZ[i1], &workbuf->trnset.xZ[i2]);
       if (nclasses > 1) {
-         j = workbuf->trnlabelsi.xZ[i1];
-         workbuf->trnlabelsi.xZ[i1] = workbuf->trnlabelsi.xZ[i2];
-         workbuf->trnlabelsi.xZ[i2] = j;
+         swapi(&workbuf->trnlabelsi.xZ[i1], &workbuf->trnlabelsi.xZ[i2]);
       } else {
-         v = workbuf->trnlabelsr.xR[i1];
-         workbuf->trnlabelsr.xR[i1] = workbuf->trnlabelsr.xR[i2];
-         workbuf->trnlabelsr.xR[i2] = v;
+         swapr(&workbuf->trnlabelsr.xR[i1], &workbuf->trnlabelsr.xR[i2]);
       }
       i1++;
       i2--;
@@ -12092,17 +12079,11 @@ static void dforest_buildrandomtreerec(decisionforestbuilder *s, dfworkbuf *work
             i2--;
             continue;
          }
-         j = workbuf->oobset.xZ[i1];
-         workbuf->oobset.xZ[i1] = workbuf->oobset.xZ[i2];
-         workbuf->oobset.xZ[i2] = j;
+         swapi(&workbuf->oobset.xZ[i1], &workbuf->oobset.xZ[i2]);
          if (nclasses > 1) {
-            j = workbuf->ooblabelsi.xZ[i1];
-            workbuf->ooblabelsi.xZ[i1] = workbuf->ooblabelsi.xZ[i2];
-            workbuf->ooblabelsi.xZ[i2] = j;
+            swapi(&workbuf->ooblabelsi.xZ[i1], &workbuf->ooblabelsi.xZ[i2]);
          } else {
-            v = workbuf->ooblabelsr.xR[i1];
-            workbuf->ooblabelsr.xR[i1] = workbuf->ooblabelsr.xR[i2];
-            workbuf->ooblabelsr.xR[i2] = v;
+            swapr(&workbuf->ooblabelsr.xR[i1], &workbuf->ooblabelsr.xR[i2]);
          }
          i1++;
          i2--;
@@ -12469,7 +12450,6 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
    ae_int_t nperm;
    ae_int_t i;
    ae_int_t j;
-   ae_int_t k;
    double nopermloss;
    double totalpermloss;
    ae_frame_make(&_frame_block);
@@ -12533,9 +12513,7 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
       }
       for (i = 0; i < npoints - 1; i++) {
          j = i + hqrnduniformi(&varimprs, npoints - i);
-         k = s->varimpshuffle2.xZ[i];
-         s->varimpshuffle2.xZ[i] = s->varimpshuffle2.xZ[j];
-         s->varimpshuffle2.xZ[j] = k;
+         swapi(&s->varimpshuffle2.xZ[i], &s->varimpshuffle2.xZ[j]);
       }
       for (i = 0; i < nvars; i++) {
          s->varimpshuffle2.xZ[npoints + i] = hqrnduniformi(&varimprs, npoints);
@@ -16683,13 +16661,9 @@ static void ssa_updatebasis(ssamodel *s, ae_int_t appendlen, double updateits) {
                if (i >= k) {
                   break;
                }
-               v = s->sv.xR[i];
-               s->sv.xR[i] = s->sv.xR[k];
-               s->sv.xR[k] = v;
+               swapr(&s->sv.xR[i], &s->sv.xR[k]);
                for (j = 0; j < winw; j++) {
-                  v = s->basis.xyR[j][i];
-                  s->basis.xyR[j][i] = s->basis.xyR[j][k];
-                  s->basis.xyR[j][k] = v;
+                  swapr(&s->basis.xyR[j][i], &s->basis.xyR[j][k]);
                }
             }
             for (i = 0; i < s->nbasis; i++) {

@@ -190,9 +190,7 @@ static void directdensesolvers_rbasiclusolve(RMatrix *lua, ZVector *p, ae_int_t 
    double v;
    for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
-         v = xb->xR[i];
-         xb->xR[i] = xb->xR[p->xZ[i]];
-         xb->xR[p->xZ[i]] = v;
+         swapr(&xb->xR[i], &xb->xR[p->xZ[i]]);
       }
    }
    for (i = 1; i < n; i++) {
@@ -217,9 +215,7 @@ static void directdensesolvers_cbasiclusolve(CMatrix *lua, ZVector *p, ae_int_t 
    complex v;
    for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
-         v = xb->xC[i];
-         xb->xC[i] = xb->xC[p->xZ[i]];
-         xb->xC[p->xZ[i]] = v;
+         swapc(&xb->xC[i], &xb->xC[p->xZ[i]]);
       }
    }
    for (i = 1; i < n; i++) {
@@ -399,9 +395,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
          for (j = 0; j < m; j++) {
-            v = x->xyR[i][j];
-            x->xyR[i][j] = x->xyR[p->xZ[i]][j];
-            x->xyR[p->xZ[i]][j] = v;
+            swapr(&x->xyR[i][j], &x->xyR[p->xZ[i]][j]);
          }
       }
    }
@@ -509,9 +503,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
          for (j = 0; j < m; j++) {
-            v = x->xyC[i][j];
-            x->xyC[i][j] = x->xyC[p->xZ[i]][j];
-            x->xyC[p->xZ[i]][j] = v;
+            swapc(&x->xyC[i][j], &x->xyC[p->xZ[i]][j]);
          }
       }
    }
@@ -792,7 +784,6 @@ void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_
 // API: void rmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info);
 void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info) {
    ae_frame _frame_block;
-   double v;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -823,9 +814,7 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
    for (i = 0; i < n; i++) {
       if (p.xZ[i] != i) {
          for (j = 0; j < m; j++) {
-            v = b->xyR[i][j];
-            b->xyR[i][j] = b->xyR[p.xZ[i]][j];
-            b->xyR[p.xZ[i]][j] = v;
+            swapr(&b->xyR[i][j], &b->xyR[p.xZ[i]][j]);
          }
       }
    }
@@ -1062,7 +1051,6 @@ void rmatrixlusolvem(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t 
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 // API: void rmatrixlusolvemfast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info);
 void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info) {
-   double v;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -1087,9 +1075,7 @@ void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_in
    for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
          for (j = 0; j < m; j++) {
-            v = b->xyR[i][j];
-            b->xyR[i][j] = b->xyR[p->xZ[i]][j];
-            b->xyR[p->xZ[i]][j] = v;
+            swapr(&b->xyR[i][j], &b->xyR[p->xZ[i]][j]);
          }
       }
    }
@@ -1430,7 +1416,6 @@ void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_
 // API: void cmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info);
 void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info) {
    ae_frame _frame_block;
-   complex v;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -1461,9 +1446,7 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
    for (i = 0; i < n; i++) {
       if (p.xZ[i] != i) {
          for (j = 0; j < m; j++) {
-            v = b->xyC[i][j];
-            b->xyC[i][j] = b->xyC[p.xZ[i]][j];
-            b->xyC[p.xZ[i]][j] = v;
+            swapc(&b->xyC[i][j], &b->xyC[p.xZ[i]][j]);
          }
       }
    }
@@ -1683,7 +1666,6 @@ void cmatrixlusolvem(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t 
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 // API: void cmatrixlusolvemfast(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info);
 void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info) {
-   complex v;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -1708,9 +1690,7 @@ void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_in
    for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
          for (j = 0; j < m; j++) {
-            v = b->xyC[i][j];
-            b->xyC[i][j] = b->xyC[p->xZ[i]][j];
-            b->xyC[p->xZ[i]][j] = v;
+            swapc(&b->xyC[i][j], &b->xyC[p->xZ[i]][j]);
          }
       }
    }
@@ -3577,9 +3557,7 @@ void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sp
 void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_int_t j;
    ae_int_t n;
-   double v;
    ae_frame_make(&_frame_block);
    SetVector(x);
    SetObj(sparsesolverreport, rep);
@@ -3600,12 +3578,7 @@ void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, spars
       return;
    }
    rcopyallocv(n, b, x);
-   for (i = 0; i < n; i++) {
-      j = p.xZ[i];
-      v = x->xR[i];
-      x->xR[i] = x->xR[j];
-      x->xR[j] = v;
-   }
+   for (i = 0; i < n; i++) swapr(&x->xR[i], &x->xR[p.xZ[i]]);
    if (isupper) {
       sparsetrsv(&a2, isupper, false, 1, x);
       sparsetrsv(&a2, isupper, false, 0, x);
@@ -3613,12 +3586,7 @@ void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, spars
       sparsetrsv(&a2, isupper, false, 0, x);
       sparsetrsv(&a2, isupper, false, 1, x);
    }
-   for (i = n - 1; i >= 0; i--) {
-      j = p.xZ[i];
-      v = x->xR[i];
-      x->xR[i] = x->xR[j];
-      x->xR[j] = v;
-   }
+   for (i = n - 1; i >= 0; i--) swapr(&x->xR[i], &x->xR[p.xZ[i]]);
    rep->terminationtype = 1;
    ae_frame_leave();
 }
@@ -3704,9 +3672,7 @@ void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *
 void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *rep) {
    ae_frame _frame_block;
    ae_int_t i;
-   ae_int_t j;
    ae_int_t n;
-   double v;
    ae_frame_make(&_frame_block);
    SetVector(x);
    SetObj(sparsesolverreport, rep);
@@ -3734,18 +3700,12 @@ void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *re
       x->xR[i] = b->xR[i];
    }
    for (i = 0; i < n; i++) {
-      j = pivp.xZ[i];
-      v = x->xR[i];
-      x->xR[i] = x->xR[j];
-      x->xR[j] = v;
+      swapr(&x->xR[i], &x->xR[pivp.xZ[i]]);
    }
    sparsetrsv(&a2, false, true, 0, x);
    sparsetrsv(&a2, true, false, 0, x);
    for (i = n - 1; i >= 0; i--) {
-      j = pivq.xZ[i];
-      v = x->xR[i];
-      x->xR[i] = x->xR[j];
-      x->xR[j] = v;
+      swapr(&x->xR[i], &x->xR[pivq.xZ[i]]);
    }
    rep->terminationtype = 1;
    ae_frame_leave();
@@ -3776,8 +3736,6 @@ void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *re
 // API: void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integer_1d_array &q, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
 void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector *x, sparsesolverreport *rep) {
    ae_int_t i;
-   ae_int_t j;
-   double v;
    ae_int_t n;
    SetVector(x);
    SetObj(sparsesolverreport, rep);
@@ -3809,18 +3767,12 @@ void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector 
       x->xR[i] = b->xR[i];
    }
    for (i = 0; i < n; i++) {
-      j = p->xZ[i];
-      v = x->xR[i];
-      x->xR[i] = x->xR[j];
-      x->xR[j] = v;
+      swapr(&x->xR[i], &x->xR[p->xZ[i]]);
    }
    sparsetrsv(a, false, true, 0, x);
    sparsetrsv(a, true, false, 0, x);
    for (i = n - 1; i >= 0; i--) {
-      j = q->xZ[i];
-      v = x->xR[i];
-      x->xR[i] = x->xR[j];
-      x->xR[j] = v;
+      swapr(&x->xR[i], &x->xR[q->xZ[i]]);
    }
    rep->terminationtype = 1;
 }

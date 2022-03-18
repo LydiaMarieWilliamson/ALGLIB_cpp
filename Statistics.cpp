@@ -257,7 +257,6 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
    ae_int_t midp;
    ae_int_t k;
    double a;
-   double tval;
    ae_frame_make(&_frame_block);
    DupVector(x);
    *median = 0;
@@ -289,30 +288,20 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
       if (ir <= l + 1) {
       // 1 or 2 elements in partition
          if (ir == l + 1 && x->xR[ir] < x->xR[l]) {
-            tval = x->xR[l];
-            x->xR[l] = x->xR[ir];
-            x->xR[ir] = tval;
+            swapr(&x->xR[l], &x->xR[ir]);
          }
          break;
       } else {
          midp = (l + ir) / 2;
-         tval = x->xR[midp];
-         x->xR[midp] = x->xR[l + 1];
-         x->xR[l + 1] = tval;
+         swapr(&x->xR[midp], &x->xR[l + 1]);
          if (x->xR[l] > x->xR[ir]) {
-            tval = x->xR[l];
-            x->xR[l] = x->xR[ir];
-            x->xR[ir] = tval;
+            swapr(&x->xR[l], &x->xR[ir]);
          }
          if (x->xR[l + 1] > x->xR[ir]) {
-            tval = x->xR[l + 1];
-            x->xR[l + 1] = x->xR[ir];
-            x->xR[ir] = tval;
+            swapr(&x->xR[l + 1], &x->xR[ir]);
          }
          if (x->xR[l] > x->xR[l + 1]) {
-            tval = x->xR[l];
-            x->xR[l] = x->xR[l + 1];
-            x->xR[l + 1] = tval;
+            swapr(&x->xR[l], &x->xR[l + 1]);
          }
          i = l + 1;
          j = ir;
@@ -327,9 +316,7 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
             if (j < i) {
                break;
             }
-            tval = x->xR[i];
-            x->xR[i] = x->xR[j];
-            x->xR[j] = tval;
+            swapr(&x->xR[i], &x->xR[j]);
          }
          x->xR[l + 1] = x->xR[j];
          x->xR[j] = a;
@@ -9005,8 +8992,6 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
    ae_int_t j;
    ae_int_t k;
    ae_int_t t;
-   double tmp;
-   ae_int_t tmpi;
    ae_int_t ns;
    double w;
    double p;
@@ -9060,12 +9045,8 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
             if (r.xR[k - 1] >= r.xR[t - 1]) {
                t = 1;
             } else {
-               tmp = r.xR[k - 1];
-               r.xR[k - 1] = r.xR[t - 1];
-               r.xR[t - 1] = tmp;
-               tmpi = c.xZ[k - 1];
-               c.xZ[k - 1] = c.xZ[t - 1];
-               c.xZ[t - 1] = tmpi;
+               swapr(&r.xR[k - 1], &r.xR[t - 1]);
+               swapi(&c.xZ[k - 1], &c.xZ[t - 1]);
                t = k;
             }
          }
@@ -9073,12 +9054,8 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
       } while (i <= ns);
       i = ns - 1;
       do {
-         tmp = r.xR[i];
-         r.xR[i] = r.xR[0];
-         r.xR[0] = tmp;
-         tmpi = c.xZ[i];
-         c.xZ[i] = c.xZ[0];
-         c.xZ[0] = tmpi;
+         swapr(&r.xR[i], &r.xR[0]);
+         swapi(&c.xZ[i], &c.xZ[0]);
          t = 1;
          while (t != 0) {
             k = 2 * t;
@@ -9093,12 +9070,8 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
                if (r.xR[t - 1] >= r.xR[k - 1]) {
                   t = 0;
                } else {
-                  tmp = r.xR[k - 1];
-                  r.xR[k - 1] = r.xR[t - 1];
-                  r.xR[t - 1] = tmp;
-                  tmpi = c.xZ[k - 1];
-                  c.xZ[k - 1] = c.xZ[t - 1];
-                  c.xZ[t - 1] = tmpi;
+                  swapr(&r.xR[k - 1], &r.xR[t - 1]);
+                  swapi(&c.xZ[k - 1], &c.xZ[t - 1]);
                   t = k;
                }
             }
@@ -12630,7 +12603,6 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    ae_int_t k;
    ae_int_t t;
    double tmp;
-   ae_int_t tmpi;
    ae_int_t ns;
    double u;
    double p;
@@ -12675,12 +12647,8 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
             if (r.xR[k - 1] >= r.xR[t - 1]) {
                t = 1;
             } else {
-               tmp = r.xR[k - 1];
-               r.xR[k - 1] = r.xR[t - 1];
-               r.xR[t - 1] = tmp;
-               tmpi = c.xZ[k - 1];
-               c.xZ[k - 1] = c.xZ[t - 1];
-               c.xZ[t - 1] = tmpi;
+               swapr(&r.xR[k - 1], &r.xR[t - 1]);
+               swapi(&c.xZ[k - 1], &c.xZ[t - 1]);
                t = k;
             }
          }
@@ -12688,12 +12656,8 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
       } while (i <= ns);
       i = ns - 1;
       do {
-         tmp = r.xR[i];
-         r.xR[i] = r.xR[0];
-         r.xR[0] = tmp;
-         tmpi = c.xZ[i];
-         c.xZ[i] = c.xZ[0];
-         c.xZ[0] = tmpi;
+         swapr(&r.xR[i], &r.xR[0]);
+         swapi(&c.xZ[i], &c.xZ[0]);
          t = 1;
          while (t != 0) {
             k = 2 * t;
@@ -12708,12 +12672,8 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
                if (r.xR[t - 1] >= r.xR[k - 1]) {
                   t = 0;
                } else {
-                  tmp = r.xR[k - 1];
-                  r.xR[k - 1] = r.xR[t - 1];
-                  r.xR[t - 1] = tmp;
-                  tmpi = c.xZ[k - 1];
-                  c.xZ[k - 1] = c.xZ[t - 1];
-                  c.xZ[t - 1] = tmpi;
+                  swapr(&r.xR[k - 1], &r.xR[t - 1]);
+                  swapi(&c.xZ[k - 1], &c.xZ[t - 1]);
                   t = k;
                }
             }

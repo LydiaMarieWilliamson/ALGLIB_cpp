@@ -995,7 +995,7 @@ void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2) {
 }
 
 // Make dst into a new smart pointer.
-// dst is assumed to be uninitialized, but pre-allocated, by aliasing subscriber (which may be NULL) with dst->ptr.
+// dst is assumed to be uninitialized, but preallocated, by aliasing subscriber (which may be NULL) with dst->ptr.
 // After initialization, dst stores the NULL pointer.
 // make_automatic indicates whether or not dst is to be added to the dynamic block list.
 // Upon allocation failure, call ae_break().
@@ -1767,7 +1767,7 @@ void ae_free_lock(ae_lock *lock) {
 static void ae_shared_pool_destroy(void *_dst) { ae_shared_pool_free(_dst, false); }
 
 // A new ae_shared_pool structure for _dst.
-// _dst is assumed to be pre-allocated, and uninitialized, its fields are ignored.
+// _dst is assumed to be preallocated, and uninitialized, its fields are ignored.
 // make_automatic indicates whether or not _dst is to be removed after leaving the current frame
 // as opposed to being the field of some other object.
 // Upon allocation failure, call ae_break().

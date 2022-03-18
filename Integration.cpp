@@ -916,7 +916,6 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t ng;
-   double tmp;
    ae_frame_make(&_frame_block);
    SetVector(x);
    SetVector(wkronrod);
@@ -1256,12 +1255,8 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
 // reorder
    tagsort(x, n, &p1, &p2);
    for (i = 0; i < n; i++) {
-      tmp = wkronrod->xR[i];
-      wkronrod->xR[i] = wkronrod->xR[p2.xZ[i]];
-      wkronrod->xR[p2.xZ[i]] = tmp;
-      tmp = wgauss->xR[i];
-      wgauss->xR[i] = wgauss->xR[p2.xZ[i]];
-      wgauss->xR[p2.xZ[i]] = tmp;
+      swapr(&wkronrod->xR[i], &wkronrod->xR[p2.xZ[i]]);
+      swapr(&wgauss->xR[i], &wgauss->xR[p2.xZ[i]]);
    }
    ae_frame_leave();
 }
@@ -1568,15 +1563,12 @@ static void autogk_autogkinternalprepare(double a, double b, double eps, double 
 static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth) {
    ae_int_t i;
    ae_int_t p;
-   double t;
    ae_int_t maxcp;
    if (heapsize == 1) {
       return;
    }
    for (i = 0; i < heapwidth; i++) {
-      t = heap->xyR[heapsize - 1][i];
-      heap->xyR[heapsize - 1][i] = heap->xyR[0][i];
-      heap->xyR[0][i] = t;
+      swapr(&heap->xyR[heapsize - 1][i], &heap->xyR[0][i]);
    }
    p = 0;
    while (2 * p + 1 < heapsize - 1) {
@@ -1588,9 +1580,7 @@ static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth
       }
       if (heap->xyR[p][0] < heap->xyR[maxcp][0]) {
          for (i = 0; i < heapwidth; i++) {
-            t = heap->xyR[p][i];
-            heap->xyR[p][i] = heap->xyR[maxcp][i];
-            heap->xyR[maxcp][i] = t;
+            swapr(&heap->xyR[p][i], &heap->xyR[maxcp][i]);
          }
          p = maxcp;
       } else {
@@ -1602,7 +1592,6 @@ static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth
 static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth) {
    ae_int_t i;
    ae_int_t p;
-   double t;
    ae_int_t parent;
    if (heapsize == 0) {
       return;
@@ -1612,9 +1601,7 @@ static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidt
       parent = (p - 1) / 2;
       if (heap->xyR[p][0] > heap->xyR[parent][0]) {
          for (i = 0; i < heapwidth; i++) {
-            t = heap->xyR[p][i];
-            heap->xyR[p][i] = heap->xyR[parent][i];
-            heap->xyR[parent][i] = t;
+            swapr(&heap->xyR[p][i], &heap->xyR[parent][i]);
          }
          p = parent;
       } else {
@@ -1874,7 +1861,6 @@ Pause:
 // API: void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr = NULL);
 bool autogkiteration(autogkstate *state) {
    AutoS double s;
-   AutoS double tmp;
    AutoS double eps;
    AutoS double a;
    AutoS double b;
@@ -1895,7 +1881,6 @@ bool autogkiteration(autogkstate *state) {
    }
 Spawn:
    s = 359;
-   tmp = -58;
    eps = -919;
    a = -909;
    b = 81;
@@ -1954,12 +1939,8 @@ Spawn:
          s = 1.0;
       } else {
          s = -1.0;
-         tmp = a;
-         a = b;
-         b = tmp;
-         tmp = alpha;
-         alpha = beta;
-         beta = tmp;
+         swapr(&a, &b);
+         swapr(&alpha, &beta);
       }
       alpha = rmin2(alpha, 0.0);
       beta = rmin2(beta, 0.0);
