@@ -687,6 +687,7 @@ A6.3. Test Results
 0-39	6289 1.0x 10001 1.0x 12199 1.0x 9158 1.0x 1647383434 (6231138a) 78 // Adding more changes made in AlgLib++ to TestC.cpp.
 9-39	7874 0.4x 11629 1.1x 12199 1.0x 8801 1.0x 1647593235 (62344713) 79 // AlgLibInternal.{cpp,h}: Synchronize to AlgLib++.
 0-39	7092 0.5x 12501 1.0x 12199 1.0x 7795 1.2x 1648502128 (62422570) 78 // Checking for suspicious slowdown in TestX.cpp.
+40	4348 1.0x 5000 2.0x 12199 1.0x 8948 1.1x 1648502820 (62422824) 76 // AlgLibInternal.{cpp,h}: New recoding.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -738,19 +739,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7092
-* RGEMM-MTN-16              0.5x
-* RGEMM-SEQ-32   (MFLOPS)  12501
-* RGEMM-MTN-32              1.0x
+* RGEMM-SEQ-16   (MFLOPS)   4348
+* RGEMM-MTN-16              1.0x
+* RGEMM-SEQ-32   (MFLOPS)   5000
+* RGEMM-MTN-32              2.0x
 * RGEMM-SEQ-64   (MFLOPS)  12199
 * RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   7795
-* RGEMM-MTN-1024            1.2x
+* RGEMM-SEQ-1024 (MFLOPS)   8948
+* RGEMM-MTN-1024            1.1x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-Seed: 1648502128 (62422570)
+Seed: 1648502820 (62422824)
 Compiler: GCC
 Hardware: 64-bit
 Byte Order: little-endian
@@ -850,4 +851,4 @@ Testing Mode: single core
 88/90: knn                              Ok
 89/90: mlptrain                         Ok
 90/90: alglibbasics                     Ok
-Done in 78 seconds
+Done in 76 seconds

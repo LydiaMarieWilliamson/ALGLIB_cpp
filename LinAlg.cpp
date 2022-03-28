@@ -21128,12 +21128,12 @@ static void spchol_generatedbgpermutation(sparsematrix *a, ae_int_t n, ZVector *
       }
    }
 // Prepare permutation that orders vertices by degrees
-   iallocv(n, invperm);
+   allocv(n, invperm);
    for (i = 0; i < n; i++) {
       invperm->xZ[i] = i;
    }
    tagsortfasti(&d, invperm, &tmpr, &tmpperm, n);
-   iallocv(n, perm);
+   allocv(n, perm);
    for (i = 0; i < n; i++) {
       perm->xZ[invperm->xZ[i]] = i;
    }
@@ -21790,7 +21790,7 @@ static void spchol_loadmatrix(spcholanalysis *analysis, sparsematrix *at) {
    ae_int_t blocksize;
    ae_int_t sidx;
    n = analysis->n;
-   iallocv(n, &analysis->raw2smap);
+   allocv(n, &analysis->raw2smap);
    rsetallocv(analysis->rowoffsets.xZ[analysis->nsuper], 0.0, &analysis->inputstorage);
    for (sidx = 0; sidx < analysis->nsuper; sidx++) {
       cols0 = analysis->supercolrange.xZ[sidx];
@@ -22071,11 +22071,11 @@ static void spchol_partialcholeskypattern(sparsematrix *a, ae_int_t head, ae_int
    spchol_fromparenttochildren(tmpparent, cursize, tmpchildrenr, tmpchildreni, tmp1);
    tmpbottomt->m = head;
    tmpbottomt->n = tail;
-   iallocv(head + 1, &tmpbottomt->ridx);
+   allocv(head + 1, &tmpbottomt->ridx);
    tmpbottomt->ridx.xZ[0] = 0;
    tmpupdatet->m = head;
    tmpupdatet->n = tail;
-   iallocv(head + 1, &tmpupdatet->ridx);
+   allocv(head + 1, &tmpupdatet->ridx);
    tmpupdatet->ridx.xZ[0] = 0;
    bsetv(tail, false, flagarray);
    for (j = 0; j < head; j++) {
@@ -22148,7 +22148,7 @@ static void spchol_partialcholeskypattern(sparsematrix *a, ae_int_t head, ae_int
    bsetv(tail, false, flagarray);
    tmpnewtailt->m = tail;
    tmpnewtailt->n = tail;
-   iallocv(tail + 1, &tmpnewtailt->ridx);
+   allocv(tail + 1, &tmpnewtailt->ridx);
    tmpnewtailt->ridx.xZ[0] = 0;
    for (j = 0; j < tail; j++) {
       k = tmpnewtailt->ridx.xZ[j];
@@ -23386,8 +23386,8 @@ bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spchol
       // After each partial AMD we compute sparsity pattern of the tail, set it as the new residual
       // and repeat iteration.
          residual = n;
-         iallocv(n, &analysis->fillinperm);
-         iallocv(n, &analysis->invfillinperm);
+         allocv(n, &analysis->fillinperm);
+         allocv(n, &analysis->invfillinperm);
          for (i = 0; i < n; i++) {
             analysis->fillinperm.xZ[i] = i;
             analysis->invfillinperm.xZ[i] = i;
@@ -29390,8 +29390,8 @@ void fblsgmrescreate(RVector *b, ae_int_t n, ae_int_t k, fblsgmresstate *state) 
    state->itsperformed = 0;
    state->retcode = 0;
    rcopyallocv(n, b, &state->b);
-   rallocv(n, &state->x);
-   rallocv(n, &state->ax);
+   allocv(n, &state->x);
+   allocv(n, &state->ax);
    state->PQ = -1;
 }
 
@@ -29452,8 +29452,8 @@ Spawn:
    if (bnrm == 0.0) {
       goto Exit;
    }
-   rallocm(state->itscnt + 1, n, &state->qi);
-   rallocm(state->itscnt, n, &state->aqi);
+   allocm(state->itscnt + 1, n, &state->qi);
+   allocm(state->itscnt, n, &state->aqi);
    rcopymulvr(n, 1 / bnrm, &state->b, &state->qi, 0);
    rsetallocm(state->itscnt + 1, state->itscnt, 0.0, &state->h);
    rsetallocm(state->itscnt + 1, state->itscnt, 0.0, &state->hr);
@@ -29469,8 +29469,8 @@ Spawn:
    rmax = 0.0;
    rmindiag = 1.0E99;
    rsetallocv(state->itscnt, 0.0, &state->ys);
-   rallocv(imax2(n, state->itscnt + 2), &state->tmp0);
-   rallocv(imax2(n, state->itscnt + 2), &state->tmp1);
+   allocv(imax2(n, state->itscnt + 2), &state->tmp0);
+   allocv(imax2(n, state->itscnt + 2), &state->tmp1);
    for (itidx = 0; itidx < state->itscnt; itidx++) {
       prevresnrm = resnrm;
    // Compute A*Qi[ItIdx], then compute Qi[ItIdx+1]

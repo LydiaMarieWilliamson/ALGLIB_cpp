@@ -19596,7 +19596,7 @@ static void testfblsunit_testgmres(bool *err) {
             return;
          }
       // Compute residual
-         rallocv(n, &r);
+         allocv(n, &r);
          rmatrixmv(n, n, &a, 0, 0, 0, &state.xs, 0, &r, 0);
          raddv(n, -1.0, &b, &r);
          e = sqrt(rdotv2(n, &r));
@@ -19625,7 +19625,7 @@ static void testfblsunit_testgmres(bool *err) {
                rmatrixmv(n, n, &a, 0, 0, 0, &state.x, 0, &state.ax, 0);
             }
          // Compute residual
-            rallocv(n, &r);
+            allocv(n, &r);
             rmatrixmv(n, n, &a, 0, 0, 0, &state.xs, 0, &r, 0);
             raddv(n, -1.0, &b, &r);
             e = sqrt(rdotv2(n, &r));

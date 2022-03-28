@@ -983,7 +983,7 @@ void avx2_rgemvx_transposed(const ae_int_t m, const ae_int_t n, const double alp
 }
 
 // Block packing function for fast rGEMM. Loads long  WIDTH*LENGTH  submatrix
-// with LENGTH <= BLOCK_SIZE and WIDTH <= MICRO_SIZE into contiguous  MICRO_SIZE*
+// with LENGTH ≤ BLOCK_SIZE and WIDTH ≤ MICRO_SIZE into contiguous  MICRO_SIZE*
 // BLOCK_SIZE row-wise 'horizontal' storage (hence H in the function name).
 //
 // The matrix occupies first ROUND_LENGTH cols of the  storage  (with  LENGTH
@@ -1005,7 +1005,7 @@ void avx2_rgemvx_transposed(const ae_int_t m, const ae_int_t n, const double alp
 // Requires AVX2, does NOT check its presense.
 //
 // The function is present in two versions, one  with  variable  opsrc_length
-// and another one with opsrc_length == block_size == 32.
+// and another one with opsrc_length ≡ block_size ≡ 32.
 // ALGLIB Routine: Copyright 19.07.2021 by Sergey Bochkanov
 ae_int_t avx2_ablasf_packblkh(const double *src, ae_int_t src_stride, ae_int_t op, ae_int_t opsrc_length, ae_int_t opsrc_width, double *dst, ae_int_t block_size, ae_int_t micro_size) {
    ae_int_t i;

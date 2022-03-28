@@ -15822,7 +15822,7 @@ static void vipmsolver_multiplygeax(vipmstate *state, double alpha, RVector *x, 
    mdense = state->mdense;
    msparse = state->msparse;
    if (beta == 0.0) {
-      rallocv(offsax + m, y);
+      allocv(offsax + m, y);
    } else {
       ae_assert(y->cnt >= offsax + m, "MultiplyGEAX: Y is too short");
    }
@@ -15852,7 +15852,7 @@ static void vipmsolver_multiplygeatx(vipmstate *state, double alpha, RVector *x,
    mdense = state->mdense;
    msparse = state->msparse;
    if (beta == 0.0) {
-      rallocv(offsy + n, y);
+      allocv(offsy + n, y);
       rsetvx(n, 0.0, y, offsy);
    } else {
       ae_assert(y->cnt >= offsy + n, "MultiplyGEATX: Y is too short");
@@ -16147,7 +16147,7 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
 // Sparse (M+N)x(M+N) factorization
    if (state->factorizationtype == 1) {
    // Generate reduced KKT matrix
-      rallocv(n + m, &state->facttmpdiag);
+      allocv(n + m, &state->facttmpdiag);
       for (i = 0; i < n; i++) {
          ae_assert(state->factsparsekkttmpl.didx.xZ[i] + 1 == state->factsparsekkttmpl.uidx.xZ[i], "VIPMFactorize: integrity check failed, no diagonal element");
          v = state->factsparsekkttmpl.vals.xR[state->factsparsekkttmpl.didx.xZ[i]];
@@ -16340,8 +16340,8 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree) {
          state->diagr.xR[i] = regfree;
       }
    }
-   ballocv(m, &state->haspq);
-   ballocv(m, &state->haswv);
+   allocv(m, &state->haspq);
+   allocv(m, &state->haswv);
    for (i = 0; i < m; i++) {
       state->haswv.xB[i] = state->slacksforequalityconstraints || !state->hasr.xB[i] || state->r.xR[i] > 0.0;
       state->haspq.xB[i] = state->hasr.xB[i] && state->haswv.xB[i];
@@ -16448,7 +16448,7 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree) {
    ae_assert(success, "VIPMInitialPoint: impossible failure of LDLT factorization");
    vipmsolver_multiplyhx(state, &state->current.x, &state->tmp0);
    vipmsolver_multiplygeax(state, 1.0, &state->current.x, 0, 0.0, &state->tmp1, 0);
-   rallocv(n + m, &state->deltaxy);
+   allocv(n + m, &state->deltaxy);
    for (i = 0; i < n; i++) {
       state->deltaxy.xR[i] = state->c.xR[i] + state->tmp0.xR[i];
    }
@@ -16654,9 +16654,9 @@ static bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmv
    rsetallocv(m, 0.0, &state->diagdq);
    rsetallocv(m, 0.0, &state->diagdqi);
    rsetallocv(m, 0.0, &state->diagdqiri);
-   rallocv(n, &state->diagddr);
-   rallocv(m, &state->diagde);
-   rallocv(m, &state->diagder);
+   allocv(n, &state->diagddr);
+   allocv(m, &state->diagde);
+   allocv(m, &state->diagder);
 // Handle temporary matrices arising due to box constraints
    for (i = 0; i < n; i++) {
    // Lower bound: G*inv(Z) and Z*inv(G)
@@ -16732,10 +16732,10 @@ static void vipmsolver_solvekktsystem(vipmstate *state, vipmrighthandside *rhs, 
 // RhsNuCap     = RhsNu    + InvDZ*GammaZ
 // RhsTauCap    = RhsTau   - InvDS*GammaS
 // RhsBetaCap   = RhsBeta  - InvDW*GammaW
-   rallocv(n, &state->rhsnucap);
-   rallocv(n, &state->rhstaucap);
-   rallocv(m, &state->rhsbetacap);
-   rallocv(m, &state->rhsalphacap);
+   allocv(n, &state->rhsnucap);
+   allocv(n, &state->rhstaucap);
+   allocv(m, &state->rhsbetacap);
+   allocv(m, &state->rhsalphacap);
    for (i = 0; i < m; i++) {
       state->rhsalphacap.xR[i] = rhs->alpha.xR[i] - state->diagdqi.xR[i] * rhs->gammaq.xR[i];
    }
@@ -26460,7 +26460,7 @@ void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
    vectorsetlengthatleast(&state->scaledbndu, n);
    matrixsetlengthatleast(&state->scaledcleic, nec + nic, n + 1);
    vectorsetlengthatleast(&state->lcsrcidx, nec + nic);
-   rallocv(nec + nic + nlec + nlic, &state->meritlagmult);
+   allocv(nec + nic + nlec + nlic, &state->meritlagmult);
    rsetallocm(nlcsqp_penaltymemlen, nec + nic + nlec + nlic, 0.0, &state->abslagmemory);
 // Prepare scaled problem
    for (i = 0; i < n; i++) {
