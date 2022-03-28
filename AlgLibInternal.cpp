@@ -234,10 +234,8 @@ void vectorsetlengthatleast(ae_vector *x, ae_int_t n) {
 // If Cols(X)<N or Rows(X)<M, resizes X
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void matrixsetlengthatleast(ae_matrix *x, ae_int_t m, ae_int_t n) {
-   if (m > 0 && n > 0) {
-      if (x->rows < m || x->cols < n) {
-         ae_matrix_set_length(x, m, n);
-      }
+   if (x->rows < m || x->cols < n) {
+      ae_matrix_set_length(x, m, n);
    }
 }
 
@@ -2080,17 +2078,17 @@ void rsetc(ae_int_t n, double v, RMatrix *y, ae_int_t jy) {
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 // Boolean:
 void bsetallocv(ae_int_t n, bool v, BVector *y) {
-   if (y->cnt < n) ae_vector_set_length(y, n);
+   vectorsetlengthatleast(y, n);
    bsetv(n, v, y);
 }
 // Integer:
 void isetallocv(ae_int_t n, ae_int_t v, ZVector *y) {
-   if (y->cnt < n) ae_vector_set_length(y, n);
+   vectorsetlengthatleast(y, n);
    isetv(n, v, y);
 }
 // Real:
 void rsetallocv(ae_int_t n, double v, RVector *y) {
-   if (y->cnt < n) ae_vector_set_length(y, n);
+   vectorsetlengthatleast(y, n);
    rsetv(n, v, y);
 }
 
@@ -2104,7 +2102,7 @@ void rsetallocv(ae_int_t n, double v, RVector *y) {
 //	y:	Elements [0,m) x [0,n) of y are set to v; y is reallocated, if its row or column counts are too small.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *y) {
-   if (y->rows < m || y->cols < n) ae_matrix_set_length(y, m, n);
+   matrixsetlengthatleast(y, m, n);
    rsetm(m, n, v, y);
 }
 
@@ -2116,17 +2114,8 @@ void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *y) {
 // Output:
 //	x:	A vector, at least of length n.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-// Boolean:
-void ballocv(ae_int_t n, BVector *x) {
-   if (x->cnt < n) ae_vector_set_length(x, n);
-}
-// Integer:
-void iallocv(ae_int_t n, ZVector *x) {
-   if (x->cnt < n) ae_vector_set_length(x, n);
-}
-// Real:
-void rallocv(ae_int_t n, RVector *x) {
-   if (x->cnt < n) ae_vector_set_length(x, n);
+void allocv(ae_int_t n, BVector *x) {
+   vectorsetlengthatleast(x, n);
 }
 
 // Reallocate the matrix x, if its size is less than m x n.
@@ -2138,8 +2127,8 @@ void rallocv(ae_int_t n, RVector *x) {
 // Output:
 //	x:	A matrix, at least of size m x n.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void rallocm(ae_int_t m, ae_int_t n, RMatrix *x) {
-   if (x->rows < m || x->cols < n) ae_matrix_set_length(x, m, n);
+void allocm(ae_int_t m, ae_int_t n, RMatrix *x) {
+   matrixsetlengthatleast(x, m, n);
 }
 
 // Copy elements [0,n) of the vector x into y.
@@ -2370,17 +2359,17 @@ void rcopymulvc(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t jy) {
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 // Boolean:
 void bcopyallocv(ae_int_t n, BVector *x, BVector *y) {
-   if (y->cnt < n) ae_vector_set_length(y, n);
+   vectorsetlengthatleast(y, n);
    bcopyv(n, x, y);
 }
 // Integer:
 void icopyallocv(ae_int_t n, ZVector *x, ZVector *y) {
-   if (y->cnt < n) ae_vector_set_length(y, n);
+   vectorsetlengthatleast(y, n);
    icopyv(n, x, y);
 }
 // Real:
 void rcopyallocv(ae_int_t n, RVector *x, RVector *y) {
-   if (y->cnt < n) ae_vector_set_length(y, n);
+   vectorsetlengthatleast(y, n);
    rcopyv(n, x, y);
 }
 
@@ -2396,7 +2385,7 @@ void rcopyallocv(ae_int_t n, RVector *x, RVector *y) {
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
 void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y) {
    if (m == 0 || n == 0) return;
-   if (y->rows < m || y->cols < n) ae_matrix_set_length(y, imax2(m, y->rows), imax2(n, y->cols));
+   matrixsetlengthatleast(y, m, n);
    rcopym(m, n, x, y);
 }
 

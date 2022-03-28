@@ -3402,7 +3402,7 @@ int main() {
          // and general linear constraints
          //
          //     x0 - x1 >= -1
-         //     x0 + x1 <=  1
+         //     x0 + x1 <= +1
          //
          // We use dual simplex solver provided by ALGLIB for this task. Box
          // constraints are specified by means of constraint vectors bndl and

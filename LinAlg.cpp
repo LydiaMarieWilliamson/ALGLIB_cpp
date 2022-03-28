@@ -21343,8 +21343,7 @@ static void spchol_extractmatrix(spcholanalysis *analysis, ZVector *offsets, ZVe
       // Swap elements of P[I:N-1] that is used to store current locations of elements in different way
          swapi(&p->xZ[i], &p->xZ[j]);
       // record pivoting of positions I and J
-         tmpp->xZ[p->xZ[j]] = j;
-         p->xZ[i] = j;
+         p->xZ[i] = tmpp->xZ[p->xZ[j]] = j;
       }
    }
 }
@@ -28064,8 +28063,8 @@ void fblsgmrescreate(RVector *b, ae_int_t n, ae_int_t k, fblsgmresstate *state) 
    state->itsperformed = 0;
    state->retcode = 0;
    rcopyallocv(n, b, &state->b);
-   rallocv(n, &state->x);
-   rallocv(n, &state->ax);
+   allocv(n, &state->x);
+   allocv(n, &state->ax);
    state->PQ = -1;
 }
 
@@ -28117,8 +28116,8 @@ Spawn:
    if (bnrm == 0.0) {
       goto Exit;
    }
-   rallocm(state->itscnt + 1, n, &state->qi);
-   rallocm(state->itscnt, n, &state->aqi);
+   allocm(state->itscnt + 1, n, &state->qi);
+   allocm(state->itscnt, n, &state->aqi);
    rcopymulvr(n, 1 / bnrm, &state->b, &state->qi, 0);
    rsetallocm(state->itscnt + 1, state->itscnt, 0.0, &state->h);
    rsetallocm(state->itscnt + 1, state->itscnt, 0.0, &state->hr);
@@ -28134,8 +28133,8 @@ Spawn:
    rmax = 0.0;
    rmindiag = 1.0E99;
    rsetallocv(state->itscnt, 0.0, &state->ys);
-   rallocv(imax2(n, state->itscnt + 2), &state->tmp0);
-   rallocv(imax2(n, state->itscnt + 2), &state->tmp1);
+   allocv(imax2(n, state->itscnt + 2), &state->tmp0);
+   allocv(imax2(n, state->itscnt + 2), &state->tmp1);
    for (itidx = 0; itidx < state->itscnt; itidx++) {
       prevresnrm = resnrm;
    // Compute A*Qi[ItIdx], then compute Qi[ItIdx+1]

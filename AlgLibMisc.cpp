@@ -266,7 +266,7 @@ void hqrndnormalv(hqrndstate *state, ae_int_t n, RVector *x) {
    double v2;
    SetVector(x);
    n2 = n / 2;
-   rallocv(n, x);
+   allocv(n, x);
    for (i = 0; i < n2; i++) {
       hqrndnormal2(state, &v1, &v2);
       x->xR[2 * i] = v1;
