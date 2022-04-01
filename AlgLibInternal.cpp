@@ -2016,7 +2016,7 @@ static void rsetm_simd(const ae_int_t n, const double v, double *yp) {
    for (ae_int_t j = 0; j < n; j++) yp[j] = v;
 }
 #endif
- 
+
 // Set elements [0,m) x [0,n) of the matrix y to v.
 // Inputs:
 //	m, n:	The row and column counts.
@@ -3024,68 +3024,11 @@ void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
    }
 }
 
+#if 0
+// Returned to Ap.cpp, because merely putting it here, instead of in Ap.cpp, seems to degrade the speed of the GEMM routine!
 // Fast rmatrixgemm() kernel: with AVX2/FMA support.
-#if defined ALGLIB_NO_FAST_KERNELS
-// ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-#else
-// ALGLIB Routine: Copyright 19.09.2021 by Sergey Bochkanov
+static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
 #endif
-static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-#if defined ALGLIB_NO_FAST_KERNELS || !defined _ALGLIB_HAS_AVX2_INTRINSICS
-   return false;
-#else
-   const ae_int_t block_size = _ABLASF_BLOCK_SIZE;
-   const ae_int_t micro_size = _ABLASF_MICRO_SIZE;
-   ae_int_t (*ablasf_packblk)(const double *, ae_int_t, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t, ae_int_t) = k == 32 && block_size == 32 ? avx2_ablasf_packblkh32 : avx2_ablasf_packblkh;
-   void (*ablasf_dotblk)(const double *, const double *, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t) = avx2_ablasf_dotblkh;
-   void (*ablasf_daxpby)(ae_int_t, double, const double *, double, double *) = avx2_ablasf_daxpby;
-// Determine CPU and kernel support
-   if (m > block_size || n > block_size || k > block_size || m == 0 || n == 0 || !(CurCPU & CPU_AVX2)) return false;
-#if defined _ALGLIB_HAS_FMA_INTRINSICS
-   if (CurCPU & CPU_FMA) ablasf_dotblk = fma_ablasf_dotblkh;
-#endif
-// Prepare c.
-   double *cp = c->xyR[ic] + jc;
-   ae_int_t stride_c = c->stride;
-// Do we have alpha a b?
-   if (alpha != 0.0 && k > 0) {
-   // Prepare the structures.
-      double *ap = a->xyR[ia] + ja; ae_int_t stride_a = a->stride;
-      double *bp = b->xyR[ib] + jb; ae_int_t stride_b = b->stride;
-      double _blka[_ABLASF_BLOCK_SIZE * _ABLASF_MICRO_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
-      double _blkb_long[_ABLASF_BLOCK_SIZE * _ABLASF_BLOCK_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
-      double _blkc[_ABLASF_MICRO_SIZE * _ABLASF_BLOCK_SIZE + _ALGLIB_SIMD_ALIGNMENT_DOUBLES];
-      double *blka = (double *)ae_align(_blka, _ALGLIB_SIMD_ALIGNMENT_BYTES);
-      double *storageb_long = (double *)ae_align(_blkb_long, _ALGLIB_SIMD_ALIGNMENT_BYTES);
-      double *blkc = (double *)ae_align(_blkc, _ALGLIB_SIMD_ALIGNMENT_BYTES);
-   // Pack transform(b) into precomputed block form.
-      for (ae_int_t base1 = 0; base1 < n; base1 += micro_size) {
-         const ae_int_t lim1 = n - base1 < micro_size ? n - base1 : micro_size;
-         double *curb = storageb_long + base1 * block_size;
-         ablasf_packblk(bp + (opb == 0 ? base1 : base1 * stride_b), stride_b, opb == 0 ? 1 : 0, k, lim1, curb, block_size, micro_size);
-      }
-   // Output.
-      for (ae_int_t base0 = 0; base0 < m; base0 += micro_size) {
-      // Load block row of transform(a).
-         const ae_int_t lim0 = m - base0 < micro_size ? m - base0 : micro_size;
-         const ae_int_t round_k = ablasf_packblk(ap + (opa == 0 ? base0 * stride_a : base0), stride_a, opa, k, lim0, blka, block_size, micro_size);
-      // Compute block(a)' entire(b).
-         for (ae_int_t base1 = 0; base1 < n; base1 += micro_size)
-            ablasf_dotblk(blka, storageb_long + base1 * block_size, round_k, block_size, micro_size, blkc + base1, block_size);
-      // Output block row of block(a)' entire(b).
-         for (ae_int_t offs0 = 0; offs0 < lim0; offs0++)
-            ablasf_daxpby(n, alpha, blkc + offs0 * block_size, beta, cp + (base0 + offs0) * stride_c);
-      }
-   } else {
-   // No a b, just beta c (degenerate case, not optimized).
-      if (beta == 0.0)
-         for (ae_int_t out0 = 0; out0 < m; out0++) for (ae_int_t out1 = 0; out1 < n; out1++) cp[out0 * stride_c + out1] = 0.0;
-      else if (beta != 1.0)
-         for (ae_int_t out0 = 0; out0 < m; out0++) for (ae_int_t out1 = 0; out1 < n; out1++) cp[out0 * stride_c + out1] *= beta;
-   }
-   return true;
-#endif
-}
 
 // rmatrixgemm() kernel: the base case code for rmatrixgemm().
 void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
