@@ -757,6 +757,9 @@ bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, a
 void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst);
 void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode);
 void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride);
+
+// ABLASF kernels.
+bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
 } // end of namespace alglib_impl
 
 // Internal macros, defined only when _ALGLIB_IMPL_DEFINES is defined before inclusion of this header file.

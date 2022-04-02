@@ -21550,10 +21550,10 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
 #if defined ALGLIB_NO_FAST_KERNELS
    const ae_int_t louwidth = 3;
 #else
-   const ae_int_t louwidth = 1;
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    KerFunAvx2Fma(spchol_updatekernelabc4(rowstorage->xR, offss, twidth, offsu, uheight, urank, urowstride, uwidth, diagd->xR, offsd, raw2smap->xZ, superrowidx->xZ, urbase))
+   const ae_int_t louwidth = 1;
 #endif
 // Generic code.
    ae_int_t k;
