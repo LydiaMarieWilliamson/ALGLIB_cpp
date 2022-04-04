@@ -15439,7 +15439,7 @@ static void evd_internaldstein(ae_int_t n, RVector *d, RVector *e, ae_int_t m, R
             nrmchk = 0;
          // Get random starting vector.
             for (ti = 1; ti <= blksiz; ti++) {
-               work1.xR[ti] = 2 * hqrnduniformr(&rs) - 1;
+               work1.xR[ti] = hqrndmiduniformr(&rs);
             }
          // Copy the matrix T so it won't be destroyed in factorization.
             for (ti = 1; ti < blksiz; ti++) {

@@ -12142,6 +12142,7 @@ using namespace alglib;
 <a href='#sub_hqrndcontinuous' class=toc>hqrndcontinuous</a><br>
 <a href='#sub_hqrnddiscrete' class=toc>hqrnddiscrete</a><br>
 <a href='#sub_hqrndexponential' class=toc>hqrndexponential</a><br>
+<a href='#sub_hqrndmiduniformr' class=toc>hqrndmiduniformr</a><br>
 <a href='#sub_hqrndnormal' class=toc>hqrndnormal</a><br>
 <a href='#sub_hqrndnormal2' class=toc>hqrndnormal2</a><br>
 <a href='#sub_hqrndnormalm' class=toc>hqrndnormalm</a><br>
@@ -12221,6 +12222,18 @@ using namespace alglib;
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
 <b>double</b> hqrndexponential(hqrndstate state, <b>double</b> lambdav);
+</div></pre>
+<a name='sub_hqrndmiduniformr'></a><h3 class=pageheader><code>hqrndmiduniformr</code> function</h3>
+<pre class=source>
+<div style='color: navy; margin-top: 0; margin-bottom: 0;'>
+// This function generates random real number in (-1,+1),
+// not including interval boundaries
+//
+// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+</div>
+<div style='margin-top: 0; margin-bottom: 0;'>
+<b>double</b> hqrndmiduniformr(hqrndstate state);
 </div></pre>
 <a name='sub_hqrndnormal'></a><h3 class=pageheader><code>hqrndnormal</code> function</h3>
 <pre class=source>

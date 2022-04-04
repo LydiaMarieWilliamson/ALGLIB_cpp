@@ -631,6 +631,13 @@ A6.2. Test Stages
 0-39	LinAlg.{cpp,h}: Adding some changes made in AlgLib++.
 	LinAlg.cpp: Recoded {r,c}matrixgemm[rec] to increase efficiency
 	Reformatted the layout to combine the type/object section with function section in each namespace.
+0-39	AlgLibMisc.{cpp,h}: Adding changes made in AlgLib++.
+	AlgLibMisc.{cpp,h}: Recoding of internal and non-API routines.
+	―	Local routine nearestneighbor_kdtreesplit()
+		redefined with the output-only parameter "ae_int_t *i3" remade a return value.
+	―	Synthesized new API routine hqrndmiduniformr() = 2 hqrnduniformr() - 1.
+	―	An update was made to Manual.htm to reflect the addition.
+	―	Re-coding of HQRND direct from the original reference for the algorithm.
 
 A6.3. Test Results
 ──────────────────
@@ -689,6 +696,7 @@ A6.3. Test Results
 0-39	7092 0.5x 12501 1.0x 12199 1.0x 7795 1.2x 1648502128 (62422570) 78 // Checking for suspicious slowdown in TestX.cpp.
 40	4348 1.0x 5000 2.0x 12199 1.0x 8948 1.1x 1648502820 (62422824) 76 // AlgLibInternal.{cpp,h}: New recoding.
 40	8065 1.0x 12501 1.0x 12052 1.0x 8819 1.1x 1648856974 (62478f8e) 81 // Stop-gap fix of the slowdown problem in TestX.cpp.
+0-39	7937 1.0x 12049 1.0x 12350 0.9x 9042 1.0x 1649021559 (624a1277) 78 // AlgLibMisc.{cpp,h}: Synchronize to AlgLib++.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -740,19 +748,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   8065
+* RGEMM-SEQ-16   (MFLOPS)   7937
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12501
+* RGEMM-SEQ-32   (MFLOPS)  12049
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12052
-* RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   8819
-* RGEMM-MTN-1024            1.1x
+* RGEMM-SEQ-64   (MFLOPS)  12350
+* RGEMM-MTN-64              0.9x
+* RGEMM-SEQ-1024 (MFLOPS)   9042
+* RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-Seed: 1648856974 (62478f8e)
+Seed: 1649021559 (624a1277)
 Compiler: GCC
 Hardware: 64-bit
 Byte Order: little-endian
@@ -852,4 +860,4 @@ Testing Mode: single core
 88/90: knn                              Ok
 89/90: mlptrain                         Ok
 90/90: alglibbasics                     Ok
-Done in 81 seconds
+Done in 78 seconds

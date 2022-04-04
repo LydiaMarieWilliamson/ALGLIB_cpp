@@ -9731,14 +9731,14 @@ void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
          if (isfinite(cnstrleft)) {
             p1.xR[0] = cnstrleft;
          } else {
-            p1.xR[0] = y->xR[0] + 0.15 * scaley * (hqrnduniformr(&rs) - 0.5);
+            p1.xR[0] = y->xR[0] + 0.075 * scaley * hqrndmiduniformr(&rs);
          }
          p1.xR[1] = 0.5 + hqrnduniformr(&rs);
          p1.xR[2] = x->xR[nz + hqrnduniformi(&rs, n - nz)];
          if (isfinite(cnstrright)) {
             p1.xR[3] = cnstrright;
          } else {
-            p1.xR[3] = y->xR[n - 1] + 0.25 * scaley * (hqrnduniformr(&rs) - 0.5);
+            p1.xR[3] = y->xR[n - 1] + 0.125 * scaley * hqrndmiduniformr(&rs);
          }
          p1.xR[4] = 1.0;
       // Run optimization with tight constraints and increased regularization
@@ -9812,10 +9812,10 @@ void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
    fbest = maxrealnumber;
    for (outerit = 0; outerit < rscnt; outerit++) {
    // First, we try positive B.
-      p1.xR[0] = y->xR[0] + 0.15 * scaley * (hqrnduniformr(&rs) - 0.5);
+      p1.xR[0] = y->xR[0] + 0.075 * scaley * hqrndmiduniformr(&rs);
       p1.xR[1] = 0.5 + hqrnduniformr(&rs);
       p1.xR[2] = x->xR[nz + hqrnduniformi(&rs, n - nz)];
-      p1.xR[3] = y->xR[n - 1] + 0.25 * scaley * (hqrnduniformr(&rs) - 0.5);
+      p1.xR[3] = y->xR[n - 1] + 0.125 * scaley * hqrndmiduniformr(&rs);
       p1.xR[4] = 1.0;
       bndl1.xR[0] = -INFINITY;
       bndu1.xR[0] = +INFINITY;
@@ -9841,10 +9841,10 @@ void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
       lsfit_logisticfitinternal(x, y, n, is4pl, 100 * lambdav, &state, &replm, &p1, &fposb);
       rep->iterationscount += replm.iterationscount;
    // Second attempt - with negative B (constraints are still tight).
-      p2.xR[0] = y->xR[n - 1] + 0.15 * scaley * (hqrnduniformr(&rs) - 0.5);
+      p2.xR[0] = y->xR[n - 1] + 0.075 * scaley * hqrndmiduniformr(&rs);
       p2.xR[1] = -(0.5 + hqrnduniformr(&rs));
       p2.xR[2] = x->xR[nz + hqrnduniformi(&rs, n - nz)];
-      p2.xR[3] = y->xR[0] + 0.25 * scaley * (hqrnduniformr(&rs) - 0.5);
+      p2.xR[3] = y->xR[0] + 0.125 * scaley * hqrndmiduniformr(&rs);
       p2.xR[4] = 1.0;
       bndl2.xR[0] = -INFINITY;
       bndu2.xR[0] = +INFINITY;
