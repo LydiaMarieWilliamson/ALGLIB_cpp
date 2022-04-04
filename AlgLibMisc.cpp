@@ -1222,7 +1222,7 @@ void xdebugr1outeven(const ae_int_t n, real_1d_array &a) {
 
 complex xdebugc1sum(const complex_1d_array &a) {
    alglib_impl::ae_state_init();
-   TryCatch(0.0)
+   TryCatch(complex(0.0))
    alglib_impl::complex C = alglib_impl::xdebugc1sum(ConstT(ae_vector, a));
    alglib_impl::ae_state_clear();
    return ComplexOf(C);
@@ -1983,7 +1983,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
                   buf->curdist = rmax2(buf->curdist, s - t1);
                }
                if (kdt->normtype == 1) {
-                  buf->curdist -= rmax2(v - t1, 0.0) - s + t1;
+                  buf->curdist -= rmax2(v, t1) - s;
                }
                if (kdt->normtype == 2) {
                   buf->curdist -= sqr(rmax2(v - t1, 0.0)) - sqr(s - t1);
@@ -1999,7 +1999,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
                   buf->curdist = rmax2(buf->curdist, t1 - s);
                }
                if (kdt->normtype == 1) {
-                  buf->curdist -= rmax2(t1 - v, 0.0) - t1 + s;
+                  buf->curdist -= s - rmin2(v, t1);
                }
                if (kdt->normtype == 2) {
                   buf->curdist -= sqr(rmax2(t1 - v, 0.0)) - sqr(t1 - s);

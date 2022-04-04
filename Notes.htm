@@ -1056,6 +1056,8 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	Optimized iround(A,B) as A / B and iceil(A,B) as (A + B - 1) / B for integer types A and B.
 	Renamed _ae_{init,acquire,release,free}_lock_raw as _ae_{init,acquire,release,free}_lock.
 	Changed xparams into enum { NonTH = 0, SerTH = 1, ParTH = 2 };
+39	Continuing stage 37: Recoding of internal and non-API routines.
+	AlgLibMisc: Re-coding of HQRND direct from the original reference for the algorithm.
 39	Continuing stage 28: conversions of more assignment expressions to update operators (++X, --X, X++, X--, X op= Y).
 39	Continuing stage 33: more conversions related to sinteger ⇒ ae_int_t, sreal ⇒ double, srealarray ⇒ RVector.
 39	Setting the values of values of global_failure_flag and the return values of main() to EXIT_{SUCCESS,FAILURE}.
@@ -1233,9 +1235,9 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 40	5952 1.0x 10001 1.2x 12052 1.0x 9486 1.0x 1648501134 (6242218e) 79 // Problems fixed.
 40	7408 1.0x 11495 1.0x 11368 1.0x 9592 1.0x 1648501372 (6242227c) 80 // Checking for suspicious slow-down in TestX.
 40	6024 1.0x 9805 1.1x 11632 0.9x 9684 0.9x 1648857552 (624791d0) 78 // Attempted stop-gap fix for the slow-down.
+0-39	8000 0.9x 11766 1.1x 12199 1.0x 9608 1.0x 1649021803 (624a136b) 78 // Minor changes to AlgLibMisc.* to sync to 3.18.0.
 </pre>
 </p>
 </div>
 </body>
 </html>
-

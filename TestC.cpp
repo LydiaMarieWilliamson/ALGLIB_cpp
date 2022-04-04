@@ -11103,7 +11103,7 @@ static bool sparserealcholeskytest() {
                   continue;
                }
                if (hqrnduniformr(&rs) <= pnz) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                   a.xyR[j][i] = a.xyR[i][j];
                } else {
                   a.xyR[i][j] = 0.0;
@@ -11332,7 +11332,7 @@ static bool sparserealcholeskytest() {
                   continue;
                }
                if (hqrnduniformr(&rs) <= pnz) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                   a.xyR[j][i] = a.xyR[i][j];
                } else {
                   a.xyR[i][j] = 0.0;
@@ -11493,7 +11493,7 @@ static bool sparserealcholeskytest() {
                   continue;
                }
                if (hqrnduniformr(&rs) <= pnz) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                   a.xyR[j][i] = a.xyR[i][j];
                } else {
                   a.xyR[i][j] = 0.0;
@@ -11565,7 +11565,7 @@ static bool sparserealcholeskytest() {
                   continue;
                }
                if (hqrnduniformr(&rs) <= pnz) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                   a.xyR[j][i] = a.xyR[i][j];
                } else {
                   a.xyR[i][j] = 0.0;
@@ -11662,23 +11662,23 @@ static bool sparserealcholeskytest() {
             }
             for (j = 0; j < updaterank; j++) {
                for (i = j + 1; i < updaterank + updatewidth; i++) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                }
                for (i = n - bottomsize; i < n; i++) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                }
             }
             for (j = updaterank; j < updaterank + targetwidth; j++) {
                for (i = j + 1; i < updaterank + targetwidth + bigsize; i++) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                }
                for (i = n - bottomsize; i < n; i++) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                }
             }
             for (j = updaterank + targetwidth; j < n; j++) {
                for (i = j + 1; i < n; i++) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                }
             }
             for (i = 0; i < n; i++) {
