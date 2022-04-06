@@ -2244,7 +2244,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 // ALGLIB Routine: Copyright 2009-2019 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, complex_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, complex_2d_array b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, complex_2d_array &amp;c, ae_int_t ic, ae_int_t jc);
+<b>void</b> cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, complex_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, complex_2d_array b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, complex_2d_array c, ae_int_t ic, ae_int_t jc);
 </div></pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span>&nbsp;&nbsp;&nbsp;<a href='#example_ablas_d_gemm' class=nav>[1]</a>&nbsp;&nbsp;</p>
 <a name='sub_cmatrixherk'></a><h3 class=pageheader><code>cmatrixherk</code> function</h3>
@@ -2281,7 +2281,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 // ALGLIB Routine: Copyright 16.12.2009-22.01.2018 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> cmatrixherk(ae_int_t n, ae_int_t k, <b>double</b> alpha, complex_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, <b>double</b> beta, complex_2d_array &amp;c, ae_int_t ic, ae_int_t jc, <b>bool</b> isupper);
+<b>void</b> cmatrixherk(ae_int_t n, ae_int_t k, <b>double</b> alpha, complex_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, <b>double</b> beta, complex_2d_array c, ae_int_t ic, ae_int_t jc, <b>bool</b> isupper);
 </div></pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span>&nbsp;&nbsp;&nbsp;<a href='#example_ablas_d_syrk' class=nav>[1]</a>&nbsp;&nbsp;</p>
 <a name='sub_cmatrixlefttrsm'></a><h3 class=pageheader><code>cmatrixlefttrsm</code> function</h3>
@@ -2311,7 +2311,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 // ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, complex_2d_array &amp;x, ae_int_t i2, ae_int_t j2);
+<b>void</b> cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, complex_2d_array x, ae_int_t i2, ae_int_t j2);
 </div></pre>
 <a name='sub_cmatrixmv'></a><h3 class=pageheader><code>cmatrixmv</code> function</h3>
 <pre class=source>
@@ -2391,7 +2391,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 // ALGLIB Routine: Copyright 20.01.2018 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, complex_2d_array &amp;x, ae_int_t i2, ae_int_t j2);
+<b>void</b> cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, complex_2d_array x, ae_int_t i2, ae_int_t j2);
 </div></pre>
 <a name='sub_cmatrixsyrk'></a><h3 class=pageheader><code>cmatrixsyrk</code> function</h3>
 <pre class=source>
@@ -2402,7 +2402,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 // ALGLIB Routine: Copyright 16.12.2009 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> cmatrixsyrk(ae_int_t n, ae_int_t k, <b>double</b> alpha, complex_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, <b>double</b> beta, complex_2d_array &amp;c, ae_int_t ic, ae_int_t jc, <b>bool</b> isupper);
+<b>void</b> cmatrixsyrk(ae_int_t n, ae_int_t k, <b>double</b> alpha, complex_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, <b>double</b> beta, complex_2d_array c, ae_int_t ic, ae_int_t jc, <b>bool</b> isupper);
 </div></pre>
 <a name='sub_cmatrixtranspose'></a><h3 class=pageheader><code>cmatrixtranspose</code> function</h3>
 <pre class=source>
@@ -2453,7 +2453,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 //             or vice versa (False).
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixenforcesymmetricity(real_2d_array &amp;a, ae_int_t n, <b>bool</b> isupper);
+<b>void</b> rmatrixenforcesymmetricity(real_2d_array a, ae_int_t n, <b>bool</b> isupper);
 </div></pre>
 <a name='sub_rmatrixgemm'></a><h3 class=pageheader><code>rmatrixgemm</code> function</h3>
 <pre class=source>
@@ -2501,7 +2501,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 // ALGLIB Routine: Copyright 2009-2019 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, real_2d_array b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, <b>double</b> beta, real_2d_array &amp;c, ae_int_t ic, ae_int_t jc);
+<b>void</b> rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, real_2d_array b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, <b>double</b> beta, real_2d_array c, ae_int_t ic, ae_int_t jc);
 </div></pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span>&nbsp;&nbsp;&nbsp;<a href='#example_ablas_d_gemm' class=nav>[1]</a>&nbsp;&nbsp;</p>
 <a name='sub_rmatrixgemv'></a><h3 class=pageheader><code>rmatrixgemv</code> function</h3>
@@ -2510,7 +2510,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 //
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixgemv(ae_int_t m, ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t opa, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array &amp;y, ae_int_t iy);
+<b>void</b> rmatrixgemv(ae_int_t m, ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t opa, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array y, ae_int_t iy);
 </div></pre>
 <a name='sub_rmatrixgencopy'></a><h3 class=pageheader><code>rmatrixgencopy</code> function</h3>
 <pre class=source>
@@ -2534,7 +2534,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 //     JB  -   submatrix offset (column index)
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixgencopy(ae_int_t m, ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>double</b> beta, real_2d_array &amp;b, ae_int_t ib, ae_int_t jb);
+<b>void</b> rmatrixgencopy(ae_int_t m, ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>double</b> beta, real_2d_array b, ae_int_t ib, ae_int_t jb);
 </div></pre>
 <a name='sub_rmatrixger'></a><h3 class=pageheader><code>rmatrixger</code> function</h3>
 <pre class=source>
@@ -2559,7 +2559,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 // ALGLIB Routine: Copyright 16.10.2017 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixger(ae_int_t m, ae_int_t n, real_2d_array &amp;a, ae_int_t ia, ae_int_t ja, <b>double</b> alpha, real_1d_array u, ae_int_t iu, real_1d_array v, ae_int_t iv);
+<b>void</b> rmatrixger(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>double</b> alpha, real_1d_array u, ae_int_t iu, real_1d_array v, ae_int_t iv);
 </div></pre>
 <a name='sub_rmatrixlefttrsm'></a><h3 class=pageheader><code>rmatrixlefttrsm</code> function</h3>
 <pre class=source>
@@ -2587,7 +2587,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 // ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixlefttrsm(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_2d_array &amp;x, ae_int_t i2, ae_int_t j2);
+<b>void</b> rmatrixlefttrsm(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_2d_array x, ae_int_t i2, ae_int_t j2);
 </div></pre>
 <a name='sub_rmatrixmv'></a><h3 class=pageheader><code>rmatrixmv</code> function</h3>
 <pre class=source>
@@ -2669,7 +2669,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 // ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixrighttrsm(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_2d_array &amp;x, ae_int_t i2, ae_int_t j2);
+<b>void</b> rmatrixrighttrsm(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_2d_array x, ae_int_t i2, ae_int_t j2);
 </div></pre>
 <a name='sub_rmatrixsymv'></a><h3 class=pageheader><code>rmatrixsymv</code> function</h3>
 <pre class=source>
@@ -2677,7 +2677,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 //
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixsymv(ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array &amp;y, ae_int_t iy);
+<b>void</b> rmatrixsymv(ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array y, ae_int_t iy);
 </div></pre>
 <a name='sub_rmatrixsyrk'></a><h3 class=pageheader><code>rmatrixsyrk</code> function</h3>
 <pre class=source>
@@ -2711,7 +2711,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 // ALGLIB Routine: Copyright 16.12.2009-22.01.2018 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixsyrk(ae_int_t n, ae_int_t k, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, <b>double</b> beta, real_2d_array &amp;c, ae_int_t ic, ae_int_t jc, <b>bool</b> isupper);
+<b>void</b> rmatrixsyrk(ae_int_t n, ae_int_t k, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, <b>double</b> beta, real_2d_array c, ae_int_t ic, ae_int_t jc, <b>bool</b> isupper);
 </div></pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span>&nbsp;&nbsp;&nbsp;<a href='#example_ablas_d_syrk' class=nav>[1]</a>&nbsp;&nbsp;</p>
 <a name='sub_rmatrixsyvmv'></a><h3 class=pageheader><code>rmatrixsyvmv</code> function</h3>
@@ -2720,7 +2720,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 //
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>double</b> rmatrixsyvmv(ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, real_1d_array x, ae_int_t ix, real_1d_array &amp;tmp);
+<b>double</b> rmatrixsyvmv(ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, real_1d_array x, ae_int_t ix, real_1d_array tmp);
 </div></pre>
 <a name='sub_rmatrixtranspose'></a><h3 class=pageheader><code>rmatrixtranspose</code> function</h3>
 <pre class=source>
@@ -2777,7 +2777,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 //      Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd.
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixtrsv(ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array &amp;x, ae_int_t ix);
+<b>void</b> rmatrixtrsv(ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array x, ae_int_t ix);
 </div></pre>
 <a name='sub_rvectorcopy'></a><h3 class=pageheader><code>rvectorcopy</code> function</h3>
 <pre class=source>
@@ -2792,7 +2792,7 @@ If your compiler/system are not in the list of supported ones, we recommend you 
 //     IB  -   destination offset (first element index)
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rvectorcopy(ae_int_t n, real_1d_array a, ae_int_t ia, real_1d_array &amp;b, ae_int_t ib);
+<b>void</b> rvectorcopy(ae_int_t n, real_1d_array a, ae_int_t ia, real_1d_array b, ae_int_t ib);
 </div></pre>
 <a name='example_ablas_d_gemm'></a><h3 class=pageheader>ablas_d_gemm example</h3>
 <pre class=source>
@@ -3400,8 +3400,8 @@ using namespace alglib;
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rankdata(real_2d_array &amp;xy, ae_int_t npoints, ae_int_t nfeatures);
-<b>void</b> rankdata(real_2d_array &amp;xy);
+<b>void</b> rankdata(real_2d_array xy, ae_int_t npoints, ae_int_t nfeatures);
+<b>void</b> rankdata(real_2d_array xy);
 </div></pre>
 <a name='sub_rankdatacentered'></a><h3 class=pageheader><code>rankdatacentered</code> function</h3>
 <pre class=source>
@@ -3426,8 +3426,8 @@ using namespace alglib;
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rankdatacentered(real_2d_array &amp;xy, ae_int_t npoints, ae_int_t nfeatures);
-<b>void</b> rankdatacentered(real_2d_array &amp;xy);
+<b>void</b> rankdatacentered(real_2d_array xy, ae_int_t npoints, ae_int_t nfeatures);
+<b>void</b> rankdatacentered(real_2d_array xy);
 </div></pre>
 <a name='sub_sampleadev'></a><h3 class=pageheader><code>sampleadev</code> function</h3>
 <pre class=source>
@@ -7629,7 +7629,7 @@ using namespace alglib;
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> cmatrixlusolvefast(complex_2d_array lua, integer_1d_array p, ae_int_t n, complex_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> cmatrixlusolvefast(complex_2d_array lua, integer_1d_array p, ae_int_t n, complex_1d_array b, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_cmatrixlusolvem'></a><h3 class=pageheader><code>cmatrixlusolvem</code> function</h3>
 <pre class=source>
@@ -7715,7 +7715,7 @@ using namespace alglib;
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> cmatrixlusolvemfast(complex_2d_array lua, integer_1d_array p, ae_int_t n, complex_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> cmatrixlusolvemfast(complex_2d_array lua, integer_1d_array p, ae_int_t n, complex_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_cmatrixmixedsolve'></a><h3 class=pageheader><code>cmatrixmixedsolve</code> function</h3>
 <pre class=source>
@@ -7865,7 +7865,7 @@ using namespace alglib;
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> cmatrixsolvefast(complex_2d_array a, ae_int_t n, complex_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> cmatrixsolvefast(complex_2d_array a, ae_int_t n, complex_1d_array b, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_cmatrixsolvem'></a><h3 class=pageheader><code>cmatrixsolvem</code> function</h3>
 <pre class=source>
@@ -7956,7 +7956,7 @@ using namespace alglib;
 // ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> cmatrixsolvemfast(complex_2d_array a, ae_int_t n, complex_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> cmatrixsolvemfast(complex_2d_array a, ae_int_t n, complex_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_hpdmatrixcholeskysolve'></a><h3 class=pageheader><code>hpdmatrixcholeskysolve</code> function</h3>
 <pre class=source>
@@ -8046,7 +8046,7 @@ using namespace alglib;
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> hpdmatrixcholeskysolvefast(complex_2d_array cha, ae_int_t n, <b>bool</b> isupper, complex_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> hpdmatrixcholeskysolvefast(complex_2d_array cha, ae_int_t n, <b>bool</b> isupper, complex_1d_array b, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_hpdmatrixcholeskysolvem'></a><h3 class=pageheader><code>hpdmatrixcholeskysolvem</code> function</h3>
 <pre class=source>
@@ -8141,7 +8141,7 @@ using namespace alglib;
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> hpdmatrixcholeskysolvemfast(complex_2d_array cha, ae_int_t n, <b>bool</b> isupper, complex_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> hpdmatrixcholeskysolvemfast(complex_2d_array cha, ae_int_t n, <b>bool</b> isupper, complex_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_hpdmatrixsolve'></a><h3 class=pageheader><code>hpdmatrixsolve</code> function</h3>
 <pre class=source>
@@ -8223,7 +8223,7 @@ using namespace alglib;
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> hpdmatrixsolvefast(complex_2d_array a, ae_int_t n, <b>bool</b> isupper, complex_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> hpdmatrixsolvefast(complex_2d_array a, ae_int_t n, <b>bool</b> isupper, complex_1d_array b, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_hpdmatrixsolvem'></a><h3 class=pageheader><code>hpdmatrixsolvem</code> function</h3>
 <pre class=source>
@@ -8304,7 +8304,7 @@ using namespace alglib;
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> hpdmatrixsolvemfast(complex_2d_array a, ae_int_t n, <b>bool</b> isupper, complex_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> hpdmatrixsolvemfast(complex_2d_array a, ae_int_t n, <b>bool</b> isupper, complex_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_rmatrixlusolve'></a><h3 class=pageheader><code>rmatrixlusolve</code> function</h3>
 <pre class=source>
@@ -8395,7 +8395,7 @@ using namespace alglib;
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixlusolvefast(real_2d_array lua, integer_1d_array p, ae_int_t n, real_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> rmatrixlusolvefast(real_2d_array lua, integer_1d_array p, ae_int_t n, real_1d_array b, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_rmatrixlusolvem'></a><h3 class=pageheader><code>rmatrixlusolvem</code> function</h3>
 <pre class=source>
@@ -8490,7 +8490,7 @@ using namespace alglib;
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixlusolvemfast(real_2d_array lua, integer_1d_array p, ae_int_t n, real_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> rmatrixlusolvemfast(real_2d_array lua, integer_1d_array p, ae_int_t n, real_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_rmatrixmixedsolve'></a><h3 class=pageheader><code>rmatrixmixedsolve</code> function</h3>
 <pre class=source>
@@ -8655,7 +8655,7 @@ using namespace alglib;
 // ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixsolvefast(real_2d_array a, ae_int_t n, real_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> rmatrixsolvefast(real_2d_array a, ae_int_t n, real_1d_array b, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_rmatrixsolvels'></a><h3 class=pageheader><code>rmatrixsolvels</code> function</h3>
 <pre class=source>
@@ -8807,7 +8807,7 @@ using namespace alglib;
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> rmatrixsolvemfast(real_2d_array a, ae_int_t n, real_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> rmatrixsolvemfast(real_2d_array a, ae_int_t n, real_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_spdmatrixcholeskysolve'></a><h3 class=pageheader><code>spdmatrixcholeskysolve</code> function</h3>
 <pre class=source>
@@ -8897,7 +8897,7 @@ using namespace alglib;
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> spdmatrixcholeskysolvefast(real_2d_array cha, ae_int_t n, <b>bool</b> isupper, real_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> spdmatrixcholeskysolvefast(real_2d_array cha, ae_int_t n, <b>bool</b> isupper, real_1d_array b, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_spdmatrixcholeskysolvem'></a><h3 class=pageheader><code>spdmatrixcholeskysolvem</code> function</h3>
 <pre class=source>
@@ -8992,7 +8992,7 @@ using namespace alglib;
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> spdmatrixcholeskysolvemfast(real_2d_array cha, ae_int_t n, <b>bool</b> isupper, real_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> spdmatrixcholeskysolvemfast(real_2d_array cha, ae_int_t n, <b>bool</b> isupper, real_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_spdmatrixsolve'></a><h3 class=pageheader><code>spdmatrixsolve</code> function</h3>
 <pre class=source>
@@ -9079,7 +9079,7 @@ using namespace alglib;
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> spdmatrixsolvefast(real_2d_array a, ae_int_t n, <b>bool</b> isupper, real_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> spdmatrixsolvefast(real_2d_array a, ae_int_t n, <b>bool</b> isupper, real_1d_array b, ae_int_t &amp;info);
 </div></pre>
 <a name='sub_spdmatrixsolvem'></a><h3 class=pageheader><code>spdmatrixsolvem</code> function</h3>
 <pre class=source>
@@ -9166,7 +9166,7 @@ using namespace alglib;
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> spdmatrixsolvemfast(real_2d_array a, ae_int_t n, <b>bool</b> isupper, real_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> spdmatrixsolvemfast(real_2d_array a, ae_int_t n, <b>bool</b> isupper, real_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </div></pre>
 <a name=unit_directsparsesolvers></a><h2 class=pageheader><code>directsparsesolvers</code> subpackage</h2>
 <div class=pagecontent>
@@ -43856,7 +43856,7 @@ using namespace alglib;
 // ALGLIB Project: Copyright 10.12.2019 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> sparsegemv(sparsematrix s, <b>double</b> alpha, ae_int_t ops, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array &amp;y, ae_int_t iy);
+<b>void</b> sparsegemv(sparsematrix s, <b>double</b> alpha, ae_int_t ops, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array y, ae_int_t iy);
 </div></pre>
 <a name='sub_sparseget'></a><h3 class=pageheader><code>sparseget</code> function</h3>
 <pre class=source>
@@ -44613,7 +44613,7 @@ ae_int_t sparsegetuppercount(sparsematrix s);
 // ALGLIB Project: Copyright 20.01.2014 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> sparsetrmv(sparsematrix s, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array &amp;x, real_1d_array &amp;y);
+<b>void</b> sparsetrmv(sparsematrix s, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array x, real_1d_array &amp;y);
 </div></pre>
 <a name='sub_sparsetrsv'></a><h3 class=pageheader><code>sparsetrsv</code> function</h3>
 <pre class=source>
@@ -44658,7 +44658,7 @@ ae_int_t sparsegetuppercount(sparsematrix s);
 // ALGLIB Project: Copyright 20.01.2014 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> sparsetrsv(sparsematrix s, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array &amp;x);
+<b>void</b> sparsetrsv(sparsematrix s, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array x);
 </div></pre>
 <a name='sub_sparseunserialize'></a><h3 class=pageheader><code>sparseunserialize</code> function</h3>
 <pre class=source>
@@ -49730,7 +49730,7 @@ using namespace alglib;
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> spdmatrixcholeskyupdateadd1(real_2d_array &amp;a, ae_int_t n, <b>bool</b> isupper, real_1d_array u);
+<b>void</b> spdmatrixcholeskyupdateadd1(real_2d_array a, ae_int_t n, <b>bool</b> isupper, real_1d_array u);
 </div></pre>
 <a name='sub_spdmatrixcholeskyupdateadd1buf'></a><h3 class=pageheader><code>spdmatrixcholeskyupdateadd1buf</code> function</h3>
 <pre class=source>
@@ -49761,7 +49761,7 @@ using namespace alglib;
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> spdmatrixcholeskyupdateadd1buf(real_2d_array &amp;a, ae_int_t n, <b>bool</b> isupper, real_1d_array u, real_1d_array &amp;bufr);
+<b>void</b> spdmatrixcholeskyupdateadd1buf(real_2d_array a, ae_int_t n, <b>bool</b> isupper, real_1d_array u, real_1d_array &amp;bufr);
 </div></pre>
 <a name='sub_spdmatrixcholeskyupdatefix'></a><h3 class=pageheader><code>spdmatrixcholeskyupdatefix</code> function</h3>
 <pre class=source>
@@ -49821,7 +49821,7 @@ using namespace alglib;
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> spdmatrixcholeskyupdatefix(real_2d_array &amp;a, ae_int_t n, <b>bool</b> isupper, boolean_1d_array fix);
+<b>void</b> spdmatrixcholeskyupdatefix(real_2d_array a, ae_int_t n, <b>bool</b> isupper, boolean_1d_array fix);
 </div></pre>
 <a name='sub_spdmatrixcholeskyupdatefixbuf'></a><h3 class=pageheader><code>spdmatrixcholeskyupdatefixbuf</code> function</h3>
 <pre class=source>
@@ -49852,7 +49852,7 @@ using namespace alglib;
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> spdmatrixcholeskyupdatefixbuf(real_2d_array &amp;a, ae_int_t n, <b>bool</b> isupper, boolean_1d_array fix, real_1d_array &amp;bufr);
+<b>void</b> spdmatrixcholeskyupdatefixbuf(real_2d_array a, ae_int_t n, <b>bool</b> isupper, boolean_1d_array fix, real_1d_array &amp;bufr);
 </div></pre>
 <a name=unit_trigintegrals></a><h2 class=pageheader><code>trigintegrals</code> subpackage</h2>
 <div class=pagecontent>
@@ -50186,7 +50186,7 @@ ae_int_t xdebugb1count(boolean_1d_array a);
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> xdebugb1not(boolean_1d_array &amp;a);
+<b>void</b> xdebugb1not(boolean_1d_array a);
 </div></pre>
 <a name='sub_xdebugb1outeven'></a><h3 class=pageheader><code>xdebugb1outeven</code> function</h3>
 <pre class=source>
@@ -50224,7 +50224,7 @@ ae_int_t xdebugb2count(boolean_2d_array a);
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> xdebugb2not(boolean_2d_array &amp;a);
+<b>void</b> xdebugb2not(boolean_2d_array a);
 </div></pre>
 <a name='sub_xdebugb2outsin'></a><h3 class=pageheader><code>xdebugb2outsin</code> function</h3>
 <pre class=source>
@@ -50276,7 +50276,7 @@ ae_int_t xdebugb2count(boolean_2d_array a);
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> xdebugc1neg(complex_1d_array &amp;a);
+<b>void</b> xdebugc1neg(complex_1d_array a);
 </div></pre>
 <a name='sub_xdebugc1outeven'></a><h3 class=pageheader><code>xdebugc1outeven</code> function</h3>
 <pre class=source>
@@ -50316,7 +50316,7 @@ complex xdebugc1sum(complex_1d_array a);
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> xdebugc2neg(complex_2d_array &amp;a);
+<b>void</b> xdebugc2neg(complex_2d_array a);
 </div></pre>
 <a name='sub_xdebugc2outsincos'></a><h3 class=pageheader><code>xdebugc2outsincos</code> function</h3>
 <pre class=source>
@@ -50380,7 +50380,7 @@ complex xdebugc2sum(complex_2d_array a);
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> xdebugi1neg(integer_1d_array &amp;a);
+<b>void</b> xdebugi1neg(integer_1d_array a);
 </div></pre>
 <a name='sub_xdebugi1outeven'></a><h3 class=pageheader><code>xdebugi1outeven</code> function</h3>
 <pre class=source>
@@ -50420,7 +50420,7 @@ ae_int_t xdebugi1sum(integer_1d_array a);
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> xdebugi2neg(integer_2d_array &amp;a);
+<b>void</b> xdebugi2neg(integer_2d_array a);
 </div></pre>
 <a name='sub_xdebugi2outsin'></a><h3 class=pageheader><code>xdebugi2outsin</code> function</h3>
 <pre class=source>
@@ -50510,7 +50510,7 @@ ae_int_t xdebugi2sum(integer_2d_array a);
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> xdebugr1neg(real_1d_array &amp;a);
+<b>void</b> xdebugr1neg(real_1d_array a);
 </div></pre>
 <a name='sub_xdebugr1outeven'></a><h3 class=pageheader><code>xdebugr1outeven</code> function</h3>
 <pre class=source>
@@ -50550,7 +50550,7 @@ ae_int_t xdebugi2sum(integer_2d_array a);
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </div>
 <div style='margin-top: 0; margin-bottom: 0;'>
-<b>void</b> xdebugr2neg(real_2d_array &amp;a);
+<b>void</b> xdebugr2neg(real_2d_array a);
 </div></pre>
 <a name='sub_xdebugr2outsin'></a><h3 class=pageheader><code>xdebugr2outsin</code> function</h3>
 <pre class=source>

@@ -251,59 +251,59 @@ For user-supplied functions in the iteration routines and their high-level versi
 For both these routines as well as for the serializer/unserializer routines, the documented and declared/implemented versions match.
 
 Other exceptions include array parameters, which are documented as (Type &), but declared as (const Type &), as indicated below:
-	rankdatacentered(∙,_,_);
-	rankdata(∙,_,_);
-	xdebugb1not(∙);
-	xdebugb2not(∙);
-	xdebugc1neg(∙);
-	xdebugc2neg(∙);
-	xdebugi1neg(∙);
-	xdebugi2neg(∙);
-	xdebugr1neg(∙);
-	xdebugr2neg(∙);
-	rvectorcopy(_,_,_,∙,_);
-	rmatrixcopy(_,_,_,_,_,∙,_,_);
-	rmatrixgencopy(_,_,_,_,_,_,_,∙,_,_);
-	rmatrixgemv(_,_,_,_,_,_,_,_,_,_,∙,_);
-	sparsegemv(_,_,_,_,_,_,∙,_);
-	rmatrixmv(_,_,_,_,_,_,_,_,∙,_);
-	rmatrixsymv(_,_,_,_,_,_,_,_,_,∙,_);
-	rmatrixsyvmv(_,_,_,_,_,_,_,∙);
-	sparsetrmv(_,_,_,_,∙,_);
-	rmatrixger(_,_,∙,_,_,_,_,_,_,_);
-	rmatrixtranspose(_,_,_,_,_,∙,_,_);
-	rmatrixtrsv(_,_,_,_,_,_,_,∙,_);
-	sparsetrsv(_,_,_,_,∙);
-	rmatrixenforcesymmetricity(∙,_,_);
-	rmatrixgemm(_,_,_,_,_,_,_,_,_,_,_,_,_,∙,_,_);
-	cmatrixgemm(_,_,_,_,_,_,_,_,_,_,_,_,_,∙,_,_);
-	rmatrixsyrk(_,_,_,_,_,_,_,_,∙,_,_,_);
-	cmatrixsyrk(_,_,_,_,_,_,_,_,∙,_,_,_);
-	cmatrixherk(_,_,_,_,_,_,_,_,∙,_,_,_);
-	rmatrixlefttrsm(_,_,_,_,_,_,_,_,∙,_,_);
-	cmatrixlefttrsm(_,_,_,_,_,_,_,_,∙,_,_);
-	rmatrixlusolvefast(_,_,_,∙,_);
-	cmatrixlusolvefast(_,_,_,∙,_);
-	spdmatrixcholeskysolvefast(_,_,_,∙,_);
-	hpdmatrixcholeskysolvefast(_,_,_,∙,_);
-	rmatrixlusolvemfast(_,_,_,∙,_,_);
-	cmatrixlusolvemfast(_,_,_,∙,_,_);
-	spdmatrixcholeskysolvemfast(_,_,_,∙,_,_);
-	hpdmatrixcholeskysolvemfast(_,_,_,∙,_,_);
-	rmatrixrighttrsm(_,_,_,_,_,_,_,_,∙,_,_);
-	cmatrixrighttrsm(_,_,_,_,_,_,_,_,∙,_,_);
-	rmatrixsolvefast(_,_,∙,_);
-	cmatrixsolvefast(_,_,∙,_);
-	spdmatrixsolvefast(_,_,_,∙,_);
-	hpdmatrixsolvefast(_,_,_,∙,_);
-	rmatrixsolvemfast(_,_,∙,_,_);
-	cmatrixsolvemfast(_,_,∙,_,_);
-	spdmatrixsolvemfast(_,_,_,∙,_,_);
-	hpdmatrixsolvemfast(_,_,_,∙,_,_);
-	spdmatrixcholeskyupdateadd1buf(∙,_,_,_,_);
-	spdmatrixcholeskyupdateadd1(∙,_,_,_);
-	spdmatrixcholeskyupdatefixbuf(∙,_,_,_,_);
-	spdmatrixcholeskyupdatefix(∙,_,_,_);
+xy	rankdatacentered(∙,_,_);
+xy	rankdata(∙,_,_);
+a	xdebugb1not(∙);
+a	xdebugb2not(∙);
+a	xdebugc1neg(∙);
+a	xdebugc2neg(∙);
+a	xdebugi1neg(∙);
+a	xdebugi2neg(∙);
+a	xdebugr1neg(∙);
+a	xdebugr2neg(∙);
+b	rvectorcopy(_,_,_,∙,_);
+b	rmatrixcopy(_,_,_,_,_,∙,_,_);
+b	rmatrixgencopy(_,_,_,_,_,_,_,∙,_,_);
+y	rmatrixgemv(_,_,_,_,_,_,_,_,_,_,∙,_);
+y	sparsegemv(_,_,_,_,_,_,∙,_);
+y	rmatrixmv(_,_,_,_,_,_,_,_,∙,_);
+y	rmatrixsymv(_,_,_,_,_,_,_,_,_,∙,_);
+tmp	rmatrixsyvmv(_,_,_,_,_,_,_,∙);
+x	sparsetrmv(_,_,_,_,∙,_);
+a	rmatrixger(_,_,∙,_,_,_,_,_,_,_);
+b	rmatrixtranspose(_,_,_,_,_,∙,_,_);
+x	rmatrixtrsv(_,_,_,_,_,_,_,∙,_);
+x	sparsetrsv(_,_,_,_,∙);
+a	rmatrixenforcesymmetricity(∙,_,_);
+c	rmatrixgemm(_,_,_,_,_,_,_,_,_,_,_,_,_,∙,_,_);
+c	cmatrixgemm(_,_,_,_,_,_,_,_,_,_,_,_,_,∙,_,_);
+c	rmatrixsyrk(_,_,_,_,_,_,_,_,∙,_,_,_);
+c	cmatrixsyrk(_,_,_,_,_,_,_,_,∙,_,_,_);
+c	cmatrixherk(_,_,_,_,_,_,_,_,∙,_,_,_);
+x	rmatrixlefttrsm(_,_,_,_,_,_,_,_,∙,_,_);
+x	cmatrixlefttrsm(_,_,_,_,_,_,_,_,∙,_,_);
+b	rmatrixlusolvefast(_,_,_,∙,_);
+b	cmatrixlusolvefast(_,_,_,∙,_);
+b	spdmatrixcholeskysolvefast(_,_,_,∙,_);
+b	hpdmatrixcholeskysolvefast(_,_,_,∙,_);
+b	rmatrixlusolvemfast(_,_,_,∙,_,_);
+b	cmatrixlusolvemfast(_,_,_,∙,_,_);
+b	spdmatrixcholeskysolvemfast(_,_,_,∙,_,_);
+b	hpdmatrixcholeskysolvemfast(_,_,_,∙,_,_);
+x	rmatrixrighttrsm(_,_,_,_,_,_,_,_,∙,_,_);
+x	cmatrixrighttrsm(_,_,_,_,_,_,_,_,∙,_,_);
+b	rmatrixsolvefast(_,_,∙,_);
+b	cmatrixsolvefast(_,_,∙,_);
+b	spdmatrixsolvefast(_,_,_,∙,_);
+b	hpdmatrixsolvefast(_,_,_,∙,_);
+b	rmatrixsolvemfast(_,_,∙,_,_);
+b	cmatrixsolvemfast(_,_,∙,_,_);
+b	spdmatrixsolvemfast(_,_,_,∙,_,_);
+b	hpdmatrixsolvemfast(_,_,_,∙,_,_);
+a	spdmatrixcholeskyupdateadd1buf(∙,_,_,_,_);
+a	spdmatrixcholeskyupdateadd1(∙,_,_,_);
+a	spdmatrixcholeskyupdatefixbuf(∙,_,_,_,_);
+a	spdmatrixcholeskyupdatefix(∙,_,_,_);
 
 A6.2. Test Stages
 ─────────────────
@@ -638,6 +638,26 @@ A6.2. Test Stages
 	―	Synthesized new API routine hqrndmiduniformr() = 2 hqrnduniformr() - 1.
 	―	An update was made to Manual.htm to reflect the addition.
 	―	Re-coding of HQRND direct from the original reference for the algorithm.
+0-39	For parameter declarations:
+	∙	Output parameters X of type T are documented and declared respectively as:
+		―	T &X	⇔	T &X
+	∙	Input parameters X of type T are documented and declared respectively as:
+		―	T X	⇔	const T X	― for scalar types T ∈ { bool, ae_int_t, double, complex },
+		―	T X	⇔	const T &X	― for all other types T.
+	Manual.htm: The documentation of the following 1D and 2D array argument parameters
+	was changed from output (T &X) to input (T X) to match its declaration (const T &X).
+	∙	a	rmatrixenforcesymmetricity rmatrixger, spdmatrixcholeskyupdate{add1,fix}[buf], xdebug{b{1,2}not,{c,i,r}{1,2}neg}
+	∙	b	rmatrix{[gen]copy,transpose}, {r,c}matrix[lu]solve[m]fast, rvectorcopy, {h,s}pdmatrix[cholesky]solve[m]fast
+	∙	c	cmatrixherk, {r,c}matrix{gemm,syrk}
+	∙	tmp	rmatrixsyvmv
+	∙	x	{r,c}matrix{left,right}trsm, rmatrixtrsv, sparsetr{m,s}v
+	∙	xy	rankdata[centered]
+	∙	y	rmatrix[ge,sy]mv, sparsegemv
+	Statistics.{cpp,h}:
+	∙	xy	In the reduced forms of rankdata[centered]().
+	LinAlg.{cpp,h}:
+	∙	b	In rmatrix{transpose,copy}() to match "b" in cmatrix{transpose,copy}().
+	∙	y	In rmatrixmv() to match "y" in cmatrixmv().
 
 A6.3. Test Results
 ──────────────────

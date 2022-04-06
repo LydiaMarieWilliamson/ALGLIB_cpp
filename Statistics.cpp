@@ -490,7 +490,7 @@ static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 // API: void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
-// API: void rankdata(real_2d_array &xy);
+// API: void rankdata(const real_2d_array &xy);
 void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    ae_frame _frame_block;
    ae_int_t basecasecost;
@@ -542,7 +542,7 @@ void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 // API: void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
-// API: void rankdatacentered(real_2d_array &xy);
+// API: void rankdatacentered(const real_2d_array &xy);
 void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    ae_frame _frame_block;
    ae_int_t basecasecost;
@@ -1600,7 +1600,7 @@ void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nf
    alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
-void rankdata(real_2d_array &xy) {
+void rankdata(const real_2d_array &xy) {
    ae_int_t npoints = xy.rows();
    ae_int_t nfeatures = xy.cols();
    alglib_impl::ae_state_init();
@@ -1617,7 +1617,7 @@ void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_
    alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
-void rankdatacentered(real_2d_array &xy) {
+void rankdatacentered(const real_2d_array &xy) {
    ae_int_t npoints = xy.rows();
    ae_int_t nfeatures = xy.cols();
    alglib_impl::ae_state_init();

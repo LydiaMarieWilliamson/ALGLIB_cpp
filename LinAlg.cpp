@@ -382,7 +382,7 @@ void applyreflectionfromtheright(RMatrix *c, double tau, RVector *v, ae_int_t m1
 //     B   -   destination matrix, must be large enough to store result
 //     IB  -   submatrix offset (row index)
 //     JB  -   submatrix offset (column index)
-// API: void rmatrixtranspose(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb);
+// API: void rmatrixtranspose(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_2d_array &b, const ae_int_t ib, const ae_int_t jb);
 void rmatrixtranspose(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb) {
    ae_int_t i;
    ae_int_t s1;
@@ -499,7 +499,7 @@ void rvectorcopy(ae_int_t n, RVector *a, ae_int_t ia, RVector *b, ae_int_t ib) {
 //     B   -   destination matrix, must be large enough to store result
 //     IB  -   submatrix offset (row index)
 //     JB  -   submatrix offset (column index)
-// API: void rmatrixcopy(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb);
+// API: void rmatrixcopy(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_2d_array &b, const ae_int_t ib, const ae_int_t jb);
 void rmatrixcopy(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb) {
    ae_int_t i;
    if (m == 0 || n == 0) {
@@ -697,7 +697,7 @@ void cmatrixrank1(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, 
 // if M=0, then subroutine does nothing.
 // if N=0, Y is filled by zeros.
 // ALGLIB Routine: Copyright 28.01.2010 by Sergey Bochkanov
-// API: void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const real_1d_array &y, const ae_int_t iy);
+// API: void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, real_1d_array &y, const ae_int_t iy);
 void rmatrixmv(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, RVector *y, ae_int_t iy) {
    ae_int_t i;
    double v;
@@ -2428,7 +2428,7 @@ void rmatrixgemv(const ae_int_t m, const ae_int_t n, const double alpha, const r
    alglib_impl::ae_state_clear();
 }
 
-void rmatrixtranspose(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb) {
+void rmatrixtranspose(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_2d_array &b, const ae_int_t ib, const ae_int_t jb) {
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::rmatrixtranspose(m, n, ConstT(ae_matrix, a), ia, ja, ConstT(ae_matrix, b), ib, jb);
@@ -2456,7 +2456,7 @@ void rvectorcopy(const ae_int_t n, const real_1d_array &a, const ae_int_t ia, co
    alglib_impl::ae_state_clear();
 }
 
-void rmatrixcopy(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb) {
+void rmatrixcopy(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_2d_array &b, const ae_int_t ib, const ae_int_t jb) {
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::rmatrixcopy(m, n, ConstT(ae_matrix, a), ia, ja, ConstT(ae_matrix, b), ib, jb);
@@ -2491,7 +2491,7 @@ void cmatrixrank1(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const
    alglib_impl::ae_state_clear();
 }
 
-void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const real_1d_array &y, const ae_int_t iy) {
+void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, real_1d_array &y, const ae_int_t iy) {
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::rmatrixmv(m, n, ConstT(ae_matrix, a), ia, ja, opa, ConstT(ae_vector, x), ix, ConstT(ae_vector, y), iy);
