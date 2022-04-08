@@ -735,7 +735,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 25	Separated the subpackages
 26	3.16.0 upgrade
 	Corrected a long-standing hidden bug testablasunit_testsyrk() in TestC.cpp: cct was initialized with itself, instead of with the transpose of cc.
-        All of the extra infrastructure for internal tracing and timing, added in ALGLIB starting with version 3.16.0, has been kept out of ALGLIB++.
+	All of the extra infrastructure for internal tracing and timing, added in ALGLIB starting with version 3.16.0, has been kept out of ALGLIB++.
 27	Normalized the Makefile
 	Minor change in Ap.cpp.
 28	Conversions of assignment expressions to update operators (++X, --X, X++, X--, X op= Y), where applicable.
@@ -971,17 +971,22 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 		―	Local routine logit_mnlmcsrch(): Redeclared "double *f" as an input-only parameter "double f".
 		―	Local boolean routine ssa_hassomethingtoanalyze(): reversed, renamed ssa_isdegenerate() and recoded.
 	∙	Statistics.{cpp,h}:
-		―	Local routine wsr_wcheb() eliminated and substituted into wsr_w{25,26,...,200}(), wsr_wsigma() recoded.
-		―	wsr_w*() recoded.
+		―	Local routines correlationtests_spearmantail{5,6,7,8,9}() eliminated and substituted into correlationtests_spearmantail(),
+			and correlationtests_spearmantail() recoded.
 		―	Local routine jarquebera_jarqueberastatistic() eliminated and substituted into jarqueberatest(),
 			and jarqueberatest() recoded.
 		―	Local routine jarquebera_jbcheb() eliminated and substituted into jarquebera_jbtbl*(),
 			and jarquebera_jbtbl*() recoded.
 		―	Local routine jarquebera_jarqueberaapprox() recoded.
 		―	API routine jarqueberatest() recoded.
-		―	Local routines correlationtests_spearmantail{5,6,7,8,9}() eliminated and substituted into correlationtests_spearmantail(),
-			and correlationtests_spearmantail() recoded.
+		―	Local routine wsr_wcheb() eliminated and substituted into wsr_w{25,26,...,200}(), wsr_wsigma() recoded.
+		―	wsr_w*() recoded.
 	∙	SpecialFunctions.{cpp,h}:
+		―	Synthesized internal constants for the Euler constant, π/2 and √2.
+		―	Minor changes in the layout of the conditional code in gammafunction() and lngamma().
+		―	Compilation of the local function gammafunc_gammastirf() made conditional to !defined ALGLIB_INTERCEPTS_SPECFUNCS.
+		―	Synthesized local routines erfr0(), erfr1() and recoded errorfunction[c](), normal{cdf,distribution}() using them to remove recursive calls.
+		―	Synthesized local routines inverfr0(), inverfr1(), inverfr2() and recoded invnormal{cdf,distribution}() and inverf() using them.
 		―	Recoded sinecosineintegrals().
 		―	Local routine trigintegrals_chebiterationshichi() eliminated and substituted into hyperbolicsinecosineintegrals(),
 			hyperbolicsinecosineintegrals() recoded.
@@ -989,9 +994,6 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 		―	Local routines bessel_besselm1{first,next}cheb() eliminated and substituted into besseli1(), besselk0(), besselk1().
 		―	Local routines bessel_besselasympt{0,1}(x, ⋯) recoded and redefined as bessel_besselasympt{0,1}(8.0/x, ⋯).
 		―	API routines besseli{0,1}(), bessel{j,y,k}{0,1,n}() recoded.
-		―	Synthesized internal constants for the Euler constant, π/2 and √2.
-		―	Synthesized local routines erfr0(), erfr1() and recoded errorfunction[c](), normal{cdf,distribution}() using them to remove recursive calls.
-		―	Synthesized local routines inverfr0(), inverfr1(), inverfr2() and recoded invnormal{cdf,distribution}() and inverf() using them.
 	∙	Optimization.cpp:
 		―	optserv_feasibilityerrorgrad(): remade "double *err" into a return value.
 		―	localized most static constants that are used in only one routine to the routines they are used in,
@@ -1013,18 +1015,19 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 		―	hqrndmiduniformr(): added to the API and newly documented.
 		―	ssaforecastsequence() documentation: the Data parameter is array[DataLen], not array[NTicks].
 	∙	Interpolation.cpp:
-		―	Local routine spline1d_diffthreepoint() in-line substituted into spline1dbuildakima() and removed,
-			and spline1dbuildakima() recoded.
+		―	Moved spline1dfitpenalized[w]() from INTCOMP back into SPLINE1D.
 		―	localized most static constants that are used in only one routine to the routines they are used in,
 			and removed the prefixes (e.g. spline1d_lambdareg → lambdareg).
-		―	spline3d_spline3ddiff(): remade "double *fx", "double *fy", "double *fxy" into optional output parameters.
+		―	spline1d_spline1dgriddiffcubicinternal():
+			removed "RVector *dt", it's not used by any of routine's callers,
+			replaced its use inside the routine by d, since it was copied to d after being assigned to.
+		―	Local routine spline1d_diffthreepoint() in-line substituted into spline1dbuildakima() and removed,
+			and spline1dbuildakima() recoded.
 		―	spline1dconvdiffinternal():
 			remade the non-API routine into static local.
 			remade "RVector *y", "RVector *d1", "RVector *d2" into optional output parameters.
 			eliminated "bool needy", "bool needd1", "bool needd2" respectively in favor of (y != NULL), (d1 != NULL) and (d2 != NULL).
-		―	spline1d_spline1dgriddiffcubicinternal():
-			removed "RVector *dt", it's not used by any of routine's callers,
-			replaced its use inside the routine by d, since it was copied to d after being assigned to.
+		―	spline3d_spline3ddiff(): remade "double *fx", "double *fy", "double *fxy" into optional output parameters.
 		―	rbf_clearreportfields(): removed and inserted inline at its point of use.
 38	Integration of version 3.17.0.
 	Minor corrections in TestC.cpp:
@@ -1236,6 +1239,7 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 40	7408 1.0x 11495 1.0x 11368 1.0x 9592 1.0x 1648501372 (6242227c) 80 // Checking for suspicious slow-down in TestX.
 40	6024 1.0x 9805 1.1x 11632 0.9x 9684 0.9x 1648857552 (624791d0) 78 // Attempted stop-gap fix for the slow-down.
 0-39	8000 0.9x 11766 1.1x 12199 1.0x 9608 1.0x 1649021803 (624a136b) 78 // Minor changes to AlgLibMisc.* to sync to 3.18.0.
+0-39	7692 1.0x 12196 1.0x 12350 1.0x 8911 1.1x 1649378705 (624f8591) 79 // Minor changes to {Interpolation,LinAlg,SpecialFunctions}.cpp to sync to 3.18.0.
 </pre>
 </p>
 </div>

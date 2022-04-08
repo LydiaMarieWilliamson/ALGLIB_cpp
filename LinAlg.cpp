@@ -54,10 +54,13 @@ ae_int_t ablasmicroblocksize() {
 
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 static ae_int_t ablas_ablasinternalsplitlength(ae_int_t n, ae_int_t nb) {
-   if (n <= nb) ; // Block size: no further splitting.
+// Block size: no further splitting.
+   if (n <= nb) ;
 // Greater than the block size.
-   else if (n % nb != 0) n -= n % nb; // Split the remainder.
-   else { // Split on the block boundaries.
+// Split the remainder.
+   else if (n % nb != 0) n -= n % nb;
+// Split on block boundaries.
+   else {
       n -= n / 2;
       if (n % nb != 0) n += nb - n % nb;
    }

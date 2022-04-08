@@ -1893,6 +1893,11 @@ double invfdistribution(const ae_int_t a, const ae_int_t b, const double y) {
 // === IGAMMAF Package ===
 // Depends on: GAMMAFUNC, NORMALDISTR
 namespace alglib_impl {
+#if 0
+// Forward reference to an indirect recursive call. //(@) Already declared externally.
+double incompletegammac(double a, double x);
+#endif
+
 // Incomplete gamma integral
 //
 // The function is defined by
