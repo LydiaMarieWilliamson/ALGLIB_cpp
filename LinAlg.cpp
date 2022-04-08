@@ -54,32 +54,18 @@ ae_int_t ablasmicroblocksize() {
 
 // Complex ABLASSplitLength
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
-static void ablas_ablasinternalsplitlength(ae_int_t n, ae_int_t nb, ae_int_t *n1, ae_int_t *n2) {
-   ae_int_t r;
-   *n1 = 0;
-   *n2 = 0;
-   if (n <= nb) {
-   // Block size, no further splitting
-      *n1 = n;
-      *n2 = 0;
-   } else {
-   // Greater than block size
-      if (n % nb != 0) {
-      // Split remainder
-         *n2 = n % nb;
-         *n1 = n - *n2;
-      } else {
-      // Split on block boundaries
-         *n2 = n / 2;
-         *n1 = n - *n2;
-         if (*n1 % nb == 0) {
-            return;
-         }
-         r = nb - *n1 % nb;
-         *n1 += r;
-         *n2 -= r;
-      }
+static ae_int_t ablas_ablasinternalsplitlength(ae_int_t n, ae_int_t nb) {
+// Block size: no further splitting.
+   if (n <= nb) ;
+// Greater than the block size.
+// Split the remainder.
+   else if (n % nb != 0) n -= n % nb;
+// Split on block boundaries.
+   else {
+      n -= n / 2;
+      if (n % nb != 0) n += nb - n % nb;
    }
+   return n;
 }
 
 // Splits matrix length in two parts, left part should match ABLAS block size
@@ -96,26 +82,14 @@ static void ablas_ablasinternalsplitlength(ae_int_t n, ae_int_t nb, ae_int_t *n1
 //
 // N1+N2=N, N1 >= N2, N2 may be zero
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
-void ablassplitlength(RMatrix *a, ae_int_t n, ae_int_t *n1, ae_int_t *n2) {
-   *n1 = 0;
-   *n2 = 0;
-   if (n > ablasblocksize(a)) {
-      ablas_ablasinternalsplitlength(n, ablasblocksize(a), n1, n2);
-   } else {
-      ablas_ablasinternalsplitlength(n, ablasmicroblocksize(), n1, n2);
-   }
+ae_int_t ablassplitlength(RMatrix *a, ae_int_t n) {
+   return ablas_ablasinternalsplitlength(n, n > ablasblocksize(a) ? ablasblocksize(a) : ablasmicroblocksize());
 }
 
 // Complex ABLASSplitLength
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
-void ablascomplexsplitlength(CMatrix *a, ae_int_t n, ae_int_t *n1, ae_int_t *n2) {
-   *n1 = 0;
-   *n2 = 0;
-   if (n > ablascomplexblocksize(a)) {
-      ablas_ablasinternalsplitlength(n, ablascomplexblocksize(a), n1, n2);
-   } else {
-      ablas_ablasinternalsplitlength(n, ablasmicroblocksize(), n1, n2);
-   }
+ae_int_t ablascomplexsplitlength(CMatrix *a, ae_int_t n) {
+   return ablas_ablasinternalsplitlength(n, n > ablascomplexblocksize(a) ? ablascomplexblocksize(a) : ablasmicroblocksize());
 }
 
 // Returns switch point for parallelism.
@@ -395,11 +369,11 @@ void rmatrixtranspose(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t 
    } else {
    // Cache-oblivious recursion
       if (m > n) {
-         ablassplitlength(a, m, &s1, &s2);
+         s1 = ablassplitlength(a, m), s2 = m - s1;
          rmatrixtranspose(s1, n, a, ia, ja, b, ib, jb);
          rmatrixtranspose(s2, n, a, ia + s1, ja, b, ib, jb + s1);
       } else {
-         ablassplitlength(a, n, &s1, &s2);
+         s1 = ablassplitlength(a, n), s2 = n - s1;
          rmatrixtranspose(m, s1, a, ia, ja, b, ib, jb);
          rmatrixtranspose(m, s2, a, ia, ja + s1, b, ib + s1, jb);
       }
@@ -430,11 +404,11 @@ void cmatrixtranspose(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t 
    } else {
    // Cache-oblivious recursion
       if (m > n) {
-         ablascomplexsplitlength(a, m, &s1, &s2);
+         s1 = ablascomplexsplitlength(a, m), s2 = m - s1;
          cmatrixtranspose(s1, n, a, ia, ja, b, ib, jb);
          cmatrixtranspose(s2, n, a, ia + s1, ja, b, ib, jb + s1);
       } else {
-         ablascomplexsplitlength(a, n, &s1, &s2);
+         s1 = ablascomplexsplitlength(a, n), s2 = n - s1;
          cmatrixtranspose(m, s1, a, ia, ja, b, ib, jb);
          cmatrixtranspose(m, s2, a, ia, ja + s1, b, ib + s1, jb);
       }
@@ -2722,7 +2696,7 @@ static void ortfac_cmatrixblockreflector(CMatrix *a, CVector *tau, bool columnwi
 //      September 30, 1994.
 //      Sergey Bochkanov, ALGLIB project, translation from FORTRAN to
 //      pseudocode, 2007-2010.
-void rmatrixqrbasecase(RMatrix *a, ae_int_t m, ae_int_t n, RVector *work, RVector *t, RVector *tau) {
+static void ortfac_rmatrixqrbasecase(RMatrix *a, ae_int_t m, ae_int_t n, RVector *work, RVector *t, RVector *tau) {
    ae_int_t i;
    ae_int_t k;
    ae_int_t minmn;
@@ -2916,7 +2890,7 @@ void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau) {
    // some TLB issues arising from non-contiguous memory
    // access pattern.
       rmatrixcopy(rowscount, blocksize, a, blockstart, blockstart, &tmpa, 0, 0);
-      rmatrixqrbasecase(&tmpa, rowscount, blocksize, &work, &t, &taubuf);
+      ortfac_rmatrixqrbasecase(&tmpa, rowscount, blocksize, &work, &t, &taubuf);
       rmatrixcopy(rowscount, blocksize, &tmpa, 0, 0, a, blockstart, blockstart);
       ae_v_move(&tau->xR[blockstart], 1, taubuf.xR, 1, blocksize);
    // Update the rest, choose between:
@@ -17664,7 +17638,7 @@ void rmatrixluprec(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *p
       rmatrixrighttrsm(m - n, n, a, offs, offs, true, true, 0, a, offs + n, offs);
       return;
    }
-   ablassplitlength(a, m, &m1, &m2);
+   m1 = ablassplitlength(a, m), m2 = m - m1;
    rmatrixluprec(a, offs, m1, n, pivots, tmp);
    if (m2 > 0) {
       for (i = 0; i < m1; i++) {
@@ -17708,7 +17682,7 @@ void cmatrixluprec(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *p
       cmatrixrighttrsm(m - n, n, a, offs, offs, true, true, 0, a, offs + n, offs);
       return;
    }
-   ablascomplexsplitlength(a, m, &m1, &m2);
+   m1 = ablascomplexsplitlength(a, m), m2 = m - m1;
    cmatrixluprec(a, offs, m1, n, pivots, tmp);
    if (m2 > 0) {
       for (i = 0; i < m1; i++) {
@@ -29594,7 +29568,7 @@ void fblssolvels(RMatrix *a, RVector *b, ae_int_t m, ae_int_t n, RVector *tmp0, 
    vectorsetlengthatleast(tmp1, imax2(m, n) + 1);
    vectorsetlengthatleast(tmp2, imin2(m, n));
 // Call basecase QR
-   rmatrixqrbasecase(a, m, n, tmp0, tmp1, tmp2);
+   ortfac_rmatrixqrbasecase(a, m, n, tmp0, tmp1, tmp2);
 // Multiply B by Q'
    for (k = 0; k < n; k++) {
       for (i = 0; i < k; i++) {
@@ -30478,7 +30452,7 @@ static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CV
 //
 // NOTE: this function expects that matris is strictly positive-definite.
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
-void spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, RVector *tmp) {
+static void matinv_spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, RVector *tmp) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -30577,7 +30551,7 @@ void spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isu
       rmatrixlefttrsm(n2, n1, a, offs + n1, offs + n1, isupper, false, 0, a, offs + n1, offs);
    }
 // invert first diagonal block
-   spdmatrixcholeskyinverserec(a, offs, n1, isupper, tmp);
+   matinv_spdmatrixcholeskyinverserec(a, offs, n1, isupper, tmp);
 // update first diagonal block with off-diagonal block,
 // update off-diagonal block
    if (isupper) {
@@ -30588,7 +30562,7 @@ void spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isu
       rmatrixlefttrsm(n2, n1, a, offs + n1, offs + n1, isupper, false, 1, a, offs + n1, offs);
    }
 // invert second diagonal block
-   spdmatrixcholeskyinverserec(a, offs + n1, n2, isupper, tmp);
+   matinv_spdmatrixcholeskyinverserec(a, offs + n1, n2, isupper, tmp);
    ae_frame_leave();
 }
 
@@ -30995,7 +30969,7 @@ void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
    }
 // Inverse
    ae_vector_set_length(&tmp, n);
-   spdmatrixcholeskyinverserec(a, 0, n, isupper, &tmp);
+   matinv_spdmatrixcholeskyinverserec(a, 0, n, isupper, &tmp);
    ae_frame_leave();
 }
 

@@ -16288,21 +16288,11 @@ namespace alglib_impl {
 // * all sequences are shorter than the window length
 // * no algorithm is specified
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
-static bool ssa_hassomethingtoanalyze(ssamodel *s) {
-   ae_int_t i;
-   bool allsmaller;
-   bool isdegenerate;
-   bool result;
-   isdegenerate = false;
-   isdegenerate = isdegenerate || s->algotype == 0;
-   isdegenerate = isdegenerate || s->nsequences == 0;
-   allsmaller = true;
-   for (i = 0; i < s->nsequences; i++) {
-      allsmaller = allsmaller && s->sequenceidx.xZ[i + 1] - s->sequenceidx.xZ[i] < s->windowwidth;
-   }
-   isdegenerate = isdegenerate || allsmaller;
-   result = !isdegenerate;
-   return result;
+static bool ssa_isdegenerate(ssamodel *s) {
+   if (s->algotype == 0 || s->nsequences == 0) return true;
+   for (ae_int_t i = 0; i < s->nsequences; i++)
+      if (s->sequenceidx.xZ[i + 1] - s->sequenceidx.xZ[i] >= s->windowwidth) return false;
+   return true;
 }
 
 // This function checks whether I-th sequence is big enough for analysis or not.
@@ -17215,7 +17205,7 @@ void ssaappendpointandupdate(ssamodel *s, double x, double updateits) {
    s->sequenceidx.xZ[s->nsequences]++;
 // Do we have something to analyze? If no, invalidate basis
 // (just to be sure) and exit.
-   if (!ssa_hassomethingtoanalyze(s)) {
+   if (ssa_isdegenerate(s)) {
       s->arebasisandsolvervalid = false;
       return;
    }
@@ -17301,7 +17291,7 @@ void ssaappendsequenceandupdate(ssamodel *s, RVector *x, ae_int_t nticks, double
    s->nsequences++;
 // Do we have something to analyze? If no, invalidate basis
 // (just to be sure) and exit.
-   if (!ssa_hassomethingtoanalyze(s)) {
+   if (ssa_isdegenerate(s)) {
       s->arebasisandsolvervalid = false;
       return;
    }
@@ -17520,7 +17510,7 @@ void ssagetbasis(ssamodel *s, RMatrix *a, RVector *sv, ae_int_t *windowwidth, ae
    *windowwidth = 0;
    *nbasis = 0;
 // Is it degenerate case?
-   if (!ssa_hassomethingtoanalyze(s)) {
+   if (ssa_isdegenerate(s)) {
       *windowwidth = s->windowwidth;
       *nbasis = 1;
       ae_matrix_set_length(a, *windowwidth, 1);
@@ -17590,7 +17580,7 @@ void ssagetlrr(ssamodel *s, RVector *a, ae_int_t *windowwidth) {
    *windowwidth = 0;
    ae_assert(s->windowwidth > 0, "SSAGetLRR: integrity check failed");
 // Is it degenerate case?
-   if (!ssa_hassomethingtoanalyze(s)) {
+   if (ssa_isdegenerate(s)) {
       *windowwidth = s->windowwidth;
       ae_vector_set_length(a, *windowwidth - 1);
       for (i = 0; i < *windowwidth - 1; i++) {
@@ -17693,7 +17683,7 @@ void ssaanalyzelastwindow(ssamodel *s, RVector *trend, RVector *noise, ae_int_t 
    ae_vector_set_length(trend, s->windowwidth);
    ae_vector_set_length(noise, s->windowwidth);
 // Is it degenerate case?
-   if (!ssa_hassomethingtoanalyze(s) || !ssa_issequencebigenough(s, -1)) {
+   if (ssa_isdegenerate(s) || !ssa_issequencebigenough(s, -1)) {
       for (i = 0; i < *nticks; i++) {
          trend->xR[i] = 0.0;
          noise->xR[i] = 0.0;
@@ -17823,7 +17813,7 @@ void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise
    ae_vector_set_length(trend, nticks);
    ae_vector_set_length(noise, nticks);
 // Is it degenerate case?
-   if (!ssa_hassomethingtoanalyze(s) || !ssa_issequencebigenough(s, -1)) {
+   if (ssa_isdegenerate(s) || !ssa_issequencebigenough(s, -1)) {
       for (i = 0; i < nticks; i++) {
          trend->xR[i] = 0.0;
          noise->xR[i] = 0.0;
@@ -17949,7 +17939,7 @@ void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *tr
    ae_vector_set_length(trend, nticks);
    ae_vector_set_length(noise, nticks);
 // Is it degenerate case?
-   if (!ssa_hassomethingtoanalyze(s) || nticks < s->windowwidth) {
+   if (ssa_isdegenerate(s) || nticks < s->windowwidth) {
       for (i = 0; i < nticks; i++) {
          trend->xR[i] = 0.0;
          noise->xR[i] = data->xR[i];
@@ -18046,7 +18036,7 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend) {
    winw = s->windowwidth;
    ae_vector_set_length(trend, nticks);
 // Is it degenerate case?
-   if (!ssa_hassomethingtoanalyze(s)) {
+   if (ssa_isdegenerate(s)) {
       for (i = 0; i < nticks; i++) {
          trend->xR[i] = 0.0;
       }
@@ -18132,7 +18122,7 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend) {
 //
 // Inputs:
 //     S               -   SSA model
-//     Data            -   array[NTicks], data to forecast
+//     Data            -   array[DataLen], data to forecast
 //     DataLen         -   number of ticks in the data, DataLen >= 1
 //     ForecastLen     -   number of ticks to predict, ForecastLen >= 1
 //     ApplySmoothing  -   whether to apply smoothing trend extraction or not;
@@ -18195,7 +18185,7 @@ void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t 
    winw = s->windowwidth;
    ae_vector_set_length(trend, forecastlen);
 // Is it degenerate case?
-   if (!ssa_hassomethingtoanalyze(s) || datalen < winw) {
+   if (ssa_isdegenerate(s) || datalen < winw) {
       for (i = 0; i < forecastlen; i++) {
          trend->xR[i] = 0.0;
       }
@@ -18333,7 +18323,7 @@ void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend
    winw = s->windowwidth;
    ae_vector_set_length(trend, nticks);
 // Is it degenerate case?
-   if (!ssa_hassomethingtoanalyze(s)) {
+   if (ssa_isdegenerate(s)) {
       for (i = 0; i < nticks; i++) {
          trend->xR[i] = 0.0;
       }
@@ -18467,7 +18457,7 @@ void ssaforecastavgsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int
    winw = s->windowwidth;
    ae_vector_set_length(trend, forecastlen);
 // Is it degenerate case?
-   if (!ssa_hassomethingtoanalyze(s) || datalen < winw) {
+   if (ssa_isdegenerate(s) || datalen < winw) {
       for (i = 0; i < forecastlen; i++) {
          trend->xR[i] = 0.0;
       }

@@ -1191,21 +1191,21 @@ static double optserv_feasibilityerror(RMatrix *ce, RVector *x, ae_int_t nmain, 
 //     Err     -   Sqrt(SUM(Err^2))
 //     Grad    -   error gradient with respect to X, array[NMain+NSlack]
 // ALGLIB: Copyright 17.09.2015 by Sergey Bochkanov
-static void optserv_feasibilityerrorgrad(RMatrix *ce, RVector *x, ae_int_t nmain, ae_int_t nslack, ae_int_t k, double *err, RVector *grad, RVector *tmp0) {
+static double optserv_feasibilityerrorgrad(RMatrix *ce, RVector *x, ae_int_t nmain, ae_int_t nslack, ae_int_t k, RVector *grad, RVector *tmp0) {
    ae_int_t i;
    double v;
-   *err = 0;
    ae_assert(grad->cnt >= nmain + nslack, "FeasibilityErrorGrad: integrity check failed");
    vectorsetlengthatleast(tmp0, k);
    rmatrixgemv(k, nmain + nslack, 1.0, ce, 0, 0, 0, x, 0, 0.0, tmp0, 0);
-   *err = 0.0;
+   double err = 0.0;
    for (i = 0; i < k; i++) {
       v = tmp0->xR[i] - ce->xyR[i][nmain + nslack];
       tmp0->xR[i] = v;
-      *err += v * v;
+      err += v * v;
    }
-   *err = sqrt(*err);
+   err = sqrt(err);
    rmatrixgemv(nmain + nslack, k, 1.0, ce, 0, 0, 1, tmp0, 0, 0.0, grad, 0);
+   return err;
 }
 
 // This function finds feasible point of  (NMain+NSlack)-dimensional  problem
@@ -1436,7 +1436,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
       // of "starts to increase" in order to correctly handle cases with
       // zero CE.
          armijobeststep = 0.0;
-         optserv_feasibilityerrorgrad(ce, x, nmain, nslack, k, &armijobestfeas, &g, &tmpk);
+         armijobestfeas = optserv_feasibilityerrorgrad(ce, x, nmain, nslack, k, &g, &tmpk);
          for (i = 0; i < nmain; i++) {
             if (havebndl->xB[i] && x->xR[i] == bndl->xR[i]) {
                g.xR[i] = 0.0;
@@ -1701,7 +1701,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
       werechangesinconstraints = false;
       for (gparuns = 1; gparuns <= k; gparuns++) {
       // calculate feasibility error and G
-         optserv_feasibilityerrorgrad(ce, x, nmain, nslack, k, &feaserr, &g, &tmpk);
+         feaserr = optserv_feasibilityerrorgrad(ce, x, nmain, nslack, k, &g, &tmpk);
       // project G, filter it (strip numerical noise)
          ae_v_move(pg.xR, 1, g.xR, 1, nmain + nslack);
          projectgradientintobc(x, &pg, bndl, havebndl, bndu, havebndu, nmain, nslack);
@@ -21192,9 +21192,9 @@ void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state) {
    state->hasfi = true;
    state->hasg = false;
 // second stage of initialization
-   minlm_lmprepare(n, m, false, state);
    minlmsetacctype(state, 0);
    minlmsetcond(state, 0.0, 0);
+   minlm_lmprepare(n, m, false, state);
    minlmsetxrep(state, false);
    minlmsetstpmax(state, 0.0);
    minlmrestartfrom(state, x);
@@ -21277,9 +21277,9 @@ void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstat
    state->hasg = false;
    state->diffstep = diffstep;
 // Second stage of initialization
-   minlm_lmprepare(n, m, false, state);
    minlmsetacctype(state, 1);
    minlmsetcond(state, 0.0, 0);
+   minlm_lmprepare(n, m, false, state);
    minlmsetxrep(state, false);
    minlmsetstpmax(state, 0.0);
    minlmrestartfrom(state, x);
@@ -21359,9 +21359,9 @@ void minlmcreatefgh(ae_int_t n, RVector *x, minlmstate *state) {
    state->hasfi = false;
    state->hasg = true;
 // init2
-   minlm_lmprepare(n, 0, true, state);
    minlmsetacctype(state, 2);
    minlmsetcond(state, 0.0, 0);
+   minlm_lmprepare(n, 0, true, state);
    minlmsetxrep(state, false);
    minlmsetstpmax(state, 0.0);
    minlmrestartfrom(state, x);
@@ -21399,9 +21399,9 @@ void minlmcreatefj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state) {
    state->hasfi = false;
    state->hasg = false;
 // init 2
-   minlm_lmprepare(n, m, true, state);
    minlmsetacctype(state, 0);
    minlmsetcond(state, 0.0, 0);
+   minlm_lmprepare(n, m, true, state);
    minlmsetxrep(state, false);
    minlmsetstpmax(state, 0.0);
    minlmrestartfrom(state, x);

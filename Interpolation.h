@@ -280,6 +280,8 @@ void spline1dunpack(spline1dinterpolant *c, ae_int_t *n, RMatrix *tbl);
 void spline1dlintransx(spline1dinterpolant *c, double a, double b);
 void spline1dlintransy(spline1dinterpolant *c, double a, double b);
 double spline1dintegrate(spline1dinterpolant *c, double x);
+void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep);
+void spline1dfitpenalized(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep);
 void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans, spline1dinterpolant *s, spline1dfitreport *rep);
 void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, double *x1, ae_int_t *nr);
 ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, double b, double *x);
@@ -319,6 +321,8 @@ void spline1dunpack(const spline1dinterpolant &c, ae_int_t &n, real_2d_array &tb
 void spline1dlintransx(const spline1dinterpolant &c, const double a, const double b);
 void spline1dlintransy(const spline1dinterpolant &c, const double a, const double b);
 double spline1dintegrate(const spline1dinterpolant &c, const double x);
+void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
+void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
 void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep);
 void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep);
 } // end of namespace alglib
@@ -1019,8 +1023,6 @@ void nsfitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemty
 void nsfitspheremcc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi);
 void nsfitspheremic(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo);
 void nsfitspheremzc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi);
-void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep);
-void spline1dfitpenalized(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1028,8 +1030,6 @@ void nsfitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_
 void nsfitspheremcc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi);
 void nsfitspheremic(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo);
 void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi);
-void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
-void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
 void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
 void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
 } // end of namespace alglib

@@ -22,8 +22,8 @@ namespace alglib_impl {
 ae_int_t ablasblocksize(RMatrix *a);
 ae_int_t ablascomplexblocksize(CMatrix *a);
 ae_int_t ablasmicroblocksize();
-void ablassplitlength(RMatrix *a, ae_int_t n, ae_int_t *n1, ae_int_t *n2);
-void ablascomplexsplitlength(CMatrix *a, ae_int_t n, ae_int_t *n1, ae_int_t *n2);
+ae_int_t ablassplitlength(RMatrix *a, ae_int_t n);
+ae_int_t ablascomplexsplitlength(CMatrix *a, ae_int_t n);
 ae_int_t gemmparallelsize();
 void generatereflection(RVector *x, ae_int_t n, double *tau);
 void rmatrixger(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv);
@@ -89,7 +89,6 @@ void cmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const c
 // Depends on: (AlgLibMisc) HQRND
 // Depends on: ABLAS
 namespace alglib_impl {
-void rmatrixqrbasecase(RMatrix *a, ae_int_t m, ae_int_t n, RVector *work, RVector *t, RVector *tau);
 void rmatrixlqbasecase(RMatrix *a, ae_int_t m, ae_int_t n, RVector *work, RVector *t, RVector *tau);
 void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau);
 void cmatrixqr(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau);
@@ -956,7 +955,6 @@ void matinvreport_init(void *_p, bool make_automatic);
 void matinvreport_copy(void *_dst, void *_src, bool make_automatic);
 void matinvreport_free(void *_p, bool make_automatic);
 
-void spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, RVector *tmp);
 void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, matinvreport *rep);
 void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, matinvreport *rep);
 void rmatrixinverse(RMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep);

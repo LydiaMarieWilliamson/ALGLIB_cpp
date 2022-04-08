@@ -638,7 +638,7 @@ A6.2. Test Stages
 	―	Synthesized new API routine hqrndmiduniformr() = 2 hqrnduniformr() - 1.
 	―	An update was made to Manual.htm to reflect the addition.
 	―	Re-coding of HQRND direct from the original reference for the algorithm.
-0-39	For parameter declarations:
+0-39	Reconciled parameter declarations versus documentation:
 	∙	Output parameters X of type T are documented and declared respectively as:
 		―	T &X	⇔	T &X
 	∙	Input parameters X of type T are documented and declared respectively as:
@@ -658,6 +658,58 @@ A6.2. Test Stages
 	LinAlg.{cpp,h}:
 	∙	b	In rmatrix{transpose,copy}() to match "b" in cmatrix{transpose,copy}().
 	∙	y	In rmatrixmv() to match "y" in cmatrixmv().
+0-39	LinAlg.{cpp,h}: Adding changes made in AlgLib++.
+	―	Non-API routine rmatrixqrbasecase() removed from LinAlg.h, made local to LinAlg.cpp, renamed ortfac_rmatrixqrbasecase().
+	―	Non-API routine spdmatrixcholeskyinverserec() removed from LinAlg.h, made local to LinAlg.cpp, renamed matinv_spdmatrixcholeskyinverserec().
+	―	Non-API routine ablascomplexsplitlength(a, n, &n1, &n2) redefined as n1 = ablascomplexsplitlength(a, n), n2 = n - n1;
+	―	Non-API routine ablassplitlength(a, n, &n1, &n2) redefined as n1 = ablassplitlength(a, n), n2 = n - n1;
+	―	Local routine ablas_ablasinternalsplitlength(n, nb, &n1, &n2) redefined as n1 = ablas_ablasinternalsplitlength(n, nb), n2 = n - n1;
+0-39	Solvers.cpp, Manual.htm: Adding changes made in AlgLib++.
+	―	lincgsetb(): added to the API and newly documented.
+0-39	Optimization.cpp: Adding changes made in AlgLib++.
+	―	optserv_feasibilityerrorgrad(): remade "double *err" into a return value.
+	―	Move minlm_lmprepare() after minlmsetcond() in the minlmcreate*() routines.
+0-39	DataAnalysis.cpp, Manual.htm: Adding changes made in AlgLib++.
+	―	Local boolean routine ssa_hassomethingtoanalyze(): reversed, renamed ssa_isdegenerate() and recoded.
+	―	ssaforecastsequence() comments and documentation: the Data parameter is array[DataLen], not array[NTicks].
+0-39	Statistics.cpp: Adding changes made in AlgLib++.
+	―	Local routines correlationtests_spearmantail{5,6,7,8,9}() eliminated and substituted into correlationtests_spearmantail(),
+		and correlationtests_spearmantail() recoded.
+	―	Local routine jarquebera_jarqueberastatistic() eliminated and substituted into jarqueberatest(),
+		and jarqueberatest() recoded.
+	―	Local routine jarquebera_jbcheb() eliminated and substituted into jarquebera_jbtbl*(),
+		and jarquebera_jbtbl*() recoded.
+	―	Local routine jarquebera_jarqueberaapprox() recoded.
+	―	API routine jarqueberatest() recoded.
+	―	Local routine wsr_wcheb() eliminated and substituted into wsr_w{25,26,...,200}(), wsr_wsigma() recoded.
+	―	wsr_w*() recoded.
+0-39	SpecialFunctions.cpp, Manual.htm: Adding changes made in AlgLib++.
+	―	Synthesized internal constants for the Euler constant, π/2 and √2.
+	―	Minor changes in the layout of the conditional code in gammafunction() and lngamma().
+	―	Compilation of the local function gammafunc_gammastirf() made conditional to !defined ALGLIB_INTERCEPTS_SPECFUNCS.
+	―	Synthesized local routines erfr0(), erfr1() and recoded errorfunction[c](), normal{cdf,distribution}() using them to remove recursive calls.
+	―	Synthesized local routines inverfr0(), inverfr1(), inverfr2() and recoded invnormal{cdf,distribution}() and inverf() using them.
+	―	Recoded sinecosineintegrals().
+	―	Local routine trigintegrals_chebiterationshichi() eliminated and substituted into hyperbolicsinecosineintegrals(),
+		hyperbolicsinecosineintegrals() recoded.
+	―	Local routines bessel_besselm{first,next}cheb() eliminated and substituted into besseli0().
+	―	Local routines bessel_besselm1{first,next}cheb() eliminated and substituted into besseli1(), besselk0(), besselk1().
+	―	Local routines bessel_besselasympt{0,1}(x, ⋯) recoded and redefined as bessel_besselasympt{0,1}(8.0/x, ⋯).
+	―	API routines besseli{0,1}(), bessel{j,y,k}{0,1,n}() recoded.
+	―	Minor changes in the layout of some of the header comments.
+0-39	Interpolation.cpp: Adding changes made in AlgLib++.
+	―	Moved spline1dfitpenalized[w]() from INTCOMP back into SPLINE1D.
+	―	spline1d_spline1dgriddiffcubicinternal():
+		removed "RVector *dt", it's not used by any of routine's callers,
+		replaced its use inside the routine by d, since it was copied to d after being assigned to.
+	―	Local routine spline1d_diffthreepoint() in-line substituted into spline1dbuildakima() and removed,
+		and spline1dbuildakima() recoded.
+	―	spline1dconvdiffinternal():
+		remade the non-API routine into static local.
+		remade "RVector *y", "RVector *d1", "RVector *d2" into optional output parameters.
+		eliminated "bool needy", "bool needd1", "bool needd2" respectively in favor of (y != NULL), (d1 != NULL) and (d2 != NULL).
+	―	spline3d_spline3ddiff(): remade "double *fx", "double *fy", "double *fxy" into optional output parameters.
+	―	rbf_clearreportfields(): removed and inserted inline at its point of use.
 
 A6.3. Test Results
 ──────────────────
@@ -717,6 +769,7 @@ A6.3. Test Results
 40	4348 1.0x 5000 2.0x 12199 1.0x 8948 1.1x 1648502820 (62422824) 76 // AlgLibInternal.{cpp,h}: New recoding.
 40	8065 1.0x 12501 1.0x 12052 1.0x 8819 1.1x 1648856974 (62478f8e) 81 // Stop-gap fix of the slowdown problem in TestX.cpp.
 0-39	7937 1.0x 12049 1.0x 12350 0.9x 9042 1.0x 1649021559 (624a1277) 78 // AlgLibMisc.{cpp,h}: Synchronize to AlgLib++.
+0-39	6024 1.0x 10417 1.0x 10104 1.1x 9465 1.0x 1649379288 (624f87d8) 78 // {LinAlg,Solvers,Interpolation,SpecialFunctions,Statistics}.cpp: Adding changes made in AlgLib++.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -768,19 +821,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7937
+* RGEMM-SEQ-16   (MFLOPS)   6024
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12049
+* RGEMM-SEQ-32   (MFLOPS)  10417
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12350
-* RGEMM-MTN-64              0.9x
-* RGEMM-SEQ-1024 (MFLOPS)   9042
+* RGEMM-SEQ-64   (MFLOPS)  10104
+* RGEMM-MTN-64              1.1x
+* RGEMM-SEQ-1024 (MFLOPS)   9465
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-Seed: 1649021559 (624a1277)
+Seed: 1649379288 (624f87d8)
 Compiler: GCC
 Hardware: 64-bit
 Byte Order: little-endian

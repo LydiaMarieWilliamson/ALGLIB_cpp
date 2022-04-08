@@ -2953,8 +2953,6 @@ using namespace alglib;
 // Evaluation is by power series summation for small x,
 // by rational minimax approximations for large x.
 //
-//
-//
 // ACCURACY:
 // Error criterion is absolute when function &le; 1, relative
 // when function &gt; 1, except * denotes relative error criterion.
@@ -4094,7 +4092,6 @@ using namespace alglib;
 // (5, infinity). In the first interval the following rational
 // approximation is used:
 //
-//
 //        2         2
 // (w - r  ) (w - r  ) P (w) / Q (w)
 //       1         2    3       8
@@ -4165,7 +4162,6 @@ using namespace alglib;
 //                      Absolute error:
 // arithmetic   range      # trials      peak         rms
 //    IEEE      0, 30        5000       4.4e-16     7.9e-17
-//
 //
 // Not suitable for large n or x. Use jv() (fractional order) instead.
 //
@@ -4270,8 +4266,6 @@ using namespace alglib;
 // is employed with two rational functions of degree 6/6
 // and 7/7.
 //
-//
-//
 // ACCURACY:
 //
 //  Absolute error, when y0(x) &lt; 1; else relative error:
@@ -4349,7 +4343,6 @@ using namespace alglib;
 <pre class=source>
 <div style='color: navy; margin-top: 0; margin-bottom: 0;'>
 // Beta function
-//
 //
 //                   -     -
 //                  | (a) | (b)
@@ -4623,7 +4616,6 @@ using namespace alglib;
 // of the Chi square probability density function with
 // v degrees of freedom.
 //
-//
 //                                   x
 //                                    -
 //                        1          | |  v/2-1  -t/2
@@ -4644,7 +4636,6 @@ using namespace alglib;
 // ACCURACY:
 //
 // See incomplete gamma function
-//
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
@@ -4669,7 +4660,6 @@ using namespace alglib;
 // ACCURACY:
 //
 // See inverse incomplete gamma function
-//
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
@@ -9428,7 +9418,6 @@ using namespace alglib;
 //
 // Approximates the integral
 //
-//
 //            pi/2
 //             -
 //            | |                 2
@@ -9459,8 +9448,6 @@ using namespace alglib;
 // Complete elliptic integral of the first kind
 //
 // Approximates the integral
-//
-//
 //
 //            pi/2
 //             -
@@ -9494,8 +9481,6 @@ using namespace alglib;
 // Complete elliptic integral of the first kind
 //
 // Approximates the integral
-//
-//
 //
 //            pi/2
 //             -
@@ -9536,7 +9521,6 @@ using namespace alglib;
 //
 // Approximates the integral
 //
-//
 //                phi
 //                 -
 //                | |
@@ -9571,8 +9555,6 @@ using namespace alglib;
 //
 // Approximates the integral
 //
-//
-//
 //                phi
 //                 -
 //                | |
@@ -9585,9 +9567,6 @@ using namespace alglib;
 //
 // of amplitude phi and modulus m, using the arithmetic -
 // geometric mean algorithm.
-//
-//
-//
 //
 // ACCURACY:
 //
@@ -10526,8 +10505,6 @@ using namespace alglib;
 // Not defined for x &le; 0.
 // See also expn.c.
 //
-//
-//
 // ACCURACY:
 //
 //                      Relative error:
@@ -10556,7 +10533,6 @@ using namespace alglib;
 //                | |     t
 //                 -
 //                  1
-//
 //
 // Both n and x must be nonnegative.
 //
@@ -10594,7 +10570,6 @@ using namespace alglib;
 // function (also known as Snedcor's density or the
 // variance ratio density).
 //
-//
 //                      inf.
 //                       -
 //              1       | |  a-1      b-1
@@ -10603,12 +10578,10 @@ using namespace alglib;
 //                     -
 //                      x
 //
-//
 // The incomplete beta integral is used, according to the
 // formula
 //
 // P(x) = incbet( df2/2, df1/2, (df2/(df2 + df1*x) ).
-//
 //
 // ACCURACY:
 //
@@ -10641,7 +10614,6 @@ using namespace alglib;
 // formula
 //
 // P(x) = incbet( df1/2, df2/2, (df1*x/(df2 + df1*x) ).
-//
 //
 // The arguments a and b are greater than zero, and x is
 // nonnegative.
@@ -11559,15 +11531,12 @@ using namespace alglib;
 //         -
 //          0
 //
-//
 // The integrals are evaluated by a power series for x &lt; 1.
 // For x &ge; 1 auxiliary functions f(x) and g(x) are employed
 // such that
 //
 // C(x) = 0.5 + f(x) sin( pi/2 x**2 ) - g(x) cos( pi/2 x**2 )
 // S(x) = 0.5 - f(x) cos( pi/2 x**2 ) - g(x) sin( pi/2 x**2 )
-//
-//
 //
 // ACCURACY:
 //
@@ -12412,7 +12381,6 @@ ae_int_t hqrnduniformi(hqrndstate state, ae_int_t n);
 // The routine performs interval halving or Newton iterations to find the
 // root of incbet(a,b,x) - y = 0.
 //
-//
 // ACCURACY:
 //
 //                      Relative error:
@@ -13171,7 +13139,6 @@ using namespace alglib;
 //                 | (a)    -
 //                           0
 //
-//
 // In this implementation both arguments must be positive.
 // The integral is evaluated by either a power series or
 // continued fraction expansion, depending on the relative
@@ -13197,7 +13164,6 @@ using namespace alglib;
 //
 // The function is defined by
 //
-//
 //  igamc(a,x)   =   1 - igam(a,x)
 //
 //                            inf.
@@ -13207,7 +13173,6 @@ using namespace alglib;
 //                    -      | |
 //                   | (a)    -
 //                             x
-//
 //
 // In this implementation both arguments must be positive.
 // The integral is evaluated by either a power series or
@@ -15176,6 +15141,7 @@ using namespace alglib;
 <h3 class=pageheader>Functions</h3>
 <a href='#sub_lincgcreate' class=toc>lincgcreate</a><br>
 <a href='#sub_lincgresults' class=toc>lincgresults</a><br>
+<a href='#sub_lincgsetb' class=toc>lincgsetb</a><br>
 <a href='#sub_lincgsetcond' class=toc>lincgsetcond</a><br>
 <a href='#sub_lincgsetprecdiag' class=toc>lincgsetprecdiag</a><br>
 <a href='#sub_lincgsetprecunit' class=toc>lincgsetprecunit</a><br>
@@ -15272,6 +15238,21 @@ using namespace alglib;
 <b>void</b> lincgresults(lincgstate state, real_1d_array &amp;x, lincgreport &amp;rep);
 </div></pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span>&nbsp;&nbsp;&nbsp;<a href='#example_lincg_d_1' class=nav>[1]</a>&nbsp;&nbsp;</p>
+<a name='sub_lincgsetb'></a><h3 class=pageheader><code>lincgsetb</code> function</h3>
+<pre class=source>
+<div style='color: navy; margin-top: 0; margin-bottom: 0;'>
+// This function sets right part. By default, right part is zero.
+//
+// Inputs:
+//    B       -   right part, array[N].
+//
+// Outputs:
+//    State   -   structure which stores algorithm state
+// ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
+</div>
+<div style='margin-top: 0; margin-bottom: 0;'>
+<b>void</b> lincgsetb(lincgstate state, real_1d_array b);
+</div></pre>
 <a name='sub_lincgsetcond'></a><h3 class=pageheader><code>lincgsetcond</code> function</h3>
 <pre class=source>
 <div style='color: navy; margin-top: 0; margin-bottom: 0;'>
@@ -37447,7 +37428,6 @@ using namespace alglib;
 // Returns the area under the bivariate Gaussian  PDF  with  correlation
 // parameter equal to Rho, integrated from minus infinity to (x,y):
 //
-//
 //                                           x      y
 //                                           -      -
 //                             1            | |    | |
@@ -37456,15 +37436,13 @@ using namespace alglib;
 //                                         -      -
 //                                        -INF   -INF
 //
-//
 // where
 //
 //                       (    u^2 - 2*rho*u*v + v^2  )
 //     f(u,v,rho)   = exp( - ----------------------- )
 //                       (        2*(1-rho^2)        )
 //
-//
-// with -1&lt;rho&lt;+1 and arbitrary x, y.
+// with -1 &lt; rho &lt; +1 and arbitrary x, y.
 //
 // This subroutine uses high-precision approximation scheme proposed  by
 // Alan Genz in &quot;Numerical  Computation  of  Rectangular  Bivariate  and
@@ -37489,8 +37467,7 @@ using namespace alglib;
 //     f(x,y,rho) = ----------------- * exp( - ----------------------- )
 //                  2pi*sqrt(1-rho^2)      (        2*(1-rho^2)        )
 //
-//
-// with -1&lt;rho&lt;+1 and arbitrary x, y.
+// with -1 &lt; rho &lt; +1 and arbitrary x, y.
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
@@ -37515,7 +37492,6 @@ using namespace alglib;
 //
 // For 0 &le; |x| &lt; 1, erf(x) = x * P4(x**2)/Q5(x**2); otherwise
 // erf(x) = 1 - erfc(x).
-//
 //
 // ACCURACY:
 //
@@ -37544,10 +37520,8 @@ using namespace alglib;
 //                           -
 //                            x
 //
-//
 // For small x, erfc(x) = 1 - erf(x); otherwise rational
 // approximations are computed.
-//
 //
 // ACCURACY:
 //
@@ -37580,7 +37554,6 @@ using namespace alglib;
 // Returns the argument, x, for which the area under the
 // Gaussian probability density function (integrated from
 // minus infinity to x) is equal to y.
-//
 //
 // For small arguments 0 &lt; y &lt; exp(-2), the program computes
 // z = sqrt( -2.0 * log(y) );  then the approximation is
@@ -37631,7 +37604,6 @@ using namespace alglib;
 //
 // where z = x/sqrt(2). Computation is via the functions
 // erf and erfc.
-//
 //
 // ACCURACY:
 //
@@ -39962,6 +39934,7 @@ using namespace alglib;
 // y = pdtr( k, m ) = igamc( k+1, m ).
 //
 // The arguments must both be positive.
+//
 // ACCURACY:
 //
 // See incomplete gamma function
@@ -48242,7 +48215,7 @@ using namespace alglib;
 //
 // Inputs:
 //     S               -   SSA model
-//     Data            -   array[NTicks], data to forecast
+//     Data            -   array[DataLen], data to forecast
 //     DataLen         -   number of ticks in the data, DataLen &ge; 1
 //     ForecastLen     -   number of ticks to predict, ForecastLen &ge; 1
 //     ApplySmoothing  -   whether to apply smoothing trend extraction or not;
@@ -49891,7 +49864,6 @@ using namespace alglib;
 // For large x, both functions approach exp(x)/2x.
 // Arguments greater than 88 in magnitude return MAXNUM.
 //
-//
 // ACCURACY:
 //
 // Test interval 0 to 88.
@@ -49936,7 +49908,6 @@ using namespace alglib;
 //
 // Ci(x) = f(x) sin(x) - g(x) cos(x)
 // Si(x) = pi/2 - f(x) cos(x) - g(x) sin(x)
-//
 //
 // ACCURACY:
 //    Test interval = [0,50].

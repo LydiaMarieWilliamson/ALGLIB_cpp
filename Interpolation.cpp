@@ -3984,7 +3984,7 @@ static void spline1d_solvecyclictridiagonal(RVector *a, RVector *b, RVector *c, 
 // Y is passed as var-parameter because we may need to force last element  to
 // be equal to the first one (if periodic boundary conditions are specified).
 // ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
-static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *d, RVector *a1, RVector *a2, RVector *a3, RVector *b, RVector *dt) {
+static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *d, RVector *a1, RVector *a2, RVector *a3, RVector *b) {
    ae_int_t i;
 // allocate arrays
    if (d->cnt < n) {
@@ -4001,9 +4001,6 @@ static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_in
    }
    if (b->cnt < n) {
       ae_vector_set_length(b, n);
-   }
-   if (dt->cnt < n) {
-      ae_vector_set_length(dt, n);
    }
 // Special cases:
 // * N=2, parabolic terminated boundary condition on both ends
@@ -4038,8 +4035,7 @@ static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_in
          b->xR[i] = 3 * (y->xR[i] - y->xR[i - 1]) / (x->xR[i] - x->xR[i - 1]) * (x->xR[i + 1] - x->xR[i]) + 3 * (y->xR[i + 1] - y->xR[i]) / (x->xR[i + 1] - x->xR[i]) * (x->xR[i] - x->xR[i - 1]);
       }
    // Solve, add last point (with index N-1)
-      spline1d_solvecyclictridiagonal(a1, a2, a3, b, n - 1, dt);
-      ae_v_move(d->xR, 1, dt->xR, 1, n - 1);
+      spline1d_solvecyclictridiagonal(a1, a2, a3, b, n - 1, d);
       d->xR[n - 1] = d->xR[0];
    } else {
    // Non-periodic boundary condition.
@@ -4091,20 +4087,6 @@ static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_in
    // Solve
       spline1d_solvetridiagonal(a1, a2, a3, b, n, d);
    }
-}
-
-// Internal subroutine. Three-point differentiation
-static double spline1d_diffthreepoint(double t, double x0, double f0, double x1, double f1, double x2, double f2) {
-   double a;
-   double b;
-   double result;
-   t -= x0;
-   x1 -= x0;
-   x2 -= x0;
-   a = (f2 - f0 - x2 / x1 * (f1 - f0)) / (sqr(x2) - x1 * x2);
-   b = (f1 - f0 - a * sqr(x1)) / x1;
-   result = 2 * a * t + b;
-   return result;
 }
 
 // This subroutine builds linear spline interpolant
@@ -4293,7 +4275,6 @@ void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype,
    NewVector(a2, 0, DT_REAL);
    NewVector(a3, 0, DT_REAL);
    NewVector(b, 0, DT_REAL);
-   NewVector(dt, 0, DT_REAL);
    NewVector(d, 0, DT_REAL);
    NewVector(p, 0, DT_INT);
 // check correctness of boundary conditions
@@ -4325,7 +4306,7 @@ void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype,
    if (boundltype == -1 || boundrtype == -1) {
       y->xR[n - 1] = y->xR[0];
    }
-   spline1d_spline1dgriddiffcubicinternal(x, y, n, boundltype, boundl, boundrtype, boundr, &d, &a1, &a2, &a3, &b, &dt);
+   spline1d_spline1dgriddiffcubicinternal(x, y, n, boundltype, boundl, boundrtype, boundr, &d, &a1, &a2, &a3, &b);
    spline1dbuildhermite(x, y, &d, n, c);
    c->periodic = boundltype == -1 || boundrtype == -1;
    c->continuity = 2;
@@ -4454,51 +4435,45 @@ void spline1dbuildcatmullrom(RVector *x, RVector *y, ae_int_t n, ae_int_t boundt
 // API: void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c);
 void spline1dbuildakima(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant *c) {
    ae_frame _frame_block;
-   ae_int_t i;
    ae_frame_make(&_frame_block);
    DupVector(x);
    DupVector(y);
-   SetObj(spline1dinterpolant, c);
-   NewVector(d, 0, DT_REAL);
-   NewVector(w, 0, DT_REAL);
-   NewVector(diff, 0, DT_REAL);
-   ae_assert(n >= 2, "Spline1DBuildAkima: N<2!");
-   ae_assert(x->cnt >= n, "Spline1DBuildAkima: Length(X)<N!");
-   ae_assert(y->cnt >= n, "Spline1DBuildAkima: Length(Y)<N!");
-// check and sort points
+   ae_assert(n >= 2, "Spline1DBuildAkima: N < 2!");
+   ae_assert(x->cnt >= n, "Spline1DBuildAkima: Length(X) < N!");
+   ae_assert(y->cnt >= n, "Spline1DBuildAkima: Length(Y) < N!");
+// Check and sort the points.
    ae_assert(isfinitevector(x, n), "Spline1DBuildAkima: X contains infinite or NAN values!");
    ae_assert(isfinitevector(y, n), "Spline1DBuildAkima: Y contains infinite or NAN values!");
    spline1d_heapsortpoints(x, y, n);
    ae_assert(aredistinct(x, n), "Spline1DBuildAkima: at least two consequent points are too close!");
-// Handle special cases: N=2, N=3, N=4
+   SetObj(spline1dinterpolant, c);
+// Handle special cases: N == 2, N == 3, N == 4.
    if (n <= 4) {
       spline1dbuildcubic(x, y, n, 0, 0.0, 0, 0.0, c);
       ae_frame_leave();
       return;
    }
-// Prepare W (weights), Diff (divided differences)
-   ae_vector_set_length(&w, n - 1);
-   ae_vector_set_length(&diff, n - 1);
-   for (i = 0; i < n - 1; i++) {
-      diff.xR[i] = (y->xR[i + 1] - y->xR[i]) / (x->xR[i + 1] - x->xR[i]);
+// Prepare the Hermite interpolation scheme.
+   NewVector(d, n, DT_REAL);
+// Prepare the differences (dx1, dx2, dx3), slopes (p1, p2, p3) and weights (r12, r13).
+   double dx1 = x->xR[1] - x->xR[0], p1 = (y->xR[1] - y->xR[0])/dx1;
+   double dx2 = x->xR[2] - x->xR[1], p2 = (y->xR[2] - y->xR[1])/dx2;
+   double dx3 = x->xR[3] - x->xR[2], p3 = (y->xR[3] - y->xR[2])/dx3;
+   double r12 = fabs(p2 - p1), r23 = fabs(p3 - p2);
+   d.xR[0] = p1 + (p1 - p2) * dx1 / (dx1 + dx2);
+   d.xR[1] = (p1 * dx2 + p2 * dx1) / (dx1 + dx2);
+   for (ae_int_t i = 2; i < n - 2; i++) {
+   // Update the differences (dx1, dx2, dx3), slopes (p1, p2, p3) and weights (r12, r13).
+      dx1 = dx2, p1 = p2;
+      dx2 = dx3, p2 = p3;
+      dx3 = x->xR[i + 2] - x->xR[i + 1], p3 = (y->xR[i + 2] - y->xR[i + 1]) / dx3;
+      double r01 = r12;
+      r12 = r23, r23 = fabs(p3 - p2);
+      d.xR[i] = r01 + r23 > 0.0 ? (p1 * r23 + p2 * r01) / (r01 + r23) : (p1 * dx2 + p2 * dx1) / (dx1 + dx2);
    }
-   for (i = 1; i < n - 1; i++) {
-      w.xR[i] = fabs(diff.xR[i] - diff.xR[i - 1]);
-   }
-// Prepare Hermite interpolation scheme
-   ae_vector_set_length(&d, n);
-   for (i = 2; i < n - 2; i++) {
-      if (fabs(w.xR[i - 1]) + fabs(w.xR[i + 1]) != 0.0) {
-         d.xR[i] = (w.xR[i + 1] * diff.xR[i - 1] + w.xR[i - 1] * diff.xR[i]) / (w.xR[i + 1] + w.xR[i - 1]);
-      } else {
-         d.xR[i] = ((x->xR[i + 1] - x->xR[i]) * diff.xR[i - 1] + (x->xR[i] - x->xR[i - 1]) * diff.xR[i]) / (x->xR[i + 1] - x->xR[i - 1]);
-      }
-   }
-   d.xR[0] = spline1d_diffthreepoint(x->xR[0], x->xR[0], y->xR[0], x->xR[1], y->xR[1], x->xR[2], y->xR[2]);
-   d.xR[1] = spline1d_diffthreepoint(x->xR[1], x->xR[0], y->xR[0], x->xR[1], y->xR[1], x->xR[2], y->xR[2]);
-   d.xR[n - 2] = spline1d_diffthreepoint(x->xR[n - 2], x->xR[n - 3], y->xR[n - 3], x->xR[n - 2], y->xR[n - 2], x->xR[n - 1], y->xR[n - 1]);
-   d.xR[n - 1] = spline1d_diffthreepoint(x->xR[n - 1], x->xR[n - 3], y->xR[n - 3], x->xR[n - 2], y->xR[n - 2], x->xR[n - 1], y->xR[n - 1]);
-// Build Akima spline using Hermite interpolation scheme
+   d.xR[n - 2] = (p2 * dx3 + p3 * dx2) / (dx2 + dx3);
+   d.xR[n - 1] = p3 + (p3 - p2) * dx3 / (dx2 + dx3);
+// Build the Akima spline using the Hermite interpolation scheme.
    spline1dbuildhermite(x, y, &d, n, c);
    ae_frame_leave();
 }
@@ -4723,7 +4698,7 @@ void spline1dgriddiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
    ae_assert(aredistinct(x, n), "Spline1DGridDiffCubic: at least two consequent points are too close!");
 // Now we've checked and preordered everything,
 // so we can call internal function.
-   spline1d_spline1dgriddiffcubicinternal(x, y, n, boundltype, boundl, boundrtype, boundr, d, &a1, &a2, &a3, &b, &dt);
+   spline1d_spline1dgriddiffcubicinternal(x, y, n, boundltype, boundl, boundrtype, boundr, d, &a1, &a2, &a3, &b);
 // Remember that HeapSortPPoints() call?
 // Now we have to reorder them back.
    if (dt.cnt < n) {
@@ -4844,7 +4819,7 @@ void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 //
 // After this call we will calculate second derivatives
 // (manually, by converting to the power basis)
-   spline1d_spline1dgriddiffcubicinternal(x, y, n, boundltype, boundl, boundrtype, boundr, d1, &a1, &a2, &a3, &b, &dt);
+   spline1d_spline1dgriddiffcubicinternal(x, y, n, boundltype, boundl, boundrtype, boundr, d1, &a1, &a2, &a3, &b);
    ae_vector_set_length(d2, n);
    delta = 0.0;
    s2 = 0.0;
@@ -4893,22 +4868,16 @@ void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 //     N       -   grid size
 //     X2      -   new grid
 //     N2      -   new grid size
-//     Y       -   possibly preallocated output array
-//                 (reallocate if too small)
-//     NeedY   -   do we need Y?
-//     D1      -   possibly preallocated output array
-//                 (reallocate if too small)
-//     NeedD1  -   do we need D1?
-//     D2      -   possibly preallocated output array
-//                 (reallocate if too small)
-//     NeedD2  -   do we need D1?
+//     Y       -   possibly preallocated output array (reallocate if too small); NULL if not needed.
+//     D1      -   possibly preallocated output array (reallocate if too small); NULL if not needed.
+//     D2      -   possibly preallocated output array (reallocate if too small); NULL if not needed.
 //
 // OUTPUT ARRAYS:
 //     Y       -   values, if needed
 //     D1      -   first derivative, if needed
 //     D2      -   second derivative, if needed
 // ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
-void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold, ae_int_t n, RVector *x2, ae_int_t n2, RVector *y, bool needy, RVector *d1, bool needd1, RVector *d2, bool needd2) {
+static void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold, ae_int_t n, RVector *x2, ae_int_t n2, RVector *y, RVector *d1, RVector *d2) {
    ae_int_t intervalindex;
    ae_int_t pointindex;
    bool havetoadvance;
@@ -4927,14 +4896,14 @@ void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold, ae_in
    double db;
    double t;
 // Prepare space
-   if (needy && y->cnt < n2) {
-      ae_vector_set_length(y, n2);
+   if (y != NULL) {
+      vectorsetlengthatleast(y, n2);
    }
-   if (needd1 && d1->cnt < n2) {
-      ae_vector_set_length(d1, n2);
+   if (d1 != NULL) {
+      vectorsetlengthatleast(d1, n2);
    }
-   if (needd2 && d2->cnt < n2) {
-      ae_vector_set_length(d2, n2);
+   if (d2 != NULL) {
+      vectorsetlengthatleast(d2, n2);
    }
 // These assignments aren't actually needed
 // (variables are initialized in the loop below),
@@ -4982,13 +4951,13 @@ void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold, ae_in
       }
    // Calculate spline and its derivatives using power basis
       t -= a;
-      if (needy) {
+      if (y != NULL) {
          y->xR[pointindex] = c0 + t * (c1 + t * (c2 + t * c3));
       }
-      if (needd1) {
+      if (d1 != NULL) {
          d1->xR[pointindex] = c1 + 2 * t * c2 + 3 * t * t * c3;
       }
-      if (needd2) {
+      if (d2 != NULL) {
          d2->xR[pointindex] = 2 * c2 + 6 * t * c3;
       }
       pointindex++;
@@ -5076,8 +5045,6 @@ void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, 
    NewVector(b, 0, DT_REAL);
    NewVector(d, 0, DT_REAL);
    NewVector(dt, 0, DT_REAL);
-   NewVector(d1, 0, DT_REAL);
-   NewVector(d2, 0, DT_REAL);
    NewVector(p, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
 // check correctness of boundary conditions
@@ -5124,8 +5091,8 @@ void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, 
 // * call internal GridDiff() function to get Hermite form of spline
 // * convert using internal Conv() function
 // * convert Y2 back to original order
-   spline1d_spline1dgriddiffcubicinternal(x, y, n, boundltype, boundl, boundrtype, boundr, &d, &a1, &a2, &a3, &b, &dt);
-   spline1dconvdiffinternal(x, y, &d, n, x2, n2, y2, true, &d1, false, &d2, false);
+   spline1d_spline1dgriddiffcubicinternal(x, y, n, boundltype, boundl, boundrtype, boundr, &d, &a1, &a2, &a3, &b);
+   spline1dconvdiffinternal(x, y, &d, n, x2, n2, y2, NULL, NULL);
    ae_assert(dt.cnt >= n2, "Spline1DConvCubic: internal error!");
    for (i = 0; i < n2; i++) {
       dt.xR[p2.xZ[i]] = y2->xR[i];
@@ -5217,7 +5184,6 @@ void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
    NewVector(b, 0, DT_REAL);
    NewVector(d, 0, DT_REAL);
    NewVector(dt, 0, DT_REAL);
-   NewVector(rt1, 0, DT_REAL);
    NewVector(p, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
 // check correctness of boundary conditions
@@ -5264,8 +5230,8 @@ void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 // * call internal GridDiff() function to get Hermite form of spline
 // * convert using internal Conv() function
 // * convert Y2 back to original order
-   spline1d_spline1dgriddiffcubicinternal(x, y, n, boundltype, boundl, boundrtype, boundr, &d, &a1, &a2, &a3, &b, &dt);
-   spline1dconvdiffinternal(x, y, &d, n, x2, n2, y2, true, d2, true, &rt1, false);
+   spline1d_spline1dgriddiffcubicinternal(x, y, n, boundltype, boundl, boundrtype, boundr, &d, &a1, &a2, &a3, &b);
+   spline1dconvdiffinternal(x, y, &d, n, x2, n2, y2, d2, NULL);
    ae_assert(dt.cnt >= n2, "Spline1DConvDiffCubic: internal error!");
    for (i = 0; i < n2; i++) {
       dt.xR[p2.xZ[i]] = y2->xR[i];
@@ -5410,8 +5376,8 @@ void spline1dconvdiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 // * call internal GridDiff() function to get Hermite form of spline
 // * convert using internal Conv() function
 // * convert Y2 back to original order
-   spline1d_spline1dgriddiffcubicinternal(x, y, n, boundltype, boundl, boundrtype, boundr, &d, &a1, &a2, &a3, &b, &dt);
-   spline1dconvdiffinternal(x, y, &d, n, x2, n2, y2, true, d2, true, dd2, true);
+   spline1d_spline1dgriddiffcubicinternal(x, y, n, boundltype, boundl, boundrtype, boundr, &d, &a1, &a2, &a3, &b);
+   spline1dconvdiffinternal(x, y, &d, n, x2, n2, y2, d2, dd2);
    ae_assert(dt.cnt >= n2, "Spline1DConvDiff2Cubic: internal error!");
    for (i = 0; i < n2; i++) {
       dt.xR[p2.xZ[i]] = y2->xR[i];
@@ -5757,6 +5723,262 @@ double spline1dintegrate(spline1dinterpolant *c, double x) {
    }
    result += additionalterm;
    return result;
+}
+
+// This function is an obsolete and deprecated version of fitting by
+// penalized cubic spline.
+//
+// It was superseded by spline1dfit(), which is an orders of magnitude faster
+// and more memory-efficient implementation.
+//
+// Do NOT use this function in the new code!
+// ALGLIB Project: Copyright 19.10.2010 by Sergey Bochkanov
+// API: void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
+// API: void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
+void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t b;
+   double v;
+   double relcnt;
+   double xa;
+   double xb;
+   double sa;
+   double sb;
+   double pdecay;
+   double tdecay;
+   double fdmax;
+   double admax;
+   double fa;
+   double ga;
+   double fb;
+   double gb;
+   double lambdav;
+   ae_frame_make(&_frame_block);
+   DupVector(x);
+   DupVector(y);
+   DupVector(w);
+   *info = 0;
+   SetObj(spline1dinterpolant, s);
+   SetObj(spline1dfitreport, rep);
+   NewVector(xoriginal, 0, DT_REAL);
+   NewVector(yoriginal, 0, DT_REAL);
+   NewMatrix(fmatrix, 0, 0, DT_REAL);
+   NewVector(fcolumn, 0, DT_REAL);
+   NewVector(y2, 0, DT_REAL);
+   NewVector(w2, 0, DT_REAL);
+   NewVector(xc, 0, DT_REAL);
+   NewVector(yc, 0, DT_REAL);
+   NewVector(dc, 0, DT_INT);
+   NewMatrix(amatrix, 0, 0, DT_REAL);
+   NewMatrix(d2matrix, 0, 0, DT_REAL);
+   NewVector(bx, 0, DT_REAL);
+   NewVector(by, 0, DT_REAL);
+   NewVector(bd1, 0, DT_REAL);
+   NewVector(bd2, 0, DT_REAL);
+   NewVector(tx, 0, DT_REAL);
+   NewVector(ty, 0, DT_REAL);
+   NewVector(td, 0, DT_REAL);
+   NewObj(spline1dinterpolant, bs);
+   NewMatrix(nmatrix, 0, 0, DT_REAL);
+   NewVector(rightpart, 0, DT_REAL);
+   NewObj(fblslincgstate, cgstate);
+   NewVector(c, 0, DT_REAL);
+   NewVector(tmp0, 0, DT_REAL);
+   ae_assert(n >= 1, "Spline1DFitPenalizedW: N<1!");
+   ae_assert(m >= 4, "Spline1DFitPenalizedW: M<4!");
+   ae_assert(x->cnt >= n, "Spline1DFitPenalizedW: Length(X)<N!");
+   ae_assert(y->cnt >= n, "Spline1DFitPenalizedW: Length(Y)<N!");
+   ae_assert(w->cnt >= n, "Spline1DFitPenalizedW: Length(W)<N!");
+   ae_assert(isfinitevector(x, n), "Spline1DFitPenalizedW: X contains infinite or NAN values!");
+   ae_assert(isfinitevector(y, n), "Spline1DFitPenalizedW: Y contains infinite or NAN values!");
+   ae_assert(isfinitevector(w, n), "Spline1DFitPenalizedW: Y contains infinite or NAN values!");
+   ae_assert(isfinite(rho), "Spline1DFitPenalizedW: Rho is infinite!");
+// Prepare LambdaV
+   v = -log(machineepsilon) / log(10.0);
+   if (rho < -v) {
+      rho = -v;
+   }
+   if (rho > v) {
+      rho = v;
+   }
+   lambdav = pow(10.0, rho);
+// Sort X, Y, W
+   heapsortdpoints(x, y, w, n);
+// Scale X, Y, XC, YC
+   lsfitscalexy(x, y, w, n, &xc, &yc, &dc, 0, &xa, &xb, &sa, &sb, &xoriginal, &yoriginal);
+// Allocate space
+   ae_matrix_set_length(&fmatrix, n, m);
+   ae_matrix_set_length(&amatrix, m, m);
+   ae_matrix_set_length(&d2matrix, m, m);
+   ae_vector_set_length(&bx, m);
+   ae_vector_set_length(&by, m);
+   ae_vector_set_length(&fcolumn, n);
+   ae_matrix_set_length(&nmatrix, m, m);
+   ae_vector_set_length(&rightpart, m);
+   ae_vector_set_length(&tmp0, imax2(m, n));
+   ae_vector_set_length(&c, m);
+// Fill:
+// * FMatrix by values of basis functions
+// * TmpAMatrix by second derivatives of I-th function at J-th point
+// * CMatrix by constraints
+   fdmax = 0.0;
+   for (b = 0; b < m; b++) {
+   // Prepare I-th basis function
+      for (j = 0; j < m; j++) {
+         bx.xR[j] = (double)(2 * j) / (m - 1) - 1;
+         by.xR[j] = 0.0;
+      }
+      by.xR[b] = 1.0;
+      spline1dgriddiff2cubic(&bx, &by, m, 2, 0.0, 2, 0.0, &bd1, &bd2);
+      spline1dbuildcubic(&bx, &by, m, 2, 0.0, 2, 0.0, &bs);
+   // Calculate B-th column of FMatrix
+   // Update FDMax (maximum column norm)
+      spline1dconvcubic(&bx, &by, m, 2, 0.0, 2, 0.0, x, n, &fcolumn);
+      ae_v_move(&fmatrix.xyR[0][b], fmatrix.stride, fcolumn.xR, 1, n);
+      v = 0.0;
+      for (i = 0; i < n; i++) {
+         v += sqr(w->xR[i] * fcolumn.xR[i]);
+      }
+      fdmax = rmax2(fdmax, v);
+   // Fill temporary with second derivatives of basis function
+      ae_v_move(d2matrix.xyR[b], 1, bd2.xR, 1, m);
+   }
+// * calculate penalty matrix A
+// * calculate max of diagonal elements of A
+// * calculate PDecay - coefficient before penalty matrix
+   for (i = 0; i < m; i++) {
+      for (j = i; j < m; j++) {
+      // calculate integral(B_i''*B_j'') where B_i and B_j are
+      // i-th and j-th basis splines.
+      // B_i and B_j are piecewise linear functions.
+         v = 0.0;
+         for (b = 0; b < m - 1; b++) {
+            fa = d2matrix.xyR[i][b];
+            fb = d2matrix.xyR[i][b + 1];
+            ga = d2matrix.xyR[j][b];
+            gb = d2matrix.xyR[j][b + 1];
+            v += (bx.xR[b + 1] - bx.xR[b]) * (fa * ga + (fa * (gb - ga) + ga * (fb - fa)) / 2 + (fb - fa) * (gb - ga) / 3);
+         }
+         amatrix.xyR[i][j] = v;
+         amatrix.xyR[j][i] = v;
+      }
+   }
+   admax = 0.0;
+   for (i = 0; i < m; i++) {
+      admax = rmax2(admax, fabs(amatrix.xyR[i][i]));
+   }
+   pdecay = lambdav * fdmax / admax;
+// Calculate TDecay for Tikhonov regularization
+   tdecay = fdmax * (1.0 + pdecay) * 10.0 * machineepsilon;
+// Prepare system
+//
+// NOTE: FMatrix is spoiled during this process
+   for (i = 0; i < n; i++) {
+      v = w->xR[i];
+      ae_v_muld(fmatrix.xyR[i], 1, m, v);
+   }
+   rmatrixgemm(m, m, n, 1.0, &fmatrix, 0, 0, 1, &fmatrix, 0, 0, 0, 0.0, &nmatrix, 0, 0);
+   for (i = 0; i < m; i++) {
+      for (j = 0; j < m; j++) {
+         nmatrix.xyR[i][j] += pdecay * amatrix.xyR[i][j];
+      }
+   }
+   for (i = 0; i < m; i++) {
+      nmatrix.xyR[i][i] += tdecay;
+   }
+   for (i = 0; i < m; i++) {
+      rightpart.xR[i] = 0.0;
+   }
+   for (i = 0; i < n; i++) {
+      v = y->xR[i] * w->xR[i];
+      ae_v_addd(rightpart.xR, 1, fmatrix.xyR[i], 1, m, v);
+   }
+// Solve system
+   if (!spdmatrixcholesky(&nmatrix, m, true)) {
+      *info = -4;
+      ae_frame_leave();
+      return;
+   }
+   fblscholeskysolve(&nmatrix, 1.0, m, true, &rightpart, &tmp0);
+   ae_v_move(c.xR, 1, rightpart.xR, 1, m);
+// add nodes to force linearity outside of the fitting interval
+   spline1dgriddiffcubic(&bx, &c, m, 2, 0.0, 2, 0.0, &bd1);
+   ae_vector_set_length(&tx, m + 2);
+   ae_vector_set_length(&ty, m + 2);
+   ae_vector_set_length(&td, m + 2);
+   ae_v_move(&tx.xR[1], 1, bx.xR, 1, m);
+   ae_v_move(&ty.xR[1], 1, rightpart.xR, 1, m);
+   ae_v_move(&td.xR[1], 1, bd1.xR, 1, m);
+   tx.xR[0] = tx.xR[1] - (tx.xR[2] - tx.xR[1]);
+   ty.xR[0] = ty.xR[1] - td.xR[1] * (tx.xR[2] - tx.xR[1]);
+   td.xR[0] = td.xR[1];
+   tx.xR[m + 1] = tx.xR[m] + (tx.xR[m] - tx.xR[m - 1]);
+   ty.xR[m + 1] = ty.xR[m] + td.xR[m] * (tx.xR[m] - tx.xR[m - 1]);
+   td.xR[m + 1] = td.xR[m];
+   spline1dbuildhermite(&tx, &ty, &td, m + 2, s);
+   spline1dlintransx(s, 2 / (xb - xa), -(xa + xb) / (xb - xa));
+   spline1dlintransy(s, sb - sa, sa);
+   *info = 1;
+// Fill report
+   rep->rmserror = 0.0;
+   rep->avgerror = 0.0;
+   rep->avgrelerror = 0.0;
+   rep->maxerror = 0.0;
+   relcnt = 0.0;
+   spline1dconvcubic(&bx, &rightpart, m, 2, 0.0, 2, 0.0, x, n, &fcolumn);
+   for (i = 0; i < n; i++) {
+      v = (sb - sa) * fcolumn.xR[i] + sa;
+      rep->rmserror += sqr(v - yoriginal.xR[i]);
+      rep->avgerror += fabs(v - yoriginal.xR[i]);
+      if (yoriginal.xR[i] != 0.0) {
+         rep->avgrelerror += fabs(v - yoriginal.xR[i]) / fabs(yoriginal.xR[i]);
+         relcnt++;
+      }
+      rep->maxerror = rmax2(rep->maxerror, fabs(v - yoriginal.xR[i]));
+   }
+   rep->rmserror = sqrt(rep->rmserror / n);
+   rep->avgerror /= n;
+   if (relcnt != 0.0) {
+      rep->avgrelerror /= relcnt;
+   }
+   ae_frame_leave();
+}
+
+// This function is an obsolete and deprecated version of fitting by
+// penalized cubic spline.
+//
+// It was superseded by spline1dfit(), which is an orders of magnitude faster
+// and more memory-efficient implementation.
+//
+// Do NOT use this function in the new code!
+// ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
+// API: void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
+// API: void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
+void spline1dfitpenalized(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_frame_make(&_frame_block);
+   DupVector(x);
+   DupVector(y);
+   *info = 0;
+   SetObj(spline1dinterpolant, s);
+   SetObj(spline1dfitreport, rep);
+   NewVector(w, 0, DT_REAL);
+   ae_assert(n >= 1, "Spline1DFitPenalized: N<1!");
+   ae_assert(m >= 4, "Spline1DFitPenalized: M<4!");
+   ae_assert(x->cnt >= n, "Spline1DFitPenalized: Length(X)<N!");
+   ae_assert(y->cnt >= n, "Spline1DFitPenalized: Length(Y)<N!");
+   ae_assert(isfinitevector(x, n), "Spline1DFitPenalized: X contains infinite or NAN values!");
+   ae_assert(isfinitevector(y, n), "Spline1DFitPenalized: Y contains infinite or NAN values!");
+   ae_assert(isfinite(rho), "Spline1DFitPenalized: Rho is infinite!");
+   ae_vector_set_length(&w, n);
+   for (i = 0; i < n; i++) {
+      w.xR[i] = 1.0;
+   }
+   spline1dfitpenalizedw(x, y, &w, n, m, rho, info, s, rep);
+   ae_frame_leave();
 }
 
 // Fitting by smoothing (penalized) cubic spline.
@@ -7369,6 +7591,40 @@ double spline1dintegrate(const spline1dinterpolant &c, const double x) {
    alglib_impl::ae_state_clear();
    return D;
 }
+
+void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::spline1dfitpenalizedw(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep));
+   alglib_impl::ae_state_clear();
+}
+#if !defined AE_NO_EXCEPTIONS
+void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
+   if (x.length() != y.length() || x.length() != w.length()) ThrowError("Error while calling 'spline1dfitpenalizedw': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::spline1dfitpenalizedw(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep));
+   alglib_impl::ae_state_clear();
+}
+#endif
+
+void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::spline1dfitpenalized(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep));
+   alglib_impl::ae_state_clear();
+}
+#if !defined AE_NO_EXCEPTIONS
+void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
+   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dfitpenalized': looks like one of arguments has wrong size");
+   ae_int_t n = x.length();
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::spline1dfitpenalized(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep));
+   alglib_impl::ae_state_clear();
+}
+#endif
 
 void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep) {
    alglib_impl::ae_state_init();
@@ -24709,17 +24965,13 @@ static void spline3d_spline3ddiff(spline3dinterpolant *c, double x, double y, do
    ae_int_t l;
    ae_int_t r;
    ae_int_t h;
-   *f = 0;
-   *fx = 0;
-   *fy = 0;
-   *fxy = 0;
    ae_assert(c->stype == -1 || c->stype == -3, "Spline3DDiff: incorrect C (incorrect parameter C.SType)");
    ae_assert(isfinite(x) && isfinite(y), "Spline3DDiff: X or Y contains NaN or Infinite value");
 // Prepare F, dF/dX, dF/dY, d2F/dXdY
    *f = 0.0;
-   *fx = 0.0;
-   *fy = 0.0;
-   *fxy = 0.0;
+   if (fx != NULL) *fx = 0.0;
+   if (fy != NULL) *fy = 0.0;
+   if (fxy != NULL) *fxy = 0.0;
    if (c->d != 1) {
       return;
    }
@@ -24899,9 +25151,6 @@ void spline3dcalcv(spline3dinterpolant *c, double x, double y, double z, RVector
 // API: double spline3dcalc(const spline3dinterpolant &c, const double x, const double y, const double z);
 double spline3dcalc(spline3dinterpolant *c, double x, double y, double z) {
    double v;
-   double vx;
-   double vy;
-   double vxy;
    double result;
    ae_assert(c->stype == -1 || c->stype == -3, "Spline3DCalc: incorrect C (incorrect parameter C.SType)");
    ae_assert(isfinite(x) && isfinite(y) && isfinite(z), "Spline3DCalc: X=NaN/Infinite, Y=NaN/Infinite or Z=NaN/Infinite");
@@ -24909,7 +25158,7 @@ double spline3dcalc(spline3dinterpolant *c, double x, double y, double z) {
       result = 0.0;
       return result;
    }
-   spline3d_spline3ddiff(c, x, y, z, &v, &vx, &vy, &vxy);
+   spline3d_spline3ddiff(c, x, y, z, &v, NULL, NULL, NULL);
    result = v;
    return result;
 }
@@ -25616,262 +25865,6 @@ void nsfitspheremzc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, dou
    *rhi = 0;
    nsfitspherex(xy, npoints, nx, 3, 0.0, 0, 0.0, cx, rlo, rhi);
 }
-
-// This function is an obsolete and deprecated version of fitting by
-// penalized cubic spline.
-//
-// It was superseded by spline1dfit(), which is an orders of magnitude faster
-// and more memory-efficient implementation.
-//
-// Do NOT use this function in the new code!
-// ALGLIB Project: Copyright 19.10.2010 by Sergey Bochkanov
-// API: void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
-// API: void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
-void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t b;
-   double v;
-   double relcnt;
-   double xa;
-   double xb;
-   double sa;
-   double sb;
-   double pdecay;
-   double tdecay;
-   double fdmax;
-   double admax;
-   double fa;
-   double ga;
-   double fb;
-   double gb;
-   double lambdav;
-   ae_frame_make(&_frame_block);
-   DupVector(x);
-   DupVector(y);
-   DupVector(w);
-   *info = 0;
-   SetObj(spline1dinterpolant, s);
-   SetObj(spline1dfitreport, rep);
-   NewVector(xoriginal, 0, DT_REAL);
-   NewVector(yoriginal, 0, DT_REAL);
-   NewMatrix(fmatrix, 0, 0, DT_REAL);
-   NewVector(fcolumn, 0, DT_REAL);
-   NewVector(y2, 0, DT_REAL);
-   NewVector(w2, 0, DT_REAL);
-   NewVector(xc, 0, DT_REAL);
-   NewVector(yc, 0, DT_REAL);
-   NewVector(dc, 0, DT_INT);
-   NewMatrix(amatrix, 0, 0, DT_REAL);
-   NewMatrix(d2matrix, 0, 0, DT_REAL);
-   NewVector(bx, 0, DT_REAL);
-   NewVector(by, 0, DT_REAL);
-   NewVector(bd1, 0, DT_REAL);
-   NewVector(bd2, 0, DT_REAL);
-   NewVector(tx, 0, DT_REAL);
-   NewVector(ty, 0, DT_REAL);
-   NewVector(td, 0, DT_REAL);
-   NewObj(spline1dinterpolant, bs);
-   NewMatrix(nmatrix, 0, 0, DT_REAL);
-   NewVector(rightpart, 0, DT_REAL);
-   NewObj(fblslincgstate, cgstate);
-   NewVector(c, 0, DT_REAL);
-   NewVector(tmp0, 0, DT_REAL);
-   ae_assert(n >= 1, "Spline1DFitPenalizedW: N<1!");
-   ae_assert(m >= 4, "Spline1DFitPenalizedW: M<4!");
-   ae_assert(x->cnt >= n, "Spline1DFitPenalizedW: Length(X)<N!");
-   ae_assert(y->cnt >= n, "Spline1DFitPenalizedW: Length(Y)<N!");
-   ae_assert(w->cnt >= n, "Spline1DFitPenalizedW: Length(W)<N!");
-   ae_assert(isfinitevector(x, n), "Spline1DFitPenalizedW: X contains infinite or NAN values!");
-   ae_assert(isfinitevector(y, n), "Spline1DFitPenalizedW: Y contains infinite or NAN values!");
-   ae_assert(isfinitevector(w, n), "Spline1DFitPenalizedW: Y contains infinite or NAN values!");
-   ae_assert(isfinite(rho), "Spline1DFitPenalizedW: Rho is infinite!");
-// Prepare LambdaV
-   v = -log(machineepsilon) / log(10.0);
-   if (rho < -v) {
-      rho = -v;
-   }
-   if (rho > v) {
-      rho = v;
-   }
-   lambdav = pow(10.0, rho);
-// Sort X, Y, W
-   heapsortdpoints(x, y, w, n);
-// Scale X, Y, XC, YC
-   lsfitscalexy(x, y, w, n, &xc, &yc, &dc, 0, &xa, &xb, &sa, &sb, &xoriginal, &yoriginal);
-// Allocate space
-   ae_matrix_set_length(&fmatrix, n, m);
-   ae_matrix_set_length(&amatrix, m, m);
-   ae_matrix_set_length(&d2matrix, m, m);
-   ae_vector_set_length(&bx, m);
-   ae_vector_set_length(&by, m);
-   ae_vector_set_length(&fcolumn, n);
-   ae_matrix_set_length(&nmatrix, m, m);
-   ae_vector_set_length(&rightpart, m);
-   ae_vector_set_length(&tmp0, imax2(m, n));
-   ae_vector_set_length(&c, m);
-// Fill:
-// * FMatrix by values of basis functions
-// * TmpAMatrix by second derivatives of I-th function at J-th point
-// * CMatrix by constraints
-   fdmax = 0.0;
-   for (b = 0; b < m; b++) {
-   // Prepare I-th basis function
-      for (j = 0; j < m; j++) {
-         bx.xR[j] = (double)(2 * j) / (m - 1) - 1;
-         by.xR[j] = 0.0;
-      }
-      by.xR[b] = 1.0;
-      spline1dgriddiff2cubic(&bx, &by, m, 2, 0.0, 2, 0.0, &bd1, &bd2);
-      spline1dbuildcubic(&bx, &by, m, 2, 0.0, 2, 0.0, &bs);
-   // Calculate B-th column of FMatrix
-   // Update FDMax (maximum column norm)
-      spline1dconvcubic(&bx, &by, m, 2, 0.0, 2, 0.0, x, n, &fcolumn);
-      ae_v_move(&fmatrix.xyR[0][b], fmatrix.stride, fcolumn.xR, 1, n);
-      v = 0.0;
-      for (i = 0; i < n; i++) {
-         v += sqr(w->xR[i] * fcolumn.xR[i]);
-      }
-      fdmax = rmax2(fdmax, v);
-   // Fill temporary with second derivatives of basis function
-      ae_v_move(d2matrix.xyR[b], 1, bd2.xR, 1, m);
-   }
-// * calculate penalty matrix A
-// * calculate max of diagonal elements of A
-// * calculate PDecay - coefficient before penalty matrix
-   for (i = 0; i < m; i++) {
-      for (j = i; j < m; j++) {
-      // calculate integral(B_i''*B_j'') where B_i and B_j are
-      // i-th and j-th basis splines.
-      // B_i and B_j are piecewise linear functions.
-         v = 0.0;
-         for (b = 0; b < m - 1; b++) {
-            fa = d2matrix.xyR[i][b];
-            fb = d2matrix.xyR[i][b + 1];
-            ga = d2matrix.xyR[j][b];
-            gb = d2matrix.xyR[j][b + 1];
-            v += (bx.xR[b + 1] - bx.xR[b]) * (fa * ga + (fa * (gb - ga) + ga * (fb - fa)) / 2 + (fb - fa) * (gb - ga) / 3);
-         }
-         amatrix.xyR[i][j] = v;
-         amatrix.xyR[j][i] = v;
-      }
-   }
-   admax = 0.0;
-   for (i = 0; i < m; i++) {
-      admax = rmax2(admax, fabs(amatrix.xyR[i][i]));
-   }
-   pdecay = lambdav * fdmax / admax;
-// Calculate TDecay for Tikhonov regularization
-   tdecay = fdmax * (1.0 + pdecay) * 10.0 * machineepsilon;
-// Prepare system
-//
-// NOTE: FMatrix is spoiled during this process
-   for (i = 0; i < n; i++) {
-      v = w->xR[i];
-      ae_v_muld(fmatrix.xyR[i], 1, m, v);
-   }
-   rmatrixgemm(m, m, n, 1.0, &fmatrix, 0, 0, 1, &fmatrix, 0, 0, 0, 0.0, &nmatrix, 0, 0);
-   for (i = 0; i < m; i++) {
-      for (j = 0; j < m; j++) {
-         nmatrix.xyR[i][j] += pdecay * amatrix.xyR[i][j];
-      }
-   }
-   for (i = 0; i < m; i++) {
-      nmatrix.xyR[i][i] += tdecay;
-   }
-   for (i = 0; i < m; i++) {
-      rightpart.xR[i] = 0.0;
-   }
-   for (i = 0; i < n; i++) {
-      v = y->xR[i] * w->xR[i];
-      ae_v_addd(rightpart.xR, 1, fmatrix.xyR[i], 1, m, v);
-   }
-// Solve system
-   if (!spdmatrixcholesky(&nmatrix, m, true)) {
-      *info = -4;
-      ae_frame_leave();
-      return;
-   }
-   fblscholeskysolve(&nmatrix, 1.0, m, true, &rightpart, &tmp0);
-   ae_v_move(c.xR, 1, rightpart.xR, 1, m);
-// add nodes to force linearity outside of the fitting interval
-   spline1dgriddiffcubic(&bx, &c, m, 2, 0.0, 2, 0.0, &bd1);
-   ae_vector_set_length(&tx, m + 2);
-   ae_vector_set_length(&ty, m + 2);
-   ae_vector_set_length(&td, m + 2);
-   ae_v_move(&tx.xR[1], 1, bx.xR, 1, m);
-   ae_v_move(&ty.xR[1], 1, rightpart.xR, 1, m);
-   ae_v_move(&td.xR[1], 1, bd1.xR, 1, m);
-   tx.xR[0] = tx.xR[1] - (tx.xR[2] - tx.xR[1]);
-   ty.xR[0] = ty.xR[1] - td.xR[1] * (tx.xR[2] - tx.xR[1]);
-   td.xR[0] = td.xR[1];
-   tx.xR[m + 1] = tx.xR[m] + (tx.xR[m] - tx.xR[m - 1]);
-   ty.xR[m + 1] = ty.xR[m] + td.xR[m] * (tx.xR[m] - tx.xR[m - 1]);
-   td.xR[m + 1] = td.xR[m];
-   spline1dbuildhermite(&tx, &ty, &td, m + 2, s);
-   spline1dlintransx(s, 2 / (xb - xa), -(xa + xb) / (xb - xa));
-   spline1dlintransy(s, sb - sa, sa);
-   *info = 1;
-// Fill report
-   rep->rmserror = 0.0;
-   rep->avgerror = 0.0;
-   rep->avgrelerror = 0.0;
-   rep->maxerror = 0.0;
-   relcnt = 0.0;
-   spline1dconvcubic(&bx, &rightpart, m, 2, 0.0, 2, 0.0, x, n, &fcolumn);
-   for (i = 0; i < n; i++) {
-      v = (sb - sa) * fcolumn.xR[i] + sa;
-      rep->rmserror += sqr(v - yoriginal.xR[i]);
-      rep->avgerror += fabs(v - yoriginal.xR[i]);
-      if (yoriginal.xR[i] != 0.0) {
-         rep->avgrelerror += fabs(v - yoriginal.xR[i]) / fabs(yoriginal.xR[i]);
-         relcnt++;
-      }
-      rep->maxerror = rmax2(rep->maxerror, fabs(v - yoriginal.xR[i]));
-   }
-   rep->rmserror = sqrt(rep->rmserror / n);
-   rep->avgerror /= n;
-   if (relcnt != 0.0) {
-      rep->avgrelerror /= relcnt;
-   }
-   ae_frame_leave();
-}
-
-// This function is an obsolete and deprecated version of fitting by
-// penalized cubic spline.
-//
-// It was superseded by spline1dfit(), which is an orders of magnitude faster
-// and more memory-efficient implementation.
-//
-// Do NOT use this function in the new code!
-// ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
-// API: void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
-// API: void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
-void spline1dfitpenalized(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_frame_make(&_frame_block);
-   DupVector(x);
-   DupVector(y);
-   *info = 0;
-   SetObj(spline1dinterpolant, s);
-   SetObj(spline1dfitreport, rep);
-   NewVector(w, 0, DT_REAL);
-   ae_assert(n >= 1, "Spline1DFitPenalized: N<1!");
-   ae_assert(m >= 4, "Spline1DFitPenalized: M<4!");
-   ae_assert(x->cnt >= n, "Spline1DFitPenalized: Length(X)<N!");
-   ae_assert(y->cnt >= n, "Spline1DFitPenalized: Length(Y)<N!");
-   ae_assert(isfinitevector(x, n), "Spline1DFitPenalized: X contains infinite or NAN values!");
-   ae_assert(isfinitevector(y, n), "Spline1DFitPenalized: Y contains infinite or NAN values!");
-   ae_assert(isfinite(rho), "Spline1DFitPenalized: Rho is infinite!");
-   ae_vector_set_length(&w, n);
-   for (i = 0; i < n; i++) {
-      w.xR[i] = 1.0;
-   }
-   spline1dfitpenalizedw(x, y, &w, n, m, rho, info, s, rep);
-   ae_frame_leave();
-}
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -25902,40 +25895,6 @@ void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_in
    alglib_impl::nsfitspheremzc(ConstT(ae_matrix, xy), npoints, nx, ConstT(ae_vector, cx), &rlo, &rhi);
    alglib_impl::ae_state_clear();
 }
-
-void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::spline1dfitpenalizedw(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep));
-   alglib_impl::ae_state_clear();
-}
-#if !defined AE_NO_EXCEPTIONS
-void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
-   if (x.length() != y.length() || x.length() != w.length()) ThrowError("Error while calling 'spline1dfitpenalizedw': looks like one of arguments has wrong size");
-   ae_int_t n = x.length();
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::spline1dfitpenalizedw(ConstT(ae_vector, x), ConstT(ae_vector, y), ConstT(ae_vector, w), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep));
-   alglib_impl::ae_state_clear();
-}
-#endif
-
-void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::spline1dfitpenalized(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep));
-   alglib_impl::ae_state_clear();
-}
-#if !defined AE_NO_EXCEPTIONS
-void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep) {
-   if (x.length() != y.length()) ThrowError("Error while calling 'spline1dfitpenalized': looks like one of arguments has wrong size");
-   ae_int_t n = x.length();
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::spline1dfitpenalized(ConstT(ae_vector, x), ConstT(ae_vector, y), n, m, rho, &info, ConstT(spline1dinterpolant, s), ConstT(spline1dfitreport, rep));
-   alglib_impl::ae_state_clear();
-}
-#endif
 } // end of namespace alglib
 
 // === RBF Package ===
@@ -25977,19 +25936,6 @@ static void rbf_initializev1(ae_int_t nx, ae_int_t ny, rbfv1model *s) {
 static void rbf_initializev2(ae_int_t nx, ae_int_t ny, rbfv2model *s) {
    SetObj(rbfv2model, s);
    rbfv2create(nx, ny, s);
-}
-
-// Cleans report fields
-// ALGLIB: Copyright 16.06.2016 by Sergey Bochkanov
-static void rbf_clearreportfields(rbfreport *rep) {
-   rep->rmserror = NAN;
-   rep->maxerror = NAN;
-   rep->arows = 0;
-   rep->acols = 0;
-   rep->annz = 0;
-   rep->iterationscount = 0;
-   rep->nmv = 0;
-   rep->terminationtype = 0;
 }
 
 // This function creates RBF  model  for  a  scalar (NY=1)  or  vector (NY>1)
@@ -26756,7 +26702,13 @@ void rbfbuildmodel(rbfmodel *s, rbfreport *rep) {
    NewMatrix(x3, 0, 0, DT_REAL);
    NewVector(scalevec, 0, DT_REAL);
 // Clean fields prior to processing
-   rbf_clearreportfields(rep);
+// ALGLIB: Copyright 16.06.2016 by Sergey Bochkanov
+   rep->maxerror = rep->rmserror = NAN;
+   rep->acols = rep->arows = 0;
+   rep->annz = 0;
+   rep->iterationscount = 0;
+   rep->nmv = 0;
+   rep->terminationtype = 0;
    s->progress10000 = 0;
    s->terminationrequest = false;
 // Autoselect algorithm
