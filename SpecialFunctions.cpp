@@ -1579,7 +1579,7 @@ namespace alglib_impl {
 //
 // For t < -2, this is the method of computation.  For higher t,
 // a direct method is derived from integration by parts.
-// Since the function is symmetric about t=0, the area under the
+// Since the function is symmetric about t = 0, the area under the
 // right tail of the density is found by calling the function
 // with -t instead of t.
 //
@@ -1835,10 +1835,10 @@ double fcdistribution(ae_int_t a, ae_int_t b, double x) {
 //
 //              a,b                     Relative error:
 // arithmetic  domain     # trials      peak         rms
-//  For p between .001 and 1:
+// For p between .001 and 1:
 //    IEEE     1,100       100000      8.3e-15     4.7e-16
 //    IEEE     1,10000     100000      2.1e-11     1.4e-13
-//  For p between 10^-6 and 10^-3:
+// For p between 10^-6 and 10^-3:
 //    IEEE     1,100        50000      1.3e-12     8.4e-15
 //    IEEE     1,10000      50000      3.0e-12     4.8e-14
 //
@@ -2409,7 +2409,7 @@ namespace alglib_impl {
 //
 //               a,b                     Relative error:
 // arithmetic  domain     # trials      peak         rms
-//  For p between 0.001 and 1:
+// For p between 0.001 and 1:
 //    IEEE     0,100       100000      4.3e-15     2.6e-16
 //
 // Cephes Math Library Release 2.8:  June, 2000
@@ -2464,9 +2464,9 @@ double binomialdistribution(ae_int_t k, ae_int_t n, double p) {
 //
 //               a,b                     Relative error:
 // arithmetic  domain     # trials      peak         rms
-//  For p between 0.001 and 1:
+// For p between 0.001 and 1:
 //    IEEE     0,100       100000      6.7e-15     8.2e-16
-//  For p between 0 and .001:
+// For p between 0 and .001:
 //    IEEE     0,100       100000      1.5e-13     2.7e-15
 //
 // Cephes Math Library Release 2.8:  June, 2000
@@ -2518,10 +2518,10 @@ double binomialcdistribution(ae_int_t k, ae_int_t n, double p) {
 //
 //               a,b                     Relative error:
 // arithmetic  domain     # trials      peak         rms
-//  For p between 0.001 and 1:
+// For p between 0.001 and 1:
 //    IEEE     0,100       100000      2.3e-14     6.4e-16
 //    IEEE     0,10000     100000      6.6e-12     1.2e-13
-//  For p between 10^-6 and 0.001:
+// For p between 10^-6 and 0.001:
 //    IEEE     0,100       100000      2.0e-12     1.3e-14
 //    IEEE     0,10000     100000      1.5e-12     3.2e-14
 //
@@ -3364,7 +3364,7 @@ double chebyshevcalculate(ae_int_t r, ae_int_t n, double x) {
       a = 1.0;
       b = 2 * x;
    }
-// Special cases: N=0 or N=1
+// Special cases: N = 0 or N = 1
    if (n == 0) {
       result = a;
       return result;
@@ -4484,7 +4484,7 @@ double hermitecalculate(ae_int_t n, double x) {
 // Prepare A and B
    a = 1.0;
    b = 2 * x;
-// Special cases: N=0 or N=1
+// Special cases: N = 0 or N = 1
    if (n == 0) {
       result = a;
       return result;

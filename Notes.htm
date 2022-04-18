@@ -685,7 +685,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 01	The original version: ALGLIB 3.15.0.
 	Many of the revisions described in the previous section were implemented here and in the previous stage.
 02	The allocation counters were fully turned on.
-03	The rcomm-related structures removed and replaced by an integer "stage" variable; the AutoS macro added (for "static Thread_local").
+03	The RComm-related structures removed and replaced by an integer "stage" variable; the AutoS macro added (for "static Thread_local").
 04	The FP operations removed, except for the FP comparison operations.
 05	The FP comparison operations replaced by macros that directly invoke the floating point operators {==,!=,&lt;,&lt;=,&gt;,&gt;=} with the optimization bug fixed;
 	this requires repairing a flaw in GCC on x86_64 platforms and possibly elsewhere.

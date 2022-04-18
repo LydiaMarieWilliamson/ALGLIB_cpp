@@ -389,7 +389,7 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w)
 }
 
 // Returns  nodes/weights  for  Gauss-Jacobi quadrature on [-1,1] with weight
-// function W(x)=power(1-x,Alpha)*power(1+x,Beta).
+// function W(x) = power(1-x,Alpha)*power(1+x,Beta).
 //
 // Inputs:
 //     N           -   number of nodes, >= 1
@@ -467,7 +467,7 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
 }
 
 // Returns  nodes/weights  for  Gauss-Laguerre  quadrature  on  [0,+inf) with
-// weight function W(x)=power(x,Alpha)*exp(-x)
+// weight function W(x) = power(x,Alpha)*exp(-x)
 //
 // Inputs:
 //     N           -   number of nodes, >= 1
@@ -536,7 +536,7 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
 }
 
 // Returns  nodes/weights  for  Gauss-Hermite  quadrature on (-inf,+inf) with
-// weight function W(x)=exp(-x*x)
+// weight function W(x) = exp(-x*x)
 //
 // Inputs:
 //     N           -   number of nodes, >= 1
@@ -676,7 +676,7 @@ namespace alglib_impl {
 //                             be created for such a weight function  with  a
 //                             given number of nodes.
 //                     * -4    N is too large, task may be ill  conditioned -
-//                             x[i]=x[i+1] found.
+//                             x[i] == x[i+1] found.
 //                     * -3    internal eigenproblem solver hasn't converged
 //                     * -2    Beta[i] <= 0
 //                     * -1    incorrect N was passed
@@ -1302,7 +1302,7 @@ void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w
 // Returns   Gauss   and   Gauss-Kronrod   nodes/weights   for   Gauss-Jacobi
 // quadrature on [-1,1] with weight function
 //
-//     W(x)=power(1-x,Alpha)*power(1+x,Beta).
+//     W(x) = power(1-x,Alpha)*power(1+x,Beta).
 //
 // Inputs:
 //     N           -   number of Kronrod nodes, must be odd number, >= 3.
@@ -1450,7 +1450,7 @@ static const ae_int_t autogk_maxsubintervals = 10000;
 // subroutine can overlook them.
 //
 // Inputs:
-//     A, B    -   interval boundaries (A < B, A = B or A > B)
+//     A, B    -   interval boundaries (A < B, A == B or A > B)
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -1484,7 +1484,7 @@ void autogksmoothw(double a, double b, double xwidth, autogkstate *state) {
 // cases.
 //
 // Inputs:
-//     A, B    -   interval boundaries (A < B, A = B or A > B)
+//     A, B    -   interval boundaries (A < B, A == B or A > B)
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -1515,7 +1515,7 @@ void autogksmooth(double a, double b, autogkstate *state) {
 // is calculated with accuracy close to the machine precision.
 //
 // Inputs:
-//     A, B    -   interval boundaries (A < B, A = B or A > B)
+//     A, B    -   interval boundaries (A < B, A == B or A > B)
 //     Alpha   -   power-law coefficient of the F(x) at A,
 //                 Alpha > -1
 //     Beta    -   power-law coefficient of the F(x) at B,
@@ -1544,11 +1544,11 @@ void autogksingular(double a, double b, double alpha, double beta, autogkstate *
 }
 
 // Internal AutoGK subroutine
-// eps<0   - error
-// eps=0   - automatic eps selection
+// eps < 0  - error
+// eps == 0 - automatic eps selection
 //
-// width<0 -   error
-// width=0 -   no width requirements
+// width < 0  - error
+// width == 0 - no width requirements
 static void autogk_autogkinternalprepare(double a, double b, double eps, double xwidth, autogkinternalstate *state) {
 // Save settings
    state->a = a;
@@ -1909,7 +1909,7 @@ Spawn:
       state->v = state->internalstate.r;
       state->terminationtype = state->internalstate.info;
       state->nintervals = state->internalstate.heapused;
-   } else if (state->wrappermode == 1) { // function with Power-law singularities at the ends of a finite interval
+   } else if (state->wrappermode == 1) { // function with power-law singularities at the ends of a finite interval
    // test coefficients
       if (alpha <= -1.0 || beta <= -1.0) {
          state->terminationtype = -1;

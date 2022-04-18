@@ -29,7 +29,7 @@ void hqrndseed(ae_int_t s1, ae_int_t s2, hqrndstate *state) {
    SetObj(hqrndstate, state);
 // Protection against negative seeds:
 //
-//     SEED := -(SEED+1)
+//     SEED = -(SEED+1)
 //
 // We can't use just "-SEED" because there exists an integer number  N
 // such that -N < 0 and +N < 0. (This number is equal to 0x800...000).
@@ -114,7 +114,7 @@ ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n) {
    ae_int_t result;
    ae_assert(n > 0, "hqrnduniformi: N <= 0!");
    maxcnt = hqrnd_hqrndmax + 1;
-// Two branches: one for N <= MaxCnt, another for N>MaxCnt.
+// Two branches: one for N <= MaxCnt, another for N > MaxCnt.
    if (n > maxcnt) {
    // N >= MaxCnt.
    //
@@ -307,7 +307,7 @@ void hqrndnormalm(hqrndstate *state, ae_int_t m, ae_int_t n, RMatrix *x) {
    }
 }
 
-// Random number generator: random X and Y such that X^2+Y^2=1
+// Random number generator: random X and Y such that X^2+Y^2 == 1
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
@@ -350,7 +350,7 @@ double hqrndexponential(hqrndstate *state, double lambdav) {
 //         N   -   number of elements to use, N >= 1
 //
 // Result:
-//     this function returns one of the X[i] for random i=0..N-1
+//     this function returns one of the X[i] for random i = 0..N-1
 // ALGLIB: Copyright 08.11.2011 by Sergey Bochkanov
 // API: double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n);
 double hqrnddiscrete(hqrndstate *state, RVector *x, ae_int_t n) {
@@ -919,7 +919,7 @@ void xdebugi2transpose(ZMatrix *a) {
    ae_frame_leave();
 }
 
-// Generate MxN matrix with elements set to "Sign(sin(3*I+5*J))"
+// Generate MxN matrix with elements set to "sign(sin(3*I+5*J))"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a);
@@ -1418,7 +1418,7 @@ static ae_int_t nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i
 // split XY/Tags in two parts:
 // * [ILeft,IRight] is non-processed part of XY/Tags
 //
-// After cycle is done, we have Ileft=IRight. We deal with
+// After cycle is done, we have Ileft == IRight. We deal with
 // this element separately.
 //
 // After this, [I1,ILeft) contains left part, and [ILeft,I2)
@@ -1511,7 +1511,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
 // rearrange points into [I1,I3) and [I3,I2).
 //
 // In case all points has same value of D-th component
-// (MinV=MaxV) we enforce D-th dimension of bounding
+// (MinV == MaxV) we enforce D-th dimension of bounding
 // box to become exactly zero and repeat tree construction.
    s = kdt->innerbuf.curboxmin.xR[d] + 0.5 * ds;
    ae_v_move(kdt->innerbuf.buf.xR, 1, &kdt->xy.xyR[i1][d], kdt->xy.stride, i2 - i1);
@@ -1541,7 +1541,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
    }
    if (minv == maxv) {
    // In case all points has same value of D-th component
-   // (MinV=MaxV) we enforce D-th dimension of bounding
+   // (MinV == MaxV) we enforce D-th dimension of bounding
    // box to become exactly zero and repeat tree construction.
       v0 = kdt->innerbuf.curboxmin.xR[d];
       v1 = kdt->innerbuf.curboxmax.xR[d];
@@ -1676,7 +1676,7 @@ void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf) {
 //    requirements.
 // 2. Although KD-trees may be used with any combination of N  and  NX,  they
 //    are more efficient than brute-force search only when N >> 4^NX. So they
-//    are most useful in low-dimensional tasks (NX=2, NX=3). NX=1  is another
+//    are most useful in low-dimensional tasks (NX == 2, NX == 3). NX == 1  is another
 //    inefficient case, because  simple  binary  search  (without  additional
 //    structures) is much more efficient in such tasks than KD-trees.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
@@ -1688,12 +1688,12 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
    ae_int_t nodesoffs;
    ae_int_t splitsoffs;
    SetObj(kdtree, kdt);
-   ae_assert(n >= 0, "KDTreeBuildTagged: N<0");
-   ae_assert(nx >= 1, "KDTreeBuildTagged: NX<1");
-   ae_assert(ny >= 0, "KDTreeBuildTagged: NY<0");
+   ae_assert(n >= 0, "KDTreeBuildTagged: N < 0");
+   ae_assert(nx >= 1, "KDTreeBuildTagged: NX < 1");
+   ae_assert(ny >= 0, "KDTreeBuildTagged: NY < 0");
    ae_assert(normtype >= 0 && normtype <= 2, "KDTreeBuildTagged: incorrect NormType");
-   ae_assert(xy->rows >= n, "KDTreeBuildTagged: rows(X)<N");
-   ae_assert(xy->cols >= nx + ny || n == 0, "KDTreeBuildTagged: cols(X)<NX+NY");
+   ae_assert(xy->rows >= n, "KDTreeBuildTagged: rows(X) < N");
+   ae_assert(xy->cols >= nx + ny || n == 0, "KDTreeBuildTagged: cols(X) < NX+NY");
    ae_assert(apservisfinitematrix(xy, n, nx + ny), "KDTreeBuildTagged: XY contains infinite or NaN values");
 // initialize
    kdt->n = n;
@@ -1701,7 +1701,7 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
    kdt->ny = ny;
    kdt->normtype = normtype;
    kdt->innerbuf.kcur = 0;
-// N=0 => quick exit
+// N == 0 => quick exit
    if (n == 0) {
       return;
    }
@@ -1760,7 +1760,7 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
 //    requirements.
 // 2. Although KD-trees may be used with any combination of N  and  NX,  they
 //    are more efficient than brute-force search only when N >> 4^NX. So they
-//    are most useful in low-dimensional tasks (NX=2, NX=3). NX=1  is another
+//    are most useful in low-dimensional tasks (NX == 2, NX == 3). NX == 1  is another
 //    inefficient case, because  simple  binary  search  (without  additional
 //    structures) is much more efficient in such tasks than KD-trees.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
@@ -1772,12 +1772,12 @@ void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t nor
    ae_frame_make(&_frame_block);
    SetObj(kdtree, kdt);
    NewVector(tags, 0, DT_INT);
-   ae_assert(n >= 0, "KDTreeBuild: N<0");
-   ae_assert(nx >= 1, "KDTreeBuild: NX<1");
-   ae_assert(ny >= 0, "KDTreeBuild: NY<0");
+   ae_assert(n >= 0, "KDTreeBuild: N < 0");
+   ae_assert(nx >= 1, "KDTreeBuild: NX < 1");
+   ae_assert(ny >= 0, "KDTreeBuild: NY < 0");
    ae_assert(normtype >= 0 && normtype <= 2, "KDTreeBuild: incorrect NormType");
-   ae_assert(xy->rows >= n, "KDTreeBuild: rows(X)<N");
-   ae_assert(xy->cols >= nx + ny || n == 0, "KDTreeBuild: cols(X)<NX+NY");
+   ae_assert(xy->rows >= n, "KDTreeBuild: rows(X) < N");
+   ae_assert(xy->cols >= nx + ny || n == 0, "KDTreeBuild: cols(X) < NX+NY");
    ae_assert(apservisfinitematrix(xy, n, nx + ny), "KDTreeBuild: XY contains infinite or NaN values");
    if (n > 0) {
       ae_vector_set_length(&tags, n);
@@ -1916,10 +1916,10 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
             continue;
          }
       // We CAN'T process point if R-criterion isn't satisfied,
-      // i.e. (RNeeded != 0) AND (PtDist>R).
+      // i.e. (RNeeded != 0) AND (PtDist > R).
          if (buf->rneeded == 0 || ptdist <= buf->rneeded) {
          // R-criterion is satisfied, we must either:
-         // * replace worst point, if (KNeeded != 0) AND (KCur=KNeeded)
+         // * replace worst point, if (KNeeded != 0) AND (KCur == KNeeded)
          //   (or skip, if worst point is better)
          // * add point without replacement otherwise
             if (buf->kcur < buf->kneeded || buf->kneeded == 0) {
@@ -2012,10 +2012,10 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
             todive = false;
          } else {
             if (buf->kcur < buf->kneeded || buf->kneeded == 0) {
-            // KCur<KNeeded (i.e. not all points are found)
+            // KCur < KNeeded (i.e. not all points are found)
                todive = true;
             } else {
-            // KCur=KNeeded, decide to dive or not to dive
+            // KCur == KNeeded, decide to dive or not to dive
             // using point position relative to bounding box.
                todive = buf->curdist <= buf->r.xR[0] * buf->approxf;
             }
@@ -2087,9 +2087,9 @@ ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae
    ae_int_t result;
    ae_assert(k > 0, "KDTreeTsQueryAKNN: incorrect K!");
    ae_assert(eps >= 0.0, "KDTreeTsQueryAKNN: incorrect Eps!");
-   ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryAKNN: Length(X)<NX!");
+   ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryAKNN: Length(X) < NX!");
    ae_assert(isfinitevector(x, kdt->nx), "KDTreeTsQueryAKNN: X contains infinite or NaN values!");
-// Handle special case: KDT.N=0
+// Handle special case: KDT.N == 0
    if (kdt->n == 0) {
       buf->kcur = 0;
       result = 0;
@@ -2211,8 +2211,8 @@ ae_int_t kdtreequeryaknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch, do
 // API: ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k);
 ae_int_t kdtreetsqueryknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_int_t k, bool selfmatch) {
    ae_int_t result;
-   ae_assert(k >= 1, "KDTreeTsQueryKNN: K<1!");
-   ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryKNN: Length(X)<NX!");
+   ae_assert(k >= 1, "KDTreeTsQueryKNN: K < 1!");
+   ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryKNN: Length(X) < NX!");
    ae_assert(isfinitevector(x, kdt->nx), "KDTreeTsQueryKNN: X contains infinite or NaN values!");
    result = kdtreetsqueryaknn(kdt, buf, x, k, selfmatch, 0.0);
    return result;
@@ -2252,8 +2252,8 @@ ae_int_t kdtreetsqueryknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_
 // API: ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k);
 ae_int_t kdtreequeryknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch) {
    ae_int_t result;
-   ae_assert(k >= 1, "KDTreeQueryKNN: K<1!");
-   ae_assert(x->cnt >= kdt->nx, "KDTreeQueryKNN: Length(X)<NX!");
+   ae_assert(k >= 1, "KDTreeQueryKNN: K < 1!");
+   ae_assert(x->cnt >= kdt->nx, "KDTreeQueryKNN: Length(X) < NX!");
    ae_assert(isfinitevector(x, kdt->nx), "KDTreeQueryKNN: X contains infinite or NaN values!");
    result = kdtreetsqueryaknn(kdt, &kdt->innerbuf, x, k, selfmatch, 0.0);
    return result;
@@ -2305,7 +2305,7 @@ static ae_int_t nearestneighbor_tsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf
    ae_int_t i;
    ae_int_t j;
    ae_int_t result;
-// Handle special case: KDT.N=0
+// Handle special case: KDT.N == 0
    if (kdt->n == 0) {
       buf->kcur = 0;
       result = 0;
@@ -2389,7 +2389,7 @@ static ae_int_t nearestneighbor_tsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf
 ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch) {
    ae_int_t result;
    ae_assert(isfinite(r) && r > 0.0, "KDTreeTsQueryRNN: incorrect R!");
-   ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryRNN: Length(X)<NX!");
+   ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryRNN: Length(X) < NX!");
    ae_assert(isfinitevector(x, kdt->nx), "KDTreeTsQueryRNN: X contains infinite or NaN values!");
    result = nearestneighbor_tsqueryrnn(kdt, buf, x, r, selfmatch, true);
    return result;
@@ -2435,7 +2435,7 @@ ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, dou
 ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch) {
    ae_int_t result;
    ae_assert(r > 0.0, "KDTreeQueryRNN: incorrect R!");
-   ae_assert(x->cnt >= kdt->nx, "KDTreeQueryRNN: Length(X)<NX!");
+   ae_assert(x->cnt >= kdt->nx, "KDTreeQueryRNN: Length(X) < NX!");
    ae_assert(isfinitevector(x, kdt->nx), "KDTreeQueryRNN: X contains infinite or NaN values!");
    result = kdtreetsqueryrnn(kdt, &kdt->innerbuf, x, r, selfmatch);
    return result;
@@ -2487,7 +2487,7 @@ ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch) {
 ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch) {
    ae_int_t result;
    ae_assert(isfinite(r) && r > 0.0, "KDTreeTsQueryRNNU: incorrect R!");
-   ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryRNNU: Length(X)<NX!");
+   ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryRNNU: Length(X) < NX!");
    ae_assert(isfinitevector(x, kdt->nx), "KDTreeTsQueryRNNU: X contains infinite or NaN values!");
    result = nearestneighbor_tsqueryrnn(kdt, buf, x, r, selfmatch, false);
    return result;
@@ -2532,7 +2532,7 @@ ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, do
 ae_int_t kdtreequeryrnnu(kdtree *kdt, RVector *x, double r, bool selfmatch) {
    ae_int_t result;
    ae_assert(r > 0.0, "KDTreeQueryRNNU: incorrect R!");
-   ae_assert(x->cnt >= kdt->nx, "KDTreeQueryRNNU: Length(X)<NX!");
+   ae_assert(x->cnt >= kdt->nx, "KDTreeQueryRNNU: Length(X) < NX!");
    ae_assert(isfinitevector(x, kdt->nx), "KDTreeQueryRNNU: X contains infinite or NaN values!");
    result = kdtreetsqueryrnnu(kdt, &kdt->innerbuf, x, r, selfmatch);
    return result;
@@ -2553,7 +2553,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree *kdt, kdtreerequestbuffer *
    ae_assert(kdt->n > 0, "KDTreeQueryBoxRec: internal error");
    nx = kdt->nx;
 // Check that intersection of query box with bounding box is non-empty.
-// This check is performed once for Offs=0 (tree root).
+// This check is performed once for Offs == 0 (tree root).
    if (offs == 0) {
       for (j = 0; j < nx; j++) {
          if (buf->boxmin.xR[j] > buf->curboxmax.xR[j]) {
@@ -2651,8 +2651,8 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree *kdt, kdtreerequestbuffer *
 ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector *boxmin, RVector *boxmax) {
    ae_int_t j;
    ae_int_t result;
-   ae_assert(boxmin->cnt >= kdt->nx, "KDTreeTsQueryBox: Length(BoxMin)<NX!");
-   ae_assert(boxmax->cnt >= kdt->nx, "KDTreeTsQueryBox: Length(BoxMax)<NX!");
+   ae_assert(boxmin->cnt >= kdt->nx, "KDTreeTsQueryBox: Length(BoxMin) < NX!");
+   ae_assert(boxmax->cnt >= kdt->nx, "KDTreeTsQueryBox: Length(BoxMax) < NX!");
    ae_assert(isfinitevector(boxmin, kdt->nx), "KDTreeTsQueryBox: BoxMin contains infinite or NaN values!");
    ae_assert(isfinitevector(boxmax, kdt->nx), "KDTreeTsQueryBox: BoxMax contains infinite or NaN values!");
 // Check consistency of request buffer
