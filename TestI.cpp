@@ -461,13 +461,13 @@ void bad_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void
 }
 
 void function_cx_1_func(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr) {
-// this callback calculates f(c,x)=exp(-c0*sqr(x0))
+// this callback calculates f(c,x) == exp(-c0*sqr(x0))
 // where x is a position on X-axis and c is adjustable parameter
    func = exp(-c[0] * pow(x[0], 2));
 }
 
 void function_cx_1_grad(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr) {
-// this callback calculates f(c,x)=exp(-c0*sqr(x0)) and gradient G={df/dc[i]}
+// this callback calculates f(c,x) == exp(-c0*sqr(x0)) and gradient G == {df/dc[i]}
 // where x is a position on X-axis and c is adjustable parameter.
 // IMPORTANT: gradient is calculated with respect to C, not to X
    func = exp(-c[0] * pow(x[0], 2));
@@ -475,7 +475,7 @@ void function_cx_1_grad(const real_1d_array &c, const real_1d_array &x, double &
 }
 
 void function_cx_1_hess(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr) {
-// this callback calculates f(c,x)=exp(-c0*sqr(x0)), gradient G={df/dc[i]} and Hessian H={d2f/(dc[i]*dc[j])}
+// this callback calculates f(c,x) == exp(-c0*sqr(x0)), gradient G == {df/dc[i]} and Hessian H == {d2f/(dc[i]*dc[j])}
 // where x is a position on X-axis and c is adjustable parameter.
 // IMPORTANT: gradient/Hessian are calculated with respect to C, not to X
    func = exp(-c[0] * pow(x[0], 2));
@@ -484,18 +484,18 @@ void function_cx_1_hess(const real_1d_array &c, const real_1d_array &x, double &
 }
 
 void ode_function_1_diff(const real_1d_array &y, double x, real_1d_array &dy, void *ptr) {
-// this callback calculates f(y[],x)=-y[0]
+// this callback calculates f(y[],x) == -y[0]
    dy[0] = -y[0];
 }
 
 void int_function_1_func(double x, double xminusa, double bminusx, double &y, void *ptr) {
-// this callback calculates f(x)=exp(x)
+// this callback calculates f(x) == exp(x)
    y = exp(x);
 }
 
 void function_debt_func(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr) {
 //
-// this callback calculates f(c,x)=c[0]*(1+c[1]*(pow(x[0]-1999,c[2])-1))
+// this callback calculates f(c,x == =c[0]*(1+c[1]*(pow(x[0]-1999,c[2])-1))
 //
    func = c[0] * (1 + c[1] * (pow(x[0] - 1999, c[2]) - 1));
 }
@@ -577,8 +577,8 @@ int main() {
          real_2d_array b = "[[2,1],[0,1]]";
          real_2d_array c = "[[0,0],[0,0]]";
       //
-      // rmatrixgemm() function allows us to calculate matrix product C:=A*B or
-      // to perform more general operation, C:=alpha*op1(A)*op2(B)+beta*C,
+      // rmatrixgemm() function allows us to calculate matrix product C = A*B or
+      // to perform more general operation, C = alpha*op1(A)*op2(B)+beta*C,
       // where A, B, C are rectangular matrices, op(X) can be X or X^T,
       // alpha and beta are scalars.
       //
@@ -603,7 +603,7 @@ int main() {
       // * Beta               -   coefficient before C
       // * C, IC, JC          -   preallocated matrix C and offset of the submatrix
       //
-      // Below we perform simple product C:=A*B (alpha=1, beta=0)
+      // Below we perform simple product C = A*B (alpha == 1, beta == 0)
       //
       // IMPORTANT: this function works with preallocated C, which must be large
       //            enough to store multiplication result.
@@ -624,7 +624,7 @@ int main() {
          rmatrixgemm(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
          Ok = Ok && doc_test_real_matrix(c, "[[4,3],[2,4]]", 0.0001);
       //
-      // Now we try to apply some simple transformation to operands: C:=A*B^T
+      // Now we try to apply some simple transformation to operands: C = A*B^T
       //
          optypeb = 1;
          rmatrixgemm(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
@@ -642,7 +642,7 @@ int main() {
       try {
       //
       // rmatrixsyrk() function allows us to calculate symmetric rank-K update
-      // C := beta*C + alpha*A'*A, where C is square N*N matrix, A is square K*N
+      // C = beta*C + alpha*A'*A, where C is square N*N matrix, A is square K*N
       // matrix, alpha and beta are scalars. It is also possible to update by
       // adding A*A' instead of A'*A.
       //
@@ -659,9 +659,9 @@ int main() {
       //                  this function updates only one half of C, leaving
       //                  other half unchanged (not referenced at all).
       //
-      // Below we will show how to calculate simple product C:=A'*A
+      // Below we will show how to calculate simple product C = A'*A
       //
-      // NOTE: beta=0 and we do not use previous value of C, but still it
+      // NOTE: beta == 0 and we do not use previous value of C, but still it
       //       MUST be preallocated.
       //
          ae_int_t n = 2;
@@ -879,7 +879,7 @@ int main() {
          //
          // 2. SKS format requires you to specify matrix geometry prior to
          //    initialization of its elements with sparseset(). If you specified
-         //    bandwidth=1, you can not change your mind afterwards and call
+         //    bandwidth == 1, you can not change your mind afterwards and call
          //    sparseset() for non-existent elements.
          //
          // 3. Because SKS solver need just one triangle of SPD matrix, we can
@@ -897,7 +897,7 @@ int main() {
             sparseset(s, 2, 3, 1.0);
             sparseset(s, 3, 3, 2.0);
          //
-         // Now we have symmetric positive definite 4x4 system width bandwidth=1:
+         // Now we have symmetric positive definite 4x4 system width bandwidth == 1:
          //
          //     [ 2 1     ]   [ x0]]   [  4 ]
          //     [ 1 3 1   ]   [ x1 ]   [ 10 ]
@@ -938,7 +938,7 @@ int main() {
          // This example illustrates solution of sparse linear systems with
          // conjugate gradient method.
          //
-         // Suppose that we have linear system A*x=b with sparse symmetric
+         // Suppose that we have linear system A*x == b with sparse symmetric
          // positive definite A (represented by sparsematrix object)
          //         [ 5 1       ]
          //         [ 1 7 2     ]
@@ -1329,7 +1329,7 @@ int main() {
          //     f(x,y) = 100*(x+3)^4+(y-3)^4
          //
          // using LBFGS method, with:
-         // * initial point x=[0,0]
+         // * initial point x == [0,0]
          // * unit scale being set for all variables (see minlbfgssetscale for more info)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
@@ -1610,7 +1610,7 @@ int main() {
          //     -1 <= x <= +1, -1 <= y <= +1
          //
          // using BLEIC optimizer with:
-         // * initial point x=[0,0]
+         // * initial point x == [0,0]
          // * unit scale being set for all variables (see minbleicsetscale for more info)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
@@ -1740,7 +1740,7 @@ int main() {
          // * x+y >= 6
          //
          // using BLEIC optimizer with
-         // * initial point x=[0,0]
+         // * initial point x == [0,0]
          // * unit scale being set for all variables (see minbleicsetscale for more info)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
@@ -1874,7 +1874,7 @@ int main() {
          //
          // using BLEIC optimizer with:
          // * numerical differentiation being used
-         // * initial point x=[0,0]
+         // * initial point x == [0,0]
          // * unit scale being set for all variables (see minbleicsetscale for more info)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
@@ -2006,7 +2006,7 @@ int main() {
          // quadratic function, you should rewrite it in such way that quadratic term
          // is multiplied by 0.5 too.
          //
-         // For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as
+         // For example, our function is f(x) == x0^2+x1^2+..., but we rewrite it as
          //     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
          // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
          //
@@ -2137,7 +2137,7 @@ int main() {
          // Note that quadratic term has 0.5 before it. So if you want to minimize
          // quadratic function, you should rewrite it in such way that quadratic term
          // is multiplied by 0.5 too.
-         // For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as
+         // For example, our function is f(x) == x0^2+x1^2+..., but we rewrite it as
          //     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
          // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
          //
@@ -2272,7 +2272,7 @@ int main() {
          // Note that quadratic term has 0.5 before it. So if you want to minimize
          // quadratic function, you should rewrite it in such way that quadratic term
          // is multiplied by 0.5 too.
-         // For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as
+         // For example, our function is f(x) == x0^2+x1^2+..., but we rewrite it as
          //     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
          // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
          //
@@ -2398,7 +2398,7 @@ int main() {
          // quadratic function, you should rewrite it in such way that quadratic term
          // is multiplied by 0.5 too.
          //
-         // For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as
+         // For example, our function is f(x) == x0^2+x1^2+..., but we rewrite it as
          //     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
          // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
          //
@@ -2495,7 +2495,7 @@ int main() {
          // quadratic function, you should rewrite it in such way that quadratic term
          // is multiplied by 0.5 too.
          //
-         // For example, our function is f(x)=-(x0^2+x1^2), but we rewrite it as
+         // For example, our function is f(x) == -(x0^2+x1^2), but we rewrite it as
          //     f(x) = 0.5*(-2*x0^2-2*x1^2)
          // and pass diag(-2,-2) as quadratic term - NOT diag(-1,-1)!
          //
@@ -2803,8 +2803,8 @@ int main() {
          //
          // Optimization algorithm uses:
          // * function value F(x0,x1)
-         // * gradient G={dF/dxi}
-         // * Hessian H={d2F/(dxi*dxj)}
+         // * gradient G == {dF/dxi}
+         // * Hessian H == {d2F/(dxi*dxj)}
          //
             real_1d_array x = "[0,0]";
             if (Test == 0)
@@ -3077,7 +3077,7 @@ int main() {
          //     f(x,y) = 100*(x+3)^4+(y-3)^4
          //
          // using nonlinear conjugate gradient method with:
-         // * initial point x=[0,0]
+         // * initial point x == [0,0]
          // * unit scale being set for all variables (see mincgsetscale for more info)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
@@ -3411,8 +3411,8 @@ int main() {
          // 2x2 matrix.
          //
          // NOTE: some/all components of AL/AU can be +-INF, same applies to
-         //       bndl/bndu. You can also have AL[I]=AU[i] (as well as
-         //       BndL[i]=BndU[i]).
+         //       bndl/bndu. You can also have AL[I] == AU[i] (as well as
+         //       BndL[i] == BndU[i]).
          //
             real_2d_array a = "[[1,-1],[1,+1]]";
             if (Test == 0)
@@ -3543,11 +3543,11 @@ int main() {
             minnlcstate state;
          //
          // Create optimizer object and tune its settings:
-         // * epsx=0.000001  stopping condition for inner iterations
-         // * s=[1,1]        all variables have unit scale; it is important to
-         //                  tell optimizer about scales of your variables - it
-         //                  greatly accelerates convergence and helps to perform
-         //                  some important integrity checks.
+         // * epsx == 0.000001  stopping condition for inner iterations
+         // * s == [1,1]        all variables have unit scale; it is important to
+         //                     tell optimizer about scales of your variables - it
+         //                     greatly accelerates convergence and helps to perform
+         //                     some important integrity checks.
          //
             minnlccreate(2, x0, state);
             minnlcsetcond(state, epsx, maxits);
@@ -3706,8 +3706,8 @@ int main() {
             minnlcstate state;
          //
          // Create optimizer object and tune its settings:
-         // * epsx=0.000001  stopping condition for inner iterations
-         // * s=[1,1]        all variables have unit scale
+         // * epsx == 0.000001  stopping condition for inner iterations
+         // * s == [1,1]        all variables have unit scale
          //
             minnlccreate(2, x0, state);
             minnlcsetcond(state, epsx, maxits);
@@ -3878,8 +3878,8 @@ int main() {
             real_1d_array x1;
          //
          // Create optimizer object and tune its settings:
-         // * epsx=0.000001  stopping condition for inner iterations
-         // * s=[1,1]        all variables have unit scale
+         // * epsx == 0.000001  stopping condition for inner iterations
+         // * s == [1,1]        all variables have unit scale
          // * upper limit on step length is specified (to avoid probing locations where exp() is large)
          //
             minnlccreate(3, x0, state);
@@ -3978,7 +3978,7 @@ int main() {
          //     J = [-exp(x0)  0        1 ]
          //         [ 2*x0    2*x1      0 ]
          //
-         // with f0 being target function, f1 being equality constraint "f1=0",
+         // with f0 being target function, f1 being equality constraint "f1 == 0",
          // f2 being inequality constraint "f2 <= 0". Number of equality/inequality
          // constraints is specified by minnlcsetnlc(), with equality ones always
          // being first, inequality ones being last.
@@ -4059,11 +4059,11 @@ int main() {
             real_1d_array x1;
          //
          // Create optimizer object, choose AGS algorithm and tune its settings:
-         // * radius=0.1     good initial value; will be automatically decreased later.
-         // * rho=0.0        penalty coefficient for nonlinear constraints; can be zero
-         //                  because we do not have such constraints
-         // * epsx=0.000001  stopping conditions
-         // * s=[1,1]        all variables have unit scale
+         // * radius == 0.1     good initial value; will be automatically decreased later.
+         // * rho == 0.0        penalty coefficient for nonlinear constraints; can be zero
+         //                     because we do not have such constraints
+         // * epsx == 0.000001  stopping conditions
+         // * s == [1,1]        all variables have unit scale
          //
             minnscreate(2, x0, state);
             minnssetalgoags(state, radius, rho);
@@ -4208,11 +4208,11 @@ int main() {
             real_1d_array x1;
          //
          // Create optimizer object, choose AGS algorithm and tune its settings:
-         // * radius=0.1     good initial value; will be automatically decreased later.
-         // * rho=0.0        penalty coefficient for nonlinear constraints; can be zero
-         //                  because we do not have such constraints
-         // * epsx=0.000001  stopping conditions
-         // * s=[1,1]        all variables have unit scale
+         // * radius == 0.1     good initial value; will be automatically decreased later.
+         // * rho == 0.0        penalty coefficient for nonlinear constraints; can be zero
+         //                     because we do not have such constraints
+         // * epsx == 0.000001  stopping conditions
+         // * s == [1,1]        all variables have unit scale
          //
             minnscreatef(2, x0, diffstep, state);
             minnssetalgoags(state, radius, rho);
@@ -4309,11 +4309,11 @@ int main() {
             real_1d_array x1;
          //
          // Create optimizer object, choose AGS algorithm and tune its settings:
-         // * radius=0.1     good initial value; will be automatically decreased later.
-         // * rho=0.0        penalty coefficient for nonlinear constraints; can be zero
-         //                  because we do not have such constraints
-         // * epsx=0.000001  stopping conditions
-         // * s=[1,1]        all variables have unit scale
+         // * radius == 0.1     good initial value; will be automatically decreased later.
+         // * rho == 0.0        penalty coefficient for nonlinear constraints; can be zero
+         //                     because we do not have such constraints
+         // * epsx == 0.000001  stopping conditions
+         // * s == [1,1]        all variables have unit scale
          //
             minnscreate(2, x0, state);
             minnssetalgoags(state, radius, rho);
@@ -4457,13 +4457,13 @@ int main() {
             real_1d_array x1;
          //
          // Create optimizer object, choose AGS algorithm and tune its settings:
-         // * radius=0.1     good initial value; will be automatically decreased later.
-         // * rho=50.0       penalty coefficient for nonlinear constraints. It is your
-         //                  responsibility to choose good one - large enough that it
-         //                  enforces constraints, but small enough in order to avoid
-         //                  extreme slowdown due to ill-conditioning.
-         // * epsx=0.000001  stopping conditions
-         // * s=[1,1]        all variables have unit scale
+         // * radius == 0.1     good initial value; will be automatically decreased later.
+         // * rho == 50.0       penalty coefficient for nonlinear constraints. It is your
+         //                     responsibility to choose good one - large enough that it
+         //                     enforces constraints, but small enough in order to avoid
+         //                     extreme slowdown due to ill-conditioning.
+         // * epsx == 0.000001  stopping conditions
+         // * s == [1,1]        all variables have unit scale
          //
             minnscreate(2, x0, state);
             minnssetalgoags(state, radius, rho);
@@ -4496,7 +4496,7 @@ int main() {
          // (box/linear ones are passed separately by means of minnssetbc() and
          // minnssetlc() calls).
          //
-         // Nonlinear equality constraints have form Gi(x)=0, inequality ones
+         // Nonlinear equality constraints have form Gi(x) == 0, inequality ones
          // have form Hi(x) <= 0, so we may have to "normalize" constraints prior
          // to passing them to optimizer (right side is zero, constraints are
          // sorted, multiplied by -1 when needed).
@@ -4513,11 +4513,11 @@ int main() {
          //
          // which means that we have optimization problem
          //
-         //     min{f0} subject to f1=0, f2 <= 0
+         //     min{f0} subject to f1 == 0, f2 <= 0
          //
          // which is essentially same as
          //
-         //     min { 2*|x0|+|x1| } subject to x0=1, x1 >= -1
+         //     min { 2*|x0|+|x1| } subject to x0 == 1, x1 >= -1
          //
          // NOTE: AGS solver used by us can handle nonsmooth and nonconvex
          //       optimization problems. It has convergence guarantees, i.e. it will
@@ -4568,7 +4568,7 @@ int main() {
          //     -1 <= x <= +1, -1 <= y <= +1
          //
          // using MinBC optimizer with:
-         // * initial point x=[0,0]
+         // * initial point x == [0,0]
          // * unit scale being set for all variables (see minbcsetscale for more info)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
@@ -4697,7 +4697,7 @@ int main() {
          //
          // using MinBC optimizer with:
          // * numerical differentiation being used
-         // * initial point x=[0,0]
+         // * initial point x == [0,0]
          // * unit scale being set for all variables (see minbcsetscale for more info)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
@@ -4929,7 +4929,7 @@ int main() {
          fflush(stdout);
       }
       AllOk = AllOk && Ok;
-   // printf("TEST odesolver_d1: Solving y'=-y with ODE solver\n"), fflush(stdout);
+   // printf("TEST odesolver_d1: Solving y' == -y with ODE solver\n"), fflush(stdout);
       Ok = true;
       for (int Test = -1; Test < 13; Test++) {
          try {
@@ -5328,12 +5328,12 @@ int main() {
          fflush(stdout);
       }
       AllOk = AllOk && Ok;
-   // printf("TEST autogk_d1: Integrating f=exp(x) by adaptive integrator\n"), fflush(stdout);
+   // printf("TEST autogk_d1: Integrating f == exp(x) by adaptive integrator\n"), fflush(stdout);
       Ok = true;
       for (int Test = -1; Test < 6; Test++) {
          try {
          //
-         // This example demonstrates integration of f=exp(x) on [0,1]:
+         // This example demonstrates integration of f == exp(x) on [0,1]:
          // * first, autogkstate is initialized
          // * then we call integration function
          // * and finally we obtain results with autogkresults() call
@@ -6050,8 +6050,8 @@ int main() {
          //
          // Step 2: dataset addition
          //
-         // XY contains two points - x0=(-1,0) and x1=(+1,0) -
-         // and two function values f(x0)=2, f(x1)=3.
+         // XY contains two points - x0 == (-1,0) and x1 == (+1,0) -
+         // and two function values f(x0) == 2, f(x1) == 3.
          //
             real_2d_array xy = "[[-1,0,2],[+1,0,3]]";
             if (Test == 0)
@@ -6156,7 +6156,7 @@ int main() {
          try {
          //
          // Here we demonstrate polynomial interpolation and differentiation
-         // of y=x^2-x sampled at [0,1,2]. Barycentric representation of polynomial is used.
+         // of y == x^2-x sampled at [0,1,2]. Barycentric representation of polynomial is used.
          //
             real_1d_array x = "[0,1,2]";
             if (Test == 0)
@@ -6221,7 +6221,7 @@ int main() {
       for (int Test = -1; Test < 5; Test++) {
          try {
          //
-         // Here we demonstrate conversion of y=x^2-x
+         // Here we demonstrate conversion of y == x^2-x
          // between power basis and barycentric representation.
          //
             real_1d_array a = "[0,-1,+1]";
@@ -6240,7 +6240,7 @@ int main() {
             double v;
             barycentricinterpolant p;
          //
-         // a=[0,-1,+1] is decomposition of y=x^2-x in the power basis:
+         // a == [0,-1,+1] is decomposition of y == x^2-x in the power basis:
          //
          //     y = 0 - 1*x + 1*x^2
          //
@@ -6269,8 +6269,8 @@ int main() {
          try {
          //
          // Temporaries:
-         // * values of y=x^2-x sampled at three special grids:
-         //   * equdistant grid spanning [0,2],     x[i] = 2*i/(N-1), i=0..N-1
+         // * values of y == x^2-x sampled at three special grids:
+         //   * equdistant grid spanning [0,2],     x[i] = 2*i/(N-1), i = 0..N-1
          //   * Chebyshev-I grid spanning [-1,+1],  x[i] = 1 + cos(pi (2i + 1)/(2n)), i = 0..N-1
          //   * Chebyshev-II grid spanning [-1,+1], x[i] = 1 + cos(pi i/(n - 1)), i = 0..N-1
          // * barycentric interpolants for these three grids
@@ -6323,8 +6323,8 @@ int main() {
          // Now we demonstrate polynomial interpolation without construction
          // of the barycentricinterpolant structure.
          //
-         // We calculate interpolant value at x=-2.
-         // In all three cases we should get same f=6
+         // We calculate interpolant value at x == -2.
+         // In all three cases we should get same f == 6
          //
             double t = -2.0;
             if (Test == 9)
@@ -6624,7 +6624,7 @@ int main() {
          fflush(stdout);
       }
       AllOk = AllOk && Ok;
-   // printf("TEST polint_t_8: Polynomial interpolation: y=x^2-x, equidistant grid, barycentric form\n"), fflush(stdout);
+   // printf("TEST polint_t_8: Polynomial interpolation: y == x^2-x, equidistant grid, barycentric form\n"), fflush(stdout);
       Ok = true;
       for (int Test = -1; Test < 5; Test++) {
          try {
@@ -6655,7 +6655,7 @@ int main() {
          fflush(stdout);
       }
       AllOk = AllOk && Ok;
-   // printf("TEST polint_t_9: Polynomial interpolation: y=x^2-x, Chebyshev grid (first kind), barycentric form\n"), fflush(stdout);
+   // printf("TEST polint_t_9: Polynomial interpolation: y == x^2-x, Chebyshev grid (first kind), barycentric form\n"), fflush(stdout);
       Ok = true;
       for (int Test = -1; Test < 11; Test++) {
          try {
@@ -6700,7 +6700,7 @@ int main() {
          fflush(stdout);
       }
       AllOk = AllOk && Ok;
-   // printf("TEST polint_t_10: Polynomial interpolation: y=x^2-x, Chebyshev grid (second kind), barycentric form\n"), fflush(stdout);
+   // printf("TEST polint_t_10: Polynomial interpolation: y == x^2-x, Chebyshev grid (second kind), barycentric form\n"), fflush(stdout);
       Ok = true;
       for (int Test = -1; Test < 11; Test++) {
          try {
@@ -6745,7 +6745,7 @@ int main() {
          fflush(stdout);
       }
       AllOk = AllOk && Ok;
-   // printf("TEST polint_t_11: Polynomial interpolation: y=x^2-x, equidistant grid\n"), fflush(stdout);
+   // printf("TEST polint_t_11: Polynomial interpolation: y == x^2-x, equidistant grid\n"), fflush(stdout);
       Ok = true;
       for (int Test = -1; Test < 5; Test++) {
          try {
@@ -6774,7 +6774,7 @@ int main() {
          fflush(stdout);
       }
       AllOk = AllOk && Ok;
-   // printf("TEST polint_t_12: Polynomial interpolation: y=x^2-x, Chebyshev grid (first kind)\n"), fflush(stdout);
+   // printf("TEST polint_t_12: Polynomial interpolation: y == x^2-x, Chebyshev grid (first kind)\n"), fflush(stdout);
       Ok = true;
       for (int Test = -1; Test < 11; Test++) {
          try {
@@ -6817,7 +6817,7 @@ int main() {
          fflush(stdout);
       }
       AllOk = AllOk && Ok;
-   // printf("TEST polint_t_13: Polynomial interpolation: y=x^2-x, Chebyshev grid (second kind)\n"), fflush(stdout);
+   // printf("TEST polint_t_13: Polynomial interpolation: y == x^2-x, Chebyshev grid (second kind)\n"), fflush(stdout);
       Ok = true;
       for (int Test = -1; Test < 11; Test++) {
          try {
@@ -6865,7 +6865,7 @@ int main() {
       for (int Test = -1; Test < 12; Test++) {
          try {
          //
-         // We use piecewise linear spline to interpolate f(x)=x^2 sampled
+         // We use piecewise linear spline to interpolate f(x) == x^2 sampled
          // at 5 equidistant nodes on [-1,+1].
          //
             real_1d_array x = "[-1.0,-0.5,0.0,+0.5,+1.0]";
@@ -6899,7 +6899,7 @@ int main() {
             spline1dinterpolant s;
          // build spline
             spline1dbuildlinear(x, y, s);
-         // calculate S(0.25) - it is quite different from 0.25^2=0.0625
+         // calculate S(0.25) - it is quite different from 0.25^2 == 0.0625
             v = spline1dcalc(s, t);
             Ok = Ok && doc_test_real(v, 0.125, 0.00005);
             Ok = Ok && Test == -1;
@@ -6917,7 +6917,7 @@ int main() {
       for (int Test = -1; Test < 10; Test++) {
          try {
          //
-         // We use cubic spline to interpolate f(x)=x^2 sampled
+         // We use cubic spline to interpolate f(x) == x^2 sampled
          // at 5 equidistant nodes on [-1,+1].
          //
          // First, we use default boundary conditions ("parabolically terminated
@@ -6985,8 +6985,8 @@ int main() {
          try {
          //
          // Spline built witn spline1dbuildcubic() can be non-monotone even when
-         // Y-values form monotone sequence. Say, for x=[0,1,2] and y=[0,1,1]
-         // cubic spline will monotonically grow until x=1.5 and then start
+         // Y-values form monotone sequence. Say, for x == [0,1,2] and y == [0,1,1]
+         // cubic spline will monotonically grow until x == 1.5 and then start
          // decreasing.
          //
          // That's why ALGLIB provides special spline construction function
@@ -7052,7 +7052,7 @@ int main() {
          try {
          //
          // We use cubic spline to do grid differentiation, i.e. having
-         // values of f(x)=x^2 sampled at 5 equidistant nodes on [-1,+1]
+         // values of f(x) == x^2 sampled at 5 equidistant nodes on [-1,+1]
          // we calculate derivatives of cubic spline at nodes WITHOUT
          // CONSTRUCTION OF SPLINE OBJECT.
          //
@@ -7119,7 +7119,7 @@ int main() {
          try {
          //
          // We use cubic spline to do resampling, i.e. having
-         // values of f(x)=x^2 sampled at 5 equidistant nodes on [-1,+1]
+         // values of f(x) == x^2 sampled at 5 equidistant nodes on [-1,+1]
          // we calculate values/derivatives of cubic spline on
          // another grid (equidistant with 9 nodes on [-1,+1])
          // WITHOUT CONSTRUCTION OF SPLINE OBJECT.
@@ -7488,8 +7488,8 @@ int main() {
          // and secant updates. diffstep variable stores differentiation step
          // (we have to tell algorithm what step to use).
          //
-         // Unconstrained solution is c=1.5, but because of constraints we should
-         // get c=1.0 (at the boundary).
+         // Unconstrained solution is c == 1.5, but because of constraints we should
+         // get c == 1.0 (at the boundary).
          //
             real_2d_array x = "[[-1],[-0.8],[-0.6],[-0.4],[-0.2],[0],[0.2],[0.4],[0.6],[0.8],[1.0]]";
             if (Test == 0)
@@ -7751,7 +7751,7 @@ int main() {
          try {
          //
          // In this example we demonstrate linear fitting by f(x|a,b) = a*x+b
-         // with simple constraint f(0)=0.
+         // with simple constraint f(0) == 0.
          //
          // We have:
          // * y - vector of experimental data
@@ -7846,11 +7846,11 @@ int main() {
          //
          // This example demonstrates polynomial fitting.
          //
-         // Fitting is done by two (M=2) functions from polynomial basis:
+         // Fitting is done by two (M == 2) functions from polynomial basis:
          //     f0 = 1
          //     f1 = x
          // Basically, it just a linear fit; more complex polynomials may be used
-         // (e.g. parabolas with M=3, cubic with M=4), but even such simple fit allows
+         // (e.g. parabolas with M == 3, cubic with M == 4), but even such simple fit allows
          // us to demonstrate polynomialfit() function in action.
          //
          // We have:
@@ -7949,13 +7949,13 @@ int main() {
          //
          // This example demonstrates polynomial fitting.
          //
-         // Fitting is done by two (M=2) functions from polynomial basis:
+         // Fitting is done by two (M == 2) functions from polynomial basis:
          //     f0 = 1
          //     f1 = x
          // with simple constraint on function value
          //     f(0) = 0
          // Basically, it just a linear fit; more complex polynomials may be used
-         // (e.g. parabolas with M=3, cubic with M=4), but even such simple fit allows
+         // (e.g. parabolas with M == 3, cubic with M == 4), but even such simple fit allows
          // us to demonstrate polynomialfit() function in action.
          //
          // We have:
@@ -8089,7 +8089,7 @@ int main() {
             double rho;
          //
          // Fit with VERY small amount of smoothing (rho = -5.0)
-         // and large number of basis functions (M=50).
+         // and large number of basis functions (M == 50).
          //
          // With such small regularization penalized spline almost fully reproduces function values
          //
@@ -8106,10 +8106,10 @@ int main() {
             Ok = Ok && doc_test_real(v, 0.10, 0.01);
          //
          // Fit with VERY large amount of smoothing (rho = 10.0)
-         // and large number of basis functions (M=50).
+         // and large number of basis functions (M == 50).
          //
          // With such regularization our spline should become close to the straight line fit.
-         // We will compare its value in x=1.0 with results obtained from such fit.
+         // We will compare its value in x == 1.0 with results obtained from such fit.
          //
             rho = +10.0;
             if (Test == 13)
@@ -8124,7 +8124,7 @@ int main() {
             Ok = Ok && doc_test_real(v, 0.969, 0.001);
          //
          // In real life applications you may need some moderate degree of fitting,
-         // so we try to fit once more with rho=3.0.
+         // so we try to fit once more with rho == 3.0.
          //
             rho = +3.0;
             if (Test == 16)
@@ -8359,7 +8359,7 @@ int main() {
             Ok = Ok && doc_test_real(c, 0.900, 0.01);
             Ok = Ok && doc_test_real(d, 1.000, 0.01);
          //
-         // Evaluate model at point x=0.5
+         // Evaluate model at point x == 0.5
          //
             double v;
             v = logisticcalc4(0.5, a, b, c, d);
@@ -8413,7 +8413,7 @@ int main() {
             Ok = Ok && doc_test_real(d, 1.000, 0.01);
             Ok = Ok && doc_test_real(g, 1.200, 0.01);
          //
-         // Evaluate model at point x=0.5
+         // Evaluate model at point x == 0.5
          //
             double v;
             v = logisticcalc5(0.5, a, b, c, d, g);
@@ -8511,7 +8511,7 @@ int main() {
       for (int Test = -1; Test < 16; Test++) {
          try {
          //
-         // We use bilinear spline to interpolate f(x,y)=x^2+2*y^2 sampled
+         // We use bilinear spline to interpolate f(x,y) == x^2+2*y^2 sampled
          // at (x,y) from [0.0, 0.5, 1.0] X [0.0, 1.0].
          //
             real_1d_array x = "[0.0, 0.5, 1.0]";
@@ -8573,7 +8573,7 @@ int main() {
       for (int Test = -1; Test < 16; Test++) {
          try {
          //
-         // We use bilinear spline to interpolate f(x,y)=x^2+2*y^2 sampled
+         // We use bilinear spline to interpolate f(x,y) == x^2+2*y^2 sampled
          // at (x,y) from [0.0, 0.5, 1.0] X [0.0, 1.0].
          //
             real_1d_array x = "[0.0, 0.5, 1.0]";
@@ -8643,7 +8643,7 @@ int main() {
       for (int Test = -1; Test < 5; Test++) {
          try {
          //
-         // We use bicubic spline to reproduce f(x,y)=1/(1+x^2+2*y^2) sampled
+         // We use bicubic spline to reproduce f(x,y) == 1/(1+x^2+2*y^2) sampled
          // at irregular points (x,y) from [-1,+1]*[-1,+1]
          //
          // We have 5 such points, located approximately at corners of the area
@@ -8663,7 +8663,7 @@ int main() {
                spoil_matrix_by_deleting_col(xy);
          //
          // First step is to create spline2dbuilder object and set its properties:
-         // * d=1 means that we create vector-valued spline with 1 component
+         // * d == 1 means that we create vector-valued spline with 1 component
          // * we specify dataset xy
          // * we rely on automatic selection of interpolation area
          // * we tell builder that we want to use 5x5 grid for an underlying spline
@@ -8716,7 +8716,7 @@ int main() {
       for (int Test = -1; Test < 12; Test++) {
          try {
          //
-         // We build bilinear spline for f(x,y)=x+2*y+3*xy for (x,y) in [0,1].
+         // We build bilinear spline for f(x,y) == x+2*y+3*xy for (x,y) in [0,1].
          // Then we demonstrate how to unpack it.
          //
             real_1d_array x = "[0.0, 1.0]";
@@ -8771,7 +8771,7 @@ int main() {
       for (int Test = -1; Test < 16; Test++) {
          try {
          //
-         // We build bilinear spline for f(x,y)=x+2*y for (x,y) in [0,1].
+         // We build bilinear spline for f(x,y) == x+2*y for (x,y) in [0,1].
          // Then we apply several transformations to this spline.
          //
             real_1d_array x = "[0.0, 1.0]";
@@ -8805,13 +8805,13 @@ int main() {
             spline2dinterpolant snew;
             double v;
             spline2dbuildbilinearv(x, 2, y, 2, f, 1, s);
-         // copy spline, apply transformation x:=2*xnew, y:=4*ynew
-         // evaluate at (xnew,ynew) = (0.25,0.25) - should be same as (x,y)=(0.5,1.0)
+         // copy spline, apply transformation x = 2*xnew, y = 4*ynew
+         // evaluate at (xnew,ynew) == (0.25,0.25) - should be same as (x,y) == (0.5,1.0)
             spline2dcopy(s, snew);
             spline2dlintransxy(snew, 2.0, 0.0, 4.0, 0.0);
             v = spline2dcalc(snew, 0.25, 0.25);
             Ok = Ok && doc_test_real(v, 2.500, 0.00005);
-         // copy spline, apply transformation SNew:=2*S+3
+         // copy spline, apply transformation SNew = 2*S+3
             spline2dcopy(s, snew);
             spline2dlintransf(snew, 2.0, 3.0);
             v = spline2dcalc(snew, 0.5, 1.0);
@@ -8830,12 +8830,12 @@ int main() {
                spoil_vector_by_deleting_element(f2);
             real_1d_array vr;
             spline2dbuildbilinearv(x, 2, y, 2, f2, 2, s);
-         // copy spline, apply transformation x:=2*xnew, y:=4*ynew
+         // copy spline, apply transformation x = 2*xnew, y = 4*ynew
             spline2dcopy(s, snew);
             spline2dlintransxy(snew, 2.0, 0.0, 4.0, 0.0);
             spline2dcalcv(snew, 0.25, 0.25, vr);
             Ok = Ok && doc_test_real_vector(vr, "[2.500,2.000]", 0.00005);
-         // copy spline, apply transformation SNew:=2*S+3
+         // copy spline, apply transformation SNew = 2*S+3
             spline2dcopy(s, snew);
             spline2dlintransf(snew, 2.0, 3.0);
             spline2dcalcv(snew, 0.5, 1.0, vr);
@@ -8856,8 +8856,8 @@ int main() {
          try {
          //
          // We build bilinear vector-valued spline (f0,f1) = {x+2*y, 2*x+y}
-         // Spline is built using function values at 2x2 grid: (x,y)=[0,1]*[0,1]
-         // Then we perform evaluation at (x,y)=(0.1,0.3)
+         // Spline is built using function values at 2x2 grid: (x,y) == [0,1]*[0,1]
+         // Then we perform evaluation at (x,y) == (0.1,0.3)
          //
             real_1d_array x = "[0.0, 1.0]";
             if (Test == 0)
@@ -8906,7 +8906,7 @@ int main() {
       for (int Test = -1; Test < 22; Test++) {
          try {
          //
-         // We use trilinear spline to interpolate f(x,y,z)=x+xy+z sampled
+         // We use trilinear spline to interpolate f(x,y,z) == x+xy+z sampled
          // at (x,y,z) from [0.0, 1.0] X [0.0, 1.0] X [0.0, 1.0].
          //
          // We store x, y and z-values at local arrays with same names.
@@ -8993,7 +8993,7 @@ int main() {
       for (int Test = -1; Test < 22; Test++) {
          try {
          //
-         // We use trilinear vector-valued spline to interpolate {f0,f1}={x+xy+z,x+xy+yz+z}
+         // We use trilinear vector-valued spline to interpolate {f0,f1} == {x+xy+z,x+xy+yz+z}
          // sampled at (x,y,z) from [0.0, 1.0] X [0.0, 1.0] X [0.0, 1.0].
          //
          // We store x, y and z-values at local arrays with same names.
@@ -9120,8 +9120,8 @@ int main() {
          //
          // Step 2: we add dataset.
          //
-         // XY contains two points - x0=(-1,0) and x1=(+1,0) -
-         // and two function values f(x0)=2, f(x1)=3.
+         // XY contains two points - x0 == (-1,0) and x1 == (+1,0) -
+         // and two function values f(x0) == 2, f(x1) == 3.
          //
          // We added points, but model was not rebuild yet.
          // If we call rbfcalc2(), we still will get 0.0 as result.
@@ -9211,10 +9211,10 @@ int main() {
          // Step 2: we add dataset.
          //
          // XY arrays containt four points:
-         // * (x0,y0) = (+1,+1), f(x0,y0)=(0,-1)
-         // * (x1,y1) = (+1,-1), f(x1,y1)=(-1,0)
-         // * (x2,y2) = (-1,-1), f(x2,y2)=(0,+1)
-         // * (x3,y3) = (-1,+1), f(x3,y3)=(+1,0)
+         // * (x0,y0) == (+1,+1), f(x0,y0) == (0,-1)
+         // * (x1,y1) == (+1,-1), f(x1,y1) == (-1,0)
+         // * (x2,y2) == (-1,-1), f(x2,y2) == (0,+1)
+         // * (x3,y3) == (-1,+1), f(x3,y3) == (+1,0)
          //
             real_2d_array xy = "[[+1,+1,0,-1],[+1,-1,-1,0],[-1,-1,0,+1],[-1,+1,+1,0]]";
             if (Test == 3)
@@ -9429,7 +9429,7 @@ int main() {
          // NOT contain dataset - because dataset is NOT serialized.
          //
          // This, if we call rbfbuildmodel(model0,rep), we will get same model,
-         // which returns 2.5 at (x,y)=(0,0). However, after same call model1 will
+         // which returns 2.5 at (x,y) == (0,0). However, after same call model1 will
          // return zero - because it contains RBF model (coefficients), but does NOT
          // contain dataset which was used to build this model.
          //
@@ -9653,7 +9653,7 @@ int main() {
          //
          // In order to do that, we:
          // * create clusterizer with clusterizercreate()
-         // * set points XY and metric (2=Euclidean) with clusterizersetpoints()
+         // * set points XY and metric (2 == Euclidean) with clusterizersetpoints()
          // * run AHC algorithm with clusterizerrunahc
          //
          // You may see that clusterization itself is a minor part of the example,
@@ -9681,13 +9681,13 @@ int main() {
          // while ones with indexes from NPoints to 2*NPoints-2 are multi-point
          // clusters created during merges.
          //
-         // In our example, Z=[[2,4], [0,1], [3,6], [5,7]]
+         // In our example, Z == [[2,4], [0,1], [3,6], [5,7]]
          //
          // It means that:
-         // * first, we merge C2=(P2) and C4=(P4),    and create C5=(P2,P4)
-         // * then, we merge  C2=(P0) and C1=(P1),    and create C6=(P0,P1)
-         // * then, we merge  C3=(P3) and C6=(P0,P1), and create C7=(P0,P1,P3)
-         // * finally, we merge C5 and C7 and create C8=(P0,P1,P2,P3,P4)
+         // * first, we merge C2 == (P2) and C4 == (P4),    and create C5 == (P2,P4)
+         // * then, we merge  C2 == (P0) and C1 == (P1),    and create C6 == (P0,P1)
+         // * then, we merge  C3 == (P3) and C6 == (P0,P1), and create C7 == (P0,P1,P3)
+         // * finally, we merge C5 and C7 and create C8 == (P0,P1,P2,P3,P4)
          //
          // Thus, we have following dendrogram:
          //
@@ -9710,8 +9710,8 @@ int main() {
          // * rep.pm, which contains another representation of merges
          //
          // In our example we have:
-         // * P=[3,4,0,2,1]
-         // * PZ=[[0,0,1,1,0,0],[3,3,4,4,0,0],[2,2,3,4,0,1],[0,1,2,4,1,2]]
+         // * P == [3,4,0,2,1]
+         // * PZ == [[0,0,1,1,0,0],[3,3,4,4,0,0],[2,2,3,4,0,1],[0,1,2,4,1,2]]
          //
          // Permutation array P tells us that P0 should be moved to position 3,
          // P1 moved to position 4, P2 moved to position 0 and so on:
@@ -9766,11 +9766,11 @@ int main() {
          //  | P0          P2
          //  |-------------------------
          //
-         // We want to perform k-means++ clustering with K=2.
+         // We want to perform k-means++ clustering with K == 2.
          //
          // In order to do that, we:
          // * create clusterizer with clusterizercreate()
-         // * set points XY and metric (must be Euclidean, distype=2) with clusterizersetpoints()
+         // * set points XY and metric (must be Euclidean, distype == 2) with clusterizersetpoints()
          // * (optional) set number of restarts from random positions to 5
          // * run k-means algorithm with clusterizerrunkmeans()
          //
@@ -9798,7 +9798,7 @@ int main() {
          // closest to some specific point of the dataset.
          //
             Ok = Ok && doc_test_int(rep.terminationtype, 1);
-         // We called clusterizersetpoints() with disttype=2 because k-means++
+         // We called clusterizersetpoints() with disttype == 2 because k-means++
          // algorithm does NOT support metrics other than Euclidean. But what if we
          // try to use some other metric?
          //
@@ -9832,8 +9832,8 @@ int main() {
          //
          // First two steps merge P0/P1 and P3/P4 independently of the linkage type.
          // However, third step depends on linkage type being used:
-         // * in case of complete linkage P2=10 is merged with [P0,P1]
-         // * in case of single linkage P2=10 is merged with [P3,P4]
+         // * in case of complete linkage P2 == 10 is merged with [P0,P1]
+         // * in case of single linkage P2 == 10 is merged with [P3,P4]
          //
             clusterizerstate s;
             ahcreport rep;
@@ -9900,18 +9900,18 @@ int main() {
             if (Test == 2)
                spoil_matrix_by_neginf(xy);
             clusterizercreate(s);
-         // With Euclidean distance function (disttype=2) two closest points
+         // With Euclidean distance function (disttype == 2) two closest points
          // are P1 and P2, thus:
-         // * first, we merge P1 and P2 to form C3=[P1,P2]
-         // * second, we merge P0 and C3 to form C4=[P0,P1,P2]
+         // * first, we merge P1 and P2 to form C3 == [P1,P2]
+         // * second, we merge P0 and C3 to form C4 == [P0,P1,P2]
             disttype = 2;
             clusterizersetpoints(s, xy, disttype);
             clusterizerrunahc(s, rep);
             Ok = Ok && doc_test_int_matrix(rep.z, "[[1,2],[0,3]]");
-         // With Pearson correlation distance function (disttype=10) situation
+         // With Pearson correlation distance function (disttype == 10) situation
          // is different - distance between P0 and P1 is zero, thus:
-         // * first, we merge P0 and P1 to form C3=[P0,P1]
-         // * second, we merge P2 and C3 to form C4=[P0,P1,P2]
+         // * first, we merge P0 and P1 to form C3 == [P0,P1]
+         // * second, we merge P2 and C3 to form C4 == [P0,P1,P2]
             disttype = 10;
             clusterizersetpoints(s, xy, disttype);
             clusterizerrunahc(s, rep);
@@ -9921,8 +9921,8 @@ int main() {
          // P = [ 3 0 3 ], where P[i,j] = dist(Pi,Pj)
          //     [ 1 3 0 ]
          //
-         // * first, we merge P0 and P2 to form C3=[P0,P2]
-         // * second, we merge P1 and C3 to form C4=[P0,P1,P2]
+         // * first, we merge P0 and P2 to form C3 == [P0,P2]
+         // * second, we merge P1 and C3 to form C4 == [P0,P1,P2]
             real_2d_array d = "[[0,3,1],[3,0,3],[1,3,0]]";
             clusterizersetdistances(s, d, true);
             clusterizerrunahc(s, rep);
@@ -9970,14 +9970,14 @@ int main() {
             clusterizercreate(s);
             clusterizersetpoints(s, xy, 2);
             clusterizerrunahc(s, rep);
-         // with K=5, every points is assigned to its own cluster:
-         // C0=P0, C1=P1 and so on...
+         // with K == 5, every points is assigned to its own cluster:
+         // C0 == P0, C1 == P1 and so on...
             clusterizergetkclusters(rep, 5, cidx, cz);
             Ok = Ok && doc_test_int_vector(cidx, "[0,1,2,3,4]");
-         // with K=1 we have one large cluster C0=[P0,P1,P2,P3,P4,P5]
+         // with K == 1 we have one large cluster C0 == [P0,P1,P2,P3,P4,P5]
             clusterizergetkclusters(rep, 1, cidx, cz);
             Ok = Ok && doc_test_int_vector(cidx, "[0,0,0,0,0]");
-         // with K=3 we have three clusters C0=[P3], C1=[P2,P4], C2=[P0,P1]
+         // with K == 3 we have three clusters C0 == [P3], C1 == [P2,P4], C2 == [P0,P1]
             clusterizergetkclusters(rep, 3, cidx, cz);
             Ok = Ok && doc_test_int_vector(cidx, "[2,2,1,0,1]");
             Ok = Ok && Test == -1;
@@ -10013,7 +10013,7 @@ int main() {
          // range. In our example we denote points with x >= 0 as class #0, and
          // ones with negative xi as class #1.
          //
-         // NOTE: if you want to solve regression problem, specify NClasses=1. In
+         // NOTE: if you want to solve regression problem, specify NClasses == 1. In
          //       this case last column of xy can be any numeric value.
          //
          // For the sake of simplicity, our example includes only 4-point dataset.
@@ -10076,7 +10076,7 @@ int main() {
       for (int Test = -1; Test < 3; Test++) {
          try {
          //
-         // The very simple regression example: model f(x,y)=x+y
+         // The very simple regression example: model f(x,y) == x+y
          //
          // First, we have to create DF builder object, load dataset and specify
          // training settings. Our dataset is specified as matrix, which has following
@@ -10269,7 +10269,7 @@ int main() {
          // Here we demonstrate SSA trend/noise separation for some toy problem:
          // small monotonically growing series X are analyzed with 3-tick window
          // and "top-K" version of SSA, which selects K largest singular vectors
-         // for analysis, with K=1.
+         // for analysis, with K == 1.
          //
             ssamodel s;
             real_1d_array x = "[0,0.5,1,1,1.5,2]";
@@ -10282,7 +10282,7 @@ int main() {
          //
          // First, we create SSA model, set its properties and add dataset.
          //
-         // We use window with width=3 and configure model to use direct SSA
+         // We use window with width == 3 and configure model to use direct SSA
          // algorithm - one which runs exact O(N*W^2) analysis - to extract
          // one top singular vector. Well, it is toy problem :)
          //
@@ -10335,7 +10335,7 @@ int main() {
          //
          // First, we create SSA model, set its properties and add dataset.
          //
-         // We use window with width=3 and configure model to use direct SSA
+         // We use window with width == 3 and configure model to use direct SSA
          // algorithm - one which runs exact O(N*W^2) analysis - to extract
          // two top singular vectors. Well, it is toy problem :)
          //
@@ -10397,7 +10397,7 @@ int main() {
          // start appending elements one by one to the end of the last sequence.
          //
          // NOTE: direct algorithm also supports incremental updates, but
-         //       with O(Width^3) cost. Typically K<<Width, so specialized
+         //       with O(Width^3) cost. Typically K << Width, so specialized
          //       incremental algorithm is still faster.
          //
             ssamodel s1;
@@ -10415,7 +10415,7 @@ int main() {
             ssacreate(s1);
             ssasetwindow(s1, 3);
             ssaaddsequence(s1, x0);
-         // set algorithm to the real-time version of top-K, K=2
+         // set algorithm to the real-time version of top-K, K == 2
             ssasetalgotopkrealtime(s1, 2);
          // one more interesting feature of the incremental algorithm is "power-up" cycle.
          // even with incremental algorithm initial basis calculation costs O(N*Width^2) ops.
@@ -10682,7 +10682,7 @@ int main() {
          //       can have dataset with multiple dependent variables, by the way!
          //
          // For the sake of simplicity, our example includes only 4-point dataset and
-         // really simple K=1 nearest neighbor search. Industrial problems typically
+         // really simple K == 1 nearest neighbor search. Industrial problems typically
          // need larger values of K.
          //
             knnbuilder builder;
@@ -10698,13 +10698,13 @@ int main() {
                spoil_matrix_by_neginf(xy);
             knnbuildercreate(builder);
             knnbuildersetdatasetcls(builder, xy, npoints, nvars, nclasses);
-         // we build KNN model with k=1 and eps=0 (exact k-nn search is performed)
+         // we build KNN model with k == 1 and eps == 0 (exact k-nn search is performed)
             ae_int_t k = 1;
             double eps = 0.0;
             knnmodel model;
             knnreport rep;
             knnbuilderbuildknnmodel(builder, k, eps, model, rep);
-         // with such settings (k=1 is used) you can expect zero classification
+         // with such settings (k == 1 is used) you can expect zero classification
          // error on training set. Beautiful results, but remember - in real life
          // you do not need zero TRAINING SET error, you need good generalization.
             Ok = Ok && doc_test_real(rep.relclserror, 0.0000, 0.00005);
@@ -10737,7 +10737,7 @@ int main() {
       for (int Test = -1; Test < 3; Test++) {
          try {
          //
-         // The very simple regression example: model f(x,y)=x+y
+         // The very simple regression example: model f(x,y) == x+y
          //
          // First, we have to create KNN builder object, load dataset and specify
          // training settings. Our dataset is specified as matrix, which has following
@@ -10756,7 +10756,7 @@ int main() {
          //       another example for this unit.
          //
          // For the sake of simplicity, our example includes only 4-point dataset and
-         // really simple K=1 nearest neighbor search. Industrial problems typically
+         // really simple K == 1 nearest neighbor search. Industrial problems typically
          // need larger values of K.
          //
             knnbuilder builder;
@@ -10772,13 +10772,13 @@ int main() {
                spoil_matrix_by_neginf(xy);
             knnbuildercreate(builder);
             knnbuildersetdatasetreg(builder, xy, npoints, nvars, nout);
-         // we build KNN model with k=1 and eps=0 (exact k-nn search is performed)
+         // we build KNN model with k == 1 and eps == 0 (exact k-nn search is performed)
             ae_int_t k = 1;
             double eps = 0.0;
             knnmodel model;
             knnreport rep;
             knnbuilderbuildknnmodel(builder, k, eps, model, rep);
-         // with such settings (k=1 is used) you can expect zero RMS error on the
+         // with such settings (k == 1 is used) you can expect zero RMS error on the
          // training set. Beautiful results, but remember - in real life you do not
          // need zero TRAINING SET error, you need good generalization.
             Ok = Ok && doc_test_real(rep.rmserror, 0.0000, 0.00005);
@@ -10825,7 +10825,7 @@ int main() {
             mlpreport rep;
          //
          // Training set:
-         // * one row corresponds to one record A*B=C in the multiplication table
+         // * one row corresponds to one record A*B == C in the multiplication table
          // * first two columns store A and B, last column stores C
          //
          // [1 * 1 = 1]
@@ -10853,7 +10853,7 @@ int main() {
          //
             mlptrainnetwork(trn, network, 5, rep);
          //
-         // 2*2=?
+         // 2*2 == ?
          //
             real_1d_array x = "[2,2]";
             real_1d_array y = "[0]";
@@ -10916,8 +10916,8 @@ int main() {
          //
             mlptrainnetwork(trn, network, 5, rep);
          //
-         // 2+1=?
-         // 2*1=?
+         // 2+1 == ?
+         // 2*1 == ?
          //
             real_1d_array x = "[2,1]";
             real_1d_array y = "[0,0]";
@@ -11017,8 +11017,8 @@ int main() {
          // For -1 we expect to get [P0,P1] = [0,1]
          //
          // Following properties are guaranteed by network architecture:
-         // * P0 >= 0, P1 >= 0   non-negativity
-         // * P0+P1=1        normalization
+         // * P0 >= 0, P1 >= 0 non-negativity
+         // * P0+P1 == 1       normalization
          //
             x = "[1]";
             mlpprocess(network, x, y);
@@ -11121,8 +11121,8 @@ int main() {
          // and for 0 we will get [P0,P1,P2] = [0,0,1].
          //
          // Following properties are guaranteed by network architecture:
-         // * P0 >= 0, P1 >= 0, P2 >= 0    non-negativity
-         // * P0+P1+P2=1             normalization
+         // * P0 >= 0, P1 >= 0, P2 >= 0 non-negativity
+         // * P0+P1+P2 == 1             normalization
          //
             x = "[1]";
             mlpprocess(network, x, y);
@@ -11183,7 +11183,7 @@ int main() {
          // By default trainer object stores empty dataset. So to solve your non-empty problem
          // you have to set dataset by passing to trainer dense or sparse matrix.
          //
-         // One row of the matrix corresponds to one record A*B=C in the multiplication table.
+         // One row of the matrix corresponds to one record A*B == C in the multiplication table.
          // First two columns store A and B, last column stores C
          //
          //     [1 * 1 = 1]   [ 1 1 1 ]
@@ -11264,7 +11264,7 @@ int main() {
             multilayerperceptron network;
             mlpreport rep;
          //
-         // Training set: f(x)=1/(x^2+1)
+         // Training set: f(x) == 1/(x^2+1)
          // One row corresponds to one record [x,f(x)]
          //
             real_2d_array xy = "[[-2.0,0.2],[-1.6,0.3],[-1.3,0.4],[-1,0.5],[-0.6,0.7],[-0.3,0.9],[0,1],[2.0,0.2],[1.6,0.3],[1.3,0.4],[1,0.5],[0.6,0.7],[0.3,0.9]]";
@@ -11332,7 +11332,7 @@ int main() {
             mlpensemble ensemble;
             mlpreport rep;
          //
-         // Training set: f(x)=1/(x^2+1)
+         // Training set: f(x) == 1/(x^2+1)
          // One row corresponds to one record [x,f(x)]
          //
             real_2d_array xy = "[[-2.0,0.2],[-1.6,0.3],[-1.3,0.4],[-1,0.5],[-0.6,0.7],[-0.3,0.9],[0,1],[2.0,0.2],[1.6,0.3],[1.3,0.4],[1,0.5],[0.6,0.7],[0.3,0.9]]";
@@ -11409,8 +11409,8 @@ int main() {
          // In order to use multithreading, you have to:
          // 1) Install SMP edition of ALGLIB.
          // 2) This step is specific for C++ users: you should activate OS-specific
-         //    capabilities of ALGLIB by defining AE_OS = AE_POSIX (for *nix systems)
-         //    or AE_OS = AE_WINDOWS (for Windows systems).
+         //    capabilities of ALGLIB by defining AE_OS=AE_POSIX (for *nix systems)
+         //    or AE_OS=AE_WINDOWS (for Windows systems).
          //    C# users do not have to perform this step because C# programs are
          //    portable across different systems without OS-specific tuning.
          // 3) Tell ALGLIB that you want it to use multithreading by means of
@@ -11438,7 +11438,7 @@ int main() {
             mlptrainnetwork(trn, network, 5, rep);
          //
          // Then, we perform parallel 10-fold cross-validation, with 5 random
-         // restarts per each CV round. I.e., 5*10=50  networks  are trained
+         // restarts per each CV round. I.e., 5*10 == 50  networks  are trained
          // in total. All these operations can be parallelized.
          //
          // NOTE: again, ALGLIB can parallelize  calculation   of   gradient
@@ -11447,7 +11447,7 @@ int main() {
             mlpkfoldcv(trn, network, 5, 10, rep);
          //
          // Finally, we train early stopping ensemble of 50 neural networks,
-         // each  of them is trained with 5 random restarts. I.e.,  5*50=250
+         // each  of them is trained with 5 random restarts. I.e.,  5*50 == 250
          // networks aretrained in total.
          //
             mlptrainensemblees(trn, ensemble, 5, rep);

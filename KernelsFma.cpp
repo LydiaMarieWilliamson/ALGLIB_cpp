@@ -480,13 +480,13 @@ void fma_rgemvx_transposed(const ae_int_t m, const ae_int_t n, const double alph
 }
 
 // Computes  product   A*transpose(B)  of two MICRO_SIZE*ROUND_LENGTH rowwise
-// 'horizontal' matrices, stored with stride=block_size, and writes it to the
+// 'horizontal' matrices, stored with stride == block_size, and writes it to the
 // row-wise matrix C.
 //
 // ROUND_LENGTH is expected to be properly SIMD-rounded length,  as  returned
 // by avx2_ablasf_packblkh().
 //
-// Present version of the function supports only MICRO_SIZE=2,  the  behavior
+// Present version of the function supports only MICRO_SIZE == 2,  the  behavior
 // is undefined for other micro sizes.
 //
 // Requires AVX2, does NOT check its presense.
@@ -684,7 +684,7 @@ bool fma_spchol_updatekernel4444(double *rowstorage, ae_int_t offss, ae_int_t sh
    v_w2 = _mm256_permute2f128_pd(u23_lo, u01_lo, 0x13);
    v_w3 = _mm256_permute2f128_pd(u23_hi, u01_hi, 0x13);
 //
-// Compute update S:= S + row_scatter(U*W)
+// Compute update S = S + row_scatter(U*W)
 //
    if (sheight == uheight) {
    // No row scatter, the most efficient code

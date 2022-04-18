@@ -1755,7 +1755,7 @@ int main() {
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp_loc_smp += alglib_impl::tickcount() - t0;
                _ae_set_global_threading(default_global_threading); // restore
-            // global parallel, nworkers=1
+            // global parallel, nworkers == 1
                t0 = alglib_impl::tickcount();
                setglobalthreading(ParTH);
                alglib_impl::ae_state_set_flags(NonTH);
@@ -1771,7 +1771,7 @@ int main() {
          printf(fmt_speedup, "* default speedup", time_glob_ser / time_glob_ser);
          printf(fmt_speedup, "* serial (global)", time_glob_ser / time_default);
          printf(fmt_speedup, "* serial (local)", time_glob_ser / time_glob_ser_loc_ser);
-         printf(fmt_speedup, "* serial (nworkers=1)", time_glob_ser / time_glob_smp_nw1);
+         printf(fmt_speedup, "* serial (nworkers == 1)", time_glob_ser / time_glob_smp_nw1);
          printf(fmt_speedup, "* parallel (global)", time_glob_ser / time_glob_smp);
          printf(fmt_speedup, "* parallel (local) v1", time_glob_ser / time_glob_ser_loc_smp);
          Ok = Ok && time_glob_ser / time_default > 0.85 && time_glob_ser / time_default < 1.15;
@@ -1823,7 +1823,7 @@ int main() {
       }
       try {
       // Test LM
-      // Stopping criteria - after |grad|<epsG
+      // Stopping criteria - after |grad| < epsG
          minlmstate state;
          minlmreport rep;
          real_1d_array x = "[0.0]";
@@ -1849,7 +1849,7 @@ int main() {
       if (sizeof(ae_int_t) > 4) {
       //
       // 64-bit mode, perform test:
-      // * use large NMax>2^31
+      // * use large NMax > 2^31
       // * generate 1.000.000 random numbers
       // * use two bins - one for numbers less then NMax/2,
       //   another one for the rest of them

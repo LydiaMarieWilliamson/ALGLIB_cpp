@@ -74,13 +74,12 @@ static ae_int_t ablas_ablasinternalsplitlength(ae_int_t n, ae_int_t nb) {
 //     A   -   real matrix, is passed to ensure that we didn't split
 //             complex matrix using real splitting subroutine.
 //             matrix itself is not changed.
-//     N   -   length, N>0
+//     N   -   length, N > 0
 //
 // Outputs:
-//     N1  -   length
-//     N2  -   length
+//     N1  -   length of the left half
 //
-// N1+N2=N, N1 >= N2, N2 may be zero
+// N1 >= N2, N1 may be N
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 ae_int_t ablassplitlength(RMatrix *a, ae_int_t n) {
    return ablas_ablasinternalsplitlength(n, n > ablasblocksize(a) ? ablasblocksize(a) : ablasmicroblocksize());
@@ -200,7 +199,7 @@ void generatereflection(RVector *x, ae_int_t n, double *tau) {
    x->xR[1] *= s;
 }
 
-// Rank-1 correction: A := A + alpha*u*v'
+// Rank-1 correction: A = A + alpha*u*v'
 //
 // NOTE: this  function  expects  A  to  be  large enough to store result. No
 //       automatic preallocation happens for  smaller  arrays.  No  integrity
@@ -245,11 +244,12 @@ void rmatrixger(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, do
    }
 }
 
+// Scaled matrix-vector addition: y += alpha a x.
 // API: void rmatrixgemv(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy);
 void rmatrixgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
-// Quick exit for M=0, N=0 or Alpha=0.
+// Quick exit for M == 0, N == 0 or Alpha == 0.
 //
-// After this block we have M>0, N>0, Alpha != 0.
+// After this block we have M > 0, N > 0, Alpha != 0.
    if (m <= 0) {
       return;
    }
@@ -295,7 +295,7 @@ void rmatrixgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, 
 // Outputs:
 //     C       -   the result of multiplying the input matrix C by the
 //                 transformation matrix which is given by Tau and V.
-//                 If N1>N2 or M1>M2, C is not modified.
+//                 If N1 > N2 or M1 > M2, C is not modified.
 //
 //   -- LAPACK auxiliary routine (version 3.0) --
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -330,7 +330,7 @@ void applyreflectionfromtheleft(RMatrix *c, double tau, RVector *v, ae_int_t m1,
 // Outputs:
 //     C       -   the result of multiplying the input matrix C by the
 //                 transformation matrix which is given by Tau and V.
-//                 If N1>N2 or M1>M2, C is not modified.
+//                 If N1 > N2 or M1 > M2, C is not modified.
 //
 //   -- LAPACK auxiliary routine (version 3.0) --
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -506,9 +506,9 @@ void cmatrixcopy(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, C
    }
 }
 
-// Performs generalized copy: B := Beta*B + Alpha*A.
+// Performs generalized copy: B = Beta*B + Alpha*A.
 //
-// If Beta=0, then previous contents of B is simply ignored. If Alpha=0, then
+// If Beta == 0, then previous contents of B is simply ignored. If Alpha == 0, then
 // A is ignored and not referenced. If both Alpha and Beta  are  zero,  B  is
 // filled by zeros.
 //
@@ -568,7 +568,7 @@ void rmatrixgencopy(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t i
 // IMPORTANT: this function is deprecated since ALGLIB 3.13. Use RMatrixGER()
 //            which is more generic version of this function.
 //
-// Rank-1 correction: A := A + u*v'
+// Rank-1 correction: A = A + u*v'
 //
 // Inputs:
 //     M   -   number of rows
@@ -607,7 +607,7 @@ void rmatrixrank1(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, 
    }
 }
 
-// Rank-1 correction: A := A + u*v'
+// Rank-1 correction: A = A + u*v'
 //
 // Inputs:
 //     M   -   number of rows
@@ -649,7 +649,7 @@ void cmatrixrank1(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, 
 // IMPORTANT: this function is deprecated since ALGLIB 3.13. Use RMatrixGEMV()
 //            which is more generic version of this function.
 //
-// Matrix-vector product: y := op(A)*x
+// Matrix-vector product: y = op(A)*x
 //
 // Inputs:
 //     M   -   number of rows of op(A)
@@ -658,8 +658,8 @@ void cmatrixrank1(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, 
 //     IA  -   submatrix offset (row index)
 //     JA  -   submatrix offset (column index)
 //     OpA -   operation type:
-//             * OpA=0     =>  op(A) = A
-//             * OpA=1     =>  op(A) = A^T
+//             * OpA == 0 => op(A) = A
+//             * OpA == 1 => op(A) = A^T
 //     X   -   input vector
 //     IX  -   subvector offset
 //     IY  -   subvector offset
@@ -668,8 +668,8 @@ void cmatrixrank1(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, 
 // Outputs:
 //     Y   -   vector which stores result
 //
-// if M=0, then subroutine does nothing.
-// if N=0, Y is filled by zeros.
+// if M == 0, then subroutine does nothing.
+// if N == 0, Y is filled by zeros.
 // ALGLIB Routine: Copyright 28.01.2010 by Sergey Bochkanov
 // API: void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, real_1d_array &y, const ae_int_t iy);
 void rmatrixmv(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, RVector *y, ae_int_t iy) {
@@ -714,7 +714,7 @@ void rmatrixmv(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_
    }
 }
 
-// Matrix-vector product: y := op(A)*x
+// Matrix-vector product: y = op(A)*x
 //
 // Inputs:
 //     M   -   number of rows of op(A)
@@ -725,9 +725,9 @@ void rmatrixmv(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_
 //     IA  -   submatrix offset (row index)
 //     JA  -   submatrix offset (column index)
 //     OpA -   operation type:
-//             * OpA=0     =>  op(A) = A
-//             * OpA=1     =>  op(A) = A^T
-//             * OpA=2     =>  op(A) = A^H
+//             * OpA == 0 => op(A) = A
+//             * OpA == 1 => op(A) = A^T
+//             * OpA == 2 => op(A) = A^H
 //     X   -   input vector
 //     IX  -   subvector offset
 //     IY  -   subvector offset
@@ -736,8 +736,8 @@ void rmatrixmv(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_
 // Outputs:
 //     Y   -   vector which stores result
 //
-// if M=0, then subroutine does nothing.
-// if N=0, Y is filled by zeros.
+// if M == 0, then subroutine does nothing.
+// if N == 0, Y is filled by zeros.
 // ALGLIB Routine: Copyright 28.01.2010 by Sergey Bochkanov
 // API: void cmatrixmv(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const complex_1d_array &x, const ae_int_t ix, complex_1d_array &y, const ae_int_t iy);
 void cmatrixmv(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CVector *x, ae_int_t ix, CVector *y, ae_int_t iy) {
@@ -793,6 +793,7 @@ void cmatrixmv(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_
    }
 }
 
+// Scaled vector-matrix-vector addition: y = alpha a x + beta y.
 // API: void rmatrixsymv(const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy);
 void rmatrixsymv(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
    ae_int_t i;
@@ -800,9 +801,9 @@ void rmatrixsymv(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja,
    double v;
    double vr;
    double vx;
-// Quick exit for M=0, N=0 or Alpha=0.
+// Quick exit for M == 0, N == 0 or Alpha == 0.
 //
-// After this block we have M>0, N>0, Alpha != 0.
+// After this block we have M > 0, N > 0, Alpha != 0.
    if (n <= 0) {
       return;
    }
@@ -870,11 +871,12 @@ void rmatrixsymv(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja,
    }
 }
 
+// Vector-matrix-vector multiplication: x^T a x (with tmp = a x).
 // API: double rmatrixsyvmv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const real_1d_array &tmp);
 double rmatrixsyvmv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, RVector *tmp) {
    ae_int_t i;
    double result;
-// Quick exit for N=0
+// Quick exit for N == 0
    if (n <= 0) {
       result = 0.0;
       return result;
@@ -888,7 +890,7 @@ double rmatrixsyvmv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupp
    return result;
 }
 
-// This subroutine solves linear system op(A)*x=b where:
+// This subroutine solves linear system op(A)*x == b where:
 // * A is NxN upper/lower triangular/unitriangular matrix
 // * X and B are Nx1 vectors
 // * "op" may be identity transformation or transposition
@@ -914,9 +916,8 @@ double rmatrixsyvmv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupp
 //
 // Outputs:
 //     X       -   solution replaces elements X[IX:IX+N-1]
-// ALGLIB Routine / remastering of LAPACK's DTRSV:
-//      (c) 2017 Sergey Bochkanov - converted to ALGLIB
-//      (c) 2016 Reference BLAS level1 routine (LAPACK version 3.7.0)
+// ALGLIB Routine: Copyright (c) 2017 by Sergey Bochkanov - converted to ALGLIB, remastered from LAPACK's DTRSV.
+// Copyright (c) 2016 Reference BLAS level1 routine (LAPACK version 3.7.0)
 //      Reference BLAS is a software package provided by Univ. of Tennessee,
 //      Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd.
 // API: void rmatrixtrsv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, const ae_int_t ix);
@@ -1074,9 +1075,9 @@ static void ablas_cmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, complex alp
 //
 // Additional info:
 // * cache-oblivious algorithm is used.
-// * multiplication result replaces C. If Beta=0, C elements are not used in
+// * multiplication result replaces C. If Beta == 0, C elements are not used in
 //   calculations (not multiplied by zero - just not referenced)
-// * if Alpha=0, A is not used (not multiplied by zero - just not referenced)
+// * if Alpha == 0, A is not used (not multiplied by zero - just not referenced)
 // * if both Beta and Alpha are zero, C is filled by zeros.
 //
 // IMPORTANT:
@@ -1086,9 +1087,9 @@ static void ablas_cmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, complex alp
 // space to store result, exception will be generated.
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -1130,9 +1131,9 @@ void rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, a
 //
 // Additional info:
 // * cache-oblivious algorithm is used.
-// * multiplication result replaces C. If Beta=0, C elements are not used in
+// * multiplication result replaces C. If Beta == 0, C elements are not used in
 //   calculations (not multiplied by zero - just not referenced)
-// * if Alpha=0, A is not used (not multiplied by zero - just not referenced)
+// * if Alpha == 0, A is not used (not multiplied by zero - just not referenced)
 // * if both Beta and Alpha are zero, C is filled by zeros.
 //
 // IMPORTANT:
@@ -1142,9 +1143,9 @@ void rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, a
 // space to store result, exception will be generated.
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -2028,7 +2029,7 @@ static void ablas_rmatrixsyrk2(ae_int_t n, ae_int_t k, double alpha, RMatrix *a,
    }
 // SYRK
    if (optypea == 0) {
-   // C=alpha*A*A^H+beta*C
+   // C == alpha*A*A^H+beta*C
       for (i = 0; i < n; i++) {
          if (isupper) {
             j1 = i;
@@ -2052,7 +2053,7 @@ static void ablas_rmatrixsyrk2(ae_int_t n, ae_int_t k, double alpha, RMatrix *a,
       }
       return;
    } else {
-   // C=alpha*A^H*A+beta*C
+   // C == alpha*A^H*A+beta*C
       for (i = 0; i < n; i++) {
          if (isupper) {
             j1 = i;
@@ -2105,7 +2106,7 @@ static void ablas_cmatrixherk2(ae_int_t n, ae_int_t k, double alpha, CMatrix *a,
    }
 // SYRK
    if (optypea == 0) {
-   // C=alpha*A*A^H+beta*C
+   // C == alpha*A*A^H+beta*C
       for (i = 0; i < n; i++) {
          if (isupper) {
             j1 = i;
@@ -2129,7 +2130,7 @@ static void ablas_cmatrixherk2(ae_int_t n, ae_int_t k, double alpha, CMatrix *a,
       }
       return;
    } else {
-   // C=alpha*A^H*A+beta*C
+   // C == alpha*A^H*A+beta*C
       for (i = 0; i < n; i++) {
          if (isupper) {
             j1 = i;
@@ -2165,15 +2166,15 @@ static void ablas_cmatrixherk2(ae_int_t n, ae_int_t k, double alpha, CMatrix *a,
    }
 }
 
-// This subroutine calculates  C=alpha*A*A^T+beta*C  or  C=alpha*A^T*A+beta*C
+// This subroutine calculates  C == alpha*A*A^T+beta*C  or  C == alpha*A^T*A+beta*C
 // where:
 // * C is NxN symmetric matrix given by its upper/lower triangle
 // * A is NxK matrix when A*A^T is calculated, KxN matrix otherwise
 //
 // Additional info:
-// * multiplication result replaces C. If Beta=0, C elements are not used in
+// * multiplication result replaces C. If Beta == 0, C elements are not used in
 //   calculations (not multiplied by zero - just not referenced)
-// * if Alpha=0, A is not used (not multiplied by zero - just not referenced)
+// * if Alpha == 0, A is not used (not multiplied by zero - just not referenced)
 // * if both Beta and Alpha are zero, C is filled by zeros.
 //
 // Inputs:
@@ -2255,15 +2256,15 @@ void rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, 
    }
 }
 
-// This subroutine calculates  C=alpha*A*A^H+beta*C  or  C=alpha*A^H*A+beta*C
+// This subroutine calculates  C == alpha*A*A^H+beta*C  or  C == alpha*A^H*A+beta*C
 // where:
 // * C is NxN Hermitian matrix given by its upper/lower triangle
 // * A is NxK matrix when A*A^H is calculated, KxN matrix otherwise
 //
 // Additional info:
-// * multiplication result replaces C. If Beta=0, C elements are not used in
+// * multiplication result replaces C. If Beta == 0, C elements are not used in
 //   calculations (not multiplied by zero - just not referenced)
-// * if Alpha=0, A is not used (not multiplied by zero - just not referenced)
+// * if Alpha == 0, A is not used (not multiplied by zero - just not referenced)
 // * if both Beta and Alpha are zero, C is filled by zeros.
 //
 // Inputs:
@@ -2802,7 +2803,7 @@ static void ortfac_cmatrixlqbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector
    //
    // NOTE: ComplexGenerateReflection() generates left reflector,
    // i.e. H which reduces x by applyiong from the left, but we
-   // need RIGHT reflector. So we replace H=E-tau*v*v' by H^H,
+   // need RIGHT reflector. So we replace H == E-tau*v*v' by H^H,
    // which changes v to conj(v).
       ae_v_cmove(&t->xC[1], 1, &a->xyC[i][i], 1, "Conj", n - i);
       complexgeneratereflection(t, n - i, &tmp);
@@ -3048,7 +3049,7 @@ void cmatrixqr(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau) {
 //
 // H(i) = 1 - tau * v * (v^T)
 //
-// where tau is a scalar stored in Tau[I]; v - real vector, so that v(0:i-1)=0,
+// where tau is a scalar stored in Tau[I]; v - real vector, so that v(0:i-1) == 0,
 // v(i) = 1, v(i+1:n-1) stored in A(i,i+1:n-1).
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixlq(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau);
@@ -3238,7 +3239,7 @@ void cmatrixlq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau) {
 // Outputs:
 //     Q       -   first QColumns columns of matrix Q.
 //                 Array whose indexes range within [0..M-1, 0..QColumns-1].
-//                 If QColumns=0, the array remains unchanged.
+//                 If QColumns == 0, the array remains unchanged.
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixqrunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qcolumns, real_2d_array &q);
 void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t qcolumns, RMatrix *q) {
@@ -3259,7 +3260,7 @@ void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
    NewMatrix(tmpa, 0, 0, DT_REAL);
    NewMatrix(tmpt, 0, 0, DT_REAL);
    NewMatrix(tmpr, 0, 0, DT_REAL);
-   ae_assert(qcolumns <= m, "UnpackQFromQR: QColumns>M!");
+   ae_assert(qcolumns <= m, "UnpackQFromQR: QColumns > M!");
    if (m <= 0 || n <= 0 || qcolumns <= 0) {
       ae_frame_leave();
       return;
@@ -3337,7 +3338,7 @@ void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
 // Outputs:
 //     Q           -   first QColumns columns of matrix Q.
 //                     Array whose index ranges within [0..M-1, 0..QColumns-1].
-//                     If QColumns=0, array isn't changed.
+//                     If QColumns == 0, array isn't changed.
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void cmatrixqrunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qcolumns, complex_2d_array &q);
 void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t qcolumns, CMatrix *q) {
@@ -3358,7 +3359,7 @@ void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
    NewMatrix(tmpa, 0, 0, DT_COMPLEX);
    NewMatrix(tmpt, 0, 0, DT_COMPLEX);
    NewMatrix(tmpr, 0, 0, DT_COMPLEX);
-   ae_assert(qcolumns <= m, "UnpackQFromQR: QColumns>M!");
+   ae_assert(qcolumns <= m, "UnpackQFromQR: QColumns > M!");
    if (m <= 0 || n <= 0) {
       ae_frame_leave();
       return;
@@ -3502,7 +3503,7 @@ void cmatrixqrunpackr(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *r) {
 //
 // Outputs:
 //     Q       -   first QRows rows of matrix Q. Array whose indexes range
-//                 within [0..QRows-1, 0..N-1]. If QRows=0, the array remains
+//                 within [0..QRows-1, 0..N-1]. If QRows == 0, the array remains
 //                 unchanged.
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixlqunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qrows, real_2d_array &q);
@@ -3524,7 +3525,7 @@ void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
    NewMatrix(tmpa, 0, 0, DT_REAL);
    NewMatrix(tmpt, 0, 0, DT_REAL);
    NewMatrix(tmpr, 0, 0, DT_REAL);
-   ae_assert(qrows <= n, "RMatrixLQUnpackQ: QRows>N!");
+   ae_assert(qrows <= n, "RMatrixLQUnpackQ: QRows > N!");
    if (m <= 0 || n <= 0 || qrows <= 0) {
       ae_frame_leave();
       return;
@@ -3602,7 +3603,7 @@ void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
 // Outputs:
 //     Q           -   first QRows rows of matrix Q.
 //                     Array whose index ranges within [0..QRows-1, 0..N-1].
-//                     If QRows=0, array isn't changed.
+//                     If QRows == 0, array isn't changed.
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void cmatrixlqunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qrows, complex_2d_array &q);
 void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t qrows, CMatrix *q) {
@@ -3776,21 +3777,21 @@ void cmatrixlqunpackl(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *l) {
 // corresponding  elements  of  matrix  A.  Matrix  Q  is  represented  as  a
 // product   of   elementary   reflections   Q = H(0)*H(1)*...*H(n-1),  where
 // H(i) = 1-tau*v*v'. Here tau is a scalar which is stored  in  TauQ[i],  and
-// vector v has the following  structure:  v(0:i-1)=0, v(i)=1, v(i+1:m-1)  is
+// vector v has the following  structure:  v(0:i-1) == 0, v(i) == 1, v(i+1:m-1)  is
 // stored   in   elements   A(i+1:m-1,i).   Matrix   P  is  as  follows:  P =
 // G(0)*G(1)*...*G(n-2), where G(i) = 1 - tau*u*u'. Tau is stored in TauP[i],
-// u(0:i)=0, u(i+1)=1, u(i+2:n-1) is stored in elements A(i,i+2:n-1).
+// u(0:i) == 0, u(i+1) == 1, u(i+2:n-1) is stored in elements A(i,i+2:n-1).
 //
-// If M<N, B is the  lower  bidiagonal  MxN  matrix  and  is  stored  in  the
+// If M < N, B is the  lower  bidiagonal  MxN  matrix  and  is  stored  in  the
 // corresponding   elements  of  matrix  A.  Q = H(0)*H(1)*...*H(m-2),  where
-// H(i) = 1 - tau*v*v', tau is stored in TauQ, v(0:i)=0, v(i+1)=1, v(i+2:m-1)
+// H(i) = 1 - tau*v*v', tau is stored in TauQ, v(0:i) == 0, v(i+1) == 1, v(i+2:m-1)
 // is    stored    in   elements   A(i+2:m-1,i).    P = G(0)*G(1)*...*G(m-1),
-// G(i) = 1-tau*u*u', tau is stored in  TauP,  u(0:i-1)=0, u(i)=1, u(i+1:n-1)
+// G(i) = 1-tau*u*u', tau is stored in  TauP,  u(0:i-1) == 0, u(i) == 1, u(i+1:n-1)
 // is stored in A(i,i+1:n-1).
 //
 // EXAMPLE:
 //
-// m=6, n=5 (m > n):               m=5, n=6 (m < n):
+// m == 6, n == 5 (m > n):         m == 5, n == 6 (m < n):
 //
 // (  d   e   u1  u1  u1 )         (  d   u1  u1  u1  u1  u1 )
 // (  v1  d   e   u2  u2 )         (  e   d   u2  u2  u2  u2 )
@@ -3918,17 +3919,17 @@ void rmatrixbd(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tauq, RVector *taup)
 //                     Output of ToBidiagonal subroutine.
 //     Z           -   multiplied matrix.
 //                     array[0..ZRows-1,0..ZColumns-1]
-//     ZRows       -   number of rows in matrix Z. If FromTheRight=False,
-//                     ZRows=M, otherwise ZRows can be arbitrary.
-//     ZColumns    -   number of columns in matrix Z. If FromTheRight=True,
-//                     ZColumns=M, otherwise ZColumns can be arbitrary.
+//     ZRows       -   number of rows in matrix Z. If FromTheRight == False,
+//                     ZRows == M, otherwise ZRows can be arbitrary.
+//     ZColumns    -   number of columns in matrix Z. If FromTheRight == True,
+//                     ZColumns == M, otherwise ZColumns can be arbitrary.
 //     FromTheRight -  pre- or post-multiply.
 //     DoTranspose -   multiply by Q or Q'.
 //
 // Outputs:
 //     Z           -   product of Z and Q.
 //                     Array[0..ZRows-1,0..ZColumns-1]
-//                     If ZRows=0 or ZColumns=0, the array is not modified.
+//                     If ZRows == 0 or ZColumns == 0, the array is not modified.
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 // API: void rmatrixbdmultiplybyq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose);
 void rmatrixbdmultiplybyq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, RMatrix *z, ae_int_t zrows, ae_int_t zcolumns, bool fromtheright, bool dotranspose) {
@@ -4037,15 +4038,15 @@ void rmatrixbdmultiplybyq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, RM
 // Outputs:
 //     Q           -   first QColumns columns of matrix Q.
 //                     Array[0..M-1, 0..QColumns-1]
-//                     If QColumns=0, the array is not modified.
+//                     If QColumns == 0, the array is not modified.
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 // API: void rmatrixbdunpackq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, const ae_int_t qcolumns, real_2d_array &q);
 void rmatrixbdunpackq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, ae_int_t qcolumns, RMatrix *q) {
    ae_int_t i;
    ae_int_t j;
    SetMatrix(q);
-   ae_assert(qcolumns <= m, "RMatrixBDUnpackQ: QColumns>M!");
-   ae_assert(qcolumns >= 0, "RMatrixBDUnpackQ: QColumns<0!");
+   ae_assert(qcolumns <= m, "RMatrixBDUnpackQ: QColumns > M!");
+   ae_assert(qcolumns >= 0, "RMatrixBDUnpackQ: QColumns < 0!");
    if (m == 0 || n == 0 || qcolumns == 0) {
       return;
    }
@@ -4077,17 +4078,17 @@ void rmatrixbdunpackq(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, ae_int
 //                     Output of RMatrixBD subroutine.
 //     Z           -   multiplied matrix.
 //                     Array whose indexes range within [0..ZRows-1,0..ZColumns-1].
-//     ZRows       -   number of rows in matrix Z. If FromTheRight=False,
-//                     ZRows=N, otherwise ZRows can be arbitrary.
-//     ZColumns    -   number of columns in matrix Z. If FromTheRight=True,
-//                     ZColumns=N, otherwise ZColumns can be arbitrary.
+//     ZRows       -   number of rows in matrix Z. If FromTheRight == False,
+//                     ZRows == N, otherwise ZRows can be arbitrary.
+//     ZColumns    -   number of columns in matrix Z. If FromTheRight == True,
+//                     ZColumns == N, otherwise ZColumns can be arbitrary.
 //     FromTheRight -  pre- or post-multiply.
 //     DoTranspose -   multiply by P or P'.
 //
 // Outputs:
 //     Z - product of Z and P.
 //                 Array whose indexes range within [0..ZRows-1,0..ZColumns-1].
-//                 If ZRows=0 or ZColumns=0, the array is not modified.
+//                 If ZRows == 0 or ZColumns == 0, the array is not modified.
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 // API: void rmatrixbdmultiplybyp(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose);
 void rmatrixbdmultiplybyp(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, RMatrix *z, ae_int_t zrows, ae_int_t zcolumns, bool fromtheright, bool dotranspose) {
@@ -4191,15 +4192,15 @@ void rmatrixbdmultiplybyp(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, RM
 // Outputs:
 //     PT      -   first PTRows columns of matrix P^T
 //                 Array[0..PTRows-1, 0..N-1]
-//                 If PTRows=0, the array is not modified.
+//                 If PTRows == 0, the array is not modified.
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 // API: void rmatrixbdunpackpt(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, const ae_int_t ptrows, real_2d_array &pt);
 void rmatrixbdunpackpt(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *taup, ae_int_t ptrows, RMatrix *pt) {
    ae_int_t i;
    ae_int_t j;
    SetMatrix(pt);
-   ae_assert(ptrows <= n, "RMatrixBDUnpackPT: PTRows>N!");
-   ae_assert(ptrows >= 0, "RMatrixBDUnpackPT: PTRows<0!");
+   ae_assert(ptrows <= n, "RMatrixBDUnpackPT: PTRows > N!");
+   ae_assert(ptrows >= 0, "RMatrixBDUnpackPT: PTRows < 0!");
    if (m == 0 || n == 0 || ptrows == 0) {
       return;
    }
@@ -4425,7 +4426,7 @@ void rmatrixhessenbergunpackh(RMatrix *a, ae_int_t n, RMatrix *h) {
 
 // Reduction of a symmetric matrix which is given by its higher or lower
 // triangular part to a tridiagonal matrix using orthogonal similarity
-// transformation: Q'*A*Q=T.
+// transformation: Q'*A*Q == T.
 //
 // Inputs:
 //     A       -   matrix to be transformed
@@ -4445,8 +4446,7 @@ void rmatrixhessenbergunpackh(RMatrix *a, ae_int_t n, RMatrix *h) {
 //     E       -   secondary diagonal of symmetric matrix T.
 //                 array with elements [0..N-2].
 //
-//
-//   If IsUpper=True, the matrix Q is represented as a product of elementary
+//   If IsUpper == True, the matrix Q is represented as a product of elementary
 //   reflectors
 //
 //      Q = H(n-2) . . . H(2) H(0).
@@ -4459,7 +4459,7 @@ void rmatrixhessenbergunpackh(RMatrix *a, ae_int_t n, RMatrix *h) {
 //   v(i+1:n-1) = 0, v(i) = 1, v(0:i-1) is stored on exit in
 //   A(0:i-1,i+1), and tau in TAU(i).
 //
-//   If IsUpper=False, the matrix Q is represented as a product of elementary
+//   If IsUpper == False, the matrix Q is represented as a product of elementary
 //   reflectors
 //
 //      Q = H(0) H(2) . . . H(n-2).
@@ -4541,16 +4541,16 @@ void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, R
          if (taui != 0.0) {
          // Apply H from both sides to A
             a->xyR[i][i + 1] = 1.0;
-         // Compute  x := tau * A * v  storing x in TAU
+         // Compute  x = tau * A * v  storing x in TAU
             ae_v_move(&t.xR[1], 1, &a->xyR[0][i + 1], a->stride, i + 1);
             symmetricmatrixvectormultiply(a, isupper, 0, i, &t, taui, &t3);
             ae_v_move(tau->xR, 1, &t3.xR[1], 1, i + 1);
-         // Compute  w := x - 1/2 * tau * (x'*v) * v
+         // Compute  w = x - 1/2 * tau * (x'*v) * v
             v = ae_v_dotproduct(tau->xR, 1, &a->xyR[0][i + 1], a->stride, i + 1);
             alpha = -0.5 * taui * v;
             ae_v_addd(tau->xR, 1, &a->xyR[0][i + 1], a->stride, i + 1, alpha);
          // Apply the transformation as a rank-2 update:
-         //    A := A - v * w' - w * v'
+         //    A = A - v * w' - w * v'
             ae_v_move(&t.xR[1], 1, &a->xyR[0][i + 1], a->stride, i + 1);
             ae_v_move(&t3.xR[1], 1, tau->xR, 1, i + 1);
             symmetricrank2update(a, isupper, 0, i, &t, &t3, &t2, -1.0);
@@ -4571,16 +4571,16 @@ void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, R
          if (taui != 0.0) {
          // Apply H from both sides to A
             a->xyR[i + 1][i] = 1.0;
-         // Compute  x := tau * A * v  storing y in TAU
+         // Compute  x = tau * A * v  storing y in TAU
             ae_v_move(&t.xR[1], 1, &a->xyR[i + 1][i], a->stride, n - i - 1);
             symmetricmatrixvectormultiply(a, isupper, i + 1, n - 1, &t, taui, &t2);
             ae_v_move(&tau->xR[i], 1, &t2.xR[1], 1, n - i - 1);
-         // Compute  w := x - 1/2 * tau * (x'*v) * v
+         // Compute  w = x - 1/2 * tau * (x'*v) * v
             v = ae_v_dotproduct(&tau->xR[i], 1, &a->xyR[i + 1][i], a->stride, n - i - 1);
             alpha = -0.5 * taui * v;
             ae_v_addd(&tau->xR[i], 1, &a->xyR[i + 1][i], a->stride, n - i - 1, alpha);
          // Apply the transformation as a rank-2 update:
-         //     A := A - v * w' - w * v'
+         //     A = A - v * w' - w * v'
          //
             ae_v_move(&t.xR[1], 1, &a->xyR[i + 1][i], a->stride, n - i - 1);
             ae_v_move(&t2.xR[1], 1, &tau->xR[i], 1, n - i - 1);
@@ -4617,8 +4617,7 @@ void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, R
 //     E       -   secondary diagonal of real symmetric matrix T.
 //                 array with elements [0..N-2].
 //
-//
-//   If IsUpper=True, the matrix Q is represented as a product of elementary
+//   If IsUpper == True, the matrix Q is represented as a product of elementary
 //   reflectors
 //
 //      Q = H(n-2) . . . H(2) H(0).
@@ -4631,7 +4630,7 @@ void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, R
 //   v(i+1:n-1) = 0, v(i) = 1, v(0:i-1) is stored on exit in
 //   A(0:i-1,i+1), and tau in TAU(i).
 //
-//   If IsUpper=False, the matrix Q is represented as a product of elementary
+//   If IsUpper == False, the matrix Q is represented as a product of elementary
 //   reflectors
 //
 //      Q = H(0) H(2) . . . H(n-2).
@@ -4717,16 +4716,16 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
          if (ae_c_neq_d(taui, 0.0)) {
          // Apply H(I+1) from both sides to A
             a->xyC[i][i + 1] = complex_from_i(1);
-         // Compute  x := tau * A * v  storing x in TAU
+         // Compute  x = tau * A * v  storing x in TAU
             ae_v_cmove(&t.xC[1], 1, &a->xyC[0][i + 1], a->stride, "N", i + 1);
             hermitianmatrixvectormultiply(a, isupper, 0, i, &t, taui, &t2);
             ae_v_cmove(tau->xC, 1, &t2.xC[1], 1, "N", i + 1);
-         // Compute  w := x - 1/2 * tau * (x'*v) * v
+         // Compute  w = x - 1/2 * tau * (x'*v) * v
             v = ae_v_cdotproduct(tau->xC, 1, "Conj", &a->xyC[0][i + 1], a->stride, "N", i + 1);
             alpha = ae_c_neg(ae_c_mul(ae_c_mul_d(taui, 0.5), v));
             ae_v_caddc(tau->xC, 1, &a->xyC[0][i + 1], a->stride, "N", i + 1, alpha);
          // Apply the transformation as a rank-2 update:
-         //    A := A - v * w' - w * v'
+         //    A = A - v * w' - w * v'
             ae_v_cmove(&t.xC[1], 1, &a->xyC[0][i + 1], a->stride, "N", i + 1);
             ae_v_cmove(&t3.xC[1], 1, tau->xC, 1, "N", i + 1);
             hermitianrank2update(a, isupper, 0, i, &t, &t3, &t2, complex_from_i(-1));
@@ -4750,16 +4749,16 @@ void hmatrixtd(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, R
          if (ae_c_neq_d(taui, 0.0)) {
          // Apply H(i) from both sides to A(i+1:n,i+1:n)
             a->xyC[i + 1][i] = complex_from_i(1);
-         // Compute  x := tau * A * v  storing y in TAU
+         // Compute  x = tau * A * v  storing y in TAU
             ae_v_cmove(&t.xC[1], 1, &a->xyC[i + 1][i], a->stride, "N", n - i - 1);
             hermitianmatrixvectormultiply(a, isupper, i + 1, n - 1, &t, taui, &t2);
             ae_v_cmove(&tau->xC[i], 1, &t2.xC[1], 1, "N", n - i - 1);
-         // Compute  w := x - 1/2 * tau * (x'*v) * v
+         // Compute  w = x - 1/2 * tau * (x'*v) * v
             v = ae_v_cdotproduct(&tau->xC[i], 1, "Conj", &a->xyC[i + 1][i], a->stride, "N", n - i - 1);
             alpha = ae_c_neg(ae_c_mul(ae_c_mul_d(taui, 0.5), v));
             ae_v_caddc(&tau->xC[i], 1, &a->xyC[i + 1][i], a->stride, "N", n - i - 1, alpha);
          // Apply the transformation as a rank-2 update:
-         // A := A - v * w' - w * v'
+         // A = A - v * w' - w * v'
             ae_v_cmove(&t.xC[1], 1, &a->xyC[i + 1][i], a->stride, "N", n - i - 1);
             ae_v_cmove(&t2.xC[1], 1, &tau->xC[i], 1, "N", n - i - 1);
             hermitianrank2update(a, isupper, i + 1, n - 1, &t, &t2, &t3, complex_from_i(-1));
@@ -5106,7 +5105,7 @@ void rmatrixrndorthogonalfromtheright(RMatrix *a, ae_int_t m, ae_int_t n) {
    NewVector(w, 0, DT_REAL);
    NewVector(v, 0, DT_REAL);
    NewObj(hqrndstate, state);
-   ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N<1 or M<1!");
+   ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N < 1 or M < 1!");
    if (n == 1) {
    // Special case
       tau = (double)(2 * randominteger(2) - 1);
@@ -5169,7 +5168,7 @@ void cmatrixrndorthogonalfromtheright(CMatrix *a, ae_int_t m, ae_int_t n) {
    NewVector(w, 0, DT_COMPLEX);
    NewVector(v, 0, DT_COMPLEX);
    NewObj(hqrndstate, state);
-   ae_assert(n >= 1 && m >= 1, "CMatrixRndOrthogonalFromTheRight: N<1 or M<1!");
+   ae_assert(n >= 1 && m >= 1, "CMatrixRndOrthogonalFromTheRight: N < 1 or M < 1!");
    if (n == 1) {
    // Special case
       hqrndrandomize(&state);
@@ -5230,7 +5229,7 @@ void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n) {
    NewVector(w, 0, DT_REAL);
    NewVector(v, 0, DT_REAL);
    NewObj(hqrndstate, state);
-   ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N<1 or M<1!");
+   ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N < 1 or M < 1!");
    if (m == 1) {
    // special case
       tau = (double)(2 * randominteger(2) - 1);
@@ -5294,7 +5293,7 @@ void cmatrixrndorthogonalfromtheleft(CMatrix *a, ae_int_t m, ae_int_t n) {
    NewVector(w, 0, DT_COMPLEX);
    NewVector(v, 0, DT_COMPLEX);
    NewObj(hqrndstate, state);
-   ae_assert(n >= 1 && m >= 1, "CMatrixRndOrthogonalFromTheRight: N<1 or M<1!");
+   ae_assert(n >= 1 && m >= 1, "CMatrixRndOrthogonalFromTheRight: N < 1 or M < 1!");
    if (m == 1) {
    // special case
       hqrndrandomize(&state);
@@ -5356,7 +5355,7 @@ void rmatrixrndorthogonal(ae_int_t n, RMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    SetMatrix(a);
-   ae_assert(n >= 1, "RMatrixRndOrthogonal: N<1!");
+   ae_assert(n >= 1, "RMatrixRndOrthogonal: N < 1!");
    ae_matrix_set_length(a, n, n);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
@@ -5394,7 +5393,7 @@ void cmatrixrndorthogonal(ae_int_t n, CMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    SetMatrix(a);
-   ae_assert(n >= 1, "CMatrixRndOrthogonal: N<1!");
+   ae_assert(n >= 1, "CMatrixRndOrthogonal: N < 1!");
    ae_matrix_set_length(a, n, n);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
@@ -5408,14 +5407,14 @@ void cmatrixrndorthogonal(ae_int_t n, CMatrix *a) {
    cmatrixrndorthogonalfromtheright(a, n, n);
 }
 
-// Generation of random NxN matrix with given condition number and norm2(A)=1
+// Generation of random NxN matrix with given condition number and norm2(A) == 1
 //
 // Inputs:
 //     N   -   matrix size
 //     C   -   condition number (in 2-norm)
 //
 // Outputs:
-//     A   -   random matrix with norm2(A)=1 and cond(A)=C
+//     A   -   random matrix with norm2(A) == 1 and cond(A) == C
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void rmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
 void rmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
@@ -5427,7 +5426,7 @@ void rmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
    ae_frame_make(&_frame_block);
    SetMatrix(a);
    NewObj(hqrndstate, rs);
-   ae_assert(n >= 1 && c >= 1.0, "RMatrixRndCond: N<1 or C<1!");
+   ae_assert(n >= 1 && c >= 1.0, "RMatrixRndCond: N < 1 or C < 1!");
    ae_matrix_set_length(a, n, n);
    if (n == 1) {
    // special case
@@ -5454,14 +5453,14 @@ void rmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
 }
 
 // Generation of random NxN complex matrix with given condition number C and
-// norm2(A)=1
+// norm2(A) == 1
 //
 // Inputs:
 //     N   -   matrix size
 //     C   -   condition number (in 2-norm)
 //
 // Outputs:
-//     A   -   random matrix with norm2(A)=1 and cond(A)=C
+//     A   -   random matrix with norm2(A) == 1 and cond(A) == C
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void cmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void cmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
@@ -5474,7 +5473,7 @@ void cmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
    ae_frame_make(&_frame_block);
    SetMatrix(a);
    NewObj(hqrndstate, state);
-   ae_assert(n >= 1 && c >= 1.0, "CMatrixRndCond: N<1 or C<1!");
+   ae_assert(n >= 1 && c >= 1.0, "CMatrixRndCond: N < 1 or C < 1!");
    ae_matrix_set_length(a, n, n);
    if (n == 1) {
    // special case
@@ -5623,14 +5622,14 @@ void hmatrixrndmultiply(CMatrix *a, ae_int_t n) {
 }
 
 // Generation of random NxN symmetric matrix with given condition number  and
-// norm2(A)=1
+// norm2(A) == 1
 //
 // Inputs:
 //     N   -   matrix size
 //     C   -   condition number (in 2-norm)
 //
 // Outputs:
-//     A   -   random matrix with norm2(A)=1 and cond(A)=C
+//     A   -   random matrix with norm2(A) == 1 and cond(A) == C
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void smatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
 void smatrixrndcond(ae_int_t n, double c, RMatrix *a) {
@@ -5642,7 +5641,7 @@ void smatrixrndcond(ae_int_t n, double c, RMatrix *a) {
    ae_frame_make(&_frame_block);
    SetMatrix(a);
    NewObj(hqrndstate, rs);
-   ae_assert(n >= 1 && c >= 1.0, "SMatrixRndCond: N<1 or C<1!");
+   ae_assert(n >= 1 && c >= 1.0, "SMatrixRndCond: N < 1 or C < 1!");
    ae_matrix_set_length(a, n, n);
    if (n == 1) {
    // special case
@@ -5670,14 +5669,14 @@ void smatrixrndcond(ae_int_t n, double c, RMatrix *a) {
 }
 
 // Generation of random NxN Hermitian matrix with given condition number  and
-// norm2(A)=1
+// norm2(A) == 1
 //
 // Inputs:
 //     N   -   matrix size
 //     C   -   condition number (in 2-norm)
 //
 // Outputs:
-//     A   -   random matrix with norm2(A)=1 and cond(A)=C
+//     A   -   random matrix with norm2(A) == 1 and cond(A) == C
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void hmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void hmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
@@ -5689,7 +5688,7 @@ void hmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
    ae_frame_make(&_frame_block);
    SetMatrix(a);
    NewObj(hqrndstate, rs);
-   ae_assert(n >= 1 && c >= 1.0, "HMatrixRndCond: N<1 or C<1!");
+   ae_assert(n >= 1 && c >= 1.0, "HMatrixRndCond: N < 1 or C < 1!");
    ae_matrix_set_length(a, n, n);
    if (n == 1) {
    // special case
@@ -5721,14 +5720,14 @@ void hmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
 }
 
 // Generation of random NxN symmetric positive definite matrix with given
-// condition number and norm2(A)=1
+// condition number and norm2(A) == 1
 //
 // Inputs:
 //     N   -   matrix size
 //     C   -   condition number (in 2-norm)
 //
 // Outputs:
-//     A   -   random SPD matrix with norm2(A)=1 and cond(A)=C
+//     A   -   random SPD matrix with norm2(A) == 1 and cond(A) == C
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void spdmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
 void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
@@ -5771,14 +5770,14 @@ void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
 }
 
 // Generation of random NxN Hermitian positive definite matrix with given
-// condition number and norm2(A)=1
+// condition number and norm2(A) == 1
 //
 // Inputs:
 //     N   -   matrix size
 //     C   -   condition number (in 2-norm)
 //
 // Outputs:
-//     A   -   random HPD matrix with norm2(A)=1 and cond(A)=C
+//     A   -   random HPD matrix with norm2(A) == 1 and cond(A) == C
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void hpdmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
@@ -6000,7 +5999,7 @@ void sparsecreatebuf(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s) {
    ae_int_t i;
    ae_assert(m > 0, "SparseCreateBuf: M <= 0");
    ae_assert(n > 0, "SparseCreateBuf: N <= 0");
-   ae_assert(k >= 0, "SparseCreateBuf: K<0");
+   ae_assert(k >= 0, "SparseCreateBuf: K < 0");
 // Hash-table size is max(existing_size,requested_size)
 //
 // NOTE: it is important to use ALL available memory for hash table
@@ -6119,7 +6118,7 @@ void sparsecreatecrsbuf(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s) {
    ae_int_t noe;
    ae_assert(m > 0, "SparseCreateCRSBuf: M <= 0");
    ae_assert(n > 0, "SparseCreateCRSBuf: N <= 0");
-   ae_assert(ner->cnt >= m, "SparseCreateCRSBuf: Length(NER)<M");
+   ae_assert(ner->cnt >= m, "SparseCreateCRSBuf: Length(NER) < M");
    noe = 0;
    s->matrixtype = 1;
    s->ninitialized = 0;
@@ -6175,7 +6174,7 @@ void sparsecreatecrs(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s) {
    SetObj(sparsematrix, s);
    ae_assert(m > 0, "SparseCreateCRS: M <= 0");
    ae_assert(n > 0, "SparseCreateCRS: N <= 0");
-   ae_assert(ner->cnt >= m, "SparseCreateCRS: Length(NER)<M");
+   ae_assert(ner->cnt >= m, "SparseCreateCRS: Length(NER) < M");
    for (i = 0; i < m; i++) {
       ae_assert(ner->xZ[i] >= 0, "SparseCreateCRS: NER[] contains negative elements");
    }
@@ -6191,7 +6190,7 @@ void sparsecreatecrs(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s) {
 //
 // Inputs:
 //     M, N        -   number of rows(M) and columns (N) in a matrix:
-//                     * M=N (as for now, ALGLIB supports only square SKS)
+//                     * M == N (as for now, ALGLIB supports only square SKS)
 //                     * N >= 1
 //                     * M >= 1
 //     D           -   "bottom" bandwidths, array[M], 0 <= D[I] <= I.
@@ -6216,15 +6215,15 @@ void sparsecreatesksbuf(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsema
    ae_assert(m > 0, "SparseCreateSKSBuf: M <= 0");
    ae_assert(n > 0, "SparseCreateSKSBuf: N <= 0");
    ae_assert(m == n, "SparseCreateSKSBuf: M != N");
-   ae_assert(d->cnt >= m, "SparseCreateSKSBuf: Length(D)<M");
-   ae_assert(u->cnt >= n, "SparseCreateSKSBuf: Length(U)<N");
+   ae_assert(d->cnt >= m, "SparseCreateSKSBuf: Length(D) < M");
+   ae_assert(u->cnt >= n, "SparseCreateSKSBuf: Length(U) < N");
    for (i = 0; i < m; i++) {
       ae_assert(d->xZ[i] >= 0, "SparseCreateSKSBuf: D[] contains negative elements");
-      ae_assert(d->xZ[i] <= i, "SparseCreateSKSBuf: D[I]>I for some I");
+      ae_assert(d->xZ[i] <= i, "SparseCreateSKSBuf: D[I] > I for some I");
    }
    for (i = 0; i < n; i++) {
       ae_assert(u->xZ[i] >= 0, "SparseCreateSKSBuf: U[] contains negative elements");
-      ae_assert(u->xZ[i] <= i, "SparseCreateSKSBuf: U[I]>I for some I");
+      ae_assert(u->xZ[i] <= i, "SparseCreateSKSBuf: U[I] > I for some I");
    }
    minmn = imin2(m, n);
    s->matrixtype = 2;
@@ -6264,7 +6263,7 @@ void sparsecreatesksbuf(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsema
 //
 // Inputs:
 //     M, N        -   number of rows(M) and columns (N) in a matrix:
-//                     * M=N (as for now, ALGLIB supports only square SKS)
+//                     * M == N (as for now, ALGLIB supports only square SKS)
 //                     * N >= 1
 //                     * M >= 1
 //     D           -   "bottom" bandwidths, array[M], D[I] >= 0.
@@ -6290,15 +6289,15 @@ void sparsecreatesks(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematri
    ae_assert(m > 0, "SparseCreateSKS: M <= 0");
    ae_assert(n > 0, "SparseCreateSKS: N <= 0");
    ae_assert(m == n, "SparseCreateSKS: M != N");
-   ae_assert(d->cnt >= m, "SparseCreateSKS: Length(D)<M");
-   ae_assert(u->cnt >= n, "SparseCreateSKS: Length(U)<N");
+   ae_assert(d->cnt >= m, "SparseCreateSKS: Length(D) < M");
+   ae_assert(u->cnt >= n, "SparseCreateSKS: Length(U) < N");
    for (i = 0; i < m; i++) {
       ae_assert(d->xZ[i] >= 0, "SparseCreateSKS: D[] contains negative elements");
-      ae_assert(d->xZ[i] <= i, "SparseCreateSKS: D[I]>I for some I");
+      ae_assert(d->xZ[i] <= i, "SparseCreateSKS: D[I] > I for some I");
    }
    for (i = 0; i < n; i++) {
       ae_assert(u->xZ[i] >= 0, "SparseCreateSKS: U[] contains negative elements");
-      ae_assert(u->xZ[i] <= i, "SparseCreateSKS: U[I]>I for some I");
+      ae_assert(u->xZ[i] <= i, "SparseCreateSKS: U[I] > I for some I");
    }
    sparsecreatesksbuf(m, n, d, u, s);
 }
@@ -6312,7 +6311,7 @@ void sparsecreatesks(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematri
 //
 // Inputs:
 //     M, N        -   number of rows(M) and columns (N) in a matrix:
-//                     * M=N (as for now, ALGLIB supports only square SKS)
+//                     * M == N (as for now, ALGLIB supports only square SKS)
 //                     * N >= 1
 //                     * M >= 1
 //     BW          -   bandwidth, BW >= 0
@@ -6333,7 +6332,7 @@ void sparsecreatesksbandbuf(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s
    ae_assert(m > 0, "SparseCreateSKSBandBuf: M <= 0");
    ae_assert(n > 0, "SparseCreateSKSBandBuf: N <= 0");
    ae_assert(m == n, "SparseCreateSKSBandBuf: M != N");
-   ae_assert(bw >= 0, "SparseCreateSKSBandBuf: BW<0");
+   ae_assert(bw >= 0, "SparseCreateSKSBandBuf: BW < 0");
    minmn = imin2(m, n);
    s->matrixtype = 2;
    s->ninitialized = 0;
@@ -6379,7 +6378,7 @@ void sparsecreatesksbandbuf(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s
 //
 // Inputs:
 //     M, N        -   number of rows(M) and columns (N) in a matrix:
-//                     * M=N (as for now, ALGLIB supports only square SKS)
+//                     * M == N (as for now, ALGLIB supports only square SKS)
 //                     * N >= 1
 //                     * M >= 1
 //     BW          -   matrix bandwidth, BW >= 0
@@ -6398,7 +6397,7 @@ void sparsecreatesksband(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s) {
    SetObj(sparsematrix, s);
    ae_assert(m > 0, "SparseCreateSKSBand: M <= 0");
    ae_assert(n > 0, "SparseCreateSKSBand: N <= 0");
-   ae_assert(bw >= 0, "SparseCreateSKSBand: BW<0");
+   ae_assert(bw >= 0, "SparseCreateSKSBand: BW < 0");
    ae_assert(m == n, "SparseCreateSKSBand: M != N");
    sparsecreatesksbandbuf(m, n, bw, s);
 }
@@ -6505,12 +6504,13 @@ static ae_int_t sparse_hash(ae_int_t i, ae_int_t j, ae_int_t tabsize) {
 // Inputs:
 //     S           -   sparse M*N matrix in any kind of representation
 //                     (Hash, SKS, CRS).
-//     I           -   row index of non-zero element to modify, 0 <= I<M
-//     J           -   column index of non-zero element to modify, 0 <= J<N
+//     I           -   row index of non-zero element to modify, 0 <= I < M
+//     J           -   column index of non-zero element to modify, 0 <= J < N
 //     V           -   value to rewrite, must be finite number
 //
 // Outputs:
 //     S           -   modified matrix
+//
 // Result:
 //     True in case when element exists
 //     False in case when element doesn't exist or it is zero
@@ -6522,8 +6522,8 @@ bool sparserewriteexisting(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
    ae_int_t k0;
    ae_int_t k1;
    bool result;
-   ae_assert(0 <= i && i < s->m, "SparseRewriteExisting: invalid argument I(either I<0 or I >= S.M)");
-   ae_assert(0 <= j && j < s->n, "SparseRewriteExisting: invalid argument J(either J<0 or J >= S.N)");
+   ae_assert(0 <= i && i < s->m, "SparseRewriteExisting: invalid argument I(either I < 0 or I >= S.M)");
+   ae_assert(0 <= j && j < s->n, "SparseRewriteExisting: invalid argument J(either J < 0 or J >= S.N)");
    ae_assert(isfinite(v), "SparseRewriteExisting: invalid argument V(either V is infinite or V is NaN)");
    result = false;
 // Hash-table matrix
@@ -6658,13 +6658,13 @@ void sparseresizematrix(sparsematrix *s) {
 // * zero values are stored in the matrix similarly to non-zero ones
 // * this function CAN NOT be called for non-existent (outside  of  the  band
 //   specified during SKS matrix creation) elements. Say, if you created  SKS
-//   matrix  with  bandwidth=2  and  tried to call sparseset(s,0,10,VAL),  an
+//   matrix  with  bandwidth == 2  and  tried to call sparseset(s,0,10,VAL),  an
 //   exception will be generated.
 //
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table, SKS or CRS format.
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //     V           -   value to set, must be finite number, can be zero
 //
 // Outputs:
@@ -6677,9 +6677,9 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
    ae_int_t k;
    bool b;
    ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2, "SparseSet: unsupported matrix storage format");
-   ae_assert(i >= 0, "SparseSet: I<0");
+   ae_assert(i >= 0, "SparseSet: I < 0");
    ae_assert(i < s->m, "SparseSet: I >= M");
-   ae_assert(j >= 0, "SparseSet: J<0");
+   ae_assert(j >= 0, "SparseSet: J < 0");
    ae_assert(j < s->n, "SparseSet: J >= N");
    ae_assert(isfinite(v), "SparseSet: V is not finite number");
 // Hash-table matrix
@@ -6755,8 +6755,8 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table representation.
 //                     Exception will be thrown for CRS matrix.
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //     V           -   value to add, must be finite number
 //
 // Outputs:
@@ -6771,9 +6771,9 @@ void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
    ae_int_t tcode;
    ae_int_t k;
    ae_assert(s->matrixtype == 0, "SparseAdd: matrix must be in the Hash-Table mode to do this operation");
-   ae_assert(i >= 0, "SparseAdd: I<0");
+   ae_assert(i >= 0, "SparseAdd: I < 0");
    ae_assert(i < s->m, "SparseAdd: I >= M");
-   ae_assert(j >= 0, "SparseAdd: J<0");
+   ae_assert(j >= 0, "SparseAdd: J < 0");
    ae_assert(j < s->n, "SparseAdd: J >= N");
    ae_assert(isfinite(v), "SparseAdd: V is not finite number");
    if (v == 0.0) {
@@ -6824,8 +6824,8 @@ void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
 //
 // Inputs:
 //     S           -   sparse M*N matrix
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //
 // Result:
 //     value of S[I,J] or zero (in case no element with such index is found)
@@ -6837,9 +6837,9 @@ double sparseget(sparsematrix *s, ae_int_t i, ae_int_t j) {
    ae_int_t k0;
    ae_int_t k1;
    double result;
-   ae_assert(i >= 0, "SparseGet: I<0");
+   ae_assert(i >= 0, "SparseGet: I < 0");
    ae_assert(i < s->m, "SparseGet: I >= M");
-   ae_assert(j >= 0, "SparseGet: J<0");
+   ae_assert(j >= 0, "SparseGet: J < 0");
    ae_assert(j < s->n, "SparseGet: J >= N");
    result = 0.0;
    if (s->matrixtype == 0) {
@@ -6918,8 +6918,8 @@ double sparseget(sparsematrix *s, ae_int_t i, ae_int_t j) {
 //
 // Inputs:
 //     S           -   sparse M*N matrix
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //
 // Result:
 //     whether S[I,J] is present in the data structure or not
@@ -6931,9 +6931,9 @@ bool sparseexists(sparsematrix *s, ae_int_t i, ae_int_t j) {
    ae_int_t k0;
    ae_int_t k1;
    bool result;
-   ae_assert(i >= 0, "SparseExists: I<0");
+   ae_assert(i >= 0, "SparseExists: I < 0");
    ae_assert(i < s->m, "SparseExists: I >= M");
-   ae_assert(j >= 0, "SparseExists: J<0");
+   ae_assert(j >= 0, "SparseExists: J < 0");
    ae_assert(j < s->n, "SparseExists: J >= N");
    result = false;
    if (s->matrixtype == 0) {
@@ -7006,7 +7006,7 @@ bool sparseexists(sparsematrix *s, ae_int_t i, ae_int_t j) {
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table representation.
 //                     Exception will be thrown for CRS matrix.
-//     I           -   index of the element to modify, 0 <= I<min(M,N)
+//     I           -   index of the element to modify, 0 <= I < min(M,N)
 //
 // Result:
 //     value of S[I,I] or zero (in case no element with such index is found)
@@ -7014,7 +7014,7 @@ bool sparseexists(sparsematrix *s, ae_int_t i, ae_int_t j) {
 // API: double sparsegetdiagonal(const sparsematrix &s, const ae_int_t i);
 double sparsegetdiagonal(sparsematrix *s, ae_int_t i) {
    double result;
-   ae_assert(i >= 0, "SparseGetDiagonal: I<0");
+   ae_assert(i >= 0, "SparseGetDiagonal: I < 0");
    ae_assert(i < s->m, "SparseGetDiagonal: I >= M");
    ae_assert(i < s->n, "SparseGetDiagonal: I >= N");
    result = 0.0;
@@ -7073,7 +7073,7 @@ void sparsemv(sparsematrix *s, RVector *x, RVector *y) {
    ae_int_t u;
    ae_int_t ri;
    ae_int_t ri1;
-   ae_assert(x->cnt >= s->n, "SparseMV: length(X)<N");
+   ae_assert(x->cnt >= s->n, "SparseMV: length(X) < N");
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseMV: incorrect matrix type (convert your matrix to CRS/SKS)");
    vectorsetlengthatleast(y, s->m);
    n = s->n;
@@ -7166,7 +7166,7 @@ void sparsemtv(sparsematrix *s, RVector *x, RVector *y) {
    ae_int_t d;
    ae_int_t u;
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseMTV: incorrect matrix type (convert your matrix to CRS/SKS)");
-   ae_assert(x->cnt >= s->m, "SparseMTV: Length(X)<M");
+   ae_assert(x->cnt >= s->m, "SparseMTV: Length(X) < M");
    n = s->n;
    m = s->m;
    vectorsetlengthatleast(y, n);
@@ -7226,7 +7226,7 @@ void sparsemtv(sparsematrix *s, RVector *x, RVector *y) {
 
 // This function calculates generalized sparse matrix-vector product
 //
-//     y := alpha*op(S)*x + beta*y
+//     y = alpha*op(S)*x + beta*y
 //
 // Matrix S must be stored in CRS or SKS format (exception  will  be  thrown
 // otherwise). op(S) can be either S or S^T.
@@ -7238,8 +7238,8 @@ void sparsemtv(sparsematrix *s, RVector *x, RVector *y) {
 //     S           -   sparse matrix in CRS or SKS format.
 //     Alpha       -   source coefficient
 //     OpS         -   operation type:
-//                     * OpS=0     =>  op(S) = S
-//                     * OpS=1     =>  op(S) = S^T
+//                     * OpS == 0 => op(S) == S
+//                     * OpS == 1 => op(S) == S^T
 //     X           -   input vector, must have at least Cols(op(S))+IX elements
 //     IX          -   subvector offset
 //     Beta        -   destination coefficient
@@ -7251,17 +7251,17 @@ void sparsemtv(sparsematrix *s, RVector *x, RVector *y) {
 //                     other elements are not modified
 //
 // HANDLING OF SPECIAL CASES:
-// * below M=Rows(op(S)) and N=Cols(op(S)). Although current  ALGLIB  version
+// * below M == Rows(op(S)) and N == Cols(op(S)). Although current  ALGLIB  version
 //   does not allow you to  create  zero-sized  sparse  matrices,  internally
 //   ALGLIB  can  deal  with  such matrices. So, comments for M or N equal to
 //   zero are for internal use only.
-// * if M=0, then subroutine does nothing. It does not even touch arrays.
-// * if N=0 or Alpha=0.0, then:
-//   * if Beta=0, then Y is filled by zeros. S and X are  not  referenced  at
+// * if M == 0, then subroutine does nothing. It does not even touch arrays.
+// * if N == 0 or Alpha == 0.0, then:
+//   * if Beta == 0, then Y is filled by zeros. S and X are  not  referenced  at
 //     all. Initial values of Y are ignored (we do not  multiply  Y by  zero,
 //     we just rewrite it by zeros)
 //   * if Beta != 0, then Y is replaced by Beta*Y
-// * if M>0, N>0, Alpha != 0, but  Beta=0, then  Y is replaced by alpha*op(S)*x
+// * if M > 0, N > 0, Alpha != 0, but  Beta == 0, then  Y is replaced by alpha*op(S)*x
 //   initial state of Y  is ignored (rewritten without initial multiplication
 //   by zeros).
 //
@@ -7321,7 +7321,7 @@ void sparsegemv(sparsematrix *s, double alpha, ae_int_t ops, RVector *x, ae_int_
    }
 // Now we have OpM >= 1, OpN >= 1, Alpha != 0
    if (ops == 0) {
-   // Compute generalized product y := alpha*S*x + beta*y
+   // Compute generalized product y = alpha*S*x + beta*y
    // (with "beta*y" part already computed).
       if (s->matrixtype == 1) {
       // CRS format.
@@ -7373,7 +7373,7 @@ void sparsegemv(sparsematrix *s, double alpha, ae_int_t ops, RVector *x, ae_int_
          return;
       }
    } else {
-   // Compute generalized product y := alpha*S^T*x + beta*y
+   // Compute generalized product y = alpha*S^T*x + beta*y
    // (with "beta*y" part already computed).
       if (s->matrixtype == 1) {
       // CRS format
@@ -7479,7 +7479,7 @@ void sparsemv2(sparsematrix *s, RVector *x, RVector *y0, RVector *y1) {
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseMV2: incorrect matrix type (convert your matrix to CRS/SKS)");
    ae_assert(s->m == s->n, "SparseMV2: matrix is non-square");
    l = x->cnt;
-   ae_assert(l >= s->n, "SparseMV2: Length(X)<N");
+   ae_assert(l >= s->n, "SparseMV2: Length(X) < N");
    n = s->n;
    vectorsetlengthatleast(y0, l);
    vectorsetlengthatleast(y1, l);
@@ -7587,7 +7587,7 @@ void sparsesmv(sparsematrix *s, bool isupper, RVector *x, RVector *y) {
    ae_int_t lt1;
    ae_int_t rt1;
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseSMV: incorrect matrix type (convert your matrix to CRS/SKS)");
-   ae_assert(x->cnt >= s->n, "SparseSMV: length(X)<N");
+   ae_assert(x->cnt >= s->n, "SparseSMV: length(X) < N");
    ae_assert(s->m == s->n, "SparseSMV: non-square matrix");
    n = s->n;
    vectorsetlengthatleast(y, n);
@@ -7705,7 +7705,7 @@ double sparsevsmv(sparsematrix *s, bool isupper, RVector *x) {
    ae_int_t lt1;
    double result;
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseVSMV: incorrect matrix type (convert your matrix to CRS/SKS)");
-   ae_assert(x->cnt >= s->n, "SparseVSMV: length(X)<N");
+   ae_assert(x->cnt >= s->n, "SparseVSMV: length(X) < N");
    ae_assert(s->m == s->n, "SparseVSMV: non-square matrix");
    n = s->n;
    result = 0.0;
@@ -7814,7 +7814,7 @@ void sparsemm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b) {
    ae_int_t u;
    double vd;
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseMM: incorrect matrix type (convert your matrix to CRS/SKS)");
-   ae_assert(a->rows >= s->n, "SparseMM: Rows(A)<N");
+   ae_assert(a->rows >= s->n, "SparseMM: Rows(A) < N");
    ae_assert(k > 0, "SparseMM: K <= 0");
    m = s->m;
    n = s->n;
@@ -7943,7 +7943,7 @@ void sparsemtm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b) {
    ae_int_t d;
    ae_int_t u;
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseMTM: incorrect matrix type (convert your matrix to CRS/SKS)");
-   ae_assert(a->rows >= s->m, "SparseMTM: Rows(A)<M");
+   ae_assert(a->rows >= s->m, "SparseMTM: Rows(A) < M");
    ae_assert(k > 0, "SparseMTM: K <= 0");
    m = s->m;
    n = s->n;
@@ -8079,7 +8079,7 @@ void sparsemm2(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b0, RMatrix *b1
    ae_int_t u;
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseMM2: incorrect matrix type (convert your matrix to CRS/SKS)");
    ae_assert(s->m == s->n, "SparseMM2: matrix is non-square");
-   ae_assert(a->rows >= s->n, "SparseMM2: Rows(A)<N");
+   ae_assert(a->rows >= s->n, "SparseMM2: Rows(A) < N");
    ae_assert(k > 0, "SparseMM2: K <= 0");
    n = s->n;
    k1 = k - 1;
@@ -8191,9 +8191,9 @@ void sparsemm2(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b0, RMatrix *b1
 //                       empty - these elements are not referenced at all).
 //                     * if lower triangle is given,  only   S[i,j] for j <= i
 //                       are used, and upper triangle is ignored.
-//     A           -   array[N][K], input dense matrix. For performance reasons
+//     A           -   array[M][K], input dense matrix. For performance reasons
 //                     we make only quick checks - we check that array size is
-//                     at least N, but we do not check for NAN's or INF's.
+//                     at least M, but we do not check for NAN's or INF's.
 //     K           -   number of columns of matrix (A).
 //     B           -   output buffer, possibly preallocated. In case  buffer
 //                     size is too small to store  result,  this  buffer  is
@@ -8226,7 +8226,7 @@ void sparsesmm(sparsematrix *s, bool isupper, RMatrix *a, ae_int_t k, RMatrix *b
    ae_int_t d;
    ae_int_t u;
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseSMM: incorrect matrix type (convert your matrix to CRS/SKS)");
-   ae_assert(a->rows >= s->n, "SparseSMM: Rows(X)<N");
+   ae_assert(a->rows >= s->n, "SparseSMM: Rows(X) < N");
    ae_assert(s->m == s->n, "SparseSMM: matrix is non-square");
    n = s->n;
    k1 = k - 1;
@@ -8412,7 +8412,7 @@ void sparsetrmv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
    ae_int_t rt1;
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseTRMV: incorrect matrix type (convert your matrix to CRS/SKS)");
    ae_assert(optype == 0 || optype == 1, "SparseTRMV: incorrect operation type (must be 0 or 1)");
-   ae_assert(x->cnt >= s->n, "SparseTRMV: Length(X)<N");
+   ae_assert(x->cnt >= s->n, "SparseTRMV: Length(X) < N");
    ae_assert(s->m == s->n, "SparseTRMV: matrix is non-square");
    n = s->n;
    vectorsetlengthatleast(y, n);
@@ -8506,7 +8506,7 @@ void sparsetrmv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
    }
 }
 
-// This function solves linear system op(S)*y=x  where  x  is  vector,  S  is
+// This function solves linear system op(S)*y == x  where  x  is  vector,  S  is
 // symmetric  triangular  matrix,  op(S)  is  transposition  or no operation.
 // Matrix S must be stored in CRS or SKS format  (exception  will  be  thrown
 // otherwise).
@@ -8566,7 +8566,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
    ae_int_t lt1;
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseTRSV: incorrect matrix type (convert your matrix to CRS/SKS)");
    ae_assert(optype == 0 || optype == 1, "SparseTRSV: incorrect operation type (must be 0 or 1)");
-   ae_assert(x->cnt >= s->n, "SparseTRSV: Length(X)<N");
+   ae_assert(x->cnt >= s->n, "SparseTRSV: Length(X) < N");
    ae_assert(s->m == s->n, "SparseTRSV: matrix is non-square");
    n = s->n;
    if (s->matrixtype == 1) {
@@ -8577,7 +8577,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
       if (optype == 0) {
       // No transposition.
       //
-      // S*x=y with upper or lower triangular S.
+      // S*x == y with upper or lower triangular S.
          v0 = 0.0;
          if (isupper) {
             fst = n - 1;
@@ -8624,7 +8624,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
       if (optype == 1) {
       // Transposition.
       //
-      // (S^T)*x=y with upper or lower triangular S.
+      // (S^T)*x == y with upper or lower triangular S.
          if (isupper) {
             fst = 0;
             lst = n - 1;
@@ -8765,7 +8765,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
 //
 // This function applies permutation given by permutation table P (as opposed
 // to product form of permutation) to sparse symmetric  matrix  A,  given  by
-// either upper or lower triangle: B := P*A*P'.
+// either upper or lower triangle: B = P*A*P'.
 //
 // Inputs:
 //     A           -   sparse square matrix in CRS format.
@@ -8775,7 +8775,7 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
 //                       empty - these elements are not referenced at all).
 //                     * if lower triangle is given,  only   A[i,j] for  j <= i
 //                       are used, and upper triangle is ignored.
-//     P           -   array[N] which stores permutation table;  P[I]=J means
+//     P           -   array[N] which stores permutation table;  P[I] == J means
 //                     that I-th row/column of matrix  A  is  moved  to  J-th
 //                     position. For performance reasons we do NOT check that
 //                     P[] is  a   correct   permutation  (that there  is  no
@@ -8807,7 +8807,7 @@ void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematri
    ae_int_t dst;
    bool bflag;
    ae_assert(a->matrixtype == 1, "SparseSymmPermTblBuf: incorrect matrix type (convert your matrix to CRS)");
-   ae_assert(p->cnt >= a->n, "SparseSymmPermTblBuf: Length(P)<N");
+   ae_assert(p->cnt >= a->n, "SparseSymmPermTblBuf: Length(P) < N");
    ae_assert(a->m == a->n, "SparseSymmPermTblBuf: matrix is non-square");
    bflag = true;
    for (i = 0; i < a->n; i++) {
@@ -8901,7 +8901,7 @@ void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematri
 
 // This function applies permutation given by permutation table P (as opposed
 // to product form of permutation) to sparse symmetric  matrix  A,  given  by
-// either upper or lower triangle: B := P*A*P'.
+// either upper or lower triangle: B = P*A*P'.
 //
 // This function allocates completely new instance of B. Use buffered version
 // SparseSymmPermTblBuf() if you want to reuse already allocated structure.
@@ -8914,7 +8914,7 @@ void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematri
 //                       empty - these elements are not referenced at all).
 //                     * if lower triangle is given,  only   A[i,j] for  j <= i
 //                       are used, and upper triangle is ignored.
-//     P           -   array[N] which stores permutation table;  P[I]=J means
+//     P           -   array[N] which stores permutation table;  P[I] == J means
 //                     that I-th row/column of matrix  A  is  moved  to  J-th
 //                     position. For performance reasons we do NOT check that
 //                     P[] is  a   correct   permutation  (that there  is  no
@@ -8989,8 +8989,8 @@ double sparsegetaveragelengthofchain(sparsematrix *s) {
 // Hash table, elements are returned in random order.
 //
 // EXAMPLE
-//     > T0=0
-//     > T1=0
+//     > T0 == 0
+//     > T1 == 0
 //     > while SparseEnumerate(S,T0,T1,I,J,V) do
 //     >     ....do something with I,J,V
 //
@@ -9002,8 +9002,8 @@ double sparsegetaveragelengthofchain(sparsematrix *s) {
 // Outputs:
 //     T0          -   new value of the internal counter
 //     T1          -   new value of the internal counter
-//     I           -   row index of non-zero element, 0 <= I<M.
-//     J           -   column index of non-zero element, 0 <= J<N
+//     I           -   row index of non-zero element, 0 <= I < M.
+//     J           -   column index of non-zero element, 0 <= J < N
 //     V           -   value of the T-th element
 //
 // Result:
@@ -9105,7 +9105,7 @@ bool sparseenumerate(sparsematrix *s, ae_int_t *t0, ae_int_t *t1, ae_int_t *i, a
 //
 // Inputs:
 //     S           -   sparse M*N matrix in CRS format
-//     I           -   row index, 0 <= I<M
+//     I           -   row index, 0 <= I < M
 //     IRow        -   output buffer, can be  preallocated.  In  case  buffer
 //                     size  is  too  small  to  store  I-th   row,   it   is
 //                     automatically reallocated.
@@ -9132,7 +9132,7 @@ void sparsegetrow(sparsematrix *s, ae_int_t i, RVector *irow) {
    ae_int_t j;
    ae_int_t upperprofile;
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseGetRow: S must be CRS/SKS-based matrix");
-   ae_assert(i >= 0 && i < s->m, "SparseGetRow: I<0 or I >= M");
+   ae_assert(i >= 0 && i < s->m, "SparseGetRow: I < 0 or I >= M");
 // Prepare output buffer
    vectorsetlengthatleast(irow, s->n);
    for (i0 = 0; i0 < s->n; i0++) {
@@ -9172,7 +9172,7 @@ void sparsegetrow(sparsematrix *s, ae_int_t i, RVector *irow) {
 //
 // Inputs:
 //     S           -   sparse M*N matrix in CRS format
-//     I           -   row index, 0 <= I<M
+//     I           -   row index, 0 <= I < M
 //     ColIdx      -   output buffer for column indexes, can be preallocated.
 //                     In case buffer size is too small to store I-th row, it
 //                     is automatically reallocated.
@@ -9212,7 +9212,7 @@ void sparsegetcompressedrow(sparsematrix *s, ae_int_t i, ZVector *colidx, RVecto
    ae_int_t upperprofile;
    *nzcnt = 0;
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseGetRow: S must be CRS/SKS-based matrix");
-   ae_assert(i >= 0 && i < s->m, "SparseGetRow: I<0 or I >= M");
+   ae_assert(i >= 0 && i < s->m, "SparseGetRow: I < 0 or I >= M");
 // Initialize NZCnt
    *nzcnt = 0;
 // CRS matrix - just copy data
@@ -9296,7 +9296,7 @@ void sparsetransposesks(sparsematrix *s) {
       // Upper skyline height is less than lower skyline height.
       //
       // Transposition becomes a bit tricky: we have to rearrange
-      // "L0 L1 D U" to "U D L0 L1", where |L0|=|U|=u, |L1|=d-u.
+      // "L0 L1 D U" to "U D L0 L1", where |L0| == |U| == u, |L1| == d-u.
       //
       // In order to do this we perform a sequence of swaps and
       // in-place reversals:
@@ -9335,7 +9335,7 @@ void sparsetransposesks(sparsematrix *s) {
       // Upper skyline height is greater than lower skyline height.
       //
       // Transposition becomes a bit tricky: we have to rearrange
-      // "L D U0 U1" to "U0 U1 D L", where |U1|=|L|=d, |U0|=u-d.
+      // "L D U0 U1" to "U0 U1 D L", where |U1| == |L| == d, |U0| == u-d.
       //
       // In order to do this we perform a sequence of swaps and
       // in-place reversals:
@@ -9993,7 +9993,7 @@ void sparsecopytohash(sparsematrix *s0, sparsematrix *s1) {
 //
 // Inputs:
 //     S0          -   sparse matrix in any format.
-//     S1          -   matrix which may contain some pre-allocated memory, or
+//     S1          -   matrix which may contain some preallocated memory, or
 //                     can be just uninitialized structure.
 //
 // Outputs:
@@ -10323,7 +10323,7 @@ void sparsecreatecrsinplace(sparsematrix *s) {
    ae_int_t j1;
    m = s->m;
    n = s->n;
-// Quick exit for M=0 or N=0
+// Quick exit for M == 0 or N == 0
    ae_assert(s->m >= 0, "SparseCreateCRSInplace: integrity check failed");
    ae_assert(s->n >= 0, "SparseCreateCRSInplace: integrity check failed");
    if (m == 0 || n == 0) {
@@ -10833,7 +10833,6 @@ void sparsebuffers_free(void *_p, bool make_automatic) {
 
 namespace alglib {
 // Sparse matrix structure.
-//
 // You should use ALGLIB functions to work with sparse matrix. Never  try  to
 // access its fields directly!
 //
@@ -12070,7 +12069,6 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
                }
             }
          }
-      // Exit
          break;
       }
    // Perform multiple-shift QR iterations on rows and columns ILO to I
@@ -12300,7 +12298,6 @@ void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded,
 //     H   -   matrix to be decomposed.
 //             Array whose indexes range within [1..N, 1..N].
 //     N   -   size of H, N >= 0.
-//
 //
 // Outputs:
 //     H   -   contains the matrix T.
@@ -13662,7 +13659,7 @@ static void evd_tdevde2(double a, double b, double c, double *rt1, double *rt2) 
       if (adf < ab) {
          rt = ab * sqrt(1 + sqr(adf / ab));
       } else {
-      // Includes case AB=ADF=0
+      // Includes case AB == ADF == 0
          rt = ab * sqrt(2.0);
       }
    }
@@ -13698,7 +13695,6 @@ static void evd_tdevde2(double a, double b, double c, double *rt1, double *rt2) 
 //
 //    [ CS1  SN1 ] [  A   B  ] [ CS1 -SN1 ]  =  [ RT1  0  ]
 //    [-SN1  CS1 ] [  B   C  ] [ SN1  CS1 ]     [  0  RT2 ].
-//
 //
 //   -- LAPACK auxiliary routine (version 3.0) --
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -13742,7 +13738,7 @@ static void evd_tdevdev2(double a, double b, double c, double *rt1, double *rt2,
       if (adf < ab) {
          rt = ab * sqrt(1 + sqr(adf / ab));
       } else {
-      // Includes case AB=ADF=0
+      // Includes case AB == ADF == 0
          rt = ab * sqrt(2.0);
       }
    }
@@ -14402,8 +14398,8 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
 //   Intervals KF,...,KL  still need to be refined.
    kf = 1;
    kl = minp;
-// If IJOB=2, initialize C.
-// If IJOB=3, use the user-supplied starting point.
+// If IJOB == 2, initialize C.
+// If IJOB == 3, use the user-supplied starting point.
    if (ijob == 2) {
       for (ji = 1; ji <= minp; ji++) {
          c->xR[ji] = 0.5 * (ab->xyR[ji][1] + ab->xyR[ji][2]);
@@ -14428,7 +14424,7 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
       // A series of compiler directives to defeat vectorization
       // for the next loop
       //
-      // *$PL$ CMCHAR=' '
+      // *$PL$ CMCHAR == ' '
       // CDIR$          NEXTSCALAR
       // C$DIR          SCALAR
       // CDIR$          NEXT SCALAR
@@ -14438,7 +14434,7 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
       // *VDIR          NOVECTOR
       // *VOCL          LOOP,SCALAR
       // CIBM           PREFER SCALAR
-      // *$PL$ CMCHAR='*'
+      // *$PL$ CMCHAR == '*'
          for (j = 2; j <= n; j++) {
             tmp2 = d->xR[j] - e2->xR[j - 1] / tmp2 - tmp1;
             if (tmp2 <= pivmin) {
@@ -14447,7 +14443,7 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
             }
          }
          if (ijob <= 2) {
-         // IJOB=2: Choose all intervals containing eigenvalues.
+         // IJOB == 2: Choose all intervals containing eigenvalues.
          //
          // Insure that N(w) is monotone
             itmp1 = imin2(nab->xyZ[ji][2], imax2(nab->xyZ[ji][1], itmp1));
@@ -14479,7 +14475,7 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
                }
             }
          } else {
-         // IJOB=3: Binary search.  Keep only the interval
+         // IJOB == 3: Binary search.  Keep only the interval
          // containing  w  s.t. N(w) = NVAL
             if (itmp1 <= nval->xZ[ji]) {
                ab->xyR[ji][1] = tmp1;
@@ -14666,7 +14662,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
    if (irange == 3 && il == 1 && iu == n) {
       irange = 1;
    }
-// Special Case when N=1
+// Special Case when N == 1
    if (n == 1) {
       *nsplit = 1;
       isplit->xZ[1] = 1;
@@ -14720,7 +14716,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
    pivmin *= safemn;
 // Compute Interval and ATOLI
    if (irange == 3) {
-   // RANGE='I': Compute the interval containing eigenvalues
+   // RANGE == 'I': Compute the interval containing eigenvalues
    //     IL through IU.
    //
    // Compute Gershgorin interval for entire (split) matrix
@@ -14810,7 +14806,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
          return result;
       }
    } else {
-   // RANGE='A' or 'V' -- Set ATOLI
+   // RANGE == 'A' or 'V' -- Set ATOLI
       tnorm = rmax2(fabs(d->xR[1]) + fabs(e->xR[1]), fabs(d->xR[n]) + fabs(e->xR[n - 1]));
       for (j = 2; j < n; j++) {
          tnorm = rmax2(tnorm, fabs(d->xR[j]) + fabs(e->xR[j - 1]) + fabs(e->xR[j]));
@@ -14842,7 +14838,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
       iend = isplit->xZ[jb];
       iin = iend - ioff;
       if (iin == 1) {
-      // Special Case -- IIN=1
+      // Special Case -- IIN == 1
          if (irange == 1 || wl >= d->xR[ibegin] - pivmin) {
             nwl++;
          }
@@ -14978,7 +14974,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
          *m += im;
       }
    }
-// If RANGE='I', then (WL,WU) contains eigenvalues NWL+1,...,NWU
+// If RANGE == 'I', then (WL,WU) contains eigenvalues NWL+1,...,NWU
 // If NWL+1 < IL or NWU > IU, discard extra eigenvalues.
    if (irange == 3) {
       im = 0;
@@ -15009,7 +15005,7 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
       // eigenvalue(s).
       //
       // (If N(w) is monotone non-decreasing, this should never
-      //  happen.)
+      // happen.)
          if (idiscl > 0) {
             wkill = wu;
             for (jdisc = 1; jdisc <= idiscl; jdisc++) {
@@ -15050,9 +15046,9 @@ static bool evd_internalbisectioneigenvalues(RVector *d, RVector *e, ae_int_t n,
          toofew = true;
       }
    }
-// If ORDER='B', do nothing -- the eigenvalues are already sorted
+// If ORDER == 'B', do nothing -- the eigenvalues are already sorted
 //    by block.
-// If ORDER='E', sort the eigenvalues from smallest to largest
+// If ORDER == 'E', sort the eigenvalues from smallest to largest
    if (iorder == 1 && *nsplit > 1) {
       for (je = 1; je < *m; je++) {
          ie = 0;
@@ -15527,13 +15523,13 @@ static void evd_clearrfields(eigsubspacestate *state) {
 //     WR      -   imaginary parts of eigenvalues.
 //                 Array whose index ranges within [0..N-1].
 //     VL, VR  -   arrays of left and right eigenvectors (if they are needed).
-//                 If WI[i]=0, the respective eigenvalue is a real number,
+//                 If WI[i] == 0, the respective eigenvalue is a real number,
 //                 and it corresponds to the column number I of matrices VL/VR.
-//                 If WI[i]>0, we have a pair of complex conjugate numbers with
+//                 If WI[i] > 0, we have a pair of complex conjugate numbers with
 //                 positive and negative imaginary parts:
 //                     the first eigenvalue WR[i] + sqrt(-1)*WI[i];
 //                     the second eigenvalue WR[i+1] + sqrt(-1)*WI[i+1];
-//                     WI[i]>0
+//                     WI[i] > 0
 //                     WI[i+1] = -WI[i] < 0
 //                 In that case, the eigenvector  corresponding to the first
 //                 eigenvalue is located in i and i+1 columns of matrices
@@ -15548,11 +15544,11 @@ static void evd_clearrfields(eigsubspacestate *state) {
 //     False, if the algorithm has not converged.
 //
 // Note 1:
-//     Some users may ask the following question: what if WI[N-1]>0?
+//     Some users may ask the following question: what if WI[N-1] > 0?
 //     WI[N] must contain an eigenvalue which is complex conjugate to the
 //     N-th eigenvalue, but the array has only size N?
 //     The answer is as follows: such a situation cannot occur because the
-//     algorithm finds a pairs of eigenvalues, therefore, if WI[i]>0, I is
+//     algorithm finds a pairs of eigenvalues, therefore, if WI[i] > 0, I is
 //     strictly less than N-1.
 //
 // Note 2:
@@ -15561,7 +15557,6 @@ static void evd_clearrfields(eigsubspacestate *state) {
 //     of shifts in the QR algorithm (similarly to the block width in block-matrix
 //     algorithms of linear algebra). If you require maximum performance
 //     on your machine, it is recommended to adjust this parameter manually.
-//
 //
 // See also the InternalTREVC subroutine.
 //
@@ -15647,7 +15642,7 @@ bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *
 //                    square matrix Z;
 //                  * 3, matrix Z contains the first row of the eigenvectors
 //                    matrix.
-//     Z       -   if ZNeeded=1, Z contains the square matrix by which the
+//     Z       -   if ZNeeded == 1, Z contains the square matrix by which the
 //                 eigenvectors are multiplied.
 //                 Array whose indexes range within [0..N-1, 0..N-1].
 //
@@ -15660,9 +15655,9 @@ bool rmatrixevd(RMatrix *a, ae_int_t n, ae_int_t vneeded, RVector *wr, RVector *
 //                    and the eigenvectors matrix (from the right);
 //                  * 2, Z contains the eigenvectors.
 //                  * 3, Z contains the first row of the eigenvectors matrix.
-//                 If ZNeeded<3, Z is the array whose indexes range within [0..N-1, 0..N-1].
+//                 If ZNeeded < 3, Z is the array whose indexes range within [0..N-1, 0..N-1].
 //                 In that case, the eigenvectors are stored in the matrix columns.
-//                 If ZNeeded=3, Z is the array whose indexes range within [0..0, 0..N-1].
+//                 If ZNeeded == 3, Z is the array whose indexes range within [0..0, 0..N-1].
 //
 // Result:
 //     True, if the algorithm has converged.
@@ -16001,9 +15996,7 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
 //                  * 2, contains the matrix of the eigenvalues found.
 //                    Array whose indexes range within [0..N-1, 0..I2-I1].
 //
-//
 // Result:
-//
 //     True, if successful. In that case, D contains the eigenvalues,
 //     Z contains the eigenvectors (if needed).
 //     It should be noted that the subroutine changes the size of arrays D and Z.
@@ -16246,8 +16239,8 @@ bool smatrixevd(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector 
 //
 // Note:
 //     eigenvectors of Hermitian matrix are defined up to  multiplication  by
-//     a complex number L, such that |L|=1.
-// ALGLIB: Copyright 2005, 23 March 2007 by Sergey Bochkanov
+//     a complex number L, such that |L| == 1.
+// ALGLIB: Copyright 2005, 2007 March 23 by Sergey Bochkanov
 // API: bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, complex_2d_array &z);
 bool hmatrixevd(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, RVector *d, CMatrix *z) {
    ae_frame _frame_block;
@@ -16402,7 +16395,7 @@ bool smatrixevdr(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double 
 //
 // Note:
 //     eigen vectors of Hermitian matrix are defined up to multiplication  by
-//     a complex number L, such as |L|=1.
+//     a complex number L, such as |L| == 1.
 // ALGLIB: Copyright 07.01.2006, 24.03.2007 by Sergey Bochkanov
 // API: bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, complex_2d_array &z);
 bool hmatrixevdr(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, double b1, double b2, ae_int_t *m, RVector *w, CMatrix *z) {
@@ -16554,7 +16547,7 @@ bool smatrixevdi(RMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_
 //
 // Note:
 //     eigen vectors of Hermitian matrix are defined up to multiplication  by
-//     a complex number L, such as |L|=1.
+//     a complex number L, such as |L| == 1.
 // ALGLIB: Copyright 07.01.2006, 24.03.2007 by Sergey Bochkanov
 // API: bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, complex_2d_array &z);
 bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_t i1, ae_int_t i2, RVector *w, CMatrix *z) {
@@ -16633,7 +16626,7 @@ bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_
 //                     that it can stop after maxits  steps  (no  matter  how
 //                     precise current estimate is)
 //
-// NOTE: passing  eps=0  and  maxits=0  results  in  automatic  selection  of
+// NOTE: passing  eps == 0  and  maxits == 0  results  in  automatic  selection  of
 //       moderate eps as stopping criteria (1.0E-6 in current implementation,
 //       but it may change without notice).
 //
@@ -16657,8 +16650,8 @@ bool hmatrixevdi(CMatrix *a, ae_int_t n, ae_int_t zneeded, bool isupper, ae_int_
 // API: void eigsubspacesetcond(const eigsubspacestate &state, const double eps, const ae_int_t maxits);
 void eigsubspacesetcond(eigsubspacestate *state, double eps, ae_int_t maxits) {
    ae_assert(!state->running, "EigSubspaceSetCond: solver is already running");
-   ae_assert(isfinite(eps) && eps >= 0.0, "EigSubspaceSetCond: Eps<0 or NAN/INF");
-   ae_assert(maxits >= 0, "EigSubspaceSetCond: MaxIts<0");
+   ae_assert(isfinite(eps) && eps >= 0.0, "EigSubspaceSetCond: Eps < 0 or NAN/INF");
+   ae_assert(maxits >= 0, "EigSubspaceSetCond: MaxIts < 0");
    if (eps == 0.0 && maxits == 0) {
       eps = 1.0E-6;
    }
@@ -16673,7 +16666,7 @@ void eigsubspacesetcond(eigsubspacestate *state, double eps, ae_int_t maxits) {
 void eigsubspacecreatebuf(ae_int_t n, ae_int_t k, eigsubspacestate *state) {
    ae_assert(n > 0, "EigSubspaceCreate: N <= 0");
    ae_assert(k > 0, "EigSubspaceCreate: K <= 0");
-   ae_assert(k <= n, "EigSubspaceCreate: K>N");
+   ae_assert(k <= n, "EigSubspaceCreate: K > N");
 // Initialize algorithm parameters
    state->running = false;
    state->n = n;
@@ -16717,13 +16710,13 @@ void eigsubspacecreatebuf(ae_int_t n, ae_int_t k, eigsubspacestate *state) {
 //    > while alglib.eigsubspaceooccontinue(state) do
 //    >     alglib.eigsubspaceoocgetrequestinfo(state, out RequestType, out M)
 //    >     alglib.eigsubspaceoocgetrequestdata(state, out X)
-//    >     [calculate  Y=A*X, with X=R^NxM]
+//    >     [calculate Y == A*X, with X == R^NxM]
 //    >     alglib.eigsubspaceoocsendresult(state, in Y)
 //    > alglib.eigsubspaceoocstop(state, out W, out Z, out Report)
 //
 // Inputs:
-//     N       -   problem dimensionality, N>0
-//     K       -   number of top eigenvector to calculate, 0<K <= N.
+//     N       -   problem dimensionality, N > 0
+//     K       -   number of top eigenvector to calculate, 0 < K <= N.
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -16737,7 +16730,7 @@ void eigsubspacecreate(ae_int_t n, ae_int_t k, eigsubspacestate *state) {
    SetObj(eigsubspacestate, state);
    ae_assert(n > 0, "EigSubspaceCreate: N <= 0");
    ae_assert(k > 0, "EigSubspaceCreate: K <= 0");
-   ae_assert(k <= n, "EigSubspaceCreate: K>N");
+   ae_assert(k <= n, "EigSubspaceCreate: K > N");
    eigsubspacecreatebuf(n, k, state);
 }
 
@@ -16763,7 +16756,7 @@ void eigsubspacesetwarmstart(eigsubspacestate *state, bool usewarmstart) {
 // > while alglib.eigsubspaceooccontinue(state) do
 // >     alglib.eigsubspaceoocgetrequestinfo(state, out RequestType, out M)
 // >     alglib.eigsubspaceoocgetrequestdata(state, out X)
-// >     [calculate  Y=A*X, with X=R^NxM]
+// >     [calculate Y == A*X, with X == R^NxM]
 // >     alglib.eigsubspaceoocsendresult(state, in Y)
 // > alglib.eigsubspaceoocstop(state, out W, out Z, out Report)
 //
@@ -16821,7 +16814,6 @@ Spawn:
    convcnt = -788;
    vv = 809;
    v = 205;
-// Routine body
    n = state->n;
    k = state->k;
    nwork = state->nwork;
@@ -16868,7 +16860,7 @@ Spawn:
    state->repiterationscount = 0;
    convcnt = 0;
    while ((state->maxits == 0 || state->repiterationscount < state->maxits) && convcnt < evd_stepswithintol) {
-   // Update QCur := QNew
+   // Update QCur = QNew
    //
    // Calculate A*Q'
       rmatrixcopy(nwork, n, &state->qnew, 0, 0, &state->qcur, 0, 0);
@@ -16965,7 +16957,7 @@ Pause:
 // > while alglib.eigsubspaceooccontinue(state) do
 // >     alglib.eigsubspaceoocgetrequestinfo(state, out RequestType, out M)
 // >     alglib.eigsubspaceoocgetrequestdata(state, out X)
-// >     [calculate  Y=A*X, with X=R^NxM]
+// >     [calculate Y == A*X, with X == R^NxM]
 // >     alglib.eigsubspaceoocsendresult(state, in Y)
 // > alglib.eigsubspaceoocstop(state, out W, out Z, out Report)
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
@@ -16993,7 +16985,7 @@ bool eigsubspaceooccontinue(eigsubspacestate *state) {
 // > while alglib.eigsubspaceooccontinue(state) do
 // >     alglib.eigsubspaceoocgetrequestinfo(state, out RequestType, out M)
 // >     alglib.eigsubspaceoocgetrequestdata(state, out X)
-// >     [calculate  Y=A*X, with X=R^NxM]
+// >     [calculate Y == A*X, with X == R^NxM]
 // >     alglib.eigsubspaceoocsendresult(state, in Y)
 // > alglib.eigsubspaceoocstop(state, out W, out Z, out Report)
 //
@@ -17033,7 +17025,7 @@ void eigsubspaceoocgetrequestinfo(eigsubspacestate *state, ae_int_t *requesttype
 // > while alglib.eigsubspaceooccontinue(state) do
 // >     alglib.eigsubspaceoocgetrequestinfo(state, out RequestType, out M)
 // >     alglib.eigsubspaceoocgetrequestdata(state, out X)
-// >     [calculate  Y=A*X, with X=R^NxM]
+// >     [calculate Y == A*X, with X == R^NxM]
 // >     alglib.eigsubspaceoocsendresult(state, in Y)
 // > alglib.eigsubspaceoocstop(state, out W, out Z, out Report)
 //
@@ -17070,7 +17062,7 @@ void eigsubspaceoocgetrequestdata(eigsubspacestate *state, RMatrix *x) {
 // > while alglib.eigsubspaceooccontinue(state) do
 // >     alglib.eigsubspaceoocgetrequestinfo(state, out RequestType, out M)
 // >     alglib.eigsubspaceoocgetrequestdata(state, out X)
-// >     [calculate  Y=A*X, with X=R^NxM]
+// >     [calculate Y == A*X, with X == R^NxM]
 // >     alglib.eigsubspaceoocsendresult(state, in Y)
 // > alglib.eigsubspaceoocstop(state, out W, out Z, out Report)
 //
@@ -17099,7 +17091,7 @@ void eigsubspaceoocsendresult(eigsubspacestate *state, RMatrix *ax) {
 // > while alglib.eigsubspaceooccontinue(state) do
 // >     alglib.eigsubspaceoocgetrequestinfo(state, out RequestType, out M)
 // >     alglib.eigsubspaceoocgetrequestdata(state, out X)
-// >     [calculate  Y=A*X, with X=R^NxM]
+// >     [calculate Y == A*X, with X == R^NxM]
 // >     alglib.eigsubspaceoocsendresult(state, in Y)
 // > alglib.eigsubspaceoocstop(state, out W, out Z, out Report)
 //
@@ -17367,12 +17359,10 @@ void eigsubspacereport_free(void *_p, bool make_automatic) {
 
 namespace alglib {
 // This object stores state of the subspace iteration algorithm.
-//
 // You should use ALGLIB functions to work with this object.
 DefClass(eigsubspacestate, )
 
 // This object stores state of the subspace iteration algorithm.
-//
 // You should use ALGLIB functions to work with this object.
 DefClass(eigsubspacereport, DecVal(iterationscount))
 
@@ -17912,7 +17902,7 @@ static const ae_int_t sptrf_slswidth = 8;
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_sluv2list1init(ae_int_t n, sluv2list1matrix *a) {
    ae_int_t i;
-   ae_assert(n >= 1, "SLUV2List1Init: N<1");
+   ae_assert(n >= 1, "SLUV2List1Init: N < 1");
    a->nfixed = n;
    a->ndynamic = 0;
    a->nallocated = n;
@@ -17951,7 +17941,7 @@ static void sptrf_sluv2list1dropsequence(sluv2list1matrix *a, ae_int_t i) {
 //     A           -   rectangular matrix structure
 //     Src         -   sequence (row or column) index in the structure
 //     HasDiagonal -   whether we want to add diagonal element
-//     D           -   diagonal element, if HasDiagonal=True
+//     D           -   diagonal element, if HasDiagonal == True
 //     NZMAX       -   maximum estimated number of non-zeros in the row,
 //                     this function will preallocate storage in the output
 //                     matrix.
@@ -18040,7 +18030,7 @@ static void sptrf_densetrailinit(sluv2densetrail *d, ae_int_t n) {
    }
 }
 
-// This function appends column with id=ID to the dense trail (column IDs are
+// This function appends column with id == ID to the dense trail (column IDs are
 // integer numbers in [0,N) which can be used to track column permutations).
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_densetrailappendcolumn(sluv2densetrail *d, RVector *x, ae_int_t id) {
@@ -18147,8 +18137,8 @@ static void sptrf_sparsetrailinit(sparsematrix *s, sluv2sparsetrail *a) {
 // and row, with most sparse column selected for column pivoting, and largest
 // element selected for row pivoting. Function result is True.
 //
-// PivotType=1 means that no column pivoting is performed
-// PivotType=2 means that both column and row pivoting are supported
+// PivotType == 1 means that no column pivoting is performed
+// PivotType == 2 means that both column and row pivoting are supported
 //
 // If all columns were densified, False is returned.
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
@@ -18664,8 +18654,8 @@ static void sptrf_sparsetrailupdate(sluv2sparsetrail *a, ZVector *v0i, RVector *
 // Sparse LU for square NxN CRS matrix with both row and column permutations.
 //
 // Represents A as Pr*L*U*Pc, where:
-// * Pr is a product of row permutations Pr=Pr(0)*Pr(1)*...*Pr(n-2)*Pr(n-1)
-// * Pc is a product of col permutations Pc=Pc(n-1)*Pc(n-2)*...*Pc(1)*Pc(0)
+// * Pr is a product of row permutations Pr == Pr(0)*Pr(1)*...*Pr(n-2)*Pr(n-1)
+// * Pc is a product of col permutations Pc == Pc(n-1)*Pc(n-2)*...*Pc(1)*Pc(0)
 // * L is lower unitriangular
 // * U is upper triangular
 //
@@ -18686,7 +18676,7 @@ static void sptrf_sparsetrailupdate(sluv2sparsetrail *a, ZVector *v0i, RVector *
 //     PC          -   array[N], column pivots
 //     Buf         -   following fields of Buf are set:
 //                     * Buf.RowPermRawIdx[] - contains row permutation, with
-//                       RawIdx[I]=J meaning that J-th row  of  the  original
+//                       RawIdx[I] == J meaning that J-th row  of  the  original
 //                       input matrix was moved to Ith position of the output
 //                       factorization
 //
@@ -19186,7 +19176,7 @@ static void amdordering_nscopy(amdnset *ssrc, amdnset *sdst) {
 //
 // Inputs:
 //     SA          -   set
-//     K           -   element to add, 0 <= K<N.
+//     K           -   element to add, 0 <= K < N.
 //
 // Outputs:
 //     SA          -   modified SA
@@ -19437,8 +19427,8 @@ static void amdordering_nsstartenumeration(amdnset *sa) {
 //
 // Outputs:
 //     J           -   if:
-//                     * Result=True - index of element in the set
-//                     * Result=False - not set
+//                     * Result == True - index of element in the set
+//                     * Result == False - not set
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
 static bool amdordering_nsenumerate(amdnset *sa, ae_int_t *i) {
    ae_int_t k;
@@ -19636,8 +19626,8 @@ static void amdordering_knsstartenumeration(amdknset *sa, ae_int_t i) {
 //
 // Outputs:
 //     J           -   if:
-//                     * Result=True - index of element in the set
-//                     * Result=False - not set
+//                     * Result == True - index of element in the set
+//                     * Result == False - not set
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
 static bool amdordering_knsenumerate(amdknset *sa, ae_int_t *i) {
    bool result;
@@ -20407,7 +20397,7 @@ static void amdordering_amdselectpivotelement(amdbuffer *buf, ae_int_t k, ae_int
 //     Buf.Lp      -   initialized with Lp\P
 //     Buf.setRp   -   initialized with Lp\{P+Q}
 //     Buf.Ep      -   initialized with setE[P]
-//     Buf.mtxL    -   L := L+Lp
+//     Buf.mtxL    -   L = L+Lp
 //     Buf.Ls      -   first Buf.LSCnt elements contain subset of Lp elements
 //                     that are principal nodes in supervariables.
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
@@ -20664,7 +20654,7 @@ static void amdordering_amddetectsupernodes(amdbuffer *buf) {
 //
 // Result:
 //     number of successfully ordered rows/cols;
-//     N for AMDType=0, 0<Result <= N for AMDType=1
+//     N for AMDType == 0, 0 < Result <= N for AMDType == 1
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
 ae_int_t generateamdpermutationx(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, ae_int_t amdtype, amdbuffer *buf) {
    ae_int_t i;
@@ -21805,11 +21795,11 @@ static void spchol_loadmatrix(spcholanalysis *analysis, sparsematrix *at) {
 //
 // Outputs:
 //     A           -   sparse matrix in CRS format:
-//                     * for PermType=0, sparse matrix in the original ordering
+//                     * for PermType == 0, sparse matrix in the original ordering
 //                       (i.e. the matrix is reordered prior to output that
 //                       may require considerable amount of operations due to
 //                       permutation being applied)
-//                     * for PermType=1, sparse matrix in the topological
+//                     * for PermType == 1, sparse matrix in the topological
 //                       ordering. The least overhead for output.
 //     D           -   array[N], diagonal
 //     P           -   output permutation in product form
@@ -21837,7 +21827,7 @@ static void spchol_extractmatrix(spcholanalysis *analysis, ZVector *offsets, ZVe
 // Various permutation types
    if (analysis->applypermutationtooutput) {
       ae_assert(analysis->istopologicalordering, "ExtractMatrix: critical integrity check failed (attempt to merge in nontopological permutation)");
-   // Output matrix is topologically permuted, so we return A=L*L' instead of A=P*L*L'*P'.
+   // Output matrix is topologically permuted, so we return A == L*L' instead of A == P*L*L'*P'.
    // Somewhat inefficient because we have to apply permutation to L returned by supernodal code.
       vectorsetlengthatleast(&a->ridx, n + 1);
       vectorsetlengthatleast(&a->didx, n);
@@ -21896,7 +21886,7 @@ static void spchol_extractmatrix(spcholanalysis *analysis, ZVector *offsets, ZVe
       }
    } else {
    // The permutation is NOT applied to L prior to extraction,
-   // we return both L and P: A=P*L*L'*P'.
+   // we return both L and P: A == P*L*L'*P'.
       vectorsetlengthatleast(&a->ridx, n + 1);
       vectorsetlengthatleast(&a->didx, n);
       a->ridx.xZ[0] = 0;
@@ -22018,11 +22008,11 @@ static void spchol_partialcholeskypattern(sparsematrix *a, ae_int_t head, ae_int
    double v;
    ae_assert(a->m == head + tail, "PartialCholeskyPattern: rows(A) != Head+Tail");
    ae_assert(a->n == head + tail, "PartialCholeskyPattern: cols(A) != Head+Tail");
-   ae_assert(tmpparent->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmpParent)<Head+Tail+1");
-   ae_assert(tmpchildrenr->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmpChildrenR)<Head+Tail+1");
-   ae_assert(tmpchildreni->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmpChildrenI)<Head+Tail+1");
-   ae_assert(tmp1->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmp1)<Head+Tail+1");
-   ae_assert(flagarray->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmp1)<Head+Tail+1");
+   ae_assert(tmpparent->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmpParent) < Head+Tail+1");
+   ae_assert(tmpchildrenr->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmpChildrenR) < Head+Tail+1");
+   ae_assert(tmpchildreni->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmpChildrenI) < Head+Tail+1");
+   ae_assert(tmp1->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmp1) < Head+Tail+1");
+   ae_assert(flagarray->cnt >= head + tail + 1, "PartialCholeskyPattern: Length(tmp1) < Head+Tail+1");
    cursize = head + tail;
    v = 1.0 / cursize;
 // Compute leading Head columns of the Cholesky decomposition of A.
@@ -22191,7 +22181,7 @@ static void spchol_partialcholeskypattern(sparsematrix *a, ae_int_t head, ae_int
 //
 // Inputs:
 //     A           -   sparse lower triangular matrix in CRS format.
-//     P           -   array[N] which stores permutation table;  P[I]=J means
+//     P           -   array[N] which stores permutation table;  P[I] == J means
 //                     that I-th row/column of matrix  A  is  moved  to  J-th
 //                     position. For performance reasons we do NOT check that
 //                     P[] is  a   correct   permutation  (that there  is  no
@@ -22203,7 +22193,7 @@ static void spchol_partialcholeskypattern(sparsematrix *a, ae_int_t head, ae_int
 //
 // Outputs:
 //     B           -   permuted and transposed upper triangular matrix in the
-//                     special internal CRS-like matrix format (MatrixType=-10082).
+//                     special internal CRS-like matrix format (MatrixType == -10082).
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
 static void spchol_topologicalpermutation(sparsematrix *a, ZVector *p, sparsematrix *b) {
    ae_int_t i;
@@ -22216,7 +22206,7 @@ static void spchol_topologicalpermutation(sparsematrix *a, ZVector *p, sparsemat
    ae_int_t n;
    bool bflag;
    ae_assert(a->matrixtype == 1, "TopologicalPermutation: incorrect matrix type (convert your matrix to CRS)");
-   ae_assert(p->cnt >= a->n, "TopologicalPermutation: Length(P)<N");
+   ae_assert(p->cnt >= a->n, "TopologicalPermutation: Length(P) < N");
    ae_assert(a->m == a->n, "TopologicalPermutation: matrix is non-square");
    ae_assert(a->ninitialized == a->ridx.xZ[a->n], "TopologicalPermutation: integrity check failed");
    bflag = true;
@@ -22603,7 +22593,7 @@ static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_
 }
 
 // Fast kernels for small supernodal updates: special rank-1 function.
-// ∙	See comments on UpdateSupernode() for information on generic supernodal updates, including notation used below.
+// *	See comments on UpdateSupernode() for information on generic supernodal updates, including notation used below.
 // The generic update has the following form:
 //	S = S - scatter(U D Uc^T).
 // This specialized function performs a rank-1 update, i.e.:
@@ -22827,7 +22817,7 @@ static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int
 //
 // The generic update has the following form:
 //
-//     S := S - scatter(U*D*Uc')
+//     S = S - scatter(U*D*Uc')
 //
 // where
 // * S is an tHeight*tWidth rectangular target matrix that is:
@@ -22841,7 +22831,7 @@ static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int
 // * Uc is the leading uWidth*uRank submatrix of U
 // * D is uRank*uRank diagonal matrix that is:
 //   * stored in DiagD[OffsD:OffsD+uRank-1]
-//   * unit, when Analysis.UnitD=True. In this case it can be ignored, although
+//   * unit, when Analysis.UnitD == True. In this case it can be ignored, although
 //     DiagD still contains 1's in all of its entries
 // * uHeight <= tHeight, uWidth <= tWidth, so scatter operation is needed to update
 //   S with smaller update.
@@ -22907,7 +22897,7 @@ static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, 
    result = offdiagrow;
 // Handle special cases
    if (trowstride == 4) {
-   // Target is stride-4 column, try several kernels that may work with tWidth=3 and tWidth=4
+   // Target is stride-4 column, try several kernels that may work with tWidth == 3 and tWidth == 4
       if (uwidth == 4 && twidth == 4 && urank == 4 && urowstride == 4) {
          if (spchol_updatekernel4444(&analysis->outputstorage, offss, theight, offsu, uheight, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
             return result;
@@ -23134,7 +23124,7 @@ static bool spchol_dbgmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, b
          }
       }
    } else {
-   // Compute the Cholesky factorization A = L*L'.
+   // Compute the Cholesky factorization A == L*L'.
       for (j = 0; j < n; j++) {
       // Compute L(J+1,J+1) and test for non-positive-definiteness.
          v = ae_v_dotproduct(&aaa->xyR[offs + j][offs], 1, &aaa->xyR[offs + j][offs], 1, j);
@@ -23375,7 +23365,7 @@ bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spchol
             // Special debug ordering in order to test correctness of multiple AMD rounds
                tail = imax2(tail, residual / 2);
             }
-            ae_assert(tail < residual, "SPSymmAnalyze: integrity check failed (Tail=Residual)");
+            ae_assert(tail < residual, "SPSymmAnalyze: integrity check failed (Tail == Residual)");
          // Apply permutation TmpPerm[] to the tail of the permutation FillInPerm[]
             for (i = 0; i < residual; i++) {
                analysis->fillinperm.xZ[analysis->invfillinperm.xZ[n - residual + analysis->invtmpperm.xZ[i]]] = n - residual + i;
@@ -23527,7 +23517,7 @@ void spsymmreloaddiagonal(spcholanalysis *analysis, RVector *d) {
    ae_int_t offss;
    ae_int_t sstride;
    ae_int_t j;
-   ae_assert(d->cnt >= analysis->n, "SPSymmReloadDiagonal: length(D)<N");
+   ae_assert(d->cnt >= analysis->n, "SPSymmReloadDiagonal: length(D) < N");
    for (sidx = 0; sidx < analysis->nsuper; sidx++) {
       cols0 = analysis->supercolrange.xZ[sidx];
       cols1 = analysis->supercolrange.xZ[sidx + 1];
@@ -23589,7 +23579,7 @@ bool spsymmfactorize(spcholanalysis *analysis) {
    n = analysis->n;
 // Prepare structures:
 // * WrkRows[] store pointers to beginnings of the offdiagonal supernode row ranges;
-//   at the beginning of the work WrkRows[]=0, but as we advance from the column
+//   at the beginning of the work WrkRows[] == 0, but as we advance from the column
 //   range [0,A) to [A,B), to [B,C) and so on, we advance WrkRows[] in order to
 //   quickly skip parts that are less than A, less than B, less than C and so on.
    vectorsetlengthatleast(&analysis->raw2smap, n);
@@ -23652,7 +23642,7 @@ void spsymmextract(spcholanalysis *analysis, sparsematrix *a, RVector *d, ZVecto
    spchol_extractmatrix(analysis, &analysis->rowoffsets, &analysis->rowstrides, &analysis->outputstorage, &analysis->diagd, analysis->n, a, d, p, &analysis->tmp0);
 }
 
-// Solve linear system A*x=b, using internally stored  factorization  of  the
+// Solve linear system A*x == b, using internally stored  factorization  of  the
 // matrix A.
 //
 // Works faster than extracting the matrix and solving with SparseTRSV()  due
@@ -23689,7 +23679,7 @@ void spsymmsolve(spcholanalysis *analysis, RVector *b) {
    for (i = 0; i < n; i++) {
       analysis->simdbuf.xR[i * simdwidth] = b->xR[analysis->inveffectiveperm.xZ[i]];
    }
-// Solve for L*tmp_x=rhs.
+// Solve for L*tmp_x == rhs.
 //
 // The RHS (original and temporary updates) is stored in the SIMD-friendly SIMDBuf which
 // stores RHS as unevaluated sum of SIMDWidth numbers (this format allows easy updates
@@ -23717,7 +23707,7 @@ void spsymmsolve(spcholanalysis *analysis, RVector *b) {
    // Propagate update to other variables
       spchol_propagatefwd(&analysis->tmpx, cols0, blocksize, &analysis->superrowidx, rbase, offdiagsize, &analysis->outputstorage, offss, sstride, &analysis->simdbuf, simdwidth);
    }
-// Solve for D*tmp_x=rhs.
+// Solve for D*tmp_x == rhs.
    for (i = 0; i < n; i++) {
       if (analysis->diagd.xR[i] != 0.0) {
          analysis->tmpx.xR[i] /= analysis->diagd.xR[i];
@@ -23725,7 +23715,7 @@ void spsymmsolve(spcholanalysis *analysis, RVector *b) {
          analysis->tmpx.xR[i] = 0.0;
       }
    }
-// Solve for L'*tmp_x=rhs
+// Solve for L'*tmp_x == rhs
 //
    for (sidx = analysis->nsuper - 1; sidx >= 0; sidx--) {
       cols0 = analysis->supercolrange.xZ[sidx];
@@ -24144,14 +24134,13 @@ void cmatrixplu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
 // A is represented as A = P*L*U, where:
 // * L is lower unitriangular matrix
 // * U is upper triangular matrix
-// * P = P0*P1*...*PK, K=min(M,N)-1,
+// * P = P0*P1*...*PK, K == min(M,N)-1,
 //   Pi - permutation matrix for I and Pivots[I]
 //
 // Inputs:
 //     A       -   array[0..M-1, 0..N-1].
 //     M       -   number of rows in matrix A.
 //     N       -   number of columns in matrix A.
-//
 //
 // Outputs:
 //     A       -   matrices L and U in compact form:
@@ -24173,14 +24162,13 @@ void rmatrixlu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
 // A is represented as A = P*L*U, where:
 // * L is lower unitriangular matrix
 // * U is upper triangular matrix
-// * P = P0*P1*...*PK, K=min(M,N)-1,
+// * P = P0*P1*...*PK, K == min(M,N)-1,
 //   Pi - permutation matrix for I and Pivots[I]
 //
 // Inputs:
 //     A       -   array[0..M-1, 0..N-1].
 //     M       -   number of rows in matrix A.
 //     N       -   number of columns in matrix A.
-//
 //
 // Outputs:
 //     A       -   matrices L and U in compact form:
@@ -24244,7 +24232,7 @@ static bool trfac_spdmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, bo
          }
       }
    } else {
-   // Compute the Cholesky factorization A = L*L'.
+   // Compute the Cholesky factorization A == L*L'.
       for (j = 0; j < n; j++) {
       // Compute L(J+1,J+1) and test for non-positive-definiteness.
          v = ae_v_dotproduct(&aaa->xyR[offs + j][offs], 1, &aaa->xyR[offs + j][offs], 1, j);
@@ -24323,7 +24311,7 @@ static bool trfac_hpdmatrixcholesky2(CMatrix *aaa, ae_int_t offs, ae_int_t n, bo
          }
       }
    } else {
-   // Compute the Cholesky factorization A = L*L'.
+   // Compute the Cholesky factorization A == L*L'.
       for (j = 0; j < n; j++) {
       // Compute L(J+1,J+1) and test for non-positive-definiteness.
          v = ae_v_cdotproduct(&aaa->xyC[offs + j][offs], 1, "Conj", &aaa->xyC[offs + j][offs], 1, "N", j);
@@ -24458,7 +24446,7 @@ static bool trfac_hpdmatrixcholeskyrec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
 // Basecases
 //
 // NOTE: we do not use MKL for basecases because their price is only
-//       minor part of overall running time for N>256.
+//       minor part of overall running time for N > 256.
    if (n == 1) {
       if (a->xyC[offs][offs].x > 0.0) {
          a->xyC[offs][offs] = complex_from_d(sqrt(a->xyC[offs][offs].x));
@@ -24505,17 +24493,17 @@ static bool trfac_hpdmatrixcholeskyrec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
 //
 // The algorithm computes Cholesky decomposition  of  a  symmetric  positive-
 // definite matrix. The result of an algorithm is a representation  of  A  as
-// A=U^T*U  or A=L*L^T
+// A == U^T*U  or A == L*L^T
 //
 // Inputs:
 //     A       -   upper or lower triangle of a factorized matrix.
 //                 array with elements [0..N-1, 0..N-1].
 //     N       -   size of matrix A.
-//     IsUpper -   if IsUpper=True, then A contains an upper triangle of
+//     IsUpper -   if IsUpper == True, then A contains an upper triangle of
 //                 a symmetric matrix, otherwise A contains a lower one.
 //
 // Outputs:
-//     A       -   the result of factorization. If IsUpper=True, then
+//     A       -   the result of factorization. If IsUpper == True, then
 //                 the upper triangle contains matrix U, so that A = U^T*U,
 //                 and the elements below the main diagonal are not modified.
 //                 Similarly, if IsUpper = False.
@@ -24545,17 +24533,17 @@ bool spdmatrixcholesky(RMatrix *a, ae_int_t n, bool isupper) {
 //
 // The algorithm computes Cholesky decomposition  of  a  Hermitian  positive-
 // definite matrix. The result of an algorithm is a representation  of  A  as
-// A=U'*U  or A=L*L' (here X' denotes conj(X^T)).
+// A == U'*U  or A == L*L' (here X' denotes conj(X^T)).
 //
 // Inputs:
 //     A       -   upper or lower triangle of a factorized matrix.
 //                 array with elements [0..N-1, 0..N-1].
 //     N       -   size of matrix A.
-//     IsUpper -   if IsUpper=True, then A contains an upper triangle of
+//     IsUpper -   if IsUpper == True, then A contains an upper triangle of
 //                 a symmetric matrix, otherwise A contains a lower one.
 //
 // Outputs:
-//     A       -   the result of factorization. If IsUpper=True, then
+//     A       -   the result of factorization. If IsUpper == True, then
 //                 the upper triangle contains matrix U, so that A = U'*U,
 //                 and the elements below the main diagonal are not modified.
 //                 Similarly, if IsUpper = False.
@@ -24591,8 +24579,8 @@ bool hpdmatrixcholesky(CMatrix *a, ae_int_t n, bool isupper) {
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
-//     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
+//     N       -   size of matrix A, N > 0
+//     IsUpper -   if IsUpper == True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     U       -   array[N], rank-1 update to A: A_mod = A + u*u'
 //                 Exception is thrown if array size is too small.
@@ -24601,7 +24589,7 @@ bool hpdmatrixcholesky(CMatrix *a, ae_int_t n, bool isupper) {
 //                 perform a lot of subsequent decompositions.
 //
 // Outputs:
-//     A       -   updated factorization.  If  IsUpper=True,  then  the  upper
+//     A       -   updated factorization.  If  IsUpper == True,  then  the  upper
 //                 triangle contains matrix U, and the elements below the main
 //                 diagonal are not modified. Similarly, if IsUpper = False.
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
@@ -24615,9 +24603,9 @@ void spdmatrixcholeskyupdateadd1buf(RMatrix *a, ae_int_t n, bool isupper, RVecto
    double v;
    double vv;
    ae_assert(n > 0, "SPDMatrixCholeskyUpdateAdd1Buf: N <= 0");
-   ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateAdd1Buf: Rows(A)<N");
-   ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateAdd1Buf: Cols(A)<N");
-   ae_assert(u->cnt >= n, "SPDMatrixCholeskyUpdateAdd1Buf: Length(U)<N");
+   ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateAdd1Buf: Rows(A) < N");
+   ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateAdd1Buf: Cols(A) < N");
+   ae_assert(u->cnt >= n, "SPDMatrixCholeskyUpdateAdd1Buf: Length(U) < N");
 // Find index of first non-zero entry in U
    nz = n;
    for (i = 0; i < n; i++) {
@@ -24692,8 +24680,8 @@ void spdmatrixcholeskyupdateadd1buf(RMatrix *a, ae_int_t n, bool isupper, RVecto
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
-//     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
+//     N       -   size of matrix A, N > 0
+//     IsUpper -   if IsUpper == True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     U       -   array[N], rank-1 update to A: A_mod = A + u*u'
 //                 Exception is thrown if array size is too small.
@@ -24702,7 +24690,7 @@ void spdmatrixcholeskyupdateadd1buf(RMatrix *a, ae_int_t n, bool isupper, RVecto
 //                 perform a lot of subsequent decompositions.
 //
 // Outputs:
-//     A       -   updated factorization.  If  IsUpper=True,  then  the  upper
+//     A       -   updated factorization.  If  IsUpper == True,  then  the  upper
 //                 triangle contains matrix U, and the elements below the main
 //                 diagonal are not modified. Similarly, if IsUpper = False.
 //
@@ -24717,9 +24705,9 @@ void spdmatrixcholeskyupdateadd1(RMatrix *a, ae_int_t n, bool isupper, RVector *
    ae_frame_make(&_frame_block);
    NewVector(bufr, 0, DT_REAL);
    ae_assert(n > 0, "SPDMatrixCholeskyUpdateAdd1: N <= 0");
-   ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateAdd1: Rows(A)<N");
-   ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateAdd1: Cols(A)<N");
-   ae_assert(u->cnt >= n, "SPDMatrixCholeskyUpdateAdd1: Length(U)<N");
+   ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateAdd1: Rows(A) < N");
+   ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateAdd1: Cols(A) < N");
+   ae_assert(u->cnt >= n, "SPDMatrixCholeskyUpdateAdd1: Length(U) < N");
    spdmatrixcholeskyupdateadd1buf(a, n, isupper, u, &bufr);
    ae_frame_leave();
 }
@@ -24734,8 +24722,8 @@ void spdmatrixcholeskyupdateadd1(RMatrix *a, ae_int_t n, bool isupper, RVector *
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
-//     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
+//     N       -   size of matrix A, N > 0
+//     IsUpper -   if IsUpper == True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     Fix     -   array[N], I-th element is True if I-th  variable  must  be
 //                 fixed. Exception is thrown if array size is too small.
@@ -24744,7 +24732,7 @@ void spdmatrixcholeskyupdateadd1(RMatrix *a, ae_int_t n, bool isupper, RVector *
 //                 perform a lot of subsequent decompositions.
 //
 // Outputs:
-//     A       -   updated factorization.  If  IsUpper=True,  then  the  upper
+//     A       -   updated factorization.  If  IsUpper == True,  then  the  upper
 //                 triangle contains matrix U, and the elements below the main
 //                 diagonal are not modified. Similarly, if IsUpper = False.
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
@@ -24760,11 +24748,11 @@ void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector
    double v;
    double vv;
    ae_assert(n > 0, "SPDMatrixCholeskyUpdateFixBuf: N <= 0");
-   ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateFixBuf: Rows(A)<N");
-   ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateFixBuf: Cols(A)<N");
-   ae_assert(fix->cnt >= n, "SPDMatrixCholeskyUpdateFixBuf: Length(Fix)<N");
+   ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateFixBuf: Rows(A) < N");
+   ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateFixBuf: Cols(A) < N");
+   ae_assert(fix->cnt >= n, "SPDMatrixCholeskyUpdateFixBuf: Length(Fix) < N");
 // Count number of variables to fix.
-// Quick exit if NFix=0 or NFix=N
+// Quick exit if NFix == 0 or NFix == N
    nfix = 0;
    for (i = 0; i < n; i++) {
       if (fix->xB[i]) {
@@ -24938,8 +24926,8 @@ void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
-//     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
+//     N       -   size of matrix A, N > 0
+//     IsUpper -   if IsUpper == True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     Fix     -   array[N], I-th element is True if I-th  variable  must  be
 //                 fixed. Exception is thrown if array size is too small.
@@ -24948,7 +24936,7 @@ void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector
 //                 perform a lot of subsequent decompositions.
 //
 // Outputs:
-//     A       -   updated factorization.  If  IsUpper=True,  then  the  upper
+//     A       -   updated factorization.  If  IsUpper == True,  then  the  upper
 //                 triangle contains matrix U, and the elements below the main
 //                 diagonal are not modified. Similarly, if IsUpper = False.
 //
@@ -24968,9 +24956,9 @@ void spdmatrixcholeskyupdatefix(RMatrix *a, ae_int_t n, bool isupper, BVector *f
    ae_frame_make(&_frame_block);
    NewVector(bufr, 0, DT_REAL);
    ae_assert(n > 0, "SPDMatrixCholeskyUpdateFix: N <= 0");
-   ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateFix: Rows(A)<N");
-   ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateFix: Cols(A)<N");
-   ae_assert(fix->cnt >= n, "SPDMatrixCholeskyUpdateFix: Length(Fix)<N");
+   ae_assert(a->rows >= n, "SPDMatrixCholeskyUpdateFix: Rows(A) < N");
+   ae_assert(a->cols >= n, "SPDMatrixCholeskyUpdateFix: Cols(A) < N");
+   ae_assert(fix->cnt >= n, "SPDMatrixCholeskyUpdateFix: Length(Fix) < N");
    spdmatrixcholeskyupdatefixbuf(a, n, isupper, fix, &bufr);
    ae_frame_leave();
 }
@@ -24983,8 +24971,8 @@ void spdmatrixcholeskyupdatefix(RMatrix *a, ae_int_t n, bool isupper, BVector *f
 // representation of A as A = P*L*U*Q, where:
 // * L is lower unitriangular matrix
 // * U is upper triangular matrix
-// * P = P0*P1*...*PK, K=N-1, Pi - permutation matrix for I and P[I]
-// * Q = QK*...*Q1*Q0, K=N-1, Qi - permutation matrix for I and Q[I]
+// * P = P0*P1*...*PK, K == N-1, Pi - permutation matrix for I and P[I]
+// * Q = QK*...*Q1*Q0, K == N-1, Qi - permutation matrix for I and Q[I]
 //
 // This function pivots columns for higher sparsity, and then pivots rows for
 // stability (larger element at the diagonal).
@@ -25029,12 +25017,12 @@ bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q) {
    return result;
 }
 
-// Sparse Cholesky decomposition for skyline matrixm using in-place algorithm
+// Sparse Cholesky decomposition for skyline matrix using in-place algorithm
 // without allocating additional storage.
 //
 // The algorithm computes Cholesky decomposition  of  a  symmetric  positive-
 // definite sparse matrix. The result of an algorithm is a representation  of
-// A as A=U^T*U or A=L*L^T
+// A as A == U^T*U or A == L*L^T
 //
 // This function allows to perform very efficient decomposition of low-profile
 // matrices (average bandwidth is ~5-10 elements). For larger matrices it  is
@@ -25044,13 +25032,12 @@ bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q) {
 // Inputs:
 //     A       -   sparse matrix in skyline storage (SKS) format.
 //     N       -   size of matrix A (can be smaller than actual size of A)
-//     IsUpper -   if IsUpper=True, then factorization is performed on  upper
+//     IsUpper -   if IsUpper == True, then factorization is performed on  upper
 //                 triangle. Another triangle is ignored (it may contant some
 //                 data, but it is not changed).
 //
-//
 // Outputs:
-//     A       -   the result of factorization, stored in SKS. If IsUpper=True,
+//     A       -   the result of factorization, stored in SKS. If IsUpper == True,
 //                 then the upper  triangle  contains  matrix  U,  such  that
 //                 A = U^T*U. Lower triangle is not changed.
 //                 Similarly, if IsUpper = False. In this case L is returned,
@@ -25084,9 +25071,9 @@ bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper) {
    ae_int_t offsa;
    ae_int_t offsl;
    bool result;
-   ae_assert(n >= 0, "SparseCholeskySkyline: N<0");
-   ae_assert(sparsegetnrows(a) >= n, "SparseCholeskySkyline: rows(A)<N");
-   ae_assert(sparsegetncols(a) >= n, "SparseCholeskySkyline: cols(A)<N");
+   ae_assert(n >= 0, "SparseCholeskySkyline: N < 0");
+   ae_assert(sparsegetnrows(a) >= n, "SparseCholeskySkyline: rows(A) < N");
+   ae_assert(sparsegetncols(a) >= n, "SparseCholeskySkyline: cols(A) < N");
    ae_assert(sparseissks(a), "SparseCholeskySkyline: A is not stored in SKS format");
    result = false;
 // transpose if needed
@@ -25110,8 +25097,8 @@ bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper) {
 // unprocessed parts of the matrix. Of course, L/A/B are stored
 // in SKS format.
 //
-// Then, we calculate A1:=(inv(L)*A')' and replace A with A1.
-// Then, we calculate B1:=B-A1*A1'     and replace B with B1
+// Then, we calculate A1 = (inv(L)*A')' and replace A with A1.
+// Then, we calculate B1 = B-A1*A1'     and replace B with B1
 //
 // Finally, we calculate small NAdd*NAdd Cholesky of B1 with
 // dense solver. Now, L/A1/B1 are Cholesky decomposition of the
@@ -25120,12 +25107,12 @@ bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper) {
    nadd = 1;
    while (nready < n) {
       ae_assert(nadd == 1, "SkylineCholesky: internal error");
-   // Calculate A1:=(inv(L)*A')'
+   // Calculate A1 = (inv(L)*A')'
    //
    // Elements are calculated row by row (example below is given
-   // for NAdd=1):
-   // * first, we solve L[0,0]*A1[0]=A[0]
-   // * then, we solve  L[1,0]*A1[0]+L[1,1]*A1[1]=A[1]
+   // for NAdd == 1):
+   // * first, we solve L[0,0]*A1[0] == A[0]
+   // * then, we solve  L[1,0]*A1[0]+L[1,1]*A1[1] == A[1]
    // * then, we move to next row and so on
    // * during calculation of A1 we update A12 - squared norm of A1
    //
@@ -25158,7 +25145,7 @@ bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper) {
          // * OffsA - offset of A[JNZ] in A.Vals
          // * OffsL - offset of L[I,JNZ] in A.Vals
          //
-         // Then, we solve SUM(A1[j]*L[I,j],j=JNZ..I-1) + A1[I]*L[I,I] = A[I],
+         // Then, we solve SUM(A1[j]*L[I,j],j = JNZ..I-1) + A1[I]*L[I,I] = A[I],
          // with A1[JNZ..I-1] already known, and A1[I] unknown.
             jnza = nready - banda;
             jnzl = i - a->didx.xZ[i];
@@ -25219,16 +25206,16 @@ bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper) {
 //
 // Inputs:
 //     A       -   a square NxN sparse matrix, stored in any storage format.
-//     IsUpper -   if IsUpper=True, then factorization is performed on  upper
+//     IsUpper -   if IsUpper == True, then factorization is performed on  upper
 //                 triangle.  Another triangle is ignored on  input,  dropped
-//                 on output. Similarly, if IsUpper=False, the lower triangle
+//                 on output. Similarly, if IsUpper == False, the lower triangle
 //                 is processed.
 //
 // Outputs:
 //     A       -   the result of factorization, stored in CRS format:
-//                 * if IsUpper=True, then the upper triangle contains matrix
+//                 * if IsUpper == True, then the upper triangle contains matrix
 //                   U such  that  A = U^T*U and the lower triangle is empty.
-//                 * similarly, if IsUpper=False, then lower triangular L  is
+//                 * similarly, if IsUpper == False, then lower triangular L  is
 //                   returned and we have A = L*(L^T).
 //                 Note that THIS function does not  perform  permutation  of
 //                 the rows to reduce fill-in.
@@ -25327,18 +25314,18 @@ bool sparsecholesky(sparsematrix *a, bool isupper) {
 //
 // Inputs:
 //     A       -   a square NxN sparse matrix, stored in any storage format.
-//     IsUpper -   if IsUpper=True, then factorization is performed on  upper
+//     IsUpper -   if IsUpper == True, then factorization is performed on  upper
 //                 triangle.  Another triangle is ignored on  input,  dropped
-//                 on output. Similarly, if IsUpper=False, the lower triangle
+//                 on output. Similarly, if IsUpper == False, the lower triangle
 //                 is processed.
 //
 // Outputs:
 //     A       -   the result of factorization, stored in CRS format:
-//                 * if IsUpper=True, then the upper triangle contains matrix
+//                 * if IsUpper == True, then the upper triangle contains matrix
 //                   U such  that  A = U^T*U and the lower triangle is empty.
-//                 * similarly, if IsUpper=False, then lower triangular L  is
+//                 * similarly, if IsUpper == False, then lower triangular L  is
 //                   returned and we have A = L*(L^T).
-//     P       -   a row/column permutation, a product of P0*P1*...*Pk, k=N-1,
+//     P       -   a row/column permutation, a product of P0*P1*...*Pk, k == N-1,
 //                 with Pi being permutation of rows/cols I and P[I]
 //
 // Result:
@@ -25589,8 +25576,8 @@ void sparsecholeskysetmodtype(sparsedecompositionanalysis *analysis, ae_int_t mo
 //
 // Outputs:
 //     A           -   Cholesky decomposition of A stored in lower triangular
-//                     CRS format, i.e. A=L*L' (or upper triangular CRS, with
-//                     A=U'*U, depending on NeedUpper parameter).
+//                     CRS format, i.e. A == L*L' (or upper triangular CRS, with
+//                     A == U'*U, depending on NeedUpper parameter).
 //     D           -   array[N], diagonal factor. If no diagonal  factor  was
 //                     required during analysis  phase,  still  returned  but
 //                     filled with 1's
@@ -25966,9 +25953,9 @@ static void bdsvd_svdv2x2(double f, double g, double h, double *ssmin, double *s
    srt = 0.0;
    tsign = 0.0;
 // PMAX points to the maximum absolute element of matrix
-//  PMAX = 1 if F largest in absolute values
-//  PMAX = 2 if G largest in absolute values
-//  PMAX = 3 if H largest in absolute values
+//	PMAX = 1 if F largest in absolute values
+//	PMAX = 2 if G largest in absolute values
+//	PMAX = 3 if H largest in absolute values
    pmax = 1;
    swp = ha > fa;
    if (swp) {
@@ -26334,7 +26321,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
    // (from larger end diagonal element towards smaller)
    //
    // Previously was
-   //     "if (LL>OLDM) or (M<OLDLL) then"
+   //     "if (LL > OLDM) or (M < OLDLL) then"
    // fixed thanks to Michael Rolle < m@rolle.name >
    // Very strange that LAPACK still contains it.
       bchangedir = false;
@@ -26700,9 +26687,9 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
 //
 // Outputs:
 //     D       -   singular values of matrix B in descending order.
-//     U       -   if NRU>0, contains matrix U*Q.
-//     VT      -   if NCVT>0, contains matrix (P^T)*VT.
-//     C       -   if NCC>0, contains matrix Q'*C.
+//     U       -   if NRU > 0, contains matrix U*Q.
+//     VT      -   if NCVT > 0, contains matrix (P^T)*VT.
+//     C       -   if NCC > 0, contains matrix Q'*C.
 //
 // Result:
 //     True, if the algorithm has converged.
@@ -26715,7 +26702,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector *d, RVector *e, ae_
 // Additional information:
 //     The type of convergence is controlled by the internal  parameter  TOL.
 //     If the parameter is greater than 0, the singular values will have
-//     relative accuracy TOL. If TOL<0, the singular values will have
+//     relative accuracy TOL. If TOL < 0, the singular values will have
 //     absolute accuracy ABS(TOL)*norm(B).
 //     By default, |TOL| falls within the range of 10*Epsilon and 100*Epsilon,
 //     where Epsilon is the machine precision. It is not  recommended  to  use
@@ -26822,19 +26809,19 @@ namespace alglib_impl {
 //
 // Outputs:
 //     W           -   contains singular values in descending order.
-//     U           -   if UNeeded=0, U isn't changed, the left singular vectors
+//     U           -   if UNeeded == 0, U isn't changed, the left singular vectors
 //                     are not calculated.
-//                     if Uneeded=1, U contains left singular vectors (first
+//                     if Uneeded == 1, U contains left singular vectors (first
 //                     min(M,N) columns of matrix U). Array whose indexes range
 //                     within [0..M-1, 0..Min(M,N)-1].
-//                     if UNeeded=2, U contains matrix U wholly. Array whose
+//                     if UNeeded == 2, U contains matrix U wholly. Array whose
 //                     indexes range within [0..M-1, 0..M-1].
-//     VT          -   if VTNeeded=0, VT isn't changed, the right singular vectors
+//     VT          -   if VTNeeded == 0, VT isn't changed, the right singular vectors
 //                     are not calculated.
-//                     if VTNeeded=1, VT contains right singular vectors (first
+//                     if VTNeeded == 1, VT contains right singular vectors (first
 //                     min(M,N) rows of matrix V^T). Array whose indexes range
 //                     within [0..min(M,N)-1, 0..N-1].
-//                     if VTNeeded=2, VT contains matrix V^T wholly. Array whose
+//                     if VTNeeded == 2, VT contains matrix V^T wholly. Array whose
 //                     indexes range within [0..N-1, 0..N-1].
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 // API: bool rmatrixsvd(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const ae_int_t uneeded, const ae_int_t vtneeded, const ae_int_t additionalmemory, real_1d_array &w, real_2d_array &u, real_2d_array &vt);
@@ -27078,7 +27065,6 @@ static ae_int_t rcond_internalcomplexrcondicmax1(CVector *x, ae_int_t n) {
 // Internal subroutine for matrix norm estimation
 // Return Value:
 // *	The condition (*kase != 0), indicating that iteration is in progress.
-//
 //   -- LAPACK auxiliary routine (version 3.0) --
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
@@ -27312,7 +27298,7 @@ static void rcond_rmatrixrcondtrinternal(RMatrix *a, ae_int_t n, bool isupper, b
    NewVector(ev, 0, DT_REAL);
    NewVector(iwork, 0, DT_INT);
    NewVector(tmp, 0, DT_REAL);
-// RC=0 if something happens
+// RC == 0 if something happens
    *rc = 0.0;
 // init
    if (onenorm) {
@@ -27419,7 +27405,7 @@ static void rcond_cmatrixrcondtrinternal(CMatrix *a, ae_int_t n, bool isupper, b
    NewVector(cwork2, 0, DT_COMPLEX);
    NewVector(cwork3, 0, DT_COMPLEX);
    NewVector(cwork4, 0, DT_COMPLEX);
-// RC=0 if something happens
+// RC == 0 if something happens
    *rc = 0.0;
 // init
    if (n <= 0) {
@@ -27528,7 +27514,7 @@ static void rcond_spdmatrixrcondcholeskyinternal(RMatrix *cha, ae_int_t n, bool 
    NewVector(iwork, 0, DT_INT);
    ae_assert(n >= 1, "Assertion failed");
    ae_vector_set_length(&tmp, n);
-// RC=0 if something happens
+// RC == 0 if something happens
    *rc = 0.0;
 // prepare parameters for triangular solver
    maxgrowth = 1 / rcondthreshold();
@@ -27665,7 +27651,7 @@ static void rcond_hpdmatrixrcondcholeskyinternal(CMatrix *cha, ae_int_t n, bool 
    NewVector(tmp, 0, DT_COMPLEX);
    ae_assert(n >= 1, "Assertion failed");
    ae_vector_set_length(&tmp, n);
-// RC=0 if something happens
+// RC == 0 if something happens
    *rc = 0.0;
 // prepare parameters for triangular solver
    maxgrowth = 1 / rcondthreshold();
@@ -27807,7 +27793,7 @@ static void rcond_rmatrixrcondluinternal(RMatrix *lua, ae_int_t n, bool onenorm,
    NewVector(ev, 0, DT_REAL);
    NewVector(iwork, 0, DT_INT);
    NewVector(tmp, 0, DT_REAL);
-// RC=0 if something happens
+// RC == 0 if something happens
    *rc = 0.0;
 // init
    if (onenorm) {
@@ -28111,7 +28097,7 @@ static void rcond_cmatrixrcondluinternal(CMatrix *lua, ae_int_t n, bool onenorm,
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double rmatrixrcond1(const real_2d_array &a, const ae_int_t n);
 double rmatrixrcond1(RMatrix *a, ae_int_t n) {
@@ -28125,7 +28111,7 @@ double rmatrixrcond1(RMatrix *a, ae_int_t n) {
    DupMatrix(a);
    NewVector(pivots, 0, DT_INT);
    NewVector(t, 0, DT_REAL);
-   ae_assert(n >= 1, "RMatrixRCond1: N<1!");
+   ae_assert(n >= 1, "RMatrixRCond1: N < 1!");
    ae_vector_set_length(&t, n);
    for (i = 0; i < n; i++) {
       t.xR[i] = 0.0;
@@ -28159,7 +28145,7 @@ double rmatrixrcond1(RMatrix *a, ae_int_t n) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double cmatrixrcond1(const complex_2d_array &a, const ae_int_t n);
 double cmatrixrcond1(CMatrix *a, ae_int_t n) {
@@ -28173,7 +28159,7 @@ double cmatrixrcond1(CMatrix *a, ae_int_t n) {
    DupMatrix(a);
    NewVector(pivots, 0, DT_INT);
    NewVector(t, 0, DT_REAL);
-   ae_assert(n >= 1, "CMatrixRCond1: N<1!");
+   ae_assert(n >= 1, "CMatrixRCond1: N < 1!");
    ae_vector_set_length(&t, n);
    for (i = 0; i < n; i++) {
       t.xR[i] = 0.0;
@@ -28207,7 +28193,7 @@ double cmatrixrcond1(CMatrix *a, ae_int_t n) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double rmatrixrcondinf(const real_2d_array &a, const ae_int_t n);
 double rmatrixrcondinf(RMatrix *a, ae_int_t n) {
@@ -28220,7 +28206,7 @@ double rmatrixrcondinf(RMatrix *a, ae_int_t n) {
    ae_frame_make(&_frame_block);
    DupMatrix(a);
    NewVector(pivots, 0, DT_INT);
-   ae_assert(n >= 1, "RMatrixRCondInf: N<1!");
+   ae_assert(n >= 1, "RMatrixRCondInf: N < 1!");
    nrm = 0.0;
    for (i = 0; i < n; i++) {
       v = 0.0;
@@ -28249,7 +28235,7 @@ double rmatrixrcondinf(RMatrix *a, ae_int_t n) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double cmatrixrcondinf(const complex_2d_array &a, const ae_int_t n);
 double cmatrixrcondinf(CMatrix *a, ae_int_t n) {
@@ -28262,7 +28248,7 @@ double cmatrixrcondinf(CMatrix *a, ae_int_t n) {
    ae_frame_make(&_frame_block);
    DupMatrix(a);
    NewVector(pivots, 0, DT_INT);
-   ae_assert(n >= 1, "CMatrixRCondInf: N<1!");
+   ae_assert(n >= 1, "CMatrixRCondInf: N < 1!");
    nrm = 0.0;
    for (i = 0; i < n; i++) {
       v = 0.0;
@@ -28301,7 +28287,7 @@ double cmatrixrcondinf(CMatrix *a, ae_int_t n) {
 //     could not be found by this algorithm.
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double spdmatrixrcond(const real_2d_array &a, const ae_int_t n, const bool isupper);
 double spdmatrixrcond(RMatrix *a, ae_int_t n, bool isupper) {
@@ -28374,7 +28360,7 @@ double spdmatrixrcond(RMatrix *a, ae_int_t n, bool isupper) {
 //     could not be found by this algorithm.
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double hpdmatrixrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper);
 double hpdmatrixrcond(CMatrix *a, ae_int_t n, bool isupper) {
@@ -28439,7 +28425,7 @@ double hpdmatrixrcond(CMatrix *a, ae_int_t n, bool isupper) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double rmatrixtrrcond1(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit);
 double rmatrixtrrcond1(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
@@ -28454,7 +28440,7 @@ double rmatrixtrrcond1(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
    ae_frame_make(&_frame_block);
    NewVector(pivots, 0, DT_INT);
    NewVector(t, 0, DT_REAL);
-   ae_assert(n >= 1, "RMatrixTRRCond1: N<1!");
+   ae_assert(n >= 1, "RMatrixTRRCond1: N < 1!");
    ae_vector_set_length(&t, n);
    for (i = 0; i < n; i++) {
       t.xR[i] = 0.0;
@@ -28501,7 +28487,7 @@ double rmatrixtrrcond1(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double cmatrixtrrcond1(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit);
 double cmatrixtrrcond1(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
@@ -28516,7 +28502,7 @@ double cmatrixtrrcond1(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
    ae_frame_make(&_frame_block);
    NewVector(pivots, 0, DT_INT);
    NewVector(t, 0, DT_REAL);
-   ae_assert(n >= 1, "RMatrixTRRCond1: N<1!");
+   ae_assert(n >= 1, "RMatrixTRRCond1: N < 1!");
    ae_vector_set_length(&t, n);
    for (i = 0; i < n; i++) {
       t.xR[i] = 0.0;
@@ -28563,7 +28549,7 @@ double cmatrixtrrcond1(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double rmatrixtrrcondinf(const real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit);
 double rmatrixtrrcondinf(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
@@ -28577,7 +28563,7 @@ double rmatrixtrrcondinf(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
    double result;
    ae_frame_make(&_frame_block);
    NewVector(pivots, 0, DT_INT);
-   ae_assert(n >= 1, "RMatrixTRRCondInf: N<1!");
+   ae_assert(n >= 1, "RMatrixTRRCondInf: N < 1!");
    nrm = 0.0;
    for (i = 0; i < n; i++) {
       if (isupper) {
@@ -28619,7 +28605,7 @@ double rmatrixtrrcondinf(RMatrix *a, ae_int_t n, bool isupper, bool isunit) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double cmatrixtrrcondinf(const complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit);
 double cmatrixtrrcondinf(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
@@ -28633,7 +28619,7 @@ double cmatrixtrrcondinf(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
    double result;
    ae_frame_make(&_frame_block);
    NewVector(pivots, 0, DT_INT);
-   ae_assert(n >= 1, "RMatrixTRRCondInf: N<1!");
+   ae_assert(n >= 1, "RMatrixTRRCondInf: N < 1!");
    nrm = 0.0;
    for (i = 0; i < n; i++) {
       if (isupper) {
@@ -28674,7 +28660,7 @@ double cmatrixtrrcondinf(CMatrix *a, ae_int_t n, bool isupper, bool isunit) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double rmatrixlurcond1(const real_2d_array &lua, const ae_int_t n);
 double rmatrixlurcond1(RMatrix *lua, ae_int_t n) {
@@ -28699,13 +28685,13 @@ double rmatrixlurcond1(RMatrix *lua, ae_int_t n) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double cmatrixlurcond1(const complex_2d_array &lua, const ae_int_t n);
 double cmatrixlurcond1(CMatrix *lua, ae_int_t n) {
    double v;
    double result;
-   ae_assert(n >= 1, "CMatrixLURCond1: N<1!");
+   ae_assert(n >= 1, "CMatrixLURCond1: N < 1!");
    rcond_cmatrixrcondluinternal(lua, n, true, false, 0.0, &v);
    result = v;
    return result;
@@ -28726,7 +28712,7 @@ double cmatrixlurcond1(CMatrix *lua, ae_int_t n) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double rmatrixlurcondinf(const real_2d_array &lua, const ae_int_t n);
 double rmatrixlurcondinf(RMatrix *lua, ae_int_t n) {
@@ -28752,13 +28738,13 @@ double rmatrixlurcondinf(RMatrix *lua, ae_int_t n) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double cmatrixlurcondinf(const complex_2d_array &lua, const ae_int_t n);
 double cmatrixlurcondinf(CMatrix *lua, ae_int_t n) {
    double v;
    double result;
-   ae_assert(n >= 1, "CMatrixLURCondInf: N<1!");
+   ae_assert(n >= 1, "CMatrixLURCondInf: N < 1!");
    rcond_cmatrixrcondluinternal(lua, n, false, false, 0.0, &v);
    result = v;
    return result;
@@ -28783,7 +28769,7 @@ double cmatrixlurcondinf(CMatrix *lua, ae_int_t n) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double spdmatrixcholeskyrcond(const real_2d_array &a, const ae_int_t n, const bool isupper);
 double spdmatrixcholeskyrcond(RMatrix *a, ae_int_t n, bool isupper) {
@@ -28813,7 +28799,7 @@ double spdmatrixcholeskyrcond(RMatrix *a, ae_int_t n, bool isupper) {
 // Result: 1/LowerBound(cond(A))
 //
 // NOTE:
-//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A)=INF,
+//     if k(A) is very large, then matrix is  assumed  degenerate,  k(A) == INF,
 //     0.0 is returned in such cases.
 // API: double hpdmatrixcholeskyrcond(const complex_2d_array &a, const ae_int_t n, const bool isupper);
 double hpdmatrixcholeskyrcond(CMatrix *a, ae_int_t n, bool isupper) {
@@ -28979,7 +28965,7 @@ namespace alglib_impl {
 //     XB      -   solution
 //
 // NOTE 1: no assertion or tests are done during algorithm operation
-// NOTE 2: N=0 will force algorithm to silently return
+// NOTE 2: N == 0 will force algorithm to silently return
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void fblscholeskysolve(RMatrix *cha, double sqrtscalea, ae_int_t n, bool isupper, RVector *xb, RVector *tmp) {
    double v;
@@ -28992,16 +28978,16 @@ void fblscholeskysolve(RMatrix *cha, double sqrtscalea, ae_int_t n, bool isupper
 // Scale right part
    v = 1 / sqr(sqrtscalea);
    ae_v_muld(xb->xR, 1, n, v);
-// Solve A = L*L' or A=U'*U
+// Solve A == L*L' or A == U'*U
    if (isupper) {
-   // Solve U'*y=b first.
+   // Solve U'*y == b first.
       rmatrixtrsv(n, cha, 0, 0, true, false, 1, xb, 0);
-   // Solve U*x=y then.
+   // Solve U*x == y then.
       rmatrixtrsv(n, cha, 0, 0, true, false, 0, xb, 0);
    } else {
-   // Solve L*y=b first
+   // Solve L*y == b first
       rmatrixtrsv(n, cha, 0, 0, false, false, 0, xb, 0);
-   // Solve L'*x=y then.
+   // Solve L'*x == y then.
       rmatrixtrsv(n, cha, 0, 0, false, false, 1, xb, 0);
    }
 }
@@ -29010,7 +28996,7 @@ void fblscholeskysolve(RMatrix *cha, double sqrtscalea, ae_int_t n, bool isupper
 //
 // Solves (A^T*A + alpha*I)*x = b where:
 // * A is MxN matrix
-// * alpha>0 is a scalar
+// * alpha > 0 is a scalar
 // * I is NxN identity matrix
 // * b is Nx1 vector
 // * X is Nx1 unknown vector.
@@ -29057,7 +29043,7 @@ void fblssolvecgx(RMatrix *a, ae_int_t m, ae_int_t n, double alpha, RVector *b, 
    double betak;
    double v1;
    double v2;
-// Test for special case: B=0
+// Test for special case: B == 0
    v1 = ae_v_dotproduct(b->xR, 1, b->xR, 1, n);
    if (v1 == 0.0) {
       for (k = 0; k < n; k++) {
@@ -29099,7 +29085,7 @@ void fblssolvecgx(RMatrix *a, ae_int_t m, ae_int_t n, double alpha, RVector *b, 
    // Calculate A*p(k) - store in Buf[OffsTmp2:OffsTmp2+N-1]
    // and p(k)'*A*p(k)  - store in PAP
    //
-   // If PAP=0, break (iteration is over)
+   // If PAP == 0, break (iteration is over)
       rmatrixmv(m, n, a, 0, 0, 0, buf, offspk, buf, offstmp1);
       v1 = ae_v_dotproduct(&buf->xR[offstmp1], 1, &buf->xR[offstmp1], 1, m);
       v2 = ae_v_dotproduct(&buf->xR[offspk], 1, &buf->xR[offspk], 1, n);
@@ -29132,9 +29118,9 @@ void fblssolvecgx(RMatrix *a, ae_int_t m, ae_int_t n, double alpha, RVector *b, 
       betak = rk12 / rk2;
       ae_v_move(&buf->xR[offspk1], 1, &buf->xR[offsrk1], 1, n);
       ae_v_addd(&buf->xR[offspk1], 1, &buf->xR[offspk], 1, n, betak);
-   // r(k) := r(k+1)
-   // x(k) := x(k+1)
-   // p(k) := p(k+1)
+   // r(k) = r(k+1)
+   // x(k) = x(k+1)
+   // p(k) = p(k+1)
       ae_v_move(&buf->xR[offsrk], 1, &buf->xR[offsrk1], 1, n);
       ae_v_move(&buf->xR[offsxk], 1, &buf->xR[offsxk1], 1, n);
       ae_v_move(&buf->xR[offspk], 1, &buf->xR[offspk1], 1, n);
@@ -29244,10 +29230,9 @@ Spawn:
    betak = 74;
    v1 = -788;
    v2 = 809;
-// Routine body
 // prepare locals
    n = state->n;
-// Test for special case: B=0
+// Test for special case: B == 0
    v1 = ae_v_dotproduct(state->b.xR, 1, state->b.xR, 1, n);
    if (v1 == 0.0) {
       for (k = 0; k < n; k++) {
@@ -29269,7 +29254,7 @@ Spawn:
    // Calculate A*p(k) - store in State.Tmp2
    // and p(k)'*A*p(k)  - store in PAP
    //
-   // If PAP=0, break (iteration is over)
+   // If PAP == 0, break (iteration is over)
       ae_v_move(state->x.xR, 1, state->pk.xR, 1, n);
       state->PQ = 1; goto Pause; Resume1:
       ae_v_move(state->tmp2.xR, 1, state->ax.xR, 1, n);
@@ -29302,13 +29287,13 @@ Spawn:
    // p(k+1) = r(k+1)+betak*p(k)
    //
    // NOTE: we expect that BetaK won't overflow because of
-   // "Sqrt(RK12) <= 100*MachineEpsilon*E1" test above.
+   // "sqrt(RK12) <= 100*MachineEpsilon*E1" test above.
       betak = rk12 / rk2;
       ae_v_move(state->pk1.xR, 1, state->rk1.xR, 1, n);
       ae_v_addd(state->pk1.xR, 1, state->pk.xR, 1, n, betak);
-   // r(k) := r(k+1)
-   // x(k) := x(k+1)
-   // p(k) := p(k+1)
+   // r(k) = r(k+1)
+   // x(k) = x(k+1)
+   // p(k) = p(k+1)
       ae_v_move(state->rk.xR, 1, state->rk1.xR, 1, n);
       ae_v_move(state->xk.xR, 1, state->xk1.xR, 1, n);
       ae_v_move(state->pk.xR, 1, state->pk1.xR, 1, n);
@@ -29338,7 +29323,7 @@ Pause:
 // are initialized by default values, but you can change it):
 // * State.EpsOrt - stop if norm of new candidate for orthogonalization is below EpsOrt
 // * State.EpsRes - stop of residual decreased below EpsRes*|B|
-// * State.EpsRed - stop if relative reduction of residual |R(k+1)|/|R(k)|>EpsRed
+// * State.EpsRed - stop if relative reduction of residual |R(k+1)|/|R(k)| > EpsRed
 //
 // Inputs:
 //     B       -   right part
@@ -29417,7 +29402,6 @@ Spawn:
    bnrm = 487;
    resnrm = -115;
    prevresnrm = 886;
-// Routine body
    n = state->n;
    state->retcode = 1;
 // Set up Q0
@@ -29559,10 +29543,10 @@ void fblssolvels(RMatrix *a, RVector *b, ae_int_t m, ae_int_t n, RVector *tmp0, 
    ae_int_t k;
    double v;
    ae_assert(n > 0, "FBLSSolveLS: N <= 0");
-   ae_assert(m >= n, "FBLSSolveLS: M<N");
-   ae_assert(a->rows >= m, "FBLSSolveLS: Rows(A)<M");
-   ae_assert(a->cols >= n, "FBLSSolveLS: Cols(A)<N");
-   ae_assert(b->cnt >= m, "FBLSSolveLS: Length(B)<M");
+   ae_assert(m >= n, "FBLSSolveLS: M < N");
+   ae_assert(a->rows >= m, "FBLSSolveLS: Rows(A) < M");
+   ae_assert(a->cols >= n, "FBLSSolveLS: Cols(A) < N");
+   ae_assert(b->cnt >= m, "FBLSSolveLS: Length(B) < M");
 // Allocate temporaries
    vectorsetlengthatleast(tmp0, imax2(m, n) + 1);
    vectorsetlengthatleast(tmp1, imax2(m, n) + 1);
@@ -29712,8 +29696,8 @@ namespace alglib_impl {
 // 3. User calls NormEstimatorResults() to get solution.
 //
 // Inputs:
-//     M       -   number of rows in the matrix being estimated, M>0
-//     N       -   number of columns in the matrix being estimated, N>0
+//     M       -   number of rows in the matrix being estimated, M > 0
+//     N       -   number of columns in the matrix being estimated, N > 0
 //     NStart  -   number of random starting vectors
 //                 recommended value - at least 5.
 //     NIts    -   number of iterations to do with best starting vector
@@ -29721,7 +29705,6 @@ namespace alglib_impl {
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
-//
 //
 // NOTE: this algorithm is effectively deterministic, i.e. it always  returns
 // same result when repeatedly called for the same matrix. In fact, algorithm
@@ -29769,7 +29752,7 @@ void normestimatorcreate(ae_int_t m, ae_int_t n, ae_int_t nstart, ae_int_t nits,
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
 // API: void normestimatorsetseed(const normestimatorstate &state, const ae_int_t seedval);
 void normestimatorsetseed(normestimatorstate *state, ae_int_t seedval) {
-   ae_assert(seedval >= 0, "NormEstimatorSetSeed: SeedVal<0");
+   ae_assert(seedval >= 0, "NormEstimatorSetSeed: SeedVal < 0");
    state->seedval = seedval;
 }
 
@@ -29799,7 +29782,6 @@ Spawn:
    v = 81;
    growth = 255;
    bestgrowth = 74;
-// Routine body
    n = state->n;
    m = state->m;
    if (state->seedval > 0) {
@@ -29952,7 +29934,6 @@ void normestimatorstate_free(void *_p, bool make_automatic) {
 
 namespace alglib {
 // This object stores state of the iterative norm estimation algorithm.
-//
 // You should use ALGLIB functions to work with this object.
 DefClass(normestimatorstate, )
 
@@ -30017,7 +29998,6 @@ static void matinv_rmatrixtrinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bo
    if (n <= tsb) {
       tscur = tsa;
    }
-// Try to activate parallelism
 // Parallelism was tried if: n >= 2 * tsb && (double)n * n * n / 3.0 >= smpactivationlevel()
 // Base case
    if (n <= tsa) {
@@ -30136,7 +30116,6 @@ static void matinv_cmatrixtrinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
    if (n <= tsb) {
       tscur = tsa;
    }
-// Try to activate parallelism
 // Parallelism was tried if: n >= 2 * tsb && 4.0 * n * n * n / 3.0 >= smpactivationlevel()
 // Base case
    if (n <= tsa) {
@@ -30247,7 +30226,6 @@ static void matinv_rmatrixluinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, RV
    if (n <= tsb) {
       tscur = tsa;
    }
-// Try parallelism
 // Parallelism was tried if: n >= 2 * tsb && 8.0 * n * n * n / 6.0 >= smpactivationlevel()
 // Base case
    if (n <= tsa) {
@@ -30284,48 +30262,48 @@ static void matinv_rmatrixluinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, RV
 //         ( Y   Z )
 //
 // In-place calculation can be done as follows:
-// * X := inv(U1)*U12*inv(U2)
-// * Y := inv(L2)*L12*inv(L1)
-// * W := inv(L1*U1)+X*Y
-// * X := -X*inv(L2)
-// * Y := -inv(U2)*Y
-// * Z := inv(L2*U2)
+// * X = inv(U1)*U12*inv(U2)
+// * Y = inv(L2)*L12*inv(L1)
+// * W = inv(L1*U1)+X*Y
+// * X = -X*inv(L2)
+// * Y = -inv(U2)*Y
+// * Z = inv(L2*U2)
 //
 // Reordering w.r.t. interdependencies gives us:
 //
-// * X := inv(U1)*U12      \ suitable for parallel execution
-// * Y := L12*inv(L1)      /
+// * X = inv(U1)*U12      \ suitable for parallel execution
+// * Y = L12*inv(L1)      /
 //
-// * X := X*inv(U2)        \
-// * Y := inv(L2)*Y        | suitable for parallel execution
-// * W := inv(L1*U1)       /
+// * X = X*inv(U2)        \
+// * Y = inv(L2)*Y        | suitable for parallel execution
+// * W = inv(L1*U1)       /
 //
-// * W := W+X*Y
+// * W = W+X*Y
 //
-// * X := -X*inv(L2)       \ suitable for parallel execution
-// * Y := -inv(U2)*Y       /
+// * X = -X*inv(L2)       \ suitable for parallel execution
+// * Y = -inv(U2)*Y       /
 //
-// * Z := inv(L2*U2)
+// * Z = inv(L2*U2)
    n1 = tiledsplit(n, tscur), n2 = n - n1;
 // ae_int_t mn = imin2(n1, n2); //(@) Unused.
    ae_assert(n2 > 0, "LUInverseRec: internal error!");
-// X := inv(U1)*U12
-// Y := L12*inv(L1)
+// X = inv(U1)*U12
+// Y = L12*inv(L1)
    rmatrixlefttrsm(n1, n2, a, offs, offs, true, false, 0, a, offs, offs + n1);
    rmatrixrighttrsm(n2, n1, a, offs, offs, false, true, 0, a, offs + n1, offs);
-// X := X*inv(U2)
-// Y := inv(L2)*Y
-// W := inv(L1*U1)
+// X = X*inv(U2)
+// Y = inv(L2)*Y
+// W = inv(L1*U1)
    rmatrixrighttrsm(n1, n2, a, offs + n1, offs + n1, true, false, 0, a, offs, offs + n1);
    rmatrixlefttrsm(n2, n1, a, offs + n1, offs + n1, false, true, 0, a, offs + n1, offs);
    matinv_rmatrixluinverserec(a, offs, n1, work, info, rep);
    if (*info <= 0) {
       return;
    }
-// W := W+X*Y
+// W = W+X*Y
    rmatrixgemm(n1, n1, n2, 1.0, a, offs, offs + n1, 0, a, offs + n1, offs, 0, 1.0, a, offs, offs);
-// X := -X*inv(L2)
-// Y := -inv(U2)*Y
+// X = -X*inv(L2)
+// Y = -inv(U2)*Y
    rmatrixrighttrsm(n1, n2, a, offs + n1, offs + n1, false, true, 0, a, offs, offs + n1);
    rmatrixlefttrsm(n2, n1, a, offs + n1, offs + n1, true, false, 0, a, offs + n1, offs);
    for (i = 0; i < n1; i++) {
@@ -30334,7 +30312,7 @@ static void matinv_rmatrixluinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, RV
    for (i = 0; i < n2; i++) {
       ae_v_muld(&a->xyR[offs + n1 + i][offs], 1, n1, -1);
    }
-// Z := inv(L2*U2)
+// Z = inv(L2*U2)
    matinv_rmatrixluinverserec(a, offs + n1, n2, work, info, rep);
 }
 
@@ -30357,7 +30335,6 @@ static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CV
    if (n <= tsb) {
       tscur = tsa;
    }
-// Try parallelism
 // Parallelism was tried if: n >= 2 * tsb && 32.0 * n * n * n / 6.0 >= smpactivationlevel()
 // Base case
    if (n <= tsa) {
@@ -30394,48 +30371,48 @@ static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CV
 //         ( Y   Z )
 //
 // In-place calculation can be done as follows:
-// * X := inv(U1)*U12*inv(U2)
-// * Y := inv(L2)*L12*inv(L1)
-// * W := inv(L1*U1)+X*Y
-// * X := -X*inv(L2)
-// * Y := -inv(U2)*Y
-// * Z := inv(L2*U2)
+// * X = inv(U1)*U12*inv(U2)
+// * Y = inv(L2)*L12*inv(L1)
+// * W = inv(L1*U1)+X*Y
+// * X = -X*inv(L2)
+// * Y = -inv(U2)*Y
+// * Z = inv(L2*U2)
 //
 // Reordering w.r.t. interdependencies gives us:
 //
-// * X := inv(U1)*U12      \ suitable for parallel execution
-// * Y := L12*inv(L1)      /
+// * X = inv(U1)*U12      \ suitable for parallel execution
+// * Y = L12*inv(L1)      /
 //
-// * X := X*inv(U2)        \
-// * Y := inv(L2)*Y        | suitable for parallel execution
-// * W := inv(L1*U1)       /
+// * X = X*inv(U2)        \
+// * Y = inv(L2)*Y        | suitable for parallel execution
+// * W = inv(L1*U1)       /
 //
-// * W := W+X*Y
+// * W = W+X*Y
 //
-// * X := -X*inv(L2)       \ suitable for parallel execution
-// * Y := -inv(U2)*Y       /
+// * X = -X*inv(L2)       \ suitable for parallel execution
+// * Y = -inv(U2)*Y       /
 //
-// * Z := inv(L2*U2)
+// * Z = inv(L2*U2)
    n1 = tiledsplit(n, tscur), n2 = n - n1;
 // ae_int_t mn = imin2(n1, n2); //(@) Unused.
    ae_assert(n2 > 0, "LUInverseRec: internal error!");
-// X := inv(U1)*U12
-// Y := L12*inv(L1)
+// X = inv(U1)*U12
+// Y = L12*inv(L1)
    cmatrixlefttrsm(n1, n2, a, offs, offs, true, false, 0, a, offs, offs + n1);
    cmatrixrighttrsm(n2, n1, a, offs, offs, false, true, 0, a, offs + n1, offs);
-// X := X*inv(U2)
-// Y := inv(L2)*Y
-// W := inv(L1*U1)
+// X = X*inv(U2)
+// Y = inv(L2)*Y
+// W = inv(L1*U1)
    cmatrixrighttrsm(n1, n2, a, offs + n1, offs + n1, true, false, 0, a, offs, offs + n1);
    cmatrixlefttrsm(n2, n1, a, offs + n1, offs + n1, false, true, 0, a, offs + n1, offs);
    matinv_cmatrixluinverserec(a, offs, n1, work, info, rep);
    if (*info <= 0) {
       return;
    }
-// W := W+X*Y
+// W = W+X*Y
    cmatrixgemm(n1, n1, n2, complex_from_d(1.0), a, offs, offs + n1, 0, a, offs + n1, offs, 0, complex_from_d(1.0), a, offs, offs);
-// X := -X*inv(L2)
-// Y := -inv(U2)*Y
+// X = -X*inv(L2)
+// Y = -inv(U2)*Y
    cmatrixrighttrsm(n1, n2, a, offs + n1, offs + n1, false, true, 0, a, offs, offs + n1);
    cmatrixlefttrsm(n2, n1, a, offs + n1, offs + n1, true, false, 0, a, offs + n1, offs);
    for (i = 0; i < n1; i++) {
@@ -30444,7 +30421,7 @@ static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CV
    for (i = 0; i < n2; i++) {
       ae_v_cmuld(&a->xyC[offs + n1 + i][offs], 1, n1, -1);
    }
-// Z := inv(L2*U2)
+// Z = inv(L2*U2)
    matinv_cmatrixluinverserec(a, offs + n1, n2, work, info, rep);
 }
 
@@ -30722,9 +30699,9 @@ void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
    SetObj(matinvreport, rep);
    NewVector(work, 0, DT_REAL);
    ae_assert(n > 0, "RMatrixLUInverse: N <= 0!");
-   ae_assert(a->cols >= n, "RMatrixLUInverse: cols(A)<N!");
-   ae_assert(a->rows >= n, "RMatrixLUInverse: rows(A)<N!");
-   ae_assert(pivots->cnt >= n, "RMatrixLUInverse: len(Pivots)<N!");
+   ae_assert(a->cols >= n, "RMatrixLUInverse: cols(A) < N!");
+   ae_assert(a->rows >= n, "RMatrixLUInverse: rows(A) < N!");
+   ae_assert(pivots->cnt >= n, "RMatrixLUInverse: len(Pivots) < N!");
    ae_assert(apservisfinitematrix(a, n, n), "RMatrixLUInverse: A contains infinite or NaN values!");
    *info = 1;
    for (i = 0; i < n; i++) {
@@ -30790,9 +30767,9 @@ void cmatrixluinverse(CMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
    SetObj(matinvreport, rep);
    NewVector(work, 0, DT_COMPLEX);
    ae_assert(n > 0, "CMatrixLUInverse: N <= 0!");
-   ae_assert(a->cols >= n, "CMatrixLUInverse: cols(A)<N!");
-   ae_assert(a->rows >= n, "CMatrixLUInverse: rows(A)<N!");
-   ae_assert(pivots->cnt >= n, "CMatrixLUInverse: len(Pivots)<N!");
+   ae_assert(a->cols >= n, "CMatrixLUInverse: cols(A) < N!");
+   ae_assert(a->rows >= n, "CMatrixLUInverse: rows(A) < N!");
+   ae_assert(pivots->cnt >= n, "CMatrixLUInverse: len(Pivots) < N!");
    ae_assert(apservisfinitecmatrix(a, n, n), "CMatrixLUInverse: A contains infinite or NaN values!");
    *info = 1;
    for (i = 0; i < n; i++) {
@@ -30857,8 +30834,8 @@ void rmatrixinverse(RMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep) {
    SetObj(matinvreport, rep);
    NewVector(pivots, 0, DT_INT);
    ae_assert(n > 0, "RMatrixInverse: N <= 0!");
-   ae_assert(a->cols >= n, "RMatrixInverse: cols(A)<N!");
-   ae_assert(a->rows >= n, "RMatrixInverse: rows(A)<N!");
+   ae_assert(a->cols >= n, "RMatrixInverse: cols(A) < N!");
+   ae_assert(a->rows >= n, "RMatrixInverse: rows(A) < N!");
    ae_assert(apservisfinitematrix(a, n, n), "RMatrixInverse: A contains infinite or NaN values!");
    rmatrixlu(a, n, n, &pivots);
    rmatrixluinverse(a, &pivots, n, info, rep);
@@ -30889,8 +30866,8 @@ void cmatrixinverse(CMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep) {
    SetObj(matinvreport, rep);
    NewVector(pivots, 0, DT_INT);
    ae_assert(n > 0, "CRMatrixInverse: N <= 0!");
-   ae_assert(a->cols >= n, "CRMatrixInverse: cols(A)<N!");
-   ae_assert(a->rows >= n, "CRMatrixInverse: rows(A)<N!");
+   ae_assert(a->cols >= n, "CRMatrixInverse: cols(A) < N!");
+   ae_assert(a->rows >= n, "CRMatrixInverse: rows(A) < N!");
    ae_assert(apservisfinitecmatrix(a, n, n), "CMatrixInverse: A contains infinite or NaN values!");
    cmatrixlu(a, n, n, &pivots);
    cmatrixluinverse(a, &pivots, n, info, rep);
@@ -30902,7 +30879,7 @@ void cmatrixinverse(CMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep) {
 //
 // Inputs:
 //     A       -   Cholesky decomposition of the matrix to be inverted:
-//                 A=U'*U or A = L*L'.
+//                 A == U'*U or A == L*L'.
 //                 Output of  SPDMatrixCholesky subroutine.
 //     N       -   size of matrix A (optional) :
 //                 * if given, only principal NxN submatrix is processed  and
@@ -30936,8 +30913,8 @@ void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
    NewVector(tmp, 0, DT_REAL);
    NewObj(matinvreport, rep2);
    ae_assert(n > 0, "SPDMatrixCholeskyInverse: N <= 0!");
-   ae_assert(a->cols >= n, "SPDMatrixCholeskyInverse: cols(A)<N!");
-   ae_assert(a->rows >= n, "SPDMatrixCholeskyInverse: rows(A)<N!");
+   ae_assert(a->cols >= n, "SPDMatrixCholeskyInverse: cols(A) < N!");
+   ae_assert(a->rows >= n, "SPDMatrixCholeskyInverse: rows(A) < N!");
    *info = 1;
    f = true;
    for (i = 0; i < n; i++) {
@@ -30978,7 +30955,7 @@ void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
 //
 // Inputs:
 //     A       -   Cholesky decomposition of the matrix to be inverted:
-//                 A=U'*U or A = L*L'.
+//                 A == U'*U or A == L*L'.
 //                 Output of  HPDMatrixCholesky subroutine.
 //     N       -   size of matrix A (optional) :
 //                 * if given, only principal NxN submatrix is processed  and
@@ -31012,8 +30989,8 @@ void hpdmatrixcholeskyinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
    NewObj(matinvreport, rep2);
    NewVector(tmp, 0, DT_COMPLEX);
    ae_assert(n > 0, "HPDMatrixCholeskyInverse: N <= 0!");
-   ae_assert(a->cols >= n, "HPDMatrixCholeskyInverse: cols(A)<N!");
-   ae_assert(a->rows >= n, "HPDMatrixCholeskyInverse: rows(A)<N!");
+   ae_assert(a->cols >= n, "HPDMatrixCholeskyInverse: cols(A) < N!");
+   ae_assert(a->rows >= n, "HPDMatrixCholeskyInverse: rows(A) < N!");
    f = true;
    for (i = 0; i < n; i++) {
       f = f && isfinite(a->xyC[i][i].x) && isfinite(a->xyC[i][i].y);
@@ -31084,8 +31061,8 @@ void spdmatrixinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, mati
    *info = 0;
    SetObj(matinvreport, rep);
    ae_assert(n > 0, "SPDMatrixInverse: N <= 0!");
-   ae_assert(a->cols >= n, "SPDMatrixInverse: cols(A)<N!");
-   ae_assert(a->rows >= n, "SPDMatrixInverse: rows(A)<N!");
+   ae_assert(a->cols >= n, "SPDMatrixInverse: cols(A) < N!");
+   ae_assert(a->rows >= n, "SPDMatrixInverse: rows(A) < N!");
    ae_assert(isfinitertrmatrix(a, n, isupper), "SPDMatrixInverse: A contains infinite or NaN values!");
    *info = 1;
    if (spdmatrixcholesky(a, n, isupper)) {
@@ -31130,8 +31107,8 @@ void hpdmatrixinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, mati
    *info = 0;
    SetObj(matinvreport, rep);
    ae_assert(n > 0, "HPDMatrixInverse: N <= 0!");
-   ae_assert(a->cols >= n, "HPDMatrixInverse: cols(A)<N!");
-   ae_assert(a->rows >= n, "HPDMatrixInverse: rows(A)<N!");
+   ae_assert(a->cols >= n, "HPDMatrixInverse: cols(A) < N!");
+   ae_assert(a->rows >= n, "HPDMatrixInverse: rows(A) < N!");
    ae_assert(apservisfinitectrmatrix(a, n, isupper), "HPDMatrixInverse: A contains infinite or NaN values!");
    *info = 1;
    if (hpdmatrixcholesky(a, n, isupper)) {
@@ -31186,8 +31163,8 @@ void rmatrixtrinverse(RMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
    SetObj(matinvreport, rep);
    NewVector(tmp, 0, DT_REAL);
    ae_assert(n > 0, "RMatrixTRInverse: N <= 0!");
-   ae_assert(a->cols >= n, "RMatrixTRInverse: cols(A)<N!");
-   ae_assert(a->rows >= n, "RMatrixTRInverse: rows(A)<N!");
+   ae_assert(a->cols >= n, "RMatrixTRInverse: cols(A) < N!");
+   ae_assert(a->rows >= n, "RMatrixTRInverse: rows(A) < N!");
    ae_assert(isfinitertrmatrix(a, n, isupper), "RMatrixTRInverse: A contains infinite or NaN values!");
 // calculate condition numbers
    rep->r1 = rmatrixtrrcond1(a, n, isupper, isunit);
@@ -31256,8 +31233,8 @@ void cmatrixtrinverse(CMatrix *a, ae_int_t n, bool isupper, bool isunit, ae_int_
    SetObj(matinvreport, rep);
    NewVector(tmp, 0, DT_COMPLEX);
    ae_assert(n > 0, "CMatrixTRInverse: N <= 0!");
-   ae_assert(a->cols >= n, "CMatrixTRInverse: cols(A)<N!");
-   ae_assert(a->rows >= n, "CMatrixTRInverse: rows(A)<N!");
+   ae_assert(a->cols >= n, "CMatrixTRInverse: cols(A) < N!");
+   ae_assert(a->rows >= n, "CMatrixTRInverse: rows(A) < N!");
    ae_assert(apservisfinitectrmatrix(a, n, isupper), "CMatrixTRInverse: A contains infinite or NaN values!");
 // calculate condition numbers
    rep->r1 = cmatrixtrrcond1(a, n, isupper, isunit);
@@ -31497,7 +31474,6 @@ namespace alglib_impl {
 //     UpdColumn - column where the element to be updated is stored.
 //     UpdVal  -   a number to be added to the element.
 //
-//
 // Outputs:
 //     InvA    -   inverse of modified matrix A.
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
@@ -31715,7 +31691,6 @@ namespace alglib_impl {
 //             Array whose indexes range within [0..N-1, 0..N-1].
 //     N   -   size of A, N >= 0.
 //
-//
 // Outputs:
 //     A   -   contains matrix T.
 //             Array whose indexes range within [0..N-1, 0..N-1].
@@ -31822,7 +31797,7 @@ namespace alglib_impl {
 //     True, if the problem was reduced successfully.
 //     False, if the error occurred during the Cholesky decomposition of
 //         matrix B (the matrix is not positive-definite).
-// ALGLIB: Copyright 1.28.2006 by Sergey Bochkanov
+// ALGLIB: Copyright 01.28.2006 by Sergey Bochkanov
 // API: bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t problemtype, real_2d_array &r, bool &isupperr);
 bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t problemtype, RMatrix *r, bool *isupperr) {
    ae_frame _frame_block;
@@ -32039,7 +32014,7 @@ bool smatrixgevdreduce(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool i
 //     algorithm for solving the symmetric eigenproblem.
 //
 // See also the GeneralizedSymmetricDefiniteEVDReduce subroutine.
-// ALGLIB: Copyright 1.28.2006 by Sergey Bochkanov
+// ALGLIB: Copyright 01.28.2006 by Sergey Bochkanov
 // API: bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t zneeded, const ae_int_t problemtype, real_1d_array &d, real_2d_array &z);
 bool smatrixgevd(RMatrix *a, ae_int_t n, bool isuppera, RMatrix *b, bool isupperb, ae_int_t zneeded, ae_int_t problemtype, RVector *d, RMatrix *z) {
    ae_frame _frame_block;
@@ -32149,10 +32124,10 @@ double rmatrixludet(RMatrix *a, ZVector *pivots, ae_int_t n) {
    ae_int_t i;
    ae_int_t s;
    double result;
-   ae_assert(n >= 1, "RMatrixLUDet: N<1!");
+   ae_assert(n >= 1, "RMatrixLUDet: N < 1!");
    ae_assert(pivots->cnt >= n, "RMatrixLUDet: Pivots array is too short!");
-   ae_assert(a->rows >= n, "RMatrixLUDet: rows(A)<N!");
-   ae_assert(a->cols >= n, "RMatrixLUDet: cols(A)<N!");
+   ae_assert(a->rows >= n, "RMatrixLUDet: rows(A) < N!");
+   ae_assert(a->cols >= n, "RMatrixLUDet: cols(A) < N!");
    ae_assert(apservisfinitematrix(a, n, n), "RMatrixLUDet: A contains infinite or NaN values!");
    result = 1.0;
    s = 1;
@@ -32188,10 +32163,10 @@ complex cmatrixludet(CMatrix *a, ZVector *pivots, ae_int_t n) {
    ae_int_t i;
    ae_int_t s;
    complex result;
-   ae_assert(n >= 1, "CMatrixLUDet: N<1!");
+   ae_assert(n >= 1, "CMatrixLUDet: N < 1!");
    ae_assert(pivots->cnt >= n, "CMatrixLUDet: Pivots array is too short!");
-   ae_assert(a->rows >= n, "CMatrixLUDet: rows(A)<N!");
-   ae_assert(a->cols >= n, "CMatrixLUDet: cols(A)<N!");
+   ae_assert(a->rows >= n, "CMatrixLUDet: rows(A) < N!");
+   ae_assert(a->cols >= n, "CMatrixLUDet: cols(A) < N!");
    ae_assert(apservisfinitecmatrix(a, n, n), "CMatrixLUDet: A contains infinite or NaN values!");
    result = complex_from_i(1);
    s = 1;
@@ -32225,9 +32200,9 @@ double rmatrixdet(RMatrix *a, ae_int_t n) {
    ae_frame_make(&_frame_block);
    DupMatrix(a);
    NewVector(pivots, 0, DT_INT);
-   ae_assert(n >= 1, "RMatrixDet: N<1!");
-   ae_assert(a->rows >= n, "RMatrixDet: rows(A)<N!");
-   ae_assert(a->cols >= n, "RMatrixDet: cols(A)<N!");
+   ae_assert(n >= 1, "RMatrixDet: N < 1!");
+   ae_assert(a->rows >= n, "RMatrixDet: rows(A) < N!");
+   ae_assert(a->cols >= n, "RMatrixDet: cols(A) < N!");
    ae_assert(apservisfinitematrix(a, n, n), "RMatrixDet: A contains infinite or NaN values!");
    rmatrixlu(a, n, n, &pivots);
    result = rmatrixludet(a, &pivots, n);
@@ -32255,9 +32230,9 @@ complex cmatrixdet(CMatrix *a, ae_int_t n) {
    ae_frame_make(&_frame_block);
    DupMatrix(a);
    NewVector(pivots, 0, DT_INT);
-   ae_assert(n >= 1, "CMatrixDet: N<1!");
-   ae_assert(a->rows >= n, "CMatrixDet: rows(A)<N!");
-   ae_assert(a->cols >= n, "CMatrixDet: cols(A)<N!");
+   ae_assert(n >= 1, "CMatrixDet: N < 1!");
+   ae_assert(a->rows >= n, "CMatrixDet: rows(A) < N!");
+   ae_assert(a->cols >= n, "CMatrixDet: cols(A) < N!");
    ae_assert(apservisfinitecmatrix(a, n, n), "CMatrixDet: A contains infinite or NaN values!");
    cmatrixlu(a, n, n, &pivots);
    result = cmatrixludet(a, &pivots, n);
@@ -32289,9 +32264,9 @@ double spdmatrixcholeskydet(RMatrix *a, ae_int_t n) {
    ae_int_t i;
    bool f;
    double result;
-   ae_assert(n >= 1, "SPDMatrixCholeskyDet: N<1!");
-   ae_assert(a->rows >= n, "SPDMatrixCholeskyDet: rows(A)<N!");
-   ae_assert(a->cols >= n, "SPDMatrixCholeskyDet: cols(A)<N!");
+   ae_assert(n >= 1, "SPDMatrixCholeskyDet: N < 1!");
+   ae_assert(a->rows >= n, "SPDMatrixCholeskyDet: rows(A) < N!");
+   ae_assert(a->cols >= n, "SPDMatrixCholeskyDet: cols(A) < N!");
    f = true;
    for (i = 0; i < n; i++) {
       f = f && isfinite(a->xyR[i][i]);
@@ -32335,9 +32310,9 @@ double spdmatrixdet(RMatrix *a, ae_int_t n, bool isupper) {
    double result;
    ae_frame_make(&_frame_block);
    DupMatrix(a);
-   ae_assert(n >= 1, "SPDMatrixDet: N<1!");
-   ae_assert(a->rows >= n, "SPDMatrixDet: rows(A)<N!");
-   ae_assert(a->cols >= n, "SPDMatrixDet: cols(A)<N!");
+   ae_assert(n >= 1, "SPDMatrixDet: N < 1!");
+   ae_assert(a->rows >= n, "SPDMatrixDet: rows(A) < N!");
+   ae_assert(a->cols >= n, "SPDMatrixDet: cols(A) < N!");
    ae_assert(isfinitertrmatrix(a, n, isupper), "SPDMatrixDet: A contains infinite or NaN values!");
    b = spdmatrixcholesky(a, n, isupper);
    ae_assert(b, "SPDMatrixDet: A is not SPD!");

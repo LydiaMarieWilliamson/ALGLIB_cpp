@@ -710,6 +710,38 @@ A6.2. Test Stages
 		eliminated "bool needy", "bool needd1", "bool needd2" respectively in favor of (y != NULL), (d1 != NULL) and (d2 != NULL).
 	―	spline3d_spline3ddiff(): remade "double *fx", "double *fy", "double *fxy" into optional output parameters.
 	―	rbf_clearreportfields(): removed and inserted inline at its point of use.
+0-39	Re-formatting of Manual.htm
+	―	Integration of the format and layout used for ALGLIB++.
+	―	Added author and timestamps to the [un]serialization routines.
+	―	Normalized the declarations of the API object classes.
+0-39	Comment/documentation normalization & synchronization
+	―	Normalize author and timestamps (several items missed on a previous pass).
+	―	Correct timestamp error (1014 → 2014).
+	―	Normalize conditionals and other code inside comments.
+	―	< and > in comments and assert statements.
+	―	:= in comments converted to =
+	―	"PARAMETER" ⇒ "Parameter", etc.
+	―	"OUTPUT PAREMETERS" ⇒ "Outputs", "OUTPUT ARRAYS:" → "Outputs:",
+		"INPUT[S][:]" ⇒ "Inputs:", "OUTPUT[S][:]" → "Outputs:"
+	―	ouputs → outputs, agressive → aggressive, Sparcity → Sparsity
+	―	rcomm → RComm
+	―	Normalize layout (e.g. removing multiple consecutive blank lines and spaces inside comments)
+	―	Clean up irregularities
+		▪	"DESCRIPTION" in DataAnalysis.cpp and Manual.htm
+		▪	Redundant comments in xdebug in AlgLibMisc.{cpp,h} and Manual.htm put out up front.
+		▪	Comments on "silent" in TestC.cpp modified or removed.
+		▪	"Similaryly" → "Similarly"
+		▪	TestC.cpp: N = 2..8 → N = 1..8 for testing loops that actually go from 1 to 8, not 2 to 8.
+	―	The input N parameter to sparse[lu]solve() removed from the listings in the comments, since there is no N parameter.
+	―	Added header comments to rmatrixgemv(), rmatrixsymv() and rmatrixsyvmv().
+	―	References to MinCGSetGradientCheck() in the comments removed.
+		The *SetGradientCheck() functions have almost all been replaced by OptGuard functions in version 3.16.0.
+0-39	Optimization.cpp: Removing vestige of trace facility (the timer variable ‟t0”).
+0-39	Other minor changes in the documentation & Comments:
+	―	sparsesmm(): A is M × K, not N × K.
+	―	sparsecholeskyskyline(): "matrixm" → "matrix"
+	―	Sin(⋯) → sin(⋯), Cos(⋯) → cos(⋯), Exp(⋯) → exp(⋯), TanH(⋯) → tanh(⋯)
+	―	Sign(⋯) → sign(⋯), Ceil(⋯) → ceil(⋯), Sqrt(⋯) → sqrt(⋯), Power(⋯) → power(⋯)
 
 A6.3. Test Results
 ──────────────────

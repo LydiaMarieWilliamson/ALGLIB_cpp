@@ -59,7 +59,7 @@ double logbase2(double x) {
 // This  function  generates  1-dimensional  general  interpolation task with
 // moderate Lipshitz constant (close to 1.0)
 //
-// If N=1 then suborutine generates only one point at the middle of [A,B]
+// If N == 1 then suborutine generates only one point at the middle of [A,B]
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void taskgenint1d(double a, double b, ae_int_t n, RVector *x, RVector *y) {
    ae_int_t i;
@@ -90,7 +90,7 @@ void taskgenint1d(double a, double b, ae_int_t n, RVector *x, RVector *y) {
 // This function generates  1-dimensional equidistant interpolation task with
 // moderate Lipshitz constant (close to 1.0)
 //
-// If N=1 then suborutine generates only one point at the middle of [A,B]
+// If N == 1 then suborutine generates only one point at the middle of [A,B]
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void taskgenint1dequidist(double a, double b, ae_int_t n, RVector *x, RVector *y) {
    ae_int_t i;
@@ -117,7 +117,7 @@ void taskgenint1dequidist(double a, double b, ae_int_t n, RVector *x, RVector *y
 // This function generates  1-dimensional Chebyshev-1 interpolation task with
 // moderate Lipshitz constant (close to 1.0)
 //
-// If N=1 then suborutine generates only one point at the middle of [A,B]
+// If N == 1 then suborutine generates only one point at the middle of [A,B]
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector *x, RVector *y) {
    ae_int_t i;
@@ -144,7 +144,7 @@ void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector *x, RVector *y) {
 // This function generates  1-dimensional Chebyshev-2 interpolation task with
 // moderate Lipshitz constant (close to 1.0)
 //
-// If N=1 then suborutine generates only one point at the middle of [A,B]
+// If N == 1 then suborutine generates only one point at the middle of [A,B]
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void taskgenint1dcheb2(double a, double b, ae_int_t n, RVector *x, RVector *y) {
    ae_int_t i;
@@ -223,7 +223,7 @@ void setlengthzero(RVector *x, ae_int_t n) {
    }
 }
 
-// If Length(X)<N, resizes X
+// If Length(X) < N, resizes X
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void vectorsetlengthatleast(ae_vector *x, ae_int_t n) {
    if (x->cnt < n) {
@@ -231,7 +231,7 @@ void vectorsetlengthatleast(ae_vector *x, ae_int_t n) {
    }
 }
 
-// If Cols(X)<N or Rows(X)<M, resizes X
+// If Cols(X) < N or Rows(X) < M, resizes X
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void matrixsetlengthatleast(ae_matrix *x, ae_int_t m, ae_int_t n) {
    if (x->rows < m || x->cols < n) {
@@ -733,14 +733,14 @@ double safepythag3(double x, double y, double z) {
 
 // Safe division.
 //
-// This function attempts to calculate R=X/Y without overflow.
+// This function attempts to calculate R == X/Y without overflow.
 //
 // It returns:
 // * +1, if abs(X/Y) >= MaxRealNumber or undefined - overflow-like situation
 //       (no overlfow is generated, R is either NAN, PosINF, NegINF)
-// *  0, if MinRealNumber<abs(X/Y)<MaxRealNumber or X=0, Y != 0
+// *  0, if MinRealNumber < abs(X/Y) < MaxRealNumber or X == 0, Y != 0
 //       (R contains result, may be zero)
-// * -1, if 0<abs(X/Y)<MinRealNumber - underflow-like situation
+// * -1, if 0 < abs(X/Y) < MinRealNumber - underflow-like situation
 //       (R contains zero; it corresponds to underflow)
 //
 // No overflow is generated in any case.
@@ -749,8 +749,8 @@ ae_int_t saferdiv(double x, double y, double *r) {
    ae_int_t result;
    *r = 0;
 // Two special cases:
-// * Y=0
-// * X=0 and Y != 0
+// * Y == 0
+// * X == 0 and Y != 0
    if (y == 0.0) {
       result = 1;
       if (x == 0.0) {
@@ -769,7 +769,7 @@ ae_int_t saferdiv(double x, double y, double *r) {
       result = 0;
       return result;
    }
-// make Y>0
+// make Y == 0
    if (y < 0.0) {
       x = -x;
       y = -y;
@@ -815,7 +815,7 @@ double safeminposrv(double x, double y, double v) {
          result = v;
       }
    } else {
-   // Y<1, we can safely multiply by Y
+   // Y < 1, we can safely multiply by Y
       if (x < v * y) {
          result = x / y;
       } else {
@@ -929,7 +929,7 @@ void swapc(complex *v0, complex *v1) {
    swapr(&v0->y, &v1->y);
 }
 
-// This function is used to swap two cols of the matrix; if NRows<0, automatically
+// This function is used to swap two cols of the matrix; if NRows < 0, automatically
 // determined from the matrix size.
 void swapcols(RMatrix *a, ae_int_t j0, ae_int_t j1, ae_int_t nrows) {
    ae_int_t i;
@@ -944,7 +944,7 @@ void swapcols(RMatrix *a, ae_int_t j0, ae_int_t j1, ae_int_t nrows) {
    }
 }
 
-// This function is used to swap two rows of the matrix; if NCols<0, automatically
+// This function is used to swap two rows of the matrix; if NCols < 0, automatically
 // determined from the matrix size.
 void swaprows(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t ncols) {
    ae_int_t j;
@@ -992,7 +992,7 @@ void swapelements(RVector *a, ae_int_t i0, ae_int_t i1) {
 }
 
 // This function returns +1 or -1 depending on sign of X.
-// x=0 results in +1 being returned.
+// x == 0 results in +1 being returned.
 double possign(double x) {
    double result;
    if (x >= 0.0) {
@@ -3203,11 +3203,11 @@ void hermitianmatrixvectormultiply(CMatrix *a, bool isupper, ae_int_t i1, ae_int
       return;
    }
 // Let A = L + D + U, where
-//  L is strictly lower triangular (main diagonal is zero)
-//  D is diagonal
-//  U is strictly upper triangular (main diagonal is zero)
+//	L is strictly lower triangular (main diagonal is zero)
+//	D is diagonal
+//	U is strictly upper triangular (main diagonal is zero)
 //
-// A*x = L*x + D*x + U*x
+//	A*x = L*x + D*x + U*x
 //
 // Calculate D*x first
    for (i = i1; i <= i2; i++) {
@@ -3410,7 +3410,7 @@ void complexgeneratereflection(CVector *x, ae_int_t n, complex *tau) {
 // Outputs:
 //     C       -   the result of multiplying the input matrix C by the
 //                 transformation matrix which is given by Tau and V.
-//                 If N1>N2 or M1>M2, C is not modified.
+//                 If N1 > N2 or M1 > M2, C is not modified.
 //
 //   -- LAPACK auxiliary routine (version 3.0) --
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -3422,7 +3422,7 @@ void complexapplyreflectionfromtheleft(CMatrix *c, complex tau, CVector *v, ae_i
    if (ae_c_eq_d(tau, 0.0) || n1 > n2 || m1 > m2) {
       return;
    }
-// w := C^T * conj(v)
+// w = C^T * conj(v)
    for (i = n1; i <= n2; i++) {
       work->xC[i] = complex_from_i(0);
    }
@@ -3430,7 +3430,7 @@ void complexapplyreflectionfromtheleft(CMatrix *c, complex tau, CVector *v, ae_i
       t = conj(v->xC[i + 1 - m1]);
       ae_v_caddc(&work->xC[n1], 1, &c->xyC[i][n1], 1, "N", n2 - n1 + 1, t);
    }
-// C := C - tau * v * w^T
+// C = C - tau * v * w^T
    for (i = m1; i <= m2; i++) {
       t = ae_c_mul(v->xC[i - m1 + 1], tau);
       ae_v_csubc(&c->xyC[i][n1], 1, &work->xC[n1], 1, "N", n2 - n1 + 1, t);
@@ -3457,7 +3457,7 @@ void complexapplyreflectionfromtheleft(CMatrix *c, complex tau, CVector *v, ae_i
 // Outputs:
 //     C       -   the result of multiplying the input matrix C by the
 //                 transformation matrix which is given by Tau and V.
-//                 If N1>N2 or M1>M2, C is not modified.
+//                 If N1 > N2 or M1 > M2, C is not modified.
 //
 //   -- LAPACK auxiliary routine (version 3.0) --
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -3470,13 +3470,13 @@ void complexapplyreflectionfromtheright(CMatrix *c, complex tau, CVector *v, ae_
    if (ae_c_eq_d(tau, 0.0) || n1 > n2 || m1 > m2) {
       return;
    }
-// w := C * v
+// w = C * v
    vm = n2 - n1 + 1;
    for (i = m1; i <= m2; i++) {
       t = ae_v_cdotproduct(&c->xyC[i][n1], 1, "N", &v->xC[1], 1, "N", n2 - n1 + 1);
       work->xC[i] = t;
    }
-// C := C - w * conj(v^T)
+// C = C - w * conj(v^T)
    ae_v_cmove(&v->xC[1], 1, &v->xC[1], 1, "Conj", vm);
    for (i = m1; i <= m2; i++) {
       t = ae_c_mul(work->xC[i], tau);
@@ -3503,11 +3503,11 @@ void symmetricmatrixvectormultiply(RMatrix *a, bool isupper, ae_int_t i1, ae_int
       return;
    }
 // Let A = L + D + U, where
-//  L is strictly lower triangular (main diagonal is zero)
-//  D is diagonal
-//  U is strictly upper triangular (main diagonal is zero)
+//	L is strictly lower triangular (main diagonal is zero)
+//	D is diagonal
+//	U is strictly upper triangular (main diagonal is zero)
 //
-// A*x = L*x + D*x + U*x
+//	A*x = L*x + D*x + U*x
 //
 // Calculate D*x first
    for (i = i1; i <= i2; i++) {
@@ -3864,8 +3864,8 @@ bool rmatrixhessenbergunpackqmkl(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *
 // MKL-based kernel.
 //
 // NOTE: Tau, D, E must be preallocated arrays;
-//       length(E)=length(Tau)=N-1 (or larger)
-//       length(D)=N (or larger)
+//       length(E) == length(Tau) == N-1 (or larger)
+//       length(D) == N (or larger)
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
 bool smatrixtdmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, RVector *e) {
 #ifndef ALGLIB_INTERCEPTS_MKL
@@ -3880,8 +3880,8 @@ bool smatrixtdmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d
 // MKL-based kernel.
 //
 // NOTE: Tau, D, E must be preallocated arrays;
-//       length(E)=length(Tau)=N-1 (or larger)
-//       length(D)=N (or larger)
+//       length(E) == length(Tau) == N-1 (or larger)
+//       length(D) == N (or larger)
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
 bool hmatrixtdmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, RVector *e) {
 #ifndef ALGLIB_INTERCEPTS_MKL
@@ -3962,7 +3962,7 @@ bool rmatrixinternalschurdecompositionmkl(RMatrix *h, ae_int_t n, ae_int_t tneed
 //
 // Returns True if MKL was present and handled request.
 //
-// NOTE: this function does NOT support HOWMNY=3!!!!
+// NOTE: this function does NOT support HOWMNY == 3!!!!
 //
 // VL and VR are preallocated arrays with length N*N, if required. If particalar
 // variables is not required, it can be dummy (empty) array.
@@ -3985,7 +3985,7 @@ bool rmatrixinternaltrevcmkl(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t how
 // D and E are preallocated arrays with length N (both of them!). On output,
 // D constraints eigenvalues, and E is destroyed.
 //
-// Z is preallocated array[N,N] for ZNeeded != 0; ignored for ZNeeded=0.
+// Z is preallocated array[N,N] for ZNeeded != 0; ignored for ZNeeded == 0.
 //
 // EVDResult is modified if and only if MKL is present.
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
@@ -4007,7 +4007,7 @@ bool smatrixtdevdmkl(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatr
 // D and E are preallocated arrays with length N (both of them!). On output,
 // D constraints eigenvalues, and E is destroyed.
 //
-// Z is preallocated array[N,N] for ZNeeded != 0; ignored for ZNeeded=0.
+// Z is preallocated array[N,N] for ZNeeded != 0; ignored for ZNeeded == 0.
 //
 // EVDResult is modified if and only if MKL is present.
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
@@ -4430,7 +4430,7 @@ void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf
 // * permutation tables P1, P2
 //
 // Algorithm outputs permutation tables using two formats:
-// * as usual permutation of [0..N-1]. If P1[i]=j, then sorted A[i]  contains
+// * as usual permutation of [0..N-1]. If P1[i] == j, then sorted A[i]  contains
 //   value which was moved there from J-th position.
 // * as a sequence of pairwise permutations. Sorted A[] may  be  obtained  by
 //   swaping A[i] and A[P2[i]] for all i from 0 to N-1.
@@ -4476,7 +4476,7 @@ void tagheappushi(RVector *a, ZVector *b, ae_int_t *n, double va, ae_int_t vb) {
    if (*n < 0) {
       return;
    }
-// N=0 is a special case
+// N == 0 is a special case
    if (*n == 0) {
       a->xR[0] = va;
       b->xZ[0] = vb;
@@ -4529,7 +4529,7 @@ void tagheapreplacetopi(RVector *a, ZVector *b, ae_int_t n, double va, ae_int_t 
    if (n < 1) {
       return;
    }
-// N=1 is a special case
+// N == 1 is a special case
    if (n == 1) {
       a->xR[0] = va;
       b->xZ[0] = vb;
@@ -4605,7 +4605,7 @@ void tagheappopi(RVector *a, ZVector *b, ae_int_t *n) {
    if (*n < 1) {
       return;
    }
-// N=1 is a special case
+// N == 1 is a special case
    if (*n == 1) {
       *n = 0;
       return;
@@ -4829,7 +4829,7 @@ void matrixvectormultiply(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_
    ae_int_t i;
    double v;
    if (!trans) {
-   // y := alpha*A*x + beta*y;
+   // y = alpha*A*x + beta*y;
       if (i1 > i2 || j1 > j2) {
          return;
       }
@@ -4849,7 +4849,7 @@ void matrixvectormultiply(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_
          y->xR[iy1 + i - i1] += alpha * v;
       }
    } else {
-   // y := alpha*A'*x + beta*y;
+   // y = alpha*A'*x + beta*y;
       if (i1 > i2 || j1 > j2) {
          return;
       }
@@ -4999,7 +4999,7 @@ namespace alglib_impl {
 //
 // The algorithm pre-multiplies the matrix by a sequence of rotation
 // transformations which is given by arrays C and S. Depending on the value
-// of the IsForward parameter either 1 and 2, 3 and 4 and so on (if IsForward=true)
+// of the IsForward parameter either 1 and 2, 3 and 4 and so on (if IsForward == true)
 // rows are rotated, or the rows N and N-1, N-2 and N-3 and so on, are rotated.
 //
 // Not the whole matrix but only a part of it is transformed (rows from M1 to
@@ -5044,7 +5044,7 @@ void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_
             }
          }
       } else {
-      // Special case: N1=N2
+      // Special case: N1 == N2
          for (j = m1; j < m2; j++) {
             ctemp = c->xR[j - m1 + 1];
             stemp = s->xR[j - m1 + 1];
@@ -5071,7 +5071,7 @@ void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_
             }
          }
       } else {
-      // Special case: N1=N2
+      // Special case: N1 == N2
          for (j = m2 - 1; j >= m1; j--) {
             ctemp = c->xR[j - m1 + 1];
             stemp = s->xR[j - m1 + 1];
@@ -5089,7 +5089,7 @@ void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_
 //
 // The algorithm post-multiplies the matrix by a sequence of rotation
 // transformations which is given by arrays C and S. Depending on the value
-// of the IsForward parameter either 1 and 2, 3 and 4 and so on (if IsForward=true)
+// of the IsForward parameter either 1 and 2, 3 and 4 and so on (if IsForward == true)
 // rows are rotated, or the rows N and N-1, N-2 and N-3 and so on are rotated.
 //
 // Not the whole matrix but only a part of it is transformed (rows from M1
@@ -5131,7 +5131,7 @@ void applyrotationsfromtheright(bool isforward, ae_int_t m1, ae_int_t m2, ae_int
             }
          }
       } else {
-      // Special case: M1=M2
+      // Special case: M1 == M2
          for (j = n1; j < n2; j++) {
             ctemp = c->xR[j - n1 + 1];
             stemp = s->xR[j - n1 + 1];
@@ -5158,7 +5158,7 @@ void applyrotationsfromtheright(bool isforward, ae_int_t m1, ae_int_t m2, ae_int
             }
          }
       } else {
-      // Special case: M1=M2
+      // Special case: M1 == M2
          for (j = n2 - 1; j >= n1; j--) {
             ctemp = c->xR[j - n1 + 1];
             stemp = s->xR[j - n1 + 1];
@@ -5445,7 +5445,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
          // A is non-unit triangular.
          //
          // Compute GROW = 1/G(j) and XBND = 1/M(j).
-         // Initially, G(0) = max{x(i), i=1,...,n}.
+         // Initially, G(0) = max{x(i), i = 1,...,n}.
             grow = 1 / rmax2(xbnd, smlnum);
             xbnd = grow;
             j = jfirst;
@@ -5472,7 +5472,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
          } else {
          // A is unit triangular.
          //
-         // Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
+         // Compute GROW = 1/G(j), where G(0) = max{x(i), i = 1,...,n}.
             grow = rmin2(1.0, 1 / rmax2(xbnd, smlnum));
             j = jfirst;
             while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
@@ -5504,7 +5504,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
          // A is non-unit triangular.
          //
          // Compute GROW = 1/G(j) and XBND = 1/M(j).
-         // Initially, M(0) = max{x(i), i=1,...,n}.
+         // Initially, M(0) = max{x(i), i = 1,...,n}.
             grow = 1 / rmax2(xbnd, smlnum);
             xbnd = grow;
             j = jfirst;
@@ -5529,7 +5529,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
          } else {
          // A is unit triangular.
          //
-         // Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
+         // Compute GROW = 1/G(j), where G(0) = max{x(i), i = 1,...,n}.
             grow = rmin2(1.0, 1 / rmax2(xbnd, smlnum));
             j = jfirst;
             while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
@@ -5681,7 +5681,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
             if (upper) {
                if (j > 1) {
                // Compute the update
-               // x(1:j-1) := x(1:j-1) - x(j) * A(1:j-1,j)
+               // x(1:j-1) = x(1:j-1) - x(j) * A(1:j-1,j)
                   v = x->xR[j] * tscal;
                   jm1 = j - 1;
                   ae_v_subd(&x->xR[1], 1, &a->xyR[1][j], a->stride, jm1, v);
@@ -5696,7 +5696,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
             } else {
                if (j < n) {
                // Compute the update
-               // x(j+1:n) := x(j+1:n) - x(j) * A(j+1:n,j)
+               // x(j+1:n) = x(j+1:n) - x(j) * A(j+1:n,j)
                   jp1 = j + 1;
                   v = x->xR[j] * tscal;
                   ae_v_subd(&x->xR[jp1], 1, &a->xyR[jp1][j], a->stride, n - jp1 + 1, v);
@@ -5774,7 +5774,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
                }
             }
             if (uscal == tscal) {
-            // Compute x(j) := ( x(j) - sumj ) / A(j,j) if 1/A(j,j)
+            // Compute x(j) = ( x(j) - sumj ) / A(j,j) if 1/A(j,j)
             // was not used to scale the dotproduct.
                x->xR[j] -= sumj;
                xj = fabs(x->xR[j]);
@@ -5826,7 +5826,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
                   }
                }
             } else {
-            // Compute x(j) := x(j) / A(j,j)  - sumj if the dot
+            // Compute x(j) = x(j) / A(j,j)  - sumj if the dot
             // product has already been divided by 1/A(j,j).
                x->xR[j] = x->xR[j] / tjjs - sumj;
             }
@@ -5846,17 +5846,17 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
 // Utility subroutine performing the "safe" solution of system of linear
 // equations with triangular coefficient matrices.
 //
-// The subroutine uses scaling and solves the scaled system A*x=s*b (where  s
-// is  a  scalar  value)  instead  of  A*x=b,  choosing  s  so  that x can be
+// The subroutine uses scaling and solves the scaled system A*x == s*b (where  s
+// is  a  scalar  value)  instead  of  A*x == b,  choosing  s  so  that x can be
 // represented by a floating-point number. The closer the system  gets  to  a
-// singular, the less s is. If the system is singular, s=0 and x contains the
-// non-trivial solution of equation A*x=0.
+// singular, the less s is. If the system is singular, s == 0 and x contains the
+// non-trivial solution of equation A*x == 0.
 //
 // The feature of an algorithm is that it could not cause an  overflow  or  a
 // division by zero regardless of the matrix used as the input.
 //
 // The algorithm can solve systems of equations with  upper/lower  triangular
-// matrices,  with/without unit diagonal, and systems of type A*x=b or A'*x=b
+// matrices,  with/without unit diagonal, and systems of type A*x == b or A'*x == b
 // (where A' is a transposed matrix A).
 //
 // Inputs:
@@ -5868,7 +5868,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
 //                 triangular and is located in  the  corresponding  part  of
 //                 matrix A.
 //     Trans   -   problem type. If it is True, the problem to be  solved  is
-//                 A'*x=b, otherwise it is A*x=b.
+//                 A'*x == b, otherwise it is A*x == b.
 //     Isunit  -   matrix type. If it is True, the system matrix has  a  unit
 //                 diagonal (the elements on the main diagonal are  not  used
 //                 in the calculation process), otherwise the matrix is considered
@@ -5936,14 +5936,14 @@ static bool safesolve_cbasicsolveandupdate(complex alpha, complex beta, double l
       return result;
    }
    if (ae_c_neq_d(beta, 0.0)) {
-   // alpha*x[i]=beta
+   // alpha*x[i] == beta
       v = log(abscomplex(beta)) - log(abscomplex(alpha));
       if (v > lnmax) {
          return result;
       }
       *x = ae_c_div(beta, alpha);
    } else {
-   // alpha*x[i]=0
+   // alpha*x[i] == 0
       *x = complex_from_i(0);
    }
 // update NrmX, test growth limit
@@ -6103,7 +6103,7 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
 
 // Internal subroutine for safe solution of
 //
-//     SA*op(A)=b
+//     SA*op(A) == b
 //
 // where  A  is  NxN  upper/lower  triangular/unitriangular  matrix, op(A) is
 // either identity transform, transposition or Hermitian transposition, SA is
@@ -6357,7 +6357,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
    *r = 0;
    *rerr = 0;
 // special cases:
-// * N=0
+// * N == 0
 // * N is too large to use integer arithmetics
    if (n == 0) {
       *r = 0.0;
@@ -6373,9 +6373,9 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
 // Prepare
    ln2 = log(2.0);
    *rerr = mx * machineepsilon;
-// 1. find S such that 0.5 <= S*MX<1
+// 1. find S such that 0.5 <= S*MX < 1
 // 2. multiply W by S, so task is normalized in some sense
-// 3. S:=1/S so we can obtain original vector multiplying by S
+// 3. S = 1/S so we can obtain original vector multiplying by S
    k = iround(log(mx) / ln2);
    s = xblas_xfastpow(2.0, -k);
    if (!isfinite(s)) {
@@ -6395,7 +6395,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
    }
    ae_v_muld(w->xR, 1, n, s);
    s = 1 / s;
-// find Chunk=2^M such that N*Chunk<2^29
+// find Chunk == 2^M such that N*Chunk < 2^29
 //
 // we have chosen upper limit (2^29) with enough space left
 // to tolerate possible problems with rounding and N's close
@@ -6440,7 +6440,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
 // Inputs:
 //     A       -   array[0..N-1], vector 1
 //     B       -   array[0..N-1], vector 2
-//     N       -   vectors length, N<2^29.
+//     N       -   vectors length, N < 2^29.
 //     Temp    -   array[0..N-1], preallocated temporary storage
 //
 // Outputs:
@@ -6456,7 +6456,7 @@ void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *
    *r = 0;
    *rerr = 0;
 // special cases:
-// * N=0
+// * N == 0
    if (n == 0) {
       *r = 0.0;
       *rerr = 0.0;
@@ -6484,7 +6484,7 @@ void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *
 // Inputs:
 //     A       -   array[0..N-1], vector 1
 //     B       -   array[0..N-1], vector 2
-//     N       -   vectors length, N<2^29.
+//     N       -   vectors length, N < 2^29.
 //     Temp    -   array[0..2*N-1], preallocated temporary storage
 //
 // Outputs:
@@ -6503,7 +6503,7 @@ void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, complex *r, double
    r->y = 0;
    *rerr = 0;
 // special cases:
-// * N=0
+// * N == 0
    if (n == 0) {
       *r = complex_from_i(0);
       *rerr = 0.0;
@@ -6554,8 +6554,8 @@ void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, complex *r, double
 namespace alglib_impl {
 static const double linmin_stpmin = 1.0E-50;
 
-// Normalizes direction/step pair: makes |D|=1, scales Stp.
-// If |D|=0, it returns, leavind D/Stp unchanged.
+// Normalizes direction/step pair: makes |D| == 1, scales Stp.
+// If |D| == 0, it returns, leavind D/Stp unchanged.
 // ALGLIB: Copyright 01.04.2010 by Sergey Bochkanov
 void linminnormalized(RVector *d, double *stp, ae_int_t n) {
    double mx;
@@ -6919,7 +6919,7 @@ Pause:
 // criterion - it just tries different Armijo steps and returns optimum found
 // so far.
 //
-// Optimization is done using F-rcomm interface:
+// Optimization is done using F-RComm interface:
 // * ArmijoCreate initializes State structure
 //   (reusing previously allocated buffers)
 // * ArmijoIteration is subsequently called
@@ -6929,7 +6929,7 @@ Pause:
 //     N       -   problem size
 //     X       -   array[N], starting point
 //     F       -   F(X+S*STP)
-//     S       -   step direction, S>0
+//     S       -   step direction, S > 0
 //     STP     -   step length
 //     STPMAX  -   maximum value for STP or zero (if no limit is imposed)
 //     FMAX    -   maximum number of function evaluations
@@ -6955,7 +6955,7 @@ void armijocreate(ae_int_t n, RVector *x, double f, RVector *s, double stp, doub
    state->PQ = -1;
 }
 
-// This is rcomm-based search function
+// This is RComm-based search function
 // ALGLIB: Copyright 05.10.2010 by Sergey Bochkanov
 bool armijoiteration(armijostate *state) {
    const double armijofactor = 1.3;
@@ -7276,11 +7276,11 @@ static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n) {
    if (b % 2 == 0) {
    // A*B = (A*(B/2)) * 2
    //
-   // Product T=A*(B/2) is calculated recursively, product T*2 is
+   // Product T == A*(B/2) is calculated recursively, product T*2 is
    // calculated as follows:
-   // * result:=T-N
-   // * result:=result+T
-   // * if result<0 then result:=result+N
+   // * result = T-N
+   // * result = result+T
+   // * if result < 0 then result = result+N
    //
    // In case integer result overflows, we generate exception
       t = ntheory_modmul(a, b / 2, n);
@@ -7292,11 +7292,11 @@ static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n) {
    } else {
    // A*B = (A*(B div 2)) * 2 + A
    //
-   // Product T=A*(B/2) is calculated recursively, product T*2 is
+   // Product T == A*(B/2) is calculated recursively, product T*2 is
    // calculated as follows:
-   // * result:=T-N
-   // * result:=result+T
-   // * if result<0 then result:=result+N
+   // * result = T-N
+   // * result = result+T
+   // * if result < 0 then result = result+N
    //
    // In case integer result overflows, we generate exception
       t = ntheory_modmul(a, b / 2, n);
@@ -7369,7 +7369,7 @@ void findprimitiverootandinverse(ae_int_t n, ae_int_t *proot, ae_int_t *invproot
 // For testing we use algorithm from Wiki (Primitive root modulo n):
 // * compute phi(N)
 // * determine the different prime factors of phi(N), say p1, ..., pk
-// * for every element m of Zn*, compute m^(phi(N)/pi) mod N for i=1..k
+// * for every element m of Zn*, compute m^(phi(N)/pi) mod N for i = 1..k
 //   using a fast algorithm for modular exponentiation.
 // * a number m for which these k results are all different from 1 is a
 //   primitive root.
@@ -8694,7 +8694,7 @@ static bool hpccores_hpcfinalizechunkedgradientx(RVector *buf, ae_int_t wcount, 
 // a new set of weights. You have to call it only once, see example below:
 //
 // HOW TO PROCESS DATASET WITH THIS FUNCTION:
-//     Grad:=0
+//     Grad = 0
 //     HPCPrepareChunkedGradient(Weights, WCount, NTotal, NOut, Buf)
 //     foreach chunk-of-dataset do
 //         HPCChunkedGradient(...)
@@ -8750,7 +8750,7 @@ void hpcpreparechunkedgradient(RVector *weights, ae_int_t wcount, ae_int_t ntota
 // a new set of weights. You have to call it only once, see example below:
 //
 // HOW TO PROCESS DATASET WITH THIS FUNCTION:
-//     Grad:=0
+//     Grad = 0
 //     HPCPrepareChunkedGradient(Weights, WCount, NTotal, NOut, Buf)
 //     foreach chunk-of-dataset do
 //         HPCChunkedGradient(...)

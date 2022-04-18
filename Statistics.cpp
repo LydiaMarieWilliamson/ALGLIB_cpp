@@ -46,10 +46,10 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
    *variance = 0;
    *skewness = 0;
    *kurtosis = 0;
-   ae_assert(n >= 0, "SampleMoments: N<0");
-   ae_assert(x->cnt >= n, "SampleMoments: Length(X)<N!");
+   ae_assert(n >= 0, "SampleMoments: N < 0");
+   ae_assert(x->cnt >= n, "SampleMoments: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "SampleMoments: X is not finite vector");
-// Init, special case 'N=0'
+// Init, special case 'N == 0'
    *mean = 0.0;
    *variance = 0.0;
    *skewness = 0.0;
@@ -214,10 +214,10 @@ void sampleadev(RVector *x, ae_int_t n, double *adev) {
    ae_int_t i;
    double mean;
    *adev = 0;
-   ae_assert(n >= 0, "SampleADev: N<0");
-   ae_assert(x->cnt >= n, "SampleADev: Length(X)<N!");
+   ae_assert(n >= 0, "SampleADev: N < 0");
+   ae_assert(x->cnt >= n, "SampleADev: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "SampleADev: X is not finite vector");
-// Init, handle N=0
+// Init, handle N == 0
    mean = 0.0;
    *adev = 0.0;
    if (n <= 0) {
@@ -260,8 +260,8 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
    ae_frame_make(&_frame_block);
    DupVector(x);
    *median = 0;
-   ae_assert(n >= 0, "SampleMedian: N<0");
-   ae_assert(x->cnt >= n, "SampleMedian: Length(X)<N!");
+   ae_assert(n >= 0, "SampleMedian: N < 0");
+   ae_assert(x->cnt >= n, "SampleMedian: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "SampleMedian: X is not finite vector");
 // Some degenerate cases
    *median = 0.0;
@@ -366,8 +366,8 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v) {
    DupVector(x);
    *v = 0;
    NewVector(rbuf, 0, DT_REAL);
-   ae_assert(n >= 0, "SamplePercentile: N<0");
-   ae_assert(x->cnt >= n, "SamplePercentile: Length(X)<N!");
+   ae_assert(n >= 0, "SamplePercentile: N < 0");
+   ae_assert(x->cnt >= n, "SamplePercentile: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "SamplePercentile: X is not finite vector");
    ae_assert(isfinite(p), "SamplePercentile: incorrect P!");
    ae_assert(p >= 0.0 && p <= 1.0, "SamplePercentile: incorrect P!");
@@ -498,10 +498,10 @@ void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    NewObj(apbuffers, buf0);
    NewObj(apbuffers, buf1);
    NewObj(ae_shared_pool, pool);
-   ae_assert(npoints >= 0, "RankData: NPoints<0");
-   ae_assert(nfeatures >= 1, "RankData: NFeatures<1");
-   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints");
-   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures");
+   ae_assert(npoints >= 0, "RankData: NPoints < 0");
+   ae_assert(nfeatures >= 1, "RankData: NFeatures < 1");
+   ae_assert(xy->rows >= npoints, "RankData: Rows(XY) < NPoints");
+   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY) < NFeatures");
    ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "RankData: XY contains infinite/NAN elements");
 // Basecase cost is a maximum cost of basecase problems.
 // Problems harded than that cost will be split.
@@ -550,10 +550,10 @@ void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    NewObj(apbuffers, buf0);
    NewObj(apbuffers, buf1);
    NewObj(ae_shared_pool, pool);
-   ae_assert(npoints >= 0, "RankData: NPoints<0");
-   ae_assert(nfeatures >= 1, "RankData: NFeatures<1");
-   ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints");
-   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures");
+   ae_assert(npoints >= 0, "RankData: NPoints < 0");
+   ae_assert(nfeatures >= 1, "RankData: NFeatures < 1");
+   ae_assert(xy->rows >= npoints, "RankData: Rows(XY) < NPoints");
+   ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY) < NFeatures");
    ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "RankData: XY contains infinite/NAN elements");
 // Basecase cost is a maximum cost of basecase problems.
 // Problems harded than that cost will be split.
@@ -585,7 +585,7 @@ void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
 //                 * if not given, automatically determined from input sizes
 //
 // Result:
-//     covariance (zero for N=0 or N=1)
+//     covariance (zero for N == 0 or N == 1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 // API: double cov2(const real_1d_array &x, const real_1d_array &y);
@@ -600,9 +600,9 @@ double cov2(RVector *x, RVector *y, ae_int_t n) {
    bool samex;
    bool samey;
    double result;
-   ae_assert(n >= 0, "Cov2: N<0");
-   ae_assert(x->cnt >= n, "Cov2: Length(X)<N!");
-   ae_assert(y->cnt >= n, "Cov2: Length(Y)<N!");
+   ae_assert(n >= 0, "Cov2: N < 0");
+   ae_assert(x->cnt >= n, "Cov2: Length(X) < N!");
+   ae_assert(y->cnt >= n, "Cov2: Length(Y) < N!");
    ae_assert(isfinitevector(x, n), "Cov2: X is not finite vector");
    ae_assert(isfinitevector(y, n), "Cov2: Y is not finite vector");
 // Special case
@@ -611,7 +611,6 @@ double cov2(RVector *x, RVector *y, ae_int_t n) {
       return result;
    }
 // Calculate mean.
-//
 //
 // Additionally we calculate SameX and SameY -
 // flag variables which are set to True when
@@ -659,7 +658,7 @@ double cov2(RVector *x, RVector *y, ae_int_t n) {
 //
 // Result:
 //     Pearson product-moment correlation coefficient
-//     (zero for N=0 or N=1)
+//     (zero for N == 0 or N == 1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 // API: double pearsoncorr2(const real_1d_array &x, const real_1d_array &y);
@@ -678,9 +677,9 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
    double t1;
    double t2;
    double result;
-   ae_assert(n >= 0, "PearsonCorr2: N<0");
-   ae_assert(x->cnt >= n, "PearsonCorr2: Length(X)<N!");
-   ae_assert(y->cnt >= n, "PearsonCorr2: Length(Y)<N!");
+   ae_assert(n >= 0, "PearsonCorr2: N < 0");
+   ae_assert(x->cnt >= n, "PearsonCorr2: Length(X) < N!");
+   ae_assert(y->cnt >= n, "PearsonCorr2: Length(Y) < N!");
    ae_assert(isfinitevector(x, n), "PearsonCorr2: X is not finite vector");
    ae_assert(isfinitevector(y, n), "PearsonCorr2: Y is not finite vector");
 // Special case
@@ -689,7 +688,6 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
       return result;
    }
 // Calculate mean.
-//
 //
 // Additionally we calculate SameX and SameY -
 // flag variables which are set to True when
@@ -747,7 +745,7 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
 //
 // Result:
 //     Spearman's rank correlation coefficient
-//     (zero for N=0 or N=1)
+//     (zero for N == 0 or N == 1)
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 // API: double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
 // API: double spearmancorr2(const real_1d_array &x, const real_1d_array &y);
@@ -758,9 +756,9 @@ double spearmancorr2(RVector *x, RVector *y, ae_int_t n) {
    DupVector(x);
    DupVector(y);
    NewObj(apbuffers, buf);
-   ae_assert(n >= 0, "SpearmanCorr2: N<0");
-   ae_assert(x->cnt >= n, "SpearmanCorr2: Length(X)<N!");
-   ae_assert(y->cnt >= n, "SpearmanCorr2: Length(Y)<N!");
+   ae_assert(n >= 0, "SpearmanCorr2: N < 0");
+   ae_assert(x->cnt >= n, "SpearmanCorr2: Length(X) < N!");
+   ae_assert(y->cnt >= n, "SpearmanCorr2: Length(Y) < N!");
    ae_assert(isfinitevector(x, n), "SpearmanCorr2: X is not finite vector");
    ae_assert(isfinitevector(y, n), "SpearmanCorr2: Y is not finite vector");
 // Special case
@@ -803,12 +801,12 @@ double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
+//     M   -   M > 0, number of variables:
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
 // Outputs:
-//     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
+//     C   -   array[M,M], covariance matrix (zero if N == 0 or N == 1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
 // API: void covm(const real_2d_array &x, real_2d_array &c);
@@ -823,10 +821,10 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
    NewVector(t, 0, DT_REAL);
    NewVector(x0, 0, DT_REAL);
    NewVector(same, 0, DT_BOOL);
-   ae_assert(n >= 0, "CovM: N<0");
-   ae_assert(m >= 1, "CovM: M<1");
-   ae_assert(x->rows >= n, "CovM: Rows(X)<N!");
-   ae_assert(x->cols >= m || n == 0, "CovM: Cols(X)<M!");
+   ae_assert(n >= 0, "CovM: N < 0");
+   ae_assert(m >= 1, "CovM: M < 1");
+   ae_assert(x->rows >= n, "CovM: Rows(X) < N!");
+   ae_assert(x->cols >= m || n == 0, "CovM: Cols(X) < M!");
    ae_assert(apservisfinitematrix(x, n, m), "CovM: X contains infinite/NAN elements");
 // N <= 1, return zero
    if (n <= 1) {
@@ -884,12 +882,12 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
+//     M   -   M > 0, number of variables:
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
 // Outputs:
-//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
+//     C   -   array[M,M], correlation matrix (zero if N == 0 or N == 1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
 // API: void pearsoncorrm(const real_2d_array &x, real_2d_array &c);
@@ -901,10 +899,10 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
    ae_frame_make(&_frame_block);
    SetMatrix(c);
    NewVector(t, 0, DT_REAL);
-   ae_assert(n >= 0, "PearsonCorrM: N<0");
-   ae_assert(m >= 1, "PearsonCorrM: M<1");
-   ae_assert(x->rows >= n, "PearsonCorrM: Rows(X)<N!");
-   ae_assert(x->cols >= m || n == 0, "PearsonCorrM: Cols(X)<M!");
+   ae_assert(n >= 0, "PearsonCorrM: N < 0");
+   ae_assert(m >= 1, "PearsonCorrM: M < 1");
+   ae_assert(x->rows >= n, "PearsonCorrM: Rows(X) < N!");
+   ae_assert(x->cols >= m || n == 0, "PearsonCorrM: Cols(X) < M!");
    ae_assert(apservisfinitematrix(x, n, m), "PearsonCorrM: X contains infinite/NAN elements");
    ae_vector_set_length(&t, m);
    covm(x, n, m, c);
@@ -933,12 +931,12 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
+//     M   -   M > 0, number of variables:
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
 // Outputs:
-//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
+//     C   -   array[M,M], correlation matrix (zero if N == 0 or N == 1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
 // API: void spearmancorrm(const real_2d_array &x, real_2d_array &c);
@@ -955,10 +953,10 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
    NewObj(apbuffers, buf);
    NewMatrix(xc, 0, 0, DT_REAL);
    NewVector(t, 0, DT_REAL);
-   ae_assert(n >= 0, "SpearmanCorrM: N<0");
-   ae_assert(m >= 1, "SpearmanCorrM: M<1");
-   ae_assert(x->rows >= n, "SpearmanCorrM: Rows(X)<N!");
-   ae_assert(x->cols >= m || n == 0, "SpearmanCorrM: Cols(X)<M!");
+   ae_assert(n >= 0, "SpearmanCorrM: N < 0");
+   ae_assert(m >= 1, "SpearmanCorrM: M < 1");
+   ae_assert(x->rows >= n, "SpearmanCorrM: Rows(X) < N!");
+   ae_assert(x->cols >= m || n == 0, "SpearmanCorrM: Cols(X) < M!");
    ae_assert(apservisfinitematrix(x, n, m), "SpearmanCorrM: X contains infinite/NAN elements");
 // N <= 1, return zero
    if (n <= 1) {
@@ -1041,15 +1039,15 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
+//     M1  -   M1 > 0, number of variables in X:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
+//     M2  -   M2 > 0, number of variables in Y:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
 // Outputs:
-//     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
+//     C   -   array[M1,M2], cross-covariance matrix (zero if N == 0 or N == 1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
 // API: void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
@@ -1067,14 +1065,14 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
    NewVector(y0, 0, DT_REAL);
    NewVector(samex, 0, DT_BOOL);
    NewVector(samey, 0, DT_BOOL);
-   ae_assert(n >= 0, "CovM2: N<0");
-   ae_assert(m1 >= 1, "CovM2: M1<1");
-   ae_assert(m2 >= 1, "CovM2: M2<1");
-   ae_assert(x->rows >= n, "CovM2: Rows(X)<N!");
-   ae_assert(x->cols >= m1 || n == 0, "CovM2: Cols(X)<M1!");
+   ae_assert(n >= 0, "CovM2: N < 0");
+   ae_assert(m1 >= 1, "CovM2: M1 < 1");
+   ae_assert(m2 >= 1, "CovM2: M2 < 1");
+   ae_assert(x->rows >= n, "CovM2: Rows(X) < N!");
+   ae_assert(x->cols >= m1 || n == 0, "CovM2: Cols(X) < M1!");
    ae_assert(apservisfinitematrix(x, n, m1), "CovM2: X contains infinite/NAN elements");
-   ae_assert(y->rows >= n, "CovM2: Rows(Y)<N!");
-   ae_assert(y->cols >= m2 || n == 0, "CovM2: Cols(Y)<M2!");
+   ae_assert(y->rows >= n, "CovM2: Rows(Y) < N!");
+   ae_assert(y->cols >= m2 || n == 0, "CovM2: Cols(Y) < M2!");
    ae_assert(apservisfinitematrix(y, n, m2), "CovM2: X contains infinite/NAN elements");
 // N <= 1, return zero
    if (n <= 1) {
@@ -1157,15 +1155,15 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
+//     M1  -   M1 > 0, number of variables in X:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
+//     M2  -   M2 > 0, number of variables in Y:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
 // Outputs:
-//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
+//     C   -   array[M1,M2], cross-correlation matrix (zero if N == 0 or N == 1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
 // API: void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
@@ -1185,14 +1183,14 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
    NewVector(sy, 0, DT_REAL);
    NewVector(samex, 0, DT_BOOL);
    NewVector(samey, 0, DT_BOOL);
-   ae_assert(n >= 0, "PearsonCorrM2: N<0");
-   ae_assert(m1 >= 1, "PearsonCorrM2: M1<1");
-   ae_assert(m2 >= 1, "PearsonCorrM2: M2<1");
-   ae_assert(x->rows >= n, "PearsonCorrM2: Rows(X)<N!");
-   ae_assert(x->cols >= m1 || n == 0, "PearsonCorrM2: Cols(X)<M1!");
+   ae_assert(n >= 0, "PearsonCorrM2: N < 0");
+   ae_assert(m1 >= 1, "PearsonCorrM2: M1 < 1");
+   ae_assert(m2 >= 1, "PearsonCorrM2: M2 < 1");
+   ae_assert(x->rows >= n, "PearsonCorrM2: Rows(X) < N!");
+   ae_assert(x->cols >= m1 || n == 0, "PearsonCorrM2: Cols(X) < M1!");
    ae_assert(apservisfinitematrix(x, n, m1), "PearsonCorrM2: X contains infinite/NAN elements");
-   ae_assert(y->rows >= n, "PearsonCorrM2: Rows(Y)<N!");
-   ae_assert(y->cols >= m2 || n == 0, "PearsonCorrM2: Cols(Y)<M2!");
+   ae_assert(y->rows >= n, "PearsonCorrM2: Rows(Y) < N!");
+   ae_assert(y->cols >= m2 || n == 0, "PearsonCorrM2: Cols(Y) < M2!");
    ae_assert(apservisfinitematrix(y, n, m2), "PearsonCorrM2: X contains infinite/NAN elements");
 // N <= 1, return zero
    if (n <= 1) {
@@ -1309,15 +1307,15 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
+//     M1  -   M1 > 0, number of variables in X:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
+//     M2  -   M2 > 0, number of variables in Y:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
 // Outputs:
-//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
+//     C   -   array[M1,M2], cross-correlation matrix (zero if N == 0 or N == 1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 // API: void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
 // API: void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
@@ -1339,14 +1337,14 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
    NewMatrix(xc, 0, 0, DT_REAL);
    NewMatrix(yc, 0, 0, DT_REAL);
    NewObj(apbuffers, buf);
-   ae_assert(n >= 0, "SpearmanCorrM2: N<0");
-   ae_assert(m1 >= 1, "SpearmanCorrM2: M1<1");
-   ae_assert(m2 >= 1, "SpearmanCorrM2: M2<1");
-   ae_assert(x->rows >= n, "SpearmanCorrM2: Rows(X)<N!");
-   ae_assert(x->cols >= m1 || n == 0, "SpearmanCorrM2: Cols(X)<M1!");
+   ae_assert(n >= 0, "SpearmanCorrM2: N < 0");
+   ae_assert(m1 >= 1, "SpearmanCorrM2: M1 < 1");
+   ae_assert(m2 >= 1, "SpearmanCorrM2: M2 < 1");
+   ae_assert(x->rows >= n, "SpearmanCorrM2: Rows(X) < N!");
+   ae_assert(x->cols >= m1 || n == 0, "SpearmanCorrM2: Cols(X) < M1!");
    ae_assert(apservisfinitematrix(x, n, m1), "SpearmanCorrM2: X contains infinite/NAN elements");
-   ae_assert(y->rows >= n, "SpearmanCorrM2: Rows(Y)<N!");
-   ae_assert(y->cols >= m2 || n == 0, "SpearmanCorrM2: Cols(Y)<M2!");
+   ae_assert(y->rows >= n, "SpearmanCorrM2: Rows(Y) < N!");
+   ae_assert(y->cols >= m2 || n == 0, "SpearmanCorrM2: Cols(Y) < M2!");
    ae_assert(apservisfinitematrix(y, n, m2), "SpearmanCorrM2: X contains infinite/NAN elements");
 // N <= 1, return zero
    if (n <= 1) {
@@ -6886,7 +6884,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
    double s4;
    double result;
    result = 0.0;
-// N1=5, N2 = 5, 6, 7, ...
+// N1 == 5, N2 == 5, 6, 7, ...
    if (imin2(n1, n2) == 5) {
       if (imax2(n1, n2) == 5) {
          result = mannwhitneyu_utbln5n5(s);
@@ -6971,7 +6969,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
       }
       return result;
    }
-// N1=6, N2 = 6, 7, 8, ...
+// N1 == 6, N2 == 6, 7, 8, ...
    if (imin2(n1, n2) == 6) {
       if (imax2(n1, n2) == 6) {
          result = mannwhitneyu_utbln6n6(s);
@@ -7011,7 +7009,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
       }
       return result;
    }
-// N1=7, N2 = 7, 8, ...
+// N1 == 7, N2 == 7, 8, ...
    if (imin2(n1, n2) == 7) {
       if (imax2(n1, n2) == 7) {
          result = mannwhitneyu_utbln7n7(s);
@@ -7048,7 +7046,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
       }
       return result;
    }
-// N1=8, N2 = 8, 9, 10, ...
+// N1 == 8, N2 == 8, 9, 10, ...
    if (imin2(n1, n2) == 8) {
       if (imax2(n1, n2) == 8) {
          result = mannwhitneyu_utbln8n8(s);
@@ -7082,7 +7080,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
       }
       return result;
    }
-// N1=9, N2 = 9, 10, ...
+// N1 == 9, N2 == 9, 10, ...
    if (imin2(n1, n2) == 9) {
       if (imax2(n1, n2) == 9) {
          result = mannwhitneyu_utbln9n9(s);
@@ -7113,7 +7111,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
       }
       return result;
    }
-// N1=10, N2 = 10, 11, ...
+// N1 == 10, N2 == 10, 11, ...
    if (imin2(n1, n2) == 10) {
       if (imax2(n1, n2) == 10) {
          result = mannwhitneyu_utbln10n10(s);
@@ -7141,7 +7139,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
       }
       return result;
    }
-// N1=11, N2 = 11, 12, ...
+// N1 == 11, N2 == 11, 12, ...
    if (imin2(n1, n2) == 11) {
       if (imax2(n1, n2) == 11) {
          result = mannwhitneyu_utbln11n11(s);
@@ -7166,7 +7164,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
       }
       return result;
    }
-// N1=12, N2 = 12, 13, ...
+// N1 == 12, N2 == 12, 13, ...
    if (imin2(n1, n2) == 12) {
       if (imax2(n1, n2) == 12) {
          result = mannwhitneyu_utbln12n12(s);
@@ -7188,7 +7186,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
       }
       return result;
    }
-// N1=13, N2 = 13, 14, ...
+// N1 == 13, N2 == 13, 14, ...
    if (imin2(n1, n2) == 13) {
       if (imax2(n1, n2) == 13) {
          result = mannwhitneyu_utbln13n13(s);
@@ -7207,7 +7205,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
       }
       return result;
    }
-// N1=14, N2 = 14, 15, ...
+// N1 == 14, N2 == 14, 15, ...
    if (imin2(n1, n2) == 14) {
       if (imax2(n1, n2) == 14) {
          result = mannwhitneyu_utbln14n14(s);
@@ -7325,7 +7323,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
 // 10..15     N..100     1.0e-02    2.2e-05
 // 15..100    N..100     6.1e-03    2.7e-06
 //
-// For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
+// For N, M > 100 accuracy checks weren't put into  practice,  but  taking  into
 // account characteristics of asymptotic approximation used, precision should
 // not be sharply different from the values for interval [5, 100].
 //
@@ -7531,7 +7529,7 @@ void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails,
       return;
    }
 // Calculate:
-// GTCnt - count of x[i]>Median
+// GTCnt - count of x[i] > Median
 // NECnt - count of x[i] != Median
    gtcnt = 0;
    necnt = 0;
@@ -7601,7 +7599,7 @@ namespace alglib_impl {
 //                     the null hypothesis is rejected.
 //
 // NOTE: this function correctly handles degenerate cases:
-//       * when N=0, all p-values are set to 1.0
+//       * when N == 0, all p-values are set to 1.0
 //       * when variance of X[] is exactly zero, p-values are set
 //         to 1.0 or 0.0, depending on difference between sample mean and
 //         value of mean being tested.
@@ -7720,7 +7718,7 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
 //                     the null hypothesis is rejected.
 //
 // NOTE: this function correctly handles degenerate cases:
-//       * when N=0 or M=0, all p-values are set to 1.0
+//       * when N == 0 or M == 0, all p-values are set to 1.0
 //       * when both samples has exactly zero variance, p-values are set
 //         to 1.0 or 0.0, depending on difference between means.
 // ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
@@ -7843,7 +7841,7 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
 //                     the null hypothesis is rejected.
 //
 // NOTE: this function correctly handles degenerate cases:
-//       * when N=0 or M=0, all p-values are set to 1.0
+//       * when N == 0 or M == 0, all p-values are set to 1.0
 //       * when both samples has zero variance, p-values are set
 //         to 1.0 or 0.0, depending on difference between means.
 //       * when only one sample has zero variance, test reduces to 1-sample

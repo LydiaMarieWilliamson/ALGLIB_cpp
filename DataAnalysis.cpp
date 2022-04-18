@@ -41,8 +41,8 @@ namespace alglib_impl {
 // Outputs:
 //     Info        -   return code:
 //                     * -4, if SVD subroutine haven't converged
-//                     * -1, if wrong parameters has been passed (NPoints<0,
-//                           NVars<1)
+//                     * -1, if wrong parameters has been passed (NPoints < 0,
+//                           NVars < 1)
 //                     *  1, if task is solved
 //     S2          -   array[0..NVars-1]. variance values corresponding
 //                     to basis vectors.
@@ -74,7 +74,7 @@ void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
       return;
    }
    *info = 1;
-// Special case: NPoints=0
+// Special case: NPoints == 0
    if (npoints == 0) {
       ae_vector_set_length(s2, nvars);
       ae_matrix_set_length(v, nvars, nvars);
@@ -144,7 +144,7 @@ void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
 //     NPoints     -   dataset size, NPoints >= 0
 //     NVars       -   number of independent variables, NVars >= 1
 //     NNeeded     -   number of requested components, in [1,NVars] range;
-//                     this function is efficient only for NNeeded<<NVars.
+//                     this function is efficient only for NNeeded << NVars.
 //     Eps         -   desired  precision  of  vectors  returned;  underlying
 //                     solver will stop iterations as soon as absolute  error
 //                     in corresponding singular values  reduces  to  roughly
@@ -157,14 +157,13 @@ void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
 //                     method. Zero value means that no  limit  on  iteration
 //                     count is placed (eps-based stopping condition is used).
 //
-//
 // Outputs:
 //     S2          -   array[NNeeded]. Variance values corresponding
 //                     to basis vectors.
 //     V           -   array[NVars,NNeeded]
 //                     matrix, whose columns store basis vectors.
 //
-// NOTE: passing eps=0 and maxits=0 results in small eps  being  selected  as
+// NOTE: passing eps == 0 and maxits == 0 results in small eps  being  selected  as
 // stopping condition. Exact value of automatically selected eps is  version-
 // -dependent.
 // ALGLIB: Copyright 10.01.2017 by Sergey Bochkanov
@@ -183,15 +182,15 @@ void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t
    NewVector(means, 0, DT_REAL);
    NewObj(eigsubspacestate, solver);
    NewObj(eigsubspacereport, rep);
-   ae_assert(npoints >= 0, "PCATruncatedSubspace: npoints<0");
-   ae_assert(nvars >= 1, "PCATruncatedSubspace: nvars<1");
-   ae_assert(nneeded > 0, "PCATruncatedSubspace: nneeded<1");
-   ae_assert(nneeded <= nvars, "PCATruncatedSubspace: nneeded>nvars");
-   ae_assert(maxits >= 0, "PCATruncatedSubspace: maxits<0");
-   ae_assert(isfinite(eps) && eps >= 0.0, "PCATruncatedSubspace: eps<0 or is not finite");
-   ae_assert(x->rows >= npoints, "PCATruncatedSubspace: rows(x)<npoints");
-   ae_assert(x->cols >= nvars || npoints == 0, "PCATruncatedSubspace: cols(x)<nvars");
-// Special case: NPoints=0
+   ae_assert(npoints >= 0, "PCATruncatedSubspace: npoints < 0");
+   ae_assert(nvars >= 1, "PCATruncatedSubspace: nvars < 1");
+   ae_assert(nneeded > 0, "PCATruncatedSubspace: nneeded < 1");
+   ae_assert(nneeded <= nvars, "PCATruncatedSubspace: nneeded > nvars");
+   ae_assert(maxits >= 0, "PCATruncatedSubspace: maxits < 0");
+   ae_assert(isfinite(eps) && eps >= 0.0, "PCATruncatedSubspace: eps < 0 or is not finite");
+   ae_assert(x->rows >= npoints, "PCATruncatedSubspace: rows(x) < npoints");
+   ae_assert(x->cols >= nvars || npoints == 0, "PCATruncatedSubspace: cols(x) < nvars");
+// Special case: NPoints == 0
    if (npoints == 0) {
       ae_vector_set_length(s2, nneeded);
       ae_matrix_set_length(v, nvars, nneeded);
@@ -262,7 +261,7 @@ void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t
 //     NPoints     -   dataset size, NPoints >= 0
 //     NVars       -   number of independent variables, NVars >= 1
 //     NNeeded     -   number of requested components, in [1,NVars] range;
-//                     this function is efficient only for NNeeded<<NVars.
+//                     this function is efficient only for NNeeded << NVars.
 //     Eps         -   desired  precision  of  vectors  returned;  underlying
 //                     solver will stop iterations as soon as absolute  error
 //                     in corresponding singular values  reduces  to  roughly
@@ -275,14 +274,13 @@ void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t
 //                     method. Zero value means that no  limit  on  iteration
 //                     count is placed (eps-based stopping condition is used).
 //
-//
 // Outputs:
 //     S2          -   array[NNeeded]. Variance values corresponding
 //                     to basis vectors.
 //     V           -   array[NVars,NNeeded]
 //                     matrix, whose columns store basis vectors.
 //
-// NOTE: passing eps=0 and maxits=0 results in small eps  being  selected  as
+// NOTE: passing eps == 0 and maxits == 0 results in small eps  being  selected  as
 //       a stopping condition. Exact value of automatically selected  eps  is
 //       version-dependent.
 //
@@ -308,17 +306,17 @@ void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvar
    NewVector(means, 0, DT_REAL);
    NewObj(eigsubspacestate, solver);
    NewObj(eigsubspacereport, rep);
-   ae_assert(npoints >= 0, "PCATruncatedSubspaceSparse: npoints<0");
-   ae_assert(nvars >= 1, "PCATruncatedSubspaceSparse: nvars<1");
-   ae_assert(nneeded > 0, "PCATruncatedSubspaceSparse: nneeded<1");
-   ae_assert(nneeded <= nvars, "PCATruncatedSubspaceSparse: nneeded>nvars");
-   ae_assert(maxits >= 0, "PCATruncatedSubspaceSparse: maxits<0");
-   ae_assert(isfinite(eps) && eps >= 0.0, "PCATruncatedSubspaceSparse: eps<0 or is not finite");
+   ae_assert(npoints >= 0, "PCATruncatedSubspaceSparse: npoints < 0");
+   ae_assert(nvars >= 1, "PCATruncatedSubspaceSparse: nvars < 1");
+   ae_assert(nneeded > 0, "PCATruncatedSubspaceSparse: nneeded < 1");
+   ae_assert(nneeded <= nvars, "PCATruncatedSubspaceSparse: nneeded > nvars");
+   ae_assert(maxits >= 0, "PCATruncatedSubspaceSparse: maxits < 0");
+   ae_assert(isfinite(eps) && eps >= 0.0, "PCATruncatedSubspaceSparse: eps < 0 or is not finite");
    if (npoints > 0) {
       ae_assert(sparsegetnrows(x) == npoints, "PCATruncatedSubspaceSparse: rows(x) != npoints");
       ae_assert(sparsegetncols(x) == nvars, "PCATruncatedSubspaceSparse: cols(x) != nvars");
    }
-// Special case: NPoints=0
+// Special case: NPoints == 0
    if (npoints == 0) {
       ae_vector_set_length(s2, nneeded);
       ae_matrix_set_length(v, nvars, nneeded);
@@ -365,7 +363,7 @@ void pcatruncatedsubspacesparse(sparsematrix *x, ae_int_t npoints, ae_int_t nvar
    for (eigsubspaceoocstart(&solver, 0); eigsubspaceooccontinue(&solver); ) {
       ae_assert(solver.requesttype == 0, "PCATruncatedSubspace: integrity check failed");
       for (k = 0; k < solver.requestsize; k++) {
-      // Calculate B1=(X-meansX)*Zk
+      // Calculate B1 == (X-meansX)*Zk
          ae_v_move(z1.xR, 1, &solver.x.xyR[0][k], solver.x.stride, nvars);
          sparsemv(x, &z1, &b1);
          vv = ae_v_dotproduct(&solver.x.xyR[0][k], solver.x.stride, means.xR, 1, nvars);
@@ -435,8 +433,8 @@ namespace alglib_impl {
 //    * Buf[4] contains average relative error (regression, classification)
 //
 // NOTES(1):
-//     "NClasses>0" means that we have classification task.
-//     "NClasses<0" means regression task with -NClasses real outputs.
+//     "NClasses > 0" means that we have classification task.
+//     "NClasses < 0" means regression task with -NClasses real outputs.
 //
 // NOTES(2):
 //     rms. avg, avg.rel errors for classification tasks are interpreted as
@@ -749,7 +747,7 @@ static double bdss_xlny(double x, double y) {
 
 // Optimal binary classification
 //
-// Algorithms finds optimal (=with minimal cross-entropy) binary partition.
+// Algorithms finds optimal (= with minimal cross-entropy) binary partition.
 // Internal subroutine.
 //
 // Inputs:
@@ -760,13 +758,13 @@ static double bdss_xlny(double x, double y) {
 // Outputs:
 //     Info    -   completetion code:
 //                 * -3, all values of A[] are same (partition is impossible)
-//                 * -2, one of C[] is incorrect (<0, >1)
+//                 * -2, one of C[] is incorrect (< 0, > 1)
 //                 * -1, incorrect pararemets were passed (N <= 0).
 //                 *  1, OK
 //     Threshold-  partiton boundary. Left part contains values which are
 //                 strictly less than Threshold. Right part contains values
 //                 which are greater than or equal to Threshold.
-//     PAL, PBL-   probabilities P(0|v<Threshold) and P(1|v<Threshold)
+//     PAL, PBL-   probabilities P(0|v < Threshold) and P(1|v < Threshold)
 //     PAR, PBR-   probabilities P(0|v >= Threshold) and P(1|v >= Threshold)
 //     CVE     -   cross-validation estimate of cross-entropy
 // ALGLIB: Copyright 22.05.2008 by Sergey Bochkanov
@@ -914,8 +912,8 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
 //     BufR    array[0..N-1]       temporaries
 //     BufI    array[0..N-1]       temporaries
 //
-// Output:
-//     Info    error code (">0"=OK, "<0"=bad)
+// Outputs:
+//     Info    error code ("> 0" == OK, "< 0" == bad)
 //     RMS     training set RMS error
 //     CVRMS   leave-one-out RMS error
 //
@@ -1027,7 +1025,7 @@ void dsoptimalsplit2fast(RVector *a, ZVector *c, ZVector *tiesbuf, ZVector *cntb
    }
 // Calculate threshold.
 // Code is a bit complicated because there can be such
-// numbers that 0.5(A+B) equals to A or B (if A-B=epsilon)
+// numbers that 0.5(A+B) equals to A or B (if A-B == epsilon)
    *threshold = 0.5 * (a->xR[tiesbuf->xZ[koptimal]] + a->xR[tiesbuf->xZ[koptimal + 1]]);
    if (*threshold <= a->xR[tiesbuf->xZ[koptimal]]) {
       *threshold = a->xR[tiesbuf->xZ[koptimal + 1]];
@@ -1843,7 +1841,7 @@ void mlprandomize(multilayerperceptron *network) {
    montecarlocnt = 20;
 // Stage 1:
 // * Network.Weights is filled by standard deviation of weights
-// * default values: sigma=1
+// * default values: sigma == 1
    for (i = 0; i < wcount; i++) {
       network->weights.xR[i] = 1.0;
    }
@@ -1870,7 +1868,6 @@ void mlprandomize(multilayerperceptron *network) {
 // Buf[Offset]          mean value of neuron's output
 // Buf[Offset+1]        standard deviation of neuron's output
 //
-//
    entrysize = 2;
    vectorsetlengthatleast(&network->rndbuf, entrysize * ntotal);
    for (neuronidx = 0; neuronidx < ntotal; neuronidx++) {
@@ -1883,13 +1880,13 @@ void mlprandomize(multilayerperceptron *network) {
          continue;
       }
       if (neurontype == -3) {
-      // "-1" neuron: mean=-1, zero variance.
+      // "-1" neuron: mean == -1, zero variance.
          network->rndbuf.xR[entryoffs] = -1.0;
          network->rndbuf.xR[entryoffs + 1] = 0.0;
          continue;
       }
       if (neurontype == -4) {
-      // "0" neuron: mean=0, zero variance.
+      // "0" neuron: mean == 0, zero variance.
          network->rndbuf.xR[entryoffs] = 0.0;
          network->rndbuf.xR[entryoffs + 1] = 0.0;
          continue;
@@ -1905,7 +1902,7 @@ void mlprandomize(multilayerperceptron *network) {
       //   * we assume that n[i] and w[i] are independently distributed
       //   * Var(n0*w0+n1*w1+...) = Var(n0*w0)+Var(n1*w1)+...
       //   * Var(X*Y) = mean(X)^2*Var(Y) + mean(Y)^2*Var(X) + Var(X)*Var(Y)
-      //   * mean(w[i])=0, var(w[i])=1
+      //   * mean(w[i]) == 0, var(w[i]) == 1
       //   * Var(n[i]*w[i]) = mean(n[i])^2 + Var(n[i])
          n1 = network->structinfo.xZ[istart + neuronidx * mlpbase_nfieldwidth + 2];
          n2 = n1 + network->structinfo.xZ[istart + neuronidx * mlpbase_nfieldwidth + 1] - 1;
@@ -2219,7 +2216,7 @@ void mlpcreate1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, multilayerperceptron
 
 // Same as MLPCreate0, but with two hidden layers (NHid1 and  NHid2  neurons)
 // with non-linear activation function. Output layer is linear.
-//  $ALL
+//	$ALL
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 // API: void mlpcreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network);
 void mlpcreate2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, multilayerperceptron *network) {
@@ -2262,7 +2259,7 @@ void mlpcreate2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, mul
 //
 // or
 //
-//     (-INF, B), if D<0.
+//     (-INF, B), if D < 0.
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 // API: void mlpcreateb0(const ae_int_t nin, const ae_int_t nout, const double b, const double d, multilayerperceptron &network);
 void mlpcreateb0(ae_int_t nin, ae_int_t nout, double b, double d, multilayerperceptron *network) {
@@ -2294,7 +2291,7 @@ void mlpcreateb0(ae_int_t nin, ae_int_t nout, double b, double d, multilayerperc
 // Create
    mlpbase_mlpcreate(nin, nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, layerscount, false, network);
    mlpbase_fillhighlevelinformation(network, nin, 0, 0, nout, false, false);
-// Turn on ouputs shift/scaling.
+// Turn on outputs shift/scaling.
    for (i = nin; i < nin + nout; i++) {
       network->columnmeans.xR[i] = b;
       network->columnsigmas.xR[i] = d;
@@ -2336,7 +2333,7 @@ void mlpcreateb1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, double b, double d,
 // Create
    mlpbase_mlpcreate(nin, nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, layerscount, false, network);
    mlpbase_fillhighlevelinformation(network, nin, nhid, 0, nout, false, false);
-// Turn on ouputs shift/scaling.
+// Turn on outputs shift/scaling.
    for (i = nin; i < nin + nout; i++) {
       network->columnmeans.xR[i] = b;
       network->columnsigmas.xR[i] = d;
@@ -2380,7 +2377,7 @@ void mlpcreateb2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, do
 // Create
    mlpbase_mlpcreate(nin, nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, layerscount, false, network);
    mlpbase_fillhighlevelinformation(network, nin, nhid1, nhid2, nout, false, false);
-// Turn on ouputs shift/scaling.
+// Turn on outputs shift/scaling.
    for (i = nin; i < nin + nout; i++) {
       network->columnmeans.xR[i] = b;
       network->columnsigmas.xR[i] = d;
@@ -2517,7 +2514,7 @@ void mlpcreatec0(ae_int_t nin, ae_int_t nout, multilayerperceptron *network) {
    NewVector(ltypes, 0, DT_INT);
    NewVector(lconnfirst, 0, DT_INT);
    NewVector(lconnlast, 0, DT_INT);
-   ae_assert(nout >= 2, "MLPCreateC0: NOut<2!");
+   ae_assert(nout >= 2, "MLPCreateC0: NOut < 2!");
    layerscount = 1 + 2 + 1;
 // Allocate arrays
    ae_vector_set_length(&lsizes, layerscount);
@@ -2547,7 +2544,7 @@ void mlpcreatec1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, multilayerperceptro
    NewVector(ltypes, 0, DT_INT);
    NewVector(lconnfirst, 0, DT_INT);
    NewVector(lconnlast, 0, DT_INT);
-   ae_assert(nout >= 2, "MLPCreateC1: NOut<2!");
+   ae_assert(nout >= 2, "MLPCreateC1: NOut < 2!");
    layerscount = 1 + 3 + 2 + 1;
 // Allocate arrays
    ae_vector_set_length(&lsizes, layerscount);
@@ -2579,7 +2576,7 @@ void mlpcreatec2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, mu
    NewVector(ltypes, 0, DT_INT);
    NewVector(lconnfirst, 0, DT_INT);
    NewVector(lconnlast, 0, DT_INT);
-   ae_assert(nout >= 2, "MLPCreateC2: NOut<2!");
+   ae_assert(nout >= 2, "MLPCreateC2: NOut < 2!");
    layerscount = 1 + 3 + 3 + 2 + 1;
 // Allocate arrays
    ae_vector_set_length(&lsizes, layerscount);
@@ -2627,7 +2624,7 @@ void mlpactivationfunction(double net, ae_int_t k, double *f, double *df, double
       return;
    }
    if (k == 1) {
-   // TanH activation function
+   // tanh() activation function
       if (SmallR(net, 100.0)) {
          *f = tanh(net);
       } else {
@@ -2961,7 +2958,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
    double s3;
    ae_int_t chunksize;
    chunksize = 4;
-   ae_assert(csize <= chunksize, "MLPChunkedGradient: internal error (CSize>ChunkSize)");
+   ae_assert(csize <= chunksize, "MLPChunkedGradient: internal error (CSize > ChunkSize)");
 // Try to use HPC core, if possible
    if (hpcchunkedgradient(&network->weights, &network->structinfo, &network->columnmeans, &network->columnsigmas, xy, cstart, csize, batch4buf, hpcbuf, e, naturalerrorfunc)) {
       return;
@@ -2979,7 +2976,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
 // THIS STAGE IS VERY IMPORTANT!
 //
 // We fill all components of entry - neuron values, dF/dNET, dError/dF.
-// It allows us to easily handle  situations  when  CSize<ChunkSize  by
+// It allows us to easily handle  situations  when  CSize < ChunkSize  by
 // simply  working  with  ALL  components  of  Batch4Buf,  without ever
 // looking at CSize. The idea is that dError/dF for  absent  components
 // will be initialized by zeros - and won't be  rewritten  by  non-zero
@@ -2988,7 +2985,7 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron *network, RMatrix *x
       batch4buf->xR[i] = 0.0;
    }
 // Forward pass:
-// 1. Load data into Batch4Buf. If CSize<ChunkSize, data are padded by zeros.
+// 1. Load data into Batch4Buf. If CSize < ChunkSize, data are padded by zeros.
 // 2. Perform forward pass through network
    for (i = 0; i < nin; i++) {
       entryoffs = entrysize * i;
@@ -3364,7 +3361,7 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
    double s3;
    ae_int_t chunksize;
    chunksize = 4;
-   ae_assert(csize <= chunksize, "MLPChunkedProcess: internal error (CSize>ChunkSize)");
+   ae_assert(csize <= chunksize, "MLPChunkedProcess: internal error (CSize > ChunkSize)");
 // Try to use HPC core, if possible
    if (hpcchunkedprocess(&network->weights, &network->structinfo, &network->columnmeans, &network->columnsigmas, xy, cstart, csize, batch4buf, hpcbuf)) {
       return;
@@ -3380,14 +3377,14 @@ static void mlpbase_mlpchunkedprocess(multilayerperceptron *network, RMatrix *xy
 // THIS STAGE IS VERY IMPORTANT!
 //
 // We fill all components of entry - neuron values, dF/dNET, dError/dF.
-// It allows us to easily handle  situations  when  CSize<ChunkSize  by
+// It allows us to easily handle  situations  when  CSize < ChunkSize  by
 // simply  working  with  ALL  components  of  Batch4Buf,  without ever
 // looking at CSize.
    for (i = 0; i < entrysize * ntotal; i++) {
       batch4buf->xR[i] = 0.0;
    }
 // Forward pass:
-// 1. Load data into Batch4Buf. If CSize<ChunkSize, data are padded by zeros.
+// 1. Load data into Batch4Buf. If CSize < ChunkSize, data are padded by zeros.
 // 2. Perform forward pass through network
    for (i = 0; i < nin; i++) {
       entryoffs = entrysize * i;
@@ -3715,7 +3712,7 @@ void mlpgradbatchx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
    RefObj(mlpbuffers, buf2);
    RefObj(mlpbuffers, pbuf);
    RefObj(smlpgrad, sgrad);
-   ae_assert(datasetsize >= 0, "MLPGradBatchX: SetSize<0");
+   ae_assert(datasetsize >= 0, "MLPGradBatchX: SetSize < 0");
    ae_assert(datasettype == 0 || datasettype == 1, "MLPGradBatchX: DatasetType is incorrect");
    ae_assert(subsettype == 0 || subsettype == 1, "MLPGradBatchX: SubsetType is incorrect");
 // Determine network and dataset properties
@@ -3815,7 +3812,7 @@ void mlpgradbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, do
    ae_frame_make(&_frame_block);
    *e = 0;
    RefObj(smlpgrad, sgrad);
-   ae_assert(ssize >= 0, "MLPGradBatchSparse: SSize<0");
+   ae_assert(ssize >= 0, "MLPGradBatchSparse: SSize < 0");
    subset0 = 0;
    subset1 = ssize;
    subsettype = 0;
@@ -3880,7 +3877,7 @@ void mlpgradbatchsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_
    ae_frame_make(&_frame_block);
    *e = 0;
    RefObj(smlpgrad, sgrad);
-   ae_assert(ssize >= 0, "MLPGradBatchSparse: SSize<0");
+   ae_assert(ssize >= 0, "MLPGradBatchSparse: SSize < 0");
    ae_assert(sparseiscrs(xy), "MLPGradBatchSparse: sparse matrix XY must be in CRS format.");
    subset0 = 0;
    subset1 = ssize;
@@ -3959,8 +3956,8 @@ void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
    ae_frame_make(&_frame_block);
    *e = 0;
    RefObj(smlpgrad, sgrad);
-   ae_assert(setsize >= 0, "MLPGradBatchSubset: SetSize<0");
-   ae_assert(subsetsize <= idx->cnt, "MLPGradBatchSubset: SubsetSize>Length(Idx)");
+   ae_assert(setsize >= 0, "MLPGradBatchSubset: SetSize < 0");
+   ae_assert(subsetsize <= idx->cnt, "MLPGradBatchSubset: SubsetSize > Length(Idx)");
    npoints = setsize;
    if (subsetsize < 0) {
       subset0 = 0;
@@ -3971,8 +3968,8 @@ void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
       subset1 = subsetsize;
       subsettype = 1;
       for (i = 0; i < subsetsize; i++) {
-         ae_assert(idx->xZ[i] >= 0, "MLPGradBatchSubset: incorrect index of XY row(Idx[I]<0)");
-         ae_assert(idx->xZ[i] <= npoints - 1, "MLPGradBatchSubset: incorrect index of XY row(Idx[I]>Rows(XY)-1)");
+         ae_assert(idx->xZ[i] >= 0, "MLPGradBatchSubset: incorrect index of XY row(Idx[I] < 0)");
+         ae_assert(idx->xZ[i] <= npoints - 1, "MLPGradBatchSubset: incorrect index of XY row(Idx[I] > Rows(XY)-1)");
       }
    }
    mlpproperties(network, &nin, &nout, &wcount);
@@ -4037,7 +4034,7 @@ void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
 //     Grad    -   gradient  of  E  with  respect   to  weights  of  network,
 //                 array[WCount]
 //
-// NOTE: when  SubsetSize<0 is used full dataset by call MLPGradBatchSparse
+// NOTE: when  SubsetSize < 0 is used full dataset by call MLPGradBatchSparse
 //       function.
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 // API: void mlpgradbatchsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad);
@@ -4054,8 +4051,8 @@ void mlpgradbatchsparsesubset(multilayerperceptron *network, sparsematrix *xy, a
    ae_frame_make(&_frame_block);
    *e = 0;
    RefObj(smlpgrad, sgrad);
-   ae_assert(setsize >= 0, "MLPGradBatchSparseSubset: SetSize<0");
-   ae_assert(subsetsize <= idx->cnt, "MLPGradBatchSparseSubset: SubsetSize>Length(Idx)");
+   ae_assert(setsize >= 0, "MLPGradBatchSparseSubset: SetSize < 0");
+   ae_assert(subsetsize <= idx->cnt, "MLPGradBatchSparseSubset: SubsetSize > Length(Idx)");
    ae_assert(sparseiscrs(xy), "MLPGradBatchSparseSubset: sparse matrix XY must be in CRS format.");
    npoints = setsize;
    if (subsetsize < 0) {
@@ -4067,8 +4064,8 @@ void mlpgradbatchsparsesubset(multilayerperceptron *network, sparsematrix *xy, a
       subset1 = subsetsize;
       subsettype = 1;
       for (i = 0; i < subsetsize; i++) {
-         ae_assert(idx->xZ[i] >= 0, "MLPGradBatchSparseSubset: incorrect index of XY row(Idx[I]<0)");
-         ae_assert(idx->xZ[i] <= npoints - 1, "MLPGradBatchSparseSubset: incorrect index of XY row(Idx[I]>Rows(XY)-1)");
+         ae_assert(idx->xZ[i] >= 0, "MLPGradBatchSparseSubset: incorrect index of XY row(Idx[I] < 0)");
+         ae_assert(idx->xZ[i] <= npoints - 1, "MLPGradBatchSparseSubset: incorrect index of XY row(Idx[I] > Rows(XY)-1)");
       }
    }
    mlpproperties(network, &nin, &nout, &wcount);
@@ -4295,7 +4292,7 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
       // is considered as additional layer with weightless
       // activation function:
       //
-      // F(NET) := Sigma*NET
+      // F(NET) = Sigma*NET
       //
       // So we add one more layer to forward pass, and
       // make forward/backward pass through this layer.
@@ -4312,7 +4309,7 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
          // 1. Calculate R(dE/dX).
          // 2. No R(dE/dWij) is needed since weight of activation neuron
          //    is fixed to 1. So we can update R(dE/dY) for
-         //    the connected neuron (note that Vij=0, Wij=1)
+         //    the connected neuron (note that Vij == 0, Wij == 1)
             df = network->columnsigmas.xR[nin + i];
             ae_v_moved(rdx.xyR[n2], 1, rdy.xyR[n2], 1, wcount, df);
             ae_v_add(rdy.xyR[n1], 1, rdx.xyR[n2], 1, wcount);
@@ -4333,8 +4330,8 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
          // S = sum(exp(yk)),
          // ei = sum(trn)*exp(yi)/S-trn_i
          //
-         // j=i:   d(ei)/d(yj) = T*exp(yi)*(S-exp(yi))/S^2
-         // j != i:  d(ei)/d(yj) = -T*exp(yi)*exp(yj)/S^2
+         // j == i: d(ei)/d(yj) = T*exp(yi)*(S-exp(yi))/S^2
+         // j != i: d(ei)/d(yj) = -T*exp(yi)*exp(yj)/S^2
             t = 0.0;
             for (i = 0; i < nout; i++) {
                t += desiredy.xR[i];
@@ -4416,7 +4413,7 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
          // is fixed to 1.
          //
          // So we can update R(dE/dY) for the connected neuron.
-         // (note that Vij=0, Wij=1)
+         // (note that Vij == 0, Wij == 1)
             ae_v_add(rdy.xyR[n1], 1, rdx.xyR[i], 1, wcount);
             continue;
          }
@@ -4459,12 +4456,9 @@ static void mlpbase_mlphessianbatchinternal(multilayerperceptron *network, RMatr
 
 // Batch Hessian calculation (natural error function) using R-algorithm.
 // Internal subroutine.
+// Hessian calculation based on R-algorithm described in
+// "Fast Exact Multiplication by the Hessian", B. A. Pearlmutter, Neural Computation, 1994.
 // ALGLIB: Copyright 26.01.2008 by Sergey Bochkanov
-//
-//      Hessian calculation based on R-algorithm described in
-//      "Fast Exact Multiplication by the Hessian",
-//      B. A. Pearlmutter,
-//      Neural Computation, 1994.
 // API: void mlphessiannbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, real_2d_array &h);
 void mlphessiannbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad, RMatrix *h) {
    *e = 0;
@@ -4473,12 +4467,9 @@ void mlphessiannbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize
 
 // Batch Hessian calculation using R-algorithm.
 // Internal subroutine.
+// Hessian calculation based on R-algorithm described in
+// "Fast Exact Multiplication by the Hessian", B. A. Pearlmutter, Neural Computation, 1994.
 // ALGLIB: Copyright 26.01.2008 by Sergey Bochkanov
-//
-//      Hessian calculation based on R-algorithm described in
-//      "Fast Exact Multiplication by the Hessian",
-//      B. A. Pearlmutter,
-//      Neural Computation, 1994.
 // API: void mlphessianbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad, real_2d_array &h);
 void mlphessianbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, double *e, RVector *grad, RMatrix *h) {
    *e = 0;
@@ -4524,7 +4515,7 @@ ae_int_t mlpgetlayerscount(multilayerperceptron *network) {
 
 // This function returns size of K-th layer.
 //
-// K=0 corresponds to input layer, K=CNT-1 corresponds to output layer.
+// K == 0 corresponds to input layer, K == CNT-1 corresponds to output layer.
 //
 // Size of the output layer is always equal to the number of outputs, although
 // when we have softmax-normalized network, last neuron doesn't have any
@@ -4579,7 +4570,7 @@ void mlpgetinputscaling(multilayerperceptron *network, ae_int_t i, double *mean,
 // I-th output is passed through linear transformation
 //     OUT[i] = OUT[i]*Sigma+Mean
 // before returning it to user. In case we have SOFTMAX-normalized network,
-// we return (Mean,Sigma)=(0.0,1.0).
+// we return (Mean,Sigma) == (0.0,1.0).
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 // API: void mlpgetoutputscaling(const multilayerperceptron &network, const ae_int_t i, double &mean, double &sigma);
 void mlpgetoutputscaling(multilayerperceptron *network, ae_int_t i, double *mean, double *sigma) {
@@ -5092,7 +5083,7 @@ void mlpserializeold(multilayerperceptron *network, RVector *ra, ae_int_t *rlen)
    } else {
       sigmalen = nin + nout;
    }
-//  RA format:
+// RA format:
 //      LEN         DESRC.
 //      1           RLen
 //      1           version (MLPVNum)
@@ -5269,12 +5260,12 @@ void mlpinitpreprocessor(multilayerperceptron *network, RMatrix *xy, ae_int_t ss
 // Internal subroutine.
 // Initialization for preprocessor based on a sample.
 //
-// INPUT
+// Inputs:
 //     Network -   initialized neural network;
 //     XY      -   sample, given by sparse matrix;
 //     SSize   -   sample size.
 //
-// OUTPUT
+// Outputs:
 //     Network -   neural network with initialised preprocessor.
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t ssize) {
@@ -5386,10 +5377,10 @@ void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, 
 //                   repetitions.
 //     SubsetSize- number of elements in Idx[] array.
 //
-// OUTPUT:
+// Outputs:
 //     Network -   neural network with initialised preprocessor.
 //
-// NOTE: when  SubsetSize<0 is used full dataset by call MLPInitPreprocessor
+// NOTE: when  SubsetSize < 0 is used full dataset by call MLPInitPreprocessor
 //       function.
 // ALGLIB: Copyright 23.08.2012 by Sergey Bochkanov
 void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize) {
@@ -5409,17 +5400,17 @@ void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_in
    ae_frame_make(&_frame_block);
    NewVector(means, 0, DT_REAL);
    NewVector(sigmas, 0, DT_REAL);
-   ae_assert(setsize >= 0, "MLPInitPreprocessorSubset: SetSize<0");
+   ae_assert(setsize >= 0, "MLPInitPreprocessorSubset: SetSize < 0");
    if (subsetsize < 0) {
       mlpinitpreprocessor(network, xy, setsize);
       ae_frame_leave();
       return;
    }
-   ae_assert(subsetsize <= idx->cnt, "MLPInitPreprocessorSubset: SubsetSize>Length(Idx)");
+   ae_assert(subsetsize <= idx->cnt, "MLPInitPreprocessorSubset: SubsetSize > Length(Idx)");
    npoints = setsize;
    for (i = 0; i < subsetsize; i++) {
-      ae_assert(idx->xZ[i] >= 0, "MLPInitPreprocessorSubset: incorrect index of XY row(Idx[I]<0)");
-      ae_assert(idx->xZ[i] <= npoints - 1, "MLPInitPreprocessorSubset: incorrect index of XY row(Idx[I]>Rows(XY)-1)");
+      ae_assert(idx->xZ[i] >= 0, "MLPInitPreprocessorSubset: incorrect index of XY row(Idx[I] < 0)");
+      ae_assert(idx->xZ[i] <= npoints - 1, "MLPInitPreprocessorSubset: incorrect index of XY row(Idx[I] > Rows(XY)-1)");
    }
    mlpproperties(network, &nin, &nout, &wcount);
    ntotal = network->structinfo.xZ[3];
@@ -5513,10 +5504,10 @@ void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_in
 //                   repetitions.
 //     SubsetSize- number of elements in Idx[] array.
 //
-// OUTPUT:
+// Outputs:
 //     Network -   neural network with initialised preprocessor.
 //
-// NOTE: when SubsetSize<0 is used full dataset by call
+// NOTE: when SubsetSize < 0 is used full dataset by call
 //       MLPInitPreprocessorSparse function.
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 void mlpinitpreprocessorsparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_int_t setsize, ZVector *idx, ae_int_t subsetsize) {
@@ -5536,17 +5527,17 @@ void mlpinitpreprocessorsparsesubset(multilayerperceptron *network, sparsematrix
    ae_frame_make(&_frame_block);
    NewVector(means, 0, DT_REAL);
    NewVector(sigmas, 0, DT_REAL);
-   ae_assert(setsize >= 0, "MLPInitPreprocessorSparseSubset: SetSize<0");
+   ae_assert(setsize >= 0, "MLPInitPreprocessorSparseSubset: SetSize < 0");
    if (subsetsize < 0) {
       mlpinitpreprocessorsparse(network, xy, setsize);
       ae_frame_leave();
       return;
    }
-   ae_assert(subsetsize <= idx->cnt, "MLPInitPreprocessorSparseSubset: SubsetSize>Length(Idx)");
+   ae_assert(subsetsize <= idx->cnt, "MLPInitPreprocessorSparseSubset: SubsetSize > Length(Idx)");
    npoints = setsize;
    for (i = 0; i < subsetsize; i++) {
-      ae_assert(idx->xZ[i] >= 0, "MLPInitPreprocessorSparseSubset: incorrect index of XY row(Idx[I]<0)");
-      ae_assert(idx->xZ[i] <= npoints - 1, "MLPInitPreprocessorSparseSubset: incorrect index of XY row(Idx[I]>Rows(XY)-1)");
+      ae_assert(idx->xZ[i] >= 0, "MLPInitPreprocessorSparseSubset: incorrect index of XY row(Idx[I] < 0)");
+      ae_assert(idx->xZ[i] <= npoints - 1, "MLPInitPreprocessorSparseSubset: incorrect index of XY row(Idx[I] > Rows(XY)-1)");
    }
    mlpproperties(network, &nin, &nout, &wcount);
    ntotal = network->structinfo.xZ[3];
@@ -5644,7 +5635,7 @@ void mlpallerrorsx(multilayerperceptron *network, RMatrix *densexy, sparsematrix
    RefObj(mlpbuffers, pbuf);
    NewObj(modelerrors, rep0);
    NewObj(modelerrors, rep1);
-   ae_assert(datasetsize >= 0, "MLPAllErrorsX: SetSize<0");
+   ae_assert(datasetsize >= 0, "MLPAllErrorsX: SetSize < 0");
    ae_assert(datasettype == 0 || datasettype == 1, "MLPAllErrorsX: DatasetType is incorrect");
    ae_assert(subsettype == 0 || subsettype == 1, "MLPAllErrorsX: SubsetType is incorrect");
 // Determine network properties
@@ -6092,7 +6083,7 @@ double mlpavgce(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints) {
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-// ALGLIB: Copyright 9.08.2012 by Sergey Bochkanov
+// ALGLIB: Copyright 09.08.2012 by Sergey Bochkanov
 // API: double mlpavgcesparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
 double mlpavgcesparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t npoints) {
    double result;
@@ -6415,10 +6406,10 @@ double mlpavgrelerrorsparse(multilayerperceptron *network, sparsematrix *xy, ae_
 //     SetSize -   real size of XY, SetSize >= 0;
 //     Subset  -   subset of SubsetSize elements, array[SubsetSize];
 //     SubsetSize- number of elements in Subset[] array:
-//                 * if SubsetSize>0, rows of XY with indices Subset[0]...
+//                 * if SubsetSize > 0, rows of XY with indices Subset[0]...
 //                   ...Subset[SubsetSize-1] are processed
-//                 * if SubsetSize=0, zeros are returned
-//                 * if SubsetSize<0, entire dataset is  processed;  Subset[]
+//                 * if SubsetSize == 0, zeros are returned
+//                 * if SubsetSize < 0, entire dataset is  processed;  Subset[]
 //                   array is ignored in this case.
 //
 // Outputs:
@@ -6461,10 +6452,10 @@ void mlpallerrorssubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
 //     SetSize -   real size of XY, SetSize >= 0;
 //     Subset  -   subset of SubsetSize elements, array[SubsetSize];
 //     SubsetSize- number of elements in Subset[] array:
-//                 * if SubsetSize>0, rows of XY with indices Subset[0]...
+//                 * if SubsetSize > 0, rows of XY with indices Subset[0]...
 //                   ...Subset[SubsetSize-1] are processed
-//                 * if SubsetSize=0, zeros are returned
-//                 * if SubsetSize<0, entire dataset is  processed;  Subset[]
+//                 * if SubsetSize == 0, zeros are returned
+//                 * if SubsetSize < 0, entire dataset is  processed;  Subset[]
 //                   array is ignored in this case.
 //
 // Outputs:
@@ -6506,10 +6497,10 @@ void mlpallerrorssparsesubset(multilayerperceptron *network, sparsematrix *xy, a
 //     SetSize   -     real size of XY, SetSize >= 0;
 //     Subset    -     subset of SubsetSize elements, array[SubsetSize];
 //     SubsetSize-     number of elements in Subset[] array:
-//                     * if SubsetSize>0, rows of XY with indices Subset[0]...
+//                     * if SubsetSize > 0, rows of XY with indices Subset[0]...
 //                       ...Subset[SubsetSize-1] are processed
-//                     * if SubsetSize=0, zeros are returned
-//                     * if SubsetSize<0, entire dataset is  processed;  Subset[]
+//                     * if SubsetSize == 0, zeros are returned
+//                     * if SubsetSize < 0, entire dataset is  processed;  Subset[]
 //                       array is ignored in this case.
 //
 // Result:
@@ -6572,13 +6563,13 @@ double mlperrorsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsi
 //                     is passed.  Sparse  matrix  must  use  CRS  format for
 //                     storage.
 //     SetSize   -     real size of XY, SetSize >= 0;
-//                     it is used when SubsetSize<0;
+//                     it is used when SubsetSize < 0;
 //     Subset    -     subset of SubsetSize elements, array[SubsetSize];
 //     SubsetSize-     number of elements in Subset[] array:
-//                     * if SubsetSize>0, rows of XY with indices Subset[0]...
+//                     * if SubsetSize > 0, rows of XY with indices Subset[0]...
 //                       ...Subset[SubsetSize-1] are processed
-//                     * if SubsetSize=0, zeros are returned
-//                     * if SubsetSize<0, entire dataset is  processed;  Subset[]
+//                     * if SubsetSize == 0, zeros are returned
+//                     * if SubsetSize < 0, entire dataset is  processed;  Subset[]
 //                       array is ignored in this case.
 //
 // Result:
@@ -7717,7 +7708,6 @@ bool mlpeissoftmax(mlpensemble *ensemble) {
 //     Y       -   (possibly) preallocated buffer; if size of Y is less than
 //                 NOut, it will be reallocated. If it is large enough, it
 //                 is NOT reallocated, so we can save some time on reallocation.
-//
 //
 // Outputs:
 //     Y       -   result. Regression estimate when solving regression  task,
@@ -9005,8 +8995,8 @@ void kmeansgenerateinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_in
       ae_frame_leave();
       return;
    }
-// TODO: special case K=1
-// TODO: special case K=NPoints
+// TODO: special case K == 1
+// TODO: special case K == NPoints
    *info = 1;
    *iterationscount = 0;
 // Multiple passes of k-means++ algorithm
@@ -9216,10 +9206,10 @@ void clusterizercreate(clusterizerstate *s) {
 void clusterizersetpoints(clusterizerstate *s, RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_int_t disttype) {
    ae_int_t i;
    ae_assert(disttype == 0 || disttype == 1 || disttype == 2 || disttype == 10 || disttype == 11 || disttype == 12 || disttype == 13 || disttype == 20 || disttype == 21, "ClusterizerSetPoints: incorrect DistType");
-   ae_assert(npoints >= 0, "ClusterizerSetPoints: NPoints<0");
-   ae_assert(nfeatures >= 1, "ClusterizerSetPoints: NFeatures<1");
-   ae_assert(xy->rows >= npoints, "ClusterizerSetPoints: Rows(XY)<NPoints");
-   ae_assert(xy->cols >= nfeatures, "ClusterizerSetPoints: Cols(XY)<NFeatures");
+   ae_assert(npoints >= 0, "ClusterizerSetPoints: NPoints < 0");
+   ae_assert(nfeatures >= 1, "ClusterizerSetPoints: NFeatures < 1");
+   ae_assert(xy->rows >= npoints, "ClusterizerSetPoints: Rows(XY) < NPoints");
+   ae_assert(xy->cols >= nfeatures, "ClusterizerSetPoints: Cols(XY) < NFeatures");
    ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "ClusterizerSetPoints: XY contains NAN/INF");
    s->npoints = npoints;
    s->nfeatures = nfeatures;
@@ -9262,9 +9252,9 @@ void clusterizersetdistances(clusterizerstate *s, RMatrix *d, ae_int_t npoints, 
    ae_int_t j;
    ae_int_t j0;
    ae_int_t j1;
-   ae_assert(npoints >= 0, "ClusterizerSetDistances: NPoints<0");
-   ae_assert(d->rows >= npoints, "ClusterizerSetDistances: Rows(D)<NPoints");
-   ae_assert(d->cols >= npoints, "ClusterizerSetDistances: Cols(D)<NPoints");
+   ae_assert(npoints >= 0, "ClusterizerSetDistances: NPoints < 0");
+   ae_assert(d->rows >= npoints, "ClusterizerSetDistances: Rows(D) < NPoints");
+   ae_assert(d->cols >= npoints, "ClusterizerSetDistances: Cols(D) < NPoints");
    s->npoints = npoints;
    s->nfeatures = 0;
    s->disttype = -1;
@@ -9326,7 +9316,7 @@ void clusterizersetahcalgo(clusterizerstate *s, ae_int_t algo) {
 // API: void clusterizersetkmeanslimits(const clusterizerstate &s, const ae_int_t restarts, const ae_int_t maxits);
 void clusterizersetkmeanslimits(clusterizerstate *s, ae_int_t restarts, ae_int_t maxits) {
    ae_assert(restarts >= 1, "ClusterizerSetKMeansLimits: Restarts <= 0");
-   ae_assert(maxits >= 0, "ClusterizerSetKMeansLimits: MaxIts<0");
+   ae_assert(maxits >= 0, "ClusterizerSetKMeansLimits: MaxIts < 0");
    s->kmeansrestarts = restarts;
    s->kmeansmaxits = maxits;
 }
@@ -9415,8 +9405,8 @@ static void clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatures
    double vv;
    ae_assert(disttype == 0 || disttype == 1, "EvaluateDistanceMatrixRec: incorrect DistType");
 // Normalize J0/J1:
-// * J0:=max(J0,I0) - we ignore lower triangle
-// * J1:=max(J1,J0) - normalize J1
+// * J0 = max(J0,I0) - we ignore lower triangle
+// * J1 = max(J1,J0) - normalize J1
    j0 = imax2(j0, i0);
    j1 = imax2(j1, j0);
    if (j1 <= j0 || i1 <= i0) {
@@ -9426,7 +9416,7 @@ static void clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatures
 // Parallelism was tried if: (i1 - i0 > 2 || j1 - j0 > 2) && rcomplexity >= smpactivationlevel()
 // Try to process in parallel. Two condtions must hold in order to
 // activate parallel processing:
-// 1. I1-I0>2 or J1-J0>2
+// 1. I1-I0 > 2 or J1-J0 > 2
 // 2. (I1-I0)*(J1-J0)*NFeatures >= ParallelComplexity
 //
 // NOTE: all quantities are converted to reals in order to avoid
@@ -9488,11 +9478,11 @@ void clusterizergetdistancesbuf(apbuffers *buf, RMatrix *xy, ae_int_t npoints, a
    double v;
    double vv;
    double vr;
-   ae_assert(nfeatures >= 1, "ClusterizerGetDistancesBuf: NFeatures<1");
-   ae_assert(npoints >= 0, "ClusterizerGetDistancesBuf: NPoints<1");
+   ae_assert(nfeatures >= 1, "ClusterizerGetDistancesBuf: NFeatures < 1");
+   ae_assert(npoints >= 0, "ClusterizerGetDistancesBuf: NPoints < 1");
    ae_assert(disttype == 0 || disttype == 1 || disttype == 2 || disttype == 10 || disttype == 11 || disttype == 12 || disttype == 13 || disttype == 20 || disttype == 21, "ClusterizerGetDistancesBuf: incorrect DistType");
-   ae_assert(xy->rows >= npoints, "ClusterizerGetDistancesBuf: Rows(XY)<NPoints");
-   ae_assert(xy->cols >= nfeatures, "ClusterizerGetDistancesBuf: Cols(XY)<NFeatures");
+   ae_assert(xy->rows >= npoints, "ClusterizerGetDistancesBuf: Rows(XY) < NPoints");
+   ae_assert(xy->cols >= nfeatures, "ClusterizerGetDistancesBuf: Cols(XY) < NFeatures");
    ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "ClusterizerGetDistancesBuf: XY contains NAN/INF");
 // Quick exit
    if (npoints == 0) {
@@ -9690,11 +9680,11 @@ void clusterizergetdistances(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, 
    ae_frame_make(&_frame_block);
    SetMatrix(d);
    NewObj(apbuffers, buf);
-   ae_assert(nfeatures >= 1, "ClusterizerGetDistances: NFeatures<1");
-   ae_assert(npoints >= 0, "ClusterizerGetDistances: NPoints<1");
+   ae_assert(nfeatures >= 1, "ClusterizerGetDistances: NFeatures < 1");
+   ae_assert(npoints >= 0, "ClusterizerGetDistances: NPoints < 1");
    ae_assert(disttype == 0 || disttype == 1 || disttype == 2 || disttype == 10 || disttype == 11 || disttype == 12 || disttype == 13 || disttype == 20 || disttype == 21, "ClusterizerGetDistances: incorrect DistType");
-   ae_assert(xy->rows >= npoints, "ClusterizerGetDistances: Rows(XY)<NPoints");
-   ae_assert(xy->cols >= nfeatures, "ClusterizerGetDistances: Cols(XY)<NFeatures");
+   ae_assert(xy->rows >= npoints, "ClusterizerGetDistances: Rows(XY) < NPoints");
+   ae_assert(xy->cols >= nfeatures, "ClusterizerGetDistances: Cols(XY) < NFeatures");
    ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "ClusterizerGetDistances: XY contains NAN/INF");
    clusterizergetdistancesbuf(&buf, xy, npoints, nfeatures, disttype, d);
    ae_frame_leave();
@@ -9779,7 +9769,7 @@ static void clustering_clusterizerrunahcinternal(clusterizerstate *s, RMatrix *d
       ae_assert(v < maxrealnumber, "ClusterizerRunAHC: internal error");
       nnidx.xZ[i] = k;
    }
-// For AHCAlgo=4 (Ward's method) replace distances by their squares times 0.5
+// For AHCAlgo == 4 (Ward's method) replace distances by their squares times 0.5
    if (s->ahcalgo == 4) {
       for (i = 0; i < npoints; i++) {
          for (j = 0; j < npoints; j++) {
@@ -9809,7 +9799,7 @@ static void clustering_clusterizerrunahcinternal(clusterizerstate *s, RMatrix *d
       csizes.xZ[i] = 1;
    }
    for (mergeidx = 0; mergeidx < npoints - 1; mergeidx++) {
-   // Select pair of clusters (C0,C1) with CIdx[C0]<CIdx[C1] to merge.
+   // Select pair of clusters (C0,C1) with CIdx[C0] < CIdx[C1] to merge.
       c0 = -1;
       c1 = -1;
       d01 = maxrealnumber;
@@ -9919,8 +9909,8 @@ static void clustering_clusterizerrunahcinternal(clusterizerstate *s, RMatrix *d
 // * CInfo[I,3]     -   height of I-th cluster
 //
 // We perform it as follows:
-// * first NPoints clusters have unit size (CInfo[I,0]=1) and zero
-//   height (CInfo[I,3]=0)
+// * first NPoints clusters have unit size (CInfo[I,0] == 1) and zero
+//   height (CInfo[I,3] == 0)
 // * we replay NPoints-1 merges from first to last and fill sizes of
 //   corresponding clusters (new size is a sum of sizes of clusters
 //   being merged) and height (new height is max(heights)+1).
@@ -10080,9 +10070,9 @@ void clusterizerrunahc(clusterizerstate *s, ahcreport *rep) {
 //                 K  can  be  zero only when algorithm is called  for  empty
 //                 dataset,  in   this   case   completion  code  is  set  to
 //                 success (+1).
-//                 If  K=0  and  dataset  size  is  non-zero,  we   can   not
+//                 If  K == 0  and  dataset  size  is  non-zero,  we   can   not
 //                 meaningfully assign points to some center  (there  are  no
-//                 centers because K=0) and  return  -3  as  completion  code
+//                 centers because K == 0) and  return  -3  as  completion  code
 //                 (failure).
 //
 // Outputs:
@@ -10106,7 +10096,7 @@ void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep) {
    ae_frame_make(&_frame_block);
    SetObj(kmeansreport, rep);
    NewMatrix(dummy, 0, 0, DT_REAL);
-   ae_assert(k >= 0, "ClusterizerRunKMeans: K<0");
+   ae_assert(k >= 0, "ClusterizerRunKMeans: K < 0");
 // Incorrect distance type
    if (s->disttype != 2) {
       rep->npoints = s->npoints;
@@ -10117,7 +10107,7 @@ void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep) {
       ae_frame_leave();
       return;
    }
-// K>NPoints or (K=0 and NPoints>0)
+// K > NPoints or (K == 0 and NPoints > 0)
    if (k > s->npoints || k == 0 && s->npoints > 0) {
       rep->npoints = s->npoints;
       rep->terminationtype = -3;
@@ -10155,7 +10145,7 @@ void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep) {
 // Inputs:
 //     Rep     -   report from ClusterizerRunAHC() performed on XY
 //     K       -   desired number of clusters, 1 <= K <= NPoints.
-//                 K can be zero only when NPoints=0.
+//                 K can be zero only when NPoints == 0.
 //
 // Outputs:
 //     CIdx    -   array[NPoints], I-th element contains cluster index  (from
@@ -10164,7 +10154,7 @@ void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep) {
 //                 returned by this function to indexes used by  Rep.Z.  J-th
 //                 cluster returned by this function corresponds to  CZ[J]-th
 //                 cluster stored in Rep.Z/PZ/PM.
-//                 It is guaranteed that CZ[I]<CZ[I+1].
+//                 It is guaranteed that CZ[I] < CZ[I+1].
 //
 // NOTE: K clusters built by this subroutine are assumed to have no hierarchy.
 //       Although  they  were  obtained  by  manipulation with top K nodes of
@@ -10182,8 +10172,8 @@ void clusterizerrunkmeans(clusterizerstate *s, ae_int_t k, kmeansreport *rep) {
 //       by this function, which allows you to convert indexes stored in CIdx
 //       to the numeration system used by Rep.Z.
 //
-// NOTE: this subroutine is optimized for moderate values of K. Say, for  K=5
-//       it will perform many times faster than  for  K=100.  Its  worst-case
+// NOTE: this subroutine is optimized for moderate values of K. Say, for  K == 5
+//       it will perform many times faster than  for  K == 100.  Its  worst-case
 //       performance is O(N*K), although in average case  it  perform  better
 //       (up to O(N*log(K))).
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
@@ -10206,7 +10196,7 @@ void clusterizergetkclusters(ahcreport *rep, ae_int_t k, ZVector *cidx, ZVector 
    npoints = rep->npoints;
    ae_assert(npoints >= 0, "ClusterizerGetKClusters: internal error in Rep integrity");
    ae_assert(k >= 0, "ClusterizerGetKClusters: K <= 0");
-   ae_assert(k <= npoints, "ClusterizerGetKClusters: K>NPoints");
+   ae_assert(k <= npoints, "ClusterizerGetKClusters: K > NPoints");
    ae_assert(k > 0 || npoints == 0, "ClusterizerGetKClusters: K <= 0");
    ae_assert(npoints == rep->npoints, "ClusterizerGetKClusters: NPoints != Rep.NPoints");
 // Quick exit
@@ -10298,7 +10288,7 @@ void clusterizergetkclusters(ahcreport *rep, ae_int_t k, ZVector *cidx, ZVector 
 //                 returned by this function to indexes used by  Rep.Z.  J-th
 //                 cluster returned by this function corresponds to  CZ[J]-th
 //                 cluster stored in Rep.Z/PZ/PM.
-//                 It is guaranteed that CZ[I]<CZ[I+1].
+//                 It is guaranteed that CZ[I] < CZ[I+1].
 //
 // NOTE: K clusters built by this subroutine are assumed to have no hierarchy.
 //       Although  they  were  obtained  by  manipulation with top K nodes of
@@ -10316,8 +10306,8 @@ void clusterizergetkclusters(ahcreport *rep, ae_int_t k, ZVector *cidx, ZVector 
 //       by this function, which allows you to convert indexes stored in CIdx
 //       to the numeration system used by Rep.Z.
 //
-// NOTE: this subroutine is optimized for moderate values of K. Say, for  K=5
-//       it will perform many times faster than  for  K=100.  Its  worst-case
+// NOTE: this subroutine is optimized for moderate values of K. Say, for  K == 5
+//       it will perform many times faster than  for  K == 100.  Its  worst-case
 //       performance is O(N*K), although in average case  it  perform  better
 //       (up to O(N*log(K))).
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
@@ -10356,7 +10346,7 @@ void clusterizerseparatedbydist(ahcreport *rep, double r, ae_int_t *k, ZVector *
 //                 returned by this function to indexes used by  Rep.Z.  J-th
 //                 cluster returned by this function corresponds to  CZ[J]-th
 //                 cluster stored in Rep.Z/PZ/PM.
-//                 It is guaranteed that CZ[I]<CZ[I+1].
+//                 It is guaranteed that CZ[I] < CZ[I+1].
 //
 // NOTE: K clusters built by this subroutine are assumed to have no hierarchy.
 //       Although  they  were  obtained  by  manipulation with top K nodes of
@@ -10374,8 +10364,8 @@ void clusterizerseparatedbydist(ahcreport *rep, double r, ae_int_t *k, ZVector *
 //       by this function, which allows you to convert indexes stored in CIdx
 //       to the numeration system used by Rep.Z.
 //
-// NOTE: this subroutine is optimized for moderate values of K. Say, for  K=5
-//       it will perform many times faster than  for  K=100.  Its  worst-case
+// NOTE: this subroutine is optimized for moderate values of K. Say, for  K == 5
+//       it will perform many times faster than  for  K == 100.  Its  worst-case
 //       performance is O(N*K), although in average case  it  perform  better
 //       (up to O(N*log(K))).
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
@@ -10524,7 +10514,6 @@ void kmeansreport_free(void *_p, bool make_automatic) {
 
 namespace alglib {
 // This structure is a clusterization engine.
-//
 // You should not try to access its fields directly.
 // Use ALGLIB functions in order to work with this object.
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
@@ -10568,7 +10557,7 @@ DefClass(clusterizerstate, )
 //                     corresponds to I-th merge:
 //                     * Z[I,0] - index of the first cluster to merge
 //                     * Z[I,1] - index of the second cluster to merge
-//                     * Z[I,0]<Z[I,1]
+//                     * Z[I,0] < Z[I,1]
 //                     * clusters are  numbered  from 0 to 2*NPoints-2,  with
 //                       indexes from 0 to NPoints-1 corresponding to  points
 //                       of the original dataset, and indexes from NPoints to
@@ -10615,14 +10604,14 @@ DefClass(clusterizerstate, )
 //                     * C1 contains points with indexes PM[I,2]...PM[I,3]
 //                     * indexes stored in PM are given for dataset sorted
 //                       according to permutation P
-//                     * PM[I,1]=PM[I,2]-1 (only adjacent clusters are merged)
+//                     * PM[I,1] == PM[I,2]-1 (only adjacent clusters are merged)
 //                     * PM[I,0] <= PM[I,1], PM[I,2] <= PM[I,3], i.e. both
 //                       clusters contain at least one point
 //                     * heights of "subdendrograms" corresponding  to  C0/C1
 //                       are stored in PM[I,4]  and  PM[I,5].  Subdendrograms
 //                       corresponding   to   single-point   clusters    have
-//                       height=0. Dendrogram of the merge result has  height
-//                       H=max(H0,H1)+1.
+//                       height == 0. Dendrogram of the merge result has  height
+//                       H == max(H0,H1)+1.
 //
 // NOTE: there is one-to-one correspondence between merges described by Z and
 //       PM. I-th row of Z describes same merge of clusters as I-th row of PM,
@@ -10651,7 +10640,7 @@ DefClass(ahcreport, DecVal(terminationtype) DecVal(npoints) DecVar(p) DecVar(z) 
 //                     * -5 if  distance  type  is  anything  different  from
 //                          Euclidean metric
 //                     * -3 for degenerate dataset: a) less  than  K  distinct
-//                          points, b) K=0 for non-empty dataset.
+//                          points, b) K == 0 for non-empty dataset.
 //                     * +1 for successful completion
 //     K               number of clusters
 //     C               array[K,NFeatures], rows of the array store centers
@@ -10808,7 +10797,6 @@ static const ae_int_t dforest_permutationimportancebatchsize = 512;
 // Outputs:
 //     Buf         -   external buffer.
 //
-//
 // IMPORTANT: buffer object should be used only with model which was used  to
 //            initialize buffer. Any attempt to  use  buffer  with  different
 //            object is dangerous - you  may   get  integrity  check  failure
@@ -10886,7 +10874,7 @@ void dfbuildercreate(decisionforestbuilder *s) {
 //                     * NClasses >= 2 means  that  classification  problem  is
 //                       solved  (last  column  of  the  dataset stores class
 //                       number)
-//                     * NClasses=1 means that regression problem  is  solved
+//                     * NClasses == 1 means that regression problem  is  solved
 //                       (last column of the dataset stores variable value)
 //
 // Outputs:
@@ -10897,11 +10885,11 @@ void dfbuildersetdataset(decisionforestbuilder *s, RMatrix *xy, ae_int_t npoints
    ae_int_t i;
    ae_int_t j;
 // Check parameters
-   ae_assert(npoints >= 1, "dfbuildersetdataset: npoints<1");
-   ae_assert(nvars >= 1, "dfbuildersetdataset: nvars<1");
-   ae_assert(nclasses >= 1, "dfbuildersetdataset: nclasses<1");
-   ae_assert(xy->rows >= npoints, "dfbuildersetdataset: rows(xy)<npoints");
-   ae_assert(xy->cols >= nvars + 1, "dfbuildersetdataset: cols(xy)<nvars+1");
+   ae_assert(npoints >= 1, "dfbuildersetdataset: npoints < 1");
+   ae_assert(nvars >= 1, "dfbuildersetdataset: nvars < 1");
+   ae_assert(nclasses >= 1, "dfbuildersetdataset: nclasses < 1");
+   ae_assert(xy->rows >= npoints, "dfbuildersetdataset: rows(xy) < npoints");
+   ae_assert(xy->cols >= nvars + 1, "dfbuildersetdataset: cols(xy) < nvars+1");
    ae_assert(apservisfinitematrix(xy, npoints, nvars + 1), "dfbuildersetdataset: xy parameter contains INFs or NANs");
    if (nclasses > 1) {
       for (i = 0; i < npoints; i++) {
@@ -11028,7 +11016,7 @@ void dfbuildersetsubsampleratio(decisionforestbuilder *s, double f) {
 //                       decision forests
 //
 // Outputs:
-//     S           -   decision forest builder, see
+//     S           -   decision forest builder
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 // API: void dfbuildersetseed(const decisionforestbuilder &s, const ae_int_t seedval);
 void dfbuildersetseed(decisionforestbuilder *s, ae_int_t seedval) {
@@ -11046,7 +11034,7 @@ void dfbuildersetseed(decisionforestbuilder *s, ae_int_t seedval) {
 //                     * 0 = baseline dense RDF
 //
 // Outputs:
-//     S           -   decision forest builder, see
+//     S           -   decision forest builder
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 // API: void dfbuildersetrdfalgo(const decisionforestbuilder &s, const ae_int_t algotype);
 void dfbuildersetrdfalgo(decisionforestbuilder *s, ae_int_t algotype) {
@@ -11066,7 +11054,7 @@ void dfbuildersetrdfalgo(decisionforestbuilder *s, ae_int_t algotype) {
 //                     * 2 = strong split at the best point of the range (default)
 //
 // Outputs:
-//     S           -   decision forest builder, see
+//     S           -   decision forest builder
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 // API: void dfbuildersetrdfsplitstrength(const decisionforestbuilder &s, const ae_int_t splitstrength);
 void dfbuildersetrdfsplitstrength(decisionforestbuilder *s, ae_int_t splitstrength) {
@@ -11684,7 +11672,7 @@ static void dforest_regressionsplit(decisionforestbuilder *s, dfworkbuf *workbuf
 // Returns split: either deterministic split at the middle of [A,B], or randomly
 // chosen split.
 //
-// It is guaranteed that A<Split <= B.
+// It is guaranteed that A < Split <= B.
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 static double dforest_getsplit(decisionforestbuilder *s, double a, double b, hqrndstate *rs) {
    double result;
@@ -11886,12 +11874,12 @@ static void dforest_choosecurrentsplitdense(decisionforestbuilder *s, dfworkbuf 
 // * model is evaluated over TST set being passed, with L2 loss being returned
 //
 // Inputs:
-//     NClasses            -   ">1" for classification, "=1" for regression
-//     TrnLabelsI          -   training set labels, class indexes (for NClasses>1)
-//     TrnLabelsR          -   training set output values (for NClasses=1)
+//     NClasses            -   "> 1" for classification, "== 1" for regression
+//     TrnLabelsI          -   training set labels, class indexes (for NClasses > 1)
+//     TrnLabelsR          -   training set output values (for NClasses == 1)
 //     TrnIdx0, TrnIdx1    -   a range [Idx0,Idx1) of elements in LabelsI/R is considered
-//     TstLabelsI          -   training set labels, class indexes (for NClasses>1)
-//     TstLabelsR          -   training set output values (for NClasses=1)
+//     TstLabelsI          -   training set labels, class indexes (for NClasses > 1)
+//     TstLabelsR          -   training set output values (for NClasses == 1)
 //     TstIdx0, TstIdx1    -   a range [Idx0,Idx1) of elements in LabelsI/R is considered
 //     TmpI        -   temporary array, reallocated as needed
 //
@@ -12133,7 +12121,7 @@ static void dforest_buildrandomtree(decisionforestbuilder *s, ae_int_t treeidx0,
    RefObj(dfvotebuf, votebuf);
    RefObj(dftreebuf, treebuf);
 // Perform parallelization
-// Parallelism was tried if: treeidx1 - treeidx0 > 1
+// Parallelism was tried if: treeidx1 - treeidx0 > 1.
    if (treeidx1 - treeidx0 > 1) {
       j = (treeidx1 - treeidx0) / 2;
       dforest_buildrandomtree(s, treeidx0, treeidx0 + j);
@@ -12258,7 +12246,7 @@ static void dforest_dfprocessinternaluncompressed(decisionforest *df, ae_int_t s
 // points.
 //
 // Initial call to this function should span entire range of the dataset,
-// [Idx0,Idx1)=[0,NPoints), because function performs initialization of some
+// [Idx0,Idx1) == [0,NPoints), because function performs initialization of some
 // internal structures when called with these arguments.
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 static void dforest_estimatepermutationimportances(decisionforestbuilder *s, decisionforest *df, ae_int_t ntrees, ae_shared_pool *permpool, ae_int_t idx0, ae_int_t idx1) {
@@ -12439,7 +12427,7 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
 // points.
 //
 // Initial call to this function should span entire range of the dataset,
-// [Idx0,Idx1)=[0,NPoints), because function performs initialization of some
+// [Idx0,Idx1) == [0,NPoints), because function performs initialization of some
 // internal structures when called with these arguments.
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_t sessionseed, decisionforest *df, ae_int_t ntrees, dfreport *rep) {
@@ -12968,7 +12956,7 @@ static ae_int_t dforest_computecompressedsizerec(decisionforest *df, bool useman
    return result;
 }
 
-// Fast Pow
+// Fast pow().
 // ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
 static double dforest_xfastpow(double r, ae_int_t n) {
    double result;
@@ -13222,7 +13210,7 @@ static void dforest_compressrec(decisionforest *df, bool usemantissa8, ae_int_t 
       // Child #0 comes first because it is shorter:
       // * stream variable index used for splitting;
       //   value in [0,NVars) range indicates that split is
-      //   "if VAR<VAL then BRANCH0 else BRANCH1"
+      //   "if VAR < VAL then BRANCH0 else BRANCH1"
       // * stream value used for splitting
       // * stream children #0 and #1
          dforest_streamuint(buf, dstoffs, varidx);
@@ -13344,7 +13332,7 @@ static void dforest_dfprocessinternalcompressed(decisionforest *df, ae_int_t off
       splitval = dforest_unstreamfloat(&df->trees8, df->usemantissa8, &offs);
       jmplen = dforest_unstreamuint(&df->trees8, &offs);
       if (varidx < df->nvars) {
-      // The split rule is "if VAR<VAL then BRANCH0 else BRANCH1"
+      // The split rule is "if VAR < VAL then BRANCH0 else BRANCH1"
          if (x->xR[varidx] >= splitval) {
             offs += jmplen;
          }
@@ -13435,7 +13423,7 @@ void dfbuilderbuildrandomforest(decisionforestbuilder *s, ae_int_t ntrees, decis
    NewObj(dfworkbuf, workbufseed);
    NewObj(dfvotebuf, votebufseed);
    NewObj(dftreebuf, treebufseed);
-   ae_assert(ntrees >= 1, "DFBuilderBuildRandomForest: ntrees<1");
+   ae_assert(ntrees >= 1, "DFBuilderBuildRandomForest: ntrees < 1");
    dforest_cleanreport(s, rep);
    npoints = s->npoints;
    nvars = s->nvars;
@@ -13559,8 +13547,8 @@ void dfbuilderbuildrandomforest(decisionforestbuilder *s, ae_int_t ntrees, decis
 //
 // As  result,  model  needs  significantly  less  memory (compression factor
 // depends on  variable and class counts). In particular:
-// * NVars<128   and NClasses<128 result in 4.4x-5.7x model size reduction
-// * NVars<16384 and NClasses<128 result in 3.7x-4.5x model size reduction
+// * NVars < 128   and NClasses < 128 result in 4.4x-5.7x model size reduction
+// * NVars < 16384 and NClasses < 128 result in 3.7x-4.5x model size reduction
 //
 // Such storage format performs lossless compression  of  all  integers,  but
 // compression of floating point values (split values) is lossy, with roughly
@@ -13724,7 +13712,7 @@ double dfprocess0(decisionforest *model, RVector *x) {
 }
 
 // This function returns most probable class number for an  input  X.  It  is
-// same as calling  dfprocess(model,x,y), then determining i=argmax(y[i]) and
+// same as calling  dfprocess(model,x,y), then determining i == argmax(y[i]) and
 // returning i.
 //
 // A class number in [0,NOut) range in returned for classification  problems,
@@ -15170,7 +15158,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
 // 1. A = U*diag(sv)*V'
 // 2. T = b'*U
 // 3. w = SUM((T[i]/sv[i])*V[..,i])
-// 4. cov(wi,wj) = SUM(Vji*Vjk/sv[i]^2,K=1..M)
+// 4. cov(wi,wj) = SUM(Vji*Vjk/sv[i]^2,K = 1..M)
 //
 // see $15.4 of "Numerical Recipes in C" for more information
    ae_vector_set_length(&t, nvars);
@@ -15326,7 +15314,7 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
 // NOTE 1: b is not zeroed out since it is much simpler and
 // does not influence final result.
 //
-// NOTE 2: some design matrices A have such ui that 1-ui*ui'=0.
+// NOTE 2: some design matrices A have such ui that 1-ui*ui' == 0.
 // Formula (1) can't be applied for such cases and they are skipped
 // from CV calculation (which distorts resulting CV estimate).
 // But from the properties of U we can conclude that there can
@@ -15402,15 +15390,15 @@ static void linreg_lrinternal(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_
 //                     * NVars columns - independent variables
 //                     * last column - dependent variable
 //     S           -   standard deviations (errors in function values)
-//                     array[0..NPoints-1], S[i]>0.
-//     NPoints     -   training set size, NPoints>NVars+1
+//                     array[0..NPoints-1], S[i] > 0.
+//     NPoints     -   training set size, NPoints > NVars+1
 //     NVars       -   number of independent variables
 //
 // Outputs:
 //     Info        -   return code:
 //                     * -255, in case of unknown internal error
 //                     * -4, if internal SVD subroutine haven't converged
-//                     * -1, if incorrect parameters was passed (NPoints<NVars+2, NVars<1).
+//                     * -1, if incorrect parameters was passed (NPoints < NVars+2, NVars < 1).
 //                     * -2, if S[I] <= 0
 //                     *  1, if subroutine successfully finished
 //     LM          -   linear model in the ALGLIB format. Use subroutines of
@@ -15507,14 +15495,14 @@ void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_
 //     XY          -   training set, array [0..NPoints-1,0..NVars]:
 //                     * NVars columns - independent variables
 //                     * last column - dependent variable
-//     NPoints     -   training set size, NPoints>NVars+1
+//     NPoints     -   training set size, NPoints > NVars+1
 //     NVars       -   number of independent variables
 //
 // Outputs:
 //     Info        -   return code:
 //                     * -255, in case of unknown internal error
 //                     * -4, if internal SVD subroutine haven't converged
-//                     * -1, if incorrect parameters was passed (NPoints<NVars+2, NVars<1).
+//                     * -1, if incorrect parameters was passed (NPoints < NVars+2, NVars < 1).
 //                     *  1, if subroutine successfully finished
 //     LM          -   linear model in the ALGLIB format. Use subroutines of
 //                     this unit to work with the model.
@@ -15694,7 +15682,7 @@ void lrunpack(linearmodel *lm, RVector *v, ae_int_t *nvars) {
 //     V           -   coefficients, array[0..NVars]
 //     NVars       -   number of independent variables
 //
-// OUTPUT PAREMETERS:
+// Outputs:
 //     LM          -   linear model.
 // ALGLIB: Copyright 30.08.2008 by Sergey Bochkanov
 // API: void lrpack(const real_1d_array &v, const ae_int_t nvars, linearmodel &lm);
@@ -16005,7 +15993,7 @@ namespace alglib_impl {
 //                     in this case only first N points are processed.
 //     N           -   points count, N >= 0
 //     K           -   K >= 1 (K can be larger than N ,  such  cases  will  be
-//                     correctly handled). Window width. K=1 corresponds  to
+//                     correctly handled). Window width. K == 1 corresponds  to
 //                     identity transformation (nothing changes).
 //
 // Outputs:
@@ -16034,10 +16022,10 @@ void filtersma(RVector *x, ae_int_t n, ae_int_t k) {
    double termsinsum;
    ae_int_t zeroprefix;
    double v;
-   ae_assert(n >= 0, "FilterSMA: N<0");
-   ae_assert(x->cnt >= n, "FilterSMA: Length(X)<N");
+   ae_assert(n >= 0, "FilterSMA: N < 0");
+   ae_assert(x->cnt >= n, "FilterSMA: Length(X) < N");
    ae_assert(isfinitevector(x, n), "FilterSMA: X contains INF or NAN");
-   ae_assert(k >= 1, "FilterSMA: K<1");
+   ae_assert(k >= 1, "FilterSMA: K < 1");
 // Quick exit, if necessary
    if (n <= 1 || k == 1) {
       return;
@@ -16055,7 +16043,7 @@ void filtersma(RVector *x, ae_int_t n, ae_int_t k) {
       zeroprefix++;
       i++;
    }
-// General case: we assume that N>1 and K>1
+// General case: we assume that N > 1 and K > 1
 //
 // Make one pass through all elements. At the beginning of
 // the iteration we have:
@@ -16080,7 +16068,7 @@ void filtersma(RVector *x, ae_int_t n, ae_int_t k) {
          termsinsum--;
       }
    // Update ZeroPrefix.
-   // In case we have ZeroPrefix=TermsInSum,
+   // In case we have ZeroPrefix == TermsInSum,
    // RunningSum is reset to zero.
       if (i - k >= 0) {
          if (x->xR[i - k] != 0.0) {
@@ -16108,7 +16096,7 @@ void filtersma(RVector *x, ae_int_t n, ae_int_t k) {
 //     X           -   array[N], array to process. It can be larger than N,
 //                     in this case only first N points are processed.
 //     N           -   points count, N >= 0
-//     alpha       -   0<alpha <= 1, smoothing parameter.
+//     alpha       -   0 < alpha <= 1, smoothing parameter.
 //
 // Outputs:
 //     X           -   array, whose first N elements were processed
@@ -16122,17 +16110,17 @@ void filtersma(RVector *x, ae_int_t n, ae_int_t k) {
 //
 // NOTE 3: technical analytis users quite often work  with  EMA  coefficient
 //         expressed in DAYS instead of fractions. If you want to  calculate
-//         EMA(N), where N is a number of days, you can use alpha=2/(N+1).
+//         EMA(N), where N is a number of days, you can use alpha == 2/(N+1).
 // ALGLIB: Copyright 25.10.2011 by Sergey Bochkanov
 // API: void filterema(real_1d_array &x, const ae_int_t n, const double alpha);
 // API: void filterema(real_1d_array &x, const double alpha);
 void filterema(RVector *x, ae_int_t n, double alpha) {
    ae_int_t i;
-   ae_assert(n >= 0, "FilterEMA: N<0");
-   ae_assert(x->cnt >= n, "FilterEMA: Length(X)<N");
+   ae_assert(n >= 0, "FilterEMA: N < 0");
+   ae_assert(x->cnt >= n, "FilterEMA: Length(X) < N");
    ae_assert(isfinitevector(x, n), "FilterEMA: X contains INF or NAN");
    ae_assert(alpha > 0.0, "FilterEMA: Alpha <= 0");
-   ae_assert(alpha <= 1.0, "FilterEMA: Alpha>1");
+   ae_assert(alpha <= 1.0, "FilterEMA: Alpha > 1");
 // Quick exit, if necessary
    if (n <= 1 || alpha == 1.0) {
       return;
@@ -16157,7 +16145,7 @@ void filterema(RVector *x, ae_int_t n, double alpha) {
 //                     in this case only first N points are processed.
 //     N           -   points count, N >= 0
 //     K           -   K >= 1 (K can be larger than N ,  such  cases  will  be
-//                     correctly handled). Window width. K=1 corresponds  to
+//                     correctly handled). Window width. K == 1 corresponds  to
 //                     identity transformation (nothing changes).
 //
 // Outputs:
@@ -16195,10 +16183,10 @@ void filterlrma(RVector *x, ae_int_t n, ae_int_t k) {
    ae_frame_make(&_frame_block);
    NewMatrix(xy, 0, 0, DT_REAL);
    NewVector(s, 0, DT_REAL);
-   ae_assert(n >= 0, "FilterLRMA: N<0");
-   ae_assert(x->cnt >= n, "FilterLRMA: Length(X)<N");
+   ae_assert(n >= 0, "FilterLRMA: N < 0");
+   ae_assert(x->cnt >= n, "FilterLRMA: Length(X) < N");
    ae_assert(isfinitevector(x, n), "FilterLRMA: X contains INF or NAN");
-   ae_assert(k >= 1, "FilterLRMA: K<1");
+   ae_assert(k >= 1, "FilterLRMA: K < 1");
 // Quick exit, if necessary:
 // * either N is equal to 1 (nothing to average)
 // * or K is 1 (only point itself is used) or 2 (model is too simple,
@@ -16207,8 +16195,8 @@ void filterlrma(RVector *x, ae_int_t n, ae_int_t k) {
       ae_frame_leave();
       return;
    }
-// General case: K>2, N>1.
-// We do not process points with I<2 because first two points (I=0 and I=1) will be
+// General case: K > 2, N > 1.
+// We do not process points with I < 2 because first two points (I == 0 and I == 1) will be
 // left unmodified by LRMA filter in any case.
    ae_matrix_set_length(&xy, k, 2);
    ae_vector_set_length(&s, k);
@@ -16284,9 +16272,9 @@ namespace alglib_impl {
 // which can be analyzed by current algorithm, or not.
 //
 // No analysis can be done in the following degenerate cases:
-// * dataset is empty
-// * all sequences are shorter than the window length
-// * no algorithm is specified
+// *	the data set is empty,
+// *	all sequences are shorter than the window length,
+// *	no algorithm is specified.
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 static bool ssa_isdegenerate(ssamodel *s) {
    if (s->algotype == 0 || s->nsequences == 0) return true;
@@ -16297,7 +16285,7 @@ static bool ssa_isdegenerate(ssamodel *s) {
 
 // This function checks whether I-th sequence is big enough for analysis or not.
 //
-// I=-1 is used to denote last sequence (for NSequences=0)
+// I == -1 is used to denote last sequence (for NSequences == 0)
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 static bool ssa_issequencebigenough(ssamodel *s, ae_int_t i) {
    bool result;
@@ -16327,7 +16315,7 @@ static bool ssa_issequencebigenough(ssamodel *s, ae_int_t i) {
 // Inputs:
 //     S                   -   model, only fields with UX prefix are used
 //     UpdateSize          -   number of updates
-//     WindowWidth         -   window width, >0
+//     WindowWidth         -   window width, > 0
 //     MemoryLimit         -   memory limit, non-positive value means no limit
 //
 // Outputs:
@@ -16403,13 +16391,13 @@ static void ssa_updatexxtfinalize(ssamodel *s, RMatrix *xxt) {
 // kind of updates with decay.
 //
 // Inputs:
-//     S                   -   model
+//     S                   - model
 //     Beta                - >= 0, coefficient to premultiply XXT
-//     Cnt                 -   0<Cnt <= S.RTQueueCnt, number of updates to extract
-//                             from the end of the queue
+//     Cnt                 - 0 < Cnt <= S.RTQueueCnt, number of updates to extract
+//                           from the end of the queue
 //
 // Outputs:
-//     S                   -   S.XXT updated, S.RTQueueCnt decreased
+//     S                   - S.XXT updated, S.RTQueueCnt decreased
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 static void ssa_realtimedequeue(ssamodel *s, double beta, ae_int_t cnt) {
    ae_int_t i;
@@ -16448,25 +16436,24 @@ static void ssa_realtimedequeue(ssamodel *s, double beta, ae_int_t cnt) {
 // the very beginning) or partial update (handles append to the  end  of  the
 // dataset).
 //
-// With AppendLen=0 this function behaves as follows:
-// * if AreBasisAndSolverValid=False, then  solver  object  is  created  from
+// With AppendLen == 0 this function behaves as follows:
+// * if AreBasisAndSolverValid == False, then  solver  object  is  created  from
 //   scratch, initial calculations are performed according  to  specific  SSA
 //   algorithm being chosen. Basis/Solver validity flag is set to True,  then
 //   we immediately return.
-// * if AreBasisAndSolverValid=True, then nothing is done  -  we  immediately
+// * if AreBasisAndSolverValid == True, then nothing is done  -  we  immediately
 //   return.
 //
-// With AppendLen>0 this function behaves as follows:
-// * if AreBasisAndSolverValid=False, then exception is  generated;  you  can
+// With AppendLen > 0 this function behaves as follows:
+// * if AreBasisAndSolverValid == False, then exception is  generated;  you  can
 //   append points only to fully constructed basis. Call this  function  with
 //   zero AppendLen BEFORE append, then perform append, then call it one more
 //   time with non-zero AppendLen.
-// * if AreBasisAndSolverValid=True, then basis is incrementally updated.  It
+// * if AreBasisAndSolverValid == True, then basis is incrementally updated.  It
 //   also updates recurrence relation used for prediction. It is expected that
-//   either AppendLen=1, or AppendLen=length(last_sequence). Basis update  is
+//   either AppendLen == 1, or AppendLen == length(last_sequence). Basis update  is
 //   performed with probability UpdateIts (larger-than-one values  mean  that
 //   some amount of iterations is always performed).
-//
 //
 // In any case, after calling this function we either:
 // * have an exception
@@ -16602,8 +16589,8 @@ static void ssa_updatebasis(ssamodel *s, ae_int_t appendlen, double updateits) {
          }
       }
    }
-// Now, perform basis calculation - either full recalculation (AppendLen=0)
-// or quick update (AppendLen>0).
+// Now, perform basis calculation - either full recalculation (AppendLen == 0)
+// or quick update (AppendLen > 0).
    if (s->algotype == 1) {
    // Precomputed basis
       if (winw != s->precomputedwidth) {
@@ -16990,14 +16977,14 @@ void ssacreate(ssamodel *s) {
 //
 // Inputs:
 //     S               -   SSA model created with ssacreate()
-//     WindowWidth     - >= 1, new window width
+//     WindowWidth     -   >= 1, new window width
 //
 // Outputs:
 //     S               -   SSA model, updated
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 // API: void ssasetwindow(const ssamodel &s, const ae_int_t windowwidth);
 void ssasetwindow(ssamodel *s, ae_int_t windowwidth) {
-   ae_assert(windowwidth >= 1, "SSASetWindow: WindowWidth<1");
+   ae_assert(windowwidth >= 1, "SSASetWindow: WindowWidth < 1");
    if (windowwidth == s->windowwidth) {
       return;
    }
@@ -17014,7 +17001,7 @@ void ssasetwindow(ssamodel *s, ae_int_t windowwidth) {
 // results after each run.
 //
 // This function can be useful when you have several SSA models updated  with
-// sseappendpointandupdate() called with 0<UpdateIts<1 (fractional value) and
+// sseappendpointandupdate() called with 0 < UpdateIts < 1 (fractional value) and
 // due to performance limitations want them to perform updates  at  different
 // moments.
 //
@@ -17046,11 +17033,11 @@ void ssasetseed(ssamodel *s, ae_int_t seed) {
 //     PWLen   -   length of the power-up stage:
 //                 * 0 means that no power-up is requested
 //                 * 1 is the same as 0
-//                 * >1 means that delayed power-up is performed
+//                 * > 1 means that delayed power-up is performed
 // ALGLIB: Copyright 03.11.2017 by Sergey Bochkanov
 // API: void ssasetpoweruplength(const ssamodel &s, const ae_int_t pwlen);
 void ssasetpoweruplength(ssamodel *s, ae_int_t pwlen) {
-   ae_assert(pwlen >= 0, "SSASetPowerUpLength: PWLen<0");
+   ae_assert(pwlen >= 0, "SSASetPowerUpLength: PWLen < 0");
    s->rtpowerup = imax2(pwlen, 1);
    s->arebasisandsolvervalid = false;
 }
@@ -17122,7 +17109,7 @@ void ssasetmemorylimit(ssamodel *s, ae_int_t memlimit) {
 void ssaaddsequence(ssamodel *s, RVector *x, ae_int_t n) {
    ae_int_t i;
    ae_int_t offs;
-   ae_assert(n >= 0, "SSAAddSequence: N<0");
+   ae_assert(n >= 0, "SSAAddSequence: N < 0");
    ae_assert(x->cnt >= n, "SSAAddSequence: X is too short");
    ae_assert(isfinitevector(x, n), "SSAAddSequence: X contains infinities NANs");
 // Invalidate model
@@ -17157,7 +17144,7 @@ void ssaaddsequence(ssamodel *s, RVector *x, ae_int_t n) {
 // Inputs:
 //     S               -   SSA model created with ssacreate()
 //     X               -   new point
-//     UpdateIts       - >= 0,  floating  point (!)  value,  desired  update
+//     UpdateIts       -   >= 0,  floating  point (!)  value,  desired  update
 //                         frequency:
 //                         * zero value means that point is  stored,  but  no
 //                           update is performed
@@ -17166,7 +17153,7 @@ void ssaaddsequence(ssamodel *s, RVector *x, ae_int_t n) {
 //                         * fractional part of  the  value  means  that  one
 //                           iteration is performed with this probability.
 //
-//                         Recommended value: 0<UpdateIts <= 1.  Values  larger
+//                         Recommended value: 0 < UpdateIts <= 1.  Values  larger
 //                         than 1 are VERY seldom  needed.  If  your  dataset
 //                         changes slowly, you can set it  to  0.1  and  skip
 //                         90% of updates.
@@ -17197,7 +17184,7 @@ void ssaaddsequence(ssamodel *s, RVector *x, ae_int_t n) {
 void ssaappendpointandupdate(ssamodel *s, double x, double updateits) {
    ae_assert(isfinite(x), "SSAAppendPointAndUpdate: X is not finite");
    ae_assert(isfinite(updateits), "SSAAppendPointAndUpdate: UpdateIts is not finite");
-   ae_assert(updateits >= 0.0, "SSAAppendPointAndUpdate: UpdateIts<0");
+   ae_assert(updateits >= 0.0, "SSAAppendPointAndUpdate: UpdateIts < 0");
    ae_assert(s->nsequences > 0, "SSAAppendPointAndUpdate: dataset is empty, no sequence to modify");
 // Append point to dataset
    rvectorgrowto(&s->sequencedata, s->sequenceidx.xZ[s->nsequences] + 1);
@@ -17238,8 +17225,8 @@ void ssaappendpointandupdate(ssamodel *s, double x, double updateits) {
 // Inputs:
 //     S               -   SSA model created with ssacreate()
 //     X               -   new sequence, array[NTicks] or larget
-//     NTicks          - >= 1, number of ticks in the sequence
-//     UpdateIts       - >= 0,  floating  point (!)  value,  desired  update
+//     NTicks          -   >= 1, number of ticks in the sequence
+//     UpdateIts       -   >= 0,  floating  point (!)  value,  desired  update
 //                         frequency:
 //                         * zero value means that point is  stored,  but  no
 //                           update is performed
@@ -17248,7 +17235,7 @@ void ssaappendpointandupdate(ssamodel *s, double x, double updateits) {
 //                         * fractional part of  the  value  means  that  one
 //                           iteration is performed with this probability.
 //
-//                         Recommended value: 0<UpdateIts <= 1.  Values  larger
+//                         Recommended value: 0 < UpdateIts <= 1.  Values  larger
 //                         than 1 are VERY seldom  needed.  If  your  dataset
 //                         changes slowly, you can set it  to  0.1  and  skip
 //                         90% of updates.
@@ -17277,7 +17264,7 @@ void ssaappendpointandupdate(ssamodel *s, double x, double updateits) {
 void ssaappendsequenceandupdate(ssamodel *s, RVector *x, ae_int_t nticks, double updateits) {
    ae_int_t i;
    ae_int_t offs;
-   ae_assert(nticks >= 0, "SSAAppendSequenceAndUpdate: NTicks<0");
+   ae_assert(nticks >= 0, "SSAAppendSequenceAndUpdate: NTicks < 0");
    ae_assert(x->cnt >= nticks, "SSAAppendSequenceAndUpdate: X is too short");
    ae_assert(isfinitevector(x, nticks), "SSAAppendSequenceAndUpdate: X contains infinities NANs");
 // Add sequence
@@ -17343,12 +17330,12 @@ void ssaappendsequenceandupdate(ssamodel *s, RVector *x, ae_int_t nticks, double
 void ssasetalgoprecomputed(ssamodel *s, RMatrix *a, ae_int_t windowwidth, ae_int_t nbasis) {
    ae_int_t i;
    ae_int_t j;
-   ae_assert(windowwidth >= 1, "SSASetAlgoPrecomputed: WindowWidth<1");
-   ae_assert(nbasis >= 1, "SSASetAlgoPrecomputed: NBasis<1");
-   ae_assert(nbasis <= windowwidth, "SSASetAlgoPrecomputed: NBasis>WindowWidth");
-   ae_assert(a->rows >= windowwidth, "SSASetAlgoPrecomputed: Rows(A)<WindowWidth");
-   ae_assert(a->cols >= nbasis, "SSASetAlgoPrecomputed: Rows(A)<NBasis");
-   ae_assert(apservisfinitematrix(a, windowwidth, nbasis), "SSASetAlgoPrecomputed: Rows(A)<NBasis");
+   ae_assert(windowwidth >= 1, "SSASetAlgoPrecomputed: WindowWidth < 1");
+   ae_assert(nbasis >= 1, "SSASetAlgoPrecomputed: NBasis < 1");
+   ae_assert(nbasis <= windowwidth, "SSASetAlgoPrecomputed: NBasis > WindowWidth");
+   ae_assert(a->rows >= windowwidth, "SSASetAlgoPrecomputed: Rows(A) < WindowWidth");
+   ae_assert(a->cols >= nbasis, "SSASetAlgoPrecomputed: Rows(A) < NBasis");
+   ae_assert(apservisfinitematrix(a, windowwidth, nbasis), "SSASetAlgoPrecomputed: Rows(A) < NBasis");
    s->algotype = 1;
    s->precomputedwidth = windowwidth;
    s->precomputednbasis = nbasis;
@@ -17380,8 +17367,7 @@ void ssasetalgoprecomputed(ssamodel *s, RMatrix *a, ae_int_t windowwidth, ae_int
 // Outputs:
 //     S               -   updated model
 //
-//
-// NOTE: TopK>WindowWidth is silently decreased to WindowWidth during analysis
+// NOTE: TopK > WindowWidth is silently decreased to WindowWidth during analysis
 //       phase
 //
 // NOTE: calling this function invalidates basis, except  for  the  situation
@@ -17389,7 +17375,7 @@ void ssasetalgoprecomputed(ssamodel *s, RMatrix *a, ae_int_t windowwidth, ae_int
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 // API: void ssasetalgotopkdirect(const ssamodel &s, const ae_int_t topk);
 void ssasetalgotopkdirect(ssamodel *s, ae_int_t topk) {
-   ae_assert(topk >= 1, "SSASetAlgoTopKDirect: TopK<1");
+   ae_assert(topk >= 1, "SSASetAlgoTopKDirect: TopK < 1");
 // Ignore calls which change nothing
    if (s->algotype == 2 && s->topk == topk) {
       return;
@@ -17412,7 +17398,7 @@ void ssasetalgotopkdirect(ssamodel *s, ae_int_t topk) {
 // * O(K*WindowWidth^2) running time for incremental update  of  the  dataset
 //   with one of the "append-and-update" functions (ssaappendpointandupdate()
 //   or ssaappendsequenceandupdate()).
-// * O(N*WindowWidth^2) running time for initial basis evaluation (N=size  of
+// * O(N*WindowWidth^2) running time for initial basis evaluation (N == size  of
 //   dataset)
 // * ability  to  split  costly  initialization  across  several  incremental
 //   updates of the basis (so called "Power-Up" functionality,  activated  by
@@ -17431,7 +17417,7 @@ void ssasetalgotopkdirect(ssamodel *s, ae_int_t topk) {
 //       (ssasetalgotopkdirect() function). However, the  difference  becomes
 //       negligible as dataset grows.
 //
-// NOTE: TopK>WindowWidth is silently decreased to WindowWidth during analysis
+// NOTE: TopK > WindowWidth is silently decreased to WindowWidth during analysis
 //       phase
 //
 // NOTE: calling this function invalidates basis, except  for  the  situation
@@ -17439,7 +17425,7 @@ void ssasetalgotopkdirect(ssamodel *s, ae_int_t topk) {
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 // API: void ssasetalgotopkrealtime(const ssamodel &s, const ae_int_t topk);
 void ssasetalgotopkrealtime(ssamodel *s, ae_int_t topk) {
-   ae_assert(topk >= 1, "SSASetAlgoTopKRealTime: TopK<1");
+   ae_assert(topk >= 1, "SSASetAlgoTopKRealTime: TopK < 1");
 // Ignore calls which change nothing
    if (s->algotype == 3 && s->topk == topk) {
       return;
@@ -17480,7 +17466,6 @@ void ssacleardata(ssamodel *s) {
 //     WindowWidth     -   current window
 //     NBasis          -   basis size
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -17494,7 +17479,6 @@ void ssacleardata(ssamodel *s) {
 //   c) ssaappendsequenceandupdate()
 //   d) ssasetalgotopk...() with exactly same K
 //   Calling these functions will result in reuse of previously found basis.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -17523,7 +17507,7 @@ void ssagetbasis(ssamodel *s, RMatrix *a, RVector *sv, ae_int_t *windowwidth, ae
    }
 // Update basis.
 //
-// It will take care of basis validity flags. AppendLen=0 which means
+// It will take care of basis validity flags. AppendLen == 0 which means
 // that we perform initial basis evaluation.
    ssa_updatebasis(s, 0, 0.0);
 // Output
@@ -17549,9 +17533,8 @@ void ssagetbasis(ssamodel *s, RMatrix *a, RVector *sv, ae_int_t *windowwidth, ae
 //     A               -   array[WindowWidth-1]. Coefficients  of  the
 //                         linear recurrence of the form:
 //                         X[W-1] = X[W-2]*A[W-2] + X[W-3]*A[W-3] + ... + X[0]*A[0].
-//                         Empty array for WindowWidth=1.
+//                         Empty array for WindowWidth == 1.
 //     WindowWidth     -   current window width
-//
 //
 // CACHING/REUSE OF THE BASIS
 //
@@ -17566,7 +17549,6 @@ void ssagetbasis(ssamodel *s, RMatrix *a, RVector *sv, ae_int_t *windowwidth, ae
 //   c) ssaappendsequenceandupdate()
 //   d) ssasetalgotopk...() with exactly same K
 //   Calling these functions will result in reuse of previously found basis.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -17590,7 +17572,7 @@ void ssagetlrr(ssamodel *s, RVector *a, ae_int_t *windowwidth) {
    }
 // Update basis.
 //
-// It will take care of basis validity flags. AppendLen=0 which means
+// It will take care of basis validity flags. AppendLen == 0 which means
 // that we perform initial basis evaluation.
    ssa_updatebasis(s, 0, 0.0);
 // Output
@@ -17632,7 +17614,6 @@ void ssagetlrr(ssamodel *s, RVector *a, ae_int_t *windowwidth) {
 //                         it holds that ActualData = Trend+Noise.
 //     NTicks          -   current WindowSize
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -17649,7 +17630,6 @@ void ssagetlrr(ssamodel *s, RVector *a, ae_int_t *windowwidth) {
 //
 // In  any  case,  only  basis  is  reused. Reconstruction is performed  from
 // scratch every time you call this function.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -17699,7 +17679,7 @@ void ssaanalyzelastwindow(ssamodel *s, RVector *trend, RVector *noise, ae_int_t 
    }
 // Update basis.
 //
-// It will take care of basis validity flags. AppendLen=0 which means
+// It will take care of basis validity flags. AppendLen == 0 which means
 // that we perform initial basis evaluation.
    ssa_updatebasis(s, 0, 0.0);
 // Perform analysis of the last window
@@ -17733,17 +17713,17 @@ void ssaanalyzelastwindow(ssamodel *s, RVector *trend, RVector *noise, ae_int_t 
 //            For example:
 //            * Trend[NTicks-1] is always same because it is not averaged  in
 //              any case (same applies to Trend[0]).
-//            * Trend[NTicks-2] has different values  for  NTicks=WindowWidth
-//              and NTicks=WindowWidth+1 because former  case  means that  no
+//            * Trend[NTicks-2] has different values  for  NTicks == WindowWidth
+//              and NTicks == WindowWidth+1 because former  case  means that  no
 //              averaging is performed, and latter  case means that averaging
 //              using two sliding windows  is  performed.  Larger  values  of
-//              NTicks produce same results as NTicks=WindowWidth+1.
+//              NTicks produce same results as NTicks == WindowWidth+1.
 //            * ...and so on...
 //
 // PERFORMANCE: this  function has O((NTicks-WindowWidth)*WindowWidth*NBasis)
 //              running time. If you work  in  time-constrained  setting  and
 //              have to analyze just a few last ticks, choosing NTicks  equal
-//              to WindowWidth+SmoothingLen, with SmoothingLen=1...WindowWidth
+//              to WindowWidth+SmoothingLen, with SmoothingLen = 1...WindowWidth
 //              will result in good compromise between noise cancellation and
 //              analysis speed.
 //
@@ -17753,7 +17733,7 @@ void ssaanalyzelastwindow(ssamodel *s, RVector *trend, RVector *noise, ae_int_t 
 //                         * special case of NTicks <= WindowWidth  is  handled
 //                           by analyzing last window and  returning   NTicks
 //                           last ticks.
-//                         * special case NTicks>LastSequenceLen  is  handled
+//                         * special case NTicks > LastSequenceLen  is  handled
 //                           by prepending result with NTicks-LastSequenceLen
 //                           zeros.
 //
@@ -17761,7 +17741,6 @@ void ssaanalyzelastwindow(ssamodel *s, RVector *trend, RVector *noise, ae_int_t 
 //     Trend           -   array[NTicks], reconstructed trend line
 //     Noise           -   array[NTicks], the rest of the signal;
 //                         it holds that ActualData = Trend+Noise.
-//
 //
 // CACHING/REUSE OF THE BASIS
 //
@@ -17779,7 +17758,6 @@ void ssaanalyzelastwindow(ssamodel *s, RVector *trend, RVector *noise, ae_int_t 
 //
 // In  any  case,  only  basis  is  reused. Reconstruction is performed  from
 // scratch every time you call this function.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -17808,7 +17786,7 @@ void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise
    ae_int_t cntzeros;
    SetVector(trend);
    SetVector(noise);
-   ae_assert(nticks >= 1, "SSAAnalyzeLast: NTicks<1");
+   ae_assert(nticks >= 1, "SSAAnalyzeLast: NTicks < 1");
 // Init
    ae_vector_set_length(trend, nticks);
    ae_vector_set_length(noise, nticks);
@@ -17839,7 +17817,7 @@ void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise
    }
 // Update basis.
 //
-// It will take care of basis validity flags. AppendLen=0 which means
+// It will take care of basis validity flags. AppendLen == 0 which means
 // that we perform initial basis evaluation.
    ssa_updatebasis(s, 0, 0.0);
 // Perform analysis:
@@ -17874,7 +17852,7 @@ void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise
 // PERFORMANCE: this  function has O((NTicks-WindowWidth)*WindowWidth*NBasis)
 //              running time. If you work  in  time-constrained  setting  and
 //              have to analyze just a few last ticks, choosing NTicks  equal
-//              to WindowWidth+SmoothingLen, with SmoothingLen=1...WindowWidth
+//              to WindowWidth+SmoothingLen, with SmoothingLen = 1...WindowWidth
 //              will result in good compromise between noise cancellation and
 //              analysis speed.
 //
@@ -17883,14 +17861,13 @@ void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise
 //     Data            -   array[NTicks], can be larger (only NTicks  leading
 //                         elements will be used)
 //     NTicks          -   number of ticks to analyze, Nticks >= 1.
-//                         * special case of NTicks<WindowWidth  is   handled
+//                         * special case of NTicks < WindowWidth  is   handled
 //                           by returning zeros as trend, and signal as noise
 //
 // Outputs:
 //     Trend           -   array[NTicks], reconstructed trend line
 //     Noise           -   array[NTicks], the rest of the signal;
 //                         it holds that ActualData = Trend+Noise.
-//
 //
 // CACHING/REUSE OF THE BASIS
 //
@@ -17908,7 +17885,6 @@ void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise
 //
 // In  any  case,  only  basis  is  reused. Reconstruction is performed  from
 // scratch every time you call this function.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -17932,7 +17908,7 @@ void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *tr
    ae_int_t i;
    SetVector(trend);
    SetVector(noise);
-   ae_assert(nticks >= 1, "SSAAnalyzeSequence: NTicks<1");
+   ae_assert(nticks >= 1, "SSAAnalyzeSequence: NTicks < 1");
    ae_assert(data->cnt >= nticks, "SSAAnalyzeSequence: Data is too short");
    ae_assert(isfinitevector(data, nticks), "SSAAnalyzeSequence: Data contains infinities NANs");
 // Init
@@ -17948,7 +17924,7 @@ void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *tr
    }
 // Update basis.
 //
-// It will take care of basis validity flags. AppendLen=0 which means
+// It will take care of basis validity flags. AppendLen == 0 which means
 // that we perform initial basis evaluation.
    ssa_updatebasis(s, 0, 0.0);
 // Perform analysis
@@ -17986,7 +17962,6 @@ void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *tr
 // Outputs:
 //     Trend           -   array[NTicks], predicted trend line
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -18000,7 +17975,6 @@ void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *tr
 //   c) ssaappendsequenceandupdate()
 //   d) ssasetalgotopk...() with exactly same K
 //   Calling these functions will result in reuse of previously found basis.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -18017,9 +17991,9 @@ void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *tr
 //
 // Calling this function in degenerate cases returns following result:
 // * NTicks  copies  of  the  last  value is returned for non-empty task with
-//   large enough dataset, but with overcomplete  basis  (window  width=1  or
+//   large enough dataset, but with overcomplete  basis  (window  width == 1  or
 //   basis size is equal to window width)
-// * zero trend with length=NTicks is returned for empty task
+// * zero trend with length == NTicks is returned for empty task
 //
 // No analysis is performed in degenerate cases (we immediately return  dummy
 // values, no basis is ever constructed).
@@ -18031,7 +18005,7 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend) {
    double v;
    ae_int_t winw;
    SetVector(trend);
-   ae_assert(nticks >= 1, "SSAForecast: NTicks<1");
+   ae_assert(nticks >= 1, "SSAForecast: NTicks < 1");
 // Init
    winw = s->windowwidth;
    ae_vector_set_length(trend, nticks);
@@ -18059,7 +18033,7 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend) {
    }
 // Update basis and recurrent relation.
 //
-// It will take care of basis validity flags. AppendLen=0 which means
+// It will take care of basis validity flags. AppendLen == 0 which means
 // that we perform initial basis evaluation.
    ssa_updatebasis(s, 0, 0.0);
    ae_assert(s->nbasis <= winw && s->nbasis > 0, "SSAForecast: integrity check failed / 4f5et");
@@ -18131,7 +18105,6 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend) {
 // Outputs:
 //     Trend           -   array[ForecastLen], forecasted trend
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -18145,7 +18118,6 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend) {
 //   c) ssaappendsequenceandupdate()
 //   d) ssasetalgotopk...() with exactly same K
 //   Calling these functions will result in reuse of previously found basis.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -18162,9 +18134,9 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend) {
 //
 // Calling this function in degenerate cases returns following result:
 // * ForecastLen copies of the last value is returned for non-empty task with
-//   large enough dataset, but with overcomplete  basis  (window  width=1  or
+//   large enough dataset, but with overcomplete  basis  (window  width == 1  or
 //   basis size is equal to window width)
-// * zero trend with length=ForecastLen is returned for empty task
+// * zero trend with length == ForecastLen is returned for empty task
 //
 // No analysis is performed in degenerate cases (we immediately return  dummy
 // values, no basis is ever constructed).
@@ -18177,10 +18149,10 @@ void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t 
    double v;
    ae_int_t winw;
    SetVector(trend);
-   ae_assert(datalen >= 1, "SSAForecastSequence: DataLen<1");
+   ae_assert(datalen >= 1, "SSAForecastSequence: DataLen < 1");
    ae_assert(data->cnt >= datalen, "SSAForecastSequence: Data is too short");
    ae_assert(isfinitevector(data, datalen), "SSAForecastSequence: Data contains infinities NANs");
-   ae_assert(forecastlen >= 1, "SSAForecastSequence: ForecastLen<1");
+   ae_assert(forecastlen >= 1, "SSAForecastSequence: ForecastLen < 1");
 // Init
    winw = s->windowwidth;
    ae_vector_set_length(trend, forecastlen);
@@ -18199,7 +18171,7 @@ void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t 
    }
 // Update basis.
 //
-// It will take care of basis validity flags. AppendLen=0 which means
+// It will take care of basis validity flags. AppendLen == 0 which means
 // that we perform initial basis evaluation.
    ssa_updatebasis(s, 0, 0.0);
    ae_assert(s->nbasis <= winw && s->nbasis > 0, "SSAForecast: integrity check failed / 4f5et");
@@ -18274,7 +18246,6 @@ void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t 
 // Outputs:
 //     Trend           -   array[NTicks], predicted trend line
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -18288,7 +18259,6 @@ void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t 
 //   c) ssaappendsequenceandupdate()
 //   d) ssasetalgotopk...() with exactly same K
 //   Calling these functions will result in reuse of previously found basis.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -18305,9 +18275,9 @@ void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t 
 //
 // Calling this function in degenerate cases returns following result:
 // * NTicks  copies  of  the  last  value is returned for non-empty task with
-//   large enough dataset, but with overcomplete  basis  (window  width=1  or
+//   large enough dataset, but with overcomplete  basis  (window  width == 1  or
 //   basis size is equal to window width)
-// * zero trend with length=NTicks is returned for empty task
+// * zero trend with length == NTicks is returned for empty task
 //
 // No analysis is performed in degenerate cases (we immediately return  dummy
 // values, no basis is ever constructed).
@@ -18317,8 +18287,8 @@ void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend
    ae_int_t i;
    ae_int_t winw;
    SetVector(trend);
-   ae_assert(nticks >= 1, "SSAForecastAvgLast: NTicks<1");
-   ae_assert(m >= 1, "SSAForecastAvgLast: M<1");
+   ae_assert(nticks >= 1, "SSAForecastAvgLast: NTicks < 1");
+   ae_assert(m >= 1, "SSAForecastAvgLast: M < 1");
 // Init
    winw = s->windowwidth;
    ae_vector_set_length(trend, nticks);
@@ -18346,7 +18316,7 @@ void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend
    }
 // Update basis and recurrent relation.
 //
-// It will take care of basis validity flags. AppendLen=0 which means
+// It will take care of basis validity flags. AppendLen == 0 which means
 // that we perform initial basis evaluation.
    ssa_updatebasis(s, 0, 0.0);
    ae_assert(s->nbasis <= winw && s->nbasis > 0, "SSAForecastAvgLast: integrity check failed / 4f5et");
@@ -18404,7 +18374,6 @@ void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend
 // Outputs:
 //     Trend           -   array[ForecastLen], forecasted trend
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -18418,7 +18387,6 @@ void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend
 //   c) ssaappendsequenceandupdate()
 //   d) ssasetalgotopk...() with exactly same K
 //   Calling these functions will result in reuse of previously found basis.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -18435,9 +18403,9 @@ void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend
 //
 // Calling this function in degenerate cases returns following result:
 // * ForecastLen copies of the last value is returned for non-empty task with
-//   large enough dataset, but with overcomplete  basis  (window  width=1  or
+//   large enough dataset, but with overcomplete  basis  (window  width == 1  or
 //   basis size is equal to window width)
-// * zero trend with length=ForecastLen is returned for empty task
+// * zero trend with length == ForecastLen is returned for empty task
 //
 // No analysis is performed in degenerate cases (we immediately return  dummy
 // values, no basis is ever constructed).
@@ -18448,11 +18416,11 @@ void ssaforecastavgsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int
    ae_int_t i;
    ae_int_t winw;
    SetVector(trend);
-   ae_assert(datalen >= 1, "SSAForecastAvgSequence: DataLen<1");
-   ae_assert(m >= 1, "SSAForecastAvgSequence: M<1");
+   ae_assert(datalen >= 1, "SSAForecastAvgSequence: DataLen < 1");
+   ae_assert(m >= 1, "SSAForecastAvgSequence: M < 1");
    ae_assert(data->cnt >= datalen, "SSAForecastAvgSequence: Data is too short");
    ae_assert(isfinitevector(data, datalen), "SSAForecastAvgSequence: Data contains infinities NANs");
-   ae_assert(forecastlen >= 1, "SSAForecastAvgSequence: ForecastLen<1");
+   ae_assert(forecastlen >= 1, "SSAForecastAvgSequence: ForecastLen < 1");
 // Init
    winw = s->windowwidth;
    ae_vector_set_length(trend, forecastlen);
@@ -18471,7 +18439,7 @@ void ssaforecastavgsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int
    }
 // Update basis.
 //
-// It will take care of basis validity flags. AppendLen=0 which means
+// It will take care of basis validity flags. AppendLen == 0 which means
 // that we perform initial basis evaluation.
    ssa_updatebasis(s, 0, 0.0);
    ae_assert(s->nbasis <= winw && s->nbasis > 0, "SSAForecast: integrity check failed / 4f5et");
@@ -18593,7 +18561,6 @@ void ssamodel_free(void *_p, bool make_automatic) {
 
 namespace alglib {
 // This object stores state of the SSA model.
-//
 // You should use ALGLIB functions to work with this object.
 DefClass(ssamodel, )
 
@@ -18821,14 +18788,13 @@ namespace alglib_impl {
 //     NVars       -   number of independent variables, NVars >= 1
 //     NClasses    -   number of classes, NClasses >= 2
 //
-//
 // Outputs:
 //     Info        -   return code:
 //                     * -4, if internal EVD subroutine hasn't converged
 //                     * -2, if there is a point with class number
 //                           outside of [0..NClasses-1].
-//                     * -1, if incorrect parameters was passed (NPoints<0,
-//                           NVars<1, NClasses<2)
+//                     * -1, if incorrect parameters was passed (NPoints < 0,
+//                           NVars < 1, NClasses < 2)
 //                     *  1, if task has been solved
 //                     *  2, if there was a multicollinearity in training set,
 //                           but task has been solved.
@@ -18953,7 +18919,7 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
       ae_v_sub(xyc.xyR[k], 1, muc.xyR[c.xZ[k]], 1, nvars);
    }
    rmatrixgemm(nvars, nvars, npoints, 1.0, &xyc, 0, 0, 1, &xyc, 0, 0, 0, 0.0, &sw, 0, 0);
-// Maximize ratio J=(w'*ST*w)/(w'*SW*w).
+// Maximize ratio J == (w'*ST*w)/(w'*SW*w).
 //
 // First, make transition from w to v such that w'*ST*w becomes v'*v:
 //    v  = root(ST)*w = R*w
@@ -19079,14 +19045,13 @@ void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses
 //     NVars       -   number of independent variables, NVars >= 1
 //     NClasses    -   number of classes, NClasses >= 2
 //
-//
 // Outputs:
 //     Info        -   return code:
 //                     * -4, if internal EVD subroutine hasn't converged
 //                     * -2, if there is a point with class number
 //                           outside of [0..NClasses-1].
-//                     * -1, if incorrect parameters was passed (NPoints<0,
-//                           NVars<1, NClasses<2)
+//                     * -1, if incorrect parameters was passed (NPoints < 0,
+//                           NVars < 1, NClasses < 2)
 //                     *  1, if task has been solved
 //                     *  2, if there was a multicollinearity in training set,
 //                           but task has been solved.
@@ -19134,7 +19099,7 @@ static const double mcpd_xtol = 1.0E-8;
 static void mcpd_mcpdinit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, mcpdstate *s) {
    ae_int_t i;
    ae_int_t j;
-   ae_assert(n >= 1, "MCPDCreate: N<1");
+   ae_assert(n >= 1, "MCPDCreate: N < 1");
    s->n = n;
    ae_vector_set_length(&s->states, n);
    for (i = 0; i < n; i++) {
@@ -19181,8 +19146,6 @@ static void mcpd_mcpdinit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, m
    minbleiccreate(n * n, &s->tmpp, &s->bs);
 }
 
-// DESCRIPTION:
-//
 // This function creates MCPD (Markov Chains for Population Data) solver.
 //
 // This  solver  can  be  used  to find transition matrix P for N-dimensional
@@ -19236,12 +19199,10 @@ static void mcpd_mcpdinit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, m
 // API: void mcpdcreate(const ae_int_t n, mcpdstate &s);
 void mcpdcreate(ae_int_t n, mcpdstate *s) {
    SetObj(mcpdstate, s);
-   ae_assert(n >= 1, "MCPDCreate: N<1");
+   ae_assert(n >= 1, "MCPDCreate: N < 1");
    mcpd_mcpdinit(n, -1, -1, s);
 }
 
-// DESCRIPTION:
-//
 // This function is a specialized version of MCPDCreate()  function,  and  we
 // recommend  you  to read comments for this function for general information
 // about MCPD solver.
@@ -19285,14 +19246,12 @@ void mcpdcreate(ae_int_t n, mcpdstate *s) {
 // API: void mcpdcreateentry(const ae_int_t n, const ae_int_t entrystate, mcpdstate &s);
 void mcpdcreateentry(ae_int_t n, ae_int_t entrystate, mcpdstate *s) {
    SetObj(mcpdstate, s);
-   ae_assert(n >= 2, "MCPDCreateEntry: N<2");
-   ae_assert(entrystate >= 0, "MCPDCreateEntry: EntryState<0");
+   ae_assert(n >= 2, "MCPDCreateEntry: N < 2");
+   ae_assert(entrystate >= 0, "MCPDCreateEntry: EntryState < 0");
    ae_assert(entrystate < n, "MCPDCreateEntry: EntryState >= N");
    mcpd_mcpdinit(n, entrystate, -1, s);
 }
 
-// DESCRIPTION:
-//
 // This function is a specialized version of MCPDCreate()  function,  and  we
 // recommend  you  to read comments for this function for general information
 // about MCPD solver.
@@ -19336,14 +19295,12 @@ void mcpdcreateentry(ae_int_t n, ae_int_t entrystate, mcpdstate *s) {
 // API: void mcpdcreateexit(const ae_int_t n, const ae_int_t exitstate, mcpdstate &s);
 void mcpdcreateexit(ae_int_t n, ae_int_t exitstate, mcpdstate *s) {
    SetObj(mcpdstate, s);
-   ae_assert(n >= 2, "MCPDCreateExit: N<2");
-   ae_assert(exitstate >= 0, "MCPDCreateExit: ExitState<0");
+   ae_assert(n >= 2, "MCPDCreateExit: N < 2");
+   ae_assert(exitstate >= 0, "MCPDCreateExit: ExitState < 0");
    ae_assert(exitstate < n, "MCPDCreateExit: ExitState >= N");
    mcpd_mcpdinit(n, -1, exitstate, s);
 }
 
-// DESCRIPTION:
-//
 // This function is a specialized version of MCPDCreate()  function,  and  we
 // recommend  you  to read comments for this function for general information
 // about MCPD solver.
@@ -19398,12 +19355,12 @@ void mcpdcreateexit(ae_int_t n, ae_int_t exitstate, mcpdstate *s) {
 // API: void mcpdcreateentryexit(const ae_int_t n, const ae_int_t entrystate, const ae_int_t exitstate, mcpdstate &s);
 void mcpdcreateentryexit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, mcpdstate *s) {
    SetObj(mcpdstate, s);
-   ae_assert(n >= 2, "MCPDCreateEntryExit: N<2");
-   ae_assert(entrystate >= 0, "MCPDCreateEntryExit: EntryState<0");
+   ae_assert(n >= 2, "MCPDCreateEntryExit: N < 2");
+   ae_assert(entrystate >= 0, "MCPDCreateEntryExit: EntryState < 0");
    ae_assert(entrystate < n, "MCPDCreateEntryExit: EntryState >= N");
-   ae_assert(exitstate >= 0, "MCPDCreateEntryExit: ExitState<0");
+   ae_assert(exitstate >= 0, "MCPDCreateEntryExit: ExitState < 0");
    ae_assert(exitstate < n, "MCPDCreateEntryExit: ExitState >= N");
-   ae_assert(entrystate != exitstate, "MCPDCreateEntryExit: EntryState=ExitState");
+   ae_assert(entrystate != exitstate, "MCPDCreateEntryExit: EntryState == ExitState");
    mcpd_mcpdinit(n, entrystate, exitstate, s);
 }
 
@@ -19412,15 +19369,15 @@ void mcpdcreateentryexit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, mc
 //
 // You  may  add  one  or several tracks to the MCPD solver. In case you have
 // several tracks, they won't overwrite each other. For example,  if you pass
-// two tracks, A1-A2-A3 (system at t=A+1, t=A+2 and t=A+3) and B1-B2-B3, then
-// solver will try to model transitions from t=A+1 to t=A+2, t=A+2 to  t=A+3,
-// t=B+1 to t=B+2, t=B+2 to t=B+3. But it WONT mix these two tracks - i.e. it
-// wont try to model transition from t=A+3 to t=B+1.
+// two tracks, A1-A2-A3 (system at t == A+1, t == A+2 and t == A+3) and B1-B2-B3, then
+// solver will try to model transitions from t == A+1 to t == A+2, t == A+2 to  t == A+3,
+// t == B+1 to t == B+2, t == B+2 to t == B+3. But it WONT mix these two tracks - i.e. it
+// wont try to model transition from t == A+3 to t == B+1.
 //
 // Inputs:
 //     S       -   solver
 //     XY      -   track, array[K,N]:
-//                 * I-th row is a state at t=I
+//                 * I-th row is a state at t == I
 //                 * elements of XY must be non-negative (exception will be
 //                   thrown on negative elements)
 //     K       -   number of points in a track
@@ -19444,9 +19401,9 @@ void mcpdaddtrack(mcpdstate *s, RMatrix *xy, ae_int_t k) {
    double s0;
    double s1;
    n = s->n;
-   ae_assert(k >= 0, "MCPDAddTrack: K<0");
-   ae_assert(xy->cols >= n, "MCPDAddTrack: Cols(XY)<N");
-   ae_assert(xy->rows >= k, "MCPDAddTrack: Rows(XY)<K");
+   ae_assert(k >= 0, "MCPDAddTrack: K < 0");
+   ae_assert(xy->cols >= n, "MCPDAddTrack: Cols(XY) < N");
+   ae_assert(xy->rows >= k, "MCPDAddTrack: Rows(XY) < K");
    ae_assert(apservisfinitematrix(xy, k, n), "MCPDAddTrack: XY contains infinite or NaN elements");
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
@@ -19503,9 +19460,9 @@ void mcpdaddtrack(mcpdstate *s, RMatrix *xy, ae_int_t k) {
 // calculated  as  intersection  of all present constraints. For example, you
 // may specify boundary constraint on P[0,0] and equality one:
 //     0.1 <= P[0,0] <= 0.9
-//     P[0,0]=0.5
+//     P[0,0] == 0.5
 // Such  combination  of  constraints  will  be  silently  reduced  to  their
-// intersection, which is P[0,0]=0.5.
+// intersection, which is P[0,0] == 0.5.
 //
 // This  function  can  be  used  to  place equality constraints on arbitrary
 // subset of elements of P. Set of constraints is specified by EC, which  may
@@ -19546,8 +19503,8 @@ void mcpdsetec(mcpdstate *s, RMatrix *ec) {
    ae_int_t j;
    ae_int_t n;
    n = s->n;
-   ae_assert(ec->cols >= n, "MCPDSetEC: Cols(EC)<N");
-   ae_assert(ec->rows >= n, "MCPDSetEC: Rows(EC)<N");
+   ae_assert(ec->cols >= n, "MCPDSetEC: Cols(EC) < N");
+   ae_assert(ec->rows >= n, "MCPDSetEC: Rows(EC) < N");
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          ae_assert(isfinite(ec->xyR[i][j]) || isnan(ec->xyR[i][j]), "MCPDSetEC: EC containts infinite elements");
@@ -19571,9 +19528,9 @@ void mcpdsetec(mcpdstate *s, RMatrix *ec) {
 // calculated  as  intersection  of all present constraints. For example, you
 // may specify boundary constraint on P[0,0] and equality one:
 //     0.1 <= P[0,0] <= 0.9
-//     P[0,0]=0.5
+//     P[0,0] == 0.5
 // Such  combination  of  constraints  will  be  silently  reduced  to  their
-// intersection, which is P[0,0]=0.5.
+// intersection, which is P[0,0] == 0.5.
 //
 // This function can be used to ADD equality constraint for one element of  P
 // without changing constraints for other elements.
@@ -19606,9 +19563,9 @@ void mcpdsetec(mcpdstate *s, RMatrix *ec) {
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 // API: void mcpdaddec(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double c);
 void mcpdaddec(mcpdstate *s, ae_int_t i, ae_int_t j, double c) {
-   ae_assert(i >= 0, "MCPDAddEC: I<0");
+   ae_assert(i >= 0, "MCPDAddEC: I < 0");
    ae_assert(i < s->n, "MCPDAddEC: I >= N");
-   ae_assert(j >= 0, "MCPDAddEC: J<0");
+   ae_assert(j >= 0, "MCPDAddEC: J < 0");
    ae_assert(j < s->n, "MCPDAddEC: J >= N");
    ae_assert(isnan(c) || isfinite(c), "MCPDAddEC: C is not finite number or NAN");
    s->ec.xyR[i][j] = c;
@@ -19629,14 +19586,14 @@ void mcpdaddec(mcpdstate *s, ae_int_t i, ae_int_t j, double c) {
 // calculated  as  intersection  of all present constraints. For example, you
 // may specify boundary constraint on P[0,0] and equality one:
 //     0.1 <= P[0,0] <= 0.9
-//     P[0,0]=0.5
+//     P[0,0] == 0.5
 // Such  combination  of  constraints  will  be  silently  reduced  to  their
-// intersection, which is P[0,0]=0.5.
+// intersection, which is P[0,0] == 0.5.
 //
 // This  function  can  be  used  to  place bound   constraints  on arbitrary
 // subset  of  elements  of  P.  Set of constraints is specified by BndL/BndU
 // matrices, which may contain arbitrary combination  of  finite  numbers  or
-// infinities (like -INF<x <= 0.5 or 0.1 <= x<+INF).
+// infinities (like -INF < x <= 0.5 or 0.1 <= x < +INF).
 //
 // You can also use MCPDAddBC() function which allows to ADD bound constraint
 // for one element of P without changing constraints for other elements.
@@ -19664,10 +19621,10 @@ void mcpdsetbc(mcpdstate *s, RMatrix *bndl, RMatrix *bndu) {
    ae_int_t j;
    ae_int_t n;
    n = s->n;
-   ae_assert(bndl->cols >= n, "MCPDSetBC: Cols(BndL)<N");
-   ae_assert(bndl->rows >= n, "MCPDSetBC: Rows(BndL)<N");
-   ae_assert(bndu->cols >= n, "MCPDSetBC: Cols(BndU)<N");
-   ae_assert(bndu->rows >= n, "MCPDSetBC: Rows(BndU)<N");
+   ae_assert(bndl->cols >= n, "MCPDSetBC: Cols(BndL) < N");
+   ae_assert(bndl->rows >= n, "MCPDSetBC: Rows(BndL) < N");
+   ae_assert(bndu->cols >= n, "MCPDSetBC: Cols(BndU) < N");
+   ae_assert(bndu->rows >= n, "MCPDSetBC: Rows(BndU) < N");
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          ae_assert(isfinite(bndl->xyR[i][j]) || isneginf(bndl->xyR[i][j]), "MCPDSetBC: BndL containts NAN or +INF");
@@ -19693,9 +19650,9 @@ void mcpdsetbc(mcpdstate *s, RMatrix *bndl, RMatrix *bndu) {
 // calculated  as  intersection  of all present constraints. For example, you
 // may specify boundary constraint on P[0,0] and equality one:
 //     0.1 <= P[0,0] <= 0.9
-//     P[0,0]=0.5
+//     P[0,0] == 0.5
 // Such  combination  of  constraints  will  be  silently  reduced  to  their
-// intersection, which is P[0,0]=0.5.
+// intersection, which is P[0,0] == 0.5.
 //
 // This  function  can  be  used to ADD bound constraint for one element of P
 // without changing constraints for other elements.
@@ -19703,7 +19660,7 @@ void mcpdsetbc(mcpdstate *s, RMatrix *bndl, RMatrix *bndu) {
 // You  can  also  use  MCPDSetBC()  function  which  allows to  place  bound
 // constraints  on arbitrary subset of elements of P.   Set of constraints is
 // specified  by  BndL/BndU matrices, which may contain arbitrary combination
-// of finite numbers or infinities (like -INF<x <= 0.5 or 0.1 <= x<+INF).
+// of finite numbers or infinities (like -INF < x <= 0.5 or 0.1 <= x < +INF).
 //
 // These functions (MCPDSetBC and MCPDAddBC) interact as follows:
 // * there is internal matrix of bound constraints which is stored in the
@@ -19724,9 +19681,9 @@ void mcpdsetbc(mcpdstate *s, RMatrix *bndl, RMatrix *bndu) {
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 // API: void mcpdaddbc(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double bndl, const double bndu);
 void mcpdaddbc(mcpdstate *s, ae_int_t i, ae_int_t j, double bndl, double bndu) {
-   ae_assert(i >= 0, "MCPDAddBC: I<0");
+   ae_assert(i >= 0, "MCPDAddBC: I < 0");
    ae_assert(i < s->n, "MCPDAddBC: I >= N");
-   ae_assert(j >= 0, "MCPDAddBC: J<0");
+   ae_assert(j >= 0, "MCPDAddBC: J < 0");
    ae_assert(j < s->n, "MCPDAddBC: J >= N");
    ae_assert(isfinite(bndl) || isneginf(bndl), "MCPDAddBC: BndL is NAN or +INF");
    ae_assert(isfinite(bndu) || isposinf(bndu), "MCPDAddBC: BndU is NAN or -INF");
@@ -19753,7 +19710,7 @@ void mcpdaddbc(mcpdstate *s, ae_int_t i, ae_int_t j, double bndl, double bndu) {
 //     P[0,0]*C[I,0] + P[0,1]*C[I,1] + .. + P[0,N-1]*C[I,N-1] +
 //         + P[1,0]*C[I,N] + P[1,1]*C[I,N+1] + ... +
 //         + P[N-1,N-1]*C[I,N*N-1]  ?=?  C[I,N*N]
-// where ?=? can be either "=" (CT[i]=0), "<=" (CT[i]<0) or ">=" (CT[i]>0).
+// where ?=? can be either "==" (CT[i] == 0), "<=" (CT[i] < 0) or ">=" (CT[i] > 0).
 //
 // Your constraint may involve only some subset of P (less than N*N elements).
 // For example it can be something like
@@ -19778,9 +19735,9 @@ void mcpdsetlc(mcpdstate *s, RMatrix *c, ZVector *ct, ae_int_t k) {
    ae_int_t j;
    ae_int_t n;
    n = s->n;
-   ae_assert(c->cols >= n * n + 1, "MCPDSetLC: Cols(C)<N*N+1");
-   ae_assert(c->rows >= k, "MCPDSetLC: Rows(C)<K");
-   ae_assert(ct->cnt >= k, "MCPDSetLC: Len(CT)<K");
+   ae_assert(c->cols >= n * n + 1, "MCPDSetLC: Cols(C) < N*N+1");
+   ae_assert(c->rows >= k, "MCPDSetLC: Rows(C) < K");
+   ae_assert(ct->cnt >= k, "MCPDSetLC: Len(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n * n + 1), "MCPDSetLC: C contains infinite or NaN values!");
    matrixsetlengthatleast(&s->c, k, n * n + 1);
    vectorsetlengthatleast(&s->ct, k);
@@ -19843,8 +19800,8 @@ void mcpdsetprior(mcpdstate *s, RMatrix *pp) {
    ae_frame_make(&_frame_block);
    DupMatrix(pp);
    n = s->n;
-   ae_assert(pp->cols >= n, "MCPDSetPrior: Cols(PP)<N");
-   ae_assert(pp->rows >= n, "MCPDSetPrior: Rows(PP)<K");
+   ae_assert(pp->cols >= n, "MCPDSetPrior: Cols(PP) < N");
+   ae_assert(pp->rows >= n, "MCPDSetPrior: Rows(PP) < K");
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          ae_assert(isfinite(pp->xyR[i][j]), "MCPDSetPrior: PP containts infinite elements");
@@ -19881,7 +19838,7 @@ void mcpdsetpredictionweights(mcpdstate *s, RVector *pw) {
    ae_int_t i;
    ae_int_t n;
    n = s->n;
-   ae_assert(pw->cnt >= n, "MCPDSetPredictionWeights: Length(PW)<N");
+   ae_assert(pw->cnt >= n, "MCPDSetPredictionWeights: Length(PW) < N");
    for (i = 0; i < n; i++) {
       ae_assert(isfinite(pw->xR[i]), "MCPDSetPredictionWeights: PW containts infinite or NAN elements");
       ae_assert(pw->xR[i] >= 0.0, "MCPDSetPredictionWeights: PW containts negative elements");
@@ -20192,7 +20149,6 @@ void mcpdreport_free(void *_p, bool make_automatic) {
 
 namespace alglib {
 // This structure is a MCPD (Markov Chains for Population Data) solver.
-//
 // You should use ALGLIB functions in order to work with this object.
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 DefClass(mcpdstate, )
@@ -20654,7 +20610,7 @@ Pause:
 //                     * -2, if there is a point with class number
 //                           outside of [0..NClasses-1].
 //                     * -1, if incorrect parameters was passed
-//                           (NPoints<NVars+2, NVars<1, NClasses<2).
+//                           (NPoints < NVars+2, NVars < 1, NClasses < 2).
 //                     *  1, if task has been solved
 //     LM          -   model built
 //     Rep         -   training report
@@ -20852,9 +20808,9 @@ void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
 
 // Unpacks coefficients of logit model. Logit model have form:
 //
-//     P(class=i) = S(i) / (S(0) + S(1) + ... +S(M-1))
-//           S(i) = Exp(A[i,0]*X[0] + ... + A[i,N-1]*X[N-1] + A[i,N]), when i<M-1
-//         S(M-1) = 1
+//     P(class == i) = S(i) / (S(0) + S(1) + ... +S(M-1))
+//           S(i)    = exp(A[i,0]*X[0] + ... + A[i,N-1]*X[N-1] + A[i,N]), when i < M-1
+//         S(M-1)    = 1
 //
 // Inputs:
 //     LM          -   logit model in ALGLIB format
@@ -21317,7 +21273,6 @@ static const ae_int_t knn_knnfirstversion = 0;
 // Outputs:
 //     Buf         -   external buffer.
 //
-//
 // IMPORTANT: buffer object should be used only with model which was used  to
 //            initialize buffer. Any attempt to  use  buffer  with  different
 //            object is dangerous - you  may   get  integrity  check  failure
@@ -21395,11 +21350,11 @@ void knnbuildersetdatasetreg(knnbuilder *s, RMatrix *xy, ae_int_t npoints, ae_in
    ae_int_t i;
    ae_int_t j;
 // Check parameters
-   ae_assert(npoints >= 1, "knnbuildersetdatasetreg: npoints<1");
-   ae_assert(nvars >= 1, "knnbuildersetdatasetreg: nvars<1");
-   ae_assert(nout >= 1, "knnbuildersetdatasetreg: nout<1");
-   ae_assert(xy->rows >= npoints, "knnbuildersetdatasetreg: rows(xy)<npoints");
-   ae_assert(xy->cols >= nvars + nout, "knnbuildersetdatasetreg: cols(xy)<nvars+nout");
+   ae_assert(npoints >= 1, "knnbuildersetdatasetreg: npoints < 1");
+   ae_assert(nvars >= 1, "knnbuildersetdatasetreg: nvars < 1");
+   ae_assert(nout >= 1, "knnbuildersetdatasetreg: nout < 1");
+   ae_assert(xy->rows >= npoints, "knnbuildersetdatasetreg: rows(xy) < npoints");
+   ae_assert(xy->cols >= nvars + nout, "knnbuildersetdatasetreg: cols(xy) < nvars+nout");
    ae_assert(apservisfinitematrix(xy, npoints, nvars + nout), "knnbuildersetdatasetreg: xy parameter contains INFs or NANs");
 // Set dataset
    s->dstype = 0;
@@ -21447,11 +21402,11 @@ void knnbuildersetdatasetcls(knnbuilder *s, RMatrix *xy, ae_int_t npoints, ae_in
    ae_int_t i;
    ae_int_t j;
 // Check parameters
-   ae_assert(npoints >= 1, "knnbuildersetdatasetcls: npoints<1");
-   ae_assert(nvars >= 1, "knnbuildersetdatasetcls: nvars<1");
-   ae_assert(nclasses >= 2, "knnbuildersetdatasetcls: nclasses<2");
-   ae_assert(xy->rows >= npoints, "knnbuildersetdatasetcls: rows(xy)<npoints");
-   ae_assert(xy->cols >= nvars + 1, "knnbuildersetdatasetcls: cols(xy)<nvars+1");
+   ae_assert(npoints >= 1, "knnbuildersetdatasetcls: npoints < 1");
+   ae_assert(nvars >= 1, "knnbuildersetdatasetcls: nvars < 1");
+   ae_assert(nclasses >= 2, "knnbuildersetdatasetcls: nclasses < 2");
+   ae_assert(xy->rows >= npoints, "knnbuildersetdatasetcls: rows(xy) < npoints");
+   ae_assert(xy->cols >= nvars + 1, "knnbuildersetdatasetcls: cols(xy) < nvars+1");
    ae_assert(apservisfinitematrix(xy, npoints, nvars + 1), "knnbuildersetdatasetcls: xy parameter contains INFs or NANs");
    for (i = 0; i < npoints; i++) {
       j = iround(xy->xyR[i][nvars]);
@@ -21508,7 +21463,6 @@ static void knn_clearreport(knnreport *rep) {
 // Inputs:
 //     Model       -   KNN model
 //     Buf         -   processing buffer.
-//
 //
 // IMPORTANT: buffer object should be used only with model which was used  to
 //            initialize buffer. Any attempt to  use  buffer  with  different
@@ -21608,9 +21562,9 @@ void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep
       ny = nout;
    }
 // Check input
-   ae_assert(npoints >= 0, "knnallerrors: npoints<0");
-   ae_assert(xy->rows >= npoints, "knnallerrors: rows(xy)<npoints");
-   ae_assert(xy->cols >= nvars + ny, "knnallerrors: cols(xy)<nvars+nout");
+   ae_assert(npoints >= 0, "knnallerrors: npoints < 0");
+   ae_assert(xy->rows >= npoints, "knnallerrors: rows(xy) < npoints");
+   ae_assert(xy->cols >= nvars + ny, "knnallerrors: cols(xy) < nvars+nout");
    ae_assert(apservisfinitematrix(xy, npoints, nvars + ny), "knnallerrors: xy parameter contains INFs or NANs");
 // Clean up report
    knn_clearreport(rep);
@@ -21660,9 +21614,9 @@ void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep
 //
 // The model being built performs inference using Eps-approximate  K  nearest
 // neighbors search algorithm, with:
-// * K=1,  Eps=0 corresponding to the "nearest neighbor algorithm"
-// * K>1,  Eps=0 corresponding to the "K nearest neighbors algorithm"
-// * K >= 1, Eps>0 corresponding to "approximate nearest neighbors algorithm"
+// * K == 1, Eps == 0 corresponding to the "nearest neighbor algorithm"
+// * K > 1,  Eps == 0 corresponding to the "K nearest neighbors algorithm"
+// * K >= 1, Eps > 0 corresponding to "approximate nearest neighbors algorithm"
 //
 // An approximate KNN is a good option for high-dimensional  datasets  (exact
 // KNN works slowly when dimensions count grows).
@@ -21673,8 +21627,8 @@ void knnallerrors(knnmodel *model, RMatrix *xy, ae_int_t npoints, knnreport *rep
 //     S       -   KNN builder object
 //     K       -   number of neighbors to search for, K >= 1
 //     Eps     -   approximation factor:
-//                 * Eps=0 means that exact kNN search is performed
-//                 * Eps>0 means that (1+Eps)-approximate search is performed
+//                 * Eps == 0 means that exact kNN search is performed
+//                 * Eps > 0 means that (1+Eps)-approximate search is performed
 //
 // Outputs:
 //     Model       -   KNN model
@@ -21699,8 +21653,8 @@ void knnbuilderbuildknnmodel(knnbuilder *s, ae_int_t k, double eps, knnmodel *mo
    nout = s->nout;
    iscls = s->iscls;
 // Check settings
-   ae_assert(k >= 1, "knnbuilderbuildknnmodel: k<1");
-   ae_assert(isfinite(eps) && eps >= 0.0, "knnbuilderbuildknnmodel: eps<0");
+   ae_assert(k >= 1, "knnbuilderbuildknnmodel: k < 1");
+   ae_assert(isfinite(eps) && eps >= 0.0, "knnbuilderbuildknnmodel: eps < 0");
 // Prepare output
    knn_clearreport(rep);
    model->nvars = nvars;
@@ -21771,8 +21725,8 @@ void knnbuilderbuildknnmodel(knnbuilder *s, ae_int_t k, double eps, knnmodel *mo
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 // API: void knnrewritekeps(const knnmodel &model, const ae_int_t k, const double eps);
 void knnrewritekeps(knnmodel *model, ae_int_t k, double eps) {
-   ae_assert(k >= 1, "knnrewritekeps: k<1");
-   ae_assert(isfinite(eps) && eps >= 0.0, "knnrewritekeps: eps<0");
+   ae_assert(k >= 1, "knnrewritekeps: k < 1");
+   ae_assert(isfinite(eps) && eps >= 0.0, "knnrewritekeps: eps < 0");
    model->k = k;
    model->eps = eps;
 }
@@ -21882,7 +21836,7 @@ double knnprocess0(knnmodel *model, RVector *x) {
 }
 
 // This function returns most probable class number for an  input  X.  It  is
-// same as calling knnprocess(model,x,y), then determining i=argmax(y[i]) and
+// same as calling knnprocess(model,x,y), then determining i == argmax(y[i]) and
 // returning i.
 //
 // A class number in [0,NOut) range in returned for classification  problems,
@@ -22503,7 +22457,7 @@ static const ae_int_t mlptrain_defaultlbfgsfactor = 6;
 //                     Decay term 'Decay*||Weights||^2' is added to error
 //                     function.
 //                     If you don't know what Decay to choose, use 0.001.
-//     Restarts    -   number of restarts from random position, >0.
+//     Restarts    -   number of restarts from random position, > 0.
 //                     If you don't know what Restarts to choose, use 2.
 //
 // Outputs:
@@ -22513,7 +22467,7 @@ static const ae_int_t mlptrain_defaultlbfgsfactor = 6;
 //                     * -2, if there is a point with class number
 //                           outside of [0..NOut-1].
 //                     * -1, if wrong parameters specified
-//                           (NPoints<0, Restarts<1).
+//                           (NPoints < 0, Restarts < 1).
 //                     *  2, if task has been solved.
 //     Rep         -   training report
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
@@ -22657,7 +22611,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
       // Lambda found.
       // 1. Save old w in WBase
       // 1. Test some stopping criterions
-      // 2. If error(w+wdir)>error(w), increase lambda
+      // 2. If error(w+wdir) > error(w), increase lambda
          ae_v_add(network->weights.xR, 1, wdir.xR, 1, wcount);
          xnorm2 = ae_v_dotproduct(network->weights.xR, 1, network->weights.xR, 1, wcount);
          stepnorm = ae_v_dotproduct(wdir.xR, 1, wdir.xR, 1, wcount);
@@ -22756,7 +22710,7 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
 //                     Decay term 'Decay*||Weights||^2' is added to error
 //                     function.
 //                     If you don't know what Decay to choose, use 0.001.
-//     Restarts    -   number of restarts from random position, >0.
+//     Restarts    -   number of restarts from random position, > 0.
 //                     If you don't know what Restarts to choose, use 2.
 //     WStep       -   stopping criterion. Algorithm stops if  step  size  is
 //                     less than WStep. Recommended value - 0.01.  Zero  step
@@ -22768,11 +22722,11 @@ void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, do
 // Outputs:
 //     Network     -   trained neural network.
 //     Info        -   return code:
-//                     * -8, if both WStep=0 and MaxIts=0
+//                     * -8, if both WStep == 0 and MaxIts == 0
 //                     * -2, if there is a point with class number
 //                           outside of [0..NOut-1].
 //                     * -1, if wrong parameters specified
-//                           (NPoints<0, Restarts<1).
+//                           (NPoints < 0, Restarts < 1).
 //                     *  2, if task has been solved.
 //     Rep         -   training report
 // ALGLIB: Copyright 09.12.2007 by Sergey Bochkanov
@@ -22861,9 +22815,9 @@ void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints,
 // Inputs:
 //     Network     -   neural network with initialized geometry
 //     TrnXY       -   training set
-//     TrnSize     -   training set size, TrnSize>0
+//     TrnSize     -   training set size, TrnSize > 0
 //     ValXY       -   validation set
-//     ValSize     -   validation set size, ValSize>0
+//     ValSize     -   validation set size, ValSize > 0
 //     Decay       -   weight decay constant, >= 0.001
 //                     Decay term 'Decay*||Weights||^2' is added to error
 //                     function.
@@ -22885,7 +22839,7 @@ void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints,
 //                     * -2, if there is a point with class number
 //                           outside of [0..NOut-1].
 //                     * -1, if wrong parameters specified
-//                           (NPoints<0, Restarts<1, ...).
+//                           (NPoints < 0, Restarts < 1, ...).
 //                     *  2, task has been solved, stopping  criterion  met -
 //                           sufficiently small step size.  Not expected  (we
 //                           use  EARLY  stopping)  but  possible  and not an
@@ -23019,8 +22973,8 @@ void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize,
 // Subroutine prepares K-fold split of the training set.
 //
 // NOTES:
-//     "NClasses>0" means that we have classification task.
-//     "NClasses<0" means regression task with -NClasses real outputs.
+//     "NClasses > 0" means that we have classification task.
+//     "NClasses < 0" means regression task with -NClasses real outputs.
 static void mlptrain_mlpkfoldsplit(RMatrix *xy, ae_int_t npoints, ae_int_t nclasses, ae_int_t foldscount, bool stratifiedsplits, ZVector *folds) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -23200,7 +23154,7 @@ static void mlptrain_initmlptrnsession(multilayerperceptron *networktrained, boo
    NewVector(dummysubset, 0, DT_INT);
 // Prepare network:
 // * copy input network to Session.Network
-// * re-initialize preprocessor and weights if RandomizeNetwork=True
+// * re-initialize preprocessor and weights if RandomizeNetwork == True
    mlpcopy(networktrained, &session->network);
    if (randomizenetwork) {
       ae_assert(trainer->datatype == 0 || trainer->datatype == 1, "InitTemporaries: unexpected Trainer.DataType");
@@ -23271,7 +23225,7 @@ static void mlptrain_mlpstarttrainingx(mlptrainer *s, bool randomstart, ae_int_t
    ae_int_t ttype;
    ae_int_t i;
 // Check parameters
-   ae_assert(s->npoints >= 0, "MLPStartTrainingX: internal error - parameter S is not initialized or is spoiled(S.NPoints<0)");
+   ae_assert(s->npoints >= 0, "MLPStartTrainingX: internal error - parameter S is not initialized or is spoiled(S.NPoints < 0)");
    ae_assert(algokind == 0 || algokind == -1, "MLPStartTrainingX: unexpected AlgoKind");
    if (s->rcpar) {
       ttype = 0;
@@ -23287,9 +23241,9 @@ static void mlptrain_mlpstarttrainingx(mlptrainer *s, bool randomstart, ae_int_t
    mlpproperties(&session->network, &nin, &nout, &wcount);
    ae_assert(s->nin == nin, "MLPStartTrainingX: number of inputs in trainer is not equal to number of inputs in the network.");
    ae_assert(s->nout == nout, "MLPStartTrainingX: number of outputs in trainer is not equal to number of outputs in the network.");
-   ae_assert(subset->cnt >= subsetsize, "MLPStartTrainingX: internal error - parameter SubsetSize more than input subset size(Length(Subset)<SubsetSize)");
+   ae_assert(subset->cnt >= subsetsize, "MLPStartTrainingX: internal error - parameter SubsetSize more than input subset size(Length(Subset) < SubsetSize)");
    for (i = 0; i < subsetsize; i++) {
-      ae_assert(subset->xZ[i] >= 0 && subset->xZ[i] <= s->npoints - 1, "MLPStartTrainingX: internal error - parameter Subset contains incorrect index(Subset[I]<0 or Subset[I]>S.NPoints-1)");
+      ae_assert(subset->xZ[i] >= 0 && subset->xZ[i] <= s->npoints - 1, "MLPStartTrainingX: internal error - parameter Subset contains incorrect index(Subset[I] < 0 or Subset[I] > S.NPoints-1)");
    }
 // Prepare session
    minlbfgssetcond(&session->optimizer, 0.0, 0.0, s->wstep, s->maxits);
@@ -23383,9 +23337,8 @@ Spawn:
    idx1 = -698;
    decay = -900;
    v = -318;
-// Routine body
 // Check correctness of inputs
-   ae_assert(s->npoints >= 0, "MLPContinueTrainingX: internal error - parameter S is not initialized or is spoiled(S.NPoints<0).");
+   ae_assert(s->npoints >= 0, "MLPContinueTrainingX: internal error - parameter S is not initialized or is spoiled(S.NPoints < 0).");
    if (s->rcpar) {
       ttype = 0;
    } else {
@@ -23400,9 +23353,9 @@ Spawn:
    mlpproperties(&session->network, &nin, &nout, &wcount);
    ae_assert(s->nin == nin, "MLPContinueTrainingX: internal error - number of inputs in trainer is not equal to number of inputs in the network.");
    ae_assert(s->nout == nout, "MLPContinueTrainingX: internal error - number of outputs in trainer is not equal to number of outputs in the network.");
-   ae_assert(subset->cnt >= subsetsize, "MLPContinueTrainingX: internal error - parameter SubsetSize more than input subset size(Length(Subset)<SubsetSize).");
+   ae_assert(subset->cnt >= subsetsize, "MLPContinueTrainingX: internal error - parameter SubsetSize more than input subset size(Length(Subset) < SubsetSize).");
    for (i = 0; i < subsetsize; i++) {
-      ae_assert(subset->xZ[i] >= 0 && subset->xZ[i] <= s->npoints - 1, "MLPContinueTrainingX: internal error - parameter Subset contains incorrect index(Subset[I]<0 or Subset[I]>S.NPoints-1).");
+      ae_assert(subset->xZ[i] >= 0 && subset->xZ[i] <= s->npoints - 1, "MLPContinueTrainingX: internal error - parameter Subset contains incorrect index(Subset[I] < 0 or Subset[I] > S.NPoints-1).");
    }
 // Quick exit on empty training set
    if (s->npoints == 0 || subsetsize == 0) {
@@ -23447,10 +23400,10 @@ Pause:
 //
 // This function is inteded to be used internally. It may be used in  several
 // settings:
-// * training with ValSubsetSize=0, corresponds  to  "normal"  training  with
+// * training with ValSubsetSize == 0, corresponds  to  "normal"  training  with
 //   termination  criteria  based on S.MaxIts (steps count) and S.WStep (step
 //   size). Training sample is given by TrnSubset/TrnSubsetSize.
-// * training with ValSubsetSize>0, corresponds to  early  stopping  training
+// * training with ValSubsetSize > 0, corresponds to  early  stopping  training
 //   with additional MaxIts/WStep stopping criteria. Training sample is given
 //   by TrnSubset/TrnSubsetSize, validation sample  is  given  by  ValSubset/
 //   ValSubsetSize.
@@ -23488,7 +23441,7 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
    // Parallelism was tried if: imax2(nrestarts, 1) * 100.0 * (2 * wcount) * s->npoints >= smpactivationlevel()
    // Check correctness of parameters
       ae_assert(algokind == 0 || algokind == -1, "MLPTrainNetworkX: unexpected AlgoKind");
-      ae_assert(s->npoints >= 0, "MLPTrainNetworkX: internal error - parameter S is not initialized or is spoiled(S.NPoints<0)");
+      ae_assert(s->npoints >= 0, "MLPTrainNetworkX: internal error - parameter S is not initialized or is spoiled(S.NPoints < 0)");
       if (s->rcpar) {
          ttype = 0;
       } else {
@@ -23502,14 +23455,14 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
       ae_assert(ntype == ttype, "MLPTrainNetworkX: internal error - type of the training network is not similar to network type in trainer object");
       ae_assert(s->nin == nin, "MLPTrainNetworkX: internal error - number of inputs in trainer is not equal to number of inputs in the training network.");
       ae_assert(s->nout == nout, "MLPTrainNetworkX: internal error - number of outputs in trainer is not equal to number of outputs in the training network.");
-      ae_assert(nrestarts >= 0, "MLPTrainNetworkX: internal error - NRestarts<0.");
-      ae_assert(trnsubset->cnt >= trnsubsetsize, "MLPTrainNetworkX: internal error - parameter TrnSubsetSize more than input subset size(Length(TrnSubset)<TrnSubsetSize)");
+      ae_assert(nrestarts >= 0, "MLPTrainNetworkX: internal error - NRestarts < 0.");
+      ae_assert(trnsubset->cnt >= trnsubsetsize, "MLPTrainNetworkX: internal error - parameter TrnSubsetSize more than input subset size(Length(TrnSubset) < TrnSubsetSize)");
       for (i = 0; i < trnsubsetsize; i++) {
-         ae_assert(trnsubset->xZ[i] >= 0 && trnsubset->xZ[i] <= s->npoints - 1, "MLPTrainNetworkX: internal error - parameter TrnSubset contains incorrect index(TrnSubset[I]<0 or TrnSubset[I]>S.NPoints-1)");
+         ae_assert(trnsubset->xZ[i] >= 0 && trnsubset->xZ[i] <= s->npoints - 1, "MLPTrainNetworkX: internal error - parameter TrnSubset contains incorrect index(TrnSubset[I] < 0 or TrnSubset[I] > S.NPoints-1)");
       }
-      ae_assert(valsubset->cnt >= valsubsetsize, "MLPTrainNetworkX: internal error - parameter ValSubsetSize more than input subset size(Length(ValSubset)<ValSubsetSize)");
+      ae_assert(valsubset->cnt >= valsubsetsize, "MLPTrainNetworkX: internal error - parameter ValSubsetSize more than input subset size(Length(ValSubset) < ValSubsetSize)");
       for (i = 0; i < valsubsetsize; i++) {
-         ae_assert(valsubset->xZ[i] >= 0 && valsubset->xZ[i] <= s->npoints - 1, "MLPTrainNetworkX: internal error - parameter ValSubset contains incorrect index(ValSubset[I]<0 or ValSubset[I]>S.NPoints-1)");
+         ae_assert(valsubset->xZ[i] >= 0 && valsubset->xZ[i] <= s->npoints - 1, "MLPTrainNetworkX: internal error - parameter ValSubset contains incorrect index(ValSubset[I] < 0 or ValSubset[I] > S.NPoints-1)");
       }
    // Train
       randomizenetwork = nrestarts > 0;
@@ -23556,9 +23509,9 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
       ae_frame_leave();
       return;
    }
-// Execution with NRestarts=1 or NRestarts=0:
-// * NRestarts=1 means that network is restarted from random position
-// * NRestarts=0 means that network is not randomized
+// Execution with NRestarts == 1 or NRestarts == 0:
+// * NRestarts == 1 means that network is restarted from random position
+// * NRestarts == 0 means that network is not randomized
    ae_assert(nrestarts == 0 || nrestarts == 1, "MLPTrainNetworkX: internal error");
    rep->ngrad = 0;
    rep->nhess = 0;
@@ -23626,7 +23579,6 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
 
 // Internal subroutine for parallelization function MLPFoldCV.
 //
-//
 // Inputs:
 //     S         -   trainer object;
 //     RowSize   -   row size(eitherNIn+NOut or NIn+1);
@@ -23676,7 +23628,7 @@ static void mlptrain_mthreadcv(mlptrainer *s, ae_int_t rowsize, ae_int_t nrestar
       }
       ae_shared_pool_recycle(pooldatacv, &_datacv);
    } else {
-      ae_assert(fold < dfold - 1, "MThreadCV: internal error(Fold>DFold-1).");
+      ae_assert(fold < dfold - 1, "MThreadCV: internal error(Fold > DFold-1).");
    // We expect that minimum number of iterations before convergence is 100.
    // Hence is our approach to evaluation of task complexity.
    // Parallelism was tried if: imax2(nrestarts, 1) * 100.0 * (2 * wcount) * s->npoints >= smpactivationlevel()
@@ -23695,7 +23647,7 @@ static void mlptrain_initmlpetrnsession(multilayerperceptron *individualnetwork,
    NewVector(dummysubset, 0, DT_INT);
 // Prepare network:
 // * copy input network to Session.Network
-// * re-initialize preprocessor and weights if RandomizeNetwork=True
+// * re-initialize preprocessor and weights if RandomizeNetwork == True
    mlpcopy(individualnetwork, &session->network);
    mlptrain_initmlptrnsessions(individualnetwork, true, trainer, &session->mlpsessions);
    vectorsetlengthatleast(&session->trnsubset, trainer->npoints);
@@ -24007,7 +23959,7 @@ static void mlptrain_mlpebagginginternal(mlpensemble *ensemble, RMatrix *xy, ae_
 //     XY          -   training set.
 //     SSize       -   training set size
 //     Decay       -   weight  decay, same as in MLPTrainLBFGS
-//     Restarts    -   number of restarts, >0.
+//     Restarts    -   number of restarts, > 0.
 //                     restarts are counted for each partition separately, so
 //                     total number of restarts will be Restarts*FoldsCount.
 //     WStep       -   stopping criterion, same as in MLPTrainLBFGS
@@ -24040,7 +23992,7 @@ void mlpkfoldcvlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoint
 //     XY          -   training set.
 //     SSize       -   training set size
 //     Decay       -   weight  decay, same as in MLPTrainLBFGS
-//     Restarts    -   number of restarts, >0.
+//     Restarts    -   number of restarts, > 0.
 //                     restarts are counted for each partition separately, so
 //                     total number of restarts will be Restarts*FoldsCount.
 //     FoldsCount  -   number of folds in k-fold cross-validation,
@@ -24073,11 +24025,11 @@ void mlpkfoldcvlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, 
 //                     generalization properties of  ARCHITECTURE,  not  some
 //                     specific network.
 //     NRestarts   -   number of restarts, >= 0:
-//                     * NRestarts>0  means  that  for  each cross-validation
+//                     * NRestarts > 0  means  that  for  each cross-validation
 //                       round   specified  number   of  random  restarts  is
 //                       performed,  with  best  network  being  chosen after
 //                       training.
-//                     * NRestarts=0 is same as NRestarts=1
+//                     * NRestarts == 0 is same as NRestarts == 1
 //     FoldsCount  -   number of folds in k-fold cross-validation:
 //                     * 2 <= FoldsCount <= size of dataset
 //                     * recommended value: 10.
@@ -24138,12 +24090,12 @@ void mlpkfoldcv(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts
       ttype = 1;
    }
    ae_assert(ntype == ttype, "MLPKFoldCV: type of input network is not similar to network type in trainer object");
-   ae_assert(s->npoints >= 0, "MLPKFoldCV: possible trainer S is not initialized(S.NPoints<0)");
+   ae_assert(s->npoints >= 0, "MLPKFoldCV: possible trainer S is not initialized(S.NPoints < 0)");
    mlpproperties(network, &nin, &nout, &wcount);
    ae_assert(s->nin == nin, "MLPKFoldCV:  number of inputs in trainer is not equal to number of inputs in network");
    ae_assert(s->nout == nout, "MLPKFoldCV:  number of outputs in trainer is not equal to number of outputs in network");
-   ae_assert(nrestarts >= 0, "MLPKFoldCV: NRestarts<0");
-   ae_assert(foldscount >= 2, "MLPKFoldCV: FoldsCount<2");
+   ae_assert(nrestarts >= 0, "MLPKFoldCV: NRestarts < 0");
+   ae_assert(foldscount >= 2, "MLPKFoldCV: FoldsCount < 2");
    if (foldscount > s->npoints) {
       foldscount = s->npoints;
    }
@@ -24261,7 +24213,7 @@ void mlpsetdataset(mlptrainer *s, RMatrix *xy, ae_int_t npoints) {
    ae_int_t i;
    ae_int_t j;
    ae_assert(s->nin >= 1, "MLPSetDataset: possible parameter S is not initialized or spoiled(S.NIn <= 0).");
-   ae_assert(npoints >= 0, "MLPSetDataset: NPoint<0");
+   ae_assert(npoints >= 0, "MLPSetDataset: NPoint < 0");
    ae_assert(npoints <= xy->rows, "MLPSetDataset: invalid size of matrix XY(NPoint more then rows of matrix XY)");
    s->datatype = 0;
    s->npoints = npoints;
@@ -24269,17 +24221,17 @@ void mlpsetdataset(mlptrainer *s, RMatrix *xy, ae_int_t npoints) {
       return;
    }
    if (s->rcpar) {
-      ae_assert(s->nout >= 1, "MLPSetDataset: possible parameter S is not initialized or is spoiled(NOut<1 for regression).");
+      ae_assert(s->nout >= 1, "MLPSetDataset: possible parameter S is not initialized or is spoiled(NOut < 1 for regression).");
       ndim = s->nin + s->nout;
       ae_assert(ndim <= xy->cols, "MLPSetDataset: invalid size of matrix XY(too few columns in matrix XY).");
       ae_assert(apservisfinitematrix(xy, npoints, ndim), "MLPSetDataset: parameter XY contains Infinite or NaN.");
    } else {
-      ae_assert(s->nout >= 2, "MLPSetDataset: possible parameter S is not initialized or is spoiled(NClasses<2 for classifier).");
+      ae_assert(s->nout >= 2, "MLPSetDataset: possible parameter S is not initialized or is spoiled(NClasses < 2 for classifier).");
       ndim = s->nin + 1;
       ae_assert(ndim <= xy->cols, "MLPSetDataset: invalid size of matrix XY(too few columns in matrix XY).");
       ae_assert(apservisfinitematrix(xy, npoints, ndim), "MLPSetDataset: parameter XY contains Infinite or NaN.");
       for (i = 0; i < npoints; i++) {
-         ae_assert(iround(xy->xyR[i][s->nin]) >= 0 && iround(xy->xyR[i][s->nin]) < s->nout, "MLPSetDataset: invalid parameter XY(in classifier used nonexistent class number: either XY[.,NIn]<0 or XY[.,NIn] >= NClasses).");
+         ae_assert(iround(xy->xyR[i][s->nin]) >= 0 && iround(xy->xyR[i][s->nin]) < s->nout, "MLPSetDataset: invalid parameter XY(in classifier used nonexistent class number: either XY[.,NIn] < 0 or XY[.,NIn] >= NClasses).");
       }
    }
    matrixsetlengthatleast(&s->densexy, npoints, ndim);
@@ -24330,13 +24282,13 @@ void mlpsetsparsedataset(mlptrainer *s, sparsematrix *xy, ae_int_t npoints) {
    ae_int_t j;
 // Check correctness of the data
    ae_assert(s->nin > 0, "MLPSetSparseDataset: possible parameter S is not initialized or spoiled(S.NIn <= 0).");
-   ae_assert(npoints >= 0, "MLPSetSparseDataset: NPoint<0");
+   ae_assert(npoints >= 0, "MLPSetSparseDataset: NPoint < 0");
    ae_assert(npoints <= sparsegetnrows(xy), "MLPSetSparseDataset: invalid size of sparse matrix XY(NPoint more then rows of matrix XY)");
    if (npoints > 0) {
       t0 = 0;
       t1 = 0;
       if (s->rcpar) {
-         ae_assert(s->nout >= 1, "MLPSetSparseDataset: possible parameter S is not initialized or is spoiled(NOut<1 for regression).");
+         ae_assert(s->nout >= 1, "MLPSetSparseDataset: possible parameter S is not initialized or is spoiled(NOut < 1 for regression).");
          ae_assert(s->nin + s->nout <= sparsegetncols(xy), "MLPSetSparseDataset: invalid size of sparse matrix XY(too few columns in sparse matrix XY).");
          while (sparseenumerate(xy, &t0, &t1, &i, &j, &v)) {
             if (i < npoints && j < s->nin + s->nout) {
@@ -24344,14 +24296,14 @@ void mlpsetsparsedataset(mlptrainer *s, sparsematrix *xy, ae_int_t npoints) {
             }
          }
       } else {
-         ae_assert(s->nout >= 2, "MLPSetSparseDataset: possible parameter S is not initialized or is spoiled(NClasses<2 for classifier).");
+         ae_assert(s->nout >= 2, "MLPSetSparseDataset: possible parameter S is not initialized or is spoiled(NClasses < 2 for classifier).");
          ae_assert(s->nin + 1 <= sparsegetncols(xy), "MLPSetSparseDataset: invalid size of sparse matrix XY(too few columns in sparse matrix XY).");
          while (sparseenumerate(xy, &t0, &t1, &i, &j, &v)) {
             if (i < npoints && j <= s->nin) {
                if (j != s->nin) {
                   ae_assert(isfinite(v), "MLPSetSparseDataset: sparse matrix XY contains Infinite or NaN.");
                } else {
-                  ae_assert(isfinite(v) && iround(v) >= 0 && iround(v) < s->nout, "MLPSetSparseDataset: invalid sparse matrix XY(in classifier used nonexistent class number: either XY[.,NIn]<0 or XY[.,NIn] >= NClasses).");
+                  ae_assert(isfinite(v) && iround(v) >= 0 && iround(v) < s->nout, "MLPSetSparseDataset: invalid sparse matrix XY(in classifier used nonexistent class number: either XY[.,NIn] < 0 or XY[.,NIn] >= NClasses).");
                }
             }
          }
@@ -24378,7 +24330,7 @@ void mlpsetsparsedataset(mlptrainer *s, sparsematrix *xy, ae_int_t npoints) {
 // API: void mlpsetdecay(const mlptrainer &s, const double decay);
 void mlpsetdecay(mlptrainer *s, double decay) {
    ae_assert(isfinite(decay), "MLPSetDecay: parameter Decay contains Infinite or NaN.");
-   ae_assert(decay >= 0.0, "MLPSetDecay: Decay<0.");
+   ae_assert(decay >= 0.0, "MLPSetDecay: Decay < 0.");
    s->decay = decay;
 }
 
@@ -24395,8 +24347,8 @@ void mlpsetdecay(mlptrainer *s, double decay) {
 //                     means stopping when step is sufficiently small.
 //                     MaxIts >= 0.
 //
-// NOTE: by default, WStep=0.005 and MaxIts=0 are used. These values are also
-//       used when MLPSetCond() is called with WStep=0 and MaxIts=0.
+// NOTE: by default, WStep == 0.005 and MaxIts == 0 are used. These values are also
+//       used when MLPSetCond() is called with WStep == 0 and MaxIts == 0.
 //
 // NOTE: these stopping criteria are used for all kinds of neural training  -
 //       from "conventional" networks to early stopping ensembles. When  used
@@ -24407,8 +24359,8 @@ void mlpsetdecay(mlptrainer *s, double decay) {
 // API: void mlpsetcond(const mlptrainer &s, const double wstep, const ae_int_t maxits);
 void mlpsetcond(mlptrainer *s, double wstep, ae_int_t maxits) {
    ae_assert(isfinite(wstep), "MLPSetCond: parameter WStep contains Infinite or NaN.");
-   ae_assert(wstep >= 0.0, "MLPSetCond: WStep<0.");
-   ae_assert(maxits >= 0, "MLPSetCond: MaxIts<0.");
+   ae_assert(wstep >= 0.0, "MLPSetCond: WStep < 0.");
+   ae_assert(maxits >= 0, "MLPSetCond: MaxIts < 0.");
    if (wstep != 0.0 || maxits != 0) {
       s->wstep = wstep;
       s->maxits = maxits;
@@ -24450,8 +24402,8 @@ void mlpsetalgobatch(mlptrainer *s) {
 // API: void mlpcreatetrainer(const ae_int_t nin, const ae_int_t nout, mlptrainer &s);
 void mlpcreatetrainer(ae_int_t nin, ae_int_t nout, mlptrainer *s) {
    SetObj(mlptrainer, s);
-   ae_assert(nin >= 1, "MLPCreateTrainer: NIn<1.");
-   ae_assert(nout >= 1, "MLPCreateTrainer: NOut<1.");
+   ae_assert(nin >= 1, "MLPCreateTrainer: NIn < 1.");
+   ae_assert(nout >= 1, "MLPCreateTrainer: NOut < 1.");
    s->nin = nin;
    s->nout = nout;
    s->rcpar = true;
@@ -24477,8 +24429,8 @@ void mlpcreatetrainer(ae_int_t nin, ae_int_t nout, mlptrainer *s) {
 // API: void mlpcreatetrainercls(const ae_int_t nin, const ae_int_t nclasses, mlptrainer &s);
 void mlpcreatetrainercls(ae_int_t nin, ae_int_t nclasses, mlptrainer *s) {
    SetObj(mlptrainer, s);
-   ae_assert(nin >= 1, "MLPCreateTrainerCls: NIn<1.");
-   ae_assert(nclasses >= 2, "MLPCreateTrainerCls: NClasses<2.");
+   ae_assert(nin >= 1, "MLPCreateTrainerCls: NIn < 1.");
+   ae_assert(nclasses >= 2, "MLPCreateTrainerCls: NClasses < 2.");
    s->nin = nin;
    s->nout = nclasses;
    s->rcpar = false;
@@ -24503,10 +24455,10 @@ void mlpcreatetrainercls(ae_int_t nin, ae_int_t nclasses, mlptrainer *s) {
 //                     output/classes as was specified during creation of the
 //                     trainer object.
 //     NRestarts   -   number of restarts, >= 0:
-//                     * NRestarts>0 means that specified  number  of  random
+//                     * NRestarts > 0 means that specified  number  of  random
 //                       restarts are performed, best network is chosen after
 //                       training
-//                     * NRestarts=0 means that current state of the  network
+//                     * NRestarts == 0 means that current state of the  network
 //                       is used for training.
 //
 // Outputs:
@@ -24529,7 +24481,7 @@ void mlptrainnetwork(mlptrainer *s, multilayerperceptron *network, ae_int_t nres
    ae_frame_make(&_frame_block);
    SetObj(mlpreport, rep);
    NewObj(ae_shared_pool, trnpool);
-   ae_assert(s->npoints >= 0, "MLPTrainNetwork: parameter S is not initialized or is spoiled(S.NPoints<0)");
+   ae_assert(s->npoints >= 0, "MLPTrainNetwork: parameter S is not initialized or is spoiled(S.NPoints < 0)");
    if (!mlpissoftmax(network)) {
       ntype = 0;
    } else {
@@ -24544,7 +24496,7 @@ void mlptrainnetwork(mlptrainer *s, multilayerperceptron *network, ae_int_t nres
    mlpproperties(network, &nin, &nout, &wcount);
    ae_assert(s->nin == nin, "MLPTrainNetwork: number of inputs in trainer is not equal to number of inputs in network");
    ae_assert(s->nout == nout, "MLPTrainNetwork: number of outputs in trainer is not equal to number of outputs in network");
-   ae_assert(nrestarts >= 0, "MLPTrainNetwork: NRestarts<0.");
+   ae_assert(nrestarts >= 0, "MLPTrainNetwork: NRestarts < 0.");
 // Train
    mlptrain_mlptrainnetworkx(s, nrestarts, -1, &s->subset, -1, &s->subset, 0, network, rep, true, &trnpool);
    ae_frame_leave();
@@ -24605,7 +24557,7 @@ void mlpstarttraining(mlptrainer *s, multilayerperceptron *network, bool randoms
    ae_int_t wcount;
    ae_int_t ntype;
    ae_int_t ttype;
-   ae_assert(s->npoints >= 0, "MLPStartTraining: parameter S is not initialized or is spoiled(S.NPoints<0)");
+   ae_assert(s->npoints >= 0, "MLPStartTraining: parameter S is not initialized or is spoiled(S.NPoints < 0)");
    if (!mlpissoftmax(network)) {
       ntype = 0;
    } else {
@@ -24694,7 +24646,7 @@ bool mlpcontinuetraining(mlptrainer *s, multilayerperceptron *network) {
    ae_int_t ntype;
    ae_int_t ttype;
    bool result;
-   ae_assert(s->npoints >= 0, "MLPContinueTraining: parameter S is not initialized or is spoiled(S.NPoints<0)");
+   ae_assert(s->npoints >= 0, "MLPContinueTraining: parameter S is not initialized or is spoiled(S.NPoints < 0)");
    if (s->rcpar) {
       ttype = 0;
    } else {
@@ -24724,7 +24676,7 @@ bool mlpcontinuetraining(mlptrainer *s, multilayerperceptron *network) {
 //     XY          -   training set
 //     NPoints     -   training set size
 //     Decay       -   weight decay coefficient, >= 0.001
-//     Restarts    -   restarts, >0.
+//     Restarts    -   restarts, > 0.
 //
 // Outputs:
 //     Ensemble    -   trained model
@@ -24732,7 +24684,7 @@ bool mlpcontinuetraining(mlptrainer *s, multilayerperceptron *network) {
 //                     * -2, if there is a point with class number
 //                           outside of [0..NClasses-1].
 //                     * -1, if incorrect parameters was passed
-//                           (NPoints<0, Restarts<1).
+//                           (NPoints < 0, Restarts < 1).
 //                     *  2, if task has been solved.
 //     Rep         -   training report.
 //     OOBErrors   -   out-of-bag generalization error estimate
@@ -24753,18 +24705,18 @@ void mlpebagginglm(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double 
 //     XY          -   training set
 //     NPoints     -   training set size
 //     Decay       -   weight decay coefficient, >= 0.001
-//     Restarts    -   restarts, >0.
+//     Restarts    -   restarts, > 0.
 //     WStep       -   stopping criterion, same as in MLPTrainLBFGS
 //     MaxIts      -   stopping criterion, same as in MLPTrainLBFGS
 //
 // Outputs:
 //     Ensemble    -   trained model
 //     Info        -   return code:
-//                     * -8, if both WStep=0 and MaxIts=0
+//                     * -8, if both WStep == 0 and MaxIts == 0
 //                     * -2, if there is a point with class number
 //                           outside of [0..NClasses-1].
 //                     * -1, if incorrect parameters was passed
-//                           (NPoints<0, Restarts<1).
+//                           (NPoints < 0, Restarts < 1).
 //                     *  2, if task has been solved.
 //     Rep         -   training report.
 //     OOBErrors   -   out-of-bag generalization error estimate
@@ -24784,7 +24736,7 @@ void mlpebagginglbfgs(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, doub
 //     XY          -   training set
 //     NPoints     -   training set size
 //     Decay       -   weight decay coefficient, >= 0.001
-//     Restarts    -   restarts, >0.
+//     Restarts    -   restarts, > 0.
 //
 // Outputs:
 //     Ensemble    -   trained model
@@ -24792,7 +24744,7 @@ void mlpebagginglbfgs(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, doub
 //                     * -2, if there is a point with class number
 //                           outside of [0..NClasses-1].
 //                     * -1, if incorrect parameters was passed
-//                           (NPoints<0, Restarts<1).
+//                           (NPoints < 0, Restarts < 1).
 //                     *  6, if task has been solved.
 //     Rep         -   training report.
 //     OOBErrors   -   out-of-bag generalization error estimate
@@ -24902,9 +24854,9 @@ void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double de
 //                     inputs and outputs/classes  as  was  specified  during
 //                     creation of the trainer object.
 //     NRestarts   -   number of restarts, >= 0:
-//                     * NRestarts>0 means that specified  number  of  random
+//                     * NRestarts > 0 means that specified  number  of  random
 //                       restarts are performed during each ES round;
-//                     * NRestarts=0 is silently replaced by 1.
+//                     * NRestarts == 0 is silently replaced by 1.
 //
 // Outputs:
 //     Ensemble    -   trained ensemble;
@@ -24931,7 +24883,7 @@ void mlptrainensemblees(mlptrainer *s, mlpensemble *ensemble, ae_int_t nrestarts
    SetObj(mlpreport, rep);
    NewObj(ae_shared_pool, esessions);
    NewObj(modelerrors, tmprep);
-   ae_assert(s->npoints >= 0, "MLPTrainEnsembleES: parameter S is not initialized or is spoiled(S.NPoints<0)");
+   ae_assert(s->npoints >= 0, "MLPTrainEnsembleES: parameter S is not initialized or is spoiled(S.NPoints < 0)");
    if (!mlpeissoftmax(ensemble)) {
       ntype = 0;
    } else {
@@ -24947,7 +24899,7 @@ void mlptrainensemblees(mlptrainer *s, mlpensemble *ensemble, ae_int_t nrestarts
    ae_assert(s->nin == nin, "MLPTrainEnsembleES: number of inputs in trainer is not equal to number of inputs in ensemble network");
    nout = mlpgetoutputscount(&ensemble->network);
    ae_assert(s->nout == nout, "MLPTrainEnsembleES: number of outputs in trainer is not equal to number of outputs in ensemble network");
-   ae_assert(nrestarts >= 0, "MLPTrainEnsembleES: NRestarts<0.");
+   ae_assert(nrestarts >= 0, "MLPTrainEnsembleES: NRestarts < 0.");
 // Initialize parameter Rep
    rep->relclserror = 0.0;
    rep->avgce = 0.0;
@@ -25186,7 +25138,6 @@ DefClass(mlpreport, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(av
 DefClass(mlpcvreport, DecVal(relclserror) DecVal(avgce) DecVal(rmserror) DecVal(avgerror) DecVal(avgrelerror))
 
 // Trainer object for neural network.
-//
 // You should not try to access fields of this object directly -  use  ALGLIB
 // functions to work with this object.
 DefClass(mlptrainer, )

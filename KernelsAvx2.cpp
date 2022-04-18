@@ -994,11 +994,11 @@ void avx2_rgemvx_transposed(const ae_int_t m, const ae_int_t n, const double alp
 // Unused rows and columns in [LENGTH,ROUND_LENGTH) range are filled by zeros;
 // unused cols in [ROUND_LENGTH,BLOCK_SIZE) range are ignored.
 //
-// * op=0 means that source is an WIDTH*LENGTH matrix stored with  src_stride
+// * op == 0 means that source is an WIDTH*LENGTH matrix stored with  src_stride
 //   stride. The matrix is NOT transposed on load.
-// * op=1 means that source is an LENGTH*WIDTH matrix  stored with src_stride
+// * op == 1 means that source is an LENGTH*WIDTH matrix  stored with src_stride
 //   that is loaded with transposition
-// * present version of the function supports only MICRO_SIZE=2, the behavior
+// * present version of the function supports only MICRO_SIZE == 2, the behavior
 //   is undefined for other micro sizes.
 // * the target is properly aligned; the source can be unaligned.
 //
@@ -1016,7 +1016,7 @@ ae_int_t avx2_ablasf_packblkh(const double *src, ae_int_t src_stride, ae_int_t o
       const double *src1 = src + src_stride;
       double *dst1 = dst + block_size;
       if (opsrc_width == 2) {
-      // Width=2
+      // Width == 2
          for (i = 0; i < len8; i += 8) {
             _mm256_store_pd(dst + i, _mm256_loadu_pd(src + i));
             _mm256_store_pd(dst + i + 4, _mm256_loadu_pd(src + i + 4));
@@ -1028,7 +1028,7 @@ ae_int_t avx2_ablasf_packblkh(const double *src, ae_int_t src_stride, ae_int_t o
             dst1[i] = src1[i];
          }
       } else {
-      // Width=1, pad by zeros
+      // Width == 1, pad by zeros
          __m256d vz = _mm256_setzero_pd();
          for (i = 0; i < len8; i += 8) {
             _mm256_store_pd(dst + i, _mm256_loadu_pd(src + i));
@@ -1050,7 +1050,7 @@ ae_int_t avx2_ablasf_packblkh(const double *src, ae_int_t src_stride, ae_int_t o
       const double *srci = src;
       double *dst1 = dst + block_size;
       if (opsrc_width == 2) {
-      // Width=2
+      // Width == 2
          for (i = 0; i < len4; i += 4) {
             __m128d s0 = _mm_loadu_pd(srci), s1 = _mm_loadu_pd(srci + src_stride);
             __m128d s2 = _mm_loadu_pd(srci + stride2), s3 = _mm_loadu_pd(srci + stride3);
@@ -1066,7 +1066,7 @@ ae_int_t avx2_ablasf_packblkh(const double *src, ae_int_t src_stride, ae_int_t o
             srci += src_stride;
          }
       } else {
-      // Width=1, pad by zeros
+      // Width == 1, pad by zeros
          __m128d vz = _mm_setzero_pd();
          for (i = 0; i < len4; i += 4) {
             __m128d s0 = _mm_load_sd(srci), s1 = _mm_load_sd(srci + src_stride);
@@ -1101,7 +1101,7 @@ ae_int_t avx2_ablasf_packblkh32(const double *src, ae_int_t src_stride, ae_int_t
       const double *src1 = src + src_stride;
       double *dst1 = dst + 32;
       if (opsrc_width == 2) {
-      // Width=2
+      // Width == 2
          for (i = 0; i < 32; i += 8) {
             _mm256_store_pd(dst + i, _mm256_loadu_pd(src + i));
             _mm256_store_pd(dst + i + 4, _mm256_loadu_pd(src + i + 4));
@@ -1109,7 +1109,7 @@ ae_int_t avx2_ablasf_packblkh32(const double *src, ae_int_t src_stride, ae_int_t
             _mm256_store_pd(dst1 + i + 4, _mm256_loadu_pd(src1 + i + 4));
          }
       } else {
-      // Width=1, pad by zeros
+      // Width == 1, pad by zeros
          __m256d vz = _mm256_setzero_pd();
          for (i = 0; i < 32; i += 8) {
             _mm256_store_pd(dst + i, _mm256_loadu_pd(src + i));
@@ -1126,7 +1126,7 @@ ae_int_t avx2_ablasf_packblkh32(const double *src, ae_int_t src_stride, ae_int_t
       const double *srci = src;
       double *dst1 = dst + 32;
       if (opsrc_width == 2) {
-      // Width=2
+      // Width == 2
          for (i = 0; i < 32; i += 4) {
             __m128d s0 = _mm_loadu_pd(srci), s1 = _mm_loadu_pd(srci + src_stride);
             __m128d s2 = _mm_loadu_pd(srci + stride2), s3 = _mm_loadu_pd(srci + stride3);
@@ -1137,7 +1137,7 @@ ae_int_t avx2_ablasf_packblkh32(const double *src, ae_int_t src_stride, ae_int_t
             srci += stride4;
          }
       } else {
-      // Width=1, pad by zeros
+      // Width == 1, pad by zeros
          __m128d vz = _mm_setzero_pd();
          for (i = 0; i < 32; i += 4) {
             __m128d s0 = _mm_load_sd(srci), s1 = _mm_load_sd(srci + src_stride);
@@ -1154,13 +1154,13 @@ ae_int_t avx2_ablasf_packblkh32(const double *src, ae_int_t src_stride, ae_int_t
 }
 
 // Computes  product   A*transpose(B)  of two MICRO_SIZE*ROUND_LENGTH rowwise
-// 'horizontal' matrices, stored with stride=block_size, and writes it to the
+// 'horizontal' matrices, stored with stride == block_size, and writes it to the
 // row-wise matrix C.
 //
 // ROUND_LENGTH is expected to be properly SIMD-rounded length,  as  returned
 // by avx2_ablasf_packblkh().
 //
-// Present version of the function supports only MICRO_SIZE=2,  the  behavior
+// Present version of the function supports only MICRO_SIZE == 2,  the  behavior
 // is undefined for other micro sizes.
 //
 // Requires AVX2, does NOT check its presense.
@@ -1203,13 +1203,13 @@ void avx2_ablasf_dotblkh(const double *src_a, const double *src_b, ae_int_t roun
    _mm_store_pd(dst + dst_stride, _mm_add_pd(_mm256_castpd256_pd128(sum1), _mm256_extractf128_pd(sum1, 1)));
 }
 
-// Y := alpha*X + beta*Y
+// Y = alpha*X + beta*Y
 //
 // Requires AVX2, does NOT check its presense.
 // ALGLIB Routine: Copyright 19.07.2021 by Sergey Bochkanov
 void avx2_ablasf_daxpby(ae_int_t n, double alpha, const double *src, double beta, double *dst) {
    if (beta == 1.0) {
-   // The most optimized case: DST := alpha*SRC + DST
+   // The most optimized case: DST = alpha*SRC + DST
    //
    // First, we process leading elements with generic C code until DST is aligned.
    // Then, we process central part, assuming that DST is properly aligned.
@@ -1230,7 +1230,7 @@ void avx2_ablasf_daxpby(ae_int_t n, double alpha, const double *src, double beta
       for (i = n4; i < n; i++)
          dst[i] += alpha * src[i];
    } else if (beta != 0.0) {
-   // Well optimized: DST := alpha*SRC + beta*DST
+   // Well optimized: DST = alpha*SRC + beta*DST
       ae_int_t i, n4;
       __m256d avx_alpha = _mm256_set1_pd(alpha);
       __m256d avx_beta = _mm256_set1_pd(beta);
@@ -1249,7 +1249,7 @@ void avx2_ablasf_daxpby(ae_int_t n, double alpha, const double *src, double beta
       for (i = n4; i < n; i++)
          dst[i] = alpha * src[i] + beta * dst[i];
    } else {
-   // Easy case: DST := alpha*SRC
+   // Easy case: DST = alpha*SRC
       ae_int_t i;
       for (i = 0; i < n; i++)
          dst[i] = alpha * src[i];
@@ -1357,7 +1357,7 @@ bool avx2_spchol_updatekernel4444(double *rowstorage, ae_int_t offss, ae_int_t s
    v_w2 = _mm256_permute2f128_pd(u23_lo, u01_lo, 0x13);
    v_w3 = _mm256_permute2f128_pd(u23_hi, u01_hi, 0x13);
 //
-// Compute update S:= S + row_scatter(U*W)
+// Compute update S = S + row_scatter(U*W)
 //
    if (sheight == uheight) {
    // No row scatter, the most efficient code

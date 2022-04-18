@@ -334,7 +334,6 @@ namespace alglib {
 // * nonc1suspected
 // * badgradsuspected
 //
-//
 // ==== WHAT CAN BE DETECTED WITH OptGuard INTEGRITY CHECKER ====
 //
 // Following  types  of  errors  in your target function (constraints) can be
@@ -359,7 +358,6 @@ namespace alglib {
 // even one step  or result in optimizing stopping  too  early,  as  soon  as
 // actual descent direction becomes too different from one suggested by user-
 // supplied gradient.
-//
 //
 // ==== WHAT IS REPORTED ====
 //
@@ -422,7 +420,6 @@ DefClass(optguardreport, DecVal(nonc0suspected) DecVal(nonc0test0positive) DecVa
 // searches and monitors estimate of the Lipschitz  constant.  Sudden  spikes
 // usually indicate that discontinuity was detected.
 //
-//
 // ==== WHAT IS REPORTED ====
 //
 // Actually, report retrieval function returns TWO report structures:
@@ -444,7 +441,7 @@ DefClass(optguardreport, DecVal(nonc0suspected) DecVal(nonc0test0positive) DecVa
 // * stp[], f[] - arrays of length CNT which store step lengths and  function
 //   values at these points; f[i] is evaluated in x0+stp[i]*d.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -465,7 +462,6 @@ DefClass(optguardnonc0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecVar(d)
 // test is less powerful than test #1, but it does  not  depend  on  gradient
 // values  and  thus  it  is  more  robust  against  artifacts  introduced by
 // numerical differentiation.
-//
 //
 // ==== WHAT IS REPORTED ====
 //
@@ -488,7 +484,7 @@ DefClass(optguardnonc0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecVar(d)
 // * stp[], f[] - arrays of length CNT which store step lengths and  function
 //   values at these points; f[i] is evaluated in x0+stp[i]*d.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -519,7 +515,6 @@ DefClass(optguardnonc1test0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecV
 // continuity, which makes it more informative than #0, which just tells that
 // continuity is violated.
 //
-//
 // ==== WHAT IS REPORTED ====
 //
 // Actually, report retrieval function returns TWO report structures:
@@ -543,7 +538,7 @@ DefClass(optguardnonc1test0report, DecVal(positive) DecVal(fidx) DecVar(x0) DecV
 //   values at these points; g[i] is evaluated in  x0+stp[i]*d  and  contains
 //   vidx-th component of the gradient.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -567,10 +562,10 @@ static const double optserv_ogminrating1 = 50.0;
 // bcerr to the maximum scaled violation, bcidx to the index of the violating
 // constraint.
 //
-// if bcerr=0 (say, if no constraints are violated) then bcidx=-1.
+// if bcerr == 0 (say, if no constraints are violated) then bcidx == -1.
 //
-// If nonunits=false then s[] is not referenced at all (assumed unit).
-// ALGLIB: Copyright 7.11.2018 by Sergey Bochkanov
+// If nonunits == false then s[] is not referenced at all (assumed unit).
+// ALGLIB: Copyright 07.11.2018 by Sergey Bochkanov
 void checkbcviolation(BVector *hasbndl, RVector *bndl, BVector *hasbndu, RVector *bndu, RVector *x, ae_int_t n, RVector *s, bool nonunits, double *bcerr, ae_int_t *bcidx) {
    ae_int_t i;
    double vs;
@@ -614,10 +609,10 @@ void checkbcviolation(BVector *hasbndl, RVector *bndl, BVector *hasbndu, RVector
 // index of the most violating constraint (row indexes of CLEIC are mapped to
 // the indexes of the "original" constraints via LCSrcIdx[] array.
 //
-// if lcerr=0 (say, if no constraints are violated) then lcidx=-1.
+// if lcerr == 0 (say, if no constraints are violated) then lcidx == -1.
 //
-// If nonunits=false then s[] is not referenced at all (assumed unit).
-// ALGLIB: Copyright 7.11.2018 by Sergey Bochkanov
+// If nonunits == false then s[] is not referenced at all (assumed unit).
+// ALGLIB: Copyright 07.11.2018 by Sergey Bochkanov
 void checklcviolation(RMatrix *cleic, ZVector *lcsrcidx, ae_int_t nec, ae_int_t nic, RVector *x, ae_int_t n, double *lcerr, ae_int_t *lcidx) {
    ae_int_t i;
    ae_int_t j;
@@ -656,10 +651,10 @@ void checklcviolation(RMatrix *cleic, ZVector *lcsrcidx, ae_int_t nec, ae_int_t 
 // On output it sets nlcerr to the scaled violation, nlcidx to the index
 // of the most violating constraint in [0,NG+NH-1] range.
 //
-// if nlcerr=0 (say, if no constraints are violated) then nlcidx=-1.
+// if nlcerr == 0 (say, if no constraints are violated) then nlcidx == -1.
 //
-// If nonunits=false then s[] is not referenced at all (assumed unit).
-// ALGLIB: Copyright 7.11.2018 by Sergey Bochkanov
+// If nonunits == false then s[] is not referenced at all (assumed unit).
+// ALGLIB: Copyright 07.11.2018 by Sergey Bochkanov
 void checknlcviolation(RVector *fi, ae_int_t ng, ae_int_t nh, double *nlcerr, ae_int_t *nlcidx) {
    ae_int_t i;
    double v;
@@ -686,7 +681,7 @@ void checknlcviolation(RVector *fi, ae_int_t ng, ae_int_t nh, double *nlcerr, ae
 // passing them to this function.
 //
 // The function checks scaled values, but reports unscaled errors.
-// ALGLIB: Copyright 7.11.2018 by Sergey Bochkanov
+// ALGLIB: Copyright 07.11.2018 by Sergey Bochkanov
 void unscaleandchecknlcviolation(RVector *fi, RVector *fscales, ae_int_t ng, ae_int_t nh, double *nlcerr, ae_int_t *nlcidx) {
    ae_int_t i;
    double v;
@@ -724,7 +719,7 @@ void trimprepare(double f, double *threshold) {
 // This subroutine is used to "trim" target function, i.e. to do following
 // transformation:
 //
-//                    { {F,G}          if F<Threshold
+//                    { {F,G}          if F < Threshold
 //     {F_tr, G_tr} = {
 //                    { {Threshold, 0} if F >= Threshold
 //
@@ -807,8 +802,8 @@ bool enforceboundaryconstraints(RVector *x, RVector *bl, BVector *havebl, RVecto
 // Outputs:
 //     G       -   projection of G. Components of G which satisfy one of the
 //                 following
-//                     (1) (X[I] <= BndL[I]) and (G[I]>0), OR
-//                     (2) (X[I] >= BndU[I]) and (G[I]<0)
+//                     (1) (X[I] <= BndL[I]) and (G[I] > 0), OR
+//                     (2) (X[I] >= BndU[I]) and (G[I] < 0)
 //                 are replaced by zeros.
 //
 // NOTE 1: this function assumes that constraints are feasible. It throws
@@ -887,8 +882,8 @@ void projectgradientintobc(RVector *x, RVector *g, RVector *bl, BVector *havebl,
 //
 // Outputs:
 //     VariableToFreeze:
-//                     * negative value     = step is unbounded, ValueToFreeze=0,
-//                                            MaxStepLen=0.
+//                     * negative value     = step is unbounded, ValueToFreeze == 0,
+//                                            MaxStepLen == 0.
 //                     * non-negative value = at least one constraint, given by
 //                                            this parameter, will  be  activated
 //                                            upon performing maximum step.
@@ -954,7 +949,7 @@ void calculatestepbound(RVector *x, RVector *d, double alpha, RVector *bndl, BVe
 // exactly feasible with respect to boundary constraints.
 //
 // NOTE 1: this function does NOT handle and check linear equality constraints
-// NOTE 2: when StepTaken=MaxStepLen we always activate at least one constraint
+// NOTE 2: when StepTaken == MaxStepLen we always activate at least one constraint
 //
 // Inputs:
 //     X           -   array[NMain+NSlack], final point to postprocess
@@ -1034,7 +1029,7 @@ ae_int_t postprocessboundedstep(RVector *x, RVector *xprev, RVector *bndl, BVect
 // It is done by zeroing some components of the search direction D.  D[i]  is
 // zeroed when both (a) and (b) are true:
 // a) corresponding X[i] is exactly at the boundary
-// b) |D[i]*S[i]| <= DropTol*Sqrt(SUM(D[i]^2*S[I]^2))
+// b) |D[i]*S[i]| <= DropTol*sqrt(SUM(D[i]^2*S[I]^2))
 //
 // D  can  be  step  direction , antigradient, gradient, or anything similar.
 // Sign of D does not matter, nor matters step length.
@@ -1156,7 +1151,7 @@ ae_int_t numberofchangedconstraints(RVector *x, RVector *xprev, RVector *bndl, B
 //     Tmp0    -   possible preallocated buffer, automatically resized
 //
 // Result:
-//     Sqrt(SUM(Err^2))
+//     sqrt(SUM(Err^2))
 // ALGLIB: Copyright 17.09.2015 by Sergey Bochkanov
 static double optserv_feasibilityerror(RMatrix *ce, RVector *x, ae_int_t nmain, ae_int_t nslack, ae_int_t k, RVector *tmp0) {
    ae_int_t i;
@@ -1188,7 +1183,7 @@ static double optserv_feasibilityerror(RMatrix *ce, RVector *x, ae_int_t nmain, 
 //     Tmp0    -   possible preallocated buffer, automatically resized
 //
 // Result:
-//     Err     -   Sqrt(SUM(Err^2))
+//     Err     -   sqrt(SUM(Err^2))
 //     Grad    -   error gradient with respect to X, array[NMain+NSlack]
 // ALGLIB: Copyright 17.09.2015 by Sergey Bochkanov
 static double optserv_feasibilityerrorgrad(RMatrix *ce, RVector *x, ae_int_t nmain, ae_int_t nslack, ae_int_t k, RVector *grad, RVector *tmp0) {
@@ -1225,7 +1220,7 @@ static double optserv_feasibilityerrorgrad(RMatrix *ce, RVector *x, ae_int_t nma
 //                     then i-th bound is not present
 //     NMain       -   number of main variables
 //     NSlack      -   number of slack variables
-//     CE          -   array[K,NMain+NSlack+1], equality  constraints CE*x=b.
+//     CE          -   array[K,NMain+NSlack+1], equality  constraints CE*x == b.
 //                     Rows contain constraints, first  NMain+NSlack  columns
 //                     contain coefficients before X[], last  column  contain
 //                     right part.
@@ -1318,7 +1313,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
       ae_frame_leave();
       return result;
    }
-// Scale rows of CE in such way that max(CE[i,0..nmain+nslack-1])=1 for any i=0..k-1
+// Scale rows of CE in such way that max(CE[i,0..nmain+nslack-1]) == 1 for any i = 0..k-1
    for (i = 0; i < k; i++) {
       v = 0.0;
       for (j = 0; j < nmain + nslack; j++) {
@@ -1348,7 +1343,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
          colnorms.xR[i] += sqr(ce->xyR[j][i]);
       }
    }
-// K>0, we have linear equality constraints combined with bound constraints.
+// K > 0, we have linear equality constraints combined with bound constraints.
 //
 // Try to find feasible point as minimizer of the quadratic function
 //     F(x) = 0.5*||CE*x-b||^2 = 0.5*x'*(CE'*CE)*x - (b'*CE)*x + 0.5*b'*b
@@ -1356,7 +1351,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
 // the slack variables. BTW, we drop constant term because it does not
 // actually influences on the solution.
 //
-// Below we will assume that K>0.
+// Below we will assume that K > 0.
    itswithintolerance = 0;
    badits = 0;
    itscount = 0;
@@ -1401,9 +1396,9 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    // * calculate unrestricted Newton step to point XM (which may be infeasible)
    //   calculate MaxStepLen = largest step in direction of XM which retains feasibility.
    // * perform bounded step from X to XN:
-   //   a) XN=XM                  (if XM is feasible)
-   //   b) XN=X-MaxStepLen*(XM-X) (otherwise)
-   // * X := XN
+   //   a) XN == XM                  (if XM is feasible)
+   //   b) XN == X-MaxStepLen*(XM-X) (otherwise)
+   // * X = XN
    // * if XM (Newton step subject to currently active constraints) was feasible, goto Stage 2
    // * repeat Stage 1
    //
@@ -1415,7 +1410,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    //                                                       [ xa ]
    //         to INACTIVE constraints, and CEa/Xa correspond to the ACTIVE ones.
    //
-   //         Now, instead of F=0.5*x'*(CE'*CE)*x - (b'*CE)*x + 0.5*b'*b, we have
+   //         Now, instead of F == 0.5*x'*(CE'*CE)*x - (b'*CE)*x + 0.5*b'*b, we have
    //         F(xi) = 0.5*(CEi*xi,CEi*xi) + (CEa*xa-b,CEi*xi) + (0.5*CEa*xa-b,CEa*xa).
    //         Here xa is considered constant, i.e. we optimize with respect to xi, leaving xa fixed.
    //
@@ -1619,7 +1614,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
       // Thus, we perform optimization in two stages:
       // a) perform bounded Newton step, i.e. step in the Newton direction
       //    until activation of the first constraint
-      // b) in case (MaxStepLen>0)and(MaxStepLen<1), perform additional iteration
+      // b) in case (MaxStepLen > 0)and(MaxStepLen < 1), perform additional iteration
       //    of the Armijo line search in the rest of the Newton direction.
          calculatestepbound(x, &newtonstep, 1.0, bndl, havebndl, bndu, havebndu, nmain, nslack, &vartofreeze, &valtofreeze, &maxsteplen);
          if (vartofreeze >= 0 && maxsteplen == 0.0) {
@@ -1687,15 +1682,15 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    // * let XM be exact minimum of F along -PG (XM may be infeasible).
    //   calculate MaxStepLen = largest step in direction of -PG which retains feasibility.
    // * perform bounded step from X to XN:
-   //   a) XN=XM              (if XM is feasible)
-   //   b) XN=X-MaxStepLen*PG (otherwise)
-   // * X := XN
+   //   a) XN == XM              (if XM is feasible)
+   //   b) XN == X-MaxStepLen*PG (otherwise)
+   // * X = XN
    // * stop after specified number of iterations or when no new constraints was activated
    //
    // NOTES:
    // * grad(F) = (CE'*CE)*x - (b'*CE)^T
    // * CE[i] denotes I-th row of CE
-   // * XM = X+stp*(-PG) where stp=(grad(F(X)),PG)/(CE*PG,CE*PG).
+   // * XM = X+stp*(-PG) where stp == (grad(F(X)),PG)/(CE*PG,CE*PG).
    //   Here PG is a projected gradient, but in fact it can be arbitrary non-zero
    //   direction vector - formula for minimum of F along PG still will be correct.
       werechangesinconstraints = false;
@@ -1784,7 +1779,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    return result;
 }
 
-//     This function checks that input derivatives are right. First it scales
+// This function checks that input derivatives are right. First it scales
 // parameters DF0 and DF1 from segment [A;B] to [0;1]. Then it builds Hermite
 // spline and derivative of it in 0.5. Search scale as Max(DF0,DF1, |F0-F1|).
 // Right derivative has to satisfy condition:
@@ -1871,18 +1866,18 @@ bool derivativecheck(double f0, double df0, double f1, double df1, double f, dou
 // Outputs:
 //     D1Est   -   estimate of D1 sign,  accounting  for  possible  numerical
 //                 errors:
-//                 * >0    means "almost surely positive" (D1>0 and large)
-//                 * <0    means "almost surely negative" (D1<0 and large)
-//                 * =0    means "pessimistic estimate  of  numerical  errors
-//                         in D1 is larger than magnitude of D1 itself; it is
-//                         impossible to reliably distinguish D1 from zero".
+//                 * > 0  means "almost surely positive" (D1 > 0 and large)
+//                 * < 0  means "almost surely negative" (D1 < 0 and large)
+//                 * == 0 means "pessimistic estimate  of  numerical  errors
+//                        in D1 is larger than magnitude of D1 itself; it is
+//                        impossible to reliably distinguish D1 from zero".
 //     D2Est   -   estimate of D2 sign,  accounting  for  possible  numerical
 //                 errors:
-//                 * >0    means "almost surely positive" (D2>0 and large)
-//                 * <0    means "almost surely negative" (D2<0 and large)
-//                 * =0    means "pessimistic estimate  of  numerical  errors
-//                         in D2 is larger than magnitude of D2 itself; it is
-//                         impossible to reliably distinguish D2 from zero".
+//                 * > 0  means "almost surely positive" (D2 > 0 and large)
+//                 * < 0  means "almost surely negative" (D2 < 0 and large)
+//                 * == 0 means "pessimistic estimate  of  numerical  errors
+//                        in D2 is larger than magnitude of D2 itself; it is
+//                        impossible to reliably distinguish D2 from zero".
 // ALGLIB: Copyright 14.05.2014 by Sergey Bochkanov
 void estimateparabolicmodel(double absasum, double absasum2, double mx, double mb, double md, double d1, double d2, ae_int_t *d1est, ae_int_t *d2est) {
    double d1esterror;
@@ -1894,9 +1889,9 @@ void estimateparabolicmodel(double absasum, double absasum2, double mx, double m
    *d2est = 0;
 // Error estimates:
 //
-// * error in D1=d'*(A*x+b) is estimated as
+// * error in D1 == d'*(A*x+b) is estimated as
 //   ED1 = eps*MAX_ABS(D)*(MAX_ABS(X)*ENORM(A)+MAX_ABS(B))
-// * error in D2=0.5*d'*A*d is estimated as
+// * error in D2 == 0.5*d'*A*d is estimated as
 //   ED2 = eps*MAX_ABS(D)^2*ENORM(A)
 //
 // Here ENORM(A) is some pseudo-norm which reflects the way numerical
@@ -1926,7 +1921,7 @@ void estimateparabolicmodel(double absasum, double absasum2, double mx, double m
 }
 
 // This function calculates inexact rank-K preconditioner for Hessian  matrix
-// H=D+W'*C*W, where:
+// H == D+W'*C*W, where:
 // * H is a Hessian matrix, which is approximated by D/W/C
 // * D is a diagonal matrix with positive entries
 // * W is a rank-K correction
@@ -1974,7 +1969,7 @@ void inexactlbfgspreconditioner(RVector *s, ae_int_t n, RVector *d, RVector *c, 
       ae_assert(d->xR[i] > 0.0, "InexactLBFGSPreconditioner: D[] <= 0");
    }
    for (i = 0; i < k; i++) {
-      ae_assert(c->xR[i] >= 0.0, "InexactLBFGSPreconditioner: C[]<0");
+      ae_assert(c->xR[i] >= 0.0, "InexactLBFGSPreconditioner: C[] < 0");
    }
 // Reorder linear terms according to increase of second derivative.
 // Fill Norms[] array.
@@ -2035,7 +2030,7 @@ void inexactlbfgspreconditioner(RVector *s, ae_int_t n, RVector *d, RVector *c, 
 }
 
 // This function prepares exact low-rank preconditioner  for  Hessian  matrix
-// H=D+W'*C*W, where:
+// H == D+W'*C*W, where:
 // * H is a Hessian matrix, which is approximated by D/W/C
 // * D is a diagonal matrix with positive entries
 // * W is a rank-K correction
@@ -2062,7 +2057,7 @@ void preparelowrankpreconditioner(RVector *d, RVector *c, RMatrix *w, ae_int_t n
       ae_assert(d->xR[i] > 0.0, "PrepareLowRankPreconditioner: D[] <= 0");
    }
    for (i = 0; i < k; i++) {
-      ae_assert(c->xR[i] >= 0.0, "PrepareLowRankPreconditioner: C[]<0");
+      ae_assert(c->xR[i] >= 0.0, "PrepareLowRankPreconditioner: C[] < 0");
    }
 // Prepare buffer structure; skip zero entries of update.
    vectorsetlengthatleast(&buf->d, n);
@@ -2092,7 +2087,7 @@ void preparelowrankpreconditioner(RVector *d, RVector *c, RMatrix *w, ae_int_t n
    }
 // Reset K (for convenience)
    k = buf->k;
-// Prepare diagonal factor; quick exit for K=0
+// Prepare diagonal factor; quick exit for K == 0
    for (i = 0; i < n; i++) {
       buf->d.xR[i] = 1 / d->xR[i];
    }
@@ -2160,7 +2155,7 @@ void applylowrankpreconditioner(RVector *s, precbuflowrank *buf) {
 // This subroutine initializes smoothness monitor at  the  beginning  of  the
 // optimization session. It requires variable scales to be passed.
 //
-// It is possible to perform "dummy" initialization with N=K=0.
+// It is possible to perform "dummy" initialization with N == K == 0.
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
 void smoothnessmonitorinit(smoothnessmonitor *monitor, RVector *s, ae_int_t n, ae_int_t k, bool checksmoothness) {
    ae_int_t i;
@@ -2316,7 +2311,7 @@ static void optserv_testc0continuity(double f0, double f1, double f2, double f3,
    lipschitz12 = rmax2(fabs(f2 - f1) - (noise1 + noise2), 0.0) / delta1;
 // Compute Lipschitz constant for the interval [StpIdx+2,StpIdx+3]
 // using special algorithm:
-// a) if F3<F2-Noise23, Lipschitz constant is assumed to be zero
+// a) if F3 < F2-Noise23, Lipschitz constant is assumed to be zero
 // b) otherwise, we compute Lipschitz constant as usual,
 //    with noise correction term being added
 //
@@ -2878,8 +2873,8 @@ void smoothnessmonitorenqueuepoint1u(smoothnessmonitor *monitor, RVector *s, RVe
 // ALGLIB: Copyright 10.10.2019 by Sergey Bochkanov
 void smoothnessmonitorstartprobing(smoothnessmonitor *monitor, double stpmax, ae_int_t nvalues, double stepscale) {
    ae_assert(isfinite(stpmax) && stpmax > 0.0, "SmoothnessMonitorStartProbing: StpMax <= 0");
-   ae_assert(nvalues >= 1, "SmoothnessMonitorStartProbing: NValues<1");
-   ae_assert(isfinite(stepscale) && stepscale >= 0.0, "SmoothnessMonitorStartProbing: StepScale<0");
+   ae_assert(nvalues >= 1, "SmoothnessMonitorStartProbing: NValues < 1");
+   ae_assert(isfinite(stepscale) && stepscale >= 0.0, "SmoothnessMonitorStartProbing: StepScale < 0");
    monitor->probingnvalues = nvalues;
    monitor->probingnstepsstored = 0;
    monitor->probingstepmax = stpmax;
@@ -2922,7 +2917,6 @@ Spawn:
    v = 81;
    v0 = 255;
    v1 = 74;
-// Routine body
    for (i = 0; i < 40; i++) {
    // Increase storage size
       rvectorgrowto(&monitor->probingsteps, monitor->probingnstepsstored + 1);
@@ -3009,15 +3003,15 @@ void smoothnessmonitorexportreport(smoothnessmonitor *monitor, optguardreport *r
 }
 
 // Check numerical gradient at point X0 (unscaled variables!), with  optional
-// box constraints [BndL,BndU] (if  HasBoxConstraints=True)  and  with  scale
+// box constraints [BndL,BndU] (if  HasBoxConstraints == True)  and  with  scale
 // vector S[].
 //
 // Step S[i]*TestStep is performed along I-th variable.
 //
-// NeedFiJ rcomm protocol is used to request derivative information.
+// NeedFiJ RComm protocol is used to request derivative information. //(@) Redundant and removed.
 //
 // Box constraints BndL/BndU are expected to be feasible. It is  possible  to
-// have BndL=BndU.
+// have BndL == BndU.
 // ALGLIB: Copyright 06.12.2018 by Sergey Bochkanov
 bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *unscaledx0, RVector *s, RVector *bndl, RVector *bndu, bool hasboxconstraints, double teststep) {
    AutoS ae_int_t n;
@@ -3048,7 +3042,6 @@ Spawn:
    vp = 763;
    vm = -541;
    vc = -698;
-// Routine body
    n = monitor->n;
    k = monitor->k;
    monitor->needfij = false;
@@ -3409,9 +3402,9 @@ static const double minlbfgs_gtol = 0.4;
 //     State   -   structure which stores algorithm state
 //     EpsG    -   >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
-//                 |v|<EpsG is satisfied, where:
+//                 |v| < EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
-//                 * v - scaled gradient vector, v[i]=g[i]*s[i]
+//                 * v - scaled gradient vector, v[i] == g[i]*s[i]
 //                 * g - gradient
 //                 * s - scaling coefficients set by MinLBFGSSetScale()
 //     EpsF    -   >= 0
@@ -3422,13 +3415,13 @@ static const double minlbfgs_gtol = 0.4;
 //                 The subroutine finishes its work if  on  k+1-th  iteration
 //                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
-//                 * v - scaled step vector, v[i]=dx[i]/s[i]
-//                 * dx - ste pvector, dx=X(k+1)-X(k)
+//                 * v - scaled step vector, v[i] == dx[i]/s[i]
+//                 * dx - ste pvector, dx == X(k+1)-X(k)
 //                 * s - scaling coefficients set by MinLBFGSSetScale()
-//     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
+//     MaxIts  -   maximum number of iterations. If MaxIts == 0, the  number  of
 //                 iterations is unlimited.
 //
-// Passing EpsG=0, EpsF=0, EpsX=0 and MaxIts=0 (simultaneously) will lead to
+// Passing EpsG == 0, EpsF == 0, EpsX == 0 and MaxIts == 0 (simultaneously) will lead to
 // automatic stopping criterion selection (small EpsX).
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 // API: void minlbfgssetcond(const minlbfgsstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
@@ -3479,7 +3472,7 @@ void minlbfgssetxrep(minlbfgsstate *state, bool needxrep) {
 // API: void minlbfgssetstpmax(const minlbfgsstate &state, const double stpmax);
 void minlbfgssetstpmax(minlbfgsstate *state, double stpmax) {
    ae_assert(isfinite(stpmax), "MinLBFGSSetStpMax: StpMax is not finite!");
-   ae_assert(stpmax >= 0.0, "MinLBFGSSetStpMax: StpMax<0!");
+   ae_assert(stpmax >= 0.0, "MinLBFGSSetStpMax: StpMax < 0!");
    state->stpmax = stpmax;
 }
 
@@ -3513,7 +3506,7 @@ void minlbfgssetstpmax(minlbfgsstate *state, double stpmax) {
 // API: void minlbfgssetscale(const minlbfgsstate &state, const real_1d_array &s);
 void minlbfgssetscale(minlbfgsstate *state, RVector *s) {
    ae_int_t i;
-   ae_assert(s->cnt >= state->n, "MinLBFGSSetScale: Length(S)<N");
+   ae_assert(s->cnt >= state->n, "MinLBFGSSetScale: Length(S) < N");
    for (i = 0; i < state->n; i++) {
       ae_assert(isfinite(s->xR[i]), "MinLBFGSSetScale: S contains infinite or NAN elements");
       ae_assert(s->xR[i] != 0.0, "MinLBFGSSetScale: S contains zero elements");
@@ -3533,7 +3526,7 @@ void minlbfgssetscale(minlbfgsstate *state, RVector *s) {
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
 // API: void minlbfgsrestartfrom(const minlbfgsstate &state, const real_1d_array &x);
 void minlbfgsrestartfrom(minlbfgsstate *state, RVector *x) {
-   ae_assert(x->cnt >= state->n, "MinLBFGSRestartFrom: Length(X)<N!");
+   ae_assert(x->cnt >= state->n, "MinLBFGSRestartFrom: Length(X) < N!");
    ae_assert(isfinitevector(x, state->n), "MinLBFGSRestartFrom: X contains infinite or NaN values!");
    ae_v_move(state->xbase.xR, 1, x->xR, 1, state->n);
    state->PQ = -1;
@@ -3594,9 +3587,7 @@ void minlbfgscreatex(ae_int_t n, ae_int_t m, RVector *x, ae_int_t flags, double 
    minlbfgsrestartfrom(state, x);
 }
 
-//         LIMITED MEMORY BFGS METHOD FOR LARGE SCALE OPTIMIZATION
-//
-// DESCRIPTION:
+// LIMITED MEMORY BFGS METHOD FOR LARGE SCALE OPTIMIZATION
 // The subroutine minimizes function F(x) of N arguments by  using  a  quasi-
 // Newton method (LBFGS scheme) which is optimized to use  a  minimum  amount
 // of memory.
@@ -3605,11 +3596,9 @@ void minlbfgscreatex(ae_int_t n, ae_int_t m, RVector *x, ae_int_t flags, double 
 // It lessens a required amount of memory from a value  of  order  N^2  to  a
 // value of order 2*N*M.
 //
-//
 // REQUIREMENTS:
 // Algorithm will request following information during its operation:
 // * function value F and its gradient G (simultaneously) at given point X
-//
 //
 // USAGE:
 // 1. User initializes algorithm state with MinLBFGSCreate() call
@@ -3622,9 +3611,8 @@ void minlbfgscreatex(ae_int_t n, ae_int_t m, RVector *x, ae_int_t flags, double 
 //    with same N/M but another starting point and/or another function.
 //    MinLBFGSRestartFrom() allows to reuse already initialized structure.
 //
-//
 // Inputs:
-//     N       -   problem dimension. N>0
+//     N       -   problem dimension. N > 0
 //     M       -   number of corrections in the BFGS scheme of Hessian
 //                 approximation update. Recommended value:  3 <= M <= 7. The smaller
 //                 value causes worse convergence, the bigger will  not  cause  a
@@ -3632,10 +3620,8 @@ void minlbfgscreatex(ae_int_t n, ae_int_t m, RVector *x, ae_int_t flags, double 
 //                 performance. M <= N.
 //     X       -   initial solution approximation, array[0..N-1].
 //
-//
 // Outputs:
 //     State   -   structure which stores algorithm state
-//
 //
 // NOTES:
 // 1. you may tune stopping conditions with MinLBFGSSetCond() function
@@ -3648,10 +3634,10 @@ void minlbfgscreatex(ae_int_t n, ae_int_t m, RVector *x, ae_int_t flags, double 
 // API: void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state);
 void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state) {
    SetObj(minlbfgsstate, state);
-   ae_assert(n >= 1, "MinLBFGSCreate: N<1!");
-   ae_assert(m >= 1, "MinLBFGSCreate: M<1");
-   ae_assert(m <= n, "MinLBFGSCreate: M>N");
-   ae_assert(x->cnt >= n, "MinLBFGSCreate: Length(X)<N!");
+   ae_assert(n >= 1, "MinLBFGSCreate: N < 1!");
+   ae_assert(m >= 1, "MinLBFGSCreate: M < 1");
+   ae_assert(m <= n, "MinLBFGSCreate: M > N");
+   ae_assert(x->cnt >= n, "MinLBFGSCreate: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "MinLBFGSCreate: X contains infinite or NaN values!");
    minlbfgscreatex(n, m, x, 0, 0.0, state);
 }
@@ -3664,7 +3650,7 @@ void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state) {
 // more information about creation of LBFGS optimizer.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     M       -   number of corrections in the BFGS scheme of Hessian
@@ -3673,7 +3659,7 @@ void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state) {
 //                 considerably better convergence, but will cause a fall in  the
 //                 performance. M <= N.
 //     X       -   starting point, array[0..N-1].
-//     DiffStep-   differentiation step, >0
+//     DiffStep-   differentiation step, > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -3704,9 +3690,9 @@ void minlbfgscreate(ae_int_t n, ae_int_t m, RVector *x, minlbfgsstate *state) {
 void minlbfgscreatef(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlbfgsstate *state) {
    SetObj(minlbfgsstate, state);
    ae_assert(n >= 1, "MinLBFGSCreateF: N too small!");
-   ae_assert(m >= 1, "MinLBFGSCreateF: M<1");
-   ae_assert(m <= n, "MinLBFGSCreateF: M>N");
-   ae_assert(x->cnt >= n, "MinLBFGSCreateF: Length(X)<N!");
+   ae_assert(m >= 1, "MinLBFGSCreateF: M < 1");
+   ae_assert(m <= n, "MinLBFGSCreateF: M > N");
+   ae_assert(x->cnt >= n, "MinLBFGSCreateF: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "MinLBFGSCreateF: X contains infinite or NaN values!");
    ae_assert(isfinite(diffstep), "MinLBFGSCreateF: DiffStep is infinite or NaN!");
    ae_assert(diffstep > 0.0, "MinLBFGSCreateF: DiffStep is non-positive!");
@@ -3820,7 +3806,7 @@ void minlbfgssetprecscale(minlbfgsstate *state) {
    state->prectype = 3;
 }
 
-// This function sets low-rank preconditioner for Hessian matrix  H=D+W'*C*W,
+// This function sets low-rank preconditioner for Hessian matrix  H == D+W'*C*W,
 // where:
 // * H is a Hessian matrix, which is approximated by D/W/C
 // * D is a NxN diagonal positive definite matrix
@@ -3867,7 +3853,7 @@ void minlbfgssetprecrankklbfgsfast(minlbfgsstate *state, RVector *d, RVector *c,
 }
 
 // This function  sets  exact  low-rank  preconditioner  for  Hessian  matrix
-// H=D+W'*C*W, where:
+// H == D+W'*C*W, where:
 // * H is a Hessian matrix, which is approximated by D/W/C
 // * D is a NxN diagonal positive definite matrix
 // * W is a KxN low-rank correction
@@ -3918,7 +3904,6 @@ Spawn:
    mcinfo = 255;
    v = 74;
    vv = -788;
-// Routine body
 // Unload frequently used variables from State structure
 // (just for typing convinience)
    n = state->n;
@@ -3935,7 +3920,7 @@ Spawn:
       state->lastscaleused.xR[i] = state->s.xR[i];
       state->invs.xR[i] = 1 / state->s.xR[i];
    }
-//  Check, that transferred derivative value is right
+// Check, that transferred derivative value is right
    state->stp = 0.0;
    if (state->diffstep == 0.0 && state->teststep > 0.0) {
       while (smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->s, &state->s, false, state->teststep)) {
@@ -4163,18 +4148,18 @@ Spawn:
          }
          state->rho.xR[state->p] = 1 / v;
          state->gammak = v / vv;
-      //  Calculate d(k+1) = -H(k+1)*g(k+1)
+      // Calculate d(k+1) = -H(k+1)*g(k+1)
       //
-      //  for I:=K downto K-Q do
-      //      V = s(i)^T * work(iteration:I)
-      //      theta(i) = V
-      //      work(iteration:I+1) = work(iteration:I) - V*Rho(i)*y(i)
-      //  work(last iteration) = H0*work(last iteration) - preconditioner
-      //  for I:=K-Q to K do
-      //      V = y(i)^T*work(iteration:I)
-      //      work(iteration:I+1) = work(iteration:I) +(-V+theta(i))*Rho(i)*s(i)
+      // for I = K downto K-Q do
+      //    V = s(i)^T * work(iteration:I)
+      //    theta(i) = V
+      //    work(iteration:I+1) = work(iteration:I) - V*Rho(i)*y(i)
+      // work(last iteration) = H0*work(last iteration) - preconditioner
+      // for I = K-Q to K do
+      //    V = y(i)^T*work(iteration:I)
+      //    work(iteration:I+1) = work(iteration:I) +(-V+theta(i))*Rho(i)*s(i)
       //
-      //  NOW WORK CONTAINS d(k+1)
+      // NOW WORK CONTAINS d(k+1)
          ae_v_move(state->work.xR, 1, state->g.xR, 1, n);
          for (i = state->k; i >= state->k - state->q; i--) {
             ic = i % m;
@@ -4259,8 +4244,8 @@ Pause:
 // Inputs:
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step used for numerical differentiation:
-//                     * TestStep=0 turns verification off
-//                     * TestStep>0 activates verification
+//                     * TestStep == 0 turns verification off
+//                     * TestStep > 0 activates verification
 //                     You should carefully choose TestStep. Value  which  is
 //                     too large (so large that  function  behavior  is  non-
 //                     cubic at this scale) will lead  to  false  alarms. Too
@@ -4285,7 +4270,7 @@ Pause:
 // API: void minlbfgsoptguardgradient(const minlbfgsstate &state, const double teststep);
 void minlbfgsoptguardgradient(minlbfgsstate *state, double teststep) {
    ae_assert(isfinite(teststep), "MinLBFGSOptGuardGradient: TestStep contains NaN or INF");
-   ae_assert(teststep >= 0.0, "MinLBFGSOptGuardGradient: invalid argument TestStep(TestStep<0)");
+   ae_assert(teststep >= 0.0, "MinLBFGSOptGuardGradient: invalid argument TestStep(TestStep < 0)");
    state->teststep = teststep;
 }
 
@@ -4452,7 +4437,7 @@ void minlbfgsoptguardresults(minlbfgsstate *state, optguardreport *rep) {
 // * stp[], f[] - arrays of length CNT which store step lengths and  function
 //   values at these points; f[i] is evaluated in x0+stp[i]*d.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -4506,7 +4491,7 @@ void minlbfgsoptguardnonc1test0results(minlbfgsstate *state, optguardnonc1test0r
 //   values at these points; g[i] is evaluated in  x0+stp[i]*d  and  contains
 //   vidx-th component of the gradient.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -4530,7 +4515,7 @@ void minlbfgsoptguardnonc1test1results(minlbfgsstate *state, optguardnonc1test1r
 
 // L-BFGS algorithm results
 //
-// Buffered implementation of MinLBFGSResults which uses pre-allocated buffer
+// Buffered implementation of MinLBFGSResults which uses preallocated buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -4900,7 +4885,6 @@ bool minlbfgsiteration(const minlbfgsstate &state) {
 //    callback (function/gradient) passed to MinLBFGSOptimize()  and specific
 //    function used to create optimizer.
 //
-//
 //                      |         USER PASSED TO MinLBFGSOptimize()
 //    CREATED WITH      |  function only   |  function and gradient
 //    ------------------------------------------------------------
@@ -5011,7 +4995,7 @@ namespace alglib_impl {
 static const ae_int_t cqmodels_newtonrefinementits = 3;
 
 // This subroutine is used to initialize CQM. By default, empty NxN model  is
-// generated, with Alpha=Lambda=Theta=0.0 and zero b.
+// generated, with Alpha == Lambda == Theta == 0.0 and zero b.
 //
 // Previously allocated buffer variables are reused as much as possible.
 // ALGLIB: Copyright 12.06.2012 by Sergey Bochkanov
@@ -5049,13 +5033,13 @@ void cqminit(ae_int_t n, convexquadraticmodel *s) {
 //     S       -   model
 //     A       -   NxN matrix, only upper or lower triangle is referenced
 //     IsUpper -   True, when matrix is stored in upper triangle
-//     Alpha   -   multiplier; when Alpha=0, A is not referenced at all
+//     Alpha   -   multiplier; when Alpha == 0, A is not referenced at all
 // ALGLIB: Copyright 12.06.2012 by Sergey Bochkanov
 void cqmseta(convexquadraticmodel *s, RMatrix *a, bool isupper, double alpha) {
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_assert(isfinite(alpha) && alpha >= 0.0, "CQMSetA: Alpha<0 or is not finite number");
+   ae_assert(isfinite(alpha) && alpha >= 0.0, "CQMSetA: Alpha < 0 or is not finite number");
    ae_assert(alpha == 0.0 || isfinitertrmatrix(a, s->n, isupper), "CQMSetA: A is not finite NxN matrix");
    s->alpha = alpha;
    if (alpha > 0.0) {
@@ -5149,11 +5133,11 @@ void cqmrewritedensediagonal(convexquadraticmodel *s, RVector *z) {
 // Inputs:
 //     S       -   model
 //     D       -   array[N], semidefinite diagonal matrix
-//     Tau     -   multiplier; when Tau=0, D is not referenced at all
+//     Tau     -   multiplier; when Tau == 0, D is not referenced at all
 // ALGLIB: Copyright 12.06.2012 by Sergey Bochkanov
 void cqmsetd(convexquadraticmodel *s, RVector *d, double tau) {
    ae_int_t i;
-   ae_assert(isfinite(tau) && tau >= 0.0, "CQMSetD: Tau<0 or is not finite number");
+   ae_assert(isfinite(tau) && tau >= 0.0, "CQMSetD: Tau < 0 or is not finite number");
    ae_assert(tau == 0.0 || isfinitevector(d, s->n), "CQMSetD: D is not finite Nx1 vector");
    s->tau = tau;
    if (tau > 0.0) {
@@ -5161,7 +5145,7 @@ void cqmsetd(convexquadraticmodel *s, RVector *d, double tau) {
       vectorsetlengthatleast(&s->ecadiag, s->n);
       vectorsetlengthatleast(&s->tq2diag, s->n);
       for (i = 0; i < s->n; i++) {
-         ae_assert(d->xR[i] >= 0.0, "CQMSetD: D[i]<0");
+         ae_assert(d->xR[i] >= 0.0, "CQMSetD: D[i] < 0");
          s->d.xR[i] = d->xR[i];
       }
    }
@@ -5198,18 +5182,18 @@ void cqmsetb(convexquadraticmodel *s, RVector *b) {
 void cqmsetq(convexquadraticmodel *s, RMatrix *q, RVector *r, ae_int_t k, double theta) {
    ae_int_t i;
    ae_int_t j;
-   ae_assert(k >= 0, "CQMSetQ: K<0");
+   ae_assert(k >= 0, "CQMSetQ: K < 0");
    ae_assert(k == 0 || theta == 0.0 || apservisfinitematrix(q, k, s->n), "CQMSetQ: Q is not finite matrix");
    ae_assert(k == 0 || theta == 0.0 || isfinitevector(r, k), "CQMSetQ: R is not finite vector");
-   ae_assert(isfinite(theta) && theta >= 0.0, "CQMSetQ: Theta<0 or is not finite number");
-// degenerate case: K=0 or Theta=0
+   ae_assert(isfinite(theta) && theta >= 0.0, "CQMSetQ: Theta < 0 or is not finite number");
+// degenerate case: K == 0 or Theta == 0
    if (k == 0 || theta == 0.0) {
       s->k = 0;
       s->theta = 0.0;
       s->issecondarytermchanged = true;
       return;
    }
-// General case: both Theta>0 and K>0
+// General case: both Theta > 0 and K > 0
    s->k = k;
    s->theta = theta;
    matrixsetlengthatleast(&s->q, s->k, s->n);
@@ -5231,13 +5215,13 @@ void cqmsetq(convexquadraticmodel *s, RMatrix *q, RVector *r, ae_int_t k, double
 // Inputs:
 //     S       -   model
 //     X       -   array[N], constraint values
-//     ActiveSet-  array[N], active set. If ActiveSet[I]=True, then I-th
+//     ActiveSet-  array[N], active set. If ActiveSet[I] == True, then I-th
 //                 variables is constrained to X[I].
 // ALGLIB: Copyright 12.06.2012 by Sergey Bochkanov
 void cqmsetactiveset(convexquadraticmodel *s, RVector *x, BVector *activeset) {
    ae_int_t i;
-   ae_assert(x->cnt >= s->n, "CQMSetActiveSet: Length(X)<N");
-   ae_assert(activeset->cnt >= s->n, "CQMSetActiveSet: Length(ActiveSet)<N");
+   ae_assert(x->cnt >= s->n, "CQMSetActiveSet: Length(X) < N");
+   ae_assert(activeset->cnt >= s->n, "CQMSetActiveSet: Length(ActiveSet) < N");
    for (i = 0; i < s->n; i++) {
       s->isactivesetchanged = s->isactivesetchanged || s->activeset.xB[i] && !activeset->xB[i];
       s->isactivesetchanged = s->isactivesetchanged || activeset->xB[i] && !s->activeset.xB[i];
@@ -5417,7 +5401,7 @@ double cqmxtadx2(convexquadraticmodel *s, RVector *x, RVector *tmp) {
    double result;
    n = s->n;
    ae_assert(isfinitevector(x, n), "CQMXTADX2: X is not finite vector");
-   ae_assert(tmp->cnt >= n, "CQMXTADX2: Length(Tmp)<N");
+   ae_assert(tmp->cnt >= n, "CQMXTADX2: Length(Tmp) < N");
    result = 0.0;
 // main quadratic term
    if (s->alpha > 0.0) {
@@ -5498,12 +5482,12 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
    nfree = s->nfree;
 // Re-evaluate TQ2/TQ1/TQ0, if needed
    if (s->isactivesetchanged || s->ismaintermchanged) {
-   // Handle cases Alpha>0 and Alpha=0 separately:
+   // Handle cases Alpha > 0 and Alpha == 0 separately:
    // * in the first case we have dense matrix
    // * in the second one we have diagonal matrix, which can be
    //   handled more efficiently
       if (s->alpha > 0.0) {
-      // Alpha>0, dense QP
+      // Alpha > 0, dense QP
       //
       // Split variables into two groups - free (F) and constrained (C). Reorder
       // variables in such way that free vars come first, constrained are last:
@@ -5576,7 +5560,7 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
             }
          }
       // Now we have TQ2, and we can evaluate TQ1.
-      // In the special case when we have Alpha=0, NFree=0 or NFree=N,
+      // In the special case when we have Alpha == 0, NFree == 0 or NFree == N,
       // TQ1 is filled by zeros.
          for (i = 0; i < n; i++) {
             s->tq1.xR[i] = 0.0;
@@ -5593,7 +5577,7 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
          }
          s->tq0 = v;
       } else {
-      // Alpha=0, diagonal QP
+      // Alpha == 0, diagonal QP
       //
       // Split variables into two groups - free (F) and constrained (C). Reorder
       // variables in such way that free vars come first, constrained are last:
@@ -5650,8 +5634,8 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
    // * Tmp1 - to store Qc*xc
    //
    // Generation of TK2/TK1/TK0 is performed as follows:
-   // * we fill TK2/TK1/TK0 (to handle K=0 or Theta=0)
-   // * other steps are performed only for K>0 and Theta>0
+   // * we fill TK2/TK1/TK0 (to handle K == 0 or Theta == 0)
+   // * other steps are performed only for K > 0 and Theta > 0
    // * we pass through columns of Q and copy I-th column into left block (Qf) or
    //   right one (Qc) of TK2, depending on presence of X[i] in the active set.
    //   CIdx0 variable contains current position for insertion into upper block,
@@ -5891,7 +5875,7 @@ bool cqmconstrainedoptimum(convexquadraticmodel *s, RVector *x) {
 //
 // In an ideal world without numerical errors it would be enough
 // to make just one Newton step from initial point:
-//   x_new = -H^(-1)*grad(x=0)
+//   x_new = -H^(-1)*grad(x == 0)
 // However, roundoff errors can significantly deteriorate quality
 // of the solution. So we have to recalculate gradient and to
 // perform Newton steps several times.
@@ -6279,7 +6263,7 @@ namespace alglib_impl {
 // Inputs:
 //     S               -   scale vector, array[N]:
 //                         * I-th element contains scale of I-th variable,
-//                         * SC[I]>0
+//                         * SC[I] > 0
 //     XOrigin         -   origin term, array[N]. Can be zero.
 //     BndL            -     raw lower bounds, array[N]
 //     BndU            -   raw upper bounds, array[N]
@@ -6300,7 +6284,7 @@ void scaleshiftbcinplace(RVector *s, RVector *xorigin, RVector *bndl, RVector *b
       hasbndl = isfinite(bndl->xR[i]);
       hasbndu = isfinite(bndu->xR[i]);
       if (hasbndl && hasbndu && bndl->xR[i] == bndu->xR[i]) {
-      // Make sure that BndL[I]=BndU[I] bit-to-bit
+      // Make sure that BndL[I] == BndU[I] bit-to-bit
       // even with CRAZY optimizing compiler.
          bndu->xR[i] = (bndu->xR[i] - xorigin->xR[i]) / s->xR[i];
          bndl->xR[i] = bndu->xR[i];
@@ -6321,7 +6305,7 @@ void scaleshiftbcinplace(RVector *s, RVector *xorigin, RVector *bndl, RVector *b
 // Inputs:
 //     S               -   scale vector, array[N]:
 //                         * I-th element contains scale of I-th variable,
-//                         * SC[I]>0
+//                         * SC[I] > 0
 //     XOrigin         -   origin term, array[N]. Can be zero.
 //     N               -   number of variables.
 //     DenseA          -   array[M,N], constraint matrix
@@ -6362,14 +6346,14 @@ void scaleshiftdensebrlcinplace(RVector *s, RVector *xorigin, ae_int_t n, RMatri
 // Inputs:
 //     S               -   scale vector, array[N]:
 //                         * I-th element contains scale of I-th variable,
-//                         * SC[I]>0
+//                         * SC[I] > 0
 //     XOrigin         -   origin term, array[N]. Can be zero.
 //     N               -   number of variables.
 //     SparseA         -   sparse MSparse*N constraint matrix in CRS format;
-//                         ignored if MSparse=0.
+//                         ignored if MSparse == 0.
 //     MSparse         -   dense constraint count, MSparse >= 0
 //     DenseA          -   array[MDense,N], constraint matrix;
-//                         ignored if MDense=0.
+//                         ignored if MDense == 0.
 //     MDense          -   dense constraint count, MDense >= 0
 //     AB              -   lower bounds for constraints, always present and
 //                         finite, array[MSparse+MDense]
@@ -6433,7 +6417,7 @@ void scaleshiftmixedbrlcinplace(RVector *s, RVector *xorigin, ae_int_t n, sparse
 //     NTotal          -   total number of variables, NTotal >= 1
 //     S               -   scale vector, array[NTotal]:
 //                         * I-th element contains scale of I-th variable,
-//                         * SC[I]>0
+//                         * SC[I] > 0
 //
 // Outputs:
 //     DenseA          -   replaced by scaled term, array[N,N]
@@ -6469,7 +6453,7 @@ void scaledenseqpinplace(RMatrix *densea, bool isupper, ae_int_t nmain, RVector 
 // Inputs:
 //     S               -   scale vector, array[N]:
 //                         * I-th element contains scale of I-th variable,
-//                         * SC[I]>0
+//                         * SC[I] > 0
 //     N               -   number of variables.
 //     SparseA         -   NxN SparseMatrix in CRS format (any triangle can
 //                         be present, we will scale everything)
@@ -6557,10 +6541,10 @@ void normalizedensebrlcinplace(RMatrix *densea, RVector *ab, RVector *ar, ae_int
 //
 // Inputs:
 //     SparseA         -   sparse MSparse*N constraint matrix in CRS format;
-//                         ignored if MSparse=0.
+//                         ignored if MSparse == 0.
 //     MSparse         -   dense constraint count, MSparse >= 0
 //     DenseA          -   array[MDense,N], constraint matrix;
-//                         ignored if MDense=0.
+//                         ignored if MDense == 0.
 //     MDense          -   dense constraint count, MDense >= 0
 //     AB              -   lower bounds for constraints, always present and
 //                         finite, array[MSparse+MDense]
@@ -6889,21 +6873,21 @@ void snnlsinit(ae_int_t nsmax, ae_int_t ndmax, ae_int_t nrmax, snnlssolver *s) {
 //     B   -   array[NR], right part
 //     NS  -   size of the sparse part of the system, 0 <= NS <= NR
 //     ND  -   size of the dense part of the system, ND >= 0
-//     NR  -   rows count, NR>0
+//     NR  -   rows count, NR > 0
 //
 // NOTE:
-//     1. You can have NS+ND=0, solver will correctly accept such combination
+//     1. You can have NS+ND == 0, solver will correctly accept such combination
 //        and return empty array as problem solution.
 // ALGLIB: Copyright 10.10.2012 by Sergey Bochkanov
 void snnlssetproblem(snnlssolver *s, RMatrix *a, RVector *b, ae_int_t ns, ae_int_t nd, ae_int_t nr) {
    ae_int_t i;
-   ae_assert(nd >= 0, "SNNLSSetProblem: ND<0");
-   ae_assert(ns >= 0, "SNNLSSetProblem: NS<0");
+   ae_assert(nd >= 0, "SNNLSSetProblem: ND < 0");
+   ae_assert(ns >= 0, "SNNLSSetProblem: NS < 0");
    ae_assert(nr > 0, "SNNLSSetProblem: NR <= 0");
-   ae_assert(ns <= nr, "SNNLSSetProblem: NS>NR");
-   ae_assert(a->rows >= nr || nd == 0, "SNNLSSetProblem: rows(A)<NR");
-   ae_assert(a->cols >= nd, "SNNLSSetProblem: cols(A)<ND");
-   ae_assert(b->cnt >= nr, "SNNLSSetProblem: length(B)<NR");
+   ae_assert(ns <= nr, "SNNLSSetProblem: NS > NR");
+   ae_assert(a->rows >= nr || nd == 0, "SNNLSSetProblem: rows(A) < NR");
+   ae_assert(a->cols >= nd, "SNNLSSetProblem: cols(A) < ND");
+   ae_assert(b->cnt >= nr, "SNNLSSetProblem: length(B) < NR");
    ae_assert(apservisfinitematrix(a, nr, nd), "SNNLSSetProblem: A contains INF/NAN");
    ae_assert(isfinitevector(b, nr), "SNNLSSetProblem: B contains INF/NAN");
 // Copy problem
@@ -6932,10 +6916,10 @@ void snnlssetproblem(snnlssolver *s, RMatrix *a, RVector *b, ae_int_t ns, ae_int
 // Inputs:
 //     S   -   SNNLS solver, must be initialized with SNNLSInit() call,
 //             problem must be set with SNNLSSetProblem() call.
-//     Idx -   constraint index, 0 <= IDX<NS+ND
+//     Idx -   constraint index, 0 <= IDX < NS+ND
 // ALGLIB: Copyright 10.10.2012 by Sergey Bochkanov
 void snnlsdropnnc(snnlssolver *s, ae_int_t idx) {
-   ae_assert(idx >= 0, "SNNLSDropNNC: Idx<0");
+   ae_assert(idx >= 0, "SNNLSDropNNC: Idx < 0");
    ae_assert(idx < s->ns + s->nd, "SNNLSDropNNC: Idx >= NS+ND");
    s->nnc.xB[idx] = false;
 }
@@ -7081,7 +7065,7 @@ static void snnls_trdsolve(RVector *trdd, RMatrix *trda, ae_int_t ns, ae_int_t n
    ae_int_t i;
    ae_int_t j;
    double v;
-// Solve U'*y=d first.
+// Solve U'*y == d first.
 //
 // This section includes two parts:
 // * solve diagonal part of U'
@@ -7100,7 +7084,7 @@ static void snnls_trdsolve(RVector *trdd, RMatrix *trda, ae_int_t ns, ae_int_t n
          d->xR[ns + j] -= v * trda->xyR[ns + i][j];
       }
    }
-// Solve U*x=y then.
+// Solve U*x == y then.
 //
 // This section includes two parts:
 // * solve trailing triangular part of U
@@ -7292,7 +7276,7 @@ static void snnls_trdfixvariable(RVector *trdd, RMatrix *trda, ae_int_t ns, ae_i
 //     X   -   array[NS+ND], solution
 //
 // NOTE:
-//     1. You can have NS+ND=0, solver will correctly accept such combination
+//     1. You can have NS+ND == 0, solver will correctly accept such combination
 //        and return empty array as problem solution.
 //
 //     2. Internal field S.DebugFLOPS contains rough estimate of  FLOPs  used
@@ -7327,8 +7311,8 @@ void snnlssolve(snnlssolver *s, RVector *x) {
    nr = s->nr;
    s->debugflops = 0.0;
 // Handle special cases:
-// * NS+ND=0
-// * ND=0
+// * NS+ND == 0
+// * ND == 0
    if (ns + nd == 0) {
       return;
    }
@@ -7343,7 +7327,7 @@ void snnlssolve(snnlssolver *s, RVector *x) {
       return;
    }
 // Main cycle of BLEIC-SNNLS algorithm.
-// Below we assume that ND>0.
+// Below we assume that ND > 0.
    vectorsetlengthatleast(x, ns + nd);
    vectorsetlengthatleast(&s->xn, ns + nd);
    vectorsetlengthatleast(&s->xp, ns + nd);
@@ -7379,11 +7363,11 @@ void snnlssolve(snnlssolver *s, RVector *x) {
       }
    // Decide whether we need "kick" stage: special stage
    // that moves us away from boundary constraints which are
-   // not strictly active (i.e. such constraints that x[i]=0.0 and d[i]>0).
+   // not strictly active (i.e. such constraints that x[i] == 0.0 and d[i] > 0).
    //
    // If we need kick stage, we make a kick - and restart iteration.
    // If not, after this block we can rely on the fact that
-   // for all x[i]=0.0 we have d[i]=0.0
+   // for all x[i] == 0.0 we have d[i] == 0.0
    //
    // NOTE: we do not increase outer iterations counter here
       kickneeded = false;
@@ -7685,7 +7669,7 @@ void sasinit(ae_int_t n, sactiveset *s) {
 void sassetscale(sactiveset *state, RVector *s) {
    ae_int_t i;
    ae_assert(state->algostate == 0, "SASSetScale: you may change scale only in modification mode");
-   ae_assert(s->cnt >= state->n, "SASSetScale: Length(S)<N");
+   ae_assert(s->cnt >= state->n, "SASSetScale: Length(S) < N");
    for (i = 0; i < state->n; i++) {
       ae_assert(isfinite(s->xR[i]), "SASSetScale: S contains infinite or NAN elements");
       ae_assert(s->xR[i] != 0.0, "SASSetScale: S contains zero elements");
@@ -7731,16 +7715,16 @@ void sassetprecdiag(sactiveset *state, RVector *d) {
 //                 If some (all) variables are unbounded, you may specify
 //                 very large number or +INF.
 //
-// NOTE 1: it is possible to specify BndL[i]=BndU[i]. In this case I-th
-// variable will be "frozen" at X[i]=BndL[i]=BndU[i].
+// NOTE 1: it is possible to specify BndL[i] == BndU[i]. In this case I-th
+// variable will be "frozen" at X[i] == BndL[i] == BndU[i].
 // ALGLIB: Copyright 21.12.2012 by Sergey Bochkanov
 void sassetbc(sactiveset *state, RVector *bndl, RVector *bndu) {
    ae_int_t i;
    ae_int_t n;
    ae_assert(state->algostate == 0, "SASSetBC: you may change constraints only in modification mode");
    n = state->n;
-   ae_assert(bndl->cnt >= n, "SASSetBC: Length(BndL)<N");
-   ae_assert(bndu->cnt >= n, "SASSetBC: Length(BndU)<N");
+   ae_assert(bndl->cnt >= n, "SASSetBC: Length(BndL) < N");
+   ae_assert(bndu->cnt >= n, "SASSetBC: Length(BndU) < N");
    for (i = 0; i < n; i++) {
       ae_assert(isfinite(bndl->xR[i]) || isneginf(bndl->xR[i]), "SASSetBC: BndL contains NAN or +INF");
       ae_assert(isfinite(bndu->xR[i]) || isposinf(bndu->xR[i]), "SASSetBC: BndL contains NAN or -INF");
@@ -7765,9 +7749,9 @@ void sassetbc(sactiveset *state, RVector *bndl, RVector *bndu) {
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
-//                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
+//                 * if CT[i] == 0, then I-th constraint is C[i,*]*x  = C[i,n+1]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
 //     K       -   number of equality/inequality constraints, K >= 0
 //
 // NOTE 1: linear (non-bound) constraints are satisfied only approximately:
@@ -7787,10 +7771,10 @@ void sassetlc(sactiveset *state, RMatrix *c, ZVector *ct, ae_int_t k) {
    ae_assert(state->algostate == 0, "SASSetLC: you may change constraints only in modification mode");
    n = state->n;
 // First, check for errors in the inputs
-   ae_assert(k >= 0, "SASSetLC: K<0");
-   ae_assert(c->cols >= n + 1 || k == 0, "SASSetLC: Cols(C)<N+1");
-   ae_assert(c->rows >= k, "SASSetLC: Rows(C)<K");
-   ae_assert(ct->cnt >= k, "SASSetLC: Length(CT)<K");
+   ae_assert(k >= 0, "SASSetLC: K < 0");
+   ae_assert(c->cols >= n + 1 || k == 0, "SASSetLC: Cols(C) < N+1");
+   ae_assert(c->rows >= k, "SASSetLC: Rows(C) < K");
+   ae_assert(ct->cnt >= k, "SASSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n + 1), "SASSetLC: C contains infinite or NaN values!");
 // Handle zero K
    if (k == 0) {
@@ -7863,10 +7847,10 @@ void sassetlcx(sactiveset *state, RMatrix *cleic, ae_int_t nec, ae_int_t nic) {
    ae_assert(state->algostate == 0, "SASSetLCX: you may change constraints only in modification mode");
    n = state->n;
 // First, check for errors in the inputs
-   ae_assert(nec >= 0, "SASSetLCX: NEC<0");
-   ae_assert(nic >= 0, "SASSetLCX: NIC<0");
-   ae_assert(cleic->cols >= n + 1 || nec + nic == 0, "SASSetLCX: Cols(CLEIC)<N+1");
-   ae_assert(cleic->rows >= nec + nic, "SASSetLCX: Rows(CLEIC)<NEC+NIC");
+   ae_assert(nec >= 0, "SASSetLCX: NEC < 0");
+   ae_assert(nic >= 0, "SASSetLCX: NIC < 0");
+   ae_assert(cleic->cols >= n + 1 || nec + nic == 0, "SASSetLCX: Cols(CLEIC) < N+1");
+   ae_assert(cleic->rows >= nec + nic, "SASSetLCX: Rows(CLEIC) < NEC+NIC");
    ae_assert(apservisfinitematrix(cleic, nec + nic, n + 1), "SASSetLCX: CLEIC contains infinite or NaN values!");
 // Store constraints
    matrixsetlengthatleast(&state->cleic, nec + nic, n + 1);
@@ -7882,7 +7866,7 @@ void sassetlcx(sactiveset *state, RMatrix *cleic, ae_int_t nec, ae_int_t nic) {
 }
 
 // This subroutine turns on optimization mode:
-// 1. feasibility in X is enforced  (in case X=S.XC and constraints  have not
+// 1. feasibility in X is enforced  (in case X == S.XC and constraints  have not
 //    changed, algorithm just uses X without any modifications at all)
 // 2. constraints are marked as "candidate" or "inactive"
 //
@@ -8071,7 +8055,7 @@ bool sasstartoptimization(sactiveset *state, RVector *x) {
 //     CIdx        -   -1 for unlimited step, in [0,N+NEC+NIC) in case of
 //                     limited step.
 //     VVal        -   value which is assigned to X[CIdx] during activation.
-//                     For CIdx<0 or CIdx >= N some dummy value is assigned to
+//                     For CIdx < 0 or CIdx >= N some dummy value is assigned to
 //                     this parameter.
 void sasexploredirection(sactiveset *state, RVector *d, double *stpmax, ae_int_t *cidx, double *vval) {
    ae_int_t n;
@@ -8146,7 +8130,7 @@ void sasexploredirection(sactiveset *state, RVector *d, double *stpmax, ae_int_t
 // This  function  appends new constraints (if possible; sometimes it isn't!)
 // to three orthonormal basises for current active set:
 // * P-orthogonal one, which is orthogonalized with inner product
-//   (x,y) = x'*P*y, where P=inv(H) is current preconditioner
+//   (x,y) = x'*P*y, where P == inv(H) is current preconditioner
 // * S-orthogonal one, which is orthogonalized with inner product
 //   (x,y) = x'*S'*S*y, where S is diagonal scaling matrix
 // * I-orthogonal one, which is orthogonalized with standard dot product
@@ -8310,9 +8294,9 @@ void sasappendtobasis(sactiveset *state, BVector *newentries) {
             return;
          // Nearly zero row, skip
          }
-         ae_assert(projnormp > 0.0, "SAS: integrity check failed, ProjNormP=0");
-         ae_assert(projnorms > 0.0, "SAS: integrity check failed, ProjNormS=0");
-         ae_assert(projnormi > 0.0, "SAS: integrity check failed, ProjNormI=0");
+         ae_assert(projnormp > 0.0, "SAS: integrity check failed, ProjNormP == 0");
+         ae_assert(projnorms > 0.0, "SAS: integrity check failed, ProjNormS == 0");
+         ae_assert(projnormi > 0.0, "SAS: integrity check failed, ProjNormI == 0");
          v = 1 / projnormp;
          ae_v_moved(state->pdensebatch.xyR[state->densebatchsize], 1, state->tmpcp.xR, 1, n + 1, v);
          v = 1 / projnorms;
@@ -8358,9 +8342,9 @@ void sasappendtobasis(sactiveset *state, BVector *newentries) {
 //     S       -   current point and list of active constraints are changed.
 //
 // Result:
-//     >0, in case at least one inactive non-candidate constraint was activated
-//     =0, in case only "candidate" constraints were activated
-//     <0, in case no constraints were activated by the step
+//     > 0,	in case at least one inactive non-candidate constraint was activated
+//     == 0,	in case only "candidate" constraints were activated
+//     < 0,	in case no constraints were activated by the step
 //
 // NOTE: in general case State.XC != XN because activation of  constraints  may
 //       slightly change current point (to enforce feasibility).
@@ -8398,7 +8382,7 @@ ae_int_t sasmoveto(sactiveset *state, RVector *xn, bool needact, ae_int_t cidx, 
       if (cidx < n) {
       // CIdx in [0,N-1] means that bound constraint was activated.
       // We activate it explicitly to avoid situation when roundoff-error
-      // prevents us from moving EXACTLY to x=CVal.
+      // prevents us from moving EXACTLY to x == CVal.
          state->xc.xR[cidx] = cval;
       }
       state->cstatus.xZ[cidx] = 1;
@@ -8434,13 +8418,13 @@ ae_int_t sasmoveto(sactiveset *state, RVector *xn, bool needact, ae_int_t cidx, 
    // (ones which were not in the active set at the solution):
    //
    // * for non-boundary constraint it is enough to check that previous value
-   //   of CStatus[i] is negative (=far from boundary), and new one is
-   //   positive (=we are at the boundary, constraint is activated).
+   //   of CStatus[i] is negative ( == far from boundary), and new one is
+   //   positive ( == we are at the boundary, constraint is activated).
    //
    // * for boundary constraints previous criterion won't work. Each variable
    //   has two constraints, and simply checking their status is not enough -
    //   we have to correctly identify cases when we leave one boundary
-   //   (PrevActiveSet[i]=0) and move to another boundary (CStatus[i]>0).
+   //   (PrevActiveSet[i] == 0) and move to another boundary (CStatus[i] > 0).
    //   Such cases can be identified if we compare previous X with new X.
    //
    // In case only "candidate" constraints were activated, result variable
@@ -8497,7 +8481,7 @@ void sasimmediateactivation(sactiveset *state, ae_int_t cidx, double cval) {
 
 // This function builds three orthonormal basises for current active set:
 // * P-orthogonal one, which is orthogonalized with inner product
-//   (x,y) = x'*P*y, where P=inv(H) is current preconditioner
+//   (x,y) = x'*P*y, where P == inv(H) is current preconditioner
 // * S-orthogonal one, which is orthogonalized with inner product
 //   (x,y) = x'*S'*S*y, where S is diagonal scaling matrix
 // * I-orthogonal one, which is orthogonalized with standard dot product
@@ -8512,7 +8496,7 @@ void sasimmediateactivation(sactiveset *state, ae_int_t cidx, double cval) {
 //
 // Inputs:
 //     State   -   active set object
-//     H       -   diagonal preconditioner, H[i]>0
+//     H       -   diagonal preconditioner, H[i] > 0
 //
 // Outputs:
 //     State   -   active set object with new basis
@@ -8718,7 +8702,7 @@ void sasrebuildbasis(sactiveset *state) {
          vv = state->sdensebatch.xyR[state->densebatchsize][j] * state->s.xR[j];
          v += vv * vv;
       }
-      ae_assert(v > 0.0, "SActiveSet.RebuildBasis(): integrity check failed, SNorm=0");
+      ae_assert(v > 0.0, "SActiveSet.RebuildBasis(): integrity check failed, SNorm == 0");
       v = 1 / sqrt(v);
       ae_v_muld(state->sdensebatch.xyR[state->densebatchsize], 1, n + 1, v);
       v = 0.0;
@@ -8726,7 +8710,7 @@ void sasrebuildbasis(sactiveset *state) {
          vv = state->idensebatch.xyR[state->densebatchsize][j];
          v += vv * vv;
       }
-      ae_assert(v > 0.0, "SActiveSet.RebuildBasis(): integrity check failed, INorm=0");
+      ae_assert(v > 0.0, "SActiveSet.RebuildBasis(): integrity check failed, INorm == 0");
       v = 1 / sqrt(v);
       ae_v_muld(state->idensebatch.xyR[state->densebatchsize], 1, n + 1, v);
    // Reorthogonalize other candidates with respect to candidate #0:
@@ -8786,7 +8770,7 @@ static void sactivesets_constraineddescent(sactiveset *state, RVector *g, RVecto
    vectorsetlengthatleast(d, n);
 // Calculate preconditioned constrained descent direction:
 //
-//     d := -inv(H)*( g - HA'*(HA*inv(H)*g) )
+//     d = -inv(H)*( g - HA'*(HA*inv(H)*g) )
 //
 // Formula above always gives direction which is orthogonal to rows of HA.
 // You can verify it by multiplication of both sides by HA[i] (I-th row),
@@ -8932,7 +8916,7 @@ void sasconstraineddirectionprec(sactiveset *state, RVector *d) {
 //     Penalty = SUM( Abs((C_i*x-R_i)/Alpha_i) )
 //
 // Here:
-// * summation is performed for I=0...NEC+NIC-1, CStatus[N+I]>0
+// * summation is performed for I = 0...NEC+NIC-1, CStatus[N+I] > 0
 //   (only for rows of CLEIC which are in active set)
 // * C_i is I-th row of CLEIC
 // * R_i is corresponding right part
@@ -9036,7 +9020,7 @@ void sascorrection(sactiveset *state, RVector *x, double *penalty) {
 // where x is original x before projection, S is a scale matrix,
 // As is a matrix of equality constraints (active set) which were
 // orthogonalized with respect to inner product given by S (i.e. we
-// have As*S*S'*As'=I), b is a right part of the orthogonalized
+// have As*S*S'*As' == I), b is a right part of the orthogonalized
 // constraints.
 //
 // NOTE: you can verify that x_proj is strictly feasible w.r.t.
@@ -9046,7 +9030,7 @@ void sascorrection(sactiveset *state, RVector *x, double *penalty) {
 //       This formula for projection can be obtained by solving
 //       following minimization problem.
 //
-//           min ||inv(S)*(x_proj-x)||^2 s.t. As*x_proj=b
+//           min ||inv(S)*(x_proj-x)||^2 s.t. As*x_proj == b
 //
 // NOTE: we apply sparse batch by examining CStatus[]; it is guaranteed
 //       to contain sparse batch, but avoids roundoff errors associated
@@ -9216,8 +9200,8 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
    ae_v_moveneg(state->rctmpg.xR, 1, gc->xR, 1, n);
 // Determine candidates to the active set.
 //
-// After this block constraints become either "inactive" (CStatus[i]<0)
-// or "candidates" (CStatus[i]=0). Previously active constraints always
+// After this block constraints become either "inactive" (CStatus[i] < 0)
+// or "candidates" (CStatus[i] == 0). Previously active constraints always
 // become "candidates".
    for (i = 0; i < n; i++) {
       state->cstatus.xZ[i] = -1;
@@ -9237,7 +9221,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
    // * copy constraint index to RCTmpConstraintIdx
    // * set corresponding element of CStatus[] to "candidate"
    // * fill RCTmpS by either +1 (lower bound) or -1 (upper bound)
-   // * set RCTmpIsEquality to False (BndL<BndU) or True (BndL=BndU)
+   // * set RCTmpIsEquality to False (BndL < BndU) or True (BndL == BndU)
    // * increase counters
       if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
       // Equality constraint is activated
@@ -9331,7 +9315,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
 // Here:
 // * G is a gradient (column vector)
 // * A[i] is a column vector, linear (left) part of I-th constraint.
-//   I=0..NActiveConstraints-1, first NActiveBnd elements of A are just
+//   I = 0..NActiveConstraints-1, first NActiveBnd elements of A are just
 //   subset of identity matrix (boundary constraints), next NActiveLin
 //   elements are subset of rows of the matrix of general linear constraints.
 // * lambda[i] is a Lagrange multiplier corresponding to I-th constraint
@@ -9658,7 +9642,6 @@ void qqpcopysettings(qqpsettings *src, qqpsettings *dst) {
 //                     buffers are preallocated up to NGrowTo*NGrowTo
 //     NGrowTo     -   new size
 //
-//
 // Outputs:
 //     SState      -   temporary buffers, some of them are preallocated
 // ALGLIB: Copyright 09.10.2017 by Sergey Bochkanov
@@ -9674,8 +9657,8 @@ void qqppreallocategrowdense(qqpbuffers *sstate, ae_int_t nexpected, ae_int_t ng
 // Target function at point PROJ(X+Stp*D), where PROJ(.) is a projection into
 // feasible set.
 //
-// NOTE: if Stp=0, D is not referenced at all. Thus,  there  is  no  need  to
-//       fill it by some meaningful values for Stp=0.
+// NOTE: if Stp == 0, D is not referenced at all. Thus,  there  is  no  need  to
+//       fill it by some meaningful values for Stp == 0.
 //
 // This subroutine uses temporary buffers  Tmp0/1,  which  are  automatically
 // resized if needed.
@@ -9781,19 +9764,19 @@ static void qqpsolver_targetgradient(qqpbuffers *sstate, RVector *x, RVector *g)
 //     D1      -   linear coefficient
 //     D1Est   -   estimate of D1 sign,  accounting  for  possible  numerical
 //                 errors:
-//                 * >0    means "almost surely positive"
-//                 * <0    means "almost surely negative"
-//                 * =0    means "pessimistic estimate  of  numerical  errors
-//                         in D1 is larger than magnitude of D1 itself; it is
-//                         impossible to reliably distinguish D1 from zero".
+//                 * > 0  means "almost surely positive"
+//                 * < 0  means "almost surely negative"
+//                 * == 0 means "pessimistic estimate  of  numerical  errors
+//                        in D1 is larger than magnitude of D1 itself; it is
+//                        impossible to reliably distinguish D1 from zero".
 //     D2      -   quadratic coefficient
 //     D2Est   -   estimate of D2 sign,  accounting  for  possible  numerical
 //                 errors:
-//                 * >0    means "almost surely positive"
-//                 * <0    means "almost surely negative"
-//                 * =0    means "pessimistic estimate  of  numerical  errors
-//                         in D2 is larger than magnitude of D2 itself; it is
-//                         impossible to reliably distinguish D2 from zero".
+//                 * > 0  means "almost surely positive"
+//                 * < 0  means "almost surely negative"
+//                 * == 0 means "pessimistic estimate  of  numerical  errors
+//                        in D2 is larger than magnitude of D2 itself; it is
+//                        impossible to reliably distinguish D2 from zero".
 // ALGLIB: Copyright 14.05.2014 by Sergey Bochkanov
 static void qqpsolver_quadraticmodel(qqpbuffers *sstate, RVector *x, RVector *d, RVector *g, double *d1, ae_int_t *d1est, double *d2, ae_int_t *d2est, RVector *tmp0) {
    ae_int_t n;
@@ -9870,7 +9853,7 @@ static void qqpsolver_quadraticmodel(qqpbuffers *sstate, RVector *x, RVector *d,
 //                 SAS.XC[CIdx] is forced to be equal to CVal.
 //     AddSteps-   array[AddStepsCnt] of additional steps:
 //                 * AddSteps[] <= Stp are ignored
-//                 * AddSteps[]>Stp are tried
+//                 * AddSteps[] > Stp are tried
 //     Activated-  possibly preallocated buffer; previously allocated memory
 //                 will be reused.
 //     Tmp0/1   -  possibly preallocated buffers; previously allocated memory
@@ -9914,7 +9897,7 @@ static void qqpsolver_findbeststepandmove(qqpbuffers *sstate, sactiveset *sas, R
    if (needact) {
       tmp0->xR[cidx] = cval;
    }
-// Try additional steps, if AddStepsCnt>0
+// Try additional steps, if AddStepsCnt > 0
    if (addstepscnt > 0) {
    // Find best step
       stpbest = stp;
@@ -9930,7 +9913,7 @@ static void qqpsolver_findbeststepandmove(qqpbuffers *sstate, sactiveset *sas, R
       }
    // Prepare best step
    //
-   // NOTE: because only AddSteps[]>Stp were checked,
+   // NOTE: because only AddSteps[] > Stp were checked,
    //       this step will activate constraint CIdx.
       for (i = 0; i < n; i++) {
          v = sas->xc.xR[i] + stpbest * d->xR[i];
@@ -10372,11 +10355,11 @@ static bool qqpsolver_cnewtonstep(qqpbuffers *sstate, qqpsettings *settings, RVe
 //            DURING SOLUTION PROCESS.
 //
 // Inputs:
-//     AC          -   for dense problems given by CQM model (AKind=0) A-term
+//     AC          -   for dense problems given by CQM model (AKind == 0) A-term
 //                     of CQM object contains system matrix. Other terms  are
 //                     unspecified and should not be referenced.
-//     SparseAC    -   for sparse problems (AKind=1)
-//     DenseAC     -   for traditional dense matrices (AKind=2)
+//     SparseAC    -   for sparse problems (AKind == 1)
+//     DenseAC     -   for traditional dense matrices (AKind == 2)
 //     AKind       -   matrix term to use:
 //                     * 0 for dense CQM (CQMAC)
 //                     * 1 for sparse matrix (SparseAC)
@@ -10389,7 +10372,7 @@ static bool qqpsolver_cnewtonstep(qqpbuffers *sstate, qqpsettings *settings, RVe
 //     BndUC       -   upper bound, array[NC]
 //     SC          -   scale vector, array[NC]:
 //                     * I-th element contains scale of I-th variable,
-//                     * SC[I]>0
+//                     * SC[I] > 0
 //     XOriginC    -   origin term, array[NC]. Can be zero.
 //     NC          -   number of variables in the  original  formulation  (no
 //                     slack variables).
@@ -10407,13 +10390,9 @@ static bool qqpsolver_cnewtonstep(qqpbuffers *sstate, qqpsettings *settings, RVe
 //                       as possible
 //     XS          -   initial point, array[NC]
 //
-//
 // Outputs:
 //     XS          -   last point
 //     TerminationType-termination type:
-//                     *
-//                     *
-//                     *
 // ALGLIB: Copyright 14.05.2011 by Sergey Bochkanov
 void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *denseac, ae_int_t akind, bool isupper, RVector *bc, RVector *bndlc, RVector *bnduc, RVector *sc, RVector *xoriginc, ae_int_t nc, qqpsettings *settings, qqpbuffers *sstate, RVector *xs, ae_int_t *terminationtype) {
    ae_int_t n;
@@ -10502,7 +10481,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
 //
 //     min { 0.5*y'*(S*A*S)*y + (S*b)'*y
 //
-// Modified A_mod=S*A*S and b_mod=S*(b+A*x0) are
+// Modified A_mod == S*A*S and b_mod == S*(b+A*x0) are
 // stored into SState.DenseA and SState.B.
 //
    vectorsetlengthatleast(&sstate->b, n);
@@ -10610,7 +10589,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
    ae_assert(sstate->akind >= 0, "QQP: integrity check failed");
 // Load box constraints into State structure.
 //
-// We apply transformation to variables: y=(x-x_origin)/s,
+// We apply transformation to variables: y == (x-x_origin)/s,
 // each of the constraints is appropriately shifted/scaled.
    for (i = 0; i < n; i++) {
       sstate->havebndl.xB[i] = isfinite(bndlc->xR[i]);
@@ -10732,7 +10711,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
          // Because problem was already scaled, we do not scale step before checking its length.
          // NOTE: these checks are performed only after at least one outer iteration was made.
             if (settings->epsf > 0.0) {
-            // NOTE 1: here we rely on the fact that ProjectedTargetFunction() ignore D when Stp=0
+            // NOTE 1: here we rely on the fact that ProjectedTargetFunction() ignore D when Stp == 0
             // NOTE 2: code below handles situation when update increases function value instead
             //         of decreasing it.
                fprev = qqpsolver_projectedtargetfunction(sstate, &sstate->xp, &sstate->dc, 0.0, &sstate->tmp0, &sstate->tmp1);
@@ -10781,7 +10760,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
          // Prepare search direction DC and explore it.
          //
          // We try to use CGP/DP to prepare conjugate gradient step,
-         // but we resort to steepest descent step (Beta=0) in case
+         // but we resort to steepest descent step (Beta == 0) in case
          // we are at I-th boundary, but DP[I] != 0.
          //
          // Such approach allows us to ALWAYS have feasible DC, with
@@ -10836,8 +10815,8 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
             }
             if (d2est <= 0 && cidx < 0) {
             // Function is unbounded from below:
-            // * D1<0 (verified by previous block)
-            // * D2Est <= 0, which means that either D2<0 - or it can not
+            // * D1 < 0 (verified by previous block)
+            // * D2Est <= 0, which means that either D2 < 0 - or it can not
             //   be reliably distinguished from zero.
             // * step is unconstrained
             //
@@ -10856,7 +10835,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
          //              unbounded from below without constraints, FullStp is
          //              forced to be RestStp.
          //
-         // So, if function is convex (D2>0):
+         // So, if function is convex (D2 > 0):
          // * FullStp = -D1/(2*D2)
          // * RestStp = restricted FullStp
          // * 0 <= RestStp <= FullStp
@@ -10983,7 +10962,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
             // * first, we explore direction:
             //   * if it is unbounded, we stop algorithm with
             //     appropriate termination code -4.
-            //   * if StpMax=0, we break Newton phase and return to
+            //   * if StpMax == 0, we break Newton phase and return to
             //     CG phase - constraint geometry is complicated near
             //     current point, so it is better to use simpler algo.
             // * second, we check that bounded step decreases function;
@@ -10994,8 +10973,8 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
                sasexploredirection(&sstate->sas, &sstate->dc, &stpmax, &cidx, &cval);
                if (cidx < 0) {
                // Function is unbounded from below:
-               // * D1<0 (verified by previous block)
-               // * D2Est <= 0, which means that either D2<0 - or it can not
+               // * D1 < 0 (verified by previous block)
+               // * D2Est <= 0, which means that either D2 < 0 - or it can not
                //   be reliably distinguished from zero.
                // * step is unconstrained
                //
@@ -11287,7 +11266,7 @@ static void qpdenseaulsolver_generateexmodel(RMatrix *sclsfta, RVector *sclsftb,
    //
    //     -Rho*ri*ci
    //
-   // Similaryly, lagrangian term is -NUi*(ci'*x-ri),
+   // Similarly, lagrangian term is -NUi*(ci'*x-ri),
    // so linear term is updated by
    //
    //     -NUi*ci
@@ -11369,9 +11348,9 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
 // Given current point ExXC, we can determine active and inactive
 // constraints. After we drop inactive inequality constraints, we
 // have equality-only constrained QP problem, with mix of general
-// linear equality constraints and "simple" constraints Xi=Ci.
+// linear equality constraints and "simple" constraints Xi == Ci.
 //
-// Problem min(0.5*x'*A*x + b'*x) s.t. C*x=d (general linear
+// Problem min(0.5*x'*A*x + b'*x) s.t. C*x == d (general linear
 // constraints) can be solved by explicitly writing out Lagrange
 // equations:
 //
@@ -11520,10 +11499,10 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
 // the original problem.
 //
 // Inputs:
-//     DenseA      -   for dense problems (AKind=0), A-term of CQM object
+//     DenseA      -   for dense problems (AKind == 0), A-term of CQM object
 //                     contains system matrix. Other terms are unspecified
 //                     and should not be referenced.
-//     SparseA     -   for sparse problems (AKind=1), CRS format
+//     SparseA     -   for sparse problems (AKind == 1), CRS format
 //     AKind       -   sparse matrix format:
 //                     * 0 for dense matrix
 //                     * 1 for sparse matrix
@@ -11535,7 +11514,7 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
 //     BndU        -   upper bound, array[N]
 //     S           -   scale vector, array[NC]:
 //                     * I-th element contains scale of I-th variable,
-//                     * SC[I]>0
+//                     * SC[I] > 0
 //     XOrigin     -   origin term, array[NC]. Can be zero.
 //     N           -   number of variables in the  original  formulation  (no
 //                     slack variables).
@@ -11551,7 +11530,6 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
 //                     functions.
 //     State       -   object which stores temporaries
 //     XS          -   initial point, array[NC]
-//
 //
 // On output, following fields of the State structure are modified:
 // * SclSftA       -   array[NMain,NMain], quadratic term, both triangles
@@ -11815,8 +11793,8 @@ static double qpdenseaulsolver_normalizequadraticterm(RMatrix *a, RVector *b, ae
 
 // This function selects initial working set of general inequality constraints
 // for QP problem:
-// * for non-convex QP problems    -   NICWork=NIC is returned
-// * otherwise                     -   NICWork=0 is returned (we have to
+// * for non-convex QP problems    -   NICWork == NIC is returned
+// * otherwise                     -   NICWork == 0 is returned (we have to
 //                                     determine working set iteratively)
 //
 // Inputs:
@@ -11828,7 +11806,7 @@ static double qpdenseaulsolver_normalizequadraticterm(RMatrix *a, RVector *b, ae
 //
 // Outputs:
 //     NICWork     -   recommended size of working set; in current version
-//                     either all (NICWork=NIC) or none (NICWork=0) constraints
+//                     either all (NICWork == NIC) or none (NICWork == 0) constraints
 //                     are included.
 //     AllowWSEviction-whether problem properties allow eviction of constraints
 //                     from working set or not. Non-convex problems do not
@@ -11870,10 +11848,10 @@ static void qpdenseaulsolver_selectinitialworkingset(RMatrix *a, ae_int_t nmain,
 // subject to combination of box and general linear dense/sparse constraints.
 //
 // Inputs:
-//     DenseA      -   for dense problems (AKind=0), A-term of CQM object
+//     DenseA      -   for dense problems (AKind == 0), A-term of CQM object
 //                     contains system matrix. Other terms are unspecified
 //                     and should not be referenced.
-//     SparseA     -   for sparse problems (AKind=1), CRS format
+//     SparseA     -   for sparse problems (AKind == 1), CRS format
 //     AKind       -   sparse matrix format:
 //                     * 0 for dense matrix
 //                     * 1 for sparse matrix
@@ -11885,7 +11863,7 @@ static void qpdenseaulsolver_selectinitialworkingset(RMatrix *a, ae_int_t nmain,
 //     BndU        -   upper bound, array[N]
 //     S           -   scale vector, array[NC]:
 //                     * I-th element contains scale of I-th variable,
-//                     * SC[I]>0
+//                     * SC[I] > 0
 //     XOrigin     -   origin term, array[NC]. Can be zero.
 //     N           -   number of variables in the  original  formulation  (no
 //                     slack variables).
@@ -11901,7 +11879,6 @@ static void qpdenseaulsolver_selectinitialworkingset(RMatrix *a, ae_int_t nmain,
 //                     functions.
 //     State       -   object which stores temporaries
 //     XS          -   initial point, array[NC]
-//
 //
 // Outputs:
 //     XS          -   last point
@@ -12004,12 +11981,12 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
 // Select working set of inequality constraints.
 //
 // Although it is possible to process all inequality constraints
-// at once, in one large batch, some QP problems have NIC>>N constraints,
+// at once, in one large batch, some QP problems have NIC >> N constraints,
 // but only minor fraction of them is inactive in the solution.
 //
 // Because algorithm running time is O((N+NEC+NIC)^3), we can
 // save a lot of time if we process only those inequality constraints
-// which need activation. Generally, NEC<N, and only O(N) inequality
+// which need activation. Generally, NEC < N, and only O(N) inequality
 // constraints are active in the solution.
 //
 // We can do so by solving problem first without general inequality
@@ -12057,7 +12034,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
       // Preallocate space for ExA and for QQP solver; we do not allocate
       // array[NTotal,NTotal] from the start because NTotal can be much
       // larger than NMain for problems with large amount of inequality
-      // constraints, and we usually need NWork=O(NMain).
+      // constraints, and we usually need NWork == O(NMain).
       //
       // NOTE: for the sake of simplicity, 1-dimensional arrays were
       //       preallocated to the maximum size required (NTotal).
@@ -12162,7 +12139,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
       for (i = 0; i < kwork; i++) {
       // Calculate I-th feasibility error in V using formula for distance
       // between point and line (here we calculate actual distance between
-      // XN and hyperplane Ci'*XN=Bi, which is different from error Ci'*XN-Bi).
+      // XN and hyperplane Ci'*XN == Bi, which is different from error Ci'*XN-Bi).
          v = 0.0;
          vv = 0.0;
          for (j = 0; j < nmain; j++) {
@@ -12433,8 +12410,8 @@ static const double minbleic_penaltyfactor = 100.0;
 //                 If some (all) variables are unbounded, you may specify
 //                 very large number or +INF.
 //
-// NOTE 1: it is possible to specify BndL[i]=BndU[i]. In this case I-th
-// variable will be "frozen" at X[i]=BndL[i]=BndU[i].
+// NOTE 1: it is possible to specify BndL[i] == BndU[i]. In this case I-th
+// variable will be "frozen" at X[i] == BndL[i] == BndU[i].
 //
 // NOTE 2: this solver has following useful properties:
 // * bound constraints are always satisfied exactly
@@ -12447,8 +12424,8 @@ void minbleicsetbc(minbleicstate *state, RVector *bndl, RVector *bndu) {
    ae_int_t i;
    ae_int_t n;
    n = state->nmain;
-   ae_assert(bndl->cnt >= n, "MinBLEICSetBC: Length(BndL)<N");
-   ae_assert(bndu->cnt >= n, "MinBLEICSetBC: Length(BndU)<N");
+   ae_assert(bndl->cnt >= n, "MinBLEICSetBC: Length(BndL) < N");
+   ae_assert(bndu->cnt >= n, "MinBLEICSetBC: Length(BndU) < N");
    for (i = 0; i < n; i++) {
       ae_assert(isfinite(bndl->xR[i]) || isneginf(bndl->xR[i]), "MinBLEICSetBC: BndL contains NAN or +INF");
       ae_assert(isfinite(bndu->xR[i]) || isposinf(bndu->xR[i]), "MinBLEICSetBC: BndL contains NAN or -INF");
@@ -12474,9 +12451,9 @@ void minbleicsetbc(minbleicstate *state, RVector *bndl, RVector *bndu) {
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n]
-//                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n]
+//                 * if CT[i] == 0, then I-th constraint is C[i,*]*x  = C[i,n]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n]
 //     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
@@ -12501,10 +12478,10 @@ void minbleicsetlc(minbleicstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
    double v;
    n = state->nmain;
 // First, check for errors in the inputs
-   ae_assert(k >= 0, "MinBLEICSetLC: K<0");
-   ae_assert(c->cols >= n + 1 || k == 0, "MinBLEICSetLC: Cols(C)<N+1");
-   ae_assert(c->rows >= k, "MinBLEICSetLC: Rows(C)<K");
-   ae_assert(ct->cnt >= k, "MinBLEICSetLC: Length(CT)<K");
+   ae_assert(k >= 0, "MinBLEICSetLC: K < 0");
+   ae_assert(c->cols >= n + 1 || k == 0, "MinBLEICSetLC: Cols(C) < N+1");
+   ae_assert(c->rows >= k, "MinBLEICSetLC: Rows(C) < K");
+   ae_assert(ct->cnt >= k, "MinBLEICSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n + 1), "MinBLEICSetLC: C contains infinite or NaN values!");
 // Handle zero K
    if (k == 0) {
@@ -12561,9 +12538,9 @@ void minbleicsetlc(minbleicstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
 //     State   -   structure which stores algorithm state
 //     EpsG    -   >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
-//                 |v|<EpsG is satisfied, where:
+//                 |v| < EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
-//                 * v - scaled gradient vector, v[i]=g[i]*s[i]
+//                 * v - scaled gradient vector, v[i] == g[i]*s[i]
 //                 * g - gradient
 //                 * s - scaling coefficients set by MinBLEICSetScale()
 //     EpsF    -   >= 0
@@ -12574,13 +12551,13 @@ void minbleicsetlc(minbleicstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
 //                 The subroutine finishes its work if  on  k+1-th  iteration
 //                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
-//                 * v - scaled step vector, v[i]=dx[i]/s[i]
-//                 * dx - step vector, dx=X(k+1)-X(k)
+//                 * v - scaled step vector, v[i] == dx[i]/s[i]
+//                 * dx - step vector, dx == X(k+1)-X(k)
 //                 * s - scaling coefficients set by MinBLEICSetScale()
-//     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
+//     MaxIts  -   maximum number of iterations. If MaxIts == 0, the  number  of
 //                 iterations is unlimited.
 //
-// Passing EpsG=0, EpsF=0 and EpsX=0 and MaxIts=0 (simultaneously) will lead
+// Passing EpsG == 0, EpsF == 0 and EpsX == 0 and MaxIts == 0 (simultaneously) will lead
 // to automatic stopping criterion selection.
 //
 // NOTE: when SetCond() called with non-zero MaxIts, BLEIC solver may perform
@@ -12635,7 +12612,7 @@ void minbleicsetcond(minbleicstate *state, double epsg, double epsf, double epsx
 // API: void minbleicsetscale(const minbleicstate &state, const real_1d_array &s);
 void minbleicsetscale(minbleicstate *state, RVector *s) {
    ae_int_t i;
-   ae_assert(s->cnt >= state->nmain, "MinBLEICSetScale: Length(S)<N");
+   ae_assert(s->cnt >= state->nmain, "MinBLEICSetScale: Length(S) < N");
    for (i = 0; i < state->nmain; i++) {
       ae_assert(isfinite(s->xR[i]), "MinBLEICSetScale: S contains infinite or NAN elements");
       ae_assert(s->xR[i] != 0.0, "MinBLEICSetScale: S contains zero elements");
@@ -12757,7 +12734,7 @@ void minbleicsetdrep(minbleicstate *state, bool needdrep) {
 // API: void minbleicsetstpmax(const minbleicstate &state, const double stpmax);
 void minbleicsetstpmax(minbleicstate *state, double stpmax) {
    ae_assert(isfinite(stpmax), "MinBLEICSetStpMax: StpMax is not finite!");
-   ae_assert(stpmax >= 0.0, "MinBLEICSetStpMax: StpMax<0!");
+   ae_assert(stpmax >= 0.0, "MinBLEICSetStpMax: StpMax < 0!");
    state->stpmax = stpmax;
 }
 
@@ -12776,7 +12753,7 @@ void minbleicrestartfrom(minbleicstate *state, RVector *x) {
    ae_int_t n;
    n = state->nmain;
 // First, check for errors in the inputs
-   ae_assert(x->cnt >= n, "MinBLEICRestartFrom: Length(X)<N");
+   ae_assert(x->cnt >= n, "MinBLEICRestartFrom: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinBLEICRestartFrom: X contains infinite or NaN values!");
 // Set XC
    ae_v_move(state->xstart.xR, 1, x->xR, 1, n);
@@ -12836,10 +12813,8 @@ static void minbleic_minbleicinitinternal(ae_int_t n, RVector *x, double diffste
    ae_frame_leave();
 }
 
-//                      BOUND CONSTRAINED OPTIMIZATION
-//        WITH ADDITIONAL LINEAR EQUALITY AND INEQUALITY CONSTRAINTS
-//
-// DESCRIPTION:
+// BOUND CONSTRAINED OPTIMIZATION
+// WITH ADDITIONAL LINEAR EQUALITY AND INEQUALITY CONSTRAINTS
 // The  subroutine  minimizes  function   F(x)  of N arguments subject to any
 // combination of:
 // * bound constraints
@@ -12887,7 +12862,7 @@ static void minbleic_minbleicinitinternal(ae_int_t n, RVector *x, double diffste
 //       constraints) it can be several times faster than MinBLEIC.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size ofX
 //     X       -   starting point, array[N]:
@@ -12907,8 +12882,8 @@ void minbleiccreate(ae_int_t n, RVector *x, minbleicstate *state) {
    SetObj(minbleicstate, state);
    NewMatrix(c, 0, 0, DT_REAL);
    NewVector(ct, 0, DT_INT);
-   ae_assert(n >= 1, "MinBLEICCreate: N<1");
-   ae_assert(x->cnt >= n, "MinBLEICCreate: Length(X)<N");
+   ae_assert(n >= 1, "MinBLEICCreate: N < 1");
+   ae_assert(x->cnt >= n, "MinBLEICCreate: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinBLEICCreate: X contains infinite or NaN values!");
    minbleic_minbleicinitinternal(n, x, 0.0, state);
    ae_frame_leave();
@@ -12922,11 +12897,11 @@ void minbleiccreate(ae_int_t n, RVector *x, minbleicstate *state) {
 // more information about creation of BLEIC optimizer.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   starting point, array[0..N-1].
-//     DiffStep-   differentiation step, >0
+//     DiffStep-   differentiation step, > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -12960,8 +12935,8 @@ void minbleiccreatef(ae_int_t n, RVector *x, double diffstep, minbleicstate *sta
    SetObj(minbleicstate, state);
    NewMatrix(c, 0, 0, DT_REAL);
    NewVector(ct, 0, DT_INT);
-   ae_assert(n >= 1, "MinBLEICCreateF: N<1");
-   ae_assert(x->cnt >= n, "MinBLEICCreateF: Length(X)<N");
+   ae_assert(n >= 1, "MinBLEICCreateF: N < 1");
+   ae_assert(x->cnt >= n, "MinBLEICCreateF: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinBLEICCreateF: X contains infinite or NaN values!");
    ae_assert(isfinite(diffstep), "MinBLEICCreateF: DiffStep is infinite or NaN!");
    ae_assert(diffstep > 0.0, "MinBLEICCreateF: DiffStep is non-positive!");
@@ -13045,7 +13020,6 @@ Spawn:
    penalty = 939;
    ginit = -526;
    gdecay = 763;
-// Routine body
 // Algorithm parameters:
 // * M          number of L-BFGS corrections.
 //              This coefficient remains fixed during iterations.
@@ -13082,7 +13056,7 @@ Spawn:
       state->lastscaleused.xR[i] = state->s.xR[i];
       state->invs.xR[i] = 1 / state->s.xR[i];
    }
-//  Check analytic derivative
+// Check analytic derivative
    if (state->diffstep == 0.0 && state->teststep > 0.0) {
       while (smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xstart, &state->s, &state->bndl, &state->bndu, true, state->teststep)) {
          for (i = 0; i < n; i++) {
@@ -13237,7 +13211,7 @@ Spawn:
    // * first iteration of LBFGS is a special - it is performed with
    //   minimum set of active constraints, algorithm termination can
    //   be performed only at this state. We call this iteration
-   //  "steepest descent step".
+   //   "steepest descent step".
    //
    // About termination:
    // * LBFGS iterations can be terminated because of two reasons:
@@ -13485,9 +13459,9 @@ Spawn:
             b = false;
             if (state->cidx >= 0 && v <= minbleic_maxnonmonotoniclen && state->nonmonotoniccnt > 0) {
             // We try to enforce non-monotonic step:
-            // * Stp    := CurStpMax
-            // * MCINFO := 5
-            // * XN     := XC+CurStpMax*D
+            // * Stp    = CurStpMax
+            // * MCINFO = 5
+            // * XN     = XC+CurStpMax*D
             // * non-monotonic counter is decreased
             //
             // NOTE: UGN/CGN are not updated because step is so short that we assume that
@@ -13529,7 +13503,7 @@ Spawn:
       // * change current point remembered by SAS structure
       // * move XN/FN/GN to XC/FC/GC
       // * report current point and update iterations counter
-      // * if MCINFO=1, push new pair SK/YK to LBFGS buffer
+      // * if MCINFO == 1, push new pair SK/YK to LBFGS buffer
          state->fp = state->fc;
          ae_v_move(state->xp.xR, 1, state->sas.xc.xR, 1, n);
          state->fc = state->fn;
@@ -13560,10 +13534,10 @@ Spawn:
             v = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufsk.xyR[state->bufsize - 1], 1, n);
             vv = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufyk.xyR[state->bufsize - 1], 1, n);
             if (v == 0.0 || vv == 0.0) {
-            // Strange internal error in LBFGS - either YK=0
-            // (which should not have been) or (SK,YK)=0 (again,
+            // Strange internal error in LBFGS - either YK == 0
+            // (which should not have been) or (SK,YK) == 0 (again,
             // unexpected). It should not take place because
-            // MCINFO=1, which signals "good" step. But just
+            // MCINFO == 1, which signals "good" step. But just
             // to be sure we have special branch of code which
             // restarts LBFGS
                break;
@@ -13678,8 +13652,8 @@ Pause:
 // Inputs:
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step used for numerical differentiation:
-//                     * TestStep=0 turns verification off
-//                     * TestStep>0 activates verification
+//                     * TestStep == 0 turns verification off
+//                     * TestStep > 0 activates verification
 //                     You should carefully choose TestStep. Value  which  is
 //                     too large (so large that  function  behavior  is  non-
 //                     cubic at this scale) will lead  to  false  alarms. Too
@@ -13704,7 +13678,7 @@ Pause:
 // API: void minbleicoptguardgradient(const minbleicstate &state, const double teststep);
 void minbleicoptguardgradient(minbleicstate *state, double teststep) {
    ae_assert(isfinite(teststep), "MinBLEICOptGuardGradient: TestStep contains NaN or INF");
-   ae_assert(teststep >= 0.0, "MinBLEICOptGuardGradient: invalid argument TestStep(TestStep<0)");
+   ae_assert(teststep >= 0.0, "MinBLEICOptGuardGradient: invalid argument TestStep(TestStep < 0)");
    state->teststep = teststep;
 }
 
@@ -13871,7 +13845,7 @@ void minbleicoptguardresults(minbleicstate *state, optguardreport *rep) {
 // * stp[], f[] - arrays of length CNT which store step lengths and  function
 //   values at these points; f[i] is evaluated in x0+stp[i]*d.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -13925,7 +13899,7 @@ void minbleicoptguardnonc1test0results(minbleicstate *state, optguardnonc1test0r
 //   values at these points; g[i] is evaluated in  x0+stp[i]*d  and  contains
 //   vidx-th component of the gradient.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -13949,7 +13923,7 @@ void minbleicoptguardnonc1test1results(minbleicstate *state, optguardnonc1test1r
 
 // BLEIC results
 //
-// Buffered implementation of MinBLEICResults() which uses pre-allocated buffer
+// Buffered implementation of MinBLEICResults() which uses preallocated buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -14427,7 +14401,6 @@ bool minbleiciteration(const minbleicstate &state) {
 //    callback (function/gradient) passed to MinBLEICOptimize()  and specific
 //    function used to create optimizer.
 //
-//
 //                      |         USER PASSED TO MinBLEICOptimize()
 //    CREATED WITH      |  function only   |  function and gradient
 //    ------------------------------------------------------------
@@ -14565,10 +14538,10 @@ void qpbleiccopysettings(qpbleicsettings *src, qpbleicsettings *dst) {
 // subject to boundary constraints.
 //
 // Inputs:
-//     AC          -   for dense problems (AKind=0), A-term of CQM object
+//     AC          -   for dense problems (AKind == 0), A-term of CQM object
 //                     contains system matrix. Other terms are unspecified
 //                     and should not be referenced.
-//     SparseAC    -   for sparse problems (AKind=1
+//     SparseAC    -   for sparse problems (AKind == 1
 //     AKind       -   sparse matrix format:
 //                     * 0 for dense matrix
 //                     * 1 for sparse matrix
@@ -14582,7 +14555,7 @@ void qpbleiccopysettings(qpbleicsettings *src, qpbleicsettings *dst) {
 //     BndUC       -   upper bound, array[NC]
 //     SC          -   scale vector, array[NC]:
 //                     * I-th element contains scale of I-th variable,
-//                     * SC[I]>0
+//                     * SC[I] > 0
 //     XOriginC    -   origin term, array[NC]. Can be zero.
 //     NC          -   number of variables in the  original  formulation  (no
 //                     slack variables).
@@ -14598,13 +14571,12 @@ void qpbleiccopysettings(qpbleicsettings *src, qpbleicsettings *dst) {
 //                     * if uninitialized object was passed, FirstCall parameter MUST
 //                       be set to True; object will be automatically initialized by the
 //                       function, and FirstCall will be set to False.
-//                     * if FirstCall=False, it is assumed that this parameter was already
+//                     * if FirstCall == False, it is assumed that this parameter was already
 //                       initialized by previous call to this function with same
 //                       problem dimensions (variable count N).
 //     FirstCall   -   whether it is first call of this function for this specific
 //                     instance of SState, with this number of variables N specified.
 //     XS          -   initial point, array[NC]
-//
 //
 // Outputs:
 //     XS          -   last point
@@ -14789,8 +14761,8 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
          if ((d2est < 0 || d2est == 0 && d1est < 0) && !sstate->solver.boundedstep) {
          // Function is unbounded from below:
          // * function will decrease along D, i.e. either:
-         //   * D2<0
-         //   * D2=0 and D1<0
+         //   * D2 < 0
+         //   * D2 == 0 and D1 < 0
          // * step is unconstrained
          //
          // If these conditions are true, we abnormally terminate QP
@@ -14913,14 +14885,14 @@ static const double vipmsolver_badsteplength = 1.0E-3;
 // Sets linear/quadratic terms for QP-IPM solver
 //
 // If you initialized solver with VIPMInitDenseWithSlacks(), NMain below is a
-// number of non-slack variables. In other cases, NMain=N.
+// number of non-slack variables. In other cases, NMain == N.
 //
 // Inputs:
 //     State               -   instance initialized with one of the initialization
 //                             functions
-//     DenseH              -   if HKind=0: array[NMain,NMain], dense quadratic term
+//     DenseH              -   if HKind == 0: array[NMain,NMain], dense quadratic term
 //                             (either upper or lower triangle)
-//     SparseH             -   if HKind=1: array[NMain,NMain], sparse quadratic term
+//     SparseH             -   if HKind == 1: array[NMain,NMain], sparse quadratic term
 //                             (either upper or lower triangle)
 //     HKind               -   0 or 1, quadratic term format
 //     IsUpper             -   whether dense/sparse H contains lower or upper
@@ -15166,7 +15138,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
 //                             -INF <= CL[I] <= CU[I] <= +INF.
 //
 // This function throws exception if constraints have inconsistent bounds, i.e.
-// either BndL[I]>BndU[I] or CL[I]>CU[I]. In all other cases it succeeds.
+// either BndL[I] > BndU[I] or CL[I] > CU[I]. In all other cases it succeeds.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsematrix *sparsea, ae_int_t msparse, RMatrix *densea, ae_int_t mdense, RVector *cl, RVector *cu) {
    ae_int_t m;
@@ -15185,8 +15157,8 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
    n = state->n;
    nmain = state->nmain;
    nslack = n - nmain;
-   ae_assert(mdense >= 0, "VIPMSetConstraints: MDense<0");
-   ae_assert(msparse >= 0, "VIPMSetConstraints: MSparse<0");
+   ae_assert(mdense >= 0, "VIPMSetConstraints: MDense < 0");
+   ae_assert(msparse >= 0, "VIPMSetConstraints: MSparse < 0");
    ae_assert(apservisfinitematrix(densea, mdense, n), "VIPMSetConstraints: DenseA contains infinite or NaN values!");
    ae_assert(msparse == 0 || sparsea->matrixtype == 1, "VIPMSetConstraints: non-CRS constraint matrix!");
    ae_assert(msparse == 0 || sparsea->m == msparse && sparsea->n == n, "VIPMSetConstraints: constraint matrix has incorrect size");
@@ -15382,15 +15354,15 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
 //     EpsP                -   maximum primal error allowed in the  solution,
 //                             EpsP >= 0. Zero will be  automatically  replaced
 //                             by recommended default value,  which is  equal
-//                             to 10*Sqrt(Epsilon) in the current version
+//                             to 10*sqrt(Epsilon) in the current version
 //     EpsD                -   maximum  dual  error allowed in the  solution,
 //                             EpsP >= 0. Zero will be  automatically  replaced
 //                             by recommended default value,  which is  equal
-//                             to 10*Sqrt(Epsilon) in the current version
+//                             to 10*sqrt(Epsilon) in the current version
 //     EpsGap              -   maximum  duality gap allowed in the  solution,
 //                             EpsP >= 0. Zero will be  automatically  replaced
 //                             by recommended default value,  which is  equal
-//                             to 10*Sqrt(Epsilon) in the current version
+//                             to 10*sqrt(Epsilon) in the current version
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 void vipmsetcond(vipmstate *state, double epsp, double epsd, double epsgap) {
    double sml;
@@ -15413,7 +15385,7 @@ void vipmsetcond(vipmstate *state, double epsp, double epsd, double epsgap) {
 //                     memory is reused as much as possible
 //     S           -   scale vector, array[N]:
 //                     * I-th element contains scale of I-th variable,
-//                     * S[I]>0
+//                     * S[I] > 0
 //     XOrigin     -   origin term, array[N]. Can be zero. The solver solves
 //                     problem of the form
 //
@@ -15431,12 +15403,12 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
    ae_int_t i;
    ae_int_t j;
    ae_int_t nslack;
-   ae_assert(n >= 1, "VIPMInit: N<1");
+   ae_assert(n >= 1, "VIPMInit: N < 1");
    ae_assert(isfinitevector(s, n), "VIPMInit: S contains infinite or NaN elements");
    ae_assert(isfinitevector(xorigin, n), "VIPMInit: XOrigin contains infinite or NaN elements");
    ae_assert(ftype == 0 || ftype == 1, "VIPMInit: unexpected FType");
-   ae_assert(nmain >= 1, "VIPMInit: NMain<1");
-   ae_assert(nmain <= n, "VIPMInit: NMain>N");
+   ae_assert(nmain >= 1, "VIPMInit: NMain < 1");
+   ae_assert(nmain <= n, "VIPMInit: NMain > N");
    nslack = n - nmain;
 // Problem metrics, settings and type
    state->n = n;
@@ -15529,7 +15501,7 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
 //                     memory is reused as much as possible
 //     S           -   scale vector, array[N]:
 //                     * I-th element contains scale of I-th variable,
-//                     * S[I]>0
+//                     * S[I] > 0
 //     XOrigin     -   origin term, array[N]. Can be zero. The solver solves
 //                     problem of the form
 //
@@ -15541,7 +15513,7 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
 //                     specified later with separate calls.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 void vipminitdense(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n) {
-   ae_assert(n >= 1, "VIPMInitDense: N<1");
+   ae_assert(n >= 1, "VIPMInitDense: N < 1");
    ae_assert(isfinitevector(s, n), "VIPMInitDense: S contains infinite or NaN elements");
    ae_assert(isfinitevector(xorigin, n), "VIPMInitDense: XOrigin contains infinite or NaN elements");
    vipmsolver_vipminit(state, s, xorigin, n, n, 0);
@@ -15565,7 +15537,7 @@ void vipminitdense(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n) {
 //                     memory is reused as much as possible
 //     S           -   scale vector, array[N]:
 //                     * I-th element contains scale of I-th variable,
-//                     * S[I]>0
+//                     * S[I] > 0
 //     XOrigin     -   origin term, array[N]. Can be zero. The solver solves
 //                     problem of the form
 //
@@ -15579,9 +15551,9 @@ void vipminitdense(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n) {
 //     N           -   total number of variables including slack ones
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 void vipminitdensewithslacks(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t nmain, ae_int_t n) {
-   ae_assert(nmain >= 1, "VIPMInitDense: NMain<1");
-   ae_assert(n >= 1, "VIPMInitDense: N<1");
-   ae_assert(nmain <= n, "VIPMInitDense: NMain>N");
+   ae_assert(nmain >= 1, "VIPMInitDense: NMain < 1");
+   ae_assert(n >= 1, "VIPMInitDense: N < 1");
+   ae_assert(nmain <= n, "VIPMInitDense: NMain > N");
    ae_assert(isfinitevector(s, n), "VIPMInitDense: S contains infinite or NaN elements");
    ae_assert(isfinitevector(xorigin, n), "VIPMInitDense: XOrigin contains infinite or NaN elements");
    vipmsolver_vipminit(state, s, xorigin, n, nmain, 0);
@@ -15599,7 +15571,7 @@ void vipminitdensewithslacks(vipmstate *state, RVector *s, RVector *xorigin, ae_
 //                     memory is reused as much as possible
 //     S           -   scale vector, array[N]:
 //                     * I-th element contains scale of I-th variable,
-//                     * S[I]>0
+//                     * S[I] > 0
 //     XOrigin     -   origin term, array[N]. Can be zero. The solver solves
 //                     problem of the form
 //                     >
@@ -15612,7 +15584,7 @@ void vipminitdensewithslacks(vipmstate *state, RVector *s, RVector *xorigin, ae_
 // This optimization mode assumes that no slack variables is present.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 void vipminitsparse(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n) {
-   ae_assert(n >= 1, "VIPMInitSparse: N<1");
+   ae_assert(n >= 1, "VIPMInitSparse: N < 1");
    ae_assert(isfinitevector(s, n), "VIPMInitSparse: S contains infinite or NaN elements");
    ae_assert(isfinitevector(xorigin, n), "VIPMInitSparse: XOrigin contains infinite or NaN elements");
    vipmsolver_vipminit(state, s, xorigin, n, n, 1);
@@ -15621,8 +15593,8 @@ void vipminitsparse(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n) 
 // Allocates place for variables of IPM and fills by zeros.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 static void vipmsolver_varsinitbyzero(vipmvars *vstate, ae_int_t n, ae_int_t m) {
-   ae_assert(n >= 1, "VarsInitByZero: N<1");
-   ae_assert(m >= 0, "VarsInitByZero: M<0");
+   ae_assert(n >= 1, "VarsInitByZero: N < 1");
+   ae_assert(m >= 0, "VarsInitByZero: M < 0");
    vstate->n = n;
    vstate->m = m;
    rsetallocv(n, 0.0, &vstate->x);
@@ -15646,8 +15618,8 @@ static void vipmsolver_varsinitfrom(vipmvars *vstate, vipmvars *vsrc) {
    ae_int_t m;
    n = vsrc->n;
    m = vsrc->m;
-   ae_assert(n >= 1, "VarsInitFrom: N<1");
-   ae_assert(m >= 0, "VarsInitFrom: M<0");
+   ae_assert(n >= 1, "VarsInitFrom: N < 1");
+   ae_assert(m >= 0, "VarsInitFrom: M < 0");
    vstate->n = n;
    vstate->m = m;
    vectorsetlengthatleast(&vstate->x, n);
@@ -15685,8 +15657,8 @@ static void vipmsolver_varsaddstep(vipmvars *vstate, vipmvars *vdir, double stpp
    ae_int_t m;
    n = vstate->n;
    m = vstate->m;
-   ae_assert(n >= 1, "VarsAddStep: N<1");
-   ae_assert(m >= 0, "VarsAddStep: M<0");
+   ae_assert(n >= 1, "VarsAddStep: N < 1");
+   ae_assert(m >= 0, "VarsAddStep: M < 0");
    ae_assert(n == vdir->n, "VarsAddStep: sizes mismatch");
    ae_assert(m == vdir->m, "VarsAddStep: sizes mismatch");
    for (i = 0; i < n; i++) {
@@ -15805,7 +15777,7 @@ static double vipmsolver_vipmtarget(vipmstate *state, RVector *x) {
 
 // Computes
 //
-//     Y := alpha*A*x + beta*Y
+//     Y = alpha*A*x + beta*Y
 //
 // where A is constraint matrix, X is user-specified source, Y is target.
 //
@@ -15836,7 +15808,7 @@ static void vipmsolver_multiplygeax(vipmstate *state, double alpha, RVector *x, 
 
 // Computes
 //
-//     Y := alpha*A'*x + beta*Y
+//     Y = alpha*A'*x + beta*Y
 //
 // where A is constraint matrix, X is user-specified source, Y is target.
 //
@@ -16288,7 +16260,7 @@ static void vipmsolver_solvereducedkktsystem(vipmstate *state, RVector *deltaxy)
 // temporaries. It should be called once prior to the first call to
 // VIPMInitialPoint() or VIPMFactorize().
 //
-// Parameters:
+// Parameter:
 //     RegFree     -   regularization for free variables;
 //                     good value sqrt(MachineEpsilon)
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
@@ -16540,6 +16512,7 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree) {
          state->current.q.xR[i] *= v;
       }
    }
+// Almost done.
 }
 
 // Generates precomputed temporary  vectors  and  KKT  factorization  at  the
@@ -16718,7 +16691,7 @@ static bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmv
 }
 
 // Solves KKT system stored in VIPMState with user-passed RHS.  The  solution
-// X is either copied to Sol (AlphaSol=0) or added Sol:=AlphaSol*Sol+X.
+// X is either copied to Sol (AlphaSol == 0) or added Sol = AlphaSol*Sol+X.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 static void vipmsolver_solvekktsystem(vipmstate *state, vipmrighthandside *rhs, vipmvars *sol) {
    ae_int_t n;
@@ -16818,7 +16791,7 @@ static void vipmsolver_rhscompute(vipmstate *state, vipmvars *v0, double muestim
       // Inequality/range constraint
          rhs->rho.xR[i] += v0->w.xR[i];
       } else {
-      // Equality constraint without slack variables, W[i]=0
+      // Equality constraint without slack variables, W[i] == 0
          ae_assert(v0->w.xR[i] == 0.0, "RhsCompute: W[i] != 0 for linear equality constraint");
       }
    }
@@ -17237,8 +17210,6 @@ static void vipmsolver_vipmcomputesteplength(vipmstate *state, vipmvars *v0, vip
 //     State               -   solver state
 //     AlphaP              -   primal step to perform
 //     AlphaD              -   dual   step to perform
-//
-// Outputs:
 // ALGLIB: Copyright 01.08.2020 by Sergey Bochkanov
 static void vipmsolver_vipmperformstep(vipmstate *state, double alphap, double alphad) {
 // Perform step
@@ -17529,7 +17500,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    rsetallocv(n, 0.0, lagbc);
    rsetallocv(m, 0.0, laglc);
 // Some integrity checks:
-// * we need PrimalStagnationLen<DualStagnationLen in order to be able to correctly
+// * we need PrimalStagnationLen < DualStagnationLen in order to be able to correctly
 //   detect infeasible instances (stagnated dual error is present in both infeasible
 //   and unbounded instances, so we should check for primal stagnation a few iters
 //   before checking for dual stagnation)
@@ -17671,7 +17642,7 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
          //
          // We can't drop b <= A from b <= A <= b+r because it impossible with our choice of
          // slack variables. Usually we do not need to do so because we reorder constraints
-         // during initialization in such a way that |b+r|>|b| and because typical
+         // during initialization in such a way that |b+r| > |b| and because typical
          // applications do not have excessively large lower AND upper bound (user may
          // specify large value for 'absent' bound, but usually he does not mark both bounds as absent).
             vipmsolver_multiplygeax(state, 1.0, &state->current.x, 0, 0.0, &state->tmpax, 0);
@@ -17750,8 +17721,6 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
 // Load best point, perform some checks
    if (loadbest) {
    // Load best point
-   //
-   // NOTE: TouchReal() is used to avoid spurious compiler warnings about 'set but unused'
       vipmsolver_varsinitfrom(&state->current, &state->best);
    // If no error flags were set yet, check solution quality
       bady = vipmsolver_bigy;
@@ -18209,9 +18178,9 @@ namespace alglib_impl {
 //     State   -   structure which stores algorithm state
 //     EpsG    -   >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
-//                 |v|<EpsG is satisfied, where:
+//                 |v| < EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
-//                 * v - scaled constrained gradient vector, v[i]=g[i]*s[i]
+//                 * v - scaled constrained gradient vector, v[i] == g[i]*s[i]
 //                 * g - gradient
 //                 * s - scaling coefficients set by MinQPSetScale()
 //     EpsF    -   >= 0
@@ -18223,10 +18192,10 @@ namespace alglib_impl {
 //                 descent  step  on  k+1-th iteration  satisfies   following
 //                 condition:
 //                 * |.| means Euclidian norm
-//                 * v - scaled step vector, v[i]=dx[i]/s[i]
-//                 * dx - step vector, dx=X(k+1)-X(k)
+//                 * v - scaled step vector, v[i] == dx[i]/s[i]
+//                 * dx - step vector, dx == X(k+1)-X(k)
 //                 * s - scaling coefficients set by MinQPSetScale()
-//     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
+//     MaxIts  -   maximum number of iterations. If MaxIts == 0, the  number  of
 //                 iterations is unlimited. NOTE: this  algorithm uses  LBFGS
 //                 iterations,  which  are  relatively  cheap,  but   improve
 //                 function value only a bit. So you will need many iterations
@@ -18236,7 +18205,7 @@ namespace alglib_impl {
 // IT IS VERY IMPORTANT TO CALL MinQPSetScale() WHEN YOU USE THIS  ALGORITHM
 // BECAUSE ITS STOPPING CRITERIA ARE SCALE-DEPENDENT!
 //
-// Passing EpsG=0, EpsF=0 and EpsX=0 and MaxIts=0 (simultaneously) will lead
+// Passing EpsG == 0, EpsF == 0 and EpsX == 0 and MaxIts == 0 (simultaneously) will lead
 // to automatic stopping criterion selection (presently it is  small    step
 // length, but it may change in the future versions of ALGLIB).
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
@@ -18311,7 +18280,7 @@ void minqpsetalgobleic(minqpstate *state, double epsg, double epsf, double epsx,
 //                 variable scaling being applied) is less than EpsX.
 //                 See  minqpsetscale()  for  more  information  on  variable
 //                 scaling.
-//     Rho     -   penalty coefficient, Rho>0:
+//     Rho     -   penalty coefficient, Rho > 0:
 //                 * large enough  that  algorithm  converges  with   desired
 //                   precision.
 //                 * not TOO large to prevent ill-conditioning
@@ -18320,17 +18289,17 @@ void minqpsetalgobleic(minqpstate *state, double epsg, double epsf, double epsx,
 //                 * recommended values: 10-15 (although  in  most  cases  it
 //                   converges within 5 iterations, you may need a  few  more
 //                   to be sure).
-//                 * ItsCnt=0 means that small number of outer iterations  is
+//                 * ItsCnt == 0 means that small number of outer iterations  is
 //                   automatically chosen (10 iterations in current version).
-//                 * ItsCnt=1 means that AUL algorithm performs just as usual
+//                 * ItsCnt == 1 means that AUL algorithm performs just as usual
 //                   penalty method.
-//                 * ItsCnt>1 means that  AUL  algorithm  performs  specified
+//                 * ItsCnt > 1 means that  AUL  algorithm  performs  specified
 //                   number of outer iterations
 //
 // IT IS VERY IMPORTANT TO CALL minqpsetscale() WHEN YOU USE THIS  ALGORITHM
 // BECAUSE ITS CONVERGENCE PROPERTIES AND STOPPING CRITERIA ARE SCALE-DEPENDENT!
 //
-// NOTE: Passing  EpsX=0  will  lead  to  automatic  step  length  selection
+// NOTE: Passing  EpsX == 0  will  lead  to  automatic  step  length  selection
 //       (specific step length chosen may change in the future  versions  of
 //       ALGLIB, so it is better to specify step length explicitly).
 // ALGLIB: Copyright 20.08.2016 by Sergey Bochkanov
@@ -18404,7 +18373,7 @@ void minqpsetalgodenseaul(minqpstate *state, double epsx, double rho, ae_int_t i
 // IT IS VERY IMPORTANT TO CALL minqpsetscale() WHEN YOU USE THIS  ALGORITHM
 // BECAUSE ITS CONVERGENCE PROPERTIES AND STOPPING CRITERIA ARE SCALE-DEPENDENT!
 //
-// NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
+// NOTE: Passing EpsX == 0 will lead to automatic selection of small epsilon.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 // API: void minqpsetalgodenseipm(const minqpstate &state, const double eps);
 void minqpsetalgodenseipm(minqpstate *state, double eps) {
@@ -18473,7 +18442,7 @@ void minqpsetalgodenseipm(minqpstate *state, double eps) {
 // IT IS VERY IMPORTANT TO CALL minqpsetscale() WHEN YOU USE THIS  ALGORITHM
 // BECAUSE ITS CONVERGENCE PROPERTIES AND STOPPING CRITERIA ARE SCALE-DEPENDENT!
 //
-// NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
+// NOTE: Passing EpsX == 0 will lead to automatic selection of small epsilon.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 // API: void minqpsetalgosparseipm(const minqpstate &state, const double eps);
 void minqpsetalgosparseipm(minqpstate *state, double eps) {
@@ -18539,9 +18508,9 @@ void minqpsetalgosparseipm(minqpstate *state, double eps) {
 //     State   -   structure which stores algorithm state
 //     EpsG    -   >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
-//                 |v|<EpsG is satisfied, where:
+//                 |v| < EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
-//                 * v - scaled constrained gradient vector, v[i]=g[i]*s[i]
+//                 * v - scaled constrained gradient vector, v[i] == g[i]*s[i]
 //                 * g - gradient
 //                 * s - scaling coefficients set by MinQPSetScale()
 //     EpsF    -   >= 0
@@ -18553,8 +18522,8 @@ void minqpsetalgosparseipm(minqpstate *state, double eps) {
 //                 descent  step  on  k+1-th iteration  satisfies   following
 //                 condition:
 //                 * |.| means Euclidian norm
-//                 * v - scaled step vector, v[i]=dx[i]/s[i]
-//                 * dx - step vector, dx=X(k+1)-X(k)
+//                 * v - scaled step vector, v[i] == dx[i]/s[i]
+//                 * dx - step vector, dx == X(k+1)-X(k)
 //                 * s - scaling coefficients set by MinQPSetScale()
 //     MaxOuterIts-maximum number of OUTER iterations.  One  outer  iteration
 //                 includes some amount of CG iterations (from 5 to  ~N)  and
@@ -18575,7 +18544,7 @@ void minqpsetalgosparseipm(minqpstate *state, double eps) {
 // IT IS VERY IMPORTANT TO CALL MinQPSetScale() WHEN YOU USE THIS  ALGORITHM
 // BECAUSE ITS STOPPING CRITERIA ARE SCALE-DEPENDENT!
 //
-// Passing EpsG=0, EpsF=0 and EpsX=0 and MaxIts=0 (simultaneously) will lead
+// Passing EpsG == 0, EpsF == 0 and EpsX == 0 and MaxIts == 0 (simultaneously) will lead
 // to automatic stopping criterion selection (presently it is  small    step
 // length, but it may change in the future versions of ALGLIB).
 // ALGLIB: Copyright 22.05.2014 by Sergey Bochkanov
@@ -18599,8 +18568,7 @@ void minqpsetalgoquickqp(minqpstate *state, double epsg, double epsf, double eps
    state->qqpsettingsuser.cnphase = usenewton;
 }
 
-//                     CONSTRAINED QUADRATIC PROGRAMMING
-//
+// CONSTRAINED QUADRATIC PROGRAMMING
 // The subroutine creates QP optimizer. After initial creation,  it  contains
 // default optimization problem with zero quadratic and linear terms  and  no
 // constraints.
@@ -18657,7 +18625,7 @@ void minqpsetalgoquickqp(minqpstate *state, double epsg, double epsf, double eps
 void minqpcreate(ae_int_t n, minqpstate *state) {
    ae_int_t i;
    SetObj(minqpstate, state);
-   ae_assert(n >= 1, "MinQPCreate: N<1");
+   ae_assert(n >= 1, "MinQPCreate: N < 1");
 // initialize QP solver
    state->n = n;
    state->mdense = 0;
@@ -18720,7 +18688,7 @@ void minqpsetlineartermfast(minqpstate *state, RVector *b) {
 void minqpsetlinearterm(minqpstate *state, RVector *b) {
    ae_int_t n;
    n = state->n;
-   ae_assert(b->cnt >= n, "MinQPSetLinearTerm: Length(B)<N");
+   ae_assert(b->cnt >= n, "MinQPSetLinearTerm: Length(B) < N");
    ae_assert(isfinitevector(b, n), "MinQPSetLinearTerm: B contains infinite or NaN elements");
    minqpsetlineartermfast(state, b);
 }
@@ -18800,8 +18768,8 @@ void minqpsetquadratictermfast(minqpstate *state, RMatrix *a, bool isupper, doub
 void minqpsetquadraticterm(minqpstate *state, RMatrix *a, bool isupper) {
    ae_int_t n;
    n = state->n;
-   ae_assert(a->rows >= n, "MinQPSetQuadraticTerm: Rows(A)<N");
-   ae_assert(a->cols >= n, "MinQPSetQuadraticTerm: Cols(A)<N");
+   ae_assert(a->rows >= n, "MinQPSetQuadraticTerm: Rows(A) < N");
+   ae_assert(a->cols >= n, "MinQPSetQuadraticTerm: Cols(A) < N");
    ae_assert(isfinitertrmatrix(a, n, isupper), "MinQPSetQuadraticTerm: A contains infinite or NaN elements");
    minqpsetquadratictermfast(state, a, isupper, 0.0);
 }
@@ -18895,7 +18863,7 @@ void minqpsetstartingpointfast(minqpstate *state, RVector *x) {
 void minqpsetstartingpoint(minqpstate *state, RVector *x) {
    ae_int_t n;
    n = state->n;
-   ae_assert(x->cnt >= n, "MinQPSetStartingPoint: Length(B)<N");
+   ae_assert(x->cnt >= n, "MinQPSetStartingPoint: Length(B) < N");
    ae_assert(isfinitevector(x, n), "MinQPSetStartingPoint: X contains infinite or NaN elements");
    minqpsetstartingpointfast(state, x);
 }
@@ -18930,7 +18898,7 @@ void minqpsetoriginfast(minqpstate *state, RVector *xorigin) {
 void minqpsetorigin(minqpstate *state, RVector *xorigin) {
    ae_int_t n;
    n = state->n;
-   ae_assert(xorigin->cnt >= n, "MinQPSetOrigin: Length(B)<N");
+   ae_assert(xorigin->cnt >= n, "MinQPSetOrigin: Length(B) < N");
    ae_assert(isfinitevector(xorigin, n), "MinQPSetOrigin: B contains infinite or NaN elements");
    minqpsetoriginfast(state, xorigin);
 }
@@ -18960,7 +18928,7 @@ void minqpsetorigin(minqpstate *state, RVector *xorigin) {
 // API: void minqpsetscale(const minqpstate &state, const real_1d_array &s);
 void minqpsetscale(minqpstate *state, RVector *s) {
    ae_int_t i;
-   ae_assert(s->cnt >= state->n, "MinQPSetScale: Length(S)<N");
+   ae_assert(s->cnt >= state->n, "MinQPSetScale: Length(S) < N");
    for (i = 0; i < state->n; i++) {
       ae_assert(isfinite(s->xR[i]), "MinQPSetScale: S contains infinite or NAN elements");
       ae_assert(s->xR[i] != 0.0, "MinQPSetScale: S contains zero elements");
@@ -18987,7 +18955,7 @@ void minqpsetscale(minqpstate *state, RVector *s) {
 // you perform fast prototyping, or when you know your problem well  and  you
 // are 100% sure that this quick solution is robust enough in your case.
 //
-// One such solution is to evaluate scale of I-th variable as 1/Sqrt(A[i,i]),
+// One such solution is to evaluate scale of I-th variable as 1/sqrt(A[i,i]),
 // where A[i,i] is an I-th diagonal element of the quadratic term.
 //
 // Such approach works well sometimes, but you have to be careful here.
@@ -19010,11 +18978,11 @@ void minqpsetscaleautodiag(minqpstate *state) {
 // Following types of constraints are supported:
 //
 //     DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
-//     fixed variable      x[i]=Bnd[i]             BndL[i]=BndU[i]
-//     lower bound         BndL[i] <= x[i]           BndU[i]=+INF
-//     upper bound         x[i] <= BndU[i]           BndL[i]=-INF
+//     fixed variable      x[i] == Bnd[i]          BndL[i] == BndU[i]
+//     lower bound         BndL[i] <= x[i]         BndU[i] == +INF
+//     upper bound         x[i] <= BndU[i]         BndL[i] == -INF
 //     range               BndL[i] <= x[i] <= BndU[i]  ...
-//     free variable       -                       BndL[I]=-INF, BndU[I]+INF
+//     free variable       -                       BndL[i] == -INF, BndU[i] == +INF
 //
 // Inputs:
 //     State   -   structure stores algorithm state
@@ -19038,15 +19006,15 @@ void minqpsetscaleautodiag(minqpstate *state) {
 // NOTE: if constraints for all variables are same you may use minqpsetbcall()
 //       which allows to specify constraints without using arrays.
 //
-// NOTE: BndL>BndU will result in QP problem being recognized as infeasible.
+// NOTE: BndL > BndU will result in QP problem being recognized as infeasible.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 // API: void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 void minqpsetbc(minqpstate *state, RVector *bndl, RVector *bndu) {
    ae_int_t i;
    ae_int_t n;
    n = state->n;
-   ae_assert(bndl->cnt >= n, "MinQPSetBC: Length(BndL)<N");
-   ae_assert(bndu->cnt >= n, "MinQPSetBC: Length(BndU)<N");
+   ae_assert(bndl->cnt >= n, "MinQPSetBC: Length(BndL) < N");
+   ae_assert(bndu->cnt >= n, "MinQPSetBC: Length(BndU) < N");
    for (i = 0; i < n; i++) {
       ae_assert(isfinite(bndl->xR[i]) || isneginf(bndl->xR[i]), "MinQPSetBC: BndL contains NAN or +INF");
       ae_assert(isfinite(bndu->xR[i]) || isposinf(bndu->xR[i]), "MinQPSetBC: BndU contains NAN or -INF");
@@ -19068,11 +19036,11 @@ void minqpsetbc(minqpstate *state, RVector *bndl, RVector *bndu) {
 // Following types of constraints are supported:
 //
 //     DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
-//     fixed variable      x[i]=Bnd                BndL=BndU
-//     lower bound         BndL <= x[i]              BndU=+INF
-//     upper bound         x[i] <= BndU              BndL=-INF
-//     range               BndL <= x[i] <= BndU        ...
-//     free variable       -                       BndL=-INF, BndU+INF
+//     fixed variable      x[i] == Bnd             BndL == BndU
+//     lower bound         BndL <= x[i]            BndU == +INF
+//     upper bound         x[i] <= BndU            BndL == -INF
+//     range               BndL <= x[i] <= BndU    ...
+//     free variable       -                       BndL == -INF, BndU == +INF
 //
 // Inputs:
 //     State   -   structure stores algorithm state
@@ -19087,7 +19055,7 @@ void minqpsetbc(minqpstate *state, RVector *bndl, RVector *bndu) {
 //       is not recommended because large numbers may introduce large numerical
 //       errors in the algorithm.
 //
-// NOTE: BndL>BndU will result in QP problem being recognized as infeasible.
+// NOTE: BndL > BndU will result in QP problem being recognized as infeasible.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 // API: void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu);
 void minqpsetbcall(minqpstate *state, double bndl, double bndu) {
@@ -19110,11 +19078,11 @@ void minqpsetbcall(minqpstate *state, double bndl, double bndu) {
 // Following types of constraints are supported:
 //
 //     DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
-//     fixed variable      x[i]=Bnd                BndL=BndU
-//     lower bound         BndL <= x[i]              BndU=+INF
-//     upper bound         x[i] <= BndU              BndL=-INF
-//     range               BndL <= x[i] <= BndU        ...
-//     free variable       -                       BndL=-INF, BndU+INF
+//     fixed variable      x[i] == Bnd             BndL == BndU
+//     lower bound         BndL <= x[i]            BndU == +INF
+//     upper bound         x[i] <= BndU            BndL == -INF
+//     range               BndL <= x[i] <= BndU    ...
+//     free variable       -                       BndL == -INF, BndU == +INF
 //
 // Inputs:
 //     State   -   structure stores algorithm state
@@ -19129,7 +19097,7 @@ void minqpsetbcall(minqpstate *state, double bndl, double bndu) {
 //       is not recommended because large numbers may introduce large numerical
 //       errors in the algorithm.
 //
-// NOTE: BndL>BndU will result in QP problem being recognized as infeasible.
+// NOTE: BndL > BndU will result in QP problem being recognized as infeasible.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 // API: void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, const double bndu);
 void minqpsetbci(minqpstate *state, ae_int_t i, double bndl, double bndu) {
@@ -19163,9 +19131,9 @@ void minqpsetbci(minqpstate *state, ae_int_t i, double bndl, double bndu) {
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
-//                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
+//                 * if CT[i] == 0, then I-th constraint is C[i,*]*x  = C[i,n+1]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
 //     K       -   number of equality/inequality constraints, K >= 0
 //
 // NOTE 1: linear (non-bound) constraints are satisfied only approximately  -
@@ -19204,9 +19172,9 @@ void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t 
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     SparseCT-   type of sparse constraints, array[K]:
-//                 * if SparseCT[i]>0, then I-th constraint is SparseC[i,*]*x >= SparseC[i,n+1]
-//                 * if SparseCT[i]=0, then I-th constraint is SparseC[i,*]*x  = SparseC[i,n+1]
-//                 * if SparseCT[i]<0, then I-th constraint is SparseC[i,*]*x <= SparseC[i,n+1]
+//                 * if SparseCT[i] > 0, then I-th constraint is SparseC[i,*]*x >= SparseC[i,n+1]
+//                 * if SparseCT[i] == 0, then I-th constraint is SparseC[i,*]*x  = SparseC[i,n+1]
+//                 * if SparseCT[i] < 0, then I-th constraint is SparseC[i,*]*x <= SparseC[i,n+1]
 //     SparseK -   number of sparse equality/inequality constraints, K >= 0
 //     DenseC  -   dense linear constraints, array[K,N+1].
 //                 Each row of DenseC represents one constraint, either equality
@@ -19215,9 +19183,9 @@ void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t 
 //                 * last element corresponds to the right part.
 //                 All elements of DenseC (including right part) must be finite.
 //     DenseCT -   type of constraints, array[K]:
-//                 * if DenseCT[i]>0, then I-th constraint is DenseC[i,*]*x >= DenseC[i,n+1]
-//                 * if DenseCT[i]=0, then I-th constraint is DenseC[i,*]*x  = DenseC[i,n+1]
-//                 * if DenseCT[i]<0, then I-th constraint is DenseC[i,*]*x <= DenseC[i,n+1]
+//                 * if DenseCT[i] > 0, then I-th constraint is DenseC[i,*]*x >= DenseC[i,n+1]
+//                 * if DenseCT[i] == 0, then I-th constraint is DenseC[i,*]*x  = DenseC[i,n+1]
+//                 * if DenseCT[i] < 0, then I-th constraint is DenseC[i,*]*x <= DenseC[i,n+1]
 //     DenseK  -   number of equality/inequality constraints, DenseK >= 0
 //
 // NOTE 1: linear (non-box) constraints  are  satisfied only approximately  -
@@ -19254,15 +19222,15 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
    NewVector(eval, 0, DT_REAL);
    n = state->n;
 // First, check for errors in the inputs
-   ae_assert(densek >= 0, "MinQPSetLCMixed: K<0");
-   ae_assert(densek == 0 || densec->cols >= n + 1, "MinQPSetLCMixed: Cols(C)<N+1");
-   ae_assert(densec->rows >= densek, "MinQPSetLCMixed: Rows(DenseC)<DenseK");
-   ae_assert(densect->cnt >= densek, "MinQPSetLCMixed: Length(DenseCT)<DenseK");
+   ae_assert(densek >= 0, "MinQPSetLCMixed: K < 0");
+   ae_assert(densek == 0 || densec->cols >= n + 1, "MinQPSetLCMixed: Cols(C) < N+1");
+   ae_assert(densec->rows >= densek, "MinQPSetLCMixed: Rows(DenseC) < DenseK");
+   ae_assert(densect->cnt >= densek, "MinQPSetLCMixed: Length(DenseCT) < DenseK");
    ae_assert(apservisfinitematrix(densec, densek, n + 1), "MinQPSetLCMixed: C contains infinite or NaN values!");
-   ae_assert(sparsek >= 0, "MinQPSetLCMixed: SparseK<0");
-   ae_assert(sparsek == 0 || sparsegetncols(sparsec) >= n + 1, "MinQPSetLCMixed: Cols(SparseC)<N+1");
-   ae_assert(sparsek == 0 || sparsegetnrows(sparsec) >= sparsek, "MinQPSetLCMixed: Rows(SparseC)<SparseK");
-   ae_assert(sparsect->cnt >= sparsek, "MinQPSetLCMixed: Length(SparseCT)<SparseK");
+   ae_assert(sparsek >= 0, "MinQPSetLCMixed: SparseK < 0");
+   ae_assert(sparsek == 0 || sparsegetncols(sparsec) >= n + 1, "MinQPSetLCMixed: Cols(SparseC) < N+1");
+   ae_assert(sparsek == 0 || sparsegetnrows(sparsec) >= sparsek, "MinQPSetLCMixed: Rows(SparseC) < SparseK");
+   ae_assert(sparsect->cnt >= sparsek, "MinQPSetLCMixed: Length(SparseCT) < SparseK");
 // Allocate place for Lagrange multipliers, fill by zero
    vectorsetlengthatleast(&state->replaglc, densek + sparsek);
    for (i = 0; i < densek + sparsek; i++) {
@@ -19399,9 +19367,9 @@ void minqpsetlcmixedlegacy(minqpstate *state, RMatrix *densec, ZVector *densect,
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
-//                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
+//                 * if CT[i] == 0, then I-th constraint is C[i,*]*x  = C[i,n+1]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
 //     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
@@ -19447,12 +19415,12 @@ void minqpsetlc(minqpstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
 //     AL, AU  -   lower and upper bounds, array[SparseK+DenseK], with former
 //                 SparseK elements corresponding to sparse constraints,  and
 //                 latter DenseK elements corresponding to dense constraints;
-//                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
-//                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
-//                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
-//                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
-//     K       -   number  of equality/inequality constraints, K >= 0.  If  K=0
+//                 * AL[i] == AU[i] => equality constraint Ai*x
+//                 * AL[i] < AU[i]  => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i] == -INF  => one-sided constraint Ai*x <= AU[i]
+//                 * AU[i] == +INF  => one-sided constraint AL[i] <= Ai*x
+//                 * AL[i] == -INF, AU[i] == +INF => constraint is ignored
+//     K       -   number  of equality/inequality constraints, K >= 0.  If  K == 0
 //                 is specified, A, AL, AU are ignored.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 // API: void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, const ae_int_t ksparse, const real_2d_array &densea, const ae_int_t kdense, const real_1d_array &al, const real_1d_array &au);
@@ -19463,15 +19431,15 @@ void minqpsetlc2mixed(minqpstate *state, sparsematrix *sparsea, ae_int_t ksparse
    n = state->n;
    m = kdense + ksparse;
 // Check input arguments
-   ae_assert(ksparse >= 0, "MinQPSetLC2Mixed: KSparse<0");
+   ae_assert(ksparse >= 0, "MinQPSetLC2Mixed: KSparse < 0");
    ae_assert(ksparse == 0 || sparsegetncols(sparsea) == n, "MinQPSetLC2: Cols(SparseA) != N");
    ae_assert(ksparse == 0 || sparsegetnrows(sparsea) == ksparse, "MinQPSetLC2: Rows(SparseA) != K");
-   ae_assert(kdense >= 0, "MinQPSetLC2Mixed: KDense<0");
-   ae_assert(kdense == 0 || densea->cols >= n, "MinQPSetLC2Mixed: Cols(DenseA)<N");
-   ae_assert(kdense == 0 || densea->rows >= kdense, "MinQPSetLC2Mixed: Rows(DenseA)<K");
+   ae_assert(kdense >= 0, "MinQPSetLC2Mixed: KDense < 0");
+   ae_assert(kdense == 0 || densea->cols >= n, "MinQPSetLC2Mixed: Cols(DenseA) < N");
+   ae_assert(kdense == 0 || densea->rows >= kdense, "MinQPSetLC2Mixed: Rows(DenseA) < K");
    ae_assert(apservisfinitematrix(densea, kdense, n), "MinQPSetLC2Mixed: DenseA contains infinite or NaN values!");
-   ae_assert(al->cnt >= kdense + ksparse, "MinQPSetLC2Mixed: Length(AL)<K");
-   ae_assert(au->cnt >= kdense + ksparse, "MinQPSetLC2Mixed: Length(AU)<K");
+   ae_assert(al->cnt >= kdense + ksparse, "MinQPSetLC2Mixed: Length(AL) < K");
+   ae_assert(au->cnt >= kdense + ksparse, "MinQPSetLC2Mixed: Length(AU) < K");
    for (i = 0; i < m; i++) {
       ae_assert(isfinite(al->xR[i]) || isneginf(al->xR[i]), "MinQPSetLC2Mixed: AL contains NAN or +INF");
       ae_assert(isfinite(au->xR[i]) || isposinf(au->xR[i]), "MinQPSetLC2Mixed: AU contains NAN or -INF");
@@ -19523,11 +19491,11 @@ void minqpsetlc2mixed(minqpstate *state, sparsematrix *sparsea, ae_int_t ksparse
 //                 sided inequality  constraints,  equality  constraints  are
 //                 supported (see below)
 //     AL, AU  -   lower and upper bounds, array[K];
-//                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
-//                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
-//                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
-//                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
+//                 * AL[i] == AU[i] => equality constraint Ai*x
+//                 * AL[i] < AU[i]  => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i] == -INF  => one-sided constraint Ai*x <= AU[i]
+//                 * AU[i] == +INF  => one-sided constraint AL[i] <= Ai*x
+//                 * AL[i] == -INF, AU[i] == +INF => constraint is ignored
 //     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A, AL, AU.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
@@ -19549,12 +19517,12 @@ void minqpsetlc2dense(minqpstate *state, RMatrix *a, RVector *al, RVector *au, a
 //                 Each row of A represents one general linear constraint.
 //                 A can be stored in any sparse storage format.
 //     AL, AU  -   lower and upper bounds, array[K];
-//                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
-//                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
-//                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
-//                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
-//     K       -   number  of equality/inequality constraints, K >= 0.  If  K=0
+//                 * AL[i] == AU[i] => equality constraint Ai*x
+//                 * AL[i] < AU[i]  => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i] == -INF  => one-sided constraint Ai*x <= AU[i]
+//                 * AU[i] == +INF  => one-sided constraint AL[i] <= Ai*x
+//                 * AL[i] == -INF, AU[i] == +INF => constraint is ignored
+//     K       -   number  of equality/inequality constraints, K >= 0.  If  K == 0
 //                 is specified, A, AL, AU are ignored.
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 // API: void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k);
@@ -19570,18 +19538,18 @@ void minqpsetlc2(minqpstate *state, sparsematrix *a, RVector *al, RVector *au, a
 //     A       -   linear constraint coefficient, array[N], right side is NOT
 //                 included.
 //     AL, AU  -   lower and upper bounds;
-//                 * AL=AU    => equality constraint Ai*x
-//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
-//                 * AL=-INF  => one-sided constraint Ai*x <= AU
-//                 * AU=+INF  => one-sided constraint AL <= Ai*x
-//                 * AL=-INF, AU=+INF => constraint is ignored
+//                 * AL == AU   => equality constraint Ai*x
+//                 * AL < AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL == -INF => one-sided constraint Ai*x <= AU
+//                 * AU == +INF => one-sided constraint AL <= Ai*x
+//                 * AL == -INF, AU == +INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const double al, const double au);
 void minqpaddlc2dense(minqpstate *state, RVector *a, double al, double au) {
    ae_int_t i;
    ae_int_t n;
    n = state->n;
-   ae_assert(a->cnt >= n, "MinQPAddLC2Dense: Length(A)<N");
+   ae_assert(a->cnt >= n, "MinQPAddLC2Dense: Length(A) < N");
    ae_assert(isfinitevector(a, n), "MinQPAddLC2Dense: A contains infinite or NaN values!");
    ae_assert(isfinite(al) || isneginf(al), "MinQPAddLC2Dense: AL is NAN or +INF");
    ae_assert(isfinite(au) || isposinf(au), "MinQPAddLC2Dense: AU is NAN or -INF");
@@ -19614,11 +19582,11 @@ void minqpaddlc2dense(minqpstate *state, RVector *a, double al, double au) {
 //     ValA    -   array[NNZ], values of non-zero elements of A
 //     NNZ     -   number of non-zero coefficients in A
 //     AL, AU  -   lower and upper bounds;
-//                 * AL=AU    => equality constraint A*x
-//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
-//                 * AL=-INF  => one-sided constraint A*x <= AU
-//                 * AU=+INF  => one-sided constraint AL <= A*x
-//                 * AL=-INF, AU=+INF => constraint is ignored
+//                 * AL == AU   => equality constraint A*x
+//                 * AL < AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL == -INF => one-sided constraint A*x <= AU
+//                 * AU == +INF => one-sided constraint AL <= A*x
+//                 * AL == -INF, AU == +INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au);
 void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, double al, double au) {
@@ -19632,16 +19600,16 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
    ae_int_t uidx;
    n = state->n;
 // Check inputs
-   ae_assert(nnz >= 0, "MinQPAddLC2: NNZ<0");
-   ae_assert(idxa->cnt >= nnz, "MinQPAddLC2: Length(IdxA)<NNZ");
-   ae_assert(vala->cnt >= nnz, "MinQPAddLC2: Length(ValA)<NNZ");
+   ae_assert(nnz >= 0, "MinQPAddLC2: NNZ < 0");
+   ae_assert(idxa->cnt >= nnz, "MinQPAddLC2: Length(IdxA) < NNZ");
+   ae_assert(vala->cnt >= nnz, "MinQPAddLC2: Length(ValA) < NNZ");
    for (i = 0; i < nnz; i++) {
       ae_assert(idxa->xZ[i] >= 0 && idxa->xZ[i] < n, "MinQPAddLC2: IdxA contains indexes outside of [0,N) range");
    }
    ae_assert(isfinitevector(vala, nnz), "MinQPAddLC2: ValA contains infinite or NaN values!");
    ae_assert(isfinite(al) || isneginf(al), "MinQPAddLC2: AL is NAN or +INF");
    ae_assert(isfinite(au) || isposinf(au), "MinQPAddLC2: AU is NAN or -INF");
-// If M=0, it means that A is uninitialized.
+// If M == 0, it means that A is uninitialized.
 // Prepare sparse matrix structure
    if (state->msparse == 0) {
       state->sparsec.matrixtype = 1;
@@ -19671,7 +19639,7 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
    ivectorgrowto(&state->sparsec.didx, state->msparse + 1);
    ivectorgrowto(&state->sparsec.uidx, state->msparse + 1);
    ivectorgrowto(&state->sparsec.ridx, state->msparse + 2);
-// If NNZ=0, perform quick and simple row append.
+// If NNZ == 0, perform quick and simple row append.
    if (nnz == 0) {
       state->sparsec.didx.xZ[state->msparse] = state->sparsec.ridx.xZ[state->msparse];
       state->sparsec.uidx.xZ[state->msparse] = state->sparsec.ridx.xZ[state->msparse];
@@ -19681,7 +19649,7 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
       return;
    }
 // Now we are sure that SparseC contains properly initialized sparse
-// matrix (or some appropriate dummy for M=0) and we have NNZ>0
+// matrix (or some appropriate dummy for M == 0) and we have NNZ > 0
 // (no need to care about degenerate cases).
 //
 // Append rows to SparseC:
@@ -19743,11 +19711,11 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
 //     State   -   structure previously allocated with minqpcreate() call.
 //     DA      -   array[N], constraint vector
 //     AL, AU  -   lower and upper bounds;
-//                 * AL=AU    => equality constraint A*x
-//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
-//                 * AL=-INF  => one-sided constraint A*x <= AU
-//                 * AU=+INF  => one-sided constraint AL <= A*x
-//                 * AL=-INF, AU=+INF => constraint is ignored
+//                 * AL == AU   => equality constraint A*x
+//                 * AL < AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL == -INF => one-sided constraint A*x <= AU
+//                 * AU == +INF => one-sided constraint AL <= A*x
+//                 * AL == -INF, AU == +INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da, const double al, const double au);
 void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, double au) {
@@ -19762,11 +19730,11 @@ void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, doubl
    ae_int_t uidx;
    n = state->n;
 // Check inputs
-   ae_assert(da->cnt >= n, "MinQPAddLC2SparseFromDense: Length(DA)<N");
+   ae_assert(da->cnt >= n, "MinQPAddLC2SparseFromDense: Length(DA) < N");
    ae_assert(isfinitevector(da, n), "MinQPAddLC2SparseFromDense: DA contains infinities/NANs");
    ae_assert(isfinite(al) || isneginf(al), "MinQPAddLC2SparseFromDense: AL is NAN or +INF");
    ae_assert(isfinite(au) || isposinf(au), "MinQPAddLC2SparseFromDense: AU is NAN or -INF");
-// If M=0, it means that A is uninitialized.
+// If M == 0, it means that A is uninitialized.
 // Prepare sparse matrix structure
    if (state->msparse == 0) {
       state->sparsec.matrixtype = 1;
@@ -19803,7 +19771,7 @@ void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, doubl
    ivectorgrowto(&state->sparsec.didx, state->msparse + 1);
    ivectorgrowto(&state->sparsec.uidx, state->msparse + 1);
    ivectorgrowto(&state->sparsec.ridx, state->msparse + 2);
-// If NNZ=0, perform quick and simple row append.
+// If NNZ == 0, perform quick and simple row append.
    if (nnz == 0) {
       state->sparsec.didx.xZ[state->msparse] = state->sparsec.ridx.xZ[state->msparse];
       state->sparsec.uidx.xZ[state->msparse] = state->sparsec.ridx.xZ[state->msparse];
@@ -19813,7 +19781,7 @@ void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, doubl
       return;
    }
 // Now we are sure that SparseC contains properly initialized sparse
-// matrix (or some appropriate dummy for M=0) and we have NNZ>0
+// matrix (or some appropriate dummy for M == 0) and we have NNZ > 0
 // (no need to care about degenerate cases).
 //
 // Append rows to SparseC:
@@ -19877,8 +19845,7 @@ void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, doubl
 // You should use MinQPResults() function to access results after calls
 // to this function.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
-//      Special thanks to Elvira Illarionova  for  important  suggestions  on
-//      the linearly constrained QP algorithm.
+// Special thanks to Elvira Illarionova for important suggestions on the linearly constrained QP algorithm.
 // API: void minqpoptimize(const minqpstate &state);
 void minqpoptimize(minqpstate *state) {
    ae_int_t n;
@@ -20152,7 +20119,7 @@ void minqpoptimize(minqpstate *state) {
 
 // QP results
 //
-// Buffered implementation of MinQPResults() which uses pre-allocated  buffer
+// Buffered implementation of MinQPResults() which uses preallocated  buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -20209,7 +20176,7 @@ void minqpresultsbuf(minqpstate *state, RVector *x, minqpreport *rep) {
 //         It is likely that the problem is either infeasible or unbounded,
 //         but it is difficult to determine exact reason for termination.
 //         X contains best point found so far.
-// *  >0   success
+// *  > 0  success
 // *  7    stopping conditions are too stringent,
 //         further improvement is impossible,
 //         X contains best point found so far.
@@ -20461,23 +20428,23 @@ DefClass(minqpstate, )
 //
 // Two arrays of multipliers are returned:
 // * LagBC is array[N] which is loaded with multipliers from box constraints;
-//   LagBC[i]>0 means that I-th constraint is at the  upper bound, LagBC[I]<0
-//   means that I-th constraint is at the lower bound, LagBC[I]=0 means  that
+//   LagBC[i] > 0 means that I-th constraint is at the upper bound, LagBC[I] < 0
+//   means that I-th constraint is at the lower bound, LagBC[I] == 0 means  that
 //   I-th box constraint is inactive.
 // * LagLC is array[MSparse+MDense] which is  loaded  with  multipliers  from
 //   general  linear  constraints  (former  MSparse  elements  corresponds to
 //   sparse part of the constraint matrix, latter MDense are  for  the  dense
 //   constraints, as was specified by user).
-//   LagLC[i]>0 means that I-th constraint at  the  upper  bound,  LagLC[i]<0
-//   means that I-th constraint is at the lower bound, LagLC[i]=0 means  that
-//   I-th linear constraint is inactive.
+//   LagLC[i] > 0 means that the I-th constraint is at the upper bound,
+//   LagLC[i] < 0 means that the I-th constraint is at the lower bound,
+//   LagLC[i] == 0 means that the I-th linear constraint is inactive.
 //
 // On failure (or when optimizer does not support Lagrange multipliers) these
 // arrays are zero-filled.
 //
 // It is expected that at solution the dual feasibility condition holds:
 //
-//     C+H*(Xs-X0) + SUM(Ei*LagBC[i],i=0..n-1) + SUM(Ai*LagLC[i],i=0..m-1) ~ 0
+//     C+H*(Xs-X0) + SUM(Ei*LagBC[i],i = 0..n-1) + SUM(Ai*LagLC[i],i = 0..m-1) ~ 0
 //
 // where
 // * C is a linear term
@@ -20743,17 +20710,17 @@ static const ae_int_t minlm_additers = 5;
 //                 The subroutine finishes its work if  on  k+1-th  iteration
 //                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
-//                 * v - scaled step vector, v[i]=dx[i]/s[i]
-//                 * dx - ste pvector, dx=X(k+1)-X(k)
+//                 * v - scaled step vector, v[i] == dx[i]/s[i]
+//                 * dx - ste pvector, dx == X(k+1)-X(k)
 //                 * s - scaling coefficients set by MinLMSetScale()
 //                 Recommended values: 1E-9 ... 1E-12.
-//     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
+//     MaxIts  -   maximum number of iterations. If MaxIts == 0, the  number  of
 //                 iterations   is    unlimited.   Only   Levenberg-Marquardt
 //                 iterations  are  counted  (L-BFGS/CG  iterations  are  NOT
 //                 counted because their cost is very low compared to that of
 //                 LM).
 //
-// Passing  EpsX=0  and  MaxIts=0  (simultaneously)  will  lead  to automatic
+// Passing  EpsX == 0  and  MaxIts == 0  (simultaneously)  will  lead  to automatic
 // stopping criterion selection (small EpsX).
 //
 // NOTE: it is not recommended to set large EpsX (say, 0.001). Because LM  is
@@ -20806,7 +20773,7 @@ void minlmsetxrep(minlmstate *state, bool needxrep) {
 // API: void minlmsetstpmax(const minlmstate &state, const double stpmax);
 void minlmsetstpmax(minlmstate *state, double stpmax) {
    ae_assert(isfinite(stpmax), "MinLMSetStpMax: StpMax is not finite!");
-   ae_assert(stpmax >= 0.0, "MinLMSetStpMax: StpMax<0!");
+   ae_assert(stpmax >= 0.0, "MinLMSetStpMax: StpMax < 0!");
    state->stpmax = stpmax;
 }
 
@@ -20836,7 +20803,7 @@ void minlmsetstpmax(minlmstate *state, double stpmax) {
 // API: void minlmsetscale(const minlmstate &state, const real_1d_array &s);
 void minlmsetscale(minlmstate *state, RVector *s) {
    ae_int_t i;
-   ae_assert(s->cnt >= state->n, "MinLMSetScale: Length(S)<N");
+   ae_assert(s->cnt >= state->n, "MinLMSetScale: Length(S) < N");
    for (i = 0; i < state->n; i++) {
       ae_assert(isfinite(s->xR[i]), "MinLMSetScale: S contains infinite or NAN elements");
       ae_assert(s->xR[i] != 0.0, "MinLMSetScale: S contains zero elements");
@@ -20860,8 +20827,8 @@ void minlmsetscale(minlmstate *state, RVector *s) {
 //                 very large number or +INF (latter is recommended because
 //                 it will allow solver to use better algorithm).
 //
-// NOTE 1: it is possible to specify BndL[i]=BndU[i]. In this case I-th
-// variable will be "frozen" at X[i]=BndL[i]=BndU[i].
+// NOTE 1: it is possible to specify BndL[i] == BndU[i]. In this case I-th
+// variable will be "frozen" at X[i] == BndL[i] == BndU[i].
 //
 // NOTE 2: this solver has following useful properties:
 // * bound constraints are always satisfied exactly
@@ -20873,8 +20840,8 @@ void minlmsetbc(minlmstate *state, RVector *bndl, RVector *bndu) {
    ae_int_t i;
    ae_int_t n;
    n = state->n;
-   ae_assert(bndl->cnt >= n, "MinLMSetBC: Length(BndL)<N");
-   ae_assert(bndu->cnt >= n, "MinLMSetBC: Length(BndU)<N");
+   ae_assert(bndl->cnt >= n, "MinLMSetBC: Length(BndL) < N");
+   ae_assert(bndu->cnt >= n, "MinLMSetBC: Length(BndU) < N");
    for (i = 0; i < n; i++) {
       ae_assert(isfinite(bndl->xR[i]) || isneginf(bndl->xR[i]), "MinLMSetBC: BndL contains NAN or +INF");
       ae_assert(isfinite(bndu->xR[i]) || isposinf(bndu->xR[i]), "MinLMSetBC: BndU contains NAN or -INF");
@@ -20899,9 +20866,9 @@ void minlmsetbc(minlmstate *state, RVector *bndl, RVector *bndu) {
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
-//                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
+//                 * if CT[i] == 0, then I-th constraint is C[i,*]*x  = C[i,n+1]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
 //     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
@@ -20933,10 +20900,10 @@ void minlmsetlc(minlmstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
    ae_int_t n;
    n = state->n;
 // First, check for errors in the inputs
-   ae_assert(k >= 0, "MinLMSetLC: K<0");
-   ae_assert(c->cols >= n + 1 || k == 0, "MinLMSetLC: Cols(C)<N+1");
-   ae_assert(c->rows >= k, "MinLMSetLC: Rows(C)<K");
-   ae_assert(ct->cnt >= k, "MinLMSetLC: Length(CT)<K");
+   ae_assert(k >= 0, "MinLMSetLC: K < 0");
+   ae_assert(c->cols >= n + 1 || k == 0, "MinLMSetLC: Cols(C) < N+1");
+   ae_assert(c->rows >= k, "MinLMSetLC: Rows(C) < K");
+   ae_assert(ct->cnt >= k, "MinLMSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n + 1), "MinLMSetLC: C contains infinite or NaN values!");
 // Handle zero K
    if (k == 0) {
@@ -20974,15 +20941,15 @@ void minlmsetlc(minlmstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
 // This function is used to change acceleration settings
 //
 // You can choose between three acceleration strategies:
-// * AccType=0, no acceleration.
-// * AccType=1, secant updates are used to update quadratic model after  each
+// * AccType == 0, no acceleration.
+// * AccType == 1, secant updates are used to update quadratic model after  each
 //   iteration. After fixed number of iterations (or after  model  breakdown)
 //   we  recalculate  quadratic  model  using  analytic  Jacobian  or  finite
 //   differences. Number of secant-based iterations depends  on  optimization
 //   settings: about 3 iterations - when we have analytic Jacobian, up to 2*N
 //   iterations - when we use finite differences to calculate Jacobian.
 //
-// AccType=1 is recommended when Jacobian  calculation  cost is prohibitively
+// AccType == 1 is recommended when Jacobian  calculation  cost is prohibitively
 // high (several Mx1 function vector calculations  followed  by  several  NxN
 // Cholesky factorizations are faster than calculation of one M*N  Jacobian).
 // It should also be used when we have no Jacobian, because finite difference
@@ -21023,7 +20990,7 @@ void minlmsetacctype(minlmstate *state, ae_int_t acctype) {
       return;
    }
    if (acctype == 1) {
-      ae_assert(state->hasfi, "MinLMSetAccType: AccType=1 is incompatible with current protocol!");
+      ae_assert(state->hasfi, "MinLMSetAccType: AccType == 1 is incompatible with current protocol!");
       if (state->algomode == 0) {
          state->maxmodelage = 2 * state->n;
       } else {
@@ -21047,7 +21014,7 @@ void minlmsetacctype(minlmstate *state, ae_int_t acctype) {
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
 // API: void minlmrestartfrom(const minlmstate &state, const real_1d_array &x);
 void minlmrestartfrom(minlmstate *state, RVector *x) {
-   ae_assert(x->cnt >= state->n, "MinLMRestartFrom: Length(X)<N!");
+   ae_assert(x->cnt >= state->n, "MinLMRestartFrom: Length(X) < N!");
    ae_assert(isfinitevector(x, state->n), "MinLMRestartFrom: X contains infinite or NaN values!");
    ae_v_move(state->xbase.xR, 1, x->xR, 1, state->n);
    state->PQ = -1;
@@ -21118,15 +21085,12 @@ static void minlm_lmprepare(ae_int_t n, ae_int_t m, bool havegrad, minlmstate *s
    state->nic = 0;
 }
 
-//                 IMPROVED LEVENBERG-MARQUARDT METHOD FOR
-//                  NON-LINEAR LEAST SQUARES OPTIMIZATION
-//
-// DESCRIPTION:
+// IMPROVED LEVENBERG-MARQUARDT METHOD
+// FOR NON-LINEAR LEAST SQUARES OPTIMIZATION
 // This function is used to find minimum of function which is represented  as
 // sum of squares:
 //     F(x) = f[0]^2(x[0],...,x[n-1]) + ... + f[m-1]^2(x[0],...,x[n-1])
 // using value of function vector f[] and Jacobian of f[].
-//
 //
 // REQUIREMENTS:
 // This algorithm will request following information during its operation:
@@ -21146,7 +21110,6 @@ static void minlm_lmprepare(ae_int_t n, ae_int_t m, bool havegrad, minlmstate *s
 // will  lead  to  exception  being  thrown  after first attempt to calculate
 // Jacobian.
 //
-//
 // USAGE:
 // 1. User initializes algorithm state with MinLMCreateVJ() call
 // 2. User tunes solver parameters with MinLMSetCond(),  MinLMSetStpMax() and
@@ -21158,9 +21121,8 @@ static void minlm_lmprepare(ae_int_t n, ae_int_t m, bool havegrad, minlmstate *s
 //    with same N/M but another starting point and/or another function.
 //    MinLMRestartFrom() allows to reuse already initialized structure.
 //
-//
 // Inputs:
-//     N       -   dimension, N>1
+//     N       -   dimension, N > 1
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     M       -   number of functions f[i]
@@ -21179,9 +21141,9 @@ static void minlm_lmprepare(ae_int_t n, ae_int_t m, bool havegrad, minlmstate *s
 // API: void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state);
 void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state) {
    SetObj(minlmstate, state);
-   ae_assert(n >= 1, "MinLMCreateVJ: N<1!");
-   ae_assert(m >= 1, "MinLMCreateVJ: M<1!");
-   ae_assert(x->cnt >= n, "MinLMCreateVJ: Length(X)<N!");
+   ae_assert(n >= 1, "MinLMCreateVJ: N < 1!");
+   ae_assert(m >= 1, "MinLMCreateVJ: M < 1!");
+   ae_assert(x->cnt >= n, "MinLMCreateVJ: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "MinLMCreateVJ: X contains infinite or NaN values!");
 // initialize, check parameters
    state->teststep = 0.0;
@@ -21200,16 +21162,13 @@ void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state) {
    minlmrestartfrom(state, x);
 }
 
-//                 IMPROVED LEVENBERG-MARQUARDT METHOD FOR
-//                  NON-LINEAR LEAST SQUARES OPTIMIZATION
-//
-// DESCRIPTION:
+// IMPROVED LEVENBERG-MARQUARDT METHOD
+// FOR NON-LINEAR LEAST SQUARES OPTIMIZATION
 // This function is used to find minimum of function which is represented  as
 // sum of squares:
 //     F(x) = f[0]^2(x[0],...,x[n-1]) + ... + f[m-1]^2(x[0],...,x[n-1])
 // using value of function vector f[] only. Finite differences  are  used  to
 // calculate Jacobian.
-//
 //
 // REQUIREMENTS:
 // This algorithm will request following information during its operation:
@@ -21225,7 +21184,6 @@ void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state) {
 // it will  lead  to  exception being thrown after first attempt to calculate
 // Jacobian.
 //
-//
 // USAGE:
 // 1. User initializes algorithm state with MinLMCreateV() call
 // 2. User tunes solver parameters with MinLMSetCond(),  MinLMSetStpMax() and
@@ -21237,14 +21195,13 @@ void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state) {
 //    with same N/M but another starting point and/or another function.
 //    MinLMRestartFrom() allows to reuse already initialized structure.
 //
-//
 // Inputs:
-//     N       -   dimension, N>1
+//     N       -   dimension, N > 1
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     M       -   number of functions f[i]
 //     X       -   initial solution, array[0..N-1]
-//     DiffStep-   differentiation step, >0
+//     DiffStep-   differentiation step, > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -21263,9 +21220,9 @@ void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstat
    SetObj(minlmstate, state);
    ae_assert(isfinite(diffstep), "MinLMCreateV: DiffStep is not finite!");
    ae_assert(diffstep > 0.0, "MinLMCreateV: DiffStep <= 0!");
-   ae_assert(n >= 1, "MinLMCreateV: N<1!");
-   ae_assert(m >= 1, "MinLMCreateV: M<1!");
-   ae_assert(x->cnt >= n, "MinLMCreateV: Length(X)<N!");
+   ae_assert(n >= 1, "MinLMCreateV: N < 1!");
+   ae_assert(m >= 1, "MinLMCreateV: M < 1!");
+   ae_assert(x->cnt >= n, "MinLMCreateV: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "MinLMCreateV: X contains infinite or NaN values!");
 // Initialize
    state->teststep = 0.0;
@@ -21285,16 +21242,13 @@ void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstat
    minlmrestartfrom(state, x);
 }
 
-//     LEVENBERG-MARQUARDT-LIKE METHOD FOR NON-LINEAR OPTIMIZATION
-//
-// DESCRIPTION:
+// LEVENBERG-MARQUARDT-LIKE METHOD FOR NON-LINEAR OPTIMIZATION
 // This  function  is  used  to  find  minimum  of general form (not "sum-of-
 // -squares") function
 //     F = F(x[0], ..., x[n-1])
 // using  its  gradient  and  Hessian.  Levenberg-Marquardt modification with
 // L-BFGS pre-optimization and internal pre-conditioned  L-BFGS  optimization
 // after each Levenberg-Marquardt step is used.
-//
 //
 // REQUIREMENTS:
 // This algorithm will request following information during its operation:
@@ -21315,7 +21269,6 @@ void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstat
 // not provide Hessian matrix), but it will lead to  exception  being  thrown
 // after first attempt to calculate Hessian.
 //
-//
 // USAGE:
 // 1. User initializes algorithm state with MinLMCreateFGH() call
 // 2. User tunes solver parameters with MinLMSetCond(),  MinLMSetStpMax() and
@@ -21327,9 +21280,8 @@ void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstat
 //    with same N but another starting point and/or another function.
 //    MinLMRestartFrom() allows to reuse already initialized structure.
 //
-//
 // Inputs:
-//     N       -   dimension, N>1
+//     N       -   dimension, N > 1
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   initial solution, array[0..N-1]
@@ -21347,8 +21299,8 @@ void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstat
 // API: void minlmcreatefgh(const real_1d_array &x, minlmstate &state);
 void minlmcreatefgh(ae_int_t n, RVector *x, minlmstate *state) {
    SetObj(minlmstate, state);
-   ae_assert(n >= 1, "MinLMCreateFGH: N<1!");
-   ae_assert(x->cnt >= n, "MinLMCreateFGH: Length(X)<N!");
+   ae_assert(n >= 1, "MinLMCreateFGH: N < 1!");
+   ae_assert(x->cnt >= n, "MinLMCreateFGH: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "MinLMCreateFGH: X contains infinite or NaN values!");
 // initialize
    state->teststep = 0.0;
@@ -21386,9 +21338,9 @@ void minlmcreatevgj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state) {
 // API: void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state);
 void minlmcreatefj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state) {
    SetObj(minlmstate, state);
-   ae_assert(n >= 1, "MinLMCreateFJ: N<1!");
-   ae_assert(m >= 1, "MinLMCreateFJ: M<1!");
-   ae_assert(x->cnt >= n, "MinLMCreateFJ: Length(X)<N!");
+   ae_assert(n >= 1, "MinLMCreateFJ: N < 1!");
+   ae_assert(m >= 1, "MinLMCreateFJ: M < 1!");
+   ae_assert(x->cnt >= n, "MinLMCreateFJ: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "MinLMCreateFJ: X contains infinite or NaN values!");
 // initialize
    state->teststep = 0.0;
@@ -21457,9 +21409,9 @@ static void minlm_decreaselambda(double *lambdav, double *nu) {
 //
 // Inputs:
 //     QuadraticModel      -   array[N,N], full Hessian matrix of quadratic
-//                             model at deltaX=0
-//     GBase               -   array[N], gradient at deltaX=0
-//     FBase               -   F(deltaX=0)
+//                             model at deltaX == 0
+//     GBase               -   array[N], gradient at deltaX == 0
+//     FBase               -   F(deltaX == 0)
 //     N                   -   size
 //     DeltaX              -   step vector
 //     FNew                -   new function value
@@ -21467,7 +21419,7 @@ static void minlm_decreaselambda(double *lambdav, double *nu) {
 //     Nu                  -   Nu-multiplier, updated on exit
 //
 // On exit it returns:
-// * Result=0  - if we have to continue iterations
+// * Result == 0  - if we have to continue iterations
 // * Result != 0 - if termination with completion code Result is requested
 // ALGLIB: Copyright 17.02.2017 by Sergey Bochkanov
 static ae_int_t minlm_checkdecrease(RMatrix *quadraticmodel, RVector *gbase, double fbase, ae_int_t n, RVector *deltax, double fnew, double *lambdav, double *nu) {
@@ -21665,7 +21617,6 @@ Spawn:
    m = -526;
    bflag = true;
    v = -541;
-// Routine body
    *iflag = -99;
    n = state->n;
    m = state->m;
@@ -21735,7 +21686,7 @@ Spawn:
    // DeltaX, which is used for secant updates, is initialized here.
    //
    // This code is a bit tricky because sometimes XDir != 0, but
-   // it is so small that XDir+XBase == XBase (in finite precision
+   // it is so small that XDir + XBase == XBase (in finite precision
    // arithmetics). So we set DeltaX to XBase, then
    // add XDir, and then subtract XBase to get exact value of
    // DeltaX.
@@ -21743,7 +21694,7 @@ Spawn:
    // Step length is estimated using DeltaX.
    //
    // NOTE: stopping conditions are tested
-   // for fresh models only (ModelAge=0)
+   // for fresh models only (ModelAge == 0)
       ae_v_move(deltax->xR, 1, xnew->xR, 1, n);
       ae_v_sub(deltax->xR, 1, state->xbase.xR, 1, n);
       *deltaxready = true;
@@ -21766,9 +21717,9 @@ Spawn:
          }
       }
    // Let's evaluate new step:
-   // a) if we have Fi vector, we evaluate it using rcomm, and
+   // a) if we have Fi vector, we evaluate it using RComm, and
    //    then we manually calculate State.F as sum of squares of Fi[]
-   // b) if we have F value, we just evaluate it through rcomm interface
+   // b) if we have F value, we just evaluate it through RComm interface
    //
    // We prefer (a) because we may need Fi vector for additional
    // iterations
@@ -21856,7 +21807,6 @@ Spawn:
    s = -788;
    t = 809;
    fnew = 205;
-// Routine body
 // prepare
    n = state->n;
    m = state->m;
@@ -21882,7 +21832,7 @@ Spawn:
    }
 // set constraints for obsolete QP solver
    minqpsetbc(&state->qpstate, &state->bndl, &state->bndu);
-//  Check correctness of the analytic Jacobian
+// Check correctness of the analytic Jacobian
    if (state->algomode == 1 && state->teststep > 0.0) {
       ae_assert(m > 0, "MinLM: integrity check failed");
       while (smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->bndl, &state->bndu, true, state->teststep)) {
@@ -21970,7 +21920,7 @@ Spawn:
                ae_assert(state->hasfi, "MinLMIteration: internal error when estimating Jacobian (no f[])");
                for (k = 0; k < n; k++) {
                // We guard X[k] from leaving [BndL,BndU].
-               // In case BndL=BndU, we assume that derivative in this direction is zero.
+               // In case BndL == BndU, we assume that derivative in this direction is zero.
                   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
                   state->x.xR[k] -= state->s.xR[k] * state->diffstep;
                   if (state->havebndl.xB[k]) {
@@ -22041,7 +21991,7 @@ Spawn:
          // State.DeltaY contain updates from last step.
             ae_assert(state->deltaxready && state->deltafready, "MinLMIteration: uninitialized DeltaX/DeltaF");
             t = ae_v_dotproduct(state->deltax.xR, 1, state->deltax.xR, 1, n);
-            ae_assert(t != 0.0, "MinLM: internal error (T=0)");
+            ae_assert(t != 0.0, "MinLM: internal error (T == 0)");
             for (i = 0; i < m; i++) {
                v = ae_v_dotproduct(state->j.xyR[i], 1, state->deltax.xR, 1, n);
                v = (state->deltaf.xR[i] - v) / t;
@@ -22249,7 +22199,7 @@ Spawn:
                   ae_assert(state->hasfi, "MinLMIteration: internal error when estimating Jacobian (no f[])");
                   for (k = 0; k < n; k++) {
                   // We guard X[k] from leaving [BndL,BndU].
-                  // In case BndL=BndU, we assume that derivative in this direction is zero.
+                  // In case BndL == BndU, we assume that derivative in this direction is zero.
                      ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
                      state->x.xR[k] -= state->s.xR[k] * state->diffstep;
                      if (state->havebndl.xB[k]) {
@@ -22320,7 +22270,7 @@ Spawn:
             // State.DeltaY contain updates from last step.
                ae_assert(state->deltaxready && state->deltafready, "MinLMIteration: uninitialized DeltaX/DeltaF");
                t = ae_v_dotproduct(state->deltax.xR, 1, state->deltax.xR, 1, n);
-               ae_assert(t != 0.0, "MinLM: internal error (T=0)");
+               ae_assert(t != 0.0, "MinLM: internal error (T == 0)");
                for (i = 0; i < m; i++) {
                   v = ae_v_dotproduct(state->j.xyR[i], 1, state->deltax.xR, 1, n);
                   v = (state->deltaf.xR[i] - v) / t;
@@ -22461,7 +22411,7 @@ Spawn:
          // DeltaX, which is used for secant updates, is initialized here.
          //
          // This code is a bit tricky because sometimes XDir != 0, but
-         // it is so small that XDir+XBase == XBase (in finite precision
+         // it is so small that XDir + XBase == XBase (in finite precision
          // arithmetics). So we set DeltaX to XBase, then
          // add XDir, and then subtract XBase to get exact value of
          // DeltaX.
@@ -22469,7 +22419,7 @@ Spawn:
          // Step length is estimated using DeltaX.
          //
          // NOTE: stopping conditions are tested
-         // for fresh models only (ModelAge=0)
+         // for fresh models only (ModelAge == 0)
             ae_v_move(state->deltax.xR, 1, state->xbase.xR, 1, n);
             ae_v_add(state->deltax.xR, 1, state->xdir.xR, 1, n);
             ae_v_sub(state->deltax.xR, 1, state->xbase.xR, 1, n);
@@ -22498,9 +22448,9 @@ Spawn:
                }
             }
          // Let's evaluate new step:
-         // a) if we have Fi vector, we evaluate it using rcomm, and
+         // a) if we have Fi vector, we evaluate it using RComm, and
          //    then we manually calculate State.F as sum of squares of Fi[]
-         // b) if we have F value, we just evaluate it through rcomm interface
+         // b) if we have F value, we just evaluate it through RComm interface
          //
          // We prefer (a) because we may need Fi vector for additional
          // iterations
@@ -22655,8 +22605,8 @@ Pause:
 // Inputs:
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step used for numerical differentiation:
-//                     * TestStep=0 turns verification off
-//                     * TestStep>0 activates verification
+//                     * TestStep == 0 turns verification off
+//                     * TestStep > 0 activates verification
 //                     You should carefully choose TestStep. Value  which  is
 //                     too large (so large that  function  behavior  is  non-
 //                     cubic at this scale) will lead  to  false  alarms. Too
@@ -22681,7 +22631,7 @@ Pause:
 // API: void minlmoptguardgradient(const minlmstate &state, const double teststep);
 void minlmoptguardgradient(minlmstate *state, double teststep) {
    ae_assert(isfinite(teststep), "MinLMOptGuardGradient: TestStep contains NaN or INF");
-   ae_assert(teststep >= 0.0, "MinLMOptGuardGradient: invalid argument TestStep(TestStep<0)");
+   ae_assert(teststep >= 0.0, "MinLMOptGuardGradient: invalid argument TestStep(TestStep < 0)");
    state->teststep = teststep;
 }
 
@@ -22724,7 +22674,7 @@ void minlmoptguardresults(minlmstate *state, optguardreport *rep) {
 
 // Levenberg-Marquardt algorithm results
 //
-// Buffered implementation of MinLMResults(), which uses pre-allocated buffer
+// Buffered implementation of MinLMResults(), which uses preallocated buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -23415,9 +23365,9 @@ static const double mincg_gtol = 0.3;
 //     State   -   structure which stores algorithm state
 //     EpsG    -   >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
-//                 |v|<EpsG is satisfied, where:
+//                 |v| < EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
-//                 * v - scaled gradient vector, v[i]=g[i]*s[i]
+//                 * v - scaled gradient vector, v[i] == g[i]*s[i]
 //                 * g - gradient
 //                 * s - scaling coefficients set by MinCGSetScale()
 //     EpsF    -   >= 0
@@ -23428,13 +23378,13 @@ static const double mincg_gtol = 0.3;
 //                 The subroutine finishes its work if  on  k+1-th  iteration
 //                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
-//                 * v - scaled step vector, v[i]=dx[i]/s[i]
-//                 * dx - ste pvector, dx=X(k+1)-X(k)
+//                 * v - scaled step vector, v[i] == dx[i]/s[i]
+//                 * dx - ste pvector, dx == X(k+1)-X(k)
 //                 * s - scaling coefficients set by MinCGSetScale()
-//     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
+//     MaxIts  -   maximum number of iterations. If MaxIts == 0, the  number  of
 //                 iterations is unlimited.
 //
-// Passing EpsG=0, EpsF=0, EpsX=0 and MaxIts=0 (simultaneously) will lead to
+// Passing EpsG == 0, EpsF == 0, EpsX == 0 and MaxIts == 0 (simultaneously) will lead to
 // automatic stopping criterion selection (small EpsX).
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 // API: void mincgsetcond(const mincgstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
@@ -23484,7 +23434,7 @@ void mincgsetcond(mincgstate *state, double epsg, double epsf, double epsx, ae_i
 // API: void mincgsetscale(const mincgstate &state, const real_1d_array &s);
 void mincgsetscale(mincgstate *state, RVector *s) {
    ae_int_t i;
-   ae_assert(s->cnt >= state->n, "MinCGSetScale: Length(S)<N");
+   ae_assert(s->cnt >= state->n, "MinCGSetScale: Length(S) < N");
    for (i = 0; i < state->n; i++) {
       ae_assert(isfinite(s->xR[i]), "MinCGSetScale: S contains infinite or NAN elements");
       ae_assert(s->xR[i] != 0.0, "MinCGSetScale: S contains zero elements");
@@ -23555,7 +23505,7 @@ void mincgsetcgtype(mincgstate *state, ae_int_t cgtype) {
 // API: void mincgsetstpmax(const mincgstate &state, const double stpmax);
 void mincgsetstpmax(mincgstate *state, double stpmax) {
    ae_assert(isfinite(stpmax), "MinCGSetStpMax: StpMax is not finite!");
-   ae_assert(stpmax >= 0.0, "MinCGSetStpMax: StpMax<0!");
+   ae_assert(stpmax >= 0.0, "MinCGSetStpMax: StpMax < 0!");
    state->stpmax = stpmax;
 }
 
@@ -23641,10 +23591,10 @@ void mincgsetprecscale(mincgstate *state) {
    state->innerresetneeded = true;
 }
 
-// This function sets low-rank preconditioner for Hessian matrix  H=D+V'*C*V,
+// This function sets low-rank preconditioner for Hessian matrix  H == D+V'*C*V,
 // where:
 // * H is a Hessian matrix, which is approximated by D/V/C
-// * D=D1+D2 is a diagonal matrix, which includes two positive definite terms:
+// * D == D1+D2 is a diagonal matrix, which includes two positive definite terms:
 //   * constant term D1 (is not updated or infrequently updated)
 //   * variable term D2 (can be cheaply updated from iteration to iteration)
 // * V is a low-rank correction
@@ -23745,7 +23695,7 @@ void mincgsetprecvarpart(mincgstate *state, RVector *d2) {
 // magnitude different from the desired step.
 //
 // Line search  may  fail  on  such problems without good estimate of initial
-// step length. Imagine, for example, problem with ||grad||=10^50 and desired
+// step length. Imagine, for example, problem with ||grad|| == 10^50 and desired
 // step equal to 0.1 Line  search function will use 10^50  as  initial  step,
 // then  it  will  decrease step length by 2 (up to 20 attempts) and will get
 // 10^44, which is still too large.
@@ -23769,7 +23719,7 @@ void mincgsetprecvarpart(mincgstate *state, RVector *d2) {
 // API: void mincgsuggeststep(const mincgstate &state, const double stp);
 void mincgsuggeststep(mincgstate *state, double stp) {
    ae_assert(isfinite(stp), "MinCGSuggestStep: Stp is infinite or NAN");
-   ae_assert(stp >= 0.0, "MinCGSuggestStep: Stp<0");
+   ae_assert(stp >= 0.0, "MinCGSuggestStep: Stp < 0");
    state->suggestedstep = stp;
 }
 
@@ -23808,7 +23758,7 @@ double mincglastgoodstep(mincgstate *state) {
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
 // API: void mincgrestartfrom(const mincgstate &state, const real_1d_array &x);
 void mincgrestartfrom(mincgstate *state, RVector *x) {
-   ae_assert(x->cnt >= state->n, "MinCGRestartFrom: Length(X)<N!");
+   ae_assert(x->cnt >= state->n, "MinCGRestartFrom: Length(X) < N!");
    ae_assert(isfinitevector(x, state->n), "MinCGCreate: X contains infinite or NaN values!");
    ae_v_move(state->xbase.xR, 1, x->xR, 1, state->n);
    mincgsuggeststep(state, 0.0);
@@ -23853,9 +23803,7 @@ static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *sta
    }
 }
 
-//         NONLINEAR CONJUGATE GRADIENT METHOD
-//
-// DESCRIPTION:
+// NONLINEAR CONJUGATE GRADIENT METHOD
 // The subroutine minimizes function F(x) of N arguments by using one of  the
 // nonlinear conjugate gradient methods.
 //
@@ -23863,11 +23811,9 @@ static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *sta
 // long as grad(f) is Lipschitz continuous in  a  some  neighborhood  of  the
 // L = { x : f(x) <= f(x0) }.
 //
-//
 // REQUIREMENTS:
 // Algorithm will request following information during its operation:
 // * function value F and its gradient G (simultaneously) at given point X
-//
 //
 // USAGE:
 // 1. User initializes algorithm state with MinCGCreate() call
@@ -23880,9 +23826,8 @@ static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *sta
 //    with same N but another starting point and/or another function.
 //    MinCGRestartFrom() allows to reuse already initialized structure.
 //
-//
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   starting point, array[0..N-1].
@@ -23895,7 +23840,7 @@ static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *sta
 void mincgcreate(ae_int_t n, RVector *x, mincgstate *state) {
    SetObj(mincgstate, state);
    ae_assert(n >= 1, "MinCGCreate: N too small!");
-   ae_assert(x->cnt >= n, "MinCGCreate: Length(X)<N!");
+   ae_assert(x->cnt >= n, "MinCGCreate: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "MinCGCreate: X contains infinite or NaN values!");
    mincg_mincginitinternal(n, 0.0, state);
    mincgrestartfrom(state, x);
@@ -23909,11 +23854,11 @@ void mincgcreate(ae_int_t n, RVector *x, mincgstate *state) {
 // information about creation of CG optimizer.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   starting point, array[0..N-1].
-//     DiffStep-   differentiation step, >0
+//     DiffStep-   differentiation step, > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -23944,7 +23889,7 @@ void mincgcreate(ae_int_t n, RVector *x, mincgstate *state) {
 void mincgcreatef(ae_int_t n, RVector *x, double diffstep, mincgstate *state) {
    SetObj(mincgstate, state);
    ae_assert(n >= 1, "MinCGCreateF: N too small!");
-   ae_assert(x->cnt >= n, "MinCGCreateF: Length(X)<N!");
+   ae_assert(x->cnt >= n, "MinCGCreateF: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "MinCGCreateF: X contains infinite or NaN values!");
    ae_assert(isfinite(diffstep), "MinCGCreateF: DiffStep is infinite or NaN!");
    ae_assert(diffstep > 0.0, "MinCGCreateF: DiffStep is non-positive!");
@@ -23973,11 +23918,11 @@ static void mincg_preconditionedmultiply(mincgstate *state, RVector *x, RVector 
       return;
    }
    ae_assert(state->prectype == 2, "MinCG: internal error (unexpected PrecType)");
-// handle part common for VCnt=0 and VCnt != 0
+// handle part common for VCnt == 0 and VCnt != 0
    for (i = 0; i < n; i++) {
       x->xR[i] /= state->diagh.xR[i] + state->diaghl2.xR[i];
    }
-// if VCnt>0
+// if VCnt > 0
    if (vcnt > 0) {
       for (i = 0; i < vcnt; i++) {
          v = ae_v_dotproduct(state->vcorr.xyR[i], 1, x->xR, 1, n);
@@ -24073,7 +24018,6 @@ Spawn:
    betak = -919;
    v = -909;
    vv = 81;
-// Routine body
 // Prepare
    n = state->n;
    state->algpowerup = state->lsend = state->lsstart = state->xupdated = state->needfg = state->needf = false;
@@ -24089,7 +24033,7 @@ Spawn:
       state->lastscaleused.xR[i] = state->s.xR[i];
       state->invs.xR[i] = 1 / state->s.xR[i];
    }
-//  Check, that transferred derivative value is right
+// Check, that transferred derivative value is right
    if (state->diffstep == 0.0 && state->teststep > 0.0) {
       while (smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->s, &state->s, false, state->teststep)) {
          for (i = 0; i < n; i++) {
@@ -24306,7 +24250,7 @@ Spawn:
       // Something is wrong (may be function is too wild or too flat)
       // or we just have to restart algo.
       //
-      // We'll set BetaK=0, which will restart CG algorithm.
+      // We'll set BetaK == 0, which will restart CG algorithm.
       // We can stop later (during normal checks) if stopping conditions are met.
          betak = 0.0;
          state->debugrestartscount++;
@@ -24331,7 +24275,7 @@ Spawn:
       if (state->mcinfo == 1) {
       // Step is good (Wolfe conditions hold), update LastGoodStep.
       //
-      // This check for MCINFO=1 is essential because sometimes in the
+      // This check for MCINFO == 1 is essential because sometimes in the
       // constrained optimization setting we may take very short steps
       // (like 1E-15) because we were very close to boundary of the
       // feasible area. Such short step does not mean that we've converged
@@ -24431,8 +24375,8 @@ Pause:
 // Inputs:
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step used for numerical differentiation:
-//                     * TestStep=0 turns verification off
-//                     * TestStep>0 activates verification
+//                     * TestStep == 0 turns verification off
+//                     * TestStep > 0 activates verification
 //                     You should carefully choose TestStep. Value  which  is
 //                     too large (so large that  function  behavior  is  non-
 //                     cubic at this scale) will lead  to  false  alarms. Too
@@ -24457,7 +24401,7 @@ Pause:
 // API: void mincgoptguardgradient(const mincgstate &state, const double teststep);
 void mincgoptguardgradient(mincgstate *state, double teststep) {
    ae_assert(isfinite(teststep), "MinCGOptGuardGradient: TestStep contains NaN or INF");
-   ae_assert(teststep >= 0.0, "MinCGOptGuardGradient: invalid argument TestStep(TestStep<0)");
+   ae_assert(teststep >= 0.0, "MinCGOptGuardGradient: invalid argument TestStep(TestStep < 0)");
    state->teststep = teststep;
 }
 
@@ -24624,7 +24568,7 @@ void mincgoptguardresults(mincgstate *state, optguardreport *rep) {
 // * stp[], f[] - arrays of length CNT which store step lengths and  function
 //   values at these points; f[i] is evaluated in x0+stp[i]*d.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -24678,7 +24622,7 @@ void mincgoptguardnonc1test0results(mincgstate *state, optguardnonc1test0report 
 //   values at these points; g[i] is evaluated in  x0+stp[i]*d  and  contains
 //   vidx-th component of the gradient.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -24702,7 +24646,7 @@ void mincgoptguardnonc1test1results(mincgstate *state, optguardnonc1test1report 
 
 // Conjugate gradient results
 //
-// Buffered implementation of MinCGResults(), which uses pre-allocated buffer
+// Buffered implementation of MinCGResults(), which uses preallocated buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -24730,8 +24674,6 @@ void mincgresultsbuf(mincgstate *state, RVector *x, mincgreport *rep) {
 //                     * -8    internal integrity control  detected  infinite
 //                             or NAN values in  function/gradient.  Abnormal
 //                             termination signalled.
-//                     * -7    gradient verification failed.
-//                             See MinCGSetGradientCheck() for more information.
 //                     *  1    relative function improvement is no more than
 //                             EpsF.
 //                     *  2    relative step is no more than EpsX.
@@ -25080,7 +25022,6 @@ bool mincgiteration(const mincgstate &state) {
 //    callback (function/gradient) passed  to  MinCGOptimize()  and  specific
 //    function used to create optimizer.
 //
-//
 //                   |         USER PASSED TO MinCGOptimize()
 //    CREATED WITH   |  function only   |  function and gradient
 //    ------------------------------------------------------------
@@ -25210,7 +25151,6 @@ static const ae_int_t nlcsqp_penaltymemlen = 5;
 // Inputs:
 //     SState          -   solver state
 //     Subsolver       -   SQP subproblem to initialize
-//
 //
 // Return Value:
 //     True on success
@@ -26088,7 +26028,7 @@ static double nlcsqp_rawlagrangian(minsqpstate *state, RVector *x, RVector *fi, 
 //     UserTerminationNeeded-True if user requested termination
 //
 // Outputs:
-//     State       -   RepTerminationType is set to current termination code (if Status=0).
+//     State       -   RepTerminationType is set to current termination code (if Status == 0).
 //     Status      -   when reverse communication is done, Status is set to:
 //                     * positive value,  if we can proceed to the next stage
 //                       of the outer iteration
@@ -26144,7 +26084,6 @@ Spawn:
    stepklagval = -731;
    stepknlagval = -675;
    stp = -763;
-// Routine body
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -26293,7 +26232,7 @@ Spawn:
       }
    }
 #if 0 //(@) Not used.
-// Perform agressive probing of the search direction - additional function evaluations
+// Perform aggressive probing of the search direction - additional function evaluations
 // which help us to determine possible discontinuity and nonsmoothness of the problem
    smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad);
    smoothnessmonitorstartlinesearch(smonitor, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj);
@@ -26592,14 +26531,13 @@ Spawn:
    multiplyby = -940;
    setscaleto = 1016;
    prevtrustrad = -229;
-// Routine body
    n = state->n;
    nec = state->nec;
    nic = state->nic;
    nlec = state->nlec;
    nlic = state->nlic;
    nslack = n + 2 * (nec + nlec) + (nic + nlic);
-// Prepare rcomm interface
+// Prepare RComm interface
    state->xupdated = state->needfij = false;
 // Initialize algorithm data:
 // * Lagrangian and "Big C" estimates
@@ -26667,7 +26605,7 @@ Spawn:
          if (multiplyby != 1.0) {
          // Function #I needs renormalization:
          // * update function vector element and Jacobian matrix row
-         // * update FScales[] and TraceGamma[] arrays
+         // * update FScales[] array
             state->stepkfi.xR[i] *= multiplyby;
             for (j = 0; j < n; j++) {
                state->stepkj.xyR[i][j] *= multiplyby;
@@ -27086,11 +27024,11 @@ namespace alglib_impl {
 // normalization.
 //
 // Inputs:
-//     S           -   array[N], user-supplied scale vector, S[I]>0
+//     S           -   array[N], user-supplied scale vector, S[I] > 0
 //     C           -   array[N], costs
 //     BndL        -   array[N], lower bounds (may contain -INF)
 //     BndU        -   array[N], upper bounds (may contain +INF)
-//     N           -   variable count, N>0
+//     N           -   variable count, N > 0
 //     SparseA     -   matrix[K,N], sparse constraints
 //     AL          -   array[K], lower constraint bounds (may contain -INF)
 //     AU          -   array[K], upper constraint bounds (may contain +INF)
@@ -27103,10 +27041,10 @@ namespace alglib_impl {
 //                     and   information   necessary   to   perform  backward
 //                     transformation.
 //                     Following fields can be acessed:
-//                     * Info.NewN>0  for transformed problem size
+//                     * Info.NewN > 0  for transformed problem size
 //                     * Info.NewM >= 0 for transformed constraint count
 //                     * always:          Info.C, Info.BndL, Info.BndU - array[NewN]
-//                     * for Info.NewM>0: Info.SparseA, Info.AL, Info.AU
+//                     * for Info.NewM > 0: Info.SparseA, Info.AL, Info.AU
 //
 // NOTE: this routine does not reallocate arrays if NNew <= NOld and/or KNew <= KOld.
 // ALGLIB: Copyright 01.07.2020 by Sergey Bochkanov
@@ -27118,13 +27056,13 @@ void presolvenonescaleuser(RVector *s, RVector *c, RVector *bndl, RVector *bndu,
    double v;
    double avgln;
 // Integrity checks
-   ae_assert(bndl->cnt >= n, "PresolveNoneScaleUser: Length(BndL)<N");
-   ae_assert(bndu->cnt >= n, "PresolveNoneScaleUser: Length(BndU)<N");
-   ae_assert(s->cnt >= n, "PresolveNoneScaleUser: Length(S)<N");
+   ae_assert(bndl->cnt >= n, "PresolveNoneScaleUser: Length(BndL) < N");
+   ae_assert(bndu->cnt >= n, "PresolveNoneScaleUser: Length(BndU) < N");
+   ae_assert(s->cnt >= n, "PresolveNoneScaleUser: Length(S) < N");
    ae_assert(isfinitevector(s, n), "PresolveNoneScaleUser: S contains infinite or NaN elements");
-   ae_assert(c->cnt >= n, "PresolveNoneScaleUser: Length(C)<N");
+   ae_assert(c->cnt >= n, "PresolveNoneScaleUser: Length(C) < N");
    ae_assert(isfinitevector(c, n), "PresolveNoneScaleUser: C contains infinite or NaN elements");
-   ae_assert(k >= 0, "PresolveNoneScaleUser: K<0");
+   ae_assert(k >= 0, "PresolveNoneScaleUser: K < 0");
    ae_assert(k == 0 || sparseiscrs(sparsea), "PresolveNoneScaleUser: A is not CRS");
    ae_assert(k == 0 || sparsea->m == k, "PresolveNoneScaleUser: rows(A) != K");
    ae_assert(k == 0 || sparsea->n == n, "PresolveNoneScaleUser: cols(A) != N");
@@ -27471,7 +27409,7 @@ static void reviseddualsimplex_subprobleminferinitialxn(dualsimplexstate *state,
    s->state = reviseddualsimplex_ssvalidxn;
 }
 
-// This function computes solution to B*x=r. It  also   additionally  outputs
+// This function computes solution to B*x == r. It  also   additionally  outputs
 // intermediate  result  of multiplication by inv(DS)*inv(U)*inv(colPerm),  a
 // value essential for Forest-Tomlin update.
 //
@@ -27496,7 +27434,7 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
    vectorsetlengthatleast(tx, m);
 // Dense/sparse factorizations with dense PFI
 //
-// NOTE: although we solve B*x=r, internally we store factorization of B^T
+// NOTE: although we solve B*x == r, internally we store factorization of B^T
    if (s->trftype == 0 || s->trftype == 1 || s->trftype == 2) {
       ae_assert(s->trfage == 0 || s->trftype != 0, "BasisSolve: integrity check failed TrfAge vs TrfType");
       vectorsetlengthatleast(x, m);
@@ -27529,7 +27467,7 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
    }
 // Sparse factorization with Forest-Tomlin update
 //
-// NOTE: although we solve B*x=r, internally we store factorization of B^T
+// NOTE: although we solve B*x == r, internally we store factorization of B^T
    if (s->trftype == 3) {
       vectorsetlengthatleast(x, m);
       for (i = 0; i < m; i++) {
@@ -27540,16 +27478,16 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
       // The code below is an amalgamation of two parts:
       //
       // cyclic permutation
-      // V:=X[D];
-      // for I:=D to M-2 do
-      //     X[I]:=X[I+1];
-      // X[M-1]:=V;
+      // V = X[D];
+      // for I = D to M-2 do
+      //     X[I] = X[I+1];
+      // X[M-1] = V;
       //
       // and triangular factor
-      // V:=0;
-      // for I:=D to M-1 do
-      //     V:=V+X[I]*S.DenseMu[K*M+I];
-      // X[M-1]:=V;
+      // V = 0;
+      // for I = D to M-1 do
+      //     V = V+X[I]*S.DenseMu[K*M+I];
+      // X[M-1] = V;
          d = s->dk.xZ[k];
          vv = 0.0;
          vd = x->xR[d];
@@ -27584,7 +27522,7 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
    ae_assert(isfinite(v), "BasisSolve: integrity check failed (degeneracy in B?)");
 }
 
-// This function computes solution to B*x=r.
+// This function computes solution to B*x == r.
 //
 // Output array is reallocated if needed. Temporary array TmpX[] is used  and
 // reallocated if necessary.
@@ -27593,7 +27531,7 @@ static void reviseddualsimplex_basissolve(dualsimplexbasis *s, RVector *r, RVect
    reviseddualsimplex_basissolvex(s, r, x, x, false, tmpx);
 }
 
-// This function computes solution to (B^T)*x=r.
+// This function computes solution to (B^T)*x == r.
 //
 // Output array is reallocated if needed. TX[] temporary is reallocated if
 // needed
@@ -27664,16 +27602,16 @@ static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVec
       // The code below is an amalgamation of two parts:
       //
       // triangular factor
-      // V:=X[M-1];
-      // for I:=D to M-2 do
-      //     X[I]:=X[I]+S.DenseMu[K*M+I]*V;
-      // X[M-1]:=S.DenseMu[K*M+(M-1)]*V;
+      // V = X[M-1];
+      // for I = D to M-2 do
+      //     X[I] = X[I]+S.DenseMu[K*M+I]*V;
+      // X[M-1] = S.DenseMu[K*M+(M-1)]*V;
       //
       // inverse of cyclic permutation
-      // V:=X[M-1];
-      // for I:=M-1 downto D+1 do
-      //     X[I]:=X[I-1];
-      // X[D]:=V;
+      // V = X[M-1];
+      // for I = M-1 downto D+1 do
+      //     X[I] = X[I-1];
+      // X[D] = V;
          d = s->dk.xZ[k];
          vm = x->xR[m - 1];
          v = s->densemu.xR[k * m + (m - 1)] * vm;
@@ -27817,8 +27755,8 @@ static void reviseddualsimplex_subproblemhandlexnupdate(dualsimplexstate *state,
    s->state = reviseddualsimplex_ssvalid;
 }
 
-// This function returns minimum diagonal element of S. Result=1 is  returned
-// for M=0.
+// This function returns minimum diagonal element of S. Result == 1 is  returned
+// for M == 0.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 static double reviseddualsimplex_basisminimumdiagonalelement(dualsimplexbasis *s) {
    double v;
@@ -28300,7 +28238,7 @@ static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubp
    if (q < 0) {
       return;
    }
-// EXPAND with ThetaD=0
+// EXPAND with ThetaD == 0
    if (settings->shifting == 1) {
       dir = sign(delta);
       if (*thetad * dir >= 0.0) {
@@ -28311,7 +28249,7 @@ static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubp
       *thetad = 0.0;
       return;
    }
-// EXPAND with ThetaD=ShiftLen
+// EXPAND with ThetaD == ShiftLen
    if (settings->shifting == 2) {
       dir = sign(delta);
       if (*thetad * dir > 0.0) {
@@ -28447,7 +28385,6 @@ static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexs
    bool hasboth;
    bool hasl;
    bool hasu;
-   ae_int_t t0;
    *p = 0;
    *r = 0;
    *delta = 0;
@@ -28455,8 +28392,6 @@ static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexs
 // Integrity checks
    ae_assert(s->state == reviseddualsimplex_ssvalid, "PricingStep: invalid X");
    ae_assert(m > 0, "PricingStep: M <= 0");
-// Timers
-   t0 = 0;
 // Pricing
    if (settings->pricing == 0) {
    // "Most infeasible" pricing
@@ -28574,7 +28509,7 @@ static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexs
 //     X           -   temporary buffers
 //
 // Outputs:
-//     X           -   preallocated vector, X.N=N, contents undefined
+//     X           -   preallocated vector, X.N == N, contents undefined
 // ALGLIB: Copyright 24.07.2020 by Sergey Bochkanov
 static void reviseddualsimplex_dvalloc(dssvector *x, ae_int_t n) {
    vectorsetlengthatleast(&x->idx, n);
@@ -28622,12 +28557,9 @@ static void reviseddualsimplex_dvdensetosparse(dssvector *x) {
 static void reviseddualsimplex_btranstep(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t r, dssvector *rhor, dualsimplexsettings *settings) {
    ae_int_t m;
    ae_int_t i;
-   ae_int_t t0;
    m = s->m;
 // Integrity checks
    ae_assert(m > 0, "BTranStep: M <= 0");
-// Timers
-   t0 = 0;
 // BTran
    vectorsetlengthatleast(&state->btrantmp0, m);
    vectorsetlengthatleast(&state->btrantmp1, m);
@@ -28649,8 +28581,8 @@ static void reviseddualsimplex_btranstep(dualsimplexstate *state, dualsimplexsub
 //
 // Outputs:
 //     X           -   preallocated vector:
-//                     * X.N=N
-//                     * X.K=0
+//                     * X.N == N
+//                     * X.K == 0
 //                     * X.Dense is zero-filled.
 // ALGLIB: Copyright 24.07.2020 by Sergey Bochkanov
 static void reviseddualsimplex_dvinit(dssvector *x, ae_int_t n) {
@@ -28707,7 +28639,6 @@ static void reviseddualsimplex_pivotrowstep(dualsimplexstate *state, dualsimplex
    ae_int_t j1;
    ae_int_t alphark;
    double v;
-   ae_int_t t0;
    double avgcolwise;
    double avgrowwise;
    m = s->m;
@@ -28715,8 +28646,6 @@ static void reviseddualsimplex_pivotrowstep(dualsimplexstate *state, dualsimplex
    nx = s->ns + s->m;
 // Integrity checks
    ae_assert(m > 0, "BTranStep: M <= 0");
-// Timers
-   t0 = 0;
 // Determine operation counts for columnwise and rowwise approaches
    avgrowwise = rhor->k * ((double)state->at.ridx.xZ[nx] / m);
    avgcolwise = ns * ((double)state->at.ridx.xZ[nx] / nx);
@@ -28790,12 +28719,9 @@ static void reviseddualsimplex_ftranstep(dualsimplexstate *state, dualsimplexsub
    ae_int_t j;
    ae_int_t j0;
    ae_int_t j1;
-   ae_int_t t0;
    m = s->m;
 // Integrity checks
    ae_assert(m > 0, "BTranStep: M <= 0");
-// Timers
-   t0 = 0;
 // FTran
    vectorsetlengthatleast(&state->ftrantmp0, m);
    for (i = 0; i < m; i++) {
@@ -28850,15 +28776,12 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
    double adelta;
    ae_int_t idx;
    double vtheta;
-   ae_int_t t0;
    *q = 0;
    *alpharpiv = 0;
    *thetad = 0;
    nx = s->ns + s->m;
    ae_assert(delta != 0.0, "RatioTest: zero delta");
    ae_assert(s->state == reviseddualsimplex_ssvalid, "RatioTest: invalid X");
-// Timers
-   t0 = 0;
 // Clear output
    *q = -1;
    *alpharpiv = 0.0;
@@ -29015,7 +28938,7 @@ static void reviseddualsimplex_inversecyclicpermutation(ZVector *bwd, ae_int_t m
 //
 // X[], D[], Z are NOT recomputed.
 //
-// Tau is used if Settings.Pricing=1, ignored otherwise.
+// Tau is used if Settings.Pricing == 1, ignored otherwise.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix *at, ae_int_t p, ae_int_t q, RVector *alphaq, RVector *alphaqim, ae_int_t r, RVector *tau, dualsimplexsettings *settings) {
    ae_int_t m;
@@ -29059,7 +28982,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
       processed = false;
       if (s->trftype == 0 || s->trftype == 1 || s->trftype == 2) {
       // Dense/sparse factorizations with dense PFI
-         ae_assert(alphaq->xR[r] != 0.0, "BasisUpdateTrf: integrity check failed, AlphaQ[R]=0");
+         ae_assert(alphaq->xR[r] != 0.0, "BasisUpdateTrf: integrity check failed, AlphaQ[R] == 0");
          rvectorgrowto(&s->densepfieta, (s->trfage + 1) * m);
          ivectorgrowto(&s->rk, s->trfage + 1);
          s->rk.xZ[s->trfage] = r;
@@ -29078,7 +29001,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
       }
       if (s->trftype == 3) {
       // Sparse factorization with Forest-Tomlin update
-         ae_assert(alphaq->xR[r] != 0.0, "BasisUpdateTrf: integrity check failed, AlphaQ[R]=0");
+         ae_assert(alphaq->xR[r] != 0.0, "BasisUpdateTrf: integrity check failed, AlphaQ[R] == 0");
          rvectorgrowto(&s->densemu, (s->trfage + 1) * m);
          ivectorgrowto(&s->rk, s->trfage + 1);
          ivectorgrowto(&s->dk, s->trfage + 1);
@@ -29239,9 +29162,9 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
 
 // This function caches information for I-th column of the  basis,  which  is
 // assumed to store variable K:
-// * lower bound in S.BndLB[I]=S.BndL[K]
-// * upper bound in S.BndUB[I]=S.BndU[K]
-// * bound type in  S.BndTB[I]=S.BndT[K]
+// * lower bound in S.BndLB[I] == S.BndL[K]
+// * upper bound in S.BndUB[I] == S.BndU[K]
+// * bound type in  S.BndTB[I] == S.BndT[K]
 // * lower bound primal error tolerance in S.BndTolLB[I] (nonnegative)
 // * upper bound primal error tolerance in S.BndTolLB[I] (nonnegative).
 // ALGLIB: Copyright 18.07.2020 by Sergey Bochkanov
@@ -29283,16 +29206,16 @@ static double reviseddualsimplex_sparsityof(RVector *x, ae_int_t n) {
 // It also updates basis cache of the subproblem (s.bcache field).
 //
 // Depending on Settings.RatioTest, following operations are performed:
-// * Settings.RatioTest=0  ->  simple update is performed
-// * Settings.RatioTest=1  ->  bounds flipping ratio test update is performed
-// * Settings.RatioTest=2  ->  stabilizing bounds flipping ratio test update is performed
+// * Settings.RatioTest == 0 -> simple update is performed
+// * Settings.RatioTest == 1 -> bounds flipping ratio test update is performed
+// * Settings.RatioTest == 2 -> stabilizing bounds flipping ratio test update is performed
 //
 // It accepts following parameters:
 // * P - index of leaving variable from pricing step
 // * Q - index of entering variable.
 // * R - index of leaving variable in AlphaQ
 // * Delta    - delta from pricing step
-// * AlphaPiv - pivot element (in absence of numerical rounding it is AlphaR[Q]=AlphaQ[R])
+// * AlphaPiv - pivot element (in absence of numerical rounding it is AlphaR[Q] == AlphaQ[R])
 // * ThetaP   - primal step length
 // * ThetaD   - dual step length
 // * AlphaQ   - pivot column
@@ -29328,7 +29251,6 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
    ae_int_t dir;
    ae_int_t idx;
    ae_int_t actualflipscnt;
-   ae_int_t t0;
    ae_int_t alpharlen;
    nx = s->ns + s->m;
    m = s->m;
@@ -29336,10 +29258,8 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
    ae_assert(settings->ratiotest == 0 || settings->ratiotest == 1 || settings->ratiotest == 2, "UpdateStep: invalid X");
    ae_assert(s->state == reviseddualsimplex_ssvalid, "UpdateStep: invalid X");
    ae_assert(p >= 0 && q >= 0, "UpdateStep: invalid P/Q");
-   ae_assert(delta != 0.0, "UpdateStep: Delta=0");
-   ae_assert(alphapiv != 0.0, "UpdateStep: AlphaPiv=0");
-// Timers
-   t0 = 0;
+   ae_assert(delta != 0.0, "UpdateStep: Delta == 0");
+   ae_assert(alphapiv != 0.0, "UpdateStep: AlphaPiv == 0");
 // Prepare
    dir = sign(delta);
    alpharlen = alphar->k;
@@ -29545,7 +29465,7 @@ static void reviseddualsimplex_recombinebasicnonbasicx(dualsimplexsubproblem *s,
 // primary one or phase 1 one).
 //
 // A problem with following properties is expected:
-// * M>0
+// * M > 0
 // * feasible box constraints
 // * dual feasible initial basis
 // * actual initial point XC and target value Z
@@ -29686,7 +29606,7 @@ static bool reviseddualsimplex_hasbndu(dualsimplexsubproblem *subproblem, ae_int
 // This function solves simplex subproblem using primal simplex method.
 //
 // A problem with following properties is expected:
-// * M>0
+// * M > 0
 // * feasible box constraints
 // * primal feasible initial basis
 // * actual initial point XC and target value Z
@@ -29920,7 +29840,7 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
 // invokes phase 1 if necessary.
 //
 // A problem with following properties is expected:
-// * M>0
+// * M > 0
 // * feasible box constraints
 // * some initial basis (can be dual infeasible) with actual factorization
 // * actual initial point XC and target value Z
@@ -30200,13 +30120,11 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_int_t t0;
    ae_frame_make(&_frame_block);
    NewObj(hqrndstate, rs);
    nx = state->primary.ns + state->primary.m;
    m = state->primary.m;
-   t0 = 0;
-// Handle case when M=0; after this block we assume that M>0.
+// Handle case when M == 0; after this block we assume that M > 0.
    if (m == 0) {
    // Solve
       reviseddualsimplex_solveboxonly(state);
@@ -30535,7 +30453,7 @@ void dssinit(ae_int_t n, dualsimplexstate *s) {
 //     AL, AU  -   lower and upper bounds, array[K]
 //     K       -   number of equality/inequality constraints, K >= 0.
 //
-//     ProposedBasis- basis to import from (if BasisType=2)
+//     ProposedBasis- basis to import from (if BasisType == 2)
 //     BasisInitType-  what to do with basis:
 //                 * 0 - set new basis to all-logicals
 //                 * 1 - try to reuse previous basis as much as possible
@@ -30557,13 +30475,13 @@ void dsssetproblem(dualsimplexstate *state, RVector *c, RVector *bndl, RVector *
    ns = state->primary.ns;
    oldm = state->primary.m;
 // Integrity checks
-   ae_assert(bndl->cnt >= ns, "DSSSetProblem: Length(BndL)<N");
-   ae_assert(bndu->cnt >= ns, "DSSSetProblem: Length(BndU)<N");
-   ae_assert(c->cnt >= ns, "SubproblemSetCost: Length(C)<N");
+   ae_assert(bndl->cnt >= ns, "DSSSetProblem: Length(BndL) < N");
+   ae_assert(bndu->cnt >= ns, "DSSSetProblem: Length(BndU) < N");
+   ae_assert(c->cnt >= ns, "SubproblemSetCost: Length(C) < N");
    ae_assert(isfinitevector(c, ns), "SubproblemSetCost: C contains infinite or NaN elements");
    ae_assert(akind == 0 || akind == 1, "DSSSetProblem: incorrect AKind");
    ae_assert(basisinittype == 0 || basisinittype == 1 || basisinittype == 2, "DSSSetProblem: incorrect BasisInitType");
-   ae_assert(k >= 0, "DSSSetProblem: K<0");
+   ae_assert(k >= 0, "DSSSetProblem: K < 0");
    if (k > 0 && akind == 1) {
       ae_assert(sparsea->m == k, "DSSSetProblem: rows(A) != K");
       ae_assert(sparsea->n == ns, "DSSSetProblem: cols(A) != N");
@@ -31184,7 +31102,7 @@ static const ae_int_t minlp_alllogicalsbasis = 0;
 // API: void minlpsetalgodss(const minlpstate &state, const double eps);
 void minlpsetalgodss(minlpstate *state, double eps) {
    ae_assert(isfinite(eps), "MinLPSetAlgoDSS: Eps is not finite number");
-   ae_assert(eps >= 0.0, "MinLPSetAlgoDSS: Eps<0");
+   ae_assert(eps >= 0.0, "MinLPSetAlgoDSS: Eps < 0");
    state->algokind = 1;
    if (eps == 0.0) {
       eps = 1.0E-6;
@@ -31217,7 +31135,7 @@ void minlpsetalgodss(minlpstate *state, double eps) {
 // API: void minlpsetalgoipm(const minlpstate &state);
 void minlpsetalgoipm(minlpstate *state, double eps) {
    ae_assert(isfinite(eps), "MinLPSetAlgoIPM: Eps is not finite number");
-   ae_assert(eps >= 0.0, "MinLPSetAlgoIPM: Eps<0");
+   ae_assert(eps >= 0.0, "MinLPSetAlgoIPM: Eps < 0");
    state->algokind = 2;
    state->ipmeps = eps;
    state->ipmlambda = 0.0;
@@ -31236,7 +31154,7 @@ void minlpsetcost(minlpstate *state, RVector *c) {
    ae_int_t n;
    ae_int_t i;
    n = state->n;
-   ae_assert(c->cnt >= n, "MinLPSetCost: Length(C)<N");
+   ae_assert(c->cnt >= n, "MinLPSetCost: Length(C) < N");
    ae_assert(isfinitevector(c, n), "MinLPSetCost: C contains infinite or NaN elements");
    for (i = 0; i < n; i++) {
       state->c.xR[i] = c->xR[i];
@@ -31261,7 +31179,7 @@ void minlpsetcost(minlpstate *state, RVector *c) {
 // API: void minlpsetscale(const minlpstate &state, const real_1d_array &s);
 void minlpsetscale(minlpstate *state, RVector *s) {
    ae_int_t i;
-   ae_assert(s->cnt >= state->n, "MinLPSetScale: Length(S)<N");
+   ae_assert(s->cnt >= state->n, "MinLPSetScale: Length(S) < N");
    for (i = 0; i < state->n; i++) {
       ae_assert(isfinite(s->xR[i]), "MinLPSetScale: S contains infinite or NAN elements");
       ae_assert(s->xR[i] != 0.0, "MinLPSetScale: S contains zero elements");
@@ -31283,11 +31201,11 @@ void minlpsetscale(minlpstate *state, RVector *s) {
 // Following types of constraints are supported:
 //
 //     DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
-//     fixed variable      x[i]=Bnd[i]             BndL[i]=BndU[i]
-//     lower bound         BndL[i] <= x[i]           BndU[i]=+INF
-//     upper bound         x[i] <= BndU[i]           BndL[i]=-INF
+//     fixed variable      x[i] == Bnd[i]          BndL[i] == BndU[i]
+//     lower bound         BndL[i] <= x[i]         BndU[i] == +INF
+//     upper bound         x[i] <= BndU[i]         BndL[i] == -INF
 //     range               BndL[i] <= x[i] <= BndU[i]  ...
-//     free variable       -                       BndL[I]=-INF, BndU[I]+INF
+//     free variable       -                       BndL[i] == -INF, BndU[i] == +INF
 //
 // Inputs:
 //     State   -   structure stores algorithm state
@@ -31305,15 +31223,15 @@ void minlpsetscale(minlpstate *state, RVector *s) {
 // NOTE: if constraints for all variables are same you may use minlpsetbcall()
 //       which allows to specify constraints without using arrays.
 //
-// NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
+// NOTE: BndL > BndU will result in LP problem being recognized as infeasible.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 void minlpsetbc(minlpstate *state, RVector *bndl, RVector *bndu) {
    ae_int_t i;
    ae_int_t n;
    n = state->n;
-   ae_assert(bndl->cnt >= n, "MinLPSetBC: Length(BndL)<N");
-   ae_assert(bndu->cnt >= n, "MinLPSetBC: Length(BndU)<N");
+   ae_assert(bndl->cnt >= n, "MinLPSetBC: Length(BndL) < N");
+   ae_assert(bndu->cnt >= n, "MinLPSetBC: Length(BndU) < N");
    for (i = 0; i < n; i++) {
       ae_assert(isfinite(bndl->xR[i]) || isneginf(bndl->xR[i]), "MinLPSetBC: BndL contains NAN or +INF");
       ae_assert(isfinite(bndu->xR[i]) || isposinf(bndu->xR[i]), "MinLPSetBC: BndU contains NAN or -INF");
@@ -31333,11 +31251,11 @@ void minlpsetbc(minlpstate *state, RVector *bndl, RVector *bndu) {
 // Following types of constraints are supported:
 //
 //     DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
-//     fixed variable      x[i]=Bnd[i]             BndL[i]=BndU[i]
-//     lower bound         BndL[i] <= x[i]           BndU[i]=+INF
-//     upper bound         x[i] <= BndU[i]           BndL[i]=-INF
+//     fixed variable      x[i] == Bnd[i]          BndL[i] == BndU[i]
+//     lower bound         BndL[i] <= x[i]         BndU[i] == +INF
+//     upper bound         x[i] <= BndU[i]         BndL[i] == -INF
 //     range               BndL[i] <= x[i] <= BndU[i]  ...
-//     free variable       -                       BndL[I]=-INF, BndU[I]+INF
+//     free variable       -                       BndL[i] == -INF, BndU[i] == +INF
 //
 // Inputs:
 //     State   -   structure stores algorithm state
@@ -31355,7 +31273,7 @@ void minlpsetbc(minlpstate *state, RVector *bndl, RVector *bndu) {
 // NOTE: minlpsetbc() can  be  used  to  specify  different  constraints  for
 //       different variables.
 //
-// NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
+// NOTE: BndL > BndU will result in LP problem being recognized as infeasible.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu);
 void minlpsetbcall(minlpstate *state, double bndl, double bndu) {
@@ -31379,11 +31297,11 @@ void minlpsetbcall(minlpstate *state, double bndl, double bndu) {
 // Following types of constraints are supported:
 //
 //     DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
-//     fixed variable      x[i]=Bnd[i]             BndL[i]=BndU[i]
-//     lower bound         BndL[i] <= x[i]           BndU[i]=+INF
-//     upper bound         x[i] <= BndU[i]           BndL[i]=-INF
+//     fixed variable      x[i] == Bnd[i]          BndL[i] == BndU[i]
+//     lower bound         BndL[i] <= x[i]         BndU[i] == +INF
+//     upper bound         x[i] <= BndU[i]         BndL[i] == -INF
 //     range               BndL[i] <= x[i] <= BndU[i]  ...
-//     free variable       -                       BndL[I]=-INF, BndU[I]+INF
+//     free variable       -                       BndL[i] == -INF, BndU[i] == +INF
 //
 // Inputs:
 //     State   -   structure stores algorithm state
@@ -31402,7 +31320,7 @@ void minlpsetbcall(minlpstate *state, double bndl, double bndu) {
 // NOTE: minlpsetbc() can  be  used  to  specify  different  constraints  for
 //       different variables.
 //
-// NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
+// NOTE: BndL > BndU will result in LP problem being recognized as infeasible.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, const double bndu);
 void minlpsetbci(minlpstate *state, ae_int_t i, double bndl, double bndu) {
@@ -31439,11 +31357,11 @@ void minlpsetbci(minlpstate *state, ae_int_t i, double bndl, double bndu) {
 //                 sided inequality  constraints,  equality  constraints  are
 //                 supported (see below)
 //     AL, AU  -   lower and upper bounds, array[K];
-//                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
-//                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
-//                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
-//                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
+//                 * AL[i] == AU[i] => equality constraint Ai*x
+//                 * AL[i] < AU[i]  => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i] == -INF  => one-sided constraint Ai*x <= AU[i]
+//                 * AU[i] == +INF  => one-sided constraint AL[i] <= Ai*x
+//                 * AL[i] == -INF, AU[i] == +INF => constraint is ignored
 //     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A, AL, AU.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
@@ -31458,11 +31376,11 @@ void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, a
    ae_frame_make(&_frame_block);
    NewVector(nrs, 0, DT_INT);
    n = state->n;
-   ae_assert(k >= 0, "MinLPSetLC2Dense: K<0");
-   ae_assert(k == 0 || a->cols >= n, "MinLPSetLC2Dense: Cols(A)<N");
-   ae_assert(a->rows >= k, "MinLPSetLC2Dense: Rows(A)<K");
-   ae_assert(al->cnt >= k, "MinLPSetLC2Dense: Length(AL)<K");
-   ae_assert(au->cnt >= k, "MinLPSetLC2Dense: Length(AU)<K");
+   ae_assert(k >= 0, "MinLPSetLC2Dense: K < 0");
+   ae_assert(k == 0 || a->cols >= n, "MinLPSetLC2Dense: Cols(A) < N");
+   ae_assert(a->rows >= k, "MinLPSetLC2Dense: Rows(A) < K");
+   ae_assert(al->cnt >= k, "MinLPSetLC2Dense: Length(AL) < K");
+   ae_assert(au->cnt >= k, "MinLPSetLC2Dense: Length(AU) < K");
    ae_assert(apservisfinitematrix(a, k, n), "MinLPSetLC2Dense: A contains infinite or NaN values!");
 // Count actual (different from -INF <= A*x <= +INF) constraints;
 // count non-zero elements in each row.
@@ -31511,12 +31429,12 @@ void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, a
 //                 Each row of A represents one general linear constraint.
 //                 A can be stored in any sparse storage format.
 //     AL, AU  -   lower and upper bounds, array[K];
-//                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
-//                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
-//                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
-//                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
-//     K       -   number  of equality/inequality constraints, K >= 0.  If  K=0
+//                 * AL[i] == AU[i] => equality constraint Ai*x
+//                 * AL[i] < AU[i]  => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i] == -INF  => one-sided constraint Ai*x <= AU[i]
+//                 * AU[i] == +INF  => one-sided constraint AL[i] <= Ai*x
+//                 * AL[i] == -INF, AU[i] == +INF => constraint is ignored
+//     K       -   number  of equality/inequality constraints, K >= 0.  If  K == 0
 //                 is specified, A, AL, AU are ignored.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k);
@@ -31530,11 +31448,11 @@ void minlpsetlc2(minlpstate *state, sparsematrix *a, RVector *al, RVector *au, a
       return;
    }
 // Integrity checks
-   ae_assert(k > 0, "MinLPSetLC2: K<0");
+   ae_assert(k > 0, "MinLPSetLC2: K < 0");
    ae_assert(sparsegetncols(a) == n, "MinLPSetLC2: Cols(A) != N");
    ae_assert(sparsegetnrows(a) == k, "MinLPSetLC2: Rows(A) != K");
-   ae_assert(al->cnt >= k, "MinLPSetLC2: Length(AL)<K");
-   ae_assert(au->cnt >= k, "MinLPSetLC2: Length(AU)<K");
+   ae_assert(al->cnt >= k, "MinLPSetLC2: Length(AL) < K");
+   ae_assert(au->cnt >= k, "MinLPSetLC2: Length(AU) < K");
    for (i = 0; i < k; i++) {
       ae_assert(isfinite(al->xR[i]) || isneginf(al->xR[i]), "MinLPSetLC2: AL contains NAN or +INF");
       ae_assert(isfinite(au->xR[i]) || isposinf(au->xR[i]), "MinLPSetLC2: AU contains NAN or -INF");
@@ -31551,7 +31469,7 @@ void minlpsetlc2(minlpstate *state, sparsematrix *a, RVector *al, RVector *au, a
 }
 
 // This function sets one-sided linear constraints A*x ~ AU, where "~" can be
-// a mix of "<=", "=" and ">=".
+// a mix of "<=", "==" and ">=".
 //
 // IMPORTANT: this function is provided here for compatibility with the  rest
 //            of ALGLIB optimizers which accept constraints  in  format  like
@@ -31568,9 +31486,9 @@ void minlpsetlc2(minlpstate *state, sparsematrix *a, RVector *al, RVector *au, a
 //                 one constraint, with first N elements being linear coefficients,
 //                 and last element being right side.
 //     CT      -   constraint types, array[K]:
-//                 * if CT[i]>0, then I-th constraint is A[i,*]*x >= A[i,n]
-//                 * if CT[i]=0, then I-th constraint is A[i,*]*x  = A[i,n]
-//                 * if CT[i]<0, then I-th constraint is A[i,*]*x <= A[i,n]
+//                 * if CT[i] > 0, then I-th constraint is A[i,*]*x >= A[i,n]
+//                 * if CT[i] == 0, then I-th constraint is A[i,*]*x  = A[i,n]
+//                 * if CT[i] < 0, then I-th constraint is A[i,*]*x <= A[i,n]
 //     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A and CT.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
@@ -31584,10 +31502,10 @@ void minlpsetlc(minlpstate *state, RMatrix *a, ZVector *ct, ae_int_t k) {
    NewVector(al, 0, DT_REAL);
    NewVector(au, 0, DT_REAL);
    n = state->n;
-   ae_assert(k >= 0, "MinLPSetLC: K<0");
-   ae_assert(k == 0 || a->cols >= n + 1, "MinLPSetLC: Cols(A)<N+1");
-   ae_assert(a->rows >= k, "MinLPSetLC: Rows(A)<K");
-   ae_assert(ct->cnt >= k, "MinLPSetLC: Length(CT)<K");
+   ae_assert(k >= 0, "MinLPSetLC: K < 0");
+   ae_assert(k == 0 || a->cols >= n + 1, "MinLPSetLC: Cols(A) < N+1");
+   ae_assert(a->rows >= k, "MinLPSetLC: Rows(A) < K");
+   ae_assert(ct->cnt >= k, "MinLPSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(a, k, n + 1), "MinLPSetLC: A contains infinite or NaN values!");
 // Handle zero K
    if (k == 0) {
@@ -31628,8 +31546,7 @@ static void minlp_clearreportfields(minlpstate *state) {
    state->repm = 0;
 }
 
-//                             LINEAR PROGRAMMING
-//
+// LINEAR PROGRAMMING
 // The subroutine creates LP  solver.  After  initial  creation  it  contains
 // default optimization problem with zero cost vector and all variables being
 // fixed to zero values and no constraints.
@@ -31667,7 +31584,7 @@ static void minlp_clearreportfields(minlpstate *state) {
 void minlpcreate(ae_int_t n, minlpstate *state) {
    ae_int_t i;
    SetObj(minlpstate, state);
-   ae_assert(n >= 1, "MinLPCreate: N<1");
+   ae_assert(n >= 1, "MinLPCreate: N < 1");
 // Initialize
    state->n = n;
    state->m = 0;
@@ -31704,11 +31621,11 @@ void minlpcreate(ae_int_t n, minlpstate *state) {
 //     ValA    -   array[NNZ], values of non-zero elements of A
 //     NNZ     -   number of non-zero coefficients in A
 //     AL, AU  -   lower and upper bounds;
-//                 * AL=AU    => equality constraint A*x
-//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
-//                 * AL=-INF  => one-sided constraint A*x <= AU
-//                 * AU=+INF  => one-sided constraint AL <= A*x
-//                 * AL=-INF, AU=+INF => constraint is ignored
+//                 * AL == AU   => equality constraint A*x
+//                 * AL < AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL == -INF => one-sided constraint A*x <= AU
+//                 * AU == +INF => one-sided constraint AL <= A*x
+//                 * AL == -INF, AU == +INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minlpaddlc2(const minlpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au);
 void minlpaddlc2(minlpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, double al, double au) {
@@ -31724,16 +31641,16 @@ void minlpaddlc2(minlpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
    m = state->m;
    n = state->n;
 // Check inputs
-   ae_assert(nnz >= 0, "MinLPAddLC2: NNZ<0");
-   ae_assert(idxa->cnt >= nnz, "MinLPAddLC2: Length(IdxA)<NNZ");
-   ae_assert(vala->cnt >= nnz, "MinLPAddLC2: Length(ValA)<NNZ");
+   ae_assert(nnz >= 0, "MinLPAddLC2: NNZ < 0");
+   ae_assert(idxa->cnt >= nnz, "MinLPAddLC2: Length(IdxA) < NNZ");
+   ae_assert(vala->cnt >= nnz, "MinLPAddLC2: Length(ValA) < NNZ");
    for (i = 0; i < nnz; i++) {
       ae_assert(idxa->xZ[i] >= 0 && idxa->xZ[i] < n, "MinLPAddLC2: IdxA contains indexes outside of [0,N) range");
    }
    ae_assert(isfinitevector(vala, nnz), "MinLPAddLC2: ValA contains infinite or NaN values!");
    ae_assert(isfinite(al) || isneginf(al), "MinLPAddLC2Dense: AL is NAN or +INF");
    ae_assert(isfinite(au) || isposinf(au), "MinLPAddLC2Dense: AU is NAN or -INF");
-// If M=0, it means that A is uninitialized.
+// If M == 0, it means that A is uninitialized.
 // Prepare sparse matrix structure
    if (m == 0) {
       state->a.matrixtype = 1;
@@ -31752,7 +31669,7 @@ void minlpaddlc2(minlpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
    ivectorgrowto(&state->a.ridx, m + 2);
    rvectorgrowto(&state->al, m + 1);
    rvectorgrowto(&state->au, m + 1);
-// If NNZ=0, perform quick and simple row append.
+// If NNZ == 0, perform quick and simple row append.
    if (nnz == 0) {
       state->a.didx.xZ[m] = state->a.ridx.xZ[m];
       state->a.uidx.xZ[m] = state->a.ridx.xZ[m];
@@ -31764,7 +31681,7 @@ void minlpaddlc2(minlpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
       return;
    }
 // Now we are sure that A contains properly initialized sparse
-// matrix (or some appropriate dummy for M=0) and we have NNZ>0
+// matrix (or some appropriate dummy for M == 0) and we have NNZ > 0
 // (no need to care about degenerate cases).
 //
 // Append rows to A:
@@ -31832,11 +31749,11 @@ void minlpaddlc2(minlpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
 //     A       -   linear constraint coefficient, array[N], right side is NOT
 //                 included.
 //     AL, AU  -   lower and upper bounds;
-//                 * AL=AU    => equality constraint Ai*x
-//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
-//                 * AL=-INF  => one-sided constraint Ai*x <= AU
-//                 * AU=+INF  => one-sided constraint AL <= Ai*x
-//                 * AL=-INF, AU=+INF => constraint is ignored
+//                 * AL == AU   => equality constraint Ai*x
+//                 * AL < AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL == -INF => one-sided constraint Ai*x <= AU
+//                 * AU == +INF => one-sided constraint AL <= Ai*x
+//                 * AL == -INF, AU == +INF => constraint is ignored
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 // API: void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const double al, const double au);
 void minlpaddlc2dense(minlpstate *state, RVector *a, double al, double au) {
@@ -31844,7 +31761,7 @@ void minlpaddlc2dense(minlpstate *state, RVector *a, double al, double au) {
    ae_int_t n;
    ae_int_t nnz;
    n = state->n;
-   ae_assert(a->cnt >= n, "MinLPAddLC2Dense: Length(A)<N");
+   ae_assert(a->cnt >= n, "MinLPAddLC2Dense: Length(A) < N");
    ae_assert(isfinitevector(a, n), "MinLPAddLC2Dense: A contains infinite or NaN values!");
    ae_assert(isfinite(al) || isneginf(al), "MinLPAddLC2Dense: AL is NAN or +INF");
    ae_assert(isfinite(au) || isposinf(au), "MinLPAddLC2Dense: AU is NAN or -INF");
@@ -32027,7 +31944,7 @@ void minlpoptimize(minlpstate *state) {
 
 // LP results
 //
-// Buffered implementation of MinLPResults() which uses pre-allocated  buffer
+// Buffered implementation of MinLPResults() which uses preallocated  buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -32229,12 +32146,12 @@ DefClass(minlpstate, )
 //                             constraints. This array is filled only by  DSS
 //                             algorithm because IPM always stops at INTERIOR
 //                             point:
-//                             * stats[i]>0  =>  constraint at upper bound
-//                                               (also used for free non-basic
-//                                               variables set to zero)
-//                             * stats[i]<0  =>  constraint at lower bound
-//                             * stats[i]=0  =>  constraint is inactive, basic
-//                                               variable
+//                             * stats[i] > 0  => constraint at upper bound
+//                                                (also used for free non-basic
+//                                                variables set to zero)
+//                             * stats[i] < 0  => constraint at lower bound
+//                             * stats[i] == 0 => constraint is inactive, basic
+//                                                variable
 // * primalerror               primal feasibility error
 // * dualerror                 dual feasibility error
 // * slackerror                complementary slackness error
@@ -32258,7 +32175,7 @@ DefClass(minlpstate, )
 // Negative coefficient means that constraint is at its lower  bound.  It  is
 // expected that at solution the dual feasibility condition holds:
 //
-//     C + SUM(Ei*LagBC[i],i=0..n-1) + SUM(Ai*LagLC[i],i=0..m-1) ~ 0
+//     C + SUM(Ei*LagBC[i],i = 0..n-1) + SUM(Ai*LagLC[i],i = 0..m-1) ~ 0
 //
 // where
 // * C is a cost vector (linear term)
@@ -32442,7 +32359,6 @@ static const double nlcslp_slpsmallscale = 0.2;
 //     Subsolver       -   SLP subproblem to initialize
 //     HessianType     -   0 for identity Hessian, 1 for BFGS update
 //
-//
 // Return Value:
 //     True on success
 //     False on failure of the LP solver (unexpected... but possible due to numerical errors)
@@ -32586,7 +32502,7 @@ static void nlcslp_lpsubproblemupdatehessian(minslpstate *sstate, minslpsubsolve
       }
       if (sqrt(v0) > rmax2(sstate->epsx, nlcslp_bfgstol) && sqrt(v1) > nlcslp_bfgstol * sqrt(v2) && v > nlcslp_bfgstol * sqrt(v0) * sqrt(v1)) {
       // Update Hessian if following criteria hold:
-      // * MCINFO=1 (good step)
+      // * MCINFO == 1 (good step)
       // * step length is large enough
       // * |Yk| is large enough when compared with |G|
       // * (Sk,Yk) is large enough when compared with |S| and |G|
@@ -32923,17 +32839,17 @@ static void nlcslp_lpsubproblemappendconjugacyconstraint(minslpstate *state, min
 // Update matrix of products H*Dprev
    ae_assert(subsolver->curdcnt < subsolver->curd.rows, "SLP: CurD is too small");
    for (i = 0; i < n; i++) {
-   // Store direction and default conjugacy constraint d'*I*Dprev=0
+   // Store direction and default conjugacy constraint d'*I*Dprev == 0
       subsolver->curd.xyR[subsolver->curdcnt][i] = d->xR[i];
       subsolver->curhd.xyR[subsolver->curdcnt][i] = d->xR[i];
    }
    subsolver->curdcnt++;
    if (state->hessiantype == 1) {
-   // Conjugacy constraint d*H*Dprev=0, full recomputation of (H*Dprev)
+   // Conjugacy constraint d*H*Dprev == 0, full recomputation of (H*Dprev)
       rmatrixgemm(subsolver->curdcnt, n, n, 1.0, &subsolver->curd, 0, 0, 0, &subsolver->h, 0, 0, 0, 0.0, &subsolver->curhd, 0, 0);
    }
    if (state->hessiantype == 2) {
-   // Conjugacy constraint d*H*Dprev=0, only last row of (H*Dprev) is recomputed
+   // Conjugacy constraint d*H*Dprev == 0, only last row of (H*Dprev) is recomputed
       vectorsetlengthatleast(&subsolver->tmp0, n);
       rmatrixgemv(n, n, 1.0, &subsolver->h, 0, 0, 0, d, 0, 0.0, &subsolver->tmp0, 0);
       for (j = 0; j < n; j++) {
@@ -33267,7 +33183,7 @@ static double nlcslp_rawlagrangian(minslpstate *state, RVector *x, RVector *fi, 
 //     LagMult     -   array[NEC+NIC+NLEC+NLIC], contents ignored on input.
 //
 // Outputs:
-//     State       -   RepTerminationType is set to current termination code (if Status=0).
+//     State       -   RepTerminationType is set to current termination code (if Status == 0).
 //     CurX        -   advanced to new point
 //     CurFi       -   updated with function vector at CurX[]
 //     CurJ        -   updated with Jacobian at CurX[]
@@ -33324,7 +33240,6 @@ Spawn:
    nu = -675;
    localstp = -763;
    mu = -233;
-// Routine body
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -33363,7 +33278,7 @@ Spawn:
 // is a tendency of L1 penalized function to reject steps built using simple
 // linearized model when nonlinear constraints change faster than the target.
 //
-// The idea is that we perform trial step (stp=1) using simple linearized model,
+// The idea is that we perform trial step (stp == 1) using simple linearized model,
 // compute constraint vector at the new trial point - and use these updated
 // constraint linearizations back at the initial point.
    if (state13->usecorrection) {
@@ -33565,7 +33480,7 @@ static void nlcslp_phase2init(minslpphase2state *state2, ae_int_t n, ae_int_t ne
 //     GammaMax    -   current estimate of the Hessian norm
 //
 // Outputs:
-//     State       -   RepTerminationType is set to current termination code (if Status=0).
+//     State       -   RepTerminationType is set to current termination code (if Status == 0).
 //     CurX        -   advanced to new point
 //     CurFi       -   updated with function vector at CurX[]
 //     CurJ        -   updated with Jacobian at CurX[]
@@ -33636,7 +33551,6 @@ Spawn:
    f0 = 161;
    f1 = -447;
    mu = -799;
-// Routine body
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -33688,7 +33602,7 @@ Spawn:
    //
    // MCSRCH can fail in the following cases:
    // * rounding errors prevent optimization
-   // * non-descent direction is specified (MCINFO=0 is returned)
+   // * non-descent direction is specified (MCINFO == 0 is returned)
    // In the latter case we proceed to minimization of merit function.
    //
    // NOTE: constraint violation reports are updated during Lagrangian computation
@@ -33777,7 +33691,7 @@ Spawn:
       if (mx > nlcslp_bfgstol) {
          *gammamax = rmax2(*gammamax, fabs(vv / v));
       }
-   #if 0 //(@) Not used.
+#if 0 //(@) Not used.
       for (smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad); smoothnessmonitorprobe(smonitor); ) {
          for (j = 0; j < n; j++) {
             state2->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state2->d.xR[j];
@@ -33802,7 +33716,7 @@ Spawn:
       }
       f0 = nlcslp_meritfunction(state, curx, curfi, &state2->meritlagmult, mu, &state2->tmpmerit);
       f1 = nlcslp_meritfunction(state, &state2->stepkxn, &state2->stepkfin, &state2->meritlagmult, mu, &state2->tmpmerit);
-   #endif
+#endif
    // Check status of the termination request
    // Update current point
    // Update constraint status.
@@ -34037,14 +33951,13 @@ Spawn:
    setscaleto = 487;
    prevtrustrad = -115;
    mu = 886;
-// Routine body
    n = state->n;
    nec = state->nec;
    nic = state->nic;
    nlec = state->nlec;
    nlic = state->nlic;
    nslack = n + 2 * (nec + nlec) + (nic + nlic);
-// Prepare rcomm interface
+// Prepare RComm interface
    state->xupdated = state->needfij = false;
 // Initialize algorithm data:
 // * Lagrangian and "Big C" estimates
@@ -34199,7 +34112,7 @@ Spawn:
          // Merit function does not decrease, discard phase results and report is as one
          // more "fake" inner iteration.
          //
-         // NOTE: it is important that F2=F1 is considered as "does not decrease"
+         // NOTE: it is important that F2 == F1 is considered as "does not decrease"
             nlcslp_slpcopystate(state, &state->backupx, &state->backupfi, &state->backupj, &state->stepkx, &state->stepkfi, &state->stepkj);
             state->repinneriterationscount++;
             nlcslp_slpsendx(state, &state->stepkx);
@@ -34638,8 +34551,8 @@ static const double minnlc_regprec = 1.0E-6;
 //                 If some (all) variables are unbounded, you may specify
 //                 very large number or +INF.
 //
-// NOTE 1:  it is possible to specify  BndL[i]=BndU[i].  In  this  case  I-th
-// variable will be "frozen" at X[i]=BndL[i]=BndU[i].
+// NOTE 1:  it is possible to specify  BndL[i] == BndU[i].  In  this  case  I-th
+// variable will be "frozen" at X[i] == BndL[i] == BndU[i].
 //
 // NOTE 2:  when you solve your problem  with  augmented  Lagrangian  solver,
 //          boundary constraints are  satisfied  only  approximately!  It  is
@@ -34651,8 +34564,8 @@ void minnlcsetbc(minnlcstate *state, RVector *bndl, RVector *bndu) {
    ae_int_t i;
    ae_int_t n;
    n = state->n;
-   ae_assert(bndl->cnt >= n, "MinNLCSetBC: Length(BndL)<N");
-   ae_assert(bndu->cnt >= n, "MinNLCSetBC: Length(BndU)<N");
+   ae_assert(bndl->cnt >= n, "MinNLCSetBC: Length(BndL) < N");
+   ae_assert(bndu->cnt >= n, "MinNLCSetBC: Length(BndU) < N");
    for (i = 0; i < n; i++) {
       ae_assert(isfinite(bndl->xR[i]) || isneginf(bndl->xR[i]), "MinNLCSetBC: BndL contains NAN or +INF");
       ae_assert(isfinite(bndu->xR[i]) || isposinf(bndu->xR[i]), "MinNLCSetBC: BndL contains NAN or -INF");
@@ -34682,9 +34595,9 @@ void minnlcsetbc(minnlcstate *state, RVector *bndl, RVector *bndu) {
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
-//                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
+//                 * if CT[i] == 0, then I-th constraint is C[i,*]*x  = C[i,n+1]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
 //     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
@@ -34701,10 +34614,10 @@ void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
    ae_int_t i;
    n = state->n;
 // First, check for errors in the inputs
-   ae_assert(k >= 0, "MinNLCSetLC: K<0");
-   ae_assert(c->cols >= n + 1 || k == 0, "MinNLCSetLC: Cols(C)<N+1");
-   ae_assert(c->rows >= k, "MinNLCSetLC: Rows(C)<K");
-   ae_assert(ct->cnt >= k, "MinNLCSetLC: Length(CT)<K");
+   ae_assert(k >= 0, "MinNLCSetLC: K < 0");
+   ae_assert(c->cols >= n + 1 || k == 0, "MinNLCSetLC: Cols(C) < N+1");
+   ae_assert(c->rows >= k, "MinNLCSetLC: Rows(C) < K");
+   ae_assert(ct->cnt >= k, "MinNLCSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n + 1), "MinNLCSetLC: C contains infinite or NaN values!");
 // Handle zero K
    if (k == 0) {
@@ -34751,7 +34664,7 @@ void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
 // * first component of F[] and first row  of  Jacobian  J[]  corresponds  to
 //   function being minimized
 // * next NLEC components of F[] (and rows  of  J)  correspond  to  nonlinear
-//   equality constraints G_i(x)=0
+//   equality constraints G_i(x) == 0
 // * next NLIC components of F[] (and rows  of  J)  correspond  to  nonlinear
 //   inequality constraints H_i(x) <= 0
 //
@@ -34776,8 +34689,8 @@ void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
 //
 //         However,  there  is  no  way  to  automatically  scale   nonlinear
 //         constraints Gi(x) and Hi(x). Inappropriate scaling  of  Gi/Hi  may
-//         ruin convergence. Solving problem with  constraint  "1000*G0(x)=0"
-//         is NOT same as solving it with constraint "0.001*G0(x)=0".
+//         ruin convergence. Solving problem with  constraint  "1000*G0(x) == 0"
+//         is NOT same as solving it with constraint "0.001*G0(x) == 0".
 //
 //         It  means  that  YOU  are  the  one who is responsible for correct
 //         scaling of nonlinear constraints Gi(x) and Hi(x). We recommend you
@@ -34788,8 +34701,8 @@ void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 // API: void minnlcsetnlc(const minnlcstate &state, const ae_int_t nlec, const ae_int_t nlic);
 void minnlcsetnlc(minnlcstate *state, ae_int_t nlec, ae_int_t nlic) {
-   ae_assert(nlec >= 0, "MinNLCSetNLC: NLEC<0");
-   ae_assert(nlic >= 0, "MinNLCSetNLC: NLIC<0");
+   ae_assert(nlec >= 0, "MinNLCSetNLC: NLEC < 0");
+   ae_assert(nlic >= 0, "MinNLCSetNLC: NLIC < 0");
    state->ng = nlec;
    state->nh = nlic;
    ae_vector_set_length(&state->fi, 1 + state->ng + state->nh);
@@ -34804,13 +34717,13 @@ void minnlcsetnlc(minnlcstate *state, ae_int_t nlec, ae_int_t nlic) {
 //                 The subroutine finishes its work if  on  k+1-th  iteration
 //                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
-//                 * v - scaled step vector, v[i]=dx[i]/s[i]
-//                 * dx - step vector, dx=X(k+1)-X(k)
+//                 * v - scaled step vector, v[i] == dx[i]/s[i]
+//                 * dx - step vector, dx == X(k+1)-X(k)
 //                 * s - scaling coefficients set by MinNLCSetScale()
-//     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
+//     MaxIts  -   maximum number of iterations. If MaxIts == 0, the  number  of
 //                 iterations is unlimited.
 //
-// Passing EpsX=0 and MaxIts=0 (simultaneously) will lead to automatic
+// Passing EpsX == 0 and MaxIts == 0 (simultaneously) will lead to automatic
 // selection of the stopping condition.
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 // API: void minnlcsetcond(const minnlcstate &state, const double epsx, const ae_int_t maxits);
@@ -34844,7 +34757,7 @@ void minnlcsetcond(minnlcstate *state, double epsx, ae_int_t maxits) {
 // API: void minnlcsetscale(const minnlcstate &state, const real_1d_array &s);
 void minnlcsetscale(minnlcstate *state, RVector *s) {
    ae_int_t i;
-   ae_assert(s->cnt >= state->n, "MinNLCSetScale: Length(S)<N");
+   ae_assert(s->cnt >= state->n, "MinNLCSetScale: Length(S) < N");
    for (i = 0; i < state->n; i++) {
       ae_assert(isfinite(s->xR[i]), "MinNLCSetScale: S contains infinite or NAN elements");
       ae_assert(s->xR[i] != 0.0, "MinNLCSetScale: S contains zero elements");
@@ -34907,9 +34820,9 @@ void minnlcsetprecinexact(minnlcstate *state) {
 // Exact low-rank preconditioner  uses  Woodbury  matrix  identity  to  build
 // quadratic model of the penalized function. It has following features:
 // * no special assumptions about orthogonality of constraints
-// * preconditioner evaluation is optimized for K<<N. Its cost  is  O(N*K^2),
+// * preconditioner evaluation is optimized for K << N. Its cost  is  O(N*K^2),
 //   so it may become prohibitively slow for K >= N.
-// * finally, stability of the process is guaranteed only for K<<N.  Woodbury
+// * finally, stability of the process is guaranteed only for K << N.  Woodbury
 //   update often fail for K >= N due to degeneracy of  intermediate  matrices.
 //   That's why we recommend to use "exact robust"  preconditioner  for  such
 //   cases.
@@ -34929,7 +34842,7 @@ void minnlcsetprecinexact(minnlcstate *state) {
 // ALGLIB: Copyright 26.09.2014 by Sergey Bochkanov
 // API: void minnlcsetprecexactlowrank(const minnlcstate &state, const ae_int_t updatefreq);
 void minnlcsetprecexactlowrank(minnlcstate *state, ae_int_t updatefreq) {
-   ae_assert(updatefreq >= 0, "MinNLCSetPrecExactLowRank: UpdateFreq<0");
+   ae_assert(updatefreq >= 0, "MinNLCSetPrecExactLowRank: UpdateFreq < 0");
    if (updatefreq == 0) {
       updatefreq = 10;
    }
@@ -34956,7 +34869,7 @@ void minnlcsetprecexactlowrank(minnlcstate *state, ae_int_t updatefreq) {
 // used for test purposes. Comments below discuss robust preconditioner.
 //
 // Exact  robust  preconditioner   uses   Cholesky  decomposition  to  invert
-// approximate Hessian matrix H=D+W'*C*W (where D stands for  diagonal  terms
+// approximate Hessian matrix H == D+W'*C*W (where D stands for  diagonal  terms
 // of Hessian, combined result of initial scaling matrix and penalty from box
 // constraints; W stands for general linear constraints and linearization  of
 // nonlinear ones; C stands for diagonal matrix of penalty coefficients).
@@ -34967,7 +34880,7 @@ void minnlcsetprecexactlowrank(minnlcstate *state, ae_int_t updatefreq) {
 //   version which fails for K >= N, this one works well for any value of K.
 // * the only drawback is that is takes O(N^3+K*N^2) time  to  build  it.  No
 //   economical  Woodbury update is applied even when it  makes  sense,  thus
-//   there  are  exist situations (K<<N) when "exact low rank" preconditioner
+//   there  are  exist situations (K << N) when "exact low rank" preconditioner
 //   outperforms this one.
 //
 // RECOMMENDATIONS
@@ -34985,7 +34898,7 @@ void minnlcsetprecexactlowrank(minnlcstate *state, ae_int_t updatefreq) {
 // ALGLIB: Copyright 26.09.2014 by Sergey Bochkanov
 // API: void minnlcsetprecexactrobust(const minnlcstate &state, const ae_int_t updatefreq);
 void minnlcsetprecexactrobust(minnlcstate *state, ae_int_t updatefreq) {
-   ae_assert(updatefreq >= 0, "MinNLCSetPrecExactLowRank: UpdateFreq<0");
+   ae_assert(updatefreq >= 0, "MinNLCSetPrecExactLowRank: UpdateFreq < 0");
    if (updatefreq == 0) {
       updatefreq = 10;
    }
@@ -35037,7 +34950,7 @@ void minnlcsetprecnone(minnlcstate *state) {
 // API: void minnlcsetstpmax(const minnlcstate &state, const double stpmax);
 void minnlcsetstpmax(minnlcstate *state, double stpmax) {
    ae_assert(isfinite(stpmax), "MinNLCSetStpMax: StpMax is not finite!");
-   ae_assert(stpmax >= 0.0, "MinNLCSetStpMax: StpMax<0!");
+   ae_assert(stpmax >= 0.0, "MinNLCSetStpMax: StpMax < 0!");
    state->stpmax = stpmax;
 }
 
@@ -35089,7 +35002,7 @@ void minnlcsetstpmax(minnlcstate *state, double stpmax) {
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     Rho     -   penalty coefficient, Rho>0:
+//     Rho     -   penalty coefficient, Rho > 0:
 //                 * large enough  that  algorithm  converges  with   desired
 //                   precision. Minimum value is 10*max(S'*diag(H)*S),  where
 //                   S is a scale matrix (set by MinNLCSetScale) and H  is  a
@@ -35098,16 +35011,16 @@ void minnlcsetstpmax(minnlcstate *state, double stpmax) {
 //                   below.
 //                 * not TOO large to prevent ill-conditioning
 //                 * for unit-scale problems (variables and Hessian have unit
-//                   magnitude), Rho=100 or Rho=1000 can be used.
+//                   magnitude), Rho == 100 or Rho == 1000 can be used.
 //                 * it is important to note that Rho is internally multiplied
 //                   by scaling matrix, i.e. optimum value of Rho depends  on
 //                   scale of variables specified  by  MinNLCSetScale().
 //     ItsCnt  -   number of outer iterations:
-//                 * ItsCnt=0 means that small number of outer iterations  is
+//                 * ItsCnt == 0 means that small number of outer iterations  is
 //                   automatically chosen (10 iterations in current version).
-//                 * ItsCnt=1 means that AUL algorithm performs just as usual
+//                 * ItsCnt == 1 means that AUL algorithm performs just as usual
 //                   barrier method.
-//                 * ItsCnt>1 means that  AUL  algorithm  performs  specified
+//                 * ItsCnt > 1 means that  AUL  algorithm  performs  specified
 //                   number of outer iterations
 //
 // HOW TO CHOOSE PARAMETERS
@@ -35118,10 +35031,10 @@ void minnlcsetstpmax(minnlcstate *state, double stpmax) {
 // recommendations:
 //
 // * for  unit-scale  problems  (variables  and Hessian have unit magnitude),
-//   Rho=100 or Rho=1000 can be used.
+//   Rho == 100 or Rho == 1000 can be used.
 //
 // * start from  some  small  value of Rho and solve problem  with  just  one
-//   outer iteration (ItcCnt=1). In this case algorithm behaves like  penalty
+//   outer iteration (ItcCnt == 1). In this case algorithm behaves like  penalty
 //   method. Increase Rho in 2x or 10x steps until you  see  that  one  outer
 //   iteration returns point which is "rough approximation to solution".
 //
@@ -35140,12 +35053,12 @@ void minnlcsetstpmax(minnlcstate *state, double stpmax) {
 //   ones (which are NOT violated in the true solution) can push final  point
 //   too far in the inner area of the feasible set.
 //
-//   For example, if you have constraint x0 >= 0 and true solution  x0=1,  then
+//   For example, if you have constraint x0 >= 0 and true solution  x0 == 1,  then
 //   merely a presence of "x0 >= 0" will introduce a bias towards larger values
-//   of x0. Say, algorithm may stop at x0=1.5 instead of 1.0.
+//   of x0. Say, algorithm may stop at x0 == 1.5 instead of 1.0.
 //
 // * after you found good Rho, you may increase number of  outer  iterations.
-//   ItsCnt=10 is a good value. Subsequent outer iteration will refine values
+//   ItsCnt == 10 is a good value. Subsequent outer iteration will refine values
 //   of  Lagrange  multipliers.  Constraints  which  were  violated  will  be
 //   enforced, inactive constraints will be dropped (corresponding multipliers
 //   will be decreased). Ideally, you  should  see  10-1000x  improvement  in
@@ -35166,7 +35079,7 @@ void minnlcsetstpmax(minnlcstate *state, double stpmax) {
 // penalty  functions, it  is   important  to   rescale  both  variables  AND
 // constraints.
 //
-// Say,  if  you  minimize f(x)=x^2 subject to 1000000*x >= 0,  then  you  have
+// Say,  if  you  minimize f(x) == x^2 subject to 1000000*x >= 0,  then  you  have
 // constraint whose scale is different from that of target  function (another
 // example is 0.000001*x >= 0). It is also possible to have constraints   whose
 // scales  are   misaligned:   1000000*x0 >= 0, 0.000001*x1 <= 0.   Inappropriate
@@ -35216,11 +35129,11 @@ void minnlcsetstpmax(minnlcstate *state, double stpmax) {
 // out subtle degeneracies in constraint matrix.
 //
 // Third reason is tricky and hard to diagnose. Consider situation  when  you
-// minimize  f=x^2  subject to constraint x >= 0.  Unconstrained   extremum  is
+// minimize  f == x^2  subject to constraint x >= 0.  Unconstrained   extremum  is
 // located  exactly  at  the  boundary  of  constrained  area.  In  this case
 // algorithm will tend to oscillate between negative  and  positive  x.  Each
-// time it stops at x<0 it "reinforces" constraint x >= 0, and each time it  is
-// bounced to x>0 it "relaxes" constraint (and is  attracted  to  x<0).
+// time it stops at x < 0 it "reinforces" constraint x >= 0, and each time it  is
+// bounced to x > 0 it "relaxes" constraint (and is  attracted  to  x < 0).
 //
 // Such situation  sometimes  happens  in  problems  with  hidden  symetries.
 // Algorithm  is  got  caught  in  a  loop with  Lagrange  multipliers  being
@@ -35381,7 +35294,7 @@ void minnlcrestartfrom(minnlcstate *state, RVector *x) {
    ae_int_t n;
    n = state->n;
 // First, check for errors in the inputs
-   ae_assert(x->cnt >= n, "MinNLCRestartFrom: Length(X)<N");
+   ae_assert(x->cnt >= n, "MinNLCRestartFrom: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinNLCRestartFrom: X contains infinite or NaN values!");
 // Set XC
    ae_v_move(state->xstart.xR, 1, x->xR, 1, n);
@@ -35439,16 +35352,14 @@ static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, m
    ae_frame_leave();
 }
 
-//                   NONLINEARLY  CONSTRAINED  OPTIMIZATION
-//             WITH PRECONDITIONED AUGMENTED LAGRANGIAN ALGORITHM
-//
-// DESCRIPTION:
+// NONLINEARLY CONSTRAINED OPTIMIZATION
+// WITH PRECONDITIONED AUGMENTED LAGRANGIAN ALGORITHM
 // The  subroutine  minimizes  function   F(x)  of N arguments subject to any
 // combination of:
 // * bound constraints
 // * linear inequality constraints
 // * linear equality constraints
-// * nonlinear equality constraints Gi(x)=0
+// * nonlinear equality constraints Gi(x) == 0
 // * nonlinear inequality constraints Hi(x) <= 0
 //
 // REQUIREMENTS:
@@ -35457,8 +35368,8 @@ static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, m
 //   set
 // * F(), G(), H() are continuously differentiable on the  feasible  set  and
 //   its neighborhood
-// * nonlinear constraints G() and H() must have non-zero gradient at  G(x)=0
-//   and at H(x)=0. Say, constraint like x^2 >= 1 is supported, but x^2 >= 0   is
+// * nonlinear constraints G() and H() must have non-zero gradient at  G(x) == 0
+//   and at H(x) == 0. Say, constraint like x^2 >= 1 is supported, but x^2 >= 0   is
 //   NOT supported.
 //
 // USAGE:
@@ -35539,9 +35450,8 @@ static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, m
 //    with same N but another starting point. minnlcrestartfrom()  allows  to
 //    reuse already initialized structure.
 //
-//
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size ofX
 //     X       -   starting point, array[N]:
@@ -35557,8 +35467,8 @@ static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, m
 // API: void minnlccreate(const real_1d_array &x, minnlcstate &state);
 void minnlccreate(ae_int_t n, RVector *x, minnlcstate *state) {
    SetObj(minnlcstate, state);
-   ae_assert(n >= 1, "MinNLCCreate: N<1");
-   ae_assert(x->cnt >= n, "MinNLCCreate: Length(X)<N");
+   ae_assert(n >= 1, "MinNLCCreate: N < 1");
+   ae_assert(x->cnt >= n, "MinNLCCreate: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinNLCCreate: X contains infinite or NaN values");
    minnlc_minnlcinitinternal(n, x, 0.0, state);
 }
@@ -35571,7 +35481,7 @@ void minnlccreate(ae_int_t n, RVector *x, minnlcstate *state) {
 // information about creation of NLC optimizer.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size ofX
 //     X       -   starting point, array[N]:
@@ -35579,7 +35489,7 @@ void minnlccreate(ae_int_t n, RVector *x, minnlcstate *state) {
 //                 * but X can be infeasible, in which case algorithm will try
 //                   to find feasible point first, using X as initial
 //                   approximation.
-//     DiffStep-   differentiation step, >0
+//     DiffStep-   differentiation step, > 0
 //
 // Outputs:
 //     State   -   structure stores algorithm state
@@ -35608,8 +35518,8 @@ void minnlccreate(ae_int_t n, RVector *x, minnlcstate *state) {
 // API: void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state);
 void minnlccreatef(ae_int_t n, RVector *x, double diffstep, minnlcstate *state) {
    SetObj(minnlcstate, state);
-   ae_assert(n >= 1, "MinNLCCreateF: N<1");
-   ae_assert(x->cnt >= n, "MinNLCCreateF: Length(X)<N");
+   ae_assert(n >= 1, "MinNLCCreateF: N < 1");
+   ae_assert(x->cnt >= n, "MinNLCCreateF: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinNLCCreateF: X contains infinite or NaN values");
    ae_assert(isfinite(diffstep), "MinNLCCreateF: DiffStep is infinite or NaN!");
    ae_assert(diffstep > 0.0, "MinNLCCreateF: DiffStep is non-positive!");
@@ -35624,10 +35534,10 @@ void minnlccreatef(ae_int_t n, RVector *x, double diffstep, minnlcstate *state) 
 //
 // Outputs:
 //     F       -   depending on Alpha:
-//                 * for Alpha in (-1+eps,+1-eps), F=F(Alpha)
+//                 * for Alpha in (-1+eps,+1-eps), F == F(Alpha)
 //                 * for Alpha outside of interval, F is some very large number
 //     DF      -   depending on Alpha:
-//                 * for Alpha in (-1+eps,+1-eps), DF=dF(Alpha)/dAlpha, exact
+//                 * for Alpha in (-1+eps,+1-eps), DF == dF(Alpha)/dAlpha, exact
 //                   numerical derivative.
 //                 * otherwise, it is zero
 //     D2F     -   second derivative
@@ -35663,14 +35573,14 @@ void minnlcequalitypenaltyfunction(double alpha, double *f, double *df, double *
 //     Alpha   -   function argument. Typically, if we have active constraint
 //                 with precise Lagrange multiplier, we have Alpha  around 1.
 //                 Large positive Alpha's correspond to  inner  area  of  the
-//                 feasible set. Alpha<1 corresponds to  outer  area  of  the
+//                 feasible set. Alpha < 1 corresponds to  outer  area  of  the
 //                 feasible set.
 //     StabilizingPoint- point where F becomes  non-zero.  Must  be  negative
 //                 value, at least -1, large values (hundreds) are possible.
 //
 // Outputs:
 //     F       -   F(Alpha)
-//     DF      -   DF=dF(Alpha)/dAlpha, exact derivative
+//     DF      -   DF == dF(Alpha)/dAlpha, exact derivative
 //     D2F     -   second derivative
 //
 // NOTE: it is important to  have  significantly  non-zero  StabilizingPoint,
@@ -35712,12 +35622,12 @@ void minnlcinequalitypenaltyfunction(double alpha, double stabilizingpoint, doub
 //     Alpha   -   function argument. Typically, if we have active constraint
 //                 with precise Lagrange multiplier, we have Alpha  around 1.
 //                 Large positive Alpha's correspond to  inner  area  of  the
-//                 feasible set. Alpha<1 corresponds to  outer  area  of  the
+//                 feasible set. Alpha < 1 corresponds to  outer  area  of  the
 //                 feasible set.
 //
 // Outputs:
 //     F       -   F(Alpha)
-//     DF      -   DF=dF(Alpha)/dAlpha, exact derivative
+//     DF      -   DF == dF(Alpha)/dAlpha, exact derivative
 //     D2F     -   second derivative
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 void minnlcinequalityshiftfunction(double alpha, double *f, double *df, double *d2f) {
@@ -35738,7 +35648,7 @@ void minnlcinequalityshiftfunction(double alpha, double *f, double *df, double *
 // This function clears preconditioner for L-BFGS optimizer (sets it do default
 // state);
 //
-// Parameters:
+// Parameter:
 //     AULOptimizer    -   optimizer to tune
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 static void minnlc_clearpreconditioner(minlbfgsstate *auloptimizer) {
@@ -35994,7 +35904,7 @@ static void minnlc_penaltylc(RVector *x, RMatrix *cleic, RVector *nulc, ae_int_t
 // Parameters:
 //     Fi[] - function vector:
 //           * 1 component for function being minimized
-//           * NG components for equality constraints G_i(x)=0
+//           * NG components for equality constraints G_i(x) == 0
 //           * NH components for inequality constraints H_i(x) <= 0
 //     J[]  - Jacobian matrix, array[1+NG+NH,N]
 //     NuNLC[]  -   Lagrange multipliers corresponding to constraints,
@@ -36095,7 +36005,6 @@ Spawn:
    v0 = 487;
    v1 = -115;
    v2 = 886;
-// Routine body
    ae_assert(state->solvertype == 0, "MinNLC: internal error");
    n = state->n;
    nec = state->nec;
@@ -36252,7 +36161,7 @@ Spawn:
             //   reported by RComm interface
             // * calculate step length V2.
             //
-            // If V2>HessEstTol, then:
+            // If V2 > HessEstTol, then:
             // * calculate V0 - directional derivative at XK,
             //   and V1 - directional derivative at XK1
             // * set GammaK to Max(GammaK, |V1-V0|/V2)
@@ -36449,7 +36358,6 @@ Spawn:
    b = true;
    vleft = 74;
    vright = -788;
-// Routine body
 // Init
    state->xupdated = state->needfij = state->needfi = false;
    state->userterminationneeded = false;
@@ -36540,7 +36448,7 @@ Spawn:
          // Restore previous values of fields and continue
             state->needfi = false, state->needfij = true;
          } else {
-         // Forward request to caller
+         // Forward request to caller.
             state->PQ = 6; goto Pause; Resume06: ;
          }
       }
@@ -36555,7 +36463,7 @@ Spawn:
       }
       minslpinitbuf(&state->bndl, &state->bndu, &state->s, &state->xstart, n, &state->cleic, &state->lcsrcidx, state->nec, state->nic, state->ng, state->nh, state->epsx, state->maxits, &state->slpsolverstate);
       while (minslpiteration(&state->slpsolverstate, &state->smonitor, state->userterminationneeded))
-      // Forward request to caller
+      // Forward request to caller.
          if (state->slpsolverstate.needfij) {
          // Evaluate target function/Jacobian
             if (state->diffstep == 0.0) {
@@ -36665,7 +36573,7 @@ Spawn:
       }
       minsqpinitbuf(&state->bndl, &state->bndu, &state->s, &state->xstart, n, &state->cleic, &state->lcsrcidx, state->nec, state->nic, state->ng, state->nh, state->epsx, state->maxits, &state->sqpsolverstate);
       while (minsqpiteration(&state->sqpsolverstate, &state->smonitor, state->userterminationneeded))
-      // Forward request to caller
+      // Forward request to caller.
          if (state->sqpsolverstate.needfij) {
          // Evaluate target function/Jacobian
             if (state->diffstep == 0.0) {
@@ -36801,8 +36709,8 @@ Pause:
 // Inputs:
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step used for numerical differentiation:
-//                     * TestStep=0 turns verification off
-//                     * TestStep>0 activates verification
+//                     * TestStep == 0 turns verification off
+//                     * TestStep > 0 activates verification
 //                     You should carefully choose TestStep. Value  which  is
 //                     too large (so large that  function  behavior  is  non-
 //                     cubic at this scale) will lead  to  false  alarms. Too
@@ -36827,7 +36735,7 @@ Pause:
 // API: void minnlcoptguardgradient(const minnlcstate &state, const double teststep);
 void minnlcoptguardgradient(minnlcstate *state, double teststep) {
    ae_assert(isfinite(teststep), "MinNLCOptGuardGradient: TestStep contains NaN or INF");
-   ae_assert(teststep >= 0.0, "MinNLCOptGuardGradient: invalid argument TestStep(TestStep<0)");
+   ae_assert(teststep >= 0.0, "MinNLCOptGuardGradient: invalid argument TestStep(TestStep < 0)");
    state->teststep = teststep;
 }
 
@@ -37001,7 +36909,7 @@ void minnlcoptguardresults(minnlcstate *state, optguardreport *rep) {
 // * stp[], f[] - arrays of length CNT which store step lengths and  function
 //   values at these points; f[i] is evaluated in x0+stp[i]*d.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -37057,7 +36965,7 @@ void minnlcoptguardnonc1test0results(minnlcstate *state, optguardnonc1test0repor
 //   values at these points; g[i] is evaluated in  x0+stp[i]*d  and  contains
 //   vidx-th component of the gradient.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -37081,7 +36989,7 @@ void minnlcoptguardnonc1test1results(minnlcstate *state, optguardnonc1test1repor
 
 // NLC results
 //
-// Buffered implementation of MinNLCResults() which uses pre-allocated buffer
+// Buffered implementation of MinNLCResults() which uses preallocated buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -37610,7 +37518,6 @@ bool minnlciteration(const minnlcstate &state) {
 //     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
 //                 can be NULL
 //
-//
 // NOTES:
 //
 // 1. This function has two different implementations: one which  uses  exact
@@ -37626,7 +37533,6 @@ bool minnlciteration(const minnlcstate &state) {
 //    your optimization scheme! Table below lists different  combinations  of
 //    callback (function/gradient) passed to MinNLCOptimize()   and  specific
 //    function used to create optimizer.
-//
 //
 //                      |         USER PASSED TO MinNLCOptimize()
 //    CREATED WITH      |  function only   |  function and gradient
@@ -37747,8 +37653,8 @@ namespace alglib_impl {
 //                 If some (all) variables are unbounded, you may specify
 //                 very large number or +INF.
 //
-// NOTE 1: it is possible to specify BndL[i]=BndU[i]. In this case I-th
-// variable will be "frozen" at X[i]=BndL[i]=BndU[i].
+// NOTE 1: it is possible to specify BndL[i] == BndU[i]. In this case I-th
+// variable will be "frozen" at X[i] == BndL[i] == BndU[i].
 //
 // NOTE 2: AGS solver has following useful properties:
 // * bound constraints are always satisfied exactly
@@ -37761,8 +37667,8 @@ void minnssetbc(minnsstate *state, RVector *bndl, RVector *bndu) {
    ae_int_t i;
    ae_int_t n;
    n = state->n;
-   ae_assert(bndl->cnt >= n, "MinNSSetBC: Length(BndL)<N");
-   ae_assert(bndu->cnt >= n, "MinNSSetBC: Length(BndU)<N");
+   ae_assert(bndl->cnt >= n, "MinNSSetBC: Length(BndL) < N");
+   ae_assert(bndu->cnt >= n, "MinNSSetBC: Length(BndU) < N");
    for (i = 0; i < n; i++) {
       ae_assert(isfinite(bndl->xR[i]) || isneginf(bndl->xR[i]), "MinNSSetBC: BndL contains NAN or +INF");
       ae_assert(isfinite(bndu->xR[i]) || isposinf(bndu->xR[i]), "MinNSSetBC: BndL contains NAN or -INF");
@@ -37787,9 +37693,9 @@ void minnssetbc(minnsstate *state, RVector *bndl, RVector *bndu) {
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
-//                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
+//                 * if CT[i] == 0, then I-th constraint is C[i,*]*x  = C[i,n+1]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
 //     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
@@ -37815,10 +37721,10 @@ void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
    ae_int_t i;
    n = state->n;
 // First, check for errors in the inputs
-   ae_assert(k >= 0, "MinNSSetLC: K<0");
-   ae_assert(c->cols >= n + 1 || k == 0, "MinNSSetLC: Cols(C)<N+1");
-   ae_assert(c->rows >= k, "MinNSSetLC: Rows(C)<K");
-   ae_assert(ct->cnt >= k, "MinNSSetLC: Length(CT)<K");
+   ae_assert(k >= 0, "MinNSSetLC: K < 0");
+   ae_assert(c->cols >= n + 1 || k == 0, "MinNSSetLC: Cols(C) < N+1");
+   ae_assert(c->rows >= k, "MinNSSetLC: Rows(C) < K");
+   ae_assert(ct->cnt >= k, "MinNSSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n + 1), "MinNSSetLC: C contains infinite or NaN values!");
 // Handle zero K
    if (k == 0) {
@@ -37862,7 +37768,7 @@ void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
 // * first component of F[] and first row  of  Jacobian  J[]  correspond   to
 //   function being minimized
 // * next NLEC components of F[] (and rows  of  J)  correspond  to  nonlinear
-//   equality constraints G_i(x)=0
+//   equality constraints G_i(x) == 0
 // * next NLIC components of F[] (and rows  of  J)  correspond  to  nonlinear
 //   inequality constraints H_i(x) <= 0
 //
@@ -37886,8 +37792,8 @@ void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
 //
 //         However,  there  is  no  way  to  automatically  scale   nonlinear
 //         constraints Gi(x) and Hi(x). Inappropriate scaling  of  Gi/Hi  may
-//         ruin convergence. Solving problem with  constraint  "1000*G0(x)=0"
-//         is NOT same as solving it with constraint "0.001*G0(x)=0".
+//         ruin convergence. Solving problem with  constraint  "1000*G0(x) == 0"
+//         is NOT same as solving it with constraint "0.001*G0(x) == 0".
 //
 //         It  means  that  YOU  are  the  one who is responsible for correct
 //         scaling of nonlinear constraints Gi(x) and Hi(x). We recommend you
@@ -37910,8 +37816,8 @@ void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 // API: void minnssetnlc(const minnsstate &state, const ae_int_t nlec, const ae_int_t nlic);
 void minnssetnlc(minnsstate *state, ae_int_t nlec, ae_int_t nlic) {
-   ae_assert(nlec >= 0, "MinNSSetNLC: NLEC<0");
-   ae_assert(nlic >= 0, "MinNSSetNLC: NLIC<0");
+   ae_assert(nlec >= 0, "MinNSSetNLC: NLEC < 0");
+   ae_assert(nlic >= 0, "MinNSSetNLC: NLIC < 0");
    state->ng = nlec;
    state->nh = nlic;
    ae_vector_set_length(&state->fi, 1 + state->ng + state->nh);
@@ -37925,10 +37831,10 @@ void minnssetnlc(minnsstate *state, ae_int_t nlec, ae_int_t nlic) {
 //     EpsX    -   >= 0
 //                 The AGS solver finishes its work if  on  k+1-th  iteration
 //                 sampling radius decreases below EpsX.
-//     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
+//     MaxIts  -   maximum number of iterations. If MaxIts == 0, the  number  of
 //                 iterations is unlimited.
 //
-// Passing EpsX=0  and  MaxIts=0  (simultaneously)  will  lead  to  automatic
+// Passing EpsX == 0  and  MaxIts == 0  (simultaneously)  will  lead  to  automatic
 // stopping criterion selection. We do not recommend you to rely  on  default
 // choice in production code.
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
@@ -37963,7 +37869,7 @@ void minnssetcond(minnsstate *state, double epsx, ae_int_t maxits) {
 // API: void minnssetscale(const minnsstate &state, const real_1d_array &s);
 void minnssetscale(minnsstate *state, RVector *s) {
    ae_int_t i;
-   ae_assert(s->cnt >= state->n, "MinNSSetScale: Length(S)<N");
+   ae_assert(s->cnt >= state->n, "MinNSSetScale: Length(S) < N");
    for (i = 0; i < state->n; i++) {
       ae_assert(isfinite(s->xR[i]), "MinNSSetScale: S contains infinite or NAN elements");
       ae_assert(s->xR[i] != 0.0, "MinNSSetScale: S contains zero elements");
@@ -37993,7 +37899,7 @@ void minnssetscale(minnsstate *state, RVector *s) {
 //            points by definition, and algorithm may be caught here.
 //
 //            Nonsmooth CONVEX tasks are not prone to  this  problem. Say, if
-//            your function has form f()=MAX(f0,f1,...), and f_i are  convex,
+//            your function has form f() == MAX(f0,f1,...), and f_i are  convex,
 //            then f() is convex too and you have guaranteed  convergence  to
 //            solution.
 //
@@ -38065,7 +37971,7 @@ void minnssetalgoags(minnsstate *state, double radius, double penalty) {
    ae_assert(isfinite(radius), "MinNSSetAlgoAGS: Radius is not finite");
    ae_assert(radius > 0.0, "MinNSSetAlgoAGS: Radius <= 0");
    ae_assert(isfinite(penalty), "MinNSSetAlgoAGS: Penalty is not finite");
-   ae_assert(penalty >= 0.0, "MinNSSetAlgoAGS: Penalty<0");
+   ae_assert(penalty >= 0.0, "MinNSSetAlgoAGS: Penalty < 0");
    state->agsrhononlinear = penalty;
    state->agsradius = radius;
    state->solvertype = 0;
@@ -38100,7 +38006,7 @@ void minnsrestartfrom(minnsstate *state, RVector *x) {
    ae_int_t n;
    n = state->n;
 // First, check for errors in the inputs
-   ae_assert(x->cnt >= n, "MinNSRestartFrom: Length(X)<N");
+   ae_assert(x->cnt >= n, "MinNSRestartFrom: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinNSRestartFrom: X contains infinite or NaN values!");
 // Set XC
    ae_v_move(state->xstart.xR, 1, x->xR, 1, n);
@@ -38164,17 +38070,14 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
    ae_frame_leave();
 }
 
-//                   NONSMOOTH NONCONVEX OPTIMIZATION
-//             SUBJECT TO BOX/LINEAR/NONLINEAR-NONSMOOTH CONSTRAINTS
-//
-// DESCRIPTION:
-//
+// NONSMOOTH NONCONVEX OPTIMIZATION
+// SUBJECT TO BOX/LINEAR/NONLINEAR-NONSMOOTH CONSTRAINTS
 // The  subroutine  minimizes  function   F(x)  of N arguments subject to any
 // combination of:
 // * bound constraints
 // * linear inequality constraints
 // * linear equality constraints
-// * nonlinear equality constraints Gi(x)=0
+// * nonlinear equality constraints Gi(x) == 0
 // * nonlinear inequality constraints Hi(x) <= 0
 //
 // IMPORTANT: see MinNSSetAlgoAGS for important  information  on  performance
@@ -38193,16 +38096,16 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
 //   anything which involves finite number of abs(), min() and max() is  very
 //   likely to pass the test.
 //   Say, it is possible to optimize anything of the following:
-//   * f=abs(x0)+2*abs(x1)
-//   * f=max(x0,x1)
-//   * f=sin(max(x0,x1)+abs(x2))
+//   * f == abs(x0)+2*abs(x1)
+//   * f == max(x0,x1)
+//   * f == sin(max(x0,x1)+abs(x2))
 // * for nonlinearly constrained problems: F()  must  be  bounded from  below
 //   without nonlinear constraints (this requirement is due to the fact that,
 //   contrary to box and linear constraints, nonlinear ones  require  special
 //   handling).
 // * user must provide function value and gradient for F(), H(), G()  at  all
 //   points where function/gradient can be calculated. If optimizer  requires
-//   value exactly at the boundary between "patches" (say, at x=0 for f=abs(x)),
+//   value exactly at the boundary between "patches" (say, at x == 0 for f == abs(x)),
 //   where gradient is not defined, user may resolve tie arbitrarily (in  our
 //   case - return +1 or -1 at its discretion).
 // * NS solver supports numerical differentiation, i.e. it may  differentiate
@@ -38248,9 +38151,8 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
 //    with same N but another starting point. MinNSRestartFrom()  allows   to
 //    reuse already initialized structure.
 //
-//
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   starting point, array[N]:
@@ -38270,8 +38172,8 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
 // API: void minnscreate(const real_1d_array &x, minnsstate &state);
 void minnscreate(ae_int_t n, RVector *x, minnsstate *state) {
    SetObj(minnsstate, state);
-   ae_assert(n >= 1, "MinNSCreate: N<1");
-   ae_assert(x->cnt >= n, "MinNSCreate: Length(X)<N");
+   ae_assert(n >= 1, "MinNSCreate: N < 1");
+   ae_assert(x->cnt >= n, "MinNSCreate: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinNSCreate: X contains infinite or NaN values");
    minns_minnsinitinternal(n, x, 0.0, state);
 }
@@ -38284,7 +38186,7 @@ void minnscreate(ae_int_t n, RVector *x, minnsstate *state) {
 // formula is unstable when used on non-smooth functions.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   starting point, array[N]:
@@ -38292,7 +38194,7 @@ void minnscreate(ae_int_t n, RVector *x, minnsstate *state) {
 //                 * but X can be infeasible, in which case algorithm will try
 //                   to find feasible point first, using X as initial
 //                   approximation.
-//     DiffStep-   differentiation  step,  DiffStep>0.   Algorithm   performs
+//     DiffStep-   differentiation  step,  DiffStep > 0.   Algorithm   performs
 //                 numerical differentiation  with  step  for  I-th  variable
 //                 being equal to DiffStep*S[I] (here S[] is a  scale vector,
 //                 set by minnssetscale() function).
@@ -38306,8 +38208,8 @@ void minnscreate(ae_int_t n, RVector *x, minnsstate *state) {
 // API: void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state);
 void minnscreatef(ae_int_t n, RVector *x, double diffstep, minnsstate *state) {
    SetObj(minnsstate, state);
-   ae_assert(n >= 1, "MinNSCreateF: N<1");
-   ae_assert(x->cnt >= n, "MinNSCreateF: Length(X)<N");
+   ae_assert(n >= 1, "MinNSCreateF: N < 1");
+   ae_assert(x->cnt >= n, "MinNSCreateF: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinNSCreateF: X contains infinite or NaN values");
    ae_assert(isfinite(diffstep), "MinNSCreateF: DiffStep is infinite or NaN!");
    ae_assert(diffstep > 0.0, "MinNSCreateF: DiffStep is non-positive!");
@@ -38457,7 +38359,7 @@ static void minns_qpsolveut(RMatrix *a, ae_int_t n, RVector *x) {
 // This function solves QP problem of the form
 //
 //         [                        ]
-//     min [ 0.5*c'*(G*inv(H)*G')*c ] s.t. c[i] >= 0, SUM(c[i])=1.0
+//     min [ 0.5*c'*(G*inv(H)*G')*c ] s.t. c[i] >= 0, SUM(c[i]) == 1.0
 //         [                        ]
 //
 // where G is stored in SampleG[] array, diagonal H is stored in DiagH[].
@@ -38546,7 +38448,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
    //       in such way that sparse ones come first.
    //
    // After finding lambda[] coefficients, we can find constrained descent
-   // direction by subtracting lambda[i]*A[i] from D=-G. We make use of the
+   // direction by subtracting lambda[i]*A[i] from D == -G. We make use of the
    // fact that first NCandBnd columns are just columns of identity matrix,
    // so we can perform exact projection by explicitly setting elements of D
    // to zeros.
@@ -38601,8 +38503,8 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
    // and to perform additional integrity check.
    //
    // After this stage we are pretty sure that:
-   // * if x[i]=0.0, then d[i] >= 0.0
-   // * if d[i]<0.0, then x[i]>0.0
+   // * if x[i] == 0.0, then d[i] >= 0.0
+   // * if d[i] < 0.0, then x[i] > 0.0
       for (i = 0; i < n; i++) {
          if (state->xc.xR[i] == 0.0 && state->d.xR[i] < 0.0) {
             state->d.xR[i] = 0.0;
@@ -38610,11 +38512,11 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
       }
    // Decide whether we need "kick" stage: special stage
    // that moves us away from boundary constraints which are
-   // not strictly active (i.e. such constraints that x[i]=0.0 and d[i]>0).
+   // not strictly active (i.e. such constraints that x[i] == 0.0 and d[i] > 0).
    //
    // If we need kick stage, we make a kick - and restart iteration.
    // If not, after this block we can rely on the fact that
-   // for all x[i]=0.0 we have d[i]=0.0
+   // for all x[i] == 0.0 we have d[i] == 0.0
       kickneeded = false;
       for (i = 0; i < n; i++) {
          if (state->xc.xR[i] == 0.0 && state->d.xR[i] > 0.0) {
@@ -38882,7 +38784,6 @@ Spawn:
    v0 = -678;
    v1 = -731;
    currentf0 = -675;
-// Routine body
    ae_assert(state->solvertype == 0, "MinNS: internal error");
    n = state->n;
    nec = state->nec;
@@ -39187,7 +39088,7 @@ Spawn:
    // * if gradients with different signs are present, Hessian
    //   component is set to M/R, where M is a maximum magnitude
    //   of corresponding gradient component, R is a sampling radius.
-   //   Note that sign=0 and sign=1 are treated as different ones
+   //   Note that sign == 0 and sign == 1 are treated as different ones
    // * if all gradients have same sign, Hessian component is
    //   set to M/R0, where R0 is initial sampling radius.
       for (j = 0; j < n; j++) {
@@ -39382,7 +39283,6 @@ Spawn:
    v = 809;
    xp = 205;
    xm = -838;
-// Routine body
 // Init
    state->xupdated = state->needfij = state->needfi = false;
    state->replcerr = 0.0;
@@ -39456,7 +39356,7 @@ Spawn:
             rcopyv(1 + ng + nh, &state->fbase, &state->fi);
             state->needfi = false, state->needfij = true;
          } else {
-         // Forward request to caller
+         // Forward request to caller.
             state->PQ = 3; goto Pause; Resume3:
             state->repnfev++;
             rcopyv(n, &state->xscaled, &state->x);
@@ -39498,8 +39398,7 @@ Pause:
    return true;
 }
 
-//
-// Buffered implementation of minnsresults() which uses pre-allocated  buffer
+// Buffered implementation of minnsresults() which uses preallocated  buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -39973,7 +39872,6 @@ bool minnsiteration(const minnsstate &state) {
 //     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
 //                 can be NULL
 //
-//
 // NOTES:
 //
 // 1. This function has two different implementations: one which  uses  exact
@@ -39989,7 +39887,6 @@ bool minnsiteration(const minnsstate &state) {
 //    your optimization scheme! Table below lists different  combinations  of
 //    callback (function/gradient) passed to minnsoptimize()    and  specific
 //    function used to create optimizer.
-//
 //
 //                      |         USER PASSED TO minnsoptimize()
 //    CREATED WITH      |  function only   |  function and gradient
@@ -40128,7 +40025,7 @@ void minasasetalgorithm(minasastate *state, ae_int_t algotype) {
 // API: void minasasetstpmax(const minasastate &state, const double stpmax);
 void minasasetstpmax(minasastate *state, double stpmax) {
    ae_assert(isfinite(stpmax), "MinASASetStpMax: StpMax is not finite!");
-   ae_assert(stpmax >= 0.0, "MinASASetStpMax: StpMax<0!");
+   ae_assert(stpmax >= 0.0, "MinASASetStpMax: StpMax < 0!");
    state->stpmax = stpmax;
 }
 
@@ -40137,11 +40034,11 @@ void minasasetstpmax(minasastate *state, double stpmax) {
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
 // API: void minasarestartfrom(const minasastate &state, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu);
 void minasarestartfrom(minasastate *state, RVector *x, RVector *bndl, RVector *bndu) {
-   ae_assert(x->cnt >= state->n, "MinASARestartFrom: Length(X)<N!");
+   ae_assert(x->cnt >= state->n, "MinASARestartFrom: Length(X) < N!");
    ae_assert(isfinitevector(x, state->n), "MinASARestartFrom: X contains infinite or NaN values!");
-   ae_assert(bndl->cnt >= state->n, "MinASARestartFrom: Length(BndL)<N!");
+   ae_assert(bndl->cnt >= state->n, "MinASARestartFrom: Length(BndL) < N!");
    ae_assert(isfinitevector(bndl, state->n), "MinASARestartFrom: BndL contains infinite or NaN values!");
-   ae_assert(bndu->cnt >= state->n, "MinASARestartFrom: Length(BndU)<N!");
+   ae_assert(bndu->cnt >= state->n, "MinASARestartFrom: Length(BndU) < N!");
    ae_assert(isfinitevector(bndu, state->n), "MinASARestartFrom: BndU contains infinite or NaN values!");
    ae_v_move(state->x.xR, 1, x->xR, 1, state->n);
    ae_v_move(state->bndl.xR, 1, bndl->xR, 1, state->n);
@@ -40159,11 +40056,11 @@ void minasacreate(ae_int_t n, RVector *x, RVector *bndl, RVector *bndu, minasast
    ae_int_t i;
    SetObj(minasastate, state);
    ae_assert(n >= 1, "MinASA: N too small!");
-   ae_assert(x->cnt >= n, "MinCGCreate: Length(X)<N!");
+   ae_assert(x->cnt >= n, "MinCGCreate: Length(X) < N!");
    ae_assert(isfinitevector(x, n), "MinCGCreate: X contains infinite or NaN values!");
-   ae_assert(bndl->cnt >= n, "MinCGCreate: Length(BndL)<N!");
+   ae_assert(bndl->cnt >= n, "MinCGCreate: Length(BndL) < N!");
    ae_assert(isfinitevector(bndl, n), "MinCGCreate: BndL contains infinite or NaN values!");
-   ae_assert(bndu->cnt >= n, "MinCGCreate: Length(BndU)<N!");
+   ae_assert(bndu->cnt >= n, "MinCGCreate: Length(BndU) < N!");
    ae_assert(isfinitevector(bndu, n), "MinCGCreate: BndU contains infinite or NaN values!");
    for (i = 0; i < n; i++) {
       ae_assert(bndl->xR[i] <= bndu->xR[i], "MinASA: inconsistent bounds!");
@@ -40198,9 +40095,9 @@ void minasacreate(ae_int_t n, RVector *x, RVector *bndl, RVector *bndu, minasast
 // Bounded antigradient is a vector obtained from  anti-gradient  by  zeroing
 // components which point outwards:
 //     result = norm(v)
-//     v[i]=0     if ((-g[i]<0)and(x[i]=bndl[i])) or
-//                   ((-g[i]>0)and(x[i]=bndu[i]))
-//     v[i]=-g[i] otherwise
+//     v[i] == 0     if ((-g[i] < 0)and(x[i] == bndl[i])) or
+//                      ((-g[i] > 0)and(x[i] == bndu[i]))
+//     v[i] == -g[i] otherwise
 //
 // This function may be used to check a stopping criterion.
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
@@ -40326,7 +40223,6 @@ Spawn:
    betak = 74;
    v = -788;
    vv = 809;
-// Routine body
 // Prepare
    n = state->n;
    state->xupdated = state->needfg = false;
@@ -40372,15 +40268,15 @@ Spawn:
                state->d.xR[i] = rboundval(state->xk.xR[i] - state->g.xR[i], state->bndl.xR[i], state->bndu.xR[i]) - state->xk.xR[i];
             }
          // Armijo line search.
-         // * exact search with alpha=1 is tried first,
+         // * exact search with alpha == 1 is tried first,
          //   'exact' means that we evaluate f() EXACTLY at
          //   bound(x-g,bndl,bndu), without intermediate floating
          //   point operations.
-         // * alpha<1 are tried if explicit search wasn't successful
+         // * alpha < 1 are tried if explicit search wasn't successful
          // Result is placed into XN.
          //
          // Two types of search are needed because we can't
-         // just use second type with alpha=1 because in finite
+         // just use second type with alpha == 1 because in finite
          // precision arithmetics (x1-x0)+x0 may differ from x1.
          // So while x1 is correctly bounded (it lie EXACTLY on
          // boundary, if it is active), (x1-x0)+x0 may be
@@ -40389,7 +40285,7 @@ Spawn:
             state->dginit = v;
             state->finit = state->f;
             if (mincomp_asad1norm(state) <= state->stpmax || state->stpmax == 0.0) {
-            // Try alpha=1 step first
+            // Try alpha == 1 step first
                for (i = 0; i < n; i++) {
                   state->x.xR[i] = rboundval(state->xk.xR[i] - state->g.xR[i], state->bndl.xR[i], state->bndu.xR[i]);
                }
@@ -40404,7 +40300,7 @@ Spawn:
                ae_v_move(state->xn.xR, 1, state->x.xR, 1, n);
                state->stp = 1.0;
             } else {
-            // alpha=1 is too large, try smaller values
+            // alpha == 1 is too large, try smaller values
                state->stp = 1.0;
                linminnormalized(&state->d, &state->stp, n);
                state->dginit /= state->stp;
@@ -40618,7 +40514,7 @@ Spawn:
             // NOTE: consition |G| >= Mu*|D1| must be exactly opposite
             // to the condition used to switch back to GPA. At least
             // one inequality must be strict, otherwise infinite cycle
-            // may occur when |G|=Mu*|D1| (we DON'T test stopping
+            // may occur when |G| == Mu*|D1| (we DON'T test stopping
             // conditions and we DON'T switch to GPA, so we cycle
             // indefinitely).
                if (state->fold - state->f <= state->epsf * rmax2(fabs(state->fold), rmax2(fabs(state->f), 1.0))) {
@@ -40673,7 +40569,7 @@ Spawn:
             } else {
             // Something is wrong (may be function is too wild or too flat).
             //
-            // We'll set BetaK=0, which will restart CG algorithm.
+            // We'll set BetaK == 0, which will restart CG algorithm.
             // We can stop later (during normal checks) if stopping conditions are met.
                betak = 0.0;
                state->debugrestartscount++;
@@ -40983,8 +40879,8 @@ static const double minbc_decaycorrection = 0.8;
 //                 If some (all) variables are unbounded, you may specify
 //                 very large number or +INF.
 //
-// NOTE 1: it is possible to specify BndL[i]=BndU[i]. In this case I-th
-// variable will be "frozen" at X[i]=BndL[i]=BndU[i].
+// NOTE 1: it is possible to specify BndL[i] == BndU[i]. In this case I-th
+// variable will be "frozen" at X[i] == BndL[i] == BndU[i].
 //
 // NOTE 2: this solver has following useful properties:
 // * bound constraints are always satisfied exactly
@@ -40997,8 +40893,8 @@ void minbcsetbc(minbcstate *state, RVector *bndl, RVector *bndu) {
    ae_int_t i;
    ae_int_t n;
    n = state->nmain;
-   ae_assert(bndl->cnt >= n, "MinBCSetBC: Length(BndL)<N");
-   ae_assert(bndu->cnt >= n, "MinBCSetBC: Length(BndU)<N");
+   ae_assert(bndl->cnt >= n, "MinBCSetBC: Length(BndL) < N");
+   ae_assert(bndu->cnt >= n, "MinBCSetBC: Length(BndU) < N");
    for (i = 0; i < n; i++) {
       ae_assert(isfinite(bndl->xR[i]) || isneginf(bndl->xR[i]), "MinBCSetBC: BndL contains NAN or +INF");
       ae_assert(isfinite(bndu->xR[i]) || isposinf(bndu->xR[i]), "MinBCSetBC: BndL contains NAN or -INF");
@@ -41015,9 +40911,9 @@ void minbcsetbc(minbcstate *state, RVector *bndl, RVector *bndu) {
 //     State   -   structure which stores algorithm state
 //     EpsG    -   >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
-//                 |v|<EpsG is satisfied, where:
+//                 |v| < EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
-//                 * v - scaled gradient vector, v[i]=g[i]*s[i]
+//                 * v - scaled gradient vector, v[i] == g[i]*s[i]
 //                 * g - gradient
 //                 * s - scaling coefficients set by MinBCSetScale()
 //     EpsF    -   >= 0
@@ -41028,13 +40924,13 @@ void minbcsetbc(minbcstate *state, RVector *bndl, RVector *bndu) {
 //                 The subroutine finishes its work if  on  k+1-th  iteration
 //                 the condition |v| <= EpsX is fulfilled, where:
 //                 * |.| means Euclidian norm
-//                 * v - scaled step vector, v[i]=dx[i]/s[i]
-//                 * dx - step vector, dx=X(k+1)-X(k)
+//                 * v - scaled step vector, v[i] == dx[i]/s[i]
+//                 * dx - step vector, dx == X(k+1)-X(k)
 //                 * s - scaling coefficients set by MinBCSetScale()
-//     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
+//     MaxIts  -   maximum number of iterations. If MaxIts == 0, the  number  of
 //                 iterations is unlimited.
 //
-// Passing EpsG=0, EpsF=0 and EpsX=0 and MaxIts=0 (simultaneously) will lead
+// Passing EpsG == 0, EpsF == 0 and EpsX == 0 and MaxIts == 0 (simultaneously) will lead
 // to automatic stopping criterion selection.
 //
 // NOTE: when SetCond() called with non-zero MaxIts, BC solver may perform
@@ -41089,7 +40985,7 @@ void minbcsetcond(minbcstate *state, double epsg, double epsf, double epsx, ae_i
 // API: void minbcsetscale(const minbcstate &state, const real_1d_array &s);
 void minbcsetscale(minbcstate *state, RVector *s) {
    ae_int_t i;
-   ae_assert(s->cnt >= state->nmain, "MinBCSetScale: Length(S)<N");
+   ae_assert(s->cnt >= state->nmain, "MinBCSetScale: Length(S) < N");
    for (i = 0; i < state->nmain; i++) {
       ae_assert(isfinite(s->xR[i]), "MinBCSetScale: S contains infinite or NAN elements");
       ae_assert(s->xR[i] != 0.0, "MinBCSetScale: S contains zero elements");
@@ -41187,7 +41083,7 @@ void minbcsetxrep(minbcstate *state, bool needxrep) {
 // API: void minbcsetstpmax(const minbcstate &state, const double stpmax);
 void minbcsetstpmax(minbcstate *state, double stpmax) {
    ae_assert(isfinite(stpmax), "MinBCSetStpMax: StpMax is not finite!");
-   ae_assert(stpmax >= 0.0, "MinBCSetStpMax: StpMax<0!");
+   ae_assert(stpmax >= 0.0, "MinBCSetStpMax: StpMax < 0!");
    state->stpmax = stpmax;
 }
 
@@ -41206,7 +41102,7 @@ void minbcrestartfrom(minbcstate *state, RVector *x) {
    ae_int_t n;
    n = state->nmain;
 // First, check for errors in the inputs
-   ae_assert(x->cnt >= n, "MinBCRestartFrom: Length(X)<N");
+   ae_assert(x->cnt >= n, "MinBCRestartFrom: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinBCRestartFrom: X contains infinite or NaN values!");
 // Set XC
    ae_v_move(state->xstart.xR, 1, x->xR, 1, n);
@@ -41263,10 +41159,8 @@ static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, min
    ae_frame_leave();
 }
 
-//                      BOX CONSTRAINED OPTIMIZATION
-//           WITH FAST ACTIVATION OF MULTIPLE BOX CONSTRAINTS
-//
-// DESCRIPTION:
+// BOX CONSTRAINED OPTIMIZATION
+// WITH FAST ACTIVATION OF MULTIPLE BOX CONSTRAINTS
 // The  subroutine  minimizes  function   F(x) of N arguments subject  to box
 // constraints (with some of box constraints actually being equality ones).
 //
@@ -41306,9 +41200,8 @@ static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, min
 //    with same N but another starting point.
 //    MinBCRestartFrom() allows to reuse already initialized structure.
 //
-//
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size ofX
 //     X       -   starting point, array[N]:
@@ -41328,8 +41221,8 @@ void minbccreate(ae_int_t n, RVector *x, minbcstate *state) {
    SetObj(minbcstate, state);
    NewMatrix(c, 0, 0, DT_REAL);
    NewVector(ct, 0, DT_INT);
-   ae_assert(n >= 1, "MinBCCreate: N<1");
-   ae_assert(x->cnt >= n, "MinBCCreate: Length(X)<N");
+   ae_assert(n >= 1, "MinBCCreate: N < 1");
+   ae_assert(x->cnt >= n, "MinBCCreate: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinBCCreate: X contains infinite or NaN values!");
    minbc_minbcinitinternal(n, x, 0.0, state);
    ae_frame_leave();
@@ -41343,11 +41236,11 @@ void minbccreate(ae_int_t n, RVector *x, minbcstate *state) {
 // more information about creation of BC optimizer.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   starting point, array[0..N-1].
-//     DiffStep-   differentiation step, >0
+//     DiffStep-   differentiation step, > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -41381,8 +41274,8 @@ void minbccreatef(ae_int_t n, RVector *x, double diffstep, minbcstate *state) {
    SetObj(minbcstate, state);
    NewMatrix(c, 0, 0, DT_REAL);
    NewVector(ct, 0, DT_INT);
-   ae_assert(n >= 1, "MinBCCreateF: N<1");
-   ae_assert(x->cnt >= n, "MinBCCreateF: Length(X)<N");
+   ae_assert(n >= 1, "MinBCCreateF: N < 1");
+   ae_assert(x->cnt >= n, "MinBCCreateF: Length(X) < N");
    ae_assert(isfinitevector(x, n), "MinBCCreateF: X contains infinite or NaN values!");
    ae_assert(isfinite(diffstep), "MinBCCreateF: DiffStep is infinite or NaN!");
    ae_assert(diffstep > 0.0, "MinBCCreateF: DiffStep is non-positive!");
@@ -41474,7 +41367,6 @@ Spawn:
    ginit = -541;
    gdecay = -698;
    activationstep = -900;
-// Routine body
 // Algorithm parameters:
 // * M          number of L-BFGS corrections.
 //              This coefficient remains fixed during iterations.
@@ -41522,7 +41414,7 @@ Spawn:
       }
       state->tmpprec.xR[i] = 1.0;
    }
-//  Check correctness of user-supplied gradient
+// Check correctness of user-supplied gradient
    if (state->diffstep == 0.0 && state->teststep > 0.0) {
       while (smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xc, &state->s, &state->bndl, &state->bndu, true, state->teststep)) {
          for (i = 0; i < n; i++) {
@@ -41789,9 +41681,9 @@ Spawn:
       // of small steps which increase function value.
          if (freezeidx >= 0 && scaleddnorm * state->curstpmax <= minbc_maxnonmonotoniclen && state->nonmonotoniccnt > 0) {
          // We enforce non-monotonic step:
-         // * Stp    := CurStpMax
-         // * MCINFO := 5
-         // * XN     := XC+CurStpMax*D
+         // * Stp    = CurStpMax
+         // * MCINFO = 5
+         // * XN     = XC+CurStpMax*D
          // * non-monotonic counter is decreased
          //
          // NOTE: UGN/CGN are not updated because step is so short that we assume that
@@ -42105,10 +41997,10 @@ Spawn:
          v = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufsk.xyR[state->bufsize - 1], 1, n);
          vv = ae_v_dotproduct(state->bufyk.xyR[state->bufsize - 1], 1, state->bufyk.xyR[state->bufsize - 1], 1, n);
          if (v == 0.0 || vv == 0.0) {
-         // Strange internal error in LBFGS - either YK=0
-         // (which should not have been) or (SK,YK)=0 (again,
+         // Strange internal error in LBFGS - either YK == 0
+         // (which should not have been) or (SK,YK) == 0 (again,
          // unexpected). It should not take place because
-         // MCINFO=1, which signals "good" step. But just
+         // MCINFO == 1, which signals "good" step. But just
          // to be sure we have special branch of code which
          // restarts LBFGS
             break;
@@ -42181,8 +42073,8 @@ Pause:
 // Inputs:
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step used for numerical differentiation:
-//                     * TestStep=0 turns verification off
-//                     * TestStep>0 activates verification
+//                     * TestStep == 0 turns verification off
+//                     * TestStep > 0 activates verification
 //                     You should carefully choose TestStep. Value  which  is
 //                     too large (so large that  function  behavior  is  non-
 //                     cubic at this scale) will lead  to  false  alarms. Too
@@ -42207,7 +42099,7 @@ Pause:
 // API: void minbcoptguardgradient(const minbcstate &state, const double teststep);
 void minbcoptguardgradient(minbcstate *state, double teststep) {
    ae_assert(isfinite(teststep), "MinBCOptGuardGradient: TestStep contains NaN or INF");
-   ae_assert(teststep >= 0.0, "MinBCOptGuardGradient: invalid argument TestStep(TestStep<0)");
+   ae_assert(teststep >= 0.0, "MinBCOptGuardGradient: invalid argument TestStep(TestStep < 0)");
    state->teststep = teststep;
 }
 
@@ -42374,7 +42266,7 @@ void minbcoptguardresults(minbcstate *state, optguardreport *rep) {
 // * stp[], f[] - arrays of length CNT which store step lengths and  function
 //   values at these points; f[i] is evaluated in x0+stp[i]*d.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -42428,7 +42320,7 @@ void minbcoptguardnonc1test0results(minbcstate *state, optguardnonc1test0report 
 //   values at these points; g[i] is evaluated in  x0+stp[i]*d  and  contains
 //   vidx-th component of the gradient.
 // * stpidxa, stpidxb - we  suspect  that  function  violates  C1  continuity
-//   between steps #stpidxa and #stpidxb (usually we have  stpidxb=stpidxa+3,
+//   between steps #stpidxa and #stpidxb (usually we have  stpidxb == stpidxa+3,
 //   with  most  likely  position  of  the  violation  between  stpidxa+1 and
 //   stpidxa+2.
 //
@@ -42452,7 +42344,7 @@ void minbcoptguardnonc1test1results(minbcstate *state, optguardnonc1test1report 
 
 // BC results
 //
-// Buffered implementation of MinBCResults() which uses pre-allocated buffer
+// Buffered implementation of MinBCResults() which uses preallocated buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
@@ -42849,7 +42741,6 @@ bool minbciteration(const minbcstate &state) {
 //    callback (function/gradient) passed to MinBCOptimize()  and specific
 //    function used to create optimizer.
 //
-//
 //                      |         USER PASSED TO MinBCOptimize()
 //    CREATED WITH      |  function only   |  function and gradient
 //    ------------------------------------------------------------
@@ -42964,7 +42855,7 @@ namespace alglib_impl {
 // API: void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p);
 void lptestproblemcreate(ae_int_t n, bool hasknowntarget, double targetf, lptestproblem *p) {
    SetObj(lptestproblem, p);
-   ae_assert(n >= 1, "LPTestProblemCreate: N<1");
+   ae_assert(n >= 1, "LPTestProblemCreate: N < 1");
    p->n = n;
    p->hasknowntarget = hasknowntarget;
    if (hasknowntarget) {

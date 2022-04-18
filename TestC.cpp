@@ -444,9 +444,9 @@ static double refrmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx) {
 static void refrgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
    ae_int_t i;
    double v;
-// Quick exit for M=0, N=0 or Alpha=0.
+// Quick exit for M == 0, N == 0 or Alpha == 0.
 //
-// After this block we have M>0, N>0, Alpha != 0.
+// After this block we have M > 0, N > 0, Alpha != 0.
    if (m <= 0) {
       return;
    }
@@ -1449,7 +1449,7 @@ static bool hqrndcontinuoustest() {
    sigmamax = 10.0;
    for (samplesize = 2; samplesize <= 5; samplesize++) {
    // 1. Generate random sample with SampleSize points
-   // 2. Generate NB=3*(SampleSize-1) bins, with bounds as prescribed by (BinBounds[I],BinBounds[I+1]).
+   // 2. Generate NB == 3*(SampleSize-1) bins, with bounds as prescribed by (BinBounds[I],BinBounds[I+1]).
    //    Bin bounds are generated in such a way that value can fall into any bin with same probability
    // 3. Generate many random values
    // 4. Calculate number of values which fall into each bin
@@ -1544,7 +1544,7 @@ static bool hqrnddiscretetest() {
          if (nn.xZ[i] < (double)xp / binscount - sigmathreshold * sigma || nn.xZ[i] > (double)xp / binscount + sigmathreshold * sigma) {
             if (!silent) {
                printf("HQRNDDiscreteTest::ErrorReport::\n");
-               printf("nn[%0d]=%0d;\n   xp/BinsCount=%0.5f;\n   C*sigma=%0.5f\n", (int)i, (int)nn.xZ[i], (double)xp / binscount, sigmathreshold * sigma);
+               printf("nn[%0d] == %0d;\n   xp/BinsCount == %0.5f;\n   C*sigma == %0.5f\n", (int)i, (int)nn.xZ[i], (double)xp / binscount, sigmathreshold * sigma);
                printf("HQRNDDiscreteTest: test is FAILED!\n");
             }
             result = true;
@@ -1733,7 +1733,7 @@ bool testhqrnd() {
    uierrors = uierrors || uisigmaerr > sigmathreshold;
 // Special 'close-to-limit' test on uniformity of integers
 // (straightforward implementation like 'RND mod N' will return
-//  non-uniform numbers for N=2/3*LIMIT)
+// non-uniform numbers for N == 2/3*LIMIT)
    testhqrndunit_unsetstate(&state);
    hqrndrandomize(&state);
    uisigmaerr = 0.0;
@@ -2453,7 +2453,7 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
    threshold = sqr((double)maxn) * 100.0 * machineepsilon;
    result = false;
    for (mx = minn; mx <= maxn; mx++) {
-   // Select random M/N in [1,MX] such that max(M,N)=MX
+   // Select random M/N in [1,MX] such that max(M,N) == MX
       m = 1 + randominteger(mx);
       n = 1 + randominteger(mx);
       if (randombool()) {
@@ -2781,7 +2781,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
    threshold = maxn * 100.0 * machineepsilon;
    result = false;
    for (mx = minn; mx <= maxn; mx++) {
-   // Select random M/N in [1,MX] such that max(M,N)=MX
+   // Select random M/N in [1,MX] such that max(M,N) == MX
       k = 1 + randominteger(mx);
       n = 1 + randominteger(mx);
       if (randombool()) {
@@ -3063,7 +3063,7 @@ static bool testablasunit_testgemm(ae_int_t minn, ae_int_t maxn) {
    threshold = maxn * 100.0 * machineepsilon;
    result = false;
    for (mx = minn; mx <= maxn; mx++) {
-   // Select random M/N/K in [1,MX] such that max(M,N,K)=MX
+   // Select random M/N/K in [1,MX] such that max(M,N,K) == MX
       m = 1 + randominteger(mx);
       n = 1 + randominteger(mx);
       k = 1 + randominteger(mx);
@@ -3181,7 +3181,7 @@ static bool testablasunit_testtrans(ae_int_t minn, ae_int_t maxn) {
    result = false;
    threshold = 1000.0 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
-   // Select random M/N in [1,MX] such that max(M,N)=MX
+   // Select random M/N in [1,MX] such that max(M,N) == MX
    // Generate random V1 and V2 which are used to fill
    // RefRB/RefCB with control values.
       m = 1 + randominteger(mx);
@@ -3270,7 +3270,7 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn) {
    result = false;
    threshold = 1000.0 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
-   // Select random M/N in [1,MX] such that max(M,N)=MX
+   // Select random M/N in [1,MX] such that max(M,N) == MX
       m = 1 + randominteger(mx);
       n = 1 + randominteger(mx);
       if (randominteger(2) == 0) {
@@ -3394,7 +3394,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
    result = false;
    threshold = 1000.0 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
-   // Select random M/N in [1,MX] such that max(M,N)=MX
+   // Select random M/N in [1,MX] such that max(M,N) == MX
       m = 1 + randominteger(mx);
       n = 1 + randominteger(mx);
       if (randominteger(2) == 0) {
@@ -3707,8 +3707,8 @@ static void testablasunit_testtrsv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       }
    // Test RMatrixTRSV():
    // * check that elements of RX beyond [XOffs,XOffs+N-1] are unchanged
-   // * calculate RX:=TRSV(RX)
-   // * extract effective A from RefRA to EA=array[N,N]
+   // * calculate RX = TRSV(RX)
+   // * extract effective A from RefRA to EA == array[N,N]
    // * compare product EA*RX, compare with copy of RX stored in RY
       for (i = 0; i < 2 * maxn; i++) {
          ry.xR[i] = rx.xR[i];
@@ -3811,7 +3811,7 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
    result = false;
    threshold = 1000.0 * machineepsilon;
    for (mx = minn; mx <= maxn; mx++) {
-   // Select random M/N in [1,MX] such that max(M,N)=MX
+   // Select random M/N in [1,MX] such that max(M,N) == MX
       m = 1 + randominteger(mx);
       n = 1 + randominteger(mx);
       if (randominteger(2) == 0) {
@@ -5805,7 +5805,7 @@ static bool testmatgenunit_isspd(RMatrix *a, ae_int_t n, bool isupper) {
          }
       }
    } else {
-   // Compute the Cholesky factorization A = L*L'.
+   // Compute the Cholesky factorization A == L*L'.
       for (j = 0; j < n; j++) {
       // Compute L(J,J) and test for non-positive-definiteness.
          v = ae_v_dotproduct(a->xyR[j], 1, a->xyR[j], 1, j);
@@ -7193,7 +7193,7 @@ static void sparsegenerator_free(void *_p, bool make_automatic) {
 // Function for testing basic SKS functional.
 // Returns True on errors, False on success.
 //
-// ALGLIB Project: Copyright 16.01.1014 by Sergey Bochkanov
+// ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 static bool skstest() {
    ae_frame _frame_block;
    ae_int_t n;
@@ -7433,7 +7433,7 @@ static bool skstest() {
             }
          }
       // Increase problem sparsity and try one more time.
-      // Stop after testing NZ=0.
+      // Stop after testing NZ == 0.
          if (nz == 0) {
             break;
          }
@@ -7559,7 +7559,7 @@ static void crstest(bool *errorflag) {
                return;
             }
          // Increase problem sparsity and try one more time.
-         // Stop after testing NZ=0.
+         // Stop after testing NZ == 0.
             if (nz == 0) {
                break;
             }
@@ -7658,7 +7658,7 @@ static void testserialize(bool *errorflag) {
                   return;
                }
             // Increase problem sparsity and try one more time.
-            // Stop after testing NZ=0.
+            // Stop after testing NZ == 0.
                if (nz == 0) {
                   break;
                }
@@ -7755,7 +7755,7 @@ static bool basicfunctest() {
 // a set of matrices with sequentially increasing sparsity.
 //
 // Parameters:
-//     M, N        -   matrix size. If M=0, then matrix is square N*N.
+//     M, N        -   matrix size. If M == 0, then matrix is square N*N.
 //                     N and M must be small enough to store N*M dense matrix.
 //     MatKind     -   matrix properties:
 //                     * 0     -   general sparse (no structure)
@@ -7809,7 +7809,6 @@ Spawn:
    j = 255;
    pnz = 74;
    v = -788;
-// Routine body
    n = g->n;
    if (g->m == 0) {
       m = n;
@@ -7847,13 +7846,13 @@ Spawn:
          }
          g->PQ = 0; goto Pause; Resume0:
       // Increase problem sparsity and try one more time.
-      // Stop after testing NZ=0.
+      // Stop after testing NZ == 0.
          if (nz == 0) {
             break;
          }
       }
    } else if (g->matkind == 1) { // Generate general sparse matrix with non-zero diagonal
-      ae_assert(n == m, "GenerateNext: non-square matrix for MatKind=1");
+      ae_assert(n == m, "GenerateNext: non-square matrix for MatKind == 1");
       for (nz = n * n - n; ; nz /= 2) {
       // Generate dense N*N matrix where probability of non-diagonal element
       // being non-zero is PNZ.
@@ -7894,7 +7893,7 @@ Spawn:
          }
          g->PQ = 1; goto Pause; Resume1:
       // Increase problem sparsity and try one more time.
-      // Stop after testing NZ=0.
+      // Stop after testing NZ == 0.
          if (nz == 0) {
             break;
          }
@@ -7949,7 +7948,7 @@ static bool testlevel2unsymmetric() {
          for (testsparseunit_initgenerator(m, n, 0, 0, &g); testsparseunit_generatenext(&g, &a, &sa); ) {
          // Convert SA to desired storage format:
          // * to CRS if M != N
-         // * with 50% probability to CRS or SKS, if M=N
+         // * with 50% probability to CRS or SKS, if M == N
             if (m != n || hqrnduniformr(&rs) < 0.5) {
                sparsecopytocrs(&sa, &s0);
             } else {
@@ -8109,7 +8108,7 @@ static bool testlevel3unsymmetric() {
             k = 1 + hqrnduniformi(&rs, 20);
          // Convert SA to desired storage format:
          // * to CRS if M != N
-         // * with 50% probability to CRS or SKS, if M=N
+         // * with 50% probability to CRS or SKS, if M == N
             if (m != n || hqrnduniformr(&rs) < 0.5) {
                sparsecopytocrs(&sa, &s0);
             } else {
@@ -8443,7 +8442,6 @@ static bool testlevel3symmetric() {
 }
 
 // Function for testing sparse symmetric permutations
-//
 // ALGLIB Project: Copyright 07.10.2020 by Sergey Bochkanov
 static bool testsymmetricperm() {
    ae_frame _frame_block;
@@ -9559,8 +9557,8 @@ static bool basiccopyfunctest() {
                if (a0 != a1) {
                   if (!silent) {
                      printf("BasicCopyFuncTest::Report::SparseGet\n");
-                     printf("S::[%0d,%0d]=%0.5f\n", (int)i1, (int)j1, a0);
-                     printf("SS::[%0d,%0d]=%0.5f\n", (int)i1, (int)j1, a1);
+                     printf("S::[%0d,%0d] == %0.5f\n", (int)i1, (int)j1, a0);
+                     printf("SS::[%0d,%0d] == %0.5f\n", (int)i1, (int)j1, a1);
                      printf("          TEST FAILED.\n");
                   }
                   result = true;
@@ -9578,8 +9576,8 @@ static bool basiccopyfunctest() {
                if (a0 != a1) {
                   if (!silent) {
                      printf("BasicCopyFuncTest::Report::SparseGet\n");
-                     printf("S::[%0d,%0d]=%0.5f\n", (int)i1, (int)j1, a0);
-                     printf("SS::[%0d,%0d]=%0.5f\n", (int)i1, (int)j1, a1);
+                     printf("S::[%0d,%0d] == %0.5f\n", (int)i1, (int)j1, a0);
+                     printf("SS::[%0d,%0d] == %0.5f\n", (int)i1, (int)j1, a1);
                      printf("          TEST FAILED.\n");
                   }
                   result = true;
@@ -9598,8 +9596,8 @@ static bool basiccopyfunctest() {
                if (a0 != a1) {
                   if (!silent) {
                      printf("BasicCopyFuncTest::Report::SparseGet\n");
-                     printf("S::[%0d,%0d]=%0.5f\n", (int)i1, (int)j1, a0);
-                     printf("SS::[%0d,%0d]=%0.5f\n", (int)i1, (int)j1, a1);
+                     printf("S::[%0d,%0d] == %0.5f\n", (int)i1, (int)j1, a0);
+                     printf("SS::[%0d,%0d] == %0.5f\n", (int)i1, (int)j1, a1);
                      printf("          TEST FAILED.\n");
                   }
                   result = true;
@@ -9705,8 +9703,8 @@ static bool copyfunctest() {
                   if (!NearR(y.xR[i1], ty.xR[i1], eps) || !NearR(cpy.xR[i1], ty.xR[i1], eps) || cpy.xR[i1] - y.xR[i1] != 0.0) {
                      if (!silent) {
                         printf("CopyFuncTest::Report::RES_MV\n");
-                        printf("Y[%0d]=%0.5f; tY[%0d]=%0.5f\n", (int)i1, y.xR[i1], (int)i1, ty.xR[i1]);
-                        printf("cpY[%0d]=%0.5f;\n", (int)i1, cpy.xR[i1]);
+                        printf("Y[%0d] == %0.5f; tY[%0d] == %0.5f\n", (int)i1, y.xR[i1], (int)i1, ty.xR[i1]);
+                        printf("cpY[%0d] == %0.5f;\n", (int)i1, cpy.xR[i1]);
                         printf("          TEST FAILED.\n");
                      }
                      result = true;
@@ -9719,8 +9717,8 @@ static bool copyfunctest() {
                   if (!NearR(yt.xR[i1], tyt.xR[i1], eps) || !NearR(cpyt.xR[i1], tyt.xR[i1], eps) || cpyt.xR[i1] - yt.xR[i1] != 0.0) {
                      if (!silent) {
                         printf("CopyFuncTest::Report::RES_MTV\n");
-                        printf("Yt[%0d]=%0.5f; tYt[%0d]=%0.5f\n", (int)i1, yt.xR[i1], (int)i1, tyt.xR[i1]);
-                        printf("cpYt[%0d]=%0.5f;\n", (int)i1, cpyt.xR[i1]);
+                        printf("Yt[%0d] == %0.5f; tYt[%0d] == %0.5f\n", (int)i1, yt.xR[i1], (int)i1, tyt.xR[i1]);
+                        printf("cpYt[%0d] == %0.5f;\n", (int)i1, cpyt.xR[i1]);
                         printf("          TEST FAILED.\n");
                      }
                      result = true;
@@ -9736,8 +9734,8 @@ static bool copyfunctest() {
                      if (a0 != a1) {
                         if (!silent) {
                            printf("CopyFuncTest::Report::SparseGet\n");
-                           printf("S::[%0d,%0d]=%0.5f\n", (int)i1, (int)j1, a0);
-                           printf("SS::[%0d,%0d]=%0.5f\n", (int)i1, (int)j1, a1);
+                           printf("S::[%0d,%0d] == %0.5f\n", (int)i1, (int)j1, a0);
+                           printf("SS::[%0d,%0d] == %0.5f\n", (int)i1, (int)j1, a1);
                            printf("          TEST FAILED.\n");
                         }
                         result = true;
@@ -9766,10 +9764,10 @@ static bool copyfunctest() {
                   if (!NearR(y0.xR[i1], ty.xR[i1], eps) || !NearR(yt0.xR[i1], tyt.xR[i1], eps) || !NearR(cpy0.xR[i1], ty.xR[i1], eps) || !NearR(cpyt0.xR[i1], tyt.xR[i1], eps) || cpy0.xR[i1] - y0.xR[i1] != 0.0 || cpyt0.xR[i1] - yt0.xR[i1] != 0.0) {
                      if (!silent) {
                         printf("CopyFuncTest::Report::RES_MV2\n");
-                        printf("Y0[%0d]=%0.5f; tY[%0d]=%0.5f\n", (int)i1, y0.xR[i1], (int)i1, ty.xR[i1]);
-                        printf("Yt0[%0d]=%0.5f; tYt[%0d]=%0.5f\n", (int)i1, yt0.xR[i1], (int)i1, tyt.xR[i1]);
-                        printf("cpY0[%0d]=%0.5f;\n", (int)i1, cpy0.xR[i1]);
-                        printf("cpYt0[%0d]=%0.5f;\n", (int)i1, cpyt0.xR[i1]);
+                        printf("Y0[%0d] == %0.5f; tY[%0d] == %0.5f\n", (int)i1, y0.xR[i1], (int)i1, ty.xR[i1]);
+                        printf("Yt0[%0d] == %0.5f; tYt[%0d] == %0.5f\n", (int)i1, yt0.xR[i1], (int)i1, tyt.xR[i1]);
+                        printf("cpY0[%0d] == %0.5f;\n", (int)i1, cpy0.xR[i1]);
+                        printf("cpYt0[%0d] == %0.5f;\n", (int)i1, cpyt0.xR[i1]);
                         printf("          TEST FAILED.\n");
                      }
                      result = true;
@@ -9782,10 +9780,10 @@ static bool copyfunctest() {
                   if (!NearAtR(y0.xR[i1], y.xR[i1], eps) || !NearAtR(yt0.xR[i1], yt.xR[i1], eps) || !NearAtR(cpy0.xR[i1], cpy.xR[i1], eps) || !NearAtR(cpyt0.xR[i1], cpyt.xR[i1], eps)) {
                      if (!silent) {
                         printf("CopyFuncTest::Report::RES_MV_MVT\n");
-                        printf("Y0[%0d]=%0.5f; Y[%0d]=%0.5f\n", (int)i1, y0.xR[i1], (int)i1, y.xR[i1]);
-                        printf("Yt0[%0d]=%0.5f; Yt[%0d]=%0.5f\n", (int)i1, yt0.xR[i1], (int)i1, yt.xR[i1]);
-                        printf("cpY0[%0d]=%0.5f; cpY[%0d]=%0.5f\n", (int)i1, cpy0.xR[i1], (int)i1, cpy.xR[i1]);
-                        printf("cpYt0[%0d]=%0.5f; cpYt[%0d]=%0.5f\n", (int)i1, cpyt0.xR[i1], (int)i1, cpyt.xR[i1]);
+                        printf("Y0[%0d] == %0.5f; Y[%0d] == %0.5f\n", (int)i1, y0.xR[i1], (int)i1, y.xR[i1]);
+                        printf("Yt0[%0d] == %0.5f; Yt[%0d] == %0.5f\n", (int)i1, yt0.xR[i1], (int)i1, yt.xR[i1]);
+                        printf("cpY0[%0d] == %0.5f; cpY[%0d] == %0.5f\n", (int)i1, cpy0.xR[i1], (int)i1, cpy.xR[i1]);
+                        printf("cpYt0[%0d] == %0.5f; cpYt[%0d] == %0.5f\n", (int)i1, cpyt0.xR[i1], (int)i1, cpyt.xR[i1]);
                         printf("          TEST FAILED.\n");
                      }
                      result = true;
@@ -9801,8 +9799,8 @@ static bool copyfunctest() {
                      if (a0 != a1) {
                         if (!silent) {
                            printf("CopyFuncTest::Report::SparseGet\n");
-                           printf("S::[%0d,%0d]=%0.5f\n", (int)i1, (int)j1, a0);
-                           printf("SS::[%0d,%0d]=%0.5f\n", (int)i1, (int)j1, a1);
+                           printf("S::[%0d,%0d] == %0.5f\n", (int)i1, (int)j1, a0);
+                           printf("SS::[%0d,%0d] == %0.5f\n", (int)i1, (int)j1, a1);
                            printf("          TEST FAILED.\n");
                         }
                         result = true;
@@ -9850,7 +9848,7 @@ static bool testsparseunit_enumeratetest() {
       for (n = 1; n <= 30; n++) {
          ne = 0;
       // Create matrix with non-zero elements inside the region:
-      // 0 <= I<S.M and 0 <= J<S.N
+      // 0 <= I < S.M and 0 <= J < S.N
          ae_matrix_set_length(&a, m, n);
          ae_matrix_set_length(&ta, m, n);
          for (i = 0; i < m; i++) {
@@ -10899,7 +10897,7 @@ bool testblas() {
 // === evd testing unit ===
 // Sparse fill
 //
-// Sparsity - sparsity level, in [0,1] (0=dense matrix).
+// Sparsity - sparsity level, in [0,1] (0 == dense matrix).
 // DiagMAg - magnitude of dense diagonal entries; zero value means that diagonal
 // is sparse too, non-zero value means that diagonal is dense
 static void testevdunit_rmatrixfillsparsea(RMatrix *a, ae_int_t m, ae_int_t n, double sparsity, double diagmag) {
@@ -10923,7 +10921,7 @@ static void testevdunit_rmatrixfillsparsea(RMatrix *a, ae_int_t m, ae_int_t n, d
 
 // Sparse fill
 //
-// Sparsity - sparsity level, in [0,1] (0=dense matrix).
+// Sparsity - sparsity level, in [0,1] (0 == dense matrix).
 // DiagMAg - magnitude of dense diagonal entries; zero value means that diagonal
 // is sparse too, non-zero value means that diagonal is dense
 static void testevdunit_cmatrixfillsparsea(CMatrix *a, ae_int_t m, ae_int_t n, double sparsity, double diagmag) {
@@ -11883,15 +11881,15 @@ static void testevdunit_testtdevdproblem(RVector *d, RVector *e, ae_int_t n, dou
    }
 // Test first row variant.
 //
-// NOTE: this test is special because ZNeeded=3 is ALGLIB-specific feature
+// NOTE: this test is special because ZNeeded == 3 is ALGLIB-specific feature
 //       which is NOT supported by Intel MKL. Thus, MKL-capable version of
-//       ALGLIB will use different algorithms for ZNeeded=3 and for ZNeeded<3.
+//       ALGLIB will use different algorithms for ZNeeded == 3 and for ZNeeded < 3.
 //
 //       In most cases it is OK, but when problem happened to be degenerate
 //       (two close eigenvalues), Z computed by ALGLIB may be different from
 //       Z computed by MKL (up to arbitrary rotation), which will lead to
-//       failure of the test, because ZNeeded=2 is used as reference value
-//       for ZNeeded=3.
+//       failure of the test, because ZNeeded == 2 is used as reference value
+//       for ZNeeded == 3.
 //
 //       That's why this test is performed only for well-separated matrices,
 //       and with custom threshold.
@@ -13040,7 +13038,7 @@ bool testevd() {
 // Function for testing sparse real Cholesky.
 // Returns True on errors, False on success.
 //
-// ALGLIB Project: Copyright 16.01.1014 by Sergey Bochkanov
+// ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 static bool sparserealcholeskytest() {
    ae_frame _frame_block;
    ae_int_t n;
@@ -13316,7 +13314,7 @@ static bool sparserealcholeskytest() {
             }
          }
       // Increase problem sparsity and try one more time.
-      // Stop after testing NZ=0.
+      // Stop after testing NZ == 0.
          if (nz == 0) {
             break;
          }
@@ -13475,7 +13473,7 @@ static bool sparserealcholeskytest() {
             }
          }
       // Increase problem sparsity and try one more time.
-      // Stop after testing NZ=0.
+      // Stop after testing NZ == 0.
          if (nz == 0) {
             break;
          }
@@ -13546,7 +13544,7 @@ static bool sparserealcholeskytest() {
             return result;
          }
       // Increase problem sparsity and try one more time.
-      // Stop after testing NZ=0.
+      // Stop after testing NZ == 0.
          if (nz == 0) {
             break;
          }
@@ -13845,7 +13843,7 @@ static bool sparserealcholeskytest() {
             }
          }
       // Increase problem sparsity and try one more time.
-      // Stop after testing NZ=0.
+      // Stop after testing NZ == 0.
          if (nz == 0) {
             break;
          }
@@ -13928,7 +13926,7 @@ static bool sparserealcholeskytest() {
 // Function for testing sparse real LU decomposition.
 // Sets error flag on failure, leave is unchanged on success.
 //
-// ALGLIB Project: Copyright 16.01.1014 by Sergey Bochkanov
+// ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 static void sparsereallutest(bool *err) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -14039,7 +14037,7 @@ static void sparsereallutest(bool *err) {
             *err = *err || success == haszero;
          }
       // Increase problem sparsity and try one more time.
-      // Stop after testing NZ=0.
+      // Stop after testing NZ == 0.
          if (nz == 0) {
             break;
          }
@@ -14294,7 +14292,7 @@ static void testtrfacunit_testcluproblem(CMatrix *a, ae_int_t m, ae_int_t n, dou
 // Function for testing dense Cholesky updates
 // Sets error flag to True on errors, does not change it on success.
 //
-// ALGLIB Project: Copyright 16.01.1014 by Sergey Bochkanov
+// ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -14318,7 +14316,7 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
 // For each matrix size in 1..30 select sparse update vector with probability of element
 // being non-zero equal to 1/2.
    for (n = 1; n <= 30; n++) {
-   // Generate two matrices A0=A1, fill one triangle with SPD matrix,
+   // Generate two matrices A0 == A1, fill one triangle with SPD matrix,
    // another one with trash. Prepare vector U.
       isupper = hqrnduniformr(&rs) < 0.5;
       spdmatrixrndcond(n, 1.0E4, &a0);
@@ -14383,7 +14381,7 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
 // For each matrix size in 1..30 select PFix - probability of each variable being fixed,
 // and perform test.
    for (n = 1; n <= 30; n++) {
-   // Generate two matrices A0=A1, fill one triangle with SPD matrix,
+   // Generate two matrices A0 == A1, fill one triangle with SPD matrix,
    // another one with trash. Prepare vector Fix.
       pfix = (double)hqrnduniformi(&rs, n + 1) / n;
       isupper = hqrnduniformr(&rs) < 0.5;
@@ -17239,7 +17237,7 @@ bool testxblas() {
 // 2. higher precision
    for (n = 1; n <= maxn; n++) {
       for (pass = 1; pass <= passcount; pass++) {
-      //  ability to approximately calculate real dot product
+      // ability to approximately calculate real dot product
          ae_vector_set_length(&rx, n);
          ae_vector_set_length(&ry, n);
          ae_vector_set_length(&temp, n);
@@ -17258,7 +17256,7 @@ bool testxblas() {
          rv1 = ae_v_dotproduct(rx.xR, 1, ry.xR, 1, n);
          xdot(&rx, &ry, n, &temp, &rv2, &rv2err);
          approxerrors = approxerrors || !NearAtR(rv1, rv2, approxthreshold);
-      //  ability to approximately calculate complex dot product
+      // ability to approximately calculate complex dot product
          ae_vector_set_length(&cx, n);
          ae_vector_set_length(&cy, n);
          ae_vector_set_length(&temp, 2 * n);
@@ -17811,7 +17809,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
          //
          // 1. generate random well conditioned matrix A.
          // 2. generate random solution vector xe
-         // 3. generate right part b=A*xe
+         // 3. generate right part b == A*xe
          // 4. test different methods on original A
             rmatrixrndcond(n, 1000.0, &a);
             testdirectdensesolversunit_rmatrixmakeacopy(&a, n, n, &lua);
@@ -17963,12 +17961,12 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
          // ********************************************************
          //
          // 1. generate different types of singular matrices:
-         //    * zero (TaskKind=0)
-         //    * with zero columns (TaskKind=1)
-         //    * with zero rows (TaskKind=2)
-         //    * with equal rows/columns (TaskKind=2 or 3)
+         //    * zero (TaskKind == 0)
+         //    * with zero columns (TaskKind == 1)
+         //    * with zero rows (TaskKind == 2)
+         //    * with equal rows/columns (TaskKind == 2 or 3)
          // 2. generate random solution vector xe
-         // 3. generate right part b=A*xe
+         // 3. generate right part b == A*xe
          // 4. test different methods
             for (taskkind = 0; taskkind <= 4; taskkind++) {
                testdirectdensesolversunit_unset2d(&a);
@@ -18244,7 +18242,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
          //
          // 1. generate random well conditioned matrix A.
          // 2. generate random solution vector xe
-         // 3. generate right part b=A*xe
+         // 3. generate right part b == A*xe
          // 4. test different methods on original A
             cmatrixrndcond(n, 1000.0, &a);
             testdirectdensesolversunit_cmatrixmakeacopy(&a, n, n, &lua);
@@ -18338,7 +18336,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
          //    * with zero rows
          //    * with equal rows/columns
          // 2. generate random solution vector xe
-         // 3. generate right part b=A*xe
+         // 3. generate right part b == A*xe
          // 4. test different methods
             for (taskkind = 0; taskkind <= 4; taskkind++) {
                testdirectdensesolversunit_cunset2d(&a);
@@ -18601,7 +18599,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
          //
          // 1. generate random well conditioned matrix A.
          // 2. generate random solution vector xe
-         // 3. generate right part b=A*xe
+         // 3. generate right part b == A*xe
          // 4. test different methods on original A
             isupper = randombool();
             spdmatrixrndcond(n, 1000.0, &a);
@@ -18690,7 +18688,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
          //    * with zero rows
          //    * with equal rows/columns
          // 2. generate random solution vector xe
-         // 3. generate right part b=A*xe
+         // 3. generate right part b == A*xe
          // 4. test different methods
             for (taskkind = 0; taskkind <= 3; taskkind++) {
                testdirectdensesolversunit_unset2d(&a);
@@ -18877,7 +18875,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
          //
          // 1. generate random well conditioned matrix A.
          // 2. generate random solution vector xe
-         // 3. generate right part b=A*xe
+         // 3. generate right part b == A*xe
          // 4. test different methods on original A
             isupper = randombool();
             hpdmatrixrndcond(n, 1000.0, &a);
@@ -18966,7 +18964,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
          //    * with zero rows
          //    * with equal rows/columns
          // 2. generate random solution vector xe
-         // 3. generate right part b=A*xe
+         // 3. generate right part b == A*xe
          // 4. test different methods
             for (taskkind = 0; taskkind <= 3; taskkind++) {
                testdirectdensesolversunit_cunset2d(&a);
@@ -19221,7 +19219,7 @@ static void testdirectsparsesolversunit_testsks(bool *errorflag) {
       for (pass = 1; pass <= passcount; pass++) {
       // 1. generate random well conditioned matrix A.
       // 2. generate random solution vector xe
-      // 3. generate right part b=A*xe
+      // 3. generate right part b == A*xe
          isupper = hqrndnormal(&rs) > 0.5;
          bw = hqrnduniformi(&rs, n + 1);
          ae_matrix_set_length(&a, n, n);
@@ -19326,7 +19324,7 @@ static void testdirectsparsesolversunit_testcholesky(bool *errorflag) {
       for (pass = 1; pass <= passcount; pass++) {
       // 1. generate random well conditioned matrix A.
       // 2. generate random solution vector xe
-      // 3. generate right part b=A*xe
+      // 3. generate right part b == A*xe
          isupper = hqrndnormal(&rs) > 0.5;
          bw = hqrnduniformi(&rs, n + 1);
          ae_matrix_set_length(&a, n, n);
@@ -19421,7 +19419,7 @@ static void testdirectsparsesolversunit_testgen(bool *errorflag) {
          // 1. generate random well conditioned matrix A.
          // 2. apply row/col permutation
          // 3. generate random solution vector xe
-         // 4. generate right part b=A*xe
+         // 4. generate right part b == A*xe
             ae_matrix_set_length(&a, n, n);
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
@@ -19560,7 +19558,7 @@ static void testfblsunit_testgmres(bool *err) {
    hqrndrandomize(&rs);
 // Test following properties:
 // * increasing iterations count results in decreased residual
-// * residual with ItsCnt=N is nearly zero
+// * residual with ItsCnt == N is nearly zero
 // * State.Qi are orthonormal
    for (n = 1; n <= 5; n++) {
    // Create problem
@@ -19608,7 +19606,7 @@ static void testfblsunit_testgmres(bool *err) {
          eprev = e;
       }
    }
-// Test that solving A*x=b with rank-k A (k<N) returns exact solution for ItsCnt >= k
+// Test that solving A*x == b with rank-k A (k < N) returns exact solution for ItsCnt >= k
    for (n = 2; n <= 10; n++) {
       for (rk = 1; rk < n; rk++) {
       // Create problem
@@ -19705,7 +19703,7 @@ bool testfbls() {
 // * E1 = ||A'A*x-b||
 // * solve
 // * E2 = ||A'A*x-b||
-// * test that E2<0.001*E1
+// * test that E2 < 0.001*E1
    for (n = 1; n <= mx; n++) {
       for (m = 1; m <= mx; m++) {
          ae_matrix_set_length(&a, m, n);
@@ -19727,7 +19725,7 @@ bool testfbls() {
             xe.xR[i] = randommid();
             x.xR[i] = (2 * randominteger(2) - 1) * (2 + randomreal());
          }
-      // Test dense CG (which solves A'A*x=b and accepts dense A)
+      // Test dense CG (which solves A'A*x == b and accepts dense A)
          for (i = 0; i < n; i++) {
             x.xR[i] = (2 * randominteger(2) - 1) * (2 + randomreal());
          }
@@ -19775,14 +19773,14 @@ bool testfbls() {
       }
    }
 // Test linear least squares:
-// * try N=1..5, M=N..2*N
+// * try N = 1..5, M = N..2*N
 //                           [ B ]
 // * generate MxN matrix A = [   ], where (M-N)xN submatrix B contains
 //                           [ C ]
 //   random values from [-1,+1], and NxN submatrix C is diagonally dominant
 //   (diagonal of C is equal to 1.0, and magnitude of off-diagonal elements
 //   is smaller than 0.01). Such matrix is guaranteed to be non-degenerate.
-// * generate random known solution xe, set right part b=A*xe
+// * generate random known solution xe, set right part b == A*xe
 // * check that results of FBLSSolveLS agree with xe
    eps = 1.0E-6;
    for (n = 1; n <= 5; n++) {
@@ -20098,7 +20096,7 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
    }
 // Check that initial point is actually used and improves the situation:
 // * generate big random problem
-// * solve it with GMRES(1), EpsF=0.1
+// * solve it with GMRES(1), EpsF == 0.1
 // * restart using previous solution as initial point
 // Restarted solution must be achieved in 1 iteration
 //
@@ -20293,16 +20291,13 @@ static const double testlincgunit_e0 = 1.0E-6;
 static const double testlincgunit_maxcond = 30.0;
 
 // Function for testing LinCGIteration function(custom option), which to solve
-// Ax=b(here A is random positive definite matrix NxN, b is random vector). It
-// uses  the  default  stopping criterion(RNorm<FEps=10^-6). If algorithm does
+// Ax == b(here A is random positive definite matrix NxN, b is random vector). It
+// uses  the  default  stopping criterion(RNorm < FEps == 10^-6). If algorithm does
 // more iterations than size  of  the problem, then  some errors are possible.
 // The test verifies the following propirties:
-//     1. (A*pk,pm)=0 for any m != k;
-//     2. (rk,rm)=0 for any m != k;
-//     3. (rk,pm)=0 for any m != k;
-//
-// INPUT:
-//     Silent   -   if true then function output report
+//     1. (A*pk,pm) == 0 for any m != k;
+//     2. (rk,rm) == 0 for any m != k;
+//     3. (rk,pm) == 0 for any m != k;
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_complextest() {
    ae_frame _frame_block;
@@ -20400,8 +20395,8 @@ static bool testlincgunit_complextest() {
       lincgresults(&state, &x0, &rep);
       if (getrnorm != rep.r2) {
          if (!silent) {
-            printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
-            printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::GetRNorm!=Rep.R2!(%0.2e!=%0.2e)\n", (int)sz, c, getrnorm, rep.r2);
+            printf("IterationsCount == %0d;\nNMV == %0d;\nTerminationType == %0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
+            printf("Size == %0d;\nCond == %0.5f;\nComplexTest::Fail::GetRNorm!=Rep.R2!(%0.2e!=%0.2e)\n", (int)sz, c, getrnorm, rep.r2);
          }
          result = true;
          ae_frame_leave();
@@ -20420,8 +20415,8 @@ static bool testlincgunit_complextest() {
       for (i = 0; i < sz; i++) {
          if (!SmallAtR(residual.xR[i], testlincgunit_e0)) {
             if (!silent) {
-               printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
-               printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::Discripancy[%0d]>E0!(%0.2e>%0.2e)\n", (int)sz, c, (int)i, residual.xR[i], testlincgunit_e0);
+               printf("IterationsCount == %0d;\nNMV == %0d;\nTerminationType == %0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
+               printf("Size == %0d;\nCond == %0.5f;\nComplexTest::Fail::Discripancy[%0d] > E0!(%0.2e > %0.2e)\n", (int)sz, c, (int)i, residual.xR[i], testlincgunit_e0);
             }
             result = true;
             ae_frame_leave();
@@ -20431,9 +20426,9 @@ static bool testlincgunit_complextest() {
       }
       if (!NearAtR(normofresidual, rep.r2, testlincgunit_e0)) {
          if (!silent) {
-            printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
-            printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::||NormOfResidual-Rep.R2||>E0!(%0.2e>%0.2e)\n", (int)sz, c, fabs(normofresidual - rep.r2), testlincgunit_e0);
-            printf("NormOfResidual=%0.2e; Rep.R2=%0.2e\n", normofresidual, rep.r2);
+            printf("IterationsCount == %0d;\nNMV == %0d;\nTerminationType == %0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
+            printf("Size == %0d;\nCond == %0.5f;\nComplexTest::Fail::||NormOfResidual-Rep.R2|| > E0!(%0.2e > %0.2e)\n", (int)sz, c, fabs(normofresidual - rep.r2), testlincgunit_e0);
+            printf("NormOfResidual == %0.2e; Rep.R2 == %0.2e\n", normofresidual, rep.r2);
          }
          result = true;
          ae_frame_leave();
@@ -20456,7 +20451,7 @@ static bool testlincgunit_complextest() {
                mtr.xyR[i][j] = b.xR[j] - tmp;
             }
          }
-      // (Api,pj)=0?
+      // (Api,pj) == 0?
          sclr = 0.0;
          nv0 = 0.0;
          nv1 = 0.0;
@@ -20478,8 +20473,8 @@ static bool testlincgunit_complextest() {
                nv1 = sqrt(nv1);
                if (!SmallAtR(sclr, testlincgunit_e0 * na * rmax2(nv0, 1.0) * rmax2(nv1, 1.0))) {
                   if (!silent) {
-                     printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
-                     printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::(Ap%0d,p%0d) != 0\n{Sclr=%0.15f; NA=%0.15f NV0=%0.15f NV1=%0.15f;}\n", (int)sz, c, (int)i, (int)j, sclr, na, nv0, nv1);
+                     printf("IterationsCount == %0d;\nNMV == %0d;\nTerminationType == %0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
+                     printf("Size == %0d;\nCond == %0.5f;\nComplexTest::Fail::(Ap%0d,p%0d) != 0\n{Sclr == %0.15f; NA == %0.15f NV0 == %0.15f NV1 == %0.15f;}\n", (int)sz, c, (int)i, (int)j, sclr, na, nv0, nv1);
                   }
                   result = true;
                   ae_frame_leave();
@@ -20487,7 +20482,7 @@ static bool testlincgunit_complextest() {
                }
             }
          }
-      // (ri,pj)=0?
+      // (ri,pj) == 0?
          for (i = 1; i < sz; i++) {
             for (j = 0; j < i; j++) {
                sclr = 0.0;
@@ -20502,8 +20497,8 @@ static bool testlincgunit_complextest() {
                nv1 = sqrt(nv1);
                if (!SmallAtR(sclr, testlincgunit_e0 * rmax2(nv0, 1.0) * rmax2(nv1, 1.0))) {
                   if (!silent) {
-                     printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
-                     printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::(r%0d,p%0d) != 0\n{Sclr=%0.15f; NV0=%0.15f NV1=%0.15f;}\n", (int)sz, c, (int)i, (int)j, sclr, nv0, nv1);
+                     printf("IterationsCount == %0d;\nNMV == %0d;\nTerminationType == %0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
+                     printf("Size == %0d;\nCond == %0.5f;\nComplexTest::Fail::(r%0d,p%0d) != 0\n{Sclr == %0.15f; NV0 == %0.15f NV1 == %0.15f;}\n", (int)sz, c, (int)i, (int)j, sclr, nv0, nv1);
                   }
                   result = true;
                   ae_frame_leave();
@@ -20511,7 +20506,7 @@ static bool testlincgunit_complextest() {
                }
             }
          }
-      // (ri,rj)=0?
+      // (ri,rj) == 0?
          for (i = 0; i < sz; i++) {
             for (j = i + 1; j < sz; j++) {
                sclr = 0.0;
@@ -20526,8 +20521,8 @@ static bool testlincgunit_complextest() {
                nv1 = sqrt(nv1);
                if (!SmallAtR(sclr, testlincgunit_e0 * rmax2(nv0, 1.0) * rmax2(nv1, 1.0))) {
                   if (!silent) {
-                     printf("IterationsCount=%0d;\nNMV=%0d;\nTerminationType=%0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
-                     printf("Size=%0d;\nCond=%0.5f;\nComplexTest::Fail::(rm,rk) != 0\n{Sclr=%0.15f; NV0=%0.15f NV1=%0.15f;}\n", (int)sz, c, sclr, nv0, nv1);
+                     printf("IterationsCount == %0d;\nNMV == %0d;\nTerminationType == %0d;\n", (int)rep.iterationscount, (int)rep.nmv, (int)rep.terminationtype);
+                     printf("Size == %0d;\nCond == %0.5f;\nComplexTest::Fail::(rm,rk) != 0\n{Sclr == %0.15f; NV0 == %0.15f NV1 == %0.15f;}\n", (int)sz, c, sclr, nv0, nv1);
                   }
                   result = true;
                   ae_frame_leave();
@@ -20544,11 +20539,11 @@ static bool testlincgunit_complextest() {
    return result;
 }
 
-// This function prepare problem with a known solution 'Xs'(A*Xs-b=0). There
+// This function prepare problem with a known solution 'Xs'(A*Xs-b == 0). There
 // b is A*Xs. After, function check algorithm result and 'Xs'.
 // There used two stopping criterions:
-//     1. achieved the required precision(StCrit=0);
-//     2. execution of the required number of iterations(StCrit=1).
+//     1. achieved the required precision(StCrit == 0);
+//     2. execution of the required number of iterations(StCrit == 1).
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_complexres() {
    ae_frame _frame_block;
@@ -20647,12 +20642,12 @@ static bool testlincgunit_complexres() {
             if (err > eps) {
                if (!silent) {
                   printf("ComplexRes::fail\n");
-                  printf("IterationsCount=%0d\n", (int)rep.iterationscount);
-                  printf("NMV=%0d\n", (int)rep.nmv);
-                  printf("TerminationType=%0d\n", (int)rep.terminationtype);
+                  printf("IterationsCount == %0d\n", (int)rep.iterationscount);
+                  printf("NMV == %0d\n", (int)rep.nmv);
+                  printf("TerminationType == %0d\n", (int)rep.terminationtype);
                   printf("X and Xs...\n");
                   for (j = 0; j < n; j++) {
-                     printf("x[%0d]=%0.10f; xs[%0d]=%0.10f\n", (int)j, x0.xR[j], (int)j, xs.xR[j]);
+                     printf("x[%0d] == %0.10f; xs[%0d] == %0.10f\n", (int)j, x0.xR[j], (int)j, xs.xR[j]);
                   }
                }
                result = true;
@@ -20671,8 +20666,8 @@ static bool testlincgunit_complexres() {
    return result;
 }
 
-// This function check, that XUpdated return State.X=X0 at zero iteration and
-// State.X=X(algorithm result) at last.
+// This function check, that XUpdated return State.X == X0 at zero iteration and
+// State.X == X(algorithm result) at last.
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_basictestx() {
    ae_frame _frame_block;
@@ -20755,11 +20750,11 @@ static bool testlincgunit_basictestx() {
          if (x00.xR[i] != x0.xR[i]) {
             if (!silent) {
                printf("BasicTestX::fail\n");
-               printf("IterationsCount=%0d\n", (int)rep.iterationscount);
-               printf("NMV=%0d\n", (int)rep.nmv);
-               printf("TerminationType=%0d\n", (int)rep.terminationtype);
+               printf("IterationsCount == %0d\n", (int)rep.iterationscount);
+               printf("NMV == %0d\n", (int)rep.nmv);
+               printf("TerminationType == %0d\n", (int)rep.terminationtype);
                for (j = 0; j < n; j++) {
-                  printf("x0=%0.5f; x00=%0.5f;\n", x0.xR[j], x00.xR[j]);
+                  printf("x0 == %0.5f; x00 == %0.5f;\n", x0.xR[j], x00.xR[j]);
                }
             }
             result = true;
@@ -20772,11 +20767,11 @@ static bool testlincgunit_basictestx() {
          if (x01.xR[i] != x0.xR[i]) {
             if (!silent) {
                printf("BasicTestX::fail\n");
-               printf("IterationsCount=%0d\n", (int)rep.iterationscount);
-               printf("NMV=%0d\n", (int)rep.nmv);
-               printf("TerminationType=%0d\n", (int)rep.terminationtype);
+               printf("IterationsCount == %0d\n", (int)rep.iterationscount);
+               printf("NMV == %0d\n", (int)rep.nmv);
+               printf("TerminationType == %0d\n", (int)rep.terminationtype);
                for (j = 0; j < n; j++) {
-                  printf("x0=%0.5f; x01=%0.5f;\n", x0.xR[j], x01.xR[j]);
+                  printf("x0 == %0.5f; x01 == %0.5f;\n", x0.xR[j], x01.xR[j]);
                }
             }
             result = true;
@@ -20795,7 +20790,7 @@ static bool testlincgunit_basictestx() {
 }
 
 // This function checks that XUpdated returns correct State.R2. It creates
-// large badly conditioned problem (N=50), which should be large enough and
+// large badly conditioned problem (N == 50), which should be large enough and
 // ill-conditioned enough to cause periodic recalculation of R.
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_testrcorrectness() {
@@ -20944,10 +20939,10 @@ static bool testlincgunit_basictestiters() {
       if (iters != rep.iterationscount + 1 || iters > n + 1) {
          if (!silent) {
             printf("BasicTestIters::fail\n");
-            printf("IterationsCount=%0d\n", (int)rep.iterationscount);
-            printf("NMV=%0d\n", (int)rep.nmv);
-            printf("TerminationType=%0d\n", (int)rep.terminationtype);
-            printf("Iters=%0d\n", (int)iters);
+            printf("IterationsCount == %0d\n", (int)rep.iterationscount);
+            printf("NMV == %0d\n", (int)rep.nmv);
+            printf("TerminationType == %0d\n", (int)rep.terminationtype);
+            printf("Iters == %0d\n", (int)iters);
          }
          result = true;
          ae_frame_leave();
@@ -20993,10 +20988,10 @@ static bool testlincgunit_basictestiters() {
       if (iters != rep.iterationscount + 1 || iters > n + 1) {
          if (!silent) {
             printf("BasicTestIters::fail\n");
-            printf("IterationsCount=%0d\n", (int)rep.iterationscount);
-            printf("NMV=%0d\n", (int)rep.nmv);
-            printf("TerminationType=%0d\n", (int)rep.terminationtype);
-            printf("Iters=%0d\n", (int)iters);
+            printf("IterationsCount == %0d\n", (int)rep.iterationscount);
+            printf("NMV == %0d\n", (int)rep.nmv);
+            printf("TerminationType == %0d\n", (int)rep.terminationtype);
+            printf("Iters == %0d\n", (int)iters);
          }
          result = true;
          ae_frame_leave();
@@ -21239,7 +21234,7 @@ static bool testlincgunit_krylovsubspacetest() {
             }
             numofit++;
          }
-   // Check that I-th step S_i=X[I+1]-X[i] belongs to I-th Krylov subspace.
+   // Check that I-th step S_i == X[I+1]-X[i] belongs to I-th Krylov subspace.
    // Checks are done for first K2 steps, with K2 small enough to avoid
    // numerical errors.
       if (n <= maxits) {
@@ -21254,7 +21249,7 @@ static bool testlincgunit_krylovsubspacetest() {
          if (!testlincgunit_frombasis(&tarray, &ksr, n, i + 1, testlincgunit_e0)) {
             if (!silent) {
                printf("KrylovSubspaceTest::FAIL\n");
-               printf("Size=%0d; Iters=%0d;\n", (int)n, (int)i);
+               printf("Size == %0d; Iters == %0d;\n", (int)n, (int)i);
             }
             result = true;
             ae_frame_leave();
@@ -21270,7 +21265,7 @@ static bool testlincgunit_krylovsubspacetest() {
 }
 
 // Function for testing  LinCgSolveSparse. This function  prepare problem with
-// a known solution 'Xs'(A*Xs-b=0). There b is A*Xs. After, function calculate
+// a known solution 'Xs'(A*Xs-b == 0). There b is A*Xs. After, function calculate
 // result by LinCGSolveSparse and compares it with 'Xs'.
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_sparsetest() {
@@ -21401,9 +21396,9 @@ static bool testlincgunit_precondtest() {
    NewVector(err, 0, DT_REAL);
 // Test 1.
 //
-// Preconditioned CG for A*x=b with preconditioner M=E*E' is algebraically
+// Preconditioned CG for A*x == b with preconditioner M == E*E' is algebraically
 // equivalent to non-preconditioned CG for (inv(E)*A*inv(E'))*z = inv(E)*b
-// with z=E'*x.
+// with z == E'*x.
 //
 // We test it by generating random preconditioner, running algorithm twice -
 // one  time  for  original  problem  with  preconditioner , another one  for
@@ -21413,8 +21408,8 @@ static bool testlincgunit_precondtest() {
    // Generate:
    // * random A with unit norm
    // * random positive definite diagonal preconditioner M
-   // * dE=sqrt(M)
-   // * rdE=dE^(-1)
+   // * dE == sqrt(M)
+   // * rdE == dE^(-1)
    // * tA = rdE*A*rdE
    // * random x0 and b - for original preconditioned problem
    // * tx0 and tb - for modified problem
@@ -21532,13 +21527,13 @@ static bool testlincgunit_precondtest() {
             if (!NearAtR(mtx.xyR[i][j], rde.xR[j] * mtprex.xyR[i][j], eps)) {
                if (!silent) {
                   printf("PrecondTest::fail\n");
-                  printf("Size=%0d\n", (int)n);
-                  printf("IterationsCount=%0d\n", (int)rep.iterationscount);
-                  printf("NMV=%0d\n", (int)rep.nmv);
-                  printf("TerminationType=%0d\n", (int)rep.terminationtype);
+                  printf("Size == %0d\n", (int)n);
+                  printf("IterationsCount == %0d\n", (int)rep.iterationscount);
+                  printf("NMV == %0d\n", (int)rep.nmv);
+                  printf("TerminationType == %0d\n", (int)rep.terminationtype);
                   printf("X and X^...\n");
                   for (k = 0; k < n; k++) {
-                     printf("I=%0d; mtx[%0d]=%0.10f; mtx^[%0d]=%0.10f\n", (int)i, (int)k, mtx.xyR[i][k], (int)k, mtprex.xyR[i][k]);
+                     printf("I == %0d; mtx[%0d] == %0.10f; mtx^[%0d] == %0.10f\n", (int)i, (int)k, mtx.xyR[i][k], (int)k, mtprex.xyR[i][k]);
                   }
                }
                result = true;
@@ -21553,16 +21548,16 @@ static bool testlincgunit_precondtest() {
 // We test automatic diagonal preconditioning used by SolveSparse.
 // In order to do so we:
 // 1. generate 20*20 matrix A0 with condition number equal to 1.0E1
-// 2. generate random "exact" solution xe and right part b=A0*xe
+// 2. generate random "exact" solution xe and right part b == A0*xe
 // 3. generate random ill-conditioned diagonal scaling matrix D with
 //    condition number equal to 1.0E50:
-// 4. transform A*x=b into badly scaled problem:
-//    A0*x0=b0
-//    A0*D*(inv(D)*x0)=b0
-//    (D*A0*D)*(inv(D)*x0)=(D*b0)
-//    finally we got new problem A*x=b with A=D*A0*D, b=D*b0, x=inv(D)*x0
+// 4. transform A*x == b into badly scaled problem:
+//    A0*x0 == b0
+//    A0*D*(inv(D)*x0) == b0
+//    (D*A0*D)*(inv(D)*x0) == (D*b0)
+//    finally we got new problem A*x == b with A == D*A0*D, b == D*b0, x == inv(D)*x0
 //
-// Then we solve A*x=b:
+// Then we solve A*x == b:
 // 1. with default preconditioner
 // 2. with explicitly activayed diagonal preconditioning
 // 3. with unit preconditioner.
@@ -21801,13 +21796,13 @@ bool testnormestimator() {
          waserrors = waserrors || enorm > snorm * (1.0 + tol) || enorm < snorm * (1.0 - tol);
       }
    }
-// NStart=10 should give statistically better results than NStart=1.
+// NStart == 10 should give statistically better results than NStart == 1.
 // In order to test it we perform PassCount attempts to solve random
-// problem by means of two estimators: one with NStart=10 and another
-// one with NStart=1. Every time we compare two estimates and choose
+// problem by means of two estimators: one with NStart == 10 and another
+// one with NStart == 1. Every time we compare two estimates and choose
 // better one.
 //
-// Random variable NBetter is a number of cases when NStart=10 was better.
+// Random variable NBetter is a number of cases when NStart == 10 was better.
 // Under null hypothesis (no difference) it is binomially distributed
 // with mean PassCount/2 and variance PassCount/4. However, we expect
 // to have significant deviation to the right, in the area of larger
@@ -22020,7 +22015,7 @@ static bool testlinlsqrunit_isitgoodsolution(RMatrix *a, RVector *b, ae_int_t m,
       clause1holds = anorm * rnorm == 0.0 || atrnorm / (anorm * rnorm) <= epsort;
    }
 // Check (2).
-// Here we assume that Result=True when we enter this block.
+// Here we assume that Result == True when we enter this block.
    v = ae_v_dotproduct(x->xR, 1, x->xR, 1, n);
    xnorm = sqrt(v);
    v = ae_v_dotproduct(svdx.xR, 1, svdx.xR, 1, n);
@@ -22041,9 +22036,6 @@ static bool testlinlsqrunit_isitgoodsolution(RMatrix *a, RVector *b, ae_int_t m,
 // in  order  to  test  regularizer.  Default  stopping  criteria  are  used.
 // Preconditioning is turned off because it skews results for  rank-deficient
 // problems.
-//
-// INPUT:
-//     Silent   -   if true then function output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_svdtest() {
    ae_frame _frame_block;
@@ -22137,9 +22129,6 @@ static bool testlinlsqrunit_svdtest() {
 // require several additional iterations to converge.
 //
 // We try different scalings of the A and B.
-//
-// INPUT:
-//     Silent   -   if true then function does not outputs results to console
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_mwcranksvdtest() {
    ae_frame _frame_block;
@@ -22173,7 +22162,7 @@ static bool testlinlsqrunit_mwcranksvdtest() {
                // * scale factors s0, s1
                // * MxN well conditioned A (with condition number C in [1,10] and norm s0)
                // * regularization coefficient LambdaI
-               // * right part b, with |b|=s1
+               // * right part b, with |b| == s1
                   s0 = pow(10.0, (double)(10 * ns0));
                   s1 = pow(10.0, (double)(10 * ns1));
                   lambdai = 0.0;
@@ -22248,9 +22237,6 @@ static bool testlinlsqrunit_mwcranksvdtest() {
 // The test checks that algorithm can find a solution with minimum norm for a
 // singular rectangular problem. System matrix has special property - singular
 // values are either zero or well separated from zero.
-//
-// INPUT:
-//     Silent   -   if true then function output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_mwicranksvdtest() {
    ae_frame _frame_block;
@@ -22286,8 +22272,8 @@ static bool testlinlsqrunit_mwicranksvdtest() {
                   // Generate problem:
                   // * scale coefficients s0, s1
                   // * regularization coefficient LambdaI
-                  // * MxN matrix A, norm(A)=s0, with NZ zero singular values and N-NZ nonzero ones
-                  // * right part b with norm(b)=s1
+                  // * MxN matrix A, norm(A) == s0, with NZ zero singular values and N-NZ nonzero ones
+                  // * right part b with norm(b) == s1
                      s0 = pow(10.0, (double)(10 * ns0));
                      s1 = pow(10.0, (double)(10 * ns1));
                      lambdai = 0.0;
@@ -22368,9 +22354,6 @@ static bool testlinlsqrunit_mwicranksvdtest() {
 //
 // We do not use iteration count as stopping condition, because problem can
 // be degenerate and we may need more than N iterations to converge.
-//
-// INPUT:
-//     Silent   -   if true then function output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_bidiagonaltest() {
    ae_frame _frame_block;
@@ -22495,13 +22478,10 @@ static bool testlinlsqrunit_bidiagonaltest() {
 }
 
 // The test does check, that algorithm correctly solves a problem in cases:
-//     1. A=0, B != 0;
-//     2. A != 0, B=0;
-//     3. A=0, B=0.
+//     1. A == 0, B != 0;
+//     2. A != 0, B == 0;
+//     3. A == 0, B == 0.
 // If some part is not zero then it filled with ones.
-//
-// INPUT:
-//     Silent   -   if true then function output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_zeromatrixtest() {
    ae_frame _frame_block;
@@ -22583,9 +22563,6 @@ static bool testlinlsqrunit_zeromatrixtest() {
 }
 
 // The test does check, that algorithm correctly displays a progress report.
-//
-// INPUT:
-//     Silent   -   if true then function output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_reportcorrectnesstest() {
    ae_frame _frame_block;
@@ -22683,9 +22660,9 @@ static bool testlinlsqrunit_reportcorrectnesstest() {
                   }
                // check, that RNorm is't more than S.R2
                // and difference between S.R2 and TNorm
-               // is't more than 'eps'(here S.R2=||rk||,
+               // is't more than 'eps'(here S.R2 == ||rk||,
                // calculated by the algorithm for LSQR, and
-               // TNorm=||A*S.x-b||, calculated by test function).
+               // TNorm == ||A*S.x-b||, calculated by test function).
                   if (s.r2 > rnorm + 1000.0 * machineepsilon * rmax2(rnorm, 1.0)) {
                      result = true;
                      ae_frame_leave();
@@ -22721,12 +22698,12 @@ static bool testlinlsqrunit_reportcorrectnesstest() {
                if (firstx.xR[i] != 0.0 || lastx.xR[i] != x0.xR[i]) {
                   if (!silent) {
                      printf("ReportCorrectnessTest::Fail\n");
-                     printf("IterationsCount=%0d\n", (int)rep.iterationscount);
-                     printf("NMV=%0d\n", (int)rep.nmv);
-                     printf("TerminationType=%0d\n", (int)rep.terminationtype);
+                     printf("IterationsCount == %0d\n", (int)rep.iterationscount);
+                     printf("NMV == %0d\n", (int)rep.nmv);
+                     printf("TerminationType == %0d\n", (int)rep.terminationtype);
                      printf("X and LastX...\n");
                      for (j = 0; j < n; j++) {
-                        printf("x[%0d]=%0.10e; LastX[%0d]=%0.10e\n", (int)j, x0.xR[j], (int)j, lastx.xR[j]);
+                        printf("x[%0d] == %0.10e; LastX[%0d] == %0.10e\n", (int)j, x0.xR[j], (int)j, lastx.xR[j]);
                      }
                   }
                   result = true;
@@ -22745,9 +22722,6 @@ static bool testlinlsqrunit_reportcorrectnesstest() {
 }
 
 // The test does check, that correctly executed stop criteria by algorithm.
-//
-// INPUT:
-//     Silent   -   if true then function output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_stoppingcriteriatest() {
    ae_frame _frame_block;
@@ -22823,17 +22797,17 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
       if (rep.iterationscount > maxits || rep.terminationtype <= 0) {
          if (!silent) {
             printf("StoppingCriteriaTest::Fail\n");
-            printf("N=%0d\n", (int)n);
-            printf("IterationsCount=%0d\n", (int)rep.iterationscount);
-            printf("NMV=%0d\n", (int)rep.nmv);
-            printf("TerminationType=%0d\n", (int)rep.terminationtype);
+            printf("N == %0d\n", (int)n);
+            printf("IterationsCount == %0d\n", (int)rep.iterationscount);
+            printf("NMV == %0d\n", (int)rep.nmv);
+            printf("TerminationType == %0d\n", (int)rep.terminationtype);
          }
          result = true;
          ae_frame_leave();
          return result;
       }
    // Test EpsB.
-   // Set EpsB=eps, check that |r|<epsMod*|b|, where epsMod=1.1*eps.
+   // Set EpsB == eps, check that |r| < epsMod*|b|, where epsMod == 1.1*eps.
    // This modified epsilon is used to avoid influence of the numerical errors.
    //
    // NOTE: we do not check TerminationType because algorithm may terminate for
@@ -22874,10 +22848,10 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
       if (rknorm > epsmod * bnorm || rep.terminationtype <= 0) {
          if (!silent) {
             printf("StoppingCriteriaTest::Fail\n");
-            printf("rkNorm=%0.2e\n", rknorm);
-            printf("IterationsCount=%0d\n", (int)rep.iterationscount);
-            printf("NMV=%0d\n", (int)rep.nmv);
-            printf("TerminationType=%0d\n", (int)rep.terminationtype);
+            printf("rkNorm == %0.2e\n", rknorm);
+            printf("IterationsCount == %0d\n", (int)rep.iterationscount);
+            printf("NMV == %0d\n", (int)rep.nmv);
+            printf("TerminationType == %0d\n", (int)rep.terminationtype);
          }
          result = true;
          ae_frame_leave();
@@ -22967,10 +22941,10 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
             if (arknorm / (anorm * rknorm) > epsmod || rep.terminationtype != 4) {
                if (!silent) {
                   printf("StoppingCriteriaTest::Fail\n");
-                  printf("N=%0d\n", (int)n);
-                  printf("IterationsCount=%0d\n", (int)rep.iterationscount);
-                  printf("NMV=%0d\n", (int)rep.nmv);
-                  printf("TerminationType=%0d\n", (int)rep.terminationtype);
+                  printf("N == %0d\n", (int)n);
+                  printf("IterationsCount == %0d\n", (int)rep.iterationscount);
+                  printf("NMV == %0d\n", (int)rep.nmv);
+                  printf("TerminationType == %0d\n", (int)rep.terminationtype);
                }
                result = true;
                ae_frame_leave();
@@ -22987,13 +22961,10 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
    return result;
 }
 
-// This test compares LSQR  for  original  system  A*x=b  against  CG  for  a
+// This test compares LSQR  for  original  system  A*x == b  against  CG  for  a
 // modified system (A'*A)x = A*b. Both algorithms should give same  sequences
 // of trial points (under exact arithmetics, or  for  very  good  conditioned
 // systems).
-//
-// INPUT:
-//     Silent   -   if true then function does not output report
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_analytictest() {
    ae_frame _frame_block;
@@ -23085,9 +23056,9 @@ static bool testlinlsqrunit_analytictest() {
       // However, we can do better - we can check that sequence of steps
       // satisfies orthogonality/conjugacy conditions, which are stated
       // as follows:
-      // * (r[i]^T)*r[j]=0 for i != j
-      // * (p[i]^T)*A'*A*p[j]=0 for i != j
-      // where r[i]=(A'*A)*x[i]-A'*b is I-th residual , p[i] is I-th step.
+      // * (r[i]^T)*r[j] == 0 for i != j
+      // * (p[i]^T)*A'*A*p[j] == 0 for i != j
+      // where r[i] == (A'*A)*x[i]-A'*b is I-th residual , p[i] is I-th step.
       //
       // In order to test these criteria we generate two matrices:
       // * (PointsStored-1)*M matrix AP (matrix of A*p products)
@@ -23236,15 +23207,15 @@ static bool testlinlsqrunit_preconditionertest() {
 // We test automatic diagonal preconditioning used by SolveSparse.
 // In order to do so we:
 // 1. generate 20*20 matrix A0 with condition number equal to 1.0E1
-// 2. generate random "exact" solution xe and right part b=A0*xe
+// 2. generate random "exact" solution xe and right part b == A0*xe
 // 3. generate random ill-conditioned diagonal scaling matrix D with
 //    condition number equal to 1.0E50:
-// 4. transform A*x=b into badly scaled problem:
-//    A0*x0=b0
-//    (A0*D)*(inv(D)*x0)=b0
-//    finally we got new problem A*x=b with A=A0*D, b=b0, x=inv(D)*x0
+// 4. transform A*x == b into badly scaled problem:
+//    A0*x0 == b0
+//    (A0*D)*(inv(D)*x0) == b0
+//    finally we got new problem A*x == b with A == A0*D, b == b0, x == inv(D)*x0
 //
-// Then we solve A*x=b:
+// Then we solve A*x == b:
 // 1. with default preconditioner
 // 2. with explicitly activayed diagonal preconditioning
 // 3. with unit preconditioner.
@@ -24255,7 +24226,7 @@ static void testmatinvunit_testrinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
       //
       // 1. generate random well conditioned matrix A.
       // 2. generate random solution vector xe
-      // 3. generate right part b=A*xe
+      // 3. generate right part b == A*xe
       // 4. test different methods on original A
          rmatrixrndcond(n, 1000.0, &a);
          testmatinvunit_rmatrixmakeacopy(&a, n, n, &lua);
@@ -24387,7 +24358,7 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
       //
       // 1. generate random well conditioned matrix A.
       // 2. generate random solution vector xe
-      // 3. generate right part b=A*xe
+      // 3. generate right part b == A*xe
       // 4. test different methods on original A
          cmatrixrndcond(n, 1000.0, &a);
          testmatinvunit_cmatrixmakeacopy(&a, n, n, &lua);
@@ -24520,7 +24491,7 @@ static void testmatinvunit_testspdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
       //
       // 1. generate random well conditioned matrix A.
       // 2. generate random solution vector xe
-      // 3. generate right part b=A*xe
+      // 3. generate right part b == A*xe
       // 4. test different methods on original A
          spdmatrixrndcond(n, 1000.0, &a);
          testmatinvunit_rmatrixdrophalf(&a, n, isupper);
@@ -24626,7 +24597,7 @@ static void testmatinvunit_testhpdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
       //
       // 1. generate random well conditioned matrix A.
       // 2. generate random solution vector xe
-      // 3. generate right part b=A*xe
+      // 3. generate right part b == A*xe
       // 4. test different methods on original A
          hpdmatrixrndcond(n, 1000.0, &a);
          testmatinvunit_cmatrixdrophalf(&a, n, isupper);
@@ -24830,7 +24801,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
    hqrndrandomize(&rs);
 // Test for inexact L-BFGS preconditioner.
 //
-// We generate QP problem 0.5*x'*H*x, with random H=D+V'*C*V.
+// We generate QP problem 0.5*x'*H*x, with random H == D+V'*C*V.
 // Different K's, from 0 to N, are tried. We test preconditioner
 // code which uses compact L-BFGS update against reference implementation
 // which uses non-compact BFGS scheme.
@@ -24965,7 +24936,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
    }
 // Test for exact low-rank preconditioner.
 //
-// We generate QP problem 0.5*x'*H*x, with random H=D+V'*C*V.
+// We generate QP problem 0.5*x'*H*x, with random H == D+V'*C*V.
 // Different K's, from 0 to N, are tried. We test preconditioner
 // code which uses Woodbury update against reference implementation
 // which performs straightforward matrix inversion.
@@ -25148,7 +25119,7 @@ static void testminlbfgsunit_testfunc3(minlbfgsstate *state) {
 
 // Calculate test function IIP2
 //
-// f(x) = sum( ((i*i+1)*x[i])^2, i=0..N-1)
+// f(x) = sum( ((i*i+1)*x[i])^2, i = 0..N-1)
 //
 // It has high condition number which makes fast convergence unlikely without
 // good preconditioner.
@@ -25203,8 +25174,8 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
 // then "bad" preconditioners (B1/B2/..) are worse than "good" ones (G1/G2/..).
 // "Worse" means more iterations to converge.
 //
-// We test it using f(x) = sum( ((i*i+1)*x[i])^2, i=0..N-1) and L-BFGS
-// optimizer with deliberately small M=1.
+// We test it using f(x) = sum( ((i*i+1)*x[i])^2, i = 0..N-1) and L-BFGS
+// optimizer with deliberately small M == 1.
 //
 // N        - problem size
 // PKind    - zero for upper triangular preconditioner, one for lower triangular.
@@ -25301,8 +25272,8 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
 // Preconditioner test 2.
 //
 // If
-// * B2 is default preconditioner with non-unit scale S[i]=1/sqrt(h[i])
-// * G2 is scale-based preconditioner with non-unit scale S[i]=1/sqrt(h[i])
+// * B2 is default preconditioner with non-unit scale S[i] == 1/sqrt(h[i])
+// * G2 is scale-based preconditioner with non-unit scale S[i] == 1/sqrt(h[i])
 // then B2 is worse than G2.
 // "Worse" means more iterations to converge.
    for (n = 10; n <= 15; n++) {
@@ -25619,7 +25590,7 @@ static void testminlbfgsunit_testother(bool *err) {
 // problem:
 //
 //     min f(x) subject to no constraints on X
-//            { 1/(1-x) + 1/(1+x) + c*x, if -0.999999<x<0.999999
+//            { 1/(1-x) + 1/(1+x) + c*x, if -0.999999 < x < 0.999999
 //     f(x) = {
 //            { M, if x <= -0.999999 or x >= 0.999999
 //
@@ -26179,7 +26150,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
    }
 // A test for detection of C1 continuity violations in the target.
 //
-// Target function is a sum of |(x,c_i)| for i=1..N.
+// Target function is a sum of |(x,c_i)| for i = 1..N.
 // No constraints is present.
 // Analytic gradient is provided.
 //
@@ -26305,7 +26276,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
    *wereerrors = *wereerrors || avglng0len <= avgstr0len;
    *wereerrors = *wereerrors || avglng1len <= avgstr1len;
 // Detection of C1 continuity violations in the target under numerical differentiation:
-// * target function is a sum of |(x,c_i)| for i=1..N.
+// * target function is a sum of |(x,c_i)| for i = 1..N.
 // * no constraints is present.
 // * analytic gradient is provided.
 //
@@ -26377,9 +26348,9 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
    *wereerrors = *wereerrors || failurecounter > maxfails;
 // Make sure than no false positives are reported for larger
 // problems where numerical noise can be an issue:
-// * N=100 dimensions
+// * N == 100 dimensions
 // * positive-definite quadratic programming problem
-// * upper limit on iterations count, MaxIts=25
+// * upper limit on iterations count, MaxIts == 25
 // We simply test that OptGuard does not return error code.
    n = 100;
    m = 5;
@@ -26695,7 +26666,7 @@ bool testminlbfgs() {
    }
    minlbfgsresults(&state, &x, &rep);
    crashtest = crashtest || rep.terminationtype <= 0;
-//  Test OptGuard
+// Test OptGuard
    optguarderr = false;
    testminlbfgsunit_testoptguard(&optguarderr);
 // end
@@ -27020,7 +26991,7 @@ bool testcqmodels() {
          } else {
             if (mkind == 1.0) {
             // Set zero D.
-            // In case Alpha=0, set non-zero A.
+            // In case Alpha == 0, set non-zero A.
                if (alpha == 0.0) {
                   alpha = 1.0 + randomreal();
                   for (i = 0; i < n; i++) {
@@ -27056,7 +27027,7 @@ bool testcqmodels() {
                } else {
                   if (mkind == 3.0) {
                   // Set zero A.
-                  // In case Tau=0, set non-zero D.
+                  // In case Tau == 0, set non-zero D.
                      if (tau == 0.0) {
                         tau = 1.0 + randomreal();
                         for (i = 0; i < n; i++) {
@@ -27273,9 +27244,9 @@ bool testcqmodels() {
    waserrors = waserrors || newton1errors;
 // Newton2 test: we test ability to work with diagonal matrices, including
 // very large ones (up to 100.000 elements). This test checks that:
-// a) we can work with Alpha=0, i.e. when we have strictly diagonal A
+// a) we can work with Alpha == 0, i.e. when we have strictly diagonal A
 // b) diagonal problems are handled efficiently, i.e. algorithm will
-//    successfully solve problem with N=100.000
+//    successfully solve problem with N == 100.000
 //
 // Test problem:
 // * diagonal term D and rank-K term Q
@@ -27442,9 +27413,9 @@ bool testsnnls() {
    hqrndrandomize(&rs);
    nmax = 10;
 // Test 2 (comes first because it is very basic):
-// * NS=0
+// * NS == 0
 // * ND in [1,NMAX]
-// * NR=ND
+// * NR == ND
 // * DenseA is diagonal with positive entries
 // * B is random
 // * random constraints
@@ -27488,14 +27459,14 @@ bool testsnnls() {
 // * NS in [0,NMAX]
 // * ND in [0,NMAX]
 // * NR in [NS,NS+ND+NMAX]
-// * NS+ND>0, NR>0
+// * NS+ND > 0, NR > 0
 // * about 50% of variables are constrained
 // * we check that constrained gradient is small at the solution
    eps = 1.0E-5;
    for (ns = 0; ns <= nmax; ns++) {
       for (nd = 0; nd <= nmax; nd++) {
          for (nr = ns; nr <= ns + nd + nmax; nr++) {
-         // Skip NS+ND=0, NR=0
+         // Skip NS+ND == 0, NR == 0
             if (ns + nd == 0) {
                continue;
             }
@@ -27581,9 +27552,9 @@ bool testsnnls() {
       for (nd = 0; nd <= nmax; nd++) {
          for (nr = ns; nr <= ns + nd + nmax; nr++) {
             for (k = 0; k <= 20; k++) {
-            // Skip NS+ND=0, NR=0
+            // Skip NS+ND == 0, NR == 0
             //
-            // Skip degenerate problems (NR<NS+ND) - important for this particular test.
+            // Skip degenerate problems (NR < NS+ND) - important for this particular test.
                if (ns + nd == 0) {
                   continue;
                }
@@ -27660,7 +27631,7 @@ bool testsnnls() {
 // * NS in [0,NMAX]
 // * ND in [0,NMAX]
 // * NR in [NS,NS+ND+NMAX]
-// * NS+ND>0, NR>0
+// * NS+ND > 0, NR > 0
 // * all variables are unconstrained
 // * S.DebugMaxNewton is set to 1, S.RefinementIts is set to 1,
 //   i.e. algorithm is terminated after one Newton iteration, and no
@@ -27677,7 +27648,7 @@ bool testsnnls() {
    for (ns = 0; ns <= nmax; ns++) {
       for (nd = 0; nd <= nmax; nd++) {
          for (nr = ns; nr <= ns + nd + nmax; nr++) {
-         // Skip NS+ND=0, NR=0
+         // Skip NS+ND == 0, NR == 0
             if (ns + nd == 0) {
                continue;
             }
@@ -27987,7 +27958,7 @@ static const ae_int_t testminbleicunit_maxoptguardlevel = 1;
 
 // Calculate test function IIP2
 //
-// f(x) = sum( ((i*i+1)^FK*x[i])^2, i=0..N-1)
+// f(x) = sum( ((i*i+1)^FK*x[i])^2, i = 0..N-1)
 //
 // It has high condition number which makes fast convergence unlikely without
 // good preconditioner.
@@ -28006,9 +27977,9 @@ static void testminbleicunit_calciip2(minbleicstate *state, ae_int_t n, ae_int_t
 }
 
 // This function sets random preconditioner:
-// * unit one, for PrecKind=0
-// * diagonal-based one, for PrecKind=1
-// * scale-based one, for PrecKind=2
+// * unit one, for PrecKind == 0
+// * diagonal-based one, for PrecKind == 1
+// * scale-based one, for PrecKind == 2
 static void testminbleicunit_setrandompreconditioner(minbleicstate *state, ae_int_t n, ae_int_t preckind) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -28177,7 +28148,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    // * N-dimensional space
    // * randomly generated point xs
    // * K randomly generated hyperplanes which all pass through xs
-   //   define K equality constraints: (a[k],x)=b[k]
+   //   define K equality constraints: (a[k],x) == b[k]
    // * equality constraints are checked for being well conditioned
    // * preconditioner is chosen at random (we just want to be
    //   sure that preconditioning won't prevent us from converging
@@ -28188,7 +28159,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    // * f(x) = |x-x0|^2, x0 = xs+a[0]
    // * either analytic gradient or numerical differentiation are used
    // * extremum of f(x) is exactly xs because:
-   //   * xs is the closest point in the plane defined by (a[0],x)=b[0]
+   //   * xs is the closest point in the plane defined by (a[0],x) == b[0]
    //   * xs is feasible by definition
       diffstep = 1.0E-6;
       for (dkind = 0; dkind <= 1; dkind++) {
@@ -28280,7 +28251,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    //   * unit preconditioner
    //   * random diagonal-based preconditioner
    //   * random scale-based preconditioner
-   // * F(x) = |x-x0|^P, where P={2,4} and x0 is randomly selected from [-1,+2]^N
+   // * F(x) = |x-x0|^P, where P == {2,4} and x0 is randomly selected from [-1,+2]^N
    // * with such simple boundaries and function it is easy to find
    //   analytic form of solution: S[i] = bound(x0[i], 0, 1)
    // * we also check that both final solution and subsequent iterates
@@ -28349,7 +28320,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
          }
       }
    // Same as previous problem, but with minor modifications:
-   // * some bound constraints are 0 <= x[i] <= 1, some are Ci=x[i]=Ci
+   // * some bound constraints are 0 <= x[i] <= 1, some are Ci == x[i] == Ci
    // * no linear constraints
    // * preconditioner is chosen at random (we just want to be
    //   sure that preconditioning won't prevent us from converging
@@ -28357,7 +28328,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    //   * unit preconditioner
    //   * random diagonal-based preconditioner
    //   * random scale-based preconditioner
-   // * F(x) = |x-x0|^P, where P={2,4} and x0 is randomly selected from [-1,+2]^N
+   // * F(x) = |x-x0|^P, where P == {2,4} and x0 is randomly selected from [-1,+2]^N
    // * with such simple boundaries and function it is easy to find
    //   analytic form of solution: S[i] = bound(x0[i], 0, 1)
    // * we also check that both final solution and subsequent iterates
@@ -28440,7 +28411,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    //   * unit preconditioner
    //   * random diagonal-based preconditioner
    //   * random scale-based preconditioner
-   // * F(x) = |x-x0|^P, where P={2,4} and x0 is randomly selected from [-1,+2]^N
+   // * F(x) = |x-x0|^P, where P == {2,4} and x0 is randomly selected from [-1,+2]^N
    // * with such simple constraints and function it is easy to find
    //   analytic form of solution: S[i] = bound(x0[i], 0, 1).
    // * however, we can't guarantee that solution is strictly feasible
@@ -28511,7 +28482,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    // * starting point xs with xs[i] in [-1,+2]
    // * random point xc from [0,1] is used to generate K <= N
    //   random linear equality/inequality constraints of the form
-   //   (c,x-xc)=0.0 (or, alternatively, >= or <= ), where
+   //   (c,x-xc) == 0.0 (or, alternatively, >= or <= ), where
    //   c is a random vector.
    // * preconditioner is chosen at random (we just want to be
    //   sure that preconditioning won't prevent us from converging
@@ -28519,7 +28490,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    //   * unit preconditioner
    //   * random diagonal-based preconditioner
    //   * random scale-based preconditioner
-   // * F(x) = |x-x0|^P, where P={2,4} and x0 is randomly selected from [-1,+2]^N
+   // * F(x) = |x-x0|^P, where P == {2,4} and x0 is randomly selected from [-1,+2]^N
    // * we do not know analytic form of the solution, and, if fact, we do not
    //   check for solution correctness. We just check that algorithm converges
    //   to the feasible points.
@@ -28607,7 +28578,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    //   * unit preconditioner
    //   * random diagonal-based preconditioner
    //   * random scale-based preconditioner
-   // * F(x) = |x-x0|^P, where P={2,4} and x0 is randomly selected from [-1,+2]^N
+   // * F(x) = |x-x0|^P, where P == {2,4} and x0 is randomly selected from [-1,+2]^N
    // * algorithm must return correct error code on such problem
       for (preckind = 0; preckind <= 2; preckind++) {
          for (pkind = 1; pkind <= 2; pkind++) {
@@ -28652,8 +28623,8 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    // Infeasible problem (2):
    // * no bound and inequality constraints
    // * 1 <= K <= N arbitrary equality constraints
-   // * (K+1)th constraint which is equal to the first constraint a*x=c,
-   //   but with c:=c+1. I.e. we have both a*x=c and a*x=c+1, which can't
+   // * (K+1)th constraint which is equal to the first constraint a*x == c,
+   //   but with c = c+1. I.e. we have both a*x == c and a*x == c+1, which can't
    //   be true (other constraints may be inconsistent too, but we don't
    //   have to check it).
    // * preconditioner is chosen at random (we just want to be
@@ -28662,7 +28633,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    //   * unit preconditioner
    //   * random diagonal-based preconditioner
    //   * random scale-based preconditioner
-   // * F(x) = |x|^P, where P={2,4}
+   // * F(x) = |x|^P, where P == {2,4}
    // * algorithm must return correct error code on such problem
       for (preckind = 0; preckind <= 2; preckind++) {
          for (pkind = 1; pkind <= 2; pkind++) {
@@ -28784,11 +28755,11 @@ static void testminbleicunit_testother(bool *err) {
 //
 // subject to
 //
-//     x[i] >= 0, for i=0..n-1
+//     x[i] >= 0, for i = 0..n-1
 //
 // with initial point
 //
-//     x[0] = 1.0E-100, x[1]=x[2]=...=0.5
+//     x[0] = 1.0E-100, x[1] == x[2] == ... == 0.5
 //
 // We try to reproduce this problem in different settings:
 // * boundary-only constraints - we test that completion code is positive,
@@ -29011,7 +28982,7 @@ static void testminbleicunit_testother(bool *err) {
 //   in order to explore different control paths of the optimizer:
 //   0) absense of constraints
 //   1) bound constraints -100000 <= x[i] <= 100000
-//   2) one linear constraint 0*x=0
+//   2) one linear constraint 0*x == 0
 //   3) combination of (1) and (2)
 // * we use random scaling matrix
 // * we test different variants of the preconditioning:
@@ -29092,7 +29063,7 @@ static void testminbleicunit_testother(bool *err) {
 // problem:
 //
 //     min f(x) subject to no constraints on X
-//            { 1/(1-x) + 1/(1+x) + c*x, if -0.999999<x<0.999999
+//            { 1/(1-x) + 1/(1+x) + c*x, if -0.999999 < x < 0.999999
 //     f(x) = {
 //            { M, if x <= -0.999999 or x >= 0.999999
 //
@@ -29150,10 +29121,10 @@ static void testminbleicunit_testother(bool *err) {
 // Consider following problem:
 // * f(x,y) = (x+1)^2 + (y+1)^2 + 10000*MachineEpsilon*RandomReal()
 // * boundary constraints x >= 0, y >= 0
-// * starting point (x0,y0)=(10*MachineEpsilon,1.0)
+// * starting point (x0,y0) == (10*MachineEpsilon,1.0)
 //
 // Such problem contains small numerical noise. Without noise its
-// solution is (xs,ys)=(0,0), which is easy to find. However, presence
+// solution is (xs,ys) == (0,0), which is easy to find. However, presence
 // of the noise makes it hard to solve:
 // * noisy f(x,y) is monotonically decreasing only when we perform
 //   steps orders of magnitude larger than 10000*MachineEpsilon
@@ -29210,10 +29181,10 @@ static void testminbleicunit_testother(bool *err) {
 //
 // Consider following problem:
 // * boundary constraints x >= 0, y >= 0
-// * starting point (x0,y0)=(10*MachineEpsilon,1.0)
+// * starting point (x0,y0) == (10*MachineEpsilon,1.0)
 //            / (x+1)^2 + (y+1)^2,        for (x,y) != (x0,y0)
 // * f(x,y) = |
-//            \ (x+1)^2 + (y+1)^2 - 0.1,  for (x,y)=(x0,y0)
+//            \ (x+1)^2 + (y+1)^2 - 0.1,  for (x,y) == (x0,y0)
 //
 // Such problem contains deterministic numerical noise (-0.1 at
 // starting point). Without noise its solution is easy to find.
@@ -29458,8 +29429,8 @@ static void testminbleicunit_testother(bool *err) {
 // * generate random SPD matrix A with moderate condition number ~1E3
 //   and huge norm (about 1E9)
 // * generate random initial point x0 with unit norm
-// * generate single linear constraint c'*x >= c'*x0, with c=A*x0
-// * run BLEIC algorithm from initial point x0 for target function f=0.5*x'*A*x
+// * generate single linear constraint c'*x >= c'*x0, with c == A*x0
+// * run BLEIC algorithm from initial point x0 for target function f == 0.5*x'*A*x
 //   and check that it stops at x0 (less than 1E-12 away from it)
    n = 20;
    for (pass = 0; pass <= 20000; pass++) {
@@ -29570,9 +29541,9 @@ static void testminbleicunit_testconv(bool *err) {
 //   * -x+y <= 1.5
 //   * -x-y <= 1.5
 // * several target functions:
-//   * f0=x+0.001*y, minimum at x=-1, y=-0.5
-//   * f1=(x+10)^2+y^2, minimum at x=-1, y=0
-//   * f2=(x+10)^2+(y-0.6)^2, minimum at x=-1, y=0.5
+//   * f0 == x+0.001*y, minimum at x == -1, y == -0.5
+//   * f1 == (x+10)^2+y^2, minimum at x == -1, y == 0
+//   * f2 == (x+10)^2+(y-0.6)^2, minimum at x == -1, y == 0.5
    ae_vector_set_length(&x, 2);
    ae_vector_set_length(&bl, 2);
    ae_vector_set_length(&bu, 2);
@@ -29662,14 +29633,14 @@ static void testminbleicunit_testconv(bool *err) {
    }
 // Degenerate optimization problem with excessive constraints.
 //
-// * N=3..10, M=N div 3, K = 2*N
+// * N = 3..10, M == N div 3, K == 2*N
 // * f(x) = 0.5*|A*x-b|^2, where A is MxN random matrix, b is Mx1 random vector
 // * bound constraint:
-//   a) Ci=x[i]=Ci  for i=0..M-1
-//   b) 0 <= x[i] <= 1  for i=M..N-1
+//   a) Ci == x[i] == Ci for i = 0..M-1
+//   b) 0 <= x[i] <= 1   for i = M..N-1
 // * linear constraints (for fixed feasible xf and random ai):
-//   a) ai*x  = ai*xf                   for i=0..M-1
-//   b) ai*x <= ai*xf+random(0.1,1.0)   for i=M..K-1
+//   a) ai*x == ai*xf                 for i = 0..M-1
+//   b) ai*x <= ai*xf+random(0.1,1.0) for i = M..K-1
 // * preconditioner is chosen at random (we just want to be
 //   sure that preconditioning won't prevent us from detecting
 //   infeasible point):
@@ -29852,7 +29823,7 @@ static void testminbleicunit_testconv(bool *err) {
 // Convex/nonconvex optimization problem with excessive
 // (degenerate constraints):
 //
-// * N=2..8
+// * N = 2..8
 // * f = 0.5*x'*A*x+b'*x
 // * b has normally distributed entries with scale 10^BScale
 // * several kinds of A are tried: zero, well conditioned SPD, well conditioned indefinite, low rank
@@ -29984,14 +29955,14 @@ static void testminbleicunit_testconv(bool *err) {
 // Convex/nonconvex optimization problem with combination of
 // box and linear constraints:
 //
-// * N=2..8
+// * N = 2..8
 // * f = 0.5*x'*A*x+b'*x
 // * b has normally distributed entries with scale 10^BScale
 // * several kinds of A are tried: zero, well conditioned SPD,
 //   well conditioned indefinite, low rank
 // * box constraints: x[i] in [-1,+1]
 // * initial point x0 = [0 0 ... 0 0]
-// * CCnt=min(3,N-1) general linear constraints of form (c,x)=0.
+// * CCnt == min(3,N-1) general linear constraints of form (c,x) == 0.
 //   random mix of equality/inequality constraints is tried.
 //   x0 is guaranteed to be feasible.
 //
@@ -30207,13 +30178,13 @@ static void testminbleicunit_testpreconditioning(bool *err) {
 // If
 // * B1 is default preconditioner with unit scale
 // * G1 is diagonal preconditioner based on approximate diagonal of Hessian matrix
-// * B2 is default preconditioner with non-unit scale S[i]=1/sqrt(h[i])
-// * G2 is scale-based preconditioner with non-unit scale S[i]=1/sqrt(h[i])
+// * B2 is default preconditioner with non-unit scale S[i] == 1/sqrt(h[i])
+// * G2 is scale-based preconditioner with non-unit scale S[i] == 1/sqrt(h[i])
 // then B1 is worse than G1, B2 is worse than G2.
 // "Worse" means more iterations to converge.
 //
 // Test problem setup:
-// * f(x) = sum( ((i*i+1)*x[i])^2, i=0..N-1)
+// * f(x) = sum( ((i*i+1)*x[i])^2, i = 0..N-1)
 // * constraints:
 //   0) absent
 //   1) boundary only
@@ -30355,9 +30326,9 @@ static void testminbleicunit_testbugs(bool *err) {
 // in one of the early optimizer versions.
 //
 // The problem is:
-// * f(x)= x'*x + c'*x
-// * linear constraint c'*x=0
-// * initial point is x=0
+// * f(x) = x'*x + c'*x
+// * linear constraint c'*x == 0
+// * initial point is x == 0
 // * there are two ways to choose coefficient vector c:
 //   * its components can be long binary fractions
 //   * or they can be either 0 or 1
@@ -30922,7 +30893,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
    }
 // A test for detection of C1 continuity violations in the target.
 //
-// Target function is a sum of |(x,c_i)| for i=1..N.
+// Target function is a sum of |(x,c_i)| for i = 1..N.
 // No constraints is present.
 // Analytic gradient is provided.
 //
@@ -31048,7 +31019,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
    *wereerrors = *wereerrors || avglng0len <= avgstr0len;
    *wereerrors = *wereerrors || avglng1len <= avgstr1len;
 // Detection of C1 continuity violations in the target under numerical differentiation:
-// * target function is a sum of |(x,c_i)| for i=1..N.
+// * target function is a sum of |(x,c_i)| for i = 1..N.
 // * no constraints is present.
 // * analytic gradient is provided.
 //
@@ -31122,9 +31093,9 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
    *wereerrors = *wereerrors || failurecounter > maxfails;
 // Make sure than no false positives are reported for larger
 // problems where numerical noise can be an issue:
-// * N=100 dimensions
+// * N == 100 dimensions
 // * positive-definite quadratic programming problem
-// * upper limit on iterations count, MaxIts=25
+// * upper limit on iterations count, MaxIts == 25
 // We simply test that OptGuard does not return error code.
    n = 100;
    spdmatrixrndcond(n, 1.0E2, &a);
@@ -31259,9 +31230,9 @@ static void testminqpunit_setrandomalgobc(minqpstate *s) {
 // 'MinQPSetOrigin', 'MinQPSetStartingPoint', 'MinQPOptimize', 'MinQPResults'.
 //
 // Test problem:
-//     A = diag(aii), aii>0 (random)
+//     A = diag(aii), aii > 0 (random)
 //     b = 0
-//     random bounds (either no bounds, one bound, two bounds a<b, two bounds a=b)
+//     random bounds (either no bounds, one bound, two bounds a < b, two bounds a == b)
 //     random start point
 //     dimension - from 1 to 5.
 //
@@ -31678,7 +31649,7 @@ static bool consoletest() {
          minqpsetquadraticterm(&state, &a, false);
          for (j = 0; j < sn; j++) {
             xoric.xR[j] = 1.0;
-            printf("XoriC=%0.5f \n", xoric.xR[j]);
+            printf("XoriC == %0.5f \n", xoric.xR[j]);
          }
       // create linear part
          for (j = 0; j < sn; j++) {
@@ -31686,7 +31657,7 @@ static bool consoletest() {
             for (k = 0; k < sn; k++) {
                b.xR[j] -= xoric.xR[k] * a.xyR[k][j];
             }
-            printf("B[%0d]=%0.5f\n", (int)j, b.xR[j]);
+            printf("B[%0d] == %0.5f\n", (int)j, b.xR[j]);
          }
          minqpsetlinearterm(&state, &b);
          for (j = 0; j < sn; j++) {
@@ -31714,14 +31685,14 @@ static bool consoletest() {
             g.xR[j] = b.xR[j] + c + y0.xR[j] + y1.xR[j];
          }
          anti = testminqpunit_projectedantigradnorm(sn, &x, &b, &db, &ub);
-         printf("SN=%0d\n", (int)sn);
-         printf("NEXP=%0d\n", (int)i);
-         printf("TermType=%0d\n", (int)rep.terminationtype);
+         printf("SN == %0d\n", (int)sn);
+         printf("NEXP == %0d\n", (int)i);
+         printf("TermType == %0d\n", (int)rep.terminationtype);
          for (j = 0; j < sn; j++) {
-            printf("X[%0d]=%0.5f;\n", (int)j, x.xR[j]);
-            printf("DB[%0d]=%0.5f; UB[%0d]=%0.5f\n", (int)j, db.xR[j], (int)j, ub.xR[j]);
-            printf("XORi[%0d]=%0.5f; XORiC[%0d]=%0.5f;\n", (int)j, xori.xR[j], (int)j, xoric.xR[j]);
-            printf("Anti[%0d]=%0.5f;\n", (int)j, anti);
+            printf("X[%0d] == %0.5f;\n", (int)j, x.xR[j]);
+            printf("DB[%0d] == %0.5f; UB[%0d] == %0.5f\n", (int)j, db.xR[j], (int)j, ub.xR[j]);
+            printf("XORi[%0d] == %0.5f; XORiC[%0d] == %0.5f;\n", (int)j, xori.xR[j], (int)j, xoric.xR[j]);
+            printf("Anti[%0d] == %0.5f;\n", (int)j, anti);
             if (!SmallAtR(anti, eps)) {
                result = true;
                ae_frame_leave();
@@ -32306,7 +32277,7 @@ static bool quickqptests() {
 // phase can find good solution within one step. In order to do
 // so we:
 // * solve convex QP problem (dense or sparse)
-// * with K <= N equality-only constraints ai=x=bi
+// * with K <= N equality-only constraints ai == x == bi
 // * with number of outer iterations limited to just 1
 // * and with CG phase turned off (we modify internal structures
 //   of the QQP solver in order to make it)
@@ -32541,13 +32512,13 @@ static bool quickqptests() {
 //     (2) f = 0.5*y'*(inv(S)*A*inv(S))*y + (inv(S)*b)'*y
 //         (scale matrix S is used)
 //
-// Solution process is started from X=0, we perform ItsCnt=1 outer
+// Solution process is started from X == 0, we perform ItsCnt == 1 outer
 // iterations with Newton phase turned off (to slow down convergence;
 // we want to prevent algorithm from converging to exact solution which
 // is exactly same for both problems; the idea is to test that same
 // intermediate tests are taken).
 //
-// As result, we must get S*x=y
+// As result, we must get S*x == y
    eps = 1.0E-3;
    itscnt = 1;
    n = 100;
@@ -32587,7 +32558,7 @@ static bool quickqptests() {
 // Test that QQP can efficiently use sparse matrices (i.e. it is
 // not disguised version of some dense QP solver). In order to test
 // it we create very large and very sparse problem (diagonal matrix
-// with N=40.000) and perform 10 iterations of QQP solver.
+// with N == 40.000) and perform 10 iterations of QQP solver.
 //
 // In case QP solver uses some form of dense linear algebra to solve
 // this problem, it will take TOO much time to solve it. And we will
@@ -32710,8 +32681,8 @@ static bool bleictests() {
 //     (2) f = 0.5*y'*(inv(S)*A*inv(S))*y + (inv(S)*b)'*y
 //         (scale matrix S is used)
 //
-// Solution process is started from X=0, we perform ItsCnt=5 steps.
-// As result, we must get S*x=y
+// Solution process is started from X == 0, we perform ItsCnt == 5 steps.
+// As result, we must get S*x == y
    eps = 1.0E-3;
    itscnt = 5;
    n = 20;
@@ -32751,7 +32722,7 @@ static bool bleictests() {
 // Test that BLEIC can efficiently use sparse matrices (i.e. it is
 // not disguised version of some dense QP solver). In order to test
 // it we create very large and very sparse problem (diagonal matrix
-// with N=20.000) and perform 10 iterations of BLEIC-based QP solver.
+// with N == 20.000) and perform 10 iterations of BLEIC-based QP solver.
 //
 // In case QP solver uses some form of dense linear algebra to solve
 // this problem, it will take TOO much time to solve it. And we will
@@ -32777,8 +32748,8 @@ static bool bleictests() {
 //       [ 1 1 ... 1 1 ]
 // * A = [ ... ... ... ]
 //       [ 1 1 ... 1 1 ]
-// * random B such that SUM(b[i])=0.0 (important!)
-// * initial point x0 is chosen in such way that SUM(x[i])=0.0
+// * random B such that SUM(b[i]) == 0.0 (important!)
+// * initial point x0 is chosen in such way that SUM(x[i]) == 0.0
 //   (important!)
 //
 // We perform two tests:
@@ -33825,10 +33796,10 @@ static bool testminqpunit_ecqptest() {
    waserrors = false;
 // First test:
 // * N*N identity A
-// * K<N equality constraints Q*x = Q*x0, where Q is random
+// * K < N equality constraints Q*x = Q*x0, where Q is random
 //   orthogonal K*N matrix, x0 is some random vector
-// * x1 is some random vector such that Q*x1=0. It is always possible
-//   to find such x1, because K<N
+// * x1 is some random vector such that Q*x1 == 0. It is always possible
+//   to find such x1, because K < N
 // * optimization problem has form 0.5*x'*A*x-(x1*A)*x
 // * exact solution must be equal to x0
    eps = 1.0E-4;
@@ -33887,7 +33858,7 @@ static bool testminqpunit_ecqptest() {
    }
 // Second test:
 // * N*N SPD A
-// * K<N equality constraints Q*x = Q*x0, where Q is random
+// * K < N equality constraints Q*x = Q*x0, where Q is random
 //   orthogonal K*N matrix, x0 is some random vector
 // * optimization problem has form 0.5*x'*A*x-(x1*A)*x,
 //   where x1 is some random vector
@@ -33957,7 +33928,7 @@ static bool testminqpunit_ecqptest() {
 // Boundary and linear equality constrained QP problem:
 // * N*N SPD A with moderate condtion number (up to 100)
 // * boundary constraints 0 <= x[i] <= 1
-// * K<N equality constraints C*x = C*x0, where Q is random
+// * K < N equality constraints C*x = C*x0, where Q is random
 //   K*N matrix, x0 is some random vector from the
 //   feasible hypercube (0 <= x0[i] <= 1)
 // * optimization problem has form 0.5*x'*A*x-(x1*A)*x,
@@ -34031,8 +34002,8 @@ static bool testminqpunit_ecqptest() {
       // Solve problem using barrier functions (quadrative objective, boundary constraints,
       // explicit penalty term added to the main quadratic matrix. Lagrangian terms improve
       // solution quality):
-      // * A2 := A+C'*C
-      // * b2 := b-r'*C
+      // * A2 = A+C'*C
+      // * b2 = b-r'*C
       // * b2 is iteratively updated using augmented Lagrangian update
       //
       // NOTE: we may need many outer iterations to converge to the optimal values
@@ -34100,7 +34071,7 @@ static bool testminqpunit_ecqptest() {
 // test for correct handling of non-zero XOrigin:
 // * N*N SPD A with moderate condtion number (up to 100)
 // * boundary constraints 0 <= x[i] <= 1
-// * K<N equality constraints Q*x = Q*x0, where Q is random
+// * K < N equality constraints Q*x = Q*x0, where Q is random
 //   orthogonal K*N matrix, x0 is some random vector from the
 //   inner area of the feasible hypercube (0.1 <= x0[i] <= 0.9)
 // * optimization problem has form 0.5*(x-xorigin)'*A*(x-xorigin)+b*(x-xorigin),
@@ -34194,7 +34165,7 @@ static bool testminqpunit_ecqptest() {
 // equality constraints:
 // * N*N SPD A with moderate condtion number (up to 100)
 // * boundary constraints 0 <= x[i] <= 1
-// * K=2*N equality constraints Q*x = Q*x0, where Q is random matrix,
+// * K == 2*N equality constraints Q*x = Q*x0, where Q is random matrix,
 //   x0 is some random vector from the feasible hypercube (0.1 <= x0[i] <= 0.9)
 // * optimization problem has form 0.5*x'*A*x-b*x,
 //   where b is some random vector
@@ -34244,7 +34215,6 @@ static bool testminqpunit_ecqptest() {
       ae_vector_set_length(&xend, 0);
       minqpresults(&state, &xend, &rep);
    // Check feasibility properties of the solution
-   //
    // NOTE: we do not check termination type because some solvers (IPM) may return feasible X even with negative code
       if (xend.cnt != n) {
          waserrors = true;
@@ -34260,7 +34230,7 @@ static bool testminqpunit_ecqptest() {
 // * random N from [1..6], random K from [1..2*N]
 // * N*N SPD A with moderate condtion number (up to 100)
 // * boundary constraints 0 <= x[i] <= 1
-// * K<N random linear equality constraints C*x = C*x0,
+// * K < N random linear equality constraints C*x = C*x0,
 //   where x0 is some random vector from the inner area of the
 //   feasible hypercube (0.1 <= x0[i] <= 0.9)
 // * optimization problem has form 0.5*x'*A*x+b*x,
@@ -34349,7 +34319,7 @@ static bool testminqpunit_ecqptest() {
 // * subject to c'*x = c'*x0, with c and x0 random unit vectors
 // * with initial point xs = x0+r*xd, where r is scalar,
 //   xd is vector which is orthogonal to c.
-// * we try different r=power(2,-rk) for rk=0...70. The idea
+// * we try different r == power(2,-rk) for rk = 0...70. The idea
 //   is that as we approach closer and closer to x0, which is
 //   a solution of the constrained problem, constrained gradient
 //   of the function rapidly vanishes.
@@ -34476,8 +34446,8 @@ static void testminqpunit_icqptest(bool *err) {
 //   where x1 is some random vector
 // * either:
 //   a) x1 is feasible => we must stop at x1
-//   b) x1 is infeasible => we must stop at the boundary q'*x=0 and
-//      projection of gradient onto q*x=0 must be zero
+//   b) x1 is infeasible => we must stop at the boundary q'*x == 0 and
+//      projection of gradient onto q*x == 0 must be zero
 //
 // NOTE: we make several passes because some specific kind of errors is rarely
 //       caught by this test, so we need several repetitions.
@@ -34535,7 +34505,7 @@ static void testminqpunit_icqptest(bool *err) {
          } else {
          // X1 is infeasible:
          // * XEnd must be approximately feasible
-         // * gradient projection onto c'*x=0 must be zero
+         // * gradient projection onto c'*x == 0 must be zero
             v = ae_v_dotproduct(xend.xR, 1, c.xyR[0], 1, n);
             *err = *err || v < -eps;
             ae_vector_set_length(&g, n);
@@ -34555,7 +34525,7 @@ static void testminqpunit_icqptest(bool *err) {
 // test for correct handling of non-zero XOrigin:
 // * N*N SPD A with moderate condtion number (up to 100)
 // * boundary constraints 0 <= x[i] <= 1
-// * K<N linear equality/inequality constraints Q*x = Q*x0, where
+// * K < N linear equality/inequality constraints Q*x = Q*x0, where
 //   Q is random orthogonal K*N matrix, x0 is some random vector from the
 //   inner area of the feasible hypercube (0.1 <= x0[i] <= 0.9)
 // * optimization problem has form 0.5*(x-xorigin)'*A*(x-xorigin)+b*(x-xorigin),
@@ -34668,7 +34638,7 @@ static void testminqpunit_icqptest(bool *err) {
 // * N*N SPD A
 // * optimization problem has form 0.5*x'*A*x-(x1*A)*x,
 //   where x1 is some random vector from [-1,+1]
-// * K=2*N constraints of the form ai <= x[i] or x[i] <= b[i],
+// * K == 2*N constraints of the form ai <= x[i] or x[i] <= b[i],
 //   with ai in [-1.0,-0.1], bi in [+0.1,+1.0]
 // * initial point xstart is from [-1,+2]
 // * we solve two related QP problems:
@@ -34746,7 +34716,7 @@ static void testminqpunit_icqptest(bool *err) {
 //   * unit preconditioner
 //   * random diagonal-based preconditioner
 //   * random scale-based preconditioner
-// * F(x) = |x-x0|^P, where P={2,4} and x0 is randomly selected from [-1,+2]^N
+// * F(x) = |x-x0|^P, where P == {2,4} and x0 is randomly selected from [-1,+2]^N
 // * with such simple constraints and function it is easy to find
 //   analytic form of solution: S[i] = bound(x0[i], 0, 1).
 // * however, we can't guarantee that solution is strictly feasible
@@ -34809,7 +34779,7 @@ static void testminqpunit_icqptest(bool *err) {
 // excessive constraints:
 // * N*N SPD A with moderate condtion number (up to 100)
 // * boundary constraints 0 <= x[i] <= 1
-// * K=2*N equality/inequality constraints Q*x = Q*x0, where Q is random matrix,
+// * K == 2*N equality/inequality constraints Q*x = Q*x0, where Q is random matrix,
 //   x0 is some random vector from the feasible hypercube (0.1 <= x0[i] <= 0.9)
 // * optimization problem has form 0.5*x'*A*x-b*x,
 //   where b is some random vector
@@ -34867,7 +34837,6 @@ static void testminqpunit_icqptest(bool *err) {
       ae_vector_set_length(&xend, 0);
       minqpresults(&state, &xend, &rep);
    // Check feasibility properties of the solution
-   //
    // NOTE: we do not check termination type because some solvers (IPM) may return feasible X even with negative code
       if (xend.cnt != n) {
          *err = true;
@@ -34889,7 +34858,7 @@ static void testminqpunit_icqptest(bool *err) {
 // General inequality constrained problem:
 // * N*N SPD diagonal A with moderate condtion number
 // * no boundary constraints
-// * K=N inequality constraints C*x >= C*x0, where C is N*N well conditioned
+// * K == N inequality constraints C*x >= C*x0, where C is N*N well conditioned
 //   matrix, x0 is some random vector [-1,+1]
 // * optimization problem has form 0.5*x'*A*x-b'*x,
 //   where b is random vector from [-1,+1]
@@ -34999,7 +34968,7 @@ static void testminqpunit_icqptest(bool *err) {
 // * random N from [1..6], random K from [1..2*N]
 // * N*N SPD A with moderate condtion number (up to 100)
 // * boundary constraints 0 <= x[i] <= 1
-// * K<2*N linear inequality constraints Q*x <= Q*x0, where
+// * K < 2*N linear inequality constraints Q*x <= Q*x0, where
 //   Q is random K*N matrix, x0 is some random vector from the
 //   inner area of the feasible hypercube (0.1 <= x0[i] <= 0.9)
 // * optimization problem has form 0.5*x'*A*x+b*x,
@@ -35051,7 +35020,6 @@ static void testminqpunit_icqptest(bool *err) {
          }
       }
    // Solve with XStart
-   //
    // NOTE: we do not check termination type because some solvers (IPM) may return feasible X even with negative code
       minqpcreate(n, &state);
       testminqpunit_setrandomalgoconvexlc(&state);
@@ -35091,7 +35059,7 @@ static void testminqpunit_icqptest(bool *err) {
    }
 // Convex/nonconvex optimization problem with excessive constraints:
 //
-// * N=2..5
+// * N = 2..5
 // * f = 0.5*x'*A*x+b'*x
 // * b has normally distributed entries with scale 10^BScale
 // * several kinds of A are tried: zero, well conditioned SPD, well conditioned indefinite, low rank SPD, low rank indefinite
@@ -35241,14 +35209,14 @@ static void testminqpunit_icqptest(bool *err) {
 // Convex/nonconvex optimization problem with combination of
 // box and linear constraints:
 //
-// * N=2..8
+// * N = 2..8
 // * f = 0.5*x'*A*x+b'*x
 // * b has normally distributed entries with scale 10^BScale
 // * several kinds of A are tried: zero, well conditioned SPD,
 //   well conditioned indefinite, low rank semidefinite, low rank indefinite
 // * box constraints: x[i] in [-1,+1]
 // * initial point x0 = [0 0 ... 0 0]
-// * CCnt=min(3,N-1) general linear constraints of form (c,x)=0.
+// * CCnt == min(3,N-1) general linear constraints of form (c,x) == 0.
 //   random mix of equality/inequality constraints is tried.
 //   x0 is guaranteed to be feasible.
 //
@@ -36037,8 +36005,8 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    //   where xs is some random vector
    // * either:
    //   a) xs is feasible => we must stop at xs
-   //   b) xs is infeasible => we must stop at the boundary q'*x=0 and
-   //      projection of gradient onto q*x=0 must be zero
+   //   b) xs is infeasible => we must stop at the boundary q'*x == 0 and
+   //      projection of gradient onto q*x == 0 must be zero
    //
    // NOTE: we make several passes because some specific kind of errors is rarely
    //       caught by this test, so we need several repetitions.
@@ -36114,7 +36082,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             } else {
             // XS is infeasible:
             // * X1 must be approximately feasible
-            // * gradient projection onto c'*x=0 must be zero
+            // * gradient projection onto c'*x == 0 must be zero
                v = ae_v_dotproduct(x1.xR, 1, rawc.xyR[0], 1, n);
                *errorflag = *errorflag || v < -xtol;
                ae_vector_set_length(&g, n);
@@ -36134,7 +36102,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    // * N*N SPD A
    // * optimization problem has form 0.5*x'*A*x-(x1*A)*x,
    //   where x1 is some random vector from [-1,+1]
-   // * K=2*N constraints of the form ai <= x[i] or x[i] <= b[i],
+   // * K == 2*N constraints of the form ai <= x[i] or x[i] <= b[i],
    //   with ai in [-1.0,-0.1], bi in [+0.1,+1.0]
    // * initial point xstart is from [-1,+2]
    // * we solve two related QP problems:
@@ -36239,14 +36207,14 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    // Convex/nonconvex optimization problem with combination of
    // box and linear constraints:
    //
-   // * N=2..8
+   // * N = 2..8
    // * f = 0.5*x'*A*x+b'*x
    // * b has normally distributed entries with scale 10^BScale
    // * several kinds of A are tried: zero, well conditioned SPD,
    //   well conditioned definite, low rank semidefinity
    // * box constraints: x[i] in [-1,+1]
    // * initial point x0 = [0 0 ... 0 0]
-   // * CCnt=min(3,N-1) general linear constraints of form (c,x)=0.
+   // * CCnt == min(3,N-1) general linear constraints of form (c,x) == 0.
    //   random mix of equality/inequality constraints is tried, moderate
    //   condition number is guaranteed, x0 is guaranteed to be feasible.
    //
@@ -36259,7 +36227,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          for (akind = 0; akind <= 3; akind++) {
             for (bscale = 1; bscale >= -1; bscale--) {
             // Dense-AUL solver has lower precision on rank-deficient
-            // problems, so we skip AKind=3.
+            // problems, so we skip AKind == 3.
             //
             // IPM solvers can not work with indefinite problems.
                if (solvertype == 1 && akind == 3) {
@@ -36460,7 +36428,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    // test for correct handling of non-zero XOrigin:
    // * N*N SPD A with moderate condtion number (up to 100)
    // * boundary constraints 0 <= x[i] <= 1
-   // * K<N linear equality/inequality constraints Q*x = Q*x0, where
+   // * K < N linear equality/inequality constraints Q*x = Q*x0, where
    //   Q is random orthogonal K*N matrix, x0 is some random vector from the
    //   inner area of the feasible hypercube (0.1 <= x0[i] <= 0.9)
    // * optimization problem has form 0.5*(x-xorigin)'*A*(x-xorigin)+b*(x-xorigin),
@@ -36619,13 +36587,13 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    //
    // with correspondingly scaled constraints, origin and starting point.
    //
-   // As result, we must get S*x=y
+   // As result, we must get S*x == y
       for (n = 2; n <= 6; n++) {
          for (k = 1; k < imax2(n - 1, 2); k++) {
          // Set up tolerances:
          // * BLEIC or IPM do not guarantee that we perform steps exactly even
-         //   when scale is 2^k, so we use non-zero XTol=1E-3
-         // * DENSE-AUL provides such guarantee, so XTol=0
+         //   when scale is 2^k, so we use non-zero XTol == 1E-3
+         // * DENSE-AUL provides such guarantee, so XTol == 0
             if (solvertype == 0 || solvertype == 2 || solvertype == 3) {
                xtol = 1.0E-3;
             } else {
@@ -36792,7 +36760,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    // General inequality constrained problem:
    // * N*N SPD diagonal A with moderate condtion number
    // * no boundary constraints
-   // * K=N inequality constraints C*x >= C*x0, where C is N*N well conditioned
+   // * K == N inequality constraints C*x >= C*x0, where C is N*N well conditioned
    //   matrix, x0 is some random vector [-1,+1]
    // * optimization problem has form 0.5*x'*A*x-b'*x,
    //   where b is random vector from [-1,+1]
@@ -36918,7 +36886,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    // excessive constraints:
    // * N*N SPD A with moderate condtion number (up to 100)
    // * boundary constraints 0 <= x[i] <= 1
-   // * K=2*N equality/inequality constraints Q*x = Q*x0, where Q is random matrix,
+   // * K == 2*N equality/inequality constraints Q*x = Q*x0, where Q is random matrix,
    //   x0 is some random vector from the feasible hypercube (0.1 <= x0[i] <= 0.9)
    // * optimization problem has form 0.5*x'*A*x-b*x,
    //   where b is some random vector
@@ -37001,7 +36969,6 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          ae_vector_set_length(&x1, 0);
          minqpresults(&state, &x1, &rep);
       // Check feasibility properties of the solution
-      //
       // NOTE: we do not check termination type because some solvers (IPM) may return feasible X even with negative code
          if (x1.cnt != n) {
             *errorflag = true;
@@ -37023,7 +36990,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    // Boundary constraints posed as general linear ones:
    // * no bound constraints
    // * 2*N linear constraints 0 <= x[i] <= 1
-   // * F(x) = |x-x0|^P, where P={2,4} and x0 is randomly selected from [-1,+2]^N
+   // * F(x) = |x-x0|^P, where P == {2,4} and x0 is randomly selected from [-1,+2]^N
    // * with such simple constraints and function it is easy to find
    //   analytic form of solution: S[i] = bound(x0[i], 0, 1).
    // * however, we can't guarantee that solution is strictly feasible
@@ -37111,7 +37078,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       }
    // Convex optimization problem with excessive constraints:
    //
-   // * N=2..5
+   // * N = 2..5
    // * f = 0.5*x'*A*x+b'*x
    // * b has normally distributed entries
    // * A is diagonal with log-normally distributed entries
@@ -37229,7 +37196,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    // and Lagrange coefficients, and then generate quadratic and linear term
    // which satisfy KKT conditions for given Lagrange coefficients):
    //
-   // * N=2..8
+   // * N = 1..8
    // * f = 0.5*x'*A*x+b'*x
    // * several kinds of A are tried: zero, well conditioned SPD, low rank
    // * initial point x0 = [0 0 ... 0 0]
@@ -37312,7 +37279,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                   rawc.xyR[i][j] = v;
                }
             }
-         // Generate Lagrange multipliers, with at most NActive<N being non-zero
+         // Generate Lagrange multipliers, with at most NActive < N being non-zero
             ae_vector_set_length(&lagbc, n);
             ae_vector_set_length(&laglc, rawccnt);
             for (i = 0; i < n; i++) {
@@ -37423,7 +37390,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             }
          // Completely skip some solvers depending on their properties:
          // * Dense-AUL solver has lower precision on rank-deficient
-         //   problems, so we skip AKind=0 and AKind=2.
+         //   problems, so we skip AKind == 0 and AKind == 2.
          // * BLEIC solver is always skipped
             if (solvertype == 1 && akind != 1) {
                continue;
@@ -37505,7 +37472,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    // General equality constrained problem:
    // * N*N SPD (non-diagonal) A with moderate condition number
    // * no box constraints
-   // * K<N equality constraints C*x = C*x0, where C is K*N well conditioned
+   // * K < N equality constraints C*x = C*x0, where C is K*N well conditioned
    //   matrix, x0 is some random vector [-1,+1]
    // * optimization problem has form 0.5*x'*A*x-b'*x,
    //   where b is random vector from [-1,+1]
@@ -37596,7 +37563,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    // General inequality constrained problem:
    // * N*N SPD diagonal A with moderate condtion number
    // * no box constraints
-   // * K<N inequality constraints C*x >= C*x0, where C is N*N well conditioned
+   // * K < N inequality constraints C*x >= C*x0, where C is N*N well conditioned
    //   matrix, x0 is some random vector [-1,+1]
    // * optimization problem has form 0.5*x'*A*x-b'*x,
    //   where b is random vector from [-1,+1]
@@ -38555,7 +38522,7 @@ static void testminqpunit_ipmtests(bool *errorflag) {
 // and Lagrange coefficients, and then generate quadratic and linear term
 // which satisfy KKT conditions for given Lagrange coefficients):
 //
-// * N=2..8
+// * N = 1..8
 // * f = 0.5*x'*A*x+b'*x
 // * several kinds of A are tried: zero, well conditioned SPD, low rank
 // * initial point x0 = [0 0 ... 0 0]
@@ -39091,14 +39058,14 @@ bool testminqp() {
 // Returns False otherwise.
 //
 // RKind is an algorithm selector:
-// * -2 = V, AccType=1
-// * -1 = V, AccType=0
+// * -2 = V, AccType == 1
+// * -1 = V, AccType == 0
 // *  0 = FJ
 // *  1 = FGJ
 // *  2 = FGH
-// *  3 = VJ, AccType=0
-// *  4 = VJ, AccType=1
-// *  5 = VJ, AccType=2
+// *  3 = VJ, AccType == 0
+// *  4 = VJ, AccType == 1
+// *  5 = VJ, AccType == 2
 //
 static bool testminlmunit_rkindvsstatecheck(ae_int_t rkind, minlmstate *state) {
    ae_int_t nset;
@@ -40115,7 +40082,7 @@ static void testminlmunit_testlc(bool *errorflag) {
 // coefficients (c0_ij and c1_ij, M1*N and M2*N matrices) subject
 // to equality constraint
 //
-//     x0_j=x1_j for all j
+//     x0_j == x1_j for all j
 //
 // Such optimization problem arises when we fit same model to
 // two distinct datasets and want to share SOME of coefficients
@@ -40775,7 +40742,7 @@ bool testminlm() {
    testminlmunit_testlc(&lcerrors);
 // Try to reproduce previously fixed bugs
    testminlmunit_tryreproducefixedbugs(&othererrors);
-//  Test for MinLMGradientCheck
+// Test for MinLMGradientCheck
    optguarderr = false;
    testminlmunit_testoptguard(&optguarderr);
 // end
@@ -41103,7 +41070,7 @@ static void testother(bool *err) {
    // problem:
    //
    //     min f(x) subject to no constraints on X
-   //            { 1/(1-x) + 1/(1+x) + c*x, if -0.999999<x<0.999999
+   //            { 1/(1-x) + 1/(1+x) + c*x, if -0.999999 < x < 0.999999
    //     f(x) = {
    //            { M, if x <= -0.999999 or x >= 0.999999
    //
@@ -41314,7 +41281,7 @@ static void testmincgunit_testfunc3(mincgstate *state) {
 
 // Calculate test function IIP2
 //
-// f(x) = sum( ((i*i+1)*x[i])^2, i=0..N-1)
+// f(x) = sum( ((i*i+1)*x[i])^2, i = 0..N-1)
 //
 // It has high condition number which makes fast convergence unlikely without
 // good preconditioner.
@@ -41398,7 +41365,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
    // "Worse" means more iterations to converge.
    //
    //
-   // We test it using f(x) = sum( ((i*i+1)*x[i])^2, i=0..N-1).
+   // We test it using f(x) = sum( ((i*i+1)*x[i])^2, i = 0..N-1).
    //
    // N        - problem size
    // K        - number of repeated passes (should be large enough to average out random factors)
@@ -41505,8 +41472,8 @@ static void testmincgunit_testpreconditioning(bool *err) {
    // Preconditioner test 3.
    //
    // If
-   // * B2 is default preconditioner with non-unit scale S[i]=1/sqrt(h[i])
-   // * G2 is scale-based preconditioner with non-unit scale S[i]=1/sqrt(h[i])
+   // * B2 is default preconditioner with non-unit scale S[i] == 1/sqrt(h[i])
+   // * G2 is scale-based preconditioner with non-unit scale S[i] == 1/sqrt(h[i])
    // then B2 is worse than G2.
    // "Worse" means more iterations to converge.
       for (n = 10; n <= 15; n++) {
@@ -41952,7 +41919,7 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
    }
 // A test for detection of C1 continuity violations in the target.
 //
-// Target function is a sum of |(x,c_i)| for i=1..N.
+// Target function is a sum of |(x,c_i)| for i = 1..N.
 // No constraints is present.
 // Analytic gradient is provided.
 //
@@ -42078,7 +42045,7 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
    *wereerrors = *wereerrors || avglng0len <= avgstr0len;
    *wereerrors = *wereerrors || avglng1len <= avgstr1len;
 // Detection of C1 continuity violations in the target under numerical differentiation:
-// * target function is a sum of |(x,c_i)| for i=1..N.
+// * target function is a sum of |(x,c_i)| for i = 1..N.
 // * no constraints is present.
 // * analytic gradient is provided.
 //
@@ -42152,9 +42119,9 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
    *wereerrors = *wereerrors || failurecounter > maxfails;
 // Make sure than no false positives are reported for larger
 // problems where numerical noise can be an issue:
-// * N=100 dimensions
+// * N == 100 dimensions
 // * positive-definite quadratic programming problem
-// * upper limit on iterations count, MaxIts=25
+// * upper limit on iterations count, MaxIts == 25
 // We simply test that OptGuard does not return error code.
    n = 100;
    spdmatrixrndcond(n, 1.0E2, &a);
@@ -42457,7 +42424,7 @@ bool testmincg() {
          converror = converror || !(rep.terminationtype == 5 && rep.iterationscount == 10 || rep.terminationtype == 7);
       }
    }
-//  Test for MinCGGradientCheck
+// Test for MinCGGradientCheck
    optguarderr = false;
    testmincgunit_testoptguard(&optguarderr);
 // end
@@ -43641,7 +43608,7 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix *a, RVe
                }
             }
          // Possibly nonexistent elements are added as +V and -V
-         // Do not performed for NZ=0 rows because it may introduce slightly nonzero coefficients
+         // Do not performed for NZ == 0 rows because it may introduce slightly nonzero coefficients
          // to exactly zero row (constraint normalization goes crazy).
             ndup = hqrnduniformi(rs, 2) * hqrnduniformi(rs, 4);
             if (nz == 0) {
@@ -43952,8 +43919,8 @@ static void testminlpunit_singlecalltests(bool *err) {
 // Check SetBCAll() and SetBCi()
 //
 // We generate random problem with box constraints
-// L <= x[i] <= U, with L<0<U, and random linear constraints
-// feasible at x=0.
+// L <= x[i] <= U, with L < 0 < U, and random linear constraints
+// feasible at x == 0.
 //
 // In order to test SetBCAll() we solve it two times,
 // first one with box constraints specified via setbc(),
@@ -44448,11 +44415,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
    hqrndrandomize(&rs);
    for (solvertype = 0; solvertype <= testminnlcunit_maxsolvertype; solvertype++) {
    // First test:
-   // * K<N equality constraints Q*x = Q*x0, where Q is random
+   // * K < N equality constraints Q*x = Q*x0, where Q is random
    //   orthogonal K*N matrix, x0 is some random vector
    // * quadratic programming problem with identity quadratic term A and
    //   linear term equal to xm*A, where xm is some random vector such
-   //   that Q*xm=0. It is always possible to find such xm, because K<N
+   //   that Q*xm == 0. It is always possible to find such xm, because K < N
    //   Thus, optimization problem has form 0.5*x'*I*x-xm'*x.
    // * exact solution must be equal to x0
    //
@@ -44582,8 +44549,8 @@ static void testminnlcunit_testlc(bool *wereerrors) {
    //   where x1 is some random vector
    // * either:
    //   a) x1 is feasible => we must stop at x1
-   //   b) x1 is infeasible => we must stop at the boundary q'*x=0 and
-   //      projection of gradient onto q*x=0 must be zero
+   //   b) x1 is infeasible => we must stop at the boundary q'*x == 0 and
+   //      projection of gradient onto q*x == 0 must be zero
    //
    // NOTE: we make several passes because some specific kind of errors is rarely
    //       caught by this test, so we need several repetitions.
@@ -44721,7 +44688,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
       }
    // Equality-constrained test:
    // * N*N SPD A
-   // * K<N equality constraints Q*x = Q*x0, where Q is random
+   // * K < N equality constraints Q*x = Q*x0, where Q is random
    //   orthogonal K*N matrix, x0 is some random vector
    // * optimization problem has form 0.5*x'*A*x-(xm*A)*x,
    //   where xm is some random vector
@@ -44830,7 +44797,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
    // * N*N SPD A
    // * optimization problem has form 0.5*x'*A*x-(xm*A)*x,
    //   where xm is some random vector from [-1,+1]
-   // * K=2*N constraints of the form ai <= x[i] or x[i] <= b[i],
+   // * K == 2*N constraints of the form ai <= x[i] or x[i] <= b[i],
    //   with ai in [-1.0,-0.1], bi in [+0.1,+1.0]
    // * initial point xstart is from [-1,+2]
    // * we solve two related QP problems:
@@ -44967,7 +44934,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
    // equality constraints:
    // * N*N SPD A with moderate condtion number (up to 100)
    // * boundary constraints 0 <= x[i] <= 1
-   // * K=2*N equality constraints Q*x = Q*x0, where Q is random matrix,
+   // * K == 2*N equality constraints Q*x = Q*x0, where Q is random matrix,
    //   x0 is some random vector from the feasible hypercube (0.1 <= x0[i] <= 0.9)
    // * optimization problem has form 0.5*x'*A*x-b*x,
    //   where b is some random vector
@@ -45059,7 +45026,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
    // excessive constraints:
    // * N*N SPD A with moderate condtion number (up to 100)
    // * boundary constraints 0 <= x[i] <= 1
-   // * K=2*N equality/inequality constraints:
+   // * K == 2*N equality/inequality constraints:
    //   * N/2 equality ones q'*x = q'*xm for random vector q
    //   * the rest are inequality ones, feasible at xm (xm is an inner point for these constraints)
    //   where xm is some random vector from the feasible hypercube (0.1 <= xm[i] <= 0.9)
@@ -45179,7 +45146,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
    // * random N from [1..6], random K from [1..N-1]
    // * N*N SPD A with moderate condtion number (important!)
    // * boundary constraints 0 <= x[i] <= 1
-   // * K<N random linear equality constraints C*x = C*x0,
+   // * K < N random linear equality constraints C*x = C*x0,
    //   where x0 is some random vector from the inner area of the
    //   feasible hypercube (0.1 <= x0[i] <= 0.9)
    // * optimization problem has form 0.5*x'*A*x+b*x,
@@ -45308,7 +45275,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
    // Convex/nonconvex optimization problem with excessive
    // (degenerate constraints):
    //
-   // * N=2..7
+   // * N = 2..7
    // * f = 0.5*x'*A*x+b'*x
    // * b has normally distributed entries with scale 10^BScale
    // * several kinds of A are tried: zero, well conditioned SPD, well conditioned indefinite, low rank
@@ -45462,13 +45429,13 @@ static void testminnlcunit_testlc(bool *wereerrors) {
    // Linear/convex optimization problem with combination of
    // box and linear constraints:
    //
-   // * N=2..8
+   // * N = 2..8
    // * f = 0.5*x'*A*x+b'*x
    // * b has normally distributed entries with scale 10^BScale
    // * several kinds of A are tried: zero, well conditioned SPD
    // * box constraints: x[i] in [-1,+1]
    // * initial point x0 = [0 0 ... 0 0]
-   // * CCnt=min(3,N-1) general linear constraints of form (c,x)=0.
+   // * CCnt == min(3,N-1) general linear constraints of form (c,x) == 0.
    //   random mix of equality/inequality constraints is tried.
    //   x0 is guaranteed to be feasible.
    //
@@ -45946,13 +45913,13 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
    //   only pair of adjacent variables (x0/x1, x2/x3, x4/x5 and so on), and each
    //   pair of variables has at most one constraint which binds them
    // * for variables u and v following kinds of constraints can be randomly set:
-   //   * CKind=0      no constraint
-   //   * CKind=1      boundary equality constraint:    u=a, v=b
-   //   * CKind=2      boundary inequality constraint:  a0 <= u <= b0, a1 <= v <= b1
-   //   * CKind=3      linear equality constraint:      a*u+b*v  = c
-   //   * CKind=4      linear inequality constraint:    a*u+b*v <= c
-   //   * CKind=5      nonlinear equality constraint:   u^2+v^2  = 1
-   //   * CKind=6      nonlinear inequality constraint: u^2+v^2 <= 1
+   //   * CKind == 0      no constraint
+   //   * CKind == 1      boundary equality constraint:    u == a, v == b
+   //   * CKind == 2      boundary inequality constraint:  a0 <= u <= b0, a1 <= v <= b1
+   //   * CKind == 3      linear equality constraint:      a*u+b*v  = c
+   //   * CKind == 4      linear inequality constraint:    a*u+b*v <= c
+   //   * CKind == 5      nonlinear equality constraint:   u^2+v^2  = 1
+   //   * CKind == 6      nonlinear inequality constraint: u^2+v^2 <= 1
    // * it is relatively easy to calculated projected gradient for such problem
       aulits = 50;
       rho = 200.0;
@@ -46595,7 +46562,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
    // * test that analytic Jacobian respects them
    // * test that numerical Jacobian respects them
    //
-   // NOTE: we skip SolverType=0 (AUL) because AUL optimizer
+   // NOTE: we skip SolverType == 0 (AUL) because AUL optimizer
    //       does not provide such guarantee
       if (solvertype != 0) {
          n = 10;
@@ -48066,10 +48033,10 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
       }
    // Make sure than no false positives are reported for larger
    // problems where numerical noise can be an issue:
-   // * N=100 dimensions
+   // * N == 100 dimensions
    // * nonnegativity constraints
    // * positive-definite quadratic programming problem
-   // * upper limit on iterations count, MaxIts=25
+   // * upper limit on iterations count, MaxIts == 25
    // We simply test that OptGuard does not return error code.
       n = 100;
       spdmatrixrndcond(n, 1.0E2, &a);
@@ -48302,7 +48269,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
       }
    // One more test for detection of C1 continuity violations in the target.
    //
-   // Target function is a sum of |(x,c_i)| for i=1..N.
+   // Target function is a sum of |(x,c_i)| for i = 1..N.
    // No constraints is present.
    // Analytic gradient is provided.
    //
@@ -48443,7 +48410,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
       *wereerrors = *wereerrors || avglng0len <= avgstr0len;
       *wereerrors = *wereerrors || avglng1len <= avgstr1len;
    // Detection of C1 continuity violations in the target under numerical differentiation:
-   // * target function is a sum of |(x,c_i)| for i=1..N.
+   // * target function is a sum of |(x,c_i)| for i = 1..N.
    // * no constraints is present.
    // * analytic gradient is provided.
    //
@@ -48804,7 +48771,7 @@ static void testminnsunit_basictest0uc(bool *errors) {
 //     minimize [ 10*|x0^2-x1| + (1-x0)^2 + 100*max(sqrt(2)*x0-1,0) + 100*max(2*x1-1,0) ]
 //              [                                                                       ]
 //
-// Its exact solution is x0=1/sqrt(2), x1=1/2
+// Its exact solution is x0 == 1/sqrt(2), x1 == 1/2
 static void testminnsunit_basictest1uc(bool *errors) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -48918,7 +48885,7 @@ static void testminnsunit_basictest0bc(bool *errors) {
 //
 //     s.t. x0 <= 1/sqrt(2), x1 <= 0.5
 //
-// Its exact solution is x0=1/sqrt(2), x1=1/2
+// Its exact solution is x0 == 1/sqrt(2), x1 == 1/2
 static void testminnsunit_basictest1bc(bool *errors) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -49047,7 +49014,7 @@ static void testminnsunit_basictest0lc(bool *errors) {
 //
 //     s.t. x0 <= 1/sqrt(2), x1 <= 0.5
 //
-// Its exact solution is x0=1/sqrt(2), x1=1/2
+// Its exact solution is x0 == 1/sqrt(2), x1 == 1/2
 static void testminnsunit_basictest1lc(bool *errors) {
    ae_frame _frame_block;
    ae_int_t n;
@@ -49538,7 +49505,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
 //   rounding-related issues
 // * non-negativity box constraints
 // * unit scale is used
-// * extreme stopping criteria (EpsX=1.0E-12)
+// * extreme stopping criteria (EpsX == 1.0E-12)
 // * single pass for each problem size
 // * check that constrained gradient at solution is small
    conda = 1.0E3;
@@ -50401,10 +50368,10 @@ static void testminnsunit_testother(bool *othererrors) {
    NewObj(minnsstate, state);
    NewObj(minnsreport, rep);
 // First test:
-// * 2D problem, minimization of F(x0,x1)=x1
+// * 2D problem, minimization of F(x0,x1) == x1
 // * two constraints, with wildly different magnitudes
-//   * G0(x0,x1)=Rho*Abs(x0+x1)=0
-//   * H0(x0,x1)=Rho*(x0-1000) <= 0
+//   * G0(x0,x1) == Rho*Abs(x0+x1) == 0
+//   * H0(x0,x1) == Rho*(x0-1000) <= 0
 //   where Rho is some large value
 //
 // Optimizer should be able to deal with situation when
@@ -50526,7 +50493,7 @@ static const ae_int_t testminbcunit_maxoptguardlevel = 1;
 
 // Calculate test function IIP2
 //
-// f(x) = sum( ((i*i+1)^FK*x[i])^2, i=0..N-1)
+// f(x) = sum( ((i*i+1)^FK*x[i])^2, i = 0..N-1)
 //
 // It has high condition number which makes fast convergence unlikely without
 // good preconditioner.
@@ -50545,9 +50512,9 @@ static void testminbcunit_calciip2(minbcstate *state, ae_int_t n, ae_int_t fk) {
 }
 
 // This function sets random preconditioner:
-// * unit one, for PrecKind=0
-// * diagonal-based one, for PrecKind=1
-// * scale-based one, for PrecKind=2
+// * unit one, for PrecKind == 0
+// * diagonal-based one, for PrecKind == 1
+// * scale-based one, for PrecKind == 2
 static void testminbcunit_setrandompreconditioner(minbcstate *state, ae_int_t n, ae_int_t preckind) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -50614,7 +50581,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
    //   * unit preconditioner
    //   * random diagonal-based preconditioner
    //   * random scale-based preconditioner
-   // * F(x) = |x-x0|^P, where P={2,4} and x0 is randomly selected from [-1,+2]^N
+   // * F(x) = |x-x0|^P, where P == {2,4} and x0 is randomly selected from [-1,+2]^N
    // * with such simple boundaries and function it is easy to find
    //   analytic form of solution: S[i] = bound(x0[i], 0, 1)
    // * we also check that both final solution and subsequent iterates
@@ -50683,7 +50650,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
          }
       }
    // Same as previous problem, but with minor modifications:
-   // * some bound constraints are 0 <= x[i] <= 1, some are Ci=x[i]=Ci
+   // * some bound constraints are 0 <= x[i] <= 1, some are Ci == x[i] == Ci
    // * no linear constraints
    // * preconditioner is chosen at random (we just want to be
    //   sure that preconditioning won't prevent us from converging
@@ -50691,7 +50658,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
    //   * unit preconditioner
    //   * random diagonal-based preconditioner
    //   * random scale-based preconditioner
-   // * F(x) = |x-x0|^P, where P={2,4} and x0 is randomly selected from [-1,+2]^N
+   // * F(x) = |x-x0|^P, where P == {2,4} and x0 is randomly selected from [-1,+2]^N
    // * with such simple boundaries and function it is easy to find
    //   analytic form of solution: S[i] = bound(x0[i], 0, 1)
    // * we also check that both final solution and subsequent iterates
@@ -50774,7 +50741,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
    //   * unit preconditioner
    //   * random diagonal-based preconditioner
    //   * random scale-based preconditioner
-   // * F(x) = |x-x0|^P, where P={2,4} and x0 is randomly selected from [-1,+2]^N
+   // * F(x) = |x-x0|^P, where P == {2,4} and x0 is randomly selected from [-1,+2]^N
    // * algorithm must return correct error code on such problem
       for (preckind = 0; preckind <= 2; preckind++) {
          for (pkind = 1; pkind <= 2; pkind++) {
@@ -50887,11 +50854,11 @@ static void testminbcunit_testother(bool *err) {
 //
 // subject to
 //
-//     x[i] >= 0, for i=0..n-1
+//     x[i] >= 0, for i = 0..n-1
 //
 // with initial point
 //
-//     x[0] = 1.0E-100, x[1]=x[2]=...=0.5
+//     x[0] = 1.0E-100, x[1] == x[2] == ... == 0.5
 //
 // We try to reproduce this problem in different settings:
 // * boundary-only constraints - we test that completion code is positive,
@@ -51160,7 +51127,7 @@ static void testminbcunit_testother(bool *err) {
 // problem:
 //
 //     min f(x) subject to no constraints on X
-//            { 1/(1-x) + 1/(1+x) + c*x, if -0.999999<x<0.999999
+//            { 1/(1-x) + 1/(1+x) + c*x, if -0.999999 < x < 0.999999
 //     f(x) = {
 //            { M, if x <= -0.999999 or x >= 0.999999
 //
@@ -51218,10 +51185,10 @@ static void testminbcunit_testother(bool *err) {
 // Consider following problem:
 // * f(x,y) = (x+1)^2 + (y+1)^2 + 10000*MachineEpsilon*RandomReal()
 // * boundary constraints x >= 0, y >= 0
-// * starting point (x0,y0)=(10*MachineEpsilon,1.0)
+// * starting point (x0,y0) == (10*MachineEpsilon,1.0)
 //
 // Such problem contains small numerical noise. Without noise its
-// solution is (xs,ys)=(0,0), which is easy to find. However, presence
+// solution is (xs,ys) == (0,0), which is easy to find. However, presence
 // of the noise makes it hard to solve:
 // * noisy f(x,y) is monotonically decreasing only when we perform
 //   steps orders of magnitude larger than 10000*MachineEpsilon
@@ -51278,10 +51245,10 @@ static void testminbcunit_testother(bool *err) {
 //
 // Consider following problem:
 // * boundary constraints x >= 0, y >= 0
-// * starting point (x0,y0)=(10*MachineEpsilon,1.0)
+// * starting point (x0,y0) == (10*MachineEpsilon,1.0)
 //            / (x+1)^2 + (y+1)^2,        for (x,y) != (x0,y0)
 // * f(x,y) = |
-//            \ (x+1)^2 + (y+1)^2 - 0.1,  for (x,y)=(x0,y0)
+//            \ (x+1)^2 + (y+1)^2 - 0.1,  for (x,y) == (x0,y0)
 //
 // Such problem contains deterministic numerical noise (-0.1 at
 // starting point). Without noise its solution is easy to find.
@@ -51480,13 +51447,13 @@ static void testminbcunit_testpreconditioning(bool *err) {
 // If
 // * B1 is default preconditioner with unit scale
 // * G1 is diagonal preconditioner based on approximate diagonal of Hessian matrix
-// * B2 is default preconditioner with non-unit scale S[i]=1/sqrt(h[i])
-// * G2 is scale-based preconditioner with non-unit scale S[i]=1/sqrt(h[i])
+// * B2 is default preconditioner with non-unit scale S[i] == 1/sqrt(h[i])
+// * G2 is scale-based preconditioner with non-unit scale S[i] == 1/sqrt(h[i])
 // then B1 is worse than G1, B2 is worse than G2.
 // "Worse" means more iterations to converge.
 //
 // Test problem setup:
-// * f(x) = sum( ((i*i+1)*x[i])^2, i=0..N-1)
+// * f(x) = sum( ((i*i+1)*x[i])^2, i = 0..N-1)
 // * constraints:
 //   0) absent
 //   1) box
@@ -52001,7 +51968,7 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
    }
 // A test for detection of C1 continuity violations in the target.
 //
-// Target function is a sum of |(x,c_i)| for i=1..N.
+// Target function is a sum of |(x,c_i)| for i = 1..N.
 // No constraints is present.
 // Analytic gradient is provided.
 //
@@ -52127,7 +52094,7 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
    *wereerrors = *wereerrors || avglng0len <= avgstr0len;
    *wereerrors = *wereerrors || avglng1len <= avgstr1len;
 // Detection of C1 continuity violations in the target under numerical differentiation:
-// * target function is a sum of |(x,c_i)| for i=1..N.
+// * target function is a sum of |(x,c_i)| for i = 1..N.
 // * no constraints is present.
 // * analytic gradient is provided.
 //
@@ -52201,9 +52168,9 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
    *wereerrors = *wereerrors || failurecounter > maxfails;
 // Make sure than no false positives are reported for larger
 // problems where numerical noise can be an issue:
-// * N=100 dimensions
+// * N == 100 dimensions
 // * positive-definite quadratic programming problem
-// * upper limit on iterations count, MaxIts=25
+// * upper limit on iterations count, MaxIts == 25
 // We simply test that OptGuard does not return error code.
    n = 100;
    spdmatrixrndcond(n, 1.0E2, &a);
@@ -52412,7 +52379,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
    NewVector(qmax, 0, DT_REAL);
    qcount = 10;
    ae_assert(n > 0, "Assertion failed");
-// Tol - roundoff error tolerance (for ' >= ' comparisons)
+// Tol - roundoff error tolerance (for '>=' comparisons)
    errtol = 100000.0 * machineepsilon;
 // Evaluate bounding box and spread.
    ae_vector_set_length(&boxmin, nx);
@@ -53055,7 +53022,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix *xy, ae_int_t n, ae_i
 // * self-match - nearest neighbor of each point in XY is the point itself
 // * no self-match - nearest neighbor is NOT the point itself
    if (n > 1) {
-   // test for N=1 have non-general form, but it is not really needed
+   // test for N == 1 have non-general form, but it is not really needed
       for (task = 0; task <= 1; task++) {
          for (i = 0; i < n; i++) {
             ae_v_move(ptx.xR, 1, xy->xyR[i], 1, nx);
@@ -53449,7 +53416,7 @@ bool testodesolver() {
 //
 //     y(0)   = 0
 //     dy/dx  = f(x,y)
-//     f(x,y) = 0,   x<1
+//     f(x,y) = 0,   x < 1
 //              x-1, x >= 1
 //
 // with BOTH absolute and fractional tolerances.
@@ -53634,7 +53601,7 @@ static void testinverseupdateunit_generaterandomorthogonalmatrix(RMatrix *a0, ae
    // A * (I - 2 vv'/v'v ) =
    //   = A - (2/v'v) * A * v * v' =
    //   = A - (2/v'v) * w * v'
-   //  where w = Av
+   // where w = Av
       for (i = 1; i <= s; i++) {
          t = ae_v_dotproduct(&a.xyR[i][1], 1, &v.xR[1], 1, s);
          w.xR[i] = t;
@@ -54731,9 +54698,9 @@ bool testgq() {
    nonstricterrtol = 1.0E-6;
    stricterrtol = 1000.0 * machineepsilon;
 // Three tests for rec-based Gauss quadratures with known weights/nodes:
-// 1. Gauss-Legendre with N=2
-// 2. Gauss-Legendre with N=5
-// 3. Gauss-Chebyshev with N=1, 2, 4, 8, ..., 512
+// 1. Gauss-Legendre with N == 2
+// 2. Gauss-Legendre with N == 5
+// 3. Gauss-Chebyshev with N = 1, 2, 4, 8, ..., 512
    err = 0.0;
    ae_vector_set_length(&alpha, 2);
    ae_vector_set_length(&beta, 2);
@@ -54809,9 +54776,9 @@ bool testgq() {
    }
    recerrors = recerrors || err > errtol;
 // Three tests for rec-based Gauss-Lobatto quadratures with known weights/nodes:
-// 1. Gauss-Lobatto with N=3
-// 2. Gauss-Lobatto with N=4
-// 3. Gauss-Lobatto with N=6
+// 1. Gauss-Lobatto with N == 3
+// 2. Gauss-Lobatto with N == 4
+// 3. Gauss-Lobatto with N == 6
    err = 0.0;
    ae_vector_set_length(&alpha, 2);
    ae_vector_set_length(&beta, 2);
@@ -54891,9 +54858,9 @@ bool testgq() {
    }
    recerrors = recerrors || err > errtol;
 // Three tests for rec-based Gauss-Radau quadratures with known weights/nodes:
-// 1. Gauss-Radau with N=2
-// 2. Gauss-Radau with N=3
-// 3. Gauss-Radau with N=3 (another case)
+// 1. Gauss-Radau with N == 2
+// 2. Gauss-Radau with N == 3
+// 3. Gauss-Radau with N == 3 (another case)
    err = 0.0;
    ae_vector_set_length(&alpha, 1);
    ae_vector_set_length(&beta, 2);
@@ -55304,7 +55271,7 @@ bool testautogk() {
    } else {
       simpleerrors = simpleerrors || !NearAtR(exact, v, errtol * eabs);
    }
-// Simple test: integral(exp(x),+-1,+-2), XWidth=0.1
+// Simple test: integral(exp(x),+-1,+-2), XWidth == 0.1
    a = (2 * randominteger(2) - 1) * 1.0;
    b = (2 * randominteger(2) - 1) * 2.0;
    for (autogksmoothw(a, b, 0.1, &state); autogkiteration(&state); ) {
@@ -55332,7 +55299,7 @@ bool testautogk() {
    } else {
       simpleerrors = simpleerrors || !NearAtR(exact, v, errtol * eabs);
    }
-// Simple test: integral(cos(100*x),0,2*pi), XWidth=0.3
+// Simple test: integral(cos(100*x),0,2*pi), XWidth == 0.3
    a = 0.0;
    b = 2 * pi;
    for (autogksmoothw(a, b, 0.3, &state); autogkiteration(&state); ) {
@@ -55675,8 +55642,8 @@ static void testbasestatunit_testranking(bool *err) {
    NewMatrix(xy1, 0, 0, DT_REAL);
    NewMatrix(xy2, 0, 0, DT_REAL);
 // Test 1 - large array, unique ranks, each row is obtained as follows:
-// * we generate X[i=0..N-1] = I
-// * we add random noise: X[i] := X[i] + 0.2*randomreal()-0.1
+// * we generate X[i == 0..N-1] = I
+// * we add random noise: X[i] = X[i] + 0.2*randomreal()-0.1
 // * we perform random permutation
 //
 // Such dataset has following properties:
@@ -55957,7 +55924,7 @@ bool testbasestat() {
       for (ctype = 0; ctype <= 2; ctype++) {
          for (kx = 1; kx <= 10; kx++) {
             for (ky = 1; ky <= 10; ky++) {
-            // Fill matrices, add constant column (when CType=1 or =2)
+            // Fill matrices, add constant column (when CType == 1 or == 2)
                cidxx = -1;
                cidxy = -1;
                if (n > 0) {
@@ -56136,7 +56103,7 @@ bool testwsr() {
 // it will return incorrect results.
 //
 // We use special handcrafted N, such that in 32-bit integer
-// arithmetics int32(N*N)<0. Such negative N leads to domain
+// arithmetics int32(N*N) < 0. Such negative N leads to domain
 // error in the sqrt() function.
    n = 50000;
    ae_vector_set_length(&xa, n);
@@ -56289,7 +56256,7 @@ bool testmannwhitneyu() {
 // it will return incorrect results.
 //
 // We use special handcrafted N, such that in 32-bit integer
-// arithmetics int32(N*N)<0. Such negative N leads to domain
+// arithmetics int32(N*N) < 0. Such negative N leads to domain
 // error in the sqrt() function.
    n = 50000;
    ae_vector_set_length(&x, n);
@@ -56649,7 +56616,7 @@ bool teststudentttests() {
 // it will return incorrect results.
 //
 // We use special handcrafted N, such that in 32-bit integer
-// arithmetics int32(N*N)<0. Such negative N leads to domain
+// arithmetics int32(N*N) < 0. Such negative N leads to domain
 // error in the incomplete beta function.
    n = 50000;
    ae_vector_set_length(&xa, n);
@@ -56994,7 +56961,7 @@ bool testratint() {
       ae_vector_set_length(&y, n);
       ae_vector_set_length(&w, n);
       ae_vector_set_length(&w2, n);
-   // D=1, non-equidistant nodes
+   // D == 1, non-equidistant nodes
       for (pass = 1; pass <= passcount; pass++) {
       // Initialize X, Y, W
          a = -1 - 1 * randomreal();
@@ -57121,7 +57088,7 @@ bool testratint() {
 }
 
 // === idw testing unit ===
-// Testing continuity properties: C0 (D=0) or C1 (D=1) continuity.
+// Testing continuity properties: C0 (D == 0) or C1 (D == 1) continuity.
 //
 // Error flag is modified on failure, unchanged on success.
 static void testidwunit_testcontinuity(idwmodel *model, ae_int_t nx, ae_int_t ny, RVector *x0, RVector *x1, ae_int_t nsteps, ae_int_t d, bool *err) {
@@ -57795,7 +57762,7 @@ static void testidwunit_testmstab(bool *err) {
 // Basic test #1: nonzero derivative
 // * XY = [[-1,-1],[0,0,],[1,1]]
 // * RBase >= 2
-// * derivative at x=0 must be positive and bigger than 0.1
+// * derivative at x == 0 must be positive and bigger than 0.1
    ae_matrix_set_length(&xy, 3, 2);
    for (i = 0; i <= 2; i++) {
       xy.xyR[i][0] = (double)(i - 1);
@@ -57810,10 +57777,10 @@ static void testidwunit_testmstab(bool *err) {
    *err = *err || (idwcalc1(&model, v) - idwcalc1(&model, -v)) / (2 * v) < 0.1;
 // Basic test #2: good smoothness
 // * 2D task, dataset is composed from 3 parallel lines
-//   along y=-0.1, y=0, y=+0.1, with outer lines having
+//   along y == -0.1, y == 0, y == +0.1, with outer lines having
 //   constant zero target value, inner line having constant
 //   target equal to 1
-// * RBase=1 is used
+// * RBase == 1 is used
 // * we test that function value does not change significantly
 //   along the line
    n = 100;
@@ -58312,7 +58279,7 @@ static void testspline1dunit_lconst(double a, double b, spline1dinterpolant *c, 
 //
 // >
 // > init X, Y, N
-// > SplineIndex:=0;
+// > SplineIndex = 0;
 // > while EnumerateAllSplines(X, Y, N, SplineIndex, S) do
 // > begin
 // >     do something with S
@@ -58466,7 +58433,7 @@ static bool testspline1dunit_testmonotonespline() {
    NewVector(d, 0, DT_REAL);
    NewVector(n, 0, DT_INT);
    eps = 100.0 * machineepsilon;
-// Special test - N=2.
+// Special test - N == 2.
 //
 // Following properties are tested:
 // * monotone spline must be equal to the Hermite spline with
@@ -58499,7 +58466,7 @@ static bool testspline1dunit_testmonotonespline() {
       ae_frame_leave();
       return result;
    }
-// Special test - N=3, x=[0,1,2], y=[0,1,0].
+// Special test - N == 3, x == [0,1,2], y == [0,1,0].
 // Monotone spline must be equal to the Hermite spline with
 // zero derivative at all points.
    ae_vector_set_length(&x, 3);
@@ -58524,11 +58491,11 @@ static bool testspline1dunit_testmonotonespline() {
          return result;
       }
    }
-// Special test - N=5, x=[0,1,2,3,4], y=[0,1,1,2,3].
+// Special test - N == 5, x == [0,1,2,3,4], y == [0,1,1,2,3].
 //
 // 1) spline passes through all prescribed points
-// 2) spline derivative at all points except x=3 is exactly zero
-// 3) spline derivative at x=3 is 1.0 (within machine epsilon)
+// 2) spline derivative at all points except x == 3 is exactly zero
+// 3) spline derivative at x == 3 is 1.0 (within machine epsilon)
    ae_vector_set_length(&x, 5);
    ae_vector_set_length(&y, 5);
    x.xR[0] = 0.0;
@@ -58556,7 +58523,7 @@ static bool testspline1dunit_testmonotonespline() {
       }
    }
 // Special test:
-// * N=4
+// * N == 4
 // * three fixed points - (0,0), (1,1), (2,0)
 // * one special point (x,y) with x in [0.1,0.9], y in [0.1,0.9]
 // * monotonicity of the interpolant at [0,1] is checked with very small step 1/KMax
@@ -58771,7 +58738,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       }
    }
 // Test spline ability to reproduce target:
-// * a penalized spline with M=N and nearly zero Rho must pass
+// * a penalized spline with M == N and nearly zero Rho must pass
 //   through all points on equidistant grid
 // * a penalized spline with M about 5*N and sufficiently small
 //   Rho must pass through all points on equidistant grid
@@ -58836,7 +58803,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
 // results in residuals monotonically increasing and nonlinearity penalty
 // monotonically decreasing.
 //
-// This test is performed twice: first time for M<<N, second time for M>>N
+// This test is performed twice: first time for M << N, second time for M >> N
    for (testtype = 0; testtype <= 1; testtype++) {
       if (testtype == 0) {
          n = 100;
@@ -58895,7 +58862,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
          penalty /= k + 1;
       // Compare with previous, update previous, update Rho
       //
-      // Write('M=%i    N=%i    %.15e    %.15e    %.15e\n', M, N, Residuals, Penalty, MxD2);
+      // Write('M == %i    N == %i    %.15e    %.15e    %.15e\n', M, N, Residuals, Penalty, MxD2);
          *fiterrors = *fiterrors || residuals <= prevresiduals;
          *fiterrors = *fiterrors || penalty >= prevpenalty;
          prevresiduals = residuals;
@@ -59553,7 +59520,7 @@ bool testspline1d() {
          for (i = 0; i < xtest.cnt; i++) {
             lterrors = lterrors || !NearAtR(spline1dcalc(&c, xtest.xR[i]), spline1dcalc(&c2, (xtest.xR[i] - sb) / sa), threshold);
          }
-      // LinTransX, special case: A=0
+      // LinTransX, special case: A == 0
          sb = randommid();
          spline1dcopy(&c, &c2);
          spline1dlintransx(&c2, 0.0, sb);
@@ -59578,7 +59545,7 @@ bool testspline1d() {
 //
 // * exact test (integration of parabola, outside of [a,b], non-periodic spline
 //
-// * approximate test for periodic splines. F(x)=cos(2*pi*x)+1.
+// * approximate test for periodic splines. F(x) == cos(2*pi*x)+1.
 //   Period length is equals to 1.0, so all operations with
 //   multiples of period are done exactly. For each value of PERIOD
 //   we calculate and test integral at four points:
@@ -59801,7 +59768,7 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
 // Test polynomial fitting
    for (pass = 1; pass <= passcount; pass++) {
       for (n = 1; n <= maxn; n++) {
-      // N=M+K fitting (i.e. interpolation)
+      // N == M+K fitting (i.e. interpolation)
          for (k = 0; k < n; k++) {
             taskgenint1d(-1.0, 1.0, n, &xfull, &yfull);
             ae_vector_set_length(&x, n - k);
@@ -59836,8 +59803,8 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
          }
       // Testing constraints on derivatives.
       // Special tasks which will always have solution:
-      // 1. P(0)=YC[0]
-      // 2. P(0)=YC[0], P'(0)=YC[1]
+      // 1. P(0) == YC[0]
+      // 2. P(0) == YC[0], P'(0) == YC[1]
          if (n > 1) {
             for (m = 3; m <= 5; m++) {
                for (k = 1; k <= 2; k++) {
@@ -60049,7 +60016,7 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
 // Test rational fitting:
    for (pass = 1; pass <= passcount; pass++) {
       for (n = 2; n <= maxn; n++) {
-      // N=M+K fitting (i.e. interpolation)
+      // N == M+K fitting (i.e. interpolation)
          for (k = 0; k < n; k++) {
             ae_vector_set_length(&x, n - k);
             ae_vector_set_length(&y, n - k);
@@ -60518,7 +60485,7 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
             ae_vector_set_length(&y, 2 * n);
             ae_vector_set_length(&w, 2 * n);
             for (i = 0; i < n; i++) {
-            // "if i=0" and "if i=1" are needed to
+            // "if i == 0" and "if i == 1" are needed to
             // synchronize interval size for C2 and
             // spline being fitted (i.e. C).
                t = randomreal();
@@ -60766,9 +60733,9 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
    hqrndrandomize(&rs);
 // Fit
 //
-//                 [                              ]
-//    f(X|C)= SUM_j[ (alpha*c_j+power(c_j,3))*x_j ]
-//                 [                              ]
+//                  [                              ]
+//    f(X|C) = SUM_j[ (alpha*c_j+power(c_j,3))*x_j ]
+//                  [                              ]
 //
 // subject to non-negativity constraints on c_j
    epsx = 1.0E-9;
@@ -60858,9 +60825,9 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
    }
 // Fit
 //
-//                 [                              ]
-//    f(X|C)= SUM_j[ (alpha*c_j+power(c_j,3))*x_j ]
-//                 [                              ]
+//                  [                              ]
+//    f(X|C) = SUM_j[ (alpha*c_j+power(c_j,3))*x_j ]
+//                  [                              ]
 //
 // subject to random box constraints on c_j
    epsx = 1.0E-9;
@@ -60952,9 +60919,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
    }
 // Fit
 //
-//
-//    f(X|C)= c_0
-//
+//    f(X|C) = c_0
 //
 // subject to random box constraints on c_0, where X is N-dimensional vector
 // (f does not depend on X, and it is not an error! we just test that sizes
@@ -61046,9 +61011,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
    }
 // Fit
 //
-//
-//    f(X|C)= c_0 + c_1*x0 + c_2*x0^2 + ...
-//
+//    f(X|C) = c_0 + c_1*x0 + c_2*x0^2 + ...
 //
 // subject to random box constraints on c.
    epsx = 1.0E-9;
@@ -61415,9 +61378,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
    }
 // Fit
 //
-//
-//    f(X|C)= c_0
-//
+//    f(X|C) = c_0
 //
 // subject to single general linear equality constraint on c_0.
 //
@@ -61473,9 +61434,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
    }
 // Fit
 //
-//
-//    f(X|C)= c_0 + c_1*x0 + c_2*x0^2 + ...
-//
+//    f(X|C) = c_0 + c_1*x0 + c_2*x0^2 + ...
 //
 // subject to single general linear equality constraint on c.
 //
@@ -62106,7 +62065,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
 // * problem with known prior, noise, non-unit weights
 //
 // We test that:
-// * rep.ErrPar=sqrt(diag(Rep.CovPar))
+// * rep.ErrPar == sqrt(diag(Rep.CovPar))
 // * Rep.ErrPar is not too optimistic  - average value of ratio
 //   between  |c_fit-c_prior| and ErrPar[] is less than TOL
 // * Rep.ErrPar is not too pessimistic - average value of ratio
@@ -62128,8 +62087,8 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
       for (skind = 0; skind <= 2; skind++) {
          for (pkind = 0; pkind <= 1; pkind++) {
          // Generate problem:
-         // * PKind=0 - unit weights
-         // * PKind=1 - non-unit weights, exact estimate of noise at I-th point
+         // * PKind == 0 - unit weights
+         // * PKind == 1 - non-unit weights, exact estimate of noise at I-th point
          //
          // We generate:
          // * C      -   prior values of parameters
@@ -62168,9 +62127,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                }
             }
          // Test different solvers:
-         // * SKind=0 - nonlinear solver
-         // * SKind=1 - linear unconstrained
-         // * SKind=2 - linear constrained with empty set of constraints
+         // * SKind == 0 - nonlinear solver
+         // * SKind == 1 - linear unconstrained
+         // * SKind == 2 - linear constrained with empty set of constraints
             info = -1;
             if (skind == 0) {
                if (randombool()) {
@@ -62699,8 +62658,8 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
    // Fenerate A/B/C/D:
    // * A/D are random with scale equal to ScaleY
    // * B is in +-[0.25,4.0]
-   // * for C we choose one of X[], if N>0;
-   //   if N=0, we set C=1.
+   // * for C we choose one of X[], if N > 0;
+   //   if N == 0, we set C == 1.
       scaley = pow(10.0, 15.0 * hqrndmiduniformr(&rs));
       ae = scaley * (hqrnduniformr(&rs) - 0.5);
       be = (2 * hqrnduniformi(&rs, 2) - 1) * exp(log(4.0) * hqrndmiduniformr(&rs));
@@ -62724,7 +62683,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
       }
    // Unconstrained fit and test
    //
-   // NOTE: we test that B >= 0 is returned. If BE<0, we use
+   // NOTE: we test that B >= 0 is returned. If BE < 0, we use
    //       symmetry property of 4PL model.
       logisticfit4(&x, &y, ntotal, &a, &b, &c, &d, &rep);
       *fiterrors = *fiterrors || !isfinite(a);
@@ -62745,7 +62704,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
       *fiterrors = *fiterrors || v > (1 + tol) * noise;
    // Constrained fit and test
    //
-   // NOTE: we test that B >= 0 is returned. If BE<0, we use
+   // NOTE: we test that B >= 0 is returned. If BE < 0, we use
    //       symmetry property of 4PL model.
       for (k0 = 0; k0 <= 1; k0++) {
          for (k1 = 0; k1 <= 1; k1++) {
@@ -62825,7 +62784,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
    // * B is in +-[0.25,4.0]
    // * G is in   [0.25,4.0]
    // * C is in   [0.25,4.0]*ScaleX
-   //   if N=0, we set C=1.
+   //   if N == 0, we set C == 1.
    // Generate Y[].
       scaley = pow(10.0, 15.0 * hqrndmiduniformr(&rs));
       ae = scaley * (hqrnduniformr(&rs) - 0.5);
@@ -62848,7 +62807,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
       }
    // Unconstrained fit and test
    //
-   // NOTE: we test that B >= 0 is returned. If BE<0, we use
+   // NOTE: we test that B >= 0 is returned. If BE < 0, we use
    //       symmetry property of 4PL model.
       logisticfit5(&x, &y, n, &a, &b, &c, &d, &g, &rep);
       v = 0.0;
@@ -63043,35 +63002,35 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
    ae_frame_leave();
 }
 
-// This function return function's value(F=F(X,C)) and it derivatives(DF=dF/dC).
+// This function return function's value(F == F(X,C)) and it derivatives(DF == dF/dC).
 // Function dimension is M. Length(C) is K.
 //     Function's list:
-//         * funcType=1:
-//             K>M:
-//             F(X)=C0^2*(X0-CX0)^2+C1^2*(X1-CX1)^2+...+CM^2*(XM-CXM)^2
+//         * funcType == 1:
+//             K > M:
+//             F(X) == C0^2*(X0-CX0)^2+C1^2*(X1-CX1)^2+...+CM^2*(XM-CXM)^2
 //                 +C(M+1)^2+...+CK^2;
-//             K<M:
-//             F(X)=C0^2*(X0-CX0)^2+C1^2*(X1-CX1)^2+...+CK^2*(XK-CXK)^2
+//             K < M:
+//             F(X) == C0^2*(X0-CX0)^2+C1^2*(X1-CX1)^2+...+CK^2*(XK-CXK)^2
 //                 +(X(K+1)-CX(K+1))^2+...+(XM-CXM)^2;
-//         * funcType=2:
-//             K>M:
-//             F(X)=C0*sin(X0-CX0)^2+C1*sin(X1-CX1)^2+...+CM*sin(XM-CXM)^2
+//         * funcType == 2:
+//             K > M:
+//             F(X) == C0*sin(X0-CX0)^2+C1*sin(X1-CX1)^2+...+CM*sin(XM-CXM)^2
 //                 +C(M+1)^3+...+CK^3;
-//             K<M
-//             F(X)=C0*sin(X0-CX0)^2+C1*sin(X1-CX1)^2+...+CK*sin(XK-CXK)^2
+//             K < M
+//             F(X) == C0*sin(X0-CX0)^2+C1*sin(X1-CX1)^2+...+CK*sin(XK-CXK)^2
 //                 +sin(X(K+1)-CX(K+1))^2+...+sin(XM-CXM)^2;
-//         * funcType=3:
-//             F(X)=C0^2+C1^2+...+CK^2+(X0-CX0)^2+(X1-CX1)^2+...+(XM-CXM)^2.
+//         * funcType == 3:
+//             F(X) == C0^2+C1^2+...+CK^2+(X0-CX0)^2+(X1-CX1)^2+...+(XM-CXM)^2.
 static void testlsfitunit_funcderiv(RVector *c, RVector *x, RVector *x0, ae_int_t k, ae_int_t m, ae_int_t functype, double *f, RVector *g) {
    ae_int_t i;
-   ae_assert(functype >= 1 && functype <= 3, "FuncDeriv: incorrect funcType(funcType<1 or funcType>3).");
+   ae_assert(functype >= 1 && functype <= 3, "FuncDeriv: incorrect funcType(funcType < 1 or funcType > 3).");
    ae_assert(k > 0, "FuncDeriv: K <= 0");
    ae_assert(m > 0, "FuncDeriv: M <= 0");
-   ae_assert(x->cnt >= m, "FuncDeriv: Length(X)<M");
+   ae_assert(x->cnt >= m, "FuncDeriv: Length(X) < M");
    ae_assert(isfinitevector(x, m), "FuncDeriv: X contains NaN or Infinite.");
-   ae_assert(x0->cnt >= m, "FuncDeriv: Length(X0)<M");
+   ae_assert(x0->cnt >= m, "FuncDeriv: Length(X0) < M");
    ae_assert(isfinitevector(x0, m), "FuncDeriv: X0 contains NaN or Infinite.");
-   ae_assert(c->cnt >= k, "FuncDeriv: Length(X)<K");
+   ae_assert(c->cnt >= k, "FuncDeriv: Length(X) < K");
    ae_assert(isfinitevector(c, k), "FuncDeriv: C contains NaN or Infinite.");
    if (functype == 1) {
       *f = 0.0;
@@ -63440,7 +63399,7 @@ static void testfitsphereunit_testspherefittingls(bool *err) {
    // Check that small perturbations to center position increase target function
    //
    // NOTE: in fact, we do allow small increase in target function - but no more
-   //       than FTol=1E-6*XTol. It helps to avoid spurious error reports in
+   //       than FTol == 1E-6*XTol. It helps to avoid spurious error reports in
    //       degenerate cases.
       ftol = 1.0E-6 * xtol;
       ae_vector_set_length(&cy, nx);
@@ -63525,7 +63484,7 @@ static void testfitsphereunit_testspherefittingns(bool *err) {
       // Check that small perturbations to center position increase target function
       //
       // NOTE: in fact, we do allow small increase in target function - but no more
-      //       than FTol=1E-6*XTol. It helps to avoid spurious error reports in
+      //       than FTol == 1E-6*XTol. It helps to avoid spurious error reports in
       //       degenerate cases.
          ftol = 1.0E-6 * xtol;
          ae_vector_set_length(&cy, nx);
@@ -64821,7 +64780,7 @@ static bool testspline2dunit_testspline2dvf() {
          if (tstm != m || tstn != n || tstd != d) {
             if (!silent) {
                printf("TestSpline2DVF fail Spline2DUnpack:\n");
-               printf("    TstM=%0d; M=%0d;\n    TstN=%0d; N=%0d;\n    TstD=%0d; D=%0d.\n", (int)tstm, (int)m, (int)tstn, (int)n, (int)tstd, (int)d);
+               printf("    TstM == %0d; M == %0d;\n    TstN == %0d; N == %0d;\n    TstD == %0d; D == %0d.\n", (int)tstm, (int)m, (int)tstn, (int)n, (int)tstd, (int)d);
             }
             result = true;
             ae_frame_leave();
@@ -64843,7 +64802,7 @@ static bool testspline2dunit_testspline2dvf() {
             if (tstm != m || tstn != n) {
                if (!silent) {
                   printf("TestSpline2DVF fail Spline2DUnpack:\n");
-                  printf("    TstM=%0d; M=%0d;\n    TstN=%0d; N=%0d.\n", (int)tstm, (int)m, (int)tstn, (int)n);
+                  printf("    TstM == %0d; M == %0d;\n    TstN == %0d; N == %0d.\n", (int)tstm, (int)m, (int)tstn, (int)n);
                }
                result = true;
                ae_frame_leave();
@@ -65981,7 +65940,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          }
       }
    }
-// Test correctness of handling NLayers>0, NLayers=0 and NLayers<0.
+// Test correctness of handling NLayers > 0, NLayers == 0 and NLayers < 0.
 //
 // NOTE: we use reduced tile size and interface size, because we do
 //       not test model quality, just identity with NLayers <= 0
@@ -66007,7 +65966,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
    state.interfacesize = interfacesize;
    spline2dbuildersetpoints(&state, &xy, npoints);
    spline2dbuildersetgrid(&state, kx, ky);
-// Try different NLayers>0, compare with corresponding non-positive values
+// Try different NLayers > 0, compare with corresponding non-positive values
    for (k = 1; k <= nlayers + 1; k++) {
       spline2dbuildersetalgofastddm(&state, k, 0.0);
       spline2dfit(&state, &s1, &rep1);
@@ -66024,7 +65983,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
    }
 // Ability to reproduce target function in multilayer setup:
 // * small tile size
-// * nearly regular KX*KY dataset, for random KX>TileSize, KY>TileSize
+// * nearly regular KX*KY dataset, for random KX > TileSize, KY > TileSize
 // * (2*KX)x(2*KY) grid, flexible enough
 //
 // We check that maximum and average errors at nodes are small
@@ -66166,7 +66125,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          *errorflag = *errorflag || penaltya.xR[k] < penaltya.xR[k + 1];
       }
    }
-// Test that refining grid in "K:=2*K-1" fashion results in
+// Test that refining grid in "K = 2*K-1" fashion results in
 // decrease of RMS error; although it seems quite silly test,
 // in fact it checks various failures in the algorithm.
 //
@@ -66747,11 +66706,11 @@ bool testspline2d() {
 // The function does build random function on random grid with random number
 // of points:
 // * N, M, K   -   random from 2 to 5
-// * D         -   1 in case IsVect=False, 1..3 in case IsVect=True
+// * D         -   1 in case IsVect == False, 1..3 in case IsVect == True
 // * X, Y, Z   -   each variable spans from MinV to MaxV, with MinV is random
 //                 number from [-1.5,0.5] and MaxV is random number from
 //                 [0.5,1.5]. All nodes are well separated. All nodes are
-//                 randomly reordered in case Reorder=False. When Reorder=True,
+//                 randomly reordered in case Reorder == False. When Reorder == True,
 //                 nodes are returned in ascending order.
 // * F         -   random values from [-1,+1]
 static void testspline3dunit_buildrndgrid(bool isvect, bool reorder, ae_int_t *n, ae_int_t *m, ae_int_t *l, ae_int_t *d, RVector *x, RVector *y, RVector *z, RVector *f) {
@@ -67043,10 +67002,10 @@ static bool testspline3dunit_testunpack() {
                   p1 = (n - 1) * ((m - 1) * k + j) + i;
                   p0 = d * p1 + di;
                // Check that all components are correct:
-               //  *first check, that unpacked componets are equal
+               // * first check, that unpacked componets are equal
                //   to packed components;
                   bperr = un != n || um != m || ul != l || tbl1.xyR[p1][0] != x.xR[i] || tbl1.xyR[p1][1] != x.xR[i + 1] || tbl1.xyR[p1][2] != y.xR[j] || tbl1.xyR[p1][3] != y.xR[j + 1] || tbl1.xyR[p1][4] != z.xR[k] || tbl1.xyR[p1][5] != z.xR[k + 1] || uvn != n || uvm != m || uvl != l || uvd != d || tbl0.xyR[p0][0] != x.xR[i] || tbl0.xyR[p0][1] != x.xR[i + 1] || tbl0.xyR[p0][2] != y.xR[j] || tbl0.xyR[p0][3] != y.xR[j + 1] || tbl0.xyR[p0][4] != z.xR[k] || tbl0.xyR[p0][5] != z.xR[k + 1];
-               //  *check, that all components unpacked by Unpack
+               // * check, that all components unpacked by Unpack
                //   function are equal to all components unpacked
                //   by UnpackV function.
                   for (i0 = 0; i0 <= 13; i0++) {
@@ -67061,7 +67020,7 @@ static bool testspline3dunit_testunpack() {
                   ty = (0.001 + 0.999 * randomreal()) * (tbl1.xyR[p1][3] - tbl1.xyR[p1][2]);
                   tz = (0.001 + 0.999 * randomreal()) * (tbl1.xyR[p1][5] - tbl1.xyR[p1][4]);
                // Interpolation properties for:
-               //  *scalar function;
+               // * scalar function;
                   v1 = 0.0;
                   for (ci = 0; ci <= 1; ci++) {
                      for (cj = 0; cj <= 1; cj++) {
@@ -67072,7 +67031,7 @@ static bool testspline3dunit_testunpack() {
                   }
                   v2 = spline3dcalc(&c, tbl1.xyR[p1][0] + tx, tbl1.xyR[p1][2] + ty, tbl1.xyR[p1][4] + tz);
                   err = rmax2(err, fabs(v1 - v2));
-               //  *component of vector function.
+               // * component of vector function.
                   v1 = 0.0;
                   for (ci = 0; ci <= 1; ci++) {
                      for (cj = 0; cj <= 1; cj++) {
@@ -67350,7 +67309,7 @@ static bool sqrdegmatrixrbftest();
 
 // Function for testing basic functionality of RBF module on regular grids with
 // multi-layer algorithm in 1D.
-// ALGLIB: Copyright 2.03.2012 by Sergey Bochkanov
+// ALGLIB: Copyright 02.03.2012 by Sergey Bochkanov
 static bool basicmultilayerrbf1dtest();
 
 // The test  has  to  check, that  algorithm can solve problems of matrix are
@@ -67610,7 +67569,7 @@ static bool testrbfunit_searcherr(RMatrix *y0, RMatrix *y1, ae_int_t n, ae_int_t
 
 // Function for testing basic functionality of RBF module on regular grids with
 // multi-layer algorithm in 1D.
-// ALGLIB: Copyright 2.03.2012 by Sergey Bochkanov
+// ALGLIB: Copyright 02.03.2012 by Sergey Bochkanov
 static bool basicmultilayerrbf1dtest() {
    ae_frame _frame_block;
    ae_int_t nx;
@@ -67780,8 +67739,8 @@ static bool basicmultilayerrbf1dtest() {
 // * RBF correctly handles 1 or 2 distinct points
 // * when  we have many uniformly spaced points and one outlier, filter which
 //   is applied to radii, makes all radii equal (RBF-QNN).
-// * RBF-ML with NLayers=0 gives linear model
-// * Hierarchical RBF with NLayers=0 gives linear model
+// * RBF-ML with NLayers == 0 gives linear model
+// * Hierarchical RBF with NLayers == 0 gives linear model
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 static bool testrbfunit_specialtest() {
    ae_frame _frame_block;
@@ -67973,7 +67932,7 @@ static bool testrbfunit_specialtest() {
       }
    }
 // Generate a set of points (xi,yi) = (SX*i,0), and one
-// outlier (x_far,y_far)=(-1000*SX,0).
+// outlier (x_far,y_far) == (-1000*SX,0).
 //
 // Radii filtering should place a bound on the radius of outlier.
    for (nx = 2; nx <= 3; nx++) {
@@ -68021,7 +67980,7 @@ static bool testrbfunit_specialtest() {
          }
       }
    }
-// RBF-ML with NLayers=0 gives us linear model.
+// RBF-ML with NLayers == 0 gives us linear model.
 //
 // In order to perform this test, we use test function which
 // is perfectly linear and see whether RBF model is able to
@@ -68032,7 +67991,7 @@ static bool testrbfunit_specialtest() {
       vb = randommid();
       vc = randommid();
       vd = randommid();
-   // Test NX=2.
+   // Test NX == 2.
    // Generate linear function using random coefficients VA/VB/VC.
    // Function is K-dimensional vector-valued, each component has slightly
    // different coefficients.
@@ -68071,7 +68030,7 @@ static bool testrbfunit_specialtest() {
             return result;
          }
       }
-   // Test NX=3.
+   // Test NX == 3.
    // Generate linear function using random coefficients VA/VB/VC/VC.
    // Function is K-dimensional vector-valued, each component has slightly
    // different coefficients.
@@ -68115,7 +68074,7 @@ static bool testrbfunit_specialtest() {
          }
       }
    }
-// HierarchicalRBF with NLayers=0 gives us linear model.
+// HierarchicalRBF with NLayers == 0 gives us linear model.
 //
 // In order to perform this test, we use test function which
 // is perfectly linear and see whether RBF model is able to
@@ -69247,7 +69206,7 @@ static bool testrbfunit_serializationtest() {
 
 // Function for testing basic functionality of RBF module on regular grids with
 // multi-layer algorithm in 2-3D.
-// ALGLIB: Copyright 2.03.2012 by Sergey Bochkanov
+// ALGLIB: Copyright 02.03.2012 by Sergey Bochkanov
 static bool testrbfunit_basicmultilayerrbftest() {
    ae_frame _frame_block;
    ae_int_t nx;
@@ -69516,7 +69475,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
 
 // Function for testing basic functionality of RBF module on regular grids with
 // multi-layer algorithm in 2-3D.
-// ALGLIB: Copyright 2.03.2012 by Sergey Bochkanov
+// ALGLIB: Copyright 02.03.2012 by Sergey Bochkanov
 static void testrbfunit_gridcalc23test(bool *errorflag) {
    ae_frame _frame_block;
    ae_int_t pass;
@@ -71395,9 +71354,8 @@ static void testfftunit_reffftc1dinv(CVector *a, ae_int_t n) {
 // DFT definition.
 //
 // It updates RefErr and RefRErr as follows:
-//     RefErr:=  max(RefErr, error_of_complex_FFT)
-//     RefRErr:= max(RefRErr,error_of_real_FFT)
-//
+//     RefErr =  max(RefErr, error_of_complex_FFT)
+//     RefRErr = max(RefRErr,error_of_real_FFT)
 static void testfftunit_quicktest(ae_int_t n, double *referr, double *refrerr) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -71951,7 +71909,7 @@ bool testconv() {
          for (circkind = 0; circkind <= 1; circkind++) {
             for (rkind = -3; rkind <= 1; rkind++) {
             // skip impossible combinations of parameters:
-            // * circular convolution, M<N, RKind != -3 - internal subroutine does not support M<N.
+            // * circular convolution, M < N, RKind != -3 - internal subroutine does not support M < N.
                if (circkind != 0 && m < n && rkind != -3) {
                   continue;
                }
@@ -73038,7 +72996,7 @@ bool testpca() {
          }
       }
    }
-// Special test for N=0
+// Special test for N == 0
    for (m = 1; m <= maxm; m++) {
    // Solve
       pcabuildbasis(&x, 0, m, &info, &s, &v);
@@ -74567,7 +74525,7 @@ static void testmlpbaseunit_testinformational(ae_int_t nkind, ae_int_t nin, ae_i
 // 6. we compare results with ones obtained by MLPProcess()
 //
 // NOTE: it is important to do (4) before (5), because on SOFTMAX network
-//       MLPGetOutputScaling() must return Mean=0 and Sigma=1. In order
+//       MLPGetOutputScaling() must return Mean == 0 and Sigma == 1. In order
 //       to test it implicitly, we apply it to the classifier results
 //       (already normalized). If one of the coefficients deviates from
 //       expected values, we will get error during (6).
@@ -74658,7 +74616,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    NewVector(y2, 0, DT_REAL);
    NewVector(p0, 0, DT_REAL);
    NewVector(p1, 0, DT_REAL);
-   ae_assert(passcount >= 2, "PassCount<2!");
+   ae_assert(passcount >= 2, "PassCount < 2!");
 // Prepare network
    a1 = 0.0;
    a2 = 0.0;
@@ -75255,9 +75213,9 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
    // * "reference" error/gradient are calculated with MLPGradBatch(),
    //   which was tested in previous section and is assumed to work correctly
    // * we perform tests for different subsets:
-   //   * SubsetSize<0 - subset is a full dataset
-   //   * SubsetSize=0 - subset is empty
-   //   * SubsetSize>0 - random subset
+   //   * SubsetSize < 0 - subset is a full dataset
+   //   * SubsetSize == 0 - subset is empty
+   //   * SubsetSize > 0 - random subset
       ssize = sizemin + randominteger(sizemax - sizemin + 1);
       ae_matrix_set_length(&xy, imax2(ssize, 1), nin + nout);
       sparsecreate(imax2(ssize, 1), nin + nout, ssize * (nin + nout), &sparsexy);
@@ -75414,7 +75372,7 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
    NewVector(x2, 0, DT_REAL);
    NewVector(y1, 0, DT_REAL);
    NewVector(y2, 0, DT_REAL);
-   ae_assert(passcount >= 2, "PassCount<2!");
+   ae_assert(passcount >= 2, "PassCount < 2!");
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
@@ -75553,7 +75511,7 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
 // Error functions (other than MLPError and MLPErrorN) test.
 //
 // Network of type NKind is created, with  NIn  inputs,  NHid1*NHid2   hidden
-// layers (one layer if NHid2=0), NOut outputs. PassCount  random  passes  is
+// layers (one layer if NHid2 == 0), NOut outputs. PassCount  random  passes  is
 // performed. Dataset has random size in [SizeMin,SizeMax].
 static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, ae_int_t passcount, ae_int_t sizemin, ae_int_t sizemax, bool *err) {
    ae_frame _frame_block;
@@ -75793,7 +75751,7 @@ static void testmlpbaseunit_spectests(bool *inferrors, bool *procerrors, bool *g
    NewObj(multilayerperceptron, net);
    NewMatrix(xy, 0, 0, DT_REAL);
    NewVector(g, 0, DT_REAL);
-// Special test for overflow in TanH:
+// Special test for overflow in tanh():
 // * create 1x1x1 linear network
 // * create dataset with 1 item: [x, y] = [0, 1]
 // * set network weights to [10000000, 10000000, 10000000, 10000000]
@@ -75868,9 +75826,9 @@ static bool testmlpbaseunit_testmlpgbsubset() {
    NewVector(grad1, 0, DT_REAL);
    NewVector(grad2, 0, DT_REAL);
 // Variant:
-//  * 1 - there are all rows;
-//  * 2 - there are no one rows;
-//  * 3 - there are some random rows.
+// * 1 - there are all rows;
+// * 2 - there are no one rows;
+// * 3 - there are some random rows.
    nvar = 3;
    maxssize = 96;
    for (ssize = 0; ssize <= maxssize; ssize++) {
@@ -76051,7 +76009,7 @@ bool testmlpbase() {
          for (nhid1 = 0; nhid1 <= maxhid; nhid1++) {
             for (nhid2 = 0; nhid2 <= maxhid; nhid2++) {
                for (nkind = 0; nkind <= 3; nkind++) {
-               //  Skip meaningless parameters combinations
+               // Skip meaningless parameters combinations
                   if (nkind == 1 && nl < 2) {
                      continue;
                   }
@@ -76245,9 +76203,9 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
 // Main cycle:
 // * Pass is a number of repeated test
 // * RKind is a "replication kind":
-//   * RKind=0 means that we work with original ensemble
-//   * RKind=1 means that we work with replica created with MLPECopy()
-//   * RKind=2 means that we work with replica created with serialization/unserialization
+//   * RKind == 0 means that we work with original ensemble
+//   * RKind == 1 means that we work with replica created with MLPECopy()
+//   * RKind == 2 means that we work with replica created with serialization/unserialization
    for (pass = 1; pass <= passcount; pass++) {
       for (rkind = 0; rkind <= 2; rkind++) {
       // Create network, pass through replication in order to test that replicated network works correctly.
@@ -76454,7 +76412,7 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
 // Error functions
 //
 // Ensemble of type NKind is created, with  NIn  inputs,  NHid1*NHid2  hidden
-// layers (one layer if NHid2=0), NOut outputs. PassCount  random  passes  is
+// layers (one layer if NHid2 == 0), NOut outputs. PassCount  random  passes  is
 // performed. Dataset has random size in [SizeMin,SizeMax].
 static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, ae_int_t ec, ae_int_t passcount, ae_int_t sizemin, ae_int_t sizemax, bool *err) {
    ae_frame _frame_block;
@@ -76651,7 +76609,7 @@ bool testmlpe() {
             for (nhid2 = 0; nhid2 <= maxhid; nhid2++) {
                for (nkind = 0; nkind <= 3; nkind++) {
                   for (ec = 1; ec <= 3; ec++) {
-                  //  Skip meaningless parameters combinations
+                  // Skip meaningless parameters combinations
                      if (nkind == 1 && nl < 2) {
                         continue;
                      }
@@ -76774,7 +76732,7 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
 // * Rep.Z contains correct cluster indexes
 // * Rep.PZ is consistent with Rep.P/Rep.Z
 // * Rep.PM contains consistent indexes
-// * GetKClusters() for K=NPoints
+// * GetKClusters() for K == NPoints
    bflag = false;
    bflag = bflag || rep->terminationtype <= 0;
    if (bflag) {
@@ -77056,7 +77014,7 @@ static bool testclusteringunit_errorsinmerges(RMatrix *d, RMatrix *xy, ae_int_t 
             dm.xyR[npoints + mergeidx][i] = v;
          }
       }
-   // Check that GetKClusters() correctly unpacks clusters for K=NPoints-(MergeIdx+1):
+   // Check that GetKClusters() correctly unpacks clusters for K == NPoints-(MergeIdx+1):
    // * check lengths of arays
    // * check consistency of CIdx/CZ parameters
    // * scan clusters (CZ parameter), for each cluster scan CM matrix which stores
@@ -77385,8 +77343,8 @@ static bool testclusteringunit_basicahctests() {
    }
 // Test which differentiates complete linkage and average linkage from
 // single linkage:
-// * we have cluster C0={(-0.5), (0)},
-//   cluster C1={(19.0), (20.0), (21.0), (22.0), (23.0)},
+// * we have cluster C0 == {(-0.5), (0)},
+//   cluster C1 == {(19.0), (20.0), (21.0), (22.0), (23.0)},
 //   and point P between them - (10.0)
 // * we try three different strategies - single linkage, complete
 //   linkage, average linkage.
@@ -77437,8 +77395,8 @@ static bool testclusteringunit_basicahctests() {
    }
 // Test which differentiates single linkage and average linkage from
 // complete linkage:
-// * we have cluster C0={(-2.5), (-2.0)},
-//   cluster C1={(19.0), (20.0), (21.0), (22.0), (23.0)},
+// * we have cluster C0 == {(-2.5), (-2.0)},
+//   cluster C1 == {(19.0), (20.0), (21.0), (22.0), (23.0)},
 //   and point P between them - (10.0)
 // * we try three different strategies - single linkage, complete
 //   linkage, average linkage.
@@ -77488,8 +77446,8 @@ static bool testclusteringunit_basicahctests() {
       }
    }
 // Test which differentiates weighred average linkage from unweighted average linkage:
-// * we have cluster C0={(0.0), (1.5), (2.5)},
-//   cluster C1={(7.5), (7.99)},
+// * we have cluster C0 == {(0.0), (1.5), (2.5)},
+//   cluster C1 == {(7.5), (7.99)},
 //   and point P between them - (4.5)
 // * we try two different strategies - weighted average linkage and unweighted average linkage
 // * any strategy will merge C1 first, then merge points of C0,
@@ -77760,7 +77718,7 @@ static bool testclusteringunit_advancedahctests() {
 // Test on D-dimensional problem:
 // * D = 2...5
 // * D clusters, each has N points;
-//   centers are located at x=(0 ... 1 ... 0);
+//   centers are located at x == (0 ... 1 ... 0);
 //   cluster radii are approximately 0.1
 // * single/complete/unweighted_average/weighted_average linkage/Ward's method are tested
 // * Euclidean distance is used, either:
@@ -77902,7 +77860,7 @@ static bool testclusteringunit_advancedahctests() {
    }
 // Test on random D-dimensional problem:
 // * D = 2...5
-// * N=1..16 random points from unit hypercube
+// * N = 1..16 random points from unit hypercube
 // * single/complete/unweighted_average linkage/Ward's method are tested
 // * different distance functions are tested
 // * we call ErrorsInMerges() and we check distance matrix
@@ -78457,7 +78415,7 @@ static void testclusteringunit_kmeansinfinitelooptest(bool *othererrors) {
    NewObj(kmeansreport, rep);
 // Problem 1: all points are same.
 //
-// For NClusters=1 we must get correct solution, for NClusters>1 we must get failure.
+// For NClusters == 1 we must get correct solution, for NClusters > 1 we must get failure.
    npoints = 100;
    nfeatures = 1;
    restarts = 5;
@@ -78556,15 +78514,15 @@ static void testclusteringunit_kmeansinfinitelooptest(bool *othererrors) {
    ae_frame_leave();
 }
 
-// This non-deterministic test checks that Restarts>1 significantly  improves
+// This non-deterministic test checks that Restarts > 1 significantly  improves
 // quality of results.
 //
 // Subroutine generates random task 3 unit balls in 2D, each with 20  points,
-// separated by 5 units wide gaps, and solves it  with  Restarts=1  and  with
-// Restarts=5. Potential functions are compared,  outcome  of  the  trial  is
+// separated by 5 units wide gaps, and solves it  with  Restarts == 1  and  with
+// Restarts == 5. Potential functions are compared,  outcome  of  the  trial  is
 // either 0 or 1 (depending on what is better).
 //
-// Sequence of 1000 such tasks is  solved.  If  Restarts>1  actually  improve
+// Sequence of 1000 such tasks is  solved.  If  Restarts > 1  actually  improve
 // quality of solution, sum of outcome will be non-binomial.  If  it  doesn't
 // matter, it will be binomially distributed.
 //
@@ -78613,7 +78571,7 @@ static void testclusteringunit_kmeansrestartstest(bool *converrors, bool *restar
       }
       clusterizercreate(&state);
       clusterizersetpoints(&state, &xy, npoints, nvars, 2);
-   // Test: Restarts=1
+   // Test: Restarts == 1
       clusterizersetkmeanslimits(&state, 1, 0);
       clusterizerrunkmeans(&state, nclusters, &rep1);
       if (rep1.terminationtype <= 0) {
@@ -78628,7 +78586,7 @@ static void testclusteringunit_kmeansrestartstest(bool *converrors, bool *restar
          v = ae_v_dotproduct(tmp.xR, 1, tmp.xR, 1, nvars);
          ea += v;
       }
-   // Test: Restarts>1
+   // Test: Restarts > 1
       clusterizersetkmeanslimits(&state, restarts, 0);
       clusterizerrunkmeans(&state, nclusters, &rep2);
       if (rep2.terminationtype <= 0) {
@@ -78653,7 +78611,7 @@ static void testclusteringunit_kmeansrestartstest(bool *converrors, bool *restar
    }
 // If Restarts doesn't influence quality of centers found, P must be
 // binomially distributed random value with mean 0.5*PassCount and
-// standard deviation Sqrt(PassCount/4).
+// standard deviation sqrt(PassCount/4).
 //
 // If Restarts do influence quality of solution, P must be significantly
 // lower than 0.5*PassCount.
@@ -79188,9 +79146,9 @@ static void testdforestunit_basictest1(bool *err) {
 
 // Basic test:  tests generalization ability on a simple noisy classification
 // task:
-// * 0<x<1 - P(class=0)=1
-// * 1<x<2 - P(class=0)=2-x
-// * 2<x<3 - P(class=0)=0
+// * 0 < x < 1 - P(class == 0) == 1
+// * 1 < x < 2 - P(class == 0) == 2-x
+// * 2 < x < 3 - P(class == 0) == 0
 static void testdforestunit_basictest2(bool *err) {
    ae_frame _frame_block;
    ae_int_t pass;
@@ -79279,9 +79237,9 @@ static void testdforestunit_basictest2(bool *err) {
 
 // Basic test:  tests  generalization ability on a simple classification task
 // (no noise):
-// * |x|<1, |y|<1
-// * x^2+y^2 <= 0.25 - P(class=0)=1
-// * x^2+y^2>0.25  - P(class=0)=0
+// * |x| < 1, |y| < 1
+// * x^2+y^2 <= 0.25 - P(class == 0) == 1
+// * x^2+y^2 > 0.25  - P(class == 0) == 0
 static void testdforestunit_basictest3(bool *err) {
    ae_frame _frame_block;
    ae_int_t pass;
@@ -79370,7 +79328,7 @@ static void testdforestunit_basictest3(bool *err) {
 }
 
 // Basic test: simple regression task without noise:
-// * |x|<1, |y|<1
+// * |x| < 1, |y| < 1
 // * F(x,y) = x^2+y
 static void testdforestunit_basictest4(bool *err) {
    ae_frame _frame_block;
@@ -79669,7 +79627,7 @@ static void testdforestunit_basictestrandom(bool *err) {
                for (j = 0; j < nclasses; j++) {
                   v = y.xR[j];
                   if (j == xy.xyR[i][nvars]) {
-                     refavgce -= log(coalesce(v, minrealnumber)); //(@) Added
+                     refavgce -= log(coalesce(v, minrealnumber)); //(@) Added.
                      v--;
                   }
                   refrms += sqr(v);
@@ -79818,7 +79776,7 @@ static void testdforestunit_basictestallsame(bool *err) {
             for (j = 0; j < nclasses; j++) {
                v = y.xR[j];
                if (j == xy.xyR[i][nvars]) {
-                  refavgce -= log(coalesce(v, minrealnumber)); //(@) Added
+                  refavgce -= log(coalesce(v, minrealnumber)); //(@) Added.
                   v--;
                }
                refrms += sqr(v);
@@ -79947,8 +79905,8 @@ static void testdforestunit_testcompression(bool *err) {
       }
    }
 // Test compression on large-scale problems:
-// * NVars=500, NPoints=500, I-th point is zero except for I-th position
-// * NClasses=1 (random output) or NClasses=400
+// * NVars == 500, NPoints == 500, I-th point is zero except for I-th position
+// * NClasses == 1 (random output) or NClasses == 400
 // * NTrees is in 1...5
    for (pass = 0; pass <= 1; pass++) {
    // Set up problem
@@ -80800,7 +80758,7 @@ bool testlinreg() {
          } else {
             slerrors = slerrors || !NearAtR(a, ea, 0.001) || !NearAtR(b, eb, 0.001);
          }
-      // Test for VarA, VarB, P (P is being tested only for N>2)
+      // Test for VarA, VarB, P (P is being tested only for N > 2)
          for (i = 0; i < qcnt; i++) {
             qvals.xR[i] = 0.0;
          }
@@ -81363,8 +81321,7 @@ bool testlinreg() {
 
 // === filters testing unit ===
 // This function tests SMA(k) filter. It returns True on error.
-//
-// Additional IsSilent parameter controls detailed error reporting.
+// The constant "silent" controls detailed error reporting.
 static bool testsma() {
    ae_frame _frame_block;
    bool precomputederrors;
@@ -81463,8 +81420,7 @@ static bool testsma() {
 }
 
 // This function tests EMA(alpha) filter. It returns True on error.
-//
-// Additional IsSilent parameter controls detailed error reporting.
+// The constant "silent" controls detailed error reporting.
 static bool testema() {
    ae_frame _frame_block;
    bool precomputederrors;
@@ -81501,8 +81457,7 @@ static bool testema() {
 }
 
 // This function tests LRMA(k) filter. It returns True on error.
-//
-// Additional IsSilent parameter controls detailed error reporting.
+// The constant "silent" controls detailed error reporting.
 static bool testlrma() {
    ae_frame _frame_block;
    bool precomputederrors;
@@ -81515,7 +81470,7 @@ static bool testlrma() {
       printf("LRMA(K) TEST\n");
    }
    precomputederrors = false;
-// First, check that filter does not changes points for K=1 or K=2
+// First, check that filter does not changes points for K == 1 or K == 2
    ae_vector_set_length(&x, 1);
    x.xR[0] = 7.0;
    filterlrma(&x, 1, 1);
@@ -81812,14 +81767,14 @@ static void testssaunit_testgeneral(bool *errorflag) {
    // linear trend. Trend coefficients vary accross sequences. Top-2
    // algorithm is used (or precomputed unit-normalized linear trend basis).
    //
-   // NOTE: this test requires NTracks >= 2, WindowWidth >= 3 and TopK=2 to work;
+   // NOTE: this test requires NTracks >= 2, WindowWidth >= 3 and TopK == 2 to work;
    //       however, in order to improve numerical properties (diversity among
    //       samples, different slopes and offsets) we set NTracks to be
    //       at least 5.
    //
    // NOTE: one more version of this test verifies scaling properties
-   //       by solving larger task (WindowWidth=100, NTracks=5,
-   //       TrackLen=2*WindowWidth). This version makes just 5 checks because
+   //       by solving larger task (WindowWidth == 100, NTracks == 5,
+   //       TrackLen == 2*WindowWidth). This version makes just 5 checks because
    //       of higher cost.
       for (pass = 1; pass <= passcount; pass++) {
          ntracks = 5 + hqrnduniformi(&rs, 10);
@@ -82077,7 +82032,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
    // values of the sequence.
    //
    // Dataset consists of many sequences, each of them featuring either
-   // sine with period=WindowWidth or sine with period=WindowWidth/2. Such
+   // sine with period == WindowWidth or sine with period == WindowWidth/2. Such
    // dataset is necessary because sum of two sines is not well separated by
    // SVD (it performs only approximate, asymptotic separation). But when
    // every sequence is either one of the sines, but not two together, we
@@ -82085,7 +82040,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
    //
    // Sine coefficients are changed from sequence to sequence.
    //
-   // NOTE: this test requires large WindowWidth and TopK=2 to work.
+   // NOTE: this test requires large WindowWidth and TopK == 2 to work.
    //
    // NOTE: this test uses reduced number of passes because of higher computational complexity
       for (pass = 1; pass <= 10; pass++) {
@@ -82123,9 +82078,9 @@ static void testssaunit_testgeneral(bool *errorflag) {
             }
          }
          tol = 1.0E-6;
-      // Test analysis with WindowWidth=SinePeriod:
-      // * analyze sine with frequency=1, it must be recognized as trend
-      // * analyze sine with frequency=2, with smoothing enabled
+      // Test analysis with WindowWidth == SinePeriod:
+      // * analyze sine with frequency == 1, it must be recognized as trend
+      // * analyze sine with frequency == 2, with smoothing enabled
       //   it must be discarded as noise;
          ssasetwindow(&state, windowwidth);
          nticks = windowwidth + 1 + hqrnduniformi(&rs, windowwidth);
@@ -82209,13 +82164,13 @@ static void testssaunit_testgeneral(bool *errorflag) {
    // * NLinear ticks of series which linearly grow from 0 to 1
    // * NLinear ticks of series which linearly decrease from 1 to 0
    // * NZeros ticks of exactly zero values
-   // * NZeros=100
-   // * NLinear=20
+   // * NZeros == 100
+   // * NLinear == 20
    //
    // SSA settings have following values:
-   // * WindowWidth=4 or 25 (large widths are more problematic for
+   // * WindowWidth == 4 or 25 (large widths are more problematic for
    //   iterative solvers, so they help to debug incremental updates)
-   // * NBasis=2
+   // * NBasis == 2
    //
    // We choose number of initial values to start with NInitial
    // in [1..2*WindowWidth], then add points one
@@ -82363,13 +82318,13 @@ static void testssaunit_testgeneral(bool *errorflag) {
    // * NLinear linear sequences partially corrupted by noise
    // * NZeros exactly zero sequences (used to let incremental algo converge)
    // * all sequences have random size in [WindowWidth-2,WindowWidth+2]
-   // * NNoise=20
-   // * NLinear=20
+   // * NNoise == 20
+   // * NLinear == 20
    //
    // SSA settings have following values:
-   // * WindowWidth=4 or 25 (large widths are more problematic for
+   // * WindowWidth == 4 or 25 (large widths are more problematic for
    //   iterative solvers, so they help to debug incremental updates)
-   // * NBasis=2
+   // * NBasis == 2
    //
    // We have two solvers:
    // * one is trained on complete dataset
@@ -82586,13 +82541,13 @@ static void testssaunit_testgeneral(bool *errorflag) {
 // * NTicks ticks of linearly descending from 1 to 0 linear trend,
 //   corrupted by random Gaussian noise
 // * NZeros ticks of exactly zero values
-// * NTicks=100
-// * NZeros=100
+// * NTicks == 100
+// * NZeros == 100
 //
 // SSA settings have following values:
-// * WindowWidth=4 or 25 (large widths are more problematic for
+// * WindowWidth == 4 or 25 (large widths are more problematic for
 //   iterative solvers, so they help to debug incremental updates)
-// * NBasis=1..2 (only top vectors converge stable enough for unit testing)
+// * NBasis = 1..2 (only top vectors converge stable enough for unit testing)
 // * powerup length is 10
 //
 // We perform two SSAs:
@@ -83244,7 +83199,7 @@ static void testssaunit_testspecial(bool *errorflag) {
    // * SSAAnalyzeLastWindow() returns last element of track as trend and zeros
    //   as noise (with minor rounding error)
    // * SSAAnalyzeLast() returns tracks as trend and zeros as noise (with
-   //   minor rounding error possible). For NTicks>TrackLength result is correctly
+   //   minor rounding error possible). For NTicks > TrackLength result is correctly
    //   prepended with zeros.
    // * SSAAnalyzeSequence() returns sequence as trend, zeros as noise (up to
    //   machine precision)
@@ -83387,7 +83342,7 @@ static void testssaunit_testspecial(bool *errorflag) {
    // * SSAAnalyzeLastWindow() returns last elements of track as trend and zeros
    //   as noise (with minor rounding error)
    // * SSAAnalyzeLast() returns track as trend and zeros as noise (with
-   //   minor rounding error possible). For NTicks>TrackLength result is correctly
+   //   minor rounding error possible). For NTicks > TrackLength result is correctly
    //   prepended with zeros.
    // * SSAAnalyzeSequence() returns:
    //   * for sequences with length at least window width - sequence as trend,
@@ -84315,7 +84270,7 @@ static void testmcpdunit_testentryexit(bool *err) {
             for (popkind = 0; popkind <= 1; popkind++) {
             // Generate EntryState/ExitState such that one of the following is True:
             // * EntryState != ExitState
-            // * EntryState=-1 or ExitState=-1
+            // * EntryState == -1 or ExitState == -1
                do {
                   if (entrykind == 0) {
                      entrystate = -1;
@@ -84861,11 +84816,11 @@ static void testmcpdunit_testlc(bool *err) {
          //
          // NOTE 1: this test needs N >= 4 because smaller values
          //         can give us inconsistent constraints
-         // NOTE 2: Constraints are generated is such a way that P=(1/N ... 1/N)
+         // NOTE 2: Constraints are generated is such a way that P == (1/N ... 1/N)
          //         is always feasible. It guarantees that there always exists
          //         at least one feasible point
          // NOTE 3: If we have inequality constraint, we "shift" right part
-         //         in order to make feasible some neighborhood of P=(1/N ... 1/N).
+         //         in order to make feasible some neighborhood of P == (1/N ... 1/N).
             ae_assert(n >= 4, "TestLC: expectation failed");
             ae_matrix_set_length(&c, 1, n * n + 1);
             ae_vector_set_length(&ct, 1);
@@ -84917,7 +84872,7 @@ static void testmcpdunit_testlc(bool *err) {
          //
          // We set linear constraint which has for "sum-to-X" on
          // on random non-exit column of P. This constraint can be
-         // either consistent (X=1.0) or inconsistent (X != 1.0) with
+         // either consistent (X == 1.0) or inconsistent (X != 1.0) with
          // this default constraint.
          //
          // Algorithm must detect inconsistency.
@@ -85021,7 +84976,7 @@ static void testmcpdunit_testlc(bool *err) {
 //
 // NOTES:
 //
-// 1. Constraints are generated is such a way that P=(1/N ... 1/N)
+// 1. Constraints are generated is such a way that P == (1/N ... 1/N)
 //    is always feasible. It guarantees that there always exists
 //    at least one feasible point
 // 2. For simplicity of the test we do not use entry/exit states
@@ -85047,7 +85002,7 @@ static void testmcpdunit_testlc(bool *err) {
             }
             ct.xZ[i] = randominteger(3) - 1;
          // If we have inequality constraint, we "shift" right part
-         // in order to make feasible some neighborhood of P=(1/N ... 1/N).
+         // in order to make feasible some neighborhood of P == (1/N ... 1/N).
             if (ct.xZ[i] < 0) {
                c.xyR[i][n * n] += 0.1;
             }
@@ -85598,7 +85553,7 @@ static void testknnunit_testknnalgo(bool *err) {
       *err = *err || !NearAtR(tstrep.avgerror, refavg, 1.0E-6);
       *err = *err || !NearAtR(tstrep.avgrelerror, refavgrel, 1.0E-6);
    }
-// Test that model built with K=1 and Eps=0 remembers all training cases
+// Test that model built with K == 1 and Eps == 0 remembers all training cases
    for (nvars = 1; nvars <= 4; nvars++) {
       for (pass = 0; pass <= 10; pass++) {
       // Prepare task
@@ -85712,11 +85667,11 @@ static void testknnunit_testknnalgo(bool *err) {
       }
    }
 // Test generalization ability on a simple noisy classification task:
-// * 0<x<1 - P(class=0)=1
-// * 1<x<2 - P(class=0)=2-x
-// * 2<x<3 - P(class=0)=0
+// * 0 < x < 1 - P(class == 0) == 1
+// * 1 < x < 2 - P(class == 0) == 2-x
+// * 2 < x < 3 - P(class == 0) == 0
 //
-// An algorithm with K=100 and Eps={0,0.1} is tested
+// An algorithm with K == 100 and Eps == {0,0.1} is tested
    for (pass = 0; pass <= 1; pass++) {
    // Prepare task
       npoints = 3000;
@@ -85766,12 +85721,12 @@ static void testknnunit_testknnalgo(bool *err) {
       }
    }
 // Test simple regression task without noise:
-// * |x|<1, |y|<1
+// * |x| < 1, |y| < 1
 // * F(x,y) = x^2+y
 //
-// A model with K=50 is used, we check that
-// * Eps=0 is good enough
-// * having Eps>0 results in worse error metrics, but not too bad
+// A model with K == 50 is used, we check that
+// * Eps == 0 is good enough
+// * having Eps > 0 results in worse error metrics, but not too bad
 // Prepare task
    npoints = 5000;
    ae_matrix_set_length(&xy, npoints, 3);
@@ -85780,7 +85735,7 @@ static void testknnunit_testknnalgo(bool *err) {
       xy.xyR[i][1] = hqrndmiduniformr(&rs);
       xy.xyR[i][2] = sqr(xy.xyR[i][0]) + xy.xyR[i][1];
    }
-// Build model with Eps=0, check model quality
+// Build model with Eps == 0, check model quality
    k = 50;
    testknnunit_unsetknn(&model1);
    knnbuildercreate(&builder);
@@ -85805,7 +85760,7 @@ static void testknnunit_testknnalgo(bool *err) {
    avgerr /= cnt;
    *err = *err || maxerr > 0.15;
    *err = *err || avgerr > 0.05;
-// Build model with Eps=1.0, compare error metrics with Eps=0
+// Build model with Eps == 1.0, compare error metrics with Eps == 0
    knnbuilderbuildknnmodel(&builder, k, 1.0, &model2, &rep2);
    *err = *err || rep2.rmserror <= rep.rmserror;
    *err = *err || rep2.rmserror <= rep.rmserror + 0.001;
@@ -85929,7 +85884,7 @@ static bool testmlptrainunit_testmlptraines() {
 // This  function   tests   MLPTrainLM,  MLPTrainLBFGS   and  MLPTrainNetwork
 // functions  for regression.  It check that  train functions  work correctly.
 // Test use Create1 with 10 neurons.
-// Test function is f(x,y)=X^2+cos(3*Pi*y).
+// Test function is f(x,y) == X^2+cos(3*Pi*y).
 static bool testmlptrainunit_testmlptrainregr() {
    ae_frame _frame_block;
    ae_int_t info;
@@ -85988,7 +85943,7 @@ static bool testmlptrainunit_testmlptrainregr() {
          mlptrainlbfgs(&net, &xy, n, vdecay, nneedrest, traineps, trainits, &info, &rep);
       }
    // Train with trainer, using:
-   //  * dense matrix;
+   // * dense matrix;
       if (vtrain == 2) {
          mlpcreatetrainer(2, 1, &trainer);
          mlpsetdataset(&trainer, &xy, n);
@@ -85996,7 +85951,7 @@ static bool testmlptrainunit_testmlptrainregr() {
          mlpsetcond(&trainer, traineps, trainits);
          mlptrainnetwork(&trainer, &net, nneedrest, &rep);
       }
-   //  * sparse matrix.
+   // * sparse matrix.
       if (vtrain == 3) {
          for (i = 0; i < n; i++) {
             for (j = 0; j <= 2; j++) {
@@ -86091,7 +86046,7 @@ static bool testmlptrainunit_testmlpxorregr() {
       // Create and train a neural network
          mlpcreate1(2, nneurons, 1, &net);
       // Train with trainer, using:
-      //  * dense matrix;
+      // * dense matrix;
          if (vtrain == 0) {
             mlpcreatetrainer(2, 1, &trainer);
             mlpsetdataset(&trainer, &xy, n);
@@ -86106,7 +86061,7 @@ static bool testmlptrainunit_testmlpxorregr() {
             mlpsetcond(&trainer, traineps, trainits);
             for (mlpstarttraining(&trainer, &net, true); mlpcontinuetraining(&trainer, &net); ) { }
          }
-      //  * sparse matrix.
+      // * sparse matrix.
          if (vtrain == 2) {
             for (i = 0; i < n; i++) {
                for (j = 0; j <= 2; j++) {
@@ -86194,17 +86149,17 @@ static bool testmlptrainunit_testmlptrainclass() {
    for (xp = 1; xp <= nxp; xp++) {
       for (vtrain = 0; vtrain <= 3; vtrain++) {
       // Initialization:
-      //  * create negative part of the set;
+      // * create negative part of the set;
          for (i = 0; i < n / 2; i++) {
             xy.xyR[i][0] = -1 * ((mxc - mnc) * randomreal() + mnc);
             xy.xyR[i][1] = 0.0;
          }
-      //  * create positive part of the set;
+      // * create positive part of the set;
          for (i = n / 2; i < n; i++) {
             xy.xyR[i][0] = (mxc - mnc) * randomreal() + mnc;
             xy.xyR[i][1] = 1.0;
          }
-      //  * mix two parts.
+      // * mix two parts.
          for (i = 0; i < n; i++) {
             do {
                rndind = randominteger(n);
@@ -86221,7 +86176,7 @@ static bool testmlptrainunit_testmlptrainclass() {
             mlptrainlbfgs(&net, &xy, n, vdecay, nneedrest, traineps, trainits, &info, &rep);
          }
       // Train with trainer, using:
-      //  * dense matrix;
+      // * dense matrix;
          if (vtrain == 2) {
             mlpcreatetrainercls(1, 2, &trainer);
             mlpsetdataset(&trainer, &xy, n);
@@ -86229,7 +86184,7 @@ static bool testmlptrainunit_testmlptrainclass() {
             mlpsetcond(&trainer, traineps, trainits);
             mlptrainnetwork(&trainer, &net, nneedrest, &rep);
          }
-      //  * sparse matrix.
+      // * sparse matrix.
          if (vtrain == 3) {
             for (i = 0; i < n; i++) {
                sparseset(&sm, i, 0, xy.xyR[i][0]);
@@ -86332,7 +86287,7 @@ static bool testmlptrainunit_testmlpxorcls() {
    for (xp = 1; xp <= nxp; xp++) {
       for (vtrain = 0; vtrain <= 3; vtrain++) {
       // Train with trainer, using:
-      //  * dense matrix;
+      // * dense matrix;
          if (vtrain == 0) {
             mlpcreatetrainercls(2, 2, &trainer);
             mlpsetdataset(&trainer, &xy, n);
@@ -86359,7 +86314,7 @@ static bool testmlptrainunit_testmlpxorcls() {
          // The best result
             ae_v_move(net.weights.xR, 1, wbest.xR, 1, wcount);
          }
-      //  * sparse matrix.
+      // * sparse matrix.
          if (vtrain == 2) {
             for (i = 0; i < n; i++) {
                sparseset(&sm, i, 0, xy.xyR[i][0]);
@@ -86513,15 +86468,15 @@ static bool testmlptrainunit_testmlpzeroweights() {
 // Net1   -   network trained with more than one restart (denoted as Rn)
 //
 // We must refuse hypothesis that R1 equivalent to Rn.
-// Here Mean = N/2, Sigma = Sqrt(N)/2.
-//        _
-//       | 0   -   R1 worse than Rn;
-//  ri = |
-//       |_1   -   Rn same or worse then R1.
+// Here Mean = N/2, Sigma = sqrt(N)/2.
+//       _
+//      | 0   -   R1 worse than Rn;
+// ri = |
+//      |_1   -   Rn same or worse then R1.
 //
-// If Sum(ri)<Mean-5*Sigma then hypothesis is refused and test is passed.
+// If Sum(ri) < Mean-5*Sigma then hypothesis is refused and test is passed.
 // In another case if Mean-5*Sigma <= Sum(ri) <= Mean+5*Sigma then hypothesis
-// is't refused and test is broken; and if Mean+5*Sigma<Sum(ri) then test
+// is't refused and test is broken; and if Mean+5*Sigma < Sum(ri) then test
 // broken too hard!
 static bool testmlptrainunit_testmlprestarts() {
    ae_frame _frame_block;
@@ -86608,7 +86563,7 @@ static bool testmlptrainunit_testmlprestarts() {
          mlpproperties(&net0, &nin, &nout, &wcount0);
          e0 = ae_v_dotproduct(net0.weights.xR, 1, net0.weights.xR, 1, wcount0);
          e0 = mlperrorn(&net0, &xy, n) + 0.5 * vdecay * e0;
-      // ...for Net1, trained with NNeedRest>1 restarts.
+      // ...for Net1, trained with NNeedRest > 1 restarts.
          mlpproperties(&net1, &nin, &nout, &wcount1);
          e1 = ae_v_dotproduct(net1.weights.xR, 1, net1.weights.xR, 1, wcount1);
          e1 = mlperrorn(&net1, &xy, n) + 0.5 * vdecay * e1;
@@ -86855,9 +86810,9 @@ static bool testmlptrainunit_testmlpcverror() {
 // only one point  was  given.
 //
 // NPoints values:
-//  * -1 - don't set dataset with using MLPSetDataset..;
-//  *  0 - zero dataset;
-//  *  1 - dataset with one point.
+// * -1 - don't set dataset with using MLPSetDataset..;
+// *  0 - zero dataset;
+// *  1 - dataset with one point.
    for (npoints = -1; npoints <= 1; npoints++) {
       if (isregr) {
          mlpcreatetrainer(nin, nout, &trainer);
@@ -87091,11 +87046,11 @@ static bool testmlptrainunit_testmlptrainensregr() {
    // Create ensemble
       mlpecreate1(nin, nneurons, nout, enssize, &netens);
    // Train ensembles:
-   //  * without trainer;
+   // * without trainer;
       if (withtrainer == 0) {
          mlpetraines(&netens, &xytrain, ntrain, decay, nneedrest, &info, &rep);
       }
-   //  * with trainer.
+   // * with trainer.
       if (withtrainer == 1) {
          mlptrainensemblees(&trainer, &netens, nneedrest, &rep);
       }
@@ -87107,9 +87062,9 @@ static bool testmlptrainunit_testmlptrainensregr() {
       result = result || !RelNear(rep.avgerror, repx.avgerror, 1.0E-4, 1.0E-2);
       result = result || !RelNear(rep.avgrelerror, repx.avgrelerror, 1.0E-4, 1.0E-2);
    // Test that network fits data well. Calculate average error:
-   //  * on training dataset;
-   //  * on test dataset. (here we reduce the accuracy
-   //    requirements - average error is compared with 2*Eps).
+   // * on training dataset;
+   // * on test dataset. (here we reduce the accuracy
+   //   requirements - average error is compared with 2*Eps).
       avgerr = 0.0;
       for (i = 0; i < ntrain; i++) {
          if (issparse == 0) {
@@ -87225,7 +87180,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
       if (issparse == 0) {
          mlpsetdataset(&trainer, &xytrain, ntrain);
       }
-   //  * Sparse dataset(create it with using dense dataset).
+   // * Sparse dataset(create it with using dense dataset).
       if (issparse == 1) {
          sparsecreate(ntrain, nin + 1, ntrain * (nin + 1), &xytrainsp);
          for (i = 0; i < ntrain; i++) {
@@ -87250,16 +87205,16 @@ static bool testmlptrainunit_testmlptrainenscls() {
    // Create ensemble
       mlpecreatec0(nin, nout, enssize, &netens);
    // Train ensembles:
-   //  * without trainer;
+   // * without trainer;
       if (withtrainer == 0) {
          mlpetraines(&netens, &xytrain, ntrain, decay, nneedrest, &info, &rep);
       }
-   //  * with trainer.
+   // * with trainer.
       if (withtrainer == 1) {
          mlptrainensemblees(&trainer, &netens, nneedrest, &rep);
       }
    // Calculate average error:
-   //  * on training dataset;
+   // * on training dataset;
       avgerr = 0.0;
       for (i = 0; i < ntrain; i++) {
          if (issparse == 0) {
@@ -87283,7 +87238,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
          ae_frame_leave();
          return result;
       }
-   //  * on test dataset.
+   // * on test dataset.
       avgerr = 0.0;
       for (i = 0; i < ntest; i++) {
          ae_v_move(x.xR, 1, xytest.xyR[i], 1, nin);
@@ -88887,7 +88842,7 @@ static bool testalglibbasicsunit_testswapfunctions() {
 static bool testalglibbasicsunit_teststandardfunctions() {
    bool result;
    result = true;
-// Test Sign()
+// Test sign()
    result = result && sign(1.2) == 1;
    result = result && sign(0.0) == 0;
    result = result && sign(-1.2) == -1;

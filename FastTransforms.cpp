@@ -50,9 +50,9 @@ void fftc1d(CVector *a, ae_int_t n) {
    NewObj(fasttransformplan, plan);
    NewVector(buf, 0, DT_REAL);
    ae_assert(n > 0, "FFTC1D: incorrect N!");
-   ae_assert(a->cnt >= n, "FFTC1D: Length(A)<N!");
+   ae_assert(a->cnt >= n, "FFTC1D: Length(A) < N!");
    ae_assert(isfinitecvector(a, n), "FFTC1D: A contains infinite or NAN values!");
-// Special case: N=1, FFT is just identity transform.
+// Special case: N == 1, FFT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
    if (n == 1) {
       ae_frame_leave();
@@ -98,7 +98,7 @@ void fftc1d(CVector *a, ae_int_t n) {
 void fftc1dinv(CVector *a, ae_int_t n) {
    ae_int_t i;
    ae_assert(n > 0, "FFTC1DInv: incorrect N!");
-   ae_assert(a->cnt >= n, "FFTC1DInv: Length(A)<N!");
+   ae_assert(a->cnt >= n, "FFTC1DInv: Length(A) < N!");
    ae_assert(isfinitecvector(a, n), "FFTC1DInv: A contains infinite or NAN values!");
 // Inverse DFT can be expressed in terms of the DFT as
 //
@@ -147,11 +147,11 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f) {
    NewVector(buf, 0, DT_REAL);
    NewObj(fasttransformplan, plan);
    ae_assert(n > 0, "FFTR1D: incorrect N!");
-   ae_assert(a->cnt >= n, "FFTR1D: Length(A)<N!");
+   ae_assert(a->cnt >= n, "FFTR1D: Length(A) < N!");
    ae_assert(isfinitevector(a, n), "FFTR1D: A contains infinite or NAN values!");
 // Special cases:
-// * N=1, FFT is just identity transform.
-// * N=2, FFT is simple too
+// * N == 1, FFT is just identity transform.
+// * N == 2, FFT is simple too
 //
 // After this block we assume that N is strictly greater than 2
    if (n == 1) {
@@ -241,7 +241,7 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a) {
    NewVector(fh, 0, DT_COMPLEX);
    ae_assert(n > 0, "FFTR1DInv: incorrect N!");
    ae_int_t Nq = n / 2, Nr = n % 2;
-   ae_assert(f->cnt >= Nq + 1, "FFTR1DInv: Length(F)<Floor(N/2)+1!");
+   ae_assert(f->cnt >= Nq + 1, "FFTR1DInv: Length(F) < Floor(N/2)+1!");
    ae_assert(isfinite(f->xC[0].x), "FFTR1DInv: F contains infinite or NAN values!");
    for (i = 1; i < Nq; i++) {
       ae_assert(isfinite(f->xC[i].x) && isfinite(f->xC[i].y), "FFTR1DInv: F contains infinite or NAN values!");
@@ -250,7 +250,7 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a) {
    if (Nr) {
       ae_assert(isfinite(f->xC[Nq].y), "FFTR1DInv: F contains infinite or NAN values!");
    }
-// Special case: N=1, FFT is just identity transform.
+// Special case: N == 1, FFT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
    if (n == 1) {
       ae_vector_set_length(a, 1);
@@ -296,7 +296,7 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
    complex v;
    ae_assert(n > 0 && n % 2 == 0, "FFTR1DEvenInplace: incorrect N!");
 // Special cases:
-// * N=2
+// * N == 2
 //
 // After this block we assume that N is strictly greater than 2
    if (n == 2) {
@@ -334,7 +334,7 @@ void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformpl
    ae_int_t n2;
    ae_assert(n > 0 && n % 2 == 0, "FFTR1DInvInternalEven: incorrect N!");
 // Special cases:
-// * N=2
+// * N == 2
 //
 // After this block we assume that N is strictly greater than 2
    if (n == 2) {
@@ -450,7 +450,7 @@ namespace alglib_impl {
 //
 // Outputs:
 //     A   -   FHT of a input array, array[0..N-1],
-//             A_out[k] = sum(A_in[j]*(cos(2*pi*j*k/N)+sin(2*pi*j*k/N)), j=0..N-1)
+//             A_out[k] = sum(A_in[j]*(cos(2*pi*j*k/N)+sin(2*pi*j*k/N)), j = 0..N-1)
 // ALGLIB: Copyright 04.06.2009 by Sergey Bochkanov
 // API: void fhtr1d(real_1d_array &a, const ae_int_t n);
 void fhtr1d(RVector *a, ae_int_t n) {
@@ -459,7 +459,7 @@ void fhtr1d(RVector *a, ae_int_t n) {
    ae_frame_make(&_frame_block);
    NewVector(fa, 0, DT_COMPLEX);
    ae_assert(n > 0, "FHTR1D: incorrect N!");
-// Special case: N=1, FHT is just identity transform.
+// Special case: N == 1, FHT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
    if (n == 1) {
       ae_frame_leave();
@@ -488,7 +488,7 @@ void fhtr1d(RVector *a, ae_int_t n) {
 void fhtr1dinv(RVector *a, ae_int_t n) {
    ae_int_t i;
    ae_assert(n > 0, "FHTR1DInv: incorrect N!");
-// Special case: N=1, iFHT is just identity transform.
+// Special case: N == 1, iFHT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
    if (n == 1) {
       return;
@@ -571,7 +571,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    NewVector(buf, 0, DT_REAL);
    NewVector(buf2, 0, DT_REAL);
    ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!");
-   ae_assert(n <= m, "ConvC1DX: N<M assumption is false!");
+   ae_assert(n <= m, "ConvC1DX: N < M assumption is false!");
 // Auto-select
    if (alg == -1 || alg == -2) {
    // Initial candidate: straightforward implementation.
@@ -630,7 +630,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 //
 // Very simple code, no further comments needed.
    if (alg == 0) {
-   // Special case: N=1
+   // Special case: N == 1
       if (n == 1) {
          ae_vector_set_length(r, m);
          v = b->xC[0];
@@ -877,7 +877,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 //     R   -   convolution: A*B. array[0..N+M-2].
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -912,7 +912,7 @@ void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -975,7 +975,7 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
 // complexity for any M/N.
 //
 // IMPORTANT:  normal convolution is commutative,  i.e.   it  is symmetric  -
-// conv(A,B)=conv(B,A).  Cyclic convolution IS NOT.  One function - S - is  a
+// conv(A,B) == conv(B,A).  Cyclic convolution IS NOT.  One function - S - is  a
 // signal,  periodic function, and another - R - is a response,  non-periodic
 // function with limited length.
 //
@@ -989,7 +989,7 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
 //     R   -   convolution: A*B. array[0..M-1].
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1043,7 +1043,7 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c)
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1165,7 +1165,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
    NewVector(buf2, 0, DT_REAL);
    NewVector(buf3, 0, DT_REAL);
    ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!");
-   ae_assert(n <= m, "ConvC1DX: N<M assumption is false!");
+   ae_assert(n <= m, "ConvC1DX: N < M assumption is false!");
 // handle special cases
    if (imin2(m, n) <= 2) {
       alg = 0;
@@ -1228,7 +1228,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
 //
 // Very simple code, no further comments needed.
    if (alg == 0) {
-   // Special case: N=1
+   // Special case: N == 1
       if (n == 1) {
          ae_vector_set_length(r, m);
          v = b->xR[0];
@@ -1278,7 +1278,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
 //
 // If convolution is non-circular, we use zero-padding + FFT.
 //
-// We assume that M+N-1>2 - we should call small case code otherwise
+// We assume that M+N-1 > 2 - we should call small case code otherwise
    if (alg == 1) {
       ae_assert(m + n - 1 > 2, "ConvR1DX: internal error!");
       if (circular && ftbaseissmooth(m) && m % 2 == 0) {
@@ -1440,7 +1440,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
 //     R   -   convolution: A*B. array[0..N+M-2].
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1475,7 +1475,7 @@ void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1538,7 +1538,7 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
 //     R   -   convolution: A*B. array[0..M-1].
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1593,7 +1593,7 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c)
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov

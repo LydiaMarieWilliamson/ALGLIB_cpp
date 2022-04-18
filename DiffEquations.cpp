@@ -37,7 +37,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
       h = -h;
    }
 // quick exit if necessary.
-// after this block we assume that M>1
+// after this block we assume that M > 1
    if (m == 1) {
       state->repnfev = 0;
       state->repterminationtype = 1;
@@ -103,22 +103,22 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
 //                 values at X[i] are returned too.
 //                 SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
 //     M       -   number of intermediate points + first point + last point:
-//                 * M>2 means that you need both Y(X[M-1]) and M-2 values at
+//                 * M > 2 means that you need both Y(X[M-1]) and M-2 values at
 //                   intermediate points
-//                 * M=2 means that you want just to integrate from  X[0]  to
+//                 * M == 2 means that you want just to integrate from  X[0]  to
 //                   X[1] and don't interested in intermediate values.
-//                 * M=1 means that you don't want to integrate :)
+//                 * M == 1 means that you don't want to integrate :)
 //                   it is degenerate case, but it will be handled correctly.
-//                 * M<1 means error
+//                 * M < 1 means error
 //     Eps     -   tolerance (absolute/relative error on each  step  will  be
 //                 less than Eps). When passing:
-//                 * Eps>0, it means desired ABSOLUTE error
-//                 * Eps<0, it means desired RELATIVE error.  Relative errors
+//                 * Eps > 0, it means desired ABSOLUTE error
+//                 * Eps < 0, it means desired RELATIVE error.  Relative errors
 //                   are calculated with respect to maximum values of  Y seen
 //                   so far. Be careful to use this criterion  when  starting
 //                   from Y[] that are close to zero.
 //     H       -   initial  step  lenth,  it  will  be adjusted automatically
-//                 after the first  step.  If  H=0,  step  will  be  selected
+//                 after the first  step.  If  H == 0,  step  will  be  selected
 //                 automatically  (usualy  it  will  be  equal  to  0.001  of
 //                 min(x[i]-x[j])).
 //
@@ -135,10 +135,10 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n,
 // API: void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state);
 void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state) {
    SetObj(odesolverstate, state);
-   ae_assert(n >= 1, "ODESolverRKCK: N<1!");
-   ae_assert(m >= 1, "ODESolverRKCK: M<1!");
-   ae_assert(y->cnt >= n, "ODESolverRKCK: Length(Y)<N!");
-   ae_assert(x->cnt >= m, "ODESolverRKCK: Length(X)<M!");
+   ae_assert(n >= 1, "ODESolverRKCK: N < 1!");
+   ae_assert(m >= 1, "ODESolverRKCK: M < 1!");
+   ae_assert(y->cnt >= n, "ODESolverRKCK: Length(Y) < N!");
+   ae_assert(x->cnt >= m, "ODESolverRKCK: Length(X) < M!");
    ae_assert(isfinitevector(y, n), "ODESolverRKCK: Y contains infinite or NaN values!");
    ae_assert(isfinitevector(x, m), "ODESolverRKCK: Y contains infinite or NaN values!");
    ae_assert(isfinite(eps), "ODESolverRKCK: Eps is not finite!");
@@ -189,7 +189,6 @@ Spawn:
    h2 = -838;
    err = 939;
    maxgrowpow = -526;
-// Routine body
 // prepare
    if (state->repterminationtype != 0) {
       goto Exit;
@@ -201,7 +200,7 @@ Spawn:
    state->needdy = false;
    state->repnfev = 0;
 // some preliminary checks for internal errors
-// after this we assume that H>0 and M>1
+// after this we assume that H > 0 and M > 1
    ae_assert(state->h > 0.0, "ODESolver: internal error");
    ae_assert(m > 1, "ODESolverIteration: internal error");
 // choose solver
@@ -284,8 +283,8 @@ Spawn:
          //
          // Take into account that we use scaling of X to reduce task
          // to the form where x[0] < x[1] < ... < x[n-1]. So X is
-         // replaced by x=xscale*t, and dy/dx=f(y,x) is replaced
-         // by dy/dt=xscale*f(y,xscale*t).
+         // replaced by x == xscale*t, and dy/dx == f(y,x) is replaced
+         // by dy/dt == xscale*f(y,xscale*t).
             ae_v_move(state->yn.xR, 1, state->yc.xR, 1, n);
             ae_v_move(state->yns.xR, 1, state->yc.xR, 1, n);
             for (k = 0; k < 6; k++) {
@@ -370,7 +369,7 @@ Pause:
 //     Rep     -   solver report:
 //                 * Rep.TerminationType completetion code:
 //                     * -2    X is not ordered  by  ascending/descending  or
-//                             there are non-distinct X[],  i.e.  X[i]=X[i+1]
+//                             there are non-distinct X[],  i.e.  X[i] == X[i+1]
 //                     * -1    incorrect parameters were specified
 //                     *  1    task has been solved
 //                 * Rep.NFEV contains number of function calculations
