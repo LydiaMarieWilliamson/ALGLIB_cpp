@@ -1887,6 +1887,7 @@ Spawn:
    b = state->b;
    alpha = state->alpha;
    beta = state->beta;
+   state->needf = false;
    state->terminationtype = -1;
    state->nfev = 0;
    state->nintervals = 0;
@@ -1903,7 +1904,7 @@ Spawn:
          state->x = x;
          state->xminusa = x - a;
          state->bminusx = b - x;
-         state->PQ = 0; goto Pause; Resume0: state->nfev++;
+         state->needf = true, state->PQ = 0; goto Pause; Resume0: state->needf = false, state->nfev++;
          state->internalstate.f = state->f;
       }
       state->v = state->internalstate.r;
@@ -1948,7 +1949,7 @@ Spawn:
             state->xminusa = a + t - b;
             state->bminusx = -t;
          }
-         state->PQ = 1; goto Pause; Resume1: state->nfev++;
+         state->needf = true, state->PQ = 1; goto Pause; Resume1: state->needf = false, state->nfev++;
          if (alpha != 0.0) {
             state->internalstate.f = state->f * pow(x, -alpha / (1 + alpha)) / (1 + alpha);
          } else {
@@ -1973,7 +1974,7 @@ Spawn:
             state->xminusa = -t;
             state->bminusx = a - (b - t);
          }
-         state->PQ = 2; goto Pause; Resume2: state->nfev++;
+         state->needf = true, state->PQ = 2; goto Pause; Resume2: state->needf = false, state->nfev++;
          if (beta != 0.0) {
             state->internalstate.f = state->f * pow(x, -beta / (1 + beta)) / (1 + beta);
          } else {
@@ -2087,6 +2088,7 @@ void autogkstate_copy(void *_dst, void *_src, bool make_automatic) {
    dst->x = src->x;
    dst->xminusa = src->xminusa;
    dst->bminusx = src->bminusx;
+   dst->needf = src->needf;
    dst->f = src->f;
    dst->wrappermode = src->wrappermode;
    autogkinternalstate_copy(&dst->internalstate, &src->internalstate, make_automatic);
@@ -2122,7 +2124,7 @@ DefClass(autogkreport, DecVal(terminationtype) DecVal(nfev) DecVal(nintervals))
 // * autogksmooth()/AutoGKSmoothW()/... to create objects
 // * autogkintegrate() to begin integration
 // * autogkresults() to get results
-DefClass(autogkstate, DecVal(x) DecVal(xminusa) DecVal(bminusx) DecVal(f))
+DefClass(autogkstate, DecVal(needf) DecVal(x) DecVal(xminusa) DecVal(bminusx) DecVal(f))
 
 void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state) {
    alglib_impl::ae_state_init();
@@ -2162,10 +2164,11 @@ bool autogkiteration(const autogkstate &state) {
 void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "autogkintegrate: func is NULL");
+   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'autogkintegrate()' (func is NULL)");
    while (alglib_impl::autogkiteration(state.c_ptr()))
    BegPoll
-      func(state.x, state.xminusa, state.bminusx, state.f, ptr);
+      if (state.needf) func(state.x, state.xminusa, state.bminusx, state.f, ptr);
+      else alglib_impl::ae_assert(false, "autogkintegrate: unexpected error");
    EndPoll
    alglib_impl::ae_state_clear();
 }

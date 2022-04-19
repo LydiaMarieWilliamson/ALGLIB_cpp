@@ -30,7 +30,7 @@ struct odesolverstate {
    ae_vector escale;
    ae_vector xg;
    ae_int_t solvertype;
-// bool needdy; //(@) Redundant.
+   bool needdy;
    double x;
    ae_vector y;
    ae_vector dy;
@@ -64,7 +64,7 @@ void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(odesolverstate, real_1d_array y; real_1d_array dy; double &x;);
+DecClass(odesolverstate, bool &needdy; real_1d_array y; real_1d_array dy; double &x;);
 DecClass(odesolverreport, ae_int_t &nfev; ae_int_t &terminationtype;);
 
 void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state);

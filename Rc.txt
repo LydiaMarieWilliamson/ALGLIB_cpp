@@ -33,15 +33,15 @@ DataAnalysis.cpp
 DiffEquations.cpp:
 	odesolveriteration():
 		odesolverstate *Q;
-		(Step: needdy):	void (*G)(const real_1d_array &Y, double X, real_1d_array dY, void *P);
+		Step: needdy:	void (*G)(const real_1d_array &Y, double X, real_1d_array dY, void *P);
 				G(Q->y, Q->x, Q->dy, P);
 Integration.cpp:
 	static autogk_autogkinternaliteration():
 		autogkinternalstate *Q;
-		(Step: needf):	void (*F)(double X, double &Y);
+		Step: needf:	void (*F)(double X, double &Y);
 	autogkiteration():
 		autogkstate *Q;
-		(Step: needf):	void (*F)(double X, double AtoX, double XtoB, double &Y, void *P);
+		Step: needf:	void (*F)(double X, double AtoX, double XtoB, double &Y, void *P);
 				F(Q->x, Q->xminusa, Q->bminusx, Q->f, P);
 Interpolation.cpp:
 	lsfititeration():
@@ -79,7 +79,7 @@ Optimization.cpp:
 		(Step)		[nlcsqp_meritphaseiteration(), nlcslp_phase13iteration(), nlcslp_phase2iteration()]
 	smoothnessmonitorcheckgradientatx0():
 		smoothnessmonitor *Q;
-		(Step: needfij)	[minlbfgsiteration(), minbleiciteration(), minnlciteration(), minbciteration(), mincgiteration(), minlmiteration()]
+		Q->needfij	[minlbfgsiteration(), minbleiciteration(), minnlciteration(), minbciteration(), mincgiteration(), minlmiteration()]
 	minlbfgsiteration(): <smoothnessmonitorcheckgradientatx0()>
 		minlbfgsstate *Q;
 		Q->needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
@@ -197,12 +197,17 @@ Solvers.cpp:
 		Q->xupdated:	void (*Rep)(const real_1d_array &X);
 				if (Rep != NULL) Rep(Q->x)
 		Q->needprec:	Q->pv = Prec(Q->x)
+		Q->needmtv:	Not needed or used
+		Q->needmv2:	Not needed or used
 	linlsqriteration():
 		linlsqrstate *Q;
 		Q->needmv:	Q->mv = Mv(A, Q->tmpx, Q->tmpd, Q->x)
 		Q->needmtv:	Q->mtv = Mtv(A, Q->tmpd, Q->x)
 		Q->xupdated:	void (*Rep)(const real_1d_array &X, double R2);
 				if (Rep != NULL) Rep(Q->x, Q->r2)
+		Q->needmv2:	Not needed or used
+		Q->needvmv:	Not needed or used
+		Q->needprec:	Not needed or used
 	nleqiteration():
 		nleqstate *Q;
 		Q->needf:	void (*F)(const real_1d_array &X, double &Y, void *P);

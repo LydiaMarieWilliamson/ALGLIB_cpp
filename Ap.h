@@ -138,7 +138,7 @@ typedef enum { NonTH, SerTH, ParTH } xparams;
 #      define _ALGLIB_HAS_SSE2_INTRINSICS
 #   endif
 #   if (AE_COMPILER == AE_GNUC && !defined AE_NO_AVX2 || AE_COMPILER == AE_OTHERC) && !defined AE_NO_SSE2 || AE_COMPILER == AE_SUNC
-#      include <immintrin.h> //(@) Oriignally preceded the #defines *HAS_SSE2_INTRINSICS for AE_OTHER_OS.
+#      include <immintrin.h> //(@) Originally preceded the #defines *HAS_SSE2_INTRINSICS for AE_OTHER_OS.
 #   endif
 #   if AE_COMPILER == AE_MSVC && !defined AE_NO_SSE2 && !defined AE_NO_AVX2
 #      include <intrin.h>

@@ -193,6 +193,7 @@ Spawn:
    m = state->m;
    h = state->h;
    maxgrowpow = pow(odesolver_odesolvermaxgrow, 5.0);
+   state->needdy = false;
    state->repnfev = 0;
 // some preliminary checks for internal errors
 // after this we assume that H > 0 and M > 1
@@ -290,7 +291,7 @@ Spawn:
                   v = state->rkb.xyR[k][j];
                   ae_v_addd(state->y.xR, 1, state->rkk.xyR[j], 1, n, v);
                }
-               state->PQ = 0; goto Pause; Resume0:
+               state->needdy = true, state->PQ = 0; goto Pause; Resume0: state->needdy = false;
                state->repnfev++;
                v = h * state->xscale;
                ae_v_moved(state->rkk.xyR[k], 1, state->dy.xR, 1, n, v);
@@ -424,6 +425,7 @@ void odesolverstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->escale, &src->escale, make_automatic);
    ae_vector_copy(&dst->xg, &src->xg, make_automatic);
    dst->solvertype = src->solvertype;
+   dst->needdy = src->needdy;
    dst->x = src->x;
    ae_vector_copy(&dst->y, &src->y, make_automatic);
    ae_vector_copy(&dst->dy, &src->dy, make_automatic);
@@ -472,7 +474,7 @@ void odesolverreport_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-DefClass(odesolverstate, DecVar(y) DecVar(dy) DecVal(x))
+DefClass(odesolverstate, DecVal(needdy) DecVar(y) DecVar(dy) DecVal(x))
 DefClass(odesolverreport, DecVal(nfev) DecVal(terminationtype))
 
 void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state) {
@@ -512,7 +514,8 @@ void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, 
    alglib_impl::ae_assert(diff != NULL, "odesolversolve: diff is NULL");
    while (alglib_impl::odesolveriteration(state.c_ptr()))
    BegPoll
-      diff(state.y, state.x, state.dy, ptr);
+      if (state.needdy) diff(state.y, state.x, state.dy, ptr);
+      else alglib_impl::ae_assert(false, "odesolversolve: unexpected error");
    EndPoll
    alglib_impl::ae_state_clear();
 }

@@ -36013,11 +36013,9 @@ static bool testminlmunit_rkindvsstatecheck(ae_int_t rkind, minlmstate *state) {
    if (state->needf) {
       nset++;
    }
-#if 0
    if (state->needfg) {
       nset++;
    }
-#endif
    if (state->needfij) {
       nset++;
    }
@@ -36044,11 +36042,11 @@ static bool testminlmunit_rkindvsstatecheck(ae_int_t rkind, minlmstate *state) {
       return result;
    }
    if (rkind == 1) {
-      result = state->needf || state->needfij || /*state->needfg || */state->xupdated;
+      result = state->needf || state->needfij || state->needfg || state->xupdated;
       return result;
    }
    if (rkind == 2) {
-      result = state->needf || /*state->needfg || */state->needfgh || state->xupdated;
+      result = state->needf || state->needfg || state->needfgh || state->xupdated;
       return result;
    }
    if (rkind == 3) {
@@ -36073,10 +36071,10 @@ static void testminlmunit_axmb(minlmstate *state, RMatrix *a, RVector *b, ae_int
    ae_int_t j;
    ae_int_t k;
    double v;
-   if (state->needf || /*state->needfg || */state->needfgh) {
+   if (state->needf || state->needfg || state->needfgh) {
       state->f = 0.0;
    }
-   if (/*state->needfg || */state->needfgh) {
+   if (state->needfg || state->needfgh) {
       for (i = 0; i < n; i++) {
          state->g.xR[i] = 0.0;
       }
@@ -36090,10 +36088,10 @@ static void testminlmunit_axmb(minlmstate *state, RMatrix *a, RVector *b, ae_int
    }
    for (i = 0; i < n; i++) {
       v = ae_v_dotproduct(a->xyR[i], 1, state->x.xR, 1, n);
-      if (state->needf || /*state->needfg || */state->needfgh) {
+      if (state->needf || state->needfg || state->needfgh) {
          state->f += sqr(v - b->xR[i]);
       }
-      if (/*state->needfg || */state->needfgh) {
+      if (state->needfg || state->needfgh) {
          for (j = 0; j < n; j++) {
             state->g.xR[j] += 2 * (v - b->xR[i]) * a->xyR[i][j];
          }
@@ -36197,10 +36195,10 @@ static bool testminlmunit_testu(bool *StateFieldConsistencyOkP) {
             state.j.xyR[2][1] = 0.0;
             state.j.xyR[2][2] = 1.0;
          }
-         if (state.needf || /*state.needfg || */state.needfgh) {
+         if (state.needf || state.needfg || state.needfgh) {
             state.f = sqr(state.x.xR[0] - 2) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
          }
-         if (/*state.needfg || */state.needfgh) {
+         if (state.needfg || state.needfgh) {
             state.g.xR[0] = 2 * (state.x.xR[0] - 2) + 2 * (state.x.xR[0] - state.x.xR[2]);
             state.g.xR[1] = 2 * state.x.xR[1];
             state.g.xR[2] = 2 * (state.x.xR[2] - state.x.xR[0]);
@@ -36270,10 +36268,10 @@ static bool testminlmunit_testu(bool *StateFieldConsistencyOkP) {
          if (state.needfij) {
             state.j.xyR[0][0] = cos(state.x.xR[0]);
          }
-         if (state.needf || /*state.needfg || */state.needfgh) {
+         if (state.needf || state.needfg || state.needfgh) {
             state.f = sqr(sin(state.x.xR[0]));
          }
-         if (/*state.needfg || */state.needfgh) {
+         if (state.needfg || state.needfgh) {
             state.g.xR[0] = 2 * sin(state.x.xR[0]) * cos(state.x.xR[0]);
          }
          if (state.needfgh) {
@@ -36437,10 +36435,10 @@ static bool testminlmunit_testu(bool *StateFieldConsistencyOkP) {
                state.j.xyR[2][1] = 0.0;
                state.j.xyR[2][2] = 1.0;
             }
-            if (state.needf || /*state.needfg || */state.needfgh) {
+            if (state.needf || state.needfg || state.needfgh) {
                state.f = s * sqr(exp(state.x.xR[0]) - 2) + sqr(sqr(state.x.xR[1]) + 1) + sqr(state.x.xR[2] - state.x.xR[0]);
             }
-            if (/*state.needfg || */state.needfgh) {
+            if (state.needfg || state.needfgh) {
                state.g.xR[0] = s * 2 * (exp(state.x.xR[0]) - 2) * exp(state.x.xR[0]) + 2 * (state.x.xR[0] - state.x.xR[2]);
                state.g.xR[1] = 2 * (sqr(state.x.xR[1]) + 1) * 2 * state.x.xR[1];
                state.g.xR[2] = 2 * (state.x.xR[2] - state.x.xR[0]);
@@ -36573,13 +36571,13 @@ static bool testminlmunit_testbc() {
                   state.fi.xR[i] = pow(state.x.xR[i] - xe.xR[i], 2.0);
                }
             }
-            if (state.needf ||/* state.needfg ||*/ state.needfgh) {
+            if (state.needf || state.needfg || state.needfgh) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
                   state.f += pow(state.x.xR[i] - xe.xR[i], 4.0);
                }
             }
-            if (/*state.needfg ||*/ state.needfgh) {
+            if (state.needfg || state.needfgh) {
                for (i = 0; i < n; i++) {
                   state.g.xR[i] = 4 * pow(state.x.xR[i] - xe.xR[i], 3.0);
                }
@@ -37208,10 +37206,10 @@ static bool testminlmunit_testother(bool *StateFieldConsistencyOkP) {
             state.j.xyR[2][1] = 0.0;
             state.j.xyR[2][2] = 1.0;
          }
-         if (state.needf ||/* state.needfg ||*/ state.needfgh) {
+         if (state.needf || state.needfg || state.needfgh) {
             state.f = s * sqr(exp(state.x.xR[0]) - 2) + sqr(state.x.xR[1]) + sqr(state.x.xR[2] - state.x.xR[0]);
          }
-         if (/*state.needfg ||*/ state.needfgh) {
+         if (state.needfg || state.needfgh) {
             state.g.xR[0] = s * 2 * (exp(state.x.xR[0]) - 2) * exp(state.x.xR[0]) + 2 * (state.x.xR[0] - state.x.xR[2]);
             state.g.xR[1] = 2 * state.x.xR[1];
             state.g.xR[2] = 2 * (state.x.xR[2] - state.x.xR[0]);
@@ -37259,10 +37257,10 @@ static bool testminlmunit_testother(bool *StateFieldConsistencyOkP) {
    minlmsetxrep(&state, true);
    xprev = x.xR[0];
    while (minlmiteration(&state)) {
-      if (state.needf ||/* state.needfg ||*/ state.needfgh) {
+      if (state.needf || state.needfg || state.needfgh) {
          state.f = exp(state.x.xR[0]) + exp(-state.x.xR[0]);
       }
-      if (/*state.needfg ||*/ state.needfgh) {
+      if (state.needfg || state.needfgh) {
          state.g.xR[0] = exp(state.x.xR[0]) - exp(-state.x.xR[0]);
       }
       if (state.needfgh) {

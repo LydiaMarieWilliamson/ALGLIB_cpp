@@ -200,8 +200,8 @@ struct lincgstate {
    bool xrep;
    bool xupdated;
    bool needmv;
-// bool needmtv; //(@) Not used.
-// bool needmv2; //(@) Not used.
+   bool needmtv;
+   bool needmv2;
    bool needvmv;
    bool needprec;
    ae_int_t repiterationscount;
@@ -303,9 +303,9 @@ struct linlsqrstate {
    bool xupdated;
    bool needmv;
    bool needmtv;
-// bool needmv2; //(@) Not used.
-// bool needvmv; //(@) Not used.
-// bool needprec; //(@) Not used.
+   bool needmv2;
+   bool needvmv;
+   bool needprec;
    ae_int_t repiterationscount;
    ae_int_t repnmv;
    ae_int_t repterminationtype;

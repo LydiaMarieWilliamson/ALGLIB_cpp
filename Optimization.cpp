@@ -3033,6 +3033,7 @@ Spawn:
    vc = -698;
    n = monitor->n;
    k = monitor->k;
+   monitor->needfij = false;
 // Quick exit
    if (n <= 0 || k <= 0 || !isfinite(teststep) || teststep == 0.0) {
       goto Exit;
@@ -3070,7 +3071,7 @@ Spawn:
       monitor->rep.badgradxbase.xR[i] = v;
       monitor->x.xR[i] = v;
    }
-   monitor->PQ = 0; goto Pause; Resume0:
+   monitor->needfij = true, monitor->PQ = 0; goto Pause; Resume0: monitor->needfij = false;
    for (i = 0; i < k; i++) {
       monitor->fbase.xR[i] = monitor->fi.xR[i];
       for (j = 0; j < n; j++) {
@@ -3103,7 +3104,7 @@ Spawn:
          monitor->x.xR[i] = monitor->xbase.xR[i];
       }
       monitor->x.xR[varidx] = vm;
-      monitor->PQ = 1; goto Pause; Resume1:
+      monitor->needfij = true, monitor->PQ = 1; goto Pause; Resume1: monitor->needfij = false;
       for (i = 0; i < k; i++) {
          monitor->fm.xR[i] = monitor->fi.xR[i];
          monitor->jm.xR[i] = monitor->j.xyR[i][varidx];
@@ -3112,7 +3113,7 @@ Spawn:
          monitor->x.xR[i] = monitor->xbase.xR[i];
       }
       monitor->x.xR[varidx] = vc;
-      monitor->PQ = 2; goto Pause; Resume2:
+      monitor->needfij = true, monitor->PQ = 2; goto Pause; Resume2: monitor->needfij = false;
       for (i = 0; i < k; i++) {
          monitor->fc.xR[i] = monitor->fi.xR[i];
          monitor->jc.xR[i] = monitor->j.xyR[i][varidx];
@@ -3121,7 +3122,7 @@ Spawn:
          monitor->x.xR[i] = monitor->xbase.xR[i];
       }
       monitor->x.xR[varidx] = vp;
-      monitor->PQ = 3; goto Pause; Resume3:
+      monitor->needfij = true, monitor->PQ = 3; goto Pause; Resume3: monitor->needfij = false;
       for (i = 0; i < k; i++) {
          monitor->fp.xR[i] = monitor->fi.xR[i];
          monitor->jp.xR[i] = monitor->j.xyR[i][varidx];
@@ -3301,6 +3302,7 @@ void smoothnessmonitor_copy(void *_dst, void *_src, bool make_automatic) {
    dst->nonc1test1lngrating = src->nonc1test1lngrating;
    optguardnonc1test1report_copy(&dst->nonc1test1strrep, &src->nonc1test1strrep, make_automatic);
    optguardnonc1test1report_copy(&dst->nonc1test1lngrep, &src->nonc1test1lngrep, make_automatic);
+   dst->needfij = src->needfij;
    ae_vector_copy(&dst->x, &src->x, make_automatic);
    ae_vector_copy(&dst->fi, &src->fi, make_automatic);
    ae_matrix_copy(&dst->j, &src->j, make_automatic);
@@ -21714,7 +21716,7 @@ Spawn:
 // prepare
    n = state->n;
    m = state->m;
-   state->xupdated = state->needfi = state->needfij = state->needfgh = state->needf = false;
+   state->xupdated = state->needfi = state->needfij = state->needfgh = state->needfg = state->needf = false;
    state->repiterationscount = 0;
    state->repterminationtype = 0;
    state->repnfunc = 0;
@@ -22787,6 +22789,7 @@ void minlmstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_matrix_copy(&dst->h, &src->h, make_automatic);
    ae_vector_copy(&dst->g, &src->g, make_automatic);
    dst->needf = src->needf;
+   dst->needfg = src->needfg;
    dst->needfgh = src->needfgh;
    dst->needfij = src->needfij;
    dst->needfi = src->needfi;
@@ -22911,7 +22914,7 @@ namespace alglib {
 // This structure should be created using one of the MinLMCreate???()
 // functions. You should not access its fields directly; use ALGLIB functions
 // to work with it.
-DefClass(minlmstate, DecVal(needf)/* DecVal(needfg)*/ DecVal(needfgh) DecVal(needfi) DecVal(needfij) DecVal(xupdated) DecVal(f) DecVar(fi) DecVar(g) DecVar(h) DecVar(j) DecVar(x))
+DefClass(minlmstate, DecVal(needf) DecVal(needfg) DecVal(needfgh) DecVal(needfi) DecVal(needfij) DecVal(xupdated) DecVal(f) DecVar(fi) DecVar(g) DecVar(h) DecVar(j) DecVar(x))
 
 // Optimization report, filled by MinLMResults() function
 //
@@ -23169,7 +23172,6 @@ void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_
    alglib_impl::ae_state_clear();
 }
 void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
-//(@) state.needfg and grad() are both unused.
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::ae_assert(func != NULL, "minlmoptimize: func is NULL");
@@ -23178,6 +23180,7 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
    while (alglib_impl::minlmiteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.f, ptr);
+      else if (state.needfg) grad(state.x, state.f, state.g, ptr);
       else if (state.needfgh) hess(state.x, state.f, state.g, state.h, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
       else alglib_impl::ae_assert(false, "minlmoptimize: some derivatives were not provided?");
@@ -23199,7 +23202,6 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
    alglib_impl::ae_state_clear();
 }
 void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
-//(@) state.needfg and grad() are both unused.
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::ae_assert(func != NULL, "minlmoptimize: func is NULL");
@@ -23208,6 +23210,7 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
    while (alglib_impl::minlmiteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.f, ptr);
+      else if (state.needfg) grad(state.x, state.f, state.g, ptr);
       else if (state.needfij) jac(state.x, state.fi, state.j, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
       else alglib_impl::ae_assert(false, "minlmoptimize: some derivatives were not provided?");

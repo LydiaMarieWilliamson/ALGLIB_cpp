@@ -12905,6 +12905,7 @@ using namespace alglib;
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> odesolverstate {
+   <b>bool</b> needdy;
    real_1d_array y;
    real_1d_array dy;
    <b>double</b> x;
@@ -13796,6 +13797,7 @@ use. You should use ALGLIB functions to work with this class:
 <hr width=600 align=left>
 <pre class=declaration>
 <b>class</b> autogkstate {
+   <b>bool</b> needf;
    <b>double</b> x;
    <b>double</b> xminusa;
    <b>double</b> bminusx;
@@ -35372,6 +35374,7 @@ to work with it.
 <pre class=declaration>
 <b>class</b> minlmstate {
    <b>bool</b> needf;
+   <b>bool</b> needfg;
    <b>bool</b> needfgh;
    <b>bool</b> needfi;
    <b>bool</b> needfij;

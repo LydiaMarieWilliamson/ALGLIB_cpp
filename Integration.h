@@ -105,7 +105,7 @@ struct autogkstate {
    double x;
    double xminusa;
    double bminusx;
-// bool needf; //(@) Redundant.
+   bool needf;
    double f;
    ae_int_t wrappermode;
    autogkinternalstate internalstate;
@@ -128,7 +128,7 @@ void autogkresults(autogkstate *state, double *v, autogkreport *rep);
 
 namespace alglib {
 DecClass(autogkreport, ae_int_t &terminationtype; ae_int_t &nfev; ae_int_t &nintervals;);
-DecClass(autogkstate, double &x; double &xminusa; double &bminusx; double &f;);
+DecClass(autogkstate, bool &needf; double &x; double &xminusa; double &bminusx; double &f;);
 
 void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state);
 void autogksmooth(const double a, const double b, autogkstate &state);

@@ -12560,7 +12560,6 @@ Spawn:
             vv = state->wcur.xR[i];
             state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
          }
-#if 0 //(@) Never used.
       } else if (state->optstate.needfg) {
       // calculate F/gradF
          state->optstate.f = 0.0;
@@ -12577,7 +12576,6 @@ Spawn:
             v = sqr(vv) * 2 * (state->f - state->tasky.xR[i]);
             ae_v_addd(state->optstate.g.xR, 1, state->g.xR, 1, k, v);
          }
-#endif
       } else if (state->optstate.needfij) {
       // calculate Fi/jac(Fi)
          for (i = 0; i < n; i++) {

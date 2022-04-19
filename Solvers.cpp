@@ -4018,7 +4018,7 @@ Spawn:
    bnorm = -919;
    v = -909;
    ae_assert(state->b.cnt > 0, "LinCGIteration: B is not initialized (you must initialize B by LinCGSetB() call");
-   state->needprec = state->needvmv = state->needmv = state->xupdated = false;
+   state->needprec = state->needvmv = state->needmv2 = state->needmtv = state->needmv = state->xupdated = false;
    state->running = true;
    state->repnmv = 0;
    lincg_updateitersdata(state);
@@ -4419,6 +4419,8 @@ void lincgstate_copy(void *_dst, void *_src, bool make_automatic) {
    dst->xrep = src->xrep;
    dst->xupdated = src->xupdated;
    dst->needmv = src->needmv;
+   dst->needmtv = src->needmtv;
+   dst->needmv2 = src->needmv2;
    dst->needvmv = src->needvmv;
    dst->needprec = src->needprec;
    dst->repiterationscount = src->repiterationscount;
@@ -4721,7 +4723,7 @@ Spawn:
    ae_assert(state->b.cnt > 0, "LinLSQRIteration: using non-allocated array B");
    summn = state->m + state->n;
    bnorm = sqrt(state->bnorm2);
-   state->needmtv = state->needmv = state->xupdated = false;
+   state->needprec = state->needvmv = state->needmv2 = state->needmtv = state->needmv = state->xupdated = false;
    state->userterminationneeded = false;
    state->running = true;
    state->repnmv = 0;
@@ -5228,6 +5230,9 @@ void linlsqrstate_copy(void *_dst, void *_src, bool make_automatic) {
    dst->xupdated = src->xupdated;
    dst->needmv = src->needmv;
    dst->needmtv = src->needmtv;
+   dst->needmv2 = src->needmv2;
+   dst->needvmv = src->needvmv;
+   dst->needprec = src->needprec;
    dst->repiterationscount = src->repiterationscount;
    dst->repnmv = src->repnmv;
    dst->repterminationtype = src->repterminationtype;

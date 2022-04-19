@@ -176,7 +176,7 @@ struct smoothnessmonitor {
    double nonc1test1lngrating;
    optguardnonc1test1report nonc1test1strrep;
    optguardnonc1test1report nonc1test1lngrep;
-// bool needfij; //(@) Redundant.
+   bool needfij;
    ae_vector x;
    ae_vector fi;
    ae_matrix j;
@@ -1284,7 +1284,7 @@ struct minlmstate {
    ae_matrix h;
    ae_vector g;
    bool needf;
-// bool needfg; //(@) Not used.
+   bool needfg;
    bool needfgh;
    bool needfij;
    bool needfi;
@@ -1385,7 +1385,7 @@ void minlmrequesttermination(minlmstate *state);
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(minlmstate, bool &needf;/* bool &needfg;*/ bool &needfgh; bool &needfi; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_1d_array g; real_2d_array h; real_2d_array j; real_1d_array x;);
+DecClass(minlmstate, bool &needf; bool &needfg; bool &needfgh; bool &needfi; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_1d_array g; real_2d_array h; real_2d_array j; real_1d_array x;);
 DecClass(minlmreport, ae_int_t &iterationscount; ae_int_t &terminationtype; ae_int_t &nfunc; ae_int_t &njac; ae_int_t &ngrad; ae_int_t &nhess; ae_int_t &ncholesky;);
 
 void minlmsetcond(const minlmstate &state, const double epsx, const ae_int_t maxits);
