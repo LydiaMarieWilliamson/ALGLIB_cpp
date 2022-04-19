@@ -697,7 +697,7 @@ A6.2. Test Stages
 	―	Local routines bessel_besselasympt{0,1}(x, ⋯) recoded and redefined as bessel_besselasympt{0,1}(8.0/x, ⋯).
 	―	API routines besseli{0,1}(), bessel{j,y,k}{0,1,n}() recoded.
 	―	Minor changes in the layout of some of the header comments.
-0-39	Interpolation.cpp: Adding changes made in AlgLib++.
+0-39	Interpolation.{cpp.h}: Adding changes made in AlgLib++.
 	―	Moved spline1dfitpenalized[w]() from INTCOMP back into SPLINE1D.
 	―	spline1d_spline1dgriddiffcubicinternal():
 		removed "RVector *dt", it's not used by any of routine's callers,
@@ -705,8 +705,8 @@ A6.2. Test Stages
 	―	Local routine spline1d_diffthreepoint() in-line substituted into spline1dbuildakima() and removed,
 		and spline1dbuildakima() recoded.
 	―	spline1dconvdiffinternal():
-		remade the non-API routine into static local.
-		remade "RVector *y", "RVector *d1", "RVector *d2" into optional output parameters.
+		remade the non-API routine into static local and removed its declaration,
+		remade "RVector *y", "RVector *d1", "RVector *d2" into optional output parameters,
 		eliminated "bool needy", "bool needd1", "bool needd2" respectively in favor of (y != NULL), (d1 != NULL) and (d2 != NULL).
 	―	spline3d_spline3ddiff(): remade "double *fx", "double *fy", "double *fxy" into optional output parameters.
 	―	rbf_clearreportfields(): removed and inserted inline at its point of use.
@@ -741,7 +741,7 @@ A6.2. Test Stages
 	―	sparsesmm(): A is M × K, not N × K.
 	―	sparsecholeskyskyline(): "matrixm" → "matrix"
 	―	Sin(⋯) → sin(⋯), Cos(⋯) → cos(⋯), Exp(⋯) → exp(⋯), TanH(⋯) → tanh(⋯)
-	―	Sign(⋯) → sign(⋯), Ceil(⋯) → ceil(⋯), Sqrt(⋯) → sqrt(⋯), Power(⋯) → power(⋯)
+	―	Sign(⋯) → sign(⋯), Ceil(⋯) → ceil(⋯), Floor(⋯) → floor(⋯), Sqrt(⋯) → sqrt(⋯), Power(⋯) → power(⋯)
 
 A6.3. Test Results
 ──────────────────

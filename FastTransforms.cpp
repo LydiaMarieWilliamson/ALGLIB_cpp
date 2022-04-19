@@ -241,7 +241,7 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a) {
    NewVector(fh, 0, DT_COMPLEX);
    ae_assert(n > 0, "FFTR1DInv: incorrect N!");
    ae_int_t Nq = n / 2, Nr = n % 2;
-   ae_assert(f->cnt >= Nq + 1, "FFTR1DInv: Length(F) < Floor(N/2)+1!");
+   ae_assert(f->cnt >= Nq + 1, "FFTR1DInv: Length(F) < floor(N/2)+1!");
    ae_assert(isfinite(f->xC[0].x), "FFTR1DInv: F contains infinite or NAN values!");
    for (i = 1; i < Nq; i++) {
       ae_assert(isfinite(f->xC[i].x) && isfinite(f->xC[i].y), "FFTR1DInv: F contains infinite or NAN values!");
@@ -1635,7 +1635,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
       return;
    }
 // Task is normalized
-   ae_int_t Mq = m /2, Mr = m % 2;
+   ae_int_t Mq = m / 2, Mr = m % 2;
    if (Mr == 0) {
    // size is even, use fast even-size FFT
       ae_vector_set_length(&buf, m);

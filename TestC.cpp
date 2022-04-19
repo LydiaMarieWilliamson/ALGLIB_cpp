@@ -23432,22 +23432,18 @@ bool testlinmin() {
 static void testnlequnit_testfunchbm(nleqstate *state) {
    double x;
    double y;
-   ae_assert(state->needf || state->needfij, "TestNLEQUnit: internal error!");
    x = state->x.xR[0];
    y = state->x.xR[1];
    if (state->needf) {
       state->f = sqr(x * x + y - 11) + sqr(x + y * y - 7);
-      return;
-   }
-   if (state->needfij) {
+   } else if (state->needfij) {
       state->fi.xR[0] = x * x + y - 11;
       state->fi.xR[1] = x + y * y - 7;
       state->j.xyR[0][0] = 2 * x;
       state->j.xyR[0][1] = 1.0;
       state->j.xyR[1][0] = 1.0;
       state->j.xyR[1][1] = 2 * y;
-      return;
-   }
+   } else ae_assert(false, "TestNLEQUnit: internal error!");
 }
 
 // Himmelblau's function
@@ -23458,19 +23454,15 @@ static void testnlequnit_testfunchbm(nleqstate *state) {
 static void testnlequnit_testfunchb1(nleqstate *state) {
    double x;
    double y;
-   ae_assert(state->needf || state->needfij, "TestNLEQUnit: internal error!");
    x = state->x.xR[0];
    y = state->x.xR[1];
    if (state->needf) {
       state->f = sqr(sqr(x * x + y - 11) + sqr(x + y * y - 7));
-      return;
-   }
-   if (state->needfij) {
+   } else if (state->needfij) {
       state->fi.xR[0] = sqr(x * x + y - 11) + sqr(x + y * y - 7);
       state->j.xyR[0][0] = 2 * (x * x + y - 11) * 2 * x + 2 * (x + y * y - 7);
       state->j.xyR[0][1] = 2 * (x * x + y - 11) + 2 * (x + y * y - 7) * 2 * y;
-      return;
-   }
+   } else ae_assert(false, "TestNLEQUnit: internal error!");
 }
 
 // Shifted Himmelblau's function
@@ -23487,14 +23479,11 @@ static void testnlequnit_testfunchb1(nleqstate *state) {
 static void testnlequnit_testfuncshbm(nleqstate *state) {
    double x;
    double y;
-   ae_assert(state->needf || state->needfij, "TestNLEQUnit: internal error!");
    x = state->x.xR[0];
    y = state->x.xR[1];
    if (state->needf) {
       state->f = sqr(x * x + y - 11) + sqr(x + y * y - 7) + 1;
-      return;
-   }
-   if (state->needfij) {
+   } else if (state->needfij) {
       state->fi.xR[0] = x * x + y - 11;
       state->fi.xR[1] = x + y * y - 7;
       state->fi.xR[2] = 1.0;
@@ -23504,8 +23493,7 @@ static void testnlequnit_testfuncshbm(nleqstate *state) {
       state->j.xyR[1][1] = 2 * y;
       state->j.xyR[2][0] = 0.0;
       state->j.xyR[2][1] = 0.0;
-      return;
-   }
+   } else ae_assert(false, "TestNLEQUnit: internal error!");
 }
 
 bool testnleq() {

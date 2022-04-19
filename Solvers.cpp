@@ -5541,6 +5541,13 @@ void lincgsetstartingpoint(const lincgstate &state, const real_1d_array &x) {
    alglib_impl::ae_state_clear();
 }
 
+void lincgsetb(const lincgstate &state, const real_1d_array &b) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::lincgsetb(ConstT(lincgstate, state), ConstT(ae_vector, b));
+   alglib_impl::ae_state_clear();
+}
+
 void lincgsetprecunit(const lincgstate &state) {
    alglib_impl::ae_state_init();
    TryCatch()

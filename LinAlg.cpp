@@ -79,7 +79,7 @@ static ae_int_t ablas_ablasinternalsplitlength(ae_int_t n, ae_int_t nb) {
 // Outputs:
 //     N1  -   length of the left half
 //
-// N1 >= N2, N1 may be N
+// N1 >= N/2, N1 may be N
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 ae_int_t ablassplitlength(RMatrix *a, ae_int_t n) {
    return ablas_ablasinternalsplitlength(n, n > ablasblocksize(a) ? ablasblocksize(a) : ablasmicroblocksize());

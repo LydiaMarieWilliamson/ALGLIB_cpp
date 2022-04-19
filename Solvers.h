@@ -322,6 +322,7 @@ DecClass(lincgreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &termin
 
 void lincgcreate(const ae_int_t n, lincgstate &state);
 void lincgsetstartingpoint(const lincgstate &state, const real_1d_array &x);
+void lincgsetb(const lincgstate &state, const real_1d_array &b);
 void lincgsetprecunit(const lincgstate &state);
 void lincgsetprecdiag(const lincgstate &state);
 void lincgsetcond(const lincgstate &state, const double epsf, const ae_int_t maxits);
