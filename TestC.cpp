@@ -32868,7 +32868,7 @@ static bool testminqpunit_generallcqptest() {
                rawct.xZ[i] = -1;
                if (hqrnduniformr(&rs) < 0.66) {
                // I-th box constraint is inactive
-                  rawc.xyR[i][n] += (1.0 + hqrnduniformr(&rs));
+                  rawc.xyR[i][n] += 1.0 + hqrnduniformr(&rs);
                   if (hqrnduniformr(&rs) > 0.50) {
                      ae_v_muld(rawc.xyR[i], 1, n + 1, -1);
                      rawct.xZ[i] = -rawct.xZ[i];
