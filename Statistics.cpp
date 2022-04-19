@@ -71,7 +71,7 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 += (x->xR[i] - (*mean));
+         v2 += x->xR[i] - (*mean);
       }
       v2 = sqr(v2) / n;
       *variance = (v1 - v2) / (n - 1);
@@ -7650,7 +7650,7 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 += (x->xR[i] - xmean);
+         v2 += x->xR[i] - xmean;
       }
       v2 = sqr(v2) / n;
       xvariance = (v1 - v2) / (n - 1);

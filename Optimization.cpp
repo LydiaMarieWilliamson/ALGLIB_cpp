@@ -16328,7 +16328,7 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree) {
       if (state->mdense > 0) {
          nnzmax += n * state->mdense;
       }
-      nnzmax += (n + m);
+      nnzmax += n + m;
    // Prepare strictly lower triangle of template KKT matrix (KKT system without D and E
    // terms being added to diagonals)
       state->factsparsekkttmpl.m = n + m;
@@ -16919,29 +16919,29 @@ static void vipmsolver_rhssubtract(vipmstate *state, vipmrighthandside *rhs, vip
 // Residual for Rho, Nu, Tau, Alpha, Sigma, Beta
    for (i = 0; i < m; i++) {
       if (state->haswv.xB[i]) {
-         rhs->rho.xR[i] -= (state->tmpax.xR[i] - vdcandidate->w.xR[i] + reg * vdcandidate->y.xR[i]);
+         rhs->rho.xR[i] -= state->tmpax.xR[i] - vdcandidate->w.xR[i] + reg * vdcandidate->y.xR[i];
       } else {
-         rhs->rho.xR[i] -= (state->tmpax.xR[i] + reg * vdcandidate->y.xR[i]);
+         rhs->rho.xR[i] -= state->tmpax.xR[i] + reg * vdcandidate->y.xR[i];
       }
    }
    for (i = 0; i < n; i++) {
       if (state->hasgz.xB[i]) {
-         rhs->nu.xR[i] -= (vdcandidate->x.xR[i] - vdcandidate->g.xR[i] + reg * vdcandidate->z.xR[i]);
+         rhs->nu.xR[i] -= vdcandidate->x.xR[i] - vdcandidate->g.xR[i] + reg * vdcandidate->z.xR[i];
       }
    }
    for (i = 0; i < n; i++) {
       if (state->hasts.xB[i]) {
-         rhs->tau.xR[i] -= (vdcandidate->x.xR[i] + vdcandidate->t.xR[i] - reg * vdcandidate->s.xR[i]);
+         rhs->tau.xR[i] -= vdcandidate->x.xR[i] + vdcandidate->t.xR[i] - reg * vdcandidate->s.xR[i];
       }
    }
    for (i = 0; i < m; i++) {
       if (state->haspq.xB[i]) {
-         rhs->alpha.xR[i] -= (vdcandidate->w.xR[i] + vdcandidate->p.xR[i] - reg * vdcandidate->q.xR[i]);
+         rhs->alpha.xR[i] -= vdcandidate->w.xR[i] + vdcandidate->p.xR[i] - reg * vdcandidate->q.xR[i];
       }
    }
    for (i = 0; i < n; i++) {
       if (!state->isfrozen.xB[i]) {
-         rhs->sigma.xR[i] -= (state->tmpaty.xR[i] - state->tmphx.xR[i] - reg * vdcandidate->x.xR[i]);
+         rhs->sigma.xR[i] -= state->tmpaty.xR[i] - state->tmphx.xR[i] - reg * vdcandidate->x.xR[i];
          if (state->hasgz.xB[i]) {
             rhs->sigma.xR[i] -= vdcandidate->z.xR[i];
          }
@@ -16952,7 +16952,7 @@ static void vipmsolver_rhssubtract(vipmstate *state, vipmrighthandside *rhs, vip
    }
    for (i = 0; i < m; i++) {
       if (state->haswv.xB[i]) {
-         rhs->beta.xR[i] -= (-vdcandidate->y.xR[i] + vdcandidate->v.xR[i] - reg * vdcandidate->w.xR[i]);
+         rhs->beta.xR[i] -= -vdcandidate->y.xR[i] + vdcandidate->v.xR[i] - reg * vdcandidate->w.xR[i];
       }
       if (state->haspq.xB[i]) {
          rhs->beta.xR[i] += vdcandidate->q.xR[i];
@@ -16961,22 +16961,22 @@ static void vipmsolver_rhssubtract(vipmstate *state, vipmrighthandside *rhs, vip
 // Residual for GammaZ, GammaW, GammaS, GammaQ
    for (i = 0; i < n; i++) {
       if (state->hasgz.xB[i]) {
-         rhs->gammaz.xR[i] -= (v0->z.xR[i] / v0->g.xR[i] * vdcandidate->g.xR[i] + vdcandidate->z.xR[i]);
+         rhs->gammaz.xR[i] -= v0->z.xR[i] / v0->g.xR[i] * vdcandidate->g.xR[i] + vdcandidate->z.xR[i];
       }
    }
    for (i = 0; i < m; i++) {
       if (state->haswv.xB[i]) {
-         rhs->gammaw.xR[i] -= (v0->w.xR[i] / v0->v.xR[i] * vdcandidate->v.xR[i] + vdcandidate->w.xR[i]);
+         rhs->gammaw.xR[i] -= v0->w.xR[i] / v0->v.xR[i] * vdcandidate->v.xR[i] + vdcandidate->w.xR[i];
       }
    }
    for (i = 0; i < n; i++) {
       if (state->hasts.xB[i]) {
-         rhs->gammas.xR[i] -= (v0->s.xR[i] / v0->t.xR[i] * vdcandidate->t.xR[i] + vdcandidate->s.xR[i]);
+         rhs->gammas.xR[i] -= v0->s.xR[i] / v0->t.xR[i] * vdcandidate->t.xR[i] + vdcandidate->s.xR[i];
       }
    }
    for (i = 0; i < m; i++) {
       if (state->haspq.xB[i]) {
-         rhs->gammaq.xR[i] -= (v0->q.xR[i] / v0->p.xR[i] * vdcandidate->p.xR[i] + vdcandidate->q.xR[i]);
+         rhs->gammaq.xR[i] -= v0->q.xR[i] / v0->p.xR[i] * vdcandidate->p.xR[i] + vdcandidate->q.xR[i];
       }
    }
 }
@@ -25617,7 +25617,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          subsolver->d0.xR[offsslackic + (i - nec)] = rmax2(v, 0.0);
       }
    }
-   subsolver->sparseefflc.m += (nec + nic);
+   subsolver->sparseefflc.m += nec + nic;
 // Append nonlinear equality/inequality constraints
    for (i = 0; i < nlec + nlic; i++) {
    // Calculate scale coefficient
@@ -25676,7 +25676,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          subsolver->d0.xR[offsslacknlic + (i - nlec)] = rmax2(v, 0.0);
       }
    }
-   subsolver->sparseefflc.m += (nlec + nlic);
+   subsolver->sparseefflc.m += nlec + nlic;
 // Finalize sparse matrix structure
    ae_assert(subsolver->sparseefflc.ridx.xZ[subsolver->sparseefflc.m] <= subsolver->sparseefflc.idx.cnt, "QPSubproblemSolve: critical integrity check failed");
    ae_assert(subsolver->sparseefflc.ridx.xZ[subsolver->sparseefflc.m] <= subsolver->sparseefflc.vals.cnt, "QPSubproblemSolve: critical integrity check failed");
@@ -27984,7 +27984,7 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
          nzl = nlogical;
          for (i = 0; i < nstructural; i++) {
             k = s->lubuf2.rowpermrawidx.xZ[i];
-            nzl += (s->sparselu1.ridx.xZ[k + 1] - s->sparselu1.ridx.xZ[k]);
+            nzl += s->sparselu1.ridx.xZ[k + 1] - s->sparselu1.ridx.xZ[k];
             nzl += 1 + (s->sparselu2.didx.xZ[i] - s->sparselu2.ridx.xZ[i]);
          }
          vectorsetlengthatleast(&s->sparsel.vals, nzl);
@@ -32702,7 +32702,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          subsolver->curbndu.xR[offsslackic + (i - nec)] = rmax2(v, 0.0);
       }
    }
-   subsolver->sparseefflc.m += (nec + nic);
+   subsolver->sparseefflc.m += nec + nic;
 // Append nonlinear equality/inequality constraints
    for (i = 0; i < nlec + nlic; i++) {
    // Calculate scale coefficient
@@ -32753,7 +32753,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          subsolver->curbndu.xR[offsslacknlic + (i - nlec)] = rmax2(v, 0.0);
       }
    }
-   subsolver->sparseefflc.m += (nlec + nlic);
+   subsolver->sparseefflc.m += nlec + nlic;
 // Append conjugacy constraints
    for (i = 0; i < subsolver->curdcnt; i++) {
    // Copy N elements of CurHD

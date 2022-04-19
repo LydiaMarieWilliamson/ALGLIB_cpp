@@ -1591,7 +1591,7 @@ static void testhqrndunit_calculatemv(RVector *x, ae_int_t n, double *mean, doub
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 += (x->xR[i] - (*mean));
+         v2 += x->xR[i] - (*mean);
       }
       v2 = sqr(v2) / n;
       variance = (v1 - v2) / (n - 1);
@@ -35876,7 +35876,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                rawct.xZ[i] = -1;
                if (hqrnduniformr(&rs) < 0.66) {
                // I-th box constraint is inactive
-                  rawc.xyR[i][n] += (1.0 + hqrnduniformr(&rs));
+                  rawc.xyR[i][n] += 1.0 + hqrnduniformr(&rs);
                   if (hqrnduniformr(&rs) > 0.50) {
                      ae_v_muld(rawc.xyR[i], 1, n + 1, -1);
                      rawct.xZ[i] = -rawct.xZ[i];
@@ -48179,7 +48179,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                      v += state.x.xR[i] * xu.xR[i];
                   }
                   if (v < vbnd) {
-                     state.fi.xR[0] += (vshift + vpower * (vbnd - v));
+                     state.fi.xR[0] += vshift + vpower * (vbnd - v);
                      for (i = 0; i < n; i++) {
                         state.j.xyR[0][i] -= vpower * xu.xR[i];
                      }
@@ -72834,7 +72834,7 @@ static void testpcaunit_calculatemv(RVector *x, ae_int_t n, double *mean, double
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 += (x->xR[i] - (*mean));
+         v2 += x->xR[i] - (*mean);
       }
       v2 = sqr(v2) / n;
       variance = (v1 - v2) / n;
@@ -80548,7 +80548,7 @@ static void testlinregunit_calculatemv(RVector *x, ae_int_t n, double *mean, dou
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 += (x->xR[i] - (*mean));
+         v2 += x->xR[i] - (*mean);
       }
       v2 = sqr(v2) / n;
       variance = (v1 - v2) / (n - 1);
@@ -87216,7 +87216,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
             if (j != xytrain.xyR[i][nin]) {
                avgerr += y.xR[j];
             } else {
-               avgerr += (1 - y.xR[j]);
+               avgerr += 1 - y.xR[j];
             }
          }
       }
@@ -87235,7 +87235,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
             if (j != xytest.xyR[i][nin]) {
                avgerr += y.xR[j];
             } else {
-               avgerr += (1 - y.xR[j]);
+               avgerr += 1 - y.xR[j];
             }
          }
       }

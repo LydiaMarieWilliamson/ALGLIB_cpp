@@ -977,8 +977,8 @@ void dsoptimalsplit2fast(RVector *a, ZVector *c, ZVector *tiesbuf, ZVector *cntb
          cntbuf->xZ[cl]++;
          cntbuf->xZ[nc + cl]--;
       }
-      sl += (tiesbuf->xZ[k + 1] - tiesbuf->xZ[k]);
-      sr -= (tiesbuf->xZ[k + 1] - tiesbuf->xZ[k]);
+      sl += tiesbuf->xZ[k + 1] - tiesbuf->xZ[k];
+      sr -= tiesbuf->xZ[k + 1] - tiesbuf->xZ[k];
    // Calculate RMS error
       v = 0.0;
       for (i = 0; i < nc; i++) {

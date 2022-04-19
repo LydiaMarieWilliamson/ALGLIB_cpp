@@ -10517,7 +10517,7 @@ ae_int_t sparsegetuppercount(sparsematrix *s) {
       result = 0;
       sz = s->m;
       for (i = 0; i < sz; i++) {
-         result += (s->ridx.xZ[i + 1] - s->uidx.xZ[i]);
+         result += s->ridx.xZ[i + 1] - s->uidx.xZ[i];
       }
       return result;
    }
@@ -10572,7 +10572,7 @@ ae_int_t sparsegetlowercount(sparsematrix *s) {
       result = 0;
       sz = s->m;
       for (i = 0; i < sz; i++) {
-         result += (s->didx.xZ[i] - s->ridx.xZ[i]);
+         result += s->didx.xZ[i] - s->ridx.xZ[i];
       }
       return result;
    }
@@ -11454,7 +11454,7 @@ static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, doub
                tau = safepythag2(*c, z);
                *cs = z / tau;
                *sn = *c / tau;
-               *b -= (*c);
+               *b -= *c;
                *c = 0.0;
             } else {
             // Complex eigenvalues, or real (almost) equal eigenvalues.
@@ -11488,7 +11488,7 @@ static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, doub
                         tau = 1 / sqrt(fabs(*b + (*c)));
                         *a = temp + p;
                         *d = temp - p;
-                        *b -= (*c);
+                        *b -= *c;
                         *c = 0.0;
                         cs1 = sab * tau;
                         sn1 = sac * tau;
@@ -21371,7 +21371,7 @@ static ae_int_t spchol_computenonzeropattern(sparsematrix *wrkat, ae_int_t colum
       // Handle degenerate cases: empty merge target or empty merge source.
          if (j1 < j0) {
             icopyvx(i1 - i0 + 1, superrowidx, i0, superrowidx, rlast);
-            rlast += (i1 - i0 + 1);
+            rlast += i1 - i0 + 1;
             continue;
          }
          if (i1 < i0) {
@@ -21481,7 +21481,7 @@ static ae_int_t spchol_alignpositioninarray(ae_int_t offs) {
    ae_int_t result;
    result = offs;
    if (offs % 4 != 0) {
-      result += (4 - offs % 4);
+      result += 4 - offs % 4;
    }
    return result;
 }
@@ -21651,7 +21651,7 @@ static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, 
       rlast = analysis->superrowridx.xZ[sidx + 1];
       blocksize = cols1 - cols0;
       for (j = cols0; j < cols1; j++) {
-         analysis->outrowcounts.xZ[j] += (j - cols0 + 1);
+         analysis->outrowcounts.xZ[j] += j - cols0 + 1;
       }
       for (ii = rfirst; ii < rlast; ii++) {
          i0 = analysis->superrowidx.xZ[ii];
@@ -25903,7 +25903,7 @@ static void bdsvd_svd2x2(double f, double g, double h, double *ssmin, double *ss
             at = (fhmx - fhmn) / fhmx;
             c = 1 / (sqrt(1 + sqr(aas * au)) + sqrt(1 + sqr(at * au)));
             *ssmin = fhmn * c * au;
-            *ssmin += (*ssmin);
+            *ssmin += *ssmin;
             *ssmax = ga / (c + c);
          }
       }

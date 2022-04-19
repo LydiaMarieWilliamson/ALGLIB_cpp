@@ -742,6 +742,8 @@ A6.2. Test Stages
 	―	sparsecholeskyskyline(): "matrixm" → "matrix"
 	―	Sin(⋯) → sin(⋯), Cos(⋯) → cos(⋯), Exp(⋯) → exp(⋯), TanH(⋯) → tanh(⋯)
 	―	Sign(⋯) → sign(⋯), Ceil(⋯) → ceil(⋯), Floor(⋯) → floor(⋯), Sqrt(⋯) → sqrt(⋯), Power(⋯) → power(⋯)
+0-39	Normalize update operators
+	―	X op= (⋯); ⇒ X op= ⋯;
 
 A6.3. Test Results
 ──────────────────

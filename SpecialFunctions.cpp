@@ -2163,7 +2163,7 @@ double invincompletegammac(double a, double y0) {
          x = 1.0;
       }
       while (x0 == iinvgammabignumber) {
-         x *= (1 + d);
+         x *= 1 + d;
          y = incompletegammac(a, x);
          if (y < y0) {
             x0 = x;
