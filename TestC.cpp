@@ -23559,8 +23559,7 @@ bool testnleq() {
       ae_vector_set_length(&x, 2);
       x.xR[0] = 10.0 * randommid();
       x.xR[1] = 10.0 * randommid();
-      nleqrestartfrom(&state, &x);
-      while (nleqiteration(&state)) testnlequnit_testfunchbm(&state);
+      for (nleqrestartfrom(&state, &x); nleqiteration(&state); ) testnlequnit_testfunchbm(&state);
       nleqresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
          basicserrors = basicserrors || sqr(x.xR[0] * x.xR[0] + x.xR[1] - 11) + sqr(x.xR[0] + x.xR[1] * x.xR[1] - 7) > sqr(epsf);
@@ -23585,8 +23584,7 @@ bool testnleq() {
       ae_vector_set_length(&x, 2);
       x.xR[0] = 10.0 * randommid();
       x.xR[1] = 10.0 * randommid();
-      nleqrestartfrom(&state, &x);
-      while (nleqiteration(&state)) testnlequnit_testfunchbm(&state);
+      for (nleqrestartfrom(&state, &x); nleqiteration(&state); ) testnlequnit_testfunchbm(&state);
       nleqresults(&state, &x, &rep);
       if (rep.terminationtype > 0) {
          basicserrors = basicserrors || sqr(x.xR[0] * x.xR[0] + x.xR[1] - 11) + sqr(x.xR[0] + x.xR[1] * x.xR[1] - 7) > sqr(epsf);
@@ -55439,7 +55437,7 @@ static void testnormaldistrunit_testnormal(bool *errorflag) {
    NewObj(hqrndstate, rs);
    hqrndrandomize(&rs);
 // Test that PDF is roughly equal to derivative of CDF
-   for (k = 0; k <= 999; k++) {
+   for (k = 0; k < 1000; k++) {
       x = hqrndnormal(&rs);
       h = 1.0E-5;
       v0 = normalpdf(x);
@@ -55562,7 +55560,7 @@ static void testnormaldistrunit_testbvn(bool *errorflag) {
    err = rmax2(err, fabs(0.999688221472430000 - bivariatenormalcdf(3.421155338081630000, 3.421174755498880000, 0.999999999999000000)));
    *errorflag = *errorflag || err > 1.0E-12;
 // Test that BVN PDF is roughly equal to derivative of BVN CDF
-   for (k = 0; k <= 999; k++) {
+   for (k = 0; k < 1000; k++) {
    // Generate trial point
       x = hqrndnormal(&rs);
       y = hqrndnormal(&rs);
@@ -87757,8 +87755,7 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
    val100cnt = 0;
    val101cnt = 0;
    val102cnt = 0;
-   ae_shared_pool_first_recycled(&pool, &_prec2);
-   while (prec2 != NULL) {
+   for (ae_shared_pool_first_recycled(&pool, &_prec2); prec2 != NULL; ae_shared_pool_next_recycled(&pool, &_prec2)) {
       if (prec2->recval.ival == 100) {
          val100cnt++;
       }
@@ -87768,7 +87765,6 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
       if (prec2->recval.ival == 102) {
          val102cnt++;
       }
-      ae_shared_pool_next_recycled(&pool, &_prec2);
    }
    if (val100cnt != 1 || val101cnt != 1 || val102cnt != 1) {
       ae_frame_leave();
@@ -87777,8 +87773,7 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
    val100cnt = 0;
    val101cnt = 0;
    val102cnt = 0;
-   ae_shared_pool_first_recycled(&pool, &_prec2);
-   while (prec2 != NULL) {
+   for (ae_shared_pool_first_recycled(&pool, &_prec2); prec2 != NULL; ae_shared_pool_next_recycled(&pool, &_prec2)) {
       if (prec2->recval.ival == 100) {
          val100cnt++;
       }
@@ -87788,7 +87783,6 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
       if (prec2->recval.ival == 102) {
          val102cnt++;
       }
-      ae_shared_pool_next_recycled(&pool, &_prec2);
    }
    if (val100cnt != 1 || val101cnt != 1 || val102cnt != 1) {
       ae_frame_leave();
@@ -88987,10 +88981,8 @@ static bool testalglibbasicsunit_performtestpoolsum() {
    ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), poolsummand_init, poolsummand_copy, poolsummand_free);
    testalglibbasicsunit_parallelpoolsum(&pool, 0, n);
    sum = 0;
-   ae_shared_pool_first_recycled(&pool, &_ptr);
-   while (ptr != NULL) {
+   for (ae_shared_pool_first_recycled(&pool, &_ptr); ptr != NULL; ae_shared_pool_next_recycled(&pool, &_ptr)) {
       sum += ptr->val;
-      ae_shared_pool_next_recycled(&pool, &_ptr);
    }
    result = sum == n;
    ae_frame_leave();

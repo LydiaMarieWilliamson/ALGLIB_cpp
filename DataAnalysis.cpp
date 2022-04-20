@@ -3818,26 +3818,22 @@ void mlpgradbatch(multilayerperceptron *network, RMatrix *xy, ae_int_t ssize, do
    subsettype = 0;
    mlpproperties(network, &nin, &nout, &wcount);
    vectorsetlengthatleast(grad, wcount);
-   ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad);
-   while (sgrad != NULL) {
+   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
       sgrad->f = 0.0;
       for (i = 0; i < wcount; i++) {
          sgrad->g.xR[i] = 0.0;
       }
-      ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad);
    }
    mlpgradbatchx(network, xy, &network->dummysxy, ssize, 0, &network->dummyidx, subset0, subset1, subsettype, &network->buf, &network->gradbuf);
    *e = 0.0;
    for (i = 0; i < wcount; i++) {
       grad->xR[i] = 0.0;
    }
-   ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad);
-   while (sgrad != NULL) {
+   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
       *e += sgrad->f;
       for (i = 0; i < wcount; i++) {
          grad->xR[i] += sgrad->g.xR[i];
       }
-      ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad);
    }
    ae_frame_leave();
 }
@@ -3884,26 +3880,22 @@ void mlpgradbatchsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_
    subsettype = 0;
    mlpproperties(network, &nin, &nout, &wcount);
    vectorsetlengthatleast(grad, wcount);
-   ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad);
-   while (sgrad != NULL) {
+   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
       sgrad->f = 0.0;
       for (i = 0; i < wcount; i++) {
          sgrad->g.xR[i] = 0.0;
       }
-      ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad);
    }
    mlpgradbatchx(network, &network->dummydxy, xy, ssize, 1, &network->dummyidx, subset0, subset1, subsettype, &network->buf, &network->gradbuf);
    *e = 0.0;
    for (i = 0; i < wcount; i++) {
       grad->xR[i] = 0.0;
    }
-   ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad);
-   while (sgrad != NULL) {
+   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
       *e += sgrad->f;
       for (i = 0; i < wcount; i++) {
          grad->xR[i] += sgrad->g.xR[i];
       }
-      ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad);
    }
    ae_frame_leave();
 }
@@ -3974,26 +3966,22 @@ void mlpgradbatchsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
    }
    mlpproperties(network, &nin, &nout, &wcount);
    vectorsetlengthatleast(grad, wcount);
-   ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad);
-   while (sgrad != NULL) {
+   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
       sgrad->f = 0.0;
       for (i = 0; i < wcount; i++) {
          sgrad->g.xR[i] = 0.0;
       }
-      ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad);
    }
    mlpgradbatchx(network, xy, &network->dummysxy, setsize, 0, idx, subset0, subset1, subsettype, &network->buf, &network->gradbuf);
    *e = 0.0;
    for (i = 0; i < wcount; i++) {
       grad->xR[i] = 0.0;
    }
-   ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad);
-   while (sgrad != NULL) {
+   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
       *e += sgrad->f;
       for (i = 0; i < wcount; i++) {
          grad->xR[i] += sgrad->g.xR[i];
       }
-      ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad);
    }
    ae_frame_leave();
 }
@@ -4070,26 +4058,22 @@ void mlpgradbatchsparsesubset(multilayerperceptron *network, sparsematrix *xy, a
    }
    mlpproperties(network, &nin, &nout, &wcount);
    vectorsetlengthatleast(grad, wcount);
-   ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad);
-   while (sgrad != NULL) {
+   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
       sgrad->f = 0.0;
       for (i = 0; i < wcount; i++) {
          sgrad->g.xR[i] = 0.0;
       }
-      ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad);
    }
    mlpgradbatchx(network, &network->dummydxy, xy, setsize, 1, idx, subset0, subset1, subsettype, &network->buf, &network->gradbuf);
    *e = 0.0;
    for (i = 0; i < wcount; i++) {
       grad->xR[i] = 0.0;
    }
-   ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad);
-   while (sgrad != NULL) {
+   for (ae_shared_pool_first_recycled(&network->gradbuf, &_sgrad); sgrad != NULL; ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad)) {
       *e += sgrad->f;
       for (i = 0; i < wcount; i++) {
          grad->xR[i] += sgrad->g.xR[i];
       }
-      ae_shared_pool_next_recycled(&network->gradbuf, &_sgrad);
    }
    ae_frame_leave();
 }
@@ -11824,7 +11808,7 @@ static void dforest_choosecurrentsplitdense(decisionforestbuilder *s, dfworkbuf 
    errbest = maxrealnumber;
    *splitbest = 0.0;
    varstried = 0;
-   while (varstried <= imin2(varstoselect, *varsinpool) - 1) {
+   while (varstried < imin2(varstoselect, *varsinpool)) {
    // select variables from pool
       swapelementsi(&workbuf->varpool, varstried, varstried + hqrnduniformi(rs, *varsinpool - varstried));
       varcur = workbuf->varpool.xZ[varstried];
@@ -12461,12 +12445,10 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
 // Gini importance
    if (s->rdfimportance == dforest_needtrngini || s->rdfimportance == dforest_needoobgini) {
    // Merge OOB Gini importances computed during tree generation
-      ae_shared_pool_first_recycled(&s->votepool, &_vote);
-      while (vote != NULL) {
+      for (ae_shared_pool_first_recycled(&s->votepool, &_vote); vote != NULL; ae_shared_pool_next_recycled(&s->votepool, &_vote)) {
          for (i = 0; i < nvars; i++) {
             rep->varimportances.xR[i] += vote->giniimportances.xR[i] / ntrees;
          }
-         ae_shared_pool_next_recycled(&s->votepool, &_vote);
       }
       for (i = 0; i < nvars; i++) {
          rep->varimportances.xR[i] = rboundval(rep->varimportances.xR[i], 0.0, 1.0);
@@ -12527,12 +12509,10 @@ static void dforest_estimatevariableimportance(decisionforestbuilder *s, ae_int_
       for (j = 0; j < nperm; j++) {
          losses.xR[j] = 1.0e-20;
       }
-      ae_shared_pool_first_recycled(&permpool, &_permresult);
-      while (permresult != NULL) {
+      for (ae_shared_pool_first_recycled(&permpool, &_permresult); permresult != NULL; ae_shared_pool_next_recycled(&permpool, &_permresult)) {
          for (j = 0; j < nperm; j++) {
             losses.xR[j] += permresult->losses.xR[j];
          }
-         ae_shared_pool_next_recycled(&permpool, &_permresult);
       }
    // Compute importances
       nopermloss = losses.xR[nvars + 1];
@@ -12674,10 +12654,8 @@ static void dforest_mergetrees(decisionforestbuilder *s, decisionforest *df) {
    df->bufsize = 0;
    df->ntrees = 0;
 // Determine trees count
-   ae_shared_pool_first_recycled(&s->treepool, &_tree);
-   while (tree != NULL) {
+   for (ae_shared_pool_first_recycled(&s->treepool, &_tree); tree != NULL; ae_shared_pool_next_recycled(&s->treepool, &_tree)) {
       df->ntrees++;
-      ae_shared_pool_next_recycled(&s->treepool, &_tree);
    }
    ae_assert(df->ntrees > 0, "MergeTrees: integrity check failed, zero trees count");
 // Determine individual tree sizes and total buffer size
@@ -12685,13 +12663,11 @@ static void dforest_mergetrees(decisionforestbuilder *s, decisionforest *df) {
    for (i = 0; i < df->ntrees; i++) {
       treesizes.xZ[i] = -1;
    }
-   ae_shared_pool_first_recycled(&s->treepool, &_tree);
-   while (tree != NULL) {
+   for (ae_shared_pool_first_recycled(&s->treepool, &_tree); tree != NULL; ae_shared_pool_next_recycled(&s->treepool, &_tree)) {
       ae_assert(tree->treeidx >= 0 && tree->treeidx < df->ntrees, "MergeTrees: integrity check failed (wrong TreeIdx)");
       ae_assert(treesizes.xZ[tree->treeidx] < 0, "MergeTrees: integrity check failed (duplicate TreeIdx)");
       df->bufsize += iround(tree->treebuf.xR[0]);
       treesizes.xZ[tree->treeidx] = iround(tree->treebuf.xR[0]);
-      ae_shared_pool_next_recycled(&s->treepool, &_tree);
    }
    for (i = 0; i < df->ntrees; i++) {
       ae_assert(treesizes.xZ[i] > 0, "MergeTrees: integrity check failed (wrong TreeSize)");
@@ -12708,14 +12684,12 @@ static void dforest_mergetrees(decisionforestbuilder *s, decisionforest *df) {
 //       output (necessary for variable importance estimation), that's
 //       why we need array of tree offsets
    ae_vector_set_length(&df->trees, df->bufsize);
-   ae_shared_pool_first_recycled(&s->treepool, &_tree);
-   while (tree != NULL) {
+   for (ae_shared_pool_first_recycled(&s->treepool, &_tree); tree != NULL; ae_shared_pool_next_recycled(&s->treepool, &_tree)) {
       cursize = iround(tree->treebuf.xR[0]);
       offs = treeoffsets.xZ[tree->treeidx];
       for (i = 0; i < cursize; i++) {
          df->trees.xR[offs + i] = tree->treebuf.xR[i];
       }
-      ae_shared_pool_next_recycled(&s->treepool, &_tree);
    }
    ae_frame_leave();
 }
@@ -12765,8 +12739,7 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
       buf->oobcounts.xZ[i] = 0;
    }
 // Merge voting arrays
-   ae_shared_pool_first_recycled(&s->votepool, &_vote);
-   while (vote != NULL) {
+   for (ae_shared_pool_first_recycled(&s->votepool, &_vote); vote != NULL; ae_shared_pool_next_recycled(&s->votepool, &_vote)) {
       for (i = 0; i < npoints * nclasses; i++) {
          buf->trntotals.xR[i] += vote->trntotals.xR[i] + vote->oobtotals.xR[i];
          buf->oobtotals.xR[i] += vote->oobtotals.xR[i];
@@ -12775,7 +12748,6 @@ static void dforest_processvotingresults(decisionforestbuilder *s, ae_int_t ntre
          buf->trncounts.xZ[i] += vote->trncounts.xZ[i] + vote->oobcounts.xZ[i];
          buf->oobcounts.xZ[i] += vote->oobcounts.xZ[i];
       }
-      ae_shared_pool_next_recycled(&s->votepool, &_vote);
    }
    for (i = 0; i < npoints; i++) {
       v = 1 / coalesce((double)buf->trncounts.xZ[i], 1.0);
@@ -19980,13 +19952,12 @@ void mcpdsolve(mcpdstate *s) {
          s->tmpp.xR[i * n + j] = 1.0 / n;
       }
    }
-   minbleicrestartfrom(&s->bs, &s->tmpp);
    minbleicsetbc(&s->bs, &s->effectivebndl, &s->effectivebndu);
    minbleicsetlc(&s->bs, &s->effectivec, &s->effectivect, ccnt);
    minbleicsetcond(&s->bs, 0.0, 0.0, mcpd_xtol, 0);
    minbleicsetprecdiag(&s->bs, &s->h);
 // solve problem
-   while (minbleiciteration(&s->bs))
+   for (minbleicrestartfrom(&s->bs, &s->tmpp); minbleiciteration(&s->bs); )
       if (s->bs.needfg) {
       // Calculate regularization term
          s->bs.f = 0.0;
@@ -23193,11 +23164,9 @@ static void mlptrain_initmlptrnsessions(multilayerperceptron *networktrained, bo
    if (ae_shared_pool_is_initialized(sessions)) {
    // Pool was already initialized.
    // Clear sessions stored in the pool.
-      ae_shared_pool_first_recycled(sessions, &_p);
-      while (p != NULL) {
+      for (ae_shared_pool_first_recycled(sessions, &_p); p != NULL; ae_shared_pool_next_recycled(sessions, &_p)) {
          ae_assert(mlpsamearchitecture(&p->network, networktrained), "InitMLPTrnSessions: internal consistency error");
          p->bestrmserror = maxrealnumber;
-         ae_shared_pool_next_recycled(sessions, &_p);
       }
    } else {
    // Prepare session and seed pool
@@ -23470,13 +23439,11 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
       mlptrain_mlptrainnetworkx(s, nrestarts, algokind, trnsubset, trnsubsetsize, valsubset, valsubsetsize, network, rep, false, sessions);
    // Choose best network
       bestrmserror = maxrealnumber;
-      ae_shared_pool_first_recycled(sessions, &_psession);
-      while (psession != NULL) {
+      for (ae_shared_pool_first_recycled(sessions, &_psession); psession != NULL; ae_shared_pool_next_recycled(sessions, &_psession)) {
          if (psession->bestrmserror < bestrmserror) {
             mlpimporttunableparameters(network, &psession->bestparameters);
             bestrmserror = psession->bestrmserror;
          }
-         ae_shared_pool_next_recycled(sessions, &_psession);
       }
    // Calculate errors
       if (s->datatype == 0) {
@@ -24147,10 +24114,8 @@ void mlpkfoldcv(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts
 // Parallelization
    mlptrain_mthreadcv(s, rowsize, nrestarts, &folds, 0, foldscount, &cvy, &pooldatacv, wcount);
 // Calculate value for NGrad
-   ae_shared_pool_first_recycled(&pooldatacv, &_sdatacv);
-   while (sdatacv != NULL) {
+   for (ae_shared_pool_first_recycled(&pooldatacv, &_sdatacv); sdatacv != NULL; ae_shared_pool_next_recycled(&pooldatacv, &_sdatacv)) {
       rep->ngrad += sdatacv->ngrad;
-      ae_shared_pool_next_recycled(&pooldatacv, &_sdatacv);
    }
 // Connect of results and calculate cross-validation error
    for (i = 0; i < s->npoints; i++) {

@@ -6691,7 +6691,7 @@ Spawn:
    lambdadown = 0.3;
    lambdav = 0.001;
    rho = 1.0;
-   while (true) {
+   do {
    // Get Jacobian;
    // before we get to this point we already have State.XBase filled
    // with current point and State.FBase filled with function value
@@ -6786,11 +6786,7 @@ Spawn:
       if (state->repiterationscount >= state->maxits && state->maxits > 0) {
          state->repterminationtype = 5;
       }
-      if (state->repterminationtype != 0) {
-         break;
-      }
-   // Now, iteration is finally over
-   }
+   } while (state->repterminationtype == 0);
 Exit:
    state->PQ = -1;
    return false;

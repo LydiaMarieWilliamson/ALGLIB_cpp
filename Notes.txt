@@ -745,6 +745,30 @@ A6.2. Test Stages
 0-39	Normalize update operators
 	―	X op= (⋯); ⇒ X op= ⋯;
 
+0-39	Conversion of while loops to for loops.
+	―	Shared pool while loops converted to for loops.
+			ae_shared_pool_first_recycled(Pool, &_P);
+			while (P != NULL) {
+				⋯
+				ae_shared_pool_next_recycled(Pool, &_P);
+			}
+		converted to:
+			for (ae_shared_pool_first_recycled(Pool, &_P); P != NULL; ae_shared_pool_next_recycled(Pool, &_P)) { ⋯ }
+	―	while (A <= B - 1) ⇒ while (A < B)
+	―	Converted
+			minbleicrestartfrom(Q, P); while (minbleiciteration(Q)) { ⋯ }
+		to
+			for (minbleicrestartfrom(Q, P); minbleiciteration(Q); ) { ⋯ }
+	―	Converted
+			autogk_autogkinternalprepare(⋯, Q); while (autogk_autogkinternaliteration(Q)) { ⋯ }
+		to
+			for (autogk_autogkinternalprepare(⋯, Q); autogk_autogkinternaliteration(Q); ) { ⋯ }
+	―	while (true) { ⋯ if (C) break; } converted to do { ⋯ } while (!C);
+	―	Converted
+			nleqrestartfrom(Q, X); while (nleqiteration(Q)) { ⋯ }
+		to
+			for (nleqrestartfrom(Q, X); nleqiteration(Q); ) { ⋯ }
+
 A6.3. Test Results
 ──────────────────
 39	7519 1.0x 12049 1.0x 11909 1.0x 9587 1.0x 1635369021 (6179c03d) 83
@@ -804,6 +828,7 @@ A6.3. Test Results
 40	8065 1.0x 12501 1.0x 12052 1.0x 8819 1.1x 1648856974 (62478f8e) 81 // Stop-gap fix of the slowdown problem in TestX.cpp.
 0-39	7937 1.0x 12049 1.0x 12350 0.9x 9042 1.0x 1649021559 (624a1277) 78 // AlgLibMisc.{cpp,h}: Synchronize to AlgLib++.
 0-39	6024 1.0x 10417 1.0x 10104 1.1x 9465 1.0x 1649379288 (624f87d8) 78 // {LinAlg,Solvers,Interpolation,SpecialFunctions,Statistics}.cpp: Adding changes made in AlgLib++.
+0-39	5988 1.0x 9435 1.2x 12350 1.0x 9784 1.0x 1650480992 (62605760) 79 // Conversion of while loops to for loops.
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -855,19 +880,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   6024
+* RGEMM-SEQ-16   (MFLOPS)   5988
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  10417
-* RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  10104
-* RGEMM-MTN-64              1.1x
-* RGEMM-SEQ-1024 (MFLOPS)   9465
+* RGEMM-SEQ-32   (MFLOPS)   9435
+* RGEMM-MTN-32              1.2x
+* RGEMM-SEQ-64   (MFLOPS)  12350
+* RGEMM-MTN-64              1.0x
+* RGEMM-SEQ-1024 (MFLOPS)   9784
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-Seed: 1649379288 (624f87d8)
+Seed: 1650480992 (62605760)
 Compiler: GCC
 Hardware: 64-bit
 Byte Order: little-endian
@@ -967,4 +992,4 @@ Testing Mode: single core
 88/90: knn                              Ok
 89/90: mlptrain                         Ok
 90/90: alglibbasics                     Ok
-Done in 78 seconds
+Done in 79 seconds
