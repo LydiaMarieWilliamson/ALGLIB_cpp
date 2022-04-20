@@ -17374,7 +17374,7 @@ static void vipmsolver_runintegritychecks(vipmstate *state, vipmvars *v0, vipmva
    }
 }
 
-#if 0
+#if 0 //(@) Not used.
 // Computes minimum nonzero value of the vector. Returns 0 if all components
 // are nonpositive.
 //
@@ -25892,7 +25892,7 @@ static double nlcsqp_meritfunction(minsqpstate *state, RVector *x, RVector *fi, 
    return result;
 }
 
-#if 0
+#if 0 //(@) Not used.
 // This function calculates raw (unaugmented and smooth) Lagrangian
 static double nlcsqp_rawlagrangian(minsqpstate *state, RVector *x, RVector *fi, RVector *lagmult, RVector *penalties, minsqptmpmerit *tmp) {
    double tmp0;
@@ -28431,7 +28431,7 @@ static void reviseddualsimplex_dvsparsetodense(dssvector *x) {
    }
 }
 
-#if 0
+#if 0 //(@) Not used.
 static void reviseddualsimplex_updateavgcounter(double v, double *acc, ae_int_t *cnt) {
    *acc += v;
    ++*cnt;
@@ -28996,7 +28996,7 @@ static void reviseddualsimplex_cacheboundinfo(dualsimplexsubproblem *s, ae_int_t
    s->bndtolub.xR[i] = settings->xtolabs + settings->xtolrelabs * settings->xtolabs * fabs(s->bndub.xR[i]);
 }
 
-#if 0
+#if 0 //(@) Not used.
 static double reviseddualsimplex_sparsityof(RVector *x, ae_int_t n) {
    ae_int_t i;
    ae_int_t k;
@@ -32961,7 +32961,7 @@ static double nlcslp_meritfunction(minslpstate *state, RVector *x, RVector *fi, 
    return result;
 }
 
-#if 0
+#if 0 //(@) Not used.
 // This function calculates raw (unaugmented and smooth) Lagrangian
 static double nlcslp_rawlagrangian(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, minslptmpmerit *tmp) {
    double tmp0;
@@ -33032,13 +33032,13 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
       default: goto Exit;
    }
 Spawn:
-   i = 922;
-   j = -154;
-   v = -463;
-   f0 = -861;
-   f1 = -678;
-   nu = -731;
-   localstp = -675;
+   i = -154;
+   j = 306;
+   v = 88;
+   f0 = -678;
+   f1 = -731;
+   nu = -675;
+   localstp = -763;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -33323,20 +33323,20 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
       default: goto Exit;
    }
 Spawn:
-   mcinfo = 427;
-   mcnfev = 178;
-   mcstage = -819;
-   i = -826;
-   j = 667;
-   stp = -908;
-   v = 577;
-   vv = 289;
-   mx = 317;
-   stepklagval = 476;
-   stepknlagval = -889;
-   gammaprev = -400;
-   f0 = 489;
-   f1 = -962;
+   mcinfo = -819;
+   mcnfev = -826;
+   mcstage = 667;
+   i = 692;
+   j = 84;
+   stp = 289;
+   v = 317;
+   vv = 476;
+   mx = -889;
+   stepklagval = -400;
+   stepknlagval = 489;
+   gammaprev = -962;
+   f0 = 161;
+   f1 = -447;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -38578,27 +38578,27 @@ static bool minns_agsiteration(minnsstate *state) {
       default: goto Exit;
    }
 Spawn:
-   j = -541;
-   k = -698;
-   radiusdecays = -900;
-   cursamplesize = -940;
-   shortstepscnt = 1016;
-   backtrackits = -229;
-   maxbacktrackits = -536;
+   j = -318;
+   k = -940;
+   radiusdecays = 1016;
+   cursamplesize = -536;
+   shortstepscnt = 487;
+   backtrackits = -115;
+   maxbacktrackits = 886;
    restartneeded = true;
-   b = true;
+   b = false;
    alphadecreased = false;
-   fullsample = false;
-   radius0 = -722;
-   radius = -413;
-   alpha = -461;
-   recommendedstep = 927;
+   fullsample = true;
+   radius0 = 922;
+   radius = -154;
+   alpha = 306;
+   recommendedstep = -1011;
    dnrm = 201;
    dg = 922;
-   v = -154;
-   vv = 306;
-   v0 = -1011;
-   v1 = 951;
+   v = 88;
+   vv = -861;
+   v0 = -678;
+   v1 = -731;
    ae_assert(state->solvertype == 0, "MinNS: internal error");
    n = state->n;
    nec = state->nec;
@@ -39151,10 +39151,10 @@ bool minnsiteration(minnsstate *state) {
    }
 Spawn:
    i = 359;
-   k = -58;
-   v = 255;
-   xp = 74;
-   xm = -788;
+   k = -919;
+   v = 809;
+   xp = 205;
+   xm = -838;
 // Init
    state->xupdated = state->needfij = state->needfi = false;
    state->replcerr = 0.0;

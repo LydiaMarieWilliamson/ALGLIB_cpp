@@ -2164,7 +2164,7 @@ bool autogkiteration(const autogkstate &state) {
 void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'autogkintegrate()' (func is NULL)");
+   alglib_impl::ae_assert(func != NULL, "autogkintegrate: func is NULL");
    while (alglib_impl::autogkiteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.xminusa, state.bminusx, state.f, ptr);

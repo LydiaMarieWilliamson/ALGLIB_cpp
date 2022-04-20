@@ -343,7 +343,6 @@ Spawn:
          ae_v_move(state->ytbl.xyR[i], 1, state->yc.xR, 1, n);
       }
       state->repterminationtype = 1;
-      goto Exit;
    }
 Exit:
    state->PQ = -1;

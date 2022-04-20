@@ -5585,7 +5585,8 @@ bool nleqiteration(nleqstate *state) {
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
-      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3; case 4: goto Resume4;
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
+      case 3: goto Resume3; case 4: goto Resume4;
       default: goto Exit;
    }
 Spawn:
@@ -5715,7 +5716,6 @@ Spawn:
       if (state->repiterationscount >= state->maxits && state->maxits > 0) {
          state->repterminationtype = 5;
       }
-   // Now, iteration is finally over
    } while (state->repterminationtype == 0);
 Exit:
    state->PQ = -1;

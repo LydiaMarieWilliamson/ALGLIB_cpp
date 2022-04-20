@@ -12436,9 +12436,9 @@ bool lsfititeration(lsfitstate *state) {
 // An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
-      case 4: goto Resume4;/*case 5: goto Resume5;*/case 6: goto Resume6; case 7: goto Resume7;
-      case 8: goto Resume8; case 9: goto Resume9; case 10: goto Resume10; case 11: goto Resume11;
-      case 12: goto Resume12; case 13: goto Resume13;
+      case 4: goto Resume4; case 5: goto Resume5; case 6: goto Resume6; case 7: goto Resume7;
+      case 8: goto Resume8; case 9: goto Resume9; case 10: goto Resume10;
+      case 11: goto Resume11; case 12: goto Resume12; case 13: goto Resume13;
       default: goto Exit;
    }
 Spawn:
@@ -19462,7 +19462,7 @@ static void spline2d_flushtozerocell(ae_int_t kx, ae_int_t ky, ae_int_t blockban
    }
 }
 
-#if 0
+#if 0 //(@) Not used.
 // This function generates squared design matrix stored in block band format.
 //
 // We use adaptation of block skyline storage format, with
