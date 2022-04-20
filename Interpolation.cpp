@@ -12438,16 +12438,13 @@ bool lsfititeration(lsfitstate *state) {
 // A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
 // An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
-      case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
-      case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
-      case 8: goto Resume08; case 9: goto Resume09; case 10: goto Resume10;
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
+      case 4: goto Resume4; case 5: goto Resume5; case 6: goto Resume6; case 7: goto Resume7;
+      case 8: goto Resume8; case 9: goto Resume9; case 10: goto Resume10;
       case 11: goto Resume11; case 12: goto Resume12; case 13: goto Resume13;
+      default: goto Exit;
    }
 Spawn:
-   n = 359;
-   m = -58;
-   k = -919;
-   i = -909;
    j = 81;
    j1 = 255;
    info = 74;
@@ -12504,7 +12501,7 @@ Spawn:
                state->c.xR[i] = rmax2(state->c.xR[i], state->bndl.xR[i]);
             }
             lx = state->c.xR[i];
-            state->PQ = 0; goto Pause; Resume00:
+            state->PQ = 0; goto Pause; Resume0:
             lf = state->f;
             ld = state->g.xR[i];
             state->c.xR[i] = v + state->teststep * state->s.xR[i];
@@ -12512,7 +12509,7 @@ Spawn:
                state->c.xR[i] = rmin2(state->c.xR[i], state->bndu.xR[i]);
             }
             rx = state->c.xR[i];
-            state->PQ = 1; goto Pause; Resume01:
+            state->PQ = 1; goto Pause; Resume1:
             rf = state->f;
             rd = state->g.xR[i];
             state->c.xR[i] = (lx + rx) / 2;
@@ -12522,7 +12519,7 @@ Spawn:
             if (isfinite(state->bndu.xR[i])) {
                state->c.xR[i] = rmin2(state->c.xR[i], state->bndu.xR[i]);
             }
-            state->PQ = 2; goto Pause; Resume02:
+            state->PQ = 2; goto Pause; Resume2:
             state->c.xR[i] = v;
             if (!derivativecheck(lf, ld, rf, rd, state->f, state->g.xR[i], rx - lx)) {
                state->repvaridx = i;
@@ -12551,7 +12548,7 @@ Spawn:
             ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
             ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
             state->pointindex = i;
-            state->needf = true, state->PQ = 3; goto Pause; Resume03: state->needf = false;
+            state->needf = true, state->PQ = 3; goto Pause; Resume3: state->needf = false;
             vv = state->wcur.xR[i];
             state->optstate.fi.xR[i] = vv * (state->f - state->tasky.xR[i]);
          }
@@ -12562,7 +12559,7 @@ Spawn:
             ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
             ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
             state->pointindex = i;
-            state->needf = true, state->PQ = 4; goto Pause; Resume04: state->needf = false;
+            state->needf = true, state->PQ = 4; goto Pause; Resume4: state->needf = false;
             vv = state->wcur.xR[i];
             state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
          }
@@ -12576,7 +12573,7 @@ Spawn:
             ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
             ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
             state->pointindex = i;
-            state->needfg = true, state->PQ = 5; goto Pause; Resume05: state->needfg = false;
+            state->needfg = true, state->PQ = 5; goto Pause; Resume5: state->needfg = false;
             vv = state->wcur.xR[i];
             state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
             v = sqr(vv) * 2 * (state->f - state->tasky.xR[i]);
@@ -12588,7 +12585,7 @@ Spawn:
             ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
             ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
             state->pointindex = i;
-            state->needfg = true, state->PQ = 6; goto Pause; Resume06: state->needfg = false;
+            state->needfg = true, state->PQ = 6; goto Pause; Resume6: state->needfg = false;
             vv = state->wcur.xR[i];
             state->optstate.fi.xR[i] = vv * (state->f - state->tasky.xR[i]);
             ae_v_moved(state->optstate.j.xyR[i], 1, state->g.xR, 1, k, vv);
@@ -12608,7 +12605,7 @@ Spawn:
             ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
             ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
             state->pointindex = i;
-            state->needfgh = true, state->PQ = 7; goto Pause; Resume07: state->needfgh = false;
+            state->needfgh = true, state->PQ = 7; goto Pause; Resume7: state->needfgh = false;
             vv = state->wcur.xR[i];
             state->optstate.f += sqr(vv * (state->f - state->tasky.xR[i]));
             v = sqr(vv) * 2 * (state->f - state->tasky.xR[i]);
@@ -12624,7 +12621,7 @@ Spawn:
       // Report new iteration
          ae_v_move(state->c.xR, 1, state->optstate.x.xR, 1, k);
          state->f = state->optstate.f;
-         state->xupdated = true, state->PQ = 8; goto Pause; Resume08: state->xupdated = false;
+         state->xupdated = true, state->PQ = 8; goto Pause; Resume8: state->xupdated = false;
       }
 // Extract results
 //
@@ -12648,7 +12645,7 @@ Spawn:
          ae_v_move(state->c.xR, 1, state->c1.xR, 1, k);
          ae_v_move(state->x.xR, 1, state->taskx.xyR[i], 1, m);
          state->pointindex = i;
-         state->needf = true, state->PQ = 9; goto Pause; Resume09: state->needf = false;
+         state->needf = true, state->PQ = 9; goto Pause; Resume9: state->needf = false;
          v = state->f;
          vv = state->wcur.xR[i];
          state->reprmserror += sqr(v - state->tasky.xR[i]);
@@ -13567,45 +13564,45 @@ bool lsfititeration(const lsfitstate &state) {
 //    Be careful to avoid such errors because there is no way to find them at
 //    compile time - you can see them at runtime only.
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
-void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr), void *ptr) {
+void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'lsfitfit()' (func is NULL)");
+   alglib_impl::ae_assert(func != NULL, "lsfitfit: func is NULL");
    while (alglib_impl::lsfititeration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.c, state.x, state.f, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.c, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'lsfitfit' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "lsfitfit: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
-void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr), void *ptr) {
+void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'lsfitfit()' (func is NULL)");
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'lsfitfit()' (grad is NULL)");
+   alglib_impl::ae_assert(func != NULL, "lsfitfit: func is NULL");
+   alglib_impl::ae_assert(grad != NULL, "lsfitfit: grad is NULL");
    while (alglib_impl::lsfititeration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.c, state.x, state.f, ptr);
       else if (state.needfg) grad(state.c, state.x, state.f, state.g, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.c, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'lsfitfit' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "lsfitfit: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
-void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr), void *ptr) {
+void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'lsfitfit()' (func is NULL)");
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'lsfitfit()' (grad is NULL)");
-   alglib_impl::ae_assert(hess != NULL, "ALGLIB: error in 'lsfitfit()' (hess is NULL)");
+   alglib_impl::ae_assert(func != NULL, "lsfitfit: func is NULL");
+   alglib_impl::ae_assert(grad != NULL, "lsfitfit: grad is NULL");
+   alglib_impl::ae_assert(hess != NULL, "lsfitfit: hess is NULL");
    while (alglib_impl::lsfititeration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.c, state.x, state.f, ptr);
       else if (state.needfg) grad(state.c, state.x, state.f, state.g, ptr);
       else if (state.needfgh) hess(state.c, state.x, state.f, state.g, state.h, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.c, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'lsfitfit' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "lsfitfit: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
@@ -19470,6 +19467,7 @@ static void spline2d_flushtozerocell(ae_int_t kx, ae_int_t ky, ae_int_t blockban
    }
 }
 
+#if 0 //(@) Not used.
 // This function generates squared design matrix stored in block band format.
 //
 // We use adaptation of block skyline storage format, with
@@ -19582,6 +19580,7 @@ static void spline2d_blockllsgenerateata(sparsematrix *ah, ae_int_t ky0, ae_int_
    }
    ae_frame_leave();
 }
+#endif
 
 // This function performs Cholesky decomposition of squared design matrix
 // stored in block band format.

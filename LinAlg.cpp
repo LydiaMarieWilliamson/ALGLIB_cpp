@@ -16804,11 +16804,7 @@ bool eigsubspaceiteration(eigsubspacestate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   nwork = -58;
-   k = -919;
    cnt = -909;
-   i = 81;
    i1 = 255;
    j = 74;
    convcnt = -788;
@@ -19787,6 +19783,7 @@ static ae_int_t amdordering_knscountnot(amdknset *s0, ae_int_t i, amdnset *s1) {
    return result;
 }
 
+#if 0 //(@) Not used.
 // Counts elements of I-th set of S0 not present in K-th set of S1
 //
 // Inputs:
@@ -19860,6 +19857,7 @@ static ae_int_t amdordering_knscountandkth(amdknset *s0, ae_int_t i, amdknset *s
    }
    return result;
 }
+#endif
 
 // Sums elements in I-th set of S0, returns sum.
 //
@@ -29221,14 +29219,12 @@ bool fblscgiteration(fblslincgstate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 359;
    k = -58;
    rk2 = -919;
    rk12 = -909;
    pap = 81;
    s = 255;
    betak = 74;
-   v1 = -788;
    v2 = 809;
 // prepare locals
    n = state->n;
@@ -29386,21 +29382,13 @@ bool fblsgmresiteration(fblsgmresstate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 205;
-   itidx = -838;
-   kdim = 939;
-   i = -526;
    j = 763;
-   rmax = -541;
-   rmindiag = -698;
    cs = -900;
    sn = -318;
    v = -940;
    vv = 1016;
    anrm = -229;
    qnrm = -536;
-   bnrm = 487;
-   resnrm = -115;
    prevresnrm = 886;
    n = state->n;
    state->retcode = 1;
@@ -29775,13 +29763,8 @@ bool normestimatoriteration(normestimatorstate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   m = -58;
-   i = -919;
-   itcnt = -909;
    v = 81;
    growth = 255;
-   bestgrowth = 74;
    n = state->n;
    m = state->m;
    if (state->seedval > 0) {

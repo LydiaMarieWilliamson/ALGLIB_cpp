@@ -20493,9 +20493,8 @@ Spawn:
       ae_v_move(x->xR, 1, wa->xR, 1, n);
       ae_v_addd(x->xR, 1, s->xR, 1, n, *stp);
    // Next.
-      *stage = 4; goto Pause; Resume4:
+      *stage = 4; goto Pause; Resume4: ++*nfev;
       *info = 0;
-      ++*nfev;
       v = ae_v_dotproduct(g->xR, 1, s->xR, 1, n);
       state->dg = v;
       state->ftest1 = state->finit + *stp * state->dgtest;
@@ -23292,9 +23291,6 @@ Spawn:
    nout = -58;
    wcount = -919;
    twcount = -909;
-   ntype = 81;
-   ttype = 255;
-   i = 74;
    j = -788;
    k = 809;
    trnsetsize = 205;
@@ -23304,7 +23300,6 @@ Spawn:
    cursize = 763;
    idx0 = -541;
    idx1 = -698;
-   decay = -900;
    v = -318;
 // Check correctness of inputs
    ae_assert(s->npoints >= 0, "MLPContinueTrainingX: internal error - parameter S is not initialized or is spoiled(S.NPoints < 0).");

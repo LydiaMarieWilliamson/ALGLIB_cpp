@@ -2910,7 +2910,6 @@ bool smoothnessmonitorprobe(smoothnessmonitor *monitor) {
       default: goto Exit;
    }
 Spawn:
-   i = 359;
    j = -58;
    idx = -919;
    vlargest = -909;
@@ -3033,9 +3032,6 @@ bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *uns
       default: goto Exit;
    }
 Spawn:
-   n = -788;
-   k = 809;
-   i = 205;
    j = -838;
    varidx = 939;
    v = -526;
@@ -3896,9 +3892,6 @@ bool minlbfgsiteration(minlbfgsstate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   m = -58;
-   i = -919;
    j = -909;
    ic = 81;
    mcinfo = 255;
@@ -4898,27 +4891,27 @@ bool minlbfgsiteration(const minlbfgsstate &state) {
 //    being thrown. Either  you  did  not pass gradient when it WAS needed or
 //    you passed gradient when it was NOT needed.
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlbfgsoptimize()' (func is NULL)");
+   alglib_impl::ae_assert(func != NULL, "minlbfgsoptimize: func is NULL");
    while (alglib_impl::minlbfgsiteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.f, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minlbfgsoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minlbfgsoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
-void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minlbfgsoptimize()' (grad is NULL)");
+   alglib_impl::ae_assert(grad != NULL, "minlbfgsoptimize: grad is NULL");
    while (alglib_impl::minlbfgsiteration(state.c_ptr()))
    BegPoll
       if (state.needfg) grad(state.x, state.f, state.g, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minlbfgsoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minlbfgsoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
@@ -13006,9 +12999,6 @@ bool minbleiciteration(minbleicstate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   m = -58;
-   i = -919;
    j = -909;
    mcinfo = 81;
    actstatus = 255;
@@ -13019,7 +13009,6 @@ Spawn:
    v0 = -838;
    penalty = 939;
    ginit = -526;
-   gdecay = 763;
 // Algorithm parameters:
 // * M          number of L-BFGS corrections.
 //              This coefficient remains fixed during iterations.
@@ -14414,27 +14403,27 @@ bool minbleiciteration(const minbleicstate &state) {
 //    exception being thrown. Either  you  did  not pass gradient when it WAS
 //    needed or you passed gradient when it was NOT needed.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minbleicoptimize()' (func is NULL)");
+   alglib_impl::ae_assert(func != NULL, "minbleicoptimize: func is NULL");
    while (alglib_impl::minbleiciteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.f, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minbleicoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minbleicoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
-void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minbleicoptimize()' (grad is NULL)");
+   alglib_impl::ae_assert(grad != NULL, "minbleicoptimize: grad is NULL");
    while (alglib_impl::minbleiciteration(state.c_ptr()))
    BegPoll
       if (state.needfg) grad(state.x, state.f, state.g, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minbleicoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minbleicoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
@@ -17344,6 +17333,7 @@ static void vipmsolver_runintegritychecks(vipmstate *state, vipmvars *v0, vipmva
    }
 }
 
+#if 0 // Not used.
 // Computes minimum nonzero value of the vector. Returns 0 if all components
 // are nonpositive.
 //
@@ -17423,6 +17413,7 @@ static double vipmsolver_maxprodnz(RVector *x, RVector *y, ae_int_t n) {
    }
    return result;
 }
+#endif
 
 // Solve QP problem.
 //
@@ -21613,8 +21604,6 @@ static bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambd
    }
 Spawn:
    i = -838;
-   n = 939;
-   m = -526;
    bflag = true;
    v = -541;
    *iflag = -99;
@@ -21797,10 +21786,7 @@ bool minlmiteration(minlmstate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   m = -58;
    iflag = -919;
-   i = -909;
    k = 81;
    bflag = true;
    v = 74;
@@ -23243,75 +23229,75 @@ bool minlmiteration(const minlmstate &state) {
 //    Be careful to avoid such errors because there is no way to find them at
 //    compile time - you can see them at runtime only.
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
-void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minlmoptimize()' (fvec is NULL)");
+   alglib_impl::ae_assert(fvec != NULL, "minlmoptimize: fvec is NULL");
    while (alglib_impl::minlmiteration(state.c_ptr()))
    BegPoll
       if (state.needfi) fvec(state.x, state.fi, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minlmoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
-void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minlmoptimize()' (fvec is NULL)");
-   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minlmoptimize()' (jac is NULL)");
+   alglib_impl::ae_assert(fvec != NULL, "minlmoptimize: fvec is NULL");
+   alglib_impl::ae_assert(jac != NULL, "minlmoptimize: jac is NULL");
    while (alglib_impl::minlmiteration(state.c_ptr()))
    BegPoll
       if (state.needfi) fvec(state.x, state.fi, ptr);
       else if (state.needfij) jac(state.x, state.fi, state.j, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minlmoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
-void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlmoptimize()' (func is NULL)");
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minlmoptimize()' (grad is NULL)");
-   alglib_impl::ae_assert(hess != NULL, "ALGLIB: error in 'minlmoptimize()' (hess is NULL)");
+   alglib_impl::ae_assert(func != NULL, "minlmoptimize: func is NULL");
+   alglib_impl::ae_assert(grad != NULL, "minlmoptimize: grad is NULL");
+   alglib_impl::ae_assert(hess != NULL, "minlmoptimize: hess is NULL");
    while (alglib_impl::minlmiteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.f, ptr);
       else if (state.needfg) grad(state.x, state.f, state.g, ptr);
       else if (state.needfgh) hess(state.x, state.f, state.g, state.h, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minlmoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
-void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlmoptimize()' (func is NULL)");
-   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minlmoptimize()' (jac is NULL)");
+   alglib_impl::ae_assert(func != NULL, "minlmoptimize: func is NULL");
+   alglib_impl::ae_assert(jac != NULL, "minlmoptimize: jac is NULL");
    while (alglib_impl::minlmiteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.f, ptr);
       else if (state.needfij) jac(state.x, state.fi, state.j, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minlmoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
-void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minlmoptimize()' (func is NULL)");
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minlmoptimize()' (grad is NULL)");
-   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minlmoptimize()' (jac is NULL)");
+   alglib_impl::ae_assert(func != NULL, "minlmoptimize: func is NULL");
+   alglib_impl::ae_assert(grad != NULL, "minlmoptimize: grad is NULL");
+   alglib_impl::ae_assert(jac != NULL, "minlmoptimize: jac is NULL");
    while (alglib_impl::minlmiteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.f, ptr);
       else if (state.needfg) grad(state.x, state.f, state.g, ptr);
       else if (state.needfij) jac(state.x, state.fi, state.j, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minlmoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
@@ -24013,8 +23999,6 @@ bool mincgiteration(mincgstate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   i = -58;
    betak = -919;
    v = -909;
    vv = 81;
@@ -25035,27 +25019,27 @@ bool mincgiteration(const mincgstate &state) {
 //    thrown. Either  you  did  not  pass  gradient when it WAS needed or you
 //    passed gradient when it was NOT needed.
 // ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
-void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'mincgoptimize()' (func is NULL)");
+   alglib_impl::ae_assert(func != NULL, "mincgoptimize: func is NULL");
    while (alglib_impl::mincgiteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.f, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'mincgoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "mincgoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
-void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'mincgoptimize()' (grad is NULL)");
+   alglib_impl::ae_assert(grad != NULL, "mincgoptimize: grad is NULL");
    while (alglib_impl::mincgiteration(state.c_ptr()))
    BegPoll
       if (state.needfg) grad(state.x, state.f, state.g, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'mincgoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "mincgoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
@@ -26003,6 +25987,7 @@ static double nlcsqp_meritfunction(minsqpstate *state, RVector *x, RVector *fi, 
    return result;
 }
 
+#if 0 //(@) Not used.
 // This function calculates raw (unaugmented and smooth) Lagrangian
 static double nlcsqp_rawlagrangian(minsqpstate *state, RVector *x, RVector *fi, RVector *lagmult, RVector *penalties, minsqptmpmerit *tmp) {
    double tmp0;
@@ -26012,6 +25997,7 @@ static double nlcsqp_rawlagrangian(minsqpstate *state, RVector *x, RVector *fi, 
    result = tmp1;
    return result;
 }
+#endif
 
 // This function tries to perform either phase #1 or phase #3 step.
 //
@@ -26046,7 +26032,6 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
    AutoS ae_int_t j;
    AutoS double v;
    AutoS double vv;
-   AutoS double mx;
    AutoS double f0;
    AutoS double f1;
    AutoS double nu;
@@ -26065,25 +26050,13 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
       default: goto Exit;
    }
 Spawn:
-   n = -536;
-   nslack = 487;
-   nec = -115;
-   nic = 886;
-   nlec = 346;
-   nlic = -722;
-   i = -413;
-   j = -461;
    hessianupdateperformed = true;
    v = 306;
    vv = -1011;
-   mx = 951;
-   f0 = -463;
    f1 = 88;
    nu = -861;
-   localstp = -678;
    stepklagval = -731;
    stepknlagval = -675;
-   stp = -763;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -26258,7 +26231,7 @@ Spawn:
    smoothnessmonitorfinalizelinesearch(smonitor);
 // Update debug curvature information - TraceGamma[]
    v = 0.0;
-   mx = 0.0;
+   duoble mx = 0.0;
    for (j = 0; j < n; j++) {
       vv = meritstate->stepkxn.xR[j] - meritstate->stepkx.xR[j];
       mx = rmax2(mx, fabs(vv));
@@ -26512,15 +26485,7 @@ bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool usert
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   nslack = -58;
-   nec = -919;
-   nic = -909;
-   nlec = 81;
-   nlic = 255;
-   i = 74;
    j = -788;
-   status = 809;
    subiterationidx = 205;
    trustradstagnated = false;
    increasebigc = true;
@@ -28614,10 +28579,12 @@ static void reviseddualsimplex_dvsparsetodense(dssvector *x) {
    }
 }
 
+#if 0 //(@) Not used.
 static void reviseddualsimplex_updateavgcounter(double v, double *acc, ae_int_t *cnt) {
    *acc += v;
    ++*cnt;
 }
+#endif
 
 // This function performs PivotRow step
 //
@@ -29176,6 +29143,7 @@ static void reviseddualsimplex_cacheboundinfo(dualsimplexsubproblem *s, ae_int_t
    s->bndtolub.xR[i] = settings->xtolabs + settings->xtolrelabs * settings->xtolabs * fabs(s->bndub.xR[i]);
 }
 
+#if 0 //(@) Not used.
 static double reviseddualsimplex_sparsityof(RVector *x, ae_int_t n) {
    ae_int_t i;
    ae_int_t k;
@@ -29199,6 +29167,7 @@ static double reviseddualsimplex_sparsityof(RVector *x, ae_int_t n) {
    result = (double)k / n;
    return result;
 }
+#endif
 
 // This function performs update of XB, XN, D and Z during final step of revised
 // dual simplex method.
@@ -33154,6 +33123,7 @@ static double nlcslp_meritfunction(minslpstate *state, RVector *x, RVector *fi, 
    return result;
 }
 
+#if 0 //(@) Not used.
 // This function calculates raw (unaugmented and smooth) Lagrangian
 static double nlcslp_rawlagrangian(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, minslptmpmerit *tmp) {
    double tmp0;
@@ -33163,6 +33133,7 @@ static double nlcslp_rawlagrangian(minslpstate *state, RVector *x, RVector *fi, 
    result = tmp1;
    return result;
 }
+#endif
 
 // This function tries to perform either phase #1 or phase #3 step.
 //
@@ -33208,7 +33179,6 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
    AutoS ae_int_t i;
    AutoS ae_int_t j;
    AutoS double v;
-   AutoS double mx;
    AutoS double f0;
    AutoS double f1;
    AutoS double nu;
@@ -33224,17 +33194,9 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
       default: goto Exit;
    }
 Spawn:
-   n = 346;
-   nslack = -722;
-   nec = -413;
-   nic = -461;
-   nlec = 927;
-   nlic = 201;
-   innerk = 922;
    i = -154;
    j = 306;
    v = 88;
-   mx = -861;
    f0 = -678;
    f1 = -731;
    nu = -675;
@@ -33398,7 +33360,7 @@ Spawn:
       smonitor->probingf.xR[0] = nlcslp_rawlagrangian(state, &state13->stepkxc, &state13->stepkfic, lagmult, &state13->tmpmerit);
       smonitor->probingf.xR[1] = state13->stepkfic.xR[0];
    }
-   mx = 0.0;
+   double mx = 0.0;
    for (i = 0; i < n; i++) {
       mx = rmax2(mx, fabs(state13->d.xR[i]) / state->trustrad);
    }
@@ -33528,19 +33490,11 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
       default: goto Exit;
    }
 Spawn:
-   n = -936;
-   nslack = -279;
-   nec = 94;
-   nic = -812;
-   nlec = 427;
-   nlic = 178;
    mcinfo = -819;
    mcnfev = -826;
    mcstage = 667;
    i = 692;
    j = 84;
-   innerk = 529;
-   nondescentcnt = 14;
    stp = 289;
    v = 317;
    vv = 476;
@@ -33692,6 +33646,7 @@ Spawn:
          *gammamax = rmax2(*gammamax, fabs(vv / v));
       }
 #if 0 //(@) Not used.
+#   if 0
       for (smoothnessmonitorstartprobing(smonitor, 1.0, 2, state->trustrad); smoothnessmonitorprobe(smonitor); ) {
          for (j = 0; j < n; j++) {
             state2->stepkxc.xR[j] = curx->xR[j] + smonitor->probingstp * state2->d.xR[j];
@@ -33714,6 +33669,7 @@ Spawn:
       for (i = 0; i < n; i++) {
          mx = rmax2(mx, fabs(state2->d.xR[i]) / state->trustrad);
       }
+#   endif
       f0 = nlcslp_meritfunction(state, curx, curfi, &state2->meritlagmult, mu, &state2->tmpmerit);
       f1 = nlcslp_meritfunction(state, &state2->stepkxn, &state2->stepkfin, &state2->meritlagmult, mu, &state2->tmpmerit);
 #endif
@@ -33928,24 +33884,14 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   nslack = -58;
-   nec = -919;
-   nic = -909;
-   nlec = 81;
-   nlic = 255;
-   i = 74;
    j = -788;
    innerk = 809;
-   status = 205;
    lpstagesuccess = false;
    v = 763;
    vv = -541;
    mx = -698;
-   gammamax = -900;
    f1 = -318;
    f2 = -940;
-   stp = 1016;
    deltamax = -229;
    multiplyby = -536;
    setscaleto = 487;
@@ -35988,12 +35934,6 @@ static bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor)
       default: goto Exit;
    }
 Spawn:
-   n = 809;
-   nec = 205;
-   nic = -838;
-   ng = 939;
-   nh = -526;
-   i = 763;
    j = -541;
    outerit = -698;
    preccounter = -900;
@@ -36350,12 +36290,7 @@ bool minnlciteration(minnlcstate *state) {
       default: goto Exit;
    }
 Spawn:
-   i = 359;
    k = -58;
-   n = -919;
-   ng = -909;
-   nh = 81;
-   b = true;
    vleft = 74;
    vright = -788;
 // Init
@@ -37545,27 +37480,27 @@ bool minnlciteration(const minnlcstate &state) {
 //    combination will lead to exception. Either  you  did  not pass gradient
 //    when it WAS needed or you passed gradient when it was NOT needed.
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
-void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minnlcoptimize()' (fvec is NULL)");
+   alglib_impl::ae_assert(fvec != NULL, "minnlcoptimize: fvec is NULL");
    while (alglib_impl::minnlciteration(state.c_ptr()))
    BegPoll
       if (state.needfi) fvec(state.x, state.fi, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minnlcoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minnlcoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
-void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minnlcoptimize()' (jac is NULL)");
+   alglib_impl::ae_assert(jac != NULL, "minnlcoptimize: jac is NULL");
    while (alglib_impl::minnlciteration(state.c_ptr()))
    BegPoll
       if (state.needfij) jac(state.x, state.fi, state.j, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minnlcoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minnlcoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
@@ -38756,16 +38691,9 @@ static bool minns_agsiteration(minnsstate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 939;
-   nec = -526;
-   nic = 763;
-   ng = -541;
-   nh = -698;
-   i = -900;
    j = -318;
    k = -940;
    radiusdecays = 1016;
-   maxsamplesize = -229;
    cursamplesize = -536;
    shortstepscnt = 487;
    backtrackits = -115;
@@ -39275,11 +39203,6 @@ Spawn:
    i = 359;
    j = -58;
    k = -919;
-   n = -909;
-   nec = 81;
-   nic = 255;
-   ng = 74;
-   nh = -788;
    v = 809;
    xp = 205;
    xm = -838;
@@ -39899,27 +39822,27 @@ bool minnsiteration(const minnsstate &state) {
 //    combination will lead to exception. Either  you  did  not pass gradient
 //    when it WAS needed or you passed gradient when it was NOT needed.
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
-void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(fvec != NULL, "ALGLIB: error in 'minnsoptimize()' (fvec is NULL)");
+   alglib_impl::ae_assert(fvec != NULL, "minnsoptimize: fvec is NULL");
    while (alglib_impl::minnsiteration(state.c_ptr()))
    BegPoll
       if (state.needfi) fvec(state.x, state.fi, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minnsoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minnsoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
-void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'minnsoptimize()' (jac is NULL)");
+   alglib_impl::ae_assert(jac != NULL, "minnsoptimize: jac is NULL");
    while (alglib_impl::minnsiteration(state.c_ptr()))
    BegPoll
       if (state.needfij) jac(state.x, state.fi, state.j, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minnsoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minnsoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
@@ -40214,8 +40137,6 @@ bool minasaiteration(minasastate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   i = -58;
    mcinfo = -919;
    diffcnt = -909;
    b = true;
@@ -40827,15 +40748,15 @@ bool minasaiteration(const minasastate &state) {
 //     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
 //                 can be NULL
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minasaoptimize()' (grad is NULL)");
+   alglib_impl::ae_assert(grad != NULL, "minasaoptimize: grad is NULL");
    while (alglib_impl::minasaiteration(state.c_ptr()))
    BegPoll
       if (state.needfg) grad(state.x, state.f, state.g, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minasaoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minasaoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
@@ -41351,9 +41272,6 @@ bool minbciteration(minbcstate *state) {
    }
 Spawn:
    freezeidx = 359;
-   n = -58;
-   m = -919;
-   i = -909;
    j = 81;
    mcinfo = 255;
    itidx = 74;
@@ -41365,7 +41283,6 @@ Spawn:
    vv = -526;
    v0 = 763;
    ginit = -541;
-   gdecay = -698;
    activationstep = -900;
 // Algorithm parameters:
 // * M          number of L-BFGS corrections.
@@ -42754,27 +42671,27 @@ bool minbciteration(const minbcstate &state) {
 //    exception being thrown. Either  you  did  not pass gradient when it WAS
 //    needed or you passed gradient when it was NOT needed.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
-void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'minbcoptimize()' (func is NULL)");
+   alglib_impl::ae_assert(func != NULL, "minbcoptimize: func is NULL");
    while (alglib_impl::minbciteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.f, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minbcoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }
-void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(grad != NULL, "ALGLIB: error in 'minbcoptimize()' (grad is NULL)");
+   alglib_impl::ae_assert(grad != NULL, "minbcoptimize: grad is NULL");
    while (alglib_impl::minbciteration(state.c_ptr()))
    BegPoll
       if (state.needfg) grad(state.x, state.f, state.g, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "minbcoptimize: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }

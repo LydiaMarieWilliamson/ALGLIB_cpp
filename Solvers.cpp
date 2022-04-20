@@ -4067,8 +4067,7 @@ Spawn:
       // Non-zero starting point is provided,
          rcopyv(state->n, &state->x0, &state->xf);
          rcopyv(state->n, &state->x0, &state->x);
-         state->requesttype = 0, state->PQ = 0; goto Pause; Resume0: state->requesttype = -999;
-         state->repnmv++;
+         state->requesttype = 0, state->PQ = 0; goto Pause; Resume0: state->requesttype = -999, state->repnmv++;
          rcopyv(state->n, &state->b, &state->wrkb);
          raddv(state->n, -1.0, &state->ax, &state->wrkb);
       }
@@ -4098,9 +4097,8 @@ Spawn:
          state->gmressolver.epsres = state->epsf * res0 / res;
          while (fblsgmresiteration(&state->gmressolver)) {
             rcopyv(state->n, &state->gmressolver.x, &state->x);
-            state->requesttype = 0, state->PQ = 2; goto Pause; Resume2: state->requesttype = -999;
+            state->requesttype = 0, state->PQ = 2; goto Pause; Resume2: state->requesttype = -999, state->repnmv++;
             rcopyv(state->n, &state->ax, &state->gmressolver.ax);
-            state->repnmv++;
             if (state->userterminationneeded) {
             // User requested termination
                state->repterminationtype = 8;
@@ -4111,8 +4109,7 @@ Spawn:
          raddv(state->n, 1.0, &state->gmressolver.xs, &state->xf);
       // Update residual, evaluate residual decrease, terminate if needed
          rcopyv(state->n, &state->xf, &state->x);
-         state->requesttype = 0, state->PQ = 3; goto Pause; Resume3: state->requesttype = -999;
-         state->repnmv++;
+         state->requesttype = 0, state->PQ = 3; goto Pause; Resume3: state->requesttype = -999, state->repnmv++;
          rcopyv(state->n, &state->b, &state->wrkb);
          raddv(state->n, -1.0, &state->ax, &state->wrkb);
          state->repr2 = rdotv2(state->n, &state->wrkb);
@@ -5076,8 +5073,7 @@ Spawn:
 // Start 0-th iteration
    ae_v_move(state->rx.xR, 1, state->startx.xR, 1, state->n);
    ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-   state->repnmv++;
-   state->needvmv = true, state->PQ = 0; goto Pause; Resume0: state->needvmv = false;
+   state->repnmv++, state->needvmv = true, state->PQ = 0; goto Pause; Resume0: state->needvmv = false;
    bnorm = 0.0;
    state->r2 = 0.0;
    state->meritfunction = 0.0;
@@ -5105,8 +5101,7 @@ Spawn:
    }
 // Calculate Z and P
    ae_v_move(state->x.xR, 1, state->r.xR, 1, state->n);
-   state->repnmv++;
-   state->needprec = true, state->PQ = 2; goto Pause; Resume2: state->needprec = false;
+   state->repnmv++, state->needprec = true, state->PQ = 2; goto Pause; Resume2: state->needprec = false;
    for (i = 0; i < state->n; i++) {
       state->z.xR[i] = state->pv.xR[i];
       state->p.xR[i] = state->z.xR[i];
@@ -5117,8 +5112,7 @@ Spawn:
       state->repiterationscount++;
    // Calculate Alpha
       ae_v_move(state->x.xR, 1, state->p.xR, 1, state->n);
-      state->repnmv++;
-      state->needvmv = true, state->PQ = 3; goto Pause; Resume3: state->needvmv = false;
+      state->repnmv++, state->needvmv = true, state->PQ = 3; goto Pause; Resume3: state->needvmv = false;
       if (!isfinite(state->vmv) || state->vmv <= 0.0) {
       // a) Overflow when calculating VMV
       // b) non-positive VMV (non-SPD matrix)
@@ -5158,8 +5152,7 @@ Spawn:
       } else {
       // Calculate R using matrix-vector multiplication
          ae_v_move(state->x.xR, 1, state->cx.xR, 1, state->n);
-         state->repnmv++;
-         state->needmv = true, state->PQ = 4; goto Pause; Resume4: state->needmv = false;
+         state->repnmv++, state->needmv = true, state->PQ = 4; goto Pause; Resume4: state->needmv = false;
          for (i = 0; i < state->n; i++) {
             state->cr.xR[i] = state->b.xR[i] - state->mv.xR[i];
             state->x.xR[i] = state->cr.xR[i];
@@ -5228,8 +5221,7 @@ Spawn:
       }
       ae_v_move(state->x.xR, 1, state->cr.xR, 1, state->n);
    // prepere of parameters for next iteration
-      state->repnmv++;
-      state->needprec = true, state->PQ = 7; goto Pause; Resume7: state->needprec = false;
+      state->repnmv++, state->needprec = true, state->PQ = 7; goto Pause; Resume7: state->needprec = false;
       ae_v_move(state->cz.xR, 1, state->pv.xR, 1, state->n);
       if (state->repiterationscount % state->itsbeforerestart != 0) {
          state->beta = 0.0;
@@ -5775,9 +5767,7 @@ bool linlsqriteration(linlsqrstate *state) {
       default: goto Exit;
    }
 Spawn:
-   summn = 359;
    i = -58;
-   bnorm = -919;
    ae_assert(state->b.cnt > 0, "LinLSQRIteration: using non-allocated array B");
    summn = state->m + state->n;
    bnorm = sqrt(state->bnorm2);
@@ -5791,14 +5781,12 @@ Spawn:
    for (normestimatorrestart(&state->nes); normestimatoriteration(&state->nes); )
       if (state->nes.needmv) {
          ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->n);
-         state->repnmv++;
-         state->needmv = true, state->PQ = 0; goto Pause; Resume0: state->needmv = false;
+         state->repnmv++, state->needmv = true, state->PQ = 0; goto Pause; Resume0: state->needmv = false;
          ae_v_move(state->nes.mv.xR, 1, state->mv.xR, 1, state->m);
       } else if (state->nes.needmtv) {
          ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->m);
       // matrix-vector multiplication
-         state->repnmv++;
-         state->needmtv = true, state->PQ = 1; goto Pause; Resume1: state->needmtv = false;
+         state->repnmv++, state->needmtv = true, state->PQ = 1; goto Pause; Resume1: state->needmtv = false;
          ae_v_move(state->nes.mtv.xR, 1, state->mtv.xR, 1, state->n);
       }
    normestimatorresults(&state->nes, &state->anorm);
@@ -5853,8 +5841,7 @@ Spawn:
       }
       state->x.xR[i] = state->ui.xR[i];
    }
-   state->repnmv++;
-   state->needmtv = true, state->PQ = 3; goto Pause; Resume3: state->needmtv = false;
+   state->repnmv++, state->needmtv = true, state->PQ = 3; goto Pause; Resume3: state->needmtv = false;
    for (i = 0; i < state->n; i++) {
       state->mtv.xR[i] += state->lambdai * state->ui.xR[state->m + i];
    }
@@ -5895,8 +5882,7 @@ Spawn:
    //        and, although no division by zero will happen, orthogonality
    //        in U and V will be lost.
       ae_v_move(state->x.xR, 1, state->vi.xR, 1, state->n);
-      state->repnmv++;
-      state->needmv = true, state->PQ = 4; goto Pause; Resume4: state->needmv = false;
+      state->repnmv++, state->needmv = true, state->PQ = 4; goto Pause; Resume4: state->needmv = false;
       for (i = 0; i < state->n; i++) {
          state->mv.xR[state->m + i] = state->lambdai * state->vi.xR[i];
       }
@@ -5912,8 +5898,7 @@ Spawn:
          }
       }
       ae_v_move(state->x.xR, 1, state->uip1.xR, 1, state->m);
-      state->repnmv++;
-      state->needmtv = true, state->PQ = 5; goto Pause; Resume5: state->needmtv = false;
+      state->repnmv++, state->needmtv = true, state->PQ = 5; goto Pause; Resume5: state->needmtv = false;
       for (i = 0; i < state->n; i++) {
          state->mtv.xR[i] += state->lambdai * state->uip1.xR[state->m + i];
       }
@@ -6342,7 +6327,6 @@ void linlsqrreport_free(void *_p, bool make_automatic) {
 
 namespace alglib {
 // This object stores state of the LinLSQR method.
-//
 // You should use ALGLIB functions to work with this object.
 DefClass(linlsqrstate, )
 DefClass(linlsqrreport, DecVal(iterationscount) DecVal(nmv) DecVal(terminationtype))
@@ -6654,8 +6638,6 @@ bool nleqiteration(nleqstate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   m = -58;
    i = -919;
    b = true;
    lambdaup = 81;
@@ -6673,8 +6655,7 @@ Spawn:
    state->repnfunc = 0;
    state->repnjac = 0;
 // Calculate F/G, initialize algorithm
-   state->needf = true, state->PQ = 0; goto Pause; Resume0: state->needf = false;
-   state->repnfunc++;
+   state->needf = true, state->PQ = 0; goto Pause; Resume0: state->needf = false, state->repnfunc++;
    ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
    state->fbase = state->f;
    state->fprev = maxrealnumber;
@@ -6697,9 +6678,7 @@ Spawn:
    // with current point and State.FBase filled with function value
    // at XBase
       ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-      state->needfij = true, state->PQ = 2; goto Pause; Resume2: state->needfij = false;
-      state->repnfunc++;
-      state->repnjac++;
+      state->needfij = true, state->PQ = 2; goto Pause; Resume2: state->needfij = false, state->repnfunc++, state->repnjac++;
       rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->rightpart, 0);
       ae_v_muld(state->rightpart.xR, 1, n, -1);
    // Inner cycle: find good lambda
@@ -6748,8 +6727,7 @@ Spawn:
             state->f = state->fbase;
             break;
          }
-         state->needf = true, state->PQ = 3; goto Pause; Resume3: state->needf = false;
-         state->repnfunc++;
+         state->needf = true, state->PQ = 3; goto Pause; Resume3: state->needf = false, state->repnfunc++;
          if (state->f < state->fbase) {
          // function value decreased, move on
             nleq_decreaselambda(&lambdav, &rho, lambdadown);
@@ -6977,17 +6955,17 @@ bool nleqiteration(const nleqstate &state) {
 //     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
 //                 can be NULL
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
+void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'nleqsolve()' (func is NULL)");
-   alglib_impl::ae_assert(jac != NULL, "ALGLIB: error in 'nleqsolve()' (jac is NULL)");
+   alglib_impl::ae_assert(func != NULL, "nleqsolve: func is NULL");
+   alglib_impl::ae_assert(jac != NULL, "nleqsolve: jac is NULL");
    while (alglib_impl::nleqiteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.f, ptr);
       else if (state.needfij) jac(state.x, state.fi, state.j, ptr);
       else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "ALGLIB: error in 'nleqsolve' (some derivatives were not provided?)");
+      else alglib_impl::ae_assert(false, "nleqsolve: some derivatives were not provided?");
    EndPoll
    alglib_impl::ae_state_clear();
 }

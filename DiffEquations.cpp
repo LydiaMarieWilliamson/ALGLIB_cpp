@@ -176,8 +176,6 @@ bool odesolveriteration(odesolverstate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   m = -58;
    i = -919;
    j = -909;
    k = 81;
@@ -185,10 +183,8 @@ Spawn:
    gridpoint = false;
    xc = -788;
    v = 809;
-   h = 205;
    h2 = -838;
    err = 939;
-   maxgrowpow = -526;
 // prepare
    if (state->repterminationtype != 0) {
       goto Exit;
@@ -511,14 +507,14 @@ bool odesolveriteration(const odesolverstate &state) {
 //     diff    -   callback which calculates dy/dx for given y and x
 //     ptr     -   optional pointer which is passed to diff; can be NULL
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
-void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr) {
+void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(diff != NULL, "ALGLIB: error in 'odesolversolve()' (diff is NULL)");
+   alglib_impl::ae_assert(diff != NULL, "odesolversolve: diff is NULL");
    while (alglib_impl::odesolveriteration(state.c_ptr()))
    BegPoll
       if (state.needdy) diff(state.y, state.x, state.dy, ptr);
-      else alglib_impl::ae_assert(false, "ALGLIB: unexpected error in 'odesolversolve'");
+      else alglib_impl::ae_assert(false, "odesolversolve: unexpected error");
    EndPoll
    alglib_impl::ae_state_clear();
 }

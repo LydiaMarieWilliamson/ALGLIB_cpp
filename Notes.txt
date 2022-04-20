@@ -768,6 +768,11 @@ A6.2. Test Stages
 			nleqrestartfrom(Q, X); while (nleqiteration(Q)) { ⋯ }
 		to
 			for (nleqrestartfrom(Q, X); nleqiteration(Q); ) { ⋯ }
+0-30	Normalized RComm interface.
+	―	Integrating some changes made in AlgLib++.
+	―	Trim the RComm routines up front.
+	―	Comment the default parameters in RComm iteration routine declarations.
+0-39	Interpolation.{cpp,h}: Moving spline1dfitpenalized() from INTCOM back to SPLINE1D.
 
 A6.3. Test Results
 ──────────────────

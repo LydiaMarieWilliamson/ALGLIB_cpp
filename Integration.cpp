@@ -1651,7 +1651,6 @@ static bool autogk_autogkinternaliteration(autogkinternalstate *state) {
       default: goto Exit;
    }
 Spawn:
-   i = 939;
    j = -526;
    ns = 763;
    info = -541;
@@ -1879,13 +1878,8 @@ bool autogkiteration(autogkstate *state) {
    }
 Spawn:
    s = 359;
-   eps = -919;
-   a = -909;
-   b = 81;
    x = 255;
    t = 74;
-   alpha = -788;
-   beta = 809;
    v1 = 205;
    v2 = -838;
    eps = 0.0;
@@ -1910,8 +1904,7 @@ Spawn:
          state->x = x;
          state->xminusa = x - a;
          state->bminusx = b - x;
-         state->needf = true, state->PQ = 0; goto Pause; Resume0: state->needf = false;
-         state->nfev++;
+         state->needf = true, state->PQ = 0; goto Pause; Resume0: state->needf = false, state->nfev++;
          state->internalstate.f = state->f;
       }
       state->v = state->internalstate.r;
@@ -1956,13 +1949,12 @@ Spawn:
             state->xminusa = a + t - b;
             state->bminusx = -t;
          }
-         state->needf = true, state->PQ = 1; goto Pause; Resume1: state->needf = false;
+         state->needf = true, state->PQ = 1; goto Pause; Resume1: state->needf = false, state->nfev++;
          if (alpha != 0.0) {
             state->internalstate.f = state->f * pow(x, -alpha / (1 + alpha)) / (1 + alpha);
          } else {
             state->internalstate.f = state->f;
          }
-         state->nfev++;
       }
       v1 = state->internalstate.r;
       state->nintervals += state->internalstate.heapused;
@@ -1982,13 +1974,12 @@ Spawn:
             state->xminusa = -t;
             state->bminusx = a - (b - t);
          }
-         state->needf = true, state->PQ = 2; goto Pause; Resume2: state->needf = false;
+         state->needf = true, state->PQ = 2; goto Pause; Resume2: state->needf = false, state->nfev++;
          if (beta != 0.0) {
             state->internalstate.f = state->f * pow(x, -beta / (1 + beta)) / (1 + beta);
          } else {
             state->internalstate.f = state->f;
          }
-         state->nfev++;
       }
       v2 = state->internalstate.r;
       state->nintervals += state->internalstate.heapused;
@@ -2170,14 +2161,14 @@ bool autogkiteration(const autogkstate &state) {
 //     func    -   callback which calculates f(x) for given x
 //     ptr     -   optional pointer which is passed to func; can be NULL
 // ALGLIB: Copyright 07.05.2009 by Sergey Bochkanov
-void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr) {
+void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(func != NULL, "ALGLIB: error in 'autogkintegrate()' (func is NULL)");
+   alglib_impl::ae_assert(func != NULL, "autogkintegrate: func is NULL");
    while (alglib_impl::autogkiteration(state.c_ptr()))
    BegPoll
       if (state.needf) func(state.x, state.xminusa, state.bminusx, state.f, ptr);
-      else alglib_impl::ae_assert(false, "ALGLIB: unexpected error in 'autogkintegrate()'");
+      else alglib_impl::ae_assert(false, "autogkintegrate: unexpected error");
    EndPoll
    alglib_impl::ae_state_clear();
 }
