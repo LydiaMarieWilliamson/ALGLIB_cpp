@@ -17,10 +17,6 @@
 // === ODESOLVER Package ===
 // Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
-static const double odesolver_odesolvermaxgrow = 3.0;
-static const double odesolver_odesolvermaxshrink = 10.0;
-static const double odesolver_odesolverguaranteeddecay = 0.9;
-
 // Internal initialization subroutine
 static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state) {
    ae_int_t i;
@@ -153,6 +149,7 @@ void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, d
 // API: bool odesolveriteration(const odesolverstate &state);
 // API: void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL);
 bool odesolveriteration(odesolverstate *state) {
+   const double odesolvermaxgrow = 3.0, odesolvermaxshrink = 10.0, odesolverguaranteeddecay = 0.9;
    AutoS ae_int_t n;
    AutoS ae_int_t m;
    AutoS ae_int_t i;
@@ -192,7 +189,7 @@ Spawn:
    n = state->n;
    m = state->m;
    h = state->h;
-   maxgrowpow = pow(odesolver_odesolvermaxgrow, 5.0);
+   maxgrowpow = pow(odesolvermaxgrow, 5.0);
    state->needdy = false;
    state->repnfev = 0;
 // some preliminary checks for internal errors
@@ -318,15 +315,15 @@ Spawn:
             }
          // calculate new step, restart if necessary
             if (maxgrowpow * err <= state->eps) {
-               h2 = odesolver_odesolvermaxgrow * h;
+               h2 = odesolvermaxgrow * h;
             } else {
                h2 = h * pow(state->eps / err, 0.2);
             }
-            if (h2 * odesolver_odesolvermaxshrink < h) {
-               h2 = h / odesolver_odesolvermaxshrink;
+            if (h2 * odesolvermaxshrink < h) {
+               h2 = h / odesolvermaxshrink;
             }
             if (err > state->eps) {
-               h = rmin2(h2, odesolver_odesolverguaranteeddecay * h);
+               h = rmin2(h2, odesolverguaranteeddecay * h);
                continue;
             }
          // advance position

@@ -756,7 +756,7 @@ void idwcreatecalcbuffer(idwmodel *s, idwcalcbuffer *buf) {
 // ALGLIB Project: Copyright 22.10.2018 by Sergey Bochkanov
 // API: void idwbuildercreate(const ae_int_t nx, const ae_int_t ny, idwbuilder &state);
 void idwbuildercreate(ae_int_t nx, ae_int_t ny, idwbuilder *state) {
-   const ae_int_t idw_defaultnlayers = 16;
+   const ae_int_t defaultnlayers = 16;
    SetObj(idwbuilder, state);
    ae_assert(nx >= 1, "IDWBuilderCreate: NX <= 0");
    ae_assert(ny >= 1, "IDWBuilderCreate: NY <= 0");
@@ -768,7 +768,7 @@ void idwbuildercreate(ae_int_t nx, ae_int_t ny, idwbuilder *state) {
    state->algotype = 2;
    state->priortermtype = 2;
    vectorsetlengthatleast(&state->priortermval, ny);
-   state->nlayers = idw_defaultnlayers;
+   state->nlayers = defaultnlayers;
    state->r0 = 0.0;
    state->rdecay = 0.5;
    state->lambda0 = idw_defaultlambda0;
@@ -1460,7 +1460,7 @@ static void idw_errormetricsviacalc(idwbuilder *state, idwmodel *model, idwrepor
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 // API: void idwfit(const idwbuilder &state, idwmodel &model, idwreport &rep);
 void idwfit(idwbuilder *state, idwmodel *model, idwreport *rep) {
-   const double idw_meps = 1.0E-50;
+   const double meps = 1.0E-50;
    ae_int_t i;
    ae_int_t i0;
    ae_int_t j;
@@ -1616,7 +1616,7 @@ void idwfit(idwbuilder *state, idwmodel *model, idwreport *rep) {
       model->rdecay = 0.5;
       model->lambda0 = state->lambda0;
       model->lambdadecay = 1.0;
-      model->lambdalast = idw_meps;
+      model->lambdalast = meps;
       model->shepardp = 0.0;
    // Build kd-tree search structure,
    // prepare input residuals for the first layer of the model
@@ -16813,7 +16813,7 @@ void rbfv1gridcalc2(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int
 }
 
 void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, BVector *flagy, bool sparsey, double searchradius, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y) {
-   const double rbfv1_minbasecasecost = 100000.0;
+   const double minbasecasecost = 100000.0;
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -16857,7 +16857,7 @@ void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae
    maxbs = imax2(maxbs, block0b - block0a);
    maxbs = imax2(maxbs, block1b - block1a);
    maxbs = imax2(maxbs, block2b - block2a);
-   if (problemcost >= rbfv1_minbasecasecost && maxbs >= 2) {
+   if (problemcost >= minbasecasecost && maxbs >= 2) {
       if (block0b - block0a == maxbs) {
          rbfv1gridcalc3vrec(s, x0, n0, x1, n1, x2, n2, blocks0, block0a, block0a + maxbs / 2, blocks1, block1a, block1b, blocks2, block2a, block2b, flagy, sparsey, searchradius, avgfuncpernode, bufpool, y);
          rbfv1gridcalc3vrec(s, x0, n0, x1, n1, x2, n2, blocks0, block0a + maxbs / 2, block0b, blocks1, block1a, block1b, blocks2, block2a, block2b, flagy, sparsey, searchradius, avgfuncpernode, bufpool, y);
@@ -17330,7 +17330,6 @@ void rbfv1report_free(void *_p, bool make_automatic) {
 // Depends on: SPLINE1D
 namespace alglib_impl {
 static const double spline2d_cholreg = 1.0E-12;
-static const double spline2d_lambdadecay = 0.5;
 
 // This subroutine calculates the value of the bilinear or bicubic spline  at
 // the given point X.
@@ -20942,7 +20941,7 @@ static void spline2d_rescaledatasetandrefineindex(RVector *xy, ae_int_t npoints,
 //                     * Rep.R2
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 static void spline2d_fastddmfit(RVector *xy, ae_int_t npoints, ae_int_t d, ae_int_t kx, ae_int_t ky, ae_int_t basecasex, ae_int_t basecasey, ae_int_t maxcoresize, ae_int_t interfacesize, ae_int_t nlayers, double smoothing, ae_int_t lsqrcnt, spline1dinterpolant *basis1, spline2dinterpolant *spline, spline2dfitreport *rep, double tss) {
-   const double spline2d_lambdaregfastddm = 1.0E-4;
+   const double lambdaregfastddm = 1.0E-4, lambdadecay = 0.5;
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -21019,7 +21018,7 @@ static void spline2d_fastddmfit(RVector *xy, ae_int_t npoints, ae_int_t d, ae_in
          ae_assert(kycur % basecasey == 1, "Spline2DFit: integrity error");
          tilescount0 = kxcur / basecasex;
          tilescount1 = kycur / basecasey;
-         spline2d_fastddmfitlayer(xy, d, scalexy, &xyindex, basecasex, 0, tilescount0, tilescount0, basecasey, 0, tilescount1, tilescount1, maxcoresize, interfacesize, lsqrcnt, spline2d_lambdaregfastddm + smoothing * pow(spline2d_lambdadecay, (double)scaleidx), basis1, &pool, spline);
+         spline2d_fastddmfitlayer(xy, d, scalexy, &xyindex, basecasex, 0, tilescount0, tilescount0, basecasey, 0, tilescount1, tilescount1, maxcoresize, interfacesize, lsqrcnt, lambdaregfastddm + smoothing * pow(lambdadecay, (double)scaleidx), basis1, &pool, spline);
       // Compute residuals and update XY
          spline2d_computeresidualsfromscratch(xy, &yraw, npoints, d, scalexy, spline);
       }
@@ -21320,7 +21319,7 @@ static void spline2d_naivellsfit(sparsematrix *av, sparsematrix *ah, ae_int_t ar
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 // API: void spline2dfit(const spline2dbuilder &state, spline2dinterpolant &s, spline2dfitreport &rep);
 void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitreport *rep) {
-   const double spline2d_lambdaregblocklls = 1.0E-6;
+   const double lambdaregblocklls = 1.0E-6;
    ae_frame _frame_block;
    double xa;
    double xb;
@@ -21653,13 +21652,13 @@ void spline2dfit(spline2dbuilder *state, spline2dinterpolant *s, spline2dfitrepo
    if (state->solvertype == 1) {
    // BlockLLS
       spline2d_reorderdatasetandbuildindex(&xywork, npoints, d, &tmp0, 0, kx, ky, &xyindex, &tmpi);
-      spline2d_xdesigngenerate(&xywork, &xyindex, 0, kx, kx, 0, ky, ky, d, spline2d_lambdaregblocklls, state->smoothing, &basis1, &xdesignmatrix);
+      spline2d_xdesigngenerate(&xywork, &xyindex, 0, kx, kx, 0, ky, ky, d, lambdaregblocklls, state->smoothing, &basis1, &xdesignmatrix);
       spline2d_blockllsfit(&xdesignmatrix, state->lsqrcnt, &z, rep, tss, &blockllsbuf);
       spline2d_updatesplinetable(&z, kx, ky, d, &basis1, bfrad, &s->f, s->m, s->n, 1);
    } else {
       if (state->solvertype == 2) {
       // NaiveLLS, reference implementation
-         spline2d_generatedesignmatrix(&xywork, npoints, d, kx, ky, state->smoothing, spline2d_lambdaregblocklls, &basis1, &av, &ah, &arows);
+         spline2d_generatedesignmatrix(&xywork, npoints, d, kx, ky, state->smoothing, lambdaregblocklls, &basis1, &av, &ah, &arows);
          spline2d_naivellsfit(&av, &ah, arows, &xywork, kx, ky, npoints, d, state->lsqrcnt, &z, rep, tss);
          spline2d_updatesplinetable(&z, kx, ky, d, &basis1, bfrad, &s->f, s->m, s->n, 1);
       } else {
@@ -22249,8 +22248,8 @@ static const ae_int_t rbfv2_maxnodesize = 6;
 //     S       -   RBF model (initially equals to zero)
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfv2create(ae_int_t nx, ae_int_t ny, rbfv2model *s) {
-   const double rbfv2_defaultlambdareg = 1.0E-6, rbfv2_defaultsupportr = 0.10;
-   const ae_int_t rbfv2_defaultbf = 1;
+   const double defaultlambdareg = 1.0E-6, defaultsupportr = 0.10;
+   const ae_int_t defaultbf = 1;
    ae_int_t i;
    ae_int_t j;
    SetObj(rbfv2model, s);
@@ -22268,10 +22267,10 @@ void rbfv2create(ae_int_t nx, ae_int_t ny, rbfv2model *s) {
       }
    }
 // Non-serializable parameters
-   s->lambdareg = rbfv2_defaultlambdareg;
+   s->lambdareg = defaultlambdareg;
    s->maxits = rbfv2_defaultmaxits;
-   s->supportr = rbfv2_defaultsupportr;
-   s->basisfunction = rbfv2_defaultbf;
+   s->supportr = defaultsupportr;
+   s->basisfunction = defaultbf;
 }
 
 // Reallocates calcBuf if necessary, reuses previously allocated space if
@@ -24163,7 +24162,7 @@ double rbfv2calc3(rbfv2model *s, double x0, double x1, double x2) {
 }
 
 void rbfv2partialgridcalcrec(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, RVector *x3, ae_int_t n3, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, ZVector *blocks3, ae_int_t block3a, ae_int_t block3b, BVector *flagy, bool sparsey, ae_int_t levelidx, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y) {
-   const double rbfv2_complexitymultiplier = 100.0;
+   const double complexitymultiplier = 100.0;
    ae_frame _frame_block;
    ae_int_t nx;
    ae_int_t ny;
@@ -24213,8 +24212,8 @@ void rbfv2partialgridcalcrec(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x
    maxbs = imax2(maxbs, block1b - block1a);
    maxbs = imax2(maxbs, block2b - block2a);
    maxbs = imax2(maxbs, block3b - block3a);
-// Parallelism was tried if: problemcost * rbfv2_complexitymultiplier >= smpactivationlevel()
-   if (problemcost * rbfv2_complexitymultiplier >= spawnlevel() && maxbs >= 2) {
+// Parallelism was tried if: problemcost * complexitymultiplier >= smpactivationlevel()
+   if (problemcost * complexitymultiplier >= spawnlevel() && maxbs >= 2) {
       if (block0b - block0a == maxbs) {
          midpoint = block0a + maxbs / 2;
          rbfv2partialgridcalcrec(s, x0, n0, x1, n1, x2, n2, x3, n3, blocks0, block0a, midpoint, blocks1, block1a, block1b, blocks2, block2a, block2b, blocks3, block3a, block3b, flagy, sparsey, levelidx, avgfuncpernode, bufpool, y);
@@ -25854,7 +25853,6 @@ void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_in
 // Depends on: RBFV1, RBFV2
 namespace alglib_impl {
 static const double rbf_eps = 1.0E-6;
-static const double rbf_rbffarradius = 6.0;
 static const ae_int_t rbf_rbffirstversion = 0;
 static const ae_int_t rbf_rbfversion2 = 2;
 
@@ -27279,6 +27277,7 @@ void rbfgridcalc2vsubset(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_
 // functions for more information
 // ALGLIB: Copyright 04.03.2016 by Sergey Bochkanov
 void rbfgridcalc3vx(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, BVector *flagy, bool sparsey, RVector *y) {
+   const double rbffarradius = 6.0;
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t ylen;
@@ -27355,7 +27354,7 @@ void rbfgridcalc3vx(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t
       rmax = s->model1.rmax;
       blockwidth = 2 * rmax;
       maxblocksize = 8;
-      searchradius = rmax * rbf_rbffarradius + 0.5 * sqrt((double)s->nx) * blockwidth;
+      searchradius = rmax * rbffarradius + 0.5 * sqrt((double)s->nx) * blockwidth;
       ntrials = 100;
       avgfuncpernode = 0.0;
       for (i = 0; i < ntrials; i++) {

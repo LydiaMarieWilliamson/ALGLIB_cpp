@@ -12998,7 +12998,8 @@ static double minbleic_feasibilityerror(RVector *x, RVector *s, ae_int_t n, RMat
 // API: void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool minbleiciteration(minbleicstate *state) {
    const double gtol = 0.4, maxnonmonotoniclen = 1.0E-7, nmstol = 1.0E2;
-   const double initialdecay = 0.5, mindecay = 0.1, decaycorrection = 0.8, penaltyfactor = 100.0;
+   const double initialdecay = 0.5, mindecay = 0.1, decaycorrection = 0.8;
+   const double penaltyfactor = 100.0;
    AutoS ae_int_t n;
    AutoS ae_int_t m;
    AutoS ae_int_t i;
@@ -14874,8 +14875,6 @@ void qpbleicbuffers_free(void *_p, bool make_automatic) {
 // Depends on: (Solvers) DIRECTDENSESOLVERS
 // Depends on: MINLBFGS, CQMODELS, LPQPSERV
 namespace alglib_impl {
-static const double vipmsolver_initslackval = 100.0;
-
 // Sets linear/quadratic terms for QP-IPM solver
 //
 // If you initialized solver with VIPMInitDenseWithSlacks(), NMain below is a
@@ -16295,6 +16294,7 @@ static void vipmsolver_solvereducedkktsystem(vipmstate *state, RVector *deltaxy)
 //                     good value sqrt(MachineEpsilon)
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 static void vipmsolver_vipmpowerup(vipmstate *state, double regfree) {
+   const double initslackval = 100.0;
    ae_int_t n;
    ae_int_t m;
    ae_int_t nnzmax;
@@ -16488,8 +16488,8 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree) {
       state->current.y.xR[i] = state->deltaxy.xR[n + i];
    }
 // Set up slacks according to our own heuristic
-   initprimslack = rmax2(vipmsolver_initslackval, rmaxabsv(n, &state->current.x));
-   initdualslack = rmax2(vipmsolver_initslackval, rmaxabsv(m, &state->current.y));
+   initprimslack = rmax2(initslackval, rmaxabsv(n, &state->current.x));
+   initdualslack = rmax2(initslackval, rmaxabsv(m, &state->current.y));
    vipmsolver_multiplygeax(state, 1.0, &state->current.x, 0, 0.0, &state->tmpax, 0);
    mu0 = 1.0;
    for (i = 0; i < n; i++) {
@@ -16507,12 +16507,12 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree) {
    for (i = 0; i < m; i++) {
       if (state->haswv.xB[i]) {
          state->current.w.xR[i] = rmax2(fabs(state->tmpax.xR[i] - state->b.xR[i]), initprimslack);
-         state->current.v.xR[i] = rmax3(state->current.w.xR[i] * maxinitialimbalance, fabs(state->current.y.xR[i]), vipmsolver_initslackval);
+         state->current.v.xR[i] = rmax3(state->current.w.xR[i] * maxinitialimbalance, fabs(state->current.y.xR[i]), initslackval);
          mu0 = rmax2(mu0, state->current.w.xR[i] * state->current.v.xR[i]);
       }
       if (state->haspq.xB[i]) {
          state->current.p.xR[i] = rmax2(fabs(state->r.xR[i] - state->current.w.xR[i]), initprimslack);
-         state->current.q.xR[i] = rmax3(state->current.p.xR[i] * maxinitialimbalance, fabs(state->current.y.xR[i]), vipmsolver_initslackval);
+         state->current.q.xR[i] = rmax3(state->current.p.xR[i] * maxinitialimbalance, fabs(state->current.y.xR[i]), initslackval);
          mu0 = rmax2(mu0, state->current.p.xR[i] * state->current.q.xR[i]);
       }
    }
@@ -17485,8 +17485,9 @@ void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *la
    const double steplengthdecay = 0.95, stagnationdelta = 0.99999;
    const double primalinfeasible1 = 1.0E-3, dualinfeasible1 = 1.0E-3;
    const double bigy = 1.0E8, ygrowth = 1.0E6;
-   const ae_int_t itersfortoostringentcond = 25, minitersbeforedroppingbounds = 3;
-   const ae_int_t minitersbeforeinfeasible = 3, minitersbeforestagnation = 5, minitersbeforeeworststagnation = 50;
+   const ae_int_t itersfortoostringentcond = 25;
+   const ae_int_t minitersbeforedroppingbounds = 3, minitersbeforeinfeasible = 3;
+   const ae_int_t minitersbeforestagnation = 5, minitersbeforeeworststagnation = 50;
    const ae_int_t primalstagnationlen = 5, dualstagnationlen = 7;
    const double bigconstrxtol = 1.0E-5, bigconstrmag = 1.0E3;
    const double minitersbeforesafeguards = 5.0, badsteplength = 1.0E-3;
@@ -26312,8 +26313,8 @@ void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
 // NOTE: SMonitor is expected to be correctly initialized smoothness monitor.
 // ALGLIB: Copyright 05.03.2018 by Sergey Bochkanov
 bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool userterminationneeded) {
-   const double maxtrustraddecay = 0.1, maxtrustradgrowth = 1.333, maxbigc = 1.0E5, inittrustrad = 0.1;
-   const double stagnationepsf = 1.0E-12;
+   const double maxtrustraddecay = 0.1, maxtrustradgrowth = 1.333, maxbigc = 1.0E5;
+   const double inittrustrad = 0.1, stagnationepsf = 1.0E-12;
    const ae_int_t fstagnationlimit = 20, trustradstagnationlimit = 10;
    const double sqpbigscale = 5.0, sqpsmallscale = 0.2;
    AutoS ae_int_t n;
@@ -33676,8 +33677,8 @@ void minslpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
 // NOTE: SMonitor is expected to be correctly initialized smoothness monitor.
 // ALGLIB: Copyright 05.03.2018 by Sergey Bochkanov
 bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool userterminationneeded) {
-   const double maxtrustraddecay = 0.1, maxtrustradgrowth = 1.333, inittrustrad = 0.1;
-   const double stagnationepsf = 1.0E-12;
+   const double maxtrustraddecay = 0.1, maxtrustradgrowth = 1.333;
+   const double inittrustrad = 0.1, stagnationepsf = 1.0E-12;
    const ae_int_t fstagnationlimit = 20;
    const double slpbigscale = 5.0, slpsmallscale = 0.2;
    AutoS ae_int_t n;
@@ -40012,8 +40013,8 @@ static bool mincomp_asauisempty(minasastate *state) {
 // API: bool minasaiteration(const minasastate &state);
 // API: void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool minasaiteration(minasastate *state) {
-   const double stpmin = 1.0E-300, gtol = 0.3, gpaftol = 0.0001, gpadecay = 0.5, asarho = 0.5;
    const ae_int_t n1 = 2, n2 = 2;
+   const double stpmin = 1.0E-300, gtol = 0.3, gpaftol = 0.0001, gpadecay = 0.5, asarho = 0.5;
    AutoS ae_int_t n;
    AutoS ae_int_t i;
    AutoS double betak;

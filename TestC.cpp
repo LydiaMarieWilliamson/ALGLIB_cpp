@@ -4135,8 +4135,6 @@ bool testortfac() {
 }
 
 // === matgen testing unit ===
-static const ae_int_t testmatgenunit_maxsvditerations = 60;
-
 // Unsets 2D array.
 static void testmatgenunit_unset2d(RMatrix *a) {
    ae_matrix_set_length(a, 0 + 1, 0 + 1);
@@ -4408,6 +4406,7 @@ static double testmatgenunit_pythag(double a, double b) {
 }
 
 static bool testmatgenunit_obsoletesvddecomposition(RMatrix *a, ae_int_t m, ae_int_t n, RVector *w, RMatrix *v) {
+   const ae_int_t maxsvditerations = 60;
    ae_frame _frame_block;
    ae_int_t nm;
    ae_int_t minmn;
@@ -4579,7 +4578,7 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix *a, ae_int_t m, ae_i
    }
    nm = 0;
    for (k = n; k >= 1; k--) {
-      for (its = 1; its <= testmatgenunit_maxsvditerations; its++) {
+      for (its = 1; its <= maxsvditerations; its++) {
          flag = true;
          for (l = k; l >= 1; l--) {
             nm = l - 1;
@@ -4622,7 +4621,7 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix *a, ae_int_t m, ae_i
             }
             break;
          }
-         if (its == testmatgenunit_maxsvditerations) {
+         if (its == maxsvditerations) {
             Ok = false;
             ae_frame_leave();
             return Ok;
@@ -22248,8 +22247,6 @@ bool testoptserv() {
 }
 
 // === minlbfgs testing unit ===
-static const ae_int_t testminlbfgsunit_maxoptguardlevel = 1;
-
 // Calculate test function #2
 //
 // Simple variation of #1, much more nonlinear, which makes unlikely premature
@@ -23089,6 +23086,7 @@ static bool testminlbfgsunit_testoptguardc1test1reportfortask0(optguardnonc1test
 
 // This function tests OptGuard
 static bool testminlbfgsunit_testoptguard() {
+   const ae_int_t maxoptguardlevel = 1;
    ae_frame _frame_block;
    double v;
    ae_int_t i;
@@ -23378,7 +23376,7 @@ static bool testminlbfgsunit_testoptguard() {
       minlbfgscreate(n, m, &x0, &state);
       minlbfgssetcond(&state, 0.0, 0.0, 1.0E-9, 50);
       minlbfgssetscale(&state, &s);
-      minlbfgsoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminlbfgsunit_maxoptguardlevel));
+      minlbfgsoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, maxoptguardlevel));
       while (minlbfgsiteration(&state))
          if (state.needfg) {
             state.f = 0.0;
@@ -23498,7 +23496,7 @@ static bool testminlbfgsunit_testoptguard() {
    // Create and try to solve
       minlbfgscreatef(n, m, &x0, diffstep, &state);
       minlbfgssetcond(&state, 0.0, 0.0, 1.0E-9, 50);
-      minlbfgsoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminlbfgsunit_maxoptguardlevel));
+      minlbfgsoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, maxoptguardlevel));
       while (minlbfgsiteration(&state))
          if (state.needf) {
             state.f = 0.0;
@@ -23551,7 +23549,7 @@ static bool testminlbfgsunit_testoptguard() {
       x0.xR[i] = pow(2.0, hqrndnormal(&rs));
    }
    minlbfgscreate(n, m, &x0, &state);
-   minlbfgsoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminlbfgsunit_maxoptguardlevel));
+   minlbfgsoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, maxoptguardlevel));
    minlbfgssetcond(&state, 0.0, 0.0, 1.0E-9, 25);
    while (minlbfgsiteration(&state))
       if (state.needfg) {
@@ -25011,8 +25009,6 @@ bool testsactivesets() {
 }
 
 // === minbleic testing unit ===
-static const ae_int_t testminbleicunit_maxoptguardlevel = 1;
-
 // Calculate test function IIP2
 //
 // f(x) = sum( ((i*i+1)^FK*x[i])^2, i = 0..N-1)
@@ -27680,6 +27676,7 @@ static bool testminbleicunit_testoptguardc1test1reportfortask0(optguardnonc1test
 
 // This function tests OptGuard
 static bool testminbleicunit_testoptguard() {
+   const ae_int_t maxoptguardlevel = 1;
    ae_frame _frame_block;
    double v;
    ae_int_t i;
@@ -27984,7 +27981,7 @@ static bool testminbleicunit_testoptguard() {
       minbleiccreate(n, &x0, &state);
       minbleicsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
       minbleicsetscale(&state, &s);
-      minbleicoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminbleicunit_maxoptguardlevel));
+      minbleicoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, maxoptguardlevel));
       while (minbleiciteration(&state))
          if (state.needfg) {
             state.f = 0.0;
@@ -28103,7 +28100,7 @@ static bool testminbleicunit_testoptguard() {
    // Create and try to solve
       minbleiccreatef(n, &x0, diffstep, &state);
       minbleicsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
-      minbleicoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminbleicunit_maxoptguardlevel));
+      minbleicoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, maxoptguardlevel));
       while (minbleiciteration(&state))
          if (state.needf) {
             state.f = 0.0;
@@ -28155,7 +28152,7 @@ static bool testminbleicunit_testoptguard() {
       x0.xR[i] = pow(2.0, hqrndnormal(&rs));
    }
    minbleiccreate(n, &x0, &state);
-   minbleicoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminbleicunit_maxoptguardlevel));
+   minbleicoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, maxoptguardlevel));
    minbleicsetcond(&state, 0.0, 0.0, 1.0E-9, 25);
    while (minbleiciteration(&state))
       if (state.needfg) {
@@ -37710,8 +37707,6 @@ bool testminlm() {
 }
 
 // === mincg testing unit ===
-static const ae_int_t testmincgunit_maxoptguardlevel = 1;
-
 // Other properties
 static bool testother() {
    ae_frame _frame_block;
@@ -38583,6 +38578,7 @@ static bool testmincgunit_testoptguardc1test1reportfortask0(optguardnonc1test1re
 
 // This function tests OptGuard
 static bool testmincgunit_testoptguard() {
+   const ae_int_t maxoptguardlevel = 1;
    ae_frame _frame_block;
    double v;
    ae_int_t i;
@@ -38869,7 +38865,7 @@ static bool testmincgunit_testoptguard() {
       mincgcreate(n, &x0, &state);
       mincgsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
       mincgsetscale(&state, &s);
-      mincgoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testmincgunit_maxoptguardlevel));
+      mincgoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, maxoptguardlevel));
       while (mincgiteration(&state))
          if (state.needfg) {
             state.f = 0.0;
@@ -38988,7 +38984,7 @@ static bool testmincgunit_testoptguard() {
    // Create and try to solve
       mincgcreatef(n, &x0, diffstep, &state);
       mincgsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
-      mincgoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testmincgunit_maxoptguardlevel));
+      mincgoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, maxoptguardlevel));
       while (mincgiteration(&state))
          if (state.needf) {
             state.f = 0.0;
@@ -39040,7 +39036,7 @@ static bool testmincgunit_testoptguard() {
       x0.xR[i] = pow(2.0, hqrndnormal(&rs));
    }
    mincgcreate(n, &x0, &state);
-   mincgoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testmincgunit_maxoptguardlevel));
+   mincgoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, maxoptguardlevel));
    mincgsetcond(&state, 0.0, 0.0, 1.0E-9, 25);
    while (mincgiteration(&state))
       if (state.needfg) {
@@ -47420,8 +47416,6 @@ bool testminns() {
 }
 
 // === minbc testing unit ===
-static const ae_int_t testminbcunit_maxoptguardlevel = 1;
-
 // Calculate test function IIP2
 //
 // f(x) = sum( ((i*i+1)^FK*x[i])^2, i = 0..N-1)
@@ -48632,6 +48626,7 @@ static bool testminbcunit_testoptguardc1test1reportfortask0(optguardnonc1test1re
 
 // This function tests OptGuard
 static bool testminbcunit_testoptguard() {
+   const ae_int_t maxoptguardlevel = 1;
    ae_frame _frame_block;
    double v;
    ae_int_t i;
@@ -48936,7 +48931,7 @@ static bool testminbcunit_testoptguard() {
       minbccreate(n, &x0, &state);
       minbcsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
       minbcsetscale(&state, &s);
-      minbcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminbcunit_maxoptguardlevel));
+      minbcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, maxoptguardlevel));
       while (minbciteration(&state))
          if (state.needfg) {
             state.f = 0.0;
@@ -49055,7 +49050,7 @@ static bool testminbcunit_testoptguard() {
    // Create and try to solve
       minbccreatef(n, &x0, diffstep, &state);
       minbcsetcond(&state, 0.0, 0.0, 1.0E-9, 50);
-      minbcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminbcunit_maxoptguardlevel));
+      minbcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, maxoptguardlevel));
       while (minbciteration(&state))
          if (state.needf) {
             state.f = 0.0;
@@ -49107,7 +49102,7 @@ static bool testminbcunit_testoptguard() {
       x0.xR[i] = pow(2.0, hqrndnormal(&rs));
    }
    minbccreate(n, &x0, &state);
-   minbcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminbcunit_maxoptguardlevel));
+   minbcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, maxoptguardlevel));
    minbcsetcond(&state, 0.0, 0.0, 1.0E-9, 25);
    while (minbciteration(&state))
       if (state.needfg) {

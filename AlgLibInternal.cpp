@@ -50,7 +50,7 @@ ae_int_t coalescei(ae_int_t a, ae_int_t b) {
 // NOTE: it costs twice as much as Ln(x)
 // ALGLIB: Copyright 17.09.2012 by Sergey Bochkanov
 double logbase2(double x) {
-   static double log2e = 1.0 / log(2.0);
+   const double log2e = 1.0 / log(2.0);
    double result;
    result = log(x) * log2e;
    return result;
@@ -6734,8 +6734,7 @@ bool mcsrch(ae_int_t n, RVector *x, double f, RVector *g, RVector *s, double *st
    ae_int_t i;
    double v;
 // Initialize.
-   const double p5 = 0.5;
-   const double p66 = 0.66;
+   const double p5 = 0.5, p66 = 0.66;
    state->xtrapf = 4.0;
    const double zero = 0.0;
    if (stpmax == 0.0) {
@@ -7448,8 +7447,7 @@ static const ae_int_t ftbase_opcomplexcodeletfft = 3, ftbase_opcomplexcodelettwf
 static const ae_int_t ftbase_opcomplextranspose = -1, ftbase_opcomplexfftfactors = -2;
 static const ae_int_t ftbase_opstart = -3, ftbase_opjmp = -4, ftbase_opparallelcall = -5;
 static const ae_int_t ftbase_maxradix = 6, ftbase_updatetw = 16;
-static const ae_int_t ftbase_recursivethreshold = 0x400, ftbase_raderthreshold = 19, ftbase_ftbasecodeletrecommended = 5;
-static const double ftbase_ftbaseinefficiencyfactor = 1.3;
+static const ae_int_t ftbase_recursivethreshold = 0x400, ftbase_raderthreshold = 19;
 static const ae_int_t ftbase_ftbasemaxsmoothfactor = 5;
 
 // An optimistic cost estimate of the size n > 0 FFT, in units of 100 KFlops rounded down to nearest integer.
@@ -7894,7 +7892,8 @@ static void ftbase_ffttwcalc(double *ap, ae_int_t n1, ae_int_t n2) {
 // The estimates are badly wrong for non-power-of-2 n's.
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
 double ftbasegetflopestimate(ae_int_t n) {
-   return ftbase_ftbaseinefficiencyfactor * (4.0 * n * logbase2(n) - 6.0 * n + 8.0);
+   const double ftbaseinefficiencyfactor = 1.3;
+   return ftbaseinefficiencyfactor * (4.0 * n * logbase2(n) - 6.0 * n + 8.0);
 }
 
 #if 0
@@ -8028,16 +8027,17 @@ static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1p, ae_int_t 
 // Factoring is chosen depending on the task type and codelets we have.
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
 void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1p, ae_int_t *n2p) {
+   const ae_int_t ftbasecodeletrecommended = 5;
    ae_int_t n1 = 0, n2 = 0;
 // Look for a good codelet size.
    if (n1 * n2 != n)
-      for (ae_int_t j = ftbase_ftbasecodeletrecommended; j >= 2; j--) if (n % j == 0) {
+      for (ae_int_t j = ftbasecodeletrecommended; j >= 2; j--) if (n % j == 0) {
          n1 = j, n2 = n / j;
          break;
       }
 // Try to factor n.
    if (n1 * n2 != n)
-      for (ae_int_t j = ftbase_ftbasecodeletrecommended + 1; j < n; j++) if (n % j == 0) {
+      for (ae_int_t j = ftbasecodeletrecommended + 1; j < n; j++) if (n % j == 0) {
          n1 = j, n2 = n / j;
          break;
       }

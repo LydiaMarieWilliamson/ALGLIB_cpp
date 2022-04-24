@@ -8297,11 +8297,6 @@ double mlpeavgrelerror(const mlpensemble &ensemble, const real_2d_array &xy, con
 // Depends on: (AlgLibMisc) HQRND
 // Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
-static const ae_int_t clustering_kmeansblocksize = 32;
-static const ae_int_t clustering_kmeansparalleldim = 8;
-static const ae_int_t clustering_kmeansparallelk = 4;
-static const double clustering_complexitymultiplier = 1.0;
-
 // K-means++ initialization
 //
 // Inputs:
@@ -8347,6 +8342,7 @@ void kmeansinitbuf(kmeansbuffers *buf) {
 //                     stored in [Idx0,Idx1)
 // ALGLIB: Copyright 21.01.2015 by Sergey Bochkanov
 void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t nvars, RMatrix *ct, ae_int_t cidx0, ae_int_t cidx1, ZVector *xyc, RVector *xydist2, ae_shared_pool *bufferpool) {
+   const ae_int_t kmeansblocksize = 32, kmeansparalleldim = 8, kmeansparallelk = 4;
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t i0;
@@ -8408,9 +8404,9 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
 //
 // NOTE: real arithmetics is used to avoid integer overflow on large problem sizes
    rcomplexity = 2.0 * (idx1 - idx0) * (cidx1 - cidx0) * nvars;
-// Parallelism was tried if: rcomplexity >= smpactivationlevel() && idx1 - idx0 >= 2 * clustering_kmeansblocksize
-   if (rcomplexity >= spawnlevel() && idx1 - idx0 >= 2 * clustering_kmeansblocksize && nvars >= clustering_kmeansparalleldim && cidx1 - cidx0 >= clustering_kmeansparallelk) {
-      task0 = splitlength(idx1 - idx0, clustering_kmeansblocksize), task1 = idx1 - idx0 - task0;
+// Parallelism was tried if: rcomplexity >= smpactivationlevel() && idx1 - idx0 >= 2 * kmeansblocksize
+   if (rcomplexity >= spawnlevel() && idx1 - idx0 >= 2 * kmeansblocksize && nvars >= kmeansparalleldim && cidx1 - cidx0 >= kmeansparallelk) {
+      task0 = splitlength(idx1 - idx0, kmeansblocksize), task1 = idx1 - idx0 - task0;
       kmeansupdatedistances(xy, idx0, idx0 + task0, nvars, ct, cidx0, cidx1, xyc, xydist2, bufferpool);
       kmeansupdatedistances(xy, idx0 + task0, idx1, nvars, ct, cidx0, cidx1, xyc, xydist2, bufferpool);
       ae_frame_leave();
@@ -8422,30 +8418,30 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
 // * iterate over points, process them in KMeansBlockSize-ed chunks
 // * for each chunk of dataset, iterate over centers, process them in KMeansBlockSize-ed chunks
 // * for each chunk of dataset/centerset, iterate over variables, process them in KMeansBlockSize-ed chunks
-   ae_assert(clustering_kmeansblocksize % 2 == 0, "KMeansUpdateDistances: internal error");
+   ae_assert(kmeansblocksize % 2 == 0, "KMeansUpdateDistances: internal error");
    ae_shared_pool_retrieve(bufferpool, &_buf);
-   vectorsetlengthatleast(&buf->ra0, clustering_kmeansblocksize * clustering_kmeansblocksize);
-   vectorsetlengthatleast(&buf->ra1, clustering_kmeansblocksize * clustering_kmeansblocksize);
-   vectorsetlengthatleast(&buf->ra2, clustering_kmeansblocksize * clustering_kmeansblocksize);
-   vectorsetlengthatleast(&buf->ra3, clustering_kmeansblocksize);
-   vectorsetlengthatleast(&buf->ia3, clustering_kmeansblocksize);
-   pblkcnt = chunkscount(idx1 - idx0, clustering_kmeansblocksize);
-   cblkcnt = chunkscount(cidx1 - cidx0, clustering_kmeansblocksize);
-   vblkcnt = chunkscount(nvars, clustering_kmeansblocksize);
+   vectorsetlengthatleast(&buf->ra0, kmeansblocksize * kmeansblocksize);
+   vectorsetlengthatleast(&buf->ra1, kmeansblocksize * kmeansblocksize);
+   vectorsetlengthatleast(&buf->ra2, kmeansblocksize * kmeansblocksize);
+   vectorsetlengthatleast(&buf->ra3, kmeansblocksize);
+   vectorsetlengthatleast(&buf->ia3, kmeansblocksize);
+   pblkcnt = chunkscount(idx1 - idx0, kmeansblocksize);
+   cblkcnt = chunkscount(cidx1 - cidx0, kmeansblocksize);
+   vblkcnt = chunkscount(nvars, kmeansblocksize);
    for (pblk = 0; pblk < pblkcnt; pblk++) {
    // Process PBlk-th chunk of dataset.
-      p0 = idx0 + pblk * clustering_kmeansblocksize;
-      p1 = imin2(p0 + clustering_kmeansblocksize, idx1);
+      p0 = idx0 + pblk * kmeansblocksize;
+      p1 = imin2(p0 + kmeansblocksize, idx1);
    // Prepare RA3[]/IA3[] for storage of best distances and best cluster numbers.
-      for (i = 0; i < clustering_kmeansblocksize; i++) {
+      for (i = 0; i < kmeansblocksize; i++) {
          buf->ra3.xR[i] = maxrealnumber;
          buf->ia3.xZ[i] = -1;
       }
    // Iterare over chunks of centerset.
       for (cblk = 0; cblk < cblkcnt; cblk++) {
       // Process CBlk-th chunk of centerset
-         c0 = cidx0 + cblk * clustering_kmeansblocksize;
-         c1 = imin2(c0 + clustering_kmeansblocksize, cidx1);
+         c0 = cidx0 + cblk * kmeansblocksize;
+         c1 = imin2(c0 + kmeansblocksize, cidx1);
       // At this point we have to calculate a set of pairwise distances
       // between points [P0,P1) and centers [C0,C1) and select best center
       // for each point. It can also be done with blocked algorithm
@@ -8465,9 +8461,9 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
          pcntpadded = pcnt + pcnt % 2;
          ccnt = c1 - c0;
          ccntpadded = ccnt + ccnt % 2;
-         stride = clustering_kmeansblocksize;
-         ae_assert(pcntpadded <= clustering_kmeansblocksize, "KMeansUpdateDistances: integrity error");
-         ae_assert(ccntpadded <= clustering_kmeansblocksize, "KMeansUpdateDistances: integrity error");
+         stride = kmeansblocksize;
+         ae_assert(pcntpadded <= kmeansblocksize, "KMeansUpdateDistances: integrity error");
+         ae_assert(ccntpadded <= kmeansblocksize, "KMeansUpdateDistances: integrity error");
          for (i = 0; i < pcntpadded; i++) {
             for (j = 0; j < ccntpadded; j++) {
                buf->ra0.xR[i * stride + j] = 0.0;
@@ -8476,8 +8472,8 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
          for (vblk = 0; vblk < vblkcnt; vblk++) {
          // Fetch VBlk-th block of variables to arrays RA1 (points) and RA2 (centers).
          // Pad points and centers with zeros.
-            v0 = vblk * clustering_kmeansblocksize;
-            v1 = imin2(v0 + clustering_kmeansblocksize, nvars);
+            v0 = vblk * kmeansblocksize;
+            v1 = imin2(v0 + kmeansblocksize, nvars);
             vcnt = v1 - v0;
             for (i = 0; i < pcnt; i++) {
                for (j = 0; j < vcnt; j++) {
@@ -9377,6 +9373,7 @@ void clusterizersetseed(clusterizerstate *s, ae_int_t seed) {
 //       * [2,4)*[0,2) will result in evaluation of empty set of elements
 // ALGLIB: Copyright 07.04.2013 by Sergey Bochkanov
 static void clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatures, ae_int_t disttype, RMatrix *d, ae_int_t i0, ae_int_t i1, ae_int_t j0, ae_int_t j1) {
+   const double complexitymultiplier = 1.0;
    double rcomplexity;
    ae_int_t len0;
    ae_int_t len1;
@@ -9394,7 +9391,7 @@ static void clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatures
    if (j1 <= j0 || i1 <= i0) {
       return;
    }
-   rcomplexity = clustering_complexitymultiplier * (i1 - i0) * (j1 - j0) * nfeatures;
+   rcomplexity = complexitymultiplier * (i1 - i0) * (j1 - j0) * nfeatures;
 // Parallelism was tried if: (i1 - i0 > 2 || j1 - j0 > 2) && rcomplexity >= smpactivationlevel()
 // Try to process in parallel. Two condtions must hold in order to
 // activate parallel processing:
@@ -10761,7 +10758,6 @@ static const ae_int_t dforest_dfcompressedv0 = 1;
 static const ae_int_t dforest_needtrngini = 1;
 static const ae_int_t dforest_needoobgini = 2;
 static const ae_int_t dforest_needpermutation = 3;
-static const ae_int_t dforest_permutationimportancebatchsize = 512;
 
 // This function creates buffer  structure  which  can  be  used  to  perform
 // parallel inference requests.
@@ -12232,6 +12228,7 @@ static void dforest_dfprocessinternaluncompressed(decisionforest *df, ae_int_t s
 // internal structures when called with these arguments.
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 static void dforest_estimatepermutationimportances(decisionforestbuilder *s, decisionforest *df, ae_int_t ntrees, ae_shared_pool *permpool, ae_int_t idx0, ae_int_t idx1) {
+   const ae_int_t permutationimportancebatchsize = 512;
    ae_frame _frame_block;
    ae_int_t npoints;
    ae_int_t nvars;
@@ -12256,8 +12253,8 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
    ae_assert(idx0 >= 0 && idx0 <= idx1 && idx1 <= npoints, "EstimateVariableImportance: integrity check failed (idx)");
    ae_assert(s->iobmatrix.rows >= ntrees && s->iobmatrix.cols >= npoints, "EstimateVariableImportance: integrity check failed (IOB)");
 // Perform parallelization if batch is too large
-// Parallelism was tried if: idx1 - idx0 > dforest_permutationimportancebatchsize
-   if (idx1 - idx0 > dforest_permutationimportancebatchsize) {
+// Parallelism was tried if: idx1 - idx0 > permutationimportancebatchsize
+   if (idx1 - idx0 > permutationimportancebatchsize) {
       j = (idx1 - idx0) / 2;
       dforest_estimatepermutationimportances(s, df, ntrees, permpool, idx0, idx0 + j);
       dforest_estimatepermutationimportances(s, df, ntrees, permpool, idx0 + j, idx1);
@@ -19059,8 +19056,6 @@ void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t n
 // === MCPD Package ===
 // Depends on: (Optimization) MINBLEIC
 namespace alglib_impl {
-static const double mcpd_xtol = 1.0E-8;
-
 // Internal initialization function
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 static void mcpd_mcpdinit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, mcpdstate *s) {
@@ -19820,6 +19815,7 @@ void mcpdsetpredictionweights(mcpdstate *s, RVector *pw) {
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 // API: void mcpdsolve(const mcpdstate &s);
 void mcpdsolve(mcpdstate *s) {
+   const double xtol = 1.0E-8;
    ae_int_t n;
    ae_int_t npairs;
    ae_int_t ccnt;
@@ -19949,7 +19945,7 @@ void mcpdsolve(mcpdstate *s) {
    }
    minbleicsetbc(&s->bs, &s->effectivebndl, &s->effectivebndu);
    minbleicsetlc(&s->bs, &s->effectivec, &s->effectivect, ccnt);
-   minbleicsetcond(&s->bs, 0.0, 0.0, mcpd_xtol, 0);
+   minbleicsetcond(&s->bs, 0.0, 0.0, xtol, 0);
    minbleicsetprecdiag(&s->bs, &s->h);
 // solve problem
    for (minbleicrestartfrom(&s->bs, &s->tmpp); minbleiciteration(&s->bs); )
