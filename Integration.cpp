@@ -1438,8 +1438,6 @@ void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double b
 // === AUTOGK Package ===
 // Depends on: GKQ
 namespace alglib_impl {
-static const ae_int_t autogk_maxsubintervals = 10000;
-
 // Integration of a smooth function F(x) on a finite interval [a,b].
 //
 // This subroutine is same as AutoGKSmooth(), but it guarantees that interval
@@ -1628,6 +1626,7 @@ static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newhe
 
 // Internal AutoGK subroutine
 static bool autogk_autogkinternaliteration(autogkinternalstate *state) {
+   const ae_int_t maxsubintervals = 10000;
    AutoS double c1;
    AutoS double c2;
    AutoS ae_int_t i;
@@ -1793,7 +1792,7 @@ Spawn:
          autogk_mheapresize(&state->heap, &state->heapsize, 4 * state->heapsize, state->heapwidth);
       }
    // TODO: every 20 iterations recalculate errors/sums
-      if (state->sumerr <= state->eps * state->sumabs || state->heapused >= autogk_maxsubintervals) {
+      if (state->sumerr <= state->eps * state->sumabs || state->heapused >= maxsubintervals) {
          state->r = 0.0;
          for (j = 0; j < state->heapused; j++) {
             state->r += state->heap.xyR[j][1];

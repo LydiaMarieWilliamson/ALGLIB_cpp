@@ -20994,12 +20994,6 @@ void amdbuffer_free(void *_p, bool make_automatic) {
 // === SPCHOL Package ===
 // Depends on: AMDORDERING
 namespace alglib_impl {
-static const ae_int_t spchol_maxsupernode = 4;
-static const double spchol_maxmergeinefficiency = 0.25;
-static const ae_int_t spchol_smallfakestolerance = 2;
-static const ae_int_t spchol_maxfastkernel = 4;
-static const bool spchol_relaxedsupernodes = true;
-
 // The recommended width of the SIMD-friendly buffer.
 // Informational function, useful for debugging.
 static ae_int_t spchol_spsymmgetmaxsimd() {
@@ -21513,6 +21507,10 @@ static ae_int_t spchol_alignpositioninarray(ae_int_t offs) {
 //     Node2Supernode- array[N] that maps node indexes to supernode indexes
 // ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
 static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, ae_int_t n, spcholanalysis *analysis, ZVector *node2supernode, ZVector *tchildrenr, ZVector *tchildreni, ZVector *tparentnodeofsupernode, ZVector *tfakenonzeros, ZVector *ttmp0, BVector *tflagarray) {
+   const ae_int_t maxsupernode = 4;
+   const bool relaxedsupernodes = true;
+   const ae_int_t smallfakestolerance = 2;
+   const double maxmergeinefficiency = 0.25;
    ae_int_t nsuper;
    ae_int_t i;
    ae_int_t j;
@@ -21582,15 +21580,15 @@ static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, 
          childcolcount = analysis->supercolrange.xZ[nsuper - 1] - analysis->supercolrange.xZ[nsuper - 2];
          childoffdiagcnt = analysis->superrowridx.xZ[nsuper - 1] - analysis->superrowridx.xZ[nsuper - 2];
          hastheonlychild = tchildrenr->xZ[columnidx + 1] - tchildrenr->xZ[columnidx] == 1;
-         if ((hastheonlychild || spchol_relaxedsupernodes) && colcount + childcolcount <= spchol_maxsupernode) {
+         if ((hastheonlychild || relaxedsupernodes) && colcount + childcolcount <= maxsupernode) {
             i = colcount + childcolcount;
             k = i * (i + 1) / 2 + offdiagcnt * i;
             fakezerosinnewsupernode = tfakenonzeros->xZ[nsuper - 2] + tfakenonzeros->xZ[nsuper - 1] + (offdiagcnt - (childoffdiagcnt - 1)) * childcolcount;
             mergeinefficiency = (double)fakezerosinnewsupernode / k;
-            if (colcount + childcolcount == 2 && fakezerosinnewsupernode <= spchol_smallfakestolerance) {
+            if (colcount + childcolcount == 2 && fakezerosinnewsupernode <= smallfakestolerance) {
                createsupernode = true;
             }
-            if (mergeinefficiency <= spchol_maxmergeinefficiency) {
+            if (mergeinefficiency <= maxmergeinefficiency) {
                createsupernode = true;
             }
          }
@@ -23194,8 +23192,9 @@ static void spchol_slowdebugchecks(sparsematrix *a, ZVector *fillinperm, ae_int_
 
 // Informational function, useful for debugging
 ae_int_t spsymmgetmaxfastkernel() {
+   const ae_int_t maxfastkernel = 4;
    ae_int_t result;
-   result = spchol_maxfastkernel;
+   result = maxfastkernel;
    return result;
 }
 

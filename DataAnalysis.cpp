@@ -8299,11 +8299,6 @@ double mlpeavgrelerror(const mlpensemble &ensemble, const real_2d_array &xy, con
 // Depends on: (AlgLibMisc) HQRND
 // Depends on: (Statistics) BASESTAT
 namespace alglib_impl {
-static const ae_int_t clustering_kmeansblocksize = 32;
-static const ae_int_t clustering_kmeansparalleldim = 8;
-static const ae_int_t clustering_kmeansparallelk = 4;
-static const double clustering_complexitymultiplier = 1.0;
-
 // K-means++ initialization
 //
 // Inputs:
@@ -8349,6 +8344,7 @@ void kmeansinitbuf(kmeansbuffers *buf) {
 //                     stored in [Idx0,Idx1)
 // ALGLIB: Copyright 21.01.2015 by Sergey Bochkanov
 void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t nvars, RMatrix *ct, ae_int_t cidx0, ae_int_t cidx1, ZVector *xyc, RVector *xydist2, ae_shared_pool *bufferpool) {
+   const ae_int_t kmeansblocksize = 32, kmeansparalleldim = 8, kmeansparallelk = 4;
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t i0;
@@ -8410,9 +8406,9 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
 //
 // NOTE: real arithmetics is used to avoid integer overflow on large problem sizes
    rcomplexity = 2.0 * (idx1 - idx0) * (cidx1 - cidx0) * nvars;
-// Parallelism was tried if: rcomplexity >= smpactivationlevel() && idx1 - idx0 >= 2 * clustering_kmeansblocksize
-   if (rcomplexity >= spawnlevel() && idx1 - idx0 >= 2 * clustering_kmeansblocksize && nvars >= clustering_kmeansparalleldim && cidx1 - cidx0 >= clustering_kmeansparallelk) {
-      task0 = splitlength(idx1 - idx0, clustering_kmeansblocksize), task1 = idx1 - idx0 - task0;
+// Parallelism was tried if: rcomplexity >= smpactivationlevel() && idx1 - idx0 >= 2 * kmeansblocksize
+   if (rcomplexity >= spawnlevel() && idx1 - idx0 >= 2 * kmeansblocksize && nvars >= kmeansparalleldim && cidx1 - cidx0 >= kmeansparallelk) {
+      task0 = splitlength(idx1 - idx0, kmeansblocksize), task1 = idx1 - idx0 - task0;
       kmeansupdatedistances(xy, idx0, idx0 + task0, nvars, ct, cidx0, cidx1, xyc, xydist2, bufferpool);
       kmeansupdatedistances(xy, idx0 + task0, idx1, nvars, ct, cidx0, cidx1, xyc, xydist2, bufferpool);
       ae_frame_leave();
@@ -8424,30 +8420,30 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
 // * iterate over points, process them in KMeansBlockSize-ed chunks
 // * for each chunk of dataset, iterate over centers, process them in KMeansBlockSize-ed chunks
 // * for each chunk of dataset/centerset, iterate over variables, process them in KMeansBlockSize-ed chunks
-   ae_assert(clustering_kmeansblocksize % 2 == 0, "KMeansUpdateDistances: internal error");
+   ae_assert(kmeansblocksize % 2 == 0, "KMeansUpdateDistances: internal error");
    ae_shared_pool_retrieve(bufferpool, &_buf);
-   vectorsetlengthatleast(&buf->ra0, clustering_kmeansblocksize * clustering_kmeansblocksize);
-   vectorsetlengthatleast(&buf->ra1, clustering_kmeansblocksize * clustering_kmeansblocksize);
-   vectorsetlengthatleast(&buf->ra2, clustering_kmeansblocksize * clustering_kmeansblocksize);
-   vectorsetlengthatleast(&buf->ra3, clustering_kmeansblocksize);
-   vectorsetlengthatleast(&buf->ia3, clustering_kmeansblocksize);
-   pblkcnt = chunkscount(idx1 - idx0, clustering_kmeansblocksize);
-   cblkcnt = chunkscount(cidx1 - cidx0, clustering_kmeansblocksize);
-   vblkcnt = chunkscount(nvars, clustering_kmeansblocksize);
+   vectorsetlengthatleast(&buf->ra0, kmeansblocksize * kmeansblocksize);
+   vectorsetlengthatleast(&buf->ra1, kmeansblocksize * kmeansblocksize);
+   vectorsetlengthatleast(&buf->ra2, kmeansblocksize * kmeansblocksize);
+   vectorsetlengthatleast(&buf->ra3, kmeansblocksize);
+   vectorsetlengthatleast(&buf->ia3, kmeansblocksize);
+   pblkcnt = chunkscount(idx1 - idx0, kmeansblocksize);
+   cblkcnt = chunkscount(cidx1 - cidx0, kmeansblocksize);
+   vblkcnt = chunkscount(nvars, kmeansblocksize);
    for (pblk = 0; pblk < pblkcnt; pblk++) {
    // Process PBlk-th chunk of dataset.
-      p0 = idx0 + pblk * clustering_kmeansblocksize;
-      p1 = imin2(p0 + clustering_kmeansblocksize, idx1);
+      p0 = idx0 + pblk * kmeansblocksize;
+      p1 = imin2(p0 + kmeansblocksize, idx1);
    // Prepare RA3[]/IA3[] for storage of best distances and best cluster numbers.
-      for (i = 0; i < clustering_kmeansblocksize; i++) {
+      for (i = 0; i < kmeansblocksize; i++) {
          buf->ra3.xR[i] = maxrealnumber;
          buf->ia3.xZ[i] = -1;
       }
    // Iterare over chunks of centerset.
       for (cblk = 0; cblk < cblkcnt; cblk++) {
       // Process CBlk-th chunk of centerset
-         c0 = cidx0 + cblk * clustering_kmeansblocksize;
-         c1 = imin2(c0 + clustering_kmeansblocksize, cidx1);
+         c0 = cidx0 + cblk * kmeansblocksize;
+         c1 = imin2(c0 + kmeansblocksize, cidx1);
       // At this point we have to calculate a set of pairwise distances
       // between points [P0,P1) and centers [C0,C1) and select best center
       // for each point. It can also be done with blocked algorithm
@@ -8467,9 +8463,9 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
          pcntpadded = pcnt + pcnt % 2;
          ccnt = c1 - c0;
          ccntpadded = ccnt + ccnt % 2;
-         stride = clustering_kmeansblocksize;
-         ae_assert(pcntpadded <= clustering_kmeansblocksize, "KMeansUpdateDistances: integrity error");
-         ae_assert(ccntpadded <= clustering_kmeansblocksize, "KMeansUpdateDistances: integrity error");
+         stride = kmeansblocksize;
+         ae_assert(pcntpadded <= kmeansblocksize, "KMeansUpdateDistances: integrity error");
+         ae_assert(ccntpadded <= kmeansblocksize, "KMeansUpdateDistances: integrity error");
          for (i = 0; i < pcntpadded; i++) {
             for (j = 0; j < ccntpadded; j++) {
                buf->ra0.xR[i * stride + j] = 0.0;
@@ -8478,8 +8474,8 @@ void kmeansupdatedistances(RMatrix *xy, ae_int_t idx0, ae_int_t idx1, ae_int_t n
          for (vblk = 0; vblk < vblkcnt; vblk++) {
          // Fetch VBlk-th block of variables to arrays RA1 (points) and RA2 (centers).
          // Pad points and centers with zeros.
-            v0 = vblk * clustering_kmeansblocksize;
-            v1 = imin2(v0 + clustering_kmeansblocksize, nvars);
+            v0 = vblk * kmeansblocksize;
+            v1 = imin2(v0 + kmeansblocksize, nvars);
             vcnt = v1 - v0;
             for (i = 0; i < pcnt; i++) {
                for (j = 0; j < vcnt; j++) {
@@ -9379,6 +9375,7 @@ void clusterizersetseed(clusterizerstate *s, ae_int_t seed) {
 //       * [2,4)*[0,2) will result in evaluation of empty set of elements
 // ALGLIB: Copyright 07.04.2013 by Sergey Bochkanov
 static void clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatures, ae_int_t disttype, RMatrix *d, ae_int_t i0, ae_int_t i1, ae_int_t j0, ae_int_t j1) {
+   const double complexitymultiplier = 1.0;
    double rcomplexity;
    ae_int_t len0;
    ae_int_t len1;
@@ -9396,7 +9393,7 @@ static void clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatures
    if (j1 <= j0 || i1 <= i0) {
       return;
    }
-   rcomplexity = clustering_complexitymultiplier * (i1 - i0) * (j1 - j0) * nfeatures;
+   rcomplexity = complexitymultiplier * (i1 - i0) * (j1 - j0) * nfeatures;
 // Parallelism was tried if: (i1 - i0 > 2 || j1 - j0 > 2) && rcomplexity >= smpactivationlevel()
 // Try to process in parallel. Two condtions must hold in order to
 // activate parallel processing:
@@ -10763,7 +10760,6 @@ static const ae_int_t dforest_dfcompressedv0 = 1;
 static const ae_int_t dforest_needtrngini = 1;
 static const ae_int_t dforest_needoobgini = 2;
 static const ae_int_t dforest_needpermutation = 3;
-static const ae_int_t dforest_permutationimportancebatchsize = 512;
 
 // This function creates buffer  structure  which  can  be  used  to  perform
 // parallel inference requests.
@@ -12234,6 +12230,7 @@ static void dforest_dfprocessinternaluncompressed(decisionforest *df, ae_int_t s
 // internal structures when called with these arguments.
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 static void dforest_estimatepermutationimportances(decisionforestbuilder *s, decisionforest *df, ae_int_t ntrees, ae_shared_pool *permpool, ae_int_t idx0, ae_int_t idx1) {
+   const ae_int_t permutationimportancebatchsize = 512;
    ae_frame _frame_block;
    ae_int_t npoints;
    ae_int_t nvars;
@@ -12258,8 +12255,8 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
    ae_assert(idx0 >= 0 && idx0 <= idx1 && idx1 <= npoints, "EstimateVariableImportance: integrity check failed (idx)");
    ae_assert(s->iobmatrix.rows >= ntrees && s->iobmatrix.cols >= npoints, "EstimateVariableImportance: integrity check failed (IOB)");
 // Perform parallelization if batch is too large
-// Parallelism was tried if: idx1 - idx0 > dforest_permutationimportancebatchsize
-   if (idx1 - idx0 > dforest_permutationimportancebatchsize) {
+// Parallelism was tried if: idx1 - idx0 > permutationimportancebatchsize
+   if (idx1 - idx0 > permutationimportancebatchsize) {
       j = (idx1 - idx0) / 2;
       dforest_estimatepermutationimportances(s, df, ntrees, permpool, idx0, idx0 + j);
       dforest_estimatepermutationimportances(s, df, ntrees, permpool, idx0 + j, idx1);
@@ -19064,8 +19061,6 @@ void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t n
 // === MCPD Package ===
 // Depends on: (Optimization) MINBLEIC
 namespace alglib_impl {
-static const double mcpd_xtol = 1.0E-8;
-
 // Internal initialization function
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 static void mcpd_mcpdinit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, mcpdstate *s) {
@@ -19825,6 +19820,7 @@ void mcpdsetpredictionweights(mcpdstate *s, RVector *pw) {
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 // API: void mcpdsolve(const mcpdstate &s);
 void mcpdsolve(mcpdstate *s) {
+   const double xtol = 1.0E-8;
    ae_int_t n;
    ae_int_t npairs;
    ae_int_t ccnt;
@@ -19954,7 +19950,7 @@ void mcpdsolve(mcpdstate *s) {
    }
    minbleicsetbc(&s->bs, &s->effectivebndl, &s->effectivebndu);
    minbleicsetlc(&s->bs, &s->effectivec, &s->effectivect, ccnt);
-   minbleicsetcond(&s->bs, 0.0, 0.0, mcpd_xtol, 0);
+   minbleicsetcond(&s->bs, 0.0, 0.0, xtol, 0);
    minbleicsetprecdiag(&s->bs, &s->h);
 // solve problem
    for (minbleicrestartfrom(&s->bs, &s->tmpp); minbleiciteration(&s->bs); )
@@ -20266,12 +20262,6 @@ void mcpdresults(const mcpdstate &s, real_2d_array &p, mcpdreport &rep) {
 // Depends on: (Solvers) DIRECTDENSESOLVERS
 // Depends on: MLPBASE
 namespace alglib_impl {
-static const double logit_xtol = 100.0 * machineepsilon;
-static const double logit_ftol = 0.0001;
-static const double logit_gtol = 0.3;
-static const ae_int_t logit_maxfev = 20;
-static const double logit_stpmin = 1.0E-2;
-static const double logit_stpmax = 1.0E5;
 static const ae_int_t logit_logitvnum = 6;
 
 // Internal subroutine. Places exponents of the anti-overflow shifted
@@ -20406,6 +20396,9 @@ void mnlprocessi(logitmodel *lm, RVector *x, RVector *y) {
 // Argonne National Laboratory. MINPACK Project. 1983 June.
 // Jorge J. More', David J. Thuente.
 static bool logit_mnlmcsrch(ae_int_t n, RVector *x, double f, RVector *g, RVector *s, double *stp, ae_int_t *info, ae_int_t *nfev, RVector *wa, logitmcstate *state, ae_int_t *stage) {
+   const double xtol = 100.0 * machineepsilon, ftol = 0.0001, gtol = 0.3;
+   const ae_int_t maxfev = 20;
+   const double stpmin = 1.0E-2, stpmax = 1.0E5;
    double v;
 // Initialize.
    const double p5 = 0.5;
@@ -20431,7 +20424,7 @@ Spawn:
    state->infoc = 1;
    *info = 0;
 // Check the inputs and parameters for errors.
-   if (n <= 0 || *stp <= 0.0 || logit_ftol < 0.0 || logit_gtol < zero || logit_xtol < zero || logit_stpmin < zero || logit_stpmax < logit_stpmin || logit_maxfev <= 0) {
+   if (n <= 0 || *stp <= 0.0 || ftol < 0.0 || gtol < zero || xtol < zero || stpmin < zero || stpmax < stpmin || maxfev <= 0) {
       goto Exit;
    }
 // Compute the initial gradient in the search direction and check that s is a descent direction.
@@ -20445,8 +20438,8 @@ Spawn:
    state->stage1 = true;
    *nfev = 0;
    state->finit = f;
-   state->dgtest = logit_ftol * state->dginit;
-   state->width = logit_stpmax - logit_stpmin;
+   state->dgtest = ftol * state->dginit;
+   state->width = stpmax - stpmin;
    state->width1 = state->width / p5;
    ae_v_move(wa->xR, 1, x->xR, 1, n);
 // The members stx, fx, dgx contain the values of the step, function, and directional derivative at the best step.
@@ -20479,14 +20472,14 @@ Spawn:
          state->stmax = *stp + state->xtrapf * (*stp - state->stx);
       }
    // Force the step to be within the bounds stpmax and stpmin.
-      if (*stp > logit_stpmax) {
-         *stp = logit_stpmax;
+      if (*stp > stpmax) {
+         *stp = stpmax;
       }
-      if (*stp < logit_stpmin) {
-         *stp = logit_stpmin;
+      if (*stp < stpmin) {
+         *stp = stpmin;
       }
    // If an unusual termination is to occur then let *stp be the lowest point obtained so far.
-      if (state->brackt && (*stp <= state->stmin || *stp >= state->stmax) || *nfev >= logit_maxfev - 1 || state->infoc == 0 || state->brackt && state->stmax - state->stmin <= logit_xtol * state->stmax) {
+      if (state->brackt && (*stp <= state->stmin || *stp >= state->stmax) || *nfev >= maxfev - 1 || state->infoc == 0 || state->brackt && state->stmax - state->stmin <= xtol * state->stmax) {
          *stp = state->stx;
       }
    // Evaluate the function and gradient at *stp and compute the directional derivative.
@@ -20502,19 +20495,19 @@ Spawn:
       if (state->brackt && (*stp <= state->stmin || *stp >= state->stmax) || state->infoc == 0) {
          *info = 6;
       }
-      if (*stp == logit_stpmax && f <= state->ftest1 && state->dg <= state->dgtest) {
+      if (*stp == stpmax && f <= state->ftest1 && state->dg <= state->dgtest) {
          *info = 5;
       }
-      if (*stp == logit_stpmin && (f > state->ftest1 || state->dg >= state->dgtest)) {
+      if (*stp == stpmin && (f > state->ftest1 || state->dg >= state->dgtest)) {
          *info = 4;
       }
-      if (*nfev >= logit_maxfev) {
+      if (*nfev >= maxfev) {
          *info = 3;
       }
-      if (state->brackt && state->stmax - state->stmin <= logit_xtol * state->stmax) {
+      if (state->brackt && state->stmax - state->stmin <= xtol * state->stmax) {
          *info = 2;
       }
-      if (f <= state->ftest1 && SmallAtR(state->dg, -logit_gtol * state->dginit)) {
+      if (f <= state->ftest1 && SmallAtR(state->dg, -gtol * state->dginit)) {
          *info = 1;
       }
    // Check for termination.
@@ -20522,7 +20515,7 @@ Spawn:
          goto Exit;
       }
    // In the first stage we seek a step for which the modified function has a non-positive value and non-negative derivative.
-      if (state->stage1 && f <= state->ftest1 && state->dg >= rmin2(logit_ftol, logit_gtol) * state->dginit) {
+      if (state->stage1 && f <= state->ftest1 && state->dg >= rmin2(ftol, gtol) * state->dginit) {
          state->stage1 = false;
       }
    // A modified function is used to predict the step only if we have not obtained a step

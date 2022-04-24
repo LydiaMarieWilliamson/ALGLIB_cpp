@@ -6,4 +6,4 @@ The final result will be merged into ALGLIB_cpp, as it is also updated.
 It will be operational throughout the process.
 New multi-threading code, recently devised, may also be added in, as well.
 
-The latest revision passed its tests with timestamp 1650480992 (62605760).
+The latest revision passed its tests with timestamp 1650825124 (626597a4).
