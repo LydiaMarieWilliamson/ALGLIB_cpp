@@ -893,7 +893,7 @@ void randomunit(ae_int_t n, RVector *x) {
          v += vv * vv;
       }
    } while (v <= 0.0);
-   v = 1 / sqrt(v);
+   v = 1.0 / sqrt(v);
    for (i = 0; i < n; i++) {
       x->xR[i] *= v;
    }
@@ -1387,8 +1387,8 @@ ae_int_t matrixtilesizeb() {
 double smpactivationlevel() {
    double nn;
    double result;
-   nn = (double)(2 * matrixtilesizeb());
-   result = rmax2(0.95 * 2 * nn * nn * nn, 1.0E7);
+   nn = 2.0 * matrixtilesizeb();
+   result = rmax2(0.95 * 2 * nn * nn * nn, 10000000.0);
    return result;
 }
 
@@ -1400,7 +1400,7 @@ double smpactivationlevel() {
 double spawnlevel() {
    double nn;
    double result;
-   nn = (double)(2 * matrixtilesizea());
+   nn = 2.0 * matrixtilesizea();
    result = 0.95 * 2 * nn * nn * nn;
    return result;
 }
@@ -3340,11 +3340,11 @@ void complexgeneratereflection(CVector *x, ae_int_t n, complex *tau) {
    if (mx != 0.0) {
       if (mx < 1.0) {
          s = sqrt(minrealnumber);
-         v = complex_from_d(1 / s);
+         v = complex_from_d(1.0 / s);
          ae_v_cmulc(&x->xC[1], 1, n, v);
       } else {
          s = sqrt(maxrealnumber);
-         v = complex_from_d(1 / s);
+         v = complex_from_d(1.0 / s);
          ae_v_cmulc(&x->xC[1], 1, n, v);
       }
    }
@@ -5201,8 +5201,8 @@ void generaterotation(double f, double g, double *cs, double *sn, double *r) {
          } else {
             *r = fabs(g1) * sqrt(1 + sqr(f1 / g1));
          }
-         *cs = f1 / (*r);
-         *sn = g1 / (*r);
+         *cs = f1 / *r;
+         *sn = g1 / *r;
          if (fabs(f) > fabs(g) && *cs < 0.0) {
             *cs = -*cs;
             *sn = -*sn;
@@ -5260,7 +5260,7 @@ void rankx(RVector *x, ae_int_t n, bool iscentered, apbuffers *buf) {
       if (iscentered) {
          tmp = 0.0;
       } else {
-         tmp = (double)(n - 1) / 2.0;
+         tmp = (n - 1) / 2.0;
       }
       for (i = 0; i < n; i++) {
          x->xR[i] = tmp;
@@ -5278,13 +5278,13 @@ void rankx(RVector *x, ae_int_t n, bool iscentered, apbuffers *buf) {
          j++;
       }
       for (k = i; k < j; k++) {
-         buf->ra1.xR[k] = (double)(i + j - 1) / 2.0;
+         buf->ra1.xR[k] = (i + j - 1) / 2.0;
       }
       i = j;
    }
 // back to x
    if (iscentered) {
-      voffs = (double)(n - 1) / 2.0;
+      voffs = (n - 1) / 2.0;
    } else {
       voffs = 0.0;
    }
@@ -5323,7 +5323,7 @@ void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf) {
    }
    tagsortfasti(&buf->ra1, &buf->ia1, &buf->ra2, &buf->ia2, n);
    for (i = 0; i < n; i++) {
-      x->xR[buf->ia1.xZ[i]] = (double)i;
+      x->xR[buf->ia1.xZ[i]] = i;
    }
 }
 } // end of namespace alglib_impl
@@ -5376,7 +5376,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
    }
 // Determine machine dependent parameters to control overflow.
    smlnum = minrealnumber / (machineepsilon * 2);
-   bignum = 1 / smlnum;
+   bignum = 1.0 / smlnum;
    *s = 1.0;
    if (!normin) {
       ae_vector_set_length(cnorm, n + 1);
@@ -5414,7 +5414,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
    if (tmax <= bignum) {
       tscal = 1.0;
    } else {
-      tscal = 1 / (smlnum * tmax);
+      tscal = 1.0 / (smlnum * tmax);
       ae_v_muld(&cnorm->xR[1], 1, n, tscal);
    }
 // Compute a bound on the computed solution vector to see if the
@@ -5446,7 +5446,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
          //
          // Compute GROW = 1/G(j) and XBND = 1/M(j).
          // Initially, G(0) = max{x(i), i = 1,...,n}.
-            grow = 1 / rmax2(xbnd, smlnum);
+            grow = 1.0 / rmax2(xbnd, smlnum);
             xbnd = grow;
             j = jfirst;
             while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
@@ -5473,7 +5473,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
          // A is unit triangular.
          //
          // Compute GROW = 1/G(j), where G(0) = max{x(i), i = 1,...,n}.
-            grow = rmin2(1.0, 1 / rmax2(xbnd, smlnum));
+            grow = rmin2(1.0, 1.0 / rmax2(xbnd, smlnum));
             j = jfirst;
             while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
             // Exit the loop if the growth factor is too small.
@@ -5505,7 +5505,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
          //
          // Compute GROW = 1/G(j) and XBND = 1/M(j).
          // Initially, M(0) = max{x(i), i = 1,...,n}.
-            grow = 1 / rmax2(xbnd, smlnum);
+            grow = 1.0 / rmax2(xbnd, smlnum);
             xbnd = grow;
             j = jfirst;
             while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
@@ -5530,7 +5530,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
          // A is unit triangular.
          //
          // Compute GROW = 1/G(j), where G(0) = max{x(i), i = 1,...,n}.
-            grow = rmin2(1.0, 1 / rmax2(xbnd, smlnum));
+            grow = rmin2(1.0, 1.0 / rmax2(xbnd, smlnum));
             j = jfirst;
             while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
             // Exit the loop if the growth factor is too small.
@@ -5622,7 +5622,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
                   if (tjj < 1.0) {
                      if (xj > tjj * bignum) {
                      // Scale x by 1/b(j).
-                        rec = 1 / xj;
+                        rec = 1.0 / xj;
                         ae_v_muld(&x->xR[1], 1, n, rec);
                         *s *= rec;
                         xmax *= rec;
@@ -5664,7 +5664,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
          // Scale x if necessary to avoid overflow when adding a
          // multiple of column j of A.
             if (xj > 1.0) {
-               rec = 1 / xj;
+               rec = 1.0 / xj;
                if (cnorm->xR[j] > (bignum - xmax) * rec) {
                // Scale x by 1/(2*abs(x(j))).
                   rec *= 0.5;
@@ -5719,7 +5719,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
          //   k != j
             xj = fabs(x->xR[j]);
             uscal = tscal;
-            rec = 1 / rmax2(xmax, 1.0);
+            rec = 1.0 / rmax2(xmax, 1.0);
             if (cnorm->xR[j] > (bignum - xj) * rec) {
             // If x(j) could overflow, scale x by 1/(2*XMAX).
                rec *= 0.5;
@@ -5795,7 +5795,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
                      if (tjj < 1.0) {
                         if (xj > tjj * bignum) {
                         // Scale X by 1/abs(x(j)).
-                           rec = 1 / xj;
+                           rec = 1.0 / xj;
                            ae_v_muld(&x->xR[1], 1, n, rec);
                            *s *= rec;
                            xmax *= rec;
@@ -5838,7 +5838,7 @@ void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isu
    }
 // Scale the column norms by 1/TSCAL for return.
    if (tscal != 1.0) {
-      v = 1 / tscal;
+      v = 1.0 / tscal;
       ae_v_muld(&cnorm->xR[1], 1, n, v);
    }
 }
@@ -6327,7 +6327,7 @@ static double xblas_xfastpow(double r, ae_int_t n) {
       result = 1.0;
    }
    if (n < 0) {
-      result = xblas_xfastpow(1 / r, -n);
+      result = xblas_xfastpow(1.0 / r, -n);
    }
    return result;
 }
@@ -6394,7 +6394,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
       s *= 2;
    }
    ae_v_muld(w->xR, 1, n, s);
-   s = 1 / s;
+   s = 1.0 / s;
 // find Chunk == 2^M such that N*Chunk < 2^29
 //
 // we have chosen upper limit (2^29) with enough space left
@@ -6405,7 +6405,7 @@ static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rer
    if (chunk < 2.0) {
       chunk = 2.0;
    }
-   invchunk = 1 / chunk;
+   invchunk = 1.0 / chunk;
 // calculate result
    *r = 0.0;
    ae_v_muld(w->xR, 1, n, chunk);
@@ -6569,12 +6569,12 @@ void linminnormalized(RVector *d, double *stp, ae_int_t n) {
    if (mx == 0.0) {
       return;
    }
-   s = 1 / mx;
+   s = 1.0 / mx;
    ae_v_muld(d->xR, 1, n, s);
    *stp /= s;
 // normalize D
    s = ae_v_dotproduct(d->xR, 1, d->xR, 1, n);
-   s = 1 / sqrt(s);
+   s = 1.0 / sqrt(s);
    ae_v_muld(d->xR, 1, n, s);
    *stp /= s;
 }
@@ -7257,8 +7257,8 @@ static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n) {
    ae_assert(a >= 0 && a < n, "ntheory_modmul: a < 0 or a >= n");
    ae_assert(b >= 0 && b < n, "ntheory_modmul: b < 0 or b >= n");
 // Base cases
-   ra = (double)a;
-   rb = (double)b;
+   ra = a;
+   rb = b;
    if (b == 0 || a == 0) {
       result = 0;
       return result;
@@ -7267,7 +7267,7 @@ static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n) {
       result = a * b;
       return result;
    }
-   if (ra * rb == (double)(a * b)) {
+   if (ra * rb == a * b) {
       result = a * b % n;
       return result;
    }
@@ -7430,9 +7430,9 @@ void findprimitiverootandinverse(ae_int_t n, ae_int_t *proot, ae_int_t *invproot
 // Check results for consistency.
    n2 = (n - 1) * (n - 1);
    ae_assert(n2 / (n - 1) == n - 1, "findprimitiverootandinverse: internal error");
-   ae_assert(*proot * (*invproot) / (*proot) == (*invproot), "findprimitiverootandinverse: internal error");
-   ae_assert(*proot * (*invproot) / (*invproot) == (*proot), "findprimitiverootandinverse: internal error");
-   ae_assert(*proot * (*invproot) % n == 1, "findprimitiverootandinverse: internal error");
+   ae_assert(*proot * *invproot / *proot == *invproot, "findprimitiverootandinverse: internal error");
+   ae_assert(*proot * *invproot / *invproot == *proot, "findprimitiverootandinverse: internal error");
+   ae_assert(*proot * *invproot % n == 1, "findprimitiverootandinverse: internal error");
 }
 } // end of namespace alglib_impl
 

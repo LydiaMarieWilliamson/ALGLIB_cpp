@@ -10592,7 +10592,7 @@ Inputs:
     S           -   trainer object
     Decay       -   weight  decay  coefficient, &ge; 0.  Weight  decay  term
                     'Decay*||Weights||^2' is added to error  function.  If
-                    you don't know what Decay to choose, use 1.0E-3.
+                    you don't know what Decay to choose, use 0.001.
                     Weight decay can be set to zero,  in this case network
                     is trained without weight decay.
 
@@ -14581,7 +14581,7 @@ Inputs:
     EpsX    -   stopping condition for NLC optimizer:
                 * must be non-negative
                 * use 0 to choose default value (1.0E-12 is used by default)
-                * you may specify larger values, up to 1.0E-6, if you want
+                * you may specify larger values, up to 0.000001, if you want
                   to   speed-up   solver;   NLC   solver  performs several
                   preconditioned  outer  iterations,   so   final   result
                   typically has precision much better than EpsX.
@@ -14595,8 +14595,8 @@ Inputs:
                 Ignored for ProblemType == 0.
     Penalty -   penalty coefficient for NLC optimizer:
                 * must be non-negative
-                * use 0 to choose default value (1.0E6 in current version)
-                * it should be really large, 1.0E6...1.0E7 is a good value
+                * use 0 to choose default value (1000000 in current version)
+                * it should be really large, 1000000...10000000 is a good value
                   to start from;
                 * generally, default value is good enough
                 Ignored for ProblemType == 0.
@@ -18166,7 +18166,7 @@ using namespace alglib;
    real_2d_array x = <font color=blue><b>&quot;[[2000],[2001],[2002],[2003],[2004],[2005],[2006],[2007],[2008]]&quot;</b></font>;
    real_1d_array y = <font color=blue><b>&quot;[4323239600000.0, 4560913100000.0, 5564091500000.0, 6743189300000.0, 7284064600000.0, 7050129600000.0, 7092221500000.0, 8483907600000.0, 8625804400000.0]&quot;</b></font>;
    real_1d_array c = <font color=blue><b>&quot;[1.0e+13, 1, 1]&quot;</b></font>;
-   <b>double</b> epsx = 1.0e-5;
+   <b>double</b> epsx = 0.00001;
    real_1d_array bndl = <font color=blue><b>&quot;[-inf, -10, 0.1]&quot;</b></font>;
    real_1d_array bndu = <font color=blue><b>&quot;[+inf, +10, 2.0]&quot;</b></font>;
    real_1d_array s = <font color=blue><b>&quot;[1.0e+12, 1, 1]&quot;</b></font>;
@@ -18174,7 +18174,7 @@ using namespace alglib;
    ae_int_t info;
    lsfitstate state;
    lsfitreport rep;
-   <b>double</b> diffstep = 1.0e-5;
+   <b>double</b> diffstep = 0.00001;
    lsfitcreatef(x, y, c, diffstep, state);
    lsfitsetcond(state, epsx, maxits);
    lsfitsetbc(state, bndl, bndu);
@@ -24919,7 +24919,7 @@ Inputs:
                     precise current estimate is)
 
 NOTE: passing  eps == 0  and  maxits == 0  results  in  automatic  selection  of
-      moderate eps as stopping criteria (1.0E-6 in current implementation,
+      moderate eps as stopping criteria (0.000001 in current implementation,
       but it may change without notice).
 
 NOTE: very small values of eps are possible (say, 1.0E-12),  although  the
@@ -31023,7 +31023,7 @@ NOTES:
    S[] is scaling vector which can be set by MinBCSetScale() call.
 3. we recommend you to use moderate values of  differentiation  step.  Too
    large step will result in too large truncation  errors, while too small
-   step will result in too large numerical  errors.  1.0E-6  can  be  good
+   step will result in too large numerical  errors.  0.000001  can be good
    value to start with.
 4. Numerical  differentiation  is   very   inefficient  -   one   gradient
    calculation needs 4*N function evaluations. This function will work for
@@ -31821,7 +31821,7 @@ using namespace alglib;
    <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.000001;
    ae_int_t maxits = 0;
-   <b>double</b> diffstep = 1.0e-6;
+   <b>double</b> diffstep = 0.000001;
 <font color=navy>// Now we are ready to actually optimize something:</font>
 <font color=navy>// * first we create optimizer</font>
 <font color=navy>// * we add boundary constraints</font>
@@ -32063,7 +32063,7 @@ NOTES:
    S[] is scaling vector which can be set by MinBLEICSetScale() call.
 3. we recommend you to use moderate values of  differentiation  step.  Too
    large step will result in too large truncation  errors, while too small
-   step will result in too large numerical  errors.  1.0E-6  can  be  good
+   step will result in too large numerical  errors.  0.000001  can be good
    value to start with.
 4. Numerical  differentiation  is   very   inefficient  -   one   gradient
    calculation needs 4*N function evaluations. This function will work for
@@ -33015,7 +33015,7 @@ using namespace alglib;
    <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.000001;
    ae_int_t maxits = 0;
-   <b>double</b> diffstep = 1.0e-6;
+   <b>double</b> diffstep = 0.000001;
    minbleiccreatef(x, diffstep, state);
    minbleicsetbc(state, bndl, bndu);
    minbleicsetscale(state, s);
@@ -33205,7 +33205,7 @@ NOTES:
    S[] is scaling vector which can be set by MinCGSetScale() call.
 3. we recommend you to use moderate values of  differentiation  step.  Too
    large step will result in too large truncation  errors, while too small
-   step will result in too large numerical  errors.  1.0E-6  can  be  good
+   step will result in too large numerical  errors.  0.000001  can be good
    value to start with.
 4. Numerical  differentiation  is   very   inefficient  -   one   gradient
    calculation needs 4*N function evaluations. This function will work for
@@ -34081,7 +34081,7 @@ using namespace alglib;
    <b>double</b> epsg = 0.0;
    <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.0000000001;
-   <b>double</b> diffstep = 1.0e-6;
+   <b>double</b> diffstep = 0.000001;
    ae_int_t maxits = 0;
    mincgstate state;
    mincgcreatef(x, diffstep, state);
@@ -34476,7 +34476,7 @@ NOTES:
    S[] is scaling vector which can be set by MinLBFGSSetScale() call.
 3. we recommend you to use moderate values of  differentiation  step.  Too
    large step will result in too large truncation  errors, while too small
-   step will result in too large numerical  errors.  1.0E-6  can  be  good
+   step will result in too large numerical  errors.  0.000001  can be good
    value to start with.
 4. Numerical  differentiation  is   very   inefficient  -   one   gradient
    calculation needs 4*N function evaluations. This function will work for
@@ -35319,7 +35319,7 @@ using namespace alglib;
    <b>double</b> epsg = 0.0000000001;
    <b>double</b> epsf = 0.0;
    <b>double</b> epsx = 0.0;
-   <b>double</b> diffstep = 1.0e-6;
+   <b>double</b> diffstep = 0.000001;
    ae_int_t maxits = 0;
    minlbfgsstate state;
    minlbfgsreport rep;
@@ -37398,7 +37398,7 @@ NOTES:
    S[] is scaling vector which can be set by MinNLCSetScale() call.
 3. we recommend you to use moderate values of  differentiation  step.  Too
    large step will result in too large TRUNCATION  errors, while too small
-   step will result in too large NUMERICAL  errors.  1.0E-4  can  be  good
+   step will result in too large NUMERICAL  errors.  0.0001  can  be  good
    value to start from.
 4. Numerical  differentiation  is   very   inefficient  -   one   gradient
    calculation needs 4*N function evaluations. This function will work for
@@ -41603,7 +41603,7 @@ using namespace alglib;
 <font color=navy>// However, DENSE-AUL will work in any (including unconstrained) case.</font>
 <font color=navy>//</font>
 <font color=navy>// Default stopping criteria are used.</font>
-   minqpsetalgodenseaul(state, 1.0e-9, 1.0e+4, 5);
+   minqpsetalgodenseaul(state, 1.0E-9, 10000.0, 5);
    minqpoptimize(state);
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [2.5,2]</font>
@@ -41672,7 +41672,7 @@ using namespace alglib;
 <font color=navy>// However, DENSE-AUL will work in any (including unconstrained) case.</font>
 <font color=navy>//</font>
 <font color=navy>// Default stopping criteria are used.</font>
-   minqpsetalgodenseaul(state, 1.0e-9, 1.0e+4, 5);
+   minqpsetalgodenseaul(state, 1.0E-9, 10000.0, 5);
    minqpoptimize(state);
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(1).c_str()); <font color=navy>// EXPECTED: [1.500,0.500]</font>
@@ -41766,7 +41766,7 @@ using namespace alglib;
 <font color=navy>// solution they are locally convex).</font>
 <font color=navy>//</font>
 <font color=navy>// Default stopping criteria are used.</font>
-   minqpsetalgodenseaul(state, 1.0e-9, 1.0e+4, 5);
+   minqpsetalgodenseaul(state, 1.0E-9, 10000.0, 5);
    minqpoptimize(state);
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [2,2]</font>
@@ -41865,7 +41865,7 @@ using namespace alglib;
 <font color=navy>// However, DENSE-AUL will work in any (including unconstrained) case.</font>
 <font color=navy>//</font>
 <font color=navy>// Default stopping criteria are used.</font>
-   minqpsetalgodenseaul(state, 1.0e-9, 1.0e+4, 5);
+   minqpsetalgodenseaul(state, 1.0E-9, 10000.0, 5);
    minqpoptimize(state);
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [3,2]</font>

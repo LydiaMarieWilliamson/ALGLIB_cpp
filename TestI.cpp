@@ -1570,7 +1570,7 @@ int main() {
                epsx = +INFINITY;
             if (Test == 11)
                epsx = -INFINITY;
-            double diffstep = 1.0e-6;
+            double diffstep = 0.000001;
             if (Test == 12)
                diffstep = NAN;
             if (Test == 13)
@@ -1934,7 +1934,7 @@ int main() {
             if (Test == 19)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
-            double diffstep = 1.0e-6;
+            double diffstep = 0.000001;
             if (Test == 20)
                diffstep = NAN;
             if (Test == 21)
@@ -2102,7 +2102,7 @@ int main() {
          //
          // Default stopping criteria are used.
          //
-            minqpsetalgodenseaul(state, 1.0e-9, 1.0e+4, 5);
+            minqpsetalgodenseaul(state, 1.0E-9, 10000.0, 5);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[3,2]", 0.005);
@@ -2243,7 +2243,7 @@ int main() {
          //
          // Default stopping criteria are used.
          //
-            minqpsetalgodenseaul(state, 1.0e-9, 1.0e+4, 5);
+            minqpsetalgodenseaul(state, 1.0E-9, 10000.0, 5);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[2.5,2]", 0.005);
@@ -2353,7 +2353,7 @@ int main() {
          //
          // Default stopping criteria are used.
          //
-            minqpsetalgodenseaul(state, 1.0e-9, 1.0e+4, 5);
+            minqpsetalgodenseaul(state, 1.0E-9, 10000.0, 5);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[1.500,0.500]", 0.05);
@@ -2586,7 +2586,7 @@ int main() {
          //
          // Default stopping criteria are used.
          //
-            minqpsetalgodenseaul(state, 1.0e-9, 1.0e+4, 5);
+            minqpsetalgodenseaul(state, 1.0E-9, 10000.0, 5);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[2,2]", 0.005);
@@ -3334,7 +3334,7 @@ int main() {
                epsx = +INFINITY;
             if (Test == 14)
                epsx = -INFINITY;
-            double diffstep = 1.0e-6;
+            double diffstep = 0.000001;
             if (Test == 15)
                diffstep = NAN;
             if (Test == 16)
@@ -4752,7 +4752,7 @@ int main() {
             if (Test == 19)
                epsx = -INFINITY;
             ae_int_t maxits = 0;
-            double diffstep = 1.0e-6;
+            double diffstep = 0.000001;
             if (Test == 20)
                diffstep = NAN;
             if (Test == 21)
@@ -7623,7 +7623,7 @@ int main() {
                spoil_vector_by_posinf(c);
             if (Test == 12)
                spoil_vector_by_neginf(c);
-            double epsx = 1.0e-5;
+            double epsx = 0.00001;
             if (Test == 13)
                epsx = NAN;
             if (Test == 14)
@@ -7653,7 +7653,7 @@ int main() {
             ae_int_t info;
             lsfitstate state;
             lsfitreport rep;
-            double diffstep = 1.0e-5;
+            double diffstep = 0.00001;
             if (Test == 24)
                diffstep = NAN;
             if (Test == 25)

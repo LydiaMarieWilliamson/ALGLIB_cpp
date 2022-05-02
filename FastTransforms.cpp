@@ -110,7 +110,8 @@ void fftc1dinv(CVector *a, ae_int_t n) {
    }
    fftc1d(a, n);
    for (i = 0; i < n; i++) {
-      a->xC[i] = complex_from_d(a->xC[i].x / n, -a->xC[i].y / n);
+      a->xC[i].x /= n;
+      a->xC[i].y /= -n;
    }
 }
 
@@ -581,7 +582,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    // another algorithm selection
       algbest = 0;
       if (alg == -1) {
-         flopbest = (double)(2 * m * n);
+         flopbest = 2.0 * m * n;
       } else {
          flopbest = maxrealnumber;
       }
@@ -1187,7 +1188,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       if (alg == -1) {
          if (circular && ftbaseissmooth(m) && m % 2 == 0) {
          // special code for circular convolution of a sequence with a smooth length
-            flopcand = 3 * ftbasegetflopestimate(m / 2) + (double)(6 * m) / 2.0;
+            flopcand = 3 * ftbasegetflopestimate(m / 2) + (6 * m) / 2.0;
             if (flopcand < flopbest) {
                algbest = 1;
                flopbest = flopcand;
@@ -1195,7 +1196,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          } else {
          // general cyclic/non-cyclic convolution
             p = ftbasefindsmootheven(m + n - 1);
-            flopcand = 3 * ftbasegetflopestimate(p / 2) + (double)(6 * p) / 2.0;
+            flopcand = 3 * ftbasegetflopestimate(p / 2) + (6 * p) / 2.0;
             if (flopcand < flopbest) {
                algbest = 1;
                flopbest = flopcand;
@@ -1636,7 +1637,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
    }
 // Task is normalized
    ae_int_t Mq = m / 2, Mr = m % 2;
-   if (Mr == 0) {
+   if (!Mr) {
    // size is even, use fast even-size FFT
       ae_vector_set_length(&buf, m);
       ae_v_move(buf.xR, 1, a->xR, 1, m);

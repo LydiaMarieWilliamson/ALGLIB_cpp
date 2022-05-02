@@ -67,11 +67,11 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 += sqr(x->xR[i] - (*mean));
+         v1 += sqr(x->xR[i] - *mean);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 += x->xR[i] - (*mean);
+         v2 += x->xR[i] - *mean;
       }
       v2 = sqr(v2) / n;
       *variance = (v1 - v2) / (n - 1);
@@ -83,7 +83,7 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
 // Skewness and kurtosis
    if (stddev != 0.0) {
       for (i = 0; i < n; i++) {
-         v = (x->xR[i] - (*mean)) / stddev;
+         v = (x->xR[i] - *mean) / stddev;
          v2 = sqr(v);
          *skewness += v2 * v;
          *kurtosis += sqr(v2);
@@ -454,9 +454,9 @@ static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t
    RefObj(apbuffers, buf1);
    ae_assert(i1 >= i0, "RankDataRec: internal error");
 // Try to activate parallelism
-// Parallelism was tried if: i1 - i0 >= 4 && (double)(i1 - i0) * nfeatures * logbase2((double)nfeatures) >= smpactivationlevel()
+// Parallelism was tried if: i1 - i0 >= 4 && (i1 - i0) * nfeatures * logbase2(nfeatures) >= smpactivationlevel()
 // Recursively split problem, if it is too large
-   problemcost = (double)(i1 - i0) * nfeatures * logbase2((double)nfeatures);
+   problemcost = (i1 - i0) * nfeatures * logbase2(nfeatures);
    if (i1 - i0 >= 2 && problemcost > spawnlevel()) {
       im = (i1 + i0) / 2;
       basestat_rankdatarec(xy, i0, im, nfeatures, iscentered, pool, basecasecost);
@@ -512,7 +512,7 @@ void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
 //
 // Try to use serial code for basecase problems, no SMP functionality, no shared pools.
    basecasecost = 10000;
-   if (npoints * nfeatures * logbase2((double)nfeatures) < basecasecost) {
+   if (npoints * nfeatures * logbase2(nfeatures) < basecasecost) {
       basestat_rankdatabasecase(xy, 0, npoints, nfeatures, false, &buf0, &buf1);
       ae_frame_leave();
       return;
@@ -564,7 +564,7 @@ void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
 //
 // Try to use serial code, no SMP functionality, no shared pools.
    basecasecost = 10000;
-   if (npoints * nfeatures * logbase2((double)nfeatures) < basecasecost) {
+   if (npoints * nfeatures * logbase2(nfeatures) < basecasecost) {
       basestat_rankdatabasecase(xy, 0, npoints, nfeatures, true, &buf0, &buf1);
       ae_frame_leave();
       return;
@@ -908,7 +908,7 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
    covm(x, n, m, c);
    for (i = 0; i < m; i++) {
       if (c->xyR[i][i] > 0.0) {
-         t.xR[i] = 1 / sqrt(c->xyR[i][i]);
+         t.xR[i] = 1.0 / sqrt(c->xyR[i][i]);
       } else {
          t.xR[i] = 0.0;
       }
@@ -1011,7 +1011,7 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
 // Calculate Pearson coefficients (upper triangle)
    for (i = 0; i < m; i++) {
       if (c->xyR[i][i] > 0.0) {
-         t.xR[i] = 1 / sqrt(c->xyR[i][i]);
+         t.xR[i] = 1.0 / sqrt(c->xyR[i][i]);
       } else {
          t.xR[i] = 0.0;
       }
@@ -1274,14 +1274,14 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
 // Divide by standard deviations
    for (i = 0; i < m1; i++) {
       if (sx.xR[i] != 0.0) {
-         sx.xR[i] = 1 / sx.xR[i];
+         sx.xR[i] = 1.0 / sx.xR[i];
       } else {
          sx.xR[i] = 0.0;
       }
    }
    for (i = 0; i < m2; i++) {
       if (sy.xR[i] != 0.0) {
-         sy.xR[i] = 1 / sy.xR[i];
+         sy.xR[i] = 1.0 / sy.xR[i];
       } else {
          sy.xR[i] = 0.0;
       }
@@ -1432,14 +1432,14 @@ void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2
 // Divide by standard deviations
    for (i = 0; i < m1; i++) {
       if (sx.xR[i] != 0.0) {
-         sx.xR[i] = 1 / sx.xR[i];
+         sx.xR[i] = 1.0 / sx.xR[i];
       } else {
          sx.xR[i] = 0.0;
       }
    }
    for (i = 0; i < m2; i++) {
       if (sy.xR[i] != 0.0) {
-         sy.xR[i] = 1 / sy.xR[i];
+         sy.xR[i] = 1.0 / sy.xR[i];
       } else {
          sy.xR[i] = 0.0;
       }
@@ -2044,8 +2044,8 @@ void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, doubl
 // === JARQUEBERA Package ===
 namespace alglib_impl {
 static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r) {
-   *r += c * (*tj);
-   double t = 2.0 * x * (*tj1) - (*tj);
+   *r += c * *tj;
+   double t = 2.0 * x * *tj1 - *tj;
    *tj = *tj1, *tj1 = t;
 }
 
@@ -2970,7 +2970,7 @@ void jarqueberatest(RVector *x, ae_int_t n, double *p) {
       kurtosis = kurtosis / n - 3;
    }
 // Statistic.
-   *p = jarquebera_jarqueberaapprox(n, (double)n / 6.0 *(sqr(skewness) + sqr(kurtosis) / 4.0));
+   *p = jarquebera_jarqueberaapprox(n, n / 6.0 * (sqr(skewness) + sqr(kurtosis) / 4.0));
 }
 } // end of namespace alglib_impl
 
@@ -3069,9 +3069,9 @@ void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, do
    df1 = n - 1;
    df2 = m - 1;
    stat = rmin2(xvar / yvar, yvar / xvar);
-   *bothtails = 1 - (fdistribution(df1, df2, 1 / stat) - fdistribution(df1, df2, stat));
+   *bothtails = 1 - (fdistribution(df1, df2, 1.0 / stat) - fdistribution(df1, df2, stat));
    *lefttail = fdistribution(df1, df2, xvar / yvar);
-   *righttail = 1 - (*lefttail);
+   *righttail = 1 - *lefttail;
 }
 
 // One-sample chi-square test
@@ -3140,10 +3140,10 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
    }
 // Statistic
    stat = (n - 1) * xvar / variance;
-   s = chisquaredistribution((double)(n - 1), stat);
-   *bothtails = 2 * rmin2(s, 1 - s);
+   s = chisquaredistribution(n - 1.0, stat);
+   *bothtails = 2.0 * rmin2(s, 1.0 - s);
    *lefttail = s;
-   *righttail = 1 - (*lefttail);
+   *righttail = 1.0 - *lefttail;
 }
 } // end of namespace alglib_impl
 
@@ -3826,7 +3826,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
          j++;
       }
       for (k = i; k < j; k++) {
-         r.xR[k] = 1 + (double)(i + j - 1) / 2.0;
+         r.xR[k] = 1 + (i + j - 1) / 2.0;
       }
       i = j;
    }
@@ -3838,7 +3838,7 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
       }
    }
 // Result
-   mu = (double)ns * (ns + 1) / 4;
+   mu = ns * (ns + 1) / 4.0;
    sigma = sqrt(mu * (2 * ns + 1) / 6);
    s = (w - mu) / sigma;
    if (s <= 0.0) {
@@ -3848,8 +3848,8 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
       mp = exp(wsr_wsigma((w - mu) / sigma, ns));
       p = 1 - exp(wsr_wsigma((w + 1 - mu) / sigma, ns));
    }
-   *lefttail = rmax2(p, 1.0E-4);
-   *righttail = rmax2(mp, 1.0E-4);
+   *lefttail = rmax2(p, 0.0001);
+   *righttail = rmax2(mp, 0.0001);
    *bothtails = 2 * rmin2(*lefttail, *righttail);
    ae_frame_leave();
 }
@@ -3870,8 +3870,8 @@ namespace alglib_impl {
 // Sequential Chebyshev interpolation.
 static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, double *r) {
    double t;
-   *r += c * (*tj);
-   t = 2 * x * (*tj1) - (*tj);
+   *r += c * *tj;
+   t = 2 * x * *tj1 - *tj;
    *tj = *tj1;
    *tj1 = t;
 }
@@ -7430,7 +7430,7 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
          j++;
       }
       for (k = i; k < j; k++) {
-         r.xR[k] = 1 + (double)(i + j - 1) / 2.0;
+         r.xR[k] = 1 + (i + j - 1) / 2.0;
       }
       tiesize.xZ[tiecount] = j - i;
       tiecount++;
@@ -7443,12 +7443,12 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
          u += r.xR[i];
       }
    }
-   u = (double)n * m + 0.5 * n * (n + 1) - u;
+   u = n * m + 0.5 * n * (n + 1) - u;
 // Result
-   mu = (double)n * m / 2;
-   tmp = ns * (sqr((double)ns) - 1) / 12;
+   mu = n * m / 2.0;
+   tmp = ns * (sqr(ns) - 1) / 12;
    for (i = 0; i < tiecount; i++) {
-      tmp -= tiesize.xZ[i] * (sqr((double)tiesize.xZ[i]) - 1) / 12;
+      tmp -= tiesize.xZ[i] * (sqr(tiesize.xZ[i]) - 1.0) / 12;
    }
    sigma = sqrt((double)n * m / ns / (ns - 1) * tmp);
    s = (u - mu) / sigma;
@@ -7459,8 +7459,8 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
       mp = exp(mannwhitneyu_usigma((u - mu) / sigma, n, m));
       p = 1 - exp(mannwhitneyu_usigma((u + 1 - mu) / sigma, n, m));
    }
-   *lefttail = rboundval(rmax2(mp, 1.0E-4), 0.0001, 0.2500);
-   *righttail = rboundval(rmax2(p, 1.0E-4), 0.0001, 0.2500);
+   *lefttail = rboundval(rmax2(mp, 0.0001), 0.0001, 0.2500);
+   *righttail = rboundval(rmax2(p, 0.0001), 0.0001, 0.2500);
    *bothtails = 2 * rmin2(*lefttail, *righttail);
    ae_frame_leave();
 }
@@ -7678,7 +7678,7 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
       return;
    }
 // Statistic
-   stat = (xmean - mean) / (xstddev / sqrt((double)n));
+   stat = (xmean - mean) / (xstddev / sqrt(n));
    s = studenttdistribution(n - 1, stat);
    *bothtails = 2 * rmin2(s, 1 - s);
    *lefttail = s;

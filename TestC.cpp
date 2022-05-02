@@ -570,7 +570,7 @@ static ae_int_t testablasfunit_pseudorandominit1(RVector *x, ae_int_t iseed) {
    ae_int_t i;
    ae_int_t result;
    for (i = 0; i < x->cnt; i++) {
-      x->xR[i] = sin(iseed + sin((double)i));
+      x->xR[i] = sin(iseed + sin(i));
       iseed++;
    }
    result = iseed;
@@ -581,7 +581,7 @@ static ae_int_t testablasfunit_pseudorandominit1i(ZVector *x, ae_int_t iseed) {
    ae_int_t i;
    ae_int_t result;
    for (i = 0; i < x->cnt; i++) {
-      x->xZ[i] = iround(100 * sin(iseed + sin((double)i)));
+      x->xZ[i] = iround(100 * sin(iseed + sin(i)));
       iseed++;
    }
    result = iseed;
@@ -592,7 +592,7 @@ static ae_int_t testablasfunit_pseudorandominit1b(BVector *x, ae_int_t iseed) {
    ae_int_t i;
    ae_int_t result;
    for (i = 0; i < x->cnt; i++) {
-      x->xB[i] = sin(iseed + sin((double)i)) > 0.0;
+      x->xB[i] = sin(iseed + sin(i)) > 0.0;
       iseed++;
    }
    result = iseed;
@@ -609,12 +609,12 @@ static ae_int_t testablasfunit_pseudorandominit2(RMatrix *x, ae_int_t iseed) {
    NewVector(xc, 0, DT_REAL);
    ae_vector_set_length(&xr, x->rows);
    for (i = 0; i < x->rows; i++) {
-      xr.xR[i] = sin((double)(13 + 2 * i + iseed));
+      xr.xR[i] = sin(13.0 + 2.0 * i + iseed);
    }
    iseed++;
    ae_vector_set_length(&xc, x->cols);
    for (j = 0; j < x->cols; j++) {
-      xc.xR[j] = sin((double)(17 + 3 * j + iseed));
+      xc.xR[j] = sin(17.0 + 3.0 * j + iseed);
    }
    iseed++;
    for (i = 0; i < x->rows; i++) {
@@ -639,23 +639,23 @@ static void testablasfunit_initplayground(ae_int_t minlen, ae_int_t iseed, ablas
    SetObj(ablasfplayground, s);
    maxpad = 10;
    k = iseed + iseed * iseed * iseed;
-   ae_vector_set_length(&s->x0, minlen + iround(maxpad * sqr(sin((double)k))));
+   ae_vector_set_length(&s->x0, minlen + iround(maxpad * sqr(sin(k))));
    k++;
-   ae_vector_set_length(&s->x1, minlen + iround(maxpad * sqr(sin((double)k))));
+   ae_vector_set_length(&s->x1, minlen + iround(maxpad * sqr(sin(k))));
    k++;
-   ae_vector_set_length(&s->x2, minlen + iround(maxpad * sqr(sin((double)k))));
+   ae_vector_set_length(&s->x2, minlen + iround(maxpad * sqr(sin(k))));
    k++;
-   ae_vector_set_length(&s->ix0, minlen + iround(maxpad * sqr(sin((double)k))));
+   ae_vector_set_length(&s->ix0, minlen + iround(maxpad * sqr(sin(k))));
    k++;
-   ae_vector_set_length(&s->ix1, minlen + iround(maxpad * sqr(sin((double)k))));
+   ae_vector_set_length(&s->ix1, minlen + iround(maxpad * sqr(sin(k))));
    k++;
-   ae_vector_set_length(&s->bx0, minlen + iround(maxpad * sqr(sin((double)k))));
+   ae_vector_set_length(&s->bx0, minlen + iround(maxpad * sqr(sin(k))));
    k++;
-   ae_vector_set_length(&s->bx1, minlen + iround(maxpad * sqr(sin((double)k))));
+   ae_vector_set_length(&s->bx1, minlen + iround(maxpad * sqr(sin(k))));
    k++;
-   ae_matrix_set_length(&s->a0, minlen + iround(maxpad * sqr(sin((double)k))), minlen + iround(maxpad * sqr(sin((double)(k + 1)))));
+   ae_matrix_set_length(&s->a0, minlen + iround(maxpad * sqr(sin(k))), minlen + iround(maxpad * sqr(sin(k + 1.0))));
    k += 2;
-   ae_matrix_set_length(&s->a1, minlen + iround(maxpad * sqr(sin((double)k))), minlen + iround(maxpad * sqr(sin((double)(k + 1)))));
+   ae_matrix_set_length(&s->a1, minlen + iround(maxpad * sqr(sin(k))), minlen + iround(maxpad * sqr(sin(k + 1.0))));
    k += 2;
    s->v0 = 0.0;
    k = testablasfunit_pseudorandominit1(&s->x0, k);
@@ -703,7 +703,7 @@ static double testablasfunit_icmp1(ZVector *x, ZVector *y) {
    ae_assert(x->cnt == y->cnt, "rcmp1: sizes do not match");
    result = 0.0;
    for (i = 0; i < x->cnt; i++) {
-      result = rmax2(result, fabs((double)(x->xZ[i] - y->xZ[i])));
+      result = rmax2(result, fabs(x->xZ[i] - y->xZ[i]));
    }
    return result;
 }
@@ -1587,11 +1587,11 @@ static void testhqrndunit_calculatemv(RVector *x, ae_int_t n, double *mean, doub
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 += sqr(x->xR[i] - (*mean));
+         v1 += sqr(x->xR[i] - *mean);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 += x->xR[i] - (*mean);
+         v2 += x->xR[i] - *mean;
       }
       v2 = sqr(v2) / n;
       variance = (v1 - v2) / (n - 1);
@@ -1601,8 +1601,8 @@ static void testhqrndunit_calculatemv(RVector *x, ae_int_t n, double *mean, doub
       *stddev = sqrt(variance);
    }
 // Errors
-   *means = *stddev / sqrt((double)n);
-   *stddevs = *stddev * sqrt(2.0) / sqrt((double)(n - 1));
+   *means = *stddev / sqrt(n);
+   *stddevs = *stddev * sqrt(2.0) / sqrt(n - 1.0);
 }
 
 // Unsets HQRNDState structure
@@ -1713,7 +1713,7 @@ bool testhqrnd() {
    uisigmaerr = 0.0;
    for (n = 2; n <= 10; n++) {
       for (i = 0; i < samplesize; i++) {
-         x.xR[i] = (double)hqrnduniformi(&state, n);
+         x.xR[i] = hqrnduniformi(&state, n);
       }
       for (i = 0; i < samplesize; i++) {
          uierrors = uierrors || x.xR[i] < 0.0 || x.xR[i] >= n;
@@ -1725,7 +1725,7 @@ bool testhqrnd() {
          uierrors = true;
       }
       if (stddevs != 0.0) {
-         uisigmaerr = rmax2(uisigmaerr, fabs((stddev - sqrt((sqr((double)n) - 1) / 12)) / stddevs));
+         uisigmaerr = rmax2(uisigmaerr, fabs((stddev - sqrt((sqr(n) - 1) / 12)) / stddevs));
       } else {
          uierrors = true;
       }
@@ -1739,7 +1739,7 @@ bool testhqrnd() {
    uisigmaerr = 0.0;
    n = 1431655708;
    for (i = 0; i < samplesize; i++) {
-      x.xR[i] = (double)hqrnduniformi(&state, n);
+      x.xR[i] = hqrnduniformi(&state, n);
    }
    for (i = 0; i < samplesize; i++) {
       uierrors = uierrors || x.xR[i] < 0.0 || x.xR[i] >= n;
@@ -1751,7 +1751,7 @@ bool testhqrnd() {
       uierrors = true;
    }
    if (stddevs != 0.0) {
-      uisigmaerr = rmax2(uisigmaerr, fabs((stddev - sqrt((sqr((double)n) - 1) / 12)) / stddevs));
+      uisigmaerr = rmax2(uisigmaerr, fabs((stddev - sqrt((sqr(n) - 1) / 12)) / stddevs));
    } else {
       uierrors = true;
    }
@@ -1807,7 +1807,7 @@ bool testhqrnd() {
       normsigmaerr = rmax2(normsigmaerr, fabs((stddev - sqrt(2.0)) / coalesce(stddevs, 1.0)));
       normerrors = normerrors || normsigmaerr > sigmathreshold;
    }
-   am = 1 + randominteger(iround(sqrt((double)samplesize)));
+   am = 1 + randominteger(iround(sqrt(samplesize)));
    an = 1 + samplesize / am;
    hqrndnormalm(&state, am, an, &a);
    normerrors = normerrors || a.rows != am;
@@ -1847,7 +1847,7 @@ bool testhqrnd() {
       bins.xZ[k]++;
    }
    for (i = 0; i < bins.cnt; i++) {
-      unit2errors = unit2errors || (double)bins.xZ[i] < 0.9 * n / bins.cnt || (double)bins.xZ[i] > 1.1 * n / bins.cnt;
+      unit2errors = unit2errors || bins.xZ[i] < 0.9 * n / bins.cnt || bins.xZ[i] > 1.1 * n / bins.cnt;
    }
 // Test exponential
    testhqrndunit_unsetstate(&state);
@@ -1970,7 +1970,7 @@ static bool testablasunit_internalrmatrixtrinverse(RMatrix *a, ae_int_t n, bool 
                ae_frame_leave();
                return result;
             }
-            a->xyR[j][j] = 1 / a->xyR[j][j];
+            a->xyR[j][j] = 1.0 / a->xyR[j][j];
             ajj = -a->xyR[j][j];
          } else {
             ajj = -1.0;
@@ -2002,7 +2002,7 @@ static bool testablasunit_internalrmatrixtrinverse(RMatrix *a, ae_int_t n, bool 
                ae_frame_leave();
                return result;
             }
-            a->xyR[j][j] = 1 / a->xyR[j][j];
+            a->xyR[j][j] = 1.0 / a->xyR[j][j];
             ajj = -a->xyR[j][j];
          } else {
             ajj = -1.0;
@@ -2450,7 +2450,7 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
    NewMatrix(rxl2, 0, 0, DT_REAL);
    NewMatrix(cxr2, 0, 0, DT_COMPLEX);
    NewMatrix(cxl2, 0, 0, DT_COMPLEX);
-   threshold = sqr((double)maxn) * 100.0 * machineepsilon;
+   threshold = sqr(maxn) * 100.0 * machineepsilon;
    result = false;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N) == MX
@@ -3441,7 +3441,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
       cmatrixmv(m, n, &refca, aoffsi, aoffsj, opca, &cx, xoffs, &cy, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
          if (i < yoffs || i >= yoffs + m) {
-            result = result || ae_c_neq_d(cy.xC[i], (double)i);
+            result = result || ae_c_neq_d(cy.xC[i], i);
          } else {
             cv1 = cy.xC[i];
             cv2 = complex_from_d(0.0);
@@ -3458,7 +3458,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
          }
       }
       for (i = 0; i < 2 * maxn; i++) {
-         ry.xR[i] = (double)i;
+         ry.xR[i] = i;
       }
       rmatrixmv(m, n, &refra, aoffsi, aoffsj, opra, &rx, xoffs, &ry, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
@@ -3478,7 +3478,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
       }
    // Test modern RMatrixGEMV()
       for (i = 0; i < 2 * maxn; i++) {
-         ry.xR[i] = (double)i;
+         ry.xR[i] = i;
       }
       rmatrixgemv(m, n, ralpha, &refra, aoffsi, aoffsj, opra, &rx, xoffs, rbeta, &ry, yoffs);
       for (i = 0; i < 2 * maxn; i++) {
@@ -3630,8 +3630,8 @@ static void testablasunit_testsymv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       rbeta = (randomreal() - 0.5) * randominteger(2);
    // Test RMatrixSYMV()
       for (i = 0; i < 2 * maxn; i++) {
-         ry.xR[i] = (double)i;
-         rz.xR[i] = (double)i;
+         ry.xR[i] = i;
+         rz.xR[i] = i;
       }
       rmatrixsymv(n, ralpha, &refra, aoffsi, aoffsj, isuppera, &rx, xoffs, rbeta, &ry, yoffs);
       testablasunit_refrmatrixsymv(n, ralpha, &refra, aoffsi, aoffsj, isuppera, &rx, xoffs, rbeta, &rz, yoffs);
@@ -3673,7 +3673,7 @@ static void testablasunit_testtrsv(ae_int_t minn, ae_int_t maxn, bool *errorflag
    NewVector(ry, 0, DT_REAL);
    for (n = minn; n <= maxn; n++) {
    // Decreased threshold because of ill-conditioning of randomly generated matrices
-      threshold = 1.0E-6 * (1 + n);
+      threshold = 0.000001 * (1 + n);
    // Initialize A by random matrix with size (MaxN+MaxN)*(MaxN+MaxN)
    // Initialize X by sparse random vector with size (MaxN+MaxN) (sparsity is important to test some branches of algorithm)
    // Fill Y by control values
@@ -3830,7 +3830,7 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
          for (j = 0; j < 2 * maxn; j++) {
             ra.xyR[i][j] = randommid();
             ca.xyC[i][j] = complex_from_d(randommid(), randommid());
-            rb.xyR[i][j] = (double)(1 + 2 * i + 3 * j);
+            rb.xyR[i][j] = 1.0 + 2.0 * i + 3.0 * j;
             cb.xyC[i][j] = complex_from_i(1 + 2 * i + 3 * j);
          }
       }
@@ -3847,7 +3847,7 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
             if (i < boffsi || i >= boffsi + m || j < boffsj || j >= boffsj + n) {
-               result = result || ae_c_neq_d(cb.xyC[i][j], (double)(1 + 2 * i + 3 * j));
+               result = result || ae_c_neq_d(cb.xyC[i][j], 1.0 + 2.0 * i + 3.0 * j);
             } else {
                result = result || !NearAtC(ca.xyC[aoffsi + i - boffsi][aoffsj + j - boffsj], cb.xyC[i][j], threshold);
             }
@@ -3890,7 +3890,7 @@ static void testablasunit_testcopy1(ae_int_t minn, ae_int_t maxn, bool *err) {
       ae_vector_set_length(&rb, 2 * maxn);
       for (i = 0; i < 2 * maxn; i++) {
          ra.xR[i] = randommid();
-         rb.xR[i] = (double)(1 + 2 * i);
+         rb.xR[i] = 1.0 + 2.0 * i;
       }
    // test different offsets (zero or one)
    //
@@ -4096,8 +4096,8 @@ static void testablasunit_testreflections(bool *errorflag) {
       }
    }
 // Overflow crash test
-   ae_vector_set_length(&x, 10 + 1);
-   ae_vector_set_length(&v, 10 + 1);
+   ae_vector_set_length(&x, 11);
+   ae_vector_set_length(&v, 11);
    for (i = 1; i <= 10; i++) {
       v.xR[i] = maxrealnumber * 0.01 * randommid();
    }
@@ -4505,8 +4505,8 @@ bool testcreflections() {
       mer = rmax2(mer, err);
    }
 // Overflow crash test
-   ae_vector_set_length(&x, 10 + 1);
-   ae_vector_set_length(&v, 10 + 1);
+   ae_vector_set_length(&x, 11);
+   ae_vector_set_length(&v, 11);
    for (i = 1; i <= 10; i++) {
       v.xC[i] = complex_from_d(maxrealnumber * 0.01 * randommid());
    }
@@ -5751,13 +5751,13 @@ bool testortfac() {
 // === matgen testing unit ===
 // Unsets 2D array.
 static void testmatgenunit_unset2d(RMatrix *a) {
-   ae_matrix_set_length(a, 0 + 1, 0 + 1);
+   ae_matrix_set_length(a, 1, 1);
    a->xyR[0][0] = randommid();
 }
 
 // Unsets 2D array.
 static void testmatgenunit_unset2dc(CMatrix *a) {
-   ae_matrix_set_length(a, 0 + 1, 0 + 1);
+   ae_matrix_set_length(a, 1, 1);
    a->xyC[0][0] = complex_from_d(randommid());
 }
 
@@ -5798,7 +5798,7 @@ static bool testmatgenunit_isspd(RMatrix *a, ae_int_t n, bool isupper) {
                v = ae_v_dotproduct(&a->xyR[0][i], a->stride, &a->xyR[0][j], a->stride, j);
                a->xyR[j][i] -= v;
             }
-            v = 1 / ajj;
+            v = 1.0 / ajj;
             ae_v_muld(&a->xyR[j][j + 1], 1, n - j - 1, v);
          }
       }
@@ -5821,7 +5821,7 @@ static bool testmatgenunit_isspd(RMatrix *a, ae_int_t n, bool isupper) {
                v = ae_v_dotproduct(a->xyR[i], 1, a->xyR[j], 1, j);
                a->xyR[i][j] -= v;
             }
-            v = 1 / ajj;
+            v = 1.0 / ajj;
             ae_v_muld(&a->xyR[j + 1][j], a->stride, n - j - 1, v);
          }
       }
@@ -5871,7 +5871,7 @@ static bool testmatgenunit_ishpd(CMatrix *a, ae_int_t n) {
             t3.xC[i] = ae_c_sub(t3.xC[i], v);
          }
          ae_v_cmove(&a->xyC[j][j + 1], 1, &t3.xC[j + 1], 1, "N", n - j - 1);
-         r = 1 / ajj;
+         r = 1.0 / ajj;
          ae_v_cmuld(&a->xyC[j][j + 1], 1, n - j - 1, r);
       }
    }
@@ -6831,7 +6831,7 @@ bool testmatgen() {
 // === tsort testing unit ===
 // Unsets 1D array.
 static void testtsortunit_unset1di(ZVector *a) {
-   ae_vector_set_length(a, 0 + 1);
+   ae_vector_set_length(a, 1);
    a->xZ[0] = randominteger(3) - 1;
 }
 
@@ -6934,15 +6934,15 @@ bool testtsort() {
          ae_vector_set_length(&ar2, n);
          ae_vector_set_length(&ai, n);
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)randominteger(100000000);
+            a.xR[i] = randominteger(100000000);
             a0.xR[i] = a.xR[i];
             a1.xR[i] = a.xR[i];
             a2.xR[i] = a.xR[i];
             a3.xR[i] = a.xR[i];
             a4.xZ[i] = iround(a.xR[i]);
             a5.xZ[i] = iround(a.xR[i]);
-            ar.xR[i] = (double)i;
-            ar2.xR[i] = (double)i;
+            ar.xR[i] = i;
+            ar2.xR[i] = i;
             ai.xZ[i] = i;
          }
          tagsort(&a0, n, &p1, &p2);
@@ -6988,15 +6988,15 @@ bool testtsort() {
          ae_vector_set_length(&ar2, n);
          ae_vector_set_length(&ai, n);
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)((n - i) / 2);
+            a.xR[i] = (n - i) / 2;
             a0.xR[i] = a.xR[i];
             a1.xR[i] = a.xR[i];
             a2.xR[i] = a.xR[i];
             a3.xR[i] = a.xR[i];
             a4.xZ[i] = iround(a.xR[i]);
             a5.xZ[i] = iround(a.xR[i]);
-            ar.xR[i] = (double)i;
-            ar2.xR[i] = (double)i;
+            ar.xR[i] = i;
+            ar2.xR[i] = i;
             ai.xZ[i] = i;
          }
          tagsort(&a0, n, &p1, &p2);
@@ -7041,8 +7041,8 @@ bool testtsort() {
             a2.xR[i] = a.xR[i];
             a3.xR[i] = a.xR[i];
             a4.xZ[i] = iround(a.xR[i]);
-            ar.xR[i] = (double)i;
-            ar2.xR[i] = (double)i;
+            ar.xR[i] = i;
+            ar2.xR[i] = i;
             ai.xZ[i] = i;
          }
          tagsort(&a0, n, &p1, &p2);
@@ -7077,14 +7077,14 @@ bool testtsort() {
          ae_vector_set_length(&ar2, n);
          ae_vector_set_length(&ai, n);
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)randominteger(2);
+            a.xR[i] = randominteger(2);
             a0.xR[i] = a.xR[i];
             a1.xR[i] = a.xR[i];
             a2.xR[i] = a.xR[i];
             a3.xR[i] = a.xR[i];
             a4.xZ[i] = iround(a.xR[i]);
-            ar.xR[i] = (double)i;
-            ar2.xR[i] = (double)i;
+            ar.xR[i] = i;
+            ar2.xR[i] = i;
             ai.xZ[i] = i;
          }
          tagsort(&a0, n, &p1, &p2);
@@ -7118,8 +7118,8 @@ bool testtsort() {
             i1.xZ[i] = randominteger(100000000);
             i2.xZ[i] = i1.xZ[i];
             i3.xZ[i] = i1.xZ[i];
-            ar.xR[i] = (double)i;
-            ar2.xR[i] = (double)i;
+            ar.xR[i] = i;
+            ar2.xR[i] = i;
          }
          for (i = 0; i < n; i++) {
             i1.xZ[i] = i1.xZ[offs + i];
@@ -7703,9 +7703,9 @@ static bool basicfunctest() {
                if (j1 < i1) {
                   lowercnt++;
                }
-               a.xyR[i1][j1] = i1 + j1 + (double)((i + j) * (m + n)) / 2.0;
+               a.xyR[i1][j1] = i1 + j1 + ((i + j) * (m + n)) / 2.0;
                a.xyR[i1][j1]++;
-               sparseset(&s, i1, j1, i1 + j1 + (double)((i + j) * (m + n)) / 2.0);
+               sparseset(&s, i1, j1, i1 + j1 + ((i + j) * (m + n)) / 2.0);
                sparseadd(&s, i1, j1, 1.0);
                if (a.xyR[i1][j1] != sparseget(&s, i1, j1)) {
                   result = true;
@@ -8776,12 +8776,12 @@ static bool basicfuncrandomtest() {
          for (i1 = 0; i1 < i; i1++) {
             for (j1 = 0; j1 < j; j1++) {
                temp = 2 * randominteger(mfigure) - mfigure;
-               a.xyR[i1][j1] = (double)temp;
+               a.xyR[i1][j1] = temp;
                if (randominteger(2) == 0) {
-                  sparseset(&s, i1, j1, (double)temp);
-                  sparseset(&s, i1, j1, (double)temp);
+                  sparseset(&s, i1, j1, temp);
+                  sparseset(&s, i1, j1, temp);
                } else {
-                  sparseadd(&s, i1, j1, (double)temp);
+                  sparseadd(&s, i1, j1, temp);
                   sparseadd(&s, i1, j1, 0.0);
                }
                if (a.xyR[i1][j1] != sparseget(&s, i1, j1)) {
@@ -8805,11 +8805,11 @@ static bool basicfuncrandomtest() {
          for (i1 = 0; i1 < i; i1++) {
             for (j1 = 0; j1 < j; j1++) {
                temp = 2 * randominteger(mfigure) - mfigure;
-               a.xyR[i1][j1] = (double)temp;
+               a.xyR[i1][j1] = temp;
                if (randominteger(2) == 0) {
-                  sparseset(&s, i1, j1, (double)temp);
+                  sparseset(&s, i1, j1, temp);
                } else {
-                  sparseadd(&s, i1, j1, (double)temp);
+                  sparseadd(&s, i1, j1, temp);
                }
                if (a.xyR[i1][j1] != sparseget(&s, i1, j1)) {
                   result = true;
@@ -8913,7 +8913,7 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
          for (k = 0; k < p0; k++) {
             i = randominteger(m);
             j = randominteger(n);
-            v = (double)(randominteger(17) - 8) / 8.0;
+            v = (randominteger(17) - 8) / 8.0;
             if (randombool()) {
                da->xyR[i][j] = v;
                sparseset(sa, i, j, v);
@@ -8935,7 +8935,7 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
          for (k = 0; k < p0; k++) {
             i = randominteger(m);
             j = randominteger(n);
-            v = (double)(randominteger(17) - 8) / 8.0;
+            v = (randominteger(17) - 8) / 8.0;
             da->xyR[i][j] = v;
          }
          ae_vector_set_length(&rowsizes, m);
@@ -8972,7 +8972,7 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
       for (i = 0; i < m; i++) {
          for (j = imax2(i - p0, 0); j <= i + p1 && j < n; j++) {
             do {
-               da->xyR[i][j] = (double)(randominteger(17) - 8) / 8.0;
+               da->xyR[i][j] = (randominteger(17) - 8) / 8.0;
             } while (da->xyR[i][j] == 0.0);
          }
          rowsizes.xZ[i] = imax2(imin2(i + p1, n - 1) - imax2(i - p0, 0) + 1, 0);
@@ -9020,7 +9020,7 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
       for (i = 0; i < m; i++) {
          for (j = c0.xZ[i]; j < c1.xZ[i]; j++) {
             do {
-               da->xyR[i][j] = (double)(randominteger(17) - 8) / 8.0;
+               da->xyR[i][j] = (randominteger(17) - 8) / 8.0;
             } while (da->xyR[i][j] == 0.0);
          }
       }
@@ -9539,7 +9539,7 @@ static bool basiccopyfunctest() {
          for (i1 = 0; i1 < i; i1++) {
             for (j1 = 0; j1 < j; j1++) {
                if (j1 > i1 && j1 <= i1 + 2) {
-                  a.xyR[i1][j1] = (double)(i1 + j1 + 1);
+                  a.xyR[i1][j1] = i1 + j1 + 1.0;
                   sparseset(&s, i1, j1, a.xyR[i1][j1]);
                   sparseadd(&s, i1, j1, 0.0);
                   sparseset(&sss, i1, j1, a.xyR[i1][j1]);
@@ -10642,7 +10642,7 @@ bool testblas() {
    e3 /= scl3;
    n2errors = e1 >= threshold || e2 >= threshold || e3 >= threshold;
 // Testing VectorAbsMax, Column/Row AbsMax
-   ae_vector_set_length(&x1, 5 + 1);
+   ae_vector_set_length(&x1, 6);
    x1.xR[1] = 2.0;
    x1.xR[2] = 0.2;
    x1.xR[3] = -1.3;
@@ -10677,8 +10677,8 @@ bool testblas() {
    }
    amaxerrors = amaxerrors || was1 || was2;
 // Testing upper Hessenberg 1-norm
-   ae_matrix_set_length(&a, 3 + 1, 3 + 1);
-   ae_vector_set_length(&x1, 3 + 1);
+   ae_matrix_set_length(&a, 4, 4);
+   ae_vector_set_length(&x1, 4);
    a.xyR[1][1] = 2.0;
    a.xyR[1][2] = 3.0;
    a.xyR[1][3] = 1.0;
@@ -10690,9 +10690,9 @@ bool testblas() {
    a.xyR[3][3] = 1.0;
    hsnerrors = !NearAtR(upperhessenberg1norm(&a, 1, 3, 1, 3, &x1), 11.0, threshold);
 // Testing MatrixVectorMultiply
-   ae_matrix_set_length(&a, 3 + 1, 5 + 1);
-   ae_vector_set_length(&x1, 3 + 1);
-   ae_vector_set_length(&x2, 2 + 1);
+   ae_matrix_set_length(&a, 4, 6);
+   ae_vector_set_length(&x1, 4);
+   ae_vector_set_length(&x2, 3);
    a.xyR[2][3] = 2.0;
    a.xyR[2][4] = -1.0;
    a.xyR[2][5] = -1.0;
@@ -10985,7 +10985,7 @@ static void testevdunit_unset2d(RMatrix *a) {
 
 // Unsets 2D array.
 static void testevdunit_cunset2d(CMatrix *a) {
-   ae_matrix_set_length(a, 0 + 1, 0 + 1);
+   ae_matrix_set_length(a, 1, 1);
    a->xyC[0][0] = complex_from_d(randommid());
 }
 
@@ -11891,8 +11891,8 @@ static void testevdunit_testtdevdproblem(RVector *d, RVector *e, ae_int_t n, dou
 //
 //       That's why this test is performed only for well-separated matrices,
 //       and with custom threshold.
-   requiredseparation = 1.0E-6;
-   specialthreshold = 1.0E-6;
+   requiredseparation = 0.000001;
+   specialthreshold = 0.000001;
    worstseparation = maxrealnumber;
    for (i = 0; i < n - 1; i++) {
       worstseparation = rmin2(worstseparation, fabs(lambdav.xR[i + 1] - lambdav.xR[i]));
@@ -12120,7 +12120,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
    for (i = 0; i < n; i++) {
       lambdav.xR[i] = d->xR[i];
    }
-   ae_matrix_set_length(&z, 0 + 1, 0 + 1);
+   ae_matrix_set_length(&z, 1, 1);
    ++*runs;
    if (!smatrixtdevdr(&lambdav, e, n, 2, a, b, &m, &z)) {
       ++*failc;
@@ -12153,7 +12153,7 @@ static void testevdunit_testtdevdbiproblem(RVector *d, RVector *e, ae_int_t n, b
    for (i = 0; i < n; i++) {
       lambdav.xR[i] = d->xR[i];
    }
-   ae_matrix_set_length(&z, 0 + 1, 0 + 1);
+   ae_matrix_set_length(&z, 1, 1);
    ++*runs;
    if (!smatrixtdevdi(&lambdav, e, n, 2, i1, i2, &z)) {
       ++*failc;
@@ -12314,7 +12314,7 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
             ae_v_subd(vec3r.xR, 1, vec1i.xR, 1, n, curwi);
             ae_v_moved(vec3i.xR, 1, vec1r.xR, 1, n, curwi);
             ae_v_addd(vec3i.xR, 1, vec1i.xR, 1, n, curwr);
-            *nserrors = *nserrors || vnorm < 1.0E-3 || !isfinite(vnorm);
+            *nserrors = *nserrors || vnorm < 0.001 || !isfinite(vnorm);
             for (i = 0; i < n; i++) {
                *nserrors = *nserrors || !NearAtR(vec2r.xR[i], vec3r.xR[i], threshold);
                *nserrors = *nserrors || !NearAtR(vec2i.xR[i], vec3i.xR[i], threshold);
@@ -12361,7 +12361,7 @@ static void testevdunit_testnsevdproblem(RMatrix *a, ae_int_t n, double threshol
             ae_v_addd(vec3r.xR, 1, vec1i.xR, 1, n, curwi);
             ae_v_moved(vec3i.xR, 1, vec1r.xR, 1, n, curwi);
             ae_v_addd(vec3i.xR, 1, vec1i.xR, 1, n, -curwr);
-            *nserrors = *nserrors || vnorm < 1.0E-3 || !isfinite(vnorm);
+            *nserrors = *nserrors || vnorm < 0.001 || !isfinite(vnorm);
             for (i = 0; i < n; i++) {
                *nserrors = *nserrors || !NearAtR(vec2r.xR[i], vec3r.xR[i], threshold);
                *nserrors = *nserrors || !NearAtR(vec2i.xR[i], vec3i.xR[i], threshold);
@@ -12620,12 +12620,12 @@ static void testevdunit_testsisymm(bool *errorflag) {
 // stopping condition is used because we can not tell how many
 // iterations is required to solve it.
    tollambda = 1.0E-9;
-   tolvector = 1.0E-4;
+   tolvector = 0.0001;
    for (n = 1; n <= 25; n++) {
       for (m = 1; m <= n; m++) {
          for (smode = 0; smode <= 2; smode++) {
          // Generate eigenproblem
-            sgn = (double)(2 * hqrnduniformi(&rs, 2) - 1);
+            sgn = 2 * hqrnduniformi(&rs, 2) - 1;
             decaya = 1.05;
             ae_vector_set_length(&diaga, n);
             diaga.xR[0] = pow(10.0, hqrndmiduniformr(&rs));
@@ -12711,13 +12711,13 @@ static void testevdunit_testsisymm(bool *errorflag) {
 // sign - or all positive). Only a few iterations is performed, we
 // want to check convergence properties on such problems.
    tollambda = 1.0E-9;
-   tolvector = 1.0E-4;
+   tolvector = 0.0001;
    itscount = 5;
    for (n = 1; n <= 25; n++) {
       for (m = 1; m <= n; m++) {
          for (smode = 0; smode <= 2; smode++) {
          // Generate eigenproblem
-            sgn = (double)(2 * hqrnduniformi(&rs, 2) - 1);
+            sgn = 2 * hqrnduniformi(&rs, 2) - 1;
             decaya = 1.05;
             ae_vector_set_length(&diaga, n);
             diaga.xR[0] = pow(10.0, hqrndmiduniformr(&rs));
@@ -12833,7 +12833,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
                if (j == i) {
                   v--;
                }
-               *errorflag = *errorflag || !SmallAtR(v, 1.0E3 * machineepsilon);
+               *errorflag = *errorflag || !SmallAtR(v, 1000.0 * machineepsilon);
             }
             *errorflag = *errorflag || sw.xR[i] != 0.0;
          }
@@ -12848,7 +12848,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
                if (j == i) {
                   v--;
                }
-               *errorflag = *errorflag || !SmallAtR(v, 1.0E3 * machineepsilon);
+               *errorflag = *errorflag || !SmallAtR(v, 1000.0 * machineepsilon);
             }
             *errorflag = *errorflag || sw.xR[i] != 0.0;
          }
@@ -12867,7 +12867,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
    cnta = 0;
    cntb = 0;
    cntc = 0;
-   eps = 1.0E-3;
+   eps = 0.001;
    nu = 0.001;
    for (pass = 1; pass <= 50; pass++) {
    // Generate eigenproblem and rank-1 update
@@ -12907,8 +12907,8 @@ static void testevdunit_testsisymm(bool *errorflag) {
       eigsubspacesolvedenses(&s, &ra, true, &sw, &sz, &rep);
       cntc += rep.iterationscount;
    }
-   *errorflag = *errorflag || (double)cntb > 0.66 * cnta;
-   *errorflag = *errorflag || (double)cntc < 0.66 * cnta;
+   *errorflag = *errorflag || cntb > 0.66 * cnta;
+   *errorflag = *errorflag || cntc < 0.66 * cnta;
    ae_frame_leave();
 }
 
@@ -12936,8 +12936,8 @@ bool testevd() {
    ae_frame_make(&_frame_block);
    NewMatrix(ra, 0, 0, DT_REAL);
    failthreshold = 0.005;
-   threshold = 1.0E-8;
-   bithreshold = 1.0E-6;
+   threshold = 0.00000001;
+   bithreshold = 0.000001;
    nserrors = false;
    serrors = false;
    herrors = false;
@@ -13086,8 +13086,8 @@ static bool sparserealcholeskytest() {
    maxfmt = 2;
    minperm = -3;
    maxperm = 3;
-   offscale = 1.0E-3;
-   tol = 1.0E-8;
+   offscale = 0.001;
+   tol = 0.00000001;
 // Modern Cholesky (SparseCholesky, SparseCholeskyP, Analyze/Factorize) tests:
 // performed for positive definite matrices of all sizes in 1..20 and all sparsity percentages.
    for (n = 1; n <= 30; n++) {
@@ -13109,7 +13109,7 @@ static bool sparserealcholeskytest() {
                   continue;
                }
                if (hqrnduniformr(&rs) <= pnz) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                   a.xyR[j][i] = a.xyR[i][j];
                } else {
                   a.xyR[i][j] = 0.0;
@@ -13339,7 +13339,7 @@ static bool sparserealcholeskytest() {
                   continue;
                }
                if (hqrnduniformr(&rs) <= pnz) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                   a.xyR[j][i] = a.xyR[i][j];
                } else {
                   a.xyR[i][j] = 0.0;
@@ -13501,7 +13501,7 @@ static bool sparserealcholeskytest() {
                   continue;
                }
                if (hqrnduniformr(&rs) <= pnz) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                   a.xyR[j][i] = a.xyR[i][j];
                } else {
                   a.xyR[i][j] = 0.0;
@@ -13597,23 +13597,23 @@ static bool sparserealcholeskytest() {
             }
             for (j = 0; j < updaterank; j++) {
                for (i = j + 1; i < updaterank + updatewidth; i++) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                }
                for (i = n - bottomsize; i < n; i++) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                }
             }
             for (j = updaterank; j < updaterank + targetwidth; j++) {
                for (i = j + 1; i < updaterank + targetwidth + bigsize; i++) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                }
                for (i = n - bottomsize; i < n; i++) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                }
             }
             for (j = updaterank + targetwidth; j < n; j++) {
                for (i = j + 1; i < n; i++) {
-                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.25 / n * hqrndmiduniformr(&rs);
                }
             }
             for (i = 0; i < n; i++) {
@@ -13949,7 +13949,7 @@ static void sparsereallutest(bool *err) {
    NewObj(sparsematrix, crsa);
    NewObj(hqrndstate, rs);
    hqrndrandomize(&rs);
-   tol = 1.0E4 * machineepsilon;
+   tol = 10000.0 * machineepsilon;
 // Test matrix sizes in 1...20 and with all sparsity percentages
    for (n = 1; n <= 20; n++) {
       nz = n * n;
@@ -14308,7 +14308,7 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
    NewObj(hqrndstate, rs);
    hqrndrandomize(&rs);
 // Settings
-   tol = 1.0E-8;
+   tol = 0.00000001;
 // Test rank-1 updates
 //
 // For each matrix size in 1..30 select sparse update vector with probability of element
@@ -14317,7 +14317,7 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
    // Generate two matrices A0 == A1, fill one triangle with SPD matrix,
    // another one with trash. Prepare vector U.
       isupper = hqrnduniformr(&rs) < 0.5;
-      spdmatrixrndcond(n, 1.0E4, &a0);
+      spdmatrixrndcond(n, 10000.0, &a0);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             if (isupper ? j < i : j > i) {
@@ -14383,7 +14383,7 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
    // another one with trash. Prepare vector Fix.
       pfix = (double)hqrnduniformi(&rs, n + 1) / n;
       isupper = hqrnduniformr(&rs) < 0.5;
-      spdmatrixrndcond(n, 1.0E4, &a0);
+      spdmatrixrndcond(n, 10000.0, &a0);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             if (isupper ? j < i : j > i) {
@@ -14623,8 +14623,8 @@ bool testtrfac() {
       ae_matrix_set_length(&rau, n, n);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            ral.xyR[i][j] = (double)i;
-            rau.xyR[i][j] = (double)j;
+            ral.xyR[i][j] = i;
+            rau.xyR[i][j] = j;
          }
       }
       for (i = 0; i < n; i++) {
@@ -14755,7 +14755,7 @@ bool testpolynomialsolver() {
    NewObj(polynomialsolverreport, rep);
    wereerrors = false;
 // Basic tests
-   eps = 1.0E-6;
+   eps = 0.000001;
    n = 1;
    ae_vector_set_length(&a, n + 1);
    a.xR[0] = 2.0;
@@ -15850,7 +15850,7 @@ bool testsafesolve() {
    ca.xyC[0][0] = complex_from_i(1);
    ca.xyC[0][1] = complex_from_i(0);
    ca.xyC[1][0] = complex_from_i(0);
-   ca.xyC[1][1] = complex_from_d(1 / growth);
+   ca.xyC[1][1] = complex_from_d(1.0 / growth);
    ae_vector_set_length(&cxs, n);
    cxs.xC[0] = complex_from_d(1.0);
    cxs.xC[1] = complex_from_d(0.5);
@@ -15860,7 +15860,7 @@ bool testsafesolve() {
    ra.xyR[0][0] = 1.0;
    ra.xyR[0][1] = 0.0;
    ra.xyR[1][0] = 0.0;
-   ra.xyR[1][1] = 1 / growth;
+   ra.xyR[1][1] = 1.0 / growth;
    ae_vector_set_length(&rxs, n);
    rxs.xR[0] = 1.0;
    rxs.xR[1] = 0.5;
@@ -15957,7 +15957,7 @@ static void testrcondunit_rmatrixdrophalf(RMatrix *a, ae_int_t n, bool droplower
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          if (droplower ? i > j : i < j) {
-            a->xyR[i][j] = (double)(1 + 2 * i + 3 * j);
+            a->xyR[i][j] = 1.0 + 2.0 * i + 3.0 * j;
          }
       }
    }
@@ -16025,7 +16025,7 @@ static bool testrcondunit_rmatrixinvmattr(RMatrix *a, ae_int_t n, bool isupper, 
                ae_frame_leave();
                return result;
             }
-            a->xyR[j][j] = 1 / a->xyR[j][j];
+            a->xyR[j][j] = 1.0 / a->xyR[j][j];
             ajj = -a->xyR[j][j];
          } else {
             ajj = -1.0;
@@ -16057,7 +16057,7 @@ static bool testrcondunit_rmatrixinvmattr(RMatrix *a, ae_int_t n, bool isupper, 
                ae_frame_leave();
                return result;
             }
-            a->xyR[j][j] = 1 / a->xyR[j][j];
+            a->xyR[j][j] = 1.0 / a->xyR[j][j];
             ajj = -a->xyR[j][j];
          } else {
             ajj = -1.0;
@@ -16482,7 +16482,7 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
          }
          testrcondunit_rmatrixrefrcond(&ea, n, &erc1, &ercinf);
       // 1-norm
-         v = 1 / rmatrixtrrcond1(&a, n, isupper, isunit);
+         v = 1.0 / rmatrixtrrcond1(&a, n, isupper, isunit);
          if (v >= testrcondunit_threshold50 * erc1) {
             q50.xR[0] += 1.0 / passcount;
          }
@@ -16491,7 +16491,7 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
          }
          errless = errless || v > erc1 * 1.001;
       // Inf-norm
-         v = 1 / rmatrixtrrcondinf(&a, n, isupper, isunit);
+         v = 1.0 / rmatrixtrrcondinf(&a, n, isupper, isunit);
          if (v >= testrcondunit_threshold50 * ercinf) {
             q50.xR[1] += 1.0 / passcount;
          }
@@ -16611,7 +16611,7 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
          }
          testrcondunit_cmatrixrefrcond(&ea, n, &erc1, &ercinf);
       // 1-norm
-         v = 1 / cmatrixtrrcond1(&a, n, isupper, isunit);
+         v = 1.0 / cmatrixtrrcond1(&a, n, isupper, isunit);
          if (v >= testrcondunit_threshold50 * erc1) {
             q50.xR[0] += 1.0 / passcount;
          }
@@ -16620,7 +16620,7 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
          }
          errless = errless || v > erc1 * 1.001;
       // Inf-norm
-         v = 1 / cmatrixtrrcondinf(&a, n, isupper, isunit);
+         v = 1.0 / cmatrixtrrcondinf(&a, n, isupper, isunit);
          if (v >= testrcondunit_threshold50 * ercinf) {
             q50.xR[1] += 1.0 / passcount;
          }
@@ -16694,8 +16694,8 @@ static bool testrcondunit_testrmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
    err90 = false;
    errless = false;
    errspec = false;
-   ae_vector_set_length(&q50, 3 + 1);
-   ae_vector_set_length(&q90, 3 + 1);
+   ae_vector_set_length(&q50, 4);
+   ae_vector_set_length(&q90, 4);
    for (n = 1; n <= maxn; n++) {
    // special test for zero matrix
       testrcondunit_rmatrixgenzero(&a, n);
@@ -16717,7 +16717,7 @@ static bool testrcondunit_testrmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
          rmatrixlu(&lua, n, n, &p);
          testrcondunit_rmatrixrefrcond(&a, n, &erc1, &ercinf);
       // 1-norm, normal
-         v = 1 / rmatrixrcond1(&a, n);
+         v = 1.0 / rmatrixrcond1(&a, n);
          if (v >= testrcondunit_threshold50 * erc1) {
             q50.xR[0] += 1.0 / passcount;
          }
@@ -16726,7 +16726,7 @@ static bool testrcondunit_testrmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
          }
          errless = errless || v > erc1 * 1.001;
       // 1-norm, LU
-         v = 1 / rmatrixlurcond1(&lua, n);
+         v = 1.0 / rmatrixlurcond1(&lua, n);
          if (v >= testrcondunit_threshold50 * erc1) {
             q50.xR[1] += 1.0 / passcount;
          }
@@ -16735,7 +16735,7 @@ static bool testrcondunit_testrmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
          }
          errless = errless || v > erc1 * 1.001;
       // Inf-norm, normal
-         v = 1 / rmatrixrcondinf(&a, n);
+         v = 1.0 / rmatrixrcondinf(&a, n);
          if (v >= testrcondunit_threshold50 * ercinf) {
             q50.xR[2] += 1.0 / passcount;
          }
@@ -16744,7 +16744,7 @@ static bool testrcondunit_testrmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
          }
          errless = errless || v > ercinf * 1.001;
       // Inf-norm, LU
-         v = 1 / rmatrixlurcondinf(&lua, n);
+         v = 1.0 / rmatrixlurcondinf(&lua, n);
          if (v >= testrcondunit_threshold50 * ercinf) {
             q50.xR[3] += 1.0 / passcount;
          }
@@ -16818,8 +16818,8 @@ static bool testrcondunit_testcmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
    NewVector(p, 0, DT_INT);
    NewVector(q50, 0, DT_REAL);
    NewVector(q90, 0, DT_REAL);
-   ae_vector_set_length(&q50, 3 + 1);
-   ae_vector_set_length(&q90, 3 + 1);
+   ae_vector_set_length(&q50, 4);
+   ae_vector_set_length(&q90, 4);
    err50 = false;
    err90 = false;
    errless = false;
@@ -16846,7 +16846,7 @@ static bool testrcondunit_testcmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
          cmatrixlu(&lua, n, n, &p);
          testrcondunit_cmatrixrefrcond(&a, n, &erc1, &ercinf);
       // 1-norm, normal
-         v = 1 / cmatrixrcond1(&a, n);
+         v = 1.0 / cmatrixrcond1(&a, n);
          if (v >= testrcondunit_threshold50 * erc1) {
             q50.xR[0] += 1.0 / passcount;
          }
@@ -16855,7 +16855,7 @@ static bool testrcondunit_testcmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
          }
          errless = errless || v > erc1 * 1.001;
       // 1-norm, LU
-         v = 1 / cmatrixlurcond1(&lua, n);
+         v = 1.0 / cmatrixlurcond1(&lua, n);
          if (v >= testrcondunit_threshold50 * erc1) {
             q50.xR[1] += 1.0 / passcount;
          }
@@ -16864,7 +16864,7 @@ static bool testrcondunit_testcmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
          }
          errless = errless || v > erc1 * 1.001;
       // Inf-norm, normal
-         v = 1 / cmatrixrcondinf(&a, n);
+         v = 1.0 / cmatrixrcondinf(&a, n);
          if (v >= testrcondunit_threshold50 * ercinf) {
             q50.xR[2] += 1.0 / passcount;
          }
@@ -16873,7 +16873,7 @@ static bool testrcondunit_testcmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
          }
          errless = errless || v > ercinf * 1.001;
       // Inf-norm, LU
-         v = 1 / cmatrixlurcondinf(&lua, n);
+         v = 1.0 / cmatrixlurcondinf(&lua, n);
          if (v >= testrcondunit_threshold50 * ercinf) {
             q50.xR[3] += 1.0 / passcount;
          }
@@ -16969,7 +16969,7 @@ static bool testrcondunit_testspdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
          testrcondunit_rmatrixmakeacopy(&a, n, n, &cha);
          spdmatrixcholesky(&cha, n, isupper);
       // normal
-         v = 1 / spdmatrixrcond(&a, n, isupper);
+         v = 1.0 / spdmatrixrcond(&a, n, isupper);
          if (v >= testrcondunit_threshold50 * erc1) {
             q50.xR[0] += 1.0 / passcount;
          }
@@ -16978,7 +16978,7 @@ static bool testrcondunit_testspdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
          }
          errless = errless || v > erc1 * 1.001;
       // Cholesky
-         v = 1 / spdmatrixcholeskyrcond(&cha, n, isupper);
+         v = 1.0 / spdmatrixcholeskyrcond(&cha, n, isupper);
          if (v >= testrcondunit_threshold50 * erc1) {
             q50.xR[1] += 1.0 / passcount;
          }
@@ -17070,7 +17070,7 @@ static bool testrcondunit_testhpdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
          testrcondunit_cmatrixmakeacopy(&a, n, n, &cha);
          hpdmatrixcholesky(&cha, n, isupper);
       // normal
-         v = 1 / hpdmatrixrcond(&a, n, isupper);
+         v = 1.0 / hpdmatrixrcond(&a, n, isupper);
          if (v >= testrcondunit_threshold50 * erc1) {
             q50.xR[0] += 1.0 / passcount;
          }
@@ -17079,7 +17079,7 @@ static bool testrcondunit_testhpdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
          }
          errless = errless || v > erc1 * 1.001;
       // Cholesky
-         v = 1 / hpdmatrixcholeskyrcond(&cha, n, isupper);
+         v = 1.0 / hpdmatrixcholeskyrcond(&cha, n, isupper);
          if (v >= testrcondunit_threshold50 * erc1) {
             q50.xR[1] += 1.0 / passcount;
          }
@@ -17283,7 +17283,7 @@ bool testxblas() {
    for (pass = 0; pass < passcount; pass++) {
       ae_assert(n % 2 == 0, "Assertion failed");
    // First test: X + X + ... + X - X - X - ... - X = 1*X
-      s = exp((double)imax2(pass, 50));
+      s = exp(imax2(pass, 50));
       if (pass == passcount - 1 && pass > 1) {
          s = maxrealnumber;
       }
@@ -17303,7 +17303,7 @@ bool testxblas() {
       exactnesserrors = exactnesserrors || rv2err > 4 * machineepsilon * fabs(ry.xR[0]);
       exactnesserrors = exactnesserrors || !NearAtR(rv2, ry.xR[0], rv2err);
    // First test: X + X + ... + X = N*X
-      s = exp((double)imax2(pass, 50));
+      s = exp(imax2(pass, 50));
       if (pass == passcount - 1 && pass > 1) {
          s = maxrealnumber;
       }
@@ -17327,7 +17327,7 @@ bool testxblas() {
    for (pass = 0; pass < passcount; pass++) {
       ae_assert(n % 2 == 0, "Assertion failed");
    // First test: X + X + ... + X - X - X - ... - X = 1*X
-      s = exp((double)imax2(pass, 50));
+      s = exp(imax2(pass, 50));
       if (pass == passcount - 1 && pass > 1) {
          s = maxrealnumber;
       }
@@ -17347,7 +17347,7 @@ bool testxblas() {
       exactnesserrors = exactnesserrors || cv2err > 4 * machineepsilon * abscomplex(cy.xC[0]);
       exactnesserrors = exactnesserrors || !NearAtC(cv2, cy.xC[0], cv2err);
    // First test: X + X + ... + X = N*X
-      s = exp((double)imax2(pass, 50));
+      s = exp(imax2(pass, 50));
       if (pass == passcount - 1 && pass > 1) {
          s = maxrealnumber;
       }
@@ -17709,7 +17709,7 @@ static void testdirectdensesolversunit_rmatrixdrophalf(RMatrix *a, ae_int_t n, b
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          if (droplower ? i > j : i < j) {
-            a->xyR[i][j] = (double)(1 + 2 * i + 3 * j);
+            a->xyR[i][j] = 1.0 + 2.0 * i + 3.0 * j;
          }
       }
    }
@@ -19210,7 +19210,7 @@ static void testdirectsparsesolversunit_testsks(bool *errorflag) {
    NewObj(hqrndstate, rs);
    passcount = 10;
    maxn = 30;
-   threshold = 1.0E-6;
+   threshold = 0.000001;
    hqrndrandomize(&rs);
 // Well conditioned SPD problems solved with SKS solver
    for (n = 1; n <= maxn; n++) {
@@ -19315,7 +19315,7 @@ static void testdirectsparsesolversunit_testcholesky(bool *errorflag) {
    NewObj(hqrndstate, rs);
    passcount = 10;
    maxn = 30;
-   threshold = 1.0E-6;
+   threshold = 0.000001;
    hqrndrandomize(&rs);
 // Well conditioned SPD problems solved with Cholesky solver
    for (n = 1; n <= maxn; n++) {
@@ -19405,7 +19405,7 @@ static void testdirectsparsesolversunit_testgen(bool *errorflag) {
    NewObj(hqrndstate, rs);
    passcount = 10;
    maxn = 30;
-   threshold = 1.0E-6;
+   threshold = 0.000001;
    hqrndrandomize(&rs);
 // Well conditioned general linear problems solved with LU solver
    for (n = 1; n <= maxn; n++) {
@@ -19626,7 +19626,7 @@ static void testfblsunit_testgmres(bool *err) {
             raddv(n, -1.0, &b, &r);
             e = sqrt(rdotv2(n, &r));
          // Test condition
-            *err = *err || e > 1.0E6 * machineepsilon;
+            *err = *err || e > 1000000.0 * machineepsilon;
          }
       }
    }
@@ -19780,7 +19780,7 @@ bool testfbls() {
 //   is smaller than 0.01). Such matrix is guaranteed to be non-degenerate.
 // * generate random known solution xe, set right part b == A*xe
 // * check that results of FBLSSolveLS agree with xe
-   eps = 1.0E-6;
+   eps = 0.000001;
    for (n = 1; n <= 5; n++) {
       for (m = n; m <= 2 * n; m++) {
          ae_matrix_set_length(&a, m, n);
@@ -19826,7 +19826,7 @@ bool testfbls() {
          a.xyR[i][i] = 1 + randomreal();
          xe.xR[i] = randomreal() - 0.5;
       }
-      scalea = pow(10.0, randomreal() * 4 - 2);
+      scalea = pow(10.0, 2.0 * randommid());
       uppera = randombool();
       for (i = 0; i < n; i++) {
          if (uppera) {
@@ -19856,7 +19856,7 @@ bool testfbls() {
    // Test
       fblscholeskysolve(&a, sqrt(scalea), n, uppera, &b, &buf);
       for (i = 0; i < n; i++) {
-         cholerrors = cholerrors || !NearAtR(b.xR[i], xe.xR[i], 1.0E3 * machineepsilon);
+         cholerrors = cholerrors || !NearAtR(b.xR[i], xe.xR[i], 1000.0 * machineepsilon);
       }
    }
 // report
@@ -19937,7 +19937,7 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
    NewObj(hqrndstate, rs);
    NewObj(sparsesolverreport, rep);
    hqrndrandomize(&rs);
-   epsf = pow(10.0, (double)(-4 - hqrnduniformi(&rs, 3)));
+   epsf = pow(10.0, -4.0 - hqrnduniformi(&rs, 3));
 // Test that GMRES is a Krylov subspace method, i.e. its iterate belongs to span(b,A*b,A*A*b,...)
    for (n = 1; n <= maxn; n++) {
    // Generate sparse matrix and RHS.
@@ -19974,11 +19974,11 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
          }
          rcopyvr(n, &x, &z, gmresk);
          rmatrixlq(&z, gmresk + 1, n, &tmp);
-         *err = *err || !SmallAtR(z.xyR[gmresk][gmresk], 1.0E-6);
+         *err = *err || !SmallAtR(z.xyR[gmresk][gmresk], 0.000001);
       // Additional test - R2 field is correct
          sparsemv(&crsa, &x, &ax);
          raddv(n, -1.0, &b, &ax);
-         *err = *err || !NearAtR(rep.r2, rdotv2(n, &ax), 1.0E-6);
+         *err = *err || !NearAtR(rep.r2, rdotv2(n, &ax), 0.000001);
       }
    }
 // Randomly generated sparse problem, possibly degenerate.
@@ -20181,7 +20181,7 @@ static void testiterativesparseunit_testgmres(ae_int_t maxn, bool *err) {
 // * when XRep is activated, it does not crash SparseSolve() or SparseSolveSymmetric()
    n = 100;
    nnz = 10 * n;
-   epsf = 1.0E-3;
+   epsf = 0.001;
    gmresk = 5;
    tol = sqrt(machineepsilon);
    sparsecreate(n, n, 0, &a);
@@ -20285,7 +20285,7 @@ bool testiterativesparse() {
 }
 
 // === lincg testing unit ===
-static const double testlincgunit_e0 = 1.0E-6;
+static const double testlincgunit_e0 = 0.000001;
 static const double testlincgunit_maxcond = 30.0;
 
 // Function for testing LinCGIteration function(custom option), which to solve
@@ -20593,14 +20593,14 @@ static bool testlincgunit_complexres() {
                }
                eps += b.xR[i] * b.xR[i];
             }
-            eps = 1.0E-6 * sqrt(eps);
+            eps = 0.000001 * sqrt(eps);
          // Solve with different stopping criteria
             lincgcreate(n, &s);
             lincgsetb(&s, &b);
             lincgsetstartingpoint(&s, &x0);
             lincgsetxrep(&s, true);
             if (stcrit == 0) {
-               lincgsetcond(&s, 1.0E-6, 0);
+               lincgsetcond(&s, 0.000001, 0);
             } else {
                lincgsetcond(&s, 0.0, n);
             }
@@ -20807,7 +20807,7 @@ static bool testlincgunit_testrcorrectness() {
    NewObj(lincgreport, rep);
    NewMatrix(a, 0, 0, DT_REAL);
    NewVector(b, 0, DT_REAL);
-   rtol = 1.0E6 * machineepsilon;
+   rtol = 1000000.0 * machineepsilon;
    n = 50;
    maxits = n / 2;
    c = 10000.0;
@@ -21140,7 +21140,7 @@ static bool testlincgunit_krylovsubspacetest() {
    NewVector(r0, 0, DT_REAL);
    NewVector(tarray, 0, DT_REAL);
    NewMatrix(mtx, 0, 0, DT_REAL);
-   eps = 1.0E-6;
+   eps = 0.000001;
    maxits = 3;
    sz = 5;
    mx = 100.0;
@@ -21309,7 +21309,7 @@ static bool testlincgunit_sparsetest() {
          }
          eps += b.xR[i] * b.xR[i];
       }
-      eps = 1.0E-6 * sqrt(eps);
+      eps = 0.000001 * sqrt(eps);
       sparsecreate(n, n, 0, &uppera);
       sparsecreate(n, n, 0, &lowera);
       for (i = 0; i < n; i++) {
@@ -21422,7 +21422,7 @@ static bool testlincgunit_precondtest() {
       for (i = 0; i < n; i++) {
          m.xR[i] = randomreal() + 0.5;
          de.xR[i] = sqrt(m.xR[i]);
-         rde.xR[i] = 1 / de.xR[i];
+         rde.xR[i] = 1.0 / de.xR[i];
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
@@ -21438,7 +21438,7 @@ static bool testlincgunit_precondtest() {
          x0.xR[i] = randommid();
          b.xR[i] = randommid();
       }
-      eps = 1.0E-5;
+      eps = 0.00001;
       for (i = 0; i < n; i++) {
          tx0.xR[i] = de.xR[i] * x0.xR[i];
          tb.xR[i] = rde.xR[i] * b.xR[i];
@@ -21545,7 +21545,7 @@ static bool testlincgunit_precondtest() {
 //
 // We test automatic diagonal preconditioning used by SolveSparse.
 // In order to do so we:
-// 1. generate 20*20 matrix A0 with condition number equal to 1.0E1
+// 1. generate 20*20 matrix A0 with condition number equal to 10
 // 2. generate random "exact" solution xe and right part b == A0*xe
 // 3. generate random ill-conditioned diagonal scaling matrix D with
 //    condition number equal to 1.0E50:
@@ -21562,7 +21562,7 @@ static bool testlincgunit_precondtest() {
 // 1st and 2nd solutions must be close to xe, 3rd solution must be very
 // far from the true one.
    n = 20;
-   spdmatrixrndcond(n, 1.0E1, &ta);
+   spdmatrixrndcond(n, 10.0, &ta);
    ae_vector_set_length(&xe, n);
    for (i = 0; i < n; i++) {
       xe.xR[i] = randomnormal();
@@ -21884,8 +21884,8 @@ bool testnormestimator() {
 }
 
 // === linlsqr testing unit ===
-static const double testlinlsqrunit_e0 = 1.0E-6;
-static const double testlinlsqrunit_tolort = 1.0E-4;
+static const double testlinlsqrunit_e0 = 0.000001;
+static const double testlinlsqrunit_tolort = 0.0001;
 static const double testlinlsqrunit_emergencye0 = 1.0E-12;
 
 // This function compares solution calculated by LSQR with one calculated  by
@@ -22161,8 +22161,8 @@ static bool testlinlsqrunit_mwcranksvdtest() {
                // * MxN well conditioned A (with condition number C in [1,10] and norm s0)
                // * regularization coefficient LambdaI
                // * right part b, with |b| == s1
-                  s0 = pow(10.0, (double)(10 * ns0));
-                  s1 = pow(10.0, (double)(10 * ns1));
+                  s0 = pow(10.0, 10.0 * ns0);
+                  s1 = pow(10.0, 10.0 * ns1);
                   lambdai = 0.0;
                   if (nlambdai == 0) {
                      lambdai = 0.0;
@@ -22272,8 +22272,8 @@ static bool testlinlsqrunit_mwicranksvdtest() {
                   // * regularization coefficient LambdaI
                   // * MxN matrix A, norm(A) == s0, with NZ zero singular values and N-NZ nonzero ones
                   // * right part b with norm(b) == s1
-                     s0 = pow(10.0, (double)(10 * ns0));
-                     s1 = pow(10.0, (double)(10 * ns1));
+                     s0 = pow(10.0, 10.0 * ns0);
+                     s1 = pow(10.0, 10.0 * ns1);
                      lambdai = 0.0;
                      if (nlambdai == 0) {
                         lambdai = 0.0;
@@ -22387,8 +22387,8 @@ static bool testlinlsqrunit_bidiagonaltest() {
                   // Generate problem:
                   // * scaling coefficients s0, s1
                   // * bidiagonal A, with probability of having zero element at diagonal equal to PZ
-                     s0 = pow(10.0, (double)(10 * ns0));
-                     s1 = pow(10.0, (double)(10 * ns1));
+                     s0 = pow(10.0, 10.0 * ns0);
+                     s1 = pow(10.0, 10.0 * ns1);
                      pnz = 1.0;
                      if (p == 0) {
                         pnz = 0.75;
@@ -22605,7 +22605,7 @@ static bool testlinlsqrunit_reportcorrectnesstest() {
             for (i = m; i < m + n; i++) {
                for (j = 0; j < n; j++) {
                   if (i - m == j) {
-                     a.xyR[i][j] = (double)lambdai;
+                     a.xyR[i][j] = lambdai;
                   } else {
                      a.xyR[i][j] = 0.0;
                   }
@@ -22629,7 +22629,7 @@ static bool testlinlsqrunit_reportcorrectnesstest() {
             linlsqrcreate(m, n, &s);
             linlsqrsetb(&s, &b);
             linlsqrsetcond(&s, 0.0, 0.0, n);
-            linlsqrsetlambdai(&s, (double)lambdai);
+            linlsqrsetlambdai(&s, lambdai);
             linlsqrsetxrep(&s, true);
             result = result || linlsqrpeekiterationscount(&s) != 0;
             while (linlsqriteration(&s))
@@ -22811,7 +22811,7 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
    // NOTE: we do not check TerminationType because algorithm may terminate for
    // several reasons. The only thing which is guaranteed is that stopping condition
    // EpsB holds.
-      eps = pow(10.0, (double)-(2 + randominteger(3)));
+      eps = pow(10.0, -(2.0 + randominteger(3)));
       epsmod = 1.1 * eps;
       ae_vector_set_length(&rk, n);
       linlsqrcreate(n, n, &s);
@@ -22867,7 +22867,7 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
       for (k0 = -1; k0 <= 1; k0++) {
          for (k1 = -1; k1 <= 1; k1++) {
          // Initialize A with non-unit norm 10^(10*K0), b with non-unit norm 10^(10*K1)
-            anorm = pow(10.0, (double)(10 * k0));
+            anorm = pow(10.0, 10.0 * k0);
             rmatrixrndorthogonal(n, &a);
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
@@ -22886,14 +22886,14 @@ static bool testlinlsqrunit_stoppingcriteriatest() {
             for (i = 0; i < n; i++) {
                tmp += sqr(b.xR[i]);
             }
-            tmp = pow(10.0, (double)(10 * k1)) / sqrt(tmp);
+            tmp = pow(10.0, 10.0 * k1) / sqrt(tmp);
             ae_v_muld(b.xR, 1, n, tmp);
          // Test EpsA
          //
          // NOTE: it is guaranteed that algorithm will terminate with correct
          // TerminationType because other stopping criteria (EpsB) won't be satisfied
          // on such system.
-            eps = pow(10.0, (double)-(2 + randominteger(3)));
+            eps = pow(10.0, -(2.0 + randominteger(3)));
             epsmod = 1.1 * eps;
             linlsqrcreate(n, n - 1, &s);
             linlsqrsetb(&s, &b);
@@ -22991,7 +22991,7 @@ static bool testlinlsqrunit_analytictest() {
 // * Tol - error tolerance for orthogonality/conjugacy criteria
    result = false;
    smallk = 4;
-   tol = 1.0E-7;
+   tol = 0.0000001;
    for (m = smallk; m <= smallk + 5; m++) {
       for (n = smallk; n <= m; n++) {
       // Prepare problem:
@@ -23204,7 +23204,7 @@ static bool testlinlsqrunit_preconditionertest() {
 //
 // We test automatic diagonal preconditioning used by SolveSparse.
 // In order to do so we:
-// 1. generate 20*20 matrix A0 with condition number equal to 1.0E1
+// 1. generate 20*20 matrix A0 with condition number equal to 10
 // 2. generate random "exact" solution xe and right part b == A0*xe
 // 3. generate random ill-conditioned diagonal scaling matrix D with
 //    condition number equal to 1.0E50:
@@ -23220,7 +23220,7 @@ static bool testlinlsqrunit_preconditionertest() {
 // 1st and 2nd solutions must be close to xe, 3rd solution must be very
 // far from the true one.
    n = 20;
-   rmatrixrndcond(n, 1.0E1, &ta);
+   rmatrixrndcond(n, 10.0, &ta);
    ae_vector_set_length(&xe, n);
    for (i = 0; i < n; i++) {
       xe.xR[i] = randomnormal();
@@ -23641,7 +23641,7 @@ bool testnleq() {
    xlast.xR[0] = maxrealnumber;
    xlast.xR[1] = maxrealnumber;
    nleqcreatelm(n, 2, &x, &state);
-   nleqsetcond(&state, 1.0E-6, 0);
+   nleqsetcond(&state, 0.000001, 0);
    nleqsetxrep(&state, true);
    firstrep = true;
    flast = maxrealnumber;
@@ -23955,7 +23955,7 @@ static void testmatinvunit_rmatrixdrophalf(RMatrix *a, ae_int_t n, bool droplowe
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
          if (droplower ? i > j : i < j) {
-            a->xyR[i][j] = (double)(1 + 2 * i + 3 * j);
+            a->xyR[i][j] = 1.0 + 2.0 * i + 3.0 * j;
          }
       }
    }
@@ -24809,7 +24809,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
             s1.xR[i] = s0.xR[i];
             s2.xR[i] = s0.xR[i];
          }
-         rmatrixrndcond(n, 1.0E2, &va);
+         rmatrixrndcond(n, 100.0, &va);
          vectorsetlengthatleast(&vc, n);
          for (i = 0; i < k; i++) {
             vc.xR[i] = exp(hqrndnormal(&rs));
@@ -24872,9 +24872,9 @@ static void testoptservunit_testprec(bool *wereerrors) {
                   bksk.xR[j0] += bk.xyR[j0][j1] * sk.xyR[i][j1];
                }
             }
-            theta = 1 / theta;
+            theta = 1.0 / theta;
             rho = ae_v_dotproduct(sk.xyR[i], 1, yk.xyR[i], 1, n);
-            rho = 1 / rho;
+            rho = 1.0 / rho;
             for (j0 = 0; j0 < n; j0++) {
                for (j1 = 0; j1 < n; j1++) {
                   bk.xyR[j0][j1] += rho * yk.xyR[i][j0] * yk.xyR[i][j1];
@@ -24944,7 +24944,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
             s1.xR[i] = s0.xR[i];
             s2.xR[i] = s0.xR[i];
          }
-         rmatrixrndcond(n, 1.0E2, &va);
+         rmatrixrndcond(n, 100.0, &va);
          vectorsetlengthatleast(&vc, n);
          for (i = 0; i < k; i++) {
             vc.xR[i] = exp(hqrndnormal(&rs));
@@ -25113,10 +25113,10 @@ static void testminlbfgsunit_calciip2(minlbfgsstate *state, ae_int_t n) {
    }
    for (i = 0; i < n; i++) {
       if (state->needf || state->needfg) {
-         state->f += sqr((double)(i * i + 1)) * sqr(state->x.xR[i]);
+         state->f += sqr(i * i + 1.0) * sqr(state->x.xR[i]);
       }
       if (state->needfg) {
-         state->g.xR[i] = sqr((double)(i * i + 1)) * 2 * state->x.xR[i];
+         state->g.xR[i] = sqr(i * i + 1.0) * 2 * state->x.xR[i];
       }
    }
 }
@@ -25232,7 +25232,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
    // Test it with perturbed diagonal preconditioner
       ae_vector_set_length(&diagh, n);
       for (i = 0; i < n; i++) {
-         diagh.xR[i] = 2 * sqr((double)(i * i + 1)) * (0.8 + 0.4 * randomreal());
+         diagh.xR[i] = 2 * sqr(i * i + 1.0) * (0.8 + 0.4 * randomreal());
       }
       minlbfgssetprecdiag(&state, &diagh);
       cntg2 = 0;
@@ -25266,7 +25266,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
       minlbfgscreate(n, m, &x, &state);
       ae_vector_set_length(&s, n);
       for (i = 0; i < n; i++) {
-         s.xR[i] = 1 / sqrt(2 * pow((double)(i * i + 1), 2.0) * (0.8 + 0.4 * randomreal()));
+         s.xR[i] = 1.0 / sqrt(2.0 * pow(i * i + 1.0, 2.0) * (0.8 + 0.4 * randomreal()));
       }
       minlbfgssetprecdefault(&state);
       minlbfgssetscale(&state, &s);
@@ -25386,7 +25386,7 @@ static void testminlbfgsunit_testother(bool *err) {
 // (first one issues NeedF requests, second one issues NeedFG requests)
    n = 50;
    m = 5;
-   diffstep = 1.0E-6;
+   diffstep = 0.000001;
    for (dkind = 0; dkind <= 1; dkind++) {
       ae_vector_set_length(&x, n);
       ae_vector_set_length(&xlast, n);
@@ -25434,11 +25434,11 @@ static void testminlbfgsunit_testother(bool *err) {
 // optimizer evaluates function at +-DiffStep*S only.
    ae_vector_set_length(&x, 1);
    ae_vector_set_length(&s, 1);
-   diffstep = randomreal() * 1.0E-6;
-   s.xR[0] = exp(randomreal() * 4 - 2);
+   diffstep = randomreal() * 0.000001;
+   s.xR[0] = exp(2.0 * randommid());
    x.xR[0] = 0.0;
    minlbfgscreatef(1, 1, &x, diffstep, &state);
-   minlbfgssetcond(&state, 1.0E-6, 0.0, 0.0, 0);
+   minlbfgssetcond(&state, 0.000001, 0.0, 0.0, 0);
    minlbfgssetscale(&state, &s);
    v = 0.0;
    while (minlbfgsiteration(&state)) {
@@ -25576,7 +25576,7 @@ static void testminlbfgsunit_testother(bool *err) {
 //     f(x) = {
 //            { M, if x <= -0.999999 or x >= 0.999999
 //
-// where c is either 1.0 or 1.0E+6, M is either 1.0E8, 1.0E20 or +INF
+// where c is either 1.0 or 1000000.0, M is either 100000000.0, 1.0E20 or +INF
 // (we try different combinations)
    for (ckind = 0; ckind <= 1; ckind++) {
       for (mkind = 0; mkind <= 2; mkind++) {
@@ -25587,10 +25587,10 @@ static void testminlbfgsunit_testother(bool *err) {
             vc = 1.0;
          }
          if (ckind == 1) {
-            vc = 1.0E+6;
+            vc = 1000000.0;
          }
          if (mkind == 0) {
-            vm = 1.0E+8;
+            vm = 100000000.0;
          }
          if (mkind == 1) {
             vm = 1.0E+20;
@@ -25599,7 +25599,7 @@ static void testminlbfgsunit_testother(bool *err) {
             vm = +INFINITY;
          }
       // Create optimizer, solve optimization problem
-         epsg = 1.0E-6 * vc;
+         epsg = 0.000001 * vc;
          ae_vector_set_length(&x, 1);
          x.xR[0] = 0.0;
          minlbfgscreate(1, 1, &x, &state);
@@ -25607,8 +25607,8 @@ static void testminlbfgsunit_testother(bool *err) {
          while (minlbfgsiteration(&state))
             if (state.needfg) {
                if (-0.999999 < state.x.xR[0] && state.x.xR[0] < 0.999999) {
-                  state.f = 1 / (1 - state.x.xR[0]) + 1 / (1 + state.x.xR[0]) + vc * state.x.xR[0];
-                  state.g.xR[0] = 1 / sqr(1 - state.x.xR[0]) - 1 / sqr(1 + state.x.xR[0]) + vc;
+                  state.f = 1.0 / (1.0 - state.x.xR[0]) + 1.0 / (1.0 + state.x.xR[0]) + vc * state.x.xR[0];
+                  state.g.xR[0] = 1.0 / sqr(1.0 - state.x.xR[0]) - 1.0 / sqr(1.0 + state.x.xR[0]) + vc;
                } else {
                   state.f = vm;
                }
@@ -25648,7 +25648,7 @@ static void testminlbfgsunit_testother(bool *err) {
          spoilvar = -1;
          spoilval = NAN;
       }
-      spdmatrixrndcond(n, 1.0E5, &fulla);
+      spdmatrixrndcond(n, 100000.0, &fulla);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&x0, n);
       for (i = 0; i < n; i++) {
@@ -25771,7 +25771,7 @@ static void testminlbfgsunit_testoptguardc1test0reportfortask0(bool *err, optgua
             }
             v += fabs(vv);
          }
-         *err = *err || !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
+         *err = *err || !NearAtR(v, rep->f.xR[k], 0.000001 * rmax2(fabs(v), 1.0));
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -25846,10 +25846,10 @@ static void testminlbfgsunit_testoptguardc1test1reportfortask0(bool *err, optgua
                vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
             v += sign(vv) * a->xyR[i][rep->vidx];
-            tooclose = tooclose || SmallR(vv, 1.0E-4);
+            tooclose = tooclose || SmallR(vv, 0.0001);
          }
          if (!tooclose) {
-            *err = *err || !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
+            *err = *err || !NearAtR(v, rep->g.xR[k], 0.000001 * rmax2(fabs(v), 1.0));
          }
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
@@ -25862,7 +25862,7 @@ static void testminlbfgsunit_testoptguardc1test1reportfortask0(bool *err, optgua
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = tooclose || SmallR(va, 1.0E-8) || SmallR(vb, 1.0E-8);
+         tooclose = tooclose || SmallR(va, 0.00000001) || SmallR(vb, 0.00000001);
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -25936,8 +25936,8 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
    for (i = 0; i < n; i++) {
       x0.xR[i] = 1.0 + 0.1 * i;
    }
-   spdmatrixrndcond(n, 1.0E3, &a);
-   spdmatrixrndcond(n, 1.0E3, &a1);
+   spdmatrixrndcond(n, 1000.0, &a);
+   spdmatrixrndcond(n, 1000.0, &a1);
    minlbfgscreate(n, 3, &x0, &state);
    minlbfgssetcond(&state, 0.0, 0.0, 1.0E-9, 10);
    while (minlbfgsiteration(&state))
@@ -26002,7 +26002,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
                v += state.x.xR[j] * a.xyR[i][j];
             }
             state.f += fabs(v);
-            v = (double)sign(v);
+            v = sign(v);
             for (j = 0; j < n; j++) {
                state.g.xR[j] += v * a.xyR[i][j];
             }
@@ -26041,8 +26041,8 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
             s.xR[i] = pow(10.0, skind * 15.0 * hqrndmiduniformr(&rs));
             x0.xR[i] = (1.0 + 0.1 * i) * s.xR[i];
          }
-         spdmatrixrndcond(n, 1.0E3, &a);
-         spdmatrixrndcond(n, 1.0E3, &a1);
+         spdmatrixrndcond(n, 1000.0, &a);
+         spdmatrixrndcond(n, 1000.0, &a1);
          minlbfgscreate(n, m, &x0, &state);
          minlbfgsoptguardgradient(&state, diffstep);
          minlbfgssetcond(&state, 0.0, 0.0, 1.0E-9, 10);
@@ -26188,7 +26188,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
                   v += state.x.xR[j] * a.xyR[i][j];
                }
                state.f += fabs(v);
-               v = (double)sign(v);
+               v = sign(v);
                for (j = 0; j < n; j++) {
                   state.g.xR[j] += v * a.xyR[i][j];
                }
@@ -26337,7 +26337,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
 // We simply test that OptGuard does not return error code.
    n = 100;
    m = 5;
-   spdmatrixrndcond(n, 1.0E2, &a);
+   spdmatrixrndcond(n, 100.0, &a);
    ae_vector_set_length(&b, n);
    ae_vector_set_length(&x0, n);
    for (i = 0; i < n; i++) {
@@ -26413,7 +26413,7 @@ bool testminlbfgs() {
    testminlbfgsunit_testpreconditioning(&precerror);
    testminlbfgsunit_testother(&othererrors);
 // Reference problem
-   diffstep = 1.0E-6;
+   diffstep = 0.000001;
    for (dkind = 0; dkind <= 1; dkind++) {
       ae_vector_set_length(&x, 3);
       n = 3;
@@ -26444,7 +26444,7 @@ bool testminlbfgs() {
 // nonconvex problems with complex surface: we start from point with very small
 // gradient, but we need ever smaller gradient in the next step due to
 // Wolfe conditions.
-   diffstep = 1.0E-6;
+   diffstep = 0.000001;
    for (dkind = 0; dkind <= 1; dkind++) {
       ae_vector_set_length(&x, 1);
       n = 1;
@@ -26477,7 +26477,7 @@ bool testminlbfgs() {
 // * iterate and restart AFTER termination
 //
 // NOTE: step is bounded from above to avoid premature convergence
-   diffstep = 1.0E-6;
+   diffstep = 0.000001;
    for (dkind = 0; dkind <= 1; dkind++) {
       ae_vector_set_length(&x, 3);
       n = 3;
@@ -26508,7 +26508,7 @@ bool testminlbfgs() {
       restartserror = restartserror || rep.terminationtype <= 0 || !NearAtR(x.xR[0], log(2.0), 0.01) || !SmallAtR(x.xR[1], 0.01) || !NearAtR(x.xR[2], log(2.0), 0.01);
    }
 // Linear equations
-   diffstep = 1.0E-6;
+   diffstep = 0.000001;
    for (n = 1; n <= 10; n++) {
    // Prepare task
       ae_matrix_set_length(&a, n, n);
@@ -26572,7 +26572,7 @@ bool testminlbfgs() {
       }
    }
 // Testing convergence properties
-   diffstep = 1.0E-6;
+   diffstep = 0.000001;
    for (dkind = 0; dkind <= 1; dkind++) {
       ae_vector_set_length(&x, 3);
       n = 3;
@@ -26632,7 +26632,7 @@ bool testminlbfgs() {
    }
 // Crash test: too many iterations on a simple tasks
 // May fail when encounter zero step, underflow or something like that
-   ae_vector_set_length(&x, 2 + 1);
+   ae_vector_set_length(&x, 3);
    n = 3;
    m = 2;
    maxits = 10000;
@@ -26963,7 +26963,7 @@ bool testcqmodels() {
       //
       // MKind is a random integer in [0,7] - number of specific
       // modification to apply.
-         mkind = (double)randominteger(8);
+         mkind = randominteger(8);
          if (mkind == 0.0) {
          // Set non-zero D
             tau = 1.0 + randomreal();
@@ -27156,14 +27156,14 @@ bool testcqmodels() {
          cqmsetq(&s, &q, &r, k, theta);
          cqmconstrainedoptimum(&s, &x);
          for (i = 0; i < n; i++) {
-            newton0errors = newton0errors || !NearAtR(x.xR[i], x0.xR[i], 1.0E6 * machineepsilon);
+            newton0errors = newton0errors || !NearAtR(x.xR[i], x0.xR[i], 1000000.0 * machineepsilon);
          }
       }
    }
    waserrors = waserrors || newton0errors;
 // Newton1 test: constrained optimization
    newton1errors = false;
-   h = 1.0E-3;
+   h = 0.001;
    for (n = 1; n <= 5; n++) {
       for (k = 0; k <= 2 * n; k++) {
       // Allocate place
@@ -27238,7 +27238,7 @@ bool testcqmodels() {
    newton2errors = false;
    for (nkind = 0; nkind <= 5; nkind++) {
       for (k = 0; k <= 5; k++) {
-         n = iround(pow((double)n, (double)nkind));
+         n = iround(pow(n, nkind));
       // generate problem
          ae_vector_set_length(&d, n);
          ae_vector_set_length(&b, n);
@@ -27415,8 +27415,8 @@ bool testsnnls() {
          for (j = 0; j < nd; j++) {
             densea.xyR[i][j] = 0.0;
          }
-         densea.xyR[i][i] = (double)(1 + hqrnduniformi(&rs, 2));
-         b.xR[i] = (double)((1 + hqrnduniformi(&rs, 2)) * (2 * hqrnduniformi(&rs, 2) - 1));
+         densea.xyR[i][i] = 1.0 + hqrnduniformi(&rs, 2);
+         b.xR[i] = (1.0 + hqrnduniformi(&rs, 2)) * (2 * hqrnduniformi(&rs, 2) - 1);
          isconstrained.xB[i] = hqrnduniformr(&rs) > 0.5;
       }
    // Solve with SNNLS solver
@@ -27445,7 +27445,7 @@ bool testsnnls() {
 // * NS+ND > 0, NR > 0
 // * about 50% of variables are constrained
 // * we check that constrained gradient is small at the solution
-   eps = 1.0E-5;
+   eps = 0.00001;
    for (ns = 0; ns <= nmax; ns++) {
       for (nd = 0; nd <= nmax; nd++) {
          for (nr = ns; nr <= ns + nd + nmax; nr++) {
@@ -27530,7 +27530,7 @@ bool testsnnls() {
 // We solve problem similar to one solver in test 0, but with
 // progressively decreased magnitude of variables. We generate
 // problem with already-known solution and compare results against it.
-   xtol = 1.0E-7;
+   xtol = 0.0000001;
    for (ns = 0; ns <= nmax; ns++) {
       for (nd = 0; nd <= nmax; nd++) {
          for (nr = ns; nr <= ns + nd + nmax; nr++) {
@@ -27552,7 +27552,7 @@ bool testsnnls() {
             // * EffectiveA, array[NR,NS+ND]
             // * B, array[NR]
             // * IsConstrained, array[NS+ND]
-               rho = pow(10.0, (double)-k);
+               rho = pow(10.0, -k);
                if (nd > 0) {
                   ae_matrix_set_length(&densea, nr, nd);
                   for (i = 0; i < nr; i++) {
@@ -27627,7 +27627,7 @@ bool testsnnls() {
 // This test is intended to catch subtle bugs in the Newton solver which
 // do NOT prevent algorithm from converging to the solution, but slow it
 // down (convergence becomes linear or even slower).
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (ns = 0; ns <= nmax; ns++) {
       for (nd = 0; nd <= nmax; nd++) {
          for (nr = ns; nr <= ns + nd + nmax; nr++) {
@@ -27859,7 +27859,7 @@ static void testsactivesetsunit_testspecproperties(bool *err) {
             }
             c.xyR[i][n] = v;
             vv = coalesce(vv, 1.0);
-            vv = 1 / sqrt(vv);
+            vv = 1.0 / sqrt(vv);
             ae_v_muld(c.xyR[i], 1, n + 1, vv);
             ct.xZ[i] = 0;
          }
@@ -27869,7 +27869,7 @@ static void testsactivesetsunit_testspecproperties(bool *err) {
             distortmag = rmax2(distortmag, fabs(c.xyR[i][distortidx]));
          }
          ae_assert(distortmag > 0.0, "Assertion failed");
-         distortmag = 1.0E7 * machineepsilon / distortmag;
+         distortmag = 10000000.0 * machineepsilon / distortmag;
       // Apply scaling (if needed), then randomly multiply C by
       // some large/small value in order to distort magnitude of
       // linear constraints.
@@ -27951,8 +27951,8 @@ static void testminbleicunit_calciip2(minbleicstate *state, ae_int_t n, ae_int_t
    }
    for (i = 0; i < n; i++) {
       if (state->needfg) {
-         state->f += pow((double)(i * i + 1), (double)(2 * fk)) * sqr(state->x.xR[i]);
-         state->g.xR[i] = pow((double)(i * i + 1), (double)(2 * fk)) * 2 * state->x.xR[i];
+         state->f += pow(i * i + 1.0, 2.0 * fk) * sqr(state->x.xR[i]);
+         state->g.xR[i] = pow(i * i + 1.0, 2.0 * fk) * 2.0 * state->x.xR[i];
       }
    }
 }
@@ -28024,9 +28024,9 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    NewObj(minbleicstate, state);
    NewObj(minbleicreport, rep);
    nmax = 5;
-   weakepsg = 1.0E-4;
-   epsx = 1.0E-4;
-   epsfeas = 1.0E-6;
+   weakepsg = 0.0001;
+   epsx = 0.0001;
+   epsfeas = 0.000001;
    passcount = 10;
    for (pass = 1; pass <= passcount; pass++) {
    // Test problem 1:
@@ -28043,7 +28043,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    // * either analytic gradient or numerical differentiation are used
    // * we check that after work is over we are on the plane and
    //   that we are in the stationary point of constrained F
-      diffstep = 1.0E-6;
+      diffstep = 0.000001;
       for (dkind = 0; dkind <= 1; dkind++) {
          for (preckind = 0; preckind <= 2; preckind++) {
             for (pkind = 1; pkind <= 2; pkind++) {
@@ -28084,10 +28084,10 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f += pow(state.x.xR[i], (double)p);
+                           state.f += pow(state.x.xR[i], p);
                         }
                         if (state.needfg) {
-                           state.g.xR[i] = p * pow(state.x.xR[i], (double)(p - 1));
+                           state.g.xR[i] = p * pow(state.x.xR[i], p - 1.0);
                         }
                      }
                   }
@@ -28110,7 +28110,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   // Project gradient into C
                   // Check projected norm
                      for (i = 0; i < n; i++) {
-                        g.xR[i] = p * pow(x.xR[i], (double)(p - 1));
+                        g.xR[i] = p * pow(x.xR[i], p - 1.0);
                      }
                      v2 = ae_v_dotproduct(c.xyR[0], 1, c.xyR[0], 1, n);
                      v = ae_v_dotproduct(c.xyR[0], 1, g.xR, 1, n);
@@ -28142,7 +28142,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    // * extremum of f(x) is exactly xs because:
    //   * xs is the closest point in the plane defined by (a[0],x) == b[0]
    //   * xs is feasible by definition
-      diffstep = 1.0E-6;
+      diffstep = 0.000001;
       for (dkind = 0; dkind <= 1; dkind++) {
          for (preckind = 0; preckind <= 2; preckind++) {
             for (n = 2; n <= nmax; n++) {
@@ -28237,7 +28237,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    //   analytic form of solution: S[i] = bound(x0[i], 0, 1)
    // * we also check that both final solution and subsequent iterates
    //   are strictly feasible
-      diffstep = 1.0E-6;
+      diffstep = 0.000001;
       for (dkind = 0; dkind <= 1; dkind++) {
          for (preckind = 0; preckind <= 2; preckind++) {
             for (pkind = 1; pkind <= 2; pkind++) {
@@ -28270,10 +28270,10 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f += pow(state.x.xR[i] - x0.xR[i], (double)p);
+                           state.f += pow(state.x.xR[i] - x0.xR[i], p);
                         }
                         if (state.needfg) {
-                           state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], (double)(p - 1));
+                           state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], p - 1.0);
                         }
                         *feaserr = *feaserr || state.x.xR[i] < 0.0;
                         *feaserr = *feaserr || state.x.xR[i] > 1.0;
@@ -28290,7 +28290,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   v = 0.0;
                   for (i = 0; i < n; i++) {
                      if (x.xR[i] > 0.0 && x.xR[i] < 1.0) {
-                        v += sqr(p * pow(x.xR[i] - x0.xR[i], (double)(p - 1)));
+                        v += sqr(p * pow(x.xR[i] - x0.xR[i], p - 1.0));
                      }
                      *feaserr = *feaserr || x.xR[i] < 0.0;
                      *feaserr = *feaserr || x.xR[i] > 1.0;
@@ -28314,7 +28314,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
    //   analytic form of solution: S[i] = bound(x0[i], 0, 1)
    // * we also check that both final solution and subsequent iterates
    //   are strictly feasible
-      diffstep = 1.0E-6;
+      diffstep = 0.000001;
       for (dkind = 0; dkind <= 1; dkind++) {
          for (preckind = 0; preckind <= 2; preckind++) {
             for (pkind = 1; pkind <= 2; pkind++) {
@@ -28352,10 +28352,10 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f += pow(state.x.xR[i] - x0.xR[i], (double)p);
+                           state.f += pow(state.x.xR[i] - x0.xR[i], p);
                         }
                         if (state.needfg) {
-                           state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], (double)(p - 1));
+                           state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], p - 1.0);
                         }
                         *feaserr = *feaserr || state.x.xR[i] < bl.xR[i];
                         *feaserr = *feaserr || state.x.xR[i] > bu.xR[i];
@@ -28372,7 +28372,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   v = 0.0;
                   for (i = 0; i < n; i++) {
                      if (x.xR[i] > bl.xR[i] && x.xR[i] < bu.xR[i]) {
-                        v += sqr(p * pow(x.xR[i] - x0.xR[i], (double)(p - 1)));
+                        v += sqr(p * pow(x.xR[i] - x0.xR[i], p - 1.0));
                      }
                      *feaserr = *feaserr || x.xR[i] < bl.xR[i];
                      *feaserr = *feaserr || x.xR[i] > bu.xR[i];
@@ -28430,8 +28430,8 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f += pow(state.x.xR[i] - x0.xR[i], (double)p);
-                        state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], (double)(p - 1));
+                        state.f += pow(state.x.xR[i] - x0.xR[i], p);
+                        state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], p - 1.0);
                      }
                   } else { // Unknown protocol specified
                      *interr = true;
@@ -28449,7 +28449,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                v = 0.0;
                for (i = 0; i < n; i++) {
                   if (x.xR[i] > 0.02 && x.xR[i] < 0.98) {
-                     v += sqr(p * pow(x.xR[i] - x0.xR[i], (double)(p - 1)));
+                     v += sqr(p * pow(x.xR[i] - x0.xR[i], p - 1.0));
                   }
                   *feaserr = *feaserr || x.xR[i] < 0.0 - epsfeas;
                   *feaserr = *feaserr || x.xR[i] > 1.0 + epsfeas;
@@ -28513,8 +28513,8 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      if (state.needfg) {
                         state.f = 0.0;
                         for (i = 0; i < n; i++) {
-                           state.f += pow(state.x.xR[i] - x0.xR[i], (double)p);
-                           state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], (double)(p - 1));
+                           state.f += pow(state.x.xR[i] - x0.xR[i], p);
+                           state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], p - 1.0);
                         }
                      } else { // Unknown protocol specified
                         *interr = true;
@@ -28588,8 +28588,8 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f += pow(state.x.xR[i] - x0.xR[i], (double)p);
-                        state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], (double)(p - 1));
+                        state.f += pow(state.x.xR[i] - x0.xR[i], p);
+                        state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], p - 1.0);
                      }
                   } else { // Unknown protocol specified
                      *interr = true;
@@ -28646,8 +28646,8 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      if (state.needfg) {
                         state.f = 0.0;
                         for (i = 0; i < n; i++) {
-                           state.f += pow(state.x.xR[i], (double)p);
-                           state.g.xR[i] = p * pow(state.x.xR[i], (double)(p - 1));
+                           state.f += pow(state.x.xR[i], p);
+                           state.g.xR[i] = p * pow(state.x.xR[i], p - 1.0);
                         }
                      } else { // Unknown protocol specified
                         *interr = true;
@@ -28724,8 +28724,8 @@ static void testminbleicunit_testother(bool *err) {
    NewObj(minbleicreport, rep);
    NewObj(hqrndstate, rs);
    hqrndrandomize(&rs);
-   epsx = 1.0E-4;
-   epsg = 1.0E-8;
+   epsx = 0.0001;
+   epsg = 0.00000001;
    passcount = 10;
 // Try to reproduce bug 570 (optimizer hangs on problems where it is required
 // to perform very small step - less than 1E-50 - in order to activate constraints).
@@ -28844,7 +28844,7 @@ static void testminbleicunit_testother(bool *err) {
 // (first one issues NeedF requests, second one issues NeedFG requests)
    for (pass = 1; pass <= passcount; pass++) {
       n = 10;
-      diffstep = 1.0E-6;
+      diffstep = 0.000001;
       for (dkind = 0; dkind <= 1; dkind++) {
          ae_vector_set_length(&x, n);
          ae_vector_set_length(&xlast, n);
@@ -28857,7 +28857,7 @@ static void testminbleicunit_testother(bool *err) {
          if (dkind == 1) {
             minbleiccreatef(n, &x, diffstep, &state);
          }
-         minbleicsetcond(&state, 1.0E-6, 0.0, epsx, 0);
+         minbleicsetcond(&state, 0.000001, 0.0, epsx, 0);
          wasf = false;
          wasfg = false;
          while (minbleiciteration(&state)) {
@@ -28894,11 +28894,11 @@ static void testminbleicunit_testother(bool *err) {
    for (pass = 1; pass <= passcount; pass++) {
       ae_vector_set_length(&x, 1);
       ae_vector_set_length(&s, 1);
-      diffstep = randomreal() * 1.0E-6;
-      s.xR[0] = exp(randomreal() * 4 - 2);
+      diffstep = randomreal() * 0.000001;
+      s.xR[0] = exp(2.0 * randommid());
       x.xR[0] = 0.0;
       minbleiccreatef(1, &x, diffstep, &state);
-      minbleicsetcond(&state, 1.0E-6, 0.0, epsx, 0);
+      minbleicsetcond(&state, 0.000001, 0.0, epsx, 0);
       minbleicsetscale(&state, &s);
       v = 0.0;
       while (minbleiciteration(&state)) {
@@ -28949,7 +28949,7 @@ static void testminbleicunit_testother(bool *err) {
       minbleicsetcond(&state, epsg, 0.0, epsx, 0);
       while (minbleiciteration(&state))
          if (state.needfg) {
-            state.f = -1.0E8 * sqr(state.x.xR[0]);
+            state.f = -100000000.0 * sqr(state.x.xR[0]);
             state.g.xR[0] = -2.0E8 * state.x.xR[0];
          }
       minbleicresults(&state, &x, &rep);
@@ -28974,7 +28974,7 @@ static void testminbleicunit_testother(bool *err) {
 // * and we test that in the extremum stopping conditions are
 //   satisfied subject to the current scaling coefficients.
    for (pass = 1; pass <= passcount; pass++) {
-      tmpeps = 1.0E-5;
+      tmpeps = 0.00001;
       for (n = 1; n <= 10; n++) {
          for (ckind = 0; ckind <= 3; ckind++) {
             for (pkind = 0; pkind <= 2; pkind++) {
@@ -29048,7 +29048,7 @@ static void testminbleicunit_testother(bool *err) {
 //     f(x) = {
 //            { M, if x <= -0.999999 or x >= 0.999999
 //
-// where c is either 1.0 or 1.0E+4, M is either 1.0E8, 1.0E20 or +INF
+// where c is either 1.0 or 10000.0, M is either 100000000.0, 1.0E20 or +INF
 // (we try different combinations)
    for (pass = 1; pass <= passcount; pass++) {
       for (ckind = 0; ckind <= 1; ckind++) {
@@ -29060,10 +29060,10 @@ static void testminbleicunit_testother(bool *err) {
                vc = 1.0;
             }
             if (ckind == 1) {
-               vc = 1.0E+4;
+               vc = 10000.0;
             }
             if (mkind == 0) {
-               vm = 1.0E+8;
+               vm = 100000000.0;
             }
             if (mkind == 1) {
                vm = 1.0E+20;
@@ -29072,7 +29072,7 @@ static void testminbleicunit_testother(bool *err) {
                vm = +INFINITY;
             }
          // Create optimizer, solve optimization problem
-            epsg = 1.0E-6 * vc;
+            epsg = 0.000001 * vc;
             ae_vector_set_length(&x, 1);
             x.xR[0] = 0.0;
             minbleiccreate(1, &x, &state);
@@ -29080,8 +29080,8 @@ static void testminbleicunit_testother(bool *err) {
             while (minbleiciteration(&state))
                if (state.needfg) {
                   if (-0.999999 < state.x.xR[0] && state.x.xR[0] < 0.999999) {
-                     state.f = 1 / (1 - state.x.xR[0]) + 1 / (1 + state.x.xR[0]) + vc * state.x.xR[0];
-                     state.g.xR[0] = 1 / sqr(1 - state.x.xR[0]) - 1 / sqr(1 + state.x.xR[0]) + vc;
+                     state.f = 1.0 / (1.0 - state.x.xR[0]) + 1.0 / (1.0 + state.x.xR[0]) + vc * state.x.xR[0];
+                     state.g.xR[0] = 1.0 / sqr(1.0 - state.x.xR[0]) - 1.0 / sqr(1.0 + state.x.xR[0]) + vc;
                   } else {
                      state.f = vm;
                      state.g.xR[0] = 0.0;
@@ -29243,7 +29243,7 @@ static void testminbleicunit_testother(bool *err) {
          spoilvar = -1;
          spoilval = NAN;
       }
-      spdmatrixrndcond(n, 1.0E5, &fulla);
+      spdmatrixrndcond(n, 100000.0, &fulla);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&x0, n);
       for (i = 0; i < n; i++) {
@@ -29415,7 +29415,7 @@ static void testminbleicunit_testother(bool *err) {
 //   and check that it stops at x0 (less than 1E-12 away from it)
    n = 20;
    for (pass = 0; pass <= 20000; pass++) {
-      spdmatrixrndcond(n, 1.0E3, &fulla);
+      spdmatrixrndcond(n, 1000.0, &fulla);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             fulla.xyR[i][j] *= 1.0E9;
@@ -29508,8 +29508,8 @@ static void testminbleicunit_testconv(bool *err) {
    NewObj(snnlssolver, nnls);
    NewObj(hqrndstate, rs);
    hqrndrandomize(&rs);
-   epsg = 1.0E-8;
-   epsfeas = 1.0E-8;
+   epsg = 0.00000001;
+   epsfeas = 0.00000001;
    tol = 0.001;
    passcount = 10;
 // Three closely connected problems:
@@ -29798,7 +29798,7 @@ static void testminbleicunit_testconv(bool *err) {
             f1 += 0.5 * sqr(v);
          }
       // compare F0 and F1
-         *err = *err || !NearAtR(f0, f1, 1.0E-4);
+         *err = *err || !NearAtR(f0, f1, 0.0001);
       }
    }
 // Convex/nonconvex optimization problem with excessive
@@ -29824,7 +29824,7 @@ static void testminbleicunit_testconv(bool *err) {
 //
 // NOTE: TolConstr must be large enough so it won't conflict with
 //       perturbation introduced by v_shift
-   tolconstr = 1.0E-8;
+   tolconstr = 0.00000001;
    for (n = 2; n <= 8; n++) {
       for (akind = 0; akind <= 3; akind++) {
          for (shiftkind = -5; shiftkind <= 1; shiftkind++) {
@@ -29834,7 +29834,7 @@ static void testminbleicunit_testconv(bool *err) {
                ae_vector_set_length(&b, n);
                ae_vector_set_length(&x, n);
                for (i = 0; i < n; i++) {
-                  b.xR[i] = pow(10.0, (double)bscale) * hqrndnormal(&rs);
+                  b.xR[i] = pow(10.0, bscale) * hqrndnormal(&rs);
                   x.xR[i] = hqrnduniformr(&rs) - 0.5;
                }
                for (i = 0; i < n; i++) {
@@ -29877,15 +29877,15 @@ static void testminbleicunit_testconv(bool *err) {
                   bl.xR[i] = -1.0;
                   bu.xR[i] = 1.0;
                }
-               ccnt = iround(pow(2.0, (double)n));
+               ccnt = iround(pow(2.0, n));
                ae_matrix_set_length(&c, ccnt, n + 1);
                ae_vector_set_length(&ct, ccnt);
                for (i = 0; i < ccnt; i++) {
                   ct.xZ[i] = -1;
                   k = i;
-                  c.xyR[i][n] = sign((double)shiftkind) * pow(10.0, fabs((double)shiftkind)) * machineepsilon;
+                  c.xyR[i][n] = sign(shiftkind) * pow(10.0, fabs(shiftkind)) * machineepsilon;
                   for (j = 0; j < n; j++) {
-                     c.xyR[i][j] = (double)(2 * (k % 2) - 1);
+                     c.xyR[i][j] = 2.0 * (k % 2) - 1.0;
                      c.xyR[i][n] += c.xyR[i][j] * c.xyR[i][j];
                      k /= 2;
                   }
@@ -29928,7 +29928,7 @@ static void testminbleicunit_testconv(bool *err) {
                   vv += sqr(v);
                }
                vv = sqrt(vv);
-               *err = *err || vv > 1.0E-5;
+               *err = *err || vv > 0.00001;
             }
          }
       }
@@ -29951,7 +29951,7 @@ static void testminbleicunit_testconv(bool *err) {
 // Inequality constraint is considered active if distance to boundary
 // is less than TolConstr. We use nonnegative least squares solver
 // in order to compute constrained gradient.
-   tolconstr = 1.0E-8;
+   tolconstr = 0.00000001;
    for (n = 2; n <= 8; n++) {
       for (akind = 0; akind <= 3; akind++) {
          for (bscale = 0; bscale >= -2; bscale--) {
@@ -29960,7 +29960,7 @@ static void testminbleicunit_testconv(bool *err) {
             ae_vector_set_length(&b, n);
             ae_vector_set_length(&x, n);
             for (i = 0; i < n; i++) {
-               b.xR[i] = pow(10.0, (double)bscale) * hqrndnormal(&rs);
+               b.xR[i] = pow(10.0, bscale) * hqrndnormal(&rs);
                x.xR[i] = 0.0;
             }
             for (i = 0; i < n; i++) {
@@ -30094,7 +30094,7 @@ static void testminbleicunit_testconv(bool *err) {
                }
                if (ct.xZ[i] > 0 && v <= tolconstr || ct.xZ[i] < 0 && v >= -tolconstr) {
                   for (j = 0; j < n; j++) {
-                     ce.xyR[j][k] = sign((double)ct.xZ[i]) * c.xyR[i][j];
+                     ce.xyR[j][k] = sign(ct.xZ[i]) * c.xyR[i][j];
                   }
                   nonnegative.xB[k] = true;
                   k++;
@@ -30116,7 +30116,7 @@ static void testminbleicunit_testconv(bool *err) {
             }
             vv = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
             vv = sqrt(vv);
-            *err = *err || vv > 1.0E-5;
+            *err = *err || vv > 0.00001;
          }
       }
    }
@@ -30175,7 +30175,7 @@ static void testminbleicunit_testpreconditioning(bool *err) {
 // N        - problem size
 // K        - number of repeated passes (should be large enough to average out random factors)
    k = 100;
-   epsg = 1.0E-8;
+   epsg = 0.00000001;
    for (n = 10; n <= 10; n++) {
       for (ckind = 0; ckind <= 3; ckind++) {
          fk = 1;
@@ -30221,7 +30221,7 @@ static void testminbleicunit_testpreconditioning(bool *err) {
          }
          ae_vector_set_length(&diagh, n);
          for (i = 0; i < n; i++) {
-            diagh.xR[i] = 2 * pow((double)(i * i + 1), (double)(2 * fk)) * (0.8 + 0.4 * randomreal());
+            diagh.xR[i] = 2.0 * pow(i * i + 1.0, 2.0 * fk) * (0.8 + 0.4 * randomreal());
          }
          minbleicsetprecdiag(&state, &diagh);
          minbleicsetscale(&state, &units);
@@ -30239,7 +30239,7 @@ static void testminbleicunit_testpreconditioning(bool *err) {
       // Test it with scale-based preconditioner
          ae_vector_set_length(&s, n);
          for (i = 0; i < n; i++) {
-            s.xR[i] = 1 / sqrt(2 * pow((double)(i * i + 1), (double)(2 * fk)) * (0.8 + 0.4 * randomreal()));
+            s.xR[i] = 1.0 / sqrt(2.0 * pow(i * i + 1.0, 2.0 * fk) * (0.8 + 0.4 * randomreal()));
          }
          minbleicsetprecdefault(&state);
          minbleicsetscale(&state, &s);
@@ -30328,7 +30328,7 @@ static void testminbleicunit_testbugs(bool *err) {
                if (ckind == 0) {
                   c.xyR[0][i] = sqrt(hqrnduniformr(&rs));
                } else {
-                  c.xyR[0][i] = (double)hqrnduniformi(&rs, 2);
+                  c.xyR[0][i] = hqrnduniformi(&rs, 2);
                }
             }
             c.xyR[0][n] = 0.0;
@@ -30358,8 +30358,8 @@ static void testminbleicunit_testbugs(bool *err) {
 //
 // This test hangs if bug is present. Thus, we do not test completion
 // code returned by optimizer - we just test that it was returned :)
-   tolx = 1.0E-8;
-   regterm = 1.0E-8;
+   tolx = 0.00000001;
+   regterm = 0.00000001;
    for (pass = 1; pass <= 1000; pass++) {
    // Prepare constraints:
    // * [0,1] box constraints on all variables
@@ -30497,7 +30497,7 @@ static void testminbleicunit_testoptguardc1test0reportfortask0(bool *err, optgua
             }
             v += fabs(vv);
          }
-         *err = *err || !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
+         *err = *err || !NearAtR(v, rep->f.xR[k], 0.000001 * rmax2(fabs(v), 1.0));
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -30572,10 +30572,10 @@ static void testminbleicunit_testoptguardc1test1reportfortask0(bool *err, optgua
                vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
             v += sign(vv) * a->xyR[i][rep->vidx];
-            tooclose = tooclose || SmallR(vv, 1.0E-4);
+            tooclose = tooclose || SmallR(vv, 0.0001);
          }
          if (!tooclose) {
-            *err = *err || !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
+            *err = *err || !NearAtR(v, rep->g.xR[k], 0.000001 * rmax2(fabs(v), 1.0));
          }
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
@@ -30588,7 +30588,7 @@ static void testminbleicunit_testoptguardc1test1reportfortask0(bool *err, optgua
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = tooclose || SmallR(va, 1.0E-8) || SmallR(vb, 1.0E-8);
+         tooclose = tooclose || SmallR(va, 0.00000001) || SmallR(vb, 0.00000001);
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -30663,8 +30663,8 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
    for (i = 0; i < n; i++) {
       x0.xR[i] = 1.0 + 0.1 * i;
    }
-   spdmatrixrndcond(n, 1.0E3, &a);
-   spdmatrixrndcond(n, 1.0E3, &a1);
+   spdmatrixrndcond(n, 1000.0, &a);
+   spdmatrixrndcond(n, 1000.0, &a1);
    minbleiccreate(n, &x0, &state);
    minbleicsetcond(&state, 0.0, 0.0, 1.0E-9, 10);
    while (minbleiciteration(&state))
@@ -30729,7 +30729,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
                v += state.x.xR[j] * a.xyR[i][j];
             }
             state.f += fabs(v);
-            v = (double)sign(v);
+            v = sign(v);
             for (j = 0; j < n; j++) {
                state.g.xR[j] += v * a.xyR[i][j];
             }
@@ -30778,8 +30778,8 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
                bndu.xR[i] = x0.xR[i];
             }
          }
-         spdmatrixrndcond(n, 1.0E3, &a);
-         spdmatrixrndcond(n, 1.0E3, &a1);
+         spdmatrixrndcond(n, 1000.0, &a);
+         spdmatrixrndcond(n, 1000.0, &a1);
          minbleiccreate(n, &x0, &state);
          minbleicoptguardgradient(&state, diffstep);
          minbleicsetcond(&state, 0.0, 0.0, 1.0E-9, 10);
@@ -30930,7 +30930,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
                   v += state.x.xR[j] * a.xyR[i][j];
                }
                state.f += fabs(v);
-               v = (double)sign(v);
+               v = sign(v);
                for (j = 0; j < n; j++) {
                   state.g.xR[j] += v * a.xyR[i][j];
                }
@@ -31080,7 +31080,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
 // * upper limit on iterations count, MaxIts == 25
 // We simply test that OptGuard does not return error code.
    n = 100;
-   spdmatrixrndcond(n, 1.0E2, &a);
+   spdmatrixrndcond(n, 100.0, &a);
    ae_vector_set_length(&b, n);
    ae_vector_set_length(&x0, n);
    for (i = 0; i < n; i++) {
@@ -31372,7 +31372,7 @@ static bool functest1() {
       ae_vector_set_length(&stx, sn);
       for (i = 0; i <= nexp; i++) {
       // create simmetric matrix 'A'
-         spdmatrixrndcond(sn, exp(randomreal() * log((double)c2)), &a);
+         spdmatrixrndcond(sn, exp(randomreal() * log(c2)), &a);
          minqpcreate(sn, &state);
          testminqpunit_setrandomalgobc(&state);
          minqpsetquadraticterm(&state, &a, false);
@@ -31496,7 +31496,7 @@ static bool functest2() {
       ae_vector_set_length(&y1, sn);
       for (i = 0; i <= nexp; i++) {
       // create simmetric matrix 'A'
-         spdmatrixrndcond(sn, exp(randomreal() * log((double)c2)), &a);
+         spdmatrixrndcond(sn, exp(randomreal() * log(c2)), &a);
          minqpcreate(sn, &state);
          testminqpunit_setrandomalgobc(&state);
          minqpsetquadraticterm(&state, &a, false);
@@ -31809,7 +31809,7 @@ static bool quickqptests() {
 // * initial point is random, feasible
 // * random origin (zero or non-zero) and scale (unit or
 //   non-unit) are generated
-   eps = 1.0E-5;
+   eps = 0.00001;
    for (n = 1; n <= 10; n++) {
       for (pass = 1; pass <= 10; pass++) {
       // Generate problem
@@ -31817,7 +31817,7 @@ static bool quickqptests() {
          scaletype = hqrnduniformi(&rs, 2);
          isupper = hqrnduniformr(&rs) < 0.5;
          issparse = hqrnduniformr(&rs) < 0.5;
-         spdmatrixrndcond(n, 1.0E3, &fulla);
+         spdmatrixrndcond(n, 1000.0, &fulla);
          ae_matrix_set_length(&halfa, n, n);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
@@ -31893,7 +31893,7 @@ static bool quickqptests() {
 // * initial point is random, feasible
 // * random origin (zero or non-zero) and scale (unit or
 //   non-unit) are generated
-   eps = 1.0E-5;
+   eps = 0.00001;
    for (n = 1; n <= 10; n++) {
       for (pass = 1; pass <= 10; pass++) {
       // Generate problem
@@ -31901,7 +31901,7 @@ static bool quickqptests() {
          scaletype = hqrnduniformi(&rs, 2);
          isupper = hqrnduniformr(&rs) < 0.5;
          issparse = hqrnduniformr(&rs) < 0.5;
-         spdmatrixrndcond(n, 1.0E3, &fulla);
+         spdmatrixrndcond(n, 1000.0, &fulla);
          ae_matrix_set_length(&halfa, n, n);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
@@ -32003,7 +32003,7 @@ static bool quickqptests() {
 // * N dimensions, N >= 2
 // * box constraints, x[i] in [-1,+1]
 // * A = A0-0.5*I, where A0 is SPD with unit norm and smallest
-//   singular value equal to 1.0E-3, I is identity matrix
+//   singular value equal to 0.001, I is identity matrix
 // * random B with normal entries
 // * initial point is random, feasible
 //
@@ -32014,11 +32014,11 @@ static bool quickqptests() {
 // NOTE: it is important to have N >= 2, because formula for A
 //       can be applied only to matrix with at least two
 //       singular values
-   eps = 1.0E-5;
+   eps = 0.00001;
    for (n = 2; n <= 10; n++) {
       for (pass = 1; pass <= 10; pass++) {
       // Generate problem
-         spdmatrixrndcond(n, 1.0E3, &fulla);
+         spdmatrixrndcond(n, 1000.0, &fulla);
          for (i = 0; i < n; i++) {
             fulla.xyR[i][i] -= 0.5;
          }
@@ -32121,7 +32121,7 @@ static bool quickqptests() {
    nlist.xZ[9] = 20;
    nlist.xZ[10] = 40;
    nlist.xZ[11] = 80;
-   eps = 1.0E-5;
+   eps = 0.00001;
    for (nidx = 0; nidx < nlist.cnt; nidx++) {
       for (pass = 1; pass <= 10; pass++) {
       // Generate problem
@@ -32205,7 +32205,7 @@ static bool quickqptests() {
 // NOTE: we may explicitly set zero A, or assume that by
 //       default it is zero. During test we will try both
 //       ways.
-   eps = 1.0E-5;
+   eps = 0.00001;
    for (n = 1; n <= 10; n++) {
       for (pass = 1; pass <= 10; pass++) {
       // Generate problem
@@ -32263,11 +32263,11 @@ static bool quickqptests() {
 // * with number of outer iterations limited to just 1
 // * and with CG phase turned off (we modify internal structures
 //   of the QQP solver in order to make it)
-   eps = 1.0E-5;
+   eps = 0.00001;
    for (pass = 1; pass <= 10; pass++) {
    // Generate problem
       n = 50 + hqrnduniformi(&rs, 51);
-      spdmatrixrndcond(n, 1.0E3, &a);
+      spdmatrixrndcond(n, 1000.0, &a);
       testminqpunit_densetosparse(&a, n, &sa);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&bndl, n);
@@ -32336,7 +32336,7 @@ static bool quickqptests() {
 // * with one inequality constraint X[k] >= 5
 // * with initial point such that:
 //   * X0[i] = 100       for i != k
-//   * X0[k] = 5+1.0E-5
+//   * X0[k] = 5+0.00001
 // * with number of outer iterations limited to just 1
 // * and with CG phase turned off (we modify internal structures
 //   of the QQP solver in order to make it)
@@ -32349,11 +32349,11 @@ static bool quickqptests() {
 //   make sure that algorithm fails with just one iteration
 // * second one with State.QQP.NewtMaxIts set to 2, in order to
 //   make sure that algorithm converges when it can perform update
-   eps = 1.0E-5;
+   eps = 0.00001;
    for (pass = 1; pass <= 10; pass++) {
    // Generate problem
       n = 20 + hqrnduniformi(&rs, 20);
-      spdmatrixrndcond(n, 1.0E5, &a);
+      spdmatrixrndcond(n, 100000.0, &a);
       testminqpunit_densetosparse(&a, n, &sa);
       sparseconverttocrs(&sa);
       ae_vector_set_length(&b, n);
@@ -32438,11 +32438,11 @@ static bool quickqptests() {
 // * use stringent stopping criteria (one outer iteration)
 // * turn off Newton phase of the algorithm to slow down
 //   convergence
-   eps = 1.0E-3;
+   eps = 0.001;
    itscnt = 1;
    n = 20;
    isupper = randombool();
-   spdmatrixrndcond(n, 1.0E3, &za);
+   spdmatrixrndcond(n, 1000.0, &za);
    sparsecreate(n, n, 0, &sa);
    ae_matrix_set_length(&a, n, n);
    for (i = 0; i < n; i++) {
@@ -32501,14 +32501,14 @@ static bool quickqptests() {
 // intermediate tests are taken).
 //
 // As result, we must get S*x == y
-   eps = 1.0E-3;
+   eps = 0.001;
    itscnt = 1;
    n = 100;
    ae_vector_set_length(&s, n);
    for (i = 0; i < n; i++) {
       s.xR[i] = pow(10.0, randomnormal() / 10);
    }
-   spdmatrixrndcond(n, 1.0E3, &a);
+   spdmatrixrndcond(n, 1000.0, &a);
    ae_matrix_set_length(&za, n, n);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
@@ -32609,11 +32609,11 @@ static bool bleictests() {
 // We generate random unconstrained test problem and solve it
 // twice - first time we solve dense version, second time -
 // sparse version is solved.
-   eps = 1.0E-3;
+   eps = 0.001;
    itscnt = 5;
    n = 20;
    isupper = randombool();
-   spdmatrixrndcond(n, 1.0E3, &za);
+   spdmatrixrndcond(n, 1000.0, &za);
    sparsecreate(n, n, 0, &sa);
    ae_matrix_set_length(&a, n, n);
    for (i = 0; i < n; i++) {
@@ -32665,14 +32665,14 @@ static bool bleictests() {
 //
 // Solution process is started from X == 0, we perform ItsCnt == 5 steps.
 // As result, we must get S*x == y
-   eps = 1.0E-3;
+   eps = 0.001;
    itscnt = 5;
    n = 20;
    ae_vector_set_length(&s, n);
    for (i = 0; i < n; i++) {
       s.xR[i] = pow(10.0, randomnormal() / 10);
    }
-   spdmatrixrndcond(n, 1.0E3, &a);
+   spdmatrixrndcond(n, 1000.0, &a);
    ae_matrix_set_length(&za, n, n);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
@@ -32770,7 +32770,7 @@ static bool bleictests() {
    nlist.xZ[9] = 20;
    nlist.xZ[10] = 40;
    nlist.xZ[11] = 80;
-   eps = 1.0E-5;
+   eps = 0.00001;
    for (nidx = 0; nidx < nlist.cnt; nidx++) {
       for (pass = 1; pass <= 10; pass++) {
       // Generate problem
@@ -33114,22 +33114,22 @@ static ae_int_t testminqpunit_setrandomalgoallmodern(minqpstate *s, double *bcto
    if (result == 0) {
       minqpsetalgobleic(s, 1.0E-12, 0.0, 0.0, 0);
       *bctol = 0.0;
-      *lctol = 1.0E-8;
+      *lctol = 0.00000001;
    }
    if (result == 1) {
       minqpsetalgodenseaul(s, 1.0E-12, 1000.0, 10);
-      *bctol = 1.0E-3;
-      *lctol = 1.0E-3;
+      *bctol = 0.001;
+      *lctol = 0.001;
    }
    if (result == 2) {
       minqpsetalgodenseipm(s, 1.0E-12);
-      *bctol = 1.0E-3;
-      *lctol = 1.0E-3;
+      *bctol = 0.001;
+      *lctol = 0.001;
    }
    if (result == 3) {
       minqpsetalgosparseipm(s, 1.0E-12);
-      *bctol = 1.0E-3;
-      *lctol = 1.0E-3;
+      *bctol = 0.001;
+      *lctol = 0.001;
    }
    return result;
 }
@@ -33155,7 +33155,7 @@ static void testminqpunit_setrandomalgosemidefinite(minqpstate *s, double *bctol
    if (i == 1) {
       minqpsetalgobleic(s, 1.0E-12, 0.0, 0.0, 0);
       *bctol = 0.0;
-      *lctol = 1.0E-8;
+      *lctol = 0.00000001;
    }
    if (i == 2) {
       minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, randombool());
@@ -33164,13 +33164,13 @@ static void testminqpunit_setrandomalgosemidefinite(minqpstate *s, double *bctol
    }
    if (i == 3) {
       minqpsetalgodenseipm(s, 1.0E-12);
-      *bctol = 1.0E-3;
-      *lctol = 1.0E-3;
+      *bctol = 0.001;
+      *lctol = 0.001;
    }
    if (i == 4) {
       minqpsetalgosparseipm(s, 1.0E-12);
-      *bctol = 1.0E-3;
-      *lctol = 1.0E-3;
+      *bctol = 0.001;
+      *lctol = 0.001;
    }
 }
 
@@ -33255,7 +33255,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
 // * initial point is random, feasible
 // * random origin (zero or non-zero) and scale (unit or
 //   non-unit) are generated
-   eps = 1.0E-3;
+   eps = 0.001;
    for (n = 1; n <= 10; n++) {
       for (pass = 1; pass <= 10; pass++) {
       // Generate problem
@@ -33263,7 +33263,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
          scaletype = hqrnduniformi(&rs, 2);
          isupper = hqrnduniformr(&rs) < 0.5;
          issparse = hqrnduniformr(&rs) < 0.5;
-         spdmatrixrndcond(n, 1.0E3, &fulla);
+         spdmatrixrndcond(n, 1000.0, &fulla);
          ae_matrix_set_length(&halfa, n, n);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
@@ -33383,7 +33383,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
                gtrial.xR[i] += rep.lagbc.xR[i];
             }
             for (i = 0; i < n; i++) {
-               *wereerrors = *wereerrors || !SmallAtR(gtrial.xR[i], 1.0E-3);
+               *wereerrors = *wereerrors || !SmallAtR(gtrial.xR[i], 0.001);
             }
          }
       }
@@ -33398,7 +33398,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
 // * initial point is random, feasible
 // * random origin (zero or non-zero) and scale (unit or
 //   non-unit) are generated
-   eps = 1.0E-3;
+   eps = 0.001;
    for (n = 1; n <= 10; n++) {
       for (pass = 1; pass <= 10; pass++) {
       // Generate problem
@@ -33406,7 +33406,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
          scaletype = hqrnduniformi(&rs, 2);
          isupper = hqrnduniformr(&rs) < 0.5;
          issparse = hqrnduniformr(&rs) < 0.5;
-         spdmatrixrndcond(n, 1.0E3, &fulla);
+         spdmatrixrndcond(n, 1000.0, &fulla);
          ae_matrix_set_length(&halfa, n, n);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
@@ -33507,7 +33507,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
 //   sparse matrix it randomly choose format.
 // * random B with normal entries
 // * initial point is random, feasible
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (n = 1; n <= 10; n++) {
       for (pass = 1; pass <= 10; pass++) {
       // Generate problem
@@ -33534,7 +33534,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
             b.xR[i] = hqrndnormal(&rs);
             bndl.xR[i] = 0.0;
             bndu.xR[i] = +INFINITY;
-            x0.xR[i] = (double)hqrnduniformi(&rs, 2);
+            x0.xR[i] = hqrnduniformi(&rs, 2);
          }
       // Solve problem
          minqpcreate(n, &state);
@@ -33580,7 +33580,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
 // * N dimensions, N >= 2
 // * box constraints, x[i] in [-1,+1]
 // * A = A0-0.5*I, where A0 is SPD with unit norm and smallest
-//   singular value equal to 1.0E-3, I is identity matrix
+//   singular value equal to 0.001, I is identity matrix
 // * random B with normal entries
 // * initial point is random, feasible
 //
@@ -33591,11 +33591,11 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
 // NOTE: it is important to have N >= 2, because formula for A
 //       can be applied only to matrix with at least two
 //       singular values
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (n = 2; n <= 10; n++) {
       for (pass = 1; pass <= 10; pass++) {
       // Generate problem
-         spdmatrixrndcond(n, 1.0E3, &fulla);
+         spdmatrixrndcond(n, 1000.0, &fulla);
          for (i = 0; i < n; i++) {
             fulla.xyR[i][i] -= 0.5;
          }
@@ -33678,7 +33678,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
 // NOTE: we may explicitly set zero A, or assume that by
 //       default it is zero. During test we will try both
 //       ways.
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (n = 1; n <= 10; n++) {
       for (pass = 1; pass <= 10; pass++) {
       // Generate problem
@@ -33784,7 +33784,7 @@ static bool testminqpunit_ecqptest() {
 //   to find such x1, because K < N
 // * optimization problem has form 0.5*x'*A*x-(x1*A)*x
 // * exact solution must be equal to x0
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (n = 2; n <= 6; n++) {
       for (k = 1; k < n; k++) {
       // Generate problem: A, b, CMatrix, x0, XStart
@@ -33848,7 +33848,7 @@ static bool testminqpunit_ecqptest() {
 // * we do not know analytic form of the exact solution,
 //   but we know that projection of gradient into equality constrained
 //   subspace must be zero at the solution
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (n = 2; n <= 6; n++) {
       for (k = 1; k < n; k++) {
       // Generate problem: A, b, CMatrix, x0, XStart
@@ -33934,7 +33934,7 @@ static bool testminqpunit_ecqptest() {
 // NOTE: sometimes we need as much as 300 Augmented Lagrangian iterations for
 //       method to converge.
    eps = 5.0E-2;
-   theta = 1.0E+4;
+   theta = 10000.0;
    aulits = 300;
    for (n = 4; n <= 6; n++) {
       for (k = 1; k < n - 2; k++) {
@@ -33953,7 +33953,7 @@ static bool testminqpunit_ecqptest() {
             x1.xR[i] = randommid();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
-            xstart.xR[i] = (double)randominteger(2);
+            xstart.xR[i] = randominteger(2);
          }
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
@@ -34041,7 +34041,7 @@ static bool testminqpunit_ecqptest() {
          waserrors = waserrors || !NearAtR(f0, f1, eps);
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(xend.xR, 1, c.xyR[i], 1, n);
-            waserrors = waserrors || !NearAtR(v, c.xyR[i][n], 1.0E6 * machineepsilon);
+            waserrors = waserrors || !NearAtR(v, c.xyR[i][n], 1000000.0 * machineepsilon);
          }
          for (i = 0; i < n; i++) {
             waserrors = waserrors || xend.xR[i] < 0.0;
@@ -34067,7 +34067,7 @@ static bool testminqpunit_ecqptest() {
 //
 // Both methods should give same results; any significant difference is
 // evidence of some error in the QP implementation.
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (n = 2; n <= 6; n++) {
       for (k = 1; k < n; k++) {
       // Generate problem: A, b, BndL, BndU, CMatrix, x0, x1, XStart.
@@ -34089,7 +34089,7 @@ static bool testminqpunit_ecqptest() {
             b.xR[i] = randommid();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
-            xstart.xR[i] = (double)randominteger(2);
+            xstart.xR[i] = randominteger(2);
             xorigin.xR[i] = randommid();
          }
          for (i = 0; i < k; i++) {
@@ -34154,7 +34154,7 @@ static bool testminqpunit_ecqptest() {
 // * because constraints are excessive, the main problem is to find
 //   feasible point; the only existing feasible point is solution,
 //   so we have to check only feasibility
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (n = 1; n <= 6; n++) {
    // Generate problem: A, b, BndL, BndU, CMatrix, x0, x1, XStart
       k = 2 * n;
@@ -34172,7 +34172,7 @@ static bool testminqpunit_ecqptest() {
          x1.xR[i] = randommid();
          bndl.xR[i] = 0.0;
          bndu.xR[i] = 1.0;
-         xstart.xR[i] = (double)randominteger(2);
+         xstart.xR[i] = randominteger(2);
       }
       for (i = 0; i < k; i++) {
          for (j = 0; j < n; j++) {
@@ -34224,7 +34224,7 @@ static bool testminqpunit_ecqptest() {
 //
 // Both points should give same results; any significant difference is
 // evidence of some error in the QP implementation.
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (pass = 1; pass <= 50; pass++) {
    // Generate problem: N, K, A, b, BndL, BndU, CMatrix, x0, x1, XStart.
       n = randominteger(5) + 2;
@@ -34305,7 +34305,7 @@ static bool testminqpunit_ecqptest() {
 //   is that as we approach closer and closer to x0, which is
 //   a solution of the constrained problem, constrained gradient
 //   of the function rapidly vanishes.
-   eps = 1.0E-6;
+   eps = 0.000001;
    for (rk = 0; rk <= 70; rk++) {
       n = 10;
    // Generate x0, c, xd, xs, generate unit A
@@ -34327,7 +34327,7 @@ static bool testminqpunit_ecqptest() {
       }
       for (i = 0; i < n; i++) {
          xd.xR[i] -= v * tmp.xR[i];
-         xs.xR[i] = x0.xR[i] + xd.xR[i] * pow(2.0, (double)-rk);
+         xs.xR[i] = x0.xR[i] + xd.xR[i] * pow(2.0, -rk);
       }
       ae_matrix_set_length(&a, n, n);
       for (i = 0; i < n; i++) {
@@ -34356,7 +34356,7 @@ static bool testminqpunit_ecqptest() {
       for (i = 0; i < n; i++) {
          v += xend.xR[i] * c.xyR[0][i];
       }
-      waserrors = waserrors || !SmallAtR(v, 1.0E5 * machineepsilon);
+      waserrors = waserrors || !SmallAtR(v, 100000.0 * machineepsilon);
    }
    result = waserrors;
    ae_frame_leave();
@@ -34433,7 +34433,7 @@ static void testminqpunit_icqptest(bool *err) {
 //
 // NOTE: we make several passes because some specific kind of errors is rarely
 //       caught by this test, so we need several repetitions.
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (n = 2; n <= 6; n++) {
       for (pass = 0; pass <= 4; pass++) {
       // Generate problem: A, b, CMatrix, x0, XStart
@@ -34521,7 +34521,7 @@ static void testminqpunit_icqptest(bool *err) {
 //
 // Both methods should give same results; any significant difference is
 // evidence of some error in the QP implementation.
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (n = 2; n <= 6; n++) {
       for (k = 1; k < n; k++) {
       // Generate problem: A, b, BndL, BndU, CMatrix, x0, x1, XStart.
@@ -34543,7 +34543,7 @@ static void testminqpunit_icqptest(bool *err) {
             b.xR[i] = randommid();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
-            xstart.xR[i] = (double)randominteger(2);
+            xstart.xR[i] = randominteger(2);
             xorigin.xR[i] = randommid();
          }
          for (i = 0; i < k; i++) {
@@ -34629,7 +34629,7 @@ static void testminqpunit_icqptest(bool *err) {
 // both problems must have same solution.
 // Here we test that boundary constrained and linear inequality constrained
 // solvers give same results.
-   eps = 1.0E-3;
+   eps = 0.001;
    for (n = 1; n <= 6; n++) {
    // Generate problem: A, b, x0, XStart, C, CT
       spdmatrixrndcond(n, pow(10.0, 3 * randomreal()), &a);
@@ -34753,8 +34753,8 @@ static void testminqpunit_icqptest(bool *err) {
    // * check feasibility
       for (i = 0; i < n; i++) {
          *err = *err || !NearAtR(xend.xR[i], rboundval(x0.xR[i], 0.0, 1.0), 0.05);
-         *err = *err || xend.xR[i] < 0.0 - 1.0E-6;
-         *err = *err || xend.xR[i] > 1.0 + 1.0E-6;
+         *err = *err || xend.xR[i] < 0.0 - 0.000001;
+         *err = *err || xend.xR[i] > 1.0 + 0.000001;
       }
    }
 // Boundary and linear equality/inequality constrained QP problem with
@@ -34768,7 +34768,7 @@ static void testminqpunit_icqptest(bool *err) {
 // * because constraints are excessive, the main problem is to find
 //   feasible point; usually, the only existing feasible point is solution,
 //   so we have to check only feasibility
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (n = 1; n <= 6; n++) {
    // Generate problem: A, b, BndL, BndU, CMatrix, x0, x1, XStart
       k = 2 * n;
@@ -34786,7 +34786,7 @@ static void testminqpunit_icqptest(bool *err) {
          x1.xR[i] = randommid();
          bndl.xR[i] = 0.0;
          bndu.xR[i] = 1.0;
-         xstart.xR[i] = (double)randominteger(2);
+         xstart.xR[i] = randominteger(2);
       }
       for (i = 0; i < k; i++) {
          for (j = 0; j < n; j++) {
@@ -34798,10 +34798,10 @@ static void testminqpunit_icqptest(bool *err) {
             c.xyR[i][n] = v;
          }
          if (ct.xZ[i] > 0) {
-            c.xyR[i][n] = v - 1.0E-3;
+            c.xyR[i][n] = v - 0.001;
          }
          if (ct.xZ[i] < 0) {
-            c.xyR[i][n] = v + 1.0E-3;
+            c.xyR[i][n] = v + 0.001;
          }
       }
       for (i = 0; i < n; i++) {
@@ -34849,7 +34849,7 @@ static void testminqpunit_icqptest(bool *err) {
 //      is solved, where B = C*inv(A)*C', d = -(C*inv(A)*b + C*x0)
 //   b) after we got dual solution ys, we calculate primal solution
 //      xs = inv(A)*(C'*ys-b)
-   eps = 1.0E-3;
+   eps = 0.001;
    for (n = 1; n <= 6; n++) {
    // Generate problem
       ae_vector_set_length(&da, n);
@@ -34903,7 +34903,7 @@ static void testminqpunit_icqptest(bool *err) {
       ae_matrix_set_length(&a2, n, n);
       rmatrixtranspose(n, n, &c, 0, 0, &t3, 0, 0);
       for (i = 0; i < n; i++) {
-         v = 1 / sqrt(da.xR[i]);
+         v = 1.0 / sqrt(da.xR[i]);
          ae_v_muld(t3.xyR[i], 1, n, v);
       }
       rmatrixsyrk(n, n, 1.0, &t3, 0, 0, 2, 0.0, &a2, 0, 0, true);
@@ -34959,7 +34959,7 @@ static void testminqpunit_icqptest(bool *err) {
 // * we perform two starts from random different XStart and compare values
 //   of the target function (although final points may be slightly different,
 //   function values should match each other)
-   eps = 1.0E-4;
+   eps = 0.0001;
    for (pass = 1; pass <= 50; pass++) {
    // Generate problem: N, K, A, b, BndL, BndU, CMatrix, x0, x1, XStart.
       n = randominteger(5) + 2;
@@ -35061,7 +35061,7 @@ static void testminqpunit_icqptest(bool *err) {
 //
 // NOTE: TolConstr must be large enough so it won't conflict with
 //       perturbation introduced by v_shift
-   tolconstr = 1.0E-3;
+   tolconstr = 0.001;
    for (n = 2; n <= 5; n++) {
       for (akind = 0; akind <= 4; akind++) {
          for (shiftkind = -5; shiftkind <= 1; shiftkind++) {
@@ -35071,7 +35071,7 @@ static void testminqpunit_icqptest(bool *err) {
                ae_vector_set_length(&b, n);
                ae_vector_set_length(&x, n);
                for (i = 0; i < n; i++) {
-                  b.xR[i] = pow(10.0, (double)bscale) * hqrndnormal(&rs);
+                  b.xR[i] = pow(10.0, bscale) * hqrndnormal(&rs);
                   x.xR[i] = hqrnduniformr(&rs) - 0.5;
                }
                for (i = 0; i < n; i++) {
@@ -35137,15 +35137,15 @@ static void testminqpunit_icqptest(bool *err) {
                   bl.xR[i] = -1.0;
                   bu.xR[i] = 1.0;
                }
-               ccnt = iround(pow(2.0, (double)n));
+               ccnt = iround(pow(2.0, n));
                ae_matrix_set_length(&c, ccnt, n + 1);
                ae_vector_set_length(&ct, ccnt);
                for (i = 0; i < ccnt; i++) {
                   ct.xZ[i] = -1;
                   k = i;
-                  c.xyR[i][n] = sign((double)shiftkind) * pow(10.0, fabs((double)shiftkind)) * machineepsilon;
+                  c.xyR[i][n] = sign(shiftkind) * pow(10.0, fabs(shiftkind)) * machineepsilon;
                   for (j = 0; j < n; j++) {
-                     c.xyR[i][j] = (double)(2 * (k % 2) - 1);
+                     c.xyR[i][j] = 2.0 * (k % 2) - 1.0;
                      c.xyR[i][n] += c.xyR[i][j] * c.xyR[i][j];
                      k /= 2;
                   }
@@ -35183,7 +35183,7 @@ static void testminqpunit_icqptest(bool *err) {
                   vv += sqr(v);
                }
                vv = sqrt(vv);
-               *err = *err || vv > 1.0E-3;
+               *err = *err || vv > 0.001;
             }
          }
       }
@@ -35206,7 +35206,7 @@ static void testminqpunit_icqptest(bool *err) {
 // Inequality constraint is considered active if distance to boundary
 // is less than TolConstr. We use nonnegative least squares solver
 // in order to compute constrained gradient.
-   tolconstr = 1.0E-3;
+   tolconstr = 0.001;
    for (n = 2; n <= 8; n++) {
       for (akind = 0; akind <= 4; akind++) {
          for (bscale = 0; bscale >= -2; bscale--) {
@@ -35215,7 +35215,7 @@ static void testminqpunit_icqptest(bool *err) {
             ae_vector_set_length(&b, n);
             ae_vector_set_length(&x, n);
             for (i = 0; i < n; i++) {
-               b.xR[i] = pow(10.0, (double)bscale) * hqrndnormal(&rs);
+               b.xR[i] = pow(10.0, bscale) * hqrndnormal(&rs);
                x.xR[i] = 0.0;
             }
             isnonconvex = false;
@@ -35367,7 +35367,7 @@ static void testminqpunit_icqptest(bool *err) {
                }
                if (ct.xZ[i] > 0 && v <= tolconstr || ct.xZ[i] < 0 && v >= -tolconstr) {
                   for (j = 0; j < n; j++) {
-                     ce.xyR[j][k] = sign((double)ct.xZ[i]) * c.xyR[i][j];
+                     ce.xyR[j][k] = sign(ct.xZ[i]) * c.xyR[i][j];
                   }
                   nonnegative.xB[k] = true;
                   k++;
@@ -35390,9 +35390,9 @@ static void testminqpunit_icqptest(bool *err) {
             vv = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
             vv = sqrt(vv);
             if (akind == 3 || akind == 4) {
-               *err = *err || vv > 1.0E-2;
+               *err = *err || vv > 0.01;
             } else {
-               *err = *err || vv > 1.0E-3;
+               *err = *err || vv > 0.001;
             }
          }
       }
@@ -35412,7 +35412,7 @@ static void testminqpunit_randomlysplitlc(RMatrix *rawc, ZVector *rawct, ae_int_
    *denseccnt = 0;
 // Split "raw" constraints into dense and sparse parts
    *sparseccnt = hqrnduniformi(rs, rawccnt + 1);
-   *denseccnt = rawccnt - (*sparseccnt);
+   *denseccnt = rawccnt - *sparseccnt;
    if (*sparseccnt > 0) {
       sparsecreate(*sparseccnt, n + 1, 0, sparsec);
       ae_vector_set_length(sparsect, *sparseccnt);
@@ -35978,7 +35978,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                f1 += 0.5 * x1.xR[i] * rawa.xyR[i][j] * x1.xR[j];
             }
          }
-         *errorflag = *errorflag || !NearAtR(f0, f1, 1.0E-3);
+         *errorflag = *errorflag || !NearAtR(f0, f1, 0.001);
       }
    // Inequality constrained convex problem:
    // * N*N diagonal A
@@ -35992,8 +35992,8 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    //
    // NOTE: we make several passes because some specific kind of errors is rarely
    //       caught by this test, so we need several repetitions.
-      xtol = 1.0E-4;
-      gtol = 1.0E-4;
+      xtol = 0.0001;
+      gtol = 0.0001;
       for (n = 2; n <= 6; n++) {
          for (pass = 0; pass <= 4; pass++) {
          // Generate problem: A, b, CMatrix, x0, XStart
@@ -36093,7 +36093,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    // both problems must have same solution.
    // Here we test that boundary constrained and linear inequality constrained
    // solvers give same results.
-      xtol = 1.0E-5;
+      xtol = 0.00001;
       for (n = 1; n <= 6; n++) {
       // Generate problem: A, b, x0, XStart, C, CT
          spdmatrixrndcond(n, pow(10.0, 3 * randomreal()), &a);
@@ -36220,10 +36220,10 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                }
             // Set up tolerances
                if (solvertype == 0) {
-                  tolconstr = 1.0E-8;
+                  tolconstr = 0.00000001;
                } else {
                   if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
-                     tolconstr = 1.0E-3;
+                     tolconstr = 0.001;
                      if (akind == 3) {
                         tolconstr *= 5;
                      }
@@ -36231,13 +36231,13 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                      ae_assert(false, "unexpected solver type");
                   }
                }
-               gtol = 1.0E-4;
+               gtol = 0.0001;
             // Generate A, B and initial point
                ae_matrix_set_length(&a, n, n);
                ae_vector_set_length(&b, n);
                ae_vector_set_length(&xstart, n);
                for (i = 0; i < n; i++) {
-                  b.xR[i] = pow(10.0, (double)bscale) * hqrndnormal(&rs);
+                  b.xR[i] = pow(10.0, bscale) * hqrndnormal(&rs);
                   xstart.xR[i] = 0.0;
                }
                for (i = 0; i < n; i++) {
@@ -36380,7 +36380,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                   }
                   if (rawct.xZ[i] > 0 && v <= tolconstr || rawct.xZ[i] < 0 && v >= -tolconstr) {
                      for (j = 0; j < n; j++) {
-                        ce.xyR[j][k] = sign((double)rawct.xZ[i]) * rawc.xyR[i][j];
+                        ce.xyR[j][k] = sign(rawct.xZ[i]) * rawc.xyR[i][j];
                      }
                      nonnegative.xB[k] = true;
                      k++;
@@ -36430,12 +36430,12 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          for (k = 1; k < n; k++) {
          // Set up tolerances
             if (solvertype == 0) {
-               ftol = 1.0E-5;
-               xtol = 1.0E-5;
+               ftol = 0.00001;
+               xtol = 0.00001;
             } else {
                if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
-                  ftol = 1.0E-3;
-                  xtol = 1.0E-3;
+                  ftol = 0.001;
+                  xtol = 0.001;
                } else {
                   ae_assert(false, "unexpected solver type");
                }
@@ -36459,7 +36459,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                b.xR[i] = randommid();
                bndl.xR[i] = 0.0;
                bndu.xR[i] = 1.0;
-               xstart.xR[i] = (double)randominteger(2);
+               xstart.xR[i] = randominteger(2);
                xorigin.xR[i] = randommid();
             }
             for (i = 0; i < k; i++) {
@@ -36577,7 +36577,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          //   when scale is 2^k, so we use non-zero XTol == 1E-3
          // * DENSE-AUL provides such guarantee, so XTol == 0
             if (solvertype == 0 || solvertype == 2 || solvertype == 3) {
-               xtol = 1.0E-3;
+               xtol = 0.001;
             } else {
                if (solvertype == 1) {
                   xtol = 0.0;
@@ -36657,7 +36657,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          // Randomly choose between dense and sparse versions.
             ae_vector_set_length(&s, n);
             for (i = 0; i < n; i++) {
-               s.xR[i] = pow(2.0, (double)(hqrnduniformi(&rs, 7) - 3));
+               s.xR[i] = pow(2.0, hqrnduniformi(&rs, 7) - 3.0);
             }
             akind = hqrnduniformi(&rs, 2);
             if (akind == 0) {
@@ -36753,7 +36753,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
    //      xs = inv(A)*(C'*ys-b)
       for (n = 1; n <= 6; n++) {
       // Set up tolerances
-         xtol = 1.0E-3;
+         xtol = 0.001;
       // Generate problem
          ae_vector_set_length(&da, n);
          ae_matrix_set_length(&a, n, n);
@@ -36822,7 +36822,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          ae_matrix_set_length(&a2, n, n);
          rmatrixtranspose(n, n, &rawc, 0, 0, &t3, 0, 0);
          for (i = 0; i < n; i++) {
-            v = 1 / sqrt(da.xR[i]);
+            v = 1.0 / sqrt(da.xR[i]);
             ae_v_muld(t3.xyR[i], 1, n, v);
          }
          rmatrixsyrk(n, n, 1.0, &t3, 0, 0, 2, 0.0, &a2, 0, 0, true);
@@ -36878,7 +36878,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       for (n = 1; n <= 6; n++) {
       // Set up tolerances
          if (solvertype == 0) {
-            xtol = 1.0E-5;
+            xtol = 0.00001;
          } else {
             if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
                xtol = 5.0E-3;
@@ -36902,7 +36902,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             x1.xR[i] = randommid();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
-            xstart.xR[i] = (double)randominteger(2);
+            xstart.xR[i] = randominteger(2);
          }
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
@@ -36981,10 +36981,10 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       for (n = 1; n <= 5; n++) {
       // Set up tolerances
          if (solvertype == 0) {
-            xtol = 1.0E-3;
+            xtol = 0.001;
          } else {
             if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
-               xtol = 1.0E-3;
+               xtol = 0.001;
             } else {
                ae_assert(false, "unexpected solver type");
             }
@@ -37082,12 +37082,12 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          for (shiftkind = -5; shiftkind <= 1; shiftkind++) {
          // Set up tolerances
             if (solvertype == 0) {
-               tolconstr = 1.0E-6;
-               gtol = 1.0E-6;
+               tolconstr = 0.000001;
+               gtol = 0.000001;
             } else {
                if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
-                  tolconstr = 1.0E-4;
-                  gtol = 1.0E-4;
+                  tolconstr = 0.0001;
+                  gtol = 0.0001;
                } else {
                   ae_assert(false, "unexpected solver type");
                }
@@ -37113,15 +37113,15 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                bndl.xR[i] = -1.0;
                bndu.xR[i] = 1.0;
             }
-            rawccnt = iround(pow(2.0, (double)n));
+            rawccnt = iround(pow(2.0, n));
             ae_matrix_set_length(&rawc, rawccnt, n + 1);
             ae_vector_set_length(&rawct, rawccnt);
             for (i = 0; i < rawccnt; i++) {
                rawct.xZ[i] = -1;
                k = i;
-               rawc.xyR[i][n] = sign((double)shiftkind) * pow(10.0, fabs((double)shiftkind)) * machineepsilon;
+               rawc.xyR[i][n] = sign(shiftkind) * pow(10.0, fabs(shiftkind)) * machineepsilon;
                for (j = 0; j < n; j++) {
-                  rawc.xyR[i][j] = (double)(2 * (k % 2) - 1);
+                  rawc.xyR[i][j] = 2.0 * (k % 2) - 1.0;
                   rawc.xyR[i][n] += rawc.xyR[i][j] * rawc.xyR[i][j];
                   k /= 2;
                }
@@ -37418,7 +37418,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          // Test function value at the solution
             f0 = testminqpunit_quadratictarget(&a, &b, n, &x1);
             f1 = testminqpunit_quadratictarget(&a, &b, n, &xf);
-            *errorflag = *errorflag || !NearAtR(f0, f1, rmax3(fabs(f0), fabs(f1), 1.0) * 1.0E-3);
+            *errorflag = *errorflag || !NearAtR(f0, f1, rmax3(fabs(f0), fabs(f1), 1.0) * 0.001);
          // Test Lagrange multipliers returned by the solver; test is skipped:
          // * for BLEIC solver
          // * for overconstrained DENSE-AUL
@@ -37443,7 +37443,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                   }
                }
                for (i = 0; i < n; i++) {
-                  *errorflag = *errorflag || !SmallAtR(gtrial.xR[i], 1.0E-3);
+                  *errorflag = *errorflag || !SmallAtR(gtrial.xR[i], 0.001);
                }
             }
          }
@@ -37464,10 +37464,10 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       n = 60;
       rawccnt = 40;
       if (solvertype == 0) {
-         xtol = 1.0E-3;
+         xtol = 0.001;
       } else {
          if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
-            xtol = 1.0E-3;
+            xtol = 0.001;
          } else {
             ae_assert(false, "unexpected solver type");
          }
@@ -37557,10 +37557,10 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       n = 60;
       rawccnt = 40;
       if (solvertype == 0) {
-         xtol = 1.0E-3;
+         xtol = 0.001;
       } else {
          if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
-            xtol = 1.0E-3;
+            xtol = 0.001;
          } else {
             ae_assert(false, "unexpected solver type");
          }
@@ -37627,7 +37627,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       ae_matrix_set_length(&a2, rawccnt, rawccnt);
       rmatrixtranspose(rawccnt, n, &rawc, 0, 0, &t3, 0, 0);
       for (i = 0; i < n; i++) {
-         v = 1 / sqrt(da.xR[i]);
+         v = 1.0 / sqrt(da.xR[i]);
          ae_v_muld(t3.xyR[i], 1, rawccnt, v);
       }
       rmatrixsyrk(rawccnt, n, 1.0, &t3, 0, 0, 2, 0.0, &a2, 0, 0, true);
@@ -37753,7 +37753,7 @@ static bool testminqpunit_specialicqptests() {
    minqpresults(&state, &xend, &rep);
    if (rep.terminationtype > 0) {
       for (i = 0; i <= 2; i++) {
-         waserrors = waserrors || !NearAtR(xend.xR[i], xexact.xR[i], 1.0E6 * machineepsilon);
+         waserrors = waserrors || !NearAtR(xend.xR[i], xexact.xR[i], 1000000.0 * machineepsilon);
       }
    } else {
       waserrors = true;
@@ -37817,7 +37817,7 @@ static bool testminqpunit_specialicqptests() {
    minqpresults(&state, &xend, &rep);
    if (rep.terminationtype > 0) {
       for (i = 0; i <= 2; i++) {
-         waserrors = waserrors || !NearAtR(xend.xR[i], xexact.xR[i], 1.0E6 * machineepsilon);
+         waserrors = waserrors || !NearAtR(xend.xR[i], xexact.xR[i], 1000000.0 * machineepsilon);
       }
    } else {
       waserrors = true;
@@ -37868,7 +37868,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
 // 50% of problems are rescaled wildly (with scale being passed to
 // the solver).
    epsx = 1.0E-12;
-   xtol = 1.0E-7;
+   xtol = 0.0000001;
    for (n = 1; n <= 10; n++) {
       for (scaletype = 0; scaletype <= 1; scaletype++) {
       // Generate random A, b, X0 and XSOL
@@ -37928,7 +37928,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
 // like scaling of variables, just want to test ability to handle
 // zero matrices.
    epsx = 1.0E-12;
-   xtol = 1.0E-7;
+   xtol = 0.0000001;
    for (n = 1; n <= 10; n++) {
    // Generate random A, b, X0 and XSOL
       spdmatrixrndcond(n, pow(10.0, 3.0 * hqrnduniformr(&rs)), &rawa);
@@ -37979,7 +37979,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
 // 50% of problems are rescaled wildly (with scale being passed to
 // the solver).
    epsx = 1.0E-12;
-   xtol = 1.0E-7;
+   xtol = 0.0000001;
    for (n = 1; n <= 10; n++) {
       for (scaletype = 0; scaletype <= 1; scaletype++) {
       // Generate random A, b, X0 and XSOL
@@ -38075,7 +38075,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
 // 50% of problems are rescaled wildly (variable scaling, with scale being
 // passed to the solver).
    epsx = 1.0E-12;
-   xtol = 1.0E-6;
+   xtol = 0.000001;
    for (n = 1; n <= 10; n++) {
       for (scaletype = 0; scaletype <= 1; scaletype++) {
       // Generate random A, b, X0, constraints
@@ -38177,7 +38177,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
 // 50% of problems are rescaled wildly (variable scaling, with scale being
 // passed to the solver).
    epsx = 1.0E-12;
-   xtol = 1.0E-6;
+   xtol = 0.000001;
    for (n = 99; n <= 101; n++) {
       for (scaletype = 0; scaletype <= 1; scaletype++) {
       // Generate random A, b, X0, constraints
@@ -38282,7 +38282,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
 // NOTE: just to make things worse, we rescale variables randomly, but primary
 //       idea of this test is to check for multiplication of A/B
    epsx = 1.0E-12;
-   xtol = 1.0E-6;
+   xtol = 0.000001;
    for (n = 1; n <= 10; n++) {
       for (scaletype = -1; scaletype <= 1; scaletype++) {
       // Generate random A, b, X0, constraints
@@ -38352,7 +38352,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
             }
          }
       // Multiply A/B by some coefficient with wild magnitude
-         v = pow(10.0, (double)(10 * scaletype));
+         v = pow(10.0, 10.0 * scaletype);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                rawa.xyR[i][j] *= v;
@@ -38390,7 +38390,7 @@ static void testminqpunit_denseaultests(bool *errorflag) {
 //       set; starting with zero working set will result in recognition of
 //       problem as unbounded one and premature termination of algorithm.
    epsx = 1.0E-12;
-   xtol = 1.0E-6;
+   xtol = 0.000001;
    for (n = 1; n <= 10; n++) {
    // Generate A, b, X0, constraints
       ae_matrix_set_length(&rawa, n, n);
@@ -38745,7 +38745,7 @@ static void testminqpunit_ipmtests(bool *errorflag) {
          // Test function value at the solution
             f0 = testminqpunit_quadratictarget(&fulla, &b, n, &x1);
             f1 = testminqpunit_quadratictarget(&fulla, &b, n, &xf);
-            *errorflag = *errorflag || !NearAtR(f0, f1, rmax3(fabs(f0), fabs(f1), 1.0) * 1.0E-3);
+            *errorflag = *errorflag || !NearAtR(f0, f1, rmax3(fabs(f0), fabs(f1), 1.0) * 0.001);
          // Test Lagrange multipliers returned by the solver
             ae_vector_set_length(&gtrial, n);
             for (i = 0; i < n; i++) {
@@ -38764,7 +38764,7 @@ static void testminqpunit_ipmtests(bool *errorflag) {
                }
             }
             for (i = 0; i < n; i++) {
-               *errorflag = *errorflag || !SmallAtR(gtrial.xR[i], 1.0E-3);
+               *errorflag = *errorflag || !SmallAtR(gtrial.xR[i], 0.001);
             }
          }
       }
@@ -38773,8 +38773,8 @@ static void testminqpunit_ipmtests(bool *errorflag) {
 // (with high precision). We do not perform any additional "tweaks"
 // like scaling of variables, just want to test ability to handle
 // zero matrices.
-   epsx = 1.0E-8;
-   xtol = 1.0E-5;
+   epsx = 0.00000001;
+   xtol = 0.00001;
    for (n = 1; n <= 10; n++) {
    // Generate random A, b, X0 and XSOL
       spdmatrixrndcond(n, pow(10.0, 3.0 * hqrnduniformr(&rs)), &fulla);
@@ -38852,7 +38852,7 @@ static void testminqpunit_spectests(bool *errorflag) {
 //
 // First test is performed by comparing one step of automatically
 // scaled QP-BLEIC with one step of manually scaled QP-BLEIC.
-   xtol = 1.0E-6;
+   xtol = 0.000001;
    for (n = 1; n <= 10; n++) {
    // Generate random box constrained QP problem with specially
    // crafted diagonal.
@@ -38865,7 +38865,7 @@ static void testminqpunit_spectests(bool *errorflag) {
          for (j = 0; j < n; j++) {
             rawa.xyR[i][j] = hqrndnormal(&rs);
          }
-         rawa.xyR[i][i] = pow(2.0, (double)(hqrnduniformi(&rs, 9) - 4));
+         rawa.xyR[i][i] = pow(2.0, hqrnduniformi(&rs, 9) - 4.0);
          b.xR[i] = hqrndnormal(&rs);
          bndl.xR[i] = -1.0;
          bndu.xR[i] = 1.0;
@@ -38893,7 +38893,7 @@ static void testminqpunit_spectests(bool *errorflag) {
       }
       ae_vector_set_length(&s, n);
       for (i = 0; i < n; i++) {
-         s.xR[i] = 1 / sqrt(rawa.xyR[i][i]);
+         s.xR[i] = 1.0 / sqrt(rawa.xyR[i][i]);
       }
       minqpsetscale(&state, &s);
       minqpoptimize(&state);
@@ -38910,7 +38910,7 @@ static void testminqpunit_spectests(bool *errorflag) {
    // Check that automatic scaling fails for matrices with zero or negative elements
       i = hqrnduniformi(&rs, n);
       j = hqrnduniformi(&rs, 2) - 1;
-      rawa.xyR[i][i] = (double)j;
+      rawa.xyR[i][i] = j;
       testminqpunit_randomlyselectconvertandsetquadraticterm(&rawa, n, &state, &rs);
       minqpsetscaleautodiag(&state);
       minqpoptimize(&state);
@@ -39435,8 +39435,8 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
          epsx = 0.0;
          maxits = 0;
          if (ckind == 0) {
-            epsx = 1.0E-6;
-            eps = 1.0E-4;
+            epsx = 0.000001;
+            eps = 0.0001;
          }
          if (ckind == 1) {
             maxits = 2;
@@ -39610,9 +39610,9 @@ static void testminlmunit_testbc(bool *errorflag) {
             minlmcreatefgh(n, &x, &state);
          }
          if (tmpkind == 1) {
-            minlmcreatev(n, n, &x, 1.0E-5, &state);
+            minlmcreatev(n, n, &x, 0.00001, &state);
          }
-         minlmsetcond(&state, 1.0E-6, 0);
+         minlmsetcond(&state, 0.000001, 0);
          minlmsetbc(&state, &bl, &bu);
          while (minlmiteration(&state)) {
             if (state.needfi) {
@@ -39855,7 +39855,7 @@ static void testminlmunit_testlc(bool *errorflag) {
 // with target. Sampling is performed with respect to inequality
 // constraints.
    epsx = 1.0E-12;
-   xtol = 1.0E-8;
+   xtol = 0.00000001;
    tolf = 1.0E-10;
    for (optkind = 0; optkind <= 1; optkind++) {
       for (n = 5; n <= 20; n++) {
@@ -39975,7 +39975,7 @@ static void testminlmunit_testlc(bool *errorflag) {
 //       roundoff errors from numerical differentiation sometimes
 //       prevent us from converging with good precision.
    epsx = 1.0E-12;
-   xtol = 1.0E-8;
+   xtol = 0.00000001;
    tolf = 1.0E-10;
    optkind = 1;
    for (n = 10; n <= 20; n++) {
@@ -40150,9 +40150,9 @@ static void testminlmunit_testlc(bool *errorflag) {
       }
    // Compare solutions
       for (i = 0; i < n; i++) {
-         *errorflag = *errorflag || !NearAtR(x.xR[i], x12.xR[i], 1.0E-3);
-         *errorflag = *errorflag || !NearAtR(x.xR[i], x12.xR[n + i], 1.0E-3);
-         *errorflag = *errorflag || !NearAtR(x12.xR[i], x12.xR[n + i], 1.0E-6);
+         *errorflag = *errorflag || !NearAtR(x.xR[i], x12.xR[i], 0.001);
+         *errorflag = *errorflag || !NearAtR(x.xR[i], x12.xR[n + i], 0.001);
+         *errorflag = *errorflag || !NearAtR(x12.xR[i], x12.xR[n + i], 0.000001);
       }
    }
    ae_frame_leave();
@@ -40391,7 +40391,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
          for (i = 0; i < n; i++) {
             mx = rmax2(mx, fabs(state.x.xR[i] - 1));
          }
-         if (mx < 1.0E-2) {
+         if (mx < 0.01) {
             i = randominteger(3);
             v = NAN;
             if (i == 1) {
@@ -40416,7 +40416,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
          for (i = 0; i < n; i++) {
             mx = rmax2(mx, fabs(state.x.xR[i] - 1));
          }
-         if (mx < 1.0E-2) {
+         if (mx < 0.01) {
             i = randominteger(3);
             v = NAN;
             if (i == 1) {
@@ -40471,8 +40471,8 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
    for (i = 0; i < n; i++) {
       x0.xR[i] = 1.0 + 0.1 * i;
    }
-   spdmatrixrndcond(n, 1.0E3, &a);
-   spdmatrixrndcond(n, 1.0E3, &a1);
+   spdmatrixrndcond(n, 1000.0, &a);
+   spdmatrixrndcond(n, 1000.0, &a1);
    minlmcreatevj(n, 1, &x0, &state);
    minlmsetcond(&state, 1.0E-9, 10);
    while (minlmiteration(&state))
@@ -40538,8 +40538,8 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
                   bndu.xR[i] = x0.xR[i];
                }
             }
-            spdmatrixrndcond(n, 1.0E3, &a);
-            spdmatrixrndcond(n, 1.0E3, &a1);
+            spdmatrixrndcond(n, 1000.0, &a);
+            spdmatrixrndcond(n, 1000.0, &a1);
             minlmcreatevj(n, 2, &x0, &state);
             minlmoptguardgradient(&state, diffstep);
             minlmsetcond(&state, 1.0E-9, 10);
@@ -40866,7 +40866,7 @@ static void testother(bool *err) {
    // Test differentiation vs. analytic gradient
    // (first one issues NeedF requests, second one issues NeedFG requests)
       n = 50;
-      diffstep = 1.0E-6;
+      diffstep = 0.000001;
       for (dkind = 0; dkind <= 1; dkind++) {
          ae_vector_set_length(&x, n);
          ae_vector_set_length(&xlast, n);
@@ -40914,11 +40914,11 @@ static void testother(bool *err) {
    // optimizer evaluates function at +-DiffStep*S only.
       ae_vector_set_length(&x, 1);
       ae_vector_set_length(&s, 1);
-      diffstep = randomreal() * 1.0E-6;
-      s.xR[0] = exp(randomreal() * 4 - 2);
+      diffstep = randomreal() * 0.000001;
+      s.xR[0] = exp(2.0 * randommid());
       x.xR[0] = 0.0;
       mincgcreatef(1, &x, diffstep, &state);
-      mincgsetcond(&state, 1.0E-6, 0.0, 0.0, 0);
+      mincgsetcond(&state, 0.000001, 0.0, 0.0, 0);
       mincgsetscale(&state, &s);
       v = 0.0;
       while (mincgiteration(&state)) {
@@ -41054,15 +41054,15 @@ static void testother(bool *err) {
    //     f(x) = {
    //            { M, if x <= -0.999999 or x >= 0.999999
    //
-   // where c is either 1.0 or 1.0E+6, M is either 1.0E8, 1.0E20 or +INF
+   // where c is either 1.0 or 1000000.0, M is either 100000000.0, 1.0E20 or +INF
    // (we try different combinations)
       for (ckind = 0; ckind <= 1; ckind++) {
          for (mkind = 0; mkind <= 2; mkind++) {
          // Choose c and M
             vc = 1.0;
-            vm = 1.0E+8;
+            vm = 100000000.0;
             if (ckind == 1) {
-               vc = 1.0E+6;
+               vc = 1000000.0;
             }
             if (mkind == 1) {
                vm = 1.0E+20;
@@ -41071,7 +41071,7 @@ static void testother(bool *err) {
                vm = +INFINITY;
             }
          // Create optimizer, solve optimization problem
-            epsg = 1.0E-6 * vc;
+            epsg = 0.000001 * vc;
             ae_vector_set_length(&x, 1);
             x.xR[0] = 0.0;
             mincgcreate(1, &x, &state);
@@ -41080,8 +41080,8 @@ static void testother(bool *err) {
             while (mincgiteration(&state))
                if (state.needfg) {
                   if (-0.999999 < state.x.xR[0] && state.x.xR[0] < 0.999999) {
-                     state.f = 1 / (1 - state.x.xR[0]) + 1 / (1 + state.x.xR[0]) + vc * state.x.xR[0];
-                     state.g.xR[0] = 1 / sqr(1 - state.x.xR[0]) - 1 / sqr(1 + state.x.xR[0]) + vc;
+                     state.f = 1.0 / (1.0 - state.x.xR[0]) + 1.0 / (1.0 + state.x.xR[0]) + vc * state.x.xR[0];
+                     state.g.xR[0] = 1.0 / sqr(1.0 - state.x.xR[0]) - 1.0 / sqr(1.0 + state.x.xR[0]) + vc;
                   } else {
                      state.f = vm;
                   }
@@ -41122,7 +41122,7 @@ static void testother(bool *err) {
          spoilvar = -1;
          spoilval = NAN;
       }
-      spdmatrixrndcond(n, 1.0E5, &fulla);
+      spdmatrixrndcond(n, 100000.0, &fulla);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&x0, n);
       for (i = 0; i < n; i++) {
@@ -41273,10 +41273,10 @@ static void testmincgunit_calciip2(mincgstate *state, ae_int_t n) {
    }
    for (i = 0; i < n; i++) {
       if (state->needf || state->needfg) {
-         state->f += sqr((double)(i * i + 1)) * sqr(state->x.xR[i]);
+         state->f += sqr(i * i + 1.0) * sqr(state->x.xR[i]);
       }
       if (state->needfg) {
-         state->g.xR[i] = sqr((double)(i * i + 1)) * 2 * state->x.xR[i];
+         state->g.xR[i] = sqr(i * i + 1.0) * 2 * state->x.xR[i];
       }
    }
 }
@@ -41371,7 +41371,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
       // Test it with perturbed diagonal preconditioner
          ae_vector_set_length(&diagh, n);
          for (i = 0; i < n; i++) {
-            diagh.xR[i] = 2 * sqr((double)(i * i + 1)) * (0.8 + 0.4 * randomreal());
+            diagh.xR[i] = 2 * sqr(i * i + 1.0) * (0.8 + 0.4 * randomreal());
          }
          mincgsetprecdiag(&state, &diagh);
          cntg1 = 0;
@@ -41464,7 +41464,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
          mincgcreate(n, &x, &state);
          ae_vector_set_length(&s, n);
          for (i = 0; i < n; i++) {
-            s.xR[i] = 1 / sqrt(2 * pow((double)(i * i + 1), 2.0) * (0.8 + 0.4 * randomreal()));
+            s.xR[i] = 1.0 / sqrt(2.0 * pow(i * i + 1.0, 2.0) * (0.8 + 0.4 * randomreal()));
          }
          mincgsetprecdefault(&state);
          mincgsetscale(&state, &s);
@@ -41540,7 +41540,7 @@ static void testmincgunit_testoptguardc1test0reportfortask0(bool *err, optguardn
             }
             v += fabs(vv);
          }
-         *err = *err || !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
+         *err = *err || !NearAtR(v, rep->f.xR[k], 0.000001 * rmax2(fabs(v), 1.0));
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -41615,10 +41615,10 @@ static void testmincgunit_testoptguardc1test1reportfortask0(bool *err, optguardn
                vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
             v += sign(vv) * a->xyR[i][rep->vidx];
-            tooclose = tooclose || SmallR(vv, 1.0E-4);
+            tooclose = tooclose || SmallR(vv, 0.0001);
          }
          if (!tooclose) {
-            *err = *err || !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
+            *err = *err || !NearAtR(v, rep->g.xR[k], 0.000001 * rmax2(fabs(v), 1.0));
          }
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
@@ -41631,7 +41631,7 @@ static void testmincgunit_testoptguardc1test1reportfortask0(bool *err, optguardn
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = tooclose || SmallR(va, 1.0E-8) || SmallR(vb, 1.0E-8);
+         tooclose = tooclose || SmallR(va, 0.00000001) || SmallR(vb, 0.00000001);
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -41704,8 +41704,8 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
    for (i = 0; i < n; i++) {
       x0.xR[i] = 1.0 + 0.1 * i;
    }
-   spdmatrixrndcond(n, 1.0E3, &a);
-   spdmatrixrndcond(n, 1.0E3, &a1);
+   spdmatrixrndcond(n, 1000.0, &a);
+   spdmatrixrndcond(n, 1000.0, &a1);
    mincgcreate(n, &x0, &state);
    mincgsetcond(&state, 0.0, 0.0, 1.0E-9, 10);
    while (mincgiteration(&state))
@@ -41770,7 +41770,7 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
                v += state.x.xR[j] * a.xyR[i][j];
             }
             state.f += fabs(v);
-            v = (double)sign(v);
+            v = sign(v);
             for (j = 0; j < n; j++) {
                state.g.xR[j] += v * a.xyR[i][j];
             }
@@ -41808,8 +41808,8 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
             s.xR[i] = pow(10.0, skind * 15.0 * hqrndmiduniformr(&rs));
             x0.xR[i] = (1.0 + 0.1 * i) * s.xR[i];
          }
-         spdmatrixrndcond(n, 1.0E3, &a);
-         spdmatrixrndcond(n, 1.0E3, &a1);
+         spdmatrixrndcond(n, 1000.0, &a);
+         spdmatrixrndcond(n, 1000.0, &a1);
          mincgcreate(n, &x0, &state);
          mincgoptguardgradient(&state, diffstep);
          mincgsetcond(&state, 0.0, 0.0, 1.0E-9, 10);
@@ -41955,7 +41955,7 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
                   v += state.x.xR[j] * a.xyR[i][j];
                }
                state.f += fabs(v);
-               v = (double)sign(v);
+               v = sign(v);
                for (j = 0; j < n; j++) {
                   state.g.xR[j] += v * a.xyR[i][j];
                }
@@ -42105,7 +42105,7 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
 // * upper limit on iterations count, MaxIts == 25
 // We simply test that OptGuard does not return error code.
    n = 100;
-   spdmatrixrndcond(n, 1.0E2, &a);
+   spdmatrixrndcond(n, 100.0, &a);
    ae_vector_set_length(&b, n);
    ae_vector_set_length(&x0, n);
    for (i = 0; i < n; i++) {
@@ -42182,9 +42182,9 @@ bool testmincg() {
    for (difftype = 0; difftype <= 1; difftype++) {
       for (cgtype = -1; cgtype <= 1; cgtype++) {
       // Reference problem
-         ae_vector_set_length(&x, 2 + 1);
+         ae_vector_set_length(&x, 3);
          n = 3;
-         diffstep = 1.0E-6;
+         diffstep = 0.000001;
          x.xR[0] = 50.0 * randommid();
          x.xR[1] = 50.0 * randommid();
          x.xR[2] = 50.0 * randommid();
@@ -42214,7 +42214,7 @@ bool testmincg() {
       // NOTE: step is bounded from above to avoid premature convergence
          ae_vector_set_length(&x, 3);
          n = 3;
-         diffstep = 1.0E-6;
+         diffstep = 0.000001;
          x.xR[0] = 10 + 10 * randomreal();
          x.xR[1] = 10 + 10 * randomreal();
          x.xR[2] = 10 + 10 * randomreal();
@@ -42241,9 +42241,9 @@ bool testmincg() {
          mincgresults(&state, &x, &rep);
          restartserror = restartserror || rep.terminationtype <= 0 || !NearAtR(x.xR[0], log(2.0), 0.01) || !SmallAtR(x.xR[1], 0.01) || !NearAtR(x.xR[2], log(2.0), 0.01);
       // 1D problem #1
-         ae_vector_set_length(&x, 0 + 1);
+         ae_vector_set_length(&x, 1);
          n = 1;
-         diffstep = 1.0E-6;
+         diffstep = 0.000001;
          x.xR[0] = 50.0 * randommid();
          if (difftype == 0) {
             mincgcreate(n, &x, &state);
@@ -42263,9 +42263,9 @@ bool testmincg() {
          mincgresults(&state, &x, &rep);
          linerror1 = linerror1 || rep.terminationtype <= 0 || !NearAtR(x.xR[0] / pi, round(x.xR[0] / pi), 0.001);
       // 1D problem #2
-         ae_vector_set_length(&x, 0 + 1);
+         ae_vector_set_length(&x, 1);
          n = 1;
-         diffstep = 1.0E-6;
+         diffstep = 0.000001;
          x.xR[0] = 50.0 * randommid();
          if (difftype == 0) {
             mincgcreate(n, &x, &state);
@@ -42285,7 +42285,7 @@ bool testmincg() {
          mincgresults(&state, &x, &rep);
          linerror2 = linerror2 || rep.terminationtype <= 0 || !SmallAtR(x.xR[0], 0.001);
       // Linear equations
-         diffstep = 1.0E-6;
+         diffstep = 0.000001;
          for (n = 1; n <= 10; n++) {
          // Prepare task
             ae_matrix_set_length(&a, n, n);
@@ -42344,7 +42344,7 @@ bool testmincg() {
             }
          }
       // Testing convergence properties
-         diffstep = 1.0E-6;
+         diffstep = 0.000001;
          n = 3;
          ae_vector_set_length(&x, n);
          for (i = 0; i < n; i++) {
@@ -42625,9 +42625,9 @@ static void testminlpunit_basictests(bool *err) {
    NewVector(au, 0, DT_REAL);
    NewMatrix(a, 0, 0, DT_REAL);
    NewObj(hqrndstate, rs);
-   primtol = 1.0E-4;
-   dualtol = 1.0E-4;
-   slacktol = 1.0E-4;
+   primtol = 0.0001;
+   dualtol = 0.0001;
+   slacktol = 0.0001;
    hqrndrandomize(&rs);
 // Test default state of the solver
    for (pass = 1; pass <= 5; pass++) {
@@ -42854,8 +42854,8 @@ static void testminlpunit_basictests(bool *err) {
          for (j = 0; j < n; j++) {
             a.xyR[i][j] = hqrndmiduniformr(&rs);
          }
-         al.xR[i] = (double)(-2 * n);
-         au.xR[i] = (double)(2 * n);
+         al.xR[i] = -2.0 * n;
+         au.xR[i] = +2.0 * n;
       }
       minlpcreate(n, &state);
       testminlpunit_selectsolver(&state, solvertype);
@@ -43175,7 +43175,7 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
       }
       kk = 1 + hqrnduniformi(rs, *m);
       for (k = 0; k < kk; k++) {
-         i = hqrnduniformi(rs, n + (*m));
+         i = hqrnduniformi(rs, n + *m);
          if (i < n) {
             kt = hqrnduniformi(rs, 3);
             if (kt == 0) {
@@ -43663,11 +43663,11 @@ static void testminlpunit_singlecalltests(bool *err) {
    NewVector(x0, 0, DT_REAL);
    NewVector(x1, 0, DT_REAL);
    NewObj(hqrndstate, rs);
-   primtol = 1.0E-3;
-   dualtol = 1.0E-3;
-   slacktol = 1.0E-3;
-   etol = 1.0E-8;
-   ftol = 1.0E-3;
+   primtol = 0.001;
+   dualtol = 0.001;
+   slacktol = 0.001;
+   etol = 0.00000001;
+   ftol = 0.001;
    hqrndrandomize(&rs);
 // Try different feasible problems
    for (n = 1; n <= 50; n++) {
@@ -43734,7 +43734,7 @@ static void testminlpunit_singlecalltests(bool *err) {
          ae_vector_set_length(&bndls, n);
          ae_vector_set_length(&bndus, n);
          for (i = 0; i < n; i++) {
-            s.xR[i] = pow(2.0, (double)(hqrnduniformi(&rs, 21) - 10));
+            s.xR[i] = pow(2.0, hqrnduniformi(&rs, 21) - 10.0);
             cs.xR[i] = c.xR[i] / s.xR[i];
             bndls.xR[i] = bndl.xR[i] * s.xR[i];
             bndus.xR[i] = bndu.xR[i] * s.xR[i];
@@ -44086,7 +44086,7 @@ static void testminnlcunit_testbc(bool *wereerrors) {
          for (pass = 1; pass <= 10; pass++) {
             for (prectype = 0; prectype <= 2; prectype++) {
             // Generate well-conditioned problem with unit scale
-               spdmatrixrndcond(n, 1.0E2, &fulla);
+               spdmatrixrndcond(n, 100.0, &fulla);
                ae_vector_set_length(&b, n);
                ae_vector_set_length(&bndl, n);
                ae_vector_set_length(&bndu, n);
@@ -44160,7 +44160,7 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                   minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
                }
                minnlcsetbc(&state, &bndl, &bndu);
-               minnlcsetcond(&state, 1.0E-7, 0);
+               minnlcsetcond(&state, 0.0000001, 0);
                while (minnlciteration(&state))
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
@@ -44283,7 +44283,7 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                   minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
                }
                minnlcsetbc(&state, &bndl, &bndu);
-               minnlcsetcond(&state, 1.0E-7, 0);
+               minnlcsetcond(&state, 0.0000001, 0);
                while (minnlciteration(&state))
                   if (state.needfij) {
                      state.fi.xR[0] = 0.0;
@@ -44461,7 +44461,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             // Create optimizer, solve
                minnlccreate(n, &xstart, &state);
                minnlcsetscale(&state, &s);
-               minnlcsetcond(&state, 1.0E-7, 0);
+               minnlcsetcond(&state, 0.0000001, 0);
                minnlcsetlc(&state, &c, &ct, k);
                if (solvertype == 0) {
                   minnlcsetalgoaul(&state, rho, aulits);
@@ -44542,7 +44542,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
       for (n = 2; n <= 6; n++) {
          for (pass = 0; pass <= 4; pass++) {
          // Generate problem: A, b, CMatrix, x0, XStart
-            spdmatrixrndcond(n, 1.0E2, &fulla);
+            spdmatrixrndcond(n, 100.0, &fulla);
             ae_vector_set_length(&b, n);
             ae_vector_set_length(&xm, n);
             ae_vector_set_length(&xstart, n);
@@ -44685,7 +44685,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          for (k = 1; k < n; k++) {
          // Generate problem: A, b, CMatrix, x0, XStart
             rmatrixrndorthogonal(n, &q);
-            spdmatrixrndcond(n, 1.0E2, &fulla);
+            spdmatrixrndcond(n, 100.0, &fulla);
             ae_vector_set_length(&b, n);
             ae_vector_set_length(&x0, n);
             ae_vector_set_length(&xm, n);
@@ -44722,7 +44722,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                   }
                }
             }
-            minnlcsetcond(&state, 1.0E-7, 0);
+            minnlcsetcond(&state, 0.0000001, 0);
             minnlcsetlc(&state, &c, &ct, k);
             if (hqrndnormal(&rs) > 0.0) {
                minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
@@ -44793,7 +44793,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
       aulits = 50;
       for (n = 1; n <= 6; n++) {
       // Generate problem: A, b, x0, XStart, C, CT
-         spdmatrixrndcond(n, 1.0E2, &fulla);
+         spdmatrixrndcond(n, 100.0, &fulla);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&xm, n);
          ae_vector_set_length(&x0, n);
@@ -44928,7 +44928,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
       for (n = 1; n <= 6; n++) {
       // Generate problem: A, b, BndL, BndU, CMatrix, x0, xm, XStart
          k = 2 * n;
-         spdmatrixrndcond(n, 1.0E2, &fulla);
+         spdmatrixrndcond(n, 100.0, &fulla);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&bndl, n);
          ae_vector_set_length(&bndu, n);
@@ -44942,7 +44942,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             xm.xR[i] = randommid();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
-            xstart.xR[i] = (double)randominteger(2);
+            xstart.xR[i] = randominteger(2);
          }
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
@@ -44970,7 +44970,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                }
             }
          }
-         minnlcsetcond(&state, 1.0E-7, 0);
+         minnlcsetcond(&state, 0.0000001, 0);
          minnlcsetlc(&state, &c, &ct, k);
          if (hqrndnormal(&rs) > 0.0) {
             minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
@@ -45024,7 +45024,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
       for (n = 1; n <= 6; n++) {
       // Generate problem: A, b, BndL, BndU, CMatrix, xm, x1, XStart
          k = 2 * n;
-         spdmatrixrndcond(n, 1.0E2, &fulla);
+         spdmatrixrndcond(n, 100.0, &fulla);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&bndl, n);
          ae_vector_set_length(&bndu, n);
@@ -45036,7 +45036,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             xm.xR[i] = 0.1 + 0.8 * randomreal();
             bndl.xR[i] = 0.0;
             bndu.xR[i] = 1.0;
-            x0.xR[i] = (double)randominteger(2);
+            x0.xR[i] = randominteger(2);
             b.xR[i] = randommid();
          }
          for (i = 0; i < n / 2; i++) {
@@ -45051,7 +45051,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          for (i = n / 2; i < k; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               c.xyR[i][j] = hqrndnormal(&rs) / sqrt((double)n);
+               c.xyR[i][j] = hqrndnormal(&rs) / sqrt(n);
                v += c.xyR[i][j] * xm.xR[j];
             }
             c.xyR[i][n] = v;
@@ -45082,7 +45082,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          }
          minnlcsetbc(&state, &bndl, &bndu);
          minnlcsetlc(&state, &c, &ct, k);
-         minnlcsetcond(&state, 1.0E-7, 0);
+         minnlcsetcond(&state, 0.0000001, 0);
          if (hqrndnormal(&rs) > 0.0) {
             minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
          }
@@ -45147,7 +45147,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
       // Generate problem: N, K, A, b, BndL, BndU, CMatrix, x0, xm, XStart.
          n = randominteger(5) + 2;
          k = 1 + randominteger(n - 1);
-         spdmatrixrndcond(n, 1.0E2, &fulla);
+         spdmatrixrndcond(n, 100.0, &fulla);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&bndl, n);
          ae_vector_set_length(&bndu, n);
@@ -45188,7 +45188,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                }
             }
          }
-         minnlcsetcond(&state, 1.0E-7, 0);
+         minnlcsetcond(&state, 0.0000001, 0);
          minnlcsetbc(&state, &bndl, &bndu);
          minnlcsetlc(&state, &c, &ct, k);
          if (hqrndnormal(&rs) > 0.0) {
@@ -45276,7 +45276,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
    //
    // NOTE: because AUL algorithm is less exact than its active set counterparts,
    //       VERY loose tolerances are used for this test.
-      tolconstr = 1.0E-2;
+      tolconstr = 0.01;
       for (n = 2; n <= 6; n++) {
          for (akind = 0; akind <= 3; akind++) {
          // Choose random parameters
@@ -45287,7 +45287,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             ae_vector_set_length(&b, n);
             ae_vector_set_length(&x, n);
             for (i = 0; i < n; i++) {
-               b.xR[i] = pow(10.0, (double)bscale) * hqrndnormal(&rs);
+               b.xR[i] = pow(10.0, bscale) * hqrndnormal(&rs);
                x.xR[i] = hqrnduniformr(&rs) - 0.5;
             }
             for (i = 0; i < n; i++) {
@@ -45331,15 +45331,15 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                bl.xR[i] = -1.0;
                bu.xR[i] = 1.0;
             }
-            ccnt = iround(pow(2.0, (double)n));
+            ccnt = iround(pow(2.0, n));
             ae_matrix_set_length(&c, ccnt, n + 1);
             ae_vector_set_length(&ct, ccnt);
             for (i = 0; i < ccnt; i++) {
                ct.xZ[i] = -1;
                k = i;
-               c.xyR[i][n] = sign((double)shiftkind) * pow(10.0, fabs((double)shiftkind)) * machineepsilon;
+               c.xyR[i][n] = sign(shiftkind) * pow(10.0, fabs(shiftkind)) * machineepsilon;
                for (j = 0; j < n; j++) {
-                  c.xyR[i][j] = (double)(2 * (k % 2) - 1);
+                  c.xyR[i][j] = 2.0 * (k % 2) - 1.0;
                   c.xyR[i][n] += c.xyR[i][j] * c.xyR[i][j];
                   k /= 2;
                }
@@ -45404,7 +45404,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                vv += sqr(v);
             }
             vv = sqrt(vv / (gnrm2 + 1.0));
-            *wereerrors = *wereerrors || vv > 1.0E-2;
+            *wereerrors = *wereerrors || vv > 0.01;
          }
       }
    // Linear/convex optimization problem with combination of
@@ -45424,7 +45424,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
    // Inequality constraint is considered active if distance to boundary
    // is less than TolConstr. We use nonnegative least squares solver
    // in order to compute constrained gradient.
-      tolconstr = 1.0E-2;
+      tolconstr = 0.01;
       for (n = 2; n <= 8; n++) {
          for (akind = 0; akind <= 1; akind++) {
             for (bscale = 0; bscale >= -2; bscale--) {
@@ -45433,7 +45433,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                ae_vector_set_length(&b, n);
                ae_vector_set_length(&x, n);
                for (i = 0; i < n; i++) {
-                  b.xR[i] = pow(10.0, (double)bscale) * hqrndnormal(&rs);
+                  b.xR[i] = pow(10.0, bscale) * hqrndnormal(&rs);
                   x.xR[i] = 0.0;
                }
                for (i = 0; i < n; i++) {
@@ -45496,7 +45496,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                minnlccreate(n, &x, &state);
                minnlcsetbc(&state, &bl, &bu);
                minnlcsetlc(&state, &c, &ct, ccnt);
-               minnlcsetcond(&state, 1.0E-7, 0);
+               minnlcsetcond(&state, 0.0000001, 0);
                if (solvertype == 0) {
                   minnlcsetalgoaul(&state, 1000.0, 10);
                } else {
@@ -45593,7 +45593,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                   }
                   if (ct.xZ[i] > 0 && v <= tolconstr || ct.xZ[i] < 0 && v >= -tolconstr) {
                      for (j = 0; j < n; j++) {
-                        ce.xyR[j][k] = sign((double)ct.xZ[i]) * c.xyR[i][j];
+                        ce.xyR[j][k] = sign(ct.xZ[i]) * c.xyR[i][j];
                      }
                      nonnegative.xB[k] = true;
                      k++;
@@ -45615,7 +45615,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                }
                vv = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
                vv = sqrt(vv);
-               *wereerrors = *wereerrors || vv > 1.0E-3;
+               *wereerrors = *wereerrors || vv > 0.001;
             }
          }
       }
@@ -45700,7 +45700,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
             }
          }
       }
-      minnlcsetcond(&state, 1.0E-7, 0);
+      minnlcsetcond(&state, 0.0000001, 0);
       minnlcsetnlc(&state, 0, 1);
       while (minnlciteration(&state))
          if (state.needfij) {
@@ -45757,7 +45757,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
       for (n = 1; n <= 10; n++) {
          for (pass = 1; pass <= 10; pass++) {
          // Generate well-conditioned problem with unit scale
-            spdmatrixrndcond(n, 1.0E2, &fulla);
+            spdmatrixrndcond(n, 100.0, &fulla);
             ae_vector_set_length(&b, n);
             ae_vector_set_length(&bndl, n);
             ae_vector_set_length(&bndu, n);
@@ -45813,7 +45813,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
             }
             minnlcsetscale(&state, &s);
             minnlcsetnlc(&state, cntnlec, 2 * cntnlic);
-            minnlcsetcond(&state, 1.0E-7, 0);
+            minnlcsetcond(&state, 0.0000001, 0);
             if (hqrndnormal(&rs) > 0.0) {
                minnlcoptguardsmoothness(&state, hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel + 1));
             }
@@ -45837,15 +45837,15 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                // Equality constraints
                   for (i = 0; i < cntnlec; i++) {
                      state.fi.xR[1 + i] = (state.x.xR[i] - bndl.xR[i]) / s.xR[i];
-                     state.j.xyR[1 + i][i] = 1 / s.xR[i];
+                     state.j.xyR[1 + i][i] = 1.0 / s.xR[i];
                   }
                // Inequality constraints
                   for (i = 0; i < cntnlic; i++) {
                      k = cntnlec + i;
                      state.fi.xR[1 + cntnlec + 2 * i] = (bndl.xR[k] - state.x.xR[k]) / s.xR[k];
-                     state.j.xyR[1 + cntnlec + 2 * i][k] = -1 / s.xR[k];
+                     state.j.xyR[1 + cntnlec + 2 * i][k] = -1.0 / s.xR[k];
                      state.fi.xR[1 + cntnlec + 2 * i + 1] = (state.x.xR[k] - bndu.xR[k]) / s.xR[k];
-                     state.j.xyR[1 + cntnlec + 2 * i + 1][k] = 1 / s.xR[k];
+                     state.j.xyR[1 + cntnlec + 2 * i + 1][k] = 1.0 / s.xR[k];
                   }
                } else ae_assert(false, "Assertion failed");
             minnlcresults(&state, &x1, &rep);
@@ -45911,7 +45911,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
       for (pass = 1; pass <= 5; pass++) {
          for (prectype = 1; prectype <= 2; prectype++) {
          // Generate well-conditioned problem with unit scale
-            spdmatrixrndcond(n, 1.0E2, &fulla);
+            spdmatrixrndcond(n, 100.0, &fulla);
             ae_vector_set_length(&b, n);
             ae_vector_set_length(&bndl, n);
             ae_vector_set_length(&bndu, n);
@@ -46001,7 +46001,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
             minnlccreate(n, &x0, &state);
             if (solvertype == 0) {
                minnlcsetalgoaul(&state, rho, aulits);
-               minnlcsetcond(&state, 1.0E-7, 0);
+               minnlcsetcond(&state, 0.0000001, 0);
                if (prectype == 0) {
                   minnlcsetprecinexact(&state);
                }
@@ -46014,11 +46014,11 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
             } else {
                if (solvertype == 1) {
                   minnlcsetalgoslp(&state);
-                  minnlcsetcond(&state, 1.0E-6, 0);
+                  minnlcsetcond(&state, 0.000001, 0);
                } else {
                   if (solvertype == 2) {
                      minnlcsetalgosqp(&state);
-                     minnlcsetcond(&state, 1.0E-6, 0);
+                     minnlcsetcond(&state, 0.000001, 0);
                   } else {
                      ae_assert(false, "Assertion failed");
                   }
@@ -46322,9 +46322,9 @@ static void testminnlcunit_testother(bool *wereerrors) {
    NewVector(ct, 0, DT_INT);
    hqrndrandomize(&rs);
 // Test equality penalty function (correctly calculated and smooth)
-   h = 1.0E-4;
+   h = 0.0001;
    v = -0.98;
-   dtol = 1.0E-3;
+   dtol = 0.001;
    while (v <= 0.98) {
    // Test numerical derivative; this test also checks continuity of the
    // function
@@ -46344,9 +46344,9 @@ static void testminnlcunit_testother(bool *wereerrors) {
    *wereerrors = *wereerrors || f0 != 0.0;
    *wereerrors = *wereerrors || df != 0.0;
 // Test inequality penalty function (correctly calculated and smooth)
-   h = 1.0E-4;
+   h = 0.0001;
    v = 0.02;
-   dtol = 1.0E-3;
+   dtol = 0.001;
    while (v <= 2.00) {
    // Test numerical derivative; this test also checks continuity of the
    // function
@@ -46363,8 +46363,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
       v += h;
    }
    minnlcinequalityshiftfunction(1.0, &f0, &df, &d2f);
-   *wereerrors = *wereerrors || !SmallAtR(f0, 1.0E-6);
-   *wereerrors = *wereerrors || !NearAtR(df, -1.0, 1.0E-6);
+   *wereerrors = *wereerrors || !SmallAtR(f0, 0.000001);
+   *wereerrors = *wereerrors || !NearAtR(df, -1.0, 0.000001);
 // Test different properties shared by all solvers
    for (solvertype = 0; solvertype <= testminnlcunit_maxsolvertype; solvertype++) {
    // Test location reports
@@ -46392,7 +46392,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             }
          }
       }
-      minnlcsetcond(&state, 1.0E-7, 0);
+      minnlcsetcond(&state, 0.0000001, 0);
       minnlcsetnlc(&state, 0, 1);
       minnlcsetxrep(&state, true);
       while (minnlciteration(&state))
@@ -46406,8 +46406,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
          } else if (state.xupdated) {
          // If first point reported, compare with initial one
             if (firstrep) {
-               *wereerrors = *wereerrors || !NearAtR(state.x.xR[0], x0.xR[0], 1.0E4 * machineepsilon);
-               *wereerrors = *wereerrors || !NearAtR(state.x.xR[1], x0.xR[1], 1.0E4 * machineepsilon);
+               *wereerrors = *wereerrors || !NearAtR(state.x.xR[0], x0.xR[0], 10000.0 * machineepsilon);
+               *wereerrors = *wereerrors || !NearAtR(state.x.xR[1], x0.xR[1], 10000.0 * machineepsilon);
             }
             firstrep = false;
          // Save last point
@@ -46421,8 +46421,8 @@ static void testminnlcunit_testother(bool *wereerrors) {
          ae_frame_leave();
          return;
       }
-      *wereerrors = *wereerrors || !NearAtR(x1.xR[0], xlast.xR[0], 1.0E4 * machineepsilon);
-      *wereerrors = *wereerrors || !NearAtR(x1.xR[1], xlast.xR[1], 1.0E4 * machineepsilon);
+      *wereerrors = *wereerrors || !NearAtR(x1.xR[0], xlast.xR[0], 10000.0 * machineepsilon);
+      *wereerrors = *wereerrors || !NearAtR(x1.xR[1], xlast.xR[1], 10000.0 * machineepsilon);
    // Test numerical differentiation
       aulits = 50;
       rho = 200.0;
@@ -46446,7 +46446,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             }
          }
       }
-      minnlcsetcond(&state, 1.0E-7, 0);
+      minnlcsetcond(&state, 0.0000001, 0);
       minnlcsetnlc(&state, 0, 1);
       while (minnlciteration(&state))
          if (state.needfi) {
@@ -46488,7 +46488,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             spoilvar = -1;
             spoilval = NAN;
          }
-         spdmatrixrndcond(n, 1.0E5, &fulla);
+         spdmatrixrndcond(n, 100000.0, &fulla);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&x0, n);
          for (i = 0; i < n; i++) {
@@ -46498,7 +46498,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
          minnlccreate(n, &x0, &state);
          if (solvertype == 0) {
             aulits = 5;
-            rho = 1.0E3;
+            rho = 1000.0;
             minnlcsetalgoaul(&state, rho, aulits);
          } else {
             if (solvertype == 1) {
@@ -46547,7 +46547,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
    //       does not provide such guarantee
       if (solvertype != 0) {
          n = 10;
-         spdmatrixrndcond(n, 1.0E3, &fulla);
+         spdmatrixrndcond(n, 1000.0, &fulla);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&bndl, n);
          ae_vector_set_length(&bndu, n);
@@ -46575,7 +46575,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             }
          }
          minnlcsetbc(&state, &bndl, &bndu);
-         minnlcsetcond(&state, 1.0E-8, 0);
+         minnlcsetcond(&state, 0.00000001, 0);
          while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
@@ -46593,7 +46593,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
          minnlcresults(&state, &x1, &rep);
          *wereerrors = *wereerrors || rep.terminationtype <= 0;
       // Check numerical Jacobian
-         minnlccreatef(n, &x0, 1.0E-4, &state);
+         minnlccreatef(n, &x0, 0.0001, &state);
          if (solvertype == 1) {
             minnlcsetalgoslp(&state);
          } else {
@@ -46604,7 +46604,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             }
          }
          minnlcsetbc(&state, &bndl, &bndu);
-         minnlcsetcond(&state, 1.0E-8, 0);
+         minnlcsetcond(&state, 0.00000001, 0);
          while (minnlciteration(&state))
             if (state.needfi) {
                state.fi.xR[0] = 0.0;
@@ -46643,7 +46643,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
                }
             }
          }
-         minnlcsetcond(&state, 1.0E-7, 200);
+         minnlcsetcond(&state, 0.0000001, 200);
          while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
@@ -46714,7 +46714,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
          }
          minnlcsetbc(&state, &bndl, &bndu);
          minnlcsetlc(&state, &c, &ct, k);
-         minnlcsetcond(&state, 1.0E-7, 0);
+         minnlcsetcond(&state, 0.0000001, 0);
          while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
@@ -46783,7 +46783,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             c.xyR[j][badidx1] = 0.0;
          }
          c.xyR[badidx0][badidx1] = 1.0;
-         c.xyR[badidx0][n] = (double)(10 * (2 * hqrnduniformi(&rs, 2) - 1));
+         c.xyR[badidx0][n] = 10.0 * (2 * hqrnduniformi(&rs, 2) - 1);
          if (hqrndnormal(&rs) > 0.0) {
             ct.xZ[badidx0] = 0;
          } else {
@@ -46807,7 +46807,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
          minnlcsetbc(&state, &bndl, &bndu);
          minnlcsetlc(&state, &c, &ct, k);
          minnlcsetscale(&state, &s);
-         minnlcsetcond(&state, 1.0E-7, 0);
+         minnlcsetcond(&state, 0.0000001, 0);
          while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
@@ -46829,14 +46829,14 @@ static void testminnlcunit_testother(bool *wereerrors) {
             v = rmax2(bndl.xR[badidx1] - x1.xR[badidx1], x1.xR[badidx1] - bndu.xR[badidx1]);
             v /= s.xR[badidx1];
             *wereerrors = *wereerrors || rep.bcidx != badidx1;
-            *wereerrors = *wereerrors || !NearAtR(rep.bcerr, v, 1.0E3 * machineepsilon);
+            *wereerrors = *wereerrors || !NearAtR(rep.bcerr, v, 1000.0 * machineepsilon);
          } else {
             *wereerrors = *wereerrors || rep.bcerr != 0.0;
             *wereerrors = *wereerrors || rep.bcidx != -1;
             *wereerrors = *wereerrors || x1.xR[badidx1] < bndl.xR[badidx1] || x1.xR[badidx1] > bndu.xR[badidx1];
          }
          *wereerrors = *wereerrors || rep.lcidx != badidx0;
-         *wereerrors = *wereerrors || !NearAtR(rep.lcerr, fabs(x1.xR[badidx1] - c.xyR[badidx0][n]) / s.xR[badidx1], 1.0E3 * machineepsilon);
+         *wereerrors = *wereerrors || !NearAtR(rep.lcerr, fabs(x1.xR[badidx1] - c.xyR[badidx0][n]) / s.xR[badidx1], 1000.0 * machineepsilon);
          *wereerrors = *wereerrors || rep.nlcerr != 0.0;
          *wereerrors = *wereerrors || rep.nlcidx != -1;
       }
@@ -46907,7 +46907,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
          minnlcsetbc(&state, &bndl, &bndu);
          minnlcsetnlc(&state, nlec, nlic);
          minnlcsetscale(&state, &s);
-         minnlcsetcond(&state, 1.0E-7, 0);
+         minnlcsetcond(&state, 0.0000001, 0);
          while (minnlciteration(&state))
             if (state.needfij) {
                state.fi.xR[0] = 0.0;
@@ -46937,7 +46937,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
                v = rmax2(bndl.xR[badidx0] - x1.xR[badidx0], x1.xR[badidx0] - bndu.xR[badidx0]);
                v /= s.xR[badidx0];
                *wereerrors = *wereerrors || rep.bcidx != badidx0;
-               *wereerrors = *wereerrors || !NearAtR(rep.bcerr, v, 1.0E3 * machineepsilon);
+               *wereerrors = *wereerrors || !NearAtR(rep.bcerr, v, 1000.0 * machineepsilon);
             } else {
                *wereerrors = *wereerrors || rep.bcerr != 0.0;
                *wereerrors = *wereerrors || rep.bcidx != -1;
@@ -46947,7 +46947,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
          *wereerrors = *wereerrors || rep.lcidx != -1;
          *wereerrors = *wereerrors || rep.lcerr != 0.0;
          *wereerrors = *wereerrors || rep.nlcidx != badidx0;
-         *wereerrors = *wereerrors || !NearAtR(rep.nlcerr, fabs(x1.xR[badidx0] - c.xyR[badidx0][n]), 1.0E4 * machineepsilon);
+         *wereerrors = *wereerrors || !NearAtR(rep.nlcerr, fabs(x1.xR[badidx0] - c.xyR[badidx0][n]), 10000.0 * machineepsilon);
       }
    // Test support for termination requests:
    // * to terminate with correct return code = 8
@@ -47020,9 +47020,9 @@ static void testminnlcunit_testother(bool *wereerrors) {
    n = 30;
    blocksize = 3;
    blockcnt = 3;
-   rho = 1.0E3;
+   rho = 1000.0;
    aulits = 5;
-   condv = 1.0E2;
+   condv = 100.0;
    ae_vector_set_length(&x0, n);
    ae_vector_set_length(&bndl, n);
    ae_vector_set_length(&bndu, n);
@@ -47066,7 +47066,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
          }
          for (i = 0; i < blocksize * blockcnt; i++) {
             v = ae_v_dotproduct(c.xyR[i], 1, c.xyR[i], 1, n);
-            v = 1 / sqrt(v);
+            v = 1.0 / sqrt(v);
             ae_v_muld(c.xyR[i], 1, n, v);
             v = ae_v_dotproduct(c.xyR[i], 1, x0.xR, 1, n);
             c.xyR[i][n] = v;
@@ -47075,7 +47075,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
       // Test unpreconditioned iteration
          minnlccreate(n, &x0, &state);
          minnlcsetalgoaul(&state, rho, aulits);
-         minnlcsetcond(&state, 1.0E-7, 0);
+         minnlcsetcond(&state, 0.0000001, 0);
          if (ctype == 0) {
             minnlcsetlc(&state, &c, &ct, blocksize * blockcnt);
          } else {
@@ -47108,7 +47108,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
       // Test LBFGS preconditioned iteration
          minnlccreate(n, &x0, &state);
          minnlcsetalgoaul(&state, rho, aulits);
-         minnlcsetcond(&state, 1.0E-7, 0);
+         minnlcsetcond(&state, 0.0000001, 0);
          if (ctype == 0) {
             minnlcsetlc(&state, &c, &ct, blocksize * blockcnt);
          } else {
@@ -47141,7 +47141,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
       // Test exact low rank preconditioner
          minnlccreate(n, &x0, &state);
          minnlcsetalgoaul(&state, rho, aulits);
-         minnlcsetcond(&state, 1.0E-7, 0);
+         minnlcsetcond(&state, 0.0000001, 0);
          if (ctype == 0) {
             minnlcsetlc(&state, &c, &ct, blocksize * blockcnt);
          } else {
@@ -47174,7 +47174,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
       // Test exact robust preconditioner
          minnlccreate(n, &x0, &state);
          minnlcsetalgoaul(&state, rho, aulits);
-         minnlcsetcond(&state, 1.0E-7, 0);
+         minnlcsetcond(&state, 0.0000001, 0);
          if (ctype == 0) {
             minnlcsetlc(&state, &c, &ct, blocksize * blockcnt);
          } else {
@@ -47309,9 +47309,9 @@ static void testminnlcunit_testbugs(bool *wereerrors) {
          ae_frame_leave();
          return;
       }
-      *wereerrors = *wereerrors || x1.xR[0] > -1.0E6;
+      *wereerrors = *wereerrors || x1.xR[0] > -1000000.0;
       minnlccreate(n, &x0, &state);
-      state.stabilizingpoint = -1.0E2;
+      state.stabilizingpoint = -100.0;
       state.initialinequalitymultiplier = 1.0E-12;
       minnlcsetalgoaul(&state, rho, aulits);
       minnlcsetcond(&state, 0.0, maxits);
@@ -47422,7 +47422,7 @@ static void testminnlcunit_testbugs(bool *wereerrors) {
                }
             }
          }
-         minnlcsetcond(&state, 1.0E-7, 20);
+         minnlcsetcond(&state, 0.0000001, 20);
          minnlcsetnlc(&state, k, k);
          while (minnlciteration(&state))
             if (state.needfij) {
@@ -47556,7 +47556,7 @@ static void testminnlcunit_testoptguardc1test1reportfortask0(bool *err, optguard
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = tooclose || SmallR(va, 1.0E-8) || SmallR(vb, 1.0E-8);
+         tooclose = tooclose || SmallR(va, 0.00000001) || SmallR(vb, 0.00000001);
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -47726,8 +47726,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
       for (i = 0; i < n; i++) {
          x0.xR[i] = 1.0 + 0.1 * i;
       }
-      spdmatrixrndcond(n, 1.0E3, &a);
-      spdmatrixrndcond(n, 1.0E3, &a1);
+      spdmatrixrndcond(n, 1000.0, &a);
+      spdmatrixrndcond(n, 1000.0, &a1);
       minnlccreate(n, &x0, &state);
       if (solvertype == 0) {
          minnlcsetalgoaul(&state, 1000.0, 5);
@@ -47742,7 +47742,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             }
          }
       }
-      minnlcsetcond(&state, 1.0E-7, 10);
+      minnlcsetcond(&state, 0.0000001, 10);
       minnlcsetnlc(&state, 0, 1);
       while (minnlciteration(&state))
          if (state.needfij) {
@@ -47828,7 +47828,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                   v += state.x.xR[j] * a.xyR[i][j];
                }
                state.fi.xR[0] += fabs(v);
-               v = (double)sign(v);
+               v = sign(v);
                for (j = 0; j < n; j++) {
                   state.j.xyR[0][j] += v * a.xyR[i][j];
                }
@@ -47878,8 +47878,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                      bndu.xR[i] = x0.xR[i];
                   }
                }
-               spdmatrixrndcond(n, 1.0E3, &a);
-               spdmatrixrndcond(n, 1.0E3, &a1);
+               spdmatrixrndcond(n, 1000.0, &a);
+               spdmatrixrndcond(n, 1000.0, &a1);
                minnlccreate(n, &x0, &state);
                if (solvertype == 0) {
                   minnlcsetalgoaul(&state, 1000.0, 5);
@@ -47895,7 +47895,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                   }
                }
                minnlcoptguardgradient(&state, diffstep);
-               minnlcsetcond(&state, 1.0E-7, 10);
+               minnlcsetcond(&state, 0.0000001, 10);
                minnlcsetscale(&state, &s);
                minnlcsetbc(&state, &bndl, &bndu);
                minnlcsetnlc(&state, 0, 1);
@@ -48020,7 +48020,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
    // * upper limit on iterations count, MaxIts == 25
    // We simply test that OptGuard does not return error code.
       n = 100;
-      spdmatrixrndcond(n, 1.0E2, &a);
+      spdmatrixrndcond(n, 100.0, &a);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&bndl, n);
       ae_vector_set_length(&bndu, n);
@@ -48047,7 +48047,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
       }
       minnlcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel));
       minnlcsetbc(&state, &bndl, &bndu);
-      minnlcsetcond(&state, 1.0E-7, 25);
+      minnlcsetcond(&state, 0.0000001, 25);
       while (minnlciteration(&state))
          if (state.needfij) {
             state.fi.xR[0] = 0.0;
@@ -48101,7 +48101,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          vbnd = 1 * pow(10.0, -0.2 * hqrnduniformr(&rs));
          fscale = 0.1;
          maxshortsessions = 4;
-         shortstplen = 1.0E-6;
+         shortstplen = 0.000001;
          shortsessions = 0;
          for (pass = 1; pass <= 100; pass++) {
          // Formulate problem
@@ -48157,7 +48157,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             }
             minnlcsetbc(&state, &bndl, &bndu);
             minnlcsetscale(&state, &s);
-            minnlcsetcond(&state, 1.0E-7, 1000);
+            minnlcsetcond(&state, 0.0000001, 1000);
             minnlcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel));
             minnlcsetxrep(&state, true);
             while (minnlciteration(&state))
@@ -48305,7 +48305,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                }
             }
          }
-         minnlcsetcond(&state, 1.0E-7, 50);
+         minnlcsetcond(&state, 0.0000001, 50);
          minnlcsetscale(&state, &s);
          minnlcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel));
          while (minnlciteration(&state))
@@ -48320,7 +48320,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                      v += state.x.xR[j] * a.xyR[i][j];
                   }
                   state.fi.xR[0] += fabs(v);
-                  v = (double)sign(v);
+                  v = sign(v);
                   for (j = 0; j < n; j++) {
                      state.j.xyR[0][j] += v * a.xyR[i][j];
                   }
@@ -48440,7 +48440,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                }
             }
          }
-         minnlcsetcond(&state, 1.0E-7, 50);
+         minnlcsetcond(&state, 0.0000001, 50);
          minnlcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel));
          while (minnlciteration(&state))
             if (state.needfi) {
@@ -48528,7 +48528,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                }
             }
          }
-         minnlcsetcond(&state, 1.0E-7, 50);
+         minnlcsetcond(&state, 0.0000001, 50);
          minnlcsetnlc(&state, 0, n);
          minnlcsetscale(&state, &s);
          minnlcoptguardsmoothness(&state, 1 + hqrnduniformi(&rs, testminnlcunit_maxoptguardlevel));
@@ -48692,7 +48692,7 @@ bool testminnlc() {
 }
 
 // === minns testing unit ===
-static const double testminnsunit_scalingtesttol = 1.0E-6;
+static const double testminnsunit_scalingtesttol = 0.000001;
 static const ae_int_t testminnsunit_scalingtestcnt = 3;
 
 // Basic unconstrained test
@@ -48775,7 +48775,7 @@ static void testminnsunit_basictest1uc(bool *errors) {
          v1 = s.x.xR[1];
          s.fi.xR[0] = 10 * fabs(sqr(v0) - v1) + sqr(v0 - 1);
          s.j.xyR[0][0] = 10 * sign(sqr(v0) - v1) * 2 * v0 + 2 * (v0 - 1);
-         s.j.xyR[0][1] = (double)(10 * sign(sqr(v0) - v1) * (-1));
+         s.j.xyR[0][1] = -(10.0 * sign(sqr(v0) - v1));
          if (sqrt(2.0) * v0 - 1 > 0.0) {
             s.fi.xR[0] += 100 * (sqrt(2.0) * v0 - 1);
             s.j.xyR[0][0] += 100 * sqrt(2.0);
@@ -48887,7 +48887,7 @@ static void testminnsunit_basictest1bc(bool *errors) {
    x0.xR[1] = 0.0;
    bndl.xR[0] = -INFINITY;
    bndl.xR[1] = -INFINITY;
-   bndu.xR[0] = 1 / sqrt(2.0);
+   bndu.xR[0] = 1.0 / sqrt(2.0);
    bndu.xR[1] = 1.0 / 2.0;
    minnscreate(n, &x0, &s);
    minnssetbc(&s, &bndl, &bndu);
@@ -48898,7 +48898,7 @@ static void testminnsunit_basictest1bc(bool *errors) {
          v1 = s.x.xR[1];
          s.fi.xR[0] = 10 * fabs(sqr(v0) - v1) + sqr(v0 - 1);
          s.j.xyR[0][0] = 10 * sign(sqr(v0) - v1) * 2 * v0 + 2 * (v0 - 1);
-         s.j.xyR[0][1] = (double)(10 * sign(sqr(v0) - v1) * (-1));
+         s.j.xyR[0][1] = -(10.0 * sign(sqr(v0) - v1));
       } else ae_assert(false, "Assertion failed");
    minnsresults(&s, &x1, &rep);
    *errors = *errors || rep.terminationtype <= 0;
@@ -49016,7 +49016,7 @@ static void testminnsunit_basictest1lc(bool *errors) {
    x0.xR[1] = 0.0;
    c.xyR[0][0] = 1.0;
    c.xyR[0][1] = 0.0;
-   c.xyR[0][2] = 1 / sqrt(2.0);
+   c.xyR[0][2] = 1.0 / sqrt(2.0);
    c.xyR[1][0] = 0.0;
    c.xyR[1][1] = 1.0;
    c.xyR[1][2] = 1.0 / 2.0;
@@ -49031,7 +49031,7 @@ static void testminnsunit_basictest1lc(bool *errors) {
          v1 = s.x.xR[1];
          s.fi.xR[0] = 10 * fabs(sqr(v0) - v1) + sqr(v0 - 1);
          s.j.xyR[0][0] = 10 * sign(sqr(v0) - v1) * 2 * v0 + 2 * (v0 - 1);
-         s.j.xyR[0][1] = (double)(10 * sign(sqr(v0) - v1) * (-1));
+         s.j.xyR[0][1] = -(10.0 * sign(sqr(v0) - v1));
       } else ae_assert(false, "Assertion failed");
    minnsresults(&s, &x1, &rep);
    *errors = *errors || rep.terminationtype <= 0;
@@ -49337,7 +49337,7 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
             return;
          }
          for (i = 0; i < n; i++) {
-            *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], 1.0E-4);
+            *primaryerrors = *primaryerrors || !isfinite(x1.xR[i]) || !isfinite(x1s.xR[i]) || !NearAtR(x1.xR[i], x1s.xR[i] / s.xR[i], 0.0001);
             *othererrors = *othererrors || !isfinite(xrlast.xR[i]) || !NearAtR(x1s.xR[i], xrlast.xR[i], testminnsunit_scalingtesttol);
          }
       }
@@ -49489,7 +49489,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
 // * extreme stopping criteria (EpsX == 1.0E-12)
 // * single pass for each problem size
 // * check that constrained gradient at solution is small
-   conda = 1.0E3;
+   conda = 1000.0;
    epsrad = 1.0E-12;
    for (n = 1; n <= 10; n++) {
       ae_vector_set_length(&x0, n);
@@ -49549,7 +49549,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
          *primaryerrors = *primaryerrors || x1.xR[i] > bndu.xR[i];
       }
       gnorm = sqrt(gnorm);
-      *primaryerrors = *primaryerrors || gnorm > 1.0E-4;
+      *primaryerrors = *primaryerrors || gnorm > 0.0001;
    }
 // Test on HIGHLY nonconvex bound constrained problem.
 // Algorithm should be able to stop.
@@ -49578,7 +49578,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
                   v0 = fabs(state.x.xR[i]);
-                  v1 = (double)sign(state.x.xR[i]);
+                  v1 = sign(state.x.xR[i]);
                   state.fi.xR[0] += v * (v0 + v0 * v0);
                   state.j.xyR[0][i] = v * (v1 + 2 * v0 * v1);
                }
@@ -49695,7 +49695,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
          ae_vector_set_length(&scaledbndl, n);
          ae_vector_set_length(&scaledbndu, n);
          for (i = 0; i < n; i++) {
-            s.xR[i] = pow(2.0, (double)(randominteger(5) - 2));
+            s.xR[i] = pow(2.0, randominteger(5) - 2.0);
             d.xR[i] = pow(10.0, randomreal() - 0.5);
             x0.xR[i] = randommid();
             xc.xR[i] = randommid();
@@ -49887,15 +49887,15 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
                   v -= c.xyR[i][n];
                   vv = 0.0;
                   if (ct.xZ[i] < 0) {
-                     vv = (double)sign(rmax2(v, 0.0));
+                     vv = sign(rmax2(v, 0.0));
                      v = rmax2(v, 0.0);
                   }
                   if (ct.xZ[i] == 0) {
-                     vv = (double)sign(v);
+                     vv = sign(v);
                      v = fabs(v);
                   }
                   if (ct.xZ[i] > 0) {
-                     vv = (double)-sign(rmax2(-v, 0.0));
+                     vv = -sign(rmax2(-v, 0.0));
                      v = rmax2(-v, 0.0);
                   }
                   state.fi.xR[0] += rho * v;
@@ -49947,7 +49947,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
                state.fi.xR[0] = 0.0;
                for (i = 0; i < n; i++) {
                   v0 = fabs(state.x.xR[i]);
-                  v1 = (double)sign(state.x.xR[i]);
+                  v1 = sign(state.x.xR[i]);
                   state.fi.xR[0] += v * (v0 + v0 * v0);
                   state.j.xyR[0][i] = v * (v1 + 2 * v0 * v1);
                }
@@ -50364,7 +50364,7 @@ static void testminnsunit_testother(bool *othererrors) {
    epsrad = 0.00001;
    xtol = 0.01;
    for (k = 0; k <= 6; k++) {
-      rho = pow(10.0, (double)k);
+      rho = pow(10.0, k);
       minnscreate(n, &x0, &state);
       minnssetalgoags(&state, 0.1, 10.0);
       minnssetcond(&state, epsrad, 0);
@@ -50484,8 +50484,8 @@ static void testminbcunit_calciip2(minbcstate *state, ae_int_t n, ae_int_t fk) {
    }
    for (i = 0; i < n; i++) {
       if (state->needfg) {
-         state->f += pow((double)(i * i + 1), (double)(2 * fk)) * sqr(state->x.xR[i]);
-         state->g.xR[i] = pow((double)(i * i + 1), (double)(2 * fk)) * 2 * state->x.xR[i];
+         state->f += pow(i * i + 1.0, 2.0 * fk) * sqr(state->x.xR[i]);
+         state->g.xR[i] = pow(i * i + 1.0, 2.0 * fk) * 2.0 * state->x.xR[i];
       }
    }
 }
@@ -50548,7 +50548,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
    NewObj(minbcstate, state);
    NewObj(minbcreport, rep);
    nmax = 5;
-   weakepsg = 1.0E-4;
+   weakepsg = 0.0001;
    passcount = 10;
    for (pass = 1; pass <= passcount; pass++) {
    // Another simple problem:
@@ -50565,7 +50565,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
    //   analytic form of solution: S[i] = bound(x0[i], 0, 1)
    // * we also check that both final solution and subsequent iterates
    //   are strictly feasible
-      diffstep = 1.0E-6;
+      diffstep = 0.000001;
       for (dkind = 0; dkind <= 1; dkind++) {
          for (preckind = 0; preckind <= 2; preckind++) {
             for (pkind = 1; pkind <= 2; pkind++) {
@@ -50598,10 +50598,10 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f += pow(state.x.xR[i] - x0.xR[i], (double)p);
+                           state.f += pow(state.x.xR[i] - x0.xR[i], p);
                         }
                         if (state.needfg) {
-                           state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], (double)(p - 1));
+                           state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], p - 1.0);
                         }
                         *feaserr = *feaserr || state.x.xR[i] < 0.0;
                         *feaserr = *feaserr || state.x.xR[i] > 1.0;
@@ -50618,7 +50618,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                   v = 0.0;
                   for (i = 0; i < n; i++) {
                      if (x.xR[i] > 0.0 && x.xR[i] < 1.0) {
-                        v += sqr(p * pow(x.xR[i] - x0.xR[i], (double)(p - 1)));
+                        v += sqr(p * pow(x.xR[i] - x0.xR[i], p - 1.0));
                      }
                      *feaserr = *feaserr || x.xR[i] < 0.0;
                      *feaserr = *feaserr || x.xR[i] > 1.0;
@@ -50642,7 +50642,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
    //   analytic form of solution: S[i] = bound(x0[i], 0, 1)
    // * we also check that both final solution and subsequent iterates
    //   are strictly feasible
-      diffstep = 1.0E-6;
+      diffstep = 0.000001;
       for (dkind = 0; dkind <= 1; dkind++) {
          for (preckind = 0; preckind <= 2; preckind++) {
             for (pkind = 1; pkind <= 2; pkind++) {
@@ -50680,10 +50680,10 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f += pow(state.x.xR[i] - x0.xR[i], (double)p);
+                           state.f += pow(state.x.xR[i] - x0.xR[i], p);
                         }
                         if (state.needfg) {
-                           state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], (double)(p - 1));
+                           state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], p - 1.0);
                         }
                         *feaserr = *feaserr || state.x.xR[i] < bl.xR[i];
                         *feaserr = *feaserr || state.x.xR[i] > bu.xR[i];
@@ -50700,7 +50700,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                   v = 0.0;
                   for (i = 0; i < n; i++) {
                      if (x.xR[i] > bl.xR[i] && x.xR[i] < bu.xR[i]) {
-                        v += sqr(p * pow(x.xR[i] - x0.xR[i], (double)(p - 1)));
+                        v += sqr(p * pow(x.xR[i] - x0.xR[i], p - 1.0));
                      }
                      *feaserr = *feaserr || x.xR[i] < bl.xR[i];
                      *feaserr = *feaserr || x.xR[i] > bu.xR[i];
@@ -50749,8 +50749,8 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f += pow(state.x.xR[i] - x0.xR[i], (double)p);
-                        state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], (double)(p - 1));
+                        state.f += pow(state.x.xR[i] - x0.xR[i], p);
+                        state.g.xR[i] = p * pow(state.x.xR[i] - x0.xR[i], p - 1.0);
                      }
                   } else { // Unknown protocol specified
                      *interr = true;
@@ -50821,8 +50821,8 @@ static void testminbcunit_testother(bool *err) {
    NewObj(minbcreport, rep);
    NewObj(hqrndstate, rs);
    hqrndrandomize(&rs);
-   epsx = 1.0E-4;
-   epsg = 1.0E-8;
+   epsx = 0.0001;
+   epsg = 0.00000001;
    passcount = 10;
 // Try to reproduce bug 570 (optimizer hangs on problems where it is required
 // to perform very small step - less than 1E-50 - in order to activate constraints).
@@ -50916,7 +50916,7 @@ static void testminbcunit_testother(bool *err) {
 // (first one issues NeedF requests, second one issues NeedFG requests)
    for (pass = 1; pass <= passcount; pass++) {
       n = 10;
-      diffstep = 1.0E-6;
+      diffstep = 0.000001;
       for (dkind = 0; dkind <= 1; dkind++) {
          ae_vector_set_length(&x, n);
          ae_vector_set_length(&xlast, n);
@@ -50929,7 +50929,7 @@ static void testminbcunit_testother(bool *err) {
          if (dkind == 1) {
             minbccreatef(n, &x, diffstep, &state);
          }
-         minbcsetcond(&state, 1.0E-6, 0.0, epsx, 0);
+         minbcsetcond(&state, 0.000001, 0.0, epsx, 0);
          wasf = false;
          wasfg = false;
          while (minbciteration(&state)) {
@@ -50966,11 +50966,11 @@ static void testminbcunit_testother(bool *err) {
    for (pass = 1; pass <= passcount; pass++) {
       ae_vector_set_length(&x, 1);
       ae_vector_set_length(&s, 1);
-      diffstep = randomreal() * 1.0E-6;
-      s.xR[0] = exp(randomreal() * 4 - 2);
+      diffstep = randomreal() * 0.000001;
+      s.xR[0] = exp(2.0 * randommid());
       x.xR[0] = 0.0;
       minbccreatef(1, &x, diffstep, &state);
-      minbcsetcond(&state, 1.0E-6, 0.0, epsx, 0);
+      minbcsetcond(&state, 0.000001, 0.0, epsx, 0);
       minbcsetscale(&state, &s);
       v = 0.0;
       while (minbciteration(&state)) {
@@ -51021,7 +51021,7 @@ static void testminbcunit_testother(bool *err) {
       minbcsetcond(&state, epsg, 0.0, epsx, 0);
       while (minbciteration(&state))
          if (state.needfg) {
-            state.f = -1.0E8 * sqr(state.x.xR[0]);
+            state.f = -100000000.0 * sqr(state.x.xR[0]);
             state.g.xR[0] = -2.0E8 * state.x.xR[0];
          }
       minbcresults(&state, &x, &rep);
@@ -51044,7 +51044,7 @@ static void testminbcunit_testother(bool *err) {
 // * and we test that in the extremum stopping conditions are
 //   satisfied subject to the current scaling coefficients.
    for (pass = 1; pass <= passcount; pass++) {
-      tmpeps = 1.0E-5;
+      tmpeps = 0.00001;
       for (n = 1; n <= 10; n++) {
          for (ckind = 0; ckind <= 1; ckind++) {
             for (pkind = 0; pkind <= 2; pkind++) {
@@ -51110,7 +51110,7 @@ static void testminbcunit_testother(bool *err) {
 //     f(x) = {
 //            { M, if x <= -0.999999 or x >= 0.999999
 //
-// where c is either 1.0 or 1.0E+4, M is either 1.0E8, 1.0E20 or +INF
+// where c is either 1.0 or 10000.0, M is either 100000000.0, 1.0E20 or +INF
 // (we try different combinations)
    for (pass = 1; pass <= passcount; pass++) {
       for (ckind = 0; ckind <= 1; ckind++) {
@@ -51122,10 +51122,10 @@ static void testminbcunit_testother(bool *err) {
                vc = 1.0;
             }
             if (ckind == 1) {
-               vc = 1.0E+4;
+               vc = 10000.0;
             }
             if (mkind == 0) {
-               vm = 1.0E+8;
+               vm = 100000000.0;
             }
             if (mkind == 1) {
                vm = 1.0E+20;
@@ -51134,7 +51134,7 @@ static void testminbcunit_testother(bool *err) {
                vm = +INFINITY;
             }
          // Create optimizer, solve optimization problem
-            epsg = 1.0E-6 * vc;
+            epsg = 0.000001 * vc;
             ae_vector_set_length(&x, 1);
             x.xR[0] = 0.0;
             minbccreate(1, &x, &state);
@@ -51142,8 +51142,8 @@ static void testminbcunit_testother(bool *err) {
             while (minbciteration(&state))
                if (state.needfg) {
                   if (-0.999999 < state.x.xR[0] && state.x.xR[0] < 0.999999) {
-                     state.f = 1 / (1 - state.x.xR[0]) + 1 / (1 + state.x.xR[0]) + vc * state.x.xR[0];
-                     state.g.xR[0] = 1 / sqr(1 - state.x.xR[0]) - 1 / sqr(1 + state.x.xR[0]) + vc;
+                     state.f = 1.0 / (1.0 - state.x.xR[0]) + 1.0 / (1.0 + state.x.xR[0]) + vc * state.x.xR[0];
+                     state.g.xR[0] = 1.0 / sqr(1.0 - state.x.xR[0]) - 1.0 / sqr(1.0 + state.x.xR[0]) + vc;
                   } else {
                      state.f = vm;
                      state.g.xR[0] = 0.0;
@@ -51305,7 +51305,7 @@ static void testminbcunit_testother(bool *err) {
          spoilvar = -1;
          spoilval = NAN;
       }
-      spdmatrixrndcond(n, 1.0E5, &fulla);
+      spdmatrixrndcond(n, 100000.0, &fulla);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&x0, n);
       for (i = 0; i < n; i++) {
@@ -51440,7 +51440,7 @@ static void testminbcunit_testpreconditioning(bool *err) {
 // N        - problem size
 // K        - number of repeated passes (should be large enough to average out random factors)
    k = 100;
-   epsg = 1.0E-8;
+   epsg = 0.00000001;
    for (n = 10; n <= 10; n++) {
       for (ckind = 0; ckind <= 1; ckind++) {
          fk = 1;
@@ -51476,7 +51476,7 @@ static void testminbcunit_testpreconditioning(bool *err) {
          }
          ae_vector_set_length(&diagh, n);
          for (i = 0; i < n; i++) {
-            diagh.xR[i] = 2 * pow((double)(i * i + 1), (double)(2 * fk)) * (0.8 + 0.4 * randomreal());
+            diagh.xR[i] = 2.0 * pow(i * i + 1.0, 2.0 * fk) * (0.8 + 0.4 * randomreal());
          }
          minbcsetprecdiag(&state, &diagh);
          minbcsetscale(&state, &units);
@@ -51494,7 +51494,7 @@ static void testminbcunit_testpreconditioning(bool *err) {
       // Test it with scale-based preconditioner
          ae_vector_set_length(&s, n);
          for (i = 0; i < n; i++) {
-            s.xR[i] = 1 / sqrt(2 * pow((double)(i * i + 1), (double)(2 * fk)) * (0.8 + 0.4 * randomreal()));
+            s.xR[i] = 1.0 / sqrt(2.0 * pow(i * i + 1.0, 2.0 * fk) * (0.8 + 0.4 * randomreal()));
          }
          minbcsetprecdefault(&state);
          minbcsetscale(&state, &s);
@@ -51570,7 +51570,7 @@ static void testminbcunit_testoptguardc1test0reportfortask0(bool *err, optguardn
             }
             v += fabs(vv);
          }
-         *err = *err || !NearAtR(v, rep->f.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
+         *err = *err || !NearAtR(v, rep->f.xR[k], 0.000001 * rmax2(fabs(v), 1.0));
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
       hasc1discontinuities = false;
@@ -51645,10 +51645,10 @@ static void testminbcunit_testoptguardc1test1reportfortask0(bool *err, optguardn
                vv += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[k]);
             }
             v += sign(vv) * a->xyR[i][rep->vidx];
-            tooclose = tooclose || SmallR(vv, 1.0E-4);
+            tooclose = tooclose || SmallR(vv, 0.0001);
          }
          if (!tooclose) {
-            *err = *err || !NearAtR(v, rep->g.xR[k], 1.0E-6 * rmax2(fabs(v), 1.0));
+            *err = *err || !NearAtR(v, rep->g.xR[k], 0.000001 * rmax2(fabs(v), 1.0));
          }
       }
    // Check that interval [#StpIdxA,#StpIdxB] contains at least one discontinuity
@@ -51661,7 +51661,7 @@ static void testminbcunit_testoptguardc1test1reportfortask0(bool *err, optguardn
             va += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxa]);
             vb += a->xyR[i][j] * (rep->x0.xR[j] + rep->d.xR[j] * rep->stp.xR[rep->stpidxb]);
          }
-         tooclose = tooclose || SmallR(va, 1.0E-8) || SmallR(vb, 1.0E-8);
+         tooclose = tooclose || SmallR(va, 0.00000001) || SmallR(vb, 0.00000001);
          hasc1discontinuities = hasc1discontinuities || sign(va) != sign(vb);
       }
       if (!tooclose) {
@@ -51736,8 +51736,8 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
    for (i = 0; i < n; i++) {
       x0.xR[i] = 1.0 + 0.1 * i;
    }
-   spdmatrixrndcond(n, 1.0E3, &a);
-   spdmatrixrndcond(n, 1.0E3, &a1);
+   spdmatrixrndcond(n, 1000.0, &a);
+   spdmatrixrndcond(n, 1000.0, &a1);
    minbccreate(n, &x0, &state);
    minbcsetcond(&state, 0.0, 0.0, 1.0E-9, 10);
    while (minbciteration(&state))
@@ -51802,7 +51802,7 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
                v += state.x.xR[j] * a.xyR[i][j];
             }
             state.f += fabs(v);
-            v = (double)sign(v);
+            v = sign(v);
             for (j = 0; j < n; j++) {
                state.g.xR[j] += v * a.xyR[i][j];
             }
@@ -51851,8 +51851,8 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
                bndu.xR[i] = x0.xR[i];
             }
          }
-         spdmatrixrndcond(n, 1.0E3, &a);
-         spdmatrixrndcond(n, 1.0E3, &a1);
+         spdmatrixrndcond(n, 1000.0, &a);
+         spdmatrixrndcond(n, 1000.0, &a1);
          minbccreate(n, &x0, &state);
          minbcoptguardgradient(&state, diffstep);
          minbcsetcond(&state, 0.0, 0.0, 1.0E-9, 10);
@@ -52003,7 +52003,7 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
                   v += state.x.xR[j] * a.xyR[i][j];
                }
                state.f += fabs(v);
-               v = (double)sign(v);
+               v = sign(v);
                for (j = 0; j < n; j++) {
                   state.g.xR[j] += v * a.xyR[i][j];
                }
@@ -52153,7 +52153,7 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
 // * upper limit on iterations count, MaxIts == 25
 // We simply test that OptGuard does not return error code.
    n = 100;
-   spdmatrixrndcond(n, 1.0E2, &a);
+   spdmatrixrndcond(n, 100.0, &a);
    ae_vector_set_length(&b, n);
    ae_vector_set_length(&x0, n);
    for (i = 0; i < n; i++) {
@@ -53181,7 +53181,7 @@ static bool testnearestneighborunit_testspecialcases() {
                x.xR[i] = randomreal();
             }
             result = result || kdtreequeryknn(&kdt, &x, 1, true) > 0;
-            result = result || kdtreequeryrnn(&kdt, &x, 1.0E6, true) > 0;
+            result = result || kdtreequeryrnn(&kdt, &x, 1000000.0, true) > 0;
             result = result || kdtreequeryaknn(&kdt, &x, 1, true, 2.0) > 0;
          }
       }
@@ -53341,8 +53341,8 @@ bool testodesolver() {
    for (pass = 0; pass < passcount; pass++) {
       for (solver = 0; solver <= 0; solver++) {
       // prepare
-         h = 1.0E-2;
-         eps = 1.0E-5;
+         h = 0.01;
+         eps = 0.00001;
          if (pass % 2 == 0) {
             eps = -eps;
          }
@@ -53404,8 +53404,8 @@ bool testodesolver() {
 // fractional tolerance.
    ae_assert(passcount >= 2, "Assertion failed");
    for (pass = 0; pass < passcount; pass++) {
-      h = 1.0E-4;
-      eps = 1.0E-4;
+      h = 0.0001;
+      eps = 0.0001;
       if (pass % 2 == 0) {
          eps = -eps;
       }
@@ -53414,7 +53414,7 @@ bool testodesolver() {
       m = 21;
       ae_vector_set_length(&xg, m);
       for (i = 0; i < m; i++) {
-         xg.xR[i] = (double)(2 * i) / (m - 1);
+         xg.xR[i] = (2.0 * i) / (m - 1);
       }
       mynfev = 0;
       odesolverrkck(&y, 1, &xg, m, eps, h, &state);
@@ -53507,7 +53507,7 @@ static void testinverseupdateunit_matlu(RMatrix *a, ae_int_t m, ae_int_t n, ZVec
       // Compute elements J+1:M of J-th column.
          if (j + 1 < m) {
             jp = j + 1;
-            s = 1 / a->xyR[j][j];
+            s = 1.0 / a->xyR[j][j];
             ae_v_muld(&a->xyR[jp][j], a->stride, m - jp, s);
          }
       }
@@ -53615,7 +53615,7 @@ static void testinverseupdateunit_generaterandommatrixcond(RMatrix *a0, ae_int_t
    testinverseupdateunit_generaterandomorthogonalmatrix(&q2, n);
    ae_vector_set_length(&cc, n);
    l1 = 0.0;
-   l2 = log(1 / c);
+   l2 = log(1.0 / c);
    cc.xR[0] = exp(l1);
    for (i = 1; i < n - 1; i++) {
       cc.xR[i] = exp(randomreal() * (l2 - l1) + l1);
@@ -53657,7 +53657,7 @@ static bool testinverseupdateunit_invmattr(RMatrix *a, ae_int_t n, bool isupper,
                ae_frame_leave();
                return result;
             }
-            a->xyR[j][j] = 1 / a->xyR[j][j];
+            a->xyR[j][j] = 1.0 / a->xyR[j][j];
             ajj = -a->xyR[j][j];
          } else {
             ajj = -1.0;
@@ -53689,7 +53689,7 @@ static bool testinverseupdateunit_invmattr(RMatrix *a, ae_int_t n, bool isupper,
                ae_frame_leave();
                return result;
             }
-            a->xyR[j][j] = 1 / a->xyR[j][j];
+            a->xyR[j][j] = 1.0 / a->xyR[j][j];
             ajj = -a->xyR[j][j];
          } else {
             ajj = -1.0;
@@ -53850,7 +53850,7 @@ bool testinverseupdate() {
    waserrors = false;
    maxn = 10;
    passcount = 100;
-   threshold = 1.0E-6;
+   threshold = 0.000001;
 // process
    for (n = 1; n <= maxn; n++) {
       ae_matrix_set_length(&a, n, n);
@@ -54484,15 +54484,15 @@ static void testgqunit_buildgaussjacobiquadrature(ae_int_t n, double alpha, doub
                   r = 3 * x->xR[i - 1] - 3 * x->xR[i - 2] + x->xR[i - 3];
                } else {
                   if (i == n - 2) {
-                     t1 = (1 + 0.235 * beta) / (0.766 + 0.119 * beta);
-                     t2 = 1 / (1 + 0.639 * (n - 4) / (1 + 0.71 * (n - 4)));
-                     t3 = 1 / (1 + 20 * alpha / ((7.5 + alpha) * n * n));
+                     t1 = (1.0 + 0.235 * beta) / (0.766 + 0.119 * beta);
+                     t2 = 1.0 / (1.0 + 0.639 * (n - 4) / (1.0 + 0.71 * (n - 4)));
+                     t3 = 1.0 / (1.0 + 20.0 * alpha / ((7.5 + alpha) * n * n));
                      r += t1 * t2 * t3 * (r - x->xR[i - 2]);
                   } else {
                      if (i == n - 1) {
-                        t1 = (1 + 0.37 * beta) / (1.67 + 0.28 * beta);
-                        t2 = 1 / (1 + 0.22 * (n - 8) / n);
-                        t3 = 1 / (1 + 8 * alpha / ((6.28 + alpha) * n * n));
+                        t1 = (1.0 + 0.37 * beta) / (1.67 + 0.28 * beta);
+                        t2 = 1.0 / (1.0 + 0.22 * (n - 8) / n);
+                        t3 = 1.0 / (1.0 + 8.0 * alpha / ((6.28 + alpha) * n * n));
                         r += t1 * t2 * t3 * (r - x->xR[i - 2]);
                      }
                   }
@@ -54519,7 +54519,7 @@ static void testgqunit_buildgaussjacobiquadrature(ae_int_t n, double alpha, doub
          r = r1 - p1 / pp;
       } while (!NearR(r, r1, machineepsilon * (1.0 + fabs(r)) * 100.0));
       x->xR[i] = r;
-      w->xR[i] = exp(lngamma(alpha + n, &tmpsgn) + lngamma(beta + n, &tmpsgn) - lngamma((double)(n + 1), &tmpsgn) - lngamma(n + alfbet + 1, &tmpsgn)) * temp * pow(2.0, alfbet) / (pp * p2);
+      w->xR[i] = exp(lngamma(alpha + n, &tmpsgn) + lngamma(beta + n, &tmpsgn) - lngamma(n + 1.0, &tmpsgn) - lngamma(n + alfbet + 1, &tmpsgn)) * temp * pow(2.0, alfbet) / (pp * p2);
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < n - 1 - i; j++) {
@@ -54571,7 +54571,7 @@ static void testgqunit_buildgausslaguerrequadrature(ae_int_t n, double alpha, RV
          r -= p3 / dp3;
       } while (!NearR(r, r1, machineepsilon * (1.0 + fabs(r)) * 100.0));
       x->xR[i] = r;
-      w->xR[i] = -exp(lngamma(alpha + n, &tsg) - lngamma((double)n, &tsg)) / (dp3 * n * p2);
+      w->xR[i] = -exp(lngamma(alpha + n, &tsg) - lngamma(n, &tsg)) / (dp3 * n * p2);
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < n - 1 - i; j++) {
@@ -54603,10 +54603,10 @@ static void testgqunit_buildgausshermitequadrature(ae_int_t n, RVector *x, RVect
    r = 0.0;
    for (i = 0; i < (n + 1) / 2; i++) {
       if (i == 0) {
-         r = sqrt((double)(2 * n + 1)) - 1.85575 * pow((double)(2 * n + 1), -1.0 / 6.0);
+         r = sqrt(2.0 * n + 1.0) - 1.85575 * pow(2.0 * n + 1.0, -1.0 / 6.0);
       } else {
          if (i == 1) {
-            r -= 1.14 * pow((double)n, 0.426) / r;
+            r -= 1.14 * pow(n, 0.426) / r;
          } else {
             if (i == 2) {
                r = 1.86 * r - 0.86 * x->xR[0];
@@ -54625,9 +54625,9 @@ static void testgqunit_buildgausshermitequadrature(ae_int_t n, RVector *x, RVect
          for (j = 0; j < n; j++) {
             p1 = p2;
             p2 = p3;
-            p3 = p2 * r * sqrt(2.0 / (j + 1)) - p1 * sqrt((double)j / (j + 1));
+            p3 = p2 * r * sqrt(2.0 / (j + 1)) - p1 * sqrt(j / (j + 1.0));
          }
-         dp3 = sqrt((double)(2 * j)) * p2;
+         dp3 = sqrt(2.0 * j) * p2;
          r1 = r;
          r -= p3 / dp3;
       } while (!NearR(r, r1, machineepsilon * (1.0 + fabs(r)) * 100.0));
@@ -54675,18 +54675,18 @@ bool testgq() {
    specerrors = false;
    waserrors = false;
    errtol = 1.0E-12;
-   nonstricterrtol = 1.0E-6;
+   nonstricterrtol = 0.000001;
    stricterrtol = 1000.0 * machineepsilon;
 // Three tests for rec-based Gauss quadratures with known weights/nodes:
 // 1. Gauss-Legendre with N == 2
 // 2. Gauss-Legendre with N == 5
-// 3. Gauss-Chebyshev with N = 1, 2, 4, 8, ..., 512
+// 3. Gauss-Chebyshev with N == 1, 2, 4, 8, ..., 512
    err = 0.0;
    ae_vector_set_length(&alpha, 2);
    ae_vector_set_length(&beta, 2);
    alpha.xR[0] = 0.0;
    alpha.xR[1] = 0.0;
-   beta.xR[1] = 1.0 / (4 * 1 * 1 - 1);
+   beta.xR[1] = 1.0 / (3.0 * 1.0);
    gqgeneraterec(&alpha, &beta, 2.0, 2, &info, &x, &w);
    if (info > 0) {
       err = rmax2(err, fabs(x.xR[0] + sqrt(3.0) / 3));
@@ -54704,7 +54704,7 @@ bool testgq() {
    alpha.xR[0] = 0.0;
    for (i = 1; i <= 4; i++) {
       alpha.xR[i] = 0.0;
-      beta.xR[i] = sqr((double)i) / (4 * sqr((double)i) - 1);
+      beta.xR[i] = sqr(i) / (4 * sqr(i) - 1);
    }
    gqgeneraterec(&alpha, &beta, 2.0, 5, &info, &x, &w);
    if (info > 0) {
@@ -54765,7 +54765,7 @@ bool testgq() {
    alpha.xR[0] = 0.0;
    alpha.xR[1] = 0.0;
    beta.xR[0] = 0.0;
-   beta.xR[1] = (double)(1 * 1) / (4 * 1 * 1 - 1);
+   beta.xR[1] = 1.0 / (3.0 * 1.0);
    gqgenerategausslobattorec(&alpha, &beta, 2.0, -1.0, 1.0, 3, &info, &x, &w);
    if (info > 0) {
       err = rmax2(err, fabs(x.xR[0] + 1));
@@ -54786,8 +54786,8 @@ bool testgq() {
    alpha.xR[1] = 0.0;
    alpha.xR[2] = 0.0;
    beta.xR[0] = 0.0;
-   beta.xR[1] = (double)(1 * 1) / (4 * 1 * 1 - 1);
-   beta.xR[2] = (double)(2 * 2) / (4 * 2 * 2 - 1);
+   beta.xR[1] = 1.0 / (3.0 * 1.0);
+   beta.xR[2] = 4.0 / (5.0 * 3.0);
    gqgenerategausslobattorec(&alpha, &beta, 2.0, -1.0, 1.0, 4, &info, &x, &w);
    if (info > 0) {
       err = rmax2(err, fabs(x.xR[0] + 1));
@@ -54812,10 +54812,10 @@ bool testgq() {
    alpha.xR[3] = 0.0;
    alpha.xR[4] = 0.0;
    beta.xR[0] = 0.0;
-   beta.xR[1] = (double)(1 * 1) / (4 * 1 * 1 - 1);
-   beta.xR[2] = (double)(2 * 2) / (4 * 2 * 2 - 1);
-   beta.xR[3] = (double)(3 * 3) / (4 * 3 * 3 - 1);
-   beta.xR[4] = (double)(4 * 4) / (4 * 4 * 4 - 1);
+   beta.xR[1] = 1.0 / (3.0 * 1.0);
+   beta.xR[2] = 4.0 / (5.0 * 3.0);
+   beta.xR[3] = 9.0 / (7.0 * 5.0);
+   beta.xR[4] = 16.0 / (9.0 * 7.0);
    gqgenerategausslobattorec(&alpha, &beta, 2.0, -1.0, 1.0, 6, &info, &x, &w);
    if (info > 0) {
       err = rmax2(err, fabs(x.xR[0] + 1));
@@ -54846,7 +54846,7 @@ bool testgq() {
    ae_vector_set_length(&beta, 2);
    alpha.xR[0] = 0.0;
    beta.xR[0] = 0.0;
-   beta.xR[1] = (double)(1 * 1) / (4 * 1 * 1 - 1);
+   beta.xR[1] = 1.0 / (3.0 * 1.0);
    gqgenerategaussradaurec(&alpha, &beta, 2.0, -1.0, 2, &info, &x, &w);
    if (info > 0) {
       err = rmax2(err, fabs(x.xR[0] + 1));
@@ -54864,7 +54864,7 @@ bool testgq() {
    alpha.xR[0] = 0.0;
    alpha.xR[1] = 0.0;
    for (i = 0; i <= 2; i++) {
-      beta.xR[i] = sqr((double)i) / (4 * sqr((double)i) - 1);
+      beta.xR[i] = sqr(i) / (4 * sqr(i) - 1);
    }
    gqgenerategaussradaurec(&alpha, &beta, 2.0, -1.0, 3, &info, &x, &w);
    if (info > 0) {
@@ -54885,7 +54885,7 @@ bool testgq() {
    alpha.xR[0] = 0.0;
    alpha.xR[1] = 0.0;
    for (i = 0; i <= 2; i++) {
-      beta.xR[i] = sqr((double)i) / (4 * sqr((double)i) - 1);
+      beta.xR[i] = sqr(i) / (4 * sqr(i) - 1);
    }
    gqgenerategaussradaurec(&alpha, &beta, 2.0, 1.0, 3, &info, &x, &w);
    if (info > 0) {
@@ -55433,10 +55433,10 @@ static void testnormaldistrunit_testnormal(bool *errorflag) {
 // Test that PDF is roughly equal to derivative of CDF
    for (k = 0; k < 1000; k++) {
       x = hqrndnormal(&rs);
-      h = 1.0E-5;
+      h = 0.00001;
       v0 = normalpdf(x);
       v1 = (normalcdf(x + h) - normalcdf(x - h)) / (2 * h);
-      *errorflag = *errorflag || !NearAtR(v0, v1, 1.0E-4);
+      *errorflag = *errorflag || !NearAtR(v0, v1, 0.0001);
    }
    ae_frame_leave();
 }
@@ -55560,10 +55560,10 @@ static void testnormaldistrunit_testbvn(bool *errorflag) {
       y = hqrndnormal(&rs);
       rho = 0.0;
    // Compare two values: normal PDF and differentiation of normal CDF with step H
-      h = 1.0E-5;
+      h = 0.00001;
       v0 = bivariatenormalpdf(x, y, rho);
       v1 = (bivariatenormalcdf(x + h, y + h, rho) + bivariatenormalcdf(x - h, y - h, rho) - bivariatenormalcdf(x + h, y - h, rho) - bivariatenormalcdf(x - h, y + h, rho)) / sqr(2 * h);
-      *errorflag = *errorflag || !NearAtR(v0, v1, 1.0E-4);
+      *errorflag = *errorflag || !NearAtR(v0, v1, 0.0001);
    }
    ae_frame_leave();
 }
@@ -55622,7 +55622,7 @@ static void testbasestatunit_testranking(bool *err) {
    NewMatrix(xy1, 0, 0, DT_REAL);
    NewMatrix(xy2, 0, 0, DT_REAL);
 // Test 1 - large array, unique ranks, each row is obtained as follows:
-// * we generate X[i == 0..N-1] = I
+// * we generate X[i = 0..N-1] = I
 // * we add random noise: X[i] = X[i] + 0.2*randomreal()-0.1
 // * we perform random permutation
 //
@@ -55834,7 +55834,7 @@ bool testbasestat() {
    n = 10;
    ae_vector_set_length(&x, n);
    for (i = 0; i < n; i++) {
-      x.xR[i] = sqr((double)i);
+      x.xR[i] = sqr(i);
    }
    samplemoments(&x, n, &mean, &variance, &skewness, &kurtosis);
    s1errors = s1errors || !NearAtR(mean, 28.5, 0.001);
@@ -55854,7 +55854,7 @@ bool testbasestat() {
    samplemedian(&x, n, &median);
    s1errors = s1errors || !NearAtR(median, 0.5 * (16 + 25), 0.001);
    for (i = 0; i < n; i++) {
-      samplepercentile(&x, n, (double)i / (n - 1), &pv);
+      samplepercentile(&x, n, i / (n - 1.0), &pv);
       s1errors = s1errors || !NearAtR(pv, x.xR[i], 0.001);
    }
    samplepercentile(&x, n, 0.5, &pv);
@@ -55867,15 +55867,15 @@ bool testbasestat() {
    ae_vector_set_length(&x, n);
    ae_vector_set_length(&y, n);
    for (i = 0; i < n; i++) {
-      x.xR[i] = sqr((double)i);
-      y.xR[i] = (double)i;
+      x.xR[i] = sqr(i);
+      y.xR[i] = i;
    }
    covcorrerrors = covcorrerrors || !NearAtR(pearsoncorr2(&x, &y, n), 0.9627, 0.0001);
    covcorrerrors = covcorrerrors || !NearAtR(spearmancorr2(&x, &y, n), 1.0000, 0.0001);
    covcorrerrors = covcorrerrors || !NearAtR(cov2(&x, &y, n), 82.5000, 0.0001);
    for (i = 0; i < n; i++) {
       x.xR[i] = sqr(i - 0.5 * n);
-      y.xR[i] = (double)i;
+      y.xR[i] = i;
    }
    covcorrerrors = covcorrerrors || !NearAtR(pearsoncorr2(&x, &y, n), -0.3676, 0.0001);
    covcorrerrors = covcorrerrors || !NearAtR(spearmancorr2(&x, &y, n), -0.2761, 0.0001);
@@ -55929,7 +55929,7 @@ bool testbasestat() {
                   if (ctype == 2) {
                      cidxx = randominteger(kx);
                      cidxy = randominteger(ky);
-                     v = sqrt((double)(randominteger(kx) + 1) / kx);
+                     v = sqrt((randominteger(kx) + 1.0) / kx);
                      for (i = 0; i < n; i++) {
                         mx.xyR[i][cidxx] = v;
                         my.xyR[i][cidxy] = v;
@@ -56062,7 +56062,7 @@ bool testwsr() {
    // Generate uniform and sorted X spanning [0,1]
       ae_vector_set_length(&xa, n);
       for (i = 0; i < n; i++) {
-         xa.xR[i] = (double)i / (n - 1);
+         xa.xR[i] = i / (n - 1.0);
       }
    // Test N+1 values of E
       ebase = -0.5 / (n - 1);
@@ -56088,7 +56088,7 @@ bool testwsr() {
    n = 50000;
    ae_vector_set_length(&xa, n);
    for (i = 0; i < n; i++) {
-      xa.xR[i] = sin((double)(10 * i));
+      xa.xR[i] = sin(10.0 * i);
    }
    wilcoxonsignedranktest(&xa, n, 0.0, &tailb, &taill, &tailr);
    waserrors = waserrors || !isfinite(tailb);
@@ -56145,11 +56145,11 @@ bool testmannwhitneyu() {
       // Generate uniform and sorted X/Y spanning [0,1]
          ae_vector_set_length(&x, n);
          for (i = 0; i < n; i++) {
-            x.xR[i] = (double)i / (n - 1) + 100.0 * machineepsilon * hqrndnormal(&rs);
+            x.xR[i] = i / (n - 1.0) + 100.0 * machineepsilon * hqrndnormal(&rs);
          }
          ae_vector_set_length(&y, m);
          for (i = 0; i < m; i++) {
-            y.xR[i] = (double)i / (m - 1) + 100.0 * machineepsilon * hqrndnormal(&rs);
+            y.xR[i] = i / (m - 1.0) + 100.0 * machineepsilon * hqrndnormal(&rs);
          }
       // Test 100 values of E
          ecnt = 100;
@@ -56242,8 +56242,8 @@ bool testmannwhitneyu() {
    ae_vector_set_length(&x, n);
    ae_vector_set_length(&y, n);
    for (i = 0; i < n; i++) {
-      x.xR[i] = sin((double)(10 * i));
-      y.xR[i] = sin((double)(13 * i));
+      x.xR[i] = sin(10.0 * i);
+      y.xR[i] = sin(13.0 * i);
    }
    mannwhitneyutest(&x, n, &y, n, &tailb, &taill, &tailr);
    waserrors = waserrors || !isfinite(tailb);
@@ -56274,7 +56274,7 @@ bool teststest() {
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    waserrors = false;
-   eps = 1.0E-3;
+   eps = 0.001;
 // Test 1
    ae_vector_set_length(&x, 6);
    x.xR[0] = -3.0;
@@ -56851,10 +56851,10 @@ bool testratint() {
       y.xR[1] = 1 * h;
       y.xR[2] = 2 * h;
       y.xR[3] = 3 * h;
-      w.xR[0] = -1 / (x.xR[1] - x.xR[0]);
-      w.xR[1] = 1 * (1 / (x.xR[1] - x.xR[0]) + 1 / (x.xR[2] - x.xR[1]));
-      w.xR[2] = -1 * (1 / (x.xR[2] - x.xR[1]) + 1 / (x.xR[3] - x.xR[2]));
-      w.xR[3] = 1 / (x.xR[3] - x.xR[2]);
+      w.xR[0] = -1.0 / (x.xR[1] - x.xR[0]);
+      w.xR[1] = +(1.0 / (x.xR[1] - x.xR[0]) + 1.0 / (x.xR[2] - x.xR[1]));
+      w.xR[2] = -(1.0 / (x.xR[2] - x.xR[1]) + 1.0 / (x.xR[3] - x.xR[2]));
+      w.xR[3] = 1.0 / (x.xR[3] - x.xR[2]);
       v0 = 0.0;
       if (pass / 2 == 0) {
          v0 = 0.0;
@@ -56889,10 +56889,10 @@ bool testratint() {
    y.xR[1] = 1 * h;
    y.xR[2] = 2 * h;
    y.xR[3] = 3 * h;
-   w.xR[0] = -1 / (x.xR[1] - x.xR[0]);
-   w.xR[1] = 1 * (1 / (x.xR[1] - x.xR[0]) + 1 / (x.xR[2] - x.xR[1]));
-   w.xR[2] = -1 * (1 / (x.xR[2] - x.xR[1]) + 1 / (x.xR[3] - x.xR[2]));
-   w.xR[3] = 1 / (x.xR[3] - x.xR[2]);
+   w.xR[0] = -1.0 / (x.xR[1] - x.xR[0]);
+   w.xR[1] = +(1.0 / (x.xR[1] - x.xR[0]) + 1.0 / (x.xR[2] - x.xR[1]));
+   w.xR[2] = -(1.0 / (x.xR[2] - x.xR[1]) + 1.0 / (x.xR[3] - x.xR[2]));
+   w.xR[3] = 1.0 / (x.xR[3] - x.xR[2]);
    v0 = 100 * minrealnumber;
    barycentricbuildxyw(&x, &y, &w, 4, &b1);
    t = barycentriccalc(&b1, v0);
@@ -56916,10 +56916,10 @@ bool testratint() {
    y.xR[1] = 1 * h;
    y.xR[2] = 2 * h;
    y.xR[3] = 3 * h;
-   w.xR[0] = -1 / (x.xR[1] - x.xR[0]);
-   w.xR[1] = 1 * (1 / (x.xR[1] - x.xR[0]) + 1 / (x.xR[2] - x.xR[1]));
-   w.xR[2] = -1 * (1 / (x.xR[2] - x.xR[1]) + 1 / (x.xR[3] - x.xR[2]));
-   w.xR[3] = 1 / (x.xR[3] - x.xR[2]);
+   w.xR[0] = -1.0 / (x.xR[1] - x.xR[0]);
+   w.xR[1] = +(1.0 / (x.xR[1] - x.xR[0]) + 1.0 / (x.xR[2] - x.xR[1]));
+   w.xR[2] = -(1.0 / (x.xR[2] - x.xR[1]) + 1.0 / (x.xR[3] - x.xR[2]));
+   w.xR[3] = 1.0 / (x.xR[3] - x.xR[2]);
    v0 = minrealnumber;
    barycentricbuildxyw(&x, &y, &w, 4, &b1);
    t = barycentriccalc(&b1, v0);
@@ -56952,10 +56952,10 @@ bool testratint() {
          for (i = 0; i < n; i++) {
             y.xR[i] = randommid();
          }
-         w.xR[0] = -1 / (x.xR[1] - x.xR[0]);
+         w.xR[0] = -1.0 / (x.xR[1] - x.xR[0]);
          s = 1.0;
          for (i = 1; i < n - 1; i++) {
-            w.xR[i] = s * (1 / (x.xR[i] - x.xR[i - 1]) + 1 / (x.xR[i + 1] - x.xR[i]));
+            w.xR[i] = s * (1.0 / (x.xR[i] - x.xR[i - 1]) + 1.0 / (x.xR[i + 1] - x.xR[i]));
             s = -s;
          }
          w.xR[n - 1] = s / (x.xR[n - 1] - x.xR[n - 2]);
@@ -57089,7 +57089,7 @@ static void testidwunit_testcontinuity(idwmodel *model, ae_int_t nx, ae_int_t ny
    ae_vector_set_length(&xc, nx);
    ae_matrix_set_length(&yy, nsteps, ny);
    for (i = 0; i < nsteps; i++) {
-      t = (double)i / (nsteps - 1);
+      t = i / (nsteps - 1.0);
       for (j = 0; j < nx; j++) {
          xc.xR[j] = x0->xR[j] * t + x1->xR[j] * (1 - t);
       }
@@ -57109,7 +57109,7 @@ static void testidwunit_testcontinuity(idwmodel *model, ae_int_t nx, ae_int_t ny
             lc2 = rmax2(lc2, fabs(yy.xyR[i][j] - yy.xyR[i + 2][j]) / 2);
          }
       }
-      *err = *err || lc2 > 1.0E-4 && lc1 > 1.750 * lc2;
+      *err = *err || lc2 > 0.0001 && lc1 > 1.750 * lc2;
    // Differentiate function, repeat one more time
       for (i = 0; i < nsteps - 1; i++) {
          for (j = 0; j < ny; j++) {
@@ -57745,8 +57745,8 @@ static void testidwunit_testmstab(bool *err) {
 // * derivative at x == 0 must be positive and bigger than 0.1
    ae_matrix_set_length(&xy, 3, 2);
    for (i = 0; i <= 2; i++) {
-      xy.xyR[i][0] = (double)(i - 1);
-      xy.xyR[i][1] = (double)(i - 1);
+      xy.xyR[i][0] = i - 1.0;
+      xy.xyR[i][1] = i - 1.0;
    }
    idwbuildercreate(1, 1, &builder);
    rbase = pow(2.0, 1.0 + hqrnduniformr(&rs));
@@ -57766,13 +57766,13 @@ static void testidwunit_testmstab(bool *err) {
    n = 100;
    ae_matrix_set_length(&xy, 3 * n, 3);
    for (i = 0; i < n; i++) {
-      xy.xyR[3 * i][0] = (double)i / (n - 1);
+      xy.xyR[3 * i][0] = i / (n - 1.0);
       xy.xyR[3 * i][1] = -0.1;
       xy.xyR[3 * i][2] = 0.0;
-      xy.xyR[3 * i + 1][0] = (double)i / (n - 1);
+      xy.xyR[3 * i + 1][0] = i / (n - 1.0);
       xy.xyR[3 * i + 1][1] = 0.0;
       xy.xyR[3 * i + 1][2] = 1.0;
-      xy.xyR[3 * i + 2][0] = (double)i / (n - 1);
+      xy.xyR[3 * i + 2][0] = i / (n - 1.0);
       xy.xyR[3 * i + 2][1] = 0.1;
       xy.xyR[3 * i + 2][2] = 0.0;
    }
@@ -57801,14 +57801,14 @@ static void testidwunit_testmstab(bool *err) {
    *err = *err || idwcalc1(&model, 100000.0) != 0.0;
    v = 0.0;
    for (i = 0; i <= 500; i++) {
-      x0 = 1.2 * rbase * ((double)i / 500.0);
-      x1 = 1.2 * rbase * ((double)(i + 1) / 500.0);
+      x0 = 1.2 * rbase * (i / 500.0);
+      x1 = 1.2 * rbase * ((i + 1) / 500.0);
       v = rmax2(v, fabs((idwcalc1(&model, x1) - idwcalc1(&model, x0)) / (x1 - x0)));
    }
    vv = 0.0;
    for (i = 0; i <= 1000; i++) {
-      x0 = 1.2 * rbase * ((double)i / 1000.0);
-      x1 = 1.2 * rbase * ((double)(i + 1) / 1000.0);
+      x0 = 1.2 * rbase * (i / 1000.0);
+      x1 = 1.2 * rbase * ((i + 1) / 1000.0);
       vv = rmax2(vv, fabs((idwcalc1(&model, x1) - idwcalc1(&model, x0)) / (x1 - x0)));
    }
    *err = *err || vv / v > 1.333;
@@ -57934,7 +57934,7 @@ bool testpolint() {
    interrors = false;
    maxn = 5;
    passcount = 20;
-   threshold = 1.0E8 * machineepsilon;
+   threshold = 100000000.0 * machineepsilon;
 // Test equidistant interpolation
    for (pass = 1; pass <= passcount; pass++) {
       for (n = 1; n <= maxn; n++) {
@@ -58157,7 +58157,7 @@ bool testpolint() {
 // approximately-unit scale for data which have significantly
 // non-unit scale.
    n = 7;
-   eps = 1.0E-8;
+   eps = 0.00000001;
    ae_vector_set_length(&x, n);
    ae_vector_set_length(&x2, n);
    ae_vector_set_length(&y, n);
@@ -58176,7 +58176,7 @@ bool testpolint() {
    polynomialbuild(&x2, &y, n, &p);
    polynomialbar2pow(&p, 0.0, 1.0, &c1);
    for (i = 0; i < n; i++) {
-      interrors = interrors || !NearAtR(c0.xR[i], c1.xR[i] * pow(pscale, (double)i), eps);
+      interrors = interrors || !NearAtR(c0.xR[i], c1.xR[i] * pow(pscale, i), eps);
    }
    pscale = 1.0E10;
    for (i = 0; i < n; i++) {
@@ -58185,7 +58185,7 @@ bool testpolint() {
    polynomialbuild(&x2, &y, n, &p);
    polynomialbar2pow(&p, 0.0, 1.0, &c2);
    for (i = 0; i < n; i++) {
-      interrors = interrors || !NearAtR(c0.xR[i], c2.xR[i] * pow(pscale, (double)i), eps);
+      interrors = interrors || !NearAtR(c0.xR[i], c2.xR[i] * pow(pscale, i), eps);
    }
 // report
    waserrors = interrors;
@@ -58464,7 +58464,7 @@ static bool testspline1dunit_testmonotonespline() {
    spline1dbuildmonotone(&x, &y, 3, &c);
    spline1dbuildhermite(&x, &y, &d, 3, &s2);
    for (i = 0; i <= 10; i++) {
-      v = x.xR[0] + (double)i / 10.0 *(x.xR[2] - x.xR[0]);
+      v = x.xR[0] + i / 10.0 *(x.xR[2] - x.xR[0]);
       if (!NearAtR(spline1dcalc(&c, v), spline1dcalc(&s2, v), eps)) {
          result = true;
          ae_frame_leave();
@@ -58517,12 +58517,12 @@ static bool testspline1dunit_testmonotonespline() {
    y.xR[3] = 0.0;
    for (i = 1; i <= 9; i++) {
       for (j = 1; j <= 9; j++) {
-         x.xR[1] = (double)i / 10.0;
-         y.xR[1] = (double)j / 10.0;
+         x.xR[1] = i / 10.0;
+         y.xR[1] = j / 10.0;
          spline1dbuildmonotone(&x, &y, 4, &c);
          kmax = 1000;
          for (k = 0; k < kmax; k++) {
-            if (spline1dcalc(&c, (double)k / kmax) > spline1dcalc(&c, (double)(k + 1) / kmax)) {
+            if (spline1dcalc(&c, (double)k / kmax) > spline1dcalc(&c, (k + 1.0) / kmax)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -58537,7 +58537,7 @@ static bool testspline1dunit_testmonotonespline() {
    passcount = 30;
    for (pass = 1; pass <= passcount; pass++) {
       tp = randominteger(6) + 4;
-      r = (double)(randominteger(76) + 25);
+      r = randominteger(76) + 25.0;
       m = randominteger(nseg) + 1;
       ae_vector_set_length(&n, m);
       alln = 0;
@@ -58561,7 +58561,7 @@ static bool testspline1dunit_testmonotonespline() {
          }
          shift += n.xZ[i];
          if (i != m - 1) {
-            sign0 = pow(-1.0, (double)(i + 1));
+            sign0 = pow(-1.0, i + 1.0);
             x.xR[shift] = x.xR[shift - 1] + st + randomreal();
             y.xR[shift] = y.xR[shift - 1] + sign0 * randomreal();
          }
@@ -58687,14 +58687,14 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
 // * nonstrictthreshold - for approximate tests
    passcount = 20;
    threshold = 10000.0 * machineepsilon;
-   nonstrictthreshold = 1.0E-6;
-   lipschitzeps = 1.0E-6;
+   nonstrictthreshold = 0.000001;
+   lipschitzeps = 0.000001;
    *fiterrors = false;
 // check basic properties of penalized splines which are
 // preserved independently of Rho parameter.
    for (m = 4; m <= 10; m++) {
       for (k = -5; k <= 5; k++) {
-         rho = (double)k;
+         rho = k;
       // when we have two points (even with different weights),
       // resulting spline must be equal to the straight line
          ae_vector_set_length(&x, 2);
@@ -58730,7 +58730,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       ae_vector_set_length(&x, n);
       ae_vector_set_length(&y, n);
       for (i = 0; i < n; i++) {
-         x.xR[i] = (double)i / (n - 1);
+         x.xR[i] = i / (n - 1.0);
          y.xR[i] = randomreal() - 0.5;
       }
       testspline1dunit_unsetspline1d(&c);
@@ -58749,7 +58749,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       testspline1dunit_lconst(0.0, 1.0, &c, s / 2, &v, &v1, &v2);
       *fiterrors = *fiterrors || v / (u + lipschitzeps) > 1.2;
       *fiterrors = *fiterrors || v1 / (u1 + lipschitzeps * m) > 1.2;
-      *fiterrors = *fiterrors || v2 / (u2 + lipschitzeps * sqr((double)m)) > 1.2;
+      *fiterrors = *fiterrors || v2 / (u2 + lipschitzeps * sqr(m)) > 1.2;
    }
    for (n = 2; n <= 20; n++) {
       m = 5 * n;
@@ -58758,7 +58758,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       ae_vector_set_length(&y, n);
       ae_vector_set_length(&w, n);
       for (i = 0; i < n; i++) {
-         x.xR[i] = (double)i / (n - 1);
+         x.xR[i] = i / (n - 1.0);
          y.xR[i] = randomreal();
          w.xR[i] = 0.1 + randomreal();
       }
@@ -58777,7 +58777,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       testspline1dunit_lconst(0.0, 1.0, &c, s / 2, &v, &v1, &v2);
       *fiterrors = *fiterrors || v / (u + lipschitzeps) > 1.2;
       *fiterrors = *fiterrors || v1 / (u1 + lipschitzeps * m) > 1.2;
-      *fiterrors = *fiterrors || v2 / (u2 + lipschitzeps * sqr((double)m)) > 1.2;
+      *fiterrors = *fiterrors || v2 / (u2 + lipschitzeps * sqr(m)) > 1.2;
    }
 // Test smoothing properties: a sequence of problems with increasing Rho
 // results in residuals monotonically increasing and nonlinearity penalty
@@ -58824,7 +58824,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
          testspline1dunit_lconst(a, b, &c, s / 2, &v, &v1, &v2);
          *fiterrors = *fiterrors || v / (u + lipschitzeps) > 1.2;
          *fiterrors = *fiterrors || v1 / (u1 + lipschitzeps * m) > 1.2;
-         *fiterrors = *fiterrors || v2 / (u2 + lipschitzeps * sqr((double)m)) > 1.2;
+         *fiterrors = *fiterrors || v2 / (u2 + lipschitzeps * sqr(m)) > 1.2;
       // Compute residuals and penalty
          residuals = 0.0;
          for (i = 0; i < n; i++) {
@@ -58849,8 +58849,8 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
          prevpenalty = penalty;
          rho++;
       }
-      *fiterrors = *fiterrors || penalty >= 1.0E-6;
-      *fiterrors = *fiterrors || mxd2 >= 1.0E-3;
+      *fiterrors = *fiterrors || penalty >= 0.000001;
+      *fiterrors = *fiterrors || mxd2 >= 0.001;
    }
 // Special test which allows to distinguish "true smoothing" from
 // basic regularization enforced upon spline coefficients.
@@ -59010,7 +59010,7 @@ bool testspline1d() {
    lstep = 0.005;
    h = 0.00001;
    maxn = 10;
-   lipschitzeps = 1.0E-5;
+   lipschitzeps = 0.00001;
    lipschitztol = 1.25;
    threshold = 10000.0 * machineepsilon;
    lserrors = false;
@@ -59169,7 +59169,7 @@ bool testspline1d() {
                   err = rmax2(err, fabs(ds - ds2));
                   err = rmax2(err, fabs(d2s - d2s2));
                }
-               cserrors = cserrors || err > 1.0E-3;
+               cserrors = cserrors || err > 0.001;
             // Check Lipschitz continuity
                testspline1dunit_lconst(a, b, &c, lstep, &l10, &l11, &l12);
                testspline1dunit_lconst(a, b, &c, lstep / 3, &l20, &l21, &l22);
@@ -59318,14 +59318,14 @@ bool testspline1d() {
                err = rmax2(err, fabs(s - s2));
                err = rmax2(err, fabs(ds - ds2));
             }
-            crserrors = crserrors || err > 1.0E-3;
+            crserrors = crserrors || err > 0.001;
          // Check Lipschitz continuity
             testspline1dunit_lconst(a, b, &c, lstep, &l10, &l11, &l12);
             testspline1dunit_lconst(a, b, &c, lstep / 3, &l20, &l21, &l22);
-            if (l10 > 1.0E-6) {
+            if (l10 > 0.000001) {
                crserrors = crserrors || l20 / l10 > lipschitztol;
             }
-            if (l11 > 1.0E-6) {
+            if (l11 > 0.000001) {
                crserrors = crserrors || l21 / l11 > lipschitztol;
             }
          }
@@ -59345,7 +59345,7 @@ bool testspline1d() {
             t = (spline1dcalc(&c, x.xR[i] + h) - spline1dcalc(&c, x.xR[i] - h)) / (2 * h);
             err = rmax2(err, fabs(d.xR[i] - t));
          }
-         hserrors = hserrors || err > 1.0E-3;
+         hserrors = hserrors || err > 0.001;
          testspline1dunit_lconst(a, b, &c, lstep, &l10, &l11, &l12);
          testspline1dunit_lconst(a, b, &c, lstep / 3, &l20, &l21, &l22);
          hserrors = hserrors || l20 / (l10 + lipschitzeps) > lipschitztol;
@@ -59587,7 +59587,7 @@ bool testspline1d() {
    ae_vector_set_length(&x, n);
    ae_vector_set_length(&y, n);
    for (i = 0; i < n; i++) {
-      x.xR[i] = (double)i / (n - 1);
+      x.xR[i] = i / (n - 1.0);
       y.xR[i] = cos(2 * pi * x.xR[i]) + 1;
    }
    y.xR[0] = 2.0;
@@ -59600,7 +59600,7 @@ bool testspline1d() {
    for (i = -10; i <= 10; i++) {
       ierrors = ierrors || !NearAtR(spline1dintegrate(&c, i + v), i * intab + vr, 0.001);
       ierrors = ierrors || !NearAtR(spline1dintegrate(&c, i - 1000.0 * machineepsilon), i * intab, 0.001);
-      ierrors = ierrors || !NearAtR(spline1dintegrate(&c, (double)i), i * intab, 0.001);
+      ierrors = ierrors || !NearAtR(spline1dintegrate(&c, i), i * intab, 0.001);
       ierrors = ierrors || !NearAtR(spline1dintegrate(&c, i + 1000.0 * machineepsilon), i * intab, 0.001);
    }
 // Test monotone cubic Hermit interpolation
@@ -59744,7 +59744,7 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
    *fiterrors = false;
    maxn = 5;
    passcount = 20;
-   threshold = 1.0E8 * machineepsilon;
+   threshold = 100000000.0 * machineepsilon;
 // Test polynomial fitting
    for (pass = 1; pass <= passcount; pass++) {
       for (n = 1; n <= maxn; n++) {
@@ -59909,16 +59909,16 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
          ae_vector_set_length(&y, n);
          ae_vector_set_length(&w, n);
          for (i = 0; i < maxn; i++) {
-            x.xR[4 * i] = (double)i;
+            x.xR[4 * i] = i;
             y.xR[4 * i] = v - v2;
             w.xR[4 * i] = 1.0;
-            x.xR[4 * i + 1] = (double)i;
+            x.xR[4 * i + 1] = i;
             y.xR[4 * i + 1] = v - v1;
             w.xR[4 * i + 1] = 1.0;
-            x.xR[4 * i + 2] = (double)i;
+            x.xR[4 * i + 2] = i;
             y.xR[4 * i + 2] = v + v1;
             w.xR[4 * i + 2] = 1.0;
-            x.xR[4 * i + 3] = (double)i;
+            x.xR[4 * i + 3] = i;
             y.xR[4 * i + 3] = v + v2;
             w.xR[4 * i + 3] = 1.0;
          }
@@ -60007,12 +60007,12 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
                ae_vector_set_length(&dc, k);
             }
             for (i = 0; i < n - k; i++) {
-               x.xR[i] = (double)i / (n - 1);
+               x.xR[i] = i / (n - 1.0);
                y.xR[i] = randommid();
                w.xR[i] = 1 + randomreal();
             }
             for (i = 0; i < k; i++) {
-               xc.xR[i] = (double)(n - k + i) / (n - 1);
+               xc.xR[i] = (n - k + i) / (n - 1.0);
                yc.xR[i] = randommid();
                dc.xZ[i] = 0;
             }
@@ -60670,9 +60670,9 @@ static void testlsfitunit_testfunc3(RVector *x, ae_int_t nx, RVector *c, ae_int_
    ae_assert(nx == 1, "TestFunc3: integrity check failure");
    v = 0.0;
    for (i = 0; i < nc; i++) {
-      v += c->xR[i] * pow(x->xR[0], (double)i);
+      v += c->xR[i] * pow(x->xR[0], i);
       if (needg) {
-         g->xR[i] = pow(x->xR[0], (double)i);
+         g->xR[i] = pow(x->xR[0], i);
       }
    }
    if (needf) {
@@ -61133,7 +61133,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
 // with target. Sampling is performed with respect to inequality
 // constraints.
    epsx = 1.0E-12;
-   xtol = 1.0E-8;
+   xtol = 0.00000001;
    optkind = 1;
    for (nc = 5; nc <= 20; nc++) {
    // Generate problem
@@ -61171,7 +61171,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
       }
    // Solve
       if (optkind == 0) {
-         lsfitcreatef(&xx, &y, &c0, m, nx, nc, 1.0E-6, &state);
+         lsfitcreatef(&xx, &y, &c0, m, nx, nc, 0.000001, &state);
       }
       if (optkind == 1) {
          lsfitcreatefg(&xx, &y, &c0, m, nx, nc, hqrndnormal(&rs) > 0.0, &state);
@@ -61265,7 +61265,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
 //       roundoff errors from numerical differentiation sometimes
 //       prevent us from converging with good precision.
    epsx = 1.0E-12;
-   xtol = 1.0E-8;
+   xtol = 0.00000001;
    optkind = 1;
    for (nc = 10; nc <= 20; nc++) {
    // Generate problem
@@ -61299,7 +61299,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
       }
    // Solve
       if (optkind == 0) {
-         lsfitcreatef(&xx, &y, &c0, m, nx, nc, 1.0E-6, &state);
+         lsfitcreatef(&xx, &y, &c0, m, nx, nc, 0.000001, &state);
       }
       if (optkind == 1) {
          lsfitcreatefg(&xx, &y, &c0, m, nx, nc, hqrndnormal(&rs) > 0.0, &state);
@@ -61409,7 +61409,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
             ae_frame_leave();
             return;
          }
-         *errorflag = *errorflag || !NearAtR(c1.xR[0], rawc.xyR[0][1], 1.0E-6);
+         *errorflag = *errorflag || !NearAtR(c1.xR[0], rawc.xyR[0][1], 0.000001);
       }
    }
 // Fit
@@ -61469,7 +61469,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          for (j = 0; j < nc; j++) {
             v += rawc.xyR[0][j] * c1.xR[j];
          }
-         *errorflag = *errorflag || !SmallAtR(v, 1.0E-6);
+         *errorflag = *errorflag || !SmallAtR(v, 0.000001);
       }
    }
    ae_frame_leave();
@@ -61710,7 +61710,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                if (n == 1) {
                   x.xR[i] = randommid();
                } else {
-                  x.xR[i] = xscale * ((double)(2 * i) / (n - 1) - 1);
+                  x.xR[i] = xscale * ((2.0 * i) / (n - 1) - 1);
                }
                y.xR[i] = 3 * x.xR[i] + exp(x.xR[i]);
                w.xR[i] = 1 + randomreal();
@@ -61905,7 +61905,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   if (n == 1) {
                      x.xR[i] = randommid();
                   } else {
-                     x.xR[i] = xscale * ((double)(2 * i) / (n - 1) - 1);
+                     x.xR[i] = xscale * ((2.0 * i) / (n - 1) - 1);
                   }
                   y.xR[i] = 3 * x.xR[i] + exp(x.xR[i]);
                   w.xR[i] = 1 + randomreal();
@@ -61961,15 +61961,15 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    ae_vector_set_length(&y, n);
    for (i = 0; i < n; i++) {
       a.xyR[i][0] = 2.0 * randommid();
-      y.xR[i] = 1 / (1 + 2 * sqr(a.xyR[i][0]));
+      y.xR[i] = 1.0 / (1.0 + 2.0 * sqr(a.xyR[i][0]));
    }
    lsfitcreatefg(&a, &y, &c, n, 1, 1, true, &state);
    lsfitsetcond(&state, nlthreshold, 0);
    while (lsfititeration(&state))
       if (state.needf) {
-         state.f = 1 / (1 + state.c.xR[0] * sqr(state.x.xR[0]));
+         state.f = 1.0 / (1.0 + state.c.xR[0] * sqr(state.x.xR[0]));
       } else if (state.needfg) {
-         state.f = 1 / (1 + state.c.xR[0] * sqr(state.x.xR[0]));
+         state.f = 1.0 / (1.0 + state.c.xR[0] * sqr(state.x.xR[0]));
          state.g.xR[0] = -sqr(state.x.xR[0]) / sqr(1 + state.c.xR[0] * sqr(state.x.xR[0]));
       }
    lsfitresults(&state, &info, &c, &rep);
@@ -62101,7 +62101,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   y.xR[i] = v + s.xR[i] * randomnormal();
                }
                if (pkind == 1) {
-                  w.xR[i] = 1 / noiselevel;
+                  w.xR[i] = 1.0 / noiselevel;
                   s.xR[i] = noiselevel;
                   y.xR[i] = v + s.xR[i] * randomnormal();
                }
@@ -62274,7 +62274,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    // Compare covariance matrices, it should be enough to test algorithm
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            *nlserrors = *nlserrors || !NearAtR(rep.covpar.xyR[i][j], rep2.covpar.xyR[i][j], 1.0E-4 * rmax2(rep.covpar.xyR[i][i], rep.covpar.xyR[j][j]));
+            *nlserrors = *nlserrors || !NearAtR(rep.covpar.xyR[i][j], rep2.covpar.xyR[i][j], 0.0001 * rmax2(rep.covpar.xyR[i][i], rep.covpar.xyR[j][j]));
          }
       }
    }
@@ -62541,7 +62541,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
    NewObj(hqrndstate, rs);
    hqrndrandomize(&rs);
 // 4PL/5PL calculation
-   tol = 1.0E-6;
+   tol = 0.000001;
    for (idxa = -4; idxa <= 4; idxa++) {
       for (idxb = -3; idxb <= 3; idxb++) {
          for (idxc = -4; idxc <= 4; idxc++) {
@@ -62549,13 +62549,13 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
                for (idxg = -4; idxg <= 4; idxg++) {
                   for (idxx = -4; idxx <= 4; idxx++) {
                   // Convert Idx* to corresponding parameter value
-                     a = (double)idxa;
-                     b = (double)idxb;
-                     c = pow(2.0, (double)idxc);
-                     d = (double)idxd;
-                     g = pow(2.0, (double)idxg);
+                     a = idxa;
+                     b = idxb;
+                     c = pow(2.0, idxc);
+                     d = idxd;
+                     g = pow(2.0, idxg);
                      if (idxx != 0) {
-                        v = pow(2.0, (double)idxx);
+                        v = pow(2.0, idxx);
                      } else {
                         v = 0.0;
                      }
@@ -62607,7 +62607,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
 //
 // This test checks both unconstrained and constrained fitting (latter
 // one is performed with A constrained to AE, B constrained to BE).
-   tol = 1.0E-6;
+   tol = 0.000001;
    for (pass = 1; pass <= 30; pass++) {
    // Generate 2*N points with non-zero X and 2*NZ points with
    // zero X. In most cases we choose N != 0 and NZ != 0, but in
@@ -62746,7 +62746,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
 //       tolerance for power parameters B and G.
 //
 // This test checks both unconstrained and constrained fitting.
-   tol = 1.0E-6;
+   tol = 0.000001;
    for (pass = 1; pass <= 10; pass++) {
    // Generate N points, N-1 of them with non-zero X and
    // last one with zero X.
@@ -62756,7 +62756,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
       n = 2 * k + 1;
       ae_vector_set_length(&x, n);
       for (i = 0; i < n; i++) {
-         x.xR[i] = scalex * pow(2.0, (double)(2 * (i - k)) / k);
+         x.xR[i] = scalex * pow(2.0, (2.0 * (i - k)) / k);
       }
       x.xR[n - 1] = 0.0;
    // Generate A/B/C/D/G:
@@ -62859,14 +62859,14 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
       }
    }
 // Test correctness of errors
-   tol = 1.0E-6;
+   tol = 0.000001;
    for (pass = 1; pass <= 20; pass++) {
       n = 10;
       meany = 0.0;
       ae_vector_set_length(&x, n);
       ae_vector_set_length(&y, n);
       for (i = 0; i < n; i++) {
-         x.xR[i] = (double)i;
+         x.xR[i] = i;
          y.xR[i] = hqrnduniformr(&rs) - 0.5;
          meany += y.xR[i];
       }
@@ -63109,7 +63109,7 @@ static void testlsfitunit_testgradientcheck(bool *testg) {
       ae_matrix_set_length(&x, n, m);
       ae_vector_set_length(&y, n);
       nbrcomp = randominteger(k);
-      noise = (double)(2 * randominteger(2) - 1);
+      noise = 2.0 * randominteger(2) - 1.0;
    // Prepare function's parameters
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
@@ -63340,11 +63340,11 @@ static void testfitsphereunit_testspherefittingls(bool *err) {
    NewVector(cx, 0, DT_REAL);
    NewVector(cy, 0, DT_REAL);
    hqrndrandomize(&rs);
-   xtol = 1.0E-5;
+   xtol = 0.00001;
 // Generate random problem
    for (nx = 1; nx <= 4; nx++) {
    // Generate synthetic dataset, at least 5 points
-      npoints = 5 + 2 * nx + hqrnduniformi(&rs, 50 + iround(pow(4.0, (double)nx)));
+      npoints = 5 + 2 * nx + hqrnduniformi(&rs, 50 + iround(pow(4.0, nx)));
       ae_matrix_set_length(&xy, npoints, nx);
       for (i = 0; i < npoints; i++) {
          v = 0.0;
@@ -63381,7 +63381,7 @@ static void testfitsphereunit_testspherefittingls(bool *err) {
    // NOTE: in fact, we do allow small increase in target function - but no more
    //       than FTol == 1E-6*XTol. It helps to avoid spurious error reports in
    //       degenerate cases.
-      ftol = 1.0E-6 * xtol;
+      ftol = 0.000001 * xtol;
       ae_vector_set_length(&cy, nx);
       for (j = 0; j < nx; j++) {
          for (k = 0; k < nx; k++) {
@@ -63435,11 +63435,11 @@ static void testfitsphereunit_testspherefittingns(bool *err) {
    NewVector(cx, 0, DT_REAL);
    NewVector(cy, 0, DT_REAL);
    hqrndrandomize(&rs);
-   xtol = 1.0E-5;
+   xtol = 0.00001;
 // Generate random problem
    for (nx = 1; nx <= 4; nx++) {
    // Generate synthetic dataset
-      npoints = 50 + iround(pow(4.0, (double)nx));
+      npoints = 50 + iround(pow(4.0, nx));
       ae_matrix_set_length(&xy, npoints, nx);
       for (i = 0; i < npoints; i++) {
          v = 0.0;
@@ -63466,7 +63466,7 @@ static void testfitsphereunit_testspherefittingns(bool *err) {
       // NOTE: in fact, we do allow small increase in target function - but no more
       //       than FTol == 1E-6*XTol. It helps to avoid spurious error reports in
       //       degenerate cases.
-         ftol = 1.0E-6 * xtol;
+         ftol = 0.000001 * xtol;
          ae_vector_set_length(&cy, nx);
          if (problemtype == 2 || problemtype == 3) {
             vlo = 1.0;
@@ -63623,7 +63623,7 @@ static void testfitsphereunit_testspherefittingvosswinkel2(bool *err) {
    testfitsphereunit_addvalue(&xy, &cnt, -0.028981);
    testfitsphereunit_addvalue(&xy, &cnt, 0.101784);
    testfitsphereunit_addvalue(&xy, &cnt, -0.012918);
-   tol = 1.0E-7;
+   tol = 0.0000001;
 // MZ problem, NLC solver
    SetVector(&cx);
    rlo = 0.0;
@@ -63944,7 +63944,7 @@ static void testparametricunit_testrdp(bool *errorflag) {
          for (i = 0; i < n; i++) {
             v = pi * i / (n - 1);
             for (j = 0; j < d; j++) {
-               xy.xyR[i][j] = pow(sin(v), (double)(j + 1)) + 0.005 * hqrndmiduniformr(&rs);
+               xy.xyR[i][j] = pow(sin(v), j + 1.0) + 0.005 * hqrndmiduniformr(&rs);
             }
          }
       // Perform run of eps-based RDP algorithm
@@ -63973,12 +63973,12 @@ static void testparametricunit_testrdp(bool *errorflag) {
          }
          for (j = 0; j < d; j++) {
             for (i = 0; i <= nsections; i++) {
-               x.xR[i] = (double)idx2.xZ[i];
+               x.xR[i] = idx2.xZ[i];
                y.xR[i] = xy2.xyR[i][j];
             }
             spline1dbuildlinear(&x, &y, nsections + 1, &s);
             for (i = 0; i < n; i++) {
-               e.xR[i] += sqr(spline1dcalc(&s, (double)i) - xy.xyR[i][j]);
+               e.xR[i] += sqr(spline1dcalc(&s, i) - xy.xyR[i][j]);
             }
          }
          for (i = 0; i < n; i++) {
@@ -64379,11 +64379,11 @@ bool testparametric() {
       ae_matrix_set_length(&xy, n, 2);
       ae_matrix_set_length(&xyz, n, 3);
       for (i = 0; i < n; i++) {
-         xy.xyR[i][0] = (double)i;
-         xy.xyR[i][1] = (double)i;
-         xyz.xyR[i][0] = (double)i;
-         xyz.xyR[i][1] = (double)i;
-         xyz.xyR[i][2] = (double)i;
+         xy.xyR[i][0] = i;
+         xy.xyR[i][1] = i;
+         xyz.xyR[i][0] = i;
+         xyz.xyR[i][1] = i;
+         xyz.xyR[i][2] = i;
       }
       pspline2build(&xy, n, 1, 0, &p2);
       pspline3build(&xyz, n, 1, 0, &p3);
@@ -64543,7 +64543,7 @@ static bool testspline2dunit_testunpack(spline2dinterpolant *c, RVector *lx, RVe
             v1 = 0.0;
             for (ci = 0; ci <= 3; ci++) {
                for (cj = 0; cj <= 3; cj++) {
-                  v1 += tbl.xyR[p][4 + ci * 4 + cj] * pow(tx, (double)ci) * pow(ty, (double)cj);
+                  v1 += tbl.xyR[p][4 + ci * 4 + cj] * pow(tx, ci) * pow(ty, cj);
                }
             }
             v2 = spline2dcalc(c, tbl.xyR[p][0] + tx, tbl.xyR[p][2] + ty);
@@ -64718,7 +64718,7 @@ static bool testspline2dunit_testspline2dvf() {
    result = false;
    for (pass = 1; pass <= passcount; pass++) {
       for (variant = 1; variant <= 2; variant++) {
-         range = (double)(randominteger(71) + 30);
+         range = randominteger(71) + 30.0;
          m = randominteger(4) + 2;
          n = randominteger(4) + 2;
          d = randominteger(3) + 1;
@@ -64896,7 +64896,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
    NewVector(tmp0, 0, DT_REAL);
    NewVector(tmp1, 0, DT_REAL);
    hqrndrandomize(&rs);
-   tol = 1.0E-5;
+   tol = 0.00001;
 // Check properties of underlying linear prior.
    ae_vector_set_length(&kv, 3);
    kv.xZ[0] = 5;
@@ -65117,7 +65117,7 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
    for (kidx = 3; kidx <= 4; kidx++) {
       for (solvertype = 1; solvertype <= 2; solvertype++) {
       // Generate dataset
-         kx = iround(pow(2.0, (double)kidx));
+         kx = iround(pow(2.0, kidx));
          ky = kx;
          npoints = 4;
          ae_matrix_set_length(&xy, npoints, 3);
@@ -65151,7 +65151,7 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
             }
          }
          spline2dfit(&state, &s, &rep);
-         *errorflag = *errorflag || !NearAtR(spline2dcalc(&s, 0.0, 0.0), 0.25 * (xy.xyR[0][2] + xy.xyR[1][2] + xy.xyR[2][2] + xy.xyR[3][2]), 1.0E-4);
+         *errorflag = *errorflag || !NearAtR(spline2dcalc(&s, 0.0, 0.0), 0.25 * (xy.xyR[0][2] + xy.xyR[1][2] + xy.xyR[2][2] + xy.xyR[3][2]), 0.0001);
       // Check fitting without penalty
          if (solvertype == 1) {
             spline2dbuildersetalgoblocklls(&state, 0.0);
@@ -65163,7 +65163,7 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
             }
          }
          spline2dfit(&state, &s2, &rep2);
-         *errorflag = *errorflag || !SmallAtR(spline2dcalc(&s2, 0.0, 0.0), 1.0E-4);
+         *errorflag = *errorflag || !SmallAtR(spline2dcalc(&s2, 0.0, 0.0), 0.0001);
       }
    }
 // Solve a sequence of problems with increasing value of penalty coefficient;
@@ -65205,11 +65205,11 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
          for (k = 0; k < d; k++) {
             penalty.xR[k] = 0.0;
          }
-         v = 1.0E-3;
+         v = 0.001;
          for (i = 0; i < kx; i++) {
             for (j = 0; j < ky; j++) {
-               v0 = (double)i / (kx - 1);
-               v1 = (double)j / (ky - 1);
+               v0 = i / (kx - 1.0);
+               v1 = j / (ky - 1.0);
                for (k = 0; k < d; k++) {
                   f0 = spline2dcalcvi(&s, v0 - v, v1, k);
                   f1 = spline2dcalcvi(&s, v0, v1, k);
@@ -65234,10 +65234,10 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
       // Solve with non-zero penalty
          for (pidx = -6; pidx <= 3; pidx++) {
             if (solvertype == 1) {
-               spline2dbuildersetalgoblocklls(&state, pow(10.0, (double)pidx / 2.0));
+               spline2dbuildersetalgoblocklls(&state, pow(10.0, pidx / 2.0));
             } else {
                if (solvertype == 2) {
-                  spline2dbuildersetalgonaivells(&state, pow(10.0, (double)pidx / 2.0));
+                  spline2dbuildersetalgonaivells(&state, pow(10.0, pidx / 2.0));
                } else {
                   ae_assert(false, "Assertion failed");
                }
@@ -65247,11 +65247,11 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
             for (k = 0; k < d; k++) {
                penalty2.xR[k] = 0.0;
             }
-            v = 1.0E-3;
+            v = 0.001;
             for (i = 0; i < kx; i++) {
                for (j = 0; j < ky; j++) {
-                  v0 = (double)i / (kx - 1);
-                  v1 = (double)j / (ky - 1);
+                  v0 = i / (kx - 1.0);
+                  v1 = j / (ky - 1.0);
                   for (k = 0; k < d; k++) {
                      f0 = spline2dcalcvi(&s, v0 - v, v1, k);
                      f1 = spline2dcalcvi(&s, v0, v1, k);
@@ -65334,7 +65334,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
    NewVector(tmp0, 0, DT_REAL);
    NewVector(tmp1, 0, DT_REAL);
    hqrndrandomize(&rs);
-   errtol = 1.0E-6;
+   errtol = 0.000001;
 // Check that default state (no dataset) results in zero model being returned.
    for (priortype = 0; priortype <= 2; priortype++) {
       for (d = 1; d <= 3; d++) {
@@ -65487,7 +65487,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
                   *errorflag = *errorflag || !NearAtR(rmserror, rep.rmserror, errtol);
                   *errorflag = *errorflag || !NearAtR(avgerror, rep.avgerror, errtol);
                   *errorflag = *errorflag || !NearAtR(maxerror, rep.maxerror, errtol);
-                  if (tss > 1.0E-3) {
+                  if (tss > 0.001) {
                      *errorflag = *errorflag || !NearAtR(r2, rep.r2, errtol);
                   }
                // Minimalistic test for fitting quality: R2 is better than zero
@@ -65548,8 +65548,8 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
             npoints = kx * ky;
             ae_matrix_set_length(&xy, npoints, 2 + d);
             for (i = 0; i < npoints; i++) {
-               xy.xyR[i][0] = rboundval(i % kx + 0.05 * hqrndnormal(&rs), 0.0, (double)(kx - 1));
-               xy.xyR[i][1] = rboundval(i / kx + 0.05 * hqrndnormal(&rs), 0.0, (double)(ky - 1));
+               xy.xyR[i][0] = rboundval(i % kx + 0.05 * hqrndnormal(&rs), 0.0, kx - 1.0);
+               xy.xyR[i][1] = rboundval(i / kx + 0.05 * hqrndnormal(&rs), 0.0, ky - 1.0);
                for (j = 0; j < d; j++) {
                   xy.xyR[i][2 + j] = hqrndnormal(&rs);
                }
@@ -65573,7 +65573,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
          // Test
             for (i = 0; i < npoints; i++) {
                for (k = 0; k < d; k++) {
-                  *errorflag = *errorflag || !NearAtR(spline2dcalcvi(&s, xy.xyR[i][0], xy.xyR[i][1], k), xy.xyR[i][2 + k], 1.0E-6);
+                  *errorflag = *errorflag || !NearAtR(spline2dcalcvi(&s, xy.xyR[i][0], xy.xyR[i][1], k), xy.xyR[i][2 + k], 0.000001);
                }
             }
          }
@@ -65602,7 +65602,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
          //       reference one (NaiveLLS) and high-performance one.
             spline2dbuildercreate(d, &state);
             spline2dbuildersetgrid(&state, kx, ky);
-            spline2dbuildersetarea(&state, 0.0, (double)(kx - 1), 0.0, (double)(ky - 1));
+            spline2dbuildersetarea(&state, 0.0, kx - 1.0, 0.0, ky - 1.0);
             spline2dbuildersetpoints(&state, &xy, npoints);
             state.lsqrcnt = 1;
             spline2dbuildersetalgonaivells(&state, 0.0);
@@ -65613,7 +65613,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
                spline2dcalcv(&s, xy.xyR[i][0], xy.xyR[i][1], &tmp0);
                spline2dcalcv(&s2, xy.xyR[i][0], xy.xyR[i][1], &tmp1);
                for (j = 0; j < d; j++) {
-                  *errorflag = *errorflag || !NearAtR(tmp0.xR[j], tmp1.xR[j], 1.0E-6);
+                  *errorflag = *errorflag || !NearAtR(tmp0.xR[j], tmp1.xR[j], 0.000001);
                   mx = rmax2(mx, fabs(tmp0.xR[j] - tmp1.xR[j]));
                }
             }
@@ -65633,7 +65633,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
    }
    spline2dbuildercreate(d, &state);
    spline2dbuildersetgrid(&state, kx, ky);
-   spline2dbuildersetarea(&state, 0.0, (double)(kx - 1), 0.0, (double)(ky - 1));
+   spline2dbuildersetarea(&state, 0.0, kx - 1.0, 0.0, ky - 1.0);
    spline2dbuildersetalgoblocklls(&state, 0.001);
    spline2dbuildersetpoints(&state, &xy, npoints);
    spline2dfit(&state, &s, &rep);
@@ -65783,11 +65783,11 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          }
          rmserror = sqrt(rmserror / (npoints * d));
          r2 = 1.0 - rss / coalesce(tss, 1.0);
-         *errorflag = *errorflag || !NearAtR(rmserror, rep1.rmserror, 1.0E-6);
-         *errorflag = *errorflag || !NearAtR(avgerror, rep1.avgerror, 1.0E-6);
-         *errorflag = *errorflag || !NearAtR(maxerror, rep1.maxerror, 1.0E-6);
-         if (tss > 1.0E-3) {
-            *errorflag = *errorflag || !NearAtR(r2, rep1.r2, 1.0E-6);
+         *errorflag = *errorflag || !NearAtR(rmserror, rep1.rmserror, 0.000001);
+         *errorflag = *errorflag || !NearAtR(avgerror, rep1.avgerror, 0.000001);
+         *errorflag = *errorflag || !NearAtR(maxerror, rep1.maxerror, 0.000001);
+         if (tss > 0.001) {
+            *errorflag = *errorflag || !NearAtR(r2, rep1.r2, 0.000001);
          }
       }
    }
@@ -65802,15 +65802,15 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
       npoints = kx * ky;
       ae_matrix_set_length(&xy, npoints, 2 + d);
       for (i = 0; i < npoints; i++) {
-         xy.xyR[i][0] = rboundval(i % kx + 0.05 * hqrndnormal(&rs), 0.0, (double)(kx - 1));
-         xy.xyR[i][1] = rboundval(i / kx + 0.05 * hqrndnormal(&rs), 0.0, (double)(ky - 1));
+         xy.xyR[i][0] = rboundval(i % kx + 0.05 * hqrndnormal(&rs), 0.0, kx - 1.0);
+         xy.xyR[i][1] = rboundval(i / kx + 0.05 * hqrndnormal(&rs), 0.0, ky - 1.0);
          for (j = 0; j < d; j++) {
             xy.xyR[i][2 + j] = hqrndnormal(&rs);
          }
       }
    // Create solver, set grid, area and other properties
       spline2dbuildercreate(d, &state);
-      spline2dbuildersetarea(&state, 0.0, (double)(kx - 1), 0.0, (double)(ky - 1));
+      spline2dbuildersetarea(&state, 0.0, kx - 1.0, 0.0, ky - 1.0);
       state.maxcoresize = tilesize;
    // Fit with BlockLLS solver
       state.adddegreeoffreedom = false;
@@ -65912,11 +65912,11 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          }
          rmserror = sqrt(rmserror / (npoints * d));
          r2 = 1.0 - rss / coalesce(tss, 1.0);
-         *errorflag = *errorflag || !NearAtR(rmserror, rep1.rmserror, 1.0E-6);
-         *errorflag = *errorflag || !NearAtR(avgerror, rep1.avgerror, 1.0E-6);
-         *errorflag = *errorflag || !NearAtR(maxerror, rep1.maxerror, 1.0E-6);
-         if (tss > 1.0E-3) {
-            *errorflag = *errorflag || !NearAtR(r2, rep1.r2, 1.0E-6);
+         *errorflag = *errorflag || !NearAtR(rmserror, rep1.rmserror, 0.000001);
+         *errorflag = *errorflag || !NearAtR(avgerror, rep1.avgerror, 0.000001);
+         *errorflag = *errorflag || !NearAtR(maxerror, rep1.maxerror, 0.000001);
+         if (tss > 0.001) {
+            *errorflag = *errorflag || !NearAtR(r2, rep1.r2, 0.000001);
          }
       }
    }
@@ -65976,8 +65976,8 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
       npoints = kx * ky;
       ae_matrix_set_length(&xy, npoints, 2 + d);
       for (i = 0; i < npoints; i++) {
-         xy.xyR[i][0] = rboundval(i % kx + 0.05 * hqrndnormal(&rs), 0.0, (double)(kx - 1));
-         xy.xyR[i][1] = rboundval(i / kx + 0.05 * hqrndnormal(&rs), 0.0, (double)(ky - 1));
+         xy.xyR[i][0] = rboundval(i % kx + 0.05 * hqrndnormal(&rs), 0.0, kx - 1.0);
+         xy.xyR[i][1] = rboundval(i / kx + 0.05 * hqrndnormal(&rs), 0.0, ky - 1.0);
          for (j = 0; j < d; j++) {
             xy.xyR[i][2 + j] = hqrndnormal(&rs);
          }
@@ -65987,7 +65987,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
       state.maxcoresize = tilesize;
       spline2dbuildersetpoints(&state, &xy, npoints);
       spline2dbuildersetgrid(&state, iround(2.0 * kx), iround(2.0 * ky));
-      spline2dbuildersetarea(&state, 0.0, (double)(kx - 1), 0.0, (double)(ky - 1));
+      spline2dbuildersetarea(&state, 0.0, kx - 1.0, 0.0, ky - 1.0);
       spline2dbuildersetalgofastddm(&state, 0, 0.0);
       spline2dfit(&state, &s1, &rep1);
    // Compare
@@ -66036,8 +66036,8 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          npoints = kx * ky;
          ae_matrix_set_length(&xy, npoints, 2 + d);
          for (i = 0; i < npoints; i++) {
-            xy.xyR[i][0] = rboundval(i % kx + 0.05 * hqrndnormal(&rs), 0.0, (double)(kx - 1));
-            xy.xyR[i][1] = rboundval(i / kx + 0.05 * hqrndnormal(&rs), 0.0, (double)(ky - 1));
+            xy.xyR[i][0] = rboundval(i % kx + 0.05 * hqrndnormal(&rs), 0.0, kx - 1.0);
+            xy.xyR[i][1] = rboundval(i / kx + 0.05 * hqrndnormal(&rs), 0.0, ky - 1.0);
             for (j = 0; j < d; j++) {
                xy.xyR[i][2 + j] = hqrndnormal(&rs);
             }
@@ -66062,22 +66062,22 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
       ae_assert(vy > 0.0, "Spline2D: unit test failed integrity check");
    // Create solver, set grid, area and other properties.
       spline2dbuildercreate(d, &state);
-      spline2dbuildersetarea(&state, 0.0, (double)(kx - 1), 0.0, (double)(ky - 1));
+      spline2dbuildersetarea(&state, 0.0, kx - 1.0, 0.0, ky - 1.0);
       state.maxcoresize = tilesize;
       spline2dbuildersetpoints(&state, &xy, npoints);
       spline2dbuildersetgrid(&state, kx, ky);
    // Try different values of LambdaV, calculate penalty
       ae_vector_set_length(&lambdaa, 4);
       lambdaa.xR[0] = 0.0;
-      lambdaa.xR[1] = 1.0E-1;
-      lambdaa.xR[2] = 1.0E+1;
-      lambdaa.xR[3] = 1.0E+2;
+      lambdaa.xR[1] = 0.1;
+      lambdaa.xR[2] = 10.0;
+      lambdaa.xR[3] = 100.0;
       ae_vector_set_length(&penaltya, lambdaa.cnt);
       ae_vector_set_length(&rmsa, lambdaa.cnt);
       for (k = 0; k < lambdaa.cnt; k++) {
          spline2dbuildersetalgofastddm(&state, 0, lambdaa.xR[k]);
          spline2dfit(&state, &s1, &rep1);
-         h = 1.0E-4;
+         h = 0.0001;
          v = 0.0;
          for (i = 0; i < kx; i++) {
             for (j = 0; j < ky; j++) {
@@ -66138,8 +66138,8 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          npoints = kx * ky;
          ae_matrix_set_length(&xy, npoints, 2 + d);
          for (i = 0; i < npoints; i++) {
-            xy.xyR[i][0] = rboundval(i % kx + 0.05 * hqrndnormal(&rs), 0.0, (double)(kx - 1));
-            xy.xyR[i][1] = rboundval(i / kx + 0.05 * hqrndnormal(&rs), 0.0, (double)(ky - 1));
+            xy.xyR[i][0] = rboundval(i % kx + 0.05 * hqrndnormal(&rs), 0.0, kx - 1.0);
+            xy.xyR[i][1] = rboundval(i / kx + 0.05 * hqrndnormal(&rs), 0.0, ky - 1.0);
             for (j = 0; j < d; j++) {
                xy.xyR[i][2 + j] = hqrndnormal(&rs);
             }
@@ -66162,7 +66162,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
       }
    // Create solver, set grid, area and other properties.
       spline2dbuildercreate(d, &state);
-      spline2dbuildersetarea(&state, 0.0, (double)(kx - 1), 0.0, (double)(ky - 1));
+      spline2dbuildersetarea(&state, 0.0, kx - 1.0, 0.0, ky - 1.0);
       state.maxcoresize = tilesize;
       spline2dbuildersetpoints(&state, &xy, npoints);
    // Try different values of LambdaV, calculate penalty
@@ -66394,7 +66394,7 @@ bool testspline2d() {
                   err = rmax2(err, fabs(v1xy - v2xy));
                }
             }
-            dserrors = dserrors || err > 1.0E-3;
+            dserrors = dserrors || err > 0.001;
             uperrors = uperrors || !testspline2dunit_testunpack(&c, &lx, &ly);
             lterrors = lterrors || !testspline2dunit_testlintrans(&c, 1, ax, bx, ay, by);
          // Lin.Trans. test for multicomponent vector function
@@ -66435,7 +66435,7 @@ bool testspline2d() {
                   err = rmax2(err, fabs(v1xy - v2xy));
                }
             }
-            dserrors = dserrors || err > 1.0E-3;
+            dserrors = dserrors || err > 0.001;
             uperrors = uperrors || !testspline2dunit_testunpack(&c, &lx, &ly);
             lterrors = lterrors || !testspline2dunit_testlintrans(&c, 1, ax, bx, ay, by);
          // Lin.Trans. test for vector-function
@@ -66524,10 +66524,10 @@ bool testspline2d() {
          ae_vector_set_length(&x, n);
          ae_vector_set_length(&y, m);
          for (j = 0; j < n; j++) {
-            x.xR[j] = (double)j / (n - 1);
+            x.xR[j] = j / (n - 1.0);
          }
          for (i = 0; i < m; i++) {
-            y.xR[i] = (double)i / (m - 1);
+            y.xR[i] = i / (m - 1.0);
          }
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
@@ -66550,7 +66550,7 @@ bool testspline2d() {
                      mf = 0.0;
                      for (i = 0; i < m2; i++) {
                         for (j = 0; j < n2; j++) {
-                           v1 = spline2dcalc(&c, (double)j / (n2 - 1), (double)i / (m2 - 1));
+                           v1 = spline2dcalc(&c, j / (n2 - 1.0), i / (m2 - 1.0));
                            v2 = fr.xyR[i][j];
                            err = rmax2(err, fabs(v1 - v2));
                            mf = rmax2(mf, fabs(v1));
@@ -66723,7 +66723,7 @@ static void testspline3dunit_buildrndgrid(bool isvect, bool reorder, ae_int_t *n
    vectorsetlengthatleast(x, *n);
    vectorsetlengthatleast(y, *m);
    vectorsetlengthatleast(z, *l);
-   vectorsetlengthatleast(f, *n * (*m) * (*l) * (*d));
+   vectorsetlengthatleast(f, *n * *m * *l * *d);
 // Fill X
    x->xR[0] = 0.0;
    for (i = 1; i < *n; i++) {
@@ -66831,15 +66831,15 @@ static bool testspline3dunit_basictest() {
       l = 2 + randominteger(4);
       ae_vector_set_length(&x, n);
       for (i = 0; i < n; i++) {
-         x.xR[i] = (double)i;
+         x.xR[i] = i;
       }
       ae_vector_set_length(&y, m);
       for (i = 0; i < m; i++) {
-         y.xR[i] = (double)i;
+         y.xR[i] = i;
       }
       ae_vector_set_length(&z, l);
       for (i = 0; i < l; i++) {
-         z.xR[i] = (double)i;
+         z.xR[i] = i;
       }
       ae_vector_set_length(&vf, l * m * n * d);
       offs = 0;
@@ -67005,7 +67005,7 @@ static bool testspline3dunit_testunpack() {
                   for (ci = 0; ci <= 1; ci++) {
                      for (cj = 0; cj <= 1; cj++) {
                         for (ck = 0; ck <= 1; ck++) {
-                           v1 += tbl1.xyR[p1][6 + 2 * (2 * ck + cj) + ci] * pow(tx, (double)ci) * pow(ty, (double)cj) * pow(tz, (double)ck);
+                           v1 += tbl1.xyR[p1][6 + 2 * (2 * ck + cj) + ci] * pow(tx, ci) * pow(ty, cj) * pow(tz, ck);
                         }
                      }
                   }
@@ -67016,7 +67016,7 @@ static bool testspline3dunit_testunpack() {
                   for (ci = 0; ci <= 1; ci++) {
                      for (cj = 0; cj <= 1; cj++) {
                         for (ck = 0; ck <= 1; ck++) {
-                           v1 += tbl0.xyR[p0][6 + 2 * (2 * ck + cj) + ci] * pow(tx, (double)ci) * pow(ty, (double)cj) * pow(tz, (double)ck);
+                           v1 += tbl0.xyR[p0][6 + 2 * (2 * ck + cj) + ci] * pow(tx, ci) * pow(ty, cj) * pow(tz, ck);
                         }
                      }
                   }
@@ -67027,7 +67027,7 @@ static bool testspline3dunit_testunpack() {
          }
       }
    }
-   result = err > 1.0E+5 * machineepsilon;
+   result = err > 100000.0 * machineepsilon;
    ae_frame_leave();
    return result;
 }
@@ -67121,7 +67121,7 @@ static bool testspline3dunit_testlintrans() {
                for (i = 0; i < d; i++) {
                   err = rmax2(err, fabs(v1.xR[i] - v2.xR[i]));
                }
-               if (err > 1.0E+4 * machineepsilon) {
+               if (err > 10000.0 * machineepsilon) {
                   result = true;
                   ae_frame_leave();
                   return result;
@@ -67141,7 +67141,7 @@ static bool testspline3dunit_testlintrans() {
          }
       }
    }
-   result = err > 1.0E+4 * machineepsilon;
+   result = err > 10000.0 * machineepsilon;
    ae_frame_leave();
    return result;
 }
@@ -67186,13 +67186,13 @@ static bool testspline3dunit_testtrilinearresample() {
       vectorsetlengthatleast(&z, l);
       vectorsetlengthatleast(&f, n * m * l);
       for (i = 0; i < n; i++) {
-         x.xR[i] = (double)i / (n - 1);
+         x.xR[i] = i / (n - 1.0);
       }
       for (i = 0; i < m; i++) {
-         y.xR[i] = (double)i / (m - 1);
+         y.xR[i] = i / (m - 1.0);
       }
       for (i = 0; i < l; i++) {
-         z.xR[i] = (double)i / (l - 1);
+         z.xR[i] = i / (l - 1.0);
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
@@ -67208,14 +67208,14 @@ static bool testspline3dunit_testtrilinearresample() {
       for (i = 0; i < n2; i++) {
          for (j = 0; j < m2; j++) {
             for (k = 0; k < l2; k++) {
-               v1 = spline3dcalc(&c, (double)i / (n2 - 1), (double)j / (m2 - 1), (double)k / (l2 - 1));
+               v1 = spline3dcalc(&c, i / (n2 - 1.0), j / (m2 - 1.0), k / (l2 - 1.0));
                v2 = fr.xR[n2 * (m2 * k + j) + i];
                err = rmax2(err, fabs(v1 - v2));
                mf = rmax2(mf, fabs(v1));
             }
          }
       }
-      result = result || err / mf > 1.0E+4 * machineepsilon;
+      result = result || err / mf > 10000.0 * machineepsilon;
       if (result) {
          ae_frame_leave();
          return result;
@@ -67343,7 +67343,7 @@ static bool sqrdegmatrixrbftest() {
    px = 15.0;
    zy = 10.0;
    py = 15.0;
-   eps = 1.0E-6;
+   eps = 0.000001;
    ny = 1;
    for (nx = 2; nx <= 3; nx++) {
    // prepare test problem
@@ -67491,8 +67491,8 @@ static bool testrbfunit_searcherr(RMatrix *y0, RMatrix *y1, ae_int_t n, ae_int_t
    NewVector(orerr, 0, DT_REAL);
    ae_assert(n > 0, "SearchErr: invalid parameter N(N <= 0).");
    ae_assert(ny > 0, "SearchErr: invalid parameter NY(NY <= 0).");
-   oralerr = 1.0E-1;
-   iralerr = 1.0E-2;
+   oralerr = 0.1;
+   iralerr = 0.01;
    lb = 25;
    rb = 75;
    ae_vector_set_length(&orerr, ny);
@@ -67978,8 +67978,8 @@ static bool testrbfunit_specialtest() {
       ae_matrix_set_length(&xy, n * n, 2 + ny);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            xy.xyR[n * i + j][0] = (double)i;
-            xy.xyR[n * i + j][1] = (double)j;
+            xy.xyR[n * i + j][0] = i;
+            xy.xyR[n * i + j][1] = j;
             for (k = 0; k < ny; k++) {
                xy.xyR[n * i + j][2 + k] = (va + 0.1 * k) * i + (vb + 0.2 * k) * j + (vc + 0.3 * k);
             }
@@ -68018,9 +68018,9 @@ static bool testrbfunit_specialtest() {
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             for (t = 0; t < n; t++) {
-               xy.xyR[n * n * i + n * j + t][0] = (double)i;
-               xy.xyR[n * n * i + n * j + t][1] = (double)j;
-               xy.xyR[n * n * i + n * j + t][2] = (double)t;
+               xy.xyR[n * n * i + n * j + t][0] = i;
+               xy.xyR[n * n * i + n * j + t][1] = j;
+               xy.xyR[n * n * i + n * j + t][2] = t;
                for (k = 0; k < ny; k++) {
                   xy.xyR[n * n * i + n * j + t][3 + k] = (va + 0.1 * k) * i + (vb + 0.2 * k) * j + (vc + 0.3 * k) * t + (vd + 0.4 * k);
                }
@@ -68153,7 +68153,7 @@ static bool testrbfunit_basicrbftest() {
    px = 15.0;
    zy = 10.0;
    py = 15.0;
-   eps = 1.0E-6;
+   eps = 0.000001;
 // Problem types:
 // * 2 and 3-dimensional problems
 // * problems with zero, constant, linear terms
@@ -68482,7 +68482,7 @@ static bool testrbfunit_irregularrbftest() {
    zy = 10.0;
    py = 15.0;
    noiselevel = 0.1;
-   eps = 1.0E-6;
+   eps = 0.000001;
 // Problem types:
 // * 2 and 3-dimensional problems
 // * problems with zero, constant, linear terms
@@ -68973,7 +68973,7 @@ static bool testrbfunit_serializationtest() {
       for (ny = 1; ny <= 2; ny++) {
       // prepare test problem
          rbfcreate(nx, ny, &s);
-         rbfsetalgomultilayer(&s, 5.0, 5, 1.0E-3);
+         rbfsetalgomultilayer(&s, 5.0, 5, 0.001);
          rbfsetlinterm(&s);
          if (nx == 2) {
          // 2-dimensional problem
@@ -69090,16 +69090,16 @@ static bool testrbfunit_serializationtest() {
          n = 150;
          rbase = 0.33;
          nlayers = 5;
-         gridsize = iround(pow((double)n, 1.0 / nx)) + 1;
+         gridsize = iround(pow(n, 1.0 / nx)) + 1;
          bf = randominteger(2);
-         n = iround(pow((double)gridsize, (double)nx));
+         n = iround(pow(gridsize, nx));
          ae_matrix_set_length(&xy, n, nx + ny);
          ae_assert(gridsize > 1, "Assertion failed");
-         ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
+         ae_assert(n == pow(gridsize, nx), "Assertion failed");
          for (i = 0; i < n; i++) {
             k = i;
             for (j = 0; j < nx; j++) {
-               xy.xyR[i][j] = (double)(k % gridsize) / (gridsize - 1);
+               xy.xyR[i][j] = (k % gridsize) / (gridsize - 1.0);
                k /= gridsize;
             }
             for (j = 0; j < ny; j++) {
@@ -69232,7 +69232,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
    result = false;
    range = 10;
    passcount = 10;
-   eps = 1.0E-6;
+   eps = 0.000001;
 // Test that RBF model with sufficient layers will exactly reproduce
 // target function.
    for (pass = 0; pass < passcount; pass++) {
@@ -69240,8 +69240,8 @@ static bool testrbfunit_basicmultilayerrbftest() {
       k0 = 6 + randominteger(3);
       k1 = 6 + randominteger(3);
       k2 = 6 + randominteger(3);
-      s1 = pow((double)range, (double)(randominteger(3) - 1));
-      s2 = pow((double)range, (double)(randominteger(3) - 1));
+      s1 = pow(range, randominteger(3) - 1.0);
+      s2 = pow(range, randominteger(3) - 1.0);
       nx = randominteger(2) + 2;
       ny = randominteger(2) + 1;
       linterm = randominteger(3) + 1;
@@ -69435,8 +69435,8 @@ static bool testrbfunit_basicmultilayerrbftest() {
    ae_matrix_set_length(&gp, gridsize * gridsize, nx + ny);
    for (i = 0; i < gridsize; i++) {
       for (j = 0; j < gridsize; j++) {
-         gp.xyR[i * gridsize + j][0] = (double)i;
-         gp.xyR[i * gridsize + j][1] = (double)j;
+         gp.xyR[i * gridsize + j][0] = i;
+         gp.xyR[i * gridsize + j][1] = j;
          gp.xyR[i * gridsize + j][2] = 0.05 * randommid() + (2 * ((i + j) % 2) - 1);
       }
    }
@@ -69445,7 +69445,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
    v = 0.0;
    for (i = margin; i < gridsize - margin; i++) {
       for (j = margin; j < gridsize - margin; j++) {
-         v = rmax2(v, fabs(rbfcalc2(&s, (double)i, (double)j)));
+         v = rmax2(v, fabs(rbfcalc2(&s, i, j)));
       }
    }
    result = result || v > threshold;
@@ -69509,8 +69509,8 @@ static void testrbfunit_gridcalc23test(bool *errorflag) {
             kx.xZ[i] = 10;
          }
       }
-      sx = pow(10.0, (double)(hqrnduniformi(&rs, 3) - 1));
-      sy = pow(10.0, (double)(hqrnduniformi(&rs, 3) - 1));
+      sx = pow(10.0, hqrnduniformi(&rs, 3) - 1.0);
+      sy = pow(10.0, hqrnduniformi(&rs, 3) - 1.0);
       nx = 3;
       ny = 1 + hqrnduniformi(&rs, 5);
       linterm = hqrnduniformi(&rs, 3) + 1;
@@ -69590,7 +69590,7 @@ static void testrbfunit_gridcalc23test(bool *errorflag) {
    //   that it is not processed. So, we check empty (completely
    //   unflagged) rows
    //
-      sparsity = pow(10.0, (double)-hqrnduniformi(&rs, 4));
+      sparsity = pow(10.0, -hqrnduniformi(&rs, 4));
       ae_vector_set_length(&gf, kx.xZ[0] * kx.xZ[1] * kx.xZ[2]);
       ae_vector_set_length(&rf, kx.xZ[1] * kx.xZ[2]);
       for (i = 0; i < kx.xZ[1] * kx.xZ[2]; i++) {
@@ -69691,24 +69691,24 @@ static bool testrbfunit_basichrbftest() {
 // * RBFCalc3()
 // * RBFCalcBuf()
 // * RBFTsCalcBuf()
-   errtol = 1.0E-6;
+   errtol = 0.000001;
    for (nx = 1; nx <= 4; nx++) {
       for (ny = 1; ny <= 3; ny++) {
       // problem setup
          n = 150;
          rbase = 0.33;
          nlayers = 10;
-         gridsize = iround(pow((double)n, 1.0 / nx)) + 1;
+         gridsize = iround(pow(n, 1.0 / nx)) + 1;
          linterm = 1 + randominteger(3);
          bf = randominteger(2);
-         n = iround(pow((double)gridsize, (double)nx));
+         n = iround(pow(gridsize, nx));
          ae_matrix_set_length(&xy, n, nx + ny);
          ae_assert(gridsize > 1, "Assertion failed");
-         ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
+         ae_assert(n == pow(gridsize, nx), "Assertion failed");
          for (i = 0; i < n; i++) {
             k = i;
             for (j = 0; j < nx; j++) {
-               xy.xyR[i][j] = (double)(k % gridsize) / (gridsize - 1);
+               xy.xyR[i][j] = (k % gridsize) / (gridsize - 1.0);
                k /= gridsize;
             }
             for (j = 0; j < ny; j++) {
@@ -69847,17 +69847,17 @@ static bool testrbfunit_basichrbftest() {
          n = 150;
          rbase = 0.33;
          nlayers = 5;
-         gridsize = iround(pow((double)n, 1.0 / nx)) + 1;
+         gridsize = iround(pow(n, 1.0 / nx)) + 1;
          linterm = 1 + randominteger(3);
          bf = randominteger(2);
-         n = iround(pow((double)gridsize, (double)nx));
+         n = iround(pow(gridsize, nx));
          ae_matrix_set_length(&xy, n, nx + ny);
          ae_assert(gridsize > 1, "Assertion failed");
-         ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
+         ae_assert(n == pow(gridsize, nx), "Assertion failed");
          for (i = 0; i < n; i++) {
             k = i;
             for (j = 0; j < nx; j++) {
-               xy.xyR[i][j] = (double)(k % gridsize) / (gridsize - 1);
+               xy.xyR[i][j] = (k % gridsize) / (gridsize - 1.0);
                k /= gridsize;
             }
             for (j = 0; j < ny; j++) {
@@ -69983,16 +69983,16 @@ static bool testrbfunit_basichrbftest() {
          lowprec = -999999.0;
          highprec = -999999.0;
          if (functype == 0) {
-            lowprec = 1.0E-2;
-            highprec = 1.0E-3;
+            lowprec = 0.01;
+            highprec = 0.001;
          } else {
             if (functype == 1) {
-               lowprec = 1.0E-1;
-               highprec = 1.0E-2;
+               lowprec = 0.1;
+               highprec = 0.01;
             } else {
                if (functype == 2) {
-                  lowprec = 1.0E-3;
-                  highprec = 1.0E-4;
+                  lowprec = 0.001;
+                  highprec = 0.0001;
                } else {
                   ae_assert(false, "Assertion failed");
                }
@@ -70012,19 +70012,19 @@ static bool testrbfunit_basichrbftest() {
                fractionalerror = false;
                if (functype == 0) {
                // sin(x) on [-2*pi,+2*pi]
-                  n = 17 * iround(pow(4.0, (double)densitytype));
+                  n = 17 * iround(pow(4.0, densitytype));
                   width = pi;
                   fractionalerror = false;
                } else {
                   if (functype == 1) {
                   // exp(x) on [-3,+3]
-                     n = 50 * iround(pow(4.0, (double)densitytype));
+                     n = 50 * iround(pow(4.0, densitytype));
                      width = 3.0;
                      fractionalerror = true;
                   } else {
                      if (functype == 2) {
                      // 1/(1+x^2) on [-3,+3]
-                        n = 20 * iround(pow(4.0, (double)densitytype));
+                        n = 20 * iround(pow(4.0, densitytype));
                         width = 3.0;
                         fractionalerror = false;
                      } else {
@@ -70042,7 +70042,7 @@ static bool testrbfunit_basichrbftest() {
                ntest = n * 10;
                ae_matrix_set_length(&xytest, ntest, 2);
                for (i = 0; i < ntest; i++) {
-                  xytest.xyR[i][0] = 0.9 * width * ((double)(2 * i) / (ntest - 1) - 1);
+                  xytest.xyR[i][0] = 0.9 * width * ((2.0 * i) / (ntest - 1) - 1);
                }
             // Evaluate function
                if (functype == 0) {
@@ -70066,10 +70066,10 @@ static bool testrbfunit_basichrbftest() {
                      if (functype == 2) {
                      // 1/(1+x^2)
                         for (i = 0; i < n; i++) {
-                           xy.xyR[i][1] = 1 / (1 + sqr(xy.xyR[i][0]));
+                           xy.xyR[i][1] = 1.0 / (1.0 + sqr(xy.xyR[i][0]));
                         }
                         for (i = 0; i < ntest; i++) {
-                           xytest.xyR[i][1] = 1 / (1 + sqr(xytest.xyR[i][0]));
+                           xytest.xyR[i][1] = 1.0 / (1.0 + sqr(xytest.xyR[i][0]));
                         }
                      } else {
                         ae_assert(false, "Assertion failed");
@@ -70142,20 +70142,20 @@ static bool testrbfunit_basichrbftest() {
       n = 150;
       rbase = 0.33;
       nlayers = randominteger(4);
-      scalefactor = pow(1024.0, (double)(2 * randominteger(2) - 1));
-      gridsize = iround(pow((double)n, 1.0 / nx)) + 1;
+      scalefactor = pow(1024.0, 2.0 * randominteger(2) - 1.0);
+      gridsize = iround(pow(n, 1.0 / nx)) + 1;
       ny = 1 + randominteger(3);
       linterm = 1 + randominteger(3);
       bf = randominteger(2);
-      n = iround(pow((double)gridsize, (double)nx));
+      n = iround(pow(gridsize, nx));
       ae_matrix_set_length(&xy, n, nx + ny);
       ae_matrix_set_length(&xy2, n, nx + ny);
       ae_assert(gridsize > 1, "Assertion failed");
-      ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
+      ae_assert(n == pow(gridsize, nx), "Assertion failed");
       for (i = 0; i < n; i++) {
          k = i;
          for (j = 0; j < nx; j++) {
-            xy.xyR[i][j] = (double)(k % gridsize) / (gridsize - 1);
+            xy.xyR[i][j] = (k % gridsize) / (gridsize - 1.0);
             xy2.xyR[i][j] = xy.xyR[i][j] * scalefactor;
             k /= gridsize;
          }
@@ -70270,13 +70270,13 @@ static bool testrbfunit_basichrbftest() {
    for (bf = 0; bf <= 1; bf++) {
       rbfcreate(nx, ny, &s);
       rbfsetv2bf(&s, bf);
-      rbfsetalgohierarchical(&s, r0, 1, 1.0E-1);
+      rbfsetalgohierarchical(&s, r0, 1, 0.1);
       rbfsetzeroterm(&s);
       ae_matrix_set_length(&xy, gridsize * gridsize, nx + ny);
       for (i = 0; i < gridsize; i++) {
          for (j = 0; j < gridsize; j++) {
-            xy.xyR[i * gridsize + j][0] = (double)i;
-            xy.xyR[i * gridsize + j][1] = (double)j;
+            xy.xyR[i * gridsize + j][0] = i;
+            xy.xyR[i * gridsize + j][1] = j;
             xy.xyR[i * gridsize + j][2] = 0.01 * (randomreal() - 0.5) + (2 * ((i + j) % 2) - 1);
          }
       }
@@ -70290,7 +70290,7 @@ static bool testrbfunit_basichrbftest() {
       v = 0.0;
       for (i = margin; i < gridsize - margin; i++) {
          for (j = margin; j < gridsize - margin; j++) {
-            v = rmax2(v, fabs(rbfcalc2(&s, (double)i, (double)j)));
+            v = rmax2(v, fabs(rbfcalc2(&s, i, j)));
          }
       }
       result = result || v > threshold;
@@ -70358,14 +70358,14 @@ static bool testrbfunit_scaledhrbftest() {
                errtol = 0.0;
                ae_vector_set_length(&scalex, nx);
                for (i = 0; i < nx; i++) {
-                  scalex.xR[i] = pow(16.0, (double)(randominteger(3) - 1));
+                  scalex.xR[i] = pow(16.0, randominteger(3) - 1.0);
                }
                ae_vector_set_length(&scaley, ny);
                for (i = 0; i < ny; i++) {
-                  scaley.xR[i] = pow(16.0, (double)(randominteger(3) - 1));
+                  scaley.xR[i] = pow(16.0, randominteger(3) - 1.0);
                }
             } else {
-               errtol = 1.0E-3;
+               errtol = 0.001;
                ae_vector_set_length(&scalex, nx);
                for (i = 0; i < nx; i++) {
                   scalex.xR[i] = pow(4.0, randommid());
@@ -70378,14 +70378,14 @@ static bool testrbfunit_scaledhrbftest() {
             n = 150;
             rbase = 0.33;
             nlayers = 2;
-            gridsize = iround(pow((double)n, 1.0 / nx)) + 1;
+            gridsize = iround(pow(n, 1.0 / nx)) + 1;
             linterm = 1 + randominteger(3);
             bf = randominteger(2);
-            lambdav = 1.0E-3 * randominteger(2);
-            n = iround(pow((double)gridsize, (double)nx));
+            lambdav = 0.001 * randominteger(2);
+            n = iround(pow(gridsize, nx));
             ae_matrix_set_length(&xy, n, nx + ny);
             ae_assert(gridsize > 1, "Assertion failed");
-            ae_assert(n == pow((double)gridsize, (double)nx), "Assertion failed");
+            ae_assert(n == pow(gridsize, nx), "Assertion failed");
             ae_vector_set_length(&c0, nx);
             for (j = 0; j < nx; j++) {
                c0.xR[j] = randomreal() - 0.5;
@@ -70397,7 +70397,7 @@ static bool testrbfunit_scaledhrbftest() {
             for (i = 0; i < n; i++) {
                k = i;
                for (j = 0; j < nx; j++) {
-                  xy.xyR[i][j] = (double)(k % gridsize) / (gridsize - 1);
+                  xy.xyR[i][j] = (k % gridsize) / (gridsize - 1.0);
                   k /= gridsize;
                }
                for (j = 0; j < ny; j++) {
@@ -70555,9 +70555,9 @@ static bool testrbfunit_spechrbftest() {
    v2its = 50;
    ae_matrix_set_length(&xy, n * n, nx + ny);
    for (i = 0; i < n * n; i++) {
-      xy.xyR[i][0] = (double)(i % n);
-      xy.xyR[i][1] = (double)(i / n);
-      xy.xyR[i][2] = sin((double)i);
+      xy.xyR[i][0] = i % n;
+      xy.xyR[i][1] = i / n;
+      xy.xyR[i][2] = sin(i);
    }
    rbfcreate(nx, ny, &s0);
    rbfsetalgohierarchical(&s0, rbase, nlayers, 0.0);
@@ -70570,8 +70570,8 @@ static bool testrbfunit_spechrbftest() {
       return result;
    }
    for (i = 0; i < n * n; i++) {
-      xy.xyR[i][0] += 1.0E-14 * sin((double)(3 * i));
-      xy.xyR[i][1] += 1.0E-14 * sin((double)(7 * i * i));
+      xy.xyR[i][0] += 1.0E-14 * sin(3.0 * i);
+      xy.xyR[i][1] += 1.0E-14 * sin(7.0 * i * i);
    }
    rbfcreate(nx, ny, &s1);
    rbfsetalgohierarchical(&s1, rbase, nlayers, 0.0);
@@ -70586,7 +70586,7 @@ static bool testrbfunit_spechrbftest() {
    vdiff = 0.0;
    for (i = 0; i < n - 1; i++) {
       for (j = 0; j < n - 1; j++) {
-         vdiff += fabs(rbfcalc2(&s0, 0.5 + i, 0.5 + j) - rbfcalc2(&s1, 0.5 + i, 0.5 + j)) / sqr((double)(n - 1));
+         vdiff += fabs(rbfcalc2(&s0, 0.5 + i, 0.5 + j) - rbfcalc2(&s1, 0.5 + i, 0.5 + j)) / sqr(n - 1.0);
       }
    }
    result = result || vdiff > 0.00200 || vdiff < 0.00001;
@@ -70687,7 +70687,7 @@ static bool testrbfunit_gridhrbftest() {
          rbase = 0.10;
          nlayers = randominteger(3);
          linterm = 1 + randominteger(3);
-         lambdav = 1.0E-3 * randominteger(2);
+         lambdav = 0.001 * randominteger(2);
          bf = randominteger(2);
          ae_matrix_set_length(&xy, n, nx + ny);
          for (i = 0; i < n; i++) {
@@ -70803,7 +70803,7 @@ static bool testrbfunit_gridhrbftest() {
       // Test that scaling RBase, XY, X0, X1 by some power of 2
       // does not change values at grid (quite a strict requirement, but
       // ALGLIB implementation of RBF may deal with it).
-         scalefactor = pow(1024.0, (double)(2 * randominteger(2) - 1));
+         scalefactor = pow(1024.0, 2.0 * randominteger(2) - 1.0);
          ae_matrix_set_length(&xy2, n, nx + ny);
          ae_vector_set_length(&x02, n0);
          ae_vector_set_length(&x12, n1);
@@ -70843,7 +70843,7 @@ static bool testrbfunit_gridhrbftest() {
       // (increase RBase and decreasing scale, or vice versa) does not
       // change values at grid (quite a strict requirement, but
       // ALGLIB implementation of RBF may deal with it).
-         scalefactor = pow(1024.0, (double)(2 * randominteger(2) - 1));
+         scalefactor = pow(1024.0, 2.0 * randominteger(2) - 1.0);
          ae_vector_set_length(&scalevec2, nx);
          for (i = 0; i < nx; i++) {
             if (hasscale) {
@@ -70877,7 +70877,7 @@ static bool testrbfunit_gridhrbftest() {
       // problem setup
          n = 150;
          rbase = 0.10;
-         lambdav = 1.0E-3 * randominteger(2);
+         lambdav = 0.001 * randominteger(2);
          nlayers = randominteger(3);
          linterm = 1 + randominteger(3);
          bf = randominteger(2);
@@ -71009,7 +71009,7 @@ static bool testrbfunit_gridhrbftest() {
       // Test that scaling RBase, XY, X0, X1 and X2 by some power of 2
       // does not change values at grid (quite a strict requirement, but
       // ALGLIB implementation of RBF may deal with it).
-         scalefactor = pow(1024.0, (double)(2 * randominteger(2) - 1));
+         scalefactor = pow(1024.0, 2.0 * randominteger(2) - 1.0);
          ae_matrix_set_length(&xy2, n, nx + ny);
          ae_vector_set_length(&x02, n0);
          ae_vector_set_length(&x12, n1);
@@ -71053,7 +71053,7 @@ static bool testrbfunit_gridhrbftest() {
       // (increase RBase and decreasing scale, or vice versa) does not
       // change values at grid (quite a strict requirement, but
       // ALGLIB implementation of RBF may deal with it).
-         scalefactor = pow(1024.0, (double)(2 * randominteger(2) - 1));
+         scalefactor = pow(1024.0, 2.0 * randominteger(2) - 1.0);
          ae_vector_set_length(&scalevec2, nx);
          for (i = 0; i < nx; i++) {
             if (hasscale) {
@@ -71408,7 +71408,7 @@ bool testfft() {
    NewVector(buf, 0, DT_REAL);
    NewObj(fasttransformplan, plan);
    maxsmalln = 128;
-   errtol = 100000 * pow((double)maxsmalln, 3.0 / 2.0) * machineepsilon;
+   errtol = 100000 * pow(maxsmalln, 3.0 / 2.0) * machineepsilon;
    bidierrors = false;
    referrors = false;
    bidirerrors = false;
@@ -71680,7 +71680,7 @@ bool testfht() {
    NewVector(r2, 0, DT_REAL);
    NewVector(r3, 0, DT_REAL);
    maxn = 128;
-   errtol = 100000 * pow((double)maxn, 3.0 / 2.0) * machineepsilon;
+   errtol = 100000 * pow(maxn, 3.0 / 2.0) * machineepsilon;
    bidierrors = false;
    referrors = false;
    waserrors = false;
@@ -71873,7 +71873,7 @@ bool testconv() {
    NewVector(cr1, 0, DT_COMPLEX);
    NewVector(cr2, 0, DT_COMPLEX);
    maxn = 32;
-   errtol = 100000 * pow((double)maxn, 3.0 / 2.0) * machineepsilon;
+   errtol = 100000 * pow(maxn, 3.0 / 2.0) * machineepsilon;
    referrors = false;
    refrerrors = false;
    inverrors = false;
@@ -72212,7 +72212,7 @@ bool testcorr() {
    NewVector(cr1, 0, DT_COMPLEX);
    NewVector(cr2, 0, DT_COMPLEX);
    maxn = 32;
-   errtol = 100000 * pow((double)maxn, 3.0 / 2.0) * machineepsilon;
+   errtol = 100000 * pow(maxn, 3.0 / 2.0) * machineepsilon;
    referrors = false;
    refrerrors = false;
    waserrors = false;
@@ -72822,11 +72822,11 @@ static void testpcaunit_calculatemv(RVector *x, ae_int_t n, double *mean, double
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 += sqr(x->xR[i] - (*mean));
+         v1 += sqr(x->xR[i] - *mean);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 += x->xR[i] - (*mean);
+         v2 += x->xR[i] - *mean;
       }
       v2 = sqr(v2) / n;
       variance = (v1 - v2) / n;
@@ -72836,8 +72836,8 @@ static void testpcaunit_calculatemv(RVector *x, ae_int_t n, double *mean, double
       *stddev = sqrt(variance);
    }
 // Errors
-   *means = *stddev / sqrt((double)n);
-   *stddevs = *stddev * sqrt(2.0) / sqrt((double)(n - 1));
+   *means = *stddev / sqrt(n);
+   *stddevs = *stddev * sqrt(2.0) / sqrt(n - 1.0);
 }
 
 bool testpca() {
@@ -72889,7 +72889,7 @@ bool testpca() {
 // Primary settings
    maxm = 10;
    maxn = 100;
-   threshold = 1.0E5 * machineepsilon;
+   threshold = 100000.0 * machineepsilon;
    waserrors = false;
    pcaconverrors = false;
    pcaorterrors = false;
@@ -72969,7 +72969,7 @@ bool testpca() {
                   t += sqr(v.xyR[j][0] + h);
                }
             }
-            t = 1 / sqrt(t);
+            t = 1.0 / sqrt(t);
             ae_v_muld(t3.xR, 1, n, t);
             testpcaunit_calculatemv(&t3, n, &tmean2, &tmeans2, &tstddev2, &tstddevs2);
             pcaopterrors = pcaopterrors || tstddev2 > tstddev + threshold;
@@ -73005,7 +73005,7 @@ bool testpca() {
 // * variance values are decreasing
 // * variance by inexact reduced PCA deviates from variance explained
 //   by top REQUESTED vectors of complete PCA by at most TolReduced.
-   tolreduced = 1.0E-3;
+   tolreduced = 0.001;
    for (m = 1; m <= maxm; m++) {
       for (n = 1; n <= maxn; n++) {
       // Generate task
@@ -73064,7 +73064,7 @@ bool testpca() {
             varcomplete += s2.xR[k];
          }
          pcadensesubspaceerrors = pcadensesubspaceerrors || (varreduced - varcomplete) / varcomplete < -tolreduced;
-         pcadensesubspaceerrors = pcadensesubspaceerrors || (varreduced - varcomplete) / varcomplete > 1.0E5 * machineepsilon;
+         pcadensesubspaceerrors = pcadensesubspaceerrors || (varreduced - varcomplete) / varcomplete > 100000.0 * machineepsilon;
       }
    }
 // Test dense subspace reduced PCA on specially designed problem with good
@@ -73092,7 +73092,7 @@ bool testpca() {
       }
       ae_assert(m > 0 && requested > 0, "PCA test: integrity failure");
       n = 2 * m;
-      tolreduced = 1.0E-3;
+      tolreduced = 0.001;
       ae_matrix_set_length(&x, n, m);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
@@ -73101,7 +73101,7 @@ bool testpca() {
       }
       x.xyR[0][0] = 1.0;
       for (i = 1; i < m; i++) {
-         x.xyR[i][i] = x.xyR[i - 1][i - 1] * (1 / 1.05);
+         x.xyR[i][i] = x.xyR[i - 1][i - 1] * (1.0 / 1.05);
       }
       rmatrixrndorthogonalfromtheleft(&x, n, m);
       rmatrixrndorthogonalfromtheright(&x, n, m);
@@ -73150,7 +73150,7 @@ bool testpca() {
          varcomplete += s2.xR[k];
       }
       pcadensesubspaceerrors = pcadensesubspaceerrors || (varreduced - varcomplete) / varcomplete < -tolreduced;
-      pcadensesubspaceerrors = pcadensesubspaceerrors || (varreduced - varcomplete) / varcomplete > 1.0E5 * machineepsilon;
+      pcadensesubspaceerrors = pcadensesubspaceerrors || (varreduced - varcomplete) / varcomplete > 100000.0 * machineepsilon;
    }
 // Test sparse reduced subspace PCA on randomly generated matrix with
 // two non-zero elements at each row. Because matrix is random, it may
@@ -73162,7 +73162,7 @@ bool testpca() {
 // * variance values are decreasing
 // * variance by inexact reduced PCA deviates from variance explained
 //   by top REQUESTED vectors of complete PCA by at most TolReduced.
-   tolreduced = 1.0E-3;
+   tolreduced = 0.001;
    for (m = 1; m <= maxm; m++) {
       for (n = 1; n <= maxn; n++) {
       // Generate task
@@ -73231,7 +73231,7 @@ bool testpca() {
             varcomplete += s2.xR[k];
          }
          pcasparsesubspaceerrors = pcasparsesubspaceerrors || (varreduced - varcomplete) / rmax2(varcomplete, 1.0) < -tolreduced;
-         pcasparsesubspaceerrors = pcasparsesubspaceerrors || (varreduced - varcomplete) / rmax2(varcomplete, 1.0) > 1.0E5 * machineepsilon;
+         pcasparsesubspaceerrors = pcasparsesubspaceerrors || (varreduced - varcomplete) / rmax2(varcomplete, 1.0) > 100000.0 * machineepsilon;
       }
    }
 // Final report
@@ -73291,7 +73291,7 @@ bool testpca() {
 // === bdss testing unit ===
 // Unsets 1D array.
 static void testbdssunit_unset1di(ZVector *a) {
-   ae_vector_set_length(a, 0 + 1);
+   ae_vector_set_length(a, 1);
    a->xZ[0] = randominteger(3) - 1;
 }
 
@@ -73399,7 +73399,7 @@ bool testbdss() {
          c1 = 0;
          c0 = 0;
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)randominteger(2);
+            a.xR[i] = randominteger(2);
             if (a.xR[i] == 0.0) {
                c0++;
             } else {
@@ -73438,7 +73438,7 @@ bool testbdss() {
    // one-tie test
       if (n % 2 == 0) {
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)n;
+            a.xR[i] = n;
             c.xZ[i] = i % 2;
          }
          dsoptimalsplit2(&a, &c, n, &info, &threshold, &pal, &pbl, &par, &pbr, &cve);
@@ -73451,7 +73451,7 @@ bool testbdss() {
    // test #1
       if (n > 1) {
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)(i / ((n + 1) / 2));
+            a.xR[i] = i / ((n + 1) / 2);
             c.xZ[i] = i / ((n + 1) / 2);
          }
          dsoptimalsplit2(&a, &c, n, &info, &threshold, &pal, &pbl, &par, &pbr, &cve);
@@ -73706,11 +73706,11 @@ bool testbdss() {
       ae_vector_set_length(&a, n);
       ae_vector_set_length(&c, n);
       ae_vector_set_length(&tiebuf, n + 1);
-      ae_vector_set_length(&cntbuf, 3 + 1);
+      ae_vector_set_length(&cntbuf, 4);
    // one-tie test
       if (n % 2 == 0) {
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)n;
+            a.xR[i] = n;
             c.xZ[i] = i % 2;
          }
          dsoptimalsplit2fast(&a, &c, &tiebuf, &cntbuf, &sortrbuf, &sortibuf, n, 2, 0.00, &info, &threshold, &rms, &cvrms);
@@ -73723,7 +73723,7 @@ bool testbdss() {
    // test #1
       if (n > 1) {
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)(i / ((n + 1) / 2));
+            a.xR[i] = i / ((n + 1) / 2);
             c.xZ[i] = i / ((n + 1) / 2);
          }
          dsoptimalsplit2fast(&a, &c, &tiebuf, &cntbuf, &sortrbuf, &sortibuf, n, 2, 0.00, &info, &threshold, &rms, &cvrms);
@@ -73751,7 +73751,7 @@ bool testbdss() {
    ae_vector_set_length(&tiebuf, n + 1);
    ae_vector_set_length(&cntbuf, 2 * 3);
    for (i = 0; i < n; i++) {
-      a.xR[i] = (double)i;
+      a.xR[i] = i;
       if (i < n - 2) {
          c.xZ[i] = 0;
       } else {
@@ -73764,7 +73764,7 @@ bool testbdss() {
    } else {
       split2errors = split2errors || !NearAtR(threshold, n - 2.5, 100.0 * machineepsilon);
       split2errors = split2errors || !NearAtR(rms, sqrt((0.25 + 0.25 + 0.25 + 0.25) / (3 * n)), 100.0 * machineepsilon);
-      split2errors = split2errors || !NearAtR(cvrms, sqrt((double)(1 + 1 + 1 + 1) / (3 * n)), 100.0 * machineepsilon);
+      split2errors = split2errors || !NearAtR(cvrms, sqrt(4.0 / (3 * n)), 100.0 * machineepsilon);
    }
 // Optimal split-K
 // General tests for different N's
@@ -73774,7 +73774,7 @@ bool testbdss() {
    // one-tie test
       if (n % 2 == 0) {
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)n;
+            a.xR[i] = n;
             c.xZ[i] = i % 2;
          }
          dsoptimalsplitk(&a, &c, n, 2, 2 + randominteger(5), &info, &thresholds, &ni, &cve);
@@ -73789,7 +73789,7 @@ bool testbdss() {
          c0 = 0;
          c1 = 0;
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)(i / ((n + 1) / 2));
+            a.xR[i] = i / ((n + 1) / 2);
             c.xZ[i] = i / ((n + 1) / 2);
             if (c.xZ[i] == 0) {
                c0++;
@@ -73805,7 +73805,7 @@ bool testbdss() {
          }
          optimalsplitkerrors = optimalsplitkerrors || ni != 2;
          optimalsplitkerrors = optimalsplitkerrors || !NearAtR(thresholds.xR[0], 0.5, 100.0 * machineepsilon);
-         optimalsplitkerrors = optimalsplitkerrors || !NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100.0 * machineepsilon);
+         optimalsplitkerrors = optimalsplitkerrors || !NearAtR(cve, -c0 * log(c0 / (c0 + 1.0)) - c1 * log(c1 / (c1 + 1.0)), 100.0 * machineepsilon);
       }
    // test #2
       if (n > 2) {
@@ -73827,7 +73827,7 @@ bool testbdss() {
          }
          optimalsplitkerrors = optimalsplitkerrors || ni != 2;
          optimalsplitkerrors = optimalsplitkerrors || !NearAtR(thresholds.xR[0], 0.5, 100.0 * machineepsilon);
-         optimalsplitkerrors = optimalsplitkerrors || !NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100.0 * machineepsilon);
+         optimalsplitkerrors = optimalsplitkerrors || !NearAtR(cve, -c0 * log(c0 / (c0 + 1.0)) - c1 * log(c1 / (c1 + 1.0)), 100.0 * machineepsilon);
       }
    // multi-tie test
       if (n >= 16) {
@@ -73835,17 +73835,17 @@ bool testbdss() {
       //
       // First NC-1 ties have C0 entries, remaining NC-th tie
       // have C1 entries.
-         nc = iround(sqrt((double)n));
+         nc = iround(sqrt(n));
          c0 = n / nc;
          c1 = n - c0 * (nc - 1);
          for (i = 0; i < nc - 1; i++) {
             for (j = c0 * i; j < c0 * (i + 1); j++) {
-               a.xR[j] = (double)j;
+               a.xR[j] = j;
                c.xZ[j] = i;
             }
          }
          for (j = c0 * (nc - 1); j < n; j++) {
-            a.xR[j] = (double)j;
+            a.xR[j] = j;
             c.xZ[j] = nc - 1;
          }
          dsoptimalsplitk(&a, &c, n, nc, nc + randominteger(nc), &info, &thresholds, &ni, &cve);
@@ -73858,7 +73858,7 @@ bool testbdss() {
             for (i = 0; i < nc - 1; i++) {
                optimalsplitkerrors = optimalsplitkerrors || !NearAtR(thresholds.xR[i], c0 * (i + 1) - 1 + 0.5, 100.0 * machineepsilon);
             }
-            cvr = -((nc - 1) * c0 * log((double)c0 / (c0 + nc - 1)) + c1 * log((double)c1 / (c1 + nc - 1)));
+            cvr = -((nc - 1) * c0 * log(c0 / (c0 + nc - 1.0)) + c1 * log(c1 / (c1 + nc - 1.0)));
             optimalsplitkerrors = optimalsplitkerrors || !NearAtR(cve, cvr, 100.0 * machineepsilon);
          }
       }
@@ -73886,7 +73886,7 @@ bool testbdss() {
          c0 = 0;
          c1 = 0;
          for (i = 0; i < n; i++) {
-            a.xR[i] = (double)(i / ((n + 1) / 2));
+            a.xR[i] = i / ((n + 1) / 2);
             c.xZ[i] = i / ((n + 1) / 2);
             if (c.xZ[i] == 0) {
                c0++;
@@ -73903,7 +73903,7 @@ bool testbdss() {
          splitkerrors = splitkerrors || ni != 2;
          if (ni == 2) {
             splitkerrors = splitkerrors || !NearAtR(thresholds.xR[0], 0.5, 100.0 * machineepsilon);
-            splitkerrors = splitkerrors || !NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100.0 * machineepsilon);
+            splitkerrors = splitkerrors || !NearAtR(cve, -c0 * log(c0 / (c0 + 1.0)) - c1 * log(c1 / (c1 + 1.0)), 100.0 * machineepsilon);
          }
       }
    // test #2
@@ -73927,7 +73927,7 @@ bool testbdss() {
          splitkerrors = splitkerrors || ni != 2;
          if (ni == 2) {
             splitkerrors = splitkerrors || !NearAtR(thresholds.xR[0], 0.5, 100.0 * machineepsilon);
-            splitkerrors = splitkerrors || !NearAtR(cve, -c0 * log((double)c0 / (c0 + 1)) - c1 * log((double)c1 / (c1 + 1)), 100.0 * machineepsilon);
+            splitkerrors = splitkerrors || !NearAtR(cve, -c0 * log(c0 / (c0 + 1.0)) - c1 * log(c1 / (c1 + 1.0)), 100.0 * machineepsilon);
          }
       }
    // multi-tie test
@@ -73936,7 +73936,7 @@ bool testbdss() {
             nc = n / c0;
             for (i = 0; i < nc; i++) {
                for (j = c0 * i; j < c0 * (i + 1); j++) {
-                  a.xR[j] = (double)j;
+                  a.xR[j] = j;
                   c.xZ[j] = i;
                }
             }
@@ -73950,7 +73950,7 @@ bool testbdss() {
                for (i = 0; i < nc - 1; i++) {
                   splitkerrors = splitkerrors || !NearAtR(thresholds.xR[i], c0 * (i + 1) - 1 + 0.5, 100.0 * machineepsilon);
                }
-               cvr = -nc * c0 * log((double)c0 / (c0 + nc - 1));
+               cvr = -nc * c0 * log(c0 / (c0 + nc - 1.0));
                splitkerrors = splitkerrors || !NearAtR(cve, cvr, 100.0 * machineepsilon);
             }
          }
@@ -74858,7 +74858,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
                densexy.xyR[i][j] = randommid();
                sparseset(&sparsexy, i, j, densexy.xyR[i][j]);
             }
-            densexy.xyR[i][nin] = (double)randominteger(nout);
+            densexy.xyR[i][nin] = randominteger(nout);
             sparseset(&sparsexy, i, j, densexy.xyR[i][nin]);
          }
       } else {
@@ -74881,7 +74881,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
          mlpprocess(&network, &x1, &y1);
          mlpprocess(&network2, &x1, &y2);
          for (j = 0; j < nout; j++) {
-            *err = *err || !NearAtR(y1.xR[j], y2.xR[j], 1.0E-6);
+            *err = *err || !NearAtR(y1.xR[j], y2.xR[j], 0.000001);
          }
       }
    }
@@ -74949,9 +74949,9 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
    testmlpbaseunit_createnetwork(&network, nkind, a1, a2, nin, nhid1, nhid2, nout);
    mlpproperties(&network, &n1, &n2, &wcount);
    h = 0.0001;
-   etol = 1.0E-2;
-   escale = 1.0E-2;
-   gscale = 1.0E-2;
+   etol = 0.01;
+   escale = 0.01;
+   gscale = 0.01;
    nonstricttolerance = 0.01;
 // Initialize
    ae_vector_set_length(&x, nin);
@@ -74999,7 +74999,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
          for (i = 0; i < nout; i++) {
             y.xR[i] = 0.0;
          }
-         xy.xyR[0][nin] = (double)randominteger(nout);
+         xy.xyR[0][nin] = randominteger(nout);
          sparseset(&sparsexy, 0, nin, xy.xyR[0][nin]);
          y.xR[iround(xy.xyR[0][nin])] = 1.0;
       } else {
@@ -75060,7 +75060,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
          for (i = 0; i < nout; i++) {
             y.xR[i] = 0.0;
          }
-         xy.xyR[0][nin] = (double)randominteger(nout);
+         xy.xyR[0][nin] = randominteger(nout);
          y.xR[iround(xy.xyR[0][nin])] = 1.0;
       } else {
          for (i = 0; i < nout; i++) {
@@ -75162,7 +75162,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             for (j = 0; j < nout; j++) {
                y1.xR[j] = 0.0;
             }
-            xy.xyR[i][nin] = (double)randominteger(nout);
+            xy.xyR[i][nin] = randominteger(nout);
             sparseset(&sparsexy, i, nin, xy.xyR[i][nin]);
             y1.xR[iround(xy.xyR[i][nin])] = 1.0;
          } else {
@@ -75209,7 +75209,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             for (j = 0; j < nout; j++) {
                y1.xR[j] = 0.0;
             }
-            xy.xyR[i][nin] = (double)randominteger(nout);
+            xy.xyR[i][nin] = randominteger(nout);
             sparseset(&sparsexy, i, nin, xy.xyR[i][nin]);
             y1.xR[iround(xy.xyR[i][nin])] = 1.0;
          } else {
@@ -75300,7 +75300,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             for (j = 0; j < nout; j++) {
                y1.xR[j] = 0.0;
             }
-            xy.xyR[i][nin] = (double)randominteger(nout);
+            xy.xyR[i][nin] = randominteger(nout);
             y1.xR[iround(xy.xyR[i][nin])] = 1.0;
          } else {
             for (j = 0; j < nout; j++) {
@@ -75410,7 +75410,7 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
                for (j = 0; j < nout; j++) {
                   y1.xR[j] = 0.0;
                }
-               xy.xyR[i][nin] = (double)randominteger(nout);
+               xy.xyR[i][nin] = randominteger(nout);
                y1.xR[iround(xy.xyR[i][nin])] = 1.0;
             } else {
                for (j = 0; j < nout; j++) {
@@ -75456,7 +75456,7 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
                   mlpgradn(&network, &x1, &y1, &v, &grad3);
                }
                ae_v_sub(grad2.xR, 1, grad3.xR, 1, wcount);
-               v = 1 / (12 * h);
+               v = 1.0 / (12 * h);
                ae_v_addd(h1.xyR[j], 1, grad2.xR, 1, wcount, v);
                network.weights.xR[j] = wprev;
             }
@@ -75468,7 +75468,7 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
          }
          *err = *err || !NearAtR(e1, e2, e1 * etol);
          for (i = 0; i < wcount; i++) {
-            if (!SmallAtR(grad1.xR[i], 1.0E-2)) {
+            if (!SmallAtR(grad1.xR[i], 0.01)) {
                *err = *err || !NearAtR(grad2.xR[i], grad1.xR[i], fabs(grad1.xR[i]) * etol);
             } else {
                *err = *err || !NearAtR(grad2.xR[i], grad1.xR[i], etol);
@@ -75540,8 +75540,8 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
    }
    testmlpbaseunit_createnetwork(&network, nkind, a1, a2, nin, nhid1, nhid2, nout);
    mlpproperties(&network, &n1, &n2, &wcount);
-   etol = 1.0E-4;
-   escale = 1.0E-2;
+   etol = 0.0001;
+   escale = 0.01;
 // Initialize
    ae_vector_set_length(&x1, nin);
    ae_vector_set_length(&y, nout);
@@ -75592,7 +75592,7 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
             for (j = 0; j < nout; j++) {
                y1.xR[j] = 0.0;
             }
-            xy.xyR[i][nin] = (double)randominteger(nout);
+            xy.xyR[i][nin] = randominteger(nout);
             sparseset(&sparsexy, i, nin, xy.xyR[i][nin]);
             y1.xR[iround(xy.xyR[i][nin])] = 1.0;
          } else {
@@ -75613,7 +75613,7 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
          nnmax = 0;
          if (mlpissoftmax(&network)) {
             if (y.xR[iround(xy.xyR[i][nin])] > 0.0) {
-               refavgce += log(1 / y.xR[iround(xy.xyR[i][nin])]);
+               refavgce += log(1.0 / y.xR[iround(xy.xyR[i][nin])]);
             } else {
                refavgce += log(maxrealnumber);
             }
@@ -75850,7 +75850,7 @@ static bool testmlpbaseunit_testmlpgbsubset() {
             }
          }
          for (i = 0; i < ssize; i++) {
-            a.xyR[i][nin] = (double)randominteger(nout);
+            a.xyR[i][nin] = randominteger(nout);
             sparseset(&sa, i, nin, a.xyR[i][nin]);
          }
       } else {
@@ -75909,13 +75909,13 @@ static bool testmlpbaseunit_testmlpgbsubset() {
          mlpgradbatch(&net, &parta, sbsize, &e1, &grad1);
          mlpgradbatchsubset(&net, &a, ssize, &idx, sbsize, &e2, &grad2);
       // Test for dense matrix
-         if (!NearAtR(e1, e2, 1.0E-6)) {
+         if (!NearAtR(e1, e2, 0.000001)) {
             result = true;
             ae_frame_leave();
             return result;
          }
          for (i = 0; i < wcount; i++) {
-            if (!NearAtR(grad1.xR[i], grad2.xR[i], 1.0E-6)) {
+            if (!NearAtR(grad1.xR[i], grad2.xR[i], 0.000001)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -75924,13 +75924,13 @@ static bool testmlpbaseunit_testmlpgbsubset() {
       // Test for sparse matrix
          mlpgradbatchsparse(&net, &partsa, sbsize, &e1, &grad1);
          mlpgradbatchsparsesubset(&net, &sa, ssize, &idx, sbsize, &e2, &grad2);
-         if (!NearAtR(e1, e2, 1.0E-6)) {
+         if (!NearAtR(e1, e2, 0.000001)) {
             result = true;
             ae_frame_leave();
             return result;
          }
          for (i = 0; i < wcount; i++) {
-            if (!NearAtR(grad1.xR[i], grad2.xR[i], 1.0E-6)) {
+            if (!NearAtR(grad1.xR[i], grad2.xR[i], 0.000001)) {
                result = true;
                ae_frame_leave();
                return result;
@@ -76439,8 +76439,8 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
    }
    testmlpeunit_createensemble(&ensemble, nkind, a1, a2, nin, nhid1, nhid2, nout, ec);
    mlpproperties(&ensemble.network, &n1, &n2, &wcount);
-   etol = 1.0E-4;
-   escale = 1.0E-2;
+   etol = 0.0001;
+   escale = 0.01;
 // Initialize
    ae_vector_set_length(&x1, nin);
    ae_vector_set_length(&y, nout);
@@ -76491,7 +76491,7 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
             for (j = 0; j < nout; j++) {
                y1.xR[j] = 0.0;
             }
-            xy.xyR[i][nin] = (double)randominteger(nout);
+            xy.xyR[i][nin] = randominteger(nout);
             sparseset(&sparsexy, i, nin, xy.xyR[i][nin]);
             y1.xR[iround(xy.xyR[i][nin])] = 1.0;
          } else {
@@ -76507,7 +76507,7 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
          nnmax = 0;
          if (mlpeissoftmax(&ensemble)) {
             if (y.xR[iround(xy.xyR[i][nin])] > 0.0) {
-               refavgce += log(1 / y.xR[iround(xy.xyR[i][nin])]);
+               refavgce += log(1.0 / y.xR[iround(xy.xyR[i][nin])]);
             } else {
                refavgce += log(maxrealnumber);
             }
@@ -77721,7 +77721,7 @@ static bool testclusteringunit_advancedahctests() {
 // definition of the clustering algorithm.
    for (d = 2; d <= 5; d++) {
       for (ahcalgo = 0; ahcalgo <= 4; ahcalgo++) {
-         n = iround(pow(3.0, (double)randominteger(3)));
+         n = iround(pow(3.0, randominteger(3)));
          npoints = d * n;
       // 1. generate dataset.
       // 2. fill Idx (array of cluster indexes):
@@ -77863,7 +77863,7 @@ static bool testclusteringunit_advancedahctests() {
          if (ahcalgo == 4 && disttype != 2) {
             continue;
          }
-         npoints = iround(pow(2.0, (double)randominteger(5)));
+         npoints = iround(pow(2.0, randominteger(5)));
          d = 2 + randominteger(4);
       // Generate dataset and distance matrix
          ae_matrix_set_length(&xy, npoints, d);
@@ -77897,7 +77897,7 @@ static bool testclusteringunit_advancedahctests() {
          clusterizergetdistances(&xy, npoints, d, disttypes.xZ[disttype], &dm2);
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < npoints; j++) {
-               if (!isfinite(dm2.xyR[i][j]) || !NearAtR(dm.xyR[i][j], dm2.xyR[i][j], 1.0E5 * machineepsilon)) {
+               if (!isfinite(dm2.xyR[i][j]) || !NearAtR(dm.xyR[i][j], dm2.xyR[i][j], 100000.0 * machineepsilon)) {
                   result = true;
                   ae_frame_leave();
                   return result;
@@ -78150,7 +78150,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
          // Generate points
             for (i = 0; i < npoints; i++) {
                for (j = 0; j < nfeatures; j++) {
-                  xy.xyR[i][j] = hqrndnormal(&rs) * pow(2.0, (double)-separation) + c.xyR[i % nclusters][j];
+                  xy.xyR[i][j] = hqrndnormal(&rs) * pow(2.0, -separation) + c.xyR[i % nclusters][j];
                }
             }
          // Run clusterization
@@ -78212,7 +78212,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
             testclusteringunit_kmeansreferenceupdatedistances(&xy, npoints, nfeatures, &c, nclusters, &xycref, &xydist2ref);
             for (i = 0; i < npoints; i++) {
                *othererrors = *othererrors || xyc.xZ[i] != xycref.xZ[i];
-               *othererrors = *othererrors || !NearAtR(xydist2.xR[i], xydist2ref.xR[i], 1.0E-6);
+               *othererrors = *othererrors || !NearAtR(xydist2.xR[i], xydist2ref.xR[i], 0.000001);
             }
          }
       }
@@ -78236,7 +78236,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
             } else {
                for (i = 0; i < nclusters - 1; i++) {
                   for (j = 0; j < nfeatures; j++) {
-                     xy.xyR[i][j] = (double)hqrnduniformi(&rs, 50);
+                     xy.xyR[i][j] = hqrnduniformi(&rs, 50);
                   }
                }
             }
@@ -78595,7 +78595,7 @@ static void testclusteringunit_kmeansrestartstest(bool *converrors, bool *restar
 //
 // If Restarts do influence quality of solution, P must be significantly
 // lower than 0.5*PassCount.
-   s = (p - 0.5 * passcount) / sqrt((double)passcount / 4.0);
+   s = (p - 0.5 * passcount) / sqrt(passcount / 4.0);
    *restartserrors = *restartserrors || s > -sigmathreshold;
    ae_frame_leave();
 }
@@ -78696,7 +78696,7 @@ static void testdforestunit_unsetdf(decisionforest *df) {
    ae_frame_make(&_frame_block);
    NewMatrix(xy, 0, 0, DT_REAL);
    NewObj(dfreport, rep);
-   ae_matrix_set_length(&xy, 0 + 1, 1 + 1);
+   ae_matrix_set_length(&xy, 1, 2);
    xy.xyR[0][0] = 0.0;
    xy.xyR[0][1] = 0.0;
    dfbuildinternal(&xy, 1, 1, 1, 1, 1, 1, 0, &info, df, &rep);
@@ -78750,13 +78750,13 @@ static void testdforestunit_testprocessing(bool *err) {
             if (j % 2 == 0) {
                xy.xyR[i][j] = randommid();
             } else {
-               xy.xyR[i][j] = (double)randominteger(2);
+               xy.xyR[i][j] = randominteger(2);
             }
          }
          if (nclasses == 1) {
             xy.xyR[i][nvars] = randommid();
          } else {
-            xy.xyR[i][nvars] = (double)randominteger(nclasses);
+            xy.xyR[i][nvars] = randominteger(nclasses);
          }
       }
    // create forest
@@ -78984,12 +78984,12 @@ static void testdforestunit_basictest1(bool *err) {
             ae_vector_set_length(&x, nvars);
             ae_vector_set_length(&y, nclasses);
             for (i = 0; i < npoints; i++) {
-               xy.xyR[i][0] = (double)i;
+               xy.xyR[i][0] = i;
                for (j = 1; j < nvars; j++) {
                   xy.xyR[i][j] = hqrndnormal(&rs);
                }
                if (nclasses > 1) {
-                  xy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nclasses);
+                  xy.xyR[i][nvars] = hqrnduniformi(&rs, nclasses);
                } else {
                   xy.xyR[i][nvars] = hqrndnormal(&rs);
                }
@@ -79061,9 +79061,9 @@ static void testdforestunit_basictest1(bool *err) {
          ae_vector_set_length(&x, nvars);
          ae_vector_set_length(&y, nclasses);
          for (i = 0; i < npoints; i++) {
-            xy.xyR[i][0] = (double)i;
+            xy.xyR[i][0] = i;
             if (nclasses > 1) {
-               xy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nclasses);
+               xy.xyR[i][nvars] = hqrnduniformi(&rs, nclasses);
             } else {
                xy.xyR[i][nvars] = hqrnduniformr(&rs) - 0.5;
             }
@@ -79444,7 +79444,7 @@ static void testdforestunit_basictest5(bool *err) {
          xy.xyR[i][j] = 0.0;
       }
       xy.xyR[i][i] = 1.0;
-      xy.xyR[i][nvars] = (double)i;
+      xy.xyR[i][nvars] = i;
    }
 // Build forest
    dfbuildercreate(&builder);
@@ -79518,7 +79518,7 @@ static void testdforestunit_basictestrandom(bool *err) {
                xy.xyR[i][j] = 1.0;
             }
             if (j % 3 == 2 && hqrnduniformr(&rs) < 0.05) {
-               xy.xyR[i][j] = (double)(1 + hqrnduniformi(&rs, 3));
+               xy.xyR[i][j] = 1.0 + hqrnduniformi(&rs, 3);
             }
          }
          if (nclasses == 1) {
@@ -79527,7 +79527,7 @@ static void testdforestunit_basictestrandom(bool *err) {
                xy.xyR[i][nvars] = 0.0;
             }
          } else {
-            xy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nclasses);
+            xy.xyR[i][nvars] = hqrnduniformi(&rs, nclasses);
          }
       }
       ae_vector_set_length(&x, nvars);
@@ -79577,17 +79577,17 @@ static void testdforestunit_basictestrandom(bool *err) {
             }
             refrms = sqrt(refrms / npoints);
             refavg /= npoints;
-            refavgrel /= coalesce((double)relcnt, 1.0);
+            refavgrel /= coalesce(relcnt, 1.0);
             *err = *err || rep.relclserror != 0.0;
             *err = *err || rep.avgce != 0.0;
-            *err = *err || !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6);
-            *err = *err || !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6);
-            *err = *err || !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6);
+            *err = *err || !NearAtR(rep.rmserror, refrms, refrms * 0.000001);
+            *err = *err || !NearAtR(rep.avgerror, refavg, refavg * 0.000001);
+            *err = *err || !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 0.000001);
             *err = *err || dfrelclserror(&df, &xy, npoints) != 0.0;
             *err = *err || dfavgce(&df, &xy, npoints) != 0.0;
-            *err = *err || !NearAtR(dfrmserror(&df, &xy, npoints), refrms, refrms * 1.0E-6);
-            *err = *err || !NearAtR(dfavgerror(&df, &xy, npoints), refavg, refavg * 1.0E-6);
-            *err = *err || !NearAtR(dfavgrelerror(&df, &xy, npoints), refavgrel, refavgrel * 1.0E-6);
+            *err = *err || !NearAtR(dfrmserror(&df, &xy, npoints), refrms, refrms * 0.000001);
+            *err = *err || !NearAtR(dfavgerror(&df, &xy, npoints), refavg, refavg * 0.000001);
+            *err = *err || !NearAtR(dfavgrelerror(&df, &xy, npoints), refavgrel, refavgrel * 0.000001);
          // Check OOB errors against training set errors:
          // * RelCLS and AvgCE are not calculated for regression problems
          // * RMS and AVG should be roughly FACTOR times larger
@@ -79622,15 +79622,15 @@ static void testdforestunit_basictestrandom(bool *err) {
             refavg /= npoints * nclasses;
             refavgrel /= npoints;
             refavgce /= npoints;
-            *err = *err || !NearAtR(rep.avgce, refavgce, refavgce * 1.0E-6);
-            *err = *err || !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6);
-            *err = *err || !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6);
-            *err = *err || !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6);
+            *err = *err || !NearAtR(rep.avgce, refavgce, refavgce * 0.000001);
+            *err = *err || !NearAtR(rep.rmserror, refrms, refrms * 0.000001);
+            *err = *err || !NearAtR(rep.avgerror, refavg, refavg * 0.000001);
+            *err = *err || !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 0.000001);
             *err = *err || fabs(dfrelclserror(&df, &xy, npoints) - rep.relclserror) * npoints > 5.0;
-            *err = *err || !NearAtR(dfavgce(&df, &xy, npoints), refavgce, refavgce * 1.0E-6);
-            *err = *err || !NearAtR(dfrmserror(&df, &xy, npoints), refrms, refrms * 1.0E-6);
-            *err = *err || !NearAtR(dfavgerror(&df, &xy, npoints), refavg, refavg * 1.0E-6);
-            *err = *err || !NearAtR(dfavgrelerror(&df, &xy, npoints), refavgrel, refavgrel * 1.0E-6);
+            *err = *err || !NearAtR(dfavgce(&df, &xy, npoints), refavgce, refavgce * 0.000001);
+            *err = *err || !NearAtR(dfrmserror(&df, &xy, npoints), refrms, refrms * 0.000001);
+            *err = *err || !NearAtR(dfavgerror(&df, &xy, npoints), refavg, refavg * 0.000001);
+            *err = *err || !NearAtR(dfavgrelerror(&df, &xy, npoints), refavgrel, refavgrel * 0.000001);
          // Check OOB errors against training set errors
          // * RelCLS, AvgCE and AvgRel should be just larger (too prone to sampling noise to perform more sensitive tests)
          // * RMS and AVG should be roughly FACTOR times larger
@@ -79683,12 +79683,12 @@ static void testdforestunit_basictestallsame(bool *err) {
       k = hqrnduniformi(&rs, 11) - 5;
       for (i = 0; i < npoints; i++) {
          for (j = 0; j < nvars; j++) {
-            xy.xyR[i][j] = (double)k;
+            xy.xyR[i][j] = k;
          }
          if (nclasses == 1) {
             xy.xyR[i][nvars] = hqrndnormal(&rs);
          } else {
-            xy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nclasses);
+            xy.xyR[i][nvars] = hqrnduniformi(&rs, nclasses);
          }
       }
       ae_vector_set_length(&x, nvars);
@@ -79733,12 +79733,12 @@ static void testdforestunit_basictestallsame(bool *err) {
          }
          refrms = sqrt(refrms / npoints);
          refavg /= npoints;
-         refavgrel /= coalesce((double)relcnt, 1.0);
+         refavgrel /= coalesce(relcnt, 1.0);
          *err = *err || rep.relclserror != 0.0;
          *err = *err || rep.avgce != 0.0;
-         *err = *err || !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6);
-         *err = *err || !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6);
-         *err = *err || !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6);
+         *err = *err || !NearAtR(rep.rmserror, refrms, refrms * 0.000001);
+         *err = *err || !NearAtR(rep.avgerror, refavg, refavg * 0.000001);
+         *err = *err || !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 0.000001);
       // Check OOB errors against training set errors:
       // * RelCLS and AvgCE are not calculated for regression problems
       // * RMS and AVG should be roughly same
@@ -79771,10 +79771,10 @@ static void testdforestunit_basictestallsame(bool *err) {
          refavg /= npoints * nclasses;
          refavgrel /= npoints;
          refavgce /= npoints;
-         *err = *err || !NearAtR(rep.avgce, refavgce, refavgce * 1.0E-6);
-         *err = *err || !NearAtR(rep.rmserror, refrms, refrms * 1.0E-6);
-         *err = *err || !NearAtR(rep.avgerror, refavg, refavg * 1.0E-6);
-         *err = *err || !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 1.0E-6);
+         *err = *err || !NearAtR(rep.avgce, refavgce, refavgce * 0.000001);
+         *err = *err || !NearAtR(rep.rmserror, refrms, refrms * 0.000001);
+         *err = *err || !NearAtR(rep.avgerror, refavg, refavg * 0.000001);
+         *err = *err || !NearAtR(rep.avgrelerror, refavgrel, refavgrel * 0.000001);
       // Check OOB errors against training set errors
       // * RMS and AVG should be roughly same
       //
@@ -79824,18 +79824,18 @@ static void testdforestunit_testcompression(bool *err) {
          ae_vector_set_length(&y0, nclasses);
          ae_vector_set_length(&y1, nclasses);
       // Generate dataset
-         npoints = iround(pow(3.0, (double)nvars));
+         npoints = iround(pow(3.0, nvars));
          ae_matrix_set_length(&xy, npoints, nvars + 1);
          for (i = 0; i < npoints; i++) {
             k = i;
             for (j = 0; j < nvars; j++) {
-               xy.xyR[i][j] = (double)(k % 3 - 1);
+               xy.xyR[i][j] = k % 3 - 1.0;
                k /= 3;
             }
             if (nclasses == 1) {
                xy.xyR[i][nvars] = hqrnduniformr(&rs) - 0.5;
             } else {
-               xy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nclasses);
+               xy.xyR[i][nvars] = hqrnduniformi(&rs, nclasses);
             }
          }
       // Train uncompressed
@@ -79906,7 +79906,7 @@ static void testdforestunit_testcompression(bool *err) {
          if (nclasses == 1) {
             xy.xyR[i][nvars] = hqrnduniformr(&rs) - 0.5;
          } else {
-            xy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nclasses);
+            xy.xyR[i][nvars] = hqrnduniformi(&rs, nclasses);
          }
       }
       ae_vector_set_length(&x, nvars);
@@ -80036,7 +80036,7 @@ static void testdforestunit_testimportance(bool *err) {
          if (nclasses == 1) {
             xy.xyR[i][nvars] = hqrnduniformr(&rs) - 0.5;
          } else {
-            xy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nclasses);
+            xy.xyR[i][nvars] = hqrnduniformi(&rs, nclasses);
          }
       }
    // Train with default settings, check that variable importances reported are zero
@@ -80072,7 +80072,7 @@ static void testdforestunit_testimportance(bool *err) {
                   if (nclasses == 1) {
                      xy.xyR[i][nvars] = hqrnduniformr(&rs) - 0.5;
                   } else {
-                     xy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nclasses);
+                     xy.xyR[i][nvars] = hqrnduniformi(&rs, nclasses);
                   }
                }
             // Train
@@ -80161,7 +80161,7 @@ static void testdforestunit_testimportance(bool *err) {
             if (nclasses == 1) {
                xy.xyR[i][nvars] = hqrnduniformr(&rs) - 0.5;
             } else {
-               xy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nclasses);
+               xy.xyR[i][nvars] = hqrnduniformi(&rs, nclasses);
             }
          }
          testdforestunit_randomlyrearrange(&xy, npoints, nvars, &rs);
@@ -80211,7 +80211,7 @@ static void testdforestunit_testimportance(bool *err) {
             for (j = 0; j < nvars; j++) {
                v += rep.varimportances.xR[j];
             }
-            *err = *err || !NearAtR(v, 1.0, 1.0e-6);
+            *err = *err || !NearAtR(v, 1.0, 0.000001);
          }
       }
    // Test that on a problem where:
@@ -80226,20 +80226,20 @@ static void testdforestunit_testimportance(bool *err) {
                xy.xyR[i][nvars] = 0.0;
                k = i;
                for (j = 0; j < nvars; j++) {
-                  xy.xyR[i][j] = (double)(k % 3);
+                  xy.xyR[i][j] = k % 3;
                   xy.xyR[i][nvars] += round(xy.xyR[i][j]);
                   k /= 3;
                }
-               xy.xyR[i][nvars] = (double)(iround(xy.xyR[i][nvars]) % 3 - 1);
+               xy.xyR[i][nvars] = iround(xy.xyR[i][nvars]) % 3 - 1.0;
             } else {
                xy.xyR[i][nvars] = 0.0;
                k = i;
                for (j = 0; j < nvars; j++) {
-                  xy.xyR[i][j] = (double)(k % nclasses);
+                  xy.xyR[i][j] = k % nclasses;
                   xy.xyR[i][nvars] += round(xy.xyR[i][j]);
                   k /= nclasses;
                }
-               xy.xyR[i][nvars] = (double)(iround(xy.xyR[i][nvars]) % nclasses);
+               xy.xyR[i][nvars] = iround(xy.xyR[i][nvars]) % nclasses;
             }
          }
          testdforestunit_randomlyrearrange(&xy, npoints, nvars, &rs);
@@ -80289,7 +80289,7 @@ static void testdforestunit_testimportance(bool *err) {
             for (j = 0; j < nvars; j++) {
                v += rep.varimportances.xR[j];
             }
-            *err = *err || !NearAtR(v, 1.0, 1.0e-6);
+            *err = *err || !NearAtR(v, 1.0, 0.000001);
          }
       }
    }
@@ -80308,7 +80308,7 @@ static void testdforestunit_testimportance(bool *err) {
       nvars = 3;
       ae_vector_set_length(&c, nvars);
       for (j = 0; j < nvars; j++) {
-         c.xR[j] = pow(2.0, (double)-j);
+         c.xR[j] = pow(2.0, -j);
       }
       ae_matrix_set_length(&xy2, npoints + npoints2, nvars + 1);
       for (i = 0; i < npoints + npoints2; i++) {
@@ -80367,7 +80367,7 @@ static void testdforestunit_testimportance(bool *err) {
                }
             }
          }
-         vloss.xR[k] = sqr(dfrmserror(&df, &xyp, npoints2)) * npoints2 * nclasses + 1.0e-20;
+         vloss.xR[k] = sqr(dfrmserror(&df, &xyp, npoints2)) * npoints2 * nclasses + 1.0E-20;
       }
    // Compare
       for (k = 0; k < nvars; k++) {
@@ -80451,7 +80451,7 @@ bool testdforest() {
 // Task generation. Meaningless task, just random numbers.
 static void testlinregunit_generaterandomtask(double xl, double xr, bool randomx, double ymin, double ymax, double smin, double smax, ae_int_t n, RMatrix *xy, RVector *s) {
    ae_int_t i;
-   ae_matrix_set_length(xy, n, 1 + 1);
+   ae_matrix_set_length(xy, n, 2);
    ae_vector_set_length(s, n);
    for (i = 0; i < n; i++) {
       if (randomx) {
@@ -80487,7 +80487,7 @@ static double testlinregunit_generatenormal(double mean, double sigma) {
 // Task generation.
 static void testlinregunit_generatetask(double a, double b, double xl, double xr, bool randomx, double smin, double smax, ae_int_t n, RMatrix *xy, RVector *s) {
    ae_int_t i;
-   ae_matrix_set_length(xy, n, 1 + 1);
+   ae_matrix_set_length(xy, n, 2);
    ae_vector_set_length(s, n);
    for (i = 0; i < n; i++) {
       if (randomx) {
@@ -80536,11 +80536,11 @@ static void testlinregunit_calculatemv(RVector *x, ae_int_t n, double *mean, dou
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 += sqr(x->xR[i] - (*mean));
+         v1 += sqr(x->xR[i] - *mean);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 += x->xR[i] - (*mean);
+         v2 += x->xR[i] - *mean;
       }
       v2 = sqr(v2) / n;
       variance = (v1 - v2) / (n - 1);
@@ -80550,8 +80550,8 @@ static void testlinregunit_calculatemv(RVector *x, ae_int_t n, double *mean, dou
       *stddev = sqrt(variance);
    }
 // Errors
-   *means = *stddev / sqrt((double)n);
-   *stddevs = *stddev * sqrt(2.0) / sqrt((double)(n - 1));
+   *means = *stddev / sqrt(n);
+   *stddevs = *stddev * sqrt(2.0) / sqrt(n - 1.0);
 }
 
 // Unsets LR
@@ -80562,7 +80562,7 @@ static void testlinregunit_unsetlr(linearmodel *lr) {
    ae_frame_make(&_frame_block);
    NewMatrix(xy, 0, 0, DT_REAL);
    NewObj(lrreport, rep);
-   ae_matrix_set_length(&xy, 5 + 1, 1 + 1);
+   ae_matrix_set_length(&xy, 6, 2);
    for (i = 0; i <= 5; i++) {
       xy.xyR[i][0] = 0.0;
       xy.xyR[i][1] = 0.0;
@@ -80822,7 +80822,7 @@ bool testlinreg() {
    // Linear tests:
    // a. random points, sigmas
    // b. no sigmas
-      ae_matrix_set_length(&xy, n, 1 + 1);
+      ae_matrix_set_length(&xy, n, 2);
       for (i = 0; i < n; i++) {
          xy.xyR[i][0] = randommid();
          xy.xyR[i][1] = randommid();
@@ -80856,7 +80856,7 @@ bool testlinreg() {
 // Will S-less subroutine estimate covariance matrix good enough?
    n = 1000 + randominteger(3000);
    sigma = 0.1 + randomreal() * 1.9;
-   ae_matrix_set_length(&xy, n, 1 + 1);
+   ae_matrix_set_length(&xy, n, 2);
    ae_vector_set_length(&s, n);
    for (i = 0; i < n; i++) {
       xy.xyR[i][0] = 1.5 * randomreal() - 0.5;
@@ -80946,7 +80946,7 @@ bool testlinreg() {
                }
                if (tasktype == 1) {
                   ae_assert(m == 9, "Assertion failed");
-                  ae_vector_set_length(&ta, 8 + 1);
+                  ae_vector_set_length(&ta, 9);
                   ta.xR[0] = 1.0;
                   ta.xR[1] = 2.0;
                   ta.xR[2] = 3.0;
@@ -80963,14 +80963,14 @@ bool testlinreg() {
                      xy.xyR[i][0 + i % 3] = 1.0;
                      xy.xyR[i][3 + i / 3 % 3] = 1.0;
                      xy.xyR[i][6 + i / 9 % 3] = 1.0;
-                     v = ae_v_dotproduct(xy.xyR[i], 1, ta.xR, 1, 8 + 1);
+                     v = ae_v_dotproduct(xy.xyR[i], 1, ta.xR, 1, 9);
                      xy0.xR[i] = v;
                      xy.xyR[i][m] = v + noiselevel * testlinregunit_generatenormal(0.0, 1.0);
                   }
                }
                if (tasktype == 2 || tasktype == 3) {
                   ae_assert(m == 9, "Assertion failed");
-                  ae_vector_set_length(&ta, 8 + 1);
+                  ae_vector_set_length(&ta, 9);
                   ta.xR[0] = 1.0;
                   ta.xR[1] = -2.0;
                   ta.xR[2] = 3.0;
@@ -80988,7 +80988,7 @@ bool testlinreg() {
                            xy.xyR[i][j] = 1 + testlinregunit_generatenormal(0.0, 0.05);
                         }
                      }
-                     v = ae_v_dotproduct(xy.xyR[i], 1, ta.xR, 1, 8 + 1);
+                     v = ae_v_dotproduct(xy.xyR[i], 1, ta.xR, 1, 9);
                      xy0.xR[i] = v;
                      xy.xyR[i][m] = v + noiselevel * testlinregunit_generatenormal(0.0, 1.0);
                   }
@@ -81149,12 +81149,12 @@ bool testlinreg() {
                rmserror = sqrt(rmserror / n);
                avgerror /= n;
                avgrelerror /= n;
-               gresterrors = gresterrors || !SmallAtR(log(ar.cvrmserror / cvrmserror), log(1.0 + 1.0E-5));
-               gresterrors = gresterrors || !SmallAtR(log(ar.cvavgerror / cvavgerror), log(1.0 + 1.0E-5));
-               gresterrors = gresterrors || !SmallAtR(log(ar.cvavgrelerror / cvavgrelerror), log(1.0 + 1.0E-5));
-               gresterrors = gresterrors || !SmallAtR(log(ar.rmserror / rmserror), log(1.0 + 1.0E-5));
-               gresterrors = gresterrors || !SmallAtR(log(ar.avgerror / avgerror), log(1.0 + 1.0E-5));
-               gresterrors = gresterrors || !SmallAtR(log(ar.avgrelerror / avgrelerror), log(1.0 + 1.0E-5));
+               gresterrors = gresterrors || !SmallAtR(log(ar.cvrmserror / cvrmserror), log(1.0 + 0.00001));
+               gresterrors = gresterrors || !SmallAtR(log(ar.cvavgerror / cvavgerror), log(1.0 + 0.00001));
+               gresterrors = gresterrors || !SmallAtR(log(ar.cvavgrelerror / cvavgrelerror), log(1.0 + 0.00001));
+               gresterrors = gresterrors || !SmallAtR(log(ar.rmserror / rmserror), log(1.0 + 0.00001));
+               gresterrors = gresterrors || !SmallAtR(log(ar.avgerror / avgerror), log(1.0 + 0.00001));
+               gresterrors = gresterrors || !SmallAtR(log(ar.avgrelerror / avgrelerror), log(1.0 + 0.00001));
             }
          }
       }
@@ -81166,11 +81166,11 @@ bool testlinreg() {
          noiselevel = randomreal() + 0.1;
          tasklevel = randommid();
       } while (NearAtR(noiselevel, tasklevel, 0.05));
-      ae_matrix_set_length(&xy, 3 * n, 1 + 1);
+      ae_matrix_set_length(&xy, 3 * n, 2);
       for (i = 0; i < n; i++) {
-         xy.xyR[3 * i][0] = (double)i;
-         xy.xyR[3 * i + 1][0] = (double)i;
-         xy.xyR[3 * i + 2][0] = (double)i;
+         xy.xyR[3 * i][0] = i;
+         xy.xyR[3 * i + 1][0] = i;
+         xy.xyR[3 * i + 2][0] = i;
          xy.xyR[3 * i][1] = tasklevel - noiselevel;
          xy.xyR[3 * i + 1][1] = tasklevel;
          xy.xyR[3 * i + 2][1] = tasklevel + noiselevel;
@@ -81189,9 +81189,9 @@ bool testlinreg() {
          grothererrors = true;
       }
       for (i = 0; i < n; i++) {
-         xy.xyR[3 * i][0] = (double)i;
-         xy.xyR[3 * i + 1][0] = (double)i;
-         xy.xyR[3 * i + 2][0] = (double)i;
+         xy.xyR[3 * i][0] = i;
+         xy.xyR[3 * i + 1][0] = i;
+         xy.xyR[3 * i + 2][0] = i;
          xy.xyR[3 * i][1] = -noiselevel;
          xy.xyR[3 * i + 1][1] = 0.0;
          xy.xyR[3 * i + 2][1] = noiselevel;
@@ -81489,12 +81489,12 @@ static bool testlrma() {
    x.xR[4] = 12.0;
    x.xR[5] = 12.0;
    filterlrma(&x, 6, 3);
-   precomputederrors = precomputederrors || !NearAtR(x.xR[0], 7.0000000000, 1.0E-5);
-   precomputederrors = precomputederrors || !NearAtR(x.xR[1], 8.0000000000, 1.0E-5);
-   precomputederrors = precomputederrors || !NearAtR(x.xR[2], 8.1666666667, 1.0E-5);
-   precomputederrors = precomputederrors || !NearAtR(x.xR[3], 8.8333333333, 1.0E-5);
-   precomputederrors = precomputederrors || !NearAtR(x.xR[4], 11.6666666667, 1.0E-5);
-   precomputederrors = precomputederrors || !NearAtR(x.xR[5], 12.5000000000, 1.0E-5);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[0], 7.0000000000, 0.00001);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[1], 8.0000000000, 0.00001);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[2], 8.1666666667, 0.00001);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[3], 8.8333333333, 0.00001);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[4], 11.6666666667, 0.00001);
+   precomputederrors = precomputederrors || !NearAtR(x.xR[5], 12.5000000000, 0.00001);
 // Final result
    result = precomputederrors;
    ae_frame_leave();
@@ -81629,7 +81629,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          if (algotype == 1) {
             ae_matrix_set_length(&b, windowwidth, 1);
             for (i = 0; i < windowwidth; i++) {
-               b.xyR[i][0] = 1 / sqrt((double)windowwidth);
+               b.xyR[i][0] = 1.0 / sqrt(windowwidth);
             }
             ssasetalgoprecomputed(&state, &b, windowwidth, 1);
          } else {
@@ -81643,7 +81643,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
                }
             }
          }
-         tol = 1.0E-6;
+         tol = 0.000001;
          if (hqrnduniformr(&rs) > skipprob) {
             ssaanalyzelastwindow(&state, &trend, &noise, &nticks);
             *errorflag = *errorflag || nticks != windowwidth;
@@ -81774,8 +81774,8 @@ static void testssaunit_testgeneral(bool *errorflag) {
             ae_matrix_set_length(&b, windowwidth, 2);
             v = 0.0;
             for (i = 0; i < windowwidth; i++) {
-               b.xyR[i][0] = 1 / sqrt((double)windowwidth);
-               b.xyR[i][1] = (double)i;
+               b.xyR[i][0] = 1.0 / sqrt(windowwidth);
+               b.xyR[i][1] = i;
                v += (double)i / windowwidth;
             }
             vv = 0.0;
@@ -81798,7 +81798,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
                }
             }
          }
-         tol = 1.0E-6;
+         tol = 0.000001;
          if (hqrnduniformr(&rs) > skipprob) {
          // Basis vectors must be linear/constant functions
             ssagetbasis(&state, &a, &sv, &windowwidth2, &nbasis);
@@ -81938,8 +81938,8 @@ static void testssaunit_testgeneral(bool *errorflag) {
             ae_matrix_set_length(&b, windowwidth, 2);
             v = 0.0;
             for (i = 0; i < windowwidth; i++) {
-               b.xyR[i][0] = 1 / sqrt((double)windowwidth);
-               b.xyR[i][1] = (double)i;
+               b.xyR[i][0] = 1.0 / sqrt(windowwidth);
+               b.xyR[i][1] = i;
                v += (double)i / windowwidth;
             }
             vv = 0.0;
@@ -81962,7 +81962,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
                }
             }
          }
-         tol = 1.0E-6;
+         tol = 0.000001;
          if (hqrnduniformr(&rs) > skipprob) {
             ssaanalyzelastwindow(&state, &trend, &noise, &nticks);
             *errorflag = *errorflag || nticks != windowwidth;
@@ -82035,7 +82035,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          ssacreate(&state);
          ae_vector_set_length(&x, nlasttracklen);
          for (k = 0; k < ntracks; k++) {
-            sineoffs = (double)hqrnduniformi(&rs, windowwidth);
+            sineoffs = hqrnduniformi(&rs, windowwidth);
             if (k % 2 == 0) {
                sineamp = 1.0 + hqrnduniformr(&rs);
                sinefreq = 1.0;
@@ -82057,14 +82057,14 @@ static void testssaunit_testgeneral(bool *errorflag) {
                ae_assert(false, "Assertion failed");
             }
          }
-         tol = 1.0E-6;
+         tol = 0.000001;
       // Test analysis with WindowWidth == SinePeriod:
       // * analyze sine with frequency == 1, it must be recognized as trend
       // * analyze sine with frequency == 2, with smoothing enabled
       //   it must be discarded as noise;
          ssasetwindow(&state, windowwidth);
          nticks = windowwidth + 1 + hqrnduniformi(&rs, windowwidth);
-         sineoffs = (double)hqrnduniformi(&rs, windowwidth);
+         sineoffs = hqrnduniformi(&rs, windowwidth);
          sineamp = 1.0 + hqrnduniformr(&rs);
          sinefreq = 1.0;
          ae_vector_set_length(&x, nticks);
@@ -82107,7 +82107,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
             *errorflag = *errorflag || !NearAtR(v, x.xR[i], tol);
          }
          nticks = windowwidth + 1 + hqrnduniformi(&rs, windowwidth);
-         sineoffs = (double)hqrnduniformi(&rs, windowwidth);
+         sineoffs = hqrnduniformi(&rs, windowwidth);
          sineamp = 1.0 + hqrnduniformr(&rs);
          sinefreq = 2.0;
          ae_vector_set_length(&x, nticks);
@@ -82162,7 +82162,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
    //       has high cost.
       for (pass = 1; pass <= 25; pass++) {
       // Generate dataset
-         tol = 1.0E-6;
+         tol = 0.000001;
          nzeros = 100;
          nlinear = 50;
          if (hqrndnormal(&rs) > 0.0) {
@@ -82315,7 +82315,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
    //       has high cost.
       for (pass = 1; pass <= 25; pass++) {
       // Problem metrics
-         tol = 1.0E-5;
+         tol = 0.00001;
          nnoise = 20;
          nlinear = 20;
          nzeros = 50;
@@ -82453,7 +82453,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
                continue;
             }
          // Problem metrics
-            tol = 1.0E-5;
+            tol = 0.00001;
             nticks = 1000 + hqrnduniformi(&rs, 1000);
             if (windowwidth > 5) {
                nbasis = 1 + hqrnduniformi(&rs, 5);
@@ -82464,7 +82464,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
             ssacreate(&state);
             ssacreate(&state2);
             if (mlimit >= 0) {
-               ssasetmemorylimit(&state, iround(pow(2.0, (double)mlimit)));
+               ssasetmemorylimit(&state, iround(pow(2.0, mlimit)));
             } else {
                ssasetmemorylimit(&state, 0);
             }
@@ -82503,7 +82503,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
          // Additional tests for sizes of internal arrays.
          // Implementation-dependent, may fail due to future changes in the core.
             if (mlimit >= 0) {
-               k = imax2(4 * windowwidth * windowwidth, iround(pow(2.0, (double)mlimit)));
+               k = imax2(4 * windowwidth * windowwidth, iround(pow(2.0, mlimit)));
                *errorflag = *errorflag || state.uxbatch.cols * state.uxbatch.rows > k;
                *errorflag = *errorflag || state.aseqtrajectory.cols * state.aseqtrajectory.rows > k;
                *errorflag = *errorflag || state.aseqtbproduct.cols * state.aseqtbproduct.rows > k;
@@ -82543,7 +82543,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
 //       has high cost.
    for (pass = 1; pass <= 25; pass++) {
    // Generate dataset
-      tol = 1.0E-3;
+      tol = 0.001;
       nticks = 100;
       nzeros = 50;
       if (hqrndnormal(&rs) > 0.0) {
@@ -83170,8 +83170,8 @@ static void testssaunit_testspecial(bool *errorflag) {
          ssaanalyzelast(&state, x.cnt, &trend, &noise);
          ssaanalyzelast(&state2, x.cnt, &trend2, &noise2);
          for (i = 0; i < x.cnt; i++) {
-            *errorflag = *errorflag || !NearAtR(trend.xR[i], trend2.xR[i], 1.0E-5);
-            *errorflag = *errorflag || !NearAtR(noise.xR[i], noise2.xR[i], 1.0E-5);
+            *errorflag = *errorflag || !NearAtR(trend.xR[i], trend2.xR[i], 0.00001);
+            *errorflag = *errorflag || !NearAtR(noise.xR[i], noise2.xR[i], 0.00001);
          }
       }
    // Test that for model with some algo being set, one/few tracks and unit window length:
@@ -83206,7 +83206,7 @@ static void testssaunit_testspecial(bool *errorflag) {
          }
          if (algotype == 1) {
             ae_matrix_set_length(&b, 1, 1);
-            b.xyR[0][0] = (double)(2 * hqrnduniformi(&rs, 2) - 1);
+            b.xyR[0][0] = 2 * hqrnduniformi(&rs, 2) - 1;
             ssasetalgoprecomputed(&state, &b, 1, 1);
          } else {
             if (algotype == 2) {
@@ -83683,7 +83683,7 @@ static void testldaunit_gensimpleset(ae_int_t nfeatures, ae_int_t nclasses, ae_i
       }
       c = i % nclasses;
       xy->xyR[i][axis] += c;
-      xy->xyR[i][nfeatures] = (double)c;
+      xy->xyR[i][nfeatures] = c;
    }
 }
 
@@ -83707,7 +83707,7 @@ static void testldaunit_gendeg1set(ae_int_t nfeatures, ae_int_t nclasses, ae_int
       xy->xyR[i][nfeatures - 1] = xy->xyR[i][nfeatures - 2];
       c = i % nclasses;
       xy->xyR[i][axis] += c;
-      xy->xyR[i][nfeatures] = (double)c;
+      xy->xyR[i][nfeatures] = c;
    }
 }
 
@@ -83734,7 +83734,7 @@ static double testldaunit_calcj(ae_int_t nf, RMatrix *st, RMatrix *sw, RVector *
    }
    v = ae_v_dotproduct(w->xR, 1, tx.xR, 1, nf);
    *q = v;
-   result = *p / (*q);
+   result = *p / *q;
    ae_frame_leave();
    return result;
 }
@@ -84008,7 +84008,7 @@ static void testmcpdunit_testsimple(bool *err) {
    NewMatrix(p, 0, 0, DT_REAL);
    NewObj(mcpdstate, s);
    NewObj(mcpdreport, rep);
-   threshold = 1.0E-2;
+   threshold = 0.01;
 // First test:
 // * N-dimensional problem
 // * proportional data
@@ -84242,7 +84242,7 @@ static void testmcpdunit_testentryexit(bool *err) {
    NewMatrix(xy, 0, 0, DT_REAL);
    NewObj(mcpdstate, s);
    NewObj(mcpdreport, rep);
-   threshold = 1.0E-3;
+   threshold = 0.001;
 //
    for (n = 2; n <= 5; n++) {
       for (entrykind = 0; entrykind <= 1; entrykind++) {
@@ -84270,7 +84270,7 @@ static void testmcpdunit_testentryexit(bool *err) {
                ae_matrix_set_length(&pexact, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     pexact.xyR[i][j] = (double)(1 + randominteger(5));
+                     pexact.xyR[i][j] = 1.0 + randominteger(5);
                      if (i == entrystate) {
                         pexact.xyR[i][j] = 0.0;
                      }
@@ -84763,7 +84763,7 @@ static void testmcpdunit_testlc(bool *err) {
    NewVector(ct, 0, DT_INT);
    NewObj(mcpdstate, s);
    NewObj(mcpdreport, rep);
-   threshold = 1.0E5 * machineepsilon;
+   threshold = 100000.0 * machineepsilon;
 // We try different problems with following properties:
 // * N is large enough - we won't have problems with inconsistent constraints
 // * first state is either "entry" or "normal"
@@ -85213,7 +85213,7 @@ static void testknnunit_testseterrors(knnmodel *model, ae_int_t nvars, ae_int_t 
    *avgce /= npoints;
    *rms = sqrt(*rms / (npoints * nout));
    *avg /= npoints * nout;
-   *avgrel /= coalesce((double)relcnt, 1.0);
+   *avgrel /= coalesce(relcnt, 1.0);
    ae_frame_leave();
 }
 
@@ -85292,11 +85292,11 @@ static void testknnunit_testknnalgo(bool *err) {
             if (j % 2 == 0) {
                xy.xyR[i][j] = hqrndnormal(&rs);
             } else {
-               xy.xyR[i][j] = (double)hqrnduniformi(&rs, 2);
+               xy.xyR[i][j] = hqrnduniformi(&rs, 2);
             }
          }
          if (iscls) {
-            xy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nout);
+            xy.xyR[i][nvars] = hqrnduniformi(&rs, nout);
          } else {
             for (j = 0; j < nout; j++) {
                xy.xyR[i][nvars + j] = hqrndnormal(&rs);
@@ -85310,11 +85310,11 @@ static void testknnunit_testknnalgo(bool *err) {
             if (j % 2 == 0) {
                testxy.xyR[i][j] = hqrndnormal(&rs);
             } else {
-               testxy.xyR[i][j] = (double)hqrnduniformi(&rs, 2);
+               testxy.xyR[i][j] = hqrnduniformi(&rs, 2);
             }
          }
          if (iscls) {
-            testxy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nout);
+            testxy.xyR[i][nvars] = hqrnduniformi(&rs, nout);
          } else {
             for (j = 0; j < nout; j++) {
                testxy.xyR[i][nvars + j] = hqrndnormal(&rs);
@@ -85502,36 +85502,36 @@ static void testknnunit_testknnalgo(bool *err) {
    //       for completely unknown values
       testknnunit_testseterrors(&model1, nvars, nout, iscls, &xy, npoints, &refavgce, &refcls0, &refcls1, &refrms, &refavg, &refavgrel);
       if (iscls) {
-         *err = *err || !NearAtR(rep.avgce, refavgce, 1.0E-6);
-         *err = *err || !NearAtR(knnavgce(&model1, &xy, npoints), refavgce, 1.0E-6);
-         *err = *err || rep.relclserror < refcls0 - 1.0E-6;
-         *err = *err || rep.relclserror > refcls1 + 1.0E-6;
-         *err = *err || knnrelclserror(&model1, &xy, npoints) < refcls0 - 1.0E-6;
-         *err = *err || knnrelclserror(&model1, &xy, npoints) > refcls1 + 1.0E-6;
+         *err = *err || !NearAtR(rep.avgce, refavgce, 0.000001);
+         *err = *err || !NearAtR(knnavgce(&model1, &xy, npoints), refavgce, 0.000001);
+         *err = *err || rep.relclserror < refcls0 - 0.000001;
+         *err = *err || rep.relclserror > refcls1 + 0.000001;
+         *err = *err || knnrelclserror(&model1, &xy, npoints) < refcls0 - 0.000001;
+         *err = *err || knnrelclserror(&model1, &xy, npoints) > refcls1 + 0.000001;
       } else {
          *err = *err || rep.avgce != 0.0;
          *err = *err || knnavgce(&model1, &xy, npoints) != 0.0;
          *err = *err || rep.relclserror != 0.0;
          *err = *err || knnrelclserror(&model1, &xy, npoints) != 0.0;
       }
-      *err = *err || !NearAtR(rep.rmserror, refrms, 1.0E-6);
-      *err = *err || !NearAtR(rep.avgerror, refavg, 1.0E-6);
-      *err = *err || !NearAtR(rep.avgrelerror, refavgrel, 1.0E-6);
-      *err = *err || !NearAtR(knnrmserror(&model1, &xy, npoints), refrms, 1.0E-6);
-      *err = *err || !NearAtR(knnavgerror(&model1, &xy, npoints), refavg, 1.0E-6);
-      *err = *err || !NearAtR(knnavgrelerror(&model1, &xy, npoints), refavgrel, 1.0E-6);
+      *err = *err || !NearAtR(rep.rmserror, refrms, 0.000001);
+      *err = *err || !NearAtR(rep.avgerror, refavg, 0.000001);
+      *err = *err || !NearAtR(rep.avgrelerror, refavgrel, 0.000001);
+      *err = *err || !NearAtR(knnrmserror(&model1, &xy, npoints), refrms, 0.000001);
+      *err = *err || !NearAtR(knnavgerror(&model1, &xy, npoints), refavg, 0.000001);
+      *err = *err || !NearAtR(knnavgrelerror(&model1, &xy, npoints), refavgrel, 0.000001);
       testknnunit_testseterrors(&model1, nvars, nout, iscls, &testxy, testnpoints, &refavgce, &refcls0, &refcls1, &refrms, &refavg, &refavgrel);
       knnallerrors(&model1, &testxy, testnpoints, &tstrep);
       if (iscls) {
-         *err = *err || tstrep.relclserror < refcls0 - 1.0E-6;
-         *err = *err || tstrep.relclserror > refcls1 + 1.0E-6;
+         *err = *err || tstrep.relclserror < refcls0 - 0.000001;
+         *err = *err || tstrep.relclserror > refcls1 + 0.000001;
       } else {
          *err = *err || tstrep.avgce != 0.0;
          *err = *err || tstrep.relclserror != 0.0;
       }
-      *err = *err || !NearAtR(tstrep.rmserror, refrms, 1.0E-6);
-      *err = *err || !NearAtR(tstrep.avgerror, refavg, 1.0E-6);
-      *err = *err || !NearAtR(tstrep.avgrelerror, refavgrel, 1.0E-6);
+      *err = *err || !NearAtR(tstrep.rmserror, refrms, 0.000001);
+      *err = *err || !NearAtR(tstrep.avgerror, refavg, 0.000001);
+      *err = *err || !NearAtR(tstrep.avgrelerror, refavgrel, 0.000001);
    }
 // Test that model built with K == 1 and Eps == 0 remembers all training cases
    for (nvars = 1; nvars <= 4; nvars++) {
@@ -85554,7 +85554,7 @@ static void testknnunit_testknnalgo(bool *err) {
                xy.xyR[i][j] = hqrndnormal(&rs);
             }
             if (iscls) {
-               xy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nout);
+               xy.xyR[i][nvars] = hqrnduniformi(&rs, nout);
             } else {
                for (j = 0; j < nout; j++) {
                   xy.xyR[i][nvars + j] = hqrndnormal(&rs);
@@ -85573,9 +85573,9 @@ static void testknnunit_testknnalgo(bool *err) {
          knnbuilderbuildknnmodel(&builder, 1, 0.0, &model1, &rep);
          *err = *err || rep.avgce > 0.0;
          *err = *err || rep.relclserror > 0.0;
-         *err = *err || rep.rmserror > 1.0E-6;
-         *err = *err || rep.avgerror > 1.0E-6;
-         *err = *err || rep.avgrelerror > 1.0E-6;
+         *err = *err || rep.rmserror > 0.000001;
+         *err = *err || rep.avgerror > 0.000001;
+         *err = *err || rep.avgrelerror > 0.000001;
          ae_vector_set_length(&x1, nvars);
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < nvars; j++) {
@@ -85611,7 +85611,7 @@ static void testknnunit_testknnalgo(bool *err) {
             xy.xyR[i][j] = hqrndnormal(&rs);
          }
          if (iscls) {
-            xy.xyR[i][nvars] = (double)hqrnduniformi(&rs, nout);
+            xy.xyR[i][nvars] = hqrnduniformi(&rs, nout);
          } else {
             for (j = 0; j < nout; j++) {
                xy.xyR[i][nvars + j] = hqrndnormal(&rs);
@@ -85895,7 +85895,7 @@ static bool testmlptrainunit_testmlptrainregr() {
    vdecay = 0.001;
    nneurons = 10;
    nneedrest = 5;
-   traineps = 1.0E-3;
+   traineps = 0.001;
    trainits = 0;
    sn = 5;
    n = sn * sn;
@@ -86000,7 +86000,7 @@ static bool testmlptrainunit_testmlpxorregr() {
    vdecay = 0.0001;
    nneurons = 4;
    nneedrest = 1;
-   traineps = 1.0E-4;
+   traineps = 0.0001;
    trainits = 0;
    sn = 2;
    n = sn * sn;
@@ -86014,8 +86014,8 @@ static bool testmlptrainunit_testmlpxorregr() {
          for (i = 0; i < sn; i++) {
             for (j = 0; j < sn; j++) {
                shift = i * sn + j;
-               xy.xyR[shift][0] = (double)i;
-               xy.xyR[shift][1] = (double)j;
+               xy.xyR[shift][0] = i;
+               xy.xyR[shift][1] = j;
                if (xy.xyR[shift][0] == xy.xyR[shift][1]) {
                   xy.xyR[shift][2] = 0.0;
                } else {
@@ -86120,7 +86120,7 @@ static bool testmlptrainunit_testmlptrainclass() {
    nxp = 15;
    vdecay = 0.0001;
    nneedrest = 10;
-   traineps = 1.0E-4;
+   traineps = 0.0001;
    trainits = 0;
    n = 100;
    sparsecreate(n, 2, n * 2, &sm);
@@ -86190,7 +86190,7 @@ static bool testmlptrainunit_testmlptrainclass() {
          }
       // Test on random set
          for (i = 0; i < n; i++) {
-            x.xR[0] = pow(-1.0, (double)randominteger(2)) * ((mxc - mnc) * randomreal() + mnc);
+            x.xR[0] = pow(-1.0, randominteger(2)) * ((mxc - mnc) * randomreal() + mnc);
             mlpprocess(&net, &x, &y);
             if (x.xR[0] < 0.0 ? y.xR[0] < 0.95 && y.xR[1] > 0.05 : y.xR[0] > 0.05 && y.xR[1] < 0.95) {
                result = true;
@@ -86240,7 +86240,7 @@ static bool testmlptrainunit_testmlpxorcls() {
    nneurons = 4;
    vdecay = 0.001;
    nneedrest = 3;
-   traineps = 1.0E-4;
+   traineps = 0.0001;
    trainits = 0;
    n = 4;
    sparsecreate(n, 3, n * 3, &sm);
@@ -86382,9 +86382,9 @@ static bool testmlptrainunit_testmlpzeroweights() {
    NewObj(sparsematrix, sds);
    mxnin = 10;
    mxnout = 10;
-   vdecay = 1.0E-3;
+   vdecay = 0.001;
    nneedrest = 1;
-   traineps = 1.0E-3;
+   traineps = 0.001;
    trainits = 0;
    sparsecreate(1, 1, 0, &sds);
    sparseconverttocrs(&sds);
@@ -86501,7 +86501,7 @@ static bool testmlptrainunit_testmlprestarts() {
    ae_vector_set_length(&x, 1);
    sparsecreate(n, 2, n * 2, &sm);
    mean = numxp / 2.0;
-   numsigma = 5.0 * sqrt((double)numxp) / 2.0;
+   numsigma = 5.0 * sqrt(numxp) / 2.0;
    for (vtrain = 0; vtrain <= 2; vtrain++) {
       avval = 0.0;
       for (xp = 1; xp <= numxp; xp++) {
@@ -86606,7 +86606,7 @@ static bool testmlptrainunit_testmlpcverror() {
    NewMatrix(trainingset, 0, 0, DT_REAL);
    NewMatrix(testset, 0, 0, DT_REAL);
    result = false;
-   decay = 1.0E-6;
+   decay = 0.000001;
    wstep = 0.0;
    foldscount = 5;
    nneedrest = 1;
@@ -86648,7 +86648,7 @@ static bool testmlptrainunit_testmlpcverror() {
       isregr = false;
    }
    mean = nxp / 2.0;
-   numsigma = 3.0 * sqrt((double)nxp / 4.0);
+   numsigma = 3.0 * sqrt(nxp / 4.0);
    diffms = mean - numsigma;
    issparse = randominteger(2);
    if (isregr) {
@@ -86689,7 +86689,7 @@ static bool testmlptrainunit_testmlpcverror() {
          } else {
             for (i = 0; i < npoints; i++) {
                for (j = nin; j < rowsz; j++) {
-                  trainingset.xyR[i][j] = (double)randominteger(nout);
+                  trainingset.xyR[i][j] = randominteger(nout);
                }
             }
          }
@@ -86713,7 +86713,7 @@ static bool testmlptrainunit_testmlpcverror() {
          } else {
             for (i = 0; i < npoints; i++) {
                for (j = nin; j < rowsz; j++) {
-                  sparseset(&sptrainingset, i, j, (double)randominteger(nout));
+                  sparseset(&sptrainingset, i, j, randominteger(nout));
                }
             }
          }
@@ -86736,7 +86736,7 @@ static bool testmlptrainunit_testmlpcverror() {
       } else {
          for (i = 0; i < ntstpoints; i++) {
             for (j = nin; j < rowsz; j++) {
-               testset.xyR[i][j] = (double)randominteger(nout);
+               testset.xyR[i][j] = randominteger(nout);
             }
          }
       }
@@ -86890,9 +86890,9 @@ static bool testmlptrainunit_testmlptrainens() {
                      }
                   }
                   if (hqrndnormal(&rs) > 0.0) {
-                     xy.xyR[i][nin] = (double)k;
+                     xy.xyR[i][nin] = k;
                   } else {
-                     xy.xyR[i][nin] = (double)hqrnduniformi(&rs, nclasses);
+                     xy.xyR[i][nin] = hqrnduniformi(&rs, nclasses);
                   }
                }
                mlpecreatec1(nin, nhid, nclasses, 1 + randominteger(3), &ensemble);
@@ -86962,8 +86962,8 @@ static bool testmlptrainunit_testmlptrainensregr() {
    mxval = 1.0;
    ntrain = 40;
    ntest = 20;
-   decay = 1.0E-3;
-   wstep = 1.0E-3;
+   decay = 0.001;
+   wstep = 0.001;
    maxits = 20;
    nneedrest = 1;
    nneurons = 20;
@@ -87036,11 +87036,11 @@ static bool testmlptrainunit_testmlptrainensregr() {
       }
    // Test that Rep contains correct error values
       mlpeallerrorsx(&netens, &xytrain, &xytrainsp, ntrain, 0, &netens.network.dummyidx, 0, ntrain, 0, &netens.network.buf, &repx);
-      result = result || !RelNear(rep.relclserror, repx.relclserror, 1.0E-4, 1.0E-2);
-      result = result || !RelNear(rep.avgce, repx.avgce, 1.0E-4, 1.0E-2);
-      result = result || !RelNear(rep.rmserror, repx.rmserror, 1.0E-4, 1.0E-2);
-      result = result || !RelNear(rep.avgerror, repx.avgerror, 1.0E-4, 1.0E-2);
-      result = result || !RelNear(rep.avgrelerror, repx.avgrelerror, 1.0E-4, 1.0E-2);
+      result = result || !RelNear(rep.relclserror, repx.relclserror, 0.0001, 0.01);
+      result = result || !RelNear(rep.avgce, repx.avgce, 0.0001, 0.01);
+      result = result || !RelNear(rep.rmserror, repx.rmserror, 0.0001, 0.01);
+      result = result || !RelNear(rep.avgerror, repx.avgerror, 0.0001, 0.01);
+      result = result || !RelNear(rep.avgrelerror, repx.avgrelerror, 0.0001, 0.01);
    // Test that network fits data well. Calculate average error:
    // * on training dataset;
    // * on test dataset. (here we reduce the accuracy
@@ -87130,8 +87130,8 @@ static bool testmlptrainunit_testmlptrainenscls() {
    vectorsetlengthatleast(&x, nin);
    matrixsetlengthatleast(&xytrain, ntrain, nin + 1);
    matrixsetlengthatleast(&xytest, ntest, nin + 1);
-   decay = 1.0E-3;
-   wstep = 1.0E-3;
+   decay = 0.001;
+   wstep = 0.001;
    maxits = 100;
    nneedrest = 1;
    mlpcreatetrainercls(nin, nout, &trainer);
@@ -87139,7 +87139,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
    mlpsetcond(&trainer, wstep, maxits);
    nxp = 5;
    for (xp = 1; xp <= nxp; xp++) {
-      enssize = iround(pow(10.0, (double)(randominteger(2) + 1)));
+      enssize = iround(pow(10.0, randominteger(2) + 1.0));
       withtrainer = randominteger(2);
       issparse = 0;
       if (withtrainer == 0) {
@@ -87154,7 +87154,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
             xytrain.xyR[i][j] = delta * (randomreal() - 1);
          }
          xytrain.xyR[i][val]++;
-         xytrain.xyR[i][nin] = (double)val;
+         xytrain.xyR[i][nin] = val;
       }
    // Set dense dataset in trainer
       if (issparse == 0) {
@@ -87180,7 +87180,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
             xytest.xyR[i][j] = delta * (randomreal() - 1);
          }
          xytest.xyR[i][val]++;
-         xytest.xyR[i][nin] = (double)val;
+         xytest.xyR[i][nin] = val;
       }
    // Create ensemble
       mlpecreatec0(nin, nout, enssize, &netens);
@@ -87273,7 +87273,7 @@ bool testmlptrain() {
    mlpxorclserr = false;
    mlptrainenserrors = false;
 // Test network training on simple XOR problem
-   ae_matrix_set_length(&xy, 3 + 1, 2 + 1);
+   ae_matrix_set_length(&xy, 4, 3);
    xy.xyR[0][0] = -1.0;
    xy.xyR[0][1] = -1.0;
    xy.xyR[0][2] = -1.0;
@@ -89241,7 +89241,7 @@ ThRet_t tester_function(ThArg_t T) {
       if (!Ok) global_failure_flag = EXIT_FAILURE;
    // Display the test results.
       acquire_mutex(&print_mutex);
-      printf("%2d/%d: %-32s %s\n", test + 1, tests, unittests[test].name, Ok? "Ok": "Failed");
+      printf("%2d/%d: %-32s %s\n", test + 1, tests, unittests[test].name, Ok ? "Ok" : "Failed");
       if (!silent) putchar('\n');
       fflush(stdout);
       release_mutex(&print_mutex);

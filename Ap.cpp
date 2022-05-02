@@ -2796,19 +2796,19 @@ double rboundval(double x, double b1, double b2) {
 }
 
 double randomreal() {
-   const double mx = (double)RAND_MAX + 1.0;
+   const double mx = RAND_MAX + 1.0;
    return (rand() + rand() / mx) / mx;
 }
 
 double randommid() {
-   const double mx = (double)RAND_MAX + 1.0;
+   const double mx = RAND_MAX + 1.0;
    return 2.0 * (rand() + rand() / mx) / mx - 1.0;
 }
 
 ae_int_t randominteger(ae_int_t maxv) { return rand() % maxv; }
 
 bool randombool(double p/* = 0.5*/) {
-   const double mx = (double)RAND_MAX + 1.0;
+   const double mx = RAND_MAX + 1.0;
    return rand() + rand()/mx <= p * mx;
 }
 
@@ -5174,19 +5174,19 @@ double maxreal(double x, double y) { return x > y ? x : y; }
 double sqr(double x) { return x * x; }
 
 double randomreal() {
-   const double mx = (double)RAND_MAX + 1.0;
+   const double mx = RAND_MAX + 1.0;
    return (rand() + rand() / mx) / mx;
 }
 
 double randommid() {
-   const double mx = (double)RAND_MAX + 1.0;
+   const double mx = RAND_MAX + 1.0;
    return 2.0 * (rand() + rand() / mx) / mx - 1.0;
 }
 
 ae_int_t randominteger(ae_int_t maxv) { return (ae_int_t)rand() % maxv; }
 
 bool randombool(double p/* = 0.5*/) {
-   const double mx = (double)RAND_MAX + 1.0;
+   const double mx = RAND_MAX + 1.0;
    return rand() + rand()/mx <= p * mx;
 }
 

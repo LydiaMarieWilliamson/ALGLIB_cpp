@@ -679,7 +679,7 @@ bool randombool(double p = 0.5);
 // Complex math functions:
 // *	basic arithmetic operations
 // *	standard functions
-inline complex complex_from_i(ae_int_t x, ae_int_t y = 0) { complex r; r.x = (double)x, r.y = (double)y; return r; }
+inline complex complex_from_i(ae_int_t x, ae_int_t y = 0) { complex r; r.x = x, r.y = y; return r; }
 inline complex complex_from_d(double x, double y = 0.0) { complex r; r.x = x, r.y = y; return r; }
 
 complex ae_c_neg(complex A);

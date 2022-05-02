@@ -371,7 +371,7 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w)
    }
    beta.xR[0] = 2.0;
    for (i = 1; i < n; i++) {
-      beta.xR[i] = 1 / (4 - 1 / sqr((double)i));
+      beta.xR[i] = 1.0 / (4 - 1.0 / sqr(i));
    }
    gqgeneraterec(&alpha, &beta, beta.xR[0], n, info, x, w);
 // test basic properties to detect errors
@@ -715,7 +715,7 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
       ae_frame_leave();
       return;
    }
-   for (i = 0; i <= iceil((double)(3 * (n / 2)) / 2.0); i++) {
+   for (i = 0; i <= iceil((3 * (n / 2)) / 2.0); i++) {
       if (beta->xR[i] <= 0.0) {
          *info = -2;
          ae_frame_leave();
@@ -876,7 +876,7 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
    }
    beta.xR[0] = 2.0;
    for (k = 1; k < blen; k++) {
-      beta.xR[k] = 1 / (4 - 1 / sqr((double)k));
+      beta.xR[k] = 1.0 / (4 - 1.0 / sqr(k));
    }
    gkqgeneraterec(&alpha, &beta, mu0, n, info, x, wkronrod, wgauss);
 // test basic properties to detect errors
@@ -1357,7 +1357,7 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
       ae_frame_leave();
       return;
    }
-   clen = iceil((double)(3 * (n / 2)) / 2.0) + 1;
+   clen = iceil((3 * (n / 2)) / 2.0) + 1;
    ae_vector_set_length(&a, clen);
    ae_vector_set_length(&b, clen);
    for (i = 0; i < clen; i++) {
@@ -1731,9 +1731,9 @@ Spawn:
       // Use rectangles method
          inta += fabs(v) * state->wr.xR[i];
       }
-      intk *= (state->b - state->a) * 0.5;
-      intg *= (state->b - state->a) * 0.5;
-      inta *= (state->b - state->a) * 0.5;
+      intk *= 0.5 * (state->b - state->a);
+      intg *= 0.5 * (state->b - state->a);
+      inta *= 0.5 * (state->b - state->a);
       state->heap.xyR[0][0] = fabs(intg - intk);
       state->heap.xyR[0][1] = intk;
       state->heap.xyR[0][2] = inta;
@@ -1773,9 +1773,9 @@ Spawn:
          // Use rectangles method
             inta += fabs(v) * state->wr.xR[i];
          }
-         intk *= (tb - ta) * 0.5;
-         intg *= (tb - ta) * 0.5;
-         inta *= (tb - ta) * 0.5;
+         intk *= 0.5 * (tb - ta);
+         intg *= 0.5 * (tb - ta);
+         inta *= 0.5 * (tb - ta);
          state->heap.xyR[j][0] = fabs(intg - intk);
          state->heap.xyR[j][1] = intk;
          state->heap.xyR[j][2] = inta;
@@ -1830,9 +1830,9 @@ Spawn:
          // Use rectangles method
             inta += fabs(v) * state->wr.xR[i];
          }
-         intk *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
-         intg *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
-         inta *= (state->heap.xyR[j][4] - state->heap.xyR[j][3]) * 0.5;
+         intk *= 0.5 * (state->heap.xyR[j][4] - state->heap.xyR[j][3]);
+         intg *= 0.5 * (state->heap.xyR[j][4] - state->heap.xyR[j][3]);
+         inta *= 0.5 * (state->heap.xyR[j][4] - state->heap.xyR[j][3]);
          state->heap.xyR[j][0] = fabs(intg - intk);
          state->heap.xyR[j][1] = intk;
          state->heap.xyR[j][2] = inta;
@@ -1934,12 +1934,12 @@ Spawn:
       beta = rmin2(beta, 0.0);
    // first, integrate left half of [a,b]:
    //     integral(f(x)dx, a, (b+a)/2) =
-   //     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
+   //     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5 * (b-a))^(1+alpha))
       for (autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + alpha), eps, state->xwidth, &state->internalstate); autogk_autogkinternaliteration(&state->internalstate); ) {
       // Fill State.X, State.XMinusA, State.BMinusX.
       // Latter two are filled correctly even if B < A.
          x = state->internalstate.x;
-         t = pow(x, 1 / (1 + alpha));
+         t = pow(x, 1.0 / (1 + alpha));
          state->x = a + t;
          if (s > 0.0) {
             state->xminusa = t;
@@ -1959,12 +1959,12 @@ Spawn:
       state->nintervals += state->internalstate.heapused;
    // then, integrate right half of [a,b]:
    //     integral(f(x)dx, (b+a)/2, b) =
-   //     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
+   //     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5 * (b-a))^(1+beta))
       for (autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + beta), eps, state->xwidth, &state->internalstate); autogk_autogkinternaliteration(&state->internalstate); ) {
       // Fill State.X, State.XMinusA, State.BMinusX.
       // Latter two are filled correctly (X-A, B-X) even if B < A.
          x = state->internalstate.x;
-         t = pow(x, 1 / (1 + beta));
+         t = pow(x, 1.0 / (1 + beta));
          state->x = b - t;
          if (s > 0.0) {
             state->xminusa = b - t - a;
