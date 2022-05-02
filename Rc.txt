@@ -17,13 +17,13 @@ typedef enum {
 Manual threading interfaces:
 AlgLibInternal.cpp:
 	mcsrch():
-		(Step: Q->diffstep == 0.0? needfg: needf):		Anything
+		(Step: Q->diffstep == 0.0 ? needfg : needf):		Anything
 	armijoiteration():
 		armijostate *Q;
 		(Step: needf):	Anything
 DataAnalysis.cpp
 	static logit_mnlmcsrch():
-		(Step: Q->diffstep == 0.0? needfg: needf):		Anything
+		(Step: Q->diffstep == 0.0 ? needfg : needf):		Anything
 	static mlptrain_mlpcontinuetrainingx():
 		mlptrainer *Q; smlptrnsession *SQ;
 		(Step):		Anything

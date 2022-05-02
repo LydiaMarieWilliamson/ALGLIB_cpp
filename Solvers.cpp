@@ -3834,7 +3834,7 @@ void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integ
 // === LINCG Package ===
 // Depends on: (LinAlg) MATGEN, SPARSE
 namespace alglib_impl {
-static const double lincg_defaultprecision = 1.0E-6;
+static const double lincg_defaultprecision = 0.000001;
 
 // Clears request fields (to be sure that we don't forgot to clear something)
 static void lincg_updateitersdata(lincgstate *state) {
@@ -4262,7 +4262,7 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
       for (i = 0; i < n; i++) {
          v = sparsegetdiagonal(a, i);
          if (v > 0.0) {
-            state->tmpd.xR[i] = 1 / sqrt(v);
+            state->tmpd.xR[i] = 1.0 / sqrt(v);
          } else {
             state->tmpd.xR[i] = 1.0;
          }
@@ -4552,8 +4552,8 @@ void lincgsetxrep(const lincgstate &state, const bool needxrep) {
 // === LINLSQR Package ===
 // Depends on: (LinAlg) SVD, NORMESTIMATOR
 namespace alglib_impl {
-static const double linlsqr_atol = 1.0E-6;
-static const double linlsqr_btol = 1.0E-6;
+static const double linlsqr_atol = 0.000001;
+static const double linlsqr_btol = 0.000001;
 
 // This function initializes linear LSQR Solver.  It  provides  exactly  same
 // functionality as linlsqrcreate(), but reuses  previously  allocated  space
@@ -4576,7 +4576,7 @@ void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state) {
    state->prectype = 0;
    state->epsa = linlsqr_atol;
    state->epsb = linlsqr_btol;
-   state->epsc = 1 / sqrt(machineepsilon);
+   state->epsc = 1.0 / sqrt(machineepsilon);
    state->maxits = 0;
    state->lambdai = 0.0;
    state->xrep = false;
@@ -4884,7 +4884,7 @@ Spawn:
       state->r2 = rmin2(state->r2, state->phibarip1 * state->phibarip1);
    // Update d and DNorm, check condition-related stopping criteria
       for (i = 0; i < state->n; i++) {
-         state->d.xR[i] = 1 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
+         state->d.xR[i] = 1.0 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
          state->dnorm += state->d.xR[i] * state->d.xR[i];
       }
       if (sqrt(state->dnorm) * state->anorm >= state->epsc) {
@@ -5006,7 +5006,7 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b) {
       }
       for (i = 0; i < n; i++) {
          if (state->tmpd.xR[i] > 0.0) {
-            state->tmpd.xR[i] = 1 / sqrt(state->tmpd.xR[i]);
+            state->tmpd.xR[i] = 1.0 / sqrt(state->tmpd.xR[i]);
          } else {
             state->tmpd.xR[i] = 1.0;
          }
@@ -5387,7 +5387,7 @@ void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits) {
    ae_assert(epsf >= 0.0, "NLEQSetCond: negative EpsF!");
    ae_assert(maxits >= 0, "NLEQSetCond: negative MaxIts!");
    if (epsf == 0.0 && maxits == 0) {
-      epsf = 1.0E-6;
+      epsf = 0.000001;
    }
    state->epsf = epsf;
    state->maxits = maxits;

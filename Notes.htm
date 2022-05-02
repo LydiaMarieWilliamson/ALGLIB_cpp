@@ -1083,6 +1083,11 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 40	AlgLibInternal.{cpp,h}: Adding rmatrixgemmf().
 40	Restoring the original RComm flags, in preparation of later normalization of iterative routines.
 37	(Continued) Localized more static constants and removed their prefixes.
+40	Synchronizing to minor changes made in alglib.3.18.
+	∙	Numerals converted to double (in some places only), excesses (double) typecasts eliminated.
+	∙	1.0 E n, 1.0 e n converted to numeral form, for n ∈ [-8,+8];
+		1.0 e n converted to 1.0 E n most elsewhere outside of comments and strings.
+	∙	Optimization.cpp: Reinstated deleted, but commented out, code.
 </pre>
 </p>
 <p>
@@ -1243,6 +1248,7 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 0-39	8000 0.9x 11766 1.1x 12199 1.0x 9608 1.0x 1649021803 (624a136b) 78 // Minor changes to AlgLibMisc.* to sync to 3.18.0.
 0-39	7692 1.0x 12196 1.0x 12350 1.0x 8911 1.1x 1649378705 (624f8591) 79 // Minor changes to {Interpolation,LinAlg,SpecialFunctions}.cpp to sync to 3.18.0.
 0-39	7634 0.9x 11237 1.1x 12199 1.0x 9550 1.0x 1650824757 (62659635) 78 // Localized more static constants.
+40	8065 1.0x 12049 1.0x 11769 1.0x 9403 1.0x 1651429624 (626ed0f8) 80 // Minor changes to sync to 3.18.0.
 </pre>
 </p>
 </div>

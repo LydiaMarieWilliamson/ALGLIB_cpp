@@ -582,7 +582,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    // another algorithm selection
       algbest = 0;
       if (alg == -1) {
-         flopbest = (double)(2 * m * n);
+         flopbest = 2.0 * m * n;
       } else {
          flopbest = maxrealnumber;
       }
@@ -1188,7 +1188,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       if (alg == -1) {
          if (circular && ftbaseissmooth(m) && m % 2 == 0) {
          // special code for circular convolution of a sequence with a smooth length
-            flopcand = 3 * ftbasegetflopestimate(m / 2) + (double)(6 * m) / 2.0;
+            flopcand = 3 * ftbasegetflopestimate(m / 2) + (6 * m) / 2.0;
             if (flopcand < flopbest) {
                algbest = 1;
                flopbest = flopcand;
@@ -1196,7 +1196,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
          } else {
          // general cyclic/non-cyclic convolution
             p = ftbasefindsmootheven(m + n - 1);
-            flopcand = 3 * ftbasegetflopestimate(p / 2) + (double)(6 * p) / 2.0;
+            flopcand = 3 * ftbasegetflopestimate(p / 2) + (6 * p) / 2.0;
             if (flopcand < flopbest) {
                algbest = 1;
                flopbest = flopcand;
@@ -1855,7 +1855,7 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
    convc1dcircular(signal, m, &p, n, &b);
    ae_vector_set_length(c, m);
    ae_v_cmove(c->xC, 1, &b.xC[n - 1], 1, "N", m - n + 1);
-   if (m - n + 1 < m) {
+   if (1 < n) {
       ae_v_cmove(&c->xC[m - n + 1], 1, b.xC, 1, "N", n - 1);
    }
    ae_frame_leave();
@@ -1975,7 +1975,7 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
    convr1dcircular(signal, m, &p, n, &b);
    ae_vector_set_length(c, m);
    ae_v_move(c->xR, 1, &b.xR[n - 1], 1, m - n + 1);
-   if (m - n + 1 < m) {
+   if (1 < n) {
       ae_v_move(&c->xR[m - n + 1], 1, b.xR, 1, n - 1);
    }
    ae_frame_leave();

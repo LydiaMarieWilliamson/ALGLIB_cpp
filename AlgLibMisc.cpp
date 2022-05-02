@@ -190,7 +190,7 @@ ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n) {
 // API: double hqrnduniformr(const hqrndstate &state);
 double hqrnduniformr(hqrndstate *state) {
    double result;
-   result = (double)(hqrnd_hqrndintegerbase(state) + 1) / (hqrnd_hqrndmax + 2);
+   result = (hqrnd_hqrndintegerbase(state) + 1.0) / (hqrnd_hqrndmax + 2);
    return result;
 }
 
@@ -202,7 +202,7 @@ double hqrnduniformr(hqrndstate *state) {
 // API: double hqrndmiduniformr(const hqrndstate &state);
 double hqrndmiduniformr(hqrndstate *state) {
    double result;
-   result = (double)(2 * hqrnd_hqrndintegerbase(state) - hqrnd_hqrndmax) / (hqrnd_hqrndmax + 2);
+   result = (2.0 * hqrnd_hqrndintegerbase(state) - hqrnd_hqrndmax) / (hqrnd_hqrndmax + 2);
    return result;
 }
 
@@ -859,7 +859,7 @@ void xdebugb2outsin(ae_int_t m, ae_int_t n, BMatrix *a) {
    ae_matrix_set_length(a, m, n);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->xyB[i][j] = sin((double)(3 * i + 5 * j)) > 0.0;
+         a->xyB[i][j] = sin(3.0 * i + 5.0 * j) > 0.0;
       }
    }
 }
@@ -930,7 +930,7 @@ void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix *a) {
    ae_matrix_set_length(a, m, n);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->xyZ[i][j] = sign(sin((double)(3 * i + 5 * j)));
+         a->xyZ[i][j] = sign(sin(3.0 * i + 5.0 * j));
       }
    }
 }
@@ -1001,7 +1001,7 @@ void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a) {
    ae_matrix_set_length(a, m, n);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->xyR[i][j] = sin((double)(3 * i + 5 * j));
+         a->xyR[i][j] = sin(3.0 * i + 5.0 * j);
       }
    }
 }
@@ -1072,7 +1072,7 @@ void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a) {
    ae_matrix_set_length(a, m, n);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->xyC[i][j] = complex_from_d(sin((double)(3 * i + 5 * j)), cos((double)(3 * i + 5 * j)));
+         a->xyC[i][j] = complex_from_d(sin(3.0 * i + 5.0 * j), cos(3.0 * i + 5.0 * j));
       }
    }
 }
@@ -2103,9 +2103,9 @@ ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae
    buf->rneeded = 0.0;
    buf->selfmatch = selfmatch;
    if (kdt->normtype == 2) {
-      buf->approxf = 1 / sqr(1 + eps);
+      buf->approxf = 1.0 / sqr(1 + eps);
    } else {
-      buf->approxf = 1 / (1 + eps);
+      buf->approxf = 1.0 / (1 + eps);
    }
    buf->kcur = 0;
 // calculate distance from point to current bounding box
@@ -3185,7 +3185,7 @@ void kdtreeexploreleaf(kdtree *kdt, ae_int_t node, RMatrix *xy, ae_int_t *k) {
    *k = kdt->nodes.xZ[node];
    offs = kdt->nodes.xZ[node + 1];
    ae_assert(offs >= 0, "KDTreeExploreLeaf: integrity error");
-   ae_assert(offs + (*k) - 1 < kdt->xy.rows, "KDTreeExploreLeaf: integrity error");
+   ae_assert(offs + *k - 1 < kdt->xy.rows, "KDTreeExploreLeaf: integrity error");
    matrixsetlengthatleast(xy, *k, kdt->nx + kdt->ny);
    for (i = 0; i < *k; i++) {
       for (j = 0; j < kdt->nx + kdt->ny; j++) {

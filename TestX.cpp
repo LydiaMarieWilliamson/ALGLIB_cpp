@@ -1817,7 +1817,7 @@ int main() {
          mincgsetcond(state, 0.0, 0.0, epsx, 0);
          mincgoptimize(state, func505_grad, NULL, &x0);
          mincgresults(state, x, rep);
-         issue505Ok = issue505Ok && SmallR(4.0 * pow(x[0] - x0, 3), 1.0E-3);
+         issue505Ok = issue505Ok && SmallR(4.0 * pow(x[0] - x0, 3), 0.001);
       } catch(...) {
          issue505Ok = false;
       }
@@ -1833,7 +1833,7 @@ int main() {
          minlmsetcond(state, epsx, 0);
          minlmoptimize(state, func505_vec, func505_jac, NULL, &x0);
          minlmresults(state, x, rep);
-         issue505Ok = issue505Ok && NearR(x[0], x0, 1.0E-3);
+         issue505Ok = issue505Ok && NearR(x[0], x0, 0.001);
       } catch(...) {
          issue505Ok = false;
       }
@@ -2130,7 +2130,7 @@ int main() {
          //
             int n = _n[nidx];
             double desiredflops = n > 64 ? 1.0E10 : 1.0E9;
-            int nrepeat = (int)(desiredflops / (2 * pow((double)n, 3.0)));
+            int nrepeat = (int)(desiredflops / (2 * pow(n, 3.0)));
             nrepeat = 4 * (nrepeat / 4 + 1);
          //
          // Actual processing
@@ -2150,7 +2150,7 @@ int main() {
             for (k = 0; k < nrepeat; k++)
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, k % 2, b, 0, 0, (k / 2) % 2, 0.0, c, 0, 0);
             t = alglib_impl::tickcount() - t;
-            perf0 = 1.0E-6 * pow((double)n, 3) * 2.0 * nrepeat / (0.001 * t);
+            perf0 = 0.000001 * pow(n, 3.0) * 2.0 * nrepeat / (0.001 * t);
             printf("* RGEMM-SEQ-%-4ld (MFLOPS)  %5.0lf\n", (long)n, perf0);
             setnworkers(0);
             t = alglib_impl::tickcount();
@@ -2159,7 +2159,7 @@ int main() {
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, k % 2, b, 0, 0, (k / 2) % 2, 0.0, c, 0, 0),
                alglib_impl::ae_state_set_flags(NonTH);
             t = alglib_impl::tickcount() - t;
-            perf2 = 1.0E-6 * pow((double)n, 3) * 2.0 * nrepeat / (0.001 * t);
+            perf2 = 0.000001 * pow(n, 3.0) * 2.0 * nrepeat / (0.001 * t);
             printf("* RGEMM-MTN-%-4ld           %4.1lfx\n", (long)n, perf2 / perf0);
             setnworkers(1);
          }

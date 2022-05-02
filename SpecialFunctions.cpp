@@ -25,7 +25,7 @@ static double gammafunc_gammastirf(double x) {
    double v;
    double stir;
    double result;
-   w = 1 / x;
+   w = 1.0 / x;
    stir = 7.87311395793093628397E-4;
    stir = -2.29549961613378126380E-4 + w * stir;
    stir = -2.68132617805781232825E-3 + w * stir;
@@ -263,7 +263,7 @@ double lngamma(double x, double *sgngam) {
       result = q;
       return result;
    }
-   p = 1 / (x * x);
+   p = 1.0 / (x * x);
    if (x >= 1000.0) {
       q += ((7.9365079365079365079365 * 0.0001 * p - 2.7777777777777777777778 * 0.001) * p + 0.0833333333333333333333) / x;
    } else {
@@ -571,7 +571,7 @@ static double normaldistr_bvnintegrate3(double rangea, double rangeb, double x, 
    double result;
    r = (rangeb - rangea) * 0.5 * gx + (rangeb + rangea) * 0.5;
    t2 = tan(0.5 * r);
-   dd = 1 / (1 + t2 * t2);
+   dd = 1.0 / (1 + t2 * t2);
    sinr = 2 * t2 * dd;
    cosr = (1 - t2 * t2) * dd;
    result = gw * exp(-(x * x + y * y - 2 * x * y * sinr) / (2 * cosr * cosr));
@@ -671,7 +671,7 @@ double bivariatenormalcdf(double x, double y, double rho) {
    // by means of 20-point Gauss-Legendre quadrature.
       x = -x;
       y = -y;
-      s = (double)sign(rho);
+      s = sign(rho);
       if (s > 0.0) {
          fxys = normalcdf(-rmax2(x, y));
       } else {
@@ -1275,7 +1275,7 @@ double invincompletebeta(double a, double b, double y) {
    // start
       if (mainlooppos == 0) {
          if (a <= 1.0 || b <= 1.0) {
-            dithresh = 1.0e-6;
+            dithresh = 0.000001;
             rflg = 0;
             aaa = a;
             bbb = b;
@@ -1285,7 +1285,7 @@ double invincompletebeta(double a, double b, double y) {
             mainlooppos = ihalve;
             continue;
          } else {
-            dithresh = 1.0e-4;
+            dithresh = 0.0001;
          }
          yp = -invnormaldistribution(y);
          if (y > 0.5) {
@@ -1610,7 +1610,7 @@ double studenttdistribution(ae_int_t k, double t) {
       return result;
    }
    if (t < -2.0) {
-      rk = (double)k;
+      rk = k;
       z = rk / (rk + t * t);
       result = 0.5 * incompletebeta(0.5 * rk, 0.5, z);
       return result;
@@ -1620,7 +1620,7 @@ double studenttdistribution(ae_int_t k, double t) {
    } else {
       x = t;
    }
-   rk = (double)k;
+   rk = k;
    z = 1.0 + x * x / rk;
    if (k % 2 != 0) {
       xsqk = x / sqrt(rk);
@@ -1678,7 +1678,7 @@ double invstudenttdistribution(ae_int_t k, double p) {
    ae_int_t rflg;
    double result;
    ae_assert(k > 0 && p > 0.0 && p < 1.0, "Domain error in InvStudentTDistribution");
-   rk = (double)k;
+   rk = k;
    if (p > 0.25 && p < 0.75) {
       if (p == 0.5) {
          result = 0.0;
@@ -2122,7 +2122,7 @@ double invincompletegammac(double a, double y0) {
    x1 = 0.0;
    yh = 1.0;
    dithresh = 5 * igammaepsilon;
-   d = 1 / (9 * a);
+   d = 1.0 / (9 * a);
    y = 1 - d - invnormaldistribution(y0) * sqrt(d);
    x = a * y * y * y;
    lgm = lngamma(a, &tmp);
@@ -2429,11 +2429,11 @@ double binomialdistribution(ae_int_t k, ae_int_t n, double p) {
       result = 1.0;
       return result;
    }
-   dn = (double)(n - k);
+   dn = n - k;
    if (k == 0) {
       dk = pow(1.0 - p, dn);
    } else {
-      dk = (double)(k + 1);
+      dk = k + 1.0;
       dk = incompletebeta(dn, dk, 1.0 - p);
    }
    result = dk;
@@ -2486,7 +2486,7 @@ double binomialcdistribution(ae_int_t k, ae_int_t n, double p) {
       result = 0.0;
       return result;
    }
-   dn = (double)(n - k);
+   dn = n - k;
    if (k == 0) {
       if (p < 0.01) {
          dk = -nuexpm1(dn * nulog1p(-p));
@@ -2494,7 +2494,7 @@ double binomialcdistribution(ae_int_t k, ae_int_t n, double p) {
          dk = 1.0 - pow(1.0 - p, dn);
       }
    } else {
-      dk = (double)(k + 1);
+      dk = k + 1.0;
       dk = incompletebeta(dk, dn, p);
    }
    result = dk;
@@ -2534,7 +2534,7 @@ double invbinomialdistribution(ae_int_t k, ae_int_t n, double y) {
    double p;
    double result;
    ae_assert(k >= 0 && k < n, "Domain error in InvBinomialDistribution");
-   dn = (double)(n - k);
+   dn = n - k;
    if (k == 0) {
       if (y > 0.8) {
          p = -nuexpm1(nulog1p(y - 1.0) / dn);
@@ -2542,7 +2542,7 @@ double invbinomialdistribution(ae_int_t k, ae_int_t n, double y) {
          p = 1.0 - pow(y, 1.0 / dn);
       }
    } else {
-      dk = (double)(k + 1);
+      dk = k + 1.0;
       p = incompletebeta(dn, dk, 0.5);
       if (p > 0.5) {
          p = invincompletebeta(dk, dn, 1.0 - y);
@@ -2634,7 +2634,7 @@ double exponentialintegralei(double x) {
       return result;
    }
    if (x < 4.0) {
-      w = 1 / x;
+      w = 1.0 / x;
       f1 = 1.981808503259689673238E-2;
       f1 = f1 * w - 1.271645625984917501326;
       f1 = f1 * w - 2.088160335681228318920;
@@ -2656,7 +2656,7 @@ double exponentialintegralei(double x) {
       return result;
    }
    if (x < 8.0) {
-      w = 1 / x;
+      w = 1.0 / x;
       f1 = -1.373215375871208729803;
       f1 = f1 * w - 7.084559133740838761406E-1;
       f1 = f1 * w + 1.580806855547941010501;
@@ -2679,7 +2679,7 @@ double exponentialintegralei(double x) {
       return result;
    }
    if (x < 16.0) {
-      w = 1 / x;
+      w = 1.0 / x;
       f1 = -2.106934601691916512584;
       f1 = f1 * w + 1.732733869664688041885;
       f1 = f1 * w - 2.423619178935841904839E-1;
@@ -2705,7 +2705,7 @@ double exponentialintegralei(double x) {
       return result;
    }
    if (x < 32.0) {
-      w = 1 / x;
+      w = 1.0 / x;
       f1 = -2.458119367674020323359E-1;
       f1 = f1 * w - 1.483382253322077687183E-1;
       f1 = f1 * w + 7.248291795735551591813E-2;
@@ -2728,7 +2728,7 @@ double exponentialintegralei(double x) {
       return result;
    }
    if (x < 64.0) {
-      w = 1 / x;
+      w = 1.0 / x;
       f1 = 1.212561118105456670844E-1;
       f1 = f1 * w - 5.823133179043894485122E-1;
       f1 = f1 * w + 2.348887314557016779211E-1;
@@ -2745,7 +2745,7 @@ double exponentialintegralei(double x) {
       result = exp(x) * w * (1 + w * f);
       return result;
    }
-   w = 1 / x;
+   w = 1.0 / x;
    f1 = -7.657847078286127362028E-1;
    f1 = f1 * w + 6.886192415566705051750E-1;
    f1 = f1 * w - 2.132598113545206124553E-1;
@@ -2831,8 +2831,8 @@ double exponentialintegralen(double x, ae_int_t n) {
    }
    if (n > 5000) {
       xk = x + n;
-      yk = 1 / (xk * xk);
-      t = (double)n;
+      yk = 1.0 / (xk * xk);
+      t = n;
       result = yk * t * (6 * x * x - 8 * t * x + t * t);
       result = yk * (result + t * (t - 2.0 * x));
       result = yk * (result + t);
@@ -2847,7 +2847,7 @@ double exponentialintegralen(double x, ae_int_t n) {
       z = -x;
       xk = 0.0;
       yk = 1.0;
-      pk = (double)(1 - n);
+      pk = 1.0 - n;
       if (n == 1) {
          result = 0.0;
       } else {
@@ -2883,10 +2883,10 @@ double exponentialintegralen(double x, ae_int_t n) {
          k++;
          if (k % 2 == 1) {
             yk = 1.0;
-            xk = n + (double)(k - 1) / 2.0;
+            xk = n + (k - 1) / 2.0;
          } else {
             yk = x;
-            xk = (double)k / 2.0;
+            xk = k / 2.0;
          }
          pk = pkm1 * yk + pkm2 * xk;
          qk = qkm1 * yk + qkm2 * xk;
@@ -2989,9 +2989,9 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    NewVector(a, 0, DT_REAL);
    NewVector(c, 0, DT_REAL);
    ae_assert(m >= 0.0 && m <= 1.0, "Domain error in JacobianEllipticFunctions: m<0 or m>1");
-   ae_vector_set_length(&a, 8 + 1);
-   ae_vector_set_length(&c, 8 + 1);
-   if (m < 1.0e-9) {
+   ae_vector_set_length(&a, 9);
+   ae_vector_set_length(&c, 9);
+   if (m < 1.0E-9) {
       t = sin(u);
       b = cos(u);
       ai = 0.25 * m * (u - t * b);
@@ -3561,7 +3561,7 @@ namespace alglib_impl {
 double poissondistribution(ae_int_t k, double m) {
    double result;
    ae_assert(k >= 0 && m > 0.0, "Domain error in PoissonDistribution");
-   result = incompletegammac((double)(k + 1), m);
+   result = incompletegammac(k + 1, m);
    return result;
 }
 
@@ -3593,7 +3593,7 @@ double poissondistribution(ae_int_t k, double m) {
 double poissoncdistribution(ae_int_t k, double m) {
    double result;
    ae_assert(k >= 0 && m > 0.0, "Domain error in PoissonDistributionC");
-   result = incompletegamma((double)(k + 1), m);
+   result = incompletegamma(k + 1, m);
    return result;
 }
 
@@ -3618,7 +3618,7 @@ double poissoncdistribution(ae_int_t k, double m) {
 double invpoissondistribution(ae_int_t k, double y) {
    double result;
    ae_assert(k >= 0 && y >= 0.0 && y < 1.0, "Domain error in InvPoissonDistribution");
-   result = invincompletegammac((double)(k + 1), y);
+   result = invincompletegammac(k + 1, y);
    return result;
 }
 } // end of namespace alglib_impl
@@ -3815,8 +3815,8 @@ void fresnelintegral(double x, double *c, double *s) {
    }
    x2 = x * x;
    t = pi * x2;
-   u = 1 / (t * t);
-   t = 1 / t;
+   u = 1.0 / (t * t);
+   t = 1.0 / t;
    fn = 4.21543555043677546506E-1;
    fn = fn * u + 1.43407919780758885261E-1;
    fn = fn * u + 1.15220955073585758835E-2;
@@ -3963,7 +3963,7 @@ double psi(double x) {
       y = 0.0;
       n = ifloor(x);
       for (i = 1; i < n; i++) {
-         w = (double)i;
+         w = i;
          y += 1.0 / w;
       }
       y -= Eul;
