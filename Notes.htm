@@ -60,7 +60,7 @@ This is a supplement to the <a href="Manual.htm">ALGLIB++ Reference Manual</a>.
 <a href=#supp_DemoFile>ALGLIB++ Demo</a> |
 <a href=#supp_Classes>ALGLIB++ Object Classes</a> |
 <a href=#supp_Links>ALGLIB++ Package Dependencies</a> |
-<a href=#supp_Commercial>ALGLIB Commercial Version: Notes</a> |
+<a href=#supp_Commercial>ALGLIB Commercial and Free Versions: Notes</a> |
 <a href=#supp_History>ALGLIB &rArr; ALGLIB++ Revision Sequence</a>
 ]</font>
 </p>
@@ -294,30 +294,30 @@ For reference, the following is the minimal spanning tree of the dependency hier
 Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} files.
 <ul>
 <li>AlgLibInternal:<ul>
-   <li>SCODES:</li>
    <li>APSERV:</li>
-   <li>TSORT: APSERV</li>
    <li>ABLASF:</li>
-   <li>ABLASMKL:</li>
+   <li>HBLAS:</li>
    <li>CREFLECTIONS:</li>
+   <li>SBLAS: APSERV</li>
+   <li>ABLASMKL:</li>
+   <li>SCODES:</li>
+   <li>TSORT: APSERV</li>
+   <li>BLAS:</li>
    <li>ROTATIONS:</li>
+   <li>BASICSTATOPS: TSORT</li>
    <li>TRLINSOLVE:</li>
    <li>SAFESOLVE:</li>
-   <li>HBLAS:</li>
-   <li>SBLAS: APSERV</li>
-   <li>BLAS:</li>
-   <li>LINMIN:</li>
    <li>XBLAS:</li>
-   <li>BASICSTATOPS: TSORT</li>
-   <li>HPCCORES:</li>
+   <li>LINMIN:</li>
+   <li>NEARUNITYUNIT:</li>
    <li>NTHEORY:</li>
    <li>FTBASE: APSERV, NTHEORY</li>
-   <li>NEARUNITYUNIT:</li>
+   <li>HPCCORES:</li>
 </ul></li>
 <li>AlgLibMisc: AlgLibInternal<ul>
-   <li>NEARESTNEIGHBOR: (AlgLibInternal) SCODES, TSORT</li>
    <li>HQRND: (AlgLibInternal) APSERV, ABLASF</li>
    <li>XDEBUG:</li>
+   <li>NEARESTNEIGHBOR: (AlgLibInternal) SCODES, TSORT</li>
 </ul></li>
 <li>DiffEquations: AlgLibInternal<ul>
    <li>ODESOLVER: (AlgLibInternal) APSERV</li>
@@ -331,49 +331,49 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
 <li>SpecialFunctions: AlgLibMisc [AlgLibInternal]<ul>
    <li>GAMMAFUNC:</li>
    <li>NORMALDISTR: (AlgLibMisc) HQRND</li>
-   <li>IGAMMAF: GAMMAFUNC, NORMALDISTR</li>
-   <li>ELLIPTIC:</li>
-   <li>HERMITE:</li>
-   <li>DAWSON:</li>
-   <li>TRIGINTEGRALS:</li>
-   <li>POISSONDISTR: IGAMMAF</li>
-   <li>BESSEL:</li>
    <li>IBETAF: GAMMAFUNC, NORMALDISTR</li>
-   <li>FDISTR: IBETAF</li>
-   <li>FRESNEL:</li>
-   <li>JACOBIANELLIPTIC:</li>
-   <li>PSIF:</li>
-   <li>EXPINTEGRALS:</li>
-   <li>LAGUERRE:</li>
-   <li>CHISQUAREDISTR: IGAMMAF</li>
-   <li>LEGENDRE:</li>
-   <li>BETAF: GAMMAFUNC</li>
-   <li>CHEBYSHEV:</li>
    <li>STUDENTTDISTR: IBETAF</li>
+   <li>FDISTR: IBETAF</li>
+   <li>IGAMMAF: GAMMAFUNC, NORMALDISTR</li>
+   <li>CHISQUAREDISTR: IGAMMAF</li>
    <li>BINOMIALDISTR: (AlgLibInternal) NEARUNITYUNIT │ IBETAF</li>
+   <li>EXPINTEGRALS:</li>
+   <li>JACOBIANELLIPTIC:</li>
+   <li>TRIGINTEGRALS:</li>
+   <li>CHEBYSHEV:</li>
+   <li>POISSONDISTR: IGAMMAF</li>
+   <li>BETAF: GAMMAFUNC</li>
+   <li>FRESNEL:</li>
+   <li>PSIF:</li>
    <li>AIRYF:</li>
+   <li>DAWSON:</li>
+   <li>HERMITE:</li>
+   <li>LEGENDRE:</li>
+   <li>BESSEL:</li>
+   <li>LAGUERRE:</li>
+   <li>ELLIPTIC:</li>
 </ul></li>
 <li>LinAlg: AlgLibMisc [AlgLibInternal]<ul>
-   <li>SPARSE: (AlgLibInternal) ABLASMKL, TSORT │ (AlgLibMisc) HQRND</li>
    <li>ABLAS: (AlgLibInternal) APSERV, ABLASF, ABLASMKL</li>
+   <li>ORTFAC: (AlgLibInternal) HBLAS, CREFLECTIONS, SBLAS │ (AlgLibMisc) HQRND │ ABLAS</li>
+   <li>MATGEN: (AlgLibInternal) CREFLECTIONS │ (AlgLibMisc) HQRND │ ABLAS</li>
+   <li>SPARSE: (AlgLibInternal) ABLASMKL, SCODES, TSORT │ (AlgLibMisc) HQRND</li>
+   <li>HSSCHUR: (AlgLibInternal) BLAS, ROTATIONS │ ABLAS</li>
+   <li>EVD: (AlgLibInternal) BASICSTATOPS │ ORTFAC, MATGEN, SPARSE, HSSCHUR</li>
    <li>DLU: ABLAS</li>
    <li>SPTRF: SPARSE, DLU</li>
-   <li>AMDORDERING: SPARSE, ABLAS</li>
+   <li>AMDORDERING: ABLAS, SPARSE</li>
    <li>SPCHOL: AMDORDERING</li>
-   <li>MATGEN: (AlgLibInternal) CREFLECTIONS │ (AlgLibMisc) HQRND │ ABLAS</li>
-   <li>TRFAC: (AlgLibInternal) ROTATIONS │ SPTRF, SPCHOL, MATGEN</li>
-   <li>RCOND: (AlgLibInternal) TRLINSOLVE, SAFESOLVE │ TRFAC</li>
-   <li>MATINV: RCOND</li>
-   <li>ORTFAC: (AlgLibInternal) CREFLECTIONS, HBLAS, SBLAS │ (AlgLibMisc) HQRND │ ABLAS</li>
-   <li>FBLS: (AlgLibInternal) ROTATIONS | ORTFAC</li>
+   <li>TRFAC: (AlgLibInternal) ROTATIONS │ MATGEN, SPTRF, SPCHOL</li>
    <li>BDSVD: (AlgLibInternal) ROTATIONS │ (AlgLibMisc) HQRND │ ABLAS</li>
    <li>SVD: (AlgLibInternal) BLAS │ ORTFAC, BDSVD</li>
-   <li>NORMESTIMATOR: SPARSE, MATGEN</li>
-   <li>HSSCHUR: (AlgLibInternal) ROTATIONS, BLAS │ ABLAS</li>
-   <li>EVD: (AlgLibInternal) BASICSTATOPS │ SPARSE, MATGEN, ORTFAC, HSSCHUR</li>
-   <li>SCHUR: ORTFAC, HSSCHUR</li>
-   <li>SPDGEVD: MATINV, EVD</li>
+   <li>RCOND: (AlgLibInternal) TRLINSOLVE, SAFESOLVE │ TRFAC</li>
+   <li>FBLS: (AlgLibInternal) ROTATIONS │ ORTFAC</li>
+   <li>NORMESTIMATOR: MATGEN, SPARSE</li>
+   <li>MATINV: RCOND</li>
    <li>INVERSEUPDATE:</li>
+   <li>SCHUR: ORTFAC, HSSCHUR</li>
+   <li>SPDGEVD: EVD, MATINV</li>
    <li>MATDET: TRFAC</li>
 </ul></li>
 <li>Integration: SpecialFunctions LinAlg<ul>
@@ -382,100 +382,106 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>AUTOGK: GKQ</li>
 </ul></li>
 <li>Solvers: LinAlg [AlgLibInternal]<ul>
-   <li>DIRECTDENSESOLVERS: (AlgLibInternal) XBLAS │ (LinAlg) RCOND, SVD</li>
-   <li>LINLSQR: (LinAlg) SVD, NORMESTIMATOR</li>
-   <li>POLYNOMIALSOLVER: (LinAlg) TRFAC, EVD</li>
-   <li>NLEQ: (AlgLibInternal) LINMIN │ (LinAlg) FBLS</li>
+   <li>POLYNOMIALSOLVER: (LinAlg) EVD, TRFAC</li>
+   <li>DIRECTDENSESOLVERS: (AlgLibInternal) XBLAS │ (LinAlg) SVD, RCOND</li>
    <li>DIRECTSPARSESOLVERS: (LinAlg) TRFAC</li>
-   <li>LINCG: (LinAlg) SPARSE, MATGEN</li>
+   <li>LINCG: (LinAlg) MATGEN, SPARSE</li>
+   <li>LINLSQR: (LinAlg) SVD, NORMESTIMATOR</li>
+   <li>NLEQ: (AlgLibInternal) LINMIN │ (LinAlg) FBLS</li>
 </ul></li>
 <li>Statistics: SpecialFunctions LinAlg [AlgLibInternal AlgLibMisc]<ul>
    <li>BASESTAT: (AlgLibInternal) BASICSTATOPS │ (LinAlg) ABLAS</li>
-   <li>WSR: (AlgLibInternal) APSERV</li>
-   <li>STEST: (SpecialFunctions) BINOMIALDISTR</li>
    <li>CORRELATIONTESTS: (SpecialFunctions) STUDENTTDISTR │ BASESTAT</li>
-   <li>STUDENTTTESTS: (SpecialFunctions) STUDENTTDISTR</li>
-   <li>MANNWHITNEYU: (AlgLibMisc) HQRND</li>
    <li>JARQUEBERA:</li>
    <li>VARIANCETESTS: (SpecialFunctions) FDISTR, CHISQUAREDISTR</li>
+   <li>WSR: (AlgLibInternal) APSERV</li>
+   <li>MANNWHITNEYU: (AlgLibMisc) HQRND</li>
+   <li>STEST: (SpecialFunctions) BINOMIALDISTR</li>
+   <li>STUDENTTTESTS: (SpecialFunctions) STUDENTTDISTR</li>
 </ul></li>
 <li>Optimization: Solvers [AlgLibInternal LinAlg]<ul>
-   <li>CQMODELS: (LinAlg) TRFAC, FBLS</li>
    <li>OPTGUARDAPI: (AlgLibInternal) APSERV</li>
-   <li>OPTSERV: (LinAlg) MATINV, SVD │ OPTGUARDAPI</li>
+   <li>OPTSERV: (LinAlg) SVD, MATINV │ OPTGUARDAPI</li>
+   <li>MINLBFGS: (AlgLibInternal) LINMIN │ (LinAlg) FBLS │ OPTSERV</li>
+   <li>CQMODELS: (LinAlg) TRFAC, FBLS</li>
+   <li>LPQPSERV: (LinAlg) SPARSE</li>
    <li>SNNLS: (LinAlg) TRFAC, FBLS</li>
    <li>SACTIVESETS: OPTSERV, SNNLS</li>
    <li>QQPSOLVER: CQMODELS, SACTIVESETS</li>
-   <li>MINLBFGS: (AlgLibInternal) LINMIN │ (LinAlg) FBLS │ OPTSERV</li>
-   <li>LPQPSERV: (LinAlg) SPARSE</li>
-   <li>VIPMSOLVER: (LinAlg) DIRECTDENSESOLVERS │ CQMODELS, MINLBFGS, LPQPSERV</li>
-   <li>NLCSQP: VIPMSOLVER</li>
-   <li>QPDENSEAULSOLVER: (Solvers) DIRECTDENSESOLVERS, LINLSQR │ QQPSOLVER, MINLBFGS, LPQPSERV</li>
+   <li>QPDENSEAULSOLVER: (Solvers) DIRECTDENSESOLVERS, LINLSQR │ MINLBFGS, LPQPSERV, QQPSOLVER</li>
    <li>MINBLEIC: (AlgLibInternal) LINMIN │ CQMODELS, SACTIVESETS</li>
    <li>QPBLEICSOLVER: MINBLEIC</li>
-   <li>MINQP: VIPMSOLVER, QPDENSEAULSOLVER, QPBLEICSOLVER</li>
+   <li>VIPMSOLVER: (Solvers) DIRECTDENSESOLVERS │ MINLBFGS, CQMODELS, LPQPSERV</li>
+   <li>MINQP: QPDENSEAULSOLVER, QPBLEICSOLVER, VIPMSOLVER</li>
+   <li>MINLM: MINQP</li>
+   <li>MINCG: (AlgLibInternal) LINMIN │ OPTSERV</li>
+   <li>NLCSQP: VIPMSOLVER</li>
    <li>LPQPPRESOLVE: (LinAlg) SPARSE</li>
-   <li>REVISEDDUALSIMPLEX: (LinAlg) TRFAC | LPQPPRESOLVE</li>
+   <li>REVISEDDUALSIMPLEX: (LinAlg) TRFAC │ LPQPPRESOLVE</li>
    <li>MINLP: VIPMSOLVER, REVISEDDUALSIMPLEX</li>
    <li>NLCSLP: (AlgLibInternal) LINMIN │ OPTSERV, REVISEDDUALSIMPLEX</li>
-   <li>MINNLC: NLCSQP, MINBLEIC, NLCSLP</li>
-   <li>MINBC: (AlgLibInternal) LINMIN │ OPTSERV</li>
+   <li>MINNLC: MINBLEIC, NLCSQP, NLCSLP</li>
    <li>MINNS: MINBLEIC</li>
    <li>MINCOMP: MINLBFGS, MINBLEIC</li>
-   <li>MINCG: (AlgLibInternal) LINMIN │ OPTSERV</li>
-   <li>MINLM: MINQP</li>
+   <li>MINBC: (AlgLibInternal) LINMIN │ OPTSERV</li>
 </ul></li>
 <li>Interpolation: Integration Optimization [AlgLibInternal AlgLibMisc LinAlg Solvers]<ul>
-   <li>IDW: (AlgLibMisc) HQRND, NEARESTNEIGHBOR │ (LinAlg) ABLAS</li>
    <li>RATINT: (AlgLibInternal) TSORT</li>
-   <li>FITSPHERE: (Optimization) MINNLC, MINLM</li>
+   <li>IDW: (AlgLibMisc) HQRND, NEARESTNEIGHBOR │ (LinAlg) ABLAS</li>
    <li>INTFITSERV: (LinAlg) TRFAC</li>
-   <li>SPLINE1D: (LinAlg) FBLS │ (Solvers) LINLSQR │ INTFITSERV</li>
-   <li>PARAMETRIC: (Integration) AUTOGK │ SPLINE1D</li>
-   <li>SPLINE3D: SPLINE1D</li>
    <li>POLINT: RATINT</li>
-   <li>LSFIT: (Optimization) MINLM │ SPLINE1D, POLINT</li>
-   <li>RBFV2: (AlgLibMisc) NEARESTNEIGHBOR │ LSFIT</li>
-   <li>SPLINE2D: (AlgLibInternal) SCODES │ SPLINE1D</li>
+   <li>SPLINE1D: (LinAlg) FBLS │ (Solvers) LINLSQR │ INTFITSERV</li>
+   <li>LSFIT: (Optimization) MINLM │ POLINT, SPLINE1D</li>
+   <li>FITSPHERE: (Optimization) MINLM, MINNLC</li>
+   <li>PARAMETRIC: (Integration) AUTOGK │ SPLINE1D</li>
    <li>RBFV1: (AlgLibMisc) NEARESTNEIGHBOR │ LSFIT</li>
-   <li>RBF: RBFV2, RBFV1</li>
-   <li>INTCOMP: FITSPHERE, SPLINE1D</li>
+   <li>SPLINE2D: SPLINE1D</li>
+   <li>RBFV2: (AlgLibMisc) NEARESTNEIGHBOR │ LSFIT</li>
+   <li>SPLINE3D: SPLINE1D</li>
+   <li>INTCOMP: SPLINE1D, FITSPHERE</li>
+   <li>RBF: RBFV1, RBFV2</li>
 </ul></li>
 <li>DataAnalysis: Statistics Optimization [AlgLibInternal AlgLibMisc SpecialFunctions LinAlg Solvers]<ul>
-   <li>PCA: (LinAlg) SVD, EVD │ (Statistics) BASESTAT</li>
+   <li>PCA: (LinAlg) EVD, SVD │ (Statistics) BASESTAT</li>
    <li>BDSS: (Statistics) BASESTAT</li>
-   <li>MLPBASE: (AlgLibInternal) SCODES, HPCCORES │ (LinAlg) SPARSE │ BDSS</li>
-   <li>LDA: (LinAlg) MATINV, EVD</li>
-   <li>SSA: (LinAlg) SVD, EVD</li>
-   <li>LINREG: (SpecialFunctions) IGAMMAF │ (LinAlg) SVD │ (Statistics) BASESTAT</li>
-   <li>FILTERS: LINREG</li>
-   <li>LOGIT: (Solvers) DIRECTDENSESOLVERS │ MLPBASE</li>
-   <li>MCPD: (Optimization) MINBLEIC</li>
+   <li>MLPBASE: (AlgLibInternal) HPCCORES │ (LinAlg) SPARSE │ BDSS</li>
    <li>MLPE: MLPBASE</li>
-   <li>MLPTRAIN: (Solvers) DIRECTDENSESOLVERS │ (Optimization) MINLBFGS │ MLPE</li>
    <li>CLUSTERING: (AlgLibInternal) BLAS │ (AlgLibMisc) HQRND │ (Statistics) BASESTAT</li>
    <li>DFOREST: (AlgLibInternal) SCODES │ (AlgLibMisc) HQRND │ BDSS</li>
+   <li>LINREG: (SpecialFunctions) IGAMMAF │ (LinAlg) SVD │ (Statistics) BASESTAT</li>
+   <li>FILTERS: LINREG</li>
+   <li>SSA: (LinAlg) EVD, SVD</li>
+   <li>LDA: (LinAlg) EVD, MATINV</li>
+   <li>MCPD: (Optimization) MINBLEIC</li>
+   <li>LOGIT: (Solvers) DIRECTDENSESOLVERS │ MLPBASE</li>
    <li>KNN: (AlgLibMisc) HQRND, NEARESTNEIGHBOR │ BDSS</li>
+   <li>MLPTRAIN: (Solvers) DIRECTDENSESOLVERS │ (Optimization) MINLBFGS │ MLPE</li>
    <li>DATACOMP: CLUSTERING</li>
 </ul></li>
 <li>TestC, TestI: DataAnalysis DiffEquations FastTransforms Interpolation</li>
-<li>TestX: DataAnalysis</li>
+<li>TestX: DataAnalysis Interpolation</li>
 <li>TestZ: Interpolation</li>
 <li>TestY: LinAlg</li>
 </ul>
 </p>
 <p>
-<a name=supp_Commercial class=sheader></a><h2>A5. ALGLIB Commercial Version: Notes</h2>
+<a name=supp_Commercial class=sheader></a><h2>A5. ALGLIB Commercial and Free Versions: Notes</h2>
 <font size=2>[
-<a href=#supp_Commercial1>ALGLIB Commercial Notifications</a> |
+<a href=#supp_Commercial1>ALGLIB Commercial and Free Notifications</a> |
 <a href=#supp_Commercial2>ALGLIB Commercial Support by Routine</a>
 ]</font>
 </p>
 <p>
 For those who wish to use the improvements provided by the Commercial version of ALGLIB,
 the following is a list of the routines in ALGLIB that have been provided with enhancements there; along with the corresponding notifications.
+</p><p>
+Multi-threading support for ALGLIB++, in place of that provided by the commercial version, is currently being developed.
+In addition, some enhancements, which have been made available for the free edition of ALGLIB, are inherited by ALGLIB++.
+</p><p>
 There are 6 groups of routines (labeled A, B, C, D, E and F), based on which parts of which notifications apply to them.
-<a name=supp_Commercial1 class=sheader></a><h3>A5.1. ALGLIB Commercial Notifications</h3>
+</p>
+<p>
+<a name=supp_Commercial1 class=sheader></a><h3>A5.1. ALGLIB Commercial and Free Notifications</h3>
 <pre class=narration>
 ABCDEF	│ COMMERCIAL EDITION OF ALGLIB:
 ABCDEF	│
@@ -484,13 +490,13 @@ ABC───	│ Commercial Edition of ALGLIB includes following important impro
 ─────F	│ Commercial version of ALGLIB includes two important improvements of this function, which can be used from C++ and C#:
 ABC───	│ ∙	high-performance native backend with same C# interface (C# version)
 ─BC───	│ ∙	hardware vendor (Intel) implementations of linear algebra primitives (C++ and C# versions, x86_64 platform)
-───DEF	│ ∙	Intel MKL support (lightweight Intel MKL is shipped with ALGLIB)
 AB────	│ ∙	multithreading support (C++ and C# versions)
+───DEF	│ ∙	Intel MKL support (lightweight Intel MKL is shipped with ALGLIB)
 ─────F	│ ∙	multithreading support
 ───DEF	│
 ───DEF	│ Intel MKL gives approximately constant (with respect to number of worker threads)
-───DEF	│ acceleration factor which depends on CPU being used, problem size and "baseline" ALGLIB edition
-───DEF	│ which is used for comparison.
+───DEF	│ acceleration factor which depends on CPU being used,
+───DEF	│ problem size and "baseline" ALGLIB edition which is used for comparison.
 ─────F	│ Best results are achieved for high-dimensional problems
 ─────F	│ (NVars is at least 256).
 ─────F	│
@@ -507,7 +513,7 @@ ABCDEF	│ in order to find out how to use performance-related features provided
 </pre>
 </p>
 <p>
-<a name=supp_Commercial2 class=sheader></a><h3>A5.2. ALGLIB Commercial Support by Routine</h3>
+<a name=supp_Commercial2 class=sheader></a><h3>A5.2. ALGLIB Commercial Support and Free Enhancements by Routine</h3>
 The routines are listed by subpackage module:
 <ul>
 <li>8.2.2. clustering<ul>
@@ -536,7 +542,7 @@ The routines are listed by subpackage module:
 <li><b>A</b>: idwbuildercreate</li>
 </ul></li>
 <li>8.6.4. lsfit<ul>
-<li><b>B</b>: barycentricfitfloaterhormann barycentricfitfloaterhormannwc, lsfitlinear, lsfitlinearc, lsfitlinearw, lsfitlinearwc, polynomialfit, polynomialfitwc, spline1dfitcubic, spline1dfitcubicwc, spline1dfithermite, spline1dfithermitewc</li>
+<li><b>B</b>: barycentricfitfloaterhormann, barycentricfitfloaterhormannwc, lsfitlinear, lsfitlinearc, lsfitlinearw, lsfitlinearwc, polynomialfit, polynomialfitwc, spline1dfitcubic, spline1dfitcubicwc, spline1dfithermite, spline1dfithermitewc</li>
 </ul></li>
 <li>8.6.8. rbf<ul>
 <li><b>A</b>: rbfgridcalc2v, rbfgridcalc2vsubset, rbfgridcalc3v, rbfgridcalc3vsubset</li>
@@ -587,13 +593,15 @@ The routines are listed by subpackage module:
 <font size=2>[
 <a href=#supp_History1 class=sheader>Revision Notes</a> |
 <a href=#supp_History2 class=sheader>Test Stages</a> |
-<a href=#supp_History3 class=sheader>Test Results</a>
+<a href=#supp_History3 class=sheader>Test Results</a> |
+<a href=#supp_History4 class=sheader>The Most Recent Test Run</a>
 ]</font>
 </p>
 <p>
 We maintain several independently recoded versions of ALGLIB, locally, for testing and experimentation and cross-validation.
 The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one of these; and the revisions made here - as well as in the local versions - result from reconciling the different versions with one another.
 </p>
+<p>
 <a name=supp_History1 class=sheader></a><h3>A6.1. Revision Notes</h3>
 <pre class=narration>
 ∙	Corrected "ASCI" to "ASCII" and "#alglib_packages" to "#alglib_main" (mistakes inherited from the original ALGLIB manual).
@@ -896,8 +904,8 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	∙	Input parameters X of type T are documented and declared respectively as:
 		―	T X	⇔	const T X	― for scalar types T ∈ { bool, ae_int_t, double, complex },
 		―	T X	⇔	const T &amp;X	― for all other types T.
-	The documentation of the following 1D and 2D array argument parameters in Manual.htm was changed from output (T &amp;X) to input (T X) to match its declaration (const T &amp;X).
-	∙	a	rmatrixenforcesymmetricity rmatrixger, spdmatrixcholeskyupdate{add1,fix}[buf], xdebug{b{1,2}not,{c,i,r}{1,2}neg}
+	Manual.htm: The documentation of the following 1D and 2D array argument parameters was changed from output (T &amp;X) to input (T X) to match its declaration (const T &amp;X).
+	∙	a	rmatrixenforcesymmetricity, rmatrixger, spdmatrixcholeskyupdate{add1,fix}[buf], xdebug{b{1,2}not,{c,i,r}{1,2}neg}
 	∙	b	rmatrix{[gen]copy,transpose}, {r,c}matrix[lu]solve[m]fast, rvectorcopy, {h,s}pdmatrix[cholesky]solve[m]fast
 	∙	c	cmatrixherk, {r,c}matrix{gemm,syrk}
 	∙	tmp	rmatrixsyvmv
@@ -1088,6 +1096,9 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	∙	1.0 E n, 1.0 e n converted to numeral form, for n ∈ [-8,+8];
 		1.0 e n converted to 1.0 E n most elsewhere outside of comments and strings.
 	∙	Optimization.cpp: Reinstated deleted, but commented out, code.
+40	Synchronizing changes made to Notes.htm starting with alglib.3.18
+	∙	minor corrections,
+	∙	a section added for the most recent test run.
 </pre>
 </p>
 <p>
@@ -1249,6 +1260,173 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 0-39	7692 1.0x 12196 1.0x 12350 1.0x 8911 1.1x 1649378705 (624f8591) 79 // Minor changes to {Interpolation,LinAlg,SpecialFunctions}.cpp to sync to 3.18.0.
 0-39	7634 0.9x 11237 1.1x 12199 1.0x 9550 1.0x 1650824757 (62659635) 78 // Localized more static constants.
 40	8065 1.0x 12049 1.0x 11769 1.0x 9403 1.0x 1651429624 (626ed0f8) 80 // Minor changes to sync to 3.18.0.
+40	8130 1.0x 12501 1.0x 11240 0.9x 9576 1.0x 1651694486 (6272db96) 79 // Notes.htm: Compiling a ‟Most Recent” test run.
+</pre>
+</p>
+<p>
+<a name=supp_History3 class=sheader></a><h3>A6.4. The Most Recent Test Run</h3>
+<pre class=narration>
+echo "TestI: API Interface"
+TestI: API Interface
+./TestI
+CPUID: sse2 avx2 fma
+OS: POSIX
+C++ tests. Please wait...
+Allocation counter activated...
+Allocation counter checked... Ok
+echo "TestY: C++ Wrapper Test"
+TestY: C++ Wrapper Test
+./TestY
+echo "TestZ: Exception-Free Wrapper Test"
+TestZ: Exception-Free Wrapper Test
+./TestZ
+Test exception-free error handling:
+Allocation counter activated...
+* default flag value          Ok
+* 1D arrays                   Ok
+* 2D arrays                   Ok
+* ALGLIB objects              Ok
+* ALGLIB functions            Ok
+Allocation counter checked... Ok
+echo "TestX: Speed and Consistency"
+TestX: Speed and Consistency
+./TestX
+System:
+* cores count                  1
+Allocation counter activated...
+Basic functions:
+* 1D arrays                   Ok
+* 2D arrays                   Ok
+* CSV support                 Ok
+* Serialization (kd-tree)     Ok
+* Serialization (RBF)         Ok
+* Progress/termination (RBF)  Ok
+* Exceptions in constructors  Ok
+SMP settings vs GEMM speedup:
+* test skipped (no SMP)       ??
+Issues:
+* Issue 505                   Ok
+* Issue 478                   Ok
+* Issue 528                   Ok
+* Issue 591                   Ok
+* Issue 594                   Ok
+* Issue 764                   Ok
+* Issue 813                   Ok
+* Issue 824                   Ok
+Performance:
+* RGEMM-SEQ-16   (MFLOPS)   8130
+* RGEMM-MTN-16              1.0x
+* RGEMM-SEQ-32   (MFLOPS)  12501
+* RGEMM-MTN-32              1.0x
+* RGEMM-SEQ-64   (MFLOPS)  11240
+* RGEMM-MTN-64              0.9x
+* RGEMM-SEQ-1024 (MFLOPS)   9576
+* RGEMM-MTN-1024            1.0x
+Allocation counter checked... Ok
+echo "TestC: Internal Routines"
+TestC: Internal Routines
+./TestC
+Seed: 1651694486 (6272db96)
+Compiler: GCC
+Hardware: 64-bit
+Byte Order: little-endian
+CPU: Intel
+Cores: 1 (serial version)
+Libs: (None)
+CPUID: sse2 avx2 fma
+OS: POSIX
+Testing Mode: single core
+ 1/90: ablasf                           Ok
+ 2/90: hqrnd                            Ok
+ 3/90: ablas                            Ok
+ 4/90: hblas                            Ok
+ 5/90: creflections                     Ok
+ 6/90: sblas                            Ok
+ 7/90: ortfac                           Ok
+ 8/90: matgen                           Ok
+ 9/90: tsort                            Ok
+10/90: sparse                           Ok
+11/90: blas                             Ok
+12/90: evd                              Ok
+13/90: trfac                            Ok
+14/90: polynomialsolver                 Ok
+15/90: bdsvd                            Ok
+16/90: svd                              Ok
+17/90: trlinsolve                       Ok
+18/90: safesolve                        Ok
+19/90: rcond                            Ok
+20/90: xblas                            Ok
+21/90: directdensesolvers               Ok
+22/90: directsparsesolvers              Ok
+23/90: fbls                             Ok
+24/90: iterativesparse                  Ok
+25/90: lincg                            Ok
+26/90: normestimator                    Ok
+27/90: linlsqr                          Ok
+28/90: linmin                           Ok
+29/90: nleq                             Ok
+30/90: matinv                           Ok
+31/90: optserv                          Ok
+32/90: minlbfgs                         Ok
+33/90: cqmodels                         Ok
+34/90: snnls                            Ok
+35/90: sactivesets                      Ok
+36/90: minbleic                         Ok
+37/90: minqp                            Ok
+38/90: minlm                            Ok
+39/90: mincg                            Ok
+40/90: minlp                            Ok
+41/90: minnlc                           Ok
+42/90: minns                            Ok
+43/90: minbc                            Ok
+44/90: nearestneighbor                  Ok
+45/90: odesolver                        Ok
+46/90: inverseupdate                    Ok
+47/90: schur                            Ok
+48/90: spdgevd                          Ok
+49/90: gammafunc                        Ok
+50/90: gq                               Ok
+51/90: gkq                              Ok
+52/90: autogk                           Ok
+53/90: normaldistr                      Ok
+54/90: basestat                         Ok
+55/90: wsr                              Ok
+56/90: mannwhitneyu                     Ok
+57/90: stest                            Ok
+58/90: studentttests                    Ok
+59/90: ratint                           Ok
+60/90: idw                              Ok
+61/90: polint                           Ok
+62/90: spline1d                         Ok
+63/90: lsfit                            Ok
+64/90: fitsphere                        Ok
+65/90: parametric                       Ok
+66/90: spline2d                         Ok
+67/90: spline3d                         Ok
+68/90: rbf                              Ok
+69/90: fft                              Ok
+70/90: fht                              Ok
+71/90: conv                             Ok
+72/90: corr                             Ok
+73/90: chebyshev                        Ok
+74/90: hermite                          Ok
+75/90: legendre                         Ok
+76/90: laguerre                         Ok
+77/90: pca                              Ok
+78/90: bdss                             Ok
+79/90: mlpbase                          Ok
+80/90: mlpe                             Ok
+81/90: clustering                       Ok
+82/90: dforest                          Ok
+83/90: linreg                           Ok
+84/90: filters                          Ok
+85/90: ssa                              Ok
+86/90: lda                              Ok
+87/90: mcpd                             Ok
+88/90: knn                              Ok
+89/90: mlptrain                         Ok
+90/90: alglibbasics                     Ok
+Done in 79 seconds
 </pre>
 </p>
 </div>
