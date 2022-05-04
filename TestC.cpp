@@ -13512,6 +13512,7 @@ static bool sparserealcholeskytest() {
          i = hqrnduniformi(&rs, n);
          a.xyR[i][i] = -1.0;
          sparsecreate(n, n, 0, &sa);
+         isupper = randombool(); //(@) Was not present in the original: isupper was left dangling from the previous set of loops.
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (isupper ? j >= i : j <= i) {
@@ -43820,6 +43821,7 @@ static void testminlpunit_singlecalltests(bool *err) {
    }
    for (n = 2; n <= 50; n++) {
       for (pass = 1; pass <= 30; pass++) {
+         solvertype = hqrnduniformi(&rs, testminlpunit_solverscount); //(@) Was not present in the original: solvertype was left dangling from the previous set of loops.
       // Special test for simplex solver.
       //
       // Generate carefully crafted primal infeasible - the problem is ALMOST feasible.
@@ -67568,6 +67570,7 @@ static bool basicmultilayerrbf1dtest() {
    ae_int_t passcount;
    ae_int_t i;
    ae_int_t j;
+   double deltapct; //(@) Added to the original.
    bool result;
    ae_frame_make(&_frame_block);
    NewObj(rbfmodel, s);
@@ -67596,6 +67599,7 @@ static bool basicmultilayerrbf1dtest() {
       gpgx1.xR[i] = 0.0;
    }
    r = 1.0;
+   deltapct = 0.45; //(@) The original used 0.35 below, but errors as high as 0.40-0.45 may occur.
    for (pass = 0; pass < passcount; pass++) {
       nx = randominteger(2) + 2;
       ny = randominteger(3) + 1;
@@ -67610,7 +67614,7 @@ static bool basicmultilayerrbf1dtest() {
       for (i = 0; i < ny; i++) {
          a1.xR[i] = a + 0.01 * a * randommid();
          b1.xR[i] = b + 0.01 * b * randommid();
-         delta.xR[i] = 0.35 * b1.xR[i];
+         delta.xR[i] = deltapct * b1.xR[i]; //(@) Originally had 0.35 in place of deltapct.
       }
       ae_matrix_set_length(&gp, n, nx + ny);
    // create grid
@@ -71112,7 +71116,7 @@ bool testrbf() {
    irregularrbferrors = testrbfunit_irregularrbftest();
    linearitymodelrbferr = testrbfunit_linearitymodelrbftest();
    sqrdegmatrixrbferr = sqrdegmatrixrbftest();
-   multilayerrbf1derrors = false;
+   multilayerrbf1derrors = basicmultilayerrbf1dtest(); //(@) This test was disabled in the distribution version.
    multilayerrbferrors = testrbfunit_basicmultilayerrbftest();
    sererrors = testrbfunit_serializationtest();
    gridcalc23errors = false;
@@ -87366,62 +87370,6 @@ bool testmlptrain() {
 }
 
 // === alglibbasics testing unit ===
-struct rec1 {
-   bool bfield;
-   double rfield;
-   ae_int_t ifield;
-   complex cfield;
-   ae_vector b1field;
-   ae_vector r1field;
-   ae_vector i1field;
-   ae_vector c1field;
-   ae_matrix b2field;
-   ae_matrix r2field;
-   ae_matrix i2field;
-   ae_matrix c2field;
-};
-
-static void rec1_init(void *_p, bool make_automatic) {
-   rec1 *p = (rec1 *)_p;
-   ae_vector_init(&p->b1field, 0, DT_BOOL, make_automatic);
-   ae_vector_init(&p->r1field, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->i1field, 0, DT_INT, make_automatic);
-   ae_vector_init(&p->c1field, 0, DT_COMPLEX, make_automatic);
-   ae_matrix_init(&p->b2field, 0, 0, DT_BOOL, make_automatic);
-   ae_matrix_init(&p->r2field, 0, 0, DT_REAL, make_automatic);
-   ae_matrix_init(&p->i2field, 0, 0, DT_INT, make_automatic);
-   ae_matrix_init(&p->c2field, 0, 0, DT_COMPLEX, make_automatic);
-}
-
-static void rec1_copy(void *_dst, void *_src, bool make_automatic) {
-   rec1 *dst = (rec1 *)_dst;
-   rec1 *src = (rec1 *)_src;
-   dst->bfield = src->bfield;
-   dst->rfield = src->rfield;
-   dst->ifield = src->ifield;
-   dst->cfield = src->cfield;
-   ae_vector_copy(&dst->b1field, &src->b1field, make_automatic);
-   ae_vector_copy(&dst->r1field, &src->r1field, make_automatic);
-   ae_vector_copy(&dst->i1field, &src->i1field, make_automatic);
-   ae_vector_copy(&dst->c1field, &src->c1field, make_automatic);
-   ae_matrix_copy(&dst->b2field, &src->b2field, make_automatic);
-   ae_matrix_copy(&dst->r2field, &src->r2field, make_automatic);
-   ae_matrix_copy(&dst->i2field, &src->i2field, make_automatic);
-   ae_matrix_copy(&dst->c2field, &src->c2field, make_automatic);
-}
-
-static void rec1_free(void *_p, bool make_automatic) {
-   rec1 *p = (rec1 *)_p;
-   ae_vector_free(&p->b1field, make_automatic);
-   ae_vector_free(&p->r1field, make_automatic);
-   ae_vector_free(&p->i1field, make_automatic);
-   ae_vector_free(&p->c1field, make_automatic);
-   ae_matrix_free(&p->b2field, make_automatic);
-   ae_matrix_free(&p->r2field, make_automatic);
-   ae_matrix_free(&p->i2field, make_automatic);
-   ae_matrix_free(&p->c2field, make_automatic);
-}
-
 struct rec4serialization {
    ae_vector b;
    ae_vector i;
