@@ -1,312 +1,691 @@
-A4. ALGLIB++ Package Dependencies
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-AlgLibInternal:
-	APSERV:
-	ABLASF:
-	HBLAS:
-	CREFLECTIONS:
-	SBLAS: APSERV
-	ABLASMKL:
-	SCODES:
-	TSORT: APSERV
-	BLAS:
-	ROTATIONS:
-	BASICSTATOPS: TSORT
-	TRLINSOLVE:
-	SAFESOLVE:
-	XBLAS:
-	LINMIN:
-	NEARUNITYUNIT:
-	NTHEORY:
-	FTBASE: APSERV NTHEORY
-	HPCCORES:
-AlgLibMisc: AlgLibInternal
-	HQRND: (AlgLibInternal) APSERV ABLASF
-	XDEBUG:
-	NEARESTNEIGHBOR: (AlgLibInternal) SCODES TSORT
-DiffEquations: AlgLibInternal
-	ODESOLVER: (AlgLibInternal) APSERV
-FastTransforms: AlgLibInternal
-	FFT: (AlgLibInternal) FTBASE
-	FHT: FFT
-	CONV: FFT
-	CORR: CONV
-SpecialFunctions: AlgLibMisc [AlgLibInternal]
-	GAMMAFUNC:
-	NORMALDISTR: (AlgLibMisc) HQRND
-	IBETAF: GAMMAFUNC NORMALDISTR
-	STUDENTTDISTR: IBETAF
-	FDISTR: IBETAF
-	IGAMMAF: GAMMAFUNC NORMALDISTR
-	CHISQUAREDISTR: IGAMMAF
-	BINOMIALDISTR: (AlgLibInternal) NEARUNITYUNIT │ IBETAF
-	EXPINTEGRALS:
-	JACOBIANELLIPTIC:
-	TRIGINTEGRALS:
-	CHEBYSHEV:
-	POISSONDISTR: IGAMMAF
-	BETAF: GAMMAFUNC
-	FRESNEL:
-	PSIF:
-	AIRYF:
-	DAWSON:
-	HERMITE:
-	LEGENDRE:
-	BESSEL:
-	LAGUERRE:
-	ELLIPTIC:
-LinAlg: AlgLibMisc [AlgLibInternal]
-	ABLAS: (AlgLibInternal) APSERV ABLASF ABLASMKL
-	ORTFAC: (AlgLibInternal) HBLAS CREFLECTIONS SBLAS │ (AlgLibMisc) HQRND │ ABLAS
-	MATGEN: (AlgLibInternal) CREFLECTIONS │ (AlgLibMisc) HQRND │ ABLAS
-	SPARSE: (AlgLibInternal) ABLASMKL SCODES TSORT │ (AlgLibMisc) HQRND
-	HSSCHUR: (AlgLibInternal) BLAS ROTATIONS │ ABLAS
-	EVD: (AlgLibInternal) BASICSTATOPS │ ORTFAC MATGEN SPARSE HSSCHUR
-	DLU: ABLAS
-	SPTRF: SPARSE DLU
-	AMDORDERING: ABLAS SPARSE
-	SPCHOL: AMDORDERING
-	TRFAC: (AlgLibInternal) ROTATIONS │ MATGEN SPTRF SPCHOL
-	BDSVD: (AlgLibInternal) ROTATIONS │ (AlgLibMisc) HQRND │ ABLAS
-	SVD: (AlgLibInternal) BLAS │ ORTFAC BDSVD
-	RCOND: (AlgLibInternal) TRLINSOLVE SAFESOLVE │ TRFAC
-	FBLS: (AlgLibInternal) ROTATIONS │ ORTFAC
-	NORMESTIMATOR: MATGEN SPARSE
-	MATINV: RCOND
-	INVERSEUPDATE:
-	SCHUR: ORTFAC HSSCHUR
-	SPDGEVD: EVD MATINV
-	MATDET: TRFAC
-Integration: LinAlg SpecialFunctions
-	GQ: (SpecialFunctions) GAMMAFUNC │ (LinAlg) EVD
-	GKQ: GQ
-	AUTOGK: GKQ
-Solvers: LinAlg [AlgLibInternal]
-	POLYNOMIALSOLVER: (LinAlg) EVD TRFAC
-	DIRECTDENSESOLVERS: (AlgLibInternal) XBLAS │ (LinAlg) SVD RCOND
-	DIRECTSPARSESOLVERS: (LinAlg) TRFAC
-	ITERATIVESPARSE: (LinAlg) FBLS │ DIRECTSPARSESOLVERS
-	LINCG: (LinAlg) MATGEN SPARSE
-	LINLSQR: (LinAlg) SVD NORMESTIMATOR
-	NLEQ: (AlgLibInternal) LINMIN │ (LinAlg) FBLS
-Statistics: LinAlg SpecialFunctions [AlgLibInternal AlgLibMisc]
-	BASESTAT: (AlgLibInternal) BASICSTATOPS │ (LinAlg) ABLAS
-	CORRELATIONTESTS: (SpecialFunctions) STUDENTTDISTR │ BASESTAT
-	JARQUEBERA:
-	VARIANCETESTS: (SpecialFunctions) FDISTR CHISQUAREDISTR
-	WSR: (AlgLibInternal) APSERV
-	MANNWHITNEYU: (AlgLibMisc) HQRND
-	STEST: (SpecialFunctions) BINOMIALDISTR
-	STUDENTTTESTS: (SpecialFunctions) STUDENTTDISTR
-Optimization: Solvers [AlgLibInternal LinAlg]
-	OPTGUARDAPI: (AlgLibInternal) APSERV
-	OPTSERV: (LinAlg) SVD MATINV │ OPTGUARDAPI
-	MINLBFGS: (AlgLibInternal) LINMIN │ (LinAlg) FBLS │ OPTSERV
-	CQMODELS: (LinAlg) TRFAC FBLS
-	LPQPSERV: (LinAlg) SPARSE
-	SNNLS: (LinAlg) TRFAC FBLS
-	SACTIVESETS: OPTSERV SNNLS
-	QQPSOLVER: CQMODELS SACTIVESETS
-	QPDENSEAULSOLVER: (Solvers) DIRECTDENSESOLVERS LINLSQR │ MINLBFGS LPQPSERV QQPSOLVER
-	MINBLEIC: (AlgLibInternal) LINMIN │ CQMODELS SACTIVESETS
-	QPBLEICSOLVER: MINBLEIC
-	VIPMSOLVER: (Solvers) DIRECTDENSESOLVERS │ MINLBFGS CQMODELS LPQPSERV
-	MINQP: QPDENSEAULSOLVER QPBLEICSOLVER VIPMSOLVER
-	MINLM: MINQP
-	MINCG: (AlgLibInternal) LINMIN │ OPTSERV
-	NLCSQP: VIPMSOLVER
-	LPQPPRESOLVE: (LinAlg) SPARSE
-	REVISEDDUALSIMPLEX: (LinAlg) TRFAC │ LPQPPRESOLVE
-	MINLP: VIPMSOLVER REVISEDDUALSIMPLEX
-	NLCSLP: (AlgLibInternal) LINMIN │ OPTSERV REVISEDDUALSIMPLEX
-	MINNLC: MINBLEIC NLCSQP NLCSLP
-	MINNS: MINBLEIC
-	MINCOMP: MINLBFGS MINBLEIC
-	MINBC: (AlgLibInternal) LINMIN │ OPTSERV
-	OPTS: MINLP
-Interpolation: Integration Optimization [AlgLibInternal AlgLibMisc LinAlg Solvers]
-	RATINT: (AlgLibInternal) TSORT
-	IDW: (AlgLibMisc) HQRND NEARESTNEIGHBOR │ (LinAlg) ABLAS
-	INTFITSERV: (LinAlg) TRFAC
-	POLINT: RATINT
-	SPLINE1D: (LinAlg) FBLS │ (Solvers) LINLSQR │ INTFITSERV
-	LSFIT: (Optimization) MINLM │ POLINT SPLINE1D
-	FITSPHERE: (Optimization) MINLM MINNLC
-	PARAMETRIC: (Integration) AUTOGK │ SPLINE1D
-	RBFV1: (AlgLibMisc) NEARESTNEIGHBOR │ LSFIT
-	SPLINE2D: SPLINE1D
-	RBFV2: (AlgLibMisc) NEARESTNEIGHBOR │ LSFIT
-	SPLINE3D: SPLINE1D
-	INTCOMP: SPLINE1D FITSPHERE
-	RBF: RBFV1 RBFV2
-DataAnalysis: Optimization [AlgLibInternal AlgLibMisc LinAlg Solvers SpecialFunctions]
-	PCA: (LinAlg) EVD SVD │ (Statistics) BASESTAT
-	BDSS: (Statistics) BASESTAT
-	MLPBASE: (AlgLibInternal) HPCCORES │ (LinAlg) SPARSE │ BDSS
-	MLPE: MLPBASE
-	CLUSTERING: (AlgLibInternal) BLAS │ (AlgLibMisc) HQRND │ (Statistics) BASESTAT
-	DFOREST: (AlgLibInternal) SCODES │ (AlgLibMisc) HQRND │ BDSS
-	LINREG: (SpecialFunctions) IGAMMAF │ (LinAlg) SVD │ (Statistics) BASESTAT
-	FILTERS: LINREG
-	SSA: (LinAlg) EVD SVD
-	LDA: (LinAlg) EVD MATINV
-	MCPD: (Optimization) MINBLEIC
-	LOGIT: (Solvers) DIRECTDENSESOLVERS │ MLPBASE
-	KNN: (AlgLibMisc) HQRND NEARESTNEIGHBOR │ BDSS
-	MLPTRAIN: (Solvers) DIRECTDENSESOLVERS │ (Optimization) MINLBFGS │ MLPE
-	DATACOMP: CLUSTERING
-TestC, TestI: DataAnalysis DiffEquations FastTransforms Interpolation
-TestX: DataAnalysis Interpolation
-TestZ: Interpolation
-TestY: LinAlg
-
-A5. ALGLIB Commercial and Free Versions: Notes
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+<html>
+<head>
+<title>ALGLIB++ Supplementary Sections</title>
+<meta http-equiv=Content-Type content="text/html; charset=utf-8">
+<style type="text/css">
+h1		{ font-family: Arial, Helvetica, sans-serif; color: #000000; font-size: 36pt; margin-top: 0; margin-bottom: 0; }
+h2		{ font-family: Arial, Helvetica, sans-serif; color: #003300; font-size: 20pt; margin-bottom: 0; }
+h3		{ font-family: Arial, Helvetica, sans-serif; color: #006600; font-size: 15pt; margin-bottom: 0; }
+h4		{ font-family: Arial, Helvetica, sans-serif; color: #666600; font-size: 14pt; margin-bottom: 0; }
+h5		{ font-family: Arial, Helvetica, sans-serif; color: #660000; font-size: 14pt; margin-top: 10pt; margin-bottom: 0; }
+h6		{ font-family: Arial, Helvetica, sans-serif; color: #000066; font-size: 13pt; margin-top: 10pt; margin-bottom: 0; }
+sheader		{ }
+.inlineheader	{ background-color: #e8e8e8; padding: 0.1em; font-weight: bold; }
+.pagecontent	{ font-family: Verdana, Arial, sans-serif; font-size: 10pt; text-align: justify; }
+.pageheader	{ width: 50em; }
+.source		{ font-family: "Courier New"; font-size: 1.0em; margin-top: 0; margin-bottom: 0; }
+.narration	{ font-family: "Courier New"; font-size: 1.0em; margin-top: 0; margin-bottom: 0; color: navy; }
+.declaration	{ font-family: "Courier New"; font-size: 1.0em; margin-top: 0; margin-bottom: 0; color: blue; }
+code		{ font-family: "Courier New"; font-size: 1.0em; }
+.p_example	{ margin-left: 4em; font-family: "Courier New"; font-size: 1.0em; }
+.p_note		{ margin-left: 10%; margin-right: 10%; font-size: 80%; }
+.p_att		{ margin-left: 10%; margin-right: 10%; color: red; font-weight: bold; }
+.p_code_head	{ margin-left: 5%; margin-top: 0; margin-bottom: 0; padding: 5px; width: 90%; font-family: "Courier New", monospace; background-color: #aaaaaa; font-weight: bold; color: white; }
+.p_code_body	{ margin-left: 5%; margin-top: 0; margin-bottom: 0; padding: 5px; width: 90%; font-family: "Courier New", monospace; background-color: #f0f0f0; }
+.p_code		{ margin-left: 5%; margin-top: 0; margin-bottom: 0; padding: 5px; width: 90%; font-family: "Courier New", monospace; background-color: #f0f0f0; }
+.s_code		{ font-family: "Courier New"; background-color: #f0f0f0; }
+.s_str		{ font-family: "Courier New"; color: blue; font-weight: bold; }
+.s_comment	{ color: navy; font-style: italic; }
+.s_preprocessor	{ color: green; }
+a		{ color: #000077; text-decoration: underline; }
+a:link		{ color: #0000ff; text-decoration: underline; }
+a:visited	{ color: #000077; text-decoration: underline; }
+a:active	{ color: #6666ff; text-decoration: underline; }
+a:hover		{ color: #ff6666; text-decoration: underline; }
+a.toc		{ color: #000077; text-decoration: none; }
+a.toc:link	{ color: #0000ff; text-decoration: none; }
+a.toc:visited	{ color: #000077; text-decoration: none; }
+a.toc:active	{ color: #6666ff; text-decoration: none; }
+a.toc:hover	{ color: #ff6666; text-decoration: none; }
+a.nav		{ color: #000077; font-weight: bold; text-decoration: none; }
+a.nav:link	{ color: #0000ff; font-weight: bold; text-decoration: none; }
+a.nav:visited	{ color: #000077; font-weight: bold; text-decoration: none; }
+a.nav:active	{ color: #6666ff; font-weight: bold; text-decoration: none; }
+a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
+.cond		{ color: blue; }
+.const		{ color: #222222; }
+.func		{ color: #111111; }
+</style>
+</head>
+<body>
+<div class=pagecontent>
+<p>
+<h1>ALGLIB++ Supplementary Notes</h1>
+Additional notes on the implementation and revisions of ALGLIB++.
+This is a supplement to the <a href="Manual.htm">ALGLIB++ Reference Manual</a>.
+</p>
+<p>
+<font size=2>[
+<a href=#supp_CppDemoModule>C++ Demo Module</a> |
+<a href=#supp_DemoFile>ALGLIB++ Demo</a> |
+<a href=#supp_Classes>ALGLIB++ Object Classes</a> |
+<a href=#supp_Links>ALGLIB++ Package Dependencies</a> |
+<a href=#supp_Commercial>ALGLIB Commercial and Free Versions: Notes</a> |
+<a href=#supp_History>ALGLIB &rArr; ALGLIB++ Revision Sequence</a>
+]</font>
+</p>
+<p>
+<a name=supp_CppDemoModule class=sheader></a><h2>A1. C++ Demo Module</h2>
+ALGLIB++ is an intermediate stage between ALGLIB and the future library undergoing development, with only minimal recoding (but this will change, soon).
+A reengineered, refactored, re-commented version is currently undergoing testing, but has not yet been released.
+We intend to roll back much of the Version 3 infrastructure, to something similar to Version 2, and move upwards from there.
+We are still experimenting with different methods for re-encapsulating the ALGLIB/ALGLIB++ classes.
+A demonstration may be found under the <a href="New/">New/</a> directory.
+If running under the configuration Linux:X86:GCC, run "make test" in the New/ directory.
+Other configurations have not been tested, but this should be suitable for a POSIX system; you may need to experiment a bit.
+</p>
+<p>
+<a name=supp_DemoFile class=sheader></a><h2>A2. ALGLIB++ Demo</h2>
+An implementation of the demo program cited in <a href="Manual.htm#gs_compile_examples">Section 4.4</a> of the ALGLIB Reference Manual for the configuration Linux:x86_64:GCC may be found under the <a href="Demo/">Demo/</a> directory.
+If running under this configuration, run ./Test.sh under Demo/.
+Again, for other configurations, you will need to do some experimentation to find what works.
+</p>
+<p>
+<a name=supp_Classes class=sheader></a><h2>A3. ALGLIB++ Object Classes</h2>
+<font size=2>[
+<a href=#supp_ObjClassMac>Object Class Macros</a> |
+<a href=#supp_ObjClassDef>Defining Object Classes</a>
+]</font>
+</p>
+<p>
+<a name=supp_ObjClassMac class=sheader></a><h3>A3.1. Object Class Macros</h3>
+For some of the types given in the C (<code>alglib_impl::</code>) namespace; in the C++ (<code>alglib::</code>) namespace, object classes are:
+<ul>
+<li>defined in a *.cpp file by <code>DefClass(Type, Vars)</code></li>
+<li>declared in the corresponding *.h file by <code>DecClass(Type, Pars)</code></li>
+</ul>
+Object classes are defined in the C++ (<code>alglib::</code>) namespace of a *.cpp file, for some of the types given in the C (<code>alglib_impl::</code>) namespace, by <code>DefClass(Type, Vars)</code>.
+</p>
+<p>
+<u>Examples:</u>
+<pre class=p_example>
+   DefClass(hqrndstate, )
+   DecClass(hqrndstate, );
+<span class=s_comment>// define/declare the object class alglib::hqrndstate for the type alglib_impl::hqrndstate, with no public members.</span>
+   DefClass(xdebugrecord1, DecVal(i) DecComplex(c) DecVar(a))
+   DecClass(xdebugrecord1, ae_int_t &amp;i; complex &amp;c; real_1d_array a;);
+<span class=s_comment>// define/declare the object class alglib::xdebugrecord1 for the type alglib_impl::xdebugrecord, with the data members i, c and a made public.</span>
+</pre>
+In <code>DefClass()</code>, public members match those of the same name declared in the <code>alglib_impl</code> Type, with the macros:
+<ul>
+<li><code>DecComplex(X)</code>, for members X of type <code>alglib_impl::ae_complex</code>;</li>
+<li><code>DecVal(X)</code>, for all other members X of scalar types (i.e., <code>bool</code>, <code>alglib_impl::ae_int_t</code> or <code>double</code>);</li>
+<li><code>DecVar(X)</code>, for non-scalar members (in particular: {integer,real}_{1,2}d_array).</li>
+</ul>
+In <code>DecClass()</code>, public members are declared as:
+<ul>
+<li><code>alglib::complex &amp;X</code>, for members X of type <code>alglib_impl::ae_complex</code>;</li>
+<li><code>alglib::ae_int_t &amp;X</code>, for members X of type <code>alglib_impl::ae_int_t</code>;</li>
+<li><code>alglib::T &amp;X</code>, for members X of types T = <code>bool</code> or T = <code>double</code>;</li>
+<li><code>alglib::T_1d_array X</code>, for members of types <code>alglib_impl::ae_vector</code>;</li>
+<li><code>alglib::T_2d_array X</code>, for members of types <code>alglib_impl::ae_matrix</code>;</li>
+<li>For the vector and matrix types, T = {<code>boolean</code>,<code>integer</code>,<code>real</code>,<code>complex</code>} matching the datatypes {<code>DT_BOOL</code>,<code>DT_INT</code>,<code>DT_REAL</code>,<code>DT_COMPLEX</code>}; the corresponding field in the C (<code>alglib_impl::</code>) type is always initialized to the corresponding datatype.</li>
+</ul>
+</p>
+<p>
+In the C++ (<code>alglib::</code>) namespace, a reflection of most routines from the C (<code>alglib_impl::</code>) namespace is called under an error-handling wrapper.
+In almost all cases, this takes the form
+<pre class=p_example>
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::Op(Args);
+   alglib_impl::ae_state_clear();
+</pre>
+Arguments are converted as:
+<ul>
+<li><code>*X.c_ptr()</code> &mdash; for <code>alglib_impl::ae_complex</code> types,</li>
+<li><code>X</code> &mdash; for all other scalar types (<code>bool</code>, <code>alglib_impl::ae_int_t</code>, <code>double</code>),</li>
+<li><code>ConstT(Type, X)</code> &mdash; for vector, matrix and other object types <code>alglib_impl::</code>T.</li>
+</ul>
+The values returned are always of scalar type and are returned as
+<ul>
+<li><code>ComplexOf(X)</code> &mdash; for routines of type <code>alglib_impl::ae_complex</code>,</li>
+<li><code>X</code> &mdash; for routines of all other scalar types (<code>bool</code>, <code>alglib_impl::ae_int_t</code>, <code>double</code>),</li>
+</ul>
+</p>
+<p>
+The other wrapper forms that occur in the C++ namespace are for
+<ul>
+<li>reduced forms of wrapper routines in which some arguments are internally assigned default values this always occurs under the conditional #if !defined AE_NO_EXCEPTIONS</li>
+<li>polling loops for the interation routines, which have the general form
+<pre class=p_example>
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::ae_assert(... conditions ... message);
+   while (alglib_impl::IterationRoutine(state.c_ptr()))
+   BegPoll
+      if (state.Flag1) Op1(...);
+      else if (state.Flag2) Op2(...);
+      ...
+      else alglib_impl::ae_assert(false, "ALGLIB: exception generated in user callback");
+   EndPoll
+   alglib_impl::ae_state_clear();
+</pre>
+</li>
+</ul>
+</p>
+<p>
+<a name=supp_ObjClassDef class=sheader></a><h3>A3.2. Defining Object Classes</h3>
+The current implementation defines an object class for some C types <code>alglib_impl::</code>Type,
+layering on top of it a C++ type <code>alglib::</code>TypeI to handle object constructors and <code>alglib::</code>Type to internalize *_init(), *_copy(), *_free() and to enforce the distinction for <code>alglib_impl::</code>Type between public and private members. The details of this implementation should not be relied on: it will undergo further changes as we experiment with different object models, with an eye toward eliminating it entirely and going fully native with C++.
+</p>
+<p>
+To expedite this process, the routines _Type_{init,init_copy,clear,destroy} have been renamed and/or redefined as Type_{init,copy,free}.
+In the original ALGLIB distribution (the GPL version, as of version 3.16.0), malloc() and free() are used.
+Most of the need for them has been eliminated, which also entails minor revisions to TestZ.cpp to redefine some of its test conditions.
+</p>
+<p>
+For <code>DecClass</code>, the declaration is:
+<pre class=p_example>
+struct TypeI {
+   TypeI();
+   TypeI(const Type &amp;A);
+protected:
+   alglib_impl::Type Obj;
+};
+struct Type: public TypeI {
+   Type();
+   Type(const Type &amp;A);
+   Type &amp;operator=(const Type &amp;A);
+   ~Type();
+   alglib_impl::Type *c_ptr();
+   alglib_impl::Type *c_ptr() const;
+   Pars ... public members (reference variables for scalar types) ...
+}
+</pre>
+</p>
+<p>
+For <code>DefClass</code>, the definition is:
+<pre class=p_example>
+TypeI::TypeI() {
+   alglib_impl::ae_state_init();
+   TryX { alglib_impl::Type_free(&amp;Obj, false); ThrowErrorMsg(); }
+   memset(&amp;Obj, 0, sizeof Obj), alglib_impl::Type_init(&amp;Obj, false);
+   alglib_impl::ae_state_clear();
+}
+TypeI::TypeI(const TypeI &amp;A) {
+   alglib_impl::ae_state_init();
+   TryX { alglib_impl::Type_free(&amp;Obj, false); ThrowErrorMsg(); }
+   memset(&amp;Obj, 0, sizeof Obj), alglib_impl::Type_copy(&amp;Obj, const_cast&lt;alglib_impl::Type *&gt;(&amp;A.Obj), false);
+   alglib_impl::ae_state_clear();
+}
+Type::Type(): TypeI() Vars ... initializations of public members ... { }
+Type::Type(const Type &amp;A): TypeI(A) Vars ... initializations of public members ... { }
+Type &amp;Type::operator=(const Type &amp;A) {
+   if (this == &amp;A) return *this;
+   alglib_impl::ae_state_init();
+   TryCatch(*this)
+   alglib_impl::Type_free(&amp;Obj, false);
+   memset(&amp;Obj, 0, sizeof Obj), alglib_impl::Type_copy(&amp;Obj, const_cast&lt;alglib_impl::Type *&gt;(&amp;A.Obj), false);
+   alglib_impl::ae_state_clear();
+   return *this;
+}
+Type::~Type() { alglib_impl::Type_free(&amp;Obj, false); }
+alglib_impl::Type *Type::c_ptr() { return &amp;Obj; }
+alglib_impl::Type *Type::c_ptr() const { return const_cast&lt;alglib_impl::Type *&gt;(&amp;Obj); }
+</pre>
+</p>
+<p>
+The following alternate form has also been tested, where the destruction and assignment operators are moved into TypeI:
+</p>
+<p>
+For DecClass, the declaration is:
+<pre class=p_example>
+struct TypeI {
+   TypeI();
+   TypeI(const TypeI &amp;A);
+   TypeI &amp;operator=(const TypeI &amp;A);
+   ~TypeI();
+protected:
+   alglib_impl::Type Obj;
+};
+struct Type: public TypeI {
+   Type();
+   Type(const Type &amp;A);
+   Type &amp;operator=(const Type &amp;A);
+   ~Type();
+   alglib_impl::Type *c_ptr();
+   alglib_impl::Type *c_ptr() const;
+   Pars ... public members (reference variables for scalar types) ...
+}
+</pre>
+</p>
+For DefClass, the definition is:
+<pre class=p_example>
+TypeI::TypeI() {
+   alglib_impl::ae_state_init();
+   TryX { alglib_impl::Type_free(&amp;Obj, false); ThrowErrorMsg(); }
+   memset(&amp;Obj, 0, sizeof Obj), alglib_impl::Type_init(&amp;Obj, false);
+   alglib_impl::ae_state_clear();
+}
+TypeI::TypeI(const TypeI &amp;A) {
+   alglib_impl::ae_state_init();
+   TryX { alglib_impl::Type_free(&amp;Obj, false); ThrowErrorMsg(); }
+   memset(&amp;Obj, 0, sizeof Obj), alglib_impl::Type_copy(&amp;Obj, const_cast&lt;alglib_impl::Type *&gt;(&amp;A.Obj), false);
+   alglib_impl::ae_state_clear();
+}
+TypeI &amp;TypeI::operator=(const TypeI &amp;A) {
+   if (this == &amp;A) return *this;
+   alglib_impl::ae_state_init();
+   TryCatch(*this)
+   alglib_impl::Type_free(&amp;Obj, false);
+   memset(&amp;Obj, 0, sizeof Obj), alglib_impl::Type_copy(&amp;Obj, const_cast&lt;alglib_impl::Type *&gt;(&amp;A.Obj), false);
+   alglib_impl::ae_state_clear();
+   return *this;
+}
+TypeI::~TypeI() { alglib_impl::Type_free(&amp;Obj, false); }
+Type::Type(): TypeI() Type::Type(): TypeI() Vars ... initializations of public members ... { }
+Type::Type(const Type &amp;A): TypeI(A) Vars ... initializations of public members ... { }
+Type &amp;Type::operator=(const Type &amp;A) { TypeI::operator=(A); return *this; }
+Type::~Type() { }
+alglib_impl::Type *Type::c_ptr() { return &amp;Obj; }
+alglib_impl::Type *Type::c_ptr() const { return const_cast&lt;alglib_impl::Type *&gt;(&amp;Obj); }
+</pre>
+</p>
+<p>
+<a name=supp_Links class=sheader></a><h2>A4. ALGLIB++ Package Dependencies</h2>
+ALGLIB originally distributed each of the subpackage modules in separate files.
+Starting with Version 3, they were compiled into larger package modules, in most cases, each module dedicated to a specific application area.
+A vestige of the earlier configuration was later reintroduced, as a compromise.
+This compromise is retained in ALGLIB++, except that the subpackages have each been segregated within their respective package modules.
+A dependency list has not been included in the Makefiles distributed with ALGLIB++, except for the package modules themselves.
+Subpackage dependencies are listed within the module files, themselves.
+For reference, the following is the minimal spanning tree of the dependency hierarchy, listed roughly in order of dependence.
+Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} files.
+<ul>
+<li>AlgLibInternal:<ul>
+   <li>APSERV:</li>
+   <li>ABLASF:</li>
+   <li>HBLAS:</li>
+   <li>CREFLECTIONS:</li>
+   <li>SBLAS: APSERV</li>
+   <li>ABLASMKL:</li>
+   <li>SCODES:</li>
+   <li>TSORT: APSERV</li>
+   <li>BLAS:</li>
+   <li>ROTATIONS:</li>
+   <li>BASICSTATOPS: TSORT</li>
+   <li>TRLINSOLVE:</li>
+   <li>SAFESOLVE:</li>
+   <li>XBLAS:</li>
+   <li>LINMIN:</li>
+   <li>NEARUNITYUNIT:</li>
+   <li>NTHEORY:</li>
+   <li>FTBASE: APSERV, NTHEORY</li>
+   <li>HPCCORES:</li>
+</ul></li>
+<li>AlgLibMisc: AlgLibInternal<ul>
+   <li>HQRND: (AlgLibInternal) APSERV, ABLASF</li>
+   <li>XDEBUG:</li>
+   <li>NEARESTNEIGHBOR: (AlgLibInternal) SCODES, TSORT</li>
+</ul></li>
+<li>DiffEquations: AlgLibInternal<ul>
+   <li>ODESOLVER: (AlgLibInternal) APSERV</li>
+</ul></li>
+<li>FastTransforms: AlgLibInternal<ul>
+   <li>FFT: (AlgLibInternal) FTBASE</li>
+   <li>FHT: FFT</li>
+   <li>CONV: FFT</li>
+   <li>CORR: CONV</li>
+</ul></li>
+<li>SpecialFunctions: AlgLibMisc [AlgLibInternal]<ul>
+   <li>GAMMAFUNC:</li>
+   <li>NORMALDISTR: (AlgLibMisc) HQRND</li>
+   <li>IBETAF: GAMMAFUNC, NORMALDISTR</li>
+   <li>STUDENTTDISTR: IBETAF</li>
+   <li>FDISTR: IBETAF</li>
+   <li>IGAMMAF: GAMMAFUNC, NORMALDISTR</li>
+   <li>CHISQUAREDISTR: IGAMMAF</li>
+   <li>BINOMIALDISTR: (AlgLibInternal) NEARUNITYUNIT │ IBETAF</li>
+   <li>EXPINTEGRALS:</li>
+   <li>JACOBIANELLIPTIC:</li>
+   <li>TRIGINTEGRALS:</li>
+   <li>CHEBYSHEV:</li>
+   <li>POISSONDISTR: IGAMMAF</li>
+   <li>BETAF: GAMMAFUNC</li>
+   <li>FRESNEL:</li>
+   <li>PSIF:</li>
+   <li>AIRYF:</li>
+   <li>DAWSON:</li>
+   <li>HERMITE:</li>
+   <li>LEGENDRE:</li>
+   <li>BESSEL:</li>
+   <li>LAGUERRE:</li>
+   <li>ELLIPTIC:</li>
+</ul></li>
+<li>LinAlg: AlgLibMisc [AlgLibInternal]<ul>
+   <li>ABLAS: (AlgLibInternal) APSERV, ABLASF, ABLASMKL</li>
+   <li>ORTFAC: (AlgLibInternal) HBLAS, CREFLECTIONS, SBLAS │ (AlgLibMisc) HQRND │ ABLAS</li>
+   <li>MATGEN: (AlgLibInternal) CREFLECTIONS │ (AlgLibMisc) HQRND │ ABLAS</li>
+   <li>SPARSE: (AlgLibInternal) ABLASMKL, SCODES, TSORT │ (AlgLibMisc) HQRND</li>
+   <li>HSSCHUR: (AlgLibInternal) BLAS, ROTATIONS │ ABLAS</li>
+   <li>EVD: (AlgLibInternal) BASICSTATOPS │ ORTFAC, MATGEN, SPARSE, HSSCHUR</li>
+   <li>DLU: ABLAS</li>
+   <li>SPTRF: SPARSE, DLU</li>
+   <li>AMDORDERING: ABLAS, SPARSE</li>
+   <li>SPCHOL: AMDORDERING</li>
+   <li>TRFAC: (AlgLibInternal) ROTATIONS │ MATGEN, SPTRF, SPCHOL</li>
+   <li>BDSVD: (AlgLibInternal) ROTATIONS │ (AlgLibMisc) HQRND │ ABLAS</li>
+   <li>SVD: (AlgLibInternal) BLAS │ ORTFAC, BDSVD</li>
+   <li>RCOND: (AlgLibInternal) TRLINSOLVE, SAFESOLVE │ TRFAC</li>
+   <li>FBLS: (AlgLibInternal) ROTATIONS │ ORTFAC</li>
+   <li>NORMESTIMATOR: MATGEN, SPARSE</li>
+   <li>MATINV: RCOND</li>
+   <li>INVERSEUPDATE:</li>
+   <li>SCHUR: ORTFAC, HSSCHUR</li>
+   <li>SPDGEVD: EVD, MATINV</li>
+   <li>MATDET: TRFAC</li>
+</ul></li>
+<li>Integration: SpecialFunctions LinAlg<ul>
+   <li>GQ: (SpecialFunctions) GAMMAFUNC │ (LinAlg) EVD</li>
+   <li>GKQ: GQ</li>
+   <li>AUTOGK: GKQ</li>
+</ul></li>
+<li>Solvers: LinAlg [AlgLibInternal]<ul>
+   <li>POLYNOMIALSOLVER: (LinAlg) EVD, TRFAC</li>
+   <li>DIRECTDENSESOLVERS: (AlgLibInternal) XBLAS │ (LinAlg) SVD, RCOND</li>
+   <li>DIRECTSPARSESOLVERS: (LinAlg) TRFAC</li>
+   <li>ITERATIVESPARSE: (LinAlg) FBLS │ DIRECTSPARSESOLVERS</li>
+   <li>LINCG: (LinAlg) MATGEN, SPARSE</li>
+   <li>LINLSQR: (LinAlg) SVD, NORMESTIMATOR</li>
+   <li>NLEQ: (AlgLibInternal) LINMIN │ (LinAlg) FBLS</li>
+</ul></li>
+<li>Statistics: SpecialFunctions LinAlg [AlgLibInternal AlgLibMisc]<ul>
+   <li>BASESTAT: (AlgLibInternal) BASICSTATOPS │ (LinAlg) ABLAS</li>
+   <li>CORRELATIONTESTS: (SpecialFunctions) STUDENTTDISTR │ BASESTAT</li>
+   <li>JARQUEBERA:</li>
+   <li>VARIANCETESTS: (SpecialFunctions) FDISTR, CHISQUAREDISTR</li>
+   <li>WSR: (AlgLibInternal) APSERV</li>
+   <li>MANNWHITNEYU: (AlgLibMisc) HQRND</li>
+   <li>STEST: (SpecialFunctions) BINOMIALDISTR</li>
+   <li>STUDENTTTESTS: (SpecialFunctions) STUDENTTDISTR</li>
+</ul></li>
+<li>Optimization: Solvers [AlgLibInternal LinAlg]<ul>
+   <li>OPTGUARDAPI: (AlgLibInternal) APSERV</li>
+   <li>OPTSERV: (LinAlg) SVD, MATINV │ OPTGUARDAPI</li>
+   <li>MINLBFGS: (AlgLibInternal) LINMIN │ (LinAlg) FBLS │ OPTSERV</li>
+   <li>CQMODELS: (LinAlg) TRFAC, FBLS</li>
+   <li>LPQPSERV: (LinAlg) SPARSE</li>
+   <li>SNNLS: (LinAlg) TRFAC, FBLS</li>
+   <li>SACTIVESETS: OPTSERV, SNNLS</li>
+   <li>QQPSOLVER: CQMODELS, SACTIVESETS</li>
+   <li>QPDENSEAULSOLVER: (Solvers) DIRECTDENSESOLVERS, LINLSQR │ MINLBFGS, LPQPSERV, QQPSOLVER</li>
+   <li>MINBLEIC: (AlgLibInternal) LINMIN │ CQMODELS, SACTIVESETS</li>
+   <li>QPBLEICSOLVER: MINBLEIC</li>
+   <li>VIPMSOLVER: (Solvers) DIRECTDENSESOLVERS │ MINLBFGS, CQMODELS, LPQPSERV</li>
+   <li>MINQP: QPDENSEAULSOLVER, QPBLEICSOLVER, VIPMSOLVER</li>
+   <li>MINLM: MINQP</li>
+   <li>MINCG: (AlgLibInternal) LINMIN │ OPTSERV</li>
+   <li>NLCSQP: VIPMSOLVER</li>
+   <li>LPQPPRESOLVE: (LinAlg) SPARSE</li>
+   <li>REVISEDDUALSIMPLEX: (LinAlg) TRFAC │ LPQPPRESOLVE</li>
+   <li>MINLP: VIPMSOLVER, REVISEDDUALSIMPLEX</li>
+   <li>NLCSLP: (AlgLibInternal) LINMIN │ OPTSERV, REVISEDDUALSIMPLEX</li>
+   <li>MINNLC: MINBLEIC, NLCSQP, NLCSLP</li>
+   <li>MINNS: MINBLEIC</li>
+   <li>MINCOMP: MINLBFGS, MINBLEIC</li>
+   <li>MINBC: (AlgLibInternal) LINMIN │ OPTSERV</li>
+   <li>OPTS: MINLP</li>
+</ul></li>
+<li>Interpolation: Integration Optimization [AlgLibInternal AlgLibMisc LinAlg Solvers]<ul>
+   <li>RATINT: (AlgLibInternal) TSORT</li>
+   <li>IDW: (AlgLibMisc) HQRND, NEARESTNEIGHBOR │ (LinAlg) ABLAS</li>
+   <li>INTFITSERV: (LinAlg) TRFAC</li>
+   <li>POLINT: RATINT</li>
+   <li>SPLINE1D: (LinAlg) FBLS │ (Solvers) LINLSQR │ INTFITSERV</li>
+   <li>LSFIT: (Optimization) MINLM │ POLINT, SPLINE1D</li>
+   <li>FITSPHERE: (Optimization) MINLM, MINNLC</li>
+   <li>PARAMETRIC: (Integration) AUTOGK │ SPLINE1D</li>
+   <li>RBFV1: (AlgLibMisc) NEARESTNEIGHBOR │ LSFIT</li>
+   <li>SPLINE2D: SPLINE1D</li>
+   <li>RBFV2: (AlgLibMisc) NEARESTNEIGHBOR │ LSFIT</li>
+   <li>SPLINE3D: SPLINE1D</li>
+   <li>INTCOMP: SPLINE1D, FITSPHERE</li>
+   <li>RBF: RBFV1, RBFV2</li>
+</ul></li>
+<li>DataAnalysis: Statistics Optimization [AlgLibInternal AlgLibMisc SpecialFunctions LinAlg Solvers]<ul>
+   <li>PCA: (LinAlg) EVD, SVD │ (Statistics) BASESTAT</li>
+   <li>BDSS: (Statistics) BASESTAT</li>
+   <li>MLPBASE: (AlgLibInternal) HPCCORES │ (LinAlg) SPARSE │ BDSS</li>
+   <li>MLPE: MLPBASE</li>
+   <li>CLUSTERING: (AlgLibInternal) BLAS │ (AlgLibMisc) HQRND │ (Statistics) BASESTAT</li>
+   <li>DFOREST: (AlgLibInternal) SCODES │ (AlgLibMisc) HQRND │ BDSS</li>
+   <li>LINREG: (SpecialFunctions) IGAMMAF │ (LinAlg) SVD │ (Statistics) BASESTAT</li>
+   <li>FILTERS: LINREG</li>
+   <li>SSA: (LinAlg) EVD, SVD</li>
+   <li>LDA: (LinAlg) EVD, MATINV</li>
+   <li>MCPD: (Optimization) MINBLEIC</li>
+   <li>LOGIT: (Solvers) DIRECTDENSESOLVERS │ MLPBASE</li>
+   <li>KNN: (AlgLibMisc) HQRND, NEARESTNEIGHBOR │ BDSS</li>
+   <li>MLPTRAIN: (Solvers) DIRECTDENSESOLVERS │ (Optimization) MINLBFGS │ MLPE</li>
+   <li>DATACOMP: CLUSTERING</li>
+</ul></li>
+<li>TestC, TestI: DataAnalysis DiffEquations FastTransforms Interpolation</li>
+<li>TestX: DataAnalysis Interpolation</li>
+<li>TestZ: Interpolation</li>
+<li>TestY: LinAlg</li>
+</ul>
+</p>
+<p>
+<a name=supp_Commercial class=sheader></a><h2>A5. ALGLIB Commercial and Free Versions: Notes</h2>
+<font size=2>[
+<a href=#supp_Commercial1>ALGLIB Commercial and Free Notifications</a> |
+<a href=#supp_Commercial2>ALGLIB Commercial Support by Routine</a>
+]</font>
+</p>
+<p>
 For those who wish to use the improvements provided by the Commercial version of ALGLIB,
-the following is a list of the routines in ALGLIB that have been provided with enhancements there;
-along with the corresponding notifications.
-
+the following is a list of the routines in ALGLIB that have been provided with enhancements there; along with the corresponding notifications.
+</p><p>
 Multi-threading support for ALGLIB++, in place of that provided by the commercial version, is currently being developed.
 In addition, some enhancements, which have been made available for the free edition of ALGLIB, are inherited by ALGLIB++.
-
+</p><p>
 There are 6 groups of routines (labeled A, B, C, D, E and F), based on which parts of which notifications apply to them.
-
-A5.1. ALGLIB Commercial and Free Notifications
-──────────────────────────────────────────────
+</p>
+<p>
+<a name=supp_Commercial1 class=sheader></a><h3>A5.1. ALGLIB Commercial and Free Notifications</h3>
+<pre class=narration>
 ABCDEF	│ COMMERCIAL EDITION OF ALGLIB:
 ABCDEF	│
-AB――――	│ Commercial version of ALGLIB includes one important improvement of this function, which can be used from C++ and C#:
-――CDEF	│ Commercial Edition of ALGLIB includes following important improvements of this function:
-AB――――	│ ∙ Intel MKL support (lightweight Intel MKL is shipped with ALGLIB)
-――CDEF	│ ∙ high-performance native backend with same C# interface (C# version)
-―――DEF	│ ∙ multithreading support (C++ and C# versions)
-――C―EF	│ ∙ hardware vendor (Intel) implementations of linear algebra primitives (C++ and C# versions, x86/x64 platform)
+ABC──F	│ Commercial Edition of ALGLIB includes following important improvements of this function:
+───DE─	│ Commercial version of ALGLIB includes one important improvement of this function, which can be used from C++ and C#:
+ABC──F	│ ∙	high-performance native backend with same C# interface (C# version)
+AB───F	│ ∙	multithreading support (C++ and C# versions)
+─BC──F	│ ∙	hardware vendor (Intel) implementations of linear algebra primitives (C++ and C# versions, x86/x64 platform)
+───DE─	│ ∙	Intel MKL support (lightweight Intel MKL is shipped with ALGLIB)
 ABCDEF	│
-AB――――	│ Intel MKL gives approximately constant (with respect to number of worker threads)
-AB――――	│ acceleration factor which depends on CPU being used,
-AB────	│ problem size and "baseline" ALGLIB edition which is used for comparison.
-AB――――	│
-A―――――	│ Generally, commercial ALGLIB is several times faster than open-source generic C edition,
-A―――――	│ and many times faster than open-source C# edition.
-A―――――	│
-AB――――	│ Multithreaded acceleration is NOT supported for this function.
+───DE─	│ Intel MKL gives approximately constant (with respect to number of worker threads)
+───DE─	│ acceleration factor which depends on CPU being used,
+───DE─	│ problem size and "baseline" ALGLIB edition which is used for comparison.
+───DE─	│
+───D──	│ Generally, commercial ALGLIB is several times faster than open-source generic C edition,
+───D──	│ and many times faster than open-source C# edition.
+───D──	│
+───DE─	│ Multithreaded acceleration is NOT supported for this function.
 ABCDEF	│
 ABCDEF	│ We recommend you to read 'Working with commercial version' section of ALGLIB Reference Manual
 ABCDEF	│ in order to find out how to use performance-related features provided by commercial edition of ALGLIB.
 
-―――――F	│ FREE EDITION OF ALGLIB:
-―――――F	│
-―――――F	│ Free Edition of ALGLIB supports following important features for this function:
-―――――F	│ ∙ C++ version: x64 SIMD support using C++ intrinsics
-―――――F	│ ∙ C# version: x64 SIMD support using NET5/NetCore hardware intrinsics
-―――――F	│ We recommend you to read 'Compiling ALGLIB' section of the ALGLIB Reference Manual
-―――――F	│ in order to find out how to activate SIMD support in ALGLIB.
-
-A5.2. ALGLIB Commercial Support and Free Enhancements by Routine
-────────────────────────────────────────────────────────────────
-The routines, by group, are:
-A:	rmatrixbdsvd,
-B:	rmatrixschur,
-C:	hmatrixevd, hmatrixtd, hmatrixtdunpackq,
-	rmatrixbd, rmatrixbdmultiplybyq, rmatrixbdunpackq, rmatrixevd, rmatrixhessenberg, rmatrixhessenbergunpackq, rmatrixsvd,
-	smatrixevd, smatrixevdr, smatrixtd, smatrixtdevd, smatrixtdunpackq,
-D:	dfbuilderbuildrandomforest, idwbuildercreate, knnbuilderbuildknnmodel,
-	mlpallerrorssparsesubset, mlpallerrorssubset,
-	mlpavgce, mlpavgcesparse, mlpavgerror, mlpavgerrorsparse, mlpavgrelerror, mlpavgrelerrorsparse,
-	mlpclserror, mlpcontinuetraining, mlperror, mlperrorsparse, mlperrorsparsesubset, mlperrorsubset,
-	mlpgradbatch, mlpgradbatchsparse, mlpgradbatchsparsesubset, mlpgradbatchsubset,
-	mlpkfoldcv, mlprelclserror, mlprelclserrorsparse, mlprmserror, mlprmserrorsparse, mlptrainensemblees, mlptrainnetwork,
-	rankdata, rankdatacentered,
-	rbfgridcalc2v, rbfgridcalc2vsubset, rbfgridcalc3v, rbfgridcalc3vsubset,
-E:	covm2, covm, pearsoncorrm2, pearsoncorrm, spearmancorrm2, spearmancorrm,
-spline2dbuildercreate, spline2dbuildersetalgoblocklls, spline2dbuildersetalgofastddm, spline2dfit,
-F:	barycentricfitfloaterhormann, barycentricfitfloaterhormannwc,
-	clusterizergetdistances, clusterizerrunahc, clusterizerrunkmeans,
-	cmatrixgemm, cmatrixherk, cmatrixinverse, cmatrixlefttrsm, cmatrixlq, cmatrixlqunpackq,
-	cmatrixlu, cmatrixluinverse, cmatrixlusolvem, cmatrixlusolvemfast, cmatrixqr, cmatrixqrunpackq,
-	cmatrixrighttrsm, cmatrixsolve, cmatrixsolvefast, cmatrixsolvem, cmatrixsolvemfast, cmatrixtrinverse,
-	eigsubspacesolvedenses,
-	fisherlda, fisherldan,
-	hpdmatrixcholesky, hpdmatrixcholeskyinverse, hpdmatrixinverse, hpdmatrixsolve, hpdmatrixsolvefast, hpdmatrixsolvem, hpdmatrixsolvemfast,
-	lsfitlinearc, lsfitlinear, lsfitlinearwc, lsfitlinearw,
-	pcabuildbasis, pcatruncatedsubspace, pcatruncatedsubspacesparse,
-	polynomialfit, polynomialfitwc,
-	rmatrixgemm, rmatrixinverse, rmatrixlefttrsm, rmatrixlq, rmatrixlqunpackq,
-	rmatrixlu, rmatrixluinverse, rmatrixlusolvem, rmatrixlusolvemfast, rmatrixqr, rmatrixqrunpackq, rmatrixrighttrsm,
-	rmatrixsolve, rmatrixsolvefast, rmatrixsolvels, rmatrixsolvem, rmatrixsolvemfast, rmatrixsyrk, rmatrixtrinverse,
-	spdmatrixcholesky, spdmatrixcholeskyinverse, spdmatrixinverse, spdmatrixsolve, spdmatrixsolvefast, spdmatrixsolvem, spdmatrixsolvemfast,
-	spline1dfitcubic, spline1dfitcubicwc, spline1dfithermite, spline1dfithermitewc
-
-A6. ALGLIB ⇒ ALGLIB++ Revision Sequence
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-A6.1. Revision Notes
-────────────────────
-For performance reasons, functions may be implemented with slight differences from how they are documented.
-In particular, while output parameters are documented and declared and implemented as (Type &Par),
-input parameters are documented as (Type Par), but declared and implemented
-as (const Type Par) for the scalar types (bool), (ae_int_t), (double) and (complex),
-and as (const Type &amp;Par) for all other types.
-This is discussed in greater depth by Stroustrup et al. (https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rf-in) in-parameter passing with constant references.
-For user-supplied functions in the iteration routines and their high-level versions, however, the prototypes actually required are made explicit.
-For both these routines as well as for the serializer/unserializer routines, the documented and declared/implemented versions match.
-
-Other exceptions include array parameters, which are documented as (Type &), but declared as (const Type &), as indicated below:
-xy	rankdatacentered(∙,_,_);
-xy	rankdata(∙,_,_);
-a	xdebugb1not(∙);
-a	xdebugb2not(∙);
-a	xdebugc1neg(∙);
-a	xdebugc2neg(∙);
-a	xdebugi1neg(∙);
-a	xdebugi2neg(∙);
-a	xdebugr1neg(∙);
-a	xdebugr2neg(∙);
-b	rvectorcopy(_,_,_,∙,_);
-b	rmatrixcopy(_,_,_,_,_,∙,_,_);
-b	rmatrixgencopy(_,_,_,_,_,_,_,∙,_,_);
-y	rmatrixgemv(_,_,_,_,_,_,_,_,_,_,∙,_);
-y	sparsegemv(_,_,_,_,_,_,∙,_);
-y	rmatrixmv(_,_,_,_,_,_,_,_,∙,_);
-y	rmatrixsymv(_,_,_,_,_,_,_,_,_,∙,_);
-tmp	rmatrixsyvmv(_,_,_,_,_,_,_,∙);
-x	sparsetrmv(_,_,_,_,∙,_);
-a	rmatrixger(_,_,∙,_,_,_,_,_,_,_);
-b	rmatrixtranspose(_,_,_,_,_,∙,_,_);
-x	rmatrixtrsv(_,_,_,_,_,_,_,∙,_);
-x	sparsetrsv(_,_,_,_,∙);
-a	rmatrixenforcesymmetricity(∙,_,_);
-c	rmatrixgemm(_,_,_,_,_,_,_,_,_,_,_,_,_,∙,_,_);
-c	cmatrixgemm(_,_,_,_,_,_,_,_,_,_,_,_,_,∙,_,_);
-c	rmatrixsyrk(_,_,_,_,_,_,_,_,∙,_,_,_);
-c	cmatrixsyrk(_,_,_,_,_,_,_,_,∙,_,_,_);
-c	cmatrixherk(_,_,_,_,_,_,_,_,∙,_,_,_);
-x	rmatrixlefttrsm(_,_,_,_,_,_,_,_,∙,_,_);
-x	cmatrixlefttrsm(_,_,_,_,_,_,_,_,∙,_,_);
-b	rmatrixlusolvefast(_,_,_,∙,_);
-b	cmatrixlusolvefast(_,_,_,∙,_);
-b	spdmatrixcholeskysolvefast(_,_,_,∙,_);
-b	hpdmatrixcholeskysolvefast(_,_,_,∙,_);
-b	rmatrixlusolvemfast(_,_,_,∙,_,_);
-b	cmatrixlusolvemfast(_,_,_,∙,_,_);
-b	spdmatrixcholeskysolvemfast(_,_,_,∙,_,_);
-b	hpdmatrixcholeskysolvemfast(_,_,_,∙,_,_);
-x	rmatrixrighttrsm(_,_,_,_,_,_,_,_,∙,_,_);
-x	cmatrixrighttrsm(_,_,_,_,_,_,_,_,∙,_,_);
-b	rmatrixsolvefast(_,_,∙,_);
-b	cmatrixsolvefast(_,_,∙,_);
-b	spdmatrixsolvefast(_,_,_,∙,_);
-b	hpdmatrixsolvefast(_,_,_,∙,_);
-b	rmatrixsolvemfast(_,_,∙,_,_);
-b	cmatrixsolvemfast(_,_,∙,_,_);
-b	spdmatrixsolvemfast(_,_,_,∙,_,_);
-b	hpdmatrixsolvemfast(_,_,_,∙,_,_);
-a	spdmatrixcholeskyupdateadd1buf(∙,_,_,_,_);
-a	spdmatrixcholeskyupdateadd1(∙,_,_,_);
-a	spdmatrixcholeskyupdatefixbuf(∙,_,_,_,_);
-a	spdmatrixcholeskyupdatefix(∙,_,_,_);
-
-A6.2. Test Stages
-─────────────────
+─────F	│ FREE EDITION OF ALGLIB:
+─────F	│
+─────F	│ Free Edition of ALGLIB supports following important features for this function:
+─────F	│ ∙	C++ version: x64 SIMD support using C++ intrinsics
+─────F	│ ∙	C# version: x64 SIMD support using NET5/NetCore hardware intrinsics
+─────F	│ We recommend you to read 'Compiling ALGLIB' section of the ALGLIB Reference Manual
+─────F	│ in order to find out how to activate SIMD support in ALGLIB.
+</pre>
+</p>
+<p>
+<a name=supp_Commercial2 class=sheader></a><h3>A5.2. ALGLIB Commercial Support and Free Enhancements by Routine</h3>
+The routines are listed by subpackage module:
+<ul>
+<li>8.2.2. clustering<ul>
+<li><b>F</b>: clusterizergetdistances, clusterizerrunahc, clusterizerrunkmeans</li>
+</ul></li>
+<li>8.2.4. dforest<ul>
+<li><b>A</b>: dfbuilderbuildrandomforest</li>
+</ul></li>
+<li>8.2.6. knn<ul>
+<li><b>A</b>: knnbuilderbuildknnmodel</li>
+</ul></li>
+<li>8.2.7. lda<ul>
+<li><b>F</b>: fisherlda, fisherldan</li>
+</ul></li>
+<li>8.2.11. mlpbase<ul>
+<li><b>A</b>: mlpallerrorssparsesubset, mlpallerrorssubset, mlpavgce, mlpavgcesparse, mlpavgerror, mlpavgerrorsparse, mlpavgrelerror, mlpavgrelerrorsparse, mlpclserror, mlperror, mlperrorsparse, mlperrorsparsesubset, mlperrorsubset, mlpgradbatch, mlpgradbatchsparse, mlpgradbatchsparsesubset, mlpgradbatchsubset, mlprelclserror, mlprelclserrorsparse, mlprmserror, mlprmserrorsparse</li>
+</ul></li>
+<li>8.2.13. mlptrain<ul>
+<li><b>A</b>: mlpcontinuetraining, mlpkfoldcv, mlptrainensemblees, mlptrainnetwork</li>
+</ul></li>
+<li>8.2.14. pca<ul>
+<li><b>F</b>: pcabuildbasis, pcatruncatedsubspace, pcatruncatedsubspacesparse</li>
+</ul></li>
+<li>8.6.2. idw<ul>
+<li><b>A</b>: idwbuildercreate</li>
+</ul></li>
+<li>8.6.4. lsfit<ul>
+<li><b>F</b>: barycentricfitfloaterhormann, barycentricfitfloaterhormannwc, lsfitlinear, lsfitlinearc, lsfitlinearw, lsfitlinearwc, polynomialfit, polynomialfitwc, spline1dfitcubic, spline1dfitcubicwc, spline1dfithermite, spline1dfithermitewc</li>
+</ul></li>
+<li>8.6.8. rbf<ul>
+<li><b>A</b>: rbfgridcalc2v, rbfgridcalc2vsubset, rbfgridcalc3v, rbfgridcalc3vsubset</li>
+</ul></li>
+<li>8.6.10. spline2d<ul>
+<li><b>B</b>: spline2dbuildercreate, spline2dbuildersetalgoblocklls, spline2dbuildersetalgofastddm, spline2dfit</li>
+</ul></li>
+<li>8.7.1. ablas<ul>
+<li><b>F</b>: cmatrixgemm, cmatrixherk, cmatrixlefttrsm, cmatrixrighttrsm, rmatrixgemm, rmatrixlefttrsm, rmatrixrighttrsm, rmatrixsyrk</li>
+</ul></li>
+<li>8.7.2. bdsvd<ul>
+<li><b>D</b>: rmatrixbdsvd</li>
+</ul></li>
+<li>8.7.3. evd<ul>
+<li><b>F</b>: eigsubspacesolvedenses</li>
+<li><b>C</b>: hmatrixevd, rmatrixevd, smatrixevd, smatrixevdr, smatrixtdevd</li>
+</ul></li>
+<li>8.7.7. matinv<ul>
+<li><b>F</b>: cmatrixinverse, cmatrixluinverse, cmatrixtrinverse, hpdmatrixcholeskyinverse, hpdmatrixinverse, rmatrixinverse, rmatrixluinverse, rmatrixtrinverse, spdmatrixcholeskyinverse, spdmatrixinverse</li>
+</ul></li>
+<li>8.7.9. ortfac<ul>
+<li><b>F</b>: cmatrixlq, cmatrixlqunpackq, cmatrixqr, cmatrixqrunpackq, rmatrixlq, rmatrixlqunpackq, rmatrixqr, rmatrixqrunpackq</li>
+<li><b>C</b>: hmatrixtd, hmatrixtdunpackq, rmatrixbd, rmatrixbdmultiplybyq, rmatrixbdunpackq, rmatrixhessenberg, rmatrixhessenbergunpackq, smatrixtd, smatrixtdunpackq</li>
+</ul></li>
+<li>8.7.11. schur<ul>
+<li><b>E</b>: rmatrixschur</li>
+</ul></li>
+<li>8.7.14. svd<ul>
+<li><b>C</b>: rmatrixsvd</li>
+</ul></li>
+<li>8.7.15. trfac<ul>
+<li><b>F</b>: cmatrixlu, hpdmatrixcholesky, rmatrixlu, spdmatrixcholesky</li>
+</ul></li>
+<li>8.9.1. directdensesolvers<ul>
+<li><b>F</b>: cmatrixlusolvem, cmatrixlusolvemfast, cmatrixsolve, cmatrixsolvefast, cmatrixsolvem, cmatrixsolvemfast, hpdmatrixsolve, hpdmatrixsolvefast, hpdmatrixsolvem, hpdmatrixsolvemfast, rmatrixlusolvem, rmatrixlusolvemfast, rmatrixsolve, rmatrixsolvefast, rmatrixsolvels, rmatrixsolvem, rmatrixsolvemfast, spdmatrixsolve, spdmatrixsolvefast, spdmatrixsolvem, spdmatrixsolvemfast</li>
+</ul></li>
+<li>8.11.1. basestat<ul>
+<li><b>A</b>: rankdata, rankdatacentered</li>
+<li><b>B</b>: covm, covm2, pearsoncorrm, pearsoncorrm2, spearmancorrm, spearmancorrm2</li>
+</ul></li>
+</ul>
+</p>
+<p>
+<a name=supp_History class=sheader></a><h2>A6. ALGLIB &rArr; ALGLIB++ Revision Sequence</h2>
+<font size=2>[
+<a href=#supp_History1 class=sheader>Revision Notes</a> |
+<a href=#supp_History2 class=sheader>Test Stages</a> |
+<a href=#supp_History3 class=sheader>Test Results</a> |
+<a href=#supp_History4 class=sheader>The Most Recent Test Run</a>
+]</font>
+</p>
+<p>
+We maintain several independently recoded versions of ALGLIB, locally, for testing and experimentation and cross-validation.
+The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one of these; and the revisions made here - as well as in the local versions - result from reconciling the different versions with one another.
+</p>
+<p>
+<a name=supp_History1 class=sheader></a><h3>A6.1. Revision Notes</h3>
+<pre class=narration>
+∙	Corrected "ASCI" to "ASCII" and "#alglib_packages" to "#alglib_main" (mistakes inherited from the original ALGLIB manual).
+∙	The files were moved to a single top-level directory and the names normalized.
+∙	References to Commercial ALGLIB in the comments and functions were removed.
+	A separate file was compiled collating all of the Commercial ALGLIB comments of the original package.
+∙	The reprogramming, itself, will be under GPL, except that recoding, repairs, and other additions made,
+	particularly in DSP, file {en/de}-coding, video/music/sound processing, time-frequency analysis,
+	will be made available for the commercial version to use, except those derived from other GPL-sources.
+∙	Full integration of a C++ version of the Time Frequency Toolkit (currently in MATLAB)
+	or the equivalent into FastTransforms is planned.
+∙	Full integration of GMP (as part of the expanded FastTransforms / DSP module)
+	and a C/C++ version of LAPACK (as part of the expanded LinAlg and Solvers modules) are both planned.
+∙	DSP and Time-Frequency analysis; file-transfer; voice generation/recognition, computer vision, sound and video production
+	is also planned.
+∙	Expansion of serialization/deserialization routines to include I/O for different file formats.
+∙	Possible integration with a refactored C++ version FFMPEG++, of FFMPEG, is undergoing evaluation.
+∙	Possible integration of a refactored C++ GUI-free version of Audacity is undergoing evaluation.
+∙	For POSIX non-compliant configurations, the user assumes primary responsibility for maintenance.
+	No support will be provided, but corrections or fixes reported will be noted, tested (where possible) and added.
+∙	Conflicting labelling in 6.3 and 6.3.1: partially repaired in the version 3.16.0 manual.
+∙	The alglib_impl namespace in ALGLIB was mostly in C, as was TestC.cpp.
+∙	Support for C is now moved away from in favor of nativizing the C++ code.
+	The Idw{0,1}.c files are a demonstration of possible future directions; we're also re-examining ALGLIB Version 2.
+	The ALGLIB library's infrastructure is naturally tailored for C++; laden with idioms that practically scream out "C++!".
+∙	Test{I,X,Y,Z} work with alglib and are C++.
+∙	The Makefile and revisions have only been tried with Linux:x86_64:GCC.
+∙	The revision to handle the rounding on the FP unit was only added in for Linux:x86_64:GCC.
+∙	Only the structural changes mentioned here were made; not any recoding, other than what was done for this.
+	The initial "structural" changes made, before actual recoding included a normalization of the ordering
+	(determined automatically with the aid of the compiler) of the routines and extraction of a dependency list;
+	and various equivalence transforms.
+∙	The God-objects in alglib_impl (ae_state) and RCOMM routines were removed.
+	For the time being, static and global variable are no longer thread-local.
+	Only the commercial version has support for multi-processors or multi-threading;
+	but a small amount of it has crept into the GPL version in test_x and inherited, from this, in ALGLIB++'s TestX file.
+∙	The partial compilation dependency includes from ALGLIB are not present.
+	Instead, the modules are collated and the minimal dependency network is sorted out and documented separately.
+	Intra-module and extra-module dependencies are distinguished.
+	There's enough information here to separate out the modules and create a suitable Makefile.
+∙	The order of
+		minlm_lmprepare(...), minlmsetacctype(...), minlmsetcond(...)
+	is switched to:
+		minlmsetacctype(...), minlmsetcond(...), minlm_lmprepare(...)
+	In the namespace alglib_impl in:
+		minlmcreatevj(), minlmcreatev(), minlmcreatefgh(), minlmcreatefj()
+∙	The calculation of refavgce in:
+		testdforestunit_basictestallsame()
+		testdforestunit_basictestrandom()
+	is rewritten to match that used by dfavgce().
+	These tests produce false positives: NAN's may be produced, which pass, because the comparison condition is stated negatively.
+∙	The minqp tests produced sporadic failures (about 4% of the time) in the original version of ALGLIB.
+	They were masked as false positives, which was uncovered in ALGLIB++ after stage 31, and became visible as a result.
+	This issue has been left unresolved.
+∙	2 C-incompatibilities: ByteOrder and CurCPU are defined at start-up time.
+	In C, it'll have to be replaced by a "startup" routine in Ap.cpp and called in up front main().
+	SSE2 intrinsics are not present in all GCC installations on Intel, so the automatic definition of AE_HAS_SSE2_INTRINSICS has been removed.
+	It must be explicitly #defined, instead (preferrably in Ap.h, where indicated).
+∙	Many more C-incompatibilities are introduced on and after stage 33.
+∙	The replacement of ae_cpuid() by CurCPU excludes the 1-compiler/loader - heterogeneous-CPU configurations;
+	which is not supported in the GPL version.
+∙	In ALGLIB _clear should have been _destroy in ~vector_wrapper(), ~matrix_wrapper() (as well as in attach_to()).
+	That is
+	vector_clear	⇒	vector_destroy in ae_vector_wrapper::~ae_vector_wrapper() and ae_vector_wrapper::attach_to()
+	matrix_clear	⇒	matrix_destroy in ae_matrix_wrapper::~ae_matrix_wrapper() and ae_matrix_wrapper::attach_to()
+	Under the revisions described here, they each become *_free(..., ae_false), while *_clear(...) would have been written as *_free(..., ae_true).
+	Both are equivalent in the GPL version, because *_clear() and *_destroy() are the same in that version;
+	but this is only an incidental equivalence that should not be relied on.
+∙	To better and more directly implement the assignment operator, a move constructor should be added;
+		Type_move(T *A, const T *B),
+	which has the effect of
+		(Type_free(A), Type_copy(A, B)),
+	except for optimizing out any (free + malloc) sequences.
+	Then, under the revision, there would be:
+	―	Type_init(Type *A),
+	―	Type_copy(Type *A, const Type *B),
+	―	Type_free(Type *A),
+	―	Type_move(Type *A, const Type *B).
+∙	Different/expanded version of the testing routines is planned for SpecialFunctions, including forward/inverse pair testing.
+∙	A possible redefinition of SpecialFunctions using the interpolation methods in ALGLIB itself is planned.
+</pre>
+</p>
+<p>
+<a name=supp_History2 class=sheader></a><h3>A6.2. Test Stages</h3>
+<pre class=narration>
 39	Integration of version 3.18.0 ― being done separately from the main branch.
 39	Removed the CPU initialization for FP-rounding (more recent versions of GCC now seem to handle this right).
 0-39	Removed hook-stub routines:
@@ -341,7 +720,7 @@ A6.2. Test Stages
 	―	Optimization.{cpp,h}:
 		3.15: The *trace* routines were stubs and were removed.
 		3.16: The *trace* routines, dotrace*, doprobing were activated for the IPM, SLP and SQP solvers.
-		3.17: The tracegamma vector and extendeddebug and dotimers flags & members and rep*time members are also removed.
+		3.17: The tracegamma vector and extendeddebug and dotimers flags &amp; members and rep*time members are also removed.
 	―	Optimization.cpp, Manual.htm:
 			TRACING * SOLVER comments
 0-39	Optimized ifloor(A,B) as A / B and iceil(A,B) as (A + B - 1) / B, for integer types A and B.
@@ -352,7 +731,7 @@ A6.2. Test Stages
 	―	X = X + 1.0 ⇒ X++;
 0-39	Synthesized update operators:
 	―	X = X % Y ⇒ X %= Y (*)
-	―	X = X & Y ⇒ X &= Y
+	―	X = X &amp; Y ⇒ X &amp;= Y
 	―	X = X + Y ⇒ X += Y
 	―	X = Y + X ⇒ X += Y
 	―	X = Y + (X) ⇒ X += Y
@@ -390,14 +769,14 @@ A6.2. Test Stages
 	−	ae_isinf,ae_isinf_stateless,fp_isinf ⇒ isinf
 	―	ae_isneginf,ae_isposinf ⇒ isneginf,isposinf
 	―	Remove the definitions from Ap.cpp and declarations from Ap.h of those that have been nativized.
-	―	_*state->v_nan,fp_nan ⇒ NAN
-	―	_*state->v_posinf,fp_posinf ⇒ +INFINITY
-	―	_*state->v_neginf,fp_neginf ⇒ -INFINITY
-	―	_*state->v_{nan,posinf,neginf} are retained (for now) as in-line constant members.
+	―	_*state-&gt;v_nan,fp_nan ⇒ NAN
+	―	_*state-&gt;v_posinf,fp_posinf ⇒ +INFINITY
+	―	_*state-&gt;v_neginf,fp_neginf ⇒ -INFINITY
+	―	_*state-&gt;v_{nan,posinf,neginf} are retained (for now) as in-line constant members.
 0-39	Removing translator-generated artifacts.
 	Commenting out or eliminating translator-generated dead-code or vestigial code from the commercial version of ALGLIB.
 	―	Merge {b,i,r}{vector,matrix}setlengthatleast() into {vector,matrix}setlengthatleast().
-	―	Normalize boolean comparisons: A&&B || !A&&!B ⇒ A == B, A&&B || !A&&C ⇒ A? B: C
+	―	Normalize boolean comparisons: A&amp;&amp;B || !A&amp;&amp;!B ⇒ A == B, A&amp;&amp;B || !A&amp;&amp;C ⇒ A? B: C
 		(including some places where A and !A are opposite comparisons on floating point).
 	―	Removed aresameboolean(); already subsumed by "==";
 	―	Removed countdown(): it is unused.
@@ -438,7 +817,7 @@ A6.2. Test Stages
 		with
 		―	is_static = true, make_automatic = false for ae_init_lock_eternal(),
 		―	is_static = false for ae_init_lock().
-0-39	Reorder Ap.{cpp,h} & reconcile with the local version of AlgLib.
+0-39	Reorder Ap.{cpp,h} &amp; reconcile with the local version of AlgLib.
 	―	alglib::ByteOrder made local in Ap.cpp and commented out (it's not used).
 	OS-dependent low-level lock routines in Ap.cpp are consolidated and made in-line.
 	―	Renamed _ae_{init,acquire,release,free}_lock_raw as _ae_{init,acquire,release,free}_lock.
@@ -531,7 +910,7 @@ A6.2. Test Stages
 			{Near,Small}[At]{R,CR,C}().
 		in the alglib_impl namespace.
 	―	AlgLibInternal.{cpp,h}: Replace approxequal() with NearAtR().
-	―	Synthesize these new routines in most places (some places, like fabs(A-B) < fabs(C-D), are not all converted).
+	―	Synthesize these new routines in most places (some places, like fabs(A-B) &lt; fabs(C-D), are not all converted).
 	―	TestC.cpp: Normalized conditionals (continued):
 		―	|A-B|/C ≥ D to |A-B| ≥ C×D,
 		Exposes bugs, inherited from ALGLIB, in the dforest test routines; and an underlying bug in the df routines.
@@ -558,7 +937,7 @@ A6.2. Test Stages
 		―	Combined the Ap versus AlgLibInternal functions.
 		―	Moved the Ap functions into AlgLibInternal, made them local and removed their declarations.
 40	AlgLibInternal.{cpp,h}: added rmatrixgemmf() alongside cmatrixgemmf().
-0-39	Corrections in the comments & printouts; e.g.
+0-39	Corrections in the comments &amp; printouts; e.g.
 	―	"launcn" → "launch", "traling" → "trailing", "trainig" → "training", "i.e \." → "i.e.", "i.e" → "i.e.",
 	―	"inself" → "itself", "it's" → "its", "discripancy" → "discrepancy", "strucure" → "structure",
 	―	"⋯intial⋯" → "⋯initial⋯", "lentgh" → "length", "loosing" → "losing", "Additonally" → "Additionally",
@@ -569,7 +948,7 @@ A6.2. Test Stages
 	―	Added RelNear()
 	―	Replaced seterrorflagdiff(P, A, B, Tiny, Scale) by set_error_flag(P, !RelNear(A, B, Tiny, Scale));
 	―	Removed the error-tracking facilities: the sef* and setflag* routines.
-		Converted set_error_flag(&X, Y) ⇒ X = X || Y;
+		Converted set_error_flag(&amp;X, Y) ⇒ X = X || Y;
 		Converted set_error_flag(P, Y) ⇒ *P = *P || Y;
 	―	Removed ALGLIB_ABORT_ON_ERROR_FLAG, effectively freezing it out to false (it's not used anywhere else).
 0-39	AlgLibInternal.{cpp,h}: Adding changes made in AlgLib++.
@@ -579,11 +958,11 @@ A6.2. Test Stages
 	―	Re-commenting in many places.
 	―	swapb(), swapc() added.
 		swap{b,i,r,c}() synthesized in numerous places.
-	―	Non-API routine tiledsplit(tasksize, tilesize, &task0, &task1)
+	―	Non-API routine tiledsplit(tasksize, tilesize, &amp;task0, &amp;task1)
 		redefined as task0 = tiledsplit(tasksize, tilesize), task1 = tasksize - task0;
-	―	Non-API routine splitlength(tasksize, chunksize, &task0, &task1)
+	―	Non-API routine splitlength(tasksize, chunksize, &amp;task0, &amp;task1)
 		redefined as task0 = splitlength(tasksize, chunksize), task1 = tasksize - task0;
-	―	Non-API routine splitlengtheven(tasksize, &task0, &task1)
+	―	Non-API routine splitlengtheven(tasksize, &amp;task0, &amp;task1)
 		redefined as task0 = splitlengtheven(tasksize), task1 = tasksize - task0;
 	―	Non-API routine sortmiddlei() removed and replaced by its duplicate tagsortmiddlei() [newly added to version 3.17.0].
 	―	Non-API routines tagsortmiddleir(), tagsortmiddlei() redeclared with default offset = 0, and recoded.
@@ -591,43 +970,43 @@ A6.2. Test Stages
 	―	Non-API routines tagsortfast[ir]() recoded.
 	―	Local routines tsort_tagsortfast[ir]rec() recoded.
 	―	Local routine tsort_tagsortfastirec(a, b, bufa, bufb, i1, i2)
-		redefined as tsort_tagsortfastirec(a->xR + i1, b->xZ + i1, bufa->xR + i1, bufb->xZ + i1, i2 - i1 + 1)
+		redefined as tsort_tagsortfastirec(a-&gt;xR + i1, b-&gt;xZ + i1, bufa-&gt;xR + i1, bufb-&gt;xZ + i1, i2 - i1 + 1)
 	―	Local routine tsort_tagsortfastrrec(a, b, bufa, bufb, i1, i2)
-		redefined as tsort_tagsortfastrrec(a->xR + i1, b->xR + i1, bufa->xR + i1, bufb->xR + i1, i2 - i1 + 1)
+		redefined as tsort_tagsortfastrrec(a-&gt;xR + i1, b-&gt;xR + i1, bufa-&gt;xR + i1, bufb-&gt;xR + i1, i2 - i1 + 1)
 	―	Local routine tsort_tagsortfastrec(a, bufa, i1, i2)
-		redefined as tsort_tagsortfastrec(a->xR + i1, bufa->xR + i1, i2 - i1 + 1)
+		redefined as tsort_tagsortfastrec(a-&gt;xR + i1, bufa-&gt;xR + i1, i2 - i1 + 1)
 	―	Localized static constants linmin_{armijofactor,ftol,xtol,maxfev,defstpmax} to the routines they are used in,
 		and removed the "linmin_" prefix.
 	―	All of the routines in the FTBASE package were recoded.
-	―	Non-API routine ftapplyplan(&plan, &buf, offset, reps) redeclared with default offset = 0 and reps = 1, and recoded.
+	―	Non-API routine ftapplyplan(&pamp;lan, &amp;buf, offset, reps) redeclared with default offset = 0 and reps = 1, and recoded.
 	―	Local routines ftbase_ftpushentry{2,4}() combined with ftbase_ftpushentry() by making defaults eparam1 = -1, eparam2 = 0, eparam3 = 0.
-	―	Local routine(s) ftbase_ftpushentry*(plan, ⋯) redefined as ftbase_ftpushentry*(&plan->entries, ⋯).
+	―	Local routine(s) ftbase_ftpushentry*(plan, ⋯) redefined as ftbase_ftpushentry*(&amp;plan-&gt;entries, ⋯).
 	―	Local routine ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m, n)
-		redefined as ftbase_fftirltrec(a->xR + astart, astride, b->xR + bstart, bstride, m, n).
+		redefined as ftbase_fftirltrec(a-&gt;xR + astart, astride, b-&gt;xR + bstart, bstride, m, n).
 	―	Local routine ftbase_ffticltrec(a, astart, astride, b, bstart, bstride, m, n)
-		redefined as ftbase_ffticltrec(a->xR + astart, astride, b->xR + bstart, bstride, m, n).
+		redefined as ftbase_ffticltrec(a-&gt;xR + astart, astride, b-&gt;xR + bstart, bstride, m, n).
 	―	Local routine ftbase_internalcomplexlintranspose(a, n, m, astart, buf)
-		redefined as ftbase_internalcomplexlintranspose(a->xR + astart, n, m, buf).
+		redefined as ftbase_internalcomplexlintranspose(a-&gt;xR + astart, n, m, buf).
 	―	Local routine ftbase_ftapplycomplexcodelettwfft(a, offs, args, n, mun)
-		redefined as ftbase_ftapplycomplexcodelettwfft(a->xR + offs, args, n, mun).
+		redefined as ftbase_ftapplycomplexcodelettwfft(a-&gt;xR + offs, args, n, mun).
 	―	Local routine ftbase_ffttwcalc(a, aoffset, n1, n2)
-		redefined as ftbase_ffttwcalc(a->xR + aoffset, n1, n2).
+		redefined as ftbase_ffttwcalc(a-&gt;xR + aoffset, n1, n2).
 	―	Local routine ftbase_ftapplycomplexreffft(a, offs, args, n, mun, buf)
-		redefined as ftbase_ftapplycomplexreffft(a->xR + offs, args, n, buf).
+		redefined as ftbase_ftapplycomplexreffft(a-&gt;xR + offs, args, n, buf).
 		The mun == 2 assertion is placed outside and before the call.
 	―	Local routine ftbase_ftapplycomplexcodeletfft(a, offs, args, n, mun)
-		redefined as ftbase_ftapplycomplexcodeletfft(a->xR + offs, args, n).
+		redefined as ftbase_ftapplycomplexcodeletfft(a-&gt;xR + offs, args, n).
 		The mun == 2 assertion is placed outside and before the call.
 	―	Local routine ftbase_ftbluesteinsfft(plan, a, abase, aoffset, ⋯, bufa, bufb, bufc, bufd)
-		redefined as ftbase_ftbluesteinsfft(plan, a->xR + abase + aoffset, ⋯, bufa, bufc).
+		redefined as ftbase_ftbluesteinsfft(plan, a-&gt;xR + abase + aoffset, ⋯, bufa, bufc).
 	―	Local routine ftbase_ftradersfft(plan, a, abase, aoffset, ⋯, buf)
-		redefined as ftbase_ftradersfft(plan, a->xR + abase + aoffset, aoffset, ⋯, buf).
+		redefined as ftbase_ftradersfft(plan, a-&gt;xR + abase + aoffset, aoffset, ⋯, buf).
 	―	Local routine ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset, buf, repcnt)
-		redefined as ftbase_ftapplysubplan(plan, subplan, a->xR + abase + aoffset, aoffset, buf, repcnt).
+		redefined as ftbase_ftapplysubplan(plan, subplan, a-&gt;xR + abase + aoffset, aoffset, buf, repcnt).
 	―	Local routine ftbase_ftprecomputebluesteinsfft(n, m, precr, offs)
-		redefined as ftbase_ftprecomputebluesteinsfft(n, m, precr->xR + offs).
+		redefined as ftbase_ftprecomputebluesteinsfft(n, m, precr-&gt;xR + offs).
 	―	Local routine ftbase_ftprecomputeradersfft(n, rq, riq, precr, offs)
-		redefined as ftbase_ftprecomputeradersfft(n, rq, riq, precr->xR + offs).
+		redefined as ftbase_ftprecomputeradersfft(n, rq, riq, precr-&gt;xR + offs).
 0-39	LinAlg.{cpp,h}: Adding some changes made in AlgLib++.
 	LinAlg.cpp: Recoded {r,c}matrixgemm[rec] to increase efficiency
 	Reformatted the layout to combine the type/object section with function section in each namespace.
@@ -640,13 +1019,12 @@ A6.2. Test Stages
 	―	Re-coding of HQRND direct from the original reference for the algorithm.
 0-39	Reconciled parameter declarations versus documentation:
 	∙	Output parameters X of type T are documented and declared respectively as:
-		―	T &X	⇔	T &X
+		―	T &amp;X	⇔	T &amp;X
 	∙	Input parameters X of type T are documented and declared respectively as:
 		―	T X	⇔	const T X	― for scalar types T ∈ { bool, ae_int_t, double, complex },
-		―	T X	⇔	const T &X	― for all other types T.
-	Manual.htm: The documentation of the following 1D and 2D array argument parameters
-	was changed from output (T &X) to input (T X) to match its declaration (const T &X).
-	∙	a	rmatrixenforcesymmetricity rmatrixger, spdmatrixcholeskyupdate{add1,fix}[buf], xdebug{b{1,2}not,{c,i,r}{1,2}neg}
+		―	T X	⇔	const T &amp;X	― for all other types T.
+	Manual.htm: The documentation of the following 1D and 2D array argument parameters was changed from output (T &amp;X) to input (T X) to match its declaration (const T &amp;X).
+	∙	a	rmatrixenforcesymmetricity, rmatrixger, spdmatrixcholeskyupdate{add1,fix}[buf], xdebug{b{1,2}not,{c,i,r}{1,2}neg}
 	∙	b	rmatrix{[gen]copy,transpose}, {r,c}matrix[lu]solve[m]fast, rvectorcopy, {h,s}pdmatrix[cholesky]solve[m]fast
 	∙	c	cmatrixherk, {r,c}matrix{gemm,syrk}
 	∙	tmp	rmatrixsyvmv
@@ -661,9 +1039,9 @@ A6.2. Test Stages
 0-39	LinAlg.{cpp,h}: Adding changes made in AlgLib++.
 	―	Non-API routine rmatrixqrbasecase() removed from LinAlg.h, made local to LinAlg.cpp, renamed ortfac_rmatrixqrbasecase().
 	―	Non-API routine spdmatrixcholeskyinverserec() removed from LinAlg.h, made local to LinAlg.cpp, renamed matinv_spdmatrixcholeskyinverserec().
-	―	Non-API routine ablascomplexsplitlength(a, n, &n1, &n2) redefined as n1 = ablascomplexsplitlength(a, n), n2 = n - n1;
-	―	Non-API routine ablassplitlength(a, n, &n1, &n2) redefined as n1 = ablassplitlength(a, n), n2 = n - n1;
-	―	Local routine ablas_ablasinternalsplitlength(n, nb, &n1, &n2) redefined as n1 = ablas_ablasinternalsplitlength(n, nb), n2 = n - n1;
+	―	Non-API routine ablascomplexsplitlength(a, n, &amp;n1, &amp;n2) redefined as n1 = ablascomplexsplitlength(a, n), n2 = n - n1;
+	―	Non-API routine ablassplitlength(a, n, &amp;n1, &amp;n2) redefined as n1 = ablassplitlength(a, n), n2 = n - n1;
+	―	Local routine ablas_ablasinternalsplitlength(n, nb, &amp;n1, &amp;n2) redefined as n1 = ablas_ablasinternalsplitlength(n, nb), n2 = n - n1;
 0-39	Solvers.cpp, Manual.htm: Adding changes made in AlgLib++.
 	―	lincgsetb(): added to the API and newly documented.
 0-39	Optimization.cpp: Adding changes made in AlgLib++.
@@ -714,11 +1092,11 @@ A6.2. Test Stages
 	―	Integration of the format and layout used for ALGLIB++.
 	―	Added author and timestamps to the [un]serialization routines.
 	―	Normalized the declarations of the API object classes.
-0-39	Comment/documentation normalization & synchronization
+0-39	Comment/documentation normalization &amp; synchronization
 	―	Normalize author and timestamps (several items missed on a previous pass).
 	―	Correct timestamp error (1014 → 2014).
 	―	Normalize conditionals and other code inside comments.
-	―	< and > in comments and assert statements.
+	―	&lt; and &gt; in comments and assert statements.
 	―	:= in comments converted to =
 	―	"PARAMETER" ⇒ "Parameter", etc.
 	―	"OUTPUT PAREMETERS" ⇒ "Outputs", "OUTPUT ARRAYS:" → "Outputs:",
@@ -737,7 +1115,7 @@ A6.2. Test Stages
 	―	References to MinCGSetGradientCheck() in the comments removed.
 		The *SetGradientCheck() functions have almost all been replaced by OptGuard functions in version 3.16.0.
 0-39	Optimization.cpp: Removing vestige of trace facility (the timer variable ‟t0”).
-0-39	Other minor changes in the documentation & Comments:
+0-39	Other minor changes in the documentation &amp; Comments:
 	―	sparsesmm(): A is M × K, not N × K.
 	―	sparsecholeskyskyline(): "matrixm" → "matrix"
 	―	Sin(⋯) → sin(⋯), Cos(⋯) → cos(⋯), Exp(⋯) → exp(⋯), TanH(⋯) → tanh(⋯)
@@ -747,14 +1125,14 @@ A6.2. Test Stages
 
 0-39	Conversion of while loops to for loops.
 	―	Shared pool while loops converted to for loops.
-			ae_shared_pool_first_recycled(Pool, &_P);
+			ae_shared_pool_first_recycled(Pool, &amp;_P);
 			while (P != NULL) {
 				⋯
-				ae_shared_pool_next_recycled(Pool, &_P);
+				ae_shared_pool_next_recycled(Pool, &amp;_P);
 			}
 		converted to:
-			for (ae_shared_pool_first_recycled(Pool, &_P); P != NULL; ae_shared_pool_next_recycled(Pool, &_P)) { ⋯ }
-	―	while (A <= B - 1) ⇒ while (A < B)
+			for (ae_shared_pool_first_recycled(Pool, &amp;_P); P != NULL; ae_shared_pool_next_recycled(Pool, &amp;_P)) { ⋯ }
+	―	while (A &le; B - 1) ⇒ while (A &lt; B)
 	―	Converted
 			minbleicrestartfrom(Q, P); while (minbleiciteration(Q)) { ⋯ }
 		to
@@ -774,12 +1152,12 @@ A6.2. Test Stages
 	―	Comment the default parameters in RComm iteration routine declarations.
 0-39	Interpolation.{cpp,h}: Moving spline1dfitpenalized() from INTCOM back to SPLINE1D.
 0-39	Localized static constants and remove the prefixes.
-0-39	Reconcile to ALGLIB++, except TestC.cpp &Notes.htm
+0-39	Reconcile to ALGLIB++, except TestC.cpp &amp; Notes.htm
 	―	Minor layout changes (e.g. conditionals and arithmetic operations, removing redundant brackets, comment formatting, etc.).
 	―	Normalize: X * Constant ⇒ Constant * X.
 	―	Normalize: X -= 1.0 and X += 1.0 to X-- and X++
 	―	In-line arithmetic (e.g. X + 0 ⇒ X, 1 + 2 ⇒ 3, 0 * X ⇒ X, 1 * 2 + 1 ⇒ 3, etc.)
-	―	Conversions X <= Y - 1 ⇒ X < Y done in those in places other than loops or branches that were missed in a previous pass.
+	―	Conversions X &le; Y - 1 ⇒ X &lt; Y done in those in places other than loops or branches that were missed in a previous pass.
 	―	Brackets (e.g. (*X) around pointer parameters in function bodies) removed.
 	―	Relabel the messages in some of the ae_assert calls (for now: just those used with the serialization routines).
 	―	TestC.cpp: Synthesis of more randommid() and hqrndmiduniformr() routines, missed on a previous pass.
@@ -787,9 +1165,17 @@ A6.2. Test Stages
 40	Numerals converted to double (in some places only), excesses (double) typecasts eliminated.
 	1.0 E n, 1.0 e n converted to numeral form, for n ∈ [-8,+8];
 	1.0 e n converted to 1.0 E n most elsewhere outside of comments and strings.
-
-A6.3. Test Results
-──────────────────
+40	Notes.htm: Partially reconciling to ALGLIB++, incorporating the format changes and section layout and narrative.
+	Manual.htm: Opening up the link to Notes.htm.
+</pre>
+</p>
+<p>
+<a name=supp_History3 class=sheader></a><h3>A6.3. Test Results</h3>
+The following are the read-outs from TestX, followed by the time-stamp and total testing time from TestC.
+The values cited for TestX are for MFLOPS counts for the RGEMM BLAS routine for N&times;N matrices for N = 16, 32, 64 and 1024.
+The times, themselves are meaningful only for comparisons on a single host, rather than across different hosts.
+In the case of TestX, not all tests were done cleanly (i.e. with background processes disabled), so there may be fluctuations.
+<pre class=narration>
 39	7519 1.0x 12049 1.0x 11909 1.0x 9587 1.0x 1635369021 (6179c03d) 83
 39	7874 1.0x 12196 1.0x 11909 1.0x 9266 1.0x 1635374188 (6179d46c) 87
 39	7937 1.0x 12196 1.0x 12199 1.0x 9138 1.0x 1635377026 (6179df82) 86
@@ -813,14 +1199,14 @@ A6.3. Test Results
 39	7937 1.0x 12196 1.0x 12052 1.0x 9544 1.0x 1642926906 (61ed133a) 85 // Real to Complex conversion generalized.
 39	6410 0.9x 10310 1.1x 10313 1.0x 9539 1.0x 1642933377 (61ed2c81) 83 // Removed all trace-related functionality.
 39	7353 1.0x 11365 1.0x 11368 1.0x 9241 1.0x 1643002115 (61ee3903) 82 // Synthesize the ++ and -- operators.
-39	7937 1.0x 12347 0.9x 12199 1.0x 9513 1.0x 1643154969 (61f08e19) 84 // Synthesize the {+,-,*,/,%,&}= operators.
-39	8000 1.0x 12501 1.0x 12199 1.0x 9100 1.0x 1643326894 (61f32dae) 80 // Synthesize in-line operators & set_error_msg(), etc.
+39	7937 1.0x 12347 0.9x 12199 1.0x 9513 1.0x 1643154969 (61f08e19) 84 // Synthesize the {+,-,*,/,%,&amp;}= operators.
+39	8000 1.0x 12501 1.0x 12199 1.0x 9100 1.0x 1643326894 (61f32dae) 80 // Synthesize in-line operators &amp; set_error_msg(), etc.
 39	6803 1.1x 11629 1.0x 11909 1.0x 9143 1.0x 1643389187 (61f42103) 81 // Nativize floating point constants and operations.
 39	7752 1.0x 12501 1.0x 12199 1.0x 9608 1.0x 1643680716 (61f893cc) // Remove translator-artifacts. (Crashed in TestC at testspline2d.)
 39	8000 1.0x 12196 1.0x 12199 1.0x 9187 1.0x 1643685611 (61f8a6eb) 80 // Remove translator-artifacts. (Corrected.)
 39	7937 1.0x 12501 1.0x 10873 0.9x 9172 1.1x 1643757812 (61f9c0f4) 80 // Recode random*() and *pythag2().
 39	7692 1.0x 12347 0.9x 11240 1.0x 9492 1.0x 1643828901 (61fad6a5) 78 // Recode "eternal" locks in Ap.{cpp,h}.
-39	7874 1.0x 12501 1.0x 12199 1.0x 9018 1.0x 1644128862 (61ff6a5e) 79 // Recode ByteOrder, _lock routines & xparams.
+39	7874 1.0x 12501 1.0x 12199 1.0x 9018 1.0x 1644128862 (61ff6a5e) 79 // Recode ByteOrder, _lock routines &amp; xparams.
 39	8000 1.0x 12347 1.0x 12052 1.0x 8761 1.0x 1644295249 (6201f451) 81 // Reduce ae_state and xparams.
 39	8065 1.0x 12501 1.0x 12199 1.0x 9614 1.0x 1644352844 (6202d54c) 77 // Further reduce ae_state; synthesize TestMode.
 39	7937 1.0x 12501 1.0x 11909 1.0x 9296 1.0x 1644431780 (620409a4) 79 // Recoding state and frame routines in Ap.{cpp,h}.
@@ -829,7 +1215,7 @@ A6.3. Test Results
 39	8065 0.9x 11629 0.9x 11368 1.1x 9172 1.0x 1644615571 (6206d793) 78 // Error in TestC (iterativesparse) corrected.
 39	8130 1.0x 12501 1.0x 12052 1.0x 9307 1.0x 1644616814 (6206dc6e) 75 // Error in TestC (minnlc) corrected.
 39	7576 1.1x 12347 1.0x 12350 0.9x 8957 1.0x 1644799817 (6209a749) 77 // Normalization of the RCOMM routines and those similar to it.
-39	6289 1.0x 9710 1.0x 8775 1.1x 8569 1.1x 1645146923 (620ef32b) 79 // Restructuring Ap.{cpp,h} & TestZ.cpp; retrofitting ALGLIB++.
+39	6289 1.0x 9710 1.0x 8775 1.1x 8569 1.1x 1645146923 (620ef32b) 79 // Restructuring Ap.{cpp,h} &amp; TestZ.cpp; retrofitting ALGLIB++.
 39	7937 1.0x 11906 1.0x 11769 1.0x 8699 1.1x 1645147397 (620ef505) 79 // Re-testing, with other processes off.
 39	8000 1.0x 12347 1.0x 11368 1.0x 9153 1.0x 1645650939 (6216a3fb) 78 // Normalization of conditionals.
 40	7092 1.1x 12347 1.0x 11498 1.0x 9486 1.0x 1646537151 (622429bf) 77 // Recoding the kernel dispatcher.
@@ -850,9 +1236,11 @@ A6.3. Test Results
 0-39	5988 1.0x 9435 1.2x 12350 1.0x 9784 1.0x 1650480992 (62605760) 79 // Conversion of while loops to for loops.
 0-39	7408 0.9x 12347 1.0x 12199 1.0x 9717 1.0x 1650825124 (626597a4) 77 // Localized more static constants.
 40	7752 0.9x 12347 1.0x 12199 1.0x 9723 1.0x 1651429815 (626ed1b7) 82 // Adding changes made to AlgLib++, except TestC.cpp.
-
-A6.4. The Most Recent Test Run
-──────────────────────────────
+</pre>
+</p>
+<p>
+<a name=supp_History4 class=sheader></a><h3>A6.4. The Most Recent Test Run</h3>
+<pre class=narration>
 echo "TestI: API Interface"
 TestI: API Interface
 ./TestI
@@ -1014,3 +1402,8 @@ Testing Mode: single core
 89/90: mlptrain                         Ok
 90/90: alglibbasics                     Ok
 Done in 82 seconds
+</pre>
+</p>
+</div>
+</body>
+</html>
