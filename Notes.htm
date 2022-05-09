@@ -1099,6 +1099,15 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 40	Synchronizing changes made to Notes.htm starting with alglib.3.18
 	∙	minor corrections,
 	∙	a section added for the most recent test run.
+0-39	TestC.cpp: Minor changes to sync to 3.18.0.
+	∙	Test and sub-test reports and outputs made more uniform.
+	∙	Normalized error flags to Ok with the logic set to Ok = success (some were missed in Stage 33).
+	∙	Accidental duplication of code in sparserealcholeskytest() removed.
+	∙	More double numerals made explicitly so (e.g. 1 ⇒ 1.0).
+	∙	More in-line arithmetic (e.g. sqrt(2.0) / 2.0 ⇒ sqrt(0.5)).
+	∙	More optimizations of ifloor(X / Y.0) ⇒ X / Y.
+	∙	Finally resolved and fixed a bug in testminqpunit_generallcqptest() [a conditional expression was synthesized erroneously].
+	∙	testsvdunit_get[bd]svderror(): Corrected the mistake on the "Ok" flag (the logic was erroneously reversed).
 </pre>
 </p>
 <p>
@@ -1261,6 +1270,7 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 0-39	7634 0.9x 11237 1.1x 12199 1.0x 9550 1.0x 1650824757 (62659635) 78 // Localized more static constants.
 40	8065 1.0x 12049 1.0x 11769 1.0x 9403 1.0x 1651429624 (626ed0f8) 80 // Minor changes to sync to 3.18.0.
 40	8130 1.0x 12501 1.0x 11240 0.9x 9576 1.0x 1651694486 (6272db96) 79 // Notes.htm: Compiling a ‟Most Recent” test run.
+0-39	8130 1.0x 12347 1.0x 12199 0.9x 9502 1.0x 1652120495 (62795baf) 78 // TestC.cpp: Minor changes to sync to 3.18.0.
 </pre>
 </p>
 <p>
@@ -1316,17 +1326,17 @@ Issues:
 Performance:
 * RGEMM-SEQ-16   (MFLOPS)   8130
 * RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12501
+* RGEMM-SEQ-32   (MFLOPS)  12347
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  11240
+* RGEMM-SEQ-64   (MFLOPS)  12199
 * RGEMM-MTN-64              0.9x
-* RGEMM-SEQ-1024 (MFLOPS)   9576
+* RGEMM-SEQ-1024 (MFLOPS)   9502
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-Seed: 1651694486 (6272db96)
+Seed: 1652120495 (62795baf)
 Compiler: GCC
 Hardware: 64-bit
 Byte Order: little-endian
@@ -1426,7 +1436,7 @@ Testing Mode: single core
 88/90: knn                              Ok
 89/90: mlptrain                         Ok
 90/90: alglibbasics                     Ok
-Done in 79 seconds
+Done in 78 seconds
 </pre>
 </p>
 </div>
