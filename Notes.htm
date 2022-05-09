@@ -385,6 +385,7 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>POLYNOMIALSOLVER: (LinAlg) EVD, TRFAC</li>
    <li>DIRECTDENSESOLVERS: (AlgLibInternal) XBLAS │ (LinAlg) SVD, RCOND</li>
    <li>DIRECTSPARSESOLVERS: (LinAlg) TRFAC</li>
+   <li>ITERATIVESPARSE: (LinAlg) FBLS │ DIRECTSPARSESOLVERS</li>
    <li>LINCG: (LinAlg) MATGEN, SPARSE</li>
    <li>LINLSQR: (LinAlg) SVD, NORMESTIMATOR</li>
    <li>NLEQ: (AlgLibInternal) LINMIN │ (LinAlg) FBLS</li>
@@ -424,6 +425,7 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>MINNS: MINBLEIC</li>
    <li>MINCOMP: MINLBFGS, MINBLEIC</li>
    <li>MINBC: (AlgLibInternal) LINMIN │ OPTSERV</li>
+   <li>OPTS: MINLP</li>
 </ul></li>
 <li>Interpolation: Integration Optimization [AlgLibInternal AlgLibMisc LinAlg Solvers]<ul>
    <li>RATINT: (AlgLibInternal) TSORT</li>
@@ -485,31 +487,32 @@ There are 6 groups of routines (labeled A, B, C, D, E and F), based on which par
 <pre class=narration>
 ABCDEF	│ COMMERCIAL EDITION OF ALGLIB:
 ABCDEF	│
-ABC───	│ Commercial Edition of ALGLIB includes following important improvements of this function:
+ABC──F	│ Commercial Edition of ALGLIB includes following important improvements of this function:
 ───DE─	│ Commercial version of ALGLIB includes one important improvement of this function, which can be used from C++ and C#:
-─────F	│ Commercial version of ALGLIB includes two important improvements of this function, which can be used from C++ and C#:
-ABC───	│ ∙	high-performance native backend with same C# interface (C# version)
-─BC───	│ ∙	hardware vendor (Intel) implementations of linear algebra primitives (C++ and C# versions, x86_64 platform)
-AB────	│ ∙	multithreading support (C++ and C# versions)
-───DEF	│ ∙	Intel MKL support (lightweight Intel MKL is shipped with ALGLIB)
-─────F	│ ∙	multithreading support
-───DEF	│
-───DEF	│ Intel MKL gives approximately constant (with respect to number of worker threads)
-───DEF	│ acceleration factor which depends on CPU being used,
-───DEF	│ problem size and "baseline" ALGLIB edition which is used for comparison.
-─────F	│ Best results are achieved for high-dimensional problems
-─────F	│ (NVars is at least 256).
-─────F	│
-─────F	│ Multithreading is used to accelerate initial phase of LDA, which includes calculation of products of large matrices.
-─────F	│ Again, for best efficiency problem must be high-dimensional.
-───D─F	│
-───D─F	│ Generally, commercial ALGLIB is several times faster than open-source generic C edition,
-───D─F	│ and many times faster than open-source C# edition.
+ABC──F	│ ∙	high-performance native backend with same C# interface (C# version)
+AB───F	│ ∙	multithreading support (C++ and C# versions)
+─BC──F	│ ∙	hardware vendor (Intel) implementations of linear algebra primitives (C++ and C# versions, x86/x64 platform)
+───DE─	│ ∙	Intel MKL support (lightweight Intel MKL is shipped with ALGLIB)
+ABCDEF	│
+───DE─	│ Intel MKL gives approximately constant (with respect to number of worker threads)
+───DE─	│ acceleration factor which depends on CPU being used,
+───DE─	│ problem size and "baseline" ALGLIB edition which is used for comparison.
 ───DE─	│
+───D──	│ Generally, commercial ALGLIB is several times faster than open-source generic C edition,
+───D──	│ and many times faster than open-source C# edition.
+───D──	│
 ───DE─	│ Multithreaded acceleration is NOT supported for this function.
 ABCDEF	│
-ABCDEF	│ We recommend you to read 'Working with the Commercial Version' section of ALGLIB Reference Manual
+ABCDEF	│ We recommend you to read 'Working with commercial version' section of ALGLIB Reference Manual
 ABCDEF	│ in order to find out how to use performance-related features provided by commercial edition of ALGLIB.
+
+─────F	│ FREE EDITION OF ALGLIB:
+─────F	│
+─────F	│ Free Edition of ALGLIB supports following important features for this function:
+─────F	│ ∙	C++ version: x64 SIMD support using C++ intrinsics
+─────F	│ ∙	C# version: x64 SIMD support using NET5/NetCore hardware intrinsics
+─────F	│ We recommend you to read 'Compiling ALGLIB' section of the ALGLIB Reference Manual
+─────F	│ in order to find out how to activate SIMD support in ALGLIB.
 </pre>
 </p>
 <p>
@@ -517,7 +520,7 @@ ABCDEF	│ in order to find out how to use performance-related features provided
 The routines are listed by subpackage module:
 <ul>
 <li>8.2.2. clustering<ul>
-<li><b>B</b>: clusterizergetdistances, clusterizerrunahc, clusterizerrunkmeans</li>
+<li><b>F</b>: clusterizergetdistances, clusterizerrunahc, clusterizerrunkmeans</li>
 </ul></li>
 <li>8.2.4. dforest<ul>
 <li><b>A</b>: dfbuilderbuildrandomforest</li>
@@ -526,8 +529,7 @@ The routines are listed by subpackage module:
 <li><b>A</b>: knnbuilderbuildknnmodel</li>
 </ul></li>
 <li>8.2.7. lda<ul>
-<li><b>F</b>: fisherlda</li>
-<li><b>B</b>: fisherldan</li>
+<li><b>F</b>: fisherlda, fisherldan</li>
 </ul></li>
 <li>8.2.11. mlpbase<ul>
 <li><b>A</b>: mlpallerrorssparsesubset, mlpallerrorssubset, mlpavgce, mlpavgcesparse, mlpavgerror, mlpavgerrorsparse, mlpavgrelerror, mlpavgrelerrorsparse, mlpclserror, mlperror, mlperrorsparse, mlperrorsparsesubset, mlperrorsubset, mlpgradbatch, mlpgradbatchsparse, mlpgradbatchsparsesubset, mlpgradbatchsubset, mlprelclserror, mlprelclserrorsparse, mlprmserror, mlprmserrorsparse</li>
@@ -536,38 +538,35 @@ The routines are listed by subpackage module:
 <li><b>A</b>: mlpcontinuetraining, mlpkfoldcv, mlptrainensemblees, mlptrainnetwork</li>
 </ul></li>
 <li>8.2.14. pca<ul>
-<li><b>B</b>: pcabuildbasis, pcatruncatedsubspace, pcatruncatedsubspacesparse</li>
+<li><b>F</b>: pcabuildbasis, pcatruncatedsubspace, pcatruncatedsubspacesparse</li>
 </ul></li>
 <li>8.6.2. idw<ul>
 <li><b>A</b>: idwbuildercreate</li>
 </ul></li>
 <li>8.6.4. lsfit<ul>
-<li><b>B</b>: barycentricfitfloaterhormann, barycentricfitfloaterhormannwc, lsfitlinear, lsfitlinearc, lsfitlinearw, lsfitlinearwc, polynomialfit, polynomialfitwc, spline1dfitcubic, spline1dfitcubicwc, spline1dfithermite, spline1dfithermitewc</li>
+<li><b>F</b>: barycentricfitfloaterhormann, barycentricfitfloaterhormannwc, lsfitlinear, lsfitlinearc, lsfitlinearw, lsfitlinearwc, polynomialfit, polynomialfitwc, spline1dfitcubic, spline1dfitcubicwc, spline1dfithermite, spline1dfithermitewc</li>
 </ul></li>
 <li>8.6.8. rbf<ul>
 <li><b>A</b>: rbfgridcalc2v, rbfgridcalc2vsubset, rbfgridcalc3v, rbfgridcalc3vsubset</li>
-</ul></li>
-<li>8.6.9. spline1d<ul>
-<li><b>B</b>: spline1dfitpenalized, spline1dfitpenalizedw (Not supported after version 3.15.0, no commercial-level replacement in 3.16.0)</li>
 </ul></li>
 <li>8.6.10. spline2d<ul>
 <li><b>B</b>: spline2dbuildercreate, spline2dbuildersetalgoblocklls, spline2dbuildersetalgofastddm, spline2dfit</li>
 </ul></li>
 <li>8.7.1. ablas<ul>
-<li><b>B</b>: cmatrixgemm, cmatrixherk, cmatrixlefttrsm, cmatrixrighttrsm, rmatrixgemm, rmatrixlefttrsm, rmatrixrighttrsm, rmatrixsyrk</li>
+<li><b>F</b>: cmatrixgemm, cmatrixherk, cmatrixlefttrsm, cmatrixrighttrsm, rmatrixgemm, rmatrixlefttrsm, rmatrixrighttrsm, rmatrixsyrk</li>
 </ul></li>
 <li>8.7.2. bdsvd<ul>
 <li><b>D</b>: rmatrixbdsvd</li>
 </ul></li>
 <li>8.7.3. evd<ul>
-<li><b>B</b>: eigsubspacesolvedenses</li>
+<li><b>F</b>: eigsubspacesolvedenses</li>
 <li><b>C</b>: hmatrixevd, rmatrixevd, smatrixevd, smatrixevdr, smatrixtdevd</li>
 </ul></li>
 <li>8.7.7. matinv<ul>
-<li><b>B</b>: cmatrixinverse, cmatrixluinverse, cmatrixtrinverse, hpdmatrixcholeskyinverse, hpdmatrixinverse, rmatrixinverse, rmatrixluinverse, rmatrixtrinverse, spdmatrixcholeskyinverse, spdmatrixinverse</li>
+<li><b>F</b>: cmatrixinverse, cmatrixluinverse, cmatrixtrinverse, hpdmatrixcholeskyinverse, hpdmatrixinverse, rmatrixinverse, rmatrixluinverse, rmatrixtrinverse, spdmatrixcholeskyinverse, spdmatrixinverse</li>
 </ul></li>
 <li>8.7.9. ortfac<ul>
-<li><b>B</b>: cmatrixlq, cmatrixlqunpackq, cmatrixqr, cmatrixqrunpackq, rmatrixlq, rmatrixlqunpackq, rmatrixqr, rmatrixqrunpackq</li>
+<li><b>F</b>: cmatrixlq, cmatrixlqunpackq, cmatrixqr, cmatrixqrunpackq, rmatrixlq, rmatrixlqunpackq, rmatrixqr, rmatrixqrunpackq</li>
 <li><b>C</b>: hmatrixtd, hmatrixtdunpackq, rmatrixbd, rmatrixbdmultiplybyq, rmatrixbdunpackq, rmatrixhessenberg, rmatrixhessenbergunpackq, smatrixtd, smatrixtdunpackq</li>
 </ul></li>
 <li>8.7.11. schur<ul>
@@ -577,10 +576,10 @@ The routines are listed by subpackage module:
 <li><b>C</b>: rmatrixsvd</li>
 </ul></li>
 <li>8.7.15. trfac<ul>
-<li><b>B</b>: cmatrixlu, hpdmatrixcholesky, rmatrixlu, spdmatrixcholesky</li>
+<li><b>F</b>: cmatrixlu, hpdmatrixcholesky, rmatrixlu, spdmatrixcholesky</li>
 </ul></li>
 <li>8.9.1. directdensesolvers<ul>
-<li><b>B</b>: cmatrixlusolvem, cmatrixlusolvemfast, cmatrixsolve, cmatrixsolvefast, cmatrixsolvem, cmatrixsolvemfast, hpdmatrixsolve, hpdmatrixsolvefast, hpdmatrixsolvem, hpdmatrixsolvemfast, rmatrixlusolvem, rmatrixlusolvemfast, rmatrixsolve, rmatrixsolvefast, rmatrixsolvels, rmatrixsolvem, rmatrixsolvemfast, spdmatrixsolve, spdmatrixsolvefast, spdmatrixsolvem, spdmatrixsolvemfast</li>
+<li><b>F</b>: cmatrixlusolvem, cmatrixlusolvemfast, cmatrixsolve, cmatrixsolvefast, cmatrixsolvem, cmatrixsolvemfast, hpdmatrixsolve, hpdmatrixsolvefast, hpdmatrixsolvem, hpdmatrixsolvemfast, rmatrixlusolvem, rmatrixlusolvemfast, rmatrixsolve, rmatrixsolvefast, rmatrixsolvels, rmatrixsolvem, rmatrixsolvemfast, spdmatrixsolve, spdmatrixsolvefast, spdmatrixsolvem, spdmatrixsolvemfast</li>
 </ul></li>
 <li>8.11.1. basestat<ul>
 <li><b>A</b>: rankdata, rankdatacentered</li>
@@ -1108,6 +1107,10 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	∙	More optimizations of ifloor(X / Y.0) ⇒ X / Y.
 	∙	Finally resolved and fixed a bug in testminqpunit_generallcqptest() [a conditional expression was synthesized erroneously].
 	∙	testsvdunit_get[bd]svderror(): Corrected the mistake on the "Ok" flag (the logic was erroneously reversed).
+40	Notes.htm: Minor correction to an internal link.
+40	{Manual,Notes}.htm: Updated the documentation to alglib.3.18.
+40	{LinAlg,Solvers,Optimization}.{cpp,h}, TestC.cpp: Integrated the changes made in alglib.3.18.
+	Inclusion of the notes for the alglib.3.18 branch are to later be added here.
 </pre>
 </p>
 <p>
@@ -1271,10 +1274,11 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 40	8065 1.0x 12049 1.0x 11769 1.0x 9403 1.0x 1651429624 (626ed0f8) 80 // Minor changes to sync to 3.18.0.
 40	8130 1.0x 12501 1.0x 11240 0.9x 9576 1.0x 1651694486 (6272db96) 79 // Notes.htm: Compiling a ‟Most Recent” test run.
 0-39	8130 1.0x 12347 1.0x 12199 0.9x 9502 1.0x 1652120495 (62795baf) 78 // TestC.cpp: Minor changes to sync to 3.18.0.
+40	7143 1.1x 12501 1.0x 12350 1.0x 9784 1.0x 1652120083 (62795a13) 75 // Updated {LinAlg,Solvers,Optimization,TestC}.* to 3.18.0.
 </pre>
 </p>
 <p>
-<a name=supp_History3 class=sheader></a><h3>A6.4. The Most Recent Test Run</h3>
+<a name=supp_History4 class=sheader></a><h3>A6.4. The Most Recent Test Run</h3>
 <pre class=narration>
 echo "TestI: API Interface"
 TestI: API Interface
@@ -1324,19 +1328,19 @@ Issues:
 * Issue 813                   Ok
 * Issue 824                   Ok
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   8130
-* RGEMM-MTN-16              1.0x
-* RGEMM-SEQ-32   (MFLOPS)  12347
+* RGEMM-SEQ-16   (MFLOPS)   7143
+* RGEMM-MTN-16              1.1x
+* RGEMM-SEQ-32   (MFLOPS)  12501
 * RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12199
-* RGEMM-MTN-64              0.9x
-* RGEMM-SEQ-1024 (MFLOPS)   9502
+* RGEMM-SEQ-64   (MFLOPS)  12350
+* RGEMM-MTN-64              1.0x
+* RGEMM-SEQ-1024 (MFLOPS)   9784
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... Ok
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-Seed: 1652120495 (62795baf)
+Seed: 1652120083 (62795a13)
 Compiler: GCC
 Hardware: 64-bit
 Byte Order: little-endian
@@ -1436,7 +1440,7 @@ Testing Mode: single core
 88/90: knn                              Ok
 89/90: mlptrain                         Ok
 90/90: alglibbasics                     Ok
-Done in 78 seconds
+Done in 75 seconds
 </pre>
 </p>
 </div>

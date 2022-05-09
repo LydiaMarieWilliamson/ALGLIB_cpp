@@ -203,6 +203,9 @@ struct sparsematrix {
 void sparsematrix_init(void *_p, bool make_automatic);
 void sparsematrix_copy(void *_dst, void *_src, bool make_automatic);
 void sparsematrix_free(void *_p, bool make_automatic);
+void sparsealloc(ae_serializer *s, sparsematrix *a);
+void sparseserialize(ae_serializer *s, sparsematrix *a);
+void sparseunserialize(ae_serializer *s, sparsematrix *a);
 
 struct sparsebuffers {
    ae_vector d;
@@ -280,6 +283,10 @@ ae_int_t sparsegetlowercount(sparsematrix *s);
 namespace alglib {
 DecClass(sparsematrix, );
 DecClass(sparsebuffers, );
+void sparseserialize(sparsematrix &obj, std::string &s_out);
+void sparseserialize(sparsematrix &obj, std::ostream &s_out);
+void sparseunserialize(const std::string &s_in, sparsematrix &obj);
+void sparseunserialize(const std::istream &s_in, sparsematrix &obj);
 
 void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const ae_int_t k, const sparsematrix &s);
 void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const sparsematrix &s);
@@ -603,16 +610,19 @@ struct amdbuffer {
    amdknset sete;
    amdllmatrix mtxl;
    amdvertexset vertexdegrees;
+   amdnset setq;
    ae_vector perm;
    ae_vector invperm;
    ae_vector columnswaps;
+   amdnset setp;
    amdnset lp;
-   amdnset plp;
+   amdnset setrp;
    amdnset ep;
    amdnset adji;
    amdnset adjj;
    ae_vector ls;
    ae_int_t lscnt;
+   amdnset setqsupercand;
    amdnset exactdegreetmp0;
    amdknset hashbuckets;
    amdnset nonemptybuckets;
@@ -625,6 +635,7 @@ void amdbuffer_init(void *_p, bool make_automatic);
 void amdbuffer_copy(void *_dst, void *_src, bool make_automatic);
 void amdbuffer_free(void *_p, bool make_automatic);
 
+ae_int_t generateamdpermutationx(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, ae_int_t amdtype, amdbuffer *buf);
 void generateamdpermutation(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, amdbuffer *buf);
 } // end of namespace alglib_impl
 
@@ -657,7 +668,7 @@ struct spcholanalysis {
    ae_vector ladjplusr;
    ae_vector ladjplus;
    ae_vector outrowcounts;
-   sparsematrix wrkat;
+   ae_vector inputstorage;
    ae_vector outputstorage;
    ae_vector rowstrides;
    ae_vector rowoffsets;
@@ -675,6 +686,16 @@ struct spcholanalysis {
    ae_vector tmp3;
    ae_vector tmp4;
    sparsematrix tmpa;
+   sparsematrix tmpat;
+   sparsematrix tmpa2;
+   sparsematrix tmpbottomt;
+   sparsematrix tmpupdate;
+   sparsematrix tmpupdatet;
+   sparsematrix tmpnewtailt;
+   ae_vector tmpperm;
+   ae_vector invtmpperm;
+   ae_vector tmpx;
+   ae_vector simdbuf;
 };
 void spcholanalysis_init(void *_p, bool make_automatic);
 void spcholanalysis_copy(void *_dst, void *_src, bool make_automatic);
@@ -684,7 +705,11 @@ ae_int_t spsymmgetmaxfastkernel();
 bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spcholanalysis *analysis);
 void spsymmsetmodificationstrategy(spcholanalysis *analysis, ae_int_t modstrategy, double p0, double p1, double p2, double p3);
 void spsymmreload(spcholanalysis *analysis, sparsematrix *a);
-bool spsymmfactorize(spcholanalysis *analysis, sparsematrix *a, RVector *d, ZVector *p);
+void spsymmreloaddiagonal(spcholanalysis *analysis, RVector *d);
+bool spsymmfactorize(spcholanalysis *analysis);
+void spsymmextract(spcholanalysis *analysis, sparsematrix *a, RVector *d, ZVector *p);
+void spsymmsolve(spcholanalysis *analysis, RVector *b);
+void spsymmdiagerr(spcholanalysis *analysis, double *sumsq, double *errsq);
 } // end of namespace alglib_impl
 
 // === TRFAC Package ===

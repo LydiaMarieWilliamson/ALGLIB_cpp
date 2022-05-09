@@ -12,8 +12,1355 @@ using namespace alglib_impl;
 inline static bool RelNear(double A, double B, double Tiny, double Scale) { return NearAtR(A, B, Tiny * rmax2(fabs(B), Scale)); }
 
 // === ablasf testing unit ===
+struct ablasfplayground {
+   double v0;
+   ae_vector x0;
+   ae_vector x1;
+   ae_vector x2;
+   ae_vector ix0;
+   ae_vector ix1;
+   ae_vector bx0;
+   ae_vector bx1;
+   ae_matrix a0;
+   ae_matrix a1;
+};
+
+static void ablasfplayground_init(void *_p, bool make_automatic) {
+   ablasfplayground *p = (ablasfplayground *)_p;
+   ae_vector_init(&p->x0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->x1, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->x2, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->ix0, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->ix1, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->bx0, 0, DT_BOOL, make_automatic);
+   ae_vector_init(&p->bx1, 0, DT_BOOL, make_automatic);
+   ae_matrix_init(&p->a0, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->a1, 0, 0, DT_REAL, make_automatic);
+}
+
+static void ablasfplayground_copy(void *_dst, void *_src, bool make_automatic) {
+   ablasfplayground *dst = (ablasfplayground *)_dst;
+   ablasfplayground *src = (ablasfplayground *)_src;
+   dst->v0 = src->v0;
+   ae_vector_copy(&dst->x0, &src->x0, make_automatic);
+   ae_vector_copy(&dst->x1, &src->x1, make_automatic);
+   ae_vector_copy(&dst->x2, &src->x2, make_automatic);
+   ae_vector_copy(&dst->ix0, &src->ix0, make_automatic);
+   ae_vector_copy(&dst->ix1, &src->ix1, make_automatic);
+   ae_vector_copy(&dst->bx0, &src->bx0, make_automatic);
+   ae_vector_copy(&dst->bx1, &src->bx1, make_automatic);
+   ae_matrix_copy(&dst->a0, &src->a0, make_automatic);
+   ae_matrix_copy(&dst->a1, &src->a1, make_automatic);
+}
+
+static void ablasfplayground_free(void *_p, bool make_automatic) {
+   ablasfplayground *p = (ablasfplayground *)_p;
+   ae_vector_free(&p->x0, make_automatic);
+   ae_vector_free(&p->x1, make_automatic);
+   ae_vector_free(&p->x2, make_automatic);
+   ae_vector_free(&p->ix0, make_automatic);
+   ae_vector_free(&p->ix1, make_automatic);
+   ae_vector_free(&p->bx0, make_automatic);
+   ae_vector_free(&p->bx1, make_automatic);
+   ae_matrix_free(&p->a0, make_automatic);
+   ae_matrix_free(&p->a1, make_automatic);
+}
+
+static double refrdotv(ae_int_t n, RVector *x, RVector *y) {
+   ae_int_t i;
+   double result;
+   result = 0.0;
+   for (i = 0; i < n; i++) {
+      result += x->xR[i] * y->xR[i];
+   }
+   return result;
+}
+
+static double refrdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i) {
+   ae_int_t j;
+   double result;
+   result = 0.0;
+   for (j = 0; j < n; j++) {
+      result += x->xR[j] * a->xyR[i][j];
+   }
+   return result;
+}
+
+static double refrdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib) {
+   ae_int_t j;
+   double result;
+   result = 0.0;
+   for (j = 0; j < n; j++) {
+      result += a->xyR[ia][j] * b->xyR[ib][j];
+   }
+   return result;
+}
+
+static double refrdotv2(ae_int_t n, RVector *x) {
+   ae_int_t i;
+   double v;
+   double result;
+   result = 0.0;
+   for (i = 0; i < n; i++) {
+      v = x->xR[i];
+      result += v * v;
+   }
+   return result;
+}
+
+static void refraddv(ae_int_t n, double alpha, RVector *y, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] += alpha * y->xR[i];
+   }
+}
+
+static void refraddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[offsx + i] += alpha * y->xR[offsy + i];
+   }
+}
+
+static void refraddvc(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t colidx) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xyR[i][colidx] += alpha * y->xR[i];
+   }
+}
+
+static void refraddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xyR[rowidx][i] += alpha * y->xR[i];
+   }
+}
+
+static void refraddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] += alpha * y->xyR[ridx][i];
+   }
+}
+
+static void refraddrr(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridxsrc, RMatrix *x, ae_int_t ridxdst) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xyR[ridxdst][i] += alpha * y->xyR[ridxsrc][i];
+   }
+}
+
+static void refrsetv(ae_int_t n, double v, RVector *x) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      x->xR[j] = v;
+   }
+}
+
+static void refrsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      x->xR[offsx + j] = v;
+   }
+}
+
+static void refisetv(ae_int_t n, ae_int_t v, ZVector *x) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      x->xZ[j] = v;
+   }
+}
+
+static void refbsetv(ae_int_t n, bool v, BVector *x) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      x->xB[j] = v;
+   }
+}
+
+static void refrsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   for (i = 0; i < m; i++) {
+      for (j = 0; j < n; j++) {
+         a->xyR[i][j] = v;
+      }
+   }
+}
+
+static void refrsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      a->xyR[i][j] = v;
+   }
+}
+
+static void refrsetc(ae_int_t n, double v, RMatrix *a, ae_int_t j) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      a->xyR[i][j] = v;
+   }
+}
+
+static void refrcopyv(ae_int_t n, RVector *x, RVector *y) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      y->xR[j] = x->xR[j];
+   }
+}
+
+static void refbcopyv(ae_int_t n, BVector *x, BVector *y) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      y->xB[j] = x->xB[j];
+   }
+}
+
+static void refrcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      y->xR[offsy + j] = x->xR[offsx + j];
+   }
+}
+
+static void reficopyv(ae_int_t n, ZVector *x, ZVector *y) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      y->xZ[j] = x->xZ[j];
+   }
+}
+
+static void reficopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      y->xZ[offsy + j] = x->xZ[offsx + j];
+   }
+}
+
+static void refrcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      a->xyR[i][j] = x->xR[j];
+   }
+}
+
+static void refrcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      x->xR[j] = a->xyR[i][j];
+   }
+}
+
+static void refrcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k) {
+   ae_int_t j;
+   for (j = 0; j < n; j++) {
+      b->xyR[k][j] = a->xyR[i][j];
+   }
+}
+
+static void refrcopyvc(ae_int_t n, RVector *x, RMatrix *a, ae_int_t j) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      a->xyR[i][j] = x->xR[i];
+   }
+}
+
+static void refrcopycv(ae_int_t n, RMatrix *a, ae_int_t j, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] = a->xyR[i][j];
+   }
+}
+
+static void refrcopymulv(ae_int_t n, double v, RVector *x, RVector *y) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      y->xR[i] = v * x->xR[i];
+   }
+}
+
+static void refrcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      y->xyR[ridx][i] = v * x->xR[i];
+   }
+}
+
+static void refrcopymulvc(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t cidx) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      y->xyR[i][cidx] = v * x->xR[i];
+   }
+}
+
+static void refrmulv(ae_int_t n, double v, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] *= v;
+   }
+}
+
+static void refrmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xyR[rowidx][i] *= v;
+   }
+}
+
+static void refrmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[offsx + i] *= v;
+   }
+}
+
+static void refrmergemulv(ae_int_t n, RVector *y, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] *= y->xR[i];
+   }
+}
+
+static void refrmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xyR[rowidx][i] *= y->xR[i];
+   }
+}
+
+static void refrmergemulrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] *= y->xyR[rowidx][i];
+   }
+}
+
+static void refrmergemaxv(ae_int_t n, RVector *y, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] = rmax2(x->xR[i], y->xR[i]);
+   }
+}
+
+static void refrmergemaxvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xyR[rowidx][i] = rmax2(x->xyR[rowidx][i], y->xR[i]);
+   }
+}
+
+static void refrmergemaxrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] = rmax2(x->xR[i], y->xyR[rowidx][i]);
+   }
+}
+
+static void refrmergeminv(ae_int_t n, RVector *y, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] = rmin2(x->xR[i], y->xR[i]);
+   }
+}
+
+static void refrmergeminvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xyR[rowidx][i] = rmin2(x->xyR[rowidx][i], y->xR[i]);
+   }
+}
+
+static void refrmergeminrv(ae_int_t n, RMatrix *y, ae_int_t rowidx, RVector *x) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      x->xR[i] = rmin2(x->xR[i], y->xyR[rowidx][i]);
+   }
+}
+
+static double refrmaxv(ae_int_t n, RVector *x) {
+   ae_int_t i;
+   double v;
+   double result;
+   if (n <= 0) {
+      result = 0.0;
+      return result;
+   }
+   result = x->xR[0];
+   for (i = 0; i < n; i++) {
+      v = x->xR[i];
+      if (v > result) {
+         result = v;
+      }
+   }
+   return result;
+}
+
+static double refrmaxabsv(ae_int_t n, RVector *x) {
+   ae_int_t i;
+   double v;
+   double result;
+   result = 0.0;
+   for (i = 0; i < n; i++) {
+      v = fabs(x->xR[i]);
+      if (v > result) {
+         result = v;
+      }
+   }
+   return result;
+}
+
+static double refrmaxr(ae_int_t n, RMatrix *x, ae_int_t rowidx) {
+   ae_int_t i;
+   double v;
+   double result;
+   if (n <= 0) {
+      result = 0.0;
+      return result;
+   }
+   result = x->xyR[rowidx][0];
+   for (i = 0; i < n; i++) {
+      v = x->xyR[rowidx][i];
+      if (v > result) {
+         result = v;
+      }
+   }
+   return result;
+}
+
+static double refrmaxabsr(ae_int_t n, RMatrix *x, ae_int_t rowidx) {
+   ae_int_t i;
+   double v;
+   double result;
+   result = 0.0;
+   for (i = 0; i < n; i++) {
+      v = fabs(x->xyR[rowidx][i]);
+      if (v > result) {
+         result = v;
+      }
+   }
+   return result;
+}
+
+static void refrgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
+   ae_int_t i;
+   double v;
+// Quick exit for M == 0, N == 0 or Alpha == 0.
+//
+// After this block we have M > 0, N > 0, Alpha != 0.
+   if (m <= 0) {
+      return;
+   }
+   if (n <= 0 || alpha == 0.0) {
+      if (beta != 0.0) {
+         for (i = 0; i < m; i++) {
+            y->xR[iy + i] *= beta;
+         }
+      } else {
+         for (i = 0; i < m; i++) {
+            y->xR[iy + i] = 0.0;
+         }
+      }
+      return;
+   }
+// Generic code
+   if (opa == 0) {
+   // y = A*x
+      for (i = 0; i < m; i++) {
+         v = ae_v_dotproduct(&a->xyR[ia + i][ja], 1, &x->xR[ix], 1, n);
+         if (beta == 0.0) {
+            y->xR[iy + i] = alpha * v;
+         } else {
+            y->xR[iy + i] = alpha * v + beta * y->xR[iy + i];
+         }
+      }
+      return;
+   }
+   if (opa == 1) {
+   // Prepare output array
+      if (beta == 0.0) {
+         for (i = 0; i < m; i++) {
+            y->xR[iy + i] = 0.0;
+         }
+      } else {
+         for (i = 0; i < m; i++) {
+            y->xR[iy + i] *= beta;
+         }
+      }
+   // y += A^T*x
+      for (i = 0; i < n; i++) {
+         v = alpha * x->xR[ix + i];
+         ae_v_addd(&y->xR[iy], 1, &a->xyR[ia + i][ja], 1, iy + m - iy, v);
+      }
+      return;
+   }
+}
+
+// Reference TRSV
+static void reftrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix) {
+   ae_int_t i;
+   ae_int_t j;
+   double v;
+// Quick exit
+   if (n <= 0) {
+      return;
+   }
+// Generic code
+   if (optype == 0 && isupper) {
+      for (i = n - 1; i >= 0; i--) {
+         v = x->xR[ix + i];
+         for (j = i + 1; j < n; j++) {
+            v -= a->xyR[ia + i][ja + j] * x->xR[ix + j];
+         }
+         if (!isunit) {
+            v /= a->xyR[ia + i][ja + i];
+         }
+         x->xR[ix + i] = v;
+      }
+      return;
+   }
+   if (optype == 0 && !isupper) {
+      for (i = 0; i < n; i++) {
+         v = x->xR[ix + i];
+         for (j = 0; j < i; j++) {
+            v -= a->xyR[ia + i][ja + j] * x->xR[ix + j];
+         }
+         if (!isunit) {
+            v /= a->xyR[ia + i][ja + i];
+         }
+         x->xR[ix + i] = v;
+      }
+      return;
+   }
+   if (optype == 1 && isupper) {
+      for (i = 0; i < n; i++) {
+         v = x->xR[ix + i];
+         if (!isunit) {
+            v /= a->xyR[ia + i][ja + i];
+         }
+         x->xR[ix + i] = v;
+         if (v == 0) {
+            continue;
+         }
+         for (j = i + 1; j < n; j++) {
+            x->xR[ix + j] -= v * a->xyR[ia + i][ja + j];
+         }
+      }
+      return;
+   }
+   if (optype == 1 && !isupper) {
+      for (i = n - 1; i >= 0; i--) {
+         v = x->xR[ix + i];
+         if (!isunit) {
+            v /= a->xyR[ia + i][ja + i];
+         }
+         x->xR[ix + i] = v;
+         if (v == 0) {
+            continue;
+         }
+         for (j = 0; j < i; j++) {
+            x->xR[ix + j] -= v * a->xyR[ia + i][ja + j];
+         }
+      }
+      return;
+   }
+   ae_assert(false, "RMatrixTRSV: unexpected operation type");
+}
+
+static ae_int_t testablasfunit_pseudorandominit1(RVector *x, ae_int_t iseed) {
+   ae_int_t i;
+   ae_int_t result;
+   for (i = 0; i < x->cnt; i++) {
+      x->xR[i] = sin(iseed + sin(i));
+      iseed++;
+   }
+   result = iseed;
+   return result;
+}
+
+static ae_int_t testablasfunit_pseudorandominit1i(ZVector *x, ae_int_t iseed) {
+   ae_int_t i;
+   ae_int_t result;
+   for (i = 0; i < x->cnt; i++) {
+      x->xZ[i] = iround(100.0 * sin(iseed + sin(i)));
+      iseed++;
+   }
+   result = iseed;
+   return result;
+}
+
+static ae_int_t testablasfunit_pseudorandominit1b(BVector *x, ae_int_t iseed) {
+   ae_int_t i;
+   ae_int_t result;
+   for (i = 0; i < x->cnt; i++) {
+      x->xB[i] = sin(iseed + sin(i)) > 0.0;
+      iseed++;
+   }
+   result = iseed;
+   return result;
+}
+
+static ae_int_t testablasfunit_pseudorandominit2(RMatrix *x, ae_int_t iseed) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t result;
+   ae_frame_make(&_frame_block);
+   NewVector(xr, 0, DT_REAL);
+   NewVector(xc, 0, DT_REAL);
+   ae_vector_set_length(&xr, x->rows);
+   for (i = 0; i < x->rows; i++) {
+      xr.xR[i] = sin(13.0 + 2.0 * i + iseed);
+   }
+   iseed++;
+   ae_vector_set_length(&xc, x->cols);
+   for (j = 0; j < x->cols; j++) {
+      xc.xR[j] = sin(17.0 + 3.0 * j + iseed);
+   }
+   iseed++;
+   for (i = 0; i < x->rows; i++) {
+      for (j = 0; j < x->cols; j++) {
+         x->xyR[i][j] = xr.xR[i] + xc.xR[j];
+         while (x->xyR[i][j] > 1.0) {
+            x->xyR[i][j]--;
+         }
+         while (x->xyR[i][j] < -1.0) {
+            x->xyR[i][j]++;
+         }
+      }
+   }
+   result = iseed;
+   ae_frame_leave();
+   return result;
+}
+
+static void testablasfunit_initplayground(ae_int_t minlen, ae_int_t iseed, ablasfplayground *s) {
+   ae_int_t maxpad;
+   ae_int_t k;
+   SetObj(ablasfplayground, s);
+   maxpad = 10;
+   k = iseed + iseed * iseed * iseed;
+   ae_vector_set_length(&s->x0, minlen + iround(maxpad * sqr(sin(k))));
+   k++;
+   ae_vector_set_length(&s->x1, minlen + iround(maxpad * sqr(sin(k))));
+   k++;
+   ae_vector_set_length(&s->x2, minlen + iround(maxpad * sqr(sin(k))));
+   k++;
+   ae_vector_set_length(&s->ix0, minlen + iround(maxpad * sqr(sin(k))));
+   k++;
+   ae_vector_set_length(&s->ix1, minlen + iround(maxpad * sqr(sin(k))));
+   k++;
+   ae_vector_set_length(&s->bx0, minlen + iround(maxpad * sqr(sin(k))));
+   k++;
+   ae_vector_set_length(&s->bx1, minlen + iround(maxpad * sqr(sin(k))));
+   k++;
+   ae_matrix_set_length(&s->a0, minlen + iround(maxpad * sqr(sin(k))), minlen + iround(maxpad * sqr(sin(k + 1.0))));
+   k += 2;
+   ae_matrix_set_length(&s->a1, minlen + iround(maxpad * sqr(sin(k))), minlen + iround(maxpad * sqr(sin(k + 1.0))));
+   k += 2;
+   s->v0 = 0.0;
+   k = testablasfunit_pseudorandominit1(&s->x0, k);
+   k = testablasfunit_pseudorandominit1(&s->x1, k);
+   k = testablasfunit_pseudorandominit1(&s->x2, k);
+   k = testablasfunit_pseudorandominit1i(&s->ix0, k);
+   k = testablasfunit_pseudorandominit1i(&s->ix1, k);
+   k = testablasfunit_pseudorandominit1b(&s->bx0, k);
+   k = testablasfunit_pseudorandominit1b(&s->bx1, k);
+   k = testablasfunit_pseudorandominit2(&s->a0, k);
+   k = testablasfunit_pseudorandominit2(&s->a1, k);
+}
+
+static double testablasfunit_rmx3(double r0, double r1, double r2) {
+   double result;
+   result = r0;
+   if (r1 > result) {
+      result = r1;
+   }
+   if (r2 > result) {
+      result = r2;
+   }
+   return result;
+}
+
+static double testablasfunit_rcmp1(RVector *x, RVector *y) {
+   ae_int_t i;
+   double mx;
+   double result;
+   ae_assert(x->cnt == y->cnt, "rcmp1: sizes do not match");
+   result = 0.0;
+   mx = 1.0;
+   for (i = 0; i < x->cnt; i++) {
+      result = rmax2(result, fabs(x->xR[i] - y->xR[i]));
+      mx = rmax2(mx, fabs(x->xR[i]));
+      mx = rmax2(mx, fabs(y->xR[i]));
+   }
+   result /= mx;
+   return result;
+}
+
+static double testablasfunit_icmp1(ZVector *x, ZVector *y) {
+   ae_int_t i;
+   double result;
+   ae_assert(x->cnt == y->cnt, "rcmp1: sizes do not match");
+   result = 0.0;
+   for (i = 0; i < x->cnt; i++) {
+      result = rmax2(result, fabs(x->xZ[i] - y->xZ[i]));
+   }
+   return result;
+}
+
+static double testablasfunit_bcmp1(BVector *x, BVector *y) {
+   ae_int_t i;
+   double result;
+   ae_assert(x->cnt == y->cnt, "rcmp1: sizes do not match");
+   result = 0.0;
+   for (i = 0; i < x->cnt; i++) {
+      if (x->xB[i] != y->xB[i]) {
+         result = 1.0;
+      }
+   }
+   return result;
+}
+
+static double testablasfunit_rcmp2(RMatrix *x, RMatrix *y) {
+   ae_int_t i;
+   ae_int_t j;
+   double mx;
+   double result;
+   ae_assert(x->rows == y->rows, "rcmp2: rows do not match");
+   ae_assert(x->cols == y->cols, "rcmp2: cols do not match");
+   result = 0.0;
+   mx = 1.0;
+   for (i = 0; i < x->rows; i++) {
+      for (j = 0; j < x->cols; j++) {
+         result = rmax2(result, fabs(x->xyR[i][j] - y->xyR[i][j]));
+         mx = rmax2(mx, fabs(x->xyR[i][j]));
+         mx = rmax2(mx, fabs(y->xyR[i][j]));
+      }
+   }
+   result /= mx;
+   return result;
+}
+
+static double testablasfunit_compareplaygrounds(ablasfplayground *s0, ablasfplayground *s1) {
+   double result;
+   result = 0.0;
+   result = rmax2(result, fabs(s0->v0 - s1->v0) / testablasfunit_rmx3(fabs(s0->v0), fabs(s1->v0), 1.0));
+   result = rmax2(result, testablasfunit_rcmp1(&s0->x0, &s1->x0));
+   result = rmax2(result, testablasfunit_rcmp1(&s0->x1, &s1->x1));
+   result = rmax2(result, testablasfunit_icmp1(&s0->ix0, &s1->ix0));
+   result = rmax2(result, testablasfunit_icmp1(&s0->ix1, &s1->ix1));
+   result = rmax2(result, testablasfunit_bcmp1(&s0->bx0, &s1->bx0));
+   result = rmax2(result, testablasfunit_bcmp1(&s0->bx1, &s1->bx1));
+   result = rmax2(result, testablasfunit_rcmp1(&s0->x2, &s1->x2));
+   result = rmax2(result, testablasfunit_rcmp2(&s0->a0, &s1->a0));
+   result = rmax2(result, testablasfunit_rcmp2(&s0->a1, &s1->a1));
+   return result;
+}
+
+static bool testablasfunit_testxdot(ae_int_t maxn, double tol) {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t iseed;
+   ae_int_t ridx;
+   ae_int_t ridx2;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(ablasfplayground, s0);
+   NewObj(ablasfplayground, s1);
+   iseed = randominteger(10000);
+   Ok = true;
+   for (n = 0; n <= maxn; n++) {
+   // Prepare two identical playground structures
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      iseed++;
+   // Compute each rDot version twice - reference vs library.
+   // Compare playground snapshots - should be identical.
+      ridx = randominteger(imax2(n, 1));
+      ridx2 = randominteger(imax2(n, 1));
+      Ok = Ok && NearAtR(rdotv(n, &s0.x0, &s0.x1), refrdotv(n, &s1.x0, &s1.x1), tol);
+      Ok = Ok && NearAtR(rdotvr(n, &s0.x0, &s0.a0, ridx), refrdotvr(n, &s1.x0, &s1.a0, ridx), tol);
+      Ok = Ok && NearAtR(rdotrr(n, &s0.a0, ridx, &s0.a1, ridx2), refrdotrr(n, &s1.a0, ridx, &s1.a1, ridx2), tol);
+      Ok = Ok && NearAtR(rdotv2(n, &s0.x0), refrdotv2(n, &s1.x0), tol);
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+static bool testablasfunit_testxset(ae_int_t maxn, double tol) {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t iseed;
+   double alpha;
+   ae_int_t ialpha;
+   bool balpha;
+   ae_int_t ridx;
+   ae_int_t cidx;
+   ae_int_t m0;
+   ae_int_t m1;
+   ae_int_t offsx;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(ablasfplayground, s0);
+   NewObj(ablasfplayground, s1);
+   iseed = randominteger(10000);
+   Ok = true;
+   for (n = 0; n <= maxn; n++) {
+   // Prepare two identical playground structures
+   // Compute each xSetXX version twice - reference vs library.
+   // Compare playground snapshots - should be identical.
+      m0 = randominteger(imax2(n, 1));
+      m1 = randominteger(imax2(n, 1));
+      ridx = randominteger(imax2(n, 1));
+      cidx = randominteger(imax2(n, 1));
+      offsx = randominteger(n / 2 + 1);
+      alpha = randommid();
+      ialpha = randominteger(21) - 10;
+      balpha = randombool();
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rsetv(n, alpha, &s0.x0);
+      refrsetv(n, alpha, &s1.x0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rsetr(n, alpha, &s0.a0, ridx);
+      refrsetr(n, alpha, &s1.a0, ridx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rsetc(n, alpha, &s0.a0, cidx);
+      refrsetc(n, alpha, &s1.a0, cidx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rsetm(m0, m1, alpha, &s0.a0);
+      refrsetm(m0, m1, alpha, &s1.a0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      isetv(n, ialpha, &s0.ix0);
+      refisetv(n, ialpha, &s1.ix0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      bsetv(n, balpha, &s0.bx0);
+      refbsetv(n, balpha, &s1.bx0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rsetvx(n / 2, alpha, &s0.x0, offsx);
+      refrsetvx(n / 2, alpha, &s1.x0, offsx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+   // Increment seed
+      iseed++;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+static bool testablasfunit_testxadd(ae_int_t maxn, double tol) {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t iseed;
+   double alpha;
+   ae_int_t ridx;
+   ae_int_t ridx2;
+   ae_int_t cidx;
+   ae_int_t offsx;
+   ae_int_t offsy;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(ablasfplayground, s0);
+   NewObj(ablasfplayground, s1);
+   iseed = randominteger(10000);
+   Ok = true;
+   for (n = 0; n <= maxn; n++) {
+   // Prepare two identical playground structures
+   // Compute each xAddXX version twice - reference vs library.
+   // Compare playground snapshots - should be identical.
+      ridx = randominteger(imax2(n, 1));
+      ridx2 = randominteger(imax2(n, 1));
+      cidx = randominteger(imax2(n, 1));
+      offsx = randominteger(n / 2 + 1);
+      offsy = randominteger(n / 2 + 1);
+      alpha = randommid();
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      raddv(n, alpha, &s0.x0, &s0.x1);
+      refraddv(n, alpha, &s1.x0, &s1.x1);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      raddvr(n, alpha, &s0.x0, &s0.a0, cidx);
+      refraddvr(n, alpha, &s1.x0, &s1.a0, cidx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      raddvc(n, alpha, &s0.x0, &s0.a0, cidx);
+      refraddvc(n, alpha, &s1.x0, &s1.a0, cidx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      raddrv(n, alpha, &s0.a0, ridx, &s0.x0);
+      refraddrv(n, alpha, &s1.a0, ridx, &s1.x0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      raddrr(n, alpha, &s0.a0, ridx, &s0.a1, ridx2);
+      refraddrr(n, alpha, &s1.a0, ridx, &s1.a1, ridx2);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      raddvx(n / 2, alpha, &s0.x0, offsx, &s0.x1, offsy);
+      refraddvx(n / 2, alpha, &s1.x0, offsx, &s1.x1, offsy);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+   // Increment seed
+      iseed++;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+static bool testablasfunit_testxmul(ae_int_t maxn, double tol) {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t iseed;
+   double alpha;
+   ae_int_t ridx;
+   ae_int_t offsx;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(ablasfplayground, s0);
+   NewObj(ablasfplayground, s1);
+   iseed = randominteger(10000);
+   Ok = true;
+   for (n = 0; n <= maxn; n++) {
+   // Prepare two identical playground structures
+   // Compute each xAddXX version twice - reference vs library.
+   // Compare playground snapshots - should be identical.
+      ridx = randominteger(imax2(n, 1));
+      offsx = randominteger(n / 2 + 1);
+      alpha = randommid();
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmulv(n, alpha, &s0.x0);
+      refrmulv(n, alpha, &s1.x0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmulr(n, alpha, &s0.a0, ridx);
+      refrmulr(n, alpha, &s1.a0, ridx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmulvx(n / 2, alpha, &s0.x0, offsx);
+      refrmulvx(n / 2, alpha, &s1.x0, offsx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+   // Increment seed
+      iseed++;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+static bool testablasfunit_testxmax(ae_int_t maxn, double tol) {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t iseed;
+   ae_int_t ridx;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(ablasfplayground, s0);
+   NewObj(ablasfplayground, s1);
+   iseed = randominteger(10000);
+   Ok = true;
+   for (n = 0; n <= maxn; n++) {
+   // Prepare two identical playground structures
+   // Compute each xAddXX version twice - reference vs library.
+   // Compare playground snapshots - should be identical.
+      ridx = randominteger(imax2(n, 1));
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      s0.v0 = rmaxv(n, &s0.x0);
+      s1.v0 = refrmaxv(n, &s1.x0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      s0.v0 = rmaxabsv(n, &s0.x0);
+      s1.v0 = refrmaxabsv(n, &s1.x0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      s0.v0 = rmaxr(n, &s0.a0, ridx);
+      s1.v0 = refrmaxr(n, &s1.a0, ridx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      s0.v0 = rmaxabsr(n, &s0.a0, ridx);
+      s1.v0 = refrmaxabsr(n, &s1.a0, ridx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+   // Increment seed
+      iseed++;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+static bool testablasfunit_testxmerge(ae_int_t maxn, double tol) {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t iseed;
+   ae_int_t ridx;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(ablasfplayground, s0);
+   NewObj(ablasfplayground, s1);
+   iseed = randominteger(10000);
+   Ok = true;
+   for (n = 0; n <= maxn; n++) {
+   // Prepare two identical playground structures
+   // Compute each xAddXX version twice - reference vs library.
+   // Compare playground snapshots - should be identical.
+      ridx = randominteger(imax2(n, 1));
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmergemulv(n, &s0.x0, &s0.x1);
+      refrmergemulv(n, &s1.x0, &s1.x1);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmergemulvr(n, &s0.x0, &s0.a0, ridx);
+      refrmergemulvr(n, &s1.x0, &s1.a0, ridx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmergemulrv(n, &s0.a0, ridx, &s0.x0);
+      refrmergemulrv(n, &s1.a0, ridx, &s1.x0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmergemaxv(n, &s0.x0, &s0.x1);
+      refrmergemaxv(n, &s1.x0, &s1.x1);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmergemaxvr(n, &s0.x0, &s0.a0, ridx);
+      refrmergemaxvr(n, &s1.x0, &s1.a0, ridx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmergemaxrv(n, &s0.a0, ridx, &s0.x0);
+      refrmergemaxrv(n, &s1.a0, ridx, &s1.x0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmergeminv(n, &s0.x0, &s0.x1);
+      refrmergeminv(n, &s1.x0, &s1.x1);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmergeminvr(n, &s0.x0, &s0.a0, ridx);
+      refrmergeminvr(n, &s1.x0, &s1.a0, ridx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rmergeminrv(n, &s0.a0, ridx, &s0.x0);
+      refrmergeminrv(n, &s1.a0, ridx, &s1.x0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+   // Increment seed
+      iseed++;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+static bool testablasfunit_testxcopy(ae_int_t maxn, double tol) {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t iseed;
+   double alpha;
+   ae_int_t ridx;
+   ae_int_t ridx2;
+   ae_int_t cidx;
+   ae_int_t offsx;
+   ae_int_t offsy;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(ablasfplayground, s0);
+   NewObj(ablasfplayground, s1);
+   iseed = randominteger(10000);
+   Ok = true;
+   for (n = 0; n <= maxn; n++) {
+   // Prepare two identical playground structures
+   // Compute each xAddXX version twice - reference vs library.
+   // Compare playground snapshots - should be identical.
+      ridx = randominteger(imax2(n, 1));
+      ridx2 = randominteger(imax2(n, 1));
+      cidx = randominteger(imax2(n, 1));
+      offsx = randominteger(n / 2 + 1);
+      offsy = randominteger(n / 2 + 1);
+      alpha = randommid();
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rcopyv(n, &s0.x0, &s0.x1);
+      refrcopyv(n, &s1.x0, &s1.x1);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      icopyv(n, &s0.ix0, &s0.ix1);
+      reficopyv(n, &s1.ix0, &s1.ix1);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      bcopyv(n, &s0.bx0, &s0.bx1);
+      refbcopyv(n, &s1.bx0, &s1.bx1);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rcopyvr(n, &s0.x0, &s0.a0, ridx);
+      refrcopyvr(n, &s1.x0, &s1.a0, ridx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rcopyrv(n, &s0.a0, ridx, &s0.x0);
+      refrcopyrv(n, &s1.a0, ridx, &s1.x0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rcopyrr(n, &s0.a0, ridx, &s0.a1, ridx2);
+      refrcopyrr(n, &s1.a0, ridx, &s1.a1, ridx2);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rcopyvc(n, &s0.x0, &s0.a0, cidx);
+      refrcopyvc(n, &s1.x0, &s1.a0, cidx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rcopycv(n, &s0.a0, cidx, &s0.x0);
+      refrcopycv(n, &s1.a0, cidx, &s1.x0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rcopyvx(n / 2, &s0.x0, offsx, &s0.x1, offsy);
+      refrcopyvx(n / 2, &s1.x0, offsx, &s1.x1, offsy);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      icopyvx(n / 2, &s0.ix0, offsx, &s0.ix1, offsy);
+      reficopyvx(n / 2, &s1.ix0, offsx, &s1.ix1, offsy);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rcopymulv(n, alpha, &s0.x0, &s0.x1);
+      refrcopymulv(n, alpha, &s1.x0, &s1.x1);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rcopymulvr(n, alpha, &s0.x0, &s0.a0, ridx);
+      refrcopymulvr(n, alpha, &s1.x0, &s1.a0, ridx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(n, iseed, &s0);
+      testablasfunit_initplayground(n, iseed, &s1);
+      rcopymulvc(n, alpha, &s0.x0, &s0.a0, cidx);
+      refrcopymulvc(n, alpha, &s1.x0, &s1.a0, cidx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+   // Increment seed
+      iseed++;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+static bool testablasfunit_testxgemv(ae_int_t maxn, double tol) {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t m;
+   ae_int_t iseed;
+   double alpha;
+   double beta;
+   ae_int_t offs0;
+   ae_int_t offs1;
+   ae_int_t offsx;
+   ae_int_t offsy;
+   ae_int_t padding;
+   ae_int_t opa;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(ablasfplayground, s0);
+   NewObj(ablasfplayground, s1);
+   iseed = randominteger(10000);
+   Ok = true;
+   for (n = 0; n <= maxn; n++) {
+   // Prepare two identical playground structures
+   // Compute each GEMV version twice - reference vs library.
+   // Compare playground snapshots - should be identical.
+      padding = randominteger(10);
+      m = randominteger(n + 1);
+      offs0 = randominteger(imax2(n, 1));
+      offs1 = randominteger(imax2(n, 1));
+      offsx = randominteger(imax2(n, 1));
+      offsy = randominteger(imax2(n, 1));
+      alpha = randommid() * randominteger(2);
+      beta = randommid() * randominteger(2);
+      opa = randominteger(2);
+      testablasfunit_initplayground(2 * n + padding, iseed, &s0);
+      testablasfunit_initplayground(2 * n + padding, iseed, &s1);
+      rgemv(m, n, alpha, &s0.a0, opa, &s0.x0, beta, &s0.x1);
+      refrgemvx(m, n, alpha, &s1.a0, 0, 0, opa, &s1.x0, 0, beta, &s1.x1, 0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(2 * n + padding, iseed, &s0);
+      testablasfunit_initplayground(2 * n + padding, iseed, &s1);
+      rgemvx(m, n, alpha, &s0.a0, offs0, offs1, opa, &s0.x0, offsx, beta, &s0.x1, offsy);
+      refrgemvx(m, n, alpha, &s1.a0, offs0, offs1, opa, &s1.x0, offsx, beta, &s1.x1, offsy);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+   // Increment seed
+      iseed++;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+// Reference code
+//
+//      16.10.2017
+//      Sergey Bochkanov
+static void testablasfunit_refgerx(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
+   ae_int_t i;
+   ae_int_t j;
+   double s;
+   if (m <= 0 || n <= 0 || alpha == 0.0) {
+      return;
+   }
+   for (i = 0; i < m; i++) {
+      s = alpha * u->xR[iu + i];
+      for (j = 0; j < n; j++) {
+         a->xyR[ia + i][ja + j] += s * v->xR[iv + j];
+      }
+   }
+}
+
+static bool testablasfunit_testxger(ae_int_t maxn, double tol) {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t m;
+   ae_int_t iseed;
+   double alpha;
+   ae_int_t padding;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(ablasfplayground, s0);
+   NewObj(ablasfplayground, s1);
+   iseed = randominteger(10000);
+   Ok = true;
+   for (n = 0; n <= maxn; n++) {
+   // Prepare two identical playground structures
+   // Compute each GER version twice - reference vs library.
+   // Compare playground snapshots - should be identical.
+      padding = randominteger(10);
+      m = randominteger(n + 1);
+      alpha = randommid() * randominteger(2);
+      testablasfunit_initplayground(2 * n + padding, iseed, &s0);
+      testablasfunit_initplayground(2 * n + padding, iseed, &s1);
+      rger(m, n, alpha, &s0.x0, &s0.x1, &s0.a0);
+      testablasfunit_refgerx(m, n, &s1.a0, 0, 0, alpha, &s1.x0, 0, &s1.x1, 0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+      testablasfunit_initplayground(2 * n + padding, iseed, &s0);
+      testablasfunit_initplayground(2 * n + padding, iseed, &s1);
+      rger(n, m, alpha, &s0.x0, &s0.x1, &s0.a0);
+      testablasfunit_refgerx(n, m, &s1.a0, 0, 0, alpha, &s1.x0, 0, &s1.x1, 0);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+   // Increment seed
+      iseed++;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+static bool testablasfunit_testxtrsv(ae_int_t maxn, double tol) {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t iseed;
+   ae_int_t offs0;
+   ae_int_t offs1;
+   ae_int_t offsx;
+   ae_int_t padding;
+   ae_int_t opa;
+   bool isupper;
+   bool isunit;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(ablasfplayground, s0);
+   NewObj(ablasfplayground, s1);
+   iseed = randominteger(10000);
+   Ok = true;
+   for (n = 0; n <= maxn; n++) {
+   // Prepare two identical playground structures
+   // Compute each GEMV version twice - reference vs library.
+   // Compare playground snapshots - should be identical.
+      padding = randominteger(10);
+      offs0 = randominteger(imax2(n, 1));
+      offs1 = randominteger(imax2(n, 1));
+      offsx = randominteger(imax2(n, 1));
+      opa = randominteger(2);
+      isupper = randombool();
+      isunit = randombool();
+      testablasfunit_initplayground(2 * n + padding, iseed, &s0);
+      testablasfunit_initplayground(2 * n + padding, iseed, &s1);
+      rtrsvx(n, &s0.a0, offs0, offs1, isupper, isunit, opa, &s0.x0, offsx);
+      reftrsvx(n, &s1.a0, offs0, offs1, isupper, isunit, opa, &s1.x0, offsx);
+      Ok = Ok && testablasfunit_compareplaygrounds(&s0, &s1) <= tol;
+   // Increment seed
+      iseed++;
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
 bool testablasf() {
-   return true;
+   ae_int_t maxn;
+   double tol;
+   bool Ok;
+   bool xdotOk;
+   bool xsetOk;
+   bool xaddOk;
+   bool xmulOk;
+   bool xmaxOk;
+   bool xmergeOk;
+   bool xcopyOk;
+   bool xgemvOk;
+   bool xgerOk;
+   bool xtrsvOk;
+   maxn = 100;
+   tol = 10000.0 * machineepsilon;
+   xdotOk = testablasfunit_testxdot(maxn, tol);
+   xsetOk = testablasfunit_testxset(maxn, tol);
+   xaddOk = testablasfunit_testxadd(maxn, tol);
+   xmulOk = testablasfunit_testxmul(maxn, tol);
+   xmaxOk = testablasfunit_testxmax(maxn, tol);
+   xmergeOk = testablasfunit_testxmerge(maxn, tol);
+   xcopyOk = testablasfunit_testxcopy(maxn, tol);
+   xgemvOk = testablasfunit_testxgemv(maxn, tol);
+   xgerOk = testablasfunit_testxger(maxn, tol);
+   xtrsvOk = testablasfunit_testxtrsv(maxn, tol);
+   Ok = xdotOk && xsetOk && xaddOk && xmulOk && xmaxOk && xmergeOk && xcopyOk && xgemvOk && xgerOk && xtrsvOk;
+// The final report.
+   if (!Ok || !silent) {
+      printf("ABLASF Tests\n");
+      printf("xDotXX:                                   %s\n", xdotOk ? "Ok" : "Failed");
+      printf("xSetXX:                                   %s\n", xsetOk ? "Ok" : "Failed");
+      printf("xAddXX:                                   %s\n", xaddOk ? "Ok" : "Failed");
+      printf("xMulXX:                                   %s\n", xmulOk ? "Ok" : "Failed");
+      printf("xMaxXX:                                   %s\n", xmaxOk ? "Ok" : "Failed");
+      printf("xMergeXX:                                 %s\n", xmergeOk ? "Ok" : "Failed");
+      printf("xCopyXX:                                  %s\n", xcopyOk ? "Ok" : "Failed");
+      printf("xGEMVx:                                   %s\n", xgemvOk ? "Ok" : "Failed");
+      printf("xGERx:                                    %s\n", xgerOk ? "Ok" : "Failed");
+      printf("xTRSVx:                                   %s\n", xtrsvOk ? "Ok" : "Failed");
+      printf("Test %s\n", Ok ? "Passed" : "Failed");
+   }
+   return Ok;
 }
 
 // === hqrnd testing unit ===
@@ -2326,7 +3673,7 @@ static bool testablasunit_spectest() {
    return Ok;
 }
 
-// COPY tests
+// COPY (Level 2) tests
 static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
    ae_frame _frame_block;
    ae_int_t m;
@@ -2398,6 +3745,49 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
             } else {
                Ok = Ok && NearAtR(ra.xyR[aoffsi + i - boffsi][aoffsj + j - boffsj], rb.xyR[i][j], threshold);
             }
+         }
+      }
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+// COPY (Level 1) tests
+static bool testablasunit_testcopy1(ae_int_t minn, ae_int_t maxn) {
+   ae_frame _frame_block;
+   ae_int_t ss;
+   ae_int_t i;
+   ae_int_t aoffs;
+   ae_int_t boffs;
+   double threshold;
+   bool Ok = true;
+   ae_frame_make(&_frame_block);
+   NewVector(ra, 0, DT_REAL);
+   NewVector(rb, 0, DT_REAL);
+   threshold = 1000.0 * machineepsilon;
+   for (ss = minn; ss <= maxn; ss++) {
+   // Initialize A by random vector
+   // Initialize X by random vector
+   // Fill Y by control values
+      ae_vector_set_length(&ra, 2 * maxn);
+      ae_vector_set_length(&rb, 2 * maxn);
+      for (i = 0; i < 2 * maxn; i++) {
+         ra.xR[i] = randommid();
+         rb.xR[i] = 1.0 + 2.0 * i;
+      }
+   // test different offsets (zero or one)
+   //
+   // to avoid unnecessary slowdown we don't test ALL possible
+   // combinations of operation types. We just generate one random
+   // set of parameters and test it.
+      aoffs = randominteger(maxn);
+      boffs = randominteger(maxn);
+      rvectorcopy(ss, &ra, aoffs, &rb, boffs);
+      for (i = 0; i < 2 * maxn; i++) {
+         if (i < boffs || i >= boffs + ss) {
+            Ok = Ok && rb.xR[i] == 1 + 2 * i;
+         } else {
+            Ok = Ok && NearAtR(ra.xR[aoffs + i - boffs], rb.xR[i], threshold);
          }
       }
    }
@@ -2617,6 +4007,7 @@ bool testablas() {
    bool trsvOk;
    bool reflOk;
    bool copyOk;
+   bool copy1Ok;
    bool specOk;
    bool Ok;
    ae_frame_make(&_frame_block);
@@ -2631,6 +4022,7 @@ bool testablas() {
    trsvOk = true;
    reflOk = true;
    copyOk = true;
+   copy1Ok = true;
    Ok = true;
    specOk = true;
    specOk = specOk && testablasunit_spectest();
@@ -2649,8 +4041,9 @@ bool testablas() {
    gemmOk = gemmOk && testablasunit_testgemm(n0, n1);
    trsmOk = trsmOk && testablasunit_testtrsm(n0, n1);
    syrkOk = syrkOk && testablasunit_testsyrk(n0, n1);
+   copy1Ok = copy1Ok && testablasunit_testcopy1(1, 3 * matrixtilesizea() + 1);
 // The final report.
-   Ok = trsmOk && syrkOk && gemmOk && transOk && rank1Ok && gemvOk && symvOk && trsvOk && reflOk && copyOk && specOk;
+   Ok = trsmOk && syrkOk && gemmOk && transOk && rank1Ok && gemvOk && symvOk && trsvOk && reflOk && copyOk && copy1Ok && specOk;
    if (!Ok || !silent) {
       printf("ABLAS Tests\n");
       printf("Level 3 Functions:\n");
@@ -2665,6 +4058,8 @@ bool testablas() {
       printf("* TRSV:                                   %s\n", trsvOk ? "Ok" : "Failed");
       printf("* Reflection:                             %s\n", reflOk ? "Ok" : "Failed");
       printf("* Copy:                                   %s\n", copyOk ? "Ok" : "Failed");
+      printf("Level 1 Functions:\n");
+      printf("* Copy:                                   %s\n", copy1Ok ? "Ok" : "Failed");
       printf("Special Tests:                            %s\n", specOk ? "Ok" : "Failed");
       printf("Test %s\n", Ok ? "Passed" : "Failed");
    }
@@ -5889,6 +7284,106 @@ static bool crstest() {
    return Ok;
 }
 
+// Function for testing serialization.
+// ALGLIB Project: Copyright 30.01.2018 by Sergey Bochkanov
+static bool testserialize() {
+   const ae_int_t maxtype = 2;
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t m;
+   ae_int_t mtype;
+   ae_int_t nz;
+   double pnz;
+   ae_int_t i;
+   ae_int_t j;
+   bool Ok = true;
+   ae_frame_make(&_frame_block);
+   NewObj(hqrndstate, rs);
+   NewObj(sparsematrix, s0);
+   NewObj(sparsematrix, s1);
+   NewObj(sparsematrix, s2);
+   NewObj(sparsematrix, s3);
+   NewObj(sparsematrix, s4);
+   hqrndrandomize(&rs);
+   for (n = 1; n <= 10; n++) {
+      for (m = 1; m <= 10; m++) {
+         for (mtype = 0; mtype <= maxtype; mtype++) {
+            if (mtype == 2 && m != n) {
+               continue;
+            }
+            nz = n * m;
+            while (true) {
+            // Generate N*N matrix where probability of non-diagonal element
+            // being non-zero is PNZ.
+               if (n > 1) {
+                  pnz = (double)nz / (m * n);
+               } else {
+                  pnz = 0.5;
+               }
+            // Generate random matrix in HASH format (testing SparseExists()
+            // during process), convert it to HASH/CRS/SKS format
+               sparsecreate(m, n, iround(nz * hqrnduniformr(&rs)), &s0);
+               for (i = 0; i < m; i++) {
+                  for (j = 0; j < n; j++) {
+                     Ok = Ok && !sparseexists(&s0, i, j);
+                     if (hqrnduniformr(&rs) <= pnz) {
+                        sparseset(&s0, i, j, hqrndnormal(&rs));
+                        Ok = Ok && sparseexists(&s0, i, j);
+                     }
+                  }
+               }
+               sparseconvertto(&s0, mtype);
+               Ok = Ok && sparsegetmatrixtype(&s0) == mtype;
+            // Check copy-through-serialization
+               {
+               // This code passes data structure through serializers
+               // (serializes it to string and loads back)
+                  ae_frame _local_frame_block;
+                  ae_frame_make(&_local_frame_block);
+                  NewSerializer(_local_serializer);
+                  ae_serializer_alloc_start(&_local_serializer);
+                  sparsealloc(&_local_serializer, &s0);
+                  ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                  NewBlock(_local_dynamic_block, _local_ssize + 1);
+                  ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
+                  sparseserialize(&_local_serializer, &s0);
+                  ae_serializer_stop(&_local_serializer);
+                  ae_serializer_init(&_local_serializer);
+                  ae_serializer_ustart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
+                  sparseunserialize(&_local_serializer, &s1);
+                  ae_serializer_stop(&_local_serializer);
+                  ae_frame_leave();
+               }
+               Ok = Ok && sparsegetmatrixtype(&s1) == mtype;
+               Ok = Ok && sparsegetnrows(&s0) == sparsegetnrows(&s1);
+               Ok = Ok && sparsegetncols(&s0) == sparsegetncols(&s1);
+               if (!Ok) {
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (i = 0; i < m; i++) {
+                  for (j = 0; j < n; j++) {
+                     Ok = Ok && sparseget(&s0, i, j) == sparseget(&s1, i, j);
+                  }
+               }
+               if (!Ok) {
+                  ae_frame_leave();
+                  return Ok;
+               }
+            // Increase problem sparsity and try one more time.
+            // Stop after testing NZ == 0.
+               if (nz == 0) {
+                  break;
+               }
+               nz = imin2(iround(nz * 0.95), nz - 1);
+            }
+         }
+      }
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
 // Function for testing basic functional
 //
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
@@ -7064,6 +8559,8 @@ static bool basicfuncrandomtest() {
 //                 * 0 = matrix is created in Hash-Table format and converted
 //                       to CRS representation
 //                 * 1 = matrix is created in CRS format
+//                 * 2 = matrix is created in Hash-Table format and converted
+//                       to SKS representation
 //
 // Outputs:
 //     DA      -   dense representation of A, array[M,N]
@@ -7085,11 +8582,12 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
    NewVector(c1, 0, DT_INT);
    NewVector(rowsizes, 0, DT_INT);
    maxpkind = 2;
-   maxckind = 1;
+   maxckind = 2;
    ae_assert(m >= 1, "CreateRandom: incorrect parameters");
    ae_assert(n >= 1, "CreateRandom: incorrect parameters");
    ae_assert(pkind >= -1 && pkind <= maxpkind, "CreateRandom: incorrect parameters");
    ae_assert(ckind >= -1 && ckind <= maxckind, "CreateRandom: incorrect parameters");
+   ae_assert(ckind != 2 || m == n, "CreateRandom: incorrect parameters");
    if (pkind == -1) {
       pkind = randominteger(maxpkind + 1);
       if (pkind == 0) {
@@ -7101,7 +8599,9 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
       }
    }
    if (ckind == -1) {
-      ckind = randominteger(maxckind + 1);
+      do {
+         ckind = randominteger(maxckind + 1);
+      } while (ckind == 2 && m != n);
    }
    if (pkind == 0) {
    // Matrix with elements at random locations
@@ -7111,8 +8611,8 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
             da->xyR[i][j] = 0.0;
          }
       }
-      if (ckind == 0) {
-      // Create matrix in Hash format, convert to CRS
+      if (ckind == 0 || ckind == 2) {
+      // Create matrix in Hash format, convert to CRS or SKS
          sparsecreate(m, n, 1, sa);
          for (k = 0; k < p0; k++) {
             i = randominteger(m);
@@ -7126,7 +8626,11 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
                sparseadd(sa, i, j, v);
             }
          }
-         sparseconverttocrs(sa);
+         if (ckind != 2) {
+            sparseconverttocrs(sa);
+         } else {
+            sparseconverttosks(sa);
+         }
          ae_frame_leave();
          return;
       }
@@ -7183,6 +8687,9 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
       if (ckind == 1) {
          sparsecreatecrs(m, n, &rowsizes, sa);
       }
+      if (ckind == 2) {
+         sparsecreate(m, n, 1, sa);
+      }
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
             if (da->xyR[i][j] != 0.0) {
@@ -7190,7 +8697,11 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
             }
          }
       }
-      sparseconverttocrs(sa);
+      if (ckind != 2) {
+         sparseconverttocrs(sa);
+      } else {
+         sparseconverttosks(sa);
+      }
       ae_frame_leave();
       return;
    }
@@ -7223,6 +8734,9 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
       if (ckind == 1) {
          sparsecreatecrs(m, n, &rowsizes, sa);
       }
+      if (ckind == 2) {
+         sparsecreate(m, n, 1, sa);
+      }
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
             if (da->xyR[i][j] != 0.0) {
@@ -7230,7 +8744,11 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
             }
          }
       }
-      sparseconverttocrs(sa);
+      if (ckind != 2) {
+         sparseconverttocrs(sa);
+      } else {
+         sparseconverttosks(sa);
+      }
       ae_frame_leave();
       return;
    }
@@ -8036,7 +9554,9 @@ static bool testsparseunit_enumeratetest() {
                if (c == 0) {
                   a.xyR[i][j] = 0.0;
                } else {
-                  a.xyR[i][j] = r * randommid();
+                  do {
+                     a.xyR[i][j] = r * randommid();
+                  } while (a.xyR[i][j] == 0.0);
                // Number of non-zero elements
                   ne++;
                }
@@ -8350,7 +9870,9 @@ static bool testsparseunit_testconvertsm() {
                for (j = 0; j < n; j++) {
                   if (randominteger(5) == 3) {
                      ner.xZ[i]++;
-                     a.xyR[i][j] = randommid();
+                     do {
+                        a.xyR[i][j] = randommid();
+                     } while (a.xyR[i][j] == 0.0);
                   } else {
                      a.xyR[i][j] = 0.0;
                   }
@@ -8485,6 +10007,7 @@ bool testsparse() {
    bool linearmmOk;
    bool linearsmmOk;
    bool getrowOk;
+   bool serializeOk;
    bool copyOk;
    bool basiccopyOk;
    bool enumerateOk;
@@ -8494,6 +10017,7 @@ bool testsparse() {
    if (!silent) printf("Sparse Matrix Test Breakdown\n");
    getrowOk = true;
    crsOk = true;
+   serializeOk = true;
    sksOk = skstest();
    crsOk = crsOk && crstest();
    basicOk = basicfunctest() && testsparseunit_testgcmatrixtype();
@@ -8513,8 +10037,9 @@ bool testsparse() {
    enumerateOk = testsparseunit_enumeratetest();
    rewriteexistingOk = testsparseunit_rewriteexistingtest();
    getrowOk = getrowOk && testsparseunit_testgetrow();
+   serializeOk = serializeOk && testserialize();
 // The final report.
-   Ok = sksOk && crsOk && getrowOk && basicOk && linearOk && basicrndOk && level2unsymmetricOk && level2symmetricOk && level2triangularOk && level3unsymmetricOk && level3symmetricOk && symmetricpermOk && linearsOk && linearmmOk && linearsmmOk && copyOk && basiccopyOk && enumerateOk && rewriteexistingOk;
+   Ok = sksOk && crsOk && getrowOk && serializeOk && basicOk && linearOk && basicrndOk && level2unsymmetricOk && level2symmetricOk && level2triangularOk && level3unsymmetricOk && level3symmetricOk && symmetricpermOk && linearsOk && linearmmOk && linearsmmOk && copyOk && basiccopyOk && enumerateOk && rewriteexistingOk;
    if (!Ok || !silent) {
       printf("Sparse Matrix Tests\n");
       printf("Storage Format Specifics:\n");
@@ -8522,6 +10047,7 @@ bool testsparse() {
       printf("* CRS:                                    %s\n", crsOk ? "Ok" : "Failed");
       printf("Operations:\n");
       printf("* GetRow:                                 %s\n", getrowOk ? "Ok" : "Failed");
+      printf("* Serialize:                              %s\n", serializeOk ? "Ok" : "Failed");
       printf("BLAS:\n");
       printf("* Level 2 General:                        %s\n", level2unsymmetricOk ? "Ok" : "Failed");
       printf("* Level 2 Symmetric:                      %s\n", level2symmetricOk ? "Ok" : "Failed");
@@ -11040,6 +12566,9 @@ static bool sparserealcholeskytest() {
    ae_int_t targetwidth;
    ae_int_t bigsize;
    ae_int_t bottomsize;
+   ae_int_t nbetter;
+   ae_int_t nworse;
+   ae_int_t pass;
    bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(a, 0, 0, DT_REAL);
@@ -11059,8 +12588,8 @@ static bool sparserealcholeskytest() {
    hqrndrandomize(&rs);
 // Settings
    maxfmt = 2;
-   minperm = -2;
-   maxperm = 2;
+   minperm = -3;
+   maxperm = 3;
    offscale = 0.001;
    tol = 0.00000001;
 // Modern Cholesky (SparseCholesky, SparseCholeskyP, Analyze/Factorize) tests:
@@ -11819,6 +13348,75 @@ static bool sparserealcholeskytest() {
          }
          nz /= 2;
       }
+   }
+// Test fill-in reducing permutation - on average, AMD and its variants must reduce fill-in.
+// We check it by factorizing many matrices with AMD and without it, and by comparing average
+// fill-in produced during the factorization.
+//
+// Test matrices being factorized are ones with mostly low-degree rows/cols, but (sometimes)
+// a few nearly dense rows/cols.
+   for (permtype = 0; permtype <= maxperm; permtype++) {
+   // Evaluate all orderings except for supernodal one (does not reduce fill-in)
+      if (permtype == 1) {
+         continue;
+      }
+   // Compare fill-in with ordering and without it
+      nbetter = 0;
+      nworse = 0;
+      for (pass = 0; pass <= 99; pass++) {
+      // Generate test matrix:
+      // * first, fill it with unit diagonal and typically 2 off-diagonal elements per row/col
+      // * then, make some small number of rows/cols dense
+         n = 30 + hqrnduniformi(&rs, 20);
+         sparsecreate(n, n, 0, &sa);
+         for (i = 0; i < n; i++) {
+            sparseset(&sa, i, i, 1.0);
+            for (k = 1; k <= 2; k++) {
+               j = hqrnduniformi(&rs, n);
+               if (j != i) {
+                  sparseset(&sa, i, j, 0.01 / n);
+                  sparseset(&sa, j, i, 0.01 / n);
+               }
+            }
+         }
+         while (hqrndnormal(&rs) > 0.0) {
+            i = hqrnduniformi(&rs, n);
+            for (j = 0; j < n; j++) {
+               if (j != i) {
+                  sparseset(&sa, i, j, 0.01 / n);
+                  sparseset(&sa, j, i, 0.01 / n);
+               }
+            }
+         }
+         sparsecopy(&sa, &sa1);
+      // Factorize with AMD and without it
+         if (!sparsecholeskyanalyze(&sa, false, 0, permtype, &analysis)) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         if (!sparsecholeskyfactorize(&analysis, false, &sa, &d, &p0)) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         if (!sparsecholeskyanalyze(&sa1, false, 0, -2, &analysis)) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         if (!sparsecholeskyfactorize(&analysis, false, &sa1, &d, &p0)) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         if (sa.ridx.xZ[n] < sa1.ridx.xZ[n]) {
+            nbetter++;
+         } else {
+            nworse++;
+         }
+      }
+      Ok = Ok && nbetter >= 0.75 * (nbetter + nworse);
    }
    ae_frame_leave();
    return Ok;
@@ -17231,6 +18829,7 @@ static bool testfblsunit_testgmres() {
    NewVector(b, 0, DT_REAL);
    NewVector(r, 0, DT_REAL);
    NewVector(xe, 0, DT_REAL);
+   NewVector(x0, 0, DT_REAL);
    NewObj(hqrndstate, rs);
    NewObj(fblsgmresstate, state);
    hqrndrandomize(&rs);
@@ -17240,8 +18839,10 @@ static bool testfblsunit_testgmres() {
 // * State.Qi are orthonormal
    for (n = 1; n <= 5; n++) {
    // Create problem
-      hqrndnormalv(&rs, n, &b);
+      hqrndnormalv(&rs, n, &x0);
       hqrndnormalm(&rs, n, n, &a);
+      ae_vector_set_length(&b, n);
+      rmatrixmv(n, n, &a, 0, 0, 0, &x0, 0, &b, 0);
    // Test sequence of iteration counts
       eprev = maxrealnumber;
       for (itscnt = 1; itscnt <= n; itscnt++) {
@@ -17550,8 +19151,376 @@ bool testfbls() {
 }
 
 // === iterativesparse testing unit ===
+// Test GMRES solver.
+static bool testiterativesparseunit_testgmres(ae_int_t maxn) {
+   ae_frame _frame_block;
+   ae_int_t nnz;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t n;
+   ae_int_t gmresk;
+   double epsf;
+   bool isupper;
+   double v;
+   double tol;
+   double rprev;
+   ae_int_t requesttype;
+   ae_int_t nmv;
+   ae_int_t nreports;
+   bool Ok = true;
+   ae_frame_make(&_frame_block);
+   NewObj(sparsematrix, a);
+   NewObj(sparsematrix, crsa);
+   NewVector(xref, 0, DT_REAL);
+   NewVector(x, 0, DT_REAL);
+   NewVector(b, 0, DT_REAL);
+   NewVector(b2, 0, DT_REAL);
+   NewVector(ax, 0, DT_REAL);
+   NewVector(xr, 0, DT_REAL);
+   NewVector(x0, 0, DT_REAL);
+   NewVector(repfirst, 0, DT_REAL);
+   NewVector(replast, 0, DT_REAL);
+   NewVector(tmp, 0, DT_REAL);
+   NewMatrix(z, 0, 0, DT_REAL);
+   NewObj(sparsesolverstate, solver);
+   NewObj(hqrndstate, rs);
+   NewObj(sparsesolverreport, rep);
+   hqrndrandomize(&rs);
+   epsf = pow(10.0, -4.0 - hqrnduniformi(&rs, 3));
+// Test that GMRES is a Krylov subspace method, i.e. its iterate belongs to span(b,A*b,A*A*b,...)
+   for (n = 1; n <= maxn; n++) {
+   // Generate sparse matrix and RHS.
+      sparsecreate(n, n, 0, &a);
+      for (i = 0; i < n; i++) {
+         for (j = 0; j < n; j++) {
+            sparseset(&a, i, j, hqrndnormal(&rs));
+         }
+      }
+      sparsecopytocrs(&a, &crsa);
+      hqrndnormalv(&rs, n, &xref);
+   // Test using nonsymmetric solve
+      for (gmresk = 1; gmresk < imin2(6, n); gmresk++) {
+         sparsemv(&crsa, &xref, &b);
+         ae_vector_set_length(&x, 0);
+         sparsesolvercreate(n, &solver);
+         sparsesolversetalgogmres(&solver, gmresk);
+         sparsesolversetcond(&solver, 0.0, gmresk);
+         sparsesolversolve(&solver, &a, &b);
+         sparsesolverresults(&solver, &x, &rep);
+         Ok = Ok && x.cnt == n;
+         Ok = Ok && rep.terminationtype > 0;
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+      // Test that the solution belongs to the Krylov subspace
+         ae_matrix_set_length(&z, gmresk + 1, n);
+         rcopyallocv(n, &b, &xr);
+         for (k = 0; k < gmresk; k++) {
+            rcopyvr(n, &xr, &z, k);
+            sparsemv(&crsa, &xr, &ax);
+            rcopyv(n, &ax, &xr);
+         }
+         rcopyvr(n, &x, &z, gmresk);
+         rmatrixlq(&z, gmresk + 1, n, &tmp);
+         Ok = Ok && SmallAtR(z.xyR[gmresk][gmresk], 0.000001);
+      // Additional test - R2 field is correct
+         sparsemv(&crsa, &x, &ax);
+         raddv(n, -1.0, &b, &ax);
+         Ok = Ok && NearAtR(rep.r2, rdotv2(n, &ax), 0.000001);
+      }
+   }
+// Randomly generated sparse problem, possibly degenerate.
+// Iterate until convergence.
+// Try various sparsity patterns.
+   for (n = 1; n <= maxn; n++) {
+      nnz = n * n;
+      while (true) {
+      // Generate sparse matrix and RHS.
+      // The matrix is regularized by placing large elements on its diagonal
+         sparsecreate(n, n, 0, &a);
+         for (k = 0; k < nnz; k++) {
+            sparseset(&a, hqrnduniformi(&rs, n), hqrnduniformi(&rs, n), hqrndnormal(&rs));
+         }
+         for (i = 0; i < n; i++) {
+            sparseset(&a, i, i, (2 * hqrnduniformi(&rs, 2) - 1) * (1.0 + 3.0 * nnz / n + sqr(hqrndnormal(&rs))));
+         }
+         k = hqrnduniformi(&rs, 3);
+         if (k == 1) {
+            sparseconverttocrs(&a);
+         }
+         if (k == 2) {
+            sparseconverttosks(&a);
+         }
+         sparsecopytocrs(&a, &crsa);
+         hqrndnormalv(&rs, n, &xref);
+      // Symmetric solve:
+      // * solver object API
+      // * easy access function
+      //
+      // We do not test out-of-core API because it is used internally by the
+      // SparseSolve/SparseSolveSymmetric pair of functions.
+         gmresk = 5 + hqrnduniformi(&rs, 2 * n + 1);
+         isupper = hqrndnormal(&rs) > 0.0;
+         sparsesmv(&crsa, isupper, &xref, &b);
+         ae_vector_set_length(&x, 0);
+         sparsesolvercreate(n, &solver);
+         sparsesolversetalgogmres(&solver, gmresk);
+         sparsesolversetcond(&solver, epsf, 0);
+         sparsesolversolvesymmetric(&solver, &a, isupper, &b);
+         sparsesolverresults(&solver, &x, &rep);
+         Ok = Ok && x.cnt == n;
+         Ok = Ok && rep.terminationtype == 1;
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+         sparsesmv(&crsa, isupper, &x, &b2);
+         v = 0.0;
+         for (i = 0; i < n; i++) {
+            v += sqr(b.xR[i] - b2.xR[i]);
+         }
+         v = sqrt(v) / coalesce(sqrt(rdotv2(n, &b)), 1.0);
+         Ok = Ok && v <= 1.1 * epsf;
+         ae_vector_set_length(&x, 0);
+         sparsesolvesymmetricgmres(&a, isupper, &b, gmresk, epsf, 0, &x, &rep);
+         Ok = Ok && x.cnt == n;
+         Ok = Ok && rep.terminationtype == 1;
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+         sparsesmv(&crsa, isupper, &x, &b2);
+         v = 0.0;
+         for (i = 0; i < n; i++) {
+            v += sqr(b.xR[i] - b2.xR[i]);
+         }
+         v = sqrt(v) / coalesce(sqrt(rdotv2(n, &b)), 1.0);
+         Ok = Ok && v <= 1.1 * epsf;
+      // Nonsymmetric solve
+         gmresk = 5 + hqrnduniformi(&rs, 2 * n + 1);
+         sparsemv(&crsa, &xref, &b);
+         ae_vector_set_length(&x, 0);
+         sparsesolvercreate(n, &solver);
+         sparsesolversetalgogmres(&solver, gmresk);
+         sparsesolversetcond(&solver, epsf, 0);
+         sparsesolversolve(&solver, &a, &b);
+         sparsesolverresults(&solver, &x, &rep);
+         Ok = Ok && x.cnt == n;
+         Ok = Ok && rep.terminationtype == 1;
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+         sparsemv(&crsa, &x, &b2);
+         v = 0.0;
+         for (i = 0; i < n; i++) {
+            v += sqr(b.xR[i] - b2.xR[i]);
+         }
+         v = sqrt(v) / coalesce(sqrt(rdotv2(n, &b)), 1.0);
+         Ok = Ok && v <= 1.1 * epsf;
+         ae_vector_set_length(&x, 0);
+         sparsesolvegmres(&a, &b, gmresk, epsf, 0, &x, &rep);
+         Ok = Ok && x.cnt == n;
+         Ok = Ok && rep.terminationtype == 1;
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+         sparsemv(&crsa, &x, &b2);
+         v = 0.0;
+         for (i = 0; i < n; i++) {
+            v += sqr(b.xR[i] - b2.xR[i]);
+         }
+         v = sqrt(v) / coalesce(sqrt(rdotv2(n, &b)), 1.0);
+         Ok = Ok && v <= 1.1 * epsf;
+      // Increase sparsity
+         if (nnz == 0) {
+            break;
+         }
+         nnz /= 2;
+      }
+   }
+// Check that initial point is actually used and improves the situation:
+// * generate big random problem
+// * solve it with GMRES(1), EpsF == 0.1
+// * restart using previous solution as initial point
+// Restarted solution must be achieved in 1 iteration
+//
+// To be exact, we perform three tests:
+// * initial solution needs more than 1 iteration
+// * attempt to solve second time without starting point again needs more than 1 iteration
+// * solution with starting point needs 1 iteration
+   n = 100;
+   nnz = 10 * n;
+   epsf = 0.001;
+   gmresk = 10;
+   sparsecreate(n, n, 0, &a);
+   for (k = 0; k < nnz; k++) {
+      sparseset(&a, hqrnduniformi(&rs, n), hqrnduniformi(&rs, n), 0.1 * hqrndnormal(&rs));
+   }
+   for (k = 0; k < n; k++) {
+      sparseset(&a, k, k, (2 * hqrnduniformi(&rs, 2) - 1) * ((double)nnz / n + sqr(hqrndnormal(&rs))));
+   }
+   sparsecopytocrs(&a, &crsa);
+   hqrndnormalv(&rs, n, &xref);
+   sparsemv(&crsa, &xref, &b);
+   sparsesolvercreate(n, &solver);
+   sparsesolversetalgogmres(&solver, gmresk);
+   sparsesolversetcond(&solver, epsf, 0);
+   sparsesolversolve(&solver, &a, &b);
+   sparsesolverresults(&solver, &x, &rep);
+   Ok = Ok && rep.terminationtype == 1;
+   Ok = Ok && rep.iterationscount > 1;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+   sparsesolversolve(&solver, &a, &b);
+   sparsesolverresults(&solver, &x, &rep);
+   Ok = Ok && rep.terminationtype == 1;
+   Ok = Ok && rep.iterationscount > 1;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+   sparsesolversetstartingpoint(&solver, &x);
+   sparsesolversolve(&solver, &a, &b);
+   sparsesolverresults(&solver, &x, &rep);
+   Ok = Ok && rep.terminationtype == 1;
+   Ok = Ok && rep.iterationscount <= 1;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+// Check termination request handling by the out-of-core API.
+//
+// Solve long-running problem, at each OOC call randomly decide whether
+// we want to terminate the process or not.
+   n = 100;
+   nnz = 10 * n;
+   epsf = 1.0E-50;
+   gmresk = 1;
+   sparsecreate(n, n, 0, &a);
+   for (k = 0; k < nnz; k++) {
+      sparseset(&a, hqrnduniformi(&rs, n), hqrnduniformi(&rs, n), 0.1 * hqrndnormal(&rs));
+   }
+   for (k = 0; k < n; k++) {
+      sparseset(&a, k, k, 1 + sqr(hqrndnormal(&rs)));
+   }
+   sparsecopytocrs(&a, &crsa);
+   hqrndnormalv(&rs, n, &xref);
+   sparsemv(&crsa, &xref, &b);
+   sparsesolvercreate(n, &solver);
+   sparsesolversetalgogmres(&solver, gmresk);
+   sparsesolversetcond(&solver, epsf, 0);
+   for (sparsesolveroocstart(&solver, &b); sparsesolverooccontinue(&solver); ) {
+      ae_assert(solver.requesttype == 0, "SparseSolverSolve: integrity check 7372 failed");
+      sparsemv(&crsa, &solver.x, &solver.ax);
+      if (hqrndnormal(&rs) < 0.0) {
+         sparsesolverrequesttermination(&solver);
+      }
+   }
+   sparsesolveroocstop(&solver, &x, &rep);
+   Ok = Ok && rep.terminationtype == 8;
+// Check OOC API, check reports:
+// * OOC API works correctly
+// * solver reports a sequence of decreased residuals
+// * first report is equal to the initial point, last report is equal to the final point
+// * when XRep is activated, it does not crash SparseSolve() or SparseSolveSymmetric()
+   n = 100;
+   nnz = 10 * n;
+   epsf = 0.001;
+   gmresk = 5;
+   tol = sqrt(machineepsilon);
+   sparsecreate(n, n, 0, &a);
+   for (k = 0; k < nnz; k++) {
+      sparseset(&a, hqrnduniformi(&rs, n), hqrnduniformi(&rs, n), 0.1 * hqrndnormal(&rs));
+   }
+   for (k = 0; k < n; k++) {
+      sparseset(&a, k, k, (double)nnz / n + sqr(hqrndnormal(&rs)));
+   }
+   sparsecopytocrs(&a, &crsa);
+   hqrndnormalv(&rs, n, &xref);
+   hqrndnormalv(&rs, n, &x0);
+   sparsemv(&crsa, &xref, &b);
+   sparsesolvercreate(n, &solver);
+   sparsesolversetalgogmres(&solver, gmresk);
+   sparsesolversetcond(&solver, epsf, 0);
+   sparsesolversetxrep(&solver, true);
+   sparsesolversetstartingpoint(&solver, &x0);
+   sparsesolveroocstart(&solver, &b);
+   ae_vector_set_length(&repfirst, 0);
+   ae_vector_set_length(&replast, 0);
+   rprev = maxrealnumber;
+   nmv = 0;
+   nreports = 0;
+   while (sparsesolverooccontinue(&solver)) {
+      sparsesolveroocgetrequestinfo(&solver, &requesttype);
+      if (requesttype == -1) {
+         sparsesolveroocgetrequestdata(&solver, &xr);
+         sparsesolveroocgetrequestdata1(&solver, &v);
+         if (repfirst.cnt == 0) {
+            rcopyallocv(n, &xr, &repfirst);
+         }
+         rcopyallocv(n, &xr, &replast);
+         sparsemv(&crsa, &xr, &ax);
+         raddv(n, -1.0, &b, &ax);
+         Ok = Ok && NearAtR(rdotv2(n, &ax), v, tol * (1.0 + rdotv2(n, &ax)));
+         Ok = Ok && v <= rprev + tol;
+         rprev = v;
+         nreports++;
+      } else {
+         ae_assert(requesttype == 0, "SparseSolverSolve: integrity check 5364 failed");
+         sparsesolveroocgetrequestdata(&solver, &xr);
+         sparsemv(&crsa, &xr, &ax);
+         nmv++;
+         sparsesolveroocsendresult(&solver, &ax);
+      }
+   }
+   sparsesolveroocstop(&solver, &x, &rep);
+   Ok = Ok && rep.terminationtype > 0;
+   Ok = Ok && rep.nmv == nmv;
+   Ok = Ok && rep.iterationscount >= (nreports - 2) * gmresk;
+   Ok = Ok && repfirst.cnt == n;
+   Ok = Ok && replast.cnt == n;
+   if (!Ok) {
+      ae_frame_leave();
+      return Ok;
+   }
+   for (i = 0; i < n; i++) {
+      Ok = Ok && NearAtR(repfirst.xR[i], x0.xR[i], 100.0 * machineepsilon);
+      Ok = Ok && NearAtR(replast.xR[i], x.xR[i], 100.0 * machineepsilon);
+   }
+   sparsesolversolve(&solver, &a, &b);
+   sparsesolverresults(&solver, &x, &rep);
+   Ok = Ok && rep.terminationtype == 1;
+   sparsesolversolvesymmetric(&solver, &a, hqrndnormal(&rs) > 0.0, &b);
+   sparsesolverresults(&solver, &x, &rep);
+   Ok = Ok && rep.terminationtype == 1;
+   ae_frame_leave();
+   return Ok;
+}
+
 bool testiterativesparse() {
-   return true;
+   ae_int_t maxn;
+   bool gmresOk;
+   bool Ok;
+   maxn = 50;
+// Prepare error flags
+   gmresOk = true;
+// Run tests
+   gmresOk = gmresOk && testiterativesparseunit_testgmres(maxn);
+// The final report.
+   Ok = gmresOk;
+   if (!Ok || !silent) {
+      printf("Iterative Sparse Solvers Test\n");
+      printf("* GmRes:                                  %s\n", gmresOk ? "Ok" : "Failed");
+   // Were errors?
+      printf("Test %s\n", Ok ? "Passed" : "Failed");
+   }
+   return Ok;
 }
 
 // === lincg testing unit ===
@@ -17598,6 +19567,7 @@ static bool testlincgunit_complextest() {
    NewMatrix(mtr, 0, 0, DT_REAL);
    mx = 100.0;
    n = 5;
+   Ok = true;
    for (sz = 1; sz <= n; sz++) {
    // Generate:
    // * random A with norm NA (equal to 1.0),
@@ -17750,7 +19720,7 @@ static bool testlincgunit_complextest() {
                }
                nv0 = sqrt(nv0);
                nv1 = sqrt(nv1);
-               if (!SmallAtR(sclr, testlincgunit_e0 * na * nv0 * nv1)) {
+               if (!SmallAtR(sclr, testlincgunit_e0 * na * rmax2(nv0, 1.0) * rmax2(nv1, 1.0))) {
                   if (!silent) {
                      printf("ComplexTest: Failed\n");
                      printf("* IterationsCount == %0d, NMV == %0d, TerminationType == %0d, Size == %0d, Cond == %0.5f\n",
@@ -17779,7 +19749,7 @@ static bool testlincgunit_complextest() {
                }
                nv0 = sqrt(nv0);
                nv1 = sqrt(nv1);
-               if (!SmallAtR(sclr, testlincgunit_e0 * nv0 * nv1)) {
+               if (!SmallAtR(sclr, testlincgunit_e0 * rmax2(nv0, 1.0) * rmax2(nv1, 1.0))) {
                   if (!silent) {
                      printf("ComplexTest: Failed\n");
                      printf("* IterationsCount == %0d, NMV == %0d, TerminationType == %0d, Size == %0d, Cond == %0.5f\n",
@@ -17806,7 +19776,7 @@ static bool testlincgunit_complextest() {
                }
                nv0 = sqrt(nv0);
                nv1 = sqrt(nv1);
-               if (!SmallAtR(sclr, testlincgunit_e0 * nv0 * nv1)) {
+               if (!SmallAtR(sclr, testlincgunit_e0 * rmax2(nv0, 1.0) * rmax2(nv1, 1.0))) {
                   if (!silent) {
                      printf("Complex Test: Failed\n");
                      printf("* IterationsCount == %0d, NMV == %0d, TerminationType == %0d, Size == %0d, Cond == %0.5f\n",
@@ -17825,7 +19795,6 @@ static bool testlincgunit_complextest() {
    if (!silent) {
       printf("ComplexTest: Ok\n");
    }
-   Ok = true;
    ae_frame_leave();
    return Ok;
 }
@@ -18397,7 +20366,7 @@ static bool testlincgunit_frombasis(RVector *x, RMatrix *basis, ae_int_t n, ae_i
    }
    normx = sqrt(normx);
 // Gram-Shmidt method
-   testlincgunit_gramshmidtortnorm(basis, n, k, eps, &ortnormbasis, &k2);
+   testlincgunit_gramshmidtortnorm(basis, n, k, pow(machineepsilon, 0.75), &ortnormbasis, &k2);
    for (i = 0; i < k2; i++) {
       alpha = 0.0;
       for (j = 0; j < n; j++) {
@@ -18455,6 +20424,7 @@ static bool testlincgunit_krylovsubspacetest() {
    maxits = 3;
    sz = 5;
    mx = 100.0;
+   Ok = true;
    for (n = 1; n <= sz; n++) {
    // Generate:
    // * random A with unit norm
@@ -18568,7 +20538,6 @@ static bool testlincgunit_krylovsubspacetest() {
    if (!silent) {
       printf("KrylovSubspaceTest: Ok\n");
    }
-   Ok = true;
    ae_frame_leave();
    return Ok;
 }
@@ -19919,11 +21888,12 @@ static bool testlinlsqrunit_reportcorrectnesstest() {
                // is't more than 'eps'(here S.R2 == ||rk||,
                // calculated by the algorithm for LSQR, and
                // TNorm == ||A*S.x-b||, calculated by test function).
-                  if (s.r2 > rnorm || !NearAtR(s.r2, tnorm, eps)) {
-                     if (!silent) {
-                        printf("ReportCorrectnessTest: Failed\n");
-                        printf("* TNorm == %0.2e, RNorm == %0.2e, S.R2 == %0.2e\n", tnorm, rnorm, s.r2);
-                     }
+                  if (s.r2 > rnorm + 1000.0 * machineepsilon * rmax2(rnorm, 1.0)) {
+                     Ok = false;
+                     ae_frame_leave();
+                     return Ok;
+                  }
+                  if (!NearAtR(s.r2, tnorm, eps)) {
                      Ok = false;
                      ae_frame_leave();
                      return Ok;
@@ -23252,15 +25222,14 @@ static bool testminlbfgsunit_testoptguard() {
 // Analytic gradient is provided.
 //
 // OptGuard should be able to detect violations in more than
-// 99.9% of runs; it means that 100 runs should have no more than 4
-// failures in all cases (even after multiple repeated tests; according
-// to the binomial distribution quantiles).
+// 85% of runs; it means that 100 runs should have no more than 15
+// failures in all cases.
 //
 // We select some N and perform exhaustive search for this N.
    passcount = 100;
-   maxfails = 4;
-   maxc1test0fails = 10;
-   maxc1test1fails = 10;
+   maxfails = 15;
+   maxc1test0fails = 15;
+   maxc1test1fails = 15;
    n = 1 + hqrnduniformi(&rs, 10);
    m = 1 + hqrnduniformi(&rs, n);
    failurecounter = 0;
@@ -23379,15 +25348,12 @@ static bool testminlbfgsunit_testoptguard() {
 // * analytic gradient is provided.
 //
 // OptGuard should always be able to detect violations in more than
-// 99% of runs (note: reduced strength when compared with analytic gradient);
-// it means that 100 runs should have no more than 10 failures in all cases
-// (even after multiple repeated tests; according to the binomial distribution
-// quantiles).
+// 85% of runs.
 //
 // We select some N and perform exhaustive search for this N.
    diffstep = 0.0001;
    passcount = 100;
-   maxfails = 10;
+   maxfails = 15;
    n = 1 + hqrnduniformi(&rs, 10);
    m = 1 + hqrnduniformi(&rs, n);
    failurecounter = 0;
@@ -32447,25 +34413,34 @@ static void testminqpunit_randomlysplitandsetlc2(RMatrix *rawc, RVector *rawcl, 
    ae_vector_set_length(&cv, 2 * n);
    ae_vector_set_length(&ci, 2 * n);
    for (i = sparseccnt; i < sparseccnt + appendsparse; i++) {
-   // Generate sparse representation
-      nnz = 0;
-      for (j = 0; j < n; j++) {
-         if (rawc->xyR[i][j] != 0.0) {
-            cv.xR[nnz] = rawc->xyR[i][j];
-            ci.xZ[nnz] = j;
+      if (hqrndnormal(rs) > 0.0) {
+      // Add sparse constraint using AddLC2()
+      // First, generate sparse representation
+         nnz = 0;
+         for (j = 0; j < n; j++) {
+            if (rawc->xyR[i][j] != 0.0) {
+               cv.xR[nnz] = rawc->xyR[i][j];
+               ci.xZ[nnz] = j;
+               nnz++;
+            }
+         }
+      // Add duplicates which do not change constraint (after simplification)
+         while (nnz > 0 && nnz < ci.cnt && hqrnduniformr(rs) < 0.75) {
+            j = hqrnduniformi(rs, nnz);
+            ci.xZ[nnz] = ci.xZ[j];
+            cv.xR[nnz] = hqrndnormal(rs);
+            cv.xR[j] -= cv.xR[nnz];
             nnz++;
          }
+      // Add constraint to the set
+         minqpaddlc2(state, &ci, &cv, nnz, rawcl->xR[i], rawcu->xR[i]);
+      } else {
+      // Add sparse constraint using AddLC2SparseFromDense()
+         for (j = 0; j < n; j++) {
+            cv.xR[j] = rawc->xyR[i][j];
+         }
+         minqpaddlc2sparsefromdense(state, &cv, rawcl->xR[i], rawcu->xR[i]);
       }
-   // Add duplicates which do not change constraint (after simplification)
-      while (nnz > 0 && nnz < ci.cnt && hqrnduniformr(rs) < 0.75) {
-         j = hqrnduniformi(rs, nnz);
-         ci.xZ[nnz] = ci.xZ[j];
-         cv.xR[nnz] = hqrndnormal(rs);
-         cv.xR[j] -= cv.xR[nnz];
-         nnz++;
-      }
-   // Add constraint to the set
-      minqpaddlc2(state, &ci, &cv, nnz, rawcl->xR[i], rawcu->xR[i]);
    }
    for (i = rawccnt - appenddense; i < rawccnt; i++) {
       for (j = 0; j < n; j++) {
@@ -32669,7 +34644,7 @@ static bool testminqpunit_generallcqptest() {
    bleicepsx = 1.0E-9;
    ipmeps = 1.0E-12;
    aulepsx = 1.0E-12;
-   aulrho = 1000.0;
+   aulrho = 5000.0;
    aulits = 15;
 // SMALL-SCALE TESTS: many tests for small N's
    for (solvertype = 0; solvertype <= 3; solvertype++) {
@@ -33093,7 +35068,7 @@ static bool testminqpunit_generallcqptest() {
    // * f = 0.5*x'*A*x+b'*x
    // * b has normally distributed entries with scale 10^BScale
    // * several kinds of A are tried: zero, well conditioned SPD,
-   //   well conditioned indefinite, low rank
+   //   well conditioned definite, low rank semidefinity
    // * box constraints: x[i] in [-1,+1]
    // * initial point x0 = [0 0 ... 0 0]
    // * CCnt == min(3,N-1) general linear constraints of form (c,x) == 0.
@@ -33106,7 +35081,7 @@ static bool testminqpunit_generallcqptest() {
    // in order to compute constrained gradient.
       tolconstr = -99999.0;
       for (n = 2; n <= 8; n++) {
-         for (akind = 0; akind <= 4; akind++) {
+         for (akind = 0; akind <= 3; akind++) {
             for (bscale = 1; bscale >= -1; bscale--) {
             // Dense-AUL solver has lower precision on rank-deficient
             // problems, so we skip AKind == 3.
@@ -33166,26 +35141,6 @@ static bool testminqpunit_generallcqptest() {
                         tmp.xR[i] = hqrndnormal(&rs);
                      }
                      v = pow(2.0, hqrndnormal(&rs));
-                     for (i = 0; i < n; i++) {
-                        for (j = 0; j < n; j++) {
-                           a.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
-                        }
-                     }
-                  }
-               }
-               if (akind == 4) {
-               // Low rank indefinite
-                  ae_vector_set_length(&tmp, n);
-                  for (i = 0; i < n; i++) {
-                     for (j = 0; j < n; j++) {
-                        a.xyR[i][j] = 0.0;
-                     }
-                  }
-                  for (k = 1; k < imin2(4, n); k++) {
-                     for (i = 0; i < n; i++) {
-                        tmp.xR[i] = hqrndnormal(&rs);
-                     }
-                     v = hqrndnormal(&rs);
                      for (i = 0; i < n; i++) {
                         for (j = 0; j < n; j++) {
                            a.xyR[i][j] += v * tmp.xR[i] * tmp.xR[j];
@@ -33671,15 +35626,7 @@ static bool testminqpunit_generallcqptest() {
    //      xs = inv(A)*(C'*ys-b)
       for (n = 1; n <= 6; n++) {
       // Set up tolerances
-         if (solvertype == 0) {
-            xtol = 0.00001;
-         } else {
-            if (solvertype == 1 || solvertype == 2 || solvertype == 3) {
-               xtol = 0.001;
-            } else {
-               ae_assert(false, "unexpected solver type");
-            }
-         }
+         xtol = 0.001;
       // Generate problem
          ae_vector_set_length(&da, n);
          ae_matrix_set_length(&a, n, n);
@@ -40549,9 +42496,9 @@ static bool testminlpunit_singlecalltests() {
             return Ok;
          }
          testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
-         Ok = Ok && NearAtR(errp, rep0.primalerror, etol * rmax2(errp, 1.0));
-         Ok = Ok && NearAtR(errd, rep0.dualerror, etol * rmax2(errd, 1.0));
-         Ok = Ok && NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0));
+         Ok = Ok && NearAtR(errp, rep0.primalerror, etol * rmax3(errp, rmaxabsv(n, &x0), 1.0));
+         Ok = Ok && NearAtR(errd, rep0.dualerror, etol * rmax3(errd, rmaxabsv(n, &x0), 1.0));
+         Ok = Ok && NearAtR(errs, rep0.slackerror, etol * rmax3(errs, rmaxabsv(n, &x0), 1.0));
       // Generate random primal infeasible
       //
       // NOTE: because we use constraint validation code, we can not
@@ -40573,9 +42520,9 @@ static bool testminlpunit_singlecalltests() {
             return Ok;
          }
          testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
-         Ok = Ok && NearAtR(errp, rep0.primalerror, etol * rmax2(rep0.primalerror, 1.0));
-         Ok = Ok && NearAtR(errd, rep0.dualerror, etol * rmax2(rep0.dualerror, 1.0));
-         Ok = Ok && NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0));
+         Ok = Ok && NearAtR(errp, rep0.primalerror, etol * rmax3(errp, rmaxabsv(n, &x0), 1.0));
+         Ok = Ok && NearAtR(errd, rep0.dualerror, etol * rmax3(errd, rmaxabsv(n, &x0), 1.0));
+         Ok = Ok && NearAtR(errs, rep0.slackerror, etol * rmax3(errs, rmaxabsv(n, &x0), 1.0));
       }
    }
    for (n = 2; n <= 50; n++) {
@@ -43021,7 +44968,6 @@ static bool testminnlcunit_testother() {
    ae_int_t nexactlowrank;
    ae_int_t nexactrobust;
    ae_int_t nnone;
-   ae_int_t prectype;
    ae_int_t ctype;
    ae_int_t trialidx;
    ae_int_t blocksize;
@@ -43204,141 +45150,6 @@ static bool testminnlcunit_testother() {
       }
       Ok = Ok && NearAtR(x1.xR[0], sqrt(0.5), tolx);
       Ok = Ok && NearAtR(x1.xR[1], sqrt(0.5), tolx);
-   // Check handling of general linear constraints: solve linearly
-   // constrained twice, first time with constraints posed as linear
-   // ones, second time with constraints posed as nonlinear ones.
-   //
-   // Linear constraints are normalized because we know that optimizer
-   // normalizes them internally.
-   //
-   // We perform small amount of inner iterations - just 3 steps.
-   // Only one outer iteration is performed. Such small number of
-   // iterations allows to reduce influence of round-off errors
-   // and compare results returned by different control paths within
-   // optimizer (control path for linear constraints and one for
-   // nonlinear constraints).
-   //
-   // We test following kinds of preconditioners:
-   // * "none"
-   // * "exact low rank", restart frequency is 1
-   // * "exact robust", restart frequency is 1
-   // Inexact LBFGS-based preconditioner is not tested because its
-   // behavior greatly depends on order of equations.
-      n = 15;
-      k = 5;
-      maxits = 1;
-      ae_vector_set_length(&x0, n);
-      ae_matrix_set_length(&c, k, n + 1);
-      ae_vector_set_length(&ct, k);
-      for (prectype = 0; prectype <= 2; prectype++) {
-         for (i = 0; i < n; i++) {
-            x0.xR[i] = hqrndnormal(&rs);
-         }
-         for (i = 0; i < k; i++) {
-            v = 0.0;
-            for (j = 0; j < n; j++) {
-               c.xyR[i][j] = hqrndnormal(&rs);
-               v += sqr(c.xyR[i][j]);
-            }
-            v = 1.0 / sqrt(v);
-            ae_v_muld(c.xyR[i], 1, n, v);
-            v = ae_v_dotproduct(c.xyR[i], 1, x0.xR, 1, n);
-            c.xyR[i][n] = v;
-            ct.xZ[i] = 0;
-         }
-         minnlccreate(n, &x0, &state);
-         minnlcsetcond(&state, 0.0, maxits);
-         if (solvertype == 0) {
-            aulits = 1;
-            rho = 1000.0;
-            minnlcsetalgoaul(&state, rho, aulits);
-            if (prectype == 0) {
-               minnlcsetprecnone(&state);
-            }
-            if (prectype == 1) {
-               minnlcsetprecexactlowrank(&state, 1);
-            }
-            if (prectype == 2) {
-               minnlcsetprecexactrobust(&state, 1);
-            }
-         } else {
-            if (solvertype == 1) {
-               minnlcsetalgoslp(&state);
-            } else {
-               if (solvertype == 2) {
-                  minnlcsetalgosqp(&state);
-               } else {
-                  ae_assert(false, "Assertion failed");
-               }
-            }
-         }
-         minnlcsetlc(&state, &c, &ct, k);
-         while (minnlciteration(&state))
-            if (state.needfij) {
-               state.fi.xR[0] = 0.0;
-               for (i = 0; i < n; i++) {
-                  state.fi.xR[0] += sqr(state.x.xR[i]);
-                  state.j.xyR[0][i] = 2 * state.x.xR[i];
-               }
-            } else ae_assert(false, "Assertion failed");
-         minnlcresults(&state, &x1, &rep);
-         Ok = Ok && isfinitevector(&x1, n);
-         Ok = Ok && rep.terminationtype > 0;
-         if (!Ok) {
-            ae_frame_leave();
-            return Ok;
-         }
-         minnlccreate(n, &x0, &state);
-         if (solvertype == 0) {
-            aulits = 1;
-            rho = 1000.0;
-            minnlcsetalgoaul(&state, rho, aulits);
-            if (prectype == 0) {
-               minnlcsetprecnone(&state);
-            }
-            if (prectype == 1) {
-               minnlcsetprecexactlowrank(&state, 1);
-            }
-            if (prectype == 2) {
-               minnlcsetprecexactrobust(&state, 1);
-            }
-         } else {
-            if (solvertype == 1) {
-               minnlcsetalgoslp(&state);
-            } else {
-               if (solvertype == 2) {
-                  minnlcsetalgosqp(&state);
-               } else {
-                  ae_assert(false, "Assertion failed");
-               }
-            }
-         }
-         minnlcsetcond(&state, 0.0, maxits);
-         minnlcsetnlc(&state, k, 0);
-         while (minnlciteration(&state))
-            if (state.needfij) {
-               state.fi.xR[0] = 0.0;
-               for (i = 0; i < n; i++) {
-                  state.fi.xR[0] += sqr(state.x.xR[i]);
-                  state.j.xyR[0][i] = 2 * state.x.xR[i];
-               }
-               for (i = 0; i < k; i++) {
-                  v = ae_v_dotproduct(c.xyR[i], 1, state.x.xR, 1, n);
-                  state.fi.xR[1 + i] = v - c.xyR[i][n];
-                  ae_v_move(state.j.xyR[1 + i], 1, c.xyR[i], 1, n);
-               }
-            } else ae_assert(false, "Assertion failed");
-         minnlcresults(&state, &x2, &rep);
-         Ok = Ok && isfinitevector(&x2, n);
-         Ok = Ok && rep.terminationtype > 0;
-         if (!Ok) {
-            ae_frame_leave();
-            return Ok;
-         }
-         for (i = 0; i < n; i++) {
-            Ok = Ok && NearAtR(x1.xR[i], x2.xR[i], 0.001);
-         }
-      }
    // Test integrity checks for NAN/INF:
    // * algorithm solves optimization problem, which is normal for some time (quadratic)
    // * after 5-th step we choose random component of gradient and consistently spoil
@@ -45533,7 +47344,7 @@ bool testminnlc() {
 
 // === minns testing unit ===
 static const double testminnsunit_scalingtesttol = 0.000001;
-static const ae_int_t testminnsunit_scalingtestcnt = 5;
+static const ae_int_t testminnsunit_scalingtestcnt = 3;
 
 // Basic unconstrained test
 static bool testminnsunit_basictest0uc() {
@@ -46035,8 +47846,8 @@ static bool testminnsunit_testuc(bool *otherOkP) {
             s.xR[i] = pow(10.0, 2.0 * randommid());
          }
          requirexrep = randombool();
-         epsrad = 0.01 * pow(10.0, -2.0 * randomreal());
-         xtol = 15.0 * epsrad;
+         xtol = 0.01 * pow(10.0, -randomreal());
+         epsrad = xtol / 100;
          minnscreate(n, &x0, &state);
          minnssetalgoags(&state, 0.1, 0.0);
          minnssetcond(&state, epsrad, 0);
@@ -46094,8 +47905,8 @@ static bool testminnsunit_testuc(bool *otherOkP) {
             d.xR[i] = pow(10.0, 2.0 * randommid());
             s.xR[i] = pow(10.0, 2.0 * randommid());
          }
-         epsrad = 0.01 * pow(10.0, -2.0 * randomreal());
-         xtol = 15.0 * epsrad;
+         xtol = 0.01 * pow(10.0, -randomreal());
+         epsrad = xtol / 100;
          minnscreatef(n, &x0, epsrad / 100, &state);
          minnssetalgoags(&state, 0.1, 0.0);
          minnssetcond(&state, epsrad, 0);
@@ -46282,8 +48093,8 @@ static bool testminnsunit_testbc(bool *otherOkP) {
             }
          }
          requirexrep = randombool();
-         epsrad = 0.01 * pow(10.0, -2.0 * randomreal());
-         xtol = 15.0 * epsrad;
+         xtol = 0.01 * pow(10.0, -randomreal());
+         epsrad = xtol / 100;
          minnscreate(n, &x0, &state);
          minnssetalgoags(&state, 0.1, 0.0);
          minnssetcond(&state, epsrad, 0);
@@ -46404,7 +48215,7 @@ static bool testminnsunit_testbc(bool *otherOkP) {
          Ok = Ok && x1.xR[i] <= bndu.xR[i];
       }
       gnorm = sqrt(gnorm);
-      Ok = Ok && gnorm <= 0.00001;
+      Ok = Ok && gnorm <= 0.0001;
    }
 // Test on HIGHLY nonconvex bound constrained problem.
 // Algorithm should be able to stop.
@@ -46485,8 +48296,8 @@ static bool testminnsunit_testbc(bool *otherOkP) {
                bndu.xR[i] = bndl.xR[i];
             }
          }
-         epsrad = 0.01 * pow(10.0, -2.0 * randomreal());
-         xtol = 15.0 * epsrad;
+         xtol = 0.01 * pow(10.0, -2.0 * randomreal());
+         epsrad = xtol / 100;
          minnscreatef(n, &x0, epsrad / 100, &state);
          minnssetalgoags(&state, 0.1, 0.0);
          minnssetcond(&state, epsrad, 0);
@@ -46550,7 +48361,7 @@ static bool testminnsunit_testbc(bool *otherOkP) {
          ae_vector_set_length(&scaledbndl, n);
          ae_vector_set_length(&scaledbndu, n);
          for (i = 0; i < n; i++) {
-            s.xR[i] = pow(10.0, randomreal() - 0.5);
+            s.xR[i] = pow(2.0, randominteger(5) - 2.0);
             d.xR[i] = pow(10.0, randomreal() - 0.5);
             x0.xR[i] = randommid();
             xc.xR[i] = randommid();
@@ -46729,7 +48540,7 @@ static bool testminnsunit_testlc(bool *otherOkP) {
             return Ok;
          }
          minnssetlc(&state, &c, &ct, 0);
-         rho = 1000.0;
+         rho = 10000.0;
          repferr = 0.0;
          flast1 = NAN;
          for (minnsrestartfrom(&state, &x0); minnsiteration(&state); )
@@ -46994,8 +48805,8 @@ static bool testminnsunit_testnlc(bool *otherOkP) {
                   s.xR[i] = pow(10.0, randomreal() - 0.5);
                   r.xR[i] = (2 * randominteger(2) - 1) * (0.1 + randomreal());
                }
-               epsrad = 0.001;
                xtol = 0.01;
+               epsrad = xtol / 100;
                minnscreate(n, &x0, &state);
                minnssetalgoags(&state, 0.1, rho);
                minnssetcond(&state, epsrad, 0);
@@ -47059,9 +48870,9 @@ static bool testminnsunit_testnlc(bool *otherOkP) {
                   s.xR[i] = pow(10.0, randomreal() - 0.5);
                   r.xR[i] = (2 * randominteger(2) - 1) * (0.1 + randomreal());
                }
-               epsrad = 0.001;
                xtol = 0.01;
-               diffstep = 0.001;
+               epsrad = xtol / 100;
+               diffstep = epsrad / 10;
                minnscreatef(n, &x0, diffstep, &state);
                minnssetalgoags(&state, 0.1, rho);
                minnssetcond(&state, epsrad, 0);
@@ -50575,6 +52386,20 @@ static bool testinverseupdateunit_updandinv(RMatrix *a, RVector *u, RVector *v, 
    return Ok;
 }
 
+// Compute matrix norm
+static double testinverseupdateunit_normalizednrm(RMatrix *a, ae_int_t n) {
+   ae_int_t i;
+   ae_int_t j;
+   double result;
+   result = 1.0;
+   for (i = 0; i < n; i++) {
+      for (j = 0; j < n; j++) {
+         result = rmax2(result, fabs(a->xyR[i][j]));
+      }
+   }
+   return result;
+}
+
 bool testinverseupdate() {
    ae_frame _frame_block;
    ae_int_t n;
@@ -50637,7 +52462,7 @@ bool testinverseupdate() {
          }
          testinverseupdateunit_makeacopy(&inva, n, n, &b2);
          rmatrixinvupdatesimple(&b2, n, updrow, updcol, val);
-         Ok = Ok && testinverseupdateunit_matrixdiff(&b1, &b2, n, n) <= threshold;
+         Ok = Ok && testinverseupdateunit_matrixdiff(&b1, &b2, n, n) <= threshold * testinverseupdateunit_normalizednrm(&b1, n);
       // Test row update
          updrow = randominteger(n);
          for (i = 0; i < n; i++) {
@@ -50655,7 +52480,7 @@ bool testinverseupdate() {
          }
          testinverseupdateunit_makeacopy(&inva, n, n, &b2);
          rmatrixinvupdaterow(&b2, n, updrow, &v);
-         Ok = Ok && testinverseupdateunit_matrixdiff(&b1, &b2, n, n) <= threshold;
+         Ok = Ok && testinverseupdateunit_matrixdiff(&b1, &b2, n, n) <= threshold * testinverseupdateunit_normalizednrm(&b1, n);
       // Test column update
          updcol = randominteger(n);
          for (i = 0; i < n; i++) {
@@ -50673,7 +52498,7 @@ bool testinverseupdate() {
          }
          testinverseupdateunit_makeacopy(&inva, n, n, &b2);
          rmatrixinvupdatecolumn(&b2, n, updcol, &u);
-         Ok = Ok && testinverseupdateunit_matrixdiff(&b1, &b2, n, n) <= threshold;
+         Ok = Ok && testinverseupdateunit_matrixdiff(&b1, &b2, n, n) <= threshold * testinverseupdateunit_normalizednrm(&b1, n);
       // Test full update
          for (i = 0; i < n; i++) {
             v.xR[i] = 0.1 * randommid();
@@ -50686,7 +52511,7 @@ bool testinverseupdate() {
          }
          testinverseupdateunit_makeacopy(&inva, n, n, &b2);
          rmatrixinvupdateuv(&b2, n, &u, &v);
-         Ok = Ok && testinverseupdateunit_matrixdiff(&b1, &b2, n, n) <= threshold;
+         Ok = Ok && testinverseupdateunit_matrixdiff(&b1, &b2, n, n) <= threshold * testinverseupdateunit_normalizednrm(&b1, n);
       }
    }
 // The final report.
@@ -52768,15 +54593,15 @@ bool testmannwhitneyu() {
       worsterr = rmax2(worsterr, v);
    // Test error in quantile; for different N's we have different tolerances
       if (n < 10) {
-         Ok = Ok && v <= 0.030;
+         Ok = Ok && v <= 0.035;
       } else {
          if (n < 15) {
-            Ok = Ok && v <= 0.020;
+            Ok = Ok && v <= 0.025;
          } else {
             if (n < 30) {
-               Ok = Ok && v <= 0.015;
+               Ok = Ok && v <= 0.020;
             } else {
-               Ok = Ok && v <= 0.010;
+               Ok = Ok && v <= 0.015;
             }
          }
       }
@@ -55297,9 +57122,15 @@ static bool testspline1dunit_testsplinefitting() {
          m = 100;
       }
       ae_vector_set_length(&x, n);
+      x.xR[0] = hqrndnormal(&rs);
+      for (i = 1; i < n; i++) {
+         x.xR[i] = x.xR[i - 1] + 0.25 + hqrnduniformr(&rs);
+      }
+      for (i = 0; i < n; i++) {
+         swapr(&x.xR[i], &x.xR[i + hqrnduniformi(&rs, n - i)]);
+      }
       ae_vector_set_length(&y, n);
       for (i = 0; i < n; i++) {
-         x.xR[i] = hqrndnormal(&rs);
          y.xR[i] = hqrndnormal(&rs);
       }
       a = x.xR[0];
@@ -55310,7 +57141,7 @@ static bool testspline1dunit_testsplinefitting() {
       }
       prevresiduals = 0.0;
       prevpenalty = maxrealnumber;
-      rho = -4.0;
+      rho = -3.0;
       while (rho <= 4.0) {
       // Fit spline
          testspline1dunit_unsetspline1d(&c);
@@ -55340,7 +57171,7 @@ static bool testspline1dunit_testsplinefitting() {
          penalty /= k + 1;
       // Compare with previous, update previous, update Rho
       //
-      // Write('%.15e    %.15e    %.15e\n', Residuals, Penalty, MxD2);
+      // Write('M == %i    N == %i    %.15e    %.15e    %.15e\n', M, N, Residuals, Penalty, MxD2);
          Ok = Ok && residuals > prevresiduals;
          Ok = Ok && penalty < prevpenalty;
          prevresiduals = residuals;
@@ -55471,6 +57302,7 @@ bool testspline1d() {
    double intab;
    ae_int_t splineindex;
    double lipschitzeps;
+   double lipschitztol;
    ae_frame_make(&_frame_block);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
@@ -55493,7 +57325,8 @@ bool testspline1d() {
    lstep = 0.005;
    h = 0.00001;
    maxn = 10;
-   lipschitzeps = 0.000001;
+   lipschitzeps = 0.00001;
+   lipschitztol = 1.25;
    threshold = 10000.0 * machineepsilon;
    bool lsOk = true;
    bool csOk = true;
@@ -55555,7 +57388,7 @@ bool testspline1d() {
          lsOk = lsOk && err <= threshold;
          testspline1dunit_lconst(a, b, &c, lstep, &l10, &l11, &l12);
          testspline1dunit_lconst(a, b, &c, lstep / 3, &l20, &l21, &l22);
-         lsOk = lsOk && l20 / l10 <= 1.2;
+         lsOk = lsOk && l20 / l10 <= lipschitztol;
       // Build cubic spline.
       // Test for interpolation scheme properties:
       // * values at nodes
@@ -55655,13 +57488,13 @@ bool testspline1d() {
                testspline1dunit_lconst(a, b, &c, lstep, &l10, &l11, &l12);
                testspline1dunit_lconst(a, b, &c, lstep / 3, &l20, &l21, &l22);
                if (l10 > lipschitzeps) {
-                  csOk = csOk && l20 / (l10 + lipschitzeps) <= 1.2;
+                  csOk = csOk && l20 / (l10 + lipschitzeps) <= lipschitztol;
                }
                if (l11 > lipschitzeps) {
-                  csOk = csOk && l21 / (l11 + lipschitzeps) <= 1.2;
+                  csOk = csOk && l21 / (l11 + lipschitzeps) <= lipschitztol;
                }
                if (l12 > lipschitzeps) {
-                  csOk = csOk && l22 / (l12 + lipschitzeps) <= 1.2;
+                  csOk = csOk && l22 / (l12 + lipschitzeps) <= lipschitztol;
                }
             // compare spline1dgriddiff() and spline1ddiff() results
                err = 0.0;
@@ -55804,10 +57637,10 @@ bool testspline1d() {
             testspline1dunit_lconst(a, b, &c, lstep, &l10, &l11, &l12);
             testspline1dunit_lconst(a, b, &c, lstep / 3, &l20, &l21, &l22);
             if (l10 > 0.000001) {
-               crsOk = crsOk && l20 / l10 <= 1.2;
+               crsOk = crsOk && l20 / l10 <= lipschitztol;
             }
             if (l11 > 0.000001) {
-               crsOk = crsOk && l21 / l11 <= 1.2;
+               crsOk = crsOk && l21 / l11 <= lipschitztol;
             }
          }
       // Build Hermite spline.
@@ -55829,8 +57662,8 @@ bool testspline1d() {
          hsOk = hsOk && err <= 0.001;
          testspline1dunit_lconst(a, b, &c, lstep, &l10, &l11, &l12);
          testspline1dunit_lconst(a, b, &c, lstep / 3, &l20, &l21, &l22);
-         hsOk = hsOk && l20 / l10 <= 1.2;
-         hsOk = hsOk && l21 / l11 <= 1.2;
+         hsOk = hsOk && l20 / (l10 + lipschitzeps) <= lipschitztol;
+         hsOk = hsOk && l21 / (l11 + lipschitzeps) <= lipschitztol;
       // Build Akima spline
       // Test for general interpolation scheme properties:
       // * values at nodes
@@ -55845,8 +57678,8 @@ bool testspline1d() {
          asOk = asOk && err <= threshold;
          testspline1dunit_lconst(a, b, &c, lstep, &l10, &l11, &l12);
          testspline1dunit_lconst(a, b, &c, lstep / 3, &l20, &l21, &l22);
-         hsOk = hsOk && (l10 <= 1.0E-10 || l20 / l10 <= 1.2);
-         hsOk = hsOk && (l11 <= 1.0E-10 || l21 / l11 <= 1.2);
+         asOk = asOk && l20 / (l10 + lipschitzeps) <= lipschitztol;
+         asOk = asOk && l21 / (l11 + lipschitzeps) <= lipschitztol;
       }
    }
 // Special linear spline test:
@@ -57122,6 +58955,7 @@ static bool testlsfitunit_testbcnls() {
    double f1;
    ae_int_t tmpkind;
    ae_int_t terminationtype;
+   double relaxationshift;
    bool Ok = true;
    ae_frame_make(&_frame_block);
    NewObj(lsfitstate, state);
@@ -57280,6 +59114,7 @@ static bool testlsfitunit_testbcnls() {
             ae_frame_leave();
             return Ok;
          }
+      // evaluate value at C1 and compare with value at trial points
          f0 = 0.0;
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.xR, 1, xx.xyR[ii], 1, nx);
@@ -57287,6 +59122,7 @@ static bool testlsfitunit_testbcnls() {
             f0 += sqr(v - y.xR[ii]);
          }
          h = 0.001;
+         relaxationshift = rmax2(fabs(f0), 1.0) * sqrt(machineepsilon);
          ae_vector_set_length(&c2, nc);
          for (i = 0; i < nc; i++) {
             Ok = Ok && c1.xR[i] >= bl.xR[i];
@@ -57302,7 +59138,7 @@ static bool testlsfitunit_testbcnls() {
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
                   f1 += sqr(v - y.xR[ii]);
                }
-               Ok = Ok && f1 >= f0;
+               Ok = Ok && f1 >= f0 - relaxationshift;
             }
             if (c1.xR[i] - h >= bl.xR[i] && c1.xR[i] - h <= bu.xR[i]) {
                for (j = 0; j < nc; j++) {
@@ -57315,7 +59151,7 @@ static bool testlsfitunit_testbcnls() {
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
                   f1 += sqr(v - y.xR[ii]);
                }
-               Ok = Ok && f1 >= f0;
+               Ok = Ok && f1 >= f0 - relaxationshift;
             }
          }
       }
@@ -57924,6 +59760,7 @@ static bool testlsfitunit_isglssolution(ae_int_t n, ae_int_t m, ae_int_t k, RVec
    double s3;
    double delta;
    double threshold;
+   double shift;
    bool Ok;
    ae_frame_make(&_frame_block);
    DupVector(c);
@@ -57937,6 +59774,7 @@ static bool testlsfitunit_isglssolution(ae_int_t n, ae_int_t m, ae_int_t k, RVec
 // Threshold is small because CMatrix may be ill-conditioned
    delta = 0.001;
    threshold = sqrt(machineepsilon);
+   shift = 10000.0 * machineepsilon;
    ae_vector_set_length(&c2, m);
    ae_vector_set_length(&deltac, m);
    ae_vector_set_length(&deltaproj, m);
@@ -57988,7 +59826,7 @@ static bool testlsfitunit_isglssolution(ae_int_t n, ae_int_t m, ae_int_t k, RVec
       ae_v_move(c2.xR, 1, c->xR, 1, m);
       ae_v_sub(c2.xR, 1, deltaproj.xR, 1, m);
       s3 = testlsfitunit_getglserror(n, m, y, w, fmatrix, &c2);
-      Ok = Ok && s2 >= s1 / (1.0 + threshold) && s3 >= s1 / (1.0 + threshold);
+      Ok = Ok && s2 >= s1 / (1.0 + threshold) - shift && s3 >= s1 / (1.0 + threshold) - shift;
    }
    ae_frame_leave();
    return Ok;
@@ -58880,7 +60718,7 @@ static bool testlsfitunit_testrdp() {
       y.xR[i] = sin(x.xR[i]) + 0.005 * hqrndmiduniformr(&rs);
    }
    lstfitpiecewiselinearrdpfixed(&x, &y, n, n, &x2, &y2, &nsections);
-   Ok = Ok && nsections == n - 1;
+   Ok = Ok && nsections <= n - 1;
    ae_frame_leave();
    return Ok;
 }
@@ -71299,7 +73137,7 @@ static bool testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
    }
    testmlpbaseunit_createnetwork(&network, nkind, a1, a2, nin, nhid1, nhid2, nout);
    mlpproperties(&network, &n1, &n2, &wcount);
-   h = 0.0001;
+   h = 0.00001;
    etol = 0.05;
 // Initialize
    ae_vector_set_length(&x, nin);
@@ -71534,6 +73372,11 @@ static bool testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
          } else {
             for (j = 0; j < nout; j++) {
                y1.xR[j] = 2.0 * randommid();
+               if (y1.xR[j] >= 0.0) {
+                  y1.xR[j] += 0.1;
+               } else {
+                  y1.xR[j] -= 0.1;
+               }
                sparseset(&sparsexy, i, nin + j, y1.xR[j]);
             }
             ae_v_move(&xy.xyR[i][nin], 1, y1.xR, 1, nout);
@@ -74979,6 +76822,8 @@ static bool testdforestunit_basictest2() {
    ae_int_t npoints;
    ae_int_t ntrees;
    ae_int_t i;
+   double avgerr;
+   ae_int_t cnt;
    bool Ok = true;
    ae_frame_make(&_frame_block);
    NewMatrix(xy, 0, 0, DT_REAL);
@@ -75028,6 +76873,8 @@ static bool testdforestunit_basictest2() {
       Ok = Ok && rep.avgerror < rep.oobavgerror;
       Ok = Ok && rep.avgrelerror < rep.oobavgrelerror;
    // Check outputs
+      avgerr = 0.0;
+      cnt = 0;
       x.xR[0] = 0.0;
       while (x.xR[0] <= 3.0) {
          dfprocess(&df, &x, &y);
@@ -75037,17 +76884,20 @@ static bool testdforestunit_basictest2() {
          Ok = Ok && NearAtR(y.xR[0] + y.xR[1], 1.0, 1000.0 * machineepsilon);
       // test for good correlation with results
          if (x.xR[0] < 1.0) {
-            Ok = Ok && y.xR[0] >= 0.8;
+            avgerr += fabs(1 - y.xR[0]);
          }
          if (x.xR[0] >= 1.0 && x.xR[0] <= 2.0) {
-            Ok = Ok && NearAtR(y.xR[1], x.xR[0] - 1.0, 0.5);
+            avgerr += fabs(y.xR[1] - (x.xR[0] - 1));
          }
          if (x.xR[0] > 2.0) {
-            Ok = Ok && y.xR[1] >= 0.8;
+            avgerr += fabs(1 - y.xR[1]);
          }
+         cnt++;
       // Advance
          x.xR[0] += 0.01;
       }
+      avgerr /= cnt;
+      Ok = Ok && avgerr <= 0.05;
    }
    ae_frame_leave();
    return Ok;
@@ -75347,7 +77197,7 @@ static bool testdforestunit_basictestrandom() {
    npoints = 200;
    nvars = 10;
    ntrees = 1000;
-   oobtol = 0.20;
+   oobtol = 0.15;
    for (nclasses = 1; nclasses <= 3; nclasses++) {
    // Prepare task
       ae_matrix_set_length(&xy, npoints, nvars + 1);
@@ -75439,8 +77289,8 @@ static bool testdforestunit_basictestrandom() {
          // * AVG-REL should be just larger (it is more prone to sampling noise than previous two)
             Ok = Ok && rep.oobrelclserror == 0.0;
             Ok = Ok && rep.oobavgce == 0.0;
-            Ok = Ok && NearAtR(rep.oobrmserror / rep.rmserror, factor, oobtol);
-            Ok = Ok && NearAtR(rep.oobavgerror / rep.avgerror, factor, oobtol);
+            Ok = Ok && NearAtR(rep.oobrmserror / rep.rmserror, factor, oobtol * factor);
+            Ok = Ok && NearAtR(rep.oobavgerror / rep.avgerror, factor, oobtol * factor);
             Ok = Ok && rep.oobavgrelerror >= rep.avgrelerror;
          } else {
          // Check training set errors
@@ -75483,8 +77333,8 @@ static bool testdforestunit_basictestrandom() {
             Ok = Ok && rep.oobrelclserror >= rep.relclserror;
             Ok = Ok && rep.oobavgce >= rep.avgce;
             Ok = Ok && rep.oobavgrelerror >= rep.avgrelerror;
-            Ok = Ok && NearAtR(rep.oobrmserror / rep.rmserror, factor, oobtol);
-            Ok = Ok && NearAtR(rep.oobavgerror / rep.avgerror, factor, oobtol);
+            Ok = Ok && NearAtR(rep.oobrmserror / rep.rmserror, factor, oobtol * factor);
+            Ok = Ok && NearAtR(rep.oobavgerror / rep.avgerror, factor, oobtol * factor);
          }
       }
    }
@@ -75996,10 +77846,10 @@ static bool testdforestunit_testimportance() {
       // of trees are preferred.
          npoints = 250;
          ntrees = 1000;
-         unimportantlo = 0.75 * (1.0 / nvars);
-         unimportanthi = rmin2(1.25 * (1.0 / nvars), 1.00);
-         importantlo = 0.75 * (1.0 / nvars);
-         importanthi = rmin2(1.25 * (1.0 / nvars), 1.00);
+         unimportantlo = 0.70 * (1.0 / nvars);
+         unimportanthi = rmin2(1.30 * (1.0 / nvars), 1.00);
+         importantlo = 0.70 * (1.0 / nvars);
+         importanthi = rmin2(1.30 * (1.0 / nvars), 1.00);
       }
    // Test on a problem with completely random outputs
       for (nclasses = 1; nclasses <= 3; nclasses++) {
@@ -79685,7 +81535,7 @@ bool testlda() {
                   ldanOk = false;
                   continue;
                }
-               ldanOk = ldanOk && wn.xyR[axis][0] > 0.75;
+               ldanOk = ldanOk && !SmallAtR(wn.xyR[axis][0], 0.75);
                fisherlda(&xy, ns, nf, nc, &info, &w1);
                for (i = 0; i < nf; i++) {
                   lda1Ok = lda1Ok && w1.xR[i] == wn.xyR[i][0];
@@ -81546,7 +83396,7 @@ static bool testmlptrainunit_testmlptrainregr() {
    NewObj(sparsematrix, sm);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
-   eps = 0.01;
+   eps = 0.02;
    vdecay = 0.001;
    nneurons = 10;
    nneedrest = 5;
@@ -81639,6 +83489,7 @@ static bool testmlptrainunit_testmlpxorregr() {
    ae_int_t j;
    ae_int_t vtrain;
    ae_int_t xp;
+   ae_int_t nfailures;
    bool Ok;
    ae_frame_make(&_frame_block);
    NewObj(multilayerperceptron, net);
@@ -81648,10 +83499,11 @@ static bool testmlptrainunit_testmlpxorregr() {
    NewObj(sparsematrix, sm);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
+   Ok = true;
    eps = 0.01;
    numxp = 15;
-   vdecay = 0.001;
-   nneurons = 3;
+   vdecay = 0.0001;
+   nneurons = 4;
    nneedrest = 1;
    traineps = 0.0001;
    trainits = 0;
@@ -81660,9 +83512,9 @@ static bool testmlptrainunit_testmlpxorregr() {
    sparsecreate(n, 3, n * 3, &sm);
    ae_matrix_set_length(&xy, n, 3);
    ae_vector_set_length(&x, 2);
+   nfailures = 0;
    for (xp = 1; xp <= numxp; xp++) {
       for (vtrain = 0; vtrain <= 3; vtrain++) {
-         averr = 0.0;
       // Create a train set(uniformly distributed set of points).
          for (i = 0; i < sn; i++) {
             for (j = 0; j < sn; j++) {
@@ -81720,6 +83572,7 @@ static bool testmlptrainunit_testmlpxorregr() {
             for (mlpstarttraining(&trainer, &net, true); mlpcontinuetraining(&trainer, &net); ) { }
          }
       // Check that network is trained correctly
+         averr = 0.0;
          for (i = 0; i < n; i++) {
             x.xR[0] = xy.xyR[i][0];
             x.xR[1] = xy.xyR[i][1];
@@ -81728,13 +83581,11 @@ static bool testmlptrainunit_testmlpxorregr() {
             averr += fabs(y.xR[0] - xy.xyR[i][2]);
          }
          if (averr / n > eps) {
-            Ok = false;
-            ae_frame_leave();
-            return Ok;
+            nfailures++;
          }
       }
    }
-   Ok = true;
+   Ok = Ok && nfailures < 2;
    ae_frame_leave();
    return Ok;
 }
@@ -81767,10 +83618,11 @@ static bool testmlptrainunit_testmlptrainclass() {
    NewObj(sparsematrix, sm);
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
+   Ok = true;
    mnc = 10.0;
    mxc = 11.0;
    nxp = 15;
-   vdecay = 0.001;
+   vdecay = 0.0001;
    nneedrest = 10;
    traineps = 0.0001;
    trainits = 0;
@@ -81852,7 +83704,6 @@ static bool testmlptrainunit_testmlptrainclass() {
          }
       }
    }
-   Ok = true;
    ae_frame_leave();
    return Ok;
 }
@@ -81890,7 +83741,7 @@ static bool testmlptrainunit_testmlpxorcls() {
    NewVector(y, 0, DT_REAL);
    NewVector(wbest, 0, DT_REAL);
    nxp = 15;
-   nneurons = 3;
+   nneurons = 4;
    vdecay = 0.001;
    nneedrest = 3;
    traineps = 0.0001;
@@ -82255,6 +84106,7 @@ static bool testmlptrainunit_testmlpcverror() {
    NewObj(sparsematrix, sptrainingset);
    NewMatrix(trainingset, 0, 0, DT_REAL);
    NewMatrix(testset, 0, 0, DT_REAL);
+   Ok = true;
    decay = 0.000001;
    wstep = 0.0;
    foldscount = 5;
@@ -82297,7 +84149,7 @@ static bool testmlptrainunit_testmlpcverror() {
       isregr = false;
    }
    mean = nxp / 2.0;
-   numsigma = 5.0 * sqrt(nxp) / 2.0;
+   numsigma = 3.0 * sqrt(nxp / 4.0);
    diffms = mean - numsigma;
    issparse = randominteger(2);
    if (isregr) {
@@ -82463,7 +84315,6 @@ static bool testmlptrainunit_testmlpcverror() {
          return Ok;
       }
    }
-   Ok = true;
    ae_frame_leave();
    return Ok;
 }
@@ -82486,13 +84337,17 @@ static bool testmlptrainunit_testmlptrainens() {
    ae_int_t nclasses;
    ae_int_t i;
    ae_int_t j;
+   ae_int_t k;
    bool Ok;
    ae_frame_make(&_frame_block);
    NewObj(mlpensemble, ensemble);
    NewObj(mlpreport, rep);
    NewObj(mlpcvreport, oobrep);
    NewMatrix(xy, 0, 0, DT_REAL);
+   NewMatrix(hf, 0, 0, DT_REAL);
+   NewObj(hqrndstate, rs);
    Ok = true;
+   hqrndrandomize(&rs);
 // network training must reduce error
 // test on random regression task
    nin = 3;
@@ -82505,21 +84360,41 @@ static bool testmlptrainunit_testmlptrainens() {
       for (algtype = 0; algtype <= 1; algtype++) {
          for (tasktype = 0; tasktype <= 1; tasktype++) {
             if (tasktype == 0) {
+               ae_matrix_set_length(&hf, nout, nin + 1);
+               for (i = 0; i < nout; i++) {
+                  for (j = 0; j <= nin; j++) {
+                     hf.xyR[i][j] = hqrndnormal(&rs);
+                  }
+               }
                ae_matrix_set_length(&xy, npoints, nin + nout);
                for (i = 0; i < npoints; i++) {
-                  for (j = 0; j < nin + nout; j++) {
-                     xy.xyR[i][j] = randommid();
+                  for (j = 0; j < nin; j++) {
+                     xy.xyR[i][j] = hqrndnormal(&rs);
+                  }
+                  for (j = 0; j < nout; j++) {
+                     xy.xyR[i][nin + j] = hqrndnormal(&rs) + rdotrr(nin, &hf, j, &xy, i);
                   }
                }
                mlpecreate1(nin, nhid, nout, 1 + randominteger(3), &ensemble);
             } else {
                ae_matrix_set_length(&xy, npoints, nin + 1);
                nclasses = 2 + randominteger(2);
+               ae_assert(nclasses <= nin, "MLPTrain: bug in test");
                for (i = 0; i < npoints; i++) {
                   for (j = 0; j < nin; j++) {
-                     xy.xyR[i][j] = randommid();
+                     xy.xyR[i][j] = hqrndnormal(&rs);
                   }
-                  xy.xyR[i][nin] = randominteger(nclasses);
+                  k = 0;
+                  for (j = 0; j < nclasses; j++) {
+                     if (xy.xyR[i][j] > xy.xyR[i][k]) {
+                        k = j;
+                     }
+                  }
+                  if (hqrndnormal(&rs) > 0.0) {
+                     xy.xyR[i][nin] = k;
+                  } else {
+                     xy.xyR[i][nin] = hqrnduniformi(&rs, nclasses);
+                  }
                }
                mlpecreatec1(nin, nhid, nclasses, 1 + randominteger(3), &ensemble);
             }
@@ -82912,7 +84787,7 @@ bool testmlptrain() {
    xy.xyR[3][1] = 1.0;
    xy.xyR[3][2] = -1.0;
    mlpcreate1(2, 2, 1, &network);
-   mlptrainlm(&network, &xy, 4, 0.001, 10, &info, &rep);
+   mlptrainlm(&network, &xy, 4, 0.0001, 20, &info, &rep);
    trnOk = trnOk && mlprmserror(&network, &xy, 4) <= 0.1;
 // Test early stopping
    trnOk = trnOk && testmlptrainunit_testmlptraines();

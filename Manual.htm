@@ -24336,7 +24336,7 @@ Inputs:
 This subroutine solves linear system op(A)*x == b where:
 * A is NxN upper/lower triangular/unitriangular matrix
 * X and B are Nx1 vectors
-* &quot;op&quot; may be identity transformation, transposition, conjugate transposition
+* &quot;op&quot; may be identity transformation or transposition
 
 Solution replaces X.
 
@@ -24961,8 +24961,8 @@ ALGLIB: Copyright 12.11.2017 by Sergey Bochkanov
 <a name=sub_eigsubspacesolvedenses></a><h6 class=pageheader>eigsubspacesolvedenses Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
-This  function runs eigensolver for dense NxN symmetric matrix A, given by
-upper or lower triangle.
+This  function runs subspace eigensolver for dense NxN symmetric matrix A,
+given by its upper or lower triangle.
 
 This function can not process nonsymmetric matrices.
 
@@ -28065,6 +28065,7 @@ Algorithm implemented on the basis of the DHSEQR subroutine (LAPACK 3.0 library)
 <a href=#sub_sparsemv2 class=toc>sparsemv2</a> |
 <a href=#sub_sparseresizematrix class=toc>sparseresizematrix</a> |
 <a href=#sub_sparserewriteexisting class=toc>sparserewriteexisting</a> |
+<a href=#sub_sparseserialize class=toc>sparseserialize</a> |
 <a href=#sub_sparseset class=toc>sparseset</a> |
 <a href=#sub_sparsesmm class=toc>sparsesmm</a> |
 <a href=#sub_sparsesmv class=toc>sparsesmv</a> |
@@ -28075,6 +28076,7 @@ Algorithm implemented on the basis of the DHSEQR subroutine (LAPACK 3.0 library)
 <a href=#sub_sparsetransposesks class=toc>sparsetransposesks</a> |
 <a href=#sub_sparsetrmv class=toc>sparsetrmv</a> |
 <a href=#sub_sparsetrsv class=toc>sparsetrsv</a> |
+<a href=#sub_sparseunserialize class=toc>sparseunserialize</a> |
 <a href=#sub_sparsevsmv class=toc>sparsevsmv</a>
 ]</font>
 <h5>Examples</h5>
@@ -29413,6 +29415,27 @@ ALGLIB Project: Copyright 14.03.2012 by Sergey Bochkanov
 <pre class=declaration>
 <b>bool</b> sparserewriteexisting(sparsematrix s, ae_int_t i, ae_int_t j, <b>double</b> v);
 </pre>
+<a name=sub_sparseserialize></a><h6 class=pageheader>sparseserialize Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Serializer: serialization
+These functions serialize a data structure to a C++ string or stream.
+* serialization can be freely moved across 32-bit and 64-bit systems,
+  and different byte orders. For example, you can serialize a string
+  on a SPARC and unserialize it on an x86.
+* ALGLIB++ serialization is compatible with serialization in ALGLIB,
+  in both directions.
+Important properties of s_out:
+* it contains alphanumeric characters, dots, underscores, minus signs
+* these symbols are grouped into words, which are separated by spaces
+  and Windows-style (CR+LF) newlines
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparseserialize(sparsematrix &amp;obj, std::string &amp;s_out);
+<b>void</b> sparseserialize(sparsematrix &amp;obj, std::ostream &amp;s_out);
+</pre>
 <a name=sub_sparseset></a><h6 class=pageheader>sparseset Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
@@ -29742,6 +29765,24 @@ ALGLIB Project: Copyright 20.01.2014 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=declaration>
 <b>void</b> sparsetrsv(sparsematrix s, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array x);
+</pre>
+<a name=sub_sparseunserialize></a><h6 class=pageheader>sparseunserialize Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Serializer: unserialization
+These functions unserialize a data structure from a C++ string or stream.
+Important properties of s_in:
+* any combination of spaces, tabs, Windows or Unix stype newlines can
+  be used as separators, so as to allow flexible reformatting of the
+  stream or string from text or XML files.
+* But you should not insert separators into the middle of the "words"
+  nor you should change case of letters.
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparseunserialize(<b>const</b> std::string &amp;s_in, sparsematrix &amp;obj);
+<b>void</b> sparseunserialize(<b>const</b> std::istream &amp;s_in, sparsematrix &amp;obj);
 </pre>
 <a name=sub_sparsevsmv></a><h6 class=pageheader>sparsevsmv Function</h6>
 <hr width=600 align=left>
@@ -30301,10 +30342,14 @@ Inputs:
                         which may have non-positive entries.
     PermType    -   permutation type:
                     *-1 for absence of permutation
-                    * 0 for best fill-in reducing permutation available
+                    * 0 for best fill-in reducing  permutation  available,
+                        which is 3 in the current version
                     * 1 for supernodal ordering (improves locality and
                       performance, does NOT change fill-in factor)
-                    * 2 for AMD (approximate minimum degree) ordering
+                    * 2 for original AMD ordering
+                    * 3 for  improved  AMD  (approximate  minimum  degree)
+                        ordering with better  handling  of  matrices  with
+                        dense rows/columns
 
 Outputs:
     Analysis    -   contains:
@@ -38142,15 +38187,16 @@ Inputs:
 
 OptGuard integrity  checker  allows us to catch problems  like  errors  in
 gradients   and  discontinuity/nonsmoothness  of  the  target/constraints.
-Latter kind of problems can be detected  by  looking  upon  line  searches
+The latter kind of problems can be detected  by looking upon line searches
 performed during optimization and searching for signs of nonsmoothness.
 
 The problem with SQP is that it is too good for OptGuard to work - it does
 not perform line searches. It typically  needs  1-2  function  evaluations
 per step, and it is not enough for OptGuard to detect nonsmoothness.
 
-So, if you suspect that your problem is nonsmooth, we recommend you to use
-AUL or SLP solvers.
+So, if you suspect that your problem is  nonsmooth  and  if  you  want  to
+confirm or deny it, we recommend you to use AUL or SLP solvers,  which can
+detect nonsmoothness of the problem.
 ALGLIB: Copyright 02.12.2019 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -39463,9 +39509,8 @@ The very basic outline of unconstrained AGS algorithm is given below:
 4. perform backtracking line search
 5. after moving to new point, goto (0)
 
-As for the constraints:
-* box constraints are handled exactly  by  modification  of  the  function
-  being minimized
+Constraint handling details:
+* box constraints are handled exactly by algorithm
 * linear/nonlinear constraints are handled by adding L1  penalty.  Because
   our solver can handle nonsmoothness, we can  use  L1  penalty  function,
   which is an exact one  (i.e.  exact  solution  is  returned  under  such
@@ -40120,6 +40165,7 @@ using namespace alglib;
 <h5>Functions</h5><font size=2>[
 <a href=#sub_minqpaddlc2 class=toc>minqpaddlc2</a> |
 <a href=#sub_minqpaddlc2dense class=toc>minqpaddlc2dense</a> |
+<a href=#sub_minqpaddlc2sparsefromdense class=toc>minqpaddlc2sparsefromdense</a> |
 <a href=#sub_minqpcreate class=toc>minqpcreate</a> |
 <a href=#sub_minqpoptimize class=toc>minqpoptimize</a> |
 <a href=#sub_minqpresults class=toc>minqpresults</a> |
@@ -40296,7 +40342,7 @@ ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=narration>
 This function appends two-sided linear constraint  AL &le; A*x &le; AU  to the
-list of currently present dense constraints.
+matrix of currently present dense constraints.
 
 Inputs:
     State   -   structure previously allocated with minqpcreate() call.
@@ -40314,6 +40360,30 @@ ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 <pre class=declaration>
 <b>void</b> minqpaddlc2dense(minqpstate state, real_1d_array a, <b>double</b> al, <b>double</b> au);
 </pre>
+<a name=sub_minqpaddlc2sparsefromdense></a><h6 class=pageheader>minqpaddlc2sparsefromdense Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function appends two-sided linear constraint  AL &le; A*x &le; AU  to the
+list of currently present sparse constraints.
+
+Constraint vector A is  passed  as  a  dense  array  which  is  internally
+sparsified by this function.
+
+Inputs:
+    State   -   structure previously allocated with minqpcreate() call.
+    DA      -   array[N], constraint vector
+    AL, AU  -   lower and upper bounds;
+                * AL == AU   &rArr; equality constraint A*x
+                * AL &lt; AU    &rArr; two-sided constraint AL &le; A*x &le; AU
+                * AL == -INF &rArr; one-sided constraint A*x &le; AU
+                * AU == +INF &rArr; one-sided constraint AL &le; A*x
+                * AL == -INF, AU == +INF &rArr; constraint is ignored
+ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> minqpaddlc2sparsefromdense(minqpstate state, real_1d_array da, <b>double</b> al, <b>double</b> au);
+</pre>
 <a name=sub_minqpcreate></a><h6 class=pageheader>minqpcreate Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
@@ -40330,8 +40400,9 @@ In order to actually solve something you should:
     * minqpsetlc2()       for sparse two-sided constraints AL &le; A*x &le; AU
     * minqpsetlc2dense()  for dense  two-sided constraints AL &le; A*x &le; AU
     * minqpsetlc2mixed()  for mixed  two-sided constraints AL &le; A*x &le; AU
-    * minqpaddlc2dense()  to add one dense row to dense constraint submatrix
-    * minqpaddlc2()       to add one sparse row to sparse constraint submatrix
+    * minqpaddlc2dense()  to add one dense row to the dense constraint submatrix
+    * minqpaddlc2()       to add one sparse row to the sparse constraint submatrix
+    * minqpaddlc2sparsefromdense() to add one sparse row (passed as a dense array) to the sparse constraint submatrix
   * legacy API:
     * minqpsetlc()        for dense one-sided equality/inequality constraints
     * minqpsetlcsparse()  for sparse one-sided equality/inequality constraints
@@ -42180,8 +42251,142 @@ ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
 </pre>
 <a name=unit_opts></a><h4 class=pageheader>8.8.12. opts Subpackage</h4>
 <div class=pagecontent>
-<i>To be added.</i>
+<h5>Classes</h5><font size=2>[
+<a href=#struct_lptestproblem class=toc>lptestproblem</a>
+]</font>
+<h5>Functions</h5><font size=2>[
+<a href=#sub_lptestproblemcreate class=toc>lptestproblemcreate</a> |
+<a href=#sub_lptestproblemserialize class=toc>lptestproblemserialize</a> |
+<a href=#sub_lptestproblemsetbc class=toc>lptestproblemsetbc</a> |
+<a href=#sub_lptestproblemsetcost class=toc>lptestproblemsetcost</a> |
+<a href=#sub_lptestproblemsetlc2 class=toc>lptestproblemsetlc2</a> |
+<a href=#sub_lptestproblemsetscale class=toc>lptestproblemsetscale</a> |
+<a href=#sub_lptestproblemunserialize class=toc>lptestproblemunserialize</a> |
+<a href=#sub_xdbgminlpcreatefromtestproblem class=toc>xdbgminlpcreatefromtestproblem</a>
+]</font>
 </div>
+<a name=struct_lptestproblem></a><h6 class=pageheader>lptestproblem Class</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This is a test problem class  intended  for  internal  performance  tests.
+Never use it directly in your projects.
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>class</b> lptestproblem {
+};
+</pre>
+<a name=sub_lptestproblemcreate></a><h6 class=pageheader>lptestproblemcreate Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Initialize test LP problem.
+
+This function is intended for internal use by ALGLIB.
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> lptestproblemcreate(ae_int_t n, <b>bool</b> hasknowntarget, <b>double</b> targetf, lptestproblem &amp;p);
+</pre>
+<a name=sub_lptestproblemserialize></a><h6 class=pageheader>lptestproblemserialize Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Serializer: serialization
+These functions serialize a data structure to a C++ string or stream.
+* serialization can be freely moved across 32-bit and 64-bit systems,
+  and different byte orders. For example, you can serialize a string
+  on a SPARC and unserialize it on an x86.
+* ALGLIB++ serialization is compatible with serialization in ALGLIB,
+  in both directions.
+Important properties of s_out:
+* it contains alphanumeric characters, dots, underscores, minus signs
+* these symbols are grouped into words, which are separated by spaces
+  and Windows-style (CR+LF) newlines
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> lptestproblemserialize(lptestproblem &amp;obj, std::string &amp;s_out);
+<b>void</b> lptestproblemserialize(lptestproblem &amp;obj, std::ostream &amp;s_out);
+</pre>
+<a name=sub_lptestproblemsetbc></a><h6 class=pageheader>lptestproblemsetbc Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Set box constraints for test LP problem
+
+This function is intended for internal use by ALGLIB.
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> lptestproblemsetbc(lptestproblem p, real_1d_array bndl, real_1d_array bndu);
+</pre>
+<a name=sub_lptestproblemsetcost></a><h6 class=pageheader>lptestproblemsetcost Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Set cost for test LP problem
+
+This function is intended for internal use by ALGLIB.
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> lptestproblemsetcost(lptestproblem p, real_1d_array c);
+</pre>
+<a name=sub_lptestproblemsetlc2></a><h6 class=pageheader>lptestproblemsetlc2 Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Set box constraints for test LP problem
+
+This function is intended for internal use by ALGLIB.
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> lptestproblemsetlc2(lptestproblem p, sparsematrix a, real_1d_array al, real_1d_array au, ae_int_t m);
+</pre>
+<a name=sub_lptestproblemsetscale></a><h6 class=pageheader>lptestproblemsetscale Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Set scale for test LP problem
+
+This function is intended for internal use by ALGLIB.
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> lptestproblemsetscale(lptestproblem p, real_1d_array s);
+</pre>
+<a name=sub_lptestproblemunserialize></a><h6 class=pageheader>lptestproblemunserialize Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Serializer: unserialization
+These functions unserialize a data structure from a C++ string or stream.
+Important properties of s_in:
+* any combination of spaces, tabs, Windows or Unix stype newlines can
+  be used as separators, so as to allow flexible reformatting of the
+  stream or string from text or XML files.
+* But you should not insert separators into the middle of the "words"
+  nor you should change case of letters.
+ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> lptestproblemunserialize(<b>const</b> std::string &amp;s_in, lptestproblem &amp;obj);
+<b>void</b> lptestproblemunserialize(<b>const</b> std::istream &amp;s_in, lptestproblem &amp;obj);
+</pre>
+<a name=sub_xdbgminlpcreatefromtestproblem></a><h6 class=pageheader>xdbgminlpcreatefromtestproblem Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This is internal function intended to  be  used  only  by  ALGLIB  itself.
+Although for technical reasons it is made publicly available (and has  its
+own manual entry), you should never call it.
+ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> xdbgminlpcreatefromtestproblem(lptestproblem p, minlpstate &amp;state);
+</pre>
 </p>
 <p>
 <a name=pck_Solvers class=sheader></a><h3>8.9. Solvers Package</h3>
@@ -43947,14 +44152,24 @@ ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 <a name=struct_sparsesolverreport></a><h6 class=pageheader>sparsesolverreport Class</h6>
 <hr width=600 align=left>
 <pre class=narration>
-This structure is a sparse solver report.
+This structure is a sparse solver report (both direct and iterative solvers
+use this structure).
 
 Following fields can be accessed by users:
+* TerminationType (specific error codes depend on the solver  being  used,
+  with positive values ALWAYS signaling  that something useful is returned
+  in X, and negative values ALWAYS meaning critical failures.
+* NMV - number of matrix-vector products performed (0 for direct solvers)
+* IterationsCount - inner iterations count (0 for direct solvers)
+* R2 - squared residual
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
 <b>class</b> sparsesolverreport {
    ae_int_t terminationtype;
+   ae_int_t nmv;
+   ae_int_t iterationscount;
+   <b>double</b> r2;
 };
 </pre>
 <a name=sub_sparselusolve></a><h6 class=pageheader>sparselusolve Function</h6>
@@ -44156,8 +44371,662 @@ using namespace alglib;
 </pre>
 <a name=unit_iterativesparse></a><h4 class=pageheader>8.9.3. iterativesparse Subpackage</h4>
 <div class=pagecontent>
-<i>To be added.</i>
+<h5>Classes</h5><font size=2>[
+<a href=#struct_sparsesolverstate class=toc>sparsesolverstate</a>
+]</font>
+<h5>Functions</h5><font size=2>[
+<a href=#sub_sparsesolvegmres class=toc>sparsesolvegmres</a> |
+<a href=#sub_sparsesolvercreate class=toc>sparsesolvercreate</a> |
+<a href=#sub_sparsesolverooccontinue class=toc>sparsesolverooccontinue</a> |
+<a href=#sub_sparsesolveroocgetrequestdata class=toc>sparsesolveroocgetrequestdata</a> |
+<a href=#sub_sparsesolveroocgetrequestdata1 class=toc>sparsesolveroocgetrequestdata1</a> |
+<a href=#sub_sparsesolveroocgetrequestinfo class=toc>sparsesolveroocgetrequestinfo</a> |
+<a href=#sub_sparsesolveroocsendresult class=toc>sparsesolveroocsendresult</a> |
+<a href=#sub_sparsesolveroocstart class=toc>sparsesolveroocstart</a> |
+<a href=#sub_sparsesolveroocstop class=toc>sparsesolveroocstop</a> |
+<a href=#sub_sparsesolverrequesttermination class=toc>sparsesolverrequesttermination</a> |
+<a href=#sub_sparsesolverresults class=toc>sparsesolverresults</a> |
+<a href=#sub_sparsesolversetalgogmres class=toc>sparsesolversetalgogmres</a> |
+<a href=#sub_sparsesolversetcond class=toc>sparsesolversetcond</a> |
+<a href=#sub_sparsesolversetstartingpoint class=toc>sparsesolversetstartingpoint</a> |
+<a href=#sub_sparsesolversetxrep class=toc>sparsesolversetxrep</a> |
+<a href=#sub_sparsesolversolve class=toc>sparsesolversolve</a> |
+<a href=#sub_sparsesolversolvesymmetric class=toc>sparsesolversolvesymmetric</a> |
+<a href=#sub_sparsesolvesymmetricgmres class=toc>sparsesolvesymmetricgmres</a>
+]</font>
 </div>
+<a name=struct_sparsesolverstate></a><h6 class=pageheader>sparsesolverstate Class</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This object stores state of the sparse linear solver object.
+
+You should use ALGLIB functions to work with this object.
+Never try to access its fields directly!
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>class</b> sparsesolverstate {
+};
+</pre>
+<a name=sub_sparsesolvegmres></a><h6 class=pageheader>sparsesolvegmres Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Solving sparse linear system A*x == b using GMRES(k) method.
+
+This function provides convenience API for an 'expert' interface  provided
+by SparseSolverState class. Use SparseSolver  API  if  you  need  advanced
+functions like providing initial point, using out-of-core API and so on.
+
+Inputs:
+    A       -   sparse NxN matrix in any sparse storage format. Using  CRS
+                format   is   recommended   because   it  avoids  internal
+                conversion.
+                An exception will be generated if  A  is  not  NxN  matrix
+                (where  N  is  a  size   specified  during  solver  object
+                creation).
+    B       -   right part, array[N]
+    K       -   k parameter for  GMRES(k), k &ge; 0.  Zero  value  means  that
+                algorithm will choose it automatically.
+    EpsF    -   stopping condition, EpsF &ge; 0. The algorithm will stop  when
+                residual will decrease below EpsF*|B|. Having EpsF == 0 means
+                that this stopping condition is ignored.
+    MaxIts  -   stopping condition, MaxIts &ge; 0.  The  algorithm  will  stop
+                after performing MaxIts iterations. Zero  value  means  no
+                limit.
+
+NOTE: having both EpsF == 0 and MaxIts == 0 means that stopping criteria will be
+      chosen automatically.
+
+Outputs:
+    X       -   array[N], the solution
+    Rep     -   solution report:
+                * Rep.TerminationType completion code:
+                    * -5    CG method was used for a matrix which  is  not
+                            positive definite
+                    * -4    overflow/underflow during solution
+                            (ill conditioned problem)
+                    *  1    ||residual|| &le; EpsF*||b||
+                    *  5    MaxIts steps was taken
+                    *  7    rounding errors prevent further progress,
+                            best point found is returned
+                    *  8    the  algorithm  was  terminated   early  with
+                            SparseSolverRequestTermination() being called
+                            from other thread.
+                * Rep.IterationsCount contains iterations count
+                * Rep.NMV contains number of matrix-vector calculations
+                * Rep.R2 contains squared residual
+ALGLIB: Copyright 25.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolvegmres(sparsematrix a, real_1d_array b, ae_int_t k, <b>double</b> epsf, ae_int_t maxits, real_1d_array &amp;x, sparsesolverreport &amp;rep);
+</pre>
+<a name=sub_sparsesolvercreate></a><h6 class=pageheader>sparsesolvercreate Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function initializes sparse linear iterative solver object.
+
+This solver can be used  to  solve  nonsymmetric  and  symmetric  positive
+definite NxN (square) linear systems.
+
+The solver provides  'expert'  API  which  allows  advanced  control  over
+algorithms being used, including ability to get progress report, terminate
+long-running solver from other thread, out-of-core solution and so on.
+
+NOTE: there are also convenience  functions  that  allows  quick  one-line
+      access to the solvers:
+      * SparseSolveCG() to solve SPD linear systems
+      * SparseSolveGMRES() to solve unsymmetric linear systems.
+
+NOTE: if you want to solve MxN (rectangular) linear problem  you  may  use
+      LinLSQR solver provided by ALGLIB.
+
+USAGE (A is given by the SparseMatrix structure):
+
+    1. User initializes algorithm state with SparseSolverCreate() call
+    2. User  selects   algorithm  with one of the SparseSolverSetAlgo???()
+       functions. By default, GMRES(k) is used with automatically chosen k
+    3. Optionally, user tunes solver parameters, sets starting point, etc.
+    4. Depending on whether system is symmetric or not, user calls:
+       * SparseSolverSolveSymmetric() for a  symmetric system given by its
+         lower or upper triangle
+       * SparseSolverSolve() for a nonsymmetric system or a symmetric  one
+         given by the full matrix
+    5. User calls SparseSolverResults() to get the solution
+
+    It is possible to call SparseSolverSolve???() again to  solve  another
+    task with same dimensionality but different matrix and/or  right  part
+    without reinitializing SparseSolverState structure.
+
+USAGE (out-of-core mode):
+
+    1. User initializes algorithm state with SparseSolverCreate() call
+    2. User  selects   algorithm  with one of the SparseSolverSetAlgo???()
+       functions. By default, GMRES(k) is used with automatically chosen k
+    3. Optionally, user tunes solver parameters, sets starting point, etc.
+    4. After that user should work with out-of-core interface  in  a  loop
+       like one given below:
+
+        &gt; alglib.sparsesolveroocstart(state)
+        &gt; while alglib.sparsesolverooccontinue(state) do
+        &gt;     alglib.sparsesolveroocgetrequestinfo(state, out RequestType)
+        &gt;     alglib.sparsesolveroocgetrequestdata(state, out X)
+        &gt;     if RequestType == 0 then
+        &gt;         [calculate Y == A*X, with X == R^N]
+        &gt;     alglib.sparsesolveroocsendresult(state, in Y)
+        &gt; alglib.sparsesolveroocstop(state, out X, out Report)
+
+Inputs:
+    N       -   problem dimensionality (fixed at start-up)
+
+Outputs:
+    State   -   structure which stores algorithm state
+ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolvercreate(ae_int_t n, sparsesolverstate &amp;state);
+</pre>
+<a name=sub_sparsesolverooccontinue></a><h6 class=pageheader>sparsesolverooccontinue Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function performs iterative solution of  the  linear  system  in  the
+out-of-core mode. It should be used in conjunction with other out-of-core-
+related functions of this subspackage in a loop like one given below:
+
+&gt; alglib.sparsesolveroocstart(state)
+&gt; while alglib.sparsesolverooccontinue(state) do
+&gt;     alglib.sparsesolveroocgetrequestinfo(state, out RequestType)
+&gt;     alglib.sparsesolveroocgetrequestdata(state, out X)
+&gt;     if RequestType == 0 then
+&gt;         [calculate Y == A*X, with X == R^N]
+&gt;     alglib.sparsesolveroocsendresult(state, in Y)
+&gt; alglib.sparsesolveroocstop(state, out X, out Report)
+ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>bool</b> sparsesolverooccontinue(sparsesolverstate state);
+</pre>
+<a name=sub_sparsesolveroocgetrequestdata></a><h6 class=pageheader>sparsesolveroocgetrequestdata Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function is used  to  retrieve  vector  associated  with  out-of-core
+request sent by the solver to user code. Depending  on  the  request  type
+(returned by the SparseSolverOOCGetRequestInfo()) this  vector  should  be
+multiplied by A or subjected to another processing.
+
+It should be used in conjunction with other out-of-core-related  functions
+of this subspackage in a loop like one given below:
+
+&gt; alglib.sparsesolveroocstart(state)
+&gt; while alglib.sparsesolverooccontinue(state) do
+&gt;     alglib.sparsesolveroocgetrequestinfo(state, out RequestType)
+&gt;     alglib.sparsesolveroocgetrequestdata(state, out X)
+&gt;     if RequestType == 0 then
+&gt;         [calculate Y == A*X, with X == R^N]
+&gt;     alglib.sparsesolveroocsendresult(state, in Y)
+&gt; alglib.sparsesolveroocstop(state, out X, out Report)
+
+Inputs:
+    State           -   solver running in out-of-core mode
+    X               -   possibly  preallocated   storage;  reallocated  if
+                        needed, left unchanged, if large enough  to  store
+                        request data.
+
+Outputs:
+    X               -   array[N] or larger, leading N elements are  filled
+                        with vector X.
+ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolveroocgetrequestdata(sparsesolverstate state, real_1d_array &amp;x);
+</pre>
+<a name=sub_sparsesolveroocgetrequestdata1></a><h6 class=pageheader>sparsesolveroocgetrequestdata1 Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function is used to retrieve scalar value associated with out-of-core
+request sent by the solver to user code. In  the  current  ALGLIB  version
+this function is used to retrieve squared residual  norm  during  progress
+reports.
+
+Inputs:
+    State           -   solver running in out-of-core mode
+
+Outputs:
+    V               -   scalar value associated with the current request
+ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolveroocgetrequestdata1(sparsesolverstate state, <b>double</b> &amp;v);
+</pre>
+<a name=sub_sparsesolveroocgetrequestinfo></a><h6 class=pageheader>sparsesolveroocgetrequestinfo Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function is used to retrieve information  about  out-of-core  request
+sent by the solver:
+* RequestType == 0  means that matrix-vector products A*x is requested
+* RequestType == -1 means that solver reports its progress; this  request  is
+  returned only when reports are activated wit SparseSolverSetXRep().
+
+This function returns just request type; in order  to  get contents of the
+trial vector, use sparsesolveroocgetrequestdata().
+
+It should be used in conjunction with other out-of-core-related  functions
+of this subspackage in a loop like one given below:
+
+&gt; alglib.sparsesolveroocstart(state)
+&gt; while alglib.sparsesolverooccontinue(state) do
+&gt;     alglib.sparsesolveroocgetrequestinfo(state, out RequestType)
+&gt;     alglib.sparsesolveroocgetrequestdata(state, out X)
+&gt;     if RequestType == 0 then
+&gt;         [calculate Y == A*X, with X == R^N]
+&gt;     alglib.sparsesolveroocsendresult(state, in Y)
+&gt; alglib.sparsesolveroocstop(state, out X, out Report)
+
+Inputs:
+    State           -   solver running in out-of-core mode
+
+Outputs:
+    RequestType     -   type of the request to process:
+                        * 0   for matrix-vector product A*x, with A  being
+                          NxN system matrix  and X being N-dimensional
+                          vector
+                        *-1   for location and residual report
+ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolveroocgetrequestinfo(sparsesolverstate state, ae_int_t &amp;requesttype);
+</pre>
+<a name=sub_sparsesolveroocsendresult></a><h6 class=pageheader>sparsesolveroocsendresult Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function is used to send user reply to out-of-core  request  sent  by
+the solver. Usually it is product A*x for vector X returned by the solver.
+
+It should be used in conjunction with other out-of-core-related  functions
+of this subspackage in a loop like one given below:
+
+&gt; alglib.sparsesolveroocstart(state)
+&gt; while alglib.sparsesolverooccontinue(state) do
+&gt;     alglib.sparsesolveroocgetrequestinfo(state, out RequestType)
+&gt;     alglib.sparsesolveroocgetrequestdata(state, out X)
+&gt;     if RequestType == 0 then
+&gt;         [calculate Y == A*X, with X == R^N]
+&gt;     alglib.sparsesolveroocsendresult(state, in Y)
+&gt; alglib.sparsesolveroocstop(state, out X, out Report)
+
+Inputs:
+    State           -   solver running in out-of-core mode
+    AX              -   array[N] or larger, leading N elements contain A*x
+ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolveroocsendresult(sparsesolverstate state, real_1d_array ax);
+</pre>
+<a name=sub_sparsesolveroocstart></a><h6 class=pageheader>sparsesolveroocstart Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function initiates out-of-core mode of the sparse solver.  It  should
+be used in conjunction with other out-of-core-related  functions  of  this
+subspackage in a loop like one given below:
+
+&gt; alglib.sparsesolveroocstart(state)
+&gt; while alglib.sparsesolverooccontinue(state) do
+&gt;     alglib.sparsesolveroocgetrequestinfo(state, out RequestType)
+&gt;     alglib.sparsesolveroocgetrequestdata(state, out X)
+&gt;     if RequestType == 0 then
+&gt;         [calculate Y == A*X, with X == R^N]
+&gt;     alglib.sparsesolveroocsendresult(state, in Y)
+&gt; alglib.sparsesolveroocstop(state, out X, out Report)
+
+Inputs:
+    State       -   solver object
+ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolveroocstart(sparsesolverstate state, real_1d_array b);
+</pre>
+<a name=sub_sparsesolveroocstop></a><h6 class=pageheader>sparsesolveroocstop Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This  function  finalizes out-of-core mode of the linear solver. It should
+be used in conjunction with other out-of-core-related  functions  of  this
+subspackage in a loop like one given below:
+
+&gt; alglib.sparsesolveroocstart(state)
+&gt; while alglib.sparsesolverooccontinue(state) do
+&gt;     alglib.sparsesolveroocgetrequestinfo(state, out RequestType)
+&gt;     alglib.sparsesolveroocgetrequestdata(state, out X)
+&gt;     if RequestType == 0 then
+&gt;         [calculate Y == A*X, with X == R^N]
+&gt;     alglib.sparsesolveroocsendresult(state, in Y)
+&gt; alglib.sparsesolveroocstop(state, out X, out Report)
+
+Inputs:
+    State       -   solver state
+
+Outputs:
+    X       -   array[N], the solution.
+                Zero-filled on the failure (Rep.TerminationType &lt; 0).
+    Rep     -   report with additional info:
+                * Rep.TerminationType completion code:
+                    * -5    CG method was used for a matrix which  is  not
+                            positive definite
+                    * -4    overflow/underflow during solution
+                            (ill conditioned problem)
+                    *  1    ||residual|| &le; EpsF*||b||
+                    *  5    MaxIts steps was taken
+                    *  7    rounding errors prevent further progress,
+                            best point found is returned
+                    *  8    the  algorithm  was  terminated   early  with
+                            SparseSolverRequestTermination() being called
+                            from other thread.
+                * Rep.IterationsCount contains iterations count
+                * Rep.NMV contains number of matrix-vector calculations
+                * Rep.R2 contains squared residual
+ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolveroocstop(sparsesolverstate state, real_1d_array &amp;x, sparsesolverreport &amp;rep);
+</pre>
+<a name=sub_sparsesolverrequesttermination></a><h6 class=pageheader>sparsesolverrequesttermination Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This subroutine submits request for termination of the running solver.  It
+can be called from some other thread which wants the   solver to terminate
+or when processing an out-of-core request.
+
+As result, solver  stops  at  point  which  was  &quot;current  accepted&quot;  when
+the termination request was submitted and returns error code 8 (successful
+termination).  Such   termination   is  a smooth  process  which  properly
+deallocates all temporaries.
+
+Inputs:
+    State   -   solver structure
+
+NOTE: calling this function on solver which is NOT running  will  have  no
+      effect.
+
+NOTE: multiple calls to this function are possible. First call is counted,
+      subsequent calls are silently ignored.
+
+NOTE: solver clears termination flag on its start, it means that  if  some
+      other thread will request termination too soon, its request will went
+      unnoticed.
+ALGLIB: Copyright 01.10.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolverrequesttermination(sparsesolverstate state);
+</pre>
+<a name=sub_sparsesolverresults></a><h6 class=pageheader>sparsesolverresults Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Sparse solver results.
+
+This function must be called after calling one of the SparseSolverSolve()
+functions.
+
+Inputs:
+    State   -   algorithm state
+
+Outputs:
+    X       -   array[N], solution
+    Rep     -   solution report:
+                * Rep.TerminationType completion code:
+                    * -5    CG method was used for a matrix which  is  not
+                            positive definite
+                    * -4    overflow/underflow during solution
+                            (ill conditioned problem)
+                    *  1    ||residual|| &le; EpsF*||b||
+                    *  5    MaxIts steps was taken
+                    *  7    rounding errors prevent further progress,
+                            best point found is returned
+                    *  8    the  algorithm  was  terminated   early  with
+                            SparseSolverRequestTermination() being called
+                            from other thread.
+                * Rep.IterationsCount contains iterations count
+                * Rep.NMV contains number of matrix-vector calculations
+                * Rep.R2 contains squared residual
+s
+ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolverresults(sparsesolverstate state, real_1d_array &amp;x, sparsesolverreport &amp;rep);
+</pre>
+<a name=sub_sparsesolversetalgogmres></a><h6 class=pageheader>sparsesolversetalgogmres Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function sets the solver algorithm to GMRES(k).
+
+NOTE: if you do not need advanced functionality of the  SparseSolver  API,
+      you   may   use   convenience   functions   SparseSolveGMRES()   and
+      SparseSolveSymmetricGMRES().
+
+Inputs:
+    State   -   structure which stores algorithm state
+    K       -   GMRES parameter, K &ge; 0:
+                * recommended values are in 10..100 range
+                * larger values up to N are possible but have little sense
+                  - the algorithm will be slower than any dense solver.
+                * values above N are truncated down to N
+                * zero value means that  default  value  is  chosen.  This
+                  value is 50 in the current version, but  it  may  change
+                  in future ALGLIB releases.
+ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolversetalgogmres(sparsesolverstate state, ae_int_t k);
+</pre>
+<a name=sub_sparsesolversetcond></a><h6 class=pageheader>sparsesolversetcond Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function sets stopping criteria.
+
+Inputs:
+    EpsF    -   algorithm will be stopped if norm of residual is less than
+                EpsF*||b||.
+    MaxIts  -   algorithm will be stopped if number of iterations is  more
+                than MaxIts.
+
+Outputs:
+    State   -   structure which stores algorithm state
+
+NOTES:
+If  both  EpsF  and  MaxIts  are  zero then small EpsF will be set to small
+value.
+ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolversetcond(sparsesolverstate state, <b>double</b> epsf, ae_int_t maxits);
+</pre>
+<a name=sub_sparsesolversetstartingpoint></a><h6 class=pageheader>sparsesolversetstartingpoint Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function sets starting point.
+By default, zero starting point is used.
+
+Inputs:
+    State   -   structure which stores algorithm state
+    X       -   starting point, array[N]
+
+Outputs:
+    State   -   new starting point was set
+ALGLIB: Copyright 24.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolversetstartingpoint(sparsesolverstate state, real_1d_array x);
+</pre>
+<a name=sub_sparsesolversetxrep></a><h6 class=pageheader>sparsesolversetxrep Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function turns on/off reporting during out-of-core processing.
+
+When the solver works in the out-of-core mode, it  can  be  configured  to
+report its progress by returning current location. These location  reports
+are implemented as a special kind of the out-of-core request:
+* SparseSolverOOCGetRequestInfo() returns -1
+* SparseSolverOOCGetRequestData() returns current location
+* SparseSolverOOCGetRequestData1() returns squared norm of the residual
+* SparseSolverOOCSendResult() shall NOT be called
+
+This function has no effect when SparseSolverSolve() is used because  this
+function has no method of reporting its progress.
+
+NOTE: when used with GMRES(k), this function reports progress  every  k-th
+      iteration.
+
+Inputs:
+    State   -   structure which stores algorithm state
+    NeedXRep-   whether iteration reports are needed or not
+ALGLIB: Copyright 01.10.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolversetxrep(sparsesolverstate state, <b>bool</b> needxrep);
+</pre>
+<a name=sub_sparsesolversolve></a><h6 class=pageheader>sparsesolversolve Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Procedure for the solution of A*x == b with sparse nonsymmetric A
+
+IMPORTANT: this function will work with any solver algorithm  being  used,
+           symmetric solver like CG,  or  not.  However,  using  symmetric
+           solvers on nonsymmetric problems is  dangerous.  It  may  solve
+           the problem up  to  desired  precision  (sometimes,  rarely) or
+           terminate with error code signalling  violation  of  underlying
+           assumptions.
+
+Inputs:
+    State   -   algorithm state
+    A       -   sparse NxN matrix in any sparse storage  format.
+                Using CRS format is recommended because it avoids internal
+                conversion.
+                An exception will be generated if  A  is  not  NxN  matrix
+                (where  N  is  a  size   specified  during  solver  object
+                creation).
+    B       -   right part, array[N]
+
+Result:
+    This function returns no result.
+    You can get the solution by calling SparseSolverResults()
+ALGLIB: Copyright 25.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolversolve(sparsesolverstate state, sparsematrix a, real_1d_array b);
+</pre>
+<a name=sub_sparsesolversolvesymmetric></a><h6 class=pageheader>sparsesolversolvesymmetric Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Procedure for  the  solution of A*x == b with sparse symmetric A given by its
+lower or upper triangle.
+
+This function will work with any solver algorithm  being   used,  SPD  one
+(like CG) or not (like GMRES). Using unsymmetric solvers (like  GMRES)  on
+SPD problems is suboptimal, but still possible.
+
+NOTE: the  solver  behavior is ill-defined  for  a  situation  when a  SPD
+      solver is used on indefinite matrix. It  may solve the problem up to
+      desired precision (sometimes, rarely)  or  return  with  error  code
+      signalling violation of underlying assumptions.
+
+Inputs:
+    State   -   algorithm state
+    A       -   sparse symmetric NxN matrix in any sparse storage  format.
+                Using CRS format is recommended because it avoids internal
+                conversion.
+                An exception will be generated if  A  is  not  NxN  matrix
+                (where  N  is  a  size   specified  during  solver  object
+                creation).
+    IsUpper -   whether upper or lower triangle of A is used:
+                * IsUpper == True  &rArr; only upper triangle is used and lower
+                                   triangle is not referenced at all
+                * IsUpper == False &rArr; only lower triangle is used and upper
+                                   triangle is not referenced at all
+    B       -   right part, array[N]
+
+Result:
+    This function returns no result.
+    You can get the solution by calling SparseSolverResults()
+ALGLIB: Copyright 25.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolversolvesymmetric(sparsesolverstate state, sparsematrix a, <b>bool</b> isupper, real_1d_array b);
+</pre>
+<a name=sub_sparsesolvesymmetricgmres></a><h6 class=pageheader>sparsesolvesymmetricgmres Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Solving sparse symmetric linear system A*x == b using GMRES(k) method. Sparse
+symmetric A is given by its lower or upper triangle.
+
+NOTE: use SparseSolveGMRES() to solve system with nonsymmetric A.
+
+This function provides convenience API for an 'expert' interface  provided
+by SparseSolverState class. Use SparseSolver  API  if  you  need  advanced
+functions like providing initial point, using out-of-core API and so on.
+
+Inputs:
+    A       -   sparse symmetric NxN matrix in any sparse storage  format.
+                Using CRS format is recommended because it avoids internal
+                conversion.
+                An exception will be generated if  A  is  not  NxN  matrix
+                (where  N  is  a  size   specified  during  solver  object
+                creation).
+    IsUpper -   whether upper or lower triangle of A is used:
+                * IsUpper == True  &rArr; only upper triangle is used and lower
+                                   triangle is not referenced at all
+                * IsUpper == False &rArr; only lower triangle is used and upper
+                                   triangle is not referenced at all
+    B       -   right part, array[N]
+    K       -   k parameter for  GMRES(k), k &ge; 0.  Zero  value  means  that
+                algorithm will choose it automatically.
+    EpsF    -   stopping condition, EpsF &ge; 0. The algorithm will stop  when
+                residual will decrease below EpsF*|B|. Having EpsF == 0 means
+                that this stopping condition is ignored.
+    MaxIts  -   stopping condition, MaxIts &ge; 0.  The  algorithm  will  stop
+                after performing MaxIts iterations. Zero  value  means  no
+                limit.
+
+NOTE: having both EpsF == 0 and MaxIts == 0 means that stopping criteria will be
+      chosen automatically.
+
+Outputs:
+    X       -   array[N], the solution
+    Rep     -   solution report:
+                * Rep.TerminationType completion code:
+                    * -5    CG method was used for a matrix which  is  not
+                            positive definite
+                    * -4    overflow/underflow during solution
+                            (ill conditioned problem)
+                    *  1    ||residual|| &le; EpsF*||b||
+                    *  5    MaxIts steps was taken
+                    *  7    rounding errors prevent further progress,
+                            best point found is returned
+                    *  8    the  algorithm  was  terminated   early  with
+                            SparseSolverRequestTermination() being called
+                            from other thread.
+                * Rep.IterationsCount contains iterations count
+                * Rep.NMV contains number of matrix-vector calculations
+                * Rep.R2 contains squared residual
+ALGLIB: Copyright 25.09.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesolvesymmetricgmres(sparsematrix a, <b>bool</b> isupper, real_1d_array b, ae_int_t k, <b>double</b> epsf, ae_int_t maxits, real_1d_array &amp;x, sparsesolverreport &amp;rep);
+</pre>
 <a name=unit_lincg></a><h4 class=pageheader>8.9.4. lincg Subpackage</h4>
 <div class=pagecontent>
 <h5>Classes</h5><font size=2>[

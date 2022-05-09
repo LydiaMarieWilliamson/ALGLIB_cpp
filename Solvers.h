@@ -144,11 +144,15 @@ void rmatrixsolvels(const real_2d_array &a, const ae_int_t nrows, const ae_int_t
 namespace alglib_impl {
 struct sparsesolverreport {
    ae_int_t terminationtype;
+   ae_int_t nmv;
+   ae_int_t iterationscount;
+   double r2;
 };
 void sparsesolverreport_init(void *_p, bool make_automatic);
 void sparsesolverreport_copy(void *_dst, void *_src, bool make_automatic);
 void sparsesolverreport_free(void *_p, bool make_automatic);
 
+void initsparsesolverreport(sparsesolverreport *rep);
 void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep);
 void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep);
 void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep);
@@ -157,7 +161,7 @@ void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector 
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(sparsesolverreport, ae_int_t &terminationtype;);
+DecClass(sparsesolverreport, ae_int_t &terminationtype; ae_int_t &nmv; ae_int_t &iterationscount; double &r2;);
 
 void sparsespdsolvesks(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
 void sparsespdsolve(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
@@ -169,6 +173,78 @@ void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integ
 // === ITERATIVESPARSE Package ===
 // Depends on: (LinAlg) FBLS
 // Depends on: DIRECTSPARSESOLVERS
+namespace alglib_impl {
+struct sparsesolverstate {
+   ae_int_t n;
+   ae_vector x0;
+   double epsf;
+   ae_int_t maxits;
+   ae_int_t algotype;
+   ae_int_t gmresk;
+   bool xrep;
+   bool running;
+   bool userterminationneeded;
+   ae_vector b;
+   ae_vector xf;
+   ae_int_t repiterationscount;
+   ae_int_t repnmv;
+   ae_int_t repterminationtype;
+   double repr2;
+   ae_int_t requesttype;
+   ae_vector x;
+   ae_vector ax;
+   double reply1;
+   ae_vector wrkb;
+   sparsematrix convbuf;
+   fblsgmresstate gmressolver;
+   ae_int_t PQ;
+};
+void sparsesolverstate_init(void *_p, bool make_automatic);
+void sparsesolverstate_copy(void *_dst, void *_src, bool make_automatic);
+void sparsesolverstate_free(void *_p, bool make_automatic);
+
+void sparsesolversetalgogmres(sparsesolverstate *state, ae_int_t k);
+void sparsesolversetstartingpoint(sparsesolverstate *state, RVector *x);
+void sparsesolversetcond(sparsesolverstate *state, double epsf, ae_int_t maxits);
+void sparsesolversetxrep(sparsesolverstate *state, bool needxrep);
+void sparsesolvercreate(ae_int_t n, sparsesolverstate *state);
+void sparsesolveroocstart(sparsesolverstate *state, RVector *b);
+bool sparsesolverooccontinue(sparsesolverstate *state);
+void sparsesolveroocgetrequestinfo(sparsesolverstate *state, ae_int_t *requesttype);
+void sparsesolveroocgetrequestdata(sparsesolverstate *state, RVector *x);
+void sparsesolveroocgetrequestdata1(sparsesolverstate *state, double *v);
+void sparsesolveroocsendresult(sparsesolverstate *state, RVector *ax);
+void sparsesolveroocstop(sparsesolverstate *state, RVector *x, sparsesolverreport *rep);
+void sparsesolverresults(sparsesolverstate *state, RVector *x, sparsesolverreport *rep);
+void sparsesolversolvesymmetric(sparsesolverstate *state, sparsematrix *a, bool isupper, RVector *b);
+void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int_t k, double epsf, ae_int_t maxits, RVector *x, sparsesolverreport *rep);
+void sparsesolversolve(sparsesolverstate *state, sparsematrix *a, RVector *b);
+void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_int_t maxits, RVector *x, sparsesolverreport *rep);
+void sparsesolverrequesttermination(sparsesolverstate *state);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(sparsesolverstate, );
+
+void sparsesolversetalgogmres(const sparsesolverstate &state, const ae_int_t k);
+void sparsesolversetstartingpoint(const sparsesolverstate &state, const real_1d_array &x);
+void sparsesolversetcond(const sparsesolverstate &state, const double epsf, const ae_int_t maxits);
+void sparsesolversetxrep(const sparsesolverstate &state, const bool needxrep);
+void sparsesolvercreate(const ae_int_t n, sparsesolverstate &state);
+void sparsesolveroocstart(const sparsesolverstate &state, const real_1d_array &b);
+bool sparsesolverooccontinue(const sparsesolverstate &state);
+void sparsesolveroocgetrequestinfo(const sparsesolverstate &state, ae_int_t &requesttype);
+void sparsesolveroocgetrequestdata(const sparsesolverstate &state, real_1d_array &x);
+void sparsesolveroocgetrequestdata1(const sparsesolverstate &state, double &v);
+void sparsesolveroocsendresult(const sparsesolverstate &state, const real_1d_array &ax);
+void sparsesolveroocstop(const sparsesolverstate &state, real_1d_array &x, sparsesolverreport &rep);
+void sparsesolverresults(const sparsesolverstate &state, real_1d_array &x, sparsesolverreport &rep);
+void sparsesolversolvesymmetric(const sparsesolverstate &state, const sparsematrix &a, const bool isupper, const real_1d_array &b);
+void sparsesolvesymmetricgmres(const sparsematrix &a, const bool isupper, const real_1d_array &b, const ae_int_t k, const double epsf, const ae_int_t maxits, real_1d_array &x, sparsesolverreport &rep);
+void sparsesolversolve(const sparsesolverstate &state, const sparsematrix &a, const real_1d_array &b);
+void sparsesolvegmres(const sparsematrix &a, const real_1d_array &b, const ae_int_t k, const double epsf, const ae_int_t maxits, real_1d_array &x, sparsesolverreport &rep);
+void sparsesolverrequesttermination(const sparsesolverstate &state);
+} // end of namespace alglib
 
 // === LINCG Package ===
 // Depends on: (LinAlg) MATGEN, SPARSE

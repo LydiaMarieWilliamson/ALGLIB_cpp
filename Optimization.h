@@ -1184,6 +1184,7 @@ void minqpsetlc2dense(minqpstate *state, RMatrix *a, RVector *al, RVector *au, a
 void minqpsetlc2(minqpstate *state, sparsematrix *a, RVector *al, RVector *au, ae_int_t k);
 void minqpaddlc2dense(minqpstate *state, RVector *a, double al, double au);
 void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, double al, double au);
+void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, double au);
 void minqpoptimize(minqpstate *state);
 void minqpresultsbuf(minqpstate *state, RVector *x, minqpreport *rep);
 void minqpresults(minqpstate *state, RVector *x, minqpreport *rep);
@@ -1222,6 +1223,7 @@ void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const rea
 void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k);
 void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const double al, const double au);
 void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au);
+void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da, const double al, const double au);
 void minqpoptimize(const minqpstate &state);
 void minqpresultsbuf(const minqpstate &state, real_1d_array &x, minqpreport &rep);
 void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep);
@@ -2139,6 +2141,7 @@ struct minslpstate {
    ae_vector dummylagmult;
    ae_vector fscales;
    ae_vector meritfunctionhistory;
+   ae_vector maxlaghistory;
    ae_int_t historylen;
    minslpsubsolver subsolver;
    minslptmpmerit tmpmerit;
@@ -2416,7 +2419,10 @@ struct minnsstate {
    ae_vector xstart;
    ae_vector xc;
    ae_vector xn;
-   ae_vector grs;
+   ae_vector rawg;
+   ae_vector meritg;
+   double rawf;
+   double meritf;
    ae_vector d;
    ae_vector colmax;
    ae_vector diagh;
@@ -2426,20 +2432,21 @@ struct minnsstate {
    ae_vector scaledbndl;
    ae_vector scaledbndu;
    ae_matrix scaledcleic;
-   ae_vector rholinear;
+   double rholinear;
    ae_matrix samplex;
    ae_matrix samplegm;
    ae_matrix samplegmbc;
    ae_vector samplef;
-   ae_vector samplef0;
    minnsqp nsqp;
    ae_vector tmp0;
    ae_vector tmp1;
    ae_matrix tmp2;
    ae_vector tmp3;
    ae_vector xbase;
+   ae_vector fbase;
    ae_vector fp;
    ae_vector fm;
+   ae_vector xscaled;
    ae_int_t repinneriterationscount;
    ae_int_t repouteriterationscount;
    ae_int_t repnfev;
@@ -2752,5 +2759,48 @@ void minbcrequesttermination(const minbcstate &state);
 
 // === OPTS Package ===
 // Depends on: MINLP
+namespace alglib_impl {
+struct lptestproblem {
+   ae_int_t n;
+   bool hasknowntarget;
+   double targetf;
+   ae_vector s;
+   ae_vector c;
+   ae_vector bndl;
+   ae_vector bndu;
+   ae_int_t m;
+   sparsematrix a;
+   ae_vector al;
+   ae_vector au;
+};
+void lptestproblem_init(void *_p, bool make_automatic);
+void lptestproblem_copy(void *_dst, void *_src, bool make_automatic);
+void lptestproblem_free(void *_p, bool make_automatic);
+void lptestproblemalloc(ae_serializer *s, lptestproblem *p);
+void lptestproblemserialize(ae_serializer *s, lptestproblem *p);
+void lptestproblemunserialize(ae_serializer *s, lptestproblem *p);
+
+void lptestproblemcreate(ae_int_t n, bool hasknowntarget, double targetf, lptestproblem *p);
+void lptestproblemsetscale(lptestproblem *p, RVector *s);
+void lptestproblemsetcost(lptestproblem *p, RVector *c);
+void lptestproblemsetbc(lptestproblem *p, RVector *bndl, RVector *bndu);
+void lptestproblemsetlc2(lptestproblem *p, sparsematrix *a, RVector *al, RVector *au, ae_int_t m);
+void xdbgminlpcreatefromtestproblem(lptestproblem *p, minlpstate *state);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(lptestproblem, );
+void lptestproblemserialize(lptestproblem &obj, std::string &s_out);
+void lptestproblemserialize(lptestproblem &obj, std::ostream &s_out);
+void lptestproblemunserialize(const std::string &s_in, lptestproblem &obj);
+void lptestproblemunserialize(const std::istream &s_in, lptestproblem &obj);
+
+void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p);
+void lptestproblemsetscale(const lptestproblem &p, const real_1d_array &s);
+void lptestproblemsetcost(const lptestproblem &p, const real_1d_array &c);
+void lptestproblemsetbc(const lptestproblem &p, const real_1d_array &bndl, const real_1d_array &bndu);
+void lptestproblemsetlc2(const lptestproblem &p, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t m);
+void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state);
+} // end of namespace alglib
 
 #endif // OnceOnly

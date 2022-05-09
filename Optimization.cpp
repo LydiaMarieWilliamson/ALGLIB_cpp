@@ -1269,6 +1269,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    ae_int_t maxbadits;
    ae_int_t gparuns;
    ae_int_t maxarmijoruns;
+   double infeasibilityincreasetolerance;
    bool result;
    ae_frame_make(&_frame_block);
    DupMatrix(ce);
@@ -1351,6 +1352,8 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    badits = 0;
    itscount = 0;
    while (true) {
+   // Dynamically adjust infeasibility error tolerance
+      infeasibilityincreasetolerance = rmax2(rmaxabsv(nmain + nslack, x), 1.0) * (1000 + nmain) * machineepsilon;
    // Stage 0: check for exact convergence
       converged = true;
       feaserr = optserv_feasibilityerror(ce, x, nmain, nslack, k, &tmpk);
@@ -1659,7 +1662,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
       // Update X. Exit if needed.
          feasold = optserv_feasibilityerror(ce, x, nmain, nslack, k, &tmpk);
          feasnew = optserv_feasibilityerror(ce, &xa, nmain, nslack, k, &tmpk);
-         if (feasnew >= feasold) {
+         if (feasnew >= feasold + infeasibilityincreasetolerance) {
             break;
          }
          ae_v_move(x->xR, 1, xa.xR, 1, nmain + nslack);
@@ -1752,7 +1755,7 @@ bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bn
    //    Depending on feasibility error, True or False is returned.
       feaserr = optserv_feasibilityerror(ce, x, nmain, nslack, k, &tmpk);
       feaserr1 = feaserr;
-      if (feaserr1 >= feaserr0 * (1.0 - 1000.0 * machineepsilon)) {
+      if (feaserr1 >= feaserr0 - infeasibilityincreasetolerance) {
          badits++;
       } else {
          badits = 0;
@@ -12944,52 +12947,6 @@ static void minbleic_updateestimateofgoodstep(double *estimate, double newstep) 
    *estimate = newstep;
 }
 
-// This subroutine estimates relative feasibility error of the point.
-//
-// Inputs:
-//     X       -   current point (unscaled)
-//     S       -   scale vector
-//     N       -   dimensionality
-//     CLEIC   -   array[NEC+NIC,N+1], constraint matrix, may be unnormalized
-//     NEC     -   number of equality constraints (come first)
-//     NIC     -   number of inequality constraints (come last)
-//
-// Result:
-//     feasibility error, good value is ~1E-16...1E-14
-// ALGLIB: Copyright 16.01.2013 by Sergey Bochkanov
-static double minbleic_feasibilityerror(RVector *x, RVector *s, ae_int_t n, RMatrix *cleic, ae_int_t nec, ae_int_t nic) {
-   ae_int_t i;
-   ae_int_t j;
-   double v;
-   double v0;
-   double v1;
-   double vc;
-   double vx;
-   double result;
-   result = 0.0;
-   for (i = 0; i < nec + nic; i++) {
-      v = -cleic->xyR[i][n];
-      v0 = 0.0;
-      v1 = 0.0;
-      for (j = 0; j < n; j++) {
-         vc = cleic->xyR[i][j] * s->xR[j];
-         vx = x->xR[j] / s->xR[j];
-         v += vc * vx;
-         v0 += sqr(vc);
-         v1 += sqr(vx);
-      }
-      v0 = coalesce(sqrt(v0), 1.0);
-      v1 = rmax2(sqrt(v1), 1.0);
-      if (i < nec) {
-         v = fabs(v);
-      } else {
-         v = rmax2(v, 0.0);
-      }
-      result = rmax2(result, v / (v0 * v1));
-   }
-   return result;
-}
-
 // This function provides a reverse communication interface, which is not documented or recommended for use.
 // Instead, it is recommended that you use the better-documented API functions minbleicoptimize() listed below.
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
@@ -12997,7 +12954,7 @@ static double minbleic_feasibilityerror(RVector *x, RVector *s, ae_int_t n, RMat
 // API: void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 // API: void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool minbleiciteration(minbleicstate *state) {
-   const double gtol = 0.4, maxnonmonotoniclen = 0.0000001, nmstol = 100.0;
+   const double gtol = 0.4, maxnonmonotoniclen = 0.0000001;
    const double initialdecay = 0.5, mindecay = 0.1, decaycorrection = 0.8;
    const double penaltyfactor = 100.0;
    AutoS ae_int_t n;
@@ -13483,13 +13440,11 @@ Spawn:
                v = state->curstpmax;
                ae_v_move(state->tmp0.xR, 1, state->sas.xc.xR, 1, n);
                ae_v_addd(state->tmp0.xR, 1, state->d.xR, 1, n, v);
-               if (minbleic_feasibilityerror(&state->tmp0, &state->s, n, &state->cleic, state->nec, state->nic) <= nmstol * sqrt(n) * machineepsilon) {
-                  state->stp = state->curstpmax;
-                  mcinfo = 5;
-                  ae_v_move(state->xn.xR, 1, state->tmp0.xR, 1, n);
-                  state->nonmonotoniccnt--;
-                  b = true;
-               }
+               state->stp = state->curstpmax;
+               mcinfo = 5;
+               ae_v_move(state->xn.xR, 1, state->tmp0.xR, 1, n);
+               state->nonmonotoniccnt--;
+               b = true;
             }
             if (!b) {
             // Numerical properties of the function do not allow
@@ -16113,10 +16068,9 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
    if (state->factorizationtype == 1) {
    // Generate reduced KKT matrix
       allocv(n + m, &state->facttmpdiag);
-      sparsecopybuf(&state->factsparsekkttmpl, &state->factsparsekkt);
       for (i = 0; i < n; i++) {
-         ae_assert(state->factsparsekkt.didx.xZ[i] + 1 == state->factsparsekkt.uidx.xZ[i], "VIPMFactorize: integrity check failed, no diagonal element");
-         v = state->factsparsekkt.vals.xR[state->factsparsekkt.didx.xZ[i]];
+         ae_assert(state->factsparsekkttmpl.didx.xZ[i] + 1 == state->factsparsekkttmpl.uidx.xZ[i], "VIPMFactorize: integrity check failed, no diagonal element");
+         v = state->factsparsekkttmpl.vals.xR[state->factsparsekkttmpl.didx.xZ[i]];
          vv = 0.0;
          if (alpha0 > 0.0) {
             vv += alpha0 * d->xR[i];
@@ -16127,13 +16081,12 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
          vv += state->diagr.xR[i];
          vv += dampeps;
          v -= vv;
-         state->factsparsekkt.vals.xR[state->factsparsekkt.didx.xZ[i]] = v;
          state->facttmpdiag.xR[i] = v;
          ae_assert(v < 0.0, "VIPMFactorize: integrity check failed, degenerate diagonal matrix");
       }
       for (i = 0; i < msparse + mdense; i++) {
-         ae_assert(state->factsparsekkt.didx.xZ[n + i] + 1 == state->factsparsekkt.uidx.xZ[n + i], "VIPMFactorize: integrity check failed, no diagonal element");
-         v = state->factsparsekkt.vals.xR[state->factsparsekkt.didx.xZ[n + i]];
+         ae_assert(state->factsparsekkttmpl.didx.xZ[n + i] + 1 == state->factsparsekkttmpl.uidx.xZ[n + i], "VIPMFactorize: integrity check failed, no diagonal element");
+         v = state->factsparsekkttmpl.vals.xR[state->factsparsekkttmpl.didx.xZ[n + i]];
          vv = 0.0;
          if (beta0 > 0.0) {
             vv += beta0 * e->xR[i];
@@ -16143,33 +16096,18 @@ static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d
          }
          vv += dampeps;
          v += vv;
-         state->factsparsekkt.vals.xR[state->factsparsekkt.didx.xZ[n + i]] = v;
          state->facttmpdiag.xR[n + i] = v;
          ae_assert(v > 0.0, "VIPMFactorize: integrity check failed, degenerate diagonal matrix");
       }
    // Perform factorization
    // Perform additional integrity check: LDLT should reproduce diagonal of initial KKT system with good precision
-      spsymmreload(&state->ldltanalysis, &state->factsparsekkt);
+      spsymmreloaddiagonal(&state->ldltanalysis, &state->facttmpdiag);
       spsymmsetmodificationstrategy(&state->ldltanalysis, 1, modeps, badchol, 0.0, 0.0);
-      if (!spsymmfactorize(&state->ldltanalysis, &state->factsparsekkt, &state->factsparsediagd, &state->factsparsekktpivp)) {
+      if (!spsymmfactorize(&state->ldltanalysis)) {
          result = false;
          return result;
       }
-      for (i = 0; i < n + m; i++) {
-         swapr(&state->facttmpdiag.xR[i], &state->facttmpdiag.xR[state->factsparsekktpivp.xZ[i]]);
-      }
-      sumsq = rdotv2(n + m, &state->facttmpdiag);
-      errsq = 0.0;
-      for (i = 0; i < n + m; i++) {
-         v = 0.0;
-         k0 = state->factsparsekkt.ridx.xZ[i];
-         k1 = state->factsparsekkt.didx.xZ[i];
-         for (k = k0; k <= k1; k++) {
-            vv = state->factsparsekkt.vals.xR[k];
-            v += state->factsparsediagd.xR[state->factsparsekkt.idx.xZ[k]] * vv * vv;
-         }
-         errsq += sqr(v - state->facttmpdiag.xR[i]);
-      }
+      spsymmdiagerr(&state->ldltanalysis, &sumsq, &errsq);
       if (sqrt(errsq / (1 + sumsq)) > sqrt(machineepsilon)) {
          result = false;
          return result;
@@ -16254,31 +16192,12 @@ static void vipmsolver_solvereducedkktsystem(vipmstate *state, RVector *deltaxy)
    }
 // Sparse solving
    if (state->factorizationtype == 1) {
-   // Solve sparse KKT system given by its triangular factorization
-      for (i = 0; i < n; i++) {
-         ae_assert(state->factsparsekkt.didx.xZ[i] + 1 == state->factsparsekkt.uidx.xZ[i] && state->factsparsekkt.vals.xR[state->factsparsekkt.didx.xZ[i]] != 0.0, "VIPMSolve: degenerate KKT system encountered");
-      }
-      for (i = 0; i < n + m; i++) {
-         swapr(&deltaxy->xR[i], &deltaxy->xR[state->factsparsekktpivp.xZ[i]]);
-      }
-      sparsetrsv(&state->factsparsekkt, false, false, 0, deltaxy);
-      for (i = 0; i < n + m; i++) {
-         if (state->factsparsediagd.xR[i] != 0.0) {
-            deltaxy->xR[i] /= state->factsparsediagd.xR[i];
-         } else {
-            deltaxy->xR[i] = 0.0;
-         }
-      }
-      sparsetrsv(&state->factsparsekkt, false, false, 1, deltaxy);
-      for (i = n + m - 1; i >= 0; i--) {
-         swapr(&deltaxy->xR[i], &deltaxy->xR[state->factsparsekktpivp.xZ[i]]);
-      }
+      spsymmsolve(&state->ldltanalysis, deltaxy);
       for (i = 0; i < n; i++) {
          if (state->isfrozen.xB[i]) {
             deltaxy->xR[i] = 0.0;
          }
       }
-   // Done
       return;
    }
 //
@@ -18623,8 +18542,9 @@ void minqpsetalgoquickqp(minqpstate *state, double epsg, double epsf, double eps
 //     * minqpsetlc2()       for sparse two-sided constraints AL <= A*x <= AU
 //     * minqpsetlc2dense()  for dense  two-sided constraints AL <= A*x <= AU
 //     * minqpsetlc2mixed()  for mixed  two-sided constraints AL <= A*x <= AU
-//     * minqpaddlc2dense()  to add one dense row to dense constraint submatrix
-//     * minqpaddlc2()       to add one sparse row to sparse constraint submatrix
+//     * minqpaddlc2dense()  to add one dense row to the dense constraint submatrix
+//     * minqpaddlc2()       to add one sparse row to the sparse constraint submatrix
+//     * minqpaddlc2sparsefromdense() to add one sparse row (passed as a dense array) to the sparse constraint submatrix
 //   * legacy API:
 //     * minqpsetlc()        for dense one-sided equality/inequality constraints
 //     * minqpsetlcsparse()  for sparse one-sided equality/inequality constraints
@@ -19572,7 +19492,7 @@ void minqpsetlc2(minqpstate *state, sparsematrix *a, RVector *al, RVector *au, a
 }
 
 // This function appends two-sided linear constraint  AL <= A*x <= AU  to the
-// list of currently present dense constraints.
+// matrix of currently present dense constraints.
 //
 // Inputs:
 //     State   -   structure previously allocated with minqpcreate() call.
@@ -19648,8 +19568,8 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
       ae_assert(idxa->xZ[i] >= 0 && idxa->xZ[i] < n, "MinQPAddLC2: IdxA contains indexes outside of [0,N) range");
    }
    ae_assert(isfinitevector(vala, nnz), "MinQPAddLC2: ValA contains infinite or NaN values!");
-   ae_assert(isfinite(al) || isneginf(al), "MinQPAddLC2Dense: AL is NAN or +INF");
-   ae_assert(isfinite(au) || isposinf(au), "MinQPAddLC2Dense: AU is NAN or -INF");
+   ae_assert(isfinite(al) || isneginf(al), "MinQPAddLC2: AL is NAN or +INF");
+   ae_assert(isfinite(au) || isposinf(au), "MinQPAddLC2: AU is NAN or -INF");
 // If M == 0, it means that A is uninitialized.
 // Prepare sparse matrix structure
    if (state->msparse == 0) {
@@ -19660,7 +19580,7 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
       vectorsetlengthatleast(&state->sparsec.ridx, 1);
       state->sparsec.ridx.xZ[0] = 0;
    }
-   ae_assert(state->sparsec.matrixtype == 1 && state->sparsec.m == state->msparse, "MinQPAddLC2Dense: integrity check failed!");
+   ae_assert(state->sparsec.matrixtype == 1 && state->sparsec.m == state->msparse, "MinQPAddLC2: integrity check failed!");
 // Reallocate inequality bounds
    rvectorgrowto(&state->cl, state->msparse + state->mdense + 1);
    rvectorgrowto(&state->cu, state->msparse + state->mdense + 1);
@@ -19737,6 +19657,128 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
    state->sparsec.didx.xZ[state->msparse] = didx;
    state->sparsec.uidx.xZ[state->msparse] = uidx;
    state->sparsec.ridx.xZ[state->msparse + 1] = offsdst + 1;
+   state->sparsec.ninitialized = state->sparsec.ridx.xZ[state->msparse + 1];
+   state->sparsec.m++;
+   state->msparse++;
+}
+
+// This function appends two-sided linear constraint  AL <= A*x <= AU  to the
+// list of currently present sparse constraints.
+//
+// Constraint vector A is  passed  as  a  dense  array  which  is  internally
+// sparsified by this function.
+//
+// Inputs:
+//     State   -   structure previously allocated with minqpcreate() call.
+//     DA      -   array[N], constraint vector
+//     AL, AU  -   lower and upper bounds;
+//                 * AL == AU   => equality constraint A*x
+//                 * AL < AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL == -INF => one-sided constraint A*x <= AU
+//                 * AU == +INF => one-sided constraint AL <= A*x
+//                 * AL == -INF, AU == +INF => constraint is ignored
+// ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
+// API: void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da, const double al, const double au);
+void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, double au) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t nzi;
+   ae_int_t offs;
+   ae_int_t n;
+   ae_int_t nnz;
+   ae_int_t didx;
+   ae_int_t uidx;
+   n = state->n;
+// Check inputs
+   ae_assert(da->cnt >= n, "MinQPAddLC2SparseFromDense: Length(DA) < N");
+   ae_assert(isfinitevector(da, n), "MinQPAddLC2SparseFromDense: DA contains infinities/NANs");
+   ae_assert(isfinite(al) || isneginf(al), "MinQPAddLC2SparseFromDense: AL is NAN or +INF");
+   ae_assert(isfinite(au) || isposinf(au), "MinQPAddLC2SparseFromDense: AU is NAN or -INF");
+// If M == 0, it means that A is uninitialized.
+// Prepare sparse matrix structure
+   if (state->msparse == 0) {
+      state->sparsec.matrixtype = 1;
+      state->sparsec.m = 0;
+      state->sparsec.n = n;
+      state->sparsec.ninitialized = 0;
+      vectorsetlengthatleast(&state->sparsec.ridx, 1);
+      state->sparsec.ridx.xZ[0] = 0;
+   }
+   ae_assert(state->sparsec.matrixtype == 1 && state->sparsec.m == state->msparse, "MinQPAddLC2SparseFromDense: integrity check failed!");
+// Reallocate inequality bounds
+   rvectorgrowto(&state->cl, state->msparse + state->mdense + 1);
+   rvectorgrowto(&state->cu, state->msparse + state->mdense + 1);
+   rvectorgrowto(&state->replaglc, state->msparse + state->mdense + 1);
+   for (i = state->msparse + state->mdense; i >= state->msparse + 1; i--) {
+      state->cl.xR[i] = state->cl.xR[i - 1];
+      state->cu.xR[i] = state->cu.xR[i - 1];
+      state->replaglc.xR[i] = state->replaglc.xR[i - 1];
+   }
+   state->cl.xR[state->msparse] = al;
+   state->cu.xR[state->msparse] = au;
+   state->replaglc.xR[state->msparse] = 0.0;
+// Determine nonzeros count.
+// Reallocate sparse storage.
+   nnz = 0;
+   for (i = 0; i < n; i++) {
+      if (!(da->xR[i] == 0.0)) {
+         nnz++;
+      }
+   }
+   offs = state->sparsec.ridx.xZ[state->msparse];
+   ivectorgrowto(&state->sparsec.idx, offs + nnz);
+   rvectorgrowto(&state->sparsec.vals, offs + nnz);
+   ivectorgrowto(&state->sparsec.didx, state->msparse + 1);
+   ivectorgrowto(&state->sparsec.uidx, state->msparse + 1);
+   ivectorgrowto(&state->sparsec.ridx, state->msparse + 2);
+// If NNZ == 0, perform quick and simple row append.
+   if (nnz == 0) {
+      state->sparsec.didx.xZ[state->msparse] = state->sparsec.ridx.xZ[state->msparse];
+      state->sparsec.uidx.xZ[state->msparse] = state->sparsec.ridx.xZ[state->msparse];
+      state->sparsec.ridx.xZ[state->msparse + 1] = state->sparsec.ridx.xZ[state->msparse];
+      state->sparsec.m++;
+      state->msparse++;
+      return;
+   }
+// Now we are sure that SparseC contains properly initialized sparse
+// matrix (or some appropriate dummy for M == 0) and we have NNZ > 0
+// (no need to care about degenerate cases).
+//
+// Append rows to SparseC:
+// * append data
+// * compute DIdx and UIdx
+//
+   nzi = 0;
+   for (i = 0; i < n; i++) {
+      if (!(da->xR[i] == 0.0)) {
+         state->sparsec.idx.xZ[offs + nzi] = i;
+         state->sparsec.vals.xR[offs + nzi] = da->xR[i];
+         nzi++;
+      }
+   }
+   uidx = -1;
+   didx = -1;
+   for (j = offs; j < offs + nnz; j++) {
+      k = state->sparsec.idx.xZ[j];
+      if (k == state->msparse) {
+         didx = j;
+      } else {
+         if (k > state->msparse && uidx == -1) {
+            uidx = j;
+            break;
+         }
+      }
+   }
+   if (uidx == -1) {
+      uidx = offs + nnz;
+   }
+   if (didx == -1) {
+      didx = uidx;
+   }
+   state->sparsec.didx.xZ[state->msparse] = didx;
+   state->sparsec.uidx.xZ[state->msparse] = uidx;
+   state->sparsec.ridx.xZ[state->msparse + 1] = offs + nnz;
    state->sparsec.ninitialized = state->sparsec.ridx.xZ[state->msparse + 1];
    state->sparsec.m++;
    state->msparse++;
@@ -20579,6 +20621,13 @@ void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const re
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::minqpaddlc2(ConstT(minqpstate, state), ConstT(ae_vector, idxa), ConstT(ae_vector, vala), nnz, al, au);
+   alglib_impl::ae_state_clear();
+}
+
+void minqpaddlc2sparsefromdense(const minqpstate &state, const real_1d_array &da, const double al, const double au) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::minqpaddlc2sparsefromdense(ConstT(minqpstate, state), ConstT(ae_vector, da), al, au);
    alglib_impl::ae_state_clear();
 }
 
@@ -26541,10 +26590,11 @@ Spawn:
       prevtrustrad = state->trustrad;
       if (deltamax <= nlcsqp_sqpdeltadecrease) {
          state->trustrad *= rmax2(deltamax / nlcsqp_sqpdeltadecrease, maxtrustraddecay);
-         state->trustradstagnationcnt = 0;
       }
       if (deltamax >= nlcsqp_sqpdeltaincrease) {
          state->trustrad *= rmin2(deltamax / nlcsqp_sqpdeltaincrease, maxtrustradgrowth);
+      }
+      if (state->trustrad < 0.99 * prevtrustrad || state->trustrad > 1.01 * prevtrustrad) {
          state->trustradstagnationcnt = 0;
       }
       if (state->trustradstagnationcnt >= trustradstagnationlimit) {
@@ -32199,7 +32249,6 @@ static const double nlcslp_slpstpclosetoone = 0.95;
 static const double nlcslp_slpdeltadecrease = 0.20;
 static const double nlcslp_slpdeltaincrease = 0.80;
 static const double nlcslp_bfgstol = 0.00001;
-static const double nlcslp_augmentationfactor = 10.0;
 static const ae_int_t nlcslp_nonmonotonicphase2limit = 5;
 
 // This function initializes SLP subproblem.
@@ -32814,7 +32863,7 @@ static void nlcslp_slpcopystate(minslpstate *state, RVector *x0, RVector *fi0, R
 // Additionally it also estimates violation of linear constraints at the point
 // as well as index of the most violated constraint
 static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad, RVector *fi, RMatrix *j, RVector *lagmult, minslptmplagrangian *tmp, double *f, RVector *g, double *lcerr, ae_int_t *lcidx, double *nlcerr, ae_int_t *nlcidx) {
-   const double inequalitydampingfactor = 10.0;
+   const double inequalitydampingfactor = 10.0, augmentationfactor = 10.0;
    ae_int_t i;
    ae_int_t n;
    ae_int_t nec;
@@ -32893,8 +32942,8 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad,
          } else {
             vact = 0.0;
          }
-         *f += 0.5 * nlcslp_augmentationfactor * vact * vact;
-         tmp->sclagtmp1.xR[i] += nlcslp_augmentationfactor * vact;
+         *f += 0.5 * augmentationfactor * vact * vact;
+         tmp->sclagtmp1.xR[i] += augmentationfactor * vact;
       }
       if (usesparsegemv) {
          sparsemtv(&state->subsolver.sparserawlc, &tmp->sclagtmp1, &tmp->sclagtmp0);
@@ -32937,15 +32986,15 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad,
       } else {
          vact = 0.0;
       }
-      *f += 0.5 * nlcslp_augmentationfactor * vact * vact;
-      tmp->sclagtmp1.xR[i] += nlcslp_augmentationfactor * vact;
+      *f += 0.5 * augmentationfactor * vact * vact;
+      tmp->sclagtmp1.xR[i] += augmentationfactor * vact;
    }
    rmatrixgemv(n, nlec + nlic, 1.0, j, 1, 0, 1, &tmp->sclagtmp1, 0, 1.0, g, 0);
 }
 
 // This function calculates L1-penalized merit function and raw  (smooth  and
 // un-augmented) Lagrangian
-static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, minslptmpmerit *tmp, double *meritf, double *rawlag) {
+static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, double mu, minslptmpmerit *tmp, double *meritf, double *rawlag) {
    const double meritfunctionbase = 0.0, meritfunctiongain = 2.0;
    ae_int_t i;
    ae_int_t n;
@@ -32971,14 +33020,12 @@ static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector *x,
       v = tmp->mftmp0.xR[i] - state->scaledcleic.xyR[i][n];
       if (i < nec) {
       // Merit function: augmentation term + L1 penalty term
-         *meritf += 0.5 * nlcslp_augmentationfactor * v * v;
-         *meritf += meritfunctionbase * fabs(v) + meritfunctiongain * fabs(lagmult->xR[i]) * fabs(v);
+         *meritf += meritfunctionbase * fabs(v) + meritfunctiongain * mu * fabs(v);
       // Raw Lagrangian
          *rawlag += lagmult->xR[i] * v;
       } else {
       // Merit function: augmentation term + L1 penalty term
-         *meritf += 0.5 * nlcslp_augmentationfactor * sqr(rmax2(v, 0.0));
-         *meritf += meritfunctionbase * rmax2(v, 0.0) + meritfunctiongain * rmax2(lagmult->xR[i] * v, 0.0);
+         *meritf += meritfunctionbase * rmax2(v, 0.0) + meritfunctiongain * mu * rmax2(v, 0.0);
       // Raw Lagrangian
          *rawlag += lagmult->xR[i] * v;
       }
@@ -32988,14 +33035,12 @@ static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector *x,
       v = fi->xR[1 + i];
       if (i < nlec) {
       // Merit function: augmentation term + L1 penalty term
-         *meritf += 0.5 * nlcslp_augmentationfactor * v * v;
-         *meritf += meritfunctionbase * fabs(v) + meritfunctiongain * fabs(lagmult->xR[nec + nic + i] * v);
+         *meritf += meritfunctionbase * fabs(v) + meritfunctiongain * mu * fabs(v);
       // Raw Lagrangian
          *rawlag += lagmult->xR[nec + nic + i] * v;
       } else {
       // Merit function: augmentation term + L1 penalty term
-         *meritf += 0.5 * nlcslp_augmentationfactor * sqr(rmax2(v, 0.0));
-         *meritf += meritfunctionbase * rmax2(v, 0.0) + meritfunctiongain * rmax2(lagmult->xR[nec + nic + i] * v, 0.0);
+         *meritf += meritfunctionbase * rmax2(v, 0.0) + meritfunctiongain * mu * rmax2(v, 0.0);
       // Raw Lagrangian
          *rawlag += lagmult->xR[nec + nic + i] * v;
       }
@@ -33003,11 +33048,11 @@ static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector *x,
 }
 
 // This function calculates L1-penalized merit function
-static double nlcslp_meritfunction(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, minslptmpmerit *tmp) {
+static double nlcslp_meritfunction(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, double mu, minslptmpmerit *tmp) {
    double tmp0;
    double tmp1;
    double result;
-   nlcslp_meritfunctionandrawlagrangian(state, x, fi, lagmult, tmp, &tmp0, &tmp1);
+   nlcslp_meritfunctionandrawlagrangian(state, x, fi, lagmult, mu, tmp, &tmp0, &tmp1);
    result = tmp0;
    return result;
 }
@@ -33018,7 +33063,7 @@ static double nlcslp_rawlagrangian(minslpstate *state, RVector *x, RVector *fi, 
    double tmp0;
    double tmp1;
    double result;
-   nlcslp_meritfunctionandrawlagrangian(state, x, fi, lagmult, tmp, &tmp0, &tmp1);
+   nlcslp_meritfunctionandrawlagrangian(state, x, fi, lagmult, 0.0, tmp, &tmp0, &tmp1);
    result = tmp1;
    return result;
 }
@@ -33073,6 +33118,7 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
    AutoS double f1;
    AutoS double nu;
    AutoS double localstp;
+   AutoS double mu;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
@@ -33090,6 +33136,7 @@ Spawn:
    f1 = -731;
    nu = -675;
    localstp = -763;
+   mu = -233;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -33123,6 +33170,7 @@ Spawn:
       goto Exit;
    }
    nlcslp_lpsubproblemappendconjugacyconstraint(state, &state->subsolver, &state13->d);
+   mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory), rmaxabsv(nec + nic + nlec + nlic, lagmult));
 // Compute second order correction if required. The issue we address here
 // is a tendency of L1 penalized function to reject steps built using simple
 // linearized model when nonlinear constraints change faster than the target.
@@ -33182,7 +33230,7 @@ Spawn:
 //       Using DummyLagMult can destabilize algorithm.
    localstp = 1.0;
    nu = 0.5;
-   f0 = nlcslp_meritfunction(state, curx, curfi, lagmult, &state13->tmpmerit);
+   f0 = nlcslp_meritfunction(state, curx, curfi, lagmult, mu, &state13->tmpmerit);
    f1 = f0;
    smoothnessmonitorstartlinesearch(smonitor, curx, curfi, curj);
    while (true) {
@@ -33198,7 +33246,7 @@ Spawn:
          goto Exit;
       }
       smoothnessmonitorenqueuepoint(smonitor, &state13->d, localstp, &state13->stepkxn, &state13->stepkfin, &state13->stepkjn);
-      f1 = nlcslp_meritfunction(state, &state13->stepkxn, &state13->stepkfin, lagmult, &state13->tmpmerit);
+      f1 = nlcslp_meritfunction(state, &state13->stepkxn, &state13->stepkfin, lagmult, mu, &state13->tmpmerit);
       if (f1 < f0) {
       // Step is found!
          break;
@@ -33368,6 +33416,7 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
    AutoS double gammaprev;
    AutoS double f0;
    AutoS double f1;
+   AutoS double mu;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
@@ -33392,6 +33441,7 @@ Spawn:
    gammaprev = -962;
    f0 = 161;
    f1 = -447;
+   mu = -799;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -33412,6 +33462,7 @@ Spawn:
 // * location X (scaled coordinates)
 // * function vector Fi (target function + nonlinear constraints)
 // * scaled Jacobian J
+   mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory), rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult));
    nondescentcnt = 0;
    nlcslp_lpsubproblemrestart(state, &state->subsolver);
    for (innerk = 1; innerk <= n; innerk++) {
@@ -33556,8 +33607,8 @@ Spawn:
          mx = rmax2(mx, fabs(state2->d.xR[i]) / state->trustrad);
       }
 #   endif
-      f0 = nlcslp_meritfunction(state, curx, curfi, &state2->meritlagmult, &state2->tmpmerit);
-      f1 = nlcslp_meritfunction(state, &state2->stepkxn, &state2->stepkfin, &state2->meritlagmult, &state2->tmpmerit);
+      f0 = nlcslp_meritfunction(state, curx, curfi, &state2->meritlagmult, mu, &state2->tmpmerit);
+      f1 = nlcslp_meritfunction(state, &state2->stepkxn, &state2->stepkfin, &state2->meritlagmult, mu, &state2->tmpmerit);
 #endif
    // Check status of the termination request
    // Update current point
@@ -33647,6 +33698,7 @@ void minslpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
    matrixsetlengthatleast(&state->scaledcleic, nec + nic, n + 1);
    vectorsetlengthatleast(&state->lcsrcidx, nec + nic);
    vectorsetlengthatleast(&state->meritfunctionhistory, nlcslp_nonmonotonicphase2limit + 1);
+   vectorsetlengthatleast(&state->maxlaghistory, nlcslp_nonmonotonicphase2limit + 1);
 // Prepare scaled problem
    for (i = 0; i < n; i++) {
       state->hasbndl.xB[i] = isfinite(bndl->xR[i]);
@@ -33761,6 +33813,7 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
    AutoS double multiplyby;
    AutoS double setscaleto;
    AutoS double prevtrustrad;
+   AutoS double mu;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
@@ -33784,6 +33837,7 @@ Spawn:
    multiplyby = -536;
    setscaleto = 487;
    prevtrustrad = -115;
+   mu = 886;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -33807,6 +33861,7 @@ Spawn:
    }
    for (i = 0; i <= nlcslp_nonmonotonicphase2limit; i++) {
       state->meritfunctionhistory.xR[i] = maxrealnumber;
+      state->maxlaghistory.xR[i] = 0.0;
    }
    state->historylen = 0;
    gammamax = 0.0;
@@ -33886,7 +33941,7 @@ Spawn:
    //       is to perform one look-ahead step and use updated constraint values
    //       back at the initial point.
       for (
-         nlcslp_phase13init(&state->state13, n, nec, nic, nlec, nlic, false);
+         nlcslp_phase13init(&state->state13, n, nec, nic, nlec, nlic, true);
          nlcslp_phase13iteration(state, &state->state13, smonitor, userterminationneeded, &state->stepkx, &state->stepkfi, &state->stepkj, &state->meritlagmult, &status, &stp);
       ) {
          state->PQ = 2; goto Pause; Resume2: ;
@@ -33896,10 +33951,13 @@ Spawn:
       } else if (status == 0) {
          break;
       }
+      mu = rmax2(rmaxabsv(state->historylen, &state->maxlaghistory), rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult));
       for (i = state->historylen; i >= 1; i--) {
          state->meritfunctionhistory.xR[i] = state->meritfunctionhistory.xR[i - 1];
+         state->maxlaghistory.xR[i] = state->maxlaghistory.xR[i - 1];
       }
-      state->meritfunctionhistory.xR[0] = nlcslp_meritfunction(state, &state->stepkx, &state->stepkfi, &state->meritlagmult, &state->tmpmerit);
+      state->meritfunctionhistory.xR[0] = nlcslp_meritfunction(state, &state->stepkx, &state->stepkfi, &state->meritlagmult, mu, &state->tmpmerit);
+      state->maxlaghistory.xR[0] = rmaxabsv(nec + nic + nlec + nlic, &state->meritlagmult);
       state->historylen = imin2(state->historylen + 1, nlcslp_nonmonotonicphase2limit);
    // PHASE 2: conjugate subiterations
    //
@@ -33936,7 +33994,7 @@ Spawn:
          for (i = 1; i <= state->historylen; i++) {
             f1 = rmax2(f1, state->meritfunctionhistory.xR[i]);
          }
-         f2 = nlcslp_meritfunction(state, &state->stepkx, &state->stepkfi, &state->meritlagmult, &state->tmpmerit);
+         f2 = nlcslp_meritfunction(state, &state->stepkx, &state->stepkfi, &state->meritlagmult, mu, &state->tmpmerit);
          if (f2 >= f1) {
          // Merit function does not decrease, discard phase results and report is as one
          // more "fake" inner iteration.
@@ -34251,6 +34309,7 @@ void minslpstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->dummylagmult, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->fscales, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->meritfunctionhistory, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->maxlaghistory, 0, DT_REAL, make_automatic);
    minslpsubsolver_init(&p->subsolver, make_automatic);
    minslptmpmerit_init(&p->tmpmerit, make_automatic);
 }
@@ -34297,6 +34356,7 @@ void minslpstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->dummylagmult, &src->dummylagmult, make_automatic);
    ae_vector_copy(&dst->fscales, &src->fscales, make_automatic);
    ae_vector_copy(&dst->meritfunctionhistory, &src->meritfunctionhistory, make_automatic);
+   ae_vector_copy(&dst->maxlaghistory, &src->maxlaghistory, make_automatic);
    dst->historylen = src->historylen;
    minslpsubsolver_copy(&dst->subsolver, &src->subsolver, make_automatic);
    minslptmpmerit_copy(&dst->tmpmerit, &src->tmpmerit, make_automatic);
@@ -34343,6 +34403,7 @@ void minslpstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->dummylagmult, make_automatic);
    ae_vector_free(&p->fscales, make_automatic);
    ae_vector_free(&p->meritfunctionhistory, make_automatic);
+   ae_vector_free(&p->maxlaghistory, make_automatic);
    minslpsubsolver_free(&p->subsolver, make_automatic);
    minslptmpmerit_free(&p->tmpmerit, make_automatic);
 }
@@ -35063,15 +35124,16 @@ void minnlcsetalgoslp(minnlcstate *state) {
 //
 // OptGuard integrity  checker  allows us to catch problems  like  errors  in
 // gradients   and  discontinuity/nonsmoothness  of  the  target/constraints.
-// Latter kind of problems can be detected  by  looking  upon  line  searches
+// The latter kind of problems can be detected  by looking upon line searches
 // performed during optimization and searching for signs of nonsmoothness.
 //
 // The problem with SQP is that it is too good for OptGuard to work - it does
 // not perform line searches. It typically  needs  1-2  function  evaluations
 // per step, and it is not enough for OptGuard to detect nonsmoothness.
 //
-// So, if you suspect that your problem is nonsmooth, we recommend you to use
-// AUL or SLP solvers.
+// So, if you suspect that your problem is  nonsmooth  and  if  you  want  to
+// confirm or deny it, we recommend you to use AUL or SLP solvers,  which can
+// detect nonsmoothness of the problem.
 // ALGLIB: Copyright 02.12.2019 by Sergey Bochkanov
 // API: void minnlcsetalgosqp(const minnlcstate &state);
 void minnlcsetalgosqp(minnlcstate *state) {
@@ -37764,9 +37826,8 @@ void minnssetscale(minnsstate *state, RVector *s) {
 // 4. perform backtracking line search
 // 5. after moving to new point, goto (0)
 //
-// As for the constraints:
-// * box constraints are handled exactly  by  modification  of  the  function
-//   being minimized
+// Constraint handling details:
+// * box constraints are handled exactly by algorithm
 // * linear/nonlinear constraints are handled by adding L1  penalty.  Because
 //   our solver can handle nonsmoothness, we can  use  L1  penalty  function,
 //   which is an exact one  (i.e.  exact  solution  is  returned  under  such
@@ -37832,7 +37893,7 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
    NewMatrix(c, 0, 0, DT_REAL);
    NewVector(ct, 0, DT_INT);
    state->agsinitstp = 0.2;
-   state->agsstattold = 1.0E-10;
+   state->agsstattold = sqrt(machineepsilon);
    state->agsshortstpabs = 1.0E-10;
    state->agsshortstprel = 0.75;
    state->agsshortf = 10.0 * machineepsilon;
@@ -38048,73 +38109,6 @@ void minnscreatef(ae_int_t n, RVector *x, double diffstep, minnsstate *state) {
 // API: void minnsrequesttermination(const minnsstate &state);
 void minnsrequesttermination(minnsstate *state) {
    state->userterminationneeded = true;
-}
-
-// This function calculates merit function (target function +  penalties  for
-// violation of non-box constraints),  using  State.X  (unscaled),  State.Fi,
-// State.J (unscaled) and State.SampleX (scaled) as inputs.
-//
-// Results are loaded:
-// * target function value - to State.SampleF0[SampleIdx]
-// * merit function value - to State.SampleF[SampleIdx]
-// * gradient of merit function - to State.SampleGM[SampleIdx]
-// ALGLIB: Copyright 02.06.2015 by Sergey Bochkanov
-static void minns_generatemeritfunction(minnsstate *state, ae_int_t sampleidx) {
-   ae_int_t n;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t nec;
-   ae_int_t nic;
-   ae_int_t ng;
-   ae_int_t nh;
-   double v;
-   double s;
-   n = state->n;
-   nec = state->nec;
-   nic = state->nic;
-   ng = state->ng;
-   nh = state->nh;
-// Integrity check
-   for (i = 0; i < n; i++) {
-      ae_assert(!state->hasbndl.xB[i] || state->x.xR[i] >= state->bndl.xR[i], "MinNS: integrity error");
-      ae_assert(!state->hasbndu.xB[i] || state->x.xR[i] <= state->bndu.xR[i], "MinNS: integrity error");
-   }
-// Prepare "raw" function
-   state->samplef.xR[sampleidx] = state->fi.xR[0];
-   state->samplef0.xR[sampleidx] = state->fi.xR[0];
-   for (j = 0; j < n; j++) {
-      state->samplegm.xyR[sampleidx][j] = state->j.xyR[0][j] * state->s.xR[j];
-   }
-// Modify merit function with linear constraints
-   for (i = 0; i < nec + nic; i++) {
-      v = -state->scaledcleic.xyR[i][n];
-      for (j = 0; j < n; j++) {
-         v += state->scaledcleic.xyR[i][j] * state->samplex.xyR[sampleidx][j];
-      }
-      if (i >= nec && v < 0.0) {
-         continue;
-      }
-      state->samplef.xR[sampleidx] += state->rholinear.xR[i] * fabs(v);
-      s = sign(v);
-      for (j = 0; j < n; j++) {
-         state->samplegm.xyR[sampleidx][j] += state->rholinear.xR[i] * s * state->scaledcleic.xyR[i][j];
-      }
-   }
-// Modify merit function with nonlinear constraints
-   for (i = 1; i <= ng + nh; i++) {
-      v = state->fi.xR[i];
-      if (i <= ng && v == 0.0) {
-         continue;
-      }
-      if (i > ng && v <= 0.0) {
-         continue;
-      }
-      state->samplef.xR[sampleidx] += state->agsrhononlinear * fabs(v);
-      s = sign(v);
-      for (j = 0; j < n; j++) {
-         state->samplegm.xyR[sampleidx][j] += state->agsrhononlinear * s * state->j.xyR[i][j] * state->s.xR[j];
-      }
-   }
 }
 
 // This function performs transformation of  X  from  scaled  coordinates  to
@@ -38360,8 +38354,8 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
             idx1++;
          }
       }
-      ae_assert(idx0 == ncandbnd, "MinNSQP: integrity check failed");
-      ae_assert(idx1 == n, "MinNSQP: integrity check failed");
+      ae_assert(idx0 == ncandbnd, "MinNSQP: integrity check failed (2346)");
+      ae_assert(idx1 == n, "MinNSQP: integrity check failed (4535)");
       snnlsinit(n, 1, n, &state->nnls);
       snnlssetproblem(&state->nnls, &state->tmpc2, &state->tmpd, ncandbnd, 1, n);
       snnlsdropnnc(&state->nnls, ncandbnd);
@@ -38381,16 +38375,11 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
    // After this stage we are pretty sure that:
    // * if x[i] == 0.0, then d[i] >= 0.0
    // * if d[i] < 0.0, then x[i] > 0.0
-      v = 0.0;
-      vv = 0.0;
       for (i = 0; i < n; i++) {
          if (state->xc.xR[i] == 0.0 && state->d.xR[i] < 0.0) {
             state->d.xR[i] = 0.0;
          }
-         v += state->d.xR[i];
-         vv = rmax2(vv, fabs(state->gc.xR[i]));
       }
-      ae_assert(SmallR(v, 100000.0 * sqrt(n) * machineepsilon * rmax2(vv, 1.0)), "MinNSQP: integrity check failed");
    // Decide whether we need "kick" stage: special stage
    // that moves us away from boundary constraints which are
    // not strictly active (i.e. such constraints that x[i] == 0.0 and d[i] > 0).
@@ -38415,7 +38404,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
             }
             v += state->xc.xR[i];
          }
-         ae_assert(v > 0.0, "MinNSQP: integrity check failed");
+         ae_assert(v > 0.0, "MinNSQP: integrity check failed (2572)");
          for (i = 0; i < n; i++) {
             state->xc.xR[i] /= v;
          }
@@ -38612,21 +38601,21 @@ static bool minns_agsiteration(minnsstate *state) {
    AutoS ae_int_t radiusdecays;
    AutoS double alpha;
    AutoS double recommendedstep;
-   AutoS double dnrm;
-   AutoS double dg;
+   AutoS double dhd;
+   AutoS double dnrminf;
    AutoS double v;
    AutoS double vv;
    AutoS ae_int_t maxsamplesize;
    AutoS ae_int_t cursamplesize;
    AutoS double v0;
    AutoS double v1;
-   AutoS bool restartneeded;
    AutoS bool b;
    AutoS bool alphadecreased;
    AutoS ae_int_t shortstepscnt;
    AutoS ae_int_t backtrackits;
    AutoS ae_int_t maxbacktrackits;
    AutoS bool fullsample;
+   AutoS double currentf0;
 // Manually threaded two-way signalling.
 // Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
 // A Spawn occurs when the routine is (re-)started.
@@ -38644,7 +38633,6 @@ Spawn:
    shortstepscnt = 487;
    backtrackits = -115;
    maxbacktrackits = 886;
-   restartneeded = true;
    b = false;
    alphadecreased = false;
    fullsample = true;
@@ -38652,12 +38640,13 @@ Spawn:
    radius = -154;
    alpha = 306;
    recommendedstep = -1011;
-   dnrm = 201;
-   dg = 922;
+   dhd = 951;
+   dnrminf = -463;
    v = 88;
    vv = -861;
    v0 = -678;
    v1 = -731;
+   currentf0 = -675;
    ae_assert(state->solvertype == 0, "MinNS: internal error");
    n = state->n;
    nec = state->nec;
@@ -38679,8 +38668,6 @@ Spawn:
    matrixsetlengthatleast(&state->samplegm, maxsamplesize + 1, n);
    matrixsetlengthatleast(&state->samplegmbc, maxsamplesize + 1, n);
    vectorsetlengthatleast(&state->samplef, maxsamplesize + 1);
-   vectorsetlengthatleast(&state->samplef0, maxsamplesize + 1);
-   vectorsetlengthatleast(&state->grs, n);
 // Prepare optimizer
    vectorsetlengthatleast(&state->tmp0, maxsamplesize);
    vectorsetlengthatleast(&state->tmp1, maxsamplesize);
@@ -38714,10 +38701,10 @@ Spawn:
          state->scaledbndu.xR[i] = +INFINITY;
       }
       if (state->hasbndl.xB[i] && state->hasbndu.xB[i]) {
-         ae_assert(state->scaledbndl.xR[i] <= state->scaledbndu.xR[i], "MinNS: integrity check failed");
+         ae_assert(state->scaledbndl.xR[i] <= state->scaledbndu.xR[i], "MinNS: integrity check failed (dfdf)");
       }
       if (state->hasbndl.xB[i] && state->hasbndu.xB[i] && state->bndl.xR[i] == state->bndu.xR[i]) {
-         ae_assert(state->scaledbndl.xR[i] == state->scaledbndu.xR[i], "MinNS: integrity check failed");
+         ae_assert(state->scaledbndl.xR[i] == state->scaledbndu.xR[i], "MinNS: integrity check failed (dsgh)");
       }
    // Scale and constrain point
       state->xc.xR[i] = state->xstart.xR[i];
@@ -38738,10 +38725,7 @@ Spawn:
       }
    }
    matrixsetlengthatleast(&state->scaledcleic, nec + nic, n + 1);
-   vectorsetlengthatleast(&state->rholinear, nec + nic);
    for (i = 0; i < nec + nic; i++) {
-   // Initial value of penalty coefficient is zero
-      state->rholinear.xR[i] = 0.0;
    // Scale and normalize linear constraints
       vv = 0.0;
       for (j = 0; j < n; j++) {
@@ -38773,6 +38757,7 @@ Spawn:
    radiusdecays = 0;
    shortstepscnt = 0;
    fullsample = false;
+   state->rholinear = 0.0;
    while (true) {
    // First phase of iteration - central point:
    //
@@ -38786,8 +38771,8 @@ Spawn:
       cursamplesize = imax2(cursamplesize, 1);
       ae_v_move(state->samplex.xyR[0], 1, state->xc.xR, 1, n);
       ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
-      minns_unscalepointbc(state, &state->x);
       state->needfij = true, state->AgsPQ = 0; goto Pause; Resume0: state->needfij = false;
+      currentf0 = state->rawf;
       state->replcerr = 0.0;
       for (i = 0; i < nec + nic; i++) {
          v = -state->scaledcleic.xyR[i][n];
@@ -38807,14 +38792,11 @@ Spawn:
          }
          state->repnlcerr = rmax2(state->repnlcerr, fabs(v));
       }
-      for (j = 0; j < n; j++) {
-         state->grs.xR[j] = state->j.xyR[0][j] * state->s.xR[j];
-      }
-      minns_generatemeritfunction(state, 0);
+      state->samplef.xR[0] = state->meritf;
+      rcopyvr(n, &state->meritg, &state->samplegm, 0);
       if (state->xrep) {
          ae_v_move(state->x.xR, 1, state->xc.xR, 1, n);
-         state->f = state->samplef0.xR[0];
-         minns_unscalepointbc(state, &state->x);
+         state->f = currentf0;
          state->xupdated = true, state->AgsPQ = 1; goto Pause; Resume1: state->xupdated = false;
       }
       if (state->userterminationneeded) {
@@ -38831,38 +38813,10 @@ Spawn:
          state->repterminationtype = -8;
          break;
       }
-      restartneeded = false;
-      for (i = 0; i < nec + nic; i++) {
-      // Evaluate penalty function.
-      //
-      // Skip update if penalty is satisfied exactly (this check
-      // also covers situations when I-th row is exactly zero).
-         v = -state->scaledcleic.xyR[i][n];
-         for (j = 0; j < n; j++) {
-            v += state->scaledcleic.xyR[i][j] * state->xc.xR[j];
-         }
-         if (i < nec && v == 0.0) {
-            continue;
-         }
-         if (i >= nec && v <= 0.0) {
-            continue;
-         }
-      // Calculate directional derivative, compare it with threshold.
-      //
-      // NOTE: we rely on the fact that ScaledCLEIC is normalized
-         ae_assert(state->agspenaltylevel > 1.0, "MinNS: integrity error");
-         ae_assert(state->agspenaltyincrease > state->agspenaltylevel, "MinNS: integrity error");
-         v = 0.0;
-         for (j = 0; j < n; j++) {
-            v += state->grs.xR[j] * state->scaledcleic.xyR[i][j];
-         }
-         v = fabs(v);
-         if (v * state->agspenaltylevel > state->rholinear.xR[i]) {
-            state->rholinear.xR[i] = v * state->agspenaltyincrease;
-            restartneeded = true;
-         }
-      }
-      if (restartneeded) {
+      ae_assert(state->agspenaltylevel > 1.0, "MinNS: integrity error");
+      ae_assert(state->agspenaltyincrease > state->agspenaltylevel, "MinNS: integrity error");
+      if (sqrt(rdotv2(n, &state->rawg)) * state->agspenaltylevel > state->rholinear) {
+         state->rholinear = sqrt(rdotv2(n, &state->rawg)) * state->agspenaltyincrease;
          cursamplesize = 0;
          continue;
       }
@@ -38893,7 +38847,7 @@ Spawn:
    //    AGSMinUpdate items.
    // 3. prepare "modified" gradient sample with respect to
    //    boundary constraints.
-      ae_assert(cursamplesize >= 1, "MinNS: integrity check failed");
+      ae_assert(cursamplesize >= 1, "MinNS: integrity check failed (2367)");
       k = 1;
       for (i = 1; i < cursamplesize; i++) {
       // If entry is outside of Radius-ball around XC, discard it.
@@ -38904,33 +38858,21 @@ Spawn:
          if (v > radius) {
             continue;
          }
-      // If central point is exactly at boundary, and corresponding
-      // component of entry is OUT of boundary, entry is discarded.
-         b = false;
-         for (j = 0; j < n; j++)
-            b = b ||
-               state->hasbndl.xB[j] && state->xc.xR[j] == state->scaledbndl.xR[j] && state->samplex.xyR[i][j] != state->scaledbndl.xR[j] ||
-               state->hasbndu.xB[j] && state->xc.xR[j] == state->scaledbndu.xR[j] && state->samplex.xyR[i][j] != state->scaledbndu.xR[j];
-         if (b) {
-            continue;
-         }
       // Move to the beginning
-         ae_v_move(state->samplex.xyR[k], 1, state->samplex.xyR[i], 1, n);
-         ae_v_move(state->samplegm.xyR[k], 1, state->samplegm.xyR[i], 1, n);
+         rcopyrr(n, &state->samplex, i, &state->samplex, k);
+         rcopyrr(n, &state->samplegm, i, &state->samplegm, k);
          state->samplef.xR[k] = state->samplef.xR[i];
-         state->samplef0.xR[k] = state->samplef0.xR[i];
          k++;
       }
       cursamplesize = k;
       if (state->agssamplesize - cursamplesize < state->agsminupdate) {
       // Remove oldest entries
          k = state->agsminupdate - (state->agssamplesize - cursamplesize);
-         ae_assert(k < cursamplesize, "MinNS: integrity check failed");
+         ae_assert(k < cursamplesize, "MinNS: integrity check failed (2662)");
          for (i = 1; i < cursamplesize - k; i++) {
-            ae_v_move(state->samplex.xyR[i], 1, state->samplex.xyR[i + k], 1, n);
-            ae_v_move(state->samplegm.xyR[i], 1, state->samplegm.xyR[i + k], 1, n);
+            rcopyrr(n, &state->samplex, i + k, &state->samplex, i);
+            rcopyrr(n, &state->samplegm, i + k, &state->samplegm, i);
             state->samplef.xR[i] = state->samplef.xR[i + k];
-            state->samplef0.xR[i] = state->samplef0.xR[i + k];
          }
          cursamplesize -= k;
       }
@@ -38938,14 +38880,8 @@ Spawn:
          for (j = 0; j < n; j++) {
          // Undistorted position
             state->samplex.xyR[i][j] = state->xc.xR[j];
-         // Do not apply distortion, if we are exactly at boundary constraint.
+         // Do not apply distortion if the variable is fixed
             if (state->hasbndl.xB[j] && state->hasbndu.xB[j] && state->scaledbndl.xR[j] == state->scaledbndu.xR[j]) {
-               continue;
-            }
-            if (state->hasbndl.xB[j] && state->samplex.xyR[i][j] == state->scaledbndl.xR[j]) {
-               continue;
-            }
-            if (state->hasbndu.xB[j] && state->samplex.xyR[i][j] == state->scaledbndu.xR[j]) {
                continue;
             }
          // Apply distortion
@@ -38964,13 +38900,13 @@ Spawn:
                   v1 = rmin2(state->scaledbndu.xR[j], v1);
                }
             }
-            ae_assert(v1 >= v0, "MinNS: integrity check failed");
+            ae_assert(v1 >= v0, "MinNS: integrity check failed (9743)");
             state->samplex.xyR[i][j] = rboundval(v0 + (v1 - v0) * hqrnduniformr(&state->agsrs), v0, v1);
          }
          ae_v_move(state->x.xR, 1, state->samplex.xyR[i], 1, n);
-         minns_unscalepointbc(state, &state->x);
          state->needfij = true, state->AgsPQ = 2; goto Pause; Resume2: state->needfij = false;
-         minns_generatemeritfunction(state, i);
+         state->samplef.xR[i] = state->meritf;
+         rcopyvr(n, &state->meritg, &state->samplegm, i);
       }
       cursamplesize += k;
       fullsample = cursamplesize == state->agssamplesize;
@@ -38988,27 +38924,17 @@ Spawn:
                continue;
             }
             if (state->hasbndl.xB[i] && state->xc.xR[i] == state->scaledbndl.xR[i]) {
-            // We are at lower bound.
-            //
-            // A bit more complex:
-            // * first, we have to activate/deactivate constraint depending on gradient at XC
-            // * second, in any case, I-th column of gradient sample must be non-positive
+            // We are at lower bound: activate/deactivate constraint depending on gradient at XC
                if (state->samplegm.xyR[0][i] >= 0.0) {
                   state->samplegmbc.xyR[j][i] = 0.0;
                }
-               state->samplegmbc.xyR[j][i] = rmin2(state->samplegmbc.xyR[j][i], 0.0);
                continue;
             }
             if (state->hasbndu.xB[i] && state->xc.xR[i] == state->scaledbndu.xR[i]) {
-            // We are at upper bound.
-            //
-            // A bit more complex:
-            // * first, we have to activate/deactivate constraint depending on gradient at XC
-            // * second, in any case, I-th column of gradient sample must be non-negative
+            // We are at upper bound: activate/deactivate constraint depending on gradient at XC
                if (state->samplegm.xyR[0][i] <= 0.0) {
                   state->samplegmbc.xyR[j][i] = 0.0;
                }
-               state->samplegmbc.xyR[j][i] = rmax2(state->samplegmbc.xyR[j][i], 0.0);
                continue;
             }
          }
@@ -39044,16 +38970,16 @@ Spawn:
       for (j = 0; j < n; j++) {
          if (state->signmin.xR[j] != state->signmax.xR[j]) {
          // Alternating signs of gradient - step is proportional to current sampling radius
-            ae_assert(state->colmax.xR[j] != 0.0, "MinNS: integrity check failed");
-            ae_assert(radius != 0.0, "MinNS: integrity check failed");
+            ae_assert(state->colmax.xR[j] != 0.0, "MinNS: integrity check failed (2975)");
+            ae_assert(radius != 0.0, "MinNS: integrity check failed (8473)");
             state->diagh.xR[j] = state->colmax.xR[j] / radius;
             continue;
          }
          if (state->colmax.xR[j] != 0.0) {
          // Non-alternating sign of gradient, but non-zero.
-         // Step is proportional to initial sampling radius
-            ae_assert(radius0 != 0.0, "MinNS: integrity check failed");
-            state->diagh.xR[j] = state->colmax.xR[j] / radius0;
+         // Step is proportional to recommended step
+            ae_assert(recommendedstep != 0.0, "MinNS: integrity check failed (3274)");
+            state->diagh.xR[j] = state->colmax.xR[j] / recommendedstep;
             continue;
          }
          state->diagh.xR[j] = 1.0;
@@ -39100,15 +39026,13 @@ Spawn:
    //
    // NOTE: if AGSShortLimit subsequent line searches resulted
    //       in steps shorter than AGSStatTolStp, we decrease radius.
-      dnrm = 0.0;
-      dg = 0.0;
+      dhd = 0.0;
       for (i = 0; i < n; i++) {
-         dnrm += sqr(state->d.xR[i]);
-         dg += state->d.xR[i] * state->samplegmbc.xyR[0][i];
+         dhd += state->d.xR[i] * state->diagh.xR[i] * state->d.xR[i];
       }
-      dnrm = sqrt(dnrm);
-      ae_assert(dnrm > 0.0, "MinNS: integrity error");
-      alpha = recommendedstep / dnrm;
+      dnrminf = rmaxabsv(n, &state->d);
+      ae_assert(dnrminf > 0.0, "MinNS: integrity error (2752)");
+      alpha = recommendedstep / dnrminf;
       alphadecreased = false;
       backtrackits = 0;
       if (fullsample) {
@@ -39123,12 +39047,12 @@ Spawn:
          enforceboundaryconstraints(&state->xn, &state->scaledbndl, &state->hasbndl, &state->scaledbndu, &state->hasbndu, n, 0);
          ae_v_move(state->samplex.xyR[maxsamplesize], 1, state->xn.xR, 1, n);
          ae_v_move(state->x.xR, 1, state->xn.xR, 1, n);
-         minns_unscalepointbc(state, &state->x);
          state->needfij = true, state->AgsPQ = 3; goto Pause; Resume3: state->needfij = false;
-         minns_generatemeritfunction(state, maxsamplesize);
+         state->samplef.xR[maxsamplesize] = state->meritf;
+         rcopyvr(n, &state->meritg, &state->samplegm, maxsamplesize);
       // Check sufficient decrease condition
-         ae_assert(dnrm > 0.0, "MinNS: integrity error");
-         if (state->samplef.xR[maxsamplesize] <= state->samplef.xR[0] + alpha * state->agsdecrease * dg) {
+         ae_assert(dnrminf > 0.0, "MinNS: integrity error (9642)");
+         if (state->samplef.xR[maxsamplesize] <= state->samplef.xR[0] - alpha * state->agsdecrease * dhd) {
             break;
          }
       // Decrease Alpha
@@ -39145,7 +39069,7 @@ Spawn:
             break;
          }
       }
-      if (alpha * dnrm <= state->agsshortstpabs || alpha * dnrm <= state->agsshortstprel * radius || NearAtR(state->samplef.xR[0], state->samplef.xR[maxsamplesize], state->agsshortf)) {
+      if (alpha * dnrminf <= state->agsshortstpabs || alpha * dnrminf <= state->agsshortstprel * radius || NearAtR(state->samplef.xR[0], state->samplef.xR[maxsamplesize], state->agsshortf)) {
          shortstepscnt++;
       } else {
          shortstepscnt = 0;
@@ -39191,8 +39115,11 @@ Pause:
 // API: void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 bool minnsiteration(minnsstate *state) {
    AutoS ae_int_t i;
+   AutoS ae_int_t j;
    AutoS ae_int_t k;
    AutoS ae_int_t n;
+   AutoS ae_int_t nec;
+   AutoS ae_int_t nic;
    AutoS ae_int_t ng;
    AutoS ae_int_t nh;
    AutoS double v;
@@ -39209,6 +39136,7 @@ bool minnsiteration(minnsstate *state) {
    }
 Spawn:
    i = 359;
+   j = -58;
    k = -919;
    v = 809;
    xp = 205;
@@ -39226,21 +39154,32 @@ Spawn:
    state->userterminationneeded = false;
    state->dbgncholesky = 0;
    n = state->n;
+   nec = state->nec;
+   nic = state->nic;
    ng = state->ng;
    nh = state->nh;
 // AGS solver
    if (state->solvertype == 0) {
       if (state->diffstep != 0.0) {
          vectorsetlengthatleast(&state->xbase, n);
+         vectorsetlengthatleast(&state->fbase, 1 + ng + nh);
          vectorsetlengthatleast(&state->fm, 1 + ng + nh);
          vectorsetlengthatleast(&state->fp, 1 + ng + nh);
       }
+      vectorsetlengthatleast(&state->xscaled, n);
+      vectorsetlengthatleast(&state->rawg, n);
+      vectorsetlengthatleast(&state->meritg, n);
       for (state->AgsPQ = -1; minns_agsiteration(state); ) {
+         rcopyv(n, &state->x, &state->xscaled);
+         minns_unscalepointbc(state, &state->x);
       // Numerical differentiation (if needed) - intercept NeedFiJ
       // request and replace it by sequence of NeedFi requests
          if (state->diffstep != 0.0 && state->needfij) {
             state->needfij = false, state->needfi = true;
             ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
+            state->PQ = 0; goto Pause; Resume0:
+            ae_v_move(state->fbase.xR, 1, state->fi.xR, 1, ng + nh + 1);
+            state->repnfev++;
             for (k = 0; k < n; k++) {
                v = state->xbase.xR[k];
                xm = v - state->diffstep * state->s.xR[k];
@@ -39251,36 +39190,63 @@ Spawn:
                if (state->hasbndu.xB[k] && xp > state->bndu.xR[k]) {
                   xp = state->bndu.xR[k];
                }
-               ae_assert(xm <= xp, "MinNS: integrity check failed");
+               ae_assert(xm <= xp, "MinNS: integrity check failed (3y634)");
                if (xm != xp) {
-                  ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+               // Compute F(XM) and F(XP)
+                  rcopyv(n, &state->xbase, &state->x);
                   state->x.xR[k] = xm;
-                  state->PQ = 0; goto Pause; Resume0:
-                  ae_v_move(state->fm.xR, 1, state->fi.xR, 1, ng + nh + 1);
-                  ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-                  state->x.xR[k] = xp;
                   state->PQ = 1; goto Pause; Resume1:
-                  ae_v_move(state->fp.xR, 1, state->fi.xR, 1, ng + nh + 1);
-                  ae_v_move(&state->j.xyR[0][k], state->j.stride, state->fp.xR, 1, ng + nh + 1);
-                  ae_v_sub(&state->j.xyR[0][k], state->j.stride, state->fm.xR, 1, ng + nh + 1);
-                  v = 1.0 / (xp - xm);
-                  ae_v_muld(&state->j.xyR[0][k], state->j.stride, ng + nh + 1, v);
+                  rcopyv(1 + ng + nh, &state->fi, &state->fm);
+                  rcopyv(n, &state->xbase, &state->x);
+                  state->x.xR[k] = xp;
+                  state->PQ = 2; goto Pause; Resume2:
+                  rcopyv(1 + ng + nh, &state->fi, &state->fp);
+               // Compute subgradient at XBase
+                  rcopymulvc(1 + ng + nh, 1.0 / (xp - xm), &state->fp, &state->j, k);
+                  raddvc(1 + ng + nh, -1.0 / (xp - xm), &state->fm, &state->j, k);
                   state->repnfev += 2;
                } else {
-                  for (i = 0; i <= ng + nh; i++) {
-                     state->j.xyR[i][k] = 0.0;
-                  }
+                  rsetc(1 + ng + nh, 0.0, &state->j, k);
                }
             }
-            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-            state->PQ = 2; goto Pause; Resume2:
          // Restore previous values of fields and continue
+            rcopyv(n, &state->xscaled, &state->x);
+            rcopyv(1 + ng + nh, &state->fbase, &state->fi);
             state->needfi = false, state->needfij = true;
          } else {
          // Forward request to caller.
             state->PQ = 3; goto Pause; Resume3:
             state->repnfev++;
+            rcopyv(n, &state->xscaled, &state->x);
          }
+      // Postprocess Jacobian: scale and produce 'raw' and 'merit' functions
+         for (i = 0; i <= ng + nh; i++) {
+            rmergemulvr(n, &state->s, &state->j, i);
+         }
+         state->rawf = state->fi.xR[0];
+         state->meritf = state->fi.xR[0];
+         rcopyrv(n, &state->j, 0, &state->rawg);
+         rcopyrv(n, &state->j, 0, &state->meritg);
+         for (i = 0; i < nec + nic; i++) {
+            v = rdotvr(n, &state->x, &state->scaledcleic, i) - state->scaledcleic.xyR[i][n];
+            if (i >= nec && v < 0.0) {
+               continue;
+            }
+            state->meritf += state->rholinear * fabs(v);
+            raddrv(n, state->rholinear * sign(v), &state->scaledcleic, i, &state->meritg);
+         }
+         for (i = 1; i <= ng + nh; i++) {
+            v = state->fi.xR[i];
+            if (i <= ng && v == 0.0) {
+               continue;
+            } else if (i > ng && v <= 0.0) {
+               continue;
+            }
+            state->meritf += state->agsrhononlinear * fabs(v);
+            raddrv(n, state->agsrhononlinear * sign(v), &state->j, i, &state->meritg);
+         }
+      // Done
+      // continue;
       }
    }
 Exit:
@@ -39429,7 +39395,8 @@ void minnsstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->xstart, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->xc, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->xn, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->grs, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->rawg, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->meritg, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->d, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->colmax, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->diagh, 0, DT_REAL, make_automatic);
@@ -39438,20 +39405,20 @@ void minnsstate_init(void *_p, bool make_automatic) {
    ae_vector_init(&p->scaledbndl, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->scaledbndu, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->scaledcleic, 0, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->rholinear, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->samplex, 0, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->samplegm, 0, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->samplegmbc, 0, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->samplef, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->samplef0, 0, DT_REAL, make_automatic);
    minnsqp_init(&p->nsqp, make_automatic);
    ae_vector_init(&p->tmp0, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->tmp1, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->tmp2, 0, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->tmp3, 0, DT_INT, make_automatic);
    ae_vector_init(&p->xbase, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->fbase, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->fp, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->fm, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->xscaled, 0, DT_REAL, make_automatic);
 }
 
 void minnsstate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -39504,7 +39471,10 @@ void minnsstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->xstart, &src->xstart, make_automatic);
    ae_vector_copy(&dst->xc, &src->xc, make_automatic);
    ae_vector_copy(&dst->xn, &src->xn, make_automatic);
-   ae_vector_copy(&dst->grs, &src->grs, make_automatic);
+   ae_vector_copy(&dst->rawg, &src->rawg, make_automatic);
+   ae_vector_copy(&dst->meritg, &src->meritg, make_automatic);
+   dst->rawf = src->rawf;
+   dst->meritf = src->meritf;
    ae_vector_copy(&dst->d, &src->d, make_automatic);
    ae_vector_copy(&dst->colmax, &src->colmax, make_automatic);
    ae_vector_copy(&dst->diagh, &src->diagh, make_automatic);
@@ -39514,20 +39484,21 @@ void minnsstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->scaledbndl, &src->scaledbndl, make_automatic);
    ae_vector_copy(&dst->scaledbndu, &src->scaledbndu, make_automatic);
    ae_matrix_copy(&dst->scaledcleic, &src->scaledcleic, make_automatic);
-   ae_vector_copy(&dst->rholinear, &src->rholinear, make_automatic);
+   dst->rholinear = src->rholinear;
    ae_matrix_copy(&dst->samplex, &src->samplex, make_automatic);
    ae_matrix_copy(&dst->samplegm, &src->samplegm, make_automatic);
    ae_matrix_copy(&dst->samplegmbc, &src->samplegmbc, make_automatic);
    ae_vector_copy(&dst->samplef, &src->samplef, make_automatic);
-   ae_vector_copy(&dst->samplef0, &src->samplef0, make_automatic);
    minnsqp_copy(&dst->nsqp, &src->nsqp, make_automatic);
    ae_vector_copy(&dst->tmp0, &src->tmp0, make_automatic);
    ae_vector_copy(&dst->tmp1, &src->tmp1, make_automatic);
    ae_matrix_copy(&dst->tmp2, &src->tmp2, make_automatic);
    ae_vector_copy(&dst->tmp3, &src->tmp3, make_automatic);
    ae_vector_copy(&dst->xbase, &src->xbase, make_automatic);
+   ae_vector_copy(&dst->fbase, &src->fbase, make_automatic);
    ae_vector_copy(&dst->fp, &src->fp, make_automatic);
    ae_vector_copy(&dst->fm, &src->fm, make_automatic);
+   ae_vector_copy(&dst->xscaled, &src->xscaled, make_automatic);
    dst->repinneriterationscount = src->repinneriterationscount;
    dst->repouteriterationscount = src->repouteriterationscount;
    dst->repnfev = src->repnfev;
@@ -39554,7 +39525,8 @@ void minnsstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->xstart, make_automatic);
    ae_vector_free(&p->xc, make_automatic);
    ae_vector_free(&p->xn, make_automatic);
-   ae_vector_free(&p->grs, make_automatic);
+   ae_vector_free(&p->rawg, make_automatic);
+   ae_vector_free(&p->meritg, make_automatic);
    ae_vector_free(&p->d, make_automatic);
    ae_vector_free(&p->colmax, make_automatic);
    ae_vector_free(&p->diagh, make_automatic);
@@ -39563,20 +39535,20 @@ void minnsstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->scaledbndl, make_automatic);
    ae_vector_free(&p->scaledbndu, make_automatic);
    ae_matrix_free(&p->scaledcleic, make_automatic);
-   ae_vector_free(&p->rholinear, make_automatic);
    ae_matrix_free(&p->samplex, make_automatic);
    ae_matrix_free(&p->samplegm, make_automatic);
    ae_matrix_free(&p->samplegmbc, make_automatic);
    ae_vector_free(&p->samplef, make_automatic);
-   ae_vector_free(&p->samplef0, make_automatic);
    minnsqp_free(&p->nsqp, make_automatic);
    ae_vector_free(&p->tmp0, make_automatic);
    ae_vector_free(&p->tmp1, make_automatic);
    ae_matrix_free(&p->tmp2, make_automatic);
    ae_vector_free(&p->tmp3, make_automatic);
    ae_vector_free(&p->xbase, make_automatic);
+   ae_vector_free(&p->fbase, make_automatic);
    ae_vector_free(&p->fp, make_automatic);
    ae_vector_free(&p->fm, make_automatic);
+   ae_vector_free(&p->xscaled, make_automatic);
 }
 
 void minnsreport_init(void *_p, bool make_automatic) {
@@ -42702,3 +42674,311 @@ void minbcrequesttermination(const minbcstate &state) {
 
 // === OPTS Package ===
 // Depends on: MINLP
+namespace alglib_impl {
+// Initialize test LP problem.
+//
+// This function is intended for internal use by ALGLIB.
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+// API: void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p);
+void lptestproblemcreate(ae_int_t n, bool hasknowntarget, double targetf, lptestproblem *p) {
+   SetObj(lptestproblem, p);
+   ae_assert(n >= 1, "LPTestProblemCreate: N < 1");
+   p->n = n;
+   p->hasknowntarget = hasknowntarget;
+   if (hasknowntarget) {
+      p->targetf = targetf;
+   } else {
+      p->targetf = NAN;
+   }
+   ae_vector_set_length(&p->s, n);
+   rsetv(n, 1.0, &p->s);
+   ae_vector_set_length(&p->c, n);
+   rsetv(n, 0.0, &p->c);
+   ae_vector_set_length(&p->bndl, n);
+   rsetv(n, 0.0, &p->bndl);
+   ae_vector_set_length(&p->bndu, n);
+   rsetv(n, 0.0, &p->bndu);
+   p->m = 0;
+   ae_vector_set_length(&p->al, 0);
+   ae_vector_set_length(&p->au, 0);
+}
+
+// Set scale for test LP problem
+//
+// This function is intended for internal use by ALGLIB.
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+// API: void lptestproblemsetscale(const lptestproblem &p, const real_1d_array &s);
+void lptestproblemsetscale(lptestproblem *p, RVector *s) {
+   rcopyv(p->n, s, &p->s);
+}
+
+// Set cost for test LP problem
+//
+// This function is intended for internal use by ALGLIB.
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+// API: void lptestproblemsetcost(const lptestproblem &p, const real_1d_array &c);
+void lptestproblemsetcost(lptestproblem *p, RVector *c) {
+   rcopyv(p->n, c, &p->c);
+}
+
+// Set box constraints for test LP problem
+//
+// This function is intended for internal use by ALGLIB.
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+// API: void lptestproblemsetbc(const lptestproblem &p, const real_1d_array &bndl, const real_1d_array &bndu);
+void lptestproblemsetbc(lptestproblem *p, RVector *bndl, RVector *bndu) {
+   rcopyv(p->n, bndl, &p->bndl);
+   rcopyv(p->n, bndu, &p->bndu);
+}
+
+// Set box constraints for test LP problem
+//
+// This function is intended for internal use by ALGLIB.
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+// API: void lptestproblemsetlc2(const lptestproblem &p, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t m);
+void lptestproblemsetlc2(lptestproblem *p, sparsematrix *a, RVector *al, RVector *au, ae_int_t m) {
+   if (m <= 0) {
+      p->m = 0;
+      return;
+   }
+   ae_assert(sparsegetnrows(a) == m, "LPTestProblemSetLC2: rows(A) != M");
+   p->m = m;
+   sparsecopytocrs(a, &p->a);
+   ae_vector_set_length(&p->al, m);
+   ae_vector_set_length(&p->au, m);
+   rcopyv(m, al, &p->al);
+   rcopyv(m, au, &p->au);
+}
+
+// This is internal function intended to  be  used  only  by  ALGLIB  itself.
+// Although for technical reasons it is made publicly available (and has  its
+// own manual entry), you should never call it.
+// ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
+// API: void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state);
+void xdbgminlpcreatefromtestproblem(lptestproblem *p, minlpstate *state) {
+   SetObj(minlpstate, state);
+   minlpcreate(p->n, state);
+   minlpsetscale(state, &p->s);
+   minlpsetcost(state, &p->c);
+   minlpsetbc(state, &p->bndl, &p->bndu);
+   minlpsetlc2(state, &p->a, &p->al, &p->au, p->m);
+}
+
+// Serializer: allocation
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+void lptestproblemalloc(ae_serializer *s, lptestproblem *p) {
+   ae_serializer_alloc_entry(s);
+   ae_serializer_alloc_entry(s);
+   ae_serializer_alloc_entry(s);
+   ae_serializer_alloc_entry(s);
+   ae_serializer_alloc_entry(s);
+   allocrealarray(s, &p->s, p->n);
+   allocrealarray(s, &p->c, p->n);
+   allocrealarray(s, &p->bndl, p->n);
+   allocrealarray(s, &p->bndu, p->n);
+   ae_serializer_alloc_entry(s);
+   if (p->m > 0) {
+      sparsealloc(s, &p->a);
+      allocrealarray(s, &p->al, p->m);
+      allocrealarray(s, &p->au, p->m);
+   }
+   ae_serializer_alloc_entry(s);
+}
+
+// Serializer: serialization
+// These functions serialize a data structure to a C++ string or stream.
+// * serialization can be freely moved across 32-bit and 64-bit systems,
+//   and different byte orders. For example, you can serialize a string
+//   on a SPARC and unserialize it on an x86.
+// * ALGLIB++ serialization is compatible with serialization in ALGLIB,
+//   in both directions.
+// Important properties of s_out:
+// * it contains alphanumeric characters, dots, underscores, minus signs
+// * these symbols are grouped into words, which are separated by spaces
+//   and Windows-style (CR+LF) newlines
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+// API: void lptestproblemserialize(lptestproblem &obj, std::string &s_out);
+// API: void lptestproblemserialize(lptestproblem &obj, std::ostream &s_out);
+void lptestproblemserialize(ae_serializer *s, lptestproblem *p) {
+   ae_serializer_serialize_int(s, getlptestserializationcode());
+   ae_serializer_serialize_int(s, 0);
+   ae_serializer_serialize_int(s, p->n);
+   ae_serializer_serialize_bool(s, p->hasknowntarget);
+   ae_serializer_serialize_double(s, p->targetf);
+   serializerealarray(s, &p->s, p->n);
+   serializerealarray(s, &p->c, p->n);
+   serializerealarray(s, &p->bndl, p->n);
+   serializerealarray(s, &p->bndu, p->n);
+   ae_serializer_serialize_int(s, p->m);
+   if (p->m > 0) {
+      sparseserialize(s, &p->a);
+      serializerealarray(s, &p->al, p->m);
+      serializerealarray(s, &p->au, p->m);
+   }
+   ae_serializer_serialize_int(s, 872);
+}
+
+// Serializer: unserialization
+// These functions unserialize a data structure from a C++ string or stream.
+// Important properties of s_in:
+// * any combination of spaces, tabs, Windows or Unix stype newlines can
+//   be used as separators, so as to allow flexible reformatting of the
+//   stream or string from text or XML files.
+// * But you should not insert separators into the middle of the "words"
+//   nor you should change case of letters.
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+// API: void lptestproblemunserialize(const std::string &s_in, lptestproblem &obj);
+// API: void lptestproblemunserialize(const std::istream &s_in, lptestproblem &obj);
+void lptestproblemunserialize(ae_serializer *s, lptestproblem *p) {
+   SetObj(lptestproblem, p);
+   ae_assert(ae_serializer_unserialize_int(s) == getlptestserializationcode(), "lptestproblemunserialize: stream header corrupted");
+   ae_assert(ae_serializer_unserialize_int(s) == 0, "lptestproblemunserialize: stream header corrupted");
+   p->n = ae_serializer_unserialize_int(s);
+   p->hasknowntarget = ae_serializer_unserialize_bool(s);
+   p->targetf = ae_serializer_unserialize_double(s);
+   unserializerealarray(s, &p->s);
+   unserializerealarray(s, &p->c);
+   unserializerealarray(s, &p->bndl);
+   unserializerealarray(s, &p->bndu);
+   p->m = ae_serializer_unserialize_int(s);
+   if (p->m > 0) {
+      sparseunserialize(s, &p->a);
+      unserializerealarray(s, &p->al);
+      unserializerealarray(s, &p->au);
+   }
+   ae_assert(ae_serializer_unserialize_int(s) == 872, "lptestproblemunserialize: end-of-stream marker not found");
+}
+
+void lptestproblem_init(void *_p, bool make_automatic) {
+   lptestproblem *p = (lptestproblem *)_p;
+   ae_vector_init(&p->s, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->c, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->bndl, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->bndu, 0, DT_REAL, make_automatic);
+   sparsematrix_init(&p->a, make_automatic);
+   ae_vector_init(&p->al, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->au, 0, DT_REAL, make_automatic);
+}
+
+void lptestproblem_copy(void *_dst, void *_src, bool make_automatic) {
+   lptestproblem *dst = (lptestproblem *)_dst;
+   lptestproblem *src = (lptestproblem *)_src;
+   dst->n = src->n;
+   dst->hasknowntarget = src->hasknowntarget;
+   dst->targetf = src->targetf;
+   ae_vector_copy(&dst->s, &src->s, make_automatic);
+   ae_vector_copy(&dst->c, &src->c, make_automatic);
+   ae_vector_copy(&dst->bndl, &src->bndl, make_automatic);
+   ae_vector_copy(&dst->bndu, &src->bndu, make_automatic);
+   dst->m = src->m;
+   sparsematrix_copy(&dst->a, &src->a, make_automatic);
+   ae_vector_copy(&dst->al, &src->al, make_automatic);
+   ae_vector_copy(&dst->au, &src->au, make_automatic);
+}
+
+void lptestproblem_free(void *_p, bool make_automatic) {
+   lptestproblem *p = (lptestproblem *)_p;
+   ae_vector_free(&p->s, make_automatic);
+   ae_vector_free(&p->c, make_automatic);
+   ae_vector_free(&p->bndl, make_automatic);
+   ae_vector_free(&p->bndu, make_automatic);
+   sparsematrix_free(&p->a, make_automatic);
+   ae_vector_free(&p->al, make_automatic);
+   ae_vector_free(&p->au, make_automatic);
+}
+} // end of namespace alglib_impl
+
+namespace alglib {
+// This is a test problem class  intended  for  internal  performance  tests.
+// Never use it directly in your projects.
+DefClass(lptestproblem, )
+
+void lptestproblemserialize(lptestproblem &obj, std::string &s_out) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   NewSerializer(serializer);
+   alglib_impl::ae_serializer_alloc_start(&serializer);
+   alglib_impl::lptestproblemalloc(&serializer, obj.c_ptr());
+   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   s_out.clear();
+   s_out.reserve((size_t)(ssize + 1));
+   alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
+   alglib_impl::lptestproblemserialize(&serializer, obj.c_ptr());
+   alglib_impl::ae_serializer_stop(&serializer);
+   alglib_impl::ae_assert(s_out.length() <= (size_t)ssize, "lptestproblemserialize: serialization integrity error");
+   alglib_impl::ae_state_clear();
+}
+void lptestproblemserialize(lptestproblem &obj, std::ostream &s_out) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   NewSerializer(serializer);
+   alglib_impl::ae_serializer_alloc_start(&serializer);
+   alglib_impl::lptestproblemalloc(&serializer, obj.c_ptr());
+   alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
+   alglib_impl::ae_serializer_sstart_stream(&serializer, &s_out);
+   alglib_impl::lptestproblemserialize(&serializer, obj.c_ptr());
+   alglib_impl::ae_serializer_stop(&serializer);
+   alglib_impl::ae_state_clear();
+}
+
+void lptestproblemunserialize(const std::string &s_in, lptestproblem &obj) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   NewSerializer(serializer);
+   alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
+   alglib_impl::lptestproblemunserialize(&serializer, obj.c_ptr());
+   alglib_impl::ae_serializer_stop(&serializer);
+   alglib_impl::ae_state_clear();
+}
+void lptestproblemunserialize(const std::istream &s_in, lptestproblem &obj) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   NewSerializer(serializer);
+   alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
+   alglib_impl::lptestproblemunserialize(&serializer, obj.c_ptr());
+   alglib_impl::ae_serializer_stop(&serializer);
+   alglib_impl::ae_state_clear();
+}
+
+void lptestproblemcreate(const ae_int_t n, const bool hasknowntarget, const double targetf, lptestproblem &p) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::lptestproblemcreate(n, hasknowntarget, targetf, ConstT(lptestproblem, p));
+   alglib_impl::ae_state_clear();
+}
+
+void lptestproblemsetscale(const lptestproblem &p, const real_1d_array &s) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::lptestproblemsetscale(ConstT(lptestproblem, p), ConstT(ae_vector, s));
+   alglib_impl::ae_state_clear();
+}
+
+void lptestproblemsetcost(const lptestproblem &p, const real_1d_array &c) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::lptestproblemsetcost(ConstT(lptestproblem, p), ConstT(ae_vector, c));
+   alglib_impl::ae_state_clear();
+}
+
+void lptestproblemsetbc(const lptestproblem &p, const real_1d_array &bndl, const real_1d_array &bndu) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::lptestproblemsetbc(ConstT(lptestproblem, p), ConstT(ae_vector, bndl), ConstT(ae_vector, bndu));
+   alglib_impl::ae_state_clear();
+}
+
+void lptestproblemsetlc2(const lptestproblem &p, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t m) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::lptestproblemsetlc2(ConstT(lptestproblem, p), ConstT(sparsematrix, a), ConstT(ae_vector, al), ConstT(ae_vector, au), m);
+   alglib_impl::ae_state_clear();
+}
+
+void xdbgminlpcreatefromtestproblem(const lptestproblem &p, minlpstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdbgminlpcreatefromtestproblem(ConstT(lptestproblem, p), ConstT(minlpstate, state));
+   alglib_impl::ae_state_clear();
+}
+} // end of namespace alglib
