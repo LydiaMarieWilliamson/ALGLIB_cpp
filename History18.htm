@@ -1,0 +1,639 @@
+<html>
+<head>
+<title>ALGLIB++ Revision Sequence - 3.18.0 side-branch</title>
+<meta http-equiv=Content-Type content="text/html; charset=utf-8">
+<style type="text/css">
+h1		{ font-family: Arial, Helvetica, sans-serif; color: #000000; font-size: 36pt; margin-top: 0; margin-bottom: 0; }
+h2		{ font-family: Arial, Helvetica, sans-serif; color: #003300; font-size: 20pt; margin-bottom: 0; }
+h3		{ font-family: Arial, Helvetica, sans-serif; color: #006600; font-size: 15pt; margin-bottom: 0; }
+h4		{ font-family: Arial, Helvetica, sans-serif; color: #666600; font-size: 14pt; margin-bottom: 0; }
+h5		{ font-family: Arial, Helvetica, sans-serif; color: #660000; font-size: 14pt; margin-top: 10pt; margin-bottom: 0; }
+h6		{ font-family: Arial, Helvetica, sans-serif; color: #000066; font-size: 13pt; margin-top: 10pt; margin-bottom: 0; }
+sheader		{ }
+.inlineheader	{ background-color: #e8e8e8; padding: 0.1em; font-weight: bold; }
+.pagecontent	{ font-family: Verdana, Arial, sans-serif; font-size: 10pt; text-align: justify; }
+.pageheader	{ width: 50em; }
+.source		{ font-family: "Courier New"; font-size: 1.0em; margin-top: 0; margin-bottom: 0; }
+.narration	{ font-family: "Courier New"; font-size: 1.0em; margin-top: 0; margin-bottom: 0; color: navy; }
+.declaration	{ font-family: "Courier New"; font-size: 1.0em; margin-top: 0; margin-bottom: 0; color: blue; }
+code		{ font-family: "Courier New"; font-size: 1.0em; }
+.p_example	{ margin-left: 4em; font-family: "Courier New"; font-size: 1.0em; }
+.p_note		{ margin-left: 10%; margin-right: 10%; font-size: 80%; }
+.p_att		{ margin-left: 10%; margin-right: 10%; color: red; font-weight: bold; }
+.p_code_head	{ margin-left: 5%; margin-top: 0; margin-bottom: 0; padding: 5px; width: 90%; font-family: "Courier New", monospace; background-color: #aaaaaa; font-weight: bold; color: white; }
+.p_code_body	{ margin-left: 5%; margin-top: 0; margin-bottom: 0; padding: 5px; width: 90%; font-family: "Courier New", monospace; background-color: #f0f0f0; }
+.p_code		{ margin-left: 5%; margin-top: 0; margin-bottom: 0; padding: 5px; width: 90%; font-family: "Courier New", monospace; background-color: #f0f0f0; }
+.s_code		{ font-family: "Courier New"; background-color: #f0f0f0; }
+.s_str		{ font-family: "Courier New"; color: blue; font-weight: bold; }
+.s_comment	{ color: navy; font-style: italic; }
+.s_preprocessor	{ color: green; }
+a		{ color: #000077; text-decoration: underline; }
+a:link		{ color: #0000ff; text-decoration: underline; }
+a:visited	{ color: #000077; text-decoration: underline; }
+a:active	{ color: #6666ff; text-decoration: underline; }
+a:hover		{ color: #ff6666; text-decoration: underline; }
+a.toc		{ color: #000077; text-decoration: none; }
+a.toc:link	{ color: #0000ff; text-decoration: none; }
+a.toc:visited	{ color: #000077; text-decoration: none; }
+a.toc:active	{ color: #6666ff; text-decoration: none; }
+a.toc:hover	{ color: #ff6666; text-decoration: none; }
+a.nav		{ color: #000077; font-weight: bold; text-decoration: none; }
+a.nav:link	{ color: #0000ff; font-weight: bold; text-decoration: none; }
+a.nav:visited	{ color: #000077; font-weight: bold; text-decoration: none; }
+a.nav:active	{ color: #6666ff; font-weight: bold; text-decoration: none; }
+a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
+.cond		{ color: blue; }
+.const		{ color: #222222; }
+.func		{ color: #111111; }
+</style>
+</head>
+<body>
+<div class=pagecontent>
+<p>
+<a name=supp_History2 class=sheader></a><h3>A6.2.1. Test Stages (3.18.0 side-branch)</h3>
+<a href="History.htm#supp_History2" class=sheader></a><h3>A6.2. Test Stages</h3>
+<pre class=narration>
+39	Integration of version 3.18.0 ― being done separately from the main branch.
+39	Removed the CPU initialization for FP-rounding (more recent versions of GCC now seem to handle this right).
+0-39	Removed hook-stub routines:
+	―	trypexec from DataAnalysis, Interpolation, LinAlg, Statistics,
+	―	notes are kept on the parallelism hooks.
+39	Topologically sorted all the functions: both static and external, except *alloc(), [un]serialize(), *_{init,copy,free}().
+0-39	Ap.{cpp,h}: Normalized translator-generated names across namespaces:
+		ae_machineepsilon → machineepsilon, ae_pi → pi, ae_maxrealnumber → maxrealnumber, ae_minrealnumber → minrealnumber,
+		ae_c_abs → abscomplex, ae_complex → complex, ae_c_conj → conj, ae_c_sqr → csqr, ae_sign → sign, ae_sqr → sqr,
+		ae_iceil → iceil, ae_ifloor → ifloor, ae_round → iround, ae_trunc → itrunc,
+		ae_maxreal → maxreal, ae_minreal → minreal, ae_maxint → maxint, ae_minint → minint,
+		ae_get_cores_to_use → getnworkers, ae_set_cores_to_use → setnworkers, ae_set_error_flag → set_error_flag,
+		ae_randommid → randommid, ae_randomreal → randomreal, ae_randombool → randombool, ae_randominteger → randominteger,
+		ae_tickcount → tickcount,
+		ae_complex_from_i → complex_from_i, ae_complex_from_d → complex_from_d
+0-39	Removed pi() from Ap.{cpp,h} (since it's already defined in Ap.h as a constant, ‟pi”).
+0-39	Synthesized the local ‟gateway” alglib_impl::complex → alglib::complex function complex_from_c() in Ap.cpp.
+	Generalized existing routines: complex_from_{d,i}(⋯) from (X) to (X, Y = 0.0).
+	Synthesized complex::complex(⋯) and complex_from_{d,i,c}(⋯) for Y ≠ 0.0.
+0-39	Move diagnostic functions to TestC.cpp and remove their declarations:
+	―	seterrordiff() from AlgLibInternal.{cpp,h}
+	―	set_error_flag(), ae_get_last_error_file(), ae_get_last_error_line(), ae_get_last_error_xdesc() from Ap.{cpp,h}
+
+	−	sef_file, sef_line, sef_xdesc from Ap.cpp
+	―	Eliminate the ae_get_last_error_*() functions and replace them by the corresponding sef_* variables.
+0-39	Remove all comments on, references to and support for tracing/logging added in 3.16:
+	―	Ap.{cpp,h}:
+			ae_trace_file(), ae_trace_disable(), ae_is_trace_enabled(), ae_trace()
+	―	AlgLibInternal.{cpp,h}:
+			tracevectorautoprec(), tracevectorunscaledunshiftedautoprec(), tracerownrm1autoprec(),
+			tracevectore6(), tracevectore615(), tracerownrm1e6()
+	―	Optimization.{cpp,h}:
+		3.15: The *trace* routines were stubs and were removed.
+		3.16: The *trace* routines, dotrace*, doprobing were activated for the IPM, SLP and SQP solvers.
+		3.17: The tracegamma vector and extendeddebug and dotimers flags &amp; members and rep*time members are also removed.
+	―	Optimization.cpp, Manual.htm:
+			TRACING * SOLVER comments
+0-39	Optimized ifloor(A,B) as A / B and iceil(A,B) as (A + B - 1) / B, for integer types A and B.
+	Replaced i{floor,ceil,trunc,round}() by std::{floor,ceil,trunc,round}(), for floating point types.
+0-39	Synthesized increment operators:
+	―	*X = *X + 1 ⇒ ++*X, else X = X + 1 ⇒ X++ for non-pointers.
+	―	*X = *X - 1 ⇒ --*X, else X = X - 1 ⇒ X-- for non-pointers.
+	―	X = X + 1.0 ⇒ X++;
+0-39	Synthesized update operators:
+	―	X = X % Y ⇒ X %= Y (*)
+	―	X = X &amp; Y ⇒ X &amp;= Y
+	―	X = X + Y ⇒ X += Y
+	―	X = Y + X ⇒ X += Y
+	―	X = Y + (X) ⇒ X += Y
+	―	X = X - Y ⇒ X -= Y, where Y is a monomial.
+	―	X = X - Y ± Y' ± ⋯ ± Y" ⇒ X -= Y ∓ Y' ∓ ⋯ ∓ Y", where Y, Y', ⋯, Y" are monomials. (‡)
+	―	X = X * Y ⇒ X *= Y, X = -X * Y ⇒ X *= -Y, X = Z * X ⇒ X *= Z, X = Z * X * Y ⇒ X *= Z * Y, where Y and Z are monomials.
+	―	X = X / Y ⇒ X /= Y, where Y is a single factor.
+	―	X = X * Y / Z ⇒ X *= Y / Z, in some cases, where X, Y and Z are floating point.
+	(*) This was previously already done in its sole occurrence: in hqrnduniformi() in AlgLibMisc.cpp.
+	(‡) X = X - Y + Y' - Y" is specially optimized, since its occurrences all involved *max(⋯,⋯) on the right-hand side.
+0-39	Partial recoding of Ap.{cpp,h} to bring it in line with ALGLIB++:
+	―	The declarations of ae_vector_wrapper::ae_vector_wrapper() and ae_vector_wrapper::operator=() in Ap.h were removed - unused.
+	―	The declarations of ae_matrix_wrapper::ae_matrix_wrapper() and ae_matrix_wrapper::operator=() in Ap.h were removed - unused.
+	―	*_free(⋯, true) changed to *_free(⋯, false) in:
+		ae_vector_wrapper::~ae_{vector,matrix}_wrapper(), ae_vector_wrapper::attach_to(),
+		ae_matrix_wrapper::~ae_{vector,matrix}_wrapper(), ae_matrix_wrapper::attach_to().
+	―	In the original implementaton of ALGLIB *_clear() (= *_free(, true)) should have been *_destroy (= *_free(, false))
+		in each of these routines.
+		Both are equivalent in the GPL version of ALGLIB, because *_clear() and *_destroy() were the same for ae_{vector,matrix},
+		but this is only an incidental equivalence that should not be relied on.
+	―	Synthesized the function alglib::set_error_msg() in Ap.cpp and redefined ThrowErrorMsg() in Ap.h, using it.
+	―	Remade the enum { OWN_CALLER = false, OWN_AE = true } type as bool and removed the enumerated constants.
+	―	In-line some of the alglib:: object member functions in Ap.h, removing them from Ap.cpp.
+		―	alglib::ae_vector_wrapper::c_ptr(), ae_matrix_wrapper::c_ptr()
+		―	c_ptr() for object classes, moved from DefClass to DecClass.
+		―	alglib::complex constructors.
+	―	Added declarations of the global routines in Ap.cpp
+			_ialglib_pack_n2(), _ialglib_mm22(), _ialglib_mm22x2()
+		into Ap.h, alongside those of the other _ialglib_*() routines.
+0-39	Fully nativizing floating point constants and operations, replacing them by their standard forms:
+	―	ae_sin,ae_cos,ae_tan,ae_sinh,ae_cosh,ae_tanh,ae_asin,ae_acos,ae_atan,ae_atan2,ae_log,ae_pow,ae_exp ⇒ sin,cos,tan,sinh,cosh,tanh,asin,acos,atan,atan2,log,pow,exp
+	―	ae_fabs,ae_sqrt ⇒ fabs,sqrt
+	―	ae_isfinite,ae_isfinite_stateless ⇒ isfinite,isfinite
+	―	ae_isnan,ae_isnan_stateless,fp_isnan ⇒ isnan
+	−	ae_isinf,ae_isinf_stateless,fp_isinf ⇒ isinf
+	―	ae_isneginf,ae_isposinf ⇒ isneginf,isposinf
+	―	Remove the definitions from Ap.cpp and declarations from Ap.h of those that have been nativized.
+	―	_*state-&gt;v_nan,fp_nan ⇒ NAN
+	―	_*state-&gt;v_posinf,fp_posinf ⇒ +INFINITY
+	―	_*state-&gt;v_neginf,fp_neginf ⇒ -INFINITY
+	―	_*state-&gt;v_{nan,posinf,neginf} are retained (for now) as in-line constant members.
+0-39	Removing translator-generated artifacts.
+	Commenting out or eliminating translator-generated dead-code or vestigial code from the commercial version of ALGLIB.
+	―	Merge {b,i,r}{vector,matrix}setlengthatleast() into {vector,matrix}setlengthatleast().
+	―	Normalize boolean comparisons: A&amp;&amp;B || !A&amp;&amp;!B ⇒ A == B, A&amp;&amp;B || !A&amp;&amp;C ⇒ A? B: C
+		(including some places where A and !A are opposite comparisons on floating point).
+	―	Removed aresameboolean(); already subsumed by "==";
+	―	Removed countdown(): it is unused.
+	―	Removed ivectorappend(): it is unused.
+	―	Removed {min,max}int(): they are duplicates respectively of i{min,max}2().
+	―	Renamed ae_minreal() as rmin2() and ae_maxreal() as rmax2().
+	―	Moved i{min,max}2(), imin3(), {i,r}max3(), rmaxabs3(), {i,r}boundval() from AlgLibInternal.{cpp,h} to Ap.{cpp,h}.
+	―	Removed maxreal3(); it's a duplicate of rmax3().
+	―	Removed boundval(): it's a duplicate of rboundval().
+	―	Removed unsetintegerarray(), unsetrealarray(): they are duplicates of SetVector().
+	―	Removed unsetrealmatrix(): it's a duplicate of SetMatrix().
+	―	Removed ae_touch_ptr(), touchint(), touchreal(), alwaysfalse();
+		touchint(), touchreal() unused variables are rectified or eliminated;
+		code shielded by touchint(), in ftbase_ftapplysubplan() and dsoptimalsplitk(), rectified;
+		"inaccessible" code, shielded by alwaysfalse(), rectified.
+	―	Removed threadunsafeinc(), threadunsafeincby() and in-line substituted for it.
+	―	Removed inc(), dec() and in-line substituted for it.
+	―	Removed inttoreal() from AlgLibInternal.{cpp,h} ― it's unused and duplicates the typecast function double().
+	―	Removed countnz{1,2}() from AlgLibInternal.{cpp,h} ― they are unused.
+	―	Removed idivup() from AlgLibInternal.{cpp,h}; replacing idivup(a,b) by the operation (a + b - 1) / b (restored it in version 3.19.0 on up).
+	―	Removed rmul{2,3}() from AlgLibInternal.{cpp,h}; replacing rmul2(a,b) by (double)a * b, rmul3(a,b,c) by (double)a * b * c.
+	―	Removed rmul4() from AlgLibInternal.{cpp,h}; replacing rmul4(a,b,c,d) by (double)a * b * c * d (appeared in version 3.19.0 on up).
+	―	The output parameters in ae_serializer_unserialize_{bool,int,int64,double} were remade into return values.
+	―	The parameter type in ae_shared_pool_is_initialized() was raised from (void *) to (ae_shared_pool *).
+	―	Removed the unused or redundant types s{boolean,integer,real,complex}[array] from AlgLibInternal.{cpp,h};
+	―	Converted sinteger ⇒ ae_int_t, sreal ⇒ double, srealarray ⇒ RVector;
+	―	Redefined and replaced srealarray_{init,copy,free} by RVector_{init,copy,free}.
+0-39	Recode random*():
+	―	Synthesize new routines: randombool(), randommid().
+	―	Remove the state variable from alglib_impl::randominteger() and alglib_impl::randomreal().
+∙	Recode *pythag2():
+	―	Removed pythag2() from AlgLibInternal.{cpp,h} - it is a duplicate of safepythag2();
+		replaced pythag2() in LinAlg.cpp by safepythag2().
+∙	Recode "eternal" locks in Ap.{cpp,h}.
+	―	Renamed ae_lock::eternal ae_lock::is_static.
+	―	eternal_malloc() embedded in ae_init_lock_eternal() and eliminated.
+	―	ae_init_lock_eternal(ae_lock *lock) combined into ae_init_lock(ae_lock *lock, bool make_automatic) as:
+		―	ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic);
+		with
+		―	is_static = true, make_automatic = false for ae_init_lock_eternal(),
+		―	is_static = false for ae_init_lock().
+0-39	Reorder Ap.{cpp,h} &amp; reconcile with the local version of AlgLib.
+	―	alglib::ByteOrder made local in Ap.cpp and commented out (it's not used).
+	OS-dependent low-level lock routines in Ap.cpp are consolidated and made in-line.
+	―	Renamed _ae_{init,acquire,release,free}_lock_raw as _ae_{init,acquire,release,free}_lock.
+39	Reduced the xparams types and values.
+	―	Combined the threading model names AE_{SERIAL_UNSAFE,SERIAL,PARALLEL}.
+		and flags _ALGLIB_FLG_THREADING_{USE_GLOBAL,SERIAL,PARALLEL} into {Non,Ser,Par}TH.
+	―	Replaced the threading flag names "xdefault, "serial" and "parallel" respectively by NonTH, SerTH and ParTH.
+	―	Changed xparams into enum { NonTH = 0, SerTH = 1, ParTH = 2 }.
+0-39	Consolidated {get,set}nworkers(), _ae_cores_count(), _ae_{get,set}_global_threading(), setglobalthreading().
+0-39	Ap.{cpp,h}:
+∙	Part of the ae_state structure has been removed:
+	―	Remove flags from ae_state and make it "AutoS" as CurFlags.
+		Remove the ae_state parameter from ae_set_state_flags().
+	―	Ap.*: thread_exception_handler, parent_task and worker_thread are unused.
+		Remake them "AutoS" as ErrorOp(), SupTask, CurThread, respectively.
+	―	These are all remnants from the Commercial Version of ALGLIB and not actually needed or used anywhere.
+	―	Remove v_nan, v_posinf, v_neginf from ae_state and replace then, respectively, by NAN, +INFINITY and -INFINITY.
+	―	Remove endianness from ae_state: already localized as ByteOrder in Ap.cpp.
+	―	Remove last_block from ae_state: replace it with a single shared object BotFr inside ae_state_init().
+		The frame base, last_block, is block-level static and compile-time fixed and does not need to be made thread-safe.
+	To regain thread-safety will require making CurFlags thread-local
+	(but multi-threadedness was not officially part of the Free Edition of ALGLIB).
+∙	Remove the extra xparams: they are only relevant for the Commercial Version.
+	―	xparam parameters from declarations in: *.h, in comments in *.cpp and in Manual.htm.
+	―	xparam arguments from function calls in *.cpp.
+	―	Remove the conditional if (_xparams != NonTH) ae_set_state_flags(_xparams),
+		and put it in the caller BEFORE the routine, wherever it is set to a value ≠ NonTH,
+		with a call to ae_set_state_flags(NonTH) to follow.
+	―	Update TestZ to reflect the change to xparams.
+0-39	AE_{{,PARALLEL_}SINGLECORE,{SEQUENTIAL_,PARALLEL_}MULTICORE} remade into an enum; AE_NOENV = 0 added.
+	AE_TEST renamed into a constant TestMode as declared as the enum type.
+	Multi-branch #if conditionals for the enum made into switch statements.
+39	TestC.cpp: setting the values of global_failure_flag and return the values of main() to EXIT_{SUCCESS,FAILURE}.
+9-39	The state structure removed, except the frame pointers --
+	―	Remove break_jump, last_error, error_msg from ae_state
+		in favor of Ap.cpp-internal globals CurBreakAt, CurStatus, CurMsg, respectively.
+	―	Remove the ae_state parameter from ae_state_set_break_jump() and the TryX() macro, remaking TryX as a name-macro.
+	―	Redefine ap_error() as the equivalent of ap_error(CurMsg).
+	―	CurMsg made file-scope local with suitable redefinitions of set_error_flag() and ap_error().
+	―	Remove the ae_state parameter from set_error_msg() and the ThrowErrorMsg() and TryCatch() macros.
+	―	To regain thread-safety will require making TopFr, CurBreakAt, CurStatus, CurMsg thread-local;
+		(but multi-threadedness was not officially part of the Free Edition of ALGLIB).
+	―	As an alternative/intermediate solution, the globals might later be restored as frame-local,
+		pushed on the frame to make way for new copies in ae_state_init() and popped off with ae_state_clear().
+0-39	Empty and remove the global ae_state structure.
+	―	Recode the core routines for the types:
+		ae_dyn_block, ae_vector, ae_matrix, ae_smart_ptr, x_vector, x_matrix, ae_lock, _lock, ae_shared_pool
+		in Ap.cpp to accommodate this change, grafting the revisions already made to them in ALGLIB++.
+	―	Remove all ae_state parameters from function declarations, there and elsewhere.
+	―	Remove all ae_state parameters from function calls, there and elsewhere.
+	―	Split ae_clean_up_before_breaking() into ae_clean_up() and ae_state_clear().
+	―	Remove ae_check_zeros(); placing, instead, the responsibility for zero-initialization into the constructor wrappers.
+	―	Reduce multi-threaded support in TestX, for now, until the former ae_state variables are made thread-local,
+		and synthesize approximate comparisons NearR(), SmallR() in TestX.cpp,
+		grafting these changes and most of TestX from ALGLIB++.
+0-39	Recoded the core-counting routines.
+	―	Synthesis of alglib_impl::ae_count_cores().
+	―	Renamed alglib::_ae_cores_count() as ae_cores_count().
+0-39	Restructured the "object" interface.
+	―	Internal object are made direct and calls to [ae_]malloc() and [ae_]free() removed.
+	―	Most of the "internal" object class has been removed and transposed into the main object class.
+0-39	Normalize conditional expressions in branches, loops, boolean arguments and boolean assignments.
+	Normalized comparisons
+	―	(A-B)/C ≥ D to A-B ≥ C×D,
+	―	|A-B|/C ≥ D to |A-B| ≥ C×D,
+	for C ≥ 0; in most places, removing a hidden bug in the PCA test in TestC.cpp, and possibly other hidden bugs, as a result.
+0-39	Removed stdafx.h.
+	Future expansion of ALGLIB++ to Windows support will take place either in LLVM or in VC with "precompiled headers" turned off.
+0-39	Ap.{cpp,h}: Reconciled with AlgLib++
+	―	Removed valgrind from ae_dyn_block (it was a recent addition to ALGLIB, and is redundant, unused except as a debugging hook.)
+	―	Commented out multi-threading stubs; reserving for later reuse or appropriation with a new multi-threading framework.
+40	Kernel{Avx2,Fma,Sse2}.{cpp,h}, Ap.{cpp,h}: Recoding the kernel dispatcher.
+	Kernels{Avx2,Sse2}.{cpp,h}: Regularized the parameters.
+	―	rcopyv():	rcopyv_avx2(ae_int_t n, ⋯) ⇒ rcopyv_avx2(const ae_int_t n, ⋯)
+	―	rsetvx():	rsetvx_avx2(⋯, double *__restrict x) ⇒ rsetvx_avx2(⋯, Real *__restrict x)
+	―	rmergemaxv():	rmergemaxv_avx2(ae_int_t n, ⋯) ⇒ rmergemaxv_avx2(const ae_int_t n, ⋯)
+	―	rmergeminv():	rmergeminv_avx2(ae_int_t n, ⋯) ⇒ rmergeminv_avx2(const ae_int_t n, ⋯)
+	―	rmergemulv():	rmergemulv_avx2(ae_int_t n, ⋯) ⇒ rmergemulv_avx2(const ae_int_t n, ⋯)
+	―	rmergedivv():	rmergedivv_avx2(ae_int_t n, ⋯) ⇒ rmergedivv_avx2(const ae_int_t n, ⋯) [in version 3.19.0]
+	―	rdotv():	rdotv_sse2(ae_int_t n, const Real *x) ⇒ rdotv_sse2(const ae_int_t n, const Real *_restrict y)
+	―	rdotv2():	rdotv2_sse2(ae_int_t n, const Real *x, const Real *y) ⇒ rdotv2_sse2(const ae_int_t n, const Real *_restrict y, const Real *_restrict y)
+	Ap.{cpp,h}, Kernels{Avx2,Fma,Sse2}.{cpp,h}: Recoded the kernel dispatcher:
+	―	Rewrote the kernel routines: *_avx2() ⇒ avx2_*(), *_fma() ⇒ fma_*(), *_sse2() ⇒ sse2_*().
+	―	Rewrote/renamed the internal macros: _ALGLIB_KKK_{VOID,RETURN}_{AVX2,FMA,SSE2}() ⇒ _Ker{Sub,Fun}{Avx2,Fma,Sse2}()
+	―	Rewrote/renamed the external macros: _ALGLIB_KERNEL_{VOID,RETURN}{_AVX2,_FMA,_SSE2}*() ⇒ Ker{Sub,Fun}{Avx2,Fma,Sse2}*()
+	―	Rename local routines with *_{avx2,fma,sse2}_*(), as {avx2_fma,sse2}_*_*().
+	Ap.{cpp,h}: Recoded and resorted the new BLAS.
+0-39	Synthesize Near*(), Small*() comparison macros.
+	―	TestI.cpp: Synthesize Near[At]{R,C}() in the alglib namespace (as already done with Test{X,Z}.cpp).
+	―	AlgLibInternal.{cpp,h}: Add in-line approximate comparison routines.
+			{Near,Small}[At]{R,CR,C}().
+		in the alglib_impl namespace.
+	―	AlgLibInternal.{cpp,h}: Replace approxequal() with NearAtR().
+	―	Synthesize these new routines in most places (some places, like fabs(A-B) &lt; fabs(C-D), are not all converted).
+	―	TestC.cpp: Normalized conditionals (continued):
+		―	|A-B|/C ≥ D to |A-B| ≥ C×D,
+		Exposes bugs, inherited from ALGLIB, in the dforest test routines; and an underlying bug in the df routines.
+		It is the same hidden bug already uncovered and corrected in ALGLIB++.
+0-39	Removed a hidden bug in dforest, inherited from ALGLIB
+	... dealing with the way avgce is calculated and with the mismatch with how it was used and tested.
+	Rewrote parts of:
+	-	testdforestunit_basictestallsame() and testdforestunit_basictestrandom() in TestC.cpp.
+	-	dforest_processvotingresults() in DataAnalysis.cpp
+	to make them consistent with dfavgce() in DataAnalysis.cpp.
+40	{Ap,AlgLibInternal,LinAlg,Kernel*}.*: Root canal.
+	Also: integrating some of the recoding from the local, non-public-facing, version of AlgLib++.
+	Cleaning up the mess inherited from the changes made to the infrastructure of ALGLIB between from version 3.17 and version 3.18.
+	―	Kernels{Avx2,Fma,Sse2}.{cpp,h}: Removed the redundant _ALGLI_HAS_*_INTRINSIC guards for #include "Kernel*.h" in Ap.h.
+	―	KernelsFma.h: The wrong guard (_ALGLIB_HAS_AVX2_INTRINSICS) is used in KernelsFma.h.
+		Replaced it with _ALGLIB_HAS_FMA_INTRINSICS.
+	―	Broadened the range of Kernel*.h:
+		―	Moved the #include "Kernels*.h" from Ap.cpp to Ap.h, under _ALGLIB_IMPL_DEFINES guard.
+		―	Moved the #defines {_ALGLIB_IMPL_DEFINES,_ALGLIB_INTEGRITY_CHECKS_ONCE} from Ap.cpp to {LinAlg,AlgLibInternal}.cpp.
+	―	Ap.{cpp,h}, LinAlg.cpp: Collated {Ap.cpp,LinAlg.cpp} kernel-dependent spchol functions:
+		―	Combined the Ap versus LinAlg functions.
+		―	Moved the Ap functions into LinAlg, made them local and removed their declarations.
+	―	Ap.{cpp,h}, AlgLibInternal.cpp: Collated {Ap.cpp,AlgLibInternal.cpp} kernel-dependent ablasf functions:
+		―	Combined the Ap versus AlgLibInternal functions.
+		―	Moved the Ap functions into AlgLibInternal, made them local and removed their declarations.
+40	{Ap,AlgLibInternal}.{cpp,h}: Moved ablasf_rgemm32basecase() back into Ap.{cpp,h}, to alleviate the TestX speed issue.
+40	AlgLibInternal.{cpp,h}: added rmatrixgemmf() alongside cmatrixgemmf().
+0-39	Corrections in the comments &amp; printouts; e.g.
+	―	"launcn" → "launch", "traling" → "trailing", "trainig" → "training", "i.e \." → "i.e.", "i.e" → "i.e.",
+	―	"inself" → "itself", "it's" → "its", "discripancy" → "discrepancy", "strucure" → "structure",
+	―	"⋯intial⋯" → "⋯initial⋯", "lentgh" → "length", "loosing" → "losing", "Additonally" → "Additionally",
+	―	"VIMP⋯" → "VIPM⋯", "fileds" → "fields", "ouput" → "output", "paremeter" → "parameter".
+	―	"info" → "information", to prevent confusion with any variables of the same name.
+0-39	TestC.cpp: Adding changes made in AlgLib++.
+	―	Removed the "silent" from TestC routines
+	―	modify if (!silent)	⇒	if (!silent || [errors])
+	―	Added RelNear()
+	―	Replaced seterrorflagdiff(P, A, B, Tiny, Scale) by set_error_flag(P, !RelNear(A, B, Tiny, Scale));
+	―	Removed the error-tracking facilities: the sef* and setflag* routines.
+		Converted set_error_flag(&amp;X, Y) ⇒ X = X || Y;
+		Converted set_error_flag(P, Y) ⇒ *P = *P || Y;
+	―	Removed ALGLIB_ABORT_ON_ERROR_FLAG, effectively freezing it out to false (it's not used anywhere else).
+0-39	AlgLibInternal.{cpp,h}: Adding changes made in AlgLib++.
+	AlgLibInternal.{cpp,h}: Recoding of internal and non-API routines.
+	Integrating changes to AlgLibInternal.{cpp,h} already made in AlgLib++.
+	―	Relabelling in some calls of ae_assert().
+	―	Re-commenting in many places.
+	―	swapb(), swapc() added.
+		swap{b,i,r,c}() synthesized in numerous places.
+	―	Non-API routine tiledsplit(tasksize, tilesize, &amp;task0, &amp;task1)
+		redefined as task0 = tiledsplit(tasksize, tilesize), task1 = tasksize - task0;
+	―	Non-API routine splitlength(tasksize, chunksize, &amp;task0, &amp;task1)
+		redefined as task0 = splitlength(tasksize, chunksize), task1 = tasksize - task0;
+	―	Non-API routine splitlengtheven(tasksize, &amp;task0, &amp;task1)
+		redefined as task0 = splitlengtheven(tasksize), task1 = tasksize - task0;
+	―	Non-API routine sortmiddlei() removed and replaced by its duplicate tagsortmiddlei() [newly added to version 3.17.0].
+	―	Non-API routines tagsortmiddleir(), tagsortmiddlei() redeclared with default offset = 0, and recoded.
+		Non-API routione tagsortmiddleii() (add in version 3.19.0) redeclared with default offset = 0, and recoded.
+		Declarations changed from tagsortmiddlei*(a, b, offset, n) to tagsortmiddlei*(a, b, n, offset = 0).
+	―	Non-API routines tagsortfast[ir]() recoded.
+	―	Local routines tsort_tagsortfast[ir]rec() recoded.
+	―	Local routine tsort_tagsortfastirec(a, b, bufa, bufb, i1, i2)
+		redefined as tsort_tagsortfastirec(a-&gt;xR + i1, b-&gt;xZ + i1, bufa-&gt;xR + i1, bufb-&gt;xZ + i1, i2 - i1 + 1)
+	―	Local routine tsort_tagsortfastrrec(a, b, bufa, bufb, i1, i2)
+		redefined as tsort_tagsortfastrrec(a-&gt;xR + i1, b-&gt;xR + i1, bufa-&gt;xR + i1, bufb-&gt;xR + i1, i2 - i1 + 1)
+	―	Local routine tsort_tagsortfastrec(a, bufa, i1, i2)
+		redefined as tsort_tagsortfastrec(a-&gt;xR + i1, bufa-&gt;xR + i1, i2 - i1 + 1)
+	―	Localized static constants linmin_{armijofactor,ftol,xtol,maxfev,defstpmax} to the routines they are used in,
+		and removed the "linmin_" prefix.
+	―	All of the routines in the FTBASE package were recoded.
+	―	Non-API routine ftapplyplan(&pamp;lan, &amp;buf, offset, reps) redeclared with default offset = 0 and reps = 1, and recoded.
+	―	Local routines ftbase_ftpushentry{2,4}() combined with ftbase_ftpushentry() by making defaults eparam1 = -1, eparam2 = 0, eparam3 = 0.
+	―	Local routine(s) ftbase_ftpushentry*(plan, ⋯) redefined as ftbase_ftpushentry*(&amp;plan-&gt;entries, ⋯).
+	―	Local routine ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m, n)
+		redefined as ftbase_fftirltrec(a-&gt;xR + astart, astride, b-&gt;xR + bstart, bstride, m, n).
+	―	Local routine ftbase_ffticltrec(a, astart, astride, b, bstart, bstride, m, n)
+		redefined as ftbase_ffticltrec(a-&gt;xR + astart, astride, b-&gt;xR + bstart, bstride, m, n).
+	―	Local routine ftbase_internalcomplexlintranspose(a, n, m, astart, buf)
+		redefined as ftbase_internalcomplexlintranspose(a-&gt;xR + astart, n, m, buf).
+	―	Local routine ftbase_ftapplycomplexcodelettwfft(a, offs, args, n, mun)
+		redefined as ftbase_ftapplycomplexcodelettwfft(a-&gt;xR + offs, args, n, mun).
+	―	Local routine ftbase_ffttwcalc(a, aoffset, n1, n2)
+		redefined as ftbase_ffttwcalc(a-&gt;xR + aoffset, n1, n2).
+	―	Local routine ftbase_ftapplycomplexreffft(a, offs, args, n, mun, buf)
+		redefined as ftbase_ftapplycomplexreffft(a-&gt;xR + offs, args, n, buf).
+		The mun == 2 assertion is placed outside and before the call.
+	―	Local routine ftbase_ftapplycomplexcodeletfft(a, offs, args, n, mun)
+		redefined as ftbase_ftapplycomplexcodeletfft(a-&gt;xR + offs, args, n).
+		The mun == 2 assertion is placed outside and before the call.
+	―	Local routine ftbase_ftbluesteinsfft(plan, a, abase, aoffset, ⋯, bufa, bufb, bufc, bufd)
+		redefined as ftbase_ftbluesteinsfft(plan, a-&gt;xR + abase + aoffset, ⋯, bufa, bufc).
+	―	Local routine ftbase_ftradersfft(plan, a, abase, aoffset, ⋯, buf)
+		redefined as ftbase_ftradersfft(plan, a-&gt;xR + abase + aoffset, aoffset, ⋯, buf).
+	―	Local routine ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset, buf, repcnt)
+		redefined as ftbase_ftapplysubplan(plan, subplan, a-&gt;xR + abase + aoffset, aoffset, buf, repcnt).
+	―	Local routine ftbase_ftprecomputebluesteinsfft(n, m, precr, offs)
+		redefined as ftbase_ftprecomputebluesteinsfft(n, m, precr-&gt;xR + offs).
+	―	Local routine ftbase_ftprecomputeradersfft(n, rq, riq, precr, offs)
+		redefined as ftbase_ftprecomputeradersfft(n, rq, riq, precr-&gt;xR + offs).
+0-39	LinAlg.{cpp,h}: Adding some changes made in AlgLib++.
+	LinAlg.cpp: Recoded {r,c}matrixgemm[rec] to increase efficiency
+	Reformatted the layout to combine the type/object section with function section in each namespace.
+0-39	AlgLibMisc.{cpp,h}: Adding changes made in AlgLib++.
+	AlgLibMisc.{cpp,h}: Recoding of internal and non-API routines.
+	―	Local routine nearestneighbor_kdtreesplit()
+		redefined with the output-only parameter "ae_int_t *i3" remade a return value.
+	―	Synthesized new API routine hqrndmiduniformr() = 2 hqrnduniformr() - 1.
+	―	An update was made to Manual.htm to reflect the addition.
+	―	Re-coding of HQRND direct from the original reference for the algorithm.
+0-39	Reconciled parameter declarations versus documentation:
+	∙	Output parameters X of type T are documented and declared respectively as:
+		―	T &amp;X	⇔	T &amp;X
+	∙	Input parameters X of type T are documented and declared respectively as:
+		―	T X	⇔	const T X	― for scalar types T ∈ { bool, ae_int_t, double, complex },
+		―	T X	⇔	const T &amp;X	― for all other types T.
+	Manual.htm: The documentation of the following 1D and 2D array argument parameters was changed from output (T &amp;X) to input (T X) to match its declaration (const T &amp;X).
+	∙	a	rmatrixenforcesymmetricity, rmatrixger, spdmatrixcholeskyupdate{add1,fix}[buf], xdebug{b{1,2}not,{c,i,r}{1,2}neg}
+	∙	b	rmatrix{[gen]copy,transpose}, {r,c}matrix[lu]solve[m]fast, rvectorcopy, {h,s}pdmatrix[cholesky]solve[m]fast
+	∙	c	cmatrixherk, {r,c}matrix{gemm,syrk}
+	∙	tmp	rmatrixsyvmv
+	∙	x	{r,c}matrix{left,right}trsm, rmatrixtrsv, sparsetr{m,s}v
+	∙	xy	rankdata[centered]
+	∙	y	rmatrix[ge,sy]mv, sparsegemv
+	Statistics.{cpp,h}:
+	∙	xy	In the reduced forms of rankdata[centered]().
+	LinAlg.{cpp,h}:
+	∙	b	In rmatrix{transpose,copy}() to match "b" in cmatrix{transpose,copy}().
+	∙	y	In rmatrixmv() to match "y" in cmatrixmv().
+0-39	LinAlg.{cpp,h}: Adding changes made in AlgLib++.
+	―	Non-API routine rmatrixqrbasecase() removed from LinAlg.h, made local to LinAlg.cpp, renamed ortfac_rmatrixqrbasecase().
+	―	Non-API routine spdmatrixcholeskyinverserec() removed from LinAlg.h, made local to LinAlg.cpp, renamed matinv_spdmatrixcholeskyinverserec().
+	―	Non-API routine ablascomplexsplitlength(a, n, &amp;n1, &amp;n2) redefined as n1 = ablascomplexsplitlength(a, n), n2 = n - n1;
+	―	Non-API routine ablassplitlength(a, n, &amp;n1, &amp;n2) redefined as n1 = ablassplitlength(a, n), n2 = n - n1;
+	―	Local routine ablas_ablasinternalsplitlength(n, nb, &amp;n1, &amp;n2) redefined as n1 = ablas_ablasinternalsplitlength(n, nb), n2 = n - n1;
+0-39	Solvers.cpp, Manual.htm: Adding changes made in AlgLib++.
+	―	lincgsetb(): added to the API and newly documented.
+0-39	Optimization.cpp: Adding changes made in AlgLib++.
+	―	optserv_feasibilityerrorgrad(): remade "double *err" into a return value.
+	―	Move minlm_lmprepare() after minlmsetcond() in the minlmcreate*() routines.
+0-39	DataAnalysis.cpp, Manual.htm: Adding changes made in AlgLib++.
+	―	Local boolean routine ssa_hassomethingtoanalyze(): reversed, renamed ssa_isdegenerate() and recoded.
+	―	ssaforecastsequence() comments and documentation: the Data parameter is array[DataLen], not array[NTicks].
+0-39	Statistics.cpp: Adding changes made in AlgLib++.
+	―	Local routines correlationtests_spearmantail{5,6,7,8,9}() eliminated and substituted into correlationtests_spearmantail(),
+		and correlationtests_spearmantail() recoded.
+	―	Local routine jarquebera_jarqueberastatistic() eliminated and substituted into jarqueberatest(),
+		and jarqueberatest() recoded.
+	―	Local routine jarquebera_jbcheb() eliminated and substituted into jarquebera_jbtbl*(),
+		and jarquebera_jbtbl*() recoded.
+	―	Local routine jarquebera_jarqueberaapprox() recoded.
+	―	API routine jarqueberatest() recoded.
+	―	Local routine wsr_wcheb() eliminated and substituted into wsr_w{25,26,...,200}(), wsr_wsigma() recoded.
+	―	wsr_w*() recoded.
+0-39	SpecialFunctions.cpp, Manual.htm: Adding changes made in AlgLib++.
+	―	Synthesized internal constants for the Euler constant, π/2 and √2.
+	―	Minor changes in the layout of the conditional code in gammafunction() and lngamma().
+	―	Compilation of the local function gammafunc_gammastirf() made conditional to !defined ALGLIB_INTERCEPTS_SPECFUNCS.
+	―	Synthesized local routines erfr0(), erfr1() and recoded errorfunction[c](), normal{cdf,distribution}() using them to remove recursive calls.
+	―	Synthesized local routines inverfr0(), inverfr1(), inverfr2() and recoded invnormal{cdf,distribution}() and inverf() using them.
+	―	Recoded sinecosineintegrals().
+	―	Local routine trigintegrals_chebiterationshichi() eliminated and substituted into hyperbolicsinecosineintegrals(),
+		hyperbolicsinecosineintegrals() recoded.
+	―	Local routines bessel_besselm{first,next}cheb() eliminated and substituted into besseli0().
+	―	Local routines bessel_besselm1{first,next}cheb() eliminated and substituted into besseli1(), besselk0(), besselk1().
+	―	Local routines bessel_besselasympt{0,1}(x, ⋯) recoded and redefined as bessel_besselasympt{0,1}(8.0/x, ⋯).
+	―	API routines besseli{0,1}(), bessel{j,y,k}{0,1,n}() recoded.
+	―	Minor changes in the layout of some of the header comments.
+0-39	Interpolation.{cpp.h}: Adding changes made in AlgLib++.
+	―	Moved spline1dfitpenalized[w]() from INTCOMP back into SPLINE1D.
+	―	spline1d_spline1dgriddiffcubicinternal():
+		removed "RVector *dt", it's not used by any of routine's callers,
+		replaced its use inside the routine by d, since it was copied to d after being assigned to.
+	―	Local routine spline1d_diffthreepoint() in-line substituted into spline1dbuildakima() and removed,
+		and spline1dbuildakima() recoded.
+	―	spline1dconvdiffinternal():
+		remade the non-API routine into static local and removed its declaration,
+		remade "RVector *y", "RVector *d1", "RVector *d2" into optional output parameters,
+		eliminated "bool needy", "bool needd1", "bool needd2" respectively in favor of (y != NULL), (d1 != NULL) and (d2 != NULL).
+	―	spline3d_spline3ddiff(): remade "double *fx", "double *fy", "double *fxy" into optional output parameters.
+	―	rbf_clearreportfields(): removed and inserted inline at its point of use.
+0-39	Re-formatting of Manual.htm
+	―	Integration of the format and layout used for ALGLIB++.
+	―	Added author and timestamps to the [un]serialization routines.
+	―	Normalized the declarations of the API object classes.
+0-39	Comment/documentation normalization &amp; synchronization
+	―	Normalize author and timestamps (several items missed on a previous pass).
+	―	Correct timestamp error (1014 → 2014).
+	―	Normalize conditionals and other code inside comments.
+	―	&lt; and &gt; in comments and assert statements.
+	―	:= in comments converted to =
+	―	"PARAMETER" ⇒ "Parameter", etc.
+	―	"OUTPUT PAREMETERS" ⇒ "Outputs", "OUTPUT ARRAYS:" → "Outputs:",
+		"INPUT[S][:]" ⇒ "Inputs:", "OUTPUT[S][:]" → "Outputs:"
+	―	Corrected "ASCI" to "ASCII" and "#alglib_packages" to "#alglib_main" (mistakes inherited from the original ALGLIB manual).
+		The revision was done earlier, up front.
+	―	ouputs → outputs, agressive → aggressive, Sparcity → Sparsity
+	―	rcomm → RComm
+	―	Normalize layout (e.g. removing multiple consecutive blank lines and spaces inside comments)
+	―	Clean up irregularities
+		▪	"DESCRIPTION" in DataAnalysis.cpp and Manual.htm
+		▪	Redundant comments in xdebug in AlgLibMisc.{cpp,h} and Manual.htm put out up front.
+		▪	Comments on "silent" in TestC.cpp modified or removed.
+		▪	"Similaryly" → "Similarly"
+		▪	TestC.cpp: N = 2..8 → N = 1..8 for testing loops that actually go from 1 to 8, not 2 to 8.
+	―	The input N parameter to sparse[lu]solve() removed from the listings in the comments, since there is no N parameter.
+	―	Added header comments to rmatrixgemv(), rmatrixsymv() and rmatrixsyvmv().
+	―	References to MinCGSetGradientCheck() in the comments removed.
+		The *SetGradientCheck() functions have almost all been replaced by OptGuard functions in version 3.16.0.
+0-39	Optimization.cpp: Removing vestige of trace facility (the timer variable ‟t0”).
+0-39	Other minor changes in the documentation &amp; Comments:
+	―	sparsesmm(): A is M × K, not N × K.
+	―	sparsecholeskyskyline(): "matrixm" → "matrix"
+	―	Sin(⋯) → sin(⋯), Cos(⋯) → cos(⋯), Exp(⋯) → exp(⋯), TanH(⋯) → tanh(⋯)
+	―	Sign(⋯) → sign(⋯), Ceil(⋯) → ceil(⋯), Floor(⋯) → floor(⋯), Sqrt(⋯) → sqrt(⋯), Power(⋯) → power(⋯)
+0-39	Normalize update operators
+	―	X op= (⋯); ⇒ X op= ⋯;
+
+0-39	Conversion of while loops to for loops.
+	―	Shared pool while loops converted to for loops.
+			ae_shared_pool_first_recycled(Pool, &amp;_P);
+			while (P != NULL) {
+				⋯
+				ae_shared_pool_next_recycled(Pool, &amp;_P);
+			}
+		converted to:
+			for (ae_shared_pool_first_recycled(Pool, &amp;_P); P != NULL; ae_shared_pool_next_recycled(Pool, &amp;_P)) { ⋯ }
+	―	while (A &le; B - 1) ⇒ while (A &lt; B)
+	―	Converted
+			minbleicrestartfrom(Q, P); while (minbleiciteration(Q)) { ⋯ }
+		to
+			for (minbleicrestartfrom(Q, P); minbleiciteration(Q); ) { ⋯ }
+	―	Converted
+			autogk_autogkinternalprepare(⋯, Q); while (autogk_autogkinternaliteration(Q)) { ⋯ }
+		to
+			for (autogk_autogkinternalprepare(⋯, Q); autogk_autogkinternaliteration(Q); ) { ⋯ }
+	―	while (true) { ⋯ if (C) break; } converted to do { ⋯ } while (!C);
+	―	Converted
+			nleqrestartfrom(Q, X); while (nleqiteration(Q)) { ⋯ }
+		to
+			for (nleqrestartfrom(Q, X); nleqiteration(Q); ) { ⋯ }
+0-30	Normalized RComm interface.
+	―	Integrating some changes made in AlgLib++.
+	―	Trim the RComm routines up front.
+	―	Comment the default parameters in RComm iteration routine declarations.
+0-39	Interpolation.{cpp,h}: Moving spline1dfitpenalized() from INTCOM back to SPLINE1D.
+0-39	Localized static constants and remove the prefixes.
+0-39	Reconcile to ALGLIB++, except TestC.cpp &amp; Notes.htm
+	―	Minor layout changes (e.g. conditionals and arithmetic operations, removing redundant brackets, comment formatting, etc.).
+	―	Normalize: X * Constant ⇒ Constant * X.
+	―	Normalize: X -= 1.0 and X += 1.0 to X-- and X++
+	―	In-line arithmetic (e.g. X + 0 ⇒ X, 1 + 2 ⇒ 3, 0 * X ⇒ X, 1 * 2 + 1 ⇒ 3, etc.)
+	―	Conversions X &le; Y - 1 ⇒ X &lt; Y done in those in places other than loops or branches that were missed in a previous pass.
+	―	Brackets (e.g. (*X) around pointer parameters in function bodies) removed.
+	―	Relabel the messages in some of the ae_assert calls (for now: just those used with the serialization routines).
+	―	TestC.cpp: Synthesis of more randommid() and hqrndmiduniformr() routines, missed on a previous pass.
+	―	Integrating other recoding and redocumentation changes already made in AlgLib++.
+40	Numerals converted to double (in some places only), excess (double) typecasts eliminated.
+	1.0 E n, 1.0 e n converted to numeral form, for n ∈ [-8,+8];
+	1.0 e n converted to 1.0 E n most elsewhere outside of comments and strings.
+40	Notes.htm: Partially reconciling to ALGLIB++, incorporating the format changes and section layout and narrative.
+	Manual.htm: Opening up the link to Notes.htm.
+0-39	TestC.cpp: Add corrections already made in ALGLIB++.
+0-39	TestC.cpp: Add changes already made in ALGLIB++, thereby completing the integration of ALGLIB++.
+	Normalized the test routines and flags to be true on success, false on failure.
+	―	testmlpbaseunit_spectests(): Eliminate all the flags except the one for grad.
+	―	Convert most boolean output pointers to return values (*ErrP to Erred, *OkP to Ok).
+	―	Normalized error flags in TestC.cpp to *Erred; and *Ok
+	―	Mass-convert the negative flags: *Erred to *Ok and convert the routines to positive returns.
+	Normalized the TestC printout format.
+	―	Test summaries with uniform column settings and printout.
+	―	Intermediate results made uniform (some test units had them).
+	―	Revised the layouts of the following tests, itemizing the sub-tests:
+		▪	testminqp(), testspline1d(), testspline2d(), testdforest(), testalglibbasics().
+	Retrofitting other changes to reconcile alglib.3.18 and AlgLib++:
+	―	Initialized the variables in RCOMM routines trimmed.
+	―	More double numerals explcitly converted (e.g. 1 ⇒ 1.0).
+	―	More in-line arithmetic (e.g. sqrt(2.0) / 2.0 ⇒ sqrt(0.5)).
+	―	More instances of randommid() synthesized.
+	―	testalglibbasicsunit_sharedpoolerrors(): corrected a comment (Test 9 should be Test 10).
+	―	More instances of: (A - B) / C {<,>,<=,>=} D ⇔ (A - B) {<,>,<=,>=} D * C, where C ≥ 0.
+</pre>
+</p>
+<p>
+<a name=supp_History3 class=sheader></a><h3>A6.3.1. Test Results (3.18.0 side-branch)</h3>
+<a href="History.htm#supp_History3" class=sheader></a><h3>A6.3. Test Stages</h3>
+The following are the read-outs from TestX, followed by the time-stamp and total testing time from TestC.
+The values cited for TestX are for MFLOPS counts for the RGEMM BLAS routine for N&times;N matrices for N = 16, 32, 64 and 1024.
+The times, themselves are meaningful only for comparisons on a single host, rather than across different hosts.
+In the case of TestX, not all tests were done cleanly (i.e. with background processes disabled), so there may be fluctuations.
+<pre class=narration>
+39	7519 1.0x 12049 1.0x 11909 1.0x 9587 1.0x 1635369021 (6179c03d) 83
+39	7874 1.0x 12196 1.0x 11909 1.0x 9266 1.0x 1635374188 (6179d46c) 87
+39	7937 1.0x 12196 1.0x 12199 1.0x 9138 1.0x 1635377026 (6179df82) 86
+39	7874 1.0x 12196 1.0x 12199 1.0x 8792 1.1x 1635383008 (6179f6e0) 84
+39	7752 1.0x 12049 1.0x 11769 1.0x 9037 1.0x 1635461545 (617b29a9) 85
+39	7874 0.9x 10310 1.1x 12199 1.0x 9635 1.0x 1635576384 (617cea40) 86
+39	6712 1.2x 12347 1.0x 12052 0.9x 9104 1.0x 1637111328 (61945620) 91
+39	7813 0.9x 11629 0.9x  9527 1.0x 9296 1.0x 1637355701 (619810b5) 88
+39	7813 1.0x 12196 1.0x 12199 1.0x 9023 1.1x 1637444986 (61996d7a) 87
+39	6452 1.2x 12501 1.0x 12052 1.0x 9641 1.0x 1637823278 (619f332e) 87
+39	6849 1.1x 12501 0.9x 12199 1.0x 9327 1.0x 1638487069 (61a9541d) 88
+39	7692 1.0x 12196 1.0x 12199 1.0x 9061 1.0x 1638699590 (61ac9246) 88
+39	7874 1.0x 12196 1.0x 12199 1.0x 8774 1.1x 1638841044 (61aebad4) 90
+39	7874 1.0x 12347 0.9x 11769 1.0x 9523 1.0x 1638850198 (61aede96) 89
+39	7874 1.0x 12049 1.0x 12199 1.0x 9227 1.0x 1638953198 (61b070ee) 87
+39	7752 1.0x 12049 1.0x 12052 1.0x 9327 1.0x 1638958917 (61b08745) 84
+39	7634 1.0x 11906 1.0x 11115 1.1x 8792 1.0x 1639431222 (61b7bc36) 83
+39	7874 1.0x 11766 1.0x 12199 1.0x 9476 1.0x 1639513145 (61b8fc39) 84 // TRFAC failed in TestC.
+39	7874 1.0x 12049 1.0x 10104 1.1x 9367 1.0x 1639516272 (61b90870) 82 // Corrected.
+39	7463 0.8x 11629 1.0x 11769 1.0x 8752 1.0x 1641874215 (61dd0327) 87 // Re-sorted the routines.
+39	7937 1.0x 12196 1.0x 12052 1.0x 9544 1.0x 1642926906 (61ed133a) 85 // Real to Complex conversion generalized.
+39	6410 0.9x 10310 1.1x 10313 1.0x 9539 1.0x 1642933377 (61ed2c81) 83 // Removed all trace-related functionality.
+39	7353 1.0x 11365 1.0x 11368 1.0x 9241 1.0x 1643002115 (61ee3903) 82 // Synthesize the ++ and -- operators.
+39	7937 1.0x 12347 0.9x 12199 1.0x 9513 1.0x 1643154969 (61f08e19) 84 // Synthesize the {+,-,*,/,%,&amp;}= operators.
+39	8000 1.0x 12501 1.0x 12199 1.0x 9100 1.0x 1643326894 (61f32dae) 80 // Synthesize in-line operators &amp; set_error_msg(), etc.
+39	6803 1.1x 11629 1.0x 11909 1.0x 9143 1.0x 1643389187 (61f42103) 81 // Nativize floating point constants and operations.
+39	7752 1.0x 12501 1.0x 12199 1.0x 9608 1.0x 1643680716 (61f893cc) // Remove translator-artifacts. (Crashed in TestC at testspline2d.)
+39	8000 1.0x 12196 1.0x 12199 1.0x 9187 1.0x 1643685611 (61f8a6eb) 80 // Remove translator-artifacts. (Corrected.)
+39	7937 1.0x 12501 1.0x 10873 0.9x 9172 1.1x 1643757812 (61f9c0f4) 80 // Recode random*() and *pythag2().
+39	7692 1.0x 12347 0.9x 11240 1.0x 9492 1.0x 1643828901 (61fad6a5) 78 // Recode "eternal" locks in Ap.{cpp,h}.
+39	7874 1.0x 12501 1.0x 12199 1.0x 9018 1.0x 1644128862 (61ff6a5e) 79 // Recode ByteOrder, _lock routines &amp; xparams.
+39	8000 1.0x 12347 1.0x 12052 1.0x 8761 1.0x 1644295249 (6201f451) 81 // Reduce ae_state and xparams.
+39	8065 1.0x 12501 1.0x 12199 1.0x 9614 1.0x 1644352844 (6202d54c) 77 // Further reduce ae_state; synthesize TestMode.
+39	7937 1.0x 12501 1.0x 11909 1.0x 9296 1.0x 1644431780 (620409a4) 79 // Recoding state and frame routines in Ap.{cpp,h}.
+39	7353 1.0x 12501 1.0x 12199 1.0x 9534 1.0x 1644465141 (62048bf5) 79 // Elimination of ae_state, temporary reduction of TestX.
+39	7692 1.0x 11629 1.1x 12199 1.0x 9367 1.0x 1644613148 (6206ce1c) 76 // Re-synthesis of RCOMM routines. Failed TestC (iterativesparse, minnlc).
+39	8065 0.9x 11629 0.9x 11368 1.1x 9172 1.0x 1644615571 (6206d793) 78 // Error in TestC (iterativesparse) corrected.
+39	8130 1.0x 12501 1.0x 12052 1.0x 9307 1.0x 1644616814 (6206dc6e) 75 // Error in TestC (minnlc) corrected.
+39	7576 1.1x 12347 1.0x 12350 0.9x 8957 1.0x 1644799817 (6209a749) 77 // Normalization of the RCOMM routines and those similar to it.
+39	6289 1.0x 9710 1.0x 8775 1.1x 8569 1.1x 1645146923 (620ef32b) 79 // Restructuring Ap.{cpp,h} &amp; TestZ.cpp; retrofitting ALGLIB++.
+39	7937 1.0x 11906 1.0x 11769 1.0x 8699 1.1x 1645147397 (620ef505) 79 // Re-testing, with other processes off.
+39	8000 1.0x 12347 1.0x 11368 1.0x 9153 1.0x 1645650939 (6216a3fb) 78 // Normalization of conditionals.
+40	7092 1.1x 12347 1.0x 11498 1.0x 9486 1.0x 1646537151 (622429bf) 77 // Recoding the kernel dispatcher.
+39	5952 1.0x 9347 1.1x 11115 1.1x 9037 1.0x 1646541002 (622438ca) 77 // Synthesize Small*,Near*. TestC: dforest failed (a hidden bug inherited from ALGLIB was exposed)
+39	5952 1.0x 9616 1.0x 11368 1.1x 9471 1.0x 1646544809 (622447a9) 80 // TestC: the hidden bug is temporarily re-hidden.
+39	7463 1.0x 11495 1.0x 11115 1.0x 9246 1.0x 1646545184 (62244920) 78 // Checking TestX; suspicious changes in speed.
+39	7937 1.0x 12196 1.0x 12199 0.9x 8892 1.1x 1646593750 (622506d6) 79 // Removed the dforest bug and resolved the TestC failure.
+40	7937 1.0x 12347 0.9x 12199 1.0x 9673 1.0x 1646868186 (622936da) 79 // Root canal on the kernel dispatcher.
+40	7874 1.0x 11237 0.8x 8932 1.1x 9158 1.0x 1647129328 (622d32f0) 80 // Added rmatrixgemmf() alongside cmatrixgemmf().
+0-39	7937 1.0x 11906 1.0x 12052 1.0x 9327 1.0x 1647218937 (622e90f9) 77 // Test{I,X,C}: Synchronize to AlgLib++.
+0-39	6289 1.0x 10001 1.0x 12199 1.0x 9158 1.0x 1647383434 (6231138a) 78 // Adding more changes made in AlgLib++ to TestC.cpp.
+9-39	7874 0.4x 11629 1.1x 12199 1.0x 8801 1.0x 1647593235 (62344713) 79 // AlgLibInternal.{cpp,h}: Synchronize to AlgLib++.
+0-39	7092 0.5x 12501 1.0x 12199 1.0x 7795 1.2x 1648502128 (62422570) 78 // Checking for suspicious slowdown in TestX.cpp.
+40	4348 1.0x 5000 2.0x 12199 1.0x 8948 1.1x 1648502820 (62422824) 76 // AlgLibInternal.{cpp,h}: New recoding.
+40	8065 1.0x 12501 1.0x 12052 1.0x 8819 1.1x 1648856974 (62478f8e) 81 // Stop-gap fix of the slowdown problem in TestX.cpp.
+0-39	7937 1.0x 12049 1.0x 12350 0.9x 9042 1.0x 1649021559 (624a1277) 78 // AlgLibMisc.{cpp,h}: Synchronize to AlgLib++.
+0-39	6024 1.0x 10417 1.0x 10104 1.1x 9465 1.0x 1649379288 (624f87d8) 78 // {LinAlg,Solvers,Interpolation,SpecialFunctions,Statistics}.cpp: Adding changes made in AlgLib++.
+0-39	5988 1.0x 9435 1.2x 12350 1.0x 9784 1.0x 1650480992 (62605760) 79 // Conversion of while loops to for loops.
+0-39	7408 0.9x 12347 1.0x 12199 1.0x 9717 1.0x 1650825124 (626597a4) 77 // Localized more static constants.
+40	7752 0.9x 12347 1.0x 12199 1.0x 9723 1.0x 1651429815 (626ed1b7) 82 // Adding changes made in AlgLib++, except TestC.cpp.
+0-39	6211 1.1x 11906 1.1x 11769 1.0x 9497 1.0x 1651697488 (6272e750) 76 // Adding corrections made in AlgLib++ for TestC.cpp.
+0-39	7143 1.1x 12501 1.0x 12350 1.0x 9784 1.0x 1652120083 (62795a13) 75 // Adding changes made in AlgLib++ for TestC.cpp.
+</pre>
+</p>
+</div>
+</body>
+</html>
