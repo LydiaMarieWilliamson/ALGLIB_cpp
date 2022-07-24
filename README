@@ -38,9 +38,18 @@ The recoding of ALGLIB to ALGLIB++ was originally carried out based on version 3
 and has been continuously upgraded with each revision of ALGLIB, since then.
 Starting with version 3.16.0, a public-facing copy was placed on GitHub and has since undergone resynchronization to 3.17.0.
 
-For version 3.18.0, in addition to resynchronizing to the update, a separate branch was created from the distribution version,
+For version 3.18.0, in addition to resynchronizing to the update, a separate branch was created from the distribution version, in the repository ALGLIB_cpp_3_18,
 and subject to the same stages of recoding that led from the distribution version of ALGLIB to ALGLIB++,
 in order to have the recoding sequence on record.
+
+It remained operational throughout the process, with the final result merged into ALGLIB++,
+where it has now been moved into, thereby also updating ALGLIB++ from 3.17.0 to 3.18.0.
+The last revision, at the time of merger, passed its tests with timestamp 1652120083 (62795a13).
+
+Other changes, following the merger, including new multi-threading code, recently devised,
+new DSP routines slated for addition to the FastTransforms module
+for time-frequency and time-scale analysis (and hybridizations of the two),
+and further nativization into C++, are all pending.
 
 ALGLIB++ undergoes a process of automated upgrade/reengineering/refactoring/testing.
 It does not use version numbers but, instead, is marked by the timestamp of the most recent test.
