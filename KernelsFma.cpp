@@ -10,8 +10,8 @@ double fma_rdotv(const ae_int_t n, const Real *__restrict x, const Real *__restr
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
    const ae_int_t fmaLen = (avx2len >> 2) << 2;
-   const __m256d *__restrict pX = (const __m256d *)(x);
-   const __m256d *__restrict pY = (const __m256d *)(y);
+   const __m256d *__restrict pX = (const __m256d *)x;
+   const __m256d *__restrict pY = (const __m256d *)y;
    __m256d ans;
    if (fmaLen >= 4) {
       __m256d fmaUnroll[4];
@@ -50,21 +50,18 @@ double fma_rdotv(const ae_int_t n, const Real *__restrict x, const Real *__restr
    double dot = pComps[0] + pComps[1];
    const ae_int_t tail = avx2len << 2;
    switch (n - tail) {
-      case 1:{
+      case 1:
          dot += x[tail] * y[tail];
-         break;
-      }
-      case 2:{
+      break;
+      case 2:
          dot += x[tail] * y[tail];
          dot += x[tail + 1] * y[tail + 1];
-         break;
-      }
-      case 3:{
+      break;
+      case 3:
          dot += x[tail] * y[tail];
          dot += x[tail + 1] * y[tail + 1];
          dot += x[tail + 2] * y[tail + 2];
-         break;
-      }
+      break;
    }
    return dot;
 }
@@ -73,7 +70,7 @@ double fma_rdotv2(const ae_int_t n, const Real *__restrict x) {
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
    const ae_int_t fmaLen = (avx2len >> 2) << 2;
-   const __m256d *__restrict pX = (const __m256d *)(x);
+   const __m256d *__restrict pX = (const __m256d *)x;
    __m256d ans;
    if (fmaLen >= 4) {
    //TODO: this can be further unrolled to 8 because AVX(2) provides 16 registers
@@ -113,21 +110,18 @@ double fma_rdotv2(const ae_int_t n, const Real *__restrict x) {
    double dot = pComps[0] + pComps[1];
    const ae_int_t tail = avx2len << 2;
    switch (n - tail) {
-      case 1:{
+      case 1:
          dot += x[tail] * x[tail];
-         break;
-      }
-      case 2:{
+      break;
+      case 2:
          dot += x[tail] * x[tail];
          dot += x[tail + 1] * x[tail + 1];
-         break;
-      }
-      case 3:{
+      break;
+      case 3:
          dot += x[tail] * x[tail];
          dot += x[tail + 1] * x[tail + 1];
          dot += x[tail + 2] * x[tail + 2];
-         break;
-      }
+      break;
    }
    return dot;
 }
@@ -135,7 +129,7 @@ double fma_rdotv2(const ae_int_t n, const Real *__restrict x) {
 void fma_raddv(const ae_int_t n, const double alpha, const Real *__restrict y, Real *__restrict x) {
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
-   const __m256d *__restrict pSrc = (const __m256d *)(y);
+   const __m256d *__restrict pSrc = (const __m256d *)y;
    __m256d *__restrict pDest = (__m256d *)x;
    const __m256d avx2alpha = _mm256_set1_pd(alpha);
    for (i = 0; i < avx2len; i++) {
@@ -144,15 +138,15 @@ void fma_raddv(const ae_int_t n, const double alpha, const Real *__restrict y, R
    const ae_int_t tail = avx2len << 2;
    switch (n - tail) {
       case 1:
-         *(double *)(pDest + i) += alpha * (*(const double *)(pSrc + i));
-         break;
+         *(double *)(pDest + i) += alpha * *(const double *)(pSrc + i);
+      break;
       case 2:
          *(__m128d *)(pDest + i) = _mm_fmadd_pd(_mm256_extractf128_pd(avx2alpha, 0), *(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
-         break;
+      break;
       case 3:
          *(__m128d *)(pDest + i) = _mm_fmadd_pd(_mm256_extractf128_pd(avx2alpha, 0), *(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
          x[tail + 2] += alpha * y[tail + 2];
-         break;
+      break;
    }
 }
 
@@ -168,24 +162,23 @@ void raddvx_fma3avx_xaligned(const ae_int_t n, const double alpha, const double 
    switch (n - vecLen) {
       case 1:
          x[i] += alpha * y[i];
-         break;
-      case 2:{
+      break;
+      case 2: {
          const ae_int_t iDest = i >> 2;
          *(__m128d *)(pDest + iDest) = _mm_fmadd_pd(_mm256_extractf128_pd(avx2alpha, 0), _mm_loadu_pd(y + i), *(const __m128d *)(pDest + iDest));
-         break;
       }
-      case 3:
-      {
+      break;
+      case 3: {
          const ae_int_t iDest = i >> 2;
          *(__m128d *)(pDest + iDest) = _mm_fmadd_pd(_mm256_extractf128_pd(avx2alpha, 0), _mm_loadu_pd(y + i), *(const __m128d *)(pDest + iDest));
          x[i + 2] += alpha * y[i + 2];
-         break;
       }
+      break;
    }
 }
 
 void fma_raddvx(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x) {
-   const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
+   const ptrdiff_t unal = (ptrdiff_t)x & 31;
    if (n <= 4) {
       ae_int_t i;
       for (i = 0; i < n; i++)
@@ -195,17 +188,17 @@ void fma_raddvx(const ae_int_t n, const double alpha, const double *__restrict y
    switch (unal) {
       case 0:
          raddvx_fma3avx_xaligned(n, alpha, y, x);
-         return;
+      return;
       case 8:
          x[2] += alpha * y[2];
       case 16:
          x[1] += alpha * y[1];
-      case 24:{
+      case 24: {
          x[0] += alpha * y[0];
          const ptrdiff_t nDone = 4 - (unal >> 3);
          raddvx_fma3avx_xaligned(n - nDone, alpha, y + nDone, x + nDone);
-         return;
       }
+      return;
    }
 }
 
@@ -260,28 +253,28 @@ void fma_rgemv_straight(const ae_int_t m, const ae_int_t n, const double alpha, 
          switch (nVec) {
             case 0:
                sum = _mm256_setzero_pd();
-               break;
+            break;
             case 1:
                sum = _mm256_mul_pd(pX[0], pRow[0]);
-               break;
+            break;
             case 2:
                sum = _mm256_fmadd_pd(pX[0], pRow[0], _mm256_mul_pd(pX[1], pRow[1]));
-               break;
+            break;
             case 3:
                sum = _mm256_fmadd_pd(pX[2], pRow[2], _mm256_fmadd_pd(pX[0], pRow[0], _mm256_mul_pd(pX[1], pRow[1])));
-               break;
+            break;
             case 4:
                sum = _mm256_add_pd(_mm256_fmadd_pd(pX[0], pRow[0], _mm256_mul_pd(pX[1], pRow[1])), _mm256_fmadd_pd(pX[2], pRow[2], _mm256_mul_pd(pX[3], pRow[3])));
-               break;
+            break;
             case 5:
                sum = _mm256_fmadd_pd(pX[4], pRow[4], _mm256_add_pd(_mm256_fmadd_pd(pX[0], pRow[0], _mm256_mul_pd(pX[1], pRow[1])), _mm256_fmadd_pd(pX[2], pRow[2], _mm256_mul_pd(pX[3], pRow[3]))));
-               break;
+            break;
             case 6:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_fmadd_pd(pX[0], pRow[0], _mm256_mul_pd(pX[1], pRow[1])), _mm256_fmadd_pd(pX[2], pRow[2], _mm256_mul_pd(pX[3], pRow[3]))), _mm256_fmadd_pd(pX[4], pRow[4], _mm256_mul_pd(pX[5], pRow[5])));
-               break;
+            break;
             case 7:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_fmadd_pd(pX[0], pRow[0], _mm256_mul_pd(pX[1], pRow[1])), _mm256_fmadd_pd(pX[2], pRow[2], _mm256_mul_pd(pX[3], pRow[3]))), _mm256_fmadd_pd(pX[6], pRow[6], _mm256_fmadd_pd(pX[4], pRow[4], _mm256_mul_pd(pX[5], pRow[5]))));
-               break;
+            break;
          }
       }
       const __m128d t = _mm_add_pd(_mm256_extractf128_pd(sum, 0), _mm256_extractf128_pd(sum, 1));
@@ -365,28 +358,28 @@ void fma_rgemvx_straight_xaligned(const ae_int_t m, const ae_int_t n, const doub
          switch (nVec) {
             case 0:
                sum = _mm256_setzero_pd();
-               break;
+            break;
             case 1:
                sum = _mm256_mul_pd(pX[0], ULOAD256PD(pRow[0]));
-               break;
+            break;
             case 2:
                sum = _mm256_fmadd_pd(pX[0], ULOAD256PD(pRow[0]), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1])));
-               break;
+            break;
             case 3:
                sum = _mm256_fmadd_pd(pX[2], ULOAD256PD(pRow[2]), _mm256_fmadd_pd(pX[0], ULOAD256PD(pRow[0]), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))));
-               break;
+            break;
             case 4:
                sum = _mm256_add_pd(_mm256_fmadd_pd(pX[0], ULOAD256PD(pRow[0]), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_fmadd_pd(pX[2], ULOAD256PD(pRow[2]), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3]))));
-               break;
+            break;
             case 5:
                sum = _mm256_fmadd_pd(pX[4], ULOAD256PD(pRow[4]), _mm256_add_pd(_mm256_fmadd_pd(pX[0], ULOAD256PD(pRow[0]), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_fmadd_pd(pX[2], ULOAD256PD(pRow[2]), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3])))));
-               break;
+            break;
             case 6:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_fmadd_pd(pX[0], ULOAD256PD(pRow[0]), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_fmadd_pd(pX[2], ULOAD256PD(pRow[2]), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3])))), _mm256_fmadd_pd(pX[4], ULOAD256PD(pRow[4]), _mm256_mul_pd(pX[5], ULOAD256PD(pRow[5]))));
-               break;
+            break;
             case 7:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_fmadd_pd(pX[0], ULOAD256PD(pRow[0]), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_fmadd_pd(pX[2], ULOAD256PD(pRow[2]), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3])))), _mm256_fmadd_pd(pX[6], ULOAD256PD(pRow[6]), _mm256_fmadd_pd(pX[4], ULOAD256PD(pRow[4]), _mm256_mul_pd(pX[5], ULOAD256PD(pRow[5])))));
-               break;
+            break;
          }
       }
       const __m128d t = _mm_add_pd(_mm256_extractf128_pd(sum, 0), _mm256_extractf128_pd(sum, 1));
@@ -414,7 +407,7 @@ void fma_rgemvx_straight(const ae_int_t m, const ae_int_t n, const double alpha,
       }
       return;
    }
-   const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
+   const ptrdiff_t unal = (ptrdiff_t)x & 31;
    if (unal == 0) {
       fma_rgemvx_straight_xaligned(m, n, alpha, a, ia, ja, x, y);
       return;
@@ -463,7 +456,7 @@ void fma_rgemvx_transposed(const ae_int_t m, const ae_int_t n, const double alph
       }
       return;
    }
-   const ptrdiff_t unal = ((ptrdiff_t)y) & 31;
+   const ptrdiff_t unal = (ptrdiff_t)y & 31;
    if (unal == 0) {
       fma_rgemvx_transposed_yaligned(m, n, alpha, a, ia, ja, x, y);
       return;
@@ -533,10 +526,6 @@ void fma_ablasf_dotblkh(const double *src_a, const double *src_b, ae_int_t round
 //
 // Propagates computed supernode to the rest of the RHS  using  SIMD-friendly
 // RHS storage format.
-//
-// Inputs:
-//
-// Outputs:
 // ALGLIB Routine: Copyright 08.09.2021 by Sergey Bochkanov
 void fma_spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth) {
    ae_int_t k;
@@ -587,7 +576,7 @@ bool fma_spchol_updatekernelabc4(double *rowstorage, ae_int_t offss, ae_int_t tw
    ae_int_t k;
    ae_int_t targetrow;
    ae_int_t targetcol;
-// Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
+// Filter out unsupported combinations (ones that are too sparse for the non-SIMD code).
    if (twidth < 3 || twidth > 4) {
       return false;
    }
@@ -648,16 +637,14 @@ bool fma_spchol_updatekernelabc4(double *rowstorage, ae_int_t offss, ae_int_t tw
       for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
-         _mm256_store_pd(target_storage + targetrow, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row), u_0123_0,
-                     _mm256_load_pd(target_storage + targetrow)))));
+         _mm256_store_pd(target_storage + targetrow, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row), u_0123_0, _mm256_load_pd(target_storage + targetrow)))));
       }
    }
    if (urank == 4) {
       for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
-         _mm256_store_pd(target_storage + targetrow, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 3), u_0123_3, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1,
-                     _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row), u_0123_0, _mm256_load_pd(target_storage + targetrow))))));
+         _mm256_store_pd(target_storage + targetrow, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 3), u_0123_3, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1, _mm256_fnmadd_pd(_mm256_broadcast_sd(update_row), u_0123_0, _mm256_load_pd(target_storage + targetrow))))));
       }
    }
    return true;
@@ -669,7 +656,7 @@ bool fma_spchol_updatekernel4444(double *rowstorage, ae_int_t offss, ae_int_t sh
    ae_int_t offsk;
    __m256d v_negd_u0, v_negd_u1, v_negd_u2, v_negd_u3, v_negd;
    __m256d v_w0, v_w1, v_w2, v_w3, u01_lo, u01_hi, u23_lo, u23_hi;
-// Compute W = -D*transpose(U[0:3])
+// Compute W = -D*transpose(U[0:3]).
    v_negd = _mm256_mul_pd(_mm256_loadu_pd(diagd + offsd), _mm256_set1_pd(-1.0));
    v_negd_u0 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu), v_negd);
    v_negd_u1 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu + 4), v_negd);
@@ -684,7 +671,7 @@ bool fma_spchol_updatekernel4444(double *rowstorage, ae_int_t offss, ae_int_t sh
    v_w2 = _mm256_permute2f128_pd(u23_lo, u01_lo, 0x13);
    v_w3 = _mm256_permute2f128_pd(u23_hi, u01_hi, 0x13);
 //
-// Compute update S = S + row_scatter(U*W)
+// Compute update S = S + row_scatter(U*W).
 //
    if (sheight == uheight) {
    // No row scatter, the most efficient code

@@ -18,7 +18,7 @@ Generalized Discrete Fourier Transform (DFT):
 
 ∙	Discrete Form:
 	The quantization condition on the interval spacings Δν and Δt determines the size, N, of the DFT and the corresponding FFT.
-	The intervals are evenly spaced so as to be able to fulfill the conditions placed on the kernels.
+	The intervals are evenly-spaced so as to be able to fulfill the conditions placed on the kernels.
 	―	Forward:	∀ ν ∈ F:	F(ν) = Σ_{t ∈ T} f(t) 1^{-νt} Δt
 	―	Backward:	∀ t ∈ T:	f(t) = Σ_{ν ∈ F} F(ν) 1^{+νt} Δν
 	―	Kernels:	∀ t₀, t₁ ∈ T:	Σ_{ν ∈ F} 1^{ν (t₀ - t₁)} Δν Δt = δ(t₀, t₁)
@@ -45,7 +45,7 @@ Generalized Discrete Fourier Transform (DFT):
 	―	Δt:	the time spacing (default = 1),
 	―	Δν:	the frequency spacing (default = 1/N),
 	―	The parameters N, Δt, Δν are initialized to their defaults, 0x1000, 1, 1/0x1000, respectively.
-	―	Seting N, Δt, Δν alters Δν, Δν, Δt respectively, while keeping Δt, N, N fixed, respectively.
+	―	Setting N, Δt, Δν alters Δν, Δν, Δt respectively, while keeping Δt, N, N fixed, respectively.
 	―	t₀:	the base time (default = 0),
 	―	ν₀:	the base frequency (default = -1/2Δt = -NΔν/2).
 	―	The parameters t₀ and ν₀ are initialized to their defaults, 0 and -1/2Δt respectively.
@@ -79,7 +79,7 @@ Generalized Discrete Fourier Transform (DFT):
 	―	Convolution - Product Property
 	―	Parseval Formula Invariance
 
-Spectrograph, or Windowed Fourier Transform (WFT generalized):
+Spectrogram, or Windowed Fourier Transform (WFT generalized):
 ∙	For the following, let λ ∈ [0,1] be arbitrarily chosen; the cardinal values being:
 	―	λ = 0: The phase in F(q,p) reflects the wave form for F_p(q) and yields instantaneous frequency
 	―	λ = 1: The phase in F(q,p) is slowly-varying in q and reflects the wave form for p ↦ F(q,p) and yields impulse times
@@ -106,7 +106,7 @@ Spectrograph, or Windowed Fourier Transform (WFT generalized):
 ∙	Transforms:
 	―	Forward:
 		▪	∀ q,Q ∈ ℝ×T_Q:	f_q(Q) = f(q + Q) g(Q)*
-		▪	∀ q,p ∈ ℝ×ℝ:	F_p(q) = ∫_{T_Q} f_q(Q) 1^{-pQ} dQ
+		▪	∀ q,p ∈ ℝ×ℝ:	F_q(p) = ∫_{T_Q} f_q(Q) 1^{-pQ} dQ
 		▪	∀ q,p ∈ ℝ×ℝ:	F(q,p) = F_p(q) 1^{-λpq}
 	―	Backward:
 		▪	∀ q,p ∈ ℝ×ℝ:	F_q(p) = F(q,p) 1^{+λpq}
@@ -121,8 +121,8 @@ Spectrograph, or Windowed Fourier Transform (WFT generalized):
 
 ∙	Domains:
 	―	t ∈ T: regularly-spaced with Δt = sample width,
-	―	q ∈ T_q: regularly-spaced with Δq = spectrograph time width,
-	―	p ∈ F_p: regularly-spaced with Δp = spectrograph frequency width.
+	―	q ∈ T_q: regularly-spaced with Δq = spectrogram time width,
+	―	p ∈ F_p: regularly-spaced with Δp = spectrogram frequency width.
 	―	Q ∈ T_Q = supp(g): regularly-spaced with ΔQ = windowing function time width = Δt = sample width,
 ∙	Domain Conditions:
 	―	N ≡ 1/(ΔpΔQ) ∈ { 1, 2, 3, ⋯ }
@@ -142,7 +142,7 @@ Spectrograph, or Windowed Fourier Transform (WFT generalized):
 ∙	Transforms:
 	―	Forward:
 		▪	∀ (q,Q) ∈ T_q × T_Q:	f_q(Q) = f(q + Q) g(Q)*
-		▪	∀ (q,p) ∈ T_q × F_p:	F_p(q) = Σ_{Q ∈ T_Q} f_q(Q) 1^{-pQ} Δt
+		▪	∀ (q,p) ∈ T_q × F_p:	F_p(q) = Σ_{Q ∈ T_Q} f_q(Q) 1^{-pQ} ΔQ
 		▪	∀ (q,p) ∈ T_q × F_p:	F(q,p) = F_p(q) 1^{-λpq}
 	―	Backward:
 		▪	∀ (q,p) ∈ T_q × F_p:	F_q(p) = F(q,p) 1^{+λpq}
@@ -151,12 +151,12 @@ Spectrograph, or Windowed Fourier Transform (WFT generalized):
 	―	Compatibility Condition:
 		∀ t ∈ T:	Σ_{q ∈ T_q} g(t - q)* h(t - q) Δq = 1
 
-Scalograph, or Continuous Wavelet Transform (CWT generalized):
+Scalogram, or Continuous Wavelet Transform (CWT generalized):
 ∙	Variables & Functions:
 	―	t:	real-time
 	―	p:	log-frequency = 1/σ
 		σ:	time scale
-	―	q:	scalograph time = τ
+	―	q:	scalogram time = τ
 		τ:	base time
 	―	ψ,Ψ:	forward transform wavelet (time & frequency domain forms)
 	―	φ,Φ:	backward transform wavelet (time & frequency domain forms)
@@ -182,24 +182,33 @@ Time-Scale and more General Windowed Transforms:
 ∙	Kernels:
 		∫ ψ_p(t' - q)* ψ^p(t - q) dp dq = δ(t - t')
 		∫ Ψ_p(ν)* Ψ^p(ν) dp = 1
+∙	Hybrid Time-{Frequency,Scale} Transforms:
+	―	μ = αp + β
+	―	ψ_p(Q) = |μ| g_p(μQ) 1^{pQ}, ψ^p(Q) = h(μQ) 1^{pQ}
+	―	Ψ_p(ν) = G((ν - p)/μ), Ψ^p(ν) = H((ν - p)/μ)/|μ|
+	―	1 = ∫ G((ν - p)/μ)* H((ν - p)/μ) dp/|μ| = ∫ G(γ)* H(γ) dγ/|αγ + 1|
+	―	Lie algebra: [y,p] = αp + β, [y,z] = 0, [p,z] = 0
+	―	Enumeration: Δp_n = p_{n+1} - p_n = α p_n + β ⇒ p_n = p₀ (1+α)ⁿ + β ((1+α)ⁿ - 1)/α
 ∙	Specializations:
-	―	Time-Scale Transforms (CWT generalized):
-		▪	ψ_p(Q) = |p| ψ(pQ), ψ^p(Q) = φ(pQ)
-		▪	Ψ_p(ν) = Ψ(ν/p), Ψ^p(Q) = Φ(ν/p) 1/|p|
-		▪	1 = ∫ Ψ(ν/p)* Φ(ν/p) dp/|p| = ∫ Ψ(γ)* Φ(γ) dγ/|γ|
-		▪	Default:
-				φ = ψ:	Contiuous Wavelet Transform (CWT), with scale σ = 1/p and time offset τ = q.
-	―	Time-Scale Transforms as Time-Frequency with logarithmic frequency:
-		▪	ψ_p(Q) = |p| g(pQ) 1^{pQ}, ψ^p(Q) = h(pQ) 1^{pQ}
-		▪	Ψ^p(ν) = G_p(ν/p - 1), Ψ^p(ν) = H^p(ν/p - 1)/|p|
-		▪	1 = ∫ G_p(ν/p - 1)* H^p(ν/p - 1) dp/|p| = ∫ G_p(γ - 1)* H^p(γ - 1) dγ/|γ|
+	―	(α,β) = (1,0): Time-Scale Transforms (CWT generalized) with scale as logarithmic frequency:
+		▪	ψ_p(Q) = |p| g(pQ) 1^{pQ} = |p| ψ(pQ), ψ^p(Q) = h(pQ) 1^{pQ} = φ(pQ)
+		▪	Ψ_p(ν) = G(ν/p - 1) = Ψ(ν/p), Ψ^p(ν) = H(ν/p - 1)/|p| = Φ(ν/p) 1/|p|
+		▪	1 = ∫ G(ν/p - 1)* H(ν/p - 1) dp/|p| = ∫ G(γ)* H(γ) dγ/|γ + 1|
+			1 = ∫ Ψ(ν/p)* Φ(ν/p) dp/|p| = ∫ Ψ(γ)* Φ(γ) dγ/|γ|
 		▪	Defaults:
-				h_p(Q) = δ(Q):		Generalized S-transform.
-				g_p(Q) = δ(Q):		Generalized Q transform? (Not sure.)
-	―	Time-Frequency Transforms (WFT generalized):
-		▪	ψ_p(Q) = g_p(Q) 1^{pQ}, ψ^p(Q) = h^p(Q) 1^{pQ}
-		▪	Ψ^p(ν) = G_p(ν - p), Ψ^p(ν) = H^p(ν - p)
-		▪	1 = ∫ G_p(ν - p)* H^p(ν - p) dp
+			·	h = g:		W-class transform:
+				φ = ψ:		Contiuous Wavelet Transform (CWT), with scale σ = 1/p and time offset τ = q.
+			·	H(γ) = δ(γ):	S-class transform: generalization of the S and Q transforms.
+			·	h(λ) = δ(λ):	T-class transform.
+		▪	Lie algebra: [d,p] = p, [d,z] = 0, [p,z] = 0
+		▪	Enumeration: Δp_n = p_{n+1} - p_n = p_n ⇒ p_n = p₀ 2ⁿ
+	―	(α,β) = (0,1): Time-Frequency Transforms (WFT generalized):
+		▪	ψ_p(Q) = g(Q) 1^{pQ}, ψ^p(Q) = h(Q) 1^{pQ}
+		▪	Ψ^p(ν) = G(ν - p), Ψ^p(ν) = H(ν - p)
+		▪	1 = ∫ G(ν - p)* H(ν - p) dp = ∫ G(γ)* H(γ) dγ/|γ|
 		▪	Defaults:
-			·	g_p = g, h_p = h:	Windowed Fourier transform (WFT generalized)
-			·	g_p = g = h = h_p:	Windowed Fourier transform
+			·	h = g:		W-class transform: Windowed Fourier transform
+			·	H(γ) = δ(γ):	S-class transform.
+			·	h(λ) = δ(λ):	T-class transform.
+		▪	Lie algebra: [q,p] = z, [q,z] = 0, [p,z] = 0
+		▪	Enumeration: Δp_n = p_{n+1} - p_n = 1 ⇒ p_n = p₀ + n

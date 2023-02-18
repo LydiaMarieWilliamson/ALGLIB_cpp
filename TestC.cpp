@@ -489,7 +489,7 @@ static void refrgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t
    // y += A^T*x
       for (i = 0; i < n; i++) {
          v = alpha * x->xR[ix + i];
-         ae_v_addd(&y->xR[iy], 1, &a->xyR[ia + i][ja], 1, iy + m - iy, v);
+         ae_v_addd(&y->xR[iy], 1, &a->xyR[ia + i][ja], 1, m, v);
       }
       return;
    }
@@ -1223,9 +1223,7 @@ static bool testablasfunit_testxgemv(ae_int_t maxn, double tol) {
 }
 
 // Reference code
-//
-//      16.10.2017
-//      Sergey Bochkanov
+// ALGLIB: Copyright 16.10.2017 by Sergey Bochkanov
 static void testablasfunit_refgerx(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
    ae_int_t i;
    ae_int_t j;
@@ -1780,7 +1778,7 @@ bool testhqrnd() {
    for (pass = 0; pass < n; pass++) {
       hqrndunit2(&state, &r1, &r2);
       unit2Ok = unit2Ok && NearAtR(r1 * r1 + r2 * r2, 1.0, 100.0 * machineepsilon);
-      k = ifloor((atan2(r1, r2) + pi) / (2 * pi) * bins.cnt);
+      k = ifloor((atan2(r1, r2) + pi) / (2.0 * pi) * bins.cnt);
       if (k < 0) {
          k = 0;
       }
@@ -2820,7 +2818,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
 }
 
 // Reference GEMM,
-// ALGLIB subroutine
+// ALGLIB Subroutine
 static void testablasunit_refrmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -2865,7 +2863,7 @@ static void testablasunit_refrmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, dou
 }
 
 // Reference GEMM,
-// ALGLIB subroutine
+// ALGLIB Subroutine
 static void testablasunit_refcmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -3388,7 +3386,7 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
 }
 
 // Reference SYMV,
-// ALGLIB subroutine
+// ALGLIB Subroutine
 static void testablasunit_refrmatrixsymv(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -3425,7 +3423,7 @@ static void testablasunit_refrmatrixsymv(ae_int_t n, double alpha, RMatrix *a, a
 }
 
 // Reference SYVMV,
-// ALGLIB subroutine
+// ALGLIB Subroutine
 static double testablasunit_refrmatrixsyvmv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -21883,9 +21881,9 @@ static bool testlinlsqrunit_reportcorrectnesstest() {
                      }
                      tnorm += (b.xR[i] - tmp) * (b.xR[i] - tmp);
                   }
-               // check, that RNorm is't more than S.R2
+               // check, that RNorm isn't more than S.R2
                // and difference between S.R2 and TNorm
-               // is't more than 'eps'(here S.R2 == ||rk||,
+               // isn't more than 'eps'(here S.R2 == ||rk||,
                // calculated by the algorithm for LSQR, and
                // TNorm == ||A*S.x-b||, calculated by test function).
                   if (s.r2 > rnorm + 1000.0 * machineepsilon * rmax2(rnorm, 1.0)) {
@@ -37982,7 +37980,7 @@ static bool testminlmunit_testu(bool *StateFieldConsistencyOkP) {
    NewObj(minlmstate, state);
    NewObj(minlmreport, rep);
 // Reference problem.
-// See comments for RKindVsStateCheck() for more info about RKind.
+// See comments for RKindVsStateCheck() for more information about RKind.
 //
 // NOTES: we also test negative RKind's corresponding to "inexact" schemes
 // which use approximate finite difference Jacobian.
@@ -51940,7 +51938,7 @@ bool testodesolver() {
          for (i = 1; i < m; i++) {
             xg.xR[i] = xg.xR[i - 1] + randomreal();
          }
-         v = 2 * pi / (xg.xR[m - 1] - xg.xR[0]);
+         v = 2.0 * pi / (xg.xR[m - 1] - xg.xR[0]);
          ae_v_muld(xg.xR, 1, m, v);
          if (randombool()) {
             ae_v_muld(xg.xR, 1, m, -1);
@@ -53727,7 +53725,7 @@ bool testautogk() {
    }
 // Simple test: integral(cos(100*x),0,2*pi), no maximum width requirements
    a = 0.0;
-   b = 2 * pi;
+   b = 2.0 * pi;
    for (autogksmooth(a, b, &state); autogkiteration(&state); ) {
       state.f = cos(100 * state.x);
    }
@@ -53741,7 +53739,7 @@ bool testautogk() {
    }
 // Simple test: integral(cos(100*x),0,2*pi), XWidth == 0.3
    a = 0.0;
-   b = 2 * pi;
+   b = 2.0 * pi;
    for (autogksmoothw(a, b, 0.3, &state); autogkiteration(&state); ) {
       state.f = cos(100 * state.x);
    }
@@ -57902,7 +57900,7 @@ bool testspline1d() {
    ae_vector_set_length(&y, n);
    for (i = 0; i < n; i++) {
       x.xR[i] = i / (n - 1.0);
-      y.xR[i] = cos(2 * pi * x.xR[i]) + 1;
+      y.xR[i] = cos(2.0 * pi * x.xR[i]) + 1;
    }
    y.xR[0] = 2.0;
    y.xR[n - 1] = 2.0;
@@ -58082,9 +58080,9 @@ static bool testlsfitunit_testpolynomialfitting() {
          ae_vector_set_length(&y2, n);
          ae_vector_set_length(&w2, n);
          xmin = 0.0;
-         xmax = 2 * pi;
+         xmax = 2.0 * pi;
          for (i = 0; i < n; i++) {
-            x2.xR[i] = 2 * pi * randomreal();
+            x2.xR[i] = 2.0 * pi * randomreal();
             y2.xR[i] = sin(x2.xR[i]);
             w2.xR[i] = 1.0;
          }
@@ -58333,7 +58331,7 @@ static bool testlsfitunit_testrationalfitting() {
          xmin = maxrealnumber;
          xmax = -maxrealnumber;
          for (i = 0; i < n; i++) {
-            x2.xR[i] = 2 * pi * randomreal();
+            x2.xR[i] = 2.0 * pi * randomreal();
             y2.xR[i] = sin(x2.xR[i]);
             w2.xR[i] = 1.0;
             xmin = rmin2(xmin, x2.xR[i]);
@@ -65543,8 +65541,8 @@ static bool testrbfunit_searcherr(RMatrix *y0, RMatrix *y1, ae_int_t n, ae_int_t
    DupVector(delta);
    NewVector(irerr, 0, DT_REAL);
    NewVector(orerr, 0, DT_REAL);
-   ae_assert(n > 0, "testrbfunit_searcherr: invalid parameter N(N <= 0).");
-   ae_assert(ny > 0, "testrbfunit_searcherr: invalid parameter NY(NY <= 0).");
+   ae_assert(n > 0, "testrbfunit_searcherr: invalid parameter N (N <= 0).");
+   ae_assert(ny > 0, "testrbfunit_searcherr: invalid parameter NY (NY <= 0).");
    oralerr = 0.1;
    iralerr = 0.01;
    lb = 25;
@@ -65593,7 +65591,7 @@ static bool testrbfunit_searcherr(RMatrix *y0, RMatrix *y1, ae_int_t n, ae_int_t
             }
          }
       } else {
-         ae_assert(false, "testrbfunit_searcherr: invalid argument ErrType(ErrType neither 1 nor 2)");
+         ae_assert(false, "testrbfunit_searcherr: invalid argument ErrType (ErrType neither 1 nor 2)");
       }
    }
    Ok = true;
@@ -65676,7 +65674,7 @@ static bool basicmultilayerrbf1dtest() {
          }
          gp.xyR[i][0] = (double)i / n;
          for (j = 0; j < ny; j++) {
-            gp.xyR[i][nx + j] = a1.xR[j] * cos(f1 * 2 * pi * gp.xyR[i][0]) + b1.xR[j] * cos(f2 * 2 * pi * gp.xyR[i][0]);
+            gp.xyR[i][nx + j] = a1.xR[j] * cos(f1 * 2.0 * pi * gp.xyR[i][0]) + b1.xR[j] * cos(f2 * 2.0 * pi * gp.xyR[i][0]);
             mody0.xyR[i][j] = gp.xyR[i][nx + j];
          }
       }
@@ -65973,7 +65971,7 @@ static bool testrbfunit_specialtest() {
 // Radii filtering should place a bound on the radius of outlier.
    for (nx = 2; nx <= 3; nx++) {
       for (ny = 1; ny <= 3; ny++) {
-         sx = exp(-5.0 + 10.0 * randomreal());
+         sx = exp(5.0 * randommid());
          rbfcreate(nx, ny, &s);
          ae_matrix_set_length(&xy, 20, nx + ny);
          for (i = 0; i < xy.rows; i++) {
@@ -65985,7 +65983,7 @@ static bool testrbfunit_specialtest() {
                xy.xyR[i][nx + j] = randomreal();
             }
          }
-         xy.xyR[xy.rows - 1][0] = -1000 * sx;
+         xy.xyR[xy.rows - 1][0] = -1000.0 * sx;
          rbfsetpoints(&s, &xy, xy.rows);
       // Try random Z from [1,5]
          z = 1.0 + 4.0 * randomreal();
@@ -67293,8 +67291,8 @@ static bool testrbfunit_basicmultilayerrbftest() {
       k0 = 6 + randominteger(3);
       k1 = 6 + randominteger(3);
       k2 = 6 + randominteger(3);
-      s1 = pow(range, randominteger(3) - 1.0);
-      s2 = pow(range, randominteger(3) - 1.0);
+      s1 = pow(range, randominteger(3) - 1);
+      s2 = pow(range, randominteger(3) - 1);
       nx = randominteger(2) + 2;
       ny = randominteger(2) + 1;
       linterm = randominteger(3) + 1;
@@ -67548,7 +67546,7 @@ static bool testrbfunit_gridcalc23test() {
       for (i = 0; i <= 2; i++) {
       // 66% of cases - large grid
          if (hqrnduniformi(&rs, 3) == 0) {
-            kx.xZ[i] = iround(10 * pow(10.0, hqrnduniformr(&rs)));
+            kx.xZ[i] = iround(10.0 * pow(10.0, hqrnduniformr(&rs)));
             continue;
          }
       // 33% of cases - small grid
@@ -67563,8 +67561,8 @@ static bool testrbfunit_gridcalc23test() {
             kx.xZ[i] = 10;
          }
       }
-      sx = pow(10.0, hqrnduniformi(&rs, 3) - 1.0);
-      sy = pow(10.0, hqrnduniformi(&rs, 3) - 1.0);
+      sx = pow(10, hqrnduniformi(&rs, 3) - 1);
+      sy = pow(10, hqrnduniformi(&rs, 3) - 1);
       nx = 3;
       ny = 1 + hqrnduniformi(&rs, 5);
       linterm = hqrnduniformi(&rs, 3) + 1;
@@ -67862,17 +67860,17 @@ static bool testrbfunit_basichrbftest() {
          if (linterm == 2) {
             for (j = 0; j < nx; j++) {
                if (randombool()) {
-                  x.xR[j] = 1 + 1000 * rbase;
+                  x.xR[j] = 1.0 + 1000.0 * rbase;
                } else {
-                  x.xR[j] = 0 - 1000 * rbase;
+                  x.xR[j] = -1000.0 * rbase;
                }
             }
             rbfcalc(&s, &x, &y);
             for (j = 0; j < nx; j++) {
                if (randombool()) {
-                  x.xR[j] = 1 + 1000 * rbase;
+                  x.xR[j] = 1.0 + 1000.0 * rbase;
                } else {
-                  x.xR[j] = 0 - 1000 * rbase;
+                  x.xR[j] = -1000.0 * rbase;
                }
             }
             rbfcalc(&s, &x, &y2);
@@ -67883,9 +67881,9 @@ static bool testrbfunit_basichrbftest() {
          if (linterm == 3) {
             for (j = 0; j < nx; j++) {
                if (randombool()) {
-                  x.xR[j] = 1 + 1000 * rbase;
+                  x.xR[j] = 1.0 + 1000.0 * rbase;
                } else {
-                  x.xR[j] = 0 - 1000 * rbase;
+                  x.xR[j] = -1000.0 * rbase;
                }
             }
             rbfcalc(&s, &x, &y);
@@ -68091,7 +68089,7 @@ static bool testrbfunit_basichrbftest() {
                for (i = 0; i < n; i++) {
                   v = shaketype * 0.125 * randommid();
                   v = (i + v) / (n - 1);
-                  v = 2 * v - 1;
+                  v = 2.0 * v - 1.0;
                   xy.xyR[i][0] = width * v;
                }
                ntest = n * 10;
@@ -68133,11 +68131,11 @@ static bool testrbfunit_basichrbftest() {
                }
             // Select model properties and precision
                if (modeltype == 0) {
-                  rbase = 4.0 * (2 * width / n);
+                  rbase = 4.0 * (2.0 * width / n);
                   nlayers = 3;
                } else {
                   if (modeltype == 1) {
-                     rbase = 16.0 * (2 * width / n);
+                     rbase = 16.0 * (2.0 * width / n);
                      nlayers = 6;
                   } else {
                      ae_assert(false, "Assertion failed");
@@ -68197,7 +68195,7 @@ static bool testrbfunit_basichrbftest() {
       n = 150;
       rbase = 0.33;
       nlayers = randominteger(4);
-      scalefactor = pow(1024.0, 2.0 * randominteger(2) - 1.0);
+      scalefactor = pow(1024.0, 2 * randominteger(2) - 1);
       gridsize = iround(pow(n, 1.0 / nx)) + 1;
       ny = 1 + randominteger(3);
       linterm = 1 + randominteger(3);
@@ -68411,11 +68409,11 @@ static bool testrbfunit_scaledhrbftest() {
                errtol = 0.0;
                ae_vector_set_length(&scalex, nx);
                for (i = 0; i < nx; i++) {
-                  scalex.xR[i] = pow(16.0, randominteger(3) - 1.0);
+                  scalex.xR[i] = pow(16, randominteger(3) - 1);
                }
                ae_vector_set_length(&scaley, ny);
                for (i = 0; i < ny; i++) {
-                  scaley.xR[i] = pow(16.0, randominteger(3) - 1.0);
+                  scaley.xR[i] = pow(16, randominteger(3) - 1);
                }
             } else {
                errtol = 0.001;
@@ -68622,8 +68620,8 @@ static bool testrbfunit_spechrbftest() {
       return Ok;
    }
    for (i = 0; i < n * n; i++) {
-      xy.xyR[i][0] += 1.0E-14 * sin(3.0 * i);
-      xy.xyR[i][1] += 1.0E-14 * sin(7.0 * i * i);
+      xy.xyR[i][0] += 1.0E-14 * sin(3 * i);
+      xy.xyR[i][1] += 1.0E-14 * sin(7 * i * i);
    }
    rbfcreate(nx, ny, &s1);
    rbfsetalgohierarchical(&s1, rbase, nlayers, 0.0);
@@ -68638,7 +68636,7 @@ static bool testrbfunit_spechrbftest() {
    vdiff = 0.0;
    for (i = 0; i < n - 1; i++) {
       for (j = 0; j < n - 1; j++) {
-         vdiff += fabs(rbfcalc2(&s0, 0.5 + i, 0.5 + j) - rbfcalc2(&s1, 0.5 + i, 0.5 + j)) / sqr(n - 1.0);
+         vdiff += fabs(rbfcalc2(&s0, 0.5 + i, 0.5 + j) - rbfcalc2(&s1, 0.5 + i, 0.5 + j)) / sqr(n - 1);
       }
    }
    Ok = Ok && vdiff <= 0.00200 && vdiff >= 0.00001;
@@ -68854,7 +68852,7 @@ static bool testrbfunit_gridhrbftest() {
       // Test that scaling RBase, XY, X0, X1 by some power of 2
       // does not change values at grid (quite a strict requirement, but
       // ALGLIB implementation of RBF may deal with it).
-         scalefactor = pow(1024.0, 2.0 * randominteger(2) - 1.0);
+         scalefactor = pow(1024.0, 2 * randominteger(2) - 1);
          ae_matrix_set_length(&xy2, n, nx + ny);
          ae_vector_set_length(&x02, n0);
          ae_vector_set_length(&x12, n1);
@@ -68894,7 +68892,7 @@ static bool testrbfunit_gridhrbftest() {
       // (increase RBase and decreasing scale, or vice versa) does not
       // change values at grid (quite a strict requirement, but
       // ALGLIB implementation of RBF may deal with it).
-         scalefactor = pow(1024.0, 2.0 * randominteger(2) - 1.0);
+         scalefactor = pow(1024.0, 2 * randominteger(2) - 1);
          ae_vector_set_length(&scalevec2, nx);
          for (i = 0; i < nx; i++) {
             if (hasscale) {
@@ -69060,7 +69058,7 @@ static bool testrbfunit_gridhrbftest() {
       // Test that scaling RBase, XY, X0, X1 and X2 by some power of 2
       // does not change values at grid (quite a strict requirement, but
       // ALGLIB implementation of RBF may deal with it).
-         scalefactor = pow(1024.0, 2.0 * randominteger(2) - 1.0);
+         scalefactor = pow(1024.0, 2 * randominteger(2) - 1);
          ae_matrix_set_length(&xy2, n, nx + ny);
          ae_vector_set_length(&x02, n0);
          ae_vector_set_length(&x12, n1);
@@ -69104,7 +69102,7 @@ static bool testrbfunit_gridhrbftest() {
       // (increase RBase and decreasing scale, or vice versa) does not
       // change values at grid (quite a strict requirement, but
       // ALGLIB implementation of RBF may deal with it).
-         scalefactor = pow(1024.0, 2.0 * randominteger(2) - 1.0);
+         scalefactor = pow(1024.0, 2 * randominteger(2) - 1);
          ae_vector_set_length(&scalevec2, nx);
          for (i = 0; i < nx; i++) {
             if (hasscale) {
@@ -69150,19 +69148,19 @@ bool testrbf() {
    bool hrbfgridOk;
    bool hrbfOk;
    bool Ok;
-// HRBF tests
+// HRBF tests.
    hrbfbasicOk = testrbfunit_basichrbftest();
    hrbfspecOk = testrbfunit_spechrbftest();
    hrbfscaleOk = testrbfunit_scaledhrbftest();
    hrbfgridOk = testrbfunit_gridhrbftest();
    hrbfOk = hrbfbasicOk && hrbfspecOk && hrbfscaleOk && hrbfgridOk;
-// Other tests
+// Other tests.
    specialOk = testrbfunit_specialtest();
    basicrbfOk = testrbfunit_basicrbftest();
    irregularrbfOk = testrbfunit_irregularrbftest();
    linearitymodelrbfOk = testrbfunit_linearitymodelrbftest();
    sqrdegmatrixrbfOk = sqrdegmatrixrbftest();
-   multilayerrbf1dOk = basicmultilayerrbf1dtest(); //(@) This test was disabled in the distribution version.
+   multilayerrbf1dOk = basicmultilayerrbf1dtest(); //(@) This test was disabled in the distribution version of ALGLIB.
    multilayerrbfOk = testrbfunit_basicmultilayerrbftest();
    serOk = testrbfunit_serializationtest();
    gridcalc23Ok = true;
@@ -69216,8 +69214,8 @@ static void testfftunit_refinternalcfft(RVector *a, ae_int_t nn, bool inversefft
          for (k = 0; k < nn; k++) {
             re = a->xR[2 * k];
             im = a->xR[2 * k + 1];
-            c = cos(-2 * pi * k * i / nn);
-            s = sin(-2 * pi * k * i / nn);
+            c = cos(-2.0 * pi * k * i / nn);
+            s = sin(-2.0 * pi * k * i / nn);
             hre += c * re - s * im;
             him += c * im + s * re;
          }
@@ -69234,8 +69232,8 @@ static void testfftunit_refinternalcfft(RVector *a, ae_int_t nn, bool inversefft
          for (i = 0; i < nn; i++) {
             re = a->xR[2 * i];
             im = a->xR[2 * i + 1];
-            c = cos(2 * pi * k * i / nn);
-            s = sin(2 * pi * k * i / nn);
+            c = cos(+2.0 * pi * k * i / nn);
+            s = sin(+2.0 * pi * k * i / nn);
             hre += c * re - s * im;
             him += c * im + s * re;
          }
@@ -69344,8 +69342,8 @@ static void testfftunit_quicktest(ae_int_t n, double *referr, double *refrerr) {
       for (j = 0; j < n; j++) {
          re = a1.xC[j].x;
          im = a1.xC[j].y;
-         c = cos(-2 * pi * j * idx / n);
-         s = sin(-2 * pi * j * idx / n);
+         c = cos(-2.0 * pi * j * idx / n);
+         s = sin(-2.0 * pi * j * idx / n);
          v.x += c * re - s * im;
          v.y += c * im + s * re;
       }
@@ -69584,7 +69582,7 @@ static void testfhtunit_reffhtr1d(RVector *a, ae_int_t n) {
    for (i = 0; i < n; i++) {
       v = 0.0;
       for (j = 0; j < n; j++) {
-         v += a->xR[j] * (cos(2 * pi * i * j / n) + sin(2 * pi * i * j / n));
+         v += a->xR[j] * (cos(2.0 * pi * i * j / n) + sin(2.0 * pi * i * j / n));
       }
       buf.xR[i] = v;
    }
@@ -79644,7 +79642,7 @@ static bool testssaunit_testgeneral() {
                sinefreq = 2.0;
             }
             for (i = 0; i < nlasttracklen; i++) {
-               x.xR[i] = sineamp * sin((i + sineoffs) / windowwidth * 2 * pi * sinefreq);
+               x.xR[i] = sineamp * sin((i + sineoffs) / windowwidth * 2.0 * pi * sinefreq);
             }
             ssaaddsequence(&state, &x, nlasttracklen);
          }
@@ -79669,7 +79667,7 @@ static bool testssaunit_testgeneral() {
          sinefreq = 1.0;
          ae_vector_set_length(&x, nticks);
          for (i = 0; i < nticks; i++) {
-            x.xR[i] = sineamp * sin((i + sineoffs) / windowwidth * 2 * pi * sinefreq);
+            x.xR[i] = sineamp * sin((i + sineoffs) / windowwidth * 2.0 * pi * sinefreq);
          }
          ssaanalyzesequence(&state, &x, nticks, &trend, &noise);
          Ok = Ok && noise.cnt == nticks;
@@ -79679,7 +79677,7 @@ static bool testssaunit_testgeneral() {
             return Ok;
          }
          for (i = 0; i < nticks; i++) {
-            v = sineamp * sin((i + sineoffs) / windowwidth * 2 * pi * sinefreq);
+            v = sineamp * sin((i + sineoffs) / windowwidth * 2.0 * pi * sinefreq);
             Ok = Ok && NearAtR(trend.xR[i], v, tol);
             Ok = Ok && SmallAtR(noise.xR[i], tol);
          }
@@ -79712,7 +79710,7 @@ static bool testssaunit_testgeneral() {
          sinefreq = 2.0;
          ae_vector_set_length(&x, nticks);
          for (i = 0; i < nticks; i++) {
-            x.xR[i] = sineamp * sin((i + sineoffs) / windowwidth * 2 * pi * sinefreq);
+            x.xR[i] = sineamp * sin((i + sineoffs) / windowwidth * 2.0 * pi * sinefreq);
          }
          ssaanalyzesequence(&state, &x, nticks, &trend, &noise);
          Ok = Ok && noise.cnt == nticks;
@@ -79722,7 +79720,7 @@ static bool testssaunit_testgeneral() {
             return Ok;
          }
          for (i = 0; i < nticks; i++) {
-            v = sineamp * sin((i + sineoffs) / windowwidth * 2 * pi * sinefreq);
+            v = sineamp * sin((i + sineoffs) / windowwidth * 2.0 * pi * sinefreq);
             Ok = Ok && SmallAtR(trend.xR[i], tol);
             Ok = Ok && NearAtR(noise.xR[i], v, tol);
          }
@@ -82021,7 +82019,7 @@ static bool testmcpdunit_testec() {
          //
          // We set N-1 equality constraints on random non-exit column
          // of P, which are inconsistent with this default constraint
-         // (sum will be greater that 1.0).
+         // (sum will be greater than 1.0).
          //
          // Algorithm must detect inconsistency.
          //
@@ -82203,7 +82201,7 @@ static bool testmcpdunit_testbc() {
          //
          // We set N-1 bound constraints on random non-exit column
          // of P, which are inconsistent with this default constraint
-         // (sum will be greater that 1.0).
+         // (sum will be greater than 1.0).
          //
          // Algorithm must detect inconsistency.
          //
@@ -83854,7 +83852,7 @@ static bool testmlptrainunit_testmlpxorcls() {
 }
 
 // The  test  check,  that  all weights are zero after training with trainer
-// using empty dataset(either zero size or is't used MLPSetDataSet function).
+// using empty dataset(either zero size or isn't used MLPSetDataSet function).
 // Test  on  regression and classification problems given by dense or sparse
 // matrix.
 static bool testmlptrainunit_testmlpzeroweights() {
@@ -83957,7 +83955,7 @@ static bool testmlptrainunit_testmlpzeroweights() {
 //
 // If Sum(ri) < Mean-5*Sigma then hypothesis is refused and test is passed.
 // In another case if Mean-5*Sigma <= Sum(ri) <= Mean+5*Sigma then hypothesis
-// is't refused and test is broken; and if Mean+5*Sigma < Sum(ri) then test
+// isn't refused and test is broken; and if Mean+5*Sigma < Sum(ri) then test
 // broken too hard!
 static bool testmlptrainunit_testmlprestarts() {
    ae_frame _frame_block;
@@ -86308,7 +86306,7 @@ const ThRet_t ThNoRet = (ThRet_t)NULL;
 typedef ThRet_t (*ThOp_t)(ThArg_t);
 typedef pthread_t Thread_t;
 inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { return pthread_create(Th, Attr, Op, Arg); }
-inline void join_threads(long N, Thread_t *Bundle) { for (int T = 0; T < N; T++) pthread_join(Bundle[T], NULL); }
+inline void join_threads(long N, Thread_t *Bundle) { for (long T = 0; T < N; T++) pthread_join(Bundle[T], NULL); }
 #elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
 #   include <windows.h>
 typedef CRITICAL_SECTION MutEx_t;
@@ -86334,12 +86332,12 @@ inline void init_mutex(MutEx_t *MutEx) { }
 inline void free_mutex(MutEx_t *MutEx) { }
 typedef void *ThAttr_t;
 typedef void *ThArg_t;
-typedef void ThRet_t;
+typedef void *ThRet_t;
 const ThRet_t ThNoRet = (ThRet_t)NULL;
 typedef ThRet_t (*ThOp_t)(ThArg_t);
 struct Thread_t { ThAttr_t Attr; ThOp_t Op; ThArg_t Arg; };
 inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { Th->Attr = Attr, Th->Op = Op, Th->Arg = Arg; return 0; }
-inline void join_threads(long N, Thread_t *Bundle) { }
+inline void join_threads(long N, Thread_t *Bundle) { for (long T = 0; T < N; T++) Bundle->Op(Bundle_Arg); }
 #endif
 
 static const enum {
@@ -86582,7 +86580,7 @@ int main(int argc, char **argv) {
       case AE_SKIP_TEST: printf("Testing Mode: just compiling\nDone in 0 seconds\n"); return EXIT_SUCCESS;
       default: printf("Testing Mode: unknown\n"); return EXIT_FAILURE;
    }
-// now we are ready to test!
+// Now, we are ready to test!
    time(&time_0);
 #ifdef _ALGLIB_HAS_WORKSTEALING
    bool smpOk = ae_smpselftests();

@@ -206,28 +206,22 @@ template<class T> void spoil_matrix_by_neginf(T &x) {
 }
 
 void function1_func(const real_1d_array &x, double &func, void *ptr) {
-//
 // this callback calculates f(x0,x1) = 100*(x0+3)^4 + (x1-3)^4
-//
    func = 100 * pow(x[0] + 3, 4) + pow(x[1] - 3, 4);
 }
 
 void function1_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr) {
-//
 // this callback calculates f(x0,x1) = 100*(x0+3)^4 + (x1-3)^4
 // and its derivatives df/d0 and df/dx1
-//
    func = 100 * pow(x[0] + 3, 4) + pow(x[1] - 3, 4);
    grad[0] = 400 * pow(x[0] + 3, 3);
    grad[1] = 4 * pow(x[1] - 3, 3);
 }
 
 void function1_hess(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr) {
-//
 // this callback calculates f(x0,x1) = 100*(x0+3)^4 + (x1-3)^4
 // its derivatives df/d0 and df/dx1
 // and its Hessian.
-//
    func = 100 * pow(x[0] + 3, 4) + pow(x[1] - 3, 4);
    grad[0] = 400 * pow(x[0] + 3, 3);
    grad[1] = 4 * pow(x[1] - 3, 3);
@@ -238,22 +232,18 @@ void function1_hess(const real_1d_array &x, double &func, real_1d_array &grad, r
 }
 
 void function1_fvec(const real_1d_array &x, real_1d_array &fi, void *ptr) {
-//
 // this callback calculates
 // f0(x0,x1) = 100*(x0+3)^4,
 // f1(x0,x1) = (x1-3)^4
-//
    fi[0] = 10 * pow(x[0] + 3, 2);
    fi[1] = pow(x[1] - 3, 2);
 }
 
 void function1_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr) {
-//
 // this callback calculates
 // f0(x0,x1) = 100*(x0+3)^4,
 // f1(x0,x1) = (x1-3)^4
 // and Jacobian matrix J = [dfi/dxj]
-//
    fi[0] = 10 * pow(x[0] + 3, 2);
    fi[1] = pow(x[1] - 3, 2);
    jac[0][0] = 20 * (x[0] + 3);
@@ -263,27 +253,21 @@ void function1_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac
 }
 
 void function2_func(const real_1d_array &x, double &func, void *ptr) {
-//
 // this callback calculates f(x0,x1) = (x0^2+1)^2 + (x1-1)^2
-//
    func = pow(x[0] * x[0] + 1, 2) + pow(x[1] - 1, 2);
 }
 
 void function2_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr) {
-//
 // this callback calculates f(x0,x1) = (x0^2+1)^2 + (x1-1)^2
 // and its derivatives df/d0 and df/dx1
-//
    func = pow(x[0] * x[0] + 1, 2) + pow(x[1] - 1, 2);
    grad[0] = 4 * (x[0] * x[0] + 1) * x[0];
    grad[1] = 2 * (x[1] - 1);
 }
 
 void function2_hess(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr) {
-//
 // this callback calculates f(x0,x1) = (x0^2+1)^2 + (x1-1)^2
 // its gradient and Hessian
-//
    func = pow(x[0] * x[0] + 1, 2) + pow(x[1] - 1, 2);
    grad[0] = 4 * (x[0] * x[0] + 1) * x[0];
    grad[1] = 2 * (x[1] - 1);
@@ -294,22 +278,18 @@ void function2_hess(const real_1d_array &x, double &func, real_1d_array &grad, r
 }
 
 void function2_fvec(const real_1d_array &x, real_1d_array &fi, void *ptr) {
-//
 // this callback calculates
 // f0(x0,x1) = x0^2+1
 // f1(x0,x1) = x1-1
-//
    fi[0] = x[0] * x[0] + 1;
    fi[1] = x[1] - 1;
 }
 
 void function2_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr) {
-//
 // this callback calculates
 // f0(x0,x1) = x0^2+1
 // f1(x0,x1) = x1-1
 // and Jacobian matrix J = [dfi/dxj]
-//
    fi[0] = x[0] * x[0] + 1;
    fi[1] = x[1] - 1;
    jac[0][0] = 2 * x[0];
@@ -319,14 +299,12 @@ void function2_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac
 }
 
 void nlcfunc1_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr) {
-//
 // this callback calculates
 //
 //     f0(x0,x1) = -x0+x1
 //     f1(x0,x1) = x0^2+x1^2-1
 //
 // and Jacobian matrix J = [dfi/dxj]
-//
    fi[0] = -x[0] + x[1];
    fi[1] = x[0] * x[0] + x[1] * x[1] - 1.0;
    jac[0][0] = -1.0;
@@ -336,7 +314,6 @@ void nlcfunc1_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac,
 }
 
 void nlcfunc2_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr) {
-//
 // this callback calculates
 //
 //     f0(x0,x1,x2) = x0+x1
@@ -344,7 +321,6 @@ void nlcfunc2_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac,
 //     f2(x0,x1,x2) = x0^2+x1^2-1
 //
 // and Jacobian matrix J = [dfi/dxj]
-//
    fi[0] = x[0] + x[1];
    fi[1] = x[2] - exp(x[0]);
    fi[2] = x[0] * x[0] + x[1] * x[1] - 1.0;
@@ -360,29 +336,24 @@ void nlcfunc2_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac,
 }
 
 void nsfunc1_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr) {
-//
 // this callback calculates
 //
 //     f0(x0,x1) = 2*|x0|+x1
 //
 // and Jacobian matrix J = [df0/dx0 df0/dx1]
-//
    fi[0] = 2 * fabs(double(x[0])) + fabs(double(x[1]));
    jac[0][0] = 2 * sign(x[0]);
    jac[0][1] = sign(x[1]);
 }
 
 void nsfunc1_fvec(const real_1d_array &x, real_1d_array &fi, void *ptr) {
-//
 // this callback calculates
 //
 //     f0(x0,x1) = 2*|x0|+x1
-//
    fi[0] = 2 * fabs(double(x[0])) + fabs(double(x[1]));
 }
 
 void nsfunc2_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr) {
-//
 // this callback calculates function vector
 //
 //     f0(x0,x1) = 2*|x0|+x1
@@ -394,7 +365,6 @@ void nsfunc2_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
 //         [ df0/dx0   df0/dx1 ]
 //     J = [ df1/dx0   df1/dx1 ]
 //         [ df2/dx0   df2/dx1 ]
-//
    fi[0] = 2 * fabs(double(x[0])) + fabs(double(x[1]));
    jac[0][0] = 2 * sign(x[0]);
    jac[0][1] = sign(x[1]);
@@ -407,28 +377,22 @@ void nsfunc2_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
 }
 
 void bad_func(const real_1d_array &x, double &func, void *ptr) {
-//
 // this callback calculates 'bad' function,
 // i.e. function with incorrectly calculated derivatives
-//
    func = 100 * pow(x[0] + 3, 4) + pow(x[1] - 3, 4);
 }
 
 void bad_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr) {
-//
 // this callback calculates 'bad' function,
 // i.e. function with incorrectly calculated derivatives
-//
    func = 100 * pow(x[0] + 3, 4) + pow(x[1] - 3, 4);
    grad[0] = 40 * pow(x[0] + 3, 3);
    grad[1] = 40 * pow(x[1] - 3, 3);
 }
 
 void bad_hess(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr) {
-//
 // this callback calculates 'bad' function,
 // i.e. function with incorrectly calculated derivatives
-//
    func = 100 * pow(x[0] + 3, 4) + pow(x[1] - 3, 4);
    grad[0] = 40 * pow(x[0] + 3, 3);
    grad[1] = 40 * pow(x[1] - 3, 3);
@@ -439,19 +403,15 @@ void bad_hess(const real_1d_array &x, double &func, real_1d_array &grad, real_2d
 }
 
 void bad_fvec(const real_1d_array &x, real_1d_array &fi, void *ptr) {
-//
 // this callback calculates 'bad' function,
 // i.e. function with incorrectly calculated derivatives
-//
    fi[0] = 10 * pow(x[0] + 3, 2);
    fi[1] = pow(x[1] - 3, 2);
 }
 
 void bad_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr) {
-//
 // this callback calculates 'bad' function,
 // i.e. function with incorrectly calculated derivatives
-//
    fi[0] = 10 * pow(x[0] + 3, 2);
    fi[1] = pow(x[1] - 3, 2);
    jac[0][0] = 2 * (x[0] + 3);
@@ -494,19 +454,15 @@ void int_function_1_func(double x, double xminusa, double bminusx, double &y, vo
 }
 
 void function_debt_func(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr) {
-//
 // this callback calculates f(c,x == =c[0]*(1+c[1]*(pow(x[0]-1999,c[2])-1))
-//
    func = c[0] * (1 + c[1] * (pow(x[0] - 1999, c[2]) - 1));
 }
 
 void s1_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr) {
-//
 // this callback calculates f(x) = (1+x)^(-0.2) + (1-x)^(-0.3) + 1000*x and its gradient.
 //
 // function is trimmed when we calculate it near the singular points or outside of the [-1,+1].
 // Note that we do NOT calculate gradient in this case.
-//
    if (x[0] <= -0.999999999999 || x[0] >= +0.999999999999) {
       func = 1.0E+300;
       return;
@@ -535,7 +491,7 @@ int main() {
    if (_static_pool_used != 0 || _static_pool_free < 0.95 * _static_pool_size || _static_pool_free > _static_pool_size) {
       AllOk = false;
       printf("Failure: memory pool usage stats are inconsistent!\n");
-      return 1;
+      return EXIT_FAILURE;
    }
    {
       real_2d_array a("[[1,2],[3,4]]");
@@ -544,7 +500,7 @@ int main() {
       if (_static_pool_used2 <= _static_pool_used || _static_pool_free2 >= _static_pool_free || _static_pool_used + _static_pool_free != _static_pool_used2 + _static_pool_free2) {
          AllOk = false;
          printf("Failure: memory pool usage stats are inconsistent!\n");
-         return 1;
+         return EXIT_FAILURE;
       }
       a.setlength(1, 1); // make sure that destructor of /a/ is never called prior to this point
    }
@@ -565,7 +521,7 @@ int main() {
       }
       if (alglib_impl::_alloc_counter != 0) {
          printf("Failure: _alloc_counter does not decrease!\n");
-         return 1;
+         return EXIT_FAILURE;
       }
    }
 #endif
@@ -576,7 +532,6 @@ int main() {
          real_2d_array a = "[[2,1],[1,3]]";
          real_2d_array b = "[[2,1],[0,1]]";
          real_2d_array c = "[[0,0],[0,0]]";
-      //
       // rmatrixgemm() function allows us to calculate matrix product C = A*B or
       // to perform more general operation, C = alpha*op1(A)*op2(B)+beta*C,
       // where A, B, C are rectangular matrices, op(X) can be X or X^T,
@@ -607,7 +562,6 @@ int main() {
       //
       // IMPORTANT: this function works with preallocated C, which must be large
       //            enough to store multiplication result.
-      //
          ae_int_t m = 2;
          ae_int_t n = 2;
          ae_int_t k = 2;
@@ -623,9 +577,7 @@ int main() {
          ae_int_t jc = 0;
          rmatrixgemm(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
          Ok = Ok && doc_test_real_matrix(c, "[[4,3],[2,4]]", 0.0001);
-      //
       // Now we try to apply some simple transformation to operands: C = A*B^T
-      //
          optypeb = 1;
          rmatrixgemm(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
          Ok = Ok && doc_test_real_matrix(c, "[[5,1],[5,3]]", 0.0001);
@@ -640,7 +592,6 @@ int main() {
    // printf("TEST ablas_d_syrk: Symmetric rank-K update (single-threaded)\n"), fflush(stdout);
       Ok = true;
       try {
-      //
       // rmatrixsyrk() function allows us to calculate symmetric rank-K update
       // C = beta*C + alpha*A'*A, where C is square N*N matrix, A is square K*N
       // matrix, alpha and beta are scalars. It is also possible to update by
@@ -663,7 +614,6 @@ int main() {
       //
       // NOTE: beta == 0 and we do not use previous value of C, but still it
       //       MUST be preallocated.
-      //
          ae_int_t n = 2;
          ae_int_t k = 1;
          double alpha = 1.0;
@@ -714,7 +664,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 1; Test++) {
          try {
-         //
          // This example demonstrates creation/initialization of the sparse matrix
          // and matrix-vector multiplication.
          //
@@ -725,21 +674,18 @@ int main() {
          // NOTE: Unlike CRS format, Hash-Table representation allows you to initialize
          // elements in the arbitrary order. You may see that we initialize a[0][0] first,
          // then move to the second row, and then move back to the first row.
-         //
             sparsematrix s;
             sparsecreate(2, 2, s);
             sparseset(s, 0, 0, 2.0);
             sparseset(s, 1, 1, 1.0);
             sparseset(s, 0, 1, 1.0);
             sparseadd(s, 1, 1, 4.0);
-         //
          // Now S is equal to
          //   [ 2 1 ]
          //   [   5 ]
-         // Lets check it by reading matrix contents with sparseget().
+         // Let's check it by reading matrix contents with sparseget().
          // You may see that with sparseget() you may read both non-zero
          // and zero elements.
-         //
             double v;
             v = sparseget(s, 0, 0);
             Ok = Ok && doc_test_real(v, 2.0000, 0.005);
@@ -749,7 +695,6 @@ int main() {
             Ok = Ok && doc_test_real(v, 0.0000, 0.005);
             v = sparseget(s, 1, 1);
             Ok = Ok && doc_test_real(v, 5.0000, 0.005);
-         //
          // After successful creation we can use our matrix for linear operations.
          //
          // However, there is one more thing we MUST do before using S in linear
@@ -757,12 +702,9 @@ int main() {
          // initialization and dynamic operations) to CRS format with sparseconverttocrs()
          // call. If you omit this call, ALGLIB will generate exception on the first
          // attempt to use S in linear operations.
-         //
             sparseconverttocrs(s);
-         //
          // Now S is in the CRS format and we are ready to do linear operations.
-         // Lets calculate A*x for some x.
-         //
+         // Let's calculate A*x for some x.
             real_1d_array x = "[1,-1]";
             if (Test == 0)
                spoil_vector_by_deleting_element(x);
@@ -783,7 +725,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 2; Test++) {
          try {
-         //
          // This example demonstrates creation/initialization of the sparse matrix in the
          // CRS format.
          //
@@ -803,7 +744,6 @@ int main() {
          // * initialize matrix with sparseset() - another function, sparseadd(), is not allowed
          // * initialize elements from left to right, from top to bottom, each
          //   element is initialized only once.
-         //
             sparsematrix s;
             integer_1d_array row_sizes = "[2,2,2,1]";
             if (Test == 0)
@@ -816,7 +756,6 @@ int main() {
             sparseset(s, 2, 2, 3.0);
             sparseset(s, 2, 3, 1.0);
             sparseset(s, 3, 3, 9.0);
-         //
          // Now S is equal to
          //   [ 2 1     ]
          //   [   4 2   ]
@@ -832,7 +771,6 @@ int main() {
          // However, you should remember that sparseget() is inefficient on
          // CRS matrices (it may have to pass through all elements of the row
          // until it finds element you need).
-         //
             double v;
             v = sparseget(s, 0, 0);
             Ok = Ok && doc_test_real(v, 2.0000, 0.005);
@@ -841,10 +779,8 @@ int main() {
          // you may see that you can read zero elements (which are not stored) with sparseget()
             v = sparseget(s, 3, 2);
             Ok = Ok && doc_test_real(v, 0.0000, 0.005);
-         //
          // After successful creation we can use our matrix for linear operations.
-         // Lets calculate A*x for some x.
-         //
+         // Let's calculate A*x for some x.
             real_1d_array x = "[1,-1,1,-1]";
             if (Test == 1)
                spoil_vector_by_deleting_element(x);
@@ -865,7 +801,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 4; Test++) {
          try {
-         //
          // This example demonstrates creation/initialization of the sparse matrix
          // in the SKS (Skyline) storage format and solution using SKS-based direct
          // solver.
@@ -884,7 +819,6 @@ int main() {
          //
          // 3. Because SKS solver need just one triangle of SPD matrix, we can
          //    omit initialization of the lower triangle of our matrix.
-         //
             ae_int_t n = 4;
             ae_int_t bandwidth = 1;
             sparsematrix s;
@@ -896,7 +830,6 @@ int main() {
             sparseset(s, 2, 2, 3.0);
             sparseset(s, 2, 3, 1.0);
             sparseset(s, 3, 3, 2.0);
-         //
          // Now we have symmetric positive definite 4x4 system width bandwidth == 1:
          //
          //     [ 2 1     ]   [ x0]]   [  4 ]
@@ -905,7 +838,6 @@ int main() {
          //     [     1 2 ]   [ x3 ]   [ 11 ]
          //
          // After successful creation we can call SKS solver.
-         //
             real_1d_array b = "[4,10,15,11]";
             if (Test == 0)
                spoil_vector_by_nan(b);
@@ -934,7 +866,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 4; Test++) {
          try {
-         //
          // This example illustrates solution of sparse linear systems with
          // conjugate gradient method.
          //
@@ -964,7 +895,6 @@ int main() {
          // matrix A, both lower and upper triangles. However, it is symmetric
          // and sparse solver needs just one half of the matrix. So you may
          // save about half of the space by filling only one of the triangles.
-         //
             sparsematrix a;
             sparsecreate(5, 5, a);
             sparseset(a, 0, 0, 5.0);
@@ -980,7 +910,6 @@ int main() {
             sparseset(a, 3, 4, 1.0);
             sparseset(a, 4, 3, 1.0);
             sparseset(a, 4, 4, 4.0);
-         //
          // Now our matrix is fully initialized, but we have to do one more
          // step - convert it from Hash-Table format to CRS format (see
          // documentation on sparse matrices for more information about these
@@ -988,11 +917,8 @@ int main() {
          //
          // If you omit this call, ALGLIB will generate exception on the first
          // attempt to use A in linear operations.
-         //
             sparseconverttocrs(a);
-         //
          // Initialization of the right part
-         //
             real_1d_array b = "[7,17,14,10,6]";
             if (Test == 0)
                spoil_vector_by_nan(b);
@@ -1002,7 +928,6 @@ int main() {
                spoil_vector_by_neginf(b);
             if (Test == 3)
                spoil_vector_by_deleting_element(b);
-         //
          // Now we have to create linear solver object and to use it for the
          // solution of the linear system.
          //
@@ -1010,7 +935,6 @@ int main() {
          //       what triangle of the symmetric matrix should be used - upper
          //       or lower. Because we've filled both parts of the matrix, we
          //       can use any part - upper or lower.
-         //
             lincgstate s;
             lincgreport rep;
             real_1d_array x;
@@ -1033,7 +957,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 4; Test++) {
          try {
-         //
          // This example illustrates solution of sparse linear least squares problem
          // with LSQR algorithm.
          //
@@ -1058,7 +981,6 @@ int main() {
          // which allows easy initialization, but do not allow matrix to be
          // used in the linear solvers. So after construction you should convert
          // sparse matrix to CRS format (one suited for linear operations).
-         //
             sparsematrix a;
             sparsecreate(5, 2, a);
             sparseset(a, 0, 0, 1.0);
@@ -1069,7 +991,6 @@ int main() {
             sparseset(a, 2, 1, 1.0);
             sparseset(a, 3, 0, 1.0);
             sparseset(a, 4, 1, 1.0);
-         //
          // Now our matrix is fully initialized, but we have to do one more
          // step - convert it from Hash-Table format to CRS format (see
          // documentation on sparse matrices for more information about these
@@ -1077,11 +998,8 @@ int main() {
          //
          // If you omit this call, ALGLIB will generate exception on the first
          // attempt to use A in linear operations.
-         //
             sparseconverttocrs(a);
-         //
          // Initialization of the right part
-         //
             real_1d_array b = "[4,2,4,1,2]";
             if (Test == 0)
                spoil_vector_by_nan(b);
@@ -1091,10 +1009,8 @@ int main() {
                spoil_vector_by_neginf(b);
             if (Test == 3)
                spoil_vector_by_deleting_element(b);
-         //
          // Now we have to create linear solver object and to use it for the
          // solution of the linear system.
-         //
             linlsqrstate s;
             linlsqrreport rep;
             real_1d_array x;
@@ -1323,20 +1239,18 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 15; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x,y) = 100*(x+3)^4+(y-3)^4
          //
          // using LBFGS method, with:
          // * initial point x == [0,0]
-         // * unit scale being set for all variables (see minlbfgssetscale for more info)
+         // * unit scale being set for all variables (see minlbfgssetscale for more information)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
          //   for some common errors like nonsmoothness or bad analytic gradient
          //
          // First, we create optimizer object and tune its properties
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -1377,7 +1291,6 @@ int main() {
             minlbfgscreate(1, x, state);
             minlbfgssetcond(state, epsg, epsf, epsx, maxits);
             minlbfgssetscale(state, s);
-         //
          // Activate OptGuard integrity checking.
          //
          // OptGuard monitor helps to catch common coding and problem statement
@@ -1396,22 +1309,17 @@ int main() {
          //
          //            Other OptGuard checks add moderate overhead, but anyway
          //            it is better to turn them off when they are not needed.
-         //
             minlbfgsoptguardsmoothness(state);
             minlbfgsoptguardgradient(state, 0.001);
-         //
          // Optimize and examine results.
-         //
             minlbfgsreport rep;
             minlbfgsoptimize(state, function1_grad);
             minlbfgsresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
-         //
          // Check that OptGuard did not report errors
          //
          // NOTE: want to test OptGuard? Try breaking the gradient - say, add
          //       1.0 to some of its components.
-         //
             optguardreport ogrep;
             minlbfgsoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
@@ -1431,14 +1339,12 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 21; Test++) {
          try {
-         //
          // This example demonstrates minimization of f(x,y) = 100*(x+3)^4+(y-3)^4
          // using LBFGS method.
          //
          // Several advanced techniques are demonstrated:
          // * upper limit on step size
          // * restart from new point
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -1538,10 +1444,8 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 15; Test++) {
          try {
-         //
          // This example demonstrates minimization of f(x,y) = 100*(x+3)^4+(y-3)^4
          // using numerical differentiation to calculate gradient.
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -1600,7 +1504,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 20; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x,y) = 100*(x+3)^4+(y-3)^4
@@ -1611,7 +1514,7 @@ int main() {
          //
          // using BLEIC optimizer with:
          // * initial point x == [0,0]
-         // * unit scale being set for all variables (see minbleicsetscale for more info)
+         // * unit scale being set for all variables (see minbleicsetscale for more information)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
          //   for some common errors like nonsmoothness or bad analytic gradient
@@ -1620,7 +1523,6 @@ int main() {
          // * set box constraints
          // * set variable scales
          // * set stopping criteria
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -1674,7 +1576,6 @@ int main() {
             minbleicsetbc(state, bndl, bndu);
             minbleicsetscale(state, s);
             minbleicsetcond(state, epsg, epsf, epsx, maxits);
-         //
          // Then we activate OptGuard integrity checking.
          //
          // OptGuard monitor helps to catch common coding and problem statement
@@ -1693,23 +1594,18 @@ int main() {
          //
          //            Other OptGuard checks add moderate overhead, but anyway
          //            it is better to turn them off when they are not needed.
-         //
             minbleicoptguardsmoothness(state);
             minbleicoptguardgradient(state, 0.001);
-         //
          // Optimize and evaluate results
-         //
             minbleicreport rep;
             minbleicoptimize(state, function1_grad);
             minbleicresults(state, x, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, 4);
             Ok = Ok && doc_test_real_vector(x, "[-1,1]", 0.005);
-         //
          // Check that OptGuard did not report errors
          //
          // NOTE: want to test OptGuard? Try breaking the gradient - say, add
          //       1.0 to some of its components.
-         //
             optguardreport ogrep;
             minbleicoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
@@ -1729,7 +1625,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 22; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x,y) = 100*(x+3)^4+(y-3)^4
@@ -1741,7 +1636,7 @@ int main() {
          //
          // using BLEIC optimizer with
          // * initial point x == [0,0]
-         // * unit scale being set for all variables (see minbleicsetscale for more info)
+         // * unit scale being set for all variables (see minbleicsetscale for more information)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
          //   for some common errors like nonsmoothness or bad analytic gradient
@@ -1750,7 +1645,6 @@ int main() {
          // * set linear constraints
          // * set variable scales
          // * set stopping criteria
-         //
             real_1d_array x = "[5,5]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -1808,7 +1702,6 @@ int main() {
             minbleicsetlc(state, c, ct);
             minbleicsetscale(state, s);
             minbleicsetcond(state, epsg, epsf, epsx, maxits);
-         //
          // Then we activate OptGuard integrity checking.
          //
          // OptGuard monitor helps to catch common coding and problem statement
@@ -1827,23 +1720,18 @@ int main() {
          //
          //            Other OptGuard checks add moderate overhead, but anyway
          //            it is better to turn them off when they are not needed.
-         //
             minbleicoptguardsmoothness(state);
             minbleicoptguardgradient(state, 0.001);
-         //
          // Optimize and evaluate results
-         //
             minbleicreport rep;
             minbleicoptimize(state, function1_grad);
             minbleicresults(state, x, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, 4);
             Ok = Ok && doc_test_real_vector(x, "[2,4]", 0.005);
-         //
          // Check that OptGuard did not report errors
          //
          // NOTE: want to test OptGuard? Try breaking the gradient - say, add
          //       1.0 to some of its components.
-         //
             optguardreport ogrep;
             minbleicoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
@@ -1863,7 +1751,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 23; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x,y) = 100*(x+3)^4+(y-3)^4
@@ -1875,7 +1762,7 @@ int main() {
          // using BLEIC optimizer with:
          // * numerical differentiation being used
          // * initial point x == [0,0]
-         // * unit scale being set for all variables (see minbleicsetscale for more info)
+         // * unit scale being set for all variables (see minbleicsetscale for more information)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
          //   for some common errors like nonsmoothness or bad analytic gradient
@@ -1884,7 +1771,6 @@ int main() {
          // * set box constraints
          // * set variable scales
          // * set stopping criteria
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -1945,7 +1831,6 @@ int main() {
             minbleicsetbc(state, bndl, bndu);
             minbleicsetscale(state, s);
             minbleicsetcond(state, epsg, epsf, epsx, maxits);
-         //
          // Then we activate OptGuard integrity checking.
          //
          // Numerical differentiation always produces "correct" gradient
@@ -1955,23 +1840,18 @@ int main() {
          // Sometimes user accidentally tries to solve nonsmooth problems
          // with smooth optimizer. OptGuard helps to detect such situations
          // early, at the prototyping stage.
-         //
             minbleicoptguardsmoothness(state);
-         //
          // Optimize and evaluate results
-         //
             minbleicreport rep;
             minbleicoptimize(state, function1_func);
             minbleicresults(state, x, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, 4);
             Ok = Ok && doc_test_real_vector(x, "[-1,1]", 0.005);
-         //
          // Check that OptGuard did not report errors
          //
          // Want to challenge OptGuard? Try to make your problem
          // nonsmooth by replacing 100*(x+3)^4 by 100*|x+3| and
          // re-run optimizer.
-         //
             optguardreport ogrep;
             minbleicoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
@@ -1990,7 +1870,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 17; Test++) {
          try {
-         //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1
          //
          // Exact solution is [x0,x1] = [3,2]
@@ -2009,7 +1888,6 @@ int main() {
          // For example, our function is f(x) == x0^2+x1^2+..., but we rewrite it as
          //     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
          // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
-         //
             real_2d_array a = "[[2,0],[0,2]]";
             if (Test == 0)
                spoil_matrix_by_nan(a);
@@ -2065,7 +1943,6 @@ int main() {
          // NOTE: for convex problems you may try using minqpsetscaleautodiag()
          //       which automatically determines variable scales.
             minqpsetscale(state, s);
-         //
          // Solve problem with QuickQP solver.
          //
          // This solver is intended for medium and large-scale problems with box
@@ -2073,12 +1950,10 @@ int main() {
          // also be efficiently used on unconstrained problems.
          //
          // Default stopping criteria are used, Newton phase is active.
-         //
             minqpsetalgoquickqp(state, 0.0, 0.0, 0.0, 0, true);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[3,2]", 0.005);
-         //
          // Solve problem with BLEIC-based QP solver.
          //
          // This solver is intended for problems with moderate (up to 50) number
@@ -2086,12 +1961,10 @@ int main() {
          // Of course, unconstrained problems can be solved too.
          //
          // Default stopping criteria are used.
-         //
             minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[3,2]", 0.005);
-         //
          // Solve problem with DENSE-AUL solver.
          //
          // This solver is optimized for problems with up to several thousands of
@@ -2101,7 +1974,6 @@ int main() {
          // However, DENSE-AUL will work in any (including unconstrained) case.
          //
          // Default stopping criteria are used.
-         //
             minqpsetalgodenseaul(state, 1.0E-9, 10000.0, 5);
             minqpoptimize(state);
             minqpresults(state, x, rep);
@@ -2120,7 +1992,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 21; Test++) {
          try {
-         //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1
          // subject to bound constraints 0 <= x0 <= 2.5, 0 <= x1 <= 2.5
          //
@@ -2140,7 +2011,6 @@ int main() {
          // For example, our function is f(x) == x0^2+x1^2+..., but we rewrite it as
          //     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
          // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
-         //
             real_2d_array a = "[[2,0],[0,2]]";
             if (Test == 0)
                spoil_matrix_by_nan(a);
@@ -2207,32 +2077,27 @@ int main() {
          // NOTE: for convex problems you may try using minqpsetscaleautodiag()
          //       which automatically determines variable scales.
             minqpsetscale(state, s);
-         //
          // Solve problem with QuickQP solver.
          //
          // This solver is intended for medium and large-scale problems with box
          // constraints (general linear constraints are not supported).
          //
          // Default stopping criteria are used, Newton phase is active.
-         //
             minqpsetalgoquickqp(state, 0.0, 0.0, 0.0, 0, true);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, 4);
             Ok = Ok && doc_test_real_vector(x, "[2.5,2]", 0.005);
-         //
          // Solve problem with BLEIC-based QP solver.
          //
          // This solver is intended for problems with moderate (up to 50) number
          // of general linear constraints and unlimited number of box constraints.
          //
          // Default stopping criteria are used.
-         //
             minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[2.5,2]", 0.005);
-         //
          // Solve problem with DENSE-AUL solver.
          //
          // This solver is optimized for problems with up to several thousands of
@@ -2242,7 +2107,6 @@ int main() {
          // However, DENSE-AUL will work in any (including unconstrained) case.
          //
          // Default stopping criteria are used.
-         //
             minqpsetalgodenseaul(state, 1.0E-9, 10000.0, 5);
             minqpoptimize(state);
             minqpresults(state, x, rep);
@@ -2261,7 +2125,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 16; Test++) {
          try {
-         //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1
          // subject to linear constraint x0+x1 <= 2
          //
@@ -2275,7 +2138,6 @@ int main() {
          // For example, our function is f(x) == x0^2+x1^2+..., but we rewrite it as
          //     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
          // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
-         //
             real_2d_array a = "[[2,0],[0,2]]";
             if (Test == 0)
                spoil_matrix_by_nan(a);
@@ -2330,19 +2192,16 @@ int main() {
          // NOTE: for convex problems you may try using minqpsetscaleautodiag()
          //       which automatically determines variable scales.
             minqpsetscale(state, s);
-         //
          // Solve problem with BLEIC-based QP solver.
          //
          // This solver is intended for problems with moderate (up to 50) number
          // of general linear constraints and unlimited number of box constraints.
          //
          // Default stopping criteria are used.
-         //
             minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[1.500,0.500]", 0.05);
-         //
          // Solve problem with DENSE-AUL solver.
          //
          // This solver is optimized for problems with up to several thousands of
@@ -2352,19 +2211,16 @@ int main() {
          // However, DENSE-AUL will work in any (including unconstrained) case.
          //
          // Default stopping criteria are used.
-         //
             minqpsetalgodenseaul(state, 1.0E-9, 10000.0, 5);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[1.500,0.500]", 0.05);
-         //
          // Solve problem with QuickQP solver.
          //
          // This solver is intended for medium and large-scale problems with box
          // constraints, and...
          //
          // ...Oops! It does not support general linear constraints, -5 returned as completion code!
-         //
             minqpsetalgoquickqp(state, 0.0, 0.0, 0.0, 0, true);
             minqpoptimize(state);
             minqpresults(state, x, rep);
@@ -2383,7 +2239,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 12; Test++) {
          try {
-         //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1,
          // with quadratic term given by sparse matrix structure.
          //
@@ -2401,7 +2256,6 @@ int main() {
          // For example, our function is f(x) == x0^2+x1^2+..., but we rewrite it as
          //     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
          // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
-         //
             sparsematrix a;
             real_1d_array b = "[-6,-4]";
             if (Test == 0)
@@ -2451,7 +2305,6 @@ int main() {
          // NOTE: for convex problems you may try using minqpsetscaleautodiag()
          //       which automatically determines variable scales.
             minqpsetscale(state, s);
-         //
          // Solve problem with BLEIC-based QP solver.
          //
          // This solver is intended for problems with moderate (up to 50) number
@@ -2459,7 +2312,6 @@ int main() {
          // It also supports sparse problems.
          //
          // Default stopping criteria are used.
-         //
             minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0);
             minqpoptimize(state);
             minqpresults(state, x, rep);
@@ -2478,7 +2330,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 21; Test++) {
          try {
-         //
          // This example demonstrates minimization of nonconvex function
          //     F(x0,x1) = -(x0^2+x1^2)
          // subject to constraints x0,x1 in [1.0,2.0]
@@ -2498,7 +2349,6 @@ int main() {
          // For example, our function is f(x) == -(x0^2+x1^2), but we rewrite it as
          //     f(x) = 0.5*(-2*x0^2-2*x1^2)
          // and pass diag(-2,-2) as quadratic term - NOT diag(-1,-1)!
-         //
             real_2d_array a = "[[-2,0],[0,-2]]";
             if (Test == 0)
                spoil_matrix_by_nan(a);
@@ -2556,7 +2406,6 @@ int main() {
          //       which automatically determines variable scales; however,
          //       it does NOT work for non-convex problems.
             minqpsetscale(state, s);
-         //
          // Solve problem with BLEIC-based QP solver.
          //
          // This solver is intended for problems with moderate (up to 50) number
@@ -2566,12 +2415,10 @@ int main() {
          // below under constraints.
          //
          // Default stopping criteria are used.
-         //
             minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[2,2]", 0.005);
-         //
          // Solve problem with DENSE-AUL solver.
          //
          // This solver is optimized for problems with up to several thousands of
@@ -2585,13 +2432,12 @@ int main() {
          // solution they are locally convex).
          //
          // Default stopping criteria are used.
-         //
             minqpsetalgodenseaul(state, 1.0E-9, 10000.0, 5);
             minqpoptimize(state);
             minqpresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[2,2]", 0.005);
          // Hmm... this problem is bounded from below (has solution) only under constraints.
-         // What it we remove them?
+         // What if we remove them?
          //
          // You may see that BLEIC algorithm detects unboundedness of the problem,
          // -4 is returned as completion code. However, DENSE-AUL is unable to detect
@@ -2625,7 +2471,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 9; Test++) {
          try {
-         //
          // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
          //
          //     f0(x0,x1) = 10*(x0+3)^2
@@ -2637,7 +2482,6 @@ int main() {
          // * function vector f[] = {f1,f2}
          //
          // No other information (Jacobian, gradient, etc.) is needed.
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -2662,27 +2506,21 @@ int main() {
             ae_int_t maxits = 0;
             minlmstate state;
             minlmreport rep;
-         //
          // Create optimizer, tell it to:
          // * use numerical differentiation with step equal to 0.0001
          // * use unit scale for all variables (s is a unit vector)
          // * stop after short enough step (less than epsx)
-         //
             minlmcreatev(2, x, 0.0001, state);
             minlmsetcond(state, epsx, maxits);
             minlmsetscale(state, s);
-         //
          // Optimize
-         //
             minlmoptimize(state, function1_fvec);
-         //
          // Test optimization results
          //
          // NOTE: because we use numerical differentiation, we do not
          //       verify Jacobian correctness - it is always "correct".
          //       However, if you switch to analytic gradient, consider
          //       checking it with OptGuard (see other examples).
-         //
             minlmresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
             Ok = Ok && Test == -1;
@@ -2699,7 +2537,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 9; Test++) {
          try {
-         //
          // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
          //
          //     f0(x0,x1) = 10*(x0+3)^2
@@ -2710,7 +2547,6 @@ int main() {
          // Optimization algorithm uses:
          // * function vector f[] = {f1,f2}
          // * Jacobian matrix J = {dfi/dxj}.
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -2734,16 +2570,13 @@ int main() {
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
-         //
          // Create optimizer, tell it to:
          // * use analytic gradient provided by user
          // * use unit scale for all variables (s is a unit vector)
          // * stop after short enough step (less than epsx)
-         //
             minlmcreatevj(2, x, state);
             minlmsetcond(state, epsx, maxits);
             minlmsetscale(state, s);
-         //
          // Activate OptGuard integrity checking.
          //
          // OptGuard monitor helps to detect erroneous analytic Jacobian,
@@ -2755,19 +2588,13 @@ int main() {
          //
          // IMPORTANT: JACOBIAN VERIFICATION IS PERFORMED BY MEANS OF NUMERICAL
          //            DIFFERENTIATION, THUS DO NOT USE IT IN PRODUCTION CODE!
-         //
             minlmoptguardgradient(state, 0.001);
-         //
          // Optimize
-         //
             minlmoptimize(state, function1_fvec, function1_jac);
-         //
          // Test optimization results
-         //
             minlmreport rep;
             minlmresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
-         //
          // Check that OptGuard did not report errors
          //
          // NOTE: want to test OptGuard? Try breaking the Jacobian - say, add
@@ -2776,7 +2603,6 @@ int main() {
          // NOTE: unfortunately, specifics of LM optimization do not allow us
          //       to detect errors like nonsmoothness (like we do with other
          //       optimizers). So, only Jacobian correctness is verified.
-         //
             optguardreport ogrep;
             minlmoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
@@ -2794,7 +2620,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 6; Test++) {
          try {
-         //
          // This example demonstrates minimization of F(x0,x1) = 100*(x0+3)^4+(x1-3)^4
          // using "FGH" mode of the Levenberg-Marquardt optimizer.
          //
@@ -2805,7 +2630,6 @@ int main() {
          // * function value F(x0,x1)
          // * gradient G == {dF/dxi}
          // * Hessian H == {d2F/(dxi*dxj)}
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -2842,7 +2666,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 13; Test++) {
          try {
-         //
          // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
          //
          //     f0(x0,x1) = 10*(x0+3)^2
@@ -2859,7 +2682,6 @@ int main() {
          // * function vector f[] = {f1,f2}
          //
          // No other information (Jacobian, gradient, etc.) is needed.
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -2893,29 +2715,23 @@ int main() {
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minlmstate state;
-         //
          // Create optimizer, tell it to:
          // * use numerical differentiation with step equal to 1.0
          // * use unit scale for all variables (s is a unit vector)
          // * stop after short enough step (less than epsx)
          // * set box constraints
-         //
             minlmcreatev(2, x, 0.0001, state);
             minlmsetbc(state, bndl, bndu);
             minlmsetcond(state, epsx, maxits);
             minlmsetscale(state, s);
-         //
          // Optimize
-         //
             minlmoptimize(state, function1_fvec);
-         //
          // Test optimization results
          //
          // NOTE: because we use numerical differentiation, we do not
          //       verify Jacobian correctness - it is always "correct".
          //       However, if you switch to analytic gradient, consider
          //       checking it with OptGuard (see other examples).
-         //
             minlmreport rep;
             minlmresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-1,+1]", 0.005);
@@ -2933,14 +2749,12 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 9; Test++) {
          try {
-         //
          // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
          //
          //     f0(x0,x1) = 10*(x0+3)^2
          //     f1(x0,x1) = (x1-3)^2
          //
          // using several starting points and efficient restarts.
-         //
             real_1d_array x;
             double epsx = 0.0000000001;
             if (Test == 0)
@@ -2952,9 +2766,7 @@ int main() {
             ae_int_t maxits = 0;
             minlmstate state;
             minlmreport rep;
-         //
          // create optimizer using minlmcreatev()
-         //
             x = "[10,10]";
             if (Test == 3)
                spoil_vector_by_nan(x);
@@ -2967,13 +2779,11 @@ int main() {
             minlmoptimize(state, function1_fvec);
             minlmresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
-         //
          // restart optimizer using minlmrestartfrom()
          //
          // we can use different starting point, different function,
          // different stopping conditions, but problem size
          // must remain unchanged.
-         //
             x = "[4,4]";
             if (Test == 6)
                spoil_vector_by_nan(x);
@@ -3071,20 +2881,18 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 15; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x,y) = 100*(x+3)^4+(y-3)^4
          //
          // using nonlinear conjugate gradient method with:
          // * initial point x == [0,0]
-         // * unit scale being set for all variables (see mincgsetscale for more info)
+         // * unit scale being set for all variables (see mincgsetscale for more information)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
          //   for some common errors like nonsmoothness or bad analytic gradient
          //
          // First, we create optimizer object and tune its properties
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -3125,7 +2933,6 @@ int main() {
             mincgcreate(x, state);
             mincgsetcond(state, epsg, epsf, epsx, maxits);
             mincgsetscale(state, s);
-         //
          // Activate OptGuard integrity checking.
          //
          // OptGuard monitor helps to catch common coding and problem statement
@@ -3144,22 +2951,17 @@ int main() {
          //
          //            Other OptGuard checks add moderate overhead, but anyway
          //            it is better to turn them off when they are not needed.
-         //
             mincgoptguardsmoothness(state);
             mincgoptguardgradient(state, 0.001);
-         //
          // Optimize and evaluate results
-         //
             mincgreport rep;
             mincgoptimize(state, function1_grad);
             mincgresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
-         //
          // Check that OptGuard did not report errors
          //
          // NOTE: want to test OptGuard? Try breaking the gradient - say, add
          //       1.0 to some of its components.
-         //
             optguardreport ogrep;
             mincgoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
@@ -3179,14 +2981,12 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 21; Test++) {
          try {
-         //
          // This example demonstrates minimization of f(x,y) = 100*(x+3)^4+(y-3)^4
          // with nonlinear conjugate gradient method.
          //
          // Several advanced techniques are demonstrated:
          // * upper limit on step size
          // * restart from new point
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -3286,7 +3086,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 18; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x,y) = 100*(x+3)^4+(y-3)^4
@@ -3298,7 +3097,6 @@ int main() {
          // function.
          //
          // First, we set up optimizer...
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -3346,7 +3144,6 @@ int main() {
             mincgcreatef(x, diffstep, state);
             mincgsetcond(state, epsg, epsf, epsx, maxits);
             mincgsetscale(state, s);
-         //
          // Then, we activate OptGuard integrity checking.
          //
          // Numerical differentiation always produces "correct" gradient
@@ -3356,22 +3153,17 @@ int main() {
          // Sometimes user accidentally tried to solve nonsmooth problems
          // with smooth optimizer. OptGuard helps to detect such situations
          // early, at the prototyping stage.
-         //
             mincgoptguardsmoothness(state);
-         //
          // Now we are ready to run the optimization
-         //
             mincgreport rep;
             mincgoptimize(state, function1_func);
             mincgresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
-         //
          // ...and to check OptGuard integrity report.
          //
          // Want to challenge OptGuard? Try to make your problem
          // nonsmooth by replacing 100*(x+3)^4 by 100*|x+3| and
          // re-run optimizer.
-         //
             optguardreport ogrep;
             mincgoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
@@ -3390,7 +3182,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 15; Test++) {
          try {
-         //
          // This example demonstrates how to minimize
          //
          //     F(x0,x1) = -0.1*x0 - x1
@@ -3413,7 +3204,6 @@ int main() {
          // NOTE: some/all components of AL/AU can be +-INF, same applies to
          //       bndl/bndu. You can also have AL[I] == AU[i] (as well as
          //       BndL[i] == BndU[i]).
-         //
             real_2d_array a = "[[1,-1],[1,+1]]";
             if (Test == 0)
                spoil_matrix_by_nan(a);
@@ -3455,7 +3245,6 @@ int main() {
             minlpstate state;
             minlpreport rep;
             minlpcreate(2, state);
-         //
          // Set cost vector, box constraints, general linear constraints.
          //
          // Box constraints can be set in one call to minlpsetbc() or minlpsetbcall()
@@ -3472,18 +3261,15 @@ int main() {
          //   row being appended is specified as sparse set of elements
          // Independently from specific function being used, LP solver uses sparse
          // storage format for internal representation of constraints.
-         //
             minlpsetcost(state, c);
             minlpsetbc(state, bndl, bndu);
             minlpsetlc2dense(state, a, al, au, 2);
-         //
          // Set scale of the parameters.
          //
          // It is strongly recommended that you set scale of your variables.
          // Knowing their scales is essential for evaluation of stopping criteria
          // and for preconditioning of the algorithm steps.
          // You can find more information on scaling at http://www.alglib.net/optimization/scaling.php
-         //
             minlpsetscale(state, s);
          // Solve
             minlpoptimize(state);
@@ -3503,7 +3289,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 9; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x0,x1) = -x0+x1
@@ -3515,7 +3300,6 @@ int main() {
          // and nonlinear inequality constraint
          //
          //    x0^2 + x1^2 - 1 <= 0
-         //
             real_1d_array x0 = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x0);
@@ -3541,18 +3325,15 @@ int main() {
             real_1d_array bndl = "[0,0]";
             real_1d_array bndu = "[+inf,+inf]";
             minnlcstate state;
-         //
          // Create optimizer object and tune its settings:
          // * epsx == 0.000001  stopping condition for inner iterations
          // * s == [1,1]        all variables have unit scale; it is important to
          //                     tell optimizer about scales of your variables - it
          //                     greatly accelerates convergence and helps to perform
          //                     some important integrity checks.
-         //
             minnlccreate(2, x0, state);
             minnlcsetcond(state, epsx, maxits);
             minnlcsetscale(state, s);
-         //
          // Choose one of the nonlinear programming solvers supported by minnlc
          // optimizer:
          // * SQP - sequential quadratic programming NLP solver
@@ -3572,13 +3353,11 @@ int main() {
          // and then with SQP, so the effective choice is to use SLP. We recommend
          // you to use SQP at least for early prototyping stages, and then switch
          // to AUL if possible.
-         //
             double rho = 1000.0;
             ae_int_t outerits = 5;
             minnlcsetalgoaul(state, rho, outerits);
             minnlcsetalgoslp(state);
             minnlcsetalgosqp(state);
-         //
          // Set constraints:
          //
          // 1. boundary constraints are passed with minnlcsetbc() call
@@ -3596,10 +3375,8 @@ int main() {
          //       linear and general nonlinear constraints. This example does not
          //       show how to work with general linear constraints, but you can
          //       easily find it in documentation on minnlcsetlc() function.
-         //
             minnlcsetbc(state, bndl, bndu);
             minnlcsetnlc(state, 0, 1);
-         //
          // Activate OptGuard integrity checking.
          //
          // OptGuard monitor helps to catch common coding and problem statement
@@ -3618,10 +3395,8 @@ int main() {
          //
          //            Other OptGuard checks add moderate overhead, but anyway
          //            it is better to turn them off when they are not needed.
-         //
             minnlcoptguardsmoothness(state);
             minnlcoptguardgradient(state, 0.001);
-         //
          // Optimize and test results.
          //
          // Optimizer object accepts vector function and its Jacobian, with first
@@ -3641,18 +3416,15 @@ int main() {
          // with f0 being target function, f1 being constraining function. Number
          // of equality/inequality constraints is specified by minnlcsetnlc(),
          // with equality ones always being first, inequality ones being last.
-         //
             minnlcreport rep;
             real_1d_array x1;
             minnlcoptimize(state, nlcfunc1_jac);
             minnlcresults(state, x1, rep);
             Ok = Ok && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
-         //
          // Check that OptGuard did not report errors
          //
          // NOTE: want to test OptGuard? Try breaking the Jacobian - say, add
          //       1.0 to some of its components.
-         //
             optguardreport ogrep;
             minnlcoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
@@ -3672,7 +3444,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 9; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x0,x1) = -x0+x1
@@ -3680,7 +3451,6 @@ int main() {
          // subject to nonlinear equality constraint
          //
          //    x0^2 + x1^2 - 1 = 0
-         //
             real_1d_array x0 = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x0);
@@ -3704,15 +3474,12 @@ int main() {
                epsx = -INFINITY;
             ae_int_t maxits = 0;
             minnlcstate state;
-         //
          // Create optimizer object and tune its settings:
          // * epsx == 0.000001  stopping condition for inner iterations
          // * s == [1,1]        all variables have unit scale
-         //
             minnlccreate(2, x0, state);
             minnlcsetcond(state, epsx, maxits);
             minnlcsetscale(state, s);
-         //
          // Choose one of the nonlinear programming solvers supported by minnlc
          // optimizer:
          // * SLP - successive linear programming NLP solver
@@ -3741,12 +3508,10 @@ int main() {
          //
          // You can comment out line with SLP if you want to solve your problem with
          // AUL solver.
-         //
             double rho = 1000.0;
             ae_int_t outerits = 5;
             minnlcsetalgoaul(state, rho, outerits);
             minnlcsetalgoslp(state);
-         //
          // Set constraints:
          //
          // Nonlinear constraints are tricky - you can not "pack" general
@@ -3763,9 +3528,7 @@ int main() {
          //       show how to work with general linear constraints, but you can
          //       easily find it in documentation on minnlcsetbc() and
          //       minnlcsetlc() functions.
-         //
             minnlcsetnlc(state, 1, 0);
-         //
          // Activate OptGuard integrity checking.
          //
          // OptGuard monitor helps to catch common coding and problem statement
@@ -3784,10 +3547,8 @@ int main() {
          //
          //            Other OptGuard checks add moderate overhead, but anyway
          //            it is better to turn them off when they are not needed.
-         //
             minnlcoptguardsmoothness(state);
             minnlcoptguardgradient(state, 0.001);
-         //
          // Optimize and test results.
          //
          // Optimizer object accepts vector function and its Jacobian, with first
@@ -3807,18 +3568,15 @@ int main() {
          // with f0 being target function, f1 being constraining function. Number
          // of equality/inequality constraints is specified by minnlcsetnlc(),
          // with equality ones always being first, inequality ones being last.
-         //
             minnlcreport rep;
             real_1d_array x1;
             minnlcoptimize(state, nlcfunc1_jac);
             minnlcresults(state, x1, rep);
             Ok = Ok && doc_test_real_vector(x1, "[0.70710,-0.70710]", 0.005);
-         //
          // Check that OptGuard did not report errors
          //
          // NOTE: want to test OptGuard? Try breaking the Jacobian - say, add
          //       1.0 to some of its components.
-         //
             optguardreport ogrep;
             minnlcoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
@@ -3838,7 +3596,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 9; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x0,x1) = x0+x1
@@ -3850,7 +3607,6 @@ int main() {
          // and nonlinear equality constraint
          //
          //    x2-exp(x0) = 0
-         //
             real_1d_array x0 = "[0,0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x0);
@@ -3876,17 +3632,14 @@ int main() {
             minnlcstate state;
             minnlcreport rep;
             real_1d_array x1;
-         //
          // Create optimizer object and tune its settings:
          // * epsx == 0.000001  stopping condition for inner iterations
          // * s == [1,1]        all variables have unit scale
          // * upper limit on step length is specified (to avoid probing locations where exp() is large)
-         //
             minnlccreate(3, x0, state);
             minnlcsetcond(state, epsx, maxits);
             minnlcsetscale(state, s);
             minnlcsetstpmax(state, 10.0);
-         //
          // Choose one of the nonlinear programming solvers supported by minnlc
          // optimizer:
          // * SLP - successive linear programming NLP solver
@@ -3915,12 +3668,10 @@ int main() {
          //
          // You can comment out line with SLP if you want to solve your problem with
          // AUL solver.
-         //
             double rho = 1000.0;
             ae_int_t outerits = 5;
             minnlcsetalgoaul(state, rho, outerits);
             minnlcsetalgoslp(state);
-         //
          // Set constraints:
          //
          // Nonlinear constraints are tricky - you can not "pack" general
@@ -3937,9 +3688,7 @@ int main() {
          //       show how to work with boundary or general linear constraints, but you
          //       can easily find it in documentation on minnlcsetbc() and
          //       minnlcsetlc() functions.
-         //
             minnlcsetnlc(state, 1, 1);
-         //
          // Activate OptGuard integrity checking.
          //
          // OptGuard monitor helps to catch common coding and problem statement
@@ -3958,10 +3707,8 @@ int main() {
          //
          //            Other OptGuard checks add moderate overhead, but anyway
          //            it is better to turn them off when they are not needed.
-         //
             minnlcoptguardsmoothness(state);
             minnlcoptguardgradient(state, 0.001);
-         //
          // Optimize and test results.
          //
          // Optimizer object accepts vector function and its Jacobian, with first
@@ -3982,16 +3729,13 @@ int main() {
          // f2 being inequality constraint "f2 <= 0". Number of equality/inequality
          // constraints is specified by minnlcsetnlc(), with equality ones always
          // being first, inequality ones being last.
-         //
             minnlcoptimize(state, nlcfunc2_jac);
             minnlcresults(state, x1, rep);
             Ok = Ok && doc_test_real_vector(x1, "[-0.70710,-0.70710,0.49306]", 0.005);
-         //
          // Check that OptGuard did not report errors
          //
          // NOTE: want to test OptGuard? Try breaking the Jacobian - say, add
          //       1.0 to some of its components.
-         //
             optguardreport ogrep;
             minnlcoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
@@ -4011,13 +3755,11 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 15; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x0,x1) = 2*|x0|+|x1|
          //
          // using nonsmooth nonlinear optimizer.
-         //
             real_1d_array x0 = "[1,1]";
             if (Test == 0)
                spoil_vector_by_nan(x0);
@@ -4057,19 +3799,16 @@ int main() {
             minnsstate state;
             minnsreport rep;
             real_1d_array x1;
-         //
          // Create optimizer object, choose AGS algorithm and tune its settings:
          // * radius == 0.1     good initial value; will be automatically decreased later.
          // * rho == 0.0        penalty coefficient for nonlinear constraints; can be zero
          //                     because we do not have such constraints
          // * epsx == 0.000001  stopping conditions
          // * s == [1,1]        all variables have unit scale
-         //
             minnscreate(2, x0, state);
             minnssetalgoags(state, radius, rho);
             minnssetcond(state, epsx, maxits);
             minnssetscale(state, s);
-         //
          // Optimize and test results.
          //
          // Optimizer object accepts vector function and its Jacobian, with first
@@ -4123,7 +3862,6 @@ int main() {
          //       This note is here to warn you that you should be very careful when
          //       you solve nonsmooth optimization problems. Visual inspection of
          //       results is essential.
-         //
             minnsoptimize(state, nsfunc1_jac);
             minnsresults(state, x1, rep);
             Ok = Ok && doc_test_real_vector(x1, "[0.0000,0.0000]", 0.005);
@@ -4141,7 +3879,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 18; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x0,x1) = 2*|x0|+|x1|
@@ -4159,7 +3896,6 @@ int main() {
          //       then AGS solver with user-supplied gradient will need about 10.000
          //       function evaluations, and with numerical gradient about 1.000.000
          //       function evaluations will be performed.
-         //
             real_1d_array x0 = "[1,1]";
             if (Test == 0)
                spoil_vector_by_nan(x0);
@@ -4206,19 +3942,16 @@ int main() {
             minnsstate state;
             minnsreport rep;
             real_1d_array x1;
-         //
          // Create optimizer object, choose AGS algorithm and tune its settings:
          // * radius == 0.1     good initial value; will be automatically decreased later.
          // * rho == 0.0        penalty coefficient for nonlinear constraints; can be zero
          //                     because we do not have such constraints
          // * epsx == 0.000001  stopping conditions
          // * s == [1,1]        all variables have unit scale
-         //
             minnscreatef(2, x0, diffstep, state);
             minnssetalgoags(state, radius, rho);
             minnssetcond(state, epsx, maxits);
             minnssetscale(state, s);
-         //
          // Optimize and test results.
          //
          // Optimizer object accepts vector function, with first component
@@ -4232,7 +3965,6 @@ int main() {
          // So, our vector function has form
          //
          //     {f0} = { 2*|x0|+|x1| }
-         //
             minnsoptimize(state, nsfunc1_fvec);
             minnsresults(state, x1, rep);
             Ok = Ok && doc_test_real_vector(x1, "[0.0000,0.0000]", 0.005);
@@ -4250,7 +3982,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 17; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x0,x1) = 2*|x0|+|x1|
@@ -4261,7 +3992,6 @@ int main() {
          //     -INF <= x1 < +INF
          //
          // using nonsmooth nonlinear optimizer.
-         //
             real_1d_array x0 = "[1,1]";
             if (Test == 0)
                spoil_vector_by_nan(x0);
@@ -4307,19 +4037,16 @@ int main() {
             minnsstate state;
             minnsreport rep;
             real_1d_array x1;
-         //
          // Create optimizer object, choose AGS algorithm and tune its settings:
          // * radius == 0.1     good initial value; will be automatically decreased later.
          // * rho == 0.0        penalty coefficient for nonlinear constraints; can be zero
          //                     because we do not have such constraints
          // * epsx == 0.000001  stopping conditions
          // * s == [1,1]        all variables have unit scale
-         //
             minnscreate(2, x0, state);
             minnssetalgoags(state, radius, rho);
             minnssetcond(state, epsx, maxits);
             minnssetscale(state, s);
-         //
          // Set box constraints.
          //
          // General linear constraints are set in similar way (see comments on
@@ -4327,9 +4054,7 @@ int main() {
          //
          // You may combine box, linear and nonlinear constraints in one optimization
          // problem.
-         //
             minnssetbc(state, bndl, bndu);
-         //
          // Optimize and test results.
          //
          // Optimizer object accepts vector function and its Jacobian, with first
@@ -4383,8 +4108,6 @@ int main() {
          //       This note is here to warn you that you should be very careful when
          //       you solve nonsmooth optimization problems. Visual inspection of
          //       results is essential.
-         //
-         //
             minnsoptimize(state, nsfunc1_jac);
             minnsresults(state, x1, rep);
             Ok = Ok && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
@@ -4402,20 +4125,18 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 15; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x0,x1) = 2*|x0|+|x1|
          //
          // subject to combination of equality and inequality constraints
          //
-         //      x0  =  1
+         //      x0 == 1
          //      x1 >= -1
          //
          // using nonsmooth nonlinear optimizer. Although these constraints
          // are linear, we treat them as general nonlinear ones in order to
          // demonstrate nonlinearly constrained optimization setup.
-         //
             real_1d_array x0 = "[1,1]";
             if (Test == 0)
                spoil_vector_by_nan(x0);
@@ -4455,7 +4176,6 @@ int main() {
             minnsstate state;
             minnsreport rep;
             real_1d_array x1;
-         //
          // Create optimizer object, choose AGS algorithm and tune its settings:
          // * radius == 0.1     good initial value; will be automatically decreased later.
          // * rho == 50.0       penalty coefficient for nonlinear constraints. It is your
@@ -4464,12 +4184,10 @@ int main() {
          //                     extreme slowdown due to ill-conditioning.
          // * epsx == 0.000001  stopping conditions
          // * s == [1,1]        all variables have unit scale
-         //
             minnscreate(2, x0, state);
             minnssetalgoags(state, radius, rho);
             minnssetcond(state, epsx, maxits);
             minnssetscale(state, s);
-         //
          // Set general nonlinear constraints.
          //
          // This part is more tricky than working with box/linear constraints - you
@@ -4485,9 +4203,7 @@ int main() {
          //       linear and general nonlinear constraints. This example does not
          //       show how to work with general linear constraints, but you can
          //       easily find it in documentation on minnlcsetlc() function.
-         //
             minnssetnlc(state, 1, 1);
-         //
          // Optimize and test results.
          //
          // Optimizer object accepts vector function and its Jacobian, with first
@@ -4540,7 +4256,6 @@ int main() {
          //       This note is here to warn you that you should be very careful when
          //       you solve nonsmooth optimization problems. Visual inspection of
          //       results is essential.
-         //
             minnsoptimize(state, nsfunc2_jac);
             minnsresults(state, x1, rep);
             Ok = Ok && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
@@ -4558,7 +4273,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 20; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x,y) = 100*(x+3)^4+(y-3)^4
@@ -4569,7 +4283,7 @@ int main() {
          //
          // using MinBC optimizer with:
          // * initial point x == [0,0]
-         // * unit scale being set for all variables (see minbcsetscale for more info)
+         // * unit scale being set for all variables (see minbcsetscale for more information)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
          //   for some common errors like nonsmoothness or bad analytic gradient
@@ -4578,7 +4292,6 @@ int main() {
          // * set box constraints
          // * set variable scales
          // * set stopping criteria
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -4632,7 +4345,6 @@ int main() {
             minbcsetbc(state, bndl, bndu);
             minbcsetscale(state, s);
             minbcsetcond(state, epsg, epsf, epsx, maxits);
-         //
          // Then we activate OptGuard integrity checking.
          //
          // OptGuard monitor helps to catch common coding and problem statement
@@ -4651,22 +4363,17 @@ int main() {
          //
          //            Other OptGuard checks add moderate overhead, but anyway
          //            it is better to turn them off when they are not needed.
-         //
             minbcoptguardsmoothness(state);
             minbcoptguardgradient(state, 0.001);
-         //
          // Optimize and evaluate results
-         //
             minbcreport rep;
             minbcoptimize(state, function1_grad);
             minbcresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-1,1]", 0.005);
-         //
          // Check that OptGuard did not report errors
          //
          // NOTE: want to test OptGuard? Try breaking the gradient - say, add
          //       1.0 to some of its components.
-         //
             optguardreport ogrep;
             minbcoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
@@ -4686,7 +4393,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 23; Test++) {
          try {
-         //
          // This example demonstrates minimization of
          //
          //     f(x,y) = 100*(x+3)^4+(y-3)^4
@@ -4698,11 +4404,10 @@ int main() {
          // using MinBC optimizer with:
          // * numerical differentiation being used
          // * initial point x == [0,0]
-         // * unit scale being set for all variables (see minbcsetscale for more info)
+         // * unit scale being set for all variables (see minbcsetscale for more information)
          // * stopping criteria set to "terminate after short enough step"
          // * OptGuard integrity check being used to check problem statement
          //   for some common errors like nonsmoothness or bad analytic gradient
-         //
             real_1d_array x = "[0,0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -4759,18 +4464,15 @@ int main() {
                diffstep = +INFINITY;
             if (Test == 22)
                diffstep = -INFINITY;
-         //
          // Now we are ready to actually optimize something:
          // * first we create optimizer
          // * we add boundary constraints
          // * we tune stopping conditions
          // * and, finally, optimize and obtain results...
-         //
             minbccreatef(x, diffstep, state);
             minbcsetbc(state, bndl, bndu);
             minbcsetscale(state, s);
             minbcsetcond(state, epsg, epsf, epsx, maxits);
-         //
          // Then we activate OptGuard integrity checking.
          //
          // Numerical differentiation always produces "correct" gradient
@@ -4780,22 +4482,17 @@ int main() {
          // Sometimes user accidentally tries to solve nonsmooth problems
          // with smooth optimizer. OptGuard helps to detect such situations
          // early, at the prototyping stage.
-         //
             minbcoptguardsmoothness(state);
-         //
          // Optimize and evaluate results
-         //
             minbcreport rep;
             minbcoptimize(state, function1_func);
             minbcresults(state, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[-1,1]", 0.005);
-         //
          // Check that OptGuard did not report errors
          //
          // Want to challenge OptGuard? Try to make your problem
          // nonsmooth by replacing 100*(x+3)^4 by 100*|x+3| and
          // re-run optimizer.
-         //
             optguardreport ogrep;
             minbcoptguardresults(state, ogrep);
             Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
@@ -4903,15 +4600,11 @@ int main() {
             real_1d_array x;
             real_2d_array r0 = "[[]]";
             real_2d_array r1 = "[[]]";
-         //
          // Build tree and serialize it
-         //
             kdtreebuild(a, nx, ny, normtype, kdt0);
             kdtreeserialize(kdt0, s);
             kdtreeunserialize(s, kdt1);
-         //
          // Compare results from KNN queries
-         //
             x = "[-1,0]";
             kdtreequeryknn(kdt0, x, 1);
             kdtreequeryresultsx(kdt0, r0);
@@ -5332,12 +5025,10 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 6; Test++) {
          try {
-         //
          // This example demonstrates integration of f == exp(x) on [0,1]:
          // * first, autogkstate is initialized
          // * then we call integration function
          // * and finally we obtain results with autogkresults() call
-         //
             double a = 0.0;
             if (Test == 0)
                a = NAN;
@@ -5387,23 +5078,17 @@ int main() {
             double adev;
             double p;
             double v;
-         //
          // Here we demonstrate calculation of sample moments
          // (mean, variance, skewness, kurtosis)
-         //
             samplemoments(x, mean, variance, skewness, kurtosis);
             Ok = Ok && doc_test_real(mean, 28.5, 0.01);
             Ok = Ok && doc_test_real(variance, 801.1667, 0.01);
             Ok = Ok && doc_test_real(skewness, 0.5751, 0.01);
             Ok = Ok && doc_test_real(kurtosis, -1.2666, 0.01);
-         //
          // Average deviation
-         //
             sampleadev(x, adev);
             Ok = Ok && doc_test_real(adev, 23.2, 0.01);
-         //
          // Median and percentile
-         //
             samplemedian(x, v);
             Ok = Ok && doc_test_real(v, 20.5, 0.01);
             p = 0.5;
@@ -5429,9 +5114,7 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 10; Test++) {
          try {
-         //
          // We have two samples - x and y, and want to measure dependency between them
-         //
             real_1d_array x = "[0,1,4,9,16,25,36,49,64,81]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -5455,12 +5138,10 @@ int main() {
             if (Test == 9)
                spoil_vector_by_deleting_element(y);
             double v;
-         //
          // Three dependency measures are calculated:
          // * covariation
          // * Pearson correlation
          // * Spearman rank correlation
-         //
             v = cov2(x, y);
             Ok = Ok && doc_test_real(v, 82.5, 0.001);
             v = pearsoncorr2(x, y);
@@ -5481,11 +5162,9 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // X is a sample matrix:
          // * I-th row corresponds to I-th observation
          // * J-th column corresponds to J-th variable
-         //
             real_2d_array x = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
             if (Test == 0)
                spoil_matrix_by_nan(x);
@@ -5494,7 +5173,6 @@ int main() {
             if (Test == 2)
                spoil_matrix_by_neginf(x);
             real_2d_array c;
-         //
          // Three dependency measures are calculated:
          // * covariation
          // * Pearson correlation
@@ -5502,7 +5180,6 @@ int main() {
          //
          // Result is stored into C, with C[i,j] equal to correlation
          // (covariance) between I-th and J-th variables of X.
-         //
             covm(x, c);
             Ok = Ok && doc_test_real_matrix(c, "[[1.80,0.60,-1.40],[0.60,0.70,-0.80],[-1.40,-0.80,14.70]]", 0.01);
             pearsoncorrm(x, c);
@@ -5523,11 +5200,9 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 6; Test++) {
          try {
-         //
          // X and Y are sample matrices:
          // * I-th row corresponds to I-th observation
          // * J-th column corresponds to J-th variable
-         //
             real_2d_array x = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
             if (Test == 0)
                spoil_matrix_by_nan(x);
@@ -5543,7 +5218,6 @@ int main() {
             if (Test == 5)
                spoil_matrix_by_neginf(y);
             real_2d_array c;
-         //
          // Three dependency measures are calculated:
          // * covariation
          // * Pearson correlation
@@ -5551,7 +5225,6 @@ int main() {
          //
          // Result is stored into C, with C[i,j] equal to correlation
          // (covariance) between I-th variable of X and J-th variable of Y.
-         //
             covm2(x, y, c);
             Ok = Ok && doc_test_real_matrix(c, "[[4.100,-3.250],[2.450,-1.500],[13.450,-5.750]]", 0.01);
             pearsoncorrm2(x, y, c);
@@ -5579,9 +5252,7 @@ int main() {
             double adev;
             double p;
             double v;
-         //
          // first, we test short form of functions
-         //
             real_1d_array x1 = "[0,1,4,9,16,25,36,49,64,81]";
             if (Test == 0)
                spoil_vector_by_nan(x1);
@@ -5621,9 +5292,7 @@ int main() {
             if (Test == 14)
                p = -INFINITY;
             samplepercentile(x4, p, v);
-         //
          // and then we test full form
-         //
             real_1d_array x5 = "[0,1,4,9,16,25,36,49,64,81]";
             if (Test == 15)
                spoil_vector_by_nan(x5);
@@ -5687,9 +5356,7 @@ int main() {
          try {
             double v;
             real_2d_array c;
-         //
          // 2-sample short-form cov/corr are tested
-         //
             real_1d_array x1 = "[0,1,4,9,16,25,36,49,64,81]";
             if (Test == 0)
                spoil_vector_by_nan(x1);
@@ -5759,9 +5426,7 @@ int main() {
             if (Test == 29)
                spoil_vector_by_deleting_element(y3);
             v = spearmancorr2(x3, y3);
-         //
          // 2-sample full-form cov/corr are tested
-         //
             real_1d_array x1a = "[0,1,4,9,16,25,36,49,64,81]";
             if (Test == 30)
                spoil_vector_by_nan(x1a);
@@ -5819,9 +5484,7 @@ int main() {
             if (Test == 53)
                spoil_vector_by_deleting_element(y3a);
             v = spearmancorr2(x3a, y3a, 10);
-         //
          // vector short-form cov/corr are tested.
-         //
             real_2d_array x4 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
             if (Test == 54)
                spoil_matrix_by_nan(x4);
@@ -5846,9 +5509,7 @@ int main() {
             if (Test == 62)
                spoil_matrix_by_neginf(x6);
             spearmancorrm(x6, c);
-         //
          // vector full-form cov/corr are tested.
-         //
             real_2d_array x7 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
             if (Test == 63)
                spoil_matrix_by_nan(x7);
@@ -5885,9 +5546,7 @@ int main() {
             if (Test == 77)
                spoil_matrix_by_deleting_col(x9);
             spearmancorrm(x9, 5, 3, c);
-         //
          // cross-vector short-form cov/corr are tested.
-         //
             real_2d_array x10 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
             if (Test == 78)
                spoil_matrix_by_nan(x10);
@@ -5933,9 +5592,7 @@ int main() {
             if (Test == 95)
                spoil_matrix_by_neginf(y12);
             spearmancorrm2(x12, y12, c);
-         //
          // cross-vector full-form cov/corr are tested.
-         //
             real_2d_array x13 = "[[1,0,1],[1,1,0],[-1,1,0],[-2,-1,1],[-1,0,9]]";
             if (Test == 96)
                spoil_matrix_by_nan(x13);
@@ -6019,7 +5676,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // This example illustrates basic concepts of the IDW models:
          // creation and evaluation.
          //
@@ -6034,9 +5690,7 @@ int main() {
          // 2. we attach our dataset to the IDW builder and tune algorithm settings
          // 3. we generate IDW model
          // 4. we use IDW model instance (evaluate, serialize, etc.)
-         //
             double v;
-         //
          // Step 1: IDW builder creation.
          //
          // We have to specify dimensionality of the space (2 or 3) and
@@ -6044,15 +5698,12 @@ int main() {
          //
          // New builder object is empty - it has not dataset and uses
          // default model construction settings
-         //
             idwbuilder builder;
             idwbuildercreate(2, 1, builder);
-         //
          // Step 2: dataset addition
          //
          // XY contains two points - x0 == (-1,0) and x1 == (+1,0) -
          // and two function values f(x0) == 2, f(x1) == 3.
-         //
             real_2d_array xy = "[[-1,0,2],[+1,0,3]]";
             if (Test == 0)
                spoil_matrix_by_nan(xy);
@@ -6061,7 +5712,6 @@ int main() {
             if (Test == 2)
                spoil_matrix_by_neginf(xy);
             idwbuildersetpoints(builder, xy);
-         //
          // Step 3: choose IDW algorithm and generate model
          //
          // We use modified stabilized IDW algorithm with following parameters:
@@ -6070,14 +5720,11 @@ int main() {
          // IDW-MSTAB algorithm is a state-of-the-art implementation of IDW which
          // is competitive with RBFs and bicubic splines. See comments on the
          // idwbuildersetalgomstab() function for more information.
-         //
             idwmodel model;
             idwreport rep;
             idwbuildersetalgomstab(builder, 5.0);
             idwfit(builder, model, rep);
-         //
          // Step 4: model was built, evaluate its value
-         //
             v = idwcalc2(model, 1.0, 0.0);
             Ok = Ok && doc_test_real(v, 3.000, 0.005);
             Ok = Ok && Test == -1;
@@ -6094,7 +5741,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // This example shows how to serialize and unserialize IDW model.
          //
          // Suppose that we have set of 2-dimensional points with associated
@@ -6109,7 +5755,6 @@ int main() {
          //
          // Our first step is to build model, evaluate it at point (1,0),
          // and serialize it to string.
-         //
             std::string s;
             double v;
             real_2d_array xy = "[[-1,0,2],[+1,0,3]]";
@@ -6129,15 +5774,11 @@ int main() {
             idwfit(builder, model, rep);
             v = idwcalc2(model, 1.0, 0.0);
             Ok = Ok && doc_test_real(v, 3.000, 0.005);
-         //
          // Serialization + unserialization to a different instance
          // of the model class.
-         //
             idwserialize(model, s);
             idwunserialize(s, model2);
-         //
          // Evaluate unserialized model at the same point
-         //
             v = idwcalc2(model2, 1.0, 0.0);
             Ok = Ok && doc_test_real(v, 3.000, 0.005);
             Ok = Ok && Test == -1;
@@ -6154,10 +5795,8 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 12; Test++) {
          try {
-         //
          // Here we demonstrate polynomial interpolation and differentiation
          // of y == x^2-x sampled at [0,1,2]. Barycentric representation of polynomial is used.
-         //
             real_1d_array x = "[0,1,2]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -6220,10 +5859,8 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 5; Test++) {
          try {
-         //
          // Here we demonstrate conversion of y == x^2-x
          // between power basis and barycentric representation.
-         //
             real_1d_array a = "[0,-1,+1]";
             if (Test == 0)
                spoil_vector_by_nan(a);
@@ -6239,13 +5876,11 @@ int main() {
             real_1d_array a2;
             double v;
             barycentricinterpolant p;
-         //
          // a == [0,-1,+1] is decomposition of y == x^2-x in the power basis:
          //
          //     y = 0 - 1*x + 1*x^2
          //
          // We convert it to the barycentric form.
-         //
             polynomialpow2bar(a, p);
          // now we have barycentric interpolation; we can use it for interpolation
             v = barycentriccalc(p, t);
@@ -6267,7 +5902,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 11; Test++) {
          try {
-         //
          // Temporaries:
          // * values of y == x^2-x sampled at three special grids:
          //   * equdistant grid spanning [0,2],     x[i] = 2*i/(N-1), i = 0..N-1
@@ -6275,7 +5909,6 @@ int main() {
          //   * Chebyshev-II grid spanning [-1,+1], x[i] = 1 + cos(pi i/(n - 1)), i = 0..N-1
          // * barycentric interpolants for these three grids
          // * vectors to store coefficients of quadratic representation
-         //
             real_1d_array y_eqdist = "[0,0,2]";
             if (Test == 0)
                spoil_vector_by_nan(y_eqdist);
@@ -6303,13 +5936,11 @@ int main() {
             real_1d_array a_eqdist;
             real_1d_array a_cheb1;
             real_1d_array a_cheb2;
-         //
          // First, we demonstrate construction of barycentric interpolants on
          // special grids. We unpack power representation to ensure that
          // interpolant was built correctly.
          //
          // In all three cases we should get same quadratic function.
-         //
             polynomialbuildeqdist(0.0, 2.0, y_eqdist, p_eqdist);
             polynomialbar2pow(p_eqdist, a_eqdist);
             Ok = Ok && doc_test_real_vector(a_eqdist, "[0,-1,+1]", 0.00005);
@@ -6319,13 +5950,11 @@ int main() {
             polynomialbuildcheb2(-1, +1, y_cheb2, p_cheb2);
             polynomialbar2pow(p_cheb2, a_cheb2);
             Ok = Ok && doc_test_real_vector(a_cheb2, "[0,-1,+1]", 0.00005);
-         //
          // Now we demonstrate polynomial interpolation without construction
          // of the barycentricinterpolant structure.
          //
          // We calculate interpolant value at x == -2.
          // In all three cases we should get same f == 6
-         //
             double t = -2.0;
             if (Test == 9)
                t = +INFINITY;
@@ -6864,10 +6493,8 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 12; Test++) {
          try {
-         //
          // We use piecewise linear spline to interpolate f(x) == x^2 sampled
          // at 5 equidistant nodes on [-1,+1].
-         //
             real_1d_array x = "[-1.0,-0.5,0.0,+0.5,+1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -6916,7 +6543,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 10; Test++) {
          try {
-         //
          // We use cubic spline to interpolate f(x) == x^2 sampled
          // at 5 equidistant nodes on [-1,+1].
          //
@@ -6928,7 +6554,6 @@ int main() {
          //     d2S(-1)/dx^2 = 0.0
          //     d2S(+1)/dx^2 = 0.0
          // and see that such spline interpolated f(x) with small error.
-         //
             real_1d_array x = "[-1.0,-0.5,0.0,+0.5,+1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -6955,17 +6580,13 @@ int main() {
             double v;
             spline1dinterpolant s;
             ae_int_t natural_bound_type = 2;
-         //
          // Test exact boundary conditions: build S(x), calculare S(0.25)
          // (almost same as original function)
-         //
             spline1dbuildcubic(x, y, s);
             v = spline1dcalc(s, t);
             Ok = Ok && doc_test_real(v, 0.0625, 0.00001);
-         //
          // Test natural boundary conditions: build S(x), calculare S(0.25)
          // (small interpolation error)
-         //
             spline1dbuildcubic(x, y, 5, natural_bound_type, 0.0, natural_bound_type, 0.0, s);
             v = spline1dcalc(s, t);
             Ok = Ok && doc_test_real(v, 0.0580, 0.0001);
@@ -6983,7 +6604,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 10; Test++) {
          try {
-         //
          // Spline built witn spline1dbuildcubic() can be non-monotone even when
          // Y-values form monotone sequence. Say, for x == [0,1,2] and y == [0,1,1]
          // cubic spline will monotonically grow until x == 1.5 and then start
@@ -6995,7 +6615,6 @@ int main() {
          //
          // NOTE: in case original dataset is non-monotonic, ALGLIB splits it
          // into monotone subsequences and builds piecewise monotonic spline.
-         //
             real_1d_array x = "[0,1,2]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -7050,7 +6669,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 10; Test++) {
          try {
-         //
          // We use cubic spline to do grid differentiation, i.e. having
          // values of f(x) == x^2 sampled at 5 equidistant nodes on [-1,+1]
          // we calculate derivatives of cubic spline at nodes WITHOUT
@@ -7066,7 +6684,6 @@ int main() {
          // Actually, we could use natural conditions, but we feel that
          // spline which exactly reproduces f() will show us more
          // understandable results.
-         //
             real_1d_array x = "[-1.0,-0.5,0.0,+0.5,+1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -7091,15 +6708,11 @@ int main() {
                spoil_vector_by_deleting_element(y);
             real_1d_array d1;
             real_1d_array d2;
-         //
          // We calculate first derivatives: they must be equal to 2*x
-         //
             spline1dgriddiffcubic(x, y, d1);
             Ok = Ok && doc_test_real_vector(d1, "[-2.0, -1.0, 0.0, +1.0, +2.0]", 0.0001);
-         //
          // Now test griddiff2, which returns first AND second derivatives.
          // First derivative is 2*x, second is equal to 2.0
-         //
             spline1dgriddiff2cubic(x, y, d1, d2);
             Ok = Ok && doc_test_real_vector(d1, "[-2.0, -1.0, 0.0, +1.0, +2.0]", 0.0001);
             Ok = Ok && doc_test_real_vector(d2, "[ 2.0,  2.0, 2.0,  2.0,  2.0]", 0.0001);
@@ -7117,7 +6730,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 11; Test++) {
          try {
-         //
          // We use cubic spline to do resampling, i.e. having
          // values of f(x) == x^2 sampled at 5 equidistant nodes on [-1,+1]
          // we calculate values/derivatives of cubic spline on
@@ -7135,7 +6747,6 @@ int main() {
          // Actually, we could use natural conditions, but we feel that
          // spline which exactly reproduces f() will show us more
          // understandable results.
-         //
             real_1d_array x_old = "[-1.0,-0.5,0.0,+0.5,+1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x_old);
@@ -7164,23 +6775,14 @@ int main() {
             real_1d_array y_new;
             real_1d_array d1_new;
             real_1d_array d2_new;
-         //
          // First, conversion without differentiation.
-         //
-         //
             spline1dconvcubic(x_old, y_old, x_new, y_new);
             Ok = Ok && doc_test_real_vector(y_new, "[1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]", 0.0001);
-         //
          // Then, conversion with differentiation (first derivatives only)
-         //
-         //
             spline1dconvdiffcubic(x_old, y_old, x_new, y_new, d1_new);
             Ok = Ok && doc_test_real_vector(y_new, "[1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]", 0.0001);
             Ok = Ok && doc_test_real_vector(d1_new, "[-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]", 0.0001);
-         //
          // Finally, conversion with first and second derivatives
-         //
-         //
             spline1dconvdiff2cubic(x_old, y_old, x_new, y_new, d1_new, d2_new);
             Ok = Ok && doc_test_real_vector(y_new, "[1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]", 0.0001);
             Ok = Ok && doc_test_real_vector(d1_new, "[-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]", 0.0001);
@@ -7199,7 +6801,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 24; Test++) {
          try {
-         //
          // In this example we demonstrate exponential fitting
          // by f(x) = exp(-c*x^2)
          // using function value only.
@@ -7207,7 +6808,6 @@ int main() {
          // Gradient is estimated using combination of numerical differences
          // and secant updates. diffstep variable stores differentiation step
          // (we have to tell algorithm what step to use).
-         //
             real_2d_array x = "[[-1],[-0.8],[-0.6],[-0.4],[-0.2],[0],[0.2],[0.4],[0.6],[0.8],[1.0]]";
             if (Test == 0)
                spoil_matrix_by_nan(x);
@@ -7255,19 +6855,15 @@ int main() {
                diffstep = +INFINITY;
             if (Test == 18)
                diffstep = -INFINITY;
-         //
          // Fitting without weights
-         //
             lsfitcreatef(x, y, c, diffstep, state);
             lsfitsetcond(state, epsx, maxits);
             lsfitfit(state, function_cx_1_func);
             lsfitresults(state, info, c, rep);
             Ok = Ok && doc_test_int(info, 2);
             Ok = Ok && doc_test_real_vector(c, "[1.5]", 0.05);
-         //
          // Fitting with weights
          // (you can change weights and see how it changes result)
-         //
             real_1d_array w = "[1,1,1,1,1,1,1,1,1,1,1]";
             if (Test == 19)
                spoil_vector_by_nan(w);
@@ -7299,11 +6895,9 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 21; Test++) {
          try {
-         //
          // In this example we demonstrate exponential fitting
          // by f(x) = exp(-c*x^2)
          // using function value and gradient (with respect to c).
-         //
             real_2d_array x = "[[-1],[-0.8],[-0.6],[-0.4],[-0.2],[0],[0.2],[0.4],[0.6],[0.8],[1.0]]";
             if (Test == 0)
                spoil_matrix_by_nan(x);
@@ -7344,19 +6938,15 @@ int main() {
             ae_int_t info;
             lsfitstate state;
             lsfitreport rep;
-         //
          // Fitting without weights
-         //
             lsfitcreatefg(x, y, c, true, state);
             lsfitsetcond(state, epsx, maxits);
             lsfitfit(state, function_cx_1_func, function_cx_1_grad);
             lsfitresults(state, info, c, rep);
             Ok = Ok && doc_test_int(info, 2);
             Ok = Ok && doc_test_real_vector(c, "[1.5]", 0.05);
-         //
          // Fitting with weights
          // (you can change weights and see how it changes result)
-         //
             real_1d_array w = "[1,1,1,1,1,1,1,1,1,1,1]";
             if (Test == 16)
                spoil_vector_by_nan(w);
@@ -7388,11 +6978,9 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 21; Test++) {
          try {
-         //
          // In this example we demonstrate exponential fitting
          // by f(x) = exp(-c*x^2)
          // using function value, gradient and Hessian (with respect to c)
-         //
             real_2d_array x = "[[-1],[-0.8],[-0.6],[-0.4],[-0.2],[0],[0.2],[0.4],[0.6],[0.8],[1.0]]";
             if (Test == 0)
                spoil_matrix_by_nan(x);
@@ -7433,19 +7021,15 @@ int main() {
             ae_int_t info;
             lsfitstate state;
             lsfitreport rep;
-         //
          // Fitting without weights
-         //
             lsfitcreatefgh(x, y, c, state);
             lsfitsetcond(state, epsx, maxits);
             lsfitfit(state, function_cx_1_func, function_cx_1_grad, function_cx_1_hess);
             lsfitresults(state, info, c, rep);
             Ok = Ok && doc_test_int(info, 2);
             Ok = Ok && doc_test_real_vector(c, "[1.5]", 0.05);
-         //
          // Fitting with weights
          // (you can change weights and see how it changes result)
-         //
             real_1d_array w = "[1,1,1,1,1,1,1,1,1,1,1]";
             if (Test == 16)
                spoil_vector_by_nan(w);
@@ -7477,7 +7061,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 23; Test++) {
          try {
-         //
          // In this example we demonstrate exponential fitting by
          //     f(x) = exp(-c*x^2)
          // subject to bound constraints
@@ -7490,7 +7073,6 @@ int main() {
          //
          // Unconstrained solution is c == 1.5, but because of constraints we should
          // get c == 1.0 (at the boundary).
-         //
             real_2d_array x = "[[-1],[-0.8],[-0.6],[-0.4],[-0.2],[0],[0.2],[0.4],[0.6],[0.8],[1.0]]";
             if (Test == 0)
                spoil_matrix_by_nan(x);
@@ -7568,7 +7150,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 27; Test++) {
          try {
-         //
          // In this example we demonstrate fitting by
          //     f(x) = c[0]*(1+c[1]*((x-1999)^c[2]-1))
          // subject to bound constraints
@@ -7593,7 +7174,6 @@ int main() {
          //
          // You can try commenting out lsfitsetscale() call - and you will
          // see that algorithm will fail to converge.
-         //
             real_2d_array x = "[[2000],[2001],[2002],[2003],[2004],[2005],[2006],[2007],[2008]]";
             if (Test == 0)
                spoil_matrix_by_nan(x);
@@ -7682,14 +7262,12 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 13; Test++) {
          try {
-         //
          // In this example we demonstrate linear fitting by f(x|a) = a*exp(0.5*x).
          //
          // We have:
          // * y - vector of experimental data
          // * fmatrix -  matrix of basis functions calculated at sample points
          //              Actually, we have only one basis function F0 = exp(0.5*x).
-         //
             real_2d_array fmatrix = "[[0.606531],[0.670320],[0.740818],[0.818731],[0.904837],[1.000000],[1.105171],[1.221403],[1.349859],[1.491825],[1.648721]]";
             if (Test == 0)
                spoil_matrix_by_nan(fmatrix);
@@ -7711,16 +7289,12 @@ int main() {
             ae_int_t info;
             real_1d_array c;
             lsfitreport rep;
-         //
          // Linear fitting without weights
-         //
             lsfitlinear(y, fmatrix, info, c, rep);
             Ok = Ok && doc_test_int(info, 1);
             Ok = Ok && doc_test_real_vector(c, "[1.98650]", 0.00005);
-         //
          // Linear fitting with individual weights.
          // Slightly different result is returned.
-         //
             real_1d_array w = "[1.414213, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]";
             if (Test == 8)
                spoil_vector_by_nan(w);
@@ -7749,7 +7323,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 20; Test++) {
          try {
-         //
          // In this example we demonstrate linear fitting by f(x|a,b) = a*x+b
          // with simple constraint f(0) == 0.
          //
@@ -7769,7 +7342,6 @@ int main() {
          //              first two columns contain coefficients before basis functions,
          //              last column contains desired value of their sum.
          //              So [1,0,0] means "1*constant_term + 0*linear_term = 0"
-         //
             real_1d_array y = "[0.072436,0.246944,0.491263,0.522300,0.714064,0.921929]";
             if (Test == 0)
                spoil_vector_by_nan(y);
@@ -7806,15 +7378,11 @@ int main() {
             ae_int_t info;
             real_1d_array c;
             lsfitreport rep;
-         //
          // Constrained fitting without weights
-         //
             lsfitlinearc(y, fmatrix, cmatrix, info, c, rep);
             Ok = Ok && doc_test_int(info, 1);
             Ok = Ok && doc_test_real_vector(c, "[0,0.932933]", 0.0005);
-         //
          // Constrained fitting with individual weights
-         //
             real_1d_array w = "[1, 1.414213, 1, 1, 1, 1]";
             if (Test == 15)
                spoil_vector_by_nan(w);
@@ -7843,7 +7411,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 20; Test++) {
          try {
-         //
          // This example demonstrates polynomial fitting.
          //
          // Fitting is done by two (M == 2) functions from polynomial basis:
@@ -7859,7 +7426,6 @@ int main() {
          //
          // Additionally we demonstrate weighted fitting, where second point has
          // more weight than other ones.
-         //
             real_1d_array x = "[0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -7892,23 +7458,19 @@ int main() {
             barycentricinterpolant p;
             polynomialfitreport rep;
             double v;
-         //
          // Fitting without individual weights
          //
          // NOTE: result is returned as barycentricinterpolant structure.
          //       if you want to get representation in the power basis,
          //       you can use barycentricbar2pow() function to convert
          //       from barycentric to power representation (see docs for
-         //       POLINT subpackage for more info).
-         //
+         //       POLINT subpackage for more information).
             polynomialfit(x, y, m, info, p, rep);
             v = barycentriccalc(p, t);
             Ok = Ok && doc_test_real(v, 2.011, 0.002);
-         //
          // Fitting with individual weights
          //
          // NOTE: slightly different result is returned
-         //
             real_1d_array w = "[1,1.414213562,1,1,1,1,1,1,1,1,1]";
             if (Test == 12)
                spoil_vector_by_nan(w);
@@ -7946,7 +7508,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 29; Test++) {
          try {
-         //
          // This example demonstrates polynomial fitting.
          //
          // Fitting is done by two (M == 2) functions from polynomial basis:
@@ -7965,7 +7526,6 @@ int main() {
          // * yc     constraints on derivatives
          // * dc     derivative indices
          //          (0 means function itself, 1 means first derivative)
-         //
             real_1d_array x = "[1.0,1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -8053,13 +7613,11 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 19; Test++) {
          try {
-         //
          // In this example we demonstrate penalized spline fitting of noisy data
          //
          // We have:
          // * x - abscissas
          // * y - vector of experimental data, straight line with small noise
-         //
             real_1d_array x = "[0.00,0.10,0.20,0.30,0.40,0.50,0.60,0.70,0.80,0.90]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -8087,12 +7645,10 @@ int main() {
             spline1dinterpolant s;
             spline1dfitreport rep;
             double rho;
-         //
          // Fit with VERY small amount of smoothing (rho = -5.0)
          // and large number of basis functions (M == 50).
          //
          // With such small regularization penalized spline almost fully reproduces function values
-         //
             rho = -5.0;
             if (Test == 10)
                rho = NAN;
@@ -8104,13 +7660,11 @@ int main() {
             Ok = Ok && doc_test_int(info, 1);
             v = spline1dcalc(s, 0.0);
             Ok = Ok && doc_test_real(v, 0.10, 0.01);
-         //
          // Fit with VERY large amount of smoothing (rho = 10.0)
          // and large number of basis functions (M == 50).
          //
          // With such regularization our spline should become close to the straight line fit.
          // We will compare its value in x == 1.0 with results obtained from such fit.
-         //
             rho = +10.0;
             if (Test == 13)
                rho = NAN;
@@ -8122,10 +7676,8 @@ int main() {
             Ok = Ok && doc_test_int(info, 1);
             v = spline1dcalc(s, 1.0);
             Ok = Ok && doc_test_real(v, 0.969, 0.001);
-         //
          // In real life applications you may need some moderate degree of fitting,
          // so we try to fit once more with rho == 3.0.
-         //
             rho = +3.0;
             if (Test == 16)
                rho = NAN;
@@ -8350,17 +7902,13 @@ int main() {
             double c;
             double d;
             lsfitreport rep;
-         //
          // Test logisticfit4() on carefully designed data with a priori known answer.
-         //
             logisticfit4(x, y, n, a, b, c, d, rep);
             Ok = Ok && doc_test_real(a, -1.000, 0.01);
             Ok = Ok && doc_test_real(b, 1.200, 0.01);
             Ok = Ok && doc_test_real(c, 0.900, 0.01);
             Ok = Ok && doc_test_real(d, 1.000, 0.01);
-         //
          // Evaluate model at point x == 0.5
-         //
             double v;
             v = logisticcalc4(0.5, a, b, c, d);
             Ok = Ok && doc_test_real(v, -0.33874308, 0.001);
@@ -8403,18 +7951,14 @@ int main() {
             double d;
             double g;
             lsfitreport rep;
-         //
          // Test logisticfit5() on carefully designed data with a priori known answer.
-         //
             logisticfit5(x, y, n, a, b, c, d, g, rep);
             Ok = Ok && doc_test_real(a, -1.000, 0.01);
             Ok = Ok && doc_test_real(b, 1.200, 0.01);
             Ok = Ok && doc_test_real(c, 0.900, 0.01);
             Ok = Ok && doc_test_real(d, 1.000, 0.01);
             Ok = Ok && doc_test_real(g, 1.200, 0.01);
-         //
          // Evaluate model at point x == 0.5
-         //
             double v;
             v = logisticcalc5(0.5, a, b, c, d, g);
             Ok = Ok && doc_test_real(v, -0.2354656824, 0.001);
@@ -8432,7 +7976,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 7; Test++) {
          try {
-         //
          // We use RDP algorithm to approximate parametric 2D curve given by
          // locations in t=0,1,2,3 (see below), which form piecewise linear
          // trajectory through D-dimensional space (2-dimensional in our example).
@@ -8449,7 +7992,6 @@ int main() {
          //     |      .....
          //     |  ....
          //     X0----|-----|-----|-----|-----|-----|---
-         //
             ae_int_t npoints = 4;
             ae_int_t ndimensions = 2;
             real_2d_array x = "[[0,0],[2,1],[3,3],[6,3]]";
@@ -8463,7 +8005,6 @@ int main() {
                spoil_matrix_by_deleting_row(x);
             if (Test == 4)
                spoil_matrix_by_deleting_col(x);
-         //
          // Approximation of parametric curve is performed by another parametric curve
          // with lesser amount of points. It allows to work with "compressed"
          // representation, which needs smaller amount of memory. Say, in our example
@@ -8482,8 +8023,6 @@ int main() {
          //     |   .
          //     | .
          //     X0----|-----|-----|-----|-----|-----|---
-         //
-         //
             real_2d_array y;
             integer_1d_array idxy;
             ae_int_t nsections;
@@ -8510,10 +8049,8 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 16; Test++) {
          try {
-         //
          // We use bilinear spline to interpolate f(x,y) == x^2+2*y^2 sampled
          // at (x,y) from [0.0, 0.5, 1.0] X [0.0, 1.0].
-         //
             real_1d_array x = "[0.0, 0.5, 1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -8572,10 +8109,8 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 16; Test++) {
          try {
-         //
          // We use bilinear spline to interpolate f(x,y) == x^2+2*y^2 sampled
          // at (x,y) from [0.0, 0.5, 1.0] X [0.0, 1.0].
-         //
             real_1d_array x = "[0.0, 0.5, 1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -8642,14 +8177,12 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 5; Test++) {
          try {
-         //
          // We use bicubic spline to reproduce f(x,y) == 1/(1+x^2+2*y^2) sampled
          // at irregular points (x,y) from [-1,+1]*[-1,+1]
          //
          // We have 5 such points, located approximately at corners of the area
          // and its center -  but not exactly at the grid. Thus, we have to FIT
          // the spline, i.e. to solve least squares problem
-         //
             real_2d_array xy = "[[-0.987,-0.902,0.359],[0.948,-0.992,0.347],[-1.000,1.000,0.333],[1.000,0.973,0.339],[0.017,0.180,0.968]]";
             if (Test == 0)
                spoil_matrix_by_nan(xy);
@@ -8661,7 +8194,6 @@ int main() {
                spoil_matrix_by_deleting_row(xy);
             if (Test == 4)
                spoil_matrix_by_deleting_col(xy);
-         //
          // First step is to create spline2dbuilder object and set its properties:
          // * d == 1 means that we create vector-valued spline with 1 component
          // * we specify dataset xy
@@ -8681,7 +8213,6 @@ int main() {
          //       is intended for efficient solution of large-scale problems
          //       (up to 100.000.000 nodes). Both solvers can be parallelized, but
          //       FastDDM is much more efficient. See comments for more information.
-         //
             spline2dbuilder builder;
             ae_int_t d = 1;
             double lambdav = 0.000;
@@ -8689,9 +8220,7 @@ int main() {
             spline2dbuildersetpoints(builder, xy, 5);
             spline2dbuildersetgrid(builder, 5, 5);
             spline2dbuildersetalgoblocklls(builder, lambdav);
-         //
          // Now we are ready to fit and evaluate our results
-         //
             spline2dinterpolant s;
             spline2dfitreport rep;
             spline2dfit(builder, s, rep);
@@ -8715,10 +8244,8 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 12; Test++) {
          try {
-         //
          // We build bilinear spline for f(x,y) == x+2*y+3*xy for (x,y) in [0,1].
          // Then we demonstrate how to unpack it.
-         //
             real_1d_array x = "[0.0, 1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -8770,10 +8297,8 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 16; Test++) {
          try {
-         //
          // We build bilinear spline for f(x,y) == x+2*y for (x,y) in [0,1].
          // Then we apply several transformations to this spline.
-         //
             real_1d_array x = "[0.0, 1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -8816,9 +8341,7 @@ int main() {
             spline2dlintransf(snew, 2.0, 3.0);
             v = spline2dcalc(snew, 0.5, 1.0);
             Ok = Ok && doc_test_real(v, 8.000, 0.00005);
-         //
          // Same example, but for vector spline (f0,f1) = {x+2*y, 2*x+y}
-         //
             real_1d_array f2 = "[0.00,0.00, 1.00,2.00, 2.00,1.00, 3.00,3.00]";
             if (Test == 12)
                spoil_vector_by_nan(f2);
@@ -8854,11 +8377,9 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 12; Test++) {
          try {
-         //
          // We build bilinear vector-valued spline (f0,f1) = {x+2*y, 2*x+y}
          // Spline is built using function values at 2x2 grid: (x,y) == [0,1]*[0,1]
          // Then we perform evaluation at (x,y) == (0.1,0.3)
-         //
             real_1d_array x = "[0.0, 1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -8905,7 +8426,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 22; Test++) {
          try {
-         //
          // We use trilinear spline to interpolate f(x,y,z) == x+xy+z sampled
          // at (x,y,z) from [0.0, 1.0] X [0.0, 1.0] X [0.0, 1.0].
          //
@@ -8919,7 +8439,6 @@ int main() {
          //     f[5]     (x,y,z) = (1,0,1)
          //     f[6]     (x,y,z) = (0,1,1)
          //     f[7]     (x,y,z) = (1,1,1)
-         //
             real_1d_array x = "[0.0, 1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -8992,7 +8511,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 22; Test++) {
          try {
-         //
          // We use trilinear vector-valued spline to interpolate {f0,f1} == {x+xy+z,x+xy+yz+z}
          // sampled at (x,y,z) from [0.0, 1.0] X [0.0, 1.0] X [0.0, 1.0].
          //
@@ -9014,7 +8532,6 @@ int main() {
          //     f[13]    f1, (x,y,z) = (0,1,1)
          //     f[14]    f0, (x,y,z) = (1,1,1)
          //     f[15]    f1, (x,y,z) = (1,1,1)
-         //
             real_1d_array x = "[0.0, 1.0]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -9087,7 +8604,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // This example illustrates basic concepts of the RBF models: creation, modification,
          // evaluation.
          //
@@ -9102,9 +8618,7 @@ int main() {
          // 2. we attach our dataset to the RBF model and tune algorithm settings
          // 3. we rebuild RBF model using QNN algorithm on new data
          // 4. we use RBF model (evaluate, serialize, etc.)
-         //
             double v;
-         //
          // Step 1: RBF model creation.
          //
          // We have to specify dimensionality of the space (2 or 3) and
@@ -9112,12 +8626,10 @@ int main() {
          //
          // New model is empty - it can be evaluated,
          // but we just get zero value at any point.
-         //
             rbfmodel model;
             rbfcreate(2, 1, model);
             v = rbfcalc2(model, 0.0, 0.0);
             Ok = Ok && doc_test_real(v, 0.000, 0.005);
-         //
          // Step 2: we add dataset.
          //
          // XY contains two points - x0 == (-1,0) and x1 == (+1,0) -
@@ -9125,7 +8637,6 @@ int main() {
          //
          // We added points, but model was not rebuild yet.
          // If we call rbfcalc2(), we still will get 0.0 as result.
-         //
             real_2d_array xy = "[[-1,0,2],[+1,0,3]]";
             if (Test == 0)
                spoil_matrix_by_nan(xy);
@@ -9136,7 +8647,6 @@ int main() {
             rbfsetpoints(model, xy);
             v = rbfcalc2(model, 0.0, 0.0);
             Ok = Ok && doc_test_real(v, 0.000, 0.005);
-         //
          // Step 3: rebuild model
          //
          // After we've configured model, we should rebuild it -
@@ -9148,17 +8658,14 @@ int main() {
          // * NLayers - three layers are used (although such simple problem
          //   does not need more than 1 layer)
          // * LambdaReg - is set to zero value, no smoothing is required
-         //
             rbfreport rep;
             rbfsetalgohierarchical(model, 1.0, 3, 0.0);
             rbfbuildmodel(model, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, 1);
-         //
          // Step 4: model was built
          //
          // After call of rbfbuildmodel(), rbfcalc2() will return
          // value of the new model.
-         //
             v = rbfcalc2(model, 0.0, 0.0);
             Ok = Ok && doc_test_real(v, 2.500, 0.005);
             Ok = Ok && Test == -1;
@@ -9175,7 +8682,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 6; Test++) {
          try {
-         //
          // Suppose that we have set of 2-dimensional points with associated VECTOR
          // function values, and we want to build a RBF model using our data.
          //
@@ -9184,10 +8690,8 @@ int main() {
          // 2. we attach our dataset to the RBF model and tune algorithm settings
          // 3. we rebuild RBF model using new data
          // 4. we use RBF model (evaluate, serialize, etc.)
-         //
             real_1d_array x;
             real_1d_array y;
-         //
          // Step 1: RBF model creation.
          //
          // We have to specify dimensionality of the space (equal to 2) and
@@ -9195,7 +8699,6 @@ int main() {
          //
          // New model is empty - it can be evaluated,
          // but we just get zero value at any point.
-         //
             rbfmodel model;
             rbfcreate(2, 2, model);
             x = "[+1,+1]";
@@ -9207,7 +8710,6 @@ int main() {
                spoil_vector_by_neginf(x);
             rbfcalc(model, x, y);
             Ok = Ok && doc_test_real_vector(y, "[0.000,0.000]", 0.005);
-         //
          // Step 2: we add dataset.
          //
          // XY arrays containt four points:
@@ -9215,7 +8717,6 @@ int main() {
          // * (x1,y1) == (+1,-1), f(x1,y1) == (-1,0)
          // * (x2,y2) == (-1,-1), f(x2,y2) == (0,+1)
          // * (x3,y3) == (-1,+1), f(x3,y3) == (+1,0)
-         //
             real_2d_array xy = "[[+1,+1,0,-1],[+1,-1,-1,0],[-1,-1,0,+1],[-1,+1,+1,0]]";
             if (Test == 3)
                spoil_matrix_by_nan(xy);
@@ -9228,7 +8729,6 @@ int main() {
          // If we call rbfcalc(), we still will get 0.0 as result.
             rbfcalc(model, x, y);
             Ok = Ok && doc_test_real_vector(y, "[0.000,0.000]", 0.005);
-         //
          // Step 3: rebuild model
          //
          // We use hierarchical RBF algorithm with following parameters:
@@ -9240,17 +8740,14 @@ int main() {
          // After we've configured model, we should rebuild it -
          // it will change coefficients stored internally in the
          // rbfmodel structure.
-         //
             rbfreport rep;
             rbfsetalgohierarchical(model, 1.0, 3, 0.0);
             rbfbuildmodel(model, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, 1);
-         //
          // Step 4: model was built
          //
          // After call of rbfbuildmodel(), rbfcalc() will return
          // value of the new model.
-         //
             rbfcalc(model, x, y);
             Ok = Ok && doc_test_real_vector(y, "[0.000,-1.000]", 0.005);
             Ok = Ok && Test == -1;
@@ -9267,7 +8764,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // This example show how to work with polynomial term
          //
          // Suppose that we have set of 2-dimensional points with associated
@@ -9279,7 +8775,6 @@ int main() {
          // * NLayers - three layers are used (although such simple problem
          //   does not need more than 1 layer)
          // * LambdaReg - is set to zero value, no smoothing is required
-         //
             double v;
             rbfmodel model;
             real_2d_array xy = "[[-1,0,2],[+1,0,3]]";
@@ -9293,7 +8788,6 @@ int main() {
             rbfcreate(2, 1, model);
             rbfsetpoints(model, xy);
             rbfsetalgohierarchical(model, 1.0, 3, 0.0);
-         //
          // By default, RBF model uses linear term. It means that model
          // looks like
          //     f(x,y) = SUM(RBF[i]) + a*x + b*y + c
@@ -9308,7 +8802,6 @@ int main() {
          //     f(x,y) = 0.5*x + 2.5
          // and rbfbuildmodel() with default settings should preserve this
          // linearity.
-         //
             ae_int_t nx;
             ae_int_t ny;
             ae_int_t nc;
@@ -9322,7 +8815,6 @@ int main() {
          // asymptotic behavior of our function is linear
             v = rbfcalc2(model, 1000.0, 0.0);
             Ok = Ok && doc_test_real(v, 502.50, 0.05);
-         //
          // Instead of linear term we can use constant term. In this case
          // we will get model which has form
          //     f(x,y) = SUM(RBF[i]) + c
@@ -9332,7 +8824,6 @@ int main() {
          // Because we've already attached dataset to the model the only
          // thing we have to do is to call rbfsetconstterm() and then
          // rebuild model with rbfbuildmodel().
-         //
             rbfsetconstterm(model);
             rbfbuildmodel(model, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, 1);
@@ -9341,12 +8832,10 @@ int main() {
          // asymptotic behavior of our function is constant
             v = rbfcalc2(model, 1000.0, 0.0);
             Ok = Ok && doc_test_real(v, 2.500, 0.005);
-         //
          // Finally, we can use zero term. Just plain RBF without polynomial
          // part:
          //     f(x,y) = SUM(RBF[i])
          // where RBF[i] is I-th radial basis function.
-         //
             rbfsetzeroterm(model);
             rbfbuildmodel(model, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, 1);
@@ -9369,7 +8858,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // This example show how to serialize and unserialize RBF model
          //
          // Suppose that we have set of 2-dimensional points with associated
@@ -9378,7 +8866,6 @@ int main() {
          // from string, loading to another instance of RBF model.
          //
          // Here we assume that you already know how to create RBF models.
-         //
             std::string s;
             double v;
             rbfmodel model0;
@@ -9397,10 +8884,8 @@ int main() {
             rbfsetalgohierarchical(model0, 1.0, 3, 0.0);
             rbfbuildmodel(model0, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, 1);
-         //
          // Serialization - it looks easy,
          // but you should carefully read next section.
-         //
             rbfserialize(model0, s);
             rbfunserialize(s, model1);
          // both models return same value
@@ -9408,7 +8893,6 @@ int main() {
             Ok = Ok && doc_test_real(v, 2.500, 0.005);
             v = rbfcalc2(model1, 0.0, 0.0);
             Ok = Ok && doc_test_real(v, 2.500, 0.005);
-         //
          // Previous section shows that model state is saved/restored during
          // serialization. However, some properties are NOT serialized.
          //
@@ -9437,7 +8921,6 @@ int main() {
          // * serialization of the RBF model preserves anything related to the model
          //   EVALUATION
          // * but it does NOT creates perfect copy of the original object.
-         //
             rbfbuildmodel(model0, rep);
             v = rbfcalc2(model0, 0.0, 0.0);
             Ok = Ok && doc_test_real(v, 2.500, 0.005);
@@ -9458,10 +8941,8 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // first we demonstrate forward FFT:
          // [1i,1i,1i,1i] is converted to [4i, 0, 0, 0]
-         //
             complex_1d_array z = "[1i,1i,1i,1i]";
             if (Test == 0)
                spoil_vector_by_nan(z);
@@ -9471,10 +8952,8 @@ int main() {
                spoil_vector_by_neginf(z);
             fftc1d(z);
             Ok = Ok && doc_test_complex_vector(z, "[4i,0,0,0]", 0.0001);
-         //
          // now we convert [4i, 0, 0, 0] back to [1i,1i,1i,1i]
          // with backward FFT
-         //
             fftc1dinv(z);
             Ok = Ok && doc_test_complex_vector(z, "[1i,1i,1i,1i]", 0.0001);
             Ok = Ok && Test == -1;
@@ -9491,10 +8970,8 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // first we demonstrate forward FFT:
          // [0,1,0,1i] is converted to [1+1i, -1-1i, -1-1i, 1+1i]
-         //
             complex_1d_array z = "[0,1,0,1i]";
             if (Test == 0)
                spoil_vector_by_nan(z);
@@ -9504,9 +8981,7 @@ int main() {
                spoil_vector_by_neginf(z);
             fftc1d(z);
             Ok = Ok && doc_test_complex_vector(z, "[1+1i, -1-1i, -1-1i, 1+1i]", 0.0001);
-         //
          // now we convert result back with backward FFT
-         //
             fftc1dinv(z);
             Ok = Ok && doc_test_complex_vector(z, "[0,1,0,1i]", 0.0001);
             Ok = Ok && Test == -1;
@@ -9523,10 +8998,8 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // first we demonstrate forward FFT:
          // [1,1,1,1] is converted to [4, 0, 0, 0]
-         //
             real_1d_array x = "[1,1,1,1]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -9538,10 +9011,8 @@ int main() {
             real_1d_array x2;
             fftr1d(x, f);
             Ok = Ok && doc_test_complex_vector(f, "[4,0,0,0]", 0.0001);
-         //
          // now we convert [4, 0, 0, 0] back to [1,1,1,1]
          // with backward FFT
-         //
             fftr1dinv(f, x2);
             Ok = Ok && doc_test_real_vector(x2, "[1,1,1,1]", 0.0001);
             Ok = Ok && Test == -1;
@@ -9558,7 +9029,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // first we demonstrate forward FFT:
          // [1,2,3,4] is converted to [10, -2+2i, -2, -2-2i]
          //
@@ -9566,7 +9036,6 @@ int main() {
          // * f[0] = conj(f[0])
          // * f[1] = conj(f[3])
          // * f[2] = conj(f[2])
-         //
             real_1d_array x = "[1,2,3,4]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -9578,12 +9047,9 @@ int main() {
             real_1d_array x2;
             fftr1d(x, f);
             Ok = Ok && doc_test_complex_vector(f, "[10, -2+2i, -2, -2-2i]", 0.0001);
-         //
          // now we convert [10, -2+2i, -2, -2-2i] back to [1,2,3,4]
-         //
             fftr1dinv(f, x2);
             Ok = Ok && doc_test_real_vector(x2, "[1,2,3,4]", 0.0001);
-         //
          // remember that F is self-adjoint? It means that we can pass just half
          // (slightly larger than half) of F to inverse real FFT and still get our result.
          //
@@ -9592,7 +9058,6 @@ int main() {
          // NOTE: in this case we should explicitly pass array length (which is 4) to ALGLIB;
          // if not, it will automatically use array length to determine FFT size and
          // will erroneously make half-length FFT.
-         //
             f = "[10, -2+2i, -2]";
             fftr1dinv(f, 4, x2);
             Ok = Ok && doc_test_real_vector(x2, "[1,2,3,4]", 0.0001);
@@ -9633,7 +9098,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // The very simple clusterization example
          //
          // We have a set of points in 2D space:
@@ -9658,7 +9122,6 @@ int main() {
          //
          // You may see that clusterization itself is a minor part of the example,
          // most of which is dominated by comments :)
-         //
             clusterizerstate s;
             ahcreport rep;
             real_2d_array xy = "[[1,1],[1,2],[4,1],[2,3],[4,1.5]]";
@@ -9671,7 +9134,6 @@ int main() {
             clusterizercreate(s);
             clusterizersetpoints(s, xy, 2);
             clusterizerrunahc(s, rep);
-         //
          // Now we've built our clusterization tree. Rep.z contains information which
          // is required to build dendrogram. I-th row of rep.z represents one merge
          // operation, with first cluster to merge having index rep.z[I,0] and second
@@ -9698,9 +9160,7 @@ int main() {
          //   ---5---   |    ---6---
          //   |     |   |    |     |
          //   P2   P4   P3   P0   P1
-         //
             Ok = Ok && doc_test_int_matrix(rep.z, "[[2,4],[0,1],[3,6],[5,7]]");
-         //
          // We've built dendrogram above by reordering our dataset.
          //
          // Without such reordering it would be impossible to build dendrogram without
@@ -9735,7 +9195,6 @@ int main() {
          // For example, according to PZ, first two merges are performed on clusterization
          // trees of height 0, while next two merges are performed on 0-1 and 1-2
          // pairs of trees correspondingly.
-         //
             Ok = Ok && doc_test_int_vector(rep.p, "[3,4,0,2,1]");
             Ok = Ok && doc_test_int_matrix(rep.pm, "[[0,0,1,1,0,0],[3,3,4,4,0,0],[2,2,3,4,0,1],[0,1,2,4,1,2]]");
             Ok = Ok && Test == -1;
@@ -9752,7 +9211,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // The very simple clusterization example
          //
          // We have a set of points in 2D space:
@@ -9776,7 +9234,6 @@ int main() {
          //
          // You may see that clusterization itself is a minor part of the example,
          // most of which is dominated by comments :)
-         //
             clusterizerstate s;
             kmeansreport rep;
             real_2d_array xy = "[[1,1],[1,2],[4,1],[2,3],[4,1.5]]";
@@ -9790,13 +9247,11 @@ int main() {
             clusterizersetpoints(s, xy, 2);
             clusterizersetkmeanslimits(s, 5, 0);
             clusterizerrunkmeans(s, 2, rep);
-         //
          // We've performed clusterization, and it succeeded (completion code is +1).
          //
          // Now first center is stored in the first row of rep.c, second one is stored
          // in the second row. rep.cidx can be used to determine which center is
          // closest to some specific point of the dataset.
-         //
             Ok = Ok && doc_test_int(rep.terminationtype, 1);
          // We called clusterizersetpoints() with disttype == 2 because k-means++
          // algorithm does NOT support metrics other than Euclidean. But what if we
@@ -9804,7 +9259,6 @@ int main() {
          //
          // We change metric type by calling clusterizersetpoints() one more time,
          // and try to run k-means algo again. It fails.
-         //
             clusterizersetpoints(s, xy, 0);
             clusterizerrunkmeans(s, 2, rep);
             Ok = Ok && doc_test_int(rep.terminationtype, -5);
@@ -9822,7 +9276,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // We have a set of points in 1D space:
          //     (P0,P1,P2,P3,P4) = (1, 3, 10, 16, 20)
          //
@@ -9834,7 +9287,6 @@ int main() {
          // However, third step depends on linkage type being used:
          // * in case of complete linkage P2 == 10 is merged with [P0,P1]
          // * in case of single linkage P2 == 10 is merged with [P3,P4]
-         //
             clusterizerstate s;
             ahcreport rep;
             real_2d_array xy = "[[1],[3],[10],[16],[20]]";
@@ -9876,7 +9328,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // We have three points in 4D space:
          //     (P0,P1,P2) = ((1, 2, 1, 2), (6, 7, 6, 7), (7, 6, 7, 6))
          //
@@ -9888,7 +9339,6 @@ int main() {
          // Here we'll try three distances: Euclidean, Pearson correlation,
          // user-supplied distance matrix. Different distance functions lead
          // to different choices being made by algorithm during clustering.
-         //
             clusterizerstate s;
             ahcreport rep;
             ae_int_t disttype;
@@ -9941,7 +9391,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // We have a set of points in 2D space:
          //     (P0,P1,P2,P3,P4) = ((1,1),(1,2),(4,1),(2,3),(4,1.5))
          //
@@ -9955,7 +9404,6 @@ int main() {
          //
          // We perform Agglomerative Hierarchic Clusterization (AHC) and we want
          // to get top K clusters from clusterization tree for different K.
-         //
             clusterizerstate s;
             ahcreport rep;
             real_2d_array xy = "[[1,1],[1,2],[4,1],[2,3],[4,1.5]]";
@@ -9994,7 +9442,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // The very simple classification example: classify points (x,y) in 2D space
          // as ones with x >= 0 and ones with x < 0 (y is ignored, but our classifier
          // has to find out it).
@@ -10019,7 +9466,6 @@ int main() {
          // For the sake of simplicity, our example includes only 4-point dataset.
          // However, random forests are able to cope with extremely large datasets
          // having millions of examples.
-         //
             decisionforestbuilder builder;
             ae_int_t nvars = 2;
             ae_int_t nclasses = 2;
@@ -10075,7 +9521,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // The very simple regression example: model f(x,y) == x+y
          //
          // First, we have to create DF builder object, load dataset and specify
@@ -10091,7 +9536,6 @@ int main() {
          //
          // NOTE: you can also solve classification problems with DF models, see
          //       another example for this unit.
-         //
             decisionforestbuilder builder;
             ae_int_t nvars = 2;
             ae_int_t nclasses = 1;
@@ -10147,12 +9591,10 @@ int main() {
    // printf("TEST linreg_d_basic: Linear regression used to build the very basic model and unpack coefficients\n"), fflush(stdout);
       Ok = true;
       try {
-      //
       // In this example we demonstrate linear fitting by f(x|a) = a*exp(0.5*x).
       //
       // We have:
       // * xy - matrix of basic function values (exp(0.5*x)) and expected values
-      //
          real_2d_array xy = "[[0.606531,1.133719],[0.670320,1.306522],[0.740818,1.504604],[0.818731,1.554663],[0.904837,1.884638],[1.000000,2.072436],[1.105171,2.257285],[1.221403,2.534068],[1.349859,2.622017],[1.491825,2.897713],[1.648721,3.219371]]";
          ae_int_t info;
          ae_int_t nvars;
@@ -10175,9 +9617,7 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // Here we demonstrate SMA(k) filtering for time series.
-         //
             real_1d_array x = "[5,6,7,8]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -10185,10 +9625,8 @@ int main() {
                spoil_vector_by_posinf(x);
             if (Test == 2)
                spoil_vector_by_neginf(x);
-         //
          // Apply filter.
          // We should get [5, 5.5, 6.5, 7.5] as result
-         //
             filtersma(x, 2);
             Ok = Ok && doc_test_real_vector(x, "[5,5.5,6.5,7.5]", 0.00005);
             Ok = Ok && Test == -1;
@@ -10205,9 +9643,7 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // Here we demonstrate EMA(0.5) filtering for time series.
-         //
             real_1d_array x = "[5,6,7,8]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -10215,10 +9651,8 @@ int main() {
                spoil_vector_by_posinf(x);
             if (Test == 2)
                spoil_vector_by_neginf(x);
-         //
          // Apply filter.
          // We should get [5, 5.5, 6.25, 7.125] as result
-         //
             filterema(x, 0.5);
             Ok = Ok && doc_test_real_vector(x, "[5,5.5,6.25,7.125]", 0.00005);
             Ok = Ok && Test == -1;
@@ -10235,9 +9669,7 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // Here we demonstrate LRMA(3) filtering for time series.
-         //
             real_1d_array x = "[7,8,8,9,12,12]";
             if (Test == 0)
                spoil_vector_by_nan(x);
@@ -10245,10 +9677,8 @@ int main() {
                spoil_vector_by_posinf(x);
             if (Test == 2)
                spoil_vector_by_neginf(x);
-         //
          // Apply filter.
          // We should get [7.0000, 8.0000, 8.1667, 8.8333, 11.6667, 12.5000] as result
-         //
             filterlrma(x, 3);
             Ok = Ok && doc_test_real_vector(x, "[7.0000,8.0000,8.1667,8.8333,11.6667,12.5000]", 0.00005);
             Ok = Ok && Test == -1;
@@ -10265,12 +9695,10 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // Here we demonstrate SSA trend/noise separation for some toy problem:
          // small monotonically growing series X are analyzed with 3-tick window
          // and "top-K" version of SSA, which selects K largest singular vectors
          // for analysis, with K == 1.
-         //
             ssamodel s;
             real_1d_array x = "[0,0.5,1,1,1.5,2]";
             if (Test == 0)
@@ -10279,7 +9707,6 @@ int main() {
                spoil_vector_by_posinf(x);
             if (Test == 2)
                spoil_vector_by_neginf(x);
-         //
          // First, we create SSA model, set its properties and add dataset.
          //
          // We use window with width == 3 and configure model to use direct SSA
@@ -10289,19 +9716,16 @@ int main() {
          // NOTE: SSA model may store and analyze more than one sequence
          //       (say, different sequences may correspond to data collected
          //       from different devices)
-         //
             ssacreate(s);
             ssasetwindow(s, 3);
             ssaaddsequence(s, x);
             ssasetalgotopkdirect(s, 1);
-         //
          // Now we begin analysis. Internally SSA model stores everything it needs:
          // data, settings, solvers and so on. Right after first call to analysis-
          // related function it will analyze dataset, build basis and perform analysis.
          //
          // Subsequent calls to analysis functions will reuse previously computed
          // basis, unless you invalidate it by changing model settings (or dataset).
-         //
             real_1d_array trend;
             real_1d_array noise;
             ssaanalyzesequence(s, x, trend, noise);
@@ -10320,10 +9744,8 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // Here we demonstrate SSA forecasting on some toy problem with clearly
          // visible linear trend and small amount of noise.
-         //
             ssamodel s;
             real_1d_array x = "[0.05,0.96,2.04,3.11,3.97,5.03,5.98,7.02,8.02]";
             if (Test == 0)
@@ -10332,7 +9754,6 @@ int main() {
                spoil_vector_by_posinf(x);
             if (Test == 2)
                spoil_vector_by_neginf(x);
-         //
          // First, we create SSA model, set its properties and add dataset.
          //
          // We use window with width == 3 and configure model to use direct SSA
@@ -10342,12 +9763,10 @@ int main() {
          // NOTE: SSA model may store and analyze more than one sequence
          //       (say, different sequences may correspond to data collected
          //       from different devices)
-         //
             ssacreate(s);
             ssasetwindow(s, 3);
             ssaaddsequence(s, x);
             ssasetalgotopkdirect(s, 2);
-         //
          // Now we begin analysis. Internally SSA model stores everything it needs:
          // data, settings, solvers and so on. Right after first call to analysis-
          // related function it will analyze dataset, build basis and perform analysis.
@@ -10358,13 +9777,10 @@ int main() {
          // In this example we show how to use ssaforecastlast() function, which
          // predicts changed in the last sequence of the dataset. If you want to
          // perform prediction for some other sequence, use ssaforecastsequence().
-         //
             real_1d_array trend;
             ssaforecastlast(s, 3, trend);
-         //
          // Well, we expected it to be [9,10,11]. There exists some difference,
          // which can be explained by the artificial noise in the dataset.
-         //
             Ok = Ok && doc_test_real_vector(trend, "[9.0005,9.9322,10.8051]", 0.005);
             Ok = Ok && Test == -1;
          } catch(ap_error) {
@@ -10380,7 +9796,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 9; Test++) {
          try {
-         //
          // Suppose that you have a constant stream of incoming data, and you want
          // to regularly perform singular spectral analysis of this stream.
          //
@@ -10399,7 +9814,6 @@ int main() {
          // NOTE: direct algorithm also supports incremental updates, but
          //       with O(Width^3) cost. Typically K << Width, so specialized
          //       incremental algorithm is still faster.
-         //
             ssamodel s1;
             real_2d_array a1;
             real_1d_array sv1;
@@ -10493,7 +9907,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 6; Test++) {
          try {
-         //
          // The very simple MCPD example
          //
          // We have a loan portfolio. Our loans can be in one of two states:
@@ -10517,14 +9930,13 @@ int main() {
          // approach (Markov Chains for Proportional/Population Data), i.e.
          // to restore hidden transition matrix P using actual portfolio data.
          // We have:
-         // * poportional data, i.e. proportion of loans in the normal and past
+         // * proportional data, i.e. proportion of loans in the normal and past
          //   due states (not portfolio size measured in some currency, although
          //   it is possible to work with population data too)
          // * two tracks, i.e. two sequences which describe portfolio
          //   evolution from two different starting states: [1,0] (all loans
          //   are "good") and [0.8,0.2] (only 80% of portfolio is in the "good"
          //   state)
-         //
             mcpdstate s;
             mcpdreport rep;
             real_2d_array p;
@@ -10547,14 +9959,12 @@ int main() {
             mcpdaddtrack(s, track1);
             mcpdsolve(s);
             mcpdresults(s, p, rep);
-         //
          // Hidden matrix P is equal to
          //         ( 0.95  0.50 )
          //         (            )
          //         ( 0.05  0.50 )
          // which means that "good" loans can become "bad" with 5% probability,
          // while "bad" loans will return to good state with 50% probability.
-         //
             Ok = Ok && doc_test_real_matrix(p, "[[0.95,0.50],[0.05,0.50]]", 0.005);
             Ok = Ok && Test == -1;
          } catch(ap_error) {
@@ -10570,7 +9980,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 6; Test++) {
          try {
-         //
          // Simple MCPD example
          //
          // We have a loan portfolio. Our loans can be in one of three states:
@@ -10600,14 +10009,13 @@ int main() {
          // approach (Markov Chains for Proportional/Population Data), i.e.
          // to restore hidden transition matrix P using actual portfolio data.
          // We have:
-         // * poportional data, i.e. proportion of loans in the current and past
+         // * proportional data, i.e. proportion of loans in the current and past
          //   due states (not portfolio size measured in some currency, although
          //   it is possible to work with population data too)
          // * two tracks, i.e. two sequences which describe portfolio
          //   evolution from two different starting states: [1,0,0] (all loans
          //   are "good") and [0.8,0.2,0.0] (only 80% of portfolio is in the "good"
          //   state)
-         //
             mcpdstate s;
             mcpdreport rep;
             real_2d_array p;
@@ -10634,7 +10042,6 @@ int main() {
             mcpdaddec(s, 2, 0, 0.0);
             mcpdsolve(s);
             mcpdresults(s, p, rep);
-         //
          // Hidden matrix P is equal to
          //         ( 0.95 0.50      )
          //         ( 0.05 0.25      )
@@ -10642,7 +10049,6 @@ int main() {
          // which means that "good" loans can become past due with 5% probability,
          // while past due loans will become charged off with 25% probability or
          // return back to normal state with 50% probability.
-         //
             Ok = Ok && doc_test_real_matrix(p, "[[0.95,0.50,0.00],[0.05,0.25,0.00],[0.00,0.25,1.00]]", 0.005);
             Ok = Ok && Test == -1;
          } catch(ap_error) {
@@ -10658,7 +10064,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // The very simple classification example: classify points (x,y) in 2D space
          // as ones with x >= 0 and ones with x < 0 (y is ignored, but our classifier
          // has to find out it).
@@ -10684,7 +10089,6 @@ int main() {
          // For the sake of simplicity, our example includes only 4-point dataset and
          // really simple K == 1 nearest neighbor search. Industrial problems typically
          // need larger values of K.
-         //
             knnbuilder builder;
             ae_int_t nvars = 2;
             ae_int_t nclasses = 2;
@@ -10736,7 +10140,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // The very simple regression example: model f(x,y) == x+y
          //
          // First, we have to create KNN builder object, load dataset and specify
@@ -10758,7 +10161,6 @@ int main() {
          // For the sake of simplicity, our example includes only 4-point dataset and
          // really simple K == 1 nearest neighbor search. Industrial problems typically
          // need larger values of K.
-         //
             knnbuilder builder;
             ae_int_t nvars = 2;
             ae_int_t nout = 1;
@@ -10811,7 +10213,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // The very simple example on neural network: network is trained to reproduce
          // small 2x2 multiplication table.
          //
@@ -10819,11 +10220,9 @@ int main() {
          //       almost exact reproduction of the training set. Generalization ability
          //       of such network is rather low, but we are not concerned with such
          //       questions in this basic demo.
-         //
             mlptrainer trn;
             multilayerperceptron network;
             mlpreport rep;
-         //
          // Training set:
          // * one row corresponds to one record A*B == C in the multiplication table
          // * first two columns store A and B, last column stores C
@@ -10832,7 +10231,6 @@ int main() {
          // [1 * 2 = 2]
          // [2 * 1 = 2]
          // [2 * 2 = 4]
-         //
             real_2d_array xy = "[[1,1,1],[1,2,2],[2,1,2],[2,2,4]]";
             if (Test == 0)
                spoil_matrix_by_nan(xy);
@@ -10840,21 +10238,15 @@ int main() {
                spoil_matrix_by_posinf(xy);
             if (Test == 2)
                spoil_matrix_by_neginf(xy);
-         //
          // Network is created.
          // Trainer object is created.
          // Dataset is attached to trainer object.
-         //
             mlpcreatetrainer(2, 1, trn);
             mlpcreate1(2, 5, 1, network);
             mlpsetdataset(trn, xy, 4);
-         //
          // Network is trained with 5 restarts from random positions
-         //
             mlptrainnetwork(trn, network, 5, rep);
-         //
          // 2*2 == ?
-         //
             real_1d_array x = "[2,2]";
             real_1d_array y = "[0]";
             mlpprocess(network, x, y);
@@ -10873,7 +10265,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // Network with 2 inputs and 2 outputs is trained to reproduce vector function:
          //     (x0,x1) => (x0+x1, x0*x1)
          //
@@ -10884,18 +10275,15 @@ int main() {
          //       almost exact reproduction of the training set. Generalization ability
          //       of such network is rather low, but we are not concerned with such
          //       questions in this basic demo.
-         //
             mlptrainer trn;
             multilayerperceptron network;
             mlpreport rep;
-         //
          // Training set. One row corresponds to one record [A,B,A+B,A*B].
          //
          // [ 1   1  1+1  1*1 ]
          // [ 1   2  1+2  1*2 ]
          // [ 2   1  2+1  2*1 ]
          // [ 2   2  2+2  2*2 ]
-         //
             real_2d_array xy = "[[1,1,2,1],[1,2,3,2],[2,1,3,2],[2,2,4,4]]";
             if (Test == 0)
                spoil_matrix_by_nan(xy);
@@ -10903,22 +10291,16 @@ int main() {
                spoil_matrix_by_posinf(xy);
             if (Test == 2)
                spoil_matrix_by_neginf(xy);
-         //
          // Network is created.
          // Trainer object is created.
          // Dataset is attached to trainer object.
-         //
             mlpcreatetrainer(2, 2, trn);
             mlpcreate1(2, 5, 2, network);
             mlpsetdataset(trn, xy, 4);
-         //
          // Network is trained with 5 restarts from random positions
-         //
             mlptrainnetwork(trn, network, 5, rep);
-         //
          // 2+1 == ?
          // 2*1 == ?
-         //
             real_1d_array x = "[2,1]";
             real_1d_array y = "[0,0]";
             mlpprocess(network, x, y);
@@ -10937,7 +10319,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // Suppose that we want to classify numbers as positive (class 0) and negative
          // (class 1). We have training set which includes several strictly positive
          // or negative numbers - and zero.
@@ -10951,13 +10332,11 @@ int main() {
          //       almost exact reproduction of the training set. Generalization ability
          //       of such network is rather low, but we are not concerned with such
          //       questions in this basic demo.
-         //
             mlptrainer trn;
             multilayerperceptron network;
             mlpreport rep;
             real_1d_array x = "[0]";
             real_1d_array y = "[0,0]";
-         //
          // Training set. One row corresponds to one record [A => class(A)].
          //
          // Classes are denoted by numbers from 0 to 1, where 0 corresponds to positive
@@ -10969,7 +10348,6 @@ int main() {
          // [ -2  1]
          // [  0  0]   !! sometimes we classify 0 as positive, sometimes as negative
          // [  0  1]   !!
-         //
             real_2d_array xy = "[[+1,0],[+2,0],[-1,1],[-2,1],[0,0],[0,1]]";
             if (Test == 0)
                spoil_matrix_by_nan(xy);
@@ -10977,8 +10355,6 @@ int main() {
                spoil_matrix_by_posinf(xy);
             if (Test == 2)
                spoil_matrix_by_neginf(xy);
-         //
-         //
          // When we solve classification problems, everything is slightly different from
          // the regression ones:
          //
@@ -10995,15 +10371,11 @@ int main() {
          //
          // 3. Dataset is attached to trainer object. Note that dataset format is slightly
          //    different from one used for regression.
-         //
             mlpcreatetrainercls(1, 2, trn);
             mlpcreatec1(1, 5, 2, network);
             mlpsetdataset(trn, xy, 6);
-         //
          // Network is trained with 5 restarts from random positions
-         //
             mlptrainnetwork(trn, network, 5, rep);
-         //
          // Test our neural network on strictly positive and strictly negative numbers.
          //
          // IMPORTANT! Classifier network returns class membership probabilities instead
@@ -11019,20 +10391,17 @@ int main() {
          // Following properties are guaranteed by network architecture:
          // * P0 >= 0, P1 >= 0 non-negativity
          // * P0+P1 == 1       normalization
-         //
             x = "[1]";
             mlpprocess(network, x, y);
             Ok = Ok && doc_test_real_vector(y, "[1.000,0.000]", 0.05);
             x = "[-1]";
             mlpprocess(network, x, y);
             Ok = Ok && doc_test_real_vector(y, "[0.000,1.000]", 0.05);
-         //
          // But what our network will return for 0, which is between classes 0 and 1?
          //
          // In our dataset it has two different marks assigned (class 0 AND class 1).
          // So network will return something average between class 0 and class 1:
          //     0 => [0.5, 0.5]
-         //
             x = "[0]";
             mlpprocess(network, x, y);
             Ok = Ok && doc_test_real_vector(y, "[0.500,0.500]", 0.05);
@@ -11050,7 +10419,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // Suppose that we want to classify numbers as positive (class 0) and negative
          // (class 1). We also have one more class for zero (class 2).
          //
@@ -11058,13 +10426,11 @@ int main() {
          //       almost exact reproduction of the training set. Generalization ability
          //       of such network is rather low, but we are not concerned with such
          //       questions in this basic demo.
-         //
             mlptrainer trn;
             multilayerperceptron network;
             mlpreport rep;
             real_1d_array x = "[0]";
             real_1d_array y = "[0,0,0]";
-         //
          // Training set. One row corresponds to one record [A => class(A)].
          //
          // Classes are denoted by numbers from 0 to 2, where 0 corresponds to positive
@@ -11075,7 +10441,6 @@ int main() {
          // [ -1  1]
          // [ -2  1]
          // [  0  2]
-         //
             real_2d_array xy = "[[+1,0],[+2,0],[-1,1],[-2,1],[0,2]]";
             if (Test == 0)
                spoil_matrix_by_nan(xy);
@@ -11083,8 +10448,6 @@ int main() {
                spoil_matrix_by_posinf(xy);
             if (Test == 2)
                spoil_matrix_by_neginf(xy);
-         //
-         //
          // When we solve classification problems, everything is slightly different from
          // the regression ones:
          //
@@ -11101,15 +10464,11 @@ int main() {
          //
          // 3. Dataset is attached to trainer object. Note that dataset format is slightly
          //    different from one used for regression.
-         //
             mlpcreatetrainercls(1, 3, trn);
             mlpcreatec1(1, 5, 3, network);
             mlpsetdataset(trn, xy, 5);
-         //
          // Network is trained with 5 restarts from random positions
-         //
             mlptrainnetwork(trn, network, 5, rep);
-         //
          // Test our neural network on strictly positive and strictly negative numbers.
          //
          // IMPORTANT! Classifier network returns class membership probabilities instead
@@ -11123,7 +10482,6 @@ int main() {
          // Following properties are guaranteed by network architecture:
          // * P0 >= 0, P1 >= 0, P2 >= 0 non-negativity
          // * P0+P1+P2 == 1             normalization
-         //
             x = "[1]";
             mlpprocess(network, x, y);
             Ok = Ok && doc_test_real_vector(y, "[1.000,0.000,0.000]", 0.05);
@@ -11147,7 +10505,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 6; Test++) {
          try {
-         //
          // Trainer object is used to train network. It stores dataset, training settings,
          // and other information which is NOT part of neural network. You should use
          // trainer object as follows:
@@ -11160,9 +10517,7 @@ int main() {
          // You may interleave stages 2...4 and repeat them many times. Trainer object
          // remembers its internal state and can be used several times after its creation
          // and initialization.
-         //
             mlptrainer trn;
-         //
          // Stage 1: object creation.
          //
          // We have to specify number of inputs and outputs. Trainer object can be used
@@ -11175,9 +10530,7 @@ int main() {
          //
          // Below we create trainer object which can be used to train regression networks
          // with 2 inputs and 1 output.
-         //
             mlpcreatetrainer(2, 1, trn);
-         //
          // Stage 2: specification of the training set
          //
          // By default trainer object stores empty dataset. So to solve your non-empty problem
@@ -11190,7 +10543,6 @@ int main() {
          //     [1 * 2 = 2]   [ 1 2 2 ]
          //     [2 * 1 = 2] = [ 2 1 2 ]
          //     [2 * 2 = 4]   [ 2 2 4 ]
-         //
             real_2d_array xy = "[[1,1,1],[1,2,2],[2,1,2],[2,2,4]]";
             if (Test == 0)
                spoil_matrix_by_nan(xy);
@@ -11199,14 +10551,12 @@ int main() {
             if (Test == 2)
                spoil_matrix_by_neginf(xy);
             mlpsetdataset(trn, xy, 4);
-         //
          // Stage 3: modification of the training parameters.
          //
          // You may modify parameters like weights decay or stopping criteria:
          // * we set moderate weight decay
          // * we choose iterations limit as stopping condition (another condition - step size -
          //   is zero, which means than this condition is not active)
-         //
             double wstep = 0.000;
             if (Test == 3)
                wstep = NAN;
@@ -11217,7 +10567,6 @@ int main() {
             ae_int_t maxits = 100;
             mlpsetdecay(trn, 0.01);
             mlpsetcond(trn, wstep, maxits);
-         //
          // Stage 4: training.
          //
          // We will train several networks with different architecture using same trainer object.
@@ -11232,7 +10581,6 @@ int main() {
          // NOTE: these networks solve regression problems. For classification problems you
          //       should use mlpcreatec0/c1/c2 to create neural networks which have SOFTMAX-
          //       normalized outputs.
-         //
             multilayerperceptron net1;
             multilayerperceptron net2;
             multilayerperceptron net3;
@@ -11257,16 +10605,12 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // This example shows how to perform cross-validation with ALGLIB
-         //
             mlptrainer trn;
             multilayerperceptron network;
             mlpreport rep;
-         //
          // Training set: f(x) == 1/(x^2+1)
          // One row corresponds to one record [x,f(x)]
-         //
             real_2d_array xy = "[[-2.0,0.2],[-1.6,0.3],[-1.3,0.4],[-1,0.5],[-0.6,0.7],[-0.3,0.9],[0,1],[2.0,0.2],[1.6,0.3],[1.3,0.4],[1,0.5],[0.6,0.7],[0.3,0.9]]";
             if (Test == 0)
                spoil_matrix_by_nan(xy);
@@ -11274,7 +10618,6 @@ int main() {
                spoil_matrix_by_posinf(xy);
             if (Test == 2)
                spoil_matrix_by_neginf(xy);
-         //
          // Trainer object is created.
          // Dataset is attached to trainer object.
          //
@@ -11282,10 +10625,8 @@ int main() {
          //       as small as ours (13 examples). It is done for demonstration
          //       purposes only. Generalization error estimates won't be
          //       precise enough for practical purposes.
-         //
             mlpcreatetrainer(1, 1, trn);
             mlpsetdataset(trn, xy, 13);
-         //
          // The key property of the cross-validation is that it estimates
          // generalization properties of neural ARCHITECTURE. It does NOT
          // estimates generalization error of some specific network which
@@ -11298,10 +10639,8 @@ int main() {
          //
          // We perform 5 restarts from different random positions for each
          // of the 10 cross-validation rounds.
-         //
             mlpcreate1(1, 4, 1, network);
             mlpkfoldcv(trn, network, 5, 10, rep);
-         //
          // Cross-validation routine stores estimates of the generalization
          // error to MLP report structure. You may examine its fields and
          // see estimates of different errors (RMS, CE, Avg).
@@ -11310,7 +10649,6 @@ int main() {
          // can not say what values will be stored to rep after call to
          // mlpkfoldcv(). Every CV round will return slightly different
          // estimates.
-         //
             Ok = Ok && Test == -1;
          } catch(ap_error) {
             Ok = Ok && Test != -1;
@@ -11325,16 +10663,12 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // This example shows how to train early stopping ensebles.
-         //
             mlptrainer trn;
             mlpensemble ensemble;
             mlpreport rep;
-         //
          // Training set: f(x) == 1/(x^2+1)
          // One row corresponds to one record [x,f(x)]
-         //
             real_2d_array xy = "[[-2.0,0.2],[-1.6,0.3],[-1.3,0.4],[-1,0.5],[-0.6,0.7],[-0.3,0.9],[0,1],[2.0,0.2],[1.6,0.3],[1.3,0.4],[1,0.5],[0.6,0.7],[0.3,0.9]]";
             if (Test == 0)
                spoil_matrix_by_nan(xy);
@@ -11342,7 +10676,6 @@ int main() {
                spoil_matrix_by_posinf(xy);
             if (Test == 2)
                spoil_matrix_by_neginf(xy);
-         //
          // Trainer object is created.
          // Dataset is attached to trainer object.
          //
@@ -11350,13 +10683,10 @@ int main() {
          //       as small as ours (13 examples). It is done for demonstration
          //       purposes only. Ensemble training algorithm won't find good
          //       solution on such small sample.
-         //
             mlpcreatetrainer(1, 1, trn);
             mlpsetdataset(trn, xy, 13);
-         //
          // Ensemble is created and trained. Each of 50 network is trained
          // with 5 restarts.
-         //
             mlpecreate1(1, 4, 1, 50, ensemble);
             mlptrainensemblees(trn, ensemble, 5, rep);
             Ok = Ok && Test == -1;
@@ -11373,7 +10703,6 @@ int main() {
       Ok = true;
       for (int Test = -1; Test < 3; Test++) {
          try {
-         //
          // This example shows how to use parallel functionality of ALGLIB.
          // We generate simple 1-dimensional regression problem and show how
          // to use parallel training, parallel cross-validation, parallel
@@ -11384,7 +10713,6 @@ int main() {
          //
          // NOTE: it is not good idea to use parallel features on sample as small
          //       as ours (13 examples). It is done only for demonstration purposes.
-         //
             mlptrainer trn;
             multilayerperceptron network;
             mlpensemble ensemble;
@@ -11400,7 +10728,6 @@ int main() {
             mlpsetdataset(trn, xy, 13);
             mlpcreate1(1, 4, 1, network);
             mlpecreate1(1, 4, 1, 50, ensemble);
-         //
          // Below we demonstrate how to perform:
          // * parallel training of individual networks
          // * parallel cross-validation
@@ -11421,9 +10748,7 @@ int main() {
          //          * setnworkers(+2) = use 2 cores (even if you have more)
          //    During runtime ALGLIB will automatically determine whether it is
          //    feasible to start worker threads and split your task between cores.
-         //
             setnworkers(+2);
-         //
          // First, we perform parallel training of individual network with 5
          // restarts from random positions. These 5 rounds of  training  are
          // executed in parallel manner,  with  best  network  chosen  after
@@ -11434,22 +10759,17 @@ int main() {
          // simultaneously. It allows us  to  efficiently  parallelize  even
          // single training round. This operation is performed automatically
          // for large datasets, but our toy dataset is too small.
-         //
             mlptrainnetwork(trn, network, 5, rep);
-         //
          // Then, we perform parallel 10-fold cross-validation, with 5 random
          // restarts per each CV round. I.e., 5*10 == 50  networks  are trained
          // in total. All these operations can be parallelized.
          //
          // NOTE: again, ALGLIB can parallelize  calculation   of   gradient
          //       over entire dataset - but our dataset is too small.
-         //
             mlpkfoldcv(trn, network, 5, 10, rep);
-         //
          // Finally, we train early stopping ensemble of 50 neural networks,
          // each  of them is trained with 5 random restarts. I.e.,  5*50 == 250
          // networks aretrained in total.
-         //
             mlptrainensemblees(trn, ensemble, 5, rep);
             Ok = Ok && Test == -1;
          } catch(ap_error) {
@@ -11463,7 +10783,7 @@ int main() {
       AllOk = AllOk && Ok;
    } catch(...) {
       printf("Unhandled exception was raised!\n");
-      return 1;
+      return EXIT_FAILURE;
    }
 #ifdef AE_USE_ALLOC_COUNTER
    printf("Allocation counter checked... ");
@@ -11472,8 +10792,8 @@ int main() {
 #   endif
    if (alglib_impl::_alloc_counter != 0) {
       printf("Failure: _alloc_counter is non-zero on end!\n");
-      return 1;
+      return EXIT_FAILURE;
    } else printf("Ok\n");
 #endif
-   return AllOk ? 0 : 1;
+   return AllOk ? EXIT_SUCCESS : EXIT_FAILURE;
 }

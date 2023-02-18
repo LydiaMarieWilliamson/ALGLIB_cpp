@@ -15,7 +15,7 @@
 #include "AlgLibMisc.h"
 
 // === HQRND Package ===
-// Depends on: (AlgLibInternal) APSERV, ABLASF
+// Depends on: (AlgLibInternal) ABLASF
 namespace alglib_impl {
 static const ae_int_t hqrnd_hqrndm1 = 1 + 2 * 3 * 7 * 631 * 81031; // == 2^31 - 85
 static const ae_int_t hqrnd_hqrndm2 = 1 + 2 * 19 * 31 * 1019 * 1789; // == 2^31 - 249
@@ -114,22 +114,15 @@ ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n) {
    ae_int_t result;
    ae_assert(n > 0, "hqrnduniformi: N <= 0!");
    maxcnt = hqrnd_hqrndmax + 1;
-// Two branches: one for N <= MaxCnt, another for N > MaxCnt.
    if (n > maxcnt) {
-   // N >= MaxCnt.
-   //
    // We have two options here:
    // a) N is exactly divisible by MaxCnt
    // b) N is not divisible by MaxCnt
-   //
    // In both cases we reduce problem on interval spanning [0,N)
    // to several subproblems on intervals spanning [0,MaxCnt).
+   // [0,N) range is divided into ceil(N/MaxCnt) bins,
+   // each of them having length equal to MaxCnt.
       if (n % maxcnt == 0) {
-      // N is exactly divisible by MaxCnt.
-      //
-      // [0,N) range is dividided into N/MaxCnt bins,
-      // each of them having length equal to MaxCnt.
-      //
       // We generate:
       // * random bin number B
       // * random offset within bin A
@@ -142,11 +135,6 @@ ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n) {
          b = hqrnduniformi(state, n / maxcnt);
          result = a + maxcnt * b;
       } else {
-      // N is NOT exactly divisible by MaxCnt.
-      //
-      // [0,N) range is dividided into ceil(N/MaxCnt) bins,
-      // each of them having length equal to MaxCnt.
-      //
       // We generate:
       // * random bin number B in [0, ceil(N/MaxCnt)-1]
       // * random offset within bin A
@@ -168,8 +156,6 @@ ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n) {
          } while (result < 0);
       }
    } else {
-   // N <= MaxCnt
-   //
    // Code below is a bit complicated because we can not simply
    // return "hqrnd_hqrndintegerbase() mod N" - it will be skewed for
    // large N's in [0.1*hqrnd_hqrndmax...hqrnd_hqrndmax].
@@ -421,7 +407,6 @@ namespace alglib {
 //
 // Fields:
 //     S1, S2      -   seed values
-//     V           -   precomputed value
 //     MagicV      -   'magic' value used to determine whether State structure
 //                     was correctly initialized.
 DefClass(hqrndstate, )
@@ -2443,7 +2428,7 @@ ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch) {
 
 // R-NN query: all points within  R-sphere  centered  at  X,  using  external
 // thread-local buffer, no ordering by distance as undicated  by  "U"  suffix
-// (faster that ordered query, for large queries - significantly faster).
+// (faster than ordered query, for large queries - significantly faster).
 //
 // You can call this function from multiple threads for same kd-tree instance,
 // assuming that different instances of buffer object are passed to different
@@ -2494,7 +2479,7 @@ ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, do
 }
 
 // R-NN query: all points within R-sphere  centered  at  X,  no  ordering  by
-// distance as undicated by "U" suffix (faster that ordered query, for  large
+// distance as undicated by "U" suffix (faster than ordered query, for  large
 // queries - significantly faster).
 //
 // IMPORTANT: this function can not be used in multithreaded code because  it
@@ -2749,9 +2734,7 @@ void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *x) {
    if (buf->kcur == 0) {
       return;
    }
-   if (x->rows < buf->kcur || x->cols < kdt->nx) {
-      ae_matrix_set_length(x, buf->kcur, kdt->nx);
-   }
+   matrixsetlengthatleast(x, buf->kcur, kdt->nx);
    k = buf->kcur;
    for (i = 0; i < k; i++) {
       ae_v_move(x->xyR[i], 1, &kdt->xy.xyR[buf->idx.xZ[i]][kdt->nx], 1, kdt->nx);
@@ -2828,9 +2811,7 @@ void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *xy) 
    if (buf->kcur == 0) {
       return;
    }
-   if (xy->rows < buf->kcur || xy->cols < kdt->nx + kdt->ny) {
-      ae_matrix_set_length(xy, buf->kcur, kdt->nx + kdt->ny);
-   }
+   matrixsetlengthatleast(xy, buf->kcur, kdt->nx + kdt->ny);
    k = buf->kcur;
    for (i = 0; i < k; i++) {
       ae_v_move(xy->xyR[i], 1, &kdt->xy.xyR[buf->idx.xZ[i]][kdt->nx], 1, kdt->nx + kdt->ny);
@@ -2913,9 +2894,7 @@ void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector *ta
    if (buf->kcur == 0) {
       return;
    }
-   if (tags->cnt < buf->kcur) {
-      ae_vector_set_length(tags, buf->kcur);
-   }
+   vectorsetlengthatleast(tags, buf->kcur);
    k = buf->kcur;
    for (i = 0; i < k; i++) {
       tags->xZ[i] = kdt->tags.xZ[buf->idx.xZ[i]];
@@ -2997,9 +2976,7 @@ void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVecto
    if (buf->kcur == 0) {
       return;
    }
-   if (r->cnt < buf->kcur) {
-      ae_vector_set_length(r, buf->kcur);
-   }
+   vectorsetlengthatleast(r, buf->kcur);
    k = buf->kcur;
 // unload norms
 //

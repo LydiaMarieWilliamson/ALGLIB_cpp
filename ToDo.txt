@@ -3,9 +3,29 @@
 ∙	Add in the DSP routines: Windowed Transforms;
 	time-frequency and time-scale routines onto FastTransforms; outlined in a separate file, DSP.txt.
 ∙	Add in new multi-threading framework.
-∙	Add in a scripting language front end
+	―	Or use C++ co-routines.
+∙	Add in a scripting language front end.
+	―	A likely candidate: a front end language similar to MatLab, possibly also integrating SciLab.
 ∙	Implement the other, older, ALGLIB
 		J.M. Shearer, M.A. Wolfe
 		"ALGLIB, a simple symbol-manipulation package",
 		CACM 28(8) 1985, 820-825
 	within the scripting language.
+∙	Start modernizing and nativizing the C and C++ code to C++.
+	―	Use tuples (including std::swap).
+	―	Nativize the complex type.
+	―	Nativize shared pools and smart pointers.
+	―	Templatize the vector and matrix types and routines.
+	―	Nativize the constructors and destructors (and add a "move" constructor)
+		―	Replace all the *_init()'s by constructors.
+		―	Replace all the *_free()'s by destructors.
+		―	Replace all the *_copy()'s by copy and move constructors.
+		―	Nativize New{Block,Vector,Matrix,Obj,Serializer} using "new" or by declarations.
+		―	Add in "delete" where necessary.
+		―	Eliminate ae_frame_make(), ae_frame_leave() and ae_frame().
+	―	Eliminate the alglib namespace and fold the alglib_impl namespace into it.
+	―	Possibly using "constexpr" to fold double C++ declarations:
+			T f(⋯X⋯) { ⋯S⋯ }
+			const T f(⋯X⋯) const { ⋯S⋯ }
+		into
+			constexpr T f(⋯X⋯) { ⋯S⋯ }

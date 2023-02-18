@@ -68,18 +68,18 @@ namespace alglib_impl {
 #define AE_SER_ENTRIES_PER_ROW	5
 
 // These declarations are used to ensure, at compile-time, that
-//	sizeof(bool) == 1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_int_t) == sizeof(void *).
-// They are implemented by the following general method to verify ConstA == ConstB:
-//	static char DummyArray[1 -  2 * (ConstA - ConstB) * (ConstA - ConstB)];
-// that would lead to a syntax error if the constraint failed (by declaring a negative array size).
+//	sizeof(bool) == 1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_uint64_t) == 8, sizeof(ae_int_t) == sizeof(void *).
+// They are implemented by the following general method to verify the condition Cond:
+//	static char DummyArray[Cond ? +1 : -1];
+// that would lead to a syntax error if the condition failed (by declaring a negative array size).
 // You can remove them, if you want, since they are not used anywhere else.
-#define EquateConst(Arr, A, B)	static char Arr[1 - 2 * ((A) - (B)) * ((A) - (B))];
-EquateConst(_ae_bool_must_be_8_bits_wide, (int)sizeof(bool), 1);
-EquateConst(_ae_int32_t_must_be_32_bits_wide, (int)sizeof(ae_int32_t), 4);
-EquateConst(_ae_int64_t_must_be_64_bits_wide, (int)sizeof(ae_int64_t), 8);
-EquateConst(_ae_uint64_t_must_be_64_bits_wide, (int)sizeof(ae_uint64_t), 8);
-EquateConst(_ae_int_t_must_be_pointer_sized, (int)sizeof(ae_int_t), (int)sizeof(void *));
-#undef EquateConst
+#define ForceCond(Arr, Cond)	static char Arr[(Cond) ? +1 : -1];
+ForceCond(_ae_bool_must_be_8_bits_wide, (int)sizeof(bool) == 1);
+ForceCond(_ae_int32_t_must_be_32_bits_wide, (int)sizeof(ae_int32_t) == 4);
+ForceCond(_ae_int64_t_must_be_64_bits_wide, (int)sizeof(ae_int64_t) == 8);
+ForceCond(_ae_uint64_t_must_be_64_bits_wide, (int)sizeof(ae_uint64_t) == 8);
+ForceCond(_ae_int_t_must_be_pointer_sized, (int)sizeof(ae_int_t) == (int)sizeof(void *));
+#undef ForceCond
 
 // Allocation tracking, for debugging.
 ae_int_t _alloc_counter = 0;
@@ -180,7 +180,7 @@ void ae_clean_up() {
 // Abnormally abort the program, using one of several ways:
 // *	if TopFr != NULL and CurBreakAt points to a jmp_buf - longjmp() to the return site,
 // *	else abort().
-// In all cases, for TopFr != NULL, set the CurStatus and CurMsg fields.
+// In all cases, for TopFr != NULL, set CurStatus and CurMsg.
 // Clear the frame stack, if any, with ae_state_clear().
 #if 0 //(@) Not used, but retained for possible inclusion into the multi-threading core being created anew for ALGLIB++.
 // If TopFr != NULL and ErrorOp() != NULL, call ErrorOp() before handling errors and clearing TopFr.
@@ -263,7 +263,7 @@ static ae_cpuid_t ae_cpuid() {
 #   elif AE_COMPILER == AE_MSVC
       int CPUInfo[4];
 #   endif
-   // SSE2 support
+   // SSE2 support.
 #   if defined _ALGLIB_HAS_SSE2_INTRINSICS || AE_COMPILER == AE_SUNC
 #      if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
       __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
@@ -274,18 +274,18 @@ static ae_cpuid_t ae_cpuid() {
 #      endif
 #   endif
 #   if defined _ALGLIB_HAS_AVX2_INTRINSICS
-   // Check OS support for XSAVE XGETBV
+   // Check OS support for XSAVE XGETBV.
 #      if AE_COMPILER == AE_GNUC
       __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
       if (c & (0x1 << 27)) {
          __asm__ volatile ("xgetbv":"=a" (a), "=d"(d):"c"(0));
          if ((a & 0x6) == 0x6) {
-            if (_ae_cpuid_has_sse2) { // AVX2 support
+            if (_ae_cpuid_has_sse2) { // AVX2 support.
                __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(7), "c"(0));
                if (b & (0x1 << 5)) _ae_cpuid_has_avx2 = true;
             }
 #         if defined _ALGLIB_HAS_FMA_INTRINSICS
-            if (_ae_cpuid_has_avx2) { // FMA support
+            if (_ae_cpuid_has_avx2) { // FMA support.
                __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
                if (c & (0x1 << 12)) _ae_cpuid_has_fma = true;
             }
@@ -295,14 +295,14 @@ static ae_cpuid_t ae_cpuid() {
 #      elif AE_COMPILER == AE_MSVC && _MSC_VER >= 1600
       __cpuid(CPUInfo, 1);
       if ((CPUInfo[2] & (0x1 << 27)) && (_xgetbv(0) & 0x6) == 0x6) {
-         if (_ae_cpuid_has_sse2) { // AVX2 support
+         if (_ae_cpuid_has_sse2) { // AVX2 support.
             __cpuidex(CPUInfo, 7, 0);
-            if ((CPUInfo[1] & (0x1 << 5)) != 0) _ae_cpuid_has_avx2 = true;
+            if (CPUInfo[1] & (0x1 << 5)) _ae_cpuid_has_avx2 = true;
          }
 #         if defined _ALGLIB_HAS_FMA_INTRINSICS
-         if (_ae_cpuid_has_avx2) { // FMA support
+         if (_ae_cpuid_has_avx2) { // FMA support.
             __cpuid(CPUInfo, 1);
-            if ((CPUInfo[2] & (0x1 << 12)) != 0) _ae_cpuid_has_fma = true;
+            if (CPUInfo[2] & (0x1 << 12)) _ae_cpuid_has_fma = true;
          }
 #         endif
       }
@@ -385,18 +385,9 @@ static ae_int_t dbgws_pushroot_failed = 0;
 __asm__(".symver exp,exp@GLIBC_2.2.5");
 __asm__(".symver log,log@GLIBC_2.2.5");
 __asm__(".symver pow,pow@GLIBC_2.2.5");
-
-double __wrap_exp(double x) {
-   return exp(x);
-}
-
-double __wrap_log(double x) {
-   return log(x);
-}
-
-double __wrap_pow(double x, double y) {
-   return pow(x, y);
-}
+double __wrap_exp(double x) { return exp(x); }
+double __wrap_log(double x) { return log(x); }
+double __wrap_pow(double x, double y) { return pow(x, y); }
 #endif
 
 ae_int64_t ae_get_dbg_value(debug_flag_t id) {
@@ -406,21 +397,15 @@ ae_int64_t ae_get_dbg_value(debug_flag_t id) {
       case _ALGLIB_TOTAL_ALLOC_COUNT: return _alloc_counter_total;
 #if defined AE_MKL
       case _ALGLIB_VENDOR_MEMSTAT: return ae_mkl_memstat();
-#else
-      case _ALGLIB_VENDOR_MEMSTAT: return 0;
 #endif
    // Work-stealing counters.
 #if defined AE_SMP
       case _ALGLIB_WSDBG_NCORES: return ae_cores_count();
-#else
-      case _ALGLIB_WSDBG_NCORES: return 0;
 #endif
       case _ALGLIB_WSDBG_PUSHROOT_OK: return dbgws_pushroot_ok;
       case _ALGLIB_WSDBG_PUSHROOT_FAILED: return dbgws_pushroot_failed;
 #if defined AE_SMP
       case _ALGLIB_CORES_COUNT: return ae_cores_count();
-#else
-      case _ALGLIB_CORES_COUNT: return 0;
 #endif
       case _ALGLIB_GLOBAL_THREADING: return (ae_int64_t)ae_get_global_threading();
       case _ALGLIB_NWORKERS: return (ae_int64_t)_alglib_cores_to_use;
@@ -654,32 +639,21 @@ void *aligned_malloc(size_t size, size_t alignment) {
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    return ae_static_malloc(size, alignment);
 #else
-   char *result = NULL;
    if (size == 0 || _force_malloc_failure || _malloc_failure_after > 0 && _alloc_counter_total >= _malloc_failure_after) return NULL;
-// Allocate.
-   if (alignment <= 1) {
-   // No alignment, just call malloc().
-      void *block = malloc(sizeof block + size);
-      if (block == NULL) return NULL;
-      *(void **)block = block;
-      result = (char *)((char *)block + sizeof block);
-   } else {
-   // Align.
-      void *block = malloc(alignment - 1 + sizeof block + size);
-      if (block == NULL) return NULL;
-      result = (char *)block + sizeof block;
-#   if 0
-      if ((result - (char *)NULL) % alignment != 0) result += alignment - (result - (char *)NULL) % alignment;
-#   endif
-      result = (char *)ae_align(result, alignment);
-      *(void **)(result - sizeof block) = block;
-   }
+// Allocate, making the appropriate padding adjustments for any alignment > 1.
+   size_t alloc_size = sizeof(void *) + size;
+   if (alignment > 1) alloc_size += alignment - 1;
+   void *block = malloc(alloc_size); if (block == NULL) return NULL;
+   char *result = (char *)block + sizeof block;
+   if (alignment > 1) result = (char *)ae_align(result, alignment);
+   *(void **)(result - sizeof block) = block;
 // Update whichever counters the use-flags are set for.
    if (_use_alloc_counter) {
       ae_optional_atomic_add_i(&_alloc_counter, 1);
       ae_optional_atomic_add_i(&_alloc_counter_total, 1);
    }
    if (_use_dbg_counters) ae_optional_atomic_add_i(&_dbg_alloc_total, (ae_int64_t)size);
+// Return the result as a generic pointer.
    return (void *)result;
 #endif
 }
@@ -697,8 +671,7 @@ void aligned_free(void *block) {
    ae_static_free(block);
 #else
    if (block == NULL) return;
-   void *p = aligned_extract_ptr(block);
-   free(p);
+   free(aligned_extract_ptr(block));
    if (_use_alloc_counter) ae_optional_atomic_sub_i(&_alloc_counter, 1);
 #endif
 }
@@ -772,7 +745,7 @@ void ae_db_free(ae_dyn_block *block) {
 // *	Avoid calling it for the special blocks which mark frame boundaries!
 void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2) {
    void *volatile ptr = block1->ptr;
-   void (*deallocator)(void *) = block1->deallocator;
+   ae_deallocator deallocator = block1->deallocator;
    block1->ptr = block2->ptr;
    block1->deallocator = block2->deallocator;
    block2->ptr = ptr;
@@ -1239,7 +1212,7 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
       dst->stride = src->cols;
       dst->datatype = src->datatype;
       dst->x_ptr = ae_malloc((size_t)(dst->rows * (ae_int_t)dst->stride * ae_sizeof(src->datatype)));
-      if (dst->rows != 0 && dst->stride != 0 && dst->x_ptr == NULL) ae_break(ERR_OUT_OF_MEMORY, "ae_x_set_matrix: out of memory");
+      if (dst->rows > 0 && dst->stride != 0 && dst->x_ptr == NULL) ae_break(ERR_OUT_OF_MEMORY, "ae_x_set_matrix: out of memory");
       dst->last_action = ACT_NEW_LOCATION;
       dst->owner = true;
    } else {
@@ -1248,7 +1221,7 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
       else if (dst->last_action == ACT_NEW_LOCATION) dst->last_action = ACT_NEW_LOCATION;
       else ae_assert(false, "ae_x_set_matrix: internal error");
    }
-   if (src->cols != 0 && src->rows != 0) {
+   if (src->cols > 0 && src->rows > 0) {
       char *p_src_row = (char *)(src->xyX[0]);
       char *p_dst_row = (char *)dst->x_ptr;
       ae_int_t row_size = ae_sizeof(src->datatype) * src->cols;
@@ -1312,8 +1285,8 @@ static double x_safepythag2(double x, double y) {
 // *	*err:	the maximum componentwise difference between the lower block and the transpose of its upper counterpart.
 static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, bool *nonfinite, double *mx, double *err) {
    if (len0 <= x_nb && len1 <= x_nb) { // The base case.
-      double *p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
-      double *p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
+      double *p1 = (double *)a->x_ptr + offset0 * a->stride + offset1;
+      double *p2 = (double *)a->x_ptr + offset1 * a->stride + offset0;
       for (ae_int_t i = 0; i < len0; i++) {
          double *pcol = p2 + i;
          double *prow = p1 + i * a->stride;
@@ -1353,7 +1326,7 @@ static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
 // *	*err:	the maximum componentwise difference between the block and its transpose.
 static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len, bool *nonfinite, double *mx, double *err) {
    if (len <= x_nb) { // The base case.
-      double *p = (double *)(a->x_ptr) + offset * a->stride + offset;
+      double *p = (double *)a->x_ptr + offset * a->stride + offset;
       for (ae_int_t i = 0; i < len; i++) {
          double *pcol = p + i;
          double *prow = p + i * a->stride;
@@ -1487,8 +1460,8 @@ static bool x_is_hermitian(x_matrix *a) {
 // Copy the transpose of the len0 x len1 off-diagonal block at (offset0, offset1) to its symmetric counterpart.
 static void force_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1) {
    if (len0 <= x_nb && len1 <= x_nb) { // The base case.
-      double *p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
-      double *p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
+      double *p1 = (double *)a->x_ptr + offset0 * a->stride + offset1;
+      double *p2 = (double *)a->x_ptr + offset1 * a->stride + offset0;
       for (ae_int_t i = 0; i < len0; i++) {
          double *pcol = p2 + i;
          double *prow = p1 + i * a->stride;
@@ -1516,7 +1489,7 @@ static void force_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
 // Copy the transpose of the lower part of the len x len diagonal block at (offset, offset) to its upper part.
 static void force_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len) {
    if (len <= x_nb) { // The base case.
-      double *p = (double *)(a->x_ptr) + offset * a->stride + offset;
+      double *p = (double *)a->x_ptr + offset * a->stride + offset;
       for (ae_int_t i = 0; i < len; i++) {
          double *pcol = p + i;
          double *prow = p + i * a->stride;
@@ -1738,17 +1711,17 @@ static inline void _ae_free_lock(_lock *p) { }
 //	Errors during allocation of such locks are considered critical exceptions and are handled by calling abort().
 void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic) {
 //(@) Zero-check removed.
-   bool is_auto = !is_static && TopFr != NULL;
-   if (!is_auto) {
+   bool need_auto = !is_static && TopFr == NULL;
+   if (need_auto) {
       AE_CRITICAL_ASSERT(!make_automatic);
       ae_state_init();
    }
    lock->is_static = is_static;
    size_t size = sizeof(_lock);
-   ae_db_init(&lock->db, size, make_automatic);
+   if (!is_static) ae_db_init(&lock->db, size, make_automatic);
    lock->lock_ptr = !is_static ? lock->db.ptr : size == 0 || _force_malloc_failure ? NULL : malloc(size);
    _ae_init_lock((_lock *)lock->lock_ptr);
-   if (!is_auto) ae_state_clear();
+   if (need_auto) ae_state_clear();
 }
 
 // Acquire an ae_lock.
@@ -1795,7 +1768,7 @@ void ae_shared_pool_init(void *_dst, bool make_automatic) {
 // Clear all dynamically allocated fields of the ae_shared_pool dst except for the lock.
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
+//	It does NOT try to acquire a pool lock, and should NOT be used simultaneously from other threads.
 static void ae_shared_pool_internalclear(ae_shared_pool *dst, bool make_automatic) {
 // Free the seed.
    if (dst->seed_object != NULL) {
@@ -1827,7 +1800,7 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst, bool make_automati
 // as opposed to being the field of some other object.
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
+//	It does NOT try to acquire a pool lock, and should NOT be used simultaneously from other threads.
 void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic) {
 //(@) TopFr != NULL check removed (for TopFr != NULL: allocation errors result in an exception from ae_malloc()).
    ae_shared_pool *dst = (ae_shared_pool *)_dst;
@@ -1869,7 +1842,7 @@ void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic) {
 // Free the ae_shared_pool _dst.
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
+//	It does NOT try to acquire a pool lock, and should NOT be used simultaneously from other threads.
 void ae_shared_pool_free(void *_dst, bool make_automatic) {
    ae_shared_pool *dst = (ae_shared_pool *)_dst;
 // Clear the seed and lists.
@@ -1889,7 +1862,7 @@ void ae_shared_pool_free(void *_dst, bool make_automatic) {
 // True if and only if the already-initialized ae_shared_pool dst is seeded; i.e. if its internal seed object is set.
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
+//	It does NOT try to acquire a pool lock, and should NOT be used simultaneously from other threads.
 bool ae_shared_pool_is_initialized(ae_shared_pool *dst) {
    return dst->seed_object != NULL;
 }
@@ -1899,7 +1872,7 @@ bool ae_shared_pool_is_initialized(ae_shared_pool *dst) {
 // The make, copy and free functions are set respectively to init(), copy() and free().
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
+//	It does NOT try to acquire a pool lock, and should NOT be used simultaneously from other threads.
 void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, bool make_automatic), void (*copy)(void *dst, void *src, bool make_automatic), void (*free)(void *ptr, bool make_automatic)) {
 //(@) TopFr != NULL check removed (for TopFr != NULL: allocation errors result in an exception from ae_malloc()).
 // Free the internal objects.
@@ -1992,7 +1965,7 @@ void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 // Clear the internal list of recycled objects, keeping intact the seed object managed by the ae_shared_pool pool.
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
+//	It does NOT try to acquire a pool lock, and should NOT be used simultaneously from other threads.
 void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic) {
 // Clear the recycled objects.
    for (ae_shared_pool_entry *ptr = pool->recycled_objects; ptr != NULL; ) {
@@ -2011,7 +1984,7 @@ void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic) {
 // *	The recycled object is KEPT in pool and ownership is NOT passed to pptr.
 // *	If there are no recycled objects left in pool or pool is not seeded, then NULL is stored into pptr.
 // *	Any non-NULL pointer owned by pptr is deallocated before storing the value retrieved from pool.
-// *	This function IS NOT thread-safe
+// *	This function is NOT thread-safe
 // *	You should NOT modify pool during enumeration (although you can modify the state of the objects retrieved from pool).
 void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 // Modify the internal enumeration counter.
@@ -2047,7 +2020,7 @@ void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 // while leaving pool intact for reseeding and subsequent reuse.
 // NOTE:
 // *	This function is NOT thread-safe.
-//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
+//	It does NOT try to acquire a pool lock, and should NOT be used simultaneously from other threads.
 void ae_shared_pool_reset(ae_shared_pool *pool) {
 // Clear the seed and lists.
    ae_shared_pool_internalclear(pool, false);
@@ -2131,7 +2104,7 @@ void ae_serializer_alloc_entry(ae_serializer *serializer) {
    serializer->entries_needed++;
 }
 
-// After the allocation is done, return the required size of the output string buffer (including trailing '\0').
+// After the allocation is done, return the required size of the output string buffer (including the trailing '\0').
 // The actual size of the data being stored can be a few characters smaller than requested.
 ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer) {
    serializer->mode = AE_SM_READY2S;
@@ -2738,7 +2711,7 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
    }
 }
 
-// Integer and real math functions.
+// Integer and real math functions:
 bool isneginf(double x) { return isinf(x) && signbit(x); }
 bool isposinf(double x) { return isinf(x) && !signbit(x); }
 
@@ -2797,22 +2770,25 @@ double rboundval(double x, double b1, double b2) {
 
 double randomreal() {
    const double mx = RAND_MAX + 1.0;
-   return (rand() + rand() / mx) / mx;
+   int i = rand();
+   return (i + rand() / mx) / mx;
 }
 
 double randommid() {
    const double mx = RAND_MAX + 1.0;
-   return 2.0 * (rand() + rand() / mx) / mx - 1.0;
+   int i = rand();
+   return 2.0 * (i + rand() / mx) / mx - 1.0;
 }
 
 ae_int_t randominteger(ae_int_t maxv) { return rand() % maxv; }
 
 bool randombool(double p/* = 0.5*/) {
    const double mx = RAND_MAX + 1.0;
-   return rand() + rand()/mx <= p * mx;
+   int i = rand();
+   return i + rand() / mx <= p * mx;
 }
 
-// Complex math functions.
+// Complex math functions:
 complex ae_c_neg(complex A) { return complex_from_d(-A.x, -A.y); }
 complex conj(complex A) { return complex_from_d(+A.x, -A.y); }
 complex csqr(complex A) { double Ax = A.x, Ay = A.y; return complex_from_d(Ax * Ax - Ay * Ay, 2.0 * Ax * Ay); }
@@ -3500,7 +3476,7 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
       _mm_storeh_pd(&row1, vtmp);
       v2 = _mm_add_sd(_mm_shuffle_pd(v2, v2, 1), v2);
       _mm_storel_pd(&row2, v2);
-      if (Beta != 0) {
+      if (Beta != 0.0) {
          y[0] = Beta * y[0] + Alpha * row0;
          y[stride] = Beta * y[stride] + Alpha * row1;
          y[2 * stride] = Beta * y[2 * stride] + Alpha * row2;
@@ -3523,7 +3499,7 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
       }
       if (n % 2)
          row0 += pb[0] * pa0[0];
-      if (Beta != 0)
+      if (Beta != 0.0)
          y[0] = Beta * y[0] + Alpha * row0;
       else
          y[0] = Alpha * row0;
@@ -4108,7 +4084,7 @@ static void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *
 }
 
 // Real GEMM kernel.
-static bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double *_b, ae_int_t _b_stride, ae_int_t optypeb, double Beta, double *_c, ae_int_t _c_stride) {
+static bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, double *_a, ae_int_t _a_stride, ae_int_t opa, double *_b, ae_int_t _b_stride, ae_int_t opb, double Beta, double *_c, ae_int_t _c_stride) {
    if (m > alglib_r_block || n > alglib_r_block || k > alglib_r_block || m <= 0 || n <= 0 || k <= 0 || Alpha == 0.0)
       return false;
    void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
@@ -4123,7 +4099,7 @@ static bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double Alph
 // Copy or transpose b.
    double _bbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
    double *const b = (double *)ae_align(_bbuf, alglib_simd_alignment);
-   if (optypeb == 0)
+   if (opb == 0)
       mcopyblock(k, n, _b, 1, _b_stride, b);
    else
       mcopyblock(n, k, _b, 0, _b_stride, b);
@@ -4132,7 +4108,7 @@ static bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double Alph
    double *const abuf = (double *)ae_align(_abuf, alglib_simd_alignment);
    bool BetaIs0 = Beta == 0.0;
    double *crow = _c;
-   if (optypea == 0) {
+   if (opa == 0) {
       const double *arow = _a;
       for (ae_int_t i = 0; i < m; i++) {
          _ialglib_vcopy(k, arow, 1, abuf, 1);
@@ -4157,7 +4133,7 @@ static bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double Alph
 }
 
 // Complex GEMM kernel.
-static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex Alpha, complex *_a, ae_int_t _a_stride, ae_int_t optypea, complex *_b, ae_int_t _b_stride, ae_int_t optypeb, complex Beta, complex *_c, ae_int_t _c_stride) {
+static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex Alpha, complex *_a, ae_int_t _a_stride, ae_int_t opa, complex *_b, ae_int_t _b_stride, ae_int_t opb, complex Beta, complex *_c, ae_int_t _c_stride) {
    if (m > alglib_c_block || n > alglib_c_block || k > alglib_c_block)
       return false;
    void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, complex *, double *, ae_int_t, complex, complex) = &_ialglib_cmv;
@@ -4170,9 +4146,9 @@ static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex Alp
 // Copy, transpose, conjugate or Hermitianize b.
    double _loc_b[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
    double *const b = (double *)ae_align(_loc_b, alglib_simd_alignment);
-   ae_int_t bcols = optypeb == 0 ? n : k;
-   ae_int_t brows = optypeb == 0 ? k : n;
-   switch (optypeb) {
+   ae_int_t bcols = opb == 0 ? n : k;
+   ae_int_t brows = opb == 0 ? k : n;
+   switch (opb) {
       default:
       case 0:
          _ialglib_mcopyblock_complex(brows, bcols, _b, 1, _b_stride, b);
@@ -4191,7 +4167,7 @@ static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex Alp
    const complex *arow = _a;
    complex *crow = _c;
    for (ae_int_t i = 0; i < m; i++) {
-      switch (optypea) {
+      switch (opa) {
          case 0:
             _ialglib_vcopy_complex(k, arow, 1, abuf, 1, "No conj");
             arow += _a_stride;
@@ -4215,7 +4191,7 @@ static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex Alp
 }
 
 // Real Right TRSM kernel.
-static bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
+static bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t opa, double *_x, ae_int_t _x_stride) {
    if (m > alglib_r_block || n > alglib_r_block)
       return false;
    void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
@@ -4230,7 +4206,7 @@ static bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int
 // Prepare.
    double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
    double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   mcopyblock(n, n, _a, optype, _a_stride, abuf);
+   mcopyblock(n, n, _a, opa, _a_stride, abuf);
    double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
    double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    mcopyblock(m, n, _x, 0, _x_stride, xbuf);
@@ -4242,7 +4218,7 @@ static bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int
 // Solve y a^-1 == x, where a is upper or lower triangular.
    double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   if ((optype == 0) == isupper) {
+   if ((opa == 0) == isupper) {
       double *pdiag = abuf;
       for (ae_int_t i = 0; i < n; i++, pdiag += alglib_r_block + 1) {
          double Beta = 1.0 / *pdiag;
@@ -4265,12 +4241,12 @@ static bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int
 }
 
 // Complex Right TRSM kernel.
-static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, complex *_x, ae_int_t _x_stride) {
+static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t opa, complex *_x, ae_int_t _x_stride) {
    void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, complex *, double *, ae_int_t, complex, complex) = &_ialglib_cmv;
    if (m > alglib_c_block || n > alglib_c_block)
       return false;
 #ifdef AE_HAS_SSE2_INTRINSICS
-// Check for SSE2 support
+// Check for SSE2 support.
    if (CurCPU & CPU_SSE2) {
       cmv = &_ialglib_cmv_sse2;
    }
@@ -4278,7 +4254,7 @@ static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_in
 // Prepare.
    double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
    double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   _ialglib_mcopyblock_complex(n, n, _a, optype, _a_stride, abuf);
+   _ialglib_mcopyblock_complex(n, n, _a, opa, _a_stride, abuf);
    double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
    double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    _ialglib_mcopyblock_complex(m, n, _x, 0, _x_stride, xbuf);
@@ -4292,7 +4268,7 @@ static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_in
 // Solve y a^-1 == x, where a is upper or lower triangular.
    double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   if ((optype == 0) == isupper) {
+   if ((opa == 0) == isupper) {
       double *pdiag = abuf;
       for (ae_int_t i = 0; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
          complex tmp_c = complex_from_d(pdiag[0], pdiag[1]);
@@ -4317,7 +4293,7 @@ static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_in
 }
 
 // Real Left TRSM kernel.
-static bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
+static bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t opa, double *_x, ae_int_t _x_stride) {
    double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
    if (m > alglib_r_block || n > alglib_r_block)
@@ -4334,7 +4310,7 @@ static bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_
 // Prepare.
    double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
    double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   mcopyblock(m, m, _a, optype, _a_stride, abuf);
+   mcopyblock(m, m, _a, opa, _a_stride, abuf);
    double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
    double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    mcopyblock(m, n, _x, 1, _x_stride, xbuf);
@@ -4345,7 +4321,7 @@ static bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_
          *pdiag = 1.0;
    }
 // Solve a^-1 y^T == x^T, where a is upper or lower triangular.
-   if ((optype == 0) == isupper) {
+   if ((opa == 0) == isupper) {
       double *pdiag = abuf + (m - 1) * (alglib_r_block + 1);
       for (ae_int_t i = m - 1; i >= 0; i--, pdiag -= alglib_r_block + 1) {
          double Beta = 1.0 / *pdiag;
@@ -4368,7 +4344,7 @@ static bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_
 }
 
 // Complex Left TRSM kernel.
-static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, complex *_x, ae_int_t _x_stride) {
+static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t opa, complex *_x, ae_int_t _x_stride) {
    if (m > alglib_c_block || n > alglib_c_block)
       return false;
    void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, complex *, double *, ae_int_t, complex, complex) = &_ialglib_cmv;
@@ -4381,7 +4357,7 @@ static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int
 // Prepare.
    double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
    double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   _ialglib_mcopyblock_complex(m, m, _a, optype, _a_stride, abuf);
+   _ialglib_mcopyblock_complex(m, m, _a, opa, _a_stride, abuf);
    double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
    double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    _ialglib_mcopyblock_complex(m, n, _x, 1, _x_stride, xbuf);
@@ -4396,7 +4372,7 @@ static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int
 // Solve a^-1 y^T = x^T, where a is upper or lower triangular.
    double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   if ((optype == 0) == isupper) {
+   if ((opa == 0) == isupper) {
       double *pdiag = abuf + 2 * (m - 1) * (alglib_c_block + 1);
       for (ae_int_t i = m - 1; i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
          complex tmp_c = complex_from_d(pdiag[0], pdiag[1]);
@@ -4421,7 +4397,7 @@ static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex *_a, ae_int
 }
 
 // Real SYRK/HERK kernel.
-static bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double Alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double Beta, double *_c, ae_int_t _c_stride, bool isupper) {
+static bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double Alpha, double *_a, ae_int_t _a_stride, ae_int_t opa, double Beta, double *_c, ae_int_t _c_stride, bool isupper) {
    if (n > alglib_r_block || k > alglib_r_block)
       return false;
    else if (n == 0)
@@ -4435,7 +4411,7 @@ static bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double Alpha, double *_
    if (Alpha == 0.0)
       k = 0;
    else if (k > 0)
-      if (optypea == 0)
+      if (opa == 0)
          _ialglib_mcopyblock(n, k, _a, 0, _a_stride, abuf);
       else
          _ialglib_mcopyblock(k, n, _a, 1, _a_stride, abuf);
@@ -4466,7 +4442,7 @@ static bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double Alpha, double *_
 }
 
 // Complex SYRK/HERK kernel.
-static bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double Alpha, complex *_a, ae_int_t _a_stride, ae_int_t optypea, double Beta, complex *_c, ae_int_t _c_stride, bool isupper) {
+static bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double Alpha, complex *_a, ae_int_t _a_stride, ae_int_t opa, double Beta, complex *_c, ae_int_t _c_stride, bool isupper) {
    if (n > alglib_c_block || k > alglib_c_block)
       return false;
    else if (n == 0)
@@ -4479,7 +4455,7 @@ static bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double Alpha, complex *
    if (Alpha == 0.0)
       k = 0;
    else if (k > 0)
-      if (optypea == 0)
+      if (opa == 0)
          _ialglib_mcopyblock_complex(n, k, _a, 3, _a_stride, abuf);
       else
          _ialglib_mcopyblock_complex(k, n, _a, 1, _a_stride, abuf);
@@ -4644,52 +4620,52 @@ static bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_
 // *	handle the degenerate cases like zero matrices by ALGLIB++ - greatly simplifies passing data to ALGLIB++ kernel,
 // *	handle the general cases with the optimized ALGLIB++ kernel.
 
-bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double Beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
+bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double Alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t opa, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double Beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
    if (Alpha == 0.0 || k == 0 || n == 0 || m == 0)
       return false;
-   return _ialglib_rmatrixgemm(m, n, k, Alpha, _a->xyR[ia] + ja, _a->stride, optypea, _b->xyR[ib] + jb, _b->stride, optypeb, Beta, _c->xyR[ic] + jc, _c->stride);
+   return _ialglib_rmatrixgemm(m, n, k, Alpha, _a->xyR[ia] + ja, _a->stride, opa, _b->xyR[ib] + jb, _b->stride, opb, Beta, _c->xyR[ic] + jc, _c->stride);
 }
 
-bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex Alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex Beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex Alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t opa, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t opb, complex Beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
    if (Alpha.x == 0.0 && Alpha.y == 0.0 || k == 0 || n == 0 || m == 0)
       return false;
-   return _ialglib_cmatrixgemm(m, n, k, Alpha, _a->xyC[ia] + ja, _a->stride, optypea, _b->xyC[ib] + jb, _b->stride, optypeb, Beta, _c->xyC[ic] + jc, _c->stride);
+   return _ialglib_cmatrixgemm(m, n, k, Alpha, _a->xyC[ia] + ja, _a->stride, opa, _b->xyC[ib] + jb, _b->stride, opb, Beta, _c->xyC[ic] + jc, _c->stride);
 }
 
-bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
    if (m == 0 || n == 0)
       return false;
-   return _ialglib_rmatrixrighttrsm(m, n, &a->xyR[i1][j1], a->stride, isupper, isunit, optype, &x->xyR[i2][j2], x->stride);
+   return _ialglib_rmatrixrighttrsm(m, n, &a->xyR[i1][j1], a->stride, isupper, isunit, opa, &x->xyR[i2][j2], x->stride);
 }
 
-bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
    if (m == 0 || n == 0)
       return false;
-   return _ialglib_cmatrixrighttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
+   return _ialglib_cmatrixrighttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, opa, &x->xyC[i2][j2], x->stride);
 }
 
-bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
    if (m == 0 || n == 0)
       return false;
-   return _ialglib_rmatrixlefttrsm(m, n, &a->xyR[i1][j1], a->stride, isupper, isunit, optype, &x->xyR[i2][j2], x->stride);
+   return _ialglib_rmatrixlefttrsm(m, n, &a->xyR[i1][j1], a->stride, isupper, isunit, opa, &x->xyR[i2][j2], x->stride);
 }
 
-bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
    if (m == 0 || n == 0)
       return false;
-   return _ialglib_cmatrixlefttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
+   return _ialglib_cmatrixlefttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, opa, &x->xyC[i2][j2], x->stride);
 }
 
-bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double Alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double Beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double Alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, double Beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
    if (Alpha == 0.0 || k == 0 || n == 0)
       return false;
-   return _ialglib_rmatrixsyrk(n, k, Alpha, &a->xyR[ia][ja], a->stride, optypea, Beta, &c->xyR[ic][jc], c->stride, isupper);
+   return _ialglib_rmatrixsyrk(n, k, Alpha, &a->xyR[ia][ja], a->stride, opa, Beta, &c->xyR[ic][jc], c->stride, isupper);
 }
 
-bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double Alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double Beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double Alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, double Beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
    if (Alpha == 0.0 || k == 0 || n == 0)
       return false;
-   return _ialglib_cmatrixherk(n, k, Alpha, &a->xyC[ia][ja], a->stride, optypea, Beta, &c->xyC[ic][jc], c->stride, isupper);
+   return _ialglib_cmatrixherk(n, k, Alpha, &a->xyC[ia][ja], a->stride, opa, Beta, &c->xyC[ic][jc], c->stride, isupper);
 }
 
 bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
@@ -5063,6 +5039,7 @@ void _ialglib_mm22x2(double Alpha, const double *a, const double *b0, const doub
    _ialglib_mm22(Alpha, a, b1, k, Beta, r + 2, stride, 0);
 }
 
+//(@) Returned here from AlgLibInternal.cpp, because merely moving it here, seems to increase the speed of the GEMM routine!
 // Fast rmatrixgemm() kernel: with AVX2/FMA support.
 #if defined ALGLIB_NO_FAST_KERNELS
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
@@ -5078,7 +5055,7 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RM
    ae_int_t (*ablasf_packblk)(const double *, ae_int_t, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t, ae_int_t) = k == 32 && block_size == 32 ? avx2_ablasf_packblkh32 : avx2_ablasf_packblkh;
    void (*ablasf_dotblk)(const double *, const double *, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t) = avx2_ablasf_dotblkh;
    void (*ablasf_daxpby)(ae_int_t, double, const double *, double, double *) = avx2_ablasf_daxpby;
-// Determine CPU and kernel support
+// Determine CPU and kernel support.
    if (m > block_size || n > block_size || k > block_size || m == 0 || n == 0 || !(CurCPU & CPU_AVX2)) return false;
 #if defined _ALGLIB_HAS_FMA_INTRINSICS
    if (CurCPU & CPU_FMA) ablasf_dotblk = fma_ablasf_dotblkh;
@@ -5175,19 +5152,22 @@ double sqr(double x) { return x * x; }
 
 double randomreal() {
    const double mx = RAND_MAX + 1.0;
-   return (rand() + rand() / mx) / mx;
+   int i = rand();
+   return (i + rand() / mx) / mx;
 }
 
 double randommid() {
    const double mx = RAND_MAX + 1.0;
-   return 2.0 * (rand() + rand() / mx) / mx - 1.0;
+   int i = rand();
+   return 2.0 * (i + rand() / mx) / mx - 1.0;
 }
 
 ae_int_t randominteger(ae_int_t maxv) { return (ae_int_t)rand() % maxv; }
 
 bool randombool(double p/* = 0.5*/) {
    const double mx = RAND_MAX + 1.0;
-   return rand() + rand()/mx <= p * mx;
+   int i = rand();
+   return i + rand() / mx <= p * mx;
 }
 
 // Complex number with double precision.
@@ -6336,7 +6316,7 @@ void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
 ae_int_t ae_matrix_wrapper::cols() const { return This == NULL ? 0 : This->cols; }
 ae_int_t ae_matrix_wrapper::rows() const { return This == NULL ? 0 : This->rows; }
 ae_int_t ae_matrix_wrapper::getstride() const { return This == NULL ? 0 : This->stride; }
-bool ae_matrix_wrapper::isempty() const { return rows() == 0 || cols() == 0; }
+bool ae_matrix_wrapper::isempty() const { return cols() == 0 || rows() == 0; }
 
 void ae_matrix_wrapper::attach_to(alglib_impl::x_matrix *new_ptr) {
    if (This == &Obj) ae_matrix_free(This, false);

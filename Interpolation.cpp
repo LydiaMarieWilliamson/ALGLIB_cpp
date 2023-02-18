@@ -3151,7 +3151,7 @@ void polynomialbar2pow(barycentricinterpolant *p, double c, double s, RVector *a
 // We have y == (x-C0)/S0, z == (x-C)/S, and coefficients A[] for basis Fi(y).
 // Because we have y == A*z+B, for A == s/s0 and B == c/s0-c0/s0, we can perform
 // substitution and get coefficients A_new[] in basis Fi(z).
-   ae_assert(vp.cnt >= p->n + 1, "PolynomialBar2Pow: internal error");
+   ae_assert(vp.cnt > p->n, "PolynomialBar2Pow: internal error");
    ae_assert(t.cnt >= p->n, "PolynomialBar2Pow: internal error");
    for (i = 0; i < p->n; i++) {
       t.xR[i] = 0.0;
@@ -6306,11 +6306,11 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
 // RESTRICTIONS OF PARAMETERS:
 //
 // Parameters for this procedure has't to be zero simultaneously. Is expected,
-// that input polinom is't degenerate or constant identicaly ZERO.
+// that input polinom isn't degenerate or constant identicaly ZERO.
 //
 // REMARK:
 //
-// The procedure always fill value for X1 and X2, even if it is't belongs to [0;1].
+// The procedure always fill value for X1 and X2, even if it isn't belongs to [0;1].
 // But first true root(even if existing one) is in X1.
 // Number of roots is NR.
 // ALGLIB Project: Copyright 26.09.2011 by Sergey Bochkanov
@@ -6384,7 +6384,7 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
          *nr = 2;
          return;
       }
-   // consider case, when derivative at 0 is 0, and derivative at 1 is't 0
+   // consider case, when derivative at 0 is 0, and derivative at 1 isn't 0
       if (m0 == 0.0 && m1 != 0.0) {
          dd = b * b - 4 * a * c;
          if (dd < 0.0) {
@@ -6664,7 +6664,7 @@ static double spline1d_rescaleval(double a0, double b0, double a1, double b1, do
 //
 // RESTRICTIONS OF PARAMETERS:
 //
-// Length of [A;B] must be positive and is't zero, i.e. A != B and A < B.
+// Length of [A;B] must be positive and isn't zero, i.e. A != B and A < B.
 //
 // REMARK:
 //
@@ -6986,7 +6986,7 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
          // is there roots?
             if (*nr > 0) {
             // is a next root equal a previous root?
-            // if is't, then write new root
+            // if isn't, then write new root
                if (x0 != tmpr.xR[*nr - 1]) {
                   tmpr.xR[*nr] = x0;
                   ++*nr;
@@ -7127,7 +7127,7 @@ void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, b
                if (*nr > 0 && nstep) {
                   --*nr;
                }
-            // previous segment is't constant
+            // previous segment isn't constant
                if (nstep) {
                   nstep = false;
                }
@@ -8711,7 +8711,7 @@ void lsfitlinearwc(RVector *y, RVector *w, RMatrix *fmatrix, RMatrix *cmatrix, a
    ae_assert(fmatrix->cols >= m, "LSFitLinearWC: cols(FMatrix) < M!");
    ae_assert(apservisfinitematrix(fmatrix, n, m), "LSFitLinearWC: FMatrix contains infinite or NaN values!");
    ae_assert(cmatrix->rows >= k, "LSFitLinearWC: rows(CMatrix) < K!");
-   ae_assert(cmatrix->cols >= m + 1 || k == 0, "LSFitLinearWC: cols(CMatrix) < M+1!");
+   ae_assert(cmatrix->cols > m || k == 0, "LSFitLinearWC: cols(CMatrix) <= M!");
    ae_assert(apservisfinitematrix(cmatrix, k, m + 1), "LSFitLinearWC: CMatrix contains infinite or NaN values!");
    if (k >= m) {
       *info = -3;
@@ -8981,7 +8981,7 @@ void lsfitlinearc(RVector *y, RMatrix *fmatrix, RMatrix *cmatrix, ae_int_t n, ae
    ae_assert(fmatrix->cols >= m, "LSFitLinearC: cols(FMatrix) < M!");
    ae_assert(apservisfinitematrix(fmatrix, n, m), "LSFitLinearC: FMatrix contains infinite or NaN values!");
    ae_assert(cmatrix->rows >= k, "LSFitLinearC: rows(CMatrix) < K!");
-   ae_assert(cmatrix->cols >= m + 1 || k == 0, "LSFitLinearC: cols(CMatrix) < M+1!");
+   ae_assert(cmatrix->cols > m || k == 0, "LSFitLinearC: cols(CMatrix) <= M!");
    ae_assert(apservisfinitematrix(cmatrix, k, m + 1), "LSFitLinearC: CMatrix contains infinite or NaN values!");
    ae_vector_set_length(&w, n);
    for (i = 0; i < n; i++) {
@@ -11762,7 +11762,7 @@ void lsfitsetlc(lsfitstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
    n = state->k;
 // First, check for errors in the inputs
    ae_assert(k >= 0, "LSFitSetLC: K < 0");
-   ae_assert(c->cols >= n + 1 || k == 0, "LSFitSetLC: Cols(C) < N+1");
+   ae_assert(c->cols > n || k == 0, "LSFitSetLC: Cols(C) <= N");
    ae_assert(c->rows >= k, "LSFitSetLC: Rows(C) < K");
    ae_assert(ct->cnt >= k, "LSFitSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n + 1), "LSFitSetLC: C contains infinite or NaN values!");
@@ -19513,8 +19513,8 @@ static void spline2d_blockllsgenerateata(sparsematrix *ah, ae_int_t ky0, ae_int_
 // Determine problem cost, perform recursive subdivision
 // (with optional parallelization)
    avgrowlen = (double)ah->ridx.xZ[kx * ky] / (kx * ky);
-   cellcost = kx * (1.0 + 2.0 * blockbandwidth) * avgrowlen;
-   totalcost = (ky1 - ky0) * (1.0 + 2.0 * blockbandwidth) * cellcost;
+   cellcost = (double)kx * (1 + 2 * blockbandwidth) * avgrowlen;
+   totalcost = (double)(ky1 - ky0) * (1 + 2 * blockbandwidth) * cellcost;
 // Parallelism was tried if: ky1 - ky0 >= 2 && totalcost > smpactivationlevel()
    if (ky1 - ky0 >= 2) {
    // Split X: X*A = (X1 X2)^T*A
@@ -20327,7 +20327,7 @@ static void spline2d_updatesplinetable(RVector *z, ae_int_t kx, ae_int_t ky, ae_
 //
 // Inputs:
 //     XY      -   dataset, array[NPoints,2+D]
-//     XYIndex -   dataset index, see ReorderDatasetAndBuildIndex() for more info
+//     XYIndex -   dataset index, see ReorderDatasetAndBuildIndex() for more information
 //     KX0, KX1-   X-indices of basis functions to select and fit;
 //                 range [KX0,KX1) is processed
 //     KXTotal -   total number of indexes in the entire grid
@@ -22378,7 +22378,7 @@ static void rbfv2_converttreerec(kdtree *curtree, ae_int_t n, ae_int_t nx, ae_in
    if (nodetype == 1) {
       kdtreeexploresplit(curtree, nodeoffset, &d, &s, &nodele, &nodege);
       ae_assert(localnodes->cnt >= *localnodessize + rbfv2_maxnodesize, "ConvertTreeRec: integrity check failed");
-      ae_assert(localsplits->cnt >= *localsplitssize + 1, "ConvertTreeRec: integrity check failed");
+      ae_assert(localsplits->cnt > *localsplitssize, "ConvertTreeRec: integrity check failed");
       oldnodessize = *localnodessize;
       localnodes->xZ[(*localnodessize)++] = 0;
       localnodes->xZ[(*localnodessize)++] = d;
@@ -26651,7 +26651,7 @@ void rbfbuildmodel(rbfmodel *s, rbfreport *rep) {
 // Clean fields prior to processing
 // ALGLIB: Copyright 16.06.2016 by Sergey Bochkanov
    rep->maxerror = rep->rmserror = NAN;
-   rep->acols = rep->arows = 0;
+   rep->arows = rep->acols = 0;
    rep->annz = 0;
    rep->iterationscount = 0;
    rep->nmv = 0;

@@ -17,7 +17,7 @@
 #include "AlgLibMisc.h"
 
 // === ABLAS Package ===
-// Depends on: (AlgLibInternal) APSERV, ABLASF, ABLASMKL
+// Depends on: (AlgLibInternal) ABLASF, ABLASMKL
 namespace alglib_impl {
 ae_int_t ablasblocksize(RMatrix *a);
 ae_int_t ablascomplexblocksize(CMatrix *a);
@@ -995,15 +995,15 @@ void cmatrixtrinverse(complex_2d_array &a, const bool isupper, ae_int_t &info, m
 // === INVERSEUPDATE Package ===
 namespace alglib_impl {
 void rmatrixinvupdatesimple(RMatrix *inva, ae_int_t n, ae_int_t updrow, ae_int_t updcolumn, double updval);
-void rmatrixinvupdaterow(RMatrix *inva, ae_int_t n, ae_int_t updrow, RVector *v);
 void rmatrixinvupdatecolumn(RMatrix *inva, ae_int_t n, ae_int_t updcolumn, RVector *u);
+void rmatrixinvupdaterow(RMatrix *inva, ae_int_t n, ae_int_t updrow, RVector *v);
 void rmatrixinvupdateuv(RMatrix *inva, ae_int_t n, RVector *u, RVector *v);
 } // end of namespace alglib_impl
 
 namespace alglib {
 void rmatrixinvupdatesimple(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const ae_int_t updcolumn, const double updval);
-void rmatrixinvupdaterow(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const real_1d_array &v);
 void rmatrixinvupdatecolumn(real_2d_array &inva, const ae_int_t n, const ae_int_t updcolumn, const real_1d_array &u);
+void rmatrixinvupdaterow(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const real_1d_array &v);
 void rmatrixinvupdateuv(real_2d_array &inva, const ae_int_t n, const real_1d_array &u, const real_1d_array &v);
 } // end of namespace alglib
 

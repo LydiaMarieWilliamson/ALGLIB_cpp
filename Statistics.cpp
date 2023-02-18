@@ -3790,8 +3790,8 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
       } while (i <= ns);
       i = ns - 1;
       do {
-         swapr(&r.xR[i], &r.xR[0]);
-         swapi(&c.xZ[i], &c.xZ[0]);
+         swapr(&r.xR[i], r.xR);
+         swapi(&c.xZ[i], c.xZ);
          t = 1;
          while (t != 0) {
             k = 2 * t;
@@ -7392,8 +7392,8 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
       } while (i <= ns);
       i = ns - 1;
       do {
-         swapr(&r.xR[i], &r.xR[0]);
-         swapi(&c.xZ[i], &c.xZ[0]);
+         swapr(&r.xR[i], r.xR);
+         swapi(&c.xZ[i], c.xZ);
          t = 1;
          while (t != 0) {
             k = 2 * t;

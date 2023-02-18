@@ -5748,7 +5748,7 @@ double mlperror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints) {
    ae_assert(xy->rows >= npoints, "MLPError: XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(xy->cols >= mlpgetinputscount(network) + 1, "MLPError: XY has less than NIn+1 columns");
+         ae_assert(xy->cols > mlpgetinputscount(network), "MLPError: XY has NIn columns or less");
       } else {
          ae_assert(xy->cols >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPError: XY has less than NIn+NOut columns");
       }
@@ -5798,7 +5798,7 @@ double mlperrorsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t 
    ae_assert(sparsegetnrows(xy) >= npoints, "MLPErrorSparse: XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + 1, "MLPErrorSparse: XY has less than NIn+1 columns");
+         ae_assert(sparsegetncols(xy) > mlpgetinputscount(network), "MLPErrorSparse: XY has NIn columns or less");
       } else {
          ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPErrorSparse: XY has less than NIn+NOut columns");
       }
@@ -5880,7 +5880,7 @@ ae_int_t mlpclserror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoint
    ae_assert(xy->rows >= npoints, "MLPClsError: XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(xy->cols >= mlpgetinputscount(network) + 1, "MLPClsError: XY has less than NIn+1 columns");
+         ae_assert(xy->cols > mlpgetinputscount(network), "MLPClsError: XY has NIn columns or less");
       } else {
          ae_assert(xy->cols >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPClsError: XY has less than NIn+NOut columns");
       }
@@ -5926,7 +5926,7 @@ double mlprelclserror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoin
    ae_assert(xy->rows >= npoints, "MLPRelClsError: XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(xy->cols >= mlpgetinputscount(network) + 1, "MLPRelClsError: XY has less than NIn+1 columns");
+         ae_assert(xy->cols > mlpgetinputscount(network), "MLPRelClsError: XY has NIn columns or less");
       } else {
          ae_assert(xy->cols >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPRelClsError: XY has less than NIn+NOut columns");
       }
@@ -5977,7 +5977,7 @@ double mlprelclserrorsparse(multilayerperceptron *network, sparsematrix *xy, ae_
    ae_assert(sparsegetnrows(xy) >= npoints, "MLPRelClsErrorSparse: sparse matrix XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + 1, "MLPRelClsErrorSparse: sparse matrix XY has less than NIn+1 columns");
+         ae_assert(sparsegetncols(xy) > mlpgetinputscount(network), "MLPRelClsErrorSparse: sparse matrix XY has NIn columns or less");
       } else {
          ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPRelClsErrorSparse: sparse matrix XY has less than NIn+NOut columns");
       }
@@ -6023,7 +6023,7 @@ double mlpavgce(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints) {
    ae_assert(xy->rows >= npoints, "MLPAvgCE: XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(xy->cols >= mlpgetinputscount(network) + 1, "MLPAvgCE: XY has less than NIn+1 columns");
+         ae_assert(xy->cols > mlpgetinputscount(network), "MLPAvgCE: XY has NIn columns or less");
       } else {
          ae_assert(xy->cols >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPAvgCE: XY has less than NIn+NOut columns");
       }
@@ -6075,7 +6075,7 @@ double mlpavgcesparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t 
    ae_assert(sparsegetnrows(xy) >= npoints, "MLPAvgCESparse: sparse matrix XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + 1, "MLPAvgCESparse: sparse matrix XY has less than NIn+1 columns");
+         ae_assert(sparsegetncols(xy) > mlpgetinputscount(network), "MLPAvgCESparse: sparse matrix XY has NIn columns or less");
       } else {
          ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPAvgCESparse: sparse matrix XY has less than NIn+NOut columns");
       }
@@ -6122,7 +6122,7 @@ double mlprmserror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints)
    ae_assert(xy->rows >= npoints, "MLPRMSError: XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(xy->cols >= mlpgetinputscount(network) + 1, "MLPRMSError: XY has less than NIn+1 columns");
+         ae_assert(xy->cols > mlpgetinputscount(network), "MLPRMSError: XY has NIn columns or less");
       } else {
          ae_assert(xy->cols >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPRMSError: XY has less than NIn+NOut columns");
       }
@@ -6174,7 +6174,7 @@ double mlprmserrorsparse(multilayerperceptron *network, sparsematrix *xy, ae_int
    ae_assert(sparsegetnrows(xy) >= npoints, "MLPRMSErrorSparse: sparse matrix XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + 1, "MLPRMSErrorSparse: sparse matrix XY has less than NIn+1 columns");
+         ae_assert(sparsegetncols(xy) > mlpgetinputscount(network), "MLPRMSErrorSparse: sparse matrix XY has NIn columns or less");
       } else {
          ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPRMSErrorSparse: sparse matrix XY has less than NIn+NOut columns");
       }
@@ -6220,7 +6220,7 @@ double mlpavgerror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints)
    ae_assert(xy->rows >= npoints, "MLPAvgError: XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(xy->cols >= mlpgetinputscount(network) + 1, "MLPAvgError: XY has less than NIn+1 columns");
+         ae_assert(xy->cols > mlpgetinputscount(network), "MLPAvgError: XY has NIn columns or less");
       } else {
          ae_assert(xy->cols >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPAvgError: XY has less than NIn+NOut columns");
       }
@@ -6271,7 +6271,7 @@ double mlpavgerrorsparse(multilayerperceptron *network, sparsematrix *xy, ae_int
    ae_assert(sparsegetnrows(xy) >= npoints, "MLPAvgErrorSparse: XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + 1, "MLPAvgErrorSparse: XY has less than NIn+1 columns");
+         ae_assert(sparsegetncols(xy) > mlpgetinputscount(network), "MLPAvgErrorSparse: XY has NIn columns or less");
       } else {
          ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPAvgErrorSparse: XY has less than NIn+NOut columns");
       }
@@ -6318,7 +6318,7 @@ double mlpavgrelerror(multilayerperceptron *network, RMatrix *xy, ae_int_t npoin
    ae_assert(xy->rows >= npoints, "MLPAvgRelError: XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(xy->cols >= mlpgetinputscount(network) + 1, "MLPAvgRelError: XY has less than NIn+1 columns");
+         ae_assert(xy->cols > mlpgetinputscount(network), "MLPAvgRelError: XY has NIn columns or less");
       } else {
          ae_assert(xy->cols >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPAvgRelError: XY has less than NIn+NOut columns");
       }
@@ -6370,7 +6370,7 @@ double mlpavgrelerrorsparse(multilayerperceptron *network, sparsematrix *xy, ae_
    ae_assert(sparsegetnrows(xy) >= npoints, "MLPAvgRelErrorSparse: XY has less than NPoints rows");
    if (npoints > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + 1, "MLPAvgRelErrorSparse: XY has less than NIn+1 columns");
+         ae_assert(sparsegetncols(xy) > mlpgetinputscount(network), "MLPAvgRelErrorSparse: XY has NIn columns or less");
       } else {
          ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPAvgRelErrorSparse: XY has less than NIn+NOut columns");
       }
@@ -6408,7 +6408,7 @@ void mlpallerrorssubset(multilayerperceptron *network, RMatrix *xy, ae_int_t set
    ae_assert(xy->rows >= setsize, "MLPAllErrorsSubset: XY has less than SetSize rows");
    if (setsize > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(xy->cols >= mlpgetinputscount(network) + 1, "MLPAllErrorsSubset: XY has less than NIn+1 columns");
+         ae_assert(xy->cols > mlpgetinputscount(network), "MLPAllErrorsSubset: XY has NIn columns or less");
       } else {
          ae_assert(xy->cols >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPAllErrorsSubset: XY has less than NIn+NOut columns");
       }
@@ -6455,7 +6455,7 @@ void mlpallerrorssparsesubset(multilayerperceptron *network, sparsematrix *xy, a
    ae_assert(sparsegetnrows(xy) >= setsize, "MLPAllErrorsSparseSubset: XY has less than SetSize rows");
    if (setsize > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + 1, "MLPAllErrorsSparseSubset: XY has less than NIn+1 columns");
+         ae_assert(sparsegetncols(xy) > mlpgetinputscount(network), "MLPAllErrorsSparseSubset: XY has NIn columns or less");
       } else {
          ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPAllErrorsSparseSubset: XY has less than NIn+NOut columns");
       }
@@ -6517,7 +6517,7 @@ double mlperrorsubset(multilayerperceptron *network, RMatrix *xy, ae_int_t setsi
    ae_assert(xy->rows >= setsize, "MLPErrorSubset: XY has less than SetSize rows");
    if (setsize > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(xy->cols >= mlpgetinputscount(network) + 1, "MLPErrorSubset: XY has less than NIn+1 columns");
+         ae_assert(xy->cols > mlpgetinputscount(network), "MLPErrorSubset: XY has NIn columns or less");
       } else {
          ae_assert(xy->cols >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPErrorSubset: XY has less than NIn+NOut columns");
       }
@@ -6587,7 +6587,7 @@ double mlperrorsparsesubset(multilayerperceptron *network, sparsematrix *xy, ae_
    ae_assert(sparsegetnrows(xy) >= setsize, "MLPErrorSparseSubset: XY has less than SetSize rows");
    if (setsize > 0) {
       if (mlpissoftmax(network)) {
-         ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + 1, "MLPErrorSparseSubset: XY has less than NIn+1 columns");
+         ae_assert(sparsegetncols(xy) > mlpgetinputscount(network), "MLPErrorSparseSubset: XY has NIn columns or less");
       } else {
          ae_assert(sparsegetncols(xy) >= mlpgetinputscount(network) + mlpgetoutputscount(network), "MLPErrorSparseSubset: XY has less than NIn+NOut columns");
       }
@@ -10867,7 +10867,7 @@ void dfbuildersetdataset(decisionforestbuilder *s, RMatrix *xy, ae_int_t npoints
    ae_assert(nvars >= 1, "dfbuildersetdataset: nvars < 1");
    ae_assert(nclasses >= 1, "dfbuildersetdataset: nclasses < 1");
    ae_assert(xy->rows >= npoints, "dfbuildersetdataset: rows(xy) < npoints");
-   ae_assert(xy->cols >= nvars + 1, "dfbuildersetdataset: cols(xy) < nvars+1");
+   ae_assert(xy->cols > nvars, "dfbuildersetdataset: cols(xy) <= nvars");
    ae_assert(apservisfinitematrix(xy, npoints, nvars + 1), "dfbuildersetdataset: xy parameter contains INFs or NANs");
    if (nclasses > 1) {
       for (i = 0; i < npoints; i++) {
@@ -13329,7 +13329,7 @@ static void dforest_dfprocessinternalcompressed(decisionforest *df, ae_int_t off
 //       accuracy and (b) ~1.5x reduction in  the  inference  speed  (due  to
 //       increased complexity of the storage format).
 //
-//       See comments on dfbinarycompression() for more info.
+//       See comments on dfbinarycompression() for more information.
 //
 // Default settings are used by the algorithm; you can tweak  them  with  the
 // help of the following functions:
@@ -19697,7 +19697,7 @@ void mcpdsetlc(mcpdstate *s, RMatrix *c, ZVector *ct, ae_int_t k) {
    ae_int_t j;
    ae_int_t n;
    n = s->n;
-   ae_assert(c->cols >= n * n + 1, "MCPDSetLC: Cols(C) < N*N+1");
+   ae_assert(c->cols > n * n, "MCPDSetLC: Cols(C) <= N*N");
    ae_assert(c->rows >= k, "MCPDSetLC: Rows(C) < K");
    ae_assert(ct->cnt >= k, "MCPDSetLC: Len(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n * n + 1), "MCPDSetLC: C contains infinite or NaN values!");
@@ -21364,7 +21364,7 @@ void knnbuildersetdatasetcls(knnbuilder *s, RMatrix *xy, ae_int_t npoints, ae_in
    ae_assert(nvars >= 1, "knnbuildersetdatasetcls: nvars < 1");
    ae_assert(nclasses >= 2, "knnbuildersetdatasetcls: nclasses < 2");
    ae_assert(xy->rows >= npoints, "knnbuildersetdatasetcls: rows(xy) < npoints");
-   ae_assert(xy->cols >= nvars + 1, "knnbuildersetdatasetcls: cols(xy) < nvars+1");
+   ae_assert(xy->cols > nvars, "knnbuildersetdatasetcls: cols(xy) <= nvars");
    ae_assert(apservisfinitematrix(xy, npoints, nvars + 1), "knnbuildersetdatasetcls: xy parameter contains INFs or NANs");
    for (i = 0; i < npoints; i++) {
       j = iround(xy->xyR[i][nvars]);

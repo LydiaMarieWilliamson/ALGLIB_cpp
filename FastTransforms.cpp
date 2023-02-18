@@ -49,16 +49,16 @@ void fftc1d(CVector *a, ae_int_t n) {
    ae_frame_make(&_frame_block);
    NewObj(fasttransformplan, plan);
    NewVector(buf, 0, DT_REAL);
-   ae_assert(n > 0, "FFTC1D: incorrect N!");
-   ae_assert(a->cnt >= n, "FFTC1D: Length(A) < N!");
-   ae_assert(isfinitecvector(a, n), "FFTC1D: A contains infinite or NAN values!");
+   ae_assert(n > 0, "fftc1d: incorrect N!");
+   ae_assert(a->cnt >= n, "fftc1d: Length(A) < N!");
+   ae_assert(isfinitecvector(a, n), "fftc1d: A contains infinite or NAN values!");
 // Special case: N == 1, FFT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
    if (n == 1) {
       ae_frame_leave();
       return;
    }
-// convert input array to the more convinient format
+// convert input array to the more convenient format
    ae_vector_set_length(&buf, 2 * n);
    for (i = 0; i < n; i++) {
       buf.xR[2 * i] = a->xC[i].x;
@@ -67,7 +67,7 @@ void fftc1d(CVector *a, ae_int_t n) {
 // Generate plan and execute it.
 //
 // Plan is a combination of a successive factorizations of N and
-// precomputed data. It is much like a FFTW plan, but is not stored
+// precomputed data. It is much like an FFTW plan, but is not stored
 // between subroutine calls and is much simpler.
    ftcomplexfftplan(n, 1, &plan);
    ftapplyplan(&plan, &buf);
@@ -97,9 +97,9 @@ void fftc1d(CVector *a, ae_int_t n) {
 // API: void fftc1dinv(complex_1d_array &a);
 void fftc1dinv(CVector *a, ae_int_t n) {
    ae_int_t i;
-   ae_assert(n > 0, "FFTC1DInv: incorrect N!");
-   ae_assert(a->cnt >= n, "FFTC1DInv: Length(A) < N!");
-   ae_assert(isfinitecvector(a, n), "FFTC1DInv: A contains infinite or NAN values!");
+   ae_assert(n > 0, "fftc1dinv: incorrect N!");
+   ae_assert(a->cnt >= n, "fftc1dinv: Length(A) < N!");
+   ae_assert(isfinitecvector(a, n), "fftc1dinv: A contains infinite or NAN values!");
 // Inverse DFT can be expressed in terms of the DFT as
 //
 //     invfft(x) = fft(x')'/N
@@ -129,7 +129,7 @@ void fftc1dinv(CVector *a, ae_int_t n) {
 //
 // NOTE:
 //     F[] satisfies symmetry property F[k] = conj(F[N-k]),  so just one half
-// of  array  is  usually needed. But for convinience subroutine returns full
+// of  array  is  usually needed. But for convenience subroutine returns full
 // complex array (with frequencies above N/2), so its result may be  used  by
 // other FFT-related subroutines.
 // ALGLIB: Copyright 01.06.2009 by Sergey Bochkanov
@@ -147,9 +147,9 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f) {
    SetVector(f);
    NewVector(buf, 0, DT_REAL);
    NewObj(fasttransformplan, plan);
-   ae_assert(n > 0, "FFTR1D: incorrect N!");
-   ae_assert(a->cnt >= n, "FFTR1D: Length(A) < N!");
-   ae_assert(isfinitevector(a, n), "FFTR1D: A contains infinite or NAN values!");
+   ae_assert(n > 0, "fftr1d: incorrect N!");
+   ae_assert(a->cnt >= n, "fftr1d: Length(A) < N!");
+   ae_assert(isfinitevector(a, n), "fftr1d: A contains infinite or NAN values!");
 // Special cases:
 // * N == 1, FFT is just identity transform.
 // * N == 2, FFT is simple too
@@ -240,16 +240,16 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a) {
    SetVector(a);
    NewVector(h, 0, DT_REAL);
    NewVector(fh, 0, DT_COMPLEX);
-   ae_assert(n > 0, "FFTR1DInv: incorrect N!");
+   ae_assert(n > 0, "fftr1dinv: incorrect N!");
    ae_int_t Nq = n / 2, Nr = n % 2;
-   ae_assert(f->cnt >= Nq + 1, "FFTR1DInv: Length(F) < floor(N/2)+1!");
-   ae_assert(isfinite(f->xC[0].x), "FFTR1DInv: F contains infinite or NAN values!");
+   ae_assert(f->cnt > Nq, "fftr1dinv: Length(F) < floor(N/2)+1!");
+   ae_assert(isfinite(f->xC[0].x), "fftr1dinv: F contains infinite or NAN values!");
    for (i = 1; i < Nq; i++) {
-      ae_assert(isfinite(f->xC[i].x) && isfinite(f->xC[i].y), "FFTR1DInv: F contains infinite or NAN values!");
+      ae_assert(isfinite(f->xC[i].x) && isfinite(f->xC[i].y), "fftr1dinv: F contains infinite or NAN values!");
    }
-   ae_assert(isfinite(f->xC[Nq].x), "FFTR1DInv: F contains infinite or NAN values!");
+   ae_assert(isfinite(f->xC[Nq].x), "fftr1dinv: F contains infinite or NAN values!");
    if (Nr) {
-      ae_assert(isfinite(f->xC[Nq].y), "FFTR1DInv: F contains infinite or NAN values!");
+      ae_assert(isfinite(f->xC[Nq].y), "fftr1dinv: F contains infinite or NAN values!");
    }
 // Special case: N == 1, FFT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
@@ -295,7 +295,7 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
    complex hn;
    complex hmnc;
    complex v;
-   ae_assert(n > 0 && n % 2 == 0, "FFTR1DEvenInplace: incorrect N!");
+   ae_assert(n > 0 && n % 2 == 0, "fftr1dinternaleven: incorrect N!");
 // Special cases:
 // * N == 2
 //
@@ -333,7 +333,7 @@ void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformpl
    double t;
    ae_int_t i;
    ae_int_t n2;
-   ae_assert(n > 0 && n % 2 == 0, "FFTR1DInvInternalEven: incorrect N!");
+   ae_assert(n > 0 && n % 2 == 0, "fftr1dinvinternaleven: incorrect N!");
 // Special cases:
 // * N == 2
 //
@@ -459,7 +459,7 @@ void fhtr1d(RVector *a, ae_int_t n) {
    ae_int_t i;
    ae_frame_make(&_frame_block);
    NewVector(fa, 0, DT_COMPLEX);
-   ae_assert(n > 0, "FHTR1D: incorrect N!");
+   ae_assert(n > 0, "fhtr1d: incorrect N!");
 // Special case: N == 1, FHT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
    if (n == 1) {
@@ -488,7 +488,7 @@ void fhtr1d(RVector *a, ae_int_t n) {
 // API: void fhtr1dinv(real_1d_array &a, const ae_int_t n);
 void fhtr1dinv(RVector *a, ae_int_t n) {
    ae_int_t i;
-   ae_assert(n > 0, "FHTR1DInv: incorrect N!");
+   ae_assert(n > 0, "fhtr1dinv: incorrect N!");
 // Special case: N == 1, iFHT is just identity transform.
 // After this block we assume that N is strictly greater than 1.
    if (n == 1) {
@@ -571,8 +571,8 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    NewObj(fasttransformplan, plan);
    NewVector(buf, 0, DT_REAL);
    NewVector(buf2, 0, DT_REAL);
-   ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!");
-   ae_assert(n <= m, "ConvC1DX: N < M assumption is false!");
+   ae_assert(n > 0 && m > 0, "convc1dx: incorrect N or M!");
+   ae_assert(n <= m, "convc1dx: N <= M assumption is false!");
 // Auto-select
    if (alg == -1 || alg == -2) {
    // Initial candidate: straightforward implementation.
@@ -677,7 +677,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 //
 // First, if convolution is circular, we test whether M is smooth or not.
 // If it is smooth, we just use M-length FFT to calculate convolution.
-// If it is not, we calculate non-circular convolution and wrap it arount.
+// If it is not, we calculate non-circular convolution and wrap it around.
 //
 // IF convolution is non-circular, we use zero-padding + FFT.
    if (alg == 1) {
@@ -885,9 +885,9 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
 // API: void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
 void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
    SetVector(r);
-   ae_assert(n > 0 && m > 0, "ConvC1D: incorrect N or M!");
+   ae_assert(n > 0 && m > 0, "convc1d: incorrect N or M!");
 // normalize task: make M >= N,
-// so A will be longer that B.
+// so A will be longer than B.
    if (m < n) {
       convc1d(b, n, a, m, r);
       return;
@@ -931,7 +931,7 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
    NewVector(buf, 0, DT_REAL);
    NewVector(buf2, 0, DT_REAL);
    NewObj(fasttransformplan, plan);
-   ae_assert(n > 0 && m > 0 && n <= m, "ConvC1DInv: incorrect N or M!");
+   ae_assert(n > 0 && m > 0 && n <= m, "convc1dinv: incorrect N or M!");
    p = ftbasefindsmooth(m);
    ftcomplexfftplan(p, 1, &plan);
    ae_vector_set_length(&buf, 2 * p);
@@ -1003,9 +1003,9 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c)
    ae_frame_make(&_frame_block);
    SetVector(c);
    NewVector(buf, 0, DT_COMPLEX);
-   ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!");
+   ae_assert(n > 0 && m > 0, "convc1dcircular: incorrect N or M!");
 // normalize task: make M >= N,
-// so A will be longer (at least - not shorter) that B.
+// so S will be longer (at least - not shorter) than B.
    if (m < n) {
       ae_vector_set_length(&buf, m);
       for (i1 = 0; i1 < m; i1++) {
@@ -1065,9 +1065,9 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
    NewVector(buf2, 0, DT_REAL);
    NewVector(cbuf, 0, DT_COMPLEX);
    NewObj(fasttransformplan, plan);
-   ae_assert(n > 0 && m > 0, "ConvC1DCircularInv: incorrect N or M!");
+   ae_assert(n > 0 && m > 0, "convc1dcircularinv: incorrect N or M!");
 // normalize task: make M >= N,
-// so A will be longer (at least - not shorter) that B.
+// so A will be longer (at least - not shorter) than B.
    if (m < n) {
       ae_vector_set_length(&cbuf, m);
       for (i = 0; i < m; i++) {
@@ -1165,8 +1165,8 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
    NewVector(buf, 0, DT_REAL);
    NewVector(buf2, 0, DT_REAL);
    NewVector(buf3, 0, DT_REAL);
-   ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!");
-   ae_assert(n <= m, "ConvC1DX: N < M assumption is false!");
+   ae_assert(n > 0 && m > 0, "convr1dx: incorrect N or M!");
+   ae_assert(n <= m, "convr1dx: N <= M assumption is false!");
 // handle special cases
    if (imin2(m, n) <= 2) {
       alg = 0;
@@ -1275,13 +1275,13 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
 //
 // First, if convolution is circular, we test whether M is smooth or not.
 // If it is smooth, we just use M-length FFT to calculate convolution.
-// If it is not, we calculate non-circular convolution and wrap it arount.
+// If it is not, we calculate non-circular convolution and wrap it around.
 //
 // If convolution is non-circular, we use zero-padding + FFT.
 //
 // We assume that M+N-1 > 2 - we should call small case code otherwise
    if (alg == 1) {
-      ae_assert(m + n - 1 > 2, "ConvR1DX: internal error!");
+      ae_assert(m + n - 1 > 2, "convr1dx: internal error!");
       if (circular && ftbaseissmooth(m) && m % 2 == 0) {
       // special code for circular convolution with smooth even M
          ae_vector_set_length(&buf, m);
@@ -1363,7 +1363,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
    }
 // overlap-add method
    if (alg == 2) {
-      ae_assert((q + n - 1) % 2 == 0, "ConvR1DX: internal error!");
+      ae_assert((q + n - 1) % 2 == 0, "convr1dx: internal error!");
       ae_vector_set_length(&buf, q + n - 1);
       ae_vector_set_length(&buf2, q + n - 1);
       ae_vector_set_length(&buf3, q + n - 1);
@@ -1448,9 +1448,9 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
 // API: void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
 void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
    SetVector(r);
-   ae_assert(n > 0 && m > 0, "ConvR1D: incorrect N or M!");
+   ae_assert(n > 0 && m > 0, "convr1d: incorrect N or M!");
 // normalize task: make M >= N,
-// so A will be longer that B.
+// so A will be longer than B.
    if (m < n) {
       convr1d(b, n, a, m, r);
       return;
@@ -1494,7 +1494,7 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
    NewVector(buf2, 0, DT_REAL);
    NewVector(buf3, 0, DT_REAL);
    NewObj(fasttransformplan, plan);
-   ae_assert(n > 0 && m > 0 && n <= m, "ConvR1DInv: incorrect N or M!");
+   ae_assert(n > 0 && m > 0 && n <= m, "convr1dinv: incorrect N or M!");
    p = ftbasefindsmootheven(m);
    ae_vector_set_length(&buf, p);
    ae_v_move(buf.xR, 1, a->xR, 1, m);
@@ -1552,9 +1552,9 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c)
    ae_frame_make(&_frame_block);
    SetVector(c);
    NewVector(buf, 0, DT_REAL);
-   ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!");
+   ae_assert(n > 0 && m > 0, "convr1dcircular: incorrect N or M!");
 // normalize task: make M >= N,
-// so A will be longer (at least - not shorter) that B.
+// so S will be longer (at least - not shorter) than B.
    if (m < n) {
       ae_vector_set_length(&buf, m);
       for (i1 = 0; i1 < m; i1++) {
@@ -1616,9 +1616,9 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
    NewVector(cbuf, 0, DT_COMPLEX);
    NewVector(cbuf2, 0, DT_COMPLEX);
    NewObj(fasttransformplan, plan);
-   ae_assert(n > 0 && m > 0, "ConvR1DCircularInv: incorrect N or M!");
+   ae_assert(n > 0 && m > 0, "convr1dcircularinv: incorrect N or M!");
 // normalize task: make M >= N,
-// so A will be longer (at least - not shorter) that B.
+// so A will be longer (at least - not shorter) than B.
    if (m < n) {
       ae_vector_set_length(&buf, m);
       for (i = 0; i < m; i++) {
@@ -1781,7 +1781,7 @@ void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector 
    SetVector(r);
    NewVector(p, 0, DT_COMPLEX);
    NewVector(b, 0, DT_COMPLEX);
-   ae_assert(n > 0 && m > 0, "CorrC1D: incorrect N or M!");
+   ae_assert(n > 0 && m > 0, "corrc1d: incorrect N or M!");
    ae_vector_set_length(&p, m);
    for (i = 0; i < m; i++) {
       p.xC[m - 1 - i] = conj(pattern->xC[i]);
@@ -1828,9 +1828,9 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
    SetVector(c);
    NewVector(p, 0, DT_COMPLEX);
    NewVector(b, 0, DT_COMPLEX);
-   ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!");
+   ae_assert(n > 0 && m > 0, "corrc1dcircular: incorrect N or M!");
 // normalize task: make M >= N,
-// so A will be longer (at least - not shorter) that B.
+// so Pattern will be longer (at least - not shorter) than Signal.
    if (m < n) {
       ae_vector_set_length(&b, m);
       for (i1 = 0; i1 < m; i1++) {
@@ -1901,7 +1901,7 @@ void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector 
    SetVector(r);
    NewVector(p, 0, DT_REAL);
    NewVector(b, 0, DT_REAL);
-   ae_assert(n > 0 && m > 0, "CorrR1D: incorrect N or M!");
+   ae_assert(n > 0 && m > 0, "corrr1d: incorrect N or M!");
    ae_vector_set_length(&p, m);
    for (i = 0; i < m; i++) {
       p.xR[m - 1 - i] = pattern->xR[i];
@@ -1948,9 +1948,9 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
    SetVector(c);
    NewVector(p, 0, DT_REAL);
    NewVector(b, 0, DT_REAL);
-   ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!");
+   ae_assert(n > 0 && m > 0, "corrr1dcircular: incorrect N or M!");
 // normalize task: make M >= N,
-// so A will be longer (at least - not shorter) that B.
+// so Pattern will be longer (at least - not shorter) than Signal.
    if (m < n) {
       ae_vector_set_length(&b, m);
       for (i1 = 0; i1 < m; i1++) {

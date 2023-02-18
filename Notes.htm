@@ -188,8 +188,8 @@ struct Type: public TypeI {
    Type(const Type &amp;A);
    Type &amp;operator=(const Type &amp;A);
    ~Type();
-   alglib_impl::Type *c_ptr();
    alglib_impl::Type *c_ptr() const;
+   alglib_impl::Type *c_ptr();
    Pars ... public members (reference variables for scalar types) ...
 }
 </pre>
@@ -221,8 +221,8 @@ Type &amp;Type::operator=(const Type &amp;A) {
    return *this;
 }
 Type::~Type() { alglib_impl::Type_free(&amp;Obj, false); }
-alglib_impl::Type *Type::c_ptr() { return &amp;Obj; }
 alglib_impl::Type *Type::c_ptr() const { return const_cast&lt;alglib_impl::Type *&gt;(&amp;Obj); }
+alglib_impl::Type *Type::c_ptr() { return &amp;Obj; }
 </pre>
 </p>
 <p>
@@ -244,8 +244,8 @@ struct Type: public TypeI {
    Type(const Type &amp;A);
    Type &amp;operator=(const Type &amp;A);
    ~Type();
-   alglib_impl::Type *c_ptr();
    alglib_impl::Type *c_ptr() const;
+   alglib_impl::Type *c_ptr();
    Pars ... public members (reference variables for scalar types) ...
 }
 </pre>
@@ -278,8 +278,8 @@ Type::Type(): TypeI() Type::Type(): TypeI() Vars ... initializations of public m
 Type::Type(const Type &amp;A): TypeI(A) Vars ... initializations of public members ... { }
 Type &amp;Type::operator=(const Type &amp;A) { TypeI::operator=(A); return *this; }
 Type::~Type() { }
-alglib_impl::Type *Type::c_ptr() { return &amp;Obj; }
 alglib_impl::Type *Type::c_ptr() const { return const_cast&lt;alglib_impl::Type *&gt;(&amp;Obj); }
+alglib_impl::Type *Type::c_ptr() { return &amp;Obj; }
 </pre>
 </p>
 <p>
@@ -295,13 +295,13 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
 <ul>
 <li>AlgLibInternal:<ul>
    <li>APSERV:</li>
-   <li>ABLASF:</li>
+   <li>ABLASF: APSERV</li>
    <li>HBLAS:</li>
    <li>CREFLECTIONS:</li>
    <li>SBLAS: APSERV</li>
    <li>ABLASMKL:</li>
    <li>SCODES:</li>
-   <li>TSORT: APSERV</li>
+   <li>TSORT: ABLASF</li>
    <li>BLAS:</li>
    <li>ROTATIONS:</li>
    <li>BASICSTATOPS: TSORT</li>
@@ -315,7 +315,7 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>HPCCORES:</li>
 </ul></li>
 <li>AlgLibMisc: AlgLibInternal<ul>
-   <li>HQRND: (AlgLibInternal) APSERV, ABLASF</li>
+   <li>HQRND: (AlgLibInternal) ABLASF</li>
    <li>XDEBUG:</li>
    <li>NEARESTNEIGHBOR: (AlgLibInternal) SCODES, TSORT</li>
 </ul></li>
@@ -354,7 +354,7 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>ELLIPTIC:</li>
 </ul></li>
 <li>LinAlg: AlgLibMisc [AlgLibInternal]<ul>
-   <li>ABLAS: (AlgLibInternal) APSERV, ABLASF, ABLASMKL</li>
+   <li>ABLAS: (AlgLibInternal) ABLASF, ABLASMKL</li>
    <li>ORTFAC: (AlgLibInternal) HBLAS, CREFLECTIONS, SBLAS │ (AlgLibMisc) HQRND │ ABLAS</li>
    <li>MATGEN: (AlgLibInternal) CREFLECTIONS │ (AlgLibMisc) HQRND │ ABLAS</li>
    <li>SPARSE: (AlgLibInternal) ABLASMKL, SCODES, TSORT │ (AlgLibMisc) HQRND</li>
@@ -593,7 +593,7 @@ The routines are listed by subpackage module:
 <a href=#supp_History1 class=sheader>Revision Notes</a> |
 <a href="History.htm#supp_History2" class=sheader>Test Stages</a> |
 <a href="History.htm#supp_History3" class=sheader>Test Results</a> |
-<a href=#supp_History4 class=sheader>The Most Recent Test Run</a>
+<a href="History.htm#supp_History4" class=sheader>The Most Recent Test Run</a>
 ]</font>
 </p>
 <p>
@@ -690,171 +690,10 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 <p>
 <h3>A6.3. Test Results</h3>
 <a href="History.htm#supp_History3" class=sheader>(External link)</a>
+</p>
 <p>
-<a name=supp_History4 class=sheader></a><h3>A6.4. The Most Recent Test Run</h3>
-<pre class=narration>
-echo "TestI: API Interface"
-TestI: API Interface
-./TestI
-CPUID: sse2 avx2 fma
-OS: POSIX
-C++ tests. Please wait...
-Allocation counter activated...
-Allocation counter checked... Ok
-echo "TestY: C++ Wrapper Test"
-TestY: C++ Wrapper Test
-./TestY
-echo "TestZ: Exception-Free Wrapper Test"
-TestZ: Exception-Free Wrapper Test
-./TestZ
-Test exception-free error handling:
-Allocation counter activated...
-* default flag value          Ok
-* 1D arrays                   Ok
-* 2D arrays                   Ok
-* ALGLIB objects              Ok
-* ALGLIB functions            Ok
-Allocation counter checked... Ok
-echo "TestX: Speed and Consistency"
-TestX: Speed and Consistency
-./TestX
-System:
-* cores count                  1
-Allocation counter activated...
-Basic functions:
-* 1D arrays                   Ok
-* 2D arrays                   Ok
-* CSV support                 Ok
-* Serialization (kd-tree)     Ok
-* Serialization (RBF)         Ok
-* Progress/termination (RBF)  Ok
-* Exceptions in constructors  Ok
-SMP settings vs GEMM speedup:
-* test skipped (no SMP)       ??
-Issues:
-* Issue 505                   Ok
-* Issue 478                   Ok
-* Issue 528                   Ok
-* Issue 591                   Ok
-* Issue 594                   Ok
-* Issue 764                   Ok
-* Issue 813                   Ok
-* Issue 824                   Ok
-Performance:
-* RGEMM-SEQ-16   (MFLOPS)   7143
-* RGEMM-MTN-16              1.1x
-* RGEMM-SEQ-32   (MFLOPS)  12501
-* RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12350
-* RGEMM-MTN-64              1.0x
-* RGEMM-SEQ-1024 (MFLOPS)   9784
-* RGEMM-MTN-1024            1.0x
-Allocation counter checked... Ok
-echo "TestC: Internal Routines"
-TestC: Internal Routines
-./TestC
-Seed: 1652120083 (62795a13)
-Compiler: GCC
-Hardware: 64-bit
-Byte Order: little-endian
-CPU: Intel
-Cores: 1 (serial version)
-Libs: (None)
-CPUID: sse2 avx2 fma
-OS: POSIX
-Testing Mode: single core
- 1/90: ablasf                           Ok
- 2/90: hqrnd                            Ok
- 3/90: ablas                            Ok
- 4/90: hblas                            Ok
- 5/90: creflections                     Ok
- 6/90: sblas                            Ok
- 7/90: ortfac                           Ok
- 8/90: matgen                           Ok
- 9/90: tsort                            Ok
-10/90: sparse                           Ok
-11/90: blas                             Ok
-12/90: evd                              Ok
-13/90: trfac                            Ok
-14/90: polynomialsolver                 Ok
-15/90: bdsvd                            Ok
-16/90: svd                              Ok
-17/90: trlinsolve                       Ok
-18/90: safesolve                        Ok
-19/90: rcond                            Ok
-20/90: xblas                            Ok
-21/90: directdensesolvers               Ok
-22/90: directsparsesolvers              Ok
-23/90: fbls                             Ok
-24/90: iterativesparse                  Ok
-25/90: lincg                            Ok
-26/90: normestimator                    Ok
-27/90: linlsqr                          Ok
-28/90: linmin                           Ok
-29/90: nleq                             Ok
-30/90: matinv                           Ok
-31/90: optserv                          Ok
-32/90: minlbfgs                         Ok
-33/90: cqmodels                         Ok
-34/90: snnls                            Ok
-35/90: sactivesets                      Ok
-36/90: minbleic                         Ok
-37/90: minqp                            Ok
-38/90: minlm                            Ok
-39/90: mincg                            Ok
-40/90: minlp                            Ok
-41/90: minnlc                           Ok
-42/90: minns                            Ok
-43/90: minbc                            Ok
-44/90: nearestneighbor                  Ok
-45/90: odesolver                        Ok
-46/90: inverseupdate                    Ok
-47/90: schur                            Ok
-48/90: spdgevd                          Ok
-49/90: gammafunc                        Ok
-50/90: gq                               Ok
-51/90: gkq                              Ok
-52/90: autogk                           Ok
-53/90: normaldistr                      Ok
-54/90: basestat                         Ok
-55/90: wsr                              Ok
-56/90: mannwhitneyu                     Ok
-57/90: stest                            Ok
-58/90: studentttests                    Ok
-59/90: ratint                           Ok
-60/90: idw                              Ok
-61/90: polint                           Ok
-62/90: spline1d                         Ok
-63/90: lsfit                            Ok
-64/90: fitsphere                        Ok
-65/90: parametric                       Ok
-66/90: spline2d                         Ok
-67/90: spline3d                         Ok
-68/90: rbf                              Ok
-69/90: fft                              Ok
-70/90: fht                              Ok
-71/90: conv                             Ok
-72/90: corr                             Ok
-73/90: chebyshev                        Ok
-74/90: hermite                          Ok
-75/90: legendre                         Ok
-76/90: laguerre                         Ok
-77/90: pca                              Ok
-78/90: bdss                             Ok
-79/90: mlpbase                          Ok
-80/90: mlpe                             Ok
-81/90: clustering                       Ok
-82/90: dforest                          Ok
-83/90: linreg                           Ok
-84/90: filters                          Ok
-85/90: ssa                              Ok
-86/90: lda                              Ok
-87/90: mcpd                             Ok
-88/90: knn                              Ok
-89/90: mlptrain                         Ok
-90/90: alglibbasics                     Ok
-Done in 75 seconds
-</pre>
+<h3>A6.4. The Most Recent Test Run</h3>
+<a href="History.htm#supp_History4" class=sheader>(External link)</a>
 </p>
 </div>
 </body>

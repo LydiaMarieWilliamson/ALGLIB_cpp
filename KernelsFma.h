@@ -2,6 +2,7 @@
 #define OnceOnlyKernelsFma_h
 
 #include "Ap.h"
+
 namespace alglib_impl {
 #if !defined ALGLIB_NO_FAST_KERNELS && defined _ALGLIB_HAS_FMA_INTRINSICS
 double fma_rdotv(const ae_int_t n, const Real *__restrict x, const Real *__restrict y);

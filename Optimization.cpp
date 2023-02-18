@@ -3893,7 +3893,7 @@ Spawn:
    v = 74;
    vv = -788;
 // Unload frequently used variables from State structure
-// (just for typing convinience)
+// (just for typing convenience)
    n = state->n;
    m = state->m;
 // Init
@@ -7755,7 +7755,7 @@ void sassetlc(sactiveset *state, RMatrix *c, ZVector *ct, ae_int_t k) {
    n = state->n;
 // First, check for errors in the inputs
    ae_assert(k >= 0, "SASSetLC: K < 0");
-   ae_assert(c->cols >= n + 1 || k == 0, "SASSetLC: Cols(C) < N+1");
+   ae_assert(c->cols > n || k == 0, "SASSetLC: Cols(C) <= N");
    ae_assert(c->rows >= k, "SASSetLC: Rows(C) < K");
    ae_assert(ct->cnt >= k, "SASSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n + 1), "SASSetLC: C contains infinite or NaN values!");
@@ -7832,7 +7832,7 @@ void sassetlcx(sactiveset *state, RMatrix *cleic, ae_int_t nec, ae_int_t nic) {
 // First, check for errors in the inputs
    ae_assert(nec >= 0, "SASSetLCX: NEC < 0");
    ae_assert(nic >= 0, "SASSetLCX: NIC < 0");
-   ae_assert(cleic->cols >= n + 1 || nec + nic == 0, "SASSetLCX: Cols(CLEIC) < N+1");
+   ae_assert(cleic->cols > n || nec + nic == 0, "SASSetLCX: Cols(CLEIC) <= N");
    ae_assert(cleic->rows >= nec + nic, "SASSetLCX: Rows(CLEIC) < NEC+NIC");
    ae_assert(apservisfinitematrix(cleic, nec + nic, n + 1), "SASSetLCX: CLEIC contains infinite or NaN values!");
 // Store constraints
@@ -8651,7 +8651,7 @@ void sasrebuildbasis(sactiveset *state) {
          if (state->tmpnormestimates.xR[i] < vmax * (1.0 + minnormseparation)) {
             continue;
          }
-      // OK, upper bound is large enough... lets perform full
+      // OK, upper bound is large enough... let's perform full
       // re-evaluation and update of the estimate.
          v = 0.0;
          for (j = 0; j < n; j++) {
@@ -9814,7 +9814,7 @@ static void qqpsolver_quadraticmodel(qqpbuffers *sstate, RVector *x, RVector *d,
 //   function value; it is  responsibility  of  caller  to   provide  default
 //   candidate which reduces target function.
 // * "additional candidates", which may be shorter or longer than the default
-//   step. Candidates which are shorter that the default  step  are  ignored;
+//   step. Candidates which are shorter than the default  step  are  ignored;
 //   candidates which are longer than the "default" step are tested.
 //
 // The idea is that we ALWAYS try "default" step, and it is responsibility of
@@ -12456,7 +12456,7 @@ void minbleicsetlc(minbleicstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
    n = state->nmain;
 // First, check for errors in the inputs
    ae_assert(k >= 0, "MinBLEICSetLC: K < 0");
-   ae_assert(c->cols >= n + 1 || k == 0, "MinBLEICSetLC: Cols(C) < N+1");
+   ae_assert(c->cols > n || k == 0, "MinBLEICSetLC: Cols(C) <= N");
    ae_assert(c->rows >= k, "MinBLEICSetLC: Rows(C) < K");
    ae_assert(ct->cnt >= k, "MinBLEICSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n + 1), "MinBLEICSetLC: C contains infinite or NaN values!");
@@ -19184,12 +19184,12 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
    n = state->n;
 // First, check for errors in the inputs
    ae_assert(densek >= 0, "MinQPSetLCMixed: K < 0");
-   ae_assert(densek == 0 || densec->cols >= n + 1, "MinQPSetLCMixed: Cols(C) < N+1");
+   ae_assert(densek == 0 || densec->cols > n, "MinQPSetLCMixed: Cols(C) <= N");
    ae_assert(densec->rows >= densek, "MinQPSetLCMixed: Rows(DenseC) < DenseK");
    ae_assert(densect->cnt >= densek, "MinQPSetLCMixed: Length(DenseCT) < DenseK");
    ae_assert(apservisfinitematrix(densec, densek, n + 1), "MinQPSetLCMixed: C contains infinite or NaN values!");
    ae_assert(sparsek >= 0, "MinQPSetLCMixed: SparseK < 0");
-   ae_assert(sparsek == 0 || sparsegetncols(sparsec) >= n + 1, "MinQPSetLCMixed: Cols(SparseC) < N+1");
+   ae_assert(sparsek == 0 || sparsegetncols(sparsec) > n, "MinQPSetLCMixed: Cols(SparseC) <= N");
    ae_assert(sparsek == 0 || sparsegetnrows(sparsec) >= sparsek, "MinQPSetLCMixed: Rows(SparseC) < SparseK");
    ae_assert(sparsect->cnt >= sparsek, "MinQPSetLCMixed: Length(SparseCT) < SparseK");
 // Allocate place for Lagrange multipliers, fill by zero
@@ -19585,7 +19585,7 @@ void minqpaddlc2(minqpstate *state, ZVector *idxa, RVector *vala, ae_int_t nnz, 
    rvectorgrowto(&state->cl, state->msparse + state->mdense + 1);
    rvectorgrowto(&state->cu, state->msparse + state->mdense + 1);
    rvectorgrowto(&state->replaglc, state->msparse + state->mdense + 1);
-   for (i = state->msparse + state->mdense; i >= state->msparse + 1; i--) {
+   for (i = state->msparse + state->mdense; i > state->msparse; i--) {
       state->cl.xR[i] = state->cl.xR[i - 1];
       state->cu.xR[i] = state->cu.xR[i - 1];
       state->replaglc.xR[i] = state->replaglc.xR[i - 1];
@@ -19710,7 +19710,7 @@ void minqpaddlc2sparsefromdense(minqpstate *state, RVector *da, double al, doubl
    rvectorgrowto(&state->cl, state->msparse + state->mdense + 1);
    rvectorgrowto(&state->cu, state->msparse + state->mdense + 1);
    rvectorgrowto(&state->replaglc, state->msparse + state->mdense + 1);
-   for (i = state->msparse + state->mdense; i >= state->msparse + 1; i--) {
+   for (i = state->msparse + state->mdense; i > state->msparse; i--) {
       state->cl.xR[i] = state->cl.xR[i - 1];
       state->cu.xR[i] = state->cu.xR[i - 1];
       state->replaglc.xR[i] = state->replaglc.xR[i - 1];
@@ -20858,7 +20858,7 @@ void minlmsetlc(minlmstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
    n = state->n;
 // First, check for errors in the inputs
    ae_assert(k >= 0, "MinLMSetLC: K < 0");
-   ae_assert(c->cols >= n + 1 || k == 0, "MinLMSetLC: Cols(C) < N+1");
+   ae_assert(c->cols > n || k == 0, "MinLMSetLC: Cols(C) <= N");
    ae_assert(c->rows >= k, "MinLMSetLC: Rows(C) < K");
    ae_assert(ct->cnt >= k, "MinLMSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n + 1), "MinLMSetLC: C contains infinite or NaN values!");
@@ -22659,7 +22659,7 @@ void minlmresultsbuf(minlmstate *state, RVector *x, minlmreport *rep) {
 //     X       -   array[0..N-1], solution
 //     Rep     -   optimization  report;  includes  termination   codes   and
 //                 additional information. Termination codes are listed below,
-//                 see comments for this structure for more info.
+//                 see comments for this structure for more information.
 //                 Termination code is stored in rep.terminationtype field:
 //                 * -8    optimizer detected NAN/INF values either in the
 //                         function itself, or in its Jacobian
@@ -26153,7 +26153,7 @@ Spawn:
          for (j = 0; j < n; j++) {
             vv += fabs(state->stepkj.xyR[i][j] * state->trustrad);
          }
-         if (i >= nlec + 1) {
+         if (i > nlec) {
             v = rmax2(v, 0.0);
          }
          meritstate->increasebigc = meritstate->increasebigc || !SmallAtR(v, vv);
@@ -28276,7 +28276,7 @@ static void reviseddualsimplex_basisrequestweights(dualsimplexbasis *s, dualsimp
 //   after basis change.
 //
 //   This trick allows to accelerate and stabilize phase #1. See Robert Fourer,
-//   'Notes on the dual simplex method', draft report, 1994, for more info.
+//   'Notes on the dual simplex method', draft report, 1994, for more information.
 //
 // Returns:
 // * leaving variable index P
@@ -30532,7 +30532,7 @@ void dsssetproblem(dualsimplexstate *state, RVector *c, RVector *bndl, RVector *
       }
       ae_assert(state->at.vals.cnt >= sparsea->ridx.xZ[k] + k, "DSSSetProblem: integrity check failed");
       ae_assert(state->at.idx.cnt >= sparsea->ridx.xZ[k] + k, "DSSSetProblem: integrity check failed");
-      ae_assert(state->at.ridx.cnt >= ns + k + 1, "DSSSetProblem: integrity check failed");
+      ae_assert(state->at.ridx.cnt > ns + k, "DSSSetProblem: integrity check failed");
       ae_assert(state->at.didx.cnt >= ns + k, "DSSSetProblem: integrity check failed");
       ae_assert(state->at.uidx.cnt >= ns + k, "DSSSetProblem: integrity check failed");
       offs = state->at.ridx.xZ[ns];
@@ -31417,7 +31417,7 @@ void minlpsetlc(minlpstate *state, RMatrix *a, ZVector *ct, ae_int_t k) {
    NewVector(au, 0, DT_REAL);
    n = state->n;
    ae_assert(k >= 0, "MinLPSetLC: K < 0");
-   ae_assert(k == 0 || a->cols >= n + 1, "MinLPSetLC: Cols(A) < N+1");
+   ae_assert(k == 0 || a->cols > n, "MinLPSetLC: Cols(A) <= N");
    ae_assert(a->rows >= k, "MinLPSetLC: Rows(A) < K");
    ae_assert(ct->cnt >= k, "MinLPSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(a, k, n + 1), "MinLPSetLC: A contains infinite or NaN values!");
@@ -34495,7 +34495,7 @@ void minnlcsetlc(minnlcstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
    n = state->n;
 // First, check for errors in the inputs
    ae_assert(k >= 0, "MinNLCSetLC: K < 0");
-   ae_assert(c->cols >= n + 1 || k == 0, "MinNLCSetLC: Cols(C) < N+1");
+   ae_assert(c->cols > n || k == 0, "MinNLCSetLC: Cols(C) <= N");
    ae_assert(c->rows >= k, "MinNLCSetLC: Rows(C) < K");
    ae_assert(ct->cnt >= k, "MinNLCSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n + 1), "MinNLCSetLC: C contains infinite or NaN values!");
@@ -37592,7 +37592,7 @@ void minnssetlc(minnsstate *state, RMatrix *c, ZVector *ct, ae_int_t k) {
    n = state->n;
 // First, check for errors in the inputs
    ae_assert(k >= 0, "MinNSSetLC: K < 0");
-   ae_assert(c->cols >= n + 1 || k == 0, "MinNSSetLC: Cols(C) < N+1");
+   ae_assert(c->cols > n || k == 0, "MinNSSetLC: Cols(C) <= N");
    ae_assert(c->rows >= k, "MinNSSetLC: Rows(C) < K");
    ae_assert(ct->cnt >= k, "MinNSSetLC: Length(CT) < K");
    ae_assert(apservisfinitematrix(c, k, n + 1), "MinNSSetLC: C contains infinite or NaN values!");

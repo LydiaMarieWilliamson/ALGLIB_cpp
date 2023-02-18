@@ -36,6 +36,8 @@
 #   include <vector>
 #endif
 
+// #define AE_USE_CPP //(@) Locked in.
+
 // The CPU type.
 #define AE_OTHER_CPU	0
 #define AE_INTEL	1
@@ -159,11 +161,12 @@ namespace alglib_impl {
 // Core Code (Vectors, Matrices, Memory Management, etc.)
 
 // We are working under a C++ environment: define several conditions.
+// #define AE_USE_CPP_BOOL //(@) Locked in.
 #define AE_USE_CPP_SERIALIZATION
 // #include <iostream> //(@) Already included.
 
 // Define ae_int32_t, ae_int64_t, ae_uint64_t, ae_int_t, complex, ae_error_type and ae_datatype.
-// A boolean type was also originally (and unnecessarily) defined.
+// A boolean type was also originally and (unnecessarily) defined.
 // For C (as of 2011): one needs only to include <stdbool.h> to define "bool", "false" and "true".
 // For C++: it is already a part of the language.
 #if defined AE_INT32_T
@@ -217,7 +220,7 @@ extern bool _use_alloc_counter;
 
 // Malloc debugging:
 // Set to force ALGLIB++ malloc() to fail.
-// Useful to debug errors-handling during memory allocation.
+// Useful to debug error-handling during memory allocation.
 extern bool _force_malloc_failure;
 // If 0 and if _use_alloc_counter is set: the upper limit of _alloc_counter before forcing ALGLIB++ malloc() to fail.
 // Otherwise, this value has no effect.
@@ -302,7 +305,7 @@ struct ae_dyn_block {
    struct ae_dyn_block *volatile p_next;
 // The block deallocation function; or NULL for the stack frame/boundary "special" blocks.
    ae_deallocator deallocator; // Was: void *deallocator;
-// The argument for deallocator(); or NULL for 0-size blocks, or the DYN_BOTTOM or DYN_FRAME stack frame/boundary "special" blocks.
+// The argument for deallocator(); or NULL for 0-sized blocks, or the DYN_BOTTOM or DYN_FRAME stack frame/boundary "special" blocks.
    void *volatile ptr;
 };
 void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic);
@@ -376,7 +379,7 @@ typedef ae_vector BVector, ZVector, RVector, CVector;
 typedef ae_matrix BMatrix, ZMatrix, RMatrix, CMatrix;
 
 struct ae_smart_ptr {
-// Pointers respectively to the subscriber and the object; all changes in ptr are translated to subscriber.
+// Pointers respectively to the subscriber and the object; all changes in ptr are translated to the subscriber.
    void **subscriber, *ptr;
 // True if the smart pointer owns ptr.
    bool is_owner;
@@ -400,7 +403,7 @@ void ae_smart_ptr_release(ae_smart_ptr *dst);
 enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION = 2, ACT_NEW_LOCATION = 3 };
 
 #if 0 //(@) Not used anywhere.
-// x-strings (zero-terminated): members are ae_int64_t aligned to avoid alignment problems.
+// X-strings (zero-terminated): members are ae_int64_t aligned to avoid alignment problems.
 // Compiler-specific alignment definitions.
 #   if AE_COMPILER == AE_GNUC
 #      define ALIGNED __attribute__((aligned(8)))
@@ -420,19 +423,19 @@ struct x_string {
 //	ACT_NEW_LOCATION:	stored at a new location.
 // ACT_{UNCHANGED,SAME_LOCATION} mean no reallocation or copying is required.
    ALIGNED ae_int64_t last_action;	// enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION, ACT_NEW_LOCATION } last_action;
-// A pointer to the actual data.
+// A pointer to the actual string data.
    ALIGNED char *ptr;			// union { void *ptr; ae_int64_t portable_alignment_enforcer; };
 };
 #endif
 
-// x-vectors: members are ae_int64_t aligned to avoid alignment problems.
+// X-vectors: members are ae_int64_t aligned to avoid alignment problems.
 struct x_vector {
 // The vector size; i.e., the number of elements.
    ae_int64_t cnt;		// ae_int_t cnt;
 // One of the DT_* values.
    ae_int64_t datatype;		// ae_datatype datatype;
 // Determines what to do on realloc().
-// If the object is owned by the caller, the X-interface will just set ptr to NULL before realloc().
+// If the object is owned by the caller, the X-interface will just set x_ptr to NULL before realloc().
 // If it is owned by X, it will call one of the *_free() functions.
    ae_int64_t owner;		// bool owner;
 // Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
@@ -441,7 +444,7 @@ struct x_vector {
 //	ACT_NEW_LOCATION:	stored at a new location.
 // ACT_{UNCHANGED,SAME_LOCATION} mean no reallocation or copying is required.
    ae_int64_t last_action;	// enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION, ACT_NEW_LOCATION } last_action;
-// A pointer to the actual data - with enforced alignment.
+// A pointer to the actual vector data - with enforced alignment.
    union {
       void *x_ptr;
       ae_int64_t portable_alignment_enforcer;
@@ -453,17 +456,17 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src);
 void ae_x_attach_to_vector(x_vector *dst, ae_vector *src);
 void x_vector_free(x_vector *dst, bool make_automatic);
 
-// x-matrices: members are ae_int64_t aligned to avoid alignment problems.
+// X-matrices: members are ae_int64_t aligned to avoid alignment problems.
 struct x_matrix {
 // The matrix size.
-// If either dimension is 0, then both must be.
+// If either dimension is 0, then they both must be.
    ae_int64_t cols, rows;	// ae_int_t cols, rows;
 // The stride, i.e. the byte-distance between the first elements of adjacent matrix rows.
    ae_int64_t stride;		// ae_int_t stride;
 // One of the DT_* values.
    ae_int64_t datatype;		// ae_datatype datatype;
 // Determines what to do on realloc().
-// If the object is owned by the caller, the X-interface will just set ptr to NULL before realloc().
+// If the object is owned by the caller, the X-interface will just set x_ptr to NULL before realloc().
 // If it is owned by X, it will call one of the *_free() functions.
    ae_int64_t owner;		// bool owner;
 // Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
@@ -634,12 +637,11 @@ void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes)
 void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
 void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
 
-// Real math functions: IEEE-compliant floating point comparisons and standard functions.
-// * IEEE-compliant floating point comparisons.
+// Integer and real math functions:
 bool isneginf(double x);
 bool isposinf(double x);
 
-// * Standard functions.
+// Standard functions.
 ae_int_t imin2(ae_int_t x, ae_int_t y);
 ae_int_t imin3(ae_int_t x, ae_int_t y, ae_int_t z);
 ae_int_t imax2(ae_int_t x, ae_int_t y);
@@ -743,14 +745,14 @@ extern const double pi;
 
 // Optimized shared C/C++ linear algebra code.
 #define ALGLIB_INTERCEPTS_ABLAS
-bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
-bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
-bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
-bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
+bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, complex beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
+bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
+bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
 bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
 bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
 bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
@@ -805,7 +807,7 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RM
 #      define APPROX_FMA(x, y, z) ((x)*(y) + (z))
 #   endif
 #   if !defined ALGLIB_NO_FAST_KERNELS
-// Arrays shorter than that will be processed with generic C implementation
+// Arrays shorter than that will be processed with generic C implementation.
 #      if !defined _ABLASF_KERNEL_SIZE1
 #         define _ABLASF_KERNEL_SIZE1 16
 #      endif
@@ -815,7 +817,7 @@ bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RM
 #      define _ABLASF_BLOCK_SIZE 32
 #      define _ABLASF_MICRO_SIZE  2
 #      if defined _ALGLIB_HAS_AVX2_INTRINSICS || defined _ALGLIB_HAS_FMA_INTRINSICS
-#         define ULOAD256PD(x) _mm256_loadu_pd((const double *)&x)
+#         define ULOAD256PD(x) _mm256_loadu_pd((const double *)&(x))
 #      endif
 #   endif
 #endif
@@ -841,9 +843,9 @@ struct ap_error {
 // Exception-free code.
 #   define ThrowErrorMsg(X)	set_error_msg(); return X
 //(@) The following restriction is unnecessary.
-// #   if AE_OS != AE_OTHER_OS
-// #      error Exception-free mode can not be combined with AE_OS definition
-// #   endif
+#   if AE_OS != AE_OTHER_OS && 0
+#      error Exception-free mode can not be combined with AE_OS definition
+#   endif
 #   if AE_THREADING != NonTH
 #      error Exception-free mode is thread-unsafe; define AE_THREADING = NonTH to prove that you know it.
 #   endif
@@ -851,7 +853,7 @@ struct ap_error {
 #   define EndPoll		}
 // Set the error flag and the pending error message.
 void set_error_msg();
-// Get the error flag and (optionally) the error message (as *MsgP);
+// Get the error flag and (optionally) the error message (as *MsgP).
 // If the error flag is not set (or MsgP == NULL) *MsgP is not changed.
 bool get_error_flag(const char **MsgP = NULL);
 // Clear the error flag (it is not cleared until an explicit call to this function).
@@ -891,8 +893,8 @@ struct Type: public Type##I { \
    Type(const Type &A); \
    Type &operator=(const Type &A); \
    ~Type() { alglib_impl::Type##_free(&Obj, false); } \
-   alglib_impl::Type *c_ptr() { return &Obj; } \
    alglib_impl::Type *c_ptr() const { return const_cast<alglib_impl::Type *>(&Obj); } \
+   alglib_impl::Type *c_ptr() { return &Obj; } \
    Pars \
 }
 
@@ -929,9 +931,11 @@ extern const double machineepsilon, maxrealnumber, minrealnumber;
 extern const double pi;
 #endif
 
+// Integer and real math functions:
 bool isneginf(double x);
 bool isposinf(double x);
 
+// Standard functions.
 int minint(int x, int y);
 int maxint(int x, int y);
 int sign(double x);
@@ -965,8 +969,8 @@ struct complex {
    complex &operator*=(const complex &z);
    complex &operator/=(const double &v);
    complex &operator/=(const complex &z);
-   alglib_impl::complex *c_ptr() { return (alglib_impl::complex *)this; }
    const alglib_impl::complex *c_ptr() const { return (const alglib_impl::complex *)this; }
+   alglib_impl::complex *c_ptr() { return (alglib_impl::complex *)this; }
 #if !defined AE_NO_EXCEPTIONS
    std::string tostring(int _dps) const;
 #endif
@@ -1087,8 +1091,8 @@ struct ae_vector_wrapper {
    ae_int_t length() const;
 // Access to the internal C-structure used by the C-core.
 // Not intended for external use.
-   alglib_impl::ae_vector *c_ptr() { return This; }
    const alglib_impl::ae_vector *c_ptr() const { return This; }
+   alglib_impl::ae_vector *c_ptr() { return This; }
 #if 0 //(@) Not implemented.
 private:
    ae_vector_wrapper();
@@ -1102,8 +1106,8 @@ protected:
 // *	The wrapper object is assumed to start out already initialized; all previously allocated memory is properly deallocated.
 // *	The X-object at new_ptr is used only once;
 //	after we fetch the pointer to memory and its size, this X-object is ignored and not referenced anymore.
-//	So, you can pass pointers to temporary x-structures which are deallocated immediately after you call attach_to().
-// *	The state structure is used for error reporting purposes (longjmp on errors).
+//	So, you can pass pointers to temporary X-structures which are deallocated immediately after you call attach_to().
+// *	The frame state structure is used for error-handling/reporting purposes (longjmp on errors).
    void attach_to(alglib_impl::x_vector *new_ptr);
 // Assign rhs to the current object and return *this.
 // It has several branches depending on the target object's status:
@@ -1127,9 +1131,9 @@ protected:
 // *	ae_vector's, directly owned or not, can be read and modified.
 // *	Only internally allocated and owned ae_vector's can be freed and resized.
 // *	If owner == false:
-//	―	This == &Obj:	the ae_vector contains the object, but it points to externally allocated memory.
+//	-	This == &Obj:	the ae_vector contains the object, but it points to externally allocated memory.
 //				This memory is NOT owned by the ae_vector.
-//	―	This != &Obj:	the ae_vector is contained somewhere else.
+//	-	This != &Obj:	the ae_vector is contained somewhere else.
 //				Neither the memory pointed by the ae_vector nor the ae_vector itself are owned by the ae_vector.
    bool owner;
 };
@@ -1233,8 +1237,8 @@ struct ae_matrix_wrapper {
    bool isempty() const;
 // Access to the internal c-structure used by the c-core.
 // Not meant for external use.
-   alglib_impl::ae_matrix *c_ptr() { return This; }
    const alglib_impl::ae_matrix *c_ptr() const { return This; }
+   alglib_impl::ae_matrix *c_ptr() { return This; }
 #if 0 //(@) Not implemented.
 private:
    ae_matrix_wrapper();
@@ -1248,8 +1252,8 @@ protected:
 // *	The wrapper object is assumed to start out already initialized; all previously allocated memory is properly deallocated.
 // *	The X-object at new_ptr is used only once;
 //	after we fetch the pointer to memory and its size, this X-object is ignored and not referenced anymore.
-//	So, you can pass pointers to temporary x-structures which are deallocated immediately after you call attach_to().
-// *	The state structure is used for error-handling purposes (longjmp on errors).
+//	So, you can pass pointers to temporary X-structures which are deallocated immediately after you call attach_to().
+// *	The frame state structure is used for error-handling/reporting purposes (longjmp on errors).
 //	All previously allocated memory is correctly freed on error.
    void attach_to(alglib_impl::x_matrix *new_ptr);
 #if 0 //(@) Not implemented.

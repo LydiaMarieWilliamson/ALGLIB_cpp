@@ -112,7 +112,7 @@ void func505_grad(const real_1d_array &x, double &func, real_1d_array &grad, voi
 // assigned must be equal. In this case data are copied in the memory linked with
 // proxy.
 //
-// Early versions of ALGLIB failed to handle such assignment (it discrupted link
+// Early versions of ALGLIB failed to handle such assignment (it disrupted link
 // between proxy vector and actual gradient stored in the internals of ALGLIB).
    real_1d_array z = "[0]";
    grad = "[0]";
@@ -160,7 +160,7 @@ void func505_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
 // assigned must be equal. In this case data are copied in the memory linked with
 // proxy.
 //
-// Early versions of ALGLIB failed to handle such assignment (it discrupted link
+// Early versions of ALGLIB failed to handle such assignment (it disrupted link
 // between proxy and actual matrix stored in the internals of ALGLIB).
 //
    real_2d_array z = "[[0],[0]]";
@@ -218,9 +218,9 @@ void issue824_callback_d(const real_1d_array &, double &, void *) {
 void file_put_contents(const char *filename, const char *contents) {
    FILE *f = fopen(filename, "wb");
    if (f == NULL)
-      throw ap_error("file_put_contents: failed opening file");
+      ThrowError("file_put_contents: failed opening file");
    if (fwrite((void *)contents, 1, strlen(contents), f) != strlen(contents))
-      throw ap_error("file_put_contents: failed writing to file");
+      ThrowError("file_put_contents: failed writing to file");
    fclose(f);
 }
 
@@ -250,17 +250,17 @@ int main() {
    printf("Allocation counter activated...\n");
    alglib_impl::_use_alloc_counter = true;
    if (alglib_impl::_alloc_counter != 0) {
-      printf("FAILURE: alloc_counter is non-zero on start!\n");
+      printf("Failed: _alloc_counter is non-zero on start!\n");
       return 1;
    }
    {
       real_1d_array x;
       x.setlength(1);
       if (alglib_impl::_alloc_counter == 0)
-         printf(":::: WARNING: ALLOC_COUNTER IS INACTIVE!!! :::::\n");
+         printf("Warning: _alloc_counter is inactive!!!\n");
    }
    if (alglib_impl::_alloc_counter != 0) {
-      printf("FAILURE: alloc_counter does not decrease!\n");
+      printf("Failed: _alloc_counter does not decrease!\n");
       return 1;
    }
 #else
@@ -577,7 +577,7 @@ int main() {
             Ok = Ok && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
          }
       //
-      // Operations with proxy arrays attached via attach_to(ae_vector*):
+      // Operations with proxy arrays attached via attach_to(x_vector *):
       // * changes in target are propagated to proxy and vice versa
       // * assignments where proxy is source create new independent copy
       // * assignments to proxy are checked (their size must match to that of the target)
@@ -637,7 +637,7 @@ int main() {
       //
       // >>> Unique for real_1d_array >>>
       //
-      // Operations with proxy arrays attached via attach_to(double*):
+      // Operations with proxy arrays attached via attach_to_ptr(double *):
       // * changes in target are propagated to proxy and vice versa
       // * assignments where proxy is source create new independent copy
       // * assignments to proxy are checked (their size must match to that of the target)
@@ -932,7 +932,7 @@ int main() {
       // * attempts to call setlength() must fail even when new size match original size
       //   of the array
       //
-         { // test attach_to(ae_matrix*)
+         { // test attach_to_ptr(x_matrix *)
          // subtest 0
             real_2d_array targt, acopy, acopy2;
             targt = s3;
@@ -1020,7 +1020,7 @@ int main() {
                Ok = false;
             }
          }
-         { // test attach_to(double*)
+         { // test attach_to(double *)
          // subtest 0
             real_2d_array proxy, acopy, acopy2;
             double targt[] = { v30, v31, v32, v33, v34, v35 };
@@ -1842,7 +1842,7 @@ int main() {
       if (!issue505Ok)
          return 1;
    // Testing issue #478 (http://bugs.alglib.net/view.php?id=478)
-   // in high-quality RNG. It have to correctly handle random numbers
+   // in high-quality RNG. It has to correctly handle random numbers
    // larger than 2^31.
    //
    // This test is performed only in 64-bit mode.
@@ -2173,7 +2173,7 @@ int main() {
    alglib_impl::ae_complete_finalization_before_exit();
 #   endif
    if (alglib_impl::_alloc_counter != 0) {
-      printf("Failed: alloc_counter is non-zero on end!\n");
+      printf("Failed: _alloc_counter is non-zero on end!\n");
       return 1;
    } else printf("Ok\n");
 #endif

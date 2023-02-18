@@ -178,7 +178,7 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
       }
       e.xR[i - 1] = sqrt(beta->xR[i]);
    }
-// Caclulate Pn(a), Pn+1(a), Pn(b), Pn+1(b)
+// Calculate Pn(a), Pn+1(a), Pn(b), Pn+1(b)
    beta->xR[0] = 0.0;
    pim1a = 0.0;
    pia = 1.0;
@@ -304,7 +304,7 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
       }
       e.xR[i - 1] = sqrt(beta->xR[i]);
    }
-// Caclulate Pn(a), Pn-1(a), and D[N+1]
+// Calculate Pn(a), Pn-1(a), and D[N+1]
    beta->xR[0] = 0.0;
    polim1 = 0.0;
    poli = 1.0;

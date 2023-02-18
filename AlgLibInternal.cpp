@@ -235,6 +235,7 @@ void vectorsetlengthatleast(ae_vector *x, ae_int_t n) {
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void matrixsetlengthatleast(ae_matrix *x, ae_int_t m, ae_int_t n) {
    if (x->rows < m || x->cols < n) {
+      if (m < x->rows) m = x->rows; else if (n < x->cols) n = x->cols;
       ae_matrix_set_length(x, m, n);
    }
 }
@@ -338,45 +339,6 @@ void rvectorgrowto(RVector *x, ae_int_t n) {
    ae_frame_leave();
 }
 
-// Grows X, i.e. appends rows in such a way that:
-// a) contents is preserved
-// b) new row count is at least N
-// c) new row count can be larger than N, so subsequent grow() calls can return
-//    without reallocation
-// d) new matrix has at least MinCols columns (if less than specified amount
-//    of columns is present, new columns are added with undefined contents);
-//    MinCols can be 0 or negative value = ignored
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void rmatrixgrowrowsto(RMatrix *a, ae_int_t n, ae_int_t mincols) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t n2;
-   ae_int_t m;
-   ae_frame_make(&_frame_block);
-   NewMatrix(olda, 0, 0, DT_REAL);
-// Enough place?
-   if (a->rows >= n && a->cols >= mincols) {
-      ae_frame_leave();
-      return;
-   }
-// Sizes and metrics
-   if (a->rows < n) {
-      n = imax2(n, iround(1.8 * a->rows + 1));
-   }
-   n2 = imin2(a->rows, n);
-   m = a->cols;
-// Grow
-   ae_swap_matrices(a, &olda);
-   ae_matrix_set_length(a, n, imax2(m, mincols));
-   for (i = 0; i < n2; i++) {
-      for (j = 0; j < m; j++) {
-         a->xyR[i][j] = olda.xyR[i][j];
-      }
-   }
-   ae_frame_leave();
-}
-
 // Grows X, i.e. appends cols in such a way that:
 // a) contents is preserved
 // b) new col count is at least N
@@ -410,6 +372,45 @@ void rmatrixgrowcolsto(RMatrix *a, ae_int_t n, ae_int_t minrows) {
    ae_matrix_set_length(a, imax2(m, minrows), n);
    for (i = 0; i < m; i++) {
       for (j = 0; j < n2; j++) {
+         a->xyR[i][j] = olda.xyR[i][j];
+      }
+   }
+   ae_frame_leave();
+}
+
+// Grows X, i.e. appends rows in such a way that:
+// a) contents is preserved
+// b) new row count is at least N
+// c) new row count can be larger than N, so subsequent grow() calls can return
+//    without reallocation
+// d) new matrix has at least MinCols columns (if less than specified amount
+//    of columns is present, new columns are added with undefined contents);
+//    MinCols can be 0 or negative value = ignored
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+void rmatrixgrowrowsto(RMatrix *a, ae_int_t n, ae_int_t mincols) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t n2;
+   ae_int_t m;
+   ae_frame_make(&_frame_block);
+   NewMatrix(olda, 0, 0, DT_REAL);
+// Enough place?
+   if (a->rows >= n && a->cols >= mincols) {
+      ae_frame_leave();
+      return;
+   }
+// Sizes and metrics
+   if (a->rows < n) {
+      n = imax2(n, iround(1.8 * a->rows + 1));
+   }
+   n2 = imin2(a->rows, n);
+   m = a->cols;
+// Grow
+   ae_swap_matrices(a, &olda);
+   ae_matrix_set_length(a, n, imax2(m, mincols));
+   for (i = 0; i < n2; i++) {
+      for (j = 0; j < m; j++) {
          a->xyR[i][j] = olda.xyR[i][j];
       }
    }
@@ -714,7 +715,7 @@ double safepythag2(double x, double y) {
    return result;
 }
 
-// Safe sqrt(x^2+y^2)
+// Safe sqrt(x^2+y^2+z^2)
 // ALGLIB: Copyright by Sergey Bochkanov
 double safepythag3(double x, double y, double z) {
    double w;
@@ -1469,6 +1470,7 @@ void RVector_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 // === ABLASF Package ===
+// Depends on: APSERV
 namespace alglib_impl {
 // The dot product of elements [0,n) of vectors x and y.
 // Inputs:
@@ -1482,7 +1484,7 @@ double rdotv(ae_int_t n, RVector *x, RVector *y) {
 #if !defined ALGLIB_NO_FAST_KERNELS
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation.
-// Use KerSub* for a kernel that does not return result.
+// Use KerSub* for a kernel that does not return a result.
    if (n >= _ABLASF_KERNEL_SIZE1) KerFunSse2Avx2Fma(rdotv(n, x->xR, y->xR))
 #endif
 // Original generic C implementation.
@@ -1573,7 +1575,7 @@ void raddv(ae_int_t n, double alpha, RVector *x, RVector *y) {
 //	n:	The vector length.
 //	alpha:	The multiplier.
 //	x:	An n-vector to add.
-//	y:	A matrix.
+//	y:	The destination matrix.
 //	iy:	The destination row index in y.
 // Result:
 //	y[iy,_] += alpha x.
@@ -1836,7 +1838,7 @@ void rmulv(ae_int_t n, double v, RVector *y) {
    for (ae_int_t i = 0; i < n; i++) y->xR[i] *= v;
 }
 
-// Multiply the n-vector y[iy,_] by the scalar v.
+// Multiply elements [0,n) of the vector y[iy,_] by the scalar v.
 // Inputs:
 //	n:	The row length.
 //	v:	The multiplier.
@@ -2003,7 +2005,7 @@ void rsetvx(ae_int_t n, double v, RVector *y, ae_int_t y0) {
 }
 
 #if !defined ALGLIB_NO_FAST_KERNELS
-// Set elements of [0,n) of the vector yp[_] to v.
+// Set elements [0,n) of the vector yp[_] to v.
 // Inputs:
 //	n:	The vector size.
 //	v:	The value to set.
@@ -2110,11 +2112,11 @@ void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *y) {
 // Leave it unchanged, if it is large enough.
 // Inputs:
 //	n:	The desired vector length.
-//	x:	A possibly-preallocated array.
+//	x:	A possibly-preallocated vector.
 // Output:
 //	x:	A vector, at least of length n.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void allocv(ae_int_t n, BVector *x) {
+void allocv(ae_int_t n, ae_vector *x) {
    vectorsetlengthatleast(x, n);
 }
 
@@ -2127,7 +2129,7 @@ void allocv(ae_int_t n, BVector *x) {
 // Output:
 //	x:	A matrix, at least of size m x n.
 // ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
-void allocm(ae_int_t m, ae_int_t n, RMatrix *x) {
+void allocm(ae_int_t m, ae_int_t n, ae_matrix *x) {
    matrixsetlengthatleast(x, m, n);
 }
 
@@ -2226,7 +2228,7 @@ void rcopyrr(ae_int_t n, RMatrix *x, ae_int_t ix, RMatrix *y, ae_int_t iy) {
    for (ae_int_t j = 0; j < n; j++) y->xyR[iy][j] = x->xyR[ix][j];
 }
 
-// Copy elements [x0,x0+n) of the vector x to elements [y0,y0+n) of the vector y, extended version.
+// Copy elements [x0,x0+n) of the vector x into elements [y0,y0+n) of the vector y, extended version.
 // Inputs:
 //	n:	The vector length.
 //	x:	The source vector.
@@ -2283,7 +2285,7 @@ void rcopycv(ae_int_t n, RMatrix *x, ae_int_t jx, RVector *y) {
    for (ae_int_t i = 0; i < n; i++) y->xR[i] = x->xyR[i][jx];
 }
 
-// Copy elements [0,m) x [0,n) of the matrix x to y, resizing y if needed.
+// Copy elements [0,m) x [0,n) of the matrix x into y, resizing y if needed.
 // On resize, the dimensions of y are increased - but not decreased.
 // Inputs:
 //	m:	The row count.
@@ -2389,7 +2391,7 @@ void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y) {
    rcopym(m, n, x, y);
 }
 
-// Grow the vector x, i.e. changes its size in such a way that:
+// Grow the vector x, i.e. change its size in such a way that:
 // *	its contents is preserved,
 // *	its new size is at least newn,
 // *	its actual size may be larger than newn, so that subsequent grow() calls can return without reallocation.
@@ -2431,12 +2433,12 @@ void rgrowv(ae_int_t newn, RVector *x) {
 // Note:
 // *	This function expects y to be large enough to store the result.
 //	No automatic preallocation happens for smaller arrays.
-//	No integrity checks are performed for the sizes of a, x, y.
+//	No integrity checks are performed on the sizes of a, x, y.
 // Inputs:
 //	m:	The number of rows of a'.
 //	n:	The number of columns of a'.
 //	alpha:	The coefficient.
-//	a:	A source matrix.
+//	a:	The source matrix.
 //	opa:	The operation type:
 //		0:	a' = a,
 //		1:	a' = a^T.
@@ -2450,17 +2452,17 @@ void rgrowv(ae_int_t newn, RVector *x) {
 // --------------------------
 // *	If m == 0, then the subroutine does nothing.
 //	It does not even touch the arrays.
-// *	If n == 0 or alpha == 0.0, then:
-//	-	If beta == 0.0, then y is filled by 0's.
+// *	If n == 0 or alpha == 0, then:
+//	-	If beta == 0, then y is filled by 0's.
 //		a and x are not referenced at all.
 //		The initial values of y are ignored (we do not multiply y by 0, we just rewrite it by 0's).
-//	-	If beta != 0.0, then y is replaced by beta y.
-// *	If m > 0, n > 0, alpha != 0.0, but beta == 0.0, then y is replaced by a x;
+//	-	If beta != 0, then y is multiplied by beta.
+// *	If m > 0, n > 0, alpha != 0, but beta == 0, then y is replaced by a x;
 //	the initial state of y is ignored (rewritten by a x, without initial multiplication by 0's).
 // ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
 void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVector *x, double beta, RVector *y) {
 // Properly premultiply y by beta.
-// Quick exit for m == 0, n == 0 or alpha == 0.0.
+// Quick exit for m == 0, n == 0 or alpha == 0.
 // After this block we have m > 0, n > 0, alpha != 0.
    if (m <= 0) return;
    if (beta != 0.0) rmulv(m, beta, y); else rsetv(m, 0.0, y);
@@ -2515,7 +2517,7 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
 //	ix:	The sub-vector offset in x.
 //	beta:	A coefficient.
 //	y:	A preallocated output array, at least of size m+iy.
-//	iy:	The sub-vector offset in b.
+//	iy:	The sub-vector offset in y.
 // Output:
 //	y:	The vector which stores the result.
 //
@@ -2523,18 +2525,18 @@ void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVect
 // --------------------------
 // *	If m == 0, then the subroutine does nothing.
 //	It does not even touch the arrays.
-// *	If n == 0 or alpha == 0.0, then:
-//	-	If beta == 0.0, then y is filled by 0's.
+// *	If n == 0 or alpha == 0, then:
+//	-	If beta == 0, then y is filled by 0's.
 //		a and x are not referenced at all.
 //		The initial values of y are ignored (we do not multiply y by 0, we just rewrite it by 0's).
-//	-	If beta != 0.0, then y is replaced by beta y.
-// *	If m > 0, n > 0, alpha != 0.0, but beta == 0.0, then y is replaced by a x;
+//	-	If beta != 0, then y is multiplied by beta.
+// *	If m > 0, n > 0, alpha != 0, but beta == 0, then y is replaced by a x;
 //	the initial state of y is ignored (rewritten by a x, without initial multiplication by 0's).
 // ALGLIB Routine: Copyright 01.09.2021 by Sergey Bochkanov
 void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
 // Properly premultiply y by beta.
-// Quick exit for m == 0, n == 0 or alpha == 0.0.
-// After this block we have m > 0, n > 0, alpha != 0.0.
+// Quick exit for m == 0, n == 0 or alpha == 0.
+// After this block we have m > 0, n > 0, alpha != 0.
    if (m <= 0) return;
    if (beta != 0.0) rmulvx(m, beta, y, iy); else rsetvx(m, 0.0, y, iy);
    if (n <= 0 || alpha == 0.0) return;
@@ -2577,7 +2579,7 @@ void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_in
 //	m:	The number of rows.
 //	n:	The number of columns.
 //	alpha:	A coefficient.
-//	u:	Vector #1
+//	u:	Vector #1.
 //	v:	Vector #2.
 //	a:	The target m x n matrix.
 // ALGLIB Routine: Copyright 07.09.2021 by Sergey Bochkanov
@@ -2589,7 +2591,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
    }
 }
 
-// Solve the linear system a' x = b for x, where:
+// Solve the linear system a' x == b for x, where:
 // *	a is an n x n upper/lower triangular/unitriangular matrix,
 // *	x and b are n x 1 vectors,
 // *	the operation a' may be the identity operation a |-> a, or transposition a |-> a^T.
@@ -2605,7 +2607,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
 //	isupper: Whether the matrix is upper triangular.
 //	isunit:	Whether the matrix is unitriangular.
 //	opa:	The transformation type:
-//		0:	no transformation: a' = a.
+//		0:	no transformation: a' = a,
 //		1:	transposition: a' = a^T.
 //	x:	A vector containing the right-hand side n-vector in elements [ix,ix+n).
 //	ix:	The offset in x.
@@ -2643,7 +2645,7 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool
             for (ae_int_t j = 0; j < i; j++) x->xR[ix + j] -= v * a->xyR[ia + i][ja + j];
          }
       break;
-      default: ae_assert(false, "rTRSVX: unexpected operation type"); break;
+      default: ae_assert(false, "rtrsvx: unexpected operation type"); break;
    }
 }
 
@@ -2679,41 +2681,41 @@ bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja,
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
+bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, RMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    return false;
 #else
-   return _ialglib_i_rmatrixlefttrsmf(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+   return _ialglib_i_rmatrixlefttrsmf(m, n, a, i1, j1, isupper, isunit, opa, x, i2, j2);
 #endif
 }
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool cmatrixlefttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
+bool cmatrixlefttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, CMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    return false;
 #else
-   return _ialglib_i_cmatrixlefttrsmf(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+   return _ialglib_i_cmatrixlefttrsmf(m, n, a, i1, j1, isupper, isunit, opa, x, i2, j2);
 #endif
 }
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool rmatrixrighttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
+bool rmatrixrighttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, RMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    return false;
 #else
-   return _ialglib_i_rmatrixrighttrsmf(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+   return _ialglib_i_rmatrixrighttrsmf(m, n, a, i1, j1, isupper, isunit, opa, x, i2, j2);
 #endif
 }
 
 // Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
+bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, CMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    return false;
 #else
-   return _ialglib_i_cmatrixrighttrsmf(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+   return _ialglib_i_cmatrixrighttrsmf(m, n, a, i1, j1, isupper, isunit, opa, x, i2, j2);
 #endif
 }
 
@@ -2763,12 +2765,12 @@ bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
 // *	c is an m x n general matrix, a' is an m x k matrix, b' is a k x n matrix, with:
 // *	a' = a if opa == 0, a' = a^T if opa == 1,
 // *	b' = b if opb == 0, b' = b^T if opb == 1.
-// Additional info:
+// Additional information:
 // *	The multiplication result replaces c.
-// *	If beta == 0.0, c is not used in the calculations (not multiplied by 0.0 - just not referenced).
-// *	If alpha == 0.0, a is not used (not multiplied by 0.0 - just not referenced).
-// *	If both beta == 0.0 and alpha == 0.0, c is filled by 0's.
-// *	The specialized functions require that alpha != 0.0; an exception is thrown otherwise.
+// *	If beta == 0, c is not used in the calculations (not multiplied by 0 - just not referenced).
+// *	If alpha == 0, a is not used (not multiplied by 0 - just not referenced).
+// *	If both beta == 0 and alpha == 0, c is filled by 0's.
+// *	The specialized functions require that alpha != 0; an exception will be thrown otherwise.
 // Important:
 // *	This function requires the output matrix c to be preallocated.
 //	An exception will be thrown, if it is not large enough to store the result.
@@ -2779,13 +2781,11 @@ bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
 //	opa:		The transformation type for a:
 //			0:	no transformation: a' = a,
 //			1:	transposition: a' = a^T.
-//			a' is an m x k matrix.
 //	b, ib, jb:	A matrix and its sub-matrix offsets.
 //	opb:		The transformation type for b:
 //			0:	no transformation: b' = b,
 //			1:	transposition: b' = b^T.
-//			b' is an k x n matrix.
-//	c, ic, jc:	The m x n PRE-ALLOCATED output matrix and its sub-matrix offsets.
+//	c, ic, jc:	The m x n PREALLOCATED output matrix and its sub-matrix offsets.
 // ALGLIB Routines: Copyright 27.03.2013 by Sergey Bochkanov
 
 // rmatrixgemm() kernel: the base case code for rmatrixgemm(), specialized to opa == 0 and opb == 0.
@@ -2797,8 +2797,8 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
    for (ae_int_t i = 0; i < m; i += 4) for (ae_int_t j = 0; j < n; j += 4) {
    // Choose between the specialized 4 x 4 code and the general code.
       if (i + 4 <= m && j + 4 <= n) {
-      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
-      // A sum of K rank-1 products, with operands cached in local variables in order to speed up array operations.
+      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4):
+      // a sum of k rank-1 products, with operands cached in local variables in order to speed up array operations.
          ae_int_t ax0 = ia + i, ax1 = ax0 + 1, ax2 = ax0 + 2, ax3 = ax0 + 3, ay = ja;
          ae_int_t bx0 = jb + j, bx1 = bx0 + 1, bx2 = bx0 + 2, bx3 = bx0 + 3, by = ib;
          double v00 = 0.0, v01 = 0.0, v02 = 0.0, v03 = 0.0;
@@ -2837,7 +2837,8 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
          }
       } else {
       // Determine the sub-matrix of c of which elements [i0,i1) x [j0,j1) to process.
-         ae_int_t i0 = i, i1 = imin2(i + 4, m), j0 = j, j1 = imin2(j + 4, n);
+         ae_int_t i0 = i, i1 = imin2(i + 4, m);
+         ae_int_t j0 = j, j1 = imin2(j + 4, n);
       // Process the sub-matrix.
          for (ae_int_t ik = i0; ik < i1; ik++) for (ae_int_t jk = j0; jk < j1; jk++) {
             double v = k == 0 || alpha == 0.0 ? 0.0 : alpha * ae_v_dotproduct(&a->xyR[ia + ik][ja], 1, &b->xyR[ib][jb + jk], b->stride, k);
@@ -2856,14 +2857,15 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
    for (ae_int_t i = 0; i < m; i += 4) for (ae_int_t j = 0; j < n; j += 4) {
    // Choose between the specialized 4 x 4 code and the general code.
       if (i + 4 <= m && j + 4 <= n) {
-      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
-      // A sum of K rank-1 products, with operands cached in local variables in order to speed up array operations.
+      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4):
+      // a sum of k rank-1 products, with operands cached in local variables in order to speed up array operations.
          ae_int_t ax0 = ia + i, ax1 = ax0 + 1, ax2 = ax0 + 2, ax3 = ax0 + 3, ay = ja;
          ae_int_t bx0 = ib + j, bx1 = bx0 + 1, bx2 = bx0 + 2, bx3 = bx0 + 3, by = jb;
          double v00 = 0.0, v01 = 0.0, v02 = 0.0, v03 = 0.0;
          double v10 = 0.0, v11 = 0.0, v12 = 0.0, v13 = 0.0;
          double v20 = 0.0, v21 = 0.0, v22 = 0.0, v23 = 0.0;
          double v30 = 0.0, v31 = 0.0, v32 = 0.0, v33 = 0.0;
+      // Different variants of the internal loop.
          for (ae_int_t t = 0; t < k; ay++, by++, t++) {
             double a0 = a->xyR[ax0][ay], a1 = a->xyR[ax1][ay], a2 = a->xyR[ax2][ay], a3 = a->xyR[ax3][ay];
             double b0 = b->xyR[bx0][by], b1 = b->xyR[bx1][by], b2 = b->xyR[bx2][by], b3 = b->xyR[bx3][by];
@@ -2915,14 +2917,15 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
    for (ae_int_t i = 0; i < m; i += 4) for (ae_int_t j = 0; j < n; j += 4) {
    // Choose between the specialized 4 x 4 code and the general code.
       if (i + 4 <= m && j + 4 <= n) {
-      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
-      // A sum of K rank-1 products, with operands cached in local variables in order to speed up array operations.
+      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4):
+      // a sum of k rank-1 products, with operands cached in local variables in order to speed up array operations.
          ae_int_t ax0 = ja + i, ax1 = ax0 + 1, ax2 = ax0 + 2, ax3 = ax0 + 3, ay = ia;
          ae_int_t bx0 = jb + j, bx1 = bx0 + 1, bx2 = bx0 + 2, bx3 = bx0 + 3, by = ib;
          double v00 = 0.0, v01 = 0.0, v02 = 0.0, v03 = 0.0;
          double v10 = 0.0, v11 = 0.0, v12 = 0.0, v13 = 0.0;
          double v20 = 0.0, v21 = 0.0, v22 = 0.0, v23 = 0.0;
          double v30 = 0.0, v31 = 0.0, v32 = 0.0, v33 = 0.0;
+      // Different variants of the internal loop.
          for (ae_int_t t = 0; t < k; ay++, by++, t++) {
             double a0 = a->xyR[ay][ax0], a1 = a->xyR[ay][ax1], a2 = a->xyR[ay][ax2], a3 = a->xyR[ay][ax3];
             double b0 = b->xyR[by][bx0], b1 = b->xyR[by][bx1], b2 = b->xyR[by][bx2], b3 = b->xyR[by][bx3];
@@ -2974,14 +2977,15 @@ void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
    for (ae_int_t i = 0; i < m; i += 4) for (ae_int_t j = 0; j < n; j += 4) {
    // Choose between the specialized 4 x 4 code and the general code.
       if (i + 4 <= m && j + 4 <= n) {
-      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
-      // A sum of K rank-1 products, with operands cached in local variables in order to speed up array operations.
+      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4):
+      // a sum of k rank-1 products, with operands cached in local variables in order to speed up array operations.
          ae_int_t ax0 = ja + i, ax1 = ax0 + 1, ax2 = ax0 + 2, ax3 = ax0 + 3, ay = ia;
          ae_int_t bx0 = ib + j, bx1 = bx0 + 1, bx2 = bx0 + 2, bx3 = bx0 + 3, by = jb;
          double v00 = 0.0, v01 = 0.0, v02 = 0.0, v03 = 0.0;
          double v10 = 0.0, v11 = 0.0, v12 = 0.0, v13 = 0.0;
          double v20 = 0.0, v21 = 0.0, v22 = 0.0, v23 = 0.0;
          double v30 = 0.0, v31 = 0.0, v32 = 0.0, v33 = 0.0;
+      // Different variants of the internal loop.
          for (ae_int_t t = 0; t < k; ay++, by++, t++) {
             double a0 = a->xyR[ay][ax0], a1 = a->xyR[ay][ax1], a2 = a->xyR[ay][ax2], a3 = a->xyR[ay][ax3];
             double b0 = b->xyR[bx0][by], b1 = b->xyR[bx1][by], b2 = b->xyR[bx2][by], b3 = b->xyR[bx3][by];
@@ -3025,7 +3029,8 @@ void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 }
 
 #if 0
-// Returned to Ap.cpp, because merely putting it here, instead of in Ap.cpp, seems to degrade the speed of the GEMM routine!
+//(@) Returned to Ap.cpp, because merely putting it here, instead of in Ap.cpp, seems to degrade the speed of the GEMM routine!
+//(@) The slow-down is apparently the same issue, inherited from ALGLIB, that brought about the splitting of rmatrixgemmk() in ALGLIB.
 // Fast rmatrixgemm() kernel: with AVX2/FMA support.
 static bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
 #endif
@@ -3036,7 +3041,7 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, 
    if (m == 0 || n == 0) return;
 // Try the optimized code.
    if (ablasf_rgemm32basecase(m, n, k, alpha, a, ia, ja, opa, b, ib, jb, opb, beta, c, ic, jc)) return;
-// If k == 0 or alpha == 0.0, then c = beta c.
+// If k == 0 or alpha == 0, then c *= beta.
    if (k == 0 || alpha == 0.0) {
       if (beta == 0.0)
          for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) c->xyR[ic + i][jc + j] = 0.0;
@@ -3055,7 +3060,8 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, 
          case 1: rmatrixgemmk44v01(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc); break;
       }
       break;
-      default: switch (opb) {
+      default:
+      case 1: switch (opb) {
          case 0: rmatrixgemmk44v10(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc); break;
          default:
          case 1: rmatrixgemmk44v11(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc); break;
@@ -3064,18 +3070,17 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, 
    }
 }
 
-// cmatrixgemm() kernels the base case code for cmatrixgemm().
+// cmatrixgemm() kernels: the base case code for cmatrixgemm().
 //	c = alpha a' b' + beta c
 // where:
 // *	c is an m x n general matrix, a' is an m x k matrix, b' is a k x n matrix, with:
 // *	a' = a if opa == 0, a' = a^T if opa == 1, a' = a^+ if opa == 2,
-// *	b' = b if opb == 0, b' = b^T if opb == 1. b' = b^+ if opa == 2.
-// Additional info:
+// *	b' = b if opb == 0, b' = b^T if opb == 1, b' = b^+ if opb == 2.
+// Additional information:
 // *	The multiplication result replaces c.
-// *	If beta == 0.0, c is not used in the calculations (not multiplied by 0.0 - just not referenced).
-// *	If alpha == 0.0, a is not used (not multiplied by 0.0 - just not referenced).
-// *	If both beta == 0.0 and alpha == 0.0, c is filled by 0's.
-// *	This function requires that alpha != 0.0; an exception is thrown otherwise.
+// *	If beta == 0, c is not used in the calculations (not multiplied by 0 - just not referenced).
+// *	If alpha == 0, a is not used (not multiplied by 0 - just not referenced).
+// *	If both beta == 0 and alpha == 0, c is filled by 0's.
 // Important:
 // *	This function requires the output matrix c to be preallocated.
 //	An exception will be thrown, if it is not large enough to store the result.
@@ -3087,21 +3092,19 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, 
 //			0:	no transformation: a' = a,
 //			1:	transposition: a' = a^T,
 //			2:	conjugate transposition: a' = a^+.
-//			a' is an m x k matrix.
 //	b, ib, jb:	A matrix and its sub-matrix offsets.
 //	opb:		The transformation type for b:
 //			0:	no transformation: b' = b,
-//			1:	transposition: b' = b^T.
+//			1:	transposition: b' = b^T,
 //			2:	conjugate transposition: b' = b^+.
-//			b' is an k x n matrix.
-//	c, ic, jc:	The m x n PRE-ALLOCATED output matrix and its sub-matrix offsets.
+//	c, ic, jc:	The m x n PREALLOCATED output matrix and its sub-matrix offsets.
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
 void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
 // Size-0 matrices require nothing to be done.
    if (m == 0 || n == 0) return;
 // Try the optimized code.
    if (cmatrixgemmf(m, n, k, alpha, a, ia, ja, opa, b, ib, jb, opb, beta, c, ic, jc)) return;
-// If k == 0 or alpha == 0.0, then c = beta c.
+// If k == 0 or alpha == 0, then c *= beta.
    if (k == 0 || ae_c_eq_d(alpha, 0.0)) {
       if (ae_c_eq_d(beta, 0.0))
          for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) c->xyC[ic + i][jc + j] = complex_from_i(0);
@@ -3109,44 +3112,43 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
          for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) c->xyC[ic + i][jc + j] = ae_c_mul(beta, c->xyC[ic + i][jc + j]);
       return;
    }
-// This phase is not really necessary, but compiler complains about "possibly uninitialized variables".
+// This phase is not really necessary, but the compiler complains about "possibly uninitialized variables".
    double a0x = 0.0, a0y = 0.0, a1x = 0.0, a1y = 0.0;
    double b0x = 0.0, b0y = 0.0, b1x = 0.0, b1y = 0.0;
-// General case
+// The general case.
    for (ae_int_t i = 0; i < m; i += 2) for (ae_int_t j = 0; j < n; j += 2) {
    // Choose between the specialized 4 x 4 code and the general code.
       if (i + 2 <= m && j + 2 <= n) {
-      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4).
-      // A sum of K rank-1 products, with operands cached in local variables in order to speed up array operations.
+      // Specialized 4 x 4 code for the sub-matrix of c at elements [i,i+4) x [j,j+4):
+      // a sum of k rank-1 products, with operands cached in local variables in order to speed up array operations.
          double v00x = 0.0, v00y = 0.0, v01x = 0.0, v01y = 0.0;
          double v10x = 0.0, v10y = 0.0, v11x = 0.0, v11y = 0.0;
-         ae_int_t xa = opa == 0 ? ia : ja, a0 = opa == 0 ? ja : ia, ax0 = xa + i, ax1 = ax0 + 1;
-         ae_int_t xb = opb == 0 ? jb : ib, b0 = opb == 0 ? ib : jb, bx0 = xb + j, bx1 = bx0 + 1;
-         for (ae_int_t t = 0; t < k; a0++, b0++, t++) {
+         ae_int_t xa = opa == 0 ? ia : ja, ay = opa == 0 ? ja : ia, ax0 = xa + i, ax1 = ax0 + 1;
+         ae_int_t xb = opb == 0 ? jb : ib, by = opb == 0 ? ib : jb, bx0 = xb + j, bx1 = bx0 + 1;
+      // Different variants of the internal loop.
+         for (ae_int_t t = 0; t < k; ay++, by++, t++) {
             switch (opa) {
-               case 0: a0x = a->xyC[ax0][a0].x, a0y = a->xyC[ax0][a0].y, a1x = a->xyC[ax1][a0].x, a1y = a->xyC[ax1][a0].y; break;
-               case 1: a0x = a->xyC[a0][ax0].x, a0y = a->xyC[a0][ax0].y, a1x = a->xyC[a0][ax1].x, a1y = a->xyC[a0][ax1].y; break;
-               case 2: a0x = a->xyC[a0][ax0].x, a0y = -a->xyC[a0][ax0].y, a1x = a->xyC[a0][ax1].x, a1y = -a->xyC[a0][ax1].y; break;
+               case 0: a0x = a->xyC[ax0][ay].x, a0y = a->xyC[ax0][ay].y, a1x = a->xyC[ax1][ay].x, a1y = a->xyC[ax1][ay].y; break;
+               case 1: a0x = a->xyC[ay][ax0].x, a0y = a->xyC[ay][ax0].y, a1x = a->xyC[ay][ax1].x, a1y = a->xyC[ay][ax1].y; break;
+               case 2: a0x = a->xyC[ay][ax0].x, a0y = -a->xyC[ay][ax0].y, a1x = a->xyC[ay][ax1].x, a1y = -a->xyC[ay][ax1].y; break;
             }
             switch (opb) {
-               case 0: b0x = b->xyC[b0][bx0].x, b0y = b->xyC[b0][bx0].y, b1x = b->xyC[b0][bx1].x, b1y = b->xyC[b0][bx1].y; break;
-               case 1: b0x = b->xyC[bx0][b0].x, b0y = b->xyC[bx0][b0].y, b1x = b->xyC[bx1][b0].x, b1y = b->xyC[bx1][b0].y; break;
-               case 2: b0x = b->xyC[bx0][b0].x, b0y = -b->xyC[bx0][b0].y, b1x = b->xyC[bx1][b0].x, b1y = -b->xyC[bx1][b0].y; break;
+               case 0: b0x = b->xyC[by][bx0].x, b0y = b->xyC[by][bx0].y, b1x = b->xyC[by][bx1].x, b1y = b->xyC[by][bx1].y; break;
+               case 1: b0x = b->xyC[bx0][by].x, b0y = b->xyC[bx0][by].y, b1x = b->xyC[bx1][by].x, b1y = b->xyC[bx1][by].y; break;
+               case 2: b0x = b->xyC[bx0][by].x, b0y = -b->xyC[bx0][by].y, b1x = b->xyC[bx1][by].x, b1y = -b->xyC[bx1][by].y; break;
             }
             v00x += a0x * b0x - a0y * b0y, v00y += a0x * b0y + a0y * b0x;
             v01x += a0x * b1x - a0y * b1y, v01y += a0x * b1y + a0y * b1x;
             v10x += a1x * b0x - a1y * b0y, v10y += a1x * b0y + a1y * b0x;
             v11x += a1x * b1x - a1y * b1y, v11y += a1x * b1y + a1y * b1x;
          }
-         complex v00 = ae_c_mul(complex_from_d(v00x, v00y), alpha), v01 = ae_c_mul(complex_from_d(v01x, v01y), alpha);
-         complex v10 = ae_c_mul(complex_from_d(v10x, v10y), alpha), v11 = ae_c_mul(complex_from_d(v11x, v11y), alpha);
+         complex v00 = ae_c_mul(alpha, complex_from_d(v00x, v00y)), v01 = ae_c_mul(alpha, complex_from_d(v01x, v01y));
+         complex v10 = ae_c_mul(alpha, complex_from_d(v10x, v10y)), v11 = ae_c_mul(alpha, complex_from_d(v11x, v11y));
          ae_int_t ic0 = ic + i, ic1 = ic0 + 1;
          ae_int_t jc0 = jc + j, jc1 = jc0 + 1;
          if (ae_c_eq_d(beta, 0.0)) {
-            c->xyC[ic0][jc0] = v00;
-            c->xyC[ic0][jc1] = v01;
-            c->xyC[ic1][jc0] = v10;
-            c->xyC[ic1][jc1] = v11;
+            c->xyC[ic0][jc0] = v00, c->xyC[ic0][jc1] = v01;
+            c->xyC[ic1][jc0] = v10, c->xyC[ic1][jc1] = v11;
          } else {
             c->xyC[ic0][jc0] = ae_c_add(ae_c_mul(beta, c->xyC[ic0][jc0]), v00);
             c->xyC[ic0][jc1] = ae_c_add(ae_c_mul(beta, c->xyC[ic0][jc1]), v01);
@@ -3180,7 +3182,8 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a,
                }
                break;
             }
-            c->xyC[ic + ik][jc + jk] = ae_c_eq_d(beta, 0.0) ? ae_c_mul(alpha, v) : ae_c_add(ae_c_mul(beta, c->xyC[ic + ik][jc + jk]), ae_c_mul(alpha, v));
+            v = ae_c_mul(alpha, v);
+            c->xyC[ic + ik][jc + jk] = ae_c_eq_d(beta, 0.0) ? v : ae_c_add(ae_c_mul(beta, c->xyC[ic + ik][jc + jk]), v);
          }
       }
    }
@@ -3655,13 +3658,13 @@ bool rmatrixgemvmkl(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t i
 
 // MKL-based kernel
 // ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool rmatrixtrsvmkl(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix) {
+bool rmatrixtrsvmkl(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t opa, RVector *x, ae_int_t ix) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
    return result;
 #else
-   return _ialglib_i_rmatrixtrsvmkl(n, a, ia, ja, isupper, isunit, optype, x, ix);
+   return _ialglib_i_rmatrixtrsvmkl(n, a, ia, ja, isupper, isunit, opa, x, ix);
 #endif
 }
 
@@ -3679,97 +3682,97 @@ bool rmatrixsymvmkl(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t 
 
 // MKL-based kernel
 // ALGLIB Routine: Copyright 01.10.2013 by Sergey Bochkanov
-bool rmatrixsyrkmkl(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+bool rmatrixsyrkmkl(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
    return result;
 #else
-   return _ialglib_i_rmatrixsyrkmkl(n, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
+   return _ialglib_i_rmatrixsyrkmkl(n, k, alpha, a, ia, ja, opa, beta, c, ic, jc, isupper);
 #endif
 }
 
 // MKL-based kernel
 // ALGLIB Routine: Copyright 01.10.2013 by Sergey Bochkanov
-bool cmatrixherkmkl(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+bool cmatrixherkmkl(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
    return result;
 #else
-   return _ialglib_i_cmatrixherkmkl(n, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
+   return _ialglib_i_cmatrixherkmkl(n, k, alpha, a, ia, ja, opa, beta, c, ic, jc, isupper);
 #endif
 }
 
 // MKL-based kernel
 // ALGLIB Routine: Copyright 01.10.2013 by Sergey Bochkanov
-bool rmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
+bool rmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
    return result;
 #else
-   return _ialglib_i_rmatrixgemmmkl(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+   return _ialglib_i_rmatrixgemmmkl(m, n, k, alpha, a, ia, ja, opa, b, ib, jb, opb, beta, c, ic, jc);
 #endif
 }
 
 // MKL-based kernel
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
+bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t opb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
    return result;
 #else
-   return _ialglib_i_cmatrixgemmmkl(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+   return _ialglib_i_cmatrixgemmmkl(m, n, k, alpha, a, ia, ja, opa, b, ib, jb, opb, beta, c, ic, jc);
 #endif
 }
 
 // MKL-based kernel
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool rmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
+bool rmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, RMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
    return result;
 #else
-   return _ialglib_i_rmatrixlefttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+   return _ialglib_i_rmatrixlefttrsmmkl(m, n, a, i1, j1, isupper, isunit, opa, x, i2, j2);
 #endif
 }
 
 // MKL-based kernel
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
+bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, CMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
    return result;
 #else
-   return _ialglib_i_cmatrixlefttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+   return _ialglib_i_cmatrixlefttrsmmkl(m, n, a, i1, j1, isupper, isunit, opa, x, i2, j2);
 #endif
 }
 
 // MKL-based kernel
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool rmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
+bool rmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, RMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
    return result;
 #else
-   return _ialglib_i_rmatrixrighttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+   return _ialglib_i_rmatrixrighttrsmmkl(m, n, a, i1, j1, isupper, isunit, opa, x, i2, j2);
 #endif
 }
 
 // MKL-based kernel
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool cmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
+bool cmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t opa, CMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
    return result;
 #else
-   return _ialglib_i_cmatrixrighttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+   return _ialglib_i_cmatrixrighttrsmmkl(m, n, a, i1, j1, isupper, isunit, opa, x, i2, j2);
 #endif
 }
 
@@ -4086,7 +4089,7 @@ ae_int_t getlptestserializationcode() {
 } // end of namespace alglib_impl
 
 // === TSORT Package ===
-// Depends on: APSERV
+// Depends on: ABLASF
 namespace alglib_impl {
 // Internal versions respectively of tagsortfasti(), tagsortfastr() and tagsortfast():
 // sort the n-vector ap and apply the same permutations to abp (and to bp and bbp, if present).
@@ -6593,7 +6596,7 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
 // else the average of the cubic and quadratic steps is taken.
    if (fp > *fx) {
       *info = 1;
-      double theta = 3 * (*fx - fp) / (*stp - *stx) + *dx + dp;
+      double theta = 3.0 * (*fx - fp) / (*stp - *stx) + *dx + dp;
       double s = rmax2(fabs(theta), rmax2(fabs(*dx), fabs(dp)));
       double gamma = s * sqrt(sqr(theta / s) - *dx / s * (dp / s));
       if (*stp < *stx) gamma = -gamma;
@@ -6608,7 +6611,7 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
    // If the cubic step is closer to *stx than the quadratic (secant) step, the cubic step is taken, else the quadratic step is taken.
       *info = 2;
       bracktbound = false;
-      double theta = 3 * (*fx - fp) / (*stp - *stx) + *dx + dp;
+      double theta = 3.0 * (*fx - fp) / (*stp - *stx) + *dx + dp;
       double s = rmax2(fabs(theta), rmax2(fabs(*dx), fabs(dp)));
       double gamma = s * sqrt(sqr(theta / s) - *dx / s * (dp / s));
       if (*stp > *stx) gamma = -gamma;
@@ -6625,7 +6628,7 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
    // then the step closest to *stx is taken, else the step farthest away is taken.
       *info = 3;
       bracktbound = *brackt;
-      double theta = 3 * (*fx - fp) / (*stp - *stx) + *dx + dp;
+      double theta = 3.0 * (*fx - fp) / (*stp - *stx) + *dx + dp;
       double s = rmax2(fabs(theta), rmax2(fabs(*dx), fabs(dp)));
    // The case gamma == 0.0 only arises if the cubic does not tend to infinity in the direction of the step.
       double gamma = s * sqrt(rmax2(0.0, sqr(theta / s) - *dx / s * (dp / s)));
@@ -6640,7 +6643,7 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
       *info = 4;
       bracktbound = false;
       if (*brackt) {
-         double theta = 3 * (fp - *fy) / (*sty - *stp) + *dy + dp;
+         double theta = 3.0 * (fp - *fy) / (*sty - *stp) + *dy + dp;
          double s = rmax2(fabs(theta), rmax2(fabs(*dy), fabs(dp)));
          double gamma = s * sqrt(sqr(theta / s) - *dy / s * (dp / s));
          if (*stp > *sty) gamma = -gamma;
@@ -6728,7 +6731,7 @@ void mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double
 // Argonne National Laboratory. MINPACK Project. 1983 June.
 // Jorge J. More', David J. Thuente.
 bool mcsrch(ae_int_t n, RVector *x, double f, RVector *g, RVector *s, double *stp, double stpmax, double gtol, ae_int_t *info, ae_int_t *nfev, RVector *wa, linminstate *state, ae_int_t *stage) {
-   const double xtol = 100.0 * machineepsilon, ftol = 0.001;
+   const double ftol = 0.001, xtol = 100.0 * machineepsilon;
    const ae_int_t maxfev = 20;
    const double defstpmax = 1.0E+50;
    ae_int_t i;
@@ -7834,7 +7837,7 @@ static void ftbase_ffttwcalc(double *ap, ae_int_t n1, ae_int_t n2) {
 // * twrow = twrowx + i twrowy = 1^{k/n} - the base row twiddle,
 // * tw = twx + i twy = 1^{jk/N} - the current twiddle factor.
 // The inner loop multiplies tw by twrow, the outer loop multiplies twrow by twbase.
-   ae_assert(ftbase_updatetw >= 2, "ftbase_ffttwcalc: internal error - fftbase_updatetw < 2");
+   ae_assert(ftbase_updatetw >= 2, "ftbase_ffttwcalc: internal error - ftbase_updatetw < 2");
    ae_int_t updatetw2 = ftbase_updatetw / 2, n1q = n1 / 2, n1r = n1 % 2, n = n1 * n2;
    const double twopi = 2.0 * pi;
    double omega = -twopi / n, twbasex = cos(omega), twbasey = sin(omega);
@@ -8174,6 +8177,7 @@ static void ftbase_ftbluesteinsfft(fasttransformplan *plan, double *ap, ae_int_t
 
 // Apply the complex Rader's FFT to an input/output vector.
 // Inputs:
+//     plan        -   the transformation plan.
 //     ap          -   the vector to be transformed; assumed to be large enough for the plan to work.
 //     aoffset     -   an offset in [0, PlanLength), within the large PlanLength-subarray of the chunk to process.
 //     args        -   the number of length-n repeated operands.
@@ -8453,7 +8457,7 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, 
 //                  * it may use a global buffer for transpositions and there is no other plan which executes in parallel.
 //     rowptr     - an index which points past the last entry generated so far.
 //     bluesteinn - the amount of storage (in real numbers) required for Bluestein buffer; stored as *bluesteinnp.
-//     precrptr   - a pointer to the unused part of the precomputed real buffer (plan.precr):
+//     precrptr   - a pointer to the unused part of the precomputed real buffer (plan->precr):
 //                  * when this function stores some data to the precomputed buffer, it advances the pointer,
 //                  * the function will assert that plan->precr has enough space for the data before actually writing to the buffer.
 //                  * the caller must allocate enough space before calling this function.
@@ -8470,7 +8474,6 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, 
 static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool issub, bool istop, ae_int_t *rowptr, ae_int_t *bluesteinnp, ae_int_t *precrptr, ae_int_t *preciptr, fasttransformplan *plan) {
    ae_frame _frame_block;
    ae_frame_make(&_frame_block);
-   NewObj(RVector, localbuf);
    ae_assert(n > 0, "ftbase_ftcomplexfftplanrec: n <= 0");
    ae_assert(k > 0, "ftbase_ftcomplexfftplanrec: k <= 0");
    ae_assert(!istop || issub, "ftbase_ftcomplexfftplanrec: issub is inconsistent with istop");
@@ -8608,7 +8611,7 @@ void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan) {
    ae_assert(n > 0, "ftcomplexfftplan: n <= 0");
    ae_assert(k > 0, "ftcomplexfftplan: k <= 0");
 // Determine the required sizes of the precomputed real and integer buffers.
-// This stage of the code is highly dependent on the internals of ftcomplexfftplanrec()
+// This stage of the code is highly dependent on the internals of ftbase_ftcomplexfftplanrec()
 // and must be kept in sync with possible changes in the internals of the plan generation function.
 //
 // The buffer size is determined as follows:
@@ -8706,33 +8709,15 @@ void hpcpreparechunkedgradient(RVector *weights, ae_int_t wcount, ae_int_t ntota
    ae_int_t chunksize;
    chunksize = 4;
    batch4size = 3 * chunksize * ntotal + chunksize * (2 * nout + 1);
-   if (buf->xy.rows < chunksize || buf->xy.cols < nin + nout) {
-      ae_matrix_set_length(&buf->xy, chunksize, nin + nout);
-   }
-   if (buf->xy2.rows < chunksize || buf->xy2.cols < nin + nout) {
-      ae_matrix_set_length(&buf->xy2, chunksize, nin + nout);
-   }
-   if (buf->xyrow.cnt < nin + nout) {
-      ae_vector_set_length(&buf->xyrow, nin + nout);
-   }
-   if (buf->x.cnt < nin) {
-      ae_vector_set_length(&buf->x, nin);
-   }
-   if (buf->y.cnt < nout) {
-      ae_vector_set_length(&buf->y, nout);
-   }
-   if (buf->desiredy.cnt < nout) {
-      ae_vector_set_length(&buf->desiredy, nout);
-   }
-   if (buf->batch4buf.cnt < batch4size) {
-      ae_vector_set_length(&buf->batch4buf, batch4size);
-   }
-   if (buf->hpcbuf.cnt < wcount) {
-      ae_vector_set_length(&buf->hpcbuf, wcount);
-   }
-   if (buf->g.cnt < wcount) {
-      ae_vector_set_length(&buf->g, wcount);
-   }
+   matrixsetlengthatleast(&buf->xy, chunksize, nin + nout);
+   matrixsetlengthatleast(&buf->xy2, chunksize, nin + nout);
+   vectorsetlengthatleast(&buf->xyrow, nin + nout);
+   vectorsetlengthatleast(&buf->x, nin);
+   vectorsetlengthatleast(&buf->y, nout);
+   vectorsetlengthatleast(&buf->desiredy, nout);
+   vectorsetlengthatleast(&buf->batch4buf, batch4size);
+   vectorsetlengthatleast(&buf->hpcbuf, wcount);
+   vectorsetlengthatleast(&buf->g, wcount);
    if (!hpccores_hpcpreparechunkedgradientx(weights, wcount, &buf->hpcbuf)) {
       for (i = 0; i < wcount; i++) {
          buf->hpcbuf.xR[i] = 0.0;

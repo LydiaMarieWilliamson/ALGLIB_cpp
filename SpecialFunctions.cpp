@@ -1119,9 +1119,7 @@ double incompletebeta(double a, double b, double x) {
    w = 1.0 - x;
    if (x > a / (a + b)) {
       flag = 1;
-      t = a;
-      a = b;
-      b = t;
+      swapr(&a, &b);
       xc = x;
       x = w;
    } else {
@@ -2860,12 +2858,7 @@ double exponentialintegralen(double x, ae_int_t n) {
          if (pk != 0.0) {
             result += yk / pk;
          }
-         if (result != 0.0) {
-            t = fabs(yk / result);
-         } else {
-            t = 1.0;
-         }
-      } while (t >= machineepsilon);
+      } while (result == 0.0 || !SmallR(yk / result, machineepsilon));
       t = 1.0;
       for (i = 1; i < n; i++) {
          t = t * z / i;
@@ -3303,7 +3296,7 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi) {
       const double c08 = -1.61021375163803438552E-9, c07 = -4.72543064876271773512E-9, c06 = -3.00095178028681682282E-9;
       const double c05 = +7.79387474390914922337E-8, c04 = +1.06942765566401507066E-6, c03 = +1.59503164802313196374E-5;
       const double c02 = +3.49592575153777996871E-4, c01 = +1.28475387530065247392E-2, c00 = +1.03665693917934275131E0;
-      b2 = c23, b1 = a*b2 + c22, b0 = a*b1 - b0 + c21;
+      b2 = c23, b1 = a*b2 + c22, b0 = a*b1 - b2 + c21;
       b2 = a*b0 - b1 + c20, b1 = a*b2 - b0 + c19, b0 = a*b1 - b2 + c18;
       b2 = a*b0 - b1 + c17, b1 = a*b2 - b0 + c16, b0 = a*b1 - b2 + c15;
       b2 = a*b0 - b1 + c14, b1 = a*b2 - b0 + c13, b0 = a*b1 - b2 + c12;
@@ -3456,6 +3449,8 @@ void chebyshevcoefficients(ae_int_t n, RVector *c) {
 //     B   -   power series coefficients
 // API: void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b);
 void fromchebyshev(RVector *a, ae_int_t n, RVector *b) {
+//(#) The original did not have a check on n.
+   ae_assert(n >= 0, "Domain error in fromchebyshev: n < 0.");
    ae_int_t i;
    ae_int_t k;
    double e;

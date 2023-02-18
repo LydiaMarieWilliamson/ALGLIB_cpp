@@ -10,8 +10,8 @@ double avx2_rdotv(const ae_int_t n, const Real *__restrict x, const Real *__rest
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
    const ae_int_t fmaLen = (avx2len >> 2) << 2;
-   const __m256d *__restrict pX = (const __m256d *)(x);
-   const __m256d *__restrict pY = (const __m256d *)(y);
+   const __m256d *__restrict pX = (const __m256d *)x;
+   const __m256d *__restrict pY = (const __m256d *)y;
    __m256d ans;
    if (fmaLen >= 4) {
       __m256d fmaUnroll[4];
@@ -50,21 +50,18 @@ double avx2_rdotv(const ae_int_t n, const Real *__restrict x, const Real *__rest
    double dot = pComps[0] + pComps[1];
    const ae_int_t tail = avx2len << 2;
    switch (n - tail) {
-      case 1:{
+      case 1:
          dot += x[tail] * y[tail];
-         break;
-      }
-      case 2:{
+      break;
+      case 2:
          dot += x[tail] * y[tail];
          dot += x[tail + 1] * y[tail + 1];
-         break;
-      }
-      case 3:{
+      break;
+      case 3:
          dot += x[tail] * y[tail];
          dot += x[tail + 1] * y[tail + 1];
          dot += x[tail + 2] * y[tail + 2];
-         break;
-      }
+      break;
    }
    return dot;
 }
@@ -73,7 +70,7 @@ double avx2_rdotv2(const ae_int_t n, const Real *__restrict x) {
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
    const ae_int_t fmaLen = (avx2len >> 2) << 2;
-   const __m256d *__restrict pX = (const __m256d *)(x);
+   const __m256d *__restrict pX = (const __m256d *)x;
    __m256d ans;
    if (fmaLen >= 4) {
    //TODO: this can be further unrolled to 8 because AVX(2) provides 16 registers
@@ -113,21 +110,18 @@ double avx2_rdotv2(const ae_int_t n, const Real *__restrict x) {
    double dot = pComps[0] + pComps[1];
    const ae_int_t tail = avx2len << 2;
    switch (n - tail) {
-      case 1:{
+      case 1:
          dot += x[tail] * x[tail];
-         break;
-      }
-      case 2:{
+      break;
+      case 2:
          dot += x[tail] * x[tail];
          dot += x[tail + 1] * x[tail + 1];
-         break;
-      }
-      case 3:{
+      break;
+      case 3:
          dot += x[tail] * x[tail];
          dot += x[tail + 1] * x[tail + 1];
          dot += x[tail + 2] * x[tail + 2];
-         break;
-      }
+      break;
    }
    return dot;
 }
@@ -136,7 +130,7 @@ void avx2_rcopyv(const ae_int_t n, const Real *__restrict x, Real *__restrict y)
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
    const ae_int_t tail = avx2len << 2;
-   const __m256d *__restrict pSrc = (const __m256d *)(x);
+   const __m256d *__restrict pSrc = (const __m256d *)x;
    __m256d *__restrict pDest = (__m256d *)y;
    for (i = 0; i < avx2len; i++) {
       pDest[i] = pSrc[i];
@@ -144,14 +138,14 @@ void avx2_rcopyv(const ae_int_t n, const Real *__restrict x, Real *__restrict y)
    switch (n - tail) {
       case 1:
          *(double *)(pDest + i) = *(const double *)(pSrc + i);
-         break;
+      break;
       case 2:
          *(__m128d *)(pDest + i) = *(const __m128d *)(pSrc + i);
-         break;
+      break;
       case 3:
          *(__m128d *)(pDest + i) = *(const __m128d *)(pSrc + i);
          y[tail + 2] = x[tail + 2];
-         break;
+      break;
    }
 }
 
@@ -159,7 +153,7 @@ void avx2_rcopymulv(const ae_int_t n, const double v, const Real *__restrict x, 
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
    const ae_int_t tail = avx2len << 2;
-   const __m256d *__restrict pSrc = (const __m256d *)(x);
+   const __m256d *__restrict pSrc = (const __m256d *)x;
    __m256d *__restrict pDest = (__m256d *)y;
    const __m256d avx2v = _mm256_set1_pd(v);
    for (i = 0; i < avx2len; i++) {
@@ -167,15 +161,15 @@ void avx2_rcopymulv(const ae_int_t n, const double v, const Real *__restrict x, 
    }
    switch (n - tail) {
       case 1:
-         *(double *)(pDest + i) = v * (*(const double *)(pSrc + i));
-         break;
+         *(double *)(pDest + i) = v * *(const double *)(pSrc + i);
+      break;
       case 2:
          *(__m128d *)(pDest + i) = _mm_mul_pd(_mm256_extractf128_pd(avx2v, 0), *(const __m128d *)(pSrc + i));
-         break;
+      break;
       case 3:
          *(__m128d *)(pDest + i) = _mm_mul_pd(_mm256_extractf128_pd(avx2v, 0), *(const __m128d *)(pSrc + i));
          y[tail + 2] = v * x[tail + 2];
-         break;
+      break;
    }
 }
 
@@ -248,19 +242,19 @@ void avx2_rsetv(const ae_int_t n, const double v, Real *__restrict x) {
    switch (n - tail) {
       case 1:
          *(double *)(pDest + i) = v;
-         break;
+      break;
       case 2:
          *(__m128d *)(pDest + i) = _mm256_extractf128_pd(avx2v, 0);
-         break;
+      break;
       case 3:
          *(__m128d *)(pDest + i) = _mm256_extractf128_pd(avx2v, 0);
          x[tail + 2] = v;
-         break;
+      break;
    }
 }
 
 void avx2_rsetvx(const ae_int_t n, const double v, Real *__restrict x) {
-   const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
+   const ptrdiff_t unal = (ptrdiff_t)x & 31;
    if (n <= 4) {
       ae_int_t j;
       for (j = 0; j < n; j++)
@@ -270,18 +264,17 @@ void avx2_rsetvx(const ae_int_t n, const double v, Real *__restrict x) {
    switch (unal) {
       case 0:
          avx2_rsetv(n, v, x);
-         return;
+      return;
       case 8:
          x[2] = v;
       case 16:
          x[1] = v;
-      case 24:
-      {
+      case 24: {
          x[0] = v;
          const ptrdiff_t nDone = 4 - (unal >> 3);
          avx2_rsetv(n - nDone, v, x + nDone);
-         return;
       }
+      return;
    }
 }
 
@@ -308,7 +301,7 @@ void avx2_bsetv(const ae_int_t n, const bool v, bool *__restrict x) {
    for (i = 0; i < nVec; i++) {
       pDest[i] = avx2v;
    }
-// _mm256_extracti128_si256() has a too high latency on latest processors (Skylake+)
+// _mm256_extracti128_si256() has a too high latency on latest processors (Skylake+).
    memset(x + even, v, tail);
 }
 
@@ -323,20 +316,20 @@ void avx2_rmulv(const ae_int_t n, const double v, double *__restrict x) {
    const ae_int_t tail = avx2len << 2;
    switch (n - tail) {
       case 1:
-         *(double *)(pDest + i) = v * (*(const double *)(pDest + i));
-         break;
+         *(double *)(pDest + i) = v * *(const double *)(pDest + i);
+      break;
       case 2:
          *(__m128d *)(pDest + i) = _mm_mul_pd(_mm256_extractf128_pd(avx2v, 0), *(const __m128d *)(pDest + i));
-         break;
+      break;
       case 3:
          *(__m128d *)(pDest + i) = _mm_mul_pd(_mm256_extractf128_pd(avx2v, 0), *(const __m128d *)(pDest + i));
          x[tail + 2] *= v;
-         break;
+      break;
    }
 }
 
 void avx2_rmulvx(const ae_int_t n, const double v, double *__restrict x) {
-   const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
+   const ptrdiff_t unal = (ptrdiff_t)x & 31;
    if (n <= 4) {
       ae_int_t i;
       for (i = 0; i < n; i++)
@@ -346,24 +339,24 @@ void avx2_rmulvx(const ae_int_t n, const double v, double *__restrict x) {
    switch (unal) {
       case 0:
          avx2_rmulv(n, v, x);
-         return;
+      return;
       case 8:
          x[2] *= v;
       case 16:
          x[1] *= v;
-      case 24:{
+      case 24: {
          x[0] *= v;
          const ptrdiff_t nDone = 4 - (unal >> 3);
          avx2_rmulv(n - nDone, v, x + nDone);
-         return;
       }
+      return;
    }
 }
 
 void avx2_raddv(const ae_int_t n, const double alpha, const Real *__restrict y, Real *__restrict x) {
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
-   const __m256d *__restrict pSrc = (const __m256d *)(y);
+   const __m256d *__restrict pSrc = (const __m256d *)y;
    __m256d *__restrict pDest = (__m256d *)x;
    const __m256d avx2alpha = _mm256_set1_pd(alpha);
    for (i = 0; i < avx2len; i++) {
@@ -372,16 +365,15 @@ void avx2_raddv(const ae_int_t n, const double alpha, const Real *__restrict y, 
    const ae_int_t tail = avx2len << 2;
    switch (n - tail) {
       case 1:
-         *(double *)(pDest + i) = alpha * (*(const double *)(pSrc + i))
-            + (*(const double *)(pDest + i));
-         break;
+         *(double *)(pDest + i) = alpha * *(const double *)(pSrc + i) + *(const double *)(pDest + i);
+      break;
       case 2:
          *(__m128d *)(pDest + i) = _mm_add_pd(_mm_mul_pd(_mm256_extractf128_pd(avx2alpha, 0), *(const __m128d *)(pSrc + i)), *(const __m128d *)(pDest + i));
-         break;
+      break;
       case 3:
          *(__m128d *)(pDest + i) = _mm_add_pd(_mm_mul_pd(_mm256_extractf128_pd(avx2alpha, 0), *(const __m128d *)(pSrc + i)), *(const __m128d *)(pDest + i));
          x[tail + 2] += alpha * y[tail + 2];
-         break;
+      break;
    }
 }
 
@@ -397,24 +389,23 @@ void raddvx_avx_xaligned(const ae_int_t n, const double alpha, const double *__r
    switch (n - vecLen) {
       case 1:
          x[i] += alpha * y[i];
-         break;
-      case 2:{
+      break;
+      case 2: {
          const ae_int_t iDest = i >> 2;
          *(__m128d *)(pDest + iDest) = _mm_add_pd(_mm_mul_pd(_mm256_extractf128_pd(avx2alpha, 0), _mm_loadu_pd(y + i)), *(const __m128d *)(pDest + iDest));
-         break;
       }
-      case 3:
-      {
+      break;
+      case 3: {
          const ae_int_t iDest = i >> 2;
          *(__m128d *)(pDest + iDest) = _mm_add_pd(_mm_mul_pd(_mm256_extractf128_pd(avx2alpha, 0), _mm_loadu_pd(y + i)), *(const __m128d *)(pDest + iDest));
          x[i + 2] += alpha * y[i + 2];
-         break;
       }
+      break;
    }
 }
 
 void avx2_raddvx(const ae_int_t n, const double alpha, const double *__restrict y, double *__restrict x) {
-   const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
+   const ptrdiff_t unal = (ptrdiff_t)x & 31;
    if (n <= 4) {
       ae_int_t i;
       for (i = 0; i < n; i++)
@@ -424,25 +415,24 @@ void avx2_raddvx(const ae_int_t n, const double alpha, const double *__restrict 
    switch (unal) {
       case 0:
          raddvx_avx_xaligned(n, alpha, y, x);
-         return;
+      return;
       case 8:
          x[2] += alpha * y[2];
       case 16:
          x[1] += alpha * y[1];
-      case 24:
-      {
+      case 24: {
          x[0] += alpha * y[0];
          const ptrdiff_t nDone = 4 - (unal >> 3);
          raddvx_avx_xaligned(n - nDone, alpha, y + nDone, x + nDone);
-         return;
       }
+      return;
    }
 }
 
 void avx2_rmergemulv(const ae_int_t n, const Real *__restrict y, Real *__restrict x) {
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
-   const __m256d *__restrict pSrc = (const __m256d *)(y);
+   const __m256d *__restrict pSrc = (const __m256d *)y;
    __m256d *__restrict pDest = (__m256d *)x;
    for (i = 0; i < avx2len; i++) {
       pDest[i] = _mm256_mul_pd(pSrc[i], pDest[i]);
@@ -450,24 +440,22 @@ void avx2_rmergemulv(const ae_int_t n, const Real *__restrict y, Real *__restric
    const ae_int_t tail = avx2len << 2;
    switch (n - tail) {
       case 1:
-         *(double *)(pDest + i) = *(const double *)(pSrc + i)
-            * (*(const double *)(pDest + i));
-         break;
+         *(double *)(pDest + i) = *(const double *)(pSrc + i) * *(const double *)(pDest + i);
+      break;
       case 2:
          *(__m128d *)(pDest + i) = _mm_mul_pd(*(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
-         break;
-      case 3:{
+      break;
+      case 3:
          *(__m128d *)(pDest + i) = _mm_mul_pd(*(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
          ((double *)(pDest + i))[2] *= ((const double *)(pSrc + i))[2];
-         break;
-      }
+      break;
    }
 }
 
 void avx2_rmergemaxv(const ae_int_t n, const Real *__restrict y, Real *__restrict x) {
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
-   const __m256d *__restrict pSrc = (const __m256d *)(y);
+   const __m256d *__restrict pSrc = (const __m256d *)y;
    __m256d *__restrict pDest = (__m256d *)x;
    for (i = 0; i < avx2len; i++) {
       pDest[i] = _mm256_max_pd(pSrc[i], pDest[i]);
@@ -476,25 +464,24 @@ void avx2_rmergemaxv(const ae_int_t n, const Real *__restrict y, Real *__restric
    switch (n - tail) {
       case 1:
          *(double *)(pDest + i) = *(const double *)(pSrc + i) > *(const double *)(pDest + i) ? *(const double *)(pSrc + i) : *(const double *)(pDest + i);
-         break;
+      break;
       case 2:
          *(__m128d *)(pDest + i) = _mm_max_pd(*(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
-         break;
-      case 3:
-      {
+      break;
+      case 3: {
          double s2 = ((const double *)(pSrc + i))[2];
-         double *d2 = ((double *)(pDest + i)) + 2;
+         double *d2 = (double *)(pDest + i) + 2;
          *(__m128d *)(pDest + i) = _mm_max_pd(*(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
          *d2 = s2 > *d2 ? s2 : *d2;
-         break;
       }
+      break;
    }
 }
 
 void avx2_rmergeminv(const ae_int_t n, const Real *__restrict y, Real *__restrict x) {
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
-   const __m256d *__restrict pSrc = (const __m256d *)(y);
+   const __m256d *__restrict pSrc = (const __m256d *)y;
    __m256d *__restrict pDest = (__m256d *)x;
    for (i = 0; i < avx2len; i++) {
       pDest[i] = _mm256_min_pd(pSrc[i], pDest[i]);
@@ -503,17 +490,17 @@ void avx2_rmergeminv(const ae_int_t n, const Real *__restrict y, Real *__restric
    switch (n - tail) {
       case 1:
          *(double *)(pDest + i) = rmin2(*(const double *)(pSrc + i), *(const double *)(pDest + i));
-         break;
+      break;
       case 2:
          *(__m128d *)(pDest + i) = _mm_min_pd(*(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
-         break;
-      case 3:{
+      break;
+      case 3: {
          double s2 = ((const double *)(pSrc + i))[2];
-         double *d2 = ((double *)(pDest + i)) + 2;
+         double *d2 = (double *)(pDest + i) + 2;
          *(__m128d *)(pDest + i) = _mm_min_pd(*(const __m128d *)(pSrc + i), *(const __m128d *)(pDest + i));
          *d2 = s2 < *d2 ? s2 : *d2;
-         break;
       }
+      break;
    }
 }
 
@@ -521,7 +508,7 @@ double avx2_rmaxv(ae_int_t n, const Real *__restrict x) {
    ae_int_t i;
    const ae_int_t avx2len = n >> 2;
    const ae_int_t tail = avx2len << 2;
-   const __m256d *__restrict pSrc = (const __m256d *)(x);
+   const __m256d *__restrict pSrc = (const __m256d *)x;
    if (n <= 4) {
       double result;
       if (n == 0)
@@ -544,21 +531,17 @@ double avx2_rmaxv(ae_int_t n, const Real *__restrict x) {
    const double *p_tail = (const double *)(pSrc + i);
    switch (n - tail) {
       case 1:
-      {
          dMax = p_tail[0] > dMax ? p_tail[0] : dMax;
-         break;
-      }
-      case 2:{
+      break;
+      case 2:
          dMax = p_tail[0] > dMax ? p_tail[0] : dMax;
          dMax = p_tail[1] > dMax ? p_tail[1] : dMax;
-         break;
-      }
-      case 3:{
+      break;
+      case 3:
          dMax = p_tail[0] > dMax ? p_tail[0] : dMax;
          dMax = p_tail[1] > dMax ? p_tail[1] : dMax;
          dMax = p_tail[2] > dMax ? p_tail[2] : dMax;
-         break;
-      }
+      break;
    }
    return dMax;
 }
@@ -566,7 +549,7 @@ double avx2_rmaxv(ae_int_t n, const Real *__restrict x) {
 double avx2_rmaxabsv(ae_int_t n, const Real *__restrict x) {
    const __m256d signMask = _mm256_set1_pd(-0.); // -0. = 1 << 63
    const ae_int_t avx2len = n >> 2;
-   const __m256d *__restrict pSrc = (const __m256d *)(x);
+   const __m256d *__restrict pSrc = (const __m256d *)x;
    if (n <= 4) {
       double result;
       ae_int_t i;
@@ -589,30 +572,27 @@ double avx2_rmaxabsv(ae_int_t n, const Real *__restrict x) {
    const double *pComps = (const double *)&sseMax;
    double dMax = (pComps[0] > pComps[1]) ? pComps[0] : pComps[1];
    switch (n - tail) {
-      case 1:
-      {
+      case 1: {
          double a0 = fabs(p_tail[0]);
          dMax = a0 > dMax ? a0 : dMax;
-         break;
       }
-      case 2:
-      {
+      break;
+      case 2: {
          double a0 = fabs(p_tail[0]);
          double a1 = fabs(p_tail[1]);
          dMax = a0 > dMax ? a0 : dMax;
          dMax = a1 > dMax ? a1 : dMax;
-         break;
       }
-      case 3:
-      {
+      break;
+      case 3: {
          double a0 = fabs(p_tail[0]);
          double a1 = fabs(p_tail[1]);
          double a2 = fabs(p_tail[2]);
          dMax = a0 > dMax ? a0 : dMax;
          dMax = a1 > dMax ? a1 : dMax;
          dMax = a2 > dMax ? a2 : dMax;
-         break;
       }
+      break;
    }
    return dMax;
 }
@@ -628,24 +608,24 @@ static void avx2_rcopyvx_xaligned(const ae_int_t n, const double *__restrict x, 
    switch (n - vecLen) {
       case 1:
          y[i] = x[i];
-         break;
-      case 2:{
+      break;
+      case 2: {
          const ae_int_t iSrc = i >> 2;
          _mm_storeu_pd(y + i, *(const __m128d *)(pSrc + iSrc));
-         break;
       }
-      case 3:{
+      break;
+      case 3: {
          const ae_int_t iSrc = i >> 2;
          const __m256d t = pSrc[iSrc];
          _mm_storeu_pd(y + i, _mm256_extractf128_pd(t, 0));
          y[i + 2] = *(((const double *)&t) + 2);
-         break;
       }
+      break;
    }
 }
 
 void avx2_rcopyvx(const ae_int_t n, const double *__restrict x, double *__restrict y) {
-   const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
+   const ptrdiff_t unal = (ptrdiff_t)x & 31;
    if (n <= 4) {
       ae_int_t j;
       for (j = 0; j < n; j++)
@@ -655,17 +635,17 @@ void avx2_rcopyvx(const ae_int_t n, const double *__restrict x, double *__restri
    switch (unal) {
       case 0:
          avx2_rcopyvx_xaligned(n, x, y);
-         return;
+      return;
       case 8:
          y[2] = x[2];
       case 16:
          y[1] = x[1];
-      case 24:{
+      case 24: {
          y[0] = x[0];
          const ptrdiff_t nDone = 4 - (unal >> 3);
          avx2_rcopyvx_xaligned(n - nDone, x + nDone, y + nDone);
-         return;
       }
+      return;
    }
 }
 
@@ -695,7 +675,7 @@ static void avx2_icopyvx_xaligned(const ae_int_t n, const ae_int_t *__restrict x
 }
 
 void avx2_icopyvx(const ae_int_t n, const ae_int_t *__restrict x, ae_int_t *__restrict y) {
-   const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
+   const ptrdiff_t unal = (ptrdiff_t)x & 31;
    if (n <= 8) {
       ae_int_t j;
       for (j = 0; j < n; j++)
@@ -763,28 +743,28 @@ void avx2_rgemv_straight(const ae_int_t m, const ae_int_t n, const double alpha,
          switch (nVec) {
             case 0:
                sum = _mm256_setzero_pd();
-               break;
+            break;
             case 1:
                sum = _mm256_mul_pd(pX[0], pRow[0]);
-               break;
+            break;
             case 2:
                sum = _mm256_add_pd(_mm256_mul_pd(pX[0], pRow[0]), _mm256_mul_pd(pX[1], pRow[1]));
-               break;
+            break;
             case 3:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], pRow[0]), _mm256_mul_pd(pX[1], pRow[1])), _mm256_mul_pd(pX[2], pRow[2]));
-               break;
+            break;
             case 4:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], pRow[0]), _mm256_mul_pd(pX[1], pRow[1])), _mm256_add_pd(_mm256_mul_pd(pX[2], pRow[2]), _mm256_mul_pd(pX[3], pRow[3])));
-               break;
+            break;
             case 5:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], pRow[0]), _mm256_mul_pd(pX[1], pRow[1])), _mm256_add_pd(_mm256_mul_pd(pX[2], pRow[2]), _mm256_mul_pd(pX[3], pRow[3]))), _mm256_mul_pd(pX[4], pRow[4]));
-               break;
+            break;
             case 6:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], pRow[0]), _mm256_mul_pd(pX[1], pRow[1])), _mm256_add_pd(_mm256_mul_pd(pX[2], pRow[2]), _mm256_mul_pd(pX[3], pRow[3]))), _mm256_add_pd(_mm256_mul_pd(pX[4], pRow[4]), _mm256_mul_pd(pX[5], pRow[5])));
-               break;
+            break;
             case 7:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], pRow[0]), _mm256_mul_pd(pX[1], pRow[1])), _mm256_add_pd(_mm256_mul_pd(pX[2], pRow[2]), _mm256_mul_pd(pX[3], pRow[3]))), _mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[4], pRow[4]), _mm256_mul_pd(pX[5], pRow[5])), _mm256_mul_pd(pX[6], pRow[6])));
-               break;
+            break;
          }
       }
       const __m128d t = _mm_add_pd(_mm256_extractf128_pd(sum, 0), _mm256_extractf128_pd(sum, 1));
@@ -868,28 +848,28 @@ void avx2_rgemvx_straight_xaligned(const ae_int_t m, const ae_int_t n, const dou
          switch (nVec) {
             case 0:
                sum = _mm256_setzero_pd();
-               break;
+            break;
             case 1:
                sum = _mm256_mul_pd(pX[0], ULOAD256PD(pRow[0]));
-               break;
+            break;
             case 2:
                sum = _mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1])));
-               break;
+            break;
             case 3:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_mul_pd(pX[2], ULOAD256PD(pRow[2])));
-               break;
+            break;
             case 4:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_add_pd(_mm256_mul_pd(pX[2], ULOAD256PD(pRow[2])), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3]))));
-               break;
+            break;
             case 5:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_add_pd(_mm256_mul_pd(pX[2], ULOAD256PD(pRow[2])), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3])))), _mm256_mul_pd(pX[4], ULOAD256PD(pRow[4])));
-               break;
+            break;
             case 6:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_add_pd(_mm256_mul_pd(pX[2], ULOAD256PD(pRow[2])), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3])))), _mm256_add_pd(_mm256_mul_pd(pX[4], ULOAD256PD(pRow[4])), _mm256_mul_pd(pX[5], ULOAD256PD(pRow[5]))));
-               break;
+            break;
             case 7:
                sum = _mm256_add_pd(_mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[0], ULOAD256PD(pRow[0])), _mm256_mul_pd(pX[1], ULOAD256PD(pRow[1]))), _mm256_add_pd(_mm256_mul_pd(pX[2], ULOAD256PD(pRow[2])), _mm256_mul_pd(pX[3], ULOAD256PD(pRow[3])))), _mm256_add_pd(_mm256_add_pd(_mm256_mul_pd(pX[4], ULOAD256PD(pRow[4])), _mm256_mul_pd(pX[5], ULOAD256PD(pRow[5]))), _mm256_mul_pd(pX[6], ULOAD256PD(pRow[6]))));
-               break;
+            break;
          }
       }
       const __m128d t = _mm_add_pd(_mm256_extractf128_pd(sum, 0), _mm256_extractf128_pd(sum, 1));
@@ -917,7 +897,7 @@ void avx2_rgemvx_straight(const ae_int_t m, const ae_int_t n, const double alpha
       }
       return;
    }
-   const ptrdiff_t unal = ((ptrdiff_t)x) & 31;
+   const ptrdiff_t unal = (ptrdiff_t)x & 31;
    if (unal == 0) {
       avx2_rgemvx_straight_xaligned(m, n, alpha, a, ia, ja, x, y);
       return;
@@ -966,7 +946,7 @@ void avx2_rgemvx_transposed(const ae_int_t m, const ae_int_t n, const double alp
       }
       return;
    }
-   const ptrdiff_t unal = ((ptrdiff_t)y) & 31;
+   const ptrdiff_t unal = (ptrdiff_t)y & 31;
    if (unal == 0) {
       avx2_rgemvx_transposed_yaligned(m, n, alpha, a, ia, ja, x, y);
       return;
@@ -983,7 +963,7 @@ void avx2_rgemvx_transposed(const ae_int_t m, const ae_int_t n, const double alp
 }
 
 // Block packing function for fast rGEMM. Loads long  WIDTH*LENGTH  submatrix
-// with LENGTH ≤ BLOCK_SIZE and WIDTH ≤ MICRO_SIZE into contiguous  MICRO_SIZE*
+// with LENGTH <= BLOCK_SIZE and WIDTH <= MICRO_SIZE into contiguous  MICRO_SIZE*
 // BLOCK_SIZE row-wise 'horizontal' storage (hence H in the function name).
 //
 // The matrix occupies first ROUND_LENGTH cols of the  storage  (with  LENGTH
@@ -1005,7 +985,7 @@ void avx2_rgemvx_transposed(const ae_int_t m, const ae_int_t n, const double alp
 // Requires AVX2, does NOT check its presense.
 //
 // The function is present in two versions, one  with  variable  opsrc_length
-// and another one with opsrc_length ≡ block_size ≡ 32.
+// and another one with opsrc_length == block_size == 32.
 // ALGLIB Routine: Copyright 19.07.2021 by Sergey Bochkanov
 ae_int_t avx2_ablasf_packblkh(const double *src, ae_int_t src_stride, ae_int_t op, ae_int_t opsrc_length, ae_int_t opsrc_width, double *dst, ae_int_t block_size, ae_int_t micro_size) {
    ae_int_t i;
@@ -1242,8 +1222,7 @@ void avx2_ablasf_daxpby(ae_int_t n, double alpha, const double *src, double beta
       }
       n4 = (n >> 2) << 2;
       for (i = 0; i < n4; i += 4) {
-         __m256d r = _mm256_add_pd(_mm256_mul_pd(avx_alpha, _mm256_loadu_pd(src + i)),
-            _mm256_mul_pd(avx_beta, _mm256_load_pd(dst + i)));
+         __m256d r = _mm256_add_pd(_mm256_mul_pd(avx_alpha, _mm256_loadu_pd(src + i)), _mm256_mul_pd(avx_beta, _mm256_load_pd(dst + i)));
          _mm256_store_pd(dst + i, r);
       }
       for (i = n4; i < n; i++)
@@ -1260,7 +1239,7 @@ bool avx2_spchol_updatekernelabc4(double *rowstorage, ae_int_t offss, ae_int_t t
    ae_int_t k;
    ae_int_t targetrow;
    ae_int_t targetcol;
-// Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
+// Filter out unsupported combinations (ones that are too sparse for the non-SIMD code).
    if (twidth < 3 || twidth > 4) {
       return false;
    }
@@ -1321,16 +1300,14 @@ bool avx2_spchol_updatekernelabc4(double *rowstorage, ae_int_t offss, ae_int_t t
       for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
-         _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_sub_pd(_mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 1),
-                     u_0123_1)), _mm256_mul_pd(_mm256_broadcast_sd(update_row), u_0123_0)));
+         _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_sub_pd(_mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1)), _mm256_mul_pd(_mm256_broadcast_sd(update_row), u_0123_0)));
       }
    }
    if (urank == 4) {
       for (k = 0; k < uheight; k++) {
          targetrow = raw2smap[superrowidx[k]] * 4;
          double *update_row = rowstorage + offsu + k * urowstride;
-         _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_sub_pd(_mm256_sub_pd(_mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 3), u_0123_3)),
-                     _mm256_mul_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1)), _mm256_mul_pd(_mm256_broadcast_sd(update_row), u_0123_0)));
+         _mm256_store_pd(target_storage + targetrow, _mm256_sub_pd(_mm256_sub_pd(_mm256_sub_pd(_mm256_sub_pd(_mm256_load_pd(target_storage + targetrow), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 3), u_0123_3)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1)), _mm256_mul_pd(_mm256_broadcast_sd(update_row), u_0123_0)));
       }
    }
    return true;
@@ -1342,7 +1319,7 @@ bool avx2_spchol_updatekernel4444(double *rowstorage, ae_int_t offss, ae_int_t s
    ae_int_t offsk;
    __m256d v_negd_u0, v_negd_u1, v_negd_u2, v_negd_u3, v_negd;
    __m256d v_w0, v_w1, v_w2, v_w3, u01_lo, u01_hi, u23_lo, u23_hi;
-// Compute W = -D*transpose(U[0:3])
+// Compute W = -D*transpose(U[0:3]).
    v_negd = _mm256_mul_pd(_mm256_loadu_pd(diagd + offsd), _mm256_set1_pd(-1.0));
    v_negd_u0 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu), v_negd);
    v_negd_u1 = _mm256_mul_pd(_mm256_load_pd(rowstorage + offsu + 4), v_negd);
@@ -1357,7 +1334,7 @@ bool avx2_spchol_updatekernel4444(double *rowstorage, ae_int_t offss, ae_int_t s
    v_w2 = _mm256_permute2f128_pd(u23_lo, u01_lo, 0x13);
    v_w3 = _mm256_permute2f128_pd(u23_hi, u01_hi, 0x13);
 //
-// Compute update S = S + row_scatter(U*W)
+// Compute update S = S + row_scatter(U*W).
 //
    if (sheight == uheight) {
    // No row scatter, the most efficient code

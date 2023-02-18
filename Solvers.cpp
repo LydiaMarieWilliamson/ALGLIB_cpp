@@ -73,7 +73,7 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    NewVector(wr, 0, DT_REAL);
    NewVector(wi, 0, DT_REAL);
    ae_assert(n > 0, "PolynomialSolve: N <= 0");
-   ae_assert(a->cnt >= n + 1, "PolynomialSolve: Length(A) < N+1");
+   ae_assert(a->cnt > n, "PolynomialSolve: Length(A) <= N");
    ae_assert(isfinitevector(a, n + 1), "PolynomialSolve: A contains infitite numbers");
    ae_assert(a->xR[n] != 0.0, "PolynomialSolve: A[N] == 0");
 // Prepare
@@ -354,7 +354,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
       return;
    }
    for (i = 0; i < n; i++) {
-      if (p->xZ[i] > n - 1 || p->xZ[i] < i) {
+      if (p->xZ[i] >= n || p->xZ[i] < i) {
          *info = -1;
          ae_frame_leave();
          return;
@@ -464,7 +464,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
       return;
    }
    for (i = 0; i < n; i++) {
-      if (p->xZ[i] > n - 1 || p->xZ[i] < i) {
+      if (p->xZ[i] >= n || p->xZ[i] < i) {
          *info = -1;
          ae_frame_leave();
          return;
@@ -2984,7 +2984,7 @@ void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector 
 //                 * -4    SVD subroutine failed
 //                 * -1    if NRows <= 0 or NCols <= 0 or Threshold < 0 was passed
 //                 *  1    if task is solved
-//     Rep     -   solver report, see below for more info
+//     Rep     -   solver report, see below for more information
 //     X       -   array[0..N-1,0..M-1], it contains:
 //                 * solution of A*X == B (even for singular A)
 //                 * zeros, if SVD subroutine failed
@@ -3940,12 +3940,12 @@ void sparsesolversetxrep(sparsesolverstate *state, bool needxrep) {
    state->xrep = needxrep;
 }
 
-// Clears request fields (to be sure that we don't forgot to clear something)
+// Clears request fields (to be sure that we don't forget to clear anything)
 static void iterativesparse_clearrequestfields(sparsesolverstate *state) {
    state->requesttype = -999;
 }
 
-// Clears report fields (to be sure that we don't forgot to clear something)
+// Clears report fields (to be sure that we don't forget to clear anything)
 static void iterativesparse_clearreportfields(sparsesolverstate *state) {
    state->repiterationscount = 0;
    state->repnmv = 0;
@@ -4195,7 +4195,7 @@ bool sparsesolverooccontinue(sparsesolverstate *state) {
 // sent by the solver:
 // * RequestType == 0  means that matrix-vector products A*x is requested
 // * RequestType == -1 means that solver reports its progress; this  request  is
-//   returned only when reports are activated wit SparseSolverSetXRep().
+//   returned only when reports are activated with SparseSolverSetXRep().
 //
 // This function returns just request type; in order  to  get contents of the
 // trial vector, use sparsesolveroocgetrequestdata().
@@ -4381,8 +4381,7 @@ void sparsesolveroocstop(sparsesolverstate *state, RVector *x, sparsesolverrepor
 //                             from other thread.
 //                 * Rep.IterationsCount contains iterations count
 //                 * Rep.NMV contains number of matrix-vector calculations
-//                 * Rep.R2 contains squared residual
-// s
+//                 * Rep.R2 contains squared residuals
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 // API: void sparsesolverresults(const sparsesolverstate &state, real_1d_array &x, sparsesolverreport &rep);
 void sparsesolverresults(sparsesolverstate *state, RVector *x, sparsesolverreport *rep) {
@@ -4884,7 +4883,7 @@ void sparsesolverrequesttermination(const sparsesolverstate &state) {
 namespace alglib_impl {
 static const double lincg_defaultprecision = 0.000001;
 
-// Clears request fields (to be sure that we don't forgot to clear something)
+// Clears request fields (to be sure that we don't forget to clear anything)
 static void lincg_updateitersdata(lincgstate *state) {
    state->repiterationscount = 0;
    state->repnmv = 0;
@@ -5220,7 +5219,7 @@ Spawn:
          goto Exit;
       }
       ae_v_move(state->x.xR, 1, state->cr.xR, 1, state->n);
-   // prepere of parameters for next iteration
+   // prepare of parameters for next iteration
       state->repnmv++, state->needprec = true, state->PQ = 7; goto Pause; Resume7: state->needprec = false;
       ae_v_move(state->cz.xR, 1, state->pv.xR, 1, state->n);
       if (state->repiterationscount % state->itsbeforerestart != 0) {
@@ -5230,7 +5229,7 @@ Spawn:
             state->beta += state->cz.xR[i] * state->cr.xR[i];
             uvar += state->z.xR[i] * state->r.xR[i];
          }
-      // check that UVar is't INF or is't zero
+      // check that UVar isn't INF or isn't zero
          if (!isfinite(uvar) || uvar == 0.0) {
             state->running = false;
             state->repterminationtype = -4;
@@ -5250,7 +5249,7 @@ Spawn:
       } else {
          ae_v_move(state->p.xR, 1, state->cz.xR, 1, state->n);
       }
-   // prepere data for next iteration
+   // prepare data for next iteration
       for (i = 0; i < state->n; i++) {
       // write (k+1)th iteration to (k )th iteration
          state->r.xR[i] = state->cr.xR[i];
@@ -5366,9 +5365,7 @@ void lincgresults(lincgstate *state, RVector *x, lincgreport *rep) {
    SetVector(x);
    SetObj(lincgreport, rep);
    ae_assert(!state->running, "LinCGResult: you can not get result, because function LinCGIteration has been launched!");
-   if (x->cnt < state->n) {
-      ae_vector_set_length(x, state->n);
-   }
+   vectorsetlengthatleast(x, state->n);
    ae_v_move(x->xR, 1, state->rx.xR, 1, state->n);
    rep->iterationscount = state->repiterationscount;
    rep->nmv = state->repnmv;
@@ -5731,7 +5728,7 @@ void linlsqrsetprecunit(linlsqrstate *state) {
 // ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
 // API: void linlsqrsetprecdiag(const linlsqrstate &state);
 void linlsqrsetprecdiag(linlsqrstate *state) {
-   ae_assert(!state->running, "LinLSQRSetPrecDiag: you can not change preconditioner, because function LinCGIteration is running!");
+   ae_assert(!state->running, "LinLSQRSetPrecDiag: you can not change preconditioner, because function LinLSQRIteration is running!");
    state->prectype = 0;
 }
 
@@ -6147,9 +6144,7 @@ void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep) {
    SetVector(x);
    SetObj(linlsqrreport, rep);
    ae_assert(!state->running, "LinLSQRResult: you can not call this function when LinLSQRIteration is running");
-   if (x->cnt < state->n) {
-      ae_vector_set_length(x, state->n);
-   }
+   vectorsetlengthatleast(x, state->n);
    ae_v_move(x->xR, 1, state->rx.xR, 1, state->n);
    rep->iterationscount = state->repiterationscount;
    rep->nmv = state->repnmv;
@@ -6475,11 +6470,12 @@ void nleqsetstpmax(nleqstate *state, double stpmax) {
    state->stpmax = stpmax;
 }
 
-// This  subroutine  restarts  CG  algorithm from new point. All optimization
-// parameters are left unchanged.
+// This subroutine restarts the NL-EQ algorithm from a new point.
+// All optimization parameters are left unchanged.
 //
-// This  function  allows  to  solve multiple  optimization  problems  (which
-// must have same number of dimensions) without object reallocation penalty.
+// This function allows one to solve multiple optimization problems
+// (which must have same number of dimensions)
+// without object reallocation penalty.
 //
 // Inputs:
 //     State   -   structure used for reverse communication previously
@@ -6624,7 +6620,6 @@ bool nleqiteration(nleqstate *state) {
    AutoS double lambdadown;
    AutoS double lambdav;
    AutoS double rho;
-   AutoS double mu;
    AutoS double stepnorm;
    AutoS bool b;
 // Manually threaded two-way signalling.
@@ -6644,7 +6639,6 @@ Spawn:
    lambdadown = 255;
    lambdav = 74;
    rho = -788;
-   mu = 809;
    stepnorm = 205;
 // Prepare
    n = state->n;
@@ -6781,9 +6775,7 @@ Pause:
 // ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
 // API: void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep);
 void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep) {
-   if (x->cnt < state->n) {
-      ae_vector_set_length(x, state->n);
-   }
+   vectorsetlengthatleast(x, state->n);
    ae_v_move(x->xR, 1, state->xbase.xR, 1, state->n);
    rep->iterationscount = state->repiterationscount;
    rep->nfunc = state->repnfunc;

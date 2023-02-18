@@ -170,7 +170,7 @@ This reference manual is derived from the <a href="https://www.alglib.net/transl
 </p>
 <p>
 Copyright 1994-2017 by Sergey Bochkanov, ALGLIB Project. All rights reserved.
-Copyright 2019-2020 Lydia Marie Williamson, Mark Hopkins Consulting. ALGLIB++. Project Lydia. All rights reserved.
+Copyright 2019-2022 Lydia Marie Williamson, Mark Hopkins Consulting. ALGLIB++. Project Lydia. All rights reserved.
 </p>
 <p>
 Redistribution and use of this document (ALGLIB++ Reference Manual) with or without modification,
@@ -612,7 +612,7 @@ It is possible to selectively disable a SIMD instruction set of your choice by c
 <a name=gs_configuring_os class=sheader></a><h3>4.4. Utilizing SMP</h3>
 The following applies only to the Commercial Edition of ALGLIB, and has not been inherited by or made available in ALGLIB++.
 The open source version of ALGLIB is always OS-agnostic (it does not use functions beyond the C/C++ standard library),
-ven in the presence of OS-specific definitions.
+even in the presence of OS-specific definitions.
 </p>
 <p>
 If you want to use multithreaded capabilities of the <i>Commercial</i> Edition,
@@ -684,7 +684,7 @@ using namespace alglib;
 // Perform matrix-matrix product.
    flops = 2*pow(n, 3);
    timeneeded = counter();
-   rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 1, 0.0, c, 0, 0);
+   rmatrixgemm(n, n, n,  1.0,  a, 0, 0, 0,  b, 0, 0, 1,  0.0,  c, 0, 0);
    timeneeded = counter() - timeneeded;
 // Evaluate the performance.
    printf("Performance: %.1f GFLOPS\n", 1.0E-9*flops/timeneeded);
@@ -789,7 +789,7 @@ using namespace alglib;
 // Perform matrix-matrix product.
    flops = 2*pow(n, 3);
    timeneeded = counter();
-   rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 1, 0.0, c, 0, 0);
+   rmatrixgemm(n, n, n,  1.0,  a, 0, 0, 0,  b, 0, 0, 1,  0.0,  c, 0, 0);
    timeneeded = counter() - timeneeded;
 // Evaluate the performance.
    printf("Performance: %.1f GFLOPS\n", 1.0E-9*flops/timeneeded);
@@ -965,7 +965,6 @@ The most important "basic" functions from ALGLIB++ namespace (<code>Ap.h</code> 
 <ul>
 <li><code>randomreal()</code> &mdash; returns random real number from [0,1)</li>
 <li><code>randominteger(mx)</code> &mdash; returns random integer number from [0,nx); <i>mx</i> must be less than RAND_MAX</li>
-<li><code>std::isnan(x)</code> &mdash; checks whether the number x is NAN</li>
 <li><code>isposinf(x)</code> &mdash; checks whether the number x is +INF</li>
 <li><code>isneginf(x)</code> &mdash; checks whether the number x is -INF</li>
 </ul>
@@ -973,6 +972,7 @@ In addition, the following are inherited C++, itself, or from the native C++ lib
 <ul>
 <li><code>A {==,!=,&lt;,&le;,&gt;,&ge;} B</code> &mdash; IEEE-compliant comparisons of two double precision numbers.
 Discussed in further detail below.</li>
+<li><code>std::isnan(x)</code> &mdash; checks whether the number x is NAN</li>
 <li><code>std::isinf(x)</code> &mdash; checks whether the number x is +INF or -INF</li>
 <li><code>std::isfinite(x)</code> &mdash; checks whether the number x is finite value (possibly subnormalized)</li>
 </ul>
@@ -1402,7 +1402,7 @@ you can not have <code>AE_OS=???</code> defined together with <code>AE_NO_EXCEPT
 To enable the exception-free method of reporting critical errors, #defining the following two preprocessor symbols at the global level:
 <ul>
 <li><code>AE_NO_EXCEPTIONS</code> - to switch from exception-based to exception-free code</li>
-<li><code>AE_THREADING=AE_SERIAL_UNSAFE</code> - to confirm that you are aware of limitations associated
+<li><code>AE_THREADING=NonTH</code> - to confirm that you are aware of limitations associated
 with exception-free mode (it does not support multithreading)</li>
 </ul>
 </p>
@@ -1483,7 +1483,7 @@ There are three test suites in ALGLIB:
 <ul><li>
 <b>Computational tests</b> are located in <code>TestC.cpp</code>.
 They are focused on numerical properties of algorithms, stress testing and "deep" tests (large automatically generated problems).
-They require only a few minutes to finish even on older machines (example: the test times listed under the supplementary section <a href="Notes.htm#supp_History3">A6.3 Test Results</a>).
+They require only a few minutes to finish even on older machines (example: the test times listed under the supplementary section <a href="History.htm#supp_History3">A6.3 Test Results</a>).
 </li>
 <li>
 <b>Interface tests</b> are located in <code>TestI.cpp</code>.
@@ -1565,13 +1565,13 @@ They are, however, included in the dependencies listed under the other subpackag
 Therefore, a short summary is provided here for each of the subpackages.
 <table align=center border=1><tbody>
 <tr align=left valign=top><td><a name=unit_apserv>apserv</a></td><td>Auxiliary routines, mostly stubs/legacies from the Commercial Edition of ALGLIB.</td></tr>
-<tr align=left valign=top><td><a name=unit_ablasf>ablasf</a></td><td>ABLAS Hooks for fast ABLAS routines (used only in <a href=#unit_hqrnd>hqrnd</a> and <a href=#unit_ablas>ablas</a>).</td></tr>
+<tr align=left valign=top><td><a name=unit_ablasf>ablasf</a></td><td>ABLAS Hooks for fast ABLAS routines (used only in <a href=#unit_hqrnd>hqrnd</a> and <a href=#unit_ablas>ablas</a>).<br/>Depends on: <a href=#unit_apserv>apserv</a>.</td></tr>
 <tr align=left valign=top><td><a name=unit_hblas>hblas</a></td><td>Basic BLAS routines for Hermitian matrices (used only in <a href=#unit_ortfac>ortfac</a>).</td></tr>
 <tr align=left valign=top><td><a name=unit_creflections>creflections</a></td><td>Complex reflection transformation (used only in <a href=#unit_matgen>matgen</a> and <a href=#unit_ortfac>ortfac</a>).</td></tr>
 <tr align=left valign=top><td><a name=unit_sblas>sblas</a></td><td>Basic BLAS routines for Symmetric matrices (used only in <a href=#unit_ortfac>ortfac</a>).<br/>Depends on: <a href=#unit_apserv>apserv</a>.</td></tr>
 <tr align=left valign=top><td><a name=unit_ablasmkl>ablasmkl</a></td><td>ABLAS Hooks for MKL (or other external library) ABLAS routines (used only in <a href=#unit_sparse>sparse</a> and <a href=#unit_ablas>ablas</a>).</td></tr>
 <tr align=left valign=top><td><a name=unit_scodes>scodes</a></td><td>Serialization codes.</td></tr>
-<tr align=left valign=top><td><a name=unit_tsort>tsort</a></td><td>Basic tag sort routines.<br/>Depends on: <a href=#unit_apserv>apserv</a>.</td></tr>
+<tr align=left valign=top><td><a name=unit_tsort>tsort</a></td><td>Basic tag sort routines.<br/>Depends on: <a href=#unit_ablasf>ablasf</a>.</td></tr>
 <tr align=left valign=top><td><a name=unit_blas>blas</a></td><td>Basic BLAS routines for general matrices.</td></tr>
 <tr align=left valign=top><td><a name=unit_rotations>rotations</a></td><td>Matrix rotation routines.</td></tr>
 <tr align=left valign=top><td><a name=unit_basicstatops>basicstatops</a></td><td>Ranking procedures for statistics (used only in <a href=#unit_evd>evd</a> and <a href=#unit_basestat>basestat</a>).<br/>Depends on: <a href=#unit_tsort>tsort</a>.</td></tr>
@@ -1623,7 +1623,6 @@ Initialized with HQRNDRandomize() or HQRNDSeed().
 
 Fields:
     S1, S2      -   seed values
-    V           -   precomputed value
     MagicV      -   'magic' value used to determine whether State structure
                     was correctly initialized.
 </pre>
@@ -2998,7 +2997,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-ae_int_t xdebugb1count(boolean_1d_array a);
+ae_int_t xdebugb1count(boolean_1d_array &amp;a);
 </pre>
 <a name=sub_xdebugb1not></a><h6 class=pageheader>xdebugb1not Function</h6>
 <hr width=600 align=left>
@@ -3009,7 +3008,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugb1not(boolean_1d_array a);
+<b>void</b> xdebugb1not(boolean_1d_array &amp;a);
 </pre>
 <a name=sub_xdebugb1outeven></a><h6 class=pageheader>xdebugb1outeven Function</h6>
 <hr width=600 align=left>
@@ -3030,7 +3029,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-ae_int_t xdebugb2count(boolean_2d_array a);
+ae_int_t xdebugb2count(boolean_2d_array &amp;a);
 </pre>
 <a name=sub_xdebugb2not></a><h6 class=pageheader>xdebugb2not Function</h6>
 <hr width=600 align=left>
@@ -3041,7 +3040,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugb2not(boolean_2d_array a);
+<b>void</b> xdebugb2not(boolean_2d_array &amp;a);
 </pre>
 <a name=sub_xdebugb2outsin></a><h6 class=pageheader>xdebugb2outsin Function</h6>
 <hr width=600 align=left>
@@ -3085,7 +3084,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugc1neg(complex_1d_array a);
+<b>void</b> xdebugc1neg(complex_1d_array &amp;a);
 </pre>
 <a name=sub_xdebugc1outeven></a><h6 class=pageheader>xdebugc1outeven Function</h6>
 <hr width=600 align=left>
@@ -3108,7 +3107,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-complex xdebugc1sum(complex_1d_array a);
+complex xdebugc1sum(complex_1d_array &amp;a);
 </pre>
 <a name=sub_xdebugc2neg></a><h6 class=pageheader>xdebugc2neg Function</h6>
 <hr width=600 align=left>
@@ -3119,7 +3118,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugc2neg(complex_2d_array a);
+<b>void</b> xdebugc2neg(complex_2d_array &amp;a);
 </pre>
 <a name=sub_xdebugc2outsincos></a><h6 class=pageheader>xdebugc2outsincos Function</h6>
 <hr width=600 align=left>
@@ -3140,7 +3139,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-complex xdebugc2sum(complex_2d_array a);
+complex xdebugc2sum(complex_2d_array &amp;a);
 </pre>
 <a name=sub_xdebugc2transpose></a><h6 class=pageheader>xdebugc2transpose Function</h6>
 <hr width=600 align=left>
@@ -3173,7 +3172,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugi1neg(integer_1d_array a);
+<b>void</b> xdebugi1neg(integer_1d_array &amp;a);
 </pre>
 <a name=sub_xdebugi1outeven></a><h6 class=pageheader>xdebugi1outeven Function</h6>
 <hr width=600 align=left>
@@ -3196,7 +3195,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-ae_int_t xdebugi1sum(integer_1d_array a);
+ae_int_t xdebugi1sum(integer_1d_array &amp;a);
 </pre>
 <a name=sub_xdebugi2neg></a><h6 class=pageheader>xdebugi2neg Function</h6>
 <hr width=600 align=left>
@@ -3207,7 +3206,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugi2neg(integer_2d_array a);
+<b>void</b> xdebugi2neg(integer_2d_array &amp;a);
 </pre>
 <a name=sub_xdebugi2outsin></a><h6 class=pageheader>xdebugi2outsin Function</h6>
 <hr width=600 align=left>
@@ -3228,7 +3227,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-ae_int_t xdebugi2sum(integer_2d_array a);
+ae_int_t xdebugi2sum(integer_2d_array &amp;a);
 </pre>
 <a name=sub_xdebugi2transpose></a><h6 class=pageheader>xdebugi2transpose Function</h6>
 <hr width=600 align=left>
@@ -3261,7 +3260,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>double</b> xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, real_2d_array a, real_2d_array b, boolean_2d_array c);
+<b>double</b> xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, real_2d_array &amp;a, real_2d_array &amp;b, boolean_2d_array &amp;c);
 </pre>
 <a name=sub_xdebugr1appendcopy></a><h6 class=pageheader>xdebugr1appendcopy Function</h6>
 <hr width=600 align=left>
@@ -3283,7 +3282,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugr1neg(real_1d_array a);
+<b>void</b> xdebugr1neg(real_1d_array &amp;a);
 </pre>
 <a name=sub_xdebugr1outeven></a><h6 class=pageheader>xdebugr1outeven Function</h6>
 <hr width=600 align=left>
@@ -3306,7 +3305,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>double</b> xdebugr1sum(real_1d_array a);
+<b>double</b> xdebugr1sum(real_1d_array &amp;a);
 </pre>
 <a name=sub_xdebugr2neg></a><h6 class=pageheader>xdebugr2neg Function</h6>
 <hr width=600 align=left>
@@ -3317,7 +3316,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugr2neg(real_2d_array a);
+<b>void</b> xdebugr2neg(real_2d_array &amp;a);
 </pre>
 <a name=sub_xdebugr2outsin></a><h6 class=pageheader>xdebugr2outsin Function</h6>
 <hr width=600 align=left>
@@ -3338,7 +3337,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>double</b> xdebugr2sum(real_2d_array a);
+<b>double</b> xdebugr2sum(real_2d_array &amp;a);
 </pre>
 <a name=sub_xdebugr2transpose></a><h6 class=pageheader>xdebugr2transpose Function</h6>
 <hr width=600 align=left>
@@ -4200,7 +4199,6 @@ using namespace alglib;
 <font color=navy>//   |     |   |    |     |</font>
 <font color=navy>//   P2   P4   P3   P0   P1</font>
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, rep.z.tostring().c_str()); <font color=navy>// EXPECTED: [[2,4],[0,1],[3,6],[5,7]]</font>
-<font color=navy>//</font>
 <font color=navy>// We've built dendrogram above by reordering our dataset.</font>
 <font color=navy>//</font>
 <font color=navy>// Without such reordering it would be impossible to build dendrogram without</font>
@@ -4747,7 +4745,7 @@ NOTE: forest built with this function is  stored  in-memory  using  64-bit
       accuracy and (b) ~1.5x reduction in  the  inference  speed  (due  to
       increased complexity of the storage format).
 
-      See comments on dfbinarycompression() for more info.
+      See comments on dfbinarycompression() for more information.
 
 Default settings are used by the algorithm; you can tweak  them  with  the
 help of the following functions:
@@ -5841,7 +5839,6 @@ using namespace alglib;
    real_1d_array x = <font color=blue><b>&quot;[7,8,8,9,12,12]&quot;</b></font>;
 <font color=navy>// Apply filter.</font>
 <font color=navy>// We should get [7.0000, 8.0000, 8.1667, 8.8333, 11.6667, 12.5000] as result</font>
-<font color=navy>//    </font>
    filterlrma(x, 3);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(4).c_str()); <font color=navy>// EXPECTED: [7.0000,8.0000,8.1667,8.8333,11.6667,12.5000]</font>
    <b>return</b> 0;
@@ -8001,7 +7998,7 @@ using namespace alglib;
 <font color=navy>// approach (Markov Chains <b>for</b> Proportional/Population Data), i.e.</font>
 <font color=navy>// to restore hidden transition matrix P using actual portfolio data.</font>
 <font color=navy>// We have:</font>
-<font color=navy>// * poportional data, i.e. proportion of loans in the normal and past </font>
+<font color=navy>// * proportional data, i.e. proportion of loans in the normal and past </font>
 <font color=navy>//   due states (not portfolio size measured in some currency, although </font>
 <font color=navy>//   it is possible to work with population data too)</font>
 <font color=navy>// * two tracks, i.e. two sequences which describe portfolio</font>
@@ -8064,7 +8061,7 @@ using namespace alglib;
 <font color=navy>// approach (Markov Chains <b>for</b> Proportional/Population Data), i.e.</font>
 <font color=navy>// to restore hidden transition matrix P using actual portfolio data.</font>
 <font color=navy>// We have:</font>
-<font color=navy>// * poportional data, i.e. proportion of loans in the current and past </font>
+<font color=navy>// * proportional data, i.e. proportion of loans in the current and past </font>
 <font color=navy>//   due states (not portfolio size measured in some currency, although </font>
 <font color=navy>//   it is possible to work with population data too)</font>
 <font color=navy>// * two tracks, i.e. two sequences which describe portfolio</font>
@@ -10938,7 +10935,6 @@ using namespace alglib;
 <font color=navy>// [  0  0]   !! sometimes we classify 0 as positive, sometimes as negative</font>
 <font color=navy>// [  0  1]   !!</font>
    real_2d_array xy = <font color=blue><b>&quot;[[+1,0],[+2,0],[-1,1],[-2,1],[0,0],[0,1]]&quot;</b></font>;
-<font color=navy>//</font>
 <font color=navy>// When we solve classification problems, everything is slightly different from</font>
 <font color=navy>// the regression ones:</font>
 <font color=navy>//</font>
@@ -10981,7 +10977,6 @@ using namespace alglib;
    x = <font color=blue><b>&quot;[-1]&quot;</b></font>;
    mlpprocess(network, x, y);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, y.tostring(1).c_str()); <font color=navy>// EXPECTED: [0.000,1.000]</font>
-<font color=navy>//</font>
 <font color=navy>// But what our network will <b>return</b> <b>for</b> 0, which is between classes 0 and 1?</font>
 <font color=navy>//</font>
 <font color=navy>// In our dataset it has two different marks assigned (<b>class</b> 0 AND <b>class</b> 1).</font>
@@ -11023,7 +11018,6 @@ using namespace alglib;
 <font color=navy>// [ -2  1]</font>
 <font color=navy>// [  0  2]</font>
    real_2d_array xy = <font color=blue><b>&quot;[[+1,0],[+2,0],[-1,1],[-2,1],[0,2]]&quot;</b></font>;
-<font color=navy>//</font>
 <font color=navy>// When we solve classification problems, everything is slightly different from</font>
 <font color=navy>// the regression ones:</font>
 <font color=navy>//</font>
@@ -13538,7 +13532,7 @@ Outputs:
 
 NOTE:
     F[] satisfies symmetry property F[k] = conj(F[N-k]),  so just one half
-of  array  is  usually needed. But for convinience subroutine returns full
+of  array  is  usually needed. But for convenience subroutine returns full
 complex array (with frequencies above N/2), so its result may be  used  by
 other FFT-related subroutines.
 ALGLIB: Copyright 01.06.2009 by Sergey Bochkanov
@@ -13601,7 +13595,6 @@ using namespace alglib;
    complex_1d_array z = <font color=blue><b>&quot;[1i,1i,1i,1i]&quot;</b></font>;
    fftc1d(z);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, z.tostring(3).c_str()); <font color=navy>// EXPECTED: [4i,0,0,0]</font>
-<font color=navy>//</font>
 <font color=navy>// now we convert [4i, 0, 0, 0] back to [1i,1i,1i,1i]</font>
 <font color=navy>// with backward FFT</font>
    fftc1dinv(z);
@@ -13621,7 +13614,6 @@ using namespace alglib;
    complex_1d_array z = <font color=blue><b>&quot;[0,1,0,1i]&quot;</b></font>;
    fftc1d(z);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, z.tostring(3).c_str()); <font color=navy>// EXPECTED: [1+1i, -1-1i, -1-1i, 1+1i]</font>
-<font color=navy>//</font>
 <font color=navy>// now we convert result back with backward FFT</font>
    fftc1dinv(z);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, z.tostring(3).c_str()); <font color=navy>// EXPECTED: [0,1,0,1i]</font>
@@ -13642,7 +13634,6 @@ using namespace alglib;
    real_1d_array x2;
    fftr1d(x, f);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, f.tostring(3).c_str()); <font color=navy>// EXPECTED: [4,0,0,0]</font>
-<font color=navy>//</font>
 <font color=navy>// now we convert [4, 0, 0, 0] back to [1,1,1,1]</font>
 <font color=navy>// with backward FFT</font>
    fftr1dinv(f, x2);
@@ -13669,11 +13660,9 @@ using namespace alglib;
    real_1d_array x2;
    fftr1d(x, f);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, f.tostring(3).c_str()); <font color=navy>// EXPECTED: [10, -2+2i, -2, -2-2i]</font>
-<font color=navy>//</font>
 <font color=navy>// now we convert [10, -2+2i, -2, -2-2i] back to [1,2,3,4]</font>
    fftr1dinv(f, x2);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x2.tostring(3).c_str()); <font color=navy>// EXPECTED: [1,2,3,4]</font>
-<font color=navy>//</font>
 <font color=navy>// remember that F is self-adjoint? It means that we can pass just half</font>
 <font color=navy>// (slightly larger than half) of F to inverse real FFT and still get our result.</font>
 <font color=navy>//</font>
@@ -15387,7 +15376,6 @@ using namespace alglib;
    idwfit(builder, model, rep);
    v = idwcalc2(model, 1.0, 0.0);
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 3.000</font>
-<font color=navy>//</font>
 <font color=navy>// Serialization + unserialization to a different instance</font>
 <font color=navy>// of the model <b>class</b>.</font>
    idwserialize(model, s);
@@ -17863,7 +17851,6 @@ using namespace alglib;
    lsfitlinear(y, fmatrix, info, c, rep);
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(info)); <font color=navy>// EXPECTED: 1</font>
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, c.tostring(4).c_str()); <font color=navy>// EXPECTED: [1.98650]</font>
-<font color=navy>//</font>
 <font color=navy>// Linear fitting with individual weights.</font>
 <font color=navy>// Slightly different result is returned.</font>
    real_1d_array w = <font color=blue><b>&quot;[1.414213, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]&quot;</b></font>;
@@ -17909,7 +17896,6 @@ using namespace alglib;
    lsfitlinearc(y, fmatrix, cmatrix, info, c, rep);
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(info)); <font color=navy>// EXPECTED: 1</font>
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, c.tostring(3).c_str()); <font color=navy>// EXPECTED: [0,0.932933]</font>
-<font color=navy>//</font>
 <font color=navy>// Constrained fitting with individual weights</font>
    real_1d_array w = <font color=blue><b>&quot;[1, 1.414213, 1, 1, 1, 1]&quot;</b></font>;
    lsfitlinearwc(y, w, fmatrix, cmatrix, info, c, rep);
@@ -17954,7 +17940,6 @@ using namespace alglib;
    lsfitresults(state, info, c, rep);
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(info)); <font color=navy>// EXPECTED: 2</font>
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, c.tostring(1).c_str()); <font color=navy>// EXPECTED: [1.5]</font>
-<font color=navy>//</font>
 <font color=navy>// Fitting with weights</font>
 <font color=navy>// (you can change weights and see how it changes result)</font>
    real_1d_array w = <font color=blue><b>&quot;[1,1,1,1,1,1,1,1,1,1,1]&quot;</b></font>;
@@ -18051,7 +18036,6 @@ using namespace alglib;
    lsfitresults(state, info, c, rep);
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(info)); <font color=navy>// EXPECTED: 2</font>
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, c.tostring(1).c_str()); <font color=navy>// EXPECTED: [1.5]</font>
-<font color=navy>//</font>
 <font color=navy>// Fitting with weights</font>
 <font color=navy>// (you can change weights and see how it changes result)</font>
    real_1d_array w = <font color=blue><b>&quot;[1,1,1,1,1,1,1,1,1,1,1]&quot;</b></font>;
@@ -18112,7 +18096,6 @@ using namespace alglib;
    lsfitresults(state, info, c, rep);
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(info)); <font color=navy>// EXPECTED: 2</font>
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, c.tostring(1).c_str()); <font color=navy>// EXPECTED: [1.5]</font>
-<font color=navy>//</font>
 <font color=navy>// Fitting with weights</font>
 <font color=navy>// (you can change weights and see how it changes result)</font>
    real_1d_array w = <font color=blue><b>&quot;[1,1,1,1,1,1,1,1,1,1,1]&quot;</b></font>;
@@ -18220,11 +18203,10 @@ using namespace alglib;
 <font color=navy>//       <b>if</b> you want to get representation in the power basis,</font>
 <font color=navy>//       you can use barycentricbar2pow() function to convert</font>
 <font color=navy>//       from barycentric to power representation (see docs <b>for</b> </font>
-<font color=navy>//       POLINT subpackage <b>for</b> more info).</font>
+<font color=navy>//       POLINT subpackage <b>for</b> more information).</font>
    polynomialfit(x, y, m, info, p, rep);
    v = barycentriccalc(p, t);
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 2.011</font>
-<font color=navy>//</font>
 <font color=navy>// Fitting with individual weights</font>
 <font color=navy>//</font>
 <font color=navy>// NOTE: slightly different result is returned</font>
@@ -18309,7 +18291,6 @@ using namespace alglib;
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(info)); <font color=navy>// EXPECTED: 1</font>
    v = spline1dcalc(s, 0.0);
    printf(<font color=blue><b>&quot;%.1f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 0.10</font>
-<font color=navy>//</font>
 <font color=navy>// Fit with VERY large amount of smoothing (rho = 10.0)</font>
 <font color=navy>// and large number of basis functions (M == 50).</font>
 <font color=navy>//</font>
@@ -18320,7 +18301,6 @@ using namespace alglib;
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(info)); <font color=navy>// EXPECTED: 1</font>
    v = spline1dcalc(s, 1.0);
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 0.969</font>
-<font color=navy>//</font>
 <font color=navy>// In real life applications you may need some moderate degree of fitting,</font>
 <font color=navy>// so we try to fit once more with rho == 3.0.</font>
    rho = +3.0;
@@ -18350,7 +18330,6 @@ using namespace alglib;
    printf(<font color=blue><b>&quot;%.1f\n&quot;</b></font>, <b>double</b>(b)); <font color=navy>// EXPECTED: 1.200</font>
    printf(<font color=blue><b>&quot;%.1f\n&quot;</b></font>, <b>double</b>(c)); <font color=navy>// EXPECTED: 0.900</font>
    printf(<font color=blue><b>&quot;%.1f\n&quot;</b></font>, <b>double</b>(d)); <font color=navy>// EXPECTED: 1.000</font>
-<font color=navy>//</font>
 <font color=navy>// Evaluate model at point x == 0.5</font>
    <b>double</b> v;
    v = logisticcalc4(0.5, a, b, c, d);
@@ -18381,7 +18360,6 @@ using namespace alglib;
    printf(<font color=blue><b>&quot;%.1f\n&quot;</b></font>, <b>double</b>(c)); <font color=navy>// EXPECTED: 0.900</font>
    printf(<font color=blue><b>&quot;%.1f\n&quot;</b></font>, <b>double</b>(d)); <font color=navy>// EXPECTED: 1.000</font>
    printf(<font color=blue><b>&quot;%.1f\n&quot;</b></font>, <b>double</b>(g)); <font color=navy>// EXPECTED: 1.200</font>
-<font color=navy>//</font>
 <font color=navy>// Evaluate model at point x == 0.5</font>
    <b>double</b> v;
    v = logisticcalc5(0.5, a, b, c, d, g);
@@ -18943,8 +18921,6 @@ using namespace alglib;
 <font color=navy>//     |   .       </font>
 <font color=navy>//     | .    </font>
 <font color=navy>//     X0----|-----|-----|-----|-----|-----|---</font>
-<font color=navy>//</font>
-<font color=navy>//</font>
    real_2d_array y;
    integer_1d_array idxy;
    ae_int_t nsections;
@@ -19414,7 +19390,6 @@ using namespace alglib;
    polynomialbuildcheb2(-1, +1, y_cheb2, p_cheb2);
    polynomialbar2pow(p_cheb2, a_cheb2);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, a_cheb2.tostring(4).c_str()); <font color=navy>// EXPECTED: [0,-1,+1]</font>
-<font color=navy>//</font>
 <font color=navy>// Now we demonstrate polynomial interpolation without construction </font>
 <font color=navy>// of the barycentricinterpolant structure.</font>
 <font color=navy>//</font>
@@ -21037,7 +21012,6 @@ using namespace alglib;
    rbfcreate(2, 1, model);
    v = rbfcalc2(model, 0.0, 0.0);
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 0.000</font>
-<font color=navy>//</font>
 <font color=navy>// Step 2: we add dataset.</font>
 <font color=navy>//</font>
 <font color=navy>// XY contains two points - x0 == (-1,0) and x1 == (+1,0) -</font>
@@ -21049,7 +21023,6 @@ using namespace alglib;
    rbfsetpoints(model, xy);
    v = rbfcalc2(model, 0.0, 0.0);
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 0.000</font>
-<font color=navy>//</font>
 <font color=navy>// Step 3: rebuild model</font>
 <font color=navy>//</font>
 <font color=navy>// After we've configured model, we should rebuild it -</font>
@@ -21065,7 +21038,6 @@ using namespace alglib;
    rbfsetalgohierarchical(model, 1.0, 3, 0.0);
    rbfbuildmodel(model, rep);
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(rep.terminationtype)); <font color=navy>// EXPECTED: 1</font>
-<font color=navy>//</font>
 <font color=navy>// Step 4: model was built</font>
 <font color=navy>//</font>
 <font color=navy>// After call of rbfbuildmodel(), rbfcalc2() will <b>return</b></font>
@@ -21127,7 +21099,6 @@ using namespace alglib;
 <font color=navy>// asymptotic behavior of our function is linear</font>
    v = rbfcalc2(model, 1000.0, 0.0);
    printf(<font color=blue><b>&quot;%.1f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 502.50</font>
-<font color=navy>//</font>
 <font color=navy>// Instead of linear term we can use constant term. In this case</font>
 <font color=navy>// we will get model which has form</font>
 <font color=navy>//     f(x,y) = SUM(RBF[i]) + c</font>
@@ -21145,7 +21116,6 @@ using namespace alglib;
 <font color=navy>// asymptotic behavior of our function is constant</font>
    v = rbfcalc2(model, 1000.0, 0.0);
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 2.500</font>
-<font color=navy>//</font>
 <font color=navy>// Finally, we can use zero term. Just plain RBF without polynomial</font>
 <font color=navy>// part:</font>
 <font color=navy>//     f(x,y) = SUM(RBF[i])</font>
@@ -21188,7 +21158,6 @@ using namespace alglib;
    rbfsetalgohierarchical(model0, 1.0, 3, 0.0);
    rbfbuildmodel(model0, rep);
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(rep.terminationtype)); <font color=navy>// EXPECTED: 1</font>
-<font color=navy>//</font>
 <font color=navy>// Serialization - it looks easy,</font>
 <font color=navy>// but you should carefully read next section.</font>
    rbfserialize(model0, s);
@@ -21198,7 +21167,6 @@ using namespace alglib;
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 2.500</font>
    v = rbfcalc2(model1, 0.0, 0.0);
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 2.500</font>
-<font color=navy>//</font>
 <font color=navy>// Previous section shows that model state is saved/restored during</font>
 <font color=navy>// serialization. However, some properties are NOT serialized.</font>
 <font color=navy>//</font>
@@ -21265,7 +21233,6 @@ using namespace alglib;
    x = <font color=blue><b>&quot;[+1,+1]&quot;</b></font>;
    rbfcalc(model, x, y);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, y.tostring(2).c_str()); <font color=navy>// EXPECTED: [0.000,0.000]</font>
-<font color=navy>//</font>
 <font color=navy>// Step 2: we add dataset.</font>
 <font color=navy>//</font>
 <font color=navy>// XY arrays containt four points:</font>
@@ -21279,7 +21246,6 @@ using namespace alglib;
 <font color=navy>// If we call rbfcalc(), we still will get 0.0 as result.</font>
    rbfcalc(model, x, y);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, y.tostring(2).c_str()); <font color=navy>// EXPECTED: [0.000,0.000]</font>
-<font color=navy>//</font>
 <font color=navy>// Step 3: rebuild model</font>
 <font color=navy>//</font>
 <font color=navy>// We use hierarchical RBF algorithm with following parameters:</font>
@@ -21295,7 +21261,6 @@ using namespace alglib;
    rbfsetalgohierarchical(model, 1.0, 3, 0.0);
    rbfbuildmodel(model, rep);
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(rep.terminationtype)); <font color=navy>// EXPECTED: 1</font>
-<font color=navy>//</font>
 <font color=navy>// Step 4: model was built</font>
 <font color=navy>//</font>
 <font color=navy>// After call of rbfbuildmodel(), rbfcalc() will <b>return</b></font>
@@ -22140,21 +22105,13 @@ using namespace alglib;
    real_1d_array d1_new;
    real_1d_array d2_new;
 <font color=navy>// First, conversion without differentiation.</font>
-<font color=navy>//</font>
-<font color=navy>//</font>
    spline1dconvcubic(x_old, y_old, x_new, y_new);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, y_new.tostring(3).c_str()); <font color=navy>// EXPECTED: [1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]</font>
-<font color=navy>//</font>
 <font color=navy>// Then, conversion with differentiation (first derivatives only)</font>
-<font color=navy>//</font>
-<font color=navy>//</font>
    spline1dconvdiffcubic(x_old, y_old, x_new, y_new, d1_new);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, y_new.tostring(3).c_str()); <font color=navy>// EXPECTED: [1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]</font>
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, d1_new.tostring(3).c_str()); <font color=navy>// EXPECTED: [-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]</font>
-<font color=navy>//</font>
 <font color=navy>// Finally, conversion with first and second derivatives</font>
-<font color=navy>//</font>
-<font color=navy>//</font>
    spline1dconvdiff2cubic(x_old, y_old, x_new, y_new, d1_new, d2_new);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, y_new.tostring(3).c_str()); <font color=navy>// EXPECTED: [1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]</font>
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, d1_new.tostring(3).c_str()); <font color=navy>// EXPECTED: [-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]</font>
@@ -22191,7 +22148,6 @@ using namespace alglib;
    spline1dbuildcubic(x, y, s);
    v = spline1dcalc(s, t);
    printf(<font color=blue><b>&quot;%.4f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 0.0625</font>
-<font color=navy>//</font>
 <font color=navy>// Test natural boundary conditions: build S(x), calculare S(0.25)</font>
 <font color=navy>// (small interpolation error)</font>
    spline1dbuildcubic(x, y, 5, natural_bound_type, 0.0, natural_bound_type, 0.0, s);
@@ -22229,7 +22185,6 @@ using namespace alglib;
 <font color=navy>// We calculate first derivatives: they must be equal to 2*x</font>
    spline1dgriddiffcubic(x, y, d1);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, d1.tostring(3).c_str()); <font color=navy>// EXPECTED: [-2.0, -1.0, 0.0, +1.0, +2.0]</font>
-<font color=navy>//</font>
 <font color=navy>// Now test griddiff2, which returns first AND second derivatives.</font>
 <font color=navy>// First derivative is 2*x, second is equal to 2.0</font>
    spline1dgriddiff2cubic(x, y, d1, d2);
@@ -23227,7 +23182,6 @@ using namespace alglib;
    spline2dlintransf(snew, 2.0, 3.0);
    v = spline2dcalc(snew, 0.5, 1.0);
    printf(<font color=blue><b>&quot;%.4f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 8.000</font>
-<font color=navy>//</font>
 <font color=navy>// Same example, but <b>for</b> vector spline (f0,f1) = {x+2*y, 2*x+y}</font>
    real_1d_array f2 = <font color=blue><b>&quot;[0.00,0.00, 1.00,2.00, 2.00,1.00, 3.00,3.00]&quot;</b></font>;
    real_1d_array vr;
@@ -24439,7 +24393,6 @@ using namespace alglib;
    ae_int_t jc = 0;
    rmatrixgemm(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, c.tostring(3).c_str()); <font color=navy>// EXPECTED: [[4,3],[2,4]]</font>
-<font color=navy>//</font>
 <font color=navy>// Now we try to apply some simple transformation to operands: C = A*B^T</font>
    optypeb = 1;
    rmatrixgemm(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
@@ -26406,7 +26359,7 @@ Outputs:
                         it is filled by zeros in such cases.
                 *  1    task is solved (but matrix A may be ill-conditioned,
                         check R1/RInf parameters for condition numbers).
-    Rep     -   solver report, see below for more info
+    Rep     -   solver report, see below for more information
     A       -   inverse of matrix A.
                 Array whose indexes range within [0..N-1, 0..N-1].
 
@@ -29841,7 +29794,7 @@ using namespace alglib;
 <font color=navy>// Now S is equal to</font>
 <font color=navy>//   [ 2 1 ]</font>
 <font color=navy>//   [   5 ]</font>
-<font color=navy>// Lets check it by reading matrix contents with sparseget().</font>
+<font color=navy>// Let's check it by reading matrix contents with sparseget().</font>
 <font color=navy>// You may see that with sparseget() you may read both non-zero</font>
 <font color=navy>// and zero elements.</font>
    <b>double</b> v;
@@ -29853,7 +29806,6 @@ using namespace alglib;
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 0.0000</font>
    v = sparseget(s, 1, 1);
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 5.0000</font>
-<font color=navy>//</font>
 <font color=navy>// After successful creation we can use our matrix <b>for</b> linear operations.</font>
 <font color=navy>//</font>
 <font color=navy>// However, there is one more thing we MUST <b>do</b> before using S in linear</font>
@@ -29863,7 +29815,7 @@ using namespace alglib;
 <font color=navy>// attempt to use S in linear operations. </font>
    sparseconverttocrs(s);
 <font color=navy>// Now S is in the CRS format and we are ready to <b>do</b> linear operations.</font>
-<font color=navy>// Lets calculate A*x <b>for</b> some x.</font>
+<font color=navy>// Let's calculate A*x <b>for</b> some x.</font>
    real_1d_array x = <font color=blue><b>&quot;[1,-1]&quot;</b></font>;
    real_1d_array y = <font color=blue><b>&quot;[]&quot;</b></font>;
    sparsemv(s, x, y);
@@ -29930,9 +29882,8 @@ using namespace alglib;
 <font color=navy>// you may see that you can read zero elements (which are not stored) with sparseget()</font>
    v = sparseget(s, 3, 2);
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 0.0000</font>
-<font color=navy>//</font>
 <font color=navy>// After successful creation we can use our matrix <b>for</b> linear operations.</font>
-<font color=navy>// Lets calculate A*x <b>for</b> some x.</font>
+<font color=navy>// Let's calculate A*x <b>for</b> some x.</font>
    real_1d_array x = <font color=blue><b>&quot;[1,-1,1,-1]&quot;</b></font>;
    real_1d_array y = <font color=blue><b>&quot;[]&quot;</b></font>;
    sparsemv(s, x, y);
@@ -31723,7 +31674,7 @@ using namespace alglib;
 <font color=navy>//</font>
 <font color=navy>// using MinBC optimizer with:</font>
 <font color=navy>// * initial point x == [0,0]</font>
-<font color=navy>// * unit scale being set <b>for</b> all variables (see minbcsetscale <b>for</b> more info)</font>
+<font color=navy>// * unit scale being set <b>for</b> all variables (see minbcsetscale <b>for</b> more information)</font>
 <font color=navy>// * stopping criteria set to <font color=blue><b>&quot;terminate after short enough step&quot;</b></font></font>
 <font color=navy>// * OptGuard integrity check being used to check problem statement</font>
 <font color=navy>//   <b>for</b> some common errors like nonsmoothness or bad analytic gradient</font>
@@ -31770,7 +31721,6 @@ using namespace alglib;
    minbcoptimize(state, function1_grad);
    minbcresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [-1,1]</font>
-<font color=navy>//</font>
 <font color=navy>// Check that OptGuard did not report errors</font>
 <font color=navy>//</font>
 <font color=navy>// NOTE: want to test OptGuard? Try breaking the gradient - say, add</font>
@@ -31806,7 +31756,7 @@ using namespace alglib;
 <font color=navy>// using MinBC optimizer with:</font>
 <font color=navy>// * numerical differentiation being used</font>
 <font color=navy>// * initial point x == [0,0]</font>
-<font color=navy>// * unit scale being set <b>for</b> all variables (see minbcsetscale <b>for</b> more info)</font>
+<font color=navy>// * unit scale being set <b>for</b> all variables (see minbcsetscale <b>for</b> more information)</font>
 <font color=navy>// * stopping criteria set to <font color=blue><b>&quot;terminate after short enough step&quot;</b></font></font>
 <font color=navy>// * OptGuard integrity check being used to check problem statement</font>
 <font color=navy>//   <b>for</b> some common errors like nonsmoothness or bad analytic gradient</font>
@@ -31844,7 +31794,6 @@ using namespace alglib;
    minbcoptimize(state, function1_func);
    minbcresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [-1,1]</font>
-<font color=navy>//</font>
 <font color=navy>// Check that OptGuard did not report errors</font>
 <font color=navy>//</font>
 <font color=navy>// Want to challenge OptGuard? Try to make your problem</font>
@@ -32824,7 +32773,7 @@ using namespace alglib;
 <font color=navy>//</font>
 <font color=navy>// using BLEIC optimizer with:</font>
 <font color=navy>// * initial point x == [0,0]</font>
-<font color=navy>// * unit scale being set <b>for</b> all variables (see minbleicsetscale <b>for</b> more info)</font>
+<font color=navy>// * unit scale being set <b>for</b> all variables (see minbleicsetscale <b>for</b> more information)</font>
 <font color=navy>// * stopping criteria set to <font color=blue><b>&quot;terminate after short enough step&quot;</b></font></font>
 <font color=navy>// * OptGuard integrity check being used to check problem statement</font>
 <font color=navy>//   <b>for</b> some common errors like nonsmoothness or bad analytic gradient</font>
@@ -32872,7 +32821,6 @@ using namespace alglib;
    minbleicresults(state, x, rep);
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(rep.terminationtype)); <font color=navy>// EXPECTED: 4</font>
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [-1,1]</font>
-<font color=navy>//</font>
 <font color=navy>// Check that OptGuard did not report errors</font>
 <font color=navy>//</font>
 <font color=navy>// NOTE: want to test OptGuard? Try breaking the gradient - say, add</font>
@@ -32911,7 +32859,7 @@ using namespace alglib;
 <font color=navy>//</font>
 <font color=navy>// using BLEIC optimizer with</font>
 <font color=navy>// * initial point x == [0,0]</font>
-<font color=navy>// * unit scale being set <b>for</b> all variables (see minbleicsetscale <b>for</b> more info)</font>
+<font color=navy>// * unit scale being set <b>for</b> all variables (see minbleicsetscale <b>for</b> more information)</font>
 <font color=navy>// * stopping criteria set to <font color=blue><b>&quot;terminate after short enough step&quot;</b></font></font>
 <font color=navy>// * OptGuard integrity check being used to check problem statement</font>
 <font color=navy>//   <b>for</b> some common errors like nonsmoothness or bad analytic gradient</font>
@@ -32959,7 +32907,6 @@ using namespace alglib;
    minbleicresults(state, x, rep);
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(rep.terminationtype)); <font color=navy>// EXPECTED: 4</font>
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [2,4]</font>
-<font color=navy>//</font>
 <font color=navy>// Check that OptGuard did not report errors</font>
 <font color=navy>//</font>
 <font color=navy>// NOTE: want to test OptGuard? Try breaking the gradient - say, add</font>
@@ -32995,7 +32942,7 @@ using namespace alglib;
 <font color=navy>// using BLEIC optimizer with:</font>
 <font color=navy>// * numerical differentiation being used</font>
 <font color=navy>// * initial point x == [0,0]</font>
-<font color=navy>// * unit scale being set <b>for</b> all variables (see minbleicsetscale <b>for</b> more info)</font>
+<font color=navy>// * unit scale being set <b>for</b> all variables (see minbleicsetscale <b>for</b> more information)</font>
 <font color=navy>// * stopping criteria set to <font color=blue><b>&quot;terminate after short enough step&quot;</b></font></font>
 <font color=navy>// * OptGuard integrity check being used to check problem statement</font>
 <font color=navy>//   <b>for</b> some common errors like nonsmoothness or bad analytic gradient</font>
@@ -33034,7 +32981,6 @@ using namespace alglib;
    minbleicresults(state, x, rep);
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(rep.terminationtype)); <font color=navy>// EXPECTED: 4</font>
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [-1,1]</font>
-<font color=navy>//</font>
 <font color=navy>// Check that OptGuard did not report errors</font>
 <font color=navy>//</font>
 <font color=navy>// Want to challenge OptGuard? Try to make your problem</font>
@@ -33930,7 +33876,7 @@ using namespace alglib;
 <font color=navy>//</font>
 <font color=navy>// using nonlinear conjugate gradient method with:</font>
 <font color=navy>// * initial point x == [0,0]</font>
-<font color=navy>// * unit scale being set <b>for</b> all variables (see mincgsetscale <b>for</b> more info)</font>
+<font color=navy>// * unit scale being set <b>for</b> all variables (see mincgsetscale <b>for</b> more information)</font>
 <font color=navy>// * stopping criteria set to <font color=blue><b>&quot;terminate after short enough step&quot;</b></font></font>
 <font color=navy>// * OptGuard integrity check being used to check problem statement</font>
 <font color=navy>//   <b>for</b> some common errors like nonsmoothness or bad analytic gradient</font>
@@ -33971,7 +33917,6 @@ using namespace alglib;
    mincgoptimize(state, function1_grad);
    mincgresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [-3,3]</font>
-<font color=navy>//</font>
 <font color=navy>// Check that OptGuard did not report errors</font>
 <font color=navy>//</font>
 <font color=navy>// NOTE: want to test OptGuard? Try breaking the gradient - say, add</font>
@@ -34100,7 +34045,6 @@ using namespace alglib;
    mincgoptimize(state, function1_func);
    mincgresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [-3,3]</font>
-<font color=navy>//</font>
 <font color=navy>// ...and to check OptGuard integrity report.</font>
 <font color=navy>//</font>
 <font color=navy>// Want to challenge OptGuard? Try to make your problem</font>
@@ -35178,7 +35122,7 @@ using namespace alglib;
 <font color=navy>//</font>
 <font color=navy>// using LBFGS method, with:</font>
 <font color=navy>// * initial point x == [0,0]</font>
-<font color=navy>// * unit scale being set <b>for</b> all variables (see minlbfgssetscale <b>for</b> more info)</font>
+<font color=navy>// * unit scale being set <b>for</b> all variables (see minlbfgssetscale <b>for</b> more information)</font>
 <font color=navy>// * stopping criteria set to <font color=blue><b>&quot;terminate after short enough step&quot;</b></font></font>
 <font color=navy>// * OptGuard integrity check being used to check problem statement</font>
 <font color=navy>//   <b>for</b> some common errors like nonsmoothness or bad analytic gradient</font>
@@ -35219,7 +35163,6 @@ using namespace alglib;
    minlbfgsoptimize(state, function1_grad);
    minlbfgsresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [-3,3]</font>
-<font color=navy>//</font>
 <font color=navy>// Check that OptGuard did not report errors</font>
 <font color=navy>//</font>
 <font color=navy>// NOTE: want to test OptGuard? Try breaking the gradient - say, add</font>
@@ -35869,7 +35812,7 @@ Outputs:
     X       -   array[0..N-1], solution
     Rep     -   optimization  report;  includes  termination   codes   and
                 additional information. Termination codes are listed below,
-                see comments for this structure for more info.
+                see comments for this structure for more information.
                 Termination code is stored in rep.terminationtype field:
                 * -8    optimizer detected NAN/INF values either in the
                         function itself, or in its Jacobian
@@ -36238,7 +36181,6 @@ using namespace alglib;
    minlmoptimize(state, function1_fvec);
    minlmresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [-3,+3]</font>
-<font color=navy>//</font>
 <font color=navy>// restart optimizer using minlmrestartfrom()</font>
 <font color=navy>//</font>
 <font color=navy>// we can use different starting point, different function,</font>
@@ -36433,7 +36375,6 @@ using namespace alglib;
    minlmreport rep;
    minlmresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [-3,+3]</font>
-<font color=navy>//</font>
 <font color=navy>// Check that OptGuard did not report errors</font>
 <font color=navy>//</font>
 <font color=navy>// NOTE: want to test OptGuard? Try breaking the Jacobian - say, add</font>
@@ -38728,7 +38669,6 @@ using namespace alglib;
    minnlcoptimize(state, nlcfunc1_jac);
    minnlcresults(state, x1, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x1.tostring(2).c_str()); <font color=navy>// EXPECTED: [0.70710,-0.70710]</font>
-<font color=navy>//</font>
 <font color=navy>// Check that OptGuard did not report errors</font>
 <font color=navy>//</font>
 <font color=navy>// NOTE: want to test OptGuard? Try breaking the Jacobian - say, add</font>
@@ -38809,7 +38749,6 @@ using namespace alglib;
 <font color=navy>// and then with SQP, so the effective choice is to use SLP. We recommend</font>
 <font color=navy>// you to use SQP at least <b>for</b> early prototyping stages, and then switch</font>
 <font color=navy>// to AUL <b>if</b> possible.</font>
-<font color=navy>//</font>
    <b>double</b> rho = 1000.0;
    ae_int_t outerits = 5;
    minnlcsetalgoaul(state, rho, outerits);
@@ -38878,7 +38817,6 @@ using namespace alglib;
    minnlcoptimize(state, nlcfunc1_jac);
    minnlcresults(state, x1, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x1.tostring(2).c_str()); <font color=navy>// EXPECTED: [1.0000,0.0000]</font>
-<font color=navy>//</font>
 <font color=navy>// Check that OptGuard did not report errors</font>
 <font color=navy>//</font>
 <font color=navy>// NOTE: want to test OptGuard? Try breaking the Jacobian - say, add</font>
@@ -39038,7 +38976,6 @@ using namespace alglib;
    minnlcoptimize(state, nlcfunc2_jac);
    minnlcresults(state, x1, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x1.tostring(2).c_str()); <font color=navy>// EXPECTED: [-0.70710,-0.70710,0.49306]</font>
-<font color=navy>//</font>
 <font color=navy>// Check that OptGuard did not report errors</font>
 <font color=navy>//</font>
 <font color=navy>// NOTE: want to test OptGuard? Try breaking the Jacobian - say, add</font>
@@ -39840,8 +39777,6 @@ using namespace alglib;
 <font color=navy>//       This note is here to warn you that you should be very careful when</font>
 <font color=navy>//       you solve nonsmooth optimization problems. Visual inspection of</font>
 <font color=navy>//       results is essential.</font>
-<font color=navy>//</font>
-<font color=navy>//</font>
    minnsoptimize(state, nsfunc1_jac);
    minnsresults(state, x1, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x1.tostring(2).c_str()); <font color=navy>// EXPECTED: [1.0000,0.0000]</font>
@@ -41580,7 +41515,6 @@ using namespace alglib;
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%d\n&quot;</b></font>, <b>int</b>(rep.terminationtype)); <font color=navy>// EXPECTED: 4</font>
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [2.5,2]</font>
-<font color=navy>//</font>
 <font color=navy>// Solve problem with BLEIC-based QP solver.</font>
 <font color=navy>//</font>
 <font color=navy>// This solver is intended <b>for</b> problems with moderate (up to 50) number</font>
@@ -41591,7 +41525,6 @@ using namespace alglib;
    minqpoptimize(state);
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [2.5,2]</font>
-<font color=navy>//</font>
 <font color=navy>// Solve problem with DENSE-AUL solver.</font>
 <font color=navy>//</font>
 <font color=navy>// This solver is optimized <b>for</b> problems with up to several thousands of</font>
@@ -41660,7 +41593,6 @@ using namespace alglib;
    minqpoptimize(state);
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(1).c_str()); <font color=navy>// EXPECTED: [1.500,0.500]</font>
-<font color=navy>//</font>
 <font color=navy>// Solve problem with DENSE-AUL solver.</font>
 <font color=navy>//</font>
 <font color=navy>// This solver is optimized <b>for</b> problems with up to several thousands of</font>
@@ -41674,7 +41606,6 @@ using namespace alglib;
    minqpoptimize(state);
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(1).c_str()); <font color=navy>// EXPECTED: [1.500,0.500]</font>
-<font color=navy>//</font>
 <font color=navy>// Solve problem with QuickQP solver.</font>
 <font color=navy>//</font>
 <font color=navy>// This solver is intended <b>for</b> medium and large-scale problems with box</font>
@@ -41750,7 +41681,6 @@ using namespace alglib;
    minqpoptimize(state);
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [2,2]</font>
-<font color=navy>//</font>
 <font color=navy>// Solve problem with DENSE-AUL solver.</font>
 <font color=navy>//</font>
 <font color=navy>// This solver is optimized <b>for</b> problems with up to several thousands of</font>
@@ -41769,7 +41699,7 @@ using namespace alglib;
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [2,2]</font>
 <font color=navy>// Hmm... this problem is bounded from below (has solution) only under constraints.</font>
-<font color=navy>// What it we remove them?</font>
+<font color=navy>// What if we remove them?</font>
 <font color=navy>//</font>
 <font color=navy>// You may see that BLEIC algorithm detects unboundedness of the problem, </font>
 <font color=navy>// -4 is returned as completion code. However, DENSE-AUL is unable to detect</font>
@@ -41841,7 +41771,6 @@ using namespace alglib;
    minqpoptimize(state);
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [3,2]</font>
-<font color=navy>//</font>
 <font color=navy>// Solve problem with BLEIC-based QP solver.</font>
 <font color=navy>//</font>
 <font color=navy>// This solver is intended <b>for</b> problems with moderate (up to 50) number</font>
@@ -41853,7 +41782,6 @@ using namespace alglib;
    minqpoptimize(state);
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [3,2]</font>
-<font color=navy>//</font>
 <font color=navy>// Solve problem with DENSE-AUL solver.</font>
 <font color=navy>//</font>
 <font color=navy>// This solver is optimized <b>for</b> problems with up to several thousands of</font>
@@ -43640,7 +43568,7 @@ Outputs:
                 * -4    SVD subroutine failed
                 * -1    if NRows &le; 0 or NCols &le; 0 or Threshold &lt; 0 was passed
                 *  1    if task is solved
-    Rep     -   solver report, see below for more info
+    Rep     -   solver report, see below for more information
     X       -   array[0..N-1,0..M-1], it contains:
                 * solution of A*X == B (even for singular A)
                 * zeros, if SVD subroutine failed
@@ -44794,8 +44722,7 @@ Outputs:
                             from other thread.
                 * Rep.IterationsCount contains iterations count
                 * Rep.NMV contains number of matrix-vector calculations
-                * Rep.R2 contains squared residual
-s
+                * Rep.R2 contains squared residuals
 ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -45851,11 +45778,12 @@ ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
 <a name=sub_nleqrestartfrom></a><h6 class=pageheader>nleqrestartfrom Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
-This  subroutine  restarts  CG  algorithm from new point. All optimization
-parameters are left unchanged.
+This subroutine restarts the NL-EQ algorithm from a new point.
+All optimization parameters are left unchanged.
 
-This  function  allows  to  solve multiple  optimization  problems  (which
-must have same number of dimensions) without object reallocation penalty.
+This function allows one to solve multiple optimization problems
+(which must have same number of dimensions)
+without object reallocation penalty.
 
 Inputs:
     State   -   structure used for reverse communication previously
